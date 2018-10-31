@@ -152,3 +152,14 @@ zimage/categoryA/categoryA1/xxxx.png
 
 
 ```
+
+
+
+## 文章与图片的命名方式
+
+
+```
+文章命名方式:    (001)XXXXX   ----》 (999)XXXXX
+对应文章内图片命名方式:   001_xxxx.png     999_xxxx.png
+
+```
