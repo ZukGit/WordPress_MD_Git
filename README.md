@@ -163,3 +163,14 @@ zimage/categoryA/categoryA1/xxxx.png
 对应文章内图片命名方式:   001_xxxx.png     999_xxxx.png
 
 ```
+
+
+## MD文件命令方式
+```
+在主分类文件夹下    从三级分类起开始添加01   99 标签
+/一级分类/二级分类_01三级分类_01四级分类
+/一级分类/二级分类_99三级分类_99四级分类
+
+/tool/androidstudio.md
+/tool/androidstudio_01help_xxxx.md
+```
