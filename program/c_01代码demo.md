@@ -1,5 +1,6 @@
 
-## C语言布尔bool实现方式-宏
+
+# C语言布尔bool实现方式-宏
 
 ```
 
@@ -69,9 +70,9 @@ BOOL is_empty (const struct array *pArr)
 ```
 
 
-## C语言执行CMD命令
+# C语言执行CMD命令
 
-<img src=""/>
+
 <img src="//../zimage/program/c/c_cmd.jpg">
 ```
 

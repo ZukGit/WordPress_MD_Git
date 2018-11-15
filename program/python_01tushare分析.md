@@ -1,4 +1,4 @@
-#  Tusahre
+#  Tusahre简介
 ```
 tushare简介; 
      Tushare是一个免费、开源的python财经数据接口包。主要实现对股票等金融数据从数据采集、
@@ -16,7 +16,7 @@ pandas.set_option('display.max_rows', None)
 pandas.set_option('display.max_columns', None)
 ```
 
-
+# get_k_data【获取K线数据集合】
 ```
 函数1：  get_k_data   【获取K线数据集合】
 print ts.get_k_data('300104',autype=None,start='2018-06-17',end='2018-08-17')
@@ -186,6 +186,7 @@ print  ts.get_k_data(code='300104',ktype='5')
 ```
 
 
+# get_today_all【获取当日所有股票交易信息】
 ```
 函数2：  ts.get_today_all   【获取当日所有股票交易信息】
 import tushare as ts
@@ -220,7 +221,7 @@ print ts.get_today_all()
 ```
 
 
-
+# get_industry_classified【获取当日所有股票行业分类】
 ```
 函数3：  ts.get_industry_classified()   【 行业分类 】
 print ts.get_industry_classified()
@@ -427,7 +428,7 @@ print ts.get_industry_classified()
 
 ```
 
-
+# get_concept_classified【获取当日所有股票 概念分类】
 ```
 函数4：ts.get_concept_classified()                 概念分类
 print  ts.get_concept_classified()  
@@ -600,7 +601,7 @@ print  ts.get_concept_classified()
 ```
 
 
-
+# get_area_classified【获取当日所有股票 地域分类】
 ```
 函数5：ts.get_area_classified()               地域分类
 print  ts.get_area_classified()
@@ -641,7 +642,7 @@ print  ts.get_area_classified()
 
 ```
 
-
+# get_sme_classified【 中小板分类 】
 ```
 函数6：get_sme_classified()               中小板分类
 print  ts.get_sme_classified()
@@ -665,6 +666,7 @@ print  ts.get_sme_classified()
 
 
 
+# get_gem_classified【 创业板分类 】
 ```
 函数7：get_gem_classified()               创业板分类
 print  ts.get_gem_classified()
@@ -690,7 +692,7 @@ print  ts.get_gem_classified()
 ```
 
 
-
+# get_st_classified【 风险警示板分类 】
 ```
 函数8：get_st_classified()               风险警示板分类
 print  ts.get_st_classified()
@@ -710,7 +712,7 @@ print  ts.get_st_classified()
 ```
 
 
-
+# get_hs300s【 沪深300成份股及权重 】
 ```
 函数8：get_hs300s()               沪深300成份股及权重
 print ts.get_hs300s()
@@ -747,8 +749,7 @@ print ts.get_hs300s()
 
 ```
 
-
-
+# get_sz50s【 上证50成份股 】
 ```
 函数9：get_sz50s()               上证50成份股
 print ts.get_sz50s()
@@ -809,9 +810,9 @@ print ts.get_sz50s()
 
 
 
-
+# get_stock_basics【 当前股票信息详情列表 】
 ```
-函数10：get_stock_basics()               上证50成份股
+函数10：get_stock_basics()               当前股票信息详情列表
 print ts.get_stock_basics()
 
 
@@ -855,9 +856,14 @@ code name industry area  pe outstanding totals totalAx liquidAx fixedAx reserved
 
 ```
 
+| code代码 | name名称   | industry产业  | area区域  | pe市盈率  | outstanding流通股  |  totals总股  | liquidAx资产合计  | fixedAx流动资产|  fixedAssets固定资产 |  reserved公积金 |  reservedPerShare每股公积金 | esp每股收益  |  bvps每股净资产 |  pb市净率 | timeToMarket上市时间  |  undp未分利润 | perundp每股未分配利润  | rev营业收入增加率 | profit利润增长率  | gpr毛利率  | npr净利润率  |  holders股东人数 |
+| :------------ | :------------ | :------------ | :------------ | :------------ | :------------ | :------------ | :------------ | :------------ | :------------ | :------------ | :------------ | :------------ | :------------ | :------------ | :------------ | :------------ | :------------ | :------------ | :------------ | :------------ | :------------ | :------------ |
+|  600401 | *ST海润   |  半导体    | 江苏  |  0.000  | 47.25   |  47.25 | 1.299362e+06   | 4.599338e+05  |  576208.38   |  125456.07 |   0.27 | -0.041   |  0.21  | 0.000    | 20030924  |  -4.965379e+05 | -1.05  | -61.50   |  31.13   |   1.45 |   -67.05 |  241924.0 |
 
 
 
+
+# get_report_data【 获取指定季度股票的业绩报表数据 】
 ```
 函数11：get_report_data(2014,3)           #获取2014年第3季度的业绩报表数据
 print ts.get_report_data(2014,3)
@@ -889,6 +895,7 @@ report_date,发布日期
 
 
 
+# get_profit_data【 获取指定季度股票的业绩盈利数据 】
 ```
 函数12：get_profit_data(2017,3)       #获取2017年第3季度的业绩报表数据
 print ts.get_profit_data(2017,3)
@@ -917,8 +924,14 @@ bips,每股主营业务收入(元)
 ```
 
 
+| code代码  | name名称  | roe净资产收益率(%)  | net_profit_ratio净利率(%)|  gross_profit_rate毛利率(%)| net_profits净利润(万元)  | esp每股收益  | business_income营业收入(百万元)  | bips每股主营业务收入(元)  |  
+| ------------ | ------------ | ------------ | ------------ | ------------ | ------------ | ------------ | ------------ | ------------ | ------------ | ------------ |
+| 600793  | 宜宾纸业  |   65.40 | 13.31  |  7.9084  | 100.6484    | 0.9558   |  7.558083e+02 |  7.1776  | 
 
 
+
+
+# get_operation_data【 获取股票的营运能力数据 】
 ```
 函数13： get_operation_data(2017,3)       #获取2017年第3季度的营运能力数据
 print ts.get_operation_data(2017,3) 
@@ -944,7 +957,7 @@ currentasset_days,流动资产周转天数(天)
 ```
 
 
-
+# get_growth_data【 获取股票的成长能力数据 】
 
 ```
 函数14： get_growth_data(2017,3)       #获取2017年第3季度的成长能力数据，结果返回的数据属性说明如下：
@@ -976,7 +989,7 @@ seg,股东权益增长率
 
 
 
-
+# get_debtpaying_data【 获取股票的偿债能力数据 】
 ```
 函数15： get_debtpaying_data(2018,1)       #获取2018年第1季度的偿债能力数据 
 print ts.get_debtpaying_data(2018,1) 
@@ -1008,7 +1021,7 @@ adratio,股东权益增长率
 
 
 
-
+# get_cashflow_data【 获取股票的现金流量数据 】
 ```
 函数16： get_cashflow_data(2018,1)       #获取2018年第1季度的现金流量数据
 print ts.get_cashflow_data(2018,1) 
@@ -1039,7 +1052,7 @@ cashflowratio,现金流量比率
 
 
 
-
+# get_realtime_quotes【 获取股票的实时交易数据 】
 ```
 函数17： get_realtime_quotes('600113')       #获取股票代码 600113 的 实时交易数据
 print ts.get_realtime_quotes('600113') 
@@ -1095,7 +1108,7 @@ print ts.get_realtime_quotes('600113')
 
 
 
-
+# get_today_ticks【 获取股票的当前交易日交易数据 】
 ```
 【get_k_data 替换】
 函数18： get_today_ticks('600113')       #  获取当前交易日（交易进行中使用）已经产生的分笔明细数据。
@@ -1140,7 +1153,7 @@ type：买卖类型【买盘、卖盘、中性盘】
 
 
 
-
+# get_tick_data【 获取个股以往交易历史的分笔数据明细 】
 ```
 【get_k_data 替换】
 函数19： ts.get_tick_data('600848',date='2014-01-09')       #  获取个股以往交易历史的分笔数据明细，通过分析分笔数据，可以大致判断资金的进出情况
@@ -1189,7 +1202,8 @@ type：买卖类型【买盘、卖盘、中性盘】
 
 
 
-
+# get_index【 获取大盘指数实时行情列表 】
+【表格的形式展示大盘指数实时行情】
 ```
 函数20： get_index()       # 获取大盘指数实时行情列表，以表格的形式展示大盘指数实时行情。
 print  ts.get_index() 
@@ -1243,7 +1257,7 @@ amount:成交金额（亿元）
 
 
 
-
+# get_sina_dd 【获取大单交易数据 数据来源于新浪财经  】
 ```
 【get_k_data 替换】
 函数21： ts.get_sina_dd('600848', date='2015-12-24', vol=500)       # 获取大单交易数据，默认为大于等于400手，数据来源于新浪财经。
@@ -1290,7 +1304,7 @@ code    name      time      price  volume  preprice  type
 ```
 
 
-
+# get_deposit_rate 【 获取存款利率 】
 ```
 函数22： get_deposit_rate()       # 获取存款利率
 print  ts.get_deposit_rate() 
@@ -1850,7 +1864,7 @@ print  ts.get_deposit_rate()
 
 
 
-
+# get_loan_rate 【 获取贷款利率 】
 ```
 函数23： get_loan_rate()       # 获取贷款利率¶
 print  ts.get_loan_rate() 
@@ -2668,7 +2682,7 @@ rate:利率（%）
 
 ```
 
-
+# get_money_supply 【 获取货币供应量 】
 ```
 函数24： get_money_supply()       # 获取货币供应量
 print  ts.get_money_supply() 
@@ -3243,7 +3257,7 @@ rests:其他存款(亿元)
 
 
 
-
+# get_gdp_year 【 国内生产总值(年度) 】
 ```
 函数26： get_gdp_year()       # 国内生产总值(年度)
 print  ts.get_gdp_year() 
@@ -3340,7 +3354,7 @@ lbdy :批发零售贸易及餐饮业(亿元)
 
 
 
-
+# get_gdp_quarter 【 国内生产总值(季度)】
 ```
 函数27： get_gdp_quarter()       # 国内生产总值(季度)
 print  ts.get_gdp_quarter() 
@@ -3515,7 +3529,7 @@ ti_yoy :第三产业增加值同比增长(%)
 
 
 
-
+# get_cpi 【 居民消费价格指数 】
 ```
 函数28： get_cpi()       # 居民消费价格指数
 print  ts.get_cpi() 
@@ -3588,7 +3602,7 @@ cpi :价格指数
 
 
 
-
+# get_ppi 【 工业品出厂价格指数 】
 ```
 函数29： get_ppi()       # 工业品出厂价格指数
 print  ts.get_ppi() 
@@ -3674,7 +3688,7 @@ dcg:耐用消费品价格指数
 
 
 
-
+# get_latest_news 【 即时新闻   默认获取最近80条新闻数据 】
 ```
 函数30： get_ppi()       # 即时新闻   默认获取最近80条新闻数据，只提供新闻类型、链接和标题
 print  ts.get_latest_news()
@@ -3716,7 +3730,7 @@ content:新闻内容（在show_content为True的情况下出现）
 
 
 
-
+# get_notices 【 信息地雷 】
 ```
 函数31： get_notices()       # 信息地雷
 print  ts.get_notices()
@@ -3736,8 +3750,7 @@ url:信息内容URL
 
 ```
 
-
-
+# top_list 【 龙虎榜 】
 ```
 函数32： top_list()       # 龙虎榜
 print  ts.top_list()
@@ -3901,7 +3914,7 @@ date：日期
 
 
 
-
+# realtime_boxoffice 【 获取实时电影票房数据 】
 ```
 函数33： realtime_boxoffice()       # 获取实时电影票房数据，30分钟更新一次票房数据，可随时调用。
 print  ts.realtime_boxoffice()
@@ -3936,7 +3949,7 @@ time 数据获取时间
 
 
 
-
+# day_boxoffice 【 获取单日电影票房数据 】
 ```
 函数34： day_boxoffice()       # 获取单日电影票房数据，默认为上一日的电影票房
 print  ts.day_boxoffice()
@@ -3963,7 +3976,7 @@ WomIndex 口碑指数
 
 
 
-
+# day_cinema 【 获取全国影院单日票房排行数据 】
 ```
 函数35： day_cinema()       # 获取全国影院单日票房排行数据，默认为上一日，可输入日期参数获取指定日期的数据。
 print  ts.day_cinema()
@@ -4095,7 +4108,7 @@ price 场均票价（元）
 
 
 
-
+# profit_data 【 获取股票的送转和分红预案情况 】
 ```
 函数36: profit_data(top=100)     ## 能返回股票的送转和分红预案情况。
 print  ts.profit_data(top=100)
@@ -4232,7 +4245,7 @@ shares:转增和送股数（每10股）
 
 
 
-
+# new_stocks 【 获取新股数据 】
 ```
 函数37: new_stocks()     ## 新股数据
 print ts.new_stocks()
@@ -4301,7 +4314,7 @@ ballot:网上中签率(%)
 
 
 
-
+# sh_margins 【 获取融资融券 】
 ```
 函数38: sh_margins(start='2018-08-01', end='2018-01-19')     ## 融资融券（沪市）
 print ts.sh_margins(start='2018-08-01', end='2018-01-19')

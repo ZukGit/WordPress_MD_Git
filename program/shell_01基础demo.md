@@ -1,5 +1,5 @@
 
-## shell操作demo1
+# shell脚本一
 
 ```
 #!/bin/bash
@@ -161,7 +161,8 @@ done  > output.txt    ## 可以在done后面重定向输出内容到文件  而�
 ```
 
 
-## shell脚本demo2
+# shell脚本二
+
 
 ```
 1.getcode1.sh
@@ -257,7 +258,7 @@ cd "$newPath"
 
 
 
-## expect交互脚本
+# expect交互脚本
 
 ```
 
@@ -270,7 +271,7 @@ interact
 
 ```
 
-##  git提交脚本
+#  git提交脚本
 ```
 
 
@@ -282,7 +283,7 @@ git push origin master
 ```
 
 
-##  别名设置
+#  别名设置
 
 ```
 vim  /etc/bashrc

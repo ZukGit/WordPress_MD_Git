@@ -599,37 +599,43 @@ http://api.qingyunke.com/api.php?key=free&appid=0&msg=翻译fuck you
 
 ```
 
-```  查看IP地址归属
+```  
+查看IP地址归属
 http://api.qingyunke.com/api.php?key=free&appid=0&msg=归属43.226.44.170
 
 {"result":0,"content":"查询：43.226.44.170{br}归属：中国辽宁大连"}
 ```
 
 
-```  查看IP地址归属
+```  
+查看IP地址归属
 http://api.qingyunke.com/api.php?key=free&appid=0&msg=归属18001854227
 
 {"result":0,"content":"查询：43.226.44.170{br}归属：中国辽宁大连"}
 ```
 
 
-```  翻译播报
+```  
+翻译播报
 https://ss0.baidu.com/6KAZsjip0QIZ8tyhnq/text2audio?tex=黄色&cuid=dict&lan=en&ctp=1&pdt=30&vol=100&spd=3
 ```
 
 
-```  数字文字播报
+```  
+数字文字播报
 https://ss0.baidu.com/6KAZsjip0QIZ8tyhnq/text2audio?tex=你好百度，你是谁，你在哪啊
 &cuid=dict&lan=zh&ctp=1&pdt=30&vol=100&spd=3
 ```
 
 
-```  数字文字播报
+```  
+数字文字播报
 https://ss0.baidu.com/6KAZsjip0QIZ8tyhnq/text2audio?tex=你好百度，你是谁，你在哪啊
 &cuid=dict&lan=zh&ctp=1&pdt=30&vol=100&spd=3
 ```
 
-```  数字文字播报
+```  
+数字文字播报
 https://ss0.baidu.com/6KAZsjip0QIZ8tyhnq/text2audio?tex=red and yellow
 &cuid=dict&lan=en&ctp=1&pdt=30&vol=100&spd=3
 ``` 
