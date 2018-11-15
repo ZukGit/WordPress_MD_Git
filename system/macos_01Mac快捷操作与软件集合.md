@@ -14,10 +14,33 @@ Command + T  // 打开一个当前焦点窗口的新窗口
 
 Command + ,(逗号)  // 打开一个当前焦点窗口的设置偏好窗口
 
+Shift + Command + 3   // 全屏截屏
 
-Command +  ↑    // 在当前窗口中回到上一个记录
-Command + 【    // 在当前窗口中历史记录往前记录
-Command +  】    // 在当前窗口中历史记录往后记录
+Shift + Command + 4   // 手动截屏
+
+Option + Command + D   // 隐藏Dock
+
+Command + C               // 拷贝选中项
+Command + W               // 关闭当前应用
+Command + F               // 打开文件搜索
+Command +  i             // 显示文件夹详情
+Command +  L             // 为选中项创建快捷方式
+Command +  F3             // 最小化所有窗口
+Command +  H             // 隐藏当前的窗口
+Command +  1 | 2| 3 | 4              // 在文件夹中调整文件的显示样式
+Command + Shift + .（句号） //显示隐藏文件
+
+Command +  delete              // 删除选中项
+Shift + Tab    // 切换打开的应用
+Control + 空格    // 切换输入法
+
+
+
+defaults write com.apple.finder _FXShowPosixPathInTitle -bool TRUE;killall Finder   //打开Finder显示路径
+
+defaults delete com.apple.finder _FXShowPosixPathInTitle;killall Finder  //恢复默认Finder显示
+
+
 
 
 ```
@@ -61,7 +84,8 @@ Command + Shift + .（句号） //显示隐藏文件
 
 Shift + Command + G     //  在Find中 打开前往文件夹弹框
 
-
+Shift + Command + H   // 打开当前用户Home目录
+Shift + Command + K   // 打开网络(打开网络路由硬盘)
 Shift + Command + A     //  在Finder中快速打开我的程序路径
 Shift + Command + C     //  在Finder中快速打开我的电脑 盘符路径
 Shift + Command + D     //  在Finder中快速打开我的桌面路径
