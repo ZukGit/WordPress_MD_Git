@@ -476,7 +476,7 @@ Preferences - Profiles - Profiles Name -
 
 ```
 
-<img src="//../zimage/system/macos/iterm.png">
+<img src="//../zimage/system/macos/01_macware/iterm.png">
 # J
 # K
 # L

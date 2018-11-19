@@ -1,5 +1,10 @@
 # markdownpad2 侧边导航栏代码<头文件>
 
+
+<img src="//../zimage/tool/markdownpad2/markdownpad_01.jpg"/>
+
+**工具 》 选项 》 高级 》 HTML表头编辑器 **
+
 ```
 
 <script src="http://code.jquery.com/jquery-1.7.2.min.js"></script>
