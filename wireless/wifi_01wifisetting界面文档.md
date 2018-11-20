@@ -14,6 +14,8 @@
 
 <img src="//../zimage/wireless/wifi/01_wifisetting/16.png" width = "25%" height="25%"/>   <img src="//../zimage/wireless/wifi/01_wifisetting/17.png" width = "25%" height="25%"/>   <img src="//../zimage/wireless/wifi/01_wifisetting/18.png" width = "25%" height="25%"/> 
 
+<img src="//../zimage/wireless/wifi/01_wifisetting/29.png" width = "25%" height="25%"/><img src="//../zimage/wireless/wifi/01_wifisetting/30.png" width = "25%" height="25%"/>  
+  
 
 
 
@@ -6356,4 +6358,66 @@ else if (preference == mWifiAllowScansWithTraffic) {
         }
     
         
+```
+
+
+## WIFI UA38 分析
+
+<img src="//../zimage/wireless/wifi/01_wifisetting/30.png" width = "25%" height="25%"/>
+```
+packages/apps/Settings/res/values/strings.xml#6730
+
+<!-- [CHAR LIMIT=130] Preference title for Wi-Fi always scanning -->
+<string name="location_scanning_wifi_always_scanning_title">Wi\u2011Fi scanning</string>
+
+
+<!-- Preference description text for Wi-Fi always scanning -->
+<string name="location_scanning_wifi_always_scanning_description">Allow apps and services to scan for Wi\u2011Fi networks at any time, even when Wi\u2011Fi is off. This can be used, for example, to improve location-based features and services.</string>
+
+
+
+```
+
+```
+/packages/apps/Settings/res/xml/location_scanning.xml
+
+
+<?xml version="1.0" encoding="utf-8"?>
+
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+        android:title="@string/location_scanning_screen_title"
+        android:key="scanning_screen">
+
+        <SwitchPreference
+            android:title="@string/location_scanning_wifi_always_scanning_title"
+            android:summary="@string/location_scanning_wifi_always_scanning_description"
+            android:defaultValue="true"
+            android:key="wifi_always_scanning" />
+
+        <SwitchPreference
+            android:title="@string/location_scanning_bluetooth_always_scanning_title"
+            android:summary="@string/location_scanning_bluetooth_always_scanning_description"
+            android:defaultValue="true"
+            android:key="bluetooth_always_scanning" />
+
+</PreferenceScreen>
+
+
+
+
+```
+
+
+## WIFI UA39 分析
+
+<img src="//../zimage/wireless/wifi/01_wifisetting/30.png" width = "25%" height="25%"/>
+```
+<!-- [CHAR LIMIT=130] Preference title for Wi-Fi always scanning -->
+<string name="location_scanning_wifi_always_scanning_title">Wi\u2011Fi scanning</string>
+
+
+<!-- Preference description text for Wi-Fi always scanning -->
+<string name="location_scanning_wifi_always_scanning_description">Allow apps and services to scan for Wi\u2011Fi networks at any time, even when Wi\u2011Fi is off. This can be used, for example, to improve location-based features and services.</string>
+
+
 ```
