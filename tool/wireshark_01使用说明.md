@@ -2600,5 +2600,195 @@ min-val   max-val:  包含了在该长度区间内最小和最大长度的帧的
 
 
 
+# wireshark 过滤表达式
+
+## 帧分类过滤列表
+|  帧类型 |  帧分类  |过滤器语法  |   
+| ------------ | ------------ |  ------------ | 
+| ManagementFrame管理帧                  |  管理帧 wlan.fc.type == 0         | wlan.fc.type == 0   | 
+| ControlFrame控制帧                     |  控制帧  wlan.fc.type == 1        |  wlan.fc.type == 1  | 
+| Data数据帧                             |  数据帧  wlan.fc.type == 2        |  wlan.fc.type == 2  | 
+| Association Request 关联请求帧         |  管理帧 wlan.fc.type == 0         |   wlan.fc.type_subtype == 0x00  | 
+| Association Response 关联响应帧        |  管理帧 wlan.fc.type == 0         |   wlan.fc.type_subtype == 0x01  | 
+| ReAssociation Request 重关联请求帧     |  管理帧 wlan.fc.type == 0         |   wlan.fc.type_subtype == 0x02  | 
+| ReAssociation Response 重关联响应帧    |  管理帧 wlan.fc.type == 0         |   wlan.fc.type_subtype == 0x03  | 
+|Probe Request 探测周围无线网络的探测帧   |  管理帧 wlan.fc.type == 0         |   wlan.fc.type_subtype == 0x04  | 
+|Probe Response 无线网络响应的探测回复帧  |  管理帧 wlan.fc.type == 0         |   wlan.fc.type_subtype == 0x05  | 
+| Beacon 无线网络持续发送的HeatBeat心跳帧 |  管理帧 wlan.fc.type == 0         |   wlan.fc.type_subtype == 0x08  | 
+| Disassociate 取消关联帧                |  管理帧 wlan.fc.type == 0         |   wlan.fc.type_subtype == 0x0A  | 
+| Authentication 认证帧                  |  管理帧 wlan.fc.type == 0         |   wlan.fc.type_subtype == 0x0B  | 
+| Deauthentication 取消认证帧            |  管理帧 wlan.fc.type == 0         |   wlan.fc.type_subtype == 0x0C  |
+| Action Frame 触发测量动作帧            |  管理帧 wlan.fc.type == 0         |   wlan.fc.type_subtype == 0x0D  |  
+| Block ACK Request 块确认请求帧         |  控制帧  wlan.fc.type == 1        |   wlan.fc.type_subtype == 0x18  |  
+| Block ACK  块确认响应帧                |  控制帧  wlan.fc.type == 1        |   wlan.fc.type_subtype == 0x19  | 
+| Power save poll 省电轮询帧             |  控制帧  wlan.fc.type == 1        |   wlan.fc.type_subtype == 0x1A  |  
+| Request to Send RTS 请求发送帧         |  控制帧  wlan.fc.type == 1        |   wlan.fc.type_subtype == 0x1B  |    
+| Clear to Send CTS 准予发送帧           |  控制帧  wlan.fc.type == 1        |   wlan.fc.type_subtype == 0x1C  |  
+|ACK  数据帧确认接收帧                   |  控制帧  wlan.fc.type == 1         |   wlan.fc.type_subtype == 0x1D  |  
+|Content free period end 无竞争结束帧    |  控制帧  wlan.fc.type == 1         |   wlan.fc.type_subtype == 0x1E  | 
+| 携带data数据帧                         |  数据帧  wlan.fc.type == 2         |   wlan.fc.type_subtype == 0x20 |  
+|NULL data空数据帧                       |  数据帧  wlan.fc.type == 2         |   wlan.fc.type_subtype == 0x24  | 
+|Qos data  Qos服务质量数据帧             |  数据帧  wlan.fc.type == 2         |   wlan.fc.type_subtype == 0x28  | 
+|Null Qos data  空Qos服务质量数据帧      |  数据帧  wlan.fc.type == 2         |   wlan.fc.type_subtype == 0x2C  | 
 
 
+## 所有可能帧组合
+
+```
+ 2位比特 决定帧分类  00管理帧   01控制帧   10数据帧   11扩展帧
+管理帧  wlan.fc.type == 0 
+ wlan.fc.type_subtype == 0x00_____【Association Request】
+ wlan.fc.type_subtype == 0x01_____【Association Response】
+ wlan.fc.type_subtype == 0x02_____【Reassociation Request】
+ wlan.fc.type_subtype == 0x03_____【Reassociation Response】
+ wlan.fc.type_subtype == 0x04_____【Probe Request】
+ wlan.fc.type_subtype == 0x05_____【Probe Response】
+ wlan.fc.type_subtype == 0x06_____
+ wlan.fc.type_subtype == 0x07_____
+ wlan.fc.type_subtype == 0x08_____【Beacon】
+ wlan.fc.type_subtype == 0x09_____
+ wlan.fc.type_subtype == 0x0A_____【Disassociate】
+ wlan.fc.type_subtype == 0x0B_____【Authentication】
+ wlan.fc.type_subtype == 0x0C_____【Deauthentication】
+ wlan.fc.type_subtype == 0x0D_____【Action Frame 】
+ wlan.fc.type_subtype == 0x0E_____
+ wlan.fc.type_subtype == 0x0F_____【★ Malformed Packet】
+
+
+
+
+
+控制帧 wlan.fc.type == 1 
+ wlan.fc.type_subtype == 0x10_____
+ wlan.fc.type_subtype == 0x11_____
+ wlan.fc.type_subtype == 0x12_____
+ wlan.fc.type_subtype == 0x13_____
+ wlan.fc.type_subtype == 0x14_____
+ wlan.fc.type_subtype == 0x15_____
+ wlan.fc.type_subtype == 0x16_____
+ wlan.fc.type_subtype == 0x17_____
+ wlan.fc.type_subtype == 0x18_____【Block ACK Request】 
+ wlan.fc.type_subtype == 0x19_____【Block ACK Response】 
+ wlan.fc.type_subtype == 0x1A_____【Power save poll】
+ wlan.fc.type_subtype == 0x1B_____【 RTS 】
+ wlan.fc.type_subtype == 0x1C_____【 CTS 】
+ wlan.fc.type_subtype == 0x1D_____【 ACK 】
+ wlan.fc.type_subtype == 0x1E_____【Content free period end 】
+ wlan.fc.type_subtype == 0x1F_____
+
+
+
+
+数据帧   wlan.fc.type == 2 
+ wlan.fc.type_subtype == 0x20_____【 data 】
+ wlan.fc.type_subtype == 0x21
+ wlan.fc.type_subtype == 0x22
+ wlan.fc.type_subtype == 0x23
+ wlan.fc.type_subtype == 0x24_____【NULL data】
+ wlan.fc.type_subtype == 0x25
+ wlan.fc.type_subtype == 0x26
+ wlan.fc.type_subtype == 0x27
+ wlan.fc.type_subtype == 0x28_____【Qos data 】【EAPOP-Key1234】
+ wlan.fc.type_subtype == 0x29
+ wlan.fc.type_subtype == 0x2A
+ wlan.fc.type_subtype == 0x2B
+ wlan.fc.type_subtype == 0x2C_____【Null Qos data】
+ wlan.fc.type_subtype == 0x2D
+ wlan.fc.type_subtype == 0x2E
+ wlan.fc.type_subtype == 0x2F
+
+
+未知扩展帧
+数据帧   wlan.fc.type == 3
+ wlan.fc.type_subtype == 0x30
+ wlan.fc.type_subtype == 0x31
+ wlan.fc.type_subtype == 0x32
+ wlan.fc.type_subtype == 0x33
+ wlan.fc.type_subtype == 0x34
+ wlan.fc.type_subtype == 0x35
+ wlan.fc.type_subtype == 0x36
+ wlan.fc.type_subtype == 0x37
+ wlan.fc.type_subtype == 0x38
+ wlan.fc.type_subtype == 0x39
+ wlan.fc.type_subtype == 0x3A
+ wlan.fc.type_subtype == 0x3B
+ wlan.fc.type_subtype == 0x3C
+ wlan.fc.type_subtype == 0x3D
+ wlan.fc.type_subtype == 0x3E
+ wlan.fc.type_subtype == 0x3F
+
+
+```
+
+
+## Mac地址过滤  信道过滤 2.4G 5G 信道
+```
+wlan.bssid ==  28:6c:07:5a:f5:7c              // 热点BSSID 过滤
+radiotap.channel.freq == 5745                 // 信道过滤
+
+
+2.4G  wifi信道
+radiotap.channel.freq == 2412             // 【1 信道编号】 2412MHz
+radiotap.channel.freq == 2417             // 【2】2417MHz
+radiotap.channel.freq == 2422             // 【3】 2422MHz
+radiotap.channel.freq == 2427             // 【4】 2427MHz
+radiotap.channel.freq == 2432             // 【5】 2432MHz
+radiotap.channel.freq == 2437             // 【6】 2437MHz
+radiotap.channel.freq == 2442             // 【7】 2442MHz
+radiotap.channel.freq == 2447             // 【8】 2447MHz
+radiotap.channel.freq == 2452             // 【9】 2452MHz
+radiotap.channel.freq == 2457            // 【10】 2457MHz
+radiotap.channel.freq == 2462            // 【11】 2462MHz
+radiotap.channel.freq == 2467            // 【12】 2467MHz
+radiotap.channel.freq == 2472            // 【13】 2472MHz
+
+
+
+5G wifi信道
+radiotap.channel.freq == 5035            // 【7 】 5035MHz
+radiotap.channel.freq == 5040            // 【8 】 5040MHz
+radiotap.channel.freq == 5045            // 【9 】 5045MHz
+radiotap.channel.freq == 5055            // 【11】 5055MHz
+radiotap.channel.freq == 5060            // 【12】 5060MHz
+radiotap.channel.freq == 5080            // 【16】 5080MHz  
+radiotap.channel.freq == 5170            // 【34】 5170MHz   
+radiotap.channel.freq == 5180            // 【36】 5180MHz     中国OK
+radiotap.channel.freq == 5190            // 【38】 5190MHz
+radiotap.channel.freq == 5200            // 【40】 5200MHz     中国OK
+radiotap.channel.freq == 5210            // 【42】 5210MHz
+radiotap.channel.freq == 5220            // 【44】 5220MHz     中国OK
+radiotap.channel.freq == 5230            // 【46】 5230MHz
+radiotap.channel.freq == 5240            // 【48】 5240MHz
+radiotap.channel.freq == 5260            // 【52】 5260MHz
+radiotap.channel.freq == 5280            // 【56】 5280MHz
+radiotap.channel.freq == 5300            // 【60】 5300MHz
+radiotap.channel.freq == 5320            // 【64】 5320MHz
+radiotap.channel.freq == 5500            // 【100 】 5500 MHz
+radiotap.channel.freq == 5520            // 【104 】 5520 MHz
+radiotap.channel.freq == 5540            // 【108 】 5540 MHz
+radiotap.channel.freq == 5560            // 【112 】 5560 MHz
+radiotap.channel.freq == 5580            // 【116 】 5580 MHz
+radiotap.channel.freq == 5600            // 【120 】 5600 MHz
+radiotap.channel.freq == 5620            // 【124 】 5620 MHz
+radiotap.channel.freq == 5640            // 【128 】 5640 MHz
+radiotap.channel.freq == 5660            // 【132 】 5660 MHz
+radiotap.channel.freq == 5680            // 【136 】 5680 MHz
+radiotap.channel.freq == 5700            // 【140 】 5700 MHz
+radiotap.channel.freq == 5745            // 【149 】 5745 MHz   中国OK
+radiotap.channel.freq == 5765            // 【153 】 5765 MHz   中国OK
+radiotap.channel.freq == 5785            // 【157 】 5785 MHz   中国OK
+radiotap.channel.freq == 5805            // 【161 】 5805 MHz   中国OK
+radiotap.channel.freq == 5825            // 【165 】 5825 MHz   中国OK
+
+radiotap.channel.freq == 4915            // 【183 】 4915 MHz
+radiotap.channel.freq == 5520            // 【184 】 4920 MHz
+radiotap.channel.freq == 4925            // 【185 】 4925 MHz
+radiotap.channel.freq == 4935            // 【187 】 4935 MHz
+radiotap.channel.freq == 4940            // 【188 】 4940 MHz
+radiotap.channel.freq == 4945            // 【189 】 4945 MHz
+radiotap.channel.freq == 4960            // 【192 】 4960 MHz
+radiotap.channel.freq == 4980            // 【196 】 4980 MHz
+
+
+
+```
