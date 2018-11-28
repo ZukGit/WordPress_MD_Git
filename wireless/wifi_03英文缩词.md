@@ -69,8 +69,16 @@ DSSS:  direct-sequence sprerad-spectrum
 
 ## DFS
 DFS:  Dynamic Frequency  Selection
+```
 中文:   **动态频率选择**
 
+简介: WIFI一开始工作在2.4G 但由于升级到5G后，对5G频带的使用各个地区不一样(美国可使用，欧洲该频段是军事雷达频率所以民用禁止)，所以在欧洲销售的产品需要支持 DFS 和 TPC 传输功率控制。
+DFS作用是:  主动探测军方使用的频率 并主动选择另一个频率，以避免干扰军方通讯，【DFS和TPC在欧洲这两个功能是强制性的】，其检测的信道范围为 
+
+5250MHz ----  5350MHz
+5470MHz ----  5725MHz     这两个范围区间需要进行作用DFS
+
+```
 ## DCF
 DCF： Distributed coordination function
 中文:   **分布式协调功能**
@@ -274,6 +282,14 @@ SIFS： Short interframe Space
 中文:   **短帧间间隔**
 
 
+## signal-to-noise-ratio
+signal-to-noise-ratio : 信噪比
+
+
+## signal-quality
+signal-quality : 信号质量
+
+
 # T
 
 ## TCP
@@ -290,6 +306,10 @@ TKIP ： Temporary Key Integrity Protocol
 
 ## threshold
 threshold：  阈值
+
+## TIM
+TIM：  Traffic Indication Map
+中文:   **传输指示映射,在beacon帧中用于确定beacon中信息是哪一个睡眠状态STA的**
 # U
 
 ## UDP   

@@ -369,13 +369,19 @@ min-val   max-val:  包含了在该长度区间内最小和最大长度的帧的
  wlan.fc.type_subtype == 0x06_____
  wlan.fc.type_subtype == 0x07_____
  wlan.fc.type_subtype == 0x08_____【Beacon】
- wlan.fc.type_subtype == 0x09_____
+ wlan.fc.type_subtype == 0x09_____【ATIM 通知传输指示消息】
  wlan.fc.type_subtype == 0x0A_____【Disassociate】
  wlan.fc.type_subtype == 0x0B_____【Authentication】
  wlan.fc.type_subtype == 0x0C_____【Deauthentication】
  wlan.fc.type_subtype == 0x0D_____【Action Frame 】
  wlan.fc.type_subtype == 0x0E_____
  wlan.fc.type_subtype == 0x0F_____【★ Malformed Packet】
+
+
+ATIM:announcement traffic indication message【通知传输指示消息】 IBSS中没有接入点，无法依赖接入点缓存帧， 
+一个STA缓存了另一个STA的数据【数据是传送给另外一个处于Sleep状态的STA】的缓存帧时发送
+
+Beacon:  Beacon 可携带通知sleep状态的STA有数据缓存在AP的相关信息，STA使用TIM(traffic indication map)传输指示映射来确定
 
 
 
@@ -396,29 +402,33 @@ min-val   max-val:  包含了在该长度区间内最小和最大长度的帧的
  wlan.fc.type_subtype == 0x1B_____【 RTS 】
  wlan.fc.type_subtype == 0x1C_____【 CTS 】
  wlan.fc.type_subtype == 0x1D_____【 ACK 】
- wlan.fc.type_subtype == 0x1E_____【Content free period end 】
- wlan.fc.type_subtype == 0x1F_____
+ wlan.fc.type_subtype == 0x1E_____【Content free period end CF-End】
+ wlan.fc.type_subtype == 0x1F_____【CF-End + CF-ACK】
 
+
+Power save poll: 省电轮询-由从休眠状态醒来的STA发出
+CF-End： 无竞争周期结束
+CF-ACK:  无竞争周期确认
 
 
 
 数据帧   wlan.fc.type == 2 
- wlan.fc.type_subtype == 0x20_____【 data 】
- wlan.fc.type_subtype == 0x21
- wlan.fc.type_subtype == 0x22
- wlan.fc.type_subtype == 0x23
- wlan.fc.type_subtype == 0x24_____【NULL data】
- wlan.fc.type_subtype == 0x25
- wlan.fc.type_subtype == 0x26
- wlan.fc.type_subtype == 0x27
+ wlan.fc.type_subtype == 0x20_____【 Data 】
+ wlan.fc.type_subtype == 0x21_____【 Data + CF-ACK 】
+ wlan.fc.type_subtype == 0x22_____【 Data + CF-Poll 】
+ wlan.fc.type_subtype == 0x23_____【 Data + CF-ACK + CF-Poll 】
+ wlan.fc.type_subtype == 0x24_____【NULL data 未传输数据】
+ wlan.fc.type_subtype == 0x25_____【CF-ACK 未传送数据】
+ wlan.fc.type_subtype == 0x26_____【CF-Poll 未传送数据】
+ wlan.fc.type_subtype == 0x27_____【 Data + CF-ACK + CF-Poll 】
  wlan.fc.type_subtype == 0x28_____【Qos data 】【EAPOP-Key1234】
- wlan.fc.type_subtype == 0x29
- wlan.fc.type_subtype == 0x2A
- wlan.fc.type_subtype == 0x2B
- wlan.fc.type_subtype == 0x2C_____【Null Qos data】
- wlan.fc.type_subtype == 0x2D
- wlan.fc.type_subtype == 0x2E
- wlan.fc.type_subtype == 0x2F
+ wlan.fc.type_subtype == 0x29_____【Qos data + CF-ACK】
+ wlan.fc.type_subtype == 0x2A_____【Qos data + CF-Poll】
+ wlan.fc.type_subtype == 0x2B_____【 QosData + CF-ACK + CF-Poll 】
+ wlan.fc.type_subtype == 0x2C_____【Null Qos data 未传输数据】
+ wlan.fc.type_subtype == 0x2D_____【 Qos CF-ACK 未传输数据】
+ wlan.fc.type_subtype == 0x2E_____【 Qos CF-Poll 未传输数据】
+ wlan.fc.type_subtype == 0x2F_____【 Qos CF-ACK CF-Poll 未传输数据】
 
 
 未知扩展帧
@@ -482,10 +492,16 @@ radiotap.channel.freq == 5210            // 【42】 5210MHz
 radiotap.channel.freq == 5220            // 【44】 5220MHz     中国OK
 radiotap.channel.freq == 5230            // 【46】 5230MHz
 radiotap.channel.freq == 5240            // 【48】 5240MHz
+radiotap.channel.freq == 5250            // 【50】 5250MHz   【DFS__Begin__1】
 radiotap.channel.freq == 5260            // 【52】 5260MHz
 radiotap.channel.freq == 5280            // 【56】 5280MHz
 radiotap.channel.freq == 5300            // 【60】 5300MHz
 radiotap.channel.freq == 5320            // 【64】 5320MHz
+radiotap.channel.freq == 5320            // 【70】 5350MHz   【DFS__End__1】
+
+【DFS 检测的区段  5250MHz~5350MHz   5470MHz~5725MHz 欧洲军事雷达频段 DFS需主动避免 】
+radiotap.channel.freq == 5470            // 【94 】 5470 MHz  【DFS__Begin__2】
+
 radiotap.channel.freq == 5500            // 【100 】 5500 MHz
 radiotap.channel.freq == 5520            // 【104 】 5520 MHz
 radiotap.channel.freq == 5540            // 【108 】 5540 MHz
@@ -497,6 +513,7 @@ radiotap.channel.freq == 5640            // 【128 】 5640 MHz
 radiotap.channel.freq == 5660            // 【132 】 5660 MHz
 radiotap.channel.freq == 5680            // 【136 】 5680 MHz
 radiotap.channel.freq == 5700            // 【140 】 5700 MHz
+radiotap.channel.freq == 5700            // 【145 】 5725 MHz  【DFS__End__2】
 radiotap.channel.freq == 5745            // 【149 】 5745 MHz   中国OK
 radiotap.channel.freq == 5765            // 【153 】 5765 MHz   中国OK
 radiotap.channel.freq == 5785            // 【157 】 5785 MHz   中国OK
@@ -515,6 +532,18 @@ radiotap.channel.freq == 4980            // 【196 】 4980 MHz
 
 
 ```
+
+
+# wifi详细帧
+
+## 管理帧
+
+## 控制帧
+
+
+## 数据帧
+
+
 
 # wireshark源码
  wireshark源码地址:   https://github.com/wireshark/wireshark
