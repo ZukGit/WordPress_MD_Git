@@ -453,6 +453,920 @@ CF-ACK:  无竞争周期确认
 
 ```
 
+## wlan.flags =0xff 所有帧可能组合
+```
+Flags: .........     Flags: ........C   -->    Flags: opmPRMFTC
+1  【 o 】 Order 序号域_长帧分段严格编号
+2  【 p 】 protect enctypt frame
+3  【 m 】 more Data in AP
+4  【 P 】 Power_Save
+5  【 R 】 Retry
+6  【 M 】 More_Frame 长帧分段
+7  【 F 】 Download_Fang 
+8  【 T 】 Upload_Translate
+9  【 C 】 Check_correct 【 . 】 Correct_wrong
+
+
+
+ · Protocol Version（协议版本）：通常为0；
+     · Type（类型域）和Subtype（子类型域）：共同指出帧的类型；
+     · To DS：表明该帧是BSS向DS发送的帧；
+     · From DS：表明该帧是DS向BSS发送的帧；
+     · More Frag：用于说明长帧被分段的情况，是否还有其它的帧；
+     · Retry（重传域）：用于帧的重传，接收STA利用该域消除重传帧；
+     · Pwr Mgt（能量管理域）：1：STA处于power_save模式；0：处于active模式；
+     · More Data in AP（更多数据域）：1：至少还有一个数据帧要发送给STA ；
+     · Protected Frame： 1：帧体部分包含被密钥套处理过的数据；否则：0；
+     · Order（序号域）：1：长帧分段传送采用严格编号方式；否则：0。
+	 
+wlan.flags == 0x00   Flags: ........C
+C:  Check  Correct
+---------------------------------
+wlan.flags == 0x01    Fags:  .......TC
+
+T:  toDS   upload-frame ↑
+C:  Check  Correct
+---------------------------------
+wlan.flags == 0x02   Flags: ......F.C
+
+F :  From DS： download-frame  ↓
+C:  Check  Correct
+---------------------------------
+wlan.flags == 0x03   Flags: ......FT.    【x】
+
+F :  From DS： download-frame  ↓
+T :  toDS   upload-frame ↑
+. :  最后是. 不是C  说明  Check Wrong
+---------------------------------
+wlan.flags == 0x04  Flags: .....M...    【x】
+
+M: More Frag   长帧分段 
+. :  最后是. 不是C  说明  Check Wrong
+---------------------------------
+wlan.flags == 0x05     【x】
+
+---------------------------------
+wlan.flags == 0x06     【x】
+
+---------------------------------
+wlan.flags == 0x07     【x】
+
+---------------------------------
+
+wlan.flags == 0x08  Flags:   ....R...C
+
+R:  Retry
+C:  Check  Correct
+---------------------------------
+wlan.flags == 0x09   Flags:  ....R..TC
+R:  Retry
+T:  toDS   upload-frame ↑
+C:  Check  Correct
+
+---------------------------------
+wlan.flags == 0x10   Flags: ...P....C              
+
+
+P:  PWR MGT--STA will go to sleep 
+C:   Check  Correct
+---------------------------------
+wlan.flags == 0x11    Flags: ...P...TC
+
+
+P:  PWR MGT--STA will go to sleep 
+T:  toDS   upload-frame ↑
+C:   Check  Correct
+---------------------------------
+
+wlan.flags == 0x12    【x】
+
+---------------------------------
+wlan.flags == 0x13    【x】
+
+---------------------------------
+wlan.flags == 0x14    【x】
+
+---------------------------------
+wlan.flags == 0x15    【x】
+
+---------------------------------
+wlan.flags == 0x16    Flags: ...P.MF.C    IEEE 802.11 Beamforming Report Poll
+
+P :  PWR MGT--STA will go to sleep 
+M :  More Frag   长帧分段 
+F :  From DS： download-frame  ↓
+C :  Check  Correct
+---------------------------------
+
+wlan.flags == 0x17      Flags: ...P.MFTC    IEEE 802.11 QoS CF-Poll (No Data)
+
+P :  PWR MGT--STA will go to sleep 
+M :  More Frag   长帧分段 
+F :  From DS： download-frame  ↓        AP -to-AP 
+T :  toDS   upload-frame ↑
+C :  Check  Correct
+---------------------------------
+wlan.flags == 0x18   Flags: ...PR...C     IEEE 802.11 QoS CF-Ack + CF-Poll (No data)
+
+P :  PWR MGT--STA will go to sleep 
+R :  Retry
+C :  Check  Correct
+---------------------------------
+wlan.flags == 0x19    Flags: ...PR..TC    IEEE 802.11 QoS Null function (No data)
+
+
+P :  PWR MGT--STA will go to sleep 
+R :  Retry
+T :  toDS   upload-frame ↑
+C :  Check  Correct
+---------------------------------
+wlan.flags == 0x1a    【x】
+
+---------------------------------
+wlan.flags == 0x1b    Flags: ...PR.FTC   IEEE 802.11 Unrecognized (Reserved frame)
+
+
+P :  PWR MGT--STA will go to sleep 
+R :  Retry
+F :  From DS： download-frame  ↓  
+T :  toDS   upload-frame ↑
+C :  Check  Correct
+
+---------------------------------
+wlan.flags == 0x1c    【x】
+
+---------------------------------
+wlan.flags == 0x1d    【x】
+
+---------------------------------
+wlan.flags == 0x1e    【x】
+
+---------------------------------
+wlan.flags == 0x1f   【x】
+
+---------------------------------
+wlan.flags == 0x20   Flags: ..m.....C   IEEE 802.11 VHT NDP Announcement
+
+m :  More Data in AP
+C :  Check  Correct
+---------------------------------
+wlan.flags == 0x21   【x】
+
+---------------------------------
+wlan.flags == 0x22      Flags: ..m...F.C    IEEE 802.11 QoS Null function (No data)
+
+
+m :  More Data in AP
+F :  From DS： download-frame  ↓  
+C :  Check  Correct
+---------------------------------
+wlan.flags == 0x23   Flags: ..m...FTC      IEEE 802.11 QoS CF-Ack + CF-Poll (No data)
+
+m :  More Data in AP
+F :  From DS： download-frame  ↓  
+T:  toDS   upload-frame ↑
+C :  Check  Correct
+---------------------------------
+wlan.flags == 0x24   【x】
+
+---------------------------------
+
+wlan.flags == 0x25   【x】
+
+---------------------------------
+
+wlan.flags == 0x26   【x】
+
+---------------------------------
+wlan.flags == 0x27   【x】
+
+---------------------------------
+wlan.flags == 0x28   【x】
+
+---------------------------------
+wlan.flags == 0x29   【x】
+
+---------------------------------
+wlan.flags == 0x2a   【x】  Flags: ..m.R.F.C   IEEE 802.11 QoS Null function (No data)
+
+
+m :  More Data in AP
+R :  Retry
+F :  From DS： download-frame  ↓  
+C :  Check  Correct
+---------------------------------
+
+wlan.flags == 0x2b   【x】
+
+---------------------------------
+wlan.flags == 0x2c   【x】
+
+---------------------------------
+wlan.flags == 0x2d   【x】
+
+---------------------------------
+
+wlan.flags == 0x2e   【x】
+
+---------------------------------
+
+wlan.flags == 0x2f   【x】
+
+---------------------------------
+wlan.flags == 0x2f   【x】
+---------------------------------
+
+wlan.flags == 0x30   【x】
+---------------------------------
+wlan.flags == 0x31   【x】
+---------------------------------
+wlan.flags == 0x32   【x】
+---------------------------------
+wlan.flags == 0x33   【x】
+---------------------------------
+wlan.flags == 0x34   【x】
+---------------------------------
+wlan.flags == 0x35   【x】
+---------------------------------
+wlan.flags == 0x36   【x】
+---------------------------------
+wlan.flags ==  0x37  Flags: ..mP.MFTC   IEEE 802.11 CF-Ack/Poll (No data)
+
+m :  More Data in AP
+P :  PWR MGT--STA will go to sleep 
+M : More Frag   长帧分段 
+F :  From DS： download-frame  ↓
+T:  toDS   upload-frame ↑
+C :  Check  Correct
+---------------------------------
+wlan.flags == 0x38   【x】
+---------------------------------
+
+wlan.flags ==  0x39   Flags: ..mPR..TC    IEEE 802.11 QoS Null function (No data)
+
+m :  More Data in AP
+P :  PWR MGT--STA will go to sleep 
+R :  Retry
+T:  toDS   upload-frame ↑
+C :  Check  Correct
+
+---------------------------------
+wlan.flags == 0x3a   【x】
+---------------------------------
+wlan.flags == 0x3b   【x】
+---------------------------------
+wlan.flags == 0x3c   【x】
+---------------------------------
+wlan.flags == 0x3d   【x】
+---------------------------------
+wlan.flags == 0x3e   【x】
+---------------------------------
+wlan.flags == 0x3f  【x】
+---------------------------------
+wlan.flags == 0x40  【x】
+---------------------------------
+wlan.flags ==0x41  Flags: .p.....TC
+
+p :  protected frame： encrypted frame
+T:  toDS   upload-frame ↑
+C :  Check  Correct
+---------------------------------
+wlan.flags ==0x42  Flags: .p....F.C
+
+p :  protected frame： encrypted frame
+F :  From DS： download-frame  ↓
+C :  Check  Correct
+---------------------------------
+wlan.flags == 0x43   Flags: .p....FTC     IEEE 802.11 QoS Data + CF-Acknowledgment
+
+
+p :  protected frame： encrypted frame
+F :  From DS： download-frame  ↓
+T:  toDS   upload-frame ↑
+C :  Check  Correct
+---------------------------------
+wlan.flags == 0x44  【x】
+---------------------------------
+wlan.flags == 0x45  【x】
+---------------------------------
+wlan.flags == 0x46  【x】
+---------------------------------
+wlan.flags == 0x47  【x】
+---------------------------------
+wlan.flags == 0x48  【x】
+---------------------------------
+wlan.flags == 0x49   Flags: .p..R..TC   IEEE 802.11 QoS Data
+
+p :  protected frame： encrypted frame
+R :  Retry
+T:  toDS   upload-frame ↑
+C :  Check  Correct
+---------------------------------
+0x4a  Flags: .p..R.F.C
+
+p :  protected frame：  encrypted frame
+R :  Retry
+F :  From DS： download-frame  ↓
+C :  Check  Correct
+---------------------------------
+wlan.flags == 0x4b  【x】
+---------------------------------
+wlan.flags == 0x4c  【x】
+---------------------------------
+wlan.flags == 0x4d  【x】
+---------------------------------
+wlan.flags == 0x4e  【x】
+---------------------------------
+wlan.flags == 0x4f  【x】
+---------------------------------
+wlan.flags == 0x50  【x】
+---------------------------------
+wlan.flags == 0x51     Flags: .p.P...TC   IEEE 802.11 QoS Data
+
+p :  protected frame：  encrypted frame
+P :  PWR MGT--STA will go to sleep 
+T :  toDS   upload-frame ↑
+C :  Check  Correct
+
+---------------------------------
+
+wlan.flags == 0x52  【x】
+---------------------------------
+wlan.flags == 0x53  【x】
+---------------------------------
+wlan.flags == 0x54  【x】
+---------------------------------
+wlan.flags == 0x55  【x】
+---------------------------------
+wlan.flags == 0x56  【x】
+---------------------------------
+wlan.flags == 0x57  【x】
+---------------------------------
+wlan.flags == 0x58  【x】
+---------------------------------
+wlan.flags == 0x58  【x】
+---------------------------------
+wlan.flags == 0x59    Flags: .p.PR..TC     IEEE 802.11 QoS Data
+
+p :  protected frame：  encrypted frame
+P :  PWR MGT--STA will go to sleep 
+R :  Retry
+T :  toDS   upload-frame ↑
+C :  Check  Correct
+---------------------------------
+wlan.flags == 0x5a  【x】
+---------------------------------
+wlan.flags == 0x5b    Flags: .p.PR.FTC      IEEE 802.11 Acknowledgement (No data)
+
+p :  protected frame：  encrypted frame
+P :  PWR MGT--STA will go to sleep 
+R :  Retry
+F :  From DS： download-frame  ↓
+T :  toDS   upload-frame ↑
+C :  Check  Correct
+---------------------------------
+wlan.flags == 0x5c   【x】
+---------------------------------
+wlan.flags == 0x5d   【x】
+---------------------------------
+wlan.flags == 0x5e   【x】
+---------------------------------
+wlan.flags == 0x5f   【x】
+---------------------------------
+wlan.flags == 0x60  【x】
+---------------------------------
+wlan.flags == 0x61   【x】  
+---------------------------------
+wlan.flags == 0x62      Flags: .pm...F.C
+
+p :  protected frame：  encrypted frame
+m :  More Data in AP
+F :  From DS： download-frame  ↓
+C :  Check  Correct
+---------------------------------
+wlan.flags == 0x63  【x】
+---------------------------------
+wlan.flags == 0x64  【x】
+---------------------------------
+wlan.flags == 0x65     Flags: .pm..M.TC
+
+p :  protected frame：  encrypted frame
+m :  More Data in AP
+T :  toDS   upload-frame ↑
+C :  Check  Correct
+---------------------------------
+wlan.flags == 0x66  【x】
+---------------------------------
+wlan.flags == 0x67  【x】
+---------------------------------
+wlan.flags == 0x68  【x】
+---------------------------------
+wlan.flags == 0x69  【x】
+---------------------------------
+wlan.flags == 0x6a  【x】
+---------------------------------
+wlan.flags == 0x6b  【x】
+---------------------------------
+wlan.flags == 0x6c   【x】
+---------------------------------
+wlan.flags == 0x6d   【x】
+---------------------------------
+wlan.flags == 0x6e     Flags: .pm.RMF.C       IEEE 802.11 QoS Data + CF-Acknowledgment,
+
+p :  protected frame：  encrypted frame
+m :  More Data in AP
+R :  Retry
+M :  More Frag   长帧分段 
+F :  From DS： download-frame  ↓
+C :  Check  Correct
+---------------------------------
+wlan.flags == 0x6f   【x】
+---------------------------------
+wlan.flags == 0x70  【x】
+---------------------------------
+wlan.flags == 0x71   【x】  
+---------------------------------
+wlan.flags == 0x72  【x】
+---------------------------------
+wlan.flags == 0x73   Flags: .pmP..FTC        IEEE 802.11 Data + CF-Ack + CF-Poll
+
+p :  protected frame：  encrypted frame
+m :  More Data in AP
+P :  PWR MGT--STA will go to sleep 
+F :  From DS： download-frame  ↓
+T :  toDS   upload-frame ↑
+C :  Check  Correct
+---------------------------------
+wlan.flags == 0x74  【x】
+---------------------------------
+wlan.flags == 0x75  【x】
+---------------------------------
+wlan.flags == 0x76  【x】
+---------------------------------
+wlan.flags == 0x77  【x】
+---------------------------------
+wlan.flags == 0x78  【x】
+---------------------------------
+wlan.flags == 0x79    Flags:  .pmPR..T.                
+
+p :  protected frame：  encrypted frame
+m :  More Data
+P :  PWR MGT--STA will go to sleep 
+R :  Retry
+T :  toDS   upload-frame ↑
+. :  最后是. 不是C  说明  Check Wrong
+---------------------------------
+wlan.flags == 0x7a  【x】
+---------------------------------
+wlan.flags == 0x7b  【x】
+---------------------------------
+wlan.flags == 0x7c   【x】
+---------------------------------
+wlan.flags == 0x7d   【x】
+---------------------------------
+wlan.flags == 0x7e   【x】
+---------------------------------
+wlan.flags == 0x7f   【x】
+---------------------------------
+wlan.flags == 0x80  【x】
+---------------------------------
+wlan.flags == 0x81   【x】  
+---------------------------------
+wlan.flags == 0x82  【x】
+---------------------------------
+wlan.flags == 0x83  【x】
+---------------------------------
+wlan.flags == 0x84  【x】
+---------------------------------
+wlan.flags == 0x85  【x】
+---------------------------------
+wlan.flags == 0x86  【x】
+---------------------------------
+wlan.flags == 0x87  【x】
+---------------------------------
+wlan.flags == 0x88  Flags: o...R...C     IEEE 802.11 Beamforming Report Poll
+
+o :  Order 序号域_长帧分段严格编号 1-长帧分段传送采用严格编号方式  否则为0
+R :  Retry
+C :  Check  Correct
+---------------------------------
+wlan.flags == 0x89  【x】
+---------------------------------
+wlan.flags == 0x8a  【x】
+---------------------------------
+wlan.flags == 0x8b  【x】
+---------------------------------
+wlan.flags == 0x8c   【x】
+---------------------------------
+wlan.flags == 0x8d   【x】
+---------------------------------
+wlan.flags == 0x8e   【x】
+---------------------------------
+wlan.flags == 0x8f   【x】
+---------------------------------
+wlan.flags == 0x90  【x】
+---------------------------------
+wlan.flags == 0x91   Flags: o..P...TC     IEEE 802.11 QoS Null function (No data)
+
+o :  Order 序号域_长帧分段严格编号 1-长帧分段传送采用严格编号方式  否则为0
+P :  PWR MGT--STA will go to sleep 
+T :  toDS   upload-frame ↑
+C :  Check  Correct
+---------------------------------
+wlan.flags == 0x92  【x】
+---------------------------------
+wlan.flags == 0x93  【x】
+---------------------------------
+wlan.flags == 0x94  【x】
+---------------------------------
+wlan.flags == 0x95  【x】
+---------------------------------
+wlan.flags == 0x96  【x】
+---------------------------------
+wlan.flags == 0x97  【x】
+---------------------------------
+wlan.flags == 0x98     Flags: o..PR...C       IEEE 802.11 QoS CF-Ack + CF-Poll (No data)
+
+
+o :  Order 序号域_长帧分段严格编号 1-长帧分段传送采用严格编号方式  否则为0
+P :  PWR MGT--STA will go to sleep 
+R :  Retry
+C :  Check  Correct
+---------------------------------
+wlan.flags == 0x99      Flags: o..PR..TC    IEEE 802.11 Measurement Pilot
+
+o :  Order 序号域_长帧分段严格编号 1-长帧分段传送采用严格编号方式  否则为0
+P :  PWR MGT--STA will go to sleep 
+R :  Retry
+T :  toDS   upload-frame ↑
+C :  Check  Correct
+---------------------------------
+wlan.flags == 0x9a  【x】
+---------------------------------
+wlan.flags == 0x9b  【x】
+---------------------------------
+wlan.flags == 0x9c   【x】
+---------------------------------
+wlan.flags == 0x9d   【x】
+---------------------------------
+wlan.flags == 0x9e   【x】
+---------------------------------
+wlan.flags == 0x9f   【x】
+---------------------------------
+wlan.flags == 0xa0  【x】
+---------------------------------
+wlan.flags == 0xa1   Flags: o.m....TC   IEEE 802.11 Action,
+
+o :  Order 序号域_长帧分段严格编号 1-长帧分段传送采用严格编号方式  否则为0
+m :  More Data in AP
+T :  toDS   upload-frame ↑
+C :  Check  Correct
+---------------------------------
+wlan.flags == 0xa2  【x】
+---------------------------------
+wlan.flags == 0xa3  【x】
+---------------------------------
+wlan.flags == 0xa4  【x】
+---------------------------------
+wlan.flags == 0xa5  【x】
+---------------------------------
+wlan.flags == 0xa6  【x】
+---------------------------------
+wlan.flags == 0xa7  【x】
+---------------------------------
+wlan.flags == 0xa8  【x】
+---------------------------------
+wlan.flags == 0xa9  【x】
+---------------------------------
+wlan.flags == 0xaa  Flags: o.m.R.F.C   IEEE 802.11 QoS Null function (No data)  (数据帧)    wlan.fc.type == 2 
+                    Flags: o.m.R.F.C   IEEE 802.11 Action No Ack (管理帧)                   wlan.fc.type == 0 
+o :  Order 序号域_长帧分段严格编号 1-长帧分段传送采用严格编号方式  否则为0
+m :  More Data in AP
+R :  Retry
+F :  From DS： download-frame  ↓
+C :  Check  Correct
+---------------------------------
+wlan.flags == 0xab  【x】
+---------------------------------
+wlan.flags == 0xac   【x】
+---------------------------------
+wlan.flags == 0xad   【x】
+---------------------------------
+wlan.flags == 0xae   【x】
+---------------------------------
+wlan.flags == 0xaf   【x】
+---------------------------------
+wlan.flags == 0xb0  【x】
+---------------------------------
+wlan.flags == 0xb1   【x】  
+---------------------------------
+wlan.flags == 0xb2  【x】
+---------------------------------
+wlan.flags == 0xb3  【x】
+---------------------------------
+wlan.flags == 0xb4  【x】
+---------------------------------
+wlan.flags == 0xb5  【x】
+---------------------------------
+wlan.flags == 0xb6  【x】
+---------------------------------
+wlan.flags == 0xb7  【x】
+---------------------------------
+wlan.flags == 0xb8   Flags: o.mPR...C     IEEE 802.11 QoS CF-Poll (No Data)
+
+o :  Order 序号域_长帧分段严格编号 1-长帧分段传送采用严格编号方式  否则为0
+m :  More Data in AP
+P :  PWR MGT--STA will go to sleep 
+R :  Retry
+C :  Check  Correct
+---------------------------------
+wlan.flags == 0xb9    【x】 
+---------------------------------
+wlan.flags == 0xba  【x】
+---------------------------------
+wlan.flags == 0xbb   Flags: o.mPR.FTC   IEEE 802.11 Acknowledgement (No data)     wlan.fc.type == 2  数据帧
+                     Flags: o.mPR.FTC   IEEE 802.11 Beamforming Report Poll       wlan.fc.type == 1  控制帧
+
+o :  Order 序号域_长帧分段严格编号 1-长帧分段传送采用严格编号方式  否则为0
+m :  More Data in AP
+P :  PWR MGT--STA will go to sleep 
+R :  Retry
+F :  From DS： download-frame  ↓
+T:  toDS   upload-frame ↑
+C :  Check  Correct
+---------------------------------
+wlan.flags == 0xbc   【x】
+---------------------------------
+wlan.flags == 0xbd        Flags: o.mPRM.TC       IEEE 802.11 QoS Null function (No data)
+
+o :  Order 序号域_长帧分段严格编号 1-长帧分段传送采用严格编号方式  否则为0
+m :  More Data in AP
+P :  PWR MGT--STA will go to sleep 
+R :  Retry
+M :  More Frag   长帧分段
+T:  toDS   upload-frame ↑
+C :  Check  Correct
+---------------------------------
+wlan.flags == 0xbe   【x】
+---------------------------------
+wlan.flags == 0xbf   【x】
+---------------------------------
+wlan.flags == 0xc0  【x】
+---------------------------------
+wlan.flags == 0xc1   【x】  
+---------------------------------
+wlan.flags == 0xc2  【x】
+---------------------------------
+wlan.flags == 0xc3  【x】
+---------------------------------
+wlan.flags == 0xc4  Flags: op...M..C      IEEE 802.11 QoS Data
+
+o :  Order 序号域_长帧分段严格编号 1-长帧分段传送采用严格编号方式  否则为0
+p :  protected frame： encrypted frame
+M :  More Frag   长帧分段
+C :  Check  Correct
+---------------------------------
+wlan.flags == 0xc5  【x】
+---------------------------------
+wlan.flags == 0xc6  【x】
+---------------------------------
+wlan.flags == 0xc7  【x】
+---------------------------------
+wlan.flags == 0xc8  【x】
+---------------------------------
+wlan.flags == 0xc9    Flags: op..R..TC  IEEE 802.11 QoS Null function (No data)
+
+o :  Order 序号域_长帧分段严格编号 1-长帧分段传送采用严格编号方式  否则为0
+p :  protected frame： encrypted frame
+R :  Retry
+T:  toDS   upload-frame ↑
+C :  Check  Correct
+---------------------------------
+wlan.flags == 0xca  【x】
+---------------------------------
+wlan.flags == 0xcb  【x】
+---------------------------------
+wlan.flags == 0xcc   【x】
+---------------------------------
+wlan.flags == 0xcd   【x】
+---------------------------------
+wlan.flags == 0xce   【x】
+---------------------------------
+wlan.flags == 0xcf   【x】
+---------------------------------
+wlan.flags == 0xd0  【x】
+---------------------------------
+wlan.flags == 0xd1   【x】  
+---------------------------------
+wlan.flags == 0xd2  【x】
+---------------------------------
+wlan.flags == 0xd3  【x】
+---------------------------------
+wlan.flags == 0xd4  【x】
+---------------------------------
+wlan.flags == 0xd5  【x】
+---------------------------------
+wlan.flags == 0xd6  【x】
+---------------------------------
+wlan.flags == 0xd7  Flags: op.P.MFTC      IEEE 802.11 QoS CF-Poll (No Data)
+
+o :  Order 序号域_长帧分段严格编号 1-长帧分段传送采用严格编号方式  否则为0
+p :  protected frame： encrypted frame
+P :  PWR MGT--STA will go to sleep 
+M :  More Frag   长帧分段
+F :  From DS： download-frame  ↓
+T:  toDS   upload-frame ↑
+C :  Check  Correct
+---------------------------------
+wlan.flags == 0xd8  【x】
+---------------------------------
+wlan.flags == 0xd9  【x】
+---------------------------------
+wlan.flags == 0xda  【x】
+---------------------------------
+wlan.flags == 0xdb  【x】
+---------------------------------
+wlan.flags == 0xdc     Flags: op.PRM..C     IEEE 802.11 QoS Data + CF-Poll
+
+o :  Order 序号域_长帧分段严格编号 1-长帧分段传送采用严格编号方式  否则为0
+p :  protected frame： encrypted frame
+P :  PWR MGT--STA will go to sleep 
+R :  Retry
+M :  More Frag   长帧分段
+C :  Check  Correct
+
+---------------------------------
+wlan.flags == 0xdd   【x】
+---------------------------------
+wlan.flags == 0xde   【x】
+---------------------------------
+wlan.flags == 0xdf   【x】
+---------------------------------
+wlen.flegs == 0xe0  【x】
+---------------------------------
+wlen.flegs == 0xe1   【x】  
+---------------------------------
+wlen.flegs == 0xe2      Flags: opm...F.C    IEEE 802.11 VHT NDP Announcement
+
+o :  Order 序号域_长帧分段严格编号 1-长帧分段传送采用严格编号方式  否则为0
+p :  protected frame： encrypted frame
+m :  More Data in AP
+F :  From DS： download-frame  ↓
+C :  Check  Correct
+---------------------------------
+wlen.flegs == 0xe3  Flags: opm...FTC     IEEE 802.11 Association Request
+
+o :  Order 序号域_长帧分段严格编号 1-长帧分段传送采用严格编号方式  否则为0
+p :  protected frame： encrypted frame
+m :  More Data in AP
+F :  From DS： download-frame  ↓
+T:  toDS   upload-frame ↑
+C :  Check  Correct
+---------------------------------
+wlen.flegs == 0xe4  【x】
+---------------------------------
+wlen.flegs == 0xe5  【x】
+---------------------------------
+wlen.flegs == 0xe6     Flags: opm..MF.C       IEEE 802.11 Unrecognized (Reserved frame)
+
+o :  Order 序号域_长帧分段严格编号 1-长帧分段传送采用严格编号方式  否则为0
+p :  protected frame： encrypted frame
+m :  More Data in AP
+M :  More Frag   长帧分段
+F :  From DS： download-frame  ↓
+C :  Check  Correct
+---------------------------------
+wlen.flegs == 0xe7     Flags: opm..MFTC         IEEE 802.11 Probe Request
+
+o :  Order 序号域_长帧分段严格编号 1-长帧分段传送采用严格编号方式  否则为0
+p :  protected frame： encrypted frame
+m :  More Data in AP
+M :  More Frag   长帧分段
+F :  From DS： download-frame  ↓
+T:  toDS   upload-frame ↑
+C :  Check  Correct
+
+---------------------------------
+wlen.flegs == 0xe8  【x】
+---------------------------------
+wlen.flegs == 0xe9     Flags: opm.R..TC     IEEE 802.11 QoS Data
+
+o :  Order 序号域_长帧分段严格编号 1-长帧分段传送采用严格编号方式  否则为0
+p :  protected frame： encrypted frame
+m :  More Data in AP
+R :  Retry
+T:  toDS   upload-frame ↑
+C :  Check  Correct
+---------------------------------
+wlen.flegs == 0xea   Flags: opm.R.F.C       IEEE 802.11 QoS Null function (No data)
+
+
+o :  Order 序号域_长帧分段严格编号 1-长帧分段传送采用严格编号方式  否则为0
+p :  protected frame： encrypted frame
+m :  More Data in AP
+R :  Retry
+F :  From DS： download-frame  ↓
+C :  Check  Correct
+---------------------------------
+wlen.flegs == 0xeb    Flags: opm.R.FTC       IEEE 802.11 Beacon frame
+
+o :  Order 序号域_长帧分段严格编号 1-长帧分段传送采用严格编号方式  否则为0
+p :  protected frame： encrypted frame
+m :  More Data in AP
+R :  Retry
+F :  From DS： download-frame  ↓
+T:  toDS   upload-frame ↑
+C :  Check  Correct
+---------------------------------
+wlen.flegs == 0xec   【x】
+---------------------------------
+wlen.flegs == 0xed   【x】
+---------------------------------
+wlen.flegs == 0xee   【x】
+---------------------------------
+wlen.flegs == 0xef        Flags: opm.RMFTC          IEEE 802.11 Probe Request
+
+o :  Order 序号域_长帧分段严格编号 1-长帧分段传送采用严格编号方式  否则为0
+p :  protected frame： encrypted frame
+m :  More Data in AP
+R :  Retry
+M :  More Frag   长帧分段
+F :  From DS： download-frame  ↓
+T:  toDS   upload-frame ↑
+C :  Check  Correct
+---------------------------------
+wlan.flags == 0xf0  【x】
+---------------------------------
+wlan.flags == 0xf1   Flags: opmP...TC     IEEE 802.11 Association Response
+                     Flags: opmP...TC     IEEE 802.11 QoS CF-Ack + CF-Poll 
+o :  Order 序号域_长帧分段严格编号 1-长帧分段传送采用严格编号方式  否则为0
+p :  protected frame： encrypted frame
+m :  More Data in AP
+P :  PWR MGT--STA will go to sleep 
+T:  toDS   upload-frame ↑
+C :  Check  Correct
+---------------------------------
+wlan.flags == 0xf2  Flags: opmP..F.C    IEEE 802.11 QoS CF-Poll (No Data)
+
+
+o :  Order 序号域_长帧分段严格编号 1-长帧分段传送采用严格编号方式  否则为0
+p :  protected frame： encrypted frame
+m :  More Data in AP
+P :  PWR MGT--STA will go to   Correct
+F :  From DS： download-frame  ↓
+C :  Check  Correct
+---------------------------------
+wlan.flags == 0xf3  【x】
+---------------------------------
+wlan.flags == 0xf4     Flags: opmP.M..C   IEEE 802.11 Action 
+
+o :  Order 序号域_长帧分段严格编号 1-长帧分段传送采用严格编号方式  否则为0
+p :  protected frame： encrypted frame
+m :  More Data in AP
+P :  PWR MGT--STA will go to sleep 
+M :  More Frag   长帧分段
+C :  Check
+---------------------------------
+wlan.flags == 0xf5  【x】
+---------------------------------
+wlan.flags == 0xf6  【x】
+---------------------------------
+wlan.flags == 0xf7  【x】
+---------------------------------
+wlan.flags == 0xf8  【x】
+---------------------------------
+wlan.flags == 0xf9     Flags: opmPR..TC       IEEE 802.11 Measurement Pilot
+
+o :  Order 序号域_长帧分段严格编号 1-长帧分段传送采用严格编号方式  否则为0
+p :  protected frame： encrypted frame
+m :  More Data in AP
+P :  PWR MGT--STA will go to   Correct
+R :  Retry
+T:  toDS   upload-frame ↑
+C :  Check  Correct
+---------------------------------
+wlan.flags == 0xfa  Flags: opmPR.F.C       IEEE 802.11 QoS Data
+
+
+o :  Order 序号域_长帧分段严格编号 1-长帧分段传送采用严格编号方式  否则为0
+p :  protected frame： encrypted frame
+m :  More Data in AP
+P :  PWR MGT--STA will go to   Correct
+R :  Retry
+F :  From DS： download-frame  ↓
+C :  Check  Correct
+---------------------------------
+wlan.flags == 0xfb  【x】
+---------------------------------
+wlan.flags == 0xfc   【x】
+---------------------------------
+wlan.flags == 0xfd   【x】
+---------------------------------
+wlan.flags == 0xfe   【x】
+---------------------------------
+wlan.flags == 0xff   【x】
+---------------------------------
+```
 
 ## Mac地址过滤  信道过滤 2.4G 5G 信道
 ```
