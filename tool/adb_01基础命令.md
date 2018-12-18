@@ -222,6 +222,218 @@ TASK com.meizu.filemanager id=11866
 ```
 
 
+##  adb shell dumpsys activity services
+```
+ adb shell dumpsys activity services      //  查看Service组件信息
+
+ACTIVITY MANAGER SERVICES (dumpsys activity services)
+  User 0 active services:
+    #0 id=130 dur=-9m17s228ms dxc=6
+      intent=Intent { cmp=com.meizu.safe/com.meizu.networkmanager.service.TrafficPollingService (has extras) }
+    #1 id=131 dur=-9m17s228ms dxc=6
+      intent=Intent { cmp=com.meizu.safe/com.meizu.networkmanager.service.TrafficPollingService }
+    #2 id=132 dur=-9m17s228ms dxc=5
+      intent=Intent { cmp=com.meizu.safe/com.meizu.networkmanager.service.TrafficPollingService (has extras) }
+    #3 id=133 dur=-9m17s228ms dxc=5
+```
+
+
+## adb shell dumpsys activity providers
+```
+adb shell dumpsys activity providers        // 产看ContentProvider组件信息
+
+ACTIVITY MANAGER CONTENT PROVIDERS (dumpsys activity providers)
+  Published single-user content providers (by class):
+  * ContentProviderRecord{d4cd15 u0 com.android.providers.telephony/.TelephonyProvider}
+    package=com.android.providers.telephony process=com.android.phone
+    proc=ProcessRecord{79ebdca 2355:com.android.phone/1001}
+    uid=1001 provider=android.content.ContentProviderProxy@455e82a
+    singleton=true
+    authority=telephony
+  * ContentProviderRecord{fccd61b u0 com.android.providers.settings/.SettingsProvider}
+    package=com.android.providers.settings process=system
+    proc=ProcessRecord{c983991 1732:system/1000}
+    uid=1000 provider=android.content.ContentProvider$Transport@5d108f1
+    singleton=true
+    authority=settings
+    isSyncable=false multiprocess=false initOrder=100
+    Connections:
+      -> 2063:com.meizu.facerecognition/1000 s1/1 u0/0 +18h42m36s864ms
+      -> 2077:com.android.systemui/u0a31 s1/1 u0/0 +18h42m36s751ms
+
+```
+##  adb shell dumpsys activity provider com.android.settings
+```
+adb shell dumpsys activity provider com.android.settings       //查看settings 的 Provider
+PROVIDER ContentProviderRecord{e5f4bc0 u0 com.android.settings/.search.SettingsSearchIndexablesProvider} pid=13515
+    Client:
+      nothing to dump
+
+PROVIDER ContentProviderRecord{93ac2fe u0 com.android.settings/android.support.v4.content.FileProvider} pid=13515
+    Client:
+      nothing to dump
+
+PROVIDER ContentProviderRecord{d29c49d u0 com.android.settings/com.meizu.settings.search.FlymeGlobalSearchProvider} pid=13515
+    Client:
+      nothing to dump
+
+
+```
+
+
+## adb shell dumpsys media.camera
+```
+ adb shell dumpsys media.camera    // 查看camera的信息
+
+Camera module HAL API version: 0x100
+Camera module API version: 0x204
+Camera module name: QCamera Module
+Camera module author: Qualcomm Innovation Center Inc
+Number of camera devices: 3
+Number of normal camera devices: 3
+Active Camera Clients:
+
+Camera 0 information:
+  Facing: BACK
+  Orientation: 90
+  Resource Cost: 100
+  Conflicting Devices: NONE
+  Device version: 0x100
+  Camera1 API shim is using parameters:
+        CameraParameters::dump: mMap.size = 192
+```
+
+
+##  adb shell dumpsys media.audio_flinger
+```
+ adb shell dumpsys media.audio_flinger                   //查看audio信息
+Library livemusicMz
+  Effect Live Music / Meizu Technology Co., Ltd
+    UUID: 0bbc89fe-52dc-4c40-8211-cae4da538b50
+    TYPE: 38a6a248-94be-4007-bbe1-337d7dc49e6d
+    apiVersion: 00020000
+    flags: 00000048
+Library virtualizerMz
+  Virtualizer / Meizu Technology Co., Ltd
+    UUID: 0e9779c9-4e8f-494d-b2b1-b4ad4e37c54c
+    TYPE: 725d7fa7-9219-4f71-8fa7-240a6d489387
+    apiVersion: 00020000
+    flags: 00000210
+
+Reroute submix audio module:
+ route[0] rate in=0 out=0, addr=[]
+ route[1] rate in=0 out=0, addr=[]
+ route[2] rate in=0 out=0, addr=[]
+ route[3] rate in=0 out=0, addr=[]
+ route[4] rate in=0 out=0, addr=[]
+```
+
+
+##  adb shell pm list features 
+```
+ adb shell pm list features      // 安卓feature
+feature:reqGlEsVersion=0x30002
+feature:android.hardware.audio.output
+feature:android.hardware.bluetooth
+feature:android.hardware.bluetooth_le
+feature:android.hardware.camera
+feature:android.hardware.camera.any
+feature:android.hardware.camera.autofocus
+feature:android.hardware.camera.flash
+feature:android.hardware.camera.front
+feature:android.hardware.faketouch
+feature:android.hardware.fingerprint
+feature:android.hardware.location
+feature:android.hardware.location.gps
+feature:android.hardware.location.network
+feature:android.hardware.microphone
+feature:android.hardware.opengles.aep
+feature:android.hardware.screen.landscape
+feature:android.hardware.screen.portrait
+feature:android.hardware.sensor.accelerometer
+feature:android.hardware.sensor.compass
+feature:android.hardware.sensor.gyroscope
+feature:android.hardware.sensor.light
+feature:android.hardware.sensor.proximity
+feature:android.hardware.sensor.stepcounter
+feature:android.hardware.sensor.stepdetector
+feature:android.hardware.telephony
+feature:android.hardware.telephony.cdma
+feature:android.hardware.telephony.gsm
+feature:android.hardware.touchscreen
+feature:android.hardware.touchscreen.multitouch
+feature:android.hardware.touchscreen.multitouch.distinct
+feature:android.hardware.touchscreen.multitouch.jazzhand
+feature:android.hardware.usb.accessory
+feature:android.hardware.usb.host
+feature:android.hardware.vulkan.level
+feature:android.hardware.vulkan.version=4194307
+feature:android.hardware.wifi
+feature:android.hardware.wifi.direct
+feature:android.software.app_widgets
+feature:android.software.backup
+feature:android.software.connectionservice
+feature:android.software.device_admin
+feature:android.software.home_screen
+feature:android.software.input_methods
+feature:android.software.live_wallpaper
+feature:android.software.managed_users
+feature:android.software.midi
+feature:android.software.print
+feature:android.software.sip
+feature:android.software.sip.voip
+feature:android.software.voice_recognizers
+feature:android.software.webview
+feature:flyme.face.facerecognition
+feature:flyme.hardware.screen.bluelightreduction
+
+
+
+```
+## adb shell dumpsys activity intents
+```
+adb shell dumpsys activity intents      // 查看Intent信息
+
+ACTIVITY MANAGER PENDING INTENTS (dumpsys activity intents)
+  * PendingIntentRecord{698a3fd com.meizu.cloud broadcastIntent (whitelist: +30s0ms)}
+    uid=10049 packageName=com.meizu.cloud type=broadcastIntent flags=0x40000000
+    requestIntent=act=com.meizu.flyme.push.intent.MESSAGE dat=custom://1545117758482 cmp=com.meizu.cloud/.push.CloudPushReceiver (has extras)
+    whitelistDuration=+30s0ms
+  * PendingIntentRecord{de81bb6 com.android.phone broadcastIntent}
+    uid=1001 packageName=com.android.phone type=broadcastIntent flags=0x0
+    requestIntent=act=com.android.ims.IMS_INCOMING_CALL flg=0x10000000
+  * PendingIntentRecord{90970b7 com.tencent.mm broadcastIntent}
+    uid=10108 packageName=com.tencent.mm type=broadcastIntent flags=0x0
+    requestCode=753 requestResolvedType=null
+    requestIntent=act=ALARM_ACTION(4246) (has extras)
+```
+
+## adb shell dumpsys activity processes
+```
+adb shell dumpsys activity processes          //查看进程信息
+
+ACTIVITY MANAGER RUNNING PROCESSES (dumpsys activity processes)
+  All known processes:
+  *APP* UID 1000 ProcessRecord{b8706ca 3501:com.meizu.pps/1000}
+    user #0 uid=1000 gids={41000, 9997, 3009, 3002, 1023, 1015, 3003, 3001, 1021, 1000, 2002, 2950, 1010, 1007, 3006}
+    requiredAbi=arm64-v8a instructionSet=arm64
+    class=com.meizu.pps.PPSApplication
+    dir=/system/priv-app/AppSandbox/AppSandbox.apk publicDir=/system/priv-app/AppSandbox/AppSandbox.apk data=/data/user/0/com.meizu.pps
+    packageList={com.meizu.pps}
+    compat={480dpi}
+    thread=android.app.ApplicationThreadProxy@38e91a4
+    pid=3501 starting=false
+    lastActivityTime=-9h13m30s289ms lastPssTime=-3m46s535ms nextPssTime=+11m13s96ms
+    adjSeq=105566 lruSeq=0 lastPss=19MB lastSwapPss=2.1MB lastCachedPss=0.00 lastCachedSwapPss=0.00
+    cached=false empty=true
+    oom: max=1001 curRaw=100 setRaw=100 cur=100 set=100
+    curSchedGroup=1 setSchedGroup=1 systemNoUi=false trimMemoryLevel=0
+    vrThreadTid=0    curProcState=6 repProcState=6 pssProcState=6 setProcState=6 lastStateTime=-9h13m30s289ms
+    reportedInteraction=true time=-18h50m44s953ms
+    lastRequestedGc=-2h44m34s239ms lastLowMemory=-2h47m38s22ms reportLowMemory=false
+
+```
+
 ## adb shell pm list packages
 
 ```
@@ -368,24 +580,46 @@ Uptime: 53108366 Realtime: 161092076
 
 adb shell dumpsys battery         // 查看电池使用情况
 Current Battery Service state:
-  AC powered: false
-  USB powered: true
-  Wireless powered: false
-  Max charging current: 0
-  Max charging voltage: 0
-  Charge counter: 0
-  status: 5
-  health: 2
-  present: true
-  level: 100
-  scale: 100
-  voltage: 4367
-  temperature: 310
-  technology: Li-ion
+  AC powered: false　　　　　　　　//false表示没使用AC电源
+  USB powered: true　　　　　　　　//true表示使用USB电源
+  Wireless powered: false　　　　 //false表示没使用无线电源
+  status: 2　　　　　　　　　　　　　//2表示电池正在充电，1表示没充电
+  health: 2　　　　　　　　　　　　　//2表示电池状态优秀
+  present: true　　　　　　　　　　 //true表示已安装电池
+  level: 63　　　　　　　　　　　　　//电池百分比
+  scale: 100　　　　　　　　　　　　　//满电量时电池百分比为100%（不确定是否正确）
+  voltage: 3781　　　　　　　　　　　//电池电压3.781V
+  temperature: 250　　　　　　　　　//电池温度为25摄氏度
+  technology: Li-ion　　　　　　　　//电池类型为锂电池
 
 ```
+###  adb shell dumpsys battery set status 1|2
+```
+
+//设置电池为非充电状态
+adb shell dumpsys battery set status 1
 
 
+//设置电池为充电状态
+ adb shell dumpsys battery set status 2
+
+```
+### adb shell dumpsys battery unplug
+```
+adb shell dumpsys battery unplug    //  断开充电状态  6.0以上
+
+
+```
+###   adb shell dumpsys battery reset
+```
+ adb shell dumpsys battery reset      // 复位，恢复实际状态
+
+```
+###  adb shell dumpsys battery set level 100
+```
+adb shell dumpsys battery set level 100    // 设置电量百分比
+
+```
 ## adb shell top -m 5 -t
 ```
 adb shell top -m 5 -t             //按占用cpu大小列出5个进程列表
@@ -555,6 +789,170 @@ permission:com.ss.android.auto.push.permission.MESSAGE
 permission:com.wandoujia.phoenix2.permission.MIPUSH_RECEIVE
 permission:com.jingdong.pdj.push.permission.MESSAGE
 permission:android.permission.UPDATE_APP_OPS_STATS
+```
+
+##  db shell content query --uri
+```
+db shell content query --uri  content://xxxxxxxxxxxxxxxxx      //  查询provider数据
+
+adb shell content query --uri content://media/internal/images/media            // 查看image数据库
+adb shell content query --uri content://media/internal/video/media            // 查看video数据库
+adb shell content query --uri content://media/internal/audio/media           // 查看audio数据库
+adb shell content query --uri content://media/internal/file                 // 查看文件系统数据库
+
+
+
+Row: 0 _id=1, _data=/system, _size=0, format=12289, parent=0, date_added=172827, date_modified=0, mime_type=NULL, title=system, description=NULL, _display_name=system, picasa_id=NULL, orientation=NULL, latitude=NULL, longitude=NULL, datetaken=NULL, mini_thumb_magic=NULL, bucket_id=47, bucket_display_name=, isprivate=NULL, title_key=NULL, artist_id=NULL, album_id=NULL, composer=NULL, track=NULL, year=NULL, date=NULL, is_ringtone=NULL, is_music=NULL, is_alarm=NULL, is_notification=NULL, is_podcast=NULL, album_artist=NULL, album_artist_key=NULL, duration=NULL, bookmark=NULL, artist=NULL, album=NULL, resolution=NULL, tags=NULL, category=NULL, language=NULL, mini_thumb_data=NULL, name=NULL, media_type=0, old_id=NULL, storage_id=0, is_drm=NULL, width=NULL, height=NULL, camera_refocus=0
+
+
+Row: 1 _id=2, _data=/system/media, _size=0, format=12289, parent=1, date_added=172827, date_modified=1230739200, mime_type=NULL, title=media, description=NULL, _display_name=media, picasa_id=NULL, orientation=NULL, latitude=NULL, longitude=NULL, datetaken=NULL, mini_thumb_magic=NULL, bucket_id=-2124328162, bucket_display_name=system, isprivate=NULL, title_key=NULL, artist_id=NULL, album_id=NULL, composer=NULL, track=NULL, year=NULL, date=NULL, is_ringtone=NULL, is_music=NULL, is_alarm=NULL, is_notification=NULL, is_podcast=NULL, album_artist=NULL, album_artist_key=NULL, duration=NULL, bookmark=NULL, artist=NULL, album=NULL, resolution=NULL, tags=NULL, category=NULL, language=NULL, mini_thumb_data=NULL, name=NULL, media_type=0, old_id=NULL, storage_id=0, is_drm=NULL, width=NULL, height=NULL, camera_refocus=0
+
+
+```
+
+##  adb shell dumpsys netstats detail   
+```
+adb shell dumpsys netstats detail        // 网络情况详细信息
+Active interfaces:
+  iface=tun0 ident=[{type=VPN, subType=COMBINED, metered=false}]
+  iface=wlan0 ident=[{type=WIFI, subType=COMBINED, networkId="3CC_5G", metered=false}]
+Active UID interfaces:
+  iface=tun0 ident=[{type=VPN, subType=COMBINED, metered=false}]
+  iface=wlan0 ident=[{type=WIFI, subType=COMBINED, networkId="3CC_5G", metered=false}]
+Dev stats:
+  Pending bytes: 0
+  History since boot:
+  ident=[{type=MOBILE, subType=COMBINED, subscriberId=460110..., metered=true}] uid=-1 set=ALL tag=0x0
+    NetworkStatsHistory: bucketDuration=3600
+      st=1545048000 rb=106613 rp=291 tb=39561 tp=334 op=0
+      st=1545051600 rb=4297352 rp=7660 tb=8204613 tp=11037 op=0
+      st=1545055200 rb=254016 rp=725 tb=157683 tp=833 op=0
+      st=1545058800 rb=1868 rp=23 tb=2846 tp=30 op=0
+      st=1545062400 rb=72 rp=1 tb=166 tp=2 op=0
+      st=1545069600 rb=531 rp=7 tb=715 tp=8 op=0
+      st=1545094800 rb=24638985 rp=30319 tb=4763461 tp=26555 op=0
+      st=1545098400 rb=6258127 rp=9850 tb=1747421 tp=10521 op=0
+      st=1545102000 rb=716947 rp=1378 tb=225295 tp=1449 op=0
+
+```
+
+## adb shell dumpsys procstats --hours 3
+```
+adb shell dumpsys procstats --hours 3            //   最近三小时 进程情况
+
+AGGREGATED OVER LAST 3 HOURS:
+  * com.android.systemui:recents / u0a31 / v7000001:
+           TOTAL: 100% (40MB-34MB-89MB/21MB-33MB-69MB over 22)
+             Top: 5.4% (89MB-69MB-89MB/69MB-69MB-69MB over 3)
+          Imp Fg: 95% (40MB-28MB-53MB/21MB-28MB-36MB over 19)
+  * com.tencent.mm:push / u0a108 / v1360:
+           TOTAL: 100% (24MB-16MB-28MB/12MB-15MB-18MB over 22)
+          Imp Fg: 1.9% (26MB-17MB-28MB/16MB-18MB-18MB over 2)
+       Heavy Wgt: 98% (24MB-15MB-27MB/12MB-15MB-17MB over 20)
+  * com.meizu.dataservice / 1000 / v45:
+  * 
+Run time Stats:
+  SOff/Norm: +13m1s966ms
+       Mod : +8s746ms
+       Low : +1m11s498ms
+       Crit: +463ms
+  SOn /Norm: +57m25s143ms
+       Mod : +4m21s977ms
+       Low : +2m59s879ms
+       Crit: +20m10s227ms
+      TOTAL: +1h39m19s899ms
+
+Memory usage:
+  Kernel : 335MB (59 samples)
+  Native : 270MB (59 samples)
+  Persist: 414MB (606 samples)
+  Top    : 208MB (391 samples)
+  ImpFg  : 155MB (1150 samples)
+  ImpBg  : 58MB (469 samples)
+  HeavyWt: 109MB (297 samples)
+  Service: 254MB (2022 samples)
+  Receivr: 167KB (1629 samples)
+  Home   : 37MB (125 samples)
+  LastAct: 7.1MB (223 samples)
+  CchAct : 430KB (10 samples)
+  CchCAct: 40MB (68 samples)
+  CchEmty: 183MB (740 samples)
+  Cached : 335MB (59 samples)
+  Free   : 64MB (59 samples)
+  Z-Ram  : 235MB (59 samples)
+  TOTAL  : 2.6GB
+  ServRst: 0.95MB (871 samples)
+
+          Start time: 2018-12-18 09:43:40
+  Total elapsed time: +2h16m52s456ms (partial) (swapped-out-pss) libart.so
+
+
+```
+
+
+## adb shell dumpsys SurfaceFlinger --latency 
+```
+adb shell dumpsys SurfaceFlinger --latency                  // 画面合成帧服务状态
+
+16666666
+9223372036854775807     24382784960224  9223372036854775807
+9223372036854775807     24382868506891  9223372036854775807
+9223372036854775807     24382885229391  9223372036854775807
+9223372036854775807     24382901935381  9223372036854775807
+9223372036854775807     24382935338141  9223372036854775807
+9223372036854775807     24382968763089  9223372036854775807
+9223372036854775807     24382985478610  9223372036854775807
+9223372036854775807     24383002186943  9223372036854775807
+9223372036854775807     24383018876474  9223372036854775807
+9223372036854775807     24383035587724  9223372036854775807
+9223372036854775807     24383052287360  9223372036854775807
+9223372036854775807     24383068990433  9223372036854775807
+
+```
+
+
+## adb shell dumpsys sensorservice
+```
+adb shell dumpsys sensorservice              // 传感器信息
+
+Sensor Device:
+HAL: MultiHal Sensor Module (Google, Inc), version 0x01030001
+Fusion States:
+9-axis fusion disabled (0 clients), gyro-rate= 200.00Hz, q=< 0, 0, 0, 0 > (0), b=< 0, 0, 0 >
+game fusion(no mag) disabled (0 clients), gyro-rate= 200.00Hz, q=< 0, 0, 0, 0 > (0), b=< 0, 0, 0 >
+geomag fusion (no gyro) disabled (0 clients), gyro-rate= 200.00Hz, q=< 0, 0, 0, 0 > (0), b=< 0, 0, 0 >
+Recent Sensor events:
+Orientation: last 10 events
+	 1 (ts=49389.806111479, wall=10:25:40.599) 143.28, -38.01, -13.00, 
+	 2 (ts=49389.826100493, wall=10:25:40.620) 143.29, -38.01, -13.00, 
+Significant Motion Detector: last 2 events
+	 1 (ts=2705.598469272, wall=21:27:53.805) 1.00, 
+	 2 (ts=3366.641328087, wall=21:38:44.701) 1.00, 
+Step Counter: last 50 events
+	 1 (ts=58259.297141846, wall=12:53:29.837) 6707, 
+	 2 (ts=58259.557395752, wall=12:53:29.837) 6708,
+Linear Acceleration: last 10 events
+	 1 (ts=46750.969951023, wall=09:41:42.483) 0.03, 0.72, -0.53, 
+	 2 (ts=46750.989970555, wall=09:41:42.503) 0.72, -0.04, -0.93, 
+Gravity: last 10 events
+	 1 (ts=58918.870586946, wall=13:04:28.794) 3.32, 5.83, 7.15, 
+	 2 (ts=58918.930553987, wall=13:04:28.856) 3.40, 5.71, 7.21, 
+	 3 (ts=58918.990490511, wall=13:04:28.918) 3.53, 5.68, 7.17, 
+```
+
+##  adb shell dumpsys wifi ipmanager
+```
+adb shell dumpsys wifi ipmanager                //   WIFI配置相关信息
+IpManager.wlan0 APF dump:
+  No apf support
+
+IpManager.wlan0 StateMachine dump:
+  12-17 20:43:20.235 - CMD_SET_MULTICAST_FILTER wlan0/-1 0 0 true [rcvd_in=StoppedState, proc_in=StoppedState]
+  12-17 20:43:22.669 - OBSERVED interfaceAdded(wlan0)
+  12-17 20:43:35.293 - CMD_STOP wlan0/-1 0 0 null [rcvd_in=StoppedState, proc_in=StoppedState]
+  12-17 20:43:35.305 - INVOKE setNeighborDiscoveryOffload(true)
+  12-17 20:43:35.308 - CMD_UPDATE_HTTP_PROXY wlan0/22 0 0 null [rcvd_in=StoppedState, proc_in=StoppedState]
+
 ```
 # T
 # U
@@ -2369,958 +2767,6 @@ ACTIVITY MANAGER CONTENT PROVIDERS (dumpsys activity providers)
     authority=com.ss.android.article.news.newmedia.downloads
   * ContentProviderRecord{fdff27c u0 com.ss.android.article.news/com.ss.android.pushmanager.setting.PushMultiProcessSharedProvider}
     proc=ProcessRecord{f5bfef2 10805:com.ss.android.article.news/u0a103}
-    authority=com.ss.android.pushmanager.setting.PushMultiProcessSharedProvider143
-  * ContentProviderRecord{6243705 u0 com.ss.android.article.news/com.igexin.download.DownloadProvider}
-    proc=ProcessRecord{5dcdfbe 2265:com.ss.android.article.news:push/u0a103}
-    authority=downloads.com.ss.android.article.news
-  * ContentProviderRecord{90d235a u0 com.baidu.input/com.baidu.simeji.dpreference.PreferenceProvider}
-    proc=ProcessRecord{9e0f98 2838:com.baidu.input/u0a362}
-    authority=com.baidu.input.dprefrenceprovider
-  * ContentProviderRecord{cf9a98b u0 com.sina.weibo/.core.sp.PreferenceProvider}
-    proc=ProcessRecord{2dbe127 2646:com.sina.weibo/u0a131}
-    authority=com.sina.weibo.preferenceProvider.authorities
-  * ContentProviderRecord{477ba68 u0 com.android.mms/com.hs.ol.UpdateFileProvider}
-    proc=ProcessRecord{1990dfb 2133:com.android.mms/u0a26}
-    authority=com.android.server.telecom.updatefileprovider
-  * ContentProviderRecord{6363e81 u0 com.tencent.mm/.plugin.ext.provider.ExtControlProviderSNS}
-    proc=ProcessRecord{ebdbca 16233:com.tencent.mm/u0a108}
-    authority=com.tencent.mm.plugin.ext.SNS
-  * ContentProviderRecord{4ea1b26 u0 com.android.phone/.PhoneSearchIndexablesProvider}
-    proc=ProcessRecord{5812e6a 2332:com.android.phone/1001}
-    authority=com.android.phone
-  * ContentProviderRecord{1575367 u0 com.tencent.mm/.plugin.emoji.provider.EmotionContentProvider}
-    proc=ProcessRecord{ebdbca 16233:com.tencent.mm/u0a108}
-    authority=com.tencent.mm.storage.provider.emotion
-  * ContentProviderRecord{6421514 u0 com.ss.android.article.news/com.ss.android.ttplatformsdk.provider.TTPlatformAccountProvider}
-    proc=ProcessRecord{f5bfef2 10805:com.ss.android.article.news/u0a103}
-    authority=com.ss.android.article.news.ttplatformapi.AccountProvider
-  * ContentProviderRecord{e0741bd u0 com.android.mms/.SuggestionsProvider}
-    proc=ProcessRecord{1990dfb 2133:com.android.mms/u0a26}
-    authority=com.android.mms.SuggestionsProvider
-  * ContentProviderRecord{44cc3b2 u0 com.meizu.mstore/com.meizu.flyme.appcenter.recommend.RecommendProvider}
-    proc=ProcessRecord{331ed60 2161:com.meizu.mstore/u0a40}
-    authority=com.meizu.flyme.appcenter.recommend
-  * ContentProviderRecord{5fbbf03 u0 com.meizu.share/.BluetoothOppProvider}
-    proc=ProcessRecord{88998bf 30354:com.meizu.share/u0a56}
-    authority=com.meizu.share
-  * ContentProviderRecord{fb56e80 u0 com.meizu.netcontactservice/.utils.dump.DumpFileProvider}
-    proc=ProcessRecord{6d63095 2454:com.meizu.netcontactservice/u0a8}
-    authority=com.meizu.netcontactservice.dumpfile
-  * ContentProviderRecord{eeb3cb9 u0 com.meizu.alphame/.appinfo.AlphaMeContentProvider}
-    proc=ProcessRecord{a9a9d58 3038:com.meizu.alphame/1000}
-    authority=com.meizu.alphame.sceneupdate.provider
-  * ContentProviderRecord{6bf68fe u0 com.android.mms/com.meizu.debug.DumpFileProvider}
-    proc=ProcessRecord{1990dfb 2133:com.android.mms/u0a26}
-    authority=com.meizu.mms.dumpfile
-  * ContentProviderRecord{3f1485f u0 com.ss.android.article.news/com.ixigua.common.XGLiveFileProvider}
-    proc=ProcessRecord{f5bfef2 10805:com.ss.android.article.news/u0a103}
-    authority=com.ss.android.article.news.live
-  * ContentProviderRecord{a42f2ac u0 com.meizu.net.pedometer/.provider.StepProvider}
-    proc=ProcessRecord{179eb75 1208:com.meizu.net.pedometer/u0a89}
-    authority=com.meizu.net.pedometer
-  * ContentProviderRecord{825170a u0 com.meizu.safe/.alphame.AlphaMeContentProvider}
-    proc=ProcessRecord{52dba64 31367:com.meizu.safe/1000}
-    authority=com.meizu.safe.alphame.provider
-  * ContentProviderRecord{8c0b7b u0 com.sina.weibo/.provider.SinaWeiboSPProvider}
-    proc=ProcessRecord{2dbe127 2646:com.sina.weibo/u0a131}
-    authority=com.sina.weibo.spProvider
-  * ContentProviderRecord{3428d98 u0 com.meizu.safe/com.avl.engine.security.AVLProvider}
-    proc=ProcessRecord{52dba64 31367:com.meizu.safe/1000}
-    authority=com.meizu.safe.AVLprovider
-  * ContentProviderRecord{60ac9f1 u0 com.ss.android.article.news/com.bytedance.frameworks.core.monitor.MonitorContentProvider}
-    proc=ProcessRecord{f5bfef2 10805:com.ss.android.article.news/u0a103}
-    authority=com.ss.android.article.news.monitor
-  * ContentProviderRecord{d8599d6 u0 com.android.providers.telephony/.debug.DumpFileProvider}
-    proc=ProcessRecord{5812e6a 2332:com.android.phone/1001}
-    authority=com.meizu.mms.remote.dumpfile
-  * ContentProviderRecord{845e457 u0 com.ss.android.article.news/com.umeng.message.provider.MessageProvider}
-    proc=ProcessRecord{f5bfef2 10805:com.ss.android.article.news/u0a103}
-    authority=com.ss.android.article.news.umeng.message
-  * ContentProviderRecord{39eeb44 u0 com.meizu.netcontactservice/.provider.NetContactDirectoryProvider}
-    proc=ProcessRecord{6d63095 2454:com.meizu.netcontactservice/u0a8}
-    authority=com.meizu.netcontactservice.directory
-  * ContentProviderRecord{f1142d u0 com.android.mms/.TempFileProvider}
-    proc=ProcessRecord{1990dfb 2133:com.android.mms/u0a26}
-    authority=temp_mms_file
-  * ContentProviderRecord{2997d62 u0 com.ss.android.article.news/com.ss.android.lockscreen.component.LockScreenProvider}
-    proc=ProcessRecord{f5bfef2 10805:com.ss.android.article.news/u0a103}
-    authority=com.ss.android.article.news.lockscreen
-  * ContentProviderRecord{b5a6ef3 u0 com.android.settings/.search.SettingsSearchIndexablesProvider}
-    proc=ProcessRecord{9adc0ab 30463:com.android.settings/1000}
-    authority=com.android.settings
-  * ContentProviderRecord{64177b0 u0 com.android.providers.downloads/.SimpleDownloadFileProvider}
-    proc=ProcessRecord{fb3bdb1 6133:com.android.providers.downloads/u0a12}
-    authority=com.android.providers.downloads.fileProvider
-  * ContentProviderRecord{e77c629 u0 com.meizu.safe/.blockService.provider.WhiteListProvider}
-    proc=ProcessRecord{52dba64 31367:com.meizu.safe/1000}
-    authority=whiteList
-  * ContentProviderRecord{4160dae u0 com.meizu.share/android.support.v4.content.FileProvider}
-    proc=ProcessRecord{88998bf 30354:com.meizu.share/u0a56}
-    authority=com.meizu.share.provider
-  * ContentProviderRecord{823074f u0 com.meizu.filemanager/android.support.v4.content.FileProvider}
-    proc=ProcessRecord{93e5edc 2923:com.meizu.filemanager/u0a48}
-    authority=com.meizu.filemanager.fileprovider
-  * ContentProviderRecord{a9d9be5 u0 com.android.providers.telephony/.QuickReplyProvider}
-    proc=ProcessRecord{5812e6a 2332:com.android.phone/1001}
-    authority=smsquickreply
-  * ContentProviderRecord{2b956ba u0 com.meizu.safe/.newpermission.PermissionProvider}
-    proc=ProcessRecord{52dba64 31367:com.meizu.safe/1000}
-    authority=com.meizu.safe.permission
-  * ContentProviderRecord{f32c96b u0 com.meizu.mstore/com.meizu.cloud.app.settings.SettingsPreferencesProvider}
-    proc=ProcessRecord{331ed60 2161:com.meizu.mstore/u0a40}
-    authority=com.meizu.cloud.appcommon.settings
-  * ContentProviderRecord{5c08cc8 u0 com.ss.android.article.news/com.ss.android.common.util.MultiProcessSharedProvider}
-    proc=ProcessRecord{f5bfef2 10805:com.ss.android.article.news/u0a103}
-    authority=com.ss.android.common.multiprocess.SHARE_PROVIDER_AUTHORITY143
-  * ContentProviderRecord{8911161 u0 com.ss.android.article.news/com.tt.miniapphost.host_bridge.CrossProcessHostDataProvider}
-    proc=ProcessRecord{f5bfef2 10805:com.ss.android.article.news/u0a103}
-    authority=com.ss.android.article.news.appbrand
-  * ContentProviderRecord{b162486 u0 com.tencent.mobileqq/.openapi.OpenApiProvider}
-    proc=ProcessRecord{a1d2ac3 32571:com.tencent.mobileqq/u0a112}
-    authority=com.tencent.mobileqq.openapi.provider
-  * ContentProviderRecord{d329147 u0 com.ss.android.article.news/com.tt.miniapphost.MiniappFileProvider}
-    proc=ProcessRecord{f5bfef2 10805:com.ss.android.article.news/u0a103}
-    authority=com.ss.android.article.news.share
-  * ContentProviderRecord{ab5ad74 u0 com.tencent.mm/.sdk.platformtools.MultiProcessSharedPreferences}
-    proc=ProcessRecord{ebdbca 16233:com.tencent.mm/u0a108}
-    authority=com.tencent.mm.sdk.platformtools.MultiProcessSharedPreferences
-  * ContentProviderRecord{5ec629d u0 com.tencent.mm/.plugin.base.stub.MMPluginProvider}
-    proc=ProcessRecord{ebdbca 16233:com.tencent.mm/u0a108}
-    authority=com.tencent.mm.sdk.plugin.provider
-  * ContentProviderRecord{e200312 u0 com.meizu.safe/com.meizu.networkmanager.provider.TrafficPreferenceProvider}
-    proc=ProcessRecord{52dba64 31367:com.meizu.safe/1000}
-    authority=com.meizu.networkManager.preference.provider
-  * ContentProviderRecord{67cfae3 u0 com.meizu.safe/.blockService.provider.BSNoteSyncProvider}
-    proc=ProcessRecord{52dba64 31367:com.meizu.safe/1000}
-    authority=com.meizu.blockservice.sync
-  * ContentProviderRecord{63a2ce0 u0 com.ss.android.article.news/com.bytedance.frameworks.plugin.stub.p0.StubContentProvider}
-    proc=ProcessRecord{f5bfef2 10805:com.ss.android.article.news/u0a103}
-    authority=com.ss.android.article.news.stub.p0.STUB_AUTHORITY
-  * ContentProviderRecord{5b18b99 u0 com.meizu.netcontactservice/.intercept.PhoneInterceptProvider}
-    proc=ProcessRecord{6d63095 2454:com.meizu.netcontactservice/u0a8}
-    authority=com.meizu.netcontactservice.intercept
-  * ContentProviderRecord{6773e5e u0 com.meizu.net.search/.db.UsageHistoryContentProvider}
-    proc=ProcessRecord{7a623f 2216:com.meizu.net.search/u0a68}
-    authority=com.meizu.net.search.provider.usagehistory
-  * ContentProviderRecord{9c5370c u0 com.sina.weibo/.PictureListProvider}
-    proc=ProcessRecord{2dbe127 2646:com.sina.weibo/u0a131}
-    authority=com.sina.weibo.picListProvider
-  * ContentProviderRecord{f064855 u0 com.meizu.netcontactservice/.geo.GeoProvider}
-    proc=ProcessRecord{6d63095 2454:com.meizu.netcontactservice/u0a8}
-    authority=mzgeocoded_location
-  * ContentProviderRecord{674e26a u0 com.meizu.safe/com.meizu.networkmanager.monitor.TrafficNetStatusProvider}
-    proc=ProcessRecord{52dba64 31367:com.meizu.safe/1000}
-    authority=com.meizu.networkmanager.monitor.provider
-  * ContentProviderRecord{4bce35b u0 com.tencent.mm/.plugin.ext.provider.ExtControlProviderAccountSync}
-    proc=ProcessRecord{ebdbca 16233:com.tencent.mm/u0a108}
-    authority=com.tencent.mm.plugin.ext.AccountSync
-  * ContentProviderRecord{514b7f8 u0 com.meizu.account/.database.AccountContentProvider}
-    proc=ProcessRecord{bb014d1 7329:com.meizu.account/u0a52}
-    authority=com.meizu.account
-  * ContentProviderRecord{af6bb36 u0 com.android.providers.media/.MediaProvider}
-    proc=ProcessRecord{9dc5a37 2888:android.process.media/u0a12}
-    authority=media
-  * ContentProviderRecord{3d95ba4 u0 com.ss.android.article.news/com.bytedance.article.dex.account.huawei.OtaFileProvider}
-    proc=ProcessRecord{f5bfef2 10805:com.ss.android.article.news/u0a103}
-    authority=com.ss.android.article.news.hwid.sdk.otafileprovider
-  * ContentProviderRecord{2502d0d u0 com.sina.weibo/com.sensorsdata.analytics.android.sdk.SensorsDataContentProvider}
-    proc=ProcessRecord{2dbe127 2646:com.sina.weibo/u0a131}
-    authority=com.sina.weibo.SensorsDataContentProvider
-  * ContentProviderRecord{eeb54c2 u0 com.ss.android.article.news/com.ss.android.article.base.ImageProvider}
-    proc=ProcessRecord{f5bfef2 10805:com.ss.android.article.news/u0a103}
-    authority=com.ss.android.article.base.ImageProvider
-  * ContentProviderRecord{e1262d3 u0 com.meizu.safe/.blockService.provider.SDKBlockResultProvider}
-    proc=ProcessRecord{52dba64 31367:com.meizu.safe/1000}
-    authority=360blockresult
-  * ContentProviderRecord{a228e10 u0 com.sina.weibo/.log.UserLogProvider}
-    proc=ProcessRecord{2dbe127 2646:com.sina.weibo/u0a131}
-    authority=com.sina.weibo.userlog
-  * ContentProviderRecord{85f8d09 u0 com.meizu.filemanager/com.meizu.flyme.filemanager.FileSearchProvider}
-    proc=ProcessRecord{93e5edc 2923:com.meizu.filemanager/u0a48}
-    authority=com.meizu.flyme.filemanager.FileSearchProvider
-  * ContentProviderRecord{b9dfb0e u0 com.sina.weibo/.aqts.provider.AqtsContentProvider}
-    proc=ProcessRecord{2dbe127 2646:com.sina.weibo/u0a131}
-    authority=com.sina.weibo.aqts.AqtsContentProvider
-  * ContentProviderRecord{f96592f u0 com.sina.weibo/.log.BusinessUsedTimeLogProvider}
-    proc=ProcessRecord{2dbe127 2646:com.sina.weibo/u0a131}
-    authority=com.sina.weibo.BusinessUsedTimeLogProvider
-  * ContentProviderRecord{b8a7b3c u0 com.ss.android.article.news/com.bytedance.frameworks.plugin.am.PluginActivityManagerProvider}
-    proc=ProcessRecord{f5bfef2 10805:com.ss.android.article.news/u0a103}
-    authority=com.ss.android.article.news.am.PAMP
-  * ContentProviderRecord{7eaf0c5 u0 com.ss.android.article.news/android.arch.lifecycle.ProcessLifecycleOwnerInitializer}
-    proc=ProcessRecord{f5bfef2 10805:com.ss.android.article.news/u0a103}
-    authority=com.ss.android.article.news.lifecycle-trojan
-  * ContentProviderRecord{1c2ba1a u0 com.ss.android.article.news/cn.jpush.android.service.DownloadProvider}
-    proc=ProcessRecord{f5bfef2 10805:com.ss.android.article.news/u0a103}
-    authority=com.ss.android.article.news.DownloadProvider
-  * ContentProviderRecord{eb9594b u0 com.tencent.mm/.plugin.ext.provider.ExtControlProviderSearchContact}
-    proc=ProcessRecord{ebdbca 16233:com.tencent.mm/u0a108}
-    authority=com.tencent.mm.plugin.ext.SearchContact
-  * ContentProviderRecord{9220f28 u0 com.tencent.mm/.plugin.ext.provider.ExtControlProviderMsg}
-    proc=ProcessRecord{ebdbca 16233:com.tencent.mm/u0a108}
-    authority=com.tencent.mm.plugin.ext.message
-  * ContentProviderRecord{50ed441 u0 com.meizu.filemanager/com.meizu.flyme.filemanager.config.remark.RemarkProvider}
-    proc=ProcessRecord{93e5edc 2923:com.meizu.filemanager/u0a48}
-    authority=com.meizu.flyme.filemanager.folder
-  * ContentProviderRecord{7425de6 u0 com.sina.weibo/android.arch.lifecycle.ProcessLifecycleOwnerInitializer}
-    proc=ProcessRecord{2dbe127 2646:com.sina.weibo/u0a131}
-    authority=com.sina.weibo.lifecycle-trojan
-  * ContentProviderRecord{5c23f27 u0 com.meizu.net.search/android.support.v4.content.FileProvider}
-    proc=ProcessRecord{7a623f 2216:com.meizu.net.search/u0a68}
-    authority=com.inveno.meizusearch.downloadservice.fileprovider
-  * ContentProviderRecord{21cf5d4 u0 com.meizu.safe/.blockService.provider.BlockCallsProvider}
-    proc=ProcessRecord{52dba64 31367:com.meizu.safe/1000}
-    authority=blockcall
-  * ContentProviderRecord{f33737d u0 com.tencent.mobileqq/com.tencent.mqq.shared_file_accessor.ContentProviderImpl}
-    proc=ProcessRecord{a1d2ac3 32571:com.tencent.mobileqq/u0a112}
-    launchingApp=ProcessRecord{a1d2ac3 32571:com.tencent.mobileqq/u0a112}
-    authority=com.tencent.mqq.shared_file_accessor.ContentProviderImpl
-  * ContentProviderRecord{5c67272 u0 com.meizu.net.search/.db.MmsProvider}
-    proc=ProcessRecord{7a623f 2216:com.meizu.net.search/u0a68}
-    authority=com.meizu.net.search.db.MmsProvider
-  * ContentProviderRecord{289a6c3 u0 com.android.mms/.secret.SecretModeProvider}
-    proc=ProcessRecord{1990dfb 2133:com.android.mms/u0a26}
-    authority=com.android.mms.secret.SecretModeProvider
-  * ContentProviderRecord{33d9b40 u0 com.ss.android.article.news/com.ss.android.account.AccountProvider}
-    proc=ProcessRecord{5dcdfbe 2265:com.ss.android.article.news:push/u0a103}
-    authority=com.ss.android.account.AccountProvider
-  * ContentProviderRecord{a08ca79 u0 com.android.providers.downloads.ui/.DownloadFileProvider}
-    proc=ProcessRecord{fb3bdb1 6133:com.android.providers.downloads/u0a12}
-    authority=com.android.providers.downloads.ui.fileProvider
-  * ContentProviderRecord{60543be u0 com.ss.android.article.news/com.bytedance.frameworks.plugin.access.HostServiceProvider}
-    proc=ProcessRecord{f5bfef2 10805:com.ss.android.article.news/u0a103}
-    authority=com.bytedance.frameworks.plugin.access
-  * ContentProviderRecord{dd5ec1f u0 com.meizu.experiencedatasync/com.meizu.stats.UsageStatsProvider}
-    proc=ProcessRecord{1012b6c 3067:com.meizu.experiencedatasync/1000}
-    authority=com.meizu.usagestats
-  * ContentProviderRecord{a429535 u0 com.android.mms/android.support.v4.content.FileProvider}
-    proc=ProcessRecord{1990dfb 2133:com.android.mms/u0a26}
-    authority=com.android.mms.fileProvider
-  * ContentProviderRecord{3cdddca u0 com.tencent.mm/.plugin.ext.provider.ExtContentProviderBase}
-    proc=ProcessRecord{ebdbca 16233:com.tencent.mm/u0a108}
-    authority=com.tencent.mm.plugin.ext.ExtContentProviderBase
-  * ContentProviderRecord{c772b3b u0 com.sina.weibo/.provider.WeiboLogDBProvider}
-    proc=ProcessRecord{2dbe127 2646:com.sina.weibo/u0a131}
-    authority=com.sina.weibo.weiboLogProvider
-  * ContentProviderRecord{88b9258 u0 com.android.providers.downloads/.DownloadStorageProvider}
-    proc=ProcessRecord{fb3bdb1 6133:com.android.providers.downloads/u0a12}
-    authority=com.android.providers.downloads.documents
-  * ContentProviderRecord{2144fb1 u0 com.meizu.battery/com.meizu.power.provider.PowerProvider}
-    proc=ProcessRecord{6d40c96 1110:com.meizu.battery/1000}
-    authority=com.meizu.battery.provider
-  * ContentProviderRecord{6234017 u0 com.android.mms/cn.com.xy.sms.sdk.provider.UserPortrayProvider}
-    proc=ProcessRecord{1990dfb 2133:com.android.mms/u0a26}
-    authority=cn.com.xy.sms.sdk.provider
-  * ContentProviderRecord{3537c04 u0 com.meizu.privacy/.providers.PrivacyProvider}
-    proc=ProcessRecord{96d35ed 2344:com.meizu.privacy/1338}
-    authority=com.meizu.prvacy.providers
-  * ContentProviderRecord{c3c5c22 u0 com.ss.android.article.news/com.bytedance.frameworks.plugin.pm.PluginPackageManagerProvider}
-    proc=ProcessRecord{f5bfef2 10805:com.ss.android.article.news/u0a103}
-    authority=com.ss.android.article.news.pm.PPMP
-  * ContentProviderRecord{e11c6b3 u0 com.meizu.netcontactservice/android.arch.lifecycle.ProcessLifecycleOwnerInitializer}
-    proc=ProcessRecord{6d63095 2454:com.meizu.netcontactservice/u0a8}
-    authority=com.meizu.netcontactservice.lifecycle-trojan
-  * ContentProviderRecord{98e5470 u0 com.android.settings/android.support.v4.content.FileProvider}
-    proc=ProcessRecord{9adc0ab 30463:com.android.settings/1000}
-    authority=com.android.settings.files
-  * ContentProviderRecord{df443e9 u0 com.meizu.netcontactservice/com.meizu.breakingscam.provider.BreakingScamContentProvider}
-    proc=ProcessRecord{6d63095 2454:com.meizu.netcontactservice/u0a8}
-    launchingApp=ProcessRecord{6d63095 2454:com.meizu.netcontactservice/u0a8}
-    authority=com.meizu.breakingscam.provider.BreakingScamContentProvider
-  * ContentProviderRecord{ce8186e u0 com.ss.android.article.news/com.ss.android.partner.WakeupProvider}
-    proc=ProcessRecord{5dcdfbe 2265:com.ss.android.article.news:push/u0a103}
-    authority=com.ss.android.article.news.wakeup.provider
-  * ContentProviderRecord{9581b0f u0 com.meizu.safe/.blockService.provider.SMSUnSubscribeProvider}
-    proc=ProcessRecord{52dba64 31367:com.meizu.safe/1000}
-    authority=smsphonenum
-  * ContentProviderRecord{f5c479c u0 com.meizu.alphame/.appinfo.UserBehaviorContentProvider}
-    proc=ProcessRecord{a9a9d58 3038:com.meizu.alphame/1000}
-    authority=com.meizu.alphame.behavior.provider
-  * ContentProviderRecord{6c435a5 u0 com.android.mms/com.juphoon.rcs.provider.GroupProvider}
-    proc=ProcessRecord{1990dfb 2133:com.android.mms/u0a26}
-    authority=rms_group
-  * ContentProviderRecord{c814d7a u0 com.tencent.mobileqq/.content.FriendListProvider}
-    proc=ProcessRecord{a1d2ac3 32571:com.tencent.mobileqq/u0a112}
-    authority=qq.friendlist
-  * ContentProviderRecord{f05592b u0 com.meizu.account/android.support.v4.content.FileProvider}
-    proc=ProcessRecord{bb014d1 7329:com.meizu.account/u0a52}
-    authority=com.meizu.account.fileprovider
-  * ContentProviderRecord{8b44188 u0 com.meizu.net.search/com.squareup.picasso.PicassoProvider}
-    proc=ProcessRecord{7a623f 2216:com.meizu.net.search/u0a68}
-    authority=com.meizu.net.search.com.squareup.picasso
-  * ContentProviderRecord{7e78721 u0 com.android.providers.media/.MediaDocumentsProvider}
-    proc=ProcessRecord{9dc5a37 2888:android.process.media/u0a12}
-    authority=com.android.providers.media.documents
-  * ContentProviderRecord{d46c746 u0 com.sina.weibo/com.sina.push.datacenter.PushProvider}
-    proc=ProcessRecord{dfe5d07 2726:com.sina.weibo:remote/u0a131}
-    authority=com.sina.push.pushprovider.1004
-  * ContentProviderRecord{fee34 u0 com.android.bluetooth/.map.MmsFileProvider}
-    proc=ProcessRecord{a9b8ebe 30279:com.android.bluetooth/1002}
-    authority=com.android.bluetooth.map.MmsFileProvider
-  * ContentProviderRecord{194745d u0 com.sina.weibo/.provider.SinaWeiboDBProvider}
-    proc=ProcessRecord{2dbe127 2646:com.sina.weibo/u0a131}
-    authority=com.sina.weibo.blogProvider
-  * ContentProviderRecord{49811d2 u0 com.iflytek.speechsuite/com.iflytek.speechcloud.providers.PreBuildResourceProvider}
-    proc=ProcessRecord{971eb13 32215:com.iflytek.speechsuite/u0a51}
-    authority=com.iflytek.speechcloud.providers.PreBuildResourceProvider
-  * ContentProviderRecord{499c2a3 u0 com.meizu.safe/com.meizu.networkmanager.provider.TrafficDataStatisticProvider}
-    proc=ProcessRecord{52dba64 31367:com.meizu.safe/1000}
-    authority=com.meizu.networkmanager.monitor.data.statistic.provider
-  * ContentProviderRecord{bd7b9a0 u0 com.meizu.mzsyncservice/com.meizu.sync.db.MSyncProvider}
-    proc=ProcessRecord{b388587 30521:com.meizu.mzsyncservice/u0a88}
-    authority=com.meizu.sync.provider
-  * ContentProviderRecord{728f959 u0 com.meizu.net.search/.db.ApplicationContentProvider}
-    proc=ProcessRecord{7a623f 2216:com.meizu.net.search/u0a68}
-    authority=com.meizu.net.search.provider.application
-  * ContentProviderRecord{c41791e u0 com.meizu.safe/.security.QrCodeUrlLocalDbProvider}
-    proc=ProcessRecord{52dba64 31367:com.meizu.safe/1000}
-    authority=com.meizu.safe.provider.qr_code_url_local_db_provider
-  * ContentProviderRecord{5fbe5ff u0 com.meizu.safe/.common.provider.SharedPrefsProvider}
-    proc=ProcessRecord{52dba64 31367:com.meizu.safe/1000}
-    authority=com.meizu.safe.common.provider.SharedPrefsProvider
-  * ContentProviderRecord{e8ecfcc u0 com.sina.weibo/.core.DataCenter.DataCenterProvider}
-    proc=ProcessRecord{2dbe127 2646:com.sina.weibo/u0a131}
-    authority=com.sina.weibo.WB.DataCenterProvider
-  * ContentProviderRecord{9e6d215 u0 com.ss.android.article.news/com.storage.sp.internal.SharedPref.framework.StorageProvider}
-    proc=ProcessRecord{f5bfef2 10805:com.ss.android.article.news/u0a103}
-    authority=com.ss.android.article.news.storage
-  * ContentProviderRecord{c88092a u0 com.android.mms/com.android.messaging.datamodel.MessagingContentProvider}
-    proc=ProcessRecord{1990dfb 2133:com.android.mms/u0a26}
-    authority=com.android.messaging.datamodel.MessagingContentProvider
-  * ContentProviderRecord{932e31b u0 com.tencent.mobileqq/.emoticon.EmoticonContentProvider}
-    proc=ProcessRecord{a1d2ac3 32571:com.tencent.mobileqq/u0a112}
-    authority=qq.emoticon
-  * ContentProviderRecord{dbf1cb8 u0 com.sina.weibo/.sync.stub.SyncStubProvider}
-    proc=ProcessRecord{2dbe127 2646:com.sina.weibo/u0a131}
-    authority=com.sina.weibo.sync.authority
-
-ACTIVITY MANAGER URI PERMISSIONS (dumpsys activity permissions)
-  Granted Uri Permissions:
-  * UID 10025 holds:
-    UriPermission{36f7a91 0 @ content://downloads/all_downloads/2}
-  * UID 10026 holds:
-    UriPermission{af58df6 0 @ content://com.meizu.safe.common.provider.SharedPrefsProvider/}
-  * UID 10135 holds:
-    UriPermission{e1295f7 0 @ content://downloads/all_downloads/1}
-  * UID 10310 holds:
-    UriPermission{ba54c64 0 @ content://downloads/all_downloads/3}
-  * UID 10323 holds:
-    UriPermission{c002ecd 0 @ content://com.android.externalstorage.documents/tree/86A0-B878%3A [prefix]}
-
-ACTIVITY MANAGER SERVICES (dumpsys activity services)
-  Last ANR service:
-ServiceRecord{8c57428 u0 com.ss.android.ugc.aweme/com.xiaomi.push.service.XMPushService}
-    intent={cmp=com.ss.android.ugc.aweme/com.xiaomi.push.service.XMPushService}
-    packageName=com.ss.android.ugc.aweme
-    processName=com.ss.android.ugc.aweme:pushservice
-    baseDir=/data/app/com.ss.android.ugc.aweme-1/base.apk
-    dataDir=/data/user/0/com.ss.android.ugc.aweme
-    app=ProcessRecord{cc44cd0 29319:com.ss.android.ugc.aweme:pushservice/u0a114}
-    createTime=-15m8s616ms startingBgTimeout=-3m37s317ms
-    lastActivity=-3m20s18ms restartTime=-3m20s18ms createdFromFg=false
-    startRequested=true delayedStop=false stopIfKilled=false callStart=true lastStartId=46
-    executeNesting=2 executeFg=false executingStart=-3m20s15ms
-    restartCount=0 restartDelay=-- nextRestartTime=-3m20s72ms crashCount=0
-    Delivered Starts:
-    #0 id=46 dur=-3m20s15ms dc=1
-      intent=null
-
-  User 0 active services:
-  * ServiceRecord{44a2e40 u0 com.android.bluetooth/.hid.HidService}
-    app=ProcessRecord{a9b8ebe 30279:com.android.bluetooth/1002}
-    created=-23h21m32s271ms started=true connections=2
-    Connections:
-      act=android.bluetooth.IBluetoothInputDevice -> 2053:com.android.systemui/u0a31
-      act=android.bluetooth.IBluetoothInputDevice -> 2053:com.android.systemui/u0a31
-  * ServiceRecord{5f4414f u0 com.baidu.input/.ImeService}
-    app=ProcessRecord{9e0f98 2838:com.baidu.input/u0a362}
-    created=-1d20h12m11s919ms started=false connections=1
-    Connections:
-      act=android.view.InputMethod -> 1738:system/1000
-  * ServiceRecord{6835a8 u0 com.meizu.location/.service.UpdateService}
-    app=ProcessRecord{9e49382 3651:com.meizu.location/u0a16}
-    created=-1d20h11m30s526ms started=true connections=0
-  * ServiceRecord{51aea6f u0 com.qualcomm.qti.phonefeature/.FeatureService}
-    app=ProcessRecord{5812e6a 2332:com.android.phone/1001}
-    created=-1d20h11m56s764ms started=true connections=0
-  * ServiceRecord{8567351 u0 org.codeaurora.ims/.ImsService}
-    app=ProcessRecord{5812e6a 2332:com.android.phone/1001}
-    created=-1d20h12m14s476ms started=true connections=0
-  * ServiceRecord{ad80a52 u0 com.meizu.facerecognition/.server.BootFaceRecognitionService}
-    app=ProcessRecord{3d09a93 2048:com.meizu.facerecognition/1000}
-    created=-1d20h12m17s628ms started=true connections=0
-  * ServiceRecord{233e7d1 u0 com.ss.android.article.news/com.ss.android.message.NotifyService}
-    app=ProcessRecord{5dcdfbe 2265:com.ss.android.article.news:push/u0a103}
-    created=-3h43m30s544ms started=true connections=0
-  * ServiceRecord{1acc843 u0 com.oma.drm.server/.DrmManagerClientServer}
-    app=ProcessRecord{f9ccad0 3051:com.oma.drm.server/u0a58}
-    created=-1d20h11m38s479ms started=true connections=0
-  * ServiceRecord{35a9932 u0 com.qualcomm.location/.LocationService}
-    app=ProcessRecord{7c6d553 1738:system/1000}
-    created=-1d20h12m5s375ms started=true connections=0
-  * ServiceRecord{e55640c u0 com.meizu.net.pedometer/.receiver.SensorService}
-    app=ProcessRecord{179eb75 1208:com.meizu.net.pedometer/u0a89}
-    created=-1d20h11m35s675ms started=true connections=0
-  * ServiceRecord{bd9f4c6 u0 com.meizu.flyme.update/.download.QueryUpdateService}
-    app=ProcessRecord{f09752 30941:com.meizu.flyme.update/1000}
-    created=-22m10s519ms started=false connections=1
-    Connections:
-      act=com.meizu.flyme.update.QUERY_UPDATE pkg=com.meizu.flyme.update -> 30463:com.android.settings/1000
-  * ServiceRecord{e291a80 u0 com.android.systemui/.keyguard.KeyguardService}
-    app=ProcessRecord{b024068 2053:com.android.systemui/u0a31}
-    created=-1d20h12m16s8ms started=false connections=1
-    Connections:
-      flg=0x100 -> 1738:system/1000
-  * ServiceRecord{ed18a04 u0 com.tencent.mm/.plugin.sport.service.SportService}
-    app=ProcessRecord{dca7ca1 16300:com.tencent.mm:exdevice/u0a108}
-    created=-8h50m38s420ms started=false connections=2
-    Connections:
-      flg=0x10000000 -> 16233:com.tencent.mm/u0a108
-      flg=0x10000000 -> 16233:com.tencent.mm/u0a108
-  * ServiceRecord{2290bd1 u0 com.android.bluetooth/.btservice.AdapterService}
-    app=ProcessRecord{a9b8ebe 30279:com.android.bluetooth/1002}
-    created=-23h21m32s974ms started=false connections=1
-    Connections:
-      act=android.bluetooth.IBluetooth -> 1738:system/1000
-  * ServiceRecord{6eca683 u0 com.qualcomm.location/.izat.IzatService}
-    app=ProcessRecord{7c6d553 1738:system/1000}
-    created=-1d20h12m5s369ms started=true connections=0
-  * ServiceRecord{70bf1e0 u0 com.meizu.dataservice/.ExperienceService}
-    app=ProcessRecord{272f2fe 24067:com.meizu.dataservice/1000}
-    created=-1d20h12m10s773ms started=true connections=0
-  * ServiceRecord{7eca7bf u0 com.android.systemui/.ImageWallpaper}
-    app=ProcessRecord{b024068 2053:com.android.systemui/u0a31}
-    created=-1d20h12m16s750ms started=false connections=1
-    Connections:
-      act=android.service.wallpaper.WallpaperService -> 1738:system/1000
-  * ServiceRecord{6bc19ef u0 com.tencent.mm/.plugin.exdevice.service.ExDeviceService}
-    app=ProcessRecord{dca7ca1 16300:com.tencent.mm:exdevice/u0a108}
-    created=-23h10m31s803ms started=true connections=1
-    Connections:
-       -> 16233:com.tencent.mm/u0a108
-  * ServiceRecord{931c31 u0 com.meizu.share/.BluetoothOppService}
-    app=ProcessRecord{88998bf 30354:com.meizu.share/u0a56}
-    created=-1d20h12m10s67ms started=true connections=0
-  * ServiceRecord{9901266 u0 com.meizu.cloud/.service.MzCloudService}
-    app=ProcessRecord{86deac9 1489:com.meizu.cloud/u0a49}
-    created=-1d20h11m43s267ms started=true connections=0
-  * ServiceRecord{8df24ef u0 com.meizu.safe/.service.SafeSecureService}
-    app=ProcessRecord{52dba64 31367:com.meizu.safe/1000}
-    created=-1d20h12m5s625ms started=true connections=0
-  * ServiceRecord{4cddd2d u0 com.qualcomm.qti.tetherservice/.TetherService}
-    app=ProcessRecord{4cc65ce 2316:.dataservices/1000}
-    created=-1d20h11m37s432ms started=true connections=0
-  * ServiceRecord{20e5e56 u0 com.android.mms/com.juphoon.service.rcs.RcsService}
-    app=ProcessRecord{1990dfb 2133:com.android.mms/u0a26}
-    created=-3m28s436ms started=false connections=1
-    Connections:
-      act=com.juphoon.service.rcsservice.action -> 2133:com.android.mms/u0a26
-  * ServiceRecord{a5d2bed u0 com.tencent.mm/.booter.NotifyReceiver$NotifyService}
-    app=ProcessRecord{ebdbca 16233:com.tencent.mm/u0a108}
-    created=-8h50m38s311ms started=true connections=0
-  * ServiceRecord{a5e1e22 u0 com.flyme.systemuitools/com.meizu.luckymoney.LuckyMoneyService}
-    app=ProcessRecord{c05c39e 2708:com.flyme.systemuitools/u0a31}
-    created=-1d20h12m11s740ms started=true connections=0
-  * ServiceRecord{9b01167 u0 com.android.systemui/com.meizu.statsapp.v3.USPMultiProcessService}
-    app=ProcessRecord{b024068 2053:com.android.systemui/u0a31}
-    created=-1d20h12m17s210ms started=false connections=2
-    Connections:
-       -> 2217:com.android.systemui:recents/u0a31
-       -> 2053:com.android.systemui/u0a31
-  * ServiceRecord{7f3d103 u0 com.dsi.ant.server/.AntService}
-    app=ProcessRecord{7c6d553 1738:system/1000}
-    created=-1d20h11m42s24ms started=true connections=0
-  * ServiceRecord{fd49a19 u0 com.flyme.telecom.usagedata.service/.TeleUsageDataService}
-    app=ProcessRecord{d604cef 2348:com.flyme.telecom.usagedata.service/1001}
-    created=-1d20h12m14s598ms started=true connections=0
-  * ServiceRecord{23210b u0 com.qualcomm.location/.izatserviceprovider.service.UnifiedLocationService}
-    app=ProcessRecord{7c6d553 1738:system/1000}
-    created=-1d20h12m5s501ms started=false connections=1
-    Connections:
-      act=com.android.location.service.FusedLocationProvider -> 1738:system/1000
-  * ServiceRecord{ace32fe u0 com.ss.android.article.news/com.ss.android.socialbase.downloader.notification.DownloadNotificationService}
-    app=ProcessRecord{f5bfef2 10805:com.ss.android.article.news/u0a103}
-    created=-1h13m30s406ms started=true connections=0
-  * ServiceRecord{efdae96 u0 com.flyme.systemuitools/.gameassistant.GameAssistantService}
-    app=ProcessRecord{c05c39e 2708:com.flyme.systemuitools/u0a31}
-    created=-1d20h12m11s767ms started=true connections=0
-  * ServiceRecord{c3b860e u0 com.android.bluetooth/.gatt.GattService}
-    app=ProcessRecord{a9b8ebe 30279:com.android.bluetooth/1002}
-    created=-23h21m32s529ms started=true connections=1
-    Connections:
-      act=android.bluetooth.IBluetoothGatt -> 1738:system/1000
-  * ServiceRecord{32d6179 u0 com.android.bluetooth/.hdp.HealthService}
-    app=ProcessRecord{a9b8ebe 30279:com.android.bluetooth/1002}
-    created=-23h21m32s267ms started=true connections=0
-  * ServiceRecord{13685b3 u0 com.android.bluetooth/.sap.SapService}
-    app=ProcessRecord{a9b8ebe 30279:com.android.bluetooth/1002}
-    created=-23h21m32s227ms started=true connections=0
-  * ServiceRecord{80e6093 u0 com.meizu.safe/.blockService.service.MzBlockRealService}
-    app=ProcessRecord{52dba64 31367:com.meizu.safe/1000}
-    created=-21m53s428ms started=false connections=1
-    Connections:
-      act=com.meizu.safe.blockService.service.MzBlockService -> 31367:com.meizu.safe/1000
-  * ServiceRecord{c10b722 u0 com.android.bluetooth/.avrcp.AvrcpControllerService}
-    app=ProcessRecord{a9b8ebe 30279:com.android.bluetooth/1002}
-    created=-23h21m32s251ms started=true connections=0
-  * ServiceRecord{6190c7b u0 com.meizu.filemanager/com.meizu.flyme.filemanager.mediascan.ScanService}
-    app=ProcessRecord{93e5edc 2923:com.meizu.filemanager/u0a48}
-    created=-3m11s590ms started=true connections=0
-  * ServiceRecord{2db77c7 u0 com.android.bluetooth/.pbap.BluetoothPbapService}
-    app=ProcessRecord{a9b8ebe 30279:com.android.bluetooth/1002}
-    created=-23h21m32s12ms started=true connections=1
-    Connections:
-      act=android.bluetooth.IBluetoothPbap -> 2053:com.android.systemui/u0a31
-  * ServiceRecord{b932f5f u0 com.meizu.safe/com.meizu.networkmanager.service.TrafficPollingService}
-    app=ProcessRecord{52dba64 31367:com.meizu.safe/1000}
-    created=-1d20h12m3s151ms started=true connections=0
-  * ServiceRecord{25af9ff u0 com.meizu.flyme.service.find/.PhoneLocationService}
-    app=ProcessRecord{28df323 31263:com.meizu.flyme.service.find/u0a54}
-    created=-1d20h11m50s218ms started=true connections=0
-  * ServiceRecord{e59189f u0 com.meizu.account/.core.internal.oauth.AndroidAccountService}
-    app=ProcessRecord{bb014d1 7329:com.meizu.account/u0a52}
-    created=-1d1h51m18s951ms started=false connections=1
-    Connections:
-      act=android.accounts.AccountAuthenticator -> 1738:system/1000
-  * ServiceRecord{7fa4686 u0 com.meizu.cloud/.pushsdk.pushservice.MzPushService}
-    app=ProcessRecord{94bc3fc 1231:com.meizu.cloud:mzservice_v1/u0a49}
-    created=-1d20h12m11s879ms started=true connections=0
-  * ServiceRecord{c0ae2ed u0 com.tencent.mm/.booter.CoreService}
-    app=ProcessRecord{6b64ec6 16174:com.tencent.mm:push/u0a108}
-    created=-1d20h11m55s866ms started=true connections=1
-    Connections:
-       -> 16233:com.tencent.mm/u0a108
-       -> 16233:com.tencent.mm/u0a108
-  * ServiceRecord{6e74e27 u0 com.android.bluetooth/.a2dp.A2dpService}
-    app=ProcessRecord{a9b8ebe 30279:com.android.bluetooth/1002}
-    created=-23h21m32s275ms started=true connections=3
-    Connections:
-      act=android.bluetooth.IBluetoothA2dp -> 2053:com.android.systemui/u0a31
-      act=android.bluetooth.IBluetoothA2dp -> 2053:com.android.systemui/u0a31
-      act=android.bluetooth.IBluetoothA2dp -> 1738:system/1000
-  * ServiceRecord{b07d7e8 u0 com.tencent.mobileqq/.app.CoreService}
-    app=ProcessRecord{a1d2ac3 32571:com.tencent.mobileqq/u0a112}
-    created=-16m35s216ms started=true connections=0
-  * ServiceRecord{f38870e u0 com.qualcomm.qcrilmsgtunnel/.QcrilMsgTunnelService}
-    app=ProcessRecord{1de692 2520:com.qualcomm.qcrilmsgtunnel/1001}
-    created=-1d20h12m15s917ms started=true connections=3
-    Connections:
-       -> 2332:com.android.phone/1001
-       -> 2332:com.android.phone/1001
-       -> 2332:com.android.phone/1001
-  * ServiceRecord{ac55fce u0 com.iflytek.speechsuite/com.iflytek.business.BusinessService}
-    app=ProcessRecord{971eb13 32215:com.iflytek.speechsuite/u0a51}
-    created=-1d6h33m49s548ms started=true connections=0
-  * ServiceRecord{658e1f1 u0 com.meizu.pps/.SystemEventService}
-    app=ProcessRecord{95f9ab 3459:com.meizu.pps/1000}
-    created=-1d20h12m7s809ms started=false connections=1
-    Connections:
-       -> 1738:system/1000
-  * ServiceRecord{e8d9123 u0 com.android.systemui/.SystemUIService}
-    app=ProcessRecord{b024068 2053:com.android.systemui/u0a31}
-    created=-1d20h12m17s616ms started=true connections=0
-  * ServiceRecord{7f9e04d u0 android/.hardware.location.GeofenceHardwareService}
-    app=ProcessRecord{7c6d553 1738:system/1000}
-    created=-1d20h12m16s623ms started=false connections=1
-    Connections:
-       -> 1738:system/1000
-  * ServiceRecord{4b46be u0 com.tencent.mm/.remoteservice.RemoteService}
-    app=ProcessRecord{ebdbca 16233:com.tencent.mm/u0a108}
-    created=-6h25m4s557ms started=false connections=1
-    Connections:
-       -> 16233:com.tencent.mm/u0a108
-       -> 16233:com.tencent.mm/u0a108
-       -> 16233:com.tencent.mm/u0a108
-  * ServiceRecord{af8fd3d u0 com.qualcomm.location/.LBSSystemMonitorService}
-    app=ProcessRecord{7c6d553 1738:system/1000}
-    created=-1d20h12m5s379ms started=true connections=0
-  * ServiceRecord{c41ce1f u0 com.sina.weibo/com.sina.push.service.SinaPushService}
-    app=ProcessRecord{dfe5d07 2726:com.sina.weibo:remote/u0a131}
-    created=-3m22s685ms started=true connections=0
-  * ServiceRecord{7294c u0 com.meizu.flyme.update/.appupgrade.download.AppDownloadService}
-    app=ProcessRecord{f09752 30941:com.meizu.flyme.update/1000}
-    created=-22m10s301ms started=false connections=1
-    Connections:
-       -> 30941:com.meizu.flyme.update/1000
-  * ServiceRecord{5470414 u0 com.android.server.telecom/.components.BluetoothPhoneService}
-    app=ProcessRecord{7c6d553 1738:system/1000}
-    created=-1d20h12m15s312ms started=true connections=1
-    Connections:
-      act=android.bluetooth.IBluetoothHeadsetPhone -> 30279:com.android.bluetooth/1002
-  * ServiceRecord{267dec0 u0 com.qti.dpmserviceapp/.DpmServiceApp}
-    app=ProcessRecord{4cc65ce 2316:.dataservices/1000}
-    created=-1d20h11m38s406ms started=true connections=0
-  * ServiceRecord{e2fcabd u0 com.qualcomm.qti.appnetaccess/.AppNetAccessService}
-    app=ProcessRecord{aecc2ee 1296:com.qualcomm.qti.appnetaccess/1000}
-    created=-1d20h11m37s667ms started=true connections=0
-  * ServiceRecord{7f3550f u0 com.flyme.systemuitools/.gameheadsup.GameHeadsUpService}
-    app=ProcessRecord{c05c39e 2708:com.flyme.systemuitools/u0a31}
-    created=-1d20h12m11s730ms started=true connections=0
-  * ServiceRecord{660c2e7 u0 com.meizu.location/.GeocodeService}
-    app=ProcessRecord{9e49382 3651:com.meizu.location/u0a16}
-    created=-1d20h12m5s495ms started=false connections=1
-    Connections:
-      act=com.android.location.service.GeocodeProvider -> 1738:system/1000
-  * ServiceRecord{5da0717 u0 com.meizu.alphame/com.amap.api.location.APSService}
-    app=ProcessRecord{a9a9d58 3038:com.meizu.alphame/1000}
-    created=-1d20h12m0s374ms started=false connections=1
-    Connections:
-       -> 3038:com.meizu.alphame/1000
-  * ServiceRecord{3495cd9 u0 com.meizu.flyme.update/.download.FwDownloadService}
-    app=ProcessRecord{f09752 30941:com.meizu.flyme.update/1000}
-    created=-22m10s305ms started=false connections=1
-    Connections:
-       -> 30941:com.meizu.flyme.update/1000
-  * ServiceRecord{fb37756 u0 com.meizu.location/.NetworkLocationService}
-    app=ProcessRecord{9e49382 3651:com.meizu.location/u0a16}
-    created=-1d20h12m5s279ms started=false connections=1
-    Connections:
-      act=com.android.location.service.v3.NetworkLocationProvider pkg=com.meizu.location -> 1738:system/1000
-  * ServiceRecord{b9aa3c8 u0 com.meizu.battery/com.meizu.power.PowerService}
-    app=ProcessRecord{6d40c96 1110:com.meizu.battery/1000}
-    created=-1d20h11m47s63ms started=true connections=0
-  * ServiceRecord{5601dd0 u0 com.android.server.telecom/.components.TelecomService}
-    app=ProcessRecord{7c6d553 1738:system/1000}
-    created=-1d20h12m18s160ms started=false connections=1
-    Connections:
-      act=com.android.ITelecomService -> 1738:system/1000
-  * ServiceRecord{99bcb60 u0 com.meizu.cloud/.pushsdk.pushservice.PushManagerService}
-    app=ProcessRecord{86deac9 1489:com.meizu.cloud/u0a49}
-    created=-1d20h12m10s387ms started=true connections=0
-  * ServiceRecord{6a648e6 u0 com.android.bluetooth/.hfp.HeadsetService}
-    app=ProcessRecord{a9b8ebe 30279:com.android.bluetooth/1002}
-    created=-23h21m32s287ms started=true connections=6
-    Connections:
-      act=android.bluetooth.IBluetoothHeadset -> 1738:system/1000
-      act=android.bluetooth.IBluetoothHeadset -> 2053:com.android.systemui/u0a31
-      act=android.bluetooth.IBluetoothHeadset -> 2053:com.android.systemui/u0a31
-      act=android.bluetooth.IBluetoothHeadset -> 1738:system/1000
-      act=android.bluetooth.IBluetoothHeadset -> 1738:system/1000
-      act=android.bluetooth.IBluetoothHeadset -> 2332:com.android.phone/1001
-  * ServiceRecord{c887bdb u0 com.meizu.share/.ShareService}
-    app=ProcessRecord{88998bf 30354:com.meizu.share/u0a56}
-    created=-1d20h12m10s326ms started=true connections=1
-    Connections:
-       -> 30279:com.android.bluetooth/1002
-  * ServiceRecord{2f87b6d u0 com.qti.qualcomm.datastatusnotification/.DataStatusNotificationService}
-    app=ProcessRecord{5812e6a 2332:com.android.phone/1001}
-    created=-1d20h11m38s360ms started=true connections=0
-  * ServiceRecord{e82af6c u0 com.meizu.mzsyncservice/com.meizu.sync.service.SyncmlService}
-    app=ProcessRecord{b388587 30521:com.meizu.mzsyncservice/u0a88}
-    created=-1d20h11m50s556ms started=true connections=0
-  * ServiceRecord{a02c826 u0 com.meizu.dataservice/.uxip.VccOfflineStatsService}
-    app=ProcessRecord{272f2fe 24067:com.meizu.dataservice/1000}
-    created=-1d20h12m11s68ms started=true connections=3
-    Connections:
-      act=com.meizu.dataservice.action.vccOfflineStats pkg=com.meizu.dataservice -> 30354:com.meizu.share/u0a56
-      act=com.meizu.dataservice.action.vccOfflineStats pkg=com.meizu.dataservice -> 2454:com.meizu.netcontactservice/u0a8
-      act=com.meizu.dataservice.action.vccOfflineStats pkg=com.meizu.dataservice -> 2133:com.android.mms/u0a26
-  * ServiceRecord{33b3f1 u0 android/com.android.internal.backup.LocalTransportService}
-    app=ProcessRecord{7c6d553 1738:system/1000}
-    created=-1d20h12m11s922ms started=false connections=1
-    Connections:
-      act=android.backup.TRANSPORT_HOST -> 1738:system/1000
-  * ServiceRecord{eec83c4 u0 com.android.mms/com.juphoon.service.im.RcsImService}
-    app=ProcessRecord{1990dfb 2133:com.android.mms/u0a26}
-    created=-3m28s433ms started=false connections=1
-    Connections:
-      act=com.juphoon.service.imservice.action -> 2133:com.android.mms/u0a26
-  * ServiceRecord{e44087e u0 com.sina.weibo/.weiyou.refactor.service.DMService}
-    app=ProcessRecord{2dbe127 2646:com.sina.weibo/u0a131}
-    created=-3m22s26ms started=true connections=0
-  * ServiceRecord{cf58015 u0 com.android.systemui/com.flyme.systemui.recents.FlymeRecentsService}
-    app=ProcessRecord{29e3801 2217:com.android.systemui:recents/u0a31}
-    created=-1d20h12m16s937ms started=false connections=1
-    Connections:
-       -> 2053:com.android.systemui/u0a31
-  * ServiceRecord{22f9caf u0 com.ss.android.article.news/com.bytedance.common.wschannel.server.WsChannelService}
-    app=ProcessRecord{5dcdfbe 2265:com.ss.android.article.news:push/u0a103}
-    created=-3h43m35s327ms started=true connections=1
-    Connections:
-       -> 10805:com.ss.android.article.news/u0a103
-  * ServiceRecord{df304bd u0 android/com.android.server.content.SyncJobService}
-    app=ProcessRecord{7c6d553 1738:system/1000}
-    created=-1d20h12m15s310ms started=true connections=0
-  * ServiceRecord{10b6dbe u0 com.sina.weibo/.HotEventService}
-    app=ProcessRecord{dfe5d07 2726:com.sina.weibo:remote/u0a131}
-    created=-3m22s862ms started=false connections=1
-    Connections:
-       -> 2646:com.sina.weibo/u0a131
-  * ServiceRecord{2fdd8ca u0 com.android.bluetooth/.map.BluetoothMapService}
-    app=ProcessRecord{a9b8ebe 30279:com.android.bluetooth/1002}
-    created=-23h21m32s257ms started=true connections=1
-    Connections:
-      act=android.bluetooth.IBluetoothMap -> 2053:com.android.systemui/u0a31
-  * ServiceRecord{a9af073 u0 com.android.mms.service/.MmsService}
-    app=ProcessRecord{5812e6a 2332:com.android.phone/1001}
-    created=-22h59m40s380ms started=false connections=1
-    Connections:
-       -> 1738:system/1000
-  * ServiceRecord{383891d u0 com.android.phone/.TelephonyDebugService}
-    app=ProcessRecord{5812e6a 2332:com.android.phone/1001}
-    created=-1d20h12m14s615ms started=true connections=0
-  * ServiceRecord{206269a u0 com.meizu.account/.service.MeizuAccountService}
-    app=ProcessRecord{bb014d1 7329:com.meizu.account/u0a52}
-    created=-1d20h11m43s302ms started=true connections=0
-  * ServiceRecord{f5c3c8b u0 com.qualcomm.simcontacts/.SimContactsService}
-    app=ProcessRecord{be16a85 30975:com.qualcomm.telephony/1000}
-    created=-1d20h11m47s422ms started=true connections=0
-  * ServiceRecord{587ecf0 u0 android.ext.services/.notification.Ranker}
-    app=ProcessRecord{54d10da 2723:android.ext.services/u0a9}
-    created=-1d20h12m20s681ms started=false connections=1
-    Connections:
-      act=android.service.notification.NotificationRankerService -> 1738:system/1000
-  * ServiceRecord{284f9ee u0 com.ss.android.article.news/com.tt.miniapphost.placeholder.MiniappService0}
-    app=ProcessRecord{f8ec90b 31201:com.ss.android.article.news:miniapp0/u0a103}
-    created=-3h43m34s236ms started=true connections=0
-  * ServiceRecord{9c1ab0c u0 com.tencent.mobileqq/.msf.service.MsfService}
-    app=ProcessRecord{a8f23e8 32513:com.tencent.mobileqq:MSF/u0a112}
-    created=-16m36s447ms started=true connections=1
-    Connections:
-       -> 32571:com.tencent.mobileqq/u0a112
-       -> 32571:com.tencent.mobileqq/u0a112
-       -> 32571:com.tencent.mobileqq/u0a112
-  * ServiceRecord{6999c35 u0 com.android.bluetooth/.pan.PanService}
-    app=ProcessRecord{a9b8ebe 30279:com.android.bluetooth/1002}
-    created=-23h21m32s261ms started=true connections=2
-    Connections:
-      act=android.bluetooth.IBluetoothPan -> 2053:com.android.systemui/u0a31
-      act=android.bluetooth.IBluetoothPan -> 2053:com.android.systemui/u0a31
-  * ServiceRecord{94c4297 u0 com.flyme.systemuitools/com.meizu.notification.FlymeNotificationFilterService}
-    app=ProcessRecord{c05c39e 2708:com.flyme.systemuitools/u0a31}
-    created=-1d20h12m20s730ms started=false connections=2
-    Connections:
-      act=com.meizu.notification.FILTER pkg=com.flyme.systemuitools -> 2053:com.android.systemui/u0a31
-      act=com.meizu.notification.FILTER pkg=com.flyme.systemuitools -> 1738:system/1000
-  * ServiceRecord{126087a u0 com.android.bluetooth/.share.ShareService}
-    app=ProcessRecord{a9b8ebe 30279:com.android.bluetooth/1002}
-    created=-23h21m32s221ms started=true connections=0
-  * ServiceRecord{b837cbf u0 com.meizu.mstore/com.meizu.cloud.app.downlad.AppDownloadService}
-    app=ProcessRecord{331ed60 2161:com.meizu.mstore/u0a40}
-    created=-3m28s134ms started=false connections=1
-    Connections:
-       -> 2161:com.meizu.mstore/u0a40
-  * ServiceRecord{4cf8e66 u0 in.zhaoj.shadowsocksrr/com.evernote.android.job.v21.PlatformJobService}
-    app=null
-    created=-4h4m24s649ms started=false connections=0
-
-ACTIVITY MANAGER RECENT TASKS (dumpsys activity recents)
-  Recent tasks:
-  * Recent #0: TaskRecord{9532a01 #11866 A=com.meizu.filemanager U=0 StackId=1 sz=2}
-  * Recent #1: TaskRecord{cfb60a6 #11741 A=com.meizu.flyme.launcher U=0 StackId=0 sz=1}
-  * Recent #2: TaskRecord{4deeae7 #11863 A=com.android.settings U=0 StackId=-1 sz=0}
-  * Recent #3: TaskRecord{4269694 #11864 A=com.meizu.flyme.update U=0 StackId=-1 sz=0}
-  * Recent #4: TaskRecord{c7653d #11862 A=com.tencent.androidqqmail U=0 StackId=1 sz=1}
-  * Recent #5: TaskRecord{bb6d7b3 #11773 A=com.tencent.mm U=0 StackId=1 sz=1}
-  * Recent #6: TaskRecord{fece132 #11854 A=com.farproc.wifi.analyzer U=0 StackId=-1 sz=0}
-  * Recent #7: TaskRecord{3254e83 #11817 A=com.hexin.plat.android U=0 StackId=1 sz=1}
-  * Recent #8: TaskRecord{1208800 #11846 A=in.zhaoj.shadowsocksrr U=0 StackId=1 sz=1}
-  * Recent #9: TaskRecord{44a1839 #11845 A=com.facebook.katana U=0 StackId=-1 sz=0}
-  * Recent #10: TaskRecord{c03de7e #11827 A=com.xiaoming.vpn U=0 StackId=-1 sz=0}
-  * Recent #11: TaskRecord{ee44fdf #11842 A=com.sina.weibo U=0 StackId=-1 sz=0}
-  * Recent #12: TaskRecord{d06242c #11841 A=com.balance6game.housingfund U=0 StackId=-1 sz=0}
-  * Recent #13: TaskRecord{aafef5 #11838 A=.sdkentry U=0 StackId=-1 sz=0}
-  * Recent #14: TaskRecord{8fb648a #11837 A=ctrip.android.view U=0 StackId=-1 sz=0}
-  * Recent #15: TaskRecord{8680afb #11836 A=com.android.systemui U=0 StackId=-1 sz=0}
-  * Recent #16: TaskRecord{c75718 #11835 A=cm.aptoide.pt U=0 StackId=1 sz=1}
-  * Recent #17: TaskRecord{5f99571 #11831 A=com.UCMobile.intl U=0 StackId=-1 sz=0}
-  * Recent #18: TaskRecord{d333f56 #11833 A=com.UCMobile U=0 StackId=-1 sz=0}
-  * Recent #19: TaskRecord{ea25bd7 #11832 A=com.android.vpndialogs U=0 StackId=-1 sz=0}
-  * Recent #20: TaskRecord{266ccc4 #11830 A=com.meizu.safe U=0 StackId=-1 sz=0}
-  * Recent #21: TaskRecord{bc117ad #11791 A=com.meizu.assistant U=0 StackId=1 sz=1}
-  * Recent #22: TaskRecord{33bfae2 #11759 A=com.android.packageinstaller U=0 StackId=1 sz=1}
-  * Recent #23: TaskRecord{3c6de73 #11825 A=net.micode.fileexplorer U=0 StackId=1 sz=1}
-  * Recent #24: TaskRecord{f09d998 #11821 A=com.eg.android.AlipayGphone U=0 StackId=-1 sz=0}
-  * Recent #25: TaskRecord{dfd9c9 #11813 A=com.jingdong.app.mall U=0 StackId=1 sz=1}
-  * Recent #26: TaskRecord{365f130 #11793 A=com.tencent.qqsports U=0 StackId=-1 sz=0}
-  * Recent #27: TaskRecord{d0481a9 #11792 A=com.meizu.media.camera.CameraActivity U=0 StackId=1 sz=1}
-  * Recent #28: TaskRecord{c22e32e #11785 A=com.mobike.mobikeapp U=0 StackId=1 sz=1}
-  * Recent #29: TaskRecord{fa6eecf #11783 A=com.meizu.mznfcpay U=0 StackId=-1 sz=0}
-  * Recent #30: TaskRecord{9f0f05c #11771 A=com.meizu.account U=0 StackId=-1 sz=0}
-  * Recent #31: TaskRecord{7fa8f65 #11768 A=com.android.phone U=0 StackId=-1 sz=0}
-  * Recent #32: TaskRecord{a7e043a #11763 A=com.wandoujia.phoenix2 U=0 StackId=-1 sz=0}
-  * Recent #33: TaskRecord{bcda8eb #11756 A=com.qiyi.video U=0 StackId=-1 sz=0}
-  * Recent #34: TaskRecord{cab648 #11754 A=com.ss.android.ugc.aweme U=0 StackId=-1 sz=0}
-  * Recent #35: TaskRecord{811f0ae #11742 A=com.android.incallui U=0 StackId=1 sz=1}
-  * Recent #36: TaskRecord{d89bce1 #1 I=com.android.settings/.FallbackHome U=0 StackId=-1 sz=0}
-  * Recent #37: TaskRecord{2382a06 #11740 A=android.task.browser U=0 StackId=-1 sz=0}
-  * Recent #38: TaskRecord{55be8c7 #11737 A=com.android.dialer U=0 StackId=-1 sz=0}
-  * Recent #39: TaskRecord{9f8eef4 #11736 A=android.task.mms U=0 StackId=-1 sz=0}
-  * Recent #40: TaskRecord{c84461d #11735 A=com.youku.phone U=0 StackId=-1 sz=0}
-  * Recent #41: TaskRecord{91ce092 #11734 A=tv.danmaku.bili U=0 StackId=-1 sz=0}
-  * Recent #42: TaskRecord{a44a63 #11732 A=com.icbc U=0 StackId=-1 sz=0}
-  * Recent #43: TaskRecord{300660 #11726 A=com.meizu.media.gallery U=0 StackId=-1 sz=0}
-  * Recent #44: TaskRecord{4a42719 #11716 A=com.zhiliaoapp.musically U=0 StackId=-1 sz=0}
-  * Recent #45: TaskRecord{42473de #11719 A=com.jingdong.pdj U=0 StackId=-1 sz=0}
-  * Recent #46: TaskRecord{a8729bf #11713 A=com.taobao.idlefish U=0 StackId=-1 sz=0}
-
-ACTIVITY MANAGER ACTIVITIES (dumpsys activity activities)
-Display #0 (activities from top to bottom):
-  Stack #1:
-  mFullscreen=true
-  mBounds=null
-    Task id #11866
-    mFullscreen=true
-    mBounds=null
-    mMinWidth=-1
-    mMinHeight=-1
-    mLastNonFullscreenBounds=null
-      TaskRecord{9532a01 #11866 A=com.meizu.filemanager U=0 StackId=1 sz=2}
-      Intent { act=android.intent.action.MAIN cat=[android.intent.category.LAUNCHER] flg=0x10200000 cmp=com.meizu.filemanager/com.meizu.flyme.filemanager.activity.HomeActivity }
-        Hist #1: ActivityRecord{aad8262 u0 com.meizu.filemanager/com.meizu.flyme.filemanager.activity.CategoryActivity t11866}
-          Intent { cmp=com.meizu.filemanager/com.meizu.flyme.filemanager.activity.CategoryActivity (has extras) }
-          ProcessRecord{93e5edc 2923:com.meizu.filemanager/u0a48}
-        Hist #0: ActivityRecord{d1104a1 u0 com.meizu.filemanager/com.meizu.flyme.filemanager.activity.HomeActivity t11866}
-          Intent { act=android.intent.action.MAIN cat=[android.intent.category.LAUNCHER] flg=0x10200000 cmp=com.meizu.filemanager/com.meizu.flyme.filemanager.activity.HomeActivity bnds=[288,678][540,978] }
-          ProcessRecord{93e5edc 2923:com.meizu.filemanager/u0a48}
-    Task id #11862
-    mFullscreen=true
-    mBounds=null
-    mMinWidth=-1
-    mMinHeight=-1
-    mLastNonFullscreenBounds=null
-      TaskRecord{c7653d #11862 A=com.tencent.androidqqmail U=0 StackId=1 sz=1}
-      Intent { act=android.intent.action.MAIN cat=[android.intent.category.LAUNCHER] flg=0x10200000 cmp=com.tencent.androidqqmail/com.tencent.qqmail.launcher.desktop.LauncherActivity (has extras) }
-        Hist #0: ActivityRecord{a24867e u0 com.tencent.androidqqmail/com.tencent.qqmail.fragment.base.MailFragmentActivity t11862}
-          Intent { flg=0x10000000 cmp=com.tencent.androidqqmail/com.tencent.qqmail.fragment.base.MailFragmentActivity (has extras) }
-    Task id #11814
-    mFullscreen=true
-    mBounds=null
-    mMinWidth=-1
-    mMinHeight=-1
-    mLastNonFullscreenBounds=null
-      TaskRecord{2ff288c #11814 A=com.ss.android.article.news U=0 StackId=1 sz=1}
-      Intent { act=android.intent.action.MAIN cat=[android.intent.category.LAUNCHER] flg=0x10200000 cmp=com.ss.android.article.news/.activity.SplashBadgeActivity (has extras) }
-        Hist #0: ActivityRecord{96ef884 u0 com.ss.android.article.news/.activity.MainActivity t11814}
-          Intent { flg=0x24008000 cmp=com.ss.android.article.news/.activity.MainActivity (has extras) }
-          ProcessRecord{f5bfef2 10805:com.ss.android.article.news/u0a103}
-    Task id #11817
-    mFullscreen=true
-    mBounds=null
-    mMinWidth=-1
-    mMinHeight=-1
-    mLastNonFullscreenBounds=null
-      TaskRecord{3254e83 #11817 A=com.hexin.plat.android U=0 StackId=1 sz=1}
-      Intent { act=android.intent.action.MAIN cat=[android.intent.category.LAUNCHER] flg=0x10200000 cmp=com.hexin.plat.android/.AndroidLogoActivity }
-        Hist #0: ActivityRecord{a6ed79b u0 com.hexin.plat.android/.Hexin t11817}
-          Intent { flg=0x10000000 cmp=com.hexin.plat.android/.Hexin (has extras) }
-    Task id #11846
-    mFullscreen=true
-    mBounds=null
-    mMinWidth=-1
-    mMinHeight=-1
-    mLastNonFullscreenBounds=null
-      TaskRecord{1208800 #11846 A=in.zhaoj.shadowsocksrr U=0 StackId=1 sz=1}
-      Intent { act=android.intent.action.MAIN cat=[android.intent.category.LAUNCHER] flg=0x10200000 cmp=in.zhaoj.shadowsocksrr/com.github.shadowsocks.Shadowsocks (has extras) }
-        Hist #0: ActivityRecord{763f852 u0 in.zhaoj.shadowsocksrr/com.github.shadowsocks.Shadowsocks t11846}
-          Intent { act=android.intent.action.MAIN cat=[android.intent.category.LAUNCHER] flg=0x10200000 cmp=in.zhaoj.shadowsocksrr/com.github.shadowsocks.Shadowsocks bnds=[153,612][411,900] (has extras) }
-    Task id #11835
-    mFullscreen=true
-    mBounds=null
-    mMinWidth=-1
-    mMinHeight=-1
-    mLastNonFullscreenBounds=null
-      TaskRecord{c75718 #11835 A=cm.aptoide.pt U=0 StackId=1 sz=1}
-      Intent { act=android.intent.action.MAIN cat=[android.intent.category.LAUNCHER] flg=0x10200000 cmp=cm.aptoide.pt/.view.entry.EntryActivity (has extras) }
-        Hist #0: ActivityRecord{cd467cf u0 cm.aptoide.pt/.view.FairyMainActivity t11835}
-          Intent { flg=0x10000000 cmp=cm.aptoide.pt/.view.FairyMainActivity }
-    Task id #11791
-    mFullscreen=true
-    mBounds=null
-    mMinWidth=-1
-    mMinHeight=-1
-    mLastNonFullscreenBounds=null
-      TaskRecord{bc117ad #11791 A=com.meizu.assistant U=0 StackId=1 sz=1}
-      Intent { flg=0x10000000 pkg=com.meizu.assistant cmp=com.meizu.assistant/.ui.activity.FakeLauncherActivity (has extras) }
-        Hist #0: ActivityRecord{2a180f2 u0 com.meizu.assistant/.ui.activity.FakeLauncherActivity t11791}
-          Intent { flg=0x10000000 pkg=com.meizu.assistant cmp=com.meizu.assistant/.ui.activity.FakeLauncherActivity (has extras) }
-    Task id #11759
-    mFullscreen=true
-    mBounds=null
-    mMinWidth=-1
-    mMinHeight=-1
-    mLastNonFullscreenBounds=null
-      TaskRecord{33bfae2 #11759 A=com.android.packageinstaller U=0 StackId=1 sz=1}
-      Intent { act=android.intent.action.VIEW dat=file:///storage/emulated/0/Android/data/com.qiyi.video/files/plugins/com.qiyi.video.reader/Download/reader1.10.0.apk typ=application/vnd.android.package-archive flg=0x10000000 cmp=com.android.packageinstaller/.PackageInstallerActivity }
-        Hist #0: ActivityRecord{66fcd9c u0 com.android.packageinstaller/.PackageInstallerActivity t11759}
-          Intent { act=android.intent.action.VIEW dat=file:///storage/emulated/0/Android/data/com.qiyi.video/files/plugins/com.qiyi.video.reader/Download/reader1.10.0.apk typ=application/vnd.android.package-archive flg=0x10000000 cmp=com.android.packageinstaller/.PackageInstallerActivity }
-    Task id #11825
-    mFullscreen=true
-    mBounds=null
-    mMinWidth=-1
-    mMinHeight=-1
-    mLastNonFullscreenBounds=null
-      TaskRecord{3c6de73 #11825 A=net.micode.fileexplorer U=0 StackId=1 sz=1}
-      Intent { act=android.intent.action.MAIN cat=[android.intent.category.LAUNCHER] flg=0x10200000 cmp=net.micode.fileexplorer/.FileExplorerTabActivity (has extras) }
-        Hist #0: ActivityRecord{bac7c38 u0 net.micode.fileexplorer/.FileExplorerTabActivity t11825}
-          Intent { act=android.intent.action.MAIN cat=[android.intent.category.LAUNCHER] flg=0x10200000 cmp=net.micode.fileexplorer/.FileExplorerTabActivity bnds=[792,78][1044,378] (has extras) }
-    Task id #11792
-    mFullscreen=true
-    mBounds=null
-    mMinWidth=-1
-    mMinHeight=-1
-    mLastNonFullscreenBounds=null
-      TaskRecord{d0481a9 #11792 A=com.meizu.media.camera.CameraActivity U=0 StackId=1 sz=1}
-      Intent { act=meizu.intent.action.DOUBLE_CLICK_OPEN_CAMERA flg=0x14800000 meizuflg=0xb0 cmp=com.meizu.media.camera/.CameraActivity }
-        Hist #0: ActivityRecord{d52b437 u0 com.meizu.media.camera/.CameraLauncher t11792}
-          Intent { act=meizu.intent.action.DOUBLE_CLICK_OPEN_CAMERA flg=0x14800000 meizuflg=0xb0 cmp=com.meizu.media.camera/.CameraLauncher }
-    Task id #11785
-    mFullscreen=true
-    mBounds=null
-    mMinWidth=-1
-    mMinHeight=-1
-    mLastNonFullscreenBounds=null
-      TaskRecord{c22e32e #11785 A=com.mobike.mobikeapp U=0 StackId=1 sz=1}
-      Intent { act=android.intent.action.MAIN cat=[android.intent.category.LAUNCHER] flg=0x10200000 cmp=com.mobike.mobikeapp/.SplashActivity (has extras) }
-        Hist #0: ActivityRecord{8af6433 u0 com.mobike.mobikeapp/.ui.maintab.MainTabActivity t11785}
-          Intent { flg=0x10000000 cmp=com.mobike.mobikeapp/.ui.maintab.MainTabActivity }
-
-    Empty Task id #11711
-          from Stack#1
-          TaskRecord{d471bd5 #11711 A=com.tencent.mm U=0 StackId=1 sz=0}
-    Task id #11742
-    mFullscreen=true
-    mBounds=null
-    mMinWidth=-1
-    mMinHeight=-1
-    mLastNonFullscreenBounds=null
-      TaskRecord{811f0ae #11742 A=com.android.incallui U=0 StackId=1 sz=1}
-      Intent { act=android.intent.action.MAIN flg=0x10840000 cmp=com.android.incallui/.InCallActivity (has extras) }
-        Hist #0: ActivityRecord{63f408b u0 com.android.incallui/.InCallActivity t11742}
-          Intent { act=android.intent.action.MAIN flg=0x10840000 cmp=com.android.incallui/.InCallActivity (has extras) }
-          ProcessRecord{d7fefea 3009:com.android.incallui/u0a3}
-    Task id #11813
-    mFullscreen=true
-    mBounds=null
-    mMinWidth=-1
-    mMinHeight=-1
-    mLastNonFullscreenBounds=null
-      TaskRecord{dfd9c9 #11813 A=com.jingdong.app.mall U=0 StackId=1 sz=1}
-      Intent { act=android.intent.action.MAIN cat=[android.intent.category.LAUNCHER] flg=0x10200000 cmp=com.jingdong.app.mall/.main.MainActivity }
-        Hist #0: ActivityRecord{a42ef92 u0 com.jingdong.app.mall/.MainFrameActivity t11813}
-          Intent { flg=0x10000000 cmp=com.jingdong.app.mall/.MainFrameActivity }
-    Task id #11773
-    mFullscreen=true
-    mBounds=null
-    mMinWidth=-1
-    mMinHeight=-1
-    mLastNonFullscreenBounds=null
-      TaskRecord{bb6d7b3 #11773 A=com.tencent.mm U=0 StackId=1 sz=1}
-      Intent { flg=0x34000000 meizuflg=0x200000 cmp=com.tencent.mm/.ui.LauncherUI (has extras) }
-        Hist #0: ActivityRecord{8e7ae7a u0 com.tencent.mm/.ui.LauncherUI t11773}
-          Intent { flg=0x34000000 meizuflg=0x200000 cmp=com.tencent.mm/.ui.LauncherUI (has extras) }
-          ProcessRecord{ebdbca 16233:com.tencent.mm/u0a108}
-
-    Running activities (most recent first):
-      TaskRecord{9532a01 #11866 A=com.meizu.filemanager U=0 StackId=1 sz=2}
-        Run #4: ActivityRecord{aad8262 u0 com.meizu.filemanager/com.meizu.flyme.filemanager.activity.CategoryActivity t11866}
-        Run #3: ActivityRecord{d1104a1 u0 com.meizu.filemanager/com.meizu.flyme.filemanager.activity.HomeActivity t11866}
-      TaskRecord{2ff288c #11814 A=com.ss.android.article.news U=0 StackId=1 sz=1}
-        Run #2: ActivityRecord{96ef884 u0 com.ss.android.article.news/.activity.MainActivity t11814}
-      TaskRecord{bb6d7b3 #11773 A=com.tencent.mm U=0 StackId=1 sz=1}
-        Run #1: ActivityRecord{8e7ae7a u0 com.tencent.mm/.ui.LauncherUI t11773}
-      TaskRecord{811f0ae #11742 A=com.android.incallui U=0 StackId=1 sz=1}
-        Run #0: ActivityRecord{63f408b u0 com.android.incallui/.InCallActivity t11742}
 
     mResumedActivity: ActivityRecord{aad8262 u0 com.meizu.filemanager/com.meizu.flyme.filemanager.activity.CategoryActivity t11866}
 
@@ -4543,134 +3989,7 @@ WINDOW MANAGER WINDOWS (dumpsys window windows)
     mHasSurface=false mShownPosition=[0,0] isReadyForDisplay()=false hasSavedSurface()=false mWindowRemovalAllowed=false
     WindowStateAnimator{f798b3b KeyguardScrim}:
     mLastFreezeDuration=+54s104ms
-  Window #14 Window{9d60ed2 u0 Games}:
-    mDisplayId=0 stackId=0 mSession=Session{572e6a5 2708:u0a10031} mClient=android.os.BinderProxy@f48455d
-    mOwnerUid=10031 mShowToOwnerOnly=false package=com.flyme.systemuitools appop=NONE
-    mAttrs=WM.LayoutParams{(0,0)(fillxfill) gr=#30 sim=#20 ty=2008 fl=#1000038 fmt=-3 meizuFlags=0x0Meizu WM.LayoutParams [ flags=0x800] }
-    Requested w=0 h=0 mLayoutSeq=54
-    mHasSurface=false mShownPosition=[0,0] isReadyForDisplay()=false hasSavedSurface()=false mWindowRemovalAllowed=false
-    WindowStateAnimator{1d6a894 Games}:
-      mShownAlpha=0.0 mAlpha=1.0 mLastAlpha=0.0
-  Window #13 Window{742e969 u0 AssistPreviewPanel}:
-    mDisplayId=0 stackId=0 mSession=Session{46503f6 2053:u0a10031} mClient=android.os.BinderProxy@1021ff0
-    mOwnerUid=10031 mShowToOwnerOnly=true package=com.android.systemui appop=NONE
-    mAttrs=WM.LayoutParams{(0,0)(fillx750) gr=#800053 sim=#31 ty=2033 fl=#1000118 fmt=-3 vsysui=0x700 meizuFlags=0x0Meizu WM.LayoutParams [ flags=0x0] }
-    Requested w=0 h=0 mLayoutSeq=14538
-    mHasSurface=false mShownPosition=[0,0] isReadyForDisplay()=false hasSavedSurface()=false mWindowRemovalAllowed=false
-    WindowStateAnimator{ddc04e7 AssistPreviewPanel}:
-      mShownAlpha=0.0 mAlpha=1.0 mLastAlpha=0.0
-  Window #12 Window{c0d5548 u0 com.baidu.input}:
-    mDisplayId=0 stackId=0 mSession=Session{2b61340 2838:u0a10362} mClient=android.os.BinderProxy@c0b63eb
-    mOwnerUid=10362 mShowToOwnerOnly=true package=com.baidu.input appop=SYSTEM_ALERT_WINDOW
-    mAttrs=WM.LayoutParams{(1035,145)(45x660) gr=#33 sim=#20 ty=2002 fl=#1000028 fmt=1 meizuFlags=0x0Meizu WM.LayoutParams [ flags=0x0] }
-    Requested w=45 h=660 mLayoutSeq=18462
-    mPolicyVisibility=false mPolicyVisibilityAfterAnim=false mAppOpVisibility=false mAttachedHidden=false mSizeHidden=false mHideOnFullScreen=false
- mPermanentlyHidden=false
-    mHasSurface=true mShownPosition=[1035,211] isReadyForDisplay()=false hasSavedSurface()=false mWindowRemovalAllowed=false
-    WindowStateAnimator{9b4a2a6 }:
-      Surface: shown=false layer=0 alpha=0.0 rect=(1035.0,211.0) 45.0 x 660.0
-      mShownAlpha=1.0 mAlpha=1.0 mLastAlpha=0.0
-  Window #11 Window{a0f9033 u0 DockedStackDivider}:
-    mDisplayId=0 stackId=0 mSession=Session{46503f6 2053:u0a10031} mClient=android.os.BinderProxy@cd55ba2
-    mOwnerUid=10031 mShowToOwnerOnly=false package=com.android.systemui appop=NONE
-    mAttrs=WM.LayoutParams{(0,0)(fillx144) sim=#20 ty=2034 fl=#21840028 pfl=0x40 fmt=-3 vsysui=0x700 meizuFlags=0x0Meizu WM.LayoutParams [ flags=0x0] }
-    Requested w=1080 h=144 mLayoutSeq=18462
-    mPolicyVisibility=false mPolicyVisibilityAfterAnim=false mAppOpVisibility=true mAttachedHidden=false mSizeHidden=false mHideOnFullScreen=false
- mPermanentlyHidden=false
-    mHasSurface=false mShownPosition=[0,0] isReadyForDisplay()=false hasSavedSurface()=false mWindowRemovalAllowed=false
-    WindowStateAnimator{3401 DockedStackDivider}:
-      mShownAlpha=0.0 mAlpha=1.0 mLastAlpha=0.0
-  Window #10 Window{fc0758f u0 DockedStackFocusIndicator}:
-    mDisplayId=0 stackId=0 mSession=Session{df17933 1738:1000} mClient=android.view.ViewRootImpl$W@45dd01c
-    mOwnerUid=1000 mShowToOwnerOnly=false package=android appop=SYSTEM_ALERT_WINDOW
-    mAttrs=WM.LayoutParams{(0,0)(fillxfill) sim=#20 ty=2042 fl=#21840038 pfl=0x40 fmt=-3 vsysui=0x700 meizuFlags=0x0Meizu WM.LayoutParams [ flags=0x0] }
-    Requested w=1080 h=1854 mLayoutSeq=18462
-    mPolicyVisibility=false mPolicyVisibilityAfterAnim=false mAppOpVisibility=true mAttachedHidden=false mSizeHidden=false mHideOnFullScreen=false
- mPermanentlyHidden=false
-    mHasSurface=false mShownPosition=[0,0] isReadyForDisplay()=false hasSavedSurface()=false mWindowRemovalAllowed=false
-    WindowStateAnimator{f0215e8 DockedStackFocusIndicator}:
-      mShownAlpha=0.0 mAlpha=1.0 mLastAlpha=0.0
-  Window #9 Window{ce060fc u0 InputMethod}:
-    mDisplayId=0 stackId=0 mSession=Session{2b61340 2838:u0a10362} mClient=android.os.BinderProxy@8213def
-    mOwnerUid=10362 mShowToOwnerOnly=true package=com.baidu.input appop=NONE
-    mAttrs=WM.LayoutParams{(0,0)(fillxwrap) gr=#50 sim=#20 ty=2011 fl=#800108 pfl=0x20000 fmt=-2 wanim=0xa120005 vsysui=0x300 needsMenuKey=2 meizuFlags=0x100Meizu WM.LayoutParams [ flags=0x0] }
-    Requested w=1080 h=1920 mLayoutSeq=17757
-    mIsImWindow=true mIsWallpaper=false mIsFloatingLayer=true mWallpaperVisible=false
-    mHasSurface=false mShownPosition=[0,66] isReadyForDisplay()=false hasSavedSurface()=false mWindowRemovalAllowed=false
-    WindowStateAnimator{1817487 InputMethod}:
-  Window #8 Window{412f3dd u0 com.meizu.filemanager/com.meizu.flyme.filemanager.activity.FileManagerActivity}:
-    mDisplayId=0 stackId=1 mSession=Session{269e768 2923:u0a10048} mClient=android.os.BinderProxy@e82bbb4
-    mOwnerUid=10048 mShowToOwnerOnly=true package=com.meizu.filemanager appop=NONE
-    mAttrs=WM.LayoutParams{(0,0)(fillxfill) sim=#130 ty=1 fl=#85810100 pfl=0x20000 wanim=0x103046b vsysui=0x2700 needsMenuKey=2 meizuFlags=0x0Meizu WM.LayoutParams [ flags=0x0] }
-    Requested w=1080 h=1920 mLayoutSeq=18462
-    mHasSurface=true mShownPosition=[0,0] isReadyForDisplay()=true hasSavedSurface()=false mWindowRemovalAllowed=false
-    WindowStateAnimator{7c1da9e com.meizu.filemanager/com.meizu.flyme.filemanager.activity.FileManagerActivity}:
-      Surface: shown=true layer=21040 alpha=1.0 rect=(0.0,0.0) 1080.0 x 1920.0
-  Window #7 Window{f9d2467 u0 com.meizu.filemanager/com.meizu.flyme.filemanager.activity.HomeActivity}:
-    mDisplayId=0 stackId=1 mSession=Session{269e768 2923:u0a10048} mClient=android.os.BinderProxy@6509026
-    mOwnerUid=10048 mShowToOwnerOnly=true package=com.meizu.filemanager appop=NONE
-    mAttrs=WM.LayoutParams{(0,0)(fillxfill) sim=#30 ty=1 fl=#85810100 pfl=0x20000 wanim=0x103046b vsysui=0x2700 needsMenuKey=2 meizuFlags=0x0Meizu WM.LayoutParams [ flags=0x0] }
-    Requested w=1080 h=1920 mLayoutSeq=18410
-    mHasSurface=false mShownPosition=[0,0] isReadyForDisplay()=false hasSavedSurface()=false mWindowRemovalAllowed=false
-    WindowStateAnimator{a203b80 com.meizu.filemanager/com.meizu.flyme.filemanager.activity.HomeActivity}:
-      mShownAlpha=1.0 mAlpha=1.0 mLastAlpha=0.8
-  Window #6 Window{54721f9 u0 PopupWindow:e87939d}:
-    mDisplayId=0 stackId=1 mSession=Session{2f91567 10805:u0a10103} mClient=android.os.BinderProxy@8a8a0c0
-    mOwnerUid=10103 mShowToOwnerOnly=true package=com.ss.android.article.news appop=NONE
-    mAttrs=WM.LayoutParams{(0,0)(0xfill) gr=#800033 sim=#15 ty=1000 fl=#41820008 pfl=0x18000 fmt=-2 surfaceInsets=Rect(0, 0 - 0, 0) (manual) meizuFlags=0x0Meizu WM.LayoutParams [ flags=0x0] }
-    Requested w=0 h=1854 mLayoutSeq=18099
-    mAttachedWindow=Window{3d0a880 u0 com.ss.android.article.news/com.ss.android.article.news.activity.MainActivity} mLayoutAttached=true
-    mPolicyVisibility=true mPolicyVisibilityAfterAnim=true mAppOpVisibility=true mAttachedHidden=true mSizeHidden=false mHideOnFullScreen=false
- mPermanentlyHidden=false
-    mHasSurface=false mShownPosition=[0,66] isReadyForDisplay()=false hasSavedSurface()=false mWindowRemovalAllowed=false
-    WindowStateAnimator{a0acf9f PopupWindow:e87939d}:
-      mShownAlpha=1.0 mAlpha=1.0 mLastAlpha=0.0
-    mLastFreezeDuration=+4h41m44s435ms
-  Window #5 Window{d4f5243 u0 PopupWindow:8441a47}:
-    mDisplayId=0 stackId=1 mSession=Session{2f91567 10805:u0a10103} mClient=android.os.BinderProxy@9b19bf2
-    mOwnerUid=10103 mShowToOwnerOnly=true package=com.ss.android.article.news appop=NONE
-    mAttrs=WM.LayoutParams{(0,0)(0xfill) gr=#800033 sim=#15 ty=1000 fl=#41820008 pfl=0x18000 fmt=-2 surfaceInsets=Rect(0, 0 - 0, 0) (manual) meizuFlags=0x0Meizu WM.LayoutParams [ flags=0x0] }
-    Requested w=0 h=1854 mLayoutSeq=18099
-    mAttachedWindow=Window{3d0a880 u0 com.ss.android.article.news/com.ss.android.article.news.activity.MainActivity} mLayoutAttached=true
-    mPolicyVisibility=true mPolicyVisibilityAfterAnim=true mAppOpVisibility=true mAttachedHidden=true mSizeHidden=false mHideOnFullScreen=false
- mPermanentlyHidden=false
-    mHasSurface=false mShownPosition=[0,66] isReadyForDisplay()=false hasSavedSurface()=false mWindowRemovalAllowed=false
-    WindowStateAnimator{b39853e PopupWindow:8441a47}:
-      mShownAlpha=1.0 mAlpha=1.0 mLastAlpha=0.0
-    mLastFreezeDuration=+4h41m44s433ms
-  Window #4 Window{3d0a880 u0 com.ss.android.article.news/com.ss.android.article.news.activity.MainActivity}:
-    mDisplayId=0 stackId=1 mSession=Session{2f91567 10805:u0a10103} mClient=android.os.BinderProxy@cf7a103
-    mOwnerUid=10103 mShowToOwnerOnly=true package=com.ss.android.article.news appop=NONE
-    mAttrs=WM.LayoutParams{(0,0)(fillxfill) sim=#130 ty=1 fl=#85810100 pfl=0x20000 fmt=-3 wanim=0x103046b vsysui=0x700 needsMenuKey=2 meizuFlags=0x0Meizu WM.LayoutParams [ flags=0x0] }
-    Requested w=1080 h=1920 mLayoutSeq=18099
-    mHasSurface=false mShownPosition=[0,0] isReadyForDisplay()=false hasSavedSurface()=false mWindowRemovalAllowed=false
-    WindowStateAnimator{cc055b com.ss.android.article.news/com.ss.android.article.news.activity.MainActivity}:
-      mShownAlpha=1.0 mAlpha=1.0 mLastAlpha=0.0
-  Window #3 Window{e1069ba u0 com.android.incallui/com.android.incallui.InCallActivity}:
-    mDisplayId=0 stackId=1 mSession=Session{b8cae4f 3009:u0a10003} mClient=android.os.BinderProxy@d691ae5
-    mOwnerUid=10003 mShowToOwnerOnly=true package=com.android.incallui appop=NONE
-    mAttrs=WM.LayoutParams{(0,0)(fillxfill) sim=#30 ty=1 fl=#85298100 pfl=0x20000 fmt=-2 wanim=0x7f0c02f9 vsysui=0x700 needsMenuKey=2 meizuFlags=0x100000Meizu WM.LayoutParams [ flags=0x600] }
-    Requested w=1080 h=1920 mLayoutSeq=517
-    mHasSurface=false mShownPosition=[0,0] isReadyForDisplay()=false hasSavedSurface()=false mWindowRemovalAllowed=false
-    WindowStateAnimator{e386ee0 com.android.incallui/com.android.incallui.InCallActivity}:
-    mLastFreezeDuration=+10m38s488ms
-  Window #2 Window{ff534c u0 com.tencent.mm/com.tencent.mm.ui.LauncherUI}:
-    mDisplayId=0 stackId=1 mSession=Session{cc51ed9 16233:u0a10108} mClient=android.os.BinderProxy@c96477f
-    mOwnerUid=10108 mShowToOwnerOnly=true package=com.tencent.mm appop=NONE
-    mAttrs=WM.LayoutParams{(0,0)(fillxfill) sim=#12 ty=1 fl=#81810100 pfl=0x20000 wanim=0x7f0c001f vsysui=0x700 needsMenuKey=2 meizuFlags=0x0Meizu WM.LayoutParams [ flags=0x0] }
-    Requested w=1080 h=1920 mLayoutSeq=17763
-    mHasSurface=false mShownPosition=[0,0] isReadyForDisplay()=false hasSavedSurface()=false mWindowRemovalAllowed=false
-    WindowStateAnimator{a63f302 com.tencent.mm/com.tencent.mm.ui.LauncherUI}:
-      mShownAlpha=1.0 mAlpha=1.0 mLastAlpha=0.0
-  Window #1 Window{7a92b67 u0 com.meizu.flyme.launcher/com.meizu.flyme.launcher.Launcher}:
-    mDisplayId=0 stackId=0 mSession=Session{a013268 3137:u0a10011} mClient=android.os.BinderProxy@c7c5326
-    mOwnerUid=10011 mShowToOwnerOnly=true package=com.meizu.flyme.launcher appop=NONE
-    mAttrs=WM.LayoutParams{(0,0)(fillxfill) sim=#30 ty=1 fl=#81910100 pfl=0x20000 fmt=-2 wanim=0x103038b vsysui=0x2600 needsMenuKey=2 meizuFlags=0x0Meizu WM.LayoutParams [ flags=0x0] }
-    Requested w=1080 h=1920 mLayoutSeq=18331
-    mHasSurface=false mShownPosition=[0,0] isReadyForDisplay()=false hasSavedSurface()=false mWindowRemovalAllowed=false
-    WindowStateAnimator{d9f9979 com.meizu.flyme.launcher/com.meizu.flyme.launcher.Launcher}:
-    mLastFreezeDuration=+48m12s588ms
-    mWallpaperX=0.0 mWallpaperY=0.5
+
   Window #0 Window{c01cd53 u0 com.android.systemui.ImageWallpaper}:
     mDisplayId=0 stackId=0 mSession=Session{46503f6 2053:u0a10031} mClient=android.os.BinderProxy@ba3d942
     mOwnerUid=10031 mShowToOwnerOnly=true package=com.android.systemui appop=NONE
@@ -4708,101 +4027,7 @@ WifiController:
  total records=612
  rec[0]: time=12-17 13:13:05.633 processed=DefaultState org=ApStaDisabledState dest=<null> what=155651(0x26003)
  rec[1]: time=12-17 13:13:49.690 processed=DefaultState org=ApStaDisabledState dest=<null> what=155650(0x26002)
- rec[2]: time=12-17 13:13:51.268 processed=DefaultState org=ApStaDisabledState dest=<null> what=155660(0x2600c)
- rec[3]: time=12-17 13:14:13.575 processed=DefaultState org=ApStaDisabledState dest=<null> what=155651(0x26003)
- rec[4]: time=12-17 13:15:18.782 processed=DefaultState org=ApStaDisabledState dest=<null> what=155650(0x26002)
- rec[5]: time=12-17 13:15:20.602 processed=DefaultState org=ApStaDisabledState dest=<null> what=155660(0x2600c)
- rec[6]: time=12-17 13:17:11.998 processed=DefaultState org=ApStaDisabledState dest=<null> what=155652(0x26004)
- rec[7]: time=12-17 13:20:52.500 processed=DefaultState org=ApStaDisabledState dest=<null> what=155652(0x26004)
- rec[8]: time=12-17 13:25:18.616 processed=DefaultState org=ApStaDisabledState dest=<null> what=155651(0x26003)
- rec[9]: time=12-17 13:27:28.514 processed=DefaultState org=ApStaDisabledState dest=<null> what=155652(0x26004)
- rec[10]: time=12-17 13:32:30.074 processed=DefaultState org=ApStaDisabledState dest=<null> what=155650(0x26002)
- rec[11]: time=12-17 13:32:30.628 processed=DefaultState org=ApStaDisabledState dest=<null> what=155660(0x2600c)
- rec[12]: time=12-17 13:32:39.940 processed=DefaultState org=ApStaDisabledState dest=<null> what=155651(0x26003)
- rec[13]: time=12-17 13:39:38.174 processed=DefaultState org=ApStaDisabledState dest=<null> what=155650(0x26002)
- rec[14]: time=12-17 13:39:39.329 processed=DefaultState org=ApStaDisabledState dest=<null> what=155660(0x2600c)
- rec[15]: time=12-17 13:41:41.691 processed=DefaultState org=ApStaDisabledState dest=<null> what=155652(0x26004)
- rec[16]: time=12-17 13:43:19.840 processed=DefaultState org=ApStaDisabledState dest=<null> what=155660(0x2600c)
- rec[17]: time=12-17 13:43:20.590 processed=DefaultState org=ApStaDisabledState dest=<null> what=155651(0x26003)
- rec[18]: time=12-17 13:43:22.804 processed=DefaultState org=ApStaDisabledState dest=<null> what=155650(0x26002)
- rec[19]: time=12-17 13:44:00.874 processed=DefaultState org=ApStaDisabledState dest=<null> what=155651(0x26003)
- rec[20]: time=12-17 13:56:13.873 processed=DefaultState org=ApStaDisabledState dest=<null> what=155652(0x26004)
- rec[21]: time=12-17 14:02:39.889 processed=DefaultState org=ApStaDisabledState dest=<null> what=155650(0x26002)
- rec[22]: time=12-17 14:02:41.446 processed=DefaultState org=ApStaDisabledState dest=<null> what=155660(0x2600c)
- rec[23]: time=12-17 14:07:54.107 processed=DefaultState org=ApStaDisabledState dest=<null> what=155652(0x26004)
- rec[24]: time=12-17 14:07:55.856 processed=DefaultState org=ApStaDisabledState dest=<null> what=155651(0x26003)
- rec[25]: time=12-17 14:16:40.855 processed=DefaultState org=ApStaDisabledState dest=<null> what=155650(0x26002)
- rec[26]: time=12-17 14:16:41.694 processed=DefaultState org=ApStaDisabledState dest=<null> what=155660(0x2600c)
- rec[27]: time=12-17 14:16:47.343 processed=DefaultState org=ApStaDisabledState dest=<null> what=155652(0x26004)
- rec[28]: time=12-17 14:17:18.453 processed=DefaultState org=ApStaDisabledState dest=<null> what=155652(0x26004)
- rec[29]: time=12-17 14:18:57.437 processed=DefaultState org=ApStaDisabledState dest=<null> what=155652(0x26004)
- rec[30]: time=12-17 14:20:18.789 processed=DefaultState org=ApStaDisabledState dest=<null> what=155652(0x26004)
- rec[31]: time=12-17 14:22:29.058 processed=DefaultState org=ApStaDisabledState dest=<null> what=155652(0x26004)
- rec[32]: time=12-17 14:24:29.288 processed=DefaultState org=ApStaDisabledState dest=<null> what=155652(0x26004)
- rec[33]: time=12-17 14:24:55.413 processed=DefaultState org=ApStaDisabledState dest=<null> what=155651(0x26003)
- rec[34]: time=12-17 14:25:39.439 processed=DefaultState org=ApStaDisabledState dest=<null> what=155652(0x26004)
- rec[35]: time=12-17 14:27:19.635 processed=DefaultState org=ApStaDisabledState dest=<null> what=155652(0x26004)
- rec[36]: time=12-17 14:28:27.774 processed=DefaultState org=ApStaDisabledState dest=<null> what=155652(0x26004)
- rec[37]: time=12-17 14:29:44.015 processed=DefaultState org=ApStaDisabledState dest=<null> what=155650(0x26002)
- rec[38]: time=12-17 14:29:46.296 processed=DefaultState org=ApStaDisabledState dest=<null> what=155660(0x2600c)
- rec[39]: time=12-17 14:30:26.835 processed=DefaultState org=ApStaDisabledState dest=<null> what=155652(0x26004)
- rec[40]: time=12-17 14:32:00.833 processed=DefaultState org=ApStaDisabledState dest=<null> what=155651(0x26003)
- rec[41]: time=12-17 14:32:01.997 processed=DefaultState org=ApStaDisabledState dest=<null> what=155650(0x26002)
- rec[42]: time=12-17 14:32:12.418 processed=DefaultState org=ApStaDisabledState dest=<null> what=155651(0x26003)
- rec[43]: time=12-17 14:32:45.368 processed=DefaultState org=ApStaDisabledState dest=<null> what=155652(0x26004)
- rec[44]: time=12-17 14:34:20.510 processed=DefaultState org=ApStaDisabledState dest=<null> what=155652(0x26004)
- rec[45]: time=12-17 14:36:50.810 processed=DefaultState org=ApStaDisabledState dest=<null> what=155652(0x26004)
- rec[46]: time=12-17 14:38:47.356 processed=DefaultState org=ApStaDisabledState dest=<null> what=155652(0x26004)
- rec[47]: time=12-17 14:42:01.427 processed=DefaultState org=ApStaDisabledState dest=<null> what=155652(0x26004)
- rec[48]: time=12-17 14:44:22.546 processed=DefaultState org=ApStaDisabledState dest=<null> what=155652(0x26004)
- rec[49]: time=12-17 14:48:36.404 processed=DefaultState org=ApStaDisabledState dest=<null> what=155652(0x26004)
- rec[50]: time=12-17 14:53:44.677 processed=DefaultState org=ApStaDisabledState dest=<null> what=155652(0x26004)
- rec[51]: time=12-17 14:58:03.371 processed=DefaultState org=ApStaDisabledState dest=<null> what=155652(0x26004)
- rec[52]: time=12-17 15:02:47.346 processed=DefaultState org=ApStaDisabledState dest=<null> what=155652(0x26004)
- rec[53]: time=12-17 15:13:54.307 processed=DefaultState org=ApStaDisabledState dest=<null> what=155652(0x26004)
- rec[54]: time=12-17 15:32:52.222 processed=DefaultState org=ApStaDisabledState dest=<null> what=155650(0x26002)
- rec[55]: time=12-17 15:32:54.851 processed=DefaultState org=ApStaDisabledState dest=<null> what=155660(0x2600c)
- rec[56]: time=12-17 15:33:38.467 processed=DefaultState org=ApStaDisabledState dest=<null> what=155651(0x26003)
- rec[57]: time=12-17 15:36:51.580 processed=DefaultState org=ApStaDisabledState dest=<null> what=155650(0x26002)
- rec[58]: time=12-17 15:36:53.028 processed=DefaultState org=ApStaDisabledState dest=<null> what=155660(0x2600c)
- rec[59]: time=12-17 15:37:00.673 processed=ApStaDisabledState org=ApStaDisabledState dest=DeviceActiveState what=155656(0x26008)
- rec[60]: time=12-17 15:42:01.173 processed=StaEnabledState org=DeviceActiveState dest=<null> what=155658(0x2600a)
- rec[61]: time=12-17 15:55:44.399 processed=DefaultState org=DeviceActiveState dest=<null> what=155651(0x26003)
- rec[62]: time=12-17 16:29:36.946 processed=DefaultState org=DeviceActiveState dest=<null> what=155650(0x26002)
- rec[63]: time=12-17 16:29:38.676 processed=DefaultState org=DeviceActiveState dest=<null> what=155651(0x26003)
- rec[64]: time=12-17 16:33:39.496 processed=DefaultState org=DeviceActiveState dest=<null> what=155652(0x26004)
- rec[65]: time=12-17 16:33:39.644 processed=DefaultState org=DeviceActiveState dest=<null> what=155650(0x26002)
- rec[66]: time=12-17 16:33:42.744 processed=DeviceActiveState org=DeviceActiveState dest=<null> what=155660(0x2600c)
- rec[67]: time=12-17 16:36:50.902 processed=DefaultState org=DeviceActiveState dest=<null> what=155652(0x26004)
- rec[68]: time=12-17 16:39:37.580 processed=DefaultState org=DeviceActiveState dest=<null> what=155651(0x26003)
- rec[69]: time=12-17 16:46:59.573 processed=DefaultState org=DeviceActiveState dest=<null> what=155650(0x26002)
- rec[70]: time=12-17 16:47:03.850 processed=DeviceActiveState org=DeviceActiveState dest=<null> what=155660(0x2600c)
- rec[71]: time=12-17 16:48:03.952 processed=DefaultState org=DeviceActiveState dest=<null> what=155652(0x26004)
- rec[72]: time=12-17 16:52:28.240 processed=DefaultState org=DeviceActiveState dest=<null> what=155651(0x26003)
- rec[73]: time=12-17 16:58:45.507 processed=DefaultState org=DeviceActiveState dest=<null> what=155652(0x26004)
- rec[74]: time=12-17 17:11:29.609 processed=DefaultState org=DeviceActiveState dest=<null> what=155650(0x26002)
- rec[75]: time=12-17 17:11:31.072 processed=DeviceActiveState org=DeviceActiveState dest=<null> what=155660(0x2600c)
- rec[76]: time=12-17 17:17:30.014 processed=DefaultState org=DeviceActiveState dest=<null> what=155652(0x26004)
- rec[77]: time=12-17 17:25:20.954 processed=DefaultState org=DeviceActiveState dest=<null> what=155652(0x26004)
- rec[78]: time=12-17 17:27:40.492 processed=DefaultState org=DeviceActiveState dest=<null> what=155651(0x26003)
- rec[79]: time=12-17 17:38:08.587 processed=DefaultState org=DeviceActiveState dest=<null> what=155652(0x26004)
- rec[80]: time=12-17 17:38:09.321 processed=DeviceActiveState org=DeviceActiveState dest=<null> what=155660(0x2600c)
- rec[81]: time=12-17 17:38:09.518 processed=DefaultState org=DeviceActiveState dest=<null> what=155650(0x26002)
- rec[82]: time=12-17 17:39:13.340 processed=DefaultState org=DeviceActiveState dest=<null> what=155652(0x26004)
- rec[83]: time=12-17 17:39:13.464 processed=DefaultState org=DeviceActiveState dest=<null> what=155652(0x26004)
- rec[84]: time=12-17 17:40:29.666 processed=DefaultState org=DeviceActiveState dest=<null> what=155652(0x26004)
- rec[85]: time=12-17 17:44:13.530 processed=StaEnabledState org=DeviceActiveState dest=<null> what=155658(0x2600a)
- rec[86]: time=12-17 17:44:14.480 processed=DefaultState org=DeviceActiveState dest=<null> what=155651(0x26003)
- rec[87]: time=12-17 17:45:20.291 processed=DefaultState org=DeviceActiveState dest=<null> what=155652(0x26004)
- rec[88]: time=12-17 17:50:40.925 processed=DefaultState org=DeviceActiveState dest=<null> what=155652(0x26004)
- rec[89]: time=12-17 17:54:41.496 processed=DefaultState org=DeviceActiveState dest=<null> what=155652(0x26004)
- rec[90]: time=12-17 17:57:19.323 processed=DefaultState org=DeviceActiveState dest=<null> what=155650(0x26002)
- rec[91]: time=12-17 17:57:22.838 processed=DeviceActiveState org=DeviceActiveState dest=<null> what=155660(0x2600c)
- rec[92]: time=12-17 17:59:26.910 processed=DefaultState org=DeviceActiveState dest=<null> what=155652(0x26004)
- rec[93]: time=12-17 18:02:45.180 processed=DefaultState org=DeviceActiveState dest=<null> what=155651(0x26003)
- rec[94]: time=12-17 18:07:50.102 processed=DefaultState org=DeviceActiveState dest=<null> what=155650(0x26002)
- rec[95]: time=12-17 18:07:51.441 processed=DeviceActiveState org=DeviceActiveState dest=<null> what=155660(0x2600c)
- rec[96]: time=12-17 18:07:52.404 processed=DefaultState org=DeviceActiveState dest=<null> what=155652(0x26004)
+
  rec[97]: time=12-17 18:20:26.195 processed=DefaultState org=DeviceActiveState dest=<null> what=155651(0x26003)
  rec[98]: time=12-17 18:24:13.106 processed=DefaultState org=DeviceActiveState dest=<null> what=155650(0x26002)
  rec[99]: time=12-17 18:24:14.569 processed=DeviceActiveState org=DeviceActiveState dest=<null> what=155660(0x2600c)
@@ -6953,334 +6178,6 @@ AJujgagYMEQoFwArCOzsZpUBzxasDzpUDCgRygWY/gOeXhM2
 
 ring-buffer = pkt_stats_rb
 
-ring-buffer = connectivity_events_rb
-eAGVmX9MlHUcxx+4O84Lve4CERFODjiBix9eqZMyR20lx/rPTlOTak5tsQKdjUINklmSQCfnjzWT
-f4zKQWGFMOMaUaAQA12zokhha6tcDCmYuAHV83yfr3Vl0ft9jMGN1732+jz3/T678U1SDGGF941f
-uH2vSYlQwtRv/WFUjOIXqxIufhrVv4UpSSr94JjhokbPmZU2qK/T6PWSNs9K33SXuILCjZXYNl4k
-SpIljZUc2/a1cGeL7uDj16+620KvSZh6VbTnRjGlecWAoA3/mFKjbr2CD+XptDZ1hHKrW7vgRsWk
-fmlXsEXS2jvw33SEMlfQW726W4Ho0cd0Ovx/aYdasrv+GzFlnJKg9mmzmdWijPWeTxPcc/5s00hT
-q04uEKS2gjRSn1Qj9ddo5M4vQp2GWZwlo6FObXX+m1O7YoOmb0XnUjGVCqqP0PdOf35zzaU03HsJ
-X/3eoXxBY6t/k6SxNVe08X2iJLbpA6Jk2tVMuHNzWgj3WkljU7rrW4kSJfUsURIlaazEXP0RURKx
-LkiUxEoaKxkPfkyUHF7cTpTsbviEcEdt/oxwn+roJNyOJz4n3CfP9RLuzMV9hNvxSj/hDgQuEG77
-/W0D+P2kdlmfoLH7SbeksVWVFa5cx0t+qrILGiuZkjRWsq5L6bTBnzCmysIFjZXMK9dprOS9Xw1E
-yauDJqKkTtJYSZHXTJRca7QQJVc9kYT7/KZ5hPuKpLEpIzutRMmadBtRktxgJ9w1B6MJ93JjDOFe
-UruIcHsm4gl3QYuDcPvSEwl3b46TcO/YfvQ8vosn+94RNLaL3f06ja0qR5mvBy+Jr94maKwkW9JY
-ybs/DA7hJdtbfxY0VlIqaawkrXDXMF5S0f+coLES5/ISwt1V+gLhvixpbMrpK6VEye/L9hAlVSf2
-Eu7ip8sI935JY1PODJcTJY0F+4iS24YrCHd+88uEe8J1gHBvaKgm3O2ZrxHulICfcKfYagl3nCtA
-uGOsFqsd/uwzFBspaGxf/iJpbFUdODyXKKkasRIldZLGSioftRElaZfsRMnKVVGE+/Wl8wl3k6Sx
-KUeOxRAlzQ/HEiXP9y4k3CWt8YTbe4+DcI/dSCbcN7a4CLe5Zwnh7s5PI9yXt6YT7sLpQ744eBc3
-vnFS0Ngu7pI0tqreDNyxAS85440WNFgiaaxkVft8oqR7bAFRMihprOTMkwuJEqt7EVGSJGms5Kkj
-8UTJrj4HUVIpaaykbXUiUXLouJMoufZbEuG+8zsX4R55IJVw5wYzCPeJtCzCHefPJtypkR7CneG4
-i3DX1XTtxPd8+YqvBI3t+aOSxlZVypa3KrUS7H/rz979/RonfNd0mqYEjXWvlDTWnVOZW4SX9Fh8
-gsZKEs7tKMbd9f5qQWPus5LGplRGV5fiJRNNjwgaK7Gc1mmsJN+XtwcvyZrcLGis5BlJYyX2U/5y
-vKSj+G1BYyVfShormRzveAkvyZsZEDRWsl/SWMnB6PF9eMmLtZYKjcZKjksaK3GutQm3fs56+khN
-3oc/hp7V/f2c1Z9pFzR2zuopSBS0fs76l3tGlWqnsrpbO2f9Ax6YJVY=
-
-ring-buffer = firmware_prints_rb
-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
-
-ring-buffer = driver_prints_rb
-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
-dQ==
 
 --------------------------------------------------------------------
 --------------------------------------------------------------------
@@ -10092,7 +8989,7 @@ WifiQualifiedNetworkSelector - Log Begin ----
     "HUAWEI nova 3e":11  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
     "lenovo-internet":1  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:"200E"WPA_PSK set time:1544782706721
     "+Shjoycity Free Wifi":6  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
-    "郭慧杏的 iPhone":15  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
+    "XXX的 iPhone":15  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
     "3C_5G":23  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
     "3CC_5G":26  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
     "3CC":25  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
@@ -10136,7 +9033,7 @@ WifiQualifiedNetworkSelector - Log Begin ----
     "HUAWEI nova 3e":11  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
     "lenovo-internet":1  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:"200E"WPA_PSK set time:1544782706721
     "+Shjoycity Free Wifi":6  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
-    "郭慧杏的 iPhone":15  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
+    "XXX的 iPhone":15  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
     "3C_5G":23  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
     "3CC_5G":26  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
     "3CC":25  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
@@ -10181,7 +9078,7 @@ WifiQualifiedNetworkSelector - Log Begin ----
     "HUAWEI nova 3e":11  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
     "lenovo-internet":1  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:"200E"WPA_PSK set time:1544782706721
     "+Shjoycity Free Wifi":6  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
-    "郭慧杏的 iPhone":15  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
+    "XXX的 iPhone":15  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
     "3C_5G":23  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
     "3CC_5G":26  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
     "3CC":25  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
@@ -10224,7 +9121,7 @@ WifiQualifiedNetworkSelector - Log Begin ----
     "HUAWEI nova 3e":11  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
     "lenovo-internet":1  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:"200E"WPA_PSK set time:1544782706721
     "+Shjoycity Free Wifi":6  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
-    "郭慧杏的 iPhone":15  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
+    "XXX的 iPhone":15  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
     "3C_5G":23  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
     "3CC_5G":26  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
     "3CC":25  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
@@ -10267,7 +9164,7 @@ WifiQualifiedNetworkSelector - Log Begin ----
     "HUAWEI nova 3e":11  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
     "lenovo-internet":1  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:"200E"WPA_PSK set time:1544782706721
     "+Shjoycity Free Wifi":6  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
-    "郭慧杏的 iPhone":15  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
+    "XXX的 iPhone":15  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
     "3C_5G":23  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
     "3CC_5G":26  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
     "3CC":25  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
@@ -10313,7 +9210,7 @@ WifiQualifiedNetworkSelector - Log Begin ----
     "HUAWEI nova 3e":11  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
     "lenovo-internet":1  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:"200E"WPA_PSK set time:1544782706721
     "+Shjoycity Free Wifi":6  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
-    "郭慧杏的 iPhone":15  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
+    "XXX的 iPhone":15  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
     "3C_5G":23  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
     "3CC_5G":26  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
     "3CC":25  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
@@ -10356,7 +9253,7 @@ WifiQualifiedNetworkSelector - Log Begin ----
     "HUAWEI nova 3e":11  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
     "lenovo-internet":1  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:"200E"WPA_PSK set time:1544782706721
     "+Shjoycity Free Wifi":6  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
-    "郭慧杏的 iPhone":15  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
+    "XXX的 iPhone":15  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
     "3C_5G":23  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
     "3CC_5G":26  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
     "3CC":25  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
@@ -10399,7 +9296,7 @@ WifiQualifiedNetworkSelector - Log Begin ----
     "HUAWEI nova 3e":11  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
     "lenovo-internet":1  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:"200E"WPA_PSK set time:1544782706721
     "+Shjoycity Free Wifi":6  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
-    "郭慧杏的 iPhone":15  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
+    "XXX的 iPhone":15  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
     "3C_5G":23  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
     "3CC_5G":26  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
     "3CC":25  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
@@ -10442,7 +9339,7 @@ WifiQualifiedNetworkSelector - Log Begin ----
     "HUAWEI nova 3e":11  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
     "lenovo-internet":1  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:"200E"WPA_PSK set time:1544782706721
     "+Shjoycity Free Wifi":6  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
-    "郭慧杏的 iPhone":15  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
+    "XXX的 iPhone":15  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
     "3C_5G":23  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
     "3CC_5G":26  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
     "3CC":25  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
@@ -10485,7 +9382,7 @@ WifiQualifiedNetworkSelector - Log Begin ----
     "HUAWEI nova 3e":11  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
     "lenovo-internet":1  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:"200E"WPA_PSK set time:1544782706721
     "+Shjoycity Free Wifi":6  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
-    "郭慧杏的 iPhone":15  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
+    "XXX的 iPhone":15  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
     "3C_5G":23  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
     "3CC_5G":26  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
     "3CC":25  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
@@ -10528,7 +9425,7 @@ WifiQualifiedNetworkSelector - Log Begin ----
     "HUAWEI nova 3e":11  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
     "lenovo-internet":1  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:"200E"WPA_PSK set time:1544782706721
     "+Shjoycity Free Wifi":6  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
-    "郭慧杏的 iPhone":15  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
+    "XXX的 iPhone":15  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
     "3C_5G":23  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
     "3CC_5G":26  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
     "3CC":25  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
@@ -10571,7 +9468,7 @@ WifiQualifiedNetworkSelector - Log Begin ----
     "HUAWEI nova 3e":11  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
     "lenovo-internet":1  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:"200E"WPA_PSK set time:1544782706721
     "+Shjoycity Free Wifi":6  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
-    "郭慧杏的 iPhone":15  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
+    "XXX的 iPhone":15  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
     "3C_5G":23  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
     "3CC_5G":26  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
     "3CC":25  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
@@ -10614,7 +9511,7 @@ WifiQualifiedNetworkSelector - Log Begin ----
     "HUAWEI nova 3e":11  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
     "lenovo-internet":1  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:"200E"WPA_PSK set time:1544782706721
     "+Shjoycity Free Wifi":6  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
-    "郭慧杏的 iPhone":15  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
+    "XXX的 iPhone":15  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
     "3C_5G":23  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
     "3CC_5G":26  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
     "3CC":25  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
@@ -10657,7 +9554,7 @@ WifiQualifiedNetworkSelector - Log Begin ----
     "HUAWEI nova 3e":11  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
     "lenovo-internet":1  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:"200E"WPA_PSK set time:1544782706721
     "+Shjoycity Free Wifi":6  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
-    "郭慧杏的 iPhone":15  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
+    "XXX的 iPhone":15  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
     "3C_5G":23  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
     "3CC_5G":26  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
     "3CC":25  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
@@ -10700,7 +9597,7 @@ WifiQualifiedNetworkSelector - Log Begin ----
     "HUAWEI nova 3e":11  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
     "lenovo-internet":1  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:"200E"WPA_PSK set time:1544782706721
     "+Shjoycity Free Wifi":6  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
-    "郭慧杏的 iPhone":15  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
+    "XXX的 iPhone":15  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
     "3C_5G":23  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
     "3CC_5G":26  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
     "3CC":25  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
@@ -10743,7 +9640,7 @@ WifiQualifiedNetworkSelector - Log Begin ----
     "HUAWEI nova 3e":11  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
     "lenovo-internet":1  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:"200E"WPA_PSK set time:1544782706721
     "+Shjoycity Free Wifi":6  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
-    "郭慧杏的 iPhone":15  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
+    "XXX的 iPhone":15  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
     "3C_5G":23  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
     "3CC_5G":26  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
     "3CC":25  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
@@ -10806,7 +9703,7 @@ WifiQualifiedNetworkSelector - Log Begin ----
     "HUAWEI nova 3e":11  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
     "lenovo-internet":1  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:"200E"WPA_PSK set time:1544782706721
     "+Shjoycity Free Wifi":6  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
-    "郭慧杏的 iPhone":15  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
+    "XXX的 iPhone":15  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
     "3C_5G":23  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
     "3CC_5G":26  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
     "3CC":25  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
@@ -10849,7 +9746,7 @@ WifiQualifiedNetworkSelector - Log Begin ----
     "HUAWEI nova 3e":11  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
     "lenovo-internet":1  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:"200E"WPA_PSK set time:1544782706721
     "+Shjoycity Free Wifi":6  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
-    "郭慧杏的 iPhone":15  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
+    "XXX的 iPhone":15  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
     "3C_5G":23  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
     "3CC_5G":26  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
     "3CC":25  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
@@ -10892,7 +9789,7 @@ WifiQualifiedNetworkSelector - Log Begin ----
     "HUAWEI nova 3e":11  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
     "lenovo-internet":1  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:"200E"WPA_PSK set time:1544782706721
     "+Shjoycity Free Wifi":6  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
-    "郭慧杏的 iPhone":15  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
+    "XXX的 iPhone":15  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
     "3C_5G":23  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
     "3CC_5G":26  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
     "3CC":25  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
@@ -10935,7 +9832,7 @@ WifiQualifiedNetworkSelector - Log Begin ----
     "HUAWEI nova 3e":11  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
     "lenovo-internet":1  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:"200E"WPA_PSK set time:1544782706721
     "+Shjoycity Free Wifi":6  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
-    "郭慧杏的 iPhone":15  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
+    "XXX的 iPhone":15  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
     "3C_5G":23  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
     "3CC_5G":26  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
     "3CC":25  User Preferred BSSID:null FQDN:null NETWORK_SELECTION_ENABLED Disable account: 0 0 0 0 0 0 0 0 0 0 Connect Choice:null set time:-1
@@ -13294,6 +12191,1918 @@ permission:com.android.calendar.push.permission.MESSAGE
 permission:getui.permission.GetuiService.com.mobike.mobikeapp
 permission:com.meizu.flyme.appcenter.permission.action.perform
 permission:com.meizu.customizecenter.Permission.RW_PROVIDER
+
+
+```
+
+##  db shell content query --uri 全字符
+```
+Row: 0 _id=1, _data=/system, _size=0, format=12289, parent=0, date_added=172827, date_modified=0, mime_type=NULL, title=system, description=NULL, _display_name=system, picasa_id=NULL, orientation=NULL, latitude=NULL, longitude=NULL, datetaken=NULL, mini_thumb_magic=NULL, bucket_id=47, bucket_display_name=, isprivate=NULL, title_key=NULL, artist_id=NULL, album_id=NULL, composer=NULL, track=NULL, year=NULL, date=NULL, is_ringtone=NULL, is_music=NULL, is_alarm=NULL, is_notification=NULL, is_podcast=NULL, album_artist=NULL, album_artist_key=NULL, duration=NULL, bookmark=NULL, artist=NULL, album=NULL, resolution=NULL, tags=NULL, category=NULL, language=NULL, mini_thumb_data=NULL, name=NULL, media_type=0, old_id=NULL, storage_id=0, is_drm=NULL, width=NULL, height=NULL, camera_refocus=0
+Row: 1 _id=2, _data=/system/media, _size=0, format=12289, parent=1, date_added=172827, date_modified=1230739200, mime_type=NULL, title=media, description=NULL, _display_name=media, picasa_id=NULL, orientation=NULL, latitude=NULL, longitude=NULL, datetaken=NULL, mini_thumb_magic=NULL, bucket_id=-2124328162, bucket_display_name=system, isprivate=NULL, title_key=NULL, artist_id=NULL, album_id=NULL, composer=NULL, track=NULL, year=NULL, date=NULL, is_ringtone=NULL, is_music=NULL, is_alarm=NULL, is_notification=NULL, is_podcast=NULL, album_artist=NULL, album_artist_key=NULL, duration=NULL, bookmark=NULL, artist=NULL, album=NULL, resolution=NULL, tags=NULL, category=NULL, language=NULL, mini_thumb_data=NULL, name=NULL, media_type=0, old_id=NULL, storage_id=0, is_drm=NULL, width=NULL, height=NULL, camera_refocus=0
+Row: 2 _id=3, _data=/system/media/audio, _size=0, format=12289, parent=2, date_added=172827, date_modified=1230739200, mime_type=NULL, title=audio, description=NULL, _display_name=audio, picasa_id=NULL, orientation=NULL, latitude=NULL, longitude=NULL, datetaken=NULL, mini_thumb_magic=NULL, bucket_id=1664432563, bucket_display_name=media, isprivate=NULL, title_key=NULL, artist_id=NULL, album_id=NULL, composer=NULL, track=NULL, year=NULL, date=NULL, is_ringtone=NULL, is_music=NULL, is_alarm=NULL, is_notification=NULL, is_podcast=NULL, album_artist=NULL, album_artist_key=NULL, duration=NULL, bookmark=NULL, artist=NULL, album=NULL, resolution=NULL, tags=NULL, category=NULL, language=NULL, mini_thumb_data=NULL, name=NULL, media_type=0, old_id=NULL, storage_id=0, is_drm=0, width=NULL, height=NULL, camera_refocus=0
+Row: 3 _id=4, _data=/system/media/audio/alarms, _size=0, format=12289, parent=3, date_added=172827, date_modified=1230739200, mime_type=NULL, title=alarms, description=NULL, _display_name=alarms, picasa_id=NULL, orientation=NULL, latitude=NULL, longitude=NULL, datetaken=NULL, mini_thumb_magic=NULL, bucket_id=-43825030, bucket_display_name=audio, isprivate=NULL, title_key=NULL, artist_id=NULL, album_id=NULL, composer=NULL, track=NULL, year=NULL, date=NULL, is_ringtone=NULL, is_music=NULL, is_alarm=NULL, is_notification=NULL, is_podcast=NULL, album_artist=NULL, album_artist_key=NULL, duration=NULL, bookmark=NULL, artist=NULL, album=NULL, resolution=NULL, tags=NULL, category=NULL, language=NULL, mini_thumb_data=NULL, name=NULL, media_type=0, old_id=NULL, storage_id=0, is_drm=0, width=NULL, height=NULL, camera_refocus=0
+
+```
+
+##  adb shell dumpsys netstats detail全字符
+```
+Active interfaces:
+  iface=tun0 ident=[{type=VPN, subType=COMBINED, metered=false}] 
+  iface=wlan0 ident=[{type=WIFI, subType=COMBINED, networkId="3CC_5G", metered=false}] 
+Active UID interfaces:
+  iface=tun0 ident=[{type=VPN, subType=COMBINED, metered=false}] 
+  iface=wlan0 ident=[{type=WIFI, subType=COMBINED, networkId="3CC_5G", metered=false}] 
+Dev stats:
+  Pending bytes: 0
+  History since boot:
+  ident=[{type=MOBILE, subType=COMBINED, subscriberId=460110..., metered=true}] uid=-1 set=ALL tag=0x0
+    NetworkStatsHistory: bucketDuration=3600
+      st=1545048000 rb=106613 rp=291 tb=39561 tp=334 op=0
+      st=1545051600 rb=4297352 rp=7660 tb=8204613 tp=11037 op=0
+      st=1545055200 rb=254016 rp=725 tb=157683 tp=833 op=0
+      st=1545058800 rb=1868 rp=23 tb=2846 tp=30 op=0
+      st=1545062400 rb=72 rp=1 tb=166 tp=2 op=0
+      st=1545069600 rb=531 rp=7 tb=715 tp=8 op=0
+      st=1545094800 rb=24638985 rp=30319 tb=4763461 tp=26555 op=0
+      st=1545098400 rb=6258127 rp=9850 tb=1747421 tp=10521 op=0
+      st=1545102000 rb=716947 rp=1378 tb=225295 tp=1449 op=0
+  ident=[{type=WIFI, subType=COMBINED, networkId="102", metered=false}] uid=-1 set=ALL tag=0x0
+    NetworkStatsHistory: bucketDuration=3600
+      st=1545048000 rb=54443497 rp=48792 tb=7282128 tp=49567 op=0
+      st=1545051600 rb=75071 rp=177 tb=42600 tp=216 op=0
+      st=1545055200 rb=64664008 rp=55777 tb=5460622 tp=46474 op=0
+      st=1545058800 rb=79045709 rp=66941 tb=6840433 tp=57304 op=0
+      st=1545062400 rb=76734222 rp=54226 tb=5348766 tp=53860 op=0
+      st=1545066000 rb=10050 rp=213 tb=346 tp=1 op=0
+      st=1545069600 rb=7172 rp=151 tb=346 tp=1 op=0
+      st=1545073200 rb=7481 rp=146 tb=346 tp=1 op=0
+      st=1545076800 rb=6555 rp=140 tb=346 tp=1 op=0
+      st=1545080400 rb=6351 rp=136 tb=346 tp=1 op=0
+      st=1545084000 rb=6628 rp=140 tb=346 tp=1 op=0
+      st=1545087600 rb=6699 rp=140 tb=346 tp=1 op=0
+      st=1545091200 rb=650419 rp=1345 tb=359656 tp=1547 op=0
+      st=1545094800 rb=53254322 rp=46254 tb=6950142 tp=41290 op=0
+  ident=[{type=WIFI, subType=COMBINED, networkId="3CC_5G", metered=false}] uid=-1 set=ALL tag=0x0
+    NetworkStatsHistory: bucketDuration=3600
+      st=1545102000 rb=64970679 rp=52581 tb=4527887 tp=37284 op=0
+  ident=[{type=VPN, subType=COMBINED, metered=false}] uid=-1 set=ALL tag=0x0
+    NetworkStatsHistory: bucketDuration=3600
+      st=1545048000 rb=48839617 rp=42182 tb=3248789 tp=32397 op=0
+      st=1545051600 rb=3665873 rp=9238 tb=6999511 tp=9031 op=0
+      st=1545055200 rb=59528515 rp=46752 tb=2279231 tp=32218 op=0
+      st=1545058800 rb=72773728 rp=56153 tb=2565801 tp=38243 op=0
+      st=1545062400 rb=73921792 rp=52458 tb=1662003 tp=34775 op=0
+      st=1545091200 rb=452685 rp=1339 tb=242994 tp=1819 op=0
+      st=1545094800 rb=69918327 rp=65432 tb=6235293 tp=49944 op=0
+      st=1545098400 rb=4223882 rp=6954 tb=838206 tp=7665 op=0
+      st=1545102000 rb=37759051 rp=29496 tb=1386538 tp=20080 op=0
+Xt stats:
+  Pending bytes: 0
+  History since boot:
+  ident=[{type=MOBILE, subType=COMBINED, subscriberId=460110..., metered=true}] uid=-1 set=ALL tag=0x0
+    NetworkStatsHistory: bucketDuration=3600
+      st=1545048000 rb=106213 rp=281 tb=36889 tp=334 op=0
+      st=1545051600 rb=4258515 rp=6913 tb=7968437 tp=8234 op=0
+      st=1545055200 rb=253541 rp=716 tb=150839 tp=830 op=0
+      st=1545058800 rb=1868 rp=23 tb=2606 tp=30 op=0
+      st=1545062400 rb=72 rp=1 tb=150 tp=2 op=0
+      st=1545069600 rb=531 rp=7 tb=651 tp=8 op=0
+      st=1545094800 rb=24394391 rp=25462 tb=4526357 tp=26026 op=0
+      st=1545098400 rb=6221803 rp=9110 tb=1656576 tp=10367 op=0
+      st=1545102000 rb=711609 rp=1249 tb=213228 tp=1438 op=0
+  ident=[{type=WIFI, subType=COMBINED, networkId="102", metered=false}] uid=-1 set=ALL tag=0x0
+    NetworkStatsHistory: bucketDuration=3600
+      st=1545048000 rb=54435678 rp=48341 tb=6594389 tp=49606 op=0
+      st=1545051600 rb=75038 rp=176 tb=39563 tp=216 op=0
+      st=1545055200 rb=64607745 rp=53837 tb=4808728 tp=46429 op=0
+      st=1545058800 rb=78970886 rp=64320 tb=6037366 tp=57264 op=0
+      st=1545062400 rb=76731760 rp=54108 tb=4594939 tp=53857 op=0
+      st=1545066000 rb=10354 rp=213 tb=664 tp=2 op=0
+      st=1545069600 rb=7476 rp=151 tb=664 tp=2 op=0
+      st=1545073200 rb=7683 rp=143 tb=664 tp=2 op=0
+      st=1545076800 rb=6859 rp=140 tb=664 tp=2 op=0
+      st=1545080400 rb=6683 rp=137 tb=664 tp=2 op=0
+      st=1545084000 rb=6960 rp=141 tb=664 tp=2 op=0
+      st=1545087600 rb=7031 rp=141 tb=664 tp=2 op=0
+      st=1545091200 rb=650660 rp=1343 tb=338313 tp=1547 op=0
+      st=1545094800 rb=53227871 rp=45315 tb=6372251 tp=41283 op=0
+  ident=[{type=WIFI, subType=COMBINED, networkId="3CC_5G", metered=false}] uid=-1 set=ALL tag=0x0
+    NetworkStatsHistory: bucketDuration=3600
+      st=1545102000 rb=64966615 rp=52461 tb=4003363 tp=37193 op=0
+  ident=[{type=VPN, subType=COMBINED, metered=false}] uid=-1 set=ALL tag=0x0
+    NetworkStatsHistory: bucketDuration=3600
+      st=1545048000 rb=48847098 rp=42231 tb=3246678 tp=32206 op=0
+      st=1545051600 rb=3665873 rp=9238 tb=6942931 tp=7577 op=0
+      st=1545055200 rb=59528515 rp=46752 tb=2273984 tp=32128 op=0
+      st=1545058800 rb=72773728 rp=56153 tb=2562170 tp=38153 op=0
+      st=1545062400 rb=73921792 rp=52458 tb=1744429 tp=36077 op=0
+      st=1545066000 rb=0 rp=0 tb=60484 tp=994 op=0
+      st=1545069600 rb=0 rp=0 tb=72266 tp=1189 op=0
+      st=1545073200 rb=0 rp=0 tb=52143 tp=858 op=0
+      st=1545076800 rb=0 rp=0 tb=75209 tp=1235 op=0
+      st=1545080400 rb=0 rp=0 tb=55242 tp=907 op=0
+      st=1545084000 rb=0 rp=0 tb=68859 tp=1132 op=0
+      st=1545087600 rb=0 rp=0 tb=56007 tp=916 op=0
+      st=1545091200 rb=452685 rp=1339 tb=258388 tp=2119 op=0
+      st=1545094800 rb=69918332 rp=65432 tb=6201737 tp=49105 op=0
+      st=1545098400 rb=4223877 rp=6954 tb=838515 tp=7650 op=0
+      st=1545102000 rb=37759051 rp=29496 tb=1387569 tp=20089 op=0
+UID stats:
+  Pending bytes: 0
+  History since boot:
+  ident=[{type=MOBILE, subType=COMBINED, subscriberId=460110..., metered=true}] uid=0 set=DEFAULT tag=0x0
+    NetworkStatsHistory: bucketDuration=7200
+      st=1545048000 rb=86146 rp=1221 tb=47945 tp=944 op=0
+      st=1545055200 rb=29851 rp=249 tb=13490 tp=202 op=0
+      st=1545062400 rb=72 rp=1 tb=150 tp=2 op=0
+      st=1545069600 rb=261 rp=3 tb=208 tp=3 op=0
+      st=1545091200 rb=278100 rp=3403 tb=100828 tp=2035 op=0
+      st=1545098400 rb=258816 rp=2536 tb=127247 tp=2410 op=0
+  ident=[{type=MOBILE, subType=COMBINED, subscriberId=460110..., metered=true}] uid=0 set=DBG_VPN_IN tag=0x0
+    NetworkStatsHistory: bucketDuration=7200
+      st=1545048000 rb=36203 rp=594 tb=25756 tp=510 op=0
+      st=1545055200 rb=14964 rp=116 tb=6608 tp=81 op=0
+      st=1545091200 rb=87130 rp=1484 tb=51767 tp=1004 op=0
+      st=1545098400 rb=79847 rp=1102 tb=64950 tp=1223 op=0
+  ident=[{type=MOBILE, subType=COMBINED, subscriberId=460110..., metered=true}] uid=1000 set=DEFAULT tag=0x0
+    NetworkStatsHistory: bucketDuration=7200
+      st=1545048000 rb=60727 rp=113 tb=21327 tp=170 op=0
+      st=1545055200 rb=1158 rp=15 tb=3122 tp=27 op=0
+      st=1545069600 rb=270 rp=4 tb=443 tp=5 op=0
+      st=1545091200 rb=24324 rp=123 tb=31789 tp=214 op=0
+      st=1545098400 rb=28236 rp=132 tb=27600 tp=216 op=0
+  ident=[{type=MOBILE, subType=COMBINED, subscriberId=460110..., metered=true}] uid=1000 set=DBG_VPN_IN tag=0x0
+    NetworkStatsHistory: bucketDuration=7200
+      st=1545048000 rb=8271 rp=48 tb=14036 tp=75 op=0
+      st=1545055200 rb=336 rp=3 tb=760 tp=5 op=0
+      st=1545091200 rb=23716 rp=114 tb=29680 tp=180 op=0
+      st=1545098400 rb=20391 rp=109 tb=23318 tp=166 op=0
+  ident=[{type=MOBILE, subType=COMBINED, subscriberId=460110..., metered=true}] uid=1001 set=FOREGROUND tag=0x0
+    NetworkStatsHistory: bucketDuration=7200
+      st=1545055200 rb=0 rp=0 tb=48 tp=1 op=0
+      st=1545091200 rb=1558 rp=31 tb=8040 tp=50 op=0
+      st=1545098400 rb=1018 rp=11 tb=2480 tp=21 op=0
+
+
+
+
+```
+
+
+## adb shell dumpsys SurfaceFlinger --latency  全字符
+```
+
+adb shell dumpsys SurfaceFlinger --latency       // 画面合成帧服务状态  全字符
+16666666
+9223372036854775807	24382784960224	9223372036854775807
+9223372036854775807	24382868506891	9223372036854775807
+9223372036854775807	24382885229391	9223372036854775807
+9223372036854775807	24382901935381	9223372036854775807
+9223372036854775807	24382935338141	9223372036854775807
+9223372036854775807	24382968763089	9223372036854775807
+9223372036854775807	24382985478610	9223372036854775807
+9223372036854775807	24383002186943	9223372036854775807
+9223372036854775807	24383018876474	9223372036854775807
+9223372036854775807	24383035587724	9223372036854775807
+9223372036854775807	24383052287360	9223372036854775807
+9223372036854775807	24383068990433	9223372036854775807
+9223372036854775807	24383085702412	9223372036854775807
+9223372036854775807	24383102419964	9223372036854775807
+9223372036854775807	24383119167151	9223372036854775807
+9223372036854775807	24383135964808	9223372036854775807
+
+
+```
+
+
+## adb shell dumpsys sensorservice 全字符
+```
+adb shell dumpsys sensorservice              //  全字符
+
+
+Sensor Device:
+HAL: MultiHal Sensor Module (Google, Inc), version 0x01030001
+Total 39 h/w sensors, 39 running:
+0x00000001) active-count = 1; sampling_period(ms) = {66.7}, selected = 66.7 ms; batching_period(ms) = {100.0}, selected = 100.0 ms
+0x00000007) active-count = 1; sampling_period(ms) = {500.0}, selected = 500.0 ms; batching_period(ms) = {0.0}, selected = 0.0 ms
+0x00000013) active-count = 4; sampling_period(ms) = {200.0, 200.0, 200.0, 600.0}, selected = 200.0 ms; batching_period(ms) = {360000.0, 0.0, 180.0, 0.0}, selected = 0.0 ms
+Sensor List:
+0x00000001) ICM20608 Accelerometer    | InvenSense      | ver: 1 | type: android.sensor.accelerometer(1) | perm: n/a
+	 continuous | minRate=1.00Hz | maxRate=200.00Hz | FIFO (max,reserved) = (10000, 0) events | non-wakeUp | 
+0x00000002) ST480 ST480               | SENODIA         | ver: 1 | type: android.sensor.magnetic_field(2) | perm: n/a
+	 continuous | minRate=1.00Hz | maxRate=50.00Hz | FIFO (max,reserved) = (1000, 0) events | non-wakeUp | 
+0x00000003) ST480 ST480 Uncalibrated  | SENODIA         | ver: 1 | type: android.sensor.magnetic_field_uncalibrated(14) | perm: n/a
+	 continuous | minRate=1.00Hz | maxRate=50.00Hz | FIFO (max,reserved) = (1000, 0) events | non-wakeUp | 
+0x00000004) ICM20608 Gyroscope        | InvenSense      | ver: 1 | type: android.sensor.gyroscope(4) | perm: n/a
+	 continuous | minRate=1.00Hz | maxRate=250.00Hz | FIFO (max,reserved) = (2500, 0) events | non-wakeUp | 
+0x00000005) ICM20608 Gyroscope Uncalibrated | InvenSense      | ver: 1 | type: android.sensor.gyroscope_uncalibrated(16) | perm: n/a
+	 continuous | minRate=1.00Hz | maxRate=250.00Hz | FIFO (max,reserved) = (2500, 0) events | non-wakeUp | 
+0x00000006) LTR578 ALSPS              | LiteOn          | ver: 2 | type: android.sensor.proximity(8) | perm: n/a
+	 on-change | minRate=0.02Hz | minDelay=0us | FIFO (max,reserved) = (8770, 100) events | wakeUp | 
+0x00000007) LTR578 ALSPS              | LiteOn          | ver: 1 | type: android.sensor.light(5) | perm: n/a
+	 on-change | minRate=0.02Hz | minDelay=0us | FIFO (max,reserved) = (400, 0) events | non-wakeUp | 
+0x00000008) ICM20608 Accelerometer -Wakeup Secondary | InvenSense      | ver: 1 | type: android.sensor.accelerometer(1) | perm: n/a
+	 continuous | minRate=1.00Hz | maxRate=200.00Hz | FIFO (max,reserved) = (10000, 0) events | wakeUp | 
+0x00000009) ST480 ST480 -Wakeup Secondary | SENODIA         | ver: 1 | type: android.sensor.magnetic_field(2) | perm: n/a
+	 continuous | minRate=1.00Hz | maxRate=50.00Hz | FIFO (max,reserved) = (1000, 0) events | wakeUp | 
+0x0000000a) ST480 ST480 Uncalibrated -Wakeup Secondary | SENODIA         | ver: 1 | type: android.sensor.magnetic_field_uncalibrated(14) | perm: n/a
+	 continuous | minRate=1.00Hz | maxRate=50.00Hz | FIFO (max,reserved) = (1000, 0) events | wakeUp | 
+0x0000000b) ICM20608 Gyroscope -Wakeup Secondary | InvenSense      | ver: 1 | type: android.sensor.gyroscope(4) | perm: n/a
+	 continuous | minRate=1.00Hz | maxRate=250.00Hz | FIFO (max,reserved) = (2500, 0) events | wakeUp | 
+0x0000000c) ICM20608 Gyroscope Uncalibrated -Wakeup Secondary | InvenSense      | ver: 1 | type: android.sensor.gyroscope_uncalibrated(16) | perm: n/a
+	 continuous | minRate=1.00Hz | maxRate=250.00Hz | FIFO (max,reserved) = (2500, 0) events | wakeUp | 
+0x0000000d) LTR578 ALSPS -Non Wakeup Secondary | LiteOn          | ver: 2 | type: android.sensor.proximity(8) | perm: n/a
+	 on-change | minRate=0.02Hz | minDelay=0us | FIFO (max,reserved) = (8770, 100) events | non-wakeUp | 
+0x0000000e) LTR578 ALSPS -Wakeup Secondary | LiteOn          | ver: 1 | type: android.sensor.light(5) | perm: n/a
+	 on-change | minRate=0.02Hz | minDelay=0us | FIFO (max,reserved) = (400, 0) events | wakeUp | 
+0x0000000f) Gravity                   | QTI             | ver: 2 | type: android.sensor.gravity(9) | perm: n/a
+	 continuous | minRate=5.00Hz | maxRate=200.00Hz | FIFO (max,reserved) = (5846, 0) events | non-wakeUp | 
+0x00000010) Linear Acceleration       | QTI             | ver: 2 | type: android.sensor.linear_acceleration(10) | perm: n/a
+	 continuous | minRate=5.00Hz | maxRate=200.00Hz | FIFO (max,reserved) = (5846, 0) events | non-wakeUp | 
+0x00000011) Rotation Vector           | QTI             | ver: 2 | type: android.sensor.rotation_vector(11) | perm: n/a
+	 continuous | minRate=5.00Hz | maxRate=200.00Hz | FIFO (max,reserved) = (7517, 0) events | non-wakeUp | 
+0x00000012) Step Detector             | QTI             | ver: 2 | type: android.sensor.step_detector(18) | perm: n/a
+	 special-trigger | maxDelay=0us | minDelay=0us | FIFO (max,reserved) = (8770, 100) events | non-wakeUp | 
+0x00000013) Step Counter              | QTI             | ver: 2 | type: android.sensor.step_counter(19) | perm: n/a
+	 on-change | minRate=0.00Hz | minDelay=0us | FIFO (max,reserved) = (8770, 100) events | non-wakeUp | 
+0x00000014) Significant Motion Detector | QTI             | ver: 2 | type: android.sensor.significant_motion(17) | perm: n/a
+	 one-shot | maxDelay=0us | minDelay=-1us | no batching | wakeUp | 
+0x00000015) Game Rotation Vector      | QTI             | ver: 2 | type: android.sensor.game_rotation_vector(15) | perm: n/a
+	 continuous | minRate=5.00Hz | maxRate=200.00Hz | FIFO (max,reserved) = (7517, 300) events | non-wakeUp | 
+0x00000016) GeoMagnetic Rotation Vector | QTI             | ver: 2 | type: android.sensor.geomagnetic_rotation_vector(20) | perm: n/a
+	 continuous | minRate=5.00Hz | maxRate=50.00Hz | FIFO (max,reserved) = (4047, 0) events | non-wakeUp | 
+0x00000017) Orientation               | QTI             | ver: 2 | type: android.sensor.orientation(3) | perm: n/a
+	 continuous | minRate=5.00Hz | maxRate=200.00Hz | FIFO (max,reserved) = (7517, 0) events | non-wakeUp | 
+0x00000018) Tilt Detector             | QTI             | ver: 2 | type: android.sensor.tilt_detector(22) | perm: n/a
+	 special-trigger | maxDelay=0us | minDelay=0us | FIFO (max,reserved) = (26311, 0) events | wakeUp | 
+0x00000019) Gravity -Wakeup Secondary | QTI             | ver: 2 | type: android.sensor.gravity(9) | perm: n/a
+	 continuous | minRate=5.00Hz | maxRate=200.00Hz | FIFO (max,reserved) = (5846, 0) events | wakeUp | 
+0x0000001a) Linear Acceleration -Wakeup Secondary | QTI             | ver: 2 | type: android.sensor.linear_acceleration(10) | perm: n/a
+	 continuous | minRate=5.00Hz | maxRate=200.00Hz | FIFO (max,reserved) = (5846, 0) events | wakeUp | 
+0x0000001b) Rotation Vector -Wakeup Secondary | QTI             | ver: 2 | type: android.sensor.rotation_vector(11) | perm: n/a
+	 continuous | minRate=5.00Hz | maxRate=200.00Hz | FIFO (max,reserved) = (7517, 0) events | wakeUp | 
+0x0000001c) Step Detector -Wakeup Secondary | QTI             | ver: 2 | type: android.sensor.step_detector(18) | perm: n/a
+	 special-trigger | maxDelay=0us | minDelay=0us | FIFO (max,reserved) = (8770, 100) events | wakeUp | 
+0x0000001d) Step Counter -Wakeup Secondary | QTI             | ver: 2 | type: android.sensor.step_counter(19) | perm: n/a
+	 on-change | minRate=0.00Hz | minDelay=0us | FIFO (max,reserved) = (8770, 100) events | wakeUp | 
+0x0000001e) Game Rotation Vector -Wakeup Secondary | QTI             | ver: 2 | type: android.sensor.game_rotation_vector(15) | perm: n/a
+	 continuous | minRate=5.00Hz | maxRate=200.00Hz | FIFO (max,reserved) = (7517, 300) events | wakeUp | 
+0x0000001f) GeoMagnetic Rotation Vector -Wakeup Secondary | QTI             | ver: 2 | type: android.sensor.geomagnetic_rotation_vector(20) | perm: n/a
+	 continuous | minRate=5.00Hz | maxRate=50.00Hz | FIFO (max,reserved) = (4047, 0) events | wakeUp | 
+0x00000020) Orientation -Wakeup Secondary | QTI             | ver: 2 | type: android.sensor.orientation(3) | perm: n/a
+	 continuous | minRate=5.00Hz | maxRate=200.00Hz | FIFO (max,reserved) = (7517, 0) events | wakeUp | 
+0x00000021) AMD                       | QTI             | ver: 2 | type:   com.qti.sensor.amd(33171006) | perm: n/a
+	 on-change | minRate=0.00Hz | minDelay=0us | no batching | non-wakeUp | 
+0x00000022) RMD                       | QTI             | ver: 2 | type:   com.qti.sensor.rmd(33171007) | perm: n/a
+	 on-change | minRate=0.00Hz | minDelay=0us | no batching | non-wakeUp | 
+0x00000023) Basic Gestures            | QTI             | ver: 2 | type: com.qti.sensor.basic_gestures(33171000) | perm: n/a
+	 on-change | minRate=0.00Hz | minDelay=0us | no batching | non-wakeUp | 
+0x00000024) Facing                    | QTI             | ver: 2 | type: com.qti.sensor.facing(33171002) | perm: n/a
+	 on-change | minRate=0.00Hz | minDelay=0us | no batching | non-wakeUp | 
+0x00000025) Pedometer                 | QTI             | ver: 2 | type: com.qti.sensor.pedometer(33171009) | perm: n/a
+	 on-change | minRate=0.00Hz | minDelay=0us | FIFO (max,reserved) = (8770, 100) events | non-wakeUp | 
+0x00000026) Motion Accel              | QTI             | ver: 2 | type: com.qti.sensor.motion_accel(33171011) | perm: n/a
+	 special-trigger | maxDelay=0us | minDelay=0us | no batching | non-wakeUp | 
+0x00000027) Coarse Motion Classifier  | QTI             | ver: 3 | type:   com.qti.sensor.cmc(33171012) | perm: n/a
+	 on-change | minRate=0.00Hz | minDelay=0us | FIFO (max,reserved) = (2505, 0) events | non-wakeUp | 
+0x5f636779) Corrected Gyroscope Sensor | AOSP            | ver: 1 | type: android.sensor.gyroscope(4) | perm: n/a
+	 continuous | maxDelay=0us | maxRate=250.00Hz | no batching | non-wakeUp | 
+0x5f676172) Game Rotation Vector Sensor | AOSP            | ver: 3 | type: android.sensor.game_rotation_vector(15) | perm: n/a
+	 continuous | maxDelay=0us | maxRate=200.00Hz | no batching | non-wakeUp | 
+0x5f676273) Gyroscope Bias (debug)    | AOSP            | ver: 1 | type: android.sensor.accelerometer(1) | perm: n/a
+	 continuous | maxDelay=0us | maxRate=200.00Hz | no batching | non-wakeUp | 
+0x5f67656f) GeoMag Rotation Vector Sensor | AOSP            | ver: 3 | type: android.sensor.geomagnetic_rotation_vector(20) | perm: n/a
+	 continuous | maxDelay=0us | maxRate=200.00Hz | no batching | non-wakeUp | 
+0x5f677276) Gravity Sensor            | AOSP            | ver: 3 | type: android.sensor.gravity(9) | perm: n/a
+	 continuous | maxDelay=0us | maxRate=200.00Hz | no batching | non-wakeUp | 
+0x5f6c696e) Linear Acceleration Sensor | AOSP            | ver: 3 | type: android.sensor.linear_acceleration(10) | perm: n/a
+	 continuous | maxDelay=0us | maxRate=200.00Hz | no batching | non-wakeUp | 
+0x5f726f76) Rotation Vector Sensor    | AOSP            | ver: 3 | type: android.sensor.rotation_vector(11) | perm: n/a
+	 continuous | maxDelay=0us | maxRate=200.00Hz | no batching | non-wakeUp | 
+0x5f797072) Orientation Sensor        | AOSP            | ver: 1 | type: android.sensor.orientation(3) | perm: n/a
+	 continuous | maxDelay=0us | maxRate=200.00Hz | no batching | non-wakeUp | 
+Fusion States:
+9-axis fusion disabled (0 clients), gyro-rate= 200.00Hz, q=< 0, 0, 0, 0 > (0), b=< 0, 0, 0 >
+game fusion(no mag) disabled (0 clients), gyro-rate= 200.00Hz, q=< 0, 0, 0, 0 > (0), b=< 0, 0, 0 >
+geomag fusion (no gyro) disabled (0 clients), gyro-rate= 200.00Hz, q=< 0, 0, 0, 0 > (0), b=< 0, 0, 0 >
+Recent Sensor events:
+Orientation: last 10 events
+	 1 (ts=49389.806111479, wall=10:25:40.599) 143.28, -38.01, -13.00, 
+	 2 (ts=49389.826100493, wall=10:25:40.620) 143.29, -38.01, -13.00, 
+	 3 (ts=49389.846089507, wall=10:25:40.642) 143.28, -38.01, -13.00, 
+	 4 (ts=49389.866078520, wall=10:25:40.661) 143.21, -38.00, -13.02, 
+	 5 (ts=49389.886067534, wall=10:25:40.682) 143.19, -37.99, -13.04, 
+	 6 (ts=49389.906056548, wall=10:25:40.703) 143.16, -37.99, -13.07, 
+	 7 (ts=49389.926045561, wall=10:25:40.723) 143.12, -37.98, -13.07, 
+	 8 (ts=49389.946034575, wall=10:25:40.744) 143.10, -37.97, -13.07, 
+	 9 (ts=49389.966054106, wall=10:25:40.765) 143.09, -37.95, -13.07, 
+	10 (ts=49389.986043120, wall=10:25:40.785) 143.12, -37.94, -13.08, 
+Game Rotation Vector: last 10 events
+	 1 (ts=47218.567024985, wall=09:49:29.854) 0.22, 0.14, 0.69, 0.67, 
+	 2 (ts=47218.577034751, wall=09:49:29.865) 0.22, 0.14, 0.69, 0.67, 
+	 3 (ts=47218.587044517, wall=09:49:29.875) 0.21, 0.14, 0.69, 0.67, 
+	 4 (ts=47218.597054282, wall=09:49:29.885) 0.21, 0.14, 0.69, 0.67, 
+	 5 (ts=47218.607064048, wall=09:49:29.896) 0.21, 0.14, 0.69, 0.67, 
+	 6 (ts=47218.617073813, wall=09:49:29.906) 0.21, 0.14, 0.69, 0.67, 
+	 7 (ts=47218.627083579, wall=09:49:29.916) 0.21, 0.14, 0.69, 0.67, 
+	 8 (ts=47218.637093345, wall=09:49:29.927) 0.21, 0.14, 0.69, 0.67, 
+	 9 (ts=47218.647103110, wall=09:49:29.937) 0.21, 0.14, 0.69, 0.67, 
+	10 (ts=47218.657112876, wall=09:49:29.947) 0.21, 0.14, 0.69, 0.67, 
+Significant Motion Detector: last 2 events
+	 1 (ts=2705.598469272, wall=21:27:53.805) 1.00, 
+	 2 (ts=3366.641328087, wall=21:38:44.701) 1.00, 
+Step Counter: last 50 events
+	 1 (ts=58259.297141846, wall=12:53:29.837) 6707, 
+	 2 (ts=58259.557395752, wall=12:53:29.837) 6708, 
+	 3 (ts=58382.847742943, wall=12:55:32.968) 6709, 
+	 4 (ts=58464.088502044, wall=12:56:54.328) 6710, 
+	 5 (ts=58464.408814544, wall=12:56:55.310) 6711, 
+	 6 (ts=58464.829224700, wall=12:56:55.310) 6712, 
+	 7 (ts=58483.547826967, wall=12:57:14.028) 6713, 
+	 8 (ts=58483.908178529, wall=12:57:14.028) 6714, 
+	 9 (ts=58492.076119650, wall=12:57:22.858) 6715, 
+	10 (ts=58493.137154807, wall=12:57:23.839) 6716, 
+	11 (ts=58500.424253607, wall=12:57:30.706) 6717, 
+	12 (ts=58501.084898138, wall=12:57:31.688) 6718, 
+	13 (ts=58557.880377279, wall=12:58:28.342) 6719, 
+	14 (ts=58620.080993349, wall=12:59:30.341) 6720, 
+	15 (ts=58624.164977724, wall=12:59:34.746) 6721, 
+	16 (ts=58624.645446474, wall=12:59:35.627) 6722, 
+	17 (ts=58625.506286318, wall=12:59:35.627) 6723, 
+	18 (ts=58626.046828519, wall=12:59:36.509) 6724, 
+	19 (ts=58626.647414457, wall=12:59:37.388) 6725, 
+	20 (ts=58628.309035551, wall=12:59:39.110) 6726, 
+	21 (ts=58628.709426176, wall=12:59:39.110) 6727, 
+	22 (ts=58632.453078519, wall=12:59:43.414) 6728, 
+	23 (ts=58633.113723051, wall=12:59:43.414) 6729, 
+	24 (ts=58633.594191801, wall=12:59:44.274) 6730, 
+	25 (ts=58634.214797269, wall=12:59:45.136) 6731, 
+	26 (ts=58634.815383207, wall=12:59:45.136) 6732, 
+	27 (ts=58635.375930082, wall=12:59:45.997) 6733, 
+	28 (ts=58635.936458541, wall=12:59:46.856) 6734, 
+	29 (ts=58636.476985885, wall=12:59:46.856) 6735, 
+	30 (ts=58636.937435103, wall=12:59:47.719) 6736, 
+	31 (ts=58637.618099166, wall=12:59:47.719) 6737, 
+	32 (ts=58638.178646041, wall=12:59:48.579) 6738, 
+	33 (ts=58638.739192916, wall=12:59:49.440) 6739, 
+	34 (ts=58639.239681197, wall=12:59:49.440) 6740, 
+	35 (ts=58639.800228072, wall=12:59:50.301) 6741, 
+	36 (ts=58640.280696822, wall=12:59:51.142) 6742, 
+	37 (ts=58640.921321822, wall=12:59:51.142) 6743, 
+	38 (ts=58641.521907760, wall=12:59:51.983) 6744, 
+	39 (ts=58642.062435103, wall=12:59:52.823) 6745, 
+	40 (ts=58642.622981978, wall=12:59:52.823) 6746, 
+	41 (ts=58643.183528853, wall=12:59:53.664) 6747, 
+	42 (ts=58643.684017135, wall=12:59:54.504) 6748, 
+	43 (ts=58644.404720260, wall=12:59:54.504) 6749, 
+	44 (ts=58644.925228072, wall=12:59:55.344) 6750, 
+	45 (ts=58645.385677291, wall=12:59:56.187) 6751, 
+	46 (ts=58646.166475031, wall=12:59:57.028) 6752, 
+	47 (ts=58651.111299249, wall=13:00:02.073) 6753, 
+	48 (ts=58656.636666758, wall=13:00:07.018) 6754, 
+	49 (ts=58657.317330821, wall=13:00:07.838) 6755, 
+	50 (ts=58657.897897227, wall=13:00:08.659) 6756, 
+Step Detector: last 10 events
+	 1 (ts=266.723278680, wall=20:47:04.996) 1.00, 
+	 2 (ts=266.983532587, wall=20:47:04.996) 1.00, 
+	 3 (ts=267.303845087, wall=20:47:04.996) 1.00, 
+	 4 (ts=271.267712274, wall=20:47:08.799) 1.00, 
+	 5 (ts=271.728161493, wall=20:47:09.740) 1.00, 
+	 6 (ts=272.028454462, wall=20:47:09.740) 1.00, 
+	 7 (ts=272.288708368, wall=20:47:09.740) 1.00, 
+	 8 (ts=273.389782587, wall=20:47:11.622) 1.00, 
+	 9 (ts=273.890270868, wall=20:47:11.622) 1.00, 
+	10 (ts=274.150524774, wall=20:47:11.622) 1.00, 
+Linear Acceleration: last 10 events
+	 1 (ts=46750.969951023, wall=09:41:42.483) 0.03, 0.72, -0.53, 
+	 2 (ts=46750.989970555, wall=09:41:42.503) 0.72, -0.04, -0.93, 
+	 3 (ts=46751.009990086, wall=09:41:42.524) 0.53, -0.75, -1.49, 
+	 4 (ts=46751.030009617, wall=09:41:42.544) 0.13, -0.88, -1.25, 
+	 5 (ts=46751.050029148, wall=09:41:42.565) -0.65, -0.67, -0.97, 
+	 6 (ts=46751.070048680, wall=09:41:42.586) -0.65, 0.15, -0.81, 
+	 7 (ts=46751.090068211, wall=09:41:42.606) -0.46, 0.27, -1.09, 
+	 8 (ts=46751.110087742, wall=09:41:42.627) -0.29, -0.44, -1.26, 
+	 9 (ts=46751.130107273, wall=09:41:42.648) -0.05, -0.28, -0.07, 
+	10 (ts=46751.150126805, wall=09:41:42.669) 0.20, 0.34, -0.70, 
+Gravity: last 10 events
+	 1 (ts=58918.870586946, wall=13:04:28.794) 3.32, 5.83, 7.15, 
+	 2 (ts=58918.930553987, wall=13:04:28.856) 3.40, 5.71, 7.21, 
+	 3 (ts=58918.990490511, wall=13:04:28.918) 3.53, 5.68, 7.17, 
+	 4 (ts=58919.050457552, wall=13:04:28.979) 3.66, 5.70, 7.09, 
+	 5 (ts=58919.110394075, wall=13:04:29.042) 4.02, 5.72, 6.88, 
+	 6 (ts=58919.170330599, wall=13:04:29.104) 4.38, 5.77, 6.62, 
+	 7 (ts=58919.230297640, wall=13:04:29.104) 3.91, 5.59, 7.05, 
+	 8 (ts=58919.290234163, wall=13:04:29.165) 2.53, 5.04, 8.02, 
+	 9 (ts=58919.350201204, wall=13:04:29.227) 2.00, 4.64, 8.41, 
+	10 (ts=58919.410137728, wall=13:04:29.289) 1.79, 4.58, 8.48, 
+LTR578 ALSPS -Non Wakeup Secondary: last 6 events
+	 1 (ts=132.333002792, wall=20:44:49.526) 5.00, 0.00, 0.00, 
+	 2 (ts=43964.505424129, wall=08:55:16.161) 5.00, 0.00, 0.00, 
+	 3 (ts=50105.976380214, wall=10:37:36.759) 5.00, 0.00, 0.00, 
+	 4 (ts=55841.195384255, wall=12:13:11.977) 5.00, 0.00, 0.00, 
+	 5 (ts=55862.097364051, wall=12:13:32.879) 5.00, 0.00, 0.00, 
+	 6 (ts=55945.130059701, wall=12:14:55.912) 5.00, 0.00, 0.00, 
+ICM20608 Accelerometer -Wakeup Secondary: last 50 events
+	 1 (ts=13344.782658201, wall=00:25:02.001) 1.88, 0.03, 9.62, 
+	 2 (ts=13344.822666746, wall=00:25:02.049) 1.89, 0.04, 9.67, 
+	 3 (ts=13344.862675291, wall=00:25:02.083) 1.89, 0.04, 9.62, 
+	 4 (ts=13344.902683836, wall=00:25:02.124) 1.89, 0.06, 9.63, 
+	 5 (ts=13344.942692381, wall=00:25:02.173) 1.88, 0.03, 9.63, 
+	 6 (ts=13344.982700926, wall=00:25:02.206) 1.87, 0.04, 9.63, 
+	 7 (ts=13345.022709471, wall=00:25:02.248) 1.86, 0.04, 9.65, 
+	 8 (ts=13345.062718016, wall=00:25:02.289) 1.89, 0.07, 9.64, 
+	 9 (ts=13345.102726561, wall=00:25:02.330) 1.86, 0.04, 9.58, 
+	10 (ts=13345.142735106, wall=00:25:02.371) 1.89, 0.04, 9.65, 
+	11 (ts=13345.182743651, wall=00:25:02.412) 1.89, 0.02, 9.64, 
+	12 (ts=13345.222752195, wall=00:25:02.453) 1.89, 0.05, 9.66, 
+	13 (ts=13345.262760740, wall=00:25:02.494) 1.86, 0.06, 9.58, 
+	14 (ts=13345.302769285, wall=00:25:02.536) 1.86, 0.06, 9.60, 
+	15 (ts=13345.342777830, wall=00:25:02.577) 1.88, 0.04, 9.63, 
+	16 (ts=13345.382786375, wall=00:25:02.618) 1.89, 0.05, 9.66, 
+	17 (ts=13345.422794920, wall=00:25:02.659) 1.88, 0.03, 9.63, 
+	18 (ts=13345.462803465, wall=00:25:02.701) 1.87, 0.04, 9.58, 
+	19 (ts=13775.365365262, wall=00:32:12.567) -2.36, 0.73, 9.49, 
+	20 (ts=13775.405373807, wall=00:32:12.608) -2.36, 0.72, 9.48, 
+	21 (ts=13775.445382351, wall=00:32:12.649) -2.37, 0.74, 9.52, 
+	22 (ts=13775.485390896, wall=00:32:12.691) -2.37, 0.73, 9.53, 
+	23 (ts=13775.525399441, wall=00:32:12.731) -2.37, 0.71, 9.48, 
+	24 (ts=13775.565407986, wall=00:32:12.773) -2.35, 0.74, 9.53, 
+	25 (ts=13775.605416531, wall=00:32:12.813) -2.37, 0.73, 9.53, 
+	26 (ts=13775.645425076, wall=00:32:12.855) -2.38, 0.74, 9.54, 
+	27 (ts=13775.685433621, wall=00:32:12.896) -2.35, 0.74, 9.52, 
+	28 (ts=13775.725442166, wall=00:32:12.937) -2.39, 0.72, 9.46, 
+	29 (ts=13775.765450711, wall=00:32:12.979) -2.38, 0.73, 9.54, 
+	30 (ts=13775.805459256, wall=00:32:13.020) -2.36, 0.75, 9.51, 
+	31 (ts=13775.845467801, wall=00:32:13.061) -2.37, 0.75, 9.51, 
+	32 (ts=13775.885476346, wall=00:32:13.102) -2.40, 0.74, 9.53, 
+	33 (ts=13775.925484891, wall=00:32:13.144) -2.38, 0.73, 9.47, 
+	34 (ts=13775.965493435, wall=00:32:13.185) -2.39, 0.74, 9.50, 
+	35 (ts=13776.005501980, wall=00:32:13.226) -2.38, 0.75, 9.49, 
+	36 (ts=13776.045510525, wall=00:32:13.268) -2.38, 0.76, 9.53, 
+	37 (ts=13776.085519070, wall=00:32:13.309) -2.38, 0.77, 9.49, 
+	38 (ts=13776.125527615, wall=00:32:13.350) -2.40, 0.74, 9.50, 
+	39 (ts=13776.165536160, wall=00:32:13.391) -2.41, 0.76, 9.55, 
+	40 (ts=13776.205544705, wall=00:32:13.432) -2.39, 0.76, 9.51, 
+	41 (ts=13776.245553250, wall=00:32:13.474) -2.38, 0.76, 9.50, 
+	42 (ts=13776.285561795, wall=00:32:13.515) -2.41, 0.74, 9.50, 
+	43 (ts=13776.325570340, wall=00:32:13.557) -2.37, 0.74, 9.45, 
+	44 (ts=13776.365578885, wall=00:32:13.598) -2.39, 0.74, 9.53, 
+	45 (ts=13776.405587430, wall=00:32:13.639) -2.39, 0.76, 9.55, 
+	46 (ts=13776.445595975, wall=00:32:13.680) -2.40, 0.76, 9.53, 
+	47 (ts=13776.485604519, wall=00:32:13.721) -2.39, 0.76, 9.49, 
+	48 (ts=13776.525613064, wall=00:32:13.763) -2.39, 0.78, 9.51, 
+	49 (ts=13776.565621609, wall=00:32:13.804) -2.40, 0.76, 9.49, 
+	50 (ts=13776.605630154, wall=00:32:13.844) -2.41, 0.78, 9.53, 
+LTR578 ALSPS: last 10 events
+	 1 (ts=61925.051224808, wall=13:54:34.879) 21.00, 0.00, 0.00, 
+	 2 (ts=61925.151749711, wall=13:54:34.980) 20.00, 0.00, 0.00, 
+	 3 (ts=61927.363439384, wall=13:54:37.191) 21.00, 0.00, 0.00, 
+	 4 (ts=61927.463964287, wall=13:54:37.293) 20.00, 0.00, 0.00, 
+	 5 (ts=61927.966619316, wall=13:54:37.795) 21.00, 0.00, 0.00, 
+	 6 (ts=61928.067144218, wall=13:54:37.895) 20.00, 0.00, 0.00, 
+	 7 (ts=61928.670324150, wall=13:54:38.498) 21.00, 0.00, 0.00, 
+	 8 (ts=61928.770849052, wall=13:54:38.599) 20.00, 0.00, 0.00, 
+	 9 (ts=61932.289434257, wall=13:54:42.118) 21.00, 0.00, 0.00, 
+	10 (ts=61932.389989677, wall=13:54:42.218) 20.00, 0.00, 0.00, 
+LTR578 ALSPS: last 3 events
+	 1 (ts=3932.802476950, wall=21:48:09.992) 5.00, 0.00, 0.00, 
+	 2 (ts=3938.491332108, wall=21:48:15.679) 5.00, 0.00, 0.00, 
+	 3 (ts=48937.148711242, wall=10:18:07.952) 0.00, 0.00, 0.00, 
+ICM20608 Gyroscope: last 10 events
+	 1 (ts=54245.196329028, wall=11:46:36.108) -0.00, -0.00, -0.00, 
+	 2 (ts=54247.133255783, wall=11:46:37.968) 0.00, -0.01, -0.01, 
+	 3 (ts=54399.907036643, wall=11:49:10.803) -0.04, -0.02, -0.02, 
+	 4 (ts=57456.242454826, wall=12:40:07.227) 0.10, 0.13, 0.01, 
+	 5 (ts=57456.441368400, wall=12:40:07.433) -0.11, -0.07, 0.01, 
+	 6 (ts=57461.036461174, wall=12:40:11.915) -0.01, -0.01, 0.00, 
+	 7 (ts=57471.508016875, wall=12:40:21.387) -0.01, 0.00, -0.01, 
+	 8 (ts=57477.983758531, wall=12:40:27.927) 0.02, 0.00, 0.01, 
+	 9 (ts=58945.657734524, wall=13:04:55.624) -0.05, 0.04, 0.03, 
+	10 (ts=58948.495348330, wall=13:04:58.467) -0.00, -0.00, -0.01, 
+ST480 ST480: last 10 events
+	 1 (ts=48989.153875965, wall=10:18:59.965) 43.37, -31.01, -34.30, 
+	 2 (ts=48989.220526355, wall=10:19:00.025) 43.22, -31.06, -33.35, 
+	 3 (ts=48989.287176746, wall=10:19:00.105) 43.41, -32.31, -35.26, 
+	 4 (ts=48989.353827136, wall=10:19:00.164) 42.13, -31.04, -34.65, 
+	 5 (ts=48989.420477527, wall=10:19:00.245) 43.19, -31.40, -34.65, 
+	 6 (ts=48989.487127918, wall=10:19:00.306) 43.17, -31.57, -33.98, 
+	 7 (ts=48989.553778308, wall=10:19:00.364) 42.97, -31.83, -33.35, 
+	 8 (ts=48989.620428699, wall=10:19:00.444) 42.51, -31.22, -33.58, 
+	 9 (ts=48989.687079090, wall=10:19:00.504) 43.41, -32.72, -34.03, 
+	10 (ts=48989.753729480, wall=10:19:00.564) 42.74, -31.83, -33.82, 
+ICM20608 Accelerometer: last 50 events
+	 1 (ts=61931.524541679, wall=13:54:41.381) -1.93, 0.06, -9.42, 
+	 2 (ts=61931.589910332, wall=13:54:41.449) -1.91, 0.06, -9.39, 
+	 3 (ts=61931.655278984, wall=13:54:41.518) -1.92, 0.06, -9.43, 
+	 4 (ts=61931.720678154, wall=13:54:41.586) -1.91, 0.07, -9.42, 
+	 5 (ts=61931.786046806, wall=13:54:41.655) -1.92, 0.06, -9.41, 
+	 6 (ts=61931.851415459, wall=13:54:41.725) -1.91, 0.05, -9.40, 
+	 7 (ts=61931.916814629, wall=13:54:41.792) -1.92, 0.05, -9.39, 
+	 8 (ts=61931.982183281, wall=13:54:41.861) -1.92, 0.07, -9.40, 
+	 9 (ts=61932.047582451, wall=13:54:41.930) -1.94, 0.03, -9.51, 
+	10 (ts=61932.112951103, wall=13:54:41.998) -1.93, 0.06, -9.45, 
+	11 (ts=61932.178319755, wall=13:54:42.067) -1.92, 0.07, -9.38, 
+	12 (ts=61932.243718925, wall=13:54:42.135) -1.91, 0.08, -9.40, 
+	13 (ts=61932.309087578, wall=13:54:42.204) -1.92, 0.07, -9.43, 
+	14 (ts=61932.374456230, wall=13:54:42.273) -1.93, 0.06, -9.44, 
+	15 (ts=61932.439855400, wall=13:54:42.342) -1.91, 0.06, -9.45, 
+	16 (ts=61932.505224052, wall=13:54:42.410) -1.92, 0.07, -9.40, 
+	17 (ts=61932.570623222, wall=13:54:42.480) -1.92, 0.06, -9.43, 
+	18 (ts=61932.635991875, wall=13:54:42.480) -1.90, 0.06, -9.40, 
+	19 (ts=61932.701360527, wall=13:54:42.548) -1.93, 0.06, -9.42, 
+	20 (ts=61932.766759697, wall=13:54:42.617) -1.92, 0.06, -9.44, 
+	21 (ts=61932.832128349, wall=13:54:42.685) -1.92, 0.06, -9.45, 
+	22 (ts=61932.897497002, wall=13:54:42.754) -1.92, 0.06, -9.41, 
+	23 (ts=61932.962896171, wall=13:54:42.823) -1.91, 0.06, -9.42, 
+	24 (ts=61933.028264824, wall=13:54:42.892) -1.92, 0.06, -9.44, 
+	25 (ts=61933.093663994, wall=13:54:42.960) -1.92, 0.06, -9.43, 
+	26 (ts=61933.159032646, wall=13:54:43.028) -1.92, 0.06, -9.43, 
+	27 (ts=61933.224401298, wall=13:54:43.098) -1.91, 0.06, -9.43, 
+	28 (ts=61933.289800468, wall=13:54:43.166) -1.89, 0.03, -9.38, 
+	29 (ts=61933.355169121, wall=13:54:43.235) -1.92, 0.08, -9.42, 
+	30 (ts=61933.420568291, wall=13:54:43.304) -1.94, 0.05, -9.41, 
+	31 (ts=61933.485936943, wall=13:54:43.373) -1.92, 0.05, -9.44, 
+	32 (ts=61933.551305595, wall=13:54:43.441) -1.92, 0.06, -9.44, 
+	33 (ts=61933.616704765, wall=13:54:43.510) -1.94, 0.04, -9.45, 
+	34 (ts=61933.682073418, wall=13:54:43.578) -1.90, 0.05, -9.41, 
+	35 (ts=61933.747442070, wall=13:54:43.647) -1.92, 0.06, -9.38, 
+	36 (ts=61933.812841240, wall=13:54:43.716) -1.91, 0.06, -9.41, 
+	37 (ts=61933.878209892, wall=13:54:43.784) -1.93, 0.05, -9.45, 
+	38 (ts=61933.943609062, wall=13:54:43.853) -1.91, 0.06, -9.44, 
+	39 (ts=61934.008977714, wall=13:54:43.922) -1.91, 0.06, -9.39, 
+	40 (ts=61934.074346367, wall=13:54:43.990) -1.90, 0.07, -9.42, 
+	41 (ts=61934.139745537, wall=13:54:44.059) -1.92, 0.06, -9.44, 
+	42 (ts=61934.205114189, wall=13:54:44.059) -1.92, 0.06, -9.44, 
+	43 (ts=61934.270482841, wall=13:54:44.128) -1.92, 0.04, -9.44, 
+	44 (ts=61934.335882011, wall=13:54:44.197) -1.92, 0.08, -9.42, 
+	45 (ts=61934.401250664, wall=13:54:44.265) -1.93, 0.05, -9.43, 
+	46 (ts=61934.466649834, wall=13:54:44.334) -1.92, 0.06, -9.42, 
+	47 (ts=61934.532018486, wall=13:54:44.403) -1.94, 0.05, -9.37, 
+	48 (ts=61934.597387138, wall=13:54:44.473) -1.92, 0.07, -9.46, 
+	49 (ts=61934.662786308, wall=13:54:44.540) -1.92, 0.05, -9.41, 
+	50 (ts=61934.728154961, wall=13:54:44.608) -1.93, 0.06, -9.45, 
+Active sensors:
+ICM20608 Accelerometer (handle=0x00000001, connections=1)
+LTR578 ALSPS (handle=0x00000007, connections=1)
+Step Counter (handle=0x00000013, connections=4)
+Socket Buffer size = 984 events
+WakeLock Status: not held 
+Mode : NORMAL
+6 active connections
+Connection Number: 0 
+	Operating Mode: NORMAL
+	 com.tencent.mobileqq.msf.core.ad | WakeLockRefCount 0 | uid 10112 | cache size 0 | max cache size 0
+	 Step Counter 0x00000013 | status: active | pending flush events 0 
+Connection Number: 1 
+	Operating Mode: NORMAL
+	 com.meizu.alphame.engine.movingstate.MovingStateEngine | WakeLockRefCount 0 | uid 1000 | cache size 0 | max cache size 0
+	 Step Counter 0x00000013 | status: active | pending flush events 0 
+Connection Number: 2 
+	Operating Mode: NORMAL
+	 com.meizu.net.pedometer.receiver.a | WakeLockRefCount 0 | uid 10089 | cache size 0 | max cache size 0
+	 Step Counter 0x00000013 | status: active | pending flush events 0 
+Connection Number: 3 
+	Operating Mode: NORMAL
+	 com.tencent.mm.plugin.sport.c.k | WakeLockRefCount 0 | uid 10108 | cache size 0 | max cache size 0
+	 Step Counter 0x00000013 | status: active | pending flush events 0 
+Connection Number: 4 
+	Operating Mode: NORMAL
+	 com.android.server.policy.WindowOrientationListener | WakeLockRefCount 0 | uid 1000 | cache size 0 | max cache size 0
+	 ICM20608 Accelerometer 0x00000001 | status: active | pending flush events 0 
+Connection Number: 5 
+	Operating Mode: NORMAL
+	  | WakeLockRefCount 0 | uid 1000 | cache size 0 | max cache size 0
+	 LTR578 ALSPS 0x00000007 | status: active | pending flush events 0 
+Previous Registrations:
+13:46:29 activated handle=0x00000013 samplingRate=200000us maxReportLatency=180000us package=com.meizu.net.pedometer.receiver.a
+13:46:29 de-activated handle=0x00000013 package=com.meizu.net.pedometer.receiver.a
+13:36:29 activated handle=0x00000013 samplingRate=200000us maxReportLatency=180000us package=com.meizu.net.pedometer.receiver.a
+13:36:29 de-activated handle=0x00000013 package=com.meizu.net.pedometer.receiver.a
+13:26:29 activated handle=0x00000013 samplingRate=200000us maxReportLatency=180000us package=com.meizu.net.pedometer.receiver.a
+13:26:29 de-activated handle=0x00000013 package=com.meizu.net.pedometer.receiver.a
+13:16:29 activated handle=0x00000013 samplingRate=200000us maxReportLatency=180000us package=com.meizu.net.pedometer.receiver.a
+13:16:29 de-activated handle=0x00000013 package=com.meizu.net.pedometer.receiver.a
+13:07:42 activated handle=0x00000013 samplingRate=200000us maxReportLatency=360000000us package=com.tencent.mobileqq.msf.core.ad
+13:06:32 activated handle=0x00000001 samplingRate=66667us maxReportLatency=100000us package=com.android.server.policy.WindowOrientationListener
+13:06:29 activated handle=0x00000013 samplingRate=200000us maxReportLatency=180000us package=com.meizu.net.pedometer.receiver.a
+13:06:07 de-activated handle=0x00000001 package=com.android.server.policy.WindowOrientationListener
+13:05:18 activated handle=0x00000001 samplingRate=66667us maxReportLatency=100000us package=com.android.server.policy.WindowOrientationListener
+13:05:01 activated handle=0x00000013 samplingRate=200000us maxReportLatency=360000000us package=com.tencent.mobileqq.msf.core.ad
+13:04:58 de-activated handle=0x00000001 package=com.facebook.ads.internal.g.a
+13:04:58 de-activated handle=0x00000004 package=com.facebook.ads.internal.g.a
+13:04:58 activated handle=0x00000004 samplingRate=200000us maxReportLatency=0us package=com.facebook.ads.internal.g.a
+13:04:58 activated handle=0x00000001 samplingRate=200000us maxReportLatency=0us package=com.facebook.ads.internal.g.a
+13:04:55 de-activated handle=0x00000001 package=com.facebook.ads.internal.g.a
+13:04:55 de-activated handle=0x00000004 package=com.facebook.ads.internal.g.a
+13:04:55 activated handle=0x00000004 samplingRate=200000us maxReportLatency=0us package=com.facebook.ads.internal.g.a
+13:04:55 activated handle=0x00000001 samplingRate=200000us maxReportLatency=0us package=com.facebook.ads.internal.g.a
+13:04:29 de-activated handle=0x00000001 package=qi
+13:04:29 de-activated handle=0x0000000f package=akk
+13:04:22 activated handle=0x0000000f samplingRate=66667us maxReportLatency=0us package=akk
+13:04:19 de-activated handle=0x0000000f package=akk
+13:03:52 activated handle=0x0000000f samplingRate=66667us maxReportLatency=0us package=akk
+13:03:49 de-activated handle=0x0000000f package=akk
+13:03:44 activated handle=0x0000000f samplingRate=66667us maxReportLatency=0us package=akk
+13:03:41 de-activated handle=0x0000000f package=akk
+13:03:39 activated handle=0x0000000f samplingRate=66667us maxReportLatency=0us package=akk
+13:03:34 de-activated handle=0x0000000f package=akk
+13:03:33 activated handle=0x0000000f samplingRate=66667us maxReportLatency=0us package=akk
+13:03:32 de-activated handle=0x0000000f package=akk
+13:03:29 activated handle=0x0000000f samplingRate=66667us maxReportLatency=0us package=akk
+13:03:24 de-activated handle=0x0000000f package=akk
+13:03:23 activated handle=0x0000000f samplingRate=66667us maxReportLatency=0us package=akk
+13:03:23 activated handle=0x00000001 samplingRate=200000us maxReportLatency=0us package=qi
+13:03:23 de-activated handle=0x00000001 package=qi
+13:03:23 de-activated handle=0x0000000f package=akk
+13:03:15 activated handle=0x0000000f samplingRate=66667us maxReportLatency=0us package=akk
+13:03:15 activated handle=0x00000001 samplingRate=200000us maxReportLatency=0us package=qi
+13:03:12 de-activated handle=0x00000001 package=qi
+13:03:11 de-activated handle=0x0000000f package=akk
+13:02:59 activated handle=0x0000000f samplingRate=66667us maxReportLatency=0us package=akk
+13:02:56 de-activated handle=0x0000000f package=akk
+13:02:50 activated handle=0x0000000f samplingRate=66667us maxReportLatency=0us package=akk
+13:02:47 de-activated handle=0x0000000f package=akk
+13:02:35 activated handle=0x0000000f samplingRate=66667us maxReportLatency=0us package=akk
+13:02:31 de-activated handle=0x0000000f package=akk
+13:02:27 activated handle=0x0000000f samplingRate=66667us maxReportLatency=0us package=akk
+13:02:26 de-activated handle=0x0000000f package=akk
+13:02:24 activated handle=0x0000000f samplingRate=66667us maxReportLatency=0us package=akk
+13:02:23 de-activated handle=0x0000000f package=akk
+13:02:20 activated handle=0x0000000f samplingRate=66667us maxReportLatency=0us package=akk
+13:02:18 de-activated handle=0x0000000f package=akk
+13:02:15 activated handle=0x0000000f samplingRate=66667us maxReportLatency=0us package=akk
+13:02:11 activated handle=0x00000001 samplingRate=200000us maxReportLatency=0us package=qi
+13:02:02 de-activated handle=0x00000001 package=android.view.OrientationEventListener
+13:01:33 activated handle=0x00000001 samplingRate=200000us maxReportLatency=0us package=android.view.OrientationEventListener
+13:00:29 activated handle=0x00000013 samplingRate=200000us maxReportLatency=180000us package=com.meizu.net.pedometer.receiver.a
+13:00:29 de-activated handle=0x00000013 package=com.meizu.net.pedometer.receiver.a
+12:55:27 de-activated handle=0x00000001 package=android.view.OrientationEventListener
+12:54:34 activated handle=0x00000001 samplingRate=200000us maxReportLatency=0us package=android.view.OrientationEventListener
+12:50:29 activated handle=0x00000013 samplingRate=200000us maxReportLatency=180000us package=com.meizu.net.pedometer.receiver.a
+12:47:30 activated handle=0x00000013 samplingRate=200000us maxReportLatency=360000000us package=com.tencent.mobileqq.msf.core.ad
+12:47:28 activated handle=0x00000013 samplingRate=200000us maxReportLatency=180000us package=com.meizu.net.pedometer.receiver.a
+12:46:24 activated handle=0x00000013 samplingRate=200000us maxReportLatency=360000000us package=com.tencent.mobileqq.msf.core.ad
+12:46:13 activated handle=0x00000013 samplingRate=200000us maxReportLatency=180000us package=com.meizu.net.pedometer.receiver.a
+12:46:05 de-activated handle=0x00000001 package=android.view.OrientationEventListener
+12:45:18 activated handle=0x00000001 samplingRate=200000us maxReportLatency=0us package=android.view.OrientationEventListener
+12:45:16 de-activated handle=0x00000001 package=android.view.OrientationEventListener
+12:45:15 activated handle=0x00000001 samplingRate=200000us maxReportLatency=0us package=android.view.OrientationEventListener
+12:44:52 activated handle=0x00000013 samplingRate=200000us maxReportLatency=360000000us package=com.tencent.mobileqq.msf.core.ad
+12:44:04 activated handle=0x00000013 samplingRate=200000us maxReportLatency=360000000us package=com.tencent.mobileqq.msf.core.ad
+12:43:03 activated handle=0x00000013 samplingRate=200000us maxReportLatency=180000us package=com.meizu.net.pedometer.receiver.a
+12:41:19 activated handle=0x00000013 samplingRate=200000us maxReportLatency=360000000us package=com.tencent.mobileqq.msf.core.ad
+12:41:01 activated handle=0x00000013 samplingRate=200000us maxReportLatency=360000000us package=com.tencent.mobileqq.msf.core.ad
+12:40:44 activated handle=0x00000013 samplingRate=200000us maxReportLatency=360000000us package=com.tencent.mobileqq.msf.core.ad
+12:40:43 activated handle=0x00000013 samplingRate=200000us maxReportLatency=180000us package=com.meizu.net.pedometer.receiver.a
+12:40:27 de-activated handle=0x00000004 package=com.facebook.ads.internal.g.a
+12:40:27 de-activated handle=0x00000001 package=com.facebook.ads.internal.g.a
+12:40:27 activated handle=0x00000004 samplingRate=200000us maxReportLatency=0us package=com.facebook.ads.internal.g.a
+12:40:27 activated handle=0x00000001 samplingRate=200000us maxReportLatency=0us package=com.facebook.ads.internal.g.a
+12:40:21 de-activated handle=0x00000001 package=com.facebook.ads.internal.g.a
+12:40:21 de-activated handle=0x00000004 package=com.facebook.ads.internal.g.a
+12:40:21 activated handle=0x00000004 samplingRate=200000us maxReportLatency=0us package=com.facebook.ads.internal.g.a
+12:40:21 activated handle=0x00000001 samplingRate=200000us maxReportLatency=0us package=com.facebook.ads.internal.g.a
+12:40:11 de-activated handle=0x00000001 package=com.facebook.ads.internal.g.a
+12:40:11 de-activated handle=0x00000004 package=com.facebook.ads.internal.g.a
+12:40:10 activated handle=0x00000004 samplingRate=200000us maxReportLatency=0us package=com.facebook.ads.internal.g.a
+12:40:10 activated handle=0x00000001 samplingRate=200000us maxReportLatency=0us package=com.facebook.ads.internal.g.a
+12:40:07 de-activated handle=0x00000004 package=com.facebook.ads.internal.g.a
+12:40:07 de-activated handle=0x00000001 package=com.facebook.ads.internal.g.a
+12:40:05 activated handle=0x00000004 samplingRate=200000us maxReportLatency=0us package=com.facebook.ads.internal.g.a
+12:40:05 activated handle=0x00000001 samplingRate=200000us maxReportLatency=0us package=com.facebook.ads.internal.g.a
+12:38:05 de-activated handle=0x00000001 package=com.android.server.policy.WindowOrientationListener
+12:37:24 activated handle=0x00000013 samplingRate=200000us maxReportLatency=180000us package=com.meizu.net.pedometer.receiver.a
+12:37:06 activated handle=0x00000013 samplingRate=200000us maxReportLatency=360000000us package=com.tencent.mobileqq.msf.core.ad
+12:35:58 activated handle=0x00000013 samplingRate=200000us maxReportLatency=360000000us package=com.tencent.mobileqq.msf.core.ad
+12:34:44 activated handle=0x00000013 samplingRate=200000us maxReportLatency=180000us package=com.meizu.net.pedometer.receiver.a
+12:34:16 de-activated handle=0x0000000f package=cn.tongdun.android.core.fql.uuuvuuUUUUvUvuVuUUV.vVVUVvvVVUV
+12:34:14 activated handle=0x0000000f samplingRate=5000us maxReportLatency=0us package=cn.tongdun.android.core.fql.uuuvuuUUUUvUvuVuUUV.vVVUVvvVVUV
+12:33:01 activated handle=0x00000013 samplingRate=200000us maxReportLatency=360000000us package=com.tencent.mobileqq.msf.core.ad
+12:32:35 activated handle=0x00000013 samplingRate=200000us maxReportLatency=180000us package=com.meizu.net.pedometer.receiver.a
+12:30:55 activated handle=0x00000013 samplingRate=200000us maxReportLatency=360000000us package=com.tencent.mobileqq.msf.core.ad
+12:25:28 activated handle=0x00000013 samplingRate=200000us maxReportLatency=180000us package=com.meizu.net.pedometer.receiver.a
+12:25:28 de-activated handle=0x00000013 package=com.meizu.net.pedometer.receiver.a
+12:15:32 activated handle=0x00000001 samplingRate=66667us maxReportLatency=100000us package=com.android.server.policy.WindowOrientationListener
+12:15:29 de-activated handle=0x0000000d package=com.android.systemui.keyguard.PalmRejection
+12:15:28 activated handle=0x00000007 samplingRate=200000us maxReportLatency=0us package=
+12:15:28 activated handle=0x00000013 samplingRate=200000us maxReportLatency=180000us package=com.meizu.net.pedometer.receiver.a
+12:15:28 de-activated handle=0x00000013 package=com.meizu.net.pedometer.receiver.a
+12:15:28 activated handle=0x0000000d samplingRate=0us maxReportLatency=0us package=com.android.systemui.keyguard.PalmRejection
+12:15:26 de-activated handle=0x00000007 package=
+12:14:56 de-activated handle=0x0000000d package=com.android.systemui.keyguard.PalmRejection
+12:14:56 activated handle=0x00000013 samplingRate=200000us maxReportLatency=180000us package=com.meizu.net.pedometer.receiver.a
+12:14:56 de-activated handle=0x00000013 package=com.meizu.net.pedometer.receiver.a
+12:14:55 activated handle=0x0000000d samplingRate=0us maxReportLatency=0us package=com.android.systemui.keyguard.PalmRejection
+12:14:55 activated handle=0x00000007 samplingRate=200000us maxReportLatency=0us package=
+12:14:55 de-activated handle=0x00000007 package=
+12:13:33 de-activated handle=0x0000000d package=com.android.systemui.keyguard.PalmRejection
+12:13:33 activated handle=0x00000013 samplingRate=200000us maxReportLatency=180000us package=com.meizu.net.pedometer.receiver.a
+12:13:33 de-activated handle=0x00000013 package=com.meizu.net.pedometer.receiver.a
+12:13:32 activated handle=0x0000000d samplingRate=0us maxReportLatency=0us package=com.android.systemui.keyguard.PalmRejection
+12:13:32 activated handle=0x00000007 samplingRate=200000us maxReportLatency=0us package=
+12:13:31 de-activated handle=0x00000007 package=
+12:13:17 activated handle=0x00000013 samplingRate=200000us maxReportLatency=180000us package=com.meizu.net.pedometer.receiver.a
+12:13:17 de-activated handle=0x00000013 package=com.meizu.net.pedometer.receiver.a
+12:13:16 de-activated handle=0x00000001 package=com.android.server.policy.WindowOrientationListener
+12:13:15 activated handle=0x00000001 samplingRate=66667us maxReportLatency=100000us package=com.android.server.policy.WindowOrientationListener
+12:13:14 de-activated handle=0x00000001 package=com.android.server.policy.WindowOrientationListener
+12:13:13 activated handle=0x00000001 samplingRate=66667us maxReportLatency=100000us package=com.android.server.policy.WindowOrientationListener
+12:13:12 de-activated handle=0x0000000d package=com.android.systemui.keyguard.PalmRejection
+12:13:11 activated handle=0x0000000d samplingRate=0us maxReportLatency=0us package=com.android.systemui.keyguard.PalmRejection
+12:13:11 de-activated handle=0x00000001 package=com.android.server.policy.WindowOrientationListener
+12:13:10 activated handle=0x00000007 samplingRate=200000us maxReportLatency=0us package=
+12:13:10 activated handle=0x00000001 samplingRate=66667us maxReportLatency=100000us package=com.android.server.policy.WindowOrientationListener
+12:13:10 de-activated handle=0x00000007 package=
+12:13:10 de-activated handle=0x00000001 package=com.android.server.policy.WindowOrientationListener
+12:10:28 activated handle=0x00000013 samplingRate=200000us maxReportLatency=180000us package=com.meizu.net.pedometer.receiver.a
+12:10:28 de-activated handle=0x00000013 package=com.meizu.net.pedometer.receiver.a
+12:10:07 activated handle=0x00000013 samplingRate=200000us maxReportLatency=360000000us package=com.tencent.mobileqq.msf.core.ad
+12:00:28 activated handle=0x00000013 samplingRate=200000us maxReportLatency=180000us package=com.meizu.net.pedometer.receiver.a
+12:00:28 de-activated handle=0x00000013 package=com.meizu.net.pedometer.receiver.a
+11:56:28 activated handle=0x00000013 samplingRate=200000us maxReportLatency=180000us package=com.meizu.net.pedometer.receiver.a
+11:56:28 de-activated handle=0x00000013 package=com.meizu.net.pedometer.receiver.a
+11:49:23 activated handle=0x00000001 samplingRate=66667us maxReportLatency=100000us package=com.android.server.policy.WindowOrientationListener
+11:49:10 de-activated handle=0x00000001 package=com.facebook.ads.internal.g.a
+11:49:10 de-activated handle=0x00000004 package=com.facebook.ads.internal.g.a
+11:49:10 activated handle=0x00000004 samplingRate=200000us maxReportLatency=0us package=com.facebook.ads.internal.g.a
+11:49:10 activated handle=0x00000001 samplingRate=200000us maxReportLatency=0us package=com.facebook.ads.internal.g.a
+11:48:42 de-activated handle=0x00000001 package=com.android.server.policy.WindowOrientationListener
+11:48:38 activated handle=0x00000001 samplingRate=66667us maxReportLatency=100000us package=com.android.server.policy.WindowOrientationListener
+11:46:37 de-activated handle=0x00000001 package=com.facebook.ads.internal.g.a
+11:46:37 de-activated handle=0x00000004 package=com.facebook.ads.internal.g.a
+11:46:37 activated handle=0x00000004 samplingRate=200000us maxReportLatency=0us package=com.facebook.ads.internal.g.a
+11:46:37 activated handle=0x00000001 samplingRate=200000us maxReportLatency=0us package=com.facebook.ads.internal.g.a
+11:46:36 de-activated handle=0x00000001 package=com.facebook.ads.internal.g.a
+11:46:36 de-activated handle=0x00000004 package=com.facebook.ads.internal.g.a
+11:46:35 activated handle=0x00000004 samplingRate=200000us maxReportLatency=0us package=com.facebook.ads.internal.g.a
+11:46:35 activated handle=0x00000001 samplingRate=200000us maxReportLatency=0us package=com.facebook.ads.internal.g.a
+11:46:28 activated handle=0x00000013 samplingRate=200000us maxReportLatency=180000us package=com.meizu.net.pedometer.receiver.a
+11:46:27 activated handle=0x00000013 samplingRate=200000us maxReportLatency=360000000us package=com.tencent.mobileqq.msf.core.ad
+11:46:11 de-activated handle=0x00000001 package=com.facebook.ads.internal.g.a
+11:46:11 de-activated handle=0x00000004 package=com.facebook.ads.internal.g.a
+11:46:10 activated handle=0x00000004 samplingRate=200000us maxReportLatency=0us package=com.facebook.ads.internal.g.a
+11:46:10 activated handle=0x00000001 samplingRate=200000us maxReportLatency=0us package=com.facebook.ads.internal.g.a
+11:46:06 de-activated handle=0x00000004 package=com.facebook.ads.internal.g.a
+11:46:06 de-activated handle=0x00000001 package=com.facebook.ads.internal.g.a
+11:46:05 activated handle=0x00000004 samplingRate=200000us maxReportLatency=0us package=com.facebook.ads.internal.g.a
+11:46:05 activated handle=0x00000001 samplingRate=200000us maxReportLatency=0us package=com.facebook.ads.internal.g.a
+11:42:55 activated handle=0x00000013 samplingRate=200000us maxReportLatency=180000us package=com.meizu.net.pedometer.receiver.a
+11:42:35 de-activated handle=0x00000001 package=com.facebook.ads.internal.g.a
+11:42:35 de-activated handle=0x00000004 package=com.facebook.ads.internal.g.a
+11:42:35 activated handle=0x00000004 samplingRate=200000us maxReportLatency=0us package=com.facebook.ads.internal.g.a
+11:42:35 activated handle=0x00000001 samplingRate=200000us maxReportLatency=0us package=com.facebook.ads.internal.g.a
+11:42:30 de-activated handle=0x00000001 package=com.facebook.ads.internal.g.a
+11:42:30 de-activated handle=0x00000004 package=com.facebook.ads.internal.g.a
+11:42:30 activated handle=0x00000004 samplingRate=200000us maxReportLatency=0us package=com.facebook.ads.internal.g.a
+11:42:30 activated handle=0x00000001 samplingRate=200000us maxReportLatency=0us package=com.facebook.ads.internal.g.a
+11:41:18 activated handle=0x00000013 samplingRate=200000us maxReportLatency=360000000us package=com.tencent.mobileqq.msf.core.ad
+11:40:30 de-activated handle=0x00000001 package=android.view.OrientationEventListener
+11:40:27 activated handle=0x00000001 samplingRate=200000us maxReportLatency=0us package=android.view.OrientationEventListener
+11:37:20 activated handle=0x00000013 samplingRate=200000us maxReportLatency=180000us package=com.meizu.net.pedometer.receiver.a
+11:37:20 de-activated handle=0x00000013 package=com.meizu.net.pedometer.receiver.a
+11:34:23 de-activated handle=0x00000004 package=com.umeng.commonsdk.internal.utils.j
+11:34:22 activated handle=0x00000004 samplingRate=50000us maxReportLatency=0us package=com.umeng.commonsdk.internal.utils.j
+11:34:17 de-activated handle=0x00000004 package=com.umeng.commonsdk.internal.utils.j
+11:34:16 activated handle=0x00000004 samplingRate=50000us maxReportLatency=0us package=com.umeng.commonsdk.internal.utils.j
+11:34:06 de-activated handle=0x00000001 package=qi
+11:34:05 de-activated handle=0x0000000f package=akk
+11:34:00 activated handle=0x0000000f samplingRate=66667us maxReportLatency=0us package=akk
+11:33:57 de-activated handle=0x0000000f package=akk
+11:33:54 activated handle=0x0000000f samplingRate=66667us maxReportLatency=0us package=akk
+11:33:51 de-activated handle=0x0000000f package=akk
+11:33:43 activated handle=0x0000000f samplingRate=66667us maxReportLatency=0us package=akk
+11:33:40 de-activated handle=0x0000000f package=akk
+11:33:38 activated handle=0x0000000f samplingRate=66667us maxReportLatency=0us package=akk
+11:33:21 de-activated handle=0x0000000f package=akk
+
+```
+
+##  adb shell dumpsys wifi ipmanager全字符
+```
+adb shell dumpsys wifi ipmanager                //   WIFI配置相关信息
+
+
+
+
+IpManager.wlan0 APF dump:
+  No apf support
+
+IpManager.wlan0 StateMachine dump:
+  12-17 20:43:20.235 - CMD_SET_MULTICAST_FILTER wlan0/-1 0 0 true [rcvd_in=StoppedState, proc_in=StoppedState]
+  12-17 20:43:22.669 - OBSERVED interfaceAdded(wlan0)
+  12-17 20:43:35.293 - CMD_STOP wlan0/-1 0 0 null [rcvd_in=StoppedState, proc_in=StoppedState]
+  12-17 20:43:35.305 - INVOKE setNeighborDiscoveryOffload(true)
+  12-17 20:43:35.308 - CMD_UPDATE_HTTP_PROXY wlan0/22 0 0 null [rcvd_in=StoppedState, proc_in=StoppedState]
+  12-17 20:43:35.309 - CMD_UPDATE_TCP_BUFFER_SIZES wlan0/22 0 0 524288,1048576,2097152,262144,524288,1048576 [rcvd_in=StoppedState, proc_in=StoppedState]
+  12-17 20:43:35.311 - CMD_START wlan0/22 0 0 ProvisioningConfiguration{mEnableIPv4: true, mEnableIPv6: true, mUsingIpReachabilityMonitor: true, mRequestedPreDhcpActionMs: 36000, mStaticIpConfig: null, mApfCapabilities: ApfCapabilities{version: 0, maxSize: 0 format: 1}, mProvisioningTimeoutMs: 36000} [rcvd_in=StoppedState, proc_in=StoppedState]
+  12-17 20:43:35.316 - INVOKE setFallbackMulticastFilter(true)
+  12-17 20:43:35.338 - CMD_CONFIRM wlan0/22 0 0 null [rcvd_in=RunningState, proc_in=RunningState]
+  12-17 20:43:35.339 - INVOKE onLinkPropertiesChange({{InterfaceName: wlan0 LinkAddresses: [fe80::2e57:31ff:fec2:1d2a/64,]  Routes: [fe80::/64 -> :: wlan0,] DnsAddresses: [] Domains: null MTU: 0 TcpBufferSizes: 524288,1048576,2097152,262144,524288,1048576}})
+  12-17 20:43:35.398 - INVOKE onPreDhcpAction()
+  12-17 20:43:35.399 - CMD_PRE_DHCP_ACTION wlan0/22 0 0 null [rcvd_in=RunningState, proc_in=RunningState]
+  12-17 20:43:35.402 - EVENT_PRE_DHCP_ACTION_COMPLETE wlan0/22 0 0 null [rcvd_in=RunningState, proc_in=RunningState]
+  12-17 20:43:52.820 - INVOKE onPostDhcpAction()
+  12-17 20:43:52.821 - INVOKE onNewDhcpResults({IP address 192.168.221.110/24 Gateway 192.168.221.1  DNS servers: [ 10.64.0.10 10.64.0.100 ] Domains  DHCP server /192.168.221.1 Vendor info null lease 7200 seconds})
+  12-17 20:43:52.821 - INVOKE onLinkPropertiesChange({{InterfaceName: wlan0 LinkAddresses: [fe80::2e57:31ff:fec2:1d2a/64,]  Routes: [fe80::/64 -> :: wlan0,192.168.221.0/24 -> 0.0.0.0 wlan0,0.0.0.0/0 -> 192.168.221.1 wlan0,] DnsAddresses: [] Domains: null MTU: 0 TcpBufferSizes: 524288,1048576,2097152,262144,524288,1048576}})
+  12-17 20:43:52.821 - CMD_POST_DHCP_ACTION wlan0/22 1 0 IP address 192.168.221.110/24 Gateway 192.168.221.1  DNS servers: [ 10.64.0.10 10.64.0.100 ] Domains  DHCP server /192.168.221.1 Vendor info null lease 7200 seconds [rcvd_in=RunningState, proc_in=RunningState]
+  12-17 20:43:52.847 - CMD_CONFIGURE_LINKADDRESS wlan0/22 0 0 192.168.221.110/24 [rcvd_in=RunningState, proc_in=RunningState]
+  12-17 20:43:52.849 - INVOKE onProvisioningSuccess({{InterfaceName: wlan0 LinkAddresses: [fe80::2e57:31ff:fec2:1d2a/64,192.168.221.110/24,]  Routes: [fe80::/64 -> :: wlan0,192.168.221.0/24 -> 0.0.0.0 wlan0,0.0.0.0/0 -> 192.168.221.1 wlan0,] DnsAddresses: [10.64.0.10,10.64.0.100,] Domains: null MTU: 0 TcpBufferSizes: 524288,1048576,2097152,262144,524288,1048576}})
+  12-17 21:02:19.775 - CMD_STOP wlan0/22 0 0 null [rcvd_in=RunningState, proc_in=RunningState]
+  12-17 21:02:19.834 - CMD_STOP wlan0/22 0 0 null [rcvd_in=StoppingState, proc_in=StoppingState]
+  12-17 21:02:20.038 - CMD_CLEAR_LINKADDRESS wlan0/22 0 0 null [rcvd_in=StoppingState, proc_in=StoppingState]
+  12-17 21:02:20.038 - CMD_ON_QUIT wlan0/22 0 0 null [rcvd_in=StoppingState, proc_in=StoppingState]
+  12-17 22:14:37.692 - CMD_STOP wlan0/22 0 0 null [rcvd_in=StoppedState, proc_in=StoppedState]
+  12-17 22:14:37.693 - CMD_UPDATE_HTTP_PROXY wlan0/22 0 0 null [rcvd_in=StoppedState, proc_in=StoppedState]
+  12-17 22:14:37.693 - CMD_UPDATE_TCP_BUFFER_SIZES wlan0/22 0 0 524288,1048576,2097152,262144,524288,1048576 [rcvd_in=StoppedState, proc_in=StoppedState]
+  12-17 22:14:37.719 - INVOKE setNeighborDiscoveryOffload(true)
+  12-17 22:14:37.722 - CMD_START wlan0/22 0 0 ProvisioningConfiguration{mEnableIPv4: true, mEnableIPv6: true, mUsingIpReachabilityMonitor: true, mRequestedPreDhcpActionMs: 36000, mStaticIpConfig: null, mApfCapabilities: ApfCapabilities{version: 0, maxSize: 0 format: 1}, mProvisioningTimeoutMs: 36000} [rcvd_in=StoppedState, proc_in=StoppedState]
+  12-17 22:14:37.754 - INVOKE setFallbackMulticastFilter(true)
+  12-17 22:14:37.781 - CMD_CONFIRM wlan0/22 0 0 null [rcvd_in=RunningState, proc_in=RunningState]
+  12-17 22:14:37.782 - INVOKE onLinkPropertiesChange({{InterfaceName: wlan0 LinkAddresses: [fe80::2e57:31ff:fec2:1d2a/64,]  Routes: [fe80::/64 -> :: wlan0,] DnsAddresses: [] Domains: null MTU: 0 TcpBufferSizes: 524288,1048576,2097152,262144,524288,1048576}})
+  12-17 22:14:37.837 - INVOKE onPreDhcpAction()
+  12-17 22:14:37.842 - CMD_PRE_DHCP_ACTION wlan0/22 0 0 null [rcvd_in=RunningState, proc_in=RunningState]
+  12-17 22:14:37.843 - EVENT_PRE_DHCP_ACTION_COMPLETE wlan0/22 0 0 null [rcvd_in=RunningState, proc_in=RunningState]
+  12-17 22:14:38.003 - INVOKE onPostDhcpAction()
+  12-17 22:14:38.004 - INVOKE onNewDhcpResults({IP address 192.168.221.110/24 Gateway 192.168.221.1  DNS servers: [ 10.64.0.10 10.64.0.100 ] Domains  DHCP server /192.168.221.1 Vendor info null lease 7200 seconds})
+  12-17 22:14:38.005 - INVOKE onLinkPropertiesChange({{InterfaceName: wlan0 LinkAddresses: [fe80::2e57:31ff:fec2:1d2a/64,]  Routes: [fe80::/64 -> :: wlan0,192.168.221.0/24 -> 0.0.0.0 wlan0,0.0.0.0/0 -> 192.168.221.1 wlan0,] DnsAddresses: [] Domains: null MTU: 0 TcpBufferSizes: 524288,1048576,2097152,262144,524288,1048576}})
+  12-17 22:14:38.005 - CMD_POST_DHCP_ACTION wlan0/22 1 0 IP address 192.168.221.110/24 Gateway 192.168.221.1  DNS servers: [ 10.64.0.10 10.64.0.100 ] Domains  DHCP server /192.168.221.1 Vendor info null lease 7200 seconds [rcvd_in=RunningState, proc_in=RunningState]
+  12-17 22:14:38.030 - CMD_CONFIGURE_LINKADDRESS wlan0/22 0 0 192.168.221.110/24 [rcvd_in=RunningState, proc_in=RunningState]
+  12-17 22:14:38.032 - INVOKE onProvisioningSuccess({{InterfaceName: wlan0 LinkAddresses: [fe80::2e57:31ff:fec2:1d2a/64,192.168.221.110/24,]  Routes: [fe80::/64 -> :: wlan0,192.168.221.0/24 -> 0.0.0.0 wlan0,0.0.0.0/0 -> 192.168.221.1 wlan0,] DnsAddresses: [10.64.0.10,10.64.0.100,] Domains: null MTU: 0 TcpBufferSizes: 524288,1048576,2097152,262144,524288,1048576}})
+  12-17 23:14:38.049 - INVOKE onPreDhcpAction()
+  12-17 23:14:38.052 - CMD_PRE_DHCP_ACTION wlan0/22 0 0 null [rcvd_in=RunningState, proc_in=RunningState]
+  12-17 23:14:38.163 - EVENT_PRE_DHCP_ACTION_COMPLETE wlan0/22 0 0 null [rcvd_in=RunningState, proc_in=RunningState]
+  12-17 23:14:38.251 - INVOKE onPostDhcpAction()
+  12-17 23:14:38.252 - INVOKE onNewDhcpResults({IP address 192.168.221.110/24 Gateway 192.168.221.1  DNS servers: [ 10.64.0.10 10.64.0.100 ] Domains  DHCP server /192.168.221.1 Vendor info null lease 7200 seconds})
+  12-17 23:14:38.252 - INVOKE onLinkPropertiesChange({{InterfaceName: wlan0 LinkAddresses: [fe80::2e57:31ff:fec2:1d2a/64,192.168.221.110/24,]  Routes: [fe80::/64 -> :: wlan0,192.168.221.0/24 -> 0.0.0.0 wlan0,0.0.0.0/0 -> 192.168.221.1 wlan0,] DnsAddresses: [10.64.0.10,10.64.0.100,] Domains: null MTU: 0 TcpBufferSizes: 524288,1048576,2097152,262144,524288,1048576}})
+  12-17 23:14:38.253 - CMD_POST_DHCP_ACTION wlan0/22 1 0 IP address 192.168.221.110/24 Gateway 192.168.221.1  DNS servers: [ 10.64.0.10 10.64.0.100 ] Domains  DHCP server /192.168.221.1 Vendor info null lease 7200 seconds [rcvd_in=RunningState, proc_in=RunningState]
+  12-18 00:14:39.817 - INVOKE onPreDhcpAction()
+  12-18 00:14:39.822 - CMD_PRE_DHCP_ACTION wlan0/22 0 0 null [rcvd_in=RunningState, proc_in=RunningState]
+  12-18 00:14:45.132 - EVENT_PRE_DHCP_ACTION_COMPLETE wlan0/22 0 0 null [rcvd_in=RunningState, proc_in=RunningState]
+  12-18 00:14:45.359 - INVOKE onPostDhcpAction()
+  12-18 00:14:45.363 - INVOKE onNewDhcpResults({IP address 192.168.221.110/24 Gateway 192.168.221.1  DNS servers: [ 10.64.0.10 10.64.0.100 ] Domains  DHCP server /192.168.221.1 Vendor info null lease 7200 seconds})
+  12-18 00:14:45.364 - INVOKE onLinkPropertiesChange({{InterfaceName: wlan0 LinkAddresses: [fe80::2e57:31ff:fec2:1d2a/64,192.168.221.110/24,]  Routes: [fe80::/64 -> :: wlan0,192.168.221.0/24 -> 0.0.0.0 wlan0,0.0.0.0/0 -> 192.168.221.1 wlan0,] DnsAddresses: [10.64.0.10,10.64.0.100,] Domains: null MTU: 0 TcpBufferSizes: 524288,1048576,2097152,262144,524288,1048576}})
+  12-18 00:14:45.365 - CMD_POST_DHCP_ACTION wlan0/22 1 0 IP address 192.168.221.110/24 Gateway 192.168.221.1  DNS servers: [ 10.64.0.10 10.64.0.100 ] Domains  DHCP server /192.168.221.1 Vendor info null lease 7200 seconds [rcvd_in=RunningState, proc_in=RunningState]
+  12-18 01:14:46.843 - INVOKE onPreDhcpAction()
+  12-18 01:14:46.844 - CMD_PRE_DHCP_ACTION wlan0/22 0 0 null [rcvd_in=RunningState, proc_in=RunningState]
+  12-18 01:14:59.287 - EVENT_PRE_DHCP_ACTION_COMPLETE wlan0/22 0 0 null [rcvd_in=RunningState, proc_in=RunningState]
+  12-18 01:14:59.816 - INVOKE onPostDhcpAction()
+  12-18 01:14:59.817 - INVOKE onNewDhcpResults({IP address 192.168.221.110/24 Gateway 192.168.221.1  DNS servers: [ 10.64.0.10 10.64.0.100 ] Domains  DHCP server /192.168.221.1 Vendor info null lease 7200 seconds})
+  12-18 01:14:59.818 - INVOKE onLinkPropertiesChange({{InterfaceName: wlan0 LinkAddresses: [fe80::2e57:31ff:fec2:1d2a/64,192.168.221.110/24,]  Routes: [fe80::/64 -> :: wlan0,192.168.221.0/24 -> 0.0.0.0 wlan0,0.0.0.0/0 -> 192.168.221.1 wlan0,] DnsAddresses: [10.64.0.10,10.64.0.100,] Domains: null MTU: 0 TcpBufferSizes: 524288,1048576,2097152,262144,524288,1048576}})
+  12-18 01:14:59.819 - CMD_POST_DHCP_ACTION wlan0/22 1 0 IP address 192.168.221.110/24 Gateway 192.168.221.1  DNS servers: [ 10.64.0.10 10.64.0.100 ] Domains  DHCP server /192.168.221.1 Vendor info null lease 7200 seconds [rcvd_in=RunningState, proc_in=RunningState]
+  12-18 02:15:00.763 - INVOKE onPreDhcpAction()
+  12-18 02:15:00.767 - CMD_PRE_DHCP_ACTION wlan0/22 0 0 null [rcvd_in=RunningState, proc_in=RunningState]
+  12-18 02:15:01.208 - EVENT_PRE_DHCP_ACTION_COMPLETE wlan0/22 0 0 null [rcvd_in=RunningState, proc_in=RunningState]
+  12-18 02:15:01.290 - INVOKE onPostDhcpAction()
+  12-18 02:15:01.291 - INVOKE onNewDhcpResults({IP address 192.168.221.110/24 Gateway 192.168.221.1  DNS servers: [ 10.64.0.10 10.64.0.100 ] Domains  DHCP server /192.168.221.1 Vendor info null lease 7200 seconds})
+  12-18 02:15:01.292 - INVOKE onLinkPropertiesChange({{InterfaceName: wlan0 LinkAddresses: [fe80::2e57:31ff:fec2:1d2a/64,192.168.221.110/24,]  Routes: [fe80::/64 -> :: wlan0,192.168.221.0/24 -> 0.0.0.0 wlan0,0.0.0.0/0 -> 192.168.221.1 wlan0,] DnsAddresses: [10.64.0.10,10.64.0.100,] Domains: null MTU: 0 TcpBufferSizes: 524288,1048576,2097152,262144,524288,1048576}})
+  12-18 02:15:01.293 - CMD_POST_DHCP_ACTION wlan0/22 1 0 IP address 192.168.221.110/24 Gateway 192.168.221.1  DNS servers: [ 10.64.0.10 10.64.0.100 ] Domains  DHCP server /192.168.221.1 Vendor info null lease 7200 seconds [rcvd_in=RunningState, proc_in=RunningState]
+  12-18 03:15:03.600 - INVOKE onPreDhcpAction()
+  12-18 03:15:03.603 - CMD_PRE_DHCP_ACTION wlan0/22 0 0 null [rcvd_in=RunningState, proc_in=RunningState]
+  12-18 03:15:04.087 - EVENT_PRE_DHCP_ACTION_COMPLETE wlan0/22 0 0 null [rcvd_in=RunningState, proc_in=RunningState]
+  12-18 03:15:04.542 - INVOKE onPostDhcpAction()
+  12-18 03:15:04.543 - INVOKE onNewDhcpResults({IP address 192.168.221.110/24 Gateway 192.168.221.1  DNS servers: [ 10.64.0.10 10.64.0.100 ] Domains  DHCP server /192.168.221.1 Vendor info null lease 7200 seconds})
+  12-18 03:15:04.543 - INVOKE onLinkPropertiesChange({{InterfaceName: wlan0 LinkAddresses: [fe80::2e57:31ff:fec2:1d2a/64,192.168.221.110/24,]  Routes: [fe80::/64 -> :: wlan0,192.168.221.0/24 -> 0.0.0.0 wlan0,0.0.0.0/0 -> 192.168.221.1 wlan0,] DnsAddresses: [10.64.0.10,10.64.0.100,] Domains: null MTU: 0 TcpBufferSizes: 524288,1048576,2097152,262144,524288,1048576}})
+  12-18 03:15:04.544 - CMD_POST_DHCP_ACTION wlan0/22 1 0 IP address 192.168.221.110/24 Gateway 192.168.221.1  DNS servers: [ 10.64.0.10 10.64.0.100 ] Domains  DHCP server /192.168.221.1 Vendor info null lease 7200 seconds [rcvd_in=RunningState, proc_in=RunningState]
+  12-18 04:15:04.390 - INVOKE onPreDhcpAction()
+  12-18 04:15:04.403 - CMD_PRE_DHCP_ACTION wlan0/22 0 0 null [rcvd_in=RunningState, proc_in=RunningState]
+  12-18 04:15:05.361 - EVENT_PRE_DHCP_ACTION_COMPLETE wlan0/22 0 0 null [rcvd_in=RunningState, proc_in=RunningState]
+  12-18 04:15:05.400 - INVOKE onPostDhcpAction()
+  12-18 04:15:05.401 - INVOKE onNewDhcpResults({IP address 192.168.221.110/24 Gateway 192.168.221.1  DNS servers: [ 10.64.0.10 10.64.0.100 ] Domains  DHCP server /192.168.221.1 Vendor info null lease 7200 seconds})
+  12-18 04:15:05.401 - INVOKE onLinkPropertiesChange({{InterfaceName: wlan0 LinkAddresses: [fe80::2e57:31ff:fec2:1d2a/64,192.168.221.110/24,]  Routes: [fe80::/64 -> :: wlan0,192.168.221.0/24 -> 0.0.0.0 wlan0,0.0.0.0/0 -> 192.168.221.1 wlan0,] DnsAddresses: [10.64.0.10,10.64.0.100,] Domains: null MTU: 0 TcpBufferSizes: 524288,1048576,2097152,262144,524288,1048576}})
+  12-18 04:15:05.402 - CMD_POST_DHCP_ACTION wlan0/22 1 0 IP address 192.168.221.110/24 Gateway 192.168.221.1  DNS servers: [ 10.64.0.10 10.64.0.100 ] Domains  DHCP server /192.168.221.1 Vendor info null lease 7200 seconds [rcvd_in=RunningState, proc_in=RunningState]
+  12-18 05:15:05.402 - INVOKE onPreDhcpAction()
+  12-18 05:15:05.405 - CMD_PRE_DHCP_ACTION wlan0/22 0 0 null [rcvd_in=RunningState, proc_in=RunningState]
+  12-18 05:15:05.605 - EVENT_PRE_DHCP_ACTION_COMPLETE wlan0/22 0 0 null [rcvd_in=RunningState, proc_in=RunningState]
+  12-18 05:15:05.697 - INVOKE onPostDhcpAction()
+  12-18 05:15:05.698 - INVOKE onNewDhcpResults({IP address 192.168.221.110/24 Gateway 192.168.221.1  DNS servers: [ 10.64.0.10 10.64.0.100 ] Domains  DHCP server /192.168.221.1 Vendor info null lease 7200 seconds})
+  12-18 05:15:05.698 - INVOKE onLinkPropertiesChange({{InterfaceName: wlan0 LinkAddresses: [fe80::2e57:31ff:fec2:1d2a/64,192.168.221.110/24,]  Routes: [fe80::/64 -> :: wlan0,192.168.221.0/24 -> 0.0.0.0 wlan0,0.0.0.0/0 -> 192.168.221.1 wlan0,] DnsAddresses: [10.64.0.10,10.64.0.100,] Domains: null MTU: 0 TcpBufferSizes: 524288,1048576,2097152,262144,524288,1048576}})
+  12-18 05:15:05.699 - CMD_POST_DHCP_ACTION wlan0/22 1 0 IP address 192.168.221.110/24 Gateway 192.168.221.1  DNS servers: [ 10.64.0.10 10.64.0.100 ] Domains  DHCP server /192.168.221.1 Vendor info null lease 7200 seconds [rcvd_in=RunningState, proc_in=RunningState]
+  12-18 06:15:05.534 - INVOKE onPreDhcpAction()
+  12-18 06:15:05.537 - CMD_PRE_DHCP_ACTION wlan0/22 0 0 null [rcvd_in=RunningState, proc_in=RunningState]
+  12-18 06:15:05.919 - EVENT_PRE_DHCP_ACTION_COMPLETE wlan0/22 0 0 null [rcvd_in=RunningState, proc_in=RunningState]
+  12-18 06:15:05.983 - INVOKE onPostDhcpAction()
+  12-18 06:15:05.984 - INVOKE onNewDhcpResults({IP address 192.168.221.110/24 Gateway 192.168.221.1  DNS servers: [ 10.64.0.10 10.64.0.100 ] Domains  DHCP server /192.168.221.1 Vendor info null lease 7200 seconds})
+  12-18 06:15:05.984 - INVOKE onLinkPropertiesChange({{InterfaceName: wlan0 LinkAddresses: [fe80::2e57:31ff:fec2:1d2a/64,192.168.221.110/24,]  Routes: [fe80::/64 -> :: wlan0,192.168.221.0/24 -> 0.0.0.0 wlan0,0.0.0.0/0 -> 192.168.221.1 wlan0,] DnsAddresses: [10.64.0.10,10.64.0.100,] Domains: null MTU: 0 TcpBufferSizes: 524288,1048576,2097152,262144,524288,1048576}})
+  12-18 06:15:05.985 - CMD_POST_DHCP_ACTION wlan0/22 1 0 IP address 192.168.221.110/24 Gateway 192.168.221.1  DNS servers: [ 10.64.0.10 10.64.0.100 ] Domains  DHCP server /192.168.221.1 Vendor info null lease 7200 seconds [rcvd_in=RunningState, proc_in=RunningState]
+  12-18 07:15:05.740 - INVOKE onPreDhcpAction()
+  12-18 07:15:05.742 - CMD_PRE_DHCP_ACTION wlan0/22 0 0 null [rcvd_in=RunningState, proc_in=RunningState]
+  12-18 07:15:05.921 - EVENT_PRE_DHCP_ACTION_COMPLETE wlan0/22 0 0 null [rcvd_in=RunningState, proc_in=RunningState]
+  12-18 07:15:06.000 - INVOKE onPostDhcpAction()
+  12-18 07:15:06.001 - INVOKE onNewDhcpResults({IP address 192.168.221.110/24 Gateway 192.168.221.1  DNS servers: [ 10.64.0.10 10.64.0.100 ] Domains  DHCP server /192.168.221.1 Vendor info null lease 7200 seconds})
+  12-18 07:15:06.002 - INVOKE onLinkPropertiesChange({{InterfaceName: wlan0 LinkAddresses: [fe80::2e57:31ff:fec2:1d2a/64,192.168.221.110/24,]  Routes: [fe80::/64 -> :: wlan0,192.168.221.0/24 -> 0.0.0.0 wlan0,0.0.0.0/0 -> 192.168.221.1 wlan0,] DnsAddresses: [10.64.0.10,10.64.0.100,] Domains: null MTU: 0 TcpBufferSizes: 524288,1048576,2097152,262144,524288,1048576}})
+  12-18 07:15:06.003 - CMD_POST_DHCP_ACTION wlan0/22 1 0 IP address 192.168.221.110/24 Gateway 192.168.221.1  DNS servers: [ 10.64.0.10 10.64.0.100 ] Domains  DHCP server /192.168.221.1 Vendor info null lease 7200 seconds [rcvd_in=RunningState, proc_in=RunningState]
+  12-18 08:15:07.777 - INVOKE onPreDhcpAction()
+  12-18 08:15:07.782 - CMD_PRE_DHCP_ACTION wlan0/22 0 0 null [rcvd_in=RunningState, proc_in=RunningState]
+  12-18 08:15:08.160 - EVENT_PRE_DHCP_ACTION_COMPLETE wlan0/22 0 0 null [rcvd_in=RunningState, proc_in=RunningState]
+  12-18 08:15:08.234 - INVOKE onPostDhcpAction()
+  12-18 08:15:08.235 - INVOKE onNewDhcpResults({IP address 192.168.221.110/24 Gateway 192.168.221.1  DNS servers: [ 10.64.0.10 10.64.0.100 ] Domains  DHCP server /192.168.221.1 Vendor info null lease 7200 seconds})
+  12-18 08:15:08.236 - INVOKE onLinkPropertiesChange({{InterfaceName: wlan0 LinkAddresses: [fe80::2e57:31ff:fec2:1d2a/64,192.168.221.110/24,]  Routes: [fe80::/64 -> :: wlan0,192.168.221.0/24 -> 0.0.0.0 wlan0,0.0.0.0/0 -> 192.168.221.1 wlan0,] DnsAddresses: [10.64.0.10,10.64.0.100,] Domains: null MTU: 0 TcpBufferSizes: 524288,1048576,2097152,262144,524288,1048576}})
+  12-18 08:15:08.236 - CMD_POST_DHCP_ACTION wlan0/22 1 0 IP address 192.168.221.110/24 Gateway 192.168.221.1  DNS servers: [ 10.64.0.10 10.64.0.100 ] Domains  DHCP server /192.168.221.1 Vendor info null lease 7200 seconds [rcvd_in=RunningState, proc_in=RunningState]
+  12-18 09:15:06.619 - INVOKE onPreDhcpAction()
+  12-18 09:15:06.623 - CMD_PRE_DHCP_ACTION wlan0/22 0 0 null [rcvd_in=RunningState, proc_in=RunningState]
+  12-18 09:15:06.688 - EVENT_PRE_DHCP_ACTION_COMPLETE wlan0/22 0 0 null [rcvd_in=RunningState, proc_in=RunningState]
+  12-18 09:15:06.779 - INVOKE onPostDhcpAction()
+  12-18 09:15:06.781 - INVOKE onNewDhcpResults({IP address 192.168.221.110/24 Gateway 192.168.221.1  DNS servers: [ 10.64.0.10 10.64.0.100 ] Domains  DHCP server /192.168.221.1 Vendor info null lease 7200 seconds})
+  12-18 09:15:06.782 - INVOKE onLinkPropertiesChange({{InterfaceName: wlan0 LinkAddresses: [fe80::2e57:31ff:fec2:1d2a/64,192.168.221.110/24,]  Routes: [fe80::/64 -> :: wlan0,192.168.221.0/24 -> 0.0.0.0 wlan0,0.0.0.0/0 -> 192.168.221.1 wlan0,] DnsAddresses: [10.64.0.10,10.64.0.100,] Domains: null MTU: 0 TcpBufferSizes: 524288,1048576,2097152,262144,524288,1048576}})
+  12-18 09:15:06.782 - CMD_POST_DHCP_ACTION wlan0/22 1 0 IP address 192.168.221.110/24 Gateway 192.168.221.1  DNS servers: [ 10.64.0.10 10.64.0.100 ] Domains  DHCP server /192.168.221.1 Vendor info null lease 7200 seconds [rcvd_in=RunningState, proc_in=RunningState]
+  12-18 09:32:41.489 - CMD_STOP wlan0/22 0 0 null [rcvd_in=RunningState, proc_in=RunningState]
+  12-18 09:32:41.569 - CMD_CLEAR_LINKADDRESS wlan0/22 0 0 null [rcvd_in=StoppingState, proc_in=StoppingState]
+  12-18 09:32:41.570 - CMD_STOP wlan0/22 0 0 null [rcvd_in=StoppingState, proc_in=StoppingState]
+  12-18 09:32:41.570 - CMD_ON_QUIT wlan0/22 0 0 null [rcvd_in=StoppingState, proc_in=StoppingState]
+  12-18 09:34:06.438 - CMD_STOP wlan0/22 0 0 null [rcvd_in=StoppedState, proc_in=StoppedState]
+  12-18 09:34:08.188 - OBSERVED interfaceRemoved(wlan0)
+  12-18 11:12:20.258 - OBSERVED interfaceAdded(wlan0)
+  12-18 11:12:23.636 - CMD_STOP wlan0/22 0 0 null [rcvd_in=StoppedState, proc_in=StoppedState]
+  12-18 11:12:23.637 - CMD_UPDATE_HTTP_PROXY wlan0/22 0 0 null [rcvd_in=StoppedState, proc_in=StoppedState]
+  12-18 11:12:23.638 - CMD_UPDATE_TCP_BUFFER_SIZES wlan0/22 0 0 524288,1048576,2097152,262144,524288,1048576 [rcvd_in=StoppedState, proc_in=StoppedState]
+  12-18 11:12:23.638 - INVOKE setNeighborDiscoveryOffload(true)
+  12-18 11:12:23.638 - CMD_START wlan0/25 0 0 ProvisioningConfiguration{mEnableIPv4: true, mEnableIPv6: true, mUsingIpReachabilityMonitor: true, mRequestedPreDhcpActionMs: 36000, mStaticIpConfig: null, mApfCapabilities: ApfCapabilities{version: 0, maxSize: 0 format: 1}, mProvisioningTimeoutMs: 36000} [rcvd_in=StoppedState, proc_in=StoppedState]
+  12-18 11:12:23.639 - INVOKE setFallbackMulticastFilter(true)
+  12-18 11:12:23.654 - CMD_CONFIRM wlan0/25 0 0 null [rcvd_in=RunningState, proc_in=RunningState]
+  12-18 11:12:23.655 - INVOKE onLinkPropertiesChange({{InterfaceName: wlan0 LinkAddresses: [fe80::2e57:31ff:fec2:1d2a/64,]  Routes: [fe80::/64 -> :: wlan0,] DnsAddresses: [] Domains: null MTU: 0 TcpBufferSizes: 524288,1048576,2097152,262144,524288,1048576}})
+  12-18 11:12:23.703 - INVOKE onPreDhcpAction()
+  12-18 11:12:23.703 - CMD_PRE_DHCP_ACTION wlan0/25 0 0 null [rcvd_in=RunningState, proc_in=RunningState]
+  12-18 11:12:23.705 - EVENT_PRE_DHCP_ACTION_COMPLETE wlan0/25 0 0 null [rcvd_in=RunningState, proc_in=RunningState]
+  12-18 11:12:23.807 - INVOKE onPostDhcpAction()
+  12-18 11:12:23.807 - INVOKE onNewDhcpResults({IP address 192.168.31.239/24 Gateway 192.168.31.1  DNS servers: [ 192.168.31.1 ] Domains  DHCP server /192.168.31.1 Vendor info miwifi-R3-2.20.26-101 lease 43200 seconds})
+  12-18 11:12:23.808 - INVOKE onLinkPropertiesChange({{InterfaceName: wlan0 LinkAddresses: [fe80::2e57:31ff:fec2:1d2a/64,]  Routes: [fe80::/64 -> :: wlan0,192.168.31.0/24 -> 0.0.0.0 wlan0,0.0.0.0/0 -> 192.168.31.1 wlan0,] DnsAddresses: [] Domains: null MTU: 0 TcpBufferSizes: 524288,1048576,2097152,262144,524288,1048576}})
+  12-18 11:12:23.809 - CMD_POST_DHCP_ACTION wlan0/25 1 0 IP address 192.168.31.239/24 Gateway 192.168.31.1  DNS servers: [ 192.168.31.1 ] Domains  DHCP server /192.168.31.1 Vendor info miwifi-R3-2.20.26-101 lease 43200 seconds [rcvd_in=RunningState, proc_in=RunningState]
+  12-18 11:12:23.835 - CMD_CONFIGURE_LINKADDRESS wlan0/25 0 0 192.168.31.239/24 [rcvd_in=RunningState, proc_in=RunningState]
+  12-18 11:12:23.840 - INVOKE onProvisioningSuccess({{InterfaceName: wlan0 LinkAddresses: [fe80::2e57:31ff:fec2:1d2a/64,192.168.31.239/24,]  Routes: [fe80::/64 -> :: wlan0,192.168.31.0/24 -> 0.0.0.0 wlan0,0.0.0.0/0 -> 192.168.31.1 wlan0,] DnsAddresses: [192.168.31.1,] Domains: null MTU: 0 TcpBufferSizes: 524288,1048576,2097152,262144,524288,1048576}})
+  12-18 12:13:20.430 - CMD_STOP wlan0/25 0 0 null [rcvd_in=RunningState, proc_in=RunningState]
+  12-18 12:13:20.782 - CMD_CLEAR_LINKADDRESS wlan0/25 0 0 null [rcvd_in=StoppingState, proc_in=StoppingState]
+  12-18 12:13:20.782 - CMD_STOP wlan0/25 0 0 null [rcvd_in=StoppingState, proc_in=StoppingState]
+  12-18 12:13:20.782 - CMD_ON_QUIT wlan0/25 0 0 null [rcvd_in=StoppingState, proc_in=StoppingState]
+  12-18 12:13:30.380 - CMD_STOP wlan0/25 0 0 null [rcvd_in=StoppedState, proc_in=StoppedState]
+  12-18 12:13:31.940 - OBSERVED interfaceRemoved(wlan0)
+  12-18 13:04:46.448 - OBSERVED interfaceAdded(wlan0)
+  12-18 13:04:50.561 - CMD_STOP wlan0/25 0 0 null [rcvd_in=StoppedState, proc_in=StoppedState]
+  12-18 13:04:50.562 - CMD_UPDATE_HTTP_PROXY wlan0/25 0 0 null [rcvd_in=StoppedState, proc_in=StoppedState]
+  12-18 13:04:50.563 - CMD_UPDATE_TCP_BUFFER_SIZES wlan0/25 0 0 524288,1048576,2097152,262144,524288,1048576 [rcvd_in=StoppedState, proc_in=StoppedState]
+  12-18 13:04:50.563 - INVOKE setNeighborDiscoveryOffload(true)
+  12-18 13:04:50.564 - CMD_START wlan0/30 0 0 ProvisioningConfiguration{mEnableIPv4: true, mEnableIPv6: true, mUsingIpReachabilityMonitor: true, mRequestedPreDhcpActionMs: 36000, mStaticIpConfig: null, mApfCapabilities: ApfCapabilities{version: 0, maxSize: 0 format: 1}, mProvisioningTimeoutMs: 36000} [rcvd_in=StoppedState, proc_in=StoppedState]
+  12-18 13:04:50.569 - INVOKE setFallbackMulticastFilter(true)
+  12-18 13:04:50.585 - CMD_CONFIRM wlan0/30 0 0 null [rcvd_in=RunningState, proc_in=RunningState]
+  12-18 13:04:50.585 - INVOKE onLinkPropertiesChange({{InterfaceName: wlan0 LinkAddresses: [fe80::2e57:31ff:fec2:1d2a/64,]  Routes: [fe80::/64 -> :: wlan0,] DnsAddresses: [] Domains: null MTU: 0 TcpBufferSizes: 524288,1048576,2097152,262144,524288,1048576}})
+  12-18 13:04:50.642 - INVOKE onPreDhcpAction()
+  12-18 13:04:50.643 - CMD_PRE_DHCP_ACTION wlan0/30 0 0 null [rcvd_in=RunningState, proc_in=RunningState]
+  12-18 13:04:50.646 - EVENT_PRE_DHCP_ACTION_COMPLETE wlan0/30 0 0 null [rcvd_in=RunningState, proc_in=RunningState]
+  12-18 13:04:50.749 - INVOKE onPostDhcpAction()
+  12-18 13:04:50.749 - INVOKE onNewDhcpResults({IP address 192.168.31.239/24 Gateway 192.168.31.1  DNS servers: [ 192.168.31.1 ] Domains  DHCP server /192.168.31.1 Vendor info miwifi-R3-2.20.26-101 lease 43200 seconds})
+  12-18 13:04:50.750 - INVOKE onLinkPropertiesChange({{InterfaceName: wlan0 LinkAddresses: [fe80::2e57:31ff:fec2:1d2a/64,]  Routes: [fe80::/64 -> :: wlan0,192.168.31.0/24 -> 0.0.0.0 wlan0,0.0.0.0/0 -> 192.168.31.1 wlan0,] DnsAddresses: [] Domains: null MTU: 0 TcpBufferSizes: 524288,1048576,2097152,262144,524288,1048576}})
+  12-18 13:04:50.750 - CMD_POST_DHCP_ACTION wlan0/30 1 0 IP address 192.168.31.239/24 Gateway 192.168.31.1  DNS servers: [ 192.168.31.1 ] Domains  DHCP server /192.168.31.1 Vendor info miwifi-R3-2.20.26-101 lease 43200 seconds [rcvd_in=RunningState, proc_in=RunningState]
+  12-18 13:04:50.770 - CMD_CONFIGURE_LINKADDRESS wlan0/30 0 0 192.168.31.239/24 [rcvd_in=RunningState, proc_in=RunningState]
+  12-18 13:04:50.772 - INVOKE onProvisioningSuccess({{InterfaceName: wlan0 LinkAddresses: [fe80::2e57:31ff:fec2:1d2a/64,192.168.31.239/24,]  Routes: [fe80::/64 -> :: wlan0,192.168.31.0/24 -> 0.0.0.0 wlan0,0.0.0.0/0 -> 192.168.31.1 wlan0,] DnsAddresses: [192.168.31.1,] Domains: null MTU: 0 TcpBufferSizes: 524288,1048576,2097152,262144,524288,1048576}})
+
+IpManager.wlan0 connectivity packet log:
+  12-18 13:28:54.508 - RX 28:6c:07:5a:f5:7a > 2c:57:31:c2:1d:2a arp who-has 192.168.31.239
+  [2C5731C21D2A286C075AF57A08060001080006040001286C075AF57AC0A81F01000000000000C0A81FEF]
+  12-18 13:28:54.509 - RX aa:aa:03:00:00:00 > f5:7a:00:00:00:00 arp reply 192.168.31.239 2c:57:31:c2:1d:2a
+  [F57A00000000AAAA03000000080600010800060400022C5731C21D2AC0A81FEF286C075AF57AC0A81F01]
+  12-18 13:29:25.536 - RX 28:6c:07:5a:f5:7a > 2c:57:31:c2:1d:2a arp who-has 192.168.31.239
+  [2C5731C21D2A286C075AF57A08060001080006040001286C075AF57AC0A81F01000000000000C0A81FEF]
+  12-18 13:29:25.538 - RX aa:aa:03:00:00:00 > f5:7a:00:00:00:00 arp reply 192.168.31.239 2c:57:31:c2:1d:2a
+  [F57A00000000AAAA03000000080600010800060400022C5731C21D2AC0A81FEF286C075AF57AC0A81F01]
+  12-18 13:29:55.027 - RX 28:6c:07:5a:f5:7a > 2c:57:31:c2:1d:2a arp who-has 192.168.31.239
+  [2C5731C21D2A286C075AF57A08060001080006040001286C075AF57AC0A81F01000000000000C0A81FEF]
+  12-18 13:29:55.029 - RX aa:aa:03:00:00:00 > f5:7a:00:00:00:00 arp reply 192.168.31.239 2c:57:31:c2:1d:2a
+
+
+
+```
+
+
+
+## adb shell dumpsys media.camera全字符
+```
+adb shell dumpsys media.camera       //  查看camera  全信息
+
+
+Camera module HAL API version: 0x100
+Camera module API version: 0x204
+Camera module name: QCamera Module
+Camera module author: Qualcomm Innovation Center Inc
+Number of camera devices: 3
+Number of normal camera devices: 3
+Active Camera Clients:
+[]
+Allowed users:
+0
+Vendor tag definitions:
+    Dumping configured vendor tag descriptors: 32 entries
+      0x80000000 (privatedata_reprocess) with type 1 (int32) defined in section org.codeaurora.qcamera3.privatedata
+      0x80010000 (cds_mode) with type 1 (int32) defined in section org.codeaurora.qcamera3.CDS
+      0x80010001 (cds_info) with type 0 (byte) defined in section org.codeaurora.qcamera3.CDS
+      0x80020000 (opaque_raw_strides) with type 1 (int32) defined in section org.codeaurora.qcamera3.opaque_raw
+      0x80020001 (opaque_raw_format) with type 0 (byte) defined in section org.codeaurora.qcamera3.opaque_raw
+      0x80030000 (count) with type 1 (int32) defined in section org.codeaurora.qcamera3.crop
+      0x80030001 (data) with type 1 (int32) defined in section org.codeaurora.qcamera3.crop
+      0x80030002 (roimap) with type 1 (int32) defined in section org.codeaurora.qcamera3.crop
+      0x80040000 (tuning_meta_data_blob) with type 1 (int32) defined in section org.codeaurora.qcamera3.tuning_meta_data
+      0x80050000 (enable) with type 0 (byte) defined in section org.codeaurora.qcamera3.temporal_denoise
+      0x80050001 (process_type) with type 1 (int32) defined in section org.codeaurora.qcamera3.temporal_denoise
+      0x80060000 (use_iso_exp_priority) with type 3 (int64) defined in section org.codeaurora.qcamera3.iso_exp_priority
+      0x80060001 (select_priority) with type 1 (int32) defined in section org.codeaurora.qcamera3.iso_exp_priority
+      0x80070000 (use_saturation) with type 1 (int32) defined in section org.codeaurora.qcamera3.saturation
+      0x80080000 (exposure_metering_mode) with type 1 (int32) defined in section org.codeaurora.qcamera3.exposure_metering
+      0x80090000 (use_av_timer) with type 0 (byte) defined in section org.codeaurora.qcamera3.av_timer
+      0x800a0000 (dynamic_black_level_pattern) with type 2 (float) defined in section org.codeaurora.qcamera3.sensor_meta_data
+      0x800a0001 (is_mono_only) with type 0 (byte) defined in section org.codeaurora.qcamera3.sensor_meta_data
+      0x800b0000 (enable) with type 0 (byte) defined in section org.codeaurora.qcamera3.dualcam_link_meta_data
+      0x800b0001 (is_main) with type 0 (byte) defined in section org.codeaurora.qcamera3.dualcam_link_meta_data
+      0x800b0002 (related_camera_id) with type 1 (int32) defined in section org.codeaurora.qcamera3.dualcam_link_meta_data
+      0x800c0000 (dualcam_calib_meta_data_blob) with type 0 (byte) defined in section org.codeaurora.qcamera3.dualcam_calib_meta_data
+      0x800d0000 (reprocess_flags) with type 0 (byte) defined in section org.codeaurora.qcamera3.hal_private_data
+      0x800d0001 (reprocess_data_blob) with type 0 (byte) defined in section org.codeaurora.qcamera3.hal_private_data
+      0x800e0000 (enable) with type 0 (byte) defined in section org.codeaurora.qcamera3.jpeg_encode_crop
+      0x800e0001 (rect) with type 1 (int32) defined in section org.codeaurora.qcamera3.jpeg_encode_crop
+      0x800e0002 (roi) with type 1 (int32) defined in section org.codeaurora.qcamera3.jpeg_encode_crop
+      0x800f0000 (strength) with type 1 (int32) defined in section org.codeaurora.qcamera3.sharpness
+      0x800f0001 (range) with type 1 (int32) defined in section org.codeaurora.qcamera3.sharpness
+      0x80100000 (is_hdr_scene) with type 0 (byte) defined in section org.codeaurora.qcamera3.stats
+      0x80100001 (is_hdr_scene_confidence) with type 2 (float) defined in section org.codeaurora.qcamera3.stats
+      0x80110000 (brightness_val) with type 2 (float) defined in section org.codeaurora.qcamera3.brightness
+
+Prior client events (most recent at top):
+  12-18 11:34:17 : DISCONNECT device 1 client for package cameraserver (PID 761)
+  12-18 09:34:12 : DISCONNECT device 0 client for package com.eg.android.AlipayGphone (PID 30804)
+  12-18 09:34:10 : CONNECT device 0 client for package com.eg.android.AlipayGphone (PID 30804)
+  12-17 21:44:28 : DISCONNECT device 0 client for package com.tencent.mm (PID 21357)
+  12-17 21:44:14 : CONNECT device 0 client for package com.tencent.mm (PID 21357)
+  12-17 21:43:33 : DISCONNECT device 0 client for package com.tencent.mm (PID 21357)
+  12-17 21:43:20 : CONNECT device 0 client for package com.tencent.mm (PID 21357)
+  12-17 21:41:47 : DISCONNECT device 0 client for package com.tencent.mm (PID 21357)
+  12-17 21:41:24 : CONNECT device 0 client for package com.tencent.mm (PID 21357)
+  12-17 21:41:03 : DISCONNECT device 0 client for package com.tencent.mm (PID 21357)
+  12-17 21:40:50 : CONNECT device 0 client for package com.tencent.mm (PID 21357)
+  12-17 20:43:24 : USER_SWITCH previous allowed users:  , current allowed users: 0
+
+Camera 0 information:
+  Facing: BACK
+  Orientation: 90
+  Resource Cost: 100
+  Conflicting Devices: NONE
+  Device version: 0x100
+  Camera1 API shim is using parameters:
+        CameraParameters::dump: mMap.size = 192
+	ae-bracket-hdr: Off
+	ae-bracket-hdr-values: Off,AE-Bracket
+	af-bracket: af-bracket-off
+	af-bracket-values: af-bracket-off,af-bracket-on
+	antibanding: auto
+	antibanding-values: off,60hz,50hz,auto
+	auto-exposure: frame-average
+	auto-exposure-lock: false
+	auto-exposure-lock-supported: true
+	auto-exposure-values: frame-average,center-weighted,spot-metering,center-weighted,spot-metering-adv,center-weighted-adv
+	auto-hdr-supported: true
+	auto-whitebalance-lock: false
+	auto-whitebalance-lock-supported: true
+	avtimer: disable
+	blurintensity-step: 1
+	brightness-step: 1
+	cache-video-buffers: disable
+	camera-mode: 0
+	cds-mode-values: off,on,auto
+	chroma-flash: chroma-flash-off
+	chroma-flash-values: chroma-flash-off,chroma-flash-on
+	contrast: 5
+	contrast-step: 1
+	contrast-values: 0,5,10
+	denoise: denoise-on
+	denoise-values: denoise-off,denoise-on
+	dis: disable
+	dis-values: enable,disable
+	dual-camera-id: 0
+	dual-camera-main-camera: false
+	dual-camera-mode: off
+	effect: none
+	effect-values: none,mz_lively,mz_moonlight,mz_black_and_white,mz_blue,mz_pink,mz_film,mz_natural,mz_dawn,mz_sakura,mz_dreamy,mz_bright
+	exposure-compensation: 0
+	exposure-compensation-step: 0.166667
+	face-detection: off
+	face-detection-values: off,on
+	flash-mode: off
+	flash-mode-values: off,auto,on,torch
+	flip-mode-values: off,flip-v,flip-h,flip-vh
+	focal-length: 3.94
+	focus-areas: (0, 0, 0, 0, 0)
+	focus-distances: Infinity,Infinity,Infinity
+	focus-mode: auto
+	focus-mode-values: auto,infinity,fixed,macro,continuous-video,continuous-picture,manual
+	hdr-mode: hdr-mode-multiframe
+	hdr-mode-values: hdr-mode-sensor,hdr-mode-multiframe
+	hdr-need-1x: false
+	hdr-need-1x-values: false,true
+	hfr-size-values: 1280x720
+	histogram: disable
+	histogram-values: enable,disable
+	horizontal-view-angle: 69.89
+	instant-aec-values: 
+	instant-capture-values: 
+	internal-restart: true
+	iso: auto
+	iso-values: auto,ISO100,ISO200,ISO400,ISO800,ISO1600,ISO3200
+	jpeg-quality: 85
+	jpeg-thumbnail-height: 154
+	jpeg-thumbnail-quality: 85
+	jpeg-thumbnail-size-values: 256x154,240x160,320x320,320x240,256x144,240x144,176x144,240x320,144x176,0x0
+	jpeg-thumbnail-width: 256
+	lensshade: enable
+	lensshade-values: enable,disable
+	long-shot: off
+	longshot-supported: true
+	luma-adaptation: 3
+	manual-exposure-modes: off,exp-time-priority,iso-priority,user-setting
+	manual-focus-modes: off,scale-mode,diopter-mode
+	manual-wb-modes: off,color-temperature,rbgb-gains
+	max-blueintensity: 100
+	max-brightness: 6
+	max-contrast: 10
+	max-exposure-compensation: 12
+	max-exposure-time: 33113.058750
+	max-focus-pos-dac: 1023
+	max-focus-pos-diopter: 10
+	max-focus-pos-index: 1023
+	max-focus-pos-ratio: 100
+	max-iso: 1600
+	max-num-detected-faces-hw: 10
+	max-num-detected-faces-sw: 10
+	max-num-focus-areas: 1
+	max-num-metering-areas: 10
+	max-saturation: 10
+	max-sce-factor: 100
+	max-sharpness: 36
+	max-wb-cct: 8000
+	max-wb-gain: 4
+	max-zoom: 90
+	mce: enable
+	mce-values: enable,disable
+	metering-areas: (0, 0, 0, 0, 0)
+	min-blueintensity: 0
+	min-brightness: 0
+	min-contrast: 0
+	min-exposure-compensation: -12
+	min-exposure-time: 0.027224
+	min-focus-pos-dac: 0
+	min-focus-pos-diopter: 0
+	min-focus-pos-index: 0
+	min-focus-pos-ratio: 0
+	min-iso: 100
+	min-saturation: 0
+	min-sce-factor: -100
+	min-sharpness: 0
+	min-wb-cct: 2000
+	min-wb-gain: 1
+	num-retro-burst-per-shutter: 0
+	num-snaps-per-shutter: 1
+	opti-zoom: opti-zoom-off
+	opti-zoom-values: opti-zoom-off,opti-zoom-on
+	picture-format: jpeg
+	picture-format-values: jpeg,bayer-mipi-10bggr
+	picture-size: 176x144
+	picture-size-values: 4032x3024,4000x3000,4032x2272,4000x2256,3860x2140,3840x2160,3200x2400,2624x1968,2592x1944,2592x1458,2560x1440,2304x1728,2016x1512,2048x1536,2000x1504,2000x1126,2016x1136,1920x1080,1600x1200,1440x1080,1280x960,1280x768,1280x720,1024x	preferred-preview-size-for-video: 1920x1080
+	preview-flip: off
+	preview-format: yuv420sp
+	preview-format-values: yuv420sp,yuv420p,nv12-venus
+	preview-fps-range: 7000,30000
+	preview-fps-range-values: (15000,15000),(20000,20000),(7500,24000),(24000,24000),(7000,27000),(27000,27000),(7000,30000),(30000,30000)
+	preview-frame-rate: 30
+	preview-frame-rate-values: 7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30
+	preview-size: 640x480
+	preview-size-values: 1920x1080,1440x1080,1280x960,1280x720,960x720,800x600,864x480,800x480,768x432,720x480,640x480,480x640,640x360,576x432,480x360,480x320,384x288,352x288,320x240,240x320,240x160,176x144,144x176,160x120
+	qc-max-num-requested-faces: 10
+	raw-size: 4032x3024
+	rdi-mode: disable
+	rdi-mode-values: enable,disable
+	re-focus: re-focus-off
+	re-focus-values: re-focus-off,re-focus-on
+	redeye-reduction: disable
+	redeye-reduction-values: enable,disable
+	saturation: 5
+	saturation-step: 1
+	saturation-values: 3,5,8
+	sce-factor-step: 10
+	scene-detect: off
+	scene-detect-values: off,on
+	scene-mode: auto
+	scene-mode-values: auto,asd,landscape,snow,beach,sunset,night,portrait,backlight,sports,steadyphoto,flowers,candlelight,fireworks,party,night-portrait,theatre,action,AR,hdr
+	scene-selection: disable
+	secure-mode: disable
+	secure-mode-values: enable,disable
+	see-more: off
+	see-more-values: off,on
+	selectable-zone-af: auto
+	selectable-zone-af-values: auto,spot-metering,center-weighted,frame-average
+	sensor-hdr: off
+	sensor-hdr-values: off,on
+	sharpness: 12
+	sharpness-step: 6
+	shutter-value-supported: 0,200,500,1000,2000,5000,10000,20000,50000,100000,200000,300000,400000,500000,600000,800000,1000000,2000000,3000000,5000000,8000000,10000000,15000000,20000000
+	skinToneEnhancement: 0
+	skinToneEnhancement-values: enable,disable
+	smooth-zoom-supported: false
+	snapshot-burst-num: 0
+	snapshot-picture-flip: off
+	still-more: still-more-off
+	still-more-values: still-more-off,still-more-on
+	supported-live-snapshot-sizes: 3860x2140,3840x2160,2592x1944,2048x1536,2048x1080,1920x1080,1600x1200,1440x1080,1280x960,1280x768,1280x720,1024x768,800x600,864x480,800x480,720x480,640x480,640x360,352x288,320x240,176x144,160x120
+	tnr-mode-values: off,on
+	touch-af-aec: touch-off
+	touch-af-aec-values: touch-off,touch-on
+	true-portrait-values: true-portrait-off,true-portrait-on
+	vertical-view-angle: 51.7
+	video-batch-size: 0
+	video-cds-mode-values: off,on,auto
+	video-flip: off
+	video-frame-format: android-opaque
+	video-hdr: off
+	video-hdr-values: off,on
+	video-hfr: off
+	video-hfr-values: 120,off
+	video-hsr: off
+	video-rotation: 0
+	video-rotation-values: 0,90,180,270
+	video-size: 3860x2140
+	video-size-values: 3860x2140,3840x2160,1920x1080,1280x960,1280x720,864x480,800x480,720x480,640x480,480x640,640x360,480x360,480x320,352x288,320x240,240x320,176x144,144x176,160x120
+	video-snapshot-supported: true
+	video-stabilization-supported: false
+	video-tnr-mode-values: off,on
+	whitebalance: auto
+	whitebalance-values: auto,incandescent,fluorescent,warm-fluorescent,daylight,cloudy-daylight,twilight,shade,manual
+	zoom: 0
+	zoom-ratios: 100,102,104,107,109,112,114,117,120,123,125,128,131,135,138,141,144,148,151,155,158,162,166,170,174,178,182,186,190,195,200,204,209,214,219,224,229,235,240,246,251,257,263,270,276,282,289,296,303,310,317,324,332,340,348,356,364,373,381,390,	zoom-supported: true
+	zsl: off
+	zsl-hdr-supported: true
+	zsl-values: off,on
+  Device 0 is closed, no client instance
+Camera 1 information:
+  Facing: FRONT
+  Orientation: 270
+  Resource Cost: 100
+  Conflicting Devices: NONE
+  Device version: 0x100
+  Camera1 API shim is using parameters:
+        CameraParameters::dump: mMap.size = 178
+	ae-bracket-hdr: Off
+	ae-bracket-hdr-values: Off,AE-Bracket
+	antibanding: auto
+	antibanding-values: off,60hz,50hz,auto
+	auto-exposure: frame-average
+	auto-exposure-lock: false
+	auto-exposure-lock-supported: true
+	auto-exposure-values: frame-average,center-weighted,spot-metering,center-weighted,spot-metering-adv,center-weighted-adv
+	auto-hdr-supported: true
+	auto-whitebalance-lock: false
+	auto-whitebalance-lock-supported: true
+	avtimer: disable
+	blurintensity-step: 1
+	brightness-step: 1
+	cache-video-buffers: disable
+	camera-mode: 0
+	cds-mode-values: off,on,auto
+	contrast: 5
+	contrast-step: 1
+	contrast-values: 0,5,10
+	denoise: denoise-on
+	denoise-values: denoise-off,denoise-on
+	dis: disable
+	dis-values: enable,disable
+	dual-camera-id: 0
+	dual-camera-main-camera: false
+	dual-camera-mode: off
+	effect: none
+	effect-values: none,mz_lively,mz_moonlight,mz_black_and_white,mz_blue,mz_pink,mz_film,mz_natural,mz_dawn,mz_sakura,mz_dreamy,mz_bright
+	exposure-compensation: 0
+	exposure-compensation-step: 0.166667
+	face-detection: off
+	face-detection-values: off,on
+	flip-mode-values: off,flip-v,flip-h,flip-vh
+	focal-length: 3.519
+	focus-distances: Infinity,Infinity,Infinity
+	focus-mode: fixed
+	focus-mode-values: fixed
+	hdr-mode: hdr-mode-multiframe
+	hdr-mode-values: hdr-mode-multiframe
+	hdr-need-1x: false
+	hdr-need-1x-values: false,true
+	hfr-size-values: 
+	histogram: disable
+	histogram-values: enable,disable
+	horizontal-view-angle: 64.9
+	instant-aec-values: 
+	instant-capture-values: 
+	internal-restart: true
+	iso: auto
+	iso-values: auto,ISO100,ISO200,ISO400,ISO800,ISO1600,ISO3200
+	jpeg-quality: 85
+	jpeg-thumbnail-height: 154
+	jpeg-thumbnail-quality: 85
+	jpeg-thumbnail-size-values: 256x154,240x160,320x320,320x240,256x144,240x144,176x144,240x320,144x176,0x0
+	jpeg-thumbnail-width: 256
+	lensshade: enable
+	lensshade-values: enable,disable
+	long-shot: off
+	longshot-supported: true
+	luma-adaptation: 3
+	manual-exposure-modes: off,exp-time-priority,iso-priority,user-setting
+	manual-focus-modes: off
+	manual-wb-modes: off,color-temperature,rbgb-gains
+	max-blueintensity: 100
+	max-brightness: 6
+	max-contrast: 10
+	max-exposure-compensation: 12
+	max-exposure-time: 599.506523
+	max-focus-pos-dac: 1023
+	max-focus-pos-diopter: 0
+	max-focus-pos-index: 1023
+	max-focus-pos-ratio: 100
+	max-iso: 1600
+	max-num-detected-faces-hw: 10
+	max-num-detected-faces-sw: 10
+	max-num-focus-areas: 0
+	max-num-metering-areas: 10
+	max-saturation: 10
+	max-sce-factor: 100
+	max-sharpness: 36
+	max-wb-cct: 8000
+	max-wb-gain: 4
+	max-zoom: 90
+	mce: enable
+	mce-values: enable,disable
+	metering-areas: (0, 0, 0, 0, 0)
+	min-blueintensity: 0
+	min-brightness: 0
+	min-contrast: 0
+	min-exposure-compensation: -12
+	min-exposure-time: 0.018295
+	min-focus-pos-dac: 0
+	min-focus-pos-diopter: 0
+	min-focus-pos-index: 0
+	min-focus-pos-ratio: 0
+	min-iso: 100
+	min-saturation: 0
+	min-sce-factor: -100
+	min-sharpness: 0
+	min-wb-cct: 2000
+	min-wb-gain: 1
+	num-retro-burst-per-shutter: 0
+	num-snaps-per-shutter: 1
+	opti-zoom: opti-zoom-off
+	opti-zoom-values: opti-zoom-off,opti-zoom-on
+	picture-format: jpeg
+	picture-format-values: jpeg,bayer-mipi-10gbrg
+	picture-size: 176x144
+	picture-size-values: 4608x3456,4160x3120,4032x3024,4000x3000,4032x2272,4000x2256,3860x2140,3840x2160,3200x2400,2624x1968,2592x1944,2592x1458,2560x1440,2304x1728,2016x1512,2048x1536,2000x1504,2000x1126,2016x1136,1920x1080,1600x1200,1440x1080,1280x960,128	preferred-preview-size-for-video: 1920x1080
+	preview-flip: off
+	preview-format: yuv420sp
+	preview-format-values: yuv420sp,yuv420p,nv12-venus
+	preview-fps-range: 7000,30000
+	preview-fps-range-values: (15000,15000),(7500,20000),(20000,20000),(7500,24000),(24000,24000),(7000,30000),(30000,30000)
+	preview-frame-rate: 30
+	preview-frame-rate-values: 7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30
+	preview-size: 640x480
+	preview-size-values: 1920x1080,1440x1080,1280x960,1280x720,960x720,800x600,864x480,800x480,768x432,720x480,640x480,480x640,640x360,576x432,480x360,480x320,384x288,352x288,320x240,240x320,240x160,176x144,144x176,160x120
+	qc-max-num-requested-faces: 10
+	raw-size: 2304x1728
+	rdi-mode: disable
+	rdi-mode-values: enable,disable
+	redeye-reduction: disable
+	redeye-reduction-values: enable,disable
+	saturation: 5
+	saturation-step: 1
+	saturation-values: 3,5,8
+	sce-factor-step: 10
+	scene-detect: off
+	scene-detect-values: off,on
+	scene-mode: auto
+	scene-mode-values: auto,asd,landscape,snow,beach,sunset,night,portrait,backlight,sports,steadyphoto,flowers,candlelight,fireworks,party,night-portrait,theatre,action,AR,hdr
+	scene-selection: disable
+	secure-mode: disable
+	secure-mode-values: enable,disable
+	see-more: off
+	see-more-values: off,on
+	selectable-zone-af: auto
+	selectable-zone-af-values: auto,spot-metering,center-weighted,frame-average
+	sharpness: 12
+	sharpness-step: 6
+	skinToneEnhancement: 0
+	skinToneEnhancement-values: enable,disable
+	smooth-zoom-supported: false
+	snapshot-burst-num: 0
+	snapshot-picture-flip: off
+	still-more: still-more-off
+	still-more-values: still-more-off,still-more-on
+	supported-live-snapshot-sizes: 4128x3096,4128x2322,4000x3000,4096x2160,3860x2140,3840x2160,3264x2448,3200x2400,2592x1944,2048x1536,2048x1080,1920x1080,1600x1200,1440x1080,1280x960,1280x768,1280x720,1024x768,800x600,864x480,800x480,720x480,640x480,640x36	tnr-mode-values: off,on
+	touch-af-aec: touch-off
+	touch-af-aec-values: touch-off,touch-on
+	true-portrait-values: true-portrait-off,true-portrait-on
+	vertical-view-angle: 51.6
+	video-batch-size: 0
+	video-cds-mode-values: off,on,auto
+	video-flip: off
+	video-frame-format: android-opaque
+	video-hfr: off
+	video-hfr-values: off
+	video-hsr: off
+	video-rotation: 0
+	video-rotation-values: 0,90,180,270
+	video-size: 4096x2160
+	video-size-values: 4096x2160,3860x2140,3840x2160,1920x1080,1280x960,1280x720,864x480,800x480,720x480,640x480,480x640,640x360,480x360,480x320,352x288,320x240,240x320,176x144,144x176,160x120
+	video-snapshot-supported: true
+	video-stabilization-supported: false
+	video-tnr-mode-values: off,on
+	whitebalance: auto
+	whitebalance-values: auto,incandescent,fluorescent,warm-fluorescent,daylight,cloudy-daylight,twilight,shade,manual
+	zoom: 0
+	zoom-ratios: 100,102,104,107,109,112,114,117,120,123,125,128,131,135,138,141,144,148,151,155,158,162,166,170,174,178,182,186,190,195,200,204,209,214,219,224,229,235,240,246,251,257,263,270,276,282,289,296,303,310,317,324,332,340,348,356,364,373,381,390,	zoom-supported: true
+	zsl: off
+	zsl-hdr-supported: true
+	zsl-values: off,on
+  Device 1 is closed, no client instance
+Camera 2 information:
+  Facing: BACK
+  Orientation: 90
+  Resource Cost: 100
+  Conflicting Devices: NONE
+  Device version: 0x100
+  Device 2 is closed, no client instance
+
+No active camera clients yet.
+
+Camera traces (0):
+  No camera traces collected.
+
+```
+
+##  adb shell dumpsys media.audio_flinger全字符
+```
+Library livemusicMz
+  Effect Live Music / Meizu Technology Co., Ltd
+    UUID: 0bbc89fe-52dc-4c40-8211-cae4da538b50
+    TYPE: 38a6a248-94be-4007-bbe1-337d7dc49e6d
+    apiVersion: 00020000
+    flags: 00000048
+Library virtualizerMz
+  Virtualizer / Meizu Technology Co., Ltd
+    UUID: 0e9779c9-4e8f-494d-b2b1-b4ad4e37c54c
+    TYPE: 725d7fa7-9219-4f71-8fa7-240a6d489387
+    apiVersion: 00020000
+    flags: 00000210
+Library equalizerMz
+  Equalizer / Meizu Technology Co., Ltd
+    UUID: 9626da93-9c71-4bb2-8e23-9fc707fb9703
+    TYPE: fda57ecb-2b6f-40ec-a2b8-2b0e8c630647
+    apiVersion: 00020000
+    flags: 00000008
+Library bassboostMz
+  Bass Boost / Meizu Technology Co., Ltd
+    UUID: 850b6319-bf66-4f93-bec0-dc6964367786
+    TYPE: 47164cd2-526a-49f5-8f90-0ba88c408cd7
+    apiVersion: 00020000
+    flags: 00000008
+Library audio_pre_processing
+  Noise Suppression / Qualcomm Fluence
+    UUID: 1d97bb0b-9e2f-4403-9ae3-58c2554306f8
+    TYPE: 58b4b260-8e06-11e0-aa8e-0002a5d5c51b
+    apiVersion: 00020000
+    flags: 00000203
+  Acoustic Echo Canceler / Qualcomm Fluence
+    UUID: 0f8d0d2a-59e5-45fe-b6e4-248c8a799109
+    TYPE: 7b491460-8d4d-11e0-bd61-0002a5d5c51b
+    apiVersion: 00020000
+    flags: 00000203
+Library offload_bundle
+  (no effects)
+Library proxy
+  Visualizer / The Android Open Source Project
+    UUID: 1d0a1a53-7d5d-48f2-8e71-27fbd10d842c
+    TYPE: e46b26a0-dddd-11db-8afd-0002a5d5c51b
+    apiVersion: 00020000
+    flags: 00400008
+  Qualcomm Technologies Insert Preset Reverb / Qualcomm Technologies, Inc.
+    UUID: f3e178d2-ebcb-408e-8357-0002a5d5c51b
+    TYPE: 47382d60-ddd8-11db-bf3a-0002a5d5c51b
+    apiVersion: 00020000
+    flags: 00400088
+  Qualcomm Technologies Auxiliary Preset Reverb / Qualcomm Technologies, Inc.
+    UUID: 1b78f587-6d1c-422e-8b84-0002a5d5c51b
+    TYPE: 47382d60-ddd8-11db-bf3a-0002a5d5c51b
+    apiVersion: 00020000
+    flags: 00400001
+  Qualcomm Technologies Insert Environmental Reverb / Qualcomm Technologies, Inc.
+    UUID: b707403a-a1c1-4291-9573-0002a5d5c51b
+    TYPE: c2e5d5f0-94bd-4763-9cac-4e234d06839e
+    apiVersion: 00020000
+    flags: 00400088
+  Qualcomm Technologies Auxiliary Environmental Reverb / Qualcomm Technologies, Inc.
+    UUID: 48404ac9-d202-4ccc-bf84-0002a5d5c51b
+    TYPE: c2e5d5f0-94bd-4763-9cac-4e234d06839e
+    apiVersion: 00020000
+    flags: 00400001
+  Equalizer / NXP Software Ltd.
+    UUID: c8e70ecd-48ca-456e-8a4f-0002a5d5c51b
+    TYPE: 0bed4300-ddd6-11db-8f34-0002a5d5c51b
+    apiVersion: 00020000
+    flags: 00400048
+  Qualcomm Technologies Virtualizer / Qualcomm Technologies, Inc.
+    UUID: d3467faa-acc7-4d34-acaf-0002a5d5c51b
+    TYPE: 37cc2c00-dddd-11db-8577-0002a5d5c51b
+    apiVersion: 00020000
+    flags: 00400290
+  Qualcomm Technologies Bass Boost / Qualcomm Technologies, Inc.
+    UUID: 14804144-a5ee-4d24-aa88-0002a5d5c51b
+    TYPE: 0634f220-ddd4-11db-a0fc-0002a5d5c51b
+    apiVersion: 00020000
+    flags: 00400290
+Library loudness_enhancer
+  Loudness Enhancer / The Android Open Source Project
+    UUID: fa415329-2034-4bea-b5dc-5b381c8d1e2c
+    TYPE: fe3199be-aed0-413f-87bb-11260eb63cf1
+    apiVersion: 00020000
+    flags: 00000008
+Library downmix
+  Multichannel Downmix To Stereo / The Android Open Source Project
+    UUID: 93f04452-e4fe-41cc-91f9-e475b6d1d69f
+    TYPE: 381e49cc-a858-4aa2-87f6-e8388e7601b2
+    apiVersion: 00020000
+    flags: 00000008
+Library visualizer_hw
+  (no effects)
+Library visualizer_sw
+  (no effects)
+Library qcreverb
+  (no effects)
+Library qcvirt
+  (no effects)
+Library qcbassboost
+  (no effects)
+Library reverb
+  (no effects)
+Library bundle
+  Volume / NXP Software Ltd.
+    UUID: 119341a0-8469-11df-81f9-0002a5d5c51b
+    TYPE: 09e8ede0-ddde-11db-b4f6-0002a5d5c51b
+    apiVersion: 00020000
+    flags: 00000050
+Clients:
+  pid: 2355
+Notification Clients:
+  pid: 760
+  pid: 761
+  pid: 769
+  pid: 772
+  pid: 1732
+  pid: 2355
+  pid: 2729
+  pid: 3578
+  pid: 7478
+  pid: 9676
+  pid: 13744
+Global session refs:
+  session   pid count
+        9  2355     1
+      425  9676     1
+      889 13744     1
+Hardware status: 0
+Standby Time mSec: 3000
+
+KARAOKE MODE:
+  IsKaraokeEnabled: false
+  IsInKaraoke: false
+  mKaraokeBgVolume: 1.000000
+  mKaraokeVoiceVolume: 1.000000
+
+Output thread 0xf3283100 type 0 (MIXER):
+  Thread name: AudioOut_D
+  I/O handle: 13
+  TID: 1171
+  Standby: yes
+  Sample rate: 48000 Hz
+  HAL frame count: 480
+  HAL format: 0x1 (pcm16)
+  HAL buffer size: 1920 bytes
+  Channel count: 2
+  Channel mask: 0x00000003 (front-left, front-right)
+  Processing format: 0x5 (pcmfloat)
+  Processing frame size: 8 bytes
+  Pending config events: none
+  Output device: 0 (NONE)
+  Input device: 0 (NONE)
+  Audio source: 0 (default)
+  Normal frame count: 960
+  Last write occurred (msecs): 19606192
+  Total writes: 788
+  Delayed writes: 0
+  Blocked in write: no
+  Suspend count: 0
+  Sink buffer : 0xf47fd000
+  Mixer buffer: 0xf47db000
+  Effect buffer: 0xf47ff000
+  Fast track availMask=0xfc
+  Standby delay ns=3000000000
+  AudioStreamOut: 0xf47a3188 flags 0x6 (PRIMARY|FAST)
+  Frames written: 756480
+  Suspended frames: 0
+  PipeSink frames written: 756480
+  Hal stream dump:
+  Thread throttle time (msecs): 0
+  AudioMixer tracks: 0x00000003
+  Master mono: off
+  FastMixer command=COLD_IDLE writeSequence=3192 framesWritten=766080
+            numTracks=1 writeErrors=0 underruns=0 overruns=0
+            sampleRate=48000 frameCount=480 measuredWarmup=33.4 ms, warmupCycles=5
+            mixPeriod=10.00 ms
+  Simple moving statistics over last 3.3 seconds:
+    wall clock time in ms per mix cycle:
+      mean=10.00 min=9.55 max=10.49 stddev=0.09
+    raw CPU load in us per mix cycle:
+      mean=171 min=0 max=552 stddev=39
+  Fast tracks: sMaxFastTracks=8 activeMask=0x1
+  Index Active Full Partial Empty  Recent Ready    Written
+      0    yes  549       0     0    full  1920     754560
+      1     no    0       0     0    full     0          0
+      2     no    0       0     0    full     0          0
+      3     no    0       0     0    full     0          0
+      4     no    0       0     0    full     0          0
+      5     no    0       0     0    full     0          0
+      6     no    0       0     0    full     0          0
+      7     no    0       0     0    full     0          0
+  mMasterVolume: 0(dB), mMasterMute: false, mMuteMode: 1
+  Stream volumes in dB: 0:-24, 1:-inf, 2:-inf, 3:-23, 4:-10, 5:-inf, 6:0, 7:-inf, 8:-inf, 9:0, 10:-23, 11:0, 12:0
+  Normal mixer raw underrun counters: partial=0 empty=0
+  2 Tracks of which 0 are active
+    Name Active Client Type      Fmt Chn mask Session fCount S F SRate  L dB  R dB    Server Main buf  Aux Buf Flags UndFrmCnt
+       1     no    760   12 00000005 00000003       0   3536 I 0 44100     0     0  00000000 0xf47fd000 0x0 0x000 0x00000000         0 
+    F  1     no   2355    0 00000001 00000001       9    960 I 0 48000   -10   -10  00000000 0xf47fd000 0x0 0x000 0x00000004         0 
+  0 Effect Chains
+
+Output thread 0xf2e831c0 type 0 (MIXER):
+  Thread name: AudioOut_15
+  I/O handle: 21
+  TID: 1173
+  Standby: yes
+  Sample rate: 48000 Hz
+  HAL frame count: 480
+  HAL format: 0x1 (pcm16)
+  HAL buffer size: 1920 bytes
+  Channel count: 2
+  Channel mask: 0x00000003 (front-left, front-right)
+  Processing format: 0x5 (pcmfloat)
+  Processing frame size: 8 bytes
+  Pending config events: none
+  Output device: 0 (NONE)
+  Input device: 0 (NONE)
+  Audio source: 0 (default)
+  Normal frame count: 960
+  Last write occurred (msecs): 32931330
+  Total writes: 1645
+  Delayed writes: 0
+  Blocked in write: no
+  Suspend count: 0
+  Sink buffer : 0xf3a5c000
+  Mixer buffer: 0xf3a5a000
+  Effect buffer: 0xf3a6a000
+  Fast track availMask=0xfe
+  Standby delay ns=3000000000
+  AudioStreamOut: 0xf47a31c0 flags 0x104 (FAST|RAW)
+  Frames written: 1579200
+  Suspended frames: 0
+  PipeSink frames written: 1579200
+  Hal stream dump:
+  Thread throttle time (msecs): 0
+  AudioMixer tracks: 0x00000000
+  Master mono: off
+  FastMixer command=COLD_IDLE writeSequence=6584 framesWritten=1580160
+            numTracks=1 writeErrors=0 underruns=0 overruns=0
+            sampleRate=48000 frameCount=480 measuredWarmup=23.6 ms, warmupCycles=4
+            mixPeriod=10.00 ms
+  Simple moving statistics over last 32.9 seconds:
+    wall clock time in ms per mix cycle:
+      mean=10.00 min=8.69 max=11.11 stddev=0.16
+    raw CPU load in us per mix cycle:
+      mean=360 min=0 max=1198 stddev=155
+  Distribution of mix cycle times in ms for the tails (> ~3 stddev outliers):
+    left tail: mean=8.88 min=8.69 max=9.09 stddev=0.20
+    right tail: mean=10.98 min=10.91 max=11.11 stddev=0.11
+  Fast tracks: sMaxFastTracks=8 activeMask=0x1
+  Index Active Full Partial Empty  Recent Ready    Written
+      0    yes  216       0     0    full  1440    1577760
+      1     no  939       0     2   empty     0    1433280
+      2     no    0       0     0    full     0          0
+      3     no    0       0     0    full     0          0
+      4     no    0       0     0    full     0          0
+      5     no    0       0     0    full     0          0
+      6     no    0       0     0    full     0          0
+      7     no    0       0     0    full     0          0
+  mMasterVolume: 0(dB), mMasterMute: false, mMuteMode: 1
+  Stream volumes in dB: 0:-24, 1:-inf, 2:-inf, 3:-23, 4:-10, 5:-inf, 6:0, 7:-inf, 8:-inf, 9:0, 10:-23, 11:0, 12:0
+  Normal mixer raw underrun counters: partial=0 empty=0
+  0 Tracks
+  0 Effect Chains
+
+Output thread 0xf2b83640 type 0 (MIXER):
+  Thread name: AudioOut_1D
+  I/O handle: 29
+  TID: 1178
+  Standby: yes
+  Sample rate: 48000 Hz
+  HAL frame count: 1920
+  HAL format: 0x1 (pcm16)
+  HAL buffer size: 7680 bytes
+  Channel count: 2
+  Channel mask: 0x00000003 (front-left, front-right)
+  Processing format: 0x1 (pcm16)
+  Processing frame size: 4 bytes
+  Pending config events: none
+  Output device: 0 (NONE)
+  Input device: 0 (NONE)
+  Audio source: 0 (default)
+  Normal frame count: 1920
+  Last write occurred (msecs): 9876576
+  Total writes: 48263
+  Delayed writes: 0
+  Blocked in write: no
+  Suspend count: 0
+  Sink buffer : 0xf3a5e000
+  Mixer buffer: 0xf3afb000
+  Effect buffer: 0xf3a60000
+  Fast track availMask=0xfe
+  Standby delay ns=3000000000
+  AudioStreamOut: 0xf47a32d8 flags 0x8 (DEEP_BUFFER)
+  Frames written: 92664960
+  Suspended frames: 0
+  Hal stream dump:
+  Thread throttle time (msecs): 906
+  AudioMixer tracks: 0x00000000
+  Master mono: off
+  FastMixer not initialized
+  mMasterVolume: 0(dB), mMasterMute: false, mMuteMode: 0
+  Stream volumes in dB: 0:-inf, 1:-inf, 2:-inf, 3:-37, 4:-19, 5:-inf, 6:0, 7:-inf, 8:-inf, 9:-96, 10:-37, 11:0, 12:0
+  Normal mixer raw underrun counters: partial=0 empty=0
+  0 Tracks
+  0 Effect Chains
+
+Output thread 0xf2a03b80 type 0 (MIXER):
+  Thread name: AudioOut_25
+  I/O handle: 37
+  TID: 1184
+  Standby: yes
+  Sample rate: 48000 Hz
+  HAL frame count: 768
+  HAL format: 0x1 (pcm16)
+  HAL buffer size: 3072 bytes
+  Channel count: 2
+  Channel mask: 0x00000003 (front-left, front-right)
+  Processing format: 0x5 (pcmfloat)
+  Processing frame size: 8 bytes
+  Pending config events: none
+  Output device: 0 (NONE)
+  Input device: 0 (NONE)
+  Audio source: 0 (default)
+  Normal frame count: 1152
+  Last write occurred (msecs): 33622460
+  Total writes: 0
+  Delayed writes: 0
+  Blocked in write: no
+  Suspend count: 0
+  Sink buffer : 0xf3a7c800
+  Mixer buffer: 0xf3a7a000
+  Effect buffer: 0xf47f9400
+  Fast track availMask=0xfe
+  Standby delay ns=3000000000
+  AudioStreamOut: 0xf47a3310 flags 0 (NONE)
+  Frames written: 0
+  Suspended frames: 0
+  PipeSink frames written: 0
+  Hal stream dump:
+  Thread throttle time (msecs): 0
+  AudioMixer tracks: 0x00000000
+  Master mono: off
+  FastMixer command=COLD_IDLE writeSequence=0 framesWritten=0
+            numTracks=0 writeErrors=0 underruns=0 overruns=0
+            sampleRate=0 frameCount=0 measuredWarmup=0 ms, warmupCycles=0
+            mixPeriod=nan ms
+  No FastMixer statistics available currently
+  Fast tracks: sMaxFastTracks=8 activeMask=0
+  Index Active Full Partial Empty  Recent Ready    Written
+      0     no    0       0     0    full     0          0
+      1     no    0       0     0    full     0          0
+      2     no    0       0     0    full     0          0
+      3     no    0       0     0    full     0          0
+      4     no    0       0     0    full     0          0
+      5     no    0       0     0    full     0          0
+      6     no    0       0     0    full     0          0
+      7     no    0       0     0    full     0          0
+  mMasterVolume: 0(dB), mMasterMute: false, mMuteMode: 1
+  Stream volumes in dB: 0:-24, 1:-inf, 2:-inf, 3:-23, 4:-10, 5:-inf, 6:0, 7:-inf, 8:-inf, 9:0, 10:-23, 11:0, 12:0
+  Normal mixer raw underrun counters: partial=0 empty=0
+  0 Tracks
+  0 Effect Chains
+
+Output thread 0xf0f83200 type 0 (MIXER):
+  Thread name: AudioOut_125
+  I/O handle: 293
+  TID: 29193
+  Standby: yes
+  Sample rate: 44100 Hz
+  HAL frame count: 896
+  HAL format: 0x4 (pcm8.24)
+  HAL buffer size: 7168 bytes
+  Channel count: 2
+  Channel mask: 0x00000003 (front-left, front-right)
+  Processing format: 0x4 (pcm8.24)
+  Processing frame size: 8 bytes
+  Pending config events: none
+  Output device: 0x80 (BLUETOOTH_A2DP)
+  Input device: 0 (NONE)
+  Audio source: 0 (default)
+  Normal frame count: 896
+  Last write occurred (msecs): 7386074
+  Total writes: 89853
+  Delayed writes: 0
+  Blocked in write: no
+  Suspend count: 0
+  Sink buffer : 0xf2e5cc00
+  Mixer buffer: 0xf1554000
+  Effect buffer: 0xf1674000
+  Fast track availMask=0xfe
+  Standby delay ns=3000000000
+  AudioStreamOut: 0xf3303380 flags 0 (NONE)
+  Frames written: 80508288
+  Suspended frames: 0
+  Hal stream dump:
+  Thread throttle time (msecs): 229044
+  AudioMixer tracks: 0x00000001
+  Master mono: off
+  FastMixer not initialized
+  mMasterVolume: 0(dB), mMasterMute: false, mMuteMode: 0
+  Stream volumes in dB: 0:-21, 1:-inf, 2:-inf, 3:-5.9, 4:-12, 5:-inf, 6:0, 7:-inf, 8:-inf, 9:-96, 10:0, 11:0, 12:0
+  Normal mixer raw underrun counters: partial=0 empty=0
+  1 Tracks of which 0 are active
+    Name Active Client Type      Fmt Chn mask Session fCount S F SRate  L dB  R dB    Server Main buf  Aux Buf Flags UndFrmCnt
+       0     no    760   12 00000005 00000003       0   3584 I 0 44100     0     0  00000000 0xf2e5cc00 0x0 0x000 0x00000000         0 
+  0 Effect Chains
+
+Output thread 0xf0f03500 type 2 (DUPLICATING):
+  Thread name: AudioOut_12D
+  I/O handle: 301
+  TID: 29194
+  Standby: yes
+  Sample rate: 44100 Hz
+  HAL frame count: 896
+  HAL format: 0x4 (pcm8.24)
+  HAL buffer size: 7168 bytes
+  Channel count: 2
+  Channel mask: 0x00000003 (front-left, front-right)
+  Processing format: 0x5 (pcmfloat)
+  Processing frame size: 8 bytes
+  Pending config events: none
+  Output device: 0x80 (BLUETOOTH_A2DP)
+  Input device: 0 (NONE)
+  Audio source: 0 (default)
+  Normal frame count: 896
+  Last write occurred (msecs): 33622462
+  Total writes: 0
+  Delayed writes: 0
+  Blocked in write: no
+  Suspend count: 0
+  Sink buffer : 0xf26da000
+  Mixer buffer: 0xf1fb3c00
+  Effect buffer: 0xf1674e00
+  Fast track availMask=0xfe
+  Standby delay ns=3000000000
+  AudioStreamOut: 0xf3303380 flags 0 (NONE)
+  Frames written: 0
+  Suspended frames: 0
+  Hal stream dump:
+  Thread throttle time (msecs): 0
+  AudioMixer tracks: 0x00000000
+  Master mono: off
+  FastMixer not initialized
+  mMasterVolume: 0(dB), mMasterMute: false, mMuteMode: 0
+  Stream volumes in dB: 0:-21, 1:-inf, 2:-inf, 3:0, 4:-29, 5:-inf, 6:0, 7:-inf, 8:-inf, 9:-96, 10:0, 11:0, 12:0
+  Normal mixer raw underrun counters: partial=0 empty=0
+  0 Tracks
+  0 Effect Chains
+
+USB audio module:
+  No output streams.
+
+  No input streams.
+
+Reroute submix audio module:
+ route[0] rate in=0 out=0, addr=[]
+ route[1] rate in=0 out=0, addr=[]
+ route[2] rate in=0 out=0, addr=[]
+ route[3] rate in=0 out=0, addr=[]
+ route[4] rate in=0 out=0, addr=[]
+ route[5] rate in=0 out=0, addr=[]
+ route[6] rate in=0 out=0, addr=[]
+ route[7] rate in=0 out=0, addr=[]
+ route[8] rate in=0 out=0, addr=[]
+ route[9] rate in=48000 out=48000, addr=[]
+
 
 
 ```
