@@ -956,6 +956,14 @@ IpManager.wlan0 StateMachine dump:
 ```
 # T
 # U
+
+## adb uninstall -k dest.apk
+
+```
+adb uninstall -k dest.apk     // 卸载当前 dest.apk 从手机
+
+
+```
 # V
 # W
 # X
