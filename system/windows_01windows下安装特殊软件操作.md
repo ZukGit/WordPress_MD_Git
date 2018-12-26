@@ -116,7 +116,14 @@ Windows默认终端的Color Theme改起来比较费劲，需要使用一个叫�
 ColorTool 下载地址
 https://github.com/Microsoft/console/releases
 
-CMD下执行命令:          .\colortool.exe -d solarized_dark
+CMD下执行命令:         
+ .\colortool.exe -d solarized_dark
+ .\colortool.exe -d deuteranopia
+ .\colortool.exe -d OneHalfDark
+ .\colortool.exe -d OneHalfLight       【推荐】
+ .\colortool.exe -d solarized_dark
+ .\colortool.exe -d solarized_light
+
 ```
 
 
@@ -179,7 +186,7 @@ drwxr-xr-x 1 root root  4096 Dec 22 23:54 .oh-my-zsh
 ```
 执行命令:
 1.   curl -L git.io/antigen > ~/antigen.zsh
-2.   chmod -R 755 ~/.antigen
+
 ~/antigen.zsh    如果是普通用户就在 /home/user1/antigen.sh
 ~/antigen.zsh    如果是超级用户就在 /root/antigen.sh
 
@@ -232,11 +239,23 @@ antigen bundle zsh-users/zsh-autosuggestions   #代码提示功能
 antigen bundle zsh-users/zsh-completions   #自动补全功能
 
 # 加载主题为 Fishy2   af-magic
+##zsh主题地址    https://github.com/robbyrussell/oh-my-zsh/wiki/External-themes
+##zsh主题地址    https://github.com/robbyrussell/oh-my-zsh/wiki/themes
 antigen theme robbyrussell/oh-my-zsh themes/af-magic
 antigen apply     # 保存当前设置 并进行生效设置
 
 #修改 shell的行提示符
 PS1="[zukgit的MacPro-\`pwd\`]${ret_status} %{$fg[cyan]%}%c%{$reset_color%} $(git_prompt_info)"
+
+
+3.执行语句  
+
+chmod -R 755 ~/.antigen
+chmod -R 755 ~/
+
+
+4. 重启 Ubuntu
+
 ```
 
 <img src="//../zimage/system/windows/zsh_windows/zsh20.jpg">

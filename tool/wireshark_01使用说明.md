@@ -320,6 +320,115 @@ min-val   max-val:  包含了在该长度区间内最小和最大长度的帧的
 <img src="//../zimage/tool/wireshark/wireshark_28.jpg">
 
 
+# Wireshark 列表表头Column设置
+
+##  增加Wiredhark显示表头项
+Edit 》Preference 》Appearaance 》Columns 》+ 》 dropdownSelect 下拉框
+快捷键:       Ctrl + Shift + P 
+<img src="//../zimage/tool/wireshark/wireshark_30.jpg">
+
+
+## 默认表头显示项
+
+| Number | Title  | Type  |  desc  |  Example  |
+| ------ | ------ | ------ | ------ |------ |
+| 1  | No.  | Number | 帧序列  |  1,2,3..999...N |
+| 2 |  Time | Time(format as specified) | 时间(自定义格式)   |
+| 3  | Source  | Source address  | 源地址  | 192.168.0.2 或者 14:13:20:cd:02 |
+| 4 |  Destination |  Destination address | 目的地址 | Broadcast IP地址 Mac地址 |
+| 5  | Protocol  | Protocol  | 协议类型  | ARP  EAP 802.11 TCP ... |
+| 6 | Length  | Packet length(bytes)  | 该帧字节数据大小  | 20--1554 |
+| 7 | Info  | infomation  | 该帧对应的类型描述信息  | data SN=xx FN=xx Flag=........ |
+
+<img src="//../zimage/tool/wireshark/wireshark_29.jpg">
+
+## 表头可选项列表
+| Number | Title  | Type  |  desc  |  Example  |
+| ------ | ------ | ------ | ------ |------ |
+| 1  | No.  | Number | 帧序列  |  1,2,3..999...N |
+| 2 |  Time | Time(format as specified) | 时间(自定义格式)   |
+| 3  | Source  | Source address  | 源地址  | 192.168.0.2 或者 14:13:20:cd:02 |
+| 4 |  Destination |  Destination address | 目的地址 | Broadcast IP地址 Mac地址 |
+| 5  | Protocol  | Protocol  | 协议类型  | ARP  EAP 802.11 TCP ... |
+| 6 | Length  | Packet length(bytes)  | 该帧字节数据大小  | 20--1554 |
+| 7 | Info  | infomation  | 该帧对应的类型描述信息  | data SN=xx FN=xx Flag=........ |
+| 8  |自定义名称(VLAN id)|   802.1Q VLAN id  | xx | 空  |
+| 9  |自定义名称(AbDate)#   | Absolute date, as YYYY-MM-DD, and time | 标准时间 | 2017-05-28 23:38:07.62513  |
+| 10  |自定义名称(AbDate1)#    |Absolute date, as YYYY/DOY, and time  |一年第几天格式  | 2017/148 23:38:07.62513  |
+| 11  |自定义名称(AbTime)   |Absolute time  | 只显示时间点 |  23:38:07.62513  |
+| 12  |自定义名称(Cisco VSAN)   |Cisco VSAN  | xx | 空  |
+| 13  |自定义名称(CumulativeBytes)   |Cumulative Bytes  | 字节数累计递增  | 166,565...7093    |
+| 14  |自定义名称(Custom)   |Custom  | xx | 空  |
+| 15  |自定义名称(Call)   |DCE/RPC call (cn_call_id / dg_seqnum)  | xx |  空 |
+| 16  |自定义名称(DeltaTime1)   |Delta time displayed  | 时间增量 | 0.00  0.0121 0.02434 递增  |
+| 17  |自定义名称(DeltaTime2)   |Delta time  | 同上DeltaTime |  同上DeltaTime |
+| 18  |自定义名称(DstAddr_R)   |Dest addr (resolved)  | 目的地址(解析vendor) | XiaomiEl_5a:f5:7c  |
+| 19  |自定义名称(DstAddr_U)   |Dest addr (unresolved)  |目的地址(不解析vendor)  | 28::6c:07:5a:f5:7c   |
+| 20  |自定义名称(DestPort_R)  |Dest port (resolved)  | 目的端口(解析端口) | 空 |
+| 21  |自定义名称(DestPort_U)   |Dest port (unresolved)  | 目的端口(不解析端口) | 空  |
+| 22(同4)  |自定义名称(DstAddr) | Destination address | 目的地址 | Broadcast IP地址 Mac地址 |
+| 23  |自定义名称(DestPort)   |Destination port  | xx | 空  |
+| 24  |自定义名称(ExpertInfo)   |Expert Info Severity  | xx |  Note |
+| 25  |自定义名称(FW-1)   |FW-1 monitor if/direction  | xx | 空  |
+| 26  |自定义名称(Freq)   |Frequency/Channel  | 信道频率 | 5745MHz  |
+| 27  |自定义名称(Hard_destAddr)  |Hardware dest addr  | Mac目的地址(解析Vendor) |  XiaomiEl_5a:f5:7c  |
+| 28  |自定义名称(Hard_srcAddr)   |Hardware src addr  | Mac源地址(解析Vendor) |  xx |
+| 29  |自定义名称(Hard_destAddr_R)   |Hw dest addr (resolved) | Mac目的地址(解析Vendor) | XiaomiEl_5a:f5:7c  |
+| 30  |自定义名称(Hard_destAddr_U)   |Hw dest addr (unresolved)  |Mac目的地址(未解析Vendor)  | 28::6c:07:5a:f5:7c  |
+| 31  |自定义名称(Hard_srcAddr_R)    |Hw src addr (resolved)  | Mac源地址(解析Vendor)  |  XiaomiEl_5a:f5:7c  |
+| 32  |自定义名称(Hard_srcAddr_U)    |Hw src addr (unresolved) | Mac源地址(未解析Vendor) |  28::6c:07:5a:f5:7c  |
+| 33  |自定义名称(RSSI)   |IEEE 802.11 RSSI | 信号强度  | -46dBm  |
+| 34  |自定义名称(TX_RATE)   |IEEE 802.11 TX rate | 传输速率 | 24.0  |
+| 35  |自定义名称(IP_DSCP)   |IP DSCP Value  | xx | 空  |
+| 36(同7)  |自定义名称(INFO)   | infomation  | 帧信息 | 默认项  |
+| 37  |自定义名称(Net_destAddr_R)  |Net dest addr (resolved)  | 网络目的地址(解析Vendor) | xxx  |
+| 38  |自定义名称(Net_destAddr_U)    |Net dest addr (unresolved)  |  网络目的地址(未解析Vendor) | xxx  |
+| 39  |自定义名称(Net_srcAddr_R)    |Net src addr (resolved)  | 网络源地址(解析Vendor) | xxx  |
+| 40  |自定义名称(Net_srcAddr_U)    |Net src addr (unresolved)  | 网络源地址(未解析Vendor) | xxx  |
+| 41  |自定义名称(Net_destAddr)   |Network dest addr  |  网络目的地址(解析Vendor) | xx  |
+| 42  |自定义名称(Net_srcAddr)    |Network src addr  | 网络源地址(解析Vendor) | xx  |
+| 43(同1)  |自定义名称(No.)   |Number  | 帧标识 | 1...1000 默认项  |
+| 44(同6)  |自定义名称(PacketLength字节)   |Packet length (bytes)  | xx |  xx |
+| 45(同5)  |自定义名称(Protocol)   |Protocol  | 帧协议 | 默认项  |
+| 46  |自定义名称(RelativeTime)  |Relative time  | 相对时间 | 0.1  0.2 累加时间  |
+| 47(同3)  |自定义名称(SrcAddr)   |Source address  | xx |  xx |
+| 48  |自定义名称(SrcPort)   |Source port  | 源地址端口(解析port) |  xxx |
+| 49  |自定义名称(SrcAddr_R)   |Src addr (resolved)  | 源地址(解析Vendor)  |  XiaomiEl_5a:f5:7c |
+| 50  |自定义名称(SrcAddr_U)    |Src addr (unresolved)  | 源地址(未解析Vendor)  | 28::6c:07:5a:f5:7c  |
+| 51  |自定义名称(SrcPort_R)    |Src port (resolved)  | 源地址端口(解析port)  | xxx  |
+| 52  |自定义名称(SrcPort_U)     |Src port (unresolved)  |源地址端口(未解析port)  |  xxx |
+| 53  |自定义名称(TEI)   |TEI  | xx | 空  |
+| 54  |自定义名称(UTC_DATE)  |UTC date, as YYYY-MM-DD, and time  | UTC时间 | 2017-05-28 15:38:09.6472  |
+| 55  |自定义名称(UTC_DATE2)   |UTC date, as YYYY/DOY, and time  | 年内第几天格式 | 2017/148 15:38:09.6472  |
+| 56  |自定义名称(UTC_TIME)   |UTC time  | xx | 2017-05-28  |
+| 57(同2)  |自定义名称(Time)   | Time(format as specified) | 时间(自定义格式)   |xx|
+
+<img src="//../zimage/tool/wireshark/wireshark_29.jpg">
+<img src="//../zimage/tool/wireshark/wireshark_31.jpg">
+<img src="//../zimage/tool/wireshark/wireshark_32.jpg">
+<img src="//../zimage/tool/wireshark/wireshark_33.jpg">
+<img src="//../zimage/tool/wireshark/wireshark_34.jpg">
+
+## 推荐列表序号
+```
+1.No. 编号
+2.Time 
+11.AbTime
+16.DeltaTime1
+3.Source
+50.SrcAddr_U
+19.DstAddr_U
+4.Destination
+5.Protocol 
+6.Length
+13.CumulativeBytes
+7.info
+26.Freq
+33.RSSI
+34.TX_RATE
+24.ExpertInfo
+```
+<img src="//../zimage/tool/wireshark/wireshark_35.jpg">
 
 
 
