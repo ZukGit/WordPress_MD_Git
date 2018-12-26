@@ -5390,7 +5390,266 @@ rates：分别表示过去 2s 10s 40s 的平均流量
 http://kyberdigi.cz/projects/ipinfo/
 
 ```
-##  iperf  && iperf3
+## iperf3
+### iperf3 for linux
+
+#### 安装命令
+```
+sudo add-apt-repository "ppa:patrickdk/general-lucid"
+sudo apt-get update
+sudo apt-get install iperf3
+
+手机端安装: Magic iperf
+下载地址：  https://github.com/ZukGit/SoftWare_Resource/blob/master/Android/iperf/magic_iperf.apk
+
+测试条件:  PC连接路由器通过网线，手机连接无线路由器，使得PC和手机在同一个局域网内才能正确测试
+```
+
+
+
+#### iperf3帮助手册
+```
+Desktopiperf3 -h                                                                           \
+Usage: iperf [-s|-c host] [options]
+       iperf [-h|--help] [-v|--version]
+
+Server or Client: // Server和Client都能使用的参数
+  -p, --port      #         server port to listen on/connect to     //  -p 5055    指定端口 5055 进行测试
+  -f, --format    [kmgKMG]  format to report: Kbits, Mbits, KBytes, MBytes  
+                  // 1. -f Kb   2. -f KB   3. -f Mb 【默认】    4. -f MB
+				  
+  -i, --interval  #   seconds between periodic bandwidth reports  // 报告数据的周期  默认为 1s      -i 2   // 报告周期为2秒
+                 
+  -F, --file name           xmit/recv the specified file   // 把输出保存到文件    -F ./xxx.xmit  -F ./xxx.recv
+  -A, --affinity n/n,m      set CPU affinity                 
+  -B, --bind      <host>    bind to a specific interface
+  -V, --verbose             more detailed output      -V   // 打印更多输出数据
+  -J, --json                output in JSON format      -J  // 以Json的格式作为输出
+  --logfile f               send output to a log file      // 设置 输出到一个 log文件
+  -d, --debug               emit debugging output
+  -v, --version             show version information and quit
+  -h, --help                show this message and quit
+Server specific: // 【只有 Server才能使用的参数】
+  -s, --server              run in server mode
+  -D, --daemon              run the server as a daemon
+  -I, --pidfile file        write PID file
+  -1, --one-off             handle one client connection then exit
+Client specific:  // 【只有Client端 才能使用的参数】
+  -c, --client    <host>    run in client mode, connecting to <host>  
+  -u, --udp                 use UDP rather than TCP
+  -b, --bandwidth #[KMG][/#] target bandwidth in bits/sec (0 for unlimited)
+                            (default 1 Mbit/sec for UDP, unlimited for TCP)
+                            (optional slash and packet count for burst mode)
+  -t, --time      #         time in seconds to transmit for (default 10 secs)
+  -n, --bytes     #[KMG]    number of bytes to transmit (instead of -t)
+  -k, --blockcount #[KMG]   number of blocks (packets) to transmit (instead of -t or -n)
+  -l, --len       #[KMG]    length of buffer to read or write
+                            (default 128 KB for TCP, 8 KB for UDP)
+  --cport         <port>    bind to a specific client port (TCP and UDP, default: ephemeral port)
+  -P, --parallel  #         number of parallel client streams to run
+  -R, --reverse             run in reverse mode (server sends, client receives)
+  -w, --window    #[KMG]    set window size / socket buffer size
+  -C, --congestion <algo>   set TCP congestion control algorithm (Linux and FreeBSD only)
+  -M, --set-mss   #         set TCP/SCTP maximum segment size (MTU - 40 bytes)
+  -N, --no-delay            set TCP/SCTP no delay, disabling Nagle's Algorithm
+  -4, --version4            only use IPv4
+  -6, --version6            only use IPv6
+  -S, --tos N               set the IP 'type of service'
+  -L, --flowlabel N         set the IPv6 flow label (only supported on Linux)
+  -Z, --zerocopy            use a 'zero copy' method of sending data
+  -O, --omit N              omit the first n seconds
+  -T, --title str           prefix every output line with this string
+  --get-server-output       get results from server
+  --udp-counters-64bit      use 64-bit counters in UDP test packets
+  --no-fq-socket-pacing     disable fair-queuing based socket pacing
+                            (Linux only)
+
+[KMG] indicates options that support a K/M/G suffix for kilo-, mega-, or giga-
+
+iperf3 homepage at: http://software.es.net/iperf/
+Report bugs to:     https://github.com/esnet/iperf
+
+```
+
+#### 查看PC本地网络连接路由器的IP地址
+inet 192.168.1.7
+```
+ifconfig
+eth1: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+        inet 192.168.1.7  netmask 255.255.255.0  broadcast 192.168.1.255
+        inet6 fe80::fd84:f739:9fdf:434b  prefixlen 64  scopeid 0x0<global>
+        ether 54:e1:ad:e5:34:0c  (Ethernet)
+        RX packets 0  bytes 0 (0.0 B)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 0  bytes 0 (0.0 B)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+lo: flags=73<UP,LOOPBACK,RUNNING>  mtu 1500
+        inet 127.0.0.1  netmask 255.0.0.0
+        inet6 ::1  prefixlen 128  scopeid 0x0<global>
+        loop  (Local Loopback)
+        RX packets 0  bytes 0 (0.0 B)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 0  bytes 0 (0.0 B)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+wifi3: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+        inet 192.168.137.1  netmask 255.255.255.0  broadcast 192.168.137.255
+        inet6 fe80::f0e3:425b:7c26:ed46  prefixlen 64  scopeid 0x0<global>
+        unspec 02-E1-8C-D8-25-61-00-00-00-00-00-00-00-00-00-00  (UNSPEC)
+        RX packets 0  bytes 0 (0.0 B)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 0  bytes 0 (0.0 B)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+```
+#### 上行下行速率测试_demo1
+##### 手机server端【↓】 PC client端【↑】
+```
+测试的是手机的下行速率
+```
+###### Mobile端运行Magic iperf 作为服务端server 【↓】
+```
+-s -p 5055     //  在端口5055 开启服务 magic-iperf 会显示 ip地址  info:  192.168.1.5
+
+```
+
+
+###### PC运行iperf3的客户端client 【↑】
+
+```
+iperf3 -c 192.168.1.5 -t 20 -i 1  -p 5055    // -c 上面 server端的Ip地址  -t 运行时间 -p 5055 // 指定端口5055
+
+输出结果：
+iperf3 -c 192.168.1.5 -t 20 -i 1  -p 5055
+Connecting to host 192.168.1.5, port 5055
+[  4] local 192.168.1.7 port 6453 connected to 192.168.1.5 port 5055
+iperf3: getsockopt - Protocol not available
+[ ID] Interval           Transfer     Bandwidth       Retr  Cwnd
+[  4]   0.00-1.00   sec  1.00 MBytes  8.39 Mbits/sec  1296506937   0.00 Bytes
+iperf3: getsockopt - Protocol not available
+[  4]   1.00-2.00   sec  1.38 MBytes  11.5 Mbits/sec    0   0.00 Bytes
+iperf3: getsockopt - Protocol not available
+[  4]   2.00-3.00   sec  1.00 MBytes  8.38 Mbits/sec    0   0.00 Bytes
+iperf3: getsockopt - Protocol not available
+[  4]   3.00-4.00   sec  1.50 MBytes  12.6 Mbits/sec    0   0.00 Bytes
+iperf3: getsockopt - Protocol not available
+[  4]   4.00-5.00   sec  1.25 MBytes  10.5 Mbits/sec    0   0.00 Bytes
+iperf3: getsockopt - Protocol not available
+[  4]   5.00-6.00   sec  1.62 MBytes  13.6 Mbits/sec    0   0.00 Bytes
+iperf3: getsockopt - Protocol not available
+[  4]   6.00-7.00   sec  1.25 MBytes  10.5 Mbits/sec    0   0.00 Bytes
+iperf3: getsockopt - Protocol not available
+[  4]   7.00-8.00   sec  1.50 MBytes  12.6 Mbits/sec    0   0.00 Bytes
+iperf3: getsockopt - Protocol not available
+[  4]   8.00-9.00   sec  1.12 MBytes  9.44 Mbits/sec    0   0.00 Bytes
+iperf3: getsockopt - Protocol not available
+[  4]   9.00-10.00  sec  1.38 MBytes  11.5 Mbits/sec    0   0.00 Bytes
+iperf3: getsockopt - Protocol not available
+[  4]  10.00-11.00  sec  2.00 MBytes  16.8 Mbits/sec    0   0.00 Bytes
+iperf3: getsockopt - Protocol not available
+[  4]  11.00-12.00  sec  1.50 MBytes  12.6 Mbits/sec    0   0.00 Bytes
+iperf3: getsockopt - Protocol not available
+[  4]  12.00-13.00  sec  0.00 Bytes  0.00 bits/sec    0   0.00 Bytes
+iperf3: getsockopt - Protocol not available
+[  4]  13.00-14.00  sec  0.00 Bytes  0.00 bits/sec    0   0.00 Bytes
+iperf3: getsockopt - Protocol not available
+[  4]  14.00-15.00  sec  3.38 MBytes  28.3 Mbits/sec    0   0.00 Bytes
+iperf3: getsockopt - Protocol not available
+[  4]  15.00-16.00  sec  5.50 MBytes  46.1 Mbits/sec    0   0.00 Bytes
+iperf3: getsockopt - Protocol not available
+[  4]  16.00-17.00  sec  6.25 MBytes  52.4 Mbits/sec    0   0.00 Bytes
+iperf3: getsockopt - Protocol not available
+[  4]  17.00-18.00  sec  5.12 MBytes  43.0 Mbits/sec    0   0.00 Bytes
+iperf3: getsockopt - Protocol not available
+[  4]  18.00-19.00  sec  3.25 MBytes  27.3 Mbits/sec    0   0.00 Bytes
+iperf3: getsockopt - Protocol not available
+[  4]  19.00-20.00  sec  1.75 MBytes  14.7 Mbits/sec  2998460359   0.00 Bytes
+- - - - - - - - - - - - - - - - - - - - - - - - -
+[ ID] Interval           Transfer     Bandwidth       Retr
+[  4]   0.00-20.00  sec  41.8 MBytes  17.5 Mbits/sec    0             sender
+[  4]   0.00-20.00  sec  41.7 MBytes  17.5 Mbits/sec                  receiver
+
+
+```
+
+
+
+
+##### 手机server端【↑】 PC client端【↓】
+```
+测试的是手机的上行速率
+```
+###### Mobile端运行Magic iperf 作为服务端server 【↑】
+```
+-s -p 5055     //  在端口5055 开启服务 magic-iperf 会显示 ip地址  info:  192.168.1.5
+
+```
+
+
+###### PC运行iperf3的客户端client 【↓】
+
+```
+-R 参数把数据传输反向 所以能实现 数据反向
+iperf3 -c 192.168.1.5 -t 20 -i 1  -p 5055 -R   // -c 上面 server端的Ip地址  -t 运行时间 -p 5055 // 指定端口5055
+
+```
+
+
+```
+输出结果：
+iperf3 -c 192.168.1.5 -t 20 -i
+ 1  -p 5055 -R
+Connecting to host 192.168.1.5, port 5055
+Reverse mode, remote host 192.168.1.5 is sending
+[  4] local 192.168.1.7 port 6450 connected to 192.168.1.5 port 5055
+iperf3: getsockopt - Protocol not available
+[ ID] Interval           Transfer     Bandwidth
+[  4]   0.00-1.00   sec  5.59 MBytes  46.9 Mbits/sec
+iperf3: getsockopt - Protocol not available
+[  4]   1.00-2.00   sec  5.64 MBytes  47.3 Mbits/sec
+iperf3: getsockopt - Protocol not available
+[  4]   2.00-3.00   sec  5.98 MBytes  50.1 Mbits/sec
+iperf3: getsockopt - Protocol not available
+[  4]   3.00-4.00   sec  6.33 MBytes  53.1 Mbits/sec
+iperf3: getsockopt - Protocol not available
+[  4]   4.00-5.00   sec  6.08 MBytes  51.0 Mbits/sec
+iperf3: getsockopt - Protocol not available
+[  4]   5.00-6.00   sec  6.53 MBytes  54.8 Mbits/sec
+iperf3: getsockopt - Protocol not available
+[  4]   6.00-7.00   sec  6.13 MBytes  51.4 Mbits/sec
+iperf3: getsockopt - Protocol not available
+[  4]   7.00-8.00   sec  6.25 MBytes  52.4 Mbits/sec
+iperf3: getsockopt - Protocol not available
+[  4]   8.00-9.00   sec  6.20 MBytes  52.0 Mbits/sec
+iperf3: getsockopt - Protocol not available
+[  4]   9.00-10.00  sec  6.13 MBytes  51.4 Mbits/sec
+iperf3: getsockopt - Protocol not available
+[  4]  10.00-11.00  sec  6.52 MBytes  54.7 Mbits/sec
+iperf3: getsockopt - Protocol not available
+[  4]  11.00-12.00  sec  6.02 MBytes  50.5 Mbits/sec
+iperf3: getsockopt - Protocol not available
+[  4]  12.00-13.00  sec  5.90 MBytes  49.5 Mbits/sec
+iperf3: getsockopt - Protocol not available
+[  4]  13.00-14.00  sec  6.25 MBytes  52.5 Mbits/sec
+iperf3: getsockopt - Protocol not available
+[  4]  14.00-15.00  sec  6.08 MBytes  51.0 Mbits/sec
+iperf3: getsockopt - Protocol not available
+[  4]  15.00-16.00  sec  6.05 MBytes  50.7 Mbits/sec
+iperf3: getsockopt - Protocol not available
+[  4]  16.00-17.00  sec  6.31 MBytes  52.9 Mbits/sec
+iperf3: getsockopt - Protocol not available
+[  4]  17.00-18.00  sec  5.93 MBytes  49.7 Mbits/sec
+iperf3: getsockopt - Protocol not available
+[  4]  18.00-19.00  sec  6.33 MBytes  53.1 Mbits/sec
+iperf3: getsockopt - Protocol not available
+[  4]  19.00-20.00  sec  6.32 MBytes  53.0 Mbits/sec
+- - - - - - - - - - - - - - - - - - - - - - - - -
+[ ID] Interval           Transfer     Bandwidth
+[  4]   0.00-20.00  sec   123 MBytes  51.5 Mbits/sec                  sender
+[  4]   0.00-20.00  sec   123 MBytes  51.5 Mbits/sec                  receiver
+
+
+```
 # J
 
 ## jp2a
