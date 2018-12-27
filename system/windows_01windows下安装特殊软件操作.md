@@ -260,6 +260,98 @@ chmod -R 755 ~/
 
 <img src="//../zimage/system/windows/zsh_windows/zsh20.jpg">
 
+
+## Windows子系统Ubuntu安装ADB
+
+### 对比Windows版本与Ubuntu版本
+```
+Windows CMD 下 adb 的版本  和 Ubuntu下ADB 的 版本必须保持一致  否则在Ubuntu下无法使用 ADB连接到 device
+
+Windows版本：
+C:\Users\aaa>adb version
+Android Debug Bridge version 1.0.31
+
+Ubuntu版本：
+adb version  
+Android Debug Bridge version 1.0.36
+Revision 1:7.0.0+r33-2
+
+
+```
+
+
+### 下载ADB版本
+```
+下载ADB版本必须确保 Windows 和 Ubuntu下的版本相同
+Windows ADB 下载地址: https://github.com/ZukGit/SoftWare_Resource/tree/master/Windows/ADB_Tool
+	
+ADB_1_0_26_windows	
+ADB_1_0_31_windows
+ADB_1_0_32_windows
+ADB_1_0_36_windows
+ADB_1_0_39_windows
+ADB_1_0_40_windows
+
+
+---------------------------------------
+
+Linux ADB 下载地址: https://github.com/ZukGit/SoftWare_Resource/tree/master/Linux/ADB_Tool
+
+ADB_1_0_39_linux         【1.0.39版本】
+
+
+```
+
+### 安装步骤
+#### Windows安装步骤
+```
+下载ADB 版本
+Windows ADB 下载地址: https://github.com/ZukGit/SoftWare_Resource/tree/master/Windows/ADB_Tool
+1.  我的电脑》属性》高级系统设置》环境变量》Path      【+】按钮  添加 adb.exe 的路径   
+2.   CMD 下   adb version         //  查看是否安装成功
+```
+
+#### Linux的安装步骤
+
+#####  ADB 1.0.36 for Linux
+```
+
+sudo add-apt-repository ppa:nilarimogard/webupd8
+sudo apt-get update
+sudo apt-get install android-tools-adb
+
+adb version                                                       
+Android Debug Bridge version 1.0.36
+Revision 1:7.0.0+r33-2
+
+卸载ADB
+sudo apt-get remvoe android-tools-adb
+sudo apt remvoe adb
+```
+
+
+
+
+##### ADB 1.0.39 for Linux
+```
+sudo apt-get remove android-tools-adb                    //  首先卸载安装的ADB
+sudo apt-get remove adb                                  // 完全卸载 adb
+https://github.com/ZukGit/SoftWare_Resource/tree/master/Windows/ADB_Tool      // 下载 adb 到本地(git 收藏) ADB_1_0_39_linux
+sudo cp ./adb /usr/bin/adb
+
+adb version     // 运行该命令  查看是否成功安装
+Android Debug Bridge version 1.0.39
+Version 0.0.0-4634796
+Installed as /usr/bin/adb
+
+```
+
+
+
+
+
+
+
 ## 参考文档路径
 ```
 适用于 Linux 的 Windows 子系统没有已安装的分发版。
