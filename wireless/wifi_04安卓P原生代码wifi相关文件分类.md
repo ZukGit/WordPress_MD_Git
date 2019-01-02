@@ -332,7 +332,7 @@ StateMachine 起到Common Code的作用  具体分析该类 请移步到该类�
 
 
 ```
-#### sendMessage(CMD_WIFI_TOGGLED) 方法
+#### handleMessage(CMD_WIFI_TOGGLED) 方法
 ```
 WifiController 是 wifi功能在服务端的实现类， 为 WifiServiceImpl 提供 API 调用 , 有状态机机制
 
@@ -343,58 +343,11 @@ public class WifiController extends StateMachine {
 }
 
 
-```
-
-
-```
 /frameworks/base/core/java/com/android/internal/util/StateMachine.java
-  StateMachine  [WifiController 的父类] 实现的 状态机基本方法:
-
-状态转换栈示意图
-          mP0
-         /   \
-        mP1   mS0
-       /   \
-      mS2   mS1
-     /  \    \
-    mS3  mS4  mS5  ---&gt; initial state
-
-
-public class StateMachine {
-
- private SmHandler mSmHandler;  // 状态机中处理消息的Handler  是一个extends Handler 自定义Handler
-
-    /**
-     * Enqueue a message to this state machine.
-     * Message is ignored if state machine has quit.
-     */
-    public void sendMessage(int what) {
-        // mSmHandler can be null if the state machine has quit.
-        SmHandler smh = mSmHandler;
-        if (smh == null) return;
-
-        smh.sendMessage(obtainMessage(what));
-    }
-
-
-
-    /**
-     * Enqueue a message to this state machine.
-     * Message is ignored if state machine has quit.
-     */
-    public void sendMessage(Message msg) {
-        // mSmHandler can be null if the state machine has quit.
-        SmHandler smh = mSmHandler;
-        if (smh == null) return;
-
-        smh.sendMessage(msg 【Message(CMD_WIFI_TOGGLED) ★】);
-    }
-
-
 
 
  private static class SmHandler extends Handler {
-.....  处理消息  Message(CMD_WIFI_TOGGLED) 
+.....  处理消息  handleMessage(CMD_WIFI_TOGGLED) 
 }
 
 
@@ -404,124 +357,7 @@ public class StateMachine {
 
 ```
 
-### /frameworks/base/core/java/com/android/internal/util/StateMachine.java
-#### handleMessage(Message msg) 方法
-```
-WifiController 的父类 StateMachine的 内部类SmHandler 处理Message的方法分析
 
-
-public class StateMachine {
- private static class SmHandler extends Handler {
-
-
-        /**
-         * Handle messages sent to the state machine by calling
-         * the current state's processMessage. It also handles
-         * the enter/exit calls and placing any deferred messages
-         * back onto the queue when transitioning to a new state.
-         */
-        @Override
-        public final void handleMessage(Message msg) {
-
-                if (mSm != null && msg.what != SM_INIT_CMD && msg.what != SM_QUIT_CMD) {
-                    mSm.onPreHandleMessage(msg);
-                }
-
-                if (mDbg) mSm.log("handleMessage: E msg.what=" + msg.what);  // 打印wificontroller 状态机接收到的消息
-
-                /** Save the current message */
-                mMsg = msg;
-
-                /** State that processed the message */
-                State msgProcessedState = null;
-                if (mIsConstructionCompleted || (mMsg.what == SM_QUIT_CMD)) {  
-                    /** Normal path */  // 如果 wifiControl的完成初始化标识 mIsConstructionCompleted 为true 或者消息为 SM_QUIT_CMD 停止
-                    msgProcessedState = processMsg(msg);    //【★】 把消息放入 process 函数进行处理
-                } else if (!mIsConstructionCompleted && (mMsg.what == SM_INIT_CMD) && (mMsg.obj == mSmHandlerObj)) { 
-                    /** Initial one time path. */ // 完成标识为false 待处理消息为 SM_INIT_CMD 初始化时
-                    mIsConstructionCompleted = true;
-                    invokeEnterMethods(0);
-                } else {
-                    throw new RuntimeException("StateMachine.handleMessage: "  + "The start method not called, received msg: " + msg);
-                }
-                performTransitions(msgProcessedState, msg); //【★】
-
-                // We need to check if mSm == null here as we could be quitting.
-                if (mDbg && mSm != null) mSm.log("handleMessage: X");
-
-                if (mSm != null && msg.what != SM_INIT_CMD && msg.what != SM_QUIT_CMD) {
-                    mSm.onPostHandleMessage(msg);  //【★】
-                }
-        }
-
-
-}
-}
-
-
-```
-
-#### StateMachine.SmHandler.processMsg(msg) 方法
-
-#####  processMsg分析
-```
-WifiController.StateMachine.SmHandler.processMsg(msg)
-WifiController的父类 StateMachine的 内部类SmHandler 的方法 processMsg(msg) 函数具体如下：
-
-
-   private static class SmHandler extends Handler {
-
-      /** Stack used to manage the current hierarchy of states */
-       // 在 completeConstruction() 方法完成计算 数组大小maxDepth 并初始化数组
-        private StateInfo mStateStack[];  //  填充转态信息的数组  它的大小固定 但是是通过动态计算得到的
-
-        /** Top of mStateStack */
-        private int mStateStackTopIndex = -1;  // 标记当状态栈中有多少个状态  与 top_index 一一对应
-
-
-
-       private final State processMsg(Message msg) {
-            StateInfo curStateInfo = mStateStack[mStateStackTopIndex];  // 1. 取出当前状态StateInfo数组(长度为3) 中 位于最顶层的状态
-            if (mDbg) {
-                mSm.log("processMsg: " + curStateInfo.state.getName());
-            }
-
-            if (isQuit(msg)) {  //如果处理的消息是  SM_QUIT_CMD  那么切换状态到 QuittingState 停止状态
-                transitionTo(mQuittingState);
-            } else {
-                while (!curStateInfo.state.processMessage(msg)) {  ★
- //2. 从StateInfo 取出 State 并调用 这个State的ProcessMessage 传递Message,
-// 如果状态返回false 即不处理 那么转到状态栈的一下层状态处理  最后的父类一般都是 DefaultState
-                    /**
-                     * Not processed
-                     */
-                    curStateInfo = curStateInfo.parentStateInfo;  //3. ★ 往下切换当前状态信息为父类信息 
-                    if (curStateInfo == null) {
-                        /** 如果父类StateInfo为空 那么说明状态遍历完毕 那么这个消息处理不了 跳出循环
-                         * No parents left so it's not handled
-                         */
-                        mSm.unhandledMessage(msg);
-                        break;
-                    }
-                    if (mDbg) {
-                        mSm.log("processMsg: " + curStateInfo.state.getName());  
-                    }
-                }
-            }
-
-//4. ★ 如果跳出了while循环 那么说明有消息被状态处理了,那么返回这个处理消息的状态
-            return (curStateInfo != null) ? curStateInfo.state : null;   
-        }
-
-}
-
-
-      private final boolean isQuit(Message msg) {
-            return (msg.what == SM_QUIT_CMD) && (msg.obj == mSmHandlerObj);
-        }
-
-
-```
 
 ##### StateInfo[] mStateStack 状态树以及数据的决定
 ```
@@ -783,101 +619,11 @@ performTransitions(msgProcessedState, msg);  // msgProcessedState的processMsg�
 ```
 performTransitions 函数的详细分析
 
-        private void performTransitions(State msgProcessedState, Message msg) {
-
-            State orgState = mStateStack[mStateStackTopIndex].state;  // 拿到当前状态栈最顶层的转态
-
-            State destState = mDestState;  //  需要把当前栈顶切换到的 目的状态    ▲
-            if (destState != null) {
-                while (true) {
-
-                    /**
-                     * Determine the states to exit and enter and return the
-                     * common ancestor state of the enter/exit states. Then
-                     * invoke the exit methods then the enter methods.
-                     */
-
-                    //★  查找  目的 DesState转态为栈顶  那么这个栈中 状态标识为 StateInfo.active 为 true的那个转态 ,
-                    // 如果有  说明 当前的 srcState 所形成的的栈 中  和 DesState转态为栈顶形成的栈  有 相重合的 状态栈 
-                    // 那么切换到 DesState 那么就必须先切换到 这个 CommonState 
-                    StateInfo commonStateInfo = setupTempStateStackWithStatesToEnter(destState);
-
-                    // flag is cleared in invokeEnterMethods before entering the target state
-                    mTransitionInProgress = true;
-
-                    invokeExitMethods(commonStateInfo); // 该方法表示 在当前状态栈离开  知道栈顶状态是 commonStateInfo
-                    int stateStackEnteringIndex = moveTempStateStackToStateStack();
-                    invokeEnterMethods(stateStackEnteringIndex);
-
-                    /**
-                     * Since we have transitioned to a new state we need to have
-                     * any deferred messages moved to the front of the message queue
-                     * so they will be processed before any other messages in the
-                     * message queue.
-                     */
-                    moveDeferredMessageAtFrontOfQueue();
-
-                    if (destState != mDestState) {
-                        // A new mDestState so continue looping
-                        destState = mDestState;
-                    } else {
-                        // No change in mDestState so we're done
-                        break;
-                    }
-                }
-                mDestState = null;
-            }
-
-            /**
-             * After processing all transitions check and
-             * see if the last transition was to quit or halt.
-             */
-            if (destState != null) {
-                if (destState == mQuittingState) {
-                    /**
-                     * Call onQuitting to let subclasses cleanup.
-                     */
-                    mSm.onQuitting();
-                    cleanupAfterQuitting();
-                } else if (destState == mHaltingState) {
-                    /**
-                     * Call onHalting() if we've transitioned to the halting
-                     * state. All subsequent messages will be processed in
-                     * in the halting state which invokes haltedProcessMessage(msg);
-                     */
-                    mSm.onHalting();
-                }
-            }
-        }
 
 
 ```
 ```
 
-       //★  查找  目的 DesState转态为栈顶  那么这个栈中 状态标识为 StateInfo.active 为 true的那个转态 ,
-        // 如果有  说明 当前的 srcState 所形成的的栈 中  和 DesState转态为栈顶形成的栈  有 相重合的 状态栈 
-        // 那么切换到 DesState 那么就必须先切换到 这个 CommonState 
-
-        private final StateInfo setupTempStateStackWithStatesToEnter(State destState) {
-            /**
-             * Search up the parent list of the destination state for an active
-             * state. Use a do while() loop as the destState must always be entered
-             * even if it is active. This can happen if we are exiting/entering
-             * the current state.
-             */
-            mTempStateStackCount = 0;
-            StateInfo curStateInfo = mStateInfo.get(destState);
-            do {
-                mTempStateStack[mTempStateStackCount++] = curStateInfo;
-                curStateInfo = curStateInfo.parentStateInfo;
-            } while ((curStateInfo != null) && !curStateInfo.active); ★ 这个active 标识位 很关键
-
-            if (mDbg) {
-                mSm.log("setupTempStateStackWithStatesToEnter: X mTempStateStackCount="
-                        + mTempStateStackCount + ",curStateInfo: " + curStateInfo);
-            }
-            return curStateInfo;
-        }
 
 
 
@@ -885,22 +631,7 @@ performTransitions 函数的详细分析
 
 ```
 
-invokeExitMethods  该方法表示 在当前状态栈离开  直到栈顶状态是 commonStateInfo
 
-        /**
-         * Call the exit method for each state from the top of stack
-         * up to the common ancestor state.
-         */
-        private final void invokeExitMethods(StateInfo commonStateInfo) {
-            while ((mStateStackTopIndex >= 0)
-                    && (mStateStack[mStateStackTopIndex] != commonStateInfo)) {
-                State curState = mStateStack[mStateStackTopIndex].state;
-                if (mDbg) mSm.log("invokeExitMethods: " + curState.getName());
-                curState.exit();
-                mStateStack[mStateStackTopIndex].active = false;
-                mStateStackTopIndex -= 1;
-            }
-        }
 
 ```
 
@@ -1241,6 +972,307 @@ public interface ActiveModeManager {
 ### StateMachine.java
 ```
 http://androidxref.com/9.0.0_r3/xref/frameworks/base/core/java/com/android/internal/util/StateMachine.java
+
+
+
+StateMachine  [WifiController 的父类] 实现的 状态机基本方法:
+
+状态转换栈示意图
+          mP0
+         /   \
+        mP1   mS0
+       /   \
+      mS2   mS1
+     /  \    \
+    mS3  mS4  mS5  ---&gt; initial state
+
+
+public class StateMachine {
+
+ private SmHandler mSmHandler;  // 状态机中处理消息的Handler  是一个extends Handler 自定义Handler
+
+```
+#### sendMessage() 方法
+```
+
+    /**
+     * Enqueue a message to this state machine.
+     * Message is ignored if state machine has quit.
+     */
+    public void sendMessage(int what) {
+        // mSmHandler can be null if the state machine has quit.
+        SmHandler smh = mSmHandler;
+        if (smh == null) return;
+
+        smh.sendMessage(obtainMessage(what));
+    }
+
+
+
+    /**
+     * Enqueue a message to this state machine.
+     * Message is ignored if state machine has quit.
+     */
+    public void sendMessage(Message msg) {
+        // mSmHandler can be null if the state machine has quit.
+        SmHandler smh = mSmHandler;
+        if (smh == null) return;
+
+        smh.sendMessage(msg 【Message(CMD_WIFI_TOGGLED) ★】);  // 将会执行到 SmHandler.handleMessage() 方法中
+    }
+
+
+```
+
+#### SmHandler 内部类
+```
+
+public class StateMachine {
+ private static class SmHandler extends Handler {
+
+       // 在 completeConstruction() 方法完成计算 数组大小maxDepth 并初始化数组  
+        private StateInfo mStateStack[];  //  填充转态信息的数组  它的大小固定 但是是通过动态计算得到的  /** Stack used to manage the current hierarchy of states */
+  
+        private int mStateStackTopIndex = -1;  // 标记当状态栈中有多少个状态  与 top_index 一一对应        /** Top of mStateStack */
+
+
+
+```
+#####  handleMessage() 方法
+```
+
+        /**
+         * Handle messages sent to the state machine by calling
+         * the current state's processMessage. It also handles
+         * the enter/exit calls and placing any deferred messages
+         * back onto the queue when transitioning to a new state.
+         */
+        @Override
+        public final void handleMessage(Message msg) {
+
+                if (mSm != null && msg.what != SM_INIT_CMD && msg.what != SM_QUIT_CMD) {
+                    mSm.onPreHandleMessage(msg);
+                }
+
+                if (mDbg) mSm.log("handleMessage: E msg.what=" + msg.what);  // 打印wificontroller 状态机接收到的消息
+
+                /** Save the current message */
+                mMsg = msg;
+
+                /** State that processed the message */
+                State msgProcessedState = null;
+                if (mIsConstructionCompleted || (mMsg.what == SM_QUIT_CMD)) {  
+                    /** Normal path */  // 如果 wifiControl的完成初始化标识 mIsConstructionCompleted 为true 或者消息为 SM_QUIT_CMD 停止
+                    msgProcessedState = processMsg(msg);    //【★】 把消息放入 process 函数进行处理
+                } else if (!mIsConstructionCompleted && (mMsg.what == SM_INIT_CMD) && (mMsg.obj == mSmHandlerObj)) { 
+                    /** Initial one time path. */ // 完成标识为false 待处理消息为 SM_INIT_CMD 初始化时
+                    mIsConstructionCompleted = true;
+                    invokeEnterMethods(0);
+                } else {
+                    throw new RuntimeException("StateMachine.handleMessage: "  + "The start method not called, received msg: " + msg);
+                }
+                performTransitions(msgProcessedState, msg); //【★】
+
+                // We need to check if mSm == null here as we could be quitting.
+                if (mDbg && mSm != null) mSm.log("handleMessage: X");
+
+                if (mSm != null && msg.what != SM_INIT_CMD && msg.what != SM_QUIT_CMD) {
+                    mSm.onPostHandleMessage(msg);  //【★】
+                }
+        }
+
+
+}
+
+```
+
+##### processMsg(msg) 方法
+```
+
+       private final State processMsg(Message msg) {
+            StateInfo curStateInfo = mStateStack[mStateStackTopIndex];  // 1. 取出当前状态StateInfo数组(长度为3) 中 位于最顶层的状态
+            if (mDbg) {
+                mSm.log("processMsg: " + curStateInfo.state.getName());
+            }
+
+            if (isQuit(msg)) {  //如果处理的消息是  SM_QUIT_CMD  那么切换状态到 QuittingState 停止状态
+                transitionTo(mQuittingState);
+            } else {
+                while (!curStateInfo.state.processMessage(msg)) {  ★
+ //2. 从StateInfo 取出 State 并调用 这个State的ProcessMessage 传递Message,
+// 如果状态返回false 即不处理 那么转到状态栈的一下层状态处理  最后的父类一般都是 DefaultState
+                    /**
+                     * Not processed
+                     */
+                    curStateInfo = curStateInfo.parentStateInfo;  //3. ★ 往下切换当前状态信息为父类信息 
+                    if (curStateInfo == null) {
+                        /** 如果父类StateInfo为空 那么说明状态遍历完毕 那么这个消息处理不了 跳出循环
+                         * No parents left so it's not handled
+                         */
+                        mSm.unhandledMessage(msg);
+                        break;
+                    }
+                    if (mDbg) {
+                        mSm.log("processMsg: " + curStateInfo.state.getName());  
+                    }
+                }
+            }
+
+//4. ★ 如果跳出了while循环 那么说明有消息被状态处理了,那么返回这个处理消息的状态
+            return (curStateInfo != null) ? curStateInfo.state : null;   
+        }
+
+}
+
+
+
+
+      private final boolean isQuit(Message msg) {
+            return (msg.what == SM_QUIT_CMD) && (msg.obj == mSmHandlerObj);
+        }
+
+```
+
+##### performTransitions(msgProcessedState,msg) 方法
+```
+
+        private void performTransitions(State msgProcessedState, Message msg) {
+
+            State orgState = mStateStack[mStateStackTopIndex].state;  // 拿到当前状态栈最顶层的转态
+
+            State destState = mDestState;  //  需要把当前栈顶切换到的 目的状态    ▲
+            if (destState != null) {
+                while (true) {
+
+                    /**
+                     * Determine the states to exit and enter and return the
+                     * common ancestor state of the enter/exit states. Then
+                     * invoke the exit methods then the enter methods.
+                     */
+
+                    //★  查找  目的 DesState转态为栈顶  那么这个栈中 状态标识为 StateInfo.active 为 true的那个转态 ,
+                    // 如果有  说明 当前的 srcState 所形成的的栈 中  和 DesState转态为栈顶形成的栈  有 相重合的 状态栈 
+                    // 那么切换到 DesState 那么就必须先切换到 这个 CommonState 
+                    StateInfo commonStateInfo = setupTempStateStackWithStatesToEnter(destState);
+
+                    // flag is cleared in invokeEnterMethods before entering the target state
+                    mTransitionInProgress = true;
+
+                    invokeExitMethods(commonStateInfo); // 该方法表示 在当前状态栈离开  知道栈顶状态是 commonStateInfo
+                    int stateStackEnteringIndex = moveTempStateStackToStateStack();
+                    invokeEnterMethods(stateStackEnteringIndex);
+
+                    /**
+                     * Since we have transitioned to a new state we need to have
+                     * any deferred messages moved to the front of the message queue
+                     * so they will be processed before any other messages in the
+                     * message queue.
+                     */
+                    moveDeferredMessageAtFrontOfQueue();
+
+                    if (destState != mDestState) {
+                        // A new mDestState so continue looping
+                        destState = mDestState;
+                    } else {
+                        // No change in mDestState so we're done
+                        break;
+                    }
+                }
+                mDestState = null;
+            }
+
+            /**
+             * After processing all transitions check and
+             * see if the last transition was to quit or halt.
+             */
+            if (destState != null) {
+                if (destState == mQuittingState) {
+                    /**
+                     * Call onQuitting to let subclasses cleanup.
+                     */
+                    mSm.onQuitting();
+                    cleanupAfterQuitting();
+                } else if (destState == mHaltingState) {
+                    /**
+                     * Call onHalting() if we've transitioned to the halting
+                     * state. All subsequent messages will be processed in
+                     * in the halting state which invokes haltedProcessMessage(msg);
+                     */
+                    mSm.onHalting();
+                }
+            }
+        }
+
+
+```
+##### invokeExitMethods() 方法
+```
+invokeExitMethods  该方法表示 在当前状态栈离开  直到栈顶状态是 commonStateInfo
+
+        /**
+         * Call the exit method for each state from the top of stack
+         * up to the common ancestor state.
+         */
+        private final void invokeExitMethods(StateInfo commonStateInfo) {
+            while ((mStateStackTopIndex >= 0)
+                    && (mStateStack[mStateStackTopIndex] != commonStateInfo)) {
+                State curState = mStateStack[mStateStackTopIndex].state;
+                if (mDbg) mSm.log("invokeExitMethods: " + curState.getName());
+                curState.exit();
+                mStateStack[mStateStackTopIndex].active = false;
+                mStateStackTopIndex -= 1;
+            }
+        }
+
+
+```
+
+##### setupTempStateStackWithStatesToEnter()方法
+```
+
+       //★  查找  目的 DesState转态为栈顶  那么这个栈中 状态标识为 StateInfo.active 为 true的那个转态 ,
+        // 如果有  说明 当前的 srcState 所形成的的栈 中  和 DesState转态为栈顶形成的栈  有 相重合的 状态栈 
+        // 那么切换到 DesState 那么就必须先切换到 这个 CommonState 
+
+        private final StateInfo setupTempStateStackWithStatesToEnter(State destState) {
+            /**
+             * Search up the parent list of the destination state for an active
+             * state. Use a do while() loop as the destState must always be entered
+             * even if it is active. This can happen if we are exiting/entering
+             * the current state.
+             */
+            mTempStateStackCount = 0;
+            StateInfo curStateInfo = mStateInfo.get(destState);
+            do {
+                mTempStateStack[mTempStateStackCount++] = curStateInfo;
+                curStateInfo = curStateInfo.parentStateInfo;
+            } while ((curStateInfo != null) && !curStateInfo.active); ★ 这个active 标识位 很关键
+
+            if (mDbg) {
+                mSm.log("setupTempStateStackWithStatesToEnter: X mTempStateStackCount="
+                        + mTempStateStackCount + ",curStateInfo: " + curStateInfo);
+            }
+            return curStateInfo;
+        }
+
+
+```
+
+#### StateInfo.java  内部类
+```
+http://androidxref.com/9.0.0_r3/xref/frameworks/base/core/java/com/android/internal/util/StateMachine.java#726
+
+
+        private class StateInfo {
+            State state;    /** The state */
+            StateInfo parentStateInfo;   /** The parent of this state, null if there is no parent */
+            boolean active;  /** True when the state has been entered and on the stack */
+
+            public String toString() {
+                return "state=" + state.getName() + ",active=" + active + ",parent="
+                        + ((parentStateInfo == null) ? "null" : parentStateInfo.state.getName());
+            }
+        }
 
 
 
