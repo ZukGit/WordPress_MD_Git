@@ -14,8 +14,6 @@ WARN      android.util.Log.w();
 
 ERROR     android.util.Log.e();
 
-
-
 ```
 
 ### Logcat打印最大4K的限制
@@ -100,6 +98,13 @@ android.util.Log.i("zukgit", "RuntimeException", re);
 
 ####  打印进程pid 线程tid
 ```
+
+http://androidxref.com/9.0.0_r3/xref/packages/apps/Settings/src/com/android/settings/wifi/WifiEnabler.java#197 
+WifiEnabler.java
+public boolean onSwitchToggled(boolean isChecked)
+
+
+
 java.util.Map<Thread, StackTraceElement[]> stacks = Thread.getAllStackTraces();
 java.util.Set<Thread> threadSet = stacks.keySet();
 int mProcessId = android.os.Process.myPid();
@@ -107,11 +112,11 @@ int mProcessId = android.os.Process.myPid();
 int threadNum = 1;
 for (Thread key : threadSet) {
 StackTraceElement[] stackTraceElements = stacks.get(key);
-android.util.Log.d("zukgit", "MMMMMMMM print threadName: " + key.getName() + "ProcessID:【"+mProcessId + "】  ThreadId:【"+key.getId()+ "】 indexId: 【"+ (threadNum++)+ "】 start MMMMMMMM");
+android.util.Log.d("zukgit", "MMMMMMMM print threadName:【 " + key.getName() + "】  ProcessID:【"+mProcessId + "】  ThreadId:【"+key.getId()+ "】 indexId: 【"+ (threadNum++)+ "】 start MMMMMMMM");
 for (StackTraceElement st : stackTraceElements) {
 	android.util.Log.d("zukgit", "StackTraceElement: " + st.toString());
 }
-android.util.Log.d("zukgit", "VVVVVVVVV print threadName: " + key.getName() + " end VVVVVVVVV");
+android.util.Log.d("zukgit", "VVVVVVVVV print threadName: 【" + key.getName() + "】 end VVVVVVVVV");
 }
 
 
@@ -126,7 +131,90 @@ Process 地址:  http://androidxref.com/9.0.0_r3/xref/frameworks/base/core/java/
 ##### 输出结果
 ```
 // 输出结果：
-zukgit  : MMMMMMMM print threadName: 【 main 】 ProcessID:【12192】 ThreadId:【2】 indexId: 【1】 start MMMMMMMM
+zukgit  : MMMMMMMM print threadName: Binder:6020_1ProcessID:【6020】 ThreadId:【359】 indexId: 【1】 start MMMMMMMM
+zukgit  : VVVVVVVVV print threadName: Binder:6020_1 end VVVVVVVVV
+zukgit  : MMMMMMMM print threadName: ReferenceQueueDaemonProcessID:【6020】 ThreadId:【355】 indexId: 【2】 start MMMMMMMM
+zukgit  : StackTraceElement: java.lang.Object.wait(Native Method)
+zukgit  : StackTraceElement: java.lang.Daemons$ReferenceQueueDaemon.runInternal(Daemons.java:178)
+zukgit  : StackTraceElement: java.lang.Daemons$Daemon.run(Daemons.java:103)
+zukgit  : StackTraceElement: java.lang.Thread.run(Thread.java:764)
+zukgit  : VVVVVVVVV print threadName: ReferenceQueueDaemon end VVVVVVVVV
+zukgit  : MMMMMMMM print threadName: FinalizerWatchdogDaemonProcessID:【6020】 ThreadId:【357】 indexId: 【3 】 start MMMMMMMM
+zukgit  : StackTraceElement: java.lang.Object.wait(Native Method)
+zukgit  : StackTraceElement: java.lang.Daemons$FinalizerWatchdogDaemon.sleepUntilNeeded(Daemons.java:297)
+zukgit  : StackTraceElement: java.lang.Daemons$FinalizerWatchdogDaemon.runInternal(Daemons.java:277)
+zukgit  : StackTraceElement: java.lang.Daemons$Daemon.run(Daemons.java:103)
+zukgit  : StackTraceElement: java.lang.Thread.run(Thread.java:764)
+zukgit  : VVVVVVVVV print threadName: FinalizerWatchdogDaemon end VVVVVVVVV
+zukgit  : MMMMMMMM print threadName: Binder:6020_3ProcessID:【6020】 ThreadId:【378】 indexId: 【4】 start MMMMMMMM
+zukgit  : VVVVVVVVV print threadName: Binder:6020_3 end VVVVVVVVV
+zukgit  : MMMMMMMM print threadName: AsyncTask #14ProcessID:【6020】 ThreadId:【424】 indexId: 【5】 start MMMMMMMM
+zukgit  : StackTraceElement: java.lang.Object.wait(Native Method)
+zukgit  : StackTraceElement: java.lang.Thread.parkFor$(Thread.java:2137)
+zukgit  : StackTraceElement: sun.misc.Unsafe.park(Unsafe.java:358)
+zukgit  : StackTraceElement: java.util.concurrent.locks.LockSupport.parkNanos(LockSupport.java:230)
+zukgit  : StackTraceElement: java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.awaitNanos(AbstractQueuedSynchronizer.java:2101)
+zukgit  : StackTraceElement: java.util.concurrent.LinkedBlockingQueue.poll(LinkedBlockingQueue.java:467)
+zukgit  : StackTraceElement: java.util.concurrent.ThreadPoolExecutor.getTask(ThreadPoolExecutor.java:1091)
+zukgit  : StackTraceElement: java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1152)
+zukgit  : StackTraceElement: java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:641)
+zukgit  : StackTraceElement: java.lang.Thread.run(Thread.java:764)
+zukgit  : VVVVVVVVV print threadName: AsyncTask #14 end VVVVVVVVV
+zukgit  : MMMMMMMM print threadName: queued-work-looperProcessID:【6020】 ThreadId:【377】 indexId: 【6】 start MMMMMMMM
+zukgit  : StackTraceElement: android.os.MessageQueue.nativePollOnce(Native Method)
+zukgit  : StackTraceElement: android.os.MessageQueue.next(MessageQueue.java:326)
+zukgit  : StackTraceElement: android.os.Looper.loop(Looper.java:160)
+zukgit  : StackTraceElement: android.os.HandlerThread.run(HandlerThread.java:65)
+zukgit  : VVVVVVVVV print threadName: queued-work-looper end VVVVVVVVV
+zukgit  : MMMMMMMM print threadName: RenderThreadProcessID:【6020】 ThreadId:【370】 indexId: 【7】 start MMMMMMMM
+zukgit  : VVVVVVVVV print threadName: RenderThread end VVVVVVVVV
+zukgit  : MMMMMMMM print threadName: SummaryLoaderProcessID:【6020】 ThreadId:【403】 indexId: 【8】 start MMMMMMMM
+zukgit  : StackTraceElement: android.os.MessageQueue.nativePollOnce(Native Method)
+zukgit  : StackTraceElement: android.os.MessageQueue.next(MessageQueue.java:326)
+zukgit  : StackTraceElement: android.os.Looper.loop(Looper.java:160)
+zukgit  : StackTraceElement: android.os.HandlerThread.run(HandlerThread.java:65)
+zukgit  : VVVVVVVVV print threadName: SummaryLoader end VVVVVVVVV
+zukgit  : MMMMMMMM print threadName: Binder:6020_4ProcessID:【6020】 ThreadId:【382】 indexId: 【9】 start MMMMMMMM
+zukgit  : VVVVVVVVV print threadName: Binder:6020_4 end VVVVVVVVV
+zukgit  : MMMMMMMM print threadName: AsyncTask #13ProcessID:【6020】 ThreadId:【423】 indexId: 【10】 start MMMMMMMM
+zukgit  : StackTraceElement: java.lang.Object.wait(Native Method)
+zukgit  : StackTraceElement: java.lang.Thread.parkFor$(Thread.java:2137)
+zukgit  : StackTraceElement: sun.misc.Unsafe.park(Unsafe.java:358)
+zukgit  : StackTraceElement: java.util.concurrent.locks.LockSupport.parkNanos(LockSupport.java:230)
+zukgit  : StackTraceElement: java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.awaitNanos(AbstractQueuedSynchronizer.java:2101)
+zukgit  : StackTraceElement: java.util.concurrent.LinkedBlockingQueue.poll(LinkedBlockingQueue.java:467)
+zukgit  : StackTraceElement: java.util.concurrent.ThreadPoolExecutor.getTask(ThreadPoolExecutor.java:1091)
+zukgit  : StackTraceElement: java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1152)
+zukgit  : StackTraceElement: java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:641)
+zukgit  : StackTraceElement: java.lang.Thread.run(Thread.java:764)
+zukgit  : VVVVVVVVV print threadName: AsyncTask #13 end VVVVVVVVV
+zukgit  : MMMMMMMM print threadName: SummaryLoaderProcessID:【6020】 ThreadId:【397】 indexId: 【11】 start MMMMMMMM
+zukgit  : StackTraceElement: android.os.MessageQueue.nativePollOnce(Native Method)
+zukgit  : StackTraceElement: android.os.MessageQueue.next(MessageQueue.java:326)
+zukgit  : StackTraceElement: android.os.Looper.loop(Looper.java:160)
+zukgit  : StackTraceElement: android.os.HandlerThread.run(HandlerThread.java:65)
+zukgit  : VVVVVVVVV print threadName: SummaryLoader end VVVVVVVVV
+zukgit  : MMMMMMMM print threadName: FinalizerDaemonProcessID:【6020】 ThreadId:【356】 indexId: 【12】 start MMMMMMMM
+zukgit  : StackTraceElement: java.lang.Object.wait(Native Method)
+zukgit  : StackTraceElement: java.lang.Object.wait(Object.java:422)
+zukgit  : StackTraceElement: java.lang.ref.ReferenceQueue.remove(ReferenceQueue.java:188)
+zukgit  : StackTraceElement: java.lang.ref.ReferenceQueue.remove(ReferenceQueue.java:209)
+zukgit  : StackTraceElement: java.lang.Daemons$FinalizerDaemon.runInternal(Daemons.java:232)
+zukgit  : StackTraceElement: java.lang.Daemons$Daemon.run(Daemons.java:103)
+zukgit  : StackTraceElement: java.lang.Thread.run(Thread.java:764)
+zukgit  : VVVVVVVVV print threadName: FinalizerDaemon end VVVVVVVVV
+zukgit  : MMMMMMMM print threadName: Profile SaverProcessID:【6020】 ThreadId:【361】 indexId: 【13】 start MMMMMMMM
+zukgit  : VVVVVVVVV print threadName: Profile Saver end VVVVVVVVV
+zukgit  : MMMMMMMM print threadName: SummaryLoaderProcessID:【6020】 ThreadId:【385】 indexId: 【14】 start MMMMMMMM
+zukgit  : StackTraceElement: android.os.MessageQueue.nativePollOnce(Native Method)
+zukgit  : StackTraceElement: android.os.MessageQueue.next(MessageQueue.java:326)
+zukgit  : StackTraceElement: android.os.Looper.loop(Looper.java:160)
+zukgit  : StackTraceElement: android.os.HandlerThread.run(HandlerThread.java:65)
+zukgit  : VVVVVVVVV print threadName: SummaryLoader end VVVVVVVVV
+zukgit  : MMMMMMMM print threadName: 【 main 】 ProcessID:【6020】 ThreadId:【2】 indexId: 【15】 start MMMMMMMM
+zukgit  : StackTraceElement: dalvik.system.VMStack.getThreadStackTrace(Native Method)
+zukgit  : StackTraceElement: java.lang.Thread.getStackTrace(Thread.java:1538)
+zukgit  : StackTraceElement: java.lang.Thread.getAllStackTraces(Thread.java:1588)
 zukgit  : StackTraceElement: com.android.settings.wifi.WifiEnabler.onSwitchToggled(WifiEnabler.java:244)
 zukgit  : StackTraceElement: com.android.settings.widget.SwitchBarController.onSwitchChanged(SwitchBarController.java:77)
 zukgit  : StackTraceElement: com.android.settings.widget.SwitchBar.propagateChecked(SwitchBar.java:277)
@@ -147,58 +235,47 @@ zukgit  : StackTraceElement: java.lang.reflect.Method.invoke(Native Method)
 zukgit  : StackTraceElement: com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:493)
 zukgit  : StackTraceElement: com.android.internal.os.ZygoteInit.main(ZygoteInit.java:870)
 zukgit  : VVVVVVVVV print threadName: main end VVVVVVVVV
-zukgit  : MMMMMMMM print threadName: 【 WifiTracker{96061c6} 】 ProcessID:【12192】 ThreadId:【600】 indexId: 【2】 start MMMMMMMM
+zukgit  : MMMMMMMM print threadName: Binder:6020_6ProcessID:【6020】 ThreadId:【420】 indexId: 【16】 start MMMMMMMM
+zukgit  : VVVVVVVVV print threadName: Binder:6020_6 end VVVVVVVVV
+zukgit  : MMMMMMMM print threadName: Binder:6020_2ProcessID:【6020】 ThreadId:【360】 indexId: 【17】 start MMMMMMMM
+zukgit  : VVVVVVVVV print threadName: Binder:6020_2 end VVVVVVVVV
+zukgit  : MMMMMMMM print threadName: WifiTracker{e32daa2}ProcessID:【6020】 ThreadId:【419】 indexId: 【18】 start MMMMMMMM
 zukgit  : StackTraceElement: android.os.MessageQueue.nativePollOnce(Native Method)
 zukgit  : StackTraceElement: android.os.MessageQueue.next(MessageQueue.java:326)
 zukgit  : StackTraceElement: android.os.Looper.loop(Looper.java:160)
 zukgit  : StackTraceElement: android.os.HandlerThread.run(HandlerThread.java:65)
-zukgit  : VVVVVVVVV print threadName:  WifiTracker{96061c6} end VVVVVVVVV
-zukgit  : MMMMMMMM print threadName: 【 Binder:12192_4 】 ProcessID:【12192】 ThreadId:【550】 indexId: 【3】 start MMMMMMMM
-zukgit  : VVVVVVVVV print threadName:  Binder:12192_4 end VVVVVVVVV
-zukgit  : MMMMMMMM print threadName: 【 Binder:12192_6 】 ProcessID:【12192】 ThreadId:【558】 indexId: 【4】 start MMMMMMMM
-zukgit  : VVVVVVVVV print threadName:  Binder:12192_6 end VVVVVVVVV
-zukgit  : MMMMMMMM print threadName: 【 SummaryLoader 】 ProcessID:【12192】 ThreadId:【589】 indexId: 【5】 start MMMMMMMM
+zukgit  : VVVVVVVVV print threadName: WifiTracker{e32daa2} end VVVVVVVVV
+zukgit  : MMMMMMMM print threadName: SummaryLoaderProcessID:【6020】 ThreadId:【412】 indexId: 【19】 start MMMMMMMM
 zukgit  : StackTraceElement: android.os.MessageQueue.nativePollOnce(Native Method)
 zukgit  : StackTraceElement: android.os.MessageQueue.next(MessageQueue.java:326)
 zukgit  : StackTraceElement: android.os.Looper.loop(Looper.java:160)
 zukgit  : StackTraceElement: android.os.HandlerThread.run(HandlerThread.java:65)
-zukgit  : VVVVVVVVV print threadName:  SummaryLoader end VVVVVVVVV
-zukgit  : MMMMMMMM print threadName: 【 ReferenceQueueDaemon 】 ProcessID:【12192】 ThreadId:【531】 indexId: 【6】 start MMMMMMMM
-zukgit  : StackTraceElement: java.lang.Object.wait(Native Method)
-zukgit  : StackTraceElement: java.lang.Daemons$ReferenceQueueDaemon.runInternal(Daemons.java:178)
-zukgit  : StackTraceElement: java.lang.Daemons$Daemon.run(Daemons.java:103)
-zukgit  : StackTraceElement: java.lang.Thread.run(Thread.java:764)
-zukgit  : VVVVVVVVV print threadName:  ReferenceQueueDaemon end VVVVVVVVV
-zukgit  : MMMMMMMM print threadName: 【 Signal Catcher 】 ProcessID:【12192】 ThreadId:【529】 indexId: 【7】 start MMMMMMMM
-zukgit  : VVVVVVVVV print threadName:  Signal Catcher end VVVVVVVVV
-zukgit  : MMMMMMMM print threadName: 【 HeapTaskDaemon 】 ProcessID:【12192】 ThreadId:【534】 indexId: 【8】 start MMMMMMMM
-zukgit  : VVVVVVVVV print threadName:  HeapTaskDaemon end VVVVVVVVV
-zukgit  : MMMMMMMM print threadName: 【 FinalizerDaemon 】 ProcessID:【12192】 ThreadId:【532】 indexId: 【9】 start MMMMMMMM
-zukgit  : StackTraceElement: java.lang.Object.wait(Native Method)
-zukgit  : StackTraceElement: java.lang.Object.wait(Object.java:422)
-zukgit  : StackTraceElement: java.lang.ref.ReferenceQueue.remove(ReferenceQueue.java:188)
-zukgit  : StackTraceElement: java.lang.ref.ReferenceQueue.remove(ReferenceQueue.java:209)
-zukgit  : StackTraceElement: java.lang.Daemons$FinalizerDaemon.runInternal(Daemons.java:232)
-zukgit  : StackTraceElement: java.lang.Daemons$Daemon.run(Daemons.java:103)
-zukgit  : StackTraceElement: java.lang.Thread.run(Thread.java:764)
-zukgit  : VVVVVVVVV print threadName:  FinalizerDaemon end VVVVVVVVV
-zukgit  : MMMMMMMM print threadName: 【 Binder:12192_8 】 ProcessID:【12192】 ThreadId:【593】 indexId: 【10】 start MMMMMMMM
-zukgit  : VVVVVVVVV print threadName:  Binder:12192_8 end VVVVVVVVV
-zukgit  : MMMMMMMM print threadName: 【 Jit thread pool worker thread 0 】 ProcessID:【12192】 ThreadId:【528】 indexId: 【11】 start MMMMMMMM
-zukgit  : VVVVVVVVV print threadName:  Jit thread pool worker thread 0 end VVVVVVVVV
-zukgit  : MMMMMMMM print threadName: 【 SummaryLoader 】 ProcessID:【12192】 ThreadId:【573】 indexId: 【12】 start MMMMMMMM
+zukgit  : VVVVVVVVV print threadName: SummaryLoader end VVVVVVVVV
+zukgit  : MMMMMMMM print threadName: magnifier pixel copy result handlerProcessID:【6020】 ThreadId:【402】 indexId: 【20】 start MMMMMMMM
 zukgit  : StackTraceElement: android.os.MessageQueue.nativePollOnce(Native Method)
 zukgit  : StackTraceElement: android.os.MessageQueue.next(MessageQueue.java:326)
 zukgit  : StackTraceElement: android.os.Looper.loop(Looper.java:160)
 zukgit  : StackTraceElement: android.os.HandlerThread.run(HandlerThread.java:65)
-zukgit  : VVVVVVVVV print threadName:  SummaryLoader end VVVVVVVVV
-zukgit  : MMMMMMMM print threadName: 【 Binder:12192_1 】 ProcessID:【12192】 ThreadId:【535】 indexId: 【13】 start MMMMMMMM
-zukgit  : VVVVVVVVV print threadName:  Binder:12192_1 end VVVVVVVVV
-zukgit  : MMMMMMMM print threadName: 【 RenderThread 】 ProcessID:【12192】 ThreadId:【544】 indexId: 【14】 start MMMMMMMM
-zukgit  : VVVVVVVVV print threadName:  RenderThread end VVVVVVVVV
-zukgit  : MMMMMMMM print threadName: 【 Binder:12192_2 】 ProcessID:【12192】 ThreadId:【536】 indexId: 【15】 start MMMMMMMM
-zukgit  : VVVVVVVVV print threadName:  Binder:12192_2 end VVVVVVVVV
-zukgit  : MMMMMMMM print threadName: 【 pool-1-thread-1 】 ProcessID:【12192】 ThreadId:【542】 indexId: 【16】 start MMMMMMMM
+zukgit  : VVVVVVVVV print threadName: magnifier pixel copy result handler end VVVVVVVVV
+zukgit  : MMMMMMMM print threadName: HeapTaskDaemonProcessID:【6020】 ThreadId:【358】 indexId: 【21】 start MMMMMMMM
+zukgit  : VVVVVVVVV print threadName: HeapTaskDaemon end VVVVVVVVV
+zukgit  : MMMMMMMM print threadName: Signal CatcherProcessID:【6020】 ThreadId:【353】 indexId: 【22】 start MMMMMMMM
+zukgit  : VVVVVVVVV print threadName: Signal Catcher end VVVVVVVVV
+zukgit  : MMMMMMMM print threadName: SummaryLoaderProcessID:【6020】 ThreadId:【417】 indexId: 【23】 start MMMMMMMM
+zukgit  : StackTraceElement: android.os.MessageQueue.nativePollOnce(Native Method)
+zukgit  : StackTraceElement: android.os.MessageQueue.next(MessageQueue.java:326)
+zukgit  : StackTraceElement: android.os.Looper.loop(Looper.java:160)
+zukgit  : StackTraceElement: android.os.HandlerThread.run(HandlerThread.java:65)
+zukgit  : VVVVVVVVV print threadName: SummaryLoader end VVVVVVVVV
+zukgit  : MMMMMMMM print threadName: Binder:6020_5ProcessID:【6020】 ThreadId:【390】 indexId: 【24】 start MMMMMMMM
+zukgit  : VVVVVVVVV print threadName: Binder:6020_5 end VVVVVVVVV
+zukgit  : MMMMMMMM print threadName: SummaryLoaderProcessID:【6020】 ThreadId:【414】 indexId: 【25】 start MMMMMMMM
+zukgit  : StackTraceElement: android.os.MessageQueue.nativePollOnce(Native Method)
+zukgit  : StackTraceElement: android.os.MessageQueue.next(MessageQueue.java:326)
+zukgit  : StackTraceElement: android.os.Looper.loop(Looper.java:160)
+zukgit  : StackTraceElement: android.os.HandlerThread.run(HandlerThread.java:65)
+zukgit  : VVVVVVVVV print threadName: SummaryLoader end VVVVVVVVV
+zukgit  : MMMMMMMM print threadName: pool-1-thread-1ProcessID:【6020】 ThreadId:【369】 indexId: 【26】 start MMMMMMMM
 zukgit  : StackTraceElement: java.lang.Object.wait(Native Method)
 zukgit  : StackTraceElement: java.lang.Thread.parkFor$(Thread.java:2137)
 zukgit  : StackTraceElement: sun.misc.Unsafe.park(Unsafe.java:358)
@@ -209,101 +286,51 @@ zukgit  : StackTraceElement: java.util.concurrent.ThreadPoolExecutor.getTask(Thr
 zukgit  : StackTraceElement: java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1152)
 zukgit  : StackTraceElement: java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:641)
 zukgit  : StackTraceElement: java.lang.Thread.run(Thread.java:764)
-zukgit  : VVVVVVVVV print threadName:  pool-1-thread-1 end VVVVVVVVV
-zukgit  : MMMMMMMM print threadName: 【 Binder:12192_3 】 ProcessID:【12192】 ThreadId:【546】 indexId: 【17】 start MMMMMMMM
-zukgit  : VVVVVVVVV print threadName:  Binder:12192_3 end VVVVVVVVV
-zukgit  : MMMMMMMM print threadName: 【 AsyncTask #27 】 ProcessID:【12192】 ThreadId:【597】 indexId: 【18】 start MMMMMMMM
-zukgit  : StackTraceElement: java.lang.Object.wait(Native Method)
-zukgit  : StackTraceElement: java.lang.Thread.parkFor$(Thread.java:2137)
-zukgit  : StackTraceElement: sun.misc.Unsafe.park(Unsafe.java:358)
-zukgit  : StackTraceElement: java.util.concurrent.locks.LockSupport.parkNanos(LockSupport.java:230)
-zukgit  : StackTraceElement: java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.awaitNanos(AbstractQueuedSynchronizer.java:2101)
-zukgit  : StackTraceElement: java.util.concurrent.LinkedBlockingQueue.poll(LinkedBlockingQueue.java:467)
-zukgit  : StackTraceElement: java.util.concurrent.ThreadPoolExecutor.getTask(ThreadPoolExecutor.java:1091)
-zukgit  : StackTraceElement: java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1152)
-zukgit  : StackTraceElement: java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:641)
-zukgit  : StackTraceElement: java.lang.Thread.run(Thread.java:764)
-zukgit  : VVVVVVVVV print threadName:  AsyncTask #27 end VVVVVVVVV
-zukgit  : MMMMMMMM print threadName: 【 AsyncTask #30 】 ProcessID:【12192】 ThreadId:【602】 indexId: 【19】 start MMMMMMMM
-zukgit  : StackTraceElement: java.lang.Object.wait(Native Method)
-zukgit  : StackTraceElement: java.lang.Thread.parkFor$(Thread.java:2137)
-zukgit  : StackTraceElement: sun.misc.Unsafe.park(Unsafe.java:358)
-zukgit  : StackTraceElement: java.util.concurrent.locks.LockSupport.parkNanos(LockSupport.java:230)
-zukgit  : StackTraceElement: java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.awaitNanos(AbstractQueuedSynchronizer.java:2101)
-zukgit  : StackTraceElement: java.util.concurrent.LinkedBlockingQueue.poll(LinkedBlockingQueue.java:467)
-zukgit  : StackTraceElement: java.util.concurrent.ThreadPoolExecutor.getTask(ThreadPoolExecutor.java:1091)
-zukgit  : StackTraceElement: java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1152)
-zukgit  : StackTraceElement: java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:641)
-zukgit  : StackTraceElement: java.lang.Thread.run(Thread.java:764)
-zukgit  : VVVVVVVVV print threadName:  AsyncTask #30 end VVVVVVVVV
-zukgit  : MMMMMMMM print threadName: 【 FinalizerWatchdogDaemon 】 ProcessID:【12192】 ThreadId:【533】 indexId: 【20】 start MMMMMMMM
-zukgit  : StackTraceElement: java.lang.Thread.sleep(Native Method)
-zukgit  : StackTraceElement: java.lang.Thread.sleep(Thread.java:373)
-zukgit  : StackTraceElement: java.lang.Thread.sleep(Thread.java:314)
-zukgit  : StackTraceElement: java.lang.Daemons$FinalizerWatchdogDaemon.sleepFor(Daemons.java:342)
-zukgit  : StackTraceElement: java.lang.Daemons$FinalizerWatchdogDaemon.waitForFinalization(Daemons.java:364)
-zukgit  : StackTraceElement: java.lang.Daemons$FinalizerWatchdogDaemon.runInternal(Daemons.java:281)
-zukgit  : StackTraceElement: java.lang.Daemons$Daemon.run(Daemons.java:103)
-zukgit  : StackTraceElement: java.lang.Thread.run(Thread.java:764)
-zukgit  : VVVVVVVVV print threadName:  FinalizerWatchdogDaemon end VVVVVVVVV
-zukgit  : MMMMMMMM print threadName: 【 queued-work-looper 】 ProcessID:【12192】 ThreadId:【552】 indexId: 【21】 start MMMMMMMM
+zukgit  : VVVVVVVVV print threadName: pool-1-thread-1 end VVVVVVVVV
+zukgit  : MMMMMMMM print threadName: Jit thread pool worker thread 0ProcessID:【6020】 ThreadId:【352】 indexId: 【27】 start MMMMMMMM
+zukgit  : VVVVVVVVV print threadName: Jit thread pool worker thread 0 end VVVVVVVVV
+zukgit  : MMMMMMMM print threadName: ConnectivityThreadProcessID:【6020】 ThreadId:【363】 indexId: 【28】 start MMMMMMMM
 zukgit  : StackTraceElement: android.os.MessageQueue.nativePollOnce(Native Method)
 zukgit  : StackTraceElement: android.os.MessageQueue.next(MessageQueue.java:326)
 zukgit  : StackTraceElement: android.os.Looper.loop(Looper.java:160)
 zukgit  : StackTraceElement: android.os.HandlerThread.run(HandlerThread.java:65)
-zukgit  : VVVVVVVVV print threadName:  queued-work-looper end VVVVVVVVV
-zukgit  : MMMMMMMM print threadName: 【 SummaryLoader 】 ProcessID:【12192】 ThreadId:【576】 indexId: 【22】 start MMMMMMMM
-zukgit  : StackTraceElement: android.os.MessageQueue.nativePollOnce(Native Method)
-zukgit  : StackTraceElement: android.os.MessageQueue.next(MessageQueue.java:326)
-zukgit  : StackTraceElement: android.os.Looper.loop(Looper.java:160)
-zukgit  : StackTraceElement: android.os.HandlerThread.run(HandlerThread.java:65)
-zukgit  : VVVVVVVVV print threadName:  SummaryLoader end VVVVVVVVV
-zukgit  : MMMMMMMM print threadName: 【 AsyncTask #29 】 ProcessID:【12192】 ThreadId:【601】 indexId: 【23】 start MMMMMMMM
-zukgit  : StackTraceElement: java.lang.Object.wait(Native Method)
-zukgit  : StackTraceElement: java.lang.Thread.parkFor$(Thread.java:2137)
-zukgit  : StackTraceElement: sun.misc.Unsafe.park(Unsafe.java:358)
-zukgit  : StackTraceElement: java.util.concurrent.locks.LockSupport.parkNanos(LockSupport.java:230)
-zukgit  : StackTraceElement: java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.awaitNanos(AbstractQueuedSynchronizer.java:2101)
-zukgit  : StackTraceElement: java.util.concurrent.LinkedBlockingQueue.poll(LinkedBlockingQueue.java:467)
-zukgit  : StackTraceElement: java.util.concurrent.ThreadPoolExecutor.getTask(ThreadPoolExecutor.java:1091)
-zukgit  : StackTraceElement: java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1152)
-zukgit  : StackTraceElement: java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:641)
-zukgit  : StackTraceElement: java.lang.Thread.run(Thread.java:764)
-zukgit  : VVVVVVVVV print threadName:  AsyncTask #29 end VVVVVVVVV
-zukgit  : MMMMMMMM print threadName: 【 AsyncTask #28 】 ProcessID:【12192】 ThreadId:【598】 indexId: 【24】 start MMMMMMMM
-zukgit  : StackTraceElement: java.lang.Object.wait(Native Method)
-zukgit  : StackTraceElement: java.lang.Thread.parkFor$(Thread.java:2137)
-zukgit  : StackTraceElement: sun.misc.Unsafe.park(Unsafe.java:358)
-zukgit  : StackTraceElement: java.util.concurrent.locks.LockSupport.parkNanos(LockSupport.java:230)
-zukgit  : StackTraceElement: java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.awaitNanos(AbstractQueuedSynchronizer.java:2101)
-zukgit  : StackTraceElement: java.util.concurrent.LinkedBlockingQueue.poll(LinkedBlockingQueue.java:467)
-zukgit  : StackTraceElement: java.util.concurrent.ThreadPoolExecutor.getTask(ThreadPoolExecutor.java:1091)
-zukgit  : StackTraceElement: java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1152)
-zukgit  : StackTraceElement: java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:641)
-zukgit  : StackTraceElement: java.lang.Thread.run(Thread.java:764)
-zukgit  : VVVVVVVVV print threadName:  AsyncTask #28 end VVVVVVVVV
-zukgit  : MMMMMMMM print threadName: 【 Binder:12192_5 】 ProcessID:【12192】 ThreadId:【555】 indexId: 【25】 start MMMMMMMM
-zukgit  : VVVVVVVVV print threadName:  Binder:12192_5 end VVVVVVVVV
-zukgit  : MMMMMMMM print threadName: 【 Binder:12192_7 】 ProcessID:【12192】 ThreadId:【561】 indexId: 【26】 start MMMMMMMM
-zukgit  : VVVVVVVVV print threadName:  Binder:12192_7 end VVVVVVVVV
-zukgit  : MMMMMMMM print threadName: 【 Profile Saver 】 ProcessID:【12192】 ThreadId:【537】 indexId: 【27】 start MMMMMMMM
-zukgit  : VVVVVVVVV print threadName:  Profile Saver end VVVVVVVVV
-zukgit  : MMMMMMMM print threadName: 【 SummaryLoader 】 ProcessID:【12192】 ThreadId:【551】 indexId: 【28】 start MMMMMMMM
-zukgit  : StackTraceElement: android.os.MessageQueue.nativePollOnce(Native Method)
-zukgit  : StackTraceElement: android.os.MessageQueue.next(MessageQueue.java:326)
-zukgit  : StackTraceElement: android.os.Looper.loop(Looper.java:160)
-zukgit  : StackTraceElement: android.os.HandlerThread.run(HandlerThread.java:65)
-zukgit  : VVVVVVVVV print threadName:  SummaryLoader end VVVVVVVVV
-zukgit  : MMMMMMMM print threadName: 【 ConnectivityThread 】 ProcessID:【12192】 ThreadId:【541】 indexId: 【29】 start MMMMMMMM
-zukgit  : StackTraceElement: android.os.MessageQueue.nativePollOnce(Native Method)
-zukgit  : StackTraceElement: android.os.MessageQueue.next(MessageQueue.java:326)
-zukgit  : StackTraceElement: android.os.Looper.loop(Looper.java:160)
-zukgit  : StackTraceElement: android.os.HandlerThread.run(HandlerThread.java:65)
-zukgit  : VVVVVVVVV print threadName:  ConnectivityThread end VVVVVVVVV
+zukgit  : VVVVVVVVV print threadName: ConnectivityThread end VVVVVVVVV
+```
+
+##### ps -ATM -p 6020   [进程ID]
+```
+ps -efATM -p 6020
+UID            PID   TID  PPID TCNT               STIME TTY          TIME CMD
+system        6020  6020   864   27 2018-12-28 03:32:15 ?        00:00:30 com.android.settings
+system        6020  6026   864   27 2018-12-28 03:32:15 ?        00:00:00 com.android.settings
+system        6020  6027   864   27 2018-12-28 03:32:15 ?        00:00:00 com.android.settings
+system        6020  6029   864   27 2018-12-28 03:32:15 ?        00:00:01 com.android.settings
+system        6020  6030   864   27 2018-12-28 03:32:15 ?        00:00:00 com.android.settings
+system        6020  6031   864   27 2018-12-28 03:32:15 ?        00:00:00 com.android.settings
+system        6020  6032   864   27 2018-12-28 03:32:15 ?        00:00:00 com.android.settings
+system        6020  6033   864   27 2018-12-28 03:32:15 ?        00:00:01 com.android.settings
+system        6020  6034   864   27 2018-12-28 03:32:15 ?        00:00:00 com.android.settings
+system        6020  6035   864   27 2018-12-28 03:32:15 ?        00:00:00 com.android.settings
+system        6020  6037   864   27 2018-12-28 03:32:15 ?        00:00:00 com.android.settings
+system        6020  6057   864   27 2018-12-28 03:32:16 ?        00:00:00 com.android.settings
+system        6020  6113   864   27 2018-12-28 03:32:16 ?        00:00:00 com.android.settings
+system        6020  6123   864   27 2018-12-28 03:32:16 ?        00:00:14 com.android.settings
+system        6020  7968   864   27 2018-12-28 03:32:54 ?        00:00:00 com.android.settings
+system        6020  7969   864   27 2018-12-28 03:32:54 ?        00:00:00 com.android.settings
+system        6020  8163   864   27 2018-12-28 03:33:33 ?        00:00:00 com.android.settings
+system        6020  8984   864   27 2018-12-28 03:43:53 ?        00:00:00 com.android.settings
+system        6020  9014   864   27 2018-12-28 03:43:55 ?        00:00:00 com.android.settings
+system        6020  9234   864   27 2018-12-28 03:44:12 ?        00:00:00 com.android.settings
+system        6020  9301   864   27 2018-12-28 03:44:17 ?        00:00:00 com.android.settings
+system        6020  9307   864   27 2018-12-28 03:44:18 ?        00:00:00 com.android.settings
+system        6020  9941   864   27 2018-12-28 03:44:35 ?        00:00:00 com.android.settings
+system        6020 10008   864   27 2018-12-28 03:44:36 ?        00:00:00 com.android.settings
+system        6020 10272   864   27 2018-12-28 03:44:39 ?        00:00:00 com.android.settings
+system        6020 10414   864   27 2018-12-28 03:44:40 ?        00:00:00 com.android.settings
+system        6020 10822   864   27 2018-12-28 03:44:44 ?        00:00:00 com.android.settings
 
 
 ```
-
 
 
 ### android.util.Log代码
@@ -386,7 +413,9 @@ ERROR       android.util.Slog.e();
 
 ```
 
-### android.util.Slog代码
+
+
+### android.util.Slog 代码
 ```
 地址： http://androidxref.com/9.0.0_r3/xref/frameworks/base/core/java/android/util/Slog.java
 
@@ -500,6 +529,38 @@ public final class Slog {
 
 
 ```
+
+
+###  Framework打印运行时Log
+
+```
+RuntimeException re = new RuntimeException();
+re.fillInStackTrace();
+android.util.Slog.i("zukgit", "RuntimeException", re);
+
+```
+
+
+###   Framework打印堆栈线程
+```
+java.util.Map<Thread, StackTraceElement[]> stacks = Thread.getAllStackTraces();
+java.util.Set<Thread> threadSet = stacks.keySet();
+int mProcessId = android.os.Process.myPid();
+
+int threadNum = 1;
+for (Thread key : threadSet) {
+StackTraceElement[] stackTraceElements = stacks.get(key);
+android.util.Slog.d("zukgit", "MMMMMMMM print threadName:【 " + key.getName() + "】  ProcessID:【"+mProcessId + "】  ThreadId:【"+key.getId()+ "】 indexId: 【"+ (threadNum++)+ "】 start MMMMMMMM");
+for (StackTraceElement st : stackTraceElements) {
+	android.util.Slog.d("zukgit", "StackTraceElement: " + st.toString());
+}
+android.util.Slog.d("zukgit", "VVVVVVVVV print threadName: 【" + key.getName() + "】 end VVVVVVVVV");
+}
+
+```
+
+
+
 # C(Hal Jni) 层面打印Log
 
 ```

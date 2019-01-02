@@ -1,6 +1,6 @@
 # 打开/关闭WIFI 流程
 
-#/packages/apps/Settings/[■]
+# /packages/apps/Settings/[■]
 ```
 /packages/apps/Settings/ ：设置APP提供WIFI的操作UI
 
@@ -9,29 +9,19 @@
 
 ### WifiEnable
 ```
-WifiEnable : 是设置APP调用SDK中WIFI相关接口的类，
-1.响应设置界面用户点击打开关闭WIFI事件逻辑处理
-2.调用 mWifiManager 这个SDK的API来设置WIFI开关
-
- 
-
- <com.android.settings.widget.MasterSwitchPreference  【network_and_internet.xml 中定义的MasterSwitchPreference 】
-        android:fragment="com.android.settings.wifi.WifiSettings"
-        android:key="toggle_wifi"
-        <intent
-            android:action="android.settings.WIFI_SETTINGS"
-            android:targetClass="Settings$WifiSettingsActivity"/>
-    </com.android.settings.widget.MasterSwitchPreference>
+http://androidxref.com/9.0.0_r3/xref/packages/apps/Settings/src/com/android/settings/wifi/WifiEnabler.java
 
 
 public class WifiEnabler implements SwitchWidgetController.OnSwitchChangeListener  {
 
  // 监听  android:key="toggle_wifi"   这个Preference的值的变化  然后调用 OnSwitchChangeListener接口实现方法  WifiEnabler.onSwitchToggled
 // mSwitchWidget.setListener(this【 WifiEnabler 】);
-    private final SwitchWidgetController mSwitchWidget;
+    private final SwitchWidgetController mSwitchWidget; // WIFI开关按钮
 
-      
 
+```
+#### onSwitchToggled 方法
+```
     @Override
     public boolean onSwitchToggled(boolean isChecked) {
         //Do nothing if called as a result of a state machine event
@@ -63,28 +53,62 @@ public class WifiEnabler implements SwitchWidgetController.OnSwitchChangeListene
 
 }
 
+```
+##### RuntimeLog
+```
+12-25 11:02:32.478  7446  7446 I zukgit1 : java.lang.RuntimeException
+12-25 11:02:32.478  7446  7446 I zukgit1 :      at com.android.settings.wifi.WifiEnabler.onSwitchToggled(WifiEnabler.java:239)
+12-25 11:02:32.478  7446  7446 I zukgit1 :      at com.android.settings.widget.SwitchBarController.onSwitchChanged(SwitchBarController.java:77)
+12-25 11:02:32.478  7446  7446 I zukgit1 :      at com.android.settings.widget.SwitchBar.propagateChecked(SwitchBar.java:277)
+12-25 11:02:32.478  7446  7446 I zukgit1 :      at com.android.settings.widget.SwitchBar.onCheckedChanged(SwitchBar.java:287)
+12-25 11:02:32.478  7446  7446 I zukgit1 :      at android.widget.CompoundButton.setChecked(CompoundButton.java:171)
+12-25 11:02:32.478  7446  7446 I zukgit1 :      at android.widget.Switch.setChecked(Switch.java:1083)
+12-25 11:02:32.478  7446  7446 I zukgit1 :      at com.android.settings.widget.ToggleSwitch.setChecked(ToggleSwitch.java:57)
+12-25 11:02:32.478  7446  7446 I zukgit1 :      at android.widget.Switch.toggle(Switch.java:1078)
+12-25 11:02:32.478  7446  7446 I zukgit1 :      at android.widget.CompoundButton.performClick(CompoundButton.java:132)
+12-25 11:02:32.478  7446  7446 I zukgit1 :      at android.view.View.performClickInternal(View.java:6577)
+12-25 11:02:32.478  7446  7446 I zukgit1 :      at android.view.View.access$3100(View.java:781)
+12-25 11:02:32.478  7446  7446 I zukgit1 :      at android.view.View$PerformClick.run(View.java:25912)
+12-25 11:02:32.478  7446  7446 I zukgit1 :      at android.os.Handler.handleCallback(Handler.java:873)
+12-25 11:02:32.478  7446  7446 I zukgit1 :      at android.os.Handler.dispatchMessage(Handler.java:99)
+12-25 11:02:32.478  7446  7446 I zukgit1 :      at android.os.Looper.loop(Looper.java:193)
+12-25 11:02:32.478  7446  7446 I zukgit1 :      at android.app.ActivityThread.main(ActivityThread.java:6923)
+12-25 11:02:32.478  7446  7446 I zukgit1 :      at java.lang.reflect.Method.invoke(Native Method)
+12-25 11:02:32.478  7446  7446 I zukgit1 :      at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:493)
+12-25 11:02:32.478  7446  7446 I zukgit1 :      at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:870)
+
+```
+
+####  network_and_internet.xml
+```
+WifiEnable 关联界面
+
+WifiEnable : 是设置APP调用SDK中WIFI相关接口的类，
+1.响应设置界面用户点击打开关闭WIFI事件逻辑处理
+2.调用 mWifiManager 这个SDK的API来设置WIFI开关
+
+ 
+
+ <com.android.settings.widget.MasterSwitchPreference  【network_and_internet.xml 中定义的MasterSwitchPreference 】
+        android:fragment="com.android.settings.wifi.WifiSettings"
+        android:key="toggle_wifi"
+        <intent
+            android:action="android.settings.WIFI_SETTINGS"
+            android:targetClass="Settings$WifiSettingsActivity"/>
+    </com.android.settings.widget.MasterSwitchPreference>
+
 
 
 ```
 
-### calling(dir)[■]
 
-### details(dir)[■]
-### p2p(dir)[■]
-### tether(dir)[■]
 
 
 #  /frameworks/base/wifi [■]
 ## java/android/net/wifi/  [■]
 ###   WifiManager.java
-
 ```
-WifiManager 是系统直接提供给APP的API， 运行在进程 PID=9967
-
-ps -A |grep settings
-USER           PID   PPID     VSZ     RSS    WCHAN             ADDR S   NAME
-system        9967   733      3314280 121360 SyS_epoll_wait      0  S   com.android.settings
-
+http://androidxref.com/9.0.0_r3/xref/frameworks/base/wifi/java/android/net/wifi/WifiManager.java
 
 public class WifiManager {
 
@@ -97,49 +121,17 @@ public class WifiManager {
         mLooper = looper;
         mTargetSdkVersion = context.getApplicationInfo().targetSdkVersion;
     }
-
-
-
-    public boolean setWifiEnabled(boolean enabled) {
-        try {
-            return mService.setWifiEnabled(mContext.getOpPackageName(), enabled);  【★】 // 客户端线程在此阻塞  等待 跨进程的服务端线程返回后，继续执行
-        } catch (RemoteException e) {
-            throw e.rethrowFromSystemServer();
-        }
-    }
-
-
-
 }
 
+.............
 
 
-
-```
-
-
-```
-WifiManager的构建：
+WifiManager跨进程服务的构建代码：
 
 final class SystemServiceRegistry {
 
  static {
 ......
-
-        registerService(Context.WIFI_SERVICE, WifiManager.class,
-                new CachedServiceFetcher<WifiManager>() {
-            @Override
-            public WifiManager createService(ContextImpl ctx) throws ServiceNotFoundException {
-                IBinder b = ServiceManager.getServiceOrThrow(Context.WIFI_SERVICE 【 "wifi" 】 );
-                IWifiManager service = IWifiManager.Stub.asInterface(b);
-                return new WifiManager(ctx.getOuterContext(), service, ConnectivityThread.getInstanceLooper());
-            }});
-
-......
-}
-
-
-
 
     private static final HashMap<Class<?>, String>            SYSTEM_SERVICE_NAMES = new HashMap<Class<?>, String>();
     private static final HashMap<String, ServiceFetcher<?>>   SYSTEM_SERVICE_FETCHERS =   new HashMap<String, ServiceFetcher<?>>();
@@ -155,17 +147,40 @@ final class SystemServiceRegistry {
 
 
 
+        registerService(Context.WIFI_SERVICE, WifiManager.class,
+                new CachedServiceFetcher<WifiManager>() {
+            @Override
+            public WifiManager createService(ContextImpl ctx) throws ServiceNotFoundException {
+                IBinder b = ServiceManager.getServiceOrThrow(Context.WIFI_SERVICE 【 "wifi" 】 );
+                IWifiManager service = IWifiManager.Stub.asInterface(b);
+                return new WifiManager(ctx.getOuterContext(), service, ConnectivityThread.getInstanceLooper());
+            }});
+
+......
 }
 
+```
+
+#### setWifiEnabled 方法
+```
+
+    public boolean setWifiEnabled(boolean enabled) {
+        try {
+            return mService.setWifiEnabled(mContext.getOpPackageName(), enabled);  【★】 // 客户端线程在此阻塞  等待 跨进程的服务端线程返回后，继续执行
+        } catch (RemoteException e) {
+            throw e.rethrowFromSystemServer();
+        }
+    }
 
 ```
 
 
+
+### IWifiManager.aidl 
 ```
+http://androidxref.com/9.0.0_r3/xref/frameworks/base/wifi/java/android/net/wifi/IWifiManager.aidl
+
 IWifiManager.aidl 接口 定义： 
-
-
-
 
 interface IWifiManager
 {
@@ -178,10 +193,14 @@ boolean setWifiEnabled(String packageName, boolean enable);
 当你通过aidl去访问服务端时，默认客户端会阻塞在proxy,【服务端处理完后，通知proxy返回然后继续在客户端执行】
 但是如果在 aidl 接口中方法使用 oneway进行修饰的话,那么【客户端调用oneway接口不会阻塞，并且继续执行】
 
+
+adb shell serive list | findstr   wifi     
+64  wifi: [android.met.wifi.IWifiManager]      // 查询提供系统提供的跨进程服务API (这样的服务一般都实现了aidl接口)
+
 ```
 
 
-
+#### IWifiManager.Stub 实现类 WifiServiceImpl
 ```
 IWifiManager.aidl 接口 的实现： 
 
@@ -197,10 +216,13 @@ xxxxx
   
 ### WifiServiceImpl.java  
 ```
+http://androidxref.com/9.0.0_r3/xref/frameworks/opt/net/wifi/service/java/com/android/server/wifi/WifiServiceImpl.java
+
+
 WifiServiceImpl :  运行进程  PID=617
 1. 作为 IWifiManager.aidl 接口的实现类， 运行在系统进程中  
 2. 使用命令可查看在SystemService注册的wifi服务  adb shell serive list | findstr   wifi     
-      输出:    64  wifi: [android.met.wifi.IWifiManager]
+      输出:    64  wifi: [android.met.wifi.IWifiManager]        // 该服务API的跨进程实现类
 3. 使用 ps -A | grep servicemanager  可查看  ServiceManager注册的服务 包括  WifiServiceImpl 所运行的进程
 
 ps -A | grep servicemanager
@@ -213,6 +235,12 @@ system         659     1   12332   2548 binder_thread_read  0 S vndservicemanage
 
 public class WifiServiceImpl extends IWifiManager.Stub {
 
+
+
+
+```
+#### setWifiEnabled 方法
+```
 
 
     /**
@@ -291,7 +319,20 @@ public class WifiServiceImpl extends IWifiManager.Stub {
 ```
 
 
+
 ### WifiController.java
+```
+http://androidxref.com/9.0.0_r3/xref/frameworks/opt/net/wifi/service/java/com/android/server/wifi/WifiController.java
+
+
+public class WifiController extends StateMachine {   // WifiController 状态机_1   
+
+StateMachine 起到Common Code的作用  具体分析该类 请移步到该类查看
+
+
+
+```
+#### sendMessage(CMD_WIFI_TOGGLED) 方法
 ```
 WifiController 是 wifi功能在服务端的实现类， 为 WifiServiceImpl 提供 API 调用 , 有状态机机制
 
@@ -363,6 +404,8 @@ public class StateMachine {
 
 ```
 
+### /frameworks/base/core/java/com/android/internal/util/StateMachine.java
+#### handleMessage(Message msg) 方法
 ```
 WifiController 的父类 StateMachine的 内部类SmHandler 处理Message的方法分析
 
@@ -418,7 +461,7 @@ public class StateMachine {
 
 ```
 
-#### StateMachine.SmHandler.processMsg(msg)
+#### StateMachine.SmHandler.processMsg(msg) 方法
 
 #####  processMsg分析
 ```
@@ -866,9 +909,343 @@ invokeExitMethods  该方法表示 在当前状态栈离开  直到栈顶状态�
 
 
 
+### WifiStateMachinePrime.java
+```
+http://androidxref.com/9.0.0_r3/xref/frameworks/opt/net/wifi/service/java/com/android/server/wifi/WifiStateMachinePrime.java
+
+  private ModeStateMachine mModeStateMachine ;
+
+    WifiStateMachinePrime(WifiInjector wifiInjector,
+                          Context context,
+                          Looper looper,
+                          WifiNative wifiNative,
+                          DefaultModeManager defaultModeManager,
+                          IBatteryStats batteryStats) {
+        mWifiInjector = wifiInjector;
+        mContext = context;
+        mLooper = looper;
+        mHandler = new Handler(looper);
+        mWifiNative = wifiNative;
+        mActiveModeManagers = new ArraySet();
+        mDefaultModeManager = defaultModeManager;
+        mBatteryStats = batteryStats;
+        mSelfRecovery = mWifiInjector.getSelfRecovery();
+        mWifiDiagnostics = mWifiInjector.getWifiDiagnostics();
+        mScanRequestProxy = mWifiInjector.getScanRequestProxy();
+        mModeStateMachine = new ModeStateMachine();
+        mWifiNativeStatusListener = new WifiNativeStatusListener();
+        mWifiNative.registerStatusListener(mWifiNativeStatusListener);
+    }
+
+
+```
+#### disableWifi() 
+```
+    /**
+     * Method to disable wifi in sta/client mode scenarios.
+     * This mode will stop any client/scan modes and will not perform any network scans.
+     */
+    public void disableWifi() {
+        changeMode(ModeStateMachine.CMD_DISABLE_WIFI);
+    }
+
+
+```
+
+#### disableWifi() 
+```
+
+    /**
+     * Method to switch wifi into client mode where connections to configured networks will be  attempted.
+     */
+    public void enterClientMode() {
+        changeMode(ModeStateMachine.CMD_START_CLIENT_MODE);
+    }
+
+
+```
+#### changeMode() 
+```
+    private void changeMode(int newMode) {
+        mModeStateMachine.sendMessage(newMode);
+    }
+```
+
+####  ModeStateMachine  内部类
+```
+ private class ModeStateMachine extends StateMachine {
+           addState(mClientModeActiveState);
+            addState(mScanOnlyModeActiveState);
+            addState(mWifiDisabledState);
+}
+
+
+
+```
+
+##### class ModeActiveState extends State 
+```
+
+
+```
+###### enter() 方法
+```
+           public void enter() {
+                Log.d(TAG, "Entering WifiDisabledState");
+                mDefaultModeManager.sendScanAvailableBroadcast(mContext, false);
+                mScanRequestProxy.enableScanningForHiddenNetworks(false);
+                mScanRequestProxy.clearScanResults();
+            }
+
+```
+
+##### class WifiDisabledState extends ModeActiveState
+##### class ClientModeActiveState extends ModeActiveState 
+```
+ClientListener mListener;
+WifiInjector mWifiInjector;
+ActiveModeManager mManager;
+
+```
+###### enter() 方法
+```
+            @Override
+            public void enter() {
+                Log.d(TAG, "Entering ClientModeActiveState");
+
+                mListener = new ClientListener();
+                mManager = mWifiInjector.makeClientModeManager(mListener);
+                mManager.start();
+                mActiveModeManagers.add(mManager);
+
+            }
+
+```
+##### class ScanOnlyModeActiveState extends ModeActiveState
+```
+
+
+
+```
+
+### WifiInjector.java
+```
+http://androidxref.com/9.0.0_r3/xref/frameworks/opt/net/wifi/service/java/com/android/server/wifi/WifiInjector.java
+
+
+
+```
+#### makeClientModeManager() 方法
+```
+
+public class ClientModeManager implements ActiveModeManager {
+
+    public ClientModeManager makeClientModeManager(ClientModeManager.Listener listener) {
+        return new ClientModeManager(mContext, mWifiStateMachineHandlerThread.getLooper(),
+                mWifiNative, listener, mWifiMetrics, mScanRequestProxy, mWifiStateMachine);
+    }
+
+
+```
+###  ClientModeManager.java
+```
+http://androidxref.com/9.0.0_r3/xref/frameworks/opt/net/wifi/service/java/com/android/server/wifi/ClientModeManager.java
+
+ private final ClientModeStateMachine mStateMachine;
+
+```
+
+#### start() 函数
+````
+
+    /**
+     * Start client mode.
+     */
+    public void start() {
+        mStateMachine.sendMessage(ClientModeStateMachine.CMD_START);
+    }
+
+
+````
+
+#### ClientModeStateMachine.java 内部类
+```
+    private class ClientModeStateMachine extends StateMachine {
+
+
+```
+#####  class IdleState extends State 
+#####  class StartedState extends State 
+```
+private final ScanRequestProxy mScanRequestProxy;
+private final WifiNative mWifiNative;
+```
+###### enter() 方法
+```
+           @Override
+            public void enter() {
+                Log.d(TAG, "entering StartedState");
+                mIfaceIsUp = false;
+                onUpChanged(mWifiNative.isInterfaceUp(mClientInterfaceName));
+                mScanRequestProxy.enableScanningForHiddenNetworks(true);
+            }
+
+```
+
+
+
+###### onUpChanged() 方法
+```
+
+            private void onUpChanged(boolean isUp) {
+                if (isUp == mIfaceIsUp) {
+                    return;  // no change
+                }
+                mIfaceIsUp = isUp;
+                if (isUp) {
+                    Log.d(TAG, "Wifi is ready to use for client mode");
+                    sendScanAvailableBroadcast(true);
+                    mWifiStateMachine.setOperationalMode(WifiStateMachine.CONNECT_MODE, mClientInterfaceName);
+                    updateWifiState(WifiManager.WIFI_STATE_ENABLED,
+                                    WifiManager.WIFI_STATE_ENABLING);
+                } else {
+                    if (mWifiStateMachine.isConnectedMacRandomizationEnabled()) {
+                        // Handle the error case where our underlying interface went down if we
+                        // do not have mac randomization enabled (b/72459123).
+                        return;
+                    }
+                    // if the interface goes down we should exit and go back to idle state.
+                    Log.d(TAG, "interface down!");
+                    updateWifiState(WifiManager.WIFI_STATE_UNKNOWN, WifiManager.WIFI_STATE_ENABLED);
+                    mStateMachine.sendMessage(CMD_INTERFACE_DOWN);
+                }
+            }
+
+
+```
+
+######  processMessage 方法
+```
+            @Override
+            public boolean processMessage(Message message) {
+                switch(message.what) {
+                    case CMD_START:
+                        // Already started, ignore this command.
+                        break;
+                    case CMD_INTERFACE_DOWN:
+                        Log.e(TAG, "Detected an interface down, reporting failure to SelfRecovery");
+                        mWifiStateMachine.failureDetected(SelfRecovery.REASON_STA_IFACE_DOWN);
+
+                        updateWifiState(WifiManager.WIFI_STATE_DISABLING, WifiManager.WIFI_STATE_UNKNOWN);
+                        transitionTo(mIdleState);
+                        break;
+                    case CMD_INTERFACE_STATUS_CHANGED:
+                        boolean isUp = message.arg1 == 1;
+                        onUpChanged(isUp);
+                        break;
+                    case CMD_INTERFACE_DESTROYED:
+                        Log.d(TAG, "interface destroyed - client mode stopping");
+
+                        updateWifiState(WifiManager.WIFI_STATE_DISABLING,  WifiManager.WIFI_STATE_ENABLED);
+                        mClientInterfaceName = null;
+                        transitionTo(mIdleState);
+                        break;
+                    default:
+                        return NOT_HANDLED;
+                }
+                return HANDLED;
+            }
+
+```
+
+### WifiNative.java
+```
+http://androidxref.com/9.0.0_r3/xref/frameworks/opt/net/wifi/service/java/com/android/server/wifi/WifiNative.java
+
+```
+#### isInterfaceUp()  方法
+```
+
+    /**
+     *
+     * Check if the interface is up or down.
+     *
+     * @param ifaceName Name of the interface.
+     * @return true if iface is up, false if it's down or on error.
+     */
+    public boolean isInterfaceUp(@NonNull String ifaceName) {
+        synchronized (mLock) {
+            final Iface iface = mIfaceMgr.getIface(ifaceName);
+            if (iface == null) {
+                Log.e(TAG, "Trying to get iface state on invalid iface=" + ifaceName);
+                return false;
+            }
+            InterfaceConfiguration config = null;
+            try {
+                config = mNwManagementService.getInterfaceConfig(ifaceName);
+            } catch (RemoteException e) {
+            }
+            if (config == null) {
+                return false;
+            }
+            return config.isUp();
+        }
+    }
+
+```
+
+###  ActiveModeManager.java 
+```
+http://androidxref.com/9.0.0_r3/xref/frameworks/opt/net/wifi/service/java/com/android/server/wifi/ActiveModeManager.java
+
+public interface ActiveModeManager {
+    String TAG = "ActiveModeManager";
+
+    /**
+     * Method used to start the Manager for a given Wifi operational mode.
+     */
+    void start();
+
+    /**
+     * Method used to stop the Manager for a give Wifi operational mode.
+     */
+    void stop();
+
+    /**
+     * Method to dump for logging state.
+     */
+    void dump(FileDescriptor fd, PrintWriter pw, String[] args);
+
+    /**
+     * Method that allows Mode Managers to update WifiScanner about the current state.
+     * @param context Context to use for the notification
+     * @param available boolean indicating if scanning is available
+     */
+    default void sendScanAvailableBroadcast(Context context, boolean available) {
+        Log.d(TAG, "sending scan available broadcast: " + available);
+        final Intent intent = new Intent(WifiManager.WIFI_SCAN_AVAILABLE);
+        intent.addFlags(Intent.FLAG_RECEIVER_REGISTERED_ONLY_BEFORE_BOOT);
+        if (available) {
+            intent.putExtra(WifiManager.EXTRA_SCAN_AVAILABLE, WifiManager.WIFI_STATE_ENABLED);
+        } else {
+            intent.putExtra(WifiManager.EXTRA_SCAN_AVAILABLE, WifiManager.WIFI_STATE_DISABLED);
+        }
+        context.sendStickyBroadcastAsUser(intent, UserHandle.ALL);
+    }
+
+```
 
 #  /frameworks/base/core [■]
 ## /java/android/net/[■]
+## java/com/android/internal/util/
+### StateMachine.java
+```
+http://androidxref.com/9.0.0_r3/xref/frameworks/base/core/java/com/android/internal/util/StateMachine.java
+
+
+
+```
+
 ## /java/android/hardware/display/[■]
 
 

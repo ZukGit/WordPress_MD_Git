@@ -1115,7 +1115,7 @@ ulimit -s 512   // 设置默认线程栈大小为 512   KB
 
 ```
 
-###  ps -eflATM -o UID,PID,TID,PPID,TCNT,STIME,ETIME,TIME,F,S,PRI,NI,CPU,PCPU,C,RSS,WCHAN,SZ,VSZ,LABEL,ARGS=CMD  
+###  ps -efATM -o UID,PID,TID,PPID,TCNT,STIME,ETIME,TIME,F,S,PRI,NI,CPU,PCPU,C,RSS,WCHAN,SZ,VSZ,LABEL,ARGS=CMD  
 ```
  ps -ATMl
 
@@ -1126,7 +1126,7 @@ F S   UID   PID   TID  PPID  C PRI  NI BIT     SZ WCHAN                    TTY  
 USER             PID   TID  PPID     VSZ    RSS WCHAN                          ADDR S CMD
 root              22    22     2       0      0 0                                 0 S kworker/1:0H
 
-  ps -eflATM -o UID,PID,TID,PPID,TCNT,STIME,ETIME,TIME,F,S,PRI,NI,CPU,PCPU,C,RSS,WCHAN,SZ,VSZ,LABEL,ARGS=CMD      > log.txt
+  ps -efATM -o UID,PID,TID,PPID,TCNT,STIME,ETIME,TIME,F,S,PRI,NI,CPU,PCPU,C,RSS,WCHAN,SZ,VSZ,LABEL,ARGS=CMD      > log.txt
 
  UID   PID   TID  PPID TCNT               STIME     ELAPSED     TIME F S PRI  NI CPU %CPU  C    RSS WCHAN                        SZ     VSZ LABEL                                    CMD                                                                                                                                                         
 1000  6020  6020   864   27 2018-12-28 03:32:16  4-05:05:26 00:00:28 5 S  19   0   3  0.0  0  89212 0                        843337 3373348 u:r:system_app:s0                        com.android.settings
