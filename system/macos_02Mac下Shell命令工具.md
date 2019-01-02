@@ -5502,21 +5502,64 @@ wifi3: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
         TX packets 0  bytes 0 (0.0 B)
         TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
 ```
+
 #### 上行下行速率测试_demo1
-##### 手机server端【↓】 PC client端【↑】
+
+##### PC运行iperf3的服务端 
 ```
-测试的是手机的下行速率
+.\iperf3.exe -s -i 1 -p  5364               // Windows 下  PC 端运行 Iperf3的服务端
+
+iperf3 -s -i 1 -p  5364            // Linux 下   PC 端运行 Iperf3的服务端
+
+// 输出如下
+iperf3 -s -i 1 -p  5364                                             
+-----------------------------------------------------------
+Server listening on 5364
+-----------------------------------------------------------
 ```
-###### Mobile端运行Magic iperf 作为服务端server 【↓】
+##### Mobile端运行Magic iperf 作为客户端Client 
+
+```
+192.168.0.105 是PC 服务端Service的 IPv4地址
+
+手机下行【↓】 TCP:          iperf3 -c 192.168.0.105 -t 300 -i 1  -p 5364 -R 
+手机下行【↓】 UDP:          iperf3 -c 192.168.0.105 -t 300 -i 1  -p 5364 -u  -R 
+手机上行【↑】 TCP:          iperf3 -c 192.168.0.105 -t 300 -i 1  -p 5364  
+手机上行【↑】 UDP:          iperf3 -c 192.168.0.105 -t 300 -i 1  -p 5364 -u
+
+```
+
+
+
+
+#### 上行下行速率测试_demo2
+
+##### Mobile端运行Magic iperf 作为服务端server 
 ```
 -s -p 5055     //  在端口5055 开启服务 magic-iperf 会显示 ip地址  info:  192.168.1.5
 
 ```
 
 
-###### PC运行iperf3的客户端client 【↑】
+##### PC运行iperf3的客户端client 
+```
+192.168.1.5  是Mobile服务端Service的 IPv4地址 info地址  192.168.1.5
+
+
+手机下行【↓】 TCP:          iperf3 -c 192.168.1.5 -t 300 -i 1  -p 5055 
+手机下行【↓】 UDP:          iperf3 -c 192.168.1.5 -t 300 -i 1  -p 5055 -u 
+手机上行【↑】 TCP:          iperf3 -c 192.168.1.5 -t 300 -i 1  -p 5055 -R
+手机上行【↑】 UDP:          iperf3 -c 192.168.1.5 -t 300 -i 1  -p 5055 -u -R
+
 
 ```
+
+
+
+
+###### Iperf3输出Log
+```
+
 iperf3 -c 192.168.1.5 -t 20 -i 1  -p 5055    // -c 上面 server端的Ip地址  -t 运行时间 -p 5055 // 指定端口5055
 
 输出结果：
