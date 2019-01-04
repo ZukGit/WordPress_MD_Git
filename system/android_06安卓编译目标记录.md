@@ -13,7 +13,12 @@
 ## framework.jar
 ```
 adb disable-verify & adb reboot
-adb root & adb remount & adb push ./framework.jar /system/framework/ & adb reboot
+adb root & adb remount & adb push ./framework.jar /system/framework/ &adb push ./boot.art /system/framework/arm64/ & adb push ./boot.oat /system/framework/arm64/ & adb reboot
+
+
+out/.../system/framework/arm64/目录下的boot.art和boot.oat也push进去,重启,改动的地方才会起效!
+
+
 
 http://androidxref.com/9.0.0_r3/xref/
 http://androidxref.com/9.0.0_r3/xref/frameworks/base/

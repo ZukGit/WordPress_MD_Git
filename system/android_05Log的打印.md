@@ -67,7 +67,7 @@ public class LogUtil {
 ```
 RuntimeException re = new RuntimeException();
 re.fillInStackTrace();
-android.util.Log.i("zukgit", "RuntimeException", re);
+android.util.Log.v("zukgit", "RuntimeException", re);
 
 
 //输出结果
@@ -112,11 +112,11 @@ int mProcessId = android.os.Process.myPid();
 int threadNum = 1;
 for (Thread key : threadSet) {
 StackTraceElement[] stackTraceElements = stacks.get(key);
-android.util.Log.d("zukgit", "MMMMMMMM print threadName:【 " + key.getName() + "】  ProcessID:【"+mProcessId + "】  ThreadId:【"+key.getId()+ "】 indexId: 【"+ (threadNum++)+ "】 start MMMMMMMM");
+android.util.Log.v("zukgit", "MMMMMMMM print threadName:【 " + key.getName() + "】  ProcessID:【"+mProcessId + "】  ThreadId:【"+key.getId()+ "】 indexId: 【"+ (threadNum++)+ "】 start MMMMMMMM");
 for (StackTraceElement st : stackTraceElements) {
-	android.util.Log.d("zukgit", "StackTraceElement: " + st.toString());
+	android.util.Log.v("zukgit", "StackTraceElement: " + st.toString());
 }
-android.util.Log.d("zukgit", "VVVVVVVVV print threadName: 【" + key.getName() + "】 end VVVVVVVVV");
+android.util.Log.v("zukgit", "VVVVVVVVV print threadName: 【" + key.getName() + "】 end VVVVVVVVV");
 }
 
 
@@ -538,7 +538,7 @@ public final class Slog {
 ```
 RuntimeException re = new RuntimeException();
 re.fillInStackTrace();
-android.util.Slog.i("zukgit", "RuntimeException", re);
+android.util.Slog.v("zukgit", "RuntimeException", re);
 
 ```
 
@@ -552,11 +552,11 @@ int mProcessId = android.os.Process.myPid();
 int threadNum = 1;
 for (Thread key : threadSet) {
 StackTraceElement[] stackTraceElements = stacks.get(key);
-android.util.Slog.d("zukgit", "MMMMMMMM print threadName:【 " + key.getName() + "】  ProcessID:【"+mProcessId + "】  ThreadId:【"+key.getId()+ "】 indexId: 【"+ (threadNum++)+ "】 start MMMMMMMM");
+android.util.Slog.v("zukgit", "MMMMMMMM print threadName:【 " + key.getName() + "】  ProcessID:【"+mProcessId + "】  ThreadId:【"+key.getId()+ "】 indexId: 【"+ (threadNum++)+ "】 start MMMMMMMM");
 for (StackTraceElement st : stackTraceElements) {
-	android.util.Slog.d("zukgit", "StackTraceElement: " + st.toString());
+	android.util.Slog.v("zukgit", "StackTraceElement: " + st.toString());
 }
-android.util.Slog.d("zukgit", "VVVVVVVVV print threadName: 【" + key.getName() + "】 end VVVVVVVVV");
+android.util.Slog.v("zukgit", "VVVVVVVVV print threadName: 【" + key.getName() + "】 end VVVVVVVVV");
 }
 
 ```
