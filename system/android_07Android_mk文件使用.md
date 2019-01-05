@@ -1,3 +1,247 @@
+# makefile
+
+## 安装gcc
+
+## 安装 make
+```
+Make 是一个能自动判断大型程序哪些源代码需要重新编译的编译工具，并且能够将判断结果自动调用编译器编译源代码,
+按照一定的编译依赖树关系，将编译结果整合为  可执行文件
+
+```
+
+## 软件的构造系统
+https://edu.csdn.net/course/detail/3610
+
+### 程序的存储与运行
+<img src="//../zimage/system/android/07_mk/3.jpg" />
+```
+bss段：
+　　bss段（bss segment）通常是指用来存放程序中未初始化的全局变量的一块内存区域。
+　　bss是英文 Block Started by Symbol的简称。
+　　bss段属于静态内存分配。 
+
+  
+data段：
+　　数据段（data segment）通常是指用来存放程序中已初始化的全局变量的一块内存区域。
+　　数据段属于静态内存分配。 
+
+  
+text段：
+　　代码段（code segment/text segment）通常是指用来存放程序执行代码的一块内存区域。
+　　这部分区域的大小在程序运行前就已经确定，并且内存区域通常属于只读(某些架构也允许代码段为可写，即允许修改程序)。
+　　在代码段中，也有可能包含一些只读的常数变量，例如字符串常量等。 
+
+
+堆（heap）：
+　　堆是用于存放进程运行中被动态分配的内存段，它的大小并不固定，可动态扩张或缩减。
+　　当进程调用malloc等函数分配内存时，新分配的内存就被动态添加到堆上（堆被扩张）；
+　　当利用free等函数释放内存时，被释放的内存从堆中被剔除（堆被缩减）。
+
+  
+栈(stack)：
+　　 栈又称堆栈，是用户存放程序临时创建的局部变量，
+　　也就是说我们函数括弧“{}”中定义的变量（但不包括static声明的变量，static意味着在数据段中存放变量）。
+　　除此以外，在函数被调用时，其参数也会被压入发起调用的进程栈中，并且待到调用结束后，函数的返回值也会被存放回栈中。
+　　由于栈的先进先出(FIFO)特点，所以栈特别方便用来保存/恢复调用现场。
+　　从这个意义上讲，我们可以把堆栈看成一个寄存、交换临时数据的内存区。 
+
+
+　text和data段都【在可执行文件中】（在嵌入式系统里一般是固化在镜像文件中），【由系统从可执行文件中加载】；
+
+  bss段【不在可执行文件中】，【由系统初始化】
+```
+### 程序的编译与链接
+<img src="//../zimage/system/android/07_mk/4.jpg" />
+
+### 程序文件的分类
+<img src="//../zimage/system/android/07_mk/5.jpg" />
+
+
+### 动态库与静态库
+<img src="//../zimage/system/android/07_mk/6.jpg" />
+
+## Makefile基本语法
+### Makefile文件的主要内容
+```
+1.规则
+2.变量
+3.条件执行
+4.文本 文件名 处理函数
+5.文本包含
+6. 注释
+```
+<img src="//../zimage/system/android/07_mk/7.jpg" />
+<img src="//../zimage/system/android/07_mk/8.jpg" />
+
+#### makefile示例
+```
+ifreq( $(DEBUG),"true")
+CC = gcc -g
+else
+CC = gcc
+endif
+
+all: hello               # 定义总的生成可执行模块名为  hello
+hello: lcd.o player.o        # 定义模块hello可执行文件依赖  lcd.o  player.o
+           $(CC) -o hello lcd.o player.o          ## 规则  依据 lcd.o  player.o 生成 hello的规则
+player.o:player.c        # 目标:目标依赖   # 定义 player.o 需要依赖  player.c 
+           $(CC) -o player.o -c player.c          ## 定义  使用 player.c  生成  player.o 的规则
+
+lcd.o:lcd.c                                        # 定义 lcd.o 需要依赖  lcd.c 
+           $(CC) -o lcd.o -c lcd.c                 ## 定义 使用 lcd.c  生成  lcd.o 的规则
+
+clean:
+      rm lcd.o hello player.o 
+```
+### 依赖关系树
+<img src="//../zimage/system/android/07_mk/9.jpg" />
+<img src="//../zimage/system/android/07_mk/10.jpg" />
+
+## MakeFile基本单元
+### 规则
+```
+规则基本构成:
+● 目标
+● 目标依赖
+● 命令
+
+目标 : 目标依赖
+       命令
+
+hello : lcd.o player.o     
+           $(CC) -o hello lcd.o player.o 
+```
+<img src="//../zimage/system/android/07_mk/11.jpg" />
+
+#### 目标
+<img src="//../zimage/system/android/07_mk/12.jpg" />
+
+```
+make  // 执行makefile的默认的第一个目标
+make test  test1  // 指定要执行的 makefile文件中的目标
+
+```
+#### makefile实例
+```
+./PHONY:clean
+all: test0
+all: test1
+test1:test1.o
+	gcc -o test1 test1.o
+test1.o:test1.c
+	gcc -o test1.o -c test1.c
+test0:
+	@echo "zukgit begin ~~~~~~~~~~~~~~~~~~~~~"
+	
+clean:
+	rm -fr  test1.o
+
+	
+伪目标: ./PHONY:
+---并不是真正的文件名 , 可以看着一个标签
+---无依赖.相比一般文件不会去重新生成  执行
+---伪目标 可以无条件执行
+.PHONY是一个特殊工作目标(special target) 它用来指定一个假想的工作目标,也就是说它后面的并不是一个实际文件
+例如 一般 目标都会生成一个文件  而有些操作 比如 rm 删除 并不会生成一个文件  这个时候通常把 删除之类的操作放到 伪目标 ./PHONY:clean
+
+
+```
+
+#### 目标依赖 gcc -M 自动产生依赖
+<img src="//../zimage/system/android/07_mk/13.jpg" />
+```
+gcc -M test1.c                            
+test1.o: test1.c /usr/include/stdc-predef.h /usr/include/stdio.h \
+ /usr/include/x86_64-linux-gnu/bits/libc-header-start.h \
+ /usr/include/features.h /usr/include/x86_64-linux-gnu/sys/cdefs.h \
+ /usr/include/x86_64-linux-gnu/bits/wordsize.h \
+ /usr/include/x86_64-linux-gnu/bits/long-double.h \
+ /usr/include/x86_64-linux-gnu/gnu/stubs.h \
+ /usr/include/x86_64-linux-gnu/gnu/stubs-64.h \
+ /usr/lib/gcc/x86_64-linux-gnu/7/include/stddef.h \
+ /usr/include/x86_64-linux-gnu/bits/types.h \
+ /usr/include/x86_64-linux-gnu/bits/typesizes.h \
+ /usr/include/x86_64-linux-gnu/bits/types/__FILE.h \
+ /usr/include/x86_64-linux-gnu/bits/types/FILE.h \
+ /usr/include/x86_64-linux-gnu/bits/libio.h \
+ /usr/include/x86_64-linux-gnu/bits/_G_config.h \
+ /usr/include/x86_64-linux-gnu/bits/types/__mbstate_t.h \
+ /usr/lib/gcc/x86_64-linux-gnu/7/include/stdarg.h \
+ /usr/include/x86_64-linux-gnu/bits/stdio_lim.h \
+ /usr/include/x86_64-linux-gnu/bits/sys_errlist.h
+
+
+file test1                                
+test1: ELF 64-bit LSB shared object, x86-64, version 1 (SYSV), dynamically linked, 
+interpreter /lib64/ld-linux-x86-64.so.2,
+ for GNU/Linux 3.2.0, BuildID[sha1]=0b01602b8be0deda644624879a04a1cb475e0cd4, not stripped
+
+
+```
+
+
+#### mk命令组成
+<img src="//../zimage/system/android/07_mk/14.jpg" />
+
+### mskefile变量
+```
+● 变量基础
+● 变量分类
+● 变量追加  条件赋值
+● 目标变量
+● 模式变量
+● 自动变量
+● 系统环境变量
+● 变量的传递
+
+```
+<img src="//../zimage/system/android/07_mk/15.jpg" />
+
+```
+all:test1 test0 clean
+./PHONY:clean
+N=1
+
+test1: N=2                # 目标变量
+%.o : N =3                # 模式变量
+test1:test1.o
+	gcc -o test1 test1.o
+	@echo "test1 zukgit begin ~~~~~~~~~~N=${N}~~~~~~~~~~~"
+test1.o:test1.c
+	gcc -o test1.o -c test1.c
+	@echo "test1.o zukgit begin ~~~~~~~~~~N=${N}~~~~~~~~~~~"
+test0:
+	@echo "test0 zukgit begin ~~~~~~~~~~N=${N}~~~~~~~~~~~"
+	
+clean:
+	@echo "zukgit end ~~~~~~~~~~~~~~~~~~~~~"
+	rm -fr  test1.o
+
+输出:
+test1.o zukgit begin ~~~~~~~~~~N=3                ~~~~~~~~~~~
+gcc -o test1 test1.o
+test1 zukgit begin ~~~~~~~~~~N=2                ~~~~~~~~~~~
+test0 zukgit begin ~~~~~~~~~~N=1~~~~~~~~~~~
+zukgit end ~~~~~~~~~~~~~~~~~~~~~
+rm -fr  test1.o
+
+```
+
+### mskefile函数
+```
+GNU-makefile中文手册.pdf
+深入理解软件构造系统 原理与最佳实践.pdf
+
+
+```
+```
+● 文本处理函数
+● 文件名处理函数
+
+
+
+```
+
 # android.mk 文件使用
 https://www.jianshu.com/p/aaf44b513c63
 ```
@@ -774,6 +1018,18 @@ makefile:6: xxx.d: No such file or dirctory
 ### filter
 ### subst
 ### wildcard
+```
+
+$(wildcard $(LOCAL_PATH).c)   // wildcard常用于搜索当前目录下指定 后缀名的函数  返回该目录下该后缀名的文件列表
+
+
+```
+###  addorefix 
+```
+
+$(addprefix $(OBJ_DIR)/,$(OBJ))   // addprefix 用于把变量集合统一加前缀  时常用于把相对地址 变为绝对地址
+
+```
 
 # 编译模板
 
