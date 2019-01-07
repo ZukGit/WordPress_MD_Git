@@ -15,6 +15,13 @@ alias cdgit='cd  /Users/aaa/Desktop/code_place/zzj_git/'
 
 ```
 
+## apt-get 
+```
+apt-get install gcc
+apt-get install g++
+
+```
+
 # C
 
 
