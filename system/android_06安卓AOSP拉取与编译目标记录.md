@@ -1,6 +1,65 @@
 
 
+# 拉取官方AOSP源码
 
+<img src="//../zimage/system/android/06_repo_compile/AOSP.jpg" />
+## 拉取代码命令
+```
+需要连接VPN 才能正常拉取  , 使用国内镜像还未经测试使用
+curl https://storage.googleapis.com/git-repo-downloads/repo > repo && chmod a+x ./repo     // 【1. 抓取repo到本地 并赋予权限】
+vim ~/.bashrc          // 【2. 把repo 添加到系统环境变量目录中  本例子中当前目录是 /mnt/c/Users/zhuzj5/Desktop/bin/ 】
+export PATH=$PATH:/mnt/c/Users/zhuzj5/Desktop/bin/   【~/.zshrc   ~/.bashrc】
+sudo apt install python                        // 【3.  安装 python  拉取代码过程中会使用python 】
+config --global user.email zukgit@foxmail.com    //  【4.  设置  git 配置信息】          
+config --global user.name zukgit               
+
+repo init -u https://android.googlesource.com/platform/manifest -b android-9.0.0_r21    // 【5. 开始初始化 repo 】
+repo sync                    // 【6. 开始抓取代码  注意下面的报错 注释掉 /.repo/manifests/default.xml  中分支 】
+repo --trace sync -cdf      //  输出详细拉取分支信息         用来排查哪一个git 分支拉取失败
+
+
+```
+
+## 注释报错分支
+```
+/.repo/manifests/default.xml   中注释掉以下git分支
+
+<!-- <project path="external/autotest" name="platform/external/autotest" groups="pdk-fs" /> -->
+<!-- <project path="external/kmod" name="platform/external/kmod" groups="pdk" /> -->
+<!-- <project path="external/libunwind" name="platform/external/libunwind" groups="pdk" /> -->
+<!-- <project path="frameworks/compile/slang" name="platform/frameworks/compile/slang" groups="pdk" /> -->
+<!-- <project path="libcore" name="platform/libcore" groups="pdk" /> -->
+
+原因: 这些分支存在文件命名方式有 x?x , sa:sa 这样的命名方式在Windows下的Linux子系统不允许,导致报错
+
+报错详细:
+: export GIT_DIR=/mnt/d/AOSP/.repo/projects/external/autotest.git
+: git rev-parse --verify refs/tags/android-9.0.0_r21^0 1>| 2>|
+: cd /mnt/d/AOSP/external/autotest
+: git read-tree --reset -u -v HEAD 1>| 2>|
+error: unable to create file frontend/client/src/autotest/public/Open+Sans:300.woff: Invalid argument
+error: unable to create file frontend/client/src/autotest/public/Roboto+Bold:700.woff: Invalid argument
+error: unable to create file frontend/client/src/autotest/public/Roboto+Light:300.woff: Invalid argument
+error: unable to create file frontend/client/src/autotest/public/Roboto+Medium:500.woff: Invalid argument
+error: unable to create file frontend/client/src/autotest/public/Roboto+Regular:400.woff: Invalid argument
+error: unable to create file server/site_tests/display_EdidStress/test_data/edids/weekly/SCT_272_STEELCASE_m:s_HDMI.txt: Invalid argument
+Checking out files: 100% (9195/9195), done.
+Traceback (most recent call last):
+  File "/mnt/d/AOSP/.repo/repo/main.py", line 531, in <module>
+    _Main(sys.argv[1:])
+  File "/mnt/d/AOSP/.repo/repo/main.py", line 507, in _Main
+    result = repo._Run(argv) or 0
+  File "/mnt/d/AOSP/.repo/repo/main.py", line 180, in _Run
+    result = cmd.Execute(copts, cargs)
+  File "/mnt/d/AOSP/.repo/repo/subcmds/sync.py", line 821, in Execute
+    project.Sync_LocalHalf(syncbuf, force_sync=opt.force_sync)
+  File "/mnt/d/AOSP/.repo/repo/project.py", line 1327, in Sync_LocalHalf
+    self._InitWorkTree(force_sync=force_sync)
+  File "/mnt/d/AOSP/.repo/repo/project.py", line 2486, in _InitWorkTree
+    raise GitError("cannot initialize work tree")
+error.GitError: cannot initialize work tree
+
+```
 
 
 # A

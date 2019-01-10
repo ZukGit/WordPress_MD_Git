@@ -388,3 +388,5 @@ http://mos86.com/61530.html
 
 antigen theme robbyrussell/oh-my-zsh themes/apple
 ```
+
+# windows下小代码
