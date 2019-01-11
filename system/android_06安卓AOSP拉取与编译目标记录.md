@@ -4,9 +4,9 @@
 
 <img src="//../zimage/system/android/06_repo_compile/AOSP.jpg" />
 
-## 拉取代码命令
+## Linux系统下拉取代码命令
 
-repo墙内已保存文件： 
+repo墙内已保存文件： https://raw.githubusercontent.com/ZukGit/WordPress_MD_Git/master/system/linux/repo
 ```
 需要连接VPN 才能正常拉取  , 使用国内镜像还未经测试使用
 curl https://storage.googleapis.com/git-repo-downloads/repo > repo && chmod a+x ./repo     // 【1. 抓取repo到本地 并赋予权限】
@@ -21,19 +21,67 @@ repo sync                    // 【6. 开始抓取代码  注意下面的报错 
 repo --trace sync -cdf      //  输出详细拉取分支信息         用来排查哪一个git 分支拉取失败
 
 
+
+```
+### Linux在Shell中使用代理VPN
+```
+参考资料:   https://blog.csdn.net/twx843571091/article/details/76585599
+
+
+
+
+
 ```
 
-## 注释报错分支
+## Windos子系统Linux拉取
+
+### repo下载与执行
+
 ```
-/.repo/manifests/default.xml   中注释掉以下git分支
+【0. 当前的路径是 ~/Desktop/bin  该路径已加入Path变量     vim ~/.bashrc    export PATH=$PATH:~/Desktop/bin/   】
+【1. 抓取repo到本地 并赋予权限   】          curl https://storage.googleapis.com/git-repo-downloads/repo > repo && chmod a+x ./repo     
+【2. 安装Python repo使用python语言编写】     sudo apt install python 
+【3. 设置git 用户信息】     config --global user.email zukgit@foxmail.com    &&    config --global user.name zukgit  
+【4. 在最大空间磁盘创建文件夹  AOSP 】   mkdir  AOSP    && cd  AOSP
+【4. 初始化init repo环境】            repo init -u https://android.googlesource.com/platform/manifest
+【5. 修改 .repo/manifests/default.xml  中注释掉以下git分支 (详情看 子Linux拉取失败详情) 】   
 
 <!-- <project path="external/autotest" name="platform/external/autotest" groups="pdk-fs" /> -->
 <!-- <project path="external/kmod" name="platform/external/kmod" groups="pdk" /> -->
-<!-- <project path="external/libunwind" name="platform/external/libunwind" groups="pdk" /> -->
 <!-- <project path="frameworks/compile/slang" name="platform/frameworks/compile/slang" groups="pdk" /> -->
 <!-- <project path="libcore" name="platform/libcore" groups="pdk" /> -->
 
-原因: 这些分支存在文件命名方式有 x?x , sa:sa 这样的命名方式在Windows下的Linux子系统不允许,导致报错
+【6.执行 repo  sync 开始抓取代码】
+repo sync                    // 不输出详细信息  全力拉取代码
+repo --trace sync -cdf      //  输出详细拉取分支信息         用来排查哪一个git 分支拉取失败
+
+```
+### 子Linux拉取失败详情
+```
+Windows子系统拉取代码报错：
+
+由于 WIndows子系统 Linux拉取 安卓源码过程中 ，在源码中存在一些文件命名方式在 Linux系统中能正常存在 但在Windows系统中不允许该命名方式的文件存在,所以用Windows拉取代码 会出现python报错
+
+
+/.repo/manifests/default.xml   中注释掉以下git分支
+<!-- <project path="external/autotest" name="platform/external/autotest" groups="pdk-fs" /> -->
+<!-- <project path="external/kmod" name="platform/external/kmod" groups="pdk" /> -->
+<!-- <project path="frameworks/compile/slang" name="platform/frameworks/compile/slang" groups="pdk" /> -->
+<!-- <project path="libcore" name="platform/libcore" groups="pdk" /> -->
+
+注释掉的原因：   在Windows下 不允许以 \/:*?"<>|  这9个特殊字符创建的文件 , 所以如下git分支在拉取时会报错
+./external/autotest/server/site_tests/display_EdidStress/test_data/edids/weekly/SCT_272_STEELCASE_m:s_HDMI.txt
+./external/autotest/frontend/client/src/autotest/public/Roboto+Regular:400.woff
+./external/autotest/frontend/client/src/autotest/public/Roboto+Bold:700.woff
+./external/autotest/frontend/client/src/autotest/public/Roboto+Medium:500.woff
+./external/autotest/frontend/client/src/autotest/public/Roboto+Light:300.woff
+./external/autotest/frontend/client/src/autotest/public/Open+Sans:300.woff
+./external/kmod/testsuite/rootfs-pristine/test-loaded/sys/module/btusb/drivers/usb:btusb
+./frameworks/compile/slang/tests/P_str_escape/str\\escape.rs
+./libcore/luni/src/test/resources/org/apache/harmony/tests/java/lang/test?.properties
+
+
+
 
 报错详细:
 : export GIT_DIR=/mnt/d/AOSP/.repo/projects/external/autotest.git
@@ -63,6 +111,7 @@ Traceback (most recent call last):
 error.GitError: cannot initialize work tree
 
 ```
+
 
 
 # A
