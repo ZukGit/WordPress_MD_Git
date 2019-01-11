@@ -3,7 +3,10 @@
 # 拉取官方AOSP源码
 
 <img src="//../zimage/system/android/06_repo_compile/AOSP.jpg" />
+
 ## 拉取代码命令
+
+repo墙内已保存文件： 
 ```
 需要连接VPN 才能正常拉取  , 使用国内镜像还未经测试使用
 curl https://storage.googleapis.com/git-repo-downloads/repo > repo && chmod a+x ./repo     // 【1. 抓取repo到本地 并赋予权限】
