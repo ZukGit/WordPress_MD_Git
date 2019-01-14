@@ -124,10 +124,8 @@ error.GitError: cannot initialize work tree
 ## framework.jar
 ```
 adb disable-verify & adb reboot
-adb root & adb remount & adb push ./framework.jar /system/framework/ &adb push ./boot.art /system/framework/arm64/ & adb push ./boot.oat /system/framework/arm64/ & adb reboot
+adb root && adb remount && adb push ./framework.jar  /system/framework/  && adb reboot 
 
-
-out/.../system/framework/arm64/目录下的boot.art和boot.oat也push进去,重启,改动的地方才会起效!
 
 
 
@@ -159,6 +157,38 @@ java_library {
 }
 
 ```
+
+### Framework.jar push生效方法
+
+```
+adb root && adb remount && adb push ./framework.jar  /system/framework/  && adb reboot       ##  不生效需要执行如下操作重新编译
+
+
+http://androidxref.com/9.0.0_r3/xref/build/core/dex_preopt.mk     中
+
+【1】  DEX_PREOPT_DEFAULT ?= true  改为  DEX_PREOPT_DEFAULT ?= false 
+# The default value for LOCAL_DEX_PREOPT
+DEX_PREOPT_DEFAULT ?= true
+
+**********************************
+# The default value for LOCAL_DEX_PREOPT
+DEX_PREOPT_DEFAULT ?= false
+
+
+
+【2】  在 GLOBAL_DEXPREOPT_FLAGS := 下 添加  WITH_DEXPREOPT := false
+
+GLOBAL_DEXPREOPT_FLAGS :=
+
+**********************************
+
+GLOBAL_DEXPREOPT_FLAGS :=
+WITH_DEXPREOPT := false
+
+【3】 重新全局编译， 编译出来的版本就可以push生效
+
+```
+
 
 ## framework-res.apk
 ```
@@ -241,7 +271,15 @@ LOCAL_MODULE := wifi-service
 
 ```
 
-## wpa_supplicant
+## wpa_supplicant (bin)
+```
+编译命令:                        mmm external/wpa_supplicant_8/wpa_supplicant/ 
+生成目录:                        out/target/product/xxxx/vendor/bin/hw/wpa_supplicant
+手机wpa_supplicant目录:          /vendor/bin/hw/wpa_supplicant
+
+adb root && adb remount && adb push ./wpa_supplicant  /vendor/bin/hw/  && adb reboot 
+
+```
 # X
 # Y
 # Z

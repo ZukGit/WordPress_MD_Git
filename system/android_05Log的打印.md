@@ -397,8 +397,34 @@ public final class Log {
 
 ```
 
-## Framework中
+## Framework打印Log
 
+### Framework.jar push生效方法
+```
+http://androidxref.com/9.0.0_r3/xref/build/core/dex_preopt.mk     中
+
+【1】  DEX_PREOPT_DEFAULT ?= true  改为  DEX_PREOPT_DEFAULT ?= false 
+# The default value for LOCAL_DEX_PREOPT
+DEX_PREOPT_DEFAULT ?= true
+
+**********************************
+# The default value for LOCAL_DEX_PREOPT
+DEX_PREOPT_DEFAULT ?= false
+
+
+
+【2】  在 GLOBAL_DEXPREOPT_FLAGS := 下 添加  WITH_DEXPREOPT := false
+
+GLOBAL_DEXPREOPT_FLAGS :=
+
+**********************************
+
+GLOBAL_DEXPREOPT_FLAGS :=
+WITH_DEXPREOPT := false
+
+【3】 重新全局编译， 编译出来的版本就可以push生效
+
+```
 ### 打印方法
 ```
 VERBOSE     android.util.Slog.v();
@@ -560,7 +586,174 @@ android.util.Slog.v("zukgit", "VVVVVVVVV print threadName: 【" + key.getName() 
 }
 
 ```
-#### 输出结果
+
+### framework打印Log输出结果
+```
+zukgit  : MMMMMMMM print threadName:【 Profile Saver 】ProcessID:【6020】 ThreadId:【249】 indexId: 【1】 start MMMMMMMM
+zukgit  : VVVVVVVVV print threadName: Profile Saver END VVVVVVVVV!!!!!!!!!!
+zukgit  : MMMMMMMM print threadName:【 SummaryLoader 】ProcessID:【6020】 ThreadId:【251】 indexId: 【2】 start MMMMMMMM
+zukgit  : StackTraceElement: android.os.MessageQueue.nativePollOnce(Native Method)
+zukgit  : StackTraceElement: android.os.MessageQueue.next(MessageQueue.java:326)
+zukgit  : StackTraceElement: android.os.Looper.loop(Looper.java:160)
+zukgit  : StackTraceElement: android.os.HandlerThread.run(HandlerThread.java:65)
+zukgit  : VVVVVVVVV print threadName: SummaryLoader END VVVVVVVVV!!!!!!!!!!
+zukgit  : MMMMMMMM print threadName:【 Binder:6020_4 】ProcessID:【6020】 ThreadId:【260】 indexId: 【3】 start MMMMMMMM
+zukgit  : VVVVVVVVV print threadName: Binder:6020_4 END VVVVVVVVV!!!!!!!!!!
+zukgit  : MMMMMMMM print threadName:【 AsyncTask #7 】ProcessID:【6020】 ThreadId:【271】 indexId: 【4】 start MMMMMMMM
+zukgit  : StackTraceElement: java.lang.Object.wait(Native Method)
+zukgit  : StackTraceElement: java.lang.Thread.parkFor$(Thread.java:2137)
+zukgit  : StackTraceElement: sun.misc.Unsafe.park(Unsafe.java:358)
+zukgit  : StackTraceElement: java.util.concurrent.locks.LockSupport.parkNanos(LockSupport.java:230)
+zukgit  : StackTraceElement: java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.awaitNanos(AbstractQueuedSynchronizer.java:2101)
+zukgit  : StackTraceElement: java.util.concurrent.LinkedBlockingQueue.poll(LinkedBlockingQueue.java:467)
+zukgit  : StackTraceElement: java.util.concurrent.ThreadPoolExecutor.getTask(ThreadPoolExecutor.java:1091)
+zukgit  : StackTraceElement: java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1152)
+zukgit  : StackTraceElement: java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:641)
+zukgit  : StackTraceElement: java.lang.Thread.run(Thread.java:764)
+zukgit  : VVVVVVVVV print threadName: AsyncTask #7 END VVVVVVVVV!!!!!!!!!!
+zukgit  : MMMMMMMM print threadName:【 main 】ProcessID:【6020】 ThreadId:【2】 indexId: 【5】 start MMMMMMMM
+zukgit  : StackTraceElement: dalvik.system.VMStack.getThreadStackTrace(Native Method)
+zukgit  : StackTraceElement: java.lang.Thread.getStackTrace(Thread.java:1538)
+zukgit  : StackTraceElement: java.lang.Thread.getAllStackTraces(Thread.java:1588)
+zukgit  : StackTraceElement: android.net.wifi.WifiManager.setWifiEnabled(WifiManager.java:1843)
+zukgit  : StackTraceElement: com.android.settings.wifi.WifiEnabler.onSwitchToggled(WifiEnabler.java:262)
+zukgit  : StackTraceElement: com.android.settings.widget.MasterSwitchController.onPreferenceChange(MasterSwitchController.java:68)
+zukgit  : StackTraceElement: android.support.v7.preference.Preference.callChangeListener(Preference.java:1060)
+zukgit  : StackTraceElement: com.android.settings.widget.MasterSwitchPreference$1.onClick(MasterSwitchPreference.java:75)
+zukgit  : StackTraceElement: android.view.View.performClick(View.java:6600)
+zukgit  : StackTraceElement: android.view.View.performClickInternal(View.java:6577)
+zukgit  : StackTraceElement: android.view.View.access$3100(View.java:781)
+zukgit  : StackTraceElement: android.view.View$PerformClick.run(View.java:25917)
+zukgit  : StackTraceElement: android.os.Handler.handleCallback(Handler.java:873)
+zukgit  : StackTraceElement: android.os.Handler.dispatchMessage(Handler.java:99)
+zukgit  : StackTraceElement: android.os.Looper.loop(Looper.java:193)
+zukgit  : StackTraceElement: android.app.ActivityThread.main(ActivityThread.java:6923)
+zukgit  : StackTraceElement: java.lang.reflect.Method.invoke(Native Method)
+zukgit  : StackTraceElement: com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:493)
+zukgit  : StackTraceElement: com.android.internal.os.ZygoteInit.main(ZygoteInit.java:870)
+zukgit  : VVVVVVVVV print threadName: main END VVVVVVVVV!!!!!!!!!!
+zukgit  : MMMMMMMM print threadName:【 ConnectivityThread 】ProcessID:【6020】 ThreadId:【253】 indexId: 【6】 start MMMMMMMM
+zukgit  : StackTraceElement: android.os.MessageQueue.nativePollOnce(Native Method)
+zukgit  : StackTraceElement: android.os.MessageQueue.next(MessageQueue.java:326)
+zukgit  : StackTraceElement: android.os.Looper.loop(Looper.java:160)
+zukgit  : StackTraceElement: android.os.HandlerThread.run(HandlerThread.java:65)
+zukgit  : VVVVVVVVV print threadName: ConnectivityThread END VVVVVVVVV!!!!!!!!!!
+zukgit  : MMMMMMMM print threadName:【 FinalizerDaemon 】ProcessID:【6020】 ThreadId:【244】 indexId: 【7】 start MMMMMMMM
+zukgit  : StackTraceElement: java.lang.Object.wait(Native Method)
+zukgit  : StackTraceElement: java.lang.Object.wait(Object.java:422)
+zukgit  : StackTraceElement: java.lang.ref.ReferenceQueue.remove(ReferenceQueue.java:188)
+zukgit  : StackTraceElement: java.lang.ref.ReferenceQueue.remove(ReferenceQueue.java:209)
+zukgit  : StackTraceElement: java.lang.Daemons$FinalizerDaemon.runInternal(Daemons.java:232)
+zukgit  : StackTraceElement: java.lang.Daemons$Daemon.run(Daemons.java:103)
+zukgit  : StackTraceElement: java.lang.Thread.run(Thread.java:764)
+zukgit  : VVVVVVVVV print threadName: FinalizerDaemon END VVVVVVVVV!!!!!!!!!!
+zukgit  : MMMMMMMM print threadName:【 Binder:6020_3 】ProcessID:【6020】 ThreadId:【259】 indexId: 【8】 start MMMMMMMM
+zukgit  : VVVVVVVVV print threadName: Binder:6020_3 END VVVVVVVVV!!!!!!!!!!
+zukgit  : MMMMMMMM print threadName:【 ReferenceQueueDaemon 】ProcessID:【6020】 ThreadId:【243】 indexId: 【9】 start MMMMMMMM
+zukgit  : StackTraceElement: java.lang.Object.wait(Native Method)
+zukgit  : StackTraceElement: java.lang.Daemons$ReferenceQueueDaemon.runInternal(Daemons.java:178)
+zukgit  : StackTraceElement: java.lang.Daemons$Daemon.run(Daemons.java:103)
+zukgit  : StackTraceElement: java.lang.Thread.run(Thread.java:764)
+zukgit  : VVVVVVVVV print threadName: ReferenceQueueDaemon END VVVVVVVVV!!!!!!!!!!
+zukgit  : MMMMMMMM print threadName:【 SummaryLoader 】ProcessID:【6020】 ThreadId:【272】 indexId: 【10】 start MMMMMMMM
+zukgit  : StackTraceElement: android.os.MessageQueue.nativePollOnce(Native Method)
+zukgit  : StackTraceElement: android.os.MessageQueue.next(MessageQueue.java:326)
+zukgit  : StackTraceElement: android.os.Looper.loop(Looper.java:160)
+zukgit  : StackTraceElement: android.os.HandlerThread.run(HandlerThread.java:65)
+zukgit  : VVVVVVVVV print threadName: SummaryLoader END VVVVVVVVV!!!!!!!!!!
+zukgit  : MMMMMMMM print threadName:【 RenderThread 】ProcessID:【6020】 ThreadId:【256】 indexId: 【11】 start MMMMMMMM
+zukgit  : VVVVVVVVV print threadName: RenderThread END VVVVVVVVV!!!!!!!!!!
+zukgit  : MMMMMMMM print threadName:【 Binder:6020_5 】ProcessID:【6020】 ThreadId:【261】 indexId: 【12】 start MMMMMMMM
+zukgit  : VVVVVVVVV print threadName: Binder:6020_5 END VVVVVVVVV!!!!!!!!!!
+zukgit  : MMMMMMMM print threadName:【 queued-work-looper 】ProcessID:【6020】 ThreadId:【265】 indexId: 【13】 start MMMMMMMM
+zukgit  : StackTraceElement: android.os.MessageQueue.nativePollOnce(Native Method)
+zukgit  : StackTraceElement: android.os.MessageQueue.next(MessageQueue.java:326)
+zukgit  : StackTraceElement: android.os.Looper.loop(Looper.java:160)
+zukgit  : StackTraceElement: android.os.HandlerThread.run(HandlerThread.java:65)
+zukgit  : VVVVVVVVV print threadName: queued-work-looper END VVVVVVVVV!!!!!!!!!!
+zukgit  : MMMMMMMM print threadName:【 FinalizerWatchdogDaemon 】ProcessID:【6020】 ThreadId:【245】 indexId: 【14】 start MMMMMMMM
+zukgit  : StackTraceElement: java.lang.Object.wait(Native Method)
+zukgit  : StackTraceElement: java.lang.Daemons$FinalizerWatchdogDaemon.sleepUntilNeeded(Daemons.java:297)
+zukgit  : StackTraceElement: java.lang.Daemons$FinalizerWatchdogDaemon.runInternal(Daemons.java:277)
+zukgit  : StackTraceElement: java.lang.Daemons$Daemon.run(Daemons.java:103)
+zukgit  : StackTraceElement: java.lang.Thread.run(Thread.java:764)
+zukgit  : VVVVVVVVV print threadName: FinalizerWatchdogDaemon END VVVVVVVVV!!!!!!!!!!
+zukgit  : MMMMMMMM print threadName:【 Binder:6020_6 】ProcessID:【6020】 ThreadId:【269】 indexId: 【15】 start MMMMMMMM
+zukgit  : VVVVVVVVV print threadName: Binder:6020_6 END VVVVVVVVV!!!!!!!!!!
+zukgit  : MMMMMMMM print threadName:【 AsyncTask #6 】ProcessID:【6020】 ThreadId:【270】 indexId: 【16】 start MMMMMMMM
+zukgit  : StackTraceElement: java.lang.Object.wait(Native Method)
+zukgit  : StackTraceElement: java.lang.Thread.parkFor$(Thread.java:2137)
+zukgit  : StackTraceElement: sun.misc.Unsafe.park(Unsafe.java:358)
+zukgit  : StackTraceElement: java.util.concurrent.locks.LockSupport.parkNanos(LockSupport.java:230)
+zukgit  : StackTraceElement: java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.awaitNanos(AbstractQueuedSynchronizer.java:2101)
+zukgit  : StackTraceElement: java.util.concurrent.LinkedBlockingQueue.poll(LinkedBlockingQueue.java:467)
+zukgit  : StackTraceElement: java.util.concurrent.ThreadPoolExecutor.getTask(ThreadPoolExecutor.java:1091)
+zukgit  : StackTraceElement: java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1152)
+zukgit  : StackTraceElement: java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:641)
+zukgit  : StackTraceElement: java.lang.Thread.run(Thread.java:764)
+zukgit  : VVVVVVVVV print threadName: AsyncTask #6 END VVVVVVVVV!!!!!!!!!!
+zukgit  : MMMMMMMM print threadName:【 Signal Catcher 】ProcessID:【6020】 ThreadId:【241】 indexId: 【17】 start MMMMMMMM
+zukgit  : VVVVVVVVV print threadName: Signal Catcher END VVVVVVVVV!!!!!!!!!!
+zukgit  : MMMMMMMM print threadName:【 Binder:6020_1 】ProcessID:【6020】 ThreadId:【247】 indexId: 【18】 start MMMMMMMM
+zukgit  : VVVVVVVVV print threadName: Binder:6020_1 END VVVVVVVVV!!!!!!!!!!
+zukgit  : MMMMMMMM print threadName:【 HeapTaskDaemon 】ProcessID:【6020】 ThreadId:【246】 indexId: 【19】 start MMMMMMMM
+zukgit  : VVVVVVVVV print threadName: HeapTaskDaemon END VVVVVVVVV!!!!!!!!!!
+zukgit  : MMMMMMMM print threadName:【 pool-1-thread-1 】ProcessID:【6020】 ThreadId:【254】 indexId: 【20】 start MMMMMMMM
+zukgit  : StackTraceElement: java.lang.Object.wait(Native Method)
+zukgit  : StackTraceElement: java.lang.Thread.parkFor$(Thread.java:2137)
+zukgit  : StackTraceElement: sun.misc.Unsafe.park(Unsafe.java:358)
+zukgit  : StackTraceElement: java.util.concurrent.locks.LockSupport.park(LockSupport.java:190)
+zukgit  : StackTraceElement: java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.await(AbstractQueuedSynchronizer.java:2059)
+zukgit  : StackTraceElement: java.util.concurrent.LinkedBlockingQueue.take(LinkedBlockingQueue.java:442)
+zukgit  : StackTraceElement: java.util.concurrent.ThreadPoolExecutor.getTask(ThreadPoolExecutor.java:1092)
+zukgit  : StackTraceElement: java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1152)
+zukgit  : StackTraceElement: java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:641)
+zukgit  : StackTraceElement: java.lang.Thread.run(Thread.java:764)
+zukgit  : VVVVVVVVV print threadName: pool-1-thread-1 END VVVVVVVVV!!!!!!!!!!
+zukgit  : MMMMMMMM print threadName:【 AsyncTask #1 】ProcessID:【6020】 ThreadId:【252】 indexId: 【21】 start MMMMMMMM
+zukgit  : StackTraceElement: java.lang.Object.wait(Native Method)
+zukgit  : StackTraceElement: java.lang.Thread.parkFor$(Thread.java:2137)
+zukgit  : StackTraceElement: sun.misc.Unsafe.park(Unsafe.java:358)
+zukgit  : StackTraceElement: java.util.concurrent.locks.LockSupport.parkNanos(LockSupport.java:230)
+zukgit  : StackTraceElement: java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.awaitNanos(AbstractQueuedSynchronizer.java:2101)
+zukgit  : StackTraceElement: java.util.concurrent.LinkedBlockingQueue.poll(LinkedBlockingQueue.java:467)
+zukgit  : StackTraceElement: java.util.concurrent.ThreadPoolExecutor.getTask(ThreadPoolExecutor.java:1091)
+zukgit  : StackTraceElement: java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1152)
+zukgit  : StackTraceElement: java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:641)
+zukgit  : StackTraceElement: java.lang.Thread.run(Thread.java:764)
+zukgit  : VVVVVVVVV print threadName: AsyncTask #1 END VVVVVVVVV!!!!!!!!!!
+zukgit  : MMMMMMMM print threadName:【 Jit thread pool worker thread 0 】ProcessID:【6020】 ThreadId:【240】 indexId: 【22】 start MMMMMMMM
+zukgit  : VVVVVVVVV print threadName: Jit thread pool worker thread 0 END VVVVVVVVV!!!!!!!!!!
+zukgit  : MMMMMMMM print threadName:【 AsyncTask #5 】ProcessID:【6020】 ThreadId:【267】 indexId: 【23】 start MMMMMMMM
+zukgit  : StackTraceElement: java.lang.Object.wait(Native Method)
+zukgit  : StackTraceElement: java.lang.Thread.parkFor$(Thread.java:2137)
+zukgit  : StackTraceElement: sun.misc.Unsafe.park(Unsafe.java:358)
+zukgit  : StackTraceElement: java.util.concurrent.locks.LockSupport.parkNanos(LockSupport.java:230)
+zukgit  : StackTraceElement: java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.awaitNanos(AbstractQueuedSynchronizer.java:2101)
+zukgit  : StackTraceElement: java.util.concurrent.LinkedBlockingQueue.poll(LinkedBlockingQueue.java:467)
+zukgit  : StackTraceElement: java.util.concurrent.ThreadPoolExecutor.getTask(ThreadPoolExecutor.java:1091)
+zukgit  : StackTraceElement: java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1152)
+zukgit  : StackTraceElement: java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:641)
+zukgit  : StackTraceElement: java.lang.Thread.run(Thread.java:764)
+zukgit  : VVVVVVVVV print threadName: AsyncTask #5 END VVVVVVVVV!!!!!!!!!!
+zukgit  : MMMMMMMM print threadName:【 Binder:6020_2 】ProcessID:【6020】 ThreadId:【248】 indexId: 【24】 start MMMMMMMM
+zukgit  : VVVVVVVVV print threadName: Binder:6020_2 END VVVVVVVVV!!!!!!!!!!
+
+ps -ATMf | grep 6020
+system          6020  6020   855   22 2019-01-13 21:10:40 ?        00:00:04 com.android.settings
+system          6020  6321   855   22 2019-01-13 21:10:40 ?        00:00:00 com.android.settings
+system          6020  6322   855   22 2019-01-13 21:10:40 ?        00:00:00 com.android.settings
+system          6020  6323   855   22 2019-01-13 21:10:40 ?        00:00:00 com.android.settings
+system          6020  6324   855   22 2019-01-13 21:10:40 ?        00:00:00 com.android.settings
+system          6020  6325   855   22 2019-01-13 21:10:40 ?        00:00:00 com.android.settings
+
+
+
+```
+### 结论: framework.jar运行APP进程
+
+## wifi-service.jar 包打印
+#### wifi-service.jar打印Log 输出结果
 ```
 WifiServiceImpl.setWifiEnable()
 
@@ -1287,19 +1480,235 @@ ps -efATM -p 1660 -o UID,PID,TID,PPID,TCNT,STIME,ETIME,TIME,F,S,PRI,NI,CPU,PCPU,
 
 
 ```
+### 结论: wifi-service.jar运行系统进程
 
 # C(Hal Jni) 层面打印Log
 
-```
-头文件：  #include <utils/Log.h>
-
-方法：          
-VERBOSE   LOGV()；
-DEBUG     LOGD();
-INFO      LOGI();
-WARN      LOGW();
-ERROR     LOGE();
-
-例子：   LOGD("%s, %d",  s, n) ;
-```
  
+## wpa-supplicant
+```
+编译命令:                        mmm external/wpa_supplicant_8/wpa_supplicant/ 
+生成目录:                        out/target/product/xxxx/vendor/bin/hw/wpa_supplicant
+手机wpa_supplicant目录:          /vendor/bin/hw/wpa_supplicant
+
+adb root && adb remount && adb push ./wpa_supplicant  /vendor/bin/hw/  && adb reboot 
+
+
+
+
+
+```
+### __android_log_print
+```
+__android_log_print  用于打印 不可变参数函数
+
+
+使用方法：
+#include <log/log.h>
+ __android_log_print(int prio, const char* tag,const char* fmt, ...)
+ __android_log_print(ANDROID_LOG_INFO, "zukgit_c"," hello-world!");
+
+输出: I zukgit_c: hello-world!
+
+
+
+
+
+
+#include <log/log.h>
+char *c = "wifi test";
+ __android_log_print(ANDROID_LOG_INFO, "zukgit_c"," try %s" , c);
+
+输出: I zukgit_c: try wifi test
+
+
+http://androidxref.com/9.0.0_r3/xref/system/core/liblog/include/android/log.h
+typedef enum android_LogPriority {
+
+  ANDROID_LOG_UNKNOWN = 0,     /** For internal use only.  */
+
+  ANDROID_LOG_DEFAULT = 1, /* only for SetMinPriority() */    /** The default priority, for internal use only.  */
+
+  ANDROID_LOG_VERBOSE = 2, /** Verbose logging. Should typically be disabled for a release apk. */
+ 
+  ANDROID_LOG_DEBUG   = 3,    /** Debug logging. Should typically be disabled for a release apk. */
+  
+  ANDROID_LOG_INFO    = 4,   /** Informational logging. Should typically be disabled for a release apk. */
+ 
+  ANDROID_LOG_WARN    = 5,  /** Warning logging. For use with recoverable failures. */
+ 
+  ANDROID_LOG_ERROR   = 6,     /** Error logging. For use with unrecoverable failures. */
+ 
+  ANDROID_LOG_FATAL   = 7,    /** Fatal logging. For use when aborting. */
+
+  ANDROID_LOG_SILENT  = 8, /* only for SetMinPriority(); must be last */     /** For internal use only.  */
+} android_LogPriority;
+
+
+
+
+
+
+```
+
+
+### wpa_debug打印Log分析
+```
+1. wpa_debug头文件地址：   http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/utils/wpa_debug.h
+
+enum { MSG_EXCESSIVE, MSG_MSGDUMP, MSG_DEBUG, MSG_INFO, MSG_WARNING, MSG_ERROR };
+
+#ifdef CONFIG_NO_WPA_MSG
+#define wpa_dbg(args...) do { } while (0)    // 如果没有定义 CONFIG_NO_WPA_MSG 控制量  那么就把打印函数设置为死循环 while(0) 不打印Log
+
+#else
+
+#define wpa_dbg(args...) wpa_msg(args)       // 定义了打印控制量 CONFIG_NO_WPA_MSG  那么定义宏 wpa_dbg 调用函数  wpa_msg(args)  
+#endif
+
+
+
+
+
+
+2. wpa_debug实现文件c文件地址：   http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/utils/wpa_debug.c
+
+
+va_list    是一个字符指针，可以理解为指向当前参数的一个指针，取参必须通过这个指针进行
+<Step 1> 在调用参数表之前，定义一个 va_list 类型的变量，(假设va_list类型变量被定义为  va_list ap)
+<Step 2> 然后应该对ap 进行初始化，让它指向可变参数表里面的第一个参数，这是通过va_start 来实现的
+         va_start第一个参数是ap 本身，第二个参数是在变参表前面紧挨着的一个变量,即“...”之前的那个参数
+         va_start函数功能：让ap指针指向第一个可变参数的地址
+<Step 3> 然后是获取参数，调用 va_arg，它的第一个参数是ap，第二个参数是要获取的参数的指定类型，然后返回这个指定类型的值，并且把ap 的位置指向变参表的下一个变量位置；
+         va_arg函数功能：让ap指针根据可变参的地址和可变参的类型取出一定长度内存里的数据（如int类型是4字节）
+
+<Step 4> 获取所有的参数之后，我们有必要将这个 ap 指针关掉，以免发生危险，方法是调用 va_end，他是输入的参数ap 置为 NULL，
+         应该养成获取完参数表之后关闭指针的习惯。说白了，就是让我们的程序具有健壮性。通常va_start和va_end是成对出现。
+
+
+
+头文件：#include  <stdarg.h>
+函数原型：int vsnprintf(char *str, size_t size, const char *format, va_list ap);
+函数说明：将可变参数格式化输出到一个字符数组
+参数：    str输出到的数组，size指定大小，防止越界，format格式化参数，ap可变参数列表函数用法
+
+
+
+
+
+#ifndef CONFIG_NO_WPA_MSG     // 没有定义 CONFIG_NO_WPA_MSG 控制量
+
+void wpa_msg(void *ctx, int level, const char *fmt, ...)
+{
+	va_list ap;   // 不定参数列表    <Step 1>
+	char *buf;
+	int buflen;
+	int len;
+	char prefix[130];
+
+	va_start(ap, fmt);   // 对不定参数函数列表初始化    <Step 2>
+	buflen = vsnprintf(NULL, 0, fmt, ap) + 1;   // 将可变参数格式化输出到一个字符数组 这里参数为NULL ,0 主要为得到返回值即 可变参数的个数
+	va_end(ap);   // 对 不定参数列表 完成参数个数查询
+
+	buf = os_malloc(buflen);
+	if (buf == NULL) {
+		wpa_printf(MSG_ERROR, "wpa_msg: Failed to allocate message ""buffer");
+		return;
+	}
+	va_start(ap, fmt);
+	prefix[0] = '\0';
+	if (wpa_msg_ifname_cb) {
+		const char *ifname = wpa_msg_ifname_cb(ctx);
+		if (ifname) {
+			int res = os_snprintf(prefix, sizeof(prefix), "%s: ",ifname);
+			if (os_snprintf_error(sizeof(prefix), res))
+				prefix[0] = '\0';
+		}
+	}
+	len = vsnprintf(buf, buflen, fmt, ap);
+	va_end(ap);
+	wpa_printf(level, "%s%s", prefix, buf);    // 打印可变参数
+	if (wpa_msg_cb)
+		wpa_msg_cb(ctx, level, WPA_MSG_PER_INTERFACE, buf, len);
+	bin_clear_free(buf, buflen);
+}
+
+
+
+
+3. wpa_printf 函数
+
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/android.config
+CONFIG_ANDROID_LOG=y
+
+
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/utils/wpa_debug.c#wpa_printf
+
+
+enum { MSG_EXCESSIVE, MSG_MSGDUMP, MSG_DEBUG, MSG_INFO, MSG_WARNING, MSG_ERROR };
+
+int wpa_debug_level = MSG_INFO;
+
+void wpa_printf(int level, const char *fmt, ...)
+{
+	va_list ap;
+
+	va_start(ap, fmt);
+	if (level >= wpa_debug_level) {
+		__android_log_vprint(wpa_to_android_level(level), ANDROID_LOG_NAME, fmt, ap);
+
+		wpa_debug_print_timestamp();
+
+		vprintf(fmt, ap);
+		printf("\n");
+	}
+	va_end(ap);
+}
+
+
+
+
+```
+
+## 可变参数函数打印与不可变参数函数打印
+```
+
+封装了可变参数，不能使用         __android_log_print()；
+需要使用为可变参数专门提供的函数  __android_log_vprint()；
+
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/utils/wpa_debug.c
+
+__android_log_print(wpa_to_android_level(level),ANDROID_LOG_NAME, "%s - hexdump(len=%lu):%s%s",title, (long unsigned int) len, display, len > slen ? " ..." : "");
+__android_log_vprint(wpa_to_android_level(level),ANDROID_LOG_NAME, fmt, ap);
+
+
+
+http://androidxref.com/9.0.0_r3/xref/system/core/liblog/logger_write.c#491
+LIBLOG_ABI_PUBLIC int __android_log_print(int prio, const char* tag,const char* fmt, ...) {
+  va_list ap;
+  char buf[LOG_BUF_SIZE];
+
+  va_start(ap, fmt);
+  vsnprintf(buf, LOG_BUF_SIZE, fmt, ap);
+  va_end(ap);
+
+  return __android_log_write(prio, tag, buf);
+}
+
+
+
+
+http://androidxref.com/9.0.0_r3/xref/system/core/liblog/logger_write.c#482
+
+LIBLOG_ABI_PUBLIC int __android_log_vprint(int prio, const char* tag,const char* fmt, va_list ap) {
+  char buf[LOG_BUF_SIZE];
+
+  vsnprintf(buf, LOG_BUF_SIZE, fmt, ap);
+
+  return __android_log_write(prio, tag, buf);
+}
+
+
+
+
+```
