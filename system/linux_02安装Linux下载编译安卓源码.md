@@ -129,8 +129,10 @@ Swap:      15172948      180372    14992576
 ```
 
 
+## 下载源码
+### (直接下载安卓官网源码仓库 repo)-方式1
+repo墙内已保存文件： https://raw.githubusercontent.com/ZukGit/WordPress_MD_Git/master/system/linux/repo
 
-## 下载repo工具与赋权并添加到Path
 ```
 1. 把桌面 bin  加入到 PATH
 vim  ~/.bahrc      加入如下命令     把桌面的bin目录 加入到 PATH中
@@ -141,12 +143,27 @@ export PATH=$PATH:~/Desktop/bin
 2. 下载 repo  并 赋权
 mkdir ~/Desktop/bin
 cd ~/Desktop/bin
-curl https://storage.googleapis.com/git-repo-downloads/repo > ./repo
+curl https://storage.googleapis.com/git-repo-downloads/repo > ./repo            【 需要配置VPN】】
 chmod a+x ./repo
+
+sudo apt install python                        // 【3.  安装 python  拉取代码过程中会使用python 】
+git config --global user.email zukgit@foxmail.com    //  【4.  设置  git 配置信息】          
+git config --global user.name zukgit               
+
+repo init -u https://android.googlesource.com/platform/manifest -b android-9.0.0_r21    // 【5. 开始初始化 repo  需要配置VPN】
+repo sync                    // 【6. 开始抓取代码  注意下面的报错 注释掉 /.repo/manifests/default.xml  中分支 】
+repo --trace sync -cdf      //  输出详细拉取分支信息         用来排查哪一个git 分支拉取失败
+
 
 ```
 
-## 下载越更新包 aosp-latest.tar
+
+
+
+
+
+
+### 下载越更新包 aosp-latest.tar（清华镜像站）-方式2
 ```
 https://mirrors.tuna.tsinghua.edu.cn/aosp-monthly/aosp-latest.tar    # 初始化包大约40GB   建议直接浏览器下载(可以帮助加速)  不要用 wget 
 
@@ -161,5 +178,7 @@ repo sync                          # 正常同步一遍即可得到完整目录 
 ```
 编译命令：   source build/envsetup.sh  && lunch aosp_arm64-eng && make -j6 2>&1 | tee build.log      ## shell窗口和本地build.log 同时记录编译过程Log信息
 
+source build/envsetup.sh  && lunch aosp_arm64-eng && make -j4 2>&1 | tee build.log 
 
+source build/envsetup.sh  && lunch aosp_arm64-eng && make 2>&1 | tee build.log 
 ```

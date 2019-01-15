@@ -24,6 +24,19 @@ apt-get install g++
 
 # C
 
+## ctrl + alt + F1
+```
+ctrl + alt + F1        // 该快捷键是在Linux系统中 从完全命令行模式切换回桌面模式的快捷键
+
+```
+## ctrl + alt + F2
+```
+
+ctrl + alt + F2   // 该快捷键是在Linux系统中 从完全桌面模式 切换到 完全命令行模式的 快捷键
+
+export PATH=$PATH:~/Desktop/bin:/sbin:/xbin:/bin:/usr/bin/usr/sbin     【 首次进入需要加入 PATH 环境变量 来调用系统工具命令】
+
+```
 
 ## chmod   改变文件权限
 
@@ -63,6 +76,32 @@ umask     007     去掉可读r权限  + 可写w权限  + 可执行x权限
 
 
 ```
+
+## cp 
+```
+cp命令用来将一个或多个源文件或者目录复制到指定的目的文件或目录。
+它可以将单个源文件复制成一个指定文件名的具体的文件或一个已经存在的目录下。
+cp命令还支持同时复制多个文件，当一次复制多个文件时，目标文件参数必须是一个已经存在的目录，否则将出现错误。
+
+
+cp -fr ./xxx  /xxx/xxx/xxx
+
+cp(选项)(参数)
+
+-a：此参数的效果和同时指定"-dpR"参数相同；
+-d：当复制符号连接时，把目标文件或目录也建立为符号连接，并指向与源文件或目录连接的原始文件或目录；
+-f：强行复制文件或目录，不论目标文件或目录是否已存在；
+-i：覆盖既有文件之前先询问用户；
+-l：对源文件建立硬连接，而非复制文件；
+-p：保留源文件或目录的属性；
+-R/r：递归处理，将指定目录下的所有文件与子目录一并处理；
+-s：对源文件建立符号连接，而非复制文件；
+-u：使用这项参数后只会在源文件的更改时间较目标文件更新时或是名称相互对应的目标文件并不存在时，才复制文件；
+-S：在备份文件时，用指定的后缀“SUFFIX”代替文件的默认后缀；
+-b：覆盖已存在的文件目标前将目标文件备份；
+-v：详细显示命令执行的操作。
+```
+
 
 ## cat 命令
 
@@ -228,6 +267,22 @@ ubuntu@ubuntu:~$ echo $PATH
 /home/ubuntu/bin:/home/ubuntu/SDK/adt-bundle-linux-x86_64/sdk/platform-tools:/home/ubuntu/bin:/usr/lib/lightdm/lightdm:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/lib/jvm/java-1.7.0-openjdk-amd64/bin
 u
 
+
+
+```
+
+## export
+```
+export    命令用于将shell变量输出为环境变量，或者将shell函数输出为环境变量。
+一个变量创建时，它不会自动地为在它之后创建的shell进程所知。而命令export可以向后面的shell传递变量的值。
+当一个shell脚本调用并执 行时，它不会自动得到原为脚本（调用者）里定义的变量的访问权，除非这些变量已经被显式地设置为可用。
+export命令可以用于传递一个或多个变量的值到任何后继脚本
+
+
+export(选项)(参数)
+
+export PATH=$PATH:~/Desktop/bin:/sbin:/xbin:/bin:/usr/bin/usr/sbin            【设置PATH环境变量】
+echo $PATH
 
 
 ```
@@ -1253,6 +1308,26 @@ _=/usr/bin/printenv
 
 
 ```
+
+# r
+
+## rm 
+```
+rm  是删除命令 全文是 remove     -fr  表示直接强制删除 
+rm -fr  /xxx
+
+
+1. 对文件拥有777 权限但无法删除  无法替换的原因 ，  是因为用户对该文件所在目录 没有 w 写的权限 4的权限导致
+ls -la
+-rwxrwxrwx 1 zukgit zukgit  19K Mar 12  2018  记录点_2018年3月12日.kmz
+-rwxrwxrwx 1 zukgit zukgit 1.4K May 30  2018  迅雷.lnk
+-rwxrwxrwx 1 zukgit zukgit 1.1K Jul  8  2018  酷狗音乐.lnk
+
+
+```
+
+
+
 # t
 
 
