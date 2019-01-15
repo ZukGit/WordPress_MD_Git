@@ -13,8 +13,8 @@ curl https://storage.googleapis.com/git-repo-downloads/repo > repo && chmod a+x 
 vim ~/.bashrc          // 【2. 把repo 添加到系统环境变量目录中  本例子中当前目录是 /mnt/c/Users/zhuzj5/Desktop/bin/ 】
 export PATH=$PATH:/mnt/c/Users/zhuzj5/Desktop/bin/   【~/.zshrc   ~/.bashrc】
 sudo apt install python                        // 【3.  安装 python  拉取代码过程中会使用python 】
-config --global user.email zukgit@foxmail.com    //  【4.  设置  git 配置信息】          
-config --global user.name zukgit               
+git config --global user.email zukgit@foxmail.com    //  【4.  设置  git 配置信息】          
+git config --global user.name zukgit               
 
 repo init -u https://android.googlesource.com/platform/manifest -b android-9.0.0_r21    // 【5. 开始初始化 repo 】
 repo sync                    // 【6. 开始抓取代码  注意下面的报错 注释掉 /.repo/manifests/default.xml  中分支 】
