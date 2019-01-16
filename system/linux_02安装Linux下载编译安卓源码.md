@@ -130,6 +130,8 @@ Swap:      15172948      180372    14992576
 
 
 ## 下载源码
+<img src="//../zimage/system/linux/02_aosp/aosp.jpg" />
+
 ### (直接下载安卓官网源码仓库 repo)-方式1
 repo墙内已保存文件： https://raw.githubusercontent.com/ZukGit/WordPress_MD_Git/master/system/linux/repo
 
@@ -174,11 +176,32 @@ repo sync                          # 正常同步一遍即可得到完整目录 
 
 ```
 
+**清华镜像 aosp-latest.tar 40GB   解压后  40GB大小**
+<img src="//../zimage/system/linux/02_aosp/aosp_1.png" />
+
+
+
 # 编译安卓源码
 ```
 编译命令：   source build/envsetup.sh  && lunch aosp_arm64-eng && make -j6 2>&1 | tee build.log      ## shell窗口和本地build.log 同时记录编译过程Log信息
 
-source build/envsetup.sh  && lunch aosp_arm64-eng && make -j4 2>&1 | tee build.log 
+source build/envsetup.sh  && lunch aosp_arm64-eng && make -j4 2>&1 | tee build.log  
 
-source build/envsetup.sh  && lunch aosp_arm64-eng && make 2>&1 | tee build.log 
+source build/envsetup.sh  && lunch aosp_arm64-eng && make 2>&1 | tee build.log               【arm 64位机器】
+
+source build/envsetup.sh  && lunch aosp_x86_64-eng && make 2>&1 | tee build.log             【X86 64位机器】
 ```
+<img src="//../zimage/system/linux/02_aosp/aosp_2019_01_15.jpg" />
+
+
+## 编译后文件空间大小
+
+### ./repo
+<img src="//../zimage/system/linux/02_aosp/aosp_1.png" />
+
+### ./repo+repositories
+
+### ./out
+
+### ./repo+repositories+out
+<img src="//../zimage/system/linux/02_aosp/aosp.png" />
