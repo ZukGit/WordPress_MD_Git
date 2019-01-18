@@ -100,6 +100,30 @@ deb-src http://mirrors.aliyun.com/ubuntu/ trusty-updates main multiverse restric
 			lib32ncurses5-dev{b} lib32tinfo-dev{ab} 
 			0 个软件包被升级，新安装 2 个，0 个将被删除， 同时 19 个将不升级。
 ```
+## 安装依赖软件包
+```
+
+sudo apt-get install curl
+sudo apt-get install git
+sudo apt-get install libx11-dev:i386 libreadline6-dev:i386 libgl1-mesa-dev g++-multilib 
+sudo apt-get install -y git flex bison gperf build-essential libncurses5-dev:i386 
+sudo apt-get install tofrodos python-markdown libxml2-utils xsltproc zlib1g-dev:i386 
+sudo apt-get install dpkg-dev libsdl1.2-dev libesd0-dev
+sudo apt-get install git-core gnupg flex bison gperf build-essential  
+sudo apt-get install zip curl zlib1g-dev gcc-multilib g++-multilib 
+sudo apt-get install libc6-dev-i386 
+sudo apt-get install x11proto-core-dev libx11-dev 
+sudo apt-get install libgl1-mesa-dev libxml2-utils xsltproc unzip m4
+sudo apt-get install lib32z-dev ccache
+sudo apt-get install lib32ncurses5-dev
+sudo apt-get install clang
+sudo apt-get install libexpat1-dev:i386
+sudo apt-get install lib32ncurses5
+sudo apt-get install libncurses5:i386
+sudo apt-get install qemu-kvm
+
+
+```
 
 ## 创建 swap 虚拟分区来分担内存压力
 ```
@@ -182,6 +206,23 @@ repo sync                          # 正常同步一遍即可得到完整目录 
 
 
 # 编译安卓源码
+
+## 设置bashrc 环境配置文件
+```
+export PATH=$PATH:~/Desktop/bin
+unset _JAVA_OPTIONS #这句一定放在Java环境变量配置的命令的最前面
+## https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html
+export JAVA_HOME=~/dev/java/jdk1.8.0_191	#JDK的安装路径
+export PATH=$PATH:$JAVA_HOME/bin
+export CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar
+alias findm="grep -rnws --include='*.[mb][kp]' 'LOCAL_MODULE\|LOCAL_PACKAGE_NAME\|name:'"
+alias cls='clear'
+alias cdd='cd ~/Desktop'
+
+
+```
+
+## 编译命令
 ```
 编译命令：   source build/envsetup.sh  && lunch aosp_arm64-eng && make -j6 2>&1 | tee build.log      ## shell窗口和本地build.log 同时记录编译过程Log信息
 
@@ -189,9 +230,31 @@ source build/envsetup.sh  && lunch aosp_arm64-eng && make -j4 2>&1 | tee build.l
 
 source build/envsetup.sh  && lunch aosp_arm64-eng && make 2>&1 | tee build.log               【arm 64位机器】
 
-source build/envsetup.sh  && lunch aosp_x86_64-eng && make 2>&1 | tee build.log             【X86 64位机器】
+source build/envsetup.sh  && lunch aosp_x86_64-eng && make 2>&1 | tee build.log             【X86 64位机器】 推荐该版本 本地虚拟机
 ```
 <img src="//../zimage/system/linux/02_aosp/aosp_2019_01_15.jpg" />
+
+
+## 运行虚拟机命令
+```
+参考资料:   https://blog.csdn.net/pcsxk/article/details/52016739
+
+sudo apt-get install qemu-kvm
+sudo su 
+source build/envsetup.sh  && lunch aosp_x86_64-eng && emulator                 【以 root 用户 执行 emulator 安卓虚拟机】
+
+
+##################
+
+sudo su 
+source build/envsetup.sh
+lunch aosp_x86_64-eng
+emulator
+
+```
+<img src="//../zimage/system/linux/02_aosp/aosp_c1.png" />
+<img src="//../zimage/system/linux/02_aosp/aosp_c2.png" />
+<img src="//../zimage/system/linux/02_aosp/aosp_c3.png" />
 
 
 ## 编译后文件空间大小
