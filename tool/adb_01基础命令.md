@@ -696,6 +696,19 @@ adb shell am broadcast -a "Android.net.wifi.WIFI_STATE_CHANGED"  --ei "wifi_stat
 
 
 
+
+public static final int WIFI_AP_CLOSEING 		= 10;  //wifi hot is closeing
+public static final int WIFI_AP_CLOSE_SUCCESS 	= 11;  //wifi hot close success
+public static final int WIFI_AP_OPENING 		= 12;  //WiFi hot is opening 
+public static final int WIFI_AP_OPEN_SUCCESS 	= 13;  //WiFi hot open success
+
+// 打开热点	
+am broadcast -a "android.net.wifi.WIFI_AP_STATE_CHANGED"  --ei "wifi_state" 13  --ei "previous_wifi_state" 12  --ei "wifi_ap_mode" 12 --es "wifi_ap_interface_name" "wlan0" 
+
+// 关闭热点
+am broadcast -a "android.net.wifi.WIFI_AP_STATE_CHANGED"  --ei "wifi_state" 11  --ei "previous_wifi_state" 10  --ei "wifi_ap_mode" 12 --es "wifi_ap_interface_name" "wlan0"
+
+
 ```
 
 ##  adb shell wm density
