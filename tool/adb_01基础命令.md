@@ -678,29 +678,81 @@ adb shell pm get-install-location       /// 返回当前默认安装位置
 ```
 ## adb shell am broadcast
 ```
+https://www.jianshu.com/p/9e3b3a070529
+
+
 adb shell am broadcast    //   发送广播
 
 
 adb shell am broadcast -a com.Android.test --es<string> test_string "this is test string" —ei<int> test_int 100 —ez<boolean> test_boolean true
 
-adb shell am broadcast -a "Android.net.wifi.WIFI_STATE_CHANGED"  --ei "wifi_state" 0
-adb shell am broadcast -a "Android.net.wifi.WIFI_STATE_CHANGED"  --ei "wifi_state" 1 
-adb shell am broadcast -a "Android.net.wifi.WIFI_STATE_CHANGED"  --ei "wifi_state" 2 
-adb shell am broadcast -a "Android.net.wifi.WIFI_STATE_CHANGED"  --ei "wifi_state" 3 
-adb shell am broadcast -a "Android.net.wifi.WIFI_STATE_CHANGED"  --ei "wifi_state" 4 
+  [-a <ACTION>] [-d <DATA_URI>] [-t <MIME_TYPE>]
+    [-c <CATEGORY> [-c <CATEGORY>] ...]
+    [-e|--es <EXTRA_KEY> <EXTRA_STRING_VALUE> ...]
+    [--esn <EXTRA_KEY> ...]
+    [--ez <EXTRA_KEY> <EXTRA_BOOLEAN_VALUE> ...]
+    [--ei <EXTRA_KEY> <EXTRA_INT_VALUE> ...]
+    [--el <EXTRA_KEY> <EXTRA_LONG_VALUE> ...]
+    [--ef <EXTRA_KEY> <EXTRA_FLOAT_VALUE> ...]
+    [--eu <EXTRA_KEY> <EXTRA_URI_VALUE> ...]
+    [--ecn <EXTRA_KEY> <EXTRA_COMPONENT_NAME_VALUE>]
+    [--eia <EXTRA_KEY> <EXTRA_INT_VALUE>[,<EXTRA_INT_VALUE...]]
+    [--ela <EXTRA_KEY> <EXTRA_LONG_VALUE>[,<EXTRA_LONG_VALUE...]]
+    [--efa <EXTRA_KEY> <EXTRA_FLOAT_VALUE>[,<EXTRA_FLOAT_VALUE...]]
+    [-n <COMPONENT>] [-f <FLAGS>]
+    [--grant-read-uri-permission] [--grant-write-uri-permission]
+    [--debug-log-resolution] [--exclude-stopped-packages]
+    [--include-stopped-packages]
+    [--activity-brought-to-front] [--activity-clear-top]
+    [--activity-clear-when-task-reset] [--activity-exclude-from-recents]
+    [--activity-launched-from-history] [--activity-multiple-task]
+    [--activity-no-animation] [--activity-no-history]
+    [--activity-no-user-action] [--activity-previous-is-top]
+    [--activity-reorder-to-front] [--activity-reset-task-if-needed]
+    [--activity-single-top] [--activity-clear-task]
+    [--activity-task-on-home]
+    [--receiver-registered-only] [--receiver-replace-pending]
+    [--selector]
+    [<URI> | <PACKAGE> | <COMPONENT>]
+
+
+***************************************发送广播*********************************************
+=============================================wifi广播========================================
+
+
+
+ 
+
+adb shell am broadcast -a "android.net.wifi.STATE_CHANGE" -e "networkInfo" 
+
+"android.net.wifi.STATE_CHANGE" ------------- WiFi连接到一个ssid后的广播
+"android.net.wifi.WIFI_STATE_CHANGED" ------- WiFi的打开关闭等相关变化的广播 这个广播只关心wifi硬件本身打开与关闭，不关心wifi是否连接；
+
  WifiManager.WIFI_STATE_DISABLED ==1
  WifiManager.WIFI_STATE_DISABLING ==0
  WifiManager. WIFI_STATE_ENABLED==3
  WifiManager. WIFI_STATE_ENABLING==2
  WifiManager. WIFI_STATE_UNKNOWN==4
+ 
+【 已经关闭wifi硬件 】
+adb shell am broadcast -a "android.net.wifi.WIFI_STATE_CHANGED"  --ei "previous_wifi_state" 0  --ei "wifi_state" 1   
 
+【 正在关闭wifi硬件 】          
+adb shell am broadcast -a "android.net.wifi.WIFI_STATE_CHANGED"  --ei "previous_wifi_state" 3  --ei "wifi_state" 0   
+   
+【 已经打开wifi 开关 】     
+adb shell am broadcast -a "android.net.wifi.WIFI_STATE_CHANGED"  --ei "previous_wifi_state" 2  --ei "wifi_state" 3
 
+【 正在打开wifi 开关 】  
+adb shell am broadcast -a "android.net.wifi.WIFI_STATE_CHANGED"  --ei "previous_wifi_state" 1  --ei "wifi_state" 2 
 
-
+  
+=============================================热点广播========================================
 public static final int WIFI_AP_CLOSEING 		= 10;  //wifi hot is closeing
 public static final int WIFI_AP_CLOSE_SUCCESS 	= 11;  //wifi hot close success
 public static final int WIFI_AP_OPENING 		= 12;  //WiFi hot is opening 
 public static final int WIFI_AP_OPEN_SUCCESS 	= 13;  //WiFi hot open success
+
 
 // 打开热点	
 am broadcast -a "android.net.wifi.WIFI_AP_STATE_CHANGED"  --ei "wifi_state" 13  --ei "previous_wifi_state" 12  --ei "wifi_ap_mode" 12 --es "wifi_ap_interface_name" "wlan0" 
@@ -708,6 +760,11 @@ am broadcast -a "android.net.wifi.WIFI_AP_STATE_CHANGED"  --ei "wifi_state" 13  
 // 关闭热点
 am broadcast -a "android.net.wifi.WIFI_AP_STATE_CHANGED"  --ei "wifi_state" 11  --ei "previous_wifi_state" 10  --ei "wifi_ap_mode" 12 --es "wifi_ap_interface_name" "wlan0"
 
+***************************************打开应用*********************************************
+
+adb shell am start -n com.android.settings/com.android.settings.SubSettings
+
+adb shell am start -n com.android.settings/com.android.settings.Settings
 
 ```
 
