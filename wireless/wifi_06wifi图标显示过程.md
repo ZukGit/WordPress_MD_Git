@@ -1,3 +1,33 @@
+# 代码
+
+## SignalClusterView.java
+```
+/frameworks/base/packages/SystemUI/src/com/android/systemui/statusbar/SignalClusterView.java
+
+
+
+    // Run after each indicator change.
+ private void apply() {}
+
+
+    @Override
+    public void setWifiIndicators(boolean enabled, IconState statusIcon, IconState qsIcon,
+            boolean activityIn, boolean activityOut, String description, boolean isTransient,
+            String secondaryLabel) {
+        mWifiVisible = statusIcon.visible && !mBlockWifi;
+        mWifiStrengthId = statusIcon.icon;
+        mWifiDescription = statusIcon.contentDescription;
+        mWifiIn = activityIn && mActivityEnabled && mWifiVisible;
+        mWifiOut = activityOut && mActivityEnabled && mWifiVisible;
+
+        apply();
+    }
+
+```
+
+
+
+
 # 图标
 ## settings
 
@@ -403,7 +433,10 @@ http://androidxref.com/9.0.0_r3/xref/packages/apps/Settings/res/drawable/
 
 
 ## systemui
-
+```
+systemui的 drawable地址
+http://androidxref.com/9.0.0_r3/xref/frameworks/base/packages/SystemUI/res/drawable/
+```
 ### ic_qs_wifi_0.xml
 <img src="//../zimage/wireless/wifi/06_wifiicon/systemui/ic_qs_wifi_0_s.jpg"  />
 ```
@@ -588,6 +621,12 @@ http://androidxref.com/9.0.0_r3/xref/packages/apps/Settings/res/drawable/
 
 
 ## framework
+```
+framework 的 drawable地址
+http://androidxref.com/9.0.0_r3/xref/frameworks/base/core/res/res/drawable/
+
+```
+
 
 ### ic_signal_wifi_badged_0_bars.xml
 <img src="//../zimage/wireless/wifi/06_wifiicon/framework/ic_signal_wifi_badged_0_bars_f.jpg"  />

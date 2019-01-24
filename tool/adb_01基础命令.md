@@ -760,6 +760,20 @@ am broadcast -a "android.net.wifi.WIFI_AP_STATE_CHANGED"  --ei "wifi_state" 13  
 // 关闭热点
 am broadcast -a "android.net.wifi.WIFI_AP_STATE_CHANGED"  --ei "wifi_state" 11  --ei "previous_wifi_state" 10  --ei "wifi_ap_mode" 12 --es "wifi_ap_interface_name" "wlan0"
 
+
+
+
+=============================================飞行模式广播========================================
+
+// 打开 飞行模式
+adb shell settings put global airplane_mode_on 1
+adb shell am broadcast -a android.intent.action.AIRPLANE_MODE
+
+
+// 关闭 飞行模式
+adb shell settings put global airplane_mode_on 0
+adb shell am broadcast -a android.intent.action.AIRPLANE_MODE
+
 ***************************************打开应用*********************************************
 
 adb shell am start -n com.android.settings/com.android.settings.SubSettings
