@@ -2,7 +2,6 @@
 
 ## YAMA
 ```
-
 import java.io.*;
 import java.security.Key;
 import java.security.Security;
@@ -30,6 +29,8 @@ public class YAMA {
     static int DIR_INDEX = 1;
     public static ArrayList<File> jpgFileList_mingwen = new ArrayList<File>();
     public static ArrayList<File> mp4FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> gifFileList_mingwen = new ArrayList<File>();
+
     public static ArrayList<File> allFile_mingwen = new ArrayList<File>();
     public static ArrayList<File> alldir_mingwen = new ArrayList<File>();
     public static ArrayList<File> allPointFile_mingwen = new ArrayList<File>();
@@ -226,6 +227,14 @@ public class YAMA {
         }
         System.out.println("*********** mp4文件列表End*********** " );
 
+
+        System.out.println("*********** gif文件列表Begin*********** " );
+        for (int i = 0; i < gifFileList_mingwen.size(); i++) {
+            System.out.println("gif文件 index:" + (i+1)+"   路径: "+ gifFileList_mingwen.get(i).getAbsolutePath());
+        }
+        System.out.println("*********** gif文件列表End*********** " );
+
+
         System.out.println("=======文件列表 End  文件总数:"+ allPointFile_mingwen.size()+" =======" );
 
 
@@ -264,6 +273,8 @@ public class YAMA {
             if(file.getAbsolutePath().contains(File.separator+"v"+File.separator)){
 
                 mp4FileList_mingwen.add(file);
+            } else if(file.getAbsolutePath().contains(File.separator+"g"+File.separator)){
+                gifFileList_mingwen.add(file);
             } else if(file.getAbsolutePath().contains(File.separator+"i"+File.separator)){
 
                 jpgFileList_mingwen.add(file);
@@ -677,8 +688,6 @@ public class YAMA {
 
 }
 
-
-
 ```
 
 ## JIEMA
@@ -710,6 +719,9 @@ public class JIEMA {
     static int DIR_INDEX = 1;
     public static ArrayList<File> jpgFileList_miwen = new ArrayList<File>();
     public static ArrayList<File> mp4FileList_miwen = new ArrayList<File>();
+    public static ArrayList<File> gifFileList_miwen = new ArrayList<File>();
+
+
     public static ArrayList<File> allFile_miwen = new ArrayList<File>();
     public static ArrayList<File> alldir_miwen = new ArrayList<File>();
     public static ArrayList<File> allPointFile_miwen = new ArrayList<File>();
@@ -959,7 +971,7 @@ public class JIEMA {
                     mingwenFile.createNewFile();
                     System.out.println("明文jpg文件 index:"+i+"    path:"+ mingwenFile.getAbsolutePath());
                 } catch (IOException e){
-                    System.out.println("明文创建失败！");
+                    System.out.println("明文 jpg创建失败！");
                 }
             }
             allPointFile_mingwen.add(mingwenFile);
@@ -982,7 +994,7 @@ public class JIEMA {
                     mingwenFile.createNewFile();
                     System.out.println("明文mp4文件 index:"+i+"    path:"+ mingwenFile.getAbsolutePath());
                 } catch (IOException e){
-                    System.out.println("明文创建失败！");
+                    System.out.println("明文 mp4 创建失败！");
                 }
             }
             allPointFile_mingwen.add(mingwenFile);
@@ -990,6 +1002,30 @@ public class JIEMA {
 
         }
         System.out.println("*********** mp4文件列表End*********** " );
+
+
+        System.out.println("*********** gif文件列表Begin*********** " );
+        for (int i = 0; i < gifFileList_miwen.size(); i++) {
+            System.out.println("密gif文件 index:" + (i+1)+"   路径: "+ gifFileList_miwen.get(i).getAbsolutePath());
+            String miwen_gifFile = gifFileList_miwen.get(i).getAbsolutePath();
+            String mingwenPointFile = miwen_gifFile.replace("miwen","mingwen");
+            String mingwenPointFile_xxx = mingwenPointFile.trim()+".gif";
+
+            File mingwenFile =  new File(mingwenPointFile_xxx);
+            if(! mingwenFile.exists()){
+                try {
+                    mingwenFile.createNewFile();
+                    System.out.println("明文gif文件 index:"+i+"    path:"+ mingwenFile.getAbsolutePath());
+                } catch (IOException e){
+                    System.out.println("明文 gif 创建失败！");
+                }
+            }
+            allPointFile_mingwen.add(mingwenFile);
+            mingwen_miwen_Map.put(gifFileList_miwen.get(i),mingwenFile);
+
+        }
+        System.out.println("*********** gif文件列表End*********** " );
+
 
         System.out.println("=======文件列表 End  文件总数:"+ allPointFile_miwen.size()+" =======" );
     }
@@ -1008,6 +1044,8 @@ public class JIEMA {
             } else if(file.getAbsolutePath().contains(File.separator+"i"+File.separator)){
 
                 jpgFileList_miwen.add(file);
+            } else if(file.getAbsolutePath().contains(File.separator+"g"+File.separator)){
+                gifFileList_miwen.add(file);
             }
 
             return ;
@@ -1417,7 +1455,6 @@ public class JIEMA {
 
 
 }
-
 
 ```
 
