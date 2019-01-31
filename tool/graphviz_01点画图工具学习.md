@@ -220,12 +220,93 @@ attrs: Any additional node attributes (must be strings).
 ##### digraph.node('A', 'Dot A') 
 
  <img src="//../zimage/tool/graphviz/digraph3.jpg">
+```
+WifiController 状态机切换图
 
-##### digraph.node('A', 'Dot A',shape="mdiamond") 
+
+from graphviz import Digraph
+
+if __name__ == '__main__':
+    dot = Digraph(comment='record-test')
+    dot.graph_attr['rankdir'] = 'BT'
+    dot.node('Default', label="Default\nState",shape="box")
+    dot.node('StaDisabled', label="StaDisabled\nState",shape="box")
+    dot.node('StaEnabled', label="StaEnabled\nState",shape="box" )
+    dot.node('DeviceActive', label="DeviceActive\nState",shape="box")
+    dot.node('StaDisabledWithScan', label="StaDisabledWithScan\nState",shape="box")
+    dot.node('Ecm', label="Ecm\nState",shape="box")
+
+    dot.edge("Default","StaDisabled",label="1")
+    dot.edge("Default","StaEnabled",label="2",weight='8')
+    dot.edge("Default","StaDisabledWithScan",label="4")
+    dot.edge("StaEnabled","DeviceActive",label="3")
+    dot.edge("Default","Ecm",label="5")
+
+    print(dot.source)
+    print(dot.graph_attr)
+    print(dot.node_attr)
+    print(dot.edge_attr)
+    print(dot.body)
+    dot.render('test-output/test-table.gv', view=True)
+
+
+```
+ <img src="//../zimage/tool/graphviz/digraph14.jpg">
+
+
+##### digraph.node('A', 'Dot A',shape="Mdiamond") 
  <img src="//../zimage/tool/graphviz/digraph4.jpg">
 
 ##### digraph.node('A', 'Dot A',shape="box") 
  <img src="//../zimage/tool/graphviz/digraph5.jpg">
+
+
+```
+WifiStateMachine 状态机切换图
+
+from graphviz import Digraph
+
+if __name__ == '__main__':
+    dot = Digraph(comment='record-test')
+    dot.graph_attr['rankdir'] = 'BT'
+    dot.node('Default', label="Default\nState",shape="box")
+    dot.node('ConnectMode', label="ConnectMode\nState",shape="box")
+    dot.node('L2Connected', label="L2Connected\nState",shape="box" )
+    dot.node('ObtainingIp', label="ObtainingIp\nState",shape="box")
+    dot.node('Connected', label="Connected\nState",shape="box")
+    dot.node('Roaming', label="Roaming\nState",shape="box")
+    dot.node('Disconnecting', label="Disconnecting\nState",shape="box")
+    dot.node('Disconnected', label="Disconnected\nState",shape="box")
+
+
+
+    dot.edge("Default","ConnectMode")
+    dot.edge("ConnectMode","L2Connected",weight='8')
+    dot.edge("ConnectMode","Disconnecting")
+    dot.edge("ConnectMode","Disconnected")
+    dot.edge("L2Connected","ObtainingIp")
+    dot.edge("L2Connected","Connected",weight='2')
+    dot.edge("L2Connected","Roaming")
+
+    print(dot.source)
+    print(dot.graph_attr)
+    print(dot.node_attr)
+    print(dot.edge_attr)
+    print(dot.body)
+    dot.render('test-output/test-table.gv', view=True)
+
+
+
+
+```
+ <img src="//../zimage/tool/graphviz/digraph15.jpg">
+
+
+
+
+
+
+
 ##### digraph.node('A', 'Dot A',shape="triangle") 
 
  <img src="//../zimage/tool/graphviz/digraph6.jpg">
@@ -233,8 +314,64 @@ attrs: Any additional node attributes (must be strings).
 ##### digraph.node('A', 'Dot A',shape="circle") 
  <img src="//../zimage/tool/graphviz/digraph7.jpg">
 
+ <img src="//../zimage/tool/graphviz/digraph10.jpg">
 
 
+##### digraph.node('A', label='x1',shape="record")
+```
+record 图形用来定义数据结构
+
+from graphviz import Digraph
+
+if __name__ == '__main__':
+    dot = Digraph(comment='record-test')
+    dot.node('A', label="left|middle|right",shape="record")
+    dot.node('B',"hello\nworld|{b|{c|d|e}|f}|g|h",shape="record")
+    dot.view()
+    print(dot.source)
+    print(dot.graph_attr)
+    print(dot.node_attr)
+    print(dot.edge_attr)
+    print(dot.body)
+    dot.render('test-output/test-table.gv', view=True)
+```
+ <img src="//../zimage/tool/graphviz/digraph12.jpg">
+
+
+##### digraph.node('A', label='<f0>left|<f1>A|<f3>right',shape="record")
+```
+使用record图形 来定义 node左右指针结点  连接 0,1,2,3,4,5,6 七个节点
+
+from graphviz import Digraph
+
+if __name__ == '__main__':
+    dot = Digraph(comment='record_test')
+    dot.node('A', label="<f0>left|<f1>0|<f2>right",shape="record")
+    dot.node('B', label="<f0>left|<f1>1|<f2>right",shape="record")
+    dot.node('C', label="<f0>left|<f1>2|<f2>right",shape="record")
+    dot.node('E', label="<f0>left|<f1>3|<f2>right",shape="record")
+    dot.node('F', label="<f0>left|<f1>4|<f2>right",shape="record")
+    dot.node('G', label="<f0>left|<f1>5|<f2>right",shape="record")
+    dot.node('H', label="<f0>left|<f1>6|<f2>right",shape="record")
+
+    dot.edge('A:f0','B:f1')
+    dot.edge('A:f2','C:f1')
+
+    dot.edge('B:f0','E:f1')
+    dot.edge('B:f2','F:f1')
+
+    dot.edge('C:f0','G:f1')
+    dot.edge('C:f2','H:f1')
+
+    print(dot.source)
+    print(dot.graph_attr)
+    print(dot.node_attr)
+    print(dot.edge_attr)
+    print(dot.body)
+    dot.render('test-output/test-table.gv', view=True)
+```
+
+ <img src="//../zimage/tool/graphviz/digraph13.jpg">
 
 
 
@@ -687,6 +824,10 @@ digraph.node_attr['color'] = 'FF5588'
 ```
  <img src="//../zimage/tool/graphviz/digraph9.jpg">
 
+##### igraph.node_attr{'color': '常见值'}
+ <img src="//../zimage/tool/graphviz/digraph11.jpg">
+
+
 #### digraph.edge_attr
 ```
 
@@ -771,7 +912,7 @@ print(dot.edge_attr)
 <tr>
 <td>headport</td>
 <td>&nbsp;</td>
-<td>n,ne,e,se,s,sw,w,nw</td>
+<td>n,ne,e,se,s,sw,w,nw  当node为record时指定edge的端口</td>
 </tr>
 <tr>
 <td>headURL</td>
@@ -856,7 +997,7 @@ print(dot.edge_attr)
 <tr>
 <td>tailport</td>
 <td>&nbsp;</td>
-<td>label placed near tail of edge n,ne,e,se,s,sw,w,nw</td>
+<td>label placed near tail of edge n,ne,e,se,s,sw,w,nw 在PyGraphviz中用来实现nodename:portname的线端指定</td>
 </tr>
 <tr>
 <td>tailURL</td>
@@ -983,3 +1124,45 @@ graph {
 ```
  <img src="//../zimage/tool/graphviz/graph1.jpg">
 
+
+# 安卓状态机图形
+
+ <img src="//../zimage/tool/graphviz/digraph16.jpg">
+```
+WifiStateMachinePrime.ModeStateMachine  状态机
+
+addState(mDefault);
+addState(mClientModeActiveState);
+addState(mScanOnlyModeActiveState);
+addState(mWifiDisabledState);
+
+
+
+
+from graphviz import Digraph
+
+if __name__ == '__main__':
+    dot = Digraph(comment='record-test')
+    dot.graph_attr['rankdir'] = 'BT'
+
+    dot.node('Default', label="Default\nState",shape="box" )
+    dot.node('ClientModeActive', label="ClientModeActive\nState",shape="box")
+    dot.node('ScanOnlyModeActive', label="ScanOnlyModeActive\nState",shape="box")
+    dot.node('WifiDisabled', label="WifiDisabled\nState",shape="box" )
+
+    dot.edge("Default","ClientModeActive")
+    dot.edge("Default","ScanOnlyModeActive")
+    dot.edge("Default","WifiDisabled")
+
+
+    print(dot.source)
+    print(dot.graph_attr)
+    print(dot.node_attr)
+    print(dot.edge_attr)
+    print(dot.body)
+    dot.render('test-output/test-table.gv', view=True)
+
+
+
+
+```
