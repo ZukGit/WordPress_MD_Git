@@ -38,7 +38,10 @@ graphviz 学习
 
 ```
 
+# 在线运行Graphviz
+https://dreampuf.github.io/GraphvizOnline/
 
+https://graphviz.readthedocs.io/en/stable/     Graphviz教程地址
 # 下载安装使用 graphviz
 ```
 
@@ -88,6 +91,7 @@ The plugin configuration file:
 
 
 ```
+
 
 
 
@@ -1091,6 +1095,486 @@ digraph {
 
  <img src="//../zimage/tool/graphviz/digraph1.jpg">
 
+
+
+### Digraph 有向图_简单绘图_2
+```
+from graphviz import Digraph
+
+f = Digraph('finite_state_machine', filename='fsm.gv')
+f.attr(rankdir='LR', size='8,5')
+
+f.attr('node', shape='doublecircle')
+f.node('LR_0')
+f.node('LR_3')
+f.node('LR_4')
+f.node('LR_8')
+
+f.attr('node', shape='circle')
+f.edge('LR_0', 'LR_2', label='SS(B)')
+f.edge('LR_0', 'LR_1', label='SS(S)')
+f.edge('LR_1', 'LR_3', label='S($end)')
+f.edge('LR_2', 'LR_6', label='SS(b)')
+f.edge('LR_2', 'LR_5', label='SS(a)')
+f.edge('LR_2', 'LR_4', label='S(A)')
+f.edge('LR_5', 'LR_7', label='S(b)')
+f.edge('LR_5', 'LR_5', label='S(a)')
+f.edge('LR_6', 'LR_6', label='S(b)')
+f.edge('LR_6', 'LR_5', label='S(a)')
+f.edge('LR_7', 'LR_8', label='S(b)')
+f.edge('LR_7', 'LR_5', label='S(a)')
+f.edge('LR_8', 'LR_6', label='S(b)')
+f.edge('LR_8', 'LR_5', label='S(a)')
+
+f.view()
+print(f.source)
+
+```
+
+```
+digraph finite_state_machine {
+	rankdir=LR size="8,5"
+	node [shape=doublecircle]
+	LR_0
+	LR_3
+	LR_4
+	LR_8
+	node [shape=circle]
+	LR_0 -> LR_2 [label="SS(B)"]
+	LR_0 -> LR_1 [label="SS(S)"]
+	LR_1 -> LR_3 [label="S($end)"]
+	LR_2 -> LR_6 [label="SS(b)"]
+	LR_2 -> LR_5 [label="SS(a)"]
+	LR_2 -> LR_4 [label="S(A)"]
+	LR_5 -> LR_7 [label="S(b)"]
+	LR_5 -> LR_5 [label="S(a)"]
+	LR_6 -> LR_6 [label="S(b)"]
+	LR_6 -> LR_5 [label="S(a)"]
+	LR_7 -> LR_8 [label="S(b)"]
+	LR_7 -> LR_5 [label="S(a)"]
+	LR_8 -> LR_6 [label="S(b)"]
+	LR_8 -> LR_5 [label="S(a)"]
+}
+
+```
+ <img src="//../zimage/tool/graphviz/digraph17.jpg">
+
+
+
+### Digraph 有向图_集群_3
+
+```
+from graphviz import Digraph
+
+g = Digraph('G', filename='cluster.gv')
+
+# NOTE: the subgraph name needs to begin with 'cluster' (all lowercase)
+#       so that Graphviz recognizes it as a special cluster subgraph
+
+with g.subgraph(name='cluster_0') as c:
+    c.attr(style='filled')
+    c.attr(color='lightgrey')
+    c.node_attr.update(style='filled', color='white')
+    c.edges([('a0', 'a1'), ('a1', 'a2'), ('a2', 'a3')])
+    c.attr(label='process #1')
+
+with g.subgraph(name='cluster_1') as c:
+    c.node_attr.update(style='filled')
+    c.edges([('b0', 'b1'), ('b1', 'b2'), ('b2', 'b3')])
+    c.attr(label='process #2')
+    c.attr(color='blue')
+
+g.edge('start', 'a0')
+g.edge('start', 'b0')
+g.edge('a1', 'b3')
+g.edge('b2', 'a3')
+g.edge('a3', 'a0')
+g.edge('a3', 'end')
+g.edge('b3', 'end')
+
+g.node('start', shape='Mdiamond')
+g.node('end', shape='Msquare')
+
+g.view()
+print(g.source)
+
+```
+
+
+```
+digraph G {
+	subgraph cluster_0 {
+		node [color=white style=filled]
+		style=filled
+		color=lightgrey
+		a0 -> a1
+		a1 -> a2
+		a2 -> a3
+		label="process #1"
+	}
+	subgraph cluster_1 {
+		node [style=filled]
+		b0 -> b1
+		b1 -> b2
+		b2 -> b3
+		label="process #2"
+		color=blue
+	}
+	start -> a0
+	start -> b0
+	a1 -> b3
+	b2 -> a3
+	a3 -> a0
+	a3 -> end
+	b3 -> end
+	start [shape=Mdiamond]
+	end [shape=Msquare]
+}
+
+```
+
+ <img src="//../zimage/tool/graphviz/digraph18.jpg">
+
+
+### Digraph 有向图_实例关系ER图_4
+
+```
+
+# er.py - http://www.graphviz.org/content/ER
+
+from graphviz import Graph
+
+e = Graph('ER', filename='er.gv', engine='neato')
+
+e.attr('node', shape='box')
+e.node('course')
+e.node('institute')
+e.node('student')
+
+e.attr('node', shape='ellipse')
+e.node('name0', label='name')
+e.node('name1', label='name')
+e.node('name2', label='name')
+e.node('code')
+e.node('grade')
+e.node('number')
+
+e.attr('node', shape='diamond', style='filled', color='lightgrey')
+e.node('C-I')
+e.node('S-C')
+e.node('S-I')
+
+e.edge('name0', 'course')
+e.edge('code', 'course')
+e.edge('course', 'C-I', label='n', len='1.00')
+e.edge('C-I', 'institute', label='1', len='1.00')
+e.edge('institute', 'name1')
+e.edge('institute', 'S-I', label='1', len='1.00')
+e.edge('S-I', 'student', label='n', len='1.00')
+e.edge('student', 'grade')
+e.edge('student', 'name2')
+e.edge('student', 'number')
+e.edge('student', 'S-C', label='m', len='1.00')
+e.edge('S-C', 'course', label='n', len='1.00')
+
+e.attr(label=r'\n\nEntity Relation Diagram\ndrawn by Zukgit')
+e.attr(fontsize='20')
+
+e.view()
+print(e.source)
+
+```
+
+```
+
+graph ER {
+	node [shape=box]
+	course
+	institute
+	student
+	node [shape=ellipse]
+	name0 [label=name]
+	name1 [label=name]
+	name2 [label=name]
+	code
+	grade
+	number
+	node [color=lightgrey shape=diamond style=filled]
+	"C-I"
+	"S-C"
+	"S-I"
+	name0 -- course
+	code -- course
+	course -- "C-I" [label=n len=1.00]
+	"C-I" -- institute [label=1 len=1.00]
+	institute -- name1
+	institute -- "S-I" [label=1 len=1.00]
+	"S-I" -- student [label=n len=1.00]
+	student -- grade
+	student -- name2
+	student -- number
+	student -- "S-C" [label=m len=1.00]
+	"S-C" -- course [label=n len=1.00]
+	label="\n\nEntity Relation Diagram\ndrawn by Zukgit"
+	fontsize=20
+}
+
+
+```
+ <img src="//../zimage/tool/graphviz/digraph19.jpg">
+
+
+
+
+### Digraph 有向图_迭代继承图_5
+
+```
+# unix.py - http://www.graphviz.org/content/unix
+
+from graphviz import Digraph
+
+u = Digraph('unix', filename='unix.gv')
+u.attr(size='6,6')
+u.node_attr.update(color='lightblue2', style='filled')
+
+u.edge('5th Edition', '6th Edition')
+u.edge('5th Edition', 'PWB 1.0')
+u.edge('6th Edition', 'LSX')
+u.edge('6th Edition', '1 BSD')
+u.edge('6th Edition', 'Mini Unix')
+u.edge('6th Edition', 'Wollongong')
+u.edge('6th Edition', 'Interdata')
+u.edge('Interdata', 'Unix/TS 3.0')
+u.edge('Interdata', 'PWB 2.0')
+u.edge('Interdata', '7th Edition')
+u.edge('7th Edition', '8th Edition')
+u.edge('7th Edition', '32V')
+u.edge('7th Edition', 'V7M')
+u.edge('7th Edition', 'Ultrix-11')
+u.edge('7th Edition', 'Xenix')
+u.edge('7th Edition', 'UniPlus+')
+u.edge('V7M', 'Ultrix-11')
+u.edge('8th Edition', '9th Edition')
+u.edge('1 BSD', '2 BSD')
+u.edge('2 BSD', '2.8 BSD')
+u.edge('2.8 BSD', 'Ultrix-11')
+u.edge('2.8 BSD', '2.9 BSD')
+u.edge('32V', '3 BSD')
+u.edge('3 BSD', '4 BSD')
+u.edge('4 BSD', '4.1 BSD')
+u.edge('4.1 BSD', '4.2 BSD')
+u.edge('4.1 BSD', '2.8 BSD')
+u.edge('4.1 BSD', '8th Edition')
+u.edge('4.2 BSD', '4.3 BSD')
+u.edge('4.2 BSD', 'Ultrix-32')
+u.edge('PWB 1.0', 'PWB 1.2')
+u.edge('PWB 1.0', 'USG 1.0')
+u.edge('PWB 1.2', 'PWB 2.0')
+u.edge('USG 1.0', 'CB Unix 1')
+u.edge('USG 1.0', 'USG 2.0')
+u.edge('CB Unix 1', 'CB Unix 2')
+u.edge('CB Unix 2', 'CB Unix 3')
+u.edge('CB Unix 3', 'Unix/TS++')
+u.edge('CB Unix 3', 'PDP-11 Sys V')
+u.edge('USG 2.0', 'USG 3.0')
+u.edge('USG 3.0', 'Unix/TS 3.0')
+u.edge('PWB 2.0', 'Unix/TS 3.0')
+u.edge('Unix/TS 1.0', 'Unix/TS 3.0')
+u.edge('Unix/TS 3.0', 'TS 4.0')
+u.edge('Unix/TS++', 'TS 4.0')
+u.edge('CB Unix 3', 'TS 4.0')
+u.edge('TS 4.0', 'System V.0')
+u.edge('System V.0', 'System V.2')
+u.edge('System V.2', 'System V.3')
+
+u.view()
+print(u.source)
+```
+
+```
+digraph unix {
+	node [color=lightblue2 style=filled]
+	size="6,6"
+	"5th Edition" -> "6th Edition"
+	"5th Edition" -> "PWB 1.0"
+	"6th Edition" -> LSX
+	"6th Edition" -> "1 BSD"
+	"6th Edition" -> "Mini Unix"
+	"6th Edition" -> Wollongong
+	"6th Edition" -> Interdata
+	Interdata -> "Unix/TS 3.0"
+	Interdata -> "PWB 2.0"
+	Interdata -> "7th Edition"
+	"7th Edition" -> "8th Edition"
+	"7th Edition" -> "32V"
+	"7th Edition" -> V7M
+	"7th Edition" -> "Ultrix-11"
+	"7th Edition" -> Xenix
+	"7th Edition" -> "UniPlus+"
+	V7M -> "Ultrix-11"
+	"8th Edition" -> "9th Edition"
+	"1 BSD" -> "2 BSD"
+	"2 BSD" -> "2.8 BSD"
+	"2.8 BSD" -> "Ultrix-11"
+	"2.8 BSD" -> "2.9 BSD"
+	"32V" -> "3 BSD"
+	"3 BSD" -> "4 BSD"
+	"4 BSD" -> "4.1 BSD"
+	"4.1 BSD" -> "4.2 BSD"
+	"4.1 BSD" -> "2.8 BSD"
+	"4.1 BSD" -> "8th Edition"
+	"4.2 BSD" -> "4.3 BSD"
+	"4.2 BSD" -> "Ultrix-32"
+	"PWB 1.0" -> "PWB 1.2"
+	"PWB 1.0" -> "USG 1.0"
+	"PWB 1.2" -> "PWB 2.0"
+	"USG 1.0" -> "CB Unix 1"
+	"USG 1.0" -> "USG 2.0"
+	"CB Unix 1" -> "CB Unix 2"
+	"CB Unix 2" -> "CB Unix 3"
+	"CB Unix 3" -> "Unix/TS++"
+	"CB Unix 3" -> "PDP-11 Sys V"
+	"USG 2.0" -> "USG 3.0"
+	"USG 3.0" -> "Unix/TS 3.0"
+	"PWB 2.0" -> "Unix/TS 3.0"
+	"Unix/TS 1.0" -> "Unix/TS 3.0"
+	"Unix/TS 3.0" -> "TS 4.0"
+	"Unix/TS++" -> "TS 4.0"
+	"CB Unix 3" -> "TS 4.0"
+	"TS 4.0" -> "System V.0"
+	"System V.0" -> "System V.2"
+	"System V.2" -> "System V.3"
+}
+
+```
+ <img src="//../zimage/tool/graphviz/digraph20.jpg">
+
+
+
+### Digraph 有向图_数据结构图_6
+```
+# structs.py - http://www.graphviz.org/doc/info/shapes.html#html
+
+from graphviz import Digraph
+
+s = Digraph('structs', node_attr={'shape': 'plaintext'})
+
+s.node('struct1', '''<
+<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">
+  <TR>
+    <TD>left</TD>
+    <TD PORT="f1">middle</TD>
+    <TD PORT="f2">right</TD>
+  </TR>
+</TABLE>>''')
+s.node('struct2', '''<
+<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">
+  <TR>
+    <TD PORT="f0">one</TD>
+    <TD>two</TD>
+  </TR>
+</TABLE>>''')
+s.node('struct3', '''<
+<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="4">
+  <TR>
+    <TD ROWSPAN="3">hello<BR/>world</TD>
+    <TD COLSPAN="3">b</TD>
+    <TD ROWSPAN="3">g</TD>
+    <TD ROWSPAN="3">h</TD>
+  </TR>
+  <TR>
+    <TD>c</TD>
+    <TD PORT="here">d</TD>
+    <TD>e</TD>
+  </TR>
+  <TR>
+    <TD COLSPAN="3">f</TD>
+  </TR>
+</TABLE>>''')
+
+s.edges([('struct1:f1', 'struct2:f0'), ('struct1:f2', 'struct3:here')])       # 指定了 连接的 Port
+
+s.view()
+print(s.source)
+
+```
+
+
+```
+digraph structs {
+	node [shape=plaintext]
+	struct1 [label=<
+<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">
+  <TR>
+    <TD>left</TD>
+    <TD PORT="f1">middle</TD>
+    <TD PORT="f2">right</TD>
+  </TR>
+</TABLE>>]
+	struct2 [label=<
+<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">
+  <TR>
+    <TD PORT="f0">one</TD>
+    <TD>two</TD>
+  </TR>
+</TABLE>>]
+	struct3 [label=<
+<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="4">
+  <TR>
+    <TD ROWSPAN="3">hello<BR/>world</TD>
+    <TD COLSPAN="3">b</TD>
+    <TD ROWSPAN="3">g</TD>
+    <TD ROWSPAN="3">h</TD>
+  </TR>
+  <TR>
+    <TD>c</TD>
+    <TD PORT="here">d</TD>
+    <TD>e</TD>
+  </TR>
+  <TR>
+    <TD COLSPAN="3">f</TD>
+  </TR>
+</TABLE>>]
+	struct1:f1 -> struct2:f0
+	struct1:f2 -> struct3:here
+}
+
+```
+
+ <img src="//../zimage/tool/graphviz/digraph21.jpg">
+
+
+
+### Digraph 有向图_数据结构快速原型图_7
+```
+from graphviz import Digraph
+
+s = Digraph('structs', filename='structs_revisited.gv', node_attr={'shape': 'record'})
+
+s.node('struct1', '<f0> 1|<f1> 2|<f2> 3')
+s.node('struct2', '<f0> 1|<f1> 2')
+s.node('struct3', r'hello\nworld |{ b |{c|<here> d|e}| f}| g | h')
+
+s.edges([('struct1:f1', 'struct2:f0'), ('struct1:f2', 'struct3:here')])
+
+s.view()
+print(s.source)
+
+```
+
+
+```
+digraph structs {
+	node [shape=record]
+	struct1 [label="<f0> 1|<f1> 2|<f2> 3"]
+	struct2 [label="<f0> 1|<f1> 2"]
+	struct3 [label="hello\nworld |{ b |{c|<here> d|e}| f}| g | h"]
+	struct1:f1 -> struct2:f0
+	struct1:f2 -> struct3:here
+}
+```
+ <img src="//../zimage/tool/graphviz/digraph22.jpg">
+
 ## Graph无向图
 
 
@@ -1124,6 +1608,53 @@ graph {
 ```
  <img src="//../zimage/tool/graphviz/graph1.jpg">
 
+
+### Graph无向图_简单绘制_2
+```
+from graphviz import Graph
+
+g = Graph('G', filename='process.gv', engine='sfdp')
+
+g.edge('run', 'intr')
+g.edge('intr', 'runbl')
+g.edge('runbl', 'run')
+g.edge('run', 'kernel')
+g.edge('kernel', 'zombie')
+g.edge('kernel', 'sleep')
+g.edge('kernel', 'runmem')
+g.edge('sleep', 'swap')
+g.edge('swap', 'runswap')
+g.edge('runswap', 'new')
+g.edge('runswap', 'runmem')
+g.edge('new', 'runmem')
+g.edge('sleep', 'runmem')
+
+g.view()
+print(g.source)
+
+
+
+```
+```
+// dot 源码
+graph G {
+	run -- intr
+	intr -- runbl
+	runbl -- run
+	run -- kernel
+	kernel -- zombie
+	kernel -- sleep
+	kernel -- runmem
+	sleep -- swap
+	swap -- runswap
+	runswap -- new
+	runswap -- runmem
+	new -- runmem
+	sleep -- runmem
+}
+
+```
+ <img src="//../zimage/tool/graphviz/graph2.jpg">
 
 # 安卓状态机图形
 
