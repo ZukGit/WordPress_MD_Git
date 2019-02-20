@@ -42,6 +42,12 @@ be raised to QC for further investigation      // 上升到QC以进一步排查
 # N
 # O
 # P
+
+## Prioritize
+```
+Prioritize   优先处理,提高等级
+Any update on this case? please prioritize it .
+```
 # Q
 # R
 
@@ -51,6 +57,13 @@ Regard
 Regards      致意  问候
 
 Best Regards    致敬
+```
+
+## Resolve
+```
+Resolve   解决  处理 
+We need resolve it ASAP .   我们需要尽快解决它
+
 ```
 # S
 # T
