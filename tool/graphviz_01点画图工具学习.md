@@ -1575,6 +1575,208 @@ digraph structs {
 ```
  <img src="//../zimage/tool/graphviz/digraph22.jpg">
 
+
+### Digraph 有向图_二叉树图_8
+
+```
+
+from graphviz import Digraph, nohtml
+
+g = Digraph('g', filename='btree.gv', node_attr={'shape': 'record', 'height': '.1'})
+
+g.node('node0', nohtml('<f0> |<f1> G|<f2>'))
+g.node('node1', nohtml('<f0> |<f1> E|<f2>'))
+g.node('node2', nohtml('<f0> |<f1> B|<f2>'))
+g.node('node3', nohtml('<f0> |<f1> F|<f2>'))
+g.node('node4', nohtml('<f0> |<f1> R|<f2>'))
+g.node('node5', nohtml('<f0> |<f1> H|<f2>'))
+g.node('node6', nohtml('<f0> |<f1> Y|<f2>'))
+g.node('node7', nohtml('<f0> |<f1> A|<f2>'))
+g.node('node8', nohtml('<f0> |<f1> C|<f2>'))
+
+g.edge('node0:f2', 'node4:f1')
+g.edge('node0:f0', 'node1:f1')
+g.edge('node1:f0', 'node2:f1')
+g.edge('node1:f2', 'node3:f1')
+g.edge('node2:f2', 'node8:f1')
+g.edge('node2:f0', 'node7:f1')
+g.edge('node4:f2', 'node6:f1')
+g.edge('node4:f0', 'node5:f1')
+
+g.view()
+
+```
+
+
+
+```
+digraph g {
+	node [height=.1 shape=record]
+	node0 [label="<f0> |<f1> G|<f2>"]
+	node1 [label="<f0> |<f1> E|<f2>"]
+	node2 [label="<f0> |<f1> B|<f2>"]
+	node3 [label="<f0> |<f1> F|<f2>"]
+	node4 [label="<f0> |<f1> R|<f2>"]
+	node5 [label="<f0> |<f1> H|<f2>"]
+	node6 [label="<f0> |<f1> Y|<f2>"]
+	node7 [label="<f0> |<f1> A|<f2>"]
+	node8 [label="<f0> |<f1> C|<f2>"]
+	node0:f2 -> node4:f1
+	node0:f0 -> node1:f1
+	node1:f0 -> node2:f1
+	node1:f2 -> node3:f1
+	node2:f2 -> node8:f1
+	node2:f0 -> node7:f1
+	node4:f2 -> node6:f1
+	node4:f0 -> node5:f1
+}
+
+
+
+```
+
+
+ <img src="//../zimage/tool/graphviz/digraph23.jpg">
+
+
+
+
+### Digraph 有向图_环图_9
+
+
+```
+from graphviz import Digraph
+
+t = Digraph('TrafficLights', filename='traffic_lights.gv', engine='neato')
+
+t.attr('node', shape='box')
+for i in (2, 1):
+    t.node('gy%d' % i)
+    t.node('yr%d' % i)
+    t.node('rg%d' % i)
+
+t.attr('node', shape='circle', fixedsize='true', width='0.9')
+for i in (2, 1):
+    t.node('green%d' % i)
+    t.node('yellow%d' % i)
+    t.node('red%d' % i)
+    t.node('safe%d' % i)
+
+for i, j in [(2, 1), (1, 2)]:
+    t.edge('gy%d' % i, 'yellow%d' % i)
+    t.edge('rg%d' % i, 'green%d' % i)
+    t.edge('yr%d' % i, 'safe%d' % j)
+    t.edge('yr%d' % i, 'red%d' % i)
+    t.edge('safe%d' % i, 'rg%d' % i)
+    t.edge('green%d' % i, 'gy%d' % i)
+    t.edge('yellow%d' % i, 'yr%d' % i)
+    t.edge('red%d' % i, 'rg%d' % i)
+
+t.attr(overlap='false')
+t.attr(label=r'PetriNet Model TrafficLights\n'
+             r'Extracted from ConceptBase and layed out by Graphviz')
+t.attr(fontsize='12')
+
+t.view()
+print(t.source)
+
+```
+
+
+```
+digraph TrafficLights {
+	node [shape=box]
+	gy2
+	yr2
+	rg2
+	gy1
+	yr1
+	rg1
+	node [fixedsize=true shape=circle width=0.9]
+	green2
+	yellow2
+	red2
+	safe2
+	green1
+	yellow1
+	red1
+	safe1
+	gy2 -> yellow2
+	rg2 -> green2
+	yr2 -> safe1
+	yr2 -> red2
+	safe2 -> rg2
+	green2 -> gy2
+	yellow2 -> yr2
+	red2 -> rg2
+	gy1 -> yellow1
+	rg1 -> green1
+	yr1 -> safe2
+	yr1 -> red1
+	safe1 -> rg1
+	green1 -> gy1
+	yellow1 -> yr1
+	red1 -> rg1
+	overlap=false
+	label="PetriNet Model TrafficLights\nExtracted from ConceptBase and layed out by Graphviz"
+	fontsize=12
+}
+
+```
+ <img src="//../zimage/tool/graphviz/digraph24.jpg">
+
+
+### Digraph 有向图_集群有向图_10
+
+
+```
+from graphviz import Digraph
+
+g = Digraph('G', filename='cluster_edge.gv')
+g.attr(compound='true')
+
+with g.subgraph(name='cluster0') as c:
+    c.edges(['ab', 'ac', 'bd', 'cd'])
+
+with g.subgraph(name='cluster1') as c:
+    c.edges(['eg', 'ef'])
+
+g.edge('b', 'f', lhead='cluster1')
+g.edge('d', 'e')
+g.edge('c', 'g', ltail='cluster0', lhead='cluster1')
+g.edge('c', 'e', ltail='cluster0')
+g.edge('d', 'h')
+
+g.view()
+print(g.source)
+
+```
+
+
+
+```
+digraph G {
+	compound=true
+	subgraph cluster0 {
+		a -> b
+		a -> c
+		b -> d
+		c -> d
+	}
+	subgraph cluster1 {
+		e -> g
+		e -> f
+	}
+	b -> f [lhead=cluster1]
+	d -> e
+	c -> g [lhead=cluster1 ltail=cluster0]
+	c -> e [ltail=cluster0]
+	d -> h
+}
+
+```
+ <img src="//../zimage/tool/graphviz/digraph25.jpg">
+
 ## Graph无向图
 
 
@@ -1655,6 +1857,60 @@ graph G {
 
 ```
  <img src="//../zimage/tool/graphviz/graph2.jpg">
+
+
+
+
+
+### Graph无向图_集群图_3
+
+
+
+```
+from graphviz import Graph
+
+g = Graph('G', filename='fdpclust.gv', engine='fdp')
+
+g.node('e')
+
+with g.subgraph(name='clusterA') as a:
+    a.edge('a', 'b')
+    with a.subgraph(name='clusterC') as c:
+        c.edge('C', 'D')
+
+with g.subgraph(name='clusterB') as b:
+    b.edge('d', 'f')
+
+g.edge('d', 'D')
+g.edge('e', 'clusterB')
+g.edge('clusterC', 'clusterB')
+
+g.view()
+print(g.source)
+
+```
+
+```
+graph G {
+	e
+	subgraph clusterA {
+		a -- b
+		subgraph clusterC {
+			C -- D
+		}
+	}
+	subgraph clusterB {
+		d -- f
+	}
+	d -- D
+	e -- clusterB
+	clusterC -- clusterB
+}
+
+```
+ <img src="//../zimage/tool/graphviz/graph3.jpg">
+
+
 
 # 安卓状态机图形
 
