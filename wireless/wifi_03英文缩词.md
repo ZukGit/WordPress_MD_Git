@@ -205,6 +205,9 @@ NAV:  network allocation vector
 OFDM: orthogonal frequency division multiplexing
 中文:   **正交频分复用**
 
+## OWE
+OWE : Opportunistic Wireless encryption 
+中文:  机会无限加密( 为每个用户提供单独的加密方式) 
 # P
 
 ## PHY

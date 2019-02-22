@@ -255,12 +255,53 @@ cd "$newPath"
 ```
 
 
+# shell脚本三
+```
+# item.sh    创建jiraID文件夹  然后在该文件夹内创建一个 分析.txt 文件    item 65323_foles
+
+#!/bin/bash
+# 1.创建jiraID文件夹  然后在该文件夹内创建一个 分析.txt 文件
+if [ -z ${1} ] ## 检查长度是否为0  字符串长度是否为0
+then echo "参数为空"  
+exit
+else echo ""
+fi
+itemPath="/mnt/d/jira_work/${1}"
+echo "$itemPath"
+if [ -d "$itemPath" ];then
+rm -fr "$itemPath"
+mkdir "$itemPath"
+else
+mkdir "$itemPath"
+fi
+cd "$itemPath"
+touch "分析.txt"
+#echo "itemPath : ${itemPath} "
+#2. 在下载文件夹中找到最新下载的 .zip 文件 然后移动到 itemPath 中并解压
+downloadPath="/mnt/d/jira_download/"     # 下载文件夹 chrome 默认下载地址
+cd "$downloadPath"
+logName=`ls -t *| head -1`
+logPath="/mnt/d/jira_download/${logName}"
+#echo "logPath : ${logPath} "
+cp -f "${logPath}" "${itemPath}"
+itemPath_Log="${itemPath}/${logName}"
+logName_NoEnd=`basename ${logName} .zip `
+logName_Path="${itemPath}/${logName_NoEnd}"
+mkdir "$logName_Path"
+cd "$logName_Path"
+echo "logName_Path : ${logName_Path} "
+#echo "itemPath_Log : ${itemPath_Log}"
+unzip -n "${itemPath_Log}" -d "${logName_Path}"   ## sudo apt-get install unzip
+
+```
+
 
 
 
 # expect交互脚本
 
 ```
+expect1.sh
 
 #!/usr/bin/expect -f
 spawn sudo su
@@ -273,7 +314,7 @@ interact
 
 #  git提交脚本
 ```
-
+gitcommit1.sh
 
 #!/bin/sh
 git add ./
@@ -283,7 +324,7 @@ git push origin master
 ```
 
 
-#  别名设置
+#  别名设置& ~/.bashrc.rc
 
 ```
 vim  /etc/bashrc
@@ -291,6 +332,6 @@ alias suz="/usr/local/sh_expect_work/suz.sh"
 alias cmt="/usr/local/sh_expect_work/cmt.sh"
 alias cdsh='cd /usr/local/sh_expect_work/'
 alias cdgit='cd  /Users/aaa/Desktop/code_place/zzj_git/'
-
+export PATH=$PATH:/mnt/c/Users/zukgit/Desktop/bin/       ## 添加路径到环境变量
 
 ```
