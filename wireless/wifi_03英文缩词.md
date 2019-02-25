@@ -1,5 +1,11 @@
 # A
 
+## AAA
+AAA： Authentication Authorization Accounting
+中文:   **认证 (Authentication)、授权 (Authorization)和计费 (Accounting)**
+
+
+
 ## ARP
 ARP：  Address Resolution Protocol
 中文:   **地址解析协议   把网络层的IP地址 -> 数据链路层的Mac地址的协议**
@@ -7,6 +13,12 @@ ARP：  Address Resolution Protocol
 ## AKM
 AKM： Authentication and key management
 中文:   **身份验证与秘钥管理**
+
+## ACS
+ACS： Access Control Server
+中文:   **访问控制服务器 使用802.1X协议实现LAN或WLAN用户的接入认证**
+
+
 
 # B
 
@@ -34,6 +46,10 @@ bandwidth： 频带带宽
 
 # C
 
+## CAC 
+CAC:   Channel Availability Check
+中文:   **DFC动态频率选择中的 信道可用性检查**
+
 ## CSMS/CA
 CSMS/CA:  Carrier Sense Multiple Access / Collision Avoidance
 中文:   **载波侦听多路访问/冲突避免**
@@ -50,6 +66,7 @@ CTS:   Clear To Send
 
 ## coverage holes
  coverage holes ：  覆盖盲区
+
 
 # D
 
@@ -199,6 +216,11 @@ MSDU:  Mac Serivce Data Unit
 ## NAV
 NAV:  network allocation vector
 中文:   **虚拟载波监听由 网络分配矢量 提供**
+
+
+## NOP
+NOP: non-occupancy
+中文:   **不可占用 EVENT_DFS_NOP_FINISHED - Notify that non-occupancy period is over**
 # O
 
 ## OFDM
@@ -232,6 +254,10 @@ preamble :  前导码
 ## PSK
 PSK： Pre-shared Key
 中文:   ** 预共享秘钥 wifi密码 **
+
+## PSM
+PSM： Power Save Mode
+中文:   ** WLAN节能模式 **
 
 ## PCF
 PCF: point coordination function
@@ -270,6 +296,11 @@ RTO:   Round-trip Time
 ## RSSI
 RSSI :    Recevived Signal  Strength Indication
 中文:   **射频信号强度**
+
+## RSN
+RSN: Robust Security Network
+中文:   **强健安全网络 802.11x 安全交互协议 针对WEP加密机制的各种缺陷做了多方面的改进**
+
 
 ## Roaming
 Roaming ：  漫游
@@ -313,6 +344,10 @@ threshold：  阈值
 ## TIM
 TIM：  Traffic Indication Map
 中文:   **传输指示映射,在beacon帧中用于确定beacon中信息是哪一个睡眠状态STA的**
+
+## TDLS
+TDLS: Tunneled Direct Link Setup
+中文: **通道直接链路建立 项标准允许两款设备通过WiFi网络进行点对点直连，与早起提倡的WiFi Direct相似，不过功能则更加完善 **
 # U
 
 ## UDP   
@@ -346,6 +381,11 @@ WLAN:  Wireless Local Area Network
 ## WMM
 WMM：  Wi-Fi Multi-Media
 中文:   **WiFi多媒体**
+
+## WNM
+WNM : Wireless Network Manager
+中文:   **无线网络管理**
+
 
 
 ## WDS
