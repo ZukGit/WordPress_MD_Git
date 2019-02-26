@@ -362,6 +362,15 @@ UDP： User Datagram Protocol
 vendor prefix：  Mac地址的厂商前缀 
 # W
 
+## WAPI
+WAPI:  WLAN Authentication and Privacy Infrastructure
+中文:   **无线局域网鉴别与保密基础结构**
+```
+WAPI 是中国自主知识产权的WLAN安全标准协议 , 而 WLAN安全协议的国际标准是 802.11i标准
+两者都是关于无线接入安全方面的协议，都旨在保证无线网络接入的安全以及无线数据通信的安全。
+两者的区别在于802.11i只定义了对于无线客户端的安全保证，而WAPI定义了针对无线客户端和无线接入点两者的鉴权，对应的数据加密算法也不相同，属于私有。
+
+```
 ##  WAP 
 WAP :  Wireless Access Point
 中文:   **无线接入点**
