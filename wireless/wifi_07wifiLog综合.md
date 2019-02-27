@@ -1048,10 +1048,1100 @@ http://androidxref.com/9.0.0_r3/xref/frameworks/opt/net/wifi/service/java/com/an
 
 
 
-#  WIFI-Stuct数据结构
+
+# wpa_supplicant相关资料
+
+## wpa_supplicant手机内相关文件
+```
+手机内相关文件
+
+可执行文件:
+/vendor/bin/hw/wpa_supplicant
+/vendor/bin/wpa_cli
+
+共享库文件
+/vendor/lib/libwpa_client.so
+/vendor/lib64/libwpa_client.so
+
+
+配置文件
+/vendor/etc/wifi/p2p_supplicant_overlay.conf
+/vendor/etc/wifi/wpa_supplicant_overlay.conf
+/data/vendor/wifi/wpa/p2p_supplicant.conf
+/data/vendor/wifi/wpa/wpa_supplicant.conf
+/data/vendor/wifi/wigig_supplicant.conf 
+/vendor/etc/wifi/wpa_supplicant.conf
+/vendor/etc/wifi/WCNSS_qcom_cfg.ini
+/data/vendor/wifi/cnss_diag.conf
+/data/vendor/wifi/hostapd/hostapd.conf
+/data/vendor/wifi/hostapd/hostapd.accept
+/data/vendor/wifi/hostapd/hostapd.deny
+
+
+
+数据文件
+/data/misc/wifi/WifiConfigStore.xml
+/data/misc/wifi/softap.conf
+
+
+socket文件
+/dev/socket/vendor_wpa_wlan0
+/data/vendor/misc/cutback/wpa_ctrl_1465-5
+/data/vendor/misc/cutback/wpa_ctrl_1465-6
+srw-rw---- 1 radio radio 0 2019-02-27 15:17 wpa_ctrl_1470-5
+srw-rw---- 1 radio radio 0 2019-02-27 15:17 wpa_ctrl_1470-6
+/data/vendor/wifi/hostapd/ctrl/wlan0   
+/data/vendor/wifi/wpa/sockets/wpa_ctrl_1142-1
+/data/vendor/wifi/wpa/sockets/wpa_ctrl_1142-2
+/data/vendor/wifi/wpa/sockets/wpa_ctrl_1145-5
+/data/vendor/wifi/wpa/sockets/wpa_ctrl_1145-6
+/data/vendor/wifi/wpa/sockets/wpa_ctrl_1147-15
+/data/vendor/wifi/wpa/sockets/wpa_ctrl_1147-16
+/data/vendor/wifi/wpa/sockets/wpa_ctrl_1150-3
+srwxrwx--- 1 wifi   wifi 0 2019-02-27 15:17 wlan0
+srw-rw---- 1 system wifi 0 2019-02-01 17:34 wpa_ctrl_1142-1
+srw-rw---- 1 system wifi 0 2019-02-01 17:34 wpa_ctrl_1142-2
+
+
+Log文件
+foles:/data/vendor/wifi/wlan_logs/cnss_fw_logs_000.txt  
+foles:/data/vendor/wifi/wlan_logs/host_driver_logs_000.txt
+foles:/data/vendor/wifi/wlan_logs/txrx_pktlog_000.dat
+
+
+
+APK应用文件
+/system/priv-app/WpaConfigApp/WpaConfigApp.apk
+
+
+```
+
+## wpa_supplicant初始化文件
+```
+
+
+
+/device/xxxx/common/etc/init.xxx.rc
+service wpa_supplicant /vendor/bin/hw/wpa_supplicant \        #  【 以运行服务的方式 执行二进制可执行文件 wpa_supplicant /vendor/bin/hw/wpa_supplicant 】
+    -O/data/vendor/wifi/wpa/sockets  \                        #  【-O  参数指定 ctrl_interface 控制接口工作目录】                         
+    -puse_p2p_group_interface=1  \                            #  【-p 配置驱动参数 key=value 】
+    -dd \                                                     #  【 -dd 设置log等级2  -ddd   -dddd  Log等级越高 】
+    -g@android:vendor_wpa_wlan0                               #  【-g 配置global ctrl_interface 全局控制接口 [ @android:vendor_wpa_wlan0 ] /dev/socket/vendor_wpa_wlan0 】
+#   we will start as root and wpa_supplicant will switch to user wifi
+#   after setting up the capabilities required for WEXT
+#   user wifi
+#   group wifi inet keystore
+    interface android.hardware.wifi.supplicant@1.0::ISupplicant default #【 安卓O的 HAL 接口 定义 http://androidxref.com/9.0.0_r3/xref/hardware/interfaces/current.txt 接口集合 】
+    interface android.hardware.wifi.supplicant@1.1::ISupplicant default
+    class main
+    socket vendor_wpa_wlan0 dgram 660 wifi wifi  ##【 表示新建一个socket 这个socket的名字是 vendor_wpa_wlan0 属于用户群组 wifi  socket路径为 /dev/socket/vendor_wpa_wlan0】
+    disabled     
+    oneshot       ## 【表示 只创建只能存在一个相同进程】
+------------------------------
+
+/device/xxxx/common/etc/init.xxx.rc
+service vendor.xx_supplicant /vendor/bin/hw/wpa_supplicant \  #  【 以运行服务的方式 执行二进制可执行文件 wpa_supplicant /vendor/bin/hw/wpa_supplicant 】
+    -iwigig0                                               
+    -Dnl80211 
+    -c/data/vendor/wifi/wpa/wpa_supplicant.conf \
+    -m/data/vendor/wifi/wigig_p2p_supplicant.conf \
+    -O/data/vendor/wifi/wigig_sockets  \
+    -dd \
+    -e/data/vendor/wifi/wigig_entropy.bin -g@android:wpa_wigig0 \
+    -S wigigsvc 
+    #   we will start as root and wpa_supplicant will switch to user wifi
+    #   after setting up the capabilities required for WEXT
+    #   user wifi
+    #   group wifi inet keystore
+    class main
+    socket wpa_wigig0 dgram 660 wifi wifi
+    disabled
+    oneshot
+
+------------------------------
+
+
+init.mt6795.rc
+service wpa_supplicant /system/bin/wpa_supplicant \
+        -iwlan0 -Dnl80211 -c/data/misc/wifi/wpa_supplicant.conf -e/data/misc/wifi/entropy.bin -ddd \
+        -I/system/etc/wifi/wpa_supplicant_overlay.conf \
+        -O/data/misc/wifi/sockets -g@android:wpa_wlan0
+        #   we will start as root and wpa_supplicant will switch to user wifi
+        socket wpa_wlan0 dgram 660 wifi wifi
+
+解析:
+1.启动一个服务，这个服务的名字为wpa_supplicant，这个服务是执行/system/bin/wpa_supplicant二进制可执行文件启动
+2.参数说明
+-i 用于配置 wpa_supplicant 硬件接口名 指定网络设备接口名  [wlan0]
+-D 用于配置 wpa_supplicant 使用的驱动程序[nl80211]
+-e 用于配置产生随机数的可执行程序
+-I 用于配置当前wpa_supplicant程序的一些feature 以及一些预定义网络所需要的配置文件
+-d 增加调试信息
+-O 配置 override ctrl_interface parameter for new interfaces
+-g 配置global ctrl_interface 全局控制接口 [ @android:wpa_wlan0 ] wpa_wlan0
+  socket wpa_wlan0 dgram 660 wifi wifi 表示新建一个socket 这个socket的名字是wpa_wlan0 属于用户wifi
+  对应的socket路径为 /dev/socket/wpa_wlan0
+
+
+ps -g wifi
+USER           PID  PPID     VSZ    RSS WCHAN            ADDR S NAME
+wifi           912     1   27136  10140 binder_io+          0 S android.hardware.wifi@1.0-service
+wifi          1267     1   19180   6132 ep_poll             0 S wificond
+wifi         31519     1 2144672  13008 poll_sche+          0 S wpa_supplicant
+
+
+```
+
+### /vendor/bin/hw/wpa_supplicant 命令使用说明
+```
+wpa_supplicant v2.7-devel-9
+Copyright (c) 2003-2017, Jouni Malinen <j@w1.fi> and contributors
+
+This software may be distributed under the terms of the BSD license.
+See README for more details.
+
+This product includes software developed by the OpenSSL Project
+for use in the OpenSSL Toolkit (http://www.openssl.org/)
+
+usage:
+  wpa_supplicant [-BddhKLqqtvW] [-P<pid file>] [-g<global ctrl>] \
+        [-G<group>] \
+        -i<ifname> -c<config file> [-C<ctrl>] [-D<driver>] [-p<driver_param>] \
+        [-b<br_ifname>] [-e<entropy file>] \
+        [-o<override driver>] [-O<override ctrl>] \
+        [-N -i<ifname> -c<conf> [-C<ctrl>] [-D<driver>] \
+        [-m<P2P Device config file>] \
+        [-p<driver_param>] [-b<br_ifname>] [-I<config file>] ...]
+
+drivers:
+  nl80211 = Linux nl80211/cfg80211
+options:
+  -b = optional bridge interface name      网桥接口名称 -bxxx【wpa_interface.bridge_ifname】
+  -B = run daemon in the background       daemonize守护进程  -B  【 wpa_params.daemon】
+  -c = Configuration file   配置文件文件路径全名    -c/data/vendor/wifi/wpa/wpa_supplicant.conf   【wpa_interface.confname】
+  -C = ctrl_interface parameter (only used if -c is not)
+  -d = increase debugging verbosity (-dd even more)  Log打印等级信息  -dd -ddd -dddd   【wpa_params.wpa_debug_level】
+  -D = driver name (can be multiple drivers: nl80211,wext)    驱动程序类型   -Dnl80211    -Dwext 【wpa_interface.driver】
+  -e = entropy file   用于产生随机数的可执行程序用于加密  -e/data/misc/wifi/entropy.bin    【wpa_params.entropy_file 】
+  -g = global ctrl_interface   全局控制接口  -g@android:vendor_wpa_wlan0             【wpa_params.ctrl_interface】
+  -G = global ctrl_interface group
+  -h = show this help text
+  -i = interface name       网卡接口名称    -iwlan0  【wpa_interface.ifname】
+  -I = additional configuration file  备份附加的配置文件全名   -I/system/etc/wifi/wpa_supplicant_overlay.conf  【wpa_interface.confanother】
+  -K = include keys (passwords, etc.) in debug output
+  -L = show license (BSD)
+  -m = Configuration file for the P2P Device interface     P2P设备接口配置文件 -m/data/vendor/wifi/wigig_p2p_supplicant.conf  【wpa_params.conf_p2p_dev 】
+  -N = start describing new interface
+  -o = override driver parameter for new interfaces        
+  -O = override ctrl_interface parameter for new interfaces    -O 指定控制接口参数 -O/data/misc/wifi/sockets  【wpa_params.override_ctrl_interface】
+  -p = driver parameters   驱动参数键值对 -puse_p2p_group_interface=1  【wpa_interface.driver_param】
+  -P = PID file
+  -q = decrease debugging verbosity (-qq even less)
+  -S = override default HIDL service name
+  -t = include timestamp in debug messages
+  -v = show version
+  -W = wait for a control interface monitor before starting
+example:
+  wpa_supplicant -Dnl80211 -iwlan0 -c/etc/wpa_supplicant.conf
+
+
+```
+
+## wpa_supplicant上行接口
+```
+wpa_supplicant的上行接口 
+wpa_supplicant 提供两种由外部模块获取信息的方式：
+一种是外部模块通过发送request 命令然后获取response的问答模式，
+一种是wpa_supplicant主动向外部发送event事件，由外部模块监听接收。
+
+一般的常用做法是外部模块通过调用wpa_ctrl_open()两次，分别建立两个control interface接口。
+一个为ctrl interface，用于发送命令，获取信息。
+一个接口调用wpa_ctrl_attach，成为 monitor interface，用于监听接收来自于wpa_supplicant的event事件。此举可以降低通信的耦合性，避免response和event的相互干扰。
+
+主要作用: 通过Unix domainsocket建立一个control interface 的client结点，与作为server的wpa_supplicant结点通信
+
+
+/data/vendor/wifi/wpa/sockets
+/data/vendor/wifi/wpa/sockets/wpa_ctrl_1142-1
+/data/vendor/wifi/wpa/sockets/wpa_ctrl_1142-2
+
+/dev/socket/vendor_wpa_wlan0
+```
+
+## wpa_supplicant下行接口
+```
+WPA_SUPPLICANT 中的NL80211 数据结构  使用netlink与驱动交互
+nl80211其实就是利用netlink机制将一些802.11相关的命令和参数发送给驱动去执行
+// 发送netlink消息
+ret = send_and_recv_msgs(drv, msg, NULL, NULL);
+
+
+```
+
+
+
+# wpa_supplicant初始化过程分析
+```
+main 函数位置
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/main.c#181
+
+
+
+int main(int argc, char *argv[])
+{
+	int c, i;
+	struct wpa_interface *ifaces, *iface;
+	int iface_count, exitcode = -1;
+	struct wpa_params params;
+	struct wpa_global *global;
+
+	if (os_program_init())
+		return -1;
+
+	os_memset(&params, 0, sizeof(params));
+	params.wpa_debug_level = MSG_INFO;
+
+	iface = ifaces = os_zalloc(sizeof(struct wpa_interface));
+	if (ifaces == NULL)
+		return -1;
+	iface_count = 1;
+
+	wpa_supplicant_fd_workaround(1);
+
+	for (;;) {
+		c = getopt(argc, argv,
+			   "b:Bc:C:D:de:f:g:G:hi:I:KLMm:No:O:p:P:qsTtuvW");
+		if (c < 0)
+			break;
+		switch (c) {
+		case 'b':
+			iface->bridge_ifname = optarg;
+			break;
+		case 'B':
+			params.daemonize++;
+			break;
+		case 'm':
+			params.conf_p2p_dev = optarg;
+			break;
+		case 'e':
+			params.entropy_file = optarg;
+			break;
+		case 'g':
+			params.ctrl_interface = optarg;
+			break;
+		case 'p':
+			iface->driver_param = optarg;
+			break;
+		case 'O':
+			params.override_ctrl_interface = optarg;
+			break;
+		case 'i':
+			iface->ifname = optarg;
+			break;
+		case 'I':
+			iface->confanother = optarg;
+			break;
+		case 'D':
+			iface->driver = optarg;
+			break;
+		case 'd':
+			break;
+			params.wpa_debug_level--;  
+		case 'c':
+			iface->confname = optarg;
+			break;
+ // ...................   循环查找命令行输入参数
+
+}
+
+
+```
+#  WIFI数据结构
+
 
 ## wpa_supplicant(struct)
 
+http://w1.fi/wpa_supplicant/devel/classes.html
 
-### 
+
+### wpa_interface
+```
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/wpa_supplicant_i.h#53
+http://w1.fi/wpa_supplicant/devel/structwpa__interface.html
+
+/**  为函数wpa_supplicant_add_iface() 准备基础数据的 数据结构
+ * struct wpa_interface - Parameters for wpa_supplicant_add_iface()
+ */
+struct wpa_interface {
+
+	const char *confname;   // 配置文件路径名称    -c/data/vendor/wifi/wpa/wpa_supplicant.conf  -c 参数指明     
+	const char *confanother;  // 备份的配置文件路径名称   -I参数指定   -I/system/etc/wifi/wpa_supplicant_overlay.conf 
+	const char *ctrl_interface;  // 全局控制接口 -g参数指定  控制接口  .rc文件执行命令如果没有设置-g 参数 , 该值默认从配置文件读取
+	const char *driver;           //  WPA适配的驱动程序类型 -D 参数指定    -Dnl80211  
+	const char *driver_param;      // WPA 适配驱动程序键值对参数 -p参数指定 
+	const char *ifname;                 //  	Interface name.网卡接口名称  -i 参数指定  -iwlan0
+	const char *bridge_ifname;       //  -b 参数指定  桥接接口 主要用于接收EAP认证帧 -b
+	int p2p_mgmt;                    // 指示是否必须为此接口调用 wpas_p2p_init()
+};
+
+```
+
+### wpa_params
+```
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/wpa_supplicant_i.h#126
+http://w1.fi/wpa_supplicant/devel/structwpa__params.html
+
+
+
+
+/**
+ * struct wpa_params - Parameters for wpa_supplicant_init()
+ */
+struct wpa_params {
+int 	     daemonize                       // Run wpa_supplicant in the background.       开关用来设置 wpa_supplicant作为守护进程运行    -B 参数指定
+int 	     wait_for_monitor               // Wait for a monitor program before starting.  开关控制   启动之前等待 监视程序运行 wpa才继续运行
+char * 	     pid_file                       //Path to a PID (process ID) file. More...      WPA进程文件全路径名
+int 	     wpa_debug_level                // Debugging verbosity level (e.g., MSG_INFO)   WPA的LOG等级  1-高  2-中  3-低
+int 	     wpa_debug_show_keys            // Whether keying material is included in debug. Key配置信息是否打印开关  仅用于开发调试 用户版本必须关闭
+int 	     wpa_debug_timestamp            // Whether to include timestamp in debug messages.  时间戳是否显示在Log中的 开关
+char * 	     ctrl_interface                // Global ctrl_iface path/parameter.  全局控制接口 ( 单个 )   -g @android:vendor_wpa_wlan0   
+char * 	     ctrl_interface_group          //	Global ctrl_iface group.   全局控制接口( 群组 )
+int 	     dbus_ctrl_interface           // Enable the DBus control interface.   是否开启DBus 控制接口 开关
+const char*  wpa_debug_file_path           // Path of debug file or NULL to use stdout.   -f 参数指定  Log文件全路径
+int 	     wpa_debug_syslog              // Enable log output through syslog.   通过 syslog系统Log日志 来输出WPA的Log 开关
+int 	     wpa_debug_tracing              // Enable log output through Linux tracing.  通过 Linux tracing 输出 WPA的LOG 开关
+char *       override_driver                //Optional driver parameter override. More...  可选的driver驱动参数覆盖  key-value覆盖
+char *       override_ctrl_interface      // Optional ctrl_interface override. More...  可选的 -O参数指定 ctrl_interface 控制接口参数覆盖   key-value覆盖 
+char *       entropy_file                 // Optional entropy file. More... 用于生产随机数字的二进制执行程序全路径  用于加密  -e 参数指定 -e/data/misc/wifi/entropy.bin
+char *       conf_p2p_dev                 //Configuration file P2P Device configuration parameters  WLAN P2P的配置文件全路径  -m 参数指定 -m/data/vendor/wifi/wigig_p2p_supplicant.conf 
+}
+
+
+```
+
+
+### wpa_global
+```
+Internal, global data for all wpa_supplicant interfaces
+内部的全局的所有数据  对于所有 wpa_supplicant 接口
+
+
+http://w1.fi/wpa_supplicant/devel/structwpa__global.html
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/wpa_supplicant_i.h#264
+
+/**
+ * struct wpa_global - Internal, global data for all %wpa_supplicant interfaces
+ *
+ * This structure is initialized by calling wpa_supplicant_init() when starting
+ * %wpa_supplicant.
+ */
+struct wpa_global {
+	struct wpa_supplicant *ifaces;
+	struct wpa_params params;
+	struct ctrl_iface_global_priv *ctrl_iface;
+	struct wpas_dbus_priv *dbus;
+	struct wpas_hidl_priv *hidl;
+	void **drv_priv;
+	size_t drv_count;
+	struct os_time suspend_time;
+	struct p2p_data *p2p;
+	struct wpa_supplicant *p2p_init_wpa_s;
+	struct wpa_supplicant *p2p_group_formation;
+	struct wpa_supplicant *p2p_invite_group;
+	u8 p2p_dev_addr[ETH_ALEN];
+	struct os_reltime p2p_go_wait_client;
+	struct dl_list p2p_srv_bonjour; /* struct p2p_srv_bonjour */
+	struct dl_list p2p_srv_upnp; /* struct p2p_srv_upnp */
+	int p2p_disabled;
+	int cross_connection;
+	struct wpa_freq_range_list p2p_disallow_freq;
+	struct wpa_freq_range_list p2p_go_avoid_freq;
+	enum wpa_conc_pref {
+		WPA_CONC_PREF_NOT_SET,
+		WPA_CONC_PREF_STA,
+		WPA_CONC_PREF_P2P
+	} conc_pref;
+	unsigned int p2p_per_sta_psk:1;
+	unsigned int p2p_fail_on_wps_complete:1;
+	unsigned int p2p_24ghz_social_channels:1;
+	unsigned int pending_p2ps_group:1;
+	unsigned int pending_group_iface_for_p2ps:1;
+	unsigned int pending_p2ps_group_freq;
+	int wifi_display;
+#define MAX_WFD_SUBELEMS 12
+	struct wpabuf *wfd_subelem[MAX_WFD_SUBELEMS];
+#endif 
+
+	struct psk_list_entry *add_psk; /* From group formation */
+};
+
+
+```
+
+
+<img src="//../zimage/wireless/wifi/07_wifilog/wpa_global.png" width = "50%" height="50%"/>
+
+#### wpa_supplicant
+```
+Internal data for wpa_supplicant interface
+http://w1.fi/wpa_supplicant/devel/structwpa__supplicant.html
+
+
+
+
+struct wpa_global * 	global
+struct wpa_radio * 	radio
+struct dl_list 	radio_list
+struct wpa_supplicant * 	parent
+struct wpa_supplicant * 	next
+struct l2_packet_data * 	l2
+struct l2_packet_data * 	l2_br
+unsigned char 	own_addr [ETH_ALEN]
+unsigned char 	perm_addr [ETH_ALEN]
+char 	ifname [100]
+char 	bridge_ifname [16]
+char * 	confname
+char * 	confanodther
+struct wpa_config * 	conf
+int 	countermeasures
+struct os_reltime 	last_michael_mic_error
+u8 	bssid [ETH_ALEN]
+u8 	pending_bssid [ETH_ALEN]
+int 	reassociate
+int 	reassoc_same_bss
+int 	disconnected
+struct wpa_ssid * 	current_ssid
+struct wpa_ssid * 	last_ssid
+struct wpa_bss * 	current_bss
+int 	ap_ies_from_associnfo
+unsigned int 	assoc_freq
+int 	pairwise_cipher
+int 	group_cipher
+int 	key_mgmt
+int 	wpa_proto
+int 	mgmt_group_cipher
+void * 	drv_priv
+void * 	global_drv_priv
+u8 * 	bssid_filter
+size_t 	bssid_filter_count
+u8 * 	disallow_aps_bssid
+size_t 	disallow_aps_bssid_count
+struct wpa_ssid_value * 	disallow_aps_ssid
+size_t 	disallow_aps_ssid_count
+enum set_band 	setband
+struct wpa_ssid * 	next_ssid
+int 	prev_scan_wildcard
+struct wpa_ssid * 	prev_scan_ssid
+struct wpa_ssid * 	prev_sched_ssid
+int 	sched_scan_timeout
+int 	sched_scan_interval
+int 	first_sched_scan
+int 	sched_scan_timed_out
+void(* 	scan_res_handler )(struct wpa_supplicant *wpa_s, struct wpa_scan_results *scan_res)
+struct dl_list 	bss
+struct dl_list 	bss_id
+size_t 	num_bss
+unsigned int 	bss_update_idx
+unsigned int 	bss_next_id
+struct wpa_bss ** 	last_scan_res
+unsigned int 	last_scan_res_used
+unsigned int 	last_scan_res_size
+struct os_reltime 	last_scan
+const struct wpa_driver_ops * 	driver
+int 	interface_removed
+struct wpa_sm * 	wpa
+struct eapol_sm * 	eapol
+struct ctrl_iface_priv * 	ctrl_iface
+enum wpa_states 	wpa_state
+struct wpa_radio_work * 	scan_work
+int 	scanning
+int 	sched_scanning
+int 	new_connection
+int 	eapol_received
+struct scard_data * 	scard
+char 	imsi [20]
+int 	mnc_len
+unsigned char 	last_eapol_src [ETH_ALEN]
+unsigned int 	keys_cleared
+struct wpa_blacklist * 	blacklist
+int 	extra_blacklist_count
+ 	Sum of blacklist counts after last connection. More...
+enum wpa_supplicant::scan_req_type 	scan_req
+enum wpa_supplicant::scan_req_type 	last_scan_req
+enum wpa_states 	scan_prev_wpa_state
+struct os_reltime scan_trigger_time 	scan_start_time
+struct os_reltime 	scan_min_time
+int 	scan_runs
+int * 	next_scan_freqs
+int * 	manual_scan_freqs
+int * 	manual_sched_scan_freqs
+unsigned int 	manual_scan_passive:1
+unsigned int 	manual_scan_use_id:1
+unsigned int 	manual_scan_only_new:1
+unsigned int 	own_scan_requested:1
+unsigned int 	own_scan_running:1
+unsigned int 	clear_driver_scan_cache:1
+unsigned int 	manual_scan_id
+int 	scan_interval
+int 	normal_scans
+int 	scan_for_connection
+int 	scan_id [MAX_SCAN_ID]
+unsigned int 	scan_id_count
+struct wpa_ssid_value * 	ssids_from_scan_req
+unsigned int 	num_ssids_from_scan_req
+u64 	drv_flags
+unsigned int 	drv_enc
+unsigned int 	drv_smps_modes
+unsigned int 	drv_rrm_flags
+unsigned int 	probe_resp_offloads
+const u8 * 	extended_capa
+const u8 * 	extended_capa_mask
+unsigned int 	extended_capa_len
+int 	max_scan_ssids
+int 	max_sched_scan_ssids
+int 	sched_scan_supported
+unsigned int 	max_match_sets
+unsigned int 	max_remain_on_chan
+unsigned int 	max_stations
+int 	pending_mic_error_report
+int 	pending_mic_error_pairwise
+int 	mic_errors_seen
+struct wps_context * 	wps
+int 	wps_success
+struct wps_er * 	wps_er
+unsigned int 	wps_run
+struct os_reltime 	wps_pin_start_time
+int 	blacklist_cleared
+struct wpabuf * 	pending_eapol_rx
+struct os_reltime 	pending_eapol_rx_time
+u8 	pending_eapol_rx_src [ETH_ALEN]
+unsigned int 	last_eapol_matches_bssid:1
+unsigned int 	eap_expected_failure:1
+unsigned int 	reattach:1
+unsigned int 	mac_addr_changed:1
+unsigned int 	added_vif:1
+struct os_reltime 	last_mac_addr_change
+int 	last_mac_addr_style
+struct ibss_rsn * 	ibss_rsn
+int 	set_sta_uapsd
+int 	sta_uapsd
+int 	set_ap_uapsd
+int 	ap_uapsd
+struct hostapd_iface * 	ifmsh
+unsigned int 	off_channel_freq
+struct wpabuf * 	pending_action_tx
+u8 	pending_action_src [ETH_ALEN]
+u8 	pending_action_dst [ETH_ALEN]
+u8 	pending_action_bssid [ETH_ALEN]
+unsigned int 	pending_action_freq
+int 	pending_action_no_cck
+int 	pending_action_without_roc
+unsigned int 	pending_action_tx_done:1
+void(* 	pending_action_tx_status_cb )(struct wpa_supplicant *wpa_s, unsigned int freq, const u8 *dst, const u8 *src, const u8 *bssid, const u8 *data, size_t data_len, enum offchannel_send_action_result result)
+unsigned int 	roc_waiting_drv_freq
+int 	action_tx_wait_time
+int 	p2p_mgmt
+struct p2p_go_neg_results * 	go_params
+int 	create_p2p_iface
+u8 	pending_interface_addr [ETH_ALEN]
+char 	pending_interface_name [100]
+int 	pending_interface_type
+int 	p2p_group_idx
+unsigned int 	pending_listen_freq
+unsigned int 	pending_listen_duration
+enum wpa_supplicant:: { ... }  	p2p_group_interface
+struct p2p_group * 	p2p_group
+int 	p2p_long_listen
+char 	p2p_pin [10]
+int 	p2p_wps_method
+u8 	p2p_auth_invite [ETH_ALEN]
+int 	p2p_sd_over_ctrl_iface
+int 	p2p_in_provisioning
+int 	p2p_in_invitation
+int 	p2p_invite_go_freq
+int 	pending_invite_ssid_id
+int 	show_group_started
+u8 	go_dev_addr [ETH_ALEN]
+int 	pending_pd_before_join
+u8 	pending_join_iface_addr [ETH_ALEN]
+u8 	pending_join_dev_addr [ETH_ALEN]
+int 	pending_join_wps_method
+u8 	p2p_join_ssid [SSID_MAX_LEN]
+size_t 	p2p_join_ssid_len
+int 	p2p_join_scan_count
+int 	auto_pd_scan_retry
+int 	force_long_sd
+u16 	pending_pd_config_methods
+enum wpa_supplicant:: { ... }  	pending_pd_use
+int 	cross_connect_disallowed
+int 	cross_connect_enabled
+int 	cross_connect_in_use
+char 	cross_connect_uplink [100]
+unsigned int 	p2p_auto_join:1
+unsigned int 	p2p_auto_pd:1
+unsigned int 	p2p_persistent_group:1
+unsigned int 	p2p_fallback_to_go_neg:1
+unsigned int 	p2p_pd_before_go_neg:1
+unsigned int 	p2p_go_ht40:1
+unsigned int 	p2p_go_vht:1
+unsigned int 	user_initiated_pd:1
+unsigned int 	p2p_go_group_formation_completed:1
+unsigned int 	group_formation_reported:1
+unsigned int 	waiting_presence_resp
+int 	p2p_first_connection_timeout
+unsigned int 	p2p_nfc_tag_enabled:1
+unsigned int 	p2p_peer_oob_pk_hash_known:1
+unsigned int 	p2p_disable_ip_addr_req:1
+unsigned int 	p2ps_method_config_any:1
+unsigned int 	p2p_cli_probe:1
+int 	p2p_persistent_go_freq
+int 	p2p_persistent_id
+int 	p2p_go_intent
+int 	p2p_connect_freq
+struct os_reltime 	p2p_auto_started
+struct wpa_ssid * 	p2p_last_4way_hs_fail
+struct wpa_radio_work * 	p2p_scan_work
+struct wpa_radio_work * 	p2p_listen_work
+struct wpa_radio_work * 	p2p_send_action_work
+u16 	p2p_oob_dev_pw_id
+struct wpabuf * 	p2p_oob_dev_pw
+u8 	p2p_peer_oob_pubkey_hash [WPS_OOB_PUBKEY_HASH_LEN]
+u8 	p2p_ip_addr_info [3 *4]
+int * 	p2p_group_common_freqs
+unsigned int 	p2p_group_common_freqs_num
+u8 	p2ps_join_addr [ETH_ALEN]
+struct wpa_ssid * 	bgscan_ssid
+const struct bgscan_ops * 	bgscan
+void * 	bgscan_priv
+const struct autoscan_ops * 	autoscan
+struct wpa_driver_scan_params * 	autoscan_params
+void * 	autoscan_priv
+struct wpa_ssid * 	connect_without_scan
+struct wps_ap_info * 	wps_ap
+size_t 	num_wps_ap
+int 	wps_ap_iter
+int 	after_wps
+int 	known_wps_freq
+unsigned int 	wps_freq
+int 	wps_fragment_size
+int 	auto_reconnect_disabled
+int 	best_24_freq
+int 	best_5_freq
+int 	best_overall_freq
+struct gas_query * 	gas
+unsigned int 	drv_capa_known
+struct {
+   struct hostapd_hw_modes *   modes
+   u16   num_modes
+   u16   flags
+} 	hw
+enum wpa_supplicant::local_hw_capab 	hw_capab
+int 	pno
+int 	pno_sched_pending
+int 	disconnect_reason
+struct ext_password_data * 	ext_pw
+struct wpabuf * 	last_gas_resp
+struct wpabuf * 	prev_gas_resp
+u8 	last_gas_addr [ETH_ALEN]
+u8 	prev_gas_addr [ETH_ALEN]
+u8 	last_gas_dialog_token
+u8 	prev_gas_dialog_token
+unsigned int 	no_keep_alive:1
+unsigned int 	ext_mgmt_frame_handling:1
+unsigned int 	ext_eapol_frame_io:1
+unsigned int 	wmm_ac_supported:1
+unsigned int 	ext_work_in_progress:1
+unsigned int 	own_disconnect_req:1
+unsigned int 	mac_addr_rand_supported
+unsigned int 	mac_addr_rand_enable
+u8 * 	mac_addr_scan
+u8 * 	mac_addr_sched_scan
+u8 * 	mac_addr_pno
+unsigned int 	num_multichan_concurrent
+struct wpa_radio_work * 	connect_work
+unsigned int 	ext_work_id
+struct wpabuf * 	vendor_elem [NUM_VENDOR_ELEM_FRAMES]
+struct wmm_ac_assoc_data * 	wmm_ac_assoc_info
+struct wmm_tspec_element * 	tspecs [WMM_AC_NUM][TS_DIR_IDX_COUNT]
+struct wmm_ac_addts_request * 	addts_request
+u8 	wmm_ac_last_dialog_token
+struct wmm_tspec_element * 	last_tspecs
+u8 	last_tspecs_count
+struct rrm_data 	rrm
+
+```
+
+<img src="//../zimage/wireless/wifi/07_wifilog/wpa_supplicant.png" width = "50%" height="50%"/>
+
+
+
+
+
+
+#### wpa_driver_ops
+
+```
+Driver interface API definition
+与驱动交互的API接口
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/hostapd/src/drivers/driver.h#2061
+http://w1.fi/wpa_supplicant/devel/structwpa__driver__ops.html
+
+
+
+const char * 	name    // Name of the driver interface.
+const char * 	desc    // One line description of the driver interface.
+int(* 	get_bssid )(void *priv, u8 *bssid)  //Get the current BSSID. More...
+int(* 	get_ssid )(void *priv, u8 *ssid)  // Get the current SSID. More...
+
+// Configure encryption key. More...
+int(* 	set_key )(const char *ifname, void *priv, enum wpa_alg alg, const u8 *addr, int key_idx, int set_tx, const u8 *seq, size_t seq_len, const u8 *key, size_t key_len)
+
+// Initialize driver interface. More...
+void *(* 	init )(void *ctx, const char *ifname)
+
+void(* 	deinit )(void *priv)  // Deinitialize driver interface. More...
+
+int(* 	set_param )(void *priv, const char *param)  // Set driver configuration parameters. More...
+
+int(* 	set_countermeasures )(void *priv, int enabled)  // Enable/disable TKIP countermeasures. More...
+
+int(* 	deauthenticate )(void *priv, const u8 *addr, int reason_code)  // Request driver to deauthenticate. More...
+
+int(* 	associate )(void *priv, struct wpa_driver_associate_params *params)  //Request driver to associate. More...
+
+int(* 	add_pmkid )(void *priv, const u8 *bssid, const u8 *pmkid)  // Add PMKSA cache entry to the driver. More...
+
+int(* 	remove_pmkid )(void *priv, const u8 *bssid, const u8 *pmkid)  // Remove PMKSA cache entry to the driver. More...
+
+int(* 	flush_pmkid )(void *priv)  // Flush PMKSA cache. More...
+
+int(* 	get_capa )(void *priv, struct wpa_driver_capa *capa)  // Get driver capabilities. More...
+
+void(* 	poll )(void *priv)   // Poll driver for association information. More...
+
+const char *(* 	get_ifname )(void *priv)  // Get interface name. More...
+
+const u8 *(* 	get_mac_addr )(void *priv)   // Get own MAC address. More...
+
+int(* 	set_operstate )(void *priv, int state)   // Sets device operating state to DORMANT or UP. More...
+
+//MLME-SETPROTECTION.request primitive. More...
+int(* 	mlme_setprotection )(void *priv, const u8 *addr, int protect_type, int key_type)
+
+//Get hardware support data (channels and rates) More...
+struct hostapd_hw_modes *(* 	get_hw_feature_data )(void *priv, u16 *num_modes, u16 *flags)
+
+//Send management frame from MLME. More...
+int(* 	send_mlme )(void *priv, const u8 *data, size_t data_len, int noack, unsigned int freq)
+
+//Update FT (IEEE 802.11r) IEs. More...
+int(* 	update_ft_ies )(void *priv, const u8 *md, const u8 *ies, size_t ies_len)
+
+//Fetch the latest scan results. More...
+struct wpa_scan_results *(* 	get_scan_results2 )(void *priv)
+
+
+// Set country. More...
+int(* 	set_country )(void *priv, const char *alpha2)
+
+// Get country. More...
+int(* 	get_country )(void *priv, char *alpha2)
+
+
+// Global driver initialization. More...
+void *(* 	global_init )(void)
+
+// Global driver deinitialization. More...
+void(* 	global_deinit )(void *priv)
+
+//Initialize driver interface (with global data) More...
+void *(* 	init2 )(void *ctx, const char *ifname, void *global_priv)
+
+//Get information about available interfaces. More...
+struct wpa_interface_info *(* 	get_interfaces )(void *global_priv)
+
+//Request the driver to initiate scan. More...
+int(* 	scan2 )(void *priv, struct wpa_driver_scan_params *params)
+
+//Request driver to authenticate. More...
+int(* 	authenticate )(void *priv, struct wpa_driver_auth_params *params)
+
+//Set Beacon and Probe Response information for AP mode. More...
+int(* 	set_ap )(void *priv, struct wpa_driver_ap_params *params)
+
+//Set ACL in AP mode. More...
+int(* 	set_acl )(void *priv, struct hostapd_acl_params *params)
+
+//Initialize driver interface (hostapd only) More...
+void *(* 	hapd_init )(struct hostapd_data *hapd, struct wpa_init_params *params)
+
+// Deinitialize driver interface (hostapd only) More...
+void(* 	hapd_deinit )(void *priv)
+
+// Enable/disable IEEE 802.1X support (AP only) More...
+int(* 	set_ieee8021x )(void *priv, struct wpa_bss_params *params)
+
+// Enable/disable privacy (AP only) More...
+int(* 	set_privacy )(void *priv, int enabled)
+
+// Fetch the current TSC/packet number (AP only) More...
+int(* 	get_seqnum )(const char *ifname, void *priv, const u8 *addr, int idx, u8 *seq)
+
+// Flush all association stations (AP only) More...
+int(* 	flush )(void *priv)
+
+// Add IEs into Beacon/Probe Response frames (AP) More...
+int(* 	set_generic_elem )(void *priv, const u8 *elem, size_t elem_len)
+
+// Fetch station data. More...
+int(* 	read_sta_data )(void *priv, struct hostap_sta_driver_data *data, const u8 *addr)
+
+// Send an EAPOL packet (AP only) More...
+int(* 	hapd_send_eapol )(void *priv, const u8 *addr, const u8 *data, size_t data_len, int encrypt, const u8 *own_addr, u32 flags)
+
+//Deauthenticate a station (AP only) More...
+int(* 	sta_deauth )(void *priv, const u8 *own_addr, const u8 *addr, int reason)
+
+// Disassociate a station (AP only) More...
+int(* 	sta_disassoc )(void *priv, const u8 *own_addr, const u8 *addr, int reason)
+
+//Remove a station entry (AP only) More...
+int(* 	sta_remove )(void *priv, const u8 *addr)
+
+// Get the current SSID (AP only) More...
+int(* 	hapd_get_ssid )(void *priv, u8 *buf, int len)
+
+// Set SSID (AP only) More...
+int(* 	hapd_set_ssid )(void *priv, const u8 *buf, int len)
+
+// Enable/disable TKIP countermeasures (AP) More...
+int(* 	hapd_set_countermeasures )(void *priv, int enabled)
+
+//Add a station entry. More...
+int(* 	sta_add )(void *priv, struct hostapd_sta_add_params *params)
+
+// Get station inactivity duration (AP only) More...
+int(* 	get_inact_sec )(void *priv, const u8 *addr)
+
+// Clear station statistics (AP only) More...
+int(* 	sta_clear_stats )(void *priv, const u8 *addr)
+
+//Set channel/frequency (AP only) More...
+int(* 	set_freq )(void *priv, struct hostapd_freq_params *freq)
+
+// Set RTS threshold. More...
+int(* 	set_rts )(void *priv, int rts)
+
+//Set fragmentation threshold. More...
+int(* 	set_frag )(void *priv, int frag)
+
+// Set station flags (AP only) More...
+int(* 	sta_set_flags )(void *priv, const u8 *addr, unsigned int total_flags, unsigned int flags_or, unsigned int flags_and)
+
+//Set TX queue parameters. More...
+int(* 	set_tx_queue_params )(void *priv, int queue, int aifs, int cw_min, int cw_max, int burst_time)
+
+
+// Add a virtual interface. More...
+int(* 	if_add )(void *priv, enum wpa_driver_if_type type, const char *ifname, const u8 *addr, void *bss_ctx, void **drv_priv, char *force_ifname, u8 *if_addr, const char *bridge, int use_existing)
+
+// Remove a virtual interface. More...
+int(* 	if_remove )(void *priv, enum wpa_driver_if_type type, const char *ifname)
+
+// Bind a station into a specific interface (AP only) More...
+int(* 	set_sta_vlan )(void *priv, const u8 *addr, const char *ifname, int vlan_id)
+
+// Optional commit changes handler (AP only) More...
+int(* 	commit )(void *priv)
+
+//Send an ethernet packet (AP only) More...
+int(* 	send_ether )(void *priv, const u8 *dst, const u8 *src, u16 proto, const u8 *data, size_t data_len)
+
+//Notification of RADIUS ACL change. More...
+int(* 	set_radius_acl_auth )(void *priv, const u8 *mac, int accepted, u32 session_timeout)
+
+// Notification of RADIUS ACL expiration. More...
+int(* 	set_radius_acl_expire )(void *priv, const u8 *mac)
+
+// Add WPS IE(s) into Beacon/Probe Response frames (AP) More...
+int(* 	set_ap_wps_ie )(void *priv, const struct wpabuf *beacon, const struct wpabuf *proberesp, const struct wpabuf *assocresp)
+
+// Set IEEE 802.1X Supplicant Port status. More...
+int(* 	set_supp_port )(void *priv, int authorized)
+
+// Bind a station into a 4-address WDS (AP only) More...
+int(* 	set_wds_sta )(void *priv, const u8 *addr, int aid, int val, const char *bridge_ifname, char *ifname_wds)
+
+// Transmit an Action frame. More...
+int(* 	send_action )(void *priv, unsigned int freq, unsigned int wait, const u8 *dst, const u8 *src, const u8 *bssid, const u8 *data, size_t data_len, int no_cck)
+
+// Cancel action frame TX wait. More...
+void(* 	send_action_cancel_wait )(void *priv)
+
+//Remain awake on a channel. More...
+int(* 	remain_on_channel )(void *priv, unsigned int freq, unsigned int duration)
+
+// Cancel remain-on-channel operation. More...
+int(* 	cancel_remain_on_channel )(void *priv)
+
+// Request Probe Request frames to be indicated. More...
+int(* 	probe_req_report )(void *priv, int report)
+
+// Deinitialize AP mode. More...
+int(* 	deinit_ap )(void *priv)
+
+// Deinitialize P2P client mode. More...
+int(* 	deinit_p2p_cli )(void *priv)
+
+//Notification on system suspend/hibernate event. More...
+void(* 	suspend )(void *priv)
+
+// Notification on system resume/thaw event. More...
+void(* 	resume )(void *priv)
+
+// Set signal monitoring parameters. More...
+int(* 	signal_monitor )(void *priv, int threshold, int hysteresis)
+
+// Send IEEE 802.11 frame (testing use only) More...
+int(* 	send_frame )(void *priv, const u8 *data, size_t data_len, int encrypt)
+
+// Get current Notice of Absence attribute payload. More...
+int(* 	get_noa )(void *priv, u8 *buf, size_t buf_len)
+
+
+// Set Notice of Absence parameters for GO (testing) More...
+int(* 	set_noa )(void *priv, u8 count, int start, int duration)
+
+//Set P2P power save options. More...
+int(* 	set_p2p_powersave )(void *priv, int legacy_ps, int opp_ps, int ctwindow)
+
+// Enable/disable aggregation. More...
+int(* 	ampdu )(void *priv, int ampdu)
+
+//Get physical radio name for the device. More...
+const char *(* 	get_radio_name )(void *priv)
+
+//for sending TDLS management packets More...
+int(* 	send_tdls_mgmt )(void *priv, const u8 *dst, u8 action_code, u8 dialog_token, u16 status_code, u32 peer_capab, int initiator, const u8 *buf, size_t len)
+
+// Ask the driver to perform high-level TDLS operations. More...
+int(* 	tdls_oper )(void *priv, enum tdls_oper oper, const u8 *peer)
+
+// Notify driver of the WNM frame reception. More...
+int(* 	wnm_oper )(void *priv, enum wnm_oper oper, const u8 *peer, u8 *buf, u16 *buf_len)
+
+// Set QoS Map. More...
+int(* 	set_qos_map )(void *priv, const u8 *qos_map_set, u8 qos_map_set_len)
+
+// Add a neigh to the bridge ip neigh table. More...
+int(* 	br_add_ip_neigh )(void *priv, u8 version, const u8 *ipaddr, int prefixlen, const u8 *addr)
+
+// Remove a neigh from the bridge ip neigh table. More...
+int(* 	br_delete_ip_neigh )(void *priv, u8 version, const u8 *ipaddr)
+
+
+// Set a bridge port attribute. More...
+int(* 	br_port_set_attr )(void *priv, enum drv_br_port_attr attr, unsigned int val)
+
+// Set a bridge network parameter. More...
+int(* 	br_set_net_param )(void *priv, enum drv_br_net_param param, unsigned int val)
+
+// Set wake-on-wireless triggers. More...
+int(* 	set_wowlan )(void *priv, const struct wowlan_triggers *triggers)
+
+//Get current connection information. More...
+int(* 	signal_poll )(void *priv, struct wpa_signal_info *signal_info)
+
+// Set authentication algorithm(s) for static WEP. More...
+int(* 	set_authmode )(void *priv, int authmode)
+
+// Execute vendor specific command. More...
+int(* 	vendor_cmd )(void *priv, unsigned int vendor_id, unsigned int subcmd, const u8 *data, size_t data_len, struct wpabuf *buf)
+
+// Set rekey information. More...
+void(* 	set_rekey_info )(void *priv, const u8 *kek, size_t kek_len, const u8 *kck, size_t kck_len, const u8 *replay_ctr)
+
+// Station association indication. More...
+int(* 	sta_assoc )(void *priv, const u8 *own_addr, const u8 *addr, int reassoc, u16 status, const u8 *ie, size_t len)
+
+// Station authentication indication. More...
+int(* 	sta_auth )(void *priv, const u8 *own_addr, const u8 *addr, u16 seq, u16 status, const u8 *ie, size_t len)
+
+// Add traffic stream. More...
+int(* 	add_tspec )(void *priv, const u8 *addr, u8 *tspec_ie, size_t tspec_ielen)
+
+// Add a station node in the driver. More...
+int(* 	add_sta_node )(void *priv, const u8 *addr, u16 auth_alg)
+
+
+// Request the driver to initiate scheduled scan. More...
+int(* 	sched_scan )(void *priv, struct wpa_driver_scan_params *params, u32 interval)
+
+// Request the driver to stop a scheduled scan. More...
+int(* 	stop_sched_scan )(void *priv)
+
+// Probe (null data or such) the given station. More...
+void(* 	poll_client )(void *priv, const u8 *own_addr, const u8 *addr, int qos)
+
+// Disable/enable radio. More...
+int(* 	radio_disable )(void *priv, int disabled)
+
+// Announce channel switch and migrate the GO to the given frequency. More...
+int(* 	switch_channel )(void *priv, struct csa_settings *settings)
+
+// Add traffic stream. More...
+int(* 	add_tx_ts )(void *priv, u8 tsid, const u8 *addr, u8 user_prio, u16 admitted_time)
+
+// Delete traffic stream. More...
+int(* 	del_tx_ts )(void *priv, u8 tsid, const u8 *addr)
+
+// Enable channel-switching with TDLS peer. More...
+int(* 	tdls_enable_channel_switch )(void *priv, const u8 *addr, u8 oper_class, const struct hostapd_freq_params *params)
+
+//Disable channel switching with TDLS peer. More...
+int(* 	tdls_disable_channel_switch )(void *priv, const u8 *addr)
+
+// Listen for radar interference on the channel. More...
+int(* 	start_dfs_cac )(void *priv, struct hostapd_freq_params *freq)
+
+// Removes beacon from AP. More...
+int(* 	stop_ap )(void *priv)
+
+// Retrieve survey data. More...
+int(* 	get_survey )(void *priv, unsigned int freq)
+
+// Get driver interface status information. More...
+int(* 	status )(void *priv, char *buf, size_t buflen)
+
+// Set roaming policy for driver-based BSS selection. More...
+int(* 	roaming )(void *priv, int allowed, const u8 *bssid)
+
+// Set MAC address. More...
+int(* 	set_mac_addr )(void *priv, const u8 *addr)
+
+// Driver specific initialization for mesh. More...
+int(* 	init_mesh )(void *priv)
+
+// Join a mesh network. More...
+int(* 	join_mesh )(void *priv, struct wpa_driver_mesh_join_params *params)
+
+// Leave a mesh network. More...
+int(* 	leave_mesh )(void *priv)
+
+// Automatically select channel. More...
+int(* 	do_acs )(void *priv, struct drv_acs_params *params)
+
+//Notify driver of band selection. More...
+int(* 	set_band )(void *priv, enum set_band band)
+
+//Get preferred frequency list for an interface. More...
+int(* 	get_pref_freq_list )(void *priv, enum wpa_driver_if_type if_type, unsigned int *num, unsigned int *freq_list)
+
+//Indicate probable P2P operating channel. More...
+int(* 	set_prob_oper_freq )(void *priv, unsigned int freq)
+
+
+
+```
+<img src="//../zimage/wireless/wifi/07_wifilog/wpa_driver_ops.png" width = "50%" height="50%"/>
 
