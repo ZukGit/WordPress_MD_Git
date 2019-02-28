@@ -7,6 +7,7 @@
 ## E
 ## F
 ## G
+### getgrnam("wifi")
 ## H
 ## I
 ## J
@@ -19,6 +20,13 @@
 ## Q
 ## R
 ## S
+### select()
+```
+int select(int n,fd_set * readfds,fd_set * writefds,fd_set * exceptfds,struct timeval * timeout);
+select（I/O多工机制） 
+
+```
+
 ## T
 ## U
 ## V

@@ -321,7 +321,18 @@ root@ubuntu:/proc# ipcs
 ```
 
 
+# id root
+```
+id
+uid=0(root) gid=0(root) groups=0(root),1004(input),1007(log),1011(adb),1015(sdcard_rw),1028(sdcard_r),3001(net_bt_admin),3002(net_bt),3003(inet),3006(net_bw_stats)
+,3009(readproc),3011(uhid) context=u:r:su:s0
 
+id root
+uid=0(root) gid=0(root) groups=0(root), context=u:r:su:s0
+
+id wifi
+uid=1010(wifi) gid=1010(wifi) groups=1010(wifi), context=u:r:su:s0
+```
 
 # k
 
