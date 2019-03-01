@@ -733,7 +733,7 @@ Cap data 0xffffffff, 0xffffffff, 0x0
 ## void wpa_supplicant_fd_workaround(1)
 ```
 http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/main.c#128
-
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/android.config#248
 http://androidxref.com/9.0.0_r3/xref/external/libchrome/build/build_config.h#41 
 #define __linux__ 1
 
@@ -1203,7 +1203,7 @@ struct p2p_srv_upnp {    //p2p_srv_upnp  包含链表指针 dl_list    包含dl_
 
 ```
 
-static inline void dl_list_init(struct dl_list *list)
+static inline void dl_list_init(struct dl_list *list)   // 把双向链表的前指针和后指针都指向自己
 {
 	list->next = list;
 	list->prev = list;
@@ -1211,7 +1211,255 @@ static inline void dl_list_init(struct dl_list *list)
 
 
 ```
+<img src="//../zimage/wireless/wifi/09_supplicant/dl_list.jpg" width = "50%" height="50%"/>
 
+
+### eloop_init()
+```
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/utils/eloop.c#161
+
+
+static struct eloop_data eloop;
+
+int eloop_init(void)
+{
+	os_memset(&eloop, 0, sizeof(eloop));  
+	dl_list_init(&eloop.timeout);   // 使用 dl_list timeout 这个双向链表变量 把所有的  eloop_data链接起来  这里初始化  两个链表都指向自己
+
+	return 0;
+}
+
+```
+
+### random_init(params->entropy_file)
+```
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/crypto/random.c#405
+
+static char *random_entropy_file = NULL;
+
+void random_init(const char *entropy_file)
+{
+	os_free(random_entropy_file);
+	if (entropy_file)
+		random_entropy_file = os_strdup(entropy_file);   //   -e/data/misc/wifi/entropy.bin   把  /data/misc/wifi/entropy.bin赋值到 random_entropy_file
+	else
+		random_entropy_file = NULL;
+
+	random_read_entropy();   // 【1】
+
+	if (random_fd >= 0)
+		return;
+
+	random_fd = open("/dev/random", O_RDONLY | O_NONBLOCK);  // 打开随机数设备 /dev/random是 Linux系统中提供的随机伪设备
+
+	if (random_fd < 0) {
+		wpa_printf(MSG_ERROR, "random: Cannot open /dev/random: %s", strerror(errno));
+		return;
+	}
+	wpa_printf(MSG_DEBUG, "random: Trying to read entropy from /dev/random");
+
+	eloop_register_read_sock(random_fd, random_read_fd, NULL, NULL);  //【2】
+
+
+	random_write_entropy();
+}
+
+
+```
+
+#### random_read_entropy()
+```
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/crypto/random.c#339
+
+
+static void random_read_entropy(void)   // 检测随机数文件 /data/misc/wifi/entropy.bin 是否可用 
+{
+	char *buf;
+	size_t len;
+
+	if (!random_entropy_file)
+		return;
+
+	buf = os_readfile(random_entropy_file, &len);    // 从加密文件/data/misc/wifi/entropy.bin 读取字符串 
+	if (buf == NULL)
+		return; /* entropy file not yet available */
+
+	if (len != 1 + RANDOM_ENTROPY_SIZE) {  // #define RANDOM_ENTROPY_SIZE 20
+		wpa_printf(MSG_DEBUG, "random: Invalid entropy file %s",  random_entropy_file);
+		os_free(buf);
+		return;
+	}
+
+	own_pool_ready = (u8) buf[0];     // static unsigned int own_pool_ready = 0;
+	random_add_randomness(buf + 1, RANDOM_ENTROPY_SIZE);
+	random_entropy_file_read = 1;
+	os_free(buf);
+	wpa_printf(MSG_DEBUG, "random: Added entropy from %s (own_pool_ready=%u)",random_entropy_file, own_pool_ready);
+}
+
+
+```
+
+#### eloop_register_read_sock(random_fd, random_read_fd, NULL, NULL)
+```
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/utils/eloop.c#711
+
+int eloop_register_read_sock(int sock, eloop_sock_handler handler,void *eloop_data, void *user_data)
+{
+	return eloop_register_sock(sock, EVENT_TYPE_READ, handler,   eloop_data, user_data); // 【1】
+}
+
+
+```
+
+##### eloop_register_sock()_1
+```
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/utils/eloop.c#740
+int eloop_register_sock(int sock, eloop_event_type type,eloop_sock_handler handler,void *eloop_data, void *user_data)
+{
+	struct eloop_sock_table *table;
+
+	assert(sock >= 0);
+	table = eloop_get_sock_table(type);
+	return eloop_sock_table_add_sock(table, sock, handler, eloop_data, user_data);   // 【1】
+}
+
+
+
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/utils/eloop.c#725
+
+
+static struct eloop_sock_table *eloop_get_sock_table(eloop_event_type type)    //  返回依据类型初始化了的 eloop_data中的 reader  writer exception table
+{
+	switch (type) {
+	case EVENT_TYPE_READ:
+		return &eloop.readers;
+	case EVENT_TYPE_WRITE:
+		return &eloop.writers;
+	case EVENT_TYPE_EXCEPTION:
+		return &eloop.exceptions;
+	}
+
+	return NULL;
+}
+
+
+```
+
+
+##### eloop_sock_table_add_sock
+```
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/utils/eloop.c#253
+
+
+static int eloop_sock_table_add_sock(struct eloop_sock_table *table,int sock, eloop_sock_handler handler,void *eloop_data, void *user_data)
+{
+
+
+	struct eloop_sock *tmp;
+	int new_max_sock;
+
+	if (sock > eloop.max_sock)   // eloop_data 存储的 int max_sock  始终更新为最大的值
+		new_max_sock = sock;
+	else
+		new_max_sock = eloop.max_sock;
+
+	if (table == NULL)
+		return -1;
+
+	eloop_trace_sock_remove_ref(table);  【1】
+	tmp = os_realloc_array(table->table, table->count + 1,sizeof(struct eloop_sock));
+	if (tmp == NULL) {
+		eloop_trace_sock_add_ref(table);  【1】
+		return -1;
+	}
+
+	tmp[table->count].sock = sock;
+	tmp[table->count].eloop_data = eloop_data;
+	tmp[table->count].user_data = user_data;
+	tmp[table->count].handler = handler;
+	wpa_trace_record(&tmp[table->count]);  【2】
+	table->count++;
+	table->table = tmp;
+	eloop.max_sock = new_max_sock;
+	eloop.count++;
+	table->changed = 1;
+	eloop_trace_sock_add_ref(table);  【1】
+	return 0;
+}
+
+```
+
+###### eloop_trace_sock_remove_ref
+```
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/utils/eloop.c#140
+
+
+static struct eloop_data eloop;
+
+没有定义WPA_TRACE   那么  函数 eloop_trace_sock_remove_ref 就是空     #define eloop_trace_sock_remove_ref(table) do { } while (0)
+没有定义WPA_TRACE   那么  函数 eloop_trace_sock_add_ref就是空   #define eloop_trace_sock_remove_ref(table) do { } while (0)
+
+
+#ifdef WPA_TRACE
+
+static void eloop_sigsegv_handler(int sig)
+{
+	wpa_trace_show("eloop SIGSEGV");
+	abort();
+}
+
+static void eloop_trace_sock_add_ref(struct eloop_sock_table *table)
+{
+	int i;
+	if (table == NULL || table->table == NULL)
+		return;
+	for (i = 0; i < table->count; i++) {
+		wpa_trace_add_ref(&table->table[i], eloop,table->table[i].eloop_data);
+		wpa_trace_add_ref(&table->table[i], user,table->table[i].user_data);
+	}
+}
+
+
+static void eloop_trace_sock_remove_ref(struct eloop_sock_table *table)
+{
+	int i;
+	if (table == NULL || table->table == NULL)
+		return;
+	for (i = 0; i < table->count; i++) {  // 遍历 epool_sock_table上的所有 epool_sock  和  epool_sock.eloop_data    epool_sock.user_data
+		wpa_trace_remove_ref(&table->table[i], eloop, table->table[i].eloop_data);
+		wpa_trace_remove_ref(&table->table[i], user,  table->table[i].user_data);
+	}
+}
+
+#else /* WPA_TRACE */
+
+#define eloop_trace_sock_add_ref(table) do { } while (0)
+#define eloop_trace_sock_remove_ref(table) do { } while (0)
+
+#endif /* WPA_TRACE */
+
+
+
+```
+
+
+###### wpa_trace_record
+```
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/utils/trace.h#50
+
+没有定义WPA_TRACE  那么函数  #define wpa_trace_record(ptr) do { } while (0) 就是空  
+
+#ifdef WPA_TRACE
+
+#define wpa_trace_record(ptr)  (ptr)->btrace_num = backtrace((ptr)->btrace, WPA_TRACE_LEN)
+
+#else /* WPA_TRACE */
+
+#define wpa_trace_record(ptr) do { } while (0)
+#endif /* WPA_TRACE */
+
+```
 
 
 ## wpa_supplicant* wpa_supplicant_add_iface( wpa_global,wpa_interface ,wpa_supplicant)
@@ -1253,6 +1501,47 @@ http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/wp
 
 
 ```
+
+### wpa_supplicant_global_ctrl_iface_init()
+
+```
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/ctrl_iface_unix.c#1293
+
+struct ctrl_iface_global_priv * wpa_supplicant_global_ctrl_iface_init(struct wpa_global *global)
+{
+	struct ctrl_iface_global_priv *priv;
+
+	priv = os_zalloc(sizeof(*priv));
+	if (priv == NULL)
+		return NULL;
+	dl_list_init(&priv->ctrl_dst);  // 初始化 双向链表
+	dl_list_init(&priv->msg_queue);    // 初始化 双向链表
+	priv->global = global;            // 建立引用关系
+	priv->sock = -1;
+
+	if (global->params.ctrl_interface == NULL)
+		return priv;
+
+	if (wpas_global_ctrl_iface_open_sock(global, priv) < 0) {     // 【1】
+		os_free(priv);
+		return NULL;
+	}
+
+	wpa_msg_register_cb(wpa_supplicant_ctrl_iface_msg_cb);  // 【2】
+
+	return priv;
+}
+
+
+
+
+```
+#### wpas_global_ctrl_iface_open_sock(global, priv) 
+
+
+#### wpa_msg_register_cb(wpa_supplicant_ctrl_iface_msg_cb)
+
+
 
 ## void wpa_supplicant_deinit( wpa_global *global)
 ```
@@ -2147,3 +2436,201 @@ print(s.source)
 ```
 
 <img src="//../zimage/wireless/wifi/09_supplicant/eap_method.jpg"/>
+
+### dl_list
+```
+struct dl_list {
+    struct dl_list *next, *prev;
+};
+
+
+```
+
+
+
+### eloop_data
+```
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/utils/eloop.c#161
+
+
+struct eloop_data {
+	int max_sock;
+	int count; /* sum of all table counts */
+
+	struct eloop_sock_table readers;
+	struct eloop_sock_table writers;
+	struct eloop_sock_table exceptions;
+	struct eloop_signal *signals;
+	struct dl_list timeout;
+
+	int signal_count;
+
+	int signaled;
+	int pending_terminate;
+
+	int terminate;
+};
+
+
+
+
+```
+
+<img src="//../zimage/wireless/wifi/09_supplicant/eloop_data.png" width = "50%" height="50%"/>
+```
+# eloop_data 数据结构绘图
+
+from graphviz import Digraph
+
+s = Digraph('structs', filename='structs_revisited.gv', node_attr={'shape': 'record'} )
+s.attr(rankdir='LR')
+
+s.node('eloop_data2', "{{ eloop_data2 | <data2_reader>eloop_sock_table reader "
+                      "|<data2_writer>eloop_sock_table writer "
+                      "|<data2_exception> eloop_sock_table exception "
+                      "|<data2_signal> eloop_signal signals"
+                      "|<data2_dllist> timeout dl_list  }}")
+
+s.node('eloop_data0', "{{ eloop_data0 | <data0_reader>eloop_sock_table reader "
+                      "|<data0_writer>eloop_sock_table writer "
+                      "|<data0_exception> eloop_sock_table exception "
+                      "|<data0_signal> eloop_signal signals"
+                      "|<data0_dllist> timeout dl_list }}")
+
+s.node('eloop_data1', "{{ eloop_data1 | <data1_reader>eloop_sock_table reader "
+                      "|<data1_writer>eloop_sock_table writer "
+                      "|<data1_exception> eloop_sock_table exception "
+                      "|<data1_signal> eloop_signal signals"
+                      "| {<data1_dllist_left> timeout dl_list_pre | <data1_dllist_right> timeout dl_list_next} }}")
+
+
+s.node('eloop_sock_table_reader', "{{ eloop_sock_table_reader | int count "
+                      "|eloop_event_type#READ#WRITE#EXCEPTION# "
+                      "|<eloop_sock_reader>eloop_sock   }}")
+
+s.node('eloop_sock_table_writer', "{{ eloop_sock_table_writer | int count "
+                      "|eloop_event_type#READ#WRITE#EXCEPTION# "
+                      "|<eloop_sock_writer>eloop_sock   }}")
+
+s.node('eloop_sock_table_exception', "{{ eloop_sock_table_exception | int count "
+                      "|eloop_event_type#READ#WRITE#EXCEPTION# "
+                      "|<eloop_sock_exception>eloop_sock   }}")
+
+
+s.node('eloop_signal', "{{ eloop_signal | int sig 信号量 "
+                      "|void *user_data 用户数据 "
+                      "|void* eloop_signal_handler 处理函数 }}")
+
+s.node('eloop_sock_reader', "{{ eloop_sock_reader | int sock 句柄 "
+                      "|void *eloop_data 数据 "
+                      "|void *user_data 数据 "
+                      "|void * eloop_sock_handler reader处理函数指针  }}")
+
+s.node('eloop_sock_writer', "{{ eloop_sock_writer | int sock 句柄 "
+                      "|void *eloop_data 数据 "
+                      "|void *user_data 数据 "
+                      "|void * eloop_sock_handler writer处理函数指针  }}")
+
+
+s.node('eloop_sock_exception', "{{ eloop_sock_exception | int sock 句柄 "
+                      "|void *eloop_data 数据 "
+                      "|void *user_data 数据 "
+                      "|void * eloop_sock_handler exception处理函数指针  }}")
+
+
+s.edges([('eloop_data1:data1_dllist_left', 'eloop_data0')])
+s.edges([('eloop_data1:data1_dllist_right', 'eloop_data2')])
+s.edges([('eloop_data2:data2_reader', 'eloop_sock_table_reader')])
+s.edges([('eloop_data2:data2_writer', 'eloop_sock_table_writer')])
+s.edges([('eloop_data2:data2_exception', 'eloop_sock_table_exception')])
+s.edges([('eloop_data2:data2_signal', 'eloop_signal')])
+
+s.edges([('eloop_sock_table_reader:eloop_sock_reader', 'eloop_sock_reader')])
+s.edges([('eloop_sock_table_writer:eloop_sock_writer', 'eloop_sock_writer')])
+s.edges([('eloop_sock_table_exception:eloop_sock_exception', 'eloop_sock_exception')])
+s.view()
+print(s.source)
+
+
+```
+
+
+
+
+
+#### eloop_sock_table
+
+```
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/utils/eloop.c#70
+
+struct eloop_sock_table {
+	int count;
+	struct eloop_sock *table;
+	eloop_event_type type;   // 事件类型
+	int changed;
+};
+
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/utils/eloop.h#31
+typedef enum {
+	EVENT_TYPE_READ = 0,    // 读 
+	EVENT_TYPE_WRITE,       // 写
+	EVENT_TYPE_EXCEPTION    // 异常
+} eloop_event_type;
+
+
+
+```
+
+
+#### eloop_sock
+```
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/utils/eloop.c#42
+struct eloop_sock {
+	int sock;
+	void *eloop_data;
+	void *user_data;
+	eloop_sock_handler handler;  // 函数指针
+	WPA_TRACE_REF(eloop);
+	WPA_TRACE_REF(user);
+	WPA_TRACE_INFO
+};
+
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/utils/eloop.h#43
+typedef void (*eloop_sock_handler)(int sock, void *eloop_ctx, void *sock_ctx);
+
+```
+
+#### eloop_signal
+```
+
+struct eloop_signal {
+	int sig;
+	void *user_data;
+	eloop_signal_handler handler;   // 函数指针
+	int signaled;
+};
+
+```
+
+
+
+### ctrl_iface_global_priv
+
+```
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/ctrl_iface_unix.c#ctrl_iface_global_priv
+
+struct ctrl_iface_global_priv {
+	struct wpa_global *global;
+	int sock;
+	struct dl_list ctrl_dst;
+	int android_control_socket;
+	struct dl_list msg_queue;
+	unsigned int throttle_count;
+};
+
+
+
+```
+
+
+<img src="//../zimage/wireless/wifi/09_supplicant/ctrl_iface_global_priv.jpg" width = "50%" height="50%"/>
