@@ -29,6 +29,8 @@ Graphviz提供了dot语言来编写绘图脚本，dot语言是非常简单
 CMD下输入命令 确认是否生效
 dot -version
 
+https://chungkwong.github.io/dot.html
+
 配置地址: 
 https://www.cnblogs.com/BlameKidd/p/9762046.html
 

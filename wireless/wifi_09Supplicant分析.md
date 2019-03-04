@@ -1537,6 +1537,12 @@ struct ctrl_iface_global_priv * wpa_supplicant_global_ctrl_iface_init(struct wpa
 
 ```
 #### wpas_global_ctrl_iface_open_sock(global, priv) 
+```
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/ctrl_iface_unix.c#1111
+
+详情见长函数分析
+
+```
 
 
 #### wpa_msg_register_cb(wpa_supplicant_ctrl_iface_msg_cb)
@@ -1586,6 +1592,592 @@ void fst_global_deinit(void)
 
 
 ```
+
+# wpas_global_ctrl_iface_open_sock 长函数分析
+```
+
+static int wpas_global_ctrl_iface_open_sock(struct wpa_global *global,
+					    struct ctrl_iface_global_priv *priv)
+{
+	struct sockaddr_un addr;
+	const char *ctrl = global->params.ctrl_interface;   //  -g@android:vendor_wpa_wlan0
+	int flags;
+
+	wpa_printf(MSG_DEBUG, "Global control interface '%s'", ctrl);
+
+	if (os_strncmp(ctrl, "@android:", 9) == 0) {  //strncmp比较特定长度的字符串   大于时返回1；等于时返回0；小于时返回-1     判断借口前9个字符是不是  @android:
+		priv->sock = android_get_control_socket(ctrl + 9);  【1】
+		if (priv->sock < 0) {
+			wpa_printf(MSG_ERROR, "Failed to open Android control socket '%s'", ctrl + 9);
+			goto fail;
+		}
+		wpa_printf(MSG_DEBUG, "Using Android control socket '%s'", ctrl + 9);
+		priv->android_control_socket = 1;   // 安卓控制接口 int 初始化为1 
+		goto havesock;
+	}
+
+	if (os_strncmp(ctrl, "@abstract:", 10) != 0) {
+		/*
+		 * Backwards compatibility - try to open an Android control
+		 * socket and if that fails, assume this was a UNIX domain
+		 * socket instead.
+		 */
+        // 尝试打开 socket 句柄 以  @android:vendor_wpa_wlan0 为参数
+		priv->sock = android_get_control_socket(ctrl);     
+		if (priv->sock >= 0) {
+			wpa_printf(MSG_DEBUG,
+				   "Using Android control socket '%s'",
+				   ctrl);
+			priv->android_control_socket = 1;
+			goto havesock;
+		}
+	}
+
+	priv->sock = socket(PF_UNIX, SOCK_DGRAM, 0);
+	if (priv->sock < 0) {
+		wpa_printf(MSG_ERROR, "socket(PF_UNIX): %s", strerror(errno));
+		goto fail;
+	}
+
+	os_memset(&addr, 0, sizeof(addr));
+	addr.sun_family = AF_UNIX;
+
+	if (os_strncmp(ctrl, "@abstract:", 10) == 0) {
+		addr.sun_path[0] = '\0';
+		os_strlcpy(addr.sun_path + 1, ctrl + 10,
+			   sizeof(addr.sun_path) - 1);
+		if (bind(priv->sock, (struct sockaddr *) &addr, sizeof(addr)) <
+		    0) {
+			wpa_printf(MSG_ERROR, "supp-global-ctrl-iface-init: "
+				   "bind(PF_UNIX;%s) failed: %s",
+				   ctrl, strerror(errno));
+			goto fail;
+		}
+		wpa_printf(MSG_DEBUG, "Using Abstract control socket '%s'",
+			   ctrl + 10);
+		goto havesock;
+	}
+
+	os_strlcpy(addr.sun_path, ctrl, sizeof(addr.sun_path));
+	if (bind(priv->sock, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
+		wpa_printf(MSG_INFO, "supp-global-ctrl-iface-init(%s) (will try fixup): bind(PF_UNIX): %s",
+			   ctrl, strerror(errno));
+		if (connect(priv->sock, (struct sockaddr *) &addr,
+			    sizeof(addr)) < 0) {
+			wpa_printf(MSG_DEBUG, "ctrl_iface exists, but does not"
+				   " allow connections - assuming it was left"
+				   "over from forced program termination");
+			if (unlink(ctrl) < 0) {
+				wpa_printf(MSG_ERROR,
+					   "Could not unlink existing ctrl_iface socket '%s': %s",
+					   ctrl, strerror(errno));
+				goto fail;
+			}
+			if (bind(priv->sock, (struct sockaddr *) &addr,
+				 sizeof(addr)) < 0) {
+				wpa_printf(MSG_ERROR, "supp-glb-iface-init: bind(PF_UNIX;%s): %s",
+					   ctrl, strerror(errno));
+				goto fail;
+			}
+			wpa_printf(MSG_DEBUG, "Successfully replaced leftover "
+				   "ctrl_iface socket '%s'",
+				   ctrl);
+		} else {
+			wpa_printf(MSG_INFO, "ctrl_iface exists and seems to "
+				   "be in use - cannot override it");
+			wpa_printf(MSG_INFO, "Delete '%s' manually if it is "
+				   "not used anymore",
+				   ctrl);
+			goto fail;
+		}
+	}
+
+	wpa_printf(MSG_DEBUG, "Using UNIX control socket '%s'", ctrl);
+
+	if (global->params.ctrl_interface_group) {
+		char *gid_str = global->params.ctrl_interface_group;
+		gid_t gid = 0;
+		struct group *grp;
+		char *endp;
+
+		grp = getgrnam(gid_str);
+		if (grp) {
+			gid = grp->gr_gid;
+			wpa_printf(MSG_DEBUG, "ctrl_interface_group=%d"
+				   " (from group name '%s')",
+				   (int) gid, gid_str);
+		} else {
+			/* Group name not found - try to parse this as gid */
+			gid = strtol(gid_str, &endp, 10);
+			if (*gid_str == '\0' || *endp != '\0') {
+				wpa_printf(MSG_ERROR, "CTRL: Invalid group "
+					   "'%s'", gid_str);
+				goto fail;
+			}
+			wpa_printf(MSG_DEBUG, "ctrl_interface_group=%d",
+				   (int) gid);
+		}
+		if (chown(ctrl, -1, gid) < 0) {
+			wpa_printf(MSG_ERROR,
+				   "chown[global_ctrl_interface=%s,gid=%d]: %s",
+				   ctrl, (int) gid, strerror(errno));
+			goto fail;
+		}
+
+		if (chmod(ctrl, S_IRWXU | S_IRWXG) < 0) {
+			wpa_printf(MSG_ERROR,
+				   "chmod[global_ctrl_interface=%s]: %s",
+				   ctrl, strerror(errno));
+			goto fail;
+		}
+	} else {
+		if (chmod(ctrl, S_IRWXU) < 0) {
+			wpa_printf(MSG_DEBUG,
+				   "chmod[global_ctrl_interface=%s](S_IRWXU): %s",
+				   ctrl, strerror(errno));
+			/* continue anyway since group change was not required
+			 */
+		}
+	}
+
+havesock:
+
+	/*  使套接字不阻塞，以便在目标意外死亡时不会永久挂起。
+	 * Make socket non-blocking so that we don't hang forever if target dies unexpectedly.
+	 */
+	flags = fcntl(priv->sock, F_GETFL);  【2】  取得文件描述词状态旗标
+	if (flags >= 0) {
+		flags |= O_NONBLOCK;          // 添加非阻塞标识 旗标
+		if (fcntl(priv->sock, F_SETFL, flags) < 0) {    //  设置文件状态旗标 
+			wpa_printf(MSG_INFO, "fcntl(ctrl, O_NONBLOCK): %s", strerror(errno));
+			/* Not fatal, continue on.*/
+		}
+	}
+
+// 往 eloop_data 中的 read table 加入一个新的读 socket item
+// wpa_supplicant_global_ctrl_iface_receive 是 vendor_wpa_wlan0 读取socket 的 处理函数
+	eloop_register_read_sock(priv->sock,wpa_supplicant_global_ctrl_iface_receive,global, priv); 【3】
+
+	return 0;
+
+fail:
+	if (priv->sock >= 0) {
+		close(priv->sock);
+		priv->sock = -1;
+	}
+	return -1;
+}
+
+
+```
+
+## android_get_control_socket
+```
+获取 init_xx.rc 中配置为 @android:vendor_wpa_wlan0 Socket 的 句柄 
+
+http://androidxref.com/9.0.0_r3/xref/system/core/libcutils/sockets_unix.cpp#97
+
+http://eeepage.info/android_get_control_socket/
+
+
+        // 尝试打开 socket 句柄 以  @android:vendor_wpa_wlan0 为参数
+		priv->sock = android_get_control_socket(ctrl);  
+
+
+android_get_control_socket 定义在 /system/core/include/cutils/sockets.h
+
+android_get_control_socket  简单的辅助功能,让我初始化 unix_domain_socket socket文件描述符
+android_get_control_socket(char* name) 是socket的名字, 可以在 init_xx.rc 文件中找到
+返回 -1  表示socket创建失败 
+
+
+
+int android_get_control_socket(const char* name) {
+    int fd = __android_get_control_from_env(ANDROID_SOCKET_ENV_PREFIX, name);  // #define ANDROID_SOCKET_ENV_PREFIX "ANDROID_SOCKET_"   获取句柄函数
+    if (fd < 0) return fd;
+
+    // Compare to UNIX domain socket name, must match!
+    struct sockaddr_un addr;
+    socklen_t addrlen = sizeof(addr);
+    int ret = TEMP_FAILURE_RETRY(getsockname(fd, (struct sockaddr *)&addr, &addrlen));
+    if (ret < 0) return -1;
+    char *path = NULL;
+    if (asprintf(&path, ANDROID_SOCKET_DIR "/%s", name) < 0) return -1;
+    if (!path) return -1;
+    int cmp = strcmp(addr.sun_path, path);
+    free(path);
+    if (cmp != 0) return -1;
+
+    // It is what we think it is
+    return fd;
+}
+
+
+
+
+
+
+```
+## fcntl(priv->sock, F_GETFL)
+```
+int flags = fcntl(priv->sock, F_GETFL);  // 取得文件描述词状态旗标
+
+http://net.pku.edu.cn/~yhf/linux_c/function/09.html#linuxc137
+
+表头文件             #include<unistd.h>                  #include<fcntl.h>
+定义函数
+             int fcntl(int fd , int cmd);
+             int fcntl(int fd,int cmd,long arg);
+             int fcntl(int fd,int cmd,struct flock * lock);
+函数说明
+fcntl()用来操作文件描述词的一些特性。参数fd代表欲设置的文件描述词，参数cmd代表欲操作的指令。
+有以下几种情况:
+F_DUPFD用来查找大于或等于参数arg的最小且仍未使用的文件描述词，并且复制参数fd的文件描述词。执行成功则返回新复制的文件描述词。请参考dup2()。
+F_GETFD 取得close-on-exec旗标。若此旗标的FD_CLOEXEC位为0，代表在调用exec()相关函数时文件将不会关闭。
+F_SETFD 设置close-on-exec 旗标。该旗标以参数arg 的FD_CLOEXEC位决定。
+F_GETFL 取得文件描述词状态旗标，此旗标为open（）的参数flags。
+F_SETFL 设置文件描述词状态旗标，参数arg为新旗标，但只允许O_APPEND、O_NONBLOCK和O_ASYNC位的改变，其他位的改变将不受影响。
+F_GETLK 取得文件锁定的状态。
+F_SETLK 设置文件锁定的状态。此时flcok 结构的l_type 值必须是F_RDLCK、F_WRLCK或F_UNLCK。如果无法建立锁定，则返回-1，错误代码为EACCES 或EAGAIN。
+F_SETLKW F_SETLK 作用相同，但是无法建立锁定时，此调用会一直等到锁定动作成功为止。若在等待锁定的过程中被信号中断时，会立即返回-1，错误代码为EINTR。参数lock指针为flock 结构指针
+```
+
+## eloop_register_read_sock(priv->sock,wpa_supplicant_global_ctrl_iface_receive）
+```
+设置 @android:vendor_wpa_wlan0  这个 eloop_data 中  read-table 中 一个 socket-item【vendor_wpa_wlan0】的处理函数  wpa_supplicant_global_ctrl_iface_receive
+
+
+eloop_register_read_sock(priv->sock,wpa_supplicant_global_ctrl_iface_receive 【1】,global, priv); 
+
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/utils/eloop.c#711
+
+int eloop_register_read_sock(int sock, eloop_sock_handler handler,void *eloop_data, void *user_data)
+{
+	return eloop_register_sock(sock, EVENT_TYPE_READ, handler,   eloop_data, user_data); 
+}
+
+
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/utils/eloop.c#740
+int eloop_register_sock(int sock, eloop_event_type type,eloop_sock_handler handler,void *eloop_data, void *user_data)
+{
+	struct eloop_sock_table *table;
+
+	assert(sock >= 0);
+	table = eloop_get_sock_table(type);
+	return eloop_sock_table_add_sock(table, sock, handler, eloop_data, user_data);   
+}
+
+
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/utils/eloop.c#725
+
+static struct eloop_sock_table *eloop_get_sock_table(eloop_event_type type)    //  返回依据类型初始化了的 eloop_data中的 reader  writer exception table
+{
+	switch (type) {
+	case EVENT_TYPE_READ:
+		return &eloop.readers;
+	case EVENT_TYPE_WRITE:
+		return &eloop.writers;
+	case EVENT_TYPE_EXCEPTION:
+		return &eloop.exceptions;
+	}
+
+	return NULL;
+}
+
+
+```
+
+### wpa_supplicant_global_ctrl_iface_receive
+```
+
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/ctrl_iface_unix.c#1044
+
+
+/* Global ctrl_iface */
+
+static void wpa_supplicant_global_ctrl_iface_receive(int sock, void *eloop_ctx, void *sock_ctx)
+{
+	struct wpa_global *global = eloop_ctx;
+	struct ctrl_iface_global_priv *priv = sock_ctx;
+	char buf[4096];
+	int res;
+	struct sockaddr_storage from;
+	socklen_t fromlen = sizeof(from);
+	char *reply = NULL, *reply_buf = NULL;
+	size_t reply_len;
+
+	res = recvfrom(sock, buf, sizeof(buf) - 1, 0, (struct sockaddr *) &from, &fromlen); 【1】 （经socket接收数据）
+	if (res < 0) {
+		wpa_printf(MSG_ERROR, "recvfrom(ctrl_iface): %s",  strerror(errno));
+		return;
+	}
+	buf[res] = '\0';  // 设置字符串终结符 \0
+
+	if (os_strcmp(buf, "ATTACH") == 0) {
+		if (wpa_supplicant_ctrl_iface_attach(&priv->ctrl_dst, &from, fromlen, 1))  【2】 如果命令为 ATTACH 那么执行函数 wpa_supplicant_ctrl_iface_attach  // ctrl_dst为 控制双向链表
+			reply_len = 1;
+		else
+			reply_len = 2;
+	} else if (os_strcmp(buf, "DETACH") == 0) { 
+		if (wpa_supplicant_ctrl_iface_detach(&priv->ctrl_dst, &from,fromlen))      【3】如果命令为 DETACH 那么执行函数 wpa_supplicant_ctrl_iface_detach
+			reply_len = 1;
+		else
+			reply_len = 2;
+	} else {
+		reply_buf = wpa_supplicant_global_ctrl_iface_process(global, buf, &reply_len); 【4】如果命令不为 ATTACH 和 DETACH 那么执行函数 wpa_supplicant_global_ctrl_iface_process
+		reply = reply_buf;
+
+		/*
+		 * There could be some password/key material in the command, so
+		 * clear the buffer explicitly now that it is not needed
+		 * anymore.
+		 */
+		os_memset(buf, 0, res);
+	}
+
+	if (!reply && reply_len == 1) {
+		reply = "FAIL\n";
+		reply_len = 5;
+	} else if (!reply && reply_len == 2) {
+		reply = "OK\n";
+		reply_len = 3;
+	}
+
+	if (reply) {
+		wpas_ctrl_sock_debug("global_ctrl_sock-sendto",sock, reply, reply_len);
+		if (sendto(sock, reply, reply_len, 0, (struct sockaddr *) &from, fromlen) < 0) {
+			wpa_printf(MSG_DEBUG, "ctrl_iface sendto failed: %s",strerror(errno));
+		}
+	}
+	os_free(reply_buf);
+}
+
+
+```
+
+#### recvfrom(sock, buf, sizeof(buf) - 1 ,0）
+```
+http://net.pku.edu.cn/~yhf/linux_c/function/14.html#linuxc278
+
+recvfrom（经socket接收数据）
+相关函数   recv，recvmsg，send，sendto，socket
+表头文件          #include<sys/types.h>              #include<sys/socket.h>
+定义函数          int recvfrom(int s,void *buf,int len,unsigned int flags ,struct sockaddr *from ,int *fromlen);
+函数说明
+recv()用来接收远程主机经指定的socket 传来的数据，并把数据存到由参数buf 指向的内存空间，参数len 为可接收数据的最大长度。
+参数flags 一般设0，其他数值定义请参考recv()。参数from用来指定欲传送的网络地址，结构sockaddr 请参考bind()。参数fromlen为sockaddr的结构长度。
+
+返回值     成功则返回接收到的字符数，失败则返回-1，错误原因存于errno中。
+错误代码
+EBADF    参数s非合法的socket处理代码
+EFAULT   参数中有一指针指向无法存取的内存空间。
+ENOTSOCK 参数s为一文件描述词，非socket。
+EINTR    被信号所中断。
+EAGAIN   此动作会令进程阻断，但参数s的socket为不可阻断。
+ENOBUFS  系统的缓冲内存不足
+ENOMEM   核心内存不足
+EINVAL   传给系统调用的参数不正确。
+
+
+```
+
+#### wpa_supplicant_ctrl_iface_attach
+```
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/ctrl_iface_unix.c#102
+
+static int wpa_supplicant_ctrl_iface_attach(struct dl_list *ctrl_dst,struct sockaddr_storage *from, socklen_t fromlen, int global)
+{
+	return ctrl_iface_attach(ctrl_dst, from, fromlen);
+}
+
+
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/common/ctrl_iface_common.c#116
+
+int ctrl_iface_attach(struct dl_list *ctrl_dst, struct sockaddr_storage *from, socklen_t fromlen)
+{
+	struct wpa_ctrl_dst *dst;
+
+	dst = os_zalloc(sizeof(*dst));
+	if (dst == NULL)
+		return -1;
+	os_memcpy(&dst->addr, from, fromlen);
+	dst->addrlen = fromlen;
+	dst->debug_level = MSG_INFO;
+	dl_list_add(ctrl_dst, &dst->list); 【1】
+
+	sockaddr_print(MSG_DEBUG, "CTRL_IFACE monitor attached", from, fromlen);
+	return 0;
+}
+
+
+
+```
+
+##### dl_list_add
+```
+dl_list_add(struct dl_list ctrl_dst 【主链表】,struct dl_list &dst->list【待添加链表结点】); 
+
+把控制接口加入双向链表中
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/utils/list.h#28
+
+
+static inline void dl_list_add(struct dl_list *list, struct dl_list *item)
+{
+	item->next = list->next;
+	item->prev = list;
+	list->next->prev = item;
+	list->next = item;
+}
+
+
+```
+
+#### wpa_supplicant_ctrl_iface_detach
+```
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/ctrl_iface_unix.c#110
+
+wpa_supplicant_ctrl_iface_detach(&priv->ctrl_dst, &from,fromlen)
+
+static int wpa_supplicant_ctrl_iface_detach(struct dl_list *ctrl_dst,struct sockaddr_storage *from,socklen_t fromlen)
+{
+	return ctrl_iface_detach(ctrl_dst, from, fromlen);
+}
+
+
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/common/ctrl_iface_common.c#134
+
+
+int ctrl_iface_detach(struct dl_list *ctrl_dst, struct sockaddr_storage *from,socklen_t fromlen)
+{
+	struct wpa_ctrl_dst *dst;
+
+
+// ##   for (dst = dl_list_entry((ctrl_dst)->next, wpa_ctrl_dst, list); &dst->list != (ctrl_dst);  dst = dl_list_entry(dst->list.next, wpa_ctrl_dst, list))##
+	dl_list_for_each(dst, ctrl_dst, struct wpa_ctrl_dst, list) {        // 【1】  遍历双向链表
+		if (!sockaddr_compare(from, fromlen, &dst->addr, dst->addrlen)) {    // 【2】 socket 地址进行判断? 
+			sockaddr_print(MSG_DEBUG, "CTRL_IFACE monitor detached",  from, fromlen);  
+			dl_list_del(&dst->list);    //   【3】  从双向链表中删除一个 item
+			os_free(dst);
+			return 0;
+		}
+	}
+
+	return -1;
+}
+
+```
+##### dl_list_for_each
+```
+dl_list_for_each 是一个 for(;;)  条件的宏 
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/src/utils/list.h#78
+
+#define dl_list_for_each(item, list, type, member) 
+ for (item = dl_list_entry((list)->next, type, member); &item->member != (list);  item = dl_list_entry 【1】(item->member.next, type, member))
+
+
+	dl_list_for_each(dst, ctrl_dst, struct wpa_ctrl_dst, list) {       
+		if (!sockaddr_compare(from, fromlen, &dst->addr, dst->addrlen)) {   
+			sockaddr_print(MSG_DEBUG, "CTRL_IFACE monitor detached",  from, fromlen);  
+			dl_list_del(&dst->list);  
+			os_free(dst);
+			return 0;
+		}
+	}
+
+等于
+
+
+ for (dst = dl_list_entry((ctrl_dst)->next, wpa_ctrl_dst, list); &dst->list != (ctrl_dst);  dst = dl_list_entry(dst->list.next, wpa_ctrl_dst, list))
+		if (!sockaddr_compare(from, fromlen, &dst->addr, dst->addrlen)) {   
+			sockaddr_print(MSG_DEBUG, "CTRL_IFACE monitor detached",  from, fromlen);  
+			dl_list_del(&dst->list);  
+			os_free(dst);
+			return 0;
+		}
+	}
+
+```
+###### dl_list_entry
+```
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/src/utils/list.h#67
+#define dl_list_entry(item, type, member)  ((type *) ((char *) item - offsetof(type, member)))   // 通过链表获得包含该链表的那个数据结构体
+
+
+```
+
+##### sockaddr_compare
+```
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/common/ctrl_iface_common.c#17
+
+要打Log 查看
+
+static int sockaddr_compare(struct sockaddr_storage *a, socklen_t a_len,struct sockaddr_storage *b, socklen_t b_len)
+{
+	if (a->ss_family != b->ss_family)
+		return 1;
+
+	switch (a->ss_family) {
+#ifdef CONFIG_CTRL_IFACE_UDP
+	case AF_INET:
+	{
+		struct sockaddr_in *in_a, *in_b;
+
+		in_a = (struct sockaddr_in *) a;
+		in_b = (struct sockaddr_in *) b;
+
+		if (in_a->sin_port != in_b->sin_port)
+			return 1;
+		if (in_a->sin_addr.s_addr != in_b->sin_addr.s_addr)
+			return 1;
+		break;
+	}
+	case AF_INET6:
+	{
+		struct sockaddr_in6 *in6_a, *in6_b;
+
+		in6_a = (struct sockaddr_in6 *) a;
+		in6_b = (struct sockaddr_in6 *) b;
+
+		if (in6_a->sin6_port != in6_b->sin6_port)
+			return 1;
+		if (os_memcmp(&in6_a->sin6_addr, &in6_b->sin6_addr,
+			      sizeof(in6_a->sin6_addr)) != 0)
+			return 1;
+		break;
+	}
+#endif /* CONFIG_CTRL_IFACE_UDP */
+#ifdef CONFIG_CTRL_IFACE_UNIX
+	case AF_UNIX:
+	{
+		struct sockaddr_un *u_a, *u_b;
+
+		u_a = (struct sockaddr_un *) a;
+		u_b = (struct sockaddr_un *) b;
+
+		if (a_len != b_len ||
+		    os_memcmp(u_a->sun_path, u_b->sun_path,
+			      a_len - offsetof(struct sockaddr_un, sun_path))
+		    != 0)
+			return 1;
+		break;
+	}
+#endif /* CONFIG_CTRL_IFACE_UNIX */
+	default:
+		return 1;
+	}
+
+	return 0;
+}
+
+
+
+```
+
+
+#####  dl_list_del
+
+
+
 #  WIFI数据结构
 
 
