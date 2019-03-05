@@ -2109,7 +2109,7 @@ http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/src/utils/list.h#
 ```
 http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/common/ctrl_iface_common.c#17
 
-要打Log 查看
+要打Log 查看  貌似执行不到这里
 
 static int sockaddr_compare(struct sockaddr_storage *a, socklen_t a_len,struct sockaddr_storage *b, socklen_t b_len)
 {
@@ -2175,6 +2175,968 @@ static int sockaddr_compare(struct sockaddr_storage *a, socklen_t a_len,struct s
 
 
 #####  dl_list_del
+```
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/utils/list.h#41
+
+
+
+static inline void dl_list_del(struct dl_list *item)
+{
+	item->next->prev = item->prev;
+	item->prev->next = item->next;
+	item->next = NULL;
+	item->prev = NULL;
+}
+
+```
+
+
+#### wpa_supplicant_global_ctrl_iface_process
+```
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/ctrl_iface.c#11084
+
+char * wpa_supplicant_global_ctrl_iface_process(struct wpa_global *global,char *buf, size_t *resp_len)
+{
+	char *reply;
+	const int reply_size = 2048;
+	int reply_len;
+	int level = MSG_DEBUG;
+
+	if (os_strncmp(buf, "IFNAME=", 7) == 0) {     // 判断 buf 字符串命令 是以 IFNAME= 为开头的话
+		char *pos = os_strchr(buf + 7, ' ');
+		if (pos) {
+			*pos++ = '\0';
+			return wpas_global_ctrl_iface_ifname(global, buf + 7, pos, resp_len);   【1】
+		}
+	}
+
+	reply = wpas_global_ctrl_iface_redir(global, buf, resp_len);   【2】
+	if (reply)
+		return reply;
+
+	if (os_strcmp(buf, "PING") == 0)
+		level = MSG_EXCESSIVE;
+	wpa_hexdump_ascii(level, "RX global ctrl_iface", (const u8 *) buf, os_strlen(buf)); 【3】
+
+	reply = os_malloc(reply_size);
+	if (reply == NULL) {
+		*resp_len = 1;
+		return NULL;
+	}
+
+	os_memcpy(reply, "OK\n", 3);
+	reply_len = 3;
+
+	if (os_strcmp(buf, "PING") == 0) {  // 如果命令是 PING  
+		os_memcpy(reply, "PONG\n", 5);
+		reply_len = 5;
+	} else if (os_strncmp(buf, "INTERFACE_ADD ", 14) == 0) {   // 如果命令是 INTERFACE_ADD
+		if (wpa_supplicant_global_iface_add(global, buf + 14))     【4】
+			reply_len = -1;
+	} else if (os_strncmp(buf, "INTERFACE_REMOVE ", 17) == 0) {   // 如果命令是  INTERFACE_REMOVE
+		if (wpa_supplicant_global_iface_remove(global, buf + 17))     【5】
+			reply_len = -1;
+	} else if (os_strcmp(buf, "INTERFACE_LIST") == 0) {            //  如果命令是 INTERFACE_LIST 
+		reply_len = wpa_supplicant_global_iface_list(global, reply, reply_size);    【6】
+
+	} else if (os_strncmp(buf, "INTERFACES", 10) == 0) {            //  如果命令是 INTERFACES
+		reply_len = wpa_supplicant_global_iface_interfaces(global, buf + 10, reply, reply_size);    【7】
+
+	} else if (os_strncmp(buf, "FST-ATTACH ", 11) == 0) {             // 如果命令是  FST-ATTACH
+		reply_len = wpas_global_ctrl_iface_fst_attach(global, buf + 11,reply,reply_size);    【8】
+
+	} else if (os_strncmp(buf, "FST-DETACH ", 11) == 0) {                // 如果命令是 FST-DETACH
+		reply_len = wpas_global_ctrl_iface_fst_detach(global, buf + 11,reply,reply_size);  【9】
+
+	} else if (os_strncmp(buf, "FST-MANAGER ", 12) == 0) {                //  如果命令是 FST-MANAGER
+		reply_len = fst_ctrl_iface_receive(buf + 12, reply, reply_size);             【10 】
+	} else if (os_strcmp(buf, "TERMINATE") == 0) {    //  如果命令是 TERMINATE
+		wpa_supplicant_terminate_proc(global);                      【11】
+	} else if (os_strcmp(buf, "SUSPEND") == 0) {   //  如果命令是 SUSPEND
+		wpas_notify_suspend(global);                  【12】
+	} else if (os_strcmp(buf, "RESUME") == 0) {   //  如果命令是 RESUME
+		wpas_notify_resume(global);                   【13】
+	} else if (os_strncmp(buf, "SET ", 4) == 0) {   //  如果命令是 SET
+		if (wpas_global_ctrl_iface_set(global, buf + 4)) {               【14】
+			if (global->p2p_init_wpa_s) {
+				os_free(reply);
+
+				/* Check if P2P redirection would work for thiscommand. */
+				return wpa_supplicant_ctrl_iface_process(global->p2p_init_wpa_s,buf, resp_len);    【15】
+			}
+			reply_len = -1;
+		}
+	} else if (os_strncmp(buf, "DUP_NETWORK ", 12) == 0) {        //  如果命令是 DUP_NETWORK
+		if (wpas_global_ctrl_iface_dup_network(global, buf + 12))            【16】
+			reply_len = -1;
+	} else if (os_strcmp(buf, "SAVE_CONFIG") == 0) {    //  如果命令是 SAVE_CONFIG
+		if (wpas_global_ctrl_iface_save_config(global))                     【17】
+			reply_len = -1;
+	} else if (os_strcmp(buf, "STATUS") == 0) {         //  如果命令是 STATUS
+		reply_len = wpas_global_ctrl_iface_status(global, reply, reply_size);          【18】
+
+	} else if (os_strncmp(buf, "RELOG", 5) == 0) {    //  如果命令是 RELOG
+		if (wpa_debug_reopen_file() < 0)                                      【19】
+			reply_len = -1;
+	} else {
+		os_memcpy(reply, "UNKNOWN COMMAND\n", 16);
+		reply_len = 16;
+	}
+
+	if (reply_len < 0) {
+		os_memcpy(reply, "FAIL\n", 5);
+		reply_len = 5;
+	}
+
+	*resp_len = reply_len;
+	return reply;
+}
+
+
+
+```
+
+##### wpas_global_ctrl_iface_ifname
+```
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/ctrl_iface.c#10746
+
+
+
+static char * wpas_global_ctrl_iface_ifname(struct wpa_global *global, const char *ifname, char *cmd, size_t *resp_len)
+{
+	struct wpa_supplicant *wpa_s;
+
+// 查询所有保存在 wpa_global->ifaces 【wpa_supplicant *ifaces】中的wpa_supplicant数组, 查看其中的 wpa_supplicant.ifname 【 char ifname[100]; 】 是否与参数ifname相等
+// 如果相等 就跳出循环   此时 临时变量  wpa_supplicant *wpa_s;  就指向了 参数 ifname 确定的  wpa_supplicant 结构
+	for (wpa_s = global->ifaces; wpa_s; wpa_s = wpa_s->next) {  
+		if (os_strcmp(ifname, wpa_s->ifname) == 0)
+			break;
+	}
+
+	if (wpa_s == NULL) {   // 如果查找的 wpa_s 为空 说明 在 wpa_global->ifaces 【wpa_supplicant *ifaces】中 未找到参数指定的那个 wpa_supplicant
+		char *resp = os_strdup("FAIL-NO-IFNAME-MATCH\n");
+		if (resp)
+			*resp_len = os_strlen(resp);
+		else
+			*resp_len = 1;
+		return resp;
+	}
+
+	return wpa_supplicant_ctrl_iface_process(wpa_s, cmd, resp_len);   // 【1】 在 该 wpa_supplicant 处理该命令
+}
+
+
+
+
+
+```
+
+###### wpa_supplicant_ctrl_iface_process()
+```
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/ctrl_iface.c#wpas_global_ctrl_iface_ifname
+
+详情见wpa_supplicant_ctrl_iface_process 长函数分析
+```
+
+
+# wpa_supplicant_ctrl_iface_process 长函数分析
+```
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/ctrl_iface.c#wpas_global_ctrl_iface_ifname
+
+
+
+char * wpa_supplicant_ctrl_iface_process(struct wpa_supplicant *wpa_s, char *buf, size_t *resp_len)
+{
+	char *reply;
+	const int reply_size = 4096;
+	int reply_len;
+
+// 如果命令 buf 以 "CTRL-RSP-"   "SET_NETWORK "   "PMKSA_ADD "    "MESH_PMKSA_ADD "  开头 那么进入 if语句
+	if (os_strncmp(buf, WPA_CTRL_RSP【"CTRL-RSP-"】, os_strlen(WPA_CTRL_RSP【CTRL-RSP-】)) == 0 || os_strncmp(buf, "SET_NETWORK ", 12) == 0 ||
+	    os_strncmp(buf, "PMKSA_ADD ", 10) == 0 || os_strncmp(buf, "MESH_PMKSA_ADD ", 15) == 0) {
+		if (wpa_debug_show_keys)  // int wpa_debug_show_keys = 0;  是否打印具体的命令的开关  打印命令
+			wpa_dbg(wpa_s, MSG_DEBUG,"Control interface command '%s'", buf);
+		else
+			wpa_dbg(wpa_s, MSG_DEBUG,"Control interface command '%s [REMOVED]'",
+           os_strncmp(buf, WPA_CTRL_RSP, os_strlen(WPA_CTRL_RSP)) == 0 ?	WPA_CTRL_RSP :	(os_strncmp(buf, "SET_NETWORK ", 12) == 0 ? "SET_NETWORK" : "key-add"));
+	} else if (os_strncmp(buf, "WPS_NFC_TAG_READ", 16) == 0 || os_strncmp(buf, "NFC_REPORT_HANDOVER", 19) == 0) {
+// 如果命令 buf 以   "WPS_NFC_TAG_READ"    "NFC_REPORT_HANDOVER" 开头
+		wpa_hexdump_ascii_key(MSG_DEBUG, "RX ctrl_iface",(const u8 *) buf, os_strlen(buf));   【1】
+	} else { // 其余命令执行以下code
+		int level = wpas_ctrl_cmd_debug_level(buf);    【2】
+		wpa_dbg(wpa_s, level, "Control interface command '%s'", buf);   // 打印Log  【3】
+	}
+
+
+
+	reply = os_malloc(reply_size);
+	if (reply == NULL) {
+		*resp_len = 1;
+		return NULL;
+	}
+
+	os_memcpy(reply, "OK\n", 3);
+	reply_len = 3;
+
+	if (os_strcmp(buf, "PING") == 0) {   // 如果命令 buf 是 PING  那么回复 PING 命令
+		os_memcpy(reply, "PONG\n", 5);
+		reply_len = 5;
+	} else if (os_strcmp(buf, "IFNAME") == 0) {  // 如果命令 buf 是 IFNAME  那么回复 wpa_s->ifname (wlan0)的名字  接口名字
+		reply_len = os_strlen(wpa_s->ifname);
+		os_memcpy(reply, wpa_s->ifname, reply_len);
+	} else if (os_strncmp(buf, "RELOG", 5) == 0) {  // 如果命令 buf 是 RELOG  那么执行 函数
+		if (wpa_debug_reopen_file() < 0)         【4】
+			reply_len = -1;
+	} else if (os_strncmp(buf, "NOTE ", 5) == 0) {  // 需要有命令参数输入
+		wpa_printf(MSG_INFO, "NOTE: %s", buf + 5);
+	} else if (os_strcmp(buf, "MIB") == 0) {  // 如果 命令 buf  是 MIB  那么执行 函数 返回MIB信息
+		reply_len = wpa_sm_get_mib(wpa_s->wpa, reply, reply_size);  【5】
+		if (reply_len >= 0) {
+			reply_len += eapol_sm_get_mib(wpa_s->eapol,reply + reply_len,  reply_size - reply_len);  【6】
+		}
+	} else if (os_strncmp(buf, "STATUS", 6) == 0) { // 如果 命令 buf  是 STATUS  那么执行函数 
+		reply_len = wpa_supplicant_ctrl_iface_status(wpa_s, buf + 6, reply, reply_size);   【7】
+
+	} else if (os_strcmp(buf, "PMKSA") == 0) {     // 如果 命令 buf  是 PMKSA  那么执行函数 
+		reply_len = wpas_ctrl_iface_pmksa(wpa_s, reply, reply_size);   【8】
+
+	} else if (os_strcmp(buf, "PMKSA_FLUSH") == 0) {// 如果 命令 buf  是 PMKSA_FLUSH  那么执行函数 
+		wpas_ctrl_iface_pmksa_flush(wpa_s);          【9】
+
+	} else if (os_strncmp(buf, "SET ", 4) == 0) {    // 如果 命令 buf  是 SET 那么执行函数   需要有命令参数输入 key value  ,例如 set passive_scan 1
+		if (wpa_supplicant_ctrl_iface_set(wpa_s, buf + 4))  【10】
+			reply_len = -1;
+
+	} else if (os_strncmp(buf, "DUMP", 4) == 0) {   // 如果 命令 buf  是 DUMP  那么执行函数 
+		reply_len = wpa_config_dump_values(wpa_s->conf,  reply, reply_size); 【11】
+
+	} else if (os_strncmp(buf, "GET ", 4) == 0) {   // 如果 命令 buf  是 GET  那么执行函数 
+		reply_len = wpa_supplicant_ctrl_iface_get(wpa_s, buf + 4, reply, reply_size);   【12】
+
+	} else if (os_strcmp(buf, "LOGON") == 0) {   // 如果 命令 buf  是 LOGON  那么执行函数 
+		eapol_sm_notify_logoff(wpa_s->eapol, FALSE);  【13】
+
+	} else if (os_strcmp(buf, "LOGOFF") == 0) {      // 如果 命令 buf  是 LOGOFF  那么执行函数 
+		eapol_sm_notify_logoff(wpa_s->eapol, TRUE);   【14】
+
+	} else if (os_strcmp(buf, "REASSOCIATE") == 0) {   // 如果 命令 buf  是 REASSOCIATE  那么执行函数 
+		if (wpa_s->wpa_state == WPA_INTERFACE_DISABLED)  
+			reply_len = -1;
+		else
+			wpas_request_connection(wpa_s);   【15】
+	} else if (os_strcmp(buf, "REATTACH") == 0) {      // 如果 命令 buf  是 REATTACH  那么执行函数 
+		if (wpa_s->wpa_state == WPA_INTERFACE_DISABLED ||  !wpa_s->current_ssid)
+			reply_len = -1;
+		else {
+			wpa_s->reattach = 1;
+			wpas_request_connection(wpa_s);
+		}
+	} else if (os_strcmp(buf, "RECONNECT") == 0) { // 如果 命令 buf  是 RECONNECT  那么执行函数 
+		if (wpa_s->wpa_state == WPA_INTERFACE_DISABLED)
+			reply_len = -1;
+		else if (wpa_s->disconnected)
+			wpas_request_connection(wpa_s);
+
+	} else if (os_strncmp(buf, "PREAUTH ", 8) == 0) { // 如果 命令 buf  是 PREAUTH  那么执行函数   需要输入命令参数
+		if (wpa_supplicant_ctrl_iface_preauth(wpa_s, buf + 8))   【16】
+			reply_len = -1;
+	} else if (os_strncmp(buf, "FT_DS ", 6) == 0) {  // 如果 命令 buf  是 FT_DS  那么执行函数   需要输入命令参数
+		if (wpa_supplicant_ctrl_iface_ft_ds(wpa_s, buf + 6))   【17】
+			reply_len = -1;
+
+	} else if (os_strcmp(buf, "WPS_PBC") == 0) { // 如果 命令 buf  是 [WPS_PBC]  那么执行函数 
+		int res = wpa_supplicant_ctrl_iface_wps_pbc(wpa_s, NULL);  【18】
+		if (res == -2) {
+			os_memcpy(reply, "FAIL-PBC-OVERLAP\n", 17);
+			reply_len = 17;
+		} else if (res)
+			reply_len = -1;
+	} else if (os_strncmp(buf, "WPS_PBC ", 8) == 0) {  // 如果 命令 buf  是 [WPS_PBC 输入参数] 那么执行函数 
+		int res = wpa_supplicant_ctrl_iface_wps_pbc(wpa_s, buf + 8);
+		if (res == -2) {
+			os_memcpy(reply, "FAIL-PBC-OVERLAP\n", 17);
+			reply_len = 17;
+		} else if (res)
+			reply_len = -1;
+	} else if (os_strncmp(buf, "WPS_PIN ", 8) == 0) {   // 如果 命令 buf  是WPS_PIN  那么执行函数    需要输入命令参数
+		reply_len = wpa_supplicant_ctrl_iface_wps_pin(wpa_s, buf + 8,reply,reply_size);  【19】
+
+	} else if (os_strncmp(buf, "WPS_CHECK_PIN ", 14) == 0) {   // 如果 命令 buf  是 WPS_CHECK_PIN  那么执行函数    需要输入命令参数
+		reply_len = wpa_supplicant_ctrl_iface_wps_check_pin(wpa_s, buf + 14, reply, reply_size); 【20】
+
+	} else if (os_strcmp(buf, "WPS_CANCEL") == 0) {   // 如果 命令 buf  是 WPS_CANCEL  那么执行函数 
+		if (wpas_wps_cancel(wpa_s))  【21】
+			reply_len = -1;
+
+	} else if (os_strcmp(buf, "WPS_NFC") == 0) {     // 如果 命令 buf  是 WPS_NFC  那么执行函数 
+		if (wpa_supplicant_ctrl_iface_wps_nfc(wpa_s, NULL))  【22】
+			reply_len = -1;
+	} else if (os_strncmp(buf, "WPS_NFC ", 8) == 0) {
+		if (wpa_supplicant_ctrl_iface_wps_nfc(wpa_s, buf + 8))
+			reply_len = -1;
+	} else if (os_strncmp(buf, "WPS_NFC_CONFIG_TOKEN ", 21) == 0) {  // 如果 命令 buf  是 WPS_NFC_CONFIG_TOKEN  那么执行函数 
+		reply_len = wpa_supplicant_ctrl_iface_wps_nfc_config_token(wpa_s, buf + 21, reply, reply_size);      【23】
+
+	} else if (os_strncmp(buf, "WPS_NFC_TOKEN ", 14) == 0) {   // 如果 命令 buf  是 WPS_NFC_TOKEN  那么执行函数   需要输入命令参数
+		reply_len = wpa_supplicant_ctrl_iface_wps_nfc_token(wpa_s, buf + 14, reply, reply_size);     【24】
+
+	} else if (os_strncmp(buf, "WPS_NFC_TAG_READ ", 17) == 0) {   // 如果 命令 buf  是 WPS_NFC_TAG_READ  那么执行函数   需要输入命令参数
+		if (wpa_supplicant_ctrl_iface_wps_nfc_tag_read(wpa_s, buf + 17))   【25】
+			reply_len = -1;
+	} else if (os_strncmp(buf, "NFC_GET_HANDOVER_REQ ", 21) == 0) {    // 如果 命令 buf  是 NFC_GET_HANDOVER_REQ  那么执行函数   需要输入2个命令参数
+		reply_len = wpas_ctrl_nfc_get_handover_req(wpa_s, buf + 21, reply, reply_size);  【26】
+
+	} else if (os_strncmp(buf, "NFC_GET_HANDOVER_SEL ", 21) == 0) {   // 如果 命令 buf  是 NFC_GET_HANDOVER_SEL  那么执行函数   需要输入2个命令参数
+		reply_len = wpas_ctrl_nfc_get_handover_sel(wpa_s, buf + 21, reply, reply_size);   【27】
+
+	} else if (os_strncmp(buf, "NFC_REPORT_HANDOVER ", 20) == 0) {  // 如果 命令 buf  是 NFC_REPORT_HANDOVER  那么执行函数   需要输入4个命令参数
+		if (wpas_ctrl_nfc_report_handover(wpa_s, buf + 20))                【28】
+			reply_len = -1;
+	} else if (os_strncmp(buf, "WPS_REG ", 8) == 0) {   // 如果 命令 buf  是 WPS_REG  那么执行函数   需要输入4个命令参数
+		if (wpa_supplicant_ctrl_iface_wps_reg(wpa_s, buf + 8))   【29】
+			reply_len = -1;
+
+
+	} else if (os_strcmp(buf, "WPS_ER_START") == 0) {  // 如果 命令 buf  是 WPS_ER_START  那么执行函数   可选输入参数命令
+		if (wpas_wps_er_start(wpa_s, NULL))        【30】
+			reply_len = -1;
+	} else if (os_strncmp(buf, "WPS_ER_START ", 13) == 0) { 
+		if (wpas_wps_er_start(wpa_s, buf + 13))
+			reply_len = -1;
+	} else if (os_strcmp(buf, "WPS_ER_STOP") == 0) {  // 如果 命令 buf  是 WPS_ER_STOP  那么执行函数   可选输入参数命令
+		wpas_wps_er_stop(wpa_s);                               【31】
+	} else if (os_strncmp(buf, "WPS_ER_PIN ", 11) == 0) {            // 如果 命令 buf  是 WPS_ER_PIN  那么执行函数   可选输入参数命令
+		if (wpa_supplicant_ctrl_iface_wps_er_pin(wpa_s, buf + 11))              【32】    
+			reply_len = -1;
+	} else if (os_strncmp(buf, "WPS_ER_PBC ", 11) == 0) {     // 如果 命令 buf  是 WPS_ER_PIN  那么执行函数    需要输入1个命令参数
+		int ret = wpas_wps_er_pbc(wpa_s, buf + 11);             【33】    
+		if (ret == -2) {
+			os_memcpy(reply, "FAIL-PBC-OVERLAP\n", 17);
+			reply_len = 17;
+		} else if (ret == -3) {
+			os_memcpy(reply, "FAIL-UNKNOWN-UUID\n", 18);
+			reply_len = 18;
+		} else if (ret == -4) {
+			os_memcpy(reply, "FAIL-NO-AP-SETTINGS\n", 20);
+			reply_len = 20;
+		} else if (ret)
+			reply_len = -1;
+	} else if (os_strncmp(buf, "WPS_ER_LEARN ", 13) == 0) {  // 如果 命令 buf  是 WPS_ER_LEARN  那么执行函数    需要输入2个命令参数
+		if (wpa_supplicant_ctrl_iface_wps_er_learn(wpa_s, buf + 13))   【34】
+			reply_len = -1;
+	} else if (os_strncmp(buf, "WPS_ER_SET_CONFIG ", 18) == 0) {    // 如果 命令 buf  是 WPS_ER_LEARN  那么执行函数    需要输入2个命令参数
+		if (wpa_supplicant_ctrl_iface_wps_er_set_config(wpa_s,buf + 18))    【35】
+			reply_len = -1;
+	} else if (os_strncmp(buf, "WPS_ER_CONFIG ", 14) == 0) {   // 如果 命令 buf  是 WPS_ER_CONFIG  那么执行函数    需要输入6个命令参数
+		if (wpa_supplicant_ctrl_iface_wps_er_config(wpa_s, buf + 14))   【36】
+			reply_len = -1;
+
+	} else if (os_strncmp(buf, "WPS_ER_NFC_CONFIG_TOKEN ", 24) == 0) {   // 如果 命令 buf  是 WPS_ER_NFC_CONFIG_TOKEN  那么执行函数    需要输入2个命令参数 
+		reply_len = wpa_supplicant_ctrl_iface_wps_er_nfc_config_token(wpa_s, buf + 24, reply, reply_size);     【37】
+
+	} else if (os_strncmp(buf, "IBSS_RSN ", 9) == 0) { // 如果 命令 buf  是 IBSS_RSN  那么执行函数    需要输入1个命令参数  奇怪 打印 UNKNOW_COMMAND
+		if (wpa_supplicant_ctrl_iface_ibss_rsn(wpa_s, buf + 9))
+			reply_len = -1;
+
+#ifdef CONFIG_MESH
+	} else if (os_strncmp(buf, "MESH_INTERFACE_ADD ", 19) == 0) {
+		reply_len = wpa_supplicant_ctrl_iface_mesh_interface_add(
+			wpa_s, buf + 19, reply, reply_size);
+	} else if (os_strcmp(buf, "MESH_INTERFACE_ADD") == 0) {
+		reply_len = wpa_supplicant_ctrl_iface_mesh_interface_add(
+			wpa_s, "", reply, reply_size);
+	} else if (os_strncmp(buf, "MESH_GROUP_ADD ", 15) == 0) {
+		if (wpa_supplicant_ctrl_iface_mesh_group_add(wpa_s, buf + 15))
+			reply_len = -1;
+	} else if (os_strncmp(buf, "MESH_GROUP_REMOVE ", 18) == 0) {
+		if (wpa_supplicant_ctrl_iface_mesh_group_remove(wpa_s,
+								buf + 18))
+			reply_len = -1;
+	} else if (os_strncmp(buf, "MESH_PEER_REMOVE ", 17) == 0) {
+		if (wpa_supplicant_ctrl_iface_mesh_peer_remove(wpa_s, buf + 17))
+			reply_len = -1;
+	} else if (os_strncmp(buf, "MESH_PEER_ADD ", 14) == 0) {
+		if (wpa_supplicant_ctrl_iface_mesh_peer_add(wpa_s, buf + 14))
+			reply_len = -1;
+#endif /* CONFIG_MESH */
+#ifdef CONFIG_P2P
+	} else if (os_strncmp(buf, "P2P_FIND ", 9) == 0) {
+		if (p2p_ctrl_find(wpa_s, buf + 8))
+			reply_len = -1;
+	} else if (os_strcmp(buf, "P2P_FIND") == 0) {
+		if (p2p_ctrl_find(wpa_s, ""))
+			reply_len = -1;
+	} else if (os_strcmp(buf, "P2P_STOP_FIND") == 0) {
+		wpas_p2p_stop_find(wpa_s);
+	} else if (os_strncmp(buf, "P2P_ASP_PROVISION ", 18) == 0) {
+		if (p2p_ctrl_asp_provision(wpa_s, buf + 18))
+			reply_len = -1;
+	} else if (os_strncmp(buf, "P2P_ASP_PROVISION_RESP ", 23) == 0) {
+		if (p2p_ctrl_asp_provision_resp(wpa_s, buf + 23))
+			reply_len = -1;
+	} else if (os_strncmp(buf, "P2P_CONNECT ", 12) == 0) {
+		reply_len = p2p_ctrl_connect(wpa_s, buf + 12, reply,
+					     reply_size);
+	} else if (os_strncmp(buf, "P2P_LISTEN ", 11) == 0) {
+		if (p2p_ctrl_listen(wpa_s, buf + 11))
+			reply_len = -1;
+	} else if (os_strcmp(buf, "P2P_LISTEN") == 0) {
+		if (p2p_ctrl_listen(wpa_s, ""))
+			reply_len = -1;
+	} else if (os_strncmp(buf, "P2P_GROUP_REMOVE ", 17) == 0) {
+		if (wpas_p2p_group_remove(wpa_s, buf + 17))
+			reply_len = -1;
+	} else if (os_strcmp(buf, "P2P_GROUP_ADD") == 0) {
+		if (p2p_ctrl_group_add(wpa_s, ""))
+			reply_len = -1;
+	} else if (os_strncmp(buf, "P2P_GROUP_ADD ", 14) == 0) {
+		if (p2p_ctrl_group_add(wpa_s, buf + 14))
+			reply_len = -1;
+	} else if (os_strncmp(buf, "P2P_GROUP_MEMBER ", 17) == 0) {
+		reply_len = p2p_ctrl_group_member(wpa_s, buf + 17, reply,
+						  reply_size);
+	} else if (os_strncmp(buf, "P2P_PROV_DISC ", 14) == 0) {
+		if (p2p_ctrl_prov_disc(wpa_s, buf + 14))
+			reply_len = -1;
+	} else if (os_strcmp(buf, "P2P_GET_PASSPHRASE") == 0) {
+		reply_len = p2p_get_passphrase(wpa_s, reply, reply_size);
+	} else if (os_strncmp(buf, "P2P_SERV_DISC_REQ ", 18) == 0) {
+		reply_len = p2p_ctrl_serv_disc_req(wpa_s, buf + 18, reply,
+						   reply_size);
+	} else if (os_strncmp(buf, "P2P_SERV_DISC_CANCEL_REQ ", 25) == 0) {
+		if (p2p_ctrl_serv_disc_cancel_req(wpa_s, buf + 25) < 0)
+			reply_len = -1;
+	} else if (os_strncmp(buf, "P2P_SERV_DISC_RESP ", 19) == 0) {
+		if (p2p_ctrl_serv_disc_resp(wpa_s, buf + 19) < 0)
+			reply_len = -1;
+	} else if (os_strcmp(buf, "P2P_SERVICE_UPDATE") == 0) {
+		wpas_p2p_sd_service_update(wpa_s);
+	} else if (os_strncmp(buf, "P2P_SERV_DISC_EXTERNAL ", 23) == 0) {
+		if (p2p_ctrl_serv_disc_external(wpa_s, buf + 23) < 0)
+			reply_len = -1;
+	} else if (os_strcmp(buf, "P2P_SERVICE_FLUSH") == 0) {
+		wpas_p2p_service_flush(wpa_s);
+	} else if (os_strncmp(buf, "P2P_SERVICE_ADD ", 16) == 0) {
+		if (p2p_ctrl_service_add(wpa_s, buf + 16) < 0)
+			reply_len = -1;
+	} else if (os_strncmp(buf, "P2P_SERVICE_DEL ", 16) == 0) {
+		if (p2p_ctrl_service_del(wpa_s, buf + 16) < 0)
+			reply_len = -1;
+	} else if (os_strncmp(buf, "P2P_SERVICE_REP ", 16) == 0) {
+		if (p2p_ctrl_service_replace(wpa_s, buf + 16) < 0)
+			reply_len = -1;
+	} else if (os_strncmp(buf, "P2P_REJECT ", 11) == 0) {
+		if (p2p_ctrl_reject(wpa_s, buf + 11) < 0)
+			reply_len = -1;
+	} else if (os_strncmp(buf, "P2P_INVITE ", 11) == 0) {
+		if (p2p_ctrl_invite(wpa_s, buf + 11) < 0)
+			reply_len = -1;
+	} else if (os_strncmp(buf, "P2P_PEER ", 9) == 0) {
+		reply_len = p2p_ctrl_peer(wpa_s, buf + 9, reply,
+					      reply_size);
+	} else if (os_strncmp(buf, "P2P_SET ", 8) == 0) {
+		if (p2p_ctrl_set(wpa_s, buf + 8) < 0)
+			reply_len = -1;
+	} else if (os_strcmp(buf, "P2P_FLUSH") == 0) {
+		p2p_ctrl_flush(wpa_s);
+	} else if (os_strncmp(buf, "P2P_UNAUTHORIZE ", 16) == 0) {
+		if (wpas_p2p_unauthorize(wpa_s, buf + 16) < 0)
+			reply_len = -1;
+	} else if (os_strcmp(buf, "P2P_CANCEL") == 0) {
+		if (wpas_p2p_cancel(wpa_s))
+			reply_len = -1;
+	} else if (os_strncmp(buf, "P2P_PRESENCE_REQ ", 17) == 0) {
+		if (p2p_ctrl_presence_req(wpa_s, buf + 17) < 0)
+			reply_len = -1;
+	} else if (os_strcmp(buf, "P2P_PRESENCE_REQ") == 0) {
+		if (p2p_ctrl_presence_req(wpa_s, "") < 0)
+			reply_len = -1;
+	} else if (os_strncmp(buf, "P2P_EXT_LISTEN ", 15) == 0) {
+		if (p2p_ctrl_ext_listen(wpa_s, buf + 15) < 0)
+			reply_len = -1;
+	} else if (os_strcmp(buf, "P2P_EXT_LISTEN") == 0) {
+		if (p2p_ctrl_ext_listen(wpa_s, "") < 0)
+			reply_len = -1;
+	} else if (os_strncmp(buf, "P2P_REMOVE_CLIENT ", 18) == 0) {
+		if (p2p_ctrl_remove_client(wpa_s, buf + 18) < 0)
+			reply_len = -1;
+	} else if (os_strncmp(buf, "P2P_LO_START ", 13) == 0) {
+		if (p2p_ctrl_iface_p2p_lo_start(wpa_s, buf + 13))
+			reply_len = -1;
+	} else if (os_strcmp(buf, "P2P_LO_STOP") == 0) {
+		if (wpas_p2p_lo_stop(wpa_s))
+			reply_len = -1;
+#endif /* CONFIG_P2P */
+#ifdef CONFIG_WIFI_DISPLAY
+	} else if (os_strncmp(buf, "WFD_SUBELEM_SET ", 16) == 0) {
+		if (wifi_display_subelem_set(wpa_s->global, buf + 16) < 0)
+			reply_len = -1;
+	} else if (os_strncmp(buf, "WFD_SUBELEM_GET ", 16) == 0) {
+		reply_len = wifi_display_subelem_get(wpa_s->global, buf + 16,
+						     reply, reply_size);
+#endif /* CONFIG_WIFI_DISPLAY */
+#ifdef CONFIG_INTERWORKING
+	} else if (os_strcmp(buf, "FETCH_ANQP") == 0) {
+		if (interworking_fetch_anqp(wpa_s) < 0)
+			reply_len = -1;
+	} else if (os_strcmp(buf, "STOP_FETCH_ANQP") == 0) {
+		interworking_stop_fetch_anqp(wpa_s);
+	} else if (os_strcmp(buf, "INTERWORKING_SELECT") == 0) {
+		if (ctrl_interworking_select(wpa_s, NULL) < 0)
+			reply_len = -1;
+	} else if (os_strncmp(buf, "INTERWORKING_SELECT ", 20) == 0) {
+		if (ctrl_interworking_select(wpa_s, buf + 20) < 0)
+			reply_len = -1;
+	} else if (os_strncmp(buf, "INTERWORKING_CONNECT ", 21) == 0) {
+		if (ctrl_interworking_connect(wpa_s, buf + 21, 0) < 0)
+			reply_len = -1;
+	} else if (os_strncmp(buf, "INTERWORKING_ADD_NETWORK ", 25) == 0) {
+		int id;
+
+		id = ctrl_interworking_connect(wpa_s, buf + 25, 1);
+		if (id < 0)
+			reply_len = -1;
+		else {
+			reply_len = os_snprintf(reply, reply_size, "%d\n", id);
+			if (os_snprintf_error(reply_size, reply_len))
+				reply_len = -1;
+		}
+	} else if (os_strncmp(buf, "ANQP_GET ", 9) == 0) {
+		if (get_anqp(wpa_s, buf + 9) < 0)
+			reply_len = -1;
+	} else if (os_strncmp(buf, "GAS_REQUEST ", 12) == 0) {
+		if (gas_request(wpa_s, buf + 12) < 0)
+			reply_len = -1;
+	} else if (os_strncmp(buf, "GAS_RESPONSE_GET ", 17) == 0) {
+		reply_len = gas_response_get(wpa_s, buf + 17, reply,
+					     reply_size);
+#endif /* CONFIG_INTERWORKING */
+#ifdef CONFIG_HS20
+	} else if (os_strncmp(buf, "HS20_ANQP_GET ", 14) == 0) {
+		if (get_hs20_anqp(wpa_s, buf + 14) < 0)
+			reply_len = -1;
+	} else if (os_strncmp(buf, "HS20_GET_NAI_HOME_REALM_LIST ", 29) == 0) {
+		if (hs20_get_nai_home_realm_list(wpa_s, buf + 29) < 0)
+			reply_len = -1;
+	} else if (os_strncmp(buf, "HS20_ICON_REQUEST ", 18) == 0) {
+		if (hs20_icon_request(wpa_s, buf + 18, 0) < 0)
+			reply_len = -1;
+	} else if (os_strncmp(buf, "REQ_HS20_ICON ", 14) == 0) {
+		if (hs20_icon_request(wpa_s, buf + 14, 1) < 0)
+			reply_len = -1;
+	} else if (os_strncmp(buf, "GET_HS20_ICON ", 14) == 0) {
+		reply_len = get_hs20_icon(wpa_s, buf + 14, reply, reply_size);
+	} else if (os_strncmp(buf, "DEL_HS20_ICON ", 14) == 0) {
+		if (del_hs20_icon(wpa_s, buf + 14) < 0)
+			reply_len = -1;
+	} else if (os_strcmp(buf, "FETCH_OSU") == 0) {
+		if (hs20_fetch_osu(wpa_s, 0) < 0)
+			reply_len = -1;
+	} else if (os_strcmp(buf, "FETCH_OSU no-scan") == 0) {
+		if (hs20_fetch_osu(wpa_s, 1) < 0)
+			reply_len = -1;
+	} else if (os_strcmp(buf, "CANCEL_FETCH_OSU") == 0) {
+		hs20_cancel_fetch_osu(wpa_s);
+#endif /* CONFIG_HS20 */
+	} else if (os_strncmp(buf, WPA_CTRL_RSP, os_strlen(WPA_CTRL_RSP)) == 0)
+	{
+		if (wpa_supplicant_ctrl_iface_ctrl_rsp(
+			    wpa_s, buf + os_strlen(WPA_CTRL_RSP)))
+			reply_len = -1;
+		else {
+			/*
+			 * Notify response from timeout to allow the control
+			 * interface response to be sent first.
+			 */
+			eloop_register_timeout(0, 0, wpas_ctrl_eapol_response,
+					       wpa_s, NULL);
+		}
+	} else if (os_strcmp(buf, "RECONFIGURE") == 0) {
+		if (wpa_supplicant_reload_configuration(wpa_s))
+			reply_len = -1;
+	} else if (os_strcmp(buf, "TERMINATE") == 0) {
+		wpa_supplicant_terminate_proc(wpa_s->global);
+	} else if (os_strncmp(buf, "BSSID ", 6) == 0) {
+		if (wpa_supplicant_ctrl_iface_bssid(wpa_s, buf + 6))
+			reply_len = -1;
+	} else if (os_strncmp(buf, "BLACKLIST", 9) == 0) {
+		reply_len = wpa_supplicant_ctrl_iface_blacklist(
+			wpa_s, buf + 9, reply, reply_size);
+	} else if (os_strncmp(buf, "LOG_LEVEL", 9) == 0) {
+		reply_len = wpa_supplicant_ctrl_iface_log_level(
+			wpa_s, buf + 9, reply, reply_size);
+	} else if (os_strncmp(buf, "LIST_NETWORKS ", 14) == 0) {
+		reply_len = wpa_supplicant_ctrl_iface_list_networks(
+			wpa_s, buf + 14, reply, reply_size);
+	} else if (os_strcmp(buf, "LIST_NETWORKS") == 0) {
+		reply_len = wpa_supplicant_ctrl_iface_list_networks(
+			wpa_s, NULL, reply, reply_size);
+	} else if (os_strcmp(buf, "DISCONNECT") == 0) {
+		wpas_request_disconnection(wpa_s);
+	} else if (os_strcmp(buf, "SCAN") == 0) {
+		wpas_ctrl_scan(wpa_s, NULL, reply, reply_size, &reply_len);
+	} else if (os_strncmp(buf, "SCAN ", 5) == 0) {
+		wpas_ctrl_scan(wpa_s, buf + 5, reply, reply_size, &reply_len);
+	} else if (os_strcmp(buf, "SCAN_RESULTS") == 0) {
+		reply_len = wpa_supplicant_ctrl_iface_scan_results(
+			wpa_s, reply, reply_size);
+	} else if (os_strcmp(buf, "ABORT_SCAN") == 0) {
+		if (wpas_abort_ongoing_scan(wpa_s) < 0)
+			reply_len = -1;
+	} else if (os_strncmp(buf, "SELECT_NETWORK ", 15) == 0) {
+		if (wpa_supplicant_ctrl_iface_select_network(wpa_s, buf + 15))
+			reply_len = -1;
+	} else if (os_strncmp(buf, "ENABLE_NETWORK ", 15) == 0) {
+		if (wpa_supplicant_ctrl_iface_enable_network(wpa_s, buf + 15))
+			reply_len = -1;
+	} else if (os_strncmp(buf, "DISABLE_NETWORK ", 16) == 0) {
+		if (wpa_supplicant_ctrl_iface_disable_network(wpa_s, buf + 16))
+			reply_len = -1;
+	} else if (os_strcmp(buf, "ADD_NETWORK") == 0) {
+		reply_len = wpa_supplicant_ctrl_iface_add_network(
+			wpa_s, reply, reply_size);
+	} else if (os_strncmp(buf, "REMOVE_NETWORK ", 15) == 0) {
+		if (wpa_supplicant_ctrl_iface_remove_network(wpa_s, buf + 15))
+			reply_len = -1;
+	} else if (os_strncmp(buf, "SET_NETWORK ", 12) == 0) {
+		if (wpa_supplicant_ctrl_iface_set_network(wpa_s, buf + 12))
+			reply_len = -1;
+	} else if (os_strncmp(buf, "GET_NETWORK ", 12) == 0) {
+		reply_len = wpa_supplicant_ctrl_iface_get_network(
+			wpa_s, buf + 12, reply, reply_size);
+	} else if (os_strncmp(buf, "DUP_NETWORK ", 12) == 0) {
+		if (wpa_supplicant_ctrl_iface_dup_network(wpa_s, buf + 12,
+							  wpa_s))
+			reply_len = -1;
+	} else if (os_strcmp(buf, "LIST_CREDS") == 0) {
+		reply_len = wpa_supplicant_ctrl_iface_list_creds(
+			wpa_s, reply, reply_size);
+	} else if (os_strcmp(buf, "ADD_CRED") == 0) {
+		reply_len = wpa_supplicant_ctrl_iface_add_cred(
+			wpa_s, reply, reply_size);
+	} else if (os_strncmp(buf, "REMOVE_CRED ", 12) == 0) {
+		if (wpa_supplicant_ctrl_iface_remove_cred(wpa_s, buf + 12))
+			reply_len = -1;
+	} else if (os_strncmp(buf, "SET_CRED ", 9) == 0) {
+		if (wpa_supplicant_ctrl_iface_set_cred(wpa_s, buf + 9))
+			reply_len = -1;
+	} else if (os_strncmp(buf, "GET_CRED ", 9) == 0) {
+		reply_len = wpa_supplicant_ctrl_iface_get_cred(wpa_s, buf + 9,
+							       reply,
+							       reply_size);
+#ifndef CONFIG_NO_CONFIG_WRITE
+	} else if (os_strcmp(buf, "SAVE_CONFIG") == 0) {
+		if (wpa_supplicant_ctrl_iface_save_config(wpa_s))
+			reply_len = -1;
+#endif /* CONFIG_NO_CONFIG_WRITE */
+	} else if (os_strncmp(buf, "GET_CAPABILITY ", 15) == 0) {
+		reply_len = wpa_supplicant_ctrl_iface_get_capability(
+			wpa_s, buf + 15, reply, reply_size);
+	} else if (os_strncmp(buf, "AP_SCAN ", 8) == 0) {
+		if (wpa_supplicant_ctrl_iface_ap_scan(wpa_s, buf + 8))
+			reply_len = -1;
+	} else if (os_strncmp(buf, "SCAN_INTERVAL ", 14) == 0) {
+		if (wpa_supplicant_ctrl_iface_scan_interval(wpa_s, buf + 14))
+			reply_len = -1;
+	} else if (os_strcmp(buf, "INTERFACE_LIST") == 0) {
+		reply_len = wpa_supplicant_global_iface_list(
+			wpa_s->global, reply, reply_size);
+	} else if (os_strncmp(buf, "INTERFACES", 10) == 0) {
+		reply_len = wpa_supplicant_global_iface_interfaces(
+			wpa_s->global, buf + 10, reply, reply_size);
+	} else if (os_strncmp(buf, "BSS ", 4) == 0) {
+		reply_len = wpa_supplicant_ctrl_iface_bss(
+			wpa_s, buf + 4, reply, reply_size);
+#ifdef CONFIG_AP
+	} else if (os_strcmp(buf, "STA-FIRST") == 0) {
+		reply_len = ap_ctrl_iface_sta_first(wpa_s, reply, reply_size);
+	} else if (os_strncmp(buf, "STA ", 4) == 0) {
+		reply_len = ap_ctrl_iface_sta(wpa_s, buf + 4, reply,
+					      reply_size);
+	} else if (os_strncmp(buf, "STA-NEXT ", 9) == 0) {
+		reply_len = ap_ctrl_iface_sta_next(wpa_s, buf + 9, reply,
+						   reply_size);
+	} else if (os_strncmp(buf, "DEAUTHENTICATE ", 15) == 0) {
+		if (ap_ctrl_iface_sta_deauthenticate(wpa_s, buf + 15))
+			reply_len = -1;
+	} else if (os_strncmp(buf, "DISASSOCIATE ", 13) == 0) {
+		if (ap_ctrl_iface_sta_disassociate(wpa_s, buf + 13))
+			reply_len = -1;
+	} else if (os_strncmp(buf, "CHAN_SWITCH ", 12) == 0) {
+		if (ap_ctrl_iface_chanswitch(wpa_s, buf + 12))
+			reply_len = -1;
+	} else if (os_strcmp(buf, "STOP_AP") == 0) {
+		if (wpas_ap_stop_ap(wpa_s))
+			reply_len = -1;
+#endif /* CONFIG_AP */
+	} else if (os_strcmp(buf, "SUSPEND") == 0) {
+		wpas_notify_suspend(wpa_s->global);
+	} else if (os_strcmp(buf, "RESUME") == 0) {
+		wpas_notify_resume(wpa_s->global);
+#ifdef CONFIG_TESTING_OPTIONS
+	} else if (os_strcmp(buf, "DROP_SA") == 0) {
+		wpa_supplicant_ctrl_iface_drop_sa(wpa_s);
+#endif /* CONFIG_TESTING_OPTIONS */
+	} else if (os_strncmp(buf, "ROAM ", 5) == 0) {
+		if (wpa_supplicant_ctrl_iface_roam(wpa_s, buf + 5))
+			reply_len = -1;
+	} else if (os_strncmp(buf, "STA_AUTOCONNECT ", 16) == 0) {
+		wpa_s->auto_reconnect_disabled = atoi(buf + 16) == 0;
+	} else if (os_strncmp(buf, "BSS_EXPIRE_AGE ", 15) == 0) {
+		if (wpa_supplicant_ctrl_iface_bss_expire_age(wpa_s, buf + 15))
+			reply_len = -1;
+	} else if (os_strncmp(buf, "BSS_EXPIRE_COUNT ", 17) == 0) {
+		if (wpa_supplicant_ctrl_iface_bss_expire_count(wpa_s,
+							       buf + 17))
+			reply_len = -1;
+	} else if (os_strncmp(buf, "BSS_FLUSH ", 10) == 0) {
+		wpa_supplicant_ctrl_iface_bss_flush(wpa_s, buf + 10);
+#ifdef CONFIG_TDLS
+	} else if (os_strncmp(buf, "TDLS_DISCOVER ", 14) == 0) {
+		if (wpa_supplicant_ctrl_iface_tdls_discover(wpa_s, buf + 14))
+			reply_len = -1;
+	} else if (os_strncmp(buf, "TDLS_SETUP ", 11) == 0) {
+		if (wpa_supplicant_ctrl_iface_tdls_setup(wpa_s, buf + 11))
+			reply_len = -1;
+	} else if (os_strncmp(buf, "TDLS_TEARDOWN ", 14) == 0) {
+		if (wpa_supplicant_ctrl_iface_tdls_teardown(wpa_s, buf + 14))
+			reply_len = -1;
+	} else if (os_strncmp(buf, "TDLS_CHAN_SWITCH ", 17) == 0) {
+		if (wpa_supplicant_ctrl_iface_tdls_chan_switch(wpa_s,
+							       buf + 17))
+			reply_len = -1;
+	} else if (os_strncmp(buf, "TDLS_CANCEL_CHAN_SWITCH ", 24) == 0) {
+		if (wpa_supplicant_ctrl_iface_tdls_cancel_chan_switch(wpa_s,
+								      buf + 24))
+			reply_len = -1;
+	} else if (os_strncmp(buf, "TDLS_LINK_STATUS ", 17) == 0) {
+		reply_len = wpa_supplicant_ctrl_iface_tdls_link_status(
+			wpa_s, buf + 17, reply, reply_size);
+#endif /* CONFIG_TDLS */
+	} else if (os_strcmp(buf, "WMM_AC_STATUS") == 0) {
+		reply_len = wpas_wmm_ac_status(wpa_s, reply, reply_size);
+	} else if (os_strncmp(buf, "WMM_AC_ADDTS ", 13) == 0) {
+		if (wmm_ac_ctrl_addts(wpa_s, buf + 13))
+			reply_len = -1;
+	} else if (os_strncmp(buf, "WMM_AC_DELTS ", 13) == 0) {
+		if (wmm_ac_ctrl_delts(wpa_s, buf + 13))
+			reply_len = -1;
+	} else if (os_strncmp(buf, "SIGNAL_POLL", 11) == 0) {
+		reply_len = wpa_supplicant_signal_poll(wpa_s, reply,
+						       reply_size);
+	} else if (os_strncmp(buf, "SIGNAL_MONITOR", 14) == 0) {
+		if (wpas_ctrl_iface_signal_monitor(wpa_s, buf + 14))
+			reply_len = -1;
+	} else if (os_strncmp(buf, "PKTCNT_POLL", 11) == 0) {
+		reply_len = wpa_supplicant_pktcnt_poll(wpa_s, reply,
+						       reply_size);
+#ifdef CONFIG_AUTOSCAN
+	} else if (os_strncmp(buf, "AUTOSCAN ", 9) == 0) {
+		if (wpa_supplicant_ctrl_iface_autoscan(wpa_s, buf + 9))
+			reply_len = -1;
+#endif /* CONFIG_AUTOSCAN */
+	} else if (os_strcmp(buf, "DRIVER_FLAGS") == 0) {
+		reply_len = wpas_ctrl_iface_driver_flags(wpa_s, reply,
+							 reply_size);
+#ifdef ANDROID
+	} else if (os_strncmp(buf, "DRIVER ", 7) == 0) {
+		reply_len = wpa_supplicant_driver_cmd(wpa_s, buf + 7, reply,
+						      reply_size);
+#endif /* ANDROID */
+	} else if (os_strncmp(buf, "VENDOR ", 7) == 0) {
+		reply_len = wpa_supplicant_vendor_cmd(wpa_s, buf + 7, reply,
+						      reply_size);
+	} else if (os_strcmp(buf, "REAUTHENTICATE") == 0) {
+		pmksa_cache_clear_current(wpa_s->wpa);
+		eapol_sm_request_reauth(wpa_s->eapol);
+#ifdef CONFIG_WNM
+	} else if (os_strncmp(buf, "WNM_SLEEP ", 10) == 0) {
+		if (wpas_ctrl_iface_wnm_sleep(wpa_s, buf + 10))
+			reply_len = -1;
+	} else if (os_strncmp(buf, "WNM_BSS_QUERY ", 14) == 0) {
+		if (wpas_ctrl_iface_wnm_bss_query(wpa_s, buf + 14))
+				reply_len = -1;
+#endif /* CONFIG_WNM */
+	} else if (os_strcmp(buf, "FLUSH") == 0) {
+		wpa_supplicant_ctrl_iface_flush(wpa_s);
+	} else if (os_strncmp(buf, "RADIO_WORK ", 11) == 0) {
+		reply_len = wpas_ctrl_radio_work(wpa_s, buf + 11, reply,
+						 reply_size);
+#ifdef CONFIG_TESTING_OPTIONS
+	} else if (os_strncmp(buf, "MGMT_TX ", 8) == 0) {
+		if (wpas_ctrl_iface_mgmt_tx(wpa_s, buf + 8) < 0)
+			reply_len = -1;
+	} else if (os_strcmp(buf, "MGMT_TX_DONE") == 0) {
+		wpas_ctrl_iface_mgmt_tx_done(wpa_s);
+	} else if (os_strncmp(buf, "MGMT_RX_PROCESS ", 16) == 0) {
+		if (wpas_ctrl_iface_mgmt_rx_process(wpa_s, buf + 16) < 0)
+			reply_len = -1;
+	} else if (os_strncmp(buf, "DRIVER_EVENT ", 13) == 0) {
+		if (wpas_ctrl_iface_driver_event(wpa_s, buf + 13) < 0)
+			reply_len = -1;
+	} else if (os_strncmp(buf, "EAPOL_RX ", 9) == 0) {
+		if (wpas_ctrl_iface_eapol_rx(wpa_s, buf + 9) < 0)
+			reply_len = -1;
+	} else if (os_strncmp(buf, "DATA_TEST_CONFIG ", 17) == 0) {
+		if (wpas_ctrl_iface_data_test_config(wpa_s, buf + 17) < 0)
+			reply_len = -1;
+	} else if (os_strncmp(buf, "DATA_TEST_TX ", 13) == 0) {
+		if (wpas_ctrl_iface_data_test_tx(wpa_s, buf + 13) < 0)
+			reply_len = -1;
+	} else if (os_strncmp(buf, "DATA_TEST_FRAME ", 16) == 0) {
+		if (wpas_ctrl_iface_data_test_frame(wpa_s, buf + 16) < 0)
+			reply_len = -1;
+	} else if (os_strncmp(buf, "TEST_ALLOC_FAIL ", 16) == 0) {
+		if (wpas_ctrl_test_alloc_fail(wpa_s, buf + 16) < 0)
+			reply_len = -1;
+	} else if (os_strcmp(buf, "GET_ALLOC_FAIL") == 0) {
+		reply_len = wpas_ctrl_get_alloc_fail(wpa_s, reply, reply_size);
+	} else if (os_strncmp(buf, "TEST_FAIL ", 10) == 0) {
+		if (wpas_ctrl_test_fail(wpa_s, buf + 10) < 0)
+			reply_len = -1;
+	} else if (os_strcmp(buf, "GET_FAIL") == 0) {
+		reply_len = wpas_ctrl_get_fail(wpa_s, reply, reply_size);
+	} else if (os_strncmp(buf, "EVENT_TEST ", 11) == 0) {
+		if (wpas_ctrl_event_test(wpa_s, buf + 11) < 0)
+			reply_len = -1;
+	} else if (os_strncmp(buf, "TEST_ASSOC_IE ", 14) == 0) {
+		if (wpas_ctrl_test_assoc_ie(wpa_s, buf + 14) < 0)
+			reply_len = -1;
+	} else if (os_strcmp(buf, "RESET_PN") == 0) {
+		if (wpas_ctrl_reset_pn(wpa_s) < 0)
+			reply_len = -1;
+	} else if (os_strncmp(buf, "KEY_REQUEST ", 12) == 0) {
+		if (wpas_ctrl_key_request(wpa_s, buf + 12) < 0)
+			reply_len = -1;
+	} else if (os_strcmp(buf, "RESEND_ASSOC") == 0) {
+		if (wpas_ctrl_resend_assoc(wpa_s) < 0)
+			reply_len = -1;
+#endif /* CONFIG_TESTING_OPTIONS */
+	} else if (os_strncmp(buf, "VENDOR_ELEM_ADD ", 16) == 0) {
+		if (wpas_ctrl_vendor_elem_add(wpa_s, buf + 16) < 0)
+			reply_len = -1;
+	} else if (os_strncmp(buf, "VENDOR_ELEM_GET ", 16) == 0) {
+		reply_len = wpas_ctrl_vendor_elem_get(wpa_s, buf + 16, reply,
+						      reply_size);
+	} else if (os_strncmp(buf, "VENDOR_ELEM_REMOVE ", 19) == 0) {
+		if (wpas_ctrl_vendor_elem_remove(wpa_s, buf + 19) < 0)
+			reply_len = -1;
+	} else if (os_strncmp(buf, "NEIGHBOR_REP_REQUEST", 20) == 0) {
+		if (wpas_ctrl_iface_send_neighbor_rep(wpa_s, buf + 20))
+			reply_len = -1;
+	} else if (os_strcmp(buf, "ERP_FLUSH") == 0) {
+		wpas_ctrl_iface_erp_flush(wpa_s);
+	} else if (os_strncmp(buf, "MAC_RAND_SCAN ", 14) == 0) {
+		if (wpas_ctrl_iface_mac_rand_scan(wpa_s, buf + 14))
+			reply_len = -1;
+	} else if (os_strncmp(buf, "GET_PREF_FREQ_LIST ", 19) == 0) {
+		reply_len = wpas_ctrl_iface_get_pref_freq_list(
+			wpa_s, buf + 19, reply, reply_size);
+#ifdef CONFIG_FILS
+	} else if (os_strncmp(buf, "FILS_HLP_REQ_ADD ", 17) == 0) {
+		if (wpas_ctrl_iface_fils_hlp_req_add(wpa_s, buf + 17))
+			reply_len = -1;
+	} else if (os_strcmp(buf, "FILS_HLP_REQ_FLUSH") == 0) {
+		wpas_flush_fils_hlp_req(wpa_s);
+#endif /* CONFIG_FILS */
+#ifdef CONFIG_DPP
+	} else if (os_strncmp(buf, "DPP_QR_CODE ", 12) == 0) {
+		int res;
+
+		res = wpas_dpp_qr_code(wpa_s, buf + 12);
+		if (res < 0) {
+			reply_len = -1;
+		} else {
+			reply_len = os_snprintf(reply, reply_size, "%d", res);
+			if (os_snprintf_error(reply_size, reply_len))
+				reply_len = -1;
+		}
+	} else if (os_strncmp(buf, "DPP_BOOTSTRAP_GEN ", 18) == 0) {
+		int res;
+
+		res = wpas_dpp_bootstrap_gen(wpa_s, buf + 18);
+		if (res < 0) {
+			reply_len = -1;
+		} else {
+			reply_len = os_snprintf(reply, reply_size, "%d", res);
+			if (os_snprintf_error(reply_size, reply_len))
+				reply_len = -1;
+		}
+	} else if (os_strncmp(buf, "DPP_BOOTSTRAP_REMOVE ", 21) == 0) {
+		if (wpas_dpp_bootstrap_remove(wpa_s, buf + 21) < 0)
+			reply_len = -1;
+	} else if (os_strncmp(buf, "DPP_BOOTSTRAP_GET_URI ", 22) == 0) {
+		const char *uri;
+
+		uri = wpas_dpp_bootstrap_get_uri(wpa_s, atoi(buf + 22));
+		if (!uri) {
+			reply_len = -1;
+		} else {
+			reply_len = os_snprintf(reply, reply_size, "%s", uri);
+			if (os_snprintf_error(reply_size, reply_len))
+				reply_len = -1;
+		}
+	} else if (os_strncmp(buf, "DPP_BOOTSTRAP_INFO ", 19) == 0) {
+		reply_len = wpas_dpp_bootstrap_info(wpa_s, atoi(buf + 19),
+						    reply, reply_size);
+	} else if (os_strncmp(buf, "DPP_AUTH_INIT ", 14) == 0) {
+		if (wpas_dpp_auth_init(wpa_s, buf + 13) < 0)
+			reply_len = -1;
+	} else if (os_strncmp(buf, "DPP_LISTEN ", 11) == 0) {
+		if (wpas_dpp_listen(wpa_s, buf + 11) < 0)
+			reply_len = -1;
+	} else if (os_strcmp(buf, "DPP_STOP_LISTEN") == 0) {
+		wpas_dpp_listen_stop(wpa_s);
+	} else if (os_strncmp(buf, "DPP_CONFIGURATOR_ADD", 20) == 0) {
+		int res;
+
+		res = wpas_dpp_configurator_add(wpa_s, buf + 20);
+		if (res < 0) {
+			reply_len = -1;
+		} else {
+			reply_len = os_snprintf(reply, reply_size, "%d", res);
+			if (os_snprintf_error(reply_size, reply_len))
+				reply_len = -1;
+		}
+	} else if (os_strncmp(buf, "DPP_CONFIGURATOR_REMOVE ", 24) == 0) {
+		if (wpas_dpp_configurator_remove(wpa_s, buf + 24) < 0)
+			reply_len = -1;
+	} else if (os_strncmp(buf, "DPP_CONFIGURATOR_SIGN ", 22) == 0) {
+		if (wpas_dpp_configurator_sign(wpa_s, buf + 22) < 0)
+			reply_len = -1;
+	} else if (os_strncmp(buf, "DPP_PKEX_ADD ", 13) == 0) {
+		int res;
+
+		res = wpas_dpp_pkex_add(wpa_s, buf + 12);
+		if (res < 0) {
+			reply_len = -1;
+		} else {
+			reply_len = os_snprintf(reply, reply_size, "%d", res);
+			if (os_snprintf_error(reply_size, reply_len))
+				reply_len = -1;
+		}
+	} else if (os_strncmp(buf, "DPP_PKEX_REMOVE ", 16) == 0) {
+		if (wpas_dpp_pkex_remove(wpa_s, buf + 16) < 0)
+			reply_len = -1;
+#endif /* CONFIG_DPP */
+	} else {
+		os_memcpy(reply, "UNKNOWN COMMAND\n", 16);
+		reply_len = 16;
+	}
+
+	if (reply_len < 0) {
+		os_memcpy(reply, "FAIL\n", 5);
+		reply_len = 5;
+	}
+
+	*resp_len = reply_len;
+	return reply;
+}
+
+
+```
+
+
 
 
 

@@ -30,9 +30,14 @@ adb pull /sdcard/ss-ram-dumps .
 ```
 
 # E
-## PRONTO_MR.elf|WLAN.elf
+## PRONTO_MR.elf|WLAN_MERGED.elf
 ```
-vendor/qcom/nonhlos/WLAN.HL.xxx/wcnss_proc/build/ms/xxx_WLAN.elf
+vendor/qcom/nonhlos/WLAN.HL.xxx/wcnss_proc/build/ms/xxx型号_MERGED_WLAN.elf
+
+/wlan_proc/build/ms/WLAN_MERGED.elf 
+==M6150_WLAN_MERGED.elf
+
+vendor/qcom/nonhlos/WLAN.HL.xxx/wcnss_proc/build/ms/M6150_WLAN_MERGED.elf
 
 ```
 
@@ -61,6 +66,29 @@ AOSP:
 # K
 # L
 # M
+
+## Modem symbol
+```
+
+1.  \modem_proc\build\ms\xxx_ELF_LOADER.elf 
+2.  \modem_proc\build\ms\orig_MODEM_PROC_IMG_xxx.elf 
+3.  \modem_proc\core\bsp\core_user_pic\build\xxx\CORE_USER.so 
+4.   \modem_proc\build\myps\qshrink\msg_hash_xxxx.qsr4 
+
+
+CORE_USER.so
+M6150sm6150.gen.prodQ00364_ELF_LOADER.elf
+msg_hash_e799c8e2-4367-a5f7-3e94-8f7455fdffae.qsr4
+orig_MODEM_PROC_IMG_sm6150.gen.prodQ.elf
+
+about.html 中 MPSS 中有版本号
+
+
+
+
+```
+
+
 # N
 # O
 ## vmlinux.o
