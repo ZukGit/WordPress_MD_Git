@@ -69,6 +69,8 @@ AOSP:
 
 ## Modem symbol
 ```
+Artifactory中依据 PDF29.xx 找到 ReleaseNote.html 中的 Modem_ReleaseNote 就能找到对应的 modem_symbol 文件
+
 
 1.  \modem_proc\build\ms\xxx_ELF_LOADER.elf 
 2.  \modem_proc\build\ms\orig_MODEM_PROC_IMG_xxx.elf 

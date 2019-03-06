@@ -2535,165 +2535,153 @@ char * wpa_supplicant_ctrl_iface_process(struct wpa_supplicant *wpa_s, char *buf
 		reply_len = wpa_supplicant_ctrl_iface_wps_er_nfc_config_token(wpa_s, buf + 24, reply, reply_size);     【37】
 
 	} else if (os_strncmp(buf, "IBSS_RSN ", 9) == 0) { // 如果 命令 buf  是 IBSS_RSN  那么执行函数    需要输入1个命令参数  奇怪 打印 UNKNOW_COMMAND
-		if (wpa_supplicant_ctrl_iface_ibss_rsn(wpa_s, buf + 9))
+		if (wpa_supplicant_ctrl_iface_ibss_rsn(wpa_s, buf + 9))       【38】
 			reply_len = -1;
 
-#ifdef CONFIG_MESH
-	} else if (os_strncmp(buf, "MESH_INTERFACE_ADD ", 19) == 0) {
-		reply_len = wpa_supplicant_ctrl_iface_mesh_interface_add(
-			wpa_s, buf + 19, reply, reply_size);
+	} else if (os_strncmp(buf, "MESH_INTERFACE_ADD ", 19) == 0) { // 如果 命令 buf  是 MESH_INTERFACE_ADD  那么执行函数   可带参数
+		reply_len = wpa_supplicant_ctrl_iface_mesh_interface_add(wpa_s, buf + 19, reply, reply_size);     【39】
 	} else if (os_strcmp(buf, "MESH_INTERFACE_ADD") == 0) {
-		reply_len = wpa_supplicant_ctrl_iface_mesh_interface_add(
-			wpa_s, "", reply, reply_size);
-	} else if (os_strncmp(buf, "MESH_GROUP_ADD ", 15) == 0) {
-		if (wpa_supplicant_ctrl_iface_mesh_group_add(wpa_s, buf + 15))
+		reply_len = wpa_supplicant_ctrl_iface_mesh_interface_add(wpa_s, "", reply, reply_size);
+	} else if (os_strncmp(buf, "MESH_GROUP_ADD ", 15) == 0) {       // 如果 命令 buf  是 MESH_GROUP_ADD  那么执行函数    需要输入1个命令参数 
+		if (wpa_supplicant_ctrl_iface_mesh_group_add(wpa_s, buf + 15))  【168】
 			reply_len = -1;
-	} else if (os_strncmp(buf, "MESH_GROUP_REMOVE ", 18) == 0) {
-		if (wpa_supplicant_ctrl_iface_mesh_group_remove(wpa_s,
-								buf + 18))
+	} else if (os_strncmp(buf, "MESH_GROUP_REMOVE ", 18) == 0) {   // 如果 命令 buf  是 MESH_GROUP_ADD  那么执行函数    需要输入1个命令参数 
+		if (wpa_supplicant_ctrl_iface_mesh_group_remove(wpa_s,buf + 18))    【 40 】
 			reply_len = -1;
-	} else if (os_strncmp(buf, "MESH_PEER_REMOVE ", 17) == 0) {
-		if (wpa_supplicant_ctrl_iface_mesh_peer_remove(wpa_s, buf + 17))
+	} else if (os_strncmp(buf, "MESH_PEER_REMOVE ", 17) == 0) {     // 如果 命令 buf  是 MESH_PEER_REMOVE  那么执行函数    需要输入1个命令参数 
+		if (wpa_supplicant_ctrl_iface_mesh_peer_remove(wpa_s, buf + 17))        【 41 】
 			reply_len = -1;
-	} else if (os_strncmp(buf, "MESH_PEER_ADD ", 14) == 0) {
-		if (wpa_supplicant_ctrl_iface_mesh_peer_add(wpa_s, buf + 14))
+	} else if (os_strncmp(buf, "MESH_PEER_ADD ", 14) == 0) {   // 如果 命令 buf  是 MESH_PEER_ADD  那么执行函数    需要输入1个命令参数 
+		if (wpa_supplicant_ctrl_iface_mesh_peer_add(wpa_s, buf + 14))   【 42 】
 			reply_len = -1;
-#endif /* CONFIG_MESH */
-#ifdef CONFIG_P2P
-	} else if (os_strncmp(buf, "P2P_FIND ", 9) == 0) {
-		if (p2p_ctrl_find(wpa_s, buf + 8))
+	} else if (os_strncmp(buf, "P2P_FIND ", 9) == 0) {  // 如果 命令 buf  是 P2P_FIND  那么执行函数    可选带参数
+		if (p2p_ctrl_find(wpa_s, buf + 8))      【 43 】
 			reply_len = -1;
-	} else if (os_strcmp(buf, "P2P_FIND") == 0) {
+	} else if (os_strcmp(buf, "P2P_FIND") == 0) {   
 		if (p2p_ctrl_find(wpa_s, ""))
 			reply_len = -1;
-	} else if (os_strcmp(buf, "P2P_STOP_FIND") == 0) {
-		wpas_p2p_stop_find(wpa_s);
-	} else if (os_strncmp(buf, "P2P_ASP_PROVISION ", 18) == 0) {
-		if (p2p_ctrl_asp_provision(wpa_s, buf + 18))
+	} else if (os_strcmp(buf, "P2P_STOP_FIND") == 0) {   // 如果 命令 buf  是 P2P_STOP_FIND  那么执行函数    可选带参数
+		wpas_p2p_stop_find(wpa_s);                    【 44 】
+	} else if (os_strncmp(buf, "P2P_ASP_PROVISION ", 18) == 0) {   // 如果 命令 buf  是 P2P_ASP_PROVISION  那么执行函数     需要输入3个命令参数 
+		if (p2p_ctrl_asp_provision(wpa_s, buf + 18))                      【 45 】
 			reply_len = -1;
-	} else if (os_strncmp(buf, "P2P_ASP_PROVISION_RESP ", 23) == 0) {
-		if (p2p_ctrl_asp_provision_resp(wpa_s, buf + 23))
+	} else if (os_strncmp(buf, "P2P_ASP_PROVISION_RESP ", 23) == 0) {  // 如果 命令 buf  是 P2P_ASP_PROVISION_RESP  那么执行函数     需要输入2个命令参数 
+		if (p2p_ctrl_asp_provision_resp(wpa_s, buf + 23))        【 46 】
 			reply_len = -1;
-	} else if (os_strncmp(buf, "P2P_CONNECT ", 12) == 0) {
-		reply_len = p2p_ctrl_connect(wpa_s, buf + 12, reply,
-					     reply_size);
-	} else if (os_strncmp(buf, "P2P_LISTEN ", 11) == 0) {
-		if (p2p_ctrl_listen(wpa_s, buf + 11))
+	} else if (os_strncmp(buf, "P2P_CONNECT ", 12) == 0) {   // 如果 命令 buf  是 P2P_CONNECT  那么执行函数         需要输入2个命令参数 
+		reply_len = p2p_ctrl_connect(wpa_s, buf + 12, reply, reply_size);      【 47 】
+	} else if (os_strncmp(buf, "P2P_LISTEN ", 11) == 0) {  // 如果 命令 buf  是 P2P_LISTEN  那么执行函数        可选带参数
+		if (p2p_ctrl_listen(wpa_s, buf + 11))                       【 48 】
 			reply_len = -1;
 	} else if (os_strcmp(buf, "P2P_LISTEN") == 0) {
 		if (p2p_ctrl_listen(wpa_s, ""))
 			reply_len = -1;
-	} else if (os_strncmp(buf, "P2P_GROUP_REMOVE ", 17) == 0) {
-		if (wpas_p2p_group_remove(wpa_s, buf + 17))
+	} else if (os_strncmp(buf, "P2P_GROUP_REMOVE ", 17) == 0) {   // 如果 命令 buf  是 P2P_GROUP_REMOVE  那么执行函数        可选带参数
+		if (wpas_p2p_group_remove(wpa_s, buf + 17))                 【 49 】
 			reply_len = -1;
-	} else if (os_strcmp(buf, "P2P_GROUP_ADD") == 0) {
-		if (p2p_ctrl_group_add(wpa_s, ""))
+	} else if (os_strcmp(buf, "P2P_GROUP_ADD") == 0) {         // 如果 命令 buf  是 P2P_GROUP_ADD  那么执行函数        可选带参数
+		if (p2p_ctrl_group_add(wpa_s, ""))                              【 50 】
 			reply_len = -1;
 	} else if (os_strncmp(buf, "P2P_GROUP_ADD ", 14) == 0) {
 		if (p2p_ctrl_group_add(wpa_s, buf + 14))
 			reply_len = -1;
-	} else if (os_strncmp(buf, "P2P_GROUP_MEMBER ", 17) == 0) {
-		reply_len = p2p_ctrl_group_member(wpa_s, buf + 17, reply,
-						  reply_size);
+	} else if (os_strncmp(buf, "P2P_GROUP_MEMBER ", 17) == 0) {     // 如果 命令 buf  是 P2P_GROUP_MEMBER  那么执行函数        可选带参数
+		reply_len = p2p_ctrl_group_member(wpa_s, buf + 17, reply, reply_size);           【51】
 	} else if (os_strncmp(buf, "P2P_PROV_DISC ", 14) == 0) {
 		if (p2p_ctrl_prov_disc(wpa_s, buf + 14))
 			reply_len = -1;
-	} else if (os_strcmp(buf, "P2P_GET_PASSPHRASE") == 0) {
-		reply_len = p2p_get_passphrase(wpa_s, reply, reply_size);
-	} else if (os_strncmp(buf, "P2P_SERV_DISC_REQ ", 18) == 0) {
-		reply_len = p2p_ctrl_serv_disc_req(wpa_s, buf + 18, reply,
-						   reply_size);
-	} else if (os_strncmp(buf, "P2P_SERV_DISC_CANCEL_REQ ", 25) == 0) {
-		if (p2p_ctrl_serv_disc_cancel_req(wpa_s, buf + 25) < 0)
+	} else if (os_strcmp(buf, "P2P_GET_PASSPHRASE") == 0) {     // 如果 命令 buf  是 P2P_GET_PASSPHRASE  那么执行函数        
+		reply_len = p2p_get_passphrase(wpa_s, reply, reply_size);       【 52 】
+	} else if (os_strncmp(buf, "P2P_SERV_DISC_REQ ", 18) == 0) {                           // 如果 命令 buf  是 P2P_SERV_DISC_REQ   需要输入2个命令参数    
+		reply_len = p2p_ctrl_serv_disc_req(wpa_s, buf + 18, reply,reply_size);       【 53 】
+	} else if (os_strncmp(buf, "P2P_SERV_DISC_CANCEL_REQ ", 25) == 0) {      // 如果 命令 buf  是 P2P_SERV_DISC_CANCEL_REQ   需要输入1个命令参数    
+		if (p2p_ctrl_serv_disc_cancel_req(wpa_s, buf + 25) < 0)                      【54】
 			reply_len = -1;
-	} else if (os_strncmp(buf, "P2P_SERV_DISC_RESP ", 19) == 0) {
-		if (p2p_ctrl_serv_disc_resp(wpa_s, buf + 19) < 0)
+	} else if (os_strncmp(buf, "P2P_SERV_DISC_RESP ", 19) == 0) {             // 如果 命令 buf  是 P2P_SERV_DISC_RESP     需要输入4个命令参数    
+		if (p2p_ctrl_serv_disc_resp(wpa_s, buf + 19) < 0)                               【 55 】
 			reply_len = -1;
-	} else if (os_strcmp(buf, "P2P_SERVICE_UPDATE") == 0) {
-		wpas_p2p_sd_service_update(wpa_s);
-	} else if (os_strncmp(buf, "P2P_SERV_DISC_EXTERNAL ", 23) == 0) {
-		if (p2p_ctrl_serv_disc_external(wpa_s, buf + 23) < 0)
+	} else if (os_strcmp(buf, "P2P_SERVICE_UPDATE") == 0) {           // 如果 命令 buf  是 P2P_SERVICE_UPDATE     
+		wpas_p2p_sd_service_update(wpa_s);                               【 56 】
+	} else if (os_strncmp(buf, "P2P_SERV_DISC_EXTERNAL ", 23) == 0) {           // 如果 命令 buf  是 P2P_SERV_DISC_EXTERNAL        需要输入1个命令参数    
+		if (p2p_ctrl_serv_disc_external(wpa_s, buf + 23) < 0)             【 57 】          
 			reply_len = -1;
-	} else if (os_strcmp(buf, "P2P_SERVICE_FLUSH") == 0) {
-		wpas_p2p_service_flush(wpa_s);
-	} else if (os_strncmp(buf, "P2P_SERVICE_ADD ", 16) == 0) {
-		if (p2p_ctrl_service_add(wpa_s, buf + 16) < 0)
+	} else if (os_strcmp(buf, "P2P_SERVICE_FLUSH") == 0) {            // 如果 命令 buf  是 P2P_SERVICE_FLUSH    
+		wpas_p2p_service_flush(wpa_s);                             【 58 】  
+	} else if (os_strncmp(buf, "P2P_SERVICE_ADD ", 16) == 0) {        // 如果 命令 buf  是 P2P_SERVICE_ADD    需要输入3--6个命令参数    
+		if (p2p_ctrl_service_add(wpa_s, buf + 16) < 0)                         【59】
 			reply_len = -1;
-	} else if (os_strncmp(buf, "P2P_SERVICE_DEL ", 16) == 0) {
-		if (p2p_ctrl_service_del(wpa_s, buf + 16) < 0)
+	} else if (os_strncmp(buf, "P2P_SERVICE_DEL ", 16) == 0) {    // 如果 命令 buf  是 P2P_SERVICE_DEL   需要输入2--3个命令参数    
+		if (p2p_ctrl_service_del(wpa_s, buf + 16) < 0)                            【60】
 			reply_len = -1;
-	} else if (os_strncmp(buf, "P2P_SERVICE_REP ", 16) == 0) {
-		if (p2p_ctrl_service_replace(wpa_s, buf + 16) < 0)
+	} else if (os_strncmp(buf, "P2P_SERVICE_REP ", 16) == 0) {  // 如果 命令 buf  是 P2P_SERVICE_REP   需要输入5--6个命令参数    
+		if (p2p_ctrl_service_replace(wpa_s, buf + 16) < 0)         【 61 】
 			reply_len = -1;
-	} else if (os_strncmp(buf, "P2P_REJECT ", 11) == 0) {
-		if (p2p_ctrl_reject(wpa_s, buf + 11) < 0)
+	} else if (os_strncmp(buf, "P2P_REJECT ", 11) == 0) {        // 如果 命令 buf  是 P2P_REJECT   需要输入1 个命令参数    
+		if (p2p_ctrl_reject(wpa_s, buf + 11) < 0)                          【 62 】
 			reply_len = -1;
-	} else if (os_strncmp(buf, "P2P_INVITE ", 11) == 0) {
-		if (p2p_ctrl_invite(wpa_s, buf + 11) < 0)
+	} else if (os_strncmp(buf, "P2P_INVITE ", 11) == 0) {        // 如果 命令 buf  是 P2P_INVITE   需要输入1 个命令参数    
+		if (p2p_ctrl_invite(wpa_s, buf + 11) < 0)                  【63】
 			reply_len = -1;
-	} else if (os_strncmp(buf, "P2P_PEER ", 9) == 0) {
-		reply_len = p2p_ctrl_peer(wpa_s, buf + 9, reply,
-					      reply_size);
-	} else if (os_strncmp(buf, "P2P_SET ", 8) == 0) {
-		if (p2p_ctrl_set(wpa_s, buf + 8) < 0)
+	} else if (os_strncmp(buf, "P2P_PEER ", 9) == 0) {                // 如果 命令 buf  是 P2P_PEER   需要输入1 个命令参数    
+		reply_len = p2p_ctrl_peer(wpa_s, buf + 9, reply,  reply_size);           【 64 】
+	} else if (os_strncmp(buf, "P2P_SET ", 8) == 0) {        // 如果 命令 buf  是 P2P_SET   需要输入2 个命令参数     
+		if (p2p_ctrl_set(wpa_s, buf + 8) < 0)                               【 65 】
 			reply_len = -1;
-	} else if (os_strcmp(buf, "P2P_FLUSH") == 0) {
-		p2p_ctrl_flush(wpa_s);
-	} else if (os_strncmp(buf, "P2P_UNAUTHORIZE ", 16) == 0) {
-		if (wpas_p2p_unauthorize(wpa_s, buf + 16) < 0)
+	} else if (os_strcmp(buf, "P2P_FLUSH") == 0) {         // 如果 命令 buf  是 P2P_FLUSH 
+		p2p_ctrl_flush(wpa_s);                                  【 66 】 
+	} else if (os_strncmp(buf, "P2P_UNAUTHORIZE ", 16) == 0) {   // 如果 命令 buf  是 P2P_UNAUTHORIZE   需要输入1 个命令参数   
+		if (wpas_p2p_unauthorize(wpa_s, buf + 16) < 0)                     【 67 】
 			reply_len = -1;
-	} else if (os_strcmp(buf, "P2P_CANCEL") == 0) {
-		if (wpas_p2p_cancel(wpa_s))
+	} else if (os_strcmp(buf, "P2P_CANCEL") == 0) {   // 如果 命令 buf  是 P2P_CANCEL 
+		if (wpas_p2p_cancel(wpa_s))                                     【 68 】
 			reply_len = -1;
-	} else if (os_strncmp(buf, "P2P_PRESENCE_REQ ", 17) == 0) {
-		if (p2p_ctrl_presence_req(wpa_s, buf + 17) < 0)
+	} else if (os_strncmp(buf, "P2P_PRESENCE_REQ ", 17) == 0) {    // 如果 命令 buf  是 P2P_PRESENCE_REQ   可选可带2个参数
+		if (p2p_ctrl_presence_req(wpa_s, buf + 17) < 0)                【 69 】                     
 			reply_len = -1;
-	} else if (os_strcmp(buf, "P2P_PRESENCE_REQ") == 0) {
+	} else if (os_strcmp(buf, "P2P_PRESENCE_REQ") == 0) {  
 		if (p2p_ctrl_presence_req(wpa_s, "") < 0)
 			reply_len = -1;
-	} else if (os_strncmp(buf, "P2P_EXT_LISTEN ", 15) == 0) {
-		if (p2p_ctrl_ext_listen(wpa_s, buf + 15) < 0)
+	} else if (os_strncmp(buf, "P2P_EXT_LISTEN ", 15) == 0) {    // 如果 命令 buf  是 P2P_EXT_LISTEN   可选可带2个参数
+		if (p2p_ctrl_ext_listen(wpa_s, buf + 15) < 0)                    【70】
 			reply_len = -1;
 	} else if (os_strcmp(buf, "P2P_EXT_LISTEN") == 0) {
 		if (p2p_ctrl_ext_listen(wpa_s, "") < 0)
 			reply_len = -1;
-	} else if (os_strncmp(buf, "P2P_REMOVE_CLIENT ", 18) == 0) {
-		if (p2p_ctrl_remove_client(wpa_s, buf + 18) < 0)
+	} else if (os_strncmp(buf, "P2P_REMOVE_CLIENT ", 18) == 0) {        // 如果 命令 buf  是 P2P_REMOVE_CLIENT   需要输入1 个命令参数   
+		if (p2p_ctrl_remove_client(wpa_s, buf + 18) < 0)                        【71】
 			reply_len = -1;
-	} else if (os_strncmp(buf, "P2P_LO_START ", 13) == 0) {
-		if (p2p_ctrl_iface_p2p_lo_start(wpa_s, buf + 13))
+	} else if (os_strncmp(buf, "P2P_LO_START ", 13) == 0) {      // 如果 命令 buf  是 P2P_LO_START   需要输入4 个命令参数         
+		if (p2p_ctrl_iface_p2p_lo_start(wpa_s, buf + 13))                   【72】
 			reply_len = -1;
-	} else if (os_strcmp(buf, "P2P_LO_STOP") == 0) {
-		if (wpas_p2p_lo_stop(wpa_s))
+	} else if (os_strcmp(buf, "P2P_LO_STOP") == 0) {              // 如果 命令 buf  是 P2P_LO_STOP   
+		if (wpas_p2p_lo_stop(wpa_s))                                                 【73】
 			reply_len = -1;
-#endif /* CONFIG_P2P */
-#ifdef CONFIG_WIFI_DISPLAY
-	} else if (os_strncmp(buf, "WFD_SUBELEM_SET ", 16) == 0) {
-		if (wifi_display_subelem_set(wpa_s->global, buf + 16) < 0)
+
+	} else if (os_strncmp(buf, "WFD_SUBELEM_SET ", 16) == 0) {        // 如果 命令 buf  是 WFD_SUBELEM_SET    需要输入2个命令参数     
+		if (wifi_display_subelem_set(wpa_s->global, buf + 16) < 0)               【74】
 			reply_len = -1;
-	} else if (os_strncmp(buf, "WFD_SUBELEM_GET ", 16) == 0) {
-		reply_len = wifi_display_subelem_get(wpa_s->global, buf + 16,
-						     reply, reply_size);
-#endif /* CONFIG_WIFI_DISPLAY */
-#ifdef CONFIG_INTERWORKING
-	} else if (os_strcmp(buf, "FETCH_ANQP") == 0) {
-		if (interworking_fetch_anqp(wpa_s) < 0)
+	} else if (os_strncmp(buf, "WFD_SUBELEM_GET ", 16) == 0) {           // 如果 命令 buf  是 WFD_SUBELEM_GET   
+		reply_len = wifi_display_subelem_get(wpa_s->global, buf + 16,  reply, reply_size);           【75】
+
+
+	} else if (os_strcmp(buf, "FETCH_ANQP") == 0) {             // 如果 命令 buf  是 FETCH_ANQP   
+		if (interworking_fetch_anqp(wpa_s) < 0)                           【76】          
 			reply_len = -1;
-	} else if (os_strcmp(buf, "STOP_FETCH_ANQP") == 0) {
-		interworking_stop_fetch_anqp(wpa_s);
-	} else if (os_strcmp(buf, "INTERWORKING_SELECT") == 0) {
-		if (ctrl_interworking_select(wpa_s, NULL) < 0)
+	} else if (os_strcmp(buf, "STOP_FETCH_ANQP") == 0) {            // 如果 命令 buf  是 STOP_FETCH_ANQP   
+		interworking_stop_fetch_anqp(wpa_s);                                【77】      
+	} else if (os_strcmp(buf, "INTERWORKING_SELECT") == 0) {               // 如果 命令 buf  是 INTERWORKING_SELECT  
+		if (ctrl_interworking_select(wpa_s, NULL) < 0)                                 【78】
 			reply_len = -1;
 	} else if (os_strncmp(buf, "INTERWORKING_SELECT ", 20) == 0) {
 		if (ctrl_interworking_select(wpa_s, buf + 20) < 0)
 			reply_len = -1;
-	} else if (os_strncmp(buf, "INTERWORKING_CONNECT ", 21) == 0) {
-		if (ctrl_interworking_connect(wpa_s, buf + 21, 0) < 0)
+	} else if (os_strncmp(buf, "INTERWORKING_CONNECT ", 21) == 0) {             // 如果 命令 buf  是 INTERWORKING_CONNECT  
+		if (ctrl_interworking_connect(wpa_s, buf + 21, 0) < 0)                              【79】
 			reply_len = -1;
-	} else if (os_strncmp(buf, "INTERWORKING_ADD_NETWORK ", 25) == 0) {
+	} else if (os_strncmp(buf, "INTERWORKING_ADD_NETWORK ", 25) == 0) {       // 如果 命令 buf  是 INTERWORKING_ADD_NETWORK  
 		int id;
 
-		id = ctrl_interworking_connect(wpa_s, buf + 25, 1);
+		id = ctrl_interworking_connect(wpa_s, buf + 25, 1);                                   【80】
 		if (id < 0)
 			reply_len = -1;
 		else {
@@ -2701,267 +2689,256 @@ char * wpa_supplicant_ctrl_iface_process(struct wpa_supplicant *wpa_s, char *buf
 			if (os_snprintf_error(reply_size, reply_len))
 				reply_len = -1;
 		}
-	} else if (os_strncmp(buf, "ANQP_GET ", 9) == 0) {
-		if (get_anqp(wpa_s, buf + 9) < 0)
+	} else if (os_strncmp(buf, "ANQP_GET ", 9) == 0) {             // 如果 命令 buf  是 ANQP_GET     需要输入2个命令参数                
+		if (get_anqp(wpa_s, buf + 9) < 0)                                      【81】
 			reply_len = -1;
-	} else if (os_strncmp(buf, "GAS_REQUEST ", 12) == 0) {
-		if (gas_request(wpa_s, buf + 12) < 0)
+	} else if (os_strncmp(buf, "GAS_REQUEST ", 12) == 0) {        // 如果 命令 buf  是 GAS_REQUEST     需要输入2个命令参数          
+		if (gas_request(wpa_s, buf + 12) < 0)                                         【82】
 			reply_len = -1;
-	} else if (os_strncmp(buf, "GAS_RESPONSE_GET ", 17) == 0) {
-		reply_len = gas_response_get(wpa_s, buf + 17, reply,
-					     reply_size);
-#endif /* CONFIG_INTERWORKING */
-#ifdef CONFIG_HS20
-	} else if (os_strncmp(buf, "HS20_ANQP_GET ", 14) == 0) {
-		if (get_hs20_anqp(wpa_s, buf + 14) < 0)
+	} else if (os_strncmp(buf, "GAS_RESPONSE_GET ", 17) == 0) {  // 如果 命令 buf  是 GAS_RESPONSE_GET     需要输入2个命令参数     
+		reply_len = gas_response_get(wpa_s, buf + 17, reply, reply_size);            【83】
+
+	} else if (os_strncmp(buf, "HS20_ANQP_GET ", 14) == 0) {  // 如果 命令 buf  是 HS20_ANQP_GET     需要输入2个命令参数    
+		if (get_hs20_anqp(wpa_s, buf + 14) < 0)                                 【84】   
 			reply_len = -1;
-	} else if (os_strncmp(buf, "HS20_GET_NAI_HOME_REALM_LIST ", 29) == 0) {
-		if (hs20_get_nai_home_realm_list(wpa_s, buf + 29) < 0)
+	} else if (os_strncmp(buf, "HS20_GET_NAI_HOME_REALM_LIST ", 29) == 0) {   // 如果 命令 buf  是 HS20_GET_NAI_HOME_REALM_LIST     需要输入2个命令参数   
+		if (hs20_get_nai_home_realm_list(wpa_s, buf + 29) < 0)                       【 不识别 UNKNOW COMMAND 】
 			reply_len = -1;
-	} else if (os_strncmp(buf, "HS20_ICON_REQUEST ", 18) == 0) {
-		if (hs20_icon_request(wpa_s, buf + 18, 0) < 0)
+	} else if (os_strncmp(buf, "HS20_ICON_REQUEST ", 18) == 0) { // 如果 命令 buf  是 HS20_ICON_REQUEST     需要输入2个命令参数   
+		if (hs20_icon_request(wpa_s, buf + 18, 0) < 0)                              【85】
 			reply_len = -1;
-	} else if (os_strncmp(buf, "REQ_HS20_ICON ", 14) == 0) {
-		if (hs20_icon_request(wpa_s, buf + 14, 1) < 0)
+	} else if (os_strncmp(buf, "REQ_HS20_ICON ", 14) == 0) {           // 如果 命令 buf  是 REQ_HS20_ICON     需要输入2个命令参数   
+		if (hs20_icon_request(wpa_s, buf + 14, 1) < 0)                           【 不识别 UNKNOW COMMAND 】
 			reply_len = -1;
-	} else if (os_strncmp(buf, "GET_HS20_ICON ", 14) == 0) {
+	} else if (os_strncmp(buf, "GET_HS20_ICON ", 14) == 0) {         【 不识别 UNKNOW COMMAND 】  
 		reply_len = get_hs20_icon(wpa_s, buf + 14, reply, reply_size);
-	} else if (os_strncmp(buf, "DEL_HS20_ICON ", 14) == 0) {
+	} else if (os_strncmp(buf, "DEL_HS20_ICON ", 14) == 0) {                【 不识别 UNKNOW COMMAND 】
 		if (del_hs20_icon(wpa_s, buf + 14) < 0)
 			reply_len = -1;
-	} else if (os_strcmp(buf, "FETCH_OSU") == 0) {
-		if (hs20_fetch_osu(wpa_s, 0) < 0)
+	} else if (os_strcmp(buf, "FETCH_OSU") == 0) {        // 如果 命令 buf  是 FETCH_OSU     
+		if (hs20_fetch_osu(wpa_s, 0) < 0)                                 【86】
 			reply_len = -1;
 	} else if (os_strcmp(buf, "FETCH_OSU no-scan") == 0) {
 		if (hs20_fetch_osu(wpa_s, 1) < 0)
 			reply_len = -1;
-	} else if (os_strcmp(buf, "CANCEL_FETCH_OSU") == 0) {
-		hs20_cancel_fetch_osu(wpa_s);
-#endif /* CONFIG_HS20 */
-	} else if (os_strncmp(buf, WPA_CTRL_RSP, os_strlen(WPA_CTRL_RSP)) == 0)
+	} else if (os_strcmp(buf, "CANCEL_FETCH_OSU") == 0) {         // 如果 命令 buf  是 CANCEL_FETCH_OSU     
+		hs20_cancel_fetch_osu(wpa_s);                                      【87】
+
+	} else if (os_strncmp(buf, WPA_CTRL_RSP 【"CTRL-RSP-"】, os_strlen(WPA_CTRL_RSP)) == 0)          // 如果 命令 buf  是 CTRL-RSP- 那么执行函数        
 	{
-		if (wpa_supplicant_ctrl_iface_ctrl_rsp(
-			    wpa_s, buf + os_strlen(WPA_CTRL_RSP)))
+		if (wpa_supplicant_ctrl_iface_ctrl_rsp(wpa_s, buf + os_strlen(WPA_CTRL_RSP)))            【88】   
 			reply_len = -1;
 		else {
 			/*
 			 * Notify response from timeout to allow the control
 			 * interface response to be sent first.
 			 */
-			eloop_register_timeout(0, 0, wpas_ctrl_eapol_response,
-					       wpa_s, NULL);
+			eloop_register_timeout(0, 0, wpas_ctrl_eapol_response, wpa_s, NULL);             【89】
 		}
-	} else if (os_strcmp(buf, "RECONFIGURE") == 0) {
-		if (wpa_supplicant_reload_configuration(wpa_s))
+	} else if (os_strcmp(buf, "RECONFIGURE") == 0) {     // 如果 命令 buf  是 RECONFIGURE     
+		if (wpa_supplicant_reload_configuration(wpa_s))             【90】
 			reply_len = -1;
-	} else if (os_strcmp(buf, "TERMINATE") == 0) {
-		wpa_supplicant_terminate_proc(wpa_s->global);
-	} else if (os_strncmp(buf, "BSSID ", 6) == 0) {
-		if (wpa_supplicant_ctrl_iface_bssid(wpa_s, buf + 6))
+	} else if (os_strcmp(buf, "TERMINATE") == 0) {           // 如果 命令 buf  是 TERMINATE  
+		wpa_supplicant_terminate_proc(wpa_s->global);                       【91】
+	} else if (os_strncmp(buf, "BSSID ", 6) == 0) {               // 如果 命令 buf  是 BSSID    需要输入2个命令参数     
+		if (wpa_supplicant_ctrl_iface_bssid(wpa_s, buf + 6))                      【92】
 			reply_len = -1;
-	} else if (os_strncmp(buf, "BLACKLIST", 9) == 0) {
-		reply_len = wpa_supplicant_ctrl_iface_blacklist(
-			wpa_s, buf + 9, reply, reply_size);
-	} else if (os_strncmp(buf, "LOG_LEVEL", 9) == 0) {
-		reply_len = wpa_supplicant_ctrl_iface_log_level(
-			wpa_s, buf + 9, reply, reply_size);
-	} else if (os_strncmp(buf, "LIST_NETWORKS ", 14) == 0) {
-		reply_len = wpa_supplicant_ctrl_iface_list_networks(
-			wpa_s, buf + 14, reply, reply_size);
+	} else if (os_strncmp(buf, "BLACKLIST", 9) == 0) {           // 如果 命令 buf  是 BLACKLIST   
+		reply_len = wpa_supplicant_ctrl_iface_blacklist(wpa_s, buf + 9, reply, reply_size);            【93】
+
+	} else if (os_strncmp(buf, "LOG_LEVEL", 9) == 0) {            // 如果 命令 buf  是 LOG_LEVEL 
+		reply_len = wpa_supplicant_ctrl_iface_log_level(wpa_s, buf + 9, reply, reply_size);       【94】
+
+	} else if (os_strncmp(buf, "LIST_NETWORKS ", 14) == 0) {           // 如果 命令 buf  是 LIST_NETWORKS 
+		reply_len = wpa_supplicant_ctrl_iface_list_networks(wpa_s, buf + 14, reply, reply_size);          【95】
 	} else if (os_strcmp(buf, "LIST_NETWORKS") == 0) {
-		reply_len = wpa_supplicant_ctrl_iface_list_networks(
-			wpa_s, NULL, reply, reply_size);
-	} else if (os_strcmp(buf, "DISCONNECT") == 0) {
-		wpas_request_disconnection(wpa_s);
-	} else if (os_strcmp(buf, "SCAN") == 0) {
-		wpas_ctrl_scan(wpa_s, NULL, reply, reply_size, &reply_len);
+		reply_len = wpa_supplicant_ctrl_iface_list_networks(wpa_s, NULL, reply, reply_size);
+
+	} else if (os_strcmp(buf, "DISCONNECT") == 0) {              // 如果 命令 buf  是 DISCONNECT 
+		wpas_request_disconnection(wpa_s);                              【96】
+
+	} else if (os_strcmp(buf, "SCAN") == 0) {                 // 如果 命令 buf  是 SCAN                   
+		wpas_ctrl_scan(wpa_s, NULL, reply, reply_size, &reply_len);       【97】  
 	} else if (os_strncmp(buf, "SCAN ", 5) == 0) {
 		wpas_ctrl_scan(wpa_s, buf + 5, reply, reply_size, &reply_len);
-	} else if (os_strcmp(buf, "SCAN_RESULTS") == 0) {
-		reply_len = wpa_supplicant_ctrl_iface_scan_results(
-			wpa_s, reply, reply_size);
-	} else if (os_strcmp(buf, "ABORT_SCAN") == 0) {
-		if (wpas_abort_ongoing_scan(wpa_s) < 0)
+
+
+	} else if (os_strcmp(buf, "SCAN_RESULTS") == 0) {        // 如果 命令 buf  是 SCAN_RESULTS         
+		reply_len = wpa_supplicant_ctrl_iface_scan_results(wpa_s, reply, reply_size);   【98】  
+
+	} else if (os_strcmp(buf, "ABORT_SCAN") == 0) {      // 如果 命令 buf  是 ABORT_SCAN    
+		if (wpas_abort_ongoing_scan(wpa_s) < 0)                       【99】
 			reply_len = -1;
-	} else if (os_strncmp(buf, "SELECT_NETWORK ", 15) == 0) {
-		if (wpa_supplicant_ctrl_iface_select_network(wpa_s, buf + 15))
+	} else if (os_strncmp(buf, "SELECT_NETWORK ", 15) == 0) {              //  如果 命令 buf  是 SELECT_NETWORK    
+		if (wpa_supplicant_ctrl_iface_select_network(wpa_s, buf + 15))                【100】          
 			reply_len = -1;
-	} else if (os_strncmp(buf, "ENABLE_NETWORK ", 15) == 0) {
-		if (wpa_supplicant_ctrl_iface_enable_network(wpa_s, buf + 15))
+	} else if (os_strncmp(buf, "ENABLE_NETWORK ", 15) == 0) {             //  如果 命令 buf  是 ENABLE_NETWORK    
+		if (wpa_supplicant_ctrl_iface_enable_network(wpa_s, buf + 15))            【101】
 			reply_len = -1;
-	} else if (os_strncmp(buf, "DISABLE_NETWORK ", 16) == 0) {
-		if (wpa_supplicant_ctrl_iface_disable_network(wpa_s, buf + 16))
+	} else if (os_strncmp(buf, "DISABLE_NETWORK ", 16) == 0) {              //  如果 命令 buf  是 DISABLE_NETWORK    
+		if (wpa_supplicant_ctrl_iface_disable_network(wpa_s, buf + 16))               【102】
 			reply_len = -1;
-	} else if (os_strcmp(buf, "ADD_NETWORK") == 0) {
-		reply_len = wpa_supplicant_ctrl_iface_add_network(
-			wpa_s, reply, reply_size);
-	} else if (os_strncmp(buf, "REMOVE_NETWORK ", 15) == 0) {
-		if (wpa_supplicant_ctrl_iface_remove_network(wpa_s, buf + 15))
+	} else if (os_strcmp(buf, "ADD_NETWORK") == 0) {                          //  如果 命令 buf  是 ADD_NETWORK                     
+		reply_len = wpa_supplicant_ctrl_iface_add_network(wpa_s, reply, reply_size);         【103】
+
+	} else if (os_strncmp(buf, "REMOVE_NETWORK ", 15) == 0) {                 //  如果 命令 buf  是 REMOVE_NETWORK       
+		if (wpa_supplicant_ctrl_iface_remove_network(wpa_s, buf + 15))                        【104】 
 			reply_len = -1;
-	} else if (os_strncmp(buf, "SET_NETWORK ", 12) == 0) {
-		if (wpa_supplicant_ctrl_iface_set_network(wpa_s, buf + 12))
+	} else if (os_strncmp(buf, "SET_NETWORK ", 12) == 0) {            //  如果 命令 buf  是 SET_NETWORK      
+		if (wpa_supplicant_ctrl_iface_set_network(wpa_s, buf + 12))                【105】 
 			reply_len = -1;
-	} else if (os_strncmp(buf, "GET_NETWORK ", 12) == 0) {
-		reply_len = wpa_supplicant_ctrl_iface_get_network(
-			wpa_s, buf + 12, reply, reply_size);
-	} else if (os_strncmp(buf, "DUP_NETWORK ", 12) == 0) {
-		if (wpa_supplicant_ctrl_iface_dup_network(wpa_s, buf + 12,
-							  wpa_s))
+	} else if (os_strncmp(buf, "GET_NETWORK ", 12) == 0) {                       //  如果 命令 buf  是 GET_NETWORK      
+		reply_len = wpa_supplicant_ctrl_iface_get_network(wpa_s, buf + 12, reply, reply_size);          【106】 
+
+	} else if (os_strncmp(buf, "DUP_NETWORK ", 12) == 0) {            //  如果 命令 buf  是 DUP_NETWORK       需要输入3个命令参数   
+		if (wpa_supplicant_ctrl_iface_dup_network(wpa_s, buf + 12,wpa_s))      【107】
 			reply_len = -1;
-	} else if (os_strcmp(buf, "LIST_CREDS") == 0) {
-		reply_len = wpa_supplicant_ctrl_iface_list_creds(
-			wpa_s, reply, reply_size);
-	} else if (os_strcmp(buf, "ADD_CRED") == 0) {
-		reply_len = wpa_supplicant_ctrl_iface_add_cred(
-			wpa_s, reply, reply_size);
-	} else if (os_strncmp(buf, "REMOVE_CRED ", 12) == 0) {
-		if (wpa_supplicant_ctrl_iface_remove_cred(wpa_s, buf + 12))
+	} else if (os_strcmp(buf, "LIST_CREDS") == 0) {              //  如果 命令 buf  是 LIST_CREDS             
+		reply_len = wpa_supplicant_ctrl_iface_list_creds(wpa_s, reply, reply_size);      【108】
+
+	} else if (os_strcmp(buf, "ADD_CRED") == 0) {                    //  如果 命令 buf  是 ADD_CRED      
+		reply_len = wpa_supplicant_ctrl_iface_add_cred(wpa_s, reply, reply_size);       【109】
+
+	} else if (os_strncmp(buf, "REMOVE_CRED ", 12) == 0) {          //  如果 命令 buf  是 REMOVE_CRED  
+		if (wpa_supplicant_ctrl_iface_remove_cred(wpa_s, buf + 12))                【110】
 			reply_len = -1;
-	} else if (os_strncmp(buf, "SET_CRED ", 9) == 0) {
-		if (wpa_supplicant_ctrl_iface_set_cred(wpa_s, buf + 9))
+	} else if (os_strncmp(buf, "SET_CRED ", 9) == 0) {                //  如果 命令 buf  是 SET_CRED  
+		if (wpa_supplicant_ctrl_iface_set_cred(wpa_s, buf + 9))                          【111】
 			reply_len = -1;
-	} else if (os_strncmp(buf, "GET_CRED ", 9) == 0) {
-		reply_len = wpa_supplicant_ctrl_iface_get_cred(wpa_s, buf + 9,
-							       reply,
-							       reply_size);
-#ifndef CONFIG_NO_CONFIG_WRITE
-	} else if (os_strcmp(buf, "SAVE_CONFIG") == 0) {
-		if (wpa_supplicant_ctrl_iface_save_config(wpa_s))
+	} else if (os_strncmp(buf, "GET_CRED ", 9) == 0) {               //  如果 命令 buf  是 GET_CRED  需要输入3个命令参数   
+		reply_len = wpa_supplicant_ctrl_iface_get_cred(wpa_s, buf + 9, reply,  reply_size);   【112】
+
+	} else if (os_strcmp(buf, "SAVE_CONFIG") == 0) {          //  如果 命令 buf  是 SAVE_CONFIG  
+		if (wpa_supplicant_ctrl_iface_save_config(wpa_s))                          【113】
 			reply_len = -1;
-#endif /* CONFIG_NO_CONFIG_WRITE */
-	} else if (os_strncmp(buf, "GET_CAPABILITY ", 15) == 0) {
-		reply_len = wpa_supplicant_ctrl_iface_get_capability(
-			wpa_s, buf + 15, reply, reply_size);
-	} else if (os_strncmp(buf, "AP_SCAN ", 8) == 0) {
-		if (wpa_supplicant_ctrl_iface_ap_scan(wpa_s, buf + 8))
+	} else if (os_strncmp(buf, "GET_CAPABILITY ", 15) == 0) {         //  如果 命令 buf  是 GET_CAPABILITY  
+		reply_len = wpa_supplicant_ctrl_iface_get_capability(wpa_s, buf + 15, reply, reply_size);    【114】
+
+	} else if (os_strncmp(buf, "AP_SCAN ", 8) == 0) {          //  如果 命令 buf  是 AP_SCAN   需要输入1个命令参数   
+		if (wpa_supplicant_ctrl_iface_ap_scan(wpa_s, buf + 8))               【115】
 			reply_len = -1;
-	} else if (os_strncmp(buf, "SCAN_INTERVAL ", 14) == 0) {
-		if (wpa_supplicant_ctrl_iface_scan_interval(wpa_s, buf + 14))
+	} else if (os_strncmp(buf, "SCAN_INTERVAL ", 14) == 0) {            //  如果 命令 buf  是 SCAN_INTERVAL  
+		if (wpa_supplicant_ctrl_iface_scan_interval(wpa_s, buf + 14))                  【116】
 			reply_len = -1;
-	} else if (os_strcmp(buf, "INTERFACE_LIST") == 0) {
-		reply_len = wpa_supplicant_global_iface_list(
-			wpa_s->global, reply, reply_size);
-	} else if (os_strncmp(buf, "INTERFACES", 10) == 0) {
-		reply_len = wpa_supplicant_global_iface_interfaces(
-			wpa_s->global, buf + 10, reply, reply_size);
-	} else if (os_strncmp(buf, "BSS ", 4) == 0) {
-		reply_len = wpa_supplicant_ctrl_iface_bss(
-			wpa_s, buf + 4, reply, reply_size);
-#ifdef CONFIG_AP
-	} else if (os_strcmp(buf, "STA-FIRST") == 0) {
+	} else if (os_strcmp(buf, "INTERFACE_LIST") == 0) {                   //  如果 命令 buf  是 INTERFACE_LIST  
+		reply_len = wpa_supplicant_global_iface_list(wpa_s->global, reply, reply_size);       【117】
+
+	} else if (os_strncmp(buf, "INTERFACES", 10) == 0) {                                   //  如果 命令 buf  是 INTERFACES  
+		reply_len = wpa_supplicant_global_iface_interfaces(wpa_s->global, buf + 10, reply, reply_size);    【不识别 UNKNOW COMMAND 】
+	} else if (os_strncmp(buf, "BSS ", 4) == 0) {                       //  如果 命令 buf  是 BSS  
+		reply_len = wpa_supplicant_ctrl_iface_bss(wpa_s, buf + 4, reply, reply_size);   【118】
+
+	} else if (os_strcmp(buf, "STA-FIRST") == 0) {            【不识别 UNKNOW COMMAND 】  
 		reply_len = ap_ctrl_iface_sta_first(wpa_s, reply, reply_size);
-	} else if (os_strncmp(buf, "STA ", 4) == 0) {
-		reply_len = ap_ctrl_iface_sta(wpa_s, buf + 4, reply,
-					      reply_size);
-	} else if (os_strncmp(buf, "STA-NEXT ", 9) == 0) {
-		reply_len = ap_ctrl_iface_sta_next(wpa_s, buf + 9, reply,
-						   reply_size);
-	} else if (os_strncmp(buf, "DEAUTHENTICATE ", 15) == 0) {
-		if (ap_ctrl_iface_sta_deauthenticate(wpa_s, buf + 15))
+
+	} else if (os_strncmp(buf, "STA ", 4) == 0) {                //  如果 命令 buf  是 STA   需要输入1个命令参数 
+		reply_len = ap_ctrl_iface_sta(wpa_s, buf + 4, reply,reply_size);                 【119】
+
+	} else if (os_strncmp(buf, "STA-NEXT ", 9) == 0) {              【不识别 UNKNOW COMMAND 】  
+		reply_len = ap_ctrl_iface_sta_next(wpa_s, buf + 9, reply,reply_size);
+
+	} else if (os_strncmp(buf, "DEAUTHENTICATE ", 15) == 0) {          //  如果 命令 buf  是 DEAUTHENTICATE    
+		if (ap_ctrl_iface_sta_deauthenticate(wpa_s, buf + 15))                     【120】
 			reply_len = -1;
-	} else if (os_strncmp(buf, "DISASSOCIATE ", 13) == 0) {
-		if (ap_ctrl_iface_sta_disassociate(wpa_s, buf + 13))
+	} else if (os_strncmp(buf, "DISASSOCIATE ", 13) == 0) { //  如果 命令 buf  是 DISASSOCIATE    
+		if (ap_ctrl_iface_sta_disassociate(wpa_s, buf + 13))                          【121】
 			reply_len = -1;
-	} else if (os_strncmp(buf, "CHAN_SWITCH ", 12) == 0) {
-		if (ap_ctrl_iface_chanswitch(wpa_s, buf + 12))
+	} else if (os_strncmp(buf, "CHAN_SWITCH ", 12) == 0) {  //  如果 命令 buf  是 CHAN_SWITCH      需要输入2个命令参数 
+		if (ap_ctrl_iface_chanswitch(wpa_s, buf + 12))               【122】
 			reply_len = -1;
-	} else if (os_strcmp(buf, "STOP_AP") == 0) {
-		if (wpas_ap_stop_ap(wpa_s))
+	} else if (os_strcmp(buf, "STOP_AP") == 0) {         //  如果 命令 buf  是 STOP_AP 
+		if (wpas_ap_stop_ap(wpa_s))                       【不识别 UNKNOW COMMAND 】  
 			reply_len = -1;
 #endif /* CONFIG_AP */
-	} else if (os_strcmp(buf, "SUSPEND") == 0) {
-		wpas_notify_suspend(wpa_s->global);
-	} else if (os_strcmp(buf, "RESUME") == 0) {
-		wpas_notify_resume(wpa_s->global);
+	} else if (os_strcmp(buf, "SUSPEND") == 0) {  //  如果 命令 buf  是 SUSPEND 
+		wpas_notify_suspend(wpa_s->global);                      【123】
+	} else if (os_strcmp(buf, "RESUME") == 0) {         //  如果 命令 buf  是 RESUME 
+		wpas_notify_resume(wpa_s->global);                              【124】
 #ifdef CONFIG_TESTING_OPTIONS
 	} else if (os_strcmp(buf, "DROP_SA") == 0) {
 		wpa_supplicant_ctrl_iface_drop_sa(wpa_s);
 #endif /* CONFIG_TESTING_OPTIONS */
-	} else if (os_strncmp(buf, "ROAM ", 5) == 0) {
-		if (wpa_supplicant_ctrl_iface_roam(wpa_s, buf + 5))
+	} else if (os_strncmp(buf, "ROAM ", 5) == 0) {          //  如果 命令 buf  是 ROAM 
+		if (wpa_supplicant_ctrl_iface_roam(wpa_s, buf + 5))              【125】
 			reply_len = -1;
-	} else if (os_strncmp(buf, "STA_AUTOCONNECT ", 16) == 0) {
-		wpa_s->auto_reconnect_disabled = atoi(buf + 16) == 0;
-	} else if (os_strncmp(buf, "BSS_EXPIRE_AGE ", 15) == 0) {
-		if (wpa_supplicant_ctrl_iface_bss_expire_age(wpa_s, buf + 15))
+
+	} else if (os_strncmp(buf, "STA_AUTOCONNECT ", 16) == 0) {        //  如果 命令 buf  是 STA_AUTOCONNECT 
+		wpa_s->auto_reconnect_disabled = atoi(buf + 16) == 0;                 【126】  
+            
+	} else if (os_strncmp(buf, "BSS_EXPIRE_AGE ", 15) == 0) {  //  如果 命令 buf  是 BSS_EXPIRE_AGE 
+		if (wpa_supplicant_ctrl_iface_bss_expire_age(wpa_s, buf + 15))       【127】
 			reply_len = -1;
-	} else if (os_strncmp(buf, "BSS_EXPIRE_COUNT ", 17) == 0) {
-		if (wpa_supplicant_ctrl_iface_bss_expire_count(wpa_s,
-							       buf + 17))
+	} else if (os_strncmp(buf, "BSS_EXPIRE_COUNT ", 17) == 0) {     //  如果 命令 buf  是 BSS_EXPIRE_COUNT    需要输入1个命令参数 
+		if (wpa_supplicant_ctrl_iface_bss_expire_count(wpa_s, buf + 17))         【128】 
 			reply_len = -1;
-	} else if (os_strncmp(buf, "BSS_FLUSH ", 10) == 0) {
-		wpa_supplicant_ctrl_iface_bss_flush(wpa_s, buf + 10);
+	} else if (os_strncmp(buf, "BSS_FLUSH ", 10) == 0) {      //  如果 命令 buf  是 BSS_FLUSH   
+		wpa_supplicant_ctrl_iface_bss_flush(wpa_s, buf + 10);                   【129】 
 #ifdef CONFIG_TDLS
-	} else if (os_strncmp(buf, "TDLS_DISCOVER ", 14) == 0) {
-		if (wpa_supplicant_ctrl_iface_tdls_discover(wpa_s, buf + 14))
+	} else if (os_strncmp(buf, "TDLS_DISCOVER ", 14) == 0) {            //  如果 命令 buf  是 TDLS_DISCOVER        
+		if (wpa_supplicant_ctrl_iface_tdls_discover(wpa_s, buf + 14))             【130】
 			reply_len = -1;
-	} else if (os_strncmp(buf, "TDLS_SETUP ", 11) == 0) {
-		if (wpa_supplicant_ctrl_iface_tdls_setup(wpa_s, buf + 11))
+	} else if (os_strncmp(buf, "TDLS_SETUP ", 11) == 0) {                 //  如果 命令 buf  是 TDLS_SETUP   需要输入1个命令参数       
+		if (wpa_supplicant_ctrl_iface_tdls_setup(wpa_s, buf + 11))                 【131】
 			reply_len = -1;
-	} else if (os_strncmp(buf, "TDLS_TEARDOWN ", 14) == 0) {
-		if (wpa_supplicant_ctrl_iface_tdls_teardown(wpa_s, buf + 14))
+	} else if (os_strncmp(buf, "TDLS_TEARDOWN ", 14) == 0) {     //  如果 命令 buf  是 TDLS_TEARDOWN 
+		if (wpa_supplicant_ctrl_iface_tdls_teardown(wpa_s, buf + 14))                   【132】
 			reply_len = -1;
-	} else if (os_strncmp(buf, "TDLS_CHAN_SWITCH ", 17) == 0) {
-		if (wpa_supplicant_ctrl_iface_tdls_chan_switch(wpa_s,
-							       buf + 17))
+	} else if (os_strncmp(buf, "TDLS_CHAN_SWITCH ", 17) == 0) {             //  如果 命令 buf  是 TDLS_CHAN_SWITCH    需要输入2个命令参数           
+		if (wpa_supplicant_ctrl_iface_tdls_chan_switch(wpa_s,buf + 17))                    【133】
 			reply_len = -1;
-	} else if (os_strncmp(buf, "TDLS_CANCEL_CHAN_SWITCH ", 24) == 0) {
-		if (wpa_supplicant_ctrl_iface_tdls_cancel_chan_switch(wpa_s,
-								      buf + 24))
+	} else if (os_strncmp(buf, "TDLS_CANCEL_CHAN_SWITCH ", 24) == 0) {   //  如果 命令 buf  是 TDLS_CANCEL_CHAN_SWITCH    需要输入2个命令参数    
+		if (wpa_supplicant_ctrl_iface_tdls_cancel_chan_switch(wpa_s,buf + 24))            【134】
 			reply_len = -1;
-	} else if (os_strncmp(buf, "TDLS_LINK_STATUS ", 17) == 0) {
-		reply_len = wpa_supplicant_ctrl_iface_tdls_link_status(
-			wpa_s, buf + 17, reply, reply_size);
+	} else if (os_strncmp(buf, "TDLS_LINK_STATUS ", 17) == 0) {  //  如果 命令 buf  是 TDLS_LINK_STATUS    需要输入1个命令参数    
+		reply_len = wpa_supplicant_ctrl_iface_tdls_link_status(wpa_s, buf + 17, reply, reply_size);    【135】
 #endif /* CONFIG_TDLS */
-	} else if (os_strcmp(buf, "WMM_AC_STATUS") == 0) {
-		reply_len = wpas_wmm_ac_status(wpa_s, reply, reply_size);
-	} else if (os_strncmp(buf, "WMM_AC_ADDTS ", 13) == 0) {
-		if (wmm_ac_ctrl_addts(wpa_s, buf + 13))
+	} else if (os_strcmp(buf, "WMM_AC_STATUS") == 0) {  //  如果 命令 buf  是 WMM_AC_STATUS    需要输入1个命令参数    
+		reply_len = wpas_wmm_ac_status(wpa_s, reply, reply_size);             【136】
+
+	} else if (os_strncmp(buf, "WMM_AC_ADDTS ", 13) == 0) {  //  如果 命令 buf  是 WMM_AC_ADDTS    需要输入3个命令参数    
+		if (wmm_ac_ctrl_addts(wpa_s, buf + 13))                                       【137】
 			reply_len = -1;
-	} else if (os_strncmp(buf, "WMM_AC_DELTS ", 13) == 0) {
-		if (wmm_ac_ctrl_delts(wpa_s, buf + 13))
+	} else if (os_strncmp(buf, "WMM_AC_DELTS ", 13) == 0) {         //  如果 命令 buf  是 WMM_AC_DELTS    需要输入3个命令参数   
+		if (wmm_ac_ctrl_delts(wpa_s, buf + 13))                                            【138】
 			reply_len = -1;
-	} else if (os_strncmp(buf, "SIGNAL_POLL", 11) == 0) {
-		reply_len = wpa_supplicant_signal_poll(wpa_s, reply,
-						       reply_size);
-	} else if (os_strncmp(buf, "SIGNAL_MONITOR", 14) == 0) {
-		if (wpas_ctrl_iface_signal_monitor(wpa_s, buf + 14))
+	} else if (os_strncmp(buf, "SIGNAL_POLL", 11) == 0) {                     //  如果 命令 buf  是 SIGNAL_POLL    需要输入3个命令参数          
+		reply_len = wpa_supplicant_signal_poll(wpa_s, reply,reply_size);                            【139】
+
+	} else if (os_strncmp(buf, "SIGNAL_MONITOR", 14) == 0) {        //  如果 命令 buf  是 SIGNAL_MONITOR    需要输入3个命令参数  
+		if (wpas_ctrl_iface_signal_monitor(wpa_s, buf + 14))                             【140】              
 			reply_len = -1;
-	} else if (os_strncmp(buf, "PKTCNT_POLL", 11) == 0) {
-		reply_len = wpa_supplicant_pktcnt_poll(wpa_s, reply,
-						       reply_size);
+	} else if (os_strncmp(buf, "PKTCNT_POLL", 11) == 0) {         //  如果 命令 buf  是 PKTCNT_POLL    
+		reply_len = wpa_supplicant_pktcnt_poll(wpa_s, reply,reply_size);             【141】  
 #ifdef CONFIG_AUTOSCAN
-	} else if (os_strncmp(buf, "AUTOSCAN ", 9) == 0) {
+	} else if (os_strncmp(buf, "AUTOSCAN ", 9) == 0) {         【不识别 UNKNOW COMMAND 】  
 		if (wpa_supplicant_ctrl_iface_autoscan(wpa_s, buf + 9))
 			reply_len = -1;
 #endif /* CONFIG_AUTOSCAN */
-	} else if (os_strcmp(buf, "DRIVER_FLAGS") == 0) {
-		reply_len = wpas_ctrl_iface_driver_flags(wpa_s, reply,
-							 reply_size);
+	} else if (os_strcmp(buf, "DRIVER_FLAGS") == 0) {                   //  如果 命令 buf  是 DRIVER_FLAGS    
+		reply_len = wpas_ctrl_iface_driver_flags(wpa_s, reply,reply_size);                【142】
 #ifdef ANDROID
-	} else if (os_strncmp(buf, "DRIVER ", 7) == 0) {
-		reply_len = wpa_supplicant_driver_cmd(wpa_s, buf + 7, reply,
-						      reply_size);
+	} else if (os_strncmp(buf, "DRIVER ", 7) == 0) {                              //  如果 命令 buf  是 DRIVER    
+		reply_len = wpa_supplicant_driver_cmd(wpa_s, buf + 7, reply,reply_size);           【143】
 #endif /* ANDROID */
-	} else if (os_strncmp(buf, "VENDOR ", 7) == 0) {
-		reply_len = wpa_supplicant_vendor_cmd(wpa_s, buf + 7, reply,
-						      reply_size);
-	} else if (os_strcmp(buf, "REAUTHENTICATE") == 0) {
-		pmksa_cache_clear_current(wpa_s->wpa);
-		eapol_sm_request_reauth(wpa_s->eapol);
+	} else if (os_strncmp(buf, "VENDOR ", 7) == 0) {                                      //  如果 命令 buf  是 VENDOR   
+		reply_len = wpa_supplicant_vendor_cmd(wpa_s, buf + 7, reply, reply_size);                             【144】
+	} else if (os_strcmp(buf, "REAUTHENTICATE") == 0) {                 //  如果 命令 buf  是 REAUTHENTICATE   
+		pmksa_cache_clear_current(wpa_s->wpa);            【145】
+		eapol_sm_request_reauth(wpa_s->eapol);             【146】
 #ifdef CONFIG_WNM
-	} else if (os_strncmp(buf, "WNM_SLEEP ", 10) == 0) {
+	} else if (os_strncmp(buf, "WNM_SLEEP ", 10) == 0) {  【不识别 UNKNOW COMMAND 】  
 		if (wpas_ctrl_iface_wnm_sleep(wpa_s, buf + 10))
 			reply_len = -1;
-	} else if (os_strncmp(buf, "WNM_BSS_QUERY ", 14) == 0) {
-		if (wpas_ctrl_iface_wnm_bss_query(wpa_s, buf + 14))
+	} else if (os_strncmp(buf, "WNM_BSS_QUERY ", 14) == 0) {      //  如果 命令 buf  是 WNM_BSS_QUERY    
+		if (wpas_ctrl_iface_wnm_bss_query(wpa_s, buf + 14))                    【147】
 				reply_len = -1;
 #endif /* CONFIG_WNM */
-	} else if (os_strcmp(buf, "FLUSH") == 0) {
-		wpa_supplicant_ctrl_iface_flush(wpa_s);
-	} else if (os_strncmp(buf, "RADIO_WORK ", 11) == 0) {
-		reply_len = wpas_ctrl_radio_work(wpa_s, buf + 11, reply,
-						 reply_size);
+	} else if (os_strcmp(buf, "FLUSH") == 0) {            //  如果 命令 buf  是 FLUSH   
+		wpa_supplicant_ctrl_iface_flush(wpa_s);            【148】
+
+	} else if (os_strncmp(buf, "RADIO_WORK ", 11) == 0) {                        //  如果 命令 buf  是 RADIO_WORK     需要输入1个命令参数    
+		reply_len = wpas_ctrl_radio_work(wpa_s, buf + 11, reply, reply_size);            【149】
+
 #ifdef CONFIG_TESTING_OPTIONS
 	} else if (os_strncmp(buf, "MGMT_TX ", 8) == 0) {
 		if (wpas_ctrl_iface_mgmt_tx(wpa_s, buf + 8) < 0)
@@ -3012,35 +2989,35 @@ char * wpa_supplicant_ctrl_iface_process(struct wpa_supplicant *wpa_s, char *buf
 		if (wpas_ctrl_resend_assoc(wpa_s) < 0)
 			reply_len = -1;
 #endif /* CONFIG_TESTING_OPTIONS */
-	} else if (os_strncmp(buf, "VENDOR_ELEM_ADD ", 16) == 0) {
-		if (wpas_ctrl_vendor_elem_add(wpa_s, buf + 16) < 0)
+	} else if (os_strncmp(buf, "VENDOR_ELEM_ADD ", 16) == 0) {    //  如果 命令 buf  是 VENDOR_ELEM_ADD     需要输入2个命令参数
+		if (wpas_ctrl_vendor_elem_add(wpa_s, buf + 16) < 0)                         【150】
 			reply_len = -1;
-	} else if (os_strncmp(buf, "VENDOR_ELEM_GET ", 16) == 0) {
-		reply_len = wpas_ctrl_vendor_elem_get(wpa_s, buf + 16, reply,
-						      reply_size);
-	} else if (os_strncmp(buf, "VENDOR_ELEM_REMOVE ", 19) == 0) {
-		if (wpas_ctrl_vendor_elem_remove(wpa_s, buf + 19) < 0)
+	} else if (os_strncmp(buf, "VENDOR_ELEM_GET ", 16) == 0) {           //  如果 命令 buf  是 VENDOR_ELEM_GET     需要输入2个命令参数
+		reply_len = wpas_ctrl_vendor_elem_get(wpa_s, buf + 16, reply, reply_size);         【151】
+
+	} else if (os_strncmp(buf, "VENDOR_ELEM_REMOVE ", 19) == 0) {  //  如果 命令 buf  是 VENDOR_ELEM_REMOVE     需要输入2个命令参数
+		if (wpas_ctrl_vendor_elem_remove(wpa_s, buf + 19) < 0)                              【152】
 			reply_len = -1;
-	} else if (os_strncmp(buf, "NEIGHBOR_REP_REQUEST", 20) == 0) {
-		if (wpas_ctrl_iface_send_neighbor_rep(wpa_s, buf + 20))
+	} else if (os_strncmp(buf, "NEIGHBOR_REP_REQUEST", 20) == 0) {    //  如果 命令 buf  是 NEIGHBOR_REP_REQUEST   
+		if (wpas_ctrl_iface_send_neighbor_rep(wpa_s, buf + 20))                               【153】
 			reply_len = -1;
-	} else if (os_strcmp(buf, "ERP_FLUSH") == 0) {
-		wpas_ctrl_iface_erp_flush(wpa_s);
-	} else if (os_strncmp(buf, "MAC_RAND_SCAN ", 14) == 0) {
-		if (wpas_ctrl_iface_mac_rand_scan(wpa_s, buf + 14))
+	} else if (os_strcmp(buf, "ERP_FLUSH") == 0) {           //  如果 命令 buf  是 ERP_FLUSH   
+		wpas_ctrl_iface_erp_flush(wpa_s);                                    【154】
+
+	} else if (os_strncmp(buf, "MAC_RAND_SCAN ", 14) == 0) {     //  如果 命令 buf  是 MAC_RAND_SCAN   
+		if (wpas_ctrl_iface_mac_rand_scan(wpa_s, buf + 14))                       【155】
 			reply_len = -1;
-	} else if (os_strncmp(buf, "GET_PREF_FREQ_LIST ", 19) == 0) {
-		reply_len = wpas_ctrl_iface_get_pref_freq_list(
-			wpa_s, buf + 19, reply, reply_size);
+	} else if (os_strncmp(buf, "GET_PREF_FREQ_LIST ", 19) == 0) {    //  如果 命令 buf  是 GET_PREF_FREQ_LIST  
+		reply_len = wpas_ctrl_iface_get_pref_freq_list(wpa_s, buf + 19, reply, reply_size);   【156】
 #ifdef CONFIG_FILS
-	} else if (os_strncmp(buf, "FILS_HLP_REQ_ADD ", 17) == 0) {
+	} else if (os_strncmp(buf, "FILS_HLP_REQ_ADD ", 17) == 0) {         【不识别 UNKNOW COMMAND 】  
 		if (wpas_ctrl_iface_fils_hlp_req_add(wpa_s, buf + 17))
 			reply_len = -1;
-	} else if (os_strcmp(buf, "FILS_HLP_REQ_FLUSH") == 0) {
+	} else if (os_strcmp(buf, "FILS_HLP_REQ_FLUSH") == 0) {   【不识别 UNKNOW COMMAND 】 
 		wpas_flush_fils_hlp_req(wpa_s);
 #endif /* CONFIG_FILS */
 #ifdef CONFIG_DPP
-	} else if (os_strncmp(buf, "DPP_QR_CODE ", 12) == 0) {
+	} else if (os_strncmp(buf, "DPP_QR_CODE ", 12) == 0) {       【不识别 UNKNOW COMMAND 】 
 		int res;
 
 		res = wpas_dpp_qr_code(wpa_s, buf + 12);
@@ -3051,10 +3028,10 @@ char * wpa_supplicant_ctrl_iface_process(struct wpa_supplicant *wpa_s, char *buf
 			if (os_snprintf_error(reply_size, reply_len))
 				reply_len = -1;
 		}
-	} else if (os_strncmp(buf, "DPP_BOOTSTRAP_GEN ", 18) == 0) {
+	} else if (os_strncmp(buf, "DPP_BOOTSTRAP_GEN ", 18) == 0) {     //  如果 命令 buf  是 DPP_BOOTSTRAP_GEN     需要输入1个命令参数
 		int res;
 
-		res = wpas_dpp_bootstrap_gen(wpa_s, buf + 18);
+		res = wpas_dpp_bootstrap_gen(wpa_s, buf + 18);                          【157】
 		if (res < 0) {
 			reply_len = -1;
 		} else {
@@ -3062,13 +3039,12 @@ char * wpa_supplicant_ctrl_iface_process(struct wpa_supplicant *wpa_s, char *buf
 			if (os_snprintf_error(reply_size, reply_len))
 				reply_len = -1;
 		}
-	} else if (os_strncmp(buf, "DPP_BOOTSTRAP_REMOVE ", 21) == 0) {
-		if (wpas_dpp_bootstrap_remove(wpa_s, buf + 21) < 0)
+	} else if (os_strncmp(buf, "DPP_BOOTSTRAP_REMOVE ", 21) == 0) {      //  如果 命令 buf  是 DPP_BOOTSTRAP_REMOVE      需要输入1个命令参数
+		if (wpas_dpp_bootstrap_remove(wpa_s, buf + 21) < 0)                                【158】
 			reply_len = -1;
-	} else if (os_strncmp(buf, "DPP_BOOTSTRAP_GET_URI ", 22) == 0) {
+	} else if (os_strncmp(buf, "DPP_BOOTSTRAP_GET_URI ", 22) == 0) {            //  如果 命令 buf  是 DPP_BOOTSTRAP_GET_URI     需要输入1个命令参数
 		const char *uri;
-
-		uri = wpas_dpp_bootstrap_get_uri(wpa_s, atoi(buf + 22));
+		uri = wpas_dpp_bootstrap_get_uri(wpa_s, atoi(buf + 22));                             【159】
 		if (!uri) {
 			reply_len = -1;
 		} else {
@@ -3076,21 +3052,21 @@ char * wpa_supplicant_ctrl_iface_process(struct wpa_supplicant *wpa_s, char *buf
 			if (os_snprintf_error(reply_size, reply_len))
 				reply_len = -1;
 		}
-	} else if (os_strncmp(buf, "DPP_BOOTSTRAP_INFO ", 19) == 0) {
-		reply_len = wpas_dpp_bootstrap_info(wpa_s, atoi(buf + 19),
-						    reply, reply_size);
-	} else if (os_strncmp(buf, "DPP_AUTH_INIT ", 14) == 0) {
-		if (wpas_dpp_auth_init(wpa_s, buf + 13) < 0)
-			reply_len = -1;
-	} else if (os_strncmp(buf, "DPP_LISTEN ", 11) == 0) {
-		if (wpas_dpp_listen(wpa_s, buf + 11) < 0)
-			reply_len = -1;
-	} else if (os_strcmp(buf, "DPP_STOP_LISTEN") == 0) {
-		wpas_dpp_listen_stop(wpa_s);
-	} else if (os_strncmp(buf, "DPP_CONFIGURATOR_ADD", 20) == 0) {
-		int res;
+	} else if (os_strncmp(buf, "DPP_BOOTSTRAP_INFO ", 19) == 0) {              //  如果 命令 buf  是 DPP_BOOTSTRAP_INFO     需要输入1个命令参数 
+		reply_len = wpas_dpp_bootstrap_info(wpa_s, atoi(buf + 19), reply, reply_size);           【160】
 
-		res = wpas_dpp_configurator_add(wpa_s, buf + 20);
+	} else if (os_strncmp(buf, "DPP_AUTH_INIT ", 14) == 0) {    //  如果 命令 buf  是 DPP_AUTH_INIT     需要输入1个命令参数 
+		if (wpas_dpp_auth_init(wpa_s, buf + 13) < 0)                              【161】
+			reply_len = -1;
+	} else if (os_strncmp(buf, "DPP_LISTEN ", 11) == 0) {    //  如果 命令 buf  是 DPP_LISTEN     需要输入1个命令参数 
+		if (wpas_dpp_listen(wpa_s, buf + 11) < 0)                                  【162】
+			reply_len = -1;
+	} else if (os_strcmp(buf, "DPP_STOP_LISTEN") == 0) {            //  如果 命令 buf  是 DPP_STOP_LISTEN     需要输入1个命令参数 
+		wpas_dpp_listen_stop(wpa_s);                                                    【163】
+
+	} else if (os_strncmp(buf, "DPP_CONFIGURATOR_ADD", 20) == 0) {    //  如果 命令 buf  是 DPP_CONFIGURATOR_ADD     
+		int res;
+		res = wpas_dpp_configurator_add(wpa_s, buf + 20);                            【164】
 		if (res < 0) {
 			reply_len = -1;
 		} else {
@@ -3098,16 +3074,15 @@ char * wpa_supplicant_ctrl_iface_process(struct wpa_supplicant *wpa_s, char *buf
 			if (os_snprintf_error(reply_size, reply_len))
 				reply_len = -1;
 		}
-	} else if (os_strncmp(buf, "DPP_CONFIGURATOR_REMOVE ", 24) == 0) {
-		if (wpas_dpp_configurator_remove(wpa_s, buf + 24) < 0)
+	} else if (os_strncmp(buf, "DPP_CONFIGURATOR_REMOVE ", 24) == 0) {  //  如果 命令 buf  是 DPP_CONFIGURATOR_REMOVE     
+		if (wpas_dpp_configurator_remove(wpa_s, buf + 24) < 0)                          【165】
 			reply_len = -1;
-	} else if (os_strncmp(buf, "DPP_CONFIGURATOR_SIGN ", 22) == 0) {
-		if (wpas_dpp_configurator_sign(wpa_s, buf + 22) < 0)
+	} else if (os_strncmp(buf, "DPP_CONFIGURATOR_SIGN ", 22) == 0) {   
+		if (wpas_dpp_configurator_sign(wpa_s, buf + 22) < 0)                               【不识别 UNKNOW COMMAND 】 
 			reply_len = -1;
-	} else if (os_strncmp(buf, "DPP_PKEX_ADD ", 13) == 0) {
+	} else if (os_strncmp(buf, "DPP_PKEX_ADD ", 13) == 0) {    //  如果 命令 buf  是 DPP_PKEX_ADD     
 		int res;
-
-		res = wpas_dpp_pkex_add(wpa_s, buf + 12);
+		res = wpas_dpp_pkex_add(wpa_s, buf + 12);                        【166】
 		if (res < 0) {
 			reply_len = -1;
 		} else {
@@ -3115,8 +3090,8 @@ char * wpa_supplicant_ctrl_iface_process(struct wpa_supplicant *wpa_s, char *buf
 			if (os_snprintf_error(reply_size, reply_len))
 				reply_len = -1;
 		}
-	} else if (os_strncmp(buf, "DPP_PKEX_REMOVE ", 16) == 0) {
-		if (wpas_dpp_pkex_remove(wpa_s, buf + 16) < 0)
+	} else if (os_strncmp(buf, "DPP_PKEX_REMOVE ", 16) == 0) {   //  如果 命令 buf  是 DPP_PKEX_REMOVE     
+		if (wpas_dpp_pkex_remove(wpa_s, buf + 16) < 0)                      【167】
 			reply_len = -1;
 #endif /* CONFIG_DPP */
 	} else {
@@ -3135,7 +3110,175 @@ char * wpa_supplicant_ctrl_iface_process(struct wpa_supplicant *wpa_s, char *buf
 
 
 ```
-
+ ## wpa_hexdump_ascii_key
+## wpas_ctrl_cmd_debug_level
+## wpa_dbg
+## wpa_debug_reopen_file
+## wpa_sm_get_mib
+## eapol_sm_get_mib
+## wpa_supplicant_ctrl_iface_status
+## wpas_ctrl_iface_pmksa
+## wpas_ctrl_iface_pmksa_flush
+## wpa_supplicant_ctrl_iface_set
+## wpa_config_dump_values
+## wpa_supplicant_ctrl_iface_get
+## eapol_sm_notify_logoff(on)
+## eapol_sm_notify_logoff(off)
+## wpas_request_connection
+## wpa_supplicant_ctrl_iface_preauth
+## wpa_supplicant_ctrl_iface_ft_ds
+## wpa_supplicant_ctrl_iface_wps_pbc
+## wpa_supplicant_ctrl_iface_wps_pin
+## wpa_supplicant_ctrl_iface_wps_check_pin
+## wpas_wps_cancel
+## wpa_supplicant_ctrl_iface_wps_nfc
+## wpa_supplicant_ctrl_iface_wps_nfc_config_token
+## wpa_supplicant_ctrl_iface_wps_nfc_token
+## wpa_supplicant_ctrl_iface_wps_nfc_tag_read
+## wpas_ctrl_nfc_get_handover_req
+## wpas_ctrl_nfc_get_handover_sel
+## wpas_ctrl_nfc_report_handover
+## wpa_supplicant_ctrl_iface_wps_reg
+## wpas_wps_er_start
+## wpas_wps_er_stop
+## wpa_supplicant_ctrl_iface_wps_er_pin
+## wpas_wps_er_pbc
+## wpa_supplicant_ctrl_iface_wps_er_learn
+## wpa_supplicant_ctrl_iface_wps_er_set_config
+## wpa_supplicant_ctrl_iface_wps_er_config
+## wpa_supplicant_ctrl_iface_wps_er_nfc_config_token
+## wpa_supplicant_ctrl_iface_ibss_rsn
+## wpa_supplicant_ctrl_iface_mesh_interface_add
+## wpa_supplicant_ctrl_iface_mesh_group_remove
+## wpa_supplicant_ctrl_iface_mesh_peer_remove
+## wpa_supplicant_ctrl_iface_mesh_peer_add
+## p2p_ctrl_find
+## wpas_p2p_stop_find
+## p2p_ctrl_asp_provision
+## p2p_ctrl_asp_provision_resp
+## p2p_ctrl_connect
+## p2p_ctrl_listen
+## wpas_p2p_group_remove
+## p2p_ctrl_group_add
+## p2p_ctrl_group_member
+## p2p_get_passphrase
+## p2p_ctrl_serv_disc_req
+## p2p_ctrl_serv_disc_cancel_req
+## p2p_ctrl_serv_disc_resp
+## wpas_p2p_sd_service_update
+## p2p_ctrl_serv_disc_external
+## wpas_p2p_service_flush
+## p2p_ctrl_service_add
+## p2p_ctrl_service_del
+## p2p_ctrl_service_replace
+## p2p_ctrl_reject
+## p2p_ctrl_invite
+## p2p_ctrl_peer
+## p2p_ctrl_set
+## p2p_ctrl_flush
+## wpas_p2p_unauthorize
+## wpas_p2p_cancel
+## p2p_ctrl_presence_req
+## p2p_ctrl_ext_listen
+## p2p_ctrl_remove_client
+## p2p_ctrl_iface_p2p_lo_start
+## wpas_p2p_lo_stop
+## wifi_display_subelem_set
+## wifi_display_subelem_get
+## interworking_fetch_anqp
+## interworking_stop_fetch_anqp
+## ctrl_interworking_select
+## ctrl_interworking_connect
+## ctrl_interworking_connect
+## get_anqp
+## gas_request
+## gas_response_get
+## get_hs20_anqp
+## hs20_icon_request
+## hs20_fetch_osu
+## hs20_cancel_fetch_osu
+## wpa_supplicant_ctrl_iface_ctrl_rsp
+## eloop_register_timeout
+## wpa_supplicant_reload_configuration
+## wpa_supplicant_terminate_proc
+## wpa_supplicant_ctrl_iface_bssid
+## wpa_supplicant_ctrl_iface_blacklist
+## wpa_supplicant_ctrl_iface_log_level
+## wpa_supplicant_ctrl_iface_list_networks
+## wpas_request_disconnection
+## wpas_ctrl_scan
+## wpa_supplicant_ctrl_iface_scan_results
+## wpas_abort_ongoing_scan
+## wpa_supplicant_ctrl_iface_select_network
+## wpa_supplicant_ctrl_iface_enable_network
+## wpa_supplicant_ctrl_iface_disable_network
+## wpa_supplicant_ctrl_iface_add_network
+## wpa_supplicant_ctrl_iface_remove_network
+## wpa_supplicant_ctrl_iface_set_network
+## wpa_supplicant_ctrl_iface_get_network
+## wpa_supplicant_ctrl_iface_dup_network
+## wpa_supplicant_ctrl_iface_list_creds
+## wpa_supplicant_ctrl_iface_add_cred
+## wpa_supplicant_ctrl_iface_remove_cred
+## wpa_supplicant_ctrl_iface_set_cred
+## wpa_supplicant_ctrl_iface_get_cred
+## wpa_supplicant_ctrl_iface_save_config
+## wpa_supplicant_ctrl_iface_get_capability
+## wpa_supplicant_ctrl_iface_ap_scan
+## wpa_supplicant_ctrl_iface_scan_interval
+## wpa_supplicant_global_iface_list
+## wpa_supplicant_ctrl_iface_bss
+## ap_ctrl_iface_sta
+## ap_ctrl_iface_sta_deauthenticate
+## ap_ctrl_iface_sta_disassociate
+## ap_ctrl_iface_chanswitch
+## wpas_notify_suspend
+## wpas_notify_resume
+## wpa_supplicant_ctrl_iface_roam
+## atoi(buf + 16)
+## wpa_supplicant_ctrl_iface_bss_expire_age
+## wpa_supplicant_ctrl_iface_bss_expire_count
+## wpa_supplicant_ctrl_iface_bss_flush
+## wpa_supplicant_ctrl_iface_tdls_discover
+## wpa_supplicant_ctrl_iface_tdls_setup
+## wpa_supplicant_ctrl_iface_tdls_teardown
+## wpa_supplicant_ctrl_iface_tdls_chan_switch
+## wpa_supplicant_ctrl_iface_tdls_cancel_chan_switch
+## wpa_supplicant_ctrl_iface_tdls_link_status
+## wpas_wmm_ac_status
+## wmm_ac_ctrl_addts
+## wmm_ac_ctrl_delts
+## wpa_supplicant_signal_poll
+## wpas_ctrl_iface_signal_monitor
+## wpa_supplicant_pktcnt_poll
+## wpas_ctrl_iface_driver_flags
+## wpa_supplicant_driver_cmd
+## wpa_supplicant_vendor_cmd
+## pmksa_cache_clear_current
+## eapol_sm_request_reauth
+## wpas_ctrl_iface_wnm_bss_query
+## wpa_supplicant_ctrl_iface_flush
+## wpas_ctrl_radio_work
+## wpas_ctrl_vendor_elem_add
+## wpas_ctrl_vendor_elem_get
+## wpas_ctrl_vendor_elem_remove
+## wpas_ctrl_iface_send_neighbor_rep
+## wpas_ctrl_iface_erp_flush
+## wpas_ctrl_iface_mac_rand_scan
+## wpas_ctrl_iface_get_pref_freq_list
+## wpas_dpp_bootstrap_gen
+## wpas_dpp_bootstrap_remove
+## wpas_dpp_bootstrap_get_uri
+## wpas_dpp_bootstrap_info
+## wpas_dpp_auth_init
+## wpas_dpp_listen
+## wpas_dpp_listen_stop
+## wpas_dpp_configurator_add
+## wpas_dpp_configurator_remove
+## wpas_dpp_pkex_add
+## wpas_dpp_pkex_remove
+## wpa_supplicant_ctrl_iface_mesh_group_add
+ 
 
 
 
@@ -4188,3 +4331,1259 @@ struct ctrl_iface_global_priv {
 
 
 <img src="//../zimage/wireless/wifi/09_supplicant/ctrl_iface_global_priv.jpg" width = "50%" height="50%"/>
+
+
+# wpa_cli 命令
+
+```
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 IFNAME
+wlan0
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 PING
+PONG
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 NOTE
+Invalid NOTE command - at least 1 argument is required.
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 NOTE wlan
+ok
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 MIB
+dot11RSNAOptionImplemented=TRUE
+dot11RSNAPreauthenticationImplemented=TRUE
+dot11RSNAEnabled=FALSE
+dot11RSNAPreauthenticationEnabled=FALSE
+dot11RSNAConfigVersion=1
+dot11RSNAConfigPairwiseKeysSupported=5
+dot11RSNAConfigGroupCipherSize=0
+dot11RSNAConfigPMKLifetime=43200
+dot11RSNAConfigPMKReauthThreshold=70
+dot11RSNAConfigNumberOfPTKSAReplayCounters=1
+dot11RSNAConfigSATimeout=60
+dot11RSNAAuthenticationSuiteSelected=00-00-00-0
+dot11RSNAPairwiseCipherSelected=00-00-00-0
+dot11RSNAGroupCipherSelected=00-00-00-0
+dot11RSNAPMKIDUsed=
+dot11RSNAAuthenticationSuiteRequested=00-00-00-0
+dot11RSNAPairwiseCipherRequested=00-00-00-0
+dot11RSNAGroupCipherRequested=00-00-00-0
+dot11RSNAConfigNumberOfGTKSAReplayCounters=0
+dot11RSNA4WayHandshakeFailures=0
+dot1xSuppPaeState=1
+dot1xSuppHeldPeriod=60
+dot1xSuppAuthPeriod=30
+dot1xSuppStartPeriod=30
+dot1xSuppMaxStart=3
+dot1xSuppSuppControlledPortStatus=Unauthorized
+dot1xSuppBackendPaeState=1
+dot1xSuppEapolFramesRx=0
+dot1xSuppEapolFramesTx=0
+dot1xSuppEapolStartFramesTx=0
+dot1xSuppEapolLogoffFramesTx=0
+dot1xSuppEapolRespFramesTx=0
+dot1xSuppEapolReqIdFramesRx=0
+dot1xSuppEapolReqFramesRx=0
+dot1xSuppInvalidEapolFramesRx=0
+dot1xSuppEapLengthErrorFramesRx=0
+dot1xSuppLastEapolFrameVersion=0
+dot1xSuppLastEapolFrameSource=00:00:00:00:00:00
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 STATUS
+bssid=18:64:72:21:86:54
+freq=5745
+ssid=xxx-guest
+id=0
+id_str=%7B%22configKey%22%3A%22%5C%22xxx-guest%5C%22NONE%22%2C%22creatorUid%22%3A%221000%22%7D
+mode=station
+pairwise_cipher=NONE
+group_cipher=NONE
+key_mgmt=NONE
+wpa_state=COMPLETED
+ip_address=10.104.218.64
+address=c0:8c:71:ac:da:33
+uuid=c1d4e1cd-6d7e-5c2b-a2db-d731c1decc57
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 PMKSA
+Index / AA / PMKID / expiration (in seconds) / opportunistic
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 PMKSA_FLUSH
+OK
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 SET
+Invalid SET command - at least 2 arguments are required.
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 SET passive_scan 1
+OK
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 DUMP
+ctrl_interface=/data/vendor/wifi/wpa/sockets
+ctrl_interface_group=null
+eapol_version=1
+ap_scan=1
+user_mpm=1
+max_peer_links=99
+mesh_max_inactivity=300
+dot11RSNASAERetransPeriod=1000
+disable_scan_offload=1
+fast_reauth=1
+opensc_engine_path=null
+pkcs11_engine_path=null
+pkcs11_module_path=null
+openssl_ciphers=null
+pcsc_reader=null
+pcsc_pin=null
+external_sim=1
+driver_param=null
+dot11RSNAConfigPMKLifetime=0
+dot11RSNAConfigPMKReauthThreshold=0
+dot11RSNAConfigSATimeout=0
+update_config=1
+auto_uuid=0
+device_name=foles
+manufacturer=motorola
+model_name=Moto Z3 Play
+model_number=Moto Z3 Play
+serial_number=NNBA260199
+config_methods=display push_button virtual_push_button physical_display
+wps_cred_processing=0
+p2p_listen_reg_class=0
+p2p_listen_channel=0
+p2p_oper_reg_class=0
+p2p_oper_channel=0
+p2p_go_intent=7
+p2p_ssid_postfix=null
+persistent_reconnect=0
+p2p_intra_bss=1
+p2p_group_idle=0
+p2p_go_freq_change_policy=2
+p2p_passphrase_len=0
+p2p_add_cli_chan=1
+p2p_optimize_listen_chan=0
+p2p_go_ht40=0
+p2p_go_vht=0
+p2p_disabled=1
+p2p_go_ctwindow=0
+p2p_no_group_iface=1
+p2p_ignore_shared_freq=0
+ip_addr_go=0.0.0.0
+ip_addr_mask=0.0.0.0
+ip_addr_start=0.0.0.0
+ip_addr_end=0.0.0.0
+p2p_cli_probe=0
+bss_max_count=400
+bss_expiration_age=180
+bss_expiration_scan_count=2
+filter_ssids=0
+filter_rssi=0
+max_num_sta=128
+ap_isolate=0
+disassoc_low_ack=0
+hs20=0
+interworking=1
+access_network_type=15
+go_interworking=0
+go_access_network_type=0
+go_internet=0
+go_venue_group=0
+go_venue_type=0
+pbc_in_m1=0
+autoscan=null
+wps_nfc_dev_pw_id=0
+ext_password_backend=null
+p2p_go_max_inactivity=300
+auto_interworking=0
+okc=0
+pmf=1
+dtim_period=0
+beacon_int=0
+ignore_old_scan_res=0
+scan_cur_freq=0
+sched_scan_interval=0
+sched_scan_start_delay=0
+tdls_external_control=1
+osu_dir=null
+wowlan_triggers=magic_pkt
+p2p_search_delay=500
+mac_addr=0
+rand_addr_lifetime=60
+preassoc_mac_addr=0
+key_mgmt_offload=1
+passive_scan=1
+reassoc_same_bss_optim=0
+wps_priority=0
+fst_group_id=null
+fst_priority=0
+fst_llt=0
+cert_in_cb=1
+wpa_rsc_relaxation=1
+sched_scan_plans=null
+gas_address3=0
+ftm_responder=0
+ftm_initiator=0
+gas_rand_addr_lifetime=60
+gas_rand_mac_addr=0
+dpp_config_processing=0
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 GET
+Invalid GET command - at least 1 argument is required.
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 GET passive_scan
+1
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 LOGON
+OK
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 LOGOFF
+OK
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 REASSOCIATE
+OK
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 REATTACH
+OK
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 RECONNECT
+OK
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 PREAUTH
+Invalid PREAUTH command - at least 1 argument is required.
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 PREAUTH ssid
+FAIL
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 FT_DS
+Invalid FT_DS command - at least 1 argument is required.
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 FT_DS ssid
+FAIL
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 WPS_PBC
+OK
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 WPS_PBC ssid     ## 可跟输入参数
+FAIL
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 WPS_PIN
+Invalid WPS_PIN command: need one or two arguments:
+- BSSID: use 'any' to select any
+- PIN: optional, used only with devices that have no display
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 WPS_PIN any
+42142003
+
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 WPS_CHECK_PIN 
+Invalid WPS_CHECK_PIN command - at least 1 argument is required.
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 WPS_CHECK_PIN 42142003
+42142003
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 WPS_CHECK_PIN  ssid
+FAIL
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 WPS_CANCEL
+OK
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 WPS_NFC
+FAIL
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 WPS_NFC sss  ## 可跟输入参数
+FAIL
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 WPS_NFC_CONFIG_TOKEN
+Invalid WPS_NFC_CONFIG_TOKEN command - at least 1 argument is required.
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 WPS_NFC_CONFIG_TOKEN ssid    ## 必须要输入参数
+FAIL
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 WPS_NFC_TOKEN
+Invalid WPS_NFC_TOKEN command - at least 1 argument is required.
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 WPS_NFC_TOKEN ssid  ## 必须要输入参数
+FAIL
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 WPS_NFC_TAG_READ
+Invalid 'wps_nfc_tag_read' command - one argument is required.
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 WPS_NFC_TAG_READ ssid  ## 必须要输入参数
+FAIL
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 NFC_GET_HANDOVER_REQ
+Invalid NFC_GET_HANDOVER_REQ command - at least 2 arguments are required.
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 NFC_GET_HANDOVER_REQ ssid
+Invalid NFC_GET_HANDOVER_REQ command - at least 2 arguments are required.
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 NFC_GET_HANDOVER_REQ ssid 12  ## 必须要输入2个参数
+FAIL
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 NFC_GET_HANDOVER_SEL
+Invalid NFC_GET_HANDOVER_REQ command - at least 2 arguments are required.
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 NFC_GET_HANDOVER_SEL ssid 12   ## 必须要输入2个参数
+FAIL
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 NFC_REPORT_HANDOVER
+Invalid NFC_REPORT_HANDOVER command - at least 4 arguments are required.
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 NFC_REPORT_HANDOVER 1 1 1  1  ## 必须要输入5个参数
+FAIL
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 WPS_REG
+Invalid WPS_REG command: need two arguments:
+- BSSID of the target AP
+- AP PIN
+Alternatively, six arguments can be used to reconfigure the AP:
+- BSSID of the target AP
+- AP PIN
+- new SSID
+- new auth (OPEN, WPAPSK, WPA2PSK)
+- new encr (NONE, WEP, TKIP, CCMP)
+- new key
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 WPS_REG BSSID 01:01:01:01:01
+FAIL
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 WPS_REG AP 2314141
+FAIL
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 WPS_REG SSID 01:01:01:01:01
+FAIL
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 WPS_ER_START
+OK
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 WPS_ER_STOP
+OK
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 WPS_ER_PBC
+Invalid WPS_ER_PBC command - at least 1 argument is required.
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 WPS_ER_PBC enable
+FAIL
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 WPS_ER_LEARN
+Invalid WPS_ER_LEARN command: need two arguments:
+- UUID: specify which AP to use
+- PIN: AP PIN
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 WPS_ER_LEARN uuid 213
+FAIL
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 WPS_ER_LEARN PIN 213
+FAIL
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 WPS_ER_SET_CONFIG 
+Invalid WPS_ER_SET_CONFIG command: need two arguments:
+- UUID: specify which AP to use
+- Network configuration id
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 WPS_ER_SET_CONFIG UUID 1241
+FAIL
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 WPS_ER_CONFIG 
+Invalid WPS_ER_CONFIG command: need six arguments:
+- AP UUID
+- AP PIN
+- new SSID
+- new auth (OPEN, WPAPSK, WPA2PSK)
+- new encr (NONE, WEP, TKIP, CCMP)
+- new key
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 WPS_ER_CONFIG  ssid 1234   ## 必须要输入6个参数
+Invalid WPS_ER_CONFIG command: need six arguments:
+- AP UUID
+- AP PIN
+- new SSID
+- new auth (OPEN, WPAPSK, WPA2PSK)
+- new encr (NONE, WEP, TKIP, CCMP)
+- new key
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 WPS_ER_NFC_CONFIG_TOKEN
+Invalid WPS_ER_NFC_CONFIG_TOKEN command: need two arguments:
+- WPS/NDEF: token format
+- UUID: specify which AP to use
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 WPS_ER_NFC_CONFIG_TOKEN UUID 123 
+FAIL
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 IBSS_RSN
+Invalid IBSS_RSN command - at least 1 argument is required.
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 IBSS_RSN ssid  
+UNKNOWN COMMAND   奇怪了
+
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 MESH_INTERFACE_ADD
+FAIL
+
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 MESH_INTERFACE_ADD ssid
+FAIL
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 MESH_GROUP_ADD
+Invalid MESH_GROUP_ADD command - at least 1 argument is required.
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 MESH_GROUP_ADD ssid
+FAIL
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 MESH_GROUP_REMOVE
+Invalid MESH_GROUP_REMOVE command - at least 1 argument is required.
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 MESH_GROUP_REMOVE ssid
+FAIL
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 MESH_PEER_REMOVE
+Invalid MESH_PEER_REMOVE command - at least 1 argument is required.
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 MESH_PEER_REMOVE ssid
+FAIL
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 MESH_PEER_ADD
+Invalid MESH_PEER_ADD command - at least 1 argument is required.
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 MESH_PEER_ADD ssid
+FAIL
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 P2P_FIND 
+FAIL
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 P2P_FIND ssid
+FAIL
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 P2P_STOP_FIND 
+OK
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 P2P_ASP_PROVISION
+Invalid P2P_ASP_PROVISION command - at least 3 arguments are required.
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 P2P_ASP_PROVISION 1 2 3
+FAIL
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 P2P_ASP_PROVISION_RESP
+Invalid P2P_ASP_PROVISION_RESP command - at least 2 arguments are required.
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 P2P_ASP_PROVISION_RESP ssid 1
+FAIL
+
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 P2P_CONNECT
+Invalid P2P_CONNECT command - at least 2 arguments are required. 
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 P2P_CONNECT ssid 01:01:01:01:01
+FAIL
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 P2P_LISTEN
+FAIL
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 P2P_LISTEN ssid
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 P2P_GROUP_REMOVE
+Invalid P2P_GROUP_REMOVE command - at least 1 argument is required.
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 P2P_GROUP_REMOVE ssid
+FAIL
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 P2P_GROUP_ADD
+FAIL
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 P2P_GROUP_ADD ssid
+FAIL
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 P2P_GROUP_MEMBER 
+Invalid P2P_GROUP_MEMBER command - at least 1 argument is required.
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 P2P_GROUP_MEMBER  ssid
+FAIL
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 P2P_GET_PASSPHRASE
+FAIL
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 P2P_SERV_DISC_REQ
+Invalid P2P_SERV_DISC_REQ command: needs two or more arguments (address and TLVs)
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 P2P_SERV_DISC_REQ address 01:01:02:03:04
+FAIL
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 P2P_SERV_DISC_CANCEL_REQ 
+Invalid P2P_SERV_DISC_CANCEL_REQ command - at least 1 argument is required.
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 P2P_SERV_DISC_CANCEL_REQ  ssid
+FAIL
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 P2P_SERV_DISC_RESP 
+Invalid P2P_SERV_DISC_RESP command: needs four arguments (freq, address, dialog token, and TLVs)
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 P2P_SERV_DISC_RESP  1 2 3 4 
+FAIL
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 P2P_SERVICE_UPDATE
+OK
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 P2P_SERV_DISC_EXTERNAL
+Invalid P2P_SERV_DISC_EXTERNAL command - at least 1 argument is required. 
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 P2P_SERV_DISC_EXTERNAL  ssid
+FAIL
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 P2P_SERVICE_FLUSH
+OK
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 P2P_SERVICE_ADD
+Invalid P2P_SERVICE_ADD command: needs 3-6 arguments
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 P2P_SERVICE_ADD 1 2 3 4 5 6 
+FAIL
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 P2P_SERVICE_DEL
+Invalid P2P_SERVICE_DEL command: needs two or three arguments
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 P2P_SERVICE_DEL 1 2
+FAIL
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 P2P_SERVICE_REP
+Invalid P2P_SERVICE_REP command: needs 5-6 arguments
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 P2P_SERVICE_REP 1 2 3 4 5 
+FAIL
+
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 P2P_REJECT
+Invalid P2P_REJECT command - at least 1 argument is required.
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 P2P_REJECT 1 
+FAIL
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 P2P_INVITE
+Invalid P2P_INVITE command - at least 1 argument is required.
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 P2P_INVITE 1
+FAIL
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 P2P_PEER
+Invalid P2P_PEER command - at least 1 argument is required.
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 P2P_PEER 1
+FAIL
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 P2P_SET 
+Invalid P2P_SET command - at least 2 arguments are required.
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 P2P_SET  1 2
+FAIL
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 P2P_FLUSH
+OK
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 P2P_UNAUTHORIZE
+Invalid P2P_UNAUTHORIZE command - at least 1 argument is required.
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 P2P_UNAUTHORIZE 1
+FAIL
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 P2P_CANCEL
+FAIL
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 P2P_PRESENCE_REQ 
+FAIL
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 P2P_PRESENCE_REQ 1
+Invalid P2P_PRESENCE_REQ command: needs two arguments 
+(preferred duration, interval ,in microsecods).Optional second pair can be used to provide acceptable values.
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 P2P_PRESENCE_REQ  1 2
+FAIL
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 P2P_EXT_LISTEN
+FAIL
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 P2P_EXT_LISTEN 1
+Invalid P2P_EXT_LISTEN command: needs two arguments (availability period, availability interval; in millisecods).
+Extended Listen Timing can be cancelled with this command when used without parameters.
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 P2P_EXT_LISTEN 1 2 
+FAIL
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 P2P_REMOVE_CLIENT
+Invalid P2P_REMOVE_CLIENT command - at least 1 argument is required.
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 P2P_REMOVE_CLIENT 1
+FAIL
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 P2P_LO_START
+Invalid P2P_LO_START command - at least 4 arguments are required.
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 P2P_LO_START 1 2 3 4
+FAIL
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 P2P_LO_STOP
+OK
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 WFD_SUBELEM_SET
+Invalid WFD_SUBELEM_SET command: needs one or two arguments (subelem, hexdump)
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 WFD_SUBELEM_SET 1 2 
+FAIL
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 WFD_SUBELEM_GET
+Invalid WFD_SUBELEM_GET command: needs one argument (subelem)
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 WFD_SUBELEM_GET any
+[]
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 WFD_SUBELEM_GET  1 
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 FETCH_ANQP 
+OK
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 STOP_FETCH_ANQP 
+OK
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 INTERWORKING_SELECT
+OK
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 INTERWORKING_SELECT 1 
+OK
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 INTERWORKING_CONNECT
+Invalid INTERWORKING_CONNECT command - at least 1 argument is required.
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 INTERWORKING_CONNECT 1 
+FAIL
+
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 INTERWORKING_ADD_NETWORK 
+Invalid INTERWORKING_ADD_NETWORK command - at least 1 argument is required.
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 INTERWORKING_ADD_NETWORK  1
+FAIL
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 ANQP_GET 
+Invalid ANQP_GET command - at least 2 arguments are required.
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 ANQP_GET  any ssid
+FAIL
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 GAS_REQUEST 
+Invalid GAS_REQUEST command - at least 2 arguments are required.
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 GAS_REQUEST  1 2 
+FAIL
+ 
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 GAS_RESPONSE_GET
+Invalid GAS_RESPONSE_GET command - at least 2 arguments are required.  
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 GAS_RESPONSE_GET 1 2
+FAIL
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 HS20_ANQP_GET
+Invalid HS20_ANQP_GET command - at least 2 arguments are required.
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 HS20_ANQP_GET 1 2
+FAIL
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 HS20_ICON_REQUEST
+Command needs two arguments (dst mac addr and icon name)
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 HS20_ICON_REQUEST 1 2 
+FAIL
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 FETCH_OSU 
+FAIL
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 FETCH_OSU no-scan
+FAIL
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 CANCEL_FETCH_OSU 
+OK
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 RECONFIGURE 
+OK
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 TERMINATE 
+OK
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0  BSSID 01:01:01:01:01
+Invalid BSSID command: needs two arguments (network id and BSSID)
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0  BSSID bssid 01:01:01:01:01
+FAIL
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 BLACKLIST 
+[]
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 LOG_LEVEL 
+Current level: INFO
+Timestamp: 0
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 LIST_NETWORK 
+network id / ssid / bssid / flags
+0       RD-Test any     [CURRENT]
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 DISCONNECT
+OK
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 SCAN
+OK
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 SCAN 1 
+OK
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 SCAN_RESULT
+bssid / frequency / signal level / flags / ssid
+1c:5f:2b:5e:d5:54       5785    -29     [WPA-PSK-CCMP+TKIP][WPA2-PSK-CCMP+TKIP][WPS][ESS]       D-Link_DIR-816_5G
+88:25:93:9f:31:44       5785    -70     [WPA-PSK-CCMP][WPA2-PSK-CCMP][ESS]      bsptest-5G
+02:e1:8c:d8:25:61       5745    -39     [WPA2-PSK-CCMP][WPS][ESS][P2P]  DIRECT-GOZHUZJ5-PF10GBUUmsJQ
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 ABORT_SCAN
+FAIL
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 SELECT_NETWORK 
+Invalid SELECT_NETWORK command - at least 1 argument is required.
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 SELECT_NETWORK D-Link_DIR-816_5G
+OK
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 ENABLE_NETWORK 
+Invalid ENABLE_NETWORK command - at least 1 argument is required.
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 ENABLE_NETWORK D-Link_DIR-816_5G
+OK
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 DISABLE_NETWORK RD-Test
+OK
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 ADD_NETWORK Bell
+2
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 REMOVE_NETWORK zukgit
+OK
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 REMOVE_NETWORK RD-Test
+FAIL
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 SET_NETWORK RD-Test
+Invalid SET_NETWORK command: needs three arguments
+(network id, variable name, and value)
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 SET_NETWORK 1 2 3
+FAIL
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 GET_NETWORK 
+set_network variables:
+  ssid (network name, SSID)
+  psk (WPA passphrase or pre-shared key)
+  key_mgmt (key management protocol)
+  identity (EAP identity)
+  password (EAP password)
+  ...
+Note: Values are entered in the same format as the configuration file is using,
+i.e., strings values need to be inside double quotation marks.
+For example: set_network 1 ssid "network name"
+Please see wpa_supplicant.conf documentation for full list of
+available variables.
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 GET_NETWORK  RD-Test
+Invalid GET_NETWORK command: needs two arguments
+(network id and variable name)
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 GET_NETWORK 1  RD-Test
+FAIL
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 DUP_NETWORK  RD-Test
+Invalid DUP_NETWORK command: needs three arguments
+(src netid, dest netid, and variable name)
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 LIST_CREDS
+cred id / realm / username / domain / imsi
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 ADD_CRED
+0
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 REMOVE_CRED
+Invalid REMOVE_CRED command - at least 1 argument is required.
+
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 REMOVE_CRED 1
+OK
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 SET_CRED 
+Invalid SET_CRED command: needs three arguments
+(cred id, variable name, and value)
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 GET_CRED
+Invalid GET_CRED command: needs two arguments
+(cred id, variable name)
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 GET_CRED  1 1
+FAIL
+
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 SAVE_CONFIG
+OK
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 GET_CAPABILITY
+Invalid GET_CAPABILITY command: need either one or two arguments
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 GET_CAPABILITY ssid
+FAIL
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 AP_SCAN
+Invalid AP_SCAN command - at least 1 argument is required.
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 AP_SCAN 1
+OK
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 SCAN_INTERVAL
+Invalid SCAN_INTERVAL command - at least 1 argument is required.
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 SCAN_INTERVAL 1
+OK
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 INTERFACE_LIST
+[]
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 BSS
+Invalid BSS command - at least 1 argument is required.
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 BSS 1
+id=278
+bssid=1c:5f:2b:5e:d5:54
+freq=5785
+beacon_int=100
+capabilities=0x0031
+qual=0
+noise=-104
+level=-32
+tsf=0000083860155465
+age=181
+ie=0011442d4c696e6b5f4449522d3831365f354701088c129824b048606c03019d3c04011a9d052d1a6e0116ff000000010000000000000000000000000c00000000003d169d050000000000000000000000000000000000000000dd1a0050f20101000050f20202000050f2020050f20401000050f20230180100000fac020200000fac02000fac040100000fac020000dd180050f2020101000003a4000027a4000042435e0062322f000b050000ce127add07000c4307000000bf0c0000c031feff2401feff2401c005019b00feffdd8a0050f204104a0001101044000102103b00010310470010bc329e001dd811b286011c5f2b5ed55410210014442d4c696e6b2053797374656d732c20496e632e102300074449522d3831361024000676312e302e30104200033130311054000800060050f20400011011000a4449522d3831365f3547100800020080103c0001021049000600372a000120dd1900a0c6000100000000000077386aa9cb48eed706040000ed02
+flags=[WPA-PSK-CCMP+TKIP][WPA2-PSK-CCMP+TKIP][WPS][ESS]
+ssid=D-Link_DIR-816_5G
+wps_state=configured
+wps_primary_device_type=6-0050F204-1
+wps_device_name=DIR-816_5G
+wps_config_methods=0x0080
+snr=72
+est_throughput=390001
+update_idx=282
+beacon_ie=0011442d4c696e6b5f4449522d3831365f354701088c129824b048606c03019d050400010002dd310050f204104a000110104400010210470010bc329e001dd811b286011c5f2b5ed554103c0001021049000600372a0001202d1a6e0116ff000000010000000000000000000000000c00000000003d169d050000000000000000000000000000000000000000bf0c0000c031feff2401feff2401c005019b00feffdd1a0050f20101000050f20202000050f2020050f20401000050f20230180100000fac020200000fac02000fac040100000fac020000dd180050f2020101000003a4000027a4000042435e0062322f000b050000ce127add07000c4307000000dd1900a0c6000100000000000079386aa94fd0edd7060400005c0d
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 STA
+Invalid STA command - at least 1 argument is required.
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 STA 1
+FAIL
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 DEAUTHENTICATE 
+Invalid DEAUTHENTICATE command - at least 1 argument is required.
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 DISASSOCIATE  
+Invalid DISASSOCIATE command - at least 1 argument is required.
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 DISASSOCIATE   1
+FAIL
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 CHAN_SWITCH 
+Invalid CHAN_SWITCH command - at least 2 arguments are required.
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 CHAN_SWITCH 1 2 
+FAIL
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 SUSPEND  
+OK
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 RESUME  
+OK
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 DROP_SA  
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 ROAM  
+Invalid ROAM command - at least 1 argument is required.
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 ROAM   1
+FAIL
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 ROAM   0
+FAIL
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 BSS_EXPIRE_AGE
+FAIL
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 BSS_EXPIRE_COUNT
+Invalid BSS_EXPIRE_AGE command - at least 1 argument is required.
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 BSS_EXPIRE_COUNT 1
+OK
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 BSS_FLUSH
+OK
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 TDLS_DISCOVER
+OK
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 TDLS_SETUP
+Invalid TDLS_DISCOVER command - at least 1 argument is required.
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 TDLS_SETUP 1
+FAIL
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 TDLS_TEARDOWN
+Invalid TDLS_TEARDOWN command - at least 1 argument is required.
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 TDLS_TEARDOWN 1 
+FAIL
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 TDLS_CHAN_SWITCH
+Invalid TDLS_CHAN_SWITCH command - at least 2 arguments are required.
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 TDLS_CHAN_SWITCH 1 2 
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 TDLS_CANCEL_CHAN_SWITCH
+Invalid TDLS_CANCEL_CHAN_SWITCH command - at least 1 argument is required.
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 TDLS_CANCEL_CHAN_SWITCH 1 2
+FAIL
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 TDLS_LINK_STATUS
+Invalid TDLS_LINK_STATUS command - at least 1 argument is required.
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 TDLS_LINK_STATUS 1 
+FAIL
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 WMM_AC_STATUS
+Invalid TDLS_LINK_STATUS command - at least 1 argument is required.
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 WMM_AC_STATUS 1
+Not associated to a WMM AP, WMM AC is Disabled
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 WMM_AC_ADDTS
+Invalid WMM_AC_ADDTS command - at least 3 arguments are required.
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 WMM_AC_ADDTS 1 2 3
+FAIL
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 WMM_AC_DELTS
+Invalid WMM_AC_DELTS command - at least 1 argument is required.
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 WMM_AC_DELTS 1
+FAIL
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 SIGNAL_POLL
+RSSI=-48
+LINKSPEED=200
+NOISE=-104
+FREQUENCY=5745
+AVG_RSSI=-47
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 SIGNAL_MONITOR
+FAIL
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 PKTCNT_POLL
+TXGOOD=26478
+TXBAD=1
+RXGOOD=58453
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 DRIVER_FLAG
+00A17A769ABCFBC0:
+AP
+SET_KEYS_AFTER_ASSOC_DONE
+HT_2040_COEX
+P2P_CONCURRENT
+P2P_CAPABLE
+AP_TEARDOWN_SUPPORT
+P2P_MGMT_AND_NON_P2P
+SANE_ERROR_CODES
+OFFCHANNEL_TX
+BSS_SELECTION
+TDLS_SUPPORT
+TDLS_EXTERNAL_SETUP
+PROBE_RESP_OFFLOAD
+INACTIVITY_TIMER
+SAE
+IBSS
+RADAR
+AP_CSA
+ACS_OFFLOAD
+KEY_MGMT_OFFLOAD
+HT_IBSS
+VHT_IBSS
+SUPPORT_HW_MODE_ANY
+P2P_LISTEN_OFFLOAD
+UNKNOWN
+UNKNOWN
+UNKNOWN
+UNKNOWN
+UNKNOWN
+UNKNOWN
+UNKNOWN
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 DRIVER
+Invalid DRIVER command - at least 1 argument is required.
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 DRIVER IBSS
+FAIL
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 VENDOR
+Invalid VENDOR command - at least 1 argument is required.
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 VENDOR 1
+FAIL
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 REAUTHENTICATE
+OK
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 WNM_BSS_QUERY
+Invalid WNM_BSS_QUERY command - at least 1 argument is required.
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 WNM_BSS_QUERY 1
+OK
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 FLUSH
+OK
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 RADIO_WORK
+Invalid RADIO_WORK command - at least 1 argument is required.
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 RADIO_WORK 1
+FAIL
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 VENDOR_ELEM_ADD
+Invalid VENDOR_ELEM_ADD command - at least 2 arguments are required.
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 VENDOR_ELEM_ADD 1 2 
+FAIL
+
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 VENDOR_ELEM_GET 
+Invalid VENDOR_ELEM_ADD command - at least 2 arguments are required.
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 VENDOR_ELEM_GET  1 2
+[]
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 VENDOR_ELEM_REMOVE
+Invalid VENDOR_ELEM_REMOVE command - at least 2 arguments are required.
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 VENDOR_ELEM_REMOVE 1 2
+FAIL
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 NEIGHBOR_REP_REQUEST
+FAIL
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 ERP_FLUSH
+OK
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 MAC_RAND_SCAN
+Invalid MAC_RAND_SCAN command - at least 1 argument is required.
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 MAC_RAND_SCAN 0
+FAIL
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 GET_PREF_FREQ_LIST
+Invalid GET_PREF_FREQ_LIST command - at least 1 argument is required.
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 GET_PREF_FREQ_LIST 1
+FAIL
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 DPP_BOOTSTRAP_GEN
+Invalid DPP_BOOTSTRAP_GEN command - at least 1 argument is required.
+
+
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 DPP_BOOTSTRAP_GEN 1
+FAIL
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 DPP_BOOTSTRAP_REMOVE
+Invalid DPP_BOOTSTRAP_REMOVE command - at least 1 argument is required.
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 DPP_BOOTSTRAP_REMOVE 1
+FAIL
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 DPP_BOOTSTRAP_GET_URI
+Invalid DPP_BOOTSTRAP_GET_URI command - at least 1 argument is required.
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 DPP_BOOTSTRAP_GET_URI 1
+FAIL
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 DPP_BOOTSTRAP_INFO
+Invalid DPP_BOOTSTRAP_INFO command - at least 1 argument is required
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 DPP_BOOTSTRAP_INFO 1
+FAIL
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 DPP_AUTH_INIT
+Invalid DPP_AUTH_INIT command - at least 1 argument is required.
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 DPP_AUTH_INIT 1
+FAIL
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 DPP_LISTEN
+Invalid DPP_LISTEN command - at least 1 argument is required.
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 DPP_LISTEN 1
+OK
+
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 DPP_STOP_LISTEN
+OK
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 DPP_CONFIGURATOR_ADD 
+1
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 DPP_CONFIGURATOR_REMOVE
+Invalid DPP_CONFIGURATOR_REMOVE command - at least 1 argument is required.
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 DPP_CONFIGURATOR_REMOVE 1
+OK
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 DPP_PKEX_ADD
+Invalid DPP_PKEX_ADD command - at least 1 argument is required.
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 DPP_PKEX_ADD 1
+FAIL
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 DPP_PKEX_REMOVE
+Invalid DPP_PKEX_REMOVE command - at least 1 argument is required.
+
+
+adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 DPP_PKEX_REMOVE 1
+FAIL
+
+
+```
