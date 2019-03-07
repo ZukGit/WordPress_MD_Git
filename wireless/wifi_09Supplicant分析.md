@@ -1462,45 +1462,7 @@ http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/sr
 ```
 
 
-## wpa_supplicant* wpa_supplicant_add_iface( wpa_global,wpa_interface ,wpa_supplicant)
-```
-http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/wpa_supplicant.c#5673
 
-
- 
-
-/**
- * wpa_supplicant_add_iface - Add a new network interface
- * @global: Pointer to global data from wpa_supplicant_init()
- * @iface: Interface configuration options
- * @parent: Parent interface or %NULL to assign new interface as parent
- * Returns: Pointer to the created interface or %NULL on failure
- *
- * This function is used to add new network interfaces for %wpa_supplicant.
- * This can be called before wpa_supplicant_run() to add interfaces before the
- * main event loop has been started. In addition, new interfaces can be added
- * dynamically while %wpa_supplicant is already running. This could happen,
- * e.g., when a hotplug network adapter is inserted.
- */
-
-```
-
-## int wpa_supplicant_run( wpa_global *global)
-```
-http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/wpa_supplicant.c#6047
-
-/**
- * wpa_supplicant_run - Run the %wpa_supplicant main event loop
- * @global: Pointer to global data from wpa_supplicant_init()
- * Returns: 0 after successful event loop run, -1 on failure
- *
- * This function starts the main event loop and continues running as long as
- * there are any remaining events. In most cases, this function is running as
- * long as the %wpa_supplicant process in still in use.
- */
-
-
-```
 
 ### wpa_supplicant_global_ctrl_iface_init()
 
@@ -1546,8 +1508,546 @@ http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/ct
 
 
 #### wpa_msg_register_cb(wpa_supplicant_ctrl_iface_msg_cb)
+```
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/utils/wpa_debug.c#593
+
+wpa_msg_register_cb(wpa_supplicant_ctrl_iface_msg_cb);   【1】
 
 
+/**
+ * wpa_msg_register_cb - Register callback function for wpa_msg() messages
+ * @func: Callback function (%NULL to unregister)
+ */
+
+typedef void (*wpa_msg_cb_func)(void *ctx, int level, enum wpa_msg_type type,const char *txt, size_t len);
+
+static wpa_msg_cb_func wpa_msg_cb = NULL;
+
+void wpa_msg_register_cb(wpa_msg_cb_func func)
+{
+	wpa_msg_cb = func;
+}
+
+```
+
+##### wpa_supplicant_ctrl_iface_msg_cb & wpa_msg_cb
+
+```
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/ctrl_iface_unix.c#415
+
+
+static void wpa_supplicant_ctrl_iface_msg_cb(void *ctx, int level, enum wpa_msg_type type,const char *txt, size_t len)
+{
+	struct wpa_supplicant *wpa_s = ctx;
+	struct ctrl_iface_priv *priv;
+	struct ctrl_iface_global_priv *gpriv;
+
+	if (wpa_s == NULL)
+		return;
+
+	gpriv = wpa_s->global->ctrl_iface;
+
+	if (type != WPA_MSG_NO_GLOBAL && gpriv &&
+	    !dl_list_empty(&gpriv->ctrl_dst)) {
+		if (!dl_list_empty(&gpriv->msg_queue) ||  wpas_ctrl_iface_throttle(gpriv->sock)) {
+			if (gpriv->throttle_count == 0) {
+				wpa_printf(MSG_MSGDUMP, "CTRL: Had to throttle global event message for sock %d", gpriv->sock);
+			}
+			gpriv->throttle_count++;
+			wpas_ctrl_msg_queue_limit(gpriv->throttle_count,&gpriv->msg_queue);
+			wpas_ctrl_msg_queue(&gpriv->msg_queue, wpa_s, level,type, txt, len);
+		} else {
+			if (gpriv->throttle_count) {
+				wpa_printf(MSG_MSGDUMP,"CTRL: Had to throttle %u global event message(s) for sock %d",gpriv->throttle_count, gpriv->sock);
+			}
+			gpriv->throttle_count = 0;
+			wpa_supplicant_ctrl_iface_send(wpa_s,type != WPA_MSG_PER_INTERFACE ?NULL : wpa_s->ifname,gpriv->sock, &gpriv->ctrl_dst, level,txt, len, NULL, gpriv);
+		}
+	}
+
+	priv = wpa_s->ctrl_iface;
+
+	if (type != WPA_MSG_ONLY_GLOBAL && priv) {
+		if (!dl_list_empty(&priv->msg_queue) || wpas_ctrl_iface_throttle(priv->sock)) {
+			if (priv->throttle_count == 0) {
+				wpa_printf(MSG_MSGDUMP, "CTRL: Had to throttle event message for sock %d",  priv->sock);
+			}
+			priv->throttle_count++;
+			wpas_ctrl_msg_queue_limit(priv->throttle_count,  &priv->msg_queue);
+			wpas_ctrl_msg_queue(&priv->msg_queue, wpa_s, level, type, txt, len);
+		} else {
+			if (priv->throttle_count) {
+				wpa_printf(MSG_MSGDUMP,"CTRL: Had to throttle %u event message(s) for sock %d", priv->throttle_count, priv->sock);
+			}
+			priv->throttle_count = 0;
+			wpa_supplicant_ctrl_iface_send(wpa_s, NULL, priv->sock,&priv->ctrl_dst, level, txt, len, priv, NULL);
+		}
+	}
+}
+
+
+```
+### wpas_notify_supplicant_initialized
+```
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/notify.c#28
+
+
+
+int wpas_notify_supplicant_initialized(struct wpa_global *global)
+{
+
+	global->hidl = wpas_hidl_init(global); 【1】
+
+	if (!global->hidl)
+		return -1;
+
+	return 0;
+}
+
+```
+
+#### wpas_hidl_init(global)
+```
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/hidl/1.1/hidl.cpp#34
+
+struct wpas_hidl_priv *wpas_hidl_init(struct wpa_global *global)
+{
+	struct wpas_hidl_priv *priv;
+	HidlManager *hidl_manager;
+
+	priv = (wpas_hidl_priv *)os_zalloc(sizeof(*priv));
+	if (!priv)
+		return NULL;
+	priv->global = global;
+
+	wpa_printf(MSG_DEBUG, "Initing hidl control");
+
+	configureRpcThreadpool(1, true /* callerWillJoin */);  【1】  设置进程最大线程数 1
+	priv->hidl_fd = setupTransportPolling();                 【2】 从 HwServiceManager 进程得到的一个句柄
+	if (priv->hidl_fd < 0)
+		goto err;
+
+	wpa_printf(MSG_INFO, "Processing hidl events on FD %d", priv->hidl_fd);
+	// Look for read events from the hidl socket in the eloop.
+
+	if (eloop_register_read_sock(priv->hidl_fd, wpas_hidl_sock_handler, global, priv) < 0)  【3】
+		goto err;
+
+	hidl_manager = HidlManager::getInstance();  【4】 获得系统 hidl_manager的C语言本地代理引用
+	if (!hidl_manager)
+		goto err;
+	hidl_manager->registerHidlService(global);  【5】
+
+	// We may not need to store this hidl manager reference in the
+	// global data strucure because we've made it a singleton class.
+	priv->hidl_manager = (void *)hidl_manager;
+
+	return priv;
+err:
+	wpas_hidl_deinit(priv);  【6】
+	return NULL;
+}
+
+
+数据结构
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/hidl/1.1/hidl_i.h#17
+struct wpas_hidl_priv
+{
+	int hidl_fd;       // 句柄
+	struct wpa_global *global;    // 全局数据
+	void *hidl_manager;     // 无类型指针
+};
+
+
+```
+
+##### configureRpcThreadpool(1, true)
+```
+http://androidxref.com/9.0.0_r3/xref/system/libhidl/transport/HidlTransportSupport.cpp#24
+
+ //  hidl service启动时要设置binder的线程池：    configureRpcThreadpool(1, true);
+// roc->max_threads 设置的时候有的是1 有的是10不等，具体这个值要设置多少呢？
+
+
+
+void configureRpcThreadpool(size_t maxThreads, bool callerWillJoin) {
+    // TODO(b/32756130) this should be transport-dependent
+    configureBinderRpcThreadpool(maxThreads, callerWillJoin);
+}
+
+
+http://androidxref.com/9.0.0_r3/xref/system/libhidl/transport/HidlBinderSupport.cpp#199
+void configureBinderRpcThreadpool(size_t maxThreads, bool callerWillJoin) {
+    ProcessState::self()->setThreadPoolConfiguration(maxThreads, callerWillJoin /*callerJoinsPool*/);
+}
+
+
+http://androidxref.com/9.0.0_r3/xref/system/libhwbinder/ProcessState.cpp#319
+
+https://blog.csdn.net/wzoxylwzoxyl/article/details/81872974   【 HwServiceManager 进程启动 】
+   size_t              mMaxThreads;  // Maximum number for binder threads allowed for this process. 最大线程数在一个进程中
+   bool                mSpawnThreadOnStart;    // true:标识当前创建的线程的子线程为一个新的统计线程   false:标识当前创建的线程不标记为新线程而是线程池线程       这里为 false
+
+
+
+
+status_t ProcessState::setThreadPoolConfiguration(size_t maxThreads, bool callerJoinsPool) {
+    LOG_ALWAYS_FATAL_IF(maxThreads < 1, "Binder threadpool must have a minimum of one thread.");
+    status_t result = NO_ERROR;
+
+    // the BINDER_SET_MAX_THREADS ioctl really tells the kernel how many threads
+    // it's allowed to spawn, *in addition* to any threads we may have already
+    // spawned locally. If 'callerJoinsPool' is true, it means that the caller
+    // will join the threadpool, and so the kernel needs to create one less thread.
+    // If 'callerJoinsPool' is false, we will still spawn a thread locally, and we should
+    // also tell the kernel to create one less thread than what was requested here.
+   //  mMaxThreads(DEFAULT_MAX_BINDER_THREADS)
+
+    size_t kernelMaxThreads = maxThreads - 1;
+/* 最终其实就是调用ioctl()通知驱动  最大线程数 */
+    if (ioctl(mDriverFD, BINDER_SET_MAX_THREADS, &kernelMaxThreads) != -1) {   //   #define BINDER_SET_MAX_THREADS _IOW('b', 5, __u32) 
+        AutoMutex _l(mLock);
+        mMaxThreads = maxThreads;
+        mSpawnThreadOnStart = !callerJoinsPool;
+    } else {
+        result = -errno;
+        ALOGE("Binder ioctl to set max threads failed: %s", strerror(-result));
+    }
+    return result;
+}
+
+
+构造器；
+
+ProcessState::ProcessState(size_t mmap_size)
+    : mDriverFD(open_driver())  //构造函数中open("/dev/hwbinder")
+    , mVMStart(MAP_FAILED)
+    , mThreadCountLock(PTHREAD_MUTEX_INITIALIZER)
+    , mThreadCountDecrement(PTHREAD_COND_INITIALIZER)
+    , mExecutingThreadsCount(0)
+    , mMaxThreads(DEFAULT_MAX_BINDER_THREADS)
+    , mStarvationStartTimeMs(0)
+    , mManagesContexts(false)
+    , mBinderContextCheckFunc(NULL)
+    , mBinderContextUserData(NULL)
+    , mThreadPoolStarted(false)
+    , mSpawnThreadOnStart(true)
+    , mThreadPoolSeq(1)
+    , mMmapSize(mmap_size)
+{
+    if (mDriverFD >= 0) {
+        // mmap the binder, providing a chunk of virtual address space to receive transactions.
+        mVMStart = mmap(0, mMmapSize, PROT_READ, MAP_PRIVATE | MAP_NORESERVE, mDriverFD, 0);
+        if (mVMStart == MAP_FAILED) {
+            // *sigh*
+            ALOGE("Using /dev/hwbinder failed: unable to mmap transaction memory.\n");
+            close(mDriverFD);
+            mDriverFD = -1;
+        }
+    }
+    else {
+        ALOGE("Binder driver could not be opened.  Terminating.");
+    }
+}
+
+```
+
+
+##### setupTransportPolling()
+```
+http://androidxref.com/9.0.0_r3/xref/system/libhidl/transport/HidlTransportSupport.cpp#33
+
+int setupTransportPolling() {
+    return setupBinderPolling();
+}
+
+http://androidxref.com/9.0.0_r3/xref/system/libhidl/transport/HidlBinderSupport.cpp#207
+
+int setupBinderPolling() {
+    int fd;
+    int err = IPCThreadState::self()->setupPolling(&fd); 【1】
+
+    if (err != OK) {
+        ALOGE("Failed to setup binder polling: %d (%s)", err, strerror(err));
+    }
+
+    return err == OK ? fd : -1;
+}
+
+```
+######  IPCThreadState.setupPolling
+```
+http://androidxref.com/9.0.0_r3/xref/system/libhwbinder/IPCThreadState.cpp#565 
+
+  bool mIsPollingThread;   轮训线程 标记位
+  Parcel              mOut;
+
+int IPCThreadState::setupPolling(int* fd)
+{
+    if (mProcess->mDriverFD <= 0) {
+        return -EBADF;
+    }
+
+    // Tells the kernel to not spawn any additional binder threads,  告诉内核不要生成任何额外的绑定线程
+    // as that won't work with polling 因为这对轮询不起作用 . Also, the caller is responsible  调用者有责任调用 handlePolledCommands()
+    // for subsequently calling handlePolledCommands()
+    mProcess->setThreadPoolConfiguration(1, true /* callerWillJoin */);
+    mIsPollingThread = true;   
+
+    mOut.writeInt32(BC_ENTER_LOOPER);  // BC_ENTER_LOOPER 是给驱动的命令   enum  binder_driver_command_protocol { BC_EXIT_LOOPER = _IO('c', 13), }
+    *fd = mProcess->mDriverFD;       // 返回句柄
+    return 0;
+}
+
+
+
+
+static const char *kReturnStrings[] = {
+    "BR_ERROR",
+    "BR_OK",
+    "BR_TRANSACTION",
+    "BR_REPLY",
+    "BR_ACQUIRE_RESULT",
+    "BR_DEAD_REPLY",
+    "BR_TRANSACTION_COMPLETE",
+    "BR_INCREFS",
+    "BR_ACQUIRE",
+    "BR_RELEASE",
+    "BR_DECREFS",
+    "BR_ATTEMPT_ACQUIRE",
+    "BR_NOOP",
+    "BR_SPAWN_LOOPER",
+    "BR_FINISHED",
+    "BR_DEAD_BINDER",
+    "BR_CLEAR_DEATH_NOTIFICATION_DONE",
+    "BR_FAILED_REPLY"
+};
+
+static const char *kCommandStrings[] = {
+    "BC_TRANSACTION",
+    "BC_REPLY",
+    "BC_ACQUIRE_RESULT",
+    "BC_FREE_BUFFER",
+    "BC_INCREFS",
+    "BC_ACQUIRE",
+    "BC_RELEASE",
+    "BC_DECREFS",
+    "BC_INCREFS_DONE",
+    "BC_ACQUIRE_DONE",
+    "BC_ATTEMPT_ACQUIRE",
+    "BC_REGISTER_LOOPER",
+    "BC_ENTER_LOOPER",
+    "BC_EXIT_LOOPER",
+    "BC_REQUEST_DEATH_NOTIFICATION",
+    "BC_CLEAR_DEATH_NOTIFICATION",
+    "BC_DEAD_BINDER_DONE"
+};
+
+
+```
+
+##### eloop_register_read_sock(priv->hidl_fd, wpas_hidl_sock_handler...)  
+```
+同 其他的  eloop_register_read_sock   把 hidl_fd 注册到 eloop_data 的 read_table 中 ,一直监听往该fd 写入的 数据  并处理
+
+```
+##### HidlManager::getInstance()
+```
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/hidl/1.1/hidl_manager.cpp#409
+
+HidlManager *HidlManager::instance_ = NULL;
+
+
+HidlManager *HidlManager::getInstance()
+{
+	if (!instance_)
+		instance_ = new HidlManager();   // 和malloc 差不多
+	return instance_;
+}
+
+	HidlManager() = default;
+
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/hidl/1.1/hidl_manager.h#51
+
+/**  HidlManager负责管理wpa_supplicant创建的所有hidl对象的生命周期
+ * HidlManager is responsible for managing the lifetime of all hidl objects created by wpa_supplicant. 
+ * 
+ * 这是一个由supplicant core创建的单例类，可用于获取对hidl对象的引用
+ * This is a singleton class which is created by the supplicant core and can be used to get references to the hidl objects.
+ */
+class HidlManager
+{
+public:
+	static HidlManager *getInstance();
+.....
+
+}
+
+
+
+HidlManager属性
+
+	// Singleton instance of this class.
+	static HidlManager *instance_;
+
+
+	// The main hidl service object.
+	android::sp<Supplicant> supplicant_object_;
+
+
+	// Map of all the P2P interface specific hidl objects controlled by
+	// wpa_supplicant. This map is keyed in by the corresponding
+	// |ifname|. P2P 接口Map  <namestring,P2pIface> map
+	std::map<const std::string, android::sp<P2pIface>>p2p_iface_object_map_;
+
+
+
+	// Map of all the STA interface specific hidl objects controlled by
+	// wpa_supplicant. This map is keyed in by the corresponding
+	// |ifname|.    STA 接口Map
+	std::map<const std::string, android::sp<StaIface>> sta_iface_object_map_;
+
+
+
+
+	// Map of all the P2P network specific hidl objects controlled by
+	// wpa_supplicant. This map is keyed in by the corresponding
+	// |ifname| & |network_id|.  < p2p_1  , P2pNetwork > Map 映射
+	std::map<const std::string, android::sp<P2pNetwork>> p2p_network_object_map_;
+
+
+
+	// Map of all the STA network specific hidl objects controlled by
+	// wpa_supplicant. This map is keyed in by the corresponding
+	// |ifname| & |network_id|.    < wlan0_1  , StaNetwork > Map 映射
+	std::map<const std::string, android::sp<StaNetwork>> sta_network_object_map_;
+
+	// Callback registered for the main hidl service object.  ISupplicantCallback 回调集合
+	std::vector<android::sp<ISupplicantCallback>> supplicant_callbacks_;
+
+
+	// Map of all the callbacks registered for P2P interface specific
+	// hidl objects controlled by wpa_supplicant.  This map is keyed in by
+	// the corresponding |ifname|.  P2P接口回调 集合映射
+	std::map<const std::string,std::vector<android::sp<ISupplicantP2pIfaceCallback>>> p2p_iface_callbacks_map_;
+
+	// Map of all the callbacks registered for STA interface specific
+	// hidl objects controlled by wpa_supplicant.  This map is keyed in by
+	// the corresponding |ifname|.  STA 接口回调 集合映射
+	std::map<const std::string,std::vector<android::sp<ISupplicantStaIfaceCallback>>>sta_iface_callbacks_map_;
+
+
+
+	// Map of all the callbacks registered for P2P network specific
+	// hidl objects controlled by wpa_supplicant.  This map is keyed in by
+	// the corresponding |ifname| & |network_id|.   P2P接口  网络回调 集合映射
+	std::map<const std::string,std::vector<android::sp<ISupplicantP2pNetworkCallback>>>p2p_network_callbacks_map_;
+
+
+	// Map of all the callbacks registered for STA network specific
+	// hidl objects controlled by wpa_supplicant.  This map is keyed in by
+	// the corresponding |ifname| & |network_id|.   STA 接口  网络回调 集合映射
+	std::map<const std::string,std::vector<android::sp<ISupplicantStaNetworkCallback>>> sta_network_callbacks_map_;
+
+```
+
+##### hidl_manager->registerHidlService
+```
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/hidl/1.1/hidl_manager.cpp#423
+
+
+int HidlManager::registerHidlService(struct wpa_global *global)
+{
+	// Create the main hidl service object and register it.
+	supplicant_object_ = new Supplicant(global);  【1】
+
+	if (supplicant_object_->registerAsService() != android::NO_ERROR) {   【2】
+		return 1;
+	}
+	return 0;
+}
+
+
+
+```
+
+###### new Supplicant(global)
+```
+// Create the main hidl service object and register it.
+// 创建主hidl服务对象 supplicant  并注册它
+
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/hidl/1.1/supplicant.cpp#164
+
+
+Supplicant::Supplicant(struct wpa_global* global) : wpa_global_(global) {   // malloc  this.wpa_global_ = wpa_global;
+
+}
+
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/hidl/1.1/supplicant.h#83
+
+	// Raw pointer to the global structure maintained by the core.  hidl中需要使用的 wpa_global 执行  
+	struct wpa_global* wpa_global_;
+
+```
+
+###### supplicant_object_->registerAsService()
+```
+尼玛  找不到
+https://blog.csdn.net/yangwen123/article/details/79876534
+	if (supplicant_object_->registerAsService() != android::NO_ERROR) { }
+
+
+
+
+
+```
+
+
+
+##### wpas_hidl_deinit
+
+### wifi_display_init
+### eloop_register_timeout
+
+## wpa_supplicant* wpa_supplicant_add_iface( wpa_global,wpa_interface ,wpa_supplicant)
+```
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/wpa_supplicant.c#5673
+
+
+ 
+
+/**
+ * wpa_supplicant_add_iface - Add a new network interface
+ * @global: Pointer to global data from wpa_supplicant_init()
+ * @iface: Interface configuration options
+ * @parent: Parent interface or %NULL to assign new interface as parent
+ * Returns: Pointer to the created interface or %NULL on failure
+ *### wpa_supplicant_global_ctrl
+ * This function is used to add new network interfaces for %wpa_supplicant.
+ * This can be called before wpa_supplicant_run() to add interfaces before the
+ * main event loop has been started. In addition, new interfaces can be added
+ * dynamically while %wpa_supplicant is already running. This could happen,
+ * e.g., when a hotplug network adapter is inserted.
+ */
+
+```
+
+## int wpa_supplicant_run( wpa_global *global)
+```
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/wpa_supplicant.c#6047
+
+/**
+ * wpa_supplicant_run - Run the %wpa_supplicant main event loop
+ * @global: Pointer to global data from wpa_supplicant_init()
+ * Returns: 0 after successful event loop run, -1 on failure
+ *
+ * This function starts the main event loop and continues running as long as
+ * there are any remaining events. In most cases, this function is running as
+ * long as the %wpa_supplicant process in still in use.
+ */
+
+
+```
 
 ## void wpa_supplicant_deinit( wpa_global *global)
 ```
@@ -2338,6 +2838,25 @@ http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/ct
 详情见wpa_supplicant_ctrl_iface_process 长函数分析
 ```
 
+##### wpas_global_ctrl_iface_redir
+##### wpa_hexdump_ascii
+##### wpa_supplicant_global_iface_add
+##### wpa_supplicant_global_iface_remove
+##### wpa_supplicant_global_iface_list
+##### wpa_supplicant_global_iface_interfaces
+##### wpas_global_ctrl_iface_fst_attach
+##### wpas_global_ctrl_iface_fst_detach
+##### fst_ctrl_iface_receive
+##### wpa_supplicant_terminate_proc
+##### wpas_notify_suspend
+##### wpas_notify_resume
+##### wpas_global_ctrl_iface_set
+##### wpa_supplicant_ctrl_iface_process
+##### wpas_global_ctrl_iface_dup_network
+##### wpas_global_ctrl_iface_save_config
+##### wpas_global_ctrl_iface_status
+##### wpa_debug_reopen_file
+
 
 # wpa_supplicant_ctrl_iface_process 长函数分析
 ```
@@ -3110,7 +3629,7 @@ char * wpa_supplicant_ctrl_iface_process(struct wpa_supplicant *wpa_s, char *buf
 
 
 ```
- ## wpa_hexdump_ascii_key
+## wpa_hexdump_ascii_key
 ## wpas_ctrl_cmd_debug_level
 ## wpa_dbg
 ## wpa_debug_reopen_file

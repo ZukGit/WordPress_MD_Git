@@ -50,6 +50,22 @@ vendor/qcom/nonhlos/WLAN.HL.xxx/wcnss_proc/build/ms/M6150_WLAN_MERGED.elf
 ```
 
 # F
+## fireware
+```
+
+adb pull   /vendor/fireware_mnt/image/wlanmdsp.mbn
+adb pull  /vendor/fireware_mnt/image/Data.msc
+
+
+
+fastboot oem ssm_test
+adb root & adb disable-verity & adb remount & adb shell mount -o rw, remount /vendor/firmware_mnt
+
+adb push wlanmdsp.mbn  /vendor/fireware_mnt/image/
+adb push Data.msc  /vendor/fireware_mnt/image/
+
+
+```
 # G
 # H
 
@@ -88,6 +104,14 @@ about.html 中 MPSS 中有版本号
 
 
 
+```
+
+## Flash_Modem
+```
+
+AT4.3_xxxxxxMxxxx_sideload 文件夹
+
+adb 模式下 点击  文件夹内  sideloadmodem.bat  即可完成 Modem的 flash
 ```
 
 
