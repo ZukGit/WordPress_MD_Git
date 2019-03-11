@@ -6,7 +6,7 @@
 # C
 # D
 
-## dumps(dir)
+## riva-dumps(dir) bp-dumps
 ```
 
 /data/vendor/ss-ram-dumps/bp-dumps/20190226xxxxxx/ramdump_wcss_msa0_xxxxx.bin
@@ -124,6 +124,19 @@ out/target/product/xxxxx/obj/KERNEL_OBJ/vmlinux.o
 ```
 # P
 
+## pd_dump
+```
+Could you help to pull pd_dump from device ?
+Then upload google drive and share to us .
+
+PATH :  /vendor/rfs/msm/mpss/ramdumps
+
+COMMAND：
+
+adb root
+adb pull  /vendor/rfs/msm/mpss/ramdumps pd_dump
+
+```
 # Q
 # R
 # S
