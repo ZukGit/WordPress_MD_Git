@@ -1528,6 +1528,13 @@ void wpa_msg_register_cb(wpa_msg_cb_func func)
 	wpa_msg_cb = func;
 }
 
+
+void wpa_msg(void *ctx, int level, const char *fmt, ...)
+{
+......
+wpa_msg_cb(ctx, level, WPA_MSG_PER_INTERFACE, buf, len);
+......
+}
 ```
 
 ##### wpa_supplicant_ctrl_iface_msg_cb & wpa_msg_cb
@@ -1547,8 +1554,7 @@ static void wpa_supplicant_ctrl_iface_msg_cb(void *ctx, int level, enum wpa_msg_
 
 	gpriv = wpa_s->global->ctrl_iface;
 
-	if (type != WPA_MSG_NO_GLOBAL && gpriv &&
-	    !dl_list_empty(&gpriv->ctrl_dst)) {
+	if (type != WPA_MSG_NO_GLOBAL && gpriv && !dl_list_empty(&gpriv->ctrl_dst)) {
 		if (!dl_list_empty(&gpriv->msg_queue) ||  wpas_ctrl_iface_throttle(gpriv->sock)) {
 			if (gpriv->throttle_count == 0) {
 				wpa_printf(MSG_MSGDUMP, "CTRL: Had to throttle global event message for sock %d", gpriv->sock);

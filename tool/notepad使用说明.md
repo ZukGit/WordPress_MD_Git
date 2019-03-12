@@ -145,16 +145,37 @@ null             15      null
 
 #### commandA1
 ```   
-cmd /K cd /d %userprofile%\Desktop\zbin & %userprofile%\Desktop\zbin\A1.bat  $(FULL_CURRENT_PATH)
+cmd /K cd /d %userprofile%\Desktop\zbin & %userprofile%\Desktop\zbin\A1.bat %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH)      【bat】
+
+Wscript.exe  /x %userprofile%\Desktop\zbin\A1.vbs  %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH)     【vbs】
 ```
+
+#### A1.vbs
+```
+Set args = WScript.Arguments
+If args.Count = 2 Then
+
+zbinpath= WScript.Arguments(0)
+textpath= WScript.Arguments(1)
+
+command = "cmd /c "+ zbinpath +"\A1.bat  " +zbinpath+"\  "+textpath
+DIM objShell
+set objShell=wscript.createObject("wscript.shell")
+iReturn=objShell.Run(command, 0, TRUE)
+WScript.Echo("Please Refresh!")
+End If
+
+```
+
 
 #### A1.bat
 ```
 C:\Users\aaa\Desktop\TestA\A1.bat 
 
 @echo off
+@cd %1
 @javac A1.java
-@java A1 %1
+@java A1 %2
 @exit
 
 
@@ -252,5 +273,7 @@ cmd /K   echo %OS%             // 检测 %OS% 这个环境变量  打印   Windo
 cmd /K   echo %userprofile%\Desktop        //  打印   C:\Users\aaa\Desktop
 
 
-cmd /K cd /d %userprofile%\Desktop\zbin & %userprofile%\Desktop\zbin\A1.bat  $(FULL_CURRENT_PATH)
+cmd /K cd /d %userprofile%\Desktop\zbin & %userprofile%\Desktop\zbin\A1.bat %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH)      【bat】
+
+Wscript.exe  /x %userprofile%\Desktop\zbin\A1.vbs  %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH)     【vbs】
 ```
