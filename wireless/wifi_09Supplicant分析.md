@@ -908,7 +908,7 @@ struct wpa_global * wpa_supplicant_init(struct wpa_params *params)
 	}
 
 
-	eloop_register_timeout(WPA_SUPPLICANT_CLEANUP_INTERVAL, 0, wpas_periodic, global, NULL);  【10】
+	eloop_register_timeout(WPA_SUPPLICANT_CLEANUP_INTERVAL===10, 0, wpas_periodic, global, NULL);  【10】
 
 	return global;
 }
@@ -1509,7 +1509,7 @@ http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/ct
 
 #### wpa_msg_register_cb(wpa_supplicant_ctrl_iface_msg_cb)
 ```
-http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/utils/wpa_debug.c#593
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/utils/wpa_debug.c#593    调试debug的回复?
 
 wpa_msg_register_cb(wpa_supplicant_ctrl_iface_msg_cb);   【1】
 
@@ -1535,9 +1535,18 @@ void wpa_msg(void *ctx, int level, const char *fmt, ...)
 wpa_msg_cb(ctx, level, WPA_MSG_PER_INTERFACE, buf, len);
 ......
 }
+
+
+void wpa_msg_global_ctrl(void *ctx, int level, const char *fmt, ...)
+{.......
+	wpa_msg_cb(ctx, level, WPA_MSG_GLOBAL, buf, len);
+	bin_clear_free(buf, buflen);
+}
+
+
 ```
 
-##### wpa_supplicant_ctrl_iface_msg_cb & wpa_msg_cb
+##### wpa_supplicant_ctrl_iface_msg_cb & wpa_msg_cb & wpa_msg_cb_func 消息回调
 
 ```
 http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/ctrl_iface_unix.c#415
@@ -1555,19 +1564,19 @@ static void wpa_supplicant_ctrl_iface_msg_cb(void *ctx, int level, enum wpa_msg_
 	gpriv = wpa_s->global->ctrl_iface;
 
 	if (type != WPA_MSG_NO_GLOBAL && gpriv && !dl_list_empty(&gpriv->ctrl_dst)) {
-		if (!dl_list_empty(&gpriv->msg_queue) ||  wpas_ctrl_iface_throttle(gpriv->sock)) {
+		if (!dl_list_empty(&gpriv->msg_queue) ||  wpas_ctrl_iface_throttle(gpriv->sock) 【1】) {
 			if (gpriv->throttle_count == 0) {
 				wpa_printf(MSG_MSGDUMP, "CTRL: Had to throttle global event message for sock %d", gpriv->sock);
 			}
 			gpriv->throttle_count++;
-			wpas_ctrl_msg_queue_limit(gpriv->throttle_count,&gpriv->msg_queue);
-			wpas_ctrl_msg_queue(&gpriv->msg_queue, wpa_s, level,type, txt, len);
+			wpas_ctrl_msg_queue_limit(gpriv->throttle_count,&gpriv->msg_queue); 【2】
+			wpas_ctrl_msg_queue(&gpriv->msg_queue, wpa_s, level,type, txt, len);  【3】
 		} else {
 			if (gpriv->throttle_count) {
 				wpa_printf(MSG_MSGDUMP,"CTRL: Had to throttle %u global event message(s) for sock %d",gpriv->throttle_count, gpriv->sock);
 			}
 			gpriv->throttle_count = 0;
-			wpa_supplicant_ctrl_iface_send(wpa_s,type != WPA_MSG_PER_INTERFACE ?NULL : wpa_s->ifname,gpriv->sock, &gpriv->ctrl_dst, level,txt, len, NULL, gpriv);
+			wpa_supplicant_ctrl_iface_send(wpa_s,type != WPA_MSG_PER_INTERFACE ?NULL : wpa_s->ifname,gpriv->sock, &gpriv->ctrl_dst, level,txt, len, NULL, gpriv); 【4】
 		}
 	}
 
@@ -1593,6 +1602,14 @@ static void wpa_supplicant_ctrl_iface_msg_cb(void *ctx, int level, enum wpa_msg_
 
 
 ```
+
+###### wpas_ctrl_iface_throttle(gpriv->sock)
+###### wpas_ctrl_msg_queue_limit
+###### wpas_ctrl_msg_queue
+###### wpa_supplicant_ctrl_iface_send
+
+
+
 ### wpas_notify_supplicant_initialized
 ```
 http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/notify.c#28
@@ -1646,7 +1663,7 @@ struct wpas_hidl_priv *wpas_hidl_init(struct wpa_global *global)
 
 	// We may not need to store this hidl manager reference in the
 	// global data strucure because we've made it a singleton class.
-	priv->hidl_manager = (void *)hidl_manager;
+	priv->hidl_manager = (void *)hidl_manager;    //  把 hidl_manager保存起来 hidl_manager 初始化完成
 
 	return priv;
 err:
@@ -1897,8 +1914,8 @@ HidlManager属性
 	static HidlManager *instance_;
 
 
-	// The main hidl service object.
-	android::sp<Supplicant> supplicant_object_;
+	// The main hidl service object.   Supplicant注册到 HwServiceManager的服务类    , 它是 HidlManager属性
+	android::sp<Supplicant> supplicant_object_;  
 
 
 	// Map of all the P2P interface specific hidl objects controlled by
@@ -1991,6 +2008,24 @@ Supplicant::Supplicant(struct wpa_global* global) : wpa_global_(global) {   // m
 
 http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/hidl/1.1/supplicant.h#83
 
+
+namespace android {
+namespace hardware {
+namespace wifi {
+namespace supplicant {
+namespace V1_0 {
+namespace implementation {
+/**
+ * Implementation of the supplicant hidl object. This hidl object is used core for global control operations on wpa_supplicant.
+ */
+class Supplicant : public android::hardware::wifi::supplicant::V1_0::ISupplicant     // 继承关系
+{
+public:
+	Supplicant(struct wpa_global* global);
+	~Supplicant() override = default;
+	bool isValid();
+
+
 	// Raw pointer to the global structure maintained by the core.  hidl中需要使用的 wpa_global 执行  
 	struct wpa_global* wpa_global_;
 
@@ -2000,28 +2035,404 @@ http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/hi
 ```
 尼玛  找不到
 https://blog.csdn.net/yangwen123/article/details/79876534
-	if (supplicant_object_->registerAsService() != android::NO_ERROR) { }
+
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/hidl/1.1/hidl_manager.cpp#427
+
+int HidlManager::registerHidlService(struct wpa_global *global)
+{
+	// Create the main hidl service object and register it.
+	supplicant_object_ = new Supplicant(global);                         // class Supplicant : public android::hardware::wifi::supplicant::V1_0::ISupplicant   继承ISupplicant 
+	if (supplicant_object_->registerAsService() != android::NO_ERROR) {  //将 ISupplicant 注册到 hwservicemanager 中
+		return 1;
+	}
+	return 0;
+}
+
+registerAsService 是 HwBinder 中定义的方法
+当我们定义IXXX.hal文件后，通过编译将在out/target/common/gen/JAVA_LIBRARIES目录下生成对应的IXXX.java       /out/target/common/obj/JAVA_LIBRARIES/android.hardware.wifi-java/classes.jar
+当我们定义IXXX.hal文件后，通过编译将在out/target/common/gen/STATIC_LIBRARIES目录下生成对应的IXXX.cpp     /out/target/product/xxNamexx/obj/STATIC_LIBRARY/libwpa_hidlxxxx
+http://androidxref.com/9.0.0_r3/xref/system/tools/hidl/generateCpp.cpp#126   .hal 文件通过 hidl-gen编译为 cpp文件 ,
+
+
+如下图所示，当我们定义IXXX.hal文件后，通过编译将在out/target/common/gen/JAVA_LIBRARIES目录下生成对应的IXXX.java，
+该文件按上述类继承关系自动生成相关代码，我们只需要定义一个XXXImp类，继承Stub并实现所有方法，
+然后在某个服务进程中创建一个XXXImp对象，并调用registerService（）函数进行hidl服务注册，如下所示：
+
+XXXImp mXXXImp = new XXXImp();
+mXXXImp.registerAsService("XXXImp")
 
 
 
+```
+
+<img src="//../zimage/wireless/wifi/09_supplicant/hwbinder.png" width = "50%" height="50%"/>
+
+##### wpas_hidl_deinit
+```
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/hidl/1.1/hidl.cpp#71
+
+
+void wpas_hidl_deinit(struct wpas_hidl_priv *priv)
+{
+	if (!priv)
+		return;
+
+	wpa_printf(MSG_DEBUG, "Deiniting hidl control");
+
+	HidlManager::destroyInstance();
+	eloop_unregister_read_sock(priv->hidl_fd);   // 从 eloop_data.reader_table 去掉句柄
+	os_free(priv);
+}
+
+
+HidlManager *HidlManager::instance_ = NULL;    // 把当前单例 HidlManager 置空 释放内存
+void HidlManager::destroyInstance()
+{
+	if (instance_)
+		delete instance_;
+	instance_ = NULL;
+}
 
 
 ```
 
 
 
-##### wpas_hidl_deinit
-
 ### wifi_display_init
+```
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/wifi_display.c#22
+
+ wpa_global.wifi_display   
+int wifi_display;
+
+int wifi_display_init(struct wpa_global *global)
+{
+	global->wifi_display = 1;   // 对wpa_global的 int wifidisplay 初始化为1 
+	return 0;
+}
+
+
+
+```
+
 ### eloop_register_timeout
+```
+#define WPA_SUPPLICANT_CLEANUP_INTERVAL 10
+
+eloop_register_timeout(WPA_SUPPLICANT_CLEANUP_INTERVAL, 0, wpas_periodic 【1】, global, NULL);  
+
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/utils/eloop.c#762
+
+int eloop_register_timeout(unsigned int secs, unsigned int usecs,eloop_timeout_handler handler,void *eloop_data, void *user_data)
+{
+	struct eloop_timeout *timeout, *tmp;
+	os_time_t now_sec;
+
+	timeout = os_zalloc(sizeof(*timeout));
+	if (timeout == NULL)
+		return -1;
+	if (os_get_reltime(&timeout->time) < 0) {
+		os_free(timeout);
+		return -1;
+	}
+	now_sec = timeout->time.sec;
+	timeout->time.sec += secs;
+	if (timeout->time.sec < now_sec) {
+		/*
+		 * Integer overflow - assume long enough timeout to be assumed
+		 * to be infinite, i.e., the timeout would never happen.
+		 */
+		wpa_printf(MSG_DEBUG, "ELOOP: Too long timeout (secs=%u) to ever happen - ignore it", secs);
+		os_free(timeout);
+		return 0;
+	}
+	timeout->time.usec += usecs;
+	while (timeout->time.usec >= 1000000) {
+		timeout->time.sec++;
+		timeout->time.usec -= 1000000;
+	}
+	timeout->eloop_data = eloop_data;
+	timeout->user_data = user_data;
+	timeout->handler = handler;
+	wpa_trace_add_ref(timeout, eloop, eloop_data);
+	wpa_trace_add_ref(timeout, user, user_data);
+	wpa_trace_record(timeout);
+
+ //  static struct eloop_data eloop; 
+   //  eloop定义 http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/utils/eloop.c#eloop
+	/* Maintain timeouts in order of increasing time 维护超时双向链表的顺序 随着时间的增长的情况下 */
+	dl_list_for_each(tmp, &eloop.timeout, struct eloop_timeout, list) {  
+
+		if (os_reltime_before(&timeout->time, &tmp->time)) {
+			dl_list_add(tmp->list.prev, &timeout->list);    【插入一个 dllist_timeout item 】
+			return 0;
+		}
+	}
+	dl_list_add_tail(&eloop.timeout, &timeout->list);    【插入到末尾的 dllist_timeout item 】
+
+	return 0;
+}
+
+
+```
+#### eloop_timeout_handler wpas_periodic(*void func)
+```
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/wpa_supplicant.c#5868
+
+#define WPA_SUPPLICANT_CLEANUP_INTERVAL 10
+
+/* Periodic cleanup tasks  定期执行 清理任务 */
+static void wpas_periodic(void *eloop_ctx, void *timeout_ctx)
+{
+	struct wpa_global *global = eloop_ctx;
+	struct wpa_supplicant *wpa_s;
+
+	eloop_register_timeout(WPA_SUPPLICANT_CLEANUP_INTERVAL, 0,wpas_periodic, global, NULL);  // 再次注册到 global的 timeout_dllist 双向链表 【已有分析 # eloop_register_timeout 】
+
+
+	if (global->p2p)    //   struct wpa_global {  struct p2p_data *p2p;  .... }
+		p2p_expire_peers(global->p2p); 【1】
+
+	for (wpa_s = global->ifaces; wpa_s; wpa_s = wpa_s->next) {
+		wpa_bss_flush_by_age(wpa_s, wpa_s->conf->bss_expiration_age@180@); 【2】
+		ap_periodic(wpa_s); 【3】
+
+	}
+}
+
+
+
+```
+
+#####  p2p_expire_peers(global->p2p @p2p_data@)
+```
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/p2p/p2p.c#53
+
+
+void p2p_expire_peers(struct p2p_data *p2p)
+{
+	struct p2p_device *dev, *n;
+	struct os_reltime now;
+	size_t i;
+
+	os_get_reltime(&now);
+	dl_list_for_each_safe(dev, n, &p2p->devices, struct p2p_device, list) {
+		if (dev->last_seen.sec + P2P_PEER_EXPIRATION_AGE @ 60 @ >= now.sec)
+			continue;
+
+		if (dev == p2p->go_neg_peer) {
+			/*
+			 * GO Negotiation is in progress with the peer, so
+			 * don't expire the peer entry until GO Negotiation
+			 * fails or times out.
+			 */
+			continue;
+		}
+
+		if (p2p->cfg->go_connected && p2p->cfg->go_connected(p2p->cfg->cb_ctx,dev->info.p2p_device_addr) 【1】) {
+			/*
+			 * We are connected as a client to a group in which the
+			 * peer is the GO, so do not expire the peer entry.
+			 */
+			os_get_reltime(&dev->last_seen);
+			continue;
+		}
+
+		for (i = 0; i < p2p->num_groups; i++) {
+			   if (p2p_group_is_client_connected(p2p->groups[i], dev->info.p2p_device_addr)) 【2】
+				break;
+		}
+
+
+		if (i < p2p->num_groups) {
+			/*
+			 * The peer is connected as a client in a group where
+			 * we are the GO, so do not expire the peer entry.
+			 */
+			os_get_reltime(&dev->last_seen);
+			continue;   // 继续 dl_list_for_each_safe 循环
+		}
+
+		p2p_dbg(p2p, "Expiring old peer entry " MACSTR,MAC2STR(dev->info.p2p_device_addr));
+		dl_list_del(&dev->list);       【已有分析  删除双向链表的一个 Item 】
+		p2p_device_free(p2p, dev);      【3】
+	}
+}
+
+
+```
+###### p2p->cfg->go_connected & p2p_config.go_connected
+```
+
+```
+
+###### p2p_group_is_client_connected
+```
+
+
+```
+
+###### p2p_device_free
+```
+
+
+```
+
+#####  wpa_bss_flush_by_age(wpa_s, wpa_s->conf->bss_expiration_age)
+```
+
+wpa_bss_flush_by_age(wpa_s, wpa_s->conf->bss_expiration_age@180@); 
+
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/bss.c#911
+
+
+/**
+ * wpa_bss_flush_by_age - Flush old BSS entries
+ * @wpa_s: Pointer to wpa_supplicant data
+ * @age: Maximum entry age in seconds
+ *
+ * Remove BSS entries that have not been updated during the last @age seconds.
+ */
+void wpa_bss_flush_by_age(struct wpa_supplicant *wpa_s, int age@180@)
+{
+	struct wpa_bss *bss, *n;
+	struct os_reltime t;
+
+	if (dl_list_empty(&wpa_s->bss))
+		return;
+
+	os_get_reltime(&t);
+	t.sec -= age;
+
+	dl_list_for_each_safe(bss, n, &wpa_s->bss, struct wpa_bss, list) {
+		if (wpa_bss_in_use(wpa_s, bss))  【1】
+			continue;
+
+		if (os_reltime_before(&bss->last_update, &t)) {
+			wpa_bss_remove(wpa_s, bss, __func__);【2】     // #define __func__ "__func__ not defined"
+		} else
+			break;
+	}
+}
+
+
+
+```
+###### wpa_bss_in_use(wpa_s, bss)
+```
+
+
+```
+###### wpa_bss_remove(wpa_s, bss, __func__)
+```
+
+```
+
+
+#####  ap_periodic(wpa_s)
+```
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/ap.c#1580
+
+void ap_periodic(struct wpa_supplicant *wpa_s)
+{
+	if (wpa_s->ap_iface)
+		hostapd_periodic_iface(wpa_s->ap_iface);
+}
+
+
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/ap/hostapd.c#3404
+
+
+void hostapd_periodic_iface(struct hostapd_iface *iface)
+{
+	size_t i;
+
+	ap_list_timer(iface);   【1】
+
+	for (i = 0; i < iface->num_bss; i++) {
+		struct hostapd_data *hapd = iface->bss[i];
+
+		if (!hapd->started)
+			continue;
+
+		hostapd_acl_expire(hapd);  【2】
+
+	}
+}
+
+```
+###### ap_list_timer(hostapd_iface face)
+```
+未完待续
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/ap/ap_list.c#251
+
+void ap_list_timer(struct hostapd_iface *iface)
+{
+	struct os_reltime now;
+	struct ap_info *ap;
+	int set_beacon = 0;
+
+	if (!iface->ap_list)
+		return;
+
+	os_get_reltime(&now);
+
+	while (iface->ap_list) {
+		ap = iface->ap_list->prev;
+		if (!os_reltime_expired(&now, &ap->last_beacon,iface->conf->ap_table_expiration_time))
+			break;
+
+		ap_free_ap(iface, ap);
+	}
+
+	if (iface->olbc || iface->olbc_ht) {
+		int olbc = 0;
+		int olbc_ht = 0;
+
+		ap = iface->ap_list;
+		while (ap && (olbc == 0 || olbc_ht == 0)) {
+			if (ap_list_beacon_olbc(iface, ap))
+				olbc = 1;
+			if (!ap->ht_support)
+				olbc_ht = 1;
+			ap = ap->next;
+		}
+		if (!olbc && iface->olbc) {
+			wpa_printf(MSG_DEBUG, "OLBC not detected anymore");
+			iface->olbc = 0;
+			set_beacon++;
+		}
+
+		if (!olbc_ht && iface->olbc_ht) {
+			wpa_printf(MSG_DEBUG, "OLBC HT not detected anymore");
+			iface->olbc_ht = 0;
+			hostapd_ht_operation_update(iface);
+			set_beacon++;
+		}
+
+	}
+
+	if (set_beacon)
+		ieee802_11_update_beacons(iface);
+}
+
+```
+
+###### hostapd_acl_expire(hostapd_data hapd)
+```
+
+```
+
 
 ## wpa_supplicant* wpa_supplicant_add_iface( wpa_global,wpa_interface ,wpa_supplicant)
 ```
 http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/wpa_supplicant.c#5673
 
 
- 
+struct wpa_interface *ifaces;
+struct wpa_global *global;
 
+wpa_supplicant_add_iface(global, &ifaces[i], NULL)
 /**
  * wpa_supplicant_add_iface - Add a new network interface
  * @global: Pointer to global data from wpa_supplicant_init()
@@ -2036,7 +2447,433 @@ http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/wp
  * e.g., when a hotplug network adapter is inserted.
  */
 
+
+
+
+
+struct wpa_supplicant * wpa_supplicant_add_iface(struct wpa_global *global, struct wpa_interface *iface, struct wpa_supplicant *parent)
+{
+	struct wpa_supplicant *wpa_s;
+	struct wpa_interface t_iface;
+	struct wpa_ssid *ssid;
+
+	if (global == NULL || iface == NULL)
+		return NULL;
+
+	wpa_s = wpa_supplicant_alloc(parent);  【1】
+	if (wpa_s == NULL)
+		return NULL;
+
+	wpa_s->global = global;
+
+	t_iface = *iface;
+	if (global->params.override_driver) {
+		wpa_printf(MSG_DEBUG, "Override interface parameter: driver "('%s' -> '%s')",iface->driver, global->params.override_driver);
+		t_iface.driver = global->params.override_driver;
+	}
+	if (global->params.override_ctrl_interface) {
+		wpa_printf(MSG_DEBUG, "Override interface parameter: ""ctrl_interface ('%s' -> '%s')",iface->ctrl_interface,global->params.override_ctrl_interface);
+		t_iface.ctrl_interface =global->params.override_ctrl_interface;
+	}
+	if (wpa_supplicant_init_iface(wpa_s, &t_iface)) {    【2】
+		wpa_printf(MSG_DEBUG, "Failed to add interface %s", iface->ifname);
+		wpa_supplicant_deinit_iface(wpa_s, 0, 0);
+		return NULL;
+	}
+
+	/* Notify the control interfaces about new iface */
+	if (wpas_notify_iface_added(wpa_s)) {     【3】
+		wpa_supplicant_deinit_iface(wpa_s, 1, 0);
+		return NULL;
+	}
+
+	/* Notify the control interfaces about new networks for non p2p mgmt
+	 * ifaces. */
+	if (iface->p2p_mgmt == 0) {
+		for (ssid = wpa_s->conf->ssid; ssid; ssid = ssid->next)
+			wpas_notify_network_added(wpa_s, ssid);   【4】
+	}
+
+	wpa_s->next = global->ifaces;
+	global->ifaces = wpa_s;
+
+	wpa_dbg(wpa_s, MSG_DEBUG, "Added interface %s", wpa_s->ifname);  【5】
+	wpa_supplicant_set_state(wpa_s, WPA_DISCONNECTED);       【6】
+
+#ifdef CONFIG_P2P
+
+	if (wpa_s->global->p2p == NULL && !wpa_s->global->p2p_disabled && !wpa_s->conf->p2p_disabled &&
+	    (wpa_s->drv_flags & WPA_DRIVER_FLAGS_DEDICATED_P2P_DEVICE) &&  wpas_p2p_add_p2pdev_interface( wpa_s, wpa_s->global->params.conf_p2p_dev) < 0)  【7 】{
+		wpa_printf(MSG_INFO,  "P2P: Failed to enable P2P Device interface");
+
+		/* Try to continue without. P2P will be disabled. */
+	}
+#endif /* CONFIG_P2P */
+
+
+	return wpa_s;
+}
+
+
+
 ```
+### wpa_supplicant_alloc(parent@null@)
+```
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/wpa_supplicant.c#5673
+
+static struct wpa_supplicant *  wpa_supplicant_alloc(struct wpa_supplicant *parent)
+{
+	struct wpa_supplicant *wpa_s;
+
+	wpa_s = os_zalloc(sizeof(*wpa_s));   //wpa_supplicant初始化 
+	if (wpa_s == NULL)
+		return NULL;
+	wpa_s->scan_req = INITIAL_SCAN_REQ;    // 扫描分类
+	wpa_s->scan_interval = 5;      // 扫描间隔
+	wpa_s->new_connection = 1;   
+	wpa_s->parent = parent ? parent : wpa_s;  // 自己指向自己    struct wpa_supplicant * 	parent
+	wpa_s->p2pdev = wpa_s->parent;            //自己指向自己  struct wpa_supplicant *p2pdev;  
+	wpa_s->sched_scanning = 0;
+
+	dl_list_init(&wpa_s->bss_tmp_disallowed);   // 双向链表初始化  dllist  【已有分析】
+	dl_list_init(&wpa_s->fils_hlp_req);         // 双向链表初始化
+
+	return wpa_s;
+}
+
+
+扫描类型分类
+	enum scan_req_type {
+		/**
+		 * NORMAL_SCAN_REQ - Normal scan request
+		 * This is used for scans initiated by wpa_supplicant to find an AP for a connection.
+		 */
+		NORMAL_SCAN_REQ,
+
+		/**
+		 * INITIAL_SCAN_REQ - Initial scan request
+		 * This is used for the first scan on an interface to force at
+		 * least one scan to be run even if the configuration does not
+		 * include any enabled networks.
+		 */
+		INITIAL_SCAN_REQ,
+
+		/**
+		 * MANUAL_SCAN_REQ - Manual scan request
+		 * This is used for scans where the user request a scan or
+		 * a specific wpa_supplicant operation (e.g., WPS) requires scan
+		 * to be run.
+		 */
+		MANUAL_SCAN_REQ
+	} scan_req, last_scan_req;
+
+
+```
+
+### wpa_supplicant_init_iface(wpa_s, &t_iface)
+```
+
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/wpa_supplicant.c#5157
+
+static int wpa_supplicant_init_iface(struct wpa_supplicant *wpa_s,struct wpa_interface *iface)                                
+
+
+	struct wpa_driver_capa capa;
+	int capa_res;
+	u8 dfs_domain;
+
+	wpa_printf(MSG_DEBUG, "Initializing interface '%s' conf '%s' driver "
+		   "'%s' ctrl_interface '%s' bridge '%s'", iface->ifname,
+		   iface->confname ? iface->confname : "N/A",
+		   iface->driver ? iface->driver : "default",
+		   iface->ctrl_interface ? iface->ctrl_interface : "N/A",
+		   iface->bridge_ifname ? iface->bridge_ifname : "N/A");
+
+	if (iface->confname) {
+
+		wpa_s->confname = os_strdup(iface->confname);
+		wpa_s->conf = wpa_config_read(wpa_s->confname, NULL); 【1】
+		if (wpa_s->conf == NULL) {
+			wpa_printf(MSG_ERROR, "Failed to read or parse configuration '%s'.", wpa_s->confname);
+			return -1;
+		}
+		wpa_s->confanother = os_rel2abs_path(iface->confanother); 【2】
+		wpa_config_read(wpa_s->confanother, wpa_s->conf);   // 【同1】
+
+		/*
+		 * Override ctrl_interface and driver_param if set on command line.
+		 */
+		if (iface->ctrl_interface) {
+			os_free(wpa_s->conf->ctrl_interface);
+			wpa_s->conf->ctrl_interface = os_strdup(iface->ctrl_interface); 【3】
+		}
+
+		if (iface->driver_param) {
+			os_free(wpa_s->conf->driver_param);
+			wpa_s->conf->driver_param = os_strdup(iface->driver_param);  【同3】
+		}
+
+		if (iface->p2p_mgmt && !iface->ctrl_interface) {
+			os_free(wpa_s->conf->ctrl_interface);
+			wpa_s->conf->ctrl_interface = NULL;
+		}
+	} else
+		wpa_s->conf = wpa_config_alloc_empty(iface->ctrl_interface,iface->driver_param); 【4】 // 没有定义配置文件的话
+
+	if (wpa_s->conf == NULL) {
+		wpa_printf(MSG_ERROR, "\nNo configuration found.");
+		return -1;
+	}
+
+	if (iface->ifname == NULL) {
+		wpa_printf(MSG_ERROR, "\nInterface name is required.");
+		return -1;
+	}
+	if (os_strlen(iface->ifname) >= sizeof(wpa_s->ifname)) {
+		wpa_printf(MSG_ERROR, "\nToo long interface name '%s'.", iface->ifname);
+		return -1;
+	}
+	os_strlcpy(wpa_s->ifname, iface->ifname, sizeof(wpa_s->ifname)); // 把参数 wpa_interface 中的 ifname 接口名称复制到 wpa_supplicant 中
+
+	if (iface->bridge_ifname) {
+		if (os_strlen(iface->bridge_ifname) >= sizeof(wpa_s->bridge_ifname)) {
+			wpa_printf(MSG_ERROR, "\nToo long bridge interface  name '%s'.", iface->bridge_ifname);
+			return -1;
+		}
+		os_strlcpy(wpa_s->bridge_ifname, iface->bridge_ifname,sizeof(wpa_s->bridge_ifname));  // 把参数 wpa_interface 中的 bridge_ifname 接口名称复制到 wpa_supplicant 中
+	}
+
+	/* RSNA Supplicant Key Management - INITIALIZE */
+	eapol_sm_notify_portEnabled(wpa_s->eapol, FALSE);  【5】
+	eapol_sm_notify_portValid(wpa_s->eapol, FALSE);    【6】
+
+	/* Initialize driver interface and register driver event handler before
+	 * L2 receive handler so that association events are processed before
+	 * EAPOL-Key packets if both become available for the same select() call. */
+	if (wpas_init_driver(wpa_s, iface) < 0)    【7】
+		return -1;
+
+	if (wpa_supplicant_init_wpa(wpa_s) < 0)  【8】
+		return -1;
+
+	wpa_sm_set_ifname(wpa_s->wpa, wpa_s->ifname, wpa_s->bridge_ifname[0] ? wpa_s->bridge_ifname : NULL); 【9】
+	wpa_sm_set_fast_reauth(wpa_s->wpa, wpa_s->conf->fast_reauth);  【10】
+
+	if (wpa_s->conf->dot11RSNAConfigPMKLifetime@ 43200 @ && wpa_sm_set_param(wpa_s->wpa, RSNA_PMK_LIFETIME,wpa_s->conf->dot11RSNAConfigPMKLifetime)) {  【11】
+		wpa_msg(wpa_s, MSG_ERROR, "Invalid WPA parameter value for dot11RSNAConfigPMKLifetime"); 【12】
+		return -1;
+	}
+
+	if (wpa_s->conf->dot11RSNAConfigPMKReauthThreshold@ 0 @ && wpa_sm_set_param(wpa_s->wpa, RSNA_PMK_REAUTH_THRESHOLD,wpa_s->conf->dot11RSNAConfigPMKReauthThreshold)) {
+		wpa_msg(wpa_s, MSG_ERROR, "Invalid WPA parameter value for dot11RSNAConfigPMKReauthThreshold");
+		return -1;
+	}
+
+	if (wpa_s->conf->dot11RSNAConfigSATimeout @ 0 @ &&wpa_sm_set_param(wpa_s->wpa, RSNA_SA_TIMEOUT, wpa_s->conf->dot11RSNAConfigSATimeout)) {
+		wpa_msg(wpa_s, MSG_ERROR, "Invalid WPA parameter value for "
+			"dot11RSNAConfigSATimeout");
+		return -1;
+	}
+
+	wpa_s->hw.modes = wpa_drv_get_hw_feature_data(wpa_s,&wpa_s->hw.num_modes,&wpa_s->hw.flags,&dfs_domain); 【13】
+	if (wpa_s->hw.modes) {
+		u16 i;
+
+		for (i = 0; i < wpa_s->hw.num_modes; i++) {
+			if (wpa_s->hw.modes[i].vht_capab) {
+				wpa_s->hw_capab = CAPAB_VHT;
+				break;
+			}
+
+                enum local_hw_capab {
+//                    CAPAB_NO_HT_VHT,
+//                    CAPAB_HT,
+//                    CAPAB_HT40,
+//                    CAPAB_VHT,
+//                } hw_capab;
+// #define HT_CAP_INFO_SUPP_CHANNEL_WIDTH_SET	((u16) BIT(1)) 
+
+
+			if (wpa_s->hw.modes[i].ht_capab & HT_CAP_INFO_SUPP_CHANNEL_WIDTH_SET)   // 依据bit字节位  检测能力 capable 
+				wpa_s->hw_capab = CAPAB_HT40;
+			else if (wpa_s->hw.modes[i].ht_capab && wpa_s->hw_capab == CAPAB_NO_HT_VHT)
+				wpa_s->hw_capab = CAPAB_HT;
+		}
+	}
+
+	int capa_res = wpa_drv_get_capa(wpa_s, &capa);   【14】
+	if (capa_res == 0) {    // 初始化 capa数据
+		wpa_s->drv_capa_known = 1;
+		wpa_s->drv_flags = capa.flags;
+		wpa_s->drv_enc = capa.enc;
+		wpa_s->drv_smps_modes = capa.smps_modes;
+		wpa_s->drv_rrm_flags = capa.rrm_flags;
+		wpa_s->probe_resp_offloads = capa.probe_resp_offloads;
+		wpa_s->max_scan_ssids = capa.max_scan_ssids;
+		wpa_s->max_sched_scan_ssids = capa.max_sched_scan_ssids;
+		wpa_s->max_sched_scan_plans = capa.max_sched_scan_plans;
+		wpa_s->max_sched_scan_plan_interval =capa.max_sched_scan_plan_interval;
+		wpa_s->max_sched_scan_plan_iterations =capa.max_sched_scan_plan_iterations;
+		wpa_s->sched_scan_supported = capa.sched_scan_supported;
+		wpa_s->max_match_sets = capa.max_match_sets;
+		wpa_s->max_remain_on_chan = capa.max_remain_on_chan;
+		wpa_s->max_stations = capa.max_stations;
+		wpa_s->extended_capa = capa.extended_capa;
+		wpa_s->extended_capa_mask = capa.extended_capa_mask;
+		wpa_s->extended_capa_len = capa.extended_capa_len;
+		wpa_s->num_multichan_concurrent =capa.num_multichan_concurrent;
+		wpa_s->wmm_ac_supported = capa.wmm_ac_supported;
+
+		if (capa.mac_addr_rand_scan_supported)
+			wpa_s->mac_addr_rand_supported |= MAC_ADDR_RAND_SCAN;
+		if (wpa_s->sched_scan_supported &&
+		    capa.mac_addr_rand_sched_scan_supported)
+			wpa_s->mac_addr_rand_supported |=
+				(MAC_ADDR_RAND_SCHED_SCAN | MAC_ADDR_RAND_PNO);
+	}
+	if (wpa_s->max_remain_on_chan == 0)
+		wpa_s->max_remain_on_chan = 1000;
+
+	/*
+	 * Only take p2p_mgmt parameters when P2P Device is supported.
+	 * Doing it here as it determines whether l2_packet_init() will be done
+	 * during wpa_supplicant_driver_init().
+	 */
+	if (wpa_s->drv_flags & WPA_DRIVER_FLAGS_DEDICATED_P2P_DEVICE  @ 0x20000000 @)
+		wpa_s->p2p_mgmt = iface->p2p_mgmt; 
+	else
+		iface->p2p_mgmt = 1;
+
+	if (wpa_s->num_multichan_concurrent == 0)
+		wpa_s->num_multichan_concurrent = 1;
+
+	if (wpa_supplicant_driver_init(wpa_s) < 0)  【15】
+		return -1;
+
+#ifdef CONFIG_TDLS
+	if ((!iface->p2p_mgmt || !(wpa_s->drv_flags & WPA_DRIVER_FLAGS_DEDICATED_P2P_DEVICE)) && wpa_tdls_init(wpa_s->wpa))  【16】
+		return -1;
+#endif /* CONFIG_TDLS */
+
+	if (wpa_s->conf->country[0] && wpa_s->conf->country[1] && wpa_drv_set_country(wpa_s, wpa_s->conf->country)) {  【 17 设置国家编码 countrycode 】
+		wpa_dbg(wpa_s, MSG_DEBUG, "Failed to set country");
+		return -1;
+	}
+
+
+	if (wpas_wps_init(wpa_s))   【18】
+		return -1;
+
+
+
+
+	if (wpa_supplicant_init_eapol(wpa_s) < 0)  【19】
+		return -1;
+	wpa_sm_set_eapol(wpa_s->wpa, wpa_s->eapol);  【20】
+
+	wpa_s->ctrl_iface = wpa_supplicant_ctrl_iface_init(wpa_s);   【21】
+	if (wpa_s->ctrl_iface == NULL) {
+		wpa_printf(MSG_ERROR,
+			   "Failed to initialize control interface '%s'.\n"
+			   "You may have another wpa_supplicant process "
+			   "already running or the file was\n"
+			   "left by an unclean termination of wpa_supplicant "
+			   "in which case you will need\n"
+			   "to manually remove this file before starting "
+			   "wpa_supplicant again.\n",
+			   wpa_s->conf->ctrl_interface);
+		return -1;
+	}
+
+	wpa_s->gas = gas_query_init(wpa_s);  【22】
+	if (wpa_s->gas == NULL) {
+		wpa_printf(MSG_ERROR, "Failed to initialize GAS query");
+		return -1;
+	}
+
+	if (iface->p2p_mgmt && wpas_p2p_init(wpa_s->global, wpa_s) < 0) {   【23】
+		wpa_msg(wpa_s, MSG_ERROR, "Failed to init P2P");
+		return -1;
+	}
+
+	if (wpa_bss_init(wpa_s) < 0)    【24】
+		return -1;
+
+
+	/*
+	 * Set Wake-on-WLAN triggers, if configured.
+	 * Note: We don't restore/remove the triggers on shutdown (it doesn't
+	 * have effect anyway when the interface is down).
+	 */
+	if (capa_res == 0 && wpas_set_wowlan_triggers(wpa_s, &capa) < 0)    【25】
+		return -1;
+
+
+
+	if (pcsc_reader_init(wpa_s) < 0)  【26】
+		return -1;
+
+	if (wpas_init_ext_pw(wpa_s) < 0)   【27】
+		return -1;
+
+	wpas_rrm_reset(wpa_s);   【28】
+
+	wpas_sched_scan_plans_set(wpa_s, wpa_s->conf->sched_scan_plans);   【29】
+
+#ifdef CONFIG_HS20
+	hs20_init(wpa_s);       【29】
+#endif /* CONFIG_HS20 */
+
+
+
+	wpa_supplicant_set_default_scan_ies(wpa_s);   【30】
+
+	return 0;
+}
+```
+
+#### wpa_config_read(wpa_s->confname, NULL)
+```
+继续点
+
+```
+#### os_rel2abs_path(iface->confanother)
+#### os_strdup(iface->ctrl_interface)
+#### wpa_config_alloc_empty(iface->ctrl_interface,iface->driver_param)
+#### eapol_sm_notify_portEnabled(wpa_s->eapol, FALSE); 
+#### eapol_sm_notify_portValid(wpa_s->eapol, FALSE)
+#### wpas_init_driver(wpa_s, iface)
+#### wpa_supplicant_init_wpa(wpa_s)
+#### wpa_sm_set_ifname
+#### wpa_sm_set_fast_reauth
+#### wpa_sm_set_param
+#### wpa_msg(wpa_s, MSG_ERROR,"")
+#### wpa_drv_get_hw_feature_data
+#### wpa_drv_get_capa(wpa_s, &capa)
+#### wpa_supplicant_driver_init(wpa_s)
+#### wpa_tdls_init(wpa_s->wpa)
+#### wpa_drv_set_country
+#### wpas_wps_init(wpa_s)
+#### wpa_supplicant_init_eapol(wpa_s)
+#### wpa_sm_set_eapol(wpa_s->wpa, wpa_s->eapol)
+#### wpa_supplicant_ctrl_iface_init(wpa_s)
+#### gas_query_init(wpa_s)
+#### wpas_p2p_init(wpa_s->global, wpa_s) 
+#### wpa_bss_init(wpa_s) 
+#### wpas_set_wowlan_triggers(wpa_s, &capa)
+#### pcsc_reader_init(wpa_s)
+#### wpas_init_ext_pw(wpa_s)
+#### wpas_rrm_reset(wpa_s)
+#### wpas_sched_scan_plans_set(wpa_s, wpa_s->conf->sched_scan_plans)
+#### hs20_init(wpa_s)
+#### wpa_supplicant_set_default_scan_ies(wpa_s);
+
+
+### wpas_notify_iface_added(wpa_s)
+### wpas_notify_network_added(wpa_s, ssid)
+### wpa_dbg(wpa_s, MSG_DEBUG, "Added interface %s", wpa_s->ifname)
+### wpa_supplicant_set_state(wpa_s, WPA_DISCONNECTED)
+### wpas_p2p_add_p2pdev_interface
 
 ## int wpa_supplicant_run( wpa_global *global)
 ```
@@ -3807,1057 +4644,6 @@ char * wpa_supplicant_ctrl_iface_process(struct wpa_supplicant *wpa_s, char *buf
 
 
 
-
-#  WIFI数据结构
-
-
-## wpa_supplicant(struct)
-
-http://w1.fi/wpa_supplicant/devel/classes.html
-
-
-### wpa_interface
-```
-http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/wpa_supplicant_i.h#53
-http://w1.fi/wpa_supplicant/devel/structwpa__interface.html
-
-/**  为函数wpa_supplicant_add_iface() 准备基础数据的 数据结构
- * struct wpa_interface - Parameters for wpa_supplicant_add_iface()
- */
-struct wpa_interface {
-
-	const char *confname;   // 配置文件路径名称    -c/data/vendor/wifi/wpa/wpa_supplicant.conf  -c 参数指明     
-	const char *confanother;  // 备份的配置文件路径名称   -I参数指定   -I/system/etc/wifi/wpa_supplicant_overlay.conf 
-	const char *ctrl_interface;  // 全局控制接口 -g参数指定  控制接口  .rc文件执行命令如果没有设置-g 参数 , 该值默认从配置文件读取
-	const char *driver;           //  WPA适配的驱动程序类型 -D 参数指定    -Dnl80211  
-	const char *driver_param;      // WPA 适配驱动程序键值对参数 -p参数指定 
-	const char *ifname;                 //  	Interface name.网卡接口名称  -i 参数指定  -iwlan0
-	const char *bridge_ifname;       //  -b 参数指定  桥接接口 主要用于接收EAP认证帧 -b
-	int p2p_mgmt;                    // 指示是否必须为此接口调用 wpas_p2p_init()
-};
-
-```
-
-### wpa_params
-```
-http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/wpa_supplicant_i.h#126
-http://w1.fi/wpa_supplicant/devel/structwpa__params.html
-
-
-
-
-/**
- * struct wpa_params - Parameters for wpa_supplicant_init()
- */
-struct wpa_params {
-int 	     daemonize                       // Run wpa_supplicant in the background.       开关用来设置 wpa_supplicant作为守护进程运行    -B 参数指定
-int 	     wait_for_monitor               // Wait for a monitor program before starting.  开关控制   启动之前等待 监视程序运行 wpa才继续运行
-char * 	     pid_file                       //Path to a PID (process ID) file. More...      WPA进程文件全路径名
-int 	     wpa_debug_level                // Debugging verbosity level (e.g., MSG_INFO)   WPA的LOG等级  1-高  2-中  3-低
-int 	     wpa_debug_show_keys            // Whether keying material is included in debug. Key配置信息是否打印开关  仅用于开发调试 用户版本必须关闭
-int 	     wpa_debug_timestamp            // Whether to include timestamp in debug messages.  时间戳是否显示在Log中的 开关
-char * 	     ctrl_interface                // Global ctrl_iface path/parameter.  全局控制接口 ( 单个 )   -g @android:vendor_wpa_wlan0   
-char * 	     ctrl_interface_group          //	Global ctrl_iface group.   全局控制接口( 群组 )
-int 	     dbus_ctrl_interface           // Enable the DBus control interface.   是否开启DBus 控制接口 开关
-const char*  wpa_debug_file_path           // Path of debug file or NULL to use stdout.   -f 参数指定  Log文件全路径
-int 	     wpa_debug_syslog              // Enable log output through syslog.   通过 syslog系统Log日志 来输出WPA的Log 开关
-int 	     wpa_debug_tracing              // Enable log output through Linux tracing.  通过 Linux tracing 输出 WPA的LOG 开关
-char *       override_driver                //Optional driver parameter override. More...  可选的driver驱动参数覆盖  key-value覆盖
-char *       override_ctrl_interface      // Optional ctrl_interface override. More...  可选的 -O参数指定 ctrl_interface 控制接口参数覆盖   key-value覆盖 
-char *       entropy_file                 // Optional entropy file. More... 用于生产随机数字的二进制执行程序全路径  用于加密  -e 参数指定 -e/data/misc/wifi/entropy.bin
-char *       conf_p2p_dev                 //Configuration file P2P Device configuration parameters  WLAN P2P的配置文件全路径  -m 参数指定 -m/data/vendor/wifi/wigig_p2p_supplicant.conf 
-}
-
-
-```
-
-
-### wpa_global
-```
-Internal, global data for all wpa_supplicant interfaces
-内部的全局的所有数据  对于所有 wpa_supplicant 接口
-
-
-http://w1.fi/wpa_supplicant/devel/structwpa__global.html
-http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/wpa_supplicant_i.h#264
-
-/**
- * struct wpa_global - Internal, global data for all %wpa_supplicant interfaces
- *
- * This structure is initialized by calling wpa_supplicant_init() when starting
- * %wpa_supplicant.
- */
-struct wpa_global {
-	struct wpa_supplicant *ifaces;
-	struct wpa_params params;
-	struct ctrl_iface_global_priv *ctrl_iface;
-	struct wpas_dbus_priv *dbus;
-	struct wpas_hidl_priv *hidl;
-	void **drv_priv;
-	size_t drv_count;
-	struct os_time suspend_time;
-	struct p2p_data *p2p;
-	struct wpa_supplicant *p2p_init_wpa_s;
-	struct wpa_supplicant *p2p_group_formation;
-	struct wpa_supplicant *p2p_invite_group;
-	u8 p2p_dev_addr[ETH_ALEN];
-	struct os_reltime p2p_go_wait_client;
-	struct dl_list p2p_srv_bonjour; /* struct p2p_srv_bonjour */
-	struct dl_list p2p_srv_upnp; /* struct p2p_srv_upnp */
-	int p2p_disabled;
-	int cross_connection;
-	struct wpa_freq_range_list p2p_disallow_freq;
-	struct wpa_freq_range_list p2p_go_avoid_freq;
-	enum wpa_conc_pref {
-		WPA_CONC_PREF_NOT_SET,
-		WPA_CONC_PREF_STA,
-		WPA_CONC_PREF_P2P
-	} conc_pref;
-	unsigned int p2p_per_sta_psk:1;
-	unsigned int p2p_fail_on_wps_complete:1;
-	unsigned int p2p_24ghz_social_channels:1;
-	unsigned int pending_p2ps_group:1;
-	unsigned int pending_group_iface_for_p2ps:1;
-	unsigned int pending_p2ps_group_freq;
-	int wifi_display;
-#define MAX_WFD_SUBELEMS 12
-	struct wpabuf *wfd_subelem[MAX_WFD_SUBELEMS];
-#endif 
-
-	struct psk_list_entry *add_psk; /* From group formation */
-};
-
-
-```
-
-
-<img src="//../zimage/wireless/wifi/09_supplicant/wpa_global.png" width = "50%" height="50%"/>
-
-### wpa_supplicant
-```
-Internal data for wpa_supplicant interface
-http://w1.fi/wpa_supplicant/devel/structwpa__supplicant.html
-
-
-
-
-struct wpa_global * 	global
-struct wpa_radio * 	radio
-struct dl_list 	radio_list
-struct wpa_supplicant * 	parent
-struct wpa_supplicant * 	next
-struct l2_packet_data * 	l2
-struct l2_packet_data * 	l2_br
-unsigned char 	own_addr [ETH_ALEN]
-unsigned char 	perm_addr [ETH_ALEN]
-char 	ifname [100]
-char 	bridge_ifname [16]
-char * 	confname
-char * 	confanodther
-struct wpa_config * 	conf
-int 	countermeasures
-struct os_reltime 	last_michael_mic_error
-u8 	bssid [ETH_ALEN]
-u8 	pending_bssid [ETH_ALEN]
-int 	reassociate
-int 	reassoc_same_bss
-int 	disconnected
-struct wpa_ssid * 	current_ssid
-struct wpa_ssid * 	last_ssid
-struct wpa_bss * 	current_bss
-int 	ap_ies_from_associnfo
-unsigned int 	assoc_freq
-int 	pairwise_cipher
-int 	group_cipher
-int 	key_mgmt
-int 	wpa_proto
-int 	mgmt_group_cipher
-void * 	drv_priv
-void * 	global_drv_priv
-u8 * 	bssid_filter
-size_t 	bssid_filter_count
-u8 * 	disallow_aps_bssid
-size_t 	disallow_aps_bssid_count
-struct wpa_ssid_value * 	disallow_aps_ssid
-size_t 	disallow_aps_ssid_count
-enum set_band 	setband
-struct wpa_ssid * 	next_ssid
-int 	prev_scan_wildcard
-struct wpa_ssid * 	prev_scan_ssid
-struct wpa_ssid * 	prev_sched_ssid
-int 	sched_scan_timeout
-int 	sched_scan_interval
-int 	first_sched_scan
-int 	sched_scan_timed_out
-void(* 	scan_res_handler )(struct wpa_supplicant *wpa_s, struct wpa_scan_results *scan_res)
-struct dl_list 	bss
-struct dl_list 	bss_id
-size_t 	num_bss
-unsigned int 	bss_update_idx
-unsigned int 	bss_next_id
-struct wpa_bss ** 	last_scan_res
-unsigned int 	last_scan_res_used
-unsigned int 	last_scan_res_size
-struct os_reltime 	last_scan
-const struct wpa_driver_ops * 	driver
-int 	interface_removed
-struct wpa_sm * 	wpa
-struct eapol_sm * 	eapol
-struct ctrl_iface_priv * 	ctrl_iface
-enum wpa_states 	wpa_state
-struct wpa_radio_work * 	scan_work
-int 	scanning
-int 	sched_scanning
-int 	new_connection
-int 	eapol_received
-struct scard_data * 	scard
-char 	imsi [20]
-int 	mnc_len
-unsigned char 	last_eapol_src [ETH_ALEN]
-unsigned int 	keys_cleared
-struct wpa_blacklist * 	blacklist
-int 	extra_blacklist_count
- 	Sum of blacklist counts after last connection. More...
-enum wpa_supplicant::scan_req_type 	scan_req
-enum wpa_supplicant::scan_req_type 	last_scan_req
-enum wpa_states 	scan_prev_wpa_state
-struct os_reltime scan_trigger_time 	scan_start_time
-struct os_reltime 	scan_min_time
-int 	scan_runs
-int * 	next_scan_freqs
-int * 	manual_scan_freqs
-int * 	manual_sched_scan_freqs
-unsigned int 	manual_scan_passive:1
-unsigned int 	manual_scan_use_id:1
-unsigned int 	manual_scan_only_new:1
-unsigned int 	own_scan_requested:1
-unsigned int 	own_scan_running:1
-unsigned int 	clear_driver_scan_cache:1
-unsigned int 	manual_scan_id
-int 	scan_interval
-int 	normal_scans
-int 	scan_for_connection
-int 	scan_id [MAX_SCAN_ID]
-unsigned int 	scan_id_count
-struct wpa_ssid_value * 	ssids_from_scan_req
-unsigned int 	num_ssids_from_scan_req
-u64 	drv_flags
-unsigned int 	drv_enc
-unsigned int 	drv_smps_modes
-unsigned int 	drv_rrm_flags
-unsigned int 	probe_resp_offloads
-const u8 * 	extended_capa
-const u8 * 	extended_capa_mask
-unsigned int 	extended_capa_len
-int 	max_scan_ssids
-int 	max_sched_scan_ssids
-int 	sched_scan_supported
-unsigned int 	max_match_sets
-unsigned int 	max_remain_on_chan
-unsigned int 	max_stations
-int 	pending_mic_error_report
-int 	pending_mic_error_pairwise
-int 	mic_errors_seen
-struct wps_context * 	wps
-int 	wps_success
-struct wps_er * 	wps_er
-unsigned int 	wps_run
-struct os_reltime 	wps_pin_start_time
-int 	blacklist_cleared
-struct wpabuf * 	pending_eapol_rx
-struct os_reltime 	pending_eapol_rx_time
-u8 	pending_eapol_rx_src [ETH_ALEN]
-unsigned int 	last_eapol_matches_bssid:1
-unsigned int 	eap_expected_failure:1
-unsigned int 	reattach:1
-unsigned int 	mac_addr_changed:1
-unsigned int 	added_vif:1
-struct os_reltime 	last_mac_addr_change
-int 	last_mac_addr_style
-struct ibss_rsn * 	ibss_rsn
-int 	set_sta_uapsd
-int 	sta_uapsd
-int 	set_ap_uapsd
-int 	ap_uapsd
-struct hostapd_iface * 	ifmsh
-unsigned int 	off_channel_freq
-struct wpabuf * 	pending_action_tx
-u8 	pending_action_src [ETH_ALEN]
-u8 	pending_action_dst [ETH_ALEN]
-u8 	pending_action_bssid [ETH_ALEN]
-unsigned int 	pending_action_freq
-int 	pending_action_no_cck
-int 	pending_action_without_roc
-unsigned int 	pending_action_tx_done:1
-void(* 	pending_action_tx_status_cb )(struct wpa_supplicant *wpa_s, unsigned int freq, const u8 *dst, const u8 *src, const u8 *bssid, const u8 *data, size_t data_len, enum offchannel_send_action_result result)
-unsigned int 	roc_waiting_drv_freq
-int 	action_tx_wait_time
-int 	p2p_mgmt
-struct p2p_go_neg_results * 	go_params
-int 	create_p2p_iface
-u8 	pending_interface_addr [ETH_ALEN]
-char 	pending_interface_name [100]
-int 	pending_interface_type
-int 	p2p_group_idx
-unsigned int 	pending_listen_freq
-unsigned int 	pending_listen_duration
-enum wpa_supplicant:: { ... }  	p2p_group_interface
-struct p2p_group * 	p2p_group
-int 	p2p_long_listen
-char 	p2p_pin [10]
-int 	p2p_wps_method
-u8 	p2p_auth_invite [ETH_ALEN]
-int 	p2p_sd_over_ctrl_iface
-int 	p2p_in_provisioning
-int 	p2p_in_invitation
-int 	p2p_invite_go_freq
-int 	pending_invite_ssid_id
-int 	show_group_started
-u8 	go_dev_addr [ETH_ALEN]
-int 	pending_pd_before_join
-u8 	pending_join_iface_addr [ETH_ALEN]
-u8 	pending_join_dev_addr [ETH_ALEN]
-int 	pending_join_wps_method
-u8 	p2p_join_ssid [SSID_MAX_LEN]
-size_t 	p2p_join_ssid_len
-int 	p2p_join_scan_count
-int 	auto_pd_scan_retry
-int 	force_long_sd
-u16 	pending_pd_config_methods
-enum wpa_supplicant:: { ... }  	pending_pd_use
-int 	cross_connect_disallowed
-int 	cross_connect_enabled
-int 	cross_connect_in_use
-char 	cross_connect_uplink [100]
-unsigned int 	p2p_auto_join:1
-unsigned int 	p2p_auto_pd:1
-unsigned int 	p2p_persistent_group:1
-unsigned int 	p2p_fallback_to_go_neg:1
-unsigned int 	p2p_pd_before_go_neg:1
-unsigned int 	p2p_go_ht40:1
-unsigned int 	p2p_go_vht:1
-unsigned int 	user_initiated_pd:1
-unsigned int 	p2p_go_group_formation_completed:1
-unsigned int 	group_formation_reported:1
-unsigned int 	waiting_presence_resp
-int 	p2p_first_connection_timeout
-unsigned int 	p2p_nfc_tag_enabled:1
-unsigned int 	p2p_peer_oob_pk_hash_known:1
-unsigned int 	p2p_disable_ip_addr_req:1
-unsigned int 	p2ps_method_config_any:1
-unsigned int 	p2p_cli_probe:1
-int 	p2p_persistent_go_freq
-int 	p2p_persistent_id
-int 	p2p_go_intent
-int 	p2p_connect_freq
-struct os_reltime 	p2p_auto_started
-struct wpa_ssid * 	p2p_last_4way_hs_fail
-struct wpa_radio_work * 	p2p_scan_work
-struct wpa_radio_work * 	p2p_listen_work
-struct wpa_radio_work * 	p2p_send_action_work
-u16 	p2p_oob_dev_pw_id
-struct wpabuf * 	p2p_oob_dev_pw
-u8 	p2p_peer_oob_pubkey_hash [WPS_OOB_PUBKEY_HASH_LEN]
-u8 	p2p_ip_addr_info [3 *4]
-int * 	p2p_group_common_freqs
-unsigned int 	p2p_group_common_freqs_num
-u8 	p2ps_join_addr [ETH_ALEN]
-struct wpa_ssid * 	bgscan_ssid
-const struct bgscan_ops * 	bgscan
-void * 	bgscan_priv
-const struct autoscan_ops * 	autoscan
-struct wpa_driver_scan_params * 	autoscan_params
-void * 	autoscan_priv
-struct wpa_ssid * 	connect_without_scan
-struct wps_ap_info * 	wps_ap
-size_t 	num_wps_ap
-int 	wps_ap_iter
-int 	after_wps
-int 	known_wps_freq
-unsigned int 	wps_freq
-int 	wps_fragment_size
-int 	auto_reconnect_disabled
-int 	best_24_freq
-int 	best_5_freq
-int 	best_overall_freq
-struct gas_query * 	gas
-unsigned int 	drv_capa_known
-struct {
-   struct hostapd_hw_modes *   modes
-   u16   num_modes
-   u16   flags
-} 	hw
-enum wpa_supplicant::local_hw_capab 	hw_capab
-int 	pno
-int 	pno_sched_pending
-int 	disconnect_reason
-struct ext_password_data * 	ext_pw
-struct wpabuf * 	last_gas_resp
-struct wpabuf * 	prev_gas_resp
-u8 	last_gas_addr [ETH_ALEN]
-u8 	prev_gas_addr [ETH_ALEN]
-u8 	last_gas_dialog_token
-u8 	prev_gas_dialog_token
-unsigned int 	no_keep_alive:1
-unsigned int 	ext_mgmt_frame_handling:1
-unsigned int 	ext_eapol_frame_io:1
-unsigned int 	wmm_ac_supported:1
-unsigned int 	ext_work_in_progress:1
-unsigned int 	own_disconnect_req:1
-unsigned int 	mac_addr_rand_supported
-unsigned int 	mac_addr_rand_enable
-u8 * 	mac_addr_scan
-u8 * 	mac_addr_sched_scan
-u8 * 	mac_addr_pno
-unsigned int 	num_multichan_concurrent
-struct wpa_radio_work * 	connect_work
-unsigned int 	ext_work_id
-struct wpabuf * 	vendor_elem [NUM_VENDOR_ELEM_FRAMES]
-struct wmm_ac_assoc_data * 	wmm_ac_assoc_info
-struct wmm_tspec_element * 	tspecs [WMM_AC_NUM][TS_DIR_IDX_COUNT]
-struct wmm_ac_addts_request * 	addts_request
-u8 	wmm_ac_last_dialog_token
-struct wmm_tspec_element * 	last_tspecs
-u8 	last_tspecs_count
-struct rrm_data 	rrm
-
-```
-
-<img src="//../zimage/wireless/wifi/09_supplicant/wpa_supplicant.png" width = "50%" height="50%"/>
-
-
-
-
-
-
-### wpa_driver_ops
-
-```
-Driver interface API definition
-与驱动交互的API接口
-http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/hostapd/src/drivers/driver.h#2061
-http://w1.fi/wpa_supplicant/devel/structwpa__driver__ops.html
-
-
-
-const char * 	name    // Name of the driver interface.
-const char * 	desc    // One line description of the driver interface.
-int(* 	get_bssid )(void *priv, u8 *bssid)  //Get the current BSSID. More...
-int(* 	get_ssid )(void *priv, u8 *ssid)  // Get the current SSID. More...
-
-// Configure encryption key. More...
-int(* 	set_key )(const char *ifname, void *priv, enum wpa_alg alg, const u8 *addr, int key_idx, int set_tx, const u8 *seq, size_t seq_len, const u8 *key, size_t key_len)
-
-// Initialize driver interface. More...
-void *(* 	init )(void *ctx, const char *ifname)
-
-void(* 	deinit )(void *priv)  // Deinitialize driver interface. More...
-
-int(* 	set_param )(void *priv, const char *param)  // Set driver configuration parameters. More...
-
-int(* 	set_countermeasures )(void *priv, int enabled)  // Enable/disable TKIP countermeasures. More...
-
-int(* 	deauthenticate )(void *priv, const u8 *addr, int reason_code)  // Request driver to deauthenticate. More...
-
-int(* 	associate )(void *priv, struct wpa_driver_associate_params *params)  //Request driver to associate. More...
-
-int(* 	add_pmkid )(void *priv, const u8 *bssid, const u8 *pmkid)  // Add PMKSA cache entry to the driver. More...
-
-int(* 	remove_pmkid )(void *priv, const u8 *bssid, const u8 *pmkid)  // Remove PMKSA cache entry to the driver. More...
-
-int(* 	flush_pmkid )(void *priv)  // Flush PMKSA cache. More...
-
-int(* 	get_capa )(void *priv, struct wpa_driver_capa *capa)  // Get driver capabilities. More...
-
-void(* 	poll )(void *priv)   // Poll driver for association information. More...
-
-const char *(* 	get_ifname )(void *priv)  // Get interface name. More...
-
-const u8 *(* 	get_mac_addr )(void *priv)   // Get own MAC address. More...
-
-int(* 	set_operstate )(void *priv, int state)   // Sets device operating state to DORMANT or UP. More...
-
-//MLME-SETPROTECTION.request primitive. More...
-int(* 	mlme_setprotection )(void *priv, const u8 *addr, int protect_type, int key_type)
-
-//Get hardware support data (channels and rates) More...
-struct hostapd_hw_modes *(* 	get_hw_feature_data )(void *priv, u16 *num_modes, u16 *flags)
-
-//Send management frame from MLME. More...
-int(* 	send_mlme )(void *priv, const u8 *data, size_t data_len, int noack, unsigned int freq)
-
-//Update FT (IEEE 802.11r) IEs. More...
-int(* 	update_ft_ies )(void *priv, const u8 *md, const u8 *ies, size_t ies_len)
-
-//Fetch the latest scan results. More...
-struct wpa_scan_results *(* 	get_scan_results2 )(void *priv)
-
-
-// Set country. More...
-int(* 	set_country )(void *priv, const char *alpha2)
-
-// Get country. More...
-int(* 	get_country )(void *priv, char *alpha2)
-
-
-// Global driver initialization. More...
-void *(* 	global_init )(void)
-
-// Global driver deinitialization. More...
-void(* 	global_deinit )(void *priv)
-
-//Initialize driver interface (with global data) More...
-void *(* 	init2 )(void *ctx, const char *ifname, void *global_priv)
-
-//Get information about available interfaces. More...
-struct wpa_interface_info *(* 	get_interfaces )(void *global_priv)
-
-//Request the driver to initiate scan. More...
-int(* 	scan2 )(void *priv, struct wpa_driver_scan_params *params)
-
-//Request driver to authenticate. More...
-int(* 	authenticate )(void *priv, struct wpa_driver_auth_params *params)
-
-//Set Beacon and Probe Response information for AP mode. More...
-int(* 	set_ap )(void *priv, struct wpa_driver_ap_params *params)
-
-//Set ACL in AP mode. More...
-int(* 	set_acl )(void *priv, struct hostapd_acl_params *params)
-
-//Initialize driver interface (hostapd only) More...
-void *(* 	hapd_init )(struct hostapd_data *hapd, struct wpa_init_params *params)
-
-// Deinitialize driver interface (hostapd only) More...
-void(* 	hapd_deinit )(void *priv)
-
-// Enable/disable IEEE 802.1X support (AP only) More...
-int(* 	set_ieee8021x )(void *priv, struct wpa_bss_params *params)
-
-// Enable/disable privacy (AP only) More...
-int(* 	set_privacy )(void *priv, int enabled)
-
-// Fetch the current TSC/packet number (AP only) More...
-int(* 	get_seqnum )(const char *ifname, void *priv, const u8 *addr, int idx, u8 *seq)
-
-// Flush all association stations (AP only) More...
-int(* 	flush )(void *priv)
-
-// Add IEs into Beacon/Probe Response frames (AP) More...
-int(* 	set_generic_elem )(void *priv, const u8 *elem, size_t elem_len)
-
-// Fetch station data. More...
-int(* 	read_sta_data )(void *priv, struct hostap_sta_driver_data *data, const u8 *addr)
-
-// Send an EAPOL packet (AP only) More...
-int(* 	hapd_send_eapol )(void *priv, const u8 *addr, const u8 *data, size_t data_len, int encrypt, const u8 *own_addr, u32 flags)
-
-//Deauthenticate a station (AP only) More...
-int(* 	sta_deauth )(void *priv, const u8 *own_addr, const u8 *addr, int reason)
-
-// Disassociate a station (AP only) More...
-int(* 	sta_disassoc )(void *priv, const u8 *own_addr, const u8 *addr, int reason)
-
-//Remove a station entry (AP only) More...
-int(* 	sta_remove )(void *priv, const u8 *addr)
-
-// Get the current SSID (AP only) More...
-int(* 	hapd_get_ssid )(void *priv, u8 *buf, int len)
-
-// Set SSID (AP only) More...
-int(* 	hapd_set_ssid )(void *priv, const u8 *buf, int len)
-
-// Enable/disable TKIP countermeasures (AP) More...
-int(* 	hapd_set_countermeasures )(void *priv, int enabled)
-
-//Add a station entry. More...
-int(* 	sta_add )(void *priv, struct hostapd_sta_add_params *params)
-
-// Get station inactivity duration (AP only) More...
-int(* 	get_inact_sec )(void *priv, const u8 *addr)
-
-// Clear station statistics (AP only) More...
-int(* 	sta_clear_stats )(void *priv, const u8 *addr)
-
-//Set channel/frequency (AP only) More...
-int(* 	set_freq )(void *priv, struct hostapd_freq_params *freq)
-
-// Set RTS threshold. More...
-int(* 	set_rts )(void *priv, int rts)
-
-//Set fragmentation threshold. More...
-int(* 	set_frag )(void *priv, int frag)
-
-// Set station flags (AP only) More...
-int(* 	sta_set_flags )(void *priv, const u8 *addr, unsigned int total_flags, unsigned int flags_or, unsigned int flags_and)
-
-//Set TX queue parameters. More...
-int(* 	set_tx_queue_params )(void *priv, int queue, int aifs, int cw_min, int cw_max, int burst_time)
-
-
-// Add a virtual interface. More...
-int(* 	if_add )(void *priv, enum wpa_driver_if_type type, const char *ifname, const u8 *addr, void *bss_ctx, void **drv_priv, char *force_ifname, u8 *if_addr, const char *bridge, int use_existing)
-
-// Remove a virtual interface. More...
-int(* 	if_remove )(void *priv, enum wpa_driver_if_type type, const char *ifname)
-
-// Bind a station into a specific interface (AP only) More...
-int(* 	set_sta_vlan )(void *priv, const u8 *addr, const char *ifname, int vlan_id)
-
-// Optional commit changes handler (AP only) More...
-int(* 	commit )(void *priv)
-
-//Send an ethernet packet (AP only) More...
-int(* 	send_ether )(void *priv, const u8 *dst, const u8 *src, u16 proto, const u8 *data, size_t data_len)
-
-//Notification of RADIUS ACL change. More...
-int(* 	set_radius_acl_auth )(void *priv, const u8 *mac, int accepted, u32 session_timeout)
-
-// Notification of RADIUS ACL expiration. More...
-int(* 	set_radius_acl_expire )(void *priv, const u8 *mac)
-
-// Add WPS IE(s) into Beacon/Probe Response frames (AP) More...
-int(* 	set_ap_wps_ie )(void *priv, const struct wpabuf *beacon, const struct wpabuf *proberesp, const struct wpabuf *assocresp)
-
-// Set IEEE 802.1X Supplicant Port status. More...
-int(* 	set_supp_port )(void *priv, int authorized)
-
-// Bind a station into a 4-address WDS (AP only) More...
-int(* 	set_wds_sta )(void *priv, const u8 *addr, int aid, int val, const char *bridge_ifname, char *ifname_wds)
-
-// Transmit an Action frame. More...
-int(* 	send_action )(void *priv, unsigned int freq, unsigned int wait, const u8 *dst, const u8 *src, const u8 *bssid, const u8 *data, size_t data_len, int no_cck)
-
-// Cancel action frame TX wait. More...
-void(* 	send_action_cancel_wait )(void *priv)
-
-//Remain awake on a channel. More...
-int(* 	remain_on_channel )(void *priv, unsigned int freq, unsigned int duration)
-
-// Cancel remain-on-channel operation. More...
-int(* 	cancel_remain_on_channel )(void *priv)
-
-// Request Probe Request frames to be indicated. More...
-int(* 	probe_req_report )(void *priv, int report)
-
-// Deinitialize AP mode. More...
-int(* 	deinit_ap )(void *priv)
-
-// Deinitialize P2P client mode. More...
-int(* 	deinit_p2p_cli )(void *priv)
-
-//Notification on system suspend/hibernate event. More...
-void(* 	suspend )(void *priv)
-
-// Notification on system resume/thaw event. More...
-void(* 	resume )(void *priv)
-
-// Set signal monitoring parameters. More...
-int(* 	signal_monitor )(void *priv, int threshold, int hysteresis)
-
-// Send IEEE 802.11 frame (testing use only) More...
-int(* 	send_frame )(void *priv, const u8 *data, size_t data_len, int encrypt)
-
-// Get current Notice of Absence attribute payload. More...
-int(* 	get_noa )(void *priv, u8 *buf, size_t buf_len)
-
-
-// Set Notice of Absence parameters for GO (testing) More...
-int(* 	set_noa )(void *priv, u8 count, int start, int duration)
-
-//Set P2P power save options. More...
-int(* 	set_p2p_powersave )(void *priv, int legacy_ps, int opp_ps, int ctwindow)
-
-// Enable/disable aggregation. More...
-int(* 	ampdu )(void *priv, int ampdu)
-
-//Get physical radio name for the device. More...
-const char *(* 	get_radio_name )(void *priv)
-
-//for sending TDLS management packets More...
-int(* 	send_tdls_mgmt )(void *priv, const u8 *dst, u8 action_code, u8 dialog_token, u16 status_code, u32 peer_capab, int initiator, const u8 *buf, size_t len)
-
-// Ask the driver to perform high-level TDLS operations. More...
-int(* 	tdls_oper )(void *priv, enum tdls_oper oper, const u8 *peer)
-
-// Notify driver of the WNM frame reception. More...
-int(* 	wnm_oper )(void *priv, enum wnm_oper oper, const u8 *peer, u8 *buf, u16 *buf_len)
-
-// Set QoS Map. More...
-int(* 	set_qos_map )(void *priv, const u8 *qos_map_set, u8 qos_map_set_len)
-
-// Add a neigh to the bridge ip neigh table. More...
-int(* 	br_add_ip_neigh )(void *priv, u8 version, const u8 *ipaddr, int prefixlen, const u8 *addr)
-
-// Remove a neigh from the bridge ip neigh table. More...
-int(* 	br_delete_ip_neigh )(void *priv, u8 version, const u8 *ipaddr)
-
-
-// Set a bridge port attribute. More...
-int(* 	br_port_set_attr )(void *priv, enum drv_br_port_attr attr, unsigned int val)
-
-// Set a bridge network parameter. More...
-int(* 	br_set_net_param )(void *priv, enum drv_br_net_param param, unsigned int val)
-
-// Set wake-on-wireless triggers. More...
-int(* 	set_wowlan )(void *priv, const struct wowlan_triggers *triggers)
-
-//Get current connection information. More...
-int(* 	signal_poll )(void *priv, struct wpa_signal_info *signal_info)
-
-// Set authentication algorithm(s) for static WEP. More...
-int(* 	set_authmode )(void *priv, int authmode)
-
-// Execute vendor specific command. More...
-int(* 	vendor_cmd )(void *priv, unsigned int vendor_id, unsigned int subcmd, const u8 *data, size_t data_len, struct wpabuf *buf)
-
-// Set rekey information. More...
-void(* 	set_rekey_info )(void *priv, const u8 *kek, size_t kek_len, const u8 *kck, size_t kck_len, const u8 *replay_ctr)
-
-// Station association indication. More...
-int(* 	sta_assoc )(void *priv, const u8 *own_addr, const u8 *addr, int reassoc, u16 status, const u8 *ie, size_t len)
-
-// Station authentication indication. More...
-int(* 	sta_auth )(void *priv, const u8 *own_addr, const u8 *addr, u16 seq, u16 status, const u8 *ie, size_t len)
-
-// Add traffic stream. More...
-int(* 	add_tspec )(void *priv, const u8 *addr, u8 *tspec_ie, size_t tspec_ielen)
-
-// Add a station node in the driver. More...
-int(* 	add_sta_node )(void *priv, const u8 *addr, u16 auth_alg)
-
-
-// Request the driver to initiate scheduled scan. More...
-int(* 	sched_scan )(void *priv, struct wpa_driver_scan_params *params, u32 interval)
-
-// Request the driver to stop a scheduled scan. More...
-int(* 	stop_sched_scan )(void *priv)
-
-// Probe (null data or such) the given station. More...
-void(* 	poll_client )(void *priv, const u8 *own_addr, const u8 *addr, int qos)
-
-// Disable/enable radio. More...
-int(* 	radio_disable )(void *priv, int disabled)
-
-// Announce channel switch and migrate the GO to the given frequency. More...
-int(* 	switch_channel )(void *priv, struct csa_settings *settings)
-
-// Add traffic stream. More...
-int(* 	add_tx_ts )(void *priv, u8 tsid, const u8 *addr, u8 user_prio, u16 admitted_time)
-
-// Delete traffic stream. More...
-int(* 	del_tx_ts )(void *priv, u8 tsid, const u8 *addr)
-
-// Enable channel-switching with TDLS peer. More...
-int(* 	tdls_enable_channel_switch )(void *priv, const u8 *addr, u8 oper_class, const struct hostapd_freq_params *params)
-
-//Disable channel switching with TDLS peer. More...
-int(* 	tdls_disable_channel_switch )(void *priv, const u8 *addr)
-
-// Listen for radar interference on the channel. More...
-int(* 	start_dfs_cac )(void *priv, struct hostapd_freq_params *freq)
-
-// Removes beacon from AP. More...
-int(* 	stop_ap )(void *priv)
-
-// Retrieve survey data. More...
-int(* 	get_survey )(void *priv, unsigned int freq)
-
-// Get driver interface status information. More...
-int(* 	status )(void *priv, char *buf, size_t buflen)
-
-// Set roaming policy for driver-based BSS selection. More...
-int(* 	roaming )(void *priv, int allowed, const u8 *bssid)
-
-// Set MAC address. More...
-int(* 	set_mac_addr )(void *priv, const u8 *addr)
-
-// Driver specific initialization for mesh. More...
-int(* 	init_mesh )(void *priv)
-
-// Join a mesh network. More...
-int(* 	join_mesh )(void *priv, struct wpa_driver_mesh_join_params *params)
-
-// Leave a mesh network. More...
-int(* 	leave_mesh )(void *priv)
-
-// Automatically select channel. More...
-int(* 	do_acs )(void *priv, struct drv_acs_params *params)
-
-//Notify driver of band selection. More...
-int(* 	set_band )(void *priv, enum set_band band)
-
-//Get preferred frequency list for an interface. More...
-int(* 	get_pref_freq_list )(void *priv, enum wpa_driver_if_type if_type, unsigned int *num, unsigned int *freq_list)
-
-//Indicate probable P2P operating channel. More...
-int(* 	set_prob_oper_freq )(void *priv, unsigned int freq)
-
-
-
-```
-<img src="//../zimage/wireless/wifi/09_supplicant/wpa_driver_ops.png" width = "50%" height="50%"/>
-
-
-
-### eap_method 
-```
-http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/hostapd/src/eap_peer/eap_i.h#66
-http://w1.fi/wpa_supplicant/devel/structeap__method.html
-
-/**
- * struct eap_method - EAP method interface
- * This structure defines the EAP method interface. Each method will need to
- * register its own EAP type, EAP name, and set of function pointers for method
- * specific operations. This interface is based on section 4.4 of RFC 4137.
- */
-
-struct eap_method  {
-	int vendor;
-	EapType method;
-	const char *name;
-	void * (*init)(struct eap_sm *sm);
-	void (*deinit)(struct eap_sm *sm, void *priv);
-	struct wpabuf * (*process)(struct eap_sm *sm, void *priv,struct eap_method_ret *ret,const struct wpabuf *reqData);
-	Boolean (*isKeyAvailable)(struct eap_sm *sm, void *priv);
-	u8 * (*getKey)(struct eap_sm *sm, void *priv, size_t *len);
-	int (*get_status)(struct eap_sm *sm, void *priv, char *buf,size_t buflen, int verbose);
-	Boolean (*has_reauth_data)(struct eap_sm *sm, void *priv);
-	void (*deinit_for_reauth)(struct eap_sm *sm, void *priv);
-	void * (*init_for_reauth)(struct eap_sm *sm, void *priv);
-	const u8 * (*get_identity)(struct eap_sm *sm, void *priv, size_t *len);
-	int (*get_error_code)(void *priv);
-	void (*free)(struct eap_method *method);
-	int version;
-	struct eap_method *next;
-	void *dl_handle;
-	u8 * (*get_emsk)(struct eap_sm *sm, void *priv, size_t *len);
-	u8 * (*getSessionId)(struct eap_sm *sm, void *priv, size_t *len);
-};
-
-
-```
-
-```
-#graphviz 绘图代码
-
-from graphviz import Digraph
-
-s = Digraph('structs', filename='structs_revisited.gv', node_attr={'shape': 'record'})
-s.attr(rankdir='LR')
-s.node('struct_md5', "{{ EAP-Name=EAP_MD5 |void * XmethodX |<md5here> *eap_method next}}")
-s.node('struct_tls', "{{ EAP-Name=EAP_TLS |void * XmethodX |<tlshere> *eap_method next}}")
-s.node('struct_peap', "{{ EAP-Name=EAP_PEAP |void * XmethodX |<peaphere> *eap_method next}}")
-s.node('struct_null', "NULL")
-s.edges([('struct_md5:md5here', 'struct_tls')])
-s.edges([('struct_tls:tlshere', 'struct_peap')])
-s.edges([('struct_peap:peaphere', 'struct_null')])
-s.view()
-print(s.source)
-
-
-```
-
-<img src="//../zimage/wireless/wifi/09_supplicant/eap_method.jpg"/>
-
-### dl_list
-```
-struct dl_list {
-    struct dl_list *next, *prev;
-};
-
-
-```
-
-
-
-### eloop_data
-```
-http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/utils/eloop.c#161
-
-
-struct eloop_data {
-	int max_sock;
-	int count; /* sum of all table counts */
-
-	struct eloop_sock_table readers;
-	struct eloop_sock_table writers;
-	struct eloop_sock_table exceptions;
-	struct eloop_signal *signals;
-	struct dl_list timeout;
-
-	int signal_count;
-
-	int signaled;
-	int pending_terminate;
-
-	int terminate;
-};
-
-
-
-
-```
-
-<img src="//../zimage/wireless/wifi/09_supplicant/eloop_data.png" width = "50%" height="50%"/>
-```
-# eloop_data 数据结构绘图
-
-from graphviz import Digraph
-
-s = Digraph('structs', filename='structs_revisited.gv', node_attr={'shape': 'record'} )
-s.attr(rankdir='LR')
-
-s.node('eloop_data2', "{{ eloop_data2 | <data2_reader>eloop_sock_table reader "
-                      "|<data2_writer>eloop_sock_table writer "
-                      "|<data2_exception> eloop_sock_table exception "
-                      "|<data2_signal> eloop_signal signals"
-                      "|<data2_dllist> timeout dl_list  }}")
-
-s.node('eloop_data0', "{{ eloop_data0 | <data0_reader>eloop_sock_table reader "
-                      "|<data0_writer>eloop_sock_table writer "
-                      "|<data0_exception> eloop_sock_table exception "
-                      "|<data0_signal> eloop_signal signals"
-                      "|<data0_dllist> timeout dl_list }}")
-
-s.node('eloop_data1', "{{ eloop_data1 | <data1_reader>eloop_sock_table reader "
-                      "|<data1_writer>eloop_sock_table writer "
-                      "|<data1_exception> eloop_sock_table exception "
-                      "|<data1_signal> eloop_signal signals"
-                      "| {<data1_dllist_left> timeout dl_list_pre | <data1_dllist_right> timeout dl_list_next} }}")
-
-
-s.node('eloop_sock_table_reader', "{{ eloop_sock_table_reader | int count "
-                      "|eloop_event_type#READ#WRITE#EXCEPTION# "
-                      "|<eloop_sock_reader>eloop_sock   }}")
-
-s.node('eloop_sock_table_writer', "{{ eloop_sock_table_writer | int count "
-                      "|eloop_event_type#READ#WRITE#EXCEPTION# "
-                      "|<eloop_sock_writer>eloop_sock   }}")
-
-s.node('eloop_sock_table_exception', "{{ eloop_sock_table_exception | int count "
-                      "|eloop_event_type#READ#WRITE#EXCEPTION# "
-                      "|<eloop_sock_exception>eloop_sock   }}")
-
-
-s.node('eloop_signal', "{{ eloop_signal | int sig 信号量 "
-                      "|void *user_data 用户数据 "
-                      "|void* eloop_signal_handler 处理函数 }}")
-
-s.node('eloop_sock_reader', "{{ eloop_sock_reader | int sock 句柄 "
-                      "|void *eloop_data 数据 "
-                      "|void *user_data 数据 "
-                      "|void * eloop_sock_handler reader处理函数指针  }}")
-
-s.node('eloop_sock_writer', "{{ eloop_sock_writer | int sock 句柄 "
-                      "|void *eloop_data 数据 "
-                      "|void *user_data 数据 "
-                      "|void * eloop_sock_handler writer处理函数指针  }}")
-
-
-s.node('eloop_sock_exception', "{{ eloop_sock_exception | int sock 句柄 "
-                      "|void *eloop_data 数据 "
-                      "|void *user_data 数据 "
-                      "|void * eloop_sock_handler exception处理函数指针  }}")
-
-
-s.edges([('eloop_data1:data1_dllist_left', 'eloop_data0')])
-s.edges([('eloop_data1:data1_dllist_right', 'eloop_data2')])
-s.edges([('eloop_data2:data2_reader', 'eloop_sock_table_reader')])
-s.edges([('eloop_data2:data2_writer', 'eloop_sock_table_writer')])
-s.edges([('eloop_data2:data2_exception', 'eloop_sock_table_exception')])
-s.edges([('eloop_data2:data2_signal', 'eloop_signal')])
-
-s.edges([('eloop_sock_table_reader:eloop_sock_reader', 'eloop_sock_reader')])
-s.edges([('eloop_sock_table_writer:eloop_sock_writer', 'eloop_sock_writer')])
-s.edges([('eloop_sock_table_exception:eloop_sock_exception', 'eloop_sock_exception')])
-s.view()
-print(s.source)
-
-
-```
-
-
-
-
-
-#### eloop_sock_table
-
-```
-http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/utils/eloop.c#70
-
-struct eloop_sock_table {
-	int count;
-	struct eloop_sock *table;
-	eloop_event_type type;   // 事件类型
-	int changed;
-};
-
-http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/utils/eloop.h#31
-typedef enum {
-	EVENT_TYPE_READ = 0,    // 读 
-	EVENT_TYPE_WRITE,       // 写
-	EVENT_TYPE_EXCEPTION    // 异常
-} eloop_event_type;
-
-
-
-```
-
-
-#### eloop_sock
-```
-http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/utils/eloop.c#42
-struct eloop_sock {
-	int sock;
-	void *eloop_data;
-	void *user_data;
-	eloop_sock_handler handler;  // 函数指针
-	WPA_TRACE_REF(eloop);
-	WPA_TRACE_REF(user);
-	WPA_TRACE_INFO
-};
-
-http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/utils/eloop.h#43
-typedef void (*eloop_sock_handler)(int sock, void *eloop_ctx, void *sock_ctx);
-
-```
-
-#### eloop_signal
-```
-
-struct eloop_signal {
-	int sig;
-	void *user_data;
-	eloop_signal_handler handler;   // 函数指针
-	int signaled;
-};
-
-```
-
-
-
-### ctrl_iface_global_priv
-
-```
-http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/ctrl_iface_unix.c#ctrl_iface_global_priv
-
-struct ctrl_iface_global_priv {
-	struct wpa_global *global;
-	int sock;
-	struct dl_list ctrl_dst;
-	int android_control_socket;
-	struct dl_list msg_queue;
-	unsigned int throttle_count;
-};
-
-
-
-```
-
-
-<img src="//../zimage/wireless/wifi/09_supplicant/ctrl_iface_global_priv.jpg" width = "50%" height="50%"/>
-
-
 # wpa_cli 命令
 
 ```
@@ -6110,5 +5896,2059 @@ Invalid DPP_PKEX_REMOVE command - at least 1 argument is required.
 adb root & adb shell wpa_cli -iwlan0 -g@android:vendor_wpa_wlan0 IFNAME=wlan0 DPP_PKEX_REMOVE 1
 FAIL
 
+
+```
+
+
+
+
+#  WIFI数据结构
+
+
+## wpa_supplicant(struct)
+
+http://w1.fi/wpa_supplicant/devel/classes.html
+
+
+### wpa_interface
+```
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/wpa_supplicant_i.h#53
+http://w1.fi/wpa_supplicant/devel/structwpa__interface.html
+
+/**  为函数wpa_supplicant_add_iface() 准备基础数据的 数据结构
+ * struct wpa_interface - Parameters for wpa_supplicant_add_iface()
+ */
+struct wpa_interface {
+
+	const char *confname;   // 配置文件路径名称    -c/data/vendor/wifi/wpa/wpa_supplicant.conf  -c 参数指明     
+	const char *confanother;  // 备份的配置文件路径名称   -I参数指定   -I/system/etc/wifi/wpa_supplicant_overlay.conf 
+	const char *ctrl_interface;  // 全局控制接口 -g参数指定  控制接口  .rc文件执行命令如果没有设置-g 参数 , 该值默认从配置文件读取
+	const char *driver;           //  WPA适配的驱动程序类型 -D 参数指定    -Dnl80211  
+	const char *driver_param;      // WPA 适配驱动程序键值对参数 -p参数指定 
+	const char *ifname;                 //  	Interface name.网卡接口名称  -i 参数指定  -iwlan0
+	const char *bridge_ifname;       //  -b 参数指定  桥接接口 主要用于接收EAP认证帧 -b
+	int p2p_mgmt;                    // 指示是否必须为此接口调用 wpas_p2p_init()
+};
+
+```
+
+### wpa_params
+```
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/wpa_supplicant_i.h#126
+http://w1.fi/wpa_supplicant/devel/structwpa__params.html
+
+
+
+
+/**
+ * struct wpa_params - Parameters for wpa_supplicant_init()
+ */
+struct wpa_params {
+int 	     daemonize                       // Run wpa_supplicant in the background.       开关用来设置 wpa_supplicant作为守护进程运行    -B 参数指定
+int 	     wait_for_monitor               // Wait for a monitor program before starting.  开关控制   启动之前等待 监视程序运行 wpa才继续运行
+char * 	     pid_file                       //Path to a PID (process ID) file. More...      WPA进程文件全路径名
+int 	     wpa_debug_level                // Debugging verbosity level (e.g., MSG_INFO)   WPA的LOG等级  1-高  2-中  3-低
+int 	     wpa_debug_show_keys            // Whether keying material is included in debug. Key配置信息是否打印开关  仅用于开发调试 用户版本必须关闭
+int 	     wpa_debug_timestamp            // Whether to include timestamp in debug messages.  时间戳是否显示在Log中的 开关
+char * 	     ctrl_interface                // Global ctrl_iface path/parameter.  全局控制接口 ( 单个 )   -g @android:vendor_wpa_wlan0   
+char * 	     ctrl_interface_group          //	Global ctrl_iface group.   全局控制接口( 群组 )
+int 	     dbus_ctrl_interface           // Enable the DBus control interface.   是否开启DBus 控制接口 开关
+const char*  wpa_debug_file_path           // Path of debug file or NULL to use stdout.   -f 参数指定  Log文件全路径
+int 	     wpa_debug_syslog              // Enable log output through syslog.   通过 syslog系统Log日志 来输出WPA的Log 开关
+int 	     wpa_debug_tracing              // Enable log output through Linux tracing.  通过 Linux tracing 输出 WPA的LOG 开关
+char *       override_driver                //Optional driver parameter override. More...  可选的driver驱动参数覆盖  key-value覆盖
+char *       override_ctrl_interface      // Optional ctrl_interface override. More...  可选的 -O参数指定 ctrl_interface 控制接口参数覆盖   key-value覆盖 
+char *       entropy_file                 // Optional entropy file. More... 用于生产随机数字的二进制执行程序全路径  用于加密  -e 参数指定 -e/data/misc/wifi/entropy.bin
+char *       conf_p2p_dev                 //Configuration file P2P Device configuration parameters  WLAN P2P的配置文件全路径  -m 参数指定 -m/data/vendor/wifi/wigig_p2p_supplicant.conf 
+}
+
+
+```
+
+
+### wpa_global
+```
+Internal, global data for all wpa_supplicant interfaces
+内部的全局的所有数据  对于所有 wpa_supplicant 接口
+
+
+http://w1.fi/wpa_supplicant/devel/structwpa__global.html
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/wpa_supplicant_i.h#264
+
+/**
+ * struct wpa_global - Internal, global data for all %wpa_supplicant interfaces
+ *
+ * This structure is initialized by calling wpa_supplicant_init() when starting
+ * %wpa_supplicant.
+ */
+struct wpa_global {
+	struct wpa_supplicant *ifaces;
+	struct wpa_params params;
+	struct ctrl_iface_global_priv *ctrl_iface;
+	struct wpas_dbus_priv *dbus;
+	struct wpas_hidl_priv *hidl;
+	void **drv_priv;
+	size_t drv_count;
+	struct os_time suspend_time;
+	struct p2p_data *p2p;
+	struct wpa_supplicant *p2p_init_wpa_s;
+	struct wpa_supplicant *p2p_group_formation;
+	struct wpa_supplicant *p2p_invite_group;
+	u8 p2p_dev_addr[ETH_ALEN];
+	struct os_reltime p2p_go_wait_client;
+	struct dl_list p2p_srv_bonjour; /* struct p2p_srv_bonjour */
+	struct dl_list p2p_srv_upnp; /* struct p2p_srv_upnp */
+	int p2p_disabled;
+	int cross_connection;
+	struct wpa_freq_range_list p2p_disallow_freq;
+	struct wpa_freq_range_list p2p_go_avoid_freq;
+	enum wpa_conc_pref {
+		WPA_CONC_PREF_NOT_SET,
+		WPA_CONC_PREF_STA,
+		WPA_CONC_PREF_P2P
+	} conc_pref;
+	unsigned int p2p_per_sta_psk:1;
+	unsigned int p2p_fail_on_wps_complete:1;
+	unsigned int p2p_24ghz_social_channels:1;
+	unsigned int pending_p2ps_group:1;
+	unsigned int pending_group_iface_for_p2ps:1;
+	unsigned int pending_p2ps_group_freq;
+	int wifi_display;
+#define MAX_WFD_SUBELEMS 12
+	struct wpabuf *wfd_subelem[MAX_WFD_SUBELEMS];
+#endif 
+
+	struct psk_list_entry *add_psk; /* From group formation */
+};
+
+
+```
+
+
+<img src="//../zimage/wireless/wifi/09_supplicant/wpa_global.png" width = "50%" height="50%"/>
+
+### wpa_supplicant
+```
+Internal data for wpa_supplicant interface
+http://w1.fi/wpa_supplicant/devel/structwpa__supplicant.html
+
+
+
+
+struct wpa_global * 	global
+struct wpa_radio * 	radio
+struct dl_list 	radio_list
+struct wpa_supplicant * 	parent
+struct wpa_supplicant * 	next
+struct wpa_supplicant *     p2pdev;
+
+/*
+ * This should be under CONFIG_MBO, but it is left out to allow using the bss_temp_disallowed list for other purposes as well.
+ */
+struct dl_list bss_tmp_disallowed;
+
+/* FILS HLP requests (struct fils_hlp_req) */
+struct dl_list fils_hlp_req;
+
+
+struct l2_packet_data * 	l2
+struct l2_packet_data * 	l2_br
+unsigned char 	own_addr [ETH_ALEN]
+unsigned char 	perm_addr [ETH_ALEN]
+char 	ifname [100]
+char 	bridge_ifname [16]
+char * 	confname
+char * 	confanodther
+struct wpa_config * 	conf
+int 	countermeasures
+struct os_reltime 	last_michael_mic_error
+u8 	bssid [ETH_ALEN]
+u8 	pending_bssid [ETH_ALEN]
+int 	reassociate
+int 	reassoc_same_bss
+int 	disconnected
+struct wpa_ssid * 	current_ssid
+struct wpa_ssid * 	last_ssid
+struct wpa_bss * 	current_bss
+int 	ap_ies_from_associnfo
+unsigned int 	assoc_freq
+int 	pairwise_cipher
+int 	group_cipher
+int 	key_mgmt
+int 	wpa_proto
+int 	mgmt_group_cipher
+void * 	drv_priv
+void * 	global_drv_priv
+u8 * 	bssid_filter
+size_t 	bssid_filter_count
+u8 * 	disallow_aps_bssid
+size_t 	disallow_aps_bssid_count
+struct wpa_ssid_value * 	disallow_aps_ssid
+size_t 	disallow_aps_ssid_count
+enum set_band 	setband
+struct wpa_ssid * 	next_ssid
+int 	prev_scan_wildcard
+struct wpa_ssid * 	prev_scan_ssid
+struct wpa_ssid * 	prev_sched_ssid
+int 	sched_scan_timeout
+int 	sched_scan_interval
+int 	first_sched_scan
+int 	sched_scan_timed_out
+void(* 	scan_res_handler )(struct wpa_supplicant *wpa_s, struct wpa_scan_results *scan_res)
+struct dl_list 	bss
+struct dl_list 	bss_id
+size_t 	num_bss
+unsigned int 	bss_update_idx
+unsigned int 	bss_next_id
+struct wpa_bss ** 	last_scan_res
+unsigned int 	last_scan_res_used
+unsigned int 	last_scan_res_size
+struct os_reltime 	last_scan
+const struct wpa_driver_ops * 	driver
+int 	interface_removed
+struct wpa_sm * 	wpa
+struct eapol_sm * 	eapol
+struct ctrl_iface_priv * 	ctrl_iface
+enum wpa_states 	wpa_state
+struct wpa_radio_work * 	scan_work
+int 	scanning
+int 	sched_scanning
+int 	new_connection
+int 	eapol_received
+struct scard_data * 	scard
+char 	imsi [20]
+int 	mnc_len
+unsigned char 	last_eapol_src [ETH_ALEN]
+unsigned int 	keys_cleared
+struct wpa_blacklist * 	blacklist
+int 	extra_blacklist_count
+ 	Sum of blacklist counts after last connection. More...
+enum wpa_supplicant::scan_req_type 	scan_req
+enum wpa_supplicant::scan_req_type 	last_scan_req
+enum wpa_states 	scan_prev_wpa_state
+struct os_reltime scan_trigger_time 	scan_start_time
+struct os_reltime 	scan_min_time
+int 	scan_runs
+int * 	next_scan_freqs
+int * 	manual_scan_freqs
+int * 	manual_sched_scan_freqs
+unsigned int 	manual_scan_passive:1
+unsigned int 	manual_scan_use_id:1
+unsigned int 	manual_scan_only_new:1
+unsigned int 	own_scan_requested:1
+unsigned int 	own_scan_running:1
+unsigned int 	clear_driver_scan_cache:1
+unsigned int 	manual_scan_id
+int 	scan_interval
+int 	normal_scans
+int 	scan_for_connection
+int 	scan_id [MAX_SCAN_ID]
+unsigned int 	scan_id_count
+struct wpa_ssid_value * 	ssids_from_scan_req
+unsigned int 	num_ssids_from_scan_req
+u64 	drv_flags
+unsigned int 	drv_enc
+unsigned int 	drv_smps_modes
+unsigned int 	drv_rrm_flags
+unsigned int 	probe_resp_offloads
+const u8 * 	extended_capa
+const u8 * 	extended_capa_mask
+unsigned int 	extended_capa_len
+int 	max_scan_ssids
+int 	max_sched_scan_ssids
+int 	sched_scan_supported
+unsigned int 	max_match_sets
+unsigned int 	max_remain_on_chan
+unsigned int 	max_stations
+int 	pending_mic_error_report
+int 	pending_mic_error_pairwise
+int 	mic_errors_seen
+struct wps_context * 	wps
+int 	wps_success
+struct wps_er * 	wps_er
+unsigned int 	wps_run
+struct os_reltime 	wps_pin_start_time
+int 	blacklist_cleared
+struct wpabuf * 	pending_eapol_rx
+struct os_reltime 	pending_eapol_rx_time
+u8 	pending_eapol_rx_src [ETH_ALEN]
+unsigned int 	last_eapol_matches_bssid:1
+unsigned int 	eap_expected_failure:1
+unsigned int 	reattach:1
+unsigned int 	mac_addr_changed:1
+unsigned int 	added_vif:1
+struct os_reltime 	last_mac_addr_change
+int 	last_mac_addr_style
+struct ibss_rsn * 	ibss_rsn
+int 	set_sta_uapsd
+int 	sta_uapsd
+int 	set_ap_uapsd
+int 	ap_uapsd
+struct hostapd_iface * 	ifmsh
+unsigned int 	off_channel_freq
+struct wpabuf * 	pending_action_tx
+u8 	pending_action_src [ETH_ALEN]
+u8 	pending_action_dst [ETH_ALEN]
+u8 	pending_action_bssid [ETH_ALEN]
+unsigned int 	pending_action_freq
+int 	pending_action_no_cck
+int 	pending_action_without_roc
+unsigned int 	pending_action_tx_done:1
+void(* 	pending_action_tx_status_cb )(struct wpa_supplicant *wpa_s, unsigned int freq, const u8 *dst, const u8 *src, const u8 *bssid, const u8 *data, size_t data_len, enum offchannel_send_action_result result)
+unsigned int 	roc_waiting_drv_freq
+int 	action_tx_wait_time
+int 	p2p_mgmt
+struct p2p_go_neg_results * 	go_params
+int 	create_p2p_iface
+u8 	pending_interface_addr [ETH_ALEN]
+char 	pending_interface_name [100]
+int 	pending_interface_type
+int 	p2p_group_idx
+unsigned int 	pending_listen_freq
+unsigned int 	pending_listen_duration
+enum wpa_supplicant:: { ... }  	p2p_group_interface
+struct p2p_group * 	p2p_group
+int 	p2p_long_listen
+char 	p2p_pin [10]
+int 	p2p_wps_method
+u8 	p2p_auth_invite [ETH_ALEN]
+int 	p2p_sd_over_ctrl_iface
+int 	p2p_in_provisioning
+int 	p2p_in_invitation
+int 	p2p_invite_go_freq
+int 	pending_invite_ssid_id
+int 	show_group_started
+u8 	go_dev_addr [ETH_ALEN]
+int 	pending_pd_before_join
+u8 	pending_join_iface_addr [ETH_ALEN]
+u8 	pending_join_dev_addr [ETH_ALEN]
+int 	pending_join_wps_method
+u8 	p2p_join_ssid [SSID_MAX_LEN]
+size_t 	p2p_join_ssid_len
+int 	p2p_join_scan_count
+int 	auto_pd_scan_retry
+int 	force_long_sd
+u16 	pending_pd_config_methods
+enum wpa_supplicant:: { ... }  	pending_pd_use
+int 	cross_connect_disallowed
+int 	cross_connect_enabled
+int 	cross_connect_in_use
+char 	cross_connect_uplink [100]
+unsigned int 	p2p_auto_join:1
+unsigned int 	p2p_auto_pd:1
+unsigned int 	p2p_persistent_group:1
+unsigned int 	p2p_fallback_to_go_neg:1
+unsigned int 	p2p_pd_before_go_neg:1
+unsigned int 	p2p_go_ht40:1
+unsigned int 	p2p_go_vht:1
+unsigned int 	user_initiated_pd:1
+unsigned int 	p2p_go_group_formation_completed:1
+unsigned int 	group_formation_reported:1
+unsigned int 	waiting_presence_resp
+int 	p2p_first_connection_timeout
+unsigned int 	p2p_nfc_tag_enabled:1
+unsigned int 	p2p_peer_oob_pk_hash_known:1
+unsigned int 	p2p_disable_ip_addr_req:1
+unsigned int 	p2ps_method_config_any:1
+unsigned int 	p2p_cli_probe:1
+int 	p2p_persistent_go_freq
+int 	p2p_persistent_id
+int 	p2p_go_intent
+int 	p2p_connect_freq
+struct os_reltime 	p2p_auto_started
+struct wpa_ssid * 	p2p_last_4way_hs_fail
+struct wpa_radio_work * 	p2p_scan_work
+struct wpa_radio_work * 	p2p_listen_work
+struct wpa_radio_work * 	p2p_send_action_work
+u16 	p2p_oob_dev_pw_id
+struct wpabuf * 	p2p_oob_dev_pw
+u8 	p2p_peer_oob_pubkey_hash [WPS_OOB_PUBKEY_HASH_LEN]
+u8 	p2p_ip_addr_info [3 *4]
+int * 	p2p_group_common_freqs
+unsigned int 	p2p_group_common_freqs_num
+u8 	p2ps_join_addr [ETH_ALEN]
+struct wpa_ssid * 	bgscan_ssid
+const struct bgscan_ops * 	bgscan
+void * 	bgscan_priv
+const struct autoscan_ops * 	autoscan
+struct wpa_driver_scan_params * 	autoscan_params
+void * 	autoscan_priv
+struct wpa_ssid * 	connect_without_scan
+struct wps_ap_info * 	wps_ap
+size_t 	num_wps_ap
+int 	wps_ap_iter
+int 	after_wps
+int 	known_wps_freq
+unsigned int 	wps_freq
+int 	wps_fragment_size
+int 	auto_reconnect_disabled
+int 	best_24_freq
+int 	best_5_freq
+int 	best_overall_freq
+struct gas_query * 	gas
+unsigned int 	drv_capa_known
+struct {
+   struct hostapd_hw_modes *   modes
+   u16   num_modes
+   u16   flags
+} 	hw
+enum wpa_supplicant::local_hw_capab 	hw_capab
+int 	pno
+int 	pno_sched_pending
+int 	disconnect_reason
+struct ext_password_data * 	ext_pw
+struct wpabuf * 	last_gas_resp
+struct wpabuf * 	prev_gas_resp
+u8 	last_gas_addr [ETH_ALEN]
+u8 	prev_gas_addr [ETH_ALEN]
+u8 	last_gas_dialog_token
+u8 	prev_gas_dialog_token
+unsigned int 	no_keep_alive:1
+unsigned int 	ext_mgmt_frame_handling:1
+unsigned int 	ext_eapol_frame_io:1
+unsigned int 	wmm_ac_supported:1
+unsigned int 	ext_work_in_progress:1
+unsigned int 	own_disconnect_req:1
+unsigned int 	mac_addr_rand_supported
+unsigned int 	mac_addr_rand_enable
+u8 * 	mac_addr_scan
+u8 * 	mac_addr_sched_scan
+u8 * 	mac_addr_pno
+unsigned int 	num_multichan_concurrent
+struct wpa_radio_work * 	connect_work
+unsigned int 	ext_work_id
+struct wpabuf * 	vendor_elem [NUM_VENDOR_ELEM_FRAMES]
+struct wmm_ac_assoc_data * 	wmm_ac_assoc_info
+struct wmm_tspec_element * 	tspecs [WMM_AC_NUM][TS_DIR_IDX_COUNT]
+struct wmm_ac_addts_request * 	addts_request
+u8 	wmm_ac_last_dialog_token
+struct wmm_tspec_element * 	last_tspecs
+u8 	last_tspecs_count
+struct rrm_data 	rrm
+
+```
+
+<img src="//../zimage/wireless/wifi/09_supplicant/wpa_supplicant.png" width = "50%" height="50%"/>
+
+
+
+
+
+
+### wpa_driver_ops
+
+```
+Driver interface API definition
+与驱动交互的API接口
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/hostapd/src/drivers/driver.h#2061
+http://w1.fi/wpa_supplicant/devel/structwpa__driver__ops.html
+
+
+
+const char * 	name    // Name of the driver interface.
+const char * 	desc    // One line description of the driver interface.
+int(* 	get_bssid )(void *priv, u8 *bssid)  //Get the current BSSID. More...
+int(* 	get_ssid )(void *priv, u8 *ssid)  // Get the current SSID. More...
+
+// Configure encryption key. More...
+int(* 	set_key )(const char *ifname, void *priv, enum wpa_alg alg, const u8 *addr, int key_idx, int set_tx, const u8 *seq, size_t seq_len, const u8 *key, size_t key_len)
+
+// Initialize driver interface. More...
+void *(* 	init )(void *ctx, const char *ifname)
+
+void(* 	deinit )(void *priv)  // Deinitialize driver interface. More...
+
+int(* 	set_param )(void *priv, const char *param)  // Set driver configuration parameters. More...
+
+int(* 	set_countermeasures )(void *priv, int enabled)  // Enable/disable TKIP countermeasures. More...
+
+int(* 	deauthenticate )(void *priv, const u8 *addr, int reason_code)  // Request driver to deauthenticate. More...
+
+int(* 	associate )(void *priv, struct wpa_driver_associate_params *params)  //Request driver to associate. More...
+
+int(* 	add_pmkid )(void *priv, const u8 *bssid, const u8 *pmkid)  // Add PMKSA cache entry to the driver. More...
+
+int(* 	remove_pmkid )(void *priv, const u8 *bssid, const u8 *pmkid)  // Remove PMKSA cache entry to the driver. More...
+
+int(* 	flush_pmkid )(void *priv)  // Flush PMKSA cache. More...
+
+int(* 	get_capa )(void *priv, struct wpa_driver_capa *capa)  // Get driver capabilities. More...
+
+void(* 	poll )(void *priv)   // Poll driver for association information. More...
+
+const char *(* 	get_ifname )(void *priv)  // Get interface name. More...
+
+const u8 *(* 	get_mac_addr )(void *priv)   // Get own MAC address. More...
+
+int(* 	set_operstate )(void *priv, int state)   // Sets device operating state to DORMANT or UP. More...
+
+//MLME-SETPROTECTION.request primitive. More...
+int(* 	mlme_setprotection )(void *priv, const u8 *addr, int protect_type, int key_type)
+
+//Get hardware support data (channels and rates) More...
+struct hostapd_hw_modes *(* 	get_hw_feature_data )(void *priv, u16 *num_modes, u16 *flags)
+
+//Send management frame from MLME. More...
+int(* 	send_mlme )(void *priv, const u8 *data, size_t data_len, int noack, unsigned int freq)
+
+//Update FT (IEEE 802.11r) IEs. More...
+int(* 	update_ft_ies )(void *priv, const u8 *md, const u8 *ies, size_t ies_len)
+
+//Fetch the latest scan results. More...
+struct wpa_scan_results *(* 	get_scan_results2 )(void *priv)
+
+
+// Set country. More...
+int(* 	set_country )(void *priv, const char *alpha2)
+
+// Get country. More...
+int(* 	get_country )(void *priv, char *alpha2)
+
+
+// Global driver initialization. More...
+void *(* 	global_init )(void)
+
+// Global driver deinitialization. More...
+void(* 	global_deinit )(void *priv)
+
+//Initialize driver interface (with global data) More...
+void *(* 	init2 )(void *ctx, const char *ifname, void *global_priv)
+
+//Get information about available interfaces. More...
+struct wpa_interface_info *(* 	get_interfaces )(void *global_priv)
+
+//Request the driver to initiate scan. More...
+int(* 	scan2 )(void *priv, struct wpa_driver_scan_params *params)
+
+//Request driver to authenticate. More...
+int(* 	authenticate )(void *priv, struct wpa_driver_auth_params *params)
+
+//Set Beacon and Probe Response information for AP mode. More...
+int(* 	set_ap )(void *priv, struct wpa_driver_ap_params *params)
+
+//Set ACL in AP mode. More...
+int(* 	set_acl )(void *priv, struct hostapd_acl_params *params)
+
+//Initialize driver interface (hostapd only) More...
+void *(* 	hapd_init )(struct hostapd_data *hapd, struct wpa_init_params *params)
+
+// Deinitialize driver interface (hostapd only) More...
+void(* 	hapd_deinit )(void *priv)
+
+// Enable/disable IEEE 802.1X support (AP only) More...
+int(* 	set_ieee8021x )(void *priv, struct wpa_bss_params *params)
+
+// Enable/disable privacy (AP only) More...
+int(* 	set_privacy )(void *priv, int enabled)
+
+// Fetch the current TSC/packet number (AP only) More...
+int(* 	get_seqnum )(const char *ifname, void *priv, const u8 *addr, int idx, u8 *seq)
+
+// Flush all association stations (AP only) More...
+int(* 	flush )(void *priv)
+
+// Add IEs into Beacon/Probe Response frames (AP) More...
+int(* 	set_generic_elem )(void *priv, const u8 *elem, size_t elem_len)
+
+// Fetch station data. More...
+int(* 	read_sta_data )(void *priv, struct hostap_sta_driver_data *data, const u8 *addr)
+
+// Send an EAPOL packet (AP only) More...
+int(* 	hapd_send_eapol )(void *priv, const u8 *addr, const u8 *data, size_t data_len, int encrypt, const u8 *own_addr, u32 flags)
+
+//Deauthenticate a station (AP only) More...
+int(* 	sta_deauth )(void *priv, const u8 *own_addr, const u8 *addr, int reason)
+
+// Disassociate a station (AP only) More...
+int(* 	sta_disassoc )(void *priv, const u8 *own_addr, const u8 *addr, int reason)
+
+//Remove a station entry (AP only) More...
+int(* 	sta_remove )(void *priv, const u8 *addr)
+
+// Get the current SSID (AP only) More...
+int(* 	hapd_get_ssid )(void *priv, u8 *buf, int len)
+
+// Set SSID (AP only) More...
+int(* 	hapd_set_ssid )(void *priv, const u8 *buf, int len)
+
+// Enable/disable TKIP countermeasures (AP) More...
+int(* 	hapd_set_countermeasures )(void *priv, int enabled)
+
+//Add a station entry. More...
+int(* 	sta_add )(void *priv, struct hostapd_sta_add_params *params)
+
+// Get station inactivity duration (AP only) More...
+int(* 	get_inact_sec )(void *priv, const u8 *addr)
+
+// Clear station statistics (AP only) More...
+int(* 	sta_clear_stats )(void *priv, const u8 *addr)
+
+//Set channel/frequency (AP only) More...
+int(* 	set_freq )(void *priv, struct hostapd_freq_params *freq)
+
+// Set RTS threshold. More...
+int(* 	set_rts )(void *priv, int rts)
+
+//Set fragmentation threshold. More...
+int(* 	set_frag )(void *priv, int frag)
+
+// Set station flags (AP only) More...
+int(* 	sta_set_flags )(void *priv, const u8 *addr, unsigned int total_flags, unsigned int flags_or, unsigned int flags_and)
+
+//Set TX queue parameters. More...
+int(* 	set_tx_queue_params )(void *priv, int queue, int aifs, int cw_min, int cw_max, int burst_time)
+
+
+// Add a virtual interface. More...
+int(* 	if_add )(void *priv, enum wpa_driver_if_type type, const char *ifname, const u8 *addr, void *bss_ctx, void **drv_priv, char *force_ifname, u8 *if_addr, const char *bridge, int use_existing)
+
+// Remove a virtual interface. More...
+int(* 	if_remove )(void *priv, enum wpa_driver_if_type type, const char *ifname)
+
+// Bind a station into a specific interface (AP only) More...
+int(* 	set_sta_vlan )(void *priv, const u8 *addr, const char *ifname, int vlan_id)
+
+// Optional commit changes handler (AP only) More...
+int(* 	commit )(void *priv)
+
+//Send an ethernet packet (AP only) More...
+int(* 	send_ether )(void *priv, const u8 *dst, const u8 *src, u16 proto, const u8 *data, size_t data_len)
+
+//Notification of RADIUS ACL change. More...
+int(* 	set_radius_acl_auth )(void *priv, const u8 *mac, int accepted, u32 session_timeout)
+
+// Notification of RADIUS ACL expiration. More...
+int(* 	set_radius_acl_expire )(void *priv, const u8 *mac)
+
+// Add WPS IE(s) into Beacon/Probe Response frames (AP) More...
+int(* 	set_ap_wps_ie )(void *priv, const struct wpabuf *beacon, const struct wpabuf *proberesp, const struct wpabuf *assocresp)
+
+// Set IEEE 802.1X Supplicant Port status. More...
+int(* 	set_supp_port )(void *priv, int authorized)
+
+// Bind a station into a 4-address WDS (AP only) More...
+int(* 	set_wds_sta )(void *priv, const u8 *addr, int aid, int val, const char *bridge_ifname, char *ifname_wds)
+
+// Transmit an Action frame. More...
+int(* 	send_action )(void *priv, unsigned int freq, unsigned int wait, const u8 *dst, const u8 *src, const u8 *bssid, const u8 *data, size_t data_len, int no_cck)
+
+// Cancel action frame TX wait. More...
+void(* 	send_action_cancel_wait )(void *priv)
+
+//Remain awake on a channel. More...
+int(* 	remain_on_channel )(void *priv, unsigned int freq, unsigned int duration)
+
+// Cancel remain-on-channel operation. More...
+int(* 	cancel_remain_on_channel )(void *priv)
+
+// Request Probe Request frames to be indicated. More...
+int(* 	probe_req_report )(void *priv, int report)
+
+// Deinitialize AP mode. More...
+int(* 	deinit_ap )(void *priv)
+
+// Deinitialize P2P client mode. More...
+int(* 	deinit_p2p_cli )(void *priv)
+
+//Notification on system suspend/hibernate event. More...
+void(* 	suspend )(void *priv)
+
+// Notification on system resume/thaw event. More...
+void(* 	resume )(void *priv)
+
+// Set signal monitoring parameters. More...
+int(* 	signal_monitor )(void *priv, int threshold, int hysteresis)
+
+// Send IEEE 802.11 frame (testing use only) More...
+int(* 	send_frame )(void *priv, const u8 *data, size_t data_len, int encrypt)
+
+// Get current Notice of Absence attribute payload. More...
+int(* 	get_noa )(void *priv, u8 *buf, size_t buf_len)
+
+
+// Set Notice of Absence parameters for GO (testing) More...
+int(* 	set_noa )(void *priv, u8 count, int start, int duration)
+
+//Set P2P power save options. More...
+int(* 	set_p2p_powersave )(void *priv, int legacy_ps, int opp_ps, int ctwindow)
+
+// Enable/disable aggregation. More...
+int(* 	ampdu )(void *priv, int ampdu)
+
+//Get physical radio name for the device. More...
+const char *(* 	get_radio_name )(void *priv)
+
+//for sending TDLS management packets More...
+int(* 	send_tdls_mgmt )(void *priv, const u8 *dst, u8 action_code, u8 dialog_token, u16 status_code, u32 peer_capab, int initiator, const u8 *buf, size_t len)
+
+// Ask the driver to perform high-level TDLS operations. More...
+int(* 	tdls_oper )(void *priv, enum tdls_oper oper, const u8 *peer)
+
+// Notify driver of the WNM frame reception. More...
+int(* 	wnm_oper )(void *priv, enum wnm_oper oper, const u8 *peer, u8 *buf, u16 *buf_len)
+
+// Set QoS Map. More...
+int(* 	set_qos_map )(void *priv, const u8 *qos_map_set, u8 qos_map_set_len)
+
+// Add a neigh to the bridge ip neigh table. More...
+int(* 	br_add_ip_neigh )(void *priv, u8 version, const u8 *ipaddr, int prefixlen, const u8 *addr)
+
+// Remove a neigh from the bridge ip neigh table. More...
+int(* 	br_delete_ip_neigh )(void *priv, u8 version, const u8 *ipaddr)
+
+
+// Set a bridge port attribute. More...
+int(* 	br_port_set_attr )(void *priv, enum drv_br_port_attr attr, unsigned int val)
+
+// Set a bridge network parameter. More...
+int(* 	br_set_net_param )(void *priv, enum drv_br_net_param param, unsigned int val)
+
+// Set wake-on-wireless triggers. More...
+int(* 	set_wowlan )(void *priv, const struct wowlan_triggers *triggers)
+
+//Get current connection information. More...
+int(* 	signal_poll )(void *priv, struct wpa_signal_info *signal_info)
+
+// Set authentication algorithm(s) for static WEP. More...
+int(* 	set_authmode )(void *priv, int authmode)
+
+// Execute vendor specific command. More...
+int(* 	vendor_cmd )(void *priv, unsigned int vendor_id, unsigned int subcmd, const u8 *data, size_t data_len, struct wpabuf *buf)
+
+// Set rekey information. More...
+void(* 	set_rekey_info )(void *priv, const u8 *kek, size_t kek_len, const u8 *kck, size_t kck_len, const u8 *replay_ctr)
+
+// Station association indication. More...
+int(* 	sta_assoc )(void *priv, const u8 *own_addr, const u8 *addr, int reassoc, u16 status, const u8 *ie, size_t len)
+
+// Station authentication indication. More...
+int(* 	sta_auth )(void *priv, const u8 *own_addr, const u8 *addr, u16 seq, u16 status, const u8 *ie, size_t len)
+
+// Add traffic stream. More...
+int(* 	add_tspec )(void *priv, const u8 *addr, u8 *tspec_ie, size_t tspec_ielen)
+
+// Add a station node in the driver. More...
+int(* 	add_sta_node )(void *priv, const u8 *addr, u16 auth_alg)
+
+
+// Request the driver to initiate scheduled scan. More...
+int(* 	sched_scan )(void *priv, struct wpa_driver_scan_params *params, u32 interval)
+
+// Request the driver to stop a scheduled scan. More...
+int(* 	stop_sched_scan )(void *priv)
+
+// Probe (null data or such) the given station. More...
+void(* 	poll_client )(void *priv, const u8 *own_addr, const u8 *addr, int qos)
+
+// Disable/enable radio. More...
+int(* 	radio_disable )(void *priv, int disabled)
+
+// Announce channel switch and migrate the GO to the given frequency. More...
+int(* 	switch_channel )(void *priv, struct csa_settings *settings)
+
+// Add traffic stream. More...
+int(* 	add_tx_ts )(void *priv, u8 tsid, const u8 *addr, u8 user_prio, u16 admitted_time)
+
+// Delete traffic stream. More...
+int(* 	del_tx_ts )(void *priv, u8 tsid, const u8 *addr)
+
+// Enable channel-switching with TDLS peer. More...
+int(* 	tdls_enable_channel_switch )(void *priv, const u8 *addr, u8 oper_class, const struct hostapd_freq_params *params)
+
+//Disable channel switching with TDLS peer. More...
+int(* 	tdls_disable_channel_switch )(void *priv, const u8 *addr)
+
+// Listen for radar interference on the channel. More...
+int(* 	start_dfs_cac )(void *priv, struct hostapd_freq_params *freq)
+
+// Removes beacon from AP. More...
+int(* 	stop_ap )(void *priv)
+
+// Retrieve survey data. More...
+int(* 	get_survey )(void *priv, unsigned int freq)
+
+// Get driver interface status information. More...
+int(* 	status )(void *priv, char *buf, size_t buflen)
+
+// Set roaming policy for driver-based BSS selection. More...
+int(* 	roaming )(void *priv, int allowed, const u8 *bssid)
+
+// Set MAC address. More...
+int(* 	set_mac_addr )(void *priv, const u8 *addr)
+
+// Driver specific initialization for mesh. More...
+int(* 	init_mesh )(void *priv)
+
+// Join a mesh network. More...
+int(* 	join_mesh )(void *priv, struct wpa_driver_mesh_join_params *params)
+
+// Leave a mesh network. More...
+int(* 	leave_mesh )(void *priv)
+
+// Automatically select channel. More...
+int(* 	do_acs )(void *priv, struct drv_acs_params *params)
+
+//Notify driver of band selection. More...
+int(* 	set_band )(void *priv, enum set_band band)
+
+//Get preferred frequency list for an interface. More...
+int(* 	get_pref_freq_list )(void *priv, enum wpa_driver_if_type if_type, unsigned int *num, unsigned int *freq_list)
+
+//Indicate probable P2P operating channel. More...
+int(* 	set_prob_oper_freq )(void *priv, unsigned int freq)
+
+
+
+```
+<img src="//../zimage/wireless/wifi/09_supplicant/wpa_driver_ops.png" width = "50%" height="50%"/>
+
+
+
+### eap_method 
+```
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/hostapd/src/eap_peer/eap_i.h#66
+http://w1.fi/wpa_supplicant/devel/structeap__method.html
+
+/**
+ * struct eap_method - EAP method interface
+ * This structure defines the EAP method interface. Each method will need to
+ * register its own EAP type, EAP name, and set of function pointers for method
+ * specific operations. This interface is based on section 4.4 of RFC 4137.
+ */
+
+struct eap_method  {
+	int vendor;
+	EapType method;
+	const char *name;
+	void * (*init)(struct eap_sm *sm);
+	void (*deinit)(struct eap_sm *sm, void *priv);
+	struct wpabuf * (*process)(struct eap_sm *sm, void *priv,struct eap_method_ret *ret,const struct wpabuf *reqData);
+	Boolean (*isKeyAvailable)(struct eap_sm *sm, void *priv);
+	u8 * (*getKey)(struct eap_sm *sm, void *priv, size_t *len);
+	int (*get_status)(struct eap_sm *sm, void *priv, char *buf,size_t buflen, int verbose);
+	Boolean (*has_reauth_data)(struct eap_sm *sm, void *priv);
+	void (*deinit_for_reauth)(struct eap_sm *sm, void *priv);
+	void * (*init_for_reauth)(struct eap_sm *sm, void *priv);
+	const u8 * (*get_identity)(struct eap_sm *sm, void *priv, size_t *len);
+	int (*get_error_code)(void *priv);
+	void (*free)(struct eap_method *method);
+	int version;
+	struct eap_method *next;
+	void *dl_handle;
+	u8 * (*get_emsk)(struct eap_sm *sm, void *priv, size_t *len);
+	u8 * (*getSessionId)(struct eap_sm *sm, void *priv, size_t *len);
+};
+
+
+```
+
+```
+#graphviz 绘图代码
+
+from graphviz import Digraph
+
+s = Digraph('structs', filename='structs_revisited.gv', node_attr={'shape': 'record'})
+s.attr(rankdir='LR')
+s.node('struct_md5', "{{ EAP-Name=EAP_MD5 |void * XmethodX |<md5here> *eap_method next}}")
+s.node('struct_tls', "{{ EAP-Name=EAP_TLS |void * XmethodX |<tlshere> *eap_method next}}")
+s.node('struct_peap', "{{ EAP-Name=EAP_PEAP |void * XmethodX |<peaphere> *eap_method next}}")
+s.node('struct_null', "NULL")
+s.edges([('struct_md5:md5here', 'struct_tls')])
+s.edges([('struct_tls:tlshere', 'struct_peap')])
+s.edges([('struct_peap:peaphere', 'struct_null')])
+s.view()
+print(s.source)
+
+
+```
+
+<img src="//../zimage/wireless/wifi/09_supplicant/eap_method.jpg"/>
+
+### dl_list
+```
+struct dl_list {
+    struct dl_list *next, *prev;
+};
+
+
+```
+
+
+
+### eloop_data
+```
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/utils/eloop.c#161
+
+
+struct eloop_data {
+	int max_sock;
+	int count; /* sum of all table counts */
+
+	struct eloop_sock_table readers;
+	struct eloop_sock_table writers;
+	struct eloop_sock_table exceptions;
+	struct eloop_signal *signals;
+	struct dl_list timeout;
+
+	int signal_count;
+
+	int signaled;
+	int pending_terminate;
+
+	int terminate;
+};
+
+
+
+
+```
+
+<img src="//../zimage/wireless/wifi/09_supplicant/eloop_data.png" width = "50%" height="50%"/>
+```
+# eloop_data 数据结构绘图
+
+from graphviz import Digraph
+
+s = Digraph('structs', filename='structs_revisited.gv', node_attr={'shape': 'record'} )
+s.attr(rankdir='LR')
+
+s.node('eloop_data2', "{{ eloop_data2 | <data2_reader>eloop_sock_table reader "
+                      "|<data2_writer>eloop_sock_table writer "
+                      "|<data2_exception> eloop_sock_table exception "
+                      "|<data2_signal> eloop_signal signals"
+                      "|<data2_dllist> timeout dl_list  }}")
+
+s.node('eloop_data0', "{{ eloop_data0 | <data0_reader>eloop_sock_table reader "
+                      "|<data0_writer>eloop_sock_table writer "
+                      "|<data0_exception> eloop_sock_table exception "
+                      "|<data0_signal> eloop_signal signals"
+                      "|<data0_dllist> timeout dl_list }}")
+
+s.node('eloop_data1', "{{ eloop_data1 | <data1_reader>eloop_sock_table reader "
+                      "|<data1_writer>eloop_sock_table writer "
+                      "|<data1_exception> eloop_sock_table exception "
+                      "|<data1_signal> eloop_signal signals"
+                      "| {<data1_dllist_left> timeout dl_list_pre | <data1_dllist_right> timeout dl_list_next} }}")
+
+
+s.node('eloop_sock_table_reader', "{{ eloop_sock_table_reader | int count "
+                      "|eloop_event_type#READ#WRITE#EXCEPTION# "
+                      "|<eloop_sock_reader>eloop_sock   }}")
+
+s.node('eloop_sock_table_writer', "{{ eloop_sock_table_writer | int count "
+                      "|eloop_event_type#READ#WRITE#EXCEPTION# "
+                      "|<eloop_sock_writer>eloop_sock   }}")
+
+s.node('eloop_sock_table_exception', "{{ eloop_sock_table_exception | int count "
+                      "|eloop_event_type#READ#WRITE#EXCEPTION# "
+                      "|<eloop_sock_exception>eloop_sock   }}")
+
+
+s.node('eloop_signal', "{{ eloop_signal | int sig 信号量 "
+                      "|void *user_data 用户数据 "
+                      "|void* eloop_signal_handler 处理函数 }}")
+
+s.node('eloop_sock_reader', "{{ eloop_sock_reader | int sock 句柄 "
+                      "|void *eloop_data 数据 "
+                      "|void *user_data 数据 "
+                      "|void * eloop_sock_handler reader处理函数指针  }}")
+
+s.node('eloop_sock_writer', "{{ eloop_sock_writer | int sock 句柄 "
+                      "|void *eloop_data 数据 "
+                      "|void *user_data 数据 "
+                      "|void * eloop_sock_handler writer处理函数指针  }}")
+
+
+s.node('eloop_sock_exception', "{{ eloop_sock_exception | int sock 句柄 "
+                      "|void *eloop_data 数据 "
+                      "|void *user_data 数据 "
+                      "|void * eloop_sock_handler exception处理函数指针  }}")
+
+
+s.edges([('eloop_data1:data1_dllist_left', 'eloop_data0')])
+s.edges([('eloop_data1:data1_dllist_right', 'eloop_data2')])
+s.edges([('eloop_data2:data2_reader', 'eloop_sock_table_reader')])
+s.edges([('eloop_data2:data2_writer', 'eloop_sock_table_writer')])
+s.edges([('eloop_data2:data2_exception', 'eloop_sock_table_exception')])
+s.edges([('eloop_data2:data2_signal', 'eloop_signal')])
+
+s.edges([('eloop_sock_table_reader:eloop_sock_reader', 'eloop_sock_reader')])
+s.edges([('eloop_sock_table_writer:eloop_sock_writer', 'eloop_sock_writer')])
+s.edges([('eloop_sock_table_exception:eloop_sock_exception', 'eloop_sock_exception')])
+s.view()
+print(s.source)
+
+
+```
+
+
+
+
+
+#### eloop_sock_table
+
+```
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/utils/eloop.c#70
+
+struct eloop_sock_table {
+	int count;
+	struct eloop_sock *table;
+	eloop_event_type type;   // 事件类型
+	int changed;
+};
+
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/utils/eloop.h#31
+typedef enum {
+	EVENT_TYPE_READ = 0,    // 读 
+	EVENT_TYPE_WRITE,       // 写
+	EVENT_TYPE_EXCEPTION    // 异常
+} eloop_event_type;
+
+
+
+```
+
+
+#### eloop_sock
+```
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/utils/eloop.c#42
+struct eloop_sock {
+	int sock;
+	void *eloop_data;
+	void *user_data;
+	eloop_sock_handler handler;  // 函数指针
+	WPA_TRACE_REF(eloop);
+	WPA_TRACE_REF(user);
+	WPA_TRACE_INFO
+};
+
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/utils/eloop.h#43
+typedef void (*eloop_sock_handler)(int sock, void *eloop_ctx, void *sock_ctx);
+
+```
+
+#### eloop_signal
+```
+
+struct eloop_signal {
+	int sig;
+	void *user_data;
+	eloop_signal_handler handler;   // 函数指针
+	int signaled;
+};
+
+```
+
+
+
+### ctrl_iface_global_priv
+
+```
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/ctrl_iface_unix.c#ctrl_iface_global_priv
+
+struct ctrl_iface_global_priv {
+	struct wpa_global *global;
+	int sock;
+	struct dl_list ctrl_dst;
+	int android_control_socket;
+	struct dl_list msg_queue;
+	unsigned int throttle_count;
+};
+
+
+
+```
+
+
+<img src="//../zimage/wireless/wifi/09_supplicant/ctrl_iface_global_priv.jpg" width = "50%" height="50%"/>
+
+###  p2p_data
+```
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/p2p/p2p_i.h#174
+
+
+/** struct p2p_data - P2P module data (internal to P2P module) */
+struct p2p_data {
+	/**
+	 * cfg - P2P module configuration
+	 *
+	 * This is included in the same memory allocation with the
+	 * struct p2p_data and as such, must not be freed separately.
+	 */
+	struct p2p_config *cfg;
+
+	/**
+	 * state - The current P2P state
+	 */
+	enum p2p_state {
+		/**
+		 * P2P_IDLE - Idle
+		 */
+		P2P_IDLE,
+
+		/**
+		 * P2P_SEARCH - Search (Device Discovery)
+		 */
+		P2P_SEARCH,
+
+		/**
+		 * P2P_CONNECT - Trying to start GO Negotiation
+		 */
+		P2P_CONNECT,
+
+		/**
+		 * P2P_CONNECT_LISTEN - Listen during GO Negotiation start
+		 */
+		P2P_CONNECT_LISTEN,
+
+		/**
+		 * P2P_GO_NEG - In GO Negotiation
+		 */
+		P2P_GO_NEG,
+
+		/**
+		 * P2P_LISTEN_ONLY - Listen only
+		 */
+		P2P_LISTEN_ONLY,
+
+		/**
+		 * P2P_WAIT_PEER_CONNECT - Waiting peer in List for GO Neg
+		 */
+		P2P_WAIT_PEER_CONNECT,
+
+		/**
+		 * P2P_WAIT_PEER_IDLE - Waiting peer idle for GO Neg
+		 */
+		P2P_WAIT_PEER_IDLE,
+
+		/**
+		 * P2P_SD_DURING_FIND - Service Discovery during find
+		 */
+		P2P_SD_DURING_FIND,
+
+		/**
+		 * P2P_PROVISIONING - Provisioning (during group formation)
+		 */
+		P2P_PROVISIONING,
+
+		/**
+		 * P2P_PD_DURING_FIND - Provision Discovery during find
+		 */
+		P2P_PD_DURING_FIND,
+
+		/**
+		 * P2P_INVITE - Trying to start Invite
+		 */
+		P2P_INVITE,
+
+		/**
+		 * P2P_INVITE_LISTEN - Listen during Invite
+		 */
+		P2P_INVITE_LISTEN,
+	} state;
+
+	/**
+	 * min_disc_int - minDiscoverableInterval
+	 */
+	int min_disc_int;
+
+	/**
+	 * max_disc_int - maxDiscoverableInterval
+	 */
+	int max_disc_int;
+
+	/**
+	 * max_disc_tu - Maximum number of TUs for discoverable interval
+	 */
+	int max_disc_tu;
+
+	/**
+	 * devices - List of known P2P Device peers
+	 */
+	struct dl_list devices;
+
+	/**
+	 * go_neg_peer - Pointer to GO Negotiation peer
+	 */
+	struct p2p_device *go_neg_peer;
+
+	/**
+	 * invite_peer - Pointer to Invite peer
+	 */
+	struct p2p_device *invite_peer;
+
+	/**
+	 * last_p2p_find_oper - Pointer to last pre-find operation peer
+	 */
+	struct p2p_device *last_p2p_find_oper;
+
+	const u8 *invite_go_dev_addr;
+	u8 invite_go_dev_addr_buf[ETH_ALEN];
+	int invite_dev_pw_id;
+
+	unsigned int retry_invite_req:1;
+	unsigned int retry_invite_req_sent:1;
+
+	/**
+	 * sd_peer - Pointer to Service Discovery peer
+	 */
+	struct p2p_device *sd_peer;
+
+	/**
+	 * sd_query - Pointer to Service Discovery query
+	 */
+	struct p2p_sd_query *sd_query;
+
+	/**
+	 * num_p2p_sd_queries - Total number of broadcast SD queries present in
+	 * the list
+	 */
+	int num_p2p_sd_queries;
+
+	/**
+	 * sd_query_no_ack - The first peer (Dev Addr) that did not ACK SD Query
+	 *
+	 * This is used to track the first peer that did not ACK an SD Query
+	 * within a single P2P Search iteration. All zeros address means no such
+	 * peer was yet seen. This information is used to allow a new Listen and
+	 * Search phases to be once every pending SD Query has been sent once to
+	 * each peer instead of looping all pending attempts continuously until
+	 * running out of retry maximums.
+	 */
+	u8 sd_query_no_ack[ETH_ALEN];
+
+	/* GO Negotiation data */
+
+	/**
+	 * intended_addr - Local Intended P2P Interface Address
+	 *
+	 * This address is used during group owner negotiation as the Intended
+	 * P2P Interface Address and the group interface will be created with
+	 * address as the local address in case of successfully completed
+	 * negotiation.
+	 */
+	u8 intended_addr[ETH_ALEN];
+
+	/**
+	 * go_intent - Local GO Intent to be used during GO Negotiation
+	 */
+	u8 go_intent;
+
+	/**
+	 * next_tie_breaker - Next tie-breaker value to use in GO Negotiation
+	 */
+	u8 next_tie_breaker;
+
+	/**
+	 * ssid - Selected SSID for GO Negotiation (if local end will be GO)
+	 */
+	u8 ssid[SSID_MAX_LEN];
+
+	/**
+	 * ssid_len - ssid length in octets
+	 */
+	size_t ssid_len;
+
+	/**
+	 * ssid_set - Whether SSID is already set for GO Negotiation
+	 */
+	int ssid_set;
+
+	/**
+	 * Regulatory class for own operational channel
+	 */
+	u8 op_reg_class;
+
+	/**
+	 * op_channel - Own operational channel
+	 */
+	u8 op_channel;
+
+	/**
+	 * channels - Own supported regulatory classes and channels
+	 *
+	 * List of supposerted channels per regulatory class. The regulatory
+	 * classes are defined in IEEE Std 802.11-2007 Annex J and the
+	 * numbering of the clases depends on the configured country code.
+	 */
+	struct p2p_channels channels;
+
+	struct wpa_freq_range_list no_go_freq;
+
+	enum p2p_pending_action_state {
+		P2P_NO_PENDING_ACTION,
+		P2P_PENDING_GO_NEG_REQUEST,
+		P2P_PENDING_GO_NEG_RESPONSE,
+		P2P_PENDING_GO_NEG_RESPONSE_FAILURE,
+		P2P_PENDING_GO_NEG_CONFIRM,
+		P2P_PENDING_SD,
+		P2P_PENDING_PD,
+		P2P_PENDING_PD_RESPONSE,
+		P2P_PENDING_INVITATION_REQUEST,
+		P2P_PENDING_INVITATION_RESPONSE,
+		P2P_PENDING_DEV_DISC_REQUEST,
+		P2P_PENDING_DEV_DISC_RESPONSE,
+		P2P_PENDING_GO_DISC_REQ
+	} pending_action_state;
+
+	unsigned int pending_listen_freq;
+	unsigned int pending_listen_sec;
+	unsigned int pending_listen_usec;
+
+	u8 dev_capab;
+
+	int in_listen;
+	int drv_in_listen;
+
+	/**
+	 * sd_queries - Pending service discovery queries
+	 */
+	struct p2p_sd_query *sd_queries;
+
+	/**
+	 * srv_update_indic - Service Update Indicator for local services
+	 */
+	u16 srv_update_indic;
+
+	struct wpabuf *sd_resp; /* Fragmented SD response */
+	u8 sd_resp_addr[ETH_ALEN];
+	u8 sd_resp_dialog_token;
+	size_t sd_resp_pos; /* Offset in sd_resp */
+	u8 sd_frag_id;
+
+	struct wpabuf *sd_rx_resp; /* Reassembled SD response */
+	u16 sd_rx_update_indic;
+
+	/* P2P Invitation data */
+	enum p2p_invite_role inv_role;
+	u8 inv_bssid[ETH_ALEN];
+	int inv_bssid_set;
+	u8 inv_ssid[SSID_MAX_LEN];
+	size_t inv_ssid_len;
+	u8 inv_sa[ETH_ALEN];
+	u8 inv_group_bssid[ETH_ALEN];
+	u8 *inv_group_bssid_ptr;
+	u8 inv_go_dev_addr[ETH_ALEN];
+	u8 inv_status;
+	int inv_op_freq;
+	int inv_persistent;
+
+	enum p2p_discovery_type find_type;
+	int find_specified_freq;
+	unsigned int last_p2p_find_timeout;
+	u8 last_prog_scan_class;
+	u8 last_prog_scan_chan;
+	unsigned int find_pending_full:1;
+	int p2p_scan_running;
+	enum p2p_after_scan {
+		P2P_AFTER_SCAN_NOTHING,
+		P2P_AFTER_SCAN_LISTEN,
+		P2P_AFTER_SCAN_CONNECT
+	} start_after_scan;
+	u8 after_scan_peer[ETH_ALEN];
+	struct p2p_pending_action_tx *after_scan_tx;
+	unsigned int after_scan_tx_in_progress:1;
+	unsigned int send_action_in_progress:1;
+
+	/* Requested device types for find/search */
+	unsigned int num_req_dev_types;
+	u8 *req_dev_types;
+	u8 *find_dev_id;
+	u8 find_dev_id_buf[ETH_ALEN];
+
+	struct os_reltime find_start; /* time of last p2p_find start */
+
+	struct p2p_group **groups;
+	size_t num_groups;
+
+	struct p2p_device *pending_client_disc_go;
+	u8 pending_client_disc_addr[ETH_ALEN];
+	u8 pending_dev_disc_dialog_token;
+	u8 pending_dev_disc_addr[ETH_ALEN];
+	int pending_dev_disc_freq;
+	unsigned int pending_client_disc_freq;
+
+	int ext_listen_only;
+	unsigned int ext_listen_period;
+	unsigned int ext_listen_interval;
+	unsigned int ext_listen_interval_sec;
+	unsigned int ext_listen_interval_usec;
+
+	u8 peer_filter[ETH_ALEN];
+
+	int cross_connect;
+
+	int best_freq_24;
+	int best_freq_5;
+	int best_freq_overall;
+	int own_freq_preference;
+
+	/**
+	 * wps_vendor_ext - WPS Vendor Extensions to add
+	 */
+	struct wpabuf *wps_vendor_ext[P2P_MAX_WPS_VENDOR_EXT];
+
+	/*
+	 * user_initiated_pd - Whether a PD request is user initiated or not.
+	 */
+	u8 user_initiated_pd;
+
+	/*
+	 * Keep track of which peer a given PD request was sent to.
+	 * Used to raise a timeout alert in case there is no response.
+	 */
+	u8 pending_pd_devaddr[ETH_ALEN];
+
+	/*
+	 * Retry counter for provision discovery requests when issued
+	 * in IDLE state.
+	 */
+	int pd_retries;
+
+	/**
+	 * pd_force_freq - Forced frequency for PD retries or 0 to auto-select
+	 *
+	 * This is is used during PD retries for join-a-group case to use the
+	 * correct operating frequency determined from a BSS entry for the GO.
+	 */
+	int pd_force_freq;
+
+	u8 go_timeout;
+	u8 client_timeout;
+
+	/* Extra delay in milliseconds between search iterations */
+	unsigned int search_delay;
+	int in_search_delay;
+
+	u8 pending_reg_class;
+	u8 pending_channel;
+	u8 pending_channel_forced;
+
+	/* ASP Support */
+	struct p2ps_advertisement *p2ps_adv_list;
+	struct p2ps_provision *p2ps_prov;
+	u8 wild_card_hash[P2PS_HASH_LEN];
+	u8 p2ps_seek;
+	u8 p2ps_seek_hash[P2P_MAX_QUERY_HASH * P2PS_HASH_LEN];
+	u8 p2ps_seek_count;
+
+#ifdef CONFIG_WIFI_DISPLAY
+	struct wpabuf *wfd_ie_beacon;
+	struct wpabuf *wfd_ie_probe_req;
+	struct wpabuf *wfd_ie_probe_resp;
+	struct wpabuf *wfd_ie_assoc_req;
+	struct wpabuf *wfd_ie_invitation;
+	struct wpabuf *wfd_ie_prov_disc_req;
+	struct wpabuf *wfd_ie_prov_disc_resp;
+	struct wpabuf *wfd_ie_go_neg;
+	struct wpabuf *wfd_dev_info;
+	struct wpabuf *wfd_assoc_bssid;
+	struct wpabuf *wfd_coupled_sink_info;
+	struct wpabuf *wfd_r2_dev_info;
+#endif /* CONFIG_WIFI_DISPLAY */
+
+	u16 authorized_oob_dev_pw_id;
+
+	struct wpabuf **vendor_elem;
+
+	unsigned int pref_freq_list[P2P_MAX_PREF_CHANNELS];
+	unsigned int num_pref_freq;
+
+	/* Override option for preferred operating channel in GO Negotiation */
+	u8 override_pref_op_class;
+	u8 override_pref_channel;
+};
+
+
+```
+
+###  p2p_message
+```
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/p2p/p2p_i.h#568
+
+/**
+ * struct p2p_message - Parsed P2P message (or P2P IE)
+ */
+struct p2p_message {
+	struct wpabuf *p2p_attributes;
+	struct wpabuf *wps_attributes;
+	struct wpabuf *wfd_subelems;
+
+	u8 dialog_token;
+
+	const u8 *capability;
+	const u8 *go_intent;
+	const u8 *status;
+	const u8 *listen_channel;
+	const u8 *operating_channel;
+	const u8 *channel_list;
+	u8 channel_list_len;
+	const u8 *config_timeout;
+	const u8 *intended_addr;
+	const u8 *group_bssid;
+	const u8 *invitation_flags;
+
+	const u8 *group_info;
+	size_t group_info_len;
+
+	const u8 *group_id;
+	size_t group_id_len;
+
+	const u8 *device_id;
+
+	const u8 *manageability;
+
+	const u8 *noa;
+	size_t noa_len;
+
+	const u8 *ext_listen_timing;
+
+	const u8 *minor_reason_code;
+
+	const u8 *oob_go_neg_channel;
+
+	/* P2P Device Info */
+	const u8 *p2p_device_info;
+	size_t p2p_device_info_len;
+	const u8 *p2p_device_addr;
+	const u8 *pri_dev_type;
+	u8 num_sec_dev_types;
+	char device_name[WPS_DEV_NAME_MAX_LEN + 1];
+	u16 config_methods;
+
+	/* WPS IE */
+	u16 dev_password_id;
+	int dev_password_id_present;
+	u16 wps_config_methods;
+	const u8 *wps_pri_dev_type;
+	const u8 *wps_sec_dev_type_list;
+	size_t wps_sec_dev_type_list_len;
+	const u8 *wps_vendor_ext[P2P_MAX_WPS_VENDOR_EXT];
+	size_t wps_vendor_ext_len[P2P_MAX_WPS_VENDOR_EXT];
+	const u8 *manufacturer;
+	size_t manufacturer_len;
+	const u8 *model_name;
+	size_t model_name_len;
+	const u8 *model_number;
+	size_t model_number_len;
+	const u8 *serial_number;
+	size_t serial_number_len;
+	const u8 *oob_dev_password;
+	size_t oob_dev_password_len;
+
+	/* DS Parameter Set IE */
+	const u8 *ds_params;
+
+	/* SSID IE */
+	const u8 *ssid;
+
+	/* P2PS */
+	u8 service_hash_count;
+	const u8 *service_hash;
+
+	const u8 *session_info;
+	size_t session_info_len;
+
+	const u8 *conn_cap;
+
+	const u8 *adv_id;
+	const u8 *adv_mac;
+
+	const u8 *adv_service_instance;
+	size_t adv_service_instance_len;
+
+	const u8 *session_id;
+	const u8 *session_mac;
+
+	const u8 *feature_cap;
+	size_t feature_cap_len;
+
+	const u8 *persistent_dev;
+	const u8 *persistent_ssid;
+	size_t persistent_ssid_len;
+
+	const u8 *pref_freq_list;
+	size_t pref_freq_list_len;
+};
+
+```
+
+### p2p_group_info
+```
+
+struct p2p_group_info {
+	unsigned int num_clients;
+	struct p2p_client_info {
+		const u8 *p2p_device_addr;
+		const u8 *p2p_interface_addr;
+		u8 dev_capab;
+		u16 config_methods;
+		const u8 *pri_dev_type;
+		u8 num_sec_dev_types;
+		const u8 *sec_dev_types;
+		const char *dev_name;
+		size_t dev_name_len;
+	} client[P2P_MAX_GROUP_ENTRIES];
+};
+
+
+```
+
+### hostapd_iface
+```
+/**
+ * struct hostapd_iface - hostapd per-interface data structure
+ */
+struct hostapd_iface {
+	struct hapd_interfaces *interfaces;
+	void *owner;
+	char *config_fname;
+	struct hostapd_config *conf;
+	char phy[16]; /* Name of the PHY (radio) */
+
+        enum hostapd_iface_state state;
+#ifdef CONFIG_MESH
+	struct mesh_conf *mconf;
+#endif /* CONFIG_MESH */
+
+	size_t num_bss;
+	struct hostapd_data **bss;
+
+	unsigned int wait_channel_update:1;
+	unsigned int cac_started:1;
+#ifdef CONFIG_FST
+	struct fst_iface *fst;
+	const struct wpabuf *fst_ies;
+#endif /* CONFIG_FST */
+
+	/*
+	 * When set, indicates that the driver will handle the AP
+	 * teardown: delete global keys, station keys, and stations.
+	 */
+	unsigned int driver_ap_teardown:1;
+
+	/*
+	 * When set, indicates that this interface is part of list of
+	 * interfaces that need to be started together (synchronously).
+	 */
+	unsigned int need_to_start_in_sync:1;
+
+	/* Ready to start but waiting for other interfaces to become ready. */
+	unsigned int ready_to_start_in_sync:1;
+
+	int num_ap; /* number of entries in ap_list */
+	struct ap_info *ap_list; /* AP info list head */
+	struct ap_info *ap_hash[STA_HASH_SIZE];
+
+	u64 drv_flags;
+
+	/* SMPS modes supported by the driver (WPA_DRIVER_SMPS_MODE_*) */
+	unsigned int smps_modes;
+
+	/*
+	 * A bitmap of supported protocols for probe response offload. See
+	 * struct wpa_driver_capa in driver.h
+	 */
+	unsigned int probe_resp_offloads;
+
+	/* extended capabilities supported by the driver */
+	const u8 *extended_capa, *extended_capa_mask;
+	unsigned int extended_capa_len;
+
+	unsigned int drv_max_acl_mac_addrs;
+
+	struct hostapd_hw_modes *hw_features;
+	int num_hw_features;
+	struct hostapd_hw_modes *current_mode;
+	/* Rates that are currently used (i.e., filtered copy of
+	 * current_mode->channels */
+	int num_rates;
+	struct hostapd_rate_data *current_rates;
+	int *basic_rates;
+	int freq;
+
+	u16 hw_flags;
+
+	/* Number of associated Non-ERP stations (i.e., stations using 802.11b
+	 * in 802.11g BSS) */
+	int num_sta_non_erp;
+
+	/* Number of associated stations that do not support Short Slot Time */
+	int num_sta_no_short_slot_time;
+
+	/* Number of associated stations that do not support Short Preamble */
+	int num_sta_no_short_preamble;
+
+	int olbc; /* Overlapping Legacy BSS Condition */
+
+	/* Number of HT associated stations that do not support greenfield */
+	int num_sta_ht_no_gf;
+
+	/* Number of associated non-HT stations */
+	int num_sta_no_ht;
+
+	/* Number of HT associated stations 20 MHz */
+	int num_sta_ht_20mhz;
+
+	/* Number of HT40 intolerant stations */
+	int num_sta_ht40_intolerant;
+
+	/* Overlapping BSS information */
+	int olbc_ht;
+
+	u16 ht_op_mode;
+
+	/* surveying helpers */
+
+	/* number of channels surveyed */
+	unsigned int chans_surveyed;
+
+	/* lowest observed noise floor in dBm */
+	s8 lowest_nf;
+
+	/* channel utilization calculation */
+	u64 last_channel_time;
+	u64 last_channel_time_busy;
+	u8 channel_utilization;
+
+	/* eCSA IE will be added only if operating class is specified */
+	u8 cs_oper_class;
+
+	unsigned int dfs_cac_ms;
+	struct os_reltime dfs_cac_start;
+
+	/* Latched with the actual secondary channel information and will be
+	 * used while juggling between HT20 and HT40 modes. */
+	int secondary_ch;
+
+#ifdef CONFIG_ACS
+	unsigned int acs_num_completed_scans;
+#endif /* CONFIG_ACS */
+
+	void (*scan_cb)(struct hostapd_iface *iface);
+	int num_ht40_scan_tries;
+
+	struct dl_list sta_seen; /* struct hostapd_sta_info */
+	unsigned int num_sta_seen;
+
+	u8 dfs_domain;
+};
+
+```
+
+
+
+### eloop_timeout
+```
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/hostapd/src/utils/eloop.c#52
+
+
+struct eloop_timeout {
+	struct dl_list list;
+	struct os_reltime time;
+	void *eloop_data;
+	void *user_data;
+	eloop_timeout_handler handler;
+	WPA_TRACE_REF(eloop);
+	WPA_TRACE_REF(user);
+	WPA_TRACE_INFO
+};
+
+
+
+```
+
+
+### wpa_driver_capa
+```
+
+/**
+ * struct wpa_driver_capa - Driver capability information
+ */
+struct wpa_driver_capa {
+#define WPA_DRIVER_CAPA_KEY_MGMT_WPA		0x00000001
+#define WPA_DRIVER_CAPA_KEY_MGMT_WPA2		0x00000002
+#define WPA_DRIVER_CAPA_KEY_MGMT_WPA_PSK	0x00000004
+#define WPA_DRIVER_CAPA_KEY_MGMT_WPA2_PSK	0x00000008
+#define WPA_DRIVER_CAPA_KEY_MGMT_WPA_NONE	0x00000010
+#define WPA_DRIVER_CAPA_KEY_MGMT_FT		0x00000020
+#define WPA_DRIVER_CAPA_KEY_MGMT_FT_PSK		0x00000040
+#define WPA_DRIVER_CAPA_KEY_MGMT_WAPI_PSK	0x00000080
+#define WPA_DRIVER_CAPA_KEY_MGMT_SUITE_B	0x00000100
+#define WPA_DRIVER_CAPA_KEY_MGMT_SUITE_B_192	0x00000200
+#define WPA_DRIVER_CAPA_KEY_MGMT_OWE		0x00000400
+#define WPA_DRIVER_CAPA_KEY_MGMT_DPP		0x00000800
+#define WPA_DRIVER_CAPA_KEY_MGMT_FILS_SHA256    0x00001000
+#define WPA_DRIVER_CAPA_KEY_MGMT_FILS_SHA384    0x00002000
+#define WPA_DRIVER_CAPA_KEY_MGMT_FT_FILS_SHA256 0x00004000
+#define WPA_DRIVER_CAPA_KEY_MGMT_FT_FILS_SHA384 0x00008000
+	/** Bitfield of supported key management suites */
+	unsigned int key_mgmt;
+
+#define WPA_DRIVER_CAPA_ENC_WEP40	0x00000001
+#define WPA_DRIVER_CAPA_ENC_WEP104	0x00000002
+#define WPA_DRIVER_CAPA_ENC_TKIP	0x00000004
+#define WPA_DRIVER_CAPA_ENC_CCMP	0x00000008
+#define WPA_DRIVER_CAPA_ENC_WEP128	0x00000010
+#define WPA_DRIVER_CAPA_ENC_GCMP	0x00000020
+#define WPA_DRIVER_CAPA_ENC_GCMP_256	0x00000040
+#define WPA_DRIVER_CAPA_ENC_CCMP_256	0x00000080
+#define WPA_DRIVER_CAPA_ENC_BIP		0x00000100
+#define WPA_DRIVER_CAPA_ENC_BIP_GMAC_128	0x00000200
+#define WPA_DRIVER_CAPA_ENC_BIP_GMAC_256	0x00000400
+#define WPA_DRIVER_CAPA_ENC_BIP_CMAC_256	0x00000800
+#define WPA_DRIVER_CAPA_ENC_GTK_NOT_USED	0x00001000
+	/** Bitfield of supported cipher suites */
+	unsigned int enc;
+
+#define WPA_DRIVER_AUTH_OPEN		0x00000001
+#define WPA_DRIVER_AUTH_SHARED		0x00000002
+#define WPA_DRIVER_AUTH_LEAP		0x00000004
+	/** Bitfield of supported IEEE 802.11 authentication algorithms */
+	unsigned int auth;
+
+/** Driver generated WPA/RSN IE */
+#define WPA_DRIVER_FLAGS_DRIVER_IE	0x00000001
+/** Driver needs static WEP key setup after association command */
+#define WPA_DRIVER_FLAGS_SET_KEYS_AFTER_ASSOC 0x00000002
+/** Driver takes care of all DFS operations */
+#define WPA_DRIVER_FLAGS_DFS_OFFLOAD			0x00000004
+/** Driver takes care of RSN 4-way handshake internally; PMK is configured with
+ * struct wpa_driver_ops::set_key using alg = WPA_ALG_PMK */
+#define WPA_DRIVER_FLAGS_4WAY_HANDSHAKE 0x00000008
+/** Driver is for a wired Ethernet interface */
+#define WPA_DRIVER_FLAGS_WIRED		0x00000010
+/** Driver provides separate commands for authentication and association (SME in
+ * wpa_supplicant). */
+#define WPA_DRIVER_FLAGS_SME		0x00000020
+/** Driver supports AP mode */
+#define WPA_DRIVER_FLAGS_AP		0x00000040
+/** Driver needs static WEP key setup after association has been completed */
+#define WPA_DRIVER_FLAGS_SET_KEYS_AFTER_ASSOC_DONE	0x00000080
+/** Driver supports dynamic HT 20/40 MHz channel changes during BSS lifetime */
+#define WPA_DRIVER_FLAGS_HT_2040_COEX			0x00000100
+/** Driver supports concurrent P2P operations */
+#define WPA_DRIVER_FLAGS_P2P_CONCURRENT	0x00000200
+/**
+ * Driver uses the initial interface as a dedicated management interface, i.e.,
+ * it cannot be used for P2P group operations or non-P2P purposes.
+ */
+#define WPA_DRIVER_FLAGS_P2P_DEDICATED_INTERFACE	0x00000400
+/** This interface is P2P capable (P2P GO or P2P Client) */
+#define WPA_DRIVER_FLAGS_P2P_CAPABLE	0x00000800
+/** Driver supports station and key removal when stopping an AP */
+#define WPA_DRIVER_FLAGS_AP_TEARDOWN_SUPPORT		0x00001000
+/**
+ * Driver uses the initial interface for P2P management interface and non-P2P
+ * purposes (e.g., connect to infra AP), but this interface cannot be used for
+ * P2P group operations.
+ */
+#define WPA_DRIVER_FLAGS_P2P_MGMT_AND_NON_P2P		0x00002000
+/**
+ * Driver is known to use sane error codes, i.e., when it indicates that
+ * something (e.g., association) fails, there was indeed a failure and the
+ * operation does not end up getting completed successfully later.
+ */
+#define WPA_DRIVER_FLAGS_SANE_ERROR_CODES		0x00004000
+/** Driver supports off-channel TX */
+#define WPA_DRIVER_FLAGS_OFFCHANNEL_TX			0x00008000
+/** Driver indicates TX status events for EAPOL Data frames */
+#define WPA_DRIVER_FLAGS_EAPOL_TX_STATUS		0x00010000
+/** Driver indicates TX status events for Deauth/Disassoc frames */
+#define WPA_DRIVER_FLAGS_DEAUTH_TX_STATUS		0x00020000
+/** Driver supports roaming (BSS selection) in firmware */
+#define WPA_DRIVER_FLAGS_BSS_SELECTION			0x00040000
+/** Driver supports operating as a TDLS peer */
+#define WPA_DRIVER_FLAGS_TDLS_SUPPORT			0x00080000
+/** Driver requires external TDLS setup/teardown/discovery */
+#define WPA_DRIVER_FLAGS_TDLS_EXTERNAL_SETUP		0x00100000
+/** Driver indicates support for Probe Response offloading in AP mode */
+#define WPA_DRIVER_FLAGS_PROBE_RESP_OFFLOAD		0x00200000
+/** Driver supports U-APSD in AP mode */
+#define WPA_DRIVER_FLAGS_AP_UAPSD			0x00400000
+/** Driver supports inactivity timer in AP mode */
+#define WPA_DRIVER_FLAGS_INACTIVITY_TIMER		0x00800000
+/** Driver expects user space implementation of MLME in AP mode */
+#define WPA_DRIVER_FLAGS_AP_MLME			0x01000000
+/** Driver supports SAE with user space SME */
+#define WPA_DRIVER_FLAGS_SAE				0x02000000
+/** Driver makes use of OBSS scan mechanism in wpa_supplicant */
+#define WPA_DRIVER_FLAGS_OBSS_SCAN			0x04000000
+/** Driver supports IBSS (Ad-hoc) mode */
+#define WPA_DRIVER_FLAGS_IBSS				0x08000000
+/** Driver supports radar detection */
+#define WPA_DRIVER_FLAGS_RADAR				0x10000000
+/** Driver supports a dedicated interface for P2P Device */
+#define WPA_DRIVER_FLAGS_DEDICATED_P2P_DEVICE		0x20000000
+/** Driver supports QoS Mapping */
+#define WPA_DRIVER_FLAGS_QOS_MAPPING			0x40000000
+/** Driver supports CSA in AP mode */
+#define WPA_DRIVER_FLAGS_AP_CSA				0x80000000
+/** Driver supports mesh */
+#define WPA_DRIVER_FLAGS_MESH			0x0000000100000000ULL
+/** Driver support ACS offload */
+#define WPA_DRIVER_FLAGS_ACS_OFFLOAD		0x0000000200000000ULL
+/** Driver supports key management offload */
+#define WPA_DRIVER_FLAGS_KEY_MGMT_OFFLOAD	0x0000000400000000ULL
+/** Driver supports TDLS channel switching */
+#define WPA_DRIVER_FLAGS_TDLS_CHANNEL_SWITCH	0x0000000800000000ULL
+/** Driver supports IBSS with HT datarates */
+#define WPA_DRIVER_FLAGS_HT_IBSS		0x0000001000000000ULL
+/** Driver supports IBSS with VHT datarates */
+#define WPA_DRIVER_FLAGS_VHT_IBSS		0x0000002000000000ULL
+/** Driver supports automatic band selection */
+#define WPA_DRIVER_FLAGS_SUPPORT_HW_MODE_ANY	0x0000004000000000ULL
+/** Driver supports simultaneous off-channel operations */
+#define WPA_DRIVER_FLAGS_OFFCHANNEL_SIMULTANEOUS	0x0000008000000000ULL
+/** Driver supports full AP client state */
+#define WPA_DRIVER_FLAGS_FULL_AP_CLIENT_STATE	0x0000010000000000ULL
+/** Driver supports P2P Listen offload */
+#define WPA_DRIVER_FLAGS_P2P_LISTEN_OFFLOAD     0x0000020000000000ULL
+/** Driver supports FILS */
+#define WPA_DRIVER_FLAGS_SUPPORT_FILS		0x0000040000000000ULL
+/** Driver supports Beacon frame TX rate configuration (legacy rates) */
+#define WPA_DRIVER_FLAGS_BEACON_RATE_LEGACY	0x0000080000000000ULL
+/** Driver supports Beacon frame TX rate configuration (HT rates) */
+#define WPA_DRIVER_FLAGS_BEACON_RATE_HT		0x0000100000000000ULL
+/** Driver supports Beacon frame TX rate configuration (VHT rates) */
+#define WPA_DRIVER_FLAGS_BEACON_RATE_VHT	0x0000200000000000ULL
+/** Driver supports mgmt_tx with random TX address in non-connected state */
+#define WPA_DRIVER_FLAGS_MGMT_TX_RANDOM_TA	0x0000400000000000ULL
+/** Driver supports mgmt_tx with random TX addr in connected state */
+#define WPA_DRIVER_FLAGS_MGMT_TX_RANDOM_TA_CONNECTED	0x0000800000000000ULL
+/** Driver supports better BSS reporting with sched_scan in connected mode */
+#define WPA_DRIVER_FLAGS_SCHED_SCAN_RELATIVE_RSSI	0x0001000000000000ULL
+/** Driver supports HE capabilities */
+#define WPA_DRIVER_FLAGS_HE_CAPABILITIES	0x0002000000000000ULL
+/** Driver supports FILS shared key offload */
+#define WPA_DRIVER_FLAGS_FILS_SK_OFFLOAD	0x0004000000000000ULL
+/** Driver supports all OCE STA specific mandatory features */
+#define WPA_DRIVER_FLAGS_OCE_STA		0x0008000000000000ULL
+/** Driver supports all OCE AP specific mandatory features */
+#define WPA_DRIVER_FLAGS_OCE_AP			0x0010000000000000ULL
+/**
+ * Driver supports all OCE STA-CFON specific mandatory features only.
+ * If a driver sets this bit but not the %WPA_DRIVER_FLAGS_OCE_AP, the
+ * userspace shall assume that this driver may not support all OCE AP
+ * functionality but can support only OCE STA-CFON functionality.
+ */
+#define WPA_DRIVER_FLAGS_OCE_STA_CFON		0x0020000000000000ULL
+	u64 flags;
+
+#define FULL_AP_CLIENT_STATE_SUPP(drv_flags) \
+	(drv_flags & WPA_DRIVER_FLAGS_FULL_AP_CLIENT_STATE)
+
+#define WPA_DRIVER_SMPS_MODE_STATIC			0x00000001
+#define WPA_DRIVER_SMPS_MODE_DYNAMIC			0x00000002
+	unsigned int smps_modes;
+
+	unsigned int wmm_ac_supported:1;
+
+	unsigned int mac_addr_rand_scan_supported:1;
+	unsigned int mac_addr_rand_sched_scan_supported:1;
+
+	/** Maximum number of supported active probe SSIDs */
+	int max_scan_ssids;
+
+	/** Maximum number of supported active probe SSIDs for sched_scan */
+	int max_sched_scan_ssids;
+
+	/** Maximum number of supported scan plans for scheduled scan */
+	unsigned int max_sched_scan_plans;
+
+	/** Maximum interval in a scan plan. In seconds */
+	u32 max_sched_scan_plan_interval;
+
+	/** Maximum number of iterations in a single scan plan */
+	u32 max_sched_scan_plan_iterations;
+
+	/** Whether sched_scan (offloaded scanning) is supported */
+	int sched_scan_supported;
+
+	/** Maximum number of supported match sets for sched_scan */
+	int max_match_sets;
+
+	/**
+	 * max_remain_on_chan - Maximum remain-on-channel duration in msec
+	 */
+	unsigned int max_remain_on_chan;
+
+	/**
+	 * max_stations - Maximum number of associated stations the driver
+	 * supports in AP mode
+	 */
+	unsigned int max_stations;
+
+	/**
+	 * probe_resp_offloads - Bitmap of supported protocols by the driver
+	 * for Probe Response offloading.
+	 */
+/** Driver Probe Response offloading support for WPS ver. 1 */
+#define WPA_DRIVER_PROBE_RESP_OFFLOAD_WPS		0x00000001
+/** Driver Probe Response offloading support for WPS ver. 2 */
+#define WPA_DRIVER_PROBE_RESP_OFFLOAD_WPS2		0x00000002
+/** Driver Probe Response offloading support for P2P */
+#define WPA_DRIVER_PROBE_RESP_OFFLOAD_P2P		0x00000004
+/** Driver Probe Response offloading support for IEEE 802.11u (Interworking) */
+#define WPA_DRIVER_PROBE_RESP_OFFLOAD_INTERWORKING	0x00000008
+	unsigned int probe_resp_offloads;
+
+	unsigned int max_acl_mac_addrs;
+
+	/**
+	 * Number of supported concurrent channels
+	 */
+	unsigned int num_multichan_concurrent;
+
+	/**
+	 * extended_capa - extended capabilities in driver/device
+	 *
+	 * Must be allocated and freed by driver and the pointers must be
+	 * valid for the lifetime of the driver, i.e., freed in deinit()
+	 */
+	const u8 *extended_capa, *extended_capa_mask;
+	unsigned int extended_capa_len;
+
+	struct wowlan_triggers wowlan_triggers;
+
+/** Driver adds the DS Params Set IE in Probe Request frames */
+#define WPA_DRIVER_FLAGS_DS_PARAM_SET_IE_IN_PROBES	0x00000001
+/** Driver adds the WFA TPC IE in Probe Request frames */
+#define WPA_DRIVER_FLAGS_WFA_TPC_IE_IN_PROBES		0x00000002
+/** Driver handles quiet period requests */
+#define WPA_DRIVER_FLAGS_QUIET				0x00000004
+/**
+ * Driver is capable of inserting the current TX power value into the body of
+ * transmitted frames.
+ * Background: Some Action frames include a TPC Report IE. This IE contains a
+ * TX power field, which has to be updated by lower layers. One such Action
+ * frame is Link Measurement Report (part of RRM). Another is TPC Report (part
+ * of spectrum management). Note that this insertion takes place at a fixed
+ * offset, namely the 6th byte in the Action frame body.
+ */
+#define WPA_DRIVER_FLAGS_TX_POWER_INSERTION		0x00000008
+/**
+ * Driver supports RRM. With this support, the driver will accept to use RRM in
+ * (Re)Association Request frames, without supporting quiet period.
+ */
+#define WPA_DRIVER_FLAGS_SUPPORT_RRM			0x00000010
+
+/** Driver supports setting the scan dwell time */
+#define WPA_DRIVER_FLAGS_SUPPORT_SET_SCAN_DWELL		0x00000020
+/** Driver supports Beacon Report Measurement */
+#define WPA_DRIVER_FLAGS_SUPPORT_BEACON_REPORT		0x00000040
+
+	u32 rrm_flags;
+
+	/* Driver concurrency capabilities */
+	unsigned int conc_capab;
+	/* Maximum number of concurrent channels on 2.4 GHz */
+	unsigned int max_conc_chan_2_4;
+	/* Maximum number of concurrent channels on 5 GHz */
+	unsigned int max_conc_chan_5_0;
+
+	/* Maximum number of supported CSA counters */
+	u16 max_csa_counters;
+};
 
 ```
