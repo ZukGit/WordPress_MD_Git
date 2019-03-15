@@ -748,10 +748,12 @@ adb shell am broadcast -a "android.net.wifi.WIFI_STATE_CHANGED"  --ei "previous_
 
   
 =============================================热点广播========================================
+http://androidxref.com/9.0.0_r3/xref/frameworks/base/wifi/java/android/net/wifi/WifiManager.java#511
 public static final int WIFI_AP_CLOSEING 		= 10;  //wifi hot is closeing
 public static final int WIFI_AP_CLOSE_SUCCESS 	= 11;  //wifi hot close success
 public static final int WIFI_AP_OPENING 		= 12;  //WiFi hot is opening 
 public static final int WIFI_AP_OPEN_SUCCESS 	= 13;  //WiFi hot open success
+public static final int WIFI_AP_STATE_FAILED    = 14;  // Wifi hot open failed
 
 
 // 打开热点	
