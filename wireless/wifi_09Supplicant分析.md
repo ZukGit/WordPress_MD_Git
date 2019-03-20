@@ -2834,12 +2834,714 @@ static int wpa_supplicant_init_iface(struct wpa_supplicant *wpa_s,struct wpa_int
 
 #### wpa_config_read(wpa_s->confname, NULL)
 ```
-继续点
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/config_file.c#366
+
+
+
+struct wpa_ssid {
+
+struct wpa_ssid *next;
+struct wpa_ssid *pnext;
+struct eap_peer_config eap;
+struct dl_list psk_list;
+		
+}
+
+
+struct wpa_config * wpa_config_read(const char *name 【/data/vendor/wifi/wpa/wpa_supplicant.conf】, struct wpa_config *cfgp 【NULL】)
+{
+	FILE *f;
+	char buf[512], *pos;
+	int errors = 0, line = 0;
+	struct wpa_ssid *ssid, *tail, *head;
+	struct wpa_cred *cred, *cred_tail, *cred_head;
+	struct wpa_config *config;
+	int id = 0;
+	int cred_id = 0;
+
+	if (name == NULL)
+		return NULL;
+	if (cfgp)
+		config = cfgp;
+	else
+		config = wpa_config_alloc_empty(NULL, NULL);     【已有分析】创建wpa_config 并初始化赋值
+	if (config == NULL) {
+		wpa_printf(MSG_ERROR, "Failed to allocate config file structure");
+		return NULL;
+	}
+	tail = head = config->ssid;   // 把 config-> ssid 地址传递给  wpa_ssid * head tail
+
+	while (tail && tail->next)  // 使得 tail 指向末尾 tail->next 指向为空
+		   tail = tail->next;
+
+	cred_tail = cred_head = config->cred;    // 把 config-> cred 地址传递给  wpa_cred * head   tail
+
+	while (cred_tail && cred_tail->next)  // 使得 cred_tail 指向末尾 cred_tail->next 指向为空
+		   cred_tail = cred_tail->next;
+
+	wpa_printf(MSG_DEBUG, "Reading configuration file '%s'", name);
+	f = fopen(name, "r");    //打开文件拿到句柄
+	if (f == NULL) {
+		wpa_printf(MSG_ERROR, "Failed to open config file '%s', error: %s", name, strerror(errno));
+		if (config != cfgp)
+			os_free(config);
+		return NULL;
+	}
+
+// network={ ssid="example" scan_ssid=1   key_mgmt=WPA-EAP WPA-PSK IEEE8021X NONE  } 
+
+	while (wpa_config_get_line(buf, sizeof(buf), f, &line, &pos)) {  【1】  // 读取文件的每行内容 内容装入 buf  line函数  char* pos 当前内容指针
+		if (os_strcmp(pos, "network={") == 0) {   // 如果 字符 pos 是  "network={" 开头
+			ssid = wpa_config_read_network(f, &line, id++);   【2】 从文件读取并返回 wpa_ssid ssid  
+			if (ssid == NULL) {
+				wpa_printf(MSG_ERROR, "Line %d: failed to parse network block.", line);
+				errors++;
+				continue;
+			}
+			if (head == NULL) {
+				head = tail = ssid;  // 如果当前 wpa_ssid * head 为空的话  那么 三个指针 wpa_ssid* head  tail ssid 都指向第一个创建的 wpa_ssid
+			} else {                // 如果当前的 head 不为空 说明当前已经存在有 wpa_ssid 结构体在内存   那么新得到的wpa_ssid 到到末尾
+				tail->next = ssid;
+				tail = ssid;
+			}
+			if (wpa_config_add_prio_network(config, ssid)) {   【3】
+				wpa_printf(MSG_ERROR, "Line %d: failed to add network block to priority list.",  line);
+				errors++;
+				continue;
+			}
+		} else if (os_strcmp(pos, "cred={") == 0) {   // 如果 字符 pos 是  "cred={" 开头
+			cred = wpa_config_read_cred(f, &line, cred_id++);
+			if (cred == NULL) {
+				wpa_printf(MSG_ERROR, "Line %d: failed to parse cred block.", line);
+				errors++;
+				continue;
+			}
+			if (cred_head == NULL) {
+				cred_head = cred_tail = cred;
+			} else {
+				cred_tail->next = cred;
+				cred_tail = cred;
+			}
+		} else if (wpa_config_process_global(config, pos, line) < 0) {  【4】 //当前 pos 内容 不以  network={ 或者 "cred={"开头 ， 比如  disable_scan_offload=1    persistent_reconnect=1
+			wpa_printf(MSG_ERROR, "Line %d: Invalid configuration line '%s'.", line, pos);
+			errors++;
+			continue;
+		}
+	} // end while 
+
+	fclose(f);
+
+	config->ssid = head;   // 把当前 config-> wpa_ssid ssid 保存为 head , 头结点 
+	wpa_config_debug_dump_networks(config);    【5】
+	config->cred = cred_head;   // 把当前 config-> wpa_cred cred 保存为 cred_head , 头结点 
+	return config;
+}
+
 
 ```
+##### wpa_config_get_line
+```
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/config_file.c#wpa_config_get_line
+wpa_config_get_line(buf, sizeof(buf), f, &line, &pos)
+
+
+/**
+ * wpa_config_get_line - Read the next configuration file line
+ * @s: Buffer for the line
+ * @size: The buffer length
+ * @stream: File stream to read from
+ * @line: Pointer to a variable storing the file line number  
+ * @_pos: Buffer for the pointer to the beginning of data on the text line or  
+ * %NULL if not needed (returned value used instead)  _pos将赋值为 当前一行内容的字符串指针  char*
+ * Returns: Pointer to the beginning of data on the text line or %NULL if no more text lines are available.
+ * 返回空 null 如果没有数据可读取   ， 正常返回当前一行内容的字符串指针  char*
+ * This function reads the next non-empty line from the configuration file and
+ * removes comments. The returned string is guaranteed to be null-terminated.
+ */
+static char * wpa_config_get_line(char *s, int size, FILE *stream, int *line,char **_pos)
+{
+	char *pos, *end, *sstart;
+
+	while (fgets(s, size, stream)) {
+		(*line)++;
+		s[size - 1] = '\0';
+		if (!newline_terminated(s, size)) {
+			/*
+			 * The line was truncated - skip rest of it to avoid
+			 * confusing error messages.
+			 */
+			wpa_printf(MSG_INFO, "Long line in configuration file truncated");
+			skip_line_end(stream);
+		}
+		pos = s;
+
+		/* Skip white space from the beginning of line. */
+		while (*pos == ' ' || *pos == '\t' || *pos == '\r')
+			pos++;
+
+		/* Skip comment lines and empty lines */
+		if (*pos == '#' || *pos == '\n' || *pos == '\0')
+			continue;
+		/*
+		 * Remove # comments unless they are within a double quoted string.
+		 */
+		sstart = os_strchr(pos, '"');
+		if (sstart)
+			sstart = os_strrchr(sstart + 1, '"');
+		if (!sstart)
+			sstart = pos;
+		end = os_strchr(sstart, '#');
+		if (end)
+			*end-- = '\0';
+		else
+			end = pos + os_strlen(pos) - 1;
+		/* Remove trailing white space. */
+		while (end > pos && (*end == '\n' || *end == ' ' || *end == '\t' ||	*end == '\r'))*end-- = '\0';
+		if (*pos == '\0')
+			continue;
+		if (_pos)
+			*_pos = pos;
+		return pos;
+	}
+
+	if (_pos)
+		*_pos = NULL;
+	return NULL;
+}
+
+
+```
+
+##### wpa_config_read_network
+```
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/config_file.c#166
+
+
+wpa_config_read_network(f, &line, id++);
+
+
+static struct wpa_ssid * wpa_config_read_network(FILE *f, int *line, int id)  // 文件句柄  第几行  第几个network{
+{
+	struct wpa_ssid *ssid;
+	int errors = 0, end = 0;
+	char buf[2000], *pos, *pos2;
+
+	wpa_printf(MSG_MSGDUMP, "Line: %d - start of a new network block",  *line);
+	ssid = os_zalloc(sizeof(*ssid));  // 初始wpa_ssid
+	if (ssid == NULL)
+		return NULL;
+	dl_list_init(&ssid->psk_list);  // 双向链表初始化
+	ssid->id = id;     //设置当前的索引 index id
+
+	wpa_config_set_network_defaults(ssid);  【1】
+
+	while (wpa_config_get_line(buf, sizeof(buf), f, line, &pos)) {  // 【已有分析】 只要读取内容 到   &pos
+		if (os_strcmp(pos, "}") == 0) {   // 只要   char  *pos  不等于 }  就不结束 继续执行 while 
+			end = 1;
+			break;
+		}
+
+          // 查找字符串=中首次出现字符 =的位置
+		pos2 = os_strchr(pos, '=');    // 如果当前 pos 是字符 = , 说明有一个 configitem  例如  ssid="test" pairwise=CCMP TKIP   存在 占据一行
+		if (pos2 == NULL) {
+			wpa_printf(MSG_ERROR, "Line %d: Invalid SSID line '%s'.", *line, pos);
+			errors++;
+			continue;
+		}
+
+		*pos2++ = '\0';   // 使得 pos2 读取到 等号= 后面的所有内容
+		if (*pos2 == '"') {   //  如果 等号=  后面的字符 是 引号  
+			if (os_strchr(pos2 + 1, '"') == NULL) {   判断是否有另一个引号 和它配对   不存在那么就报错 格式引号错误
+				wpa_printf(MSG_ERROR, "Line %d: invalid quotation '%s'.", *line, pos2);
+				errors++;
+				continue;
+			}
+		}
+
+		if (wpa_config_set(ssid, pos, pos2, *line) < 0)   【2】  把 key=value 设置到 wpa_ssid 中
+			errors++;
+	}
+
+	if (!end) {
+		wpa_printf(MSG_ERROR, "Line %d: network block was not terminated properly.", *line);
+		errors++;
+	}
+
+	errors += wpa_config_validate_network(ssid, *line);  【3】
+
+	if (errors) {
+		wpa_config_free_ssid(ssid);
+		ssid = NULL;
+	}
+
+	return ssid;
+}
+
+
+```
+
+###### wpa_config_set_network_defaults
+```
+
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/config.c#2740
+
+/**
+ * wpa_config_set_network_defaults - Set network default values
+ * @ssid: Pointer to network configuration data
+ */
+void wpa_config_set_network_defaults(struct wpa_ssid *ssid)
+{
+	ssid->proto = DEFAULT_PROTO;
+	ssid->pairwise_cipher = DEFAULT_PAIRWISE;       #define DEFAULT_PAIRWISE (WPA_CIPHER_CCMP | WPA_CIPHER_TKIP)
+	ssid->group_cipher = DEFAULT_GROUP;      #define DEFAULT_GROUP (WPA_CIPHER_CCMP | WPA_CIPHER_TKIP)
+	ssid->key_mgmt = DEFAULT_KEY_MGMT;                #define DEFAULT_KEY_MGMT (WPA_KEY_MGMT_PSK | WPA_KEY_MGMT_IEEE8021X)
+	ssid->bg_scan_period = DEFAULT_BG_SCAN_PERIOD;         #define DEFAULT_BG_SCAN_PERIOD -1
+	ssid->ht = 1;
+	ssid->eapol_flags = DEFAULT_EAPOL_FLAGS;         #define DEFAULT_EAPOL_FLAGS (EAPOL_FLAG_REQUIRE_KEY_UNICAST | EAPOL_FLAG_REQUIRE_KEY_BROADCAST)
+	ssid->eap_workaround = DEFAULT_EAP_WORKAROUND;        #define DEFAULT_EAP_WORKAROUND ((unsigned int) -1)
+	ssid->eap.fragment_size = DEFAULT_FRAGMENT_SIZE;      #define DEFAULT_FRAGMENT_SIZE 1398
+	ssid->eap.sim_num = DEFAULT_USER_SELECTED_SIM;         #define DEFAULT_USER_SELECTED_SIM 1
+	ssid->dot11MeshMaxRetries = DEFAULT_MESH_MAX_RETRIES;    #define DEFAULT_MESH_MAX_RETRIES 2
+	ssid->dot11MeshRetryTimeout = DEFAULT_MESH_RETRY_TIMEOUT;       #define DEFAULT_MESH_RETRY_TIMEOUT 40
+	ssid->dot11MeshConfirmTimeout = DEFAULT_MESH_CONFIRM_TIMEOUT;      #define DEFAULT_MESH_CONFIRM_TIMEOUT 40
+	ssid->dot11MeshHoldingTimeout = DEFAULT_MESH_HOLDING_TIMEOUT;         #define DEFAULT_MESH_HOLDING_TIMEOUT 40
+	ssid->mesh_rssi_threshold = DEFAULT_MESH_RSSI_THRESHOLD;           #define DEFAULT_MESH_RSSI_THRESHOLD 1 /* no change */
+	ssid->proactive_key_caching = -1;
+	ssid->mac_addr = -1;
+}
+
+```
+
+###### wpa_config_set()
+```
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/config.c#2813
+
+
+/**
+ * wpa_config_set - Set a variable in network configuration
+ * @ssid: Pointer to network configuration data
+ * @var: Variable name, e.g., "ssid"
+ * @value: Variable value
+ * @line: Line number in configuration file or 0 if not used
+ * Returns: 0 on success with possible change in the value, 1 on success with
+ * no change to previously configured value, or -1 on failure
+ *
+ * This function can be used to set network configuration variables based on
+ * both the configuration file and management interface input. The value
+ * parameter must be in the same format as the text-based configuration file is
+ * using. For example, strings are using double quotation marks.
+ */
+
+struct parse_data {
+	char *name; /* Configuration variable name */
+	int (*parser)(const struct parse_data *data, struct wpa_ssid *ssid,int line, const char *value);
+	void *param1, *param2, *param3, *param4; /* Variable specific parameters for the parser. */
+    int key_data;
+
+}
+
+
+static const struct parse_data ssid_fields[] = {
+	{ INT_RANGE(scan_ssid, 0, 1) }, { STR_RANGE(ssid, 0, SSID_MAX_LEN) },
+	{ FUNC(bssid) },
+	{ FUNC(bssid_hint) },
+	{ FUNC(bssid_blacklist) },
+	{ FUNC(bssid_whitelist) },
+	{ FUNC_KEY(psk) },
+	{ INT(mem_only_psk) },
+	{ STR_KEY(sae_password) },
+	{ FUNC(proto) },
+..........
+
+#define STR_RANGE(f, min, max) _STR_RANGE(f, min, max), 0
+
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/config.c#63   ssid 执行的 parse方法
+static int wpa_config_parse_str(const struct parse_data *data,struct wpa_ssid *ssid,int line, const char *value) 
+
+static int wpa_config_parse_key_mgmt(const struct parse_data *data,struct wpa_ssid *ssid, int line,const char *value)
+static int wpa_config_parse_bssid(const struct parse_data *data,struct wpa_ssid *ssid, int line,const char *value)
+
+}
+
+
+
+
+int wpa_config_set(struct wpa_ssid *ssid, const char *var, const char *value, int line)
+{
+	size_t i;
+	int ret = 0;
+
+	if (ssid == NULL || var == NULL || value == NULL)
+		return -1;
+
+	for (i = 0; i < NUM_SSID_FIELDS; i++) {               #define NUM_SSID_FIELDS ARRAY_SIZE(ssid_fields)
+		const struct parse_data *field = &ssid_fields[i];
+// key=value  找到名字key 与 parse_data 数组中parse_data->name 一致的那个 parse_data, 然后执行它的  parser 方法   该方法一定会把 value设置到 wpa_ssid中
+		if (os_strcmp(var, field->name) != 0)   
+			continue;
+
+
+// parser 方法   该方法一定会把 value设置到 wpa_ssid中   
+		ret = field->parser(field, ssid, line, value);  
+		if (ret < 0) {
+			if (line) {
+				wpa_printf(MSG_ERROR, "Line %d: failed to parse %s '%s'.", line, var, value);
+			}
+			ret = -1;
+		}
+		break;
+	}
+	if (i == NUM_SSID_FIELDS) {
+		if (line) {
+			wpa_printf(MSG_ERROR, "Line %d: unknown network field '%s'.", line, var);
+		}
+		ret = -1;
+	}
+
+	return ret;
+}
+
+
+bssid的 parse_data的 parse 方法
+static int wpa_config_parse_bssid(const struct parse_data *data,struct wpa_ssid *ssid, int line,const char *value)
+{
+	if (value[0] == '\0' || os_strcmp(value, "\"\"") == 0 ||
+	    os_strcmp(value, "any") == 0) {
+		ssid->bssid_set = 0;
+		wpa_printf(MSG_MSGDUMP, "BSSID any");
+		return 0;
+	}
+	if (hwaddr_aton(value, ssid->bssid)) {  // 设置当前的 value(mac地址 21:13:31:31:31)  到  wpa_ssid的 char* bssid 中 
+		wpa_printf(MSG_ERROR, "Line %d: Invalid BSSID '%s'.",line, value);
+		return -1;
+	}
+	ssid->bssid_set = 1;
+	wpa_hexdump(MSG_MSGDUMP, "BSSID", ssid->bssid, ETH_ALEN);
+	return 0;
+}
+
+
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/utils/common.c#65
+/**
+ * hwaddr_aton - Convert ASCII string to MAC address (colon-delimited format)
+ * @txt: MAC address as a string (e.g., "00:11:22:33:44:55")
+ * @addr: Buffer for the MAC address (ETH_ALEN = 6 bytes)
+ * Returns: 0 on success, -1 on failure (e.g., string not a MAC address)
+ */
+int hwaddr_aton(const char *txt, u8 *addr)
+{
+	return hwaddr_parse(txt, addr) ? 0 : -1;
+}
+
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/utils/common.c#40
+static const char * hwaddr_parse(const char *txt, u8 *addr)
+{
+	size_t i;
+
+	for (i = 0; i < ETH_ALEN; i++) {
+		int a;
+
+		a = hex2byte(txt);
+		if (a < 0)
+			return NULL;
+		txt += 2;
+		addr[i] = a;
+		if (i < ETH_ALEN - 1 && *txt++ != ':')
+			return NULL;
+	}
+	return txt;
+}
+
+
+```
+###### wpa_config_validate_network
+```
+主要执行消毒 无害化处理   预先判断值是否符合预期  不符合预期那么报错
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/config_file.c#127
+
+static int wpa_config_validate_network(struct wpa_ssid *ssid, int line)
+{
+	int errors = 0;
+
+	if (ssid->passphrase) {
+		if (ssid->psk_set) {
+			wpa_printf(MSG_ERROR, "Line %d: both PSK and passphrase configured.", line);
+			errors++;
+		}
+		wpa_config_update_psk(ssid);
+	}
+
+	if (ssid->disabled == 2)
+		ssid->p2p_persistent_group = 1;
+
+	if ((ssid->group_cipher & WPA_CIPHER_CCMP) && !(ssid->pairwise_cipher & WPA_CIPHER_CCMP) &&  !(ssid->pairwise_cipher & WPA_CIPHER_NONE)) {
+
+		/* Group cipher cannot be stronger than the pairwise cipher. */
+		wpa_printf(MSG_DEBUG, "Line %d: removed CCMP from group cipher"
+			   " list since it was not allowed for pairwise "
+			   "cipher", line);
+
+		ssid->group_cipher &= ~WPA_CIPHER_CCMP;
+	}
+
+	if (ssid->mode == WPAS_MODE_MESH &&  (ssid->key_mgmt != WPA_KEY_MGMT_NONE && ssid->key_mgmt != WPA_KEY_MGMT_SAE)) {
+		wpa_printf(MSG_ERROR, "Line %d: key_mgmt for mesh network should be open or SAE",  line);
+		errors++;
+	}
+
+	return errors;
+}
+
+
+
+```
+
+
+##### wpa_config_add_prio_network
+```
+
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/config.c#2336
+wpa_config_add_prio_network(config, ssid)
+
+
+
+
+/**
+ * wpa_config_add_prio_network - Add a network to priority lists
+ * @config: Configuration data from wpa_config_read()
+ * @ssid: Pointer to the network configuration to be added to the list
+ * Returns: 0 on success, -1 on failure
+ *
+ * This function is used to add a network block to the priority list of
+ * networks. This must be called for each network when reading in the full
+ * configuration. In addition, this can be used indirectly when updating
+ * priorities by calling wpa_config_update_prio_list().
+ */
+int wpa_config_add_prio_network(struct wpa_config *config,struct wpa_ssid *ssid)
+{
+	int prio;
+	struct wpa_ssid *prev, **nlist;
+
+	/*
+	 * Add to an existing priority list if one is available for the
+	 * configured priority level for this network.
+	 */
+	for (prio = 0; prio < config->num_prio; prio++) {
+		prev = config->pssid[prio];
+// 如果有相同的 ssid 的 priority 那么就直接放到  pssid 中 , 依据  priority来分组 只有不同的 priority 才往下执行创建新的  wpa_ssid * 起始点
+		if (prev->priority == ssid->priority) {   
+			while (prev->pnext)
+				prev = prev->pnext;
+			prev->pnext = ssid;
+			return 0;
+		}
+	}
+
+	/* First network for this priority - add a new priority list */
+// 创建 指向 指针的指针数组 大小为  num_prio + 1  , 起始地址赋值给 config->pssid 【wpa_ssid **pssid】   创建 一维数组
+	nlist = os_realloc_array(config->pssid 【wpa_ssid **pssid】, config->num_prio + 1,sizeof(struct wpa_ssid *));  
+
+	if (nlist == NULL)
+		return -1;
+
+	for (prio = 0; prio < config->num_prio; prio++) {
+		if (nlist[prio]->priority < ssid->priority) {   依据priority  进行内存排序  priority高的靠前
+			os_memmove(&nlist[prio + 1], &nlist[prio],(config->num_prio - prio) * sizeof(struct wpa_ssid *));
+			break;
+		}
+	}
+
+	nlist[prio] = ssid;    // 当前的ssid 放入  指向 wpa_ssid指针的指针数组     新的 一维数组[ 该数组内 priority 相同 ] 
+	config->num_prio++;     num_prio 自增
+	config->pssid = nlist;     //  指向 wpa_ssid指针的指针数组  指向 指针的指针的起始地址  【wpa_ssid **pssid】 起始地址
+
+	return 0;
+}
+
+
+
+```
+##### wpa_config_process_global
+```
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/config.c#4720
+
+wpa_supplicant.conf  单独存在的  key=value 键值对    例如 persistent_reconnect=1 
+
+
+static const struct global_parse_data global_fields[] = {
+	{ STR(ctrl_interface), 0 },
+	{ FUNC_NO_VAR(no_ctrl_interface), 0 },
+	{ STR(ctrl_interface_group), 0 } /* deprecated */,
+.......
+}
+
+struct global_parse_data {
+	char *name;
+	int (*parser)(const struct global_parse_data *data,struct wpa_config *config, int line, const char *value);   // 设置到 wpa_global 的函数指针
+	int (*get)(const char *name, struct wpa_config *config, long offset, char *buf, size_t buflen, int pretty_print);
+	void *param1, *param2, *param3;
+	unsigned int changed_flag;
+};
+
+bgscan=1 的解析方法
+static int wpa_config_process_bgscan(const struct global_parse_data *data,struct wpa_config *config, int line,const char *pos)
+{
+	size_t len;
+	char *tmp;
+	int res;
+
+	tmp = wpa_config_parse_string(pos, &len);
+	if (tmp == NULL) {
+		wpa_printf(MSG_ERROR, "Line %d: failed to parse %s",line, data->name);
+		return -1;
+	}
+
+	res = wpa_global_config_parse_str(data, config, line, tmp);
+	os_free(tmp);
+	return res;
+}
+
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/config.c#4004
+static int wpa_global_config_parse_str(const struct global_parse_data *data,struct wpa_config *config, int line,const char *pos){
+char **dst, *tmp;
+	tmp = os_strdup(pos);  // 得到 key 中的 value
+	if (tmp == NULL)
+		return -1;
+	dst = (char **) (((u8 *) config) + (long) data->param1);    【继续点】
+	os_free(*dst);
+	*dst = tmp;
+	wpa_printf(MSG_DEBUG, "%s='%s'", data->name, *dst);
+
+	return 0;
+
+}
+
+
+
+
+
+
+int wpa_config_process_global(struct wpa_config *config, char *pos, int line)
+{
+	size_t i;
+	int ret = 0;
+
+	for (i = 0; i < NUM_GLOBAL_FIELDS; i++) {
+		const struct global_parse_data *field = &global_fields[i];
+		size_t flen = os_strlen(field->name);
+		if (os_strncmp(pos, field->name, flen) != 0 || pos[flen] != '=')
+			continue;
+
+		if (field->parser(field, config, line, pos + flen + 1)) {  // 执行 函数指针 parse 
+			wpa_printf(MSG_ERROR, "Line %d: failed to parse '%s'.", line, pos);
+			ret = -1;
+		}
+		if (field->changed_flag == CFG_CHANGED_NFC_PASSWORD_TOKEN)
+              config->wps_nfc_pw_from_config = 1;
+
+		config->changed_parameters |= field->changed_flag;  //  添加变更标记位
+		break;
+	}
+
+	if (i == NUM_GLOBAL_FIELDS) {
+		if (os_strncmp(pos, "wmm_ac_", 7) == 0) {  // 如果key 是以   wmm_ac 开头的话
+			char *tmp = os_strchr(pos, '=');
+			if (tmp == NULL) {
+				if (line < 0)
+					return -1;
+				wpa_printf(MSG_ERROR, "Line %d: invalid line '%s'", line, pos);
+				return -1;
+			}
+			*tmp++ = '\0';
+			if (hostapd_config_wmm_ac(config->wmm_ac_params 【wmm_ac_params[4]】, pos,tmp)) {  把 wmm_ac_xx 的 value 设置到  wmm_ac_params[4]数组
+				wpa_printf(MSG_ERROR, "Line %d: invalid WMM AC item", line);
+				return -1;
+			}
+		}
+		if (line < 0)
+			return -1;
+		wpa_printf(MSG_ERROR, "Line %d: unknown global field '%s'.",  line, pos);
+		ret = -1;
+	}
+
+	return ret;
+}
+
+
+```
+##### wpa_config_debug_dump_networks
+
 #### os_rel2abs_path(iface->confanother)
 #### os_strdup(iface->ctrl_interface)
 #### wpa_config_alloc_empty(iface->ctrl_interface,iface->driver_param)
+```
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/config.c#3866
+
+
+config = wpa_config_alloc_empty(NULL, NULL)
+
+
+struct hostapd_wmm_ac_params {
+	int cwmin;
+	int cwmax;
+	int aifs;
+	int txop_limit; /* in units of 32us */
+	int admission_control_mandatory;
+};
+
+
+struct wpa_config * wpa_config_alloc_empty(const char *ctrl_interface,const char *driver_param)
+{
+	struct wpa_config *config;
+	const int aCWmin = 4, aCWmax = 10;
+	const struct hostapd_wmm_ac_params ac_bk ={ aCWmin 4, aCWmax [10], 7, 0, 0 }; /* background traffic */
+	const struct hostapd_wmm_ac_params ac_be ={ aCWmin 4, aCWmax [10], 3, 0, 0 }; /* best effort traffic */
+	const struct hostapd_wmm_ac_params ac_vi ={ aCWmin - 1 [3], aCWmin[4], 2, 3000 / 32, 0 }; /* video traffic */
+	const struct hostapd_wmm_ac_params ac_vo ={ aCWmin - 2 [2], aCWmin - 1 [3], 2, 1500 / 32, 0 }; /* voice traffic */
+
+	config = os_zalloc(sizeof(*config));  // 创建wpa_config
+	if (config == NULL)
+		return NULL;
+	config->eapol_version = DEFAULT_EAPOL_VERSION;   // #define DEFAULT_EAPOL_VERSION 1
+	config->ap_scan = DEFAULT_AP_SCAN;        //  #define DEFAULT_AP_SCAN 1
+	config->user_mpm = DEFAULT_USER_MPM;       // #define DEFAULT_USER_MPM 1 
+	config->max_peer_links = DEFAULT_MAX_PEER_LINKS;   // #define DEFAULT_MAX_PEER_LINKS 99
+	config->mesh_max_inactivity = DEFAULT_MESH_MAX_INACTIVITY; //  #define DEFAULT_MESH_MAX_INACTIVITY 300
+	config->dot11RSNASAERetransPeriod =DEFAULT_DOT11_RSNA_SAE_RETRANS_PERIOD;   // #define DEFAULT_DOT11_RSNA_SAE_RETRANS_PERIOD 1000
+	config->fast_reauth = DEFAULT_FAST_REAUTH;     //  #define DEFAULT_FAST_REAUTH 1
+	config->p2p_go_intent = DEFAULT_P2P_GO_INTENT;   #define DEFAULT_P2P_GO_INTENT 7
+	config->p2p_intra_bss = DEFAULT_P2P_INTRA_BSS;        #define DEFAULT_P2P_INTRA_BSS 1
+	config->p2p_go_freq_change_policy = DEFAULT_P2P_GO_FREQ_MOVE;    #define DEFAULT_P2P_GO_FREQ_MOVE P2P_GO_FREQ_MOVE_STAY  enum { P2P_GO_FREQ_MOVE_STAY 2 }
+	config->p2p_go_max_inactivity = DEFAULT_P2P_GO_MAX_INACTIVITY;  #define DEFAULT_P2P_GO_MAX_INACTIVITY (5 * 60)
+	config->p2p_optimize_listen_chan = DEFAULT_P2P_OPTIMIZE_LISTEN_CHAN;   #define DEFAULT_P2P_OPTIMIZE_LISTEN_CHAN 0
+	config->p2p_go_ctwindow = DEFAULT_P2P_GO_CTWINDOW;     #define DEFAULT_P2P_GO_CTWINDOW 0
+	config->bss_max_count = DEFAULT_BSS_MAX_COUNT;  #define DEFAULT_BSS_MAX_COUNT 200
+	config->bss_expiration_age = DEFAULT_BSS_EXPIRATION_AGE;   #define DEFAULT_BSS_EXPIRATION_AGE 180
+	config->bss_expiration_scan_count = DEFAULT_BSS_EXPIRATION_SCAN_COUNT;   #define DEFAULT_BSS_EXPIRATION_SCAN_COUNT 2
+	config->max_num_sta = DEFAULT_MAX_NUM_STA;    #define DEFAULT_MAX_NUM_STA 128
+	config->access_network_type = DEFAULT_ACCESS_NETWORK_TYPE;  #define DEFAULT_ACCESS_NETWORK_TYPE 15
+	config->scan_cur_freq = DEFAULT_SCAN_CUR_FREQ;   #define DEFAULT_SCAN_CUR_FREQ 0
+	config->wmm_ac_params[0] = ac_be;
+	config->wmm_ac_params[1] = ac_bk;
+	config->wmm_ac_params[2] = ac_vi;
+	config->wmm_ac_params[3] = ac_vo;
+	config->p2p_search_delay = DEFAULT_P2P_SEARCH_DELAY;    #define DEFAULT_P2P_SEARCH_DELAY 500
+	config->rand_addr_lifetime = DEFAULT_RAND_ADDR_LIFETIME; #define DEFAULT_RAND_ADDR_LIFETIME 60
+	config->key_mgmt_offload = DEFAULT_KEY_MGMT_OFFLOAD;   #define DEFAULT_KEY_MGMT_OFFLOAD 1
+	config->cert_in_cb = DEFAULT_CERT_IN_CB;      #define DEFAULT_CERT_IN_CB 1
+	config->wpa_rsc_relaxation = DEFAULT_WPA_RSC_RELAXATION;        #define DEFAULT_WPA_RSC_RELAXATION 1
+
+	if (ctrl_interface) 
+		config->ctrl_interface = os_strdup(ctrl_interface);  // 如果 参数 char *ctrl_interface 不为空 那么设置 config->ctrl_interface 为参数
+	if (driver_param)
+		config->driver_param = os_strdup(driver_param);
+	config->gas_rand_addr_lifetime = DEFAULT_RAND_ADDR_LIFETIME; #define DEFAULT_RAND_ADDR_LIFETIME 60
+
+	return config;
+}
+
+
+```
 #### eapol_sm_notify_portEnabled(wpa_s->eapol, FALSE); 
 #### eapol_sm_notify_portValid(wpa_s->eapol, FALSE)
 #### wpas_init_driver(wpa_s, iface)

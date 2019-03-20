@@ -148,6 +148,23 @@ GPL:   GUN Public Licence
 HotSpot：  hot  spot
 中文:   ** 热点**
 
+
+## HS2.0 && Hotspot2.0 
+```
+Hotspot 2.0(HS 2.0)由Wi-Fi联盟和无线带宽联盟开发，旨在当支持HS2的移动设备进入HS2覆盖区域，实现蜂窝移动网络和Wi-Fi网络之间的无缝流量切换
+无须用户选择Wi-Fi SIID和输入认证密钥，以提供更好的带宽和QoS,减少蜂窝移动网络的流量负载。
+Hotspot 2.0采用IEEE 802.11u协议，实现STA和AP之间的通信，支持自动发现网络、授权和分配访问权限
+
+支持802.11u的移动设备可以在本地存储操作员帐号信息和网络首选项策略。
+STA使用访问网络查询协议(ANQP)发送请求，寻找可用操作员、漫游伙伴和热点EAP认证的信息。
+AP通过一般广告服务(GAS)在移动设备和运营商网络服务器之间实现广告协议帧的2层网络传输
+然后，AP会将服务器响应返回设备，如果匹配，它就自动验证和连接用户。
+
+
+
+```
+
+
 ## HCF
 HCF:  hybrid coordination function
 中文:   ** 混合协调功能**
@@ -232,6 +249,37 @@ OWE : Opportunistic Wireless encryption
 中文:  机会无限加密( 为每个用户提供单独的加密方式) 
 # P
 
+## Passpoint
+```
+CERTIFIED Passpoint(认证控制点)计划实际上是创建一个Wi-Fi热点数据库，允许用户访问参加该计划的那个地区的任何热点。
+而且，参加这个计划的任何热点都允许用户接入，不必输入登录或者计费信息，
+因为这个计划支持蜂窝网络目前用于批准用户在基站之间无缝转接的SIM卡身份识别技术。
+这还意味着运营商可以相互之间建立Wi-Fi漫游协议
+
+
+WiFi联盟推出了一项名为Passpoint的技术，旨在让WiFi热点更像蜂窝网络和LTE网络一样工作
+
+简单比方:
+比如我们正用手机在家中通过WiFi上网，这时候我们起身出门，
+手机的WiFi连接瞬间从家里的无线网络切换到中国移动的WiFi网络上，
+走着走着，手机的WiFi连接又不知不觉的蹭上了联通的WiFi热点
+截止目前为止，北美仅有T-Mobile一家运营商公开承诺支持Passpoint认证
+
+
+
+```
+
+## PLMN
+```
+PLMN（Public Land Mobile Network，公共陆地移动网络）
+PLMN = MCC + MNC
+由政府或它所批准的经营者，为公众提供陆地移动通信业务目的而建立和经营的网络。该网路必须与公众交换电话网（PSTN）互连，形成整个地区或国家规模的通信网。
+例如中国移动的PLMN为46000，中国联通的PLMN为46001
+
+
+```
+
+
 ## PHY
 PHY：  physical layer
 中文:   ** 物理层 **
@@ -296,7 +344,11 @@ RTO:   Round-trip Time
 ## RSSI
 RSSI :    Recevived Signal  Strength Indication
 中文:   **射频信号强度**
+```
+https://source.android.google.cn/devices/tech/connect/wifi-rtt
 
+
+```
 ## RSN
 RSN: Robust Security Network
 中文:   **强健安全网络 802.11x 安全交互协议 针对WEP加密机制的各种缺陷做了多方面的改进**

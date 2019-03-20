@@ -1064,7 +1064,7 @@ struct eap_method_type {
 
 
 
-
+```
 ## eapol_config
 ```
 http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/eapol_supp/eapol_supp_sm.h#20
@@ -1975,6 +1975,27 @@ struct wowlan_triggers {
 	u8 four_way_handshake;
 	u8 rfkill_release;
 };
+
+```
+
+## wpa_cred
+```
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/config.h#53
+
+
+http://w1.fi/wpa_supplicant/devel/structwpa__cred.html
+
+
+struct wpa_cred {
+	struct wpa_cred *next;
+	int id;
+	int temporary;
+	char *username;
+	char *password;
+	int ext_password;
+	char *ca_cert;
+.....
+}
 
 ```
 

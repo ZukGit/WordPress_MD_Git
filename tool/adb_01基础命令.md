@@ -1,3 +1,59 @@
+# 常用adb命令
+```
+
+adb pull /data/system/users/0/settings_system.xml
+adb pull /data/system/users/0/settings_secure.xml
+adb pull /data/system/users/0/settings_global.xml
+adb pull /data/system/users/0/settings_ssaid.xml
+
+//ScreenShot
+adb pull /sdcard/Pictures/Screenshots   
+adb pull /vendor/etc/wifi/WCNSS_qcom_cfg.ini .
+
+
+adb push   C:/Users/zhuzj5/Desktop/mp3.mp3 /storage/emulated/0/Pictures/Screenshots 
+adb push  C:/Users/zhuzj5/Desktop/fileManager.apk   /storage/emulated/0/ 
+
+
+adb root  &  adb remount &  adb push ./WCNSS_qcom_cfg.ini /vendor/etc/wifi/
+adb disable-verity && adb reboot 
+
+adb root & adb install -r Settings.apk 
+adb root &  adb remount &   adb push   C:/Users/zhuzj5/Desktop/mp3.mp3 /storage/emulated/0/ 
+ 
+adb reboot bootloader 
+fastboot oem ssm_test 10 1 
+adb disable-verity  & adb remount 
+adb root  &  adb remount &  adb push C:/Users/zhuzj5/Desktop/framework.jar   /system/framework/
+adb root  &  adb remount &  adb push C:/Users/zhuzj5/Desktop/services.jar   /system/framework/  
+adb root  &  adb remount &  adb push C:/Users/zhuzj5/Desktop/services.core.jar   /system/framework/
+
+
+//pd_dump
+adb root & adb pull /vendor/rfs/msm/mpss/ramdumps
+
+// riva_dump
+adb root & adb pull /data/vendor/ss-ram-dumps 
+
+// screenshot_mp4
+adb root & adb shell screenrecord /sdcard/demo.mp4 
+adb root & adb pull  /sdcard/demo.mp4 
+```
+
+## 常用路径
+```
+
+
+1. Setting > Network & internet > Wi-fi [toogle close] 
+2. Setting > Network & internet > Wi-fi > Wi-Fi preferences > Turn on Wi-fi automatically [toogle close] 
+3. Setting > Network & internet > Wi-fi > Wi-Fi preferences > open network notification [toogle close] 
+4. Settings >System > About phone > tap "Build number" 4 times >Developer options
+   Setting > System > Advanced > Developer options >Enable WiFi Verbose Logging  [toogle open] 
+5. Setting > Security & location > Location(Privacy) > Advance > Scanning >  Wi-Fi scanning[toogle close] 
+6. Setting > Security & location > Location(Privacy) > Advance > Scanning >  Bluetooth scanning[toogle close] 
+
+```
+
 # A
 # B
 
@@ -76,6 +132,16 @@ chmod 644 /system/lib/libmedia.so
 ```
 adb pull                         // 把手机文件下载到PC本地的命令
 adb pull /system/lib/libmedia.so   ./         // 拉取 libmedia.so 到本地
+
+
+adb pull /data/system/users/0/settings_system.xml
+adb pull /data/system/users/0/settings_secure.xml
+adb pull /data/system/users/0/settings_global.xml
+adb pull /data/system/users/0/mot_settings_global.xml
+adb pull /data/system/users/0/mot_settings_secure.xml
+adb pull /data/system/users/0/mot_settings_system.xml
+adb pull /data/system/users/0/settings_ssaid.xml
+
 
 ```
 # Q
@@ -799,6 +865,8 @@ adb shell settings get global airplane_mode_on        //获得飞行模式开关
 
 adb shell settings get global airplane_mode_on
 0
+
+adb shell settings get global hs20_mncmcc_retail_saved_state  // passpoint -sim 开关
 
 ```
 
