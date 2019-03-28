@@ -71,6 +71,7 @@ adb push Data.msc  /vendor/fireware_mnt/image/
 
 ## about.html
 ```
+meta build id 曾用名
 AOSP:
 /vendor/qcom/nonhlos/common/about.html
 

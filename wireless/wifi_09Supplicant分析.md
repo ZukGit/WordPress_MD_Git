@@ -2618,7 +2618,7 @@ static int wpa_supplicant_init_iface(struct wpa_supplicant *wpa_s,struct wpa_int
 			wpa_s->conf->ctrl_interface = NULL;
 		}
 	} else
-		wpa_s->conf = wpa_config_alloc_empty(iface->ctrl_interface,iface->driver_param); 【4】 // 没有定义配置文件的话
+		wpa_s->conf = wpa_config_alloc_empty(iface->ctrl_interface,iface->driver_param); 【4】 // 没有定义配置文件的话 【已有分析】创建wpa_config 并初始化赋值
 
 	if (wpa_s->conf == NULL) {
 		wpa_printf(MSG_ERROR, "\nNo configuration found.");
@@ -3383,7 +3383,7 @@ struct global_parse_data {
 	unsigned int changed_flag;
 };
 
-bgscan=1 的解析方法
+bgscan=1 的解析方法 int (*parser)
 static int wpa_config_process_bgscan(const struct global_parse_data *data,struct wpa_config *config, int line,const char *pos)
 {
 	size_t len;
@@ -3401,20 +3401,88 @@ static int wpa_config_process_bgscan(const struct global_parse_data *data,struct
 	return res;
 }
 
+
+bgscan=1 的获取方法  int (*get)
+static int wpa_config_get_int(const char *name, struct wpa_config *config,long offset, char *buf, size_t buflen,int pretty_print)
+{
+	int *val = (int *) (((u8 *) config) + (long) offset);
+
+	if (pretty_print)
+		return os_snprintf(buf, buflen, "%s=%d\n", name, *val);
+	return os_snprintf(buf, buflen, "%d", *val);
+}
+
+
+ssid=helloworld 的获取方法  int (*get)
+static int wpa_config_get_str(const char *name, struct wpa_config *config,long offset, char *buf, size_t buflen, int pretty_print)
+{
+	char **val = (char **) (((u8 *) config) + (long) offset);  
+	int res;
+
+	if (pretty_print)
+		res = os_snprintf(buf, buflen, "%s=%s\n", name,
+				  *val ? *val : "null");
+	else if (!*val)
+		return -1;
+	else
+		res = os_snprintf(buf, buflen, "%s", *val);
+	if (os_snprintf_error(buflen, res))
+		res = -1;
+
+	return res;
+}
+
+
 http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/config.c#4004
 static int wpa_global_config_parse_str(const struct global_parse_data *data,struct wpa_config *config, int line,const char *pos){
-char **dst, *tmp;
+
+    char **dst, *tmp;
 	tmp = os_strdup(pos);  // 得到 key 中的 value
 	if (tmp == NULL)
 		return -1;
-	dst = (char **) (((u8 *) config) + (long) data->param1);    【继续点】
-	os_free(*dst);
-	*dst = tmp;
+	dst = (char **) (((u8 *) config) + (long) data->param1);    // void * param1 void * param1  必须强转为  long 是一个记录当前 field 在config中的偏移量的值
+
+// the offset of the target buffer within struct wpa_ssid is stored in .param1   结构wpa-ssid中目标缓冲区的偏移量存储在.param1中
+
+	os_free(*dst);   // 清除 dst 所指的那个字符串?     , 把 原先  config.field 对应的属性的char* 地址释放掉  因为已经有新的地址需要赋值
+	*dst = tmp;   // 把temp value 重新赋值给 dst ,  dst 实际就是   config.field  那个对应值 对应的地址
 	wpa_printf(MSG_DEBUG, "%s='%s'", data->name, *dst);
 
 	return 0;
 
 }
+
+
+static int wpa_global_config_parse_int(const struct global_parse_data *data,struct wpa_config *config, int line, const char *pos)
+{
+	int val, *dst;
+	char *end;
+
+	dst = (int *) (((u8 *) config) + (long) data->param1);  //  data->param1  必须强转为  long 是一个记录当前 field 在config中的偏移量的值
+	val = strtol(pos, &end, 0); // char * end  记录当前是否到了 /0  字符串的结尾   得到pos起点后的一个int值
+	if (*end) {
+		wpa_printf(MSG_ERROR, "Line %d: invalid number \"%s\"",line, pos);
+		return -1;
+	}
+	*dst = val;  // 把该int值  赋值给 dst  , 实际上就是赋值给了 wpa_config的对应Field变量的位置 ,  dst 和 config.该field的位置一样
+
+	wpa_printf(MSG_DEBUG, "%s=%d", data->name, *dst);
+
+	if (data->param2 && *dst < (long) data->param2) {
+		wpa_printf(MSG_ERROR, "Line %d: too small %s (value=%d min_value=%ld)", line, data->name, *dst,(long) data->param2);
+         *dst = (long) data->param2;
+		return -1;
+	}
+
+	if (data->param3 && *dst > (long) data->param3) {
+		wpa_printf(MSG_ERROR, "Line %d: too large %s (value=%d max_value=%ld)", line, data->name, *dst, (long) data->param3);
+		*dst = (long) data->param3;
+		return -1;
+	}
+
+	return 0;
+}
+
 
 
 
@@ -3432,7 +3500,7 @@ int wpa_config_process_global(struct wpa_config *config, char *pos, int line)
 		if (os_strncmp(pos, field->name, flen) != 0 || pos[flen] != '=')
 			continue;
 
-		if (field->parser(field, config, line, pos + flen + 1)) {  // 执行 函数指针 parse 
+		if (field->parser(field, config, line, pos + flen + 1)) {  // 执行 函数指针 parse  ,这里以  wpa_config_process_bgscan  为例 实际就是设置了 config.field 的值 
 			wpa_printf(MSG_ERROR, "Line %d: failed to parse '%s'.", line, pos);
 			ret = -1;
 		}
@@ -3469,10 +3537,137 @@ int wpa_config_process_global(struct wpa_config *config, char *pos, int line)
 
 
 ```
-##### wpa_config_debug_dump_networks
+```
+(char **) dst = (char **) (((u8 *) config) + (long) data->param1); 
 
+地址强制转换
+```
+<img src="//../zimage/wireless/wifi/09_supplicant/char.jpg"/>
+##### wpa_config_debug_dump_networks
+```
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/config.c#3935
+/**
+ * wpa_config_debug_dump_networks - Debug dump of configured networks   @config: Configuration data from wpa_config_read()
+ */
+void wpa_config_debug_dump_networks(struct wpa_config *config)
+{
+	int prio;
+	struct wpa_ssid *ssid;
+
+	for (prio = 0; prio < config->num_prio; prio++) {  // 以 conf 定义的优先级为最低优先级  打印所有大于该优先级的 wpa_ssid
+		ssid = config->pssid[prio]; // 切换下一个优先级 Group , 相同的优先级 wpa_ssid 集合
+		wpa_printf(MSG_DEBUG, "Priority group %d",ssid->priority);
+		while (ssid) {
+			wpa_printf(MSG_DEBUG, "   id=%d ssid='%s'",ssid->id,wpa_ssid_txt(ssid->ssid, ssid->ssid_len));  // 打印该相同优先级的 wpa_ssid的 ssid ,id  信息
+			ssid = ssid->pnext;
+		}
+	}
+}
+
+
+
+```
 #### os_rel2abs_path(iface->confanother)
+```
+添加绝对路径
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/utils/os_unix.c#280
+
+os_xxxx 替换掉 os_
+添加 头文件  #include<errno.h> #include <stdio.h>
+
+
+#include <stdio.h>
+#include<errno.h>
+
+char * rel2abs_path(const char *rel_path)
+{
+	char *buf = NULL, *cwd, *ret;
+	size_t len = 128, cwd_len, rel_len, ret_len;
+	int last_errno;
+
+	if (!rel_path)
+		return NULL;
+
+	if (rel_path[0] == '/')
+		return strdup(rel_path);
+
+	for (;;) {
+		buf = malloc(len);
+		if (buf == NULL)
+			return NULL;
+		cwd = getcwd(buf, len);
+		if (cwd == NULL) {
+			last_errno = errno;
+			free(buf);
+			if (last_errno != ERANGE)
+				return NULL;
+			len *= 2;
+			if (len > 2000)
+				return NULL;
+		} else {
+			buf[len - 1] = '\0';
+			break;
+		}
+	}
+
+	cwd_len = strlen(cwd);
+	rel_len = strlen(rel_path);
+	ret_len = cwd_len + 1 + rel_len + 1;
+	ret = malloc(ret_len);
+	if (ret) {
+		memcpy(ret, cwd, cwd_len);
+		ret[cwd_len] = '/';
+		memcpy(ret + cwd_len + 1, rel_path, rel_len);
+		ret[ret_len - 1] = '\0';
+	}
+	free(buf);
+	return ret;
+}
+
+int main () {
+	char* result = rel2abs_path("wpa.conf");
+		printf("result = %s", result);
+	return 0;
+}
+
+输入:  data/wifi/wpa.conf
+输出: //data/wifi/wpa.conf
+
+
+
+```
+
+
 #### os_strdup(iface->ctrl_interface)
+```
+#include <stdio.h>
+#include<errno.h>
+
+char * os_strdup(const char *s)
+{
+	size_t len;
+	char *d;
+	len = strlen(s);
+	d = malloc(len + 1);
+	if (d == NULL)
+		return NULL;
+	memcpy(d, s, len);
+	d[len] = '\0';
+	return d;
+}
+
+int main () {
+	char* result = os_strdup("hello-world");
+	printf("result = %s", result);
+	return 0;
+}
+
+
+输入:hello-world    完成字符串的复制操作
+输出:hello-world
+```
+
+
 #### wpa_config_alloc_empty(iface->ctrl_interface,iface->driver_param)
 ```
 http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/config.c#3866
@@ -3543,6 +3738,88 @@ struct wpa_config * wpa_config_alloc_empty(const char *ctrl_interface,const char
 
 ```
 #### eapol_sm_notify_portEnabled(wpa_s->eapol, FALSE); 
+```
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/eapol_supp/eapol_supp_sm.c#1436
+
+eapol_sm_notify_portEnabled(wpa_s->eapol, FALSE);
+
+void eapol_sm_notify_portEnabled(struct eapol_sm *sm, Boolean enabled)
+{
+	if (sm == NULL)
+		return;
+	wpa_printf(MSG_DEBUG, "EAPOL: External notification - portEnabled=%d", enabled);
+	if (sm->portEnabled != enabled)
+		sm->force_authorized_update = TRUE;
+	sm->portEnabled = enabled; // 端口enable 标记 置为 FALSE
+	eapol_sm_step(sm);
+}
+
+
+
+
+
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/eapol_supp/eapol_supp_sm.c#958
+void eapol_sm_step(struct eapol_sm *sm)
+{
+	int i;
+
+	/* In theory, it should be ok to run this in loop until !changed.
+	 * However, it is better to use a limit on number of iterations to
+	 * allow events (e.g., SIGTERM) to stop the program cleanly if the
+	 * state machine were to generate a busy loop. */
+	for (i = 0; i < 100; i++) {   // 循环100次? 
+		sm->changed = FALSE;     #define SM_STEP_RUN(machine) sm_ ## machine ## _Step(sm)       
+		SM_STEP_RUN(SUPP_PAE); 【1】    //  SM_STEP(SUPP_PAE)  执行方法  SM_STEP(KEY_RX)   SM_STEP(SUPP_BE)  三个方法   【继续点】
+		SM_STEP_RUN(KEY_RX);  【2】
+		SM_STEP_RUN(SUPP_BE); 【3】
+		if (sm->use_eap_proxy) {
+			/* Drive the EAP proxy state machine */
+			if (eap_proxy_sm_step(sm->eap_proxy, sm->eap))  【4】
+				     sm->changed = TRUE;
+		} else if (eap_peer_sm_step(sm->eap)){   【5】
+			sm->changed = TRUE;
+        }
+
+		if (!sm->changed){
+              break;   // 跳出 for 循环   如果 sm->changed == false
+          }
+			
+     }
+
+	if (sm->changed) {
+		/* restart EAPOL state machine step from timeout call in order
+		 * to allow other events to be processed. */
+		eloop_cancel_timeout(eapol_sm_step_timeout, NULL, sm);                   // 【已有分析】
+		eloop_register_timeout(0, 0, eapol_sm_step_timeout, NULL, sm);           // 【已有分析】
+	}  
+
+	if (sm->ctx->cb && sm->cb_status != EAPOL_CB_IN_PROGRESS) {
+		enum eapol_supp_result result;
+		if (sm->cb_status == EAPOL_CB_SUCCESS){
+			result = EAPOL_SUPP_RESULT_SUCCESS;
+        }else  if (eap_peer_was_failure_expected(sm->eap)){   【6】
+		     result = EAPOL_SUPP_RESULT_EXPECTED_FAILURE;
+          }
+	
+	    else
+			result = EAPOL_SUPP_RESULT_FAILURE;
+
+		sm->cb_status = EAPOL_CB_IN_PROGRESS;
+		sm->ctx->cb(sm, result, sm->ctx->cb_ctx);    【7】
+	}
+}
+
+
+```
+
+##### SM_STEP(SUPP_PAE) 
+##### SM_STEP(KEY_RX) 
+##### SM_STEP(SUPP_BE) 
+##### eap_proxy_sm_step(sm->eap_proxy, sm->eap)
+##### eap_peer_sm_step(sm->eap)
+##### eap_peer_was_failure_expected(sm->eap)
+##### sm->ctx->cb(sm, result, sm->ctx->cb_ctx)
+
 #### eapol_sm_notify_portValid(wpa_s->eapol, FALSE)
 #### wpas_init_driver(wpa_s, iface)
 #### wpa_supplicant_init_wpa(wpa_s)

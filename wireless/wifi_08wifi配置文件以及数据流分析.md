@@ -2270,8 +2270,9 @@ private void updateNetworkScores【4】() {  // 更新热点分数时  执行回
 
 
 
- 
+ http://androidxref.com/9.0.0_r3/xref/frameworks/base/packages/SettingsLib/src/com/android/settingslib/wifi/WifiTracker.java#518
     private void updateAccessPoints(final List<ScanResult> newScanResults,List<WifiConfiguration> configs) {    /** Update the internal list of access points. */
+//    List<WifiConfiguration> configs来源【8】 
         // Map configs and scan results necessary to make AccessPoints
         final Map<String, WifiConfiguration> configsByKey = new ArrayMap(configs.size());  // 创建  Map<String, WifiConfiguration>  ssid与WifiConfiguration 一一对应起来?
         if (configs != null) {
@@ -2320,7 +2321,7 @@ private void updateNetworkScores【4】() {  // 更新热点分数时  执行回
 
                 // Update the matching config if there is one, to populate saved network info
                  //  更新 accessPoint 的  networkId  ,  Map<String, WifiConfiguration>
-                accessPoint.update(configsByKey.get(entry.getKey())【WifiConfiguration】); 【5】 ▲
+                accessPoint.update(configsByKey.get(entry.getKey())【WifiConfiguration】); 【5】 ▲    
 
                 accessPoints.add(accessPoint);   // 更新过后的 AccessPoint 放入    ArrayList<AccessPoint> accessPoints
             }
@@ -2684,7 +2685,7 @@ http://androidxref.com/9.0.0_r3/xref/frameworks/base/packages/SettingsLib/src/co
 ```
 
 
-#### requestScoresForNetworkKeys(scoresToRequest)
+#### requestScoresForNetworkKeys(scoresToRequest) 热点评分方法
 ```
 http://androidxref.com/9.0.0_r3/xref/frameworks/base/packages/SettingsLib/src/com/android/settingslib/wifi/WifiTracker.java#343
 
@@ -2706,7 +2707,7 @@ private final Set<NetworkKey> mRequestedScores = new ArraySet<>();  // 全局
 ```
 
 
-#### Collections.sort(accessPoints)
+#### Collections.sort(accessPoints)  热点排序实现
 ```
 
 Collections.sort(accessPoints)
@@ -2781,5 +2782,314 @@ compareTo(T o)  函数的实现
         // Do a case sensitive comparison to distinguish SSIDs that differ in case only
         return getSsidStr().compareTo(other.getSsidStr());
     }
+
+```
+
+
+#### configsByKey List<WifiConfiguration> configs数据来源分析
+```
+List<WifiConfiguration> configs
+Map<String, WifiConfiguration> configsByKey 
+
+    private void updateAccessPoints(final List<ScanResult> newScanResults,List<WifiConfiguration> configs) { }   该方法被调用处
+
+
+
+
+    private void fetchScansAndConfigsAndUpdateAccessPoints() {
+        final List<ScanResult> newScanResults = mWifiManager.getScanResults();
+        if (isVerboseLoggingEnabled()) {
+            Log.i(TAG, "Fetched scan results: " + newScanResults);
+        }
+
+        List<WifiConfiguration> configs = mWifiManager.getConfiguredNetworks();  //    List<WifiConfiguration> 来源于 WifiManager
+        updateAccessPoints(newScanResults, configs);    【调用方法】
+    }
+
+
+http://androidxref.com/9.0.0_r3/xref/frameworks/base/wifi/java/android/net/wifi/WifiManager.java#1016
+
+    /**
+     * Return a list of all the networks configured for the current foreground
+     * user.
+     * Not all fields of WifiConfiguration are returned. Only the following
+     * fields are filled in:
+     * <ul>
+     * <li>networkId</li>
+     * <li>SSID</li>
+     * <li>BSSID</li>
+     * <li>priority</li>
+     * <li>allowedProtocols</li>
+     * <li>allowedKeyManagement</li>
+     * <li>allowedAuthAlgorithms</li>
+     * <li>allowedPairwiseCiphers</li>
+     * <li>allowedGroupCiphers</li>
+     * </ul>
+     * @return a list of network configurations in the form of a list
+     * of {@link WifiConfiguration} objects.
+     */
+    public List<WifiConfiguration> getConfiguredNetworks() {
+        try {
+            ParceledListSlice<WifiConfiguration> parceledList = mService.getConfiguredNetworks();
+            if (parceledList == null) {
+                return Collections.emptyList();
+            }
+            return parceledList.getList();
+        } catch (RemoteException e) {
+            throw e.rethrowFromSystemServer();
+        }
+    }
+
+
+http://androidxref.com/9.0.0_r3/xref/frameworks/opt/net/wifi/service/java/com/android/server/wifi/WifiServiceImpl.java#1738
+
+    /**
+     * see {@link android.net.wifi.WifiManager#getConfiguredNetworks()}
+     * @return the list of configured networks
+     */
+    @Override
+    public ParceledListSlice<WifiConfiguration> getConfiguredNetworks() {
+        enforceAccessPermission();
+        if (mVerboseLoggingEnabled) {
+            mLog.info("getConfiguredNetworks uid=%").c(Binder.getCallingUid()).flush();
+        }
+        if (mWifiStateMachineChannel != null) {
+            List<WifiConfiguration> configs = mWifiStateMachine.syncGetConfiguredNetworks( Binder.getCallingUid(), mWifiStateMachineChannel);
+            if (configs != null) {
+                return new ParceledListSlice<WifiConfiguration>(configs);
+            }
+        } else {
+            Slog.e(TAG, "mWifiStateMachineChannel is not initialized");
+        }
+        return null;
+    }
+
+
+
+http://androidxref.com/9.0.0_r3/xref/frameworks/opt/net/wifi/service/java/com/android/server/wifi/WifiStateMachine.java#1578
+
+    public List<WifiConfiguration> syncGetConfiguredNetworks(int uuid, AsyncChannel channel) {
+        Message resultMsg = channel.sendMessageSynchronously(CMD_GET_CONFIGURED_NETWORKS, uuid);
+        if (resultMsg == null) { // an error has occurred
+            return null;
+        } else {
+            List<WifiConfiguration> result = (List<WifiConfiguration>) resultMsg.obj;
+            resultMsg.recycle();
+            return result;
+        }
+    }
+
+http://androidxref.com/9.0.0_r3/xref/frameworks/opt/net/wifi/service/java/com/android/server/wifi/WifiStateMachine.java#3323
+    class DefaultState extends State {
+
+        @Override
+        public boolean processMessage(Message message) {
+            logStateAndMessage(message, this);
+
+            switch (message.what) {
+                case CMD_GET_CONFIGURED_NETWORKS:
+                    replyToMessage(message, message.what, mWifiConfigManager.getSavedNetworks());
+                    break;
+        .....
+
+}
+
+
+
+http://androidxref.com/9.0.0_r3/xref/frameworks/opt/net/wifi/service/java/com/android/server/wifi/WifiConfigManager.java#511
+    public List<WifiConfiguration> getSavedNetworks() {
+        return getConfiguredNetworks(true, true);
+    }
+
+
+http://androidxref.com/9.0.0_r3/xref/frameworks/opt/net/wifi/service/java/com/android/server/wifi/WifiConfigManager.java#472
+    private List<WifiConfiguration> getConfiguredNetworks( boolean savedOnly, boolean maskPasswords) {
+        List<WifiConfiguration> networks = new ArrayList<>();
+        for (WifiConfiguration config : getInternalConfiguredNetworks()) {
+            if (savedOnly && config.ephemeral) {
+                continue;
+            }
+            networks.add(createExternalWifiConfiguration(config, maskPasswords));
+        }
+        return networks;
+    }
+
+
+http://androidxref.com/9.0.0_r3/xref/frameworks/opt/net/wifi/service/java/com/android/server/wifi/WifiConfigManager.java#591
+    private Collection<WifiConfiguration> getInternalConfiguredNetworks() {
+        return mConfiguredNetworks.valuesForCurrentUser();
+    }
+
+
+http://androidxref.com/9.0.0_r3/xref/frameworks/opt/net/wifi/service/java/com/android/server/wifi/WifiConfigManager.java#260
+    /**
+     * Map of configured networks with network id as the key.  保存所有WiFiConfiguration 的类
+     */
+    private final ConfigurationMap mConfiguredNetworks;
+
+
+
+
+    private NetworkUpdateResult addOrUpdateNetworkInternal(WifiConfiguration config, int uid) {
+        if (mVerboseLoggingEnabled) {
+            Log.v(TAG, "Adding/Updating network " + config.getPrintableSsid());
+        }
+        WifiConfiguration newInternalConfig = null;
+        mConfiguredNetworks.put(newInternalConfig);    // 新增 WiFiConfiguration 
+}
+
+
+
+
+http://androidxref.com/9.0.0_r3/xref/frameworks/opt/net/wifi/service/java/com/android/server/wifi/WifiConfigManager.java#2790
+  public boolean loadFromStore() {
+        loadInternalData(mNetworkListStoreData.getSharedConfigurations(), mNetworkListStoreData.getUserConfigurations(),mDeletedEphemeralSsidsStoreData.getSsidList());
+
+}
+
+    private void loadInternalData(List<WifiConfiguration> sharedConfigurations,List<WifiConfiguration> userConfigurations, Set<String> deletedEphemeralSSIDs) {
+。。。。
+           mWifiConfigStore.read();
+          loadInternalDataFromSharedStore(sharedConfigurations);
+。。。。
+}
+
+
+    private void loadInternalDataFromSharedStore( List<WifiConfiguration> configurations) {
+        for (WifiConfiguration configuration : configurations) {
+            configuration.networkId = mNextNetworkId++;
+            if (mVerboseLoggingEnabled) {
+                Log.v(TAG, "Adding network from shared store " + configuration.configKey());
+            }
+            try {
+                mConfiguredNetworks.put(configuration);   // 加载配置
+            } catch (IllegalArgumentException e) {
+                Log.e(TAG, "Failed to add network to config map", e);
+            }
+        }
+    }
+
+
+http://androidxref.com/9.0.0_r3/xref/frameworks/opt/net/wifi/service/java/com/android/server/wifi/WifiInjector.java#212
+        mWifiConfigStore = new WifiConfigStore(mContext, wifiStateMachineLooper, mClock,WifiConfigStore.createSharedFile());
+
+
+
+http://androidxref.com/9.0.0_r3/xref/frameworks/opt/net/wifi/service/java/com/android/server/wifi/WifiConfigStore.java#345
+
+    public WifiConfigStore(Context context, Looper looper, Clock clock,StoreFile sharedStore) {
+        // Initialize the store files.
+        mSharedStore = sharedStore;
+
+}
+
+    public static StoreFile createSharedFile() {
+        return createFile(Environment.getDataMiscDirectory());
+    }
+
+    /**
+     * Helper method to create a store file instance for either the shared store or user store.
+     * Note: The method creates the store directory if not already present. This may be needed for
+     * user store files.
+     *
+     * @param storeBaseDir Base directory under which the store file is to be stored. The store file
+     *                     will be at <storeBaseDir>/wifi/WifiConfigStore.xml.
+     * @return new instance of the store file.
+     */
+    private static StoreFile createFile(File storeBaseDir) {
+        File storeDir = new File(storeBaseDir, STORE_DIRECTORY_NAME);
+        if (!storeDir.exists()) {
+            if (!storeDir.mkdir()) {
+                Log.w(TAG, "Could not create store directory " + storeDir);
+            }
+        }
+        return new StoreFile(new File(storeDir, STORE_FILE_NAME 【 "WifiConfigStore.xml" 】));  // /data/misc/wifi/WifiConfigStore.xml 
+    }
+
+
+
+
+
+
+    /**
+     * API to read the store data from the config stores.
+     * The method reads the user specific configurations from user specific config store and the
+     * shared configurations from the shared config store.
+     */
+    public void read() throws XmlPullParserException, IOException {
+        // Reset both share and user store data.
+        resetStoreData(true);
+        if (mUserStore != null) {
+            resetStoreData(false);
+        }
+
+        long readStartTime = mClock.getElapsedSinceBootMillis();
+        byte[] sharedDataBytes = mSharedStore.readRawData();
+        byte[] userDataBytes = null;
+        if (mUserStore != null) {
+            userDataBytes = mUserStore.readRawData();
+        }
+        long readTime = mClock.getElapsedSinceBootMillis() - readStartTime;
+        Log.d(TAG, "Reading from stores completed in " + readTime + " ms.");
+        deserializeData(sharedDataBytes, true);
+        if (mUserStore != null) {
+            deserializeData(userDataBytes, false);
+        }
+    }
+
+http://androidxref.com/9.0.0_r3/xref/frameworks/opt/net/wifi/service/java/com/android/server/wifi/WifiConfigStore.java#472
+  private StoreFile mSharedStore;
+
+  public static class StoreFile {
+   private String mFileName;
+
+   private final AtomicFile mAtomicFile;
+}
+
+
+
+http://androidxref.com/9.0.0_r3/xref/frameworks/opt/net/wifi/service/java/com/android/server/wifi/ConfigurationMap.java
+public class ConfigurationMap { ▲   WifiConfiguration 存储位置 
+
+    private final Map<Integer, WifiConfiguration> mPerID = new HashMap<>();
+    private final Map<Integer, WifiConfiguration> mPerIDForCurrentUser = new HashMap<>();
+    private final Map<ScanResultMatchInfo, WifiConfiguration>  mScanResultMatchInfoMapForCurrentUser = new HashMap<>();
+
+
+    public WifiConfiguration put(WifiConfiguration config) {  // 新增
+        final WifiConfiguration current = mPerID.put(config.networkId, config);
+        if (WifiConfigurationUtil.isVisibleToAnyProfile(config,mUserManager.getProfiles(mCurrentUserId))) {
+
+            mPerIDForCurrentUser.put(config.networkId, config);
+            mScanResultMatchInfoMapForCurrentUser.put(ScanResultMatchInfo.fromWifiConfiguration(config), config);
+
+        }
+        return current;
+    }
+
+
+    public WifiConfiguration remove(int netID) {   // 删除
+        WifiConfiguration config = mPerID.remove(netID);
+        if (config == null) {
+            return null;
+        }
+
+        mPerIDForCurrentUser.remove(netID);
+
+        Iterator<Map.Entry<ScanResultMatchInfo, WifiConfiguration>> scanResultMatchInfoEntries = mScanResultMatchInfoMapForCurrentUser.entrySet().iterator();
+        while (scanResultMatchInfoEntries.hasNext()) {
+            if (scanResultMatchInfoEntries.next().getValue().networkId == netID) {
+                scanResultMatchInfoEntries.remove();
+                break;
+            }
+        }
+        return config;
+    }
+
+
+}
+
+
+
 
 ```
