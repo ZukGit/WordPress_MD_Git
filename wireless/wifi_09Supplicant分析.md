@@ -3747,6 +3747,8 @@ void eapol_sm_notify_portEnabled(struct eapol_sm *sm, Boolean enabled)
 {
 	if (sm == NULL)
 		return;
+
+【打印  EAPOL: External notification - portEnabled= 0】
 	wpa_printf(MSG_DEBUG, "EAPOL: External notification - portEnabled=%d", enabled);
 	if (sm->portEnabled != enabled)
 		sm->force_authorized_update = TRUE;
@@ -3769,19 +3771,28 @@ void eapol_sm_step(struct eapol_sm *sm)
 	 * state machine were to generate a busy loop. */
 	for (i = 0; i < 100; i++) {   // 循环100次? 
 		sm->changed = FALSE;     #define SM_STEP_RUN(machine) sm_ ## machine ## _Step(sm)       
-		SM_STEP_RUN(SUPP_PAE); 【1】    //  SM_STEP(SUPP_PAE)  执行方法  SM_STEP(KEY_RX)   SM_STEP(SUPP_BE)  三个方法   【继续点】
-		SM_STEP_RUN(KEY_RX);  【2】
-		SM_STEP_RUN(SUPP_BE); 【3】
+		SM_STEP_RUN(SUPP_PAE); 【1】    //  SM_STEP(SUPP_PAE)  执行方法  SM_STEP(KEY_RX)   SM_STEP(SUPP_BE)  三个方法   
+		SM_STEP_RUN(KEY_RX);  【2】  The Key Receiver SM
+		SM_STEP_RUN(SUPP_BE); 【3】 Supplicant Backend SM 
+
+//  EAPOL Supplicant定义了5个不同的状态机  
+//1·Port Timers SM：Port超时控制状态机。
+//2·Supplicant PAE SM：PAE是Port Access Entitiy的缩写。该状态机用于维护Port的状态。
+//3·Supplicant Backend SM：规范并没有明示该状态机的作用。但笔者觉得它主要用于给Authenticator发送EAPOL回复消息。
+//4·The Key Receiver SM：用于处理Key（指EAPOL-Key帧）相关流程的状态机。
+//5·The Supplicant Key Transmit SM：该状态机非必选项，所以WPAS未实现它。
+
+
 		if (sm->use_eap_proxy) {
 			/* Drive the EAP proxy state machine */
-			if (eap_proxy_sm_step(sm->eap_proxy, sm->eap))  【4】
-				     sm->changed = TRUE;
+			if (eap_proxy_sm_step(sm->eap_proxy, sm->eap))  【4】 返回TRUE 说明状态改变了 
+				     sm->changed = TRUE;                
 		} else if (eap_peer_sm_step(sm->eap)){   【5】
 			sm->changed = TRUE;
         }
 
 		if (!sm->changed){
-              break;   // 跳出 for 循环   如果 sm->changed == false
+              break;   // 跳出 for 循环   如果 sm->changed == false   当  sm->changed一直稳定在 False 那么就跳出循环
           }
 			
      }
@@ -3796,8 +3807,8 @@ void eapol_sm_step(struct eapol_sm *sm)
 	if (sm->ctx->cb && sm->cb_status != EAPOL_CB_IN_PROGRESS) {
 		enum eapol_supp_result result;
 		if (sm->cb_status == EAPOL_CB_SUCCESS){
-			result = EAPOL_SUPP_RESULT_SUCCESS;
-        }else  if (eap_peer_was_failure_expected(sm->eap)){   【6】
+			result = EAPOL_SUPP_RESULT_SUCCESS;  // 认证成功 
+        }else  if (eap_peer_was_failure_expected(sm->eap)){   【6】  // 认证失败
 		     result = EAPOL_SUPP_RESULT_EXPECTED_FAILURE;
           }
 	
@@ -3813,15 +3824,1404 @@ void eapol_sm_step(struct eapol_sm *sm)
 ```
 
 ##### SM_STEP(SUPP_PAE) 
+```
+
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/eapol_supp/eapol_supp_sm.c#350
+SM_STATE(SUPP_PAE, LOGOFF)
+SM_ENTRY(SUPP_PAE, LOGOFF);
+SM_STEP(SUPP_PAE)
+SM_ENTER_GLOBAL(SUPP_PAE, DISCONNECTED);
+SM_STEP_RUN(SUPP_PAE);
+
+SM_STEP(SUPP_PAE)
+{
+	if ((sm【eapol_sm】->userLogoff && !sm->logoffSent) && !(sm->initialize || !sm->portEnabled))
+		SM_ENTER_GLOBAL(SUPP_PAE, LOGOFF);
+	else if (((sm->portControl == Auto) &&  (sm->sPortMode != sm->portControl)) || sm->initialize || !sm->portEnabled)
+		SM_ENTER_GLOBAL(SUPP_PAE, DISCONNECTED);
+	else if ((sm->portControl == ForceAuthorized) && (sm->sPortMode != sm->portControl) &&	 !(sm->initialize || !sm->portEnabled))
+		SM_ENTER_GLOBAL(SUPP_PAE, S_FORCE_AUTH);
+	else if ((sm->portControl == ForceUnauthorized) &&	 (sm->sPortMode != sm->portControl) && !(sm->initialize || !sm->portEnabled))
+		SM_ENTER_GLOBAL(SUPP_PAE, S_FORCE_UNAUTH);
+
+	else switch (sm->SUPP_PAE_state) {  // PAE 状态
+
+	case SUPP_PAE_UNKNOWN:
+		break;
+
+	case SUPP_PAE_LOGOFF:
+		if (!sm->userLogoff)
+			SM_ENTER(SUPP_PAE, DISCONNECTED);
+		break;
+
+	case SUPP_PAE_DISCONNECTED:
+		SM_ENTER(SUPP_PAE, CONNECTING);
+		break;
+
+	case SUPP_PAE_CONNECTING:
+		if (sm->startWhen == 0 && sm->startCount < sm->maxStart)
+			SM_ENTER(SUPP_PAE, CONNECTING);
+
+		else if (sm->startWhen == 0 && sm->startCount >= sm->maxStart &&  sm->portValid)
+			SM_ENTER(SUPP_PAE, AUTHENTICATED);
+
+		else if (sm->eapSuccess || sm->eapFail)
+			SM_ENTER(SUPP_PAE, AUTHENTICATING);
+
+		else if (sm->eapolEap)
+			SM_ENTER(SUPP_PAE, RESTART);
+
+		else if (sm->startWhen == 0 && sm->startCount >= sm->maxStart &&  !sm->portValid)
+			SM_ENTER(SUPP_PAE, HELD);
+		break;
+
+	case SUPP_PAE_AUTHENTICATING:
+		if (sm->eapSuccess && !sm->portValid && sm->conf.accept_802_1x_keys && sm->conf.required_keys == 0) {
+			wpa_printf(MSG_DEBUG, "EAPOL: IEEE 802.1X for plaintext connection; no EAPOL-Key frames  required");
+			sm->portValid = TRUE;
+			if (sm->ctx->eapol_done_cb)
+				sm->ctx->eapol_done_cb(sm->ctx->ctx);
+		}
+		if (sm->eapSuccess && sm->portValid)
+			SM_ENTER(SUPP_PAE, AUTHENTICATED);
+
+		else if (sm->eapFail || (sm->keyDone && !sm->portValid))
+			SM_ENTER(SUPP_PAE, HELD);
+
+		else if (sm->suppTimeout)
+			SM_ENTER(SUPP_PAE, CONNECTING);
+		else if (sm->eapTriggerStart)
+			SM_ENTER(SUPP_PAE, CONNECTING);
+		break;
+	case SUPP_PAE_HELD:
+		if (sm->heldWhile == 0)
+			SM_ENTER(SUPP_PAE, CONNECTING);
+		else if (sm->eapolEap)
+			SM_ENTER(SUPP_PAE, RESTART);
+		break;
+	case SUPP_PAE_AUTHENTICATED:
+		if (sm->eapolEap && sm->portValid)
+			SM_ENTER(SUPP_PAE, RESTART);
+		else if (!sm->portValid)
+			SM_ENTER(SUPP_PAE, DISCONNECTED);
+		break;
+	case SUPP_PAE_RESTART:
+		if (!sm->eapRestart)
+			SM_ENTER(SUPP_PAE, AUTHENTICATING);
+		break;
+	case SUPP_PAE_S_FORCE_AUTH:
+		break;
+	case SUPP_PAE_S_FORCE_UNAUTH:
+		break;
+	}
+}
+
+
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/eapol_supp/eapol_supp_sm.c#57
+
+	/* Supplicant PAE state machine */  Port Access Entity
+	enum {
+		SUPP_PAE_UNKNOWN = 0,
+		SUPP_PAE_DISCONNECTED = 1,
+		SUPP_PAE_LOGOFF = 2,
+		SUPP_PAE_CONNECTING = 3,
+		SUPP_PAE_AUTHENTICATING = 4,
+		SUPP_PAE_AUTHENTICATED = 5,
+		/* unused(6) */
+		SUPP_PAE_HELD = 7,
+		SUPP_PAE_RESTART = 8,
+		SUPP_PAE_S_FORCE_AUTH = 9,
+		SUPP_PAE_S_FORCE_UNAUTH = 10
+	} SUPP_PAE_state; /* dot1xSuppPaeState  端口PAE（Port Access Entity，端口访问实体）  用户服务器认证*/
+
+Supplicant PAE SM：PAE是Port Access Entitiy的缩写。该状态机用于维护Port的状态
+
+```
+
+
 ##### SM_STEP(KEY_RX) 
+```
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/eapol_supp/eapol_supp_sm.c#451
+
+SM_STEP(KEY_RX)
+{
+	if (sm->initialize || !sm->portEnabled) 
+          SM_ENTER_GLOBAL(KEY_RX, NO_KEY_RECEIVE);
+
+	switch (sm->KEY_RX_state) {
+
+	case KEY_RX_UNKNOWN:
+		break;
+
+	case KEY_RX_NO_KEY_RECEIVE:
+		if (sm->rxKey)
+			SM_ENTER(KEY_RX, KEY_RECEIVE);
+		break;
+
+	case KEY_RX_KEY_RECEIVE:
+		if (sm->rxKey)
+			SM_ENTER(KEY_RX, KEY_RECEIVE);
+		break;
+	}
+}
+
+
+	/* Key Receive state machine */
+	enum {
+		KEY_RX_UNKNOWN = 0,
+		KEY_RX_NO_KEY_RECEIVE, 
+        KEY_RX_KEY_RECEIVE
+	} KEY_RX_state;
+
+The Key Receiver SM  = TKR SM
+
+The Key Receiver SM
+TKR SM包含两个状态。
+第一个是NO_KEY_RECEIVE状态
+当rxKey（boolean型变量，当Supplicant收到EAPOL Key帧后，该值为TRUE）变为TRUE时，TKR进入KEY_RECEIVE状态。
+TKR在KEY_RECEIVE状态时需要调用processKey函数处理EAPOL Key消息
+
+
+
+```
 ##### SM_STEP(SUPP_BE) 
+```
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/eapol_supp/eapol_supp_sm.c#573
+SM_STEP(SUPP_BE)
+{
+	if (sm->initialize || sm->suppAbort)
+		SM_ENTER_GLOBAL(SUPP_BE, INITIALIZE);
+	else switch (sm->SUPP_BE_state) {
+	case SUPP_BE_UNKNOWN:
+		break;
+	case SUPP_BE_REQUEST:
+		/*
+		 * IEEE Std 802.1X-2004 has transitions from REQUEST to FAIL
+		 * and SUCCESS based on eapFail and eapSuccess, respectively.
+		 * However, IEEE Std 802.1X-2004 is also specifying that
+		 * eapNoResp should be set in conjunction with eapSuccess and
+		 * eapFail which would mean that more than one of the
+		 * transitions here would be activated at the same time.
+		 * Skipping RESPONSE and/or RECEIVE states in these cases can
+		 * cause problems and the direct transitions to do not seem
+		 * correct. Because of this, the conditions for these
+		 * transitions are verified only after eapNoResp. They are
+		 * unlikely to be used since eapNoResp should always be set if
+		 * either of eapSuccess or eapFail is set.
+		 */
+		if (sm->eapResp && sm->eapNoResp) {
+			wpa_printf(MSG_DEBUG, "EAPOL: SUPP_BE REQUEST: both eapResp and eapNoResp set?!");
+		}
+		if (sm->eapResp)
+			SM_ENTER(SUPP_BE, RESPONSE);
+		else if (sm->eapNoResp)
+			SM_ENTER(SUPP_BE, RECEIVE);
+		else if (sm->eapFail)
+			SM_ENTER(SUPP_BE, FAIL);
+		else if (sm->eapSuccess)
+			SM_ENTER(SUPP_BE, SUCCESS);
+		break;
+	case SUPP_BE_RESPONSE:
+		SM_ENTER(SUPP_BE, RECEIVE);
+		break;
+	case SUPP_BE_SUCCESS:
+		SM_ENTER(SUPP_BE, IDLE);
+		break;
+	case SUPP_BE_FAIL:
+		SM_ENTER(SUPP_BE, IDLE);
+		break;
+	case SUPP_BE_TIMEOUT:
+		SM_ENTER(SUPP_BE, IDLE);
+		break;
+	case SUPP_BE_IDLE:
+		if (sm->eapFail && sm->suppStart)
+			SM_ENTER(SUPP_BE, FAIL);
+		else if (sm->eapolEap && sm->suppStart)
+			SM_ENTER(SUPP_BE, REQUEST);
+		else if (sm->eapSuccess && sm->suppStart)
+			SM_ENTER(SUPP_BE, SUCCESS);
+		break;
+	case SUPP_BE_INITIALIZE:
+		SM_ENTER(SUPP_BE, IDLE);
+		break;
+	case SUPP_BE_RECEIVE:
+		if (sm->eapolEap)
+			SM_ENTER(SUPP_BE, REQUEST);
+		else if (sm->eapFail)
+			SM_ENTER(SUPP_BE, FAIL);
+		else if (sm->authWhile == 0)
+			SM_ENTER(SUPP_BE, TIMEOUT);
+		else if (sm->eapSuccess)
+			SM_ENTER(SUPP_BE, SUCCESS);
+		break;
+	}
+}
+
+
+
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/eapol_supp/eapol_supp_sm.c#90
+	/* Supplicant Backend state machine */
+	enum {
+		SUPP_BE_UNKNOWN = 0,
+		SUPP_BE_INITIALIZE = 1,
+		SUPP_BE_IDLE = 2,
+		SUPP_BE_REQUEST = 3,
+		SUPP_BE_RECEIVE = 4,
+		SUPP_BE_RESPONSE = 5,
+		SUPP_BE_FAIL = 6,
+		SUPP_BE_TIMEOUT = 7,
+		SUPP_BE_SUCCESS = 8
+	} SUPP_BE_state; /* dot1xSuppBackendPaeState  恢复状态机状态集合 */  
+
+
+```
+
 ##### eap_proxy_sm_step(sm->eap_proxy, sm->eap)
+```
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/eap_peer/eap_proxy_qmi_oc.c#1588
+
+int eap_proxy_sm_step(struct eap_proxy_sm *sm, struct eap_sm *eap_sm)
+{
+        if ((sm->proxy_state != EAP_PROXY_INITIALIZE) && (sm->proxy_state != EAP_PROXY_DISABLED)) {
+                if (TRUE == sm->isEap) {
+                        if(!eap_proxy_process(sm, sm->eapReqData,sm->eapReqDataLen,eap_sm)) { 【1】
+                                sm->proxy_state = EAP_PROXY_AUTH_FAILURE;
+                                eap_proxy_eapol_sm_set_bool(sm, EAPOL_eapRestart, TRUE);
+                        }
+                        sm->isEap = FALSE;
+                }
+        }
+        return eap_proxy_is_state_changed(sm);  // 返回状态是否改变
+}
+
+
+typedef enum {   // 【EAP_PROXY eap代理的状态】
+        EAP_PROXY_INITIALIZE, EAP_PROXY_DISABLED, EAP_PROXY_IDLE, EAP_PROXY_RECEIVED,
+        EAP_PROXY_GET_METHOD, EAP_PROXY_METHOD, EAP_PROXY_SEND_RESPONSE,
+        EAP_PROXY_DISCARD, EAP_PROXY_IDENTITY, EAP_PROXY_NOTIFICATION,
+        EAP_PROXY_RETRANSMIT,
+        EAP_PROXY_AUTH_SUCCESS,  EAP_PROXY_AUTH_FAILURE
+} eap_proxy_state;
+
+```
+###### eap_proxy_process(sm, sm->eapReqData,sm->eapReqDataLen,eap_sm)
+```
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/eap_peer/eap_proxy_qmi_oc.c#1170
+开始执行 EAP_Proxy 代理
+static enum eap_proxy_status eap_proxy_process(struct eap_proxy_sm  *eap_proxy,u8 *eapReqData, int eapReqDataLen, struct eap_sm *eap_sm);
+
+static enum eap_proxy_status eap_proxy_process(struct eap_proxy_sm  *eap_proxy,u8 *eapReqData, int eapReqDataLen, struct eap_sm *eap_sm)
+{
+        struct eap_hdr *hdr;
+        int qmiErrorCode;
+        enum eap_proxy_status proxy_status = EAP_PROXY_SUCCESS;
+        auth_send_eap_packet_req_msg_v01 eap_send_packet_req;  // eap 请求数据
+        auth_send_eap_packet_resp_msg_v01 eap_send_packet_resp; // eap 回应数据
+        qmi_txn_handle async_txn_hdl = 0;
+
+        auth_send_eap_packet_ext_req_msg_v01 eap_send_packet_ext_req;   // eap 请求扩展数据
+        auth_send_eap_packet_ext_resp_msg_v01 eap_send_packet_ext_resp;  // eap 回应扩展数据
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+struct eap_hdr{
+u8 	code
+u8 	identifier
+be16 	length
+}
+
+enum { EAP_CODE_REQUEST = 1, EAP_CODE_RESPONSE = 2, EAP_CODE_SUCCESS = 3,
+       EAP_CODE_FAILURE = 4, EAP_CODE_INITIATE = 5, EAP_CODE_FINISH = 6 };
+
+
+typedef enum {
+	EAP_TYPE_NONE = 0,
+	EAP_TYPE_IDENTITY = 1 /* RFC 3748 */,
+	EAP_TYPE_NOTIFICATION = 2 /* RFC 3748 */,
+	EAP_TYPE_NAK = 3 /* Response only, RFC 3748 */,
+	EAP_TYPE_MD5 = 4, /* RFC 3748 */
+	EAP_TYPE_OTP = 5 /* RFC 3748 */,
+	EAP_TYPE_GTC = 6, /* RFC 3748 */
+	EAP_TYPE_TLS = 13 /* RFC 2716 */,
+	EAP_TYPE_LEAP = 17 /* Cisco proprietary */,
+	EAP_TYPE_SIM = 18 /* RFC 4186 */,
+	EAP_TYPE_TTLS = 21 /* RFC 5281 */,
+	EAP_TYPE_AKA = 23 /* RFC 4187 */,
+	EAP_TYPE_PEAP = 25 /* draft-josefsson-pppext-eap-tls-eap-06.txt */,
+	EAP_TYPE_MSCHAPV2 = 26 /* draft-kamath-pppext-eap-mschapv2-00.txt */,
+	EAP_TYPE_TLV = 33 /* draft-josefsson-pppext-eap-tls-eap-07.txt */,
+	EAP_TYPE_TNC = 38 /* TNC IF-T v1.0-r3; note: tentative assignment;
+			   * type 38 has previously been allocated for
+			   * EAP-HTTP Digest, (funk.com) */,
+	EAP_TYPE_FAST = 43 /* RFC 4851 */,
+	EAP_TYPE_PAX = 46 /* RFC 4746 */,
+	EAP_TYPE_PSK = 47 /* RFC 4764 */,
+	EAP_TYPE_SAKE = 48 /* RFC 4763 */,
+	EAP_TYPE_IKEV2 = 49 /* RFC 5106 */,
+	EAP_TYPE_AKA_PRIME = 50 /* RFC 5448 */,
+	EAP_TYPE_GPSK = 51 /* RFC 5433 */,
+	EAP_TYPE_PWD = 52 /* RFC 5931 */,
+	EAP_TYPE_EKE = 53 /* RFC 6124 */,
+	EAP_TYPE_EXPANDED = 254 /* RFC 3748 */
+} EapType;
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        hdr = (struct eap_hdr *)eapReqData;
+        if ((EAP_CODE_REQUEST == hdr->code) && (EAP_TYPE_IDENTITY == eapReqData[4])) {
+                if (eap_proxy_eapol_sm_get_bool(eap_proxy, EAPOL_eapRestart) && eap_proxy_eapol_sm_get_bool(eap_proxy, EAPOL_portEnabled)) {
+                        wpa_printf (MSG_ERROR, "eap_proxy: Already Authenticated.  Clear all the flags");
+                        eap_proxy_eapol_sm_set_bool(eap_proxy, EAPOL_eapSuccess, FALSE);
+                        eap_proxy_eapol_sm_set_bool(eap_proxy, EAPOL_eapFail, FALSE);
+                        eap_proxy_eapol_sm_set_bool(eap_proxy, EAPOL_eapResp, FALSE);
+                        eap_proxy_eapol_sm_set_bool(eap_proxy, EAPOL_eapNoResp, FALSE);
+                        if (eap_proxy->key) {
+                                os_free(eap_proxy->key);
+                                eap_proxy->key = NULL;
+                        }
+                        eap_proxy->iskey_valid = FALSE;
+                        eap_proxy->is_state_changed = TRUE;
+                }
+                eap_proxy_eapol_sm_set_bool(eap_proxy, EAPOL_eapRestart, FALSE);
+
+                if(eap_proxy_build_identity(eap_proxy, hdr->identifier, eap_sm)) {  // 构建EAP 认证标志  identity  【1】
+                        eap_proxy->proxy_state = EAP_PROXY_IDENTITY;
+                } else {
+                        wpa_printf(MSG_ERROR, "eap_proxy: Error in build identity\n"); // 构建标记失败
+                        return EAP_PROXY_FAILURE;
+                }
+        }
+【打印 eap 请求的数据    wpa_supplicant: eap_proxy:  ***********Dump ReqData len 59 ***********   】
+        wpa_printf(MSG_ERROR, "eap_proxy: ***********Dump ReqData len %d***********", eapReqDataLen); 
+        dump_buff(eapReqData, eapReqDataLen);  【2】
+
+        if (eapReqDataLen <= QMI_AUTH_EAP_REQ_PACKET_MAX_V01) {
+                os_memset(&eap_send_packet_req, 0, sizeof(auth_send_eap_packet_req_msg_v01));
+                os_memset(&eap_send_packet_resp, 0, sizeof(auth_send_eap_packet_resp_msg_v01));
+                eap_send_packet_req.eap_request_pkt_len = eapReqDataLen ;
+                memcpy(eap_send_packet_req.eap_request_pkt, eapReqData, eapReqDataLen);
+
+        } else if (eapReqDataLen <= QMI_AUTH_EAP_REQ_PACKET_EXT_MAX_V01) {
+                os_memset(&eap_send_packet_ext_req, 0, sizeof(auth_send_eap_packet_ext_req_msg_v01));
+                os_memset(&eap_send_packet_ext_resp, 0, sizeof(auth_send_eap_packet_ext_resp_msg_v01));
+                eap_send_packet_ext_req.eap_request_ext_pkt_len = eapReqDataLen;
+                memcpy(eap_send_packet_ext_req.eap_request_ext_pkt, eapReqData, eapReqDataLen);
+        } else {
+                        wpa_printf(MSG_ERROR, "eap_proxy: Error in eap_send_packet_req\n");
+                        return EAP_PROXY_FAILURE;
+        }
+
+  【打印  wpa_supplicant: eap_proxy:  SIM selected by User: Selected sim = 1  使用sim1 来eap认证  】
+        wpa_printf(MSG_ERROR, "eap_proxy: SIM selected by User: Selected sim = %d\n",  eap_proxy->user_selected_sim+1);
+
+        if (eap_proxy->qmi_state != QMI_STATE_IDLE) {
+                wpa_printf(MSG_ERROR, "Error in QMI state=%d\n", eap_proxy->qmi_state);
+                return EAP_PROXY_FAILURE;
+        }
+
+【 打印 wpa_supplicant: eap_proxy:  In eap_proxy_process case = 1    】
+        wpa_printf (MSG_ERROR, "eap_proxy: In eap_proxy_process case %d\n", hdr->code);
+        eap_proxy->qmi_state = QMI_STATE_RESP_PENDING;
+
+        if(eapReqDataLen <= QMI_AUTH_EAP_REQ_PACKET_MAX_V01) {   //   依据长度判断 不一样的请求  auth_send_eap_packet_req_msg_v01
+                qmiErrorCode = qmi_client_send_msg_async(
+                                eap_proxy->qmi_auth_svc_client_ptr[eap_proxy->user_selected_sim],
+                                QMI_AUTH_SEND_EAP_PACKET_REQ_V01,
+                                (void *) &eap_send_packet_req,
+                                sizeof(auth_send_eap_packet_req_msg_v01),
+                                (void *) &eap_send_packet_resp,
+                                sizeof(auth_send_eap_packet_resp_msg_v01),
+                                &handle_qmi_eap_reply, eap_proxy,
+                                &async_txn_hdl);
+        } else if(eapReqDataLen <= QMI_AUTH_EAP_REQ_PACKET_EXT_MAX_V01) { //  auth_send_eap_packet_ext_req_msg_v01
+                qmiErrorCode = qmi_client_send_msg_async(
+                                eap_proxy->qmi_auth_svc_client_ptr[eap_proxy->user_selected_sim],
+                                QMI_AUTH_SEND_EAP_PACKET_EXT_REQ_V01,
+                                (void *) &eap_send_packet_ext_req,
+                                sizeof(auth_send_eap_packet_ext_req_msg_v01),
+                                (void *) &eap_send_packet_ext_resp,
+                                sizeof(auth_send_eap_packet_ext_resp_msg_v01),
+                                &handle_qmi_eap_reply, eap_proxy,
+                                &async_txn_hdl);
+        }
+
+        if (QMI_NO_ERR != qmiErrorCode) {
+                wpa_printf(MSG_ERROR, "QMI-ERROR Error in sending EAP packet;   error_code=%d\n", qmiErrorCode);
+                eap_proxy->proxy_state = EAP_PROXY_DISCARD;
+                eap_proxy_eapol_sm_set_bool(eap_proxy, EAPOL_eapNoResp, TRUE);
+                eap_proxy->qmi_state = QMI_STATE_RESP_PENDING;
+                return EAP_PROXY_FAILURE;
+        } else {
+【 打印 wpa_supplicant: eap_proxy:  In eap_proxy_process case = 1    】
+                wpa_printf (MSG_ERROR, "eap_proxy: In eap_proxy_process case %d\n", hdr->code);
+                switch (hdr->code) {
+                case EAP_CODE_SUCCESS:
+                        if (EAP_PROXY_SUCCESS != eap_proxy_qmi_response_wait(eap_proxy)) {
+                                eap_proxy->proxy_state = EAP_PROXY_DISCARD;
+                                eap_proxy_eapol_sm_set_bool(eap_proxy, EAPOL_eapNoResp, TRUE);
+                                return EAP_PROXY_FAILURE;
+                        } else if( eap_proxy->proxy_state == EAP_PROXY_AUTH_SUCCESS ) {  // 如果Code 和 State 都是成功的话 EAP认证成功 
+                                eap_proxy_getKey(eap_proxy);
+                                eap_proxy_eapol_sm_set_bool(eap_proxy, EAPOL_eapSuccess, TRUE);
+                        eap_proxy_eapol_sm_set_bool(eap_proxy,  EAPOL_eapReq, FALSE);
+
+                        eap_proxy_eapol_sm_set_bool(eap_proxy, EAPOL_eapNoResp, TRUE);
+
+          【打印  wpa_supplicant: wlan0: CTRL-EVENT-EAP-SUCCESS eap_proxy: EAP authentication completed successfully 】
+                        wpa_msg(eap_proxy->msg_ctx, MSG_INFO, WPA_EVENT_EAP_SUCCESS  "eap_proxy: EAP authentication completed successfully");
+
+                        eap_proxy->is_state_changed = TRUE;   // 认证成功  修改跳出 for 100 循环的 标记位  TRUE  使得 跳出循环
+
+                                /* Retrieve the keys  and store*/
+                        } else if( eap_proxy->proxy_state == EAP_PROXY_AUTH_FAILURE ){ // 如果认证失败  修改标记位
+
+                                eap_proxy_eapol_sm_set_bool(eap_proxy,  EAPOL_eapFail, TRUE);
+                                eap_proxy_eapol_sm_set_bool(eap_proxy,EAPOL_eapReq, FALSE);
+                                eap_proxy_eapol_sm_set_bool(eap_proxy,  EAPOL_eapNoResp, TRUE);
+                                eap_proxy->is_state_changed = TRUE;
+
+                        }
+
+                        break;
+
+                case EAP_CODE_FAILURE:  //CODE 标识为  认证 失败的话 
+                        wpa_printf (MSG_ERROR, "eap_proxy: in eap_proxy_process case EAP_CODE_FAILURE\n");
+                        eap_proxy->proxy_state = EAP_PROXY_AUTH_FAILURE;
+                        eap_proxy_eapol_sm_set_bool(eap_proxy, EAPOL_eapFail, TRUE);
+
+                        eap_proxy_eapol_sm_set_bool(eap_proxy,  EAPOL_eapReq, FALSE);
+                        eap_proxy_eapol_sm_set_bool(eap_proxy,  EAPOL_eapNoResp, TRUE);
+
+                        wpa_msg(eap_proxy->msg_ctx, MSG_INFO, WPA_EVENT_EAP_FAILURE"EAP authentication failed notification code 0x%x",    eap_proxy->notification_code);
+
+                        eap_proxy->is_state_changed = TRUE;
+                        break;
+
+                case EAP_CODE_REQUEST:  //   //CODE 标识为  Request 的话 那么发送请求 等待回复 
+                         eap_proxy->proxy_state = EAP_PROXY_SEND_RESPONSE;
+                        if (EAP_PROXY_SUCCESS !=  eap_proxy_qmi_response_wait(eap_proxy)) {  // 阻塞在这里等待回复  如果回复状态 不成功的话
+                                eap_proxy->proxy_state = EAP_PROXY_DISCARD;
+                                eap_proxy_eapol_sm_set_bool(eap_proxy,EAPOL_eapNoResp, TRUE);
+                                return EAP_PROXY_FAILURE;
+                        } else {
+                                eap_proxy_eapol_sm_set_bool(eap_proxy,  EAPOL_eapResp, TRUE);  // 回服务器复成功 那么进入下一个状态  EAP_PROXY_SEND_RESPONSE
+                                eap_proxy->proxy_state =    EAP_PROXY_SEND_RESPONSE;
+                        }
+
+                        eap_proxy_eapol_sm_set_bool(eap_proxy, EAPOL_eapReq, FALSE);
+                        eap_proxy->is_state_changed = TRUE;
+                        break;
+
+                default:
+                        wpa_printf(MSG_ERROR, "eap_proxy: Error in sending EAP packet;"" error_code=%d\n", qmiErrorCode);
+                        eap_proxy->proxy_state = EAP_PROXY_DISCARD;
+                        eap_proxy_eapol_sm_set_bool(eap_proxy,  EAPOL_eapNoResp, TRUE);
+                        return EAP_PROXY_FAILURE;
+                }
+        }
+
+        return EAP_PROXY_SUCCESS;
+}
+
+
+
+```
+
+<h7> eap_proxy_build_identity(eap_proxy, hdr->identifier, eap_sm) </h7>
+
+```
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/eap_peer/eap_proxy_qmi_oc.c#1656
+
+static Boolean eap_proxy_build_identity(struct eap_proxy_sm *eap_proxy, u8 id, struct eap_sm *eap_sm)
+{
+        struct eap_hdr *resp;
+        unsigned int len;
+        u8 identity_len = 0, ret;
+        u8 imsi_id_len = 0;
+        int mnc_len = -1;
+        u8 *pos;
+        int qmiRetCode;
+        u8 idx = 0, mcc_idx = 0;
+        unsigned char *identity = NULL;
+        unsigned char *imsi_identity = NULL;
+        auth_start_eap_session_req_msg_v01 eap_auth_start;
+        auth_start_eap_session_resp_msg_v01 eap_auth_start_resp;
+        auth_set_subscription_binding_req_msg_v01 sub_req_binding;
+        auth_set_subscription_binding_resp_msg_v01 sub_resp_binding;
+
+        struct eap_method_type *m;
+        eap_identity_format_e identity_format = EAP_IDENTITY_ANNONYMOUS;
+        Boolean simEnabled = FALSE, akaEnabled = FALSE;
+        struct eap_peer_config *config = eap_get_config(eap_sm);
+        const char *realm_3gpp = "@wlan.mnc000.mcc000.3gppnetwork.org";
+        int sim_num;
+
+        wpa_printf(MSG_ERROR, "eap_proxy: %s\n", __func__);   // 打印   wpa_supplicant: eap_proxy: eap_proxy_build_identity
+        sim_num = config->sim_num - 1;
+        os_memset(&eap_auth_start, 0, sizeof(eap_auth_start));
+        os_memset(&eap_auth_start_resp, 0, sizeof(eap_auth_start_resp));
+        eap_auth_start.user_id_len = 0;
+        m = config->eap_methods;
+
+~~~~~~~~~~~~~~
+#ifdef CONFIG_EAP_PROXY_DUAL_SIM  双卡支持EAP
+#define MAX_NO_OF_SIM_SUPPORTED 2
+#else
+#define MAX_NO_OF_SIM_SUPPORTED 1
+#endif /* CONFIG_EAP_PROXY_DUAL_SIM */
+~~~~~~~~~~~~~~
+
+        if (sim_num >= MAX_NO_OF_SIM_SUPPORTED*2* || sim_num < 0) {
+                wpa_printf (MSG_ERROR, "eap_proxy: Invalid SIM selected sim by user = %d\n", sim_num+1);  // 如果 sim卡数量不是 正常的 1 ,2  那么报错
+                return FALSE;
+        }
+        wpa_printf(MSG_ERROR, "eap_proxy: User selected sim = %d\n", sim_num + 1);  // 打印   wpa_supplicant: eap_proxy: User selected sim = 1 , config->sim_num 就是 1
+
+
+        if (m != NULL) {
+                for (idx = 0; m[idx].vendor != EAP_VENDOR_IETF ||  m[idx].method != EAP_TYPE_NONE; idx++) {  【判断 eap_method 是哪一个方法】
+                        if (m[idx]【eap_methods】.method == EAP_TYPE_AKA) {
+                                akaEnabled = TRUE;
+                                eap_auth_start.eap_method_mask_valid = 1;
+                                eap_auth_start.eap_method_mask |= QMI_AUTH_EAP_METHOD_MASK_AKA_V01;
+                                wpa_printf(MSG_ERROR, "eap_proxy: AKA Enabled\n");
+                        } else if (m[idx].method == EAP_TYPE_SIM) {
+                                simEnabled = TRUE;
+                                eap_auth_start.eap_method_mask_valid = 1;
+                                eap_auth_start.eap_method_mask |= QMI_AUTH_EAP_METHOD_MASK_SIM_V01;
+                                wpa_printf(MSG_ERROR, "eap_proxy: SIM Enabled\n");
+                        } else if (m[idx].method == EAP_TYPE_AKA_PRIME) {
+                                eap_auth_start.eap_method_mask_valid = 1;
+                                eap_auth_start.eap_method_mask |= QMI_AUTH_EAP_METHOD_MASK_AKA_PRIME_V01;
+                                wpa_printf(MSG_ERROR, "eap_proxy: AKA Prime Enabled\n");
+                        }
+                }
+        } else {
+                wpa_printf(MSG_ERROR, "eap_proxy: eap_methods is NULL!\n"); // 报错 EAP 方法没找到
+                return FALSE;
+        }
+        eap_auth_start.eap_method_mask_valid = 1;
+
+        idx = 0;
+
+        if (config->identity_len && config->identity != NULL) {
+                for (idx = 0; idx < config->identity_len; idx++) {
+                        if (config->identity[idx] == 64) {
+                                wpa_printf(MSG_ERROR, "eap_proxy: @ found \n");  // 正常没有打印
+                                mcc_idx = idx;
+                                if ((mcc_idx + 18) > config->identity_len)
+                                        mcc_idx = 0;
+                                else {
+                                        /* Looking for mnc and mcc pattern */
+                                        if (109 == config->identity[mcc_idx + 6] &&(110 == config->identity[mcc_idx + 7]) &&
+                                                (99 == config->identity[mcc_idx + 8]) && (109 == config->identity[mcc_idx + 13]) &&
+                                                (99 == config->identity[mcc_idx + 14]) && (99 == config->identity[mcc_idx + 15])) {
+                                                mcc_idx += 9;
+                                        } else
+                                                mcc_idx = 0;
+                                }
+                                break;
+                        }
+                } // for 循环结束
+
+
+                wpa_printf(MSG_ERROR, "eap_proxy: idx %d\n", idx);    // 正常没有打印
+                wpa_printf(MSG_ERROR, "eap_proxy: mcc idx %d\n", mcc_idx);  // 正常没有打印
+                ..............
+    } else {   //  config->identity 等于空的情况
+
+
+
+                if (config->anonymous_identity_len && config->anonymous_identity != NULL) {
+
+                        eap_auth_start.eap_meta_identity_len = config->anonymous_identity_len;
+                        os_memcpy(&eap_auth_start.eap_meta_identity ,
+                                                config->anonymous_identity ,
+                                                config->anonymous_identity_len);
+
+                        identity_format = EAP_IDENTITY_ANNONYMOUS;
+                        eap_auth_start.eap_meta_identity_valid = 1;
+                        wpa_printf(MSG_ERROR, "eap_proxy: EAP_IDENTITY_ANNONYMOUS selected user id "
+                                "%d, annonymous %d\n", eap_auth_start.user_id_len,
+                                eap_auth_start.eap_meta_identity_len);
+                } else {
+                        /* config file doesn't contain any identity  配置文件没有包含任何的标识 identity   generating IMSI@realm */
+                        identity_format = EAP_IDENTITY_IMSI_3GPP_REALM;
+                        eap_auth_start.user_id_valid = 1;
+
+                        【 打印  wpa_supplicant: eap_proxy:  EAP_IDENTITY_IMSI_3GPP_REALM id len 0 】
+                        wpa_printf(MSG_ERROR, "eap_proxy: EAP_IDENTITY_IMSI_3GPP_REALM id len %d\n",eap_auth_start.user_id_len);
+                }
+      }
+
+
+
+
+
+ // 必须执行的if 
+	if (identity_format == EAP_IDENTITY_IMSI_3GPP_REALM ||  identity_format == EAP_IDENTITY_IMSI_RAW || mcc_idx) {
+	【  打印  wpa_supplicant: eap_proxy: EAP_IDENTITY_IMSI_3GPP_REALM is selected   】
+	        wpa_printf(MSG_ERROR, "eap_proxy: EAP_IDENTITY_IMSI_3GPP_REALM is selected\n");
+//   http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/eap_peer/eap_proxy_qmi_oc.c#328  请求卡信息
+	        if (!wpa_qmi_read_card_status(sim_num, eap_proxy->wpa_uim)) {   【读取 sim 卡 状态失败 】  【1】
+	                wpa_printf(MSG_INFO, "eap_proxy: Read Card Status failed, return\n");
+	                if (NULL != identity) {
+	                        os_free(identity);
+	                        identity = NULL;
+	                }
+	                return FALSE;
+	        }
+	
+	        if (!wpa_qmi_read_card_imsi(sim_num, eap_proxy->wpa_uim)) {  【2】   【在确认sim卡正常的情况下 开始读取 sim卡信息 】
+	                wpa_printf(MSG_INFO, "eap_proxy: Read Card IMSI failed, return\n");
+	                if (NULL != identity) {
+	                        os_free(identity);
+	                        identity = NULL;
+	                }
+	                return FALSE;
+	        }
+
+                if (imsi == NULL) {  // 如果 IMSI 读取失败   那么报错退出 
+                        wpa_printf(MSG_INFO, "eap_proxy: IMSI not available, return\n");
+                        if (NULL != identity) {
+                                os_free(identity);
+                                identity = NULL;
+                        }
+                        return FALSE;
+               } else {
+
+                        wpa_printf(MSG_ERROR, "eap_proxy: IMSI not NULL \n");  【  打印  wpa_supplicant: eap_proxy: IMSI not NULL  表示已经读取到 SIM卡信息 IMSI 】
+                        if (NULL == identity)  【判断 配置文件 是否包含 identity 】
+                                wpa_printf(MSG_ERROR,"eap_proxy: config file doesn't contain identity \n");
+                        else
+                                wpa_printf(MSG_ERROR, "eap_proxy: config file contains identity\n");
+
+
+                           【  打印  wpa_supplicant: eap_proxy: eap_type:23   打印 eap类型 AKA 】
+                        wpa_printf(MSG_ERROR, "eap_proxy: eap_type: %d\n", eap_proxy->eap_type);
+
+
+                     if (!idx) {
+
+
+                                if (config->identity_len > 1)     【对 imsi_identity 初始化 】
+                                        /* @realm provided in config */
+                                        imsi_identity =os_malloc(1 + IMSI_LENGTH + config->identity_len);
+
+                                else if (identity_format == EAP_IDENTITY_IMSI_3GPP_REALM)
+                                        /* IMSI@realm not provided through config */
+                                        imsi_identity =os_malloc(1 + IMSI_LENGTH + os_strlen(realm_3gpp));
+                                else
+                                        imsi_identity = os_malloc(1 + IMSI_LENGTH);   /* IMSI RAW */
+
+
+                                if (NULL == imsi_identity) {  // 分配 imsi_identity 内存失败
+                                        wpa_printf(MSG_ERROR, "eap_proxy: Memory not available\n");
+                                        if (NULL != identity) {
+                                                os_free(identity);
+                                                identity = NULL;
+                                        }
+                                        return FALSE;
+                                } else {  // 分配  imsi_identity 内存成功 对它进行一些列操作
+                                        if (config->identity_len > 1)
+                                                os_memset(imsi_identity, 0,   (1 + IMSI_LENGTH + config->identity_len));
+                                        else if (identity_format == EAP_IDENTITY_IMSI_3GPP_REALM)
+                                                os_memset(imsi_identity, 0,     (1 + IMSI_LENGTH + os_strlen(realm_3gpp)));
+                                        else     os_memset(imsi_identity, 0, (1 + IMSI_LENGTH));
+
+ 
+                             }
+                   .....
+
+            }  // end else (imsi == NULL)
+
+
+       if (identity_format == EAP_IDENTITY_IMSI_3GPP_REALM || mcc_idx) {
+               【  打印  wpa_supplicant: eap_proxy: card mnc len 3 】
+             wpa_printf(MSG_ERROR, "eap_proxy: card mnc len %d\n", card_mnc_len);
+
+             wpa_printf(MSG_ERROR, "eap_proxy:  Appending 3gpp realm\n ");
+          }
+
+   【  打印  wpa_supplicant: eap_proxy: eap auth user identity  -  302490214610995@wlan.mnc490.mcc302.3gppnetwork.org       length-51 】
+        wpa_printf(MSG_ERROR, "eap_proxy: eap auth user identity  - %20s length-%d\n ", eap_auth_start.user_id, eap_auth_start.user_id_len);
+
+
+
+
+
+        eap_proxy->user_selected_sim = sim_num;
+ 【  打印  wpa_supplicant: eap_proxy: SIM selected by User: Selected sim = 1   用户使用了sim卡1 】
+        wpa_printf(MSG_ERROR, "eap_proxy: SIM selected by User: Selected sim = %d\n",eap_proxy->user_selected_sim+1);
+
+
+        if (sim_num == 0) {
+                sub_req_binding.bind_subs = AUTH_PRIMARY_SUBS_V01;
+                qmiRetCode = qmi_client_send_msg_sync(eap_proxy->qmi_auth_svc_client_ptr[sim_num],
+                                QMI_AUTH_SET_SUBSCRIPTION_BINDING_REQ_V01,
+                                                (void *) &sub_req_binding,
+                                                sizeof(auth_set_subscription_binding_req_msg_v01),
+                                                (void *) &sub_resp_binding,
+                                                sizeof(auth_set_subscription_binding_resp_msg_v01),
+                                                WPA_UIM_QMI_DEFAULT_TIMEOUT);
+
+                if ((QMI_NO_ERR != qmiRetCode ||
+                     sub_resp_binding.resp.result != QMI_RESULT_SUCCESS_V01 ) &&
+                    (QMI_ERR_OP_DEVICE_UNSUPPORTED_V01 != sub_resp_binding.resp.error)) {
+                        wpa_printf(MSG_ERROR, "QMI-ERROR Unable to get the qmi_auth_set_subscriptio"
+                                "n_binding for sim 1; error_ret=%d; error_code=%d\n", qmiRetCode,
+                                sub_resp_binding.resp.error);
+                        return FALSE;
+                }
+                wpa_printf (MSG_ERROR, "eap_proxy: Binded with PRIMARY Subscription\n");
+
+    }  else if (sim_num == 1) {
+
+    }
+        if (FALSE == eap_proxy->eap_auth_session_flag[sim_num]) {
+~~~~~~~~~
+    【打印 wpa_supplicant: eap_proxy: eap_auth_start values    】
+    【打印 wpa_supplicant: eap_proxy: eap_auth_start.eap_method_mask =2     】
+    【打印 wpa_supplicant: eap_proxy: eap_auth_start.user_id_len = 51     】
+    【打印 wpa_supplicant: eap_proxy:  eap_auth_start.eap_meta_id_len = 0     】
+~~~~~~~~~
+                        wpa_printf(MSG_ERROR, "eap_proxy: eap_auth_start values\n");
+                        wpa_printf(MSG_ERROR, "eap_proxy: eap_auth_start.eap_method_mask = %d\n",eap_auth_start.eap_method_mask);
+                        wpa_printf(MSG_ERROR, "eap_proxy: eap_auth_start.user_id_len = %d\n",eap_auth_start.user_id_len);
+                        wpa_printf(MSG_ERROR, "eap_proxy: eap_auth_start.eap_meta_id_len = %d\n",eap_auth_start.eap_meta_identity_len);
+
+        return TRUE;  // 返回成功 TRUE
+}
+
+```
+
+
+<h8> wpa_qmi_read_card_status(sim_num, eap_proxy->wpa_uim)</h8>
+```
+
+wpa_qmi_read_card_status(sim_num, eap_proxy->wpa_uim)   读取sim卡信息 , sim卡应该是一个文件
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/eap_peer/eap_proxy_qmi_oc.c#473
+
+static Boolean wpa_qmi_read_card_imsi(int sim_num, wpa_uim_struct_type *wpa_uim)
+{
+        int                     length;
+        unsigned char           *data;
+        int                     src = 0, dst = 0;
+        Boolean                 card_found = FALSE,
+        qmi_status = TRUE;
+        qmi_client_error_type               qmi_err_code = 0;
+        uim_read_transparent_req_msg_v01   qmi_read_trans_req;
+        uim_read_transparent_resp_msg_v01  read_trans_resp;
+        card_mnc_len = -1;
+
+        os_memset(&read_trans_resp, 0,sizeof(uim_read_transparent_resp_msg_v01));
+        os_memset(&qmi_read_trans_req, 0,sizeof(uim_read_transparent_req_msg_v01));
+
+        qmi_read_trans_req.read_transparent.length = 0;
+        qmi_read_trans_req.read_transparent.offset = 0;
+        qmi_read_trans_req.file_id.file_id = 0x6F07;
+        qmi_read_trans_req.file_id.path_len = 4;
+【打印:  wpa_supplicant: eap_proxy: read_card_imsi: session_type = 0 】
+        wpa_printf (MSG_ERROR, "eap_proxy: read_card_imsi: session_type = %d\n", session_type);
+        qmi_read_trans_req.session_information.session_type = session_type;
+
+      /* For USIM*/ 通用用户标识模块（USIM） USIM提供了不同于SIM的另外一组参数，用于3G移动系统中的WCDMA网络以及4G网络中
+        if ((wpa_uim[sim_num].card_info[wpa_uim[sim_num].card_ready_idx].app_type == UIM_APP_TYPE_USIM_V01)) {
+                qmi_read_trans_req.file_id.path[0] = 0x00;
+                qmi_read_trans_req.file_id.path[1] = 0x3F;
+                qmi_read_trans_req.file_id.path[2] = 0xFF;
+                qmi_read_trans_req.file_id.path[3] = 0x7F;
+
+        } else /* For SIM*/ 用户标识模块（SIM）
+        if ((wpa_uim[sim_num].card_info[wpa_uim[sim_num].card_ready_idx].app_type == UIM_APP_TYPE_SIM_V01)) {
+                qmi_read_trans_req.file_id.path[0] = 0x00;
+                qmi_read_trans_req.file_id.path[1] = 0x3F;
+                qmi_read_trans_req.file_id.path[2] = 0x20;
+                qmi_read_trans_req.file_id.path[3] = 0x7F;
+        }
+        else {
+                return FALSE;
+        }
+
+        if (sim_num == 0) {
+         // 开始请求 uim_read_transparent_req_msg_v01 请求 sim 卡数据   【 未查到哪里定义  必须是请求返回 uim_read_transparent_resp_msg_v01 回应数据  】
+        qmi_err_code = qmi_client_send_msg_sync(wpa_uim[sim_num].qmi_uim_svc_client_ptr,
+                                        QMI_UIM_READ_TRANSPARENT_REQ_V01,
+                                        (void *)&qmi_read_trans_req,
+                                        sizeof(uim_read_transparent_req_msg_v01),
+                                        (void *) &read_trans_resp,
+                                        sizeof(uim_read_transparent_resp_msg_v01),
+                                        WPA_UIM_QMI_DEFAULT_TIMEOUT);
+
+                if ((QMI_NO_ERR != qmiRetCode || sub_resp_binding.resp.result != QMI_RESULT_SUCCESS_V01 ) && (QMI_ERR_OP_DEVICE_UNSUPPORTED_V01 != sub_resp_binding.resp.error)) {
+               【读取sim 出错打印 错误信息】
+         wpa_printf(MSG_ERROR, "QMI-ERROR Unable to get the qmi_auth_set_subscription_binding for sim 1; error_ret=%d; error_code=%d\n",qmiRetCode,sub_resp_binding.resp.error);
+                        return FALSE;
+                }
+                【打印 wpa_supplicant: eap_proxy: Binded with PRIMARY Subscription 】
+                wpa_printf (MSG_ERROR, "eap_proxy: Binded with PRIMARY Subscription\n");
+          } else if ( sim_num == 1 ){  // 如果请求的是 sim 卡 2 的信息
+            .......
+               wpa_printf (MSG_ERROR, "eap_proxy: Binded with SECONDARY Subscription\n");
+ 
+         }
+
+
+
+        if (TRUE == eap_proxy->eap_auth_session_flag[sim_num]) {
+                if(eap_auth_end_eap_session(eap_proxy->qmi_auth_svc_client_ptr[sim_num]) < 0) {  // 判断标记位
+                        wpa_printf(MSG_ERROR, "eap_proxy: Unable to end the EAP session; sim_num%d;", sim_num);
+                        }
+                        eap_proxy->eap_auth_session_flag[sim_num] = FALSE;  // 设置标记位 为 false  标记可以开始读取 sim信息
+        }
+
+        if (FALSE == eap_proxy->eap_auth_session_flag[sim_num]) {
+~~~~~~~~~
+    【打印 wpa_supplicant: eap_proxy: eap_auth_start values    】
+    【打印 wpa_supplicant: eap_proxy: eap_auth_start.eap_method_mask =2     】
+    【打印 wpa_supplicant: eap_proxy: eap_auth_start.user_id_len = 51     】
+    【打印 wpa_supplicant: eap_proxy:  eap_auth_start.eap_meta_id_len = 0     】
+~~~~~~~~~
+                        wpa_printf(MSG_ERROR, "eap_proxy: eap_auth_start values\n");
+                        wpa_printf(MSG_ERROR, "eap_proxy: eap_auth_start.eap_method_mask = %d\n",eap_auth_start.eap_method_mask);
+                        wpa_printf(MSG_ERROR, "eap_proxy: eap_auth_start.user_id_len = %d\n",eap_auth_start.user_id_len);
+                        wpa_printf(MSG_ERROR, "eap_proxy: eap_auth_start.eap_meta_id_len = %d\n",eap_auth_start.eap_meta_identity_len);
+
+
+        qmiRetCode = qmi_client_send_msg_sync(eap_proxy->qmi_auth_svc_client_ptr[sim_num], 【 未查到哪里定义  必须是请求返回 auth_start_eap_session_resp_msg_v01 开始eap的 回应数据  】
+                                                QMI_AUTH_START_EAP_SESSION_REQ_V01,
+                                                (void *) &eap_auth_start,
+                                                sizeof(auth_start_eap_session_req_msg_v01),
+                                                (void *) &eap_auth_start_resp,
+                                                sizeof(auth_start_eap_session_resp_msg_v01),
+                                                WPA_UIM_QMI_DEFAULT_TIMEOUT);
+
+
+     if (QMI_NO_ERR != qmiRetCode || eap_auth_start_resp.resp.result != QMI_RESULT_SUCCESS_V01) {   // 如果start_session 返回失败的话
+                wpa_printf(MSG_ERROR, " QMI-ERROR Unable to start the EAP sessionerror_ret=%d; qmi_err=%d\n", qmiRetCode, eap_auth_start_resp.resp.error);
+                if(eap_auth_start.eap_method_mask == QMI_AUTH_EAP_METHOD_MASK_AKA_PRIME_V01 && eap_auth_start_resp.resp.error == QMI_ERR_INVALID_ARG_V01)
+                   wpa_printf(MSG_ERROR, "QMI-ERROR AKA' not supported\n");
+                return FALSE;
+                }
+                eap_proxy->eap_auth_session_flag[sim_num] = TRUE;
+                eap_proxy->notification_code = 0;
+                eap_proxy->qmi_state = QMI_STATE_IDLE;
+                wpa_printf(MSG_ERROR, "eap_proxy: EAP session started"" error_ret=%d; Resp=%d\n", qmiRetCode, eap_auth_start_resp.resp.error);
+        }
+
+        return TRUE;   // 执行到这里说明程序 start-session 执行成功
+
+```
+
+<h8> wpa_qmi_read_card_imsi(sim_num, eap_proxy->wpa_uim))</h8>
+```
+static Boolean wpa_qmi_read_card_imsi(int sim_num, wpa_uim_struct_type *wpa_uim);  真正读取 sim卡 信息
+
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/eap_peer/eap_proxy_qmi_oc.c#473
+
+
+
+static Boolean wpa_qmi_read_card_imsi(int sim_num, wpa_uim_struct_type *wpa_uim)
+{
+        int                     length;
+        unsigned char           *data;
+        int                     src = 0, dst = 0;
+        Boolean                 card_found = FALSE,
+        qmi_status = TRUE;
+        qmi_client_error_type               qmi_err_code = 0;
+        uim_read_transparent_req_msg_v01   qmi_read_trans_req;
+        uim_read_transparent_resp_msg_v01  read_trans_resp;
+        card_mnc_len = -1;
+
+        os_memset(&read_trans_resp, 0,sizeof(uim_read_transparent_resp_msg_v01));
+        os_memset(&qmi_read_trans_req, 0, sizeof(uim_read_transparent_req_msg_v01));
+
+        qmi_read_trans_req.read_transparent.length = 0;
+        qmi_read_trans_req.read_transparent.offset = 0;
+        qmi_read_trans_req.file_id.file_id = 0x6F07;
+        qmi_read_trans_req.file_id.path_len = 4;
+
+
+        wpa_printf (MSG_ERROR, "eap_proxy: read_card_imsi: session_type = %d\n", session_type);
+        qmi_read_trans_req.session_information.session_type = session_type;
+
+        qmi_read_trans_req.session_information.aid_len = 0;
+
+        /* For USIM*/
+        if ((wpa_uim[sim_num].card_info[wpa_uim[sim_num].card_ready_idx].app_type ==
+                UIM_APP_TYPE_USIM_V01)) {
+                qmi_read_trans_req.file_id.path[0] = 0x00;
+                qmi_read_trans_req.file_id.path[1] = 0x3F;
+                qmi_read_trans_req.file_id.path[2] = 0xFF;
+                qmi_read_trans_req.file_id.path[3] = 0x7F;
+
+        } else /* For SIM*/
+        if ((wpa_uim[sim_num].card_info[wpa_uim[sim_num].card_ready_idx].app_type ==
+                UIM_APP_TYPE_SIM_V01)) {
+                qmi_read_trans_req.file_id.path[0] = 0x00;
+                qmi_read_trans_req.file_id.path[1] = 0x3F;
+                qmi_read_trans_req.file_id.path[2] = 0x20;
+                qmi_read_trans_req.file_id.path[3] = 0x7F;
+        }
+        else {
+                return FALSE;
+        }
+
+        qmi_err_code = qmi_client_send_msg_sync(wpa_uim[sim_num].qmi_uim_svc_client_ptr,
+                                        QMI_UIM_READ_TRANSPARENT_REQ_V01,
+                                        (void *)&qmi_read_trans_req,
+                                        sizeof(uim_read_transparent_req_msg_v01),
+                                        (void *) &read_trans_resp,
+                                        sizeof(uim_read_transparent_resp_msg_v01),
+                                        WPA_UIM_QMI_DEFAULT_TIMEOUT);
+        if (QMI_NO_ERR != qmi_err_code || read_trans_resp.resp.result != QMI_RESULT_SUCCESS_V01) {  // 读取失败的话  uim_read_transparent_resp_msg_v01
+                wpa_printf(MSG_ERROR, "QMI-ERROR Unable to read IMSI from UIM service; error_ret=%d; qmi_err=%d\n", qmi_err_code,read_trans_resp.resp.error);
+                qmi_status = FALSE;
+        }
+
+        if (QMI_NO_ERR == qmi_err_code) {  // 读取成功的话
+                if (read_trans_resp.read_result_valid) {
+                        length  = read_trans_resp.read_result.content_len;
+                        data    = read_trans_resp.read_result.content;
+                                   【打印 wpa_supplicant: eap_proxy:   IMSI SIM content length = 9   】
+                                wpa_printf(MSG_ERROR,   "eap_proxy: IMSI SIM content length = %d\n",  length);
+
+                        /* Received IMSI is in the 3GPP format  converting it into ascii string  把IMSI 转为 ascii格式 */
+                        imsi = os_zalloc(2 * length);
+                        if (imsi == NULL) {
+                                wpa_printf(MSG_ERROR, "eap_proxy: Couldn't allocate memmory for imsi");
+                                return FALSE;
+                        }
+                        for (src = 1, dst = 0;(src < length) && (dst < (length * 2));  src++) {
+
+~~~~~~~~
+wpa_supplicant: eap_proxy:   IMSI read from SIM = 57 src 1
+wpa_supplicant: eap_proxy:   IMSI read from SIM = 32 src 2
+wpa_supplicant: eap_proxy:   IMSI read from SIM = 148 src 3
+wpa_supplicant: eap_proxy:   IMSI read from SIM = 32 src 4
+wpa_supplicant: eap_proxy:   IMSI read from SIM = 65 src 5
+wpa_supplicant: eap_proxy:   IMSI read from SIM = 22 src 6
+wpa_supplicant: eap_proxy:   IMSI read from SIM = 144 src 7
+wpa_supplicant: eap_proxy:   IMSI read from SIM = 89 src 8
+
+~~~~~~~~
+                                wpa_printf(MSG_ERROR, "eap_proxy: IMSI read from SIM = %d src %d\n",   data[src], src);
+                                if(data[src] == 0xFF) {
+                                        break;
+                                }
+                                if (src > 1) {
+                                        imsi[dst] = bin_to_hexchar(data[src] & 0x0F);
+                                        dst++;
+
+                                        wpa_printf(MSG_ERROR, "eap_proxy: IMSI dst = %d dst %d\n", imsi[dst-1], dst);
+                                }
+                                /* Process upper part of byte for all bytes */
+                                imsi[dst] = bin_to_hexchar(data[src] >> 4);
+                                dst++;
+
+~~~~
+wpa_supplicant: eap_proxy:   IMSI dst = 51  dst  1
+wpa_supplicant: eap_proxy:   IMSI dst = 48  dst  2
+wpa_supplicant: eap_proxy:   IMSI dst = 50  dst  3
+wpa_supplicant: eap_proxy:   IMSI dst = 52  dst  4
+wpa_supplicant: eap_proxy:   IMSI dst = 57  dst  5
+wpa_supplicant: eap_proxy:   IMSI dst = 48  dst  6
+wpa_supplicant: eap_proxy:   IMSI dst = 50  dst  7
+wpa_supplicant: eap_proxy:   IMSI dst = 49  dst  8
+
+wpa_supplicant: eap_proxy:   IMSI dst = 52  dst  9
+wpa_supplicant: eap_proxy:   IMSI dst = 54  dst  10
+wpa_supplicant: eap_proxy:   IMSI dst = 49  dst  11
+wpa_supplicant: eap_proxy:   IMSI dst = 48  dst  12
+wpa_supplicant: eap_proxy:   IMSI dst = 57  dst  13
+wpa_supplicant: eap_proxy:   IMSI dst = 57  dst  14
+wpa_supplicant: eap_proxy:   IMSI dst = 53  dst  15
+~~~~
+                                wpa_printf(MSG_ERROR, "eap_proxy: IMSI dst = %d dst %d\n",  imsi[dst-1], dst);
+                        }
+                                imsi_len_g = (data[0]*2 - 1); //dst;
+
+【打印  wpa_supplicant: eap_proxy:  IMSI first digit = 8 read legth =15 imsi = 302490214610995  】
+                                wpa_printf(MSG_ERROR, "eap_proxy: IMSI first digit = %d read length = %d imsi %20s\n", data[0],imsi_len_g, imsi);
+                        } else{  //  读取失败的情况
+                                wpa_printf(MSG_ERROR,     "eap_proxy: IMSI read failure read_result_valid = %d\n",  read_trans_resp.read_result_valid);
+                                qmi_status = FALSE;
+                        }
+                }
+        /* READ EF_AD */
+        /* if qmi_status is FALSE, UIM read for mnc may not be required - To Do */
+
+
+        qmi_read_trans_req.file_id.file_id = 0x6FAD;   // 读取 MCCMNC 信息
+        qmi_err_code = qmi_client_send_msg_sync(wpa_uim[sim_num].qmi_uim_svc_client_ptr,
+                                        QMI_UIM_READ_TRANSPARENT_REQ_V01,
+                                        (void *)&qmi_read_trans_req,
+                                        sizeof(uim_read_transparent_req_msg_v01),
+                                        (void *)&read_trans_resp,
+                                        sizeof(uim_read_transparent_resp_msg_v01),
+                                        WPA_UIM_QMI_DEFAULT_TIMEOUT);
+        if (QMI_NO_ERR != qmi_err_code ||   read_trans_resp.resp.result != QMI_RESULT_SUCCESS_V01) {
+                wpa_printf(MSG_ERROR, "QMI-ERROR Unable to read MNC from UIM service; error_ret=%d; qmi_err=%d\n", qmi_err_code,    read_trans_resp.resp.error);
+                qmi_status = FALSE;
+        }
+
+        if (QMI_NO_ERR == qmi_err_code) {   // 读取 MCCMNC 成功的话
+                if (read_trans_resp.read_result_valid) {
+                        length  =  read_trans_resp.read_result.content_len;
+                        data    =   read_trans_resp.read_result.content;
+
+                        if(length >= 4)    card_mnc_len = 0x0f & data[3]; 
+
+                        if ((card_mnc_len != 2) && (card_mnc_len != 3)) {  // 如果 mnc长度 不为2  或者 mnc长度不为3 那么出错了  打印错误信息
+                                if(check_for_3_digit())  card_mnc_len = 3;
+                                else   card_mnc_len = 2;
+
+                                wpa_printf(MSG_ERROR, "Failed to get MNC length from (U)SIM "
+                                "assuming %d as mcc %s to 3 digit mnc group\n",
+                                card_mnc_len, card_mnc_len == 3? "belongs":"not belongs");
+                        }
+                }
+        }
+
+
+        return qmi_status;
+} /* wpa_qmi_read_card_imsi */
+
+
+```
+
+
+<h7> dump_buff(eapReqData, eapReqDataLen) </h7>
+```
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/eap_peer/eap_proxy_qmi_oc.c#1637
+
+static void dump_buff(u8 *buff, int len)
+{
+        int i ;
+
+        wpa_printf(MSG_ERROR, "eap_proxy: ---- EAP Buffer----LEN %d\n",len);
+        for (i = 0; i < len; i++) {
+                if (0 == i%8)
+                        wpa_printf(MSG_DEBUG, " \n");
+                wpa_printf(MSG_ERROR, "eap_proxy: 0x%x  ", buff[i]);  // 打印信息
+        }
+        return;
+}
+
+
+```
+
+
+
 ##### eap_peer_sm_step(sm->eap)
+```
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/eap_peer/eap.c#2203
+
+
+/**
+ * eap_peer_sm_step - Step EAP peer state machine
+ * @sm: Pointer to EAP state machine allocated with eap_peer_sm_init()
+ * Returns: 1 if EAP state was changed or 0 if not
+ * 返回1 如果EAP状态机  转态有改变
+ * 返回0 如果EAP状态机  状态没有改变 
+ * This function advances EAP state machine to a new state to match with the
+ * current variables. This should be called whenever variables used by the EAP
+ * state machine have changed.
+ */
+int eap_peer_sm_step(struct eap_sm *sm)
+{
+	int res = 0;
+	do {
+		sm->changed = FALSE;
+		SM_STEP_RUN(EAP);  //  四个状态机的最后一个现身了   SM_STEP(EAP)
+		if (sm->changed)
+			res = 1;
+	} while (sm->changed);
+	return res;
+}
+
+
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/eap_peer/eap.c#1312
+
+
+
+SM_STEP(EAP)
+{
+
+
+	if (eapol_get_bool(sm, EAPOL_eapRestart) && eapol_get_bool(sm, EAPOL_portEnabled))
+		SM_ENTER_GLOBAL(EAP, INITIALIZE);  //  EAP 状态机进入  INITIALIZE 状态  【1】
+	else if (!eapol_get_bool(sm, EAPOL_portEnabled) || sm->force_disabled)  //  端口为PAE 未授权的话
+		SM_ENTER_GLOBAL(EAP, DISABLED);  //EAP 不可用状态
+	else if (sm->num_rounds > EAP_MAX_AUTH_ROUNDS @50@) {
+		if (sm->num_rounds == EAP_MAX_AUTH_ROUNDS + 1) {
+			wpa_msg(sm->msg_ctx, MSG_INFO, "EAP: more than %d ""authentication rounds - abort",EAP_MAX_AUTH_ROUNDS);
+			sm->num_rounds++;
+			SM_ENTER_GLOBAL(EAP, FAILURE);  // 进入 EAP的 FAILURE 状态
+		}
+	} else {
+		/* Local transitions */
+		eap_peer_sm_step_local(sm);  //  执行新状态进入操作  【2】
+	}
+}
+
+
+
+~~~~~~~~~~~~~~
+static void eap_peer_sm_step_local(struct eap_sm *sm)    // 进入状态时 执行的方法 
+	case EAP_INITIALIZE:  SM_ENTER(EAP, IDLE);
+	case EAP_DISABLED:
+	case EAP_IDLE:
+	case EAP_RECEIVED:
+	case EAP_GET_METHOD:
+	case EAP_METHOD:
+	case EAP_SEND_RESPONSE:
+	case EAP_DISCARD:
+	case EAP_IDENTITY:
+	case EAP_NOTIFICATION:
+	case EAP_RETRANSMIT:
+	case EAP_SUCCESS:
+	case EAP_FAILURE
+~~~~~~~~~~~~~~
+
+```
+
+
+
+
+###### SM_STATE(EAP, INITIALIZE)
+```
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/eap_peer/eap.c#213
+
+SM_STATE(EAP, INITIALIZE)
+{
+	SM_ENTRY(EAP, INITIALIZE);
+	if (sm->fast_reauth && sm->m && sm->m->has_reauth_data && sm->m->has_reauth_data(sm, sm->eap_method_priv) && !sm->prev_failure &&  sm->last_config == eap_get_config(sm)) {
+		wpa_printf(MSG_DEBUG, "EAP: maintaining EAP method data for " "fast reauthentication");
+		sm->m->deinit_for_reauth(sm, sm->eap_method_priv);
+	} else {
+		sm->last_config = eap_get_config(sm);
+		eap_deinit_prev_method(sm, "INITIALIZE");
+	}
+	sm->selectedMethod = EAP_TYPE_NONE;
+	sm->methodState = METHOD_NONE;
+	sm->ignore = 0;
+	sm->num_rounds = 0;
+	sm->prev_failure = 0;
+	sm->expected_failure = 0;
+	sm->reauthInit = FALSE;
+	sm->erp_seq = (u32) -1;
+}
+
+```
+
+###### eap_peer_sm_step_local
+```
+
+
+【#define SM_ENTER(machine, state) \ sm_ ## machine ## _ ## state ## _Enter(sm, 0)    idleEnter 】
+
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/utils/state_machine.h#46
+
+~~~~~~~~~~~~~~~
+ D wpa_supplicant: EAPOL: SUPP_PAE entering state DISCONNECTED
+ D wpa_supplicant: EAPOL: KEY_RX entering state NO_KEY_RECEIVE
+ D wpa_supplicant: EAPOL: SUPP_BE entering state INITIALIZE
+ D wpa_supplicant: EAP:   EAP entering state DISABLED
+
+ D wpa_supplicant: EAPOL: SUPP_PAE entering state DISCONNECTED
+ D wpa_supplicant: EAPOL: KEY_RX entering state NO_KEY_RECEIVE
+ D wpa_supplicant: EAPOL: SUPP_BE entering state INITIALIZE
+ D wpa_supplicant: EAP:   EAP entering state DISABLED
+ D wpa_supplicant: EAPOL: SUPP_PAE entering state DISCONNECTED
+ D wpa_supplicant: EAPOL: KEY_RX entering state NO_KEY_RECEIVE
+ D wpa_supplicant: EAPOL: SUPP_BE entering state INITIALIZE
+ D wpa_supplicant: EAP:   EAP entering state DISABLED
+ D wpa_supplicant: EAPOL: SUPP_PAE entering state DISCONNECT
+
+
+~~~~~~~~~~~~~~~
+#define SM_ENTRY(machine, state) \
+if (!global || sm->machine ## _state != machine ## _ ## state) { \
+	sm->changed = TRUE; \
+	wpa_printf(MSG_DEBUG, STATE_MACHINE_DEBUG_PREFIX ": " #machine \
+		   " entering state " #state); \      // 打印进入  说明状态 
+} \
+sm->machine ## _state = machine ## _ ## state;
+
+
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/eap_peer/eap_i.h#307
+	enum {
+		EAP_INITIALIZE, EAP_DISABLED, EAP_IDLE, EAP_RECEIVED,
+		EAP_GET_METHOD, EAP_METHOD, EAP_SEND_RESPONSE, EAP_DISCARD,
+		EAP_IDENTITY, EAP_NOTIFICATION, EAP_RETRANSMIT, EAP_SUCCESS,
+		EAP_FAILURE
+	} EAP_state;  EAP 状态
+
+
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/eap_peer/eap.c#1249
+
+static void eap_peer_sm_step_local(struct eap_sm *sm)
+{
+	switch (sm->EAP_state) {
+	case EAP_INITIALIZE:
+		SM_ENTER(EAP, IDLE);   //  进入 IDLE 状态  打印 Log
+
+
+
+		break;
+	case EAP_DISABLED:
+		if (eapol_get_bool(sm, EAPOL_portEnabled) &&
+		    !sm->force_disabled)
+			SM_ENTER(EAP, INITIALIZE);
+		break;
+	case EAP_IDLE:
+		eap_peer_sm_step_idle(sm);   // 往 状态切换
+		break;
+	case EAP_RECEIVED:
+		eap_peer_sm_step_received(sm);
+		break;
+	case EAP_GET_METHOD:
+		if (sm->selectedMethod == sm->reqMethod) 
+			SM_ENTER(EAP, METHOD);  // 进入状态 METHOD
+		else
+			SM_ENTER(EAP, SEND_RESPONSE);
+		break;
+	case EAP_METHOD:
+		if (sm->ignore)
+			SM_ENTER(EAP, DISCARD);
+		else if (sm->methodState == METHOD_DONE &&
+			 sm->decision == DECISION_FAIL && !sm->eapRespData)
+			SM_ENTER(EAP, FAILURE);
+		else
+			SM_ENTER(EAP, SEND_RESPONSE);
+		break;
+	case EAP_SEND_RESPONSE:
+		SM_ENTER(EAP, IDLE);
+		break;
+	case EAP_DISCARD:
+		SM_ENTER(EAP, IDLE);
+		break;
+	case EAP_IDENTITY:
+		SM_ENTER(EAP, SEND_RESPONSE);
+		break;
+	case EAP_NOTIFICATION:
+		SM_ENTER(EAP, SEND_RESPONSE);
+		break;
+	case EAP_RETRANSMIT:
+		SM_ENTER(EAP, SEND_RESPONSE);
+		break;
+	case EAP_SUCCESS:
+		break;
+	case EAP_FAILURE:
+		break;
+	}
+}
+
+
+```
+
+
 ##### eap_peer_was_failure_expected(sm->eap)
+```
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/eap_peer/eap.c#3162
+
+
+int eap_peer_was_failure_expected(struct eap_sm *sm)
+{
+	return sm->expected_failure;  // 返回  eap_sm 的 int expected_failure  属性
+}
+
+
+```
+
+
 ##### sm->ctx->cb(sm, result, sm->ctx->cb_ctx)
+```
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/rsn_supp/preauth.c
+
+	/**
+	 * cb - Function to be called when EAPOL negotiation has been completed
+	 * @eapol: Pointer to EAPOL state machine data
+	 * @result: Whether the authentication was completed successfully
+	 * @ctx: Pointer to context data (cb_ctx)
+	 *
+	 * This optional callback function will be called when the EAPOL
+	 * authentication has been completed. This allows the owner of the
+	 * EAPOL state machine to process the key and terminate the EAPOL state
+	 * machine. Currently, this is used only in RSN pre-authentication.
+	 */
+	void (*cb)(struct eapol_sm *eapol, enum eapol_supp_result result, void *ctx);
+
+
+
+static void rsn_preauth_eapol_cb(struct eapol_sm *eapol, enum eapol_supp_result result,void *ctx)
+{
+	struct wpa_sm *sm = ctx;
+	u8 pmk[PMK_LEN];
+
+	if (result == EAPOL_SUPP_RESULT_SUCCESS) {
+		int res, pmk_len;
+		pmk_len = PMK_LEN;
+		res = eapol_sm_get_key(eapol, pmk, PMK_LEN);
+		if (res) {
+			/*
+			 * EAP-LEAP is an exception from other EAP methods: it  uses only 16-byte PMK.
+			 */
+			res = eapol_sm_get_key(eapol, pmk, 16);
+			pmk_len = 16;
+		}
+		if (res == 0) {
+			wpa_hexdump_key(MSG_DEBUG, "RSN: PMK from pre-auth",pmk, pmk_len);
+			sm->pmk_len = pmk_len;
+			pmksa_cache_add(sm->pmksa, pmk, pmk_len, NULL,	NULL, 0,sm->preauth_bssid, sm->own_addr,sm->network_ctx,WPA_KEY_MGMT_IEEE8021X, NULL);
+		} else {
+			wpa_msg(sm->ctx->msg_ctx, MSG_INFO,"RSN: failed to get master session key from pre-auth EAPOL state machines");
+			result = EAPOL_SUPP_RESULT_FAILURE;
+		}
+	}
+
+wpa_msg(sm->ctx->msg_ctx, MSG_INFO, "RSN: pre-authentication with "MACSTR"%s", MAC2STR(sm->preauth_bssid),result == EAPOL_SUPP_RESULT_SUCCESS ? "completed successfully" :"failed");
+	rsn_preauth_deinit(sm);
+	rsn_preauth_candidate_process(sm);
+}
+
+
+
+```
+
+
 
 #### eapol_sm_notify_portValid(wpa_s->eapol, FALSE)
+```
+
+
+/**
+ * eapol_sm_notify_portValid - Notification about portValid change
+ * @sm: Pointer to EAPOL state machine allocated with eapol_sm_init()
+ * @valid: New portValid value
+ *
+ * Notify EAPOL state machine about new portValid value.
+ */
+
+void eapol_sm_notify_portValid(struct eapol_sm *sm, Boolean valid)
+{
+	if (sm == NULL)
+		return;
+【 打印  wpa_supplicant: EAPOL: External notification - portValid= 0 】
+	wpa_printf(MSG_DEBUG, "EAPOL: External notification - portValid=%d", valid);
+	sm->portValid = valid;
+	eapol_sm_step(sm);  //  已有分析  继续 EAP 状态机中去
+}
+
+
+
+
+```
+
+
 #### wpas_init_driver(wpa_s, iface)
+```
+继续点
+
+```
 #### wpa_supplicant_init_wpa(wpa_s)
 #### wpa_sm_set_ifname
 #### wpa_sm_set_fast_reauth

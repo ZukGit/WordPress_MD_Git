@@ -249,6 +249,36 @@ OWE : Opportunistic Wireless encryption
 中文:  机会无限加密( 为每个用户提供单独的加密方式) 
 # P
 
+
+## PAE
+```
+PAE (Port Access Entity)
+端口PAE（Port Access Entity，端口访问实体）
+
+原文：https://blog.csdn.net/lee244868149/article/details/52132350 
+端口PAE为802.1x系统中，在一个给定的设备端口上执行算法和协议操作的实体对象。
+设备服务端PAE利用认证服务器对需要接入局域网的客户端执行认证，并根据认证结果相应地控制受控端口的授权/非授权状态。
+客户端PAE负责响应设备端的认证请求，向设备服务端提交用户的认证信息。
+客户端PAE也可以主动向设备端发送认证请求和下线请求。
+
+
+
+设备端为客户端提供接入局域网的端口，这个端口被划分为两个逻辑端口：受控端口和非受控端口。
+
+  非受控端口始终处于双向连通状态，主要用来传递EAPOL协议帧，保证客户端始终能够发出或接收认证报文。
+
+  受控端口在授权状态下处于双向连通状态，用于传递业务报文；在非授权状态下禁止从客户端接收任何报文。
+
+  受控端口和非受控端口是同一端口的两个部分；任何到达该端口的帧，在受控端口与非受控端口上均可见。
+
+
+在非授权状态下，受控端口可以被设置成单向受控和双向受控。
+实行双向受控时，禁止帧的发送和接收；
+实行单向受控时，禁止从客户端接收帧，但允许向客户端发送帧。
+
+
+```
+
 ## Passpoint
 ```
 CERTIFIED Passpoint(认证控制点)计划实际上是创建一个Wi-Fi热点数据库，允许用户访问参加该计划的那个地区的任何热点。
@@ -400,6 +430,19 @@ TIM：  Traffic Indication Map
 ## TDLS
 TDLS: Tunneled Direct Link Setup
 中文: **通道直接链路建立 项标准允许两款设备通过WiFi网络进行点对点直连，与早起提倡的WiFi Direct相似，不过功能则更加完善 **
+
+
+## TKR SM
+```
+The Key Receiver SM
+TKR SM包含两个状态。
+第一个是NO_KEY_RECEIVE状态
+当rxKey（boolean型变量，当Supplicant收到EAPOL Key帧后，该值为TRUE）变为TRUE时，TKR进入KEY_RECEIVE状态。
+TKR在KEY_RECEIVE状态时需要调用processKey函数处理EAPOL Key消息
+
+
+```
+
 # U
 
 ## UDP   
