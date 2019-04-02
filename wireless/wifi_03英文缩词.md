@@ -178,6 +178,11 @@ ICMP：  Internet Control Message Protocol
 IEEE:   Institute of Electrical and Electronics Engineers 
 中文:   **美国电子和电器工程师协会**
 
+## IES
+```
+IES ：  InfomationElements      在 Beacon  ,  Probe Response 都包含这种信息元素   具有 AP的安全配置信息( 加密算法  安全配置 协议等等 )
+WPA IES：    WPA 信息元素     InfomationElements  
+```
 
 ## ISN
 ISN:  Initial  Sequence Number
@@ -227,6 +232,14 @@ MIMO：  Multiple-input/Multiple-output
 ## MSDU
 MSDU:  Mac Serivce Data Unit
 中文:   **Mac服务数据单元**
+
+
+## MLME
+```
+
+MLME: Mac Layer Manager Entry  MAC层管理实体  可以提供调用Mac层管理功能的服务接口 同时还负责管理 MAC-PAN信息库(MAC-PIB)
+
+```
 
 # N
 

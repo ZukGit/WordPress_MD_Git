@@ -5219,9 +5219,1574 @@ void eapol_sm_notify_portValid(struct eapol_sm *sm, Boolean valid)
 
 #### wpas_init_driver(wpa_s, iface)
 ```
+
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/wpa_supplicant.c#5073
+
+
+
+static int wpas_init_driver(struct wpa_supplicant *wpa_s, struct wpa_interface *iface)
+{
+	const char *ifname, *driver, *rn;
+
+	driver = iface->driver;     // const char * 	driver   
+
+next_driver:  【程序标记点  go  next_driver; 使得程序回到这里】
+	if (wpa_supplicant_set_driver(wpa_s, driver) < 0)    【1】
+		return -1;
+
+	wpa_s->drv_priv = wpa_drv_init(wpa_s, wpa_s->ifname);  【2】
+	if (wpa_s->drv_priv == NULL) {  //  如果驱动指针为空 那么说明没有加载驱动成功   void * 	drv_priv 
+		const char *pos;
+		pos = driver ? os_strchr(driver, ',') : NULL;   //  查找字符串s中首次出现字符c的位置
+		if (pos) {
+			wpa_dbg(wpa_s, MSG_DEBUG, "Failed to initialize driver interface - try next driver wrapper");
+			driver = pos + 1;
+			goto next_driver;   //  下一个 driver wrapper 
+		}
+		wpa_msg(wpa_s, MSG_ERROR, "Failed to initialize driver interface");
+		return -1;
+	}
+
+
+	if (wpa_drv_set_param(wpa_s, wpa_s->conf->driver_param) < 0) {  【3】 加载驱动参数  返回-1 的话 说明加载驱动参数失败
+		wpa_msg(wpa_s, MSG_ERROR, "Driver interface rejected driver_param '%s'", wpa_s->conf->driver_param);
+		return -1;
+	}
+
+	ifname = wpa_drv_get_ifname(wpa_s);    【4】 获取wlan0接口名称
+	if (ifname && os_strcmp(ifname, wpa_s->ifname) != 0) {   // 判断驱动提供的 接口名称  和本地的 wpa_supplicant保存的是否一致
+		wpa_dbg(wpa_s, MSG_DEBUG, "Driver interface replaced interface name with '%s'", ifname);
+		os_strlcpy(wpa_s->ifname, ifname, sizeof(wpa_s->ifname));
+	}
+
+	rn = wpa_driver_get_radio_name(wpa_s);    【5】  获取射频硬件名
+	if (rn && rn[0] == '\0')
+		rn = NULL;
+
+	wpa_s->radio = radio_add_interface(wpa_s, rn);  【6】 获取无线信息  // struct wpa_radio * 	radio 
+
+	if (wpa_s->radio == NULL)
+		return -1;
+
+	return 0;
+}
+
+
+```
+
+##### wpa_supplicant_set_driver(wpa_s, driver) 
+```
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/wpa_supplicant.c#3744
+
+
+static int wpa_supplicant_set_driver(struct wpa_supplicant *wpa_s, const char *name)
+{
+	int i;
+	size_t len;
+	const char *pos, *driver = name;
+
+	if (wpa_s == NULL)
+		return -1;
+
+~~~~~~~~~~~~~~~~~~~~~~~Begin
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/drivers/driver_privsep.c#835
+struct wpa_driver_ops wpa_driver_privsep_ops = {
+	"privsep",
+	"wpa_supplicant privilege separated driver",
+	.get_bssid = wpa_driver_privsep_get_bssid,
+	.get_ssid = wpa_driver_privsep_get_ssid,
+	.set_key = wpa_driver_privsep_set_key,
+	.init = wpa_driver_privsep_init,
+	.deinit = wpa_driver_privsep_deinit,
+	.set_param = wpa_driver_privsep_set_param,
+	.scan2 = wpa_driver_privsep_scan,
+	.deauthenticate = wpa_driver_privsep_deauthenticate,
+	.authenticate = wpa_driver_privsep_authenticate,
+	.associate = wpa_driver_privsep_associate,
+	.get_capa = wpa_driver_privsep_get_capa,
+	.get_mac_addr = wpa_driver_privsep_get_mac_addr,
+	.get_scan_results2 = wpa_driver_privsep_get_scan_results2,
+	.set_country = wpa_driver_privsep_set_country,
+};
+
+
+const struct wpa_driver_ops *const wpa_drivers[] =   【 驱动数组 】
+{
+	&wpa_driver_privsep_ops, NULL
+};
+~~~~~~~~~~~~~~~~~~~~~~~END
+
+
+
+
+	if (wpa_drivers[0] == NULL) {  // 如果 wpa_driver_privsep_ops 为空的话  报错
+		wpa_msg(wpa_s, MSG_ERROR, "No driver interfaces build into wpa_supplicant");
+		return -1;
+	}
+
+	if (name == NULL) {  // 如果驱动名称 nl80211 Dbus 为空的话  设置默认的驱动, 驱动列表中的第一个
+		/* default to first driver in the list */
+		return select_driver(wpa_s, 0);
+	}
+
+	do {
+		pos = os_strchr(driver, ',');  // 获取 第一个 , 逗号位置 char * 
+		if (pos)
+			len = pos - driver;    // 获取驱动名称的长度 
+		else
+			len = os_strlen(driver);
+
+		for (i = 0; wpa_drivers[i]; i++) {
+           // 如果当前 驱动名称 长度相同  , 驱动名称的 前len 个字符相同的话 
+			if (os_strlen(wpa_drivers[i]->name) == len && os_strncmp(driver, wpa_drivers[i]->name, len) == 0) {
+
+				/* First driver that succeeds wins */
+				if (select_driver(wpa_s, i) == 0)    【1】 设置驱动  设置成功的话 返回0 
+					return 0;
+			}
+		}
+
+		driver = pos + 1;
+	} while (pos);
+
+	wpa_msg(wpa_s, MSG_ERROR, "Unsupported driver '%s'", name);
+	return -1;
+}
+
+
+
+```
+
+###### select_driver(wpa_s, 0)
+```
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/wpa_supplicant.c#3724
+
+static int select_driver(struct wpa_supplicant *wpa_s, int i)
+{
+	struct wpa_global *global = wpa_s->global;
+
+~~~~~~~~~~~~~~~~~~~~~~~~Begin
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/drivers/driver.h#2467
+
+struct:wpa_driver_ops  { void * (*global_init)(void *ctx);  } 函数指针
+
+const struct wpa_driver_ops *const wpa_drivers[] 【 wpa_driver_ops 驱动数组 】 =  { &wpa_driver_privsep_ops, NULL };
+
+
+struct wpa_driver_ops wpa_driver_privsep_ops 【预置了一部分的 wpa_driver_ops 】= {
+	"privsep",
+	"wpa_supplicant privilege separated driver",
+	.get_bssid = wpa_driver_privsep_get_bssid,
+	.get_ssid = wpa_driver_privsep_get_ssid,
+	.set_key = wpa_driver_privsep_set_key,
+	.init = wpa_driver_privsep_init,
+	.deinit = wpa_driver_privsep_deinit,
+	.set_param = wpa_driver_privsep_set_param,
+	.scan2 = wpa_driver_privsep_scan,
+	.deauthenticate = wpa_driver_privsep_deauthenticate,
+	.authenticate = wpa_driver_privsep_authenticate,
+	.associate = wpa_driver_privsep_associate,
+	.get_capa = wpa_driver_privsep_get_capa,
+	.get_mac_addr = wpa_driver_privsep_get_mac_addr,
+	.get_scan_results2 = wpa_driver_privsep_get_scan_results2,
+	.set_country = wpa_driver_privsep_set_country,
+};
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~End
+
+ //  如果 void * (*global_init)(void *ctx) 不为空   并且   wpa_global  {void ** 	drv_priv } 为空才能进入
+	if (wpa_drivers[i]->global_init && global->drv_priv[i] == NULL) {
+
+~~~~~~~~~~~~~~~~~~~Begin
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/drivers/driver_nl80211.c#10358
+.global_init = nl80211_global_init,
+static void * nl80211_global_init(void *ctx)
+~~~~~~~~~~~~~~~~~~~End
+
+		global->drv_priv[i] = wpa_drivers[i]->global_init(global);  【1】// 执行 wpa_driver_ops的global_init 方法 返回的参数 void ** 	drv_priv  传递给 wpa_global->drv_priv[item]
+
+		if (global->drv_priv[i] == NULL) {  // 如果上面返回的数据为空  说明 执行失败 返回 false  -1 
+			wpa_printf(MSG_ERROR, "Failed to initialize driver '%s'", wpa_drivers[i]->name);
+			return -1;
+		}
+	}
+
+	wpa_s->driver = wpa_drivers[i];     // 把已经完成 global_init 方法的 wpa_driver_ops 数据结构  保存在   wpa_s->driver  
+	wpa_s->global_drv_priv = global->drv_priv[i];  // 把  wpa_driver_ops->global_init  返回的   void *指针 保存在  wpa_s->global_drv_priv   谁叫wpa_s包含最多的属性 组装它  
+
+	return 0;
+}
+
+
+
+
+```
+<h7> wpa_driver_ops->global_init(nl80211_global_init)</h7>
+```
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/drivers/driver_nl80211.c#7482
+驱动的 global_init 方法
+
+
+static void * nl80211_global_init(void *ctx)
+{
+	struct nl80211_global *global;  // 与 驱动交互的领导
+	struct netlink_config *cfg;
+
+	global = os_zalloc(sizeof(*global));
+	if (global == NULL)
+		return NULL;
+	global->ctx = ctx;
+	global->ioctl_sock = -1;
+	dl_list_init(&global->interfaces);   // 双向链表 已有分析
+	global->if_add_ifindex = -1;
+
+	cfg = os_zalloc(sizeof(*cfg));
+	if (cfg == NULL)
+		goto err;
+
+	cfg->ctx = global;
+	cfg->newlink_cb = wpa_driver_nl80211_event_rtm_newlink;  【1】 newlink回调函数
+	cfg->dellink_cb = wpa_driver_nl80211_event_rtm_dellink;   【2】  delink回调函数
+	global->netlink = netlink_init(cfg);   【3】 初始化 netlink ？ 内部有创建Scoket 
+	if (global->netlink == NULL) {
+		os_free(cfg);
+		goto err;
+	}
+
+	if (wpa_driver_nl80211_init_nl_global(global) < 0) 【4】 全局初始化 nl80211_global
+		goto err;
+
+	global->ioctl_sock = socket(PF_INET, SOCK_DGRAM, 0);  // 创建Socket 【5】
+
+	if (global->ioctl_sock < 0) {  // 如果 socket 创建失败 那么报错   创建Scoket
+		wpa_printf(MSG_ERROR, "nl80211: socket(PF_INET,SOCK_DGRAM) failed: %s", strerror(errno));
+		goto err;
+	}
+
+	return global;   // 返回  nl80211_global
+
+err:
+	nl80211_global_deinit(global);
+	return NULL;
+}
+
+
+
+```
+ 
+<h8>wpa_driver_nl80211_event_rtm_newlink回调 </h8>  
+```
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/drivers/driver_nl80211.c#973
+
+static void wpa_driver_nl80211_event_rtm_newlink(void *ctx,struct ifinfomsg *ifi,u8 *buf, size_t len)
+{
+	struct nl80211_global *global = ctx;
+	struct wpa_driver_nl80211_data *drv;
+	int attrlen;
+	struct rtattr *attr;
+	u32 brid = 0;
+	char namebuf[IFNAMSIZ];
+	char ifname[IFNAMSIZ + 1];
+	char extra[100], *pos, *end;
+	int init_failed;
+
+	extra[0] = '\0';
+	pos = extra;
+	end = pos + sizeof(extra);
+	ifname[0] = '\0';
+
+	attrlen = len;
+	attr = (struct rtattr *) buf;
+	while (RTA_OK(attr, attrlen)) {
+		switch (attr->rta_type) {
+		case IFLA_IFNAME:
+			if (RTA_PAYLOAD(attr) >= IFNAMSIZ)
+				break;
+			os_memcpy(ifname, RTA_DATA(attr), RTA_PAYLOAD(attr));
+			ifname[RTA_PAYLOAD(attr)] = '\0';
+			break;
+		case IFLA_MASTER:
+			brid = nla_get_u32((struct nlattr *) attr);
+			pos += os_snprintf(pos, end - pos, " master=%u", brid);
+			break;
+		case IFLA_WIRELESS:
+			pos += os_snprintf(pos, end - pos, " wext");
+			break;
+		case IFLA_OPERSTATE:
+			pos += os_snprintf(pos, end - pos, " operstate=%u",  nla_get_u32((struct nlattr *) attr));
+			break;
+		case IFLA_LINKMODE:
+			pos += os_snprintf(pos, end - pos, " linkmode=%u",  nla_get_u32((struct nlattr *) attr));
+			break;
+		}
+		attr = RTA_NEXT(attr, attrlen);
+	}
+	extra[sizeof(extra) - 1] = '\0';
+
+	wpa_printf(MSG_DEBUG, "RTM_NEWLINK: ifi_index=%d ifname=%s%s ifi_family=%d ifi_flags=0x%x (%s%s%s%s)",
+		   ifi->ifi_index, ifname, extra, ifi->ifi_family,
+		   ifi->ifi_flags,
+		   (ifi->ifi_flags & IFF_UP) ? "[UP]" : "",
+		   (ifi->ifi_flags & IFF_RUNNING) ? "[RUNNING]" : "",
+		   (ifi->ifi_flags & IFF_LOWER_UP) ? "[LOWER_UP]" : "",
+		   (ifi->ifi_flags & IFF_DORMANT) ? "[DORMANT]" : "");
+
+	drv = nl80211_find_drv(global, ifi->ifi_index, buf, len, &init_failed);   【1】
+	if (!drv)
+		goto event_newlink;  // 如果 drv 为空的话  到event_newlink执行代码
+	if (init_failed)
+		return; /* do not update interface state */
+
+	if (!drv->if_disabled && !(ifi->ifi_flags & IFF_UP)) {
+		namebuf[0] = '\0';
+		if (if_indextoname(ifi->ifi_index, namebuf) && linux_iface_up(drv->global->ioctl_sock, namebuf) > 0) {
+			/* Re-read MAC address as it may have changed */
+			nl80211_refresh_mac(drv, ifi->ifi_index);
+			wpa_printf(MSG_DEBUG, "nl80211: Ignore interface down event since interface %s is up", namebuf);
+			drv->ignore_if_down_event = 0;
+			return;
+		}
+		wpa_printf(MSG_DEBUG, "nl80211: Interface down (%s/%s)",  namebuf, ifname);
+		if (os_strcmp(drv->first_bss->ifname, ifname) != 0) {
+			wpa_printf(MSG_DEBUG,nl80211: Not the main interface (%s) - do not indicate interface down", drv->first_bss->ifname);
+		} else if (drv->ignore_if_down_event) {
+			wpa_printf(MSG_DEBUG, "nl80211: Ignore interface down event generated by mode change");
+			drv->ignore_if_down_event = 0;
+		} else {
+			drv->if_disabled = 1;
+			wpa_supplicant_event(drv->ctx, EVENT_INTERFACE_DISABLED, NULL);  // 发送事件  
+
+			/*
+			 * Try to get drv again, since it may be removed as
+			 * part of the EVENT_INTERFACE_DISABLED handling for
+			 * dynamic interfaces
+			 */
+			drv = nl80211_find_drv(global, ifi->ifi_index, buf, len, NULL);
+			if (!drv)
+				return;
+		}
+	}
+
+	if (drv->if_disabled && (ifi->ifi_flags & IFF_UP)) {
+		if (if_indextoname(ifi->ifi_index, namebuf) &&
+		    linux_iface_up(drv->global->ioctl_sock, namebuf) == 0) {
+			wpa_printf(MSG_DEBUG, "nl80211: Ignore interface up event since interface %s is down",namebuf);
+		} else if (if_nametoindex(drv->first_bss->ifname) == 0) {
+			wpa_printf(MSG_DEBUG, "nl80211: Ignore interface up event since interface %s does not exist", drv->first_bss->ifname);
+		} else if (drv->if_removed) {
+			wpa_printf(MSG_DEBUG, "nl80211: Ignore interface up event since interface %s is marked removed", drv->first_bss->ifname);
+		} else {
+			/* Re-read MAC address as it may have changed */
+			nl80211_refresh_mac(drv, ifi->ifi_index);
+
+			wpa_printf(MSG_DEBUG, "nl80211: Interface up");
+			drv->if_disabled = 0;
+			wpa_supplicant_event(drv->ctx, EVENT_INTERFACE_ENABLED,NULL);  // 发送 EVENT_INTERFACE_ENABLED 事件  【2】
+		}
+	}
+
+	/*
+	 * Some drivers send the association event before the operup event--in
+	 * this case, lifting operstate in wpa_driver_nl80211_set_operstate()
+	 * fails. This will hit us when wpa_supplicant does not need to do
+	 * IEEE 802.1X authentication
+	 */
+	if (drv->operstate == 1 && (ifi->ifi_flags & (IFF_LOWER_UP | IFF_DORMANT)) == IFF_LOWER_UP &&  !(ifi->ifi_flags & IFF_RUNNING)) {
+		wpa_printf(MSG_DEBUG, "nl80211: Set IF_OPER_UP again based on ifi_flags and expected operstate");
+		netlink_send_oper_ifla(drv->global->netlink, drv->ifindex,-1, IF_OPER_UP);
+	}
+
+event_newlink:
+	if (ifname[0])
+         wpa_driver_nl80211_event_newlink(global, drv, ifi->ifi_index,ifname);  【3】
+
+	if (ifi->ifi_family == AF_BRIDGE && brid && drv) {
+		struct i802_bss *bss;
+
+		/* device has been added to bridge */
+		if (!if_indextoname(brid, namebuf)) {
+			wpa_printf(MSG_DEBUG,"nl80211: Could not find bridge ifname for ifindex %u", brid);
+			return;
+		}
+		wpa_printf(MSG_DEBUG, "nl80211: Add ifindex %u for bridge %s",brid, namebuf);
+		add_ifidx(drv, brid, ifi->ifi_index);
+
+		for (bss = drv->first_bss; bss; bss = bss->next) {
+			if (os_strcmp(ifname, bss->ifname) == 0) {
+				os_strlcpy(bss->brname, namebuf, IFNAMSIZ);
+				break;
+			}
+		}
+	}
+}
+
+
+
+```
+
+
+
+<h8>wpa_driver_nl80211_event_rtm_dellink 回调 </h8>  
+```
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/drivers/driver_nl80211.c#1142
+static void wpa_driver_nl80211_event_rtm_dellink(void *ctx,struct ifinfomsg *ifi, u8 *buf, size_t len)
+{
+
+	struct nl80211_global *global = ctx;
+	struct wpa_driver_nl80211_data *drv;
+	int attrlen;
+	struct rtattr *attr;
+	u32 brid = 0;
+	char ifname[IFNAMSIZ + 1];
+	char extra[100], *pos, *end;
+
+	extra[0] = '\0';
+	pos = extra;
+	end = pos + sizeof(extra);
+	ifname[0] = '\0';
+
+	attrlen = len;
+	attr = (struct rtattr *) buf;
+	while (RTA_OK(attr, attrlen)) {
+		switch (attr->rta_type) {
+		case IFLA_IFNAME:
+			if (RTA_PAYLOAD(attr) >= IFNAMSIZ)
+				break;
+			os_memcpy(ifname, RTA_DATA(attr), RTA_PAYLOAD(attr));
+			ifname[RTA_PAYLOAD(attr)] = '\0';
+			break;
+		case IFLA_MASTER:
+			brid = nla_get_u32((struct nlattr *) attr);
+			pos += os_snprintf(pos, end - pos, " master=%u", brid);
+			break;
+		case IFLA_OPERSTATE:
+			pos += os_snprintf(pos, end - pos, " operstate=%u", nla_get_u32((struct nlattr *) attr));
+			break;
+		case IFLA_LINKMODE:
+			pos += os_snprintf(pos, end - pos, " linkmode=%u",  nla_get_u32((struct nlattr *) attr));
+			break;
+		}
+		attr = RTA_NEXT(attr, attrlen);
+	}
+	extra[sizeof(extra) - 1] = '\0';
+
+	wpa_printf(MSG_DEBUG, "RTM_DELLINK: ifi_index=%d ifname=%s%s ifi_family=%d ifi_flags=0x%x (%s%s%s%s)",
+		   ifi->ifi_index, ifname, extra, ifi->ifi_family,
+		   ifi->ifi_flags,
+		   (ifi->ifi_flags & IFF_UP) ? "[UP]" : "",
+		   (ifi->ifi_flags & IFF_RUNNING) ? "[RUNNING]" : "",
+		   (ifi->ifi_flags & IFF_LOWER_UP) ? "[LOWER_UP]" : "",
+		   (ifi->ifi_flags & IFF_DORMANT) ? "[DORMANT]" : "");
+
+	drv = nl80211_find_drv(global, ifi->ifi_index, buf, len, NULL);
+
+	if (ifi->ifi_family == AF_BRIDGE && brid && drv) {
+		/* device has been removed from bridge */
+		char namebuf[IFNAMSIZ];
+
+		if (!if_indextoname(brid, namebuf)) {
+			wpa_printf(MSG_DEBUG,
+				   "nl80211: Could not find bridge ifname for ifindex %u",
+				   brid);
+		} else {
+			wpa_printf(MSG_DEBUG,
+				   "nl80211: Remove ifindex %u for bridge %s",
+				   brid, namebuf);
+		}
+		del_ifidx(drv, brid, ifi->ifi_index);
+	}
+
+	if (ifi->ifi_family != AF_BRIDGE || !brid)
+		wpa_driver_nl80211_event_dellink(global, drv, ifi->ifi_index, ifname);
+}
+
+
+
+```
+
+<h8> netlink_init </h8>  
+
+```
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/drivers/netlink.c#91
+
+struct netlink_data * netlink_init(struct netlink_config *cfg)
+{
+	struct netlink_data *netlink;
+	struct sockaddr_nl local;
+
+	netlink = os_zalloc(sizeof(*netlink));
+	if (netlink == NULL)
+		return NULL;
+
+	netlink->sock = socket(PF_NETLINK, SOCK_RAW, NETLINK_ROUTE);   //  创建Socket  【1】 
+	if (netlink->sock < 0) {
+		wpa_printf(MSG_ERROR, "netlink: Failed to open netlink socket: %s", strerror(errno));
+		netlink_deinit(netlink);
+		return NULL;
+	}
+
+	os_memset(&local, 0, sizeof(local));
+	local.nl_family = AF_NETLINK;
+	local.nl_groups = RTMGRP_LINK;
+	if (bind(netlink->sock, (struct sockaddr *) &local, sizeof(local)) < 0)  【2】
+	{
+		wpa_printf(MSG_ERROR, "netlink: Failed to bind netlink socket: %s", strerror(errno));
+		netlink_deinit(netlink);
+		return NULL;
+	}
+
+	eloop_register_read_sock(netlink->sock, netlink_receive, netlink,NULL);  // 把socket 添加到 eloop中 轮训  已有分析
+
+	netlink->cfg = cfg;   // 配置引用关系
+
+	return netlink;  // 返回  netlink
+}
+
+
+
+```
+
+
+<h8> wpa_driver_nl80211_init_nl_global </h8> 
+```
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/drivers/driver_nl80211.c#1561
+
+
+static int wpa_driver_nl80211_init_nl_global(struct nl80211_global *global)
+{
+	int ret;
+
+	global->nl_cb = nl_cb_alloc(NL_CB_DEFAULT);  //  创建 struct nl_cb * 	nl_cb 
+	if (global->nl_cb == NULL) {
+		wpa_printf(MSG_ERROR, "nl80211: Failed to allocate netlink callbacks");
+		return -1;
+	}
+
+	global->nl = nl_create_handle(global->nl_cb, "nl");   // 创建 struct nl_handle * 	nl 
+	if (global->nl == NULL)
+		goto err;
+
+	global->nl80211_id = genl_ctrl_resolve(global->nl, "nl80211");  // int 	nl80211_id 获取控制句柄
+	if (global->nl80211_id < 0) {
+		wpa_printf(MSG_ERROR, "nl80211: 'nl80211' generic netlink not found");
+		goto err;
+	}
+
+	global->nl_event = nl_create_handle(global->nl_cb, "event");  // 创建 struct nl_handle * 	nl_event 
+	if (global->nl_event == NULL)
+		goto err;
+
+	ret = nl_get_multicast_id(global, "nl80211", "scan");  // 执行扫描? 
+	if (ret >= 0)
+		ret = nl_socket_add_membership(global->nl_event, ret);
+	if (ret < 0) {
+		wpa_printf(MSG_ERROR, "nl80211: Could not add multicast membership for scan events: %d (%s)",  ret, strerror(-ret));
+		goto err;
+	}
+
+//先从 nl80211 模块中获得对应的组播组编号，如"scan"、"mlme"以及"regulatory"组播组的编号 
+	ret = nl_get_multicast_id(global, "nl80211", "mlme");  // 【1】 获取 mlme mac管理服务接口   获取组播编号
+	if (ret >= 0)
+		ret = nl_socket_add_membership(global->nl_event, ret);  //  【2】 //加入某个组播组。这样，当某个组播有消息发送时， nl_event 就能收到了
+	if (ret < 0) {
+		wpa_printf(MSG_ERROR, "nl80211: Could not add multicast membership for mlme events: %d (%s)", ret, strerror(-ret));
+		goto err;
+	}
+
+	ret = nl_get_multicast_id(global, "nl80211", "regulatory");
+	if (ret >= 0)
+		ret = nl_socket_add_membership(global->nl_event, ret);
+	if (ret < 0) {
+		wpa_printf(MSG_DEBUG, "nl80211: Could not add multicast membership for regulatory events: %d (%s)", ret, strerror(-ret));
+		/* Continue without regulatory events */
+	}
+
+	ret = nl_get_multicast_id(global, "nl80211", "vendor");
+	if (ret >= 0)
+		ret = nl_socket_add_membership(global->nl_event, ret);
+	if (ret < 0) {
+		wpa_printf(MSG_DEBUG, "nl80211: Could not add multicast membership for vendor events: %d (%s)", ret, strerror(-ret));
+		/* Continue without vendor events */
+	}
+
+	nl_cb_set(global->nl_cb, NL_CB_SEQ_CHECK, NL_CB_CUSTOM,no_seq_check, NULL);   【3】 	//设置序列号检查函数为 no_seq_check
+	nl_cb_set(global->nl_cb, NL_CB_VALID, NL_CB_CUSTOM,process_global_event, global);  【4】 //设置 netlink 消息回调处理函数
+
+
+//将 nl_event 对应的 socket 注册到 eloop 中，回调函数为 wpa_driver_nl80211_event_receive ，该函数内部将调用 nl_recv_msg ，而 nl_recv_msg 又会调用 process_global_event  ▲
+	nl80211_register_eloop_read(&global->nl_event,wpa_driver_nl80211_event_receive,global->nl_cb); 【5】回调 【已有分析  添加轮训 read的轮训】
+
+	return 0;
+
+err:
+	nl_destroy_handles(&global->nl_event);
+	nl_destroy_handles(&global->nl);
+	nl_cb_put(global->nl_cb);
+	global->nl_cb = NULL;
+	return -1;
+}
+
+
+
+
+```
+
+<h9>nl_get_multicast_id(global, "nl80211", "mlme")</h9>
+```
+//先从 nl80211 模块中获得对应的组播组编号，如"scan"、"mlme"以及"regulatory"组播组的编号 
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/drivers/driver_nl80211.c#428
+
+static int nl_get_multicast_id(struct nl80211_global *global, const char *family, const char *group)
+{
+	struct nl_msg *msg;
+	int ret;
+	struct family_data res = { group, -ENOENT };
+
+	msg = nlmsg_alloc();
+	if (!msg)
+		return -ENOMEM;
+
+	if (!genlmsg_put(msg, 0, 0, genl_ctrl_resolve(global->nl, "nlctrl"), 0, 0, CTRL_CMD_GETFAMILY, 0) ||  nla_put_string(msg, CTRL_ATTR_FAMILY_NAME, family)) {
+		nlmsg_free(msg);
+		return -1;
+	}
+
+	ret = send_and_recv(global, global->nl, msg, family_handler, &res);  // 发送nl_msg消息 并 等待回复 
+	if (ret == 0)
+		ret = res.id;
+	return ret;
+}
+
+
+
+
+```
+<h9>nl_socket_add_membership(global->nl_event, ret) </h9>
+```
+http://androidxref.com/9.0.0_r3/xref/external/libnl/lib/socket.c#448
+基础代码了    绑定到组播?
+//加入某个组播组。这样，当某个组播有消息发送时， nl_event 就能收到了
+
+int nl_socket_add_membership(struct nl_sock *sk, int group)
+{
+	return nl_socket_add_memberships(sk, group, 0);
+}
+
+int nl_socket_add_memberships(struct nl_sock *sk, int group, ...)
+{
+	int err;
+	va_list ap;
+
+	if (sk->s_fd == -1)
+		return -NLE_BAD_SOCK;
+
+	va_start(ap, group);
+
+	while (group != 0) {
+		if (group < 0) {
+			va_end(ap);
+			return -NLE_INVAL;
+		}
+
+		err = setsockopt(sk->s_fd, SOL_NETLINK, NETLINK_ADD_MEMBERSHIP, &group, sizeof(group));
+		if (err < 0) {
+			va_end(ap);
+			return -nl_syserr2nlerr(errno);
+		}
+
+		group = va_arg(ap, int);
+	}
+
+	va_end(ap);
+
+	return 0;
+}
+
+
+
+```
+
+<h9>nl_cb_set(...no_seq_check)</h9>
+```
+http://androidxref.com/9.0.0_r3/xref/external/libnl/lib/handlers.c#293
+//设置序列号检查函数为 no_seq_check
+
+int nl_cb_set(struct nl_cb *cb, enum nl_cb_type type, enum nl_cb_kind kind, nl_recvmsg_msg_cb_t func, void *arg)
+{
+	if (type < 0 || type > NL_CB_TYPE_MAX)
+		return -NLE_RANGE;
+
+	if (kind < 0 || kind > NL_CB_KIND_MAX)
+		return -NLE_RANGE;
+
+	if (kind == NL_CB_CUSTOM) {
+		cb->cb_set[type] = func;
+		cb->cb_args[type] = arg;
+	} else {
+		cb->cb_set[type] = cb_def[type][kind];
+		cb->cb_args[type] = arg;
+	}
+
+	return 0;
+}
+
+
+static int no_seq_check(struct nl_msg *msg, void *arg)
+{
+	return NL_OK;
+}
+
+
+
+
+```
+
+
+<h9>nl_cb_set(..process_global_event, global)</h9>
+```
+ //设置 netlink 消息回调处理函数
+
+
+
+```
+
+
+<h9>wpa_driver_nl80211_event_receive</h9>
+```
+	nl80211_register_eloop_read(&global->nl_event,wpa_driver_nl80211_event_receive,global->nl_cb);   【已有分析  添加轮训 read的轮训】
+
+
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/drivers/driver_nl80211.c#1472
+
+static void wpa_driver_nl80211_event_receive(int sock, void *eloop_ctx, void *handle)
+{
+	struct nl_cb *cb = eloop_ctx;
+	int res;
+
+	wpa_printf(MSG_MSGDUMP, "nl80211: Event message available");
+
+	res = nl_recvmsgs(handle, cb);
+	if (res < 0) {
+		wpa_printf(MSG_INFO, "nl80211: %s->nl_recvmsgs failed: %d",__func__, res);
+	}
+}
+
+
+http://androidxref.com/9.0.0_r3/xref/external/libnl/lib/nl.c#1023
+/**
+ * Receive a set of messages from a netlink socket.
+ * @arg sk		Netlink socket.
+ * @arg cb		set of callbacks to control behaviour.
+ *
+ * Repeatedly calls nl_recv() or the respective replacement if provided
+ * by the application (see nl_cb_overwrite_recv()) and parses the
+ * received data as netlink messages. Stops reading if one of the
+ * callbacks returns NL_STOP or nl_recv returns either 0 or a negative error code.
+ *
+ * A non-blocking sockets causes the function to return immediately if
+ * no data is available.
+ *
+ * @see nl_recvmsgs_report()
+ *
+ * @return 0 on success or a negative error code from nl_recv().
+ */
+
+int nl_recvmsgs(struct nl_sock *sk, struct nl_cb *cb)
+{
+	int err;
+
+	if ((err = nl_recvmsgs_report(sk, cb)) > 0)    //  执行 cb callback?  nl_cb_set(..process_global_event, global)
+		err = 0;
+
+	return err;
+}
+
+
+
+
+
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/drivers/driver_nl80211_event.c#2384
+//将 nl_event 对应的 socket 注册到 eloop 中，回调函数为 wpa_driver_nl80211_event_receive ，该函数内部将调用 nl_recvmsgs ，而 nl_recv_msg 又会调用 process_global_event  ▲
+
+
+
+
+
+int process_global_event(struct nl_msg *msg, void *arg)
+{
+	struct nl80211_global *global = arg;
+	struct genlmsghdr *gnlh = nlmsg_data(nlmsg_hdr(msg));
+	struct nlattr *tb[NL80211_ATTR_MAX + 1];
+	struct wpa_driver_nl80211_data *drv, *tmp;
+	int ifidx = -1;
+	struct i802_bss *bss;
+	u64 wdev_id = 0;
+	int wdev_id_set = 0;
+
+	nla_parse(tb, NL80211_ATTR_MAX, genlmsg_attrdata(gnlh, 0),
+		  genlmsg_attrlen(gnlh, 0), NULL);
+
+	if (tb[NL80211_ATTR_IFINDEX])
+		ifidx = nla_get_u32(tb[NL80211_ATTR_IFINDEX]);
+	else if (tb[NL80211_ATTR_WDEV]) {
+		wdev_id = nla_get_u64(tb[NL80211_ATTR_WDEV]);
+		wdev_id_set = 1;
+	}
+
+	dl_list_for_each_safe(drv, tmp, &global->interfaces, struct wpa_driver_nl80211_data, list) {
+		for (bss = drv->first_bss; bss; bss = bss->next) {
+			if ((ifidx == -1 && !wdev_id_set) ||  ifidx == bss->ifindex || (wdev_id_set && bss->wdev_id_set && wdev_id == bss->wdev_id)) {
+				do_process_drv_event(bss, gnlh->cmd, tb);  //执行 驱动 命令? 
+				return NL_SKIP;
+			}
+		}
+wpa_printf(MSG_DEBUG, "nl80211: Ignored event (cmd=%d) for foreign interface (ifindex %d wdev 0x%llx)", gnlh->cmd, ifidx, (long long unsigned int) wdev_id);
+	}
+
+	return NL_SKIP;
+}
+
+```
+
+<h8> socket(PF_INET, SOCK_DGRAM, 0) </h8> 
+```
+创建socket 
+socket(PF_NETLINK, SOCK_RAW, NETLINK_ROUTE)
+socket(PF_INET, SOCK_DGRAM, 0)
+
+~~~~~~~~~~~~~~~~Begin
+函数说明
+socket()用来建立一个新的socket，也就是向系统注册，通知系统建立一通信端口。参数domain 指定使用何种的地址类型，完整的定义在/usr/include/bits/socket.h 内，底下是常见的协议:
+PF_UNIX/PF_LOCAL/AF_UNIX/AF_LOCAL UNIX 进程通信协议
+PF_INET/AF_INET         Ipv4网络协议
+PF_INET6/AF_INET6 Ipv6 网络协议
+PF_IPX/AF_IPX IPX-Novell协议
+PF_NETLINK/AF_NETLINK 核心用户接口装置
+PF_X25/AF_X25 ITU-T X.25/ISO-8208 协议
+PF_AX25/AF_AX25 业余无线AX.25协议
+PF_ATMPVC/AF_ATMPVC 存取原始ATM PVCs
+PF_APPLETALK/AF_APPLETALK appletalk（DDP）协议
+PF_PACKET/AF_PACKET   初级封包接口
+
+参数
+type有下列几种数值:
+SOCK_STREAM 提供双向连续且可信赖的数据流，即TCP。支持
+OOB 机制，在所有数据传送前必须使用connect()来建立连线状态。
+SOCK_DGRAM 使用不连续不可信赖的数据包连接
+SOCK_SEQPACKET 提供连续可信赖的数据包连接
+SOCK_RAW 提供原始网络协议存取
+SOCK_RDM 提供可信赖的数据包连接
+SOCK_PACKET 提供和网络驱动程序直接通信。
+
+protocol
+用来指定socket所使用的传输协议编号，通常此参考不用管它，设为0即可。
+
+返回值
+成功则返回socket处理代码，失败返回-1。
+~~~~~~~~~~~~~~~~END
+```
+##### wpa_drv_init(wpa_s, wpa_s->ifname)
+```
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/driver_i.h#15
+
+static inline void * wpa_drv_init(struct wpa_supplicant *wpa_s, const char *ifname)
+{
+ // 如果 wpa_driver_ops 中的函数指针 init2  和  init 存在 那么调用这里函数指针
+	if (wpa_s->driver->init2)
+		return wpa_s->driver->init2(wpa_s, ifname, wpa_s->global_drv_priv); 【1】
+
+	if (wpa_s->driver->init) {	
+        return wpa_s->driver->init(wpa_s, ifname);  【2】
+	}
+	return NULL;
+}
+
+
+```
+
+
+######  wpa_s->driver->init2
+```
+wpa_s->driver->init2 == wpa_driver_ops.init2 ==  void *(* 	init2 )(void *ctx, const char *ifname, void *global_priv) 【	Initialize driver interface 】
+
+Returns Pointer to private data, NULL on failure  返回数据接口指针  如果为空 那么执行失败
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/drivers/driver_nl80211.c#10360
+.init2 = wpa_driver_nl80211_init,    【1】
+
+
+```
+<h7> wpa_driver_nl80211_init</h7>
+```
+
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/drivers/driver_nl80211.c#1932
+/**
+ * wpa_driver_nl80211_init - Initialize nl80211 driver interface
+ * @ctx: context to be used when calling wpa_supplicant functions,
+ * e.g., wpa_supplicant_event()
+ * @ifname: interface name, e.g., wlan0
+ * @global_priv: private driver global data from global_init()
+ * Returns: Pointer to private data, %NULL on failure
+ */
+static void * wpa_driver_nl80211_init(void *ctx, const char *ifname, void *global_priv)
+{
+	return wpa_driver_nl80211_drv_init(ctx, ifname, global_priv, 0, NULL,   NULL);
+}
+
+
+
+
+
+
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/drivers/driver_nl80211.c#1845
+static void * wpa_driver_nl80211_drv_init(void *ctx, const char *ifname,void *global_priv, int hostapd,  const u8 *set_addr,  const char *driver_params)
+{
+	struct wpa_driver_nl80211_data *drv;
+	struct i802_bss *bss;
+
+	if (global_priv == NULL)
+		return NULL;
+	drv = os_zalloc(sizeof(*drv));
+	if (drv == NULL)
+		return NULL;
+	drv->global = global_priv;
+	drv->ctx = ctx;
+	drv->hostapd = !!hostapd;
+	drv->eapol_sock = -1;
+
+	/*
+	 * There is no driver capability flag for this, so assume it is
+	 * supported and disable this on first attempt to use if the driver
+	 * rejects the command due to missing support.
+	 */
+	drv->set_rekey_offload = 1;
+
+	drv->num_if_indices = sizeof(drv->default_if_indices) / sizeof(int);
+	drv->if_indices = drv->default_if_indices;
+	drv->if_indices_reason = drv->default_if_indices_reason;
+
+	drv->first_bss = os_zalloc(sizeof(*drv->first_bss));
+	if (!drv->first_bss) {
+		os_free(drv);
+		return NULL;
+	}
+	bss = drv->first_bss;
+	bss->drv = drv;
+	bss->ctx = ctx;
+
+	os_strlcpy(bss->ifname, ifname, sizeof(bss->ifname));  //  字符串复制
+	drv->monitor_ifidx = -1;
+	drv->monitor_sock = -1;
+	drv->eapol_tx_sock = -1;
+	drv->ap_scan_as_station = NL80211_IFTYPE_UNSPECIFIED;
+
+	if (nl80211_init_bss(bss))   【1】初始化i802_bss 
+		goto failed;
+
+	if (wpa_driver_nl80211_finish_drv_init(drv, set_addr, 1, driver_params))  【2】 完成驱动的初始化
+		goto failed;
+
+	drv->eapol_tx_sock = socket(PF_PACKET, SOCK_DGRAM, 0);  //创建Socket
+	if (drv->eapol_tx_sock < 0)
+		goto failed;
+
+	if (drv->data_tx_status) {
+		int enabled = 1;
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~Begin
+定义函数  int setsockopt(int s,int level,int optname,const void * optval,,socklen_toptlen);
+setsockopt()用来设置参数s所指定的socket状态。
+参数level代表欲设置的网络层，一般设成SOL_SOCKET以存取socket层。
+
+参数optname代表欲设置的选项，有下列几种数值:
+SO_DEBUG 打开或关闭排错模式
+SO_REUSEADDR 允许在bind（）过程中本地地址可重复使用
+SO_TYPE 返回socket形态。
+SO_ERROR 返回socket已发生的错误原因
+SO_DONTROUTE 送出的数据包不要利用路由设备来传输。
+SO_BROADCAST 使用广播方式传送
+SO_SNDBUF 设置送出的暂存区大小
+SO_RCVBUF 设置接收的暂存区大小
+SO_KEEPALIVE 定期确定连线是否已终止。
+SO_OOBINLINE 当接收到OOB 数据时会马上送至标准输入设备
+SO_LINGER 确保数据安全且可靠的传送出去。
+
+参数 optval代表欲设置的值
+参数optlen则为optval的长度。
+
+
+返回值  成功则返回0，若有错误则返回-1，错误原因存于errno。
+附加说明
+EBADF 参数s并非合法的socket处理代码
+ENOTSOCK 参数s为一文件描述词，非socket
+ENOPROTOOPT 参数optname指定的选项不正确。
+EFAULT 参数optval指针指向无法存取的内存空间。
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~End
+		if (setsockopt(drv->eapol_tx_sock, SOL_SOCKET, SO_WIFI_STATUS, &enabled, sizeof(enabled)) < 0) {
+			wpa_printf(MSG_DEBUG,"nl80211: wifi status sockopt failed\n");
+			drv->data_tx_status = 0;
+			if (!drv->use_monitor)
+				drv->capa.flags &=	~WPA_DRIVER_FLAGS_EAPOL_TX_STATUS;
+		} else {
+			eloop_register_read_sock(drv->eapol_tx_sock,wpa_driver_nl80211_handle_eapol_tx_status,drv, NULL); // 又添加了 轮训socket
+		}
+	}
+
+	if (drv->global) {
+		nl80211_check_global(drv->global);    【3】 执行nl80211_check_global 
+		dl_list_add(&drv->global->interfaces, &drv->list);   // 又添加了 双向链表 
+		drv->in_interface_list = 1;
+	}
+
+	return bss;
+
+failed:
+	wpa_driver_nl80211_deinit(bss);
+	return NULL;
+}
+
+```
+
+
+<h8>nl80211_init_bss(bss)</h8>
+```
+
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/drivers/driver_nl80211.c#1770
+nl80211_init_bss( i802_bss bss)
+
+
+static int nl80211_init_bss(struct i802_bss *bss)
+{
+	bss->nl_cb = nl_cb_alloc(NL_CB_DEFAULT);   创建回调
+	if (!bss->nl_cb)
+		return -1;
+
+	nl_cb_set(bss->nl_cb, NL_CB_SEQ_CHECK, NL_CB_CUSTOM,  no_seq_check, NULL);  // 设置回调
+	nl_cb_set(bss->nl_cb, NL_CB_VALID, NL_CB_CUSTOM, process_bss_event, bss);  // 【1】 设置回调 process_bss_event  //设置 netlink 消息回调处理函数
+
+	return 0;
+}
+
+```
+<h9> process_bss_event </h9>
+```
+
+int process_bss_event(struct nl_msg *msg, void *arg)
+{
+	struct i802_bss *bss = arg;
+	struct genlmsghdr *gnlh = nlmsg_data(nlmsg_hdr(msg));
+	struct nlattr *tb[NL80211_ATTR_MAX + 1];
+
+	nla_parse(tb, NL80211_ATTR_MAX, genlmsg_attrdata(gnlh, 0),
+		  genlmsg_attrlen(gnlh, 0), NULL);
+
+// 打印 从 BSS 接收到 命令 
+	wpa_printf(MSG_DEBUG, "nl80211: BSS Event %d (%s) received for %s", gnlh->cmd, nl80211_command_to_string(gnlh->cmd),bss->ifname);
+
+	switch (gnlh->cmd) {
+	case NL80211_CMD_FRAME:
+	case NL80211_CMD_FRAME_TX_STATUS:
+		mlme_event(bss, gnlh->cmd, tb[NL80211_ATTR_FRAME],
+			   tb[NL80211_ATTR_MAC], tb[NL80211_ATTR_TIMED_OUT],
+			   tb[NL80211_ATTR_WIPHY_FREQ], tb[NL80211_ATTR_ACK],
+			   tb[NL80211_ATTR_COOKIE],
+			   tb[NL80211_ATTR_RX_SIGNAL_DBM],
+			   tb[NL80211_ATTR_STA_WME]);
+		break;
+	case NL80211_CMD_UNEXPECTED_FRAME:
+		nl80211_spurious_frame(bss, tb, 0);
+		break;
+	case NL80211_CMD_UNEXPECTED_4ADDR_FRAME:
+		nl80211_spurious_frame(bss, tb, 1);
+		break;
+	default:
+		wpa_printf(MSG_DEBUG, "nl80211: Ignored unknown event (cmd=%d)", gnlh->cmd);
+		break;
+	}
+
+	return NL_SKIP;
+}
+
+
+
+```
+<h8> wpa_driver_nl80211_finish_drv_init </h8>
+```
+
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/drivers/driver_nl80211.c#2427
+
+
+static int wpa_driver_nl80211_finish_drv_init(struct wpa_driver_nl80211_data *drv, const u8 *set_addr, int first,const char *driver_params)
+{
+	struct i802_bss *bss = drv->first_bss;
+	int send_rfkill_event = 0;
+	enum nl80211_iftype nlmode;
+
+	drv->ifindex = if_nametoindex(bss->ifname);
+	bss->ifindex = drv->ifindex;
+	bss->wdev_id = drv->global->if_add_wdevid;
+	bss->wdev_id_set = drv->global->if_add_wdevid_set;
+
+	bss->if_dynamic = drv->ifindex == drv->global->if_add_ifindex;
+	bss->if_dynamic = bss->if_dynamic || drv->global->if_add_wdevid_set;
+	drv->global->if_add_wdevid_set = 0;
+
+~~~~~~~~~~~~~~~~~~~~~~~Begin
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/drivers/driver_nl80211.c#568
+static enum nl80211_iftype nl80211_get_ifmode(struct i802_bss *bss)
+{
+	struct nl_msg *msg;
+	struct wiphy_idx_data data = {.nlmode = NL80211_IFTYPE_UNSPECIFIED,	.macaddr = NULL,};
+
+	if (!(msg = nl80211_cmd_msg(bss, 0, NL80211_CMD_GET_INTERFACE))) // 创建消息msg
+		return NL80211_IFTYPE_UNSPECIFIED;
+
+	if (send_and_recv_msgs(bss->drv, msg, netdev_info_handler, &data) == 0)  // 发送消息并等待回复
+		return data.nlmode;
+	return NL80211_IFTYPE_UNSPECIFIED;
+}
+
+http://androidxref.com/9.0.0_r3/xref/external/kernel-headers/original/uapi/linux/nl80211.h#2673
+enum nl80211_iftype {
+	NL80211_IFTYPE_UNSPECIFIED,
+	NL80211_IFTYPE_ADHOC,
+	NL80211_IFTYPE_STATION,   【 STA 类型 】
+	NL80211_IFTYPE_AP,    【 AP类型 】
+	NL80211_IFTYPE_AP_VLAN,
+	NL80211_IFTYPE_WDS,
+	NL80211_IFTYPE_MONITOR,
+	NL80211_IFTYPE_MESH_POINT,
+	NL80211_IFTYPE_P2P_CLIENT,   【 WIFI P2P类型 】
+	NL80211_IFTYPE_P2P_GO,
+	NL80211_IFTYPE_P2P_DEVICE,
+	NL80211_IFTYPE_OCB,
+	NL80211_IFTYPE_NAN,
+
+	/* keep last */
+	NUM_NL80211_IFTYPES,
+	NL80211_IFTYPE_MAX = NUM_NL80211_IFTYPES - 1
+};
+
+~~~~~~~~~~~~~~~~~~~~~~~ENd
+
+	if (!bss->if_dynamic && nl80211_get_ifmode(bss) == NL80211_IFTYPE_AP)  // 获取接口类型
+		bss->static_ap = 1;
+
+	if (first && nl80211_get_ifmode(bss) != NL80211_IFTYPE_P2P_DEVICE &&  linux_iface_up(drv->global->ioctl_sock, bss->ifname) > 0)  【1】
+		drv->start_iface_up = 1;
+
+	if (wpa_driver_nl80211_capa(drv))  【2】
+		return -1;
+
+	if (driver_params && nl80211_set_param(bss, driver_params) < 0) 【3】
+		return -1;
+~~~~~~~~~~~~~~~~~~~~~~~Begin
+ PHY设备  phy3   phy3是具体控制硬件的device设备文件  该文件含有很多可读可写的寄存器
+【PHY是物理接口收发器，它实现物理层 包括MII/GMII（介质独立接口）子层、PCS（物理编码子层）、PMA（物理介质附加）子层、PMD（物理介质相关）子层、MDI子层 】
+
+PHY是IEEE802.3中定义的一个标准模块
+STA（station management entity，管理实体，一般为MAC或CPU）通过SMI（Serial Manage Interface）对PHY的行为、状态进行管理和控制，
+而具体管理和控制动作是通过读写PHY内部的寄存器实现的。！ 【打印   wpa_supplicant: nl80211: interface wlan0 in phy phy3 】
+~~~~~~~~~~~~~~~~~~~~~~~End
+
+	wpa_printf(MSG_DEBUG, "nl80211: interface %s in phy %s",  bss->ifname, drv->phyname);
+
+	if (set_addr &&
+	    (linux_set_iface_flags(drv->global->ioctl_sock, bss->ifname, 0) || linux_set_ifhwaddr(drv->global->ioctl_sock, bss->ifname,set_addr)))
+		return -1;
+
+	if (first && nl80211_get_ifmode(bss) == NL80211_IFTYPE_AP)
+		drv->start_mode_ap = 1;
+
+	if (drv->hostapd || bss->static_ap)
+		nlmode = NL80211_IFTYPE_AP;
+	else if (bss->if_dynamic || nl80211_get_ifmode(bss) == NL80211_IFTYPE_MESH_POINT)
+		nlmode = nl80211_get_ifmode(bss);
+	else
+		nlmode = NL80211_IFTYPE_STATION;
+
+	if (wpa_driver_nl80211_set_mode(bss, nlmode) < 0) {  【4】
+		wpa_printf(MSG_ERROR, "nl80211: Could not configure driver mode");
+		return -1;
+	}
+
+	if (nlmode == NL80211_IFTYPE_P2P_DEVICE)
+		nl80211_get_macaddr(bss);
+
+	wpa_driver_nl80211_drv_init_rfkill(drv); 【5】
+
+	if (!rfkill_is_blocked(drv->rfkill)) {  【6】
+		int ret = i802_set_iface_flags(bss, 1);
+		if (ret) {
+			wpa_printf(MSG_ERROR, "nl80211: Could not set interface '%s' UP", bss->ifname);
+			return ret;
+		}
+
+		if (is_p2p_net_interface(nlmode))
+			nl80211_disable_11b_rates(bss->drv, bss->drv->ifindex, 1);
+
+		if (nlmode == NL80211_IFTYPE_P2P_DEVICE)
+			return ret;
+	} else {
+		wpa_printf(MSG_DEBUG, "nl80211: Could not yet enable interface '%s' due to rfkill", bss->ifname);
+		if (nlmode != NL80211_IFTYPE_P2P_DEVICE)
+			drv->if_disabled = 1;
+
+		send_rfkill_event = 1;
+	}
+
+	if (!drv->hostapd && nlmode != NL80211_IFTYPE_P2P_DEVICE)
+		netlink_send_oper_ifla(drv->global->netlink, drv->ifindex,1, IF_OPER_DORMANT);
+
+	if (nlmode != NL80211_IFTYPE_P2P_DEVICE) {
+		if (linux_get_ifhwaddr(drv->global->ioctl_sock, bss->ifname,bss->addr))   // 获取mac地址
+			return -1;
+		os_memcpy(drv->perm_addr, bss->addr, ETH_ALEN);
+	}
+
+	if (send_rfkill_event) {
+		eloop_register_timeout(0, 0, wpa_driver_nl80211_send_rfkill, drv, drv->ctx);  // 注册 timeout 事件
+	}
+
+	if (drv->vendor_cmd_test_avail)
+		qca_vendor_test(drv);
+
+	return 0;
+}
+
+
+```
+
+<h9> linux_iface_up </h9>
+```
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/drivers/linux_ioctl.c#58
+
+
+int linux_iface_up(int sock, const char *ifname)
+{
+	struct ifreq ifr;
+	int ret;
+
+	if (sock < 0)
+		return -1;
+
+	os_memset(&ifr, 0, sizeof(ifr));
+	os_strlcpy(ifr.ifr_name, ifname, IFNAMSIZ);
+~~~~~~~~~~~~~~~~~~~~Begin
+
+int ioctl(int fd, int cmd, ...) ;
+ioctl 是设备驱动程序中设备控制接口函数，一个字符设备驱动通常会实现设备打开、关闭、读、写等功能，
+在一些需要细分的情境下，如果需要扩展新的功能，通常以增设 ioctl() 命令的方式实现
+
+~~~~~~~~~~~~~~~~~~~~End
+	if (ioctl(sock, SIOCGIFFLAGS 【获取接口标志】, &ifr) != 0) { // ifr_flags成员中返回接口标志  这些标志指示接口是否处于UP即在工状态(IFF_UP),
+		ret = errno ? -errno : -999;
+		wpa_printf(MSG_ERROR, "Could not read interface %s flags: %s", ifname, strerror(errno));
+		return ret;
+	}
+
+	return !!(ifr.ifr_flags & IFF_UP);   // 判断接口是否正常工作?
+}
+
+
+```
+
+<h9> wpa_driver_nl80211_capa(drv) </h9>
+
+```
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/drivers/driver_nl80211_capa.c#1129
+获取驱动传递的能力数据 capability
+
+
+int wpa_driver_nl80211_capa(struct wpa_driver_nl80211_data *drv)
+{
+	struct wiphy_info_data info;
+	if (wpa_driver_nl80211_get_info(drv, &info))  【1】
+		return -1;
+
+	if (info.error)
+		return -1;
+
+	drv->has_capability = 1;
+
+	drv->capa.key_mgmt = WPA_DRIVER_CAPA_KEY_MGMT_WPA |
+		WPA_DRIVER_CAPA_KEY_MGMT_WPA_PSK |
+		WPA_DRIVER_CAPA_KEY_MGMT_WPA2 |
+		WPA_DRIVER_CAPA_KEY_MGMT_WPA2_PSK |
+		WPA_DRIVER_CAPA_KEY_MGMT_SUITE_B |
+		WPA_DRIVER_CAPA_KEY_MGMT_SUITE_B_192 |
+		WPA_DRIVER_CAPA_KEY_MGMT_OWE |
+		WPA_DRIVER_CAPA_KEY_MGMT_DPP;
+
+	if (drv->capa.flags & WPA_DRIVER_FLAGS_SME)
+		drv->capa.key_mgmt |= WPA_DRIVER_CAPA_KEY_MGMT_FILS_SHA256 |
+			WPA_DRIVER_CAPA_KEY_MGMT_FILS_SHA384 |
+			WPA_DRIVER_CAPA_KEY_MGMT_FT_FILS_SHA256 |
+			WPA_DRIVER_CAPA_KEY_MGMT_FT_FILS_SHA384;
+
+	else if (drv->capa.flags & WPA_DRIVER_FLAGS_FILS_SK_OFFLOAD)
+		drv->capa.key_mgmt |= WPA_DRIVER_CAPA_KEY_MGMT_FILS_SHA256 |	WPA_DRIVER_CAPA_KEY_MGMT_FILS_SHA384;
+
+	drv->capa.auth = WPA_DRIVER_AUTH_OPEN |
+		WPA_DRIVER_AUTH_SHARED |
+		WPA_DRIVER_AUTH_LEAP;
+
+	drv->capa.flags |= WPA_DRIVER_FLAGS_SANE_ERROR_CODES;
+	drv->capa.flags |= WPA_DRIVER_FLAGS_SET_KEYS_AFTER_ASSOC_DONE;
+	drv->capa.flags |= WPA_DRIVER_FLAGS_EAPOL_TX_STATUS;
+
+	drv->capa.flags |= WPA_DRIVER_FLAGS_AP_TEARDOWN_SUPPORT;
+
+	if (!info.device_ap_sme) {
+		drv->capa.flags |= WPA_DRIVER_FLAGS_DEAUTH_TX_STATUS;
+		drv->capa.flags |= WPA_DRIVER_FLAGS_AP_MLME;
+	}
+
+	drv->device_ap_sme = info.device_ap_sme;
+	drv->poll_command_supported = info.poll_command_supported;
+	drv->data_tx_status = info.data_tx_status;
+	drv->p2p_go_ctwindow_supported = info.p2p_go_ctwindow_supported;
+	if (info.set_qos_map_supported)
+		drv->capa.flags |= WPA_DRIVER_FLAGS_QOS_MAPPING;
+	drv->have_low_prio_scan = info.have_low_prio_scan;
+
+	/*
+	 * If poll command and tx status are supported, mac80211 is new enough
+	 * to have everything we need to not need monitor interfaces.
+	 */
+	drv->use_monitor = !info.device_ap_sme && (!info.poll_command_supported || !info.data_tx_status);
+
+	if (!drv->use_monitor && !info.data_tx_status)
+		drv->capa.flags &= ~WPA_DRIVER_FLAGS_EAPOL_TX_STATUS;
+return 0;
+}
+
+
+```
+
+```
+wpa_driver_nl80211_get_info 分析
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/drivers/driver_nl80211_capa.c#798
+
+static int wpa_driver_nl80211_get_info(struct wpa_driver_nl80211_data *drv,
+				       struct wiphy_info_data *info)
+{
+	u32 feat;
+	struct nl_msg *msg;
+	int flags = 0;
+
+	os_memset(info, 0, sizeof(*info));
+	info->capa = &drv->capa;
+	info->drv = drv;
+
+	feat = get_nl80211_protocol_features(drv);
+	if (feat & NL80211_PROTOCOL_FEATURE_SPLIT_WIPHY_DUMP)
+		flags = NLM_F_DUMP;
+
+~~~~~~~~~~~~~~~~~~~~~~~~ Begin
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/hostapd/src/drivers/nl80211_copy.h#951   80211 nl_msg可以携带的命令
+继续点
+enum nl80211_commands {
+NL80211_CMD_UNSPEC,                         NL80211_CMD_GET_WIPHY,                      NL80211_CMD_SET_WIPHY,                      NL80211_CMD_NEW_WIPHY,
+NL80211_CMD_DEL_WIPHY,                      NL80211_CMD_GET_INTERFACE,                  NL80211_CMD_SET_INTERFACE,                  NL80211_CMD_NEW_INTERFACE,
+NL80211_CMD_DEL_INTERFACE,                  NL80211_CMD_GET_KEY,                        NL80211_CMD_SET_KEY,                        NL80211_CMD_NEW_KEY,
+NL80211_CMD_DEL_KEY,                        NL80211_CMD_GET_BEACON,                     NL80211_CMD_SET_BEACON,                     NL80211_CMD_START_AP,
+NL80211_CMD_NEW_BEACON                      NL80211_CMD_STOP_AP,                        NL80211_CMD_DEL_BEACON                      NL80211_CMD_GET_STATION,
+NL80211_CMD_SET_STATION,                    NL80211_CMD_NEW_STATION,                    NL80211_CMD_DEL_STATION,                    NL80211_CMD_GET_MPATH,
+NL80211_CMD_SET_MPATH,                      NL80211_CMD_NEW_MPATH,                      NL80211_CMD_DEL_MPATH,                      NL80211_CMD_SET_BSS,
+NL80211_CMD_SET_REG,                        NL80211_CMD_REQ_SET_REG,                    NL80211_CMD_GET_MESH_CONFIG,                NL80211_CMD_SET_MESH_CONFIG,
+NL80211_CMD_SET_MGMT_EXTRA_IE               NL80211_CMD_GET_REG,                        NL80211_CMD_GET_SCAN,                       NL80211_CMD_TRIGGER_SCAN,
+NL80211_CMD_NEW_SCAN_RESULTS,               NL80211_CMD_SCAN_ABORTED,                   NL80211_CMD_REG_CHANGE,                     NL80211_CMD_AUTHENTICATE,
+NL80211_CMD_ASSOCIATE,                      NL80211_CMD_DEAUTHENTICATE,                 NL80211_CMD_DISASSOCIATE,                   NL80211_CMD_MICHAEL_MIC_FAILURE,
+NL80211_CMD_REG_BEACON_HINT,                NL80211_CMD_JOIN_IBSS,                      NL80211_CMD_LEAVE_IBSS,                     NL80211_CMD_TESTMODE,
+NL80211_CMD_CONNECT,                        NL80211_CMD_ROAM,                           NL80211_CMD_DISCONNECT,                     NL80211_CMD_SET_WIPHY_NETNS,
+NL80211_CMD_GET_SURVEY,                     NL80211_CMD_NEW_SURVEY_RESULTS,             NL80211_CMD_SET_PMKSA,                      NL80211_CMD_DEL_PMKSA,
+NL80211_CMD_FLUSH_PMKSA,                    NL80211_CMD_REMAIN_ON_CHANNEL,              NL80211_CMD_CANCEL_REMAIN_ON_CHANNEL,       NL80211_CMD_SET_TX_BITRATE_MASK,
+NL80211_CMD_REGISTER_FRAME,                 NL80211_CMD_REGISTER_ACTION                 NL80211_CMD_FRAME,                          NL80211_CMD_ACTION
+NL80211_CMD_FRAME_TX_STATUS,                NL80211_CMD_ACTION_TX_STATUS                NL80211_CMD_SET_POWER_SAVE,                 NL80211_CMD_GET_POWER_SAVE,
+NL80211_CMD_SET_CQM,                        NL80211_CMD_NOTIFY_CQM,                     NL80211_CMD_SET_CHANNEL,                    NL80211_CMD_SET_WDS_PEER,
+NL80211_CMD_FRAME_WAIT_CANCEL,              NL80211_CMD_JOIN_MESH,                      NL80211_CMD_LEAVE_MESH,                     NL80211_CMD_UNPROT_DEAUTHENTICATE,
+NL80211_CMD_UNPROT_DISASSOCIATE,            NL80211_CMD_NEW_PEER_CANDIDATE,             NL80211_CMD_GET_WOWLAN,                     NL80211_CMD_SET_WOWLAN,
+NL80211_CMD_START_SCHED_SCAN,               NL80211_CMD_STOP_SCHED_SCAN,                NL80211_CMD_SCHED_SCAN_RESULTS,             NL80211_CMD_SCHED_SCAN_STOPPED,
+NL80211_CMD_SET_REKEY_OFFLOAD,              NL80211_CMD_PMKSA_CANDIDATE,                NL80211_CMD_TDLS_OPER,                      NL80211_CMD_TDLS_MGMT,
+NL80211_CMD_UNEXPECTED_FRAME,               NL80211_CMD_PROBE_CLIENT,                   NL80211_CMD_REGISTER_BEACONS,               NL80211_CMD_UNEXPECTED_4ADDR_FRAME,
+NL80211_CMD_SET_NOACK_MAP,                  NL80211_CMD_CH_SWITCH_NOTIFY,               NL80211_CMD_START_P2P_DEVICE,               NL80211_CMD_STOP_P2P_DEVICE,
+NL80211_CMD_CONN_FAILED,                    NL80211_CMD_SET_MCAST_RATE,                 NL80211_CMD_SET_MAC_ACL,                    NL80211_CMD_RADAR_DETECT,
+NL80211_CMD_GET_PROTOCOL_FEATURES,          NL80211_CMD_UPDATE_FT_IES,                  NL80211_CMD_FT_EVENT,                       NL80211_CMD_CRIT_PROTOCOL_START,
+NL80211_CMD_CRIT_PROTOCOL_STOP,             NL80211_CMD_GET_COALESCE,                   NL80211_CMD_SET_COALESCE,                   NL80211_CMD_CHANNEL_SWITCH,
+NL80211_CMD_VENDOR,                         NL80211_CMD_SET_QOS_MAP,                    NL80211_CMD_ADD_TX_TS,                      NL80211_CMD_DEL_TX_TS,
+NL80211_CMD_GET_MPP,                        NL80211_CMD_JOIN_OCB,                       NL80211_CMD_LEAVE_OCB,                      NL80211_CMD_CH_SWITCH_STARTED_NOTIFY,
+NL80211_CMD_TDLS_CHANNEL_SWITCH,            NL80211_CMD_TDLS_CANCEL_CHANNEL_SWITCH,     NL80211_CMD_WIPHY_REG_CHANGE,               NL80211_CMD_ABORT_SCAN,
+NL80211_CMD_START_NAN,                      NL80211_CMD_STOP_NAN,                       NL80211_CMD_ADD_NAN_FUNCTION,               NL80211_CMD_DEL_NAN_FUNCTION,
+NL80211_CMD_CHANGE_NAN_CONFIG,              NL80211_CMD_NAN_MATCH,                      NL80211_CMD_SET_MULTICAST_TO_UNICAST,       NL80211_CMD_UPDATE_CONNECT_PARAMS,
+__NL80211_CMD_AFTER_LAST,                   NL80211_CMD_MAX 
+
+
+
+enum nl80211_attrs {   80211 消息命令可携带属性
+NL80211_ATTR_UNSPEC,                             NL80211_ATTR_WIPHY,                              NL80211_ATTR_WIPHY_NAME,                         NL80211_ATTR_IFINDEX,
+NL80211_ATTR_IFNAME,                             NL80211_ATTR_IFTYPE,                             NL80211_ATTR_MAC,                                NL80211_ATTR_KEY_DATA,
+NL80211_ATTR_KEY_IDX,                            NL80211_ATTR_KEY_CIPHER,                         NL80211_ATTR_KEY_SEQ,                            NL80211_ATTR_KEY_DEFAULT,
+NL80211_ATTR_BEACON_INTERVAL,                    NL80211_ATTR_DTIM_PERIOD,                        NL80211_ATTR_BEACON_HEAD,                        NL80211_ATTR_BEACON_TAIL,
+NL80211_ATTR_STA_AID,                            NL80211_ATTR_STA_FLAGS,                          NL80211_ATTR_STA_LISTEN_INTERVAL,                NL80211_ATTR_STA_SUPPORTED_RATES,
+NL80211_ATTR_STA_VLAN,                           NL80211_ATTR_STA_INFO,                           NL80211_ATTR_WIPHY_BANDS,                        NL80211_ATTR_MNTR_FLAGS,
+NL80211_ATTR_MESH_ID,                            NL80211_ATTR_STA_PLINK_ACTION,                   NL80211_ATTR_MPATH_NEXT_HOP,                     NL80211_ATTR_MPATH_INFO,
+NL80211_ATTR_BSS_CTS_PROT,                       NL80211_ATTR_BSS_SHORT_PREAMBLE,                 NL80211_ATTR_BSS_SHORT_SLOT_TIME,                NL80211_ATTR_HT_CAPABILITY,
+NL80211_ATTR_SUPPORTED_IFTYPES,                  NL80211_ATTR_REG_ALPHA2,                         NL80211_ATTR_REG_RULES,                          NL80211_ATTR_MESH_CONFIG,
+NL80211_ATTR_BSS_BASIC_RATES,                    NL80211_ATTR_WIPHY_TXQ_PARAMS,                   NL80211_ATTR_WIPHY_FREQ,                         NL80211_ATTR_WIPHY_CHANNEL_TYPE,
+NL80211_ATTR_KEY_DEFAULT_MGMT,                   NL80211_ATTR_MGMT_SUBTYPE,                       NL80211_ATTR_IE,                                 NL80211_ATTR_MAX_NUM_SCAN_SSIDS,
+NL80211_ATTR_SCAN_FREQUENCIES,                   NL80211_ATTR_SCAN_SSIDS,                         NL80211_ATTR_GENERATION,                         NL80211_ATTR_BSS,
+NL80211_ATTR_REG_INITIATOR,                      NL80211_ATTR_REG_TYPE,                           NL80211_ATTR_SUPPORTED_COMMANDS,                 NL80211_ATTR_FRAME,
+NL80211_ATTR_SSID,                               NL80211_ATTR_AUTH_TYPE,                          NL80211_ATTR_REASON_CODE,                        NL80211_ATTR_KEY_TYPE,
+NL80211_ATTR_MAX_SCAN_IE_LEN,                    NL80211_ATTR_CIPHER_SUITES,                      NL80211_ATTR_FREQ_BEFORE,                        NL80211_ATTR_FREQ_AFTER,
+NL80211_ATTR_FREQ_FIXED,                         NL80211_ATTR_WIPHY_RETRY_SHORT,                  NL80211_ATTR_WIPHY_RETRY_LONG,                   NL80211_ATTR_WIPHY_FRAG_THRESHOLD,
+NL80211_ATTR_WIPHY_RTS_THRESHOLD,                NL80211_ATTR_TIMED_OUT,                          NL80211_ATTR_USE_MFP,                            NL80211_ATTR_STA_FLAGS2,
+NL80211_ATTR_CONTROL_PORT,                       NL80211_ATTR_TESTDATA,                           NL80211_ATTR_PRIVACY,                            NL80211_ATTR_DISCONNECTED_BY_AP,
+NL80211_ATTR_STATUS_CODE,                        NL80211_ATTR_CIPHER_SUITES_PAIRWISE,             NL80211_ATTR_CIPHER_SUITE_GROUP,                 NL80211_ATTR_WPA_VERSIONS,
+NL80211_ATTR_AKM_SUITES,                         NL80211_ATTR_REQ_IE,                             NL80211_ATTR_RESP_IE,                            NL80211_ATTR_PREV_BSSID,
+NL80211_ATTR_KEY,                                NL80211_ATTR_KEYS,                               NL80211_ATTR_PID,                                NL80211_ATTR_4ADDR,
+NL80211_ATTR_SURVEY_INFO,                        NL80211_ATTR_PMKID,                              NL80211_ATTR_MAX_NUM_PMKIDS,                     NL80211_ATTR_DURATION,
+NL80211_ATTR_COOKIE,                             NL80211_ATTR_WIPHY_COVERAGE_CLASS,               NL80211_ATTR_TX_RATES,                           NL80211_ATTR_FRAME_MATCH,
+NL80211_ATTR_ACK,                                NL80211_ATTR_PS_STATE,                           NL80211_ATTR_CQM,                                NL80211_ATTR_LOCAL_STATE_CHANGE,
+NL80211_ATTR_AP_ISOLATE,                         NL80211_ATTR_WIPHY_TX_POWER_SETTING,             NL80211_ATTR_WIPHY_TX_POWER_LEVEL,               NL80211_ATTR_TX_FRAME_TYPES,
+NL80211_ATTR_RX_FRAME_TYPES,                     NL80211_ATTR_FRAME_TYPE,                         NL80211_ATTR_CONTROL_PORT_ETHERTYPE,             NL80211_ATTR_CONTROL_PORT_NO_ENCRYPT,
+NL80211_ATTR_SUPPORT_IBSS_RSN,                   NL80211_ATTR_WIPHY_ANTENNA_TX,                   NL80211_ATTR_WIPHY_ANTENNA_RX,                   NL80211_ATTR_MCAST_RATE,
+NL80211_ATTR_OFFCHANNEL_TX_OK,                   NL80211_ATTR_BSS_HT_OPMODE,                      NL80211_ATTR_KEY_DEFAULT_TYPES,                  NL80211_ATTR_MAX_REMAIN_ON_CHANNEL_DURATION,
+NL80211_ATTR_MESH_SETUP,                         NL80211_ATTR_WIPHY_ANTENNA_AVAIL_TX,             NL80211_ATTR_WIPHY_ANTENNA_AVAIL_RX,             NL80211_ATTR_SUPPORT_MESH_AUTH,
+NL80211_ATTR_STA_PLINK_STATE,                    NL80211_ATTR_WOWLAN_TRIGGERS,                    NL80211_ATTR_WOWLAN_TRIGGERS_SUPPORTED,          NL80211_ATTR_SCHED_SCAN_INTERVAL,
+NL80211_ATTR_INTERFACE_COMBINATIONS,             NL80211_ATTR_SOFTWARE_IFTYPES,                   NL80211_ATTR_REKEY_DATA,                         NL80211_ATTR_MAX_NUM_SCHED_SCAN_SSIDS,
+NL80211_ATTR_MAX_SCHED_SCAN_IE_LEN,              NL80211_ATTR_SCAN_SUPP_RATES,                    NL80211_ATTR_HIDDEN_SSID,                        NL80211_ATTR_IE_PROBE_RESP,
+NL80211_ATTR_IE_ASSOC_RESP,                      NL80211_ATTR_STA_WME,                            NL80211_ATTR_SUPPORT_AP_UAPSD,                   NL80211_ATTR_ROAM_SUPPORT,
+NL80211_ATTR_SCHED_SCAN_MATCH,                   NL80211_ATTR_MAX_MATCH_SETS,                     NL80211_ATTR_PMKSA_CANDIDATE,                    NL80211_ATTR_TX_NO_CCK_RATE,
+NL80211_ATTR_TDLS_ACTION,                        NL80211_ATTR_TDLS_DIALOG_TOKEN,                  NL80211_ATTR_TDLS_OPERATION,                     NL80211_ATTR_TDLS_SUPPORT,
+NL80211_ATTR_TDLS_EXTERNAL_SETUP,                NL80211_ATTR_DEVICE_AP_SME,                      NL80211_ATTR_DONT_WAIT_FOR_ACK,                  NL80211_ATTR_FEATURE_FLAGS,
+NL80211_ATTR_PROBE_RESP_OFFLOAD,                 NL80211_ATTR_PROBE_RESP,                         NL80211_ATTR_DFS_REGION,                         NL80211_ATTR_DISABLE_HT,
+NL80211_ATTR_HT_CAPABILITY_MASK,                 NL80211_ATTR_NOACK_MAP,                          NL80211_ATTR_INACTIVITY_TIMEOUT,                 NL80211_ATTR_RX_SIGNAL_DBM,
+NL80211_ATTR_BG_SCAN_PERIOD,                     NL80211_ATTR_WDEV,                               NL80211_ATTR_USER_REG_HINT_TYPE,                 NL80211_ATTR_CONN_FAILED_REASON,
+NL80211_ATTR_AUTH_DATA,                          NL80211_ATTR_VHT_CAPABILITY,                     NL80211_ATTR_SCAN_FLAGS,                         NL80211_ATTR_CHANNEL_WIDTH,
+NL80211_ATTR_CENTER_FREQ1,                       NL80211_ATTR_CENTER_FREQ2,                       NL80211_ATTR_P2P_CTWINDOW,                       NL80211_ATTR_P2P_OPPPS,
+NL80211_ATTR_LOCAL_MESH_POWER_MODE,              NL80211_ATTR_ACL_POLICY,                         NL80211_ATTR_MAC_ADDRS,                          NL80211_ATTR_MAC_ACL_MAX,
+NL80211_ATTR_RADAR_EVENT,                        NL80211_ATTR_EXT_CAPA,                           NL80211_ATTR_EXT_CAPA_MASK,                      NL80211_ATTR_STA_CAPABILITY,
+NL80211_ATTR_STA_EXT_CAPABILITY,                 NL80211_ATTR_PROTOCOL_FEATURES,                  NL80211_ATTR_SPLIT_WIPHY_DUMP,                   NL80211_ATTR_DISABLE_VHT,
+NL80211_ATTR_VHT_CAPABILITY_MASK,                NL80211_ATTR_MDID,                               NL80211_ATTR_IE_RIC,                             NL80211_ATTR_CRIT_PROT_ID,
+NL80211_ATTR_MAX_CRIT_PROT_DURATION,             NL80211_ATTR_PEER_AID,                           NL80211_ATTR_COALESCE_RULE,                      NL80211_ATTR_CH_SWITCH_COUNT,
+NL80211_ATTR_CH_SWITCH_BLOCK_TX,                 NL80211_ATTR_CSA_IES,                            NL80211_ATTR_CSA_C_OFF_BEACON,                   NL80211_ATTR_CSA_C_OFF_PRESP,
+NL80211_ATTR_RXMGMT_FLAGS,                       NL80211_ATTR_STA_SUPPORTED_CHANNELS,             NL80211_ATTR_STA_SUPPORTED_OPER_CLASSES,         NL80211_ATTR_HANDLE_DFS,
+NL80211_ATTR_SUPPORT_5_MHZ,                      NL80211_ATTR_SUPPORT_10_MHZ,                     NL80211_ATTR_OPMODE_NOTIF,                       NL80211_ATTR_VENDOR_ID,
+NL80211_ATTR_VENDOR_SUBCMD,                      NL80211_ATTR_VENDOR_DATA,                        NL80211_ATTR_VENDOR_EVENTS,                      NL80211_ATTR_QOS_MAP,
+NL80211_ATTR_MAC_HINT,                           NL80211_ATTR_WIPHY_FREQ_HINT,                    NL80211_ATTR_MAX_AP_ASSOC_STA,                   NL80211_ATTR_TDLS_PEER_CAPABILITY,
+NL80211_ATTR_SOCKET_OWNER,                       NL80211_ATTR_CSA_C_OFFSETS_TX,                   NL80211_ATTR_MAX_CSA_COUNTERS,                   NL80211_ATTR_TDLS_INITIATOR,
+NL80211_ATTR_USE_RRM,                            NL80211_ATTR_WIPHY_DYN_ACK,                      NL80211_ATTR_TSID,                               NL80211_ATTR_USER_PRIO,
+NL80211_ATTR_ADMITTED_TIME,                      NL80211_ATTR_SMPS_MODE,                          NL80211_ATTR_OPER_CLASS,                         NL80211_ATTR_MAC_MASK,
+NL80211_ATTR_WIPHY_SELF_MANAGED_REG,             NL80211_ATTR_EXT_FEATURES,                       NL80211_ATTR_SURVEY_RADIO_STATS,                 NL80211_ATTR_NETNS_FD,
+NL80211_ATTR_SCHED_SCAN_DELAY,                   NL80211_ATTR_REG_INDOOR,                         NL80211_ATTR_MAX_NUM_SCHED_SCAN_PLANS,           NL80211_ATTR_MAX_SCAN_PLAN_INTERVAL,
+NL80211_ATTR_MAX_SCAN_PLAN_ITERATIONS,           NL80211_ATTR_SCHED_SCAN_PLANS,                   NL80211_ATTR_PBSS,                               NL80211_ATTR_BSS_SELECT,
+NL80211_ATTR_STA_SUPPORT_P2P_PS,                 NL80211_ATTR_PAD,                                NL80211_ATTR_IFTYPE_EXT_CAPA,                    NL80211_ATTR_MU_MIMO_GROUP_DATA,
+NL80211_ATTR_MU_MIMO_FOLLOW_MAC_ADDR,            NL80211_ATTR_SCAN_START_TIME_TSF,                NL80211_ATTR_SCAN_START_TIME_TSF_BSSID,          NL80211_ATTR_MEASUREMENT_DURATION,
+NL80211_ATTR_MEASUREMENT_DURATION_MANDATORY,     NL80211_ATTR_MESH_PEER_AID,                      NL80211_ATTR_NAN_MASTER_PREF,                    NL80211_ATTR_BANDS,
+NL80211_ATTR_NAN_FUNC,                           NL80211_ATTR_NAN_MATCH,                          NL80211_ATTR_FILS_KEK,                           NL80211_ATTR_FILS_NONCES,
+NL80211_ATTR_MULTICAST_TO_UNICAST_ENABLED,       NL80211_ATTR_BSSID,                              NL80211_ATTR_SCHED_SCAN_RELATIVE_RSSI,           NL80211_ATTR_SCHED_SCAN_RSSI_ADJUST,
+NL80211_ATTR_TIMEOUT_REASON,                     NL80211_ATTR_FILS_ERP_USERNAME,                  NL80211_ATTR_FILS_ERP_REALM,                     NL80211_ATTR_FILS_ERP_NEXT_SEQ_NUM,
+NL80211_ATTR_FILS_ERP_RRK,                       NL80211_ATTR_FILS_CACHE_ID,                      NL80211_ATTR_PMK,                                __NL80211_ATTR_AFTER_LAST,
+NUM_NL80211_ATTR =                               NL80211_ATTR_MAX =                               };
+
+
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~ End
+	msg = nl80211_cmd_msg(drv->first_bss, flags, NL80211_CMD_GET_WIPHY);  // 创建 nl_msg msg携带的命令是 NL80211_CMD_GET_WIPHY
+	if (!msg || nla_put_flag(msg, NL80211_ATTR_SPLIT_WIPHY_DUMP)) { //  消息携带标识  NL80211_ATTR_SPLIT_WIPHY_DUMP
+		nlmsg_free(msg);
+		return -1;
+	}
+
+	if (send_and_recv_msgs(drv, msg, wiphy_info_handler, info))  // 发送消息等待回复 
+		return -1;
+
+	if (info->auth_supported)
+		drv->capa.flags |= WPA_DRIVER_FLAGS_SME;
+	else if (!info->connect_supported) {
+		wpa_printf(MSG_INFO, "nl80211: Driver does not support authentication/association or connect commands");
+		info->error = 1;
+	}
+
+	if (info->p2p_go_supported && info->p2p_client_supported)
+		drv->capa.flags |= WPA_DRIVER_FLAGS_P2P_CAPABLE;
+	if (info->p2p_concurrent) {
+		wpa_printf(MSG_DEBUG, "nl80211: Use separate P2P group interface (driver advertised support)");
+		drv->capa.flags |= WPA_DRIVER_FLAGS_P2P_CONCURRENT;
+		drv->capa.flags |= WPA_DRIVER_FLAGS_P2P_MGMT_AND_NON_P2P;
+	}
+	if (info->num_multichan_concurrent > 1) {
+		wpa_printf(MSG_DEBUG, "nl80211: Enable multi-channel concurrent (driver advertised support)");
+		drv->capa.num_multichan_concurrent =info->num_multichan_concurrent;
+	}
+	if (drv->capa.flags & WPA_DRIVER_FLAGS_DEDICATED_P2P_DEVICE)
+		wpa_printf(MSG_DEBUG, "nl80211: use P2P_DEVICE support");
+
+	/* default to 5000 since early versions of mac80211 don't set it */
+	if (!drv->capa.max_remain_on_chan)
+		drv->capa.max_remain_on_chan = 5000;
+
+	drv->capa.wmm_ac_supported = info->wmm_ac_supported;
+
+	drv->capa.mac_addr_rand_sched_scan_supported =info->mac_addr_rand_sched_scan_supported;
+	drv->capa.mac_addr_rand_scan_supported = info->mac_addr_rand_scan_supported;
+
+	if (info->channel_switch_supported) {
+		drv->capa.flags |= WPA_DRIVER_FLAGS_AP_CSA;
+		if (!drv->capa.max_csa_counters)
+			drv->capa.max_csa_counters = 1;
+	}
+
+	if (!drv->capa.max_sched_scan_plans) {
+		drv->capa.max_sched_scan_plans = 1;
+		drv->capa.max_sched_scan_plan_interval = UINT32_MAX;
+		drv->capa.max_sched_scan_plan_iterations = 0;
+	}
+
+	return 0;
+}
+
+```
+
+<h9> nl80211_set_param(bss, driver_params)</h9>
+```
+
 继续点
 
 ```
+<h9> wpa_driver_nl80211_set_mode </h9>
+<h9> wpa_driver_nl80211_drv_init_rfkill(drv)</h9>
+<h9> rfkill_is_blocked(drv->rfkill) </h9>
+
+
+<h8> nl80211_check_global </h8>
+
+
+
+######  wpa_s->driver->init
+```
+wpa_s->driver->init == wpa_driver_ops::init ==  void *(* 	init )(void *ctx, const char *ifname, void *global_priv) 【Initialize driver interface. 】
+
+Returns Pointer to private data, NULL on failure  返回数据接口指针  如果为空 那么执行失败
+
+```
+
+
+##### wpa_drv_set_param(wpa_s, wpa_s->conf->driver_param) 
+
+##### wpa_drv_get_ifname(wpa_s)
+##### wpa_driver_get_radio_name(wpa_s)
+##### radio_add_interface(wpa_s, rn)
+
+
+
+
+
+
+
+
 #### wpa_supplicant_init_wpa(wpa_s)
 #### wpa_sm_set_ifname
 #### wpa_sm_set_fast_reauth
