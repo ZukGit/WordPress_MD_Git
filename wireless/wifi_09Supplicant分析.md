@@ -6585,7 +6585,6 @@ static int wpa_driver_nl80211_get_info(struct wpa_driver_nl80211_data *drv,
 
 ~~~~~~~~~~~~~~~~~~~~~~~~ Begin
 http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/hostapd/src/drivers/nl80211_copy.h#951   80211 nl_msg可以携带的命令
-继续点
 enum nl80211_commands {
 NL80211_CMD_UNSPEC,                         NL80211_CMD_GET_WIPHY,                      NL80211_CMD_SET_WIPHY,                      NL80211_CMD_NEW_WIPHY,
 NL80211_CMD_DEL_WIPHY,                      NL80211_CMD_GET_INTERFACE,                  NL80211_CMD_SET_INTERFACE,                  NL80211_CMD_NEW_INTERFACE,
@@ -6623,7 +6622,7 @@ __NL80211_CMD_AFTER_LAST,                   NL80211_CMD_MAX
 
 
 
-enum nl80211_attrs {   80211 消息命令可携带属性
+enum nl80211_attrs {   80211消息命令可携带属性
 NL80211_ATTR_UNSPEC,                             NL80211_ATTR_WIPHY,                              NL80211_ATTR_WIPHY_NAME,                         NL80211_ATTR_IFINDEX,
 NL80211_ATTR_IFNAME,                             NL80211_ATTR_IFTYPE,                             NL80211_ATTR_MAC,                                NL80211_ATTR_KEY_DATA,
 NL80211_ATTR_KEY_IDX,                            NL80211_ATTR_KEY_CIPHER,                         NL80211_ATTR_KEY_SEQ,                            NL80211_ATTR_KEY_DEFAULT,
@@ -6753,15 +6752,507 @@ NUM_NL80211_ATTR =                               NL80211_ATTR_MAX =             
 <h9> nl80211_set_param(bss, driver_params)</h9>
 ```
 
-继续点
+
+
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/drivers/driver_nl80211.c#7444
+
+static int nl80211_set_param(void *priv, const char *param)
+{
+	struct i802_bss *bss = priv;
+	struct wpa_driver_nl80211_data *drv = bss->drv;
+
+	if (param == NULL)
+		return 0;
+	wpa_printf(MSG_DEBUG, "nl80211: driver param='%s'", param);
+
+	if (os_strstr(param, "use_p2p_group_interface=1")) { // os_strstr 找出str2字符串在str1字符串中第一次出现的位置 
+		wpa_printf(MSG_DEBUG, "nl80211: Use separate P2P group interface");
+		drv->capa.flags |= WPA_DRIVER_FLAGS_P2P_CONCURRENT;
+		drv->capa.flags |= WPA_DRIVER_FLAGS_P2P_MGMT_AND_NON_P2P;
+	}
+
+
+	if (os_strstr(param, "use_monitor=1"))
+		drv->use_monitor = 1;
+
+	if (os_strstr(param, "force_connect_cmd=1")) {
+		drv->capa.flags &= ~WPA_DRIVER_FLAGS_SME;
+		drv->force_connect_cmd = 1;
+	}
+
+	if (os_strstr(param, "force_bss_selection=1"))
+		drv->capa.flags |= WPA_DRIVER_FLAGS_BSS_SELECTION;
+
+	if (os_strstr(param, "no_offchannel_tx=1")) {
+		drv->capa.flags &= ~WPA_DRIVER_FLAGS_OFFCHANNEL_TX;
+		drv->test_use_roc_tx = 1;
+	}
+
+	return 0;
+}
+
 
 ```
 <h9> wpa_driver_nl80211_set_mode </h9>
-<h9> wpa_driver_nl80211_drv_init_rfkill(drv)</h9>
-<h9> rfkill_is_blocked(drv->rfkill) </h9>
+```
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/drivers/driver_nl80211.c#5703
 
+
+int wpa_driver_nl80211_set_mode(struct i802_bss *bss, enum nl80211_iftype nlmode)
+{
+	return wpa_driver_nl80211_set_mode_impl(bss, nlmode, NULL);
+}
+
+
+
+
+
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/drivers/driver_nl80211.c#5703
+static int wpa_driver_nl80211_set_mode_impl(struct i802_bss *bss,enum nl80211_iftype nlmode,struct hostapd_freq_params *desired_freq_params)
+{
+	struct wpa_driver_nl80211_data *drv = bss->drv;
+	int ret = -1;
+	int i;
+	int was_ap = is_ap_interface(drv->nlmode);
+	int res;
+	int mode_switch_res;
+
+	if (TEST_FAIL())
+		return -1;
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~ Begin
+
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/drivers/driver_nl80211.c#nl80211_set_mode  # nl80211_set_mode
+static int nl80211_set_mode(struct wpa_driver_nl80211_data *drv,int ifindex, enum nl80211_iftype mode)
+{
+	struct nl_msg *msg;
+	int ret = -ENOBUFS;
+
+	wpa_printf(MSG_DEBUG, "nl80211: Set mode ifindex %d iftype %d (%s)",ifindex, mode, nl80211_iftype_str(mode));
+
+	msg = nl80211_cmd_msg(drv->first_bss, 0, NL80211_CMD_SET_INTERFACE);  
+	if (!msg || nla_put_u32(msg, NL80211_ATTR_IFTYPE, mode))   // 设置消息包含类型属性 NL80211_ATTR_IFTYPE 
+		goto fail;
+
+	ret = send_and_recv_msgs(drv, msg, NULL, NULL); // 发送消息等待回复  
+	msg = NULL;
+	if (!ret)
+		return 0;
+fail:
+	nlmsg_free(msg);
+	wpa_printf(MSG_DEBUG, "nl80211: Failed to set interface %d to mode %d: %d (%s)", ifindex, mode, ret, strerror(-ret));
+	return ret;
+}
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ End
+	mode_switch_res = nl80211_set_mode(drv, drv->ifindex, nlmode);  // 设置模式
+	if (mode_switch_res && nlmode == nl80211_get_ifmode(bss))
+		mode_switch_res = 0;
+
+	if (mode_switch_res == 0) {
+		drv->nlmode = nlmode;
+		ret = 0;
+		goto done;
+	}
+
+	if (mode_switch_res == -ENODEV)
+		return -1;
+
+	if (nlmode == drv->nlmode) {
+		wpa_printf(MSG_DEBUG, "nl80211: Interface already in requested mode - ignore error");
+		ret = 0;
+		goto done; /* Already in the requested mode */
+	}
+
+	/* mac80211 doesn't allow mode changes while the device is up, so
+	 * take the device down, try to set the mode again, and bring the
+	 * device back up.
+	 */
+	wpa_printf(MSG_DEBUG, "nl80211: Try mode change after setting interface down");
+	for (i = 0; i < 10; i++) {
+		res = i802_set_iface_flags(bss, 0);
+		if (res == -EACCES || res == -ENODEV)
+			break;
+		if (res != 0) {
+			wpa_printf(MSG_DEBUG, "nl80211: Failed to set interface down");
+			os_sleep(0, 100000);
+			continue;
+		}
+
+		/*
+		 * Setting the mode will fail for some drivers if the phy is
+		 * on a frequency that the mode is disallowed in.
+		 */
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Begin
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/drivers/driver_nl80211.c#4150
+
+static int nl80211_set_channel(struct i802_bss *bss,struct hostapd_freq_params *freq, int set_chan)
+{
+	struct wpa_driver_nl80211_data *drv = bss->drv;
+	struct nl_msg *msg;
+	int ret;
+
+	wpa_printf(MSG_DEBUG,"nl80211: Set freq %d (ht_enabled=%d, vht_enabled=%d, bandwidth=%d MHz, cf1=%d MHz, cf2=%d MHz)",
+		   freq->freq, freq->ht_enabled, freq->vht_enabled,freq->bandwidth, freq->center_freq1, freq->center_freq2);
+
+	msg = nl80211_drv_msg(drv, 0, set_chan ? NL80211_CMD_SET_CHANNEL :NL80211_CMD_SET_WIPHY);
+	if (!msg || nl80211_put_freq_params(msg, freq) < 0) {
+		nlmsg_free(msg);
+		return -1;
+	}
+
+	ret = send_and_recv_msgs(drv, msg, NULL, NULL);  // 发送消息等待回复 
+	if (ret == 0) {
+		bss->freq = freq->freq;
+		return 0;
+	}
+	wpa_printf(MSG_DEBUG, "nl80211: Failed to set channel (freq=%d): %d (%s)", freq->freq, ret, strerror(-ret));
+	return -1;
+}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ End
+
+		if (desired_freq_params【null】) {
+			res = nl80211_set_channel(bss, desired_freq_params, 0); // 设置工作信息道
+			if (res) {
+				wpa_printf(MSG_DEBUG, "nl80211: Failed to set frequency on interface");
+			}
+		}
+
+		/* Try to set the mode again while the interface is down */
+		mode_switch_res = nl80211_set_mode(drv, drv->ifindex, nlmode);
+		if (mode_switch_res == -EBUSY) {
+			wpa_printf(MSG_DEBUG,"nl80211: Delaying mode set while interface going down");
+			os_sleep(0, 100000);
+			continue;
+		}
+		ret = mode_switch_res;
+		break;
+	}
+
+	if (!ret) {
+		wpa_printf(MSG_DEBUG, "nl80211: Mode change succeeded while interface is down");
+		drv->nlmode = nlmode;
+		drv->ignore_if_down_event = 1;
+	}
+
+	/* Bring the interface back up */
+	res = linux_set_iface_flags(drv->global->ioctl_sock, bss->ifname, 1);
+	if (res != 0) {
+		wpa_printf(MSG_DEBUG,nl80211: Failed to set interface up after switching mode");
+		ret = -1;
+	}
+
+done:
+	if (ret) {
+		wpa_printf(MSG_DEBUG, "nl80211: Interface mode change to %d from %d failed", nlmode, drv->nlmode);
+		return ret;
+	}
+
+	if (is_p2p_net_interface(nlmode)) {
+		wpa_printf(MSG_DEBUG,"nl80211: Interface %s mode change to P2P - disable 11b rates",bss->ifname);
+		nl80211_disable_11b_rates(drv, drv->ifindex, 1);
+	} else if (drv->disabled_11b_rates) {
+		wpa_printf(MSG_DEBUG,"nl80211: Interface %s mode changed to non-P2P - re-enable 11b rates", bss->ifname);
+		nl80211_disable_11b_rates(drv, drv->ifindex, 0);
+	}
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Begin
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/drivers/driver_nl80211.c#2308
+static void nl80211_mgmt_unsubscribe(struct i802_bss *bss, const char *reason)
+{
+	if (bss->nl_mgmt == NULL)
+		return;
+	wpa_printf(MSG_DEBUG, "nl80211: Unsubscribe mgmt frames handle %p (%s)", bss->nl_mgmt, reason);
+	nl80211_destroy_eloop_handle(&bss->nl_mgmt);
+
+	nl80211_put_wiphy_data_ap(bss);
+}
+
+
+static void nl80211_destroy_eloop_handle(struct nl_handle **handle)
+{
+	*handle = (void *) (((intptr_t) *handle) ^ ELOOP_SOCKET_INVALID);
+	eloop_unregister_read_sock(nl_socket_get_fd(*handle));
+	nl_destroy_handles(handle);
+}
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ End
+
+
+	if (is_ap_interface(nlmode)) {
+		nl80211_mgmt_unsubscribe(bss, "start AP");
+		/* Setup additional AP mode functionality if needed */
+		if (nl80211_setup_ap(bss))
+			return -1;
+	} else if (was_ap) {
+		/* Remove additional AP mode functionality */
+		nl80211_teardown_ap(bss);
+	} else {
+		nl80211_mgmt_unsubscribe(bss, "mode change");
+	}
+
+	if (is_mesh_interface(nlmode) &&  nl80211_mgmt_subscribe_mesh(bss))
+		return -1;
+
+	if (!bss->in_deinit && !is_ap_interface(nlmode) &&  !is_mesh_interface(nlmode) && nl80211_mgmt_subscribe_non_ap(bss) < 0)
+		wpa_printf(MSG_DEBUG, "nl80211: Failed to register Action frame processing - ignore for now");
+
+	return 0;
+}
+
+
+
+
+```
+
+
+<h9> wpa_driver_nl80211_drv_init_rfkill(drv)</h9>
+```
+
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/drivers/driver_nl80211.c#1792
+
+static void wpa_driver_nl80211_drv_init_rfkill(struct wpa_driver_nl80211_data *drv)
+{
+	struct rfkill_config *rcfg;   // radiofreq 无线频谱管理 rfkill 用于节能 管理无线设备
+
+	if (drv->rfkill)  // 如果有这个值有那么退出 没有则往下创建 wpa_driver_nl80211_data->rfkill 【rfkill_config】
+		return;
+
+	rcfg = os_zalloc(sizeof(*rcfg));
+	if (!rcfg)
+		return;
+
+	rcfg->ctx = drv;
+
+	/* rfkill uses netdev sysfs for initialization. However, P2P Device is
+	 * not associated with a netdev, so use the name of some other interface
+	 * sharing the same wiphy as the P2P Device interface.
+	 *
+	 * Note: This is valid, as a P2P Device interface is always dynamically
+	 * created and is created only once another wpa_s interface was added.
+	 */
+	if (drv->nlmode == NL80211_IFTYPE_P2P_DEVICE) {
+		struct nl80211_global *global = drv->global;
+		struct wpa_driver_nl80211_data *tmp1;
+
+		dl_list_for_each(tmp1, &global->interfaces,struct wpa_driver_nl80211_data, list) {  // 双向链表遍历
+			if (drv == tmp1 || drv->wiphy_idx != tmp1->wiphy_idx ||    !tmp1->rfkill)
+				continue;
+
+			wpa_printf(MSG_DEBUG,"nl80211: Use (%s) to initialize P2P Device rfkill",tmp1->first_bss->ifname);
+			os_strlcpy(rcfg->ifname, tmp1->first_bss->ifname, sizeof(rcfg->ifname));   //  字符串复制
+			break;
+		}
+	} else {
+		os_strlcpy(rcfg->ifname, drv->first_bss->ifname, sizeof(rcfg->ifname));   //  字符串复制
+	}
+
+	rcfg->blocked_cb = wpa_driver_nl80211_rfkill_blocked;
+	rcfg->unblocked_cb = wpa_driver_nl80211_rfkill_unblocked;
+	drv->rfkill = rfkill_init(rcfg);  【1】
+	if (!drv->rfkill) {
+		wpa_printf(MSG_DEBUG, "nl80211: RFKILL status not available");
+		os_free(rcfg);
+	}
+}
+
+
+
+
+```
+
+```
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/drivers/rfkill.c#103
+struct rfkill_data * rfkill_init(struct rfkill_config *cfg)
+{
+	struct rfkill_data *rfkill;
+	struct rfkill_event event;
+	ssize_t len;
+	char *phy = NULL, *rfk_phy;
+	char buf[24 + IFNAMSIZ + 1];
+	char buf2[31 + 11 + 1];
+	int found = 0;
+
+	rfkill = os_zalloc(sizeof(*rfkill));
+	if (rfkill == NULL)
+		return NULL;
+
+//  /sys/class/net/wlan0/phy80211里有这个说明驱动安装成功  它是驱动安装成功的标识?     wifi打开时 它有   wifi关闭时  phy1 递增到 phyxxx   
+//  打开飞行模式   /sys/class/net/wlan0/ 路径被卸载了     重启后 /sys/class/net/wlan0/     ls -l | grep phy  看得到   phy1   还原了    热点打开关闭也会使得 phy增加
+
+
+	os_snprintf(buf, sizeof(buf), "/sys/class/net/%s/phy80211",cfg->ifname);     // 按照format的格式拷贝字符串 /sys/class/net/wlan0/phy80211
+	phy = realpath(buf, NULL);
+	if (!phy) {
+		wpa_printf(MSG_INFO, "rfkill: Cannot get wiphy information");
+		goto fail;
+	}
+
+	rfkill->cfg = cfg;
+	rfkill->fd = open("/dev/rfkill", O_RDONLY);  // 拿到    /dev/rfkill 句柄 
+	if (rfkill->fd < 0) {
+		wpa_printf(MSG_INFO, "rfkill: Cannot open RFKILL control device");
+		goto fail;
+	}
+
+	if (fcntl(rfkill->fd, F_SETFL, O_NONBLOCK) < 0) {
+		wpa_printf(MSG_ERROR, "rfkill: Cannot set non-blocking mode: %s", strerror(errno));
+		goto fail2;
+	}
+
+	for (;;) {
+		len = read(rfkill->fd, &event, sizeof(event));
+		if (len < 0) {
+			if (errno == EAGAIN)
+				break; /* No more entries */
+			wpa_printf(MSG_ERROR, "rfkill: Event read failed: %s",
+				   strerror(errno));
+			break;
+		}
+		if (len != RFKILL_EVENT_SIZE_V1) {
+			wpa_printf(MSG_DEBUG, "rfkill: Unexpected event size "
+				   "%d (expected %d)",
+				   (int) len, RFKILL_EVENT_SIZE_V1);
+			continue;
+		}
+		if (event.op != RFKILL_OP_ADD ||
+		    event.type != RFKILL_TYPE_WLAN)
+			continue;
+ 
+		os_snprintf(buf2, sizeof(buf2),"/sys/class/rfkill/rfkill%d/device", event.idx); // 按照format的格式拷贝字符串 /sys/class/net/wlan0/phy80211
+		rfk_phy = realpath(buf2, NULL);
+		if (!rfk_phy)
+			goto fail2;
+		found = os_strcmp(phy, rfk_phy) == 0;
+		free(rfk_phy);
+
+		if (!found)
+			continue;
+
+		wpa_printf(MSG_DEBUG, "rfkill: initial event: idx=%u type=%d op=%u soft=%u hard=%u",  event.idx, event.type, event.op, event.soft,   event.hard);
+
+		rfkill->idx = event.idx;
+		if (event.hard) {
+			wpa_printf(MSG_INFO, "rfkill: WLAN hard blocked");
+			rfkill->blocked = 1;
+		} else if (event.soft) {
+			wpa_printf(MSG_INFO, "rfkill: WLAN soft blocked");
+			rfkill->blocked = 1;
+		}
+		break;   //  跳出循环
+	}
+
+	if (!found)
+		goto fail2;
+
+	free(phy);
+	eloop_register_read_sock(rfkill->fd, rfkill_receive, rfkill, NULL);  //注册读取的 eloop_register_read_sock
+
+	return rfkill;
+
+fail2:
+	close(rfkill->fd);
+fail:
+	os_free(rfkill);
+	/* use standard free function to match realpath() */
+	free(phy);
+	return NULL;
+}
+
+
+
+
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/drivers/rfkill.c#103
+static void rfkill_receive(int sock, void *eloop_ctx, void *sock_ctx)   // 监听到 rfKill 的消息
+{
+	struct rfkill_data *rfkill = eloop_ctx;
+	struct rfkill_event event;
+	ssize_t len;
+	int new_blocked;
+
+	len = read(rfkill->fd, &event, sizeof(event));
+	if (len < 0) {
+		wpa_printf(MSG_ERROR, "rfkill: Event read failed: %s",strerror(errno));
+		return;
+	}
+	if (len != RFKILL_EVENT_SIZE_V1) {
+		wpa_printf(MSG_DEBUG, "rfkill: Unexpected event size %d (expected %d)", (int) len, RFKILL_EVENT_SIZE_V1);
+		return;
+	}
+	if (event.op != RFKILL_OP_CHANGE || event.idx != rfkill->idx)
+		return;
+
+	wpa_printf(MSG_DEBUG, "rfkill: event: idx=%u type=%d op=%u soft=%u hard=%u", event.idx, event.type, event.op, event.soft, event.hard);
+
+	if (event.hard) {
+		wpa_printf(MSG_INFO, "rfkill: WLAN hard blocked");
+		new_blocked = 1;
+	} else if (event.soft) {
+		wpa_printf(MSG_INFO, "rfkill: WLAN soft blocked");
+		new_blocked = 1;
+	} else {
+		wpa_printf(MSG_INFO, "rfkill: WLAN unblocked");
+		new_blocked = 0;
+	}
+
+	if (new_blocked != rfkill->blocked) {
+		rfkill->blocked = new_blocked;
+		if (new_blocked)
+			rfkill->cfg->blocked_cb(rfkill->cfg->ctx);
+		else
+			rfkill->cfg->unblocked_cb(rfkill->cfg->ctx);
+	}
+}
+
+
+```
+
+<h9> rfkill_is_blocked(drv->rfkill) </h9>
+```
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/drivers/rfkill.c#218
+int rfkill_is_blocked(struct rfkill_data *rfkill)
+{
+	if (rfkill == NULL)
+		return 0;
+
+	return rfkill->blocked;
+}
+
+
+```
 
 <h8> nl80211_check_global </h8>
+```
+
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/drivers/driver_nl80211.c#1647
+static void nl80211_check_global(struct nl80211_global *global)
+{
+	struct nl_handle *handle;
+	const char *groups[] = { "scan", "mlme", "regulatory", "vendor", NULL };
+	int ret;
+	unsigned int i;
+
+	/*
+	 * Try to re-add memberships to handle case of cfg80211 getting reloaded
+	 * and all registration having been cleared.
+	 */
+	handle = (void *) (((intptr_t) global->nl_event) ^  ELOOP_SOCKET_INVALID);
+
+	for (i = 0; groups[i]; i++) {
+		ret = nl_get_multicast_id(global, "nl80211", groups[i]);  // 再次加入组播  确保都加入了组播内 
+		if (ret >= 0)
+			ret = nl_socket_add_membership(handle, ret);
+		if (ret < 0) {
+			wpa_printf(MSG_INFO, "nl80211: Could not re-add multicast membership for %s events: %d (%s)",groups[i], ret, strerror(-ret));
+		}
+	}
+}
+
+
+```
 
 
 
@@ -6769,16 +7260,336 @@ NUM_NL80211_ATTR =                               NL80211_ATTR_MAX =             
 ```
 wpa_s->driver->init == wpa_driver_ops::init ==  void *(* 	init )(void *ctx, const char *ifname, void *global_priv) 【Initialize driver interface. 】
 
-Returns Pointer to private data, NULL on failure  返回数据接口指针  如果为空 那么执行失败
+Returns Pointer to private data, NULL on failure  返回数据接口指针  如果为空 那么执行失败    没看到具体的实现方法 略过
+
+
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/drivers/driver_privsep.c#821
+struct wpa_driver_ops wpa_driver_privsep_ops = {
+	.init = wpa_driver_privsep_init,
+	.deinit = wpa_driver_privsep_deinit,
+	.set_param = wpa_driver_privsep_set_param,
+
+};
+
+
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/drivers/driver_privsep.c#596
+static void * wpa_driver_privsep_init(void *ctx, const char *ifname)
+{
+	struct wpa_driver_privsep_data *drv;
+
+	drv = os_zalloc(sizeof(*drv));
+	if (drv == NULL)
+		return NULL;
+	drv->ctx = ctx;
+	drv->priv_socket = -1;
+	drv->cmd_socket = -1;
+	os_strlcpy(drv->ifname, ifname, sizeof(drv->ifname));
+
+	return drv;
+}
 
 ```
 
 
 ##### wpa_drv_set_param(wpa_s, wpa_s->conf->driver_param) 
+```
 
+
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/driver_i.h#33
+
+static inline int wpa_drv_set_param(struct wpa_supplicant *wpa_s,const char *param)
+{
+	if (wpa_s->driver->set_param)
+		return wpa_s->driver->set_param(wpa_s->drv_priv, param);
+	return 0;
+}
+
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/drivers/driver.h#2197
+struct wpa_driver_ops {
+	int (*set_param)(void *priv, const char *param);
+}
+
+
+
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/drivers/driver_privsep.c#821
+struct wpa_driver_ops wpa_driver_privsep_ops = {
+	.set_param = wpa_driver_privsep_set_param,
+
+};
+
+
+
+
+
+
+static int wpa_driver_privsep_set_param(void *priv, const char *param)
+{
+	struct wpa_driver_privsep_data *drv = priv;
+	const char *pos;
+	char *own_dir, *priv_dir;
+	static unsigned int counter = 0;
+	size_t len;
+	struct sockaddr_un addr;
+
+	wpa_printf(MSG_DEBUG, "%s: param='%s'", __func__, param);
+	if (param == NULL)
+		pos = NULL;
+	else
+		pos = os_strstr(param, "own_dir=");
+	if (pos) {
+		char *end;
+		own_dir = os_strdup(pos + 8);
+		if (own_dir == NULL)
+			return -1;
+		end = os_strchr(own_dir, ' ');
+		if (end)
+			*end = '\0';
+	} else {
+		own_dir = os_strdup("/tmp");
+		if (own_dir == NULL)
+			return -1;
+	}
+
+	if (param == NULL)
+		pos = NULL;
+	else
+		pos = os_strstr(param, "priv_dir=");
+	if (pos) {
+		char *end;
+		priv_dir = os_strdup(pos + 9);
+		if (priv_dir == NULL) {
+			os_free(own_dir);
+			return -1;
+		}
+		end = os_strchr(priv_dir, ' ');
+		if (end)
+			*end = '\0';
+	} else {
+		priv_dir = os_strdup("/var/run/wpa_priv");
+		if (priv_dir == NULL) {
+			os_free(own_dir);
+			return -1;
+		}
+	}
+
+	len = os_strlen(own_dir) + 50;
+	drv->own_socket_path = os_malloc(len);
+	if (drv->own_socket_path == NULL) {
+		os_free(priv_dir);
+		os_free(own_dir);
+		return -1;
+	}
+	os_snprintf(drv->own_socket_path, len, "%s/wpa_privsep-%d-%d",own_dir, getpid(), counter++);  // 按照format的格式拷贝字符串 /sys/class/net/wlan0/phy80211
+
+	len = os_strlen(own_dir) + 50;
+	drv->own_cmd_path = os_malloc(len);
+	if (drv->own_cmd_path == NULL) {
+		os_free(drv->own_socket_path);
+		drv->own_socket_path = NULL;
+		os_free(priv_dir);
+		os_free(own_dir);
+		return -1;
+	}
+	os_snprintf(drv->own_cmd_path, len, "%s/wpa_privsep-%d-%d",own_dir, getpid(), counter++);  // 按照format的格式拷贝字符串 /sys/class/net/wlan0/phy80211
+
+	os_free(own_dir);
+
+	drv->priv_addr.sun_family = AF_UNIX;
+	os_snprintf(drv->priv_addr.sun_path, sizeof(drv->priv_addr.sun_path),  "%s/%s", priv_dir, drv->ifname); // 按照format的格式拷贝字符串 /sys/class/net/wlan0/phy80211
+	os_free(priv_dir);
+
+	drv->priv_socket = socket(PF_UNIX, SOCK_DGRAM, 0);    //创建Socket  
+	if (drv->priv_socket < 0) {
+		wpa_printf(MSG_ERROR, "socket(PF_UNIX): %s", strerror(errno));
+		os_free(drv->own_socket_path);
+		drv->own_socket_path = NULL;
+		return -1;
+	}
+
+	os_memset(&addr, 0, sizeof(addr));
+	addr.sun_family = AF_UNIX;
+	os_strlcpy(addr.sun_path, drv->own_socket_path, sizeof(addr.sun_path));
+~~~~~~~~~~~~~~~~~~~~~~~~~~begin
+定义函数      int bind(int sockfd,struct sockaddr * my_addr,int addrlen);
+函数说明      bind()用来设置给参数sockfd的socket一个名称。此名称由参数my_addr指向一sockaddr结构，对于不同的socket domain定义了一个通用的数据结构
+返回值        成功则返回0，失败返回-1，错误原因存于errno中。
+
+函数说明
+bind()用来设置给参数sockfd的socket一个名称。
+此名称由参数my_addr指向一sockaddr结构，对于不同的socket domain定义了一个通用的数据结构
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~end
+
+	if (bind(drv->priv_socket, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
+		wpa_printf(MSG_ERROR,"privsep-set-params priv-sock: bind(PF_UNIX): %s",strerror(errno));
+		close(drv->priv_socket);
+		drv->priv_socket = -1;
+		unlink(drv->own_socket_path);
+		os_free(drv->own_socket_path);
+		drv->own_socket_path = NULL;
+		return -1;
+	}
+
+	eloop_register_read_sock(drv->priv_socket, wpa_driver_privsep_receive, drv, NULL);   注册 eloop 轮训的 socket地址
+
+	drv->cmd_socket = socket(PF_UNIX, SOCK_DGRAM, 0); //创建Socket  
+	if (drv->cmd_socket < 0) {
+		wpa_printf(MSG_ERROR, "socket(PF_UNIX): %s", strerror(errno));
+		os_free(drv->own_cmd_path);
+		drv->own_cmd_path = NULL;
+		return -1;
+	}
+
+	os_memset(&addr, 0, sizeof(addr));
+	addr.sun_family = AF_UNIX;
+	os_strlcpy(addr.sun_path, drv->own_cmd_path, sizeof(addr.sun_path));
+	if (bind(drv->cmd_socket, (struct sockaddr *) &addr, sizeof(addr)) < 0)
+	{
+		wpa_printf(MSG_ERROR,"privsep-set-params cmd-sock: bind(PF_UNIX): %s",strerror(errno));
+		close(drv->cmd_socket);
+		drv->cmd_socket = -1;
+		unlink(drv->own_cmd_path);
+		os_free(drv->own_cmd_path);
+		drv->own_cmd_path = NULL;
+		return -1;
+	}
+
+	if (wpa_priv_reg_cmd(drv, PRIVSEP_CMD_REGISTER) < 0) {
+		wpa_printf(MSG_ERROR, "Failed to register with wpa_priv");
+		return -1;
+	}
+
+	return 0;
+}
+
+
+
+static int wpa_priv_reg_cmd(struct wpa_driver_privsep_data *drv, int cmd)
+{
+	int res;
+
+	res = sendto(drv->priv_socket, &cmd, sizeof(cmd), 0, (struct sockaddr *) &drv->priv_addr,   sizeof(drv->priv_addr));  // 给 socket 发送数据?
+	if (res < 0)
+		wpa_printf(MSG_ERROR, "sendto: %s", strerror(errno));
+	return res < 0 ? -1 : 0;
+}
+
+
+
+
+```
 ##### wpa_drv_get_ifname(wpa_s)
+```
+
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/driver_i.h#233
+
+
+static inline const char * wpa_drv_get_ifname(struct wpa_supplicant *wpa_s)
+{
+	if (wpa_s->driver->get_ifname) {
+		return wpa_s->driver->get_ifname(wpa_s->drv_priv);
+	}
+	return NULL;
+}
+
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/drivers/driver.h#2333
+
+struct wpa_driver_ops {
+......
+const char * (*get_ifname)(void *priv);
+......
+}
+
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/drivers/driver_ndis.c#3208
+
+wpa_driver_ndis_ops.get_ifname = wpa_driver_ndis_get_ifname;
+ .get_ifname = wpa_driver_roboswitch_get_ifname,
+.get_ifname = wpa_driver_roboswitch_get_ifname,   感觉都不像 nl80211 实现的 get_ifname的方法
+
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/drivers/driver_nl80211.c#10344
+const struct wpa_driver_ops wpa_driver_nl80211_ops = {  没有定义 get_ifname 这个变量?
+
+const struct wpa_driver_ops wpa_driver_nl80211_ops = {
+	.name = "nl80211",
+	.desc = "Linux nl80211/cfg80211",
+	.get_bssid = wpa_driver_nl80211_get_bssid,
+	.get_ssid = wpa_driver_nl80211_get_ssid,
+	.set_key = driver_nl80211_set_key,
+	.scan2 = driver_nl80211_scan2,
+	.init2 = wpa_driver_nl80211_init,
+.......
+
+}
+
+
+```
 ##### wpa_driver_get_radio_name(wpa_s)
+```
+
+static inline const char * wpa_driver_get_radio_name(struct wpa_supplicant *wpa_s)
+{
+	if (wpa_s->driver->get_radio_name)
+		return wpa_s->driver->get_radio_name(wpa_s->drv_priv);
+
+	return NULL;
+}
+
+
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/drivers/driver_nl80211.c#10405
+const struct wpa_driver_ops wpa_driver_nl80211_ops = {
+.....
+	.get_radio_name = nl80211_get_radio_name,
+.....
+}
+
+
+
+static const char * nl80211_get_radio_name(void *priv)
+{
+	struct i802_bss *bss = priv;
+	struct wpa_driver_nl80211_data *drv = bss->drv;
+	return drv->phyname;   //  返回 无线phy1  名称
+}
+
+
+
+```
+
 ##### radio_add_interface(wpa_s, rn)
+```
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/wpa_supplicant.c#4660
+
+static struct wpa_radio * radio_add_interface(struct wpa_supplicant *wpa_s,const char *rn)
+{
+	struct wpa_supplicant *iface = wpa_s->global->ifaces;
+	struct wpa_radio *radio;
+
+	while (rn && iface) {
+		radio = iface->radio;
+		if (radio && os_strcmp(rn, radio->name) == 0) {
+			wpa_printf(MSG_DEBUG, "Add interface %s to existing radio %s",wpa_s->ifname, rn);
+			dl_list_add(&radio->ifaces, &wpa_s->radio_list);  // 往 双向链表  添加 Item 
+			return radio;
+		}
+
+		iface = iface->next;
+	}
+
+	wpa_printf(MSG_DEBUG, "Add interface %s to a new radio %s",  wpa_s->ifname, rn ? rn : "N/A");
+	radio = os_zalloc(sizeof(*radio));
+	if (radio == NULL)
+		return NULL;
+
+	if (rn)
+		os_strlcpy(radio->name, rn, sizeof(radio->name)); // 字符串复制
+	dl_list_init(&radio->ifaces);  //  双向链表初始化
+	dl_list_init(&radio->work);   //  双向链表初始化
+	dl_list_add(&radio->ifaces, &wpa_s->radio_list); // 往 双向链表  添加 Item 
+
+	return radio;
+}
+
+```
 
 
 
@@ -6788,13 +7599,742 @@ Returns Pointer to private data, NULL on failure  返回数据接口指针  如�
 
 
 #### wpa_supplicant_init_wpa(wpa_s)
+```
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/wpas_glue.c#1187
+
+
+int wpa_supplicant_init_wpa(struct wpa_supplicant *wpa_s)
+{
+
+	struct wpa_sm_ctx *ctx;
+	ctx = os_zalloc(sizeof(*ctx));   // 创建wpa_sm_ctx 
+	if (ctx == NULL) {
+		wpa_printf(MSG_ERROR, "Failed to allocate WPA context.");
+		return -1;
+	}
+
+~~~~~~~~~~~~~~~~~~~~~~~~Begin
+
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/rsn_supp/wpa.h#22
+struct wpa_sm_ctx {  // 包含很多指针函数
+	void *ctx; /* pointer to arbitrary upper level context */
+	void *msg_ctx; /* upper level context for wpa_msg() calls */
+	void (*set_state)(void *ctx, enum wpa_states state);
+	enum wpa_states (*get_state)(void *ctx);
+	void (*deauthenticate)(void * ctx, int reason_code);
+	int (*set_key)(void *ctx, enum wpa_alg alg, const u8 *addr, int key_idx, int set_tx,const u8 *seq, size_t seq_len, const u8 *key, size_t key_len);
+	void * (*get_network_ctx)(void *ctx);
+    int (*get_beacon_ie)(void *ctx);
+
+~~~~~~~~~~~~~~~~~~~~~~~~End
+
+
+        // 初始化wpa_sm_ctx  各种指针函数
+	ctx->ctx = wpa_s;
+	ctx->msg_ctx = wpa_s;
+	ctx->set_state = _wpa_supplicant_set_state;
+	ctx->get_state = _wpa_supplicant_get_state;
+	ctx->deauthenticate = _wpa_supplicant_deauthenticate;
+	ctx->set_key = wpa_supplicant_set_key;
+	ctx->get_network_ctx = wpa_supplicant_get_network_ctx;
+	ctx->get_bssid = wpa_supplicant_get_bssid;
+	ctx->ether_send = _wpa_ether_send;
+	ctx->get_beacon_ie = wpa_supplicant_get_beacon_ie;
+	ctx->alloc_eapol = _wpa_alloc_eapol;
+	ctx->cancel_auth_timeout = _wpa_supplicant_cancel_auth_timeout;
+	ctx->add_pmkid = wpa_supplicant_add_pmkid;
+	ctx->remove_pmkid = wpa_supplicant_remove_pmkid;
+	ctx->set_config_blob = wpa_supplicant_set_config_blob;
+	ctx->get_config_blob = wpa_supplicant_get_config_blob;
+
+	ctx->mlme_setprotection = wpa_supplicant_mlme_setprotection;
+	ctx->update_ft_ies = wpa_supplicant_update_ft_ies;
+	ctx->send_ft_action = wpa_supplicant_send_ft_action;
+	ctx->mark_authenticated = wpa_supplicant_mark_authenticated;
+
+	ctx->tdls_get_capa = wpa_supplicant_tdls_get_capa;
+	ctx->send_tdls_mgmt = wpa_supplicant_send_tdls_mgmt;
+	ctx->tdls_oper = wpa_supplicant_tdls_oper;
+	ctx->tdls_peer_addset = wpa_supplicant_tdls_peer_addset;
+	ctx->tdls_enable_channel_switch =wpa_supplicant_tdls_enable_channel_switch;
+	ctx->tdls_disable_channel_switch =wpa_supplicant_tdls_disable_channel_switch;
+	ctx->set_rekey_offload = wpa_supplicant_set_rekey_offload;
+	ctx->key_mgmt_set_pmk = wpa_supplicant_key_mgmt_set_pmk;
+	ctx->fils_hlp_rx = wpa_supplicant_fils_hlp_rx;
+
+	wpa_s->wpa = wpa_sm_init(ctx);    【1】
+	if (wpa_s->wpa == NULL) {
+		wpa_printf(MSG_ERROR, "Failed to initialize WPA state machine");
+		os_free(ctx);
+		return -1;
+	}
+
+
+	return 0;
+}
+
+```
+
+
+##### wpa_sm_init(ctx)
+```
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/rsn_supp/wpa.c#2444
+
+
+
+/**
+ * wpa_sm_init - Initialize WPA state machine
+ * @ctx: Context pointer for callbacks; this needs to be an allocated buffer
+ * Returns: Pointer to the allocated WPA state machine data
+ *
+ * This function is used to allocate a new WPA state machine and the returned
+ * value is passed to all WPA state machine calls.
+ */
+
+struct wpa_sm * wpa_sm_init(struct wpa_sm_ctx *ctx)
+{
+	struct wpa_sm *sm;
+
+	sm = os_zalloc(sizeof(*sm));
+	if (sm == NULL)
+		return NULL;
+	dl_list_init(&sm->pmksa_candidates);  // 初始化 双向链表
+	sm->renew_snonce = 1;
+	sm->ctx = ctx;
+
+	sm->dot11RSNAConfigPMKLifetime = 43200;   // 12小时
+	sm->dot11RSNAConfigPMKReauthThreshold = 70; 
+	sm->dot11RSNAConfigSATimeout = 60;
+
+	sm->pmksa = pmksa_cache_init(wpa_sm_pmksa_free_cb, sm, sm);  【1】  //  wpa_sm {struct rsn_pmksa_cache *pmksa; /* PMKSA cache */ } 
+    if (sm->pmksa == NULL) {
+		wpa_msg(sm->ctx->msg_ctx, MSG_ERROR,"RSN: PMKSA cache initialization failed");
+		os_free(sm);
+		return NULL;
+	}
+
+	return sm;
+}
+
+
+
+```
+
+######  pmksa_cache_init
+```
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/rsn_supp/pmksa_cache.c#602
+/**
+ * pmksa_cache_init - Initialize PMKSA cache
+ * @free_cb: Callback function to be called when a PMKSA cache entry is freed
+ * @ctx: Context pointer for free_cb function
+ * @sm: Pointer to WPA state machine data from wpa_sm_init()
+ * Returns: Pointer to PMKSA cache data or %NULL on failure
+ */
+struct rsn_pmksa_cache * pmksa_cache_init(void (*free_cb)(struct rsn_pmksa_cache_entry *entry, void *ctx, enum pmksa_free_reason reason), void *ctx, struct wpa_sm *sm)
+{
+	struct rsn_pmksa_cache *pmksa;
+
+	pmksa = os_zalloc(sizeof(*pmksa));  // 创建rsn_pmksa_cache
+	if (pmksa) {
+		pmksa->free_cb = free_cb;
+		pmksa->ctx = ctx;
+		pmksa->sm = sm;
+	}
+
+	return pmksa;
+}
+
+```
 #### wpa_sm_set_ifname
+```
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/rsn_supp/wpa.c#2774
+
+/**
+ * wpa_sm_set_ifname - Set network interface name
+ * @sm: Pointer to WPA state machine data from wpa_sm_init()
+ * @ifname: Interface name
+ * @bridge_ifname: Optional bridge interface name (for pre-auth)
+ */
+
+void wpa_sm_set_ifname(struct wpa_sm *sm, const char *ifname,const char *bridge_ifname)
+{
+	if (sm) {
+		sm->ifname = ifname;
+		sm->bridge_ifname = bridge_ifname;
+	}
+}
+
+
+```
+
 #### wpa_sm_set_fast_reauth
+```
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/rsn_supp/wpa.c#2683
+
+
+/**
+ * wpa_sm_set_fast_reauth - Set fast reauthentication (EAP) enabled/disabled
+ * @sm: Pointer to WPA state machine data from wpa_sm_init()
+ * @fast_reauth: Whether fast reauthentication (EAP) is allowed
+ */
+void wpa_sm_set_fast_reauth(struct wpa_sm *sm, int fast_reauth)
+{
+	if (sm)
+		sm->fast_reauth = fast_reauth;
+}
+
+
+
+
+
+```
 #### wpa_sm_set_param
+```
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/rsn_supp/wpa.c#2797
+
+
+/**  给  wpa_sm  设置参数的函数
+ * wpa_sm_set_param - Set WPA state machine parameters
+ * @sm: Pointer to WPA state machine data from wpa_sm_init()
+ * @param: Parameter field
+ * @value: Parameter value
+ * Returns: 0 on success, -1 on failure
+ */
+int wpa_sm_set_param(struct wpa_sm *sm, enum wpa_sm_conf_params param,unsigned int value)
+{
+	int ret = 0;
+
+	if (sm == NULL)
+		return -1;
+
+	switch (param) {
+	case RSNA_PMK_LIFETIME:
+		if (value > 0)
+			sm->dot11RSNAConfigPMKLifetime = value;
+		else
+			ret = -1;
+		break;
+	case RSNA_PMK_REAUTH_THRESHOLD:
+		if (value > 0 && value <= 100)
+			sm->dot11RSNAConfigPMKReauthThreshold = value;
+		else
+			ret = -1;
+		break;
+	case RSNA_SA_TIMEOUT:
+		if (value > 0)
+			sm->dot11RSNAConfigSATimeout = value;
+		else
+			ret = -1;
+		break;
+	case WPA_PARAM_PROTO:
+		sm->proto = value;
+		break;
+	case WPA_PARAM_PAIRWISE:
+		sm->pairwise_cipher = value;
+		break;
+	case WPA_PARAM_GROUP:
+		sm->group_cipher = value;
+		break;
+	case WPA_PARAM_KEY_MGMT:
+		sm->key_mgmt = value;
+		break;
+
+	case WPA_PARAM_MGMT_GROUP:
+		sm->mgmt_group_cipher = value;
+		break;
+	case WPA_PARAM_RSN_ENABLED:
+		sm->rsn_enabled = value;
+		break;
+	case WPA_PARAM_MFP:
+		sm->mfp = value;
+		break;
+	default:
+		break;
+	}
+
+	return ret;
+}
+
+
+
+```
 #### wpa_msg(wpa_s, MSG_ERROR,"")
+```
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/utils/wpa_debug.c#607
+
+
+void wpa_msg(void *ctx, int level, const char *fmt, ...)
+{
+	va_list ap;
+	char *buf;
+	int buflen;
+	int len;
+	char prefix[130];
+
+	va_start(ap, fmt);  // 读取 多参数输入
+	buflen = vsnprintf(NULL, 0, fmt, ap) + 1;
+	va_end(ap);
+
+	buf = os_malloc(buflen);
+	if (buf == NULL) {
+		wpa_printf(MSG_ERROR, "wpa_msg: Failed to allocate message buffer");
+		return;
+	}
+	va_start(ap, fmt);
+	prefix[0] = '\0';
+	if (wpa_msg_ifname_cb) {
+		const char *ifname = wpa_msg_ifname_cb(ctx);
+		if (ifname) {
+			int res = os_snprintf(prefix, sizeof(prefix), "%s: ", ifname);
+			if (os_snprintf_error(sizeof(prefix), res))
+				prefix[0] = '\0';
+		}
+	}
+
+// vsnprintf函数功能：将可变参数格式化输出到一个字符数组 加了size的限制，防止了内存溢出
+// 返回值：执行成功，返回最终生成字符串的长度  执行失败，返回负值，并置errno
+	len = vsnprintf(buf, buflen, fmt, ap);  //  vsnprintf是C语言库函数之一，属于可变参数  
+	va_end(ap);   //  多参数读取 结束
+	wpa_printf(level, "%s%s", prefix, buf);
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Begin
+enum wpa_msg_type {
+	WPA_MSG_PER_INTERFACE,
+	WPA_MSG_GLOBAL,
+	WPA_MSG_NO_GLOBAL,
+	WPA_MSG_ONLY_GLOBAL,
+};
+
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/utils/wpa_debug.c#591
+static wpa_msg_cb_func wpa_msg_cb = NULL;
+
+void wpa_msg_register_cb(wpa_msg_cb_func func)
+{
+	wpa_msg_cb = func;
+}
+
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/ctrl_iface_unix.c#1313
+wpa_msg_register_cb(wpa_supplicant_ctrl_iface_msg_cb 【1】);
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~End
+	if (wpa_msg_cb)
+		wpa_msg_cb(ctx, level, WPA_MSG_PER_INTERFACE, buf, len);  // 打印消息 【1】
+	bin_clear_free(buf, buflen);
+}
+
+
+
+```
+##### wpa_supplicant_ctrl_iface_msg_cb=wpa_msg_cb
+```
+static void wpa_supplicant_ctrl_iface_msg_cb(void *ctx, int level,enum wpa_msg_type type, const char *txt, size_t len)
+{
+	struct wpa_supplicant *wpa_s = ctx;
+	struct ctrl_iface_priv *priv;
+	struct ctrl_iface_global_priv *gpriv;
+
+	if (wpa_s == NULL)
+		return;
+
+	gpriv = wpa_s->global->ctrl_iface;
+
+	if (type != WPA_MSG_NO_GLOBAL && gpriv && !dl_list_empty(&gpriv->ctrl_dst)) {
+		if (!dl_list_empty(&gpriv->msg_queue) ||
+		    wpas_ctrl_iface_throttle(gpriv->sock)) {
+			if (gpriv->throttle_count == 0) {
+				wpa_printf(MSG_MSGDUMP, "CTRL: Had to throttle global event message for sock %d",gpriv->sock);
+			}
+			gpriv->throttle_count++;
+			wpas_ctrl_msg_queue_limit(gpriv->throttle_count,&gpriv->msg_queue);
+			wpas_ctrl_msg_queue(&gpriv->msg_queue, wpa_s, level,  type, txt, len);   //   【1】 加入msg_queue队列 
+		} else {
+			if (gpriv->throttle_count) {
+				wpa_printf(MSG_MSGDUMP,"CTRL: Had to throttle %u global event message(s) for sock %d", gpriv->throttle_count, gpriv->sock);
+			}
+			gpriv->throttle_count = 0;
+			wpa_supplicant_ctrl_iface_send(wpa_s,type != WPA_MSG_PER_INTERFACE ?NULL : wpa_s->ifname,gpriv->sock, &gpriv->ctrl_dst, level,txt, len, NULL, gpriv);
+		}
+	}
+
+	priv = wpa_s->ctrl_iface;
+
+	if (type != WPA_MSG_ONLY_GLOBAL && priv) {
+        if (!dl_list_empty(&priv->msg_queue) || wpas_ctrl_iface_throttle(priv->sock)) {
+			if (priv->throttle_count == 0) {
+				wpa_printf(MSG_MSGDUMP,
+					   "CTRL: Had to throttle event message for sock %d",
+					   priv->sock);
+			}
+			priv->throttle_count++;
+			wpas_ctrl_msg_queue_limit(priv->throttle_count,&priv->msg_queue);
+			wpas_ctrl_msg_queue(&priv->msg_queue, wpa_s, level,type, txt, len);  //   加入msg_queue队列 
+		} else {
+			if (priv->throttle_count) {
+				wpa_printf(MSG_MSGDUMP, "CTRL: Had to throttle %u event message(s) for sock %d", priv->throttle_count, priv->sock);
+			}
+			priv->throttle_count = 0;
+			wpa_supplicant_ctrl_iface_send(wpa_s, NULL, priv->sock, &priv->ctrl_dst, level, txt, len, priv, NULL);
+		}
+	}
+}
+
+
+```
+<h7>wpas_ctrl_msg_queue </h7>
+```
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/ctrl_iface_unix.c#375
+
+static void wpas_ctrl_msg_queue(struct dl_list *queue,struct wpa_supplicant *wpa_s, int level,enum wpa_msg_type type,const char *txt, size_t len)
+{
+	struct ctrl_iface_msg *msg;
+
+	msg = os_zalloc(sizeof(*msg) + len);
+	if (!msg)
+		return;
+
+	msg->wpa_s = wpa_s;
+	msg->level = level;
+	msg->type = type;
+	os_memcpy(msg + 1, txt, len);
+	msg->txt = (const char *) (msg + 1);
+	msg->len = len;
+	dl_list_add_tail(queue, &msg->list);  // 加入到双向链表的尾部
+	eloop_cancel_timeout(wpas_ctrl_msg_queue_timeout, wpa_s, NULL);
+	eloop_register_timeout(0, 0, wpas_ctrl_msg_queue_timeout, wpa_s, NULL);  // 注册 timeout的事件轮询
+}
+
+
+```
 #### wpa_drv_get_hw_feature_data
+```
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/driver_i.h#277
+static inline struct hostapd_hw_modes * wpa_drv_get_hw_feature_data(struct wpa_supplicant *wpa_s, u16 *num_modes,u16 *flags, u8 *dfs_domain)
+{
+	if (wpa_s->driver->get_hw_feature_data)
+		return wpa_s->driver->get_hw_feature_data(wpa_s->drv_priv,num_modes, flags,dfs_domain);   nl80211_get_hw_feature_data【1】
+	return NULL;
+}
+
+
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/src/drivers/driver.h#2389
+
+struct wpa_driver_ops {
+	struct hostapd_hw_modes * (*get_hw_feature_data)(void *priv,u16 *num_modes,u16 *flags, u8 *dfs);
+}
+
+
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/hostapd/src/drivers/driver_nl80211.c#10372
+.get_hw_feature_data = nl80211_get_hw_feature_data, 【1】
+
+
+
+```
+##### nl80211_get_hw_feature_data
+```
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/src/drivers/driver_nl80211_capa.c#1898
+
+
+struct hostapd_hw_modes * nl80211_get_hw_feature_data(void *priv, u16 *num_modes, u16 *flags,u8 *dfs_domain)
+{
+	u32 feat;
+	struct i802_bss *bss = priv;
+	struct wpa_driver_nl80211_data *drv = bss->drv;
+	int nl_flags = 0;
+	struct nl_msg *msg;
+	struct phy_info_arg result = {
+		.num_modes = num_modes,
+		.modes = NULL,
+		.last_mode = -1,
+		.failed = 0,
+		.dfs_domain = 0,
+	};
+
+	*num_modes = 0;
+	*flags = 0;
+	*dfs_domain = 0;
+
+	feat = get_nl80211_protocol_features(drv); 【1】
+	if (feat & NL80211_PROTOCOL_FEATURE_SPLIT_WIPHY_DUMP)
+		nl_flags = NLM_F_DUMP;
+
+	if (!(msg = nl80211_cmd_msg(bss, nl_flags, NL80211_CMD_GET_WIPHY)) ||  nla_put_flag(msg, NL80211_ATTR_SPLIT_WIPHY_DUMP)) {  // 设置CMD 和 ATTR
+		nlmsg_free(msg);
+		return NULL;
+	}
+
+	if (send_and_recv_msgs(drv, msg, phy_info_handler, &result) == 0) {  // 发送消息 并等待 回复
+		nl80211_set_regulatory_flags(drv, &result);  【2】
+		if (result.failed) { // 如果执行失败
+			int i;
+
+			for (i = 0; result.modes && i < *num_modes; i++) {
+				os_free(result.modes[i].channels);
+				os_free(result.modes[i].rates);
+			}
+			os_free(result.modes);
+			*num_modes = 0;
+			return NULL;
+		}
+
+		*dfs_domain = result.dfs_domain;
+
+		return wpa_driver_nl80211_postprocess_modes(result.modes,num_modes); 【3】
+	}
+
+	return NULL;
+}
+
+
+```
+
+###### get_nl80211_protocol_features(drv)
+```
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/src/drivers/driver_nl80211_capa.c#38
+static u32 get_nl80211_protocol_features(struct wpa_driver_nl80211_data *drv)
+{
+	u32 feat = 0;
+	struct nl_msg *msg;
+
+	msg = nlmsg_alloc();
+	if (!msg)
+		return 0;
+
+	if (!nl80211_cmd(drv, msg, 0, NL80211_CMD_GET_PROTOCOL_FEATURES)) {
+		nlmsg_free(msg);
+		return 0;
+	}
+
+	if (send_and_recv_msgs(drv, msg, protocol_feature_handler, &feat) == 0)  // 发送 NL80211_CMD_GET_PROTOCOL_FEATURES 消息等待回复
+		return feat;
+
+	return 0;
+}
+
+
+```
+###### nl80211_set_regulatory_flags(drv, &result)
+```
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/src/drivers/driver_nl80211_capa.c#1883
+static int nl80211_set_regulatory_flags(struct wpa_driver_nl80211_data *drv,struct phy_info_arg *results)
+{
+	struct nl_msg *msg;
+
+	msg = nlmsg_alloc();
+	if (!msg)
+		return -ENOMEM;
+
+	nl80211_cmd(drv, msg, 0, NL80211_CMD_GET_REG);
+	return send_and_recv_msgs(drv, msg, nl80211_get_reg, results);  // 发送 NL80211_CMD_GET_REG 消息等待回复
+}
+
+
+
+```
+###### wpa_driver_nl80211_postprocess_modes(result.modes,num_modes)
+```
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/src/drivers/driver_nl80211_capa.c#1500
+
+static struct hostapd_hw_modes * wpa_driver_nl80211_postprocess_modes(struct hostapd_hw_modes *modes,u16 *num_modes)
+{
+	u16 m;
+	struct hostapd_hw_modes *mode11g = NULL, *nmodes, *mode;
+	int i, mode11g_idx = -1;
+
+	/* heuristic to set up modes 支持哪个协议 */
+	for (m = 0; m < *num_modes; m++) {
+		if (!modes[m].num_channels)
+			continue;
+		if (modes[m].channels[0].freq < 4000) {
+			modes[m].mode = HOSTAPD_MODE_IEEE80211B;
+			for (i = 0; i < modes[m].num_rates; i++) {
+				if (modes[m].rates[i] > 200) {
+					modes[m].mode = HOSTAPD_MODE_IEEE80211G;
+					break;
+				}
+			}
+		} else if (modes[m].channels[0].freq > 50000)
+			modes[m].mode = HOSTAPD_MODE_IEEE80211AD;
+		else
+			modes[m].mode = HOSTAPD_MODE_IEEE80211A;
+	}
+
+	/* If only 802.11g mode is included, use it to construct matching
+	 * 802.11b mode data. */
+
+	for (m = 0; m < *num_modes; m++) {
+		if (modes[m].mode == HOSTAPD_MODE_IEEE80211B)
+			return modes; /* 802.11b already included */
+		if (modes[m].mode == HOSTAPD_MODE_IEEE80211G)
+			mode11g_idx = m;
+	}
+
+	if (mode11g_idx < 0)
+		return modes; /* 2.4 GHz band not supported at all */
+
+	nmodes = os_realloc_array(modes, *num_modes + 1, sizeof(*nmodes));
+	if (nmodes == NULL)
+		return modes; /* Could not add 802.11b mode */
+
+	mode = &nmodes[*num_modes];
+	os_memset(mode, 0, sizeof(*mode));
+	(*num_modes)++;
+	modes = nmodes;
+
+	mode->mode = HOSTAPD_MODE_IEEE80211B;
+
+	mode11g = &modes[mode11g_idx];
+	mode->num_channels = mode11g->num_channels;
+	mode->channels = os_memdup(mode11g->channels,mode11g->num_channels *sizeof(struct hostapd_channel_data));
+	if (mode->channels == NULL) {
+		(*num_modes)--;
+		return modes; /* Could not add 802.11b mode */
+	}
+
+	mode->num_rates = 0;
+	mode->rates = os_malloc(4 * sizeof(int));
+	if (mode->rates == NULL) {
+		os_free(mode->channels);
+		(*num_modes)--;
+		return modes; /* Could not add 802.11b mode */
+	}
+
+	for (i = 0; i < mode11g->num_rates; i++) {
+		if (mode11g->rates[i] != 10 && mode11g->rates[i] != 20 &&
+		    mode11g->rates[i] != 55 && mode11g->rates[i] != 110)
+			continue;
+		mode->rates[mode->num_rates] = mode11g->rates[i];
+		mode->num_rates++;
+		if (mode->num_rates == 4)
+			break;
+	}
+
+	if (mode->num_rates == 0) {
+		os_free(mode->channels);
+		os_free(mode->rates);
+		(*num_modes)--;
+		return modes; /* No 802.11b rates */
+	}
+
+	wpa_printf(MSG_DEBUG, "nl80211: Added 802.11b mode based on 802.11g information");
+
+	return modes;
+}
+
+
+
+```
+
+
 #### wpa_drv_get_capa(wpa_s, &capa)
+```
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/driver_i.h#217
+static inline int wpa_drv_get_capa(struct wpa_supplicant *wpa_s, struct wpa_driver_capa *capa)
+{
+	if (wpa_s->driver->get_capa) {
+		return wpa_s->driver->get_capa(wpa_s->drv_priv, capa);  【1】 wpa_driver_nl80211_get_capa 
+	}
+	return -1;
+}
+
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/hostapd/src/drivers/driver_nl80211.c#10362
+.get_capa = wpa_driver_nl80211_get_capa,
+
+```
+###### wpa_driver_nl80211_get_capa
+```
+
+static int wpa_driver_nl80211_get_capa(void *priv,
+				       struct wpa_driver_capa *capa)
+{
+	struct i802_bss *bss = priv;
+	struct wpa_driver_nl80211_data *drv = bss->drv;
+
+	if (!drv->has_capability)
+		return -1;
+	os_memcpy(capa, &drv->capa, sizeof(*capa));
+	if (drv->extended_capa && drv->extended_capa_mask) {
+		capa->extended_capa = drv->extended_capa;
+		capa->extended_capa_mask = drv->extended_capa_mask;
+		capa->extended_capa_len = drv->extended_capa_len;
+	}
+
+	return 0;
+}
+
+
+```
+
 #### wpa_supplicant_driver_init(wpa_s)
+```
+http://androidxref.com/9.0.0_r3/xref/external/wpa_supplicant_8/wpa_supplicant/wpa_supplicant.c#4011
+
+
+/**
+ * wpa_supplicant_driver_init - Initialize driver interface parameters
+ * @wpa_s: Pointer to wpa_supplicant data
+ * Returns: 0 on success, -1 on failure
+ *
+ * This function is called to initialize driver interface parameters.
+ * wpa_drv_init() must have been called before this function to initialize the
+ * driver interface.
+ */
+
+int wpa_supplicant_driver_init(struct wpa_supplicant *wpa_s)
+{
+	static int interface_count = 0;
+继续点
+	if (wpa_supplicant_update_mac_addr(wpa_s) < 0)  【1】
+		return -1;
+
+// 打印  【 wpa_supplicant: wlan0: Own MAC address: d4:d4:d4:d4:d4: 】
+	wpa_dbg(wpa_s, MSG_DEBUG, "Own MAC address: " MACSTR,MAC2STR(wpa_s->own_addr));  已有分析
+	os_memcpy(wpa_s->perm_addr, wpa_s->own_addr, ETH_ALEN);
+	wpa_sm_set_own_addr(wpa_s->wpa, wpa_s->own_addr);  【2】
+
+	if (wpa_s->bridge_ifname[0]) {
+		wpa_dbg(wpa_s, MSG_DEBUG, "Receiving packets from bridge interface '%s'", wpa_s->bridge_ifname);
+		wpa_s->l2_br = l2_packet_init_bridge(wpa_s->bridge_ifname, wpa_s->ifname, wpa_s->own_addr,ETH_P_EAPOL, wpa_supplicant_rx_eapol_bridge, wpa_s, 1); 【3】
+		if (wpa_s->l2_br == NULL) {
+			wpa_msg(wpa_s, MSG_ERROR, "Failed to open l2_packet connection for the bridge interface '%s'",wpa_s->bridge_ifname);
+			return -1;
+		}
+	}
+
+	if (wpa_s->conf->ap_scan == 2 && os_strcmp(wpa_s->driver->name, "nl80211") == 0) {
+		wpa_printf(MSG_INFO,"Note: nl80211 driver interface is not designed to be used with ap_scan=2; this can result in connection failures");
+	}
+
+	wpa_clear_keys(wpa_s, NULL); 【4】
+
+	/* Make sure that TKIP countermeasures are not left enabled (could
+	 * happen if wpa_supplicant is killed during countermeasures. */
+	wpa_drv_set_countermeasures(wpa_s, 0);  【5】
+
+	wpa_dbg(wpa_s, MSG_DEBUG, "RSN: flushing PMKID list in the driver");
+	wpa_drv_flush_pmkid(wpa_s);  【6】
+
+	wpa_s->prev_scan_ssid = WILDCARD_SSID_SCAN;
+	wpa_s->prev_scan_wildcard = 0;
+
+	if (wpa_supplicant_enabled_networks(wpa_s)) { 【7】
+		if (wpa_s->wpa_state == WPA_INTERFACE_DISABLED) {
+			wpa_supplicant_set_state(wpa_s, WPA_DISCONNECTED); 【8】
+			interface_count = 0;
+		}
+
+		interface_count++;
+	} else
+		wpa_supplicant_set_state(wpa_s, WPA_INACTIVE);
+
+	return 0;
+}
+
+
+
+
+```
+
 #### wpa_tdls_init(wpa_s->wpa)
 #### wpa_drv_set_country
 #### wpas_wps_init(wpa_s)
