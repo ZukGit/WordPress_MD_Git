@@ -1030,6 +1030,69 @@ public class A3 {
 
 ```
 
+### A4_在每行开头以及结尾添加固定字符串
+```
+1.在行首添加字符串
+2.在行尾添加字符串
+3.同时的行首以及行尾添加字符串
+
+【1】在行首添加字符串示例(同 alt键)
+
+abcd.mp3
+1.mp3
+23.mp3
+456.mp3
+78910.mp3
+
+转为
+<audio> <source src="abcd.mp3
+<audio> <source src="1.mp3
+<audio> <source src="23.mp3
+<audio> <source src="456.mp3
+<audio> <source src="78910.mp3
+
+
+
+【2】在行尾添加字符串示例(由于长度不一致 所以 alt键 发挥不了作用)
+<audio> <source src="abcd.mp3
+<audio> <source src="1.mp3
+<audio> <source src="23.mp3
+<audio> <source src="456.mp3
+<audio> <source src="78910.mp3
+转为
+<audio> <source src="abcd.mp3" /><audio>
+<audio> <source src="1.mp3" /><audio>
+<audio> <source src="23.mp3" /><audio>
+<audio> <source src="456.mp3" /><audio>
+<audio> <source src="78910.mp3" /><audio>
+
+
+【3】同时的行首以及行尾添加字符串
+abcd.mp3
+1.mp3
+23.mp3
+456.mp3
+78910.mp3
+转为
+<audio> <source src="abcd.mp3" /><audio>
+<audio> <source src="1.mp3" /><audio>
+<audio> <source src="23.mp3" /><audio>
+<audio> <source src="456.mp3" /><audio>
+<audio> <source src="78910.mp3" /><audio>
+
+```
+
+
+#### A4.vbs
+
+#### A4.java
+```
+
+
+```
+
+
+
 # F5_命令小集合
 ```
 cmd /K   echo %OS%             // 检测 %OS% 这个环境变量  打印   Windows_NT
