@@ -1272,6 +1272,197 @@ public class A4 {
 
 ```
 
+### A5_生成MD语法的表格依据当前数据
+```
+A  B   C
+1  2   3
+
+转为
+
+| A | B | C |
+| ---- | ---- | ---- |
+| 1 | 2 | 3 |
+
+
+```
+
+#### A5.vbs
+```
+Set args = WScript.Arguments
+If args.Count = 2 Then
+
+zbinpath= WScript.Arguments(0)
+textpath= WScript.Arguments(1)
+
+command = "cmd /c "+ zbinpath +"\A5.bat  " +zbinpath+"\  "+textpath
+DIM objShell
+set objShell=wscript.createObject("wscript.shell")
+iReturn=objShell.Run(command, 0, TRUE)
+WScript.Echo("Please Refresh!")
+End If
+
+```
+
+#### A5.bat
+```
+@echo off
+@cd %1
+@javac -encoding UTF-8 A5.java
+@java A5 %2
+@exit
+
+
+```
+
+#### A5.java
+```
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
+import java.util.HashMap;
+
+public class A5 {
+    public static final ArrayList<String> tableItemList = new ArrayList<>();
+    public static int rowInLine = 0;
+
+
+    public static void getRowInLine(File file) {
+
+        String titleString;
+        try {
+            BufferedReader curBR = new BufferedReader(new InputStreamReader(new FileInputStream(file), "utf-8"));
+            while ((titleString = curBR.readLine()) != null && !titleString.isEmpty()) {
+                break;
+            }
+            while (titleString.contains("  ")) {
+                titleString = titleString.replaceAll("  ", " ");
+            }
+
+            String[] strArr = titleString.split(" ");
+            rowInLine = strArr.length;
+
+            String sumString = "";
+            for (String item : strArr) {
+                sumString = sumString + " | " + item;
+            }
+            sumString = sumString + " |";
+            tableItemList.add(sumString);
+
+            String twoLine = "";
+            for (int i = 0; i < rowInLine; i++) {
+
+                twoLine = twoLine + "| ---- ";
+            }
+            twoLine = twoLine + "| ";
+            tableItemList.add(twoLine);
+
+
+            curBR.close();
+        } catch (Exception e) {
+
+
+        }
+    }
+
+    public static void main(String[] args) {
+        //===============real-test-egin===============
+        String mFilePath = null;
+        if (args.length >= 1) {
+            mFilePath = args[0];
+        } else {
+            System.out.println("input argument is empty ! retry input again!");
+            return;
+        }
+        //===============real-test-end===============
+
+        //===============local-test begin===============
+//          String mFilePath = System.getProperty("user.dir") + File.separator + "in.txt";
+//        String preString = "<audio> <source src=\"";
+//        String endString = "\" /><audio>";
+        //===============local-test end===============
+
+        File curFile;
+        if (mFilePath != null && !mFilePath.isEmpty() && (curFile = new File(mFilePath)).exists()) {
+            System.out.println("input argument success ! ");
+        } else {
+            System.out.println("input argument is invalid ! retry input again!");
+            return;
+        }
+
+        getRowInLine(curFile);
+        if (curFile != null) {
+            try {
+                BufferedReader curBR = new BufferedReader(new InputStreamReader(new FileInputStream(new File(mFilePath)), "utf-8"));
+                String oldOneLine = "";
+
+                while ((oldOneLine = curBR.readLine()) != null && !oldOneLine.isEmpty()) {
+                    break;   // 跳过首行 当做标题的那行
+                }
+
+                oldOneLine = "";
+                while (oldOneLine != null) {
+                    oldOneLine = curBR.readLine();
+                    if (oldOneLine == null || oldOneLine.isEmpty()) {
+                        continue;
+                    }
+                    String tableItem = new String(oldOneLine);
+
+
+                    while (tableItem.contains("  ")) {
+                        tableItem = tableItem.replaceAll("  ", " ");
+                    }
+                    String[] strArr = tableItem.split(" ");
+                    int length = 0;   //
+                    if (strArr.length >= rowInLine) {
+                        length = rowInLine;
+                    } else {
+                        length = strArr.length;
+                    }
+                    String sumString = "";
+                    for (int i = 0; i < length; i++) {
+                        sumString = sumString + " | " + strArr[i];
+                    }
+                    sumString = sumString + " |";
+                    if (length < rowInLine) {
+                        int blankCount = rowInLine - length;
+                        for (int j = 0; j < blankCount; j++) {
+                            sumString = sumString + "  | ";
+                        }
+                    }
+                    tableItemList.add(sumString);
+                }
+                curBR.close();
+
+
+                BufferedWriter curBW = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(mFilePath)), "utf-8"));
+
+                for (int i = 0; i < tableItemList.size(); i++) {
+                    curBW.write(tableItemList.get(i).trim());
+                    curBW.newLine();
+                }
+                curBW.close();
+                System.out.println("OK !");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
+            System.out.println("Failed !");
+        }
+    }
+}
+
+
+```
+
+
 
 
 
@@ -1321,5 +1512,10 @@ cmd /K cd /d %userprofile%\Desktop\zbin & %userprofile%\Desktop\zbin\A4.bat %use
 cmd /K cd /d %userprofile%\Desktop\zbin & %userprofile%\Desktop\zbin\A4.bat %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH)  endz#"yyyy"
 cmd /K cd /d %userprofile%\Desktop\zbin & %userprofile%\Desktop\zbin\A4.bat %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH)  prez#"xxxx"
 cmd /K cd /d %userprofile%\Desktop\zbin & %userprofile%\Desktop\zbin\A4.bat %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH)  prez#"<audio> <source src=""endz#"" /><audio>"   【A4 bat OK 使用简单无规则】
+
+
+Wscript.exe  /x %userprofile%\Desktop\zbin\A5.vbs  %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH)       【A5 vbs】
+cmd /K cd /d %userprofile%\Desktop\zbin & %userprofile%\Desktop\zbin\A5.bat %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH)      【A1 bat】
+
 ```
 
