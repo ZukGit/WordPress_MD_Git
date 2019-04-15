@@ -48,6 +48,9 @@ public class A1 {
                 while (oldOneLine != null) {
 
                     oldOneLine = curBR.readLine();
+					if(oldOneLine == null || oldOneLine.trim().isEmpty()){
+						continue;
+					}
                     indexLine++;
                     newOneLine = indexLine + "      " + oldOneLine;
                     StringArr.add(newOneLine);
