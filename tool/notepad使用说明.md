@@ -2822,6 +2822,23 @@ public class A0 {
 
 
 
+### B0_解析当前路径下的所有文件(非文件夹)生成<audio片段>
+```
+空    文件夹内文件： 蜗牛.mp3    zui_hou_de_zhan_yi.mp3   yuan_you_hui.mp3   路径为：  C:\Users\aaa\Desktop\zbin\test\yuan_you_hui.mp3
+
+转为
+
+#### yuan_you_hui
+<audio controls><source src="C:\Users\aaa\Desktop\zbin\test\yuan_you_hui.mp3" type="audio/mpeg"/></audio>
+#### zui_hou_de_zhan_yi
+<audio controls><source src="C:\Users\aaa\Desktop\zbin\test\zui_hou_de_zhan_yi.mp3" type="audio/mpeg"/></audio>
+#### 蜗牛
+<audio controls><source src="C:\Users\aaa\Desktop\zbin\test\wo_niu.mp3" type="audio/mpeg"/></audio>
+
+
+
+```
+
 
 
 
@@ -2891,6 +2908,11 @@ cmd /K cd /d %userprofile%\Desktop\zbin & %userprofile%\Desktop\zbin\A9.bat %use
 
 
 Wscript.exe  /x %userprofile%\Desktop\zbin\A0.vbs  %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH)   【A0 vbs】
-cmd /K cd /d %userprofile%\Desktop\zbin & %userprofile%\Desktop\zbin\A9.bat %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH)      【A0 bat】
+cmd /K cd /d %userprofile%\Desktop\zbin & %userprofile%\Desktop\zbin\A0.bat %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH)      【A0 bat】
+
+
+Wscript.exe  /x %userprofile%\Desktop\zbin\B0.vbs  %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH)   【B0 vbs】
+cmd /K cd /d %userprofile%\Desktop\zbin & %userprofile%\Desktop\zbin\B0.bat %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH)      【B0 bat】
+
 ```
 
