@@ -263,7 +263,7 @@ public class B0 {
     // <audio controls><source src="C:\Users\Administrator\Desktop\test\test.txt"
     public static void fillSourceArr() {
         if(mFilePath.contains("Z_Music") && curDirPath.contains("Z_Music")){
-            String temp = curDirPath.substring(curDirPath.indexOf("Z_Music")+"Z_Music".length()+1,curDirPath.length())+"/";
+            String temp = curDirPath.substring(curDirPath.lastIndexOf("Z_Music")+"Z_Music".length()+1,curDirPath.length())+"/";
             System.out.println("zukgit1 = ");
             while(temp.contains("\\")){
                 temp = temp.replace("\\","/");

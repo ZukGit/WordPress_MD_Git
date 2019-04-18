@@ -2140,6 +2140,12 @@ public class A7 {
 
 
 ### A8_对当前文件夹内所有文件进行Log的分析(后续开发 定位先)
+```
+持续更新
+
+
+```
+
 
 
 ### A9_把当前汉字转为下划线拼音形式
@@ -2840,7 +2846,15 @@ public class A0 {
 ```
 
 
+### B1_解析当前文件第一行内容转为二维码并自动打开(可设置快捷键)
+```
+123456789
 
+转为
+
+二维码图片
+
+```
 
 # F5_命令小集合
 ```
@@ -2900,7 +2914,8 @@ cmd /K cd /d %userprofile%\Desktop\zbin & %userprofile%\Desktop\zbin\A7.bat %use
 
 
 
-
+Wscript.exe  /x %userprofile%\Desktop\zbin\A8.vbs  %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH)       【A8 vbs】  解析Log
+cmd /K cd /d %userprofile%\Desktop\zbin & %userprofile%\Desktop\zbin\A8.bat %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH)      【A8 bat】 解析Log
 
 
 Wscript.exe  /x %userprofile%\Desktop\zbin\A9.vbs  %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH)     【A9 vbs】
@@ -2914,5 +2929,8 @@ cmd /K cd /d %userprofile%\Desktop\zbin & %userprofile%\Desktop\zbin\A0.bat %use
 Wscript.exe  /x %userprofile%\Desktop\zbin\B0.vbs  %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH)   【B0 vbs】
 cmd /K cd /d %userprofile%\Desktop\zbin & %userprofile%\Desktop\zbin\B0.bat %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH)      【B0 bat】
 
+
+Wscript.exe  /x %userprofile%\Desktop\zbin\B1.vbs  %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH)   【B1 vbs】
+cmd /K cd /d %userprofile%\Desktop\zbin & %userprofile%\Desktop\zbin\B1.bat %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH)     【B1 bat】
 ```
 
