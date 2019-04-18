@@ -364,3 +364,12 @@ static String	execForStr(String... cmds)                         执行系统命
 Process proc = RuntimeUtil.exec("calc");
 List<String> strListProc = RuntimeUtil.execForLines("calc");
 ```
+
+
+```
+
+static Clipboard	getClipboard()   获取系统剪贴板
+static String	    getStr()   从剪贴板获取文本
+static String	    getStr(Transferable content)  从剪贴板的Transferable获取文本
+
+```

@@ -2856,6 +2856,14 @@ public class A0 {
 
 ```
 
+### B2_在当前文件对选中的字符串进行翻译
+```
+
+
+
+```
+
+
 # F5_命令小集合
 ```
 cmd /K   echo %OS%             // 检测 %OS% 这个环境变量  打印   Windows_NT
@@ -2932,5 +2940,15 @@ cmd /K cd /d %userprofile%\Desktop\zbin & %userprofile%\Desktop\zbin\B0.bat %use
 
 Wscript.exe  /x %userprofile%\Desktop\zbin\B1.vbs  %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH)   【B1 vbs】
 cmd /K cd /d %userprofile%\Desktop\zbin & %userprofile%\Desktop\zbin\B1.bat %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH)     【B1 bat】
+
+
+Wscript.exe  /x %userprofile%\Desktop\zbin\B2.vbs  %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH)   【B2 vbs】
+cmd /K cd /d %userprofile%\Desktop\zbin & %userprofile%\Desktop\zbin\B2.bat %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH)     【B2 bat】
+
+
+
+Wscript.exe  /x %userprofile%\Desktop\zbin\B3.vbs  %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH)   【B3 vbs】
+cmd /K cd /d %userprofile%\Desktop\zbin & %userprofile%\Desktop\zbin\B3.bat %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH)     【B3 bat】
+
 ```
 
