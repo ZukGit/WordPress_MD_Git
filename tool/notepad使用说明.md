@@ -2950,5 +2950,11 @@ cmd /K cd /d %userprofile%\Desktop\zbin & %userprofile%\Desktop\zbin\B2.bat %use
 Wscript.exe  /x %userprofile%\Desktop\zbin\B3.vbs  %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH)   【B3 vbs】
 cmd /K cd /d %userprofile%\Desktop\zbin & %userprofile%\Desktop\zbin\B3.bat %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH)     【B3 bat】
 
+
+
+
+
+cmd /K cd /d %userprofile%\Desktop\zbin & %userprofile%\Desktop\zbin\B4.bat %userprofile%\Desktop\zbin    【 B4 bat 】
+cmd /K cd /d %userprofile%\Desktop\zbin & %userprofile%\Desktop\zbin\B4_push.bat %userprofile%\Desktop\zbin\image_monitor   【B4_push.bat 】
 ```
 

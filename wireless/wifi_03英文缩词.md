@@ -106,6 +106,12 @@ DIFS:  distributed interframe space
 
 # E
 
+## EAP
+```
+ 可扩展认证协议(Extensible authentication protocol,EAP)
+
+```
+
 ## ESS
 ESS:  Extended Service Set
 中文:   **扩展服务集(把多个BSS串联为逻辑上彼此相连的组)**
