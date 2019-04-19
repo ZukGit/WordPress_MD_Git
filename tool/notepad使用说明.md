@@ -2858,11 +2858,41 @@ public class A0 {
 
 ### B2_在当前文件对选中的字符串进行翻译
 ```
+对 Ctrl+C 选中到剪切板的字符串进行操作
+Hello World
+转为
+你好世界
 
-
+Good Morning
+转为
+早上好
 
 ```
 
+### B3_在当前文件对选中的字符串英文进行阅读
+```
+控制面板 => 小图标 => 语音识别 => 文本到语音转换 => 语音选择   Zira Desktop English   【 语音速度 】
+
+Hello World
+转为
+发出声音:  Hello World
+
+```
+
+
+### B4_对当前程序开机运行
+```
+'  runas /user:administrator cmd  
+'  copy %userprofile%\Desktop\zbin\B4_startup.vbs  C:\ProgramData\Microsoft\Windows\Start Menu\Programs\StartUp\
+把 vbs 放到系统默认自动回运行的目录  然后 运行 B4_startup.vbs   之后执行 B4.java 程序
+
+zbin/ 下必须包含  repo  image_monitor 仓库
+
+cmd /K cd /d %userprofile%\Desktop\zbin & %userprofile%\Desktop\zbin\B4.bat %userprofile%\Desktop\zbin    【 B4 bat 】
+cmd /K cd /d %userprofile%\Desktop\zbin & %userprofile%\Desktop\zbin\B4_push.bat %userprofile%\Desktop\zbin\image_monitor   【B4_push.bat 】
+
+
+```
 
 # F5_命令小集合
 ```
