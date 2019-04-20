@@ -221,13 +221,22 @@ public class B4 {
             if(!file.exists()){
                 file.createNewFile();
             }
-            BufferedWriter curBW = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "utf-8"));
-           if(index == 1){
-               curBW.append("============开机打印【"+DateUtil.now()+ "】==========");
+
+            // 打开一个随机访问文件流，按读写方式
+            RandomAccessFile randomFile = new RandomAccessFile(file, "rw");
+            // 文件长度，字节数
+            long fileLength = randomFile.length();
+            // 将写文件指针移到文件尾。
+            randomFile.seek(fileLength);
+            randomFile.write("\r\n".getBytes());  // 换行
+
+            if(index == 1){
+                randomFile.writeUTF("index = "+index+"============开机打印【"+DateUtil.now()+ "】========== ");
            }else{
-               curBW.append(DateUtil.now());
+                randomFile.writeUTF("index = "+index +"【"+DateUtil.now()+ "】==========");
            }
-            curBW.close();
+
+            randomFile.close();
         } catch( Exception e ){
 
 
