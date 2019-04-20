@@ -5,4 +5,4 @@
 @git add ./
 @git commit -m "%CURRENT_DATE_TIME%"
 @git push
-@exit
+@pause
