@@ -223,9 +223,9 @@ public class B4 {
             }
             BufferedWriter curBW = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "utf-8"));
            if(index == 1){
-               curBW.append("============开机打印【"+DateUtil.today()+ "】==========");
+               curBW.append("============开机打印【"+DateUtil.now()+ "】==========");
            }else{
-               curBW.append(DateUtil.today());
+               curBW.append(DateUtil.now());
            }
             curBW.close();
         } catch( Exception e ){
