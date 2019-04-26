@@ -1,0 +1,17 @@
+http://www.ximalaya.com/revision/album/getTracksList?albumId=321787&pageNum=13
+
+榜单
+http://mobile.ximalaya.com/mobile/discovery/v2/rankingList/group?channel=and-a1&device=android&includeActivity=true&includeSpecial=true&scale=2&version=5.4.45
+
+音频
+http://mobile.ximalaya.com/v1/track/baseInfo?device=android&trackId=24069144
+
+音频集合
+http://mobile.ximalaya.com/mobile/v1/album/track?albumId=203355&device=android&isAsc=true&pageId=4&pageSize=20&statEvent=pageview%2Falbum%40203355&statModule=%E6%9C%80%E5%A4%9A%E6%94%B6%E8%97%8F%E6%A6%9C&statPage=ranklist%40%E6%9C%80%E5%A4%9A%E6%94%B6%E8%97%8F%E6%A6%9C&statPosition=8
+
+网易Json集合
+https://c.m.163.com/nc/article/headline/data/10-20.html?from=toutiao&passport=&devId=OPdeGFsVSojY0ILFe6009pLR%2FMsg7TLJv5TjaQQ6Hpjxd%2BaWU4dx4OOCg2vE3noj&size=20&version=5.5.3&spever=false&net=wifi&lat=&lon=&ts=1456985878&sign=oDwq9mBweKUtUuiS%2FPvB015PyTDKHSxuyuVq2076XQB48ErR02zJ6%2FKXOnxX046I&encryption=1&canal=appstore
+
+爱奇艺Json接口  需要修改
+http://cache.video.iqiyi.com/jp/avlist/202861101/1/?callback=json
+
