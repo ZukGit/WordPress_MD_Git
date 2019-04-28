@@ -57,7 +57,8 @@ public class A8 {
 // OncePrintBase   只需要打印一次的类   打印的是原始Log  没得选
 // DiffMeetPrintBase  有差异才会打印的类  需要实现返回差异部分字符串的抽象函数
 // FixLongPrintBase    需要对当前Log  进行 修改 并打印修改后的字符串  需要实现抽象函数
-// CollectEndPrintBase    先统一收集关键字符串  并在文件读取完成后 统一打印的类   需要实现抽象函数
+// CollectEndPrintBase    先统一收集关键字符串(一行Log得到一个信息)  并在文件读取完成后 统一打印的类   需要实现抽象函数
+// CollectManyFromOneEndPrintBase  先统一收集关键字符串(一行Log得到多个信息)    并在文件读取完成后 统一打印的类   需要实现抽象函数
 // MultiKeyWordPrintBase    包含多个关键字的处理类   需要返回 关键字的字符串集合
 
 

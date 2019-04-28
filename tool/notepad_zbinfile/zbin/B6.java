@@ -135,21 +135,42 @@ public class B6 {
     }
     static String outFilepath ="";
     static File outFile = null;
+    static String dirPath = "";  // zbin 路径
     public static void main(String[] args) {
 
         try {
 
-            //     从文件夹读取Json 字符串
-            String mFilePath = System.getProperty("user.dir") + File.separator + "in.txt";
-            outFilepath =System.getProperty("user.dir") + File.separator + "B6.gv";
-            File curFile;
-            if (mFilePath != null && !mFilePath.isEmpty() && (curFile = new File(mFilePath)).exists()) {
+            //     从文件夹读取Json 字符串    Local_test
+      //      String mFilePath = System.getProperty("user.dir") + File.separator + "in.txt";
+
+
+            //===============real-test begin===============
+            String mFilePath = null;
+            if (args.length >= 1) {
+                mFilePath = args[0];
+            } else {
+                System.out.println("input argument is empty ! retry input again!");
+                return;
+            }
+            //===============real-test end===============
+
+
+            dirPath = mFilePath.trim().substring(0, mFilePath.lastIndexOf(File.separator));
+            System.out.println("dirPath  =  " + dirPath);
+
+            File curFile = new File(mFilePath);
+            if (mFilePath != null && !mFilePath.isEmpty() && curFile.exists()) {
                 System.out.println("input argument success ! ");
             } else {
                 System.out.println("input argument is invalid ! retry input again!");
                 return;
             }
+
+
+            outFilepath =dirPath + File.separator + "B6.gv";
+
             StringBuilder sb  = new StringBuilder();
+			System.out.println("curFile = "+ curFile.getAbsolutePath());
             tryReadJsonFromFile( sb ,  curFile);
             boolean isArrJson = sb.toString().startsWith("[");
             if(isArrJson){
@@ -251,9 +272,10 @@ public class B6 {
 //            });
             // https://dreampuf.github.io/GraphvizOnline/#
             dotStringArr.add("digraph {");
-            //    dotStringArr.add("#    https://dreampuf.github.io/GraphvizOnline/#      Giraphz图形地址");
-            //    dotStringArr.add("#    http://www.bejson.com/jsonviewernew/    Json 数据 ");
-            //     dotStringArr.add("#     dot  ./B6.gv -Tpdf -o B6.pdf   ");
+                 dotStringArr.add("#    https://dreampuf.github.io/GraphvizOnline/#      Giraphz图形地址 ");
+                 dotStringArr.add("#    http://www.bejson.com/jsonviewernew/    Json 数据 \n");
+                 dotStringArr.add("#     dot  ./B6.gv -Tpdf -o B6.pdf  生成PDF \n");
+				 dotStringArr.add("#     dot  ./B6.gv -Tpng -o B6.png    生成PNG   \n");
             dotStringArr.add("graph [rankdir=BT] \n");
             System.out.println("===============index" + index + "=============== Begin");
 
@@ -353,33 +375,35 @@ public class B6 {
             String command4 = "";
             System.out.println("netAddr =   "+netAddr);
             if(netAddr.length() > 4000){
-                 command4 = "cmd.exe /C start chrome   https://dreampuf.github.io/GraphvizOnline/ " ;
+                command4 = "cmd.exe /C start chrome   https://dreampuf.github.io/GraphvizOnline/ " ;
 
             }else{
 
-                 command4 = "cmd.exe /C start chrome  "+ netAddr ;
+                command4 = "cmd.exe /C start chrome  "+ netAddr ;
 
             }
-   //     String command4 = "cmd.exe /C start chrome  "  +netAddr;
+            //     String command4 = "cmd.exe /C start chrome  "  +netAddr;
 
-            String procResult4 = execCMD(command4); //  使用 Chrome 打开 Graphiz 在线解析网页
+ 
 
             String command5 = "cmd.exe /C start chrome   http://www.bejson.com/jsonviewernew/ " ;
 
- String procResult5 = execCMD(command5);
+            String procResult5 = execCMD(command5); //  使用 Chrome 打开 JSON在线解析
+			
+			String procResult4 = execCMD(command4); //  使用 Chrome 打开 Graphiz 在线解析网页
             System.out.println("command5 = "+command5 +" procResult5="+ procResult5);
 
 // command6   生成 Png 照片
-           // String command6 = "cmd.exe /C start chrome   http://www.bejson.com/jsonviewernew/ ";
+            // String command6 = "cmd.exe /C start chrome   http://www.bejson.com/jsonviewernew/ ";
             File pngFile = new File(outFile.getParentFile().getAbsolutePath()+File.separator+ "B6.png");
-          //
+            //
             //  String command6 = " cmd.exe /c cd " +dotDirPath+  "  &&  dot.exe  "+outFile.getAbsolutePath() +" -Tpng -o  " + outFile.getParentFile().getAbsolutePath()+File.separator+ "B6.png";
             String command6 = " cmd.exe /c cd " +dotDirPath+  "  &&  dot.exe  "+outFile.getAbsolutePath() +" -Tpng -o  " + pngFile.getAbsolutePath();
             String procResult6 = execCMD(command6);
             System.out.println("command6 = "+command6 +" procResult6="+ procResult6);
             // command7   使用照片浏览器打开照片
-             String command7 = "rundll32.exe C:\\\\Windows\\\\System32\\\\shimgvw.dll,ImageView_Fullscreen  " + pngFile.getAbsolutePath();
-        //    RuntimeUtil.exec("rundll32.exe C:\\\\Windows\\\\System32\\\\shimgvw.dll,ImageView_Fullscreen  " + pngFile.getAbsolutePath());
+            String command7 = "rundll32.exe C:\\\\Windows\\\\System32\\\\shimgvw.dll,ImageView_Fullscreen  " + pngFile.getAbsolutePath();
+            //    RuntimeUtil.exec("rundll32.exe C:\\\\Windows\\\\System32\\\\shimgvw.dll,ImageView_Fullscreen  " + pngFile.getAbsolutePath());
             String procResult7 = execCMD(command7);
             System.out.println("command7 = "+command7 +" procResult7="+ procResult7);
 
