@@ -2492,6 +2492,12 @@ Wscript.exe  /x %userprofile%\Desktop\zbin\A5.vbs  %userprofile%\Desktop\zbin  $
 cmd /K cd /d %userprofile%\Desktop\zbin & %userprofile%\Desktop\zbin\A5.bat %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH)      【A5 bat】
 
 
+Wscript.exe  /x %userprofile%\Desktop\zbin\A6.vbs  %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH)       【A6 vbs】
+cmd /K cd /d %userprofile%\Desktop\zbin & %userprofile%\Desktop\zbin\A6.bat %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH)      【A6 bat】
+
+
+
+
 Wscript.exe  /x %userprofile%\Desktop\zbin\A7.vbs  %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH)       【A7 vbs】
 cmd /K cd /d %userprofile%\Desktop\zbin & %userprofile%\Desktop\zbin\A7.bat %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH)      【A7 bat】
 
