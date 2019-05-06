@@ -1,0 +1,3056 @@
+<!DOCTYPE html>
+<html>
+<head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>TIME_STAMP_ROOM</title>
+        <link rel="Shortcut Icon" href="https://i.loli.net/2019/02/13/5c62f60e194c3.png" type="image/x-icon" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+        <!--<meta itemprop="image" content="./images/fenxiang.png" />-->
+
+
+        <style>
+            html {
+                height: 100%;
+            }
+            body {
+                font-family: "Helvetica Neue", "Luxi Sans", "DejaVu Sans", Tahoma, "Hiragino Sans GB", "Microsoft Yahei", sans-serif;
+                background: #79a8ae;
+                color: #CFEBE4;
+                font-size: 18px;
+            //    line-height: 2;
+                letter-spacing: 1.2px;
+                margin: 0;
+            }
+            a {
+                color: #ebf7f4;
+            }
+            .body--ready {
+                background: -webkit-linear-gradient(top, rgb(203, 235, 219) 0%, rgb(55, 148, 192) 120%);
+                background: -moz-linear-gradient(top, rgb(203, 235, 219) 0%, rgb(55, 148, 192) 120%);
+                background: -o-linear-gradient(top, rgb(203, 235, 219) 0%, rgb(55, 148, 192) 120%);
+                background: -ms-linear-gradient(top, rgb(203, 235, 219) 0%, rgb(55, 148, 192) 120%);
+                background: linear-gradient(top, rgb(203, 235, 219) 0%, rgb(55, 148, 192) 120%);
+            }
+            .text {
+                position: fixed;
+                bottom: 100px;
+                text-align: center;
+                width: 100%;
+            }
+            .canvas {
+                margin: 0 auto;
+                display: block;
+            }
+            img#logo {
+                width: 128px;
+                background-size: cover;
+                border-radius: 200px;
+                box-shadow: 0px 0px 40px rgba(63, 81, 181, 0.72);
+                border: 3px solid #00a0ff;
+                opacity: 1;
+                margin: 0 auto;
+                margin-top: 20px;
+                margin-bottom: 20px;
+                transition: all 1.0s;
+            }
+            #logo:hover {
+                box-shadow: 0 0 10px #fff;
+                -webkit-box-shadow: 0 0 19px #fff;
+                transform: rotate(360deg);
+                -ms-transform: rotate(360deg); /* IE 9 */
+                -moz-transform: rotate(360deg); /* Firefox */
+                -webkit-transform: rotate(360deg); /* Safari 和 Chrome */
+                -o-transform: rotate(360deg); /* Opera */
+                filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=3);
+            }
+            .cs {
+                width: 100%;
+                height: 100%;
+                margin: 0 auto;
+                position: absolute;
+                text-align: center;
+            }
+            .text {
+                position: fixed;
+                bottom: 20px;
+                text-align: center;
+                width: 100%;
+                font-weight: bold;
+            }
+            .text-right {
+                position: fixed;
+                bottom: 50px;
+                text-align: right;
+                width: 100%;
+                font-weight: bold;
+            }
+        </style>
+    
+	
+	
+	<!-- Table 样式-->
+	    <style>
+        .hovertreeClass a {
+            color: black;
+            text-decoration: none;
+        }
+
+     td.ztable{
+	    background: rgba(102,255,153,0.5);
+        color: black;
+	 }
+        tr.ztable {
+	    background: rgba(255,0,0,0.3);
+        color: black;
+        }
+
+        table.hovertreeClass {
+            border-collapse: collapse;
+            border: none;
+			width: 96%;
+			text-align: center;
+			margin: auto;
+			// margin-top:-176px;
+			color: black;
+			
+        }
+
+        .hovertreeClass td, th {
+            border: solid green 1px;
+        }
+		
+		table.headTable {
+            border-collapse: collapse;
+            border: none;
+			width: 96%;
+			text-align: center;
+			margin: auto;
+			color: black;
+			
+        }
+
+        .headTable td, th {
+            border: solid green 1px;
+        }
+		
+    </style>
+	
+ <!-- width: fit-content; -->
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+    }
+
+
+    .scroll_table_ot .scroll {
+      max-height: 100%;
+      border: 1px solid #6a6a6a;
+      border-top: 0;
+      overflow-y: auto;
+      border-right: 0;
+    }
+
+
+	
+    .scroll_table_ot table {
+      width: 100%;
+      table-layout: fixed;
+      border-collapse: collapse;
+      border-spacing: 0;
+    }
+
+    .scroll_table_ot th{
+      width: 120px;
+      padding: 10px;
+      border: 1px solid #6a6a6a;
+	  background:#54FF9F;
+    }
+	
+	.scroll_table_ot td {
+      width: 120px;
+      padding: 10px;
+      border: 1px solid #6a6a6a;
+    }
+
+    .scroll_table_ot th {
+      font-weight: bold;
+    }
+
+    .scroll_table_ot thead th:last-child, .scroll_table_ot tbody td:last-child {
+      width: auto;
+    }
+
+    .scroll_table_ot tbody tr:first-child td {
+      width: 120px;
+      border-top: 0;
+    }
+
+    .scroll_table_ot tbody tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .scroll_table_ot tbody tr td:first-child {
+      border-left: 0;
+    }
+
+    .scroll_table_ot tbody tr td:last-child {
+      width: 120px;
+      border-right: 0;
+    }
+	
+
+    .scroll_table_ot {
+      margin:  auto;   //     
+      line-height: 18px;
+      font-size: 14px;
+      width: fit-content;
+    }
+
+
+  </style>
+</head>
+<body>
+
+<canvas class="canvas" width="100%" height="50%"></canvas>
+<p class="text" style="color: #ed3073;">呵呵同学已经有:
+<span id="span_dt_dt"></span>
+</p>
+	
+<div class="scroll_table_ot">
+  <table id="ztable_head"   class="headTable" >
+    <thead id="ztable_head_thead" style="background:FF00FF">
+    <tr>
+      <th>编号</th>
+      <th>姓名</th>
+      <th>生日(阳历)</th>
+      <th>生日(农历)</th>
+      <th>属相</th>
+      <th>最近的生日(阳历)</th>
+      <th>最近的生日(阳历)天数</th>
+      <th>最近的生日(农历)</th>
+      <th>最近的生日(农历)天数</th>
+      <th>年岁数</th>
+      <th>月岁数</th>
+      <th>天岁数</th>
+      <th>时岁数</th>
+      <th>分岁数</th>
+      <th>秒岁数</th>
+      <th>10岁日(阳历)</th>
+      <th>距10岁日(阳历)</th>
+      <th>10岁日(农历)</th>
+      <th>距10岁日(农历)</th>
+      <th>18岁日(阳历)</th>
+      <th>距18岁日(阳历)</th>
+      <th>18岁日(农历)</th>
+      <th>距18岁日(农历)</th>
+      <th>20岁日(阳历)</th>
+      <th>距20岁日(阳历)</th>
+      <th>20岁日(农历)</th>
+      <th>距20岁日(农历)</th>
+      <th>30岁日(阳历)</th>
+      <th>距30岁日(阳历)</th>
+      <th>30岁日(农历)</th>
+      <th>距30岁日(农历)</th>
+      <th>40岁日(阳历)</th>
+      <th>距40岁日(阳历)</th>
+      <th>40岁日(农历)</th>
+      <th>距40岁日(农历)</th>
+      <th>50岁日(阳历)</th>
+      <th>距50岁日(阳历)</th>
+      <th>50岁日(农历)</th>
+      <th>距50岁日(农历)</th>
+      <th>55岁日(阳历)</th>
+      <th>距55岁日(阳历)</th>
+      <th>55岁日(农历)</th>
+      <th>距55岁日(农历)</th>
+      <th>60岁日(阳历)</th>
+      <th>距60岁日(阳历)</th>
+      <th>60岁日(农历)</th>
+      <th>距60岁日(农历)</th>
+      <th>65岁日(阳历)</th>
+      <th>距65岁日(阳历)</th>
+      <th>65岁日(农历)</th>
+      <th>距65岁日(农历)</th>
+      <th>70岁日(阳历)</th>
+      <th>距70岁日(阳历)</th>
+      <th>70岁日(农历)</th>
+      <th>距70岁日(农历)</th>
+      <th>75岁日(阳历)</th>
+      <th>距75岁日(阳历)</th>
+      <th>75岁日(农历)</th>
+      <th>距75岁日(农历)</th>
+      <th>80岁日(阳历)</th>
+      <th>距80岁日(阳历)</th>
+      <th>80岁日(农历)</th>
+
+      <th>距80岁日(农历)</th>
+      <th></th>
+    </tr>
+    </thead>
+  </table>
+  <div class="scroll scrollbarStyle"  >
+    <table id="ztable"  class="hovertreeClass">
+	    <!-- <table id="ztable"  style="overflow:hidden"  class="hovertreeClass">-->
+      <!-- <tbody id="ztbody"> -->
+     <!--  </tbody>  -->
+    </table>
+  </div>
+</div>
+
+
+<script src="https://code.jquery.com/jquery-1.11.3.js"></script>
+<script>
+
+
+  /**
+   * @1900-2100区间内的公历、农历互转
+   * @charset UTF-8
+   * @Author  Jea杨(JJonline@JJonline.Cn)
+   * @Time    2014-7-21
+   * @Time    2016-8-13 Fixed 2033hex、Attribution Annals
+   * @Time    2016-9-25 Fixed lunar LeapMonth Param Bug
+   * @Time    2017-7-24 Fixed use getTerm Func Param Error.use solar year,NOT lunar year
+   * @Version 1.0.3
+   * @公历转农历：calendar.solar2lunar(1987,11,01); //[you can ignore params of prefix 0]
+   * @农历转公历：calendar.lunar2solar(1987,09,10); //[you can ignore params of prefix 0]
+   */
+  var calendar = {
+
+    /**
+     * 农历1900-2100的润大小信息表
+     * @Array Of Property
+     * @return Hex
+     */
+    lunarInfo:[0x04bd8,0x04ae0,0x0a570,0x054d5,0x0d260,0x0d950,0x16554,0x056a0,0x09ad0,0x055d2,//1900-1909
+      0x04ae0,0x0a5b6,0x0a4d0,0x0d250,0x1d255,0x0b540,0x0d6a0,0x0ada2,0x095b0,0x14977,//1910-1919
+      0x04970,0x0a4b0,0x0b4b5,0x06a50,0x06d40,0x1ab54,0x02b60,0x09570,0x052f2,0x04970,//1920-1929
+      0x06566,0x0d4a0,0x0ea50,0x06e95,0x05ad0,0x02b60,0x186e3,0x092e0,0x1c8d7,0x0c950,//1930-1939
+      0x0d4a0,0x1d8a6,0x0b550,0x056a0,0x1a5b4,0x025d0,0x092d0,0x0d2b2,0x0a950,0x0b557,//1940-1949
+      0x06ca0,0x0b550,0x15355,0x04da0,0x0a5b0,0x14573,0x052b0,0x0a9a8,0x0e950,0x06aa0,//1950-1959
+      0x0aea6,0x0ab50,0x04b60,0x0aae4,0x0a570,0x05260,0x0f263,0x0d950,0x05b57,0x056a0,//1960-1969
+      0x096d0,0x04dd5,0x04ad0,0x0a4d0,0x0d4d4,0x0d250,0x0d558,0x0b540,0x0b6a0,0x195a6,//1970-1979
+      0x095b0,0x049b0,0x0a974,0x0a4b0,0x0b27a,0x06a50,0x06d40,0x0af46,0x0ab60,0x09570,//1980-1989
+      0x04af5,0x04970,0x064b0,0x074a3,0x0ea50,0x06b58,0x055c0,0x0ab60,0x096d5,0x092e0,//1990-1999
+      0x0c960,0x0d954,0x0d4a0,0x0da50,0x07552,0x056a0,0x0abb7,0x025d0,0x092d0,0x0cab5,//2000-2009
+      0x0a950,0x0b4a0,0x0baa4,0x0ad50,0x055d9,0x04ba0,0x0a5b0,0x15176,0x052b0,0x0a930,//2010-2019
+      0x07954,0x06aa0,0x0ad50,0x05b52,0x04b60,0x0a6e6,0x0a4e0,0x0d260,0x0ea65,0x0d530,//2020-2029
+      0x05aa0,0x076a3,0x096d0,0x04afb,0x04ad0,0x0a4d0,0x1d0b6,0x0d250,0x0d520,0x0dd45,//2030-2039
+      0x0b5a0,0x056d0,0x055b2,0x049b0,0x0a577,0x0a4b0,0x0aa50,0x1b255,0x06d20,0x0ada0,//2040-2049
+      /**Add By JJonline@JJonline.Cn**/
+      0x14b63,0x09370,0x049f8,0x04970,0x064b0,0x168a6,0x0ea50, 0x06b20,0x1a6c4,0x0aae0,//2050-2059
+      0x0a2e0,0x0d2e3,0x0c960,0x0d557,0x0d4a0,0x0da50,0x05d55,0x056a0,0x0a6d0,0x055d4,//2060-2069
+      0x052d0,0x0a9b8,0x0a950,0x0b4a0,0x0b6a6,0x0ad50,0x055a0,0x0aba4,0x0a5b0,0x052b0,//2070-2079
+      0x0b273,0x06930,0x07337,0x06aa0,0x0ad50,0x14b55,0x04b60,0x0a570,0x054e4,0x0d160,//2080-2089
+      0x0e968,0x0d520,0x0daa0,0x16aa6,0x056d0,0x04ae0,0x0a9d4,0x0a2d0,0x0d150,0x0f252,//2090-2099
+      0x0d520],//2100
+
+    /**
+     * 公历每个月份的天数普通表
+     * @Array Of Property
+     * @return Number
+     */
+    solarMonth:[31,28,31,30,31,30,31,31,30,31,30,31],
+
+    /**
+     * 天干地支之天干速查表
+     * @Array Of Property trans["甲","乙","丙","丁","戊","己","庚","辛","壬","癸"]
+     * @return Cn string
+     */
+    Gan:["\u7532","\u4e59","\u4e19","\u4e01","\u620a","\u5df1","\u5e9a","\u8f9b","\u58ec","\u7678"],
+
+    /**
+     * 天干地支之地支速查表
+     * @Array Of Property
+     * @trans["子","丑","寅","卯","辰","巳","午","未","申","酉","戌","亥"]
+     * @return Cn string
+     */
+    Zhi:["\u5b50","\u4e11","\u5bc5","\u536f","\u8fb0","\u5df3","\u5348","\u672a","\u7533","\u9149","\u620c","\u4ea5"],
+
+    /**
+     * 天干地支之地支速查表<=>生肖
+     * @Array Of Property
+     * @trans["鼠","牛","虎","兔","龙","蛇","马","羊","猴","鸡","狗","猪"]
+     * @return Cn string
+     */
+    Animals:["\u9f20","\u725b","\u864e","\u5154","\u9f99","\u86c7","\u9a6c","\u7f8a","\u7334","\u9e21","\u72d7","\u732a"],
+
+    /**
+     * 24节气速查表
+     * @Array Of Property
+     * @trans["小寒","大寒","立春","雨水","惊蛰","春分","清明","谷雨","立夏","小满","芒种","夏至","小暑","大暑","立秋","处暑","白露","秋分","寒露","霜降","立冬","小雪","大雪","冬至"]
+     * @return Cn string
+     */
+    solarTerm:["\u5c0f\u5bd2","\u5927\u5bd2","\u7acb\u6625","\u96e8\u6c34","\u60ca\u86f0","\u6625\u5206","\u6e05\u660e","\u8c37\u96e8","\u7acb\u590f","\u5c0f\u6ee1","\u8292\u79cd","\u590f\u81f3","\u5c0f\u6691","\u5927\u6691","\u7acb\u79cb","\u5904\u6691","\u767d\u9732","\u79cb\u5206","\u5bd2\u9732","\u971c\u964d","\u7acb\u51ac","\u5c0f\u96ea","\u5927\u96ea","\u51ac\u81f3"],
+
+    /**
+     * 1900-2100各年的24节气日期速查表
+     * @Array Of Property
+     * @return 0x string For splice
+     */
+    sTermInfo:['9778397bd097c36b0b6fc9274c91aa','97b6b97bd19801ec9210c965cc920e','97bcf97c3598082c95f8c965cc920f',
+      '97bd0b06bdb0722c965ce1cfcc920f','b027097bd097c36b0b6fc9274c91aa','97b6b97bd19801ec9210c965cc920e',
+      '97bcf97c359801ec95f8c965cc920f','97bd0b06bdb0722c965ce1cfcc920f','b027097bd097c36b0b6fc9274c91aa',
+      '97b6b97bd19801ec9210c965cc920e','97bcf97c359801ec95f8c965cc920f','97bd0b06bdb0722c965ce1cfcc920f',
+      'b027097bd097c36b0b6fc9274c91aa','9778397bd19801ec9210c965cc920e','97b6b97bd19801ec95f8c965cc920f',
+      '97bd09801d98082c95f8e1cfcc920f','97bd097bd097c36b0b6fc9210c8dc2','9778397bd197c36c9210c9274c91aa',
+      '97b6b97bd19801ec95f8c965cc920e','97bd09801d98082c95f8e1cfcc920f','97bd097bd097c36b0b6fc9210c8dc2',
+      '9778397bd097c36c9210c9274c91aa','97b6b97bd19801ec95f8c965cc920e','97bcf97c3598082c95f8e1cfcc920f',
+      '97bd097bd097c36b0b6fc9210c8dc2','9778397bd097c36c9210c9274c91aa','97b6b97bd19801ec9210c965cc920e',
+      '97bcf97c3598082c95f8c965cc920f','97bd097bd097c35b0b6fc920fb0722','9778397bd097c36b0b6fc9274c91aa',
+      '97b6b97bd19801ec9210c965cc920e','97bcf97c3598082c95f8c965cc920f','97bd097bd097c35b0b6fc920fb0722',
+      '9778397bd097c36b0b6fc9274c91aa','97b6b97bd19801ec9210c965cc920e','97bcf97c359801ec95f8c965cc920f',
+      '97bd097bd097c35b0b6fc920fb0722','9778397bd097c36b0b6fc9274c91aa','97b6b97bd19801ec9210c965cc920e',
+      '97bcf97c359801ec95f8c965cc920f','97bd097bd097c35b0b6fc920fb0722','9778397bd097c36b0b6fc9274c91aa',
+      '97b6b97bd19801ec9210c965cc920e','97bcf97c359801ec95f8c965cc920f','97bd097bd07f595b0b6fc920fb0722',
+      '9778397bd097c36b0b6fc9210c8dc2','9778397bd19801ec9210c9274c920e','97b6b97bd19801ec95f8c965cc920f',
+      '97bd07f5307f595b0b0bc920fb0722','7f0e397bd097c36b0b6fc9210c8dc2','9778397bd097c36c9210c9274c920e',
+      '97b6b97bd19801ec95f8c965cc920f','97bd07f5307f595b0b0bc920fb0722','7f0e397bd097c36b0b6fc9210c8dc2',
+      '9778397bd097c36c9210c9274c91aa','97b6b97bd19801ec9210c965cc920e','97bd07f1487f595b0b0bc920fb0722',
+      '7f0e397bd097c36b0b6fc9210c8dc2','9778397bd097c36b0b6fc9274c91aa','97b6b97bd19801ec9210c965cc920e',
+      '97bcf7f1487f595b0b0bb0b6fb0722','7f0e397bd097c35b0b6fc920fb0722','9778397bd097c36b0b6fc9274c91aa',
+      '97b6b97bd19801ec9210c965cc920e','97bcf7f1487f595b0b0bb0b6fb0722','7f0e397bd097c35b0b6fc920fb0722',
+      '9778397bd097c36b0b6fc9274c91aa','97b6b97bd19801ec9210c965cc920e','97bcf7f1487f531b0b0bb0b6fb0722',
+      '7f0e397bd097c35b0b6fc920fb0722','9778397bd097c36b0b6fc9274c91aa','97b6b97bd19801ec9210c965cc920e',
+      '97bcf7f1487f531b0b0bb0b6fb0722','7f0e397bd07f595b0b6fc920fb0722','9778397bd097c36b0b6fc9274c91aa',
+      '97b6b97bd19801ec9210c9274c920e','97bcf7f0e47f531b0b0bb0b6fb0722','7f0e397bd07f595b0b0bc920fb0722',
+      '9778397bd097c36b0b6fc9210c91aa','97b6b97bd197c36c9210c9274c920e','97bcf7f0e47f531b0b0bb0b6fb0722',
+      '7f0e397bd07f595b0b0bc920fb0722','9778397bd097c36b0b6fc9210c8dc2','9778397bd097c36c9210c9274c920e',
+      '97b6b7f0e47f531b0723b0b6fb0722','7f0e37f5307f595b0b0bc920fb0722','7f0e397bd097c36b0b6fc9210c8dc2',
+      '9778397bd097c36b0b70c9274c91aa','97b6b7f0e47f531b0723b0b6fb0721','7f0e37f1487f595b0b0bb0b6fb0722',
+      '7f0e397bd097c35b0b6fc9210c8dc2','9778397bd097c36b0b6fc9274c91aa','97b6b7f0e47f531b0723b0b6fb0721',
+      '7f0e27f1487f595b0b0bb0b6fb0722','7f0e397bd097c35b0b6fc920fb0722','9778397bd097c36b0b6fc9274c91aa',
+      '97b6b7f0e47f531b0723b0b6fb0721','7f0e27f1487f531b0b0bb0b6fb0722','7f0e397bd097c35b0b6fc920fb0722',
+      '9778397bd097c36b0b6fc9274c91aa','97b6b7f0e47f531b0723b0b6fb0721','7f0e27f1487f531b0b0bb0b6fb0722',
+      '7f0e397bd097c35b0b6fc920fb0722','9778397bd097c36b0b6fc9274c91aa','97b6b7f0e47f531b0723b0b6fb0721',
+      '7f0e27f1487f531b0b0bb0b6fb0722','7f0e397bd07f595b0b0bc920fb0722','9778397bd097c36b0b6fc9274c91aa',
+      '97b6b7f0e47f531b0723b0787b0721','7f0e27f0e47f531b0b0bb0b6fb0722','7f0e397bd07f595b0b0bc920fb0722',
+      '9778397bd097c36b0b6fc9210c91aa','97b6b7f0e47f149b0723b0787b0721','7f0e27f0e47f531b0723b0b6fb0722',
+      '7f0e397bd07f595b0b0bc920fb0722','9778397bd097c36b0b6fc9210c8dc2','977837f0e37f149b0723b0787b0721',
+      '7f07e7f0e47f531b0723b0b6fb0722','7f0e37f5307f595b0b0bc920fb0722','7f0e397bd097c35b0b6fc9210c8dc2',
+      '977837f0e37f14998082b0787b0721','7f07e7f0e47f531b0723b0b6fb0721','7f0e37f1487f595b0b0bb0b6fb0722',
+      '7f0e397bd097c35b0b6fc9210c8dc2','977837f0e37f14998082b0787b06bd','7f07e7f0e47f531b0723b0b6fb0721',
+      '7f0e27f1487f531b0b0bb0b6fb0722','7f0e397bd097c35b0b6fc920fb0722','977837f0e37f14998082b0787b06bd',
+      '7f07e7f0e47f531b0723b0b6fb0721','7f0e27f1487f531b0b0bb0b6fb0722','7f0e397bd097c35b0b6fc920fb0722',
+      '977837f0e37f14998082b0787b06bd','7f07e7f0e47f531b0723b0b6fb0721','7f0e27f1487f531b0b0bb0b6fb0722',
+      '7f0e397bd07f595b0b0bc920fb0722','977837f0e37f14998082b0787b06bd','7f07e7f0e47f531b0723b0b6fb0721',
+      '7f0e27f1487f531b0b0bb0b6fb0722','7f0e397bd07f595b0b0bc920fb0722','977837f0e37f14998082b0787b06bd',
+      '7f07e7f0e47f149b0723b0787b0721','7f0e27f0e47f531b0b0bb0b6fb0722','7f0e397bd07f595b0b0bc920fb0722',
+      '977837f0e37f14998082b0723b06bd','7f07e7f0e37f149b0723b0787b0721','7f0e27f0e47f531b0723b0b6fb0722',
+      '7f0e397bd07f595b0b0bc920fb0722','977837f0e37f14898082b0723b02d5','7ec967f0e37f14998082b0787b0721',
+      '7f07e7f0e47f531b0723b0b6fb0722','7f0e37f1487f595b0b0bb0b6fb0722','7f0e37f0e37f14898082b0723b02d5',
+      '7ec967f0e37f14998082b0787b0721','7f07e7f0e47f531b0723b0b6fb0722','7f0e37f1487f531b0b0bb0b6fb0722',
+      '7f0e37f0e37f14898082b0723b02d5','7ec967f0e37f14998082b0787b06bd','7f07e7f0e47f531b0723b0b6fb0721',
+      '7f0e37f1487f531b0b0bb0b6fb0722','7f0e37f0e37f14898082b072297c35','7ec967f0e37f14998082b0787b06bd',
+      '7f07e7f0e47f531b0723b0b6fb0721','7f0e27f1487f531b0b0bb0b6fb0722','7f0e37f0e37f14898082b072297c35',
+      '7ec967f0e37f14998082b0787b06bd','7f07e7f0e47f531b0723b0b6fb0721','7f0e27f1487f531b0b0bb0b6fb0722',
+      '7f0e37f0e366aa89801eb072297c35','7ec967f0e37f14998082b0787b06bd','7f07e7f0e47f149b0723b0787b0721',
+      '7f0e27f1487f531b0b0bb0b6fb0722','7f0e37f0e366aa89801eb072297c35','7ec967f0e37f14998082b0723b06bd',
+      '7f07e7f0e47f149b0723b0787b0721','7f0e27f0e47f531b0723b0b6fb0722','7f0e37f0e366aa89801eb072297c35',
+      '7ec967f0e37f14998082b0723b06bd','7f07e7f0e37f14998083b0787b0721','7f0e27f0e47f531b0723b0b6fb0722',
+      '7f0e37f0e366aa89801eb072297c35','7ec967f0e37f14898082b0723b02d5','7f07e7f0e37f14998082b0787b0721',
+      '7f07e7f0e47f531b0723b0b6fb0722','7f0e36665b66aa89801e9808297c35','665f67f0e37f14898082b0723b02d5',
+      '7ec967f0e37f14998082b0787b0721','7f07e7f0e47f531b0723b0b6fb0722','7f0e36665b66a449801e9808297c35',
+      '665f67f0e37f14898082b0723b02d5','7ec967f0e37f14998082b0787b06bd','7f07e7f0e47f531b0723b0b6fb0721',
+      '7f0e36665b66a449801e9808297c35','665f67f0e37f14898082b072297c35','7ec967f0e37f14998082b0787b06bd',
+      '7f07e7f0e47f531b0723b0b6fb0721','7f0e26665b66a449801e9808297c35','665f67f0e37f1489801eb072297c35',
+      '7ec967f0e37f14998082b0787b06bd','7f07e7f0e47f531b0723b0b6fb0721','7f0e27f1487f531b0b0bb0b6fb0722'],
+
+    /**
+     * 数字转中文速查表
+     * @Array Of Property
+     * @trans ['日','一','二','三','四','五','六','七','八','九','十']
+     * @return Cn string
+     */
+    nStr1:["\u65e5","\u4e00","\u4e8c","\u4e09","\u56db","\u4e94","\u516d","\u4e03","\u516b","\u4e5d","\u5341"],
+
+    /**
+     * 日期转农历称呼速查表
+     * @Array Of Property
+     * @trans ['初','十','廿','卅']
+     * @return Cn string
+     */
+    nStr2:["\u521d","\u5341","\u5eff","\u5345"],
+
+    /**
+     * 月份转农历称呼速查表
+     * @Array Of Property
+     * @trans ['正','一','二','三','四','五','六','七','八','九','十','冬','腊']
+     * @return Cn string
+     */
+    nStr3:["\u6b63","\u4e8c","\u4e09","\u56db","\u4e94","\u516d","\u4e03","\u516b","\u4e5d","\u5341","\u51ac","\u814a"],
+
+    /**
+     * 返回农历y年一整年的总天数
+     * @param lunar Year
+     * @return Number
+     * @eg:var count = calendar.lYearDays(1987) ;//count=387
+     */
+    lYearDays:function(y) {
+      var i, sum = 348;
+      for(i=0x8000; i>0x8; i>>=1) { sum += (calendar.lunarInfo[y-1900] & i)? 1: 0; }
+      return(sum+calendar.leapDays(y));
+    },
+
+    /**
+     * 返回农历y年闰月是哪个月；若y年没有闰月 则返回0
+     * @param lunar Year
+     * @return Number (0-12)
+     * @eg:var leapMonth = calendar.leapMonth(1987) ;//leapMonth=6
+     */
+    leapMonth:function(y) { //闰字编码 \u95f0
+      return(calendar.lunarInfo[y-1900] & 0xf);
+    },
+
+    /**
+     * 返回农历y年闰月的天数 若该年没有闰月则返回0
+     * @param lunar Year
+     * @return Number (0、29、30)
+     * @eg:var leapMonthDay = calendar.leapDays(1987) ;//leapMonthDay=29
+     */
+    leapDays:function(y) {
+      if(calendar.leapMonth(y))  {
+        return((calendar.lunarInfo[y-1900] & 0x10000)? 30: 29);
+      }
+      return(0);
+    },
+
+    /**
+     * 返回农历y年m月（非闰月）的总天数，计算m为闰月时的天数请使用leapDays方法
+     * @param lunar Year
+     * @return Number (-1、29、30)
+     * @eg:var MonthDay = calendar.monthDays(1987,9) ;//MonthDay=29
+     */
+    monthDays:function(y,m) {
+      if(m>12 || m<1) {return -1}//月份参数从1至12，参数错误返回-1
+      return( (calendar.lunarInfo[y-1900] & (0x10000>>m))? 30: 29 );
+    },
+
+    /**
+     * 返回公历(!)y年m月的天数
+     * @param solar Year
+     * @return Number (-1、28、29、30、31)
+     * @eg:var solarMonthDay = calendar.leapDays(1987) ;//solarMonthDay=30
+     */
+    solarDays:function(y,m) {
+      if(m>12 || m<1) {return -1} //若参数错误 返回-1
+      var ms = m-1;
+      if(ms==1) { //2月份的闰平规律测算后确认返回28或29
+        return(((y%4 == 0) && (y%100 != 0) || (y%400 == 0))? 29: 28);
+      }else {
+        return(calendar.solarMonth[ms]);
+      }
+    },
+
+    /**
+     * 农历年份转换为干支纪年
+     * @param  lYear 农历年的年份数
+     * @return Cn string
+     */
+    toGanZhiYear:function(lYear) {
+      var ganKey = (lYear - 3) % 10;
+      var zhiKey = (lYear - 3) % 12;
+      if(ganKey == 0) ganKey = 10;//如果余数为0则为最后一个天干
+      if(zhiKey == 0) zhiKey = 12;//如果余数为0则为最后一个地支
+      return calendar.Gan[ganKey-1] + calendar.Zhi[zhiKey-1];
+
+    },
+
+    /**
+     * 公历月、日判断所属星座
+     * @param  cMonth [description]
+     * @param  cDay [description]
+     * @return Cn string
+     */
+    toAstro:function(cMonth,cDay) {
+      var s   = "\u9b54\u7faf\u6c34\u74f6\u53cc\u9c7c\u767d\u7f8a\u91d1\u725b\u53cc\u5b50\u5de8\u87f9\u72ee\u5b50\u5904\u5973\u5929\u79e4\u5929\u874e\u5c04\u624b\u9b54\u7faf";
+      var arr = [20,19,21,21,21,22,23,23,23,23,22,22];
+      return s.substr(cMonth*2 - (cDay < arr[cMonth-1] ? 2 : 0),2) + "\u5ea7";//座
+    },
+
+    /**
+     * 传入offset偏移量返回干支
+     * @param offset 相对甲子的偏移量
+     * @return Cn string
+     */
+    toGanZhi:function(offset) {
+      return calendar.Gan[offset%10] + calendar.Zhi[offset%12];
+    },
+
+    /**
+     * 传入公历(!)y年获得该年第n个节气的公历日期
+     * @param y公历年(1900-2100)；n二十四节气中的第几个节气(1~24)；从n=1(小寒)算起
+     * @return day Number
+     * @eg:var _24 = calendar.getTerm(1987,3) ;//_24=4;意即1987年2月4日立春
+     */
+    getTerm:function(y,n) {
+      if(y<1900 || y>2100) {return -1;}
+      if(n<1 || n>24) {return -1;}
+      var _table = calendar.sTermInfo[y-1900];
+      var _info = [
+        parseInt('0x'+_table.substr(0,5)).toString() ,
+        parseInt('0x'+_table.substr(5,5)).toString(),
+        parseInt('0x'+_table.substr(10,5)).toString(),
+        parseInt('0x'+_table.substr(15,5)).toString(),
+        parseInt('0x'+_table.substr(20,5)).toString(),
+        parseInt('0x'+_table.substr(25,5)).toString()
+      ];
+      var _calday = [
+        _info[0].substr(0,1),
+        _info[0].substr(1,2),
+        _info[0].substr(3,1),
+        _info[0].substr(4,2),
+
+        _info[1].substr(0,1),
+        _info[1].substr(1,2),
+        _info[1].substr(3,1),
+        _info[1].substr(4,2),
+
+        _info[2].substr(0,1),
+        _info[2].substr(1,2),
+        _info[2].substr(3,1),
+        _info[2].substr(4,2),
+
+        _info[3].substr(0,1),
+        _info[3].substr(1,2),
+        _info[3].substr(3,1),
+        _info[3].substr(4,2),
+
+        _info[4].substr(0,1),
+        _info[4].substr(1,2),
+        _info[4].substr(3,1),
+        _info[4].substr(4,2),
+
+        _info[5].substr(0,1),
+        _info[5].substr(1,2),
+        _info[5].substr(3,1),
+        _info[5].substr(4,2),
+      ];
+      return parseInt(_calday[n-1]);
+    },
+
+    /**
+     * 传入农历数字月份返回汉语通俗表示法
+     * @param lunar month
+     * @return Cn string
+     * @eg:var cnMonth = calendar.toChinaMonth(12) ;//cnMonth='腊月'
+     */
+    toChinaMonth:function(m) { // 月 => \u6708
+      if(m>12 || m<1) {return -1} //若参数错误 返回-1
+      var s = calendar.nStr3[m-1];
+      s+= "\u6708";//加上月字
+      return s;
+    },
+
+    /**
+     * 传入农历日期数字返回汉字表示法
+     * @param lunar day
+     * @return Cn string
+     * @eg:var cnDay = calendar.toChinaDay(21) ;//cnMonth='廿一'
+     */
+    toChinaDay:function(d){ //日 => \u65e5
+      var s;
+      switch (d) {
+        case 10:
+          s = '\u521d\u5341'; break;
+        case 20:
+          s = '\u4e8c\u5341'; break;
+          break;
+        case 30:
+          s = '\u4e09\u5341'; break;
+          break;
+        default :
+          s = calendar.nStr2[Math.floor(d/10)];
+          s += calendar.nStr1[d%10];
+      }
+      return(s);
+    },
+
+    /**
+     * 年份转生肖[!仅能大致转换] => 精确划分生肖分界线是“立春”
+     * @param y year
+     * @return Cn string
+     * @eg:var animal = calendar.getAnimal(1987) ;//animal='兔'
+     */
+    getAnimal: function(y) {
+      return calendar.Animals[(y - 4) % 12]
+    },
+
+    /**
+     * 传入阳历年月日获得详细的公历、农历object信息 <=>JSON
+     * @param y  solar year
+     * @param m  solar month
+     * @param d  solar day
+     * @return JSON object
+     * @eg:console.log(calendar.solar2lunar(1987,11,01));
+     */
+    solar2lunar:function (y,m,d) { //参数区间1900.1.31~2100.12.31
+      //年份限定、上限
+      if(y<1900 || y>2100) {
+        return -1;// undefined转换为数字变为NaN
+      }
+      //公历传参最下限
+      if(y==1900&&m==1&&d<31) {
+        return -1;
+      }
+      //未传参  获得当天
+      if(!y) {
+        var objDate = new Date();
+      }else {
+        var objDate = new Date(y,parseInt(m)-1,d)
+      }
+      var i, leap=0, temp=0;
+      //修正ymd参数
+      var y = objDate.getFullYear(),
+        m = objDate.getMonth()+1,
+        d = objDate.getDate();
+      var offset = (Date.UTC(objDate.getFullYear(),objDate.getMonth(),objDate.getDate()) - Date.UTC(1900,0,31))/86400000;
+      for(i=1900; i<2101 && offset>0; i++) {
+        temp    = calendar.lYearDays(i);
+        offset -= temp;
+      }
+      if(offset<0) {
+        offset+=temp; i--;
+      }
+
+      //是否今天
+      var isTodayObj = new Date(),
+        isToday    = false;
+      if(isTodayObj.getFullYear()==y && isTodayObj.getMonth()+1==m && isTodayObj.getDate()==d) {
+        isToday = true;
+      }
+      //星期几
+      var nWeek = objDate.getDay(),
+        cWeek  = calendar.nStr1[nWeek];
+      //数字表示周几顺应天朝周一开始的惯例
+      if(nWeek==0) {
+        nWeek = 7;
+      }
+      //农历年
+      var year   = i;
+      var leap   = calendar.leapMonth(i); //闰哪个月
+      var isLeap = false;
+
+      //效验闰月
+      for(i=1; i<13 && offset>0; i++) {
+        //闰月
+        if(leap>0 && i==(leap+1) && isLeap==false){
+          --i;
+          isLeap = true; temp = calendar.leapDays(year); //计算农历闰月天数
+        }
+        else{
+          temp = calendar.monthDays(year, i);//计算农历普通月天数
+        }
+        //解除闰月
+        if(isLeap==true && i==(leap+1)) { isLeap = false; }
+        offset -= temp;
+      }
+      // 闰月导致数组下标重叠取反
+      if(offset==0 && leap>0 && i==leap+1)
+      {
+        if(isLeap){
+          isLeap = false;
+        }else{
+          isLeap = true; --i;
+        }
+      }
+      if(offset<0)
+      {
+        offset += temp; --i;
+      }
+      //农历月
+      var month      = i;
+      //农历日
+      var day        = offset + 1;
+      //天干地支处理
+      var sm         = m-1;
+      var gzY        = calendar.toGanZhiYear(year);
+
+      // 当月的两个节气
+      // bugfix-2017-7-24 11:03:38 use lunar Year Param `y` Not `year`
+      var firstNode  = calendar.getTerm(y,(m*2-1));//返回当月「节」为几日开始
+      var secondNode = calendar.getTerm(y,(m*2));//返回当月「节」为几日开始
+
+      // 依据12节气修正干支月
+      var gzM        = calendar.toGanZhi((y-1900)*12+m+11);
+      if(d>=firstNode) {
+        gzM        = calendar.toGanZhi((y-1900)*12+m+12);
+      }
+
+      //传入的日期的节气与否
+      var isTerm = false;
+      var Term   = null;
+      if(firstNode==d) {
+        isTerm  = true;
+        Term    = calendar.solarTerm[m*2-2];
+      }
+      if(secondNode==d) {
+        isTerm  = true;
+        Term    = calendar.solarTerm[m*2-1];
+      }
+      //日柱 当月一日与 1900/1/1 相差天数
+      var dayCyclical = Date.UTC(y,sm,1,0,0,0,0)/86400000+25567+10;
+      var gzD         = calendar.toGanZhi(dayCyclical+d-1);
+      //该日期所属的星座
+      var astro       = calendar.toAstro(m,d);
+
+      return {'lYear':year,'lMonth':month,'lDay':day,'Animal':calendar.getAnimal(year),'IMonthCn':(isLeap?"\u95f0":'')+calendar.toChinaMonth(month),'IDayCn':calendar.toChinaDay(day),'cYear':y,'cMonth':m,'cDay':d,'gzYear':gzY,'gzMonth':gzM,'gzDay':gzD,'isToday':isToday,'isLeap':isLeap,'nWeek':nWeek,'ncWeek':"\u661f\u671f"+cWeek,'isTerm':isTerm,'Term':Term,'astro':astro};
+    },
+
+    /**
+     * 传入农历年月日以及传入的月份是否闰月获得详细的公历、农历object信息 <=>JSON
+     * @param y  lunar year
+     * @param m  lunar month
+     * @param d  lunar day
+     * @param isLeapMonth  lunar month is leap or not.[如果是农历闰月第四个参数赋值true即可]
+     * @return JSON object
+     * @eg:console.log(calendar.lunar2solar(1987,9,10));
+     */
+    lunar2solar:function(y,m,d,isLeapMonth) {   //参数区间1900.1.31~2100.12.1
+      var isLeapMonth = !!isLeapMonth;
+      var leapOffset  = 0;
+      var leapMonth   = calendar.leapMonth(y);
+      var leapDay     = calendar.leapDays(y);
+      if(isLeapMonth&&(leapMonth!=m)) {return -1;}//传参要求计算该闰月公历 但该年得出的闰月与传参的月份并不同
+      if(y==2100&&m==12&&d>1 || y==1900&&m==1&&d<31) {return -1;}//超出了最大极限值
+      var day  = calendar.monthDays(y,m);
+      var _day = day;
+      //bugFix 2016-9-25
+      //if month is leap, _day use leapDays method
+      if(isLeapMonth) {
+        _day = calendar.leapDays(y,m);
+      }
+      if(y < 1900 || y > 2100 || d > _day) {return -1;}//参数合法性效验
+
+      //计算农历的时间差
+      var offset = 0;
+      for(var i=1900;i<y;i++) {
+        offset+=calendar.lYearDays(i);
+      }
+      var leap = 0,isAdd= false;
+      for(var i=1;i<m;i++) {
+        leap = calendar.leapMonth(y);
+        if(!isAdd) {//处理闰月
+          if(leap<=i && leap>0) {
+            offset+=calendar.leapDays(y);isAdd = true;
+          }
+        }
+        offset+=calendar.monthDays(y,i);
+      }
+      //转换闰月农历 需补充该年闰月的前一个月的时差
+      if(isLeapMonth) {offset+=day;}
+      //1900年农历正月一日的公历时间为1900年1月30日0时0分0秒(该时间也是本农历的最开始起始点)
+      var stmap   =   Date.UTC(1900,1,30,0,0,0);
+      var calObj  =   new Date((offset+d-31)*86400000+stmap);
+      var cY      =   calObj.getUTCFullYear();
+      var cM      =   calObj.getUTCMonth()+1;
+      var cD      =   calObj.getUTCDate();
+
+      return calendar.solar2lunar(cY,cM,cD);
+    }
+  };
+
+  //====================================Zukgit====================================
+  function getBirthDay_YangLi( birthDayStr ){
+    return birthDayStr;
+  }
+
+  // nongli_obj {
+  //   Animal: "兔",
+  //     IDayCn: "初十",
+  //   IMonthCn: "九月",
+  //   Term: null,
+  //   cDay: 1,
+  //   cMonth: 11,
+  //   cYear: 1987,
+  //   gzDay: "甲寅",
+  //   gzMonth: "庚戌",
+  //   gzYear: "丁卯",
+  //   isLeap: false,
+  //   isTerm: false,
+  //   isToday: false,
+  //   lDay: 10,
+  //   lMonth: 9,
+  //   lYear: 1987,
+  //   nWeek: 7,
+  //   ncWeek: "星期日"
+  // }
+
+  function getBirthDay_NongLi( birthDayStr ){
+    var birthDay = new Date(birthDayStr);
+    var year = birthDay.getFullYear();
+    var month = birthDay.getMonth()+1;
+    var day = birthDay.getDate();
+
+    var nongli_obj =  calendar.solar2lunar(year,month,day);
+    var n_year = nongli_obj.lYear+"年";
+    var n_month = nongli_obj.lMonth+"月";
+    var n_day = nongli_obj.lDay+"日";
+    return n_year+n_month+n_day;
+  }
+
+  function getAmnial_NongLi( birthDayStr ){
+    var birthDay = new Date(birthDayStr);
+    var year = birthDay.getFullYear();
+    var month = birthDay.getMonth()+1;
+    var day = birthDay.getDate();
+    var nongli_obj =  calendar.solar2lunar(year,month,day);
+    var n_amnial = nongli_obj.Animal;
+    return n_amnial;
+  }
+
+
+  function getLifeSeconds( birthDayStr ){
+    var nowDate = new Date();      // 现在的时间
+    var timeold = nowDate.getTime() - new Date(birthDayStr).getTime();;   // 时间差值间隔
+    var sectimeold = timeold / 1000
+    var  secondLife = Math.floor(sectimeold);
+    return secondLife;
+  }
+
+  function getLifeMinutes( birthDayStr ){
+    var nowDate = new Date();      // 现在的时间
+    var timeold = nowDate.getTime() - new Date(birthDayStr).getTime();;   // 时间差值间隔
+    var sectimeold = timeold / 1000
+    var secondLife = Math.floor(sectimeold);
+    var mintus  = Math.floor(secondLife/60)
+    return mintus;
+  }
+
+  function getLifeHour( birthDayStr ){
+    var nowDate = new Date();      // 现在的时间
+    var timeold = nowDate.getTime() - new Date(birthDayStr).getTime();;   // 时间差值间隔
+    var sectimeold = timeold / 1000
+    var secondLife = Math.floor(sectimeold);
+    var mintus  = Math.floor(secondLife/60)
+    var hourLife  = Math.floor(mintus/60)
+    return hourLife;
+  }
+
+
+  function getLifeDay( birthDayStr ){
+    var nowDate = new Date();      // 现在的时间
+    var timeold = nowDate.getTime() - new Date(birthDayStr).getTime();;   // 时间差值间隔
+    var sectimeold = timeold / 1000
+    var secondLife = Math.floor(sectimeold);
+    var mintus  = Math.floor(secondLife/60)
+    var hourLife  = Math.floor(mintus/60)
+    var day  = Math.floor(hourLife/24)
+    return day;
+  }
+
+  function getLifeMonth( birthDayStr ){
+    var nowDate = new Date();      // 现在的时间
+    var timeold = nowDate.getTime() - new Date(birthDayStr).getTime();;   // 时间差值间隔
+    var sectimeold = timeold / 1000
+    var secondLife = Math.floor(sectimeold);
+    var mintus  = Math.floor(secondLife/60)
+    var hourLife  = Math.floor(mintus/60)
+    var day  = Math.floor(hourLife/24)
+    return day;
+  }
+
+  function getLifeMonth(birthDayStr){
+    var birthDay = new Date(birthDayStr);
+    var nowDay = new Date();
+    var birthMonth = birthDay.getMonth();
+    var nowMonth = nowDay.getMonth();
+    var intervalMonth = (nowDay.getFullYear()*12+ nowMonth) - (birthDay.getFullYear()*12+ birthMonth);
+    return intervalMonth;
+  }
+
+
+  function getLifeYear(birthDayStr){
+    var birthDay = new Date(birthDayStr);
+    var nowDay = new Date();
+    var birthMonth = birthDay.getMonth();
+    var nowMonth = nowDay.getMonth();
+    var intervalMonth = (nowDay.getFullYear()*12+ nowMonth) - (birthDay.getFullYear()*12+ birthMonth);
+    var yearold =  Math.floor(intervalMonth/12);
+    var monthold =  intervalMonth%12;
+    return yearold+"岁"+monthold+"月";
+  }
+
+
+  // nongli_obj {
+  //   Animal: "兔",
+  //     IDayCn: "初十",
+  //   IMonthCn: "九月",
+  //   Term: null,
+  //   cDay: 1,
+  //   cMonth: 11,
+  //   cYear: 1987,
+  //   gzDay: "甲寅",
+  //   gzMonth: "庚戌",
+  //   gzYear: "丁卯",
+  //   isLeap: false,
+  //   isTerm: false,
+  //   isToday: false,
+  //   lDay: 10,
+  //   lMonth: 9,
+  //   lYear: 1987,
+  //   nWeek: 7,
+  //   ncWeek: "星期日"
+  // }
+
+
+  function get10Year(birthDayStr){
+    var birthDay = new Date(birthDayStr);
+    ;
+    var year10old = new Date(birthDay.getFullYear()+ 10,birthDay.getMonth(),birthDay.getDate());
+    var year = year10old.getFullYear();
+    var month = year10old.getMonth()+1;
+    var day = year10old.getDate();
+
+    return year+"/"+month+"/"+day;
+  }
+
+  function get10Year_NongLi(birthDayStr){
+    var birthDay = new Date(birthDayStr);
+    var year = birthDay.getFullYear();
+    var month = birthDay.getMonth()+1;
+    var day = birthDay.getDate();
+    var nongli_obj =  calendar.solar2lunar(year,month,day);   // 先把阳历转为农历
+    var n_year = nongli_obj.lYear;
+    var n_month = nongli_obj.lMonth;
+    var n_day = nongli_obj.lDay;  //  当前生日的  农历 ,  农历再相加
+    var nongli_obj_10year =  calendar.lunar2solar(n_year+10,n_month,n_day);
+    var n_year_10 = nongli_obj_10year.cYear;
+    var n_month_10 =  nongli_obj_10year.cMonth;
+    var n_day_10 =  nongli_obj_10year.cDay;
+
+    return n_year_10+"/"+n_month_10+"/"+n_day_10;
+  }
+
+  function get10Year_Day(birthDayStr){
+    var birthDay = new Date(birthDayStr);
+    var nowDate = new Date();
+    var year10old = new Date(birthDay.getFullYear()+ 10,birthDay.getMonth(),birthDay.getDate());
+    var timeold = year10old.getTime() - nowDate.getTime();   // 时间差值间隔
+    var sectimeold = timeold / 1000
+    var secondLife = Math.floor(sectimeold);
+    var mintus  = Math.floor(secondLife/60)
+    var hourLife  = Math.floor(mintus/60)
+    var day  = Math.floor(hourLife/24)
+    return day+"天";
+  }
+
+  function get10Year_Day_NongLi(birthDayStr) {
+    var birthDay = new Date(birthDayStr);
+    var year = birthDay.getFullYear();
+    var month = birthDay.getMonth()+1;
+    var day = birthDay.getDate();
+    var nongli_obj =  calendar.solar2lunar(year,month,day);   // 先把阳历转为农历
+    var n_year = nongli_obj.lYear;
+    var n_month = nongli_obj.lMonth;
+    var n_day = nongli_obj.lDay;  //  当前生日的  农历 ,  农历再相加
+    var nongli_obj_10year =  calendar.lunar2solar(n_year+10,n_month,n_day);
+    var n_year_10 = nongli_obj_10year.cYear;
+    var n_month_10 =  nongli_obj_10year.cMonth;
+    var n_day_10 =  nongli_obj_10year.cDay;    // 2027/6/17
+
+    var  n_Date_10year = new Date(n_year_10,n_month_10-1,n_day_10);
+
+
+    var timeold =   n_Date_10year.getTime() - new Date().getTime();   // 时间差值间隔   现在转为农历的时间
+    var sectimeold = timeold / 1000
+    var secondLife = Math.floor(sectimeold);
+    var mintus  = Math.floor(secondLife/60)
+    var hourLife  = Math.floor(mintus/60)
+    var returnday  = Math.floor(hourLife/24)
+    return returnday+"天";
+  }
+
+
+  function get18Year(birthDayStr){
+    var birthDay = new Date(birthDayStr);
+    ;
+    var year18old = new Date(birthDay.getFullYear()+ 18,birthDay.getMonth(),birthDay.getDate());
+    var year = year18old.getFullYear();
+    var month = year18old.getMonth()+1;
+    var day = year18old.getDate();
+
+    return year+"/"+month+"/"+day;
+  }
+
+  function get18Year_NongLi(birthDayStr){
+    var birthDay = new Date(birthDayStr);
+    var year = birthDay.getFullYear();
+    var month = birthDay.getMonth()+1;
+    var day = birthDay.getDate();
+    var nongli_obj =  calendar.solar2lunar(year,month,day);   // 先把阳历转为农历
+    var n_year = nongli_obj.lYear;
+    var n_month = nongli_obj.lMonth;
+    var n_day = nongli_obj.lDay;  //  当前生日的  农历 ,  农历再相加
+    var nongli_obj_18year =  calendar.lunar2solar(n_year+18,n_month,n_day);
+    var n_year_18 = nongli_obj_18year.cYear;
+    var n_month_18 =  nongli_obj_18year.cMonth;
+    var n_day_18 =  nongli_obj_18year.cDay;
+
+    return n_year_18+"/"+n_month_18+"/"+n_day_18;
+  }
+
+  function get18Year_Day(birthDayStr){
+    var birthDay = new Date(birthDayStr);
+    var nowDate = new Date();
+    var year18old = new Date(birthDay.getFullYear()+ 18,birthDay.getMonth(),birthDay.getDate());
+    var timeold = year18old.getTime() - nowDate.getTime();   // 时间差值间隔
+    var sectimeold = timeold / 1000
+    var secondLife = Math.floor(sectimeold);
+    var mintus  = Math.floor(secondLife/60)
+    var hourLife  = Math.floor(mintus/60)
+    var day  = Math.floor(hourLife/24)
+    return day+"天";
+  }
+
+  function get18Year_Day_NongLi(birthDayStr) {
+    var birthDay = new Date(birthDayStr);
+    var year = birthDay.getFullYear();
+    var month = birthDay.getMonth()+1;
+    var day = birthDay.getDate();
+    var nongli_obj =  calendar.solar2lunar(year,month,day);   // 先把阳历转为农历
+    var n_year = nongli_obj.lYear;
+    var n_month = nongli_obj.lMonth;
+    var n_day = nongli_obj.lDay;  //  当前生日的  农历 ,  农历再相加
+    var nongli_obj_18year =  calendar.lunar2solar(n_year+18,n_month,n_day);
+    var n_year_18 = nongli_obj_18year.cYear;
+    var n_month_18 =  nongli_obj_18year.cMonth;
+    var n_day_18 =  nongli_obj_18year.cDay;    // 2027/6/17
+
+    var  n_Date_18year = new Date(n_year_18,n_month_18-1,n_day_18);
+
+
+    var timeold =   n_Date_18year.getTime() - new Date().getTime();   // 时间差值间隔   现在转为农历的时间
+    var sectimeold = timeold / 1000
+    var secondLife = Math.floor(sectimeold);
+    var mintus  = Math.floor(secondLife/60)
+    var hourLife  = Math.floor(mintus/60)
+    var returnday  = Math.floor(hourLife/24)
+    return returnday+"天";
+  }
+
+
+
+  function get20Year(birthDayStr){
+    var birthDay = new Date(birthDayStr);
+    ;
+    var year20old = new Date(birthDay.getFullYear()+ 20,birthDay.getMonth(),birthDay.getDate());
+    var year = year20old.getFullYear();
+    var month = year20old.getMonth()+1;
+    var day = year20old.getDate();
+
+    return year+"/"+month+"/"+day;
+  }
+
+  function get20Year_NongLi(birthDayStr){
+    var birthDay = new Date(birthDayStr);
+    var year = birthDay.getFullYear();
+    var month = birthDay.getMonth()+1;
+    var day = birthDay.getDate();
+    var nongli_obj =  calendar.solar2lunar(year,month,day);   // 先把阳历转为农历
+    var n_year = nongli_obj.lYear;
+    var n_month = nongli_obj.lMonth;
+    var n_day = nongli_obj.lDay;  //  当前生日的  农历 ,  农历再相加
+    var nongli_obj_20year =  calendar.lunar2solar(n_year+20,n_month,n_day);
+    var n_year_20 = nongli_obj_20year.cYear;
+    var n_month_20 =  nongli_obj_20year.cMonth;
+    var n_day_20 =  nongli_obj_20year.cDay;
+
+    return n_year_20+"/"+n_month_20+"/"+n_day_20;
+  }
+
+  function get20Year_Day(birthDayStr){
+    var birthDay = new Date(birthDayStr);
+    var nowDate = new Date();
+    var year20old = new Date(birthDay.getFullYear()+ 20,birthDay.getMonth(),birthDay.getDate());
+    var timeold = year20old.getTime() - nowDate.getTime();   // 时间差值间隔
+    var sectimeold = timeold / 1000
+    var secondLife = Math.floor(sectimeold);
+    var mintus  = Math.floor(secondLife/60)
+    var hourLife  = Math.floor(mintus/60)
+    var day  = Math.floor(hourLife/24)
+    return day+"天";
+  }
+
+  function get20Year_Day_NongLi(birthDayStr) {
+    var birthDay = new Date(birthDayStr);
+    var year = birthDay.getFullYear();
+    var month = birthDay.getMonth()+1;
+    var day = birthDay.getDate();
+    var nongli_obj =  calendar.solar2lunar(year,month,day);   // 先把阳历转为农历
+    var n_year = nongli_obj.lYear;
+    var n_month = nongli_obj.lMonth;
+    var n_day = nongli_obj.lDay;  //  当前生日的  农历 ,  农历再相加
+    var nongli_obj_20year =  calendar.lunar2solar(n_year+20,n_month,n_day);
+    var n_year_20 = nongli_obj_20year.cYear;
+    var n_month_20 =  nongli_obj_20year.cMonth;
+    var n_day_20 =  nongli_obj_20year.cDay;    // 2027/6/17
+
+    var  n_Date_20year = new Date(n_year_20,n_month_20-1,n_day_20);
+
+
+    var timeold =   n_Date_20year.getTime() - new Date().getTime();   // 时间差值间隔   现在转为农历的时间
+    var sectimeold = timeold / 1000
+    var secondLife = Math.floor(sectimeold);
+    var mintus  = Math.floor(secondLife/60)
+    var hourLife  = Math.floor(mintus/60)
+    var returnday  = Math.floor(hourLife/24)
+    return returnday+"天";
+  }
+
+
+  function get30Year(birthDayStr){
+    var birthDay = new Date(birthDayStr);
+    ;
+    var year30old = new Date(birthDay.getFullYear()+ 30,birthDay.getMonth(),birthDay.getDate());
+    var year = year30old.getFullYear();
+    var month = year30old.getMonth()+1;
+    var day = year30old.getDate();
+
+    return year+"/"+month+"/"+day;
+  }
+
+  function get30Year_NongLi(birthDayStr){
+    var birthDay = new Date(birthDayStr);
+    var year = birthDay.getFullYear();
+    var month = birthDay.getMonth()+1;
+    var day = birthDay.getDate();
+    var nongli_obj =  calendar.solar2lunar(year,month,day);   // 先把阳历转为农历
+    var n_year = nongli_obj.lYear;
+    var n_month = nongli_obj.lMonth;
+    var n_day = nongli_obj.lDay;  //  当前生日的  农历 ,  农历再相加
+    var nongli_obj_30year =  calendar.lunar2solar(n_year+30,n_month,n_day);
+    var n_year_30 = nongli_obj_30year.cYear;
+    var n_month_30 =  nongli_obj_30year.cMonth;
+    var n_day_30 =  nongli_obj_30year.cDay;
+
+    return n_year_30+"/"+n_month_30+"/"+n_day_30;
+  }
+
+  function get30Year_Day(birthDayStr){
+    var birthDay = new Date(birthDayStr);
+    var nowDate = new Date();
+    var year30old = new Date(birthDay.getFullYear()+ 30,birthDay.getMonth(),birthDay.getDate());
+    var timeold = year30old.getTime() - nowDate.getTime();   // 时间差值间隔
+    var sectimeold = timeold / 1000
+    var secondLife = Math.floor(sectimeold);
+    var mintus  = Math.floor(secondLife/60)
+    var hourLife  = Math.floor(mintus/60)
+    var day  = Math.floor(hourLife/24)
+    return day+"天";
+  }
+
+  function get30Year_Day_NongLi(birthDayStr) {
+    var birthDay = new Date(birthDayStr);
+    var year = birthDay.getFullYear();
+    var month = birthDay.getMonth()+1;
+    var day = birthDay.getDate();
+    var nongli_obj =  calendar.solar2lunar(year,month,day);   // 先把阳历转为农历
+    var n_year = nongli_obj.lYear;
+    var n_month = nongli_obj.lMonth;
+    var n_day = nongli_obj.lDay;  //  当前生日的  农历 ,  农历再相加
+    var nongli_obj_30year =  calendar.lunar2solar(n_year+30,n_month,n_day);
+    var n_year_30 = nongli_obj_30year.cYear;
+    var n_month_30 =  nongli_obj_30year.cMonth;
+    var n_day_30 =  nongli_obj_30year.cDay;    // 3027/6/17
+
+    var  n_Date_30year = new Date(n_year_30,n_month_30-1,n_day_30);
+
+
+    var timeold =   n_Date_30year.getTime() - new Date().getTime();   // 时间差值间隔   现在转为农历的时间
+    var sectimeold = timeold / 1000
+    var secondLife = Math.floor(sectimeold);
+    var mintus  = Math.floor(secondLife/60)
+    var hourLife  = Math.floor(mintus/60)
+    var returnday  = Math.floor(hourLife/24)
+    return returnday+"天";
+  }
+
+  function get40Year(birthDayStr){
+    var birthDay = new Date(birthDayStr);
+    ;
+    var year40old = new Date(birthDay.getFullYear()+ 40,birthDay.getMonth(),birthDay.getDate());
+    var year = year40old.getFullYear();
+    var month = year40old.getMonth()+1;
+    var day = year40old.getDate();
+
+    return year+"/"+month+"/"+day;
+  }
+
+  function get40Year_NongLi(birthDayStr){
+    var birthDay = new Date(birthDayStr);
+    var year = birthDay.getFullYear();
+    var month = birthDay.getMonth()+1;
+    var day = birthDay.getDate();
+    var nongli_obj =  calendar.solar2lunar(year,month,day);   // 先把阳历转为农历
+    var n_year = nongli_obj.lYear;
+    var n_month = nongli_obj.lMonth;
+    var n_day = nongli_obj.lDay;  //  当前生日的  农历 ,  农历再相加
+    var nongli_obj_40year =  calendar.lunar2solar(n_year+40,n_month,n_day);
+    var n_year_40 = nongli_obj_40year.cYear;
+    var n_month_40 =  nongli_obj_40year.cMonth;
+    var n_day_40 =  nongli_obj_40year.cDay;
+
+    return n_year_40+"/"+n_month_40+"/"+n_day_40;
+  }
+
+  function get40Year_Day(birthDayStr){
+    var birthDay = new Date(birthDayStr);
+    var nowDate = new Date();
+    var year40old = new Date(birthDay.getFullYear()+ 40,birthDay.getMonth(),birthDay.getDate());
+    var timeold = year40old.getTime() - nowDate.getTime();   // 时间差值间隔
+    var sectimeold = timeold / 1000
+    var secondLife = Math.floor(sectimeold);
+    var mintus  = Math.floor(secondLife/60)
+    var hourLife  = Math.floor(mintus/60)
+    var day  = Math.floor(hourLife/24)
+    return day+"天";
+  }
+
+  function get40Year_Day_NongLi(birthDayStr) {
+    var birthDay = new Date(birthDayStr);
+    var year = birthDay.getFullYear();
+    var month = birthDay.getMonth()+1;
+    var day = birthDay.getDate();
+    var nongli_obj =  calendar.solar2lunar(year,month,day);   // 先把阳历转为农历
+    var n_year = nongli_obj.lYear;
+    var n_month = nongli_obj.lMonth;
+    var n_day = nongli_obj.lDay;  //  当前生日的  农历 ,  农历再相加
+    var nongli_obj_40year =  calendar.lunar2solar(n_year+40,n_month,n_day);
+    var n_year_40 = nongli_obj_40year.cYear;
+    var n_month_40 =  nongli_obj_40year.cMonth;
+    var n_day_40 =  nongli_obj_40year.cDay;    // 4027/6/17
+
+    var  n_Date_40year = new Date(n_year_40,n_month_40-1,n_day_40);
+
+    var timeold =   n_Date_40year.getTime() - new Date().getTime();   // 时间差值间隔   现在转为农历的时间
+    var sectimeold = timeold / 1000
+    var secondLife = Math.floor(sectimeold);
+    var mintus  = Math.floor(secondLife/60)
+    var hourLife  = Math.floor(mintus/60)
+    var returnday  = Math.floor(hourLife/24)
+    return returnday+"天";
+  }
+
+
+
+  function get50Year(birthDayStr){
+    var birthDay = new Date(birthDayStr);
+    var year50old = new Date(birthDay.getFullYear()+ 50,birthDay.getMonth(),birthDay.getDate());
+    var year = year50old.getFullYear();
+    var month = year50old.getMonth()+1;
+    var day = year50old.getDate();
+
+    return year+"/"+month+"/"+day;
+  }
+
+  function get50Year_NongLi(birthDayStr){
+    var birthDay = new Date(birthDayStr);
+    var year = birthDay.getFullYear();
+    var month = birthDay.getMonth()+1;
+    var day = birthDay.getDate();
+    var nongli_obj =  calendar.solar2lunar(year,month,day);   // 先把阳历转为农历
+    var n_year = nongli_obj.lYear;
+    var n_month = nongli_obj.lMonth;
+    var n_day = nongli_obj.lDay;  //  当前生日的  农历 ,  农历再相加
+    var nongli_obj_50year =  calendar.lunar2solar(n_year+50,n_month,n_day);
+    var n_year_50 = nongli_obj_50year.cYear;
+    var n_month_50 =  nongli_obj_50year.cMonth;
+    var n_day_50 =  nongli_obj_50year.cDay;
+
+    return n_year_50+"/"+n_month_50+"/"+n_day_50;
+  }
+
+  function get50Year_Day(birthDayStr){
+    var birthDay = new Date(birthDayStr);
+    var nowDate = new Date();
+    var year50old = new Date(birthDay.getFullYear()+ 50,birthDay.getMonth(),birthDay.getDate());
+    var timeold = year50old.getTime() - nowDate.getTime();   // 时间差值间隔
+    var sectimeold = timeold / 1000
+    var secondLife = Math.floor(sectimeold);
+    var mintus  = Math.floor(secondLife/60)
+    var hourLife  = Math.floor(mintus/60)
+    var day  = Math.floor(hourLife/24)
+    return day+"天";
+  }
+
+  function get50Year_Day_NongLi(birthDayStr) {
+    var birthDay = new Date(birthDayStr);
+    var year = birthDay.getFullYear();
+    var month = birthDay.getMonth()+1;
+    var day = birthDay.getDate();
+    var nongli_obj =  calendar.solar2lunar(year,month,day);   // 先把阳历转为农历
+    var n_year = nongli_obj.lYear;
+    var n_month = nongli_obj.lMonth;
+    var n_day = nongli_obj.lDay;  //  当前生日的  农历 ,  农历再相加
+    var nongli_obj_50year =  calendar.lunar2solar(n_year+50,n_month,n_day);
+    var n_year_50 = nongli_obj_50year.cYear;
+    var n_month_50 =  nongli_obj_50year.cMonth;
+    var n_day_50 =  nongli_obj_50year.cDay;    // 5027/6/17
+
+    var  n_Date_50year = new Date(n_year_50,n_month_50-1,n_day_50);
+
+
+    var timeold =   n_Date_50year.getTime() - new Date().getTime();   // 时间差值间隔   现在转为农历的时间
+    var sectimeold = timeold / 1000
+    var secondLife = Math.floor(sectimeold);
+    var mintus  = Math.floor(secondLife/60)
+    var hourLife  = Math.floor(mintus/60)
+    var returnday  = Math.floor(hourLife/24)
+    return returnday+"天";
+  }
+
+  function get55Year(birthDayStr){
+    var birthDay = new Date(birthDayStr);
+    var year55old = new Date(birthDay.getFullYear()+ 55,birthDay.getMonth(),birthDay.getDate());
+    var year = year55old.getFullYear();
+    var month = year55old.getMonth()+1;
+    var day = year55old.getDate();
+
+    return year+"/"+month+"/"+day;
+  }
+
+  function get55Year_NongLi(birthDayStr){
+    var birthDay = new Date(birthDayStr);
+    var year = birthDay.getFullYear();
+    var month = birthDay.getMonth()+1;
+    var day = birthDay.getDate();
+    var nongli_obj =  calendar.solar2lunar(year,month,day);   // 先把阳历转为农历
+    var n_year = nongli_obj.lYear;
+    var n_month = nongli_obj.lMonth;
+    var n_day = nongli_obj.lDay;  //  当前生日的  农历 ,  农历再相加
+    var nongli_obj_55year =  calendar.lunar2solar(n_year+55,n_month,n_day);
+    var n_year_55 = nongli_obj_55year.cYear;
+    var n_month_55 =  nongli_obj_55year.cMonth;
+    var n_day_55 =  nongli_obj_55year.cDay;
+
+    return n_year_55+"/"+n_month_55+"/"+n_day_55;
+  }
+
+  function get55Year_Day(birthDayStr){
+    var birthDay = new Date(birthDayStr);
+    var nowDate = new Date();
+    var year55old = new Date(birthDay.getFullYear()+ 55,birthDay.getMonth(),birthDay.getDate());
+    var timeold = year55old.getTime() - nowDate.getTime();   // 时间差值间隔
+    var sectimeold = timeold / 1000
+    var secondLife = Math.floor(sectimeold);
+    var mintus  = Math.floor(secondLife/60)
+    var hourLife  = Math.floor(mintus/60)
+    var day  = Math.floor(hourLife/24)
+    return day+"天";
+  }
+
+  function get55Year_Day_NongLi(birthDayStr) {
+    var birthDay = new Date(birthDayStr);
+    var year = birthDay.getFullYear();
+    var month = birthDay.getMonth()+1;
+    var day = birthDay.getDate();
+    var nongli_obj =  calendar.solar2lunar(year,month,day);   // 先把阳历转为农历
+    var n_year = nongli_obj.lYear;
+    var n_month = nongli_obj.lMonth;
+    var n_day = nongli_obj.lDay;  //  当前生日的  农历 ,  农历再相加
+    var nongli_obj_55year =  calendar.lunar2solar(n_year+55,n_month,n_day);
+    var n_year_55 = nongli_obj_55year.cYear;
+    var n_month_55 =  nongli_obj_55year.cMonth;
+    var n_day_55 =  nongli_obj_55year.cDay;    // 5527/6/17
+
+    var  n_Date_55year = new Date(n_year_55,n_month_55-1,n_day_55);
+
+
+    var timeold =   n_Date_55year.getTime() - new Date().getTime();   // 时间差值间隔   现在转为农历的时间
+    var sectimeold = timeold / 1000
+    var secondLife = Math.floor(sectimeold);
+    var mintus  = Math.floor(secondLife/60)
+    var hourLife  = Math.floor(mintus/60)
+    var returnday  = Math.floor(hourLife/24)
+    return returnday+"天";
+  }
+
+
+  function get60Year(birthDayStr){
+    var birthDay = new Date(birthDayStr);
+    var year60old = new Date(birthDay.getFullYear()+ 60,birthDay.getMonth(),birthDay.getDate());
+    var year = year60old.getFullYear();
+    var month = year60old.getMonth()+1;
+    var day = year60old.getDate();
+
+    return year+"/"+month+"/"+day;
+  }
+
+  function get60Year_NongLi(birthDayStr){
+    var birthDay = new Date(birthDayStr);
+    var year = birthDay.getFullYear();
+    var month = birthDay.getMonth()+1;
+    var day = birthDay.getDate();
+    var nongli_obj =  calendar.solar2lunar(year,month,day);   // 先把阳历转为农历
+    var n_year = nongli_obj.lYear;
+    var n_month = nongli_obj.lMonth;
+    var n_day = nongli_obj.lDay;  //  当前生日的  农历 ,  农历再相加
+    var nongli_obj_60year =  calendar.lunar2solar(n_year+60,n_month,n_day);
+    var n_year_60 = nongli_obj_60year.cYear;
+    var n_month_60 =  nongli_obj_60year.cMonth;
+    var n_day_60 =  nongli_obj_60year.cDay;
+
+    return n_year_60+"/"+n_month_60+"/"+n_day_60;
+  }
+
+  function get60Year_Day(birthDayStr){
+    var birthDay = new Date(birthDayStr);
+    var nowDate = new Date();
+    var year60old = new Date(birthDay.getFullYear()+ 60,birthDay.getMonth(),birthDay.getDate());
+    var timeold = year60old.getTime() - nowDate.getTime();   // 时间差值间隔
+    var sectimeold = timeold / 1000
+    var secondLife = Math.floor(sectimeold);
+    var mintus  = Math.floor(secondLife/60)
+    var hourLife  = Math.floor(mintus/60)
+    var day  = Math.floor(hourLife/24)
+    return day+"天";
+  }
+
+  function get60Year_Day_NongLi(birthDayStr) {
+    var birthDay = new Date(birthDayStr);
+    var year = birthDay.getFullYear();
+    var month = birthDay.getMonth()+1;
+    var day = birthDay.getDate();
+    var nongli_obj =  calendar.solar2lunar(year,month,day);   // 先把阳历转为农历
+    var n_year = nongli_obj.lYear;
+    var n_month = nongli_obj.lMonth;
+    var n_day = nongli_obj.lDay;  //  当前生日的  农历 ,  农历再相加
+    var nongli_obj_60year =  calendar.lunar2solar(n_year+60,n_month,n_day);
+    var n_year_60 = nongli_obj_60year.cYear;
+    var n_month_60 =  nongli_obj_60year.cMonth;
+    var n_day_60 =  nongli_obj_60year.cDay;    // 6027/6/17
+
+    var  n_Date_60year = new Date(n_year_60,n_month_60-1,n_day_60);
+
+
+    var timeold =   n_Date_60year.getTime() - new Date().getTime();   // 时间差值间隔   现在转为农历的时间
+    var sectimeold = timeold / 1000
+    var secondLife = Math.floor(sectimeold);
+    var mintus  = Math.floor(secondLife/60)
+    var hourLife  = Math.floor(mintus/60)
+    var returnday  = Math.floor(hourLife/24)
+    return returnday+"天";
+  }
+
+
+  function get65Year(birthDayStr){
+    var birthDay = new Date(birthDayStr);
+    var year65old = new Date(birthDay.getFullYear()+ 65,birthDay.getMonth(),birthDay.getDate());
+    var year = year65old.getFullYear();
+    var month = year65old.getMonth()+1;
+    var day = year65old.getDate();
+
+    return year+"/"+month+"/"+day;
+  }
+
+  function get65Year_NongLi(birthDayStr){
+    var birthDay = new Date(birthDayStr);
+    var year = birthDay.getFullYear();
+    var month = birthDay.getMonth()+1;
+    var day = birthDay.getDate();
+    var nongli_obj =  calendar.solar2lunar(year,month,day);   // 先把阳历转为农历
+    var n_year = nongli_obj.lYear;
+    var n_month = nongli_obj.lMonth;
+    var n_day = nongli_obj.lDay;  //  当前生日的  农历 ,  农历再相加
+    var nongli_obj_65year =  calendar.lunar2solar(n_year+65,n_month,n_day);
+    var n_year_65 = nongli_obj_65year.cYear;
+    var n_month_65 =  nongli_obj_65year.cMonth;
+    var n_day_65 =  nongli_obj_65year.cDay;
+
+    return n_year_65+"/"+n_month_65+"/"+n_day_65;
+  }
+
+  function get65Year_Day(birthDayStr){
+    var birthDay = new Date(birthDayStr);
+    var nowDate = new Date();
+    var year65old = new Date(birthDay.getFullYear()+ 65,birthDay.getMonth(),birthDay.getDate());
+    var timeold = year65old.getTime() - nowDate.getTime();   // 时间差值间隔
+    var sectimeold = timeold / 1000
+    var secondLife = Math.floor(sectimeold);
+    var mintus  = Math.floor(secondLife/65)
+    var hourLife  = Math.floor(mintus/65)
+    var day  = Math.floor(hourLife/24)
+    return day+"天";
+  }
+
+  function get65Year_Day_NongLi(birthDayStr) {
+    var birthDay = new Date(birthDayStr);
+    var year = birthDay.getFullYear();
+    var month = birthDay.getMonth()+1;
+    var day = birthDay.getDate();
+    var nongli_obj =  calendar.solar2lunar(year,month,day);   // 先把阳历转为农历
+    var n_year = nongli_obj.lYear;
+    var n_month = nongli_obj.lMonth;
+    var n_day = nongli_obj.lDay;  //  当前生日的  农历 ,  农历再相加
+    var nongli_obj_65year =  calendar.lunar2solar(n_year+65,n_month,n_day);
+    var n_year_65 = nongli_obj_65year.cYear;
+    var n_month_65 =  nongli_obj_65year.cMonth;
+    var n_day_65 =  nongli_obj_65year.cDay;    // 6527/6/17
+
+    var  n_Date_65year = new Date(n_year_65,n_month_65-1,n_day_65);
+
+
+    var timeold =   n_Date_65year.getTime() - new Date().getTime();   // 时间差值间隔   现在转为农历的时间
+    var sectimeold = timeold / 1000
+    var secondLife = Math.floor(sectimeold);
+    var mintus  = Math.floor(secondLife/65)
+    var hourLife  = Math.floor(mintus/65)
+    var returnday  = Math.floor(hourLife/24)
+    return returnday+"天";
+  }
+
+
+  function get70Year(birthDayStr){
+    var birthDay = new Date(birthDayStr);
+    var year70old = new Date(birthDay.getFullYear()+ 70,birthDay.getMonth(),birthDay.getDate());
+    var year = year70old.getFullYear();
+    var month = year70old.getMonth()+1;
+    var day = year70old.getDate();
+
+    return year+"/"+month+"/"+day;
+  }
+
+  function get70Year_NongLi(birthDayStr){
+    var birthDay = new Date(birthDayStr);
+    var year = birthDay.getFullYear();
+    var month = birthDay.getMonth()+1;
+    var day = birthDay.getDate();
+    var nongli_obj =  calendar.solar2lunar(year,month,day);   // 先把阳历转为农历
+    var n_year = nongli_obj.lYear;
+    var n_month = nongli_obj.lMonth;
+    var n_day = nongli_obj.lDay;  //  当前生日的  农历 ,  农历再相加
+    var nongli_obj_70year =  calendar.lunar2solar(n_year+70,n_month,n_day);
+    var n_year_70 = nongli_obj_70year.cYear;
+    var n_month_70 =  nongli_obj_70year.cMonth;
+    var n_day_70 =  nongli_obj_70year.cDay;
+
+    return n_year_70+"/"+n_month_70+"/"+n_day_70;
+  }
+
+  function get70Year_Day(birthDayStr){
+    var birthDay = new Date(birthDayStr);
+    var nowDate = new Date();
+    var year70old = new Date(birthDay.getFullYear()+ 70,birthDay.getMonth(),birthDay.getDate());
+    var timeold = year70old.getTime() - nowDate.getTime();   // 时间差值间隔
+    var sectimeold = timeold / 1000
+    var secondLife = Math.floor(sectimeold);
+    var mintus  = Math.floor(secondLife/70)
+    var hourLife  = Math.floor(mintus/70)
+    var day  = Math.floor(hourLife/24)
+    return day+"天";
+  }
+
+  function get70Year_Day_NongLi(birthDayStr) {
+    var birthDay = new Date(birthDayStr);
+    var year = birthDay.getFullYear();
+    var month = birthDay.getMonth()+1;
+    var day = birthDay.getDate();
+    var nongli_obj =  calendar.solar2lunar(year,month,day);   // 先把阳历转为农历
+    var n_year = nongli_obj.lYear;
+    var n_month = nongli_obj.lMonth;
+    var n_day = nongli_obj.lDay;  //  当前生日的  农历 ,  农历再相加
+    var nongli_obj_70year =  calendar.lunar2solar(n_year+70,n_month,n_day);
+    var n_year_70 = nongli_obj_70year.cYear;
+    var n_month_70 =  nongli_obj_70year.cMonth;
+    var n_day_70 =  nongli_obj_70year.cDay;    // 7027/6/17
+
+    var  n_Date_70year = new Date(n_year_70,n_month_70-1,n_day_70);
+
+
+    var timeold =   n_Date_70year.getTime() - new Date().getTime();   // 时间差值间隔   现在转为农历的时间
+    var sectimeold = timeold / 1000
+    var secondLife = Math.floor(sectimeold);
+    var mintus  = Math.floor(secondLife/70)
+    var hourLife  = Math.floor(mintus/70)
+    var returnday  = Math.floor(hourLife/24)
+    return returnday+"天";
+  }
+
+
+  function get75Year(birthDayStr){
+    var birthDay = new Date(birthDayStr);
+    var year75old = new Date(birthDay.getFullYear()+ 75,birthDay.getMonth(),birthDay.getDate());
+    var year = year75old.getFullYear();
+    var month = year75old.getMonth()+1;
+    var day = year75old.getDate();
+
+    return year+"/"+month+"/"+day;
+  }
+
+  function get75Year_NongLi(birthDayStr){
+    var birthDay = new Date(birthDayStr);
+    var year = birthDay.getFullYear();
+    var month = birthDay.getMonth()+1;
+    var day = birthDay.getDate();
+    var nongli_obj =  calendar.solar2lunar(year,month,day);   // 先把阳历转为农历
+    var n_year = nongli_obj.lYear;
+    var n_month = nongli_obj.lMonth;
+    var n_day = nongli_obj.lDay;  //  当前生日的  农历 ,  农历再相加
+    var nongli_obj_75year =  calendar.lunar2solar(n_year+75,n_month,n_day);
+    var n_year_75 = nongli_obj_75year.cYear;
+    var n_month_75 =  nongli_obj_75year.cMonth;
+    var n_day_75 =  nongli_obj_75year.cDay;
+
+    return n_year_75+"/"+n_month_75+"/"+n_day_75;
+  }
+
+  function get75Year_Day(birthDayStr){
+    var birthDay = new Date(birthDayStr);
+    var nowDate = new Date();
+    var year75old = new Date(birthDay.getFullYear()+ 75,birthDay.getMonth(),birthDay.getDate());
+    var timeold = year75old.getTime() - nowDate.getTime();   // 时间差值间隔
+    var sectimeold = timeold / 1000
+    var secondLife = Math.floor(sectimeold);
+    var mintus  = Math.floor(secondLife/75)
+    var hourLife  = Math.floor(mintus/75)
+    var day  = Math.floor(hourLife/24)
+    return day+"天";
+  }
+
+  function get75Year_Day_NongLi(birthDayStr) {
+    var birthDay = new Date(birthDayStr);
+    var year = birthDay.getFullYear();
+    var month = birthDay.getMonth()+1;
+    var day = birthDay.getDate();
+    var nongli_obj =  calendar.solar2lunar(year,month,day);   // 先把阳历转为农历
+    var n_year = nongli_obj.lYear;
+    var n_month = nongli_obj.lMonth;
+    var n_day = nongli_obj.lDay;  //  当前生日的  农历 ,  农历再相加
+    var nongli_obj_75year =  calendar.lunar2solar(n_year+75,n_month,n_day);
+    var n_year_75 = nongli_obj_75year.cYear;
+    var n_month_75 =  nongli_obj_75year.cMonth;
+    var n_day_75 =  nongli_obj_75year.cDay;    // 7527/6/17
+
+    var  n_Date_75year = new Date(n_year_75,n_month_75-1,n_day_75);
+
+
+    var timeold =   n_Date_75year.getTime() - new Date().getTime();   // 时间差值间隔   现在转为农历的时间
+    var sectimeold = timeold / 1000
+    var secondLife = Math.floor(sectimeold);
+    var mintus  = Math.floor(secondLife/75)
+    var hourLife  = Math.floor(mintus/75)
+    var returnday  = Math.floor(hourLife/24)
+    return returnday+"天";
+  }
+
+
+  function get80Year(birthDayStr){
+    var birthDay = new Date(birthDayStr);
+    var year80old = new Date(birthDay.getFullYear()+ 80,birthDay.getMonth(),birthDay.getDate());
+    var year = year80old.getFullYear();
+    var month = year80old.getMonth()+1;
+    var day = year80old.getDate();
+
+    return year+"/"+month+"/"+day;
+  }
+
+  function get80Year_NongLi(birthDayStr){
+    var birthDay = new Date(birthDayStr);
+    var year = birthDay.getFullYear();
+    var month = birthDay.getMonth()+1;
+    var day = birthDay.getDate();
+    var nongli_obj =  calendar.solar2lunar(year,month,day);   // 先把阳历转为农历
+    var n_year = nongli_obj.lYear;
+    var n_month = nongli_obj.lMonth;
+    var n_day = nongli_obj.lDay;  //  当前生日的  农历 ,  农历再相加
+    var nongli_obj_80year =  calendar.lunar2solar(n_year+80,n_month,n_day);
+    var n_year_80 = nongli_obj_80year.cYear;
+    var n_month_80 =  nongli_obj_80year.cMonth;
+    var n_day_80 =  nongli_obj_80year.cDay;
+
+    return n_year_80+"/"+n_month_80+"/"+n_day_80;
+  }
+
+  function get80Year_Day(birthDayStr){
+    var birthDay = new Date(birthDayStr);
+    var nowDate = new Date();
+    var year80old = new Date(birthDay.getFullYear()+ 80,birthDay.getMonth(),birthDay.getDate());
+    var timeold = year80old.getTime() - nowDate.getTime();   // 时间差值间隔
+    var sectimeold = timeold / 1000
+    var secondLife = Math.floor(sectimeold);
+    var mintus  = Math.floor(secondLife/60)
+    var hourLife  = Math.floor(mintus/60)
+    var day  = Math.floor(hourLife/24)
+    return day+"天";
+  }
+
+  function get80Year_Day_NongLi(birthDayStr) {
+    var birthDay = new Date(birthDayStr);
+    var year = birthDay.getFullYear();
+    var month = birthDay.getMonth()+1;
+    var day = birthDay.getDate();
+    var nongli_obj =  calendar.solar2lunar(year,month,day);   // 先把阳历转为农历
+    var n_year = nongli_obj.lYear;
+    var n_month = nongli_obj.lMonth;
+    var n_day = nongli_obj.lDay;  //  当前生日的  农历 ,  农历再相加
+    var nongli_obj_80year =  calendar.lunar2solar(n_year+80,n_month,n_day);
+    var n_year_80 = nongli_obj_80year.cYear;
+    var n_month_80 =  nongli_obj_80year.cMonth;
+    var n_day_80 =  nongli_obj_80year.cDay;    // 8027/6/17
+
+    var  n_Date_80year = new Date(n_year_80,n_month_80-1,n_day_80);
+
+
+    var timeold =   n_Date_80year.getTime() - new Date().getTime();   // 时间差值间隔   现在转为农历的时间
+    var sectimeold = timeold / 1000
+    var secondLife = Math.floor(sectimeold);
+    var mintus  = Math.floor(secondLife/60)
+    var hourLife  = Math.floor(mintus/60)
+    var returnday  = Math.floor(hourLife/24)
+    return returnday+"天";
+  }
+
+  // 获取最近的生日 日期
+  function getLastBirth(birthDayStr) {
+    var birthDay = new Date(birthDayStr);
+    var nowDate = new Date();
+    var birthDayCurrntYear = new Date(nowDate.getFullYear(),birthDay.getMonth(),birthDay.getDate());
+
+    var timeold =   birthDayCurrntYear.getTime() - nowDate.getTime();
+    if( timeold < 0 && (Math.abs(timeold)/(1000*60*60*24)) < 1){  //   如果绝对值的范围 那么今天就是生日
+      return birthDayCurrntYear.getFullYear()+"/"+(birthDayCurrntYear.getMonth()+1)+"/"+ birthDayCurrntYear.getDate()+" 恭喜今日生日";
+    } else if(timeold > 0){  // 如果差值大于0  说明 生日还没过
+
+      return birthDayCurrntYear.getFullYear()+"/"+(birthDayCurrntYear.getMonth()+1)+"/"+ birthDayCurrntYear.getDate();
+    } else{   // 差值小于0  说明生日已经过掉了
+      var nextBirthDay = new Date(nowDate.getFullYear()+1,birthDay.getMonth(),birthDay.getDate());
+      return nextBirthDay.getFullYear()+"/"+(nextBirthDay.getMonth()+1)+"/"+ nextBirthDay.getDate();
+    }
+  }
+
+  // 获取最近的生日 日期相差的天数
+  function getLastBirth_Day(birthDayStr) {
+
+    var birthDay = new Date(birthDayStr);
+    var nowDate = new Date();
+
+    var birthDayCurrntYear = new Date(nowDate.getFullYear(),birthDay.getMonth(),birthDay.getDate());
+
+    var birthDate ;
+    var timeold =   birthDayCurrntYear.getTime() - nowDate.getTime();
+    if( timeold < 0 && (Math.abs(timeold)/(1000*60*60*24)) < 1){  //   如果绝对值的范围 那么今天就是生日
+      return "0天"+"恭喜今日生日";
+    } else  if(timeold > 0){  // 如果差值大于0  说明 生日还没过
+
+      birthDate = new Date(birthDayCurrntYear.getFullYear(),birthDayCurrntYear.getMonth(),birthDayCurrntYear.getDate());
+    } else{   // 差值小于0  说明生日已经过掉了
+      birthDate = new Date(birthDayCurrntYear.getFullYear()+1,(birthDayCurrntYear.getMonth()),birthDayCurrntYear.getDate());
+    }
+
+    var timeold2 =   birthDate.getTime() - nowDate.getTime();   // 时间差值间隔   现在转为农历的时间
+    if(timeold > 0 && (Math.abs(timeold)/(1000*60*60*24)) < 1){
+      // 一天以内的话 , 显示 1 天
+      return "1天";
+    }
+    var sectimeold = timeold2 / 1000
+    var secondLife = Math.floor(sectimeold);
+    var mintus  = Math.floor(secondLife/60)
+    var hourLife  = Math.floor(mintus/60)
+    var returnday  = Math.floor(hourLife/24)
+    return returnday+"天";
+  }
+
+
+
+
+  // 获取最近的生日 日期_农历
+  function getLastBirth_NongLi(birthDayStr) {
+    var birthDay = new Date(birthDayStr);
+    var year = birthDay.getFullYear();
+    var month = birthDay.getMonth()+1;
+    var day = birthDay.getDate();
+
+    var nongli_obj =  calendar.solar2lunar(year,month,day);    // 阳历转为 农历
+    var n_year = nongli_obj.lYear;
+    var n_month = nongli_obj.lMonth;
+    var n_day = nongli_obj.lDay;
+
+    var nowDate = new Date();
+    var birthDay_nongli = calendar.lunar2solar(nowDate.getFullYear(),n_month,n_day);   //  今年的农历 对应的 阳历
+    var cur_year = birthDay_nongli.cYear;
+    var cur_month = birthDay_nongli.cMonth;
+    var cur_day = birthDay_nongli.cDay;
+
+    var birthDayCurYear = new Date(cur_year,cur_month -1,cur_day);  //  农历生日 那天   农历是  n_month,n_month
+
+    var birthDate ;
+    var timeold =   birthDayCurYear.getTime() - nowDate.getTime();
+    if( timeold < 0 && (Math.abs(timeold)/(1000*60*60*24)) < 1){  //   如果绝对值的范围 那么今天就是生日  // 2017/05/01 转农历
+      // 阳历转为 农历
+      console.log("ZAAAAA");
+      var birthDate =  calendar.solar2lunar(birthDayCurYear.getFullYear(),(birthDayCurYear.getMonth()+1),birthDayCurYear.getDate());
+      return birthDate.cYear+"/"+(birthDate.cMonth)+"/"+ (birthDate.cDay)+" 恭喜今日生日";
+
+    } else if(timeold > 0){  // 如果差值大于0  说明 生日还没过
+      var birthDate =  calendar.solar2lunar(birthDayCurYear.getFullYear(),(birthDayCurYear.getMonth()+1),birthDayCurYear.getDate());
+      console.log("ZBBBBB");
+      return birthDate.cYear+"/"+(birthDate.cMonth)+"/"+ (birthDate.cDay);
+
+    } else{   // 差值小于0  说明生日已经过掉了   计算下一年的生日   农历   获取下一年 农历 对应的 阳历的 日子
+      // birthDate.lYear=2020  birthDate.lMonth=4  birthDate.lDay=8
+      var birthDate =  calendar.lunar2solar(nowDate.getFullYear()+1,n_month,n_day);
+      //  2020/3/8
+      console.log("ZCCCCCC");
+
+// nowDate.getFullYear()=2020 birthDate.lMonth=3 birthDate.lDay=26
+      console.log("ZEEEEE n_month= "+ n_month + "  n_day="+ n_day  + " nowDate.getFullYear()="+(nowDate.getFullYear()+1)+  " birthDate.lMonth="+ birthDate.lMonth +" birthDate.lDay="+ birthDate.lDay);  // 3   31 | 3 27
+
+      // ZFFFF birthDate.lYear=2020birthDate.lMonth=3birthDate.lDay=26
+      console.log("ZFFFF birthDate.lYear="+ birthDate.lYear + "   birthDate.lMonth="+ birthDate.lMonth + "   birthDate.lDay="+ birthDate.lDay); // 3 8
+// ZHHHHHH birthDate.cYear=2020   birthDate.cMonth=4   birthDate.cDay=18
+      console.log("ZHHHHHH birthDate.cYear="+ birthDate.cYear + "    birthDate.cMonth="+ birthDate.cMonth + "   birthDate.cDay="+ birthDate.cDay); // 3 8
+
+      return birthDate.cYear+"/"+(birthDate.cMonth  )+"/"+ (birthDate.cDay);   //  cMonth=3  cDay=31
+    }
+
+
+
+  }
+
+
+  // 公历转农历：calendar.solar2lunar(1987,11,01);
+  // 农历转公历：calendar.lunar2solar(1987,09,10);
+
+  // {
+  //   Animal: "兔",
+  //     IDayCn: "初十",
+  //   IMonthCn: "九月",
+  //   Term: null,
+  //   cDay: 1,
+  //   cMonth: 11,
+  //   cYear: 1987,
+  //   gzDay: "甲寅",
+  //   gzMonth: "庚戌",
+  //   gzYear: "丁卯",
+  //   isLeap: false,
+  //   isTerm: false,
+  //   isToday: false,
+  //   lDay: 10,
+  //   lMonth: 9,
+  //   lYear: 1987,
+  //   nWeek: 7,
+  //   ncWeek: "星期日"
+  // }
+
+  // 获取最近的生日 日期_农历_天数
+  function getLastBirth_Day_NongLi(birthDayStr) {
+    var birthDay = new Date(birthDayStr);
+    var year = birthDay.getFullYear();
+    var month = birthDay.getMonth()+1;
+    var day = birthDay.getDate();
+
+    var nongli_obj =  calendar.solar2lunar(year,month,day);    // 阳历转为 农历
+    var n_year = nongli_obj.lYear;
+    var n_month = nongli_obj.lMonth;
+    var n_day = nongli_obj.lDay;
+//   // 2017/04/22     三月26
+// n_year=2017  n_month=3  n_day=26
+    console.log("n_year="+ n_year + "n_month="+ n_month + "n_day="+ n_day);
+    var nowDate = new Date();
+    var birthDay_nongli = calendar.lunar2solar(nowDate.getFullYear(),n_month,n_day);   //  今年的农历 对应的 阳历
+    var cur_year = birthDay_nongli.cYear;
+    var cur_month = birthDay_nongli.cMonth;
+    var cur_day = birthDay_nongli.cDay;
+
+    // Xcur_year=2019Xcur_month=4Xcur_day=30   2019 年农历 3月26  等于 2019.4.30
+    console.log("Xcur_year="+ cur_year + "Xcur_month="+ cur_month + "Xcur_day="+ cur_day);
+
+
+    // Xcur_Lyear=2019  Xcur_Lmonth=3  Xcur_Lday=26
+    console.log("Xcur_Lyear="+ birthDay_nongli.lYear + "Xcur_Lmonth="+ birthDay_nongli.lMonth + "Xcur_Lday="+ birthDay_nongli.lDay);
+    var birthDayCurYear = new Date(cur_year,cur_month -1  ,cur_day);  //  2019.4.30 创建  日期 农历生日 那天   农历是  n_month,n_month
+
+    // XbirthDate.lYear=undefinedXbirthDate.lMonth=undefinedXbirthDate.lDay=undefined
+
+//  XbirthDate.lYear=2019   XbirthDate.lMonth=4    XbirthDate.lDay=30
+    console.log("XbirthDate.lYear="+ birthDayCurYear.getFullYear() + "XbirthDate.lMonth="+ birthDayCurYear.getMonth() + "XbirthDate.lDay="+ birthDayCurYear.getDate()); // 3 8
+    var timeold =   birthDayCurYear.getTime() - new Date().getTime();
+    console.log("birthDayCurYear.getTime()="+ birthDayCurYear.getTime());
+    console.log("nowDate.getTime()="+ new Date().getTime());
+    console.log("ZZZZ  timeold="+ timeold);
+    var nongli_obj_day ;
+    if( timeold < 0 && (Math.abs(timeold)/(1000*60*60*24)) < 1){  //   如果绝对值的范围 那么今天就是生日  // 2017/05/01 转农历
+      // 阳历转为 农历
+      console.log("AAAAA");
+      nongli_obj_day =  calendar.solar2lunar(birthDayCurYear.getFullYear(),(birthDayCurYear.getMonth()+1),birthDayCurYear.getDate());
+      return "0天"+"恭喜今日农历生日";
+    } else if(timeold > 0){  // 如果差值大于0  说明 生日还没过
+      console.log("BBBB  timeold="+ timeold);
+      nongli_obj_day =  calendar.solar2lunar(birthDayCurYear.getFullYear(),(birthDayCurYear.getMonth()+1),birthDayCurYear.getDate());
+    } else{   // 差值小于0  说明生日已经过掉了   计算下一年的生日   农历
+
+      console.log("CCCCC");
+      //  n_month=3  n_day=26      得到  2020 年的  三月26日农历  对应的阳历
+      nongli_obj_day =  calendar.lunar2solar(nowDate.getFullYear()+1,n_month,n_day);
+      // DDDD  nongli_obj_day.cYear=2020    nongli_obj_day.cMonth=4   nongli_obj_day.cDay=18 [OK]
+      // DDDD  nongli_obj_day.cYear=2020    nongli_obj_day.cMonth=4   nongli_obj_day.cDay=18
+      console.log("DDDD  nongli_obj_day.cYear="+ nongli_obj_day.cYear+"    nongli_obj_day.cMonth="+  nongli_obj_day.cMonth+"   nongli_obj_day.cDay="+ nongli_obj_day.cDay );
+
+
+      // DDDD  nongli_obj_day.lYear=2020    nongli_obj_day.lMonth=3   nongli_obj_day.lDay=26
+      // DDDD  nongli_obj_day.lYear=2020    nongli_obj_day.lMonth=3   nongli_obj_day.lDay=26
+      console.log("DDDD  nongli_obj_day.lYear="+ nongli_obj_day.lYear+"    nongli_obj_day.lMonth="+  nongli_obj_day.lMonth+"   nongli_obj_day.lDay="+ nongli_obj_day.lDay );
+
+    }
+
+
+
+    //  // DDDD  nongli_obj_day.cYear=2020    nongli_obj_day.cMonth=4   nongli_obj_day.cDay=18
+    //       return nongli_obj_day.cYear+"/"+(nongli_obj_day.cMonth)+"/"+ (nongli_obj_day.cDay);    农历3月7
+    console.log("XXXDDDD  nongli_obj_day.cYear="+ nongli_obj_day.cYear+"    nongli_obj_day.cMonth="+  (nongli_obj_day.cMonth -1)+"   nongli_obj_day.cDay="+ nongli_obj_day.cDay );
+    var birthDate = new Date(nongli_obj_day.cYear, nongli_obj_day.cMonth-1  , nongli_obj_day.cDay);    // 得到 农历对应的阳历
+    var timeold2 =   birthDate.getTime() - new Date().getTime();   // 时间差值间隔   现在转为农历的时间
+    if(timeold2 > 0 && (Math.abs(timeold2)/(1000*60*60*24)) < 1){
+      // 一天以内的话 , 显示 1 天
+      return "1天";
+    }
+    var sectimeold = timeold2 / 1000;
+    var secondLife = Math.floor(sectimeold);
+    var mintus  = Math.floor(secondLife/60)
+    var hourLife  = Math.floor(mintus/60)
+    var returnday  = Math.floor(hourLife/24)
+    return returnday+"天";
+
+  }
+
+
+
+// ▲z6 新定义标题函数的位置
+
+
+
+  // 测试日 2019.05.01
+  //测试方案1 : 2017/04/22      阳历(该年已过) && 农历(该年已过)
+  // 2017/04/22     三月26
+  //  2019/04/22    三月18
+  //  2019/04/30    三月26
+  //  2019/05/01    三月27
+  //  2020/04/18    三月26 与现在相比   有352天
+  //  2020/04/22    三月30 与现在相比   有356天
+
+
+  //测试方案2 : 2017/04/23      阳历(该年已过) && 农历(今天)
+  //  2017/04/23    三月27
+  //  2019/04/23    三月19  (已过)
+  //  2019/05/01    三月27  (农历生日今天)
+
+
+  //测试方案3 : 2017/05/01     阳历(今天) && 农历(该年未过)
+  // 2017/05/01     四月6
+  // 2019/05/01     三月27     (阳历生日今天)
+  // 2019/05/10     四月6      农历生日还差8天
+
+
+
+  //测试方案4  :  2017/06/07    阳历 和 农历生日 都还未过
+  // 2017/06/07     五月13
+  // 2019/06/07     五月5
+  // 2019/06/15     五月13
+
+  // person0={index:0 , name:"祝B",birthday:"2017/06/07 08:52:00",key:"zhmxx",}
+  // person1={index:1 , name:"祝A",birthday:"1992/02/26 05:00:00",key:"zzjxx",}
+  //
+  // var personArr=[  person0 , person1  ];
+  // var nowDate = new Date();      // 现在的时间
+  // timeold = nowDate.getTime() - new Date(birthDayStr).getTime();;   // 时间差值间隔
+  // sectimeold = timeold / 1000
+  // secondsold = Math.floor(sectimeold);
+  // msPerDay = 24 * 60 * 60 * 1000
+  // e_daysold = timeold / msPerDay
+  // daysold = Math.floor(e_daysold);   //  相差天数
+  // e_hrsold = (e_daysold - daysold) * 24;
+  // hrsold = Math.floor(e_hrsold); //  相差小时数
+  // e_minsold = (e_hrsold - hrsold) * 60;
+  // minsold = Math.floor((e_hrsold - hrsold) * 60);  //  相差分数
+  // seconds = Math.floor((e_minsold - minsold) * 60);  //  相差秒数
+
+  // console.log("zukgit2  simulate pre ");
+
+  //====================
+  // alert(" secondList = "+ getLifeSeconds(person0.birthday) +   // 秒岁数
+  //   " minutesLife = "+ getLifeMinutes(person0.birthday) +     // 分岁数
+  //   " hourLife = "+ getLifeHour(person0.birthday) +      // 时岁数
+  //   " dayLife = "+ getLifeDay(person0.birthday) +         // 天岁数
+  //   " moonthLife = "+ getLifeMonth(person0.birthday) +    // 月岁数
+  //   " yearLife = "+ getLifeYear(person0.birthday) +          // 年岁数
+  //   " nongli_birth = "+ getBirthDay_YangLi(person0.birthday) +    // 生日(阳历)
+  //   " nongli_birth = "+ getBirthDay_NongLi(person0.birthday) +  // 生日(农历)     getBirthDay_YangLi
+  //   " shuxiang = "+ getAmnial_NongLi(person0.birthday) +    //  属相
+  //   " 10nain = "+ get10Year(person0.birthday) +              //  10年
+  //   " 10nain_nongli = "+ get10Year_NongLi(person0.birthday) +
+  //   " 距离10年(阳历) = "+ get10Year_Day(person0.birthday) +
+  //   " 距离10年(农历) = "+ get10Year_Day_NongLi(person0.birthday) +
+  //
+  //   " 18nain = "+ get18Year(person0.birthday) +
+  //   " 18nain_nongli = "+ get18Year_NongLi(person0.birthday) +
+  //   " 距离18年(阳历) = "+ get18Year_Day(person0.birthday) +
+  //   " 距离18年(农历) = "+ get18Year_Day_NongLi(person0.birthday) +
+  //
+  //   " 20nain = "+ get18Year(person0.birthday) +
+  //   " 20nain_nongli = "+ get20Year_NongLi(person0.birthday) +
+  //   " 距离20年(阳历) = "+ get20Year_Day(person0.birthday) +
+  //   " 距离20年(农历) = "+ get20Year_Day_NongLi(person0.birthday) +
+  //
+  //
+  //   " 30nain = "+ get30Year(person0.birthday) +
+  //   " 30nain_nongli = "+ get30Year_NongLi(person0.birthday) +
+  //   " 距离30年(阳历) = "+ get30Year_Day(person0.birthday) +
+  //   " 距离30年(农历) = "+ get30Year_Day_NongLi(person0.birthday) +
+  //
+  //   " 40nain = "+ get40Year(person0.birthday) +
+  //   " 40nain_nongli = "+ get40Year_NongLi(person0.birthday) +
+  //   " 距离40年(阳历) = "+ get40Year_Day(person0.birthday) +
+  //   " 距离40年(农历) = "+ get40Year_Day_NongLi(person0.birthday) +
+  //
+  //   " 50nain = "+ get50Year(person0.birthday) +
+  //   " 50nain_nongli = "+ get50Year_NongLi(person0.birthday) +
+  //   " 距离50年(阳历) = "+ get50Year_Day(person0.birthday) +
+  //   " 距离50年(农历) = "+ get50Year_Day_NongLi(person0.birthday) +
+  //
+  //   " 55nain = "+ get55Year(person0.birthday) +
+  //   " 55nain_nongli = "+ get55Year_NongLi(person0.birthday) +
+  //   " 距离55年(阳历) = "+ get55Year_Day(person0.birthday) +
+  //   " 距离55年(农历) = "+ get55Year_Day_NongLi(person0.birthday) +
+  //
+  //
+  //   " 60nain = "+ get60Year(person0.birthday) +
+  //   " 60nain_nongli = "+ get60Year_NongLi(person0.birthday) +
+  //   " 距离60年(阳历) = "+ get60Year_Day(person0.birthday) +
+  //   " 距离60年(农历) = "+ get60Year_Day_NongLi(person0.birthday) +
+  //
+  //   " 65nain = "+ get65Year(person0.birthday) +
+  //   " 65nain_nongli = "+ get65Year_NongLi(person0.birthday) +
+  //   " 距离65年(阳历) = "+ get65Year_Day(person0.birthday) +
+  //   " 距离65年(农历) = "+ get65Year_Day_NongLi(person0.birthday) +
+  //
+  //   " 70nain = "+ get70Year(person0.birthday) +
+  //   " 70nain_nongli = "+ get70Year_NongLi(person0.birthday) +
+  //   " 距离70年(阳历) = "+ get70Year_Day(person0.birthday) +
+  //   " 距离70年(农历) = "+ get70Year_Day_NongLi(person0.birthday) +
+  //
+  //   " 75nain = "+ get75Year(person0.birthday) +
+  //   " 75nain_nongli = "+ get75Year_NongLi(person0.birthday) +
+  //   " 距离75年(阳历) = "+ get75Year_Day(person0.birthday) +
+  //   " 距离75年(农历) = "+ get75Year_Day_NongLi(person0.birthday) +
+  //
+  //   " 80nain = "+ get80Year(person0.birthday) +
+  //   " 80nain_nongli = "+ get80Year_NongLi(person0.birthday) +
+  //   " 距离80年(阳历) = "+ get80Year_Day(person0.birthday) +
+  //   " 距离80年(农历) = "+ get80Year_Day_NongLi(person0.birthday) +
+  //
+  //   " getLastBirth  = "+ getLastBirth(person0.birthday) +                  //  最近的生日(阳历)
+  //   " getLastBirth_Day  = "+ getLastBirth_Day(person0.birthday) +             //  最近的生日(阳历) 天数
+  //
+  //   " getLastBirth_NongLi  = "+ getLastBirth_NongLi(person0.birthday) +        //  最近的生日(农历)
+  //   " getLastBirth_Day_NongLi  = "+ getLastBirth_Day_NongLi(person0.birthday) +       //  最近的生日(农历) 天数
+  //   "");
+
+
+
+  person0={index:0 , name:"Z呵呵",birthday:"2017/06/07 08:52:00",key:"zhmxx",}
+  person1={index:1 , name:"Z正杰",birthday:"1992/02/26 20:37:00",key:"zzjxx",}
+  person2={index:2 , name:"G慧杏",birthday:"1991/04/21 00:00:00",key:"ghxxx",}
+  person3={index:3 , name:"Z正强",birthday:"1993/03/29 09:45:00",key:"zzq",}
+  person4={index:4 , name:"Z宇晨",birthday:"2016/11/19 15:30:00",key:"zyc",}
+  person5={index:5 , name:"T纯锋",birthday:"1993/01/10 15:30:00",key:"zyc",}
+  person6={index:6 , name:"Z婉婷",birthday:"2004/07/11 20:40:00",key:"zwt",}
+  person7={index:7 , name:"Z土火",birthday:"1966/01/25 00:00:00",key:"zth",}
+  person8={index:8 , name:"L雪枝",birthday:"1967/12/29 00:00:00",key:"zth",}
+  
+    // 以下时间具体未知
+person9={index:9 , name:"G吉军",birthday:"1965/12/17 00:00:00",key:"xx",}
+person10={index:10 , name:"J水凤",birthday:"1969/06/02 00:00:00",key:"xx",}
+person11={index:11 , name:"J金英",birthday:"1946/05/20 00:00:00",key:"xx",}  // 未知
+person12={index:12 ,   name:"G卫利",birthday:"1988/01/01 00:00:00",key:"xx",}
+person13={index:13 , name:"Z献策",birthday:"1987/01/01 00:00:00",key:"xx",} // 未知
+person14={index:14 , name:"Z弘毅",birthday:"2015/01/01 00:00:00",key:"xx",}  // 未知
+person15={index:15 , name:"G剑辉",birthday:"2004/01/01 00:00:00",key:"xx",}  // 未知
+person16={index:16 , name:"W淼淼",birthday:"1967/12/29 00:00:00",key:"xx",}  // 未知
+person17={index:17 , name:"W锦锦",birthday:"1967/12/29 00:00:00",key:"xx",}  // 未知
+
+  var personArr=[  person0 , person1 ,person2 , person3 ,person4 , person5 ,person6 , person7 ,person8,person9
+  , person10,person11,person12,person13,person14,person15,person16,person17];
+
+var shouString = "";
+
+    for (var i = 0; i <  personArr.length; i++) {
+	var item = "|"+personArr[i].name+":"+getLifeYear(personArr[i].birthday);
+	shouString =shouString+ item;
+	}
+	
+	    for (var i = 0; i <  5; i++) { // 使得显示的循环次数很多
+		shouString = shouString + shouString;
+		}
+		
+	// ▲z4  shouString是显示字母动画的字符串 |X|X|X|
+	shouString =shouString+ "|#countdown 99";
+	
+      console.log(" shouString = "+ shouString );
+   	
+
+   resArr = [];
+  window.onload = function () {
+    var ztbody = document.getElementById("ztbody");
+    var ztable = document.getElementById("ztable");
+    var personLength = personArr.length;
+    var innerStr = "";
+    for (var i = 0; i <  personLength; i++) {
+    //  alert("personLength ="+ personLength + "     i = "+ i + "  name="+   personArr[i].name );
+      console.log("WWWWWpersonLength ="+ personLength + "     i = "+ i + "  name="+   personArr[i].name );
+      if(personArr[i] == null){
+        continue;
+      }
+      console.log("EEEEEEpersonLength ="+ personLength + "     i = "+ i + "  name="+   personArr[i].name );
+      var trDOM = document.createElement("tr");
+	  // ▲z3 往table中加入列表的函数
+      resArr.push("<tr>");
+      resArr.push("<td>" + personArr[i].index + "</td>");                                // 编号
+      resArr.push("<td>" + personArr[i].name + "</td>");                                  // 姓名
+      resArr.push("<td>" + getBirthDay_YangLi(personArr[i].birthday) + "</td>");      // 生日阳历
+      resArr.push("<td>" + getBirthDay_NongLi(personArr[i].birthday) + "</td>");      // 生日农历
+      resArr.push("<td>" + getAmnial_NongLi(personArr[i].birthday) + "</td>");         // 属相
+      resArr.push("<td>" + getLastBirth(personArr[i].birthday) + "</td>");             // 最近的生日(阳历)
+      resArr.push("<td>" + getLastBirth_Day(personArr[i].birthday) + "</td>");             // 最近的生日(阳历)
+      resArr.push("<td>" + getLastBirth_NongLi(personArr[i].birthday) + "</td>");             //最近的生日(阳历) 天数
+      resArr.push("<td>" + getLastBirth_Day_NongLi(personArr[i].birthday) + "</td>");              //最近的生日(农历)
+      resArr.push("<td>" + getLifeYear(personArr[i].birthday) + "</td>");             //  年岁数
+      resArr.push("<td>" + getLifeMonth(personArr[i].birthday) + "</td>");             // 月岁数
+      resArr.push("<td>" + getLifeDay(personArr[i].birthday) + "</td>");               //  天岁数
+      resArr.push("<td>" + getLifeHour(personArr[i].birthday) + "</td>");             //  时岁数
+      resArr.push("<td>" + getLifeMinutes(personArr[i].birthday) + "</td>");             //  分岁数
+      resArr.push("<td>" + getLifeSeconds(personArr[i].birthday) + "</td>");             //  秒岁数
+
+      resArr.push("<td>" + get10Year(personArr[i].birthday) + "</td>");                 //  10年那天 阳历
+      resArr.push("<td>" + get10Year_Day(personArr[i].birthday) + "</td>");             // 离10年天数  阳历
+      resArr.push("<td>" + get10Year_NongLi(personArr[i].birthday) + "</td>");           //  10年那天 农历
+      resArr.push("<td>" + get10Year_Day_NongLi(personArr[i].birthday) + "</td>");       //  10年那天天数 农历
+
+      resArr.push("<td>" + get18Year(personArr[i].birthday) + "</td>");                 //  18年那天 阳历
+      resArr.push("<td>" + get18Year_Day(personArr[i].birthday) + "</td>");             // 离18年天数  阳历
+      resArr.push("<td>" + get18Year_NongLi(personArr[i].birthday) + "</td>");           //  18年那天 农历
+      resArr.push("<td>" + get18Year_Day_NongLi(personArr[i].birthday) + "</td>");       //  18年那天天数 农历
+
+      resArr.push("<td>" + get20Year(personArr[i].birthday) + "</td>");                 //  20年那天 阳历
+      resArr.push("<td>" + get20Year_Day(personArr[i].birthday) + "</td>");             // 离20年天数  阳历
+      resArr.push("<td>" + get20Year_NongLi(personArr[i].birthday) + "</td>");           //  20年那天 农历
+      resArr.push("<td>" + get20Year_Day_NongLi(personArr[i].birthday) + "</td>");       //  20年那天天数 农历
+
+
+      resArr.push("<td>" + get30Year(personArr[i].birthday) + "</td>");                 //  30年那天 阳历
+      resArr.push("<td>" + get30Year_Day(personArr[i].birthday) + "</td>");             // 离30年天数  阳历
+      resArr.push("<td>" + get30Year_NongLi(personArr[i].birthday) + "</td>");           //  30年那天 农历
+      resArr.push("<td>" + get30Year_Day_NongLi(personArr[i].birthday) + "</td>");       //  30年那天天数 农历
+
+
+      resArr.push("<td>" + get40Year(personArr[i].birthday) + "</td>");                 //  40年那天 阳历
+      resArr.push("<td>" + get40Year_Day(personArr[i].birthday) + "</td>");             // 离40年天数  阳历
+      resArr.push("<td>" + get40Year_NongLi(personArr[i].birthday) + "</td>");           //  40年那天 农历
+      resArr.push("<td>" + get40Year_Day_NongLi(personArr[i].birthday) + "</td>");       //  40年那天天数 农历
+
+
+      resArr.push("<td>" + get50Year(personArr[i].birthday) + "</td>");                 //  50年那天 阳历
+      resArr.push("<td>" + get50Year_Day(personArr[i].birthday) + "</td>");             // 离50年天数  阳历
+      resArr.push("<td>" + get50Year_NongLi(personArr[i].birthday) + "</td>");           //  50年那天 农历
+      resArr.push("<td>" + get50Year_Day_NongLi(personArr[i].birthday) + "</td>");       //  50年那天天数 农历
+
+
+      resArr.push("<td>" + get55Year(personArr[i].birthday) + "</td>");                 //  55年那天 阳历
+      resArr.push("<td>" + get55Year_Day(personArr[i].birthday) + "</td>");             // 离55年天数  阳历
+      resArr.push("<td>" + get55Year_NongLi(personArr[i].birthday) + "</td>");           //  55年那天 农历
+      resArr.push("<td>" + get55Year_Day_NongLi(personArr[i].birthday) + "</td>");       //  55年那天天数 农历
+
+
+      resArr.push("<td>" + get60Year(personArr[i].birthday) + "</td>");                 //  60年那天 阳历
+      resArr.push("<td>" + get60Year_Day(personArr[i].birthday) + "</td>");             // 离60年天数  阳历
+      resArr.push("<td>" + get60Year_NongLi(personArr[i].birthday) + "</td>");           //  60年那天 农历
+      resArr.push("<td>" + get60Year_Day_NongLi(personArr[i].birthday) + "</td>");       //  60年那天天数 农历
+
+      resArr.push("<td>" + get65Year(personArr[i].birthday) + "</td>");                 //  65年那天 阳历
+      resArr.push("<td>" + get65Year_Day(personArr[i].birthday) + "</td>");             // 离65年天数  阳历
+      resArr.push("<td>" + get65Year_NongLi(personArr[i].birthday) + "</td>");           //  65年那天 农历
+      resArr.push("<td>" + get65Year_Day_NongLi(personArr[i].birthday) + "</td>");       //  65年那天天数 农历
+
+      resArr.push("<td>" + get70Year(personArr[i].birthday) + "</td>");                 //  70年那天 阳历
+      resArr.push("<td>" + get70Year_Day(personArr[i].birthday) + "</td>");             // 离70年天数  阳历
+      resArr.push("<td>" + get70Year_NongLi(personArr[i].birthday) + "</td>");           //  70年那天 农历
+      resArr.push("<td>" + get70Year_Day_NongLi(personArr[i].birthday) + "</td>");       //  70年那天天数 农历
+
+
+      resArr.push("<td>" + get75Year(personArr[i].birthday) + "</td>");                 //  75年那天 阳历
+      resArr.push("<td>" + get75Year_Day(personArr[i].birthday) + "</td>");             // 离75年天数  阳历
+      resArr.push("<td>" + get75Year_NongLi(personArr[i].birthday) + "</td>");           //  75年那天 农历
+      resArr.push("<td>" + get75Year_Day_NongLi(personArr[i].birthday) + "</td>");       //  75年那天天数 农历
+
+
+      resArr.push("<td>" + get80Year(personArr[i].birthday) + "</td>");                 //  80年那天 阳历
+      resArr.push("<td>" + get80Year_Day(personArr[i].birthday) + "</td>");             // 离80年天数  阳历
+      resArr.push("<td>" + get80Year_NongLi(personArr[i].birthday) + "</td>");           //  80年那天 农历
+      resArr.push("<td>" + get80Year_Day_NongLi(personArr[i].birthday) + "</td>");       //  80年那天天数 农历
+      resArr.push("</tr>");
+
+
+
+    }
+   // ztbody.innerHTML = resArr.join("");
+	ztable.innerHTML = resArr.join("");
+	var originHeight = $("#ztable_head").offset().top; 
+
+	$(window).scroll(function(){
+    var height = $("#ztable_head").height();   // 58 
+	var scrollTop = $("#ztable_head").scrollTop(); //  当前表头的位置
+	var top1 = $("#ztable_head").offset().top;    //  距离表头 top1=100   2234
+
+		  var windowscrollTop =$(window).scrollTop();
+		  if( windowscrollTop < originHeight){
+		  $("#ztable_head").offset({top:originHeight,left:0});  
+		  }else if(windowscrollTop > originHeight ){ // //  离顶部距离   当大于他的 顶部距离时 就重新设置 它的位置
+var  newPos = windowscrollTop  ;
+$("#ztable_head").offset({top:newPos,left:0});
+// SSSS   height=  60      scrollTop=  0  windowscrollTop=925  newPos=925  top1=764 originHeight=902
+	console.log("SSSSSS  height=  "+height+"      scrollTop=  "+scrollTop  +
+	"  windowscrollTop="+ windowscrollTop +
+		"  newPos="+ newPos +
+	"  top1="+top1 + " originHeight="+ originHeight)
+
+			}
+
+});
+
+
+
+
+  };
+  // alert(" secondList = "+ getLifeSeconds(person0.birthday) +   // 秒岁数
+  // " minutesLife = "+ getLifeMinutes(person0.birthday) +     // 分岁数
+  // " hourLife = "+ getLifeHour(person0.birthday) +      // 时岁数
+  // " dayLife = "+ getLifeDay(person0.birthday) +         // 天岁数
+  // " moonthLife = "+ getLifeMonth(person0.birthday) +    // 月岁数
+  // " yearLife = "+ getLifeYear(person0.birthday) +          // 年岁数
+  // " nongli_birth = "+ getBirthDay_YangLi(person0.birthday) +    // 生日(阳历)
+  //  " nongli_birth = "+ getBirthDay_NongLi(person0.birthday) +  // 生日(农历)     getBirthDay_YangLi
+  // " shuxiang = "+ getAmnial_NongLi(person0.birthday) +    //  属相
+  // " 10nain = "+ get10Year(person0.birthday) +              //  10年
+  // " 10nain_nongli = "+ get10Year_NongLi(person0.birthday) +
+  // " 距离10年(阳历) = "+ get10Year_Day(person0.birthday) +
+  // " 距离10年(农历) = "+ get10Year_Day_NongLi(person0.birthday) +
+
+
+
+</script>
+
+
+
+
+
+	
+	
+
+    <script language="javascript">  //  对  var date1 起始点的时间  进行 倒计时  
+        function show_date_time() {  // 设置倒计时的起始函数
+            window.setTimeout("show_date_time()", 1000);  // 设置每秒超时时间 1000ms  即1秒执行一次 show_date_time()
+            var date1= '2017/06/07 08:52:00';  // ▲z2 红色倒计时标题起始的时间 开始时间
+            var date2 = new Date();      // 现在的时间
+            timeold = date2.getTime() - new Date(date1).getTime();;   // 时间差值间隔
+            sectimeold = timeold / 1000
+            secondsold = Math.floor(sectimeold);
+            msPerDay = 24 * 60 * 60 * 1000
+            e_daysold = timeold / msPerDay
+            daysold = Math.floor(e_daysold);   //  相差天数 
+            e_hrsold = (e_daysold - daysold) * 24;
+            hrsold = Math.floor(e_hrsold); //  相差小时数
+            e_minsold = (e_hrsold - hrsold) * 60;
+            minsold = Math.floor((e_hrsold - hrsold) * 60);  //  相差分数
+            seconds = Math.floor((e_minsold - minsold) * 60);  //  相差秒数
+            span_dt_dt.innerHTML = daysold + " 天 " + hrsold + " 小时 " + minsold + " 分 " + seconds + " 秒 ";
+        }
+        show_date_time();
+    </script>
+	
+   <script>
+	
+/*
+1. 程序通过调用   show_date_time() , 然后在  show_date_time() 递归调用自己 并设置 1秒为重复调用间隔 来实现 每秒刷新时间的字符串
+2. 创建数据Bean   
+  S.Dot{ Point({x【坐标】,y【坐标】,z【阴影 覆盖的权重】,a,h},
+        e【移动的速度|与两点距离正比】 , 
+		s【是否是之前字串的成员】 ,
+		c 【点显示的颜色】, 
+		t 【Point的 clone的对象(用于对比?)  S.Dot.prototype.clone()  】, 
+		q【 当前需要移动到的 Point的集合】  }
+3.  在末尾调用 S.init() 来启动 Canvas的画面刷新 【 从这里开始新的说明】
+
+*/
+
+/*
+3.1  执行的方法
+      S.Drawing.init('.canvas');   // 初始化
+
+
+*/
+
+        var S = {  // 创建对象S    // 包含  init 方法
+            init: function () { 
+                S.Drawing.init('.canvas');  // 执行函数 S.Drawing.init  传入参数  '.canvas'
+				// h5中新增了一个classList，原生js可以通过它来判断获取dom节点有无某个class 			
+// add( String [, String] ) 方法。可以给元素添加类名，就像jquery中的 addClass()。使用方式：
+                document.body.classList.add('body--ready');
+				console.log("zukgit2  simulate pre ");   
+				//  画面显示的文字  以 |  依次显示      #countdown 3 应该是倒计时的数字    #time 是?
+     		S.UI.simulate(shouString);  // ▲z5  显示字符串的函数
+								console.log("shouString = "+ shouString); 
+                S.Drawing.loop(function () {  //  执行 S.Drawing.loop 方法 并传入方法参数  S.Shape.render()
+                    S.Shape.render();   // 把 S.Shape.render() 函数 传入    S.Drawing.loop 中
+                });
+								console.log("zukgit4  end in S.init "); 
+            }
+        };
+        S.Drawing = (function () {   // Drawing 绘制方法
+            var canvas,    // 画布
+                context,  // 上下环境(包含系统变量)
+                renderFn,    // 未知
+// 最原始的你还可以使用window.setTimout()或者window.setInterval()通过不断更新元素的状态位置等来实现动画，
+//前提是画面的更新频率要达到每秒60次才能让肉眼看到流畅的动画效果
+// 现在又多了一种实现动画的方案，那就是还在草案当中的window.requestAnimationFrame()方法
+// requestFrame 在 这里是一个函数指针  ， requestAnimationFrame(callback)  //callback为回调函数
+// 如果 requestAnimationFrame  webkitRequestAnimationFrame ....msRequestAnimationFrame 都为空
+// 那么就设置 requestFrame 为一个函数,该函数接收一个 callnack 并每 帧 1000/60 每帧的时间调用它
+				// 请求包含的动画的集合  类似点位存储
+                requestFrame = window.requestAnimationFrame ||
+                    window.webkitRequestAnimationFrame ||
+                    window.mozRequestAnimationFrame ||
+                    window.oRequestAnimationFrame ||
+                    window.msRequestAnimationFrame ||
+                    function (callback) {      //  这里猜测是  S.Drawing 的构造器 接受一个 方法  然后每 0.01666 秒 调用一次
+                        window.setTimeout(callback, 1000 / 60);
+                    };
+            return {    // 函数返回的匿名对象?
+                init: function (el) {   //    S.Drawing.init('.canvas')
+				// HTML 的DOM querySelector()方法可以不需要额外的jQuery等支持，也可以方便的获取DOM元素
+				//  zukgit5  S.Drawing.init  el=.canvas
+				console.log("zukgit5  S.Drawing.init  el="+ el); 
+                    canvas = document.querySelector(el); // el元素   这里 el ~=  '.canvas'
+                    context = canvas.getContext('2d');   //  通过 canvas 获取 context
+                    this.adjustCanvas();  // 调整大小
+                    window.addEventListener('resize', function (e) {   // 加入 窗口大小变化执行事件
+                        S.Drawing.adjustCanvas();
+                    });
+                },
+				// 循环函数  fn 和 renderFn 是 boolean值   
+				// fn 是 函数的返回 boolean值 
+				// renderFn  是标记boolean值
+				// 如果当前的 标记值 renderFn 是 true ,  renderFn方法变量不改变
+				// 如果当前的 标记值 renderFn 是 false , renderFn方法变量变为 fn    那么执行函数 fn  赋值给 renderFn
+                loop: function (fn) { 
+//  fn 是秒数          renderFn 是刷新Canvas的函数
+//zukgit1   fn=44455.91700000023   
+//renderFn=function () {  //  执行 S.Drawing.loop 方法 并传入方法参数  S.Shape.render()
+//	S.Shape.render();   // 把 S.Shape.render() 函数 传入    S.Drawing.loop 中
+//}
+
+console.log("zukgit1   fn="+ fn + "   renderFn="+ renderFn);   
+                    renderFn = !renderFn ? fn : renderFn;
+console.log("zukgit2   fn="+ fn + "   renderFn="+ renderFn);   
+                    this.clearFrame();  // 刷新 Frame?  情况画布
+                    renderFn();   //  执行 方法函数 这个方法函数应该是   S.Shape.render()  不断刷新 dot[] 数组
+					
+					// requestFrame 是一个函数?  call 表示执行这个函数  并传参数? 
+                    requestFrame.call(window, this.loop.bind(this));  // 一直循环的源泉
+                },
+                adjustCanvas: function () {  // 调整画布大小 始终比 窗口左右窄 100  上下小30
+                 //   canvas.width = window.innerWidth - 100;
+                  //  canvas.height = window.innerHeight - 30;
+				  canvas.width = window.innerWidth - 100;
+				  canvas.height = window.innerHeight - 30;
+                },
+                clearFrame: function () {  // 给定的区域 情况 画布 
+                    context.clearRect(0, 0, canvas.width, canvas.height);
+                },
+                getArea: function () {   // 指定画布的区域大小
+                    return {w: canvas.width, h: canvas.height};
+                },
+                drawCircle: function (p, c) {  // 绘制  头像的那个圆? 
+                    context.fillStyle = c.render();
+                    context.beginPath();  // 开始绘制的函数
+                    context.arc(p.x, p.y, p.z, 0, 2 * Math.PI, true);  // 椭圆
+                    context.closePath();  // 结束绘制的函数
+                    context.fill();  // 绘制到画布上
+                }
+            };
+        }());
+        S.UI = (function () {
+            var interval,
+                currentAction,
+                time,
+                maxShapeSize = 30,
+                sequence = [],
+                cmd = '#';
+            function formatTime(date) {  // 依据data 获取 11:10 这样的字样  // 以#开头的是命令
+                var h = date.getHours(),
+                    m = date.getMinutes(),
+                    m = m < 10 ? '0' + m : m;
+                return h + ':' + m;
+            }
+            function getValue(value) { // 空格分隔的 第二个 对象
+                return value && value.split(' ')[1];
+            }
+            function getAction(value) {  //  空格分隔的 第一个 对象
+                value = value && value.split(' ')[0];
+                return value && value[0] === cmd && value.substring(1);
+            }
+			
+			// 是随时间的操作函数 由  S.UI.simulate=> performAction(value) = > timedAction
+			//  fn 似乎传递的函数    delay 是每个字符串|xxx| 持续的时间   max是显示字符串的个数   reverse不清楚
+            function timedAction(fn, delay, max, reverse) {  // 没理解含义 timedAction 
+			// 显示当前时间 ( setInterval() 函数会每秒执行一次函数，类似手表)。使用 clearInterval() 来停止执行
+			// var myVar = setInterval(function(){ setColor() }, 300);
+			//   clearInterval(myVar);
+                clearInterval(interval);
+                currentAction = reverse ? max : 1;
+				// zukgit7  delay=2000   interval=undefined   currentAction=1   reverse=undefined  max=7
+				// zukgit7  delay=1000   interval=2   currentAction=3   reverse=true  max=3
+				// zukgit7  delay=2000   interval=11   currentAction=1   reverse=undefined  max=2
+				// zukgit7  delay=1000   interval=15   currentAction=1   reverse=undefined  max=undefined 只执行了四次
+				console.log("zukgit7  delay="+delay+"   interval="+ interval+"   currentAction="+currentAction+"   reverse="+ reverse  + "  max="+ max);
+                fn(currentAction);  // 调用 fn 传入 1 , 3 ,1,  3  fn 就是 performAction(value) 定义的那个 函数
+                if (!max || (!reverse && currentAction < max) || (reverse && currentAction > 0)) {
+                    interval = setInterval(function () {
+                        currentAction = reverse ? currentAction - 1 : currentAction + 1;
+						// zukgit8  currentAction= 2,3,4,5     2,1,0   2,2,3,4,5..100    执行了好多次
+				        console.log("zukgit8  currentAction= "+ currentAction );
+                        fn(currentAction);
+                        if ((!reverse && max && currentAction === max) || (reverse && currentAction === 0)) {
+                            clearInterval(interval);
+                        }
+                    }, delay);  // interval 的 定义
+                }
+            }
+            function performAction(value) { //    S.UI.simulate2  对于给定的命令的操作吗? 
+                var action,
+                    value,
+                    current;
+					console.log("zukgit-performActionX   first value= "+ value );
+                sequence = typeof (value) === 'object' ? value : sequence.concat(value.split('|'));
+                timedAction(function (index) {
+                    current = sequence.shift();
+                    action = getAction(current);
+                    value = getValue(current);
+					// current= #countdown 3     action= countdown    value= 3
+					// current= I love you！❤️     action= false      value= love
+					// zukgit-performAction-timedAction  index= 1  index= 2   index= 3   index= 4  index=5 index= 1  index= 2
+					// 执行 七次   zukgit-performAction-timedAction 
+				console.log("zukgit-performAction-timedAction  index= "+ index );
+				//	console.log("zukgit-performAction   sequence= "+ sequence);
+				//	console.log("zukgit-performAction   current= "+ current);
+				//	console.log("zukgit-performAction   action= "+ action);
+				//	console.log("zukgit-performAction   value= "+ value);
+				
+				// zukgit6   action= false  action= time  action= countdown
+					console.log("zukgit6   action= "+ action);
+                    switch (action) {  // 如果当前的 字符串命令是 countdown
+                        case 'countdown':
+                            value = parseInt(value) || 10;
+                            value = value > 0 ? value : 10;
+                            timedAction(function (index) {
+                                if (index === 0) {
+                                    if (sequence.length === 0) {
+                                        S.Shape.switchShape(S.ShapeBuilder.letter(''));
+                                    } else {
+                                        performAction(sequence);
+                                    }
+                                } else {
+                                    S.Shape.switchShape(S.ShapeBuilder.letter(index), true);
+                                }
+                            }, 1000, value, true);  // 一秒钟显示一个数字  value是数值 
+                            break;
+                        case 'rectangle':  // 标识什么？   应该是画布把
+                            value = value && value.split('x');
+                            value = (value && value.length === 2) ? value : [maxShapeSize, maxShapeSize / 2];
+                            S.Shape.switchShape(S.ShapeBuilder.rectangle(Math.min(maxShapeSize, parseInt(value[0])), Math.min(maxShapeSize, parseInt(value[1]))));
+                            break;
+                        case 'circle':  // 圆 头像 
+                            value = parseInt(value) || maxShapeSize;
+                            value = Math.min(value, maxShapeSize);
+                            S.Shape.switchShape(S.ShapeBuilder.circle(value));
+                            break;
+                        case 'time':  // 时间
+                            var t = formatTime(new Date());
+                            if (sequence.length > 0) {
+                                S.Shape.switchShape(S.ShapeBuilder.letter(t));
+                            } else {
+                                timedAction(function () {
+                                    t = formatTime(new Date());
+                                    if (t !== time) {
+                                        time = t;
+                                        S.Shape.switchShape(S.ShapeBuilder.letter(time));
+                                    }
+                                }, 	1000);
+                            }
+                            break;
+                        default:    //  变换形状吗? 
+                            S.Shape.switchShape(S.ShapeBuilder.letter(current[0] === cmd ? 'HacPai' : current));
+							//   S.Shape.switchShape(S.ShapeBuilder.letter( current【显示 那些 文字 】));
+                    } 
+                }, 3000, sequence.length);   // ▲z7  3000 每个字符串显示的时间   ms毫秒      sequence.length 输入的字符串 以| 分割的数组长度
+            }
+            return {
+                simulate: function (action) {
+                    performAction(action); //  S.UI.simulate1 执行这里 这个 action 应该是 那个 中文字符串
+                }
+            };
+        }());
+        S.Point = function (args) {
+            this.x = args.x;
+            this.y = args.y;
+            this.z = args.z;
+            this.a = args.a;  // 宽 高 ? 
+            this.h = args.h;
+        };
+        S.Color = function (r, g, b, a) {
+            this.r = r;
+            this.g = g;
+            this.b = b;
+            this.a = a;
+        };
+        S.Color.prototype = {
+            render: function () {
+                return 'rgba(' + this.r + ',' + +this.g + ',' + this.b + ',' + this.a + ')';
+            }
+        };
+        S.Dot = function (x, y) {  //  每个点的对象
+            this.p = new S.Point({
+                x: x,
+                y: y,
+                z: 5,
+                a: 1,
+                h: 0
+            });
+            this.e = 0.07;
+            this.s = true;
+            this.c = new S.Color(255, 255, 255, this.p.a);
+            this.t = this.clone();  // 调用到 S.Dot.prototype.clone() 方法生成被选元素的副本，包含子节点、文本和属性
+            this.q = [];
+        };
+        S.Dot.prototype = {  //  需要覆盖的方法
+            clone: function () {
+                return new S.Point({
+                    x: this.x,
+                    y: this.y,
+                    z: this.z,
+                    a: this.a,
+                    h: this.h
+                });
+            },
+			
+//{Dot{ p=Point , this.e , this.q  , this.a , this.s , this.t }}
+
+            _draw: function () {  // 绘制的方法
+                this.c.a = this.p.a;  //  把 当前 Dot的 属性c (Colors)的alpha颜色 赋值给 dot.point 的alpha属性 
+                S.Drawing.drawCircle(this.p, this.c);   //  画圆圈 
+            },
+            _moveTowards: function (n) {  //  移动方向 ?    
+                var details = this.distanceTo(n, true),  // d 代表两点的直线距离   dx  dy 分别表示  x 与 y 坐标差距
+                    dx = details[0],
+                    dy = details[1],
+                    d = details[2],
+                    e = this.e * d;     //  两点之间的直线距离越大  它的移动速度越大  d 是依据  this.e 是 0.7 移动的速度  
+                if (this.p.h === -1) {  //  如果当前的 point的 h高度为 -1  那么调整它的位置为 移动目的点的 x ,y  并return
+                    this.p.x = n.x;
+                    this.p.y = n.y;
+                    return true;   
+                }
+                if (d > 1) {  // 如果高度 不为 -1  并且 两点距离大于 1 
+// 新的 point的距离就是   this.p.x =   this.p.x - ((dx / d) * e)   dx 可能是负数
+// this.p.x - ((dx / d) * e) = this.p.x - ((dx / d) * (this.e * d))  = this.p.x - ( dx * d )
+// 距离越远 离开当前点的位置 越大   dy由于可能为负数  所以当前 代码实现 字母的 均匀 左右 展开
+                    this.p.x -= ((dx / d) * e);     //  注释掉 该句话  显示的字母 就是  | 一条竖线
+                    this.p.y -= ((dy / d) * e);    //  注释掉 该句话  显示的字母 就是 ———— 一条直线
+                } else { 
+                    if (this.p.h > 0) {  //  如果 两点距离大于小于0 并且自身的point的高度 大于0  那么 高度自减
+                        this.p.h--;
+                    } else {        //  如果两点的距离 小于0   当前点的高度 也小于0  那么 放回 true 
+                        return true;
+                    }
+                }
+                return false;  //  其余情况返回 false
+            },
+            _update: function () {  //  更新 ? 
+			// this.t  是 最初的dot的样子? 
+                if (this._moveTowards(this.t)) { // this.p = Point{} 和  this.t 对比?     this.t = this.clone();
+                    var p = this.q.shift();     // 方法用于把数组的第一个元素从其中删除,并返回第一个元素的值 //  如果返回 需要移动 
+                    if (p) {
+//  = || ; 的含义  相当于这样			
+//if(p.x){                
+//return p.x;
+//}else{
+//return this.p.x;
+//}
+
+
+// 如果 point.x的x有值 那么就赋值给 this.t.x 否则就把this.p.x 赋值给this.t.x
+//  相当于对 原始保存的 dot.t [this.clone()]  进行更新  方便下次比较
+//  把    x   y   z   a  h  都赋值给 当前的 t 
+                        this.t.x = p.x || this.p.x;  
+                        this.t.y = p.y || this.p.y;
+                        this.t.z = p.z || this.p.z;
+                        this.t.a = p.a || this.p.a;
+                        this.p.h = p.h || 0;
+                    } else {  //  如果 从数组 q[] 得到的点 point 为空 
+                        if (this.s) {  //  如果当dot 是 字母的组成成分的话 
+						// Math.sin(x) x 的正玄值。返回值在 -1.0 到 1.0 之间；   X与Y 上下 调整 1 个像素?
+                            this.p.x -= Math.sin(Math.random() * 3.142);  // Math.sin([0,3.142]);
+                            this.p.y -= Math.sin(Math.random() * 3.142);
+                        } else {  //  如果当dot  不是 字母的组成成分的话    往q[] 加入一个新的 Point  x 和 y 上下随机变动  当前  [-25,25]
+                            this.move(new S.Point({
+                                x: this.p.x + (Math.random() * 50) - 25,
+                                y: this.p.y + (Math.random() * 50) - 25
+                            }));
+                        }
+                    }
+                }
+                d = this.p.a - this.t.a;  // alpha的值 之间的差距
+                this.p.a = Math.max(0.1, this.p.a - (d * 0.05)); // 在 0.1 与  this.p.a - (d * 0.05) 之间找那个 大的值 赋值给 this.p.a
+                d = this.p.z - this.t.z;           // z 坐标 之间的差异
+                this.p.z = Math.max(1, this.p.z - (d * 0.05));  // 1 与  this.p.a - (d * 0.05) 之间找那个 大的值  this.p.z
+            },
+            distanceTo: function (n, details) {  // 距离   当前点this  与参数点n  之间的距离   dx,dy, d 代表直线距离
+                var dx = this.p.x - n.x,  //  dx   x 坐标的距离
+                    dy = this.p.y - n.y,       //  dy   y 坐标的距离
+                    d = Math.sqrt(dx * dx + dy * dy);     // 两点的直线距离
+                return details ? [dx, dy, d] : d;
+            },
+            move: function (p, avoidStatic) {  // 移动  avoidStatic参数用来 控制逻辑 
+			// 当 avoidStatic 为 true时   只有移动的距离大于1 才把需要移动的点 放入到 数组 this.q[]
+                if (!avoidStatic || (avoidStatic && this.distanceTo(p) > 1)) {
+                    this.q.push(p);
+                }
+            },
+            render: function () {  //  每次的显示  粉刷 
+                this._update();   // 执行每个点的 update
+                this._draw(); // 执行每个点的 _draw()
+            }
+        };
+        S.ShapeBuilder = (function () {  // 图形构建  ?
+            var gap = 7,  // ▲z1-gap 显示字母的元素的数量 决定了 跳过的点的间隔   间隔越大 显示的点越小 ( 间接的决定了 点 的数量)
+                shapeCanvas = document.createElement('canvas'),
+                shapeContext = shapeCanvas.getContext('2d'),
+                fontSize = 500,
+                fontFamily = 'Avenir, Helvetica Neue, Helvetica, Arial, sans-serif';
+            function fit() {
+                shapeCanvas.width = Math.floor(window.innerWidth / gap) * gap;
+                shapeCanvas.height = Math.floor(window.innerHeight / gap) * gap;
+                shapeContext.fillStyle = 'red';
+                shapeContext.textBaseline = 'middle';
+                shapeContext.textAlign = 'center';
+            }
+            function processCanvas() {
+			// 从当前 canvas 获取 数据?
+			// getImageData()	返回 ImageData 对象，该对象为画布上指定的矩形复制像素数据。
+			// http://www.runoob.com/tags/canvas-getimagedata.html
+			
+//getImageData() 方法返回 ImageData 对象，该对象拷贝了画布指定矩形的像素数据。
+//注意：ImageData 对象不是图像，它规定了画布上一个部分（矩形），并保存了该矩形内每个像素的信息。
+//对于 ImageData 对象中的每个像素，都存在着四方面的信息，即 RGBA 值：
+//R - 红色（0-255）
+//G - 绿色（0-255）
+//B - 蓝色（0-255）
+//A - alpha 通道（0-255; 0 是透明的，255 是完全可见的）
+// color/alpha 信息以数组形式存在，并存储于 ImageData 对象的 data 属性中
+
+// imgData.data.length =10000   10000/4 =  2500 个像素
+// 每个像素是四个值 R:data[0]  G:data[1]  B:data[2]  A:data[3]   最后一个像素是 data[9999]
+// https://blog.csdn.net/weixin_34234823/article/details/88232605
+//  Uint8ClampedArray 8位无符号整型固定数组 
+//   width * height * 4 = data.length
+                var pixels = shapeContext.getImageData(0, 0, shapeCanvas.width, shapeCanvas.height).data;
+// pixels 是这样的一些数值		
+// ,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+// ,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+// ,0,0,0,0,0,0,0,255,0,0,53,255,0,0,255,255,0,0,255,255,0,0,255,255,0,0,255,255,0,0,255,255,0,0,255,255,0
+// ,0,255,255,0,0,255,255,0,0,255,255,0,0,255,255,0,0,255,255,0,0,255,255,0,0,255,255,0,0,255,255,0,0,255,255,0,0,255,255,0
+// ,0,255,255,0,0,255,255,0,0,255,255,0,0,255,255,0,0,255,255,0,0,255,255,0,0,255,255,0,0,255,255,0,0,255,255,0,0,255
+// ,255,0,0,255,255,0,0,255,255,0,0,255,255,0,0,255,255,0,0,255,255,0,0,255,255,0,0,255,255,0,0,255,255,0,0,255,255,0,0,255,255,
+// 0,0,255,255,0,0,255,255,0,0,255,255,0,0,255,255,0,0,255,255,0,0,255,255,0,0,255,255,0,0,255,255,0,0,255,255,0,0,255,
+// 255,0,0,255,255,0,0,255,255,0,0,255,255,0,0,255,255,0,0,255,255,0,0,255,255,0,0,255,255,0,0,255,255,0,0,255,255,0,0,255,255,
+// 0,0,255,255,0,0,255,255,0,0,255,255,0,0,255,255,0,0,255,255,0,0,255,255,0,0,255,255,0,0,255,255,0,0,255,255,0,0,255,255,0,0,255,
+
+			//	console.log("zukgit9  pixels="+ pixels);
+                dots = [],
+                    pixels,
+                    x = 0,
+                    y = 0,
+                    fx = shapeCanvas.width,  // canvas的宽
+                    fy = shapeCanvas.height,  //  canvas 的 高
+                    w = 0,
+                    h = 0;
+					// 循环 pixels  每次循环  跳过  4*gap(13) = 52 个 值    gap 是每个点与每个点之间的像素距离
+					//p 0 52 104 156 208
+		     //pixels[] 3 55 107 159 211  这些位置的像素如果大于0的话  就创建 S.point
+                for (var p = 0; p < pixels.length; p += (4 * gap)) {
+                    if (pixels[p + 3] > 0) { //    A - alpha 通道（0-255; 0 是透明的，255 是完全可见的）  不是透明的话 
+                        dots.push(new S.Point({   //  0 52 104 156 208 像素坐标的 alpha 部位0的话 那么就 创建 Point
+                            x: x,
+                            y: y
+                        }));  // 在当前循环计算出来的 x y 坐标  创建一个 Point 对象 
+                        w = x > w ? x : w;    // x与w  哪个大 赋值给 w (取得 所有像素中  x坐标值最大的那一个)
+                        h = y > h ? y : h;   // y与h  哪个大 赋值给 h  (取得 所有像素中  y坐标值最大的那一个)
+                        fx = x < fx ? x : fx;     // x 与 fx  哪个小  就把 值 赋值给 fx (取得 所有像素中  fx坐标值最小的那一个)
+                        fy = y < fy ? y : fy;   // y 与 fy  哪个小  就把 值 赋值给 fy (取得 所有像素中  fy坐标值最小的那一个)
+                    } 
+                    x += gap; // x = x + 13 , x 坐标自增13    x 坐标最大不能超过 shapeCanvas.width 
+                    if (x >= shapeCanvas.width) { //  如果 x的值 大于 canvas的宽度 
+                        x = 0;     // x 复位为0
+                        y += gap;  // y = y+13  y 坐标往下移动 13 个像素?    上下白点之间的差距也是 13 个像素  来到下一行
+						//   p = p + 52 * shapeCanvas.width;  把 循环索引 增加 4*13*  shapeCanvas.width  貌似这些里面包含的是非正确数据 
+                        p += gap * 4 * shapeCanvas.width;   // 从一行可见像素的终点 来到下一行可见像素的起点
+                    }
+                }
+				 // w宽 = x最大点的值宽 + x最小点的值宽  
+				 // h高 = y最大点的高 + y最小点的高
+                return {dots: dots, w: w + fx, h: h + fy};
+            }
+            function setFontSize(s) {  // 设置字体大小
+                shapeContext.font = 'bold ' + s + 'px ' + fontFamily;
+            }
+            function isNumber(n) { // 判断 字符串 是否是 数字
+                return !isNaN(parseFloat(n)) && isFinite(n);
+            }
+            function init() {
+                fit();  // 字体 大小 宽高  填充色 的设置
+                window.addEventListener('resize', fit);  // 增加 窗口大小的监听事件
+            }
+            // Init
+            init();
+            return {  // S.ShapeBuilder 被外部调用的 公开APi
+                imageFile: function (url, callback) {
+                    var image = new Image(), 
+                        a = S.Drawing.getArea();
+                    image.onload = function () {
+                        shapeContext.clearRect(0, 0, shapeCanvas.width, shapeCanvas.height);
+                        shapeContext.drawImage(this, 0, 0, a.h * 0.6, a.h * 0.6);  // 绘制图片, 图片原有高度* 0.6
+                        callback(processCanvas());
+                    };
+                    image.onerror = function () {
+                        callback(S.ShapeBuilder.letter('What?'));
+                    };
+                    image.src = url;
+                },
+                circle: function (d) {
+                    var r = Math.max(0, d) / 2;
+                    shapeContext.clearRect(0, 0, shapeCanvas.width, shapeCanvas.height);
+                    shapeContext.beginPath();
+                    shapeContext.arc(r * gap, r * gap, r * gap, 0, 2 * Math.PI, false); // 绘制 圆
+                    shapeContext.fill();
+                    shapeContext.closePath();
+                    return processCanvas();
+                },
+                letter: function (l) {  		
+
+                    var s = 0;
+                    setFontSize(fontSize);
+                    s = Math.min(fontSize,
+                        (shapeCanvas.width / shapeContext.measureText(l).width) * 0.8 * fontSize,
+                        (shapeCanvas.height / fontSize) * (isNumber(l) ? 1 : 0.45) * fontSize); 
+						// 三个值中 取 最小的那个值  赋值给 s
+						console.log("zukgit7   l= "+ l   +"    fontsize="+ s);
+                    setFontSize(s);
+                    shapeContext.clearRect(0, 0, shapeCanvas.width, shapeCanvas.height);  // 清除 当前显示的 区域
+                    shapeContext.fillText(l, shapeCanvas.width / 2, shapeCanvas.height / 2); // 填充文件
+                    return processCanvas();   //  具体返回的 dots = []数组 的processCanvas()
+                },
+                rectangle: function (w, h) {
+                    var dots = [],
+                        width = gap * w,
+                        height = gap * h;
+                    for (var y = 0; y < height; y += gap) {
+                        for (var x = 0; x < width; x += gap) {
+                            dots.push(new S.Point({
+                                x: x,
+                                y: y
+                            }));
+                        }
+                    }
+                    return {dots: dots, w: width, h: height};
+                }
+            };
+        }());
+        S.Shape = (function () {
+            var dots = [],
+                width = 0,
+                height = 0,
+                cx = 0,
+                cy = 0;
+            function compensate() {
+                var a = S.Drawing.getArea();    // 使得 x + cx = x(左上角坐标)  然后图形的位置 一直保持在 中心点
+                cx = a.w / 2 - width / 2;      // 画布的宽/2 - 绘制图形的宽/2 获取中心点的 x 值   y值
+                cy = a.h / 2 - height / 2;
+            }
+            return {
+                shuffleIdle: function () {
+                    var a = S.Drawing.getArea();
+                    for (var d = 0; d < dots.length; d++) {
+                        if (!dots[d].s) { // 如果不是 字母的成员点  那么移动它到一个随机的地方
+                            dots[d].move({
+                                x: Math.random() * a.w,
+                                y: Math.random() * a.h
+                            });
+                        }
+                    }
+                }, 
+                switchShape: function (n, fast) {  // fast 未定义  或者 为0 
+                    var size,
+                        a = S.Drawing.getArea();  // 绘制的区域
+                    width = n.w;
+                    height = n.h;
+                    compensate();  // 取得 中心点的那个 x y 值
+					// n 标识当前 processCanvas() 计算得到的那些 点的集合
+                    if (n.dots.length > dots.length) {  // 大于当前本地保存的点的个数   初始位为0 当然大于0 了
+                        size = n.dots.length - dots.length;
+                        for (var d = 1; d <= size; d++) {   // 在中心位置 新增加 需要 补充的那些 点 
+                            dots.push(new S.Dot(a.w / 2, a.h / 2));   // 新补充 S.Dot
+                        }
+                    }
+                    var d = 0,
+                        i = 0;
+						
+						
+// Point({  Point 的属性
+// this.x: x, x坐标
+// this.y: y,  y坐标
+// this.z: 5,  阴影偏移值
+// this.a: 1,  透明度
+// this.h: 0    高
+// this.e = 0.07;   //初始化为 0.07      e = this.e * d;
+// this.s = true;   boolean值
+// this.c = new S.Color(255, 255, 255, this.p.a);
+// this.t = this.clone();
+// this.q = [];
+			
+                    while (n.dots.length > 0) {
+                        i = Math.floor(Math.random() * n.dots.length);  // 依据长度 随机 获取一个随机值 i
+						// 在 调用   S.Shape.switchShape(S.ShapeBuilder.letter(index), true) 有时候 会传递 fast = true 进来
+						// 如果 fast为 true  那么 把  0.25 赋值给 dot.e
+						// 如果 fast为 fasle     那么判断 dot.s   [ dot.s=true dot.e=0.14 ]  [ dot.s=false dot.e=0.11 ] 
+						
+						//   dots[d].e 应该影响的是速度  0.01 就很慢很慢了
+						// e = 0.07  0.11  0.14  0.25 
+                        dots[d].e =  fast ? 0.25 : (dots[d].s ? 0.14 : 0.11);  //   dots[d].e 应该影响的是速度
+                        if (dots[d].s)  { // 如果是  大的  this.s = true
+                            dots[d].move(new S.Point({               //当前的点 发生变换  h 变为18 
+                                z: Math.random() * 20 + 10,
+                                a: Math.random(),
+                                h: 18
+                            }));
+							
+//move: function (p, avoidStatic) {  // 移动 
+//if (!avoidStatic || (avoidStatic && this.distanceTo(p) > 1)) {
+//this.q.push(p);}},
+			
+			
+                        } else {   // 如果是  小的  this.s = false   当前的点 移动到新的点
+						
+						var temp_z = Math.random() * 5 + 5;
+						var temp_h = fast ? 18 : 30;
+                            dots[d].move(new S.Point({   // 变大的情况   没有发生位置的变化
+                                z: temp_z,
+                                h: temp_h
+                            }));
+							// zukgit10   dots[d].z= 7.81175742488324    dots[d].h=30
+							// zukgit10   dots[d].z= 5.826350179619853    dots[d].h=30
+							//  一开始都是白色  慢慢有绿色      后续新增的点 是绿色
+						// 	dots[d].c = new S.Color(0, 255, 0,255);  //  最后都在 数字的那些点里
+						console.log("zukgit10   dots[d].z= "+ temp_z   +"    dots[d].h="+ temp_h);
+                        }
+                        dots[d].s = true;   // 大点 标识位该为 true  外面的点会变大   中心点会产生新的点 并往外散开
+						//   如果没有该段代码  字母就不能正常显示   
+                        dots[d].move(new S.Point({  // 需要变小的那些点          
+						// x , y 是一个这样的点, 它的中心在正中间的点   【x,y 是左上的那个点】 所以需要使得它的中心在原点
+                         //   x: n.dots[i].x  ,     //   d=0的点 移动到 随机i的该点    加 中心点的偏移
+                         //   y: n.dots[i].y   ,    // 没有 cx 和  cy  那么显示的位置就歪了
+                            x: n.dots[i].x  + cx,  
+                            y: n.dots[i].y   + cy, 	// x 点  y 点  满足 它的中心在原点
+                            a: 1,
+                            z: 5,
+                            h: 0
+                        }));
+						//  slice 方法可从已有的数组中返回选定的元素  把 随机产生的那个 数值i 从 dot集合中删除
+                        n.dots = n.dots.slice(0, i).concat(n.dots.slice(i + 1)); 
+						// d自增1   d = 1,2,3,4,5,6,7,8,9,10.....    一直到当前的 n.dots.length=0 
+						//  n.dots.length=0  意味着当前的数组 S.Shape.dots[] 依据完全包含 ProcessCanvas()返回的点 并处理过了
+                        d++;  
+                    }
+					// 对于那些 原有的  n.dot[dot1,dot2,dot3]  local.node[dot1,dot2,dot3,dot4] 对于原有的node 多出来的node的处理
+                    for (var i = d; i < dots.length; i++) {  // 从d 的值 开始 遍历  S.Shape.dots[]
+ // 如果遍历的 dot.s 为 true   那么说明这个点原来是组成字母的单元 , 现在已经不需要由这个点来构建 
+// 那么把它的 标记值 改为 false  随机移动到一个位置 h = 0  高度变小
+                        if (dots[i].s) {
+                            dots[i].move(new S.Point({   //  变化大小
+                                z: Math.random() * 20 + 10,
+                                a: Math.random(),
+                                h: 20
+                            }));
+                            dots[i].s = false;   // 把 dot.s 变为 false   貌似标记的是那些 是否是组成字母的单元
+                            dots[i].e = 0.04;  // e   变为 0.04 
+							
+							  // dots[i].c = new S.Color(0, 255, 0,255); 那些不再需要
+                            dots[i].move(new S.Point({  // 让他随机的移动
+                                x: Math.random() * a.w,
+                                y: Math.random() * a.h,
+                                a: 0.3, //.4
+                                z: Math.random() * 4,
+                                h: 0
+                            }));   //   高度为0? 
+                        }
+                    }
+                },
+                render: function () {
+					console.log("dots.length = "+ dots.length);
+                    for (var d = 0; d < dots.length; d++) {   //  遍历所有的Dot  对它 进行粉刷 显示出来
+                        dots[d].render();
+					
+                    }
+                }
+            };
+        }());
+        S.init();
+    </script>
+	
+	
+	    <script type="text/javascript">
+    $(document).ready(function () {
+				console.log("VVVVV 0000");
+        var hover_index = 0;
+        $("table.hovertreeClass td").hover(function () {
+						console.log("VVVVV A");
+            hover_index = $(this).parent().find('td').index(this);
+	
+            $("table.hovertreeClass tr").find("td:eq(" + hover_index + ")").addClass("ztable");
+            $(this).addClass("ztable");
+        }, function () {
+							console.log("VVVVV B");
+            $("table.hovertreeClass tr").find("td:eq(" + hover_index + ")").removeClass("ztable");
+            $(this).removeClass("ztable");
+        });
+
+        $("table.hovertreeClass tbody tr").hover(function () {
+					console.log("VVVVV C");
+            $(this).addClass("ztable");
+        }, function () {
+							console.log("VVVVV D");
+            $(this).removeClass("ztable");
+        });
+    });
+    </script>
+	
+		
+    <audio autoplay="autoplay" loop="loop">  
+	<!-- // ▲z8 播放mp3设置位置 
+	     https://raw.githubusercontent.com/ZukGit/Z_Music/master/music/chinese/yao_bei_na/shi_jian_dou_qu_na_le.mp3
+        <source src="http://www.ytmp3.cn/down/57693.mp3" type="audio/mpeg"> -->
+	 <source src="https://raw.githubusercontent.com/ZukGit/Z_Music/master/music/chinese/yao_bei_na/shi_jian_dou_qu_na_le.mp3" type="audio/mpeg">
+    </audio>
+	
+</body>
+
+</html>
