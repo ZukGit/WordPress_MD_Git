@@ -90,3 +90,36 @@ makedir.bat
 <img src="//../zimage/system/windows/02_tip/createdir1.jpg">
 
 
+# 批量安装APK脚本
+AudoInstallAPK.bat
+点击该文件 自动安装该文件夹下的apk文件,包括中文.apk
+提示:  当前绝对路径中避免 空格 和 中文文件夹
+```
+
+@ECHO off
+
+@REM 将adb.exe添加到PATH中
+ECHO 初始化…
+@SET PATH=%PATH%;%CD%\Adb
+@REM SET PATH
+
+@REM 无限循环的标签
+:LOOP
+
+ECHO 等待您插入手机…
+adb wait-for-device
+
+@REM 循环安装本目录下的APK文件
+FOR %%i IN (*.apk) DO ( 
+ 	ECHO 正在安装：%%i
+ 	adb install "%%i"
+ 	)
+
+ECHO 安装好了；换一台手机吧！！！
+PAUSE
+GOTO LOOP
+
+@ECHO on
+
+
+```

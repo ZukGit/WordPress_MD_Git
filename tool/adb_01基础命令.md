@@ -502,9 +502,12 @@ ACTIVITY MANAGER RUNNING PROCESSES (dumpsys activity processes)
 
 ## adb shell pm list packages
 
-```
-adb shell pm list packages -f        // 查看所有已经安装的应用
-adb shell pm list packages -3        //查看系统预先安装的应用
+```       
+adb shell pm list packages     // 列出所有包名
+
+adb shell pm list packages -s   // 查看所有已经安装的应用 列出系统包名 无法卸载
+
+adb shell pm list packages -3  //查看系统预先安装的应用   列出第三方包名  可以卸载
 
 
 package:/data/app/in.zhaoj.shadowsocksrr-1/base.apk=in.zhaoj.shadowsocksrr
