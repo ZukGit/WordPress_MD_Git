@@ -609,29 +609,20 @@ this.q = [];
 
 #####   this._update()
 ```
+
             _update: function () {  //  更新 ? 
 			// this.t  是 最初的dot的样子? 
-                if (this._moveTowards(this.t)) { // this.p = Point{} 和  this.t 对比?     this.t = this.clone();
+                if (this._moveTowards(this.t)) { //  【1】 this.p = Point{} 和  this.t 对比?     this.t = this.clone();
+ //   那些高度h 小于0的 需要重新 从 数组 S.p[PointA,PointB] 来获取下一个点 来进行移动 
                     var p = this.q.shift();     // 方法用于把数组的第一个元素从其中删除,并返回第一个元素的值 //  如果返回 需要移动 
-                    if (p) {
-//  = || ; 的含义  相当于这样			
-//if(p.x){                
-//return p.x;
-//}else{
-//return this.p.x;
-//}
-
-
-// 如果 point.x的x有值 那么就赋值给 this.t.x 否则就把this.p.x 赋值给this.t.x
-//  相当于对 原始保存的 dot.t [this.clone()]  进行更新  方便下次比较
-//  把    x   y   z   a  h  都赋值给 当前的 t 
+                    if (p) {  // 把 从 数组 var[Point]得到的 Point(x,y,z,a,h) 赋值给 SDot.t (Point.clone())
                         this.t.x = p.x || this.p.x;  
                         this.t.y = p.y || this.p.y;
                         this.t.z = p.z || this.p.z;
                         this.t.a = p.a || this.p.a;
                         this.p.h = p.h || 0;
-                    } else {  //  如果 从数组 q[] 得到的点 point 为空 
-                        if (this.s) {  //  如果当dot 是 字母的组成成分的话 
+                    } else {  //  如果 从数组 q[] 得到的点 point 为空 , 说明已经不需要移动了 
+                        if (this.s) {  //  如果当dot 是 字母的组成成分的话   上下移动 使得产生微微动的效果
 						// Math.sin(x) x 的正玄值。返回值在 -1.0 到 1.0 之间；   X与Y 上下 调整 1 个像素?
                             this.p.x -= Math.sin(Math.random() * 3.142);  // Math.sin([0,3.142]);
                             this.p.y -= Math.sin(Math.random() * 3.142);
@@ -642,7 +633,7 @@ this.q = [];
                             }));
                         }
                     }
-                }
+                }  // end moveTowards
                 d = this.p.a - this.t.a;  // alpha的值 之间的差距
                 this.p.a = Math.max(0.1, this.p.a - (d * 0.05)); // 在 0.1 与  this.p.a - (d * 0.05) 之间找那个 大的值 赋值给 this.p.a
                 d = this.p.z - this.t.z;           // z 坐标 之间的差异
@@ -653,7 +644,55 @@ this.q = [];
 
 ```
 
+###### this._moveTowards(this.t)
+```
+// 会 进行 px 和 py 的 新的位置的计算 那些高度小于 0 的点 会返回 true  
+ //  那些高度小于 0 的点 会返回 true    this.p.h=== -1 会 获取到新的 S.p.x = S.t.x   S.p.y = S.t.y 
+// 那些 距离大于1 的点 每次会获取到新的 this.p.x 和  this.p.y 点
 
+            _moveTowards: function (n) { 
+                var details = this.distanceTo(n, true),  // d 代表两点的直线距离   dx  dy 分别表示  x 与 y 坐标差距
+                    dx = details[0],
+                    dy = details[1],
+                    d = details[2],
+                    e = this.e * d;     //  两点之间的直线距离越大  它的移动速度越大  d 是依据  this.e 是 0.7 移动的速度  
+                if (this.p.h === -1) {  //  如果当前的 point的 h高度为 -1  那么调整它的位置为 移动目的点的 x ,y  并return
+                    this.p.x = n.x;
+                    this.p.y = n.y;
+                    return true;         // 高度h 变为 -1 的 那些点  需要移动 
+                }
+                if (d > 1) {  // 如果高度 不为 -1  并且 两点距离大于 1 
+// 新的 point的距离就是   this.p.x =   this.p.x - ((dx / d) * e)   dx 可能是负数
+// this.p.x - ((dx / d) * e) = this.p.x - ((dx / d) * (this.e * d))  = this.p.x - ( dx * d )
+// 距离越远 离开当前点的位置 越大   dy由于可能为负数  所以当前 代码实现 字母的 均匀 左右 展开
+                    this.p.x -= ((dx / d) * e);     //  注释掉 该句话  显示的字母 就是  | 一条竖线
+                    this.p.y -= ((dy / d) * e);    //  注释掉 该句话  显示的字母 就是 ———— 一条直线
+                } else { 
+                    if (this.p.h > 0) {  //  如果 两点距离大于小于0 并且自身的point的高度 大于0  那么 高度自减
+                        this.p.h--;
+                    } else {        //  如果两点的距离 小于0   当前点的高度 也小于0  那么 放回 true   需要进行重新定位? s
+                        return true;
+                    }
+                }
+                return false;  //  其余情况返回 false
+            }
+
+
+
+```
+
+<h7>distanceTo(n, true)<h7>
+
+```
+distanceTo: function (n, details) {  // 距离   当前点this  与参数点n  之间的距离   dx,dy, d 代表直线距离
+    var dx = this.p.x - n.x,  //  dx   x 坐标的距离
+        dy = this.p.y - n.y,       //  dy   y 坐标的距离
+        d = Math.sqrt(dx * dx + dy * dy);     // 两点的直线距离
+    return details ? [dx, dy, d] : d;
+}
+
+
+```
 
 #####  this._draw()
 ```
