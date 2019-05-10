@@ -518,6 +518,55 @@ package:/system/app/embms/embms.apk=com.qualcomm.embms
 
 ```
 
+
+### adb shell pm list packages -f 
+```
+打印所有的APK的路径 还有  包的名称
+
+package:/system/app/NetworkSetting/NetworkSetting.apk=com.qualcomm.qti.networksetting
+package:/data/app/com.baidu.netdisk-1/base.apk=com.baidu.netdisk
+package:/system/app/fastdormancy/fastdormancy.apk=com.qualcomm.fastdormancy
+package:/system/app/FidoSuiService/FidoSuiService.apk=com.qualcomm.qti.auth.fidosuiservice
+package:/data/app/cm.aptoide.pt-1/base.apk=cm.aptoide.pt
+package:/data/app/in.zhaoj.shadowsocksrr-1/base.apk=in.zhaoj.shadowsocksrr
+package:/system/app/Bluetooth/Bluetooth.apk=com.android.bluetooth
+package:/system/app/TimeService/TimeService.apk=com.qualcomm.timeservice
+package:/system/app/embms/embms.apk=com.qualcomm.embms
+package:/system/priv-app/ContactsProvider/ContactsProvider.apk=com.android.providers.contacts
+package:/data/app/com.ct.client-2/base.apk=com.ct.client
+package:/system/app/CaptivePortalLogin/CaptivePortalLogin.
+
+```
+### adb shell pm list packages -f  -3 【真实路径】
+```
+package:/data/app/com.farproc.wifi.analyzer-YFcZDtlV0Qq7fG4UKXY4Uw==/base.apk=com.farproc.wifi.analyzer
+package:/data/app/com.qiyi.video-nobeX94iDpdQvDopFilwhA==/base.apk=com.qiyi.video
+package:/data/app/com.tmri.app.main-t7CTfRK6BP9HbwiUWOMsJg==/base.apk=com.tmri.app.main
+package:/data/app/com.youdao.calculator-WyIOCVsQMjxFKyjykYNGfw==/base.apk=com.youdao.calcula
+
+
+```
+
+
+
+### adb shell pm list packages -f  -3  $pkgname
+```
+第三方应用的包名以及安装路径
+package:/data/app/com.google.android.youtube-2/base.apk=com.google.android.youtube
+package:/data/app/com.farproc.wifi.analyzer-1/base.apk=com.farproc.wifi.analyzer
+package:/data/app/com.tencent.FileManager-2/base.apk=com.tencent.FileManager
+package:/data/app/com.hexin.plat.android-1/base.apk=com.hexin.plat.android
+package:/data/app/com.tencent.androidqqmail-2/base.apk=com.tencent.androidqqmail
+package:/data/app/cmb.pb-1/base.apk=cmb.pb
+package:/data/app/cn.gov.tax.its-2/base.apk=cn.gov.tax.its
+package:/data/app/com.baidu.quickmind-1/base.apk=com.baidu.quickmind
+package:/data/app/com.lenovo.otp-1/base.apk=com.lenovo.otp
+package:/data/app/com.ccdi.news-2/base.apk=com.ccdi.news
+
+
+```
+
+
 ## adb shell screencap
 ```
 adb shell screencap         // 是截屏命令
