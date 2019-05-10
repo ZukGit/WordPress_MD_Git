@@ -17,14 +17,14 @@ if exist B7_autoBankupAPP.txt (
 @rem 遍历文件多行 
   for /f %%l in (B7_autoBankupAPP.txt) do (
 set /a num+=1 
-::set s=%%l
-echo "aaaa"
+@rem set s=%%l
+@rem echo "aaaa"
 set mystr=%%l
 
-echo "bbbbb1 = !mystr!"
-echo "bbbbb2 = %mystr%"
+@rem  echo "bbbbb1 = !mystr!"
+@rem  echo "bbbbb2 = %mystr%"
 set str=!mystr!
-echo "ccccc = !str!"
+@rem  echo "ccccc = !str!"
 ::将"号替换成空格
 set "str=!str:"= !"
 :lengthnext
@@ -33,40 +33,40 @@ if not "!str!"=="" (
  set "str=!str:~1!"
  goto lengthnext
 )
-echo !mystr!字符串长度为:%numsize%
+@rem   echo !mystr!字符串长度为:%numsize%
 
 
 set ch1=apk=
-::注意，这里是区分大小写的！
+@rem  注意，这里是区分大小写的！
 set str2=!mystr!
-::复制字符串，用来截短，而不影响源字符串
+@rem  复制字符串，用来截短，而不影响源字符串
 :indexofnext
 set prestr=!str2:~0,4! 
 if not "!str2!"=="" (
 set /a index+=1
 if "!prestr!"=="%ch1% " goto last
-::比较首字符是否为要求的字符，如果是则跳出循环
+@rem  比较首字符是否为要求的字符，如果是则跳出循环
 set "str2=!str2:~1!"
 goto indexofnext
 )
 set /a index=0
-::没有找到字符时，将num置零
+@rem  没有找到字符时，将num置零
 :last
-echo 字符'%ch1%'在字符串"!mystr!"中的首次出现位置为%index%
+@rem  echo 字符'%ch1%'在字符串"!mystr!"中的首次出现位置为%index%
 
 
-::  长度82 , = 的位置是56
+@rem  长度82 , = 的位置是56
 set /a pos = %index% -6
 set apkpath=!mystr!
 set apkpath=!mystr:~8,%pos%!
 set packagename=!mystr!
 set /a pos = %index% + 3
 set packagename=!mystr:~%pos%,%numsize%!
-::echo 安装路径为'!apkpath!'包名为"!packagename!"
+@rem  echo 安装路径为'!apkpath!'包名为"!packagename!"
 	   
 @rem 	echo !s%! >> B7_test.txt
-::       ECHO 卸载包:  !s%!
-::       call adb uninstall !s%!
+@rem        ECHO 卸载包:  !s%!
+@rem        call adb uninstall !s%!
 call adb pull !apkpath!  ./"!packagename!".apk
 
 set /a index = 0
@@ -79,12 +79,12 @@ ren a.tmp B7_autoBankupAPP.txt
 
 goto forbegin
 )
-ECHO 手机中的三方APK以完全拉取完成   
+ECHO 手机三方应用APK备份已完全备份到本地！   
 ) else (
 ECHO B7_autoBankupAPP.txt不存在！ 
 )
 
-ECHO 换一台手机进行拉取APK吧！！！
+ECHO 换一台手机继续备份APK吧！！！
 PAUSE
 GOTO LOOP
 
