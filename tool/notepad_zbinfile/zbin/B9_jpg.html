@@ -81,18 +81,18 @@
 
     function changeImageDiff() {
 	
-var randomIndex1 = Math.floor(Math.random() * (20 - 1 + 1) + 1);  // 20 最大值
-var randomIndex2 = Math.floor(Math.random() * (20 - 1 + 1) + 1);
-var randomIndex3 = Math.floor(Math.random() * (20 - 1 + 1) + 1);
-var randomIndex4 = Math.floor(Math.random() * (20 - 1 + 1) + 1);
-var randomIndex5 = Math.floor(Math.random() * (20 - 1 + 1) + 1);
-var randomIndex6 = Math.floor(Math.random() * (20 - 1 + 1) + 1);
-    document.getElementsByTagName('img')[0].setAttribute('src','img/'+randomIndex1+'.jpg');
-    document.getElementsByTagName('img')[1].setAttribute('src','img/'+randomIndex2+'.jpg');
-    document.getElementsByTagName('img')[2].setAttribute('src','img/'+randomIndex3+'.jpg');
-    document.getElementsByTagName('img')[3].setAttribute('src','img/'+randomIndex4+'.jpg');
-    document.getElementsByTagName('img')[4].setAttribute('src','img/'+randomIndex5+'.jpg');
-    document.getElementsByTagName('img')[5].setAttribute('src','img/'+randomIndex6+'.jpg');
+var randomIndex1 = Math.floor(Math.random() * (1139 - 1 + 1) + 1);  // 20 最大值
+var randomIndex2 = Math.floor(Math.random() * (1139 - 1 + 1) + 1);
+var randomIndex3 = Math.floor(Math.random() * (1139 - 1 + 1) + 1);
+var randomIndex4 = Math.floor(Math.random() * (1139 - 1 + 1) + 1);
+var randomIndex5 = Math.floor(Math.random() * (1139 - 1 + 1) + 1);
+var randomIndex6 = Math.floor(Math.random() * (1139 - 1 + 1) + 1);
+    document.getElementsByTagName('img')[0].setAttribute('src','jpg/'+randomIndex1+'.jpg');
+    document.getElementsByTagName('img')[1].setAttribute('src','jpg/'+randomIndex2+'.jpg');
+    document.getElementsByTagName('img')[2].setAttribute('src','jpg/'+randomIndex3+'.jpg');
+    document.getElementsByTagName('img')[3].setAttribute('src','jpg/'+randomIndex4+'.jpg');
+    document.getElementsByTagName('img')[4].setAttribute('src','jpg/'+randomIndex5+'.jpg');
+    document.getElementsByTagName('img')[5].setAttribute('src','jpg/'+randomIndex6+'.jpg');
     window.setTimeout("changeImageDiff()", 5000);
     };
 
@@ -110,12 +110,12 @@ window.onload=function(){
 <div id="screen">
   <div id="cube" class='cube'>
     <!-- cube images -->   <!-- 前 -->
-    <img id="1" src="img/1.jpg" class='face' data-transform="translateZ(-270px)" style="outline:none !important">
-    <img id="2" src="img/2.jpg" class='face' data-transform="rotateY(90deg) translateZ(-300px)"> <!-- 左 -->
-    <img id="3" src="img/3.jpg"  class='face' data-transform="rotateY(-90deg) translateZ(-300px)"><!-- 右 -->
-    <img id="4" src="img/4.jpg" class='face' data-transform="rotateY(180deg) translateZ(-300px)">   <!-- 后 -->
-    <img id="5" src="img/5.jpg" class='face' data-transform="rotateX(90deg) translateZ(-265px)"> <!-- 下 -->
-    <img id="6" src="img/6.jpg"  class='face' data-transform="rotateX(-90deg) translateZ(-270px)">  <!-- 上 -->
+    <img id="1" src="jpg/1.jpg" class='face' data-transform="translateZ(-270px)" style="outline:none !important">
+    <img id="2" src="jpg/2.jpg" class='face' data-transform="rotateY(90deg) translateZ(-300px)"> <!-- 左 -->
+    <img id="3" src="jpg/3.jpg"  class='face' data-transform="rotateY(-90deg) translateZ(-300px)"><!-- 右 -->
+    <img id="4" src="jpg/4.jpg" class='face' data-transform="rotateY(180deg) translateZ(-300px)">   <!-- 后 -->
+    <img id="5" src="jpg/5.jpg" class='face' data-transform="rotateX(90deg) translateZ(-265px)"> <!-- 下 -->
+    <img id="6" src="jpg/6.jpg"  class='face' data-transform="rotateX(-90deg) translateZ(-270px)">  <!-- 上 -->
     <!-- bonus image
           <img id="7" src="img/7.jpg"  class='face' data-transform="rotateY(180deg) translateZ(305px)" style="visibility:hidden">
           <!-- buttons
