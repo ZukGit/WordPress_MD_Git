@@ -38,6 +38,19 @@ ICMPv6向源节点报告关于目的地址传输IPv6包的错误和信息，具�
 
 ### NDP(基于ICMP协议实现的协议)(Neighbor Discovery Protocol)
 
+```
+
+icmpv6.type == 136      //  Wireshark中 ICMP 中的 NA 帧 ( Neighbor Advertisement Frame )
+
+icmpv6.type == 135      //  Wireshark中 ICMP 中的 NS 帧 ( Neighbor Solicitation Frame )
+
+icmpv6.type == 134    // Wireshark中 ICMP 中的 RA 帧 ( Router Advertisement Frame )
+
+icmpv6.type == 133     // Wireshark中 ICMP 中的 RS 帧 ( Router Solicitation Frame )
+
+
+
+```
 #### RS( Router Solicitation Message )路由器请求
 ```
 PC主机启动后，通过RS消息向路由器发出请求，期望路由器立即发送RA消息响应。
