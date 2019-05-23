@@ -347,11 +347,14 @@ public class B6 {
                 }
 
             }
-
-            String dotDirPath = dotPath.substring(0,dotPath.lastIndexOf("\\"));
+			System.out.println("zukgit  dotPath.substring  dotPath ="+ dotPath);
+			 String dotDirPath = "";
+			if(dotPath != null && !dotPath.isEmpty()){
+            dotDirPath = dotPath.substring(0,dotPath.lastIndexOf("\\"));
             dotPath="\""+dotPath+"\"";
             dotDirPath="\""+dotDirPath+"\"";
             // dot  ./B6.gv -Tpdf -o B6.pdf
+			System.out.println("dotDirPath 1  = "+dotDirPath);
             File outputPdfFile = new File(outFile.getParentFile().getAbsolutePath()+File.separator+ "B6.pdf");
             String command = " cmd.exe /c cd " +dotDirPath+  "  &&  dot.exe  "+outFile.getAbsolutePath() +" -Tpdf -o  " + outFile.getParentFile().getAbsolutePath()+File.separator+ "B6.pdf";
 
@@ -367,7 +370,7 @@ public class B6 {
             String procResult2 = execCMD(command2); // 打开 acrord32 Adobe 阅读  PDF 文件
             System.out.println("command2 = "+command2 +" procResult="+ procResult2);
 
-
+}
             String command3 = "cmd.exe /C start notepad++  "  +outFile.getAbsolutePath();
             String procResult3 = execCMD(command3); // 使用notepad 打开 gv 文件
             System.out.println("command3 = "+command3 +" procResult3="+ procResult3);
@@ -393,6 +396,7 @@ public class B6 {
 			String procResult4 = execCMD(command4); //  使用 Chrome 打开 Graphiz 在线解析网页
             System.out.println("command5 = "+command5 +" procResult5="+ procResult5);
 
+				if(dotPath != null && !dotPath.isEmpty()){
 // command6   生成 Png 照片
             // String command6 = "cmd.exe /C start chrome   http://www.bejson.com/jsonviewernew/ ";
             File pngFile = new File(outFile.getParentFile().getAbsolutePath()+File.separator+ "B6.png");
@@ -406,7 +410,7 @@ public class B6 {
             //    RuntimeUtil.exec("rundll32.exe C:\\\\Windows\\\\System32\\\\shimgvw.dll,ImageView_Fullscreen  " + pngFile.getAbsolutePath());
             String procResult7 = execCMD(command7);
             System.out.println("command7 = "+command7 +" procResult7="+ procResult7);
-
+				}
         } catch (Exception e) {
 
         }
