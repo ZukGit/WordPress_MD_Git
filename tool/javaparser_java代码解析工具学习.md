@@ -15,7 +15,8 @@ API说明文档:  https://www.javadoc.io/doc/com.github.javaparser/javaparser-co
 
 JavaParser库的目标: 我们的目标是构建一组简单且轻量级的工具来生成、分析和处理Java代码。
 
-
+JavaParser.jar文件下载:
+https://www.mvnjar.com/com.github.javaparser/javaparser-core/3.2.8/detail.html
 
 ```
 
