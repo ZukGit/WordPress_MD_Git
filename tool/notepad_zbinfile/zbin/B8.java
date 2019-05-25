@@ -44,23 +44,22 @@ public class B8 {
         ArrayList<ZMethod> methodList = new  ArrayList<ZMethod>();
         // 多个参数  逗号前有值   逗号后为空格
 // boolean setRandomMacOui()
-//  methodList.add(new ZMethod(WifiEnabler_java,"boolean","setRandomMacOui",""));
+methodList.add(new ZMethod(WifiEnabler_java,"boolean","setRandomMacOui",""));
 
 // boolean connectToUserSelectNetwork(int netId, int uid, boolean forceReconnect) 
-        // methodList.add(new ZMethod(WifiEnabler_java,"boolean","connectToUserSelectNetwork","int netId, int uid, boolean forceReconnect"));
+methodList.add(new ZMethod(WifiEnabler_java,"boolean","connectToUserSelectNetwork","int netId, int uid, boolean forceReconnect"));
 
 // int lookupFrameworkNetworkId(int supplicantNetworkId)
-        // methodList.add(new ZMethod(WifiEnabler_java,"int","lookupFrameworkNetworkId","int supplicantNetworkId"));
+ methodList.add(new ZMethod(WifiEnabler_java,"int","lookupFrameworkNetworkId","int supplicantNetworkId"));
 
-        // boolean setEnableAutoJoinWhenAssociated(boolean enabled)
-        // methodList.add(new ZMethod(WifiEnabler_java,"boolean","setEnableAutoJoinWhenAssociated","boolean enabled"));
+// boolean setEnableAutoJoinWhenAssociated(boolean enabled)
+methodList.add(new ZMethod(WifiEnabler_java,"boolean","setEnableAutoJoinWhenAssociated","boolean enabled"));
 
-        //  void enableVerboseLogging(int verbose)
-        //  methodList.add(new ZMethod(WifiEnabler_java,"void","enableVerboseLogging","int verbose"));
+//  void enableVerboseLogging(int verbose)
+methodList.add(new ZMethod(WifiEnabler_java,"void","enableVerboseLogging","int verbose"));
 
-
-        //  void setSupplicantLogLevel()
-        methodList.add(new ZMethod(WifiEnabler_java,"void","setSupplicantLogLevel",""));
+//  void setSupplicantLogLevel()
+methodList.add(new ZMethod(WifiEnabler_java,"void","setSupplicantLogLevel",""));
 
         WifiEnabler_java.addZMethod(methodList);
         ZClassList.add(WifiEnabler_java);
@@ -313,12 +312,15 @@ public class B8 {
             System.out.println("=========== originClassContent ==========\n"+this.originClassContent);
             originClassCode = new String(this.originClassContent);
             newClassCode = new String(originClassCode);
+			int mMethodIndex = 1;
             for (ZMethod  zmethod:this.zmethodList) {
                 //  curClassCode.replaceAll(zmethod.originCodeString,)
                 int allNodeSize = zmethod.checkAllNode(zmethod.methodDeclaration);   //  获取总共Method 中多少个结点
                 int expressNodeSize =  zmethod.expressNodeList.size();    //  每个表达式 前面 添加一些 log 以此 来观察 程序 运行
                 System.out.println(" allNodeSize = "+ allNodeSize +"       表达式结点 expressNodeSize = "+ expressNodeSize);
                 originMethodCode = zmethod.originCodeString;
+				  System.out.println("第" + mMethodIndex+" 个方法开始解析 methodName =:" +zmethod.methodName);
+				mMethodIndex++;
                 if(zmethod.originCodeString.contains("zukgit")){  // 对已经添加过Log的方法不再处理
                     System.out.println(" 该方法已添加了Log 不再添加!"+zmethod.methodName);
                     continue;
