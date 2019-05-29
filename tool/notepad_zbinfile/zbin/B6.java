@@ -172,10 +172,23 @@ public class B6 {
             StringBuilder sb  = new StringBuilder();
 			System.out.println("curFile = "+ curFile.getAbsolutePath());
             tryReadJsonFromFile( sb ,  curFile);
-            boolean isArrJson = sb.toString().startsWith("[");
+
+				String firstArrChar = sb.toString().substring(0,1);
+				while( firstArrChar != null && !(firstArrChar.equals("{") || firstArrChar.equals("[" ))){
+				
+						sb = new StringBuilder(sb.toString().trim().substring(1));
+						System.out.println("注意: 不是以{ 或者 [ 开头  firstArrChar="+ firstArrChar);
+						firstArrChar = sb.toString().substring(0,1);
+				}
+				
+			  boolean isArrJson = sb.toString().startsWith("[");
             if(isArrJson){
                 sb = new StringBuilder("{ arr:"+sb.toString()+"}");
-            }
+				        System.out.println("读取到的字符是[开头的!  firstArrChar="+ firstArrChar);
+            }else{
+              System.out.println("读取到的字符不是[开头的!  firstArrChar="+ firstArrChar);
+			  // 读取到的字符不是[开头的!  firstArrChar=?
+			}
 
 
             if(sb.toString().trim().equals("")){
@@ -186,8 +199,9 @@ public class B6 {
 			String firstChar = sb.toString().substring(0,1);
 			while( firstChar != null && !firstChar.equals("{")){
 				sb = new StringBuilder(sb.toString().trim().substring(1));
+				System.out.println("注意: 不是以{ 开头  firstChar="+ firstChar);
 				firstChar = sb.toString().substring(0,1);
-				         System.out.println("以?开头  firstChar="+ firstChar);
+
 			}
             if(!JSONUtil.isJson(sb.toString().trim())){
                 System.out.println("读取到的文件不是标准的Json 格式 退出!  当前读取到的数据为:\n"+ sb.toString() );
