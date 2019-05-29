@@ -127,6 +127,13 @@ EXT_PART              文件扩展名        cs
 
 
 ### A0_把当前井号与资源一一对齐
+
+```
+Wscript.exe  /x %userprofile%\Desktop\zbin\A0.vbs  %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH)   【A0 vbs】
+cmd /K cd /d %userprofile%\Desktop\zbin & %userprofile%\Desktop\zbin\A0.bat %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH)      【A0 bat】
+
+```
+
 ```
 #### 半岛铁盒
 #### 最后的战役
@@ -201,6 +208,12 @@ End If
 
 ### A1_添加行号
 ```
+Wscript.exe  /x %userprofile%\Desktop\zbin\A1.vbs  %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH)     【A1 vbs】
+cmd /K cd /d %userprofile%\Desktop\zbin & %userprofile%\Desktop\zbin\A1.bat %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH)      【A1 bat】
+
+```
+
+```
 aaa              01      aaa
 bbb              02      bbb
 ccc              03      ccc
@@ -261,6 +274,12 @@ C:\Users\aaa\Desktop\TestA\A1.bat
 
 
 ### A2_对齐行(命令输出的那些)
+```
+Wscript.exe  /x %userprofile%\Desktop\zbin\A2.vbs  %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH)   【A2 vbs】
+cmd /K cd /d %userprofile%\Desktop\zbin & %userprofile%\Desktop\zbin\A2.bat %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH)  【A2 bat】
+
+```
+
 
 ```
    71     aaa      staff     2414                         
@@ -310,6 +329,13 @@ End If
 ```
 
 ### A3_竖排列切换横排列(命令输出的那些)
+
+```
+Wscript.exe  /x %userprofile%\Desktop\zbin\A3.vbs  %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH)   【A3 vbs】
+cmd /K cd /d %userprofile%\Desktop\zbin & %userprofile%\Desktop\zbin\A3.bat %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH)  【A3 bat】
+
+```
+
 ```
 1
 2
@@ -364,6 +390,17 @@ End If
 
 
 ### A4_在每行开头以及结尾添加固定字符串
+```
+cmd /K cd /d %userprofile%\Desktop\zbin & %userprofile%\Desktop\zbin\A4.bat %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH)  prez#"前缀"endz#"后缀" 
+cmd /K cd /d %userprofile%\Desktop\zbin & %userprofile%\Desktop\zbin\A4.bat %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH)  prez#"xxxx"endz#"yyyy"   【A4 bat OK】
+cmd /K cd /d %userprofile%\Desktop\zbin & %userprofile%\Desktop\zbin\A4.bat %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH)  endz#"yyyy"prez#"xxxx"  
+cmd /K cd /d %userprofile%\Desktop\zbin & %userprofile%\Desktop\zbin\A4.bat %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH)  endz#"yyyy"
+cmd /K cd /d %userprofile%\Desktop\zbin & %userprofile%\Desktop\zbin\A4.bat %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH)  prez#"xxxx"
+cmd /K cd /d %userprofile%\Desktop\zbin & %userprofile%\Desktop\zbin\A4.bat %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH)  prez#"<audio> <source src=""endz#"" /><audio>"   【A4 bat OK 使用简单无规则】
+
+
+```
+
 ```
 1.在行首添加字符串
 2.在行尾添加字符串
@@ -449,6 +486,13 @@ End If
 
 ### A5_生成MD语法的表格依据当前数据
 ```
+
+Wscript.exe  /x %userprofile%\Desktop\zbin\A5.vbs  %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH)       【A5 vbs】
+cmd /K cd /d %userprofile%\Desktop\zbin & %userprofile%\Desktop\zbin\A5.bat %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH)      【A5 bat】
+
+```
+
+```
 A  B   C
 1  2   3
 
@@ -493,6 +537,13 @@ End If
 ### A6_对当前文件进行进行逐行的复制(剪切板中),原字符字词右移动
 
 ```
+Wscript.exe  /x %userprofile%\Desktop\zbin\A6.vbs  %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH)       【A6 vbs】
+cmd /K cd /d %userprofile%\Desktop\zbin & %userprofile%\Desktop\zbin\A6.bat %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH)      【A6 bat】
+
+```
+
+
+```
 剪切板内容:
 abcd
 edgh
@@ -522,7 +573,15 @@ adaac
 
 
 
-### A7_对当前文件中的中文进行清除
+### A7_对当前文件中的中文进行清除(notepad)
+```
+
+Wscript.exe  /x %userprofile%\Desktop\zbin\A7.vbs  %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH)       【A7 vbs】
+cmd /K cd /d %userprofile%\Desktop\zbin & %userprofile%\Desktop\zbin\A7.bat %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH)      【A7 bat】
+
+
+```
+
 ```
 A你B我C他
 A你B我C他
@@ -570,7 +629,7 @@ End If
 
 
 
-### A8_对当前文件夹内所有文件进行Log的分析(后续开发 定位先)
+### A8_对当前文件夹内所有文件进行Log的分析(后续开发 定位先)(notepad check.txt分析)
 ```
 
 Wscript.exe  /x %userprofile%\Desktop\zbin\A8.vbs  %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH)       【A8 vbs】  解析Log
@@ -583,7 +642,15 @@ cmd /K cd /d %userprofile%\Desktop\zbin & %userprofile%\Desktop\zbin\A8.bat %use
 ```
 
  <img src="//../zimage/tool/notepad/A8_1.png">
-### A9_把当前汉字转为下划线拼音形式
+### A9_把当前汉字转为下划线拼音形式(notepad)
+```
+Wscript.exe  /x %userprofile%\Desktop\zbin\A9.vbs  %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH)     【A9 vbs】
+cmd /K cd /d %userprofile%\Desktop\zbin & %userprofile%\Desktop\zbin\A9.bat %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH)      【A9 bat】
+
+```
+
+
+
 ```
 你我他
 大家好
@@ -640,8 +707,18 @@ End If
 
 
 ### B0_解析当前路径下的所有文件(非文件夹)生成<audio片段>
+(对应路径的notepad打开的txt文件)
+
 ```
-空    文件夹内文件： 蜗牛.mp3    zui_hou_de_zhan_yi.mp3   yuan_you_hui.mp3   路径为：  C:\Users\aaa\Desktop\zbin\test\yuan_you_hui.mp3
+
+Wscript.exe  /x %userprofile%\Desktop\zbin\B0.vbs  %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH)   【B0 vbs】
+cmd /K cd /d %userprofile%\Desktop\zbin & %userprofile%\Desktop\zbin\B0.bat %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH)      【B0 bat】
+
+```
+
+
+```
+文件内容为空    文件夹内文件： 蜗牛.mp3    zui_hou_de_zhan_yi.mp3   yuan_you_hui.mp3   路径为：  C:\Users\aaa\Desktop\zbin\test\yuan_you_hui.mp3
 
 转为
 
@@ -657,7 +734,13 @@ End If
 ```
 
 
-### B1_解析当前文件第一行内容转为二维码并自动打开(可设置快捷键)
+### B1_解析当前文件第一行内容转为二维码并自动打开((notepad第一行)
+```
+Wscript.exe  /x %userprofile%\Desktop\zbin\B1.vbs  %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH)   【B1 vbs】
+cmd /K cd /d %userprofile%\Desktop\zbin & %userprofile%\Desktop\zbin\B1.bat %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH)     【B1 bat】
+
+```
+
 ```
 123456789
 
@@ -667,7 +750,12 @@ End If
 
 ```
 
-### B2_在当前文件对选中的字符串进行翻译
+### B2_在当前文件对选中的字符串进行翻译 (notepad剪切板)
+```
+Wscript.exe  /x %userprofile%\Desktop\zbin\B2.vbs  %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH)   【B2 vbs】
+cmd /K cd /d %userprofile%\Desktop\zbin & %userprofile%\Desktop\zbin\B2.bat %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH)     【B2 bat】
+
+```
 ```
 对 Ctrl+C 选中到剪切板的字符串进行操作
 Hello World
@@ -680,7 +768,14 @@ Good Morning
 
 ```
 
-### B3_在当前文件对选中的字符串英文进行阅读
+### B3_在当前文件对选中的字符串英文进行阅读(notepad剪切板)
+
+```
+Wscript.exe  /x %userprofile%\Desktop\zbin\B3.vbs  %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH)   【B3 vbs】
+cmd /K cd /d %userprofile%\Desktop\zbin & %userprofile%\Desktop\zbin\B3.bat %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH)     【B3 bat】
+
+```
+
 ```
 控制面板 => 小图标 => 语音识别 => 文本到语音转换 => 语音选择   Zira Desktop English   【 语音速度 】
 
@@ -691,7 +786,7 @@ Hello World
 ```
 
 
-### B4_对当前程序开机运行
+### B4_对当前程序开机运行(定时拍照并上传)
 ```
 '  runas /user:administrator cmd  
 '  copy %userprofile%\Desktop\zbin\B4_startup.vbs  C:\ProgramData\Microsoft\Windows\Start Menu\Programs\StartUp\
@@ -705,15 +800,16 @@ cmd /K cd /d %userprofile%\Desktop\zbin & %userprofile%\Desktop\zbin\B4_push.bat
 
 ```
 
-### B5_对时间进行统计 记录每个人剩余时间 B5.html界面
+### B5_对时间进行统计 记录每个人剩余时间 B5.html界面(浏览器视图)
 ```
+
 B5.html 页面
 https://zukgit.github.io/ZHtml/
 
 ```
 
 
-### B6_对Json的txt文档进行graphviz的解析 并生成JavaBean类
+### B6_对Json的txt文档进行graphviz的解析生成JavaBean类(NotePad执行)
 ```
 {xx:arr[{"a":a}{"b":b}]}   对满足 Json格式的字符串 进行 结构图形的输出
 
@@ -723,7 +819,7 @@ cmd /K cd /d %userprofile%\Desktop\zbin & %userprofile%\Desktop\zbin\B6.bat %use
 
 ```
 
-### B7_安卓批量安装_批量删除_批量备份_拍照脚本
+### B7_安卓批量安装_批量删除_批量备份_拍照脚本(点击执行)
 ```
 B7_AutoBankupAPK.bat
 B7_AutoInstallAndroidAPK.bat
@@ -734,46 +830,66 @@ B7_zTakeScreenShot.bat
 ```
 
 
-### B8_安卓打印Log脚本
+### B8_安卓打印Log脚本(CMD下执行)
 ```
 B8.bat                     //WIndows  本地执行脚本
 B8.java                    //  持续添加ZMethod
 B8_Test.java                       // 测试文件
-B8_android.sh*             // AOSP 根目录执行脚本
+B8_android.sh             // AOSP 根目录执行脚本
 B8_javaparser.jar
 B8_local.sh                // 本地Linux执行脚本
 
-
+Shell 下执行  B8_android.sh  
 ```
 
 
-### B9_立体视图幻灯片 HTML
+### B9_立体视图幻灯片 HTML(浏览器视图)
 ```
 B9_gif.html
 B9_jpg.html
 
 ```
 
-### C0_加密解密文件
+### C0_加密解密文件(IDE执行)
 ```
 C0_Encryption/JIEMA
 C0_Encryption/YAMA
 ```
 
-### C1_Windows下一些脚本工具
+### C1_Windows下一些脚本工具(点击与CMD运行)
 ```
 
+C1_CapturePicture.bat       //  打开系统截图工具 snippingtool
+C1_MakeDir.bat               // 批量创建文件夹   C1_MakeDir_List.txt 文件中保存文件夹的路径  1\A   1\B   2  3   
+C1_MakeDir_List.txt             
+C1_Router_IP.bat             // 打印当前 设备的 IP地址 配置   
+C1_SystemIfo.bat               // 打开当前系统的配置信息  msinfo32   dxdiag 
+C1_WifiCode.bat                // 查看当前电脑连接的wifi密码
+                      
 
 ```
 
 
 ### C2_对Java多行字符串转为一行(当需要把方法转为字符串时)
 ```
-Wscript.exe  /x %userprofile%\Desktop\zbin\C2.vbs  %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH)  
-cmd /K cd /d %userprofile%\Desktop\zbin & %userprofile%\Desktop\zbin\C2.bat %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH)  
+
+public static void main(String[] args) {       
+ System.out.println("Hello World!");
+ }
+
+转为字符串:
+
+String codeLog = "    public static void main(String[] args) {        System.out.println(\"Hello World!\");		}";
+
+
+
+Wscript.exe  /x %userprofile%\Desktop\zbin\C2.vbs  %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH)            【C2 vbs】
+cmd /K cd /d %userprofile%\Desktop\zbin & %userprofile%\Desktop\zbin\C2.bat %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH)    【C2 bat】
 
 
 ```
+
+
 
 # F5_命令小集合
 ```
@@ -782,6 +898,12 @@ cmd /K   echo %OS%             // 检测 %OS% 这个环境变量  打印   Windo
 
 
 cmd /K   echo %userprofile%\Desktop        //  打印   C:\Users\aaa\Desktop
+
+
+Wscript.exe  /x %userprofile%\Desktop\zbin\A0.vbs  %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH)   【A0 vbs】
+cmd /K cd /d %userprofile%\Desktop\zbin & %userprofile%\Desktop\zbin\A0.bat %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH)      【A0 bat】
+
+
 
 Wscript.exe  /x %userprofile%\Desktop\zbin\A1.vbs  %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH)     【A1 vbs】
 cmd /K cd /d %userprofile%\Desktop\zbin & %userprofile%\Desktop\zbin\A1.bat %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH)      【A1 bat】
@@ -847,8 +969,7 @@ Wscript.exe  /x %userprofile%\Desktop\zbin\A9.vbs  %userprofile%\Desktop\zbin  $
 cmd /K cd /d %userprofile%\Desktop\zbin & %userprofile%\Desktop\zbin\A9.bat %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH)      【A9 bat】
 
 
-Wscript.exe  /x %userprofile%\Desktop\zbin\A0.vbs  %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH)   【A0 vbs】
-cmd /K cd /d %userprofile%\Desktop\zbin & %userprofile%\Desktop\zbin\A0.bat %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH)      【A0 bat】
+
 
 
 Wscript.exe  /x %userprofile%\Desktop\zbin\B0.vbs  %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH)   【B0 vbs】
@@ -875,12 +996,70 @@ cmd /K cd /d %userprofile%\Desktop\zbin & %userprofile%\Desktop\zbin\B4.bat %use
 cmd /K cd /d %userprofile%\Desktop\zbin & %userprofile%\Desktop\zbin\B4_push.bat %userprofile%\Desktop\zbin\image_monitor   【B4_push.bat 】
 
 
-cmd /K cd /d %userprofile%\Desktop\zbin & %userprofile%\Desktop\zbin\B5.bat %userprofile%\Desktop\zbin    【 B5 vbs 】
-cmd /K cd /d %userprofile%\Desktop\zbin & %userprofile%\Desktop\zbin\B5.bat %userprofile%\Desktop\zbin\image_monitor   【B5.bat 】
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  【 B5 vbs 】 【B5.html 呵呵倒计时HTML页面】
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx   【B5 bat 】
 
 
-
+{xx:arr[{"a":a}{"b":b}]}   对满足 Json格式的字符串 进行 结构图形的输出
 Wscript.exe  /x %userprofile%\Desktop\zbin\B6.vbs  %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH)   【B6 vbs】
 cmd /K cd /d %userprofile%\Desktop\zbin & %userprofile%\Desktop\zbin\B6.bat %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH)     【B6 bat】
+
+
+
+Wscript.exe  /x %userprofile%\Desktop\zbin\C2.vbs  %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH)            【C2 vbs】
+cmd /K cd /d %userprofile%\Desktop\zbin & %userprofile%\Desktop\zbin\C2.bat %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH)    【C2 bat】
+
+
+
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  【 B7 vbs 】 【B7 安卓Bat文件批量执行脚本】
+B7_AutoBankupAPK.bat
+B7_AutoInstallAndroidAPK.bat
+B7_UninstallAndroidAPK.bat
+B7_zTakeScreenShot.bat
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx   【B7 bat 】
+
+
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  【 B8 vbs 】 【B8 JavaParser对Java文件添加Log】
+B8_安卓打印Log脚本(CMD下执行)
+B8.bat                     //WIndows  本地执行脚本
+B8.java                    //  持续添加ZMethod
+B8_Test.java                       // 测试文件
+B8_android.sh             // AOSP 根目录执行脚本
+B8_javaparser.jar
+B8_local.sh                // 本地Linux执行脚本
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx   【B8 bat 】
+
+
+
+
+
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  【 B9 vbs 】 【B9_gif.html  Gif幻灯片】
+B9_gif.html
+B9_jpg.html
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx   【B9 bat 】【B9_jpg.html  jpg幻灯片】
+
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  【 C0 vbs 】
+C0_加密解密文件(IDE执行)
+C0_Encryption/JIEMA
+C0_Encryption/YAMA
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  【 C0 vbs 】
+
+
+
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  【 C1 vbs 】
+C1_Windows下一些脚本工具(点击与CMD运行)
+C1_CapturePicture.bat       //  打开系统截图工具 snippingtool
+C1_MakeDir.bat               // 批量创建文件夹   C1_MakeDir_List.txt 文件中保存文件夹的路径  1\A   1\B   2  3   
+C1_MakeDir_List.txt             
+C1_Router_IP.bat             // 打印当前 设备的 IP地址 配置   
+C1_SystemIfo.bat               // 打开当前系统的配置信息  msinfo32   dxdiag 
+C1_WifiCode.bat                // 查看当前电脑连接的wifi密码
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  【 C1 vbs 】                
+
+
+对Java多行字符串转为一行(当需要把方法转为字符串时)
+Wscript.exe  /x %userprofile%\Desktop\zbin\C2.vbs  %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH)            【C2 vbs】
+cmd /K cd /d %userprofile%\Desktop\zbin & %userprofile%\Desktop\zbin\C2.bat %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH)    【C2 bat】
+
 ```
 

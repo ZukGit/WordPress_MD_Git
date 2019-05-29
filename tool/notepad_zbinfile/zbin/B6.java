@@ -183,9 +183,17 @@ public class B6 {
                 return ;
             }
 
-            if(!JSONUtil.isJson(sb.toString())){
-                System.out.println("读取到的文件不是标准的Json 格式 退出!");
-                return ;
+			String firstChar = sb.toString().substring(0,1);
+			while( firstChar != null && !firstChar.equals("{")){
+				sb = new StringBuilder(sb.toString().trim().substring(1));
+				firstChar = sb.toString().substring(0,1);
+				         System.out.println("以?开头  firstChar="+ firstChar);
+			}
+            if(!JSONUtil.isJson(sb.toString().trim())){
+                System.out.println("读取到的文件不是标准的Json 格式 退出!  当前读取到的数据为:\n"+ sb.toString() );
+				        System.out.println("读取到的文件不是标准的Json 格式 退出!  firstChar 第一个字符为:\n"+ sb.toString().substring(0,1) );
+				        System.out.println("读取到的文件不是标准的Json 格式 退出!  第二个字符为:\n"+ sb.toString().substring(1,2) );         
+		 return ;
             }
 
             outFile = new File(outFilepath);
