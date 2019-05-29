@@ -6,6 +6,7 @@ import com.github.javaparser.ast.stmt.IfStmt;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 
+
 import java.io.*;
 import java.text.Format;
 import java.util.*;
@@ -19,25 +20,81 @@ public class B8 {
 
     static String TAG = "zukgit";
 
-   /*
-   static {  
-       String ZAndroidAPPClass_WifiEnabler_java_path = curProjectPath+"/WifiSettings.java";
-     //  String ZAndroidAPPClass_WifiEnabler_java_path = curProjectPath+"/packages/apps/Settings/src/com/android/settings/wifi/WifiEnabler.java";
+
+    static {    //   测试使用
+        String zClassName = curProjectPath+"/B8_Test.java";
+        //  String ZAndroidAPPClass_WifiEnabler_java_path = curProjectPath+"/packages/apps/Settings/src/com/android/settings/wifi/WifiEnabler.java";
+        ZIDEClass zClassObject = new ZIDEClass(zClassName);
+        ArrayList<ZMethod> methodList = new  ArrayList<ZMethod>();
+        // 多个参数  逗号前有值   逗号后为空格
+        methodList.add(new ZMethod(zClassObject,"void","method1","int value"));
+        methodList.add(new ZMethod(zClassObject,"void","method2","int[] value"));
+        methodList.add(new ZMethod(zClassObject,"void","method3","String[]  strArr"));
+        methodList.add(new ZMethod(zClassObject,"void","method4","ArrayList<Date> dateList"));
+        methodList.add(new ZMethod(zClassObject,"void","method5","Map<String,String> stringMap"));
+
+        zClassObject.addZMethod(methodList);
+        ZClassList.add(zClassObject);
+    }
+
+
+    static {  // packages/apps/Settings/src/com/android/settings/wifi/WifiEnabler.java
+     //  String ZAndroidAPPClass_WifiEnabler_java_path = curProjectPath+"/WifiEnabler.java";
+       String ZAndroidAPPClass_WifiEnabler_java_path = curProjectPath+"/packages/apps/Settings/src/com/android/settings/wifi/WifiEnabler.java";
+       ZAndroidAPPClass WifiEnabler_java = new ZAndroidAPPClass(ZAndroidAPPClass_WifiEnabler_java_path);
+       ArrayList<ZMethod> methodList = new  ArrayList<ZMethod>();
+       // 多个参数  逗号前有值   逗号后为空格
+       //boolean  onSwitchToggled(boolean isChecked , int int1 , String str1 , ArrayList<String> strArr , String[] strArr1 )
+       methodList.add(new ZMethod(WifiEnabler_java,"boolean","onSwitchToggled","boolean isChecked "));
+
+       WifiEnabler_java.addZMethod(methodList);
+       ZClassList.add(WifiEnabler_java);
+    }
+
+
+
+    static {  // packages/apps/Settings/src/com/android/settings/wifi/WifiConfigInfo.java
+     //  String ZAndroidAPPClass_WifiEnabler_java_path = curProjectPath+"/WifiConfigInfo.java";
+       String ZAndroidAPPClass_WifiEnabler_java_path = curProjectPath+"/packages/apps/Settings/src/com/android/settings/wifi/WifiConfigInfo.java";
+       ZAndroidAPPClass WifiEnabler_java = new ZAndroidAPPClass(ZAndroidAPPClass_WifiEnabler_java_path);
+       ArrayList<ZMethod> methodList = new  ArrayList<ZMethod>();
+       // void onResume()    void onCreate(Bundle savedInstanceState) 
+       methodList.add(new ZMethod(WifiEnabler_java,"void","onResume"," "));
+       methodList.add(new ZMethod(WifiEnabler_java,"void","onCreate"," Bundle savedInstanceState "));
+       WifiEnabler_java.addZMethod(methodList);
+       ZClassList.add(WifiEnabler_java);
+    }
+
+
+
+
+
+   
+   static {
+      // String ZAndroidAPPClass_WifiEnabler_java_path = curProjectPath+"/WifiSettings.java";
+       String ZAndroidAPPClass_WifiEnabler_java_path = curProjectPath+"/packages/apps/Settings/src/com/android/settings/wifi/WifiSettings.java";
        ZAndroidAPPClass WifiEnabler_java = new ZAndroidAPPClass(ZAndroidAPPClass_WifiEnabler_java_path);
        ArrayList<ZMethod> methodList = new  ArrayList<ZMethod>();
        // 多个参数  逗号前有值   逗号后为空格
 	   // void showDialog(AccessPoint accessPoint, int dialogMode)
        methodList.add(new ZMethod(WifiEnabler_java,"void","showDialog","AccessPoint accessPoint, int dialogMode"));
-     
+	 methodList.add(new ZMethod(WifiEnabler_java,"boolean","onPreferenceTreeClick","Preference preference "));
 	 // void onWifiStateChanged(int state)
 	 methodList.add(new ZMethod(WifiEnabler_java,"void","onWifiStateChanged","int state "));
 
+// boolean onPreferenceTreeClick(Preference preference)
+// void updateAccessPointsDelayed() 
+	 methodList.add(new ZMethod(WifiEnabler_java,"void","updateAccessPointsDelayed"," "));
+
+//  Dialog onCreateDialog(int dialogId)
+	 methodList.add(new ZMethod(WifiEnabler_java,"Dialog","onCreateDialog"," int dialogId "));
+
        WifiEnabler_java.addZMethod(methodList);
        ZClassList.add(WifiEnabler_java);
-    }  
-	*/
+    }
+	
 
-    static {
+/*    static {
         String ZAndroidAPPClass_WifiEnabler_java_path = curProjectPath+"/WifiStateMachine.java";
         //  String ZAndroidAPPClass_WifiEnabler_java_path = curProjectPath+"/packages/apps/Settings/src/com/android/settings/wifi/WifiEnabler.java";
         ZAndroidFrameworkClass WifiEnabler_java = new ZAndroidFrameworkClass(ZAndroidAPPClass_WifiEnabler_java_path);
@@ -46,56 +103,24 @@ public class B8 {
 // boolean setRandomMacOui()
 methodList.add(new ZMethod(WifiEnabler_java,"boolean","setRandomMacOui",""));
 
-// boolean connectToUserSelectNetwork(int netId, int uid, boolean forceReconnect) 
+// boolean connectToUserSelectNetwork(int netId, int uid, boolean forceReconnect)
 methodList.add(new ZMethod(WifiEnabler_java,"boolean","connectToUserSelectNetwork","int netId, int uid, boolean forceReconnect"));
 
 // int lookupFrameworkNetworkId(int supplicantNetworkId)
  methodList.add(new ZMethod(WifiEnabler_java,"int","lookupFrameworkNetworkId","int supplicantNetworkId"));
-
 // boolean setEnableAutoJoinWhenAssociated(boolean enabled)
 methodList.add(new ZMethod(WifiEnabler_java,"boolean","setEnableAutoJoinWhenAssociated","boolean enabled"));
-
 //  void enableVerboseLogging(int verbose)
 methodList.add(new ZMethod(WifiEnabler_java,"void","enableVerboseLogging","int verbose"));
-
 //  void setSupplicantLogLevel()
 methodList.add(new ZMethod(WifiEnabler_java,"void","setSupplicantLogLevel",""));
-
         WifiEnabler_java.addZMethod(methodList);
         ZClassList.add(WifiEnabler_java);
-    }
-	
-	
-/*   static {  // packages/apps/Settings/src/com/android/settings/wifi/WifiEnabler.java
-       String ZAndroidAPPClass_WifiEnabler_java_path = curProjectPath+"/WifiEnabler.java";
-     //  String ZAndroidAPPClass_WifiEnabler_java_path = curProjectPath+"/packages/apps/Settings/src/com/android/settings/wifi/WifiEnabler.java";
-       ZAndroidFrameworkClass WifiEnabler_java = new ZAndroidFrameworkClass(ZAndroidAPPClass_WifiEnabler_java_path);
-       ArrayList<ZMethod> methodList = new  ArrayList<ZMethod>();
-       // 多个参数  逗号前有值   逗号后为空格
-       //boolean  onSwitchToggled(boolean isChecked , int int1 , String str1 , ArrayList<String> strArr , String[] strArr1 )
-       methodList.add(new ZMethod(WifiEnabler_java,"boolean","onSwitchToggled","boolean isChecked , int int1 , String str1 , ArrayList<String> strArr  , String[] strArr1 ,   int[] arrInt ,Map<String,Object> mapValue"));
-
-       WifiEnabler_java.addZMethod(methodList);
-       ZClassList.add(WifiEnabler_java);
     }*/
 
-/* 
-    static {
-        String testClassA = curProjectPath+"/B8_Test.java";
-        //  String ZAndroidAPPClass_WifiEnabler_java_path = curProjectPath+"/packages/apps/Settings/src/com/android/settings/wifi/WifiEnabler.java";
-        ZIDEClass WifiEnabler_java = new ZIDEClass(testClassA);
-        ArrayList<ZMethod> methodList = new  ArrayList<ZMethod>();
-        // 多个参数  逗号前有值   逗号后为空格
-        //boolean  onSwitchToggled(boolean isChecked , int int1 , String str1 , ArrayList<String> strArr , String[] strArr1 )
-        methodList.add(new ZMethod(WifiEnabler_java,"void","method1","int value"));
-        methodList.add(new ZMethod(WifiEnabler_java,"void","method2","int[] value"));
-        methodList.add(new ZMethod(WifiEnabler_java,"void","method3","String[]  strArr"));
-        methodList.add(new ZMethod(WifiEnabler_java,"void","method4","ArrayList<Date> dateList"));
 
-        WifiEnabler_java.addZMethod(methodList);
-        ZClassList.add(WifiEnabler_java);
-    }
-*/
+
+
 
 
 
@@ -123,7 +148,32 @@ methodList.add(new ZMethod(WifiEnabler_java,"void","setSupplicantLogLevel",""));
             System.out.println(" 开始解析第  "+ i +"个文件    文件名为: " + ZClassList.get(i).path);
             newClassCode =  ZClassList.get(i).toNewClassCode();
             System.out.println("￥￥￥￥￥￥￥￥ 新构建的类文件的内容 如下: newClassCode :" + newClassCode);  // 构建新的方法的内容
-            formatNewClassCode = JavaParser.parse(newClassCode).toString();
+
+            //  在newClassCode中加入新的Log方法   找到最后一个 { 的位置
+            int lastBlock = newClassCode.lastIndexOf("}");
+            System.out.println(" 最后{ 的位置 " +lastBlock );
+            String newClassCodeFix = "";
+
+            if(!ZClassList.get(i).alreadyAddPrintMethod){
+                if(ZClassList.get(i).isIDEClass){
+                    //  newClassCodeFix = newClassCode.substring(0,lastBlock)+ "    " +IDEA_PRINT_METHOD + "}";
+                    newClassCodeFix = newClassCode.substring(0,lastBlock)+ "    " +ZClassList.get(i).GetRealPrintMethod() + "}";
+                } else if(ZClassList.get(i).isAPP){
+                    //      newClassCodeFix = newClassCode.substring(0,lastBlock) + "    " +APP_PRINT_METHOD + "}";
+                    newClassCodeFix = newClassCode.substring(0,lastBlock)+ "    " +ZClassList.get(i).GetRealPrintMethod() + "}";
+                } else if (ZClassList.get(i).isFramework){
+                    //  newClassCodeFix = newClassCode.substring(0,lastBlock) + "    " +Framework_PRINT_METHOD + "}";
+                    newClassCodeFix = newClassCode.substring(0,lastBlock)+ "    " +ZClassList.get(i).GetRealPrintMethod() + "}";
+                }
+
+            } else{  // 已经 添加过 MethodPrint的 类
+                newClassCodeFix = newClassCode;
+            }
+
+
+
+            System.out.println("  添加 打印Log 的 字符串 newClassCodeFix  \n " +newClassCodeFix );
+            formatNewClassCode = JavaParser.parse(newClassCodeFix).toString();
             System.out.println("$$$$$$$$$$$$$格式化文件 如下: formatNewClassCode :" + formatNewClassCode);
             // 把当前的新构建的文件重新写入 .java 文件
             WriteToFile(ZClassList.get(i).classFile,formatNewClassCode);
@@ -236,6 +286,7 @@ methodList.add(new ZMethod(WifiEnabler_java,"void","setSupplicantLogLevel",""));
         String className ;
         String path ;    // 类的路径
         File classFile;   // 类对应的文件
+        boolean alreadyAddPrintMethod;
         boolean isAPP;
         boolean isFramework;
         boolean isAndroidClass;     //  是否是安卓项目的类
@@ -258,6 +309,7 @@ methodList.add(new ZMethod(WifiEnabler_java,"void","setSupplicantLogLevel",""));
             }
             this.className = javaName;
             this.classFile = new File(path);
+            alreadyAddPrintMethod = false;
             if(this.classFile.exists()){
                 try {
                     zCompilationUnit = JavaParser.parse(this.classFile);
@@ -312,24 +364,31 @@ methodList.add(new ZMethod(WifiEnabler_java,"void","setSupplicantLogLevel",""));
             System.out.println("=========== originClassContent ==========\n"+this.originClassContent);
             originClassCode = new String(this.originClassContent);
             newClassCode = new String(originClassCode);
-			int mMethodIndex = 1;
+            int mMethodIndex = 1;
             for (ZMethod  zmethod:this.zmethodList) {
+           System.out.println("  当前解析Method: = "+ zmethod.methodName);
                 //  curClassCode.replaceAll(zmethod.originCodeString,)
                 int allNodeSize = zmethod.checkAllNode(zmethod.methodDeclaration);   //  获取总共Method 中多少个结点
+                if(allNodeSize == 0){
+                 continue;
+                }
+
                 int expressNodeSize =  zmethod.expressNodeList.size();    //  每个表达式 前面 添加一些 log 以此 来观察 程序 运行
                 System.out.println(" allNodeSize = "+ allNodeSize +"       表达式结点 expressNodeSize = "+ expressNodeSize);
                 originMethodCode = zmethod.originCodeString;
-				  System.out.println("第" + mMethodIndex+" 个方法开始解析 methodName =:" +zmethod.methodName);
-				mMethodIndex++;
+                System.out.println("第" + mMethodIndex+" 个方法开始解析 methodName =:" +zmethod.methodName);
+                mMethodIndex++;
                 if(zmethod.originCodeString.contains("zukgit")){  // 对已经添加过Log的方法不再处理
-                    System.out.println(" 该方法已添加了Log 不再添加!"+zmethod.methodName);
+                    System.out.println(" 该方法已经添加了Log 不再添加Log 添加log!"+zmethod.methodName);
+                    zmethod.belongClass.alreadyAddPrintMethod = true;
                     continue;
                 }
                 newMethodCode = new String(zmethod.logOnlyParam_originCodeString);
                 for (int j = 0; j < expressNodeSize; j++) {
-                    Node node =  zmethod.expressNodeList.get(j);
+                    //  Node node =  zmethod.expressNodeList.get(j);
+                    Node node = (Node)zmethod.expressNodeList.toArray()[j];
                     String code1 = zmethod.fixExpressNodeString(node.toString());  //  需要对这里进行fix  去除空格与注释
-
+                    String[] analysysCode =  zmethod.tryAnalysisExpressNodeString(node.toString());
 //Line 695: =========== fixStr = Toast.makeText(mContext, R.string.wifi_in_airplane_mode, Toast.LENGTH_SHORT).show();
 //Line 700: =========== fixStr = mSwitchWidget.setChecked(false);
 //Line 705: =========== fixStr = mMetricsFeatureProvider.action(mContext, MetricsEvent.ACTION_WIFI_ON);
@@ -337,12 +396,29 @@ methodList.add(new ZMethod(WifiEnabler_java,"void","setSupplicantLogLevel",""));
 //Line 715: =========== fixStr = mSwitchWidget.setEnabled(true);
 //Line 720: =========== fixStr = Toast.makeText(mContext, R.string.wifi_error, Toast.LENGTH_SHORT).show();
 
-
+                    //  如果父类不为空  并且父类是 com.github.javaparser.ast.stmt.IfStmt   并且父类的子项只有两个
                     String log  = zmethod.buildIndexLog();
-                    String code2 = log + code1;
+                    String codePre1 = "";
+                    String codeBack1 = "";
+                    if(analysysCode != null && analysysCode.length == 2){
+                        codePre1 = analysysCode[0];
+                        codeBack1 =  analysysCode[1];
+                    }
+                    System.out.println(" codePreXXX   = "+ codePre1);
+                    System.out.println(" codeBackXXX = "+ codeBack1);
+                    String code2 = log + codePre1+  code1 + codeBack1;
+
+                    Node fatherNode = node.getParentNode().get();
+                    if(fatherNode != null && fatherNode.getMetaModel().getType() == com.github.javaparser.ast.stmt.IfStmt.class && fatherNode.getChildNodes().size() == 2){
+                        code2 = "{" + code2 + "}" ;   //  对于  if()   int = aa  ;    // 这样的表达式处理
+                        System.out.println(" fatherNode.getChildNodes().size = "+ fatherNode.getChildNodes().size());
+                    }
                     System.out.println("############## index="+j+"     原有的Log node.toString() = "+code1);
                     System.out.println("############## index="+j+"     现有的Log code2 = "+code2);
-                    newMethodCode =  newMethodCode.replace(code1,code2);     //  继续点  这里因为空格的原因无法匹配到
+
+                    //  当前的 code1 是否是  某个 expressNode 的 子集
+                    //  判断 当前的 code1 是否含有多个子项
+                    newMethodCode =  newMethodCode.replace("  "+code1,code2);     //  继续点  这里因为空格的原因无法匹配到
 // ############## index=0     原有的Log node.toString() = Toast.makeText(mContext, R.string.wifi_in_airplane_mode, Toast.LENGTH_SHORT).show();
 //############## index=0     现有的Log code2 =
 // android.util.Log.i("zukgit_onSwitchToggled","this is indexLog index= 0");
@@ -363,7 +439,32 @@ methodList.add(new ZMethod(WifiEnabler_java,"void","setSupplicantLogLevel",""));
                     System.out.println("Method 开头不包含注释 /***/ ！！");
                 }
 
+
+          
+if(addBlankOriginCodeString.startsWith("@Override")){
+addBlankOriginCodeString="    "+addBlankOriginCodeString;
+}
+   addBlankOriginCodeString = addBlankOriginCodeString.replace("    * ","* ");
+   addBlankOriginCodeString = addBlankOriginCodeString.replace("    */","*/");
+
+
+                for (int i = 0; i < zmethod.buildIndexLogList.size() ; i++) {
+                    String index  = zmethod.buildIndexLogList.get(i);
+                    System.out.println("序号 : "+ i  + "   出现的序号: +" + (index) );
+                }
+
+                newMethodCode = zmethod.fixnewMethodCode(newMethodCode); // 把  this_is_indexLog_index=0  依次设置序号
+            // System.out.println("=============   newMethodCode  Begin=============="); 
+           //  System.out.println(newMethodCode); 
+           //  System.out.println("=============   newMethodCode  End=============="); 
+           //  System.out.println("=============   newClassCode  Begin=============="); 
+
                 newClassCode = newClassCode.replace(addBlankOriginCodeString,newMethodCode) ; // 构建新类文件内容
+            // System.out.println(newClassCode); 
+           //  System.out.println("=============   newClassCode  End=============="); 
+          //   System.out.println("=============   addBlankOriginCodeString  Begin=============="); 
+          //  System.out.println(addBlankOriginCodeString); 
+           //  System.out.println("=============   addBlankOriginCodeString  End=============="); 
                 newMethodCode = null;
             }
             System.out.println("！！！！！！！！！！  原始类的内容 :" + originClassCode);  // 构建新的方法的内容
@@ -374,6 +475,33 @@ methodList.add(new ZMethod(WifiEnabler_java,"void","setSupplicantLogLevel",""));
         void addZMethod( ArrayList<ZMethod> zmethodList ){
             this.zmethodList = zmethodList;
         }
+
+
+        String GetRealPrintMethod(){
+            String methodPrint = new String(COMMON_PRINT_METHOD);
+String holdStr = "ZukgitHoldPlace";
+            String MethodStr = "";
+            if(isIDEClass){
+                MethodStr ="System.out.println(";
+            } else if(isAPP ){
+                MethodStr ="android.util.Log.i(\""+ TAG+"_"+className+"\",";
+            }else if(isFramework){
+                MethodStr ="android.util.SLog.i(\""+ TAG+"_"+className+"\",";
+            }else{
+                MethodStr ="System.out.println(";
+            }
+
+           String returnStr =  methodPrint.replaceAll(holdStr,MethodStr);
+
+
+//            boolean isAPP;
+//            boolean isFramework;
+//            boolean isAndroidClass;     //  是否是安卓项目的类
+//            boolean isIDEClass;       // 是否是IDE 项目的 类
+
+
+            return returnStr;
+        }
     }
 
     static class ZMethod{
@@ -381,7 +509,8 @@ methodList.add(new ZMethod(WifiEnabler_java,"void","setSupplicantLogLevel",""));
         NodeList<Parameter>  methodParamList;
         String paramLogString;   //  参数的打印字符串
         ZClass  belongClass;
-        ArrayList<Node> expressNodeList;   //  表达式结点的集合( 不重复 )
+        Set<Node> expressNodeList;   //  表达式结点的集合( 不重复 )
+
         String methodIdentify ;   // 方法的唯一标识
         String returnString;   // 方法返回值
         String methodName;  // 方法名称
@@ -391,6 +520,118 @@ methodList.add(new ZMethod(WifiEnabler_java,"void","setSupplicantLogLevel",""));
         String logOnlyParam_originCodeString;  //
         int methodLogIndex;
         String newCodeString;    // 已替换方法的集合
+        ArrayList<String> buildIndexLogList ;
+
+
+        String fixnewMethodCode(String newMethodContent){
+            String flagStr = "this_is_indexLog_index=0";
+            if(!newMethodContent.contains(flagStr)){
+                return newMethodContent;
+            }
+            String curMethodContent = newMethodContent;
+            int addIntValue = 1;
+            int flagIndex = newMethodContent.indexOf(flagStr);
+            while(flagIndex > 0){
+
+                String currentLog = "this_is_indexLog_index="+addIntValue;
+                curMethodContent =  curMethodContent.substring(0,flagIndex) +currentLog+ curMethodContent.substring(flagIndex+flagStr.length());
+                flagIndex = curMethodContent.indexOf(flagStr);
+                addIntValue ++;
+                System.out.println(" addIntValue = "+ addIntValue +  "   flagIndex = "+ flagIndex);
+
+//                addIntValue = 905   flagIndex = 1398
+//                addIntValue = 906   flagIndex = 1398
+//                addIntValue = 907   flagIndex = 1398
+
+            }
+
+
+            return curMethodContent;
+        }
+        String[] tryAnalysisExpressNodeString(String nodeString) {
+            String checkCode  = "";
+            System.out.println(" 表达式分析 返回分析代码 " );
+            System.out.println(" 表达式:  "+  nodeString);
+            //   System.out.println('=');
+            //   intValue = -10;  (处理)
+            //   int xxx = 10;
+            //  System.out.println("method1   intValue =  ge" + intValue);
+            // 对于那些事赋值语句的句子 进行 代码的分析
+            // 有些表达式 内的 字符串 里面 包含 等号 这些表达式 不处理
+            // 1.判断是否包含等号  2.以等号分割的长度 必须等于2
+            // 3. 等号前面的数值不能包含空格 不能包含双引号  单引号“ ‘
+//  Map<String, String> map = new HashMap<String, String>();
+            if(nodeString.contains("=")){
+                String strArr[] = nodeString.split("=");
+                if(strArr.length !=  2){
+                    return null;
+                }  // 确保只分出两个 子subString
+                //   wifiConfig = Method.xxxxx();      type = 1
+                //  WifiGraturation wifiConfig = Method.xxxxx();    typ2 = 2
+                // final int wifiApState = mWifiManager.getWifiApState();  type3 =3
+                String variableName = "";
+
+                String str1 = strArr[0].trim();
+                String str2 = strArr[1].trim();
+                variableName = str1;
+                // 继续点
+                if( str1.contains("\"") || str1.contains("\'") ){
+                    //  不能包含双引号  单引号“ ‘
+                    return null;
+                }  // intValue = -10;
+                int type = 1 ;
+
+                if(str1.contains(" ")){
+                    String[] arrStrTest = str1.split(" ");
+                    if(arrStrTest != null && arrStrTest.length ==2){
+                        type = 2;
+                        variableName =  arrStrTest[1].trim();
+                    } else if(arrStrTest != null &&  arrStrTest.length ==3 && str1.contains(",") && !arrStrTest[2].contains("<") &&  !arrStrTest[2].contains(">") ){
+// 第二种类型   //  Map<String, String> map
+                        // final int wifiApState
+                        type = 2;
+                        variableName = arrStrTest[2].trim();
+
+                    } else  if(arrStrTest != null &&  arrStrTest.length ==3 && arrStrTest[0].trim().equals("final") ){
+                        //   // final int wifiApState = mWifiManager.getWifiApState();
+                        type = 2;
+                        variableName = arrStrTest[2].trim();
+                    }
+                    else{
+
+                        return null;
+                    }
+
+                }
+                //  泛华的打印Log的方法
+                // variableName  指向变量名称   type标识当前的表达形式 1 2
+
+                //  0 是打印前的Log
+                // 1  是 执行后的Log
+                String strShuZu[] = new String[2];
+
+                if(type == 1){  //  wifiConfig = Method.xxxxx();      type = 1
+                    String code1 = "\nzPrintLog("+ variableName+");\n";
+                    String code2 = "\nzPrintLog("+ variableName+");\n";
+                    strShuZu[0] = code1;
+                    strShuZu[1] = code2;
+
+                } else if( type == 2) {   //  WifiGraturation wifiConfig = Method.xxxxx();    typ2 = 2
+                    strShuZu[0] = "\n";
+                    String code1 = "\nzPrintLog("+ variableName+");\n";
+                    strShuZu[1] = code1;
+                }
+
+                return strShuZu;
+
+
+            }else{
+                return null;
+            }
+
+
+        }
+
 
 
         String fixExpressNodeString(String nodeString){
@@ -421,19 +662,21 @@ methodList.add(new ZMethod(WifiEnabler_java,"void","setSupplicantLogLevel",""));
             int nodelength = 0 ;
             if(node.getChildNodes().size() == 0){
                 System.out.println(" 叶子结点的类型: "+  node.getMetaModel().getType() + " 内容为: "+ node.toString());
+
                 return 0;
             } else{
-
-                System.out.println(" 非叶子结点的类型: "+  node.getMetaModel().getType() + " 内容为: "+ node.toString());
+                System.out.println(" 非叶子结点的类型: "+  node.getMetaModel().getType() + " 内容为: "+ node.toString()  );
                 if(node.getMetaModel().getType() == com.github.javaparser.ast.stmt.ExpressionStmt.class){
                     System.out.println("=============表达式类型 ExpressionStmt :"+  node.getMetaModel().getType() + " 内容为: "+ node.toString()+"=============");
 
                     Node fatherNode = node.getParentNode().get();
+                    int fatherNodeChildSize = 0;
                     String fatherType = "";
                     Node yeyeNode;
                     String yeyeType = "";
                     if(fatherNode != null){
                         fatherType = fatherNode.getMetaModel().getType().toString();
+                        fatherNodeChildSize = fatherNode.getChildNodes() != null ? fatherNode.getChildNodes().size(): 0;
                         //      System.out.println("父类的表达式: " + fatherNode.toString() );
                         yeyeNode = fatherNode.getParentNode().get();
                         if(yeyeNode != null){
@@ -442,7 +685,7 @@ methodList.add(new ZMethod(WifiEnabler_java,"void","setSupplicantLogLevel",""));
                         }
                     }
                     int index = expressNodeList.size();
-                    System.out.println("索引:"+index+"   *************表达式的父类表达式类型为 FatherExpressionStmt : fatherType="+fatherType+"     yeyeType="+yeyeType   );
+                    System.out.println("索引:"+index+"   *************表达式的父类表达式类型为 FatherExpressionStmt : fatherType="+fatherType+"     yeyeType="+yeyeType   + "  fatherNodeChildSize = "+ fatherNodeChildSize  );
 
                     expressNodeList.add(node);
                 }
@@ -459,8 +702,14 @@ methodList.add(new ZMethod(WifiEnabler_java,"void","setSupplicantLogLevel",""));
         }
 
         int  checkAllNode(MethodDeclaration method){
+if(method == null){
+return 0;
+}
             int num = 0;
             List<Node> curList = method.getChildNodes();
+if(curList == null){
+return 0;
+}
             num = curList.size();
             if(num == 0){
                 return 0;
@@ -474,9 +723,18 @@ methodList.add(new ZMethod(WifiEnabler_java,"void","setSupplicantLogLevel",""));
         }
 
 
-        String buildIndexLog(){
-            String codeStr = CommonCodePrint("\"this is indexLog index= "+ methodLogIndex +"\"");
+        synchronized String buildIndexLog() {
+            String codeStr =
+                    "";
+            if(buildIndexLogList == null ){
+                buildIndexLogList = new ArrayList<String>();
+            }
+
+            codeStr = CommonCodePrint("\"this_is_indexLog_index="+ 0 +"\"");
+            // codeStr = CommonCodePrint("this_is_indexLog_index=0");
             methodLogIndex++;
+
+            buildIndexLogList.add("this is indexLog index="+ 0);
             return codeStr;
         }
 
@@ -520,7 +778,7 @@ methodList.add(new ZMethod(WifiEnabler_java,"void","setSupplicantLogLevel",""));
                     System.out.println("不包头部含注释 preCode  :\n"+ preCode);
                 }
                 //  public void enableVerboseLogging(int verbose) {
-                //  包含注释 
+                //  包含注释
                 logOnlyParam_originCodeString = originCodeString.replace(preCode,preCode+"\n"+paramLogString);  //  添加了对 参数的打印的代码
 
                 //  把包含的 注释 /***/  去掉
@@ -532,7 +790,7 @@ methodList.add(new ZMethod(WifiEnabler_java,"void","setSupplicantLogLevel",""));
             System.out.println("方法的原始字符串:\n"+ originCodeString);
             System.out.println("加入参数Log的字符串:\n"+ logOnlyParam_originCodeString);
 
-            expressNodeList = new ArrayList<Node>();
+            expressNodeList = new HashSet<Node>();
             //  开始处理表达式的打印
         }
 
@@ -1447,6 +1705,12 @@ methodList.add(new ZMethod(WifiEnabler_java,"void","setSupplicantLogLevel",""));
 
 
 
+    static String COMMON_PRINT_METHOD =  "    public final static <T> boolean isListType(T t) {        if (t == null) {            return false;        }        String typeInfo = t.getClass().getName();        ZukgitHoldPlace\"isListType  typeInfo =  \" + typeInfo);        String[] zListTypeArr = {\"java.util.Set\",                \"java.util.ArrayList\",                \"java.util.Collection\",                \"java.util.List\",                \"java.util.Vector\",                \"java.util.Stack\",                \"java.util.LinkedList\",                \"javafx.collections.transformation.SortedList\"        };        for (String curStr : zListTypeArr) {            ZukgitHoldPlace\"cur1:   typeInfo =  \" + typeInfo + \"   curStr=\" + curStr);            if (curStr.equals(typeInfo)) {                ZukgitHoldPlace\"cur2:   typeInfo =  \" + typeInfo + \"   curStr=\" + curStr);                return true;            }        }        return false;    }    public final static <T> boolean isSetType(T t) {        if (t == null) {            return false;        }        String typeInfo = t.getClass().getName();        ZukgitHoldPlace\"isMapType  typeInfo =  \" + typeInfo);        String[] zSetTypeArr = {\"java.util.EnumSet\",                \"java.util.SortedSet\",                \"java.util.concurrent.CopyOnWriteArraySet\",                \"java.util.LinkedHashSet\",                \"java.util.HashSet\",                \"java.util.TreeSet\",                \"android.util.SparseArray\",                \"android.util.ArraySet\"        };        for (String curStr : zSetTypeArr) {            if (curStr.equals(typeInfo)) {                return true;            }        }        return false;    }    public final static <T> boolean iQueueType(T t) {        if (t == null) {            return false;        }        String typeInfo = t.getClass().getName();        ZukgitHoldPlace\"isMapType  typeInfo =  \" + typeInfo);        String[] zQueueTypeArr = {                \"java.util.concurrent.LinkedBlockingDeque\",                \"java.util.Queue\",                \"java.util.ArrayDeque\",                \"java.util.concurrent.BlockingQueue\",                \"java.util.concurrent.LinkedTransferQueue\",                \"java.util.PriorityQueue\",                \"java.util.concurrent.LinkedBlockingQueue\",        };        for (String curStr : zQueueTypeArr) {            if (curStr.equals(typeInfo)) {                return true;            }        }        return false;    }    public final static <T> boolean isShuZuType(T t) {        if (t == null) {            return false;        }        String typeInfo = t.getClass().getName();        ZukgitHoldPlace\"isMapType  typeInfo =  \" + typeInfo);        String[] zMapTypeArr = {\"[Ljava.lang.String;\",                  \"[Ljava/lang/Object;\",                  \"[I\",                 \"[B\",                  \"[C\",                 \"[S\",                 \"[J\",                 \"[F\",                \"[D\"            };        if(typeInfo.startsWith(\"[L\")){            return true;        }        for (String curStr : zMapTypeArr) {            if (curStr.equals(typeInfo)) {                return true;            }        }        return false;    }    public final static <T> boolean isMapType(T t) {        if (t == null) {            return false;        }        String typeInfo = t.getClass().getName();        ZukgitHoldPlace\"isMapType  typeInfo =  \" + typeInfo);        String[] zMapTypeArr = {\"java.util.HashMap\",                \"java.util.TreeMap\",                \"java.util.LinkedHashMap\",                \"java.util.WeakHashMap\",                \"java.util.concurrent.ConcurrentHashMap\",                \"java.util.Hashtable\",                \"android.util.ArrayMap\"};        for (String curStr : zMapTypeArr) {            if (curStr.equals(typeInfo)) {                return true;            }        }        return false;    }    public final static <T> void zPrintLog(T t) {        ;        ZukgitHoldPlace\" 当前类型:   \" + t.getClass().getName());        if (isListType(t)) {            ZukgitHoldPlace\"List数据类型类型   \");            if (t != null) {                Object[] objectList = ((java.util.List) t).toArray();                for (int zindex = 0; zindex < objectList.length; zindex++) {                    ZukgitHoldPlace\" List   \" + \"ArrayList<Date> dateList  index =\" + zindex + \" value :\" + objectList[zindex].toString());                }            } else {                ZukgitHoldPlace\" List   \" + \"ArrayList<Date> dateList is null !\");            }        } else if (isSetType(t)) {            ZukgitHoldPlace\"Set数据类型类型   \");            if (t != null) {                Object[] objectList = ((java.util.Set) t).toArray();                for (int zindex = 0; zindex < objectList.length; zindex++) {                    ZukgitHoldPlace\" Set   \" + \"ArrayList<Date> dateList  index =\" + zindex + \" value :\" + objectList[zindex].toString());                }            } else {                ZukgitHoldPlace\" Set   \" + \"ArrayList<Date> dateList is null !\");            }        } else if (iQueueType(t)) {            if (t != null) {                Object[] objectList = ((java.util.Queue) t).toArray();                for (int zindex = 0; zindex < objectList.length; zindex++) {                    ZukgitHoldPlace\" Queue :   \" + \"ArrayList<Date> dateList  index =\" + zindex + \" value :\" + objectList[zindex].toString());                }            } else {                ZukgitHoldPlace\" Queue   \" + \"ArrayList<Date> dateList is null !\");            }        } else if (isMapType(t)) {            ZukgitHoldPlace\"Map数据类型类型  \");            if (t != null) {                java.util.Map.Entry<String, String> entry = null;                java.util.Iterator iterator = ((java.util.Map) t).entrySet().iterator();                int mZindex = 0;                while (iterator.hasNext()) {                    entry = ( java.util.Map.Entry<String, String>) iterator.next();                    ZukgitHoldPlace\" Map   \" + \" stringMap    index =\" + mZindex + \"     entry.Key= \" + entry.getKey() + \" entry.Value=\" + entry.getValue());                    mZindex++;                }            } else {                ZukgitHoldPlace\" Map   \" + \" t is null !\");            }        } else if(isShuZuType(t)){            ZukgitHoldPlace\"[] 数组类型格式  \");            if (t != null) {                String Arrtype = t.getClass().getName();                java.util.ArrayList<Object>  valueList= new  java.util.ArrayList();                int[] intArr=null;                byte[] byteArr=null;                char[] charArr=null;                short[] shortArr=null;                long[] longArr=null;                float[] floatArr=null;                double[] doubleArr= null;                boolean[] booleanArr = null;                Object[]  ObjectArr =null;                if(Arrtype.equals(\"[I\")){                       intArr = (int[])t ;                    valueList.add( java.util.Arrays.toString(intArr));                } else if(Arrtype.equals(\"[J\")){                      longArr = (long[])t ;                    valueList.add( java.util.Arrays.toString(longArr));                }else if(Arrtype.equals(\"[F\")){                    floatArr = (float[])t ;                    valueList.add( java.util.Arrays.toString(floatArr));                }else if(Arrtype.equals(\"[D\")){                    doubleArr = (double[])t ;                    valueList.add( java.util.Arrays.toString(doubleArr));                }else if(Arrtype.equals(\"[S\")){                    shortArr = (short[])t ;                    valueList.add( java.util.Arrays.toString(shortArr));                }else if(Arrtype.equals(\"[C\")){                    charArr = (char[])t ;                    valueList.add( java.util.Arrays.toString(charArr));                }else if(Arrtype.equals(\"[B\")){                    byteArr = (byte[])t ;                    valueList.add( java.util.Arrays.toString(byteArr));                }else if(Arrtype.equals(\"[Z\")){                    booleanArr = (boolean[])t ;                    valueList.add( java.util.Arrays.toString(booleanArr));                }else{                    ObjectArr = (Object[]) t ;                    for (Object curObject:ObjectArr ) {                        valueList.add(curObject);                    }                }                for (int zindex = 0; zindex < valueList.size(); zindex++) {                    ZukgitHoldPlace\" shuzu[]   \" + \"XXXX[]   zindex = \" + zindex + \"   :  value= \" + valueList.get(zindex).toString());                }            } else {                ZukgitHoldPlace\" zukgit_B8_Test_method3   \" + \"strArr is null !\");            }        }else {            ZukgitHoldPlace\"    baseObject = true   基本Object对象类型   toString()=\" + t);        }    }";
 
+//System.out.println("")
+//ZukgitHoldPlace
+//System.out.println(
+//android.uti.Log.i("XXX",
+//android.Suti.Log.i("XXX",
 
 }
