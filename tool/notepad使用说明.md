@@ -123,6 +123,82 @@ EXT_PART              文件扩展名        cs
 
 ```
 
+
+
+
+### A0_把当前井号与资源一一对齐
+```
+#### 半岛铁盒
+#### 最后的战役
+#### 可爱女人
+<audiocontrols><sourcesrc="https://raw.githubusercontent.com/ZukGit/Z_Music/master/music/chinese/zhou_jie_lun/ke_ai_nv_ren.mp3"type="audio/mpeg"/></audio>
+<audiocontrols><sourcesrc="https://raw.githubusercontent.com/ZukGit/Z_Music/master/music/chinese/zhou_jie_lun/ban_dao_tie_he.mp3"type="audio/mpeg"/></audio>
+<audiocontrols><sourcesrc="https://raw.githubusercontent.com/ZukGit/Z_Music/master/music/chinese/zhou_jie_lun/zui_hou_de_zhan_yi.mp3"type="audio/mpeg"/></audio>
+
+转为
+
+#### 半岛铁盒
+<audiocontrols><sourcesrc="https://raw.githubusercontent.com/ZukGit/Z_Music/master/music/chinese/zhou_jie_lun/ban_dao_tie_he.mp3"type="audio/mpeg"/></audio>
+#### 最后的战役
+<audiocontrols><sourcesrc="https://raw.githubusercontent.com/ZukGit/Z_Music/master/music/chinese/zhou_jie_lun/zui_hou_de_zhan_yi.mp3"type="audio/mpeg"/></audio>
+#### 可爱女人
+<audiocontrols><sourcesrc="https://raw.githubusercontent.com/ZukGit/Z_Music/master/music/chinese/zhou_jie_lun/ke_ai_nv_ren.mp3"type="audio/mpeg"/></audio>
+
+================================
+
+#### ban_dao_tie_he
+#### zui_hou_de_zhan_yi
+#### ke_ai_nv_ren
+<audiocontrols><sourcesrc="https://raw.githubusercontent.com/ZukGit/Z_Music/master/music/chinese/zhou_jie_lun/ban_dao_tie_he.mp3"type="audio/mpeg"/></audio>
+<audiocontrols><sourcesrc="https://raw.githubusercontent.com/ZukGit/Z_Music/master/music/chinese/zhou_jie_lun/zui_hou_de_zhan_yi.mp3"type="audio/mpeg"/></audio>
+<audiocontrols><sourcesrc="https://raw.githubusercontent.com/ZukGit/Z_Music/master/music/chinese/zhou_jie_lun/ke_ai_nv_ren.mp3"type="audio/mpeg"/></audio>
+
+
+转为
+
+#### ban_dao_tie_he
+<audiocontrols><sourcesrc="https://raw.githubusercontent.com/ZukGit/Z_Music/master/music/chinese/zhou_jie_lun/ban_dao_tie_he.mp3"type="audio/mpeg"/></audio>
+#### zui_hou_de_zhan_yi
+<audiocontrols><sourcesrc="https://raw.githubusercontent.com/ZukGit/Z_Music/master/music/chinese/zhou_jie_lun/zui_hou_de_zhan_yi.mp3"type="audio/mpeg"/></audio>
+#### ke_ai_nv_ren
+<audiocontrols><sourcesrc="https://raw.githubusercontent.com/ZukGit/Z_Music/master/music/chinese/zhou_jie_lun/ke_ai_nv_ren.mp3"type="audio/mpeg"/></audio>
+
+
+
+```
+
+#### A0.vbs
+```
+Set args = WScript.Arguments
+If args.Count = 2 Then
+
+zbinpath= WScript.Arguments(0)
+textpath= WScript.Arguments(1)
+
+command = "cmd /c "+ zbinpath +"\A0.bat  " +zbinpath+"\  "+textpath
+DIM objShell
+set objShell=wscript.createObject("wscript.shell")
+iReturn=objShell.Run(command, 0, TRUE)
+WScript.Echo("Please Refresh!")
+End If
+
+
+
+```
+
+#### A0.bat
+```
+@echo off
+@cd %1
+@javac  -cp A0_pinyin4j.jar -encoding UTF-8  A0.java 
+@java -cp .;A0_pinyin4j.jar A0 %2
+@exit
+
+
+```
+
+
+
 ### A1_添加行号
 ```
 aaa              01      aaa
@@ -181,86 +257,6 @@ C:\Users\aaa\Desktop\TestA\A1.bat
 
 ```
 
-#### A1.java
-```
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.io.FileOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
-
-public class A1 {
-    public static final ArrayList<String> StringArr = new ArrayList<>();
-
-    public static void main(String[] args) {
-        String mFilePath = null;
-        if (args.length >= 1) {
-            mFilePath = args[0];
-        } else {
-            System.out.println("input argument is empty ! retry input again!");
-            return;
-        }
-        File curFile;
-        if (mFilePath != null && !mFilePath.isEmpty() && (curFile = new File(mFilePath)).exists()) {
-            System.out.println("input argument success ! ");
-        } else {
-            System.out.println("input argument is invalid ! retry input again!");
-            return;
-        }
-
-        if (curFile != null) {
-
-            FileReader curReader;
-            FileWriter curWriter;
-            try {
-
-                curReader = new FileReader(curFile);
-
-
-
-
-                BufferedReader curBR  = new BufferedReader(new InputStreamReader(new FileInputStream(new File(mFilePath)),"utf-8"));
-                String oldOneLine = "";
-                String newOneLine = "";
-                int indexLine = 0;
-
-                while (oldOneLine != null) {
-
-                    oldOneLine = curBR.readLine();
-                    indexLine++;
-                    newOneLine = indexLine + "      " + oldOneLine;
-                    StringArr.add(newOneLine);
-                }
-                curBR.close();
-
-
-
-                BufferedWriter curBW  = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(mFilePath)),"utf-8"));
-
-                for (int i = 0; i < StringArr.size(); i++) {
-                    curBW.write(StringArr.get(i));
-                    curBW.newLine();
-                }
-                curBW.close();
-                System.out.println("OK !");
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        } else{
-            System.out.println("Failed !");
-        }
-    }
-}
-
-
-
-```
 
 
 
@@ -313,515 +309,6 @@ End If
 
 ```
 
-#### A2.java
-
-```
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.*;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.LinkedList;
-
-public class A2 {
-
-    // 自动判断输入文件中的一行有多少列字符串
-    public static int NUM_ERERY_LINE_OLD = 0;     // 输入1.txt文件原本的每行列数  限制条件为 NEW/OLD 是正整数
-    public static int NUM_ERERY_LINE_NEW = 0;    //  输出2.txt 文件需要自定义的产生的每行列数
-
-
-    public static final int PADDING_COLOM = 5;         //  填充padding的距离  每个列之间的间距
-    public static final boolean NEED_SORT = false;      //   输出是否需要进行A-Z的排序  默认为false    默认为按照1.txt的读取顺序显示
-    public static final boolean DEBUG_LOG = false;       // 是否打印Log标识
-
-
-    public static String SRC_FILE_NAME = "1.txt";   // 输入文件1.txt
-    public static String DES_FILE_NAME = "2.txt";   // 输出文件1.txt
-
-
-    public static String[] splitArr;    // 读取输入 1.txt每行  原始的split返回值字符串数组
-    public static String[] retContentArr;   // 读取输入 1.txt每行  原始的split返回值经过过滤规格过滤后的返回值字符串数组
-
-    public static long fileSumLines;   // 输入文件1.txt 的总行数
-    public static long newSumLines;    // 输出文件 2.txt 的总行数
-    public static long stringNumOfInput_Max;    // 输入和输出文件中字符串的最大的个数
-
-    public static int[] item_Max_Length = new int[NUM_ERERY_LINE_NEW];  // 在1.txt输入文件每个列中字符串的最大长度的数组  默认为0
-    public static int[] item_Max_Length_new = new int[NUM_ERERY_LINE_NEW]; // 在2.txt文件中每个列的字符串最大长度 不足的补充padding
-
-    public static void main(String[] args) {
-
-        String mFilePath = null;
-        if (args.length >= 1) {
-            mFilePath = args[0];
-        } else {
-            System.out.println("input argument is empty ! retry input again!");
-            return;
-        }
-        File curFile;
-        if (mFilePath != null && !mFilePath.isEmpty() && (curFile = new File(mFilePath)).exists()) {
-            System.out.println("input argument success ! ");
-        } else {
-            System.out.println("input argument is invalid ! retry input again!");
-            return;
-        }
-
-//        String mFilePath = System.getProperties().getProperty("user.dir")+File.separator+"1.txt";
-
-
-        SRC_FILE_NAME =  new File(mFilePath).getAbsolutePath() ;
-        DES_FILE_NAME =  new File(mFilePath).getAbsolutePath() ;
-        System.out.println("DES_FILE_NAME =  "+ DES_FILE_NAME);
-        getLineRow();  // 获得当前输入的数据统计
-        if (NUM_ERERY_LINE_NEW == 0 || NUM_ERERY_LINE_OLD == 0) {
-            System.out.println("当前文件的列数检测失败  程序以失败姿态退出！ ");
-           return ;
-        } else {
-            System.out.println("1 ");
-            item_Max_Length = new int[NUM_ERERY_LINE_NEW];  // 在1.txt输入文件每个列中字符串的最大长度的数组  默认为0
-            item_Max_Length_new = new int[NUM_ERERY_LINE_NEW]; // 在2.txt文件中每个列的字符串最大长度 不足的补充padding
-        }
-        getLineNum();  // 获得当前输入的数据统计
-
-        System.out.println("2 ");
-
-
-        try {
-            System.out.println("3 ");
-            //链表数组 包含的是上面 LinkedList<String[]> 中的每一个String，这些String已经排序排好了
-            LinkedList<String> sortStringlist = getAllStringItemFromInput();
-
-            // 依据标识位 对 所有的String 进行排序
-            sortStringlist = sortAllStringItemMethod(sortStringlist);
-
-            // 链表数组 成员都是 每一行字符串进行split分割后产生的字符串数组 并且每个Item 对应的String[] 长度是 NUM_ERERY_LINE_NEW
-            LinkedList<String[]> list_StringArr = new LinkedList<String[]>();
-            System.out.println("4 ");
-
-            // 填充输入到2.txt中的字符串数组的List
-            fill_List_StringArr(list_StringArr, sortStringlist);
-
-
-            // list_StringArr.length  就是 2.txt输出文件的行数
-            System.out.println("list_StringArr.length 输出文件2.txt 总行数:" + list_StringArr.size());
-
-            //int[] item_Max_Length 数组进行查找  找到每列最大的字符串长度
-            getStringMaxLengthMethod(list_StringArr);
-
-            // 创建2.txt  并填充数据
-            fillOutputFile(list_StringArr);
-
-        } catch (Exception e) {
-            System.out.println(e.fillInStackTrace());
-
-        }
-
-    }
-
-
-    public static void fill_List_StringArr(LinkedList<String[]> list_StringArr, LinkedList<String> sortStringlist) {
-        String[] newRow = new String[NUM_ERERY_LINE_NEW];
-
-        for (int i = 0; i < sortStringlist.size(); i++) {
-
-            int index = i % NUM_ERERY_LINE_NEW;
-            if (index == 0 && i > 0) {
-                list_StringArr.add(newRow);
-                newRow = new String[NUM_ERERY_LINE_NEW];
-            }
-            newRow[index] = sortStringlist.get(i);
-        }
-        if (!list_StringArr.contains(newRow)) {
-            list_StringArr.add(newRow);
-        }
-
-
-    }
-
-
-    // 对 list_StringArr 内容进行重新填充 到  LinkedList<String[]> list_StringArr
-    public static void fixSortInStringArrList(LinkedList<String[]> list_StringArr, LinkedList<String> sortStringlist) {
-
-        int num = 0;
-        for (String[] item : list_StringArr) {
-
-            for (int i = 0; i < item.length; i++) {
-                if (num + i < sortStringlist.size()) {
-                    item[i] = sortStringlist.get(num + i);
-                }
-            }
-            num = num + item.length;
-
-        }
-
-    }
-
-    public static String[] getStringArr_From_EveryRow(String contentString, int num) {
-        retContentArr = new String[num];
-        if (contentString != null && !"".equals(contentString)) {
-
-            if (num == 1) {
-
-                splitArr = contentString.split(" ");
-                splitArr = makeEmptyOut(splitArr);  // 把数组中的空字符 完全剔除
-                if (splitArr.length > num) {
-
-                    String contentLine = splitArr[0];
-                    String fixString = fixStringMethod(contentLine);
-                    retContentArr[0] = fixString;
-                    if (DEBUG_LOG) System.out.println("只读取每行第一个字符串 = " + splitArr[0]);
-                }
-
-            }
-
-            if (num == 2) {
-
-                splitArr = contentString.split(" ");
-                splitArr = makeEmptyOut(splitArr);  // 把数组中的空字符 完全剔除
-                if (splitArr.length > num) {
-                    retContentArr[0] = splitArr[0];
-                    retContentArr[1] = splitArr[splitArr.length - 1];
-
-                } else if (splitArr.length == num) {
-                    retContentArr[0] = splitArr[0];
-                    retContentArr[1] = splitArr[1];
-                }
-
-            } else {
-                splitArr = contentString.split(" ");
-                if (DEBUG_LOG) System.out.println("行数大于等于3: 值为“+ num+ ”  切割长度为 splitArr.length =" + splitArr.length);
-                splitArr = makeEmptyOut(splitArr);  // 把数组中的空字符 完全剔除
-                for (int x = 0; x < splitArr.length; x++) {
-
-
-                    if (DEBUG_LOG) System.out.println("index =" + x + "   content:" + splitArr[x]);
-                    if (x == splitArr.length - 1) {
-                        if (DEBUG_LOG) System.out.println();
-                    }
-
-                }
-
-
-                if (splitArr.length > num) {
-                    int i = 0;
-                    int j = 0;
-                    for (i = 0; i < num; i++) {
-
-                        retContentArr[i] = splitArr[i];
-
-                    }
-                } else if (splitArr.length == num) {
-                    for (int x = 0; x < splitArr.length; x++) {
-
-                        retContentArr[x] = splitArr[x];
-
-                    }
-
-                }
-
-
-            }
-
-        }
-        if (DEBUG_LOG) {
-            for (String value : retContentArr) {
-                System.out.println("value = " + value);
-            }
-        }
-
-        return retContentArr;
-    }
-
-
-    public static String fixStringMethod(String contentString) {
-        int length = contentString.length();
-        //  System.out.println("contentString1"+ contentString);
-        if (contentString.contains("    ")) {
-            contentString = contentString.split("    ")[0].trim();
-        } else if (contentString.contains("\t")) {
-            contentString = contentString.split("\t")[0].trim();
-        }
-        System.out.println("contentString2  =  " + contentString);
-        return contentString;
-    }
-
-
-    public static String[] makeEmptyOut(String[] strArr) {
-        String[] validStrArrRet = null;
-        ArrayList<String> validStrArr = new ArrayList<String>();
-
-        if (strArr != null) {
-
-            for (String strItem : strArr) {
-                if (strItem == null || "".equals(strItem.trim())) {
-                    continue;
-                }
-                validStrArr.add(strItem);
-            }
-        }
-
-        if (validStrArr.size() > 0) {
-            validStrArrRet = new String[validStrArr.size()];
-
-
-            for (int x = 0; x < validStrArr.size(); x++) {
-                validStrArrRet[x] = validStrArr.get(x).trim();
-            }
-        }
-        return validStrArrRet;
-
-    }
-
-    public static boolean isArrEmpty(String[] strArr) {
-        boolean flag = false;
-
-        if (strArr != null) {
-            int i = 0;
-            for (i = 0; i < strArr.length; i++) {
-                if (strArr[i] != null && "".equals(strArr[i])) {
-                    flag = true;
-                    break;
-                }
-            }
-        } else {
-            flag = true;
-        }
-        return flag;
-    }
-
-    public static boolean checkInsert(int i, int j) {
-        boolean flag = false;
-        if (retContentArr != null && splitArr != null && i < retContentArr.length && j < splitArr.length) {
-            if ("".equals(retContentArr[i]) && !"".equals(splitArr[j])) {
-                flag = true;
-            }
-        }
-        return flag;
-    }
-
-
-    public static LinkedList<String> getAllStringItemFromInput() {
-
-
-        //链表数组 包含的是上面 LinkedList<String[]> 中的每一个String，这些String已经排序排好了
-        LinkedList<String> sortStringlist = new LinkedList<String>();
-
-
-        try {
-
-
-
-            BufferedReader txtBR  = new BufferedReader(new InputStreamReader(new FileInputStream(new File(SRC_FILE_NAME)),"utf-8"));
-
-            String lineContentFirst = "";   // 读取到的输入文件 1.txt 的每一行字符串
-
-
-            // 一次性读出所有的字符串String   然后再重新编排？
-            while (lineContentFirst != null) {
-                lineContentFirst = txtBR.readLine(); // 从1.txt中读取一行字符串出来
-                if (lineContentFirst == null) { // 如果读取到的字符串为null 说明读取到了末尾了
-                    System.out.println("1.txt read to end!");
-                    break;
-                }
-                // 对读取到的每行字符串 进行分拆   得到每一个当前字符串分拆后的数组
-                String[] arrStr = getStringArr_From_EveryRow(lineContentFirst, NUM_ERERY_LINE_OLD);
-                if (arrStr != null && arrStr.length == NUM_ERERY_LINE_OLD) {
-
-                    for (String strItem : arrStr) {
-                        sortStringlist.add(strItem);  // 包含了所有切分出来的字符串
-                    }
-                }
-            }
-
-            txtBR.close();
-
-        } catch (Exception e) {
-            System.out.println(e.fillInStackTrace());
-        }
-
-        return sortStringlist;
-    }
-
-
-    public static LinkedList<String> sortAllStringItemMethod(LinkedList<String> sortStringlist) {
-
-        // sortStringlist.size()  是 2.txt 输出中所有字符串的数量
-        System.out.println("sortStringlist.length :" + sortStringlist.size());
-        if (NEED_SORT) {
-            sortStringlist.sort(new Comparator<String>() {   // 对字符串进行排序使得 aA-zZ这样的排序
-                @Override
-                public int compare(String o1, String o2) {
-                    return o1.toLowerCase().compareTo(o2.toLowerCase());
-                }
-            });
-        }
-
-        //  打印排序后的字符串
-        if (DEBUG_LOG) {
-            for (String sortItem : sortStringlist) {
-                System.out.println("sortItem:" + sortItem);
-            }
-        }
-
-
-        return sortStringlist;
-    }
-
-    public static void getLineRow() {
-        try {
-
-
-            BufferedReader txtBR  = new BufferedReader(new InputStreamReader(new FileInputStream(new File(SRC_FILE_NAME)),"utf-8"));
-            System.out.println("NUM_ERERY_LINE_OLD=" + NUM_ERERY_LINE_OLD + "  NUM_ERERY_LINE_NEW=" + NUM_ERERY_LINE_NEW);
-            String line = txtBR.readLine();
-            int rowNum  = 0 ;
-            if (line == null ) {
-
-                line = txtBR.readLine();
-            }
-
-            if( line != null && line.trim().isEmpty()){
-                line = txtBR.readLine();
-
-            }
-            if(line != null ){
-                String numRow[] = line.trim().split(" ");
-
-                for (int i = 0 ; i <numRow.length ; i++ ){
-
-                    if(numRow[i].trim().isEmpty()){
-                        continue;
-                    }
-
-                    rowNum++;
-                }
-
-                    NUM_ERERY_LINE_OLD = rowNum;
-                    NUM_ERERY_LINE_NEW = rowNum;
-
-
-
-            }
-
-
-
-            System.out.println("NUM_ERERY_LINE_OLD=" + NUM_ERERY_LINE_OLD + "  NUM_ERERY_LINE_NEW=" + NUM_ERERY_LINE_NEW);
-            txtBR.close();
-        } catch (Exception e) {
-            System.out.println(e.fillInStackTrace());
-        }
-    }
-
-
-    public static void getLineNum() {
-        try {
-
-            BufferedReader txtBR  = new BufferedReader(new InputStreamReader(new FileInputStream(new File(SRC_FILE_NAME)),"utf-8"));
-
-
-            fileSumLines = txtBR.lines().count();  // 当前输入 1.txt的行数
-            // 当前输入 1.txt 所包含该的String字符串最大的数量  也是输入文件2.txt最大的字符串数量
-
-            stringNumOfInput_Max = fileSumLines * NUM_ERERY_LINE_OLD;
-            newSumLines = (stringNumOfInput_Max / NUM_ERERY_LINE_NEW) + 1;
-            System.out.println("old_txt_lines=" + fileSumLines + "  newSumLines=" + newSumLines + "   AllStringNum = " + stringNumOfInput_Max);
-            txtBR.close();
-        } catch (Exception e) {
-            System.out.println(e.fillInStackTrace());
-        }
-    }
-
-
-    public static void getStringMaxLengthMethod(LinkedList<String[]> list_StringArr) {
-        if (list_StringArr != null) {
-            int num = 0;
-            for (String[] item : list_StringArr) {  // 计算出每列的最长的字符串的长度
-                if (item == null) {
-                    if (DEBUG_LOG) System.out.println("item == null");
-                    continue;
-                }
-                //  System.out.println("item != null  index:"+ (num++) +"item.length="+item.length);
-                for (int z = 0; z < item.length; z++) {
-                    if (item[z] == null) {
-                        if (DEBUG_LOG) System.out.println("item[z] = null");
-                        continue;
-                    }
-
-                    if (item[z] != null && item[z].length() > item_Max_Length[z]) {
-                        if (DEBUG_LOG) System.out.println("item[z].length() = " + item[z].length());
-                        item_Max_Length[z] = item[z].length();
-                    }
-                }
-
-            }
-
-            // 设置2.txt的每一列的长度值
-            for (int itemContentLength = 0; itemContentLength < item_Max_Length.length; itemContentLength++) {
-                item_Max_Length_new[itemContentLength] = item_Max_Length[itemContentLength] + PADDING_COLOM;  // 每一列的长度值最长值+1  避免内容重叠
-                if (DEBUG_LOG)
-                    System.out.println("item_Max_Length_new_index:" + itemContentLength + " item_Max_Length_new_value:" + item_Max_Length_new[itemContentLength]);
-            }
-
-        }
-
-    }
-
-
-    public static void fillOutputFile(LinkedList<String[]> list_StringArr) {
-
-        try {
-            File txt2File = new File( DES_FILE_NAME);
-            if (!txt2File.exists()) {
-                txt2File.createNewFile();
-            }
-
-            BufferedWriter txt2BW  = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(DES_FILE_NAME)),"utf-8"));
-
-
-            //2.txt的内容进行填充 list_StringArr  中 每一个String【]  是 2.txt 中的一行】
-            for (String[] item : list_StringArr) {
-                StringBuilder sb = new StringBuilder("");
-                if (item == null) {
-                    if (DEBUG_LOG) System.out.println("item == null");
-                    continue;
-                }
-                if (DEBUG_LOG) {
-                    System.out.println("item != null  item.length=" + item.length);
-                    int index = 0;
-                    for (String str : item) {
-                        System.out.println("item[" + index + "] != null   " + "item[" + index + "]" + str);
-                        index++;
-                    }
-
-                }
-                for (int z = 0; z < item.length; z++) {
-                    if (item[z] == null) {
-                        continue;
-                    }
-                    int padding = item_Max_Length_new[z] - item[z].length();
-                    String paddingStr = "";
-                    for (int paddingNum = 0; paddingNum < padding; paddingNum++) {
-                        paddingStr += " ";
-                    }
-                    String content = item[z] + paddingStr;
-                    sb.append(content);
-                }
-                txt2BW.write(sb.toString());
-                txt2BW.newLine();
-            }
-            txt2BW.flush();
-
-        } catch (Exception e) {
-            System.out.println(e.fillInStackTrace());
-        }
-    }
-
-
-}
-
-
-```
 ### A3_竖排列切换横排列(命令输出的那些)
 ```
 1
@@ -875,160 +362,6 @@ End If
 
 ```
 
-
-#### A3.java
-```
-
-import java.io.*;
-import java.util.ArrayList;
-
-public class A3 {
-
-
-    public static String SRC_FILE_NAME = "1.txt";
-    // 实现对  竖屏的字符  添加为 横屏排列的字符
-    public static int rowItemMaxLength = 0;   // 最大item的长度
-    public static int itemSpace = 5;
-    public static int num_row = 4;   // 每行重组的个数
-    public static final ArrayList<String> SrcStringArr = new ArrayList<>();  // 源数据的每行数据
-
-    public static final ArrayList<String> DstStringArr = new ArrayList<>();  // 目的数据的每行数据
-
-    public static void main(String[] args) {
-
-        String mFilePath = null;
-        if (args.length >= 1) {
-            mFilePath = args[0];
-        } else {
-            System.out.println("input argument is empty ! retry input again!");
-            return;
-        }
-        File curFile;
-        if (mFilePath != null && !mFilePath.isEmpty() && (curFile = new File(mFilePath)).exists()) {
-            System.out.println("input argument success ! ");
-        } else {
-            System.out.println("input argument is invalid ! retry input again!");
-            return;
-        }
-
-//        String mFilePath = System.getProperties().getProperty("user.dir") + File.separator + "1.txt";
-
-        SRC_FILE_NAME = new File(mFilePath).getAbsolutePath();
-        getSrcLineArray();
-        getMaxItemLength();
-        getDstLineArray();
-        writerNewLine();
-    }
-
-    public static void getMaxItemLength() {
-
-        for (String item : SrcStringArr) {
-
-            if (item.length() > rowItemMaxLength) {
-                rowItemMaxLength = item.length();
-                continue;
-            }
-            System.out.println("最大项item的长度:  rowItemMaxLength =" + rowItemMaxLength);
-        }
-
-    }
-
-    public static void writerNewLine() {
-        try {
-
-            BufferedWriter txt2BW = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(SRC_FILE_NAME)), "utf-8"));
-            for (String item : DstStringArr) {
-                if (!item.isEmpty()) {
-                    txt2BW.write(item);
-                    txt2BW.newLine();
-                }
-
-            }
-
-            txt2BW.flush();
-            txt2BW.close();
-        } catch (IOException e) {
-            System.out.println(e.fillInStackTrace());
-        }
-    }
-
-
-    public static void getSrcLineArray() {
-        try {
-
-            BufferedReader txtBR = new BufferedReader(new InputStreamReader(new FileInputStream(new File(SRC_FILE_NAME)), "utf-8"));
-            String lineContentFirst = "";   // 读取到的输入文件 1.txt 的每一行字符串
-
-
-            // 一次性读出所有的字符串String   然后再重新编排？
-            while (lineContentFirst != null) {
-                lineContentFirst = txtBR.readLine(); // 从1.txt中读取一行字符串出来
-                if (lineContentFirst == null) { // 如果读取到的字符串为null 说明读取到了末尾了
-                    System.out.println("文件读取完全");
-                    break;
-                }
-                if (lineContentFirst != null && !lineContentFirst.isEmpty())
-                    SrcStringArr.add(lineContentFirst.trim());
-                //  System.out.println("lineContentFirst = " + lineContentFirst);
-            }
-
-            txtBR.close();
-        } catch (Exception e) {
-            System.out.println(e.fillInStackTrace());
-        }
-    }
-
-    public static void getDstLineArray() {
-
-        String dstLineString = "";
-        for (int i = 0; i < SrcStringArr.size(); i++) {
-            String item = SrcStringArr.get(i).trim();
-            String fixItem = fixItemString(item);
-            dstLineString = dstLineString + fixItem;
-            if ((i+1) % num_row == 0) {
-                if (!dstLineString.trim().isEmpty()) {
-                    DstStringArr.add(dstLineString.trim());
-                    System.out.println("dstLineString = " + dstLineString);
-                }
-                dstLineString = "";
-            }
-        }
-        DstStringArr.add(dstLineString.trim());  // 添加剩下的那些 item
-
-
-    }
-
-
-    public static String fixItemString(String item) {
-        if (item == null) {
-            System.out.println("当前行为空1！");
-            return "";
-
-        }
-        if (item != null && item.isEmpty()) {
-
-            System.out.println("当前行为空2！");
-            return "";
-        }
-
-        int fixSpace = rowItemMaxLength - item.length();
-        String spaceString = "";
-        for (int j = 0; j < fixSpace + itemSpace; j++) {
-
-            spaceString = spaceString + " ";
-        }
-        item = item + spaceString;
-        System.out.println("item = "+ item);
-        return item;
-
-    }
-
-}
-
-
-
-
-```
 
 ### A4_在每行开头以及结尾添加固定字符串
 ```
@@ -1112,165 +445,7 @@ End If
 
 ```
 
-#### A4.java
-```
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.io.FileOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
 
-public class A4 {
-    public static final ArrayList<String> StringArr = new ArrayList<>();
-    /*paramString 替换规则:
-    1.【z_z = 空格】
-    2.【z# = =等号】
-    3.【z[ = <】
-    4.【z] = >】
-    5. 【z`= 引号"】
-        */
-
-    public static String acceptRule(String param) {
-        if (param == null) {
-            return null;
-        }
-        if (param.contains("z_z")) {
-            param = param.replaceAll("z_z", " ");
-        }
-        if (param.contains("z#")) {
-            param = param.replaceAll("z#", "=");
-        }
-        while (param.contains("z[")) {
-            param = param.replace("z[", "<");
-        }
-
-        if (param.contains("z]")) {
-            param = param.replaceAll("z]", ">");
-
-        }
-        if (param.contains("z`")) {
-            param = param.replaceAll("z`", "\"");
-        }
-        // accept rule param = pre=<audio><source src#end=/><audio>
-        System.out.println("accept rule param = "+ param);
-        return param;
-    }
-
-    public static void main(String[] args) {
-        //===============VS-test===============
-        String mFilePath = null;
-        String preString = null;
-        String endString = null;
-        if (args.length >= 2) {
-            mFilePath = args[0];
-            String paramString = args[1]; //  prez#"xxxx"endz#"yyyy"
-            System.out.println("mFilePath =" + mFilePath + "  paramString = " + paramString);
-            if (paramString != null && paramString.contains("prez") && paramString.contains("endz")) {
-                // 前后都要添加字符串的情况
-                if (paramString.indexOf("prez") < paramString.indexOf("endz")) {
-                    preString = paramString.substring(paramString.indexOf("#") + 1, paramString.indexOf("endz"));
-                    endString = paramString.substring(paramString.lastIndexOf("#") + 1, paramString.length());
-                    System.out.println("zukgit 1 ");
-                } else {  //  endz#"yyyy"prez#"xxxx"
-                    System.out.println("zukgit 2 ");
-                    endString = paramString.substring(paramString.indexOf("#") + 1, paramString.indexOf("prez"));
-                    preString = paramString.substring(paramString.lastIndexOf("#") + 1, paramString.length());
-
-                }
-
-            } else if (paramString != null && paramString.contains("prez")) {
-                System.out.println("zukgit 3 ");
-                // 只包含要在行首添加字符串的情况   prez#"xxxx"
-                preString = paramString.substring(paramString.indexOf("#") + 1, paramString.length());
-                endString = "";
-            } else if (paramString != null && paramString.contains("endz")) {
-                // 只包含要在行尾添加字符串的情况  endz#"xxxx"
-                System.out.println("zukgit 4 ");
-                preString = "";
-                endString = paramString.substring(paramString.indexOf("#") + 1, paramString.length());
-            } else {
-                System.out.println("input argument pre=xxxx;end=yyyy is error ! retry input again!");
-                return;
-            }
-        } else {
-            System.out.println("input argument is empty ! retry input again!");
-            return;
-        }
-//===============local-test===============
-//        String mFilePath = System.getProperty("user.dir") + File.separator + "in.txt";
-//        String preString = "<audio> <source src=\"";
-//        String endString = "\" /><audio>";
-
-
-        if ((preString != null && preString.trim().isEmpty()) && (endString != null && endString.trim().isEmpty())) {
-            System.out.println("preString and endString both empty ");
-            return;
-        } else{
-            preString = acceptRule(preString);
-            endString = acceptRule(endString);
-        }
-
-
-        System.out.println("preString =  " + preString + " endString =" + endString);
-
-        File curFile;
-        if (mFilePath != null && !mFilePath.isEmpty() && (curFile = new File(mFilePath)).exists()) {
-            System.out.println("input argument success ! ");
-        } else {
-            System.out.println("input argument is invalid ! retry input again!");
-            return;
-        }
-
-        if (curFile != null) {
-
-            FileReader curReader;
-            FileWriter curWriter;
-            try {
-
-                curReader = new FileReader(curFile);
-
-                BufferedReader curBR = new BufferedReader(new InputStreamReader(new FileInputStream(new File(mFilePath)), "utf-8"));
-                String oldOneLine = "";
-                String newOneLine = "";
-                int indexLine = 0;
-
-                while (oldOneLine != null) {
-                    oldOneLine = curBR.readLine();
-                    if (oldOneLine == null || oldOneLine.trim().isEmpty()) {
-                        continue;
-                    }
-                    indexLine++;
-                    newOneLine = preString + oldOneLine.trim() + endString;
-                    StringArr.add(newOneLine);
-                }
-                curBR.close();
-
-
-                BufferedWriter curBW = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(mFilePath)), "utf-8"));
-
-                for (int i = 0; i < StringArr.size(); i++) {
-                    curBW.write(StringArr.get(i));
-                    curBW.newLine();
-                }
-                curBW.close();
-                System.out.println("OK !");
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        } else {
-            System.out.println("Failed !");
-        }
-    }
-}
-
-
-```
 
 ### A5_生成MD语法的表格依据当前数据
 ```
@@ -1314,154 +489,6 @@ End If
 
 ```
 
-#### A5.java
-```
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.io.FileOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
-import java.util.HashMap;
-
-public class A5 {
-    public static final ArrayList<String> tableItemList = new ArrayList<>();
-    public static int rowInLine = 0;
-
-
-    public static void getRowInLine(File file) {
-
-        String titleString;
-        try {
-            BufferedReader curBR = new BufferedReader(new InputStreamReader(new FileInputStream(file), "utf-8"));
-            while ((titleString = curBR.readLine()) != null && !titleString.isEmpty()) {
-                break;
-            }
-            while (titleString.contains("  ")) {
-                titleString = titleString.replaceAll("  ", " ");
-            }
-
-            String[] strArr = titleString.split(" ");
-            rowInLine = strArr.length;
-
-            String sumString = "";
-            for (String item : strArr) {
-                sumString = sumString + " | " + item;
-            }
-            sumString = sumString + " |";
-            tableItemList.add(sumString);
-
-            String twoLine = "";
-            for (int i = 0; i < rowInLine; i++) {
-
-                twoLine = twoLine + "| ---- ";
-            }
-            twoLine = twoLine + "| ";
-            tableItemList.add(twoLine);
-
-
-            curBR.close();
-        } catch (Exception e) {
-
-
-        }
-    }
-
-    public static void main(String[] args) {
-        //===============real-test-egin===============
-        String mFilePath = null;
-        if (args.length >= 1) {
-            mFilePath = args[0];
-        } else {
-            System.out.println("input argument is empty ! retry input again!");
-            return;
-        }
-        //===============real-test-end===============
-
-        //===============local-test begin===============
-//          String mFilePath = System.getProperty("user.dir") + File.separator + "in.txt";
-//        String preString = "<audio> <source src=\"";
-//        String endString = "\" /><audio>";
-        //===============local-test end===============
-
-        File curFile;
-        if (mFilePath != null && !mFilePath.isEmpty() && (curFile = new File(mFilePath)).exists()) {
-            System.out.println("input argument success ! ");
-        } else {
-            System.out.println("input argument is invalid ! retry input again!");
-            return;
-        }
-
-        getRowInLine(curFile);
-        if (curFile != null) {
-            try {
-                BufferedReader curBR = new BufferedReader(new InputStreamReader(new FileInputStream(new File(mFilePath)), "utf-8"));
-                String oldOneLine = "";
-
-                while ((oldOneLine = curBR.readLine()) != null && !oldOneLine.isEmpty()) {
-                    break;   // 跳过首行 当做标题的那行
-                }
-
-                oldOneLine = "";
-                while (oldOneLine != null) {
-                    oldOneLine = curBR.readLine();
-                    if (oldOneLine == null || oldOneLine.isEmpty()) {
-                        continue;
-                    }
-                    String tableItem = new String(oldOneLine);
-
-
-                    while (tableItem.contains("  ")) {
-                        tableItem = tableItem.replaceAll("  ", " ");
-                    }
-                    String[] strArr = tableItem.split(" ");
-                    int length = 0;   //
-                    if (strArr.length >= rowInLine) {
-                        length = rowInLine;
-                    } else {
-                        length = strArr.length;
-                    }
-                    String sumString = "";
-                    for (int i = 0; i < length; i++) {
-                        sumString = sumString + " | " + strArr[i];
-                    }
-                    sumString = sumString + " |";
-                    if (length < rowInLine) {
-                        int blankCount = rowInLine - length;
-                        for (int j = 0; j < blankCount; j++) {
-                            sumString = sumString + "  | ";
-                        }
-                    }
-                    tableItemList.add(sumString);
-                }
-                curBR.close();
-
-
-                BufferedWriter curBW = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(mFilePath)), "utf-8"));
-
-                for (int i = 0; i < tableItemList.size(); i++) {
-                    curBW.write(tableItemList.get(i).trim());
-                    curBW.newLine();
-                }
-                curBW.close();
-                System.out.println("OK !");
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        } else {
-            System.out.println("Failed !");
-        }
-    }
-}
-
-
-```
-
 
 ### A6_对当前文件进行进行逐行的复制(剪切板中),原字符字词右移动
 
@@ -1492,16 +519,6 @@ adaac
 
 ```
 
-#### A6.vbs
-
-#### A6.bat
-
-
-#### A6.java(java代码打开notepad)
-```
-
-
-```
 
 
 
@@ -1549,118 +566,8 @@ End If
 @java A7 %2
 @exit
 
-
 ```
 
-
-#### A7.java
-```
-import java.io.*;
-import java.util.ArrayList;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-public class A7 {
-    public static final ArrayList<String> StringArr = new ArrayList<>();
-    private static String REGEX_CHINESE = "[\u4e00-\u9fa5]";
-
-    public static void main(String[] args) {
-        //===============real-test begin===============
-        String mFilePath = null;
-        if (args.length >= 1) {
-            mFilePath = args[0];
-        } else {
-            System.out.println("input argument is empty ! retry input again!");
-            return;
-        }
-        //===============real-test end===============
-
-
-        //===============local-test begin===============
-  //      String mFilePath = System.getProperty("user.dir") + File.separator + "in.txt";
-//        String preString = "<audio> <source src=\"";
-//        String endString = "\" /><audio>";
-        //===============local-test end===============
-
-
-        File curFile;
-        if (mFilePath != null && !mFilePath.isEmpty() && (curFile = new File(mFilePath)).exists()) {
-            System.out.println("input argument success ! ");
-        } else {
-            System.out.println("input argument is invalid ! retry input again!");
-            return;
-        }
-
-        if (curFile != null) {
-
-            FileReader curReader;
-            FileWriter curWriter;
-            try {
-
-                curReader = new FileReader(curFile);
-
-
-                BufferedReader curBR = new BufferedReader(new InputStreamReader(new FileInputStream(new File(mFilePath)), "utf-8"));
-                String oldOneLine = "";
-                String newOneLine = "";
-
-
-                while (oldOneLine != null) {
-
-                    oldOneLine = curBR.readLine();
-                    if (oldOneLine == null || oldOneLine.trim().isEmpty()) {
-                        continue;
-                    }
-
-                    newOneLine = new String(oldOneLine);
-                    if (isContainChinese(newOneLine)) {
-                        newOneLine = clearChinese(newOneLine);
-
-                    }
-                    StringArr.add(newOneLine.trim());
-                }
-                curBR.close();
-
-
-                BufferedWriter curBW = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(mFilePath)), "utf-8"));
-
-                for (int i = 0; i < StringArr.size(); i++) {
-                    curBW.write(StringArr.get(i));
-                    curBW.newLine();
-                }
-                curBW.close();
-                System.out.println("OK !");
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        } else {
-            System.out.println("Failed !");
-        }
-    }
-
-    public static boolean isContainChinese(String str) {
-        Pattern p = Pattern.compile(REGEX_CHINESE);
-        Matcher m = p.matcher(str);
-        if (m.find()) {
-            return true;
-        }
-        return false;
-    }
-
-    public static String clearChinese(String lineContent) {
-        if (lineContent == null || lineContent.trim().isEmpty()) {
-            return null;
-        }
-        Pattern pat = Pattern.compile(REGEX_CHINESE);
-        Matcher mat = pat.matcher(lineContent);
-        return mat.replaceAll(" ");
-    }
-
-}
-
-
-
-```
 
 
 ### A8_对当前文件夹内所有文件进行Log的分析(后续开发 定位先)
@@ -1728,631 +635,7 @@ End If
 ```
 
 
-#### A9_pinyin4j.jar
-#### A9.java
-```
 
-import net.sourceforge.pinyin4j.PinyinHelper;
-import net.sourceforge.pinyin4j.format.HanyuPinyinCaseType;
-import net.sourceforge.pinyin4j.format.HanyuPinyinOutputFormat;
-import net.sourceforge.pinyin4j.format.HanyuPinyinToneType;
-import net.sourceforge.pinyin4j.format.exception.BadHanyuPinyinOutputFormatCombination;
-
-import java.io.*;
-import java.util.ArrayList;
-
-/**
- * 汉字转换为拼音
- *
- * @author Red
- */
-public class A9 {
-
-    public static final ArrayList<String> StringArr = new ArrayList<>();
-
-    public static void main(String[] args) {
-
-        //System.out.println(ToFirstChar("ABC  汉字转换为拼音CBA").toUpperCase()); //转为首字母大写
-        // System.out.println(ToPinyinWithLine("A周 B杰 C伦"));
-        // System.out.println(ToPinyinWithLine("ABC汉字转换为拼音CBA"));
-
-        //===============real-test begin===============
-        String mFilePath = null;
-        if (args.length >= 1) {
-            mFilePath = args[0];
-        } else {
-            System.out.println("input argument is empty ! retry input again!");
-            return;
-        }
-        //===============real-test end===============
-
-
-        //===============local-test begin===============
-        //      String mFilePath = System.getProperty("user.dir") + File.separator + "in.txt";
-//        String preString = "<audio> <source src=\"";
-//        String endString = "\" /><audio>";
-        //===============local-test end===============
-
-
-        File curFile;
-        if (mFilePath != null && !mFilePath.isEmpty() && (curFile = new File(mFilePath)).exists()) {
-            System.out.println("input argument success ! ");
-        } else {
-            System.out.println("input argument is invalid ! retry input again!");
-            return;
-        }
-
-        if (curFile != null) {
-            try {
-                BufferedReader curBR = new BufferedReader(new InputStreamReader(new FileInputStream(new File(mFilePath)), "utf-8"));
-                String oldOneLine = "";
-                String newOneLine = "";
-
-                while (oldOneLine != null) {
-
-                    oldOneLine = curBR.readLine();
-                    if (oldOneLine == null || oldOneLine.trim().isEmpty()) {
-                        continue;
-                    }
-
-                    newOneLine = new String(oldOneLine);
-                    newOneLine = ToPinyinWithLine(newOneLine);
-                    if (newOneLine != null && !newOneLine.trim().isEmpty()) {
-                        StringArr.add(newOneLine);
-                    }
-
-                }
-                curBR.close();
-
-
-                BufferedWriter curBW = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(mFilePath)), "utf-8"));
-
-                for (int i = 0; i < StringArr.size(); i++) {
-                    curBW.write(StringArr.get(i));
-                    curBW.newLine();
-                }
-                curBW.close();
-                System.out.println("OK !");
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        } else {
-            System.out.println("Failed !");
-        }
-    }
-
-    /**
-     * 获取字符串拼音的第一个字母
-     *
-     * @param chinese
-     * @return
-     */
-    public static String ToFirstChar(String chinese) {
-        String pinyinStr = "";
-        char[] newChar = chinese.toCharArray();  //转为单个字符
-        HanyuPinyinOutputFormat defaultFormat = new HanyuPinyinOutputFormat();
-        defaultFormat.setCaseType(HanyuPinyinCaseType.LOWERCASE);
-        defaultFormat.setToneType(HanyuPinyinToneType.WITHOUT_TONE);
-        for (int i = 0; i < newChar.length; i++) {
-            if (newChar[i] > 128) {
-                try {
-                    pinyinStr += PinyinHelper.toHanyuPinyinStringArray(newChar[i], defaultFormat)[0].charAt(0);  // charAt(0)
-                } catch (BadHanyuPinyinOutputFormatCombination e) {
-                    e.printStackTrace();
-                }
-            } else {
-                pinyinStr += newChar[i];
-            }
-        }
-        return pinyinStr;
-    }
-
-    /**
-     * 汉字转为拼音
-     *
-     * @param chinese
-     * @return
-     */
-    public static String ToPinyin(String chinese) {
-        if (chinese == null || chinese.trim().isEmpty()) {
-            return null;
-        }
-        String curItem = new String(chinese);
-        while (curItem.contains(" ")) {
-            curItem = curItem.replaceAll(" ", "");
-        }
-        String pinyinStr = "";
-        char[] newChar = curItem.toCharArray();
-        HanyuPinyinOutputFormat defaultFormat = new HanyuPinyinOutputFormat();
-        defaultFormat.setCaseType(HanyuPinyinCaseType.LOWERCASE);
-        defaultFormat.setToneType(HanyuPinyinToneType.WITHOUT_TONE);
-        for (int i = 0; i < newChar.length; i++) {
-            if (newChar[i] > 128) {
-                try {
-                    pinyinStr += PinyinHelper.toHanyuPinyinStringArray(newChar[i], defaultFormat)[0]; // [0] 标识当前拼音 汉-> han
-                } catch (BadHanyuPinyinOutputFormatCombination e) {
-                    e.printStackTrace();
-                }
-            } else {  // 汉字的编码是大于 128的 所以 小于 128编码的就直接认为是 ascii编码的
-                pinyinStr += newChar[i];
-            }
-        }
-        return pinyinStr;
-    }
-
-
-    /**
-     * 汉字转为拼音 空间以下划线_分割
-     * 1.每个汉字前面添加_
-     * 2.每个汉字后面添加_
-     * 3.把所有的两个__ 下划线转为 一个下划线
-     *
-     * @param chinese
-     * @return
-     */
-    public static String ToPinyinWithLine(String chinese) {
-        if (chinese == null || chinese.trim().isEmpty()) {
-            return null;
-        }
-        String curItem = new String(chinese);
-        while (curItem.contains(" ")) {
-            curItem = curItem.replaceAll(" ", "");
-        }
-        String pinyinStr = "";
-        char[] newChar = curItem.toCharArray();
-        HanyuPinyinOutputFormat defaultFormat = new HanyuPinyinOutputFormat();
-        defaultFormat.setCaseType(HanyuPinyinCaseType.LOWERCASE);
-        defaultFormat.setToneType(HanyuPinyinToneType.WITHOUT_TONE);
-        for (int i = 0; i < newChar.length; i++) {
-            if (newChar[i] > 128) {
-                try {
-                    pinyinStr += "_" + PinyinHelper.toHanyuPinyinStringArray(newChar[i], defaultFormat)[0] + "_"; // [0] 标识当前拼音 汉-> han
-
-                } catch (BadHanyuPinyinOutputFormatCombination e) {
-                    e.printStackTrace();
-                }
-            } else {  // 汉字的编码是大于 128的 所以 小于 128编码的就直接认为是 ascii编码的
-                pinyinStr += newChar[i];
-            }
-        }
-        while (pinyinStr.contains("__")) {
-            pinyinStr = pinyinStr.replaceAll("__", "_");
-            System.out.println("pinyinStr1 = " + pinyinStr);
-        }
-
-        while (pinyinStr.contains("u:")) {  // 女转为 nu:   绿 lu:   需要转为 nv  lv
-            pinyinStr = pinyinStr.replaceAll("u:", "v");
-            System.out.println("pinyinStr1 = " + pinyinStr);
-        }
-
-        while (pinyinStr.startsWith("_")) {
-            pinyinStr = pinyinStr.substring(1, pinyinStr.length());
-            System.out.println("pinyinStr2 = " + pinyinStr);
-        }
-        while (pinyinStr.endsWith("_")) {
-            pinyinStr = pinyinStr.substring(0, pinyinStr.length() - 1);
-            System.out.println("pinyinStr3 = " + pinyinStr);
-        }
-        return pinyinStr;
-    }
-
-}
-
-
-```
-
-### A0_把当前井号与资源一一对齐
-```
-#### 半岛铁盒
-#### 最后的战役
-#### 可爱女人
-<audiocontrols><sourcesrc="https://raw.githubusercontent.com/ZukGit/Z_Music/master/music/chinese/zhou_jie_lun/ke_ai_nv_ren.mp3"type="audio/mpeg"/></audio>
-<audiocontrols><sourcesrc="https://raw.githubusercontent.com/ZukGit/Z_Music/master/music/chinese/zhou_jie_lun/ban_dao_tie_he.mp3"type="audio/mpeg"/></audio>
-<audiocontrols><sourcesrc="https://raw.githubusercontent.com/ZukGit/Z_Music/master/music/chinese/zhou_jie_lun/zui_hou_de_zhan_yi.mp3"type="audio/mpeg"/></audio>
-
-转为
-
-#### 半岛铁盒
-<audiocontrols><sourcesrc="https://raw.githubusercontent.com/ZukGit/Z_Music/master/music/chinese/zhou_jie_lun/ban_dao_tie_he.mp3"type="audio/mpeg"/></audio>
-#### 最后的战役
-<audiocontrols><sourcesrc="https://raw.githubusercontent.com/ZukGit/Z_Music/master/music/chinese/zhou_jie_lun/zui_hou_de_zhan_yi.mp3"type="audio/mpeg"/></audio>
-#### 可爱女人
-<audiocontrols><sourcesrc="https://raw.githubusercontent.com/ZukGit/Z_Music/master/music/chinese/zhou_jie_lun/ke_ai_nv_ren.mp3"type="audio/mpeg"/></audio>
-
-================================
-
-#### ban_dao_tie_he
-#### zui_hou_de_zhan_yi
-#### ke_ai_nv_ren
-<audiocontrols><sourcesrc="https://raw.githubusercontent.com/ZukGit/Z_Music/master/music/chinese/zhou_jie_lun/ban_dao_tie_he.mp3"type="audio/mpeg"/></audio>
-<audiocontrols><sourcesrc="https://raw.githubusercontent.com/ZukGit/Z_Music/master/music/chinese/zhou_jie_lun/zui_hou_de_zhan_yi.mp3"type="audio/mpeg"/></audio>
-<audiocontrols><sourcesrc="https://raw.githubusercontent.com/ZukGit/Z_Music/master/music/chinese/zhou_jie_lun/ke_ai_nv_ren.mp3"type="audio/mpeg"/></audio>
-
-
-转为
-
-#### ban_dao_tie_he
-<audiocontrols><sourcesrc="https://raw.githubusercontent.com/ZukGit/Z_Music/master/music/chinese/zhou_jie_lun/ban_dao_tie_he.mp3"type="audio/mpeg"/></audio>
-#### zui_hou_de_zhan_yi
-<audiocontrols><sourcesrc="https://raw.githubusercontent.com/ZukGit/Z_Music/master/music/chinese/zhou_jie_lun/zui_hou_de_zhan_yi.mp3"type="audio/mpeg"/></audio>
-#### ke_ai_nv_ren
-<audiocontrols><sourcesrc="https://raw.githubusercontent.com/ZukGit/Z_Music/master/music/chinese/zhou_jie_lun/ke_ai_nv_ren.mp3"type="audio/mpeg"/></audio>
-
-
-
-```
-
-#### A0.vbs
-```
-Set args = WScript.Arguments
-If args.Count = 2 Then
-
-zbinpath= WScript.Arguments(0)
-textpath= WScript.Arguments(1)
-
-command = "cmd /c "+ zbinpath +"\A0.bat  " +zbinpath+"\  "+textpath
-DIM objShell
-set objShell=wscript.createObject("wscript.shell")
-iReturn=objShell.Run(command, 0, TRUE)
-WScript.Echo("Please Refresh!")
-End If
-
-
-
-```
-
-#### A0.bat
-```
-@echo off
-@cd %1
-@javac  -cp A0_pinyin4j.jar -encoding UTF-8  A0.java 
-@java -cp .;A0_pinyin4j.jar A0 %2
-@exit
-
-
-```
-
-#### A0_pinyin4j.jar
-
-
-#### A0.java
-```
-
-import net.sourceforge.pinyin4j.PinyinHelper;
-import net.sourceforge.pinyin4j.format.HanyuPinyinCaseType;
-import net.sourceforge.pinyin4j.format.HanyuPinyinOutputFormat;
-import net.sourceforge.pinyin4j.format.HanyuPinyinToneType;
-import net.sourceforge.pinyin4j.format.exception.BadHanyuPinyinOutputFormatCombination;
-
-import java.io.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-/**
- * 汉字转换为拼音
- *
- * @author Red
- */
-public class A0 {
-    public static final ArrayList<String> stringArrTitleOrigin = new ArrayList<>();
-    public static final ArrayList<String> stringArrSource = new ArrayList<>();
-    public static final ArrayList<String> missLineArr = new ArrayList<>();
-    public static final ArrayList<String> stringArrTitleEnglish = new ArrayList<>();
-    public static final ArrayList<String> StringArr = new ArrayList<>();
-    private static String REGEX_CHINESE = "[\u4e00-\u9fa5]";
-    public static final Map<String,String> english2originMap = new HashMap<String,String>();
-    /*
-    1.读取文件 中 包含 # 号的那些行  放入 stringArrTitleOrigin( 可能包含汉字 ) ,
-      把 stringArrTitleOrigin 中的中文转为拼音 放入到 stringArrTitleEnglish  建立对应关系
-    2.读取# 号中 不包含 # 号的 那些行  放入  stringArrSource
-    3.循环 stringArrTitleEnglish 中的关键词 , 在  stringArrSource 中找到 匹配项
-      找到的话 就加入 按顺序  title 加入到 StringArr ， source 加入到 StringArr
-     4. 最后打印这个 StringArr
-     5. 打印没有匹配到的那些项
-        */
-    public static void main(String[] args) {
-
-        //System.out.println(ToFirstChar("ABC  汉字转换为拼音CBA").toUpperCase()); //转为首字母大写
-        // System.out.println(ToPinyinWithLine("A周 B杰 C伦"));
-        // System.out.println(ToPinyinWithLine("ABC汉字转换为拼音CBA"));
-
-        //===============real-test begin===============
-        String mFilePath = null;
-        if (args.length >= 1) {
-            mFilePath = args[0];
-        } else {
-            System.out.println("input argument is empty ! retry input again!");
-            return;
-        }
-        //===============real-test end===============
-
-
-        //===============local-test begin===============
-        //      String mFilePath = System.getProperty("user.dir") + File.separator + "in.txt";
-//        String preString = "<audio> <source src=\"";
-//        String endString = "\" /><audio>";
-        //===============local-test end===============
-
-
-        File curFile;
-        if (mFilePath != null && !mFilePath.isEmpty() && (curFile = new File(mFilePath)).exists()) {
-            System.out.println("input argument success ! ");
-        } else {
-            System.out.println("input argument is invalid ! retry input again!");
-            return;
-        }
-
-        if (curFile != null) {
-            fillOriginArr(curFile);   // 填充  stringArrTitleOrigin  和  stringArrSource
-            fillTitleEnglish();   //  填充 stringArrTitleEnglish
-            matchTitleAndSource();
-            findMissMatch();
-            if(missLineArr.size() > 0){
-                missLineArr.add(0,"未匹配项如下: ");
-                StringArr.addAll(missLineArr);
-            }
-            try {
-
-                BufferedWriter curBW = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(mFilePath)), "utf-8"));
-
-                for (int i = 0; i < StringArr.size(); i++) {
-                    curBW.write(StringArr.get(i));
-                    curBW.newLine();
-                }
-                curBW.close();
-                System.out.println("OK !");
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        } else {
-            System.out.println("Failed !");
-        }
-    }
-
-
-
-    public static void findMissMatch() {
-
-//        public static final ArrayList<String> stringArrTitleOrigin = new ArrayList<>();
-//        public static final ArrayList<String> stringArrSource = new ArrayList<>();
-//        public static final ArrayList<String>  StringArr = new ArrayList<>();
-        ArrayList<String> allLine = new ArrayList<>();
-        allLine.addAll(stringArrTitleOrigin);
-        allLine.addAll(stringArrSource);
-        for (String item: allLine){
-             if(!StringArr.contains(item.trim())){
-                 missLineArr.add(item);
-             }
-        }
-    }
-
-
-    public static void matchTitleAndSource() {
-        if(stringArrTitleEnglish.size() > 0 && stringArrSource.size() > 0){
-
-            for (String item1: stringArrTitleEnglish){
-                        for(String item2: stringArrSource){
-                            if(item2.contains(item1)){
-                                StringArr.add(english2originMap.get(item1).trim());
-                                StringArr.add(item2.trim());
-                            }
-
-                        }
-
-            }
-        }
-    }
-
-    //  填充 stringArrTitleEnglish and  english2originMap
-    public static void fillTitleEnglish() {
-        if (stringArrTitleOrigin.size() > 0) {
-            for (String item : stringArrTitleOrigin) {
-                if (isContainChinese(item)) {
-                    String str = fixChineseLine(item);
-                    if (str != null && !str.trim().isEmpty()) {
-                        stringArrTitleEnglish.add(str);
-                        english2originMap.put(str,item);
-                    }
-                } else {
-                    String str = fixLine(item);
-                    if (str != null && !str.trim().isEmpty()) {
-                        stringArrTitleEnglish.add(str);
-                        english2originMap.put(str,item);
-                    }
-                }
-            }
-        }
-    }
-
-    public static String fixChineseLine(String str) {
-        if (str == null || str.trim().isEmpty()) {
-            return null;
-        }
-        String curItem = new String(str);
-
-        while (curItem.contains("#")) {
-            curItem = curItem.replaceAll("#", "").trim();
-        }
-        while (isContainChinese(curItem)) {
-            curItem = ToPinyinWithLine(curItem);
-        }
-
-        return curItem;
-    }
-
-    public static String fixLine(String str) {
-        if (str == null || str.trim().isEmpty()) {
-            return null;
-        }
-        String curItem = new String(str);
-
-        while (curItem.contains("#")) {
-            curItem = curItem.replaceAll("#", "").trim();
-        }
-        return curItem;
-    }
-
-    public static boolean isContainChinese(String str) {
-        Pattern p = Pattern.compile(REGEX_CHINESE);
-        Matcher m = p.matcher(str);
-        if (m.find()) {
-            return true;
-        }
-        return false;
-    }
-
-
-    // 填充  stringArrTitleOrigin  和  stringArrSource
-    public static void fillOriginArr(File curFile) {
-        try {
-            BufferedReader curBR = new BufferedReader(new InputStreamReader(new FileInputStream(curFile), "utf-8"));
-            String oldOneLine = "";
-            String newOneLine = "";
-
-            while (oldOneLine != null) {
-
-                oldOneLine = curBR.readLine();
-                if (oldOneLine == null || oldOneLine.trim().isEmpty()) {
-                    continue;
-                }
-
-                newOneLine = new String(oldOneLine);
-                if (newOneLine.contains("#")) {
-                    stringArrTitleOrigin.add(newOneLine);
-                } else {
-                    stringArrSource.add(newOneLine);
-                }
-            }
-            curBR.close();
-        } catch (Exception e) {
-
-        }
-
-    }
-
-    /**
-     * 获取字符串拼音的第一个字母
-     *
-     * @param chinese
-     * @return
-     */
-    public static String ToFirstChar(String chinese) {
-        String pinyinStr = "";
-        char[] newChar = chinese.toCharArray();  //转为单个字符
-        HanyuPinyinOutputFormat defaultFormat = new HanyuPinyinOutputFormat();
-        defaultFormat.setCaseType(HanyuPinyinCaseType.LOWERCASE);
-        defaultFormat.setToneType(HanyuPinyinToneType.WITHOUT_TONE);
-        for (int i = 0; i < newChar.length; i++) {
-            if (newChar[i] > 128) {
-                try {
-                    pinyinStr += PinyinHelper.toHanyuPinyinStringArray(newChar[i], defaultFormat)[0].charAt(0);  // charAt(0)
-                } catch (BadHanyuPinyinOutputFormatCombination e) {
-                    e.printStackTrace();
-                }
-            } else {
-                pinyinStr += newChar[i];
-            }
-        }
-        return pinyinStr;
-    }
-
-    /**
-     * 汉字转为拼音
-     *
-     * @param chinese
-     * @return
-     */
-    public static String ToPinyin(String chinese) {
-        if (chinese == null || chinese.trim().isEmpty()) {
-            return null;
-        }
-        String curItem = new String(chinese);
-        while (curItem.contains(" ")) {
-            curItem = curItem.replaceAll(" ", "");
-        }
-        String pinyinStr = "";
-        char[] newChar = curItem.toCharArray();
-        HanyuPinyinOutputFormat defaultFormat = new HanyuPinyinOutputFormat();
-        defaultFormat.setCaseType(HanyuPinyinCaseType.LOWERCASE);
-        defaultFormat.setToneType(HanyuPinyinToneType.WITHOUT_TONE);
-        for (int i = 0; i < newChar.length; i++) {
-            if (newChar[i] > 128) {
-                try {
-                    pinyinStr += PinyinHelper.toHanyuPinyinStringArray(newChar[i], defaultFormat)[0]; // [0] 标识当前拼音 汉-> han
-                } catch (BadHanyuPinyinOutputFormatCombination e) {
-                    e.printStackTrace();
-                }
-            } else {  // 汉字的编码是大于 128的 所以 小于 128编码的就直接认为是 ascii编码的
-                pinyinStr += newChar[i];
-            }
-        }
-        return pinyinStr;
-    }
-
-
-    /**
-     * 汉字转为拼音 空间以下划线_分割
-     * 1.每个汉字前面添加_
-     * 2.每个汉字后面添加_
-     * 3.把所有的两个__ 下划线转为 一个下划线
-     *
-     * @param chinese
-     * @return
-     */
-    public static String ToPinyinWithLine(String chinese) {
-        if (chinese == null || chinese.trim().isEmpty()) {
-            return null;
-        }
-        String curItem = new String(chinese);
-        while (curItem.contains(" ")) {
-            curItem = curItem.replaceAll(" ", "");
-        }
-        String pinyinStr = "";
-        char[] newChar = curItem.toCharArray();
-        HanyuPinyinOutputFormat defaultFormat = new HanyuPinyinOutputFormat();
-        defaultFormat.setCaseType(HanyuPinyinCaseType.LOWERCASE);
-        defaultFormat.setToneType(HanyuPinyinToneType.WITHOUT_TONE);
-        for (int i = 0; i < newChar.length; i++) {
-            if (newChar[i] > 128) {
-                try {
-                    pinyinStr += "_" + PinyinHelper.toHanyuPinyinStringArray(newChar[i], defaultFormat)[0] + "_"; // [0] 标识当前拼音 汉-> han
-
-                } catch (BadHanyuPinyinOutputFormatCombination e) {
-                    e.printStackTrace();
-                }
-            } else {  // 汉字的编码是大于 128的 所以 小于 128编码的就直接认为是 ascii编码的
-                pinyinStr += newChar[i];
-            }
-        }
-        while (pinyinStr.contains("__")) {
-            pinyinStr = pinyinStr.replaceAll("__", "_");
-            System.out.println("pinyinStr1 = " + pinyinStr);
-        }
-		
-        while (pinyinStr.contains("u:")) {  // 女转为 nu:   绿 lu:   需要转为 nv  lv
-            pinyinStr = pinyinStr.replaceAll("u:", "v");
-            System.out.println("pinyinStr1 = " + pinyinStr);
-        }
-		
-        while (pinyinStr.startsWith("_")) {
-            pinyinStr = pinyinStr.substring(1, pinyinStr.length());
-            System.out.println("pinyinStr2 = " + pinyinStr);
-        }
-        while (pinyinStr.endsWith("_")) {
-            pinyinStr = pinyinStr.substring(0, pinyinStr.length() - 1);
-            System.out.println("pinyinStr3 = " + pinyinStr);
-        }
-        return pinyinStr;
-    }
-
-}
-
-
-
-```
 
 
 
@@ -2422,9 +705,10 @@ cmd /K cd /d %userprofile%\Desktop\zbin & %userprofile%\Desktop\zbin\B4_push.bat
 
 ```
 
-### B5_对时间进行统计 记录每个人剩余时间
+### B5_对时间进行统计 记录每个人剩余时间 B5.html界面
 ```
-
+B5.html 页面
+https://zukgit.github.io/ZHtml/
 
 ```
 
@@ -2439,6 +723,57 @@ cmd /K cd /d %userprofile%\Desktop\zbin & %userprofile%\Desktop\zbin\B6.bat %use
 
 ```
 
+### B7_安卓批量安装_批量删除_批量备份_拍照脚本
+```
+B7_AutoBankupAPK.bat
+B7_AutoInstallAndroidAPK.bat
+B7_UninstallAndroidAPK.bat
+B7_zTakeScreenShot.bat
+
+
+```
+
+
+### B8_安卓打印Log脚本
+```
+B8.bat                     //WIndows  本地执行脚本
+B8.java                    //  持续添加ZMethod
+B8_Test.java                       // 测试文件
+B8_android.sh*             // AOSP 根目录执行脚本
+B8_javaparser.jar
+B8_local.sh                // 本地Linux执行脚本
+
+
+```
+
+
+### B9_立体视图幻灯片 HTML
+```
+B9_gif.html
+B9_jpg.html
+
+```
+
+### C0_加密解密文件
+```
+C0_Encryption/JIEMA
+C0_Encryption/YAMA
+```
+
+### C1_Windows下一些脚本工具
+```
+
+
+```
+
+
+### C2_对Java多行字符串转为一行(当需要把方法转为字符串时)
+```
+Wscript.exe  /x %userprofile%\Desktop\zbin\C2.vbs  %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH)  
+cmd /K cd /d %userprofile%\Desktop\zbin & %userprofile%\Desktop\zbin\C2.bat %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH)  
+
+
+```
 
 # F5_命令小集合
 ```
