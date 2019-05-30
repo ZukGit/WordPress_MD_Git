@@ -41,7 +41,7 @@ static {
     String mZAndroidAPPClass_Path = curProjectPath+"/packages/apps/Settings/src/com/android/settings/wifi/WifiEnabler.java";
     ZAndroidAPPClass mZAndroidAPPClass = new ZAndroidAPPClass(mZAndroidAPPClass_Path);
     ArrayList<ZMethod> methodList = new  ArrayList<ZMethod>();
-    //boolean  onSwitchToggled(boolean isChecked , int int1 , String str1 , ArrayList<String> strArr , String[] strArr1 )
+    //boolean  onSwitchToggled(boolean isChecked)
     methodList.add(new ZMethod(mZAndroidAPPClass,"boolean","onSwitchToggled","boolean isChecked "));
     mZAndroidAPPClass.addZMethod(methodList);
     ZClassList.add(mZAndroidAPPClass);
@@ -88,6 +88,18 @@ static {
 //=================================================== FrameworkClass Begin =================================================
 // ##/frameworks/base/core
 //↓↓↓↓↓↓↓↓↓↓↓↓↓↓ /frameworks/base/core Begin ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
+
+/*
+static {
+    String mZFrameworkClass_Path = curProjectPath+"/packages/apps/Settings/src/com/android/settings/wifi/WifiEnabler.java";
+    ZAndroidFrameworkClass mFrameworkClass = new ZAndroidFrameworkClass(mZFrameworkClass_Path);
+    ArrayList<ZMethod> methodList = new  ArrayList<ZMethod>();
+    //boolean  onSwitchToggled(boolean isChecked)
+    methodList.add(new ZMethod(mFrameworkClass,"boolean","onSwitchToggled","boolean isChecked "));
+    mFrameworkClass.addZMethod(methodList);
+    ZClassList.add(mFrameworkClass);
+}
+*/
 //↑ ↑↑↑↑↑↑↑↑↑↑↑↑/frameworks/base/core  End ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
 //=================================================== FrameworkClass End ===================================================
 
