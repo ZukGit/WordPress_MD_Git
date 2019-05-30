@@ -13,129 +13,83 @@ import java.util.*;
 import java.util.concurrent.*;
 
 public class B8 {
-
-
     static ArrayList<ZClass> ZClassList = new  ArrayList<ZClass>();
     static String curProjectPath  = System.getProperty("user.dir");
-
     static String TAG = "zukgit";
 
 
-    static {    //   测试使用
+//=================================================== IDEClass Begin =================================================
+/*    static {    //   测试使用
         String zClassName = curProjectPath+"/B8_Test.java";
-        //  String ZAndroidAPPClass_WifiEnabler_java_path = curProjectPath+"/packages/apps/Settings/src/com/android/settings/wifi/WifiEnabler.java";
         ZIDEClass zClassObject = new ZIDEClass(zClassName);
         ArrayList<ZMethod> methodList = new  ArrayList<ZMethod>();
-        // 多个参数  逗号前有值   逗号后为空格
         methodList.add(new ZMethod(zClassObject,"void","method1","int value"));
         methodList.add(new ZMethod(zClassObject,"void","method2","int[] value"));
         methodList.add(new ZMethod(zClassObject,"void","method3","String[]  strArr"));
         methodList.add(new ZMethod(zClassObject,"void","method4","ArrayList<Date> dateList"));
         methodList.add(new ZMethod(zClassObject,"void","method5","Map<String,String> stringMap"));
-
         zClassObject.addZMethod(methodList);
         ZClassList.add(zClassObject);
-    }
-
-
-    static {  // packages/apps/Settings/src/com/android/settings/wifi/WifiEnabler.java
-     //  String ZAndroidAPPClass_WifiEnabler_java_path = curProjectPath+"/WifiEnabler.java";
-       String ZAndroidAPPClass_WifiEnabler_java_path = curProjectPath+"/packages/apps/Settings/src/com/android/settings/wifi/WifiEnabler.java";
-       ZAndroidAPPClass WifiEnabler_java = new ZAndroidAPPClass(ZAndroidAPPClass_WifiEnabler_java_path);
-       ArrayList<ZMethod> methodList = new  ArrayList<ZMethod>();
-       // 多个参数  逗号前有值   逗号后为空格
-       //boolean  onSwitchToggled(boolean isChecked , int int1 , String str1 , ArrayList<String> strArr , String[] strArr1 )
-       methodList.add(new ZMethod(WifiEnabler_java,"boolean","onSwitchToggled","boolean isChecked "));
-
-       WifiEnabler_java.addZMethod(methodList);
-       ZClassList.add(WifiEnabler_java);
-    }
-
-
-
-    static {  // packages/apps/Settings/src/com/android/settings/wifi/WifiConfigInfo.java
-     //  String ZAndroidAPPClass_WifiEnabler_java_path = curProjectPath+"/WifiConfigInfo.java";
-       String ZAndroidAPPClass_WifiEnabler_java_path = curProjectPath+"/packages/apps/Settings/src/com/android/settings/wifi/WifiConfigInfo.java";
-       ZAndroidAPPClass WifiEnabler_java = new ZAndroidAPPClass(ZAndroidAPPClass_WifiEnabler_java_path);
-       ArrayList<ZMethod> methodList = new  ArrayList<ZMethod>();
-       // void onResume()    void onCreate(Bundle savedInstanceState) 
-       methodList.add(new ZMethod(WifiEnabler_java,"void","onResume"," "));
-       methodList.add(new ZMethod(WifiEnabler_java,"void","onCreate"," Bundle savedInstanceState "));
-       WifiEnabler_java.addZMethod(methodList);
-       ZClassList.add(WifiEnabler_java);
-    }
-
-
-
-
-
-   
-   static {
-      // String ZAndroidAPPClass_WifiEnabler_java_path = curProjectPath+"/WifiSettings.java";
-       String ZAndroidAPPClass_WifiEnabler_java_path = curProjectPath+"/packages/apps/Settings/src/com/android/settings/wifi/WifiSettings.java";
-       ZAndroidAPPClass WifiEnabler_java = new ZAndroidAPPClass(ZAndroidAPPClass_WifiEnabler_java_path);
-       ArrayList<ZMethod> methodList = new  ArrayList<ZMethod>();
-       // 多个参数  逗号前有值   逗号后为空格
-	   // void showDialog(AccessPoint accessPoint, int dialogMode)
-       methodList.add(new ZMethod(WifiEnabler_java,"void","showDialog","AccessPoint accessPoint, int dialogMode"));
-	 methodList.add(new ZMethod(WifiEnabler_java,"boolean","onPreferenceTreeClick","Preference preference "));
-	 // void onWifiStateChanged(int state)
-	 methodList.add(new ZMethod(WifiEnabler_java,"void","onWifiStateChanged","int state "));
-
-// boolean onPreferenceTreeClick(Preference preference)
-// void updateAccessPointsDelayed() 
-	 methodList.add(new ZMethod(WifiEnabler_java,"void","updateAccessPointsDelayed"," "));
-
-//  Dialog onCreateDialog(int dialogId)
-	 methodList.add(new ZMethod(WifiEnabler_java,"Dialog","onCreateDialog"," int dialogId "));
-
-       WifiEnabler_java.addZMethod(methodList);
-       ZClassList.add(WifiEnabler_java);
-    }
-	
-
-/*    static {
-        String ZAndroidAPPClass_WifiEnabler_java_path = curProjectPath+"/WifiStateMachine.java";
-        //  String ZAndroidAPPClass_WifiEnabler_java_path = curProjectPath+"/packages/apps/Settings/src/com/android/settings/wifi/WifiEnabler.java";
-        ZAndroidFrameworkClass WifiEnabler_java = new ZAndroidFrameworkClass(ZAndroidAPPClass_WifiEnabler_java_path);
-        ArrayList<ZMethod> methodList = new  ArrayList<ZMethod>();
-        // 多个参数  逗号前有值   逗号后为空格
-// boolean setRandomMacOui()
-methodList.add(new ZMethod(WifiEnabler_java,"boolean","setRandomMacOui",""));
-
-// boolean connectToUserSelectNetwork(int netId, int uid, boolean forceReconnect)
-methodList.add(new ZMethod(WifiEnabler_java,"boolean","connectToUserSelectNetwork","int netId, int uid, boolean forceReconnect"));
-
-// int lookupFrameworkNetworkId(int supplicantNetworkId)
- methodList.add(new ZMethod(WifiEnabler_java,"int","lookupFrameworkNetworkId","int supplicantNetworkId"));
-// boolean setEnableAutoJoinWhenAssociated(boolean enabled)
-methodList.add(new ZMethod(WifiEnabler_java,"boolean","setEnableAutoJoinWhenAssociated","boolean enabled"));
-//  void enableVerboseLogging(int verbose)
-methodList.add(new ZMethod(WifiEnabler_java,"void","enableVerboseLogging","int verbose"));
-//  void setSupplicantLogLevel()
-methodList.add(new ZMethod(WifiEnabler_java,"void","setSupplicantLogLevel",""));
-        WifiEnabler_java.addZMethod(methodList);
-        ZClassList.add(WifiEnabler_java);
     }*/
+//=================================================== IDEClass End =================================================
+
+//=================================================== APPClass Begin =================================================
+
+// ##/packages/apps/Settings
+//↓↓↓↓↓↓↓↓↓↓↓↓↓↓ /packages/apps/Settings Begin ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
+static {
+    String mZAndroidAPPClass_Path = curProjectPath+"/packages/apps/Settings/src/com/android/settings/wifi/WifiEnabler.java";
+    ZAndroidAPPClass mZAndroidAPPClass = new ZAndroidAPPClass(mZAndroidAPPClass_Path);
+    ArrayList<ZMethod> methodList = new  ArrayList<ZMethod>();
+    //boolean  onSwitchToggled(boolean isChecked , int int1 , String str1 , ArrayList<String> strArr , String[] strArr1 )
+    methodList.add(new ZMethod(mZAndroidAPPClass,"boolean","onSwitchToggled","boolean isChecked "));
+    mZAndroidAPPClass.addZMethod(methodList);
+    ZClassList.add(mZAndroidAPPClass);
+}
+
+static {
+	String mZAndroidAPPClass_Path = curProjectPath+"/packages/apps/Settings/src/com/android/settings/wifi/WifiConfigInfo.java";
+	ZAndroidAPPClass mZAndroidAPPClass = new ZAndroidAPPClass(mZAndroidAPPClass_Path);
+	ArrayList<ZMethod> methodList = new  ArrayList<ZMethod>();
+	// void onResume()     void onCreate(Bundle savedInstanceState)
+	methodList.add(new ZMethod(mZAndroidAPPClass,"void","onResume"," "));
+	methodList.add(new ZMethod(mZAndroidAPPClass,"void","onCreate"," Bundle savedInstanceState "));
+	mZAndroidAPPClass.addZMethod(methodList);
+	ZClassList.add(mZAndroidAPPClass);
+}
+
+
+static {
+	String mZAndroidAPPClass_Path = curProjectPath+"/packages/apps/Settings/src/com/android/settings/wifi/WifiSettings.java";
+	ZAndroidAPPClass mZAndroidAPPClass = new ZAndroidAPPClass(mZAndroidAPPClass_Path);
+	ArrayList<ZMethod> methodList = new  ArrayList<ZMethod>();
+	// void showDialog(AccessPoint accessPoint, int dialogMode)
+	methodList.add(new ZMethod(mZAndroidAPPClass,"void","showDialog","AccessPoint accessPoint, int dialogMode"));
+   // boolean onPreferenceTreeClick(Preference preference)
+	methodList.add(new ZMethod(mZAndroidAPPClass,"boolean","onPreferenceTreeClick","Preference preference "));
+	// void onWifiStateChanged(int state)
+	methodList.add(new ZMethod(mZAndroidAPPClass,"void","onWifiStateChanged","int state "));
+	// void updateAccessPointsDelayed()
+	methodList.add(new ZMethod(mZAndroidAPPClass,"void","updateAccessPointsDelayed"," "));
+	//  Dialog onCreateDialog(int dialogId)
+	methodList.add(new ZMethod(mZAndroidAPPClass,"Dialog","onCreateDialog"," int dialogId "));
+	mZAndroidAPPClass.addZMethod(methodList);
+	ZClassList.add(mZAndroidAPPClass);
+}
+
+
+//↑ ↑↑↑↑↑↑↑↑↑↑↑↑/packages/apps/Settings End ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
+
+
+//=================================================== APPClass End ===================================================
 
 
 
-
-
-
-
-//    static {  // Main.java
-//
-//        String zIDEClass_Main = curProjectPath+"/Main.java";
-//        ZIDEClass WifiEnabler_java = new ZIDEClass(zIDEClass_Main);
-//        ArrayList<ZMethod> methodList = new  ArrayList<ZMethod>();
-//        //void main(String[] args)
-//        methodList.add(new ZMethod(WifiEnabler_java,"void","main","String[] args"));
-//
-//        WifiEnabler_java.addZMethod(methodList);
-//        ZClassList.add(WifiEnabler_java);
-//    }
-
+//=================================================== FrameworkClass Begin =================================================
+// ##/frameworks/base/core
+//↓↓↓↓↓↓↓↓↓↓↓↓↓↓ /frameworks/base/core Begin ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
+//↑ ↑↑↑↑↑↑↑↑↑↑↑↑/frameworks/base/core  End ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
+//=================================================== FrameworkClass End ===================================================
 
     public static void main(String[] args) throws IOException {
         int classSize =  ZClassList.size();
@@ -182,7 +136,7 @@ methodList.add(new ZMethod(WifiEnabler_java,"void","setSupplicantLogLevel",""));
 
 
     }
-    //class ZMethod
+//class ZMethod
 //class ZClass
 //class ZProcess
 //  1. 方法包含在类中    类包含在流程中
@@ -363,14 +317,21 @@ methodList.add(new ZMethod(WifiEnabler_java,"void","setSupplicantLogLevel",""));
             }
             System.out.println("=========== originClassContent ==========\n"+this.originClassContent);
             originClassCode = new String(this.originClassContent);
-            newClassCode = new String(originClassCode);
+
+            if(originClassCode.contains("zukgit")){
+                System.out.println(" 该类已经添加了Log 不再添加Log的打印方法 MetodPrint!");
+                this.alreadyAddPrintMethod = true;
+
+            }
+
+                newClassCode = new String(originClassCode);
             int mMethodIndex = 1;
             for (ZMethod  zmethod:this.zmethodList) {
-           System.out.println("  当前解析Method: = "+ zmethod.methodName);
+                System.out.println("  当前解析Method: = "+ zmethod.methodName);
                 //  curClassCode.replaceAll(zmethod.originCodeString,)
                 int allNodeSize = zmethod.checkAllNode(zmethod.methodDeclaration);   //  获取总共Method 中多少个结点
                 if(allNodeSize == 0){
-                 continue;
+                    continue;
                 }
 
                 int expressNodeSize =  zmethod.expressNodeList.size();    //  每个表达式 前面 添加一些 log 以此 来观察 程序 运行
@@ -440,12 +401,12 @@ methodList.add(new ZMethod(WifiEnabler_java,"void","setSupplicantLogLevel",""));
                 }
 
 
-          
-if(addBlankOriginCodeString.startsWith("@Override")){
-addBlankOriginCodeString="    "+addBlankOriginCodeString;
-}
-   addBlankOriginCodeString = addBlankOriginCodeString.replace("    * ","* ");
-   addBlankOriginCodeString = addBlankOriginCodeString.replace("    */","*/");
+
+                if(addBlankOriginCodeString.startsWith("@Override")){
+                    addBlankOriginCodeString="    "+addBlankOriginCodeString;
+                }
+                addBlankOriginCodeString = addBlankOriginCodeString.replace("    * ","* ");
+                addBlankOriginCodeString = addBlankOriginCodeString.replace("    */","*/");
 
 
                 for (int i = 0; i < zmethod.buildIndexLogList.size() ; i++) {
@@ -454,17 +415,50 @@ addBlankOriginCodeString="    "+addBlankOriginCodeString;
                 }
 
                 newMethodCode = zmethod.fixnewMethodCode(newMethodCode); // 把  this_is_indexLog_index=0  依次设置序号
-            // System.out.println("=============   newMethodCode  Begin=============="); 
-           //  System.out.println(newMethodCode); 
-           //  System.out.println("=============   newMethodCode  End=============="); 
-           //  System.out.println("=============   newClassCode  Begin=============="); 
+                // System.out.println("=============   newMethodCode  Begin==============");
+                //  System.out.println(newMethodCode);
+                //  System.out.println("=============   newMethodCode  End==============");
+                //  System.out.println("=============   newClassCode  Begin==============");
 
                 newClassCode = newClassCode.replace(addBlankOriginCodeString,newMethodCode) ; // 构建新类文件内容
-            // System.out.println(newClassCode); 
-           //  System.out.println("=============   newClassCode  End=============="); 
-          //   System.out.println("=============   addBlankOriginCodeString  Begin=============="); 
-          //  System.out.println(addBlankOriginCodeString); 
-           //  System.out.println("=============   addBlankOriginCodeString  End=============="); 
+
+                if(!newClassCode.contains(newMethodCode)){
+                    System.out.println("第一次匹配失败 在 addBlankOriginCodeString 和 newClassCode中的方法 格式问题不对称");
+                    System.out.println("1.newClassCode 中的格式无法查询  需要查看Log ");
+                    System.out.println("2.当前去匹配去适应的method字符串是:\n"+ addBlankOriginCodeString);
+
+                    String classCodeTemplate = "class ZTemplate {"+ addBlankOriginCodeString+" }";
+
+                    CompilationUnit compileUtil = JavaParser.parse(classCodeTemplate);
+
+                    String strCode1 = compileUtil.toString();
+                    //System.out.println(strCode1);
+                    String sreCode2 = strCode1.substring("class ZTemplate {".length());
+                    String strCode3 = sreCode2.substring(0,sreCode2.lastIndexOf("}"));
+                    String firstCode = "";
+                    firstCode= strCode3.substring(0,1);
+                //    System.out.println("firstCode1 = "+ firstCode);
+                    while(!strCode3.startsWith(" ")){
+                        firstCode= strCode3.substring(0,1);
+                        System.out.println("firstCode2 = "+ firstCode);
+                        strCode3 = strCode3.substring(1);
+                    }
+                    if(newClassCode.contains(strCode3)){
+                        System.out.println("第二次匹配成功 在 strCode3 和 newClassCode中的方法 格式问题对称");
+                        newClassCode = newClassCode.replace(strCode3,newMethodCode) ;
+
+                    }else{
+                        System.out.println("第二次匹配失败 在 strCode3 和 newClassCode中的方法 格式问题不对称");
+                    }
+                }else{
+                    System.out.println("第一次匹配成功 在 addBlankOriginCodeString 和 newClassCode中的方法 格式对称");
+
+                }
+                // System.out.println(newClassCode);
+                //  System.out.println("=============   newClassCode  End==============");
+                //   System.out.println("=============   addBlankOriginCodeString  Begin==============");
+                //  System.out.println(addBlankOriginCodeString);
+                //  System.out.println("=============   addBlankOriginCodeString  End==============");
                 newMethodCode = null;
             }
             System.out.println("！！！！！！！！！！  原始类的内容 :" + originClassCode);  // 构建新的方法的内容
@@ -479,7 +473,7 @@ addBlankOriginCodeString="    "+addBlankOriginCodeString;
 
         String GetRealPrintMethod(){
             String methodPrint = new String(COMMON_PRINT_METHOD);
-String holdStr = "ZukgitHoldPlace";
+            String holdStr = "ZukgitHoldPlace";
             String MethodStr = "";
             if(isIDEClass){
                 MethodStr ="System.out.println(";
@@ -491,7 +485,7 @@ String holdStr = "ZukgitHoldPlace";
                 MethodStr ="System.out.println(";
             }
 
-           String returnStr =  methodPrint.replaceAll(holdStr,MethodStr);
+            String returnStr =  methodPrint.replaceAll(holdStr,MethodStr);
 
 
 //            boolean isAPP;
@@ -702,14 +696,14 @@ String holdStr = "ZukgitHoldPlace";
         }
 
         int  checkAllNode(MethodDeclaration method){
-if(method == null){
-return 0;
-}
+            if(method == null){
+                return 0;
+            }
             int num = 0;
             List<Node> curList = method.getChildNodes();
-if(curList == null){
-return 0;
-}
+            if(curList == null){
+                return 0;
+            }
             num = curList.size();
             if(num == 0){
                 return 0;
