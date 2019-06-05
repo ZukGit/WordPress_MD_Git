@@ -70,6 +70,7 @@ mComplilationUtil.toString() ;  // 把指定Java文件的内容完全输出(并�
 ```
 
 ##### Optional<ModuleDeclaration>  mComplilationUtil.getModel()
+
 ```
 Optional<ModuleDeclaration>  mModule_opt =  mComplilationUtil.getModel();    // Optional 作用好像是标识 这个包含的<ModuleDeclaration> 可能不存在 通过 mModule_opt.isPrsent() 来判断
 
@@ -120,6 +121,7 @@ System.out.println("Hello-World!");
 
 
 ##### List<Node> mComplilationUtil.getChildNodes()
+
 ```
 List<Node> childNodeList =  mComplilationUtil.getChildNodes() ;    //   获取到当前ABT树的子节点(有点像根目录获取子文件)
 
@@ -128,6 +130,7 @@ List<Node> childNodeList =  mComplilationUtil.getChildNodes() ;    //   获取�
 ```
 
 ##### Optional<Node> mComplilationUtil.getParentNode()
+
 ```
 
 Optional<Node>  parantNode_opt =     mCompilationUnit.getParentNode();  //  获取父类的结点 如果获取不到 说明自己就是 RootNode
@@ -155,6 +158,7 @@ String nodeType = nodeSelf.getMetaModel().getType().getName().toString();
 
 
 ##### NodeList<TypeDeclaration<?>>  mComplilationUtil.getTypes()
+
 ```
 NodeList<TypeDeclaration<?>>  mComplilationUtil.getTypes()    //   获取当前ABT树的表达类型集合
 
@@ -168,6 +172,7 @@ mComplilationUtil.getType(0);    // 获取当前第一个子节点的声明表�
 ```
 
 #####  List<Comment> mComplilationUtil.getComments()
+
 ```
  List<Comment>  commentList =  mComplilationUtil.getComments();     //  获取当前Java解析中 注释  //   /**/ 的集合
 
@@ -175,6 +180,7 @@ mComplilationUtil.getType(0);    // 获取当前第一个子节点的声明表�
 ```
 
 #####  List<Comment> mComplilationUtil.getAllContainedComments()
+
 ```
  List<Comment>  commentList =  mComplilationUtil.getAllContainedComments();     //  获取当前类中包含的注释(包括类头注释)   不包括文件开头的说明注释
 
@@ -184,6 +190,7 @@ mComplilationUtil.getType(0);    // 获取当前第一个子节点的声明表�
 
 
 #####  List<ImportDeclaration> mComplilationUtil.getImports()
+
 ```
 
 List<ImportDeclaration> mImportDeclarationList = mComplilationUtil.getImports();    //  获取当前Java解析中 Import语句的集合
@@ -198,6 +205,7 @@ ImportDeclaration mFirstDeclarationList = mComplilationUtil.getImport(0);    // 
 
 
 ##### Optional<PackageDeclaration>  mComplilationUtil.getPackageDeclaration()
+
 ```
 
 Optional<PackageDeclaration>  package_opt =  mComplilationUtil.getPackageDeclaration()    //  获取当前Java中的包名
@@ -214,6 +222,7 @@ System.out.print("包名:"+ pckageDec.toString() );   //  得到包名
 
 
 ##### Optional<Range> mComplilationUtil.getRange()
+
 ```
 int beginLine =   mCompilationUnit.getRange().get().begin.line;
 int endLine =   mCompilationUnit.getRange().get().end.line;              // 获取文件行数
@@ -232,6 +241,7 @@ System.out.println("beginString = "+ beginString+"          endString = "+endStr
 
 
 ##### Optional<TokenRange> mComplilationUtil.getTokenRange()
+
 ```
 
 // 获取第一个AST结点的内容 对称符号{} /* */ 内容
