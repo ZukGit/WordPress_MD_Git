@@ -123,3 +123,29 @@ GOTO LOOP
 
 
 ```
+
+# 获取当前目录以及子目录所有文件文件名
+
+```
+dir /s /b > 1.txt
+
+
+1.txt
+C:\Users\aaa\Desktop\1.c
+C:\Users\aaa\Desktop\1.html
+C:\Users\aaa\Desktop\1.mp4
+C:\Users\aaa\Desktop\1.pdf
+C:\Users\aaa\Desktop\1.png
+C:\Users\aaa\Desktop\1.txt
+C:\Users\aaa\Desktop\10.txt
+C:\Users\aaa\Desktop\108.jpg
+C:\Users\aaa\Desktop\11
+.........
+C:\Users\aaa\Desktop\照片\thumb_1547376296382_flyme.jpg
+C:\Users\aaa\Desktop\照片\thumb_1547432018789_flyme.jpg
+C:\Users\aaa\Desktop\照片\thumb_1547432113340_flyme.jpg
+C:\Users\aaa\Desktop\照片\thumb_1547530656316_flyme.jpg
+
+
+```
+

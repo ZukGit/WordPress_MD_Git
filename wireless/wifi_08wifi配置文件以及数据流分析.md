@@ -1,4 +1,5 @@
 # /data/system/users/0/settings_system.xml
+
 ```
 adb pull /data/system/users/0/settings_system.xml
 adb push settings_system.xml /data/system/users/0/
@@ -52,6 +53,7 @@ adb push settings_system.xml /data/system/users/0/
 
 # /data/system/users/0/settings_secure.xml
 
+
 ```
 adb pull /data/system/users/0/settings_secure.xml
 adb push settings_secure.xml /data/system/users/0/
@@ -70,7 +72,7 @@ adb push settings_secure.xml /data/system/users/0/
   <setting id="79" name="default_input_method" value="com.google.android.inputmethod.latin/com.android.inputmethod.latin.LatinIME" package="android" defaultValue="com.google.android.inputmethod.latin/com.android.inputmethod.latin.LatinIME" defaultSysSet="true" />
   <setting id="25" name="sleep_timeout" value="-1" package="android" defaultValue="-1" defaultSysSet="true" />
   <setting id="93" name="location_providers_allowed" value="gps,network" package="com.google.android.gms" defaultValue="" defaultSysSet="true" />
-  <setting id="83" name="doze_enabled" value="2" package="com.motorola.motodisplay" />
+  <setting id="83" name="doze_enabled" value="2" package="com.rockrola.rockdisplay" />
   <setting id="24" name="lock_screen_allow_private_notifications" value="1" package="android" defaultValue="1" defaultSysSet="true" />
   <setting id="27" name="double_tap_to_wake" value="1" package="android" defaultValue="1" defaultSysSet="true" />
   <setting id="10" name="speak_password" value="1" package="android" defaultValue="1" defaultSysSet="true" />
@@ -108,7 +110,7 @@ adb push settings_secure.xml /data/system/users/0/
   <setting id="87" name="input_methods_subtype_history" value="com.google.android.inputmethod.latin/com.android.inputmethod.latin.LatinIME;-1" package="android" defaultValue="com.google.android.inputmethod.latin/com.android.inputmethod.latin.LatinIME;-1" defaultSysSet="true" />
   <setting id="1" name="mock_location" value="0" package="android" defaultValue="0" defaultSysSet="true" />
   <setting id="90" name="systemui.google.opa_enabled" value="0" package="com.android.systemui" defaultValue="0" defaultSysSet="true" />
-  <setting id="52" name="bluetooth_name" value="Moto Z3 Play" package="android" defaultValue="Moto Z3 Play" defaultSysSet="true" />
+  <setting id="52" name="bluetooth_name" value="IxxI" package="android" defaultValue="IxxI" defaultSysSet="true" />
   <setting id="34" name="autofill_service" value="com.google.android.gms/.autofill.service.AutofillService" package="android" defaultValue="com.google.android.gms/.autofill.service.AutofillService" defaultSysSet="true" />
   <setting id="65" name="sysui_keyguard_left" package="com.android.systemui" />
   <setting id="88" name="sync_parent_sounds" value="0" package="android" defaultValue="0" defaultSysSet="true" />
@@ -121,12 +123,12 @@ adb push settings_secure.xml /data/system/users/0/
   <setting id="67" name="icon_blacklist" package="com.android.systemui" />
   <setting id="26" name="android_id" value="c179193d5ff11435" package="android" defaultValue="c179193d5ff11435" defaultSysSet="true" />
   <setting id="9" name="touch_exploration_enabled" value="0" package="android" defaultValue="0" defaultSysSet="true" />
-  <setting id="97" name="sysui_qs_tiles" value="wifi,bt,dnd,flashlight,rotation,battery,cell,airplane,night,custom(com.motorola.ccc.ota/.env.SystemUpdateQSTile),cast,hotspot" package="com.android.systemui" defaultValue="wifi,bt,dnd,flashlight,rotation,battery,cell,airplane,night,custom(com.motorola.ccc.ota/.env.SystemUpdateQSTile),cast,hotspot" defaultSysSet="true" />
+  <setting id="97" name="sysui_qs_tiles" value="wifi,bt,dnd,flashlight,rotation,battery,cell,airplane,night,custom(com.rockrola.ccc.ota/.env.SystemUpdateQSTile),cast,hotspot" package="com.android.systemui" defaultValue="wifi,bt,dnd,flashlight,rotation,battery,cell,airplane,night,custom(com.rockrola.ccc.ota/.env.SystemUpdateQSTile),cast,hotspot" defaultSysSet="true" />
   <setting id="61" name="sysui_qqs_count" package="com.android.systemui" />
-  <setting id="48" name="enabled_notification_listeners" value="com.motorola.motodisplay/com.motorola.motodisplay.notification.DisplayNotifListenerService:com.motorola.launcher3/com.android.launcher3.notification.NotificationListener:com.google.android.apps.restore/com.google.android.apps.pixelmigrate.component.NotificationConsolidatorService" package="android" defaultValue="com.motorola.motodisplay/com.motorola.motodisplay.notification.DisplayNotifListenerService:com.motorola.launcher3/com.android.launcher3.notification.NotificationListener:com.google.android.apps.restore/com.google.android.apps.pixelmigrate.component.NotificationConsolidatorService" defaultSysSet="true" />
+  <setting id="48" name="enabled_notification_listeners" value="com.rockrola.rockdisplay/com.rockrola.rockdisplay.notification.DisplayNotifListenerService:com.rockrola.launcher3/com.android.launcher3.notification.NotificationListener:com.google.android.apps.restore/com.google.android.apps.pixelmigrate.component.NotificationConsolidatorService" package="android" defaultValue="com.rockrola.rockdisplay/com.rockrola.rockdisplay.notification.DisplayNotifListenerService:com.rockrola.launcher3/com.android.launcher3.notification.NotificationListener:com.google.android.apps.restore/com.google.android.apps.pixelmigrate.component.NotificationConsolidatorService" defaultSysSet="true" />
   <setting id="69" name="qs_show_brightness" package="com.android.systemui" />
   <setting id="40" name="carrier_apps_handled" value="1" package="android" defaultValue="1" defaultSysSet="true" />
-  <setting id="50" name="enabled_notification_policy_access_packages" value="com.motorola.camera2:com.android.camera2:com.google.android.apps.wellbeing:com.motorola.arselfie:com.motorola.cameraone" package="android" defaultValue="com.motorola.camera2:com.android.camera2:com.google.android.apps.wellbeing:com.motorola.arselfie:com.motorola.cameraone" defaultSysSet="true" />
+  <setting id="50" name="enabled_notification_policy_access_packages" value="com.rockrola.camera2:com.android.camera2:com.google.android.apps.wellbeing:com.rockrola.arselfie:com.rockrola.cameraone" package="android" defaultValue="com.rockrola.camera2:com.android.camera2:com.google.android.apps.wellbeing:com.rockrola.arselfie:com.rockrola.cameraone" defaultSysSet="true" />
   <setting id="75" name="selected_input_method_subtype" value="-1" package="android" defaultValue="-1" defaultSysSet="true" />
   <setting id="6" name="mount_ums_prompt" value="1" package="android" defaultValue="1" defaultSysSet="true" />
   <setting id="71" name="sysui_nav_bar_right" package="com.android.systemui" />
@@ -169,7 +171,7 @@ adb push settings_global.xml /data/system/users/0/
   <setting id="9" name="mode_ringer" value="2" package="android" defaultValue="2" defaultSysSet="true" />
   <setting id="39" name="default_install_location" value="0" package="android" defaultValue="0" defaultSysSet="true" />
   <setting id="24" name="wifi_display_on" value="0" package="android" defaultValue="0" defaultSysSet="true" />
-  <setting id="46" name="device_name" value="Moto Z3 Play" package="android" defaultValue="Moto Z3 Play" defaultSysSet="true" />
+  <setting id="46" name="device_name" value="IxxI" package="android" defaultValue="IxxI" defaultSysSet="true" />
   <setting id="14" name="wifi_networks_available_notification_on" value="1" package="android" defaultValue="1" defaultSysSet="true" />
   <setting id="114" name="zen_settings_updated" value="1" package="com.android.settings" defaultValue="1" defaultSysSet="true" />
   <setting id="31" name="dock_sounds_enabled_when_accessbility" value="0" package="android" defaultValue="0" defaultSysSet="true" />
@@ -182,7 +184,7 @@ adb push settings_global.xml /data/system/users/0/
   <setting id="48" name="add_users_when_locked" value="0" package="android" defaultValue="0" defaultSysSet="true" />
   <setting id="37" name="dock_audio_media_enabled" value="1" package="android" defaultValue="1" defaultSysSet="true" />
   <setting id="88" name="ble_scan_always_enabled" value="1" package="com.google.android.gms" />
-  <setting id="96" name="dropbox_max_files" value="1000" package="com.motorola.ccc.devicemanagement" />
+  <setting id="96" name="dropbox_max_files" value="1000" package="com.rockrola.ccc.devicemanagement" />
   <setting id="75" name="adb_enabled" value="1" package="android" defaultValue="1" defaultSysSet="true" />
   <setting id="27" name="trusted_sound" value="/system/media/audio/ui/Trusted.ogg" package="android" defaultValue="/system/media/audio/ui/Trusted.ogg" defaultSysSet="true" />
   <setting id="26" name="unlock_sound" value="/system/media/audio/ui/Unlock.ogg" package="android" defaultValue="/system/media/audio/ui/Unlock.ogg" defaultSysSet="true" />
@@ -224,7 +226,7 @@ adb push settings_global.xml /data/system/users/0/
   <setting id="51" name="default_restrict_background_data" value="0" package="android" defaultValue="0" defaultSysSet="true" />
   <setting id="29" name="low_battery_sound" value="/system/media/audio/ui/LowBattery.ogg" package="android" defaultValue="/system/media/audio/ui/LowBattery.ogg" defaultSysSet="true" />
   <setting id="21" name="netstats_enabled" value="1" package="android" defaultValue="1" defaultSysSet="true" />
-  <setting id="95" name="dropbox_quota_kb" value="5242880" package="com.motorola.ccc.devicemanagement" />
+  <setting id="95" name="dropbox_quota_kb" value="5242880" package="com.rockrola.ccc.devicemanagement" />
   <setting id="50" name="wifi_wakeup_enabled" value="1" package="android" defaultValue="1" defaultSysSet="true" />
   <setting id="77" name="subscription_mode" value="0" package="com.android.phone" defaultValue="0" defaultSysSet="true" />
   <setting id="86" name="assisted_gps_enabled" value="1" package="com.google.android.gsf" defaultValue="1" defaultSysSet="true" />
@@ -249,9 +251,25 @@ adb push settings_global.xml /data/system/users/0/
 ```
 
 
+# hostapd.conf
+
+```
+ProjectPath:   /device/qcom/wlan/talos/hostapd.conf
+
+
+```
+
+
 
 # /vendor/etc/wifi/WCNSS_qcom_cfg.ini
+
 ```
+adb pull /vendor/etc/wifi/WCNSS_qcom_cfg.ini
+adb push ./WCNSS_qcom_cfg.ini /vendor/etc/wifi/
+
+
+ProjectPath:   /device/qcom/wlan/talos/WCNSS_qcom_cfg.ini
+
 # This file allows user to override the factory
 # defaults for the WLAN Driver
 
@@ -767,7 +785,11 @@ END
 
 
 # /vendor/etc/wifi/wpa_supplicant.conf
+
 ```
+adb pull /vendor/etc/wifi/wpa_supplicant.conf  .
+adb push ./wpa_supplicant.conf  /vendor/etc/wifi/
+
 update_config=1
 ctrl_interface=wlan0
 eapol_version=1
@@ -781,7 +803,9 @@ disable_scan_offload=1
 
 
 ```
+
 ## update_config
+
 ```
 
 # Whether to allow wpa_supplicant to update (overwrite) configuration
@@ -797,6 +821,7 @@ update_config=1
 ```
 
 ## ctrl_interface
+
 ```
 # global configuration (shared by all network blocks)
 #
@@ -833,6 +858,7 @@ ctrl_interface=wlan0
 ```
 
 ## eapol_version
+
 ```
 # IEEE 802.1X/EAPOL version
 # wpa_supplicant is implemented based on IEEE Std 802.1X-2004 which defines
@@ -848,6 +874,7 @@ eapol_version=1
 ```
 
 ## ap_scan
+
 ```
 # AP scanning/selection
 # By default, wpa_supplicant requests driver to perform AP scanning and then
@@ -873,6 +900,7 @@ ap_scan=1
 ```
 
 ## fast_reauth
+
 ```
 # EAP fast re-authentication
 # By default, fast re-authentication is enabled for all EAP methods that
@@ -887,6 +915,7 @@ fast_reauth=1
 
 
 ## disable_scan_offload
+
 ```
 # disable_scan_offload - Disable automatic offloading of scan requests
 # By default, wpa_supplicant tries to offload scanning if the driver
@@ -899,6 +928,7 @@ disable_scan_offload=1
 
 
 ## load_dynamic_eap
+
 ```
 # Dynamic EAP methods
 # If EAP methods were built dynamically as shared object files, they need to be
@@ -924,6 +954,7 @@ driver_param="field=value"
 
 
 ## country
+
 ```
 # Country code
 # The ISO/IEC alpha2 country code for the country in which this device is
@@ -933,6 +964,7 @@ country=US
 ```
 
 ## dot11RSNAConfigPMKLifetime
+
 ```
 # Maximum lifetime for PMKSA in seconds; default 43200
 dot11RSNAConfigPMKLifetime=43200
@@ -940,6 +972,7 @@ dot11RSNAConfigPMKLifetime=43200
 ```
 
 ## dot11RSNAConfigPMKReauthThreshold
+
 ```
 # Threshold for reauthentication (percentage of PMK lifetime); default 70
 dot11RSNAConfigPMKReauthThreshold=70
@@ -947,6 +980,7 @@ dot11RSNAConfigPMKReauthThreshold=70
 ```
 
 ## dot11RSNAConfigSATimeout
+
 ```
 
 # Timeout for security association negotiation in seconds; default 60
@@ -955,6 +989,7 @@ dot11RSNAConfigSATimeout=60
 ```
 
 ## config_methods
+
 ```
 # Wi-Fi Protected Setup (WPS) parameters
 # Config Methods
@@ -969,6 +1004,7 @@ config_methods=virtual_display virtual_push_button
 ```
 
 ## uuid
+
 ```
 
 # Universally Unique IDentifier (UUID; see RFC 4122) of the device
@@ -979,6 +1015,7 @@ config_methods=virtual_display virtual_push_button
 
 
 ## device_name
+
 ```
 # Device Name
 # User-friendly description of device; up to 32 octets encoded in UTF-8
@@ -987,6 +1024,7 @@ device_name=Wireless Client
 ```
 
 ## wps_cred_processing
+
 ```
 # Credential processing
 #   0 = process received credentials internally (default)
@@ -999,6 +1037,7 @@ wps_cred_processing=0
 ```
 
 ## p2p_no_group_iface
+
 ```
 # Seperate Group interface creation
 #  1 = use same inteface for GO
@@ -1008,6 +1047,7 @@ p2p_no_group_iface=1
 ```
 
 ## network_block网络字段说明
+
 ```
 
 # network block
@@ -1324,6 +1364,7 @@ p2p_no_group_iface=1
 ## 预置网络实例
 
 ### WPA-PSK网络配置1
+
 ```
 # Simple case: WPA-PSK, PSK as an ASCII passphrase, allow all valid ciphers
 network={
@@ -1335,6 +1376,7 @@ network={
 ```
 
 ### WPA-PSK网络配置2
+
 ```
 ## Same as previous, but request SSID-specific scanning (for APs that reject broadcast SSID)
 network={
@@ -1349,6 +1391,7 @@ network={
 
 
 ### WPA-PSK网络配置3
+
 ```
 ## Only WPA-PSK is used. Any valid cipher combination is accepted.
 network={
@@ -1364,6 +1407,7 @@ network={
 ```
 
 ### WPA-PSK(TKIP)网络配置4
+
 ```
 
 ## WPA-Personal(PSK) with TKIP and enforcement for frequent PTK rekeying
@@ -1380,6 +1424,7 @@ network={
 ```
 
 ###  WPA-EAP 网络
+
 ```
 ## Only WPA-EAP is used. Both CCMP and TKIP is accepted. An AP that used WEP104
 ## or WEP40 as the group cipher will not be accepted.
@@ -1403,6 +1448,7 @@ network={
 
 
 ### EAP-PEAP/MSCHAPv2
+
 ```
 
 ## EAP-PEAP/MSCHAPv2 configuration for RADIUS servers that use the new peaplabel
@@ -1423,6 +1469,7 @@ network={
 
 
 ### EAP-TTLS/EAP-MD5-Challenge
+
 ```
 
 ## EAP-TTLS/EAP-MD5-Challenge configuration with anonymous identity for the
@@ -1444,6 +1491,7 @@ network={
 
 
 ### EAP-TTLS/MSCHAPv2
+
 ```
 ## EAP-TTLS/MSCHAPv2 configuration with anonymous identity for the unencrypted
 ## use. Real identity is sent only within an encrypted TLS tunnel.
@@ -1462,7 +1510,9 @@ network={
 ```
 
 ### WPA-EAP/EAP-TTLS/Different_CA_Certificate
+
 ```
+
 ## WPA-EAP, EAP-TTLS with different CA certificate used for outer and inner
 ## authentication.
 network={
@@ -1484,6 +1534,7 @@ network={
 ```
 
 ### WPA-PSK/WPA-EAP/CCMP
+
 ```
 ## Both WPA-PSK and WPA-EAP is accepted. Only CCMP is accepted as pairwise and
 ## group cipher.
@@ -1504,6 +1555,7 @@ network={
 
 
 ### WPA-PSK/WPA-EAP/(Special characters in SSID)
+
 ```
 ## Special characters in SSID, so use hex string. Default to WPA-PSK, WPA-EAP
 ## and all valid ciphers.
@@ -1517,6 +1569,7 @@ network={
 
 
 ### EAP-SIM
+
 ```
 ## EAP-SIM with a GSM SIM or USIM
 network={
@@ -1530,6 +1583,7 @@ network={
 ```
 
 ### EAP-PSK
+
 ```
 
 ## EAP-PSK
@@ -1545,6 +1599,7 @@ network={
 ```
 
 ### 802.1X/EAP-TLS/EAPOL(WEP NO-WPA)
+
 ```
 ## IEEE 802.1X/EAPOL with dynamically generated WEP keys (i.e., no WPA) using
 ## EAP-TLS for authentication and key generation; require both unicast and
@@ -1565,6 +1620,7 @@ network={
 
 
 ### LEAP
+
 ```
 # LEAP with dynamic WEP keys
 network={
@@ -1581,6 +1637,7 @@ network={
 
 
 ### EAP-IKEv2
+
 ```
 ## EAP-IKEv2 using shared secrets for both server and peer authentication
 network={
@@ -1596,6 +1653,7 @@ network={
 
 
 ### EAP-FAST
+
 ```
 ## EAP-FAST with WPA (WPA or WPA2)
 network={
@@ -1626,6 +1684,7 @@ network={
 
 
 ### Plaintext connection|open network开放网络
+
 ```
 ## Plaintext connection (no WPA, no IEEE 802.1X)
 network={
@@ -1635,6 +1694,7 @@ network={
 
 ```
 ### Shared WEP key connection (no WPA, no IEEE 802.1X)
+
 ```
 ## Shared WEP key connection (no WPA, no IEEE 802.1X) using Shared Key
 ## IEEE 802.11 authentication
@@ -1654,6 +1714,7 @@ network={
 
 
 ### IBSS/ad-hoc network with WPA-None/TKIP.
+
 ```
 ## IBSS/ad-hoc network with WPA-None/TKIP.
 network={
@@ -1671,6 +1732,7 @@ network={
 ```
 
 ### network可选可写配置项
+
 ```
 network={
 	ssid="example"
@@ -1692,6 +1754,7 @@ network={
 ```
 
 # /system/etc/wifi/p2p_supplicant.conf
+
 ```
 disable_scan_offload=1
 p2p_no_group_iface=1
@@ -1703,6 +1766,7 @@ bss_max_count=400
 
 
 # /data/misc/wifi/WifiConfigStore.xml
+
 ```
 adb pull /data/misc/wifi/WifiConfigStore.xml
 
@@ -1848,11 +1912,13 @@ adb push WifiConfigStore.xml /data/misc/wifi/
 
 
 # /data/misc/wifi/softap.conf
+
 ```
 adb pull /data/misc/wifi/softap.conf
 
 adb push softap.conf /data/misc/wifi/
 ```
+
 ```
     Hotspot-NAME   
      passwprd       
@@ -1863,6 +1929,7 @@ adb push softap.conf /data/misc/wifi/
 <img src="//../zimage/wireless/wifi/08_wificonfig/soft.jpg"  />
 
 ## 解析 softap.conf 的Java程序
+
 ```
 
 package com.company;
@@ -1969,6 +2036,7 @@ public class Main {
 # wifi列表数据项
 
 ## WifiSettings
+
 ```
 http://androidxref.com/9.0.0_r3/xref/packages/apps/Settings/src/com/android/settings/wifi/WifiSettings.java
 
@@ -1995,6 +2063,7 @@ public class WifiSettings extends RestrictedSettingsFragment implements Indexabl
 ```
 
 ### updateAccessPointPreferences函数
+
 ```
 ==================
  private void updateAccessPointPreferences() {   // 更新WIFI 列表的函数
@@ -2033,6 +2102,7 @@ public class WifiSettings extends RestrictedSettingsFragment implements Indexabl
 ==================
 ```
 ### onAccessPointsChanged()
+
 ```
 /frameworks/base/packages/SettingsLib/src/com/android/settingslib/wifi/WifiTracker.java的接口 WifiListener 实现函数
 
@@ -2101,6 +2171,7 @@ http://androidxref.com/9.0.0_r3/xref/frameworks/base/packages/SettingsLib/src/co
 
 
 ## WifiTracker
+
 ```
 http://androidxref.com/9.0.0_r3/xref/frameworks/base/packages/SettingsLib/src/com/android/settingslib/wifi/WifiTracker.java
 
@@ -2139,6 +2210,7 @@ http://androidxref.com/9.0.0_r3/xref/packages/apps/Settings/src/com/android/sett
 
 
 ### WifiListenerExecutor接口回调执行内部类
+
 ```
    @VisibleForTesting class WifiListenerExecutor implements WifiListener {
 
@@ -2177,9 +2249,10 @@ http://androidxref.com/9.0.0_r3/xref/packages/apps/Settings/src/com/android/sett
     }
 
 
-````
+```
 
 ### WifiListener接口
+
 ```
 
     public interface WifiListener {
@@ -2216,6 +2289,7 @@ http://androidxref.com/9.0.0_r3/xref/packages/apps/Settings/src/com/android/sett
 
 
 ### conditionallyNotifyListeners()执行热点更新函数
+
 ```
 
 
@@ -2262,6 +2336,7 @@ private void updateNetworkScores【4】() {  // 更新热点分数时  执行回
 ```
 
 ### updateAccessPoints() framework层面更新Accesspoint函数
+
 ```
     private WifiInfo mLastInfo;   // 最近连接上的 WIFIInfo 基数据
     private final List<AccessPoint> mInternalAccessPoints = new ArrayList<>();  // 当前已经保存的 AccessPoint 列表
@@ -2382,6 +2457,7 @@ private void updateNetworkScores【4】() {  // 更新热点分数时  执行回
 ```
 
 #### Accesspoint.getkey()
+
 ```
 http://androidxref.com/9.0.0_r3/xref/frameworks/base/packages/SettingsLib/src/com/android/settingslib/wifi/AccessPoint.java#589
     public static String getKey(ScanResult result) {  //  返回 ssid,1   ssid,2  ssid,3   ssid,4  作为Map<Key,WifiConfiguration> 的 key 
@@ -2448,6 +2524,7 @@ http://androidxref.com/9.0.0_r3/xref/frameworks/base/packages/SettingsLib/src/co
 ```
 
 #### updateScanResultCache
+
 ```
 http://androidxref.com/9.0.0_r3/xref/frameworks/base/packages/SettingsLib/src/com/android/settingslib/wifi/WifiTracker.java#434
 
@@ -2498,6 +2575,7 @@ http://androidxref.com/9.0.0_r3/xref/frameworks/base/packages/SettingsLib/src/co
 
 
 #### createFromScanResult
+
 ```
 http://androidxref.com/9.0.0_r3/xref/frameworks/base/core/java/android/net/NetworkKey.java#70
 
@@ -2559,6 +2637,7 @@ public class NetworkKey implements Parcelable {
 
 #### getCachedOrCreate
 
+
 ```
     AccessPoint getCachedOrCreate(List<ScanResult> scanResults, List<AccessPoint> cache) {
         final int N = cache.size();
@@ -2583,6 +2662,7 @@ public class NetworkKey implements Parcelable {
 
 
 #### accessPoint.update
+
 ```
 http://androidxref.com/9.0.0_r3/xref/frameworks/base/packages/SettingsLib/src/com/android/settingslib/wifi/AccessPoint.java#1086
 
@@ -2686,6 +2766,7 @@ http://androidxref.com/9.0.0_r3/xref/frameworks/base/packages/SettingsLib/src/co
 
 
 #### requestScoresForNetworkKeys(scoresToRequest) 热点评分方法
+
 ```
 http://androidxref.com/9.0.0_r3/xref/frameworks/base/packages/SettingsLib/src/com/android/settingslib/wifi/WifiTracker.java#343
 
@@ -2708,6 +2789,7 @@ private final Set<NetworkKey> mRequestedScores = new ArraySet<>();  // 全局
 
 
 #### Collections.sort(accessPoints)  热点排序实现
+
 ```
 
 Collections.sort(accessPoints)
@@ -2787,6 +2869,7 @@ compareTo(T o)  函数的实现
 
 
 #### configsByKey List<WifiConfiguration> configs数据来源分析
+
 ```
 List<WifiConfiguration> configs
 Map<String, WifiConfiguration> configsByKey 
@@ -3091,5 +3174,31 @@ public class ConfigurationMap { ▲   WifiConfiguration 存储位置
 
 
 
+
+```
+
+
+# /system/build.prop
+```
+adb pull /system/build.prop .
+adb push ./build.prop  /system/
+
+
+
+```
+
+# 路径(wifi详情)
+
+```
+
+1 . Setting > Network & internet > Wi-fi [toogle close] 
+2. Setting > Network & internet > Wi-fi > Wi-Fi preferences > Turn on Wi-fi automatically [toogle close] 
+3. Setting > Network & internet > Wi-fi > Wi-Fi preferences > open network notification [toogle close] 
+
+tap 5 time at Settings > System > About pone > Build number
+4. Setting > System > Advanced > Developer options >Enable WiFi Verbose Logging  [toogle open] 
+
+5. Setting > Security & location > Location(Privacy) > Advance > Scanning >  Wi-Fi scanning[toogle close] 
+6. Setting > Security & location > Location(Privacy) > Advance > Scanning >  Bluetooth scanning[toogle close]
 
 ```
