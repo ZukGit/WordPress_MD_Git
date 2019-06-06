@@ -76,6 +76,7 @@ public class A8 {
         keyEntryList.add(new Soft_AP_Is_Started());
         keyEntryList.add(new Soft_AP_Is_Stopped());
         keyEntryList.add(new BugReportService_onStartCommand());
+		keyEntryList.add(new WifiCountryCode_CountryCode());
         //===================Verbose才能打印的Log============
         keyEntryList.add(new handleWifiApStateChange_currentState13_KeyEntry());  // 热点状态打开成功
         keyEntryList.add(new handleWifiApStateChange_currentState13_previousState12__KeyEntry());
@@ -100,6 +101,34 @@ public class A8 {
 // MultiKeyWordPrintBase    包含多个关键字的处理类   需要返回 关键字的字符串集合
 
 
+
+
+    //  WifiCountryCode: Succeeded to set country code to: US
+	//  WifiCountryCode: Succeeded to set country code to: BR
+    static class WifiCountryCode_CountryCode extends FixLong_Diff_Pre_PrintBase {
+        WifiCountryCode_CountryCode() {
+            keyword = "Succeeded to set country code to:";
+            explain = "设置wifi中的countryCode [可能影响频谱 DFS等] ";
+            codePath = "http://host810096584.s248.pppf.com.cn/tool/182/";
+        }
+
+        @Override
+        public String toGetDiffSubString(String lineContent) {
+            if(lineContent != null && lineContent.indexOf("Succeeded to set country code to:") > 0){
+                return lineContent.substring(lineContent.indexOf("Succeeded to set country code to:"));
+            }
+            return null;
+        }
+
+        @Override
+        public String toReturnFixString(String lineContent) {
+            return lineContent;
+        }
+
+    }
+
+	
+	
 // Bug2Go-BugReportService: onStartCommand - action: motorola.intent.action.BUG2GO.BUGREPORT.START
 static class BugReportService_onStartCommand extends CollectEndPrintBase {
 

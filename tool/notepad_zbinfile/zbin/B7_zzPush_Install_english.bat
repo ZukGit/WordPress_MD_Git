@@ -8,6 +8,9 @@ ECHO Initize
 ECHO waiting device in USB
 adb wait-for-device
 
+adb root
+adb remount
+
 dir *.* /o:-d /B > ./B7_zPush_Install.txt
 
 
@@ -65,13 +68,6 @@ ECHO B7_zPush_Install.txt file not exist !
 )
 
 
-ECHO Please change other device 
-adb wait-for-device
-
-
-
-adb root
-adb remount
 
 
 
