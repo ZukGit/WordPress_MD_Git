@@ -152,6 +152,24 @@ out/target/product/xxx/obj/vendor/qcom/opensource/wlan/qcacld/qca_wlan.ko.unstri
 # V
 
 # W
+
+## WCNSS_qcom_cfg.ini
+```
+adb root
+adb remount
+adb pull /vendor/etc/wifi/WCNSS_qcom_cfg.ini   .
+
+// add   gindoor_channel_support=1 in end of WCNSS_qcom_cfg.ini
+gindoor_channel_support=1
+
+adb push ./WCNSS_qcom_cfg.ini  /vendor/etc/wifi/
+adb reboot
+adb pull /vendor/etc/wifi/WCNSS_qcom_cfg.ini   .
+
+
+
+
+```
 # X
 # Y
 # Z
