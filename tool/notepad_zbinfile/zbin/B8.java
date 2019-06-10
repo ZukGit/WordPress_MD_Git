@@ -420,11 +420,14 @@ static {
                 addBlankOriginCodeString = addBlankOriginCodeString.replace("    * ","* ");
                 addBlankOriginCodeString = addBlankOriginCodeString.replace("    */","*/");
 
+if(zmethod.buildIndexLogList != null){
+	
+	for (int i = 0; i < zmethod.buildIndexLogList.size() ; i++) {
+	String index  = zmethod.buildIndexLogList.get(i);
+	System.out.println("序号 : "+ i  + "   出现的序号: +" + (index) );
+}
 
-                for (int i = 0; i < zmethod.buildIndexLogList.size() ; i++) {
-                    String index  = zmethod.buildIndexLogList.get(i);
-                    System.out.println("序号 : "+ i  + "   出现的序号: +" + (index) );
-                }
+}
 
                 newMethodCode = zmethod.fixnewMethodCode(newMethodCode); // 把  this_is_indexLog_index=0  依次设置序号
                 // System.out.println("=============   newMethodCode  Begin==============");
