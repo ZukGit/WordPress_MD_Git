@@ -77,6 +77,10 @@ public class A8 {
         keyEntryList.add(new Soft_AP_Is_Stopped());
         keyEntryList.add(new BugReportService_onStartCommand());
 		keyEntryList.add(new WifiCountryCode_CountryCode());
+		keyEntryList.add(new COUNTRY_UPDATE_DISABLED());	
+		keyEntryList.add(new Updated_Country_Code());
+		keyEntryList.add(new Hardware_Does_Dot_Support_Channel());
+
         //===================Verbose才能打印的Log============
         keyEntryList.add(new handleWifiApStateChange_currentState13_KeyEntry());  // 热点状态打开成功
         keyEntryList.add(new handleWifiApStateChange_currentState13_previousState12__KeyEntry());
@@ -148,6 +152,37 @@ static class BugReportService_onStartCommand extends CollectEndPrintBase {
         return lineContent;
     }
 }
+
+
+//  06-12 12:27:07.722  9370  9370 I hostapd : wlan0: IEEE 802.11 Hardware does not support configured channel
+static class Hardware_Does_Dot_Support_Channel extends MeetPrintBase {   // 模板
+    Hardware_Does_Dot_Support_Channel() {
+        keyword = "IEEE 802.11 Hardware does not support configured channel";
+        explain = "当前硬件没有可支持的信道 无法工作 查看国家码信道";
+        codePath = "https://sse.am.mot.com/p_source/xref/mp-r-shm2017/kernel/net/wireless/db.txt";
+    }
+}
+
+
+//  06-12 12:27:07.671  9370  9370 D QCSDK   : Updated:country_code=IE
+static class Updated_Country_Code extends MeetPrintBase {   // 模板
+    Updated_Country_Code() {
+        keyword = "Updated:country_code=";
+        explain = "设置国家码";
+        codePath = "https://wenku.baidu.com/view/88021e4cc850ad02de8041ac.html";
+    }
+}
+
+
+    //  06-12 12:27:07.723  9370  9370 I hostapd : wlan0: interface state COUNTRY_UPDATE->DISABLED
+static class COUNTRY_UPDATE_DISABLED extends MeetPrintBase {   // 模板
+    COUNTRY_UPDATE_DISABLED() {
+        keyword = "interface state COUNTRY_UPDATE->DISABLED";
+        explain = "手机设置的国家码 可能没有可用5G信道 造成无法打开";
+        codePath = "https://sse.am.mot.com/p_source/xref/mp-r-shm2017/kernel/net/wireless/db.txt";
+    }
+}
+
 
 
     //  05-21 18:00:24.879  1227  2217 D SoftApManager: Soft AP is stopped
@@ -404,7 +439,7 @@ static class Soft_AP_Is_Stopped extends MeetPrintBase {   // 模板
     static class WifiTetherApBandPref_Updating_Band_Index extends FixLong_Diff_Pre_PrintBase {   // 模板
 
         WifiTetherApBandPref_Updating_Band_Index() {
-            keyword = "WifiTetherApBandPref: Band preference changed, updating band index to";
+            keyword = "WifiTetherApBandPref: Updating band index to";
             explain = "热点信道变更【0--2.4Ghz   1--5GHz】";
             codePath = null;
         }

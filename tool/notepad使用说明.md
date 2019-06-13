@@ -890,6 +890,22 @@ cmd /K cd /d %userprofile%\Desktop\zbin & %userprofile%\Desktop\zbin\C2.bat %use
 ```
 
 
+### C3_分析程序结果(CMD下执行)
+```
+
+C3.bat                       //WIndows  本地执行脚本        
+C3_Zanalyze.java         // 需要分析的工程 需自定义 要分析的目录
+C3_android.sh*            // android工程根目录 执行的脚本
+C3_javaparser.jar        
+C3_juwuba_template.html      // 生成 html的模板  不可更改
+
+
+Linux Shell 下执行  C3_android.sh  
+Windows CMD 下 执行  C3.bat 
+
+
+```
+
 
 # F5_命令小集合
 ```
@@ -1060,6 +1076,23 @@ xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  【 C1 vbs 】
 对Java多行字符串转为一行(当需要把方法转为字符串时)
 Wscript.exe  /x %userprofile%\Desktop\zbin\C2.vbs  %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH)            【C2 vbs】
 cmd /K cd /d %userprofile%\Desktop\zbin & %userprofile%\Desktop\zbin\C2.bat %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH)    【C2 bat】
+
+
+
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  【 C3 sh bat  cmd目录下执行 】 【C3 JavaParser对Java文件进行分析 并产生html吻戏文件】
+安卓&& 普通工程 分析 结果 脚本(CMD下执行) 生成 html 页面 
+C3.bat                       //WIndows  本地执行脚本        
+C3_Zanalyze.java         // 需要分析的工程 需自定义 要分析的目录
+C3_android.sh            // android工程根目录 执行的脚本
+C3_javaparser.jar        
+C3_juwuba_template.html      // 生成 html的模板  不可更改
+
+
+Linux Shell 下执行  C3_android.sh  
+Windows CMD 下 执行  C3.bat 
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx   【C3 sh bat 】
+
+
 
 ```
 
