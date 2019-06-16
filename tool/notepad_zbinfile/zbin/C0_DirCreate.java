@@ -1,7 +1,7 @@
 import java.io.*;
 import java.util.ArrayList;
 
-public class DirCreate {
+public class C0_DirCreate {
     static ArrayList<String> patList_i = new ArrayList<String>();
     static ArrayList<String> patList_g = new ArrayList<String>();
     static ArrayList<String> patList_v = new ArrayList<String>();

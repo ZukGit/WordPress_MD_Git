@@ -8,7 +8,7 @@ import java.util.Map;
 
 import javax.crypto.Cipher;
 
-public class JIEMA {
+public class C0_JIEMA {
 
     private static String strDefaultKey = "zukgit12"; //    加密原始秘钥字符串
 
@@ -18,6 +18,22 @@ public class JIEMA {
      * ECB 作为DES加密 操作模式的一种   明文与密文长度一致  但必须保证8字节长度整数倍的明文
      * CBC 作为DES加密 操作模式的一种   明文与密文长度不一致  明文长度不需要保证一定是 8字节整数倍 会多出一个 IV block padding
      */
+
+
+    static File htmlFile_gif_2x2 = new File(System.getProperty("user.dir") + File.separator + "src" + File.separator + "C0_gif_2x2.html");
+    static File htmlFile_gif_3x3 = new File(System.getProperty("user.dir") + File.separator + "src" + File.separator + "C0_gif_3x3.html");
+    static File htmlFile_gif_3x5 = new File(System.getProperty("user.dir") + File.separator + "src" + File.separator + "C0_gif_3x5.html");
+    static File htmlFile_gif__3d = new File(System.getProperty("user.dir") + File.separator + "src" + File.separator + "C0_gif__3d.html");
+    static File htmlFile_mp4_2x2 = new File(System.getProperty("user.dir") + File.separator + "src" + File.separator + "C0_mp4_2x2.html");
+    static File htmlFile_mp4_3x3 = new File(System.getProperty("user.dir") + File.separator + "src" + File.separator + "C0_mp4_3x3.html");
+    static File htmlFile_mp4_3x5 = new File(System.getProperty("user.dir") + File.separator + "src" + File.separator + "C0_mp4_3x5.html");
+    static File htmlFile_mp4__3d = new File(System.getProperty("user.dir") + File.separator + "src" + File.separator + "C0_mp4__3d.html");
+    static File htmlFile_jpg_2x2 = new File(System.getProperty("user.dir") + File.separator + "src" + File.separator + "C0_jpg_2x2.html");
+    static File htmlFile_jpg_3x3 = new File(System.getProperty("user.dir") + File.separator + "src" + File.separator + "C0_jpg_3x3.html");
+    static File htmlFile_jpg_3x5 = new File(System.getProperty("user.dir") + File.separator + "src" + File.separator + "C0_jpg_3x5.html");
+    static File htmlFile_jpg__3d = new File(System.getProperty("user.dir") + File.separator + "src" + File.separator + "C0_jpg__3d.html");
+
+
     private static Cipher encryptCipher = null;
     private static Cipher decryptCipher = null;
     static int BYTE_CONTENT_LENGTH = 1024 * 10 * 10;   // 读取文件Head字节数常数
@@ -27,7 +43,6 @@ public class JIEMA {
     public static ArrayList<File> jpgFileList_miwen = new ArrayList<File>();
     public static ArrayList<File> mp4FileList_miwen = new ArrayList<File>();
     public static ArrayList<File> gifFileList_miwen = new ArrayList<File>();
-
 
 
     public static ArrayList<File> jpgFileList_mingwen = new ArrayList<File>();
@@ -53,23 +68,84 @@ public class JIEMA {
     public static Map<File, File> mingwen_miwen_Map = new HashMap<File, File>();
 
 
+    //-----------------indivisual-------------------
+    public static HashMap<String, ArrayList<File>> arrFileMap = new HashMap<String, ArrayList<File>>();
+    public static ArrayList<File> mp4_0001bdyjy_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0002cjmyx_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0003wyzzz_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0004ymlxx_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0005zywxx_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0006gcyzx_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0007julia_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0008dyfxx_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0009xqkjx_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0010thyxx_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0011gyqyx_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0012xcnyx_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0013byyjx_FileList_mingwen = new ArrayList<File>();
+
+    static {
+        arrFileMap.put("0001bdyjy", mp4_0001bdyjy_FileList_mingwen);
+        arrFileMap.put("0002cjmyx", mp4_0002cjmyx_FileList_mingwen);
+        arrFileMap.put("0003wyzzz", mp4_0003wyzzz_FileList_mingwen);
+        arrFileMap.put("0004ymlxx", mp4_0004ymlxx_FileList_mingwen);
+        arrFileMap.put("0005zywxx", mp4_0005zywxx_FileList_mingwen);
+        arrFileMap.put("0006gcyzx", mp4_0006gcyzx_FileList_mingwen);
+        arrFileMap.put("0007julia", mp4_0007julia_FileList_mingwen);
+        arrFileMap.put("0008dyfxx", mp4_0008dyfxx_FileList_mingwen);
+        arrFileMap.put("0009xqkjx", mp4_0009xqkjx_FileList_mingwen);
+        arrFileMap.put("0010thyxx", mp4_0010thyxx_FileList_mingwen);
+        arrFileMap.put("0011gyqyx", mp4_0011gyqyx_FileList_mingwen);
+        arrFileMap.put("0012xcnyx", mp4_0012xcnyx_FileList_mingwen);
+        arrFileMap.put("0013byyjx", mp4_0013byyjx_FileList_mingwen);
+    }
+
+    //-----------------indivisual-------------------
+
+    public static void todoIndivitualFile(ArrayList<File> mp4FileList_mingwen) {
+        if (mp4FileList_mingwen == null) {
+            return;
+        }
+        ArrayList<String> nameKeyStr = new ArrayList<String>();
+        Map.Entry<String, ArrayList<File>> entry;
+        if (arrFileMap != null) {
+            Iterator iterator = arrFileMap.entrySet().iterator();
+            while (iterator.hasNext()) {
+                entry = (Map.Entry<String, ArrayList<File>>) iterator.next();
+                nameKeyStr.add(entry.getKey());
+            }
+        }
+
+        for (File mp4FileItem : mp4FileList_mingwen) {
+            String fileName = mp4FileItem.getName();
 
 
-    static File htmlFile_gif_2x2 = new File(System.getProperty("user.dir")+File.separator+"src"+File.separator+"gif_2x2.html");
-    static File htmlFile_gif_3x3 = new File(System.getProperty("user.dir")+File.separator+"src"+File.separator+"gif_3x3.html");
-    static File htmlFile_gif_3x5 = new File(System.getProperty("user.dir")+File.separator+"src"+File.separator+"gif_3x5.html");
-    static File htmlFile_gif__3d = new File(System.getProperty("user.dir")+File.separator+"src"+File.separator+"gif__3d.html");
-    static File htmlFile_mp4_2x2 = new File(System.getProperty("user.dir")+File.separator+"src"+File.separator+"mp4_2x2.html");
-    static File htmlFile_mp4_3x3 = new File(System.getProperty("user.dir")+File.separator+"src"+File.separator+"mp4_3x3.html");
-    static File htmlFile_mp4_3x5 = new File(System.getProperty("user.dir")+File.separator+"src"+File.separator+"mp4_3x5.html");
-    static File htmlFile_mp4__3d = new File(System.getProperty("user.dir")+File.separator+"src"+File.separator+"mp4__3d.html");
-    static File htmlFile_jpg_2x2 = new File(System.getProperty("user.dir")+File.separator+"src"+File.separator+"jpg_2x2.html");
-    static File htmlFile_jpg_3x3 = new File(System.getProperty("user.dir")+File.separator+"src"+File.separator+"jpg_3x3.html");
-    static File htmlFile_jpg_3x5 = new File(System.getProperty("user.dir")+File.separator+"src"+File.separator+"jpg_3x5.html");
-    static File htmlFile_jpg__3d = new File(System.getProperty("user.dir")+File.separator+"src"+File.separator+"jpg__3d.html");
+            // 从 name  以及 ArrayList<String>  获取 key；
+            String strKey = toGetKeyFromName(nameKeyStr, fileName);
+            if (strKey == null || "".equals(strKey)) {
+              // 没有找到对应的Key  所以对应的这个mp4FileItem 不是需要收集的
+                continue;
+            }
 
+            ArrayList<File> arrFileValue = arrFileMap.get(strKey);
+            arrFileValue.add(mp4FileItem);
+        }
+    }
 
+    static String toGetKeyFromName(ArrayList<String> keyList, String fileName) {
+        String keyStr = "";
+        if (keyList == null) {
+            return null;
+        }
 
+        for (int i = 0; i < keyList.size(); i++) {
+            String keyItem = keyList.get(i);
+            if (fileName.contains(keyItem)) {
+                return keyItem;
+            }
+        }
+        return keyStr;
+    }
 
     public static void main(String[] args) {
         if (isFileReady()) {
@@ -80,9 +156,60 @@ public class JIEMA {
             collectAllG();
             collectAllV();
             collectAllFileV_SubCategory();
+            collectIndivitual();
         }
 
     }
+
+    public static void collectIndivitual() {
+
+        ArrayList<String> nameKeyStr = new ArrayList<String>();
+        Map.Entry<String, ArrayList<File>> entry;
+        if (arrFileMap != null) {
+            Iterator iterator = arrFileMap.entrySet().iterator();
+            while (iterator.hasNext()) {
+                entry = (Map.Entry<String, ArrayList<File>>) iterator.next();
+                nameKeyStr.add(entry.getKey());
+            }
+        }
+
+        for (int j = 0; j < nameKeyStr.size(); j++) {
+            String keyName = nameKeyStr.get(j);
+            // 开始创建文件夹
+
+//  indivitual/00001bdyjy/mp4
+//  indivitual/00002xxxxx/mp4
+            String allPath = System.getProperties().getProperty("user.dir") + File.separator + mingwenDir + File.separator + "v" + File.separator + "indivitual"+  File.separator +keyName+ File.separator + "mp4";
+      //      String allPath = System.getProperties().getProperty("user.dir") + File.separator + mingwenDir + File.separator + "v" + File.separator + "wm" + File.separator + "mp4";
+            File allFileDir = new File(allPath);
+
+            if (!allFileDir.exists()) {
+                allFileDir.mkdirs();
+            }
+
+            ArrayList<File> itemFileArr = arrFileMap.get(keyName);
+            if(itemFileArr == null){
+                continue;
+            }
+
+            for (int i = 0; i < itemFileArr.size(); i++) {
+                File fileItem = (File) itemFileArr.get(i);
+                String name = fileItem.getName();
+                int nameIndex = i + 1;
+                String nameIdnex = nameIndex + ".mp4";
+                //  File allFileItem = new File(allPath +File.separator+name);
+                File allFileItem = new File(allPath + File.separator + nameIdnex);
+                fileCopy(fileItem, allFileItem);
+
+            }
+
+            addMP4HtmlFile(System.getProperties().getProperty("user.dir") + File.separator + mingwenDir + File.separator + "v" + File.separator + "indivitual"+  File.separator +keyName, itemFileArr.size());
+        }
+
+
+
+    }
+
 
     public static void collectAllFileV_SubCategory() {
         collectAllV_WM();
@@ -99,7 +226,7 @@ public class JIEMA {
         // mingwen/v/support/mp4
         //   String allPath = System.getProperties().getProperty("user.dir")+ File.separator +mingwenDir + File.separator + "v" + File.separator + "support_all";
 
-        String allPath = System.getProperties().getProperty("user.dir")+ File.separator +mingwenDir + File.separator + "v" + File.separator + "fakeface"+File.separator+"mp4";
+        String allPath = System.getProperties().getProperty("user.dir") + File.separator + mingwenDir + File.separator + "v" + File.separator + "fakeface" + File.separator + "mp4";
 
         File allFileDir = new File(allPath);
 
@@ -110,22 +237,22 @@ public class JIEMA {
         for (int i = 0; i < fakeface_mp4FileList_mingwen.size(); i++) {
             File fileItem = (File) fakeface_mp4FileList_mingwen.get(i);
             String name = fileItem.getName();
-            int nameIndex  = i + 1;
-            String nameIdnex = nameIndex+".mp4";
+            int nameIndex = i + 1;
+            String nameIdnex = nameIndex + ".mp4";
             //  File allFileItem = new File(allPath +File.separator+name);
-            File allFileItem = new File(allPath +File.separator+nameIdnex);
-            fileCopy(fileItem,allFileItem);
+            File allFileItem = new File(allPath + File.separator + nameIdnex);
+            fileCopy(fileItem, allFileItem);
 
         }
 
-        addMP4HtmlFile(System.getProperties().getProperty("user.dir")+ File.separator +mingwenDir + File.separator + "v"+ File.separator + "fakeface" , fakeface_mp4FileList_mingwen.size());
+        addMP4HtmlFile(System.getProperties().getProperty("user.dir") + File.separator + mingwenDir + File.separator + "v" + File.separator + "fakeface", fakeface_mp4FileList_mingwen.size());
 
     }
 
 
     public static void collectAllFile() {
         // mingwen/all
-        String allPath = System.getProperties().getProperty("user.dir")+ File.separator +mingwenDir  + File.separator + "all";
+        String allPath = System.getProperties().getProperty("user.dir") + File.separator + mingwenDir + File.separator + "all";
         File allFileDir = new File(allPath);
 
         if (!allFileDir.exists()) {
@@ -135,8 +262,8 @@ public class JIEMA {
         for (int i = 0; i < allPointFile_mingwen.size(); i++) {
             File fileItem = (File) allPointFile_mingwen.get(i);
             String name = fileItem.getName();
-            File allFileItem = new File(allPath +File.separator+name);
-            fileCopy(fileItem,allFileItem);
+            File allFileItem = new File(allPath + File.separator + name);
+            fileCopy(fileItem, allFileItem);
 
         }
     }
@@ -144,7 +271,7 @@ public class JIEMA {
     public static void collectAllV() {
         // mingwen/v/all
         // mingwen/v/mp4
-        String allPath = System.getProperties().getProperty("user.dir")+ File.separator +mingwenDir + File.separator + "v" + File.separator + "mp4";
+        String allPath = System.getProperties().getProperty("user.dir") + File.separator + mingwenDir + File.separator + "v" + File.separator + "mp4";
         File allFileDir = new File(allPath);
 
         if (!allFileDir.exists()) {
@@ -154,15 +281,15 @@ public class JIEMA {
         for (int i = 0; i < mp4FileList_mingwen.size(); i++) {
             File fileItem = (File) mp4FileList_mingwen.get(i);
             String name = fileItem.getName();
-            int nameIndex  = i + 1;
-            String nameIdnex = nameIndex+".mp4";
+            int nameIndex = i + 1;
+            String nameIdnex = nameIndex + ".mp4";
             //  File allFileItem = new File(allPath +File.separator+name);
-            File allFileItem = new File(allPath +File.separator+nameIdnex);
-            fileCopy(fileItem,allFileItem);
+            File allFileItem = new File(allPath + File.separator + nameIdnex);
+            fileCopy(fileItem, allFileItem);
 
         }
 
-        addMP4HtmlFile(System.getProperties().getProperty("user.dir")+ File.separator +mingwenDir + File.separator + "v" , mp4FileList_mingwen.size());
+        addMP4HtmlFile(System.getProperties().getProperty("user.dir") + File.separator + mingwenDir + File.separator + "v", mp4FileList_mingwen.size());
 
     }
 
@@ -170,7 +297,7 @@ public class JIEMA {
     public static void collectAllV_WM() {
         // mingwen/v/all
         // mingwen/v/wm/mp4
-        String allPath = System.getProperties().getProperty("user.dir")+ File.separator +mingwenDir + File.separator + "v" + File.separator + "wm"+File.separator+"mp4";
+        String allPath = System.getProperties().getProperty("user.dir") + File.separator + mingwenDir + File.separator + "v" + File.separator + "wm" + File.separator + "mp4";
         File allFileDir = new File(allPath);
 
         if (!allFileDir.exists()) {
@@ -180,24 +307,24 @@ public class JIEMA {
         for (int i = 0; i < wm_mp4FileList_mingwen.size(); i++) {
             File fileItem = (File) wm_mp4FileList_mingwen.get(i);
             String name = fileItem.getName();
-            int nameIndex  = i + 1;
-            String nameIdnex = nameIndex+".mp4";
+            int nameIndex = i + 1;
+            String nameIdnex = nameIndex + ".mp4";
             //  File allFileItem = new File(allPath +File.separator+name);
-            File allFileItem = new File(allPath +File.separator+nameIdnex);
-            fileCopy(fileItem,allFileItem);
+            File allFileItem = new File(allPath + File.separator + nameIdnex);
+            fileCopy(fileItem, allFileItem);
 
         }
 
-        addMP4HtmlFile(System.getProperties().getProperty("user.dir")+ File.separator +mingwenDir + File.separator + "v"+ File.separator + "wm" , wm_mp4FileList_mingwen.size());
+        addMP4HtmlFile(System.getProperties().getProperty("user.dir") + File.separator + mingwenDir + File.separator + "v" + File.separator + "wm", wm_mp4FileList_mingwen.size());
 
     }
 
     public static void collectAllV_YM() {
         // mingwen/v/all
         // mingwen/v/ym/mp4
-      // String allPath = System.getProperties().getProperty("user.dir")+ File.separator +mingwenDir + File.separator + "v" + File.separator + "ym_all";
+        // String allPath = System.getProperties().getProperty("user.dir")+ File.separator +mingwenDir + File.separator + "v" + File.separator + "ym_all";
 
-        String allPath = System.getProperties().getProperty("user.dir")+ File.separator +mingwenDir + File.separator + "v" + File.separator + "ym"+File.separator+"mp4";
+        String allPath = System.getProperties().getProperty("user.dir") + File.separator + mingwenDir + File.separator + "v" + File.separator + "ym" + File.separator + "mp4";
 
         File allFileDir = new File(allPath);
 
@@ -208,15 +335,15 @@ public class JIEMA {
         for (int i = 0; i < ym_mp4FileList_mingwen.size(); i++) {
             File fileItem = (File) ym_mp4FileList_mingwen.get(i);
             String name = fileItem.getName();
-            int nameIndex  = i + 1;
-            String nameIdnex = nameIndex+".mp4";
+            int nameIndex = i + 1;
+            String nameIdnex = nameIndex + ".mp4";
             //  File allFileItem = new File(allPath +File.separator+name);
-            File allFileItem = new File(allPath +File.separator+nameIdnex);
-            fileCopy(fileItem,allFileItem);
+            File allFileItem = new File(allPath + File.separator + nameIdnex);
+            fileCopy(fileItem, allFileItem);
 
         }
 
-        addMP4HtmlFile(System.getProperties().getProperty("user.dir")+ File.separator +mingwenDir + File.separator + "v"+ File.separator + "ym" , ym_mp4FileList_mingwen.size());
+        addMP4HtmlFile(System.getProperties().getProperty("user.dir") + File.separator + mingwenDir + File.separator + "v" + File.separator + "ym", ym_mp4FileList_mingwen.size());
 
     }
 
@@ -224,10 +351,10 @@ public class JIEMA {
     public static void collectAllV_UP() {
         // mingwen/v/all
         // mingwen/v/up/mp4
-  //      String allPath = System.getProperties().getProperty("user.dir")+ File.separator +mingwenDir + File.separator + "v" + File.separator + "up_all";
+        //      String allPath = System.getProperties().getProperty("user.dir")+ File.separator +mingwenDir + File.separator + "v" + File.separator + "up_all";
 
 
-        String allPath = System.getProperties().getProperty("user.dir")+ File.separator +mingwenDir + File.separator + "v" + File.separator + "up"+File.separator+"mp4";
+        String allPath = System.getProperties().getProperty("user.dir") + File.separator + mingwenDir + File.separator + "v" + File.separator + "up" + File.separator + "mp4";
 
         File allFileDir = new File(allPath);
 
@@ -238,15 +365,15 @@ public class JIEMA {
         for (int i = 0; i < up_mp4FileList_mingwen.size(); i++) {
             File fileItem = (File) up_mp4FileList_mingwen.get(i);
             String name = fileItem.getName();
-            int nameIndex  = i + 1;
-            String nameIdnex = nameIndex+".mp4";
+            int nameIndex = i + 1;
+            String nameIdnex = nameIndex + ".mp4";
             //  File allFileItem = new File(allPath +File.separator+name);
-            File allFileItem = new File(allPath +File.separator+nameIdnex);
-            fileCopy(fileItem,allFileItem);
+            File allFileItem = new File(allPath + File.separator + nameIdnex);
+            fileCopy(fileItem, allFileItem);
 
         }
 
-        addMP4HtmlFile(System.getProperties().getProperty("user.dir")+ File.separator +mingwenDir + File.separator + "v"+ File.separator + "up" , up_mp4FileList_mingwen.size());
+        addMP4HtmlFile(System.getProperties().getProperty("user.dir") + File.separator + mingwenDir + File.separator + "v" + File.separator + "up", up_mp4FileList_mingwen.size());
 
     }
 
@@ -254,9 +381,9 @@ public class JIEMA {
     public static void collectAllV_SUPPORT() {
         // mingwen/v/all
         // mingwen/v/support/mp4
-     //   String allPath = System.getProperties().getProperty("user.dir")+ File.separator +mingwenDir + File.separator + "v" + File.separator + "support_all";
+        //   String allPath = System.getProperties().getProperty("user.dir")+ File.separator +mingwenDir + File.separator + "v" + File.separator + "support_all";
 
-        String allPath = System.getProperties().getProperty("user.dir")+ File.separator +mingwenDir + File.separator + "v" + File.separator + "support"+File.separator+"mp4";
+        String allPath = System.getProperties().getProperty("user.dir") + File.separator + mingwenDir + File.separator + "v" + File.separator + "support" + File.separator + "mp4";
 
         File allFileDir = new File(allPath);
 
@@ -267,23 +394,23 @@ public class JIEMA {
         for (int i = 0; i < support_mp4FileList_mingwen.size(); i++) {
             File fileItem = (File) support_mp4FileList_mingwen.get(i);
             String name = fileItem.getName();
-            int nameIndex  = i + 1;
-            String nameIdnex = nameIndex+".mp4";
+            int nameIndex = i + 1;
+            String nameIdnex = nameIndex + ".mp4";
             //  File allFileItem = new File(allPath +File.separator+name);
-            File allFileItem = new File(allPath +File.separator+nameIdnex);
-            fileCopy(fileItem,allFileItem);
+            File allFileItem = new File(allPath + File.separator + nameIdnex);
+            fileCopy(fileItem, allFileItem);
 
         }
 
-        addMP4HtmlFile(System.getProperties().getProperty("user.dir")+ File.separator +mingwenDir + File.separator + "v"+ File.separator + "support" , support_mp4FileList_mingwen.size());
+        addMP4HtmlFile(System.getProperties().getProperty("user.dir") + File.separator + mingwenDir + File.separator + "v" + File.separator + "support", support_mp4FileList_mingwen.size());
 
     }
 
     public static void collectAllV_AM() {
         // mingwen/v/all
         // mingwen/v/am/mp4
-      //  String allPath = System.getProperties().getProperty("user.dir")+ File.separator +mingwenDir + File.separator + "v" + File.separator + "mp4";
-        String allPath = System.getProperties().getProperty("user.dir")+ File.separator +mingwenDir + File.separator + "v" + File.separator + "am"+File.separator+"mp4";
+        //  String allPath = System.getProperties().getProperty("user.dir")+ File.separator +mingwenDir + File.separator + "v" + File.separator + "mp4";
+        String allPath = System.getProperties().getProperty("user.dir") + File.separator + mingwenDir + File.separator + "v" + File.separator + "am" + File.separator + "mp4";
 
         File allFileDir = new File(allPath);
 
@@ -294,25 +421,22 @@ public class JIEMA {
         for (int i = 0; i < am_mp4FileList_mingwen.size(); i++) {
             File fileItem = (File) am_mp4FileList_mingwen.get(i);
             String name = fileItem.getName();
-            int nameIndex  = i + 1;
-            String nameIdnex = nameIndex+".mp4";
+            int nameIndex = i + 1;
+            String nameIdnex = nameIndex + ".mp4";
             //  File allFileItem = new File(allPath +File.separator+name);
-            File allFileItem = new File(allPath +File.separator+nameIdnex);
-            fileCopy(fileItem,allFileItem);
+            File allFileItem = new File(allPath + File.separator + nameIdnex);
+            fileCopy(fileItem, allFileItem);
         }
 
-        addMP4HtmlFile(System.getProperties().getProperty("user.dir")+ File.separator +mingwenDir + File.separator + "v"+ File.separator + "am" , am_mp4FileList_mingwen.size());
+        addMP4HtmlFile(System.getProperties().getProperty("user.dir") + File.separator + mingwenDir + File.separator + "v" + File.separator + "am", am_mp4FileList_mingwen.size());
 
     }
-
-
-
 
 
     public static void collectAllI() {
         // mingwen/i/all
         //  mingwen/i/jpg
-        String allPath = System.getProperties().getProperty("user.dir")+ File.separator +mingwenDir + File.separator + "i" + File.separator + "jpg";
+        String allPath = System.getProperties().getProperty("user.dir") + File.separator + mingwenDir + File.separator + "i" + File.separator + "jpg";
         File allFileDir = new File(allPath);
 
         if (!allFileDir.exists()) {
@@ -322,201 +446,196 @@ public class JIEMA {
         for (int i = 0; i < jpgFileList_mingwen.size(); i++) {
             File fileItem = (File) jpgFileList_mingwen.get(i);
             String name = fileItem.getName();
-            int nameIndex  = i + 1;
-            String nameIdnex = nameIndex+".jpg";
-          //  File allFileItem = new File(allPath +File.separator+name);
-             File allFileItem = new File(allPath +File.separator+nameIdnex);
-            fileCopy(fileItem,allFileItem);
+            int nameIndex = i + 1;
+            String nameIdnex = nameIndex + ".jpg";
+            //  File allFileItem = new File(allPath +File.separator+name);
+            File allFileItem = new File(allPath + File.separator + nameIdnex);
+            fileCopy(fileItem, allFileItem);
 
         }
-        addJPGHtmlFile(System.getProperties().getProperty("user.dir")+ File.separator +mingwenDir + File.separator + "i" , jpgFileList_mingwen.size());
+        addJPGHtmlFile(System.getProperties().getProperty("user.dir") + File.separator + mingwenDir + File.separator + "i", jpgFileList_mingwen.size());
     }
 
- public static void addJPGHtmlFile(String addPath , int length) {
-String htmlcode2x2  = readStringFromFile(htmlFile_jpg_2x2);
-if(htmlcode2x2 != null && htmlcode2x2.contains("zukgitPlaceHolderindex")){
-    htmlcode2x2 =  htmlcode2x2.replaceAll("zukgitPlaceHolderindex",length+"");
-}
-File htmlcode2x2_File = new File(addPath+File.separator+htmlFile_jpg_2x2.getName());
-if(!htmlcode2x2_File.exists()){
-    try {
-        htmlcode2x2_File.createNewFile();
-    } catch (IOException e) {
-        e.printStackTrace();
-    }
-}
-writeContentToFile(htmlcode2x2_File,htmlcode2x2);
-
-String htmlcode3x3  = readStringFromFile(htmlFile_jpg_3x3);
-if(htmlcode3x3 != null && htmlcode3x3.contains("zukgitPlaceHolderindex")){
-htmlcode3x3 =  htmlcode3x3.replaceAll("zukgitPlaceHolderindex",length+"");
-}
-File htmlcode3x3_File = new File(addPath+File.separator+htmlFile_jpg_3x3.getName());
-if(!htmlcode3x3_File.exists()){
-try {
- htmlcode3x3_File.createNewFile();
-} catch (IOException e) {
- e.printStackTrace();
-}
-}
-writeContentToFile(htmlcode3x3_File,htmlcode3x3);
-
-String htmlcode3x5  = readStringFromFile(htmlFile_jpg_3x5);
-if(htmlcode3x5 != null && htmlcode3x5.contains("zukgitPlaceHolderindex")){
-htmlcode3x5 =  htmlcode3x5.replaceAll("zukgitPlaceHolderindex",length+"");
-}
-File htmlcode3x5_File = new File(addPath+File.separator+htmlFile_jpg_3x5.getName());
-if(!htmlcode3x5_File.exists()){
-try {
- htmlcode3x5_File.createNewFile();
-} catch (IOException e) {
- e.printStackTrace();
-}
-}
-writeContentToFile(htmlcode3x5_File,htmlcode3x5);
-
-String htmlcode3d  = readStringFromFile(htmlFile_jpg__3d);
-if(htmlcode3d != null && htmlcode3d.contains("zukgitPlaceHolderindex")){
-    htmlcode3d =  htmlcode3d.replaceAll("zukgitPlaceHolderindex",length+"");
-}
-File htmlcode3d_File = new File(addPath+File.separator+htmlFile_jpg__3d.getName());
-if(!htmlcode3d_File.exists()){
- try {
-     htmlcode3d_File.createNewFile();
- } catch (IOException e) {
-     e.printStackTrace();
- }
-}
-writeContentToFile(htmlcode3d_File,htmlcode3d);
-    }
-
-
-
-
-
-    public static void addGIFHtmlFile(String addPath , int length) {
-        String htmlcode2x2  = readStringFromFile(htmlFile_gif_2x2);
-        if(htmlcode2x2 != null && htmlcode2x2.contains("zukgitPlaceHolderindex")){
-            htmlcode2x2 =  htmlcode2x2.replaceAll("zukgitPlaceHolderindex",length+"");
+    public static void addJPGHtmlFile(String addPath, int length) {
+        String htmlcode2x2 = readStringFromFile(htmlFile_jpg_2x2);
+        if (htmlcode2x2 != null && htmlcode2x2.contains("zukgitPlaceHolderindex")) {
+            htmlcode2x2 = htmlcode2x2.replaceAll("zukgitPlaceHolderindex", length + "");
         }
-        File htmlcode2x2_File = new File(addPath+File.separator+htmlFile_gif_2x2.getName());
-        if(!htmlcode2x2_File.exists()){
+        File htmlcode2x2_File = new File(addPath + File.separator + htmlFile_jpg_2x2.getName());
+        if (!htmlcode2x2_File.exists()) {
             try {
                 htmlcode2x2_File.createNewFile();
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
-        writeContentToFile(htmlcode2x2_File,htmlcode2x2);
+        writeContentToFile(htmlcode2x2_File, htmlcode2x2);
 
-        String htmlcode3x3  = readStringFromFile(htmlFile_gif_3x3);
-        if(htmlcode3x3 != null && htmlcode3x3.contains("zukgitPlaceHolderindex")){
-            htmlcode3x3 =  htmlcode3x3.replaceAll("zukgitPlaceHolderindex",length+"");
+        String htmlcode3x3 = readStringFromFile(htmlFile_jpg_3x3);
+        if (htmlcode3x3 != null && htmlcode3x3.contains("zukgitPlaceHolderindex")) {
+            htmlcode3x3 = htmlcode3x3.replaceAll("zukgitPlaceHolderindex", length + "");
         }
-        File htmlcode3x3_File = new File(addPath+File.separator+htmlFile_gif_3x3.getName());
-        if(!htmlcode3x3_File.exists()){
+        File htmlcode3x3_File = new File(addPath + File.separator + htmlFile_jpg_3x3.getName());
+        if (!htmlcode3x3_File.exists()) {
             try {
                 htmlcode3x3_File.createNewFile();
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
-        writeContentToFile(htmlcode3x3_File,htmlcode3x3);
+        writeContentToFile(htmlcode3x3_File, htmlcode3x3);
 
-        String htmlcode3x5  = readStringFromFile(htmlFile_gif_3x5);
-        if(htmlcode3x5 != null && htmlcode3x5.contains("zukgitPlaceHolderindex")){
-            htmlcode3x5 =  htmlcode3x5.replaceAll("zukgitPlaceHolderindex",length+"");
+        String htmlcode3x5 = readStringFromFile(htmlFile_jpg_3x5);
+        if (htmlcode3x5 != null && htmlcode3x5.contains("zukgitPlaceHolderindex")) {
+            htmlcode3x5 = htmlcode3x5.replaceAll("zukgitPlaceHolderindex", length + "");
         }
-        File htmlcode3x5_File = new File(addPath+File.separator+htmlFile_gif_3x5.getName());
-        if(!htmlcode3x5_File.exists()){
+        File htmlcode3x5_File = new File(addPath + File.separator + htmlFile_jpg_3x5.getName());
+        if (!htmlcode3x5_File.exists()) {
             try {
                 htmlcode3x5_File.createNewFile();
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
-        writeContentToFile(htmlcode3x5_File,htmlcode3x5);
+        writeContentToFile(htmlcode3x5_File, htmlcode3x5);
 
-        String htmlcode3d  = readStringFromFile(htmlFile_gif__3d);
-        if(htmlcode3d != null && htmlcode3d.contains("zukgitPlaceHolderindex")){
-            htmlcode3d =  htmlcode3d.replaceAll("zukgitPlaceHolderindex",length+"");
+        String htmlcode3d = readStringFromFile(htmlFile_jpg__3d);
+        if (htmlcode3d != null && htmlcode3d.contains("zukgitPlaceHolderindex")) {
+            htmlcode3d = htmlcode3d.replaceAll("zukgitPlaceHolderindex", length + "");
         }
-        File htmlcode3d_File = new File(addPath+File.separator+htmlFile_gif__3d.getName());
-        if(!htmlcode3d_File.exists()){
+        File htmlcode3d_File = new File(addPath + File.separator + htmlFile_jpg__3d.getName());
+        if (!htmlcode3d_File.exists()) {
             try {
                 htmlcode3d_File.createNewFile();
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
-        writeContentToFile(htmlcode3d_File,htmlcode3d);
+        writeContentToFile(htmlcode3d_File, htmlcode3d);
     }
 
 
-
-
-    public static void addMP4HtmlFile(String addPath , int length) {
-        String htmlcode2x2  = readStringFromFile(htmlFile_mp4_2x2);
-        if(htmlcode2x2 != null && htmlcode2x2.contains("zukgitPlaceHolderindex")){
-            htmlcode2x2 =  htmlcode2x2.replaceAll("zukgitPlaceHolderindex",length+"");
+    public static void addGIFHtmlFile(String addPath, int length) {
+        String htmlcode2x2 = readStringFromFile(htmlFile_gif_2x2);
+        if (htmlcode2x2 != null && htmlcode2x2.contains("zukgitPlaceHolderindex")) {
+            htmlcode2x2 = htmlcode2x2.replaceAll("zukgitPlaceHolderindex", length + "");
         }
-        File htmlcode2x2_File = new File(addPath+File.separator+htmlFile_mp4_2x2.getName());
-        if(!htmlcode2x2_File.exists()){
+        File htmlcode2x2_File = new File(addPath + File.separator + htmlFile_gif_2x2.getName());
+        if (!htmlcode2x2_File.exists()) {
             try {
                 htmlcode2x2_File.createNewFile();
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
-        writeContentToFile(htmlcode2x2_File,htmlcode2x2);
+        writeContentToFile(htmlcode2x2_File, htmlcode2x2);
 
-        String htmlcode3x3  = readStringFromFile(htmlFile_mp4_3x3);
-        if(htmlcode3x3 != null && htmlcode3x3.contains("zukgitPlaceHolderindex")){
-            htmlcode3x3 =  htmlcode3x3.replaceAll("zukgitPlaceHolderindex",length+"");
+        String htmlcode3x3 = readStringFromFile(htmlFile_gif_3x3);
+        if (htmlcode3x3 != null && htmlcode3x3.contains("zukgitPlaceHolderindex")) {
+            htmlcode3x3 = htmlcode3x3.replaceAll("zukgitPlaceHolderindex", length + "");
         }
-        File htmlcode3x3_File = new File(addPath+File.separator+htmlFile_mp4_3x3.getName());
-        if(!htmlcode3x3_File.exists()){
+        File htmlcode3x3_File = new File(addPath + File.separator + htmlFile_gif_3x3.getName());
+        if (!htmlcode3x3_File.exists()) {
             try {
                 htmlcode3x3_File.createNewFile();
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
-        writeContentToFile(htmlcode3x3_File,htmlcode3x3);
+        writeContentToFile(htmlcode3x3_File, htmlcode3x3);
 
-        String htmlcode3x5  = readStringFromFile(htmlFile_mp4_3x5);
-        if(htmlcode3x5 != null && htmlcode3x5.contains("zukgitPlaceHolderindex")){
-            htmlcode3x5 =  htmlcode3x5.replaceAll("zukgitPlaceHolderindex",length+"");
+        String htmlcode3x5 = readStringFromFile(htmlFile_gif_3x5);
+        if (htmlcode3x5 != null && htmlcode3x5.contains("zukgitPlaceHolderindex")) {
+            htmlcode3x5 = htmlcode3x5.replaceAll("zukgitPlaceHolderindex", length + "");
         }
-        File htmlcode3x5_File = new File(addPath+File.separator+htmlFile_mp4_3x5.getName());
-        if(!htmlcode3x5_File.exists()){
+        File htmlcode3x5_File = new File(addPath + File.separator + htmlFile_gif_3x5.getName());
+        if (!htmlcode3x5_File.exists()) {
             try {
                 htmlcode3x5_File.createNewFile();
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
-        writeContentToFile(htmlcode3x5_File,htmlcode3x5);
+        writeContentToFile(htmlcode3x5_File, htmlcode3x5);
 
-        String htmlcode3d  = readStringFromFile(htmlFile_mp4__3d);
-        if(htmlcode3d != null && htmlcode3d.contains("zukgitPlaceHolderindex")){
-            htmlcode3d =  htmlcode3d.replaceAll("zukgitPlaceHolderindex",length+"");
+        String htmlcode3d = readStringFromFile(htmlFile_gif__3d);
+        if (htmlcode3d != null && htmlcode3d.contains("zukgitPlaceHolderindex")) {
+            htmlcode3d = htmlcode3d.replaceAll("zukgitPlaceHolderindex", length + "");
         }
-        File htmlcode3d_File = new File(addPath+File.separator+htmlFile_mp4__3d.getName());
-        if(!htmlcode3d_File.exists()){
+        File htmlcode3d_File = new File(addPath + File.separator + htmlFile_gif__3d.getName());
+        if (!htmlcode3d_File.exists()) {
             try {
                 htmlcode3d_File.createNewFile();
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
-        writeContentToFile(htmlcode3d_File,htmlcode3d);
+        writeContentToFile(htmlcode3d_File, htmlcode3d);
+    }
+
+
+    public static void addMP4HtmlFile(String addPath, int length) {
+        String htmlcode2x2 = readStringFromFile(htmlFile_mp4_2x2);
+        if (htmlcode2x2 != null && htmlcode2x2.contains("zukgitPlaceHolderindex")) {
+            htmlcode2x2 = htmlcode2x2.replaceAll("zukgitPlaceHolderindex", length + "");
+        }
+        File htmlcode2x2_File = new File(addPath + File.separator + htmlFile_mp4_2x2.getName());
+        if (!htmlcode2x2_File.exists()) {
+            try {
+                htmlcode2x2_File.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        writeContentToFile(htmlcode2x2_File, htmlcode2x2);
+
+        String htmlcode3x3 = readStringFromFile(htmlFile_mp4_3x3);
+        if (htmlcode3x3 != null && htmlcode3x3.contains("zukgitPlaceHolderindex")) {
+            htmlcode3x3 = htmlcode3x3.replaceAll("zukgitPlaceHolderindex", length + "");
+        }
+        File htmlcode3x3_File = new File(addPath + File.separator + htmlFile_mp4_3x3.getName());
+        if (!htmlcode3x3_File.exists()) {
+            try {
+                htmlcode3x3_File.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        writeContentToFile(htmlcode3x3_File, htmlcode3x3);
+
+        String htmlcode3x5 = readStringFromFile(htmlFile_mp4_3x5);
+        if (htmlcode3x5 != null && htmlcode3x5.contains("zukgitPlaceHolderindex")) {
+            htmlcode3x5 = htmlcode3x5.replaceAll("zukgitPlaceHolderindex", length + "");
+        }
+        File htmlcode3x5_File = new File(addPath + File.separator + htmlFile_mp4_3x5.getName());
+        if (!htmlcode3x5_File.exists()) {
+            try {
+                htmlcode3x5_File.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        writeContentToFile(htmlcode3x5_File, htmlcode3x5);
+
+        String htmlcode3d = readStringFromFile(htmlFile_mp4__3d);
+        if (htmlcode3d != null && htmlcode3d.contains("zukgitPlaceHolderindex")) {
+            htmlcode3d = htmlcode3d.replaceAll("zukgitPlaceHolderindex", length + "");
+        }
+        File htmlcode3d_File = new File(addPath + File.separator + htmlFile_mp4__3d.getName());
+        if (!htmlcode3d_File.exists()) {
+            try {
+                htmlcode3d_File.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        writeContentToFile(htmlcode3d_File, htmlcode3d);
     }
 
 
     public static void collectAllG() {
         // mingwen/g/gif
-        String allPath = System.getProperties().getProperty("user.dir")+ File.separator +mingwenDir + File.separator + "g" + File.separator + "gif";
+        String allPath = System.getProperties().getProperty("user.dir") + File.separator + mingwenDir + File.separator + "g" + File.separator + "gif";
         File allFileDir = new File(allPath);
 
         if (!allFileDir.exists()) {
@@ -526,15 +645,15 @@ writeContentToFile(htmlcode3d_File,htmlcode3d);
         for (int i = 0; i < gifFileList_mingwen.size(); i++) {
             File fileItem = (File) gifFileList_mingwen.get(i);
             String name = fileItem.getName();
-            int nameIndex  = i + 1;
-            String nameIdnex = nameIndex+".gif";
-           //  File allFileItem = new File(allPath +File.separator+name);
-            File allFileItem = new File(allPath +File.separator+nameIdnex);
-            fileCopy(fileItem,allFileItem);
+            int nameIndex = i + 1;
+            String nameIdnex = nameIndex + ".gif";
+            //  File allFileItem = new File(allPath +File.separator+name);
+            File allFileItem = new File(allPath + File.separator + nameIdnex);
+            fileCopy(fileItem, allFileItem);
 
         }
 
-        addGIFHtmlFile(System.getProperties().getProperty("user.dir")+ File.separator +mingwenDir + File.separator + "g" , gifFileList_mingwen.size());
+        addGIFHtmlFile(System.getProperties().getProperty("user.dir") + File.separator + mingwenDir + File.separator + "g", gifFileList_mingwen.size());
     }
 
     public static void fileCopy(File origin, File target) {
@@ -562,7 +681,7 @@ writeContentToFile(htmlcode3d_File,htmlcode3d);
 
         } catch (Exception e) {
 
-        }finally {
+        } finally {
             if (input != null && output != null) {
                 try {
                     input.close(); // 关闭流
@@ -827,18 +946,18 @@ writeContentToFile(htmlcode3d_File,htmlcode3d);
                     System.out.println("明文mp4文件 index:" + i + "    path:" + mingwenFile.getAbsolutePath());
                     mp4FileList_mingwen.add(mingwenFile);
                     String name = mingwenFile.getName();
-                    if(name.startsWith("wm")){
+                    if (name.startsWith("wm")) {
                         wm_mp4FileList_mingwen.add(mingwenFile);
-                    } else if(name.startsWith("ym")){
+                    } else if (name.startsWith("ym")) {
                         ym_mp4FileList_mingwen.add(mingwenFile);
 
-                    } else if(name.startsWith("up")){
+                    } else if (name.startsWith("up")) {
                         up_mp4FileList_mingwen.add(mingwenFile);
-                    } else if(name.startsWith("support")){
+                    } else if (name.startsWith("support")) {
                         support_mp4FileList_mingwen.add(mingwenFile);
-                    } else if(name.startsWith("am")){
+                    } else if (name.startsWith("am")) {
                         am_mp4FileList_mingwen.add(mingwenFile);
-                    } else if(name.startsWith("fakeface")){
+                    } else if (name.startsWith("fakeface")) {
                         fakeface_mp4FileList_mingwen.add(mingwenFile);
                     }
 
@@ -879,6 +998,9 @@ writeContentToFile(htmlcode3d_File,htmlcode3d);
 
 
         System.out.println("=======文件列表 End  文件总数:" + allPointFile_miwen.size() + " =======");
+
+
+        todoIndivitualFile(mp4FileList_mingwen);
     }
 
 
@@ -1299,24 +1421,24 @@ writeContentToFile(htmlcode3d_File,htmlcode3d);
     }
 
 
-    static void writeContentToFile(File curFile , String classContent) {
+    static void writeContentToFile(File curFile, String classContent) {
         try {
             BufferedWriter strBuffWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(curFile), "utf-8"));
             strBuffWriter.write(classContent);
             strBuffWriter.flush();
             strBuffWriter.close();
-        }catch (IOException e) {
+        } catch (IOException e) {
             System.out.println(e.fillInStackTrace());
         }
 
     }
 
-    static String readStringFromFile(File fileItem){
-        if(fileItem == null ||  !fileItem.exists()){
+    static String readStringFromFile(File fileItem) {
+        if (fileItem == null || !fileItem.exists()) {
 
             System.out.println("当前读取的文件不存在!");
             return null;
-        }else{
+        } else {
             System.out.println("当前读取的文件 = " + fileItem.getAbsolutePath());
 
         }
@@ -1334,13 +1456,13 @@ writeContentToFile(htmlcode3d_File,htmlcode3d);
                 if (oldOneLine == null || oldOneLine.trim().isEmpty()) {
                     continue;
                 }
-                sb.append(oldOneLine+"\n");
+                sb.append(oldOneLine + "\n");
                 indexLine++;
             }
             curBR.close();
-        } catch (Exception e){
+        } catch (Exception e) {
 
-            System.out.println("Exception e = "+ e.toString());
+            System.out.println("Exception e = " + e.toString());
         }
         return sb.toString();
     }

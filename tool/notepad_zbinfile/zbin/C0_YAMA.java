@@ -7,7 +7,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 import javax.crypto.Cipher;
-public class YAMA {
+public class C0_YAMA {
 
     private static String strDefaultKey = "zukgit12"; //    加密原始秘钥字符串
 
