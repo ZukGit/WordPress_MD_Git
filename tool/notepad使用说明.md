@@ -907,6 +907,21 @@ Windows CMD 下 执行  C3.bat
 ```
 
 
+### C4_对C3产生的html保存到本地的页面网络化(Notepad)
+```
+会在当前目录重新生成一个html文件   C4_networkable.html
+C4.bat                     //WIndows  本地执行脚本
+C4.java                  
+C4.vbs                          
+
+
+Wscript.exe  /x %userprofile%\Desktop\zbin\C4.vbs  %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH) 
+cmd /K cd /d %userprofile%\Desktop\zbin & %userprofile%\Desktop\zbin\C4.bat %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH) 
+
+
+```
+
+
 # F5_命令小集合
 ```
 cmd /K   echo %OS%             // 检测 %OS% 这个环境变量  打印   Windows_NT
@@ -1056,8 +1071,8 @@ xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx   【B9 bat 】【B9_jpg.html  jpg
 
 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  【 C0 vbs 】
 C0_加密解密文件(IDE执行)
-C0_Encryption/JIEMA
-C0_Encryption/YAMA
+C0_JIEMA
+C0_YAMA
 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  【 C0 vbs 】
 
 
@@ -1093,6 +1108,17 @@ Windows CMD 下 执行  C3.bat
 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx   【C3 sh bat 】
 
 
+
+
+
+
+
+
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  【 C4 vbs 】 【 对 C3产生的本地化数据进行网络化  样式调整 】
+Wscript.exe  /x %userprofile%\Desktop\zbin\C4.vbs  %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH) 
+cmd /K cd /d %userprofile%\Desktop\zbin & %userprofile%\Desktop\zbin\C4.bat %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH) 
+
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx   【C4  bat 】
 
 ```
 
