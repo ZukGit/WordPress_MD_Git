@@ -1,0 +1,3 @@
+/home/zhuzjx/Desktop/Code_Dir/ProductName/1Code/frameworks/base
+/home/zhuzjx/Desktop/Code_Dir/ProductName/1Code/packages/apps/Settings
+

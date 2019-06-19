@@ -922,6 +922,37 @@ cmd /K cd /d %userprofile%\Desktop\zbin & %userprofile%\Desktop\zbin\C4.bat %use
 ```
 
 
+### C6_查看指定路径下的远程分支信息
+```
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  【 C6 sh 】 【 AOSP根目录 执行脚本 用于查看 保存在 C6_git_repository_path.txt 中对应的路径下的远程分支 】
+使用 git branch -vv  查看远程分支
+
+ git branch -vv
+* master 449275e [origin/master] 0617
+
+
+1. 预置条件:  首先在 C6_git_repository_path.txt 加入AOSP git 仓库的绝对路径    例如:
+/home/zhuzjx/Desktop/Code_Dir/ProductName/1Code/frameworks/base
+/home/zhuzjx/Desktop/Code_Dir/ProductName/1Code/packages/apps/Settings
+
+2. 把 C6_checkbranch.sh  C6_git_repository_path.txt 放入 AOSP 根目录  然后 SHell 中 执行 脚本   ./C6_checkbranch.sh  即可查看对应分支与远程分支
+
+./C6_checkbranch.sh
+
+
+3. 如果当前  ./C6_checkbranch.sh 读取 C6_git_repository_path.txt 在 windows中出现 路径错误
+./C6_checkbranch.sh: line 9: cd: $'/c/Users/aaa/Desktop/git_code/JNI_Zukgit/JNI_Zukgit\r': No such file or directory
+把文件从Linux转到Windows中 每行多出一个 /r   可用 dos2unix.exe 工具 把 当前文件格式转换一下  然后继续执行
+dos2unix.exe  C6_git_repository_path.txt
+
+
+
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx   【C6  sh 】
+
+
+```
+
+
 # F5_命令小集合
 ```
 cmd /K   echo %OS%             // 检测 %OS% 这个环境变量  打印   Windows_NT
@@ -1119,6 +1150,34 @@ Wscript.exe  /x %userprofile%\Desktop\zbin\C4.vbs  %userprofile%\Desktop\zbin  $
 cmd /K cd /d %userprofile%\Desktop\zbin & %userprofile%\Desktop\zbin\C4.bat %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH) 
 
 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx   【C4  bat 】
+
+
+
+
+
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  【 C6 sh 】 【 AOSP根目录 执行脚本 用于查看 保存在 C6_git_repository_path.txt 中对应的路径下的远程分支 】
+使用 git branch -vv  查看远程分支
+
+ git branch -vv
+* master 449275e [origin/master] 0617
+
+
+1. 预置条件:  首先在 C6_git_repository_path.txt 加入AOSP git 仓库的绝对路径    例如:
+/home/zhuzjx/Desktop/Code_Dir/ProductName/1Code/frameworks/base
+/home/zhuzjx/Desktop/Code_Dir/ProductName/1Code/packages/apps/Settings
+
+
+2. 把 C6_checkbranch.sh  C6_git_repository_path.txt 放入 AOSP 根目录  然后 SHell 中 执行 脚本   ./C6_checkbranch.sh  即可查看对应分支与远程分支
+
+./C6_checkbranch.sh
+
+3. 如果当前  ./C6_checkbranch.sh 读取 C6_git_repository_path.txt 在 windows中出现 路径错误
+./C6_checkbranch.sh: line 9: cd: $'/c/Users/aaa/Desktop/git_code/JNI_Zukgit/JNI_Zukgit\r': No such file or directory
+把文件从Linux转到Windows中 每行多出一个 /r   可用 dos2unix.exe 工具 把 当前文件格式转换一下  然后继续执行
+dos2unix.exe  C6_git_repository_path.txt
+
+
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx   【C6  sh 】
 
 ```
 
