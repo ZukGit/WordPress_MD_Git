@@ -916,10 +916,31 @@ C4.vbs
 
 
 Wscript.exe  /x %userprofile%\Desktop\zbin\C4.vbs  %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH) 
+
 cmd /K cd /d %userprofile%\Desktop\zbin & %userprofile%\Desktop\zbin\C4.bat %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH) 
 
 
 ```
+
+
+
+### C5_分析高通Qcom的WCNSS_qcom_cfg.ini文件(CMD下执行)
+```
+在高通芯片AOSP的根目录下执行  分析WCNSS_qcom_cfg.ini 和 wlan_hdd_cfg.h 两个文件
+会在当前目录重新生成一个html文件   C5_WCNSS_qcom_cfg_item.html
+C5.bat                     //WIndows  本地执行脚本
+
+C5_android.sh*            // android工程根目录 执行的脚本
+C5_juwuba_template.html      // 生成 html的模板  不可更改
+
+
+Linux Shell 下执行  C5_android.sh  
+Windows CMD 下 执行  C5.bat 
+
+
+```
+
+
 
 
 ### C6_查看指定路径下的远程分支信息
@@ -1152,6 +1173,24 @@ cmd /K cd /d %userprofile%\Desktop\zbin & %userprofile%\Desktop\zbin\C4.bat %use
 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx   【C4  bat 】
 
 
+
+
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  【 C5 sh bat  cmd目录下执行 】 【AOSP 下 C5_android.sh】
+ 【windows下需要把 WCNSS_qcom_cfg.ini 和 wlan_hdd_cfg.h 两个文件放到 user.dir 目录 】
+安卓&& 普通工程  分析WCNSS_qcom_cfg.ini 和 wlan_hdd_cfg.h 两个文件 结果 脚本(CMD下执行) 生成 html 页面 
+在高通芯片AOSP的根目录下执行  分析WCNSS_qcom_cfg.ini 和 wlan_hdd_cfg.h 两个文件
+会在当前目录重新生成一个html文件   C5_WCNSS_qcom_cfg_item.html
+C5.bat                     //WIndows  本地执行脚本
+
+C5_android.sh*            // android工程根目录 执行的脚本
+C5_juwuba_template.html      // 生成 html的模板  不可更改
+
+
+
+
+Linux Shell 下执行  C5_android.sh  
+Windows CMD 下 执行  C5.bat 
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx   【C5 sh bat 】
 
 
 
