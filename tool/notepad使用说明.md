@@ -973,6 +973,32 @@ xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx   【C6  sh 】
 
 ```
 
+### C7_在AOSP根目录下执行把那些总要找路径的文件统一管理 (AOSP Shell下执行)
+```
+chmod 777 C7*
+
+C7_AOSP_Pull.sh  // AOSP 根目录下执行  会创建一个 ZC7_2019xxx 的文件夹 该文件内会从其他地方拷贝文件进去 (专门为了优化那些需要编译生成的文件的查找过程)
+
+
+Linux Shell 下执行  C7_AOSP_Pull.sh
+
+
+```
+
+### C8_修改 dex_preopt.mk文件添加dex的标识位(AOSP shell下执行)
+```
+C8_修改 dex_preopt.mk文件添加dex的标识位(AOSP shell下执行)
+那么在编译后的版本 可以 进行 把 framework 替换的操作  而不导致死机
+
+./C8_android_addDexFlag.sh     // Linux Shell 下执行 
+ 
+C8_AOSP_AddDexFlag.java    //  逻辑: 读取原有dex_preopt.mk  把 DEX_PREOPT_DEFAULT ?= true   =》  DEX_PREOPT_DEFAULT ?= false
+                            //  把 GLOBAL_DEXPREOPT_FLAGS :=   替换为  GLOBAL_DEXPREOPT_FLAGS :=\nWITH_DEXPREOPT := false
+```
+
+
+
+
 
 # F5_命令小集合
 ```
@@ -1217,6 +1243,30 @@ dos2unix.exe  C6_git_repository_path.txt
 
 
 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx   【C6  sh 】
+
+
+
+
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  【 C7 sh 】C7_在AOSP根目录下执行把那些总要找路径的文件统一管理 (AOSP Shell下执行)
+
+chmod 777 C7*
+
+./C7_AOSP_Pull.sh         // AOSP 根目录下执行  会创建一个 ZC7_2019xxx 的文件夹 该文件内会从其他地方拷贝文件进去 (专门为了优化那些需要编译生成的文件的查找过程)
+
+
+Linux Shell 下执行  C7_AOSP_Pull.sh
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  【 C7 sh 】
+
+
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  【 C8 sh 】 C8_修改 dex_preopt.mk文件添加dex的标识位(AOSP shell下执行)
+添加了 dex 标识的话 那么在编译后的版本 可以 进行 把 framework 替换的操作  而不导致死机
+
+./C8_android_addDexFlag.sh     // Linux Shell 下执行 
+ 
+C8_AOSP_AddDexFlag.java    //  逻辑: 读取原有dex_preopt.mk  把 DEX_PREOPT_DEFAULT ?= true   =》  DEX_PREOPT_DEFAULT ?= false
+                            //  把 GLOBAL_DEXPREOPT_FLAGS :=   替换为  GLOBAL_DEXPREOPT_FLAGS :=\nWITH_DEXPREOPT := false
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  【 C8 sh 】
+
 
 ```
 
