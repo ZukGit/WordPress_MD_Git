@@ -997,6 +997,15 @@ C8_AOSP_AddDexFlag.java    //  逻辑: 读取原有dex_preopt.mk  把 DEX_PREOPT
 ```
 
 
+### C9—— 把当前markdown转为html格式
+```
+
+【 C9  把当前md文件转为html页面】
+Wscript.exe  /x %userprofile%\Desktop\zbin\C9.vbs  %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH)       【C9 vbs】
+cmd /K cd /d %userprofile%\Desktop\zbin & %userprofile%\Desktop\zbin\C9.bat %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH)      【C9 bat】
+
+```
+
 
 
 
@@ -1268,5 +1277,9 @@ C8_AOSP_AddDexFlag.java    //  逻辑: 读取原有dex_preopt.mk  把 DEX_PREOPT
 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  【 C8 sh 】
 
 
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  【 C9  把当前md文件转为html页面】
+Wscript.exe  /x %userprofile%\Desktop\zbin\C9.vbs  %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH)       【C9 vbs】
+cmd /K cd /d %userprofile%\Desktop\zbin & %userprofile%\Desktop\zbin\C9.bat %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH)      【C9 bat】
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  【 C9  】
 ```
 
