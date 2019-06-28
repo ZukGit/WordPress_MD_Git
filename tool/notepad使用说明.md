@@ -1008,6 +1008,16 @@ cmd /K cd /d %userprofile%\Desktop\zbin & %userprofile%\Desktop\zbin\C9.bat %use
 
 
 
+### D0_当前目录执行把MD文件转为html文件(复制D0到包含md文件命令  点击或者 CMD 下执行)
+```
+
+【  D0  当前目录执行把MD文件转为html文件(复制D0到包含md文件命令  点击或者 CMD 下执行) 】
+
+复制到对应目录  点击执行
+adb_01基础命令.md =》  adb_01基础命令.html   && adb_01基础命令.md 
+
+```
+
 
 # F5_命令小集合
 ```
@@ -1281,5 +1291,16 @@ xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  【 C9  把当前md文�
 Wscript.exe  /x %userprofile%\Desktop\zbin\C9.vbs  %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH)       【C9 vbs】
 cmd /K cd /d %userprofile%\Desktop\zbin & %userprofile%\Desktop\zbin\C9.bat %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH)      【C9 bat】
 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  【 C9  】
+
+
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  【 D0 bat  复制D0到目录 点击执行 】
+【  D0  当前目录执行把MD文件转为html文件(复制D0到包含md文件命令  点击或者 CMD 下执行) 】
+
+复制到对应目录  点击执行
+adb_01基础命令.md =》  adb_01基础命令.html   && adb_01基础命令.md 
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  【 D0 bat  复制D0到目录 点击执行 】
+
+
+
 ```
 
