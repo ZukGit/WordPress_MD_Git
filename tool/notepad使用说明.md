@@ -1004,19 +1004,16 @@ C8_AOSP_AddDexFlag.java    //  逻辑: 读取原有dex_preopt.mk  把 DEX_PREOPT
 Wscript.exe  /x %userprofile%\Desktop\zbin\C9.vbs  %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH)       【C9 vbs】
 cmd /K cd /d %userprofile%\Desktop\zbin & %userprofile%\Desktop\zbin\C9.bat %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH)      【C9 bat】
 
-```
-
-
-
-### D0_当前目录执行把MD文件转为html文件(复制D0到包含md文件命令  点击或者 CMD 下执行)
-```
-
-【  D0  当前目录执行把MD文件转为html文件(复制D0到包含md文件命令  点击或者 CMD 下执行) 】
-
+C9_mdRevert.bat      【转换md 转换markdown  复制bat到包含markdown的文件夹然后 点击】                                      【 C9_mdRevert.bat  】
+当前目录执行把MD文件转为html文件(复制C9 到包含md文件命令  点击或者 CMD 下执行)
 复制到对应目录  点击执行
 adb_01基础命令.md =》  adb_01基础命令.html   && adb_01基础命令.md 
 
 ```
+
+
+
+
 
 
 # F5_命令小集合
@@ -1290,15 +1287,17 @@ xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  【 C8 sh 】
 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  【 C9  把当前md文件转为html页面】
 Wscript.exe  /x %userprofile%\Desktop\zbin\C9.vbs  %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH)       【C9 vbs】
 cmd /K cd /d %userprofile%\Desktop\zbin & %userprofile%\Desktop\zbin\C9.bat %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH)      【C9 bat】
+
+
+C9_mdRevert.bat      【转换md 转换markdown  复制bat到包含markdown的文件夹然后 点击】                                      【 C9_mdRevert.bat  】
+当前目录执行把MD文件转为html文件(复制C9 到包含md文件命令  点击或者 CMD 下执行)
+复制到对应目录  点击执行
+adb_01基础命令.md =》  adb_01基础命令.html   && adb_01基础命令.md 
+
 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  【 C9  】
 
 
-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  【 D0 bat  复制D0到目录 点击执行 】
-【  D0  当前目录执行把MD文件转为html文件(复制D0到包含md文件命令  点击或者 CMD 下执行) 】
 
-复制到对应目录  点击执行
-adb_01基础命令.md =》  adb_01基础命令.html   && adb_01基础命令.md 
-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  【 D0 bat  复制D0到目录 点击执行 】
 
 
 
