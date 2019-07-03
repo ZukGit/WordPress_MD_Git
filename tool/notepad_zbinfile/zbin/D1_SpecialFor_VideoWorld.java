@@ -1,6 +1,5 @@
 
 
-
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -21,7 +20,7 @@ public class D1_SpecialFor_VideoWorld {
     public static Map<String,ArrayList<File>> nameMap = new HashMap<String,ArrayList<File>>();
 
     static Map<String,String> categoryMap = new HashMap<String,String>();
-
+static ArrayList<String> preTypeArr = new ArrayList<String>();
     static boolean isOutterMdFile = false;
  //        mountain=====山
 //        river   =====河
@@ -39,10 +38,21 @@ public class D1_SpecialFor_VideoWorld {
      categoryMap.put("lake","湖");
      categoryMap.put("ocean","海");
      categoryMap.put("sun","日");
+     categoryMap.put("moon","月");
      categoryMap.put("star","星");
      categoryMap.put("light","光");
      categoryMap.put("sky","天玄");
      categoryMap.put("land","地黄");
+     preTypeArr.add("mountain");
+     preTypeArr.add("river");
+     preTypeArr.add("lake");
+     preTypeArr.add("ocean");
+     preTypeArr.add("sun");
+     preTypeArr.add("moon");
+     preTypeArr.add("star");
+     preTypeArr.add("light");
+     preTypeArr.add("sky");
+     preTypeArr.add("land");
  }
     public static void main(String[] args) {
 
@@ -85,6 +95,7 @@ public class D1_SpecialFor_VideoWorld {
 // tofoAnalysis
           todoAnalysisFileNameFillMap();
 
+
         File localMDFile = new File(CurrentDir+File.separator+"D1_local_videoworld.md");
         File outterMDFile = new File(CurrentDir+File.separator+"02Video_World.md");
         String localMdStr = todoMarkdown();
@@ -106,16 +117,13 @@ public class D1_SpecialFor_VideoWorld {
         Map.Entry<String , String> titleEntry;
 
 
-        if(categoryMap != null){
-            Iterator iterator = categoryMap.entrySet().iterator();
+        if(categoryMap != null && preTypeArr != null){
+            for (int i = 0; i < preTypeArr.size(); i++) {
 
+                String preType =   preTypeArr.get(i);
+                String titleName =   categoryMap.get(preType);
 
-            while( iterator.hasNext() ){
-                titleEntry = (Map.Entry<String , String>) iterator.next();
-              String preType =   titleEntry.getKey();  //Map的Value
-              String titleName =   titleEntry.getValue();  //Map的Value
-
-              markdownSB.append("# "+ titleName+"\n");
+                markdownSB.append("# "+ titleName+"\n");
 
                 Map<String,ArrayList<File>> mapItem =  ruledMP4Map.get(preType);
                 Map.Entry<String , ArrayList<File>> entryMapItem;
@@ -207,7 +215,7 @@ static String BuildMarkDownFromArrayList(ArrayList<File> fileArray, String showR
         }
 
         StringBuilder resultStr = new StringBuilder();
-    resultStr.append("<p  style=\"white-space:nowrap\" >\n");
+    resultStr.append("<p  style=\"white-space:nowrap;font-size:0\" >\n");
     for (File sameSizeMP4File: fileArray) {
         resultStr.append("<video autoplay=\"true\" controls=\"controls\" width=\""+showRate+"\" hight=\""+showRate+"\" >\n");
 
