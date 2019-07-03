@@ -386,8 +386,8 @@ static Map<String,Map<String,ArrayList<FixNameFileItem>>> mFixNameFileItemMap = 
 this.preType = calculatePreType();
           try {
               it.sauronsoftware.jave.MultimediaInfo m = encoder.getInfo(oldFile);
-              high = m.getVideo().getSize().getWidth();
-              width = m.getVideo().getSize().getHeight();
+              width = m.getVideo().getSize().getWidth();
+              high = m.getVideo().getSize().getHeight();
           }catch (Exception e) {
               e.printStackTrace();
               System.out.println(" 解析MP4文件出现异常！ ");

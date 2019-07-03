@@ -1046,6 +1046,20 @@ D0_MP4_NameWithSize.java
 ```
 
 
+### D2_____解析D1产生的mp4文件并生成md文件 专用于 02worldvideo    
+```
+
+D1.bat                           
+D1_SpecialFor_VideoWorld.class   
+D1_SpecialFor_VideoWorld.java    
+D1_videoworld_md.bat   【解析规则的mp4文件生成 md问阿金   复制bat到包含D1生成的 mp4的文件夹然后 点击】                                      【 D1_videoworld_md.bat  】           
+                                 
+
+
+
+```
+
+
 
 
 
