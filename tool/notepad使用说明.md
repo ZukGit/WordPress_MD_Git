@@ -1014,6 +1014,42 @@ adb_01基础命令.md =》  adb_01基础命令.html   && adb_01基础命令.md
 
 
 
+### D1—— 把当前MP4文件,jpg文件转换名字    
+```
+
+D0_mp4_namefix.bat      【重命名当前路径下的mp4文件  复制bat到包含mp4的文件夹然后 点击】                                      【 D0_mp4_namefix.bat  】
+D0_jpg_namefix.bat      【重命名当前路径下的jpg文件  复制bat到包含jpg的文件夹然后 点击】                                      【 D0_jpg_namefix.bat  】
+
+命名规则为:   前缀分类_1000宽x1000高_0001尺寸索引_0001分类索引
+dainshixian_0595x0589_0001_0001.jpg
+kazuo_1297x0853_0001_0001.jpg
+
+chuang_0960x0720_0001_0001.mp4
+chuang_0960x0720_0002_0002.mp4
+
+
+D0_jpg.bat            【zbin下 执行jpg文件重命名的方bat文件】                
+D0_jpg_namefix.bat     【需要被复制到执行目录下的点击文件 句柄文件 】
+D0_JPG_NameWithSize.java   【对jpg文件进行处理的文件 】
+
+
+ 
+     
+D0_mp4.bat            【zbin下 执行mp4文件重命名的方bat文件】                         
+D0_mp4_namefix.bat     【需要被复制到执行目录下的点击文件 句柄文件 】       
+D0_mp4tool.jar          【解析视频的宽高 需要的库文件 jar包 】       
+D0_MP4_NameWithSize.java                             
+
+使用方法:
+把 D0_jpg_namefix.bat    或者  D0_mp4_namefix.bat   复制到包含 mp4文件或者  jpg的文件夹内  就可以双击 执行 ，来对文件进行依据规则的重命名
+
+```
+
+
+
+
+
+
 
 
 # F5_命令小集合
@@ -1297,6 +1333,37 @@ adb_01基础命令.md =》  adb_01基础命令.html   && adb_01基础命令.md
 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  【 C9  】
 
 
+
+
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  【 D0  把当前的jpg|mp4文件重命名】
+
+D0_mp4_namefix.bat      【重命名当前路径下的mp4文件  复制bat到包含mp4的文件夹然后 点击】                                      【 D0_mp4_namefix.bat  】
+D0_jpg_namefix.bat      【重命名当前路径下的jpg文件  复制bat到包含jpg的文件夹然后 点击】                                      【 D0_jpg_namefix.bat  】
+
+
+命名规则为:   前缀分类_1000宽x1000高_0001尺寸索引_0001分类索引
+dainshixian_0595x0589_0001_0001.jpg
+kazuo_1297x0853_0001_0001.jpg
+
+chuang_0960x0720_0001_0001.mp4
+chuang_0960x0720_0002_0002.mp4
+
+
+D0_jpg.bat            【zbin下 执行jpg文件重命名的方bat文件】                
+D0_jpg_namefix.bat     【需要被复制到执行目录下的点击文件 句柄文件 】
+D0_JPG_NameWithSize.java   【对jpg文件进行处理的文件 】
+
+
+ 
+     
+D0_mp4.bat            【zbin下 执行mp4文件重命名的方bat文件】                         
+D0_mp4_namefix.bat     【需要被复制到执行目录下的点击文件 句柄文件 】       
+D0_mp4tool.jar          【解析视频的宽高 需要的库文件 jar包 】       
+D0_MP4_NameWithSize.java                             
+
+使用方法:
+把 D0_jpg_namefix.bat    或者  D0_mp4_namefix.bat   复制到包含 mp4文件或者  jpg的文件夹内  就可以双击 执行 ，来对文件进行依据规则的重命名
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  【 D0  把当前的jpg|mp4文件重命名】
 
 
 
