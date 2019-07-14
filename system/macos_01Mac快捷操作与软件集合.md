@@ -36,39 +36,48 @@ Control + 空格    // 切换输入法
 
 
 
-defaults write com.apple.finder _FXShowPosixPathInTitle -bool TRUE;killall Finder   //打开Finder显示路径
-
-defaults delete com.apple.finder _FXShowPosixPathInTitle;killall Finder  //恢复默认Finder显示
-
-
 
 
 ```
 
 ## 代码隐藏选项
 ```
-defaults write com.apple.finder _FXShowPosixPathInTitle -bool TRUE;killall Finder   //打开Finder显示路径
 
+======= Finder 隐藏功能代码
+defaults write com.apple.finder _FXShowPosixPathInTitle -bool TRUE;killall Finder   //打开Finder显示路径
 defaults delete com.apple.finder _FXShowPosixPathInTitle;killall Finder  //恢复默认Finder显示
 
 
-sudo spctl --master-disable    // 打开Mac安全设置下  允许安装所有应用的隐藏选项
+
+======= Mac安全设置
+sudo spctl --master-disable    // 打开Mac安全设置下  允许安装所有应用的隐藏选项 安装非APP Store的软件
 
 
 
-终端输入
-defaults write com.apple.dock ResetLaunchPad -bool true
-再输入
-killall Dock    //删除在Launch中已经显示问号的删除不掉的顽固图标
+======= 删除Launch显示问号顽固图标
+defaults write com.apple.dock ResetLaunchPad -bool true    //删除在Launch中已经显示问号的删除不掉的顽固图标
+killall Dock                                              //删除在Launch中已经显示问号的删除不掉的顽固图标
+killall SystemUIServer                                   //重启系统UI 顽固图标消失
+
+
+======= 添加空白分割区域到Dock栏
+defaults write com.apple.dock persistent-apps -array-add '{"tile-type"="spacer-tile";}'; killall Dock
+
+=======添加最新使用应用栏到Dock栏
+defaults write com.apple.dock persistent-others -array-add '{"tile-data" = {"list-type" = 1;}; "tile-type" = "recents-tile";}'; killall Dock
 
 
 
-// 保存系统截屏 Shift + Command + 4 保存的截图图片位置
-defaults write com.apple.screencapture location ~/Desktop/ 
-killall SystemUIServer
+
+=======开机声音duang
+sudo nvram SystemAudioVolume=%80         // 关闭开机声音
+sudo nvram -d SystemAudioVolume         // 打开开机声音
 
 
-
+======= 截图操作
+defaults write com.apple.screencapture location ~/Desktop      // 把屏幕截图保存的位置   shift+command+3  或者 shift+command+4 截图
+defaults write com.apple.screencapture type jpg               // 设置截图格式为 jpg
+defaults write com.apple.screencapture type png               // 设置截图格式为 png
 
 
 ```
