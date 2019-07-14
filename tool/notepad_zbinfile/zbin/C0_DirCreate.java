@@ -65,7 +65,7 @@ public class C0_DirCreate {
         patList_v.add("v" + File.separator + "ym"+ File.separator + "beddown" +File.separator +"01cetaitui");
         patList_v.add("v" + File.separator + "ym"+ File.separator + "beddown" +File.separator +"02gaotaitui");
         patList_v.add("v" + File.separator + "ym"+ File.separator + "justbody");
-
+        patList_v.add("v" + File.separator + "ym"+ File.separator + "temp");
         patList_v.add("v" + File.separator + "ym"+ File.separator + "ownerview");
         patList_v.add("v" + File.separator + "ym"+ File.separator + "standdun");
         patList_v.add("v" + File.separator + "ym"+ File.separator + "standdun"+ File.separator +"01taijiao");
@@ -87,6 +87,7 @@ public class C0_DirCreate {
         patList_v.add("v" + File.separator + "support"+ File.separator + "02runspace");
         patList_v.add("v" + File.separator + "support"+ File.separator + "03yanshe");
         patList_v.add("v" + File.separator + "wm");
+        patList_v.add("v" + File.separator + "wm"+ File.separator + "temp");
         patList_v.add("v" + File.separator + "wm"+ File.separator + "beauyscene");
         patList_v.add("v" + File.separator + "wm"+ File.separator + "shuangdong");
         patList_v.add("v" + File.separator + "wm"+ File.separator + "gangjiao");
