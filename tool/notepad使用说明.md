@@ -1014,7 +1014,7 @@ adb_01基础命令.md =》  adb_01基础命令.html   && adb_01基础命令.md
 
 
 
-### D1—— 把当前MP4文件,jpg文件转换名字    
+### D0—— 把当前MP4文件,jpg文件转换名字    
 ```
 
 D0_mp4_namefix.bat      【重命名当前路径下的mp4文件  复制bat到包含mp4的文件夹然后 点击】                                      【 D0_mp4_namefix.bat  】
@@ -1046,7 +1046,7 @@ D0_MP4_NameWithSize.java
 ```
 
 
-### D2_____解析D1产生的mp4文件并生成md文件 专用于 02worldvideo    
+### D1_____解析D0产生的mp4文件并生成md文件 专用于 02worldvideo    
 ```
 
 D1.bat                           
@@ -1058,6 +1058,63 @@ D1_videoworld_md.bat   【解析规则的mp4文件生成 md问阿金   复制bat
 
 
 ```
+
+
+### D2_把当前文件中的url地址过滤出来 其余的一律删除 过滤url notedpad中使用
+```
+
+输入:
+ http://v.douyin.com/B1ogqG/ 复制此链接 http://v.douyin.com/BJFQax/ 复制    
+
+输出:
+http://v.douyin.com/B1ogqG/
+http://v.douyin.com/BJFQax/
+
+
+D2.bat
+D2.java         【过滤    http:    https:  thunder:    mngnet: 】
+D2.vbs
+
+
+cmd /K cd /d %userprofile%\Desktop\zbin & %userprofile%\Desktop\zbin\D2.bat %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH)  
+Wscript.exe  /x %userprofile%\Desktop\zbin\D2.vbs  %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH) 
+
+
+
+```
+
+
+### D3_解析从抖音APP中复制路径的地址一键下载对应的视频mp4文件并保存到本地 notepad执行
+```
+
+输入:
+ http://v.douyin.com/B1ogqG/ 复制此链接 http://v.douyin.com/BJFQax/ 复制    http://v.douyin.com/B1ogqG/ 
+
+输出: 路径对应的视频地址   以及下载这些视频到本地      
+https://aweme.snssdk.com/aweme/v1/playwm/?s_vid=93f1b41336a8b7a442dbf1c29c6bbc56eec38ece18305125104c8f1701457fde3a2e8aa99d44176e6bca42852a348d5b1e38c844560da04a4b10b92fb20d6db6&line=0
+https://aweme.snssdk.com/aweme/v1/playwm/?s_vid=93f1b41336a8b7a442dbf1c29c6bbc56c119744c403b44d8e169e446dde3028ae2bcc19ae5c0788a41e604f1ac15f078ebad46c507df01b72e005b4b212ada98&line=0
+https://aweme.snssdk.com/aweme/v1/playwm/?s_vid=93f1b41336a8b7a442dbf1c29c6bbc56eec38ece18305125104c8f1701457fde3a2e8aa99d44176e6bca42852a348d5b1e38c844560da04a4b10b92fb20d6db6&line=0
+
+
+文件命名规则:      年月日_时分秒_001 ..... 年月日_时分秒_999
+20190715_165856_001.mp4
+20190715_165856_002.mp4
+20190715_165856_003.mp4
+
+D3.bat
+D3.java
+D3.vbs
+D3_hutool.jar
+D3_jsoup.jar
+
+
+
+cmd /K cd /d %userprofile%\Desktop\zbin & %userprofile%\Desktop\zbin\D3.bat %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH)  
+Wscript.exe  /x %userprofile%\Desktop\zbin\D3.vbs  %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH)
+
+
+```
+
 
 
 
@@ -1382,5 +1439,78 @@ xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  【 D0  把当前的jpg
 
 
 
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  【 D1  解析D0产生的mp4文件并生成md文件 专用于 02worldvideo】
+
+D1.bat                           
+D1_SpecialFor_VideoWorld.class   
+D1_SpecialFor_VideoWorld.java    
+D1_videoworld_md.bat   【解析规则的mp4文件生成 md问阿金   复制bat到包含D1生成的 mp4的文件夹然后 点击】                                      【 D1_videoworld_md.bat  】  
+
+
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  【 D1  解析D0产生的mp4文件并生成md文件 专用于 02worldvideo】
+
+
+
+
+
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  【 D2  】
+输入:
+ http://v.douyin.com/B1ogqG/ 复制此链接 http://v.douyin.com/BJFQax/ 复制    
+
+输出:
+http://v.douyin.com/B1ogqG/
+http://v.douyin.com/BJFQax/
+
+
+D2.bat
+D2.java         【过滤    http:    https:  thunder:    mngnet: 】
+D2.vbs
+
+
+cmd /K cd /d %userprofile%\Desktop\zbin & %userprofile%\Desktop\zbin\D2.bat %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH)  
+Wscript.exe  /x %userprofile%\Desktop\zbin\D2.vbs  %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH) 
+
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  【 D2  】
+
+
+
+
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  【 D3  解析从抖音APP中复制路径的地址一键下载对应的视频mp4文件并保存到本地 notepad执行  】
+输入:
+ http://v.douyin.com/B1ogqG/ 复制此链接 http://v.douyin.com/BJFQax/ 复制    http://v.douyin.com/B1ogqG/ 
+
+输出: 路径对应的视频地址   以及下载这些视频到本地      
+https://aweme.snssdk.com/aweme/v1/playwm/?s_vid=93f1b41336a8b7a442dbf1c29c6bbc56eec38ece18305125104c8f1701457fde3a2e8aa99d44176e6bca42852a348d5b1e38c844560da04a4b10b92fb20d6db6&line=0
+https://aweme.snssdk.com/aweme/v1/playwm/?s_vid=93f1b41336a8b7a442dbf1c29c6bbc56c119744c403b44d8e169e446dde3028ae2bcc19ae5c0788a41e604f1ac15f078ebad46c507df01b72e005b4b212ada98&line=0
+https://aweme.snssdk.com/aweme/v1/playwm/?s_vid=93f1b41336a8b7a442dbf1c29c6bbc56eec38ece18305125104c8f1701457fde3a2e8aa99d44176e6bca42852a348d5b1e38c844560da04a4b10b92fb20d6db6&line=0
+
+
+文件命名规则:      年月日_时分秒_001 ..... 年月日_时分秒_999
+20190715_165856_001.mp4
+20190715_165856_002.mp4
+20190715_165856_003.mp4
+
+D3.bat
+D3.java
+D3.vbs
+D3_hutool.jar
+D3_jsoup.jar
+
+
+
+cmd /K cd /d %userprofile%\Desktop\zbin & %userprofile%\Desktop\zbin\D3.bat %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH)  
+Wscript.exe  /x %userprofile%\Desktop\zbin\D3.vbs  %userprofile%\Desktop\zbin  $(FULL_CURRENT_PATH)
+
+
+
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  【 D3   解析从抖音APP中复制路径的地址一键下载对应的视频mp4文件并保存到本地 notepad执行 】
+
+
+
+
 ```
+
+
+
+
 
