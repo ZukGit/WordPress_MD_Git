@@ -38,7 +38,7 @@ adb pull /system/etc/hostapd/hostapd.accept     ./file_%CURRENT_DATE_TIME_STAMP%
 adb pull /data/vendor/wifi/hostapd/hostapd.conf ./file_%CURRENT_DATE_TIME_STAMP%
 adb pull /data/vendor/wifi/hostapd/hostapd.accept ./file_%CURRENT_DATE_TIME_STAMP%/vendor_wifi_hostapd.accept
 adb pull /data/vendor/wifi/hostapd/hostapd.deny ./file_%CURRENT_DATE_TIME_STAMP%/vendor_wifi_hostapd.deny
-
+adb pull /data/vendor/bug2go/ ./file_%CURRENT_DATE_TIME_STAMP%./bug2go
 ECHO   END! 
 PAUSE
 GOTO LOOP

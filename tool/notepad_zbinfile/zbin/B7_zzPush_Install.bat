@@ -46,7 +46,7 @@ set pre8=!s:~0,8!
 if  "!pre8!"=="Settings" (
 ECHO currentFile=!s!
 ECHO SettingsFileName=!pre8!
-adb install -r ./"!s!.apk"
+adb install -r ./"!s!"
 PAUSE
 GOTO LOOP
 )
