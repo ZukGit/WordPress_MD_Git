@@ -85,6 +85,8 @@ public class C0_JIEMA {
     public static ArrayList<File> mp4_0013byyjx_FileList_mingwen = new ArrayList<File>();
     public static ArrayList<File> mp4_0017ssyyx_FileList_mingwen = new ArrayList<File>();
     public static ArrayList<File> mp4_0018lzllx_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0019sdfxx_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0020tymyx_FileList_mingwen = new ArrayList<File>();
     static {
         arrFileMap.put("0001bdyjy", mp4_0001bdyjy_FileList_mingwen);
         arrFileMap.put("0002cjmyx", mp4_0002cjmyx_FileList_mingwen);
@@ -101,6 +103,9 @@ public class C0_JIEMA {
         arrFileMap.put("0013byyjx", mp4_0013byyjx_FileList_mingwen);
         arrFileMap.put("0017ssyyx", mp4_0017ssyyx_FileList_mingwen);
         arrFileMap.put("0018lzllx", mp4_0018lzllx_FileList_mingwen);
+        arrFileMap.put("0019sdfxx", mp4_0019sdfxx_FileList_mingwen);
+        arrFileMap.put("0020tymyx", mp4_0020tymyx_FileList_mingwen);
+
     }
 
     //-----------------indivisual-------------------
