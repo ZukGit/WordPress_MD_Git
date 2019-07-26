@@ -215,7 +215,7 @@ static String BuildMarkDownFromArrayList(ArrayList<File> fileArray, String showR
         }
 
         StringBuilder resultStr = new StringBuilder();
-    resultStr.append("<p  style=\"white-space:nowrap;font-size:0\" >\n");
+    resultStr.append("<p  style=\"white-space:nowrap;font-size:0;margin:0;\" >\n");
     for (File sameSizeMP4File: fileArray) {
         resultStr.append("<video autoplay=\"true\" controls=\"controls\" width=\""+showRate+"\" hight=\""+showRate+"\" >\n");
 
