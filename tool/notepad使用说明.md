@@ -1117,6 +1117,17 @@ Wscript.exe  /x %userprofile%\Desktop\zbin\D3.vbs  %userprofile%\Desktop\zbin  $
 
 
 
+### D4_批量把markdown中图片拖拉类型![]()转为<img src="">形式
+
+```
+ D4_ImgSrcRevert.bat      ### 把D4 功能编译成class的            
+ D4_ImgSrcRevert.java    ### 把markdown中 ![xx](../xxx.jpg)转为html格式     <img alt="" src="../xxx.jpg"> 这样的显示方式           
+ D4_revert_md_imgsrc.bat     ### 调用文件  把该文件复制到markdown对应的文件夹 然后点击执行          
+
+
+
+```
+
 
 
 
@@ -1505,6 +1516,21 @@ Wscript.exe  /x %userprofile%\Desktop\zbin\D3.vbs  %userprofile%\Desktop\zbin  $
 
 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  【 D3   解析从抖音APP中复制路径的地址一键下载对应的视频mp4文件并保存到本地 notepad执行 】
 
+
+
+
+
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  【 D4  把当前的markdown文件中的img转为html格式 】
+ D4_ImgSrcRevert.bat      ### 把D4 功能编译成class的            
+ D4_ImgSrcRevert.java    ### 把markdown中 ![xx](../xxx.jpg)转为html格式     <img alt="" src="../xxx.jpg"> 这样的显示方式           
+ D4_revert_md_imgsrc.bat     ### 调用文件  把该文件复制到markdown对应的文件夹 然后点击执行    
+ 
+ 
+ ![xx](../xxx.jpg)    =====》    <img alt="" src="../xxx.jpg"> 
+ 
+
+
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  【 D4  把当前的markdown文件中的img转为html格式 】
 
 
 
