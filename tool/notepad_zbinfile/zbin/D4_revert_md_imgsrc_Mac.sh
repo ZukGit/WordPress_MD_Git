@@ -5,3 +5,6 @@ cd $HOME/Desktop/zbin
 echo  CDIR=$CDIR
 echo  ZBIN=$ZBIN
 ./D4_ImgSrcRevert_Mac.sh $ZBIN  $CDIR
+echo 
+read -n 1
+echo 
