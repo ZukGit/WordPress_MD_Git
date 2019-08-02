@@ -195,6 +195,18 @@ knobs and dials ：  可供调教之处
 
 
 
+### 空操作
+
+```
+在 802.11ac 中新的特性  为了实现 MU-MIMO  多用户 多输入多输出 
+当AP往 user1 发送数据时   AP会向user1 发送一个 强波束  同时 AP会在 user2 user3 方向上降低波束能量
+这被称为空操作
+这样:   每个user 都能获得所需数据的强信号
+
+```
+
+
+
 # G
 
 ## GPL
@@ -246,6 +258,16 @@ AP通过一般广告服务(GAS)在移动设备和运营商网络服务器之间�
 ## HCF
 HCF:  hybrid coordination function
 中文:   ** 混合协调功能**
+
+
+
+## HEW
+
+HEW: High-Efficiency Wireless :  就是 802.11ax 新一代WIFI技术协议 高保真无线
+
+
+
+
 
 # I
 
@@ -356,11 +378,28 @@ MLME: Mac Layer Manager Entry  MAC层管理实体  可以提供调用Mac层管�
 
 ```
 
-## MCA
+## MCS
 MCS:  Modulation and Coding Scheme :      调制与编码策略
 MCS制作了了一张表  索引1....100  每行四速率与编码方式
 
+https://blog.csdn.net/zhangfan406/article/details/80758624
 
+```
+802.11n 的物理速率由于依赖的元素过多
+1.调制方式
+2.编码率
+3.空间流数量 MIMO
+4.是否 40MHz 绑定
+.....
+这些因素组合在一起将导致非常多的物理速率可供选择 为此 802.11n提出 MCS的概念
+MCS可以理解为 影响速率因素的完整组合   每种组合都用整数唯一标识
+```
+
+
+
+## MRC
+
+MRC:   Maximal-Radio Combining  最大比合并法   MIMO调制中同时收到来自不同路径的同一个信号数据 对各个输入信号加权合并  已得到更好更稳定的信号数据
 
 # N
 
@@ -584,6 +623,60 @@ signal-quality : 信号质量
 
 
 
+## SNR
+
+SNR: Signal-to-Noise Ratio  信噪比
+
+即放大器的输出信号的功率，与同时输出的噪声功率的比值，常常用分贝数表示
+
+设备的信噪比越高表明它产生的杂音越少 说明混在信号里的噪声越小，声音回放的音质量越高
+
+
+
+
+
+## SISO
+
+SISO:  Single Input Single Output   单次输入单次输出
+
+
+
+## 数据分集
+
+数据分集: 数据分集就是把一个数据重复发送到信道多次 以确保接收端能收到 提高可靠性
+
+
+
+### 空间多路复用
+
+空间多路复用:  在同一个时刻  M 个 天线上 发送 M 个 symbol 码元  可以提升速率
+
+
+
+### 时间分集
+
+时间分集:  在 SISO 单次输入单次输出 系统中 可通过时间实现分集 在不同的时刻发送同一个symbol码元
+
+
+
+### 空间分集
+
+空间分集： 在MIMO 多路输入多路输出 系统中  分集 可以在不同的天线上实现， 同时在不同的天线上发送同一种符号Symbol
+
+
+
+### 分集增益
+
+分集增益： 分集增益是用来衡量空间分集的标准，即 从 发送端到接收端 有多少条 可辨识别的 通路 路径
+
+MIMO中   2x2 =4   3x3=9     2x1=2 (站在发送端考虑)
+
+
+
+### 自由度
+
+自由度:  自由度是衡量  复用 的标准 , 即 一个系统每时刻最多可以接收多少个不同的 码元 symbol数据 把资源用来发送不同的数据 可以提升 传输速率(站在接收端考虑)
+
 
 # T
 
@@ -634,6 +727,38 @@ UDP： User Datagram Protocol
 # V
 ## vendor prefix
 vendor prefix：  Mac地址的厂商前缀 
+
+
+
+
+
+## *VHT* *Sounding* protocol
+
+*VHT* *Sounding* protocol ：  Very High Throughput Sounding protocol   : 高速信道信号探测协议 802.11ac中使用 用来检测束波    　　
+
+NDP（Neighbor Discovery Protocol）：IPV6邻居发现协议
+
+NDPA（Null Data Packet Announcement）：空数据包声明
+
+NDP（Neighbor Discovery Protocol）：IPV6邻居发现协议
+
+Beamforming/Beamformer/Beamformee：波束成形技术/发送端/接收端
+
+
+
+```
+1. Beamformer AP 发送端  首先发送  VHT NDP Announcement 高速邻居发现通知空数据包
+2. AP 发送端 为每个  接收端 Beamformee 发送 NDP 
+3. 每个接受到 NDP的 STA 使用在 NDP中保存的 前导符 测量 AP 与自身STA的 RF 信道 并压缩信道
+4. 第一个 Beamformee STA 立即使用  VHT Compressed Beamforming【 VHT 压缩成形帧包】来响应AP 
+5. 其他的STA 在接受到AP 发送的 轮训 Beamforming Report Poll后 响应  VHT Compressed Beamforming【 VHT 压缩成形帧包】来响应AP 
+
+```
+
+
+
+
+
 # W
 
 ## WAPI
