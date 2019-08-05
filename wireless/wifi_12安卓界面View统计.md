@@ -5,18 +5,20 @@
 <img src="//../zimage/wireless/wifi/12_wifiview/systembar_wifi_1.png"  />
 
 <img src="//../zimage/wireless/wifi/12_wifiview/systembar_wifi_2.png"  />
+
+
+
 ## hotspot
-<img src="//../zimage/wireless/wifi/12_wifiview/systembar_hotspot_1.png"  />
+<img src="../zimage/wireless/wifi/12_wifiview/systembar_hotspot_1.png"  />
 
 # dropdownfame
-
-
 
 
 ## wifi
 <img src="//../zimage/wireless/wifi/12_wifiview/dropdownfame_wifi_1.png"  />
 <img src="//../zimage/wireless/wifi/12_wifiview/dropdownfame_wifi_2.png"  />
 <img src="//../zimage/wireless/wifi/12_wifiview/dropdownfame_wifi_3.png"  />
+
 ## hotspot
 
 <img src="//../zimage/wireless/wifi/12_wifiview/dropdownfame_hotspot_1.png"  />
@@ -35,6 +37,7 @@ Settings > Connected devices > Connection preferences > Cast
 
 <img src="//../zimage/wireless/wifi/12_wifiview/notificationbar_wifi_1.png"  />
 <img src="//../zimage/wireless/wifi/12_wifiview/notificationbar_wifi_2.png"  />
+
 ## hotspot
 
 
