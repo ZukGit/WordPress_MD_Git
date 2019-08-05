@@ -1128,6 +1128,26 @@ Wscript.exe  /x %userprofile%\Desktop\zbin\D3.vbs  %userprofile%\Desktop\zbin  $
 
 ```
 
+### D5_命令行下执行D5_指定文件后缀把原字符串替换为目标字符串
+```
+
+/zbin/D5_StrReplace.java       #Java代码执行程序
+/zbin/D5.bat                   #  编译并调用D5_StrReplace.java的bat文件
+/zbin/win_zbin/string_replace_D5.bat # 在shell中提供调用的bat
+在win-cmder mac-iterm2 下能快速寻找到的bat文件
+
+
+
+命令格式: 
+filez# 指定文件后缀 下划线_隔开  srcz#指定原src字符串 dstz#指定目标dst字符串 
+
+string_replace_D5.bat filez#"txt_md"srcz#"xxxx"dstz#"yyyy"
+string_replace_D5.bat filez#"txt"srcz#"xxxx"dstz#"yyyy"
+string_replace_D5.bat filez#"txt_md"srcz#"xxxx"dstz#"yyyy"
+string_replace_D5.bat filez#"md"srcz#"xxxx"dstz#"yyyy"
+
+
+```
 
 
 
@@ -1532,6 +1552,29 @@ xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  【 D4  把当前的mar
 
 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  【 D4  把当前的markdown文件中的img转为html格式 】
 
+
+
+
+xxxxxx 【 D5_命令行下执行D5_指定文件后缀把原字符串替换为目标字符串】Shell下执行
+
+
+/zbin/D5_StrReplace.java       #Java代码执行程序
+/zbin/D5.bat                   #  编译并调用D5_StrReplace.java的bat文件
+/zbin/win_zbin/string_replace_D5.bat # 在shell中提供调用的bat
+在win-cmder mac-iterm2 下能快速寻找到的bat文件
+
+
+
+命令格式: 
+filez# 指定文件后缀 下划线_隔开  srcz#指定原src字符串 dstz#指定目标dst字符串 
+
+string_replace_D5.bat filez#"txt_md"srcz#"xxxx"dstz#"yyyy"
+string_replace_D5.bat filez#"txt"srcz#"xxxx"dstz#"yyyy"
+string_replace_D5.bat filez#"txt_md"srcz#"xxxx"dstz#"yyyy"
+string_replace_D5.bat filez#"md"srcz#"xxxx"dstz#"yyyy"
+
+
+xxxx 【 D5_命令行下执行D5_指定文件后缀把原字符串替换为目标字符串】Shell下执行_End
 
 
 ```
