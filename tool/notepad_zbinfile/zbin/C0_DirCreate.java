@@ -9,6 +9,12 @@ public class C0_DirCreate {
     static {
         patList_i.add("i");
         patList_i.add("i" + File.separator + "temp");
+        patList_i.add("i" + File.separator + "temp1");
+        patList_i.add("i" + File.separator + "temp2");
+        patList_i.add("i" + File.separator + "temp3");
+        patList_i.add("i" + File.separator + "temp4");
+        patList_i.add("i" + File.separator + "temp5");
+        patList_i.add("i" + File.separator + "temp6");
         patList_i.add("i" + File.separator + "whole");
         patList_i.add("i" + File.separator + "back");
         patList_i.add("i" + File.separator + "down" + File.separator + "white");
@@ -37,13 +43,25 @@ public class C0_DirCreate {
 
         patList_g.add("g");
         patList_g.add("g" + File.separator + "temp");
+        patList_g.add("g" + File.separator + "temp1");
+        patList_g.add("g" + File.separator + "temp2");
+        patList_g.add("g" + File.separator + "temp3");
+        patList_g.add("g" + File.separator + "temp4");
+        patList_g.add("g" + File.separator + "temp5");
         patList_g.add("g" + File.separator + "crime");
         patList_g.add("g" + File.separator + "up");
         patList_g.add("g" + File.separator + "inout");
         patList_g.add("g" + File.separator + "ownerview");
 
         patList_v.add("v");
-        patList_v.add("v");
+        patList_g.add("v" + File.separator + "temp1");
+        patList_g.add("v" + File.separator + "temp2");
+        patList_g.add("v" + File.separator + "temp3");
+        patList_g.add("v" + File.separator + "temp4");
+        patList_g.add("v" + File.separator + "temp5");
+        patList_g.add("v" + File.separator + "temp6");
+        patList_g.add("v" + File.separator + "temp7");
+        patList_g.add("v" + File.separator + "temp8");
         patList_v.add("v" + File.separator + "all");
         patList_v.add("v" + File.separator + "up");
         patList_v.add("v" + File.separator + "am");
@@ -66,6 +84,7 @@ public class C0_DirCreate {
         patList_v.add("v" + File.separator + "ym"+ File.separator + "beddown" +File.separator +"02gaotaitui");
         patList_v.add("v" + File.separator + "ym"+ File.separator + "justbody");
         patList_v.add("v" + File.separator + "ym"+ File.separator + "temp");
+        patList_v.add("v" + File.separator + "ym"+ File.separator + "temp1");
         patList_v.add("v" + File.separator + "ym"+ File.separator + "ownerview");
         patList_v.add("v" + File.separator + "ym"+ File.separator + "standdun");
         patList_v.add("v" + File.separator + "ym"+ File.separator + "standdun"+ File.separator +"01taijiao");
@@ -88,6 +107,14 @@ public class C0_DirCreate {
         patList_v.add("v" + File.separator + "support"+ File.separator + "03yanshe");
         patList_v.add("v" + File.separator + "wm");
         patList_v.add("v" + File.separator + "wm"+ File.separator + "temp");
+        patList_v.add("v" + File.separator + "wm"+ File.separator + "temp1");
+        patList_v.add("v" + File.separator + "wm"+ File.separator + "temp2");
+        patList_v.add("v" + File.separator + "wm"+ File.separator + "temp3");
+        patList_v.add("v" + File.separator + "wm"+ File.separator + "temp4");
+        patList_v.add("v" + File.separator + "wm"+ File.separator + "temp5");
+        patList_v.add("v" + File.separator + "wm"+ File.separator + "temp6");
+        patList_v.add("v" + File.separator + "wm"+ File.separator + "temp7");
+        patList_v.add("v" + File.separator + "wm"+ File.separator + "temp8");
         patList_v.add("v" + File.separator + "wm"+ File.separator + "beauyscene");
         patList_v.add("v" + File.separator + "wm"+ File.separator + "shuangdong");
         patList_v.add("v" + File.separator + "wm"+ File.separator + "gangjiao");
