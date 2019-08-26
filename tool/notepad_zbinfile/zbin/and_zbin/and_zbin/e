@@ -1,0 +1,30 @@
+#!/system/bin/sh
+alias cls='clear'
+alias lss='ls -l'
+alias ll='ls -l'
+alias zl='ls -l | grep -i '
+alias zls='ls | grep -i '
+alias zll='ls -l | grep -i '
+alias zsearch='ls | grep -i '
+
+alias cdz='cd /sdcard/and_zbin '
+alias cdd='cd /'
+alias cdk='cd /sdcard'
+alias cdc='cd /sdcard'
+alias cdp='cd /sdcard/Pictures'
+alias cds='cd /system'
+alias cdbin='cd /system/bin'
+alias mk='mkdir'
+alias cdsettings='cd /data/system/users/0/'
+alias cdini='cd /vendor/etc/wifi/'
+alias cdwifi='cd /data/misc/wifi/'
+export  PATH=$PATH:/data/and_zbin
+
+if [ -d "/sdcard/and_zbin" ];then
+echo ""
+else
+mkdir -p /sdcard/and_zbin 
+fi
+ls /system/bin > /sdcard/and_zbin/a1_system_bin.txt
+ls /system/xbin/ >> /sdcard/and_zbin/a1_system_bin.txt
+echo "iwpriv" >> /sdcard/and_zbin/a1_system_bin.txt

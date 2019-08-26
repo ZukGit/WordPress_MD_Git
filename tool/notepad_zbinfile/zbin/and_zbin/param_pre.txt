@@ -1,0 +1,9 @@
+su
+chmod 777 -R /data/and_zbin
+cp -f /data/and_zbin/e  /system/bin/
+export  PATH=$PATH:/data/and_zbin
+
+
+
+
+

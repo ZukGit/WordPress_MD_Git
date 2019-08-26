@@ -1,0 +1,581 @@
+#!/system/bin/sh
+rownum=1;
+tempnum=1;
+for line in `cat /sdcard/and_zbin/a1_system_bin.txt`
+do 
+  current=$line""
+  
+  ################# Qcom 配置 Begin############### 
+  if [ "$current" == "audioserver" ];then
+    echo "X1-line="$line"=======current="$current
+    continue
+  fi
+  
+  if [ "$current" == "bootanimation" ];then
+    echo "X1-line="$line"=======current="$current
+    continue
+  fi
+
+  
+  
+  if [ "$current" == "bt_logger" ];then
+    echo "X1-line="$line"=======current="$current
+    continue
+  fi
+  
+  if [ "$current" == "btsnoop" ];then
+    echo "X1-line="$line"=======current="$current
+    continue
+  fi
+  
+  if [ "$current" == "bugreport" ];then
+    echo "X1-line="$line"=======current="$current
+    continue
+  fi
+  
+  if [ "$current" == "cameraserver" ];then
+    echo "X1-line="$line"=======current="$current
+    continue
+  fi
+  
+  if [ "$current" == "drmserver" ];then
+    echo "X1-line="$line"=======current="$current
+    continue
+  fi
+  
+  if [ "$current" == "du" ];then
+    echo "X1-line="$line"=======current="$current
+    continue
+  fi
+  
+  if [ "$current" == "healthd" ];then
+    echo "X1-line="$line"=======current="$current
+    continue
+  fi
+  
+  if [ "$current" == "host_manager_11ad" ];then
+    echo "X1-line="$line"=======current="$current
+    continue
+  fi
+  
+  if [ "$current" == "hwservicemanager" ];then
+    echo "X1-line="$line"=======current="$current
+    continue
+  fi
+  
+  if [ "$current" == "incidentd" ];then
+    echo "X1-line="$line"=======current="$current
+    continue
+  fi
+  
+  if [ "$current" == "installd" ];then
+    echo "X1-line="$line"=======current="$current
+    continue
+  fi
+  
+    
+  if [ "$current" == "incident_helper" ];then
+    echo "X1-line="$line"=======current="$current
+    continue
+  fi
+  
+  
+  
+  if [ "$current" == "mdnsd" ];then
+    echo "X1-line="$line"=======current="$current
+    continue
+  fi
+  
+  if [ "$current" == "mediadrmserver" ];then
+    echo "X1-line="$line"=======current="$current
+    continue
+  fi
+  
+  if [ "$current" == "mediaextractor" ];then
+    echo "X1-line="$line"=======current="$current
+    continue
+  fi
+
+  if [ "$current" == "mediametrics" ];then
+    echo "X1-line="$line"=======current="$current
+    continue
+  fi
+  
+  if [ "$current" == "mediaserver" ];then
+    echo "X1-line="$line"=======current="$current
+    continue
+  fi
+  
+  
+  if [ "$current" == "mmi" ];then
+    echo "X1-line="$line"=======current="$current
+    continue
+  fi
+  
+  
+  if [ "$current" == "mmi_diag" ];then
+    echo "X1-line="$line"=======current="$current
+    continue
+  fi
+ 
+  if [ "$current" == "perfprofd" ];then
+    echo "X1-line="$line"=======current="$current
+    continue
+  fi 
+ 
+  if [ "$current" == "perfservice" ];then
+    echo "X1-line="$line"=======current="$current
+    continue
+  fi   
+  
+  if [ "$current" == "schedtest" ];then
+    echo "X1-line="$line"=======current="$current
+    continue
+  fi   
+  
+  if [ "$current" == "sensorservice" ];then
+    echo "X1-line="$line"=======current="$current
+    continue
+  fi   
+  
+  if [ "$current" == "sh" ];then
+    echo "X1-line="$line"=======current="$current
+    continue
+  fi
+  
+  if [ "$current" == "statsd" ];then
+    echo "X1-line="$line"=======current="$current
+    continue
+  fi
+
+  if [ "$current" == "thermalserviced" ];then
+    echo "X1-line="$line"=======current="$current
+    continue
+  fi
+  
+  if [ "$current" == "wificond" ];then
+    echo "X1-line="$line"=======current="$current
+    continue
+  fi 
+  
+  if [ "$current" == "traced" ];then
+    echo "X1-line="$line"=======current="$current
+    continue
+  fi 
+  
+  
+  
+  if [ "$current" == "yes" ];then
+    echo "X1-line="$line"=======current="$current
+    continue
+  fi 
+  
+  
+  if [ "$current" == "ccid_daemon" ];then
+    echo "X1-line="$line"=======current="$current
+    continue
+  fi 
+  
+  if [ "$current" == "fmfactorytestserver" ];then
+    echo "X1-line="$line"=======current="$current
+    continue
+  fi 
+  
+  
+    
+  if [ "$current" == "gzip" ];then
+    echo "X1-line="$line"=======current="$current
+    continue
+  fi
+
+    
+  if [ "$current" == "hal_ss_test_manual" ];then
+    echo "X1-line="$line"=======current="$current
+    continue
+  fi
+  
+  if [ "$current" == "mcap_tool" ];then     ##  蓝牙设备测试
+    echo "X1-line="$line"=======current="$current
+    continue
+  fi
+  
+  if [ "$current" == "rfc" ];then     ##  蓝牙设备测试
+    echo "X1-line="$line"=======current="$current
+    continue
+  fi
+
+#########=========Qcom  /system/xbin 配置 Begin=========###############
+
+  if [ "$current" == "dumpcache" ];then     ##  蓝牙设备测试
+    echo "X1-line="$line"=======current="$current
+    continue
+  fi
+  
+  if [ "$current" == "sane_schedstat" ];then     ##  蓝牙设备测试
+    echo "X1-line="$line"=======current="$current
+    continue
+  fi
+  
+
+#########=========Qcom  /system/xbin 配置 End=========###############
+
+################# Qcom 配置 End############### 
+################# MTK 配置 Begin###############  
+  if [ "$current" == "atci_service_sys" ];then
+    echo "X1-line="$line"=======current="$current
+    continue
+  fi 
+
+  if [ "$current" == "connsyslogger" ];then
+    echo "X1-line="$line"=======current="$current
+    continue
+  fi 
+  
+  if [ "$current" == "emdlogger1" ];then
+    echo "X1-line="$line"=======current="$current
+    continue
+  fi 
+  
+  
+  if [ "$current" == "emdlogger2" ];then
+    echo "X1-line="$line"=======current="$current
+    continue
+  fi 
+  
+    if [ "$current" == "emdlogger3" ];then
+    echo "X1-line="$line"=======current="$current
+    continue
+  fi 
+  
+    if [ "$current" == "emdlogger4" ];then
+    echo "X1-line="$line"=======current="$current
+    continue
+  fi 
+  
+  if [ "$current" == "emdlogger5" ];then
+    echo "X1-line="$line"=======current="$current
+    continue
+  fi 
+  
+  if [ "$current" == "loghidlsysservice" ];then
+    echo "X1-line="$line"=======current="$current
+    continue
+  fi 
+  
+  if [ "$current" == "loghidlsysservice" ];then
+    echo "X1-line="$line"=======current="$current
+    continue
+  fi 
+  
+  if [ "$current" == "mdlogger" ];then
+    echo "X1-line="$line"=======current="$current
+    continue
+  fi 
+  
+  if [ "$current" == "met_log_d" ];then
+    echo "X1-line="$line"=======current="$current
+    continue
+  fi 
+  
+  
+  if [ "$current" == "mobile_log_d" ];then
+    echo "X1-line="$line"=======current="$current
+    continue
+  fi 
+  
+  if [ "$current" == "ged_srv" ];then
+    echo "X1-line="$line"=======current="$current
+    continue
+  fi 
+  
+  if [ "$current" == "killall" ];then
+    echo "X1-line="$line"=======current="$current
+    continue
+  fi 
+  
+  if [ "$current" == "kpoc_charger" ];then           # MTK 测试 屏幕
+    echo "X1-line="$line"=======current="$current
+    continue
+  fi 
+  
+  if [ "$current" == "lbs_dbg" ];then           
+    echo "X1-line="$line"=======current="$current
+    continue
+  fi 
+  
+  if [ "$current" == "md_monitor" ];then           
+    echo "X1-line="$line"=======current="$current
+    continue
+  fi 
+  
+  
+  if [ "$current" == "memtest_mode" ];then           ##   内存测试
+    echo "X1-line="$line"=======current="$current
+    continue
+  fi 
+  
+
+    
+  if [ "$current" == "sn" ];then           ##   内存测试
+    echo "X1-line="$line"=======current="$current
+    continue
+  fi 
+
+  
+  if [ "$current" == "stp_dump3" ];then           ##   内存测试
+    echo "X1-line="$line"=======current="$current
+    continue
+  fi 
+  
+  if [ "$current" == "thermald" ];then           ##   内存测试
+    echo "X1-line="$line"=======current="$current
+    continue
+  fi 
+  
+  
+  if [ "$current" == "vtservice" ];then           ##   内存测试
+    echo "X1-line="$line"=======current="$current
+    continue
+  fi 
+  
+
+  
+################# MTK 配置 End############### 
+########################## 打印  xxx --help   ||  xxx -h   BEGIN ########################
+    echo "# ("$rownum")"$line"" >> /sdcard/and_zbin/a1_system_bin_detailinfo.md
+    echo "========"$rownum"="$line"========Begin" 
+
+	echo "## COMMAND1:  "$line" --help" >> /sdcard/and_zbin/a1_system_bin_detailinfo.md
+	echo "\\n\`\`\`\\n" >>  /sdcard/and_zbin/a1_system_bin_detailinfo.md
+    ` $line --help  >> /sdcard/and_zbin/a1_system_bin_detailinfo.md `
+	    if [[ $? -eq 0  ]]; then    
+		## xxx --help   执行成功的话   那么执行 continue   第一次执行 必须执行 
+         echo $rownum"="$line"--execute success!"
+	    # ((rownum++));
+		 	echo "\\n\`\`\`\\n" >>  /sdcard/and_zbin/a1_system_bin_detailinfo.md
+	 
+        else        
+		## xxx --help   执行失败的话 执行  打印的操作
+        echo  "` $line --help 2>&1  `" >> /sdcard/and_zbin/a1_system_bin_detailinfo.md
+		echo $rownum"="$line"--execute failed!"
+	  	echo "\\n\`\`\`\\n" >>  /sdcard/and_zbin/a1_system_bin_detailinfo.md
+        fi
+
+	
+	
+	echo "## COMMAND2:  "$line" -h" >> /sdcard/and_zbin/a1_system_bin_detailinfo.md
+	echo "\\n\`\`\`\\n" >>  /sdcard/and_zbin/a1_system_bin_detailinfo.md
+    echo  "` $line -h 2>&1  `" >> /sdcard/and_zbin/a1_system_bin_detailinfo.md
+	    ##  xxx --help   执行成功的话   那么执行 continue    第二次也必须执行 
+		if [[ $? -eq 0  ]]; then    
+           echo $rownum"="$line"--execute success!"
+		   echo "\\n\`\`\`\\n" >>  /sdcard/and_zbin/a1_system_bin_detailinfo.md
+	    # ((rownum++));
+	    #  continue
+        else
+			## xxx --help   执行失败的话 执行  打印的操作 
+			# echo  "` $line -h 2>&1  `" >> /sdcard/and_zbin/a1_system_bin_detailinfo.md
+			echo "\\n\`\`\`\\n" >>  /sdcard/and_zbin/a1_system_bin_detailinfo.md
+            echo $rownum"="$line"--execute failed!"
+        fi
+
+	 ## 第三个COMMAND 是 过滤一些必须需要参数才能执行的命令
+
+((rownum++));
+tempnum=$rownum;
+	echo "## COMMAND3_PRE1: BEGIN "	
+        ` $line --help  >> /dev/null `
+	    if [[ $? -eq 0  ]]; then    
+		## 能执行成功的 continue
+		echo "COMMAND3_PRE1 SUCCESS  CONTINUE!"
+              continue;
+        else        
+	    ## 不能执行成功的  往下执行
+		   echo "COMMAND3_PRE1 FAILED  RUN NEXT !"
+        fi
+	
+	echo "## COMMAND3_PRE2: BEGIN "	
+        ` $line -h  >> /dev/null `
+	    if [[ $? -eq 0  ]]; then    
+		## 能执行成功的 continue
+		echo "COMMAND3_PRE2 SUCCESS  CONTINUE!"
+              continue;
+        else        
+	    ## 不能执行成功的  往下执行
+		   echo "COMMAND3_PRE2 FAILED  RUN NEXT !"
+        fi
+		
+########################## 打印  xxx --help   ||  xxx -h   END ########################
+	
+
+################# Qcom 配置 Begin############### 
+  if [ "$current" == "bugreportz" ];then
+    echo "X1-line="$line"=======current="$current
+    continue
+  fi
+  
+  if [ "$current" == "dd" ];then
+    echo "X1-line="$line"=======current="$current
+    continue
+  fi
+  
+  if [ "$current" == "getevent" ];then
+    echo "X1-line="$line"=======current="$current
+    continue
+  fi
+  
+  if [ "$current" == "getevent" ];then
+    echo "X1-line="$line"=======current="$current
+    continue
+  fi
+  
+  if [ "$current" == "ip6tables-restore" ];then
+    echo "X1-line="$line"=======current="$current
+    continue
+  fi
+  
+  if [ "$current" == "iptables-restore" ];then
+    echo "X1-line="$line"=======current="$current
+    continue
+  fi
+  
+  if [ "$current" == "restorecon" ];then
+    echo "X1-line="$line"=======current="$current
+    continue
+  fi
+  
+  if [ "$current" == "cqa_send" ];then
+    echo "X1-line="$line"=======current="$current
+    continue
+  fi
+  
+  if [ "$current" == "incident" ];then
+    echo "X1-line="$line"=======current="$current
+    continue
+  fi
+  
+  if [ "$current" == "reboot" ];then
+    echo "X1-line="$line"=======current="$current
+    continue
+  fi
+  
+  if [ "$current" == "sqlite3" ];then
+    echo "X1-line="$line"=======current="$current
+    continue
+  fi
+  
+  if [ "$current" == "traced_probes" ];then
+    echo "X1-line="$line"=======current="$current
+    continue
+  fi
+  
+  if [ "$current" == "screencap" ];then
+    echo "X1-line="$line"=======current="$current
+    continue
+  fi
+  
+  if [ "$current" == "wigig_remoteserver" ];then
+    echo "X1-line="$line"=======current="$current
+    continue
+  fi
+
+ 
+  if [ "$current" == "l2test_ertm" ];then
+    echo "X1-line="$line"=======current="$current
+    continue
+  fi
+  
+  if [ "$current" == "bzip2" ];then
+    echo "X1-line="$line"=======current="$current
+    continue
+  fi
+  
+  if [ "$current" == "cachemon" ];then
+    echo "X1-line="$line"=======current="$current
+    continue
+  fi
+
+  if [ "$current" == "consumer" ];then
+    echo "X1-line="$line"=======current="$current
+    continue
+  fi
+  
+  if [ "$current" == "kpitrace" ];then
+    echo "X1-line="$line"=======current="$current
+    continue
+  fi
+  
+  if [ "$current" == "cat" ];then
+    echo "X1-line="$line"=======current="$current
+    continue
+  fi 
+  
+  
+#########=========Qcom  /system/xbin 配置 End=========###############
+
+ 
+  if [ "$current" == "librank" ];then
+    echo "X1-line="$line"=======current="$current
+    continue
+  fi
+  
+  
+  if [ "$current" == "tcpdump" ];then
+    echo "X1-line="$line"=======current="$current
+    continue
+  fi
+  
+  if [ "$current" == "su" ];then
+    echo "X1-line="$line"=======current="$current
+    continue
+  fi 
+  
+  
+  if [ "$current" == "base64" ];then
+    echo "X1-line="$line"=======current="$current
+    continue
+  fi 
+  
+
+  
+#########=========Qcom  /system/xbin 配置 End=========###############
+  
+################# Qcom 配置 End############### 
+################# MTK 配置 Begin###############  
+
+  if [ "$current" == "logcat" ];then
+    echo "X1-line="$line"=======current="$current
+    continue
+  fi
+  
+  if [ "$current" == "logcatd" ];then
+    echo "X1-line="$line"=======current="$current
+    continue
+  fi
+
+    
+  if [ "$current" == "recordevent" ];then           ##   内存测试
+    echo "X1-line="$line"=======current="$current
+    continue
+  fi 
+
+    if [ "$current" == "audiocommand" ];then           ##   内存测试
+    echo "X1-line="$line"=======current="$current
+    continue
+  fi 
+################# MTK 配置 End############### 
+  
+  
+	echo "## COMMAND3:  "$line"" >> /sdcard/and_zbin/a1_system_bin_detailinfo.md
+	echo "\\n\`\`\`\\n" >>  /sdcard/and_zbin/a1_system_bin_detailinfo.md
+    ` $line   >> /sdcard/and_zbin/a1_system_bin_detailinfo.md  `
+		if [[ $? -eq 0  ]]; then    
+           echo $tempnum"="$line"--execute success!"
+        else
+            echo $tempnum"="$line"--execute failed!"
+        fi
+	echo "\\n\`\`\`\\n" >>  /sdcard/and_zbin/a1_system_bin_detailinfo.md
+		
+	echo "========"$tempnum"="$line"========END\n\n\n" >> /sdcard/and_zbin/a1_system_bin_detailinfo.md
+	# ((rownum++));
+done

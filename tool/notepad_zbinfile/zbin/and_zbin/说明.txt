@@ -1,0 +1,3 @@
+(windows)Cmder下执行:     zadb.bat
+(android)adb shell下执行别名: source e   (source alias  配置常用别名)
+

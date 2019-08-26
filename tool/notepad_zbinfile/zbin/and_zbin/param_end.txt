@@ -1,0 +1,5 @@
+su
+rm -fr /sdcard/and_zbin
+
+
+
