@@ -160,7 +160,7 @@ public class E0_bitfeature {
         System.out.println("当前解析能力标记位Long( 未补位 2进制):" + Long.toBinaryString(flag));
         System.out.println("当前解析能力标记位Long( 补位   2进制):" + get64bitString(flag));
         System.out.println("=============解析能力如下===========");
-        System.out.println("索引位:all     bit位:   " + get64bitString(flag));
+        System.out.println("索引:all  bit位:" + get64bitString(flag));
 
         //     System.out.println("能力总成: xxxx"+ getFixedStringInt(0)+ "     能力bit位    "+get64bitString(flag));
 
