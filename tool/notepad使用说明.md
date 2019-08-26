@@ -1222,6 +1222,44 @@ args[1] = .java
 ```
 
 
+### D8_安卓adb个性化配置_zadb_D8.bat
+```
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx【D8_安卓adb个性化配置 】Shell下执行
+zadb_D8.bat   // 执行个性化adb
+cd /data/and_zbin/ && source e    // 在当前shell 执行个性化配置
+
+文件列表
+
+/zbin/D8_zadb.bat     ## 标号占位符  实际调用   /zbin/and_zbin/adbshell_init_D8.bat
+/zbin/win_zbin/zadb_D8.bat    ##  在 shell 中快速调用的 bat文件   实际调用   /zbin/and_zbin/adbshell_init_D8.bat
+/zbin/and_zbin/adbshell_init_D8.bat    ## 实际执行adb的命令  逻辑为  adb 之前完成的操作写在  param_pre.txt     adb 退出时的操作写在 param_end.txt
+/zbin/and_zbin/param_pre.txt            ## adb 执行之前 执行的 一些  linux-shell 的 命令  完成 push  赋值权限等操作
+/zbin/and_zbin/param_end.txt            ## adb 退出之后 执行的 一些  linux-shell 的 命令  完成 pull 拉文件等操作 
+/zbin/and_zbin/and_zbin/e               ## 环境配置脚本文件   在  zadb.bat 进入 adb  shell 时 首选执行的 脚本  完成 alias 别名 以及其他的一些操作  环境脚本                
+/zbin/and_zbin/and_zbin/zsystem_bin_detailinfo_A1               ## 写的第一个安卓执行的脚本  用于打印所有 可执行文件的帮助信息  并输出 文件   后续持续更新
+
+
+案例：
+zadb_D8.bat
+remount succeeded
+C:\Users\aaa\Desktop\zbin\and_zbin\and_zbin\: 2 files pushed. 0.5 MB/s (15248 bytes in 0.027s)
+" please run [ source e  ||  cd /data/and_zbin/ && source e  ]  to init environment!"
+parker:/ #
+
+
+首先执行    cd /data/and_zbin/ && source e 完成环境配置
+
+parker:/data/and_zbin # zs
+zsearch                    zsystem_bin_detailinfo_A1
+
+
+
+
+
+
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx【D8_安卓adb个性化配置 】Shell下执行_END
+```
+
 
 ### D9_定字符串之前之后的字符串删除(pre-保留前  endz-保留后)_notepad
 ```
@@ -1857,6 +1895,47 @@ zfilecopy.bat   .java              ### 查找当前shell目录 以及所有子�
 
 zfilecopy.bat   .java  copy              ### 查找当前shell目录 以及所有子目录中 文件格式是java的文件 并且文件名称包含 copy的文件 大小写不敏感  并打印出来  
 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx【D7_文件类型与文件名搜索并复制 】Shell下执行_END
+
+
+
+
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx【D8_安卓adb个性化配置 】Shell下执行
+zadb_D8.bat   // 执行个性化adb
+cd /data/and_zbin/ && source e    // 在当前shell 执行个性化配置
+
+文件列表
+
+/zbin/D8_zadb.bat     ## 标号占位符  实际调用   /zbin/and_zbin/adbshell_init_D8.bat
+/zbin/win_zbin/zadb_D8.bat    ##  在 shell 中快速调用的 bat文件   实际调用   /zbin/and_zbin/adbshell_init_D8.bat
+/zbin/and_zbin/adbshell_init_D8.bat    ## 实际执行adb的命令  逻辑为  adb 之前完成的操作写在  param_pre.txt     adb 退出时的操作写在 param_end.txt
+/zbin/and_zbin/param_pre.txt            ## adb 执行之前 执行的 一些  linux-shell 的 命令  完成 push  赋值权限等操作
+/zbin/and_zbin/param_end.txt            ## adb 退出之后 执行的 一些  linux-shell 的 命令  完成 pull 拉文件等操作 
+/zbin/and_zbin/and_zbin/e               ## 环境配置脚本文件   在  zadb.bat 进入 adb  shell 时 首选执行的 脚本  完成 alias 别名 以及其他的一些操作  环境脚本                
+/zbin/and_zbin/and_zbin/zsystem_bin_detailinfo_A1               ## 写的第一个安卓执行的脚本  用于打印所有 可执行文件的帮助信息  并输出 文件   后续持续更新
+
+
+案例：
+zadb_D8.bat
+remount succeeded
+C:\Users\aaa\Desktop\zbin\and_zbin\and_zbin\: 2 files pushed. 0.5 MB/s (15248 bytes in 0.027s)
+" please run [ source e  ||  cd /data/and_zbin/ && source e  ]  to init environment!"
+parker:/ #
+
+
+首先执行    cd /data/and_zbin/ && source e 完成环境配置
+
+parker:/data/and_zbin # zs
+zsearch                    zsystem_bin_detailinfo_A1
+
+
+
+
+
+
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx【D8_安卓adb个性化配置 】Shell下执行_END
+
+
+
 
 
 
