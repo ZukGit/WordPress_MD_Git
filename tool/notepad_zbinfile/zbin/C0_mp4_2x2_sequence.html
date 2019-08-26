@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>xx</title>
+<style>
+.video_local {
+   width:49.95% ;
+    height:380px;
+   object-fit:fill;
+   float:left;
+}
+
+</style>
+</head>
+<body style="background-color:#101010">
+<script>
+var filecount = 15;
+var omin=1; 
+var max=filecount;
+var num=4; 
+var arr4Size =new Array; 
+var arrDynic4Size =new Array; 
+var videoArr1 = new Array;
+var videoArr2 = new Array;
+var videoArr3 = new Array;
+var videoArr4 = new Array;
+var videoArr =  document.getElementsByClassName("video_local");
+
+function randomPlay(obj) {
+var num = Math.floor(Math.random()*(filecount - 1) + 1);
+var str1="mp4/";
+var str2=".mp4";
+var srcStr = str1+num+str2;
+var i;
+for (i = 0; i < videoArr.length; i++) {
+    videoArr[i].src=srcStr;
+	videoArr[i].play();
+}
+}
+
+
+
+
+
+function init4SizeForVideoPlay(currentArr){
+var str1="mp4/";
+var str2=".mp4";
+var i;
+
+
+ for (i = 0; i < videoArr.length; i++) {
+ var srcStr = str1+currentArr[i]+str2;
+ videoArr[i].src=srcStr;
+  videoArr[i].pause();
+ }
+
+  videoArr[0].play();
+
+}
+
+
+
+function init4Size() {
+    var oArray=new Array; 
+    var result=""; 
+    var min=omin; 
+    for(var i=0;i<=max-omin;i++){ 
+       oArray[i]=min; 
+       min++; 
+    } 
+
+    oArray.sort(function(){return 0.5 - Math.random(); });  //把按顺序存储的数组打乱 
+    for(var i=0;i<num;i++){
+		arr4Size[i] = oArray[0];  //  初始化  必须 一样
+        result+=oArray[i]+","; 
+  }
+
+}
+
+
+function initDynic4SizeArr() {
+	for(var i=num-1;i >= 0;i--){ 
+		arrDynic4Size.unshift(arr4Size[i]);	
+	}
+	 console.log("arrDynic4Size = "+ arrDynic4Size);
+}
+
+
+
+
+
+function intArrForVideo() {
+// videoArr1.unshift(arrDynic4Size[0]);
+// videoArr2.unshift(arrDynic4Size[1]);
+// videoArr3.unshift(arrDynic4Size[2]);
+// videoArr4.unshift(arrDynic4Size[3]);
+
+for(var i=0;i<100;i++){
+arrDynic4Size.pop();
+var randomIndex = Math.floor(Math.random()*(filecount - 1) + 1);
+arrDynic4Size.unshift(randomIndex);
+videoArr1.unshift(arrDynic4Size[0]);
+videoArr2.unshift(arrDynic4Size[1]);
+videoArr3.unshift(arrDynic4Size[2]);
+videoArr4.unshift(arrDynic4Size[3]);
+}
+
+}
+
+
+window.onload=function(){
+      //do something
+   //  window.setTimeout("changeImageDiff()", 5000);
+init4Size();   // 
+init4SizeForVideoPlay(arr4Size);
+initDynic4SizeArr();   // 先进先出   所以 动态的需要从 arr4Size 的 逆序遍历放入 动态数组中
+intArrForVideo();
+
+}
+
+
+function playVideo1(obj) {
+var videoIndex1 = videoArr1.pop();
+var str1="mp4/";
+var str2=".mp4";
+var srcStr = str1+videoIndex1+str2;
+
+obj.src=srcStr;
+obj.play();
+
+ videoArr[1].play();
+}
+
+function playVideo2(obj) {
+var videoIndex1 = videoArr2.pop();
+var str1="mp4/";
+var str2=".mp4";
+var srcStr = str1+videoIndex1+str2;
+
+obj.src=srcStr;
+obj.play();
+ videoArr[2].play();
+}
+
+
+function playVideo3(obj) {
+var videoIndex1 = videoArr3.pop();
+var str1="mp4/";
+var str2=".mp4";
+var srcStr = str1+videoIndex1+str2;
+
+obj.src=srcStr;
+obj.play();
+ videoArr[3].play();
+}
+
+
+function playVideo4(obj) {
+var videoIndex1 = videoArr4.pop();
+var str1="mp4/";
+var str2=".mp4";
+var srcStr = str1+videoIndex1+str2;
+
+obj.src=srcStr;
+obj.play();
+}
+
+
+
+
+
+</script>
+
+
+
+<div width="100%" height="380px">
+<video   class="video_local"   autoplay="true"   onended="playVideo1(this)">
+<source src="mp4/1.mp4" type="video/mp4" />
+</video>
+
+<video   class="video_local"   autoplay="true" onended="playVideo2(this)" >
+<source src="mp4/1.mp4" type="video/mp4" />
+</video>
+
+
+</div>
+
+
+<div width="100%" height="380px">
+<video   class="video_local"   autoplay="true"  onended="playVideo3(this)"  >
+<source src="mp4/1.mp4" type="video/mp4" />
+</video>
+
+<video   class="video_local"   autoplay="true"  onended="playVideo4(this)"  >
+<source src="mp4/1.mp4" type="video/mp4" />
+</video>
+</div>
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>xx</title>
+<style>
+.video_local {
+   width:19.7% ;
+   height:250px;
+   object-fit:fill;
+   float:left;
+}
+
+</style>
+</head>
+<body style="background-color:#101010">
+<script>
+var videoArr =  document.getElementsByClassName("video_local");
+function randomPlay(obj) {
+var num = Math.floor(Math.random()*(9 - 1) + 1);
+var str1="mp4/";
+var str2=".mp4";
+var srcStr = str1+num+str2;
+var i;
+var interval = 600;
+for (i = 0; i < videoArr.length; i++) {
+    // videoArr[i].src=srcStr;
+	// videoArr[i].play();
+	 setTimeout(playvideo(videoArr[i],srcStr),interval);
+	 interval = interval + 600;
+}
+}
+
+
+function  playvideo(obj,srcStr)
+{
+    return function()
+    {
+	  obj.src=srcStr;
+      obj.play();
+    }
+
+}
+
+</script>
+
+
+
+<div width="100%" height="250px">
+<video   class="video_local"   autoplay="true"   onended="randomPlay(this)">
+<source src="mp4/1.mp4" type="video/mp4" />
+
+</video>
+
+<video   class="video_local"   autoplay="true" >
+<source src="mp4/1.mp4" type="video/mp4" />
+</video>
+<video   class="video_local"   autoplay="true"   >
+<source src="mp4/1.mp4" type="video/mp4" />
+</video>
+<video   class="video_local"   autoplay="true"  >
+<source src="mp4/1.mp4" type="video/mp4" />
+</video>
+<video   class="video_local"   autoplay="true" >
+<source src="mp4/1.mp4" type="video/mp4" />
+</video>
+
+</div>
+
+
+<div width="100%" height="250px">
+<video   class="video_local"   autoplay="true"  >
+<source src="mp4/1.mp4" type="video/mp4" />
+</video>
+<video   class="video_local"   autoplay="true"  >
+<source src="mp4/1.mp4" type="video/mp4" />
+</video>
+<video   class="video_local"   autoplay="true"  >
+<source src="mp4/1.mp4" type="video/mp4" />
+</video>
+<video   class="video_local"   autoplay="true"  >
+<source src="mp4/1.mp4" type="video/mp4" />
+</video>
+<video   class="video_local"   autoplay="true" >
+<source src="mp4/1.mp4" type="video/mp4" />
+</video>
+</div>
+
+<div width="100%" height="250px">
+<video   class="video_local"   autoplay="true"  >
+<source src="mp4/1.mp4" type="video/mp4" />
+</video>
+<video   class="video_local"   autoplay="true"  >
+<source src="mp4/1.mp4" type="video/mp4" />
+</video>
+<video   class="video_local"   autoplay="true"  >
+<source src="mp4/1.mp4" type="video/mp4" />
+</video>
+<video   class="video_local"   autoplay="true"  >
+<source src="mp4/1.mp4" type="video/mp4" />
+</video>
+<video   class="video_local"   autoplay="true"  >
+<source src="mp4/1.mp4" type="video/mp4" />
+</video>
+</div>
+
+
+
+<!--
+
+<div width="100%" height="250px">
+<video   class="video_local" controls autoplay="true"   onended="randomPlay(this)">
+<source src="C:/Users/Administrator/Desktop/1.mp4" type="video/mp4" />
+</video>
+<video   class="video_local" controls autoplay="true"   onended="randomPlay(this)">
+<source src="C:/Users/Administrator/Desktop/2.mp4" type="video/mp4"/>
+</video>
+<video   class="video_local" controls autoplay="true"  onended="randomPlay(this)">
+<source  src="C:/Users/Administrator/Desktop/1.mp4" type="video/mp4"/>
+</video>
+<video   class="video_local" controls autoplay="true"  onended="randomPlay(this)">
+<source src="C:/Users/Administrator/Desktop/2.mp4" type="video/mp4"/>
+</video>
+<video   class="video_local" controls autoplay="true"  onended="randomPlay(this)">
+<source src="C:/Users/Administrator/Desktop/2.mp4" type="video/mp4"/>
+</video>
+</div>
+
+
+
+
+
+<div width="100%" height="250px">
+<video   class="video_local" controls autoplay="true"   onended="randomPlay(this)">
+<source src="C:/Users/Administrator/Desktop/1.mp4" type="video/mp4" />
+</video>
+<video   class="video_local" controls autoplay="true"   onended="randomPlay(this)">
+<source src="C:/Users/Administrator/Desktop/2.mp4" type="video/mp4"/>
+</video>
+<video   class="video_local" controls autoplay="true"  onended="randomPlay(this)">
+<source  src="C:/Users/Administrator/Desktop/1.mp4" type="video/mp4"/>
+</video>
+<video   class="video_local" controls autoplay="true"  onended="randomPlay(this)">
+<source src="C:/Users/Administrator/Desktop/2.mp4" type="video/mp4"/>
+</video>
+<video   class="video_local" controls autoplay="true"  onended="randomPlay(this)">
+<source src="C:/Users/Administrator/Desktop/2.mp4" type="video/mp4"/>
+</video>
+</div>
+-->
+</body>
+</html>

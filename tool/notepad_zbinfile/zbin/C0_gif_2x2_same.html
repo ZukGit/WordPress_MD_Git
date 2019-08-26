@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>xx</title>
+<style>
+.img_local {
+   width:49.5% ;
+   height:380px;
+   object-fit:fill;
+   float:left;
+}
+
+</style>
+</head>
+<body style="background-color:#101010">
+<script>
+ 
+
+var imgArr =  document.getElementsByClassName("img_local");
+
+function changeImageDiff() {
+var randomIndex = Math.floor(Math.random() *  (15 - 1 + 1) + 1);  // 20 最大值
+//document.getElementsByTagName('img')[0].setAttribute('src','jpg/'+randomIndex1+'.jpg');
+//document.getElementsByTagName('img')[1].setAttribute('src','jpg/'+randomIndex2+'.jpg');
+//document.getElementsByTagName('img')[2].setAttribute('src','jpg/'+randomIndex3+'.jpg');
+//document.getElementsByTagName('img')[3].setAttribute('src','jpg/'+randomIndex4+'.jpg');
+var i;
+for (i = 0; i < imgArr.length; i++) {
+    imgArr[i].setAttribute('src','gif/'+randomIndex+'.gif');
+}
+window.setTimeout("changeImageDiff()", 5000);
+};
+
+
+window.onload=function(){
+    //do something
+    window.setTimeout("changeImageDiff()", 5000);
+}
+
+
+</script>
+
+
+<div width="100%" height="380px">
+<img src="gif/1.gif" id="1"   class="img_local" />
+<img src="gif/1.gif" id="2"   class="img_local" />
+
+</div>
+
+
+
+<div width="100%" height="380px">
+<img src="gif/1.gif" id="3"   class="img_local" />
+<img src="gif/1.gif" id="4"   class="img_local" />
+
+</div>
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>xx</title>
+<style>
+.img_local {
+   width:33.2% ;
+   height:250px;
+   object-fit:fill;
+   float:left;
+}
+
+</style>
+</head>
+<body style="background-color:#101010">
+<script>
+ 
+var imgArr =  document.getElementsByClassName("img_local");
+
+function changeImageDiff() {
+var randomIndex = Math.floor(Math.random() *  (9 - 1 + 1) + 1);  // 20 最大值
+
+//document.getElementsByTagName('img')[0].setAttribute('src','jpg/'+randomIndex1+'.jpg');
+//document.getElementsByTagName('img')[1].setAttribute('src','jpg/'+randomIndex2+'.jpg');
+//document.getElementsByTagName('img')[2].setAttribute('src','jpg/'+randomIndex3+'.jpg');
+//document.getElementsByTagName('img')[3].setAttribute('src','jpg/'+randomIndex4+'.jpg');
+var i;
+var interval = 1000;
+for (i = 0; i < imgArr.length; i++) {
+   // imgArr[i].setAttribute('src','jpg/'+randomIndex+'.jpg');
+	setTimeout(showImg(imgArr[i],'jpg/'+randomIndex+'.jpg'),interval);
+	interval = interval + 1000;
+}
+
+window.setTimeout("changeImageDiff()", 9000);
+};
+
+
+
+function  showImg(obj,srcStr)
+{
+    return function()
+    {
+	  obj.setAttribute('src',srcStr);
+    }
+
+}
+
+window.onload=function(){
+    //do something
+    window.setTimeout("changeImageDiff()", 3000);
+}
+
+
+</script>
+
+
+<div width="100%" height="250px">
+<img src="jpg/1.jpg" id="1"   class="img_local" />
+<img src="jpg/1.jpg" id="2"   class="img_local" />
+<img src="jpg/1.jpg" id="3"   class="img_local" />
+
+</div>
+
+
+
+
+<div width="100%" height="250px">
+<img src="jpg/1.jpg" id="4"   class="img_local" />
+<img src="jpg/1.jpg" id="5"   class="img_local" />
+<img src="jpg/1.jpg" id="6"   class="img_local" />
+
+</div>
+
+
+
+
+<div width="100%" height="250px">
+<img src="jpg/1.jpg" id="7"   class="img_local" />
+<img src="jpg/1.jpg" id="8"   class="img_local" />
+<img src="jpg/1.jpg" id="9"   class="img_local" />
+
+</div>
+
+
+</body>
+</html>
