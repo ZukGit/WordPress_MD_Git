@@ -87,6 +87,87 @@ public class C0_JIEMA {
     public static ArrayList<File> mp4_0018lzllx_FileList_mingwen = new ArrayList<File>();
     public static ArrayList<File> mp4_0019sdfxx_FileList_mingwen = new ArrayList<File>();
     public static ArrayList<File> mp4_0020tymyx_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0021lslmx_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0022ybsxx_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0023yzxxx_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0024scanx_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0025bxmhx_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0026sgszx_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0027cxmgx_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0028mzlxx_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0029sxxxx_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0030yyllx_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0031zzmmx_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0032fbbxx_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0033zcmyx_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0034mnrcx_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0035xxlmx_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0036xynmx_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0037zcbxx_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0038safhx_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0039ajlyx_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0040aymlx_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0041zzblx_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0042qbycx_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0043yblyx_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0044ccnxx_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0045qslcx_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0046qlxxx_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0047xcplx_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0048yjlyx_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0049stklx_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0050bsllx_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0051fnlxx_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0052mlcxx_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0053sxccm_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0054xdnxx_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0055ccbxx_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0056mjzgx_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0057tnmxy_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0058ytcyx_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0059sqxxx_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0060bjlmx_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0061jlxsx_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0062qxaml_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0063mrhql_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0064cxlxx_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0065yypnx_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0066slmbx_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0067qllnx_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0068mmmyx_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0069xnnmx_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0070xxcxx_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0071acanx_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0072wylsx_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0073sthmx_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0074ksxxx_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0075mlyls_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0076hcsln_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0077byymx_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0078eggxx_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0079ftyxx_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0080jcxxx_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0081qzmyx_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0082rxbjn_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0083tghlx_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0084xyyxx_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0085ycxxx_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0086nmyxx_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0087cyxxx_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0088stscx_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0089cdzyx_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0090jgyla_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0091mhxxx_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0092ryxxx_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0093zyqxx_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0094aikax_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0095xcllh_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0096xnaxx_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0097yyzln_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0098yymyx_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0099wdxxx_FileList_mingwen = new ArrayList<File>();
+
+
     static {
         arrFileMap.put("0001bdyjy", mp4_0001bdyjy_FileList_mingwen);
         arrFileMap.put("0002cjmyx", mp4_0002cjmyx_FileList_mingwen);
@@ -105,6 +186,86 @@ public class C0_JIEMA {
         arrFileMap.put("0018lzllx", mp4_0018lzllx_FileList_mingwen);
         arrFileMap.put("0019sdfxx", mp4_0019sdfxx_FileList_mingwen);
         arrFileMap.put("0020tymyx", mp4_0020tymyx_FileList_mingwen);
+        arrFileMap.put("0021lslmx", mp4_0021lslmx_FileList_mingwen);
+        arrFileMap.put("0022ybsxx", mp4_0022ybsxx_FileList_mingwen);
+        arrFileMap.put("0023yzxxx", mp4_0023yzxxx_FileList_mingwen);
+        arrFileMap.put("0024scanx", mp4_0024scanx_FileList_mingwen);
+        arrFileMap.put("0025bxmhx", mp4_0025bxmhx_FileList_mingwen);
+        arrFileMap.put("0026sgszx", mp4_0026sgszx_FileList_mingwen);
+        arrFileMap.put("0027cxmgx", mp4_0027cxmgx_FileList_mingwen);
+        arrFileMap.put("0028mzlxx", mp4_0028mzlxx_FileList_mingwen);
+        arrFileMap.put("0029sxxxx", mp4_0029sxxxx_FileList_mingwen);
+        arrFileMap.put("0030yyllx", mp4_0030yyllx_FileList_mingwen);
+        arrFileMap.put("0031zzmmx", mp4_0031zzmmx_FileList_mingwen);
+        arrFileMap.put("0032fbbxx", mp4_0032fbbxx_FileList_mingwen);
+        arrFileMap.put("0033zcmyx", mp4_0033zcmyx_FileList_mingwen);
+        arrFileMap.put("0034mnrcx", mp4_0034mnrcx_FileList_mingwen);
+        arrFileMap.put("0035xxlmx", mp4_0035xxlmx_FileList_mingwen);
+        arrFileMap.put("0036xynmx", mp4_0036xynmx_FileList_mingwen);
+        arrFileMap.put("0037zcbxx", mp4_0037zcbxx_FileList_mingwen);
+        arrFileMap.put("0038safhx", mp4_0038safhx_FileList_mingwen);
+        arrFileMap.put("0039ajlyx", mp4_0039ajlyx_FileList_mingwen);
+        arrFileMap.put("0040aymlx", mp4_0040aymlx_FileList_mingwen);
+        arrFileMap.put("0041zzblx", mp4_0041zzblx_FileList_mingwen);
+        arrFileMap.put("0042qbycx", mp4_0042qbycx_FileList_mingwen);
+        arrFileMap.put("0043yblyx", mp4_0043yblyx_FileList_mingwen);
+        arrFileMap.put("0044ccnxx", mp4_0044ccnxx_FileList_mingwen);
+        arrFileMap.put("0045qslcx", mp4_0045qslcx_FileList_mingwen);
+        arrFileMap.put("0046qlxxx", mp4_0046qlxxx_FileList_mingwen);
+        arrFileMap.put("0047xcplx", mp4_0047xcplx_FileList_mingwen);
+        arrFileMap.put("0048yjlyx", mp4_0048yjlyx_FileList_mingwen);
+        arrFileMap.put("0049stklx", mp4_0049stklx_FileList_mingwen);
+        arrFileMap.put("0050bsllx", mp4_0050bsllx_FileList_mingwen);
+        arrFileMap.put("0051fnlxx", mp4_0051fnlxx_FileList_mingwen);
+        arrFileMap.put("0052mlcxx", mp4_0052mlcxx_FileList_mingwen);
+        arrFileMap.put("0053sxccm", mp4_0053sxccm_FileList_mingwen);
+        arrFileMap.put("0054xdnxx", mp4_0054xdnxx_FileList_mingwen);
+        arrFileMap.put("0055ccbxx", mp4_0055ccbxx_FileList_mingwen);
+        arrFileMap.put("0056mjzgx", mp4_0056mjzgx_FileList_mingwen);
+        arrFileMap.put("0057tnmxy", mp4_0057tnmxy_FileList_mingwen);
+        arrFileMap.put("0058ytcyx", mp4_0058ytcyx_FileList_mingwen);
+        arrFileMap.put("0059sqxxx", mp4_0059sqxxx_FileList_mingwen);
+        arrFileMap.put("0060bjlmx", mp4_0060bjlmx_FileList_mingwen);
+        arrFileMap.put("0061jlxsx", mp4_0061jlxsx_FileList_mingwen);
+        arrFileMap.put("0062qxaml", mp4_0062qxaml_FileList_mingwen);
+        arrFileMap.put("0063mrhql", mp4_0063mrhql_FileList_mingwen);
+        arrFileMap.put("0064cxlxx", mp4_0064cxlxx_FileList_mingwen);
+        arrFileMap.put("0065yypnx", mp4_0065yypnx_FileList_mingwen);
+        arrFileMap.put("0066slmbx", mp4_0066slmbx_FileList_mingwen);
+        arrFileMap.put("0067qllnx", mp4_0067qllnx_FileList_mingwen);
+        arrFileMap.put("0068mmmyx", mp4_0068mmmyx_FileList_mingwen);
+        arrFileMap.put("0069xnnmx", mp4_0069xnnmx_FileList_mingwen);
+        arrFileMap.put("0070xxcxx", mp4_0070xxcxx_FileList_mingwen);
+        arrFileMap.put("0071acanx", mp4_0071acanx_FileList_mingwen);
+        arrFileMap.put("0072wylsx", mp4_0072wylsx_FileList_mingwen);
+        arrFileMap.put("0073sthmx", mp4_0073sthmx_FileList_mingwen);
+        arrFileMap.put("0074ksxxx", mp4_0074ksxxx_FileList_mingwen);
+        arrFileMap.put("0075mlyls", mp4_0075mlyls_FileList_mingwen);
+        arrFileMap.put("0076hcsln", mp4_0076hcsln_FileList_mingwen);
+        arrFileMap.put("0077byymx", mp4_0077byymx_FileList_mingwen);
+        arrFileMap.put("0078eggxx", mp4_0078eggxx_FileList_mingwen);
+        arrFileMap.put("0079ftyxx", mp4_0079ftyxx_FileList_mingwen);
+        arrFileMap.put("0080jcxxx", mp4_0080jcxxx_FileList_mingwen);
+        arrFileMap.put("0081qzmyx", mp4_0081qzmyx_FileList_mingwen);
+        arrFileMap.put("0082rxbjn", mp4_0082rxbjn_FileList_mingwen);
+        arrFileMap.put("0083tghlx", mp4_0083tghlx_FileList_mingwen);
+        arrFileMap.put("0084xyyxx", mp4_0084xyyxx_FileList_mingwen);
+        arrFileMap.put("0085ycxxx", mp4_0085ycxxx_FileList_mingwen);
+        arrFileMap.put("0086nmyxx", mp4_0086nmyxx_FileList_mingwen);
+        arrFileMap.put("0087cyxxx", mp4_0087cyxxx_FileList_mingwen);
+        arrFileMap.put("0088stscx", mp4_0088stscx_FileList_mingwen);
+        arrFileMap.put("0089cdzyx", mp4_0089cdzyx_FileList_mingwen);
+        arrFileMap.put("0090jgyla", mp4_0090jgyla_FileList_mingwen);
+        arrFileMap.put("0091mhxxx", mp4_0091mhxxx_FileList_mingwen);
+        arrFileMap.put("0092ryxxx", mp4_0092ryxxx_FileList_mingwen);
+        arrFileMap.put("0093zyqxx", mp4_0093zyqxx_FileList_mingwen);
+        arrFileMap.put("0094aikax", mp4_0094aikax_FileList_mingwen);
+        arrFileMap.put("0095xcllh", mp4_0095xcllh_FileList_mingwen);
+        arrFileMap.put("0096xnaxx", mp4_0096xnaxx_FileList_mingwen);
+        arrFileMap.put("0097yyzln", mp4_0097yyzln_FileList_mingwen);
+        arrFileMap.put("0098yymyx", mp4_0098yymyx_FileList_mingwen);
+        arrFileMap.put("0099wdxxx", mp4_0099wdxxx_FileList_mingwen);
+
 
     }
 
@@ -131,7 +292,7 @@ public class C0_JIEMA {
             // 从 name  以及 ArrayList<String>  获取 key；
             String strKey = toGetKeyFromName(nameKeyStr, fileName);
             if (strKey == null || "".equals(strKey)) {
-              // 没有找到对应的Key  所以对应的这个mp4FileItem 不是需要收集的
+                // 没有找到对应的Key  所以对应的这个mp4FileItem 不是需要收集的
                 continue;
             }
 
@@ -187,8 +348,8 @@ public class C0_JIEMA {
 
 //  indivitual/00001bdyjy/mp4
 //  indivitual/00002xxxxx/mp4
-            String allPath = System.getProperties().getProperty("user.dir") + File.separator + mingwenDir + File.separator + "v" + File.separator + "indivitual"+  File.separator +keyName+ File.separator + "mp4";
-      //      String allPath = System.getProperties().getProperty("user.dir") + File.separator + mingwenDir + File.separator + "v" + File.separator + "wm" + File.separator + "mp4";
+            String allPath = System.getProperties().getProperty("user.dir") + File.separator + mingwenDir + File.separator + "v" + File.separator + "indivitual" + File.separator + keyName + File.separator + "mp4";
+            //      String allPath = System.getProperties().getProperty("user.dir") + File.separator + mingwenDir + File.separator + "v" + File.separator + "wm" + File.separator + "mp4";
             File allFileDir = new File(allPath);
 
             if (!allFileDir.exists()) {
@@ -196,7 +357,7 @@ public class C0_JIEMA {
             }
 
             ArrayList<File> itemFileArr = arrFileMap.get(keyName);
-            if(itemFileArr == null){
+            if (itemFileArr == null) {
                 continue;
             }
 
@@ -211,9 +372,8 @@ public class C0_JIEMA {
 
             }
 
-            addMP4HtmlFile(System.getProperties().getProperty("user.dir") + File.separator + mingwenDir + File.separator + "v" + File.separator + "indivitual"+  File.separator +keyName, itemFileArr.size());
+            addMP4HtmlFile(System.getProperties().getProperty("user.dir") + File.separator + mingwenDir + File.separator + "v" + File.separator + "indivitual" + File.separator + keyName, itemFileArr.size());
         }
-
 
 
     }
@@ -665,6 +825,7 @@ public class C0_JIEMA {
     }
 
     public static void fileCopy(File origin, File target) {
+        System.out.println("复制中:  当前路径:" + origin.getAbsolutePath());
         InputStream input = null;
         OutputStream output = null;
         int lengthSize;

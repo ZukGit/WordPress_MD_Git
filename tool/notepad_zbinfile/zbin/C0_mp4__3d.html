@@ -76,45 +76,35 @@
 
 
 <script>
- 
 
+    var videoCount =  zukgitPlaceHolderindex;
+    function randomPlay(obj) {
+        var num = Math.floor(Math.random()*(videoCount - 1) + 1);
+        var str1="mp4/";
+        var str2=".mp4";
+        var srcStr = str1+num+str2;
 
-    function changeImageDiff() {
-	
-var randomIndex1 = Math.floor(Math.random() * (zukgitPlaceHolderindex - 1 + 1) + 1);  // 20 最大值
-var randomIndex2 = Math.floor(Math.random() * (zukgitPlaceHolderindex - 1 + 1) + 1);
-var randomIndex3 = Math.floor(Math.random() * (zukgitPlaceHolderindex - 1 + 1) + 1);
-var randomIndex4 = Math.floor(Math.random() * (zukgitPlaceHolderindex - 1 + 1) + 1);
-var randomIndex5 = Math.floor(Math.random() * (zukgitPlaceHolderindex - 1 + 1) + 1);
-var randomIndex6 = Math.floor(Math.random() * (zukgitPlaceHolderindex - 1 + 1) + 1);
-    document.getElementsByTagName('img')[0].setAttribute('src','gif/'+randomIndex1+'.gif');
-    document.getElementsByTagName('img')[1].setAttribute('src','gif/'+randomIndex2+'.gif');
-    document.getElementsByTagName('img')[2].setAttribute('src','gif/'+randomIndex3+'.gif');
-    document.getElementsByTagName('img')[3].setAttribute('src','gif/'+randomIndex4+'.gif');
-    document.getElementsByTagName('img')[4].setAttribute('src','gif/'+randomIndex5+'.gif');
-    document.getElementsByTagName('img')[5].setAttribute('src','gif/'+randomIndex6+'.gif');
-    window.setTimeout("changeImageDiff()", 5000);
+        obj.src=srcStr;
+        obj.play();
+    }
+
+    window.onload=function(){
+        //do something
+        // window.setTimeout("changeImageDiff()", 5000);
+        changeVideoDiff();
+    }
+
+    function changeVideoDiff() {
+        var pre="mp4/";
+        var end=".mp4";
+        var videoArr =  document.getElementsByClassName("face");
+        for (i = 0; i < videoArr.length; i++) {
+            var index_cur = Math.floor(Math.random()*(videoCount - 1) + 1);
+            var index_src = pre+index_cur+end;
+            videoArr[i].src=index_src;
+            videoArr[i].play();
+        }
     };
-	
-	
-function randomPlay(obj) {
-var num = Math.floor(Math.random()*(zukgitPlaceHolderindex - 1) + 1);
-//var num = Math.floor(Math.random()*(1 - 1) + 1);
-var str1="mp4/";
-var str2=".mp4";
-var srcStr = str1+num+str2;
-//obj.src="C:/Users/Administrator/Desktop/1.mp4";
-obj.src=srcStr;
-obj.play();
-}
-
-
-window.onload=function(){
-      //do something
-	  
-
-   //  window.setTimeout("changeImageDiff()", 5000);
-}
 
 
 </script>
