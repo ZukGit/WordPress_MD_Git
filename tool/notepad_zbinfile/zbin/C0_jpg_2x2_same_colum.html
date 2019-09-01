@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>xx</title>
+<style>
+.img_local {
+   width:49.5% ;
+   height:380px;
+   object-fit:fill;
+   float:left;
+}
+</style>
+</head>
+<body style="background-color:#101010">
+<script>
+var filecount = zukgitPlaceHolderindex;
+var omin=1; 
+var max=filecount;
+var num=2; 
+var arr4Size =new Array;   // 初始化时的值 数组数值
+var ImageArr =  document.getElementsByClassName("img_local");
+
+function randomPlay(obj) {
+var num = Math.floor(Math.random()*(filecount - 1) + 1);
+var str1="jpg/";
+var str2=".jpg";
+var srcStr = str1+num+str2;
+var i;
+for (i = 0; i < ImageArr.length; i++) {
+    ImageArr[i].src=srcStr;
+}
+}
+
+
+
+
+
+function init4SizeForImagePlay(currentArr){
+var str1="jpg/";
+var str2=".jpg";
+var i;
+ for (i = 0; i < currentArr.length; i++) {
+ var srcStr = str1+arr4Size[i]+str2;
+ // var vmin = i * 5 ;
+ // var vmax = i * 5 + 5;  
+ // i=0  row =0  5 10 ||  i=1  row =1  ,6 11   ||  i=2  row =2 , 7 ,12 
+ // i =3   row =3,8, 13  ||  i=4  row =4,8,14
+makecolumsame(i,srcStr);
+
+ console.log("vmin ="+ i +"    i="+i+"     srcStr="+srcStr);
+ }
+}
+
+
+function makecolumsame(curIndex  , cursrc) {
+var Index1 = curIndex;
+var Index2 = curIndex + 2;
+
+ImageArr[Index1].src=cursrc;
+ImageArr[Index2].src=cursrc;
+ console.log(" ImageArr["+Index1+"] = "+ cursrc);
+ console.log(" ImageArr["+Index2+"] = "+ cursrc);
+}
+
+ // i=0  row =0  5 10 ||  i=1  row =1  ,6 11   ||  i=3  row =2 , 7 ,12 
+ // i =4   row =3,8, 13  ||  i=5  row =4,8,14
+
+
+
+
+function initArrSize() {
+    var oArray=new Array; 
+    var result=""; 
+    var min=omin; 
+    for(var i=0;i<=max-omin;i++){ 
+       oArray[i]=min; 
+       min++; 
+    } 
+
+    oArray.sort(function(){return 0.5 - Math.random(); });  //把按顺序存储的数组打乱 
+    for(var i=0;i<num;i++){
+		arr4Size[i] = oArray[i];  //  初始化  必须 一样
+        result+=oArray[i]+","; 
+  }
+console.log("result"+result);
+
+}
+
+
+
+
+
+
+
+window.onload=function(){
+	  initArrSize();   //  初始化最初的数据样子
+	// init4SizeForImagePlay(arr4Size);
+changeImageDiff();
+}
+
+
+
+function  replaceNewValue(){   // init4SizeForImagePlay
+arr4Size.pop();  // 出栈 
+var randomIndex = Math.floor(Math.random()*(filecount - 1) + 1);
+arr4Size.unshift(randomIndex);
+
+}
+
+function RandomPicture() {
+var randomIndex = Math.floor(Math.random() *  (indexCount - 1 + 1) + 1);  
+for (var i = 0; i < imgArr.length; i++) {
+    imgArr[i].setAttribute('src','jpg/'+randomIndex+'.jpg');
+}
+};
+
+
+function changeImageDiff() {
+replaceNewValue();
+init4SizeForImagePlay(arr4Size);
+
+
+window.setTimeout("changeImageDiff()", 3000);
+};
+
+</script>
+
+
+<div width="100%" height="380px">
+<img src="jpg/1.jpg" id="1"   class="img_local" />
+<img src="jpg/1.jpg" id="2"   class="img_local" />
+
+</div>
+
+
+
+<div width="100%" height="380px">
+<img src="jpg/1.jpg" id="3"   class="img_local" />
+<img src="jpg/1.jpg" id="4"   class="img_local" />
+
+</div>
+
+
+
+
+
+</body>
+</html>
+
+

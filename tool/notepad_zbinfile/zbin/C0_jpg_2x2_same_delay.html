@@ -15,12 +15,12 @@
 </head>
 <body style="background-color:#101010">
 <script>
- 
 
+var indexCount = zukgitPlaceHolderindex;
 var imgArr =  document.getElementsByClassName("img_local");
 
 function changeImageDiff() {
-var randomIndex = Math.floor(Math.random() *  (9 - 1 + 1) + 1);  // 20 最大值
+var randomIndex = Math.floor(Math.random() *  (indexCount - 1 + 1) + 1);  
 
 //document.getElementsByTagName('img')[0].setAttribute('src','jpg/'+randomIndex1+'.jpg');
 //document.getElementsByTagName('img')[1].setAttribute('src','jpg/'+randomIndex2+'.jpg');
@@ -50,9 +50,18 @@ function  showImg(obj,srcStr)
 
 window.onload=function(){
     //do something
-    window.setTimeout("changeImageDiff()", 5000);
+    //window.setTimeout("changeImageDiff()", 5000);
+	RandomPicture();
+	changeImageDiff();
 }
 
+
+function RandomPicture() {
+var randomIndex = Math.floor(Math.random() *  (indexCount - 1 + 1) + 1);  
+for (var i = 0; i < imgArr.length; i++) {
+    imgArr[i].setAttribute('src','jpg/'+randomIndex+'.jpg');
+}
+};
 
 </script>
 
@@ -77,3 +86,5 @@ window.onload=function(){
 
 </body>
 </html>
+
+

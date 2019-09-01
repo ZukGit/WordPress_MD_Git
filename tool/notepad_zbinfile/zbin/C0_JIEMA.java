@@ -20,19 +20,104 @@ public class C0_JIEMA {
      */
 
 
+    //================================ gif_begin===================
+    //gif 2x2
     static File htmlFile_gif_2x2 = new File(System.getProperty("user.dir") + File.separator + "src" + File.separator + "C0_gif_2x2.html");
+    static File htmlFile_gif_2x2_same = new File(System.getProperty("user.dir") + File.separator + "src" + File.separator + "C0_gif_2x2_same.html");
+    static File htmlFile_gif_2x2_same_colum = new File(System.getProperty("user.dir") + File.separator + "src" + File.separator + "C0_gif_2x2_same_colum.html");
+    static File htmlFile_gif_2x2_same_delay = new File(System.getProperty("user.dir") + File.separator + "src" + File.separator + "C0_gif_2x2_same_delay.html");
+    static File htmlFile_gif_2x2_same_row = new File(System.getProperty("user.dir") + File.separator + "src" + File.separator + "C0_gif_2x2_same_row.html");
+    static File htmlFile_gif_2x2_sequence = new File(System.getProperty("user.dir") + File.separator + "src" + File.separator + "C0_gif_2x2_sequence.html");
+
+
+
+
+    //gif 3x3
     static File htmlFile_gif_3x3 = new File(System.getProperty("user.dir") + File.separator + "src" + File.separator + "C0_gif_3x3.html");
+    static File htmlFile_gif_3x3_same = new File(System.getProperty("user.dir") + File.separator + "src" + File.separator + "C0_gif_3x3_same.html");
+    static File htmlFile_gif_3x3_same_colum = new File(System.getProperty("user.dir") + File.separator + "src" + File.separator + "C0_gif_3x3_same_colum.html");
+    static File htmlFile_gif_3x3_same_delay = new File(System.getProperty("user.dir") + File.separator + "src" + File.separator + "C0_gif_3x3_same_delay.html");
+    static File htmlFile_gif_3x3_same_row = new File(System.getProperty("user.dir") + File.separator + "src" + File.separator + "C0_gif_3x3_same_row.html");
+    static File htmlFile_gif_3x3_sequence = new File(System.getProperty("user.dir") + File.separator + "src" + File.separator + "C0_gif_3x3_sequence.html");
+
+    // gif 3x5
     static File htmlFile_gif_3x5 = new File(System.getProperty("user.dir") + File.separator + "src" + File.separator + "C0_gif_3x5.html");
+    static File htmlFile_gif_3x5_same = new File(System.getProperty("user.dir") + File.separator + "src" + File.separator + "C0_gif_3x5_same.html");
+    static File htmlFile_gif_3x5_same_colum = new File(System.getProperty("user.dir") + File.separator + "src" + File.separator + "C0_gif_3x5_same_colum.html");
+    static File htmlFile_gif_3x5_same_delay = new File(System.getProperty("user.dir") + File.separator + "src" + File.separator + "C0_gif_3x5_same_delay.html");
+    static File htmlFile_gif_3x5_same_row = new File(System.getProperty("user.dir") + File.separator + "src" + File.separator + "C0_gif_3x5_same_row.html");
+    static File htmlFile_gif_3x5_sequence = new File(System.getProperty("user.dir") + File.separator + "src" + File.separator + "C0_gif_3x5_sequence.html");
+
+
+  // gif_3d
     static File htmlFile_gif__3d = new File(System.getProperty("user.dir") + File.separator + "src" + File.separator + "C0_gif__3d.html");
-    static File htmlFile_mp4_2x2 = new File(System.getProperty("user.dir") + File.separator + "src" + File.separator + "C0_mp4_2x2.html");
-    static File htmlFile_mp4_3x3 = new File(System.getProperty("user.dir") + File.separator + "src" + File.separator + "C0_mp4_3x3.html");
-    static File htmlFile_mp4_3x5 = new File(System.getProperty("user.dir") + File.separator + "src" + File.separator + "C0_mp4_3x5.html");
-    static File htmlFile_mp4__3d = new File(System.getProperty("user.dir") + File.separator + "src" + File.separator + "C0_mp4__3d.html");
+
+
+    //================================ gif_end===================
+
+    //================================ jpg_begin===================
+    //jpg 2x2
+
     static File htmlFile_jpg_2x2 = new File(System.getProperty("user.dir") + File.separator + "src" + File.separator + "C0_jpg_2x2.html");
+    static File htmlFile_jpg_2x2_same = new File(System.getProperty("user.dir") + File.separator + "src" + File.separator + "C0_jpg_2x2_same.html");
+    static File htmlFile_jpg_2x2_same_colum = new File(System.getProperty("user.dir") + File.separator + "src" + File.separator + "C0_jpg_2x2_same_colum.html");
+    static File htmlFile_jpg_2x2_same_delay = new File(System.getProperty("user.dir") + File.separator + "src" + File.separator + "C0_jpg_2x2_same_delay.html");
+    static File htmlFile_jpg_2x2_same_row = new File(System.getProperty("user.dir") + File.separator + "src" + File.separator + "C0_jpg_2x2_same_row.html");
+    static File htmlFile_jpg_2x2_sequence = new File(System.getProperty("user.dir") + File.separator + "src" + File.separator + "C0_jpg_2x2_sequence.html");
+
+
+
+    //jpg 3x3
     static File htmlFile_jpg_3x3 = new File(System.getProperty("user.dir") + File.separator + "src" + File.separator + "C0_jpg_3x3.html");
+    static File htmlFile_jpg_3x3_same = new File(System.getProperty("user.dir") + File.separator + "src" + File.separator + "C0_jpg_3x3_same.html");
+    static File htmlFile_jpg_3x3_same_colum = new File(System.getProperty("user.dir") + File.separator + "src" + File.separator + "C0_jpg_3x3_same_colum.html");
+    static File htmlFile_jpg_3x3_same_delay = new File(System.getProperty("user.dir") + File.separator + "src" + File.separator + "C0_jpg_3x3_same_delay.html");
+    static File htmlFile_jpg_3x3_same_row = new File(System.getProperty("user.dir") + File.separator + "src" + File.separator + "C0_jpg_3x3_same_row.html");
+    static File htmlFile_jpg_3x3_sequence = new File(System.getProperty("user.dir") + File.separator + "src" + File.separator + "C0_jpg_3x3_sequence.html");
+
+
+    //jpg 3x5
     static File htmlFile_jpg_3x5 = new File(System.getProperty("user.dir") + File.separator + "src" + File.separator + "C0_jpg_3x5.html");
+    static File htmlFile_jpg_3x5_same = new File(System.getProperty("user.dir") + File.separator + "src" + File.separator + "C0_jpg_3x5_same.html");
+    static File htmlFile_jpg_3x5_same_colum = new File(System.getProperty("user.dir") + File.separator + "src" + File.separator + "C0_jpg_3x5_same_colum.html");
+    static File htmlFile_jpg_3x5_same_delay = new File(System.getProperty("user.dir") + File.separator + "src" + File.separator + "C0_jpg_3x5_same_delay.html");
+    static File htmlFile_jpg_3x5_same_row = new File(System.getProperty("user.dir") + File.separator + "src" + File.separator + "C0_jpg_3x5_same_row.html");
+    static File htmlFile_jpg_3x5_sequence = new File(System.getProperty("user.dir") + File.separator + "src" + File.separator + "C0_jpg_3x5_sequence.html");
+
+
+    //jpg 3xd
     static File htmlFile_jpg__3d = new File(System.getProperty("user.dir") + File.separator + "src" + File.separator + "C0_jpg__3d.html");
 
+    //================================ jpg_end===================
+
+
+    //================================ mp4_begin===================
+    //mp4 2x2
+    static File htmlFile_mp4_2x2 = new File(System.getProperty("user.dir") + File.separator + "src" + File.separator + "C0_mp4_2x2.html");
+    static File htmlFile_mp4_2x2_same = new File(System.getProperty("user.dir") + File.separator + "src" + File.separator + "C0_mp4_2x2_same.html");
+    static File htmlFile_mp4_2x2_same_delay = new File(System.getProperty("user.dir") + File.separator + "src" + File.separator + "C0_mp4_2x2_same_delay.html");
+
+    //mp4 3x3
+    static File htmlFile_mp4_3x3 = new File(System.getProperty("user.dir") + File.separator + "src" + File.separator + "C0_mp4_3x3.html");
+    static File htmlFile_mp4_3x3_same = new File(System.getProperty("user.dir") + File.separator + "src" + File.separator + "C0_mp4_3x3_same.html");
+    static File htmlFile_mp4_3x3_same_delay = new File(System.getProperty("user.dir") + File.separator + "src" + File.separator + "C0_mp4_3x3_same_delay.html");
+
+
+    //mp4 3x5
+    static File htmlFile_mp4_3x5 = new File(System.getProperty("user.dir") + File.separator + "src" + File.separator + "C0_mp4_3x5.html");
+    static File htmlFile_mp4_3x5_same = new File(System.getProperty("user.dir") + File.separator + "src" + File.separator + "C0_mp4_3x5_same.html");
+    static File htmlFile_mp4_3x5_same_delay = new File(System.getProperty("user.dir") + File.separator + "src" + File.separator + "C0_mp4_3x5_same_delay.html");
+
+    //mp4 3d
+    static File htmlFile_mp4__3d = new File(System.getProperty("user.dir") + File.separator + "src" + File.separator + "C0_mp4__3d.html");
+
+    //mp4 indivitual
+    static File htmlFile_mp4_3x5_indivitual = new File(System.getProperty("user.dir") + File.separator + "src" + File.separator + "C0_mp4_2x2_indivitual.html");
+    static File htmlFile_mp4_3x3_indivitual = new File(System.getProperty("user.dir") + File.separator + "src" + File.separator + "C0_mp4_3x3_indivitual.html");
+    static File htmlFile_mp4_2x2_indivitual = new File(System.getProperty("user.dir") + File.separator + "src" + File.separator + "C0_mp4_3x5_indivitual.html");
+    static File htmlFile_mp4__3d_indivitual = new File(System.getProperty("user.dir") + File.separator + "src" + File.separator + "C0_mp4__3d_indivitual.html");
+
+    //================================ mp4_end===================
 
     private static Cipher encryptCipher = null;
     private static Cipher decryptCipher = null;
@@ -375,6 +460,7 @@ public class C0_JIEMA {
             addMP4HtmlFile(System.getProperties().getProperty("user.dir") + File.separator + mingwenDir + File.separator + "v" + File.separator + "indivitual" + File.separator + keyName, itemFileArr.size());
         }
 
+        todoIndivitualHtml();  //  操作 arrFileMap   map
 
     }
 
@@ -625,6 +711,7 @@ public class C0_JIEMA {
     }
 
     public static void addJPGHtmlFile(String addPath, int length) {
+        // jpg_2x2
         String htmlcode2x2 = readStringFromFile(htmlFile_jpg_2x2);
         if (htmlcode2x2 != null && htmlcode2x2.contains("zukgitPlaceHolderindex")) {
             htmlcode2x2 = htmlcode2x2.replaceAll("zukgitPlaceHolderindex", length + "");
@@ -638,6 +725,86 @@ public class C0_JIEMA {
             }
         }
         writeContentToFile(htmlcode2x2_File, htmlcode2x2);
+
+// jpg_2x2_same
+        String htmlcode2x2_same = readStringFromFile(htmlFile_jpg_2x2_same);
+        if (htmlcode2x2_same != null && htmlcode2x2_same.contains("zukgitPlaceHolderindex")) {
+            htmlcode2x2_same = htmlcode2x2_same.replaceAll("zukgitPlaceHolderindex", length + "");
+        }
+        File htmlcode2x2_same_File = new File(addPath + File.separator + htmlFile_jpg_2x2_same.getName());
+        if (!htmlcode2x2_same_File.exists()) {
+            try {
+                htmlcode2x2_same_File.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        writeContentToFile(htmlcode2x2_same_File, htmlcode2x2_same);
+
+// jpg_2x2_same_colum
+        String htmlcode2x2_same_colum = readStringFromFile(htmlFile_jpg_2x2_same_colum);
+        if (htmlcode2x2_same_colum != null && htmlcode2x2_same_colum.contains("zukgitPlaceHolderindex")) {
+            htmlcode2x2_same_colum = htmlcode2x2_same_colum.replaceAll("zukgitPlaceHolderindex", length + "");
+        }
+        File htmlcode2x2_same_colum_File = new File(addPath + File.separator + htmlFile_jpg_2x2_same_colum.getName());
+        if (!htmlcode2x2_same_colum_File.exists()) {
+            try {
+                htmlcode2x2_same_colum_File.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        writeContentToFile(htmlcode2x2_same_colum_File, htmlcode2x2_same_colum);
+
+
+// jpg_2x2_same_delay
+        String htmlcode2x2_same_delay = readStringFromFile(htmlFile_jpg_2x2_same_delay);
+        if (htmlcode2x2_same_delay != null && htmlcode2x2_same_delay.contains("zukgitPlaceHolderindex")) {
+            htmlcode2x2_same_delay = htmlcode2x2_same_delay.replaceAll("zukgitPlaceHolderindex", length + "");
+        }
+        File htmlcode2x2_same_delay_File = new File(addPath + File.separator + htmlFile_jpg_2x2_same_delay.getName());
+        if (!htmlcode2x2_same_delay_File.exists()) {
+            try {
+                htmlcode2x2_same_delay_File.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        writeContentToFile(htmlcode2x2_same_delay_File, htmlcode2x2_same_delay);
+
+
+// jpg_2x2_same_row
+        String htmlcode2x2_same_row = readStringFromFile(htmlFile_jpg_2x2_same_row);
+        if (htmlcode2x2_same_row != null && htmlcode2x2_same_row.contains("zukgitPlaceHolderindex")) {
+            htmlcode2x2_same_row = htmlcode2x2_same_row.replaceAll("zukgitPlaceHolderindex", length + "");
+        }
+        File htmlcode2x2_same_row_File = new File(addPath + File.separator + htmlFile_jpg_2x2_same_row.getName());
+        if (!htmlcode2x2_same_row_File.exists()) {
+            try {
+                htmlcode2x2_same_row_File.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        writeContentToFile(htmlcode2x2_same_row_File, htmlcode2x2_same_row);
+
+
+// jpg_2x2_sequence
+        String htmlcode2x2_sequence = readStringFromFile(htmlFile_jpg_2x2_sequence);
+        if (htmlcode2x2_sequence != null && htmlcode2x2_sequence.contains("zukgitPlaceHolderindex")) {
+            htmlcode2x2_sequence = htmlcode2x2_sequence.replaceAll("zukgitPlaceHolderindex", length + "");
+        }
+        File htmlcode2x2_sequence_File = new File(addPath + File.separator + htmlFile_jpg_2x2_sequence.getName());
+        if (!htmlcode2x2_sequence_File.exists()) {
+            try {
+                htmlcode2x2_sequence_File.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        writeContentToFile(htmlcode2x2_sequence_File, htmlcode2x2_sequence);
+
+
 
         String htmlcode3x3 = readStringFromFile(htmlFile_jpg_3x3);
         if (htmlcode3x3 != null && htmlcode3x3.contains("zukgitPlaceHolderindex")) {
@@ -653,6 +820,84 @@ public class C0_JIEMA {
         }
         writeContentToFile(htmlcode3x3_File, htmlcode3x3);
 
+        // jpg_3x3_same
+        String htmlcode3x3_same = readStringFromFile(htmlFile_jpg_3x3_same);
+        if (htmlcode3x3_same != null && htmlcode3x3_same.contains("zukgitPlaceHolderindex")) {
+            htmlcode3x3_same = htmlcode3x3_same.replaceAll("zukgitPlaceHolderindex", length + "");
+        }
+        File htmlcode3x3_same_File = new File(addPath + File.separator + htmlFile_jpg_3x3_same.getName());
+        if (!htmlcode3x3_same_File.exists()) {
+            try {
+                htmlcode3x3_same_File.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        writeContentToFile(htmlcode3x3_same_File, htmlcode3x3_same);
+
+// jpg_3x3_same_colum
+        String htmlcode3x3_same_colum = readStringFromFile(htmlFile_jpg_3x3_same_colum);
+        if (htmlcode3x3_same_colum != null && htmlcode3x3_same_colum.contains("zukgitPlaceHolderindex")) {
+            htmlcode3x3_same_colum = htmlcode3x3_same_colum.replaceAll("zukgitPlaceHolderindex", length + "");
+        }
+        File htmlcode3x3_same_colum_File = new File(addPath + File.separator + htmlFile_jpg_3x3_same_colum.getName());
+        if (!htmlcode3x3_same_colum_File.exists()) {
+            try {
+                htmlcode3x3_same_colum_File.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        writeContentToFile(htmlcode3x3_same_colum_File, htmlcode3x3_same_colum);
+
+
+// jpg_3x3_same_delay
+        String htmlcode3x3_same_delay = readStringFromFile(htmlFile_jpg_3x3_same_delay);
+        if (htmlcode3x3_same_delay != null && htmlcode3x3_same_delay.contains("zukgitPlaceHolderindex")) {
+            htmlcode3x3_same_delay = htmlcode3x3_same_delay.replaceAll("zukgitPlaceHolderindex", length + "");
+        }
+        File htmlcode3x3_same_delay_File = new File(addPath + File.separator + htmlFile_jpg_3x3_same_delay.getName());
+        if (!htmlcode3x3_same_delay_File.exists()) {
+            try {
+                htmlcode3x3_same_delay_File.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        writeContentToFile(htmlcode3x3_same_delay_File, htmlcode3x3_same_delay);
+
+
+// jpg_3x3_same_row
+        String htmlcode3x3_same_row = readStringFromFile(htmlFile_jpg_3x3_same_row);
+        if (htmlcode3x3_same_row != null && htmlcode3x3_same_row.contains("zukgitPlaceHolderindex")) {
+            htmlcode3x3_same_row = htmlcode3x3_same_row.replaceAll("zukgitPlaceHolderindex", length + "");
+        }
+        File htmlcode3x3_same_row_File = new File(addPath + File.separator + htmlFile_jpg_3x3_same_row.getName());
+        if (!htmlcode3x3_same_row_File.exists()) {
+            try {
+                htmlcode3x3_same_row_File.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        writeContentToFile(htmlcode3x3_same_row_File, htmlcode3x3_same_row);
+
+
+// jpg_3x3_sequence
+        String htmlcode3x3_sequence = readStringFromFile(htmlFile_jpg_3x3_sequence);
+        if (htmlcode3x3_sequence != null && htmlcode3x3_sequence.contains("zukgitPlaceHolderindex")) {
+            htmlcode3x3_sequence = htmlcode3x3_sequence.replaceAll("zukgitPlaceHolderindex", length + "");
+        }
+        File htmlcode3x3_sequence_File = new File(addPath + File.separator + htmlFile_jpg_3x3_sequence.getName());
+        if (!htmlcode3x3_sequence_File.exists()) {
+            try {
+                htmlcode3x3_sequence_File.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        writeContentToFile(htmlcode3x3_sequence_File, htmlcode3x3_sequence);
+
         String htmlcode3x5 = readStringFromFile(htmlFile_jpg_3x5);
         if (htmlcode3x5 != null && htmlcode3x5.contains("zukgitPlaceHolderindex")) {
             htmlcode3x5 = htmlcode3x5.replaceAll("zukgitPlaceHolderindex", length + "");
@@ -666,6 +911,84 @@ public class C0_JIEMA {
             }
         }
         writeContentToFile(htmlcode3x5_File, htmlcode3x5);
+
+        // jpg_3x5_same
+        String htmlcode3x5_same = readStringFromFile(htmlFile_jpg_3x5_same);
+        if (htmlcode3x5_same != null && htmlcode3x5_same.contains("zukgitPlaceHolderindex")) {
+            htmlcode3x5_same = htmlcode3x5_same.replaceAll("zukgitPlaceHolderindex", length + "");
+        }
+        File htmlcode3x5_same_File = new File(addPath + File.separator + htmlFile_jpg_3x5_same.getName());
+        if (!htmlcode3x5_same_File.exists()) {
+            try {
+                htmlcode3x5_same_File.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        writeContentToFile(htmlcode3x5_same_File, htmlcode3x5_same);
+
+// jpg_3x5_same_colum
+        String htmlcode3x5_same_colum = readStringFromFile(htmlFile_jpg_3x5_same_colum);
+        if (htmlcode3x5_same_colum != null && htmlcode3x5_same_colum.contains("zukgitPlaceHolderindex")) {
+            htmlcode3x5_same_colum = htmlcode3x5_same_colum.replaceAll("zukgitPlaceHolderindex", length + "");
+        }
+        File htmlcode3x5_same_colum_File = new File(addPath + File.separator + htmlFile_jpg_3x5_same_colum.getName());
+        if (!htmlcode3x5_same_colum_File.exists()) {
+            try {
+                htmlcode3x5_same_colum_File.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        writeContentToFile(htmlcode3x5_same_colum_File, htmlcode3x5_same_colum);
+
+
+// jpg_3x5_same_delay
+        String htmlcode3x5_same_delay = readStringFromFile(htmlFile_jpg_3x5_same_delay);
+        if (htmlcode3x5_same_delay != null && htmlcode3x5_same_delay.contains("zukgitPlaceHolderindex")) {
+            htmlcode3x5_same_delay = htmlcode3x5_same_delay.replaceAll("zukgitPlaceHolderindex", length + "");
+        }
+        File htmlcode3x5_same_delay_File = new File(addPath + File.separator + htmlFile_jpg_3x5_same_delay.getName());
+        if (!htmlcode3x5_same_delay_File.exists()) {
+            try {
+                htmlcode3x5_same_delay_File.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        writeContentToFile(htmlcode3x5_same_delay_File, htmlcode3x5_same_delay);
+
+
+// jpg_3x5_same_row
+        String htmlcode3x5_same_row = readStringFromFile(htmlFile_jpg_3x5_same_row);
+        if (htmlcode3x5_same_row != null && htmlcode3x5_same_row.contains("zukgitPlaceHolderindex")) {
+            htmlcode3x5_same_row = htmlcode3x5_same_row.replaceAll("zukgitPlaceHolderindex", length + "");
+        }
+        File htmlcode3x5_same_row_File = new File(addPath + File.separator + htmlFile_jpg_3x5_same_row.getName());
+        if (!htmlcode3x5_same_row_File.exists()) {
+            try {
+                htmlcode3x5_same_row_File.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        writeContentToFile(htmlcode3x5_same_row_File, htmlcode3x5_same_row);
+
+
+// jpg_3x5_sequence
+        String htmlcode3x5_sequence = readStringFromFile(htmlFile_jpg_3x5_sequence);
+        if (htmlcode3x5_sequence != null && htmlcode3x5_sequence.contains("zukgitPlaceHolderindex")) {
+            htmlcode3x5_sequence = htmlcode3x5_sequence.replaceAll("zukgitPlaceHolderindex", length + "");
+        }
+        File htmlcode3x5_sequence_File = new File(addPath + File.separator + htmlFile_jpg_3x5_sequence.getName());
+        if (!htmlcode3x5_sequence_File.exists()) {
+            try {
+                htmlcode3x5_sequence_File.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        writeContentToFile(htmlcode3x5_sequence_File, htmlcode3x5_sequence);
 
         String htmlcode3d = readStringFromFile(htmlFile_jpg__3d);
         if (htmlcode3d != null && htmlcode3d.contains("zukgitPlaceHolderindex")) {
@@ -684,6 +1007,7 @@ public class C0_JIEMA {
 
 
     public static void addGIFHtmlFile(String addPath, int length) {
+        // gif_2x2
         String htmlcode2x2 = readStringFromFile(htmlFile_gif_2x2);
         if (htmlcode2x2 != null && htmlcode2x2.contains("zukgitPlaceHolderindex")) {
             htmlcode2x2 = htmlcode2x2.replaceAll("zukgitPlaceHolderindex", length + "");
@@ -697,6 +1021,86 @@ public class C0_JIEMA {
             }
         }
         writeContentToFile(htmlcode2x2_File, htmlcode2x2);
+
+// gif_2x2_same
+        String htmlcode2x2_same = readStringFromFile(htmlFile_gif_2x2_same);
+        if (htmlcode2x2_same != null && htmlcode2x2_same.contains("zukgitPlaceHolderindex")) {
+            htmlcode2x2_same = htmlcode2x2_same.replaceAll("zukgitPlaceHolderindex", length + "");
+        }
+        File htmlcode2x2_same_File = new File(addPath + File.separator + htmlFile_gif_2x2_same.getName());
+        if (!htmlcode2x2_same_File.exists()) {
+            try {
+                htmlcode2x2_same_File.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        writeContentToFile(htmlcode2x2_same_File, htmlcode2x2_same);
+
+// gif_2x2_same_colum
+        String htmlcode2x2_same_colum = readStringFromFile(htmlFile_gif_2x2_same_colum);
+        if (htmlcode2x2_same_colum != null && htmlcode2x2_same_colum.contains("zukgitPlaceHolderindex")) {
+            htmlcode2x2_same_colum = htmlcode2x2_same_colum.replaceAll("zukgitPlaceHolderindex", length + "");
+        }
+        File htmlcode2x2_same_colum_File = new File(addPath + File.separator + htmlFile_gif_2x2_same_colum.getName());
+        if (!htmlcode2x2_same_colum_File.exists()) {
+            try {
+                htmlcode2x2_same_colum_File.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        writeContentToFile(htmlcode2x2_same_colum_File, htmlcode2x2_same_colum);
+
+
+// gif_2x2_same_delay
+        String htmlcode2x2_same_delay = readStringFromFile(htmlFile_gif_2x2_same_delay);
+        if (htmlcode2x2_same_delay != null && htmlcode2x2_same_delay.contains("zukgitPlaceHolderindex")) {
+            htmlcode2x2_same_delay = htmlcode2x2_same_delay.replaceAll("zukgitPlaceHolderindex", length + "");
+        }
+        File htmlcode2x2_same_delay_File = new File(addPath + File.separator + htmlFile_gif_2x2_same_delay.getName());
+        if (!htmlcode2x2_same_delay_File.exists()) {
+            try {
+                htmlcode2x2_same_delay_File.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        writeContentToFile(htmlcode2x2_same_delay_File, htmlcode2x2_same_delay);
+
+
+// gif_2x2_same_row
+        String htmlcode2x2_same_row = readStringFromFile(htmlFile_gif_2x2_same_row);
+        if (htmlcode2x2_same_row != null && htmlcode2x2_same_row.contains("zukgitPlaceHolderindex")) {
+            htmlcode2x2_same_row = htmlcode2x2_same_row.replaceAll("zukgitPlaceHolderindex", length + "");
+        }
+        File htmlcode2x2_same_row_File = new File(addPath + File.separator + htmlFile_gif_2x2_same_row.getName());
+        if (!htmlcode2x2_same_row_File.exists()) {
+            try {
+                htmlcode2x2_same_row_File.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        writeContentToFile(htmlcode2x2_same_row_File, htmlcode2x2_same_row);
+
+
+// gif_2x2_sequence
+        String htmlcode2x2_sequence = readStringFromFile(htmlFile_gif_2x2_sequence);
+        if (htmlcode2x2_sequence != null && htmlcode2x2_sequence.contains("zukgitPlaceHolderindex")) {
+            htmlcode2x2_sequence = htmlcode2x2_sequence.replaceAll("zukgitPlaceHolderindex", length + "");
+        }
+        File htmlcode2x2_sequence_File = new File(addPath + File.separator + htmlFile_gif_2x2_sequence.getName());
+        if (!htmlcode2x2_sequence_File.exists()) {
+            try {
+                htmlcode2x2_sequence_File.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        writeContentToFile(htmlcode2x2_sequence_File, htmlcode2x2_sequence);
+
+
 
         String htmlcode3x3 = readStringFromFile(htmlFile_gif_3x3);
         if (htmlcode3x3 != null && htmlcode3x3.contains("zukgitPlaceHolderindex")) {
@@ -712,6 +1116,84 @@ public class C0_JIEMA {
         }
         writeContentToFile(htmlcode3x3_File, htmlcode3x3);
 
+        // gif_3x3_same
+        String htmlcode3x3_same = readStringFromFile(htmlFile_gif_3x3_same);
+        if (htmlcode3x3_same != null && htmlcode3x3_same.contains("zukgitPlaceHolderindex")) {
+            htmlcode3x3_same = htmlcode3x3_same.replaceAll("zukgitPlaceHolderindex", length + "");
+        }
+        File htmlcode3x3_same_File = new File(addPath + File.separator + htmlFile_gif_3x3_same.getName());
+        if (!htmlcode3x3_same_File.exists()) {
+            try {
+                htmlcode3x3_same_File.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        writeContentToFile(htmlcode3x3_same_File, htmlcode3x3_same);
+
+// gif_3x3_same_colum
+        String htmlcode3x3_same_colum = readStringFromFile(htmlFile_gif_3x3_same_colum);
+        if (htmlcode3x3_same_colum != null && htmlcode3x3_same_colum.contains("zukgitPlaceHolderindex")) {
+            htmlcode3x3_same_colum = htmlcode3x3_same_colum.replaceAll("zukgitPlaceHolderindex", length + "");
+        }
+        File htmlcode3x3_same_colum_File = new File(addPath + File.separator + htmlFile_gif_3x3_same_colum.getName());
+        if (!htmlcode3x3_same_colum_File.exists()) {
+            try {
+                htmlcode3x3_same_colum_File.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        writeContentToFile(htmlcode3x3_same_colum_File, htmlcode3x3_same_colum);
+
+
+// gif_3x3_same_delay
+        String htmlcode3x3_same_delay = readStringFromFile(htmlFile_gif_3x3_same_delay);
+        if (htmlcode3x3_same_delay != null && htmlcode3x3_same_delay.contains("zukgitPlaceHolderindex")) {
+            htmlcode3x3_same_delay = htmlcode3x3_same_delay.replaceAll("zukgitPlaceHolderindex", length + "");
+        }
+        File htmlcode3x3_same_delay_File = new File(addPath + File.separator + htmlFile_gif_3x3_same_delay.getName());
+        if (!htmlcode3x3_same_delay_File.exists()) {
+            try {
+                htmlcode3x3_same_delay_File.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        writeContentToFile(htmlcode3x3_same_delay_File, htmlcode3x3_same_delay);
+
+
+// gif_3x3_same_row
+        String htmlcode3x3_same_row = readStringFromFile(htmlFile_gif_3x3_same_row);
+        if (htmlcode3x3_same_row != null && htmlcode3x3_same_row.contains("zukgitPlaceHolderindex")) {
+            htmlcode3x3_same_row = htmlcode3x3_same_row.replaceAll("zukgitPlaceHolderindex", length + "");
+        }
+        File htmlcode3x3_same_row_File = new File(addPath + File.separator + htmlFile_gif_3x3_same_row.getName());
+        if (!htmlcode3x3_same_row_File.exists()) {
+            try {
+                htmlcode3x3_same_row_File.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        writeContentToFile(htmlcode3x3_same_row_File, htmlcode3x3_same_row);
+
+
+// gif_3x3_sequence
+        String htmlcode3x3_sequence = readStringFromFile(htmlFile_gif_3x3_sequence);
+        if (htmlcode3x3_sequence != null && htmlcode3x3_sequence.contains("zukgitPlaceHolderindex")) {
+            htmlcode3x3_sequence = htmlcode3x3_sequence.replaceAll("zukgitPlaceHolderindex", length + "");
+        }
+        File htmlcode3x3_sequence_File = new File(addPath + File.separator + htmlFile_gif_3x3_sequence.getName());
+        if (!htmlcode3x3_sequence_File.exists()) {
+            try {
+                htmlcode3x3_sequence_File.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        writeContentToFile(htmlcode3x3_sequence_File, htmlcode3x3_sequence);
+
         String htmlcode3x5 = readStringFromFile(htmlFile_gif_3x5);
         if (htmlcode3x5 != null && htmlcode3x5.contains("zukgitPlaceHolderindex")) {
             htmlcode3x5 = htmlcode3x5.replaceAll("zukgitPlaceHolderindex", length + "");
@@ -725,6 +1207,84 @@ public class C0_JIEMA {
             }
         }
         writeContentToFile(htmlcode3x5_File, htmlcode3x5);
+
+        // gif_3x5_same
+        String htmlcode3x5_same = readStringFromFile(htmlFile_gif_3x5_same);
+        if (htmlcode3x5_same != null && htmlcode3x5_same.contains("zukgitPlaceHolderindex")) {
+            htmlcode3x5_same = htmlcode3x5_same.replaceAll("zukgitPlaceHolderindex", length + "");
+        }
+        File htmlcode3x5_same_File = new File(addPath + File.separator + htmlFile_gif_3x5_same.getName());
+        if (!htmlcode3x5_same_File.exists()) {
+            try {
+                htmlcode3x5_same_File.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        writeContentToFile(htmlcode3x5_same_File, htmlcode3x5_same);
+
+// gif_3x5_same_colum
+        String htmlcode3x5_same_colum = readStringFromFile(htmlFile_gif_3x5_same_colum);
+        if (htmlcode3x5_same_colum != null && htmlcode3x5_same_colum.contains("zukgitPlaceHolderindex")) {
+            htmlcode3x5_same_colum = htmlcode3x5_same_colum.replaceAll("zukgitPlaceHolderindex", length + "");
+        }
+        File htmlcode3x5_same_colum_File = new File(addPath + File.separator + htmlFile_gif_3x5_same_colum.getName());
+        if (!htmlcode3x5_same_colum_File.exists()) {
+            try {
+                htmlcode3x5_same_colum_File.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        writeContentToFile(htmlcode3x5_same_colum_File, htmlcode3x5_same_colum);
+
+
+// gif_3x5_same_delay
+        String htmlcode3x5_same_delay = readStringFromFile(htmlFile_gif_3x5_same_delay);
+        if (htmlcode3x5_same_delay != null && htmlcode3x5_same_delay.contains("zukgitPlaceHolderindex")) {
+            htmlcode3x5_same_delay = htmlcode3x5_same_delay.replaceAll("zukgitPlaceHolderindex", length + "");
+        }
+        File htmlcode3x5_same_delay_File = new File(addPath + File.separator + htmlFile_gif_3x5_same_delay.getName());
+        if (!htmlcode3x5_same_delay_File.exists()) {
+            try {
+                htmlcode3x5_same_delay_File.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        writeContentToFile(htmlcode3x5_same_delay_File, htmlcode3x5_same_delay);
+
+
+// gif_3x5_same_row
+        String htmlcode3x5_same_row = readStringFromFile(htmlFile_gif_3x5_same_row);
+        if (htmlcode3x5_same_row != null && htmlcode3x5_same_row.contains("zukgitPlaceHolderindex")) {
+            htmlcode3x5_same_row = htmlcode3x5_same_row.replaceAll("zukgitPlaceHolderindex", length + "");
+        }
+        File htmlcode3x5_same_row_File = new File(addPath + File.separator + htmlFile_gif_3x5_same_row.getName());
+        if (!htmlcode3x5_same_row_File.exists()) {
+            try {
+                htmlcode3x5_same_row_File.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        writeContentToFile(htmlcode3x5_same_row_File, htmlcode3x5_same_row);
+
+
+// gif_3x5_sequence
+        String htmlcode3x5_sequence = readStringFromFile(htmlFile_gif_3x5_sequence);
+        if (htmlcode3x5_sequence != null && htmlcode3x5_sequence.contains("zukgitPlaceHolderindex")) {
+            htmlcode3x5_sequence = htmlcode3x5_sequence.replaceAll("zukgitPlaceHolderindex", length + "");
+        }
+        File htmlcode3x5_sequence_File = new File(addPath + File.separator + htmlFile_gif_3x5_sequence.getName());
+        if (!htmlcode3x5_sequence_File.exists()) {
+            try {
+                htmlcode3x5_sequence_File.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        writeContentToFile(htmlcode3x5_sequence_File, htmlcode3x5_sequence);
 
         String htmlcode3d = readStringFromFile(htmlFile_gif__3d);
         if (htmlcode3d != null && htmlcode3d.contains("zukgitPlaceHolderindex")) {
@@ -757,6 +1317,38 @@ public class C0_JIEMA {
         }
         writeContentToFile(htmlcode2x2_File, htmlcode2x2);
 
+
+        String htmlcode2x2_same = readStringFromFile(htmlFile_mp4_2x2_same);
+        if (htmlcode2x2_same != null && htmlcode2x2_same.contains("zukgitPlaceHolderindex")) {
+            htmlcode2x2_same = htmlcode2x2_same.replaceAll("zukgitPlaceHolderindex", length + "");
+        }
+        File htmlcode2x2_same_File = new File(addPath + File.separator + htmlFile_mp4_2x2_same.getName());
+        if (!htmlcode2x2_same_File.exists()) {
+            try {
+                htmlcode2x2_same_File.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        writeContentToFile(htmlcode2x2_same_File, htmlcode2x2_same);
+
+
+        String htmlcode2x2_same_delay = readStringFromFile(htmlFile_mp4_2x2_same_delay);
+        if (htmlcode2x2_same_delay != null && htmlcode2x2_same_delay.contains("zukgitPlaceHolderindex")) {
+            htmlcode2x2_same_delay = htmlcode2x2_same_delay.replaceAll("zukgitPlaceHolderindex", length + "");
+        }
+        File htmlcode2x2_same_delay_File = new File(addPath + File.separator + htmlFile_mp4_2x2_same_delay.getName());
+        if (!htmlcode2x2_same_delay_File.exists()) {
+            try {
+                htmlcode2x2_same_delay_File.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        writeContentToFile(htmlcode2x2_same_delay_File, htmlcode2x2_same_delay);
+
+
+
         String htmlcode3x3 = readStringFromFile(htmlFile_mp4_3x3);
         if (htmlcode3x3 != null && htmlcode3x3.contains("zukgitPlaceHolderindex")) {
             htmlcode3x3 = htmlcode3x3.replaceAll("zukgitPlaceHolderindex", length + "");
@@ -770,6 +1362,39 @@ public class C0_JIEMA {
             }
         }
         writeContentToFile(htmlcode3x3_File, htmlcode3x3);
+
+
+        String htmlcode3x3_same = readStringFromFile(htmlFile_mp4_3x3_same);
+        if (htmlcode3x3_same != null && htmlcode3x3_same.contains("zukgitPlaceHolderindex")) {
+            htmlcode3x3_same = htmlcode3x3_same.replaceAll("zukgitPlaceHolderindex", length + "");
+        }
+        File htmlcode3x3_same_File = new File(addPath + File.separator + htmlFile_mp4_3x3_same.getName());
+        if (!htmlcode3x3_same_File.exists()) {
+            try {
+                htmlcode3x3_same_File.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        writeContentToFile(htmlcode3x3_same_File, htmlcode3x3_same);
+
+
+
+        String htmlcode3x3_same_delay = readStringFromFile(htmlFile_mp4_3x3_same_delay);
+        if (htmlcode3x3_same_delay != null && htmlcode3x3_same_delay.contains("zukgitPlaceHolderindex")) {
+            htmlcode3x3_same_delay = htmlcode3x3_same_delay.replaceAll("zukgitPlaceHolderindex", length + "");
+        }
+        File htmlcode3x3_same_delay_File = new File(addPath + File.separator + htmlFile_mp4_3x3_same_delay.getName());
+        if (!htmlcode3x3_same_delay_File.exists()) {
+            try {
+                htmlcode3x3_same_delay_File.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        writeContentToFile(htmlcode3x3_same_delay_File, htmlcode3x3_same_delay);
+
+
 
         String htmlcode3x5 = readStringFromFile(htmlFile_mp4_3x5);
         if (htmlcode3x5 != null && htmlcode3x5.contains("zukgitPlaceHolderindex")) {
@@ -785,6 +1410,38 @@ public class C0_JIEMA {
         }
         writeContentToFile(htmlcode3x5_File, htmlcode3x5);
 
+
+        String htmlcode3x5_same = readStringFromFile(htmlFile_mp4_3x5_same);
+        if (htmlcode3x5_same != null && htmlcode3x5_same.contains("zukgitPlaceHolderindex")) {
+            htmlcode3x5_same = htmlcode3x5_same.replaceAll("zukgitPlaceHolderindex", length + "");
+        }
+        File htmlcode3x5_same_File = new File(addPath + File.separator + htmlFile_mp4_3x5_same.getName());
+        if (!htmlcode3x5_same_File.exists()) {
+            try {
+                htmlcode3x5_same_File.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        writeContentToFile(htmlcode3x5_same_File, htmlcode3x5_same);
+
+
+
+        String htmlcode3x5_same_delay = readStringFromFile(htmlFile_mp4_3x5_same_delay);
+        if (htmlcode3x5_same_delay != null && htmlcode3x5_same_delay.contains("zukgitPlaceHolderindex")) {
+            htmlcode3x5_same_delay = htmlcode3x5_same_delay.replaceAll("zukgitPlaceHolderindex", length + "");
+        }
+        File htmlcode3x5_same_delay_File = new File(addPath + File.separator + htmlFile_mp4_3x5_same_delay.getName());
+        if (!htmlcode3x5_same_delay_File.exists()) {
+            try {
+                htmlcode3x5_same_delay_File.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        writeContentToFile(htmlcode3x5_same_delay_File, htmlcode3x5_same_delay);
+
+
         String htmlcode3d = readStringFromFile(htmlFile_mp4__3d);
         if (htmlcode3d != null && htmlcode3d.contains("zukgitPlaceHolderindex")) {
             htmlcode3d = htmlcode3d.replaceAll("zukgitPlaceHolderindex", length + "");
@@ -798,8 +1455,83 @@ public class C0_JIEMA {
             }
         }
         writeContentToFile(htmlcode3d_File, htmlcode3d);
+
+
     }
 
+
+// zzz
+    public static void addIndivitualMP4HtmlFile(String addPath, String defineString , String addString) {
+
+
+        String htmlcode_mp4_2x2_indivitual = readStringFromFile(htmlFile_mp4_2x2_indivitual);
+        if (htmlcode_mp4_2x2_indivitual != null && htmlcode_mp4_2x2_indivitual.contains("zukgitPlaceHolderArrayDefine")
+                && htmlcode_mp4_2x2_indivitual.contains("zukgitPlaceHolderArrayAdd") ) {
+            htmlcode_mp4_2x2_indivitual = htmlcode_mp4_2x2_indivitual.replaceAll("zukgitPlaceHolderArrayDefine", defineString);
+            htmlcode_mp4_2x2_indivitual = htmlcode_mp4_2x2_indivitual.replaceAll("zukgitPlaceHolderArrayAdd", addString);
+        }
+        File htmlcode_mp4_2x2_indivitual_File = new File(addPath + File.separator + htmlFile_mp4_2x2_indivitual.getName());
+        if (!htmlcode_mp4_2x2_indivitual_File.exists()) {
+            try {
+                htmlcode_mp4_2x2_indivitual_File.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        writeContentToFile(htmlcode_mp4_2x2_indivitual_File, htmlcode_mp4_2x2_indivitual);
+
+
+        String htmlcode_mp4_3x3_indivitual = readStringFromFile(htmlFile_mp4_3x3_indivitual);
+        if (htmlcode_mp4_3x3_indivitual != null && htmlcode_mp4_3x3_indivitual.contains("zukgitPlaceHolderArrayDefine")
+                && htmlcode_mp4_3x3_indivitual.contains("zukgitPlaceHolderArrayAdd") ) {
+            htmlcode_mp4_3x3_indivitual = htmlcode_mp4_3x3_indivitual.replaceAll("zukgitPlaceHolderArrayDefine", defineString);
+            htmlcode_mp4_3x3_indivitual = htmlcode_mp4_3x3_indivitual.replaceAll("zukgitPlaceHolderArrayAdd", addString);
+        }
+        File htmlcode_mp4_3x3_indivitual_File = new File(addPath + File.separator + htmlFile_mp4_3x3_indivitual.getName());
+        if (!htmlcode_mp4_3x3_indivitual_File.exists()) {
+            try {
+                htmlcode_mp4_3x3_indivitual_File.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        writeContentToFile(htmlcode_mp4_3x3_indivitual_File, htmlcode_mp4_3x3_indivitual);
+
+
+        String htmlcode_mp4_3x5_indivitual = readStringFromFile(htmlFile_mp4_3x5_indivitual);
+        if (htmlcode_mp4_3x5_indivitual != null && htmlcode_mp4_3x5_indivitual.contains("zukgitPlaceHolderArrayDefine")
+                && htmlcode_mp4_3x5_indivitual.contains("zukgitPlaceHolderArrayAdd") ) {
+            htmlcode_mp4_3x5_indivitual = htmlcode_mp4_3x5_indivitual.replaceAll("zukgitPlaceHolderArrayDefine", defineString);
+            htmlcode_mp4_3x5_indivitual = htmlcode_mp4_3x5_indivitual.replaceAll("zukgitPlaceHolderArrayAdd", addString);
+        }
+        File htmlcode_mp4_3x5_indivitual_File = new File(addPath + File.separator + htmlFile_mp4_3x5_indivitual.getName());
+        if (!htmlcode_mp4_3x5_indivitual_File.exists()) {
+            try {
+                htmlcode_mp4_3x5_indivitual_File.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        writeContentToFile(htmlcode_mp4_3x5_indivitual_File, htmlcode_mp4_3x5_indivitual);
+
+
+        String htmlcode_mp4__3d_indivitual = readStringFromFile(htmlFile_mp4__3d_indivitual);
+        if (htmlcode_mp4__3d_indivitual != null && htmlcode_mp4__3d_indivitual.contains("zukgitPlaceHolderArrayDefine")
+                && htmlcode_mp4__3d_indivitual.contains("zukgitPlaceHolderArrayAdd") ) {
+            htmlcode_mp4__3d_indivitual = htmlcode_mp4__3d_indivitual.replaceAll("zukgitPlaceHolderArrayDefine", defineString);
+            htmlcode_mp4__3d_indivitual = htmlcode_mp4__3d_indivitual.replaceAll("zukgitPlaceHolderArrayAdd", addString);
+        }
+        File htmlcode_mp4__3d_indivitual_File = new File(addPath + File.separator + htmlFile_mp4__3d_indivitual.getName());
+        if (!htmlcode_mp4__3d_indivitual_File.exists()) {
+            try {
+                htmlcode_mp4__3d_indivitual_File.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        writeContentToFile(htmlcode_mp4__3d_indivitual_File, htmlcode_mp4__3d_indivitual);
+
+    }
 
     public static void collectAllG() {
         // mingwen/g/gif
@@ -1170,9 +1902,51 @@ public class C0_JIEMA {
 
 
         todoIndivitualFile(mp4FileList_mingwen);
+
     }
 
 
+    public static void todoIndivitualHtml() {
+
+        ArrayList<String> defineArrWord = new ArrayList<String>();
+        ArrayList<String> defineAdd = new ArrayList<String>();
+        int curIndex = 1;
+        Map.Entry<String, ArrayList<File>> entry;
+        if (arrFileMap != null) {
+            Iterator iterator = arrFileMap.entrySet().iterator();
+            while (iterator.hasNext()) {
+                entry = (Map.Entry<String, ArrayList<File>>) iterator.next();
+                String name = entry.getKey();
+                int length  = entry.getValue().size();
+                String people = "person"+curIndex;
+                String defineItem = people+" = { index:"+curIndex+" , path:\"./"+name+"/mp4/\",length:"+length+",};\n";
+                defineArrWord.add(defineItem);
+                defineAdd.add(people+",");
+                curIndex++;
+            }
+        }
+
+        StringBuilder defineSB = new StringBuilder();
+        for (int i = 0; i < defineArrWord.size(); i++) {
+            defineSB.append(defineArrWord.get(i));
+        }
+        String defineSBString = defineSB.toString().trim();
+
+        StringBuilder addSB = new StringBuilder();
+        for (int i = 0; i < defineAdd.size(); i++) {
+            addSB.append(defineAdd.get(i));
+        }
+
+        String addSBString = addSB.toString().trim();
+       while(addSBString.endsWith(",")){
+           addSBString = addSBString.substring(0,addSBString.length()-1);
+       }
+
+        addIndivitualMP4HtmlFile(System.getProperties().getProperty("user.dir") + File.separator + mingwenDir + File.separator + "v" + File.separator + "indivitual",defineSBString,addSBString);
+// zzz
+
+
+    }
     public static void AnalysisDir(File file) {
         allFile_miwen.add(file);
         if (file.isFile()) {

@@ -15,11 +15,12 @@
 </head>
 <body style="background-color:#101010">
 <script>
- 
-var imgArr =  document.getElementsByClassName("img_local");
 
+
+var imgArr =  document.getElementsByClassName("img_local");
+var indexCount = zukgitPlaceHolderindex;
 function changeImageDiff() {
-var randomIndex = Math.floor(Math.random() *  (15 - 1 + 1) + 1);  // 20 最大值
+var randomIndex = Math.floor(Math.random() *  (indexCount - 1 + 1) + 1);  // 20 最大值
 
 //document.getElementsByTagName('img')[0].setAttribute('src','jpg/'+randomIndex1+'.jpg');
 //document.getElementsByTagName('img')[1].setAttribute('src','jpg/'+randomIndex2+'.jpg');
@@ -49,8 +50,18 @@ function  showImg(obj,srcStr)
 
 window.onload=function(){
     //do something
-    window.setTimeout("changeImageDiff()", 3000);
+    //window.setTimeout("changeImageDiff()", 3000);
+	changeImageDiff();
+	 RandomPicture() ;
 }
+
+
+function RandomPicture() {
+var randomIndex = Math.floor(Math.random() *  (indexCount - 1 + 1) + 1);  
+for (var i = 0; i < imgArr.length; i++) {
+    imgArr[i].setAttribute('src','jpg/'+randomIndex+'.jpg');
+}
+};
 
 
 </script>
@@ -72,7 +83,7 @@ window.onload=function(){
 <img src="jpg/1.jpg" id="7"   class="img_local" />
 <img src="jpg/1.jpg" id="8"   class="img_local" />
 <img src="jpg/1.jpg" id="9"   class="img_local" />
-<img src="jpg/1.jpg" id="10"  class="img_local" />
+<img src="jpg/1.jpg" id="10"   class="img_local" />
 </div>
 
 
@@ -89,3 +100,5 @@ window.onload=function(){
 
 </body>
 </html>
+
+
