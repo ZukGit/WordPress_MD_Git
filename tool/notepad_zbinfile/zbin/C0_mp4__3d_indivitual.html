@@ -73,8 +73,12 @@ var VideoArr =  document.getElementsByClassName("face");
 var indexCount =  100;
 var prePath = "./0017ssyyx/mp4/";
 var endPath = ".mp4";
+
+// hoderplace -begin
 zukgitPlaceHolderArrayDefine
 var objectArr = [ zukgitPlaceHolderArrayAdd ];
+// hoderplace -end
+
 function randomPlay(obj) {
 var num = Math.floor(Math.random()*(indexCount - 1) + 1);
 var srcStr = prePath+num+endPath;
@@ -348,3 +352,4 @@ window.setTimeout("changeVideoDiff()", 30000);
 </script>
 </body>
 </html>
+

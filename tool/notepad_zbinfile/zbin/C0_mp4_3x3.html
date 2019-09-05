@@ -12,9 +12,101 @@
 }
 </style>
 </head>
-<body style="background-color:#101010">
+<body style="background-color:#101010; margin:0px">
 <script>
-    var videoCount =  zukgitPlaceHolderindex;
+    var videoCount =  zukgitPlaceHolderindex
+
+// =================
+
+var countnum = zukgitPlaceHolderindex // 总数
+var VideoArr =  document.getElementsByTagName("video");
+var VideoNum = VideoArr.length;
+var curRowNum = 3;
+var curColumNum = 3;
+var windowWidth = document.documentElement.clientWidth; 
+var windowHeight = document.documentElement.clientHeight; 
+var curWindowWidth = ((windowWidth - curRowNum)/1) / curRowNum   ;
+var curWindowHeight = ((windowHeight -curColumNum )/1) / curColumNum  ;
+
+
+window.onload=function(){
+for (var i = 0; i < VideoArr.length; i++) {
+resetVideosize(i);
+}
+randomPlayInit();
+// samePlayInit();
+//changeVideoDiff();
+}
+
+
+
+
+window.onresize = function(){
+var windowWidthNew = window.screen.width - 100; 
+var windowHeightNew = window.screen.height - 100; 
+var curWindowWidthNew = windowWidthNew / curRowNum - 2;
+var curWindowHeightNew = windowHeightNew / curColumNum -2;
+for (var i = 0; i < VideoArr.length; i++) {
+resetVideoSizeParam(i,curWindowWidthNew,curWindowHeightNew);
+}
+}
+
+function  resetVideoSizeParam(index , widthParam , heightParam){
+//VideoArr[index].setAttribute('width',curWindowWidth);
+//VideoArr[index].setAttribute('height',curWindowHeight);
+VideoArr[index].style.float = 'left';
+VideoArr[index].style.objectFit = 'fill';
+VideoArr[index].style.height = heightParam+'px';
+VideoArr[index].style.width = widthParam+'px';
+console.log("resetVideoSizeParam VideoArr["+index+"].width="+ curWindowWidth + "  height = "+ curWindowHeight);
+};
+
+
+function  resetVideosize(index){
+//VideoArr[index].setAttribute('width',curWindowWidth);
+//VideoArr[index].setAttribute('height',curWindowHeight);
+VideoArr[index].style.float = 'left';
+VideoArr[index].style.objectFit = 'fill';
+VideoArr[index].style.height = curWindowHeight+'px';
+VideoArr[index].style.width = curWindowWidth+'px';
+console.log("resetImgsize  VideoArr["+index+"].width="+ curWindowWidth + "  height = "+ curWindowHeight);
+};
+
+function randomPlayInit() {
+var i;
+var interval = 600;
+for (i = 0; i < VideoArr.length; i++) {
+var num = Math.floor(Math.random()*(zukgitPlaceHolderindex- 1) + 1);
+var str1="mp4/";
+var str2=".mp4";
+var srcStr = str1+num+str2;
+	playvideoInit(VideoArr[i],srcStr);
+}
+}
+
+
+function samePlayInit() {
+var i;
+var interval = 600;
+var num = Math.floor(Math.random()*(zukgitPlaceHolderindex- 1) + 1);
+var str1="mp4/";
+var str2=".mp4";
+var srcStr = str1+num+str2;
+for (i = 0; i < VideoArr.length; i++) {
+	playvideoInit(VideoArr[i],srcStr);
+}
+}
+
+function  playvideoInit(obj,srcStr)
+{
+	  obj.src=srcStr;
+      obj.play();
+
+}
+
+
+// =========================
+
 function randomPlay(obj) {
 var num = Math.floor(Math.random()*(videoCount - 1) + 1);
 var str1="mp4/";
@@ -26,11 +118,7 @@ obj.play();
 }
 
 
-window.onload=function(){
-    //do something
-    // window.setTimeout("changeImageDiff()", 5000);
-    changeVideoDiff();
-}
+
 
 function changeVideoDiff() {
     var pre="mp4/";
@@ -81,3 +169,6 @@ function changeVideoDiff() {
 </div>
 </body>
 </html>
+
+
+
