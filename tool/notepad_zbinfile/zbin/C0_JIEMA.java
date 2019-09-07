@@ -339,8 +339,8 @@ public class C0_JIEMA {
     public static ArrayList<File> mp4_0097yyzln_FileList_mingwen = new ArrayList<File>();
     public static ArrayList<File> mp4_0098yymyx_FileList_mingwen = new ArrayList<File>();
     public static ArrayList<File> mp4_0099wdxxx_FileList_mingwen = new ArrayList<File>();
-
-
+    public static ArrayList<File> mp4_0100gqlxx_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_8001suren_FileList_mingwen = new ArrayList<File>();
     static {
         arrFileMap.put("0001bdyjy", mp4_0001bdyjy_FileList_mingwen);
         arrFileMap.put("0002cjmyx", mp4_0002cjmyx_FileList_mingwen);
@@ -441,6 +441,9 @@ public class C0_JIEMA {
         arrFileMap.put("0097yyzln", mp4_0097yyzln_FileList_mingwen);
         arrFileMap.put("0098yymyx", mp4_0098yymyx_FileList_mingwen);
         arrFileMap.put("0099wdxxx", mp4_0099wdxxx_FileList_mingwen);
+        arrFileMap.put("0100gqlxx", mp4_0099wdxxx_FileList_mingwen);
+        arrFileMap.put("0101lyfxx", mp4_0099wdxxx_FileList_mingwen);
+        arrFileMap.put("8001suren", mp4_0099wdxxx_FileList_mingwen);
 
 
     }
@@ -2093,7 +2096,7 @@ public class C0_JIEMA {
     }
 
 
-// zzz
+    // zzz
     public static void addIndivitualMP4HtmlFile(String addPath, String defineString , String addString) {
 
 
@@ -2571,9 +2574,9 @@ public class C0_JIEMA {
         }
 
         String addSBString = addSB.toString().trim();
-       while(addSBString.endsWith(",")){
-           addSBString = addSBString.substring(0,addSBString.length()-1);
-       }
+        while(addSBString.endsWith(",")){
+            addSBString = addSBString.substring(0,addSBString.length()-1);
+        }
 
         addIndivitualMP4HtmlFile(System.getProperties().getProperty("user.dir") + File.separator + mingwenDir + File.separator + "v" + File.separator + "indivitual",defineSBString,addSBString);
 // zzz
