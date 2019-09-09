@@ -135,7 +135,8 @@ ArrayList<File> mTypeFileList = getTypeFileList( curDirFile.getAbsolutePath(),  
 
     public static boolean isSupportType( String type){
         boolean flag = false ;
-        if("jpg".equals(type) || "jpeg".equals(type)  || "bmp".equals(type)  || "wbmp".equals(type) || "png".equals(type)  || "gif".equals(type)  || "bmp".equals(type )
+        if("jpg".equals(type) || "jpeg".equals(type)  || "bmp".equals(type)  ||  "png".equals(type)  ||
+                "wbmp".equals(type) || "gif".equals(type)
         || ("txt".equals(type)) || ("md".equals(type))  || ("java".equals(type)) || ("cpp".equals(type))
          || ("c".equals(type))  || ("xml".equals(type)) || ("json".equals(type)) || ("bat".equals(type))
                 || ("sh".equals(type))   || ("zip".equals(type)) || ("rar".equals(type))
@@ -144,8 +145,10 @@ ArrayList<File> mTypeFileList = getTypeFileList( curDirFile.getAbsolutePath(),  
                 || ("gitignore".equals(type))   || ("h".equals(type))    || ("jar".equals(type))
                 || ("py".equals(type))  || ("pkt".equals(type))  || ("7z".equals(type)) || ("pdf".equals(type))
                 || ("doc".equals(type))  || ("apk".equals(type))  || ("pcapng".equals(type))
-                || ("conf".equals(type))   || ("properties".equals(type))  || ("css".equals(type))
+                || ("conf".equals(type))   || ("properties".equals(type))   || ("prop".equals(type)) || ("css".equals(type))
                 || ("so".equals(type))     || ("bin".equals(type)) || ("raw".equals(type))
+                || ("ppt".equals(type))     || ("pptx".equals(type))|| ("docx".equals(type))
+
         ){
             flag = true;
         }
@@ -159,25 +162,119 @@ File curTempFile = null;
 
 //        Readers: [JPG, jpg, tiff, pcx, PCX, bmp, BMP, gif, GIF, WBMP, png, PNG, raw, RAW, JPEG, pnm, PNM, tif, TIF, TIFF, wbmp, jpeg]
 //        Writers: [JPG, jpg, tiff, bmp, BMP, pcx, PCX, gif, GIF, WBMP, png, PNG, raw, RAW, JPEG, pnm, PNM, tif, TIF, TIFF, wbmp, jpeg]
-        if("jpg".equals(type) || "png".equals(type) || "jpeg".equals(type) || "bmp".equals(type)
-                || "wbmp".equals(type) || "raw".equals(type)  ){  // 动态创建文件  文件的内容是数值
-
+        if("jpg".equals(type) || "png".equals(type) || "jpeg".equals(type) || "bmp".equals(type) || "gif".equals(type)
+                 ){  // 动态创建文件  文件的内容是数值
+//  不支持的格式      || "wbmp".equals(type) || "raw".equals(type)
             generalPicture(curFile , type );
 
+        }else if("wbmp".equals(type) || "raw".equals(type)){  // 不能通过 ImageIO 来创建的图片格式  wbmp  raw
+
+            // 待定
         } else if (isSupportType(type)){  // 从 E5  目录读取模板 然后输入输出 完成文件的创建
-
-
+        File typeFile = getCurrentTemplateTypeFile(type);
+            generalTemplateFile(curFile , type ,typeFile);
         }else{ // 其他格式 创建空的 后缀文件
-
-
-
+            generalTemplateEmptyFile(curFile , type );
         }
 
+    }
+
+
+    public  static String getE5ZbinPath(){
+        String path =System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin"+File.separator+"E5";
+        return path;
+    }
+
+    public static  File getCurrentTemplateTypeFile(String type){
+        String curType = type.toLowerCase();  // zbin/E5/txt/txt.txt
+        File typeFile = new File(getE5ZbinPath()+File.separator+curType+File.separator+curType+"."+curType);
+        if(!typeFile.exists()){
+            System.out.println("当前类型文件:  type:"+type +" 模板文件缺失无法批量创建文件 请创建模板！ 执行失败！");
+            return null;
+        }
+        return typeFile;
+    }
 
 
 
+
+
+
+    public static void generalTemplateEmptyFile(ArrayList<File> picFileList , String type ) {
+
+        for (int i = 0; i < picFileList.size(); i++) {
+            File curFile = picFileList.get(i);
+            try {
+                curFile.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
 
     }
+
+
+
+
+    public static void generalTemplateFile(ArrayList<File> picFileList , String type , File templateFile)  {
+ if(templateFile == null){
+     return ;
+ }
+        for (int i = 0; i < picFileList.size(); i++) {
+            int mCurIndex = i ;
+            File mCurFile = picFileList.get(i);
+            fileCopy(templateFile,mCurFile);
+        }
+
+    }
+
+
+    public static void fileCopy(File origin, File target) {
+
+        InputStream input = null;
+        OutputStream output = null;
+        int lengthSize;
+
+        // 创建输入输出流对象
+        try {
+
+            if(!target.exists()){
+                target.createNewFile();
+            }
+
+            input = new FileInputStream(origin);
+            output = new FileOutputStream(target);
+            // 获取文件长度
+            try {
+                lengthSize = input.available();
+                // 创建缓存区域
+                byte[] buffer = new byte[lengthSize];
+                // 将文件中的数据写入缓存数组
+                input.read(buffer);
+                // 将缓存数组中的数据输出到文件
+                output.write(buffer);
+
+            } catch (IOException e) {
+
+                e.printStackTrace();
+            }
+
+        } catch (Exception e) {
+
+        } finally {
+            if (input != null && output != null) {
+                try {
+                    input.close(); // 关闭流
+                    output.close();
+                } catch (IOException e) {
+                    System.out.println("复制过程报错   程序退出!");
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+
 
     public static void generalPicture(ArrayList<File> picFileList , String type)  {
 

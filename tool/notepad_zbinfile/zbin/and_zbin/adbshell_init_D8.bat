@@ -1,4 +1,7 @@
 @echo off
+adb root
+adb disable-verify
+adb remount
 adb push %userprofile%\Desktop\zbin\and_zbin\and_zbin /data  
 adb shell < %userprofile%\Desktop\zbin\and_zbin\param_pre.txt 
 echo " please run [ source e  ||  cd /data/and_zbin/ && source e  ]  to init environment!"

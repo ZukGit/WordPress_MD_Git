@@ -1,5 +1,8 @@
 import java.awt.*;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
 import java.lang.reflect.Array;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -28,7 +31,7 @@ public class E2_SystemInfo {
 
     static NumberFormat nf = new DecimalFormat("0.00");
     static SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd hh:mm:ss");
-
+    static File wifiLogFile = new File(System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin" + File.separator + "E2_WifiDetail.txt");
     public static void main(String[] args) {
         try {
             addEnvironmentPATH(System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin" + File.separator + "E2");
@@ -61,10 +64,163 @@ public class E2_SystemInfo {
             ethernetWireless();
             ethernetPC();
             System.out.println("----------------------------------");
+
+            wifi();   //  wifi 连接信息
+            System.out.println("----------------------------------");
         } catch (Exception e1) {
             e1.printStackTrace();
         }
     }
+
+
+
+    public static void wifi(){
+        String word1 = "上的配置文件";   // 接口 WLAN 上的配置文件 debugtheworld:
+        String word2 = "关键内容";    // 关键内容            : 12345678
+        if(wifiLogFile.exists() && readStringFromFile(wifiLogFile).contains(word2)){
+            //  System.out.println("wifiLogFile 文件存在");
+            readWifiObjectFromFile(wifiLogFile);
+            ArrayList<String> wifiList = transactWifiList(wifiItemList);
+            ArrayPrint(wifiList,"WIFI信息");
+            // System.out.println(readStringFromFile(wifiLogFile));
+
+        }else{
+
+        }
+    }
+
+
+static class WifiItem{
+       String name;
+       String key;
+       WifiItem(){
+
+       }
+
+    WifiItem(String name ,String key){
+this.name = name;
+this.key = key;
+    }
+
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public String getName() {
+        return name;
+    }
+}
+
+static ArrayList<WifiItem> wifiItemList = new ArrayList<WifiItem>();
+
+
+
+    static   ArrayList<String>  transactWifiList(ArrayList<WifiItem> wifiList) {
+        ArrayList<String> strArr = new    ArrayList<String>();
+
+        for (int i = 0; i < wifiList.size(); i++) {
+            WifiItem item = wifiList.get(i);
+            int index= i + 1;
+            String str0 = "WIFI索引:"+index;
+            String str1 = "WIFI名称:"+item.getName();
+            String str2 = "WIFI密码:"+item.getKey();
+            String str3 = "==================";
+            strArr.add(str0);
+            strArr.add(str1);
+            strArr.add(str2);
+            strArr.add(str3);
+        }
+
+
+
+        return strArr;
+
+    }
+
+    static synchronized void readWifiObjectFromFile(File fileItem) {
+        StringBuilder sb = new StringBuilder();
+        String word1 = "上的配置文件";   // 接口 WLAN 上的配置文件 debugtheworld:
+        String word2 = "关键内容";    // 关键内容            : 12345678
+
+        try {
+            //   BufferedReader curBR = new BufferedReader(new InputStreamReader(new FileInputStream(fileItem), "utf-8"));
+            BufferedReader curBR = new BufferedReader(new InputStreamReader(new FileInputStream(fileItem)));
+            String lineContent = "";
+
+            String wifiName = "";
+            String wifiKey = "";
+            boolean wifiNameReadyFlag = false;
+            boolean wifiKeyReadyFlag = false;
+            while (lineContent != null) {
+                lineContent = curBR.readLine();
+                if (lineContent == null || lineContent.trim().isEmpty()) {
+                    continue;
+                }
+                lineContent = lineContent.trim();
+
+
+
+                if(lineContent.contains(word1)){
+                    wifiName = lineContent.substring(lineContent.indexOf(word1)+word1.length(),lineContent.length()-1).trim();
+                    wifiNameReadyFlag = true;
+                    wifiKeyReadyFlag = false;
+                    wifiKey="";
+                }
+
+                if(lineContent.contains(word2)){
+                    wifiKey= lineContent.substring(lineContent.indexOf(word2)+word2.length()).trim();
+                    wifiKey = wifiKey.substring(1).trim();
+                    if(wifiNameReadyFlag){
+                        wifiKeyReadyFlag = true;
+                    }
+                    if(wifiNameReadyFlag && wifiNameReadyFlag){
+                        WifiItem  wifiItem = new WifiItem(wifiName , wifiKey);
+                        wifiItemList.add(wifiItem);
+                        wifiNameReadyFlag = false;
+                        wifiKeyReadyFlag = false;
+                    }
+
+
+
+                }
+
+
+
+            }
+            curBR.close();
+        } catch (Exception e) {
+        }
+
+
+    }
+    static  String readStringFromFile(File fileItem) {
+        StringBuilder sb = new StringBuilder();
+        try {
+         //   BufferedReader curBR = new BufferedReader(new InputStreamReader(new FileInputStream(fileItem), "utf-8"));
+            BufferedReader curBR = new BufferedReader(new InputStreamReader(new FileInputStream(fileItem)));
+            String lineContent = "";
+            while (lineContent != null) {
+                lineContent = curBR.readLine();
+                if (lineContent == null || lineContent.trim().isEmpty()) {
+                    continue;
+                }
+                sb.append(lineContent + "\n");
+            }
+            curBR.close();
+        } catch (Exception e) {
+        }
+        return sb.toString();
+    }
+
 
 
     private static void addEnvironmentPATH(String value) {
@@ -459,7 +615,7 @@ System.out.println("操作系统的版本号:  " + OS.getVersion());// 操作系
                 continue;
             }
             String desc = cfg.getDescription();
-     
+
 /*            System.out.println("IP地址:" +cfg.getName() + "IP地址:" + cfg.getAddress());// IP地址
             System.out.println("网关广播地址:" +cfg.getName() + "网关广播地址:" + cfg.getBroadcast());// 网关广播地址
             System.out.println("网卡MAC地址:" +cfg.getName() + "网卡MAC地址:" + cfg.getHwaddr());// 网卡MAC地址
@@ -478,9 +634,9 @@ System.out.println("操作系统的版本号:  " + OS.getVersion());// 操作系
             ArrayPrint(ethernetLogList,"PC网卡信息");
             return; // 只打印 第一个网卡本身的信息
         }
-       
+
     }
-    
+
     private static void ethernetWireless() throws SigarException {
         Sigar sigar = null;
         sigar = new Sigar();
