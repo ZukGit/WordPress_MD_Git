@@ -42,6 +42,7 @@ public class E6_Android_Info {
     static File wifiConfigStorehFile = new File(System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin" + File.separator+"E6"+File.separator + "6_4_WifiConfigStore.txt");
 
 
+    static File featureFile = new File(System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin" + File.separator+"E6"+File.separator + "7_1_FeatureList.txt");
 
 
     static class WIFI_DUMP_ITEM{
@@ -582,6 +583,8 @@ public class E6_Android_Info {
             System.out.println("----------------------------------");
             getBatteryInfo();
             System.out.println("----------------------------------");
+            getFeatureinfo();
+            System.out.println("----------------------------------");
             getWifiNetworkInfo();
             System.out.println("----------------------------------");
             getWifiDFSChannelInfo();
@@ -782,6 +785,16 @@ public class E6_Android_Info {
         return true;
     }
 
+
+
+    public static void getFeatureinfo(){
+        ArrayList<String> feaureInfoDetail  = readFeatureInfoFromFile(featureFile); // detail
+
+        ArrayPrint(feaureInfoDetail,"功能Feature");
+
+    }
+
+
     public static void getBatteryInfo(){
         ArrayList<String> batteryInfoDetail = readBatteryInfoFromFile(batteryFile); // detail
 
@@ -921,6 +934,33 @@ public class E6_Android_Info {
             e.printStackTrace();
         }
         return wifiNetworkInfoList;
+
+
+    }
+
+
+
+    static   ArrayList<String>  readFeatureInfoFromFile(File fileItem) {
+        ArrayList<String> featureInfoList = new  ArrayList<String>();
+        try {
+            BufferedReader curBR = new BufferedReader(new InputStreamReader(new FileInputStream(fileItem)));
+            String lineContent = "";
+            while (lineContent != null) {
+                lineContent = curBR.readLine();
+                if (lineContent == null || lineContent.trim().isEmpty()) {
+                    continue;
+                }
+
+                //     System.out.println("Mem-lineContentB="+lineContent);
+                lineContent= lineContent.replace("feature:","feature========:");
+                featureInfoList.add(lineContent);
+                //   sb.append(lineContent + "\n");
+            }
+            curBR.close();
+        } catch (Exception e) {
+            System.out.println("Feature 异常:"+e.toString());
+        }
+        return featureInfoList;
 
 
     }

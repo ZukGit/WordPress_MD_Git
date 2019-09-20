@@ -14,6 +14,7 @@ del %userprofile%\Desktop\zbin\E6\6_1_Wifi.txt
 del %userprofile%\Desktop\zbin\E6\6_2_Wifiscanner.txt
 del %userprofile%\Desktop\zbin\E6\6_3_IW_Reg.txt
 del %userprofile%\Desktop\zbin\E6\6_4_WifiConfigStore.txt
+del %userprofile%\Desktop\zbin\E6\7_1_FeatureList.txt
 
 adb shell getprop                    > %userprofile%\Desktop\zbin/E6/1_Prop.txt
 
@@ -41,6 +42,7 @@ adb shell dumpsys wifi               > %userprofile%\Desktop\zbin/E6/6_1_Wifi.tx
 adb shell dumpsys wifiscanner        > %userprofile%\Desktop\zbin/E6/6_2_Wifiscanner.txt  
 adb shell iw phy0 reg get            > %userprofile%\Desktop\zbin/E6/6_3_IW_Reg.txt
 adb pull /data/misc/wifi/WifiConfigStore.xml %userprofile%\Desktop\zbin/E6/6_4_WifiConfigStore.txt
+adb shell pm list features        > %userprofile%\Desktop\zbin/E6/7_1_FeatureList.txt
 
 @javac -encoding UTF-8 %userprofile%\Desktop\zbin\E6_Android_Info.java
 @java -cp  %userprofile%\Desktop\zbin    E6_Android_Info 
