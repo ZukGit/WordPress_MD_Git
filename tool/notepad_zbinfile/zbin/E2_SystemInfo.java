@@ -313,9 +313,14 @@ static ArrayList<WifiItem> wifiItemList = new ArrayList<WifiItem>();
         ArrayPrint(propertyList, "system-info");
     }
 
-    private static void memory() throws SigarException {
+    private static void memory()  {
         Sigar sigar = new Sigar();
-        Mem mem = sigar.getMem();
+        Mem mem = null;
+        try {
+            mem = sigar.getMem();
+        } catch (SigarException e) {
+            e.printStackTrace();
+        }
         ArrayList<String> MemLogList = new ArrayList<String>();
         // System.out.println("内存总量:  " + mem.getTotal() / (1024L*1024L*1024L) + "GB "); // 内存总量
 //        System.out.println("内存总量:  " + Double.parseDouble(nf.format((Double)(mem.getTotal() / (1024d*1024d*1024d))))    + "GB"); // 当前内存使用量
@@ -327,7 +332,13 @@ static ArrayList<WifiItem> wifiItemList = new ArrayList<WifiItem>();
         MemLogList.add("当前内存剩余量:" + Double.parseDouble(nf.format((Double) (mem.getFree() / (1024d * 1024d * 1024d)))) + "GB"); // 当前内存使用量
 
 
-        Swap swap = sigar.getSwap();
+        Swap swap = null;
+        try {
+            swap = sigar.getSwap();
+        } catch (SigarException e) {
+            e.printStackTrace();
+            return;
+        }
 //        System.out.println("交换区总量:  " + swap.getTotal() / (1024L*1024L*1024L) + "GB "); // 交换区总量
 //        System.out.println("当前交换区使用量:  " + swap.getUsed() / (1024L*1024L*1024L) + "GB"); // 当前交换区使用量
 //        System.out.println("当前交换区剩余量:  " + swap.getFree() / (1024L*1024L*1024L) + "GB"); // 当前交换区剩余量
@@ -344,13 +355,55 @@ static ArrayList<WifiItem> wifiItemList = new ArrayList<WifiItem>();
 
     }
 
+
+    static int getZScreenHeight() {
+        // CMD 和 IDE下 宽高一致  1920x1080
+        GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+        int height = gd.getDisplayMode().getHeight();
+        return height;
+/*           在IDE下 分辨率为 1080x720  在 CMD下确是  1920x1080  不一致
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        int screenHeight = (int) screenSize.height;
+        if (System.getProperties().getProperty("sun.stderr.encoding") != null &&
+                System.getProperties().getProperty("sun.stdout.encoding") != null &&
+                "ms936".equals(System.getProperties().getProperty("sun.stderr.encoding")) &&
+                "ms936".equals(System.getProperties().getProperty("sun.stdout.encoding"))) {
+            screenHeight = (int) (screenHeight * 1.5);
+        }
+        return screenHeight;*/
+
+
+    }
+
+
+    static int getZScreenWeight() {
+
+        // CMD 和 IDE下 宽高一致  1920x1080
+        GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+        int width = gd.getDisplayMode().getWidth();
+        return width;
+
+/*     在IDE下 分辨率为 1080x720  在 CMD下确是  1920x1080  不一致
+         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        int screenWidth = (int) screenSize.width;
+        if(System.getProperties().getProperty("sun.stderr.encoding") != null &&
+                System.getProperties().getProperty("sun.stdout.encoding") != null &&
+                "ms936".equals(System.getProperties().getProperty("sun.stderr.encoding")) &&
+                "ms936".equals(System.getProperties().getProperty("sun.stdout.encoding"))   ){
+            screenWidth = (int)(screenWidth * 1.5);
+
+        }
+        return  screenWidth;
+        */
+
+
+    }
+
+
     private static void screen() {
-
-
-        Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
         ArrayList<String> screenLogList = new ArrayList<String>();
-        int width = screen.width;
-        int high = screen.height;
+        int width = getZScreenWeight();
+        int high =getZScreenHeight();
         int width2x2 = width / 2;
         int high2x2 = high / 2;
         int width3x3 = width / 3;
@@ -378,9 +431,9 @@ static ArrayList<WifiItem> wifiItemList = new ArrayList<WifiItem>();
         System.out.println("屏幕4x3宽高信息:  宽:"+ width4x3 + "     高:"+ high4x3);
         System.out.println("屏幕5x3宽高信息:  宽:"+ width5x3 + "     高:"+ high5x3);*/
 
-        screenLogList.add("屏幕分辨率:" + screen.width + "x" + screen.height);
-        screenLogList.add("屏幕宽:" + screen.width);
-        screenLogList.add("屏幕高:" + screen.height);
+        screenLogList.add("屏幕分辨率:" + width + "x" + high);
+        screenLogList.add("屏幕宽:" + width);
+        screenLogList.add("屏幕高:" + high);
         screenLogList.add("屏幕2x2宽高信息:  宽:" + width2x2 + "     高:" + high2x2);
         screenLogList.add("屏幕3x3宽高信息:  宽:" + width3x3 + "     高:" + high3x3);
         screenLogList.add("屏幕4x2宽高信息:  宽:" + width4x2 + "     高:" + high4x2);
@@ -392,12 +445,23 @@ static ArrayList<WifiItem> wifiItemList = new ArrayList<WifiItem>();
         ArrayPrint(screenLogList, "屏幕尺寸");
     }
 
-    private static void cpu() throws SigarException {
+    private static void cpu()  {
         Sigar sigar = new Sigar();
         ArrayList<String> cpuLogList = new ArrayList<String>();
-        CpuInfo infos[] = sigar.getCpuInfoList();
+        CpuInfo infos[] = new CpuInfo[0];
+        try {
+            infos = sigar.getCpuInfoList();
+        } catch (SigarException e) {
+            e.printStackTrace();
+            return;
+        }
         CpuPerc cpuList[] = null;
-        cpuList = sigar.getCpuPercList();
+        try {
+            cpuList = sigar.getCpuPercList();
+        } catch (SigarException e) {
+            e.printStackTrace();
+            return;
+        }
         cpuLogList.add("CPU数量:" + infos.length);
         cpuLogList.add("CPU频率:" + infos[0].getMhz() + "MHz");
         cpuLogList.add("CPU产商:" + infos[0].getVendor());
@@ -456,12 +520,18 @@ System.out.println("操作系统的版本号:  " + OS.getVersion());// 操作系
         ArrayPrint(OSLogList, "操作系统");
     }
 
-    private static void who() throws SigarException {
+    private static void who()  {
         Sigar sigar = new Sigar();
         ArrayList<String> WhoLogList = new ArrayList<String>();
 
 
-        Who who[] = sigar.getWhoList();
+        Who who[] = new Who[0];
+        try {
+            who = sigar.getWhoList();
+        } catch (SigarException e) {
+            e.printStackTrace();
+            return;
+        }
         if (who != null && who.length > 0) {
             for (int i = 0; i < who.length; i++) {
                 //System.out.println("当前系统进程表中的用户名" + String.valueOf(i));
@@ -482,10 +552,16 @@ System.out.println("操作系统的版本号:  " + OS.getVersion());// 操作系
 
     }
 
-    private static void file() throws Exception {
+    private static void file()  {
         Sigar sigar = new Sigar();
         ArrayList<String> FileLogList = new ArrayList<String>();
-        FileSystem fslist[] = sigar.getFileSystemList();
+        FileSystem fslist[] = new FileSystem[0];
+        try {
+            fslist = sigar.getFileSystemList();
+        } catch (SigarException e) {
+            e.printStackTrace();
+            return;
+        }
         for (int i = 0; i < fslist.length; i++) {
             FileSystem fs = fslist[i];
 /*            System.out.println("盘符名称:  " + fs.getDevName()); // 分区的盘符名称
@@ -513,7 +589,12 @@ System.out.println("操作系统的版本号:  " + OS.getVersion());// 操作系
 //            public static final int TYPE_SWAP = 6;
 
             FileSystemUsage usage = null;
-            usage = sigar.getFileSystemUsage(fs.getDirName());
+            try {
+                usage = sigar.getFileSystemUsage(fs.getDirName());
+            } catch (SigarException e) {
+                e.printStackTrace();
+                return;
+            }
             switch (fs.getType()) {
                 case 0: // TYPE_UNKNOWN :未知
                     break;
@@ -553,15 +634,26 @@ System.out.println("操作系统的版本号:  " + OS.getVersion());// 操作系
         return;
     }
 
-    private static void net() throws Exception {
+    private static void net() {
         Sigar sigar = new Sigar();
-        String ifNames[] = sigar.getNetInterfaceList();
+        String ifNames[] = new String[0];
+        try {
+            ifNames = sigar.getNetInterfaceList();
+        } catch (SigarException e) {
+            e.printStackTrace();
+        }
         ArrayList<String> netLogList = new ArrayList<String>();
 
         netLogList.add("网络设备数量:" + ifNames.length);
         for (int i = 0; i < ifNames.length; i++) {
             String name = ifNames[i];
-            NetInterfaceConfig ifconfig = sigar.getNetInterfaceConfig(name);
+            NetInterfaceConfig ifconfig = null;
+            try {
+                ifconfig = sigar.getNetInterfaceConfig(name);
+            } catch (SigarException e) {
+                e.printStackTrace();
+                return;
+            }
 //            System.out.println("网络设备名:  " + name);// 网络设备名
 //            System.out.println("IP地址:  " + ifconfig.getAddress());// IP地址   // 0.0.0.0
 //            System.out.println("子网掩码:  " + ifconfig.getNetmask());// 子网掩码
@@ -572,7 +664,12 @@ System.out.println("操作系统的版本号:  " + OS.getVersion());// 操作系
             if ("0.0.0.0".equals(ifconfig.getAddress().trim())) { // 不打印为 IP 为 0 的那些设备
                 continue;
             }
-            NetInterfaceStat ifstat = sigar.getNetInterfaceStat(name);
+            NetInterfaceStat ifstat = null;
+            try {
+                ifstat = sigar.getNetInterfaceStat(name);
+            } catch (SigarException e) {
+                e.printStackTrace();
+            }
 /*            System.out.println("网络设备名:  " + name);// 网络设备名
             System.out.println("IP地址:  " + ifconfig.getAddress());// IP地址
             System.out.println("子网掩码:  " + ifconfig.getNetmask());// 子网掩码
@@ -603,13 +700,24 @@ System.out.println("操作系统的版本号:  " + OS.getVersion());// 操作系
         ArrayPrint(netLogList, "网络信息");
     }
 
-    private static void ethernetPC() throws SigarException {
+    private static void ethernetPC()  {
         Sigar sigar = null;
         sigar = new Sigar();
         ArrayList<String> ethernetLogList = new ArrayList<String>();
-        String[] ifaces = sigar.getNetInterfaceList();
+        String[] ifaces = new String[0];
+        try {
+            ifaces = sigar.getNetInterfaceList();
+        } catch (SigarException e) {
+            e.printStackTrace();
+            return;
+        }
         for (int i = 0; i < ifaces.length; i++) {
-            NetInterfaceConfig cfg = sigar.getNetInterfaceConfig(ifaces[i]);
+            NetInterfaceConfig cfg = null;
+            try {
+                cfg = sigar.getNetInterfaceConfig(ifaces[i]);
+            } catch (SigarException e) {
+                e.printStackTrace();
+            }
             if (NetFlags.LOOPBACK_ADDRESS.equals(cfg.getAddress()) || (cfg.getFlags() & NetFlags.IFF_LOOPBACK) != 0
                     || NetFlags.NULL_HWADDR.equals(cfg.getHwaddr())) {
                 continue;
@@ -637,13 +745,24 @@ System.out.println("操作系统的版本号:  " + OS.getVersion());// 操作系
 
     }
 
-    private static void ethernetWireless() throws SigarException {
+    private static void ethernetWireless(){
         Sigar sigar = null;
         sigar = new Sigar();
         ArrayList<String> ethernetLogList = new ArrayList<String>();
-        String[] ifaces = sigar.getNetInterfaceList();
+        String[] ifaces = new String[0];
+        try {
+            ifaces = sigar.getNetInterfaceList();
+        } catch (SigarException e) {
+            e.printStackTrace();
+            return;
+        }
         for (int i = 0; i < ifaces.length; i++) {
-            NetInterfaceConfig cfg = sigar.getNetInterfaceConfig(ifaces[i]);
+            NetInterfaceConfig cfg = null;
+            try {
+                cfg = sigar.getNetInterfaceConfig(ifaces[i]);
+            } catch (SigarException e) {
+                e.printStackTrace();
+            }
             if (NetFlags.LOOPBACK_ADDRESS.equals(cfg.getAddress()) || (cfg.getFlags() & NetFlags.IFF_LOOPBACK) != 0
                     || NetFlags.NULL_HWADDR.equals(cfg.getHwaddr())) {
                 continue;
@@ -672,14 +791,24 @@ System.out.println("操作系统的版本号:  " + OS.getVersion());// 操作系
         ArrayPrint(ethernetLogList,"无线网卡信息");
     }
 
-    private static void ethernet() throws SigarException {
+    private static void ethernet()  {
         Sigar sigar = null;
         sigar = new Sigar();
         ArrayList<String> ethernetLogList = new ArrayList<String>();
-        String[] ifaces = sigar.getNetInterfaceList();
+        String[] ifaces = new String[0];
+        try {
+            ifaces = sigar.getNetInterfaceList();
+        } catch (SigarException e) {
+            e.printStackTrace();
+        }
         ethernetLogList.add("网卡数量:"+ ifaces.length);
         for (int i = 0; i < ifaces.length; i++) {
-            NetInterfaceConfig cfg = sigar.getNetInterfaceConfig(ifaces[i]);
+            NetInterfaceConfig cfg = null;
+            try {
+                cfg = sigar.getNetInterfaceConfig(ifaces[i]);
+            } catch (SigarException e) {
+                e.printStackTrace();
+            }
             if (NetFlags.LOOPBACK_ADDRESS.equals(cfg.getAddress()) || (cfg.getFlags() & NetFlags.IFF_LOOPBACK) != 0
                     || NetFlags.NULL_HWADDR.equals(cfg.getHwaddr())) {
                 continue;
