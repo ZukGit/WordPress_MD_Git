@@ -1,4 +1,6 @@
 import java.io.File;
+import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 
 public class E0_bitfeature {
@@ -381,11 +383,35 @@ public class E0_bitfeature {
 
                 }
 
-                toCheck64BitFeature(Long.parseUnsignedLong(paramItem));
+
+                if(paramItem.trim().startsWith("-")){  //  以负号开头的数字
+
+                    long curValue = Long.parseLong(paramItem);
+                    long unsignedValue = curValue & Long.MAX_VALUE ;
+                  //  System.out.println("curValue1 = "+ curValue);
+                 //   System.out.println("curValue2 = "+ unsignedValue);
+
+                   // toCheck64BitFeature(Long.parseUnsignedLong(unsignedValue+""));
+
+
+                    toCheck64BitFeature(readUnsignedLong(curValue).longValue());
+                }else{
+
+                    toCheck64BitFeature(Long.parseUnsignedLong(paramItem));
+                }
+
+
             }
         }
 
     }
 
+
+    public static final BigDecimal readUnsignedLong(long value)  {
+        if (value >= 0)
+            return new BigDecimal(value);
+        long lowValue = value & 0x7fffffffffffffffL;
+        return BigDecimal.valueOf(lowValue).add(BigDecimal.valueOf(Long.MAX_VALUE)).add(BigDecimal.valueOf(1));
+    }
 
 }

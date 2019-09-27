@@ -17,6 +17,8 @@ public class E6_Android_Info {
 
     static NumberFormat nf = new DecimalFormat("0.00");
     static SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd hh:mm:ss");
+
+    static String cpuInfo1 = "";  // 基带版本 中可能包含CPU信息 gsm.version.baseband-
   //  static SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd hh:mm:ss",Locale.US);
     static File wifiLogFile = new File(System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin" + File.separator + "E2_WifiDetail.txt");
 
@@ -43,6 +45,17 @@ public class E6_Android_Info {
 
 
     static File featureFile = new File(System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin" + File.separator+"E6"+File.separator + "7_1_FeatureList.txt");
+
+
+    static File setting_system_File = new File(System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin" + File.separator+"E6"+File.separator + "9_1_settings_system.txt");
+    static File setting_secure_File = new File(System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin" + File.separator+"E6"+File.separator + "9_2_settings_secure.txt");
+    static File setting_global_File = new File(System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin" + File.separator+"E6"+File.separator + "9_3_settings_global.txt");
+
+
+
+    static File WCNSS_qcom_cfg_File = new File(System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin" + File.separator+"E6"+File.separator + "10_1_WCNSS_qcom_cfg.txt");
+
+    static File qcom_hostapd_cfg_File = new File(System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin" + File.separator+"E6"+File.separator + "11_1_hostapd.txt");
 
 
     static class WIFI_DUMP_ITEM{
@@ -585,20 +598,153 @@ public class E6_Android_Info {
             System.out.println("----------------------------------");
             getFeatureinfo();
             System.out.println("----------------------------------");
-            getWifiNetworkInfo();
-            System.out.println("----------------------------------");
             getWifiDFSChannelInfo();
             System.out.println("----------------------------------");
             getWifiScanInfo();
             System.out.println("----------------------------------");
             getDumpWifiInfo();
             System.out.println("----------------------------------");
+            getSettingItemInfo();
+            System.out.println("----------------------------------");
+            getWCNSSQcomConfInfo();
+            System.out.println("----------------------------------");
+            getQcomHostapdConfInfo();
+            System.out.println("----------------------------------");
+            getWifiNetworkInfo();
 
         } catch (Exception e1) {
             e1.printStackTrace();
         }
     }
 
+    static  ArrayList<Qcom_WCNSS_Item> wcnssList = new ArrayList<Qcom_WCNSS_Item>();
+
+    public static class Qcom_WCNSS_Item{
+String key;
+String rawLine;
+String desc;
+   boolean isMatch;
+        Qcom_WCNSS_Item(String mkey,String mDesc){
+            this.key = mkey;
+            this.desc = mDesc;
+
+        }
+
+     void   calculRawLine(String mRawLine){
+            this.rawLine = mRawLine;
+        }
+    }
+
+    static{
+        wcnssList.add(new Qcom_WCNSS_Item("gEnableMacAddrSpoof","是否支持随机Mac地址功能【1=Enable (default), 0=Disable】") );
+    }
+
+    public static void getWCNSSQcomConfInfo() {
+        if(checkFileExist(WCNSS_qcom_cfg_File)) {
+            // 读取到文件的所有内容
+            ArrayList<String> settingSystemInfoDetail = readSettingSystemInfoFromFile(WCNSS_qcom_cfg_File); // detail
+
+            ArrayList<String> defineValue = new   ArrayList<String>();
+            ArrayList<Qcom_WCNSS_Item> matchQcomItem = new   ArrayList<Qcom_WCNSS_Item>();
+            for (int i = 0; i < settingSystemInfoDetail.size(); i++) {
+                String strLine = settingSystemInfoDetail.get(i).trim();
+                if(strLine.startsWith("#") || strLine.startsWith("END")){
+                    continue;
+                }
+                defineValue.add("WCNSS定义值:"+strLine);
+
+
+                for (int j = 0; j < wcnssList.size(); j++) {
+                    Qcom_WCNSS_Item qcom_wcnss_item = wcnssList.get(j);
+                    String key = qcom_wcnss_item.key;
+                    if(strLine.contains(key)){
+                        qcom_wcnss_item.calculRawLine(strLine);
+                        matchQcomItem.add(qcom_wcnss_item);
+                    }
+                }
+            }
+
+
+            ArrayPrint(defineValue,"WCNSS_qcom_cfg.ini定义值列表");
+
+            ArrayList<String> matchQcomItemLog = new ArrayList<String>();
+            for (int i = 0; i < matchQcomItem.size(); i++) {
+                Qcom_WCNSS_Item  qcom_wcnss_item  = matchQcomItem.get(i);
+                matchQcomItemLog.add("匹配key值:"+qcom_wcnss_item.key);
+                matchQcomItemLog.add("匹配值描述:"+qcom_wcnss_item.desc);
+                matchQcomItemLog.add("匹配值定义:"+qcom_wcnss_item.rawLine);
+                matchQcomItemLog.add("----------");
+            }
+            ArrayPrint(matchQcomItemLog,"WCNSS_qcom_cfg.ini匹配列表");
+        }
+
+        }
+
+
+
+    static  ArrayList<Qcom_Hostapd_Item> hostapdList = new ArrayList<Qcom_Hostapd_Item>();
+
+    public static class Qcom_Hostapd_Item{
+        String key;
+        String rawLine;
+        String desc;
+        boolean isMatch;
+
+        Qcom_Hostapd_Item(String mkey,String mDesc){
+            this.key = mkey;
+            this.desc = mDesc;
+            this.isMatch = false;
+        }
+
+        void   calculRawLine(String mRawLine){
+            this.rawLine = mRawLine;
+        }
+    }
+
+    static{
+        hostapdList.add(new Qcom_Hostapd_Item("ieee80211d","是否支持随机Mac地址功能【1=Enable (default), 0=Disable】") );
+    }
+
+    public static void getQcomHostapdConfInfo() {
+        if(checkFileExist(qcom_hostapd_cfg_File)) {
+            // 读取到文件的所有内容
+            ArrayList<String> settingSystemInfoDetail = readSettingSystemInfoFromFile(qcom_hostapd_cfg_File); // detail
+
+            ArrayList<String> defineValue = new   ArrayList<String>();
+            ArrayList<Qcom_Hostapd_Item> matchQcomItem = new   ArrayList<Qcom_Hostapd_Item>();
+            for (int i = 0; i < settingSystemInfoDetail.size(); i++) {
+                String strLine = settingSystemInfoDetail.get(i).trim();
+                if(strLine.startsWith("#") || strLine.startsWith("END")){
+                    continue;
+                }
+                defineValue.add("Hostapd定义值:"+strLine);
+
+
+                for (int j = 0; j < wcnssList.size(); j++) {
+                    Qcom_Hostapd_Item qcom_hostapd_item = hostapdList.get(j);
+                    String key = qcom_hostapd_item.key;
+                    if(strLine.contains(key)){
+                        qcom_hostapd_item.calculRawLine(strLine);
+                        matchQcomItem.add(qcom_hostapd_item);
+                    }
+                }
+            }
+
+
+            ArrayPrint(defineValue,"hostapd.conf定义值列表");
+
+            ArrayList<String> matchQcomItemLog = new ArrayList<String>();
+            for (int i = 0; i < matchQcomItem.size(); i++) {
+                Qcom_Hostapd_Item  qcom_hostpad_item  = matchQcomItem.get(i);
+                matchQcomItemLog.add("匹配key值:"+qcom_hostpad_item.key);
+                matchQcomItemLog.add("匹配值描述:"+qcom_hostpad_item.desc);
+                matchQcomItemLog.add("匹配值定义:"+qcom_hostpad_item.rawLine);
+                matchQcomItemLog.add("----------");
+            }
+            ArrayPrint(matchQcomItemLog,"hostapd.conf匹配列表");
+        }
+
+    }
 
 
     public static class PropItem{
@@ -622,6 +768,9 @@ public class E6_Android_Info {
                 temp = temp.substring(0,temp.length()-1);
             }
             this.mValue = temp;
+          if("gsm.version.baseband".equals(this.mProName)){
+              cpuInfo1 = this.mValue;
+          }
             if(!"".equals(mValue) && isNumeric(this.mValue) && Long.parseLong(mValue) > 1000000000L){
                 if(mValue.length() == 13){   // 毫秒为单位
                     this.mDateString = df.format(new Date(Long.parseLong(mValue)));
@@ -670,6 +819,248 @@ public class E6_Android_Info {
 
 
 
+
+
+
+
+
+    public static void getSettingItemInfo() {
+        getSettingSecureFileInfo();
+        getSettingSystemFileInfo();
+        getSettingGlobalFileInfo();
+
+    }
+
+//    static File setting_system_File = new File(System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin" + File.separator+"E6"+File.separator + "9_1_settings_system.txt");
+//    static File setting_secure_File = new File(System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin" + File.separator+"E6"+File.separator + "9_2_settings_secure.txt");
+//    static File setting_global_File = new File(System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin" + File.separator+"E6"+File.separator + "9_3_settings_global.txt");
+
+
+    static  ArrayList<SettingItem> SettingItemList = new ArrayList<SettingItem>();
+    static class SettingItem{
+        String key;
+        String rawLine;
+        String fixLine;
+        String desc;
+        String value;
+        SettingItem(String mKey , String mDesc){
+            this.key = mKey;
+            this.desc = mDesc;
+        }
+
+      void  calculRawLine(String mRawLine){
+            this.rawLine = mRawLine;
+            String fixedStr = mRawLine.replace("<setting","");
+            fixedStr = fixedStr.replace("/>","").trim();
+            if(fixedStr.length() > (MAX_COUNT_CHAR_IN_ROW - 20)){
+
+                fixedStr = fixedStr.replace("value","】【value");
+                fixedStr = fixedStr.replace("package","】【package");
+                fixedStr = "【"+fixedStr + "】";
+            //   System.out.println("key = "+key + "   fixedStr="+fixedStr);
+            }
+
+       //   System.out.println("key1 = "+key + "   fixedStr1="+fixedStr);
+
+          this.fixLine = fixedStr;
+        }
+    }
+    static{
+
+        // setting_secure.xml
+        SettingItemList.add(new SettingItem("bluetooth_address","蓝牙地址") );
+
+        SettingItemList.add(new SettingItem("android_id","安卓id") );
+
+        SettingItemList.add(new SettingItem("user_setup_complete","初始化向导是否完成标识") );
+
+        SettingItemList.add(new SettingItem("bluetooth_name","初始化向导是否完成标识") );
+
+
+
+        // setting_system.xml
+        SettingItemList.add(new SettingItem("volume_alarm","闹钟声音") );
+        SettingItemList.add(new SettingItem("volume_music","音乐声音") );
+        SettingItemList.add(new SettingItem("volume_voice","电话声音") );
+        SettingItemList.add(new SettingItem("screen_brightness","屏幕亮度") );
+        SettingItemList.add(new SettingItem("status_bar_show_battery_percent","是否在状态栏显示电量百分比") );
+
+        SettingItemList.add(new SettingItem("volume_system","系统声音") );
+        SettingItemList.add(new SettingItem("system_locales","系统语言") );
+        SettingItemList.add(new SettingItem("volume_ring","响铃声") );
+        SettingItemList.add(new SettingItem("volume_notification","系统提示声音") );
+
+        SettingItemList.add(new SettingItem("vibrate_when_ringing","来电是否震动") );
+        SettingItemList.add(new SettingItem("screen_off_timeout","超时灭屏时间(单位 毫秒ms)") );
+
+
+
+
+        // setting_global.xml
+        SettingItemList.add(new SettingItem("wifi_country_code","WIFI国家码") );
+        SettingItemList.add(new SettingItem("wifi_sleep_policy","WIFI休眠策略") );
+        SettingItemList.add(new SettingItem("wifi_max_dhcp_retry_count","WIFI执行DHCP最大重试次数") );
+        SettingItemList.add(new SettingItem("wifi_scan_always_enabled","允许当前pakage进行wifi扫描") );
+        SettingItemList.add(new SettingItem("hs20_saved_state","passpoint(无需密码项开关)") );
+        SettingItemList.add(new SettingItem("ble_scan_always_enabled","BLE扫描相关") );
+        SettingItemList.add(new SettingItem("wifi_display_on","WIFI-Display是否打开开关") );
+        SettingItemList.add(new SettingItem("mobile_data","移动数据开关") );
+        SettingItemList.add(new SettingItem("device_name","设备名称") );
+        SettingItemList.add(new SettingItem("wifi_networks_available_notification_on","有效WIFI通知开关") );
+        SettingItemList.add(new SettingItem("wifi_on","WIFI开关") );
+        SettingItemList.add(new SettingItem("mobile_data","移动数据开关") );
+        SettingItemList.add(new SettingItem("bluetooth_on","蓝牙开关") );
+        SettingItemList.add(new SettingItem("mobile_data_always_on","移动数据总是打开开关") );
+
+
+    }
+
+    public static void getSettingSystemFileInfo() {
+        if(checkFileExist(setting_system_File)){
+            // 读取到文件的所有内容
+            ArrayList<String> settingSystemInfoDetail = readSettingSystemInfoFromFile(setting_system_File); // detail
+            ArrayList<String> settingSystemLogList = new ArrayList<String>();
+            ArrayList<SettingItem> matchSettingItem = new  ArrayList<SettingItem>();
+            for (int i = 0; i < settingSystemInfoDetail.size(); i++) {
+                String currentRawLine = settingSystemInfoDetail.get(i).trim();
+                if(!currentRawLine.startsWith("<setting ")){
+                    continue;
+                }
+
+                for (int j = 0; j < SettingItemList.size(); j++) {
+                    SettingItem settingItem = SettingItemList.get(j);
+                    String nameKey= "name=\""+settingItem.key+"\"";
+
+                    if(currentRawLine.contains(nameKey)){
+                        matchSettingItem.add(settingItem);
+                        settingItem.calculRawLine(currentRawLine);
+                        continue;
+                    }
+                }
+
+            }
+
+            for (int i = 0; i < matchSettingItem.size(); i++) {
+                SettingItem item = matchSettingItem.get(i);
+                settingSystemLogList.add("开关Key:"+item.key);
+                settingSystemLogList.add("开关说明:"+item.desc);
+                settingSystemLogList.add("开关定义值:"+item.fixLine);
+                settingSystemLogList.add("------------");
+            }
+
+
+             ArrayPrint(settingSystemLogList,"Setting_System信息");
+        }
+
+    }
+
+    static   ArrayList<String>  readSettingSystemInfoFromFile(File fileItem) {
+        ArrayList<String> fileStrArr =     readArrStringFromFile(fileItem);
+        ArrayList<String> fixedStrArr = new  ArrayList<String>();
+        for (int i = 0; i < fileStrArr.size(); i++) {
+            fixedStrArr.add(fileStrArr.get(i));
+        }
+        return fixedStrArr;
+    }
+
+
+    public static void getSettingGlobalFileInfo() {
+
+        if(checkFileExist(setting_global_File)) {
+            // 读取到文件的所有内容
+            ArrayList<String> settingSystemInfoDetail = readSettingSystemInfoFromFile(setting_global_File); // detail
+            ArrayList<String> settingSystemLogList = new ArrayList<String>();
+            ArrayList<SettingItem> matchSettingItem = new ArrayList<SettingItem>();
+            for (int i = 0; i < settingSystemInfoDetail.size(); i++) {
+                String currentRawLine = settingSystemInfoDetail.get(i).trim();
+                if (!currentRawLine.startsWith("<setting ")) {
+                    continue;
+                }
+
+                for (int j = 0; j < SettingItemList.size(); j++) {
+                    SettingItem settingItem = SettingItemList.get(j);
+                    String nameKey = "name=\"" + settingItem.key + "\"";
+
+                    if (currentRawLine.contains(nameKey)) {
+                        matchSettingItem.add(settingItem);
+                        settingItem.calculRawLine(currentRawLine);
+                        continue;
+                    }
+                }
+
+            }
+
+            for (int i = 0; i < matchSettingItem.size(); i++) {
+                SettingItem item = matchSettingItem.get(i);
+                settingSystemLogList.add("开关Key:" + item.key);
+                settingSystemLogList.add("开关说明:" + item.desc);
+                settingSystemLogList.add("开关定义值:" + item.fixLine);
+                settingSystemLogList.add("------------");
+            }
+
+
+            ArrayPrint(settingSystemLogList, "Setting_Global信息");
+        }
+    }
+
+    static   ArrayList<String>  readSettingGlobalInfoFromFile(File fileItem) {
+        ArrayList<String> fileStrArr =     readArrStringFromFile(fileItem);
+        ArrayList<String> fixedStrArr = new  ArrayList<String>();
+        for (int i = 0; i < fileStrArr.size(); i++) {
+            fixedStrArr.add(fileStrArr.get(i));
+        }
+        return fixedStrArr;
+    }
+
+    public static void getSettingSecureFileInfo() {
+
+        if(checkFileExist(setting_secure_File)){
+            // 读取到文件的所有内容
+            ArrayList<String> settingSystemInfoDetail = readSettingSystemInfoFromFile(setting_secure_File); // detail
+            ArrayList<String> settingSystemLogList = new ArrayList<String>();
+            ArrayList<SettingItem> matchSettingItem = new  ArrayList<SettingItem>();
+            for (int i = 0; i < settingSystemInfoDetail.size(); i++) {
+                String currentRawLine = settingSystemInfoDetail.get(i).trim();
+                if(!currentRawLine.startsWith("<setting ")){
+                    continue;
+                }
+
+                for (int j = 0; j < SettingItemList.size(); j++) {
+                    SettingItem settingItem = SettingItemList.get(j);
+                    String nameKey= "name=\""+settingItem.key+"\"";
+
+                    if(currentRawLine.contains(nameKey)){
+                        matchSettingItem.add(settingItem);
+                        settingItem.calculRawLine(currentRawLine);
+                        continue;
+                    }
+                }
+
+            }
+
+            for (int i = 0; i < matchSettingItem.size(); i++) {
+                SettingItem item = matchSettingItem.get(i);
+                settingSystemLogList.add("开关Key:"+item.key);
+                settingSystemLogList.add("开关说明:"+item.desc);
+                settingSystemLogList.add("开关定义值:"+item.fixLine);
+                settingSystemLogList.add("------------");
+            }
+
+
+            ArrayPrint(settingSystemLogList,"Setting_Secure信息");
+        }
+
+    }
+
+
+    static   ArrayList<String>  readSettingSecureInfoFromFile(File fileItem) {
+        ArrayList<String> fileStrArr =     readArrStringFromFile(fileItem);
+        ArrayList<String> fixedStrArr = new  ArrayList<String>();
+        for (int i = 0; i < fileStrArr.size(); i++) {
+            fixedStrArr.add(fileStrArr.get(i));
+        }
+        return fixedStrArr;
+    }
 
     public static void getDumpWifiInfo() {
           addDumpWifiBase();
@@ -813,6 +1204,9 @@ public class E6_Android_Info {
     public static void getCpuInfo(){
        // ArrayList<String> cpuInfoDetail = readCpuInfoFromFile(cpuinfoFile); // detail
         ArrayList<String> cpuInfoSimple = readCpuInfoFromFileSimple(cpuinfoFile); // simple
+        if(!"".equals(cpuInfo1.trim())){
+            cpuInfoSimple.add("gsm.version.baseband信息(可能包含CPU信息):"+cpuInfo1);
+        }
         ArrayPrint(cpuInfoSimple,"cpu简况");
     }
 
@@ -1206,16 +1600,6 @@ if(lineContent.contains("voltage")){
     }
 
 
-    static  public void printArrObject(Object[] objArr,String title){
-        ArrayList<String> curPropStrArr = new  ArrayList<String>();
-        for (int i = 0; i < objArr.length; i++) {
-            if("".equals(objArr[i].toString())){
-                continue;
-            }
-            curPropStrArr.add(objArr[i].toString());
-        }
-       ArrayPrint(curPropStrArr , title);
-    }
 
     public static void toGetPropInfo(File logFile , ArrayList<PropItem> propList){
         if(!logFile.exists()){
@@ -1234,6 +1618,7 @@ if(lineContent.contains("voltage")){
            //     System.out.println("lineContent ="+ lineContent);
                 for (int i = 0; i < propList.size(); i++) {
                     PropItem  propItem = propList.get(i);
+
                     if(lineContent.contains(propItem.mProName)){
                         propItem.initWithOriLine(new String(lineContent));
                      //   break;
@@ -1386,30 +1771,10 @@ if(lineContent.contains("voltage")){
     }
 
 
-    public static String getPaddingEmptyString(int length) {
-        String str = "";
-        for (int i = 0; i < length; i++) {
-            str += "-";
-        }
-        return str;
-    }
-
-    // 加载库时搜索的路径列表AC-:\Program Files\Java\jdk1.8.0_191\bin
-    // 加载库时搜索的路径列表A-:C\Program Files\Java\jdk1.8.0_191\bin
-    public static String addMaoChinese(String oriStr) {
-        String resultStr = "";
-        int chinesePosition = getFirstChinesePosition(oriStr);
-        resultStr = oriStr.substring(0, chinesePosition) + ":" + oriStr.substring(chinesePosition);
-        return resultStr;
-    }
 
 
-    public static String addMaoBlank(String oriStr) {
-        String resultStr = "";
-        int blankPosition = oriStr.indexOf(" ");
-        resultStr = oriStr.substring(0, blankPosition) + ":" + oriStr.substring(blankPosition);
-        return resultStr;
-    }
+
+
 
     public static ArrayList<String> CheckAndAddMaoMethod(ArrayList<String> mStrList) {
         ArrayList<String> fixedArr = new ArrayList<String>();
@@ -1477,100 +1842,139 @@ if(lineContent.contains("voltage")){
         return fixedArr;
     }
 
-    public static void ArrayPrint(ArrayList<String> mStrList, String title) {
-
-        ArrayList<String> addMao = CheckAndAddMaoMethod(mStrList);
-        // 对mStrList 进行 对其处理  重新转换为 对其的  ArrayList<String> new
-        // 1. 判断所有字符串中 第一次出现冒号的位置   查找出最大的位置的那个 并 记录这个最大位置 xMaxLengh
-        // 2.  重新排序的规则是  小字符串需要在: 之后添加  xMaxLengh - self().length 的空格 并重新加入新的数组
-        ArrayList<String> firstFixedStringArrA = firstFixedStringArr(addMao);
-        boolean isOver100 = isItemLengthOver100(firstFixedStringArrA);
-
-        if (isOver100) {
-            //     System.out.println("当前的字符串Item 存在大于 100字符的！");
-            ArrayList<String> newLessList = toMakeListItemLess100(firstFixedStringArrA, MAX_COUNT_CHAR_IN_ROW);
-            showTableLogCommon100(newLessList, title);  //  每一行都小于100个字的打印
-        } else { //
-            //   System.out.println("当前的字符串Item 不 存在大于 100字符的！");
-            showTableLogCommon100(firstFixedStringArrA, title);  //  每一行都小于100个字的打印
 
 
+    // ArrayPrint ==============================Begin
+    static public void printArrObject(Object[] objArr, String title) {
+        ArrayList<String> curPropStrArr = new ArrayList<String>();
+        for (int i = 0; i < objArr.length; i++) {
+            if ("".equals(objArr[i].toString())) {
+                continue;
+            }
+            curPropStrArr.add(objArr[i].toString());
         }
+        ArrayPrint(curPropStrArr, title);
     }
 
-    static  int MAX_COUNT_CHAR_IN_ROW = 120;
-    static  int MAX_COUNT_CHAR_IN_ROW_DEFAULT = 120;
-    public static void showTableLogCommon100(ArrayList<String> mStrList, String title) {
-        int maxLength = getItemMaxLength(mStrList);
-        ArrayList<String> fixStrArr = fixStrArrMethodCommon100(mStrList, MAX_COUNT_CHAR_IN_ROW);
-        int chineseCount = getChineseCount(title);
 
+    static int MAX_COUNT_CHAR_IN_ROW = 132;
+    static int MAX_COUNT_CHAR_IN_ROW_DEFAULT = 132;
 
-        String beginRow = "╔════════════════════════════════════════════════" + title + "═════════════════════════════════════════════════════╗";
-        String endRow = "╚═════════════════════════════════════════════════════════════════════════════════════════════════════╝";
-        int fixLength = 0;
-        int oriLength = title.length();
-        if (chineseCount == 0) { // 不包含汉字
-            fixLength = oriLength;
+    public static boolean isItemLengthOver100(ArrayList<String> mStrList) {
+        boolean flag = false;
 
-        } else {
-            if (chineseCount == oriLength) { // 全部包含汉字
-                fixLength = 2 * oriLength;
-            } else { // 一部分汉字  一部分英语
-
-                fixLength = oriLength - chineseCount + (2 * chineseCount);
-            }
-
-        }
-        String templateString = "╗";
-        if (fixLength > 0) {
-            for (int i = 0; i < fixLength; i++) {
-                templateString = "═" + templateString;
+        for (int i = 0; i < mStrList.size(); i++) {
+            if (mStrList.get(i).length() > MAX_COUNT_CHAR_IN_ROW) {
+                //   System.out.println("index["+i+"]  size= "+mStrList.get(i).length()+"     Value:" + mStrList.get(i) );
+                return true;
             }
         }
+        return flag;
 
-        beginRow = beginRow.replace(templateString, "╗");
-        //  System.out.println(" fixStrArr.size() =" + fixStrArr.size());
-        beginRow =  resetBeginRowToDefaultSize(beginRow);
-        System.out.println(beginRow);
-        for (int i = 0; i < fixStrArr.size(); i++) {
-            System.out.println(fixStrArr.get(i));
-        }
-        endRow =  resetEndRowToDefaultSize(endRow);
-        System.out.println(endRow);
-    }
-
-  static String resetBeginRowToDefaultSize(String beginRow){
-        String curBeginStr = new String(beginRow);
-       int curPaddingLength =  getPaddingChineseLength(curBeginStr);
-       int distance = 0 ;
-       if(curPaddingLength < MAX_COUNT_CHAR_IN_ROW){
-           distance = MAX_COUNT_CHAR_IN_ROW - curPaddingLength;
-       }
-       String paddingString = getRepeatString("═",distance + 3);
-      curBeginStr = curBeginStr.replace("╗",paddingString+"╗");
-      return curBeginStr;
-    }
-
-    static String resetEndRowToDefaultSize(String beginRow){
-        String curBeginStr = new String(beginRow);
-        int curPaddingLength =  getPaddingChineseLength(curBeginStr);
-        int distance = 0 ;
-        if(curPaddingLength < MAX_COUNT_CHAR_IN_ROW){
-            distance = MAX_COUNT_CHAR_IN_ROW - curPaddingLength;
-        }
-        String paddingString = getRepeatString("═",distance + 3);
-        curBeginStr = curBeginStr.replace("╝",paddingString+"╝");
-        return curBeginStr;
     }
 
 
-    static String   getRepeatString(String repeatSrc,int repeatCount){
-        String src = "";
-        for (int i = 0; i < repeatCount; i++) {
-            src += repeatSrc;
+    public static ArrayList<String> makeStringGroup(String code, int maxcount) {
+        ArrayList<String> fixArr = new ArrayList<String>();
+        String oriStr = code.trim();
+        while (oriStr.length() > maxcount) {
+            String str1 = oriStr.substring(0, maxcount);
+            fixArr.add(str1);
+            oriStr = oriStr.substring(maxcount);
         }
-        return src;
+
+
+        return fixArr;
+    }
+
+
+    public static ArrayList<String> sqlitString(String bigString, String sqlitChar) {
+        ArrayList<String> fixArr = new ArrayList<String>();
+        ArrayList<String> subArr = new ArrayList<String>();
+        String[] strArr = bigString.trim().split(sqlitChar.trim());
+        for (int i = 0; i < strArr.length; i++) {
+            if (strArr[i].length() > MAX_COUNT_CHAR_IN_ROW) {
+                ArrayList<String> subArrA = null;
+                if (strArr[i].contains("【") && strArr[i].contains("】") ){
+                    subArrA = toSqlitWithhardBlock(strArr[i] );
+                }else if (strArr[i].contains(";")) {
+                    subArrA = sqlitString(strArr[i], ";");
+
+                } else if (strArr[i].contains("。")) {
+                    subArrA = sqlitString(strArr[i], "。");
+
+                } else if (strArr[i].contains(":")) {
+                    subArrA = sqlitString(strArr[i], ":");
+                } else if (strArr[i].contains(".")) {
+                    subArrA = sqlitString(strArr[i], ".");
+                } else if (strArr[i].contains(" ")) {
+                    subArrA = sqlitString(strArr[i], " ");
+                } else {
+                    // 对于超过最大长度  并且没有特殊字符的  每 80刀一分割 把它分割
+                    ArrayList<String> tempArr = makeStringGroup(strArr[i], MAX_COUNT_CHAR_IN_ROW);
+                    for (int j = 0; j < tempArr.size(); j++) {
+                        fixArr.add(tempArr.get(j));
+                    }
+
+                }
+
+                if (subArrA != null && isItemLengthOver100(subArrA)) {
+                    String fixSub = strArr[i].substring(0, MAX_COUNT_CHAR_IN_ROW);
+                    fixArr.add(fixSub);
+                } else {
+                    if (subArrA != null) {
+                        for (int j = 0; j < subArrA.size(); j++) {
+                            fixArr.add(subArrA.get(j));
+                        }
+
+                    }
+                }
+
+            } else {
+                fixArr.add(strArr[i]);
+            }
+        }
+        return fixArr;
+    }
+
+
+
+    public static ArrayList<String> toSqlitWithhardBlock(String mStrList) {
+        ArrayList<String> resultList = new  ArrayList<String>();
+        //【】  【】,
+        String mStr = mStrList.trim();
+
+        String pre = mStr.substring(0,mStr.indexOf("【"));
+        mStr =mStr.substring(mStr.indexOf("【"));
+        resultList.add(pre);
+        String end = "";
+        if(mStr.endsWith("】")){
+            end = "";
+        }else{
+            end =  mStr.substring(mStr.lastIndexOf("】")+1);
+        }
+
+        mStr =mStr.substring(0,mStr.lastIndexOf("】")+1);
+
+        while(mStr.contains("】") && mStr.contains("【")){
+            String firstStr = mStr.substring(mStr.indexOf("【"),mStr.indexOf("】")+1);
+            resultList.add(firstStr);
+            mStr = mStr.substring(mStr.indexOf("】")+1);
+        }
+
+        if(!"".equals(mStr.trim())){
+            resultList.add(mStr.trim());
+        }
+
+        if(!"".equals(end)){
+            resultList.add(end);
+        }
+
+
+//        for (int i = 0; i < resultList.size(); i++) {
+//            System.out.println("xxx："+i+"  ="+resultList.get(i) +"   mStr="+mStr);
+//        }
+        return resultList;
     }
 
 
@@ -1583,7 +1987,9 @@ if(lineContent.contains("voltage")){
             } else {
                 String curMaxStr = mStrList.get(i);
                 ArrayList<String> fixA = null;
-                if (curMaxStr.contains(";")) {
+                if (curMaxStr.contains("【") && curMaxStr.contains("】") ){
+                    fixA = toSqlitWithhardBlock(curMaxStr );
+                }else if (curMaxStr.contains(";")) {
                     fixA = sqlitString(curMaxStr, ";");
                 } else if (curMaxStr.contains("。")) {
                     fixA = sqlitString(curMaxStr, "。");
@@ -1627,136 +2033,6 @@ if(lineContent.contains("voltage")){
         return fixLengthArr;
     }
 
-    public static ArrayList<String> sqlitString(String bigString, String sqlitChar) {
-        ArrayList<String> fixArr = new ArrayList<String>();
-        ArrayList<String> subArr = new ArrayList<String>();
-        String[] strArr = bigString.trim().split(sqlitChar.trim());
-        for (int i = 0; i < strArr.length; i++) {
-            if (strArr[i].length() > MAX_COUNT_CHAR_IN_ROW) {
-                ArrayList<String> subArrA = null;
-                if (strArr[i].contains(";")) {
-                    subArrA = sqlitString(strArr[i], ";");
-
-                } else if (strArr[i].contains("。")) {
-                    subArrA = sqlitString(strArr[i], "。");
-
-                } else if (strArr[i].contains(":")) {
-                    subArrA = sqlitString(strArr[i], ":");
-                } else if (strArr[i].contains(".")) {
-                    subArrA = sqlitString(strArr[i], ".");
-                } else if (strArr[i].contains(" ")) {
-                    subArrA = sqlitString(strArr[i], " ");
-                } else {
-                    // 对于超过最大长度  并且没有特殊字符的  每 80刀一分割 把它分割
-                    ArrayList<String> tempArr = makeStringGroup(strArr[i], MAX_COUNT_CHAR_IN_ROW);
-                    for (int j = 0; j < tempArr.size(); j++) {
-                        fixArr.add(tempArr.get(j));
-                    }
-
-                }
-
-                if (subArrA != null && isItemLengthOver100(subArrA)) {
-                    String fixSub = strArr[i].substring(0, MAX_COUNT_CHAR_IN_ROW);
-                    fixArr.add(fixSub);
-                } else {
-                    if (subArrA != null) {
-                        for (int j = 0; j < subArrA.size(); j++) {
-                            fixArr.add(subArrA.get(j));
-                        }
-
-                    }
-                }
-
-            } else {
-                fixArr.add(strArr[i]);
-            }
-        }
-        return fixArr;
-    }
-
-    public static ArrayList<String> makeStringGroup(String code, int maxcount) {
-        ArrayList<String> fixArr = new ArrayList<String>();
-        String oriStr = code.trim();
-        while (oriStr.length() > maxcount) {
-            String str1 = oriStr.substring(0, maxcount);
-            fixArr.add(str1);
-            oriStr = oriStr.substring(maxcount);
-        }
-
-
-        return fixArr;
-    }
-
-    public static ArrayList<String> fixStrArrMethodCommon100(ArrayList<String> mStrList, int maxcount) {
-        ArrayList<String> fixArr = new ArrayList<String>();
-        for (int i = 0; i < mStrList.size(); i++) {
-            String curStr = mStrList.get(i);
-            String fixCurStr = getFixLengthNewStr(curStr, maxcount);
-            fixArr.add(fixCurStr);
-        }
-
-        return fixArr;
-    }
-
-    public static String getFixLengthNewStr(String oriStr, int maxLength) {
-        String fixStr = "";
-        String beginChar = "║ ";
-        String endChar = "║";
-        String oriStrTrim = oriStr.trim();
-        int curLength = oriStrTrim.length();
-        int paddingLength = maxLength - curLength;
-
-
-        int chineseCount = getChineseCount(oriStr);
-        paddingLength = paddingLength - chineseCount;
-        if (paddingLength < 0) {
-           // return "curString:" + oriStr + "  length more than" + maxLength;
-            return "";
-        }
-
-        for (int i = 0; i < paddingLength; i++) {
-            oriStrTrim += " ";
-        }
-        oriStrTrim = beginChar + oriStrTrim + endChar;
-        //  oriStrTrim = beginChar + oriStrTrim ;
-        fixStr = oriStrTrim;
-        return fixStr;
-    }
-
-
-    public static boolean isItemLengthOver100(ArrayList<String> mStrList) {
-        boolean flag = false;
-
-        for (int i = 0; i < mStrList.size(); i++) {
-            if (mStrList.get(i).length() > MAX_COUNT_CHAR_IN_ROW) {
-                //   System.out.println("index["+i+"]  size= "+mStrList.get(i).length()+"     Value:" + mStrList.get(i) );
-                return true;
-            }
-        }
-        return flag;
-
-    }
-
-
-    public static int getMaxMaoPosition(ArrayList<String> mStrList) {
-        int maoPosition = 0;
-        String maxString = "";
-        for (int i = 0; i < mStrList.size(); i++) {
-            if ((mStrList.get(i).contains(":"))) {
-                int curMaoPosition = mStrList.get(i).indexOf(":");
-                String maoString = mStrList.get(i).substring(0, curMaoPosition + 1);
-                int paddingSize = getPaddingChineseLength(maoString);
-                if (paddingSize > maoPosition) {
-                    maoPosition = paddingSize;
-                    maxString = mStrList.get(i);
-                }
-            }
-
-        }
-        //  System.out.println("最长的冒号位置: maoPosition="+maoPosition+"   string="+maxString);
-        return maoPosition;
-    }
-
 
     public static int getItemMaxLength(ArrayList<String> mStrList) {
         int itemLength = 0;
@@ -1770,14 +2046,41 @@ if(lineContent.contains("voltage")){
         return itemLength;
     }
 
-    public static int getPaddingChineseLength(String oriStr) {
-        int resultLength = 0;
-        int oriSize = oriStr.length();
-        int chinseSize = getChineseCount(oriStr);   // 所有中文的个数
-        int distanceSize = oriSize - chinseSize; // 所有英文的个数
-        resultLength = chinseSize * 2 + distanceSize;
-        return resultLength;
+    public static ArrayList<String> fixStrArrMethodCommon100(ArrayList<String> mStrList, int maxcount) {
+        ArrayList<String> fixArr = new ArrayList<String>();
+        for (int i = 0; i < mStrList.size(); i++) {
+            String curStr = mStrList.get(i);
+            String fixCurStr = getFixLengthNewStr(curStr, maxcount);
+            fixArr.add(fixCurStr);
+        }
 
+        return fixArr;
+    }
+
+
+    public static String getFixLengthNewStr(String oriStr, int maxLength) {
+        String fixStr = "";
+        String beginChar = "║ ";
+        String endChar = "║";
+        String oriStrTrim = oriStr.trim();
+        int curLength = oriStrTrim.length();
+        int paddingLength = maxLength - curLength;
+
+
+        int chineseCount = getChineseCount(oriStr);
+        paddingLength = paddingLength - chineseCount;
+        if (paddingLength < 0) {
+            // return "curString:" + oriStr + "  length more than" + maxLength;
+            return "";
+        }
+
+        for (int i = 0; i < paddingLength; i++) {
+            oriStrTrim += " ";
+        }
+        oriStrTrim = beginChar + oriStrTrim + endChar;
+        //  oriStrTrim = beginChar + oriStrTrim ;
+        fixStr = oriStrTrim;
+        return fixStr;
     }
 
     public static int getChineseCount(String oriStr) {
@@ -1811,6 +2114,137 @@ if(lineContent.contains("voltage")){
     }
 
 
+    public static boolean isContainChinese(String str) {
+        Pattern p = Pattern.compile("[\u4e00-\u9fa5]");
+        Matcher m = p.matcher(str);
+        if (m.find()) {
+            return true;
+        }
+        return false;
+    }
+
+    public static void showTableLogCommon100(ArrayList<String> mStrList, String title) {
+        int maxLength = getItemMaxLength(mStrList);
+        ArrayList<String> fixStrArr = fixStrArrMethodCommon100(mStrList, MAX_COUNT_CHAR_IN_ROW);
+        int chineseCount = getChineseCount(title);
+
+
+        String beginRow = "╔════════════════════════════════════════════════" + title + "═════════════════════════════════════════════════════╗";
+        String endRow = "╚═════════════════════════════════════════════════════════════════════════════════════════════════════╝";
+        int fixLength = 0;
+        int oriLength = title.length();
+        if (chineseCount == 0) { // 不包含汉字
+            fixLength = oriLength;
+
+        } else {
+            if (chineseCount == oriLength) { // 全部包含汉字
+                fixLength = 2 * oriLength;
+            } else { // 一部分汉字  一部分英语
+
+                fixLength = oriLength - chineseCount + (2 * chineseCount);
+            }
+
+        }
+        String templateString = "╗";
+        if (fixLength > 0) {
+            for (int i = 0; i < fixLength; i++) {
+                templateString = "═" + templateString;
+            }
+        }
+
+        beginRow = beginRow.replace(templateString, "╗");
+        //  System.out.println(" fixStrArr.size() =" + fixStrArr.size());
+        beginRow = resetBeginRowToDefaultSize(beginRow);
+        System.out.println(beginRow);
+        for (int i = 0; i < fixStrArr.size(); i++) {
+            System.out.println(fixStrArr.get(i));
+        }
+        endRow = resetEndRowToDefaultSize(endRow);
+        System.out.println(endRow);
+    }
+
+    static String resetEndRowToDefaultSize(String beginRow) {
+        String curBeginStr = new String(beginRow);
+        int curPaddingLength = getPaddingChineseLength(curBeginStr);
+        int distance = 0;
+        if (curPaddingLength < MAX_COUNT_CHAR_IN_ROW) {
+            distance = MAX_COUNT_CHAR_IN_ROW - curPaddingLength;
+        }
+        String paddingString = getRepeatString("═", distance + 3);
+        curBeginStr = curBeginStr.replace("╝", paddingString + "╝");
+        return curBeginStr;
+    }
+
+    public static int getPaddingChineseLength(String oriStr) {
+        int resultLength = 0;
+        int oriSize = oriStr.length();
+        int chinseSize = getChineseCount(oriStr);   // 所有中文的个数
+        int distanceSize = oriSize - chinseSize; // 所有英文的个数
+        resultLength = chinseSize * 2 + distanceSize;
+        return resultLength;
+
+    }
+
+    static String getRepeatString(String repeatSrc, int repeatCount) {
+        String src = "";
+        for (int i = 0; i < repeatCount; i++) {
+            src += repeatSrc;
+        }
+        return src;
+    }
+
+
+    static String resetBeginRowToDefaultSize(String beginRow) {
+        String curBeginStr = new String(beginRow);
+        int curPaddingLength = getPaddingChineseLength(curBeginStr);
+        int distance = 0;
+        if (curPaddingLength < MAX_COUNT_CHAR_IN_ROW) {
+            distance = MAX_COUNT_CHAR_IN_ROW - curPaddingLength;
+        }
+        String paddingString = getRepeatString("═", distance + 3);
+        curBeginStr = curBeginStr.replace("╗", paddingString + "╗");
+        return curBeginStr;
+    }
+
+    public static void ArrayPrint(ArrayList<String> mStrList, String title) {
+
+        ArrayList<String> addMao = CheckAndAddMaoMethod(mStrList);
+        // 对mStrList 进行 对其处理  重新转换为 对其的  ArrayList<String> new
+        // 1. 判断所有字符串中 第一次出现冒号的位置   查找出最大的位置的那个 并 记录这个最大位置 xMaxLengh
+        // 2.  重新排序的规则是  小字符串需要在: 之后添加  xMaxLengh - self().length 的空格 并重新加入新的数组
+        ArrayList<String> firstFixedStringArrA = firstFixedStringArr(addMao);
+        boolean isOver100 = isItemLengthOver100(firstFixedStringArrA);
+
+        if (isOver100) {
+            //     System.out.println("当前的字符串Item 存在大于 100字符的！");
+            ArrayList<String> newLessList = toMakeListItemLess100(firstFixedStringArrA, MAX_COUNT_CHAR_IN_ROW);
+            showTableLogCommon100(newLessList, title);  //  每一行都小于100个字的打印
+        } else { //
+            //   System.out.println("当前的字符串Item 不 存在大于 100字符的！");
+            showTableLogCommon100(firstFixedStringArrA, title);  //  每一行都小于100个字的打印
+
+
+        }
+    }
+
+    public static String getPaddingEmptyString(int length) {
+        String str = "";
+        for (int i = 0; i < length; i++) {
+            str += "-";
+        }
+        return str;
+    }
+
+    // 加载库时搜索的路径列表AC-:\Program Files\Java\jdk1.8.0_191\bin
+    // 加载库时搜索的路径列表A-:C\Program Files\Java\jdk1.8.0_191\bin
+    public static String addMaoChinese(String oriStr) {
+        String resultStr = "";
+        int chinesePosition = getFirstChinesePosition(oriStr);
+        resultStr = oriStr.substring(0, chinesePosition) + ":" + oriStr.substring(chinesePosition);
+        return resultStr;
+    }
+
+
     public static int getFirstChinesePosition(String str) {
         int position = 0;
         boolean getFirstChinese = false;
@@ -1832,15 +2266,36 @@ if(lineContent.contains("voltage")){
         return position;
     }
 
-    public static boolean isContainChinese(String str) {
-        Pattern p = Pattern.compile("[\u4e00-\u9fa5]");
-        Matcher m = p.matcher(str);
-        if (m.find()) {
-            return true;
-        }
-        return false;
+    public static String addMaoBlank(String oriStr) {
+        String resultStr = "";
+        int blankPosition = oriStr.indexOf(" ");
+        resultStr = oriStr.substring(0, blankPosition) + ":" + oriStr.substring(blankPosition);
+        return resultStr;
     }
 
 
+
+
+
+
+    public static int getMaxMaoPosition(ArrayList<String> mStrList) {
+        int maoPosition = 0;
+        String maxString = "";
+        for (int i = 0; i < mStrList.size(); i++) {
+            if ((mStrList.get(i).contains(":"))) {
+                int curMaoPosition = mStrList.get(i).indexOf(":");
+                String maoString = mStrList.get(i).substring(0, curMaoPosition + 1);
+                int paddingSize = getPaddingChineseLength(maoString);
+                if (paddingSize > maoPosition) {
+                    maoPosition = paddingSize;
+                    maxString = mStrList.get(i);
+                }
+            }
+
+        }
+        //  System.out.println("最长的冒号位置: maoPosition="+maoPosition+"   string="+maxString);
+        return maoPosition;
+    }
+    // ArrayPrint ==============================End
 }
 
