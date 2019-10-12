@@ -1,3 +1,11 @@
+import com.github.javaparser.JavaParser;
+import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.NodeList;
+import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
+import com.github.javaparser.ast.body.FieldDeclaration;
+import com.github.javaparser.ast.body.MethodDeclaration;
+import com.github.javaparser.ast.body.Parameter;
+import com.github.javaparser.printer.PrettyPrinterConfiguration;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 
@@ -268,6 +276,10 @@ public class F2_DownFile_AOSP {
 
     }
 
+
+
+
+
     static {
         AOSP_Version_ITEM android_5_0 = new AOSP_Version_ITEM(5.0, "LOLLIPOP", 21, "5.0.1_r1", "2014.11");
         aospList.add(android_5_0);
@@ -354,7 +366,7 @@ public class F2_DownFile_AOSP {
 
         for (int i = 0; i < allFileList.size(); i++) {
             FilePath_ITEM filePathItem = allFileList.get(i);
-            if (filePathItem.mfileName_lower.startsWith(fileName)) {  // 文件名开头
+            if (filePathItem.mfileName_lower.startsWith(fileName) || filePathItem.mfileName_lower.contains(fileName) ) {  // 文件名开头
                 ArrayList<JavaFile_Item> javaFileList = filePathItem.allJavaFileList;
 
                 for (int j = 0; j < javaFileList.size(); j++) {
@@ -409,6 +421,39 @@ public class F2_DownFile_AOSP {
     }
 
 
+    static JavaFile_Item getCompareVersionFileItem(String parentAbsPath ,int targetVersion) {
+        JavaFile_Item compareItem = null;
+        int compareVersion = 0;
+        int maxVersion = getMaxVersionOnRecord();
+        int minVersion = getMinVersionOnRecord();
+
+        if(targetVersion == maxVersion){
+            compareVersion = maxVersion - 1;
+        }else if(targetVersion == minVersion){
+            compareVersion = minVersion + 1;
+        }else if( targetVersion < maxVersion && targetVersion > minVersion){
+            compareVersion =  targetVersion + 1;
+        }
+        if(compareVersion == 0){
+            return null; // 如果 没找到  那么 说明可能 参数出问题 需要返回 空
+        }
+        for (int i = 0; i < allFileList.size(); i++) {
+            FilePath_ITEM filePathItem = allFileList.get(i);
+            for (int j = 0; j < filePathItem.allJavaFileList.size(); j++) {
+                JavaFile_Item javaItem = filePathItem.allJavaFileList.get(j);
+
+
+                if(javaItem.parrentFileDir.getAbsolutePath().equals(parentAbsPath) && (int)javaItem.androidVersion == compareVersion ){
+                    compareItem = javaItem;
+                    return compareItem;
+                }
+            }
+        }
+
+        return compareItem;
+
+    }
+
 
 
     public static  void showTip(){
@@ -424,10 +469,14 @@ ArrayPrint(tipLog,"提示信息");
 
 
 
+
+
+
+
     public static void DoCommandOperation(JavaFile_Item mtargetJavaFile) {
 
 
-        printJavaFileInfo(mtargetJavaFile,"择优选中文件"+mtargetJavaFile.targetJavaFile.getName()+"信息");
+        printSelectedJavaFileInfo(mtargetJavaFile,"择优选中文件"+mtargetJavaFile.targetJavaFile.getName()+"信息");
 
         try {
             Thread.sleep(3000);
@@ -435,12 +484,16 @@ ArrayPrint(tipLog,"提示信息");
             e.printStackTrace();
         }
 
+        System.out.println();
+        System.out.println("后台打开操作1: explore文件夹打开目录:  " + mtargetJavaFile.parrentFileDir.getAbsolutePath());
+
         String comandFileExplore1 = "cmd.exe /c start   explorer  " + mtargetJavaFile.parrentFileDir.getAbsolutePath();
         execCMD(comandFileExplore1);
 
 
         if (mtargetJavaFile.isfile_exit_innet) {  // 网络端存在的路径 才能打开
             String commandChrome2 = "cmd.exe /C start chrome  " + mtargetJavaFile.mVisitedUrl;   // 打开Chrome浏览器  visited
+            System.out.println("后台打开操作2: Chrome 打开文件 " + mtargetJavaFile.targetJavaFile.getName()+" 的网络地址:");
             execCMD(commandChrome2);
         } else {
             System.out.println("当前搜索的文件:" + mtargetJavaFile.targetJavaFile.getName() + "在当前版本【" + mtargetJavaFile.androidVersion + "】不存在,请重新输入参数！");
@@ -451,10 +504,33 @@ ArrayPrint(tipLog,"提示信息");
         //   String command = "cmd.exe /c start   Notepad++.exe "  +" C:/Users/zhuzj5/Desktop/zbin/F2_AOSP_File/accesspoint/9_0_AccessPoint_P.java";
 
 
+
         String commandNotead3 = "cmd.exe /c start   Notepad++.exe " + mtargetJavaFile.targetJavaFilePath;
+        System.out.println("后台打开操作3: notepad++ 打开本地文件 " + mtargetJavaFile.targetJavaFilePath);
+
         execCMD(commandNotead3);
 
 
+
+        // 获取到对比文件
+        int currentVersion = (int)mtargetJavaFile.androidVersion;
+        JavaFile_Item compareJavaFile =   getCompareVersionFileItem(mtargetJavaFile.parrentFileDir.getAbsolutePath(),currentVersion);
+       // 打开对比文件进行 BCompany  对比
+        if(compareJavaFile != null){
+            int compareVersion = (int)compareJavaFile.androidVersion;
+            String commandCompare4 ="";
+            if(currentVersion > compareVersion){
+                commandCompare4 =  "cmd.exe /c start   BCompare.exe " + mtargetJavaFile.targetJavaFilePath +"  "+compareJavaFile.targetJavaFilePath;
+                System.out.println("后台打开操作4. Beyond Compare 【 "+ mtargetJavaFile.targetJavaFile.getName()+" 对比 " + compareJavaFile.targetJavaFile.getName()+" 】");
+            }else{
+                commandCompare4 =  "cmd.exe /c start   BCompare.exe "+   compareJavaFile.targetJavaFilePath  +"  "+ mtargetJavaFile.targetJavaFilePath;
+                System.out.println("后台打开操作4: Beyond Compare 【 "+ compareJavaFile.targetJavaFile.getName()+" 对比 " + mtargetJavaFile.targetJavaFile.getName()+" 】");
+
+
+            }
+
+            execCMD(commandCompare4);
+        }
 
 
         // 只读取第一个餐数
@@ -475,7 +551,9 @@ ArrayPrint(tipLog,"提示信息");
 
     }
 
-   static void printJavaFileInfo(JavaFile_Item mtargetJavaFile  , String title ){
+   static void printSelectedJavaFileInfo(JavaFile_Item mtargetJavaFile  , String title ){
+ ArrayList<String> groupLogInfoList = getJavaFIleGroupInfoList(mtargetJavaFile.originFileName);
+       ArrayPrint(groupLogInfoList, mtargetJavaFile.originFileName+"文件各版本信息");
 
         MAX_COUNT_CHAR_IN_ROW = 132;
         ArrayList<String> fileInfo = new ArrayList<String>();
@@ -483,9 +561,30 @@ ArrayPrint(tipLog,"提示信息");
         fileInfo.add("文件版本:" + mtargetJavaFile.androidVersion);
         fileInfo.add("文件版本号:" + mtargetJavaFile.androidNickChar);
         fileInfo.add("文件api:" + mtargetJavaFile.apiVersion);
-        fileInfo.add("文件代码行数:" + "xxxxxxxx");
-        fileInfo.add("文件代码函数:" + "xxxxxxxx");
-        fileInfo.add("文件代码成员:" + "xxxxxxxx");
+        fileInfo.add("文件代码行数:" + getLineNum(mtargetJavaFile.targetJavaFile));
+//        fileInfo.add("文件代码函数:" + "xxxxxxxx");
+//        fileInfo.add("文件代码成员:" + "xxxxxxxx");
+        ArrayList<String> memberList =  analysisJavaFile_Member(mtargetJavaFile.targetJavaFile , mtargetJavaFile.originFileName);
+      // System.out.println("memberList.size()="+ memberList.size() );
+       fileInfo.addAll(memberList);
+
+       ArrayList<String> methodList =  analysisJavaFile_Method(mtargetJavaFile.targetJavaFile , mtargetJavaFile.originFileName);
+       fileInfo.addAll(methodList);
+        ArrayPrint(fileInfo, title);
+        MAX_COUNT_CHAR_IN_ROW = MAX_COUNT_CHAR_IN_ROW_DEFAULT;
+    }
+
+    static void printJavaFileInfo(JavaFile_Item mtargetJavaFile  , String title ){
+
+        MAX_COUNT_CHAR_IN_ROW = 132;
+        ArrayList<String> fileInfo = new ArrayList<String>();
+        fileInfo.add("文件名:" + mtargetJavaFile.targetJavaFile.getName());
+        fileInfo.add("文件版本:" + mtargetJavaFile.androidVersion);
+        fileInfo.add("文件版本号:" + mtargetJavaFile.androidNickChar);
+        fileInfo.add("文件api:" + mtargetJavaFile.apiVersion);
+        fileInfo.add("文件代码行数:" + getLineNum(mtargetJavaFile.targetJavaFile));
+//        fileInfo.add("文件代码函数:" + "xxxxxxxx");
+//        fileInfo.add("文件代码成员:" + "xxxxxxxx");
         ArrayPrint(fileInfo, title);
         MAX_COUNT_CHAR_IN_ROW = MAX_COUNT_CHAR_IN_ROW_DEFAULT;
     }
@@ -649,8 +748,13 @@ ArrayPrint(tipLog,"提示信息");
                 fileItemListLog.add(androidVersion + "file:" + javaItem.targetJavaFilePath);
                 fileItemListLog.add("url1:" + javaItem.mdownloadUrl);
                 fileItemListLog.add("url2:" + javaItem.mVisitedUrl);
+                if(javaItem.targetJavaFile.exists()){
+                    fileItemListLog.add("行数:" + getLineNum(javaItem.targetJavaFile));
+                }else{
+                    fileItemListLog.add("行数:" + "该版本【"+javaItem.androidVersion+"】下该文件不存在");
+                }
                 fileItemListLog.add("flag:" + " local-exist-flag:【" + javaItem.isfile_exist_local + "】" + " net-exist-flag:【" + javaItem.isfile_exit_innet + "】");
-                fileItemListLog.add(":===============");
+                fileItemListLog.add(":===============================================================================");
                 if (!javaItem.isfile_exist_local && javaItem.isfile_exit_innet) {
                     System.out.println("首次无参数执行 将会下载对应文件并打印全局Log,请等待下载完成 正在下载:" + javaItem.targetJavaFile.getName() + "........");
                     if (downLoadWithJavaItemFile(javaItem.mdownloadUrl, javaItem)) {
@@ -666,6 +770,38 @@ ArrayPrint(tipLog,"提示信息");
 
 
     }
+
+
+   static ArrayList<String >getJavaFIleGroupInfoList(String filenamelower){
+        ArrayList<String> fileItemListLog = new ArrayList<String>();
+        for (int i = 0; i < allFileList.size(); i++) {
+
+            FilePath_ITEM fileItem = allFileList.get(i);
+
+                    if(fileItem.mOriginalName.equals(filenamelower)){
+                        fileItemListLog.add("AOSP路径:" + fileItem.mAOSP_Path);
+                        for (int j = 0; j < fileItem.allJavaFileList.size(); j++) {
+                            JavaFile_Item javaItem = fileItem.allJavaFileList.get(j);
+                            String androidVersion = javaItem.androidVersion + "";
+                            fileItemListLog.add(androidVersion + "file:" + javaItem.targetJavaFilePath);
+                            fileItemListLog.add("url1:" + javaItem.mdownloadUrl);
+                            fileItemListLog.add("url2:" + javaItem.mVisitedUrl);
+                            if(javaItem.targetJavaFile.exists()){
+                                fileItemListLog.add("行数:" + getLineNum(javaItem.targetJavaFile));
+                            }else{
+                                fileItemListLog.add("行数:" + "该版本【"+javaItem.androidVersion+"】下该文件不存在");
+                            }
+                            fileItemListLog.add("flag:" + " local-exist-flag:【" + javaItem.isfile_exist_local + "】" + " net-exist-flag:【" + javaItem.isfile_exit_innet + "】");
+                            fileItemListLog.add("============================================================");
+                        }
+                    }
+        }
+        return fileItemListLog;
+    }
+
+
+
+
 
 
     static ArrayList<FilePath_ITEM> allFileList = new ArrayList<FilePath_ITEM>();
@@ -1182,12 +1318,14 @@ ArrayPrint(tipLog,"提示信息");
         String mfileName_lower;   // 文件名全称的小写    不包含后缀
         String mFileType;  //   文件的类型   没有小数点
         String mAOSP_Path;   // AOSP 中文件的全局路径
+        String mOriginalName;   // 最原始的
         ArrayList<JavaFile_Item> allJavaFileList;    // 所有版本的文件  文件放在 ~/Desktop/zbin/F2/
 
         FilePath_ITEM(String AOSPPath) {
             this.mAOSP_Path = AOSPPath.trim();
             this.mFileType = getAbsFileType(AOSPPath.trim());
             this.mfileName_common = getAbsFileName(AOSPPath.trim());
+            this.mOriginalName = this.mfileName_common;
             this.mfileName_lower = this.mfileName_common.toLowerCase();
             allJavaFileList = new ArrayList<JavaFile_Item>();
             for (int i = 0; i < aospList.size(); i++) {
@@ -1204,7 +1342,7 @@ ArrayPrint(tipLog,"提示信息");
                 // 文件命名规则  /zbin/F2_AOSP_File/wifisettings/9_0_WIFISettings_L.java
                 String absPath = F2File_AOSP_DIR.getAbsolutePath() + File.separator + this.mfileName_lower + File.separator + mAndroidVersionFixed + this.mfileName_common + mAndroidNameTagFixed + "." + this.mFileType;
 
-                JavaFile_Item javaFile = new JavaFile_Item(absPath, parentPath, downloadPath, versionTagChar, api, androidVersion, visitedUrl);
+                JavaFile_Item javaFile = new JavaFile_Item(absPath,this.mfileName_common, parentPath, downloadPath, versionTagChar, api, androidVersion, visitedUrl);
                 allJavaFileList.add(javaFile);
             }
         }
@@ -1233,9 +1371,27 @@ ArrayPrint(tipLog,"提示信息");
     }
 
 
+    public static int getLineNum(File targetFile) {
+        long lineCount = 0 ;
+        try {
+
+            BufferedReader txtBR  = new BufferedReader(new InputStreamReader(new FileInputStream(targetFile),"utf-8"));
+
+
+            lineCount = txtBR.lines().count();  // 当前输入 1.txt的行数
+               txtBR.close();
+        } catch (Exception e) {
+            System.out.println(e.fillInStackTrace());
+        }
+
+        return (int)lineCount;
+    }
+
+
     static class JavaFile_Item {
         File targetJavaFile;   //  对应版本的目标java 文件
         File parrentFileDir;
+        String originFileName;
         boolean isfile_exist_local;
         boolean isfile_exit_innet; // 是否在 网络上存在
         String targetJavaFilePath;  // 目标java 文件的绝对路径
@@ -1249,7 +1405,7 @@ ArrayPrint(tipLog,"提示信息");
         ArrayList<String> methodList;  // 方法名列表
         ArrayList<String> memberList;   // 成员属性列表
 
-        JavaFile_Item(String absPath, String parentPath, String downloadUrl, char versionNickChar, int api, double version, String visitedUrl) {
+        JavaFile_Item(String absPath, String originalName , String parentPath, String downloadUrl, char versionNickChar, int api, double version, String visitedUrl) {
             this.targetJavaFilePath = absPath;
             this.mdownloadUrl = downloadUrl;
             this.parrentFileDir = new File(parentPath);
@@ -1257,6 +1413,7 @@ ArrayPrint(tipLog,"提示信息");
                 this.parrentFileDir.mkdirs();
             }
             this.targetJavaFile = new File(absPath);
+            this.originFileName = originalName;
             //targetJavaFile.listFiles()
             this.isfile_exist_local = targetJavaFile.exists();
             // 把  targetJavaFile的名称当做存放是否存在Tag Key
@@ -2005,5 +2162,376 @@ ArrayPrint(tipLog,"提示信息");
 
     }
 
+
+    @SuppressWarnings("unchecked")
+    static ArrayList<String>  analysisJavaFile_Method(File javaFile , String originalName){
+        ArrayList<String> arrMethodList = new   ArrayList<String>();
+        if(!javaFile.getName().endsWith(".java")){
+            return arrMethodList;   // 如果不为 .java 文件结尾的 那么 返回空
+        }
+
+        String javaName = originalName;
+        if (javaName.endsWith(".java")) {
+            javaName = javaName.substring(0, javaName.length() - ".java".length());
+        }
+
+
+
+        //   System.out.println("1 javaName ="+ javaName + " originalName ="+ originalName);
+
+        try {
+            CompilationUnit mCompilationUnit = JavaParser.parse(javaFile);
+            Optional<ClassOrInterfaceDeclaration> class_opt = mCompilationUnit.getClassByName(originalName);
+            ClassOrInterfaceDeclaration mClassDeclaration = null;
+            if (class_opt.isPresent()) {
+                mClassDeclaration = class_opt.get();
+            }
+
+            if (mClassDeclaration != null) {
+
+
+                List<MethodDeclaration> methodList = mClassDeclaration.getMethods();
+
+                ArrayList<MethodDeclaration> methodDecList_arr = new ArrayList<MethodDeclaration>();
+                for (MethodDeclaration mMethodDec : methodList) {
+                    methodDecList_arr.add(mMethodDec);
+                }
+
+                methodDecList_arr.sort(FieldMethod_Compare);
+
+                int index = 0;
+                for (MethodDeclaration methodDec : methodDecList_arr) {
+
+
+                    boolean isStaticMethod = methodDec.isStatic();
+                    boolean isNativeMethod = methodDec.isNative();
+                    boolean isSyncMethod = methodDec.isSynchronized();
+                    boolean isAbstractMethod = methodDec.isAbstract();
+                    boolean isFinalMethod = methodDec.isFinal();
+                    String modifyWord = "";
+                    if (isStaticMethod) {
+                        modifyWord = modifyWord + " static ";
+                    }
+                    if (isFinalMethod) {
+                        modifyWord = modifyWord + " final ";
+                    }
+
+                    if (isSyncMethod) {
+                        modifyWord = modifyWord + " sync ";
+                    }
+
+                    if (isNativeMethod) {
+                        modifyWord = modifyWord + " native ";
+                    }
+
+                    if (isAbstractMethod) {
+                        modifyWord = modifyWord + " abstract ";
+                    }
+
+                    modifyWord = modifyWord.trim();
+
+                    methodDec.isThrown("Exception");
+
+
+                    String methodName = methodDec.getNameAsString(); // 函数名称
+                    NodeList<Parameter> methodParamList = methodDec.getParameters();
+                    String paramStr = "";    // 函数的参数
+
+
+                    String methodDecStr = methodDec.getDeclarationAsString(false, false, false);
+                    int returnIndex = methodDecStr.indexOf(methodName);
+                    String returnString = "";
+                    if (returnIndex > 0) {
+                        returnString = methodDecStr.substring(0, returnIndex);
+                    }
+                    //  System.out.println("Signature =  "+  methodDec.getSignature().asString());
+                    //        System.out.println("getDeclarationAsString =  "+  methodDec.getDeclarationAsString());
+                    //       System.out.println("getDeclarationAsString2 =  "+  methodDec.getDeclarationAsString(false,false,false));
+                    for (Parameter param : methodParamList) {
+                        //  System.out.println("param = "+ param.toString());
+                        paramStr = paramStr + "," + param.toString();
+                    }
+                    paramStr = paramStr.trim();
+                    while (paramStr.startsWith(",")) {
+
+                        paramStr = paramStr.substring(1);
+                    }
+
+                    while (paramStr.endsWith(",")) {
+                        paramStr = paramStr.substring(1, paramStr.length());
+                    }
+
+                  //  System.out.println("returnString = " + returnString + "         methodName = " + methodName + "  paramStr = " + paramStr);
+                    //  methodDec.g
+                    // 继续点
+                    String resultStr = "方法索引"+index+": "+returnString+" "+methodName+"("+paramStr+")";
+
+                    if(resultStr.length() > MAX_COUNT_CHAR_IN_ROW){
+                         resultStr = "方法索引"+index+": "+returnString.trim()+" "+methodName+"(....."+")";
+                    }
+                    arrMethodList.add(resultStr);
+                    index ++ ;
+                }
+
+
+
+            }
+
+        }catch (FileNotFoundException e) {
+            //     System.out.println("X Exception ");
+
+            e.printStackTrace();
+        }
+
+        return arrMethodList;
+    }
+
+
+
+
+    @SuppressWarnings("unchecked")
+    static ArrayList<String>  analysisJavaFile_Member(File javaFile , String originalName){
+      ArrayList<String> arrMemberList = new   ArrayList<String>();
+      if(!javaFile.getName().endsWith(".java")){
+          return arrMemberList;   // 如果不为 .java 文件结尾的 那么 返回空
+      }
+
+      String javaName = originalName;
+      if (javaName.endsWith(".java")) {
+          javaName = javaName.substring(0, javaName.length() - ".java".length());
+      }
+
+
+
+    //   System.out.println("1 javaName ="+ javaName + " originalName ="+ originalName);
+
+      try {
+          CompilationUnit mCompilationUnit = JavaParser.parse(javaFile);
+
+          Optional<ClassOrInterfaceDeclaration> class_opt = mCompilationUnit.getClassByName(originalName);
+          ClassOrInterfaceDeclaration mClassDeclaration = null;
+          if (class_opt.isPresent()) {
+              mClassDeclaration = class_opt.get();
+          }
+
+          if (mClassDeclaration != null) {
+
+
+              List<FieldDeclaration> fieldDecList = mClassDeclaration.getFields();
+
+          //    System.out.println("2 fieldDecList ="+ fieldDecList.size());
+              ArrayList<FieldDeclaration> fieldDecList_arr = new ArrayList<FieldDeclaration>();
+
+              for (FieldDeclaration mfield : fieldDecList) {
+                  fieldDecList_arr.add(mfield);
+              }
+              fieldDecList_arr.sort(FieldDeclaration_Compare);
+
+              for (int i = 0; i < fieldDecList_arr.size(); i++) {
+                  FieldDeclaration fieldItem = fieldDecList_arr.get(i);
+                  fieldItem.isTransient();
+
+
+                  boolean isStaticField = fieldItem.isStatic();
+                  boolean isFinalField = fieldItem.isFinal();
+                  boolean isVolatileField = fieldItem.isVolatile();
+                  fieldItem.isPrivate();
+                  fieldItem.isProtected();
+                  fieldItem.isPublic();
+
+                  String fieldModifyStr = "";
+
+                  if (isStaticField) {
+                      fieldModifyStr = fieldModifyStr + " static ";
+                  }
+
+                  if (isFinalField) {
+                      fieldModifyStr = fieldModifyStr + " final ";
+                  }
+
+                  if (isVolatileField) {
+                      fieldModifyStr = fieldModifyStr + " volatile ";
+                  }
+                  fieldModifyStr = fieldModifyStr.trim();
+
+                  String metaModelFieldName = fieldItem.getMetaModel().getMetaModelFieldName();
+                  String mQualifiedClassName = fieldItem.getMetaModel().getQualifiedClassName();
+                  String mTypeNam = fieldItem.getMetaModel().getTypeName();
+                  String mTypeNameGenerified = fieldItem.getMetaModel().getTypeNameGenerified();
+                  String getMetaModelString = fieldItem.getMetaModel().toString();
+
+
+                  PrettyPrinterConfiguration mPrintConfig = new PrettyPrinterConfiguration();
+                  mPrintConfig.setPrintComments(false);
+                  fieldItem.toString(mPrintConfig);
+                  String mTypeAndName = fieldItem.toString();
+
+
+                  // 去掉注释
+                  while (mTypeAndName.contains("/*") && mTypeAndName.trim().startsWith("/*") && mTypeAndName.contains("*/")) {
+                      mTypeAndName = mTypeAndName.substring(mTypeAndName.indexOf("*/") + 2).trim();
+                  }
+
+                  // 去掉解析出来的 静态 = 等于后面的详细内容
+                  if (mTypeAndName.trim().startsWith("//")) {
+                      mTypeAndName = mTypeAndName.substring( mTypeAndName.indexOf("\n")+1).trim();
+                  }
+                   // 去掉前面的空格 以及 换行符号
+                  while (mTypeAndName.contains("\n")) {
+                      mTypeAndName = mTypeAndName.substring(mTypeAndName.indexOf("\n") + 1).trim();
+                  }
+               //   System.out.println("属性索引"+i+":"+" "+mTypeAndName);
+
+
+                  if(mTypeAndName.length() > MAX_COUNT_CHAR_IN_ROW){
+                      mTypeAndName = mTypeAndName.substring(0,MAX_COUNT_CHAR_IN_ROW-30);
+                  }
+                  arrMemberList.add("属性索引"+i+":"+" "+mTypeAndName);
+
+              }
+
+
+
+
+          }
+
+
+
+
+      } catch (FileNotFoundException e) {
+     //     System.out.println("X Exception ");
+
+          e.printStackTrace();
+      }
+
+      //  System.out.println("X end  X");
+
+      return arrMemberList;
+    }
+
+    @SuppressWarnings("unchecked")
+    static Comparator FieldDeclaration_Compare =  new Comparator<FieldDeclaration>() {
+        @Override
+        public int compare(FieldDeclaration o1, FieldDeclaration o2) {
+
+            if (o1 == o2) {
+                return 0;
+            }
+            boolean isStaticField1 = o1.isStatic();
+            boolean isFinalField1 = o1.isFinal();
+            boolean isVolatileField1 = o1.isVolatile();
+
+            boolean isStaticField2 = o2.isStatic();
+            boolean isFinalField2 = o2.isFinal();
+            boolean isVolatileField2 = o2.isVolatile();
+
+            if (isStaticField1 != isStaticField2) {
+                if (isStaticField1) {
+                    return 1;
+                }
+                if (isStaticField2) {
+                    return -1;
+                }
+            }
+
+
+            if (isFinalField1 != isFinalField2) {
+                if (isFinalField1) {
+                    return 1;
+                }
+                if (isFinalField2) {
+                    return -1;
+                }
+            }
+
+
+            if (isVolatileField1 != isVolatileField2) {
+                if (isVolatileField1) {
+                    return 1;
+                }
+                if (isVolatileField2) {
+                    return -1;
+                }
+            }
+
+            return 0;
+
+        }
+    };
+
+    @SuppressWarnings("unchecked")
+    static Comparator FieldMethod_Compare =  new Comparator<MethodDeclaration>() {
+        @Override
+        public int compare(MethodDeclaration o1, MethodDeclaration o2) {
+
+
+            if (o1 == o2) {
+                return 0;
+            }
+
+            boolean isStaticMethod1 = o1.isStatic();
+            boolean isNativeMethod1 = o1.isNative();
+            boolean isSyncMethod1 = o1.isSynchronized();
+            boolean isAbstractMethod1 = o1.isAbstract();
+            boolean isFinalMethod1 = o1.isFinal();
+
+
+            boolean isStaticMethod2 = o2.isStatic();
+            boolean isNativeMethod2 = o2.isNative();
+            boolean isSyncMethod2 = o2.isSynchronized();
+            boolean isAbstractMethod2 = o2.isAbstract();
+            boolean isFinalMethod2 = o2.isFinal();
+
+            if (isStaticMethod1 != isStaticMethod2) {
+                if (isStaticMethod1) {
+                    return 1;
+                }
+                if (isStaticMethod2) {
+                    return -1;
+                }
+            }
+
+
+            if (isNativeMethod1 != isNativeMethod2) {
+                if (isNativeMethod1) {
+                    return 1;
+                }
+                if (isNativeMethod2) {
+                    return -1;
+                }
+            }
+
+            if (isSyncMethod1 != isSyncMethod2) {
+                if (isSyncMethod1) {
+                    return 1;
+                }
+                if (isSyncMethod2) {
+                    return -1;
+                }
+            }
+
+
+            if (isAbstractMethod1 != isAbstractMethod2) {
+                if (isAbstractMethod1) {
+                    return 1;
+                }
+                if (isAbstractMethod2) {
+                    return -1;
+                }
+            }
+
+
+            if (isFinalMethod1 != isFinalMethod2) {
+                if (isFinalMethod1) {
+                    return 1;
+                }
+                if (isFinalMethod2) {
+                    return -1;
+                }
+            }
+
+            return 0;
+        }
+    };
 }
 

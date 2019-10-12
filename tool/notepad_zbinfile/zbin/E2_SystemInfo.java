@@ -241,37 +241,37 @@ static ArrayList<WifiItem> wifiItemList = new ArrayList<WifiItem>();
         Runtime r = Runtime.getRuntime();
         Properties props = System.getProperties();
         InetAddress addr;
-        addr = InetAddress.getLocalHost();
+        addr = InetAddress.getLocalHost();  // 【InetAddress.getLocalHost().getHostAddress()】
         String ip = addr.getHostAddress();
-        Map<String, String> map = System.getenv();
+        Map<String, String> map = System.getenv();  // System.getenv().get("USERNAME")
         ArrayList<String> propertyList = new ArrayList<String>();
         String userName = map.get("USERNAME");// 获取用户名
         String computerName = map.get("COMPUTERNAME");// 获取计算机名
         String userDomain = map.get("USERDOMAIN");// 获取计算机域名
-        propertyList.add("用户名:" + userName);
-        propertyList.add("计算机名:" + computerName);
-        propertyList.add("计算机域名:" + userDomain);
-        propertyList.add("本地ip地址:" + ip);
-        propertyList.add("本地主机名:" + addr.getHostName());
-        propertyList.add("JVM可以使用的总内存:" + r.totalMemory());
-        propertyList.add("JVM可以使用的剩余内存:  " + r.freeMemory());
-        propertyList.add("JVM可以使用的处理器个数:" + r.availableProcessors());
-        propertyList.add("Java的运行环境版本:" + props.getProperty("java.version"));
-        propertyList.add("Java的运行环境供应商:" + props.getProperty("java.vendor"));
-        propertyList.add("Java供应商的URL:" + props.getProperty("java.vendor.url"));
-        propertyList.add("Java的安装路径:" + props.getProperty("java.home"));
-        propertyList.add("Java的虚拟机规范版本:" + props.getProperty("java.vm.specification.version"));
-        propertyList.add("Java的虚拟机规范供应商:" + props.getProperty("java.vm.specification.vendor"));
-        propertyList.add("Java的虚拟机规范名称:" + props.getProperty("java.vm.specification.name"));
-        propertyList.add("Java的虚拟机实现版本:" + props.getProperty("java.vm.version"));
-        propertyList.add("Java的虚拟机实现供应商:" + props.getProperty("java.vm.vendor"));
-        propertyList.add("Java的虚拟机实现名称:" + props.getProperty("java.vm.name"));
-        propertyList.add("Java运行时环境规范版本:" + props.getProperty("java.specification.version"));
-        propertyList.add("Java运行时环境规范供应商:" + props.getProperty("java.specification.vender"));
-        propertyList.add("Java运行时环境规范名称:" + props.getProperty("java.specification.name"));
-        propertyList.add("Java的类格式版本号:" + props.getProperty("java.class.version"));
-        propertyList.add("Java的类路径:" + props.getProperty("java.class.path"));
-        propertyList.add("加载库时搜索的路径列表:" + props.getProperty("java.library.path"));
+        propertyList.add("用户名:"+"【System.getenv().get(\"USERNAME\")"+"】" + userName);
+        propertyList.add("计算机名:【System.getenv().get(\"COMPUTERNAME\")】" + computerName);
+        propertyList.add("计算机域名:【System.getenv().get(\"USERDOMAIN\")\"】" + userDomain);
+        propertyList.add("本地ip地址:" +"【InetAddress.getLocalHost().getHostAddress()】 "+ ip);
+        propertyList.add("本地主机名:" +"【InetAddress.getLocalHost().getHostName()】 "+  addr.getHostName());
+        propertyList.add("JVM可以使用的总内存:" +"【Runtime.getRuntime().totalMemory()】 "+ r.totalMemory());  // 【Runtime.getRuntime().totalMemory()】
+        propertyList.add("JVM可以使用的剩余内存:" +"【Runtime.getRuntime().freeMemory()】 "+ r.freeMemory());
+        propertyList.add("JVM可以使用的处理器个数:"  +"【Runtime.getRuntime().availableProcessors()】 "+ r.availableProcessors());
+        propertyList.add("Java的运行环境版本:" + "【java.version】"+ props.getProperty("java.version"));
+        propertyList.add("Java的运行环境供应商:" + "【java.vendor】"+props.getProperty("java.vendor"));
+        propertyList.add("Java供应商的URL:" +"【java.vendor.url】"+ props.getProperty("java.vendor.url"));
+        propertyList.add("Java的安装路径:" +"【java.home】"+ props.getProperty("java.home"));
+        propertyList.add("Java的虚拟机规范版本:" +"【java.vm.specification.version】"+  props.getProperty("java.vm.specification.version"));
+        propertyList.add("Java的虚拟机规范供应商:"  +"【java.vm.specification.vendor】"+  props.getProperty("java.vm.specification.vendor"));
+        propertyList.add("Java的虚拟机规范名称:" +"【java.vm.specification.name】"+  props.getProperty("java.vm.specification.name"));
+        propertyList.add("Java的虚拟机实现版本:" +"【java.vm.version】"+ props.getProperty("java.vm.version"));
+        propertyList.add("Java的虚拟机实现供应商:" +"【java.vm.vendor】"+ props.getProperty("java.vm.vendor"));
+        propertyList.add("Java的虚拟机实现名称:" + "【java.vm.name】"+  props.getProperty("java.vm.name"));
+        propertyList.add("Java运行时环境规范版本:" + "【java.specification.version】"+  props.getProperty("java.specification.version"));
+        propertyList.add("Java运行时环境规范供应商:" + "【java.specification.vender】"+  props.getProperty("java.specification.vender"));
+        propertyList.add("Java运行时环境规范名称:" + "【java.specification.name】"+  props.getProperty("java.specification.name"));
+        propertyList.add("Java的类格式版本号:" + "【java.class.version】"+  props.getProperty("java.class.version"));
+        propertyList.add("Java的类路径:" + "【java.class.path】"+  props.getProperty("java.class.path"));
+        propertyList.add("加载库时搜索的路径列表:" + "【java.library.path】"+ props.getProperty("java.library.path"));
 /*        System.out.println("用户名:  " + userName);
         System.out.println("计算机名:  " + computerName);
         System.out.println("计算机域名:  " + userDomain);

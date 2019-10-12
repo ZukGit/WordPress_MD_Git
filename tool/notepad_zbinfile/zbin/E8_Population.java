@@ -47,8 +47,13 @@ public class E8_Population {
         }
 
 
-        getDetailInput();
-        calculInfoMation();
+        if(!checkParamOK()){
+            return;
+        }
+        if(!getDetailInput()){
+            return;
+        }
+        calculSingleTimeInfo(SingleAgeAndBirthYear);
 
 
         //
@@ -132,143 +137,680 @@ public class E8_Population {
 
 
 
+    /*╔════════════════════════════════════════════════命令格式提示═════════════════════════════════════════════════════════════╗
+    ║ 输出当前统计记录-----:【 zpopulation_E8   】 //打印 1949年 至 2018年 人口统计数据                                       ║
+    ║ 依据年龄输出记录-----:【 zpopulation_E8 17 18 19 】 //当前年龄为 17 18 19岁的人的情况                                   ║
+    ║ 依据出生输出记录-----:【 zpopulation_E8 1992  1993 1994 】 //输出1992年  1993年  1994年 的出生的人口情况                ║
+    ║ 依据年龄范围输出记录-:【 zpopulation_E8 30+40 】 //当前年龄为 从30到40年龄的人口情况                                    ║
+    ║ 依据出生范围输出记录-:【 zpopulation_E8 1990+1999 】 //输出1990年后至1999年出生(90后)的人口情况                         ║
+    ║ 依据出生输出对比记录-:【 zpopulation_E8 1990:1999 】 //对比 1990和1999年的人口情况                                      ║
+    ║ 依据年龄输出对比记录-:【 zpopulation_E8 23:26 】 //对比当前23和26岁的人口情况                                           ║
+    ║ 依据年龄范围输出记录-:【 zpopulation_E8 60+ 】 //当前年龄为60岁以上(现在为终点)人群统计  数据从1949年开始               ║
+    ║ 依据出生范围输出记录-:【 zpopulation_E8 1990+ 】 //对从1992年出生到现在人群统计  数据从1949年开始                       ║
+    ╚═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
+            */
 
-    static ArrayList<String> SingleAge = new ArrayList<>();
-    static String AgeTag = "age:";
-    static ArrayList<String> RankAge = new ArrayList<>();
-    static ArrayList<String> SingleBirth = new ArrayList<>();
-    static String BirthTag = "birth:";
-    static ArrayList<String> RankBirth = new ArrayList<>();
+    //    static ArrayList<String> SingleAge = new ArrayList<>();    // 【 zpopulation_E8 17 18 19 】
+//    static ArrayList<String> SingleBirth = new ArrayList<>();  //  【 zpopulation_E8 1992  1993 1994 】
+    static ArrayList<AgeAndBirthSingleItem> SingleAgeAndBirthYear = new ArrayList<>();  //  【 zpopulation_E8 1992  1993 1994 】
 
-    static ArrayList<String> CompBirth = new ArrayList<>();
-    static ArrayList<String> CompAge = new ArrayList<>();
+    static ArrayList<String> RankAge = new ArrayList<>();   // 【 zpopulation_E8 30+40 】
+    static ArrayList<String> RankBirth = new ArrayList<>();  //  【 zpopulation_E8 1990+1999 】
+    static ArrayList<String> CompBirth = new ArrayList<>();  // 【 zpopulation_E8 1990:1999 】
+    static ArrayList<String> CompAge = new ArrayList<>();    // 【 zpopulation_E8 23:26 】
+    static ArrayList<String> BeginAge = new ArrayList<>();    // 【 zpopulation_E8 60+】
+    static ArrayList<String> BeginBirth = new ArrayList<>();    // 【 zpopulation_E8 1990+ 】
 
-    static void calculInfoMation() {
-        toCalculSingleAge(SingleAge);
-
-
+    static class AgeAndBirthSingleItem{
+        int currentAge;
+        int currentBirthYear;
+        String currentTitle;
+        AgeAndBirthSingleItem(int age , int birthYear , String title){
+            this.currentAge = age;
+            this.currentBirthYear = birthYear;
+            this.currentTitle = title;
+        }
     }
-    static void toCalculSingleAge( ArrayList<String> singleAgeList) {
-        // age:17 age:18 age:19
-        for (int i = 0; i < singleAgeList.size(); i++) {
-            String rawInputStr  = singleAgeList.get(i);
-            int ageIndex = rawInputStr.indexOf(AgeTag);
-            int ageLength =AgeTag.length();
-            String ageStr = rawInputStr.substring(ageIndex+ageLength);
-            int singleAge = Integer.parseInt(ageStr);
-            int curBirthYear = currentYear - singleAge;
-            int defaultCompBirthYear = getEndRecordYear();
-            int defaultYear = currentYear - defaultCompBirthYear;
-            showSingleAge(singleAge,curBirthYear,defaultYear,defaultCompBirthYear,true);
+
+    static class AgeAndBirthBeginItem{
+        int beginAge;
+        int endAge;
+        int beginBirthYear;
+        int endBirthYear;
+        String currentTitle;
+    }
+
+
+    static class AgeAndBirthRang{
+        int beginAge;
+        int endAge;
+        int beginBirthYear;
+        int endBirthYear;
+        String currentTitle;
+    }
+
+
+    static void calculSingleTimeInfo(ArrayList<AgeAndBirthSingleItem>  ageList) {
+        // toCalculSingleAge(SingleAge);  //  继续点
+
+
+        for (int i = 0; i < ageList.size(); i++) {
+            AgeAndBirthSingleItem item = ageList.get(i);
+            int inputYear = item.currentBirthYear;
+            int inputAge = item.currentAge;
+            String title = item.currentTitle;
+            int recordMaxYear = getEndRecordYear();
+            showSingleAge(inputAge,inputYear,recordMaxYear,title);
+
         }
 
     }
 
-    static void showSingleAge( int ageA ,int birthA ,int ageB,int birthB , boolean inputAge) {
-        ArrayList<String> singleAgeList = new  ArrayList<String>();
+
+
+    static void showSingleAge( int ageA ,int birthA ,int compareYear ,String title ) {
+
 
         PopulationYear_Item itemA = getPopulationWithYear(birthA);
-        PopulationYear_Item itemB = getPopulationWithYear(birthB);
+        PopulationYear_Item itemB = getPopulationWithYear(compareYear);
+        PopulationYear_Item itemC = null;  // 当前最新的年份
+        int comapreAge = currentYear - compareYear;
         if(itemA == null){
             System.out.println("无法查询到 年龄("+ageA+")--出生年份("+birthA+") 的人口数据!");
             return ;
         }
         if(itemB == null){
-            System.out.println("无法查询到 年龄("+ageB+")--出生年份("+birthB+") 的人口数据!");
+            System.out.println("无法查询到 年龄("+comapreAge+")--出生年份("+compareYear+") 的人口数据!");
             return ;
         }
-        boolean isSingle = (birthB == getEndRecordYear());
 
-        singleAgeList.add("当前查询年龄:"+ageA+"岁");
-        singleAgeList.add("出生年份:"+birthA+"年");
-        singleAgeList.add("属相:"+itemA.mAnimalString);
-        singleAgeList.add("当前("+birthA+"年)总人口:" + calculWanRen(itemA.curSumNum));
-        singleAgeList.add("现在已记录("+getEndRecordYear()+"年)"+"总人口:"+calculWanRen(getEndRecordYear_PeopleCount()));
-        singleAgeList.add("差距总人口数:("+getEndRecordYear()+"-"+birthA+")"+ calculWanRen(getEndRecordYear_PeopleCount() -itemA.curSumNum ));
-        singleAgeList.add("当前("+birthA+"年)出生人数:"+calculWanRen(itemA.birthnum));
-        singleAgeList.add("现在已记录("+getEndRecordYear()+"年)"+"出生人数:"+calculWanRen(getEndRecordYear_BirthNum()));
+        boolean isSameYear = false;
+        boolean isInoutMaxRecordYear = false;
+        if(birthA == compareYear){
+            isSameYear = true;
+        }
 
-        singleAgeList.add("当前("+birthA+"年)出生率:" + itemA.birthRate + "‰"+"  (千人出生 "+itemA.birthRate+"人)");
-        singleAgeList.add("现在已记录("+getEndRecordYear()+"年)"+"出生率:"+ itemB.birthRate + "‰"+"  (千人出生 "+itemB.birthRate+"人)");
+        if(birthA == getEndRecordYear() || compareYear ==getEndRecordYear()){
+            isInoutMaxRecordYear = true;
+        }
 
-        singleAgeList.add("当前("+birthA+"年)出生人数(男):"+calculWanRen(itemA.bitrhManNum));
-        singleAgeList.add("现在已记录("+getEndRecordYear()+"年)"+"出生人数(男):"+calculWanRen(itemB.bitrhManNum));
-        singleAgeList.add("当前("+birthA+"年)出生人数(女):"+calculWanRen(itemA.bitrhWomanNum));
-        singleAgeList.add("现在已记录("+getEndRecordYear()+"年)"+"出生人数(女):"+calculWanRen(itemB.bitrhWomanNum));
+        // isSameYear= false  isInoutMaxRecordYear = false  //  不是同一年  并且输入的也不是记录的最新年份  那么分别对比  【A ,B】
 
-        singleAgeList.add("当前("+birthA+"年)人口性别比:" + itemA.sexRate);
-        singleAgeList.add("现在已记录("+getEndRecordYear()+"年)"+"当前("+birthA+"年)人口性别比:"+itemB.sexRate);
+        // isSameYear = true   isInoutMaxRecordYear = false  // 查询的是同一年  但不是最新的那年   那么把 对比的那年设置为 对比的年份
+        // itemB = getPopulationWithYear(getEndRecordYear());   // 【A,New】  提示用户
+        // isSameYear = false   isInoutMaxRecordYear = true           // 不是同一年    输入的年龄为 最新的 那么 对比 【new , A】
+        // isSameYear= true  isInoutMaxRecordYear = true          // 【new  new 】     , 那么 将自己与自己对比  【new , new 】
 
-        singleAgeList.add("当前("+birthA+"年)男性人口:" + calculWanRen(itemA.curManNum));
-        singleAgeList.add("现在已记录("+getEndRecordYear()+"年)"+"男性人口:"+calculWanRen(itemB.curManNum));
+        if(isSameYear && isInoutMaxRecordYear){  // true  true   只显示一个的信息  【  1 0 0 】
+            itemC = null;
+            itemB = null;
 
-        singleAgeList.add("当前("+birthA+"年)女性人口:" + calculWanRen(itemA.curWomanNum));
-        singleAgeList.add("现在已记录("+getEndRecordYear()+"年)"+"女性人口:"+calculWanRen(itemB.curWomanNum));
+        }else if(!isSameYear && !isInoutMaxRecordYear){  // false   false   【 1 1 1 】
+            itemC = getPopulationWithYear(getEndRecordYear());  // 当前最新的年份
 
-        singleAgeList.add("当前("+birthA+"年)总人口男女数量差(男):" + calculWanRen(itemA.cur_man_woman_distance));
-        singleAgeList.add("现在已记录("+getEndRecordYear()+"年)"+"当前("+birthA+"年)总人口男女数量差(男):"+calculWanRen(itemB.cur_man_woman_distance));
+        }else if(isSameYear && !isInoutMaxRecordYear){  //   【1 1 0 】 true   false   两个不是最新的 相同的对比  那么设置itemB为最新的年份
+            itemB = getPopulationWithYear(getEndRecordYear());
+            itemC = null;
 
-        singleAgeList.add("当前("+birthA+"年)出生率:" + itemA.birthRate + "‰"+"  (千人出生 "+itemA.birthRate+"人)");
-        singleAgeList.add("当前("+birthA+"年)死亡率:" + itemA.deadRate + "‰"+"  (千人死亡 "+itemA.deadRate+"人)");
-        singleAgeList.add("当前("+birthA+"年)自然增长率:" + itemA.addRate + "‰"+"  (千人净增 "+itemA.addRate+"人)");
+        }else if(!isSameYear && isInoutMaxRecordYear){  // false   true  【 1  1  0 】
+            itemC = null;
+        }
 
-        singleAgeList.add("现在已记录("+getEndRecordYear()+"年)"+"出生率:" + itemB.birthRate + "‰"+"  (千人出生 "+itemB.birthRate+"人)");
-        singleAgeList.add("现在已记录("+getEndRecordYear()+"年)"+"死亡率:"  + itemB.deadRate + "‰"+"  (千人死亡 "+itemB.deadRate+"人)");
-        singleAgeList.add("现在已记录("+getEndRecordYear()+"年)"+"自然增长率:" + itemB.addRate + "‰"+"  (千人净增 "+itemB.addRate+"人)");
+
+        showThreeInfoMation(itemA , itemB  , itemC , title);
 
 
 
-        singleAgeList.add("当前("+birthA+"年)净增长人数:" + calculWanRen(itemA.pureNum));
-        singleAgeList.add("现在已记录("+getEndRecordYear()+"年)"+"净增长人数:" + calculWanRen(itemB.pureNum));
-        singleAgeList.add("当前("+birthA+"年)净增长人数(男):" + calculWanRen(itemA.pureManNum));
-        singleAgeList.add("现在已记录("+getEndRecordYear()+"年)"+"净增长人数(男):" + calculWanRen(itemB.pureManNum));
-        singleAgeList.add("当前("+birthA+"年)净增长人数(女):" + calculWanRen(itemA.pureWomanNum));
-        singleAgeList.add("现在已记录("+getEndRecordYear()+"年)"+"净增长人数(女):" + calculWanRen(itemB.pureWomanNum));
 
-        singleAgeList.add("当前("+birthA+"年)死亡人口:" + calculWanRen(itemA.deadnum));
-        singleAgeList.add("现在已记录("+getEndRecordYear()+"年)"+"当前("+birthA+"年)死亡人口:" + calculWanRen(itemB.deadnum));
-        singleAgeList.add("当前("+birthA+"年)死亡人口(男):" + calculWanRen(itemA.deadMan));
-        singleAgeList.add("现在已记录("+getEndRecordYear()+"年)"+"当前("+birthA+"年)死亡人口(男):" + calculWanRen(itemB.deadMan));
-        singleAgeList.add("当前("+birthA+"年)死亡人口(女):" + calculWanRen(itemA.deadWoman));
-        singleAgeList.add("现在已记录("+getEndRecordYear()+"年)"+"当前("+birthA+"年)死亡人口(女):" + calculWanRen(itemB.deadWoman));
+    }
 
-        ArrayPrint(singleAgeList,inputAge?"age:"+ageA+"岁人口情况":"birth:"+birthA+"年人口情况");
+    static void  showThreeInfoMation(PopulationYear_Item  itemA,PopulationYear_Item itemB , PopulationYear_Item itemC , String title) {
+        ArrayList<String> singleAgeList = new  ArrayList<String>();
+        int birthA = itemA.year;
+        int ageA = itemA.curAge;
+
+        if(itemB == null && itemC == null){   // 显示单独的最新的   【1 0 0 】
+            populationInfoYear(birthA,title);
+
+        }else if (itemB != null && itemC == null){  //  【1 1 0 】
+
+            // 显示 对比的数据
+
+            int birthB = itemB.year ;
+            int distanceYear = 0;
+            if(birthA > itemB.year){
+                distanceYear = birthA - itemB.year;
+            }else{
+                distanceYear = itemB.year - birthA ;
+            }
+            singleAgeList.add("当前查询年龄:[ "+birthA+"年 ]"+"[ "+ageA+"岁 ]");
+            singleAgeList.add("对比查询年龄:[ "+birthB+"年 ]"+"[ "+itemB.curAge+"岁 ]");
+
+            singleAgeList.add("出生年份:"+birthA+"年");
+            singleAgeList.add("对比年份:"+birthB+"年");
+            singleAgeList.add("相差年份:"+distanceYear+"年");
+
+
+            singleAgeList.add(birthA+"年属相:"+itemA.mAnimalString);
+            singleAgeList.add(birthB+"年属相:"+itemB.mAnimalString);
+
+
+            long distance2 = 0 ;
+            if(itemA.curSumNum > itemB.curSumNum){
+                distance2 = itemA.curSumNum - itemB.curSumNum;
+            }else{
+                distance2 =  itemB.curSumNum - itemA.curSumNum ;
+            }
+
+            singleAgeList.add("("+birthA+"年)总人口:" + calculWanRen(itemA.curSumNum));
+            singleAgeList.add("("+birthB+"年)总人口:" + calculWanRen(itemB.curSumNum));
+            singleAgeList.add("("+birthA+"---"+birthB+"年)总人口差距:"+calculWanRen(distance2));
+
+
+
+
+
+
+
+
+
+
+            // singleAgeList.add("差距总人口数:("+getEndRecordYear()+"-"+birthA+")"+ calculWanRen(getEndRecordYear_PeopleCount() -itemA.curSumNum ));
+
+            long distance5 = 0 ;
+            if(itemA.birthnum > itemB.birthnum){
+                distance5 = itemA.birthnum - itemB.birthnum;
+            }else{
+                distance5 =  itemB.birthnum - itemA.birthnum ;
+            }
+            singleAgeList.add("("+birthA+"年)出生人数:"+calculWanRen(itemA.birthnum));
+            singleAgeList.add("("+birthB+"年)出生人数:"+calculWanRen(itemB.birthnum));
+            singleAgeList.add("("+birthA+"---"+birthB+"年)出生人数差距:"+calculWanRen(distance5));
+
+
+
+
+            double distace6 = 0;
+            if(itemA.birthRate > itemB.birthRate){
+                distace6 = itemA.birthRate - itemB.birthRate;
+            }else{
+                distace6 =  itemB.birthRate - itemA.birthRate ;
+            }
+
+
+
+
+            singleAgeList.add("当前("+birthA+"年)出生率:" + itemA.birthRate + "‰"+"  (千人出生 "+itemA.birthRate+"人)");
+            singleAgeList.add("对比("+itemB.year+"年)出生率:" + itemB.birthRate + "‰"+"  (千人出生 "+itemB.birthRate+"人)");
+            singleAgeList.add("差距("+itemA.year+"年"+"---"+itemB.year+"年"+")出生率差距:" + Double.parseDouble(nf_6.format(distace6)) + "‰"+"  (千人出生差距 "+Double.parseDouble(nf_6.format(distace6))+"人)");
+
+
+            long distace7 = 0;
+            if(itemA.bitrhManNum > itemB.bitrhManNum){
+                distace7 = itemA.bitrhManNum - itemB.bitrhManNum;
+            }else{
+                distace7 =  itemB.bitrhManNum - itemA.bitrhManNum ;
+            }
+
+            singleAgeList.add("("+birthA+"年)出生人数(男):"+calculWanRen(itemA.bitrhManNum));
+            singleAgeList.add("("+birthB+"年)出生人数(男):"+calculWanRen(itemB.bitrhManNum));
+            singleAgeList.add("("+birthA+"---"+birthB+"年)出生人数相差(男):"+calculWanRen(distace7));
+
+
+            long distace8 = 0;
+            if(itemA.bitrhWomanNum > itemB.bitrhWomanNum){
+                distace8 = itemA.bitrhWomanNum - itemB.bitrhWomanNum;
+            }else{
+                distace8 =  itemB.bitrhWomanNum - itemA.bitrhWomanNum ;
+            }
+
+            singleAgeList.add("("+birthA+"年)出生人数(女):"+calculWanRen(itemA.bitrhWomanNum));
+            singleAgeList.add("("+birthB+"年)出生人数(女):"+calculWanRen(itemB.bitrhWomanNum));
+            singleAgeList.add("("+birthA+"---"+birthB+"年)出生人数相差(女):"+calculWanRen(distace8));
+
+
+            double distace9 = 0;
+            if(itemA.sexRate > itemB.sexRate){
+                distace9 = itemA.sexRate - itemB.sexRate;
+            }else{
+                distace9 =  itemB.sexRate - itemA.sexRate ;
+            }
+
+            singleAgeList.add("("+birthA+"年)人口性别比:" + itemA.sexRate);
+            singleAgeList.add("("+birthB+"年)人口性别比:" + itemB.sexRate);
+            singleAgeList.add("("+birthA+"---"+birthB+"年)人口性别比差距:" + Double.parseDouble(nf_6.format(distace9)));
+
+
+            long distace10 = 0;
+            if(itemA.curManNum > itemB.curManNum){
+                distace10 = itemA.curManNum - itemB.curManNum;
+            }else{
+                distace10 =  itemB.curManNum - itemA.curManNum ;
+            }
+
+            singleAgeList.add("("+birthA+"年)男性人口:" + calculWanRen(itemA.curManNum));
+            singleAgeList.add("("+birthB+"年)男性人口:" + calculWanRen(itemB.curManNum));
+            singleAgeList.add("("+birthA+"---"+birthB+"年)男性人口人口差距:" + calculWanRen(distace10));
+
+
+            long distace11 = 0;
+            if(itemA.curWomanNum > itemB.curWomanNum){
+                distace11 = itemA.curWomanNum - itemB.curWomanNum;
+            }else{
+                distace11 =  itemB.curWomanNum - itemA.curWomanNum ;
+            }
+
+            singleAgeList.add("("+birthA+"年)女性人口:" + calculWanRen(itemA.curWomanNum));
+            singleAgeList.add("("+birthB+"年)女性人口:" + calculWanRen(itemB.curWomanNum));
+            singleAgeList.add("("+birthA+"---"+birthB+"年)女性人口人口差距:" + calculWanRen(distace11));
+
+
+            long distace12 = 0;
+            if(itemA.cur_man_woman_distance > itemB.cur_man_woman_distance){
+                distace12 = itemA.cur_man_woman_distance - itemB.cur_man_woman_distance;
+            }else{
+                distace12 =  itemB.cur_man_woman_distance - itemA.cur_man_woman_distance ;
+            }
+            singleAgeList.add("("+birthA+"年)总人口男女数量差(男):" + calculWanRen(itemA.cur_man_woman_distance));
+            singleAgeList.add("("+birthB+"年)总人口男女数量差(男):" + calculWanRen(itemB.cur_man_woman_distance));
+            singleAgeList.add("("+birthA+"---"+birthB+"年)总人口男女数量差(男):" + calculWanRen(distace12));
+
+            double   distace13 = 0 ;
+            if(itemA.birthRate > itemB.birthRate){
+                distace13 = itemA.birthRate - itemB.birthRate;
+            }else{
+                distace13 =  itemB.birthRate - itemA.birthRate ;
+            }
+
+//            singleAgeList.add("("+birthA+"年)出生率:" + itemA.birthRate + "‰"+"  (千人出生 "+itemA.birthRate+"人)");
+//            singleAgeList.add("("+birthB+"年)出生率:" + itemB.birthRate + "‰"+"  (千人出生 "+itemB.birthRate+"人)");
+//            singleAgeList.add("("+birthA+"---"+birthB+"年)出生率差距:" + distace13+ "‰"+"  (千人出生差距: "+distace13+"人)");
+
+
+            double   distace14 = 0 ;
+            if(itemA.deadRate > itemB.deadRate){
+                distace14 = itemA.deadRate - itemB.deadRate;
+            }else{
+                distace14 =  itemB.deadRate - itemA.deadRate ;
+            }
+
+            singleAgeList.add("("+birthA+"年)死亡率:" + itemA.deadRate + "‰"+"  (千人死亡 "+itemA.deadRate+"人)");
+            singleAgeList.add("("+birthB+"年)死亡率:" + itemB.deadRate + "‰"+"   (千人死亡 "+itemB.deadRate+"人)");
+            singleAgeList.add("("+birthA+"---"+birthB+"年)死亡率差距:" + Double.parseDouble(nf_2.format(distace14)) + "‰"+"  (千人死亡差距: "+Double.parseDouble(nf_2.format(distace14))+"人)");
+
+
+            double   distace15 = 0 ;
+            if(itemA.addRate > itemB.addRate){
+                distace15 = itemA.addRate - itemB.addRate;
+            }else{
+                distace15 =  itemB.addRate - itemA.addRate ;
+            }
+
+            singleAgeList.add("("+birthA+"年)自然增长率:" + itemA.addRate + "‰"+"  (千人净增 "+itemA.addRate+"人)");
+            singleAgeList.add("("+birthB+"年)自然增长率:" + itemB.addRate + "‰"+"    (千人净增 "+itemB.addRate+"人)");
+            singleAgeList.add("("+birthA+"---"+birthB+"年)自然增长率差距:" + Double.parseDouble(nf_2.format(distace15))+ "‰"+"  (千人净增差距: "+Double.parseDouble(nf_2.format(distace15))+"人)");
+
+
+
+
+
+
+            long   distace16 = 0 ;
+            if(itemA.pureNum > itemB.pureNum){
+                distace16 = itemA.pureNum - itemB.pureNum;
+            }else{
+                distace16 =  itemB.pureNum - itemA.pureNum ;
+            }
+            singleAgeList.add("("+birthA+"年)净增长人数:" + calculWanRen(itemA.pureNum));
+            singleAgeList.add("("+birthB+"年)净增长人数:" + calculWanRen(itemB.pureNum));
+            singleAgeList.add("("+birthA+"---"+birthB+"年)净增长人数差距:" + calculWanRen(distace16));
+
+
+
+            long   distace17 = 0 ;
+            if(itemA.pureManNum > itemB.pureManNum){
+                distace17 = itemA.pureManNum - itemB.pureManNum;
+            }else{
+                distace17 =  itemB.pureManNum - itemA.pureManNum ;
+            }
+            singleAgeList.add("("+birthA+"年)净增长人数(男):" + calculWanRen(itemA.pureManNum));
+            singleAgeList.add("("+birthB+"年)净增长人数(男):" + calculWanRen(itemB.pureManNum));
+            singleAgeList.add("("+birthA+"---"+birthB+"年)净增长人数(男)差距:" + calculWanRen(distace17));
+
+
+
+            long   distace18 = 0 ;
+            if(itemA.pureWomanNum > itemB.pureWomanNum){
+                distace18 = itemA.pureWomanNum - itemB.pureWomanNum;
+            }else{
+                distace18 =  itemB.pureWomanNum - itemA.pureWomanNum ;
+            }
+            singleAgeList.add("("+birthA+"年)净增长人数(男):" + calculWanRen(itemA.pureWomanNum));
+            singleAgeList.add("("+birthB+"年)净增长人数(女):" + calculWanRen(itemB.pureWomanNum));
+            singleAgeList.add("("+birthA+"---"+birthB+"年)净增长人数(女)差距:" + calculWanRen(distace18));
+
+
+            long   distace19 = 0 ;
+            if(itemA.deadnum > itemB.deadnum){
+                distace19 = itemA.deadnum - itemB.deadnum;
+            }else{
+                distace19 =  itemB.deadnum - itemA.deadnum ;
+            }
+            singleAgeList.add("("+birthA+"年)死亡人口:" + calculWanRen(itemA.deadnum));
+            singleAgeList.add("("+birthB+"年)死亡人口:" + calculWanRen(itemB.deadnum));
+            singleAgeList.add("("+birthA+"---"+birthB+"年)死亡人口差距:" + calculWanRen(distace19));
+
+            long   distace20 = 0 ;
+            if(itemA.deadMan > itemB.deadMan){
+                distace20 = itemA.deadMan - itemB.deadMan;
+            }else{
+                distace20 =  itemB.deadMan - itemA.deadMan ;
+            }
+            singleAgeList.add("("+birthA+"年)死亡人口(男):" + calculWanRen(itemA.deadMan));
+            singleAgeList.add("("+birthB+"年)死亡人口(男):" + calculWanRen(itemB.deadMan));
+            singleAgeList.add("("+birthA+"---"+birthB+"年)死亡人口(男)差距:" + calculWanRen(distace20));
+
+            long   distace21 = 0 ;
+            if(itemA.deadWoman > itemB.deadWoman){
+                distace21 = itemA.deadWoman - itemB.deadWoman;
+            }else{
+                distace21 =  itemB.deadWoman - itemA.deadWoman ;
+            }
+            singleAgeList.add("("+birthA+"年)死亡人口(女):" + calculWanRen(itemA.deadWoman));
+            singleAgeList.add("("+birthB+"年)死亡人口(女):" + calculWanRen(itemB.deadWoman));
+            singleAgeList.add("("+birthA+"---"+birthB+"年)死亡人口(女)差距:" + calculWanRen(distace21));
+
+
+
+        }  else if( itemB != null && itemC != null){
+
+
+
+        }
+
+        ArrayPrint(singleAgeList,title);
     }
 
 
-    static void getDetailInput() {
+    static void populationInfoYear(int  myear,String mtitle) {
+        ArrayList<String> arrLogStrList = new ArrayList<String>();
+        for (int i = 0; i < popularList.size(); i++) {
+            PopulationYear_Item item = popularList.get(i);
+
+            if(item.year ==myear){
+                arrLogStrList.add("时间:" + item.year + "年");
+                arrLogStrList.add("该年出生人口当前岁数:" + item.curAge + "岁");
+                arrLogStrList.add("该年出生人口属相:" + item.mAnimalString );
+                arrLogStrList.add("总人口:" + calculWanRen(item.curSumNum));
+                arrLogStrList.add("人口性别比:" + item.sexRate);
+                arrLogStrList.add("男性人口:" + calculWanRen(item.curManNum));
+                arrLogStrList.add("女性人口:" + calculWanRen(item.curWomanNum));
+                arrLogStrList.add("总人口男女数量差(男):" + calculWanRen(item.cur_man_woman_distance));
+                arrLogStrList.add("出生率:" + item.birthRate + "‰"+"  (千人出生 "+item.birthRate+"人)");
+                arrLogStrList.add("死亡率:" + item.deadRate + "‰"+"  (千人死亡 "+item.deadRate+"人)");
+                arrLogStrList.add("自然增长率:" + item.addRate + "‰"+"  (千人净增 "+item.addRate+"人)");
+                arrLogStrList.add("净增长人数:" + calculWanRen(item.pureNum));
+                arrLogStrList.add("净增长人数(男):" + calculWanRen(item.pureManNum));
+                arrLogStrList.add("净增长人数(女):" + calculWanRen(item.pureWomanNum));
+                arrLogStrList.add("出生人口:" + calculWanRen(item.birthnum));
+                arrLogStrList.add("出生性别比:" + item.birthSexRate);
+                arrLogStrList.add("出生男女数量差(男):" + calculWanRen(item.birth_man_woman_distance));
+                arrLogStrList.add("出生人口(男):" + calculWanRen(item.bitrhManNum));
+                arrLogStrList.add("出生人口(女):" + calculWanRen(item.bitrhWomanNum));
+                arrLogStrList.add("死亡人口:" + calculWanRen(item.deadnum));
+                arrLogStrList.add("死亡人口(男):" + calculWanRen(item.deadMan));
+                arrLogStrList.add("死亡人口(女):" + calculWanRen(item.deadWoman));
+                break;
+            }
+
+
+
+            //     System.out.println("time_year   = "+ item.year + "   pure_man="+item.pureManNum + "   pure_woman= "+item.pureWomanNum + (item.pureManNum == 0 ? "": "男女净值比例:"+(double)item.pureManNum/(double)item.pureWomanNum ) );
+            //  System.out.println("time_begin = "+ item.year_begin_timestamp);
+            //  System.out.println("time_end   = "+ item.year_end_timestamp);
+
+        }
+        ArrayPrint(arrLogStrList, mtitle);
+
+    }
+
+
+
+
+    static boolean checkParamOK() {
+        // 检测是否含有字母   当前的输入参数中去除 :  和 +  判断是否含有字母
+        boolean flag = true;
+        String tempImput = "";
 
         for (int i = 0; i < mKeyWordName.size(); i++) {
             String curStr = mKeyWordName.get(i);
+            tempImput = tempImput + curStr.trim().replace("+", "");
+        }
 
-            if (curStr.contains("age:") && !curStr.contains("+")) {
-                SingleAge.add(curStr);
-            } else if (curStr.contains("age:") && curStr.contains("+")) {
-                RankAge.add(curStr);
+        tempImput = tempImput.replaceAll(":", "");
+        tempImput = tempImput.replace("+", "");
+        tempImput = tempImput.replace(" ", "");
+        if (!isNumeric(tempImput)) {
+            System.out.println("用户输入的参数无效( 输入参数中包含字母【" + clearNumber(tempImput) + "】导致) 程序退出！ 请重新输入正确参数！");
+            showTip();
+            return  false;
+        }
 
-            } else if (curStr.contains("birth:") && !curStr.contains("+")) {
-                SingleBirth.add(curStr);
-            } else if (curStr.contains("birth:") && curStr.contains("+")) {
-                RankBirth.add(curStr);
-            }else if(curStr.contains("comp:") && curStr.contains("+")){
-                String temp = curStr.trim().replace("comp:","").trim();
-                int addIndex = temp.indexOf("+");
-                String firstDigitalStr = temp.substring(0,addIndex).trim();
-                boolean isCompareAge = true;  // 对比年纪
-                if(firstDigitalStr.length() >= 4){
-                    isCompareAge = false;  // 对比出生日期
+
+        return flag;
+    }
+
+
+    static boolean getDetailInput() {
+        boolean flag = true;
+
+/*        static ArrayList<String> SingleAge = new ArrayList<>();    // 【 zpopulation_E8 17 18 19 】 默认与现在对比
+        static ArrayList<String> SingleBirth = new ArrayList<>();  //  【 zpopulation_E8 1992  1993 1994 】 默认与现在对比
+        static ArrayList<String> RankAge = new ArrayList<>();   // 【 zpopulation_E8 30+40 】
+        static ArrayList<String> RankBirth = new ArrayList<>();  //  【 zpopulation_E8 1990+1999 】
+        static ArrayList<String> CompBirth = new ArrayList<>();  // 【 zpopulation_E8 1990:1999 】
+        static ArrayList<String> CompAge = new ArrayList<>();    // 【 zpopulation_E8 23:26 】
+        static ArrayList<String> BeginAge = new ArrayList<>();    // 【 zpopulation_E8 60+】
+        static ArrayList<String> BeginBirth = new ArrayList<>();    // 【 zpopulation_E8 1990+ 】*/
+
+        for (int i = 0; i < mKeyWordName.size(); i++) {
+            String curStr = mKeyWordName.get(i);
+            if(!curStr.contains(":") && !curStr.contains("+")){ // 参数是一个单独的数值
+                String singleStr = new String(curStr);
+                if (!isNumeric(singleStr)) {  // 单独输入的数值
+                    System.out.println("用户输入的参数无效( 输入参数中包含字母导致) 程序退出！ 请重新输入正确参数！");
+                    showTip();
+                    return false;
                 }
-                if(isCompareAge){
-                     CompAge.add(curStr);   // 对比 年龄
-                }else{
-                    CompBirth.add(curStr);  // 对比出生 年份
+
+                int inputInt = Integer.parseInt(singleStr);
+
+
+                // 输入的年份大于 当前统计年份
+                if(inputInt > getEndRecordYear()){
+                    System.out.println("抱歉 当前输入的统计年份【"+inputInt + "】年 未包含在记录中! 请重新输入其他参数查询！");
+                    showTip();
+                    return false;
                 }
 
+                // 过滤  150至  1949之间的数值
+                if(inputInt > 150 && inputInt < 1949 ){
+                    System.out.println("抱歉 当前输入的岁数或年份【"+inputInt + "】未包含在记录中! 请重新输入其他参数查询！");
+                    showTip();
+                    return false;
+                }
+
+                int age =  getAgeFromInput(inputInt);
+                int birthyear =  getBirthYearFromInput(inputInt);
+                boolean isYear = isCommonYear(inputInt);
+                String mTitle = "";
+                if(isYear){
+                    mTitle = inputInt+"年统计数据";
+                }else {
+                    mTitle = inputInt+"岁统计数据";
+                }
+                SingleAgeAndBirthYear.add(new AgeAndBirthSingleItem(age,birthyear,mTitle))  ;
+
+            }else{  // 包含:  或者+
+                int value1 = 0 ;
+                int value2 = 0 ;
+                if(curStr.contains(":")){
+                    String singleStr = new String(curStr).toLowerCase().trim();  // 100:1992
+                    String preStr = singleStr.substring(0,singleStr.indexOf(":"));
+                    String endStr = singleStr.substring(singleStr.indexOf(":")+1);
+                    if(!isNumeric(preStr)){
+                        System.out.println("用户输入的参数无效( 输入参数中包含字母【" + clearNumber(curStr) + "】导致) 程序退出！ 请重新输入正确参数！");
+                        showTip();
+                        return false;
+                    }
+                    if(!isNumeric(endStr)){
+                        System.out.println("用户输入的参数无效( 输入参数中包含字母【" + clearNumber(curStr) + "】导致) 程序退出！ 请重新输入正确参数！");
+                        showTip();
+                        return false;
+                    }
+
+                    int pre = Integer.parseInt(singleStr.substring(0,singleStr.indexOf(":")));
+                    int end = Integer.parseInt(singleStr.substring(singleStr.indexOf(":")+1));
+                    value1 = pre;
+                    value2 = end;
+
+                    if(value1 != 0 && value2 != 0 &&  value1 == value2 ){
+                        System.out.println("抱歉 当前用户输入的岁数或年份【"+value1+"+"+value2 + "】两者的数据相同无法处理! 请重新输入其他参数查询！");
+                        showTip();
+                        return false;
+                    }
 
 
+                }else if(curStr.contains("+")){
+                    String singleStr = new String(curStr).toLowerCase().trim();  // 100:1992
+
+                    String preStr = singleStr.substring(0,singleStr.indexOf("+"));
+                    String endStr = singleStr.substring(singleStr.indexOf("+")+1);
+                    if(!isNumeric(preStr)){
+                        System.out.println("用户输入的参数无效( 输入参数中包含字母【" + clearNumber(curStr) + "】导致) 程序退出！ 请重新输入正确参数！");
+                        showTip();
+                        return false;
+                    }
+                    if(!isNumeric(endStr)){
+                        System.out.println("用户输入的参数无效( 输入参数中包含字母【" + clearNumber(curStr) + "】导致) 程序退出！ 请重新输入正确参数！");
+                        showTip();
+                        return false;
+                    }
+
+                    int pre = Integer.parseInt(singleStr.substring(0,singleStr.indexOf("+")));
+                    int end = Integer.parseInt(singleStr.substring(singleStr.indexOf("+")+1));
+                    value1 = pre;
+                    value2 = end;
+                    if(value1 != 0 && value2 != 0 &&  value1 == value2 ){
+                        System.out.println("抱歉 当前用户输入的岁数或年份【"+value1+":"+value2 + "】两者的数据相同无法处理! 请重新输入其他参数查询！");
+                        showTip();
+                        return false;
+
+                    }
+                }
+                //  读取到  前面两者之间的数据    并且保证 都是 数字
+                if(value1 != 0 && value2 != 0 &&  value1 != value2){
+
+                    // 两个 四位数对比    年份的对比
+                    if((""+value1).length() == 4 && (""+value2).length() == 4){
+                        if(value1 < 1949  || value2 < 1949 ||  value1 > getEndRecordYear() ||  value2 > getEndRecordYear() ){
+                            System.out.println("抱歉 当前输入的岁数或年份【"+value1+"-"+value2 + "】未包含在记录中! 请重新输入其他参数查询！");
+                            showTip();
+                            return false;
+
+                        }
+
+                    }else{    // 岁数对比
+
+                        // 过滤  150至  1949之间的数值
+                        if(value1 > 150 && value1 < 1949 ){
+                            System.out.println("抱歉 当前输入的岁数或年份【"+value1+"-"+value2 + "】未包含在记录中! 请重新输入其他参数查询！");
+                            showTip();
+                            return false;
+                        }
+
+                        // 过滤  150至  1949之间的数值
+                        if(value2 > 150 && value2 < 1949 ){
+                            System.out.println("抱歉 当前输入的岁数或年份【"+value1+"-"+value2 + "】未包含在记录中! 请重新输入其他参数查询！");
+                            showTip();
+                            return false;
+                        }
+                    }
+                }
             }
         }
+
+        return flag;
+
     }
+
+//    int age =  getAgeFromInput(inputInt);
+//    int birthyear =  getBirthYearFromInput(inputInt);
+//    boolean isYear = isCommonYear(inputInt);
+
+    public static int getAgeFromInput(int  inputInt){
+        int age = inputInt ;
+        if(( ""+inputInt).trim().length() == 4 && inputInt > 1949 ){ // 给出的是出生年月日
+            age = getCurrentYear() - inputInt;
+        }
+
+        return age;
+    }
+
+    public static int getBirthYearFromInput(int  inputInt){
+        int birth = inputInt ;
+        if(( ""+inputInt).trim().length() != 4 && inputInt < 150 ){ // 给出的是岁数
+            birth = getCurrentYear() - inputInt;   //  年份减岁数  等于 出生年份
+        }
+
+        return birth;
+    }
+
+    public static boolean   isCommonYear(int  inputInt){
+        boolean isYear = true;
+        if(( ""+inputInt).trim().length() != 4 && inputInt < 150 ){ // 给出的是岁数
+            isYear = false;
+        }
+
+        if(( ""+inputInt).trim().length() == 4 && inputInt > 1949 ){ // 给出的是出生年月日
+            isYear = true;
+        }
+        return isYear;
+    }
+
+
+    public static int getCurrentYear(){
+        int currentYear = 0;
+
+        currentYear =  Calendar.getInstance().get(Calendar.YEAR);
+        return currentYear;
+    }
+    public static boolean isNumeric(String str){
+        for (int i = str.length();--i>=0;){
+            if (!Character.isDigit(str.charAt(i))){
+                return false;
+            }
+        }
+        return true;
+    }
+
+
+    public static String clearNumber(String str){
+        String result = new String(str);
+        result = result.replaceAll("0","");
+        result = result.replaceAll("1","");
+        result = result.replaceAll("2","");
+        result = result.replaceAll("3","");
+        result = result.replaceAll("4","");
+        result = result.replaceAll("5","");
+        result = result.replaceAll("6","");
+        result = result.replaceAll("7","");
+        result = result.replaceAll("8","");
+        result = result.replaceAll("9","");
+        return result;
+    }
+
+
 
     static void showTip() {
         // zpolulation_E8 age:17 age:18 age:19  输出当前年龄为 17岁的人的情况
@@ -276,12 +818,23 @@ public class E8_Population {
         // zpolulation_E8 birth:1992 birth:1993 // 输出1992年的出生的人口情况
         // zpolulation_E8 birth:1992+2008  // 输出1992年的出生的人口情况
         ArrayList<String> tipArr = new ArrayList<String>();
-        tipArr.add("依据年龄输出记录:【 zpolulation_E8 age:17 age:18 age:19 】 //当前年龄为 17 18 19岁的人的情况   ");
-        tipArr.add("依据年龄范围输出记录:【 zpolulation_E8 age:30+40 】 //当前年龄为 从30到40年龄的人口情况   ");
-        tipArr.add("依据出生输出记录:【 zpolulation_E8 birth:1992 】 //输出1992年的出生的人口情况   ");
-        tipArr.add("依据出生范围输出记录:【 zpolulation_E8 birth:1990+1999 】 //输出1990年后至1999年出生(90后)的人口情况   ");
-        tipArr.add("依据出生输出对比记录:【 zpolulation_E8 comp:1990+1999 】 //对比 1990和1999年的人口情况   ");
-        tipArr.add("依据年龄输出对比记录:【 zpolulation_E8 comp:23+26 】 //对比当前23和26岁的人口情况 ");
+//        tipArr.add("依据年龄输出记录:【 zpopulation_E8 age:17 age:18 age:19 】 //当前年龄为 17 18 19岁的人的情况   ");
+//        tipArr.add("依据年龄范围输出记录:【 zpopulation_E8 age:30+40 】 //当前年龄为 从30到40年龄的人口情况   ");
+//        tipArr.add("依据出生输出记录:【 zpopulation_E8 birth:1992 】 //输出1992年的出生的人口情况   ");
+//        tipArr.add("依据出生范围输出记录:【 zpopulation_E8 birth:1990+1999 】 //输出1990年后至1999年出生(90后)的人口情况   ");
+//        tipArr.add("依据出生输出对比记录:【 zpopulation_E8 comp:1990+1999 】 //对比 1990和1999年的人口情况   ");
+//        tipArr.add("依据年龄输出对比记录:【 zpopulation_E8 comp:23+26 】 //对比当前23和26岁的人口情况 ");
+//        tipArr.add("=================================== ");
+        tipArr.add("输出当前统计记录:【 zpopulation_E8   】 //打印 1949年 至 "+ getEndRecordYear()+"年 人口统计数据");
+        tipArr.add("依据年龄输出记录:【 zpopulation_E8 17 18 19 】 //当前年龄为 17 18 19岁的人的情况   ");
+        tipArr.add("依据出生输出记录:【 zpopulation_E8 1992  1993 1994 】 //输出1992年  1993年  1994年 的出生的人口情况   ");
+        tipArr.add("依据年龄范围输出记录:【 zpopulation_E8 30+40 】 //当前年龄为 从30到40年龄的人口情况   ");
+        tipArr.add("依据出生范围输出记录:【 zpopulation_E8 1990+1999 】 //输出1990年后至1999年出生(90后)的人口情况   ");
+        tipArr.add("依据出生输出对比记录:【 zpopulation_E8 1990:1999 】 //对比 1990和1999年的人口情况   ");
+        tipArr.add("依据年龄输出对比记录:【 zpopulation_E8 23:26 】 //对比当前23和26岁的人口情况 ");
+        tipArr.add("依据年龄范围输出记录:【 zpopulation_E8 60+ 】 //当前年龄为60岁以上(现在为终点)人群统计  数据从1949年开始  ");
+        tipArr.add("依据出生范围输出记录:【 zpopulation_E8 1990+ 】 //对从1992年出生到现在人群统计  数据从1949年开始  ");
+
         ArrayPrint(tipArr, "命令格式提示");
     }
 
@@ -420,7 +973,7 @@ public class E8_Population {
 
     }
 
-   static PopulationYear_Item getPopulationWithYear(int year_param){
+    static PopulationYear_Item getPopulationWithYear(int year_param){
         PopulationYear_Item item = null;
         for (int i = 0; i < popularList.size(); i++) {
             if(popularList.get(i).year == year_param){
