@@ -114,6 +114,8 @@ public class F6_ZChar {
                 OutStrList.add(log2);
                 OutStrList.add("\n");
             }
+            String commandNotead = "cmd.exe /c start   Notepad++.exe " + TEXT_INPUT_FILE;
+            execCMD(commandNotead);
 
 
         }else{
@@ -161,7 +163,7 @@ public class F6_ZChar {
 */
 
 
-
+        ShowTip();
 
 
 
@@ -455,6 +457,14 @@ public class F6_ZChar {
 
     }
 
+
+    public static void ShowTip() { //从字节读取内容
+        System.out.println();
+        System.out.println(" zchar_F6.bat    (无参)-- 将解析对应的输入文件F6_Input_Text.txt中的每行字符串(可在该文件中添加非问号?的乱码已得到正确编码码元)");
+        System.out.println(" zchar_F6.bat    (无参)--【由于Shell无法输入乱码，所以必须把乱码符号写在文件中,然后再次执行无参  zchar_F6.bat 】");
+        System.out.println(" zchar_F6.bat    北京 上海   (有参)-- 将解析对应的输入字符串并打印编码解码表 ASCII码 Native码");
+
+    }
 
     public static String ChineseToASCII(byte[] rec) { //从字节读取内容
         ByteArrayInputStream bais = new ByteArrayInputStream(rec);
