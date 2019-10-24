@@ -1,0 +1,3 @@
+NotePad++ F5
+
+cmd /K cd /d %userprofile%\Desktop\zbin & %userprofile%\Desktop\zbin\F5_CreateSqliteTableTool.bat   $(FULL_CURRENT_PATH)   
