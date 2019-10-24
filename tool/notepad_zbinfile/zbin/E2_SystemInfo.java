@@ -29,15 +29,37 @@ import org.hyperic.sigar.Who;
 
 public class E2_SystemInfo {
 
+
+    enum OS_TYPE{
+        Windows,
+        Linux,
+        MacOS
+    }
+    static OS_TYPE curOS_TYPE = OS_TYPE.Windows;
     static NumberFormat nf = new DecimalFormat("0.00");
     static SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd hh:mm:ss");
     static File wifiLogFile = new File(System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin" + File.separator + "E2_WifiDetail.txt");
     public static void main(String[] args) {
+
+        String osName = System.getProperties().getProperty("os.name").toLowerCase();
+        if(osName.contains("window")){
+            curOS_TYPE = OS_TYPE.Windows;
+        }else if(osName.contains("linux")){
+            curOS_TYPE = OS_TYPE.Linux;
+        }else if(osName.contains("mac")){
+            curOS_TYPE = OS_TYPE.MacOS;
+        }
+
+
         try {
             addEnvironmentPATH(System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin" + File.separator + "E2");
 // System信息，从jvm获取
             property();
             System.out.println("----------------------------------");
+
+            javaproperty();
+            System.out.println("----------------------------------");
+
             // 屏幕分辨率
             screen();
             System.out.println("----------------------------------");
@@ -75,18 +97,24 @@ public class E2_SystemInfo {
 
 
     public static void wifi(){
-        String word1 = "上的配置文件";   // 接口 WLAN 上的配置文件 debugtheworld:
-        String word2 = "关键内容";    // 关键内容            : 12345678
-        if(wifiLogFile.exists() && readStringFromFile(wifiLogFile).contains(word2)){
-            //  System.out.println("wifiLogFile 文件存在");
-            readWifiObjectFromFile(wifiLogFile);
-            ArrayList<String> wifiList = transactWifiList(wifiItemList);
-            ArrayPrint(wifiList,"WIFI信息");
-            // System.out.println(readStringFromFile(wifiLogFile));
+        if(curOS_TYPE == OS_TYPE.Windows){
+            String word1 = "上的配置文件";   // 接口 WLAN 上的配置文件 debugtheworld:
+            String word2 = "关键内容";    // 关键内容            : 12345678
+            if(wifiLogFile.exists() && readStringFromFile(wifiLogFile).contains(word2)){
+                //  System.out.println("wifiLogFile 文件存在");
+                readWifiObjectFromFile(wifiLogFile);
+                ArrayList<String> wifiList = transactWifiList(wifiItemList);
+                ArrayPrint(wifiList,"WIFI信息");
+                // System.out.println(readStringFromFile(wifiLogFile));
 
-        }else{
+            }else{
+
+            }
 
         }
+
+
+
     }
 
 
@@ -223,18 +251,42 @@ static ArrayList<WifiItem> wifiItemList = new ArrayList<WifiItem>();
 
 
 
+    // Linux 和 Windows 中的环境变量设置不同
+    // Linux 冒号隔开
+    // Windows 分号隔开  C:\Program Files\Java\jdk1.8.0_191\bin;C:\WINDOWS\Sun\Java\bin;
     private static void addEnvironmentPATH(String value) {
         Properties props = System.getProperties();
         //  user.home = C:\Users\zhuzj5
         // String mE2_Dll_Path_Value = props.getProperty("user.home")+ File.separator+"Desktop"+File.separator+"zbin"+File.separator+"E2" ; // +File.separator+"sigar-amd64-winnt.dll";
         String curLibraryPath = props.getProperty("java.library.path");
-        while (curLibraryPath.endsWith(";") || curLibraryPath.endsWith(".")) {
-            curLibraryPath = curLibraryPath.substring(0, curLibraryPath.length() - 1);
+        String newLibraryPath = "";
+        if(curOS_TYPE == OS_TYPE.Windows){
+            while (curLibraryPath.endsWith(";") || curLibraryPath.endsWith(".")) {
+                curLibraryPath = curLibraryPath.substring(0, curLibraryPath.length() - 1);
+            }
+             newLibraryPath = curLibraryPath + ";" + value + ";;.";
+
+        }else if(curOS_TYPE == OS_TYPE.Linux ){
+            newLibraryPath = curLibraryPath + ":" + value ;
         }
-        String newLibraryPath = curLibraryPath + ";" + value + ";;.";
+
         props.setProperty("java.library.path", newLibraryPath);
         //System.out.println("加载库时搜索的路径列表B:" + props.getProperty("java.library.path"));
         //加载库时搜索的路径列表:  C:\Program Files\Java\jdk1.8.0_191\bin;C:\WINDOWS\Sun\Java\bin;C:\WINDOWS\system32;C:\WINDOWS;C:\Program Files (x86)\Graphviz2.38\bin;C:\Program Files (x86)\Common Files\Oracle\Java\javapath;C:\Program Files (x86)\RSA SecurID Token Common;C:\Program Files\RSA SecurID Token Common;C:\Program Files (x86)\Intel\iCLS Client\;C:\Program Files\Intel\iCLS Client\;C:\windows\system32;C:\windows;C:\windows\System32\Wbem;C:\windows\System32\WindowsPowerShell\v1.0\;C:\Program Files (x86)\Intel\Intel(R) Management Engine Components\DAL;C:\Program Files\Intel\Intel(R) Management Engine Components\DAL;C:\Program Files (x86)\Intel\Intel(R) Management Engine Components\IPT;C:\Program Files\Intel\Intel(R) Management Engine Components\IPT;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\Program Files\Git\cmd;C:\Program Files\MacType;C:\Program Files\Java\jdk1.6.0_45\bin;D:\software\apache-maven-3.2.5\bin;C:\Program Files\Java\jdk1.8.0_191\bin;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\ProgramData\chocolatey\bin;C:\Program Files\osquery;C:\Program Files\Microsoft Network Monitor 3\;C:\Users\zhuzj5\AppData\Local\Programs\Python\Python37\Scripts\;C:\Users\zhuzj5\AppData\Local\Programs\Python\Python37\;C:\Users\zhuzj5\AppData\Local\Microsoft\WindowsApps;D:\fireware_stone\platform-tools;C:\Users\zhuzj5\AppData\Roaming\starrynote.cn\StarryNote\;D:\software\cmder171025\cmder;C:\Program Files (x86)\Graphviz2.38\bin;;.
+    }
+
+    private static void   javaproperty(){
+        ArrayList<String> javaPropertyList = new ArrayList<String>();
+        Properties props = System.getProperties();
+       Object[] keyObjs =  System.getProperties().stringPropertyNames().toArray();
+
+        for (int i = 0; i < keyObjs.length; i++) {
+            String key = keyObjs[i]+"";
+            String value = props.getProperty(key);
+            javaPropertyList.add("Index"+i+": Java-Property【 "+key +" 】"+ "  "+value);
+        }
+        ArrayPrint(javaPropertyList, "System.getProperties()属性列表集合");
+
     }
 
     private static void property() throws UnknownHostException {
@@ -272,7 +324,24 @@ static ArrayList<WifiItem> wifiItemList = new ArrayList<WifiItem>();
         propertyList.add("Java的类格式版本号:" + "【java.class.version】"+  props.getProperty("java.class.version"));
         propertyList.add("Java的类路径:" + "【java.class.path】"+  props.getProperty("java.class.path"));
         propertyList.add("加载库时搜索的路径列表:" + "【java.library.path】"+ props.getProperty("java.library.path"));
-/*        System.out.println("用户名:  " + userName);
+
+        propertyList.add("默认的临时文件路径:" + "【java.io.tmpdir】"+ props.getProperty("java.io.tmpdir"));
+        propertyList.add("一个或多个扩展目录的路径:" + "【java.ext.dirs】"+ props.getProperty("java.ext.dirs"));
+        propertyList.add("操作系统的名称:" + "【os.name】"+ props.getProperty("os.name"));
+        propertyList.add("操作系统的构架:" + "【os.arch】"+ props.getProperty("os.arch"));
+        propertyList.add("操作系统的版本:" + "【os.version】"+ props.getProperty("os.version"));
+        propertyList.add("当前系统文件分隔符:" + "【file.separator】"+ props.getProperty("file.separator"));
+        propertyList.add("当前系统路径分隔符:" + "【path.separator】"+ props.getProperty("path.separator"));
+        propertyList.add("行分隔符:" + "【line.separator】"+ props.getProperty("line.separator"));
+        propertyList.add("用户的账户名称:" + "【user.name】"+ props.getProperty("user.name"));
+        propertyList.add("用户的主目录:" + "【user.home】"+ props.getProperty("user.home"));
+        propertyList.add("用户的Desktop目录:" + "【user.desktop】"+ props.getProperty("user.desktop"));
+
+        propertyList.add("用户的当前工作目录:" + "【user.dir】"+ props.getProperty("user.dir"));
+
+
+
+        /*        System.out.println("用户名:  " + userName);
         System.out.println("计算机名:  " + computerName);
         System.out.println("计算机域名:  " + userDomain);
         System.out.println("本地ip地址:  " + ip);
