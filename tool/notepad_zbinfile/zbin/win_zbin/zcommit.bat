@@ -1,4 +1,5 @@
 @ECHO off
+rem  notepad win自带笔记本 另存为时，UTF-8保存为ANSI 格式。即可解决运行是乱码问题
 Setlocal enabledelayedexpansion
 set hh=%time:~0,2%
 if /i %hh% LSS 10 (set hh=0%time:~1,1%)
