@@ -11,14 +11,14 @@ import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-public class F5_Sqlite {
+public class F5_CreateSqliteTableTool {
 
     static String zbinPath = System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin" + File.separator;
     static String DB_NAME = "F5_ztest" + System.currentTimeMillis() + ".db";
     //    static String DB_NAME = "F5_ztest"+".db";
     static String SQLITE_DB_PATH = zbinPath + File.separator + DB_NAME;
     static String Tushare_Token = "43acb9a5ddc2cf73c6c4ea54796748f965457ed57daaa736bb778ea2";
-    static int Tushare_Score = 120;  //  当前的积分
+    static int Tushare_Score = 620;  //  当前的积分
 
     static String Tushare_Site = "http://api.tushare.pro";
     static String requestTeplateStr = "{\"api_name\": \"ZTABLE_NAME\", \"token\": \"ZTOKEN\",\"params\": ZPARAMS,\"fields\": \"ZFields\"}";

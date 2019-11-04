@@ -299,9 +299,11 @@ public class F2_DownFile_AOSP {
         AOSP_Version_ITEM android_8_0 = new AOSP_Version_ITEM(8.0, "OREO", 26, "8.0.0_r4", "2017.03");
         aospList.add(android_8_0);
 
-        AOSP_Version_ITEM android_9_0 = new AOSP_Version_ITEM(9.0, "PIE", 27, "9.0.0_r8", "2018.03");
+        AOSP_Version_ITEM android_9_0 = new AOSP_Version_ITEM(9.0, "PIE", 28, "9.0.0_r8", "2018.03");
         aospList.add(android_9_0);
 
+		AOSP_Version_ITEM android_10_0 = new AOSP_Version_ITEM(10.0, "Q", 29, "10.0.0_r6", "2019.06");
+        aospList.add(android_10_0);
 
     }
 
