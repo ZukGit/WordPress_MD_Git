@@ -7,4 +7,4 @@ libs=$DIR
 classpath=$classes:~/Desktop/zbin
 
 javac -encoding UTF-8 ~/Desktop/zbin/D6_FileNameSearch.java 
-java  -classpath $classpath D6_FileNameSearch $CURPATH $1 $2 $3 $4 $5 6 $7 $8 $9 
+java  -classpath $classpath D6_FileNameSearch $CURPATH $1 $2 $3 $4 $5

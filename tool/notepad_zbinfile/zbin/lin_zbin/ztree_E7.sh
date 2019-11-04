@@ -6,4 +6,4 @@ libs=$DIR
 classpath=$classes:~/Desktop/zbin
 
 javac -encoding UTF-8 ~/Desktop/zbin/E7_Tree.java 
-java  -classpath $classpath E7_Tree $1 $2 $3 $4 $5 6 $7 $8 $9 
+java  -classpath $classpath E7_Tree $1 $2 $3 $4 $5
