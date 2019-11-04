@@ -129,7 +129,9 @@ public class E2_SystemInfo {
 
             ArrayPrint(wifiLogList, "WIFI信息["+wifiPath+"]");
         } else if (curOS_TYPE == OS_TYPE.MacOS) {
-
+            ArrayList<String> wifiListMac = new    ArrayList<String>();
+            wifiListMac.add("MAC系统访问WIFI密码: 请打开LaunchPad 》 其他 》 钥匙串访问 》 系统(right) 》 airport网络密码");
+            ArrayPrint(wifiListMac, "MAC系统WIFI访问方式");
         } else {
             System.out.println("UnKnow Operation System ! ");
         }
@@ -315,8 +317,8 @@ public class E2_SystemInfo {
         } else if (curOS_TYPE == OS_TYPE.Linux) {
             newLibraryPath = curLibraryPath + ":" + value;
         } else if(curOS_TYPE == OS_TYPE.MacOS){
-	              newLibraryPath = curLibraryPath + ":" + value;
-	  }
+            newLibraryPath = curLibraryPath + ":" + value;
+        }
 
         props.setProperty("java.library.path", newLibraryPath);
         //System.out.println("加载库时搜索的路径列表B:" + props.getProperty("java.library.path"));
@@ -496,6 +498,7 @@ public class E2_SystemInfo {
     static int getZScreenWeight() {
 
         // CMD 和 IDE下 宽高一致  1920x1080
+
         GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
         int width = gd.getDisplayMode().getWidth();
         return width;
@@ -513,7 +516,6 @@ public class E2_SystemInfo {
         return  screenWidth;
         */
 
-
     }
 
 
@@ -521,6 +523,10 @@ public class E2_SystemInfo {
         ArrayList<String> screenLogList = new ArrayList<String>();
         int width = getZScreenWeight();
         int high = getZScreenHeight();
+        if(curOS_TYPE == OS_TYPE.MacOS){  // MACOS的 retain默认分辨率要 x2
+            width = 2*width;
+            high =  2*high;
+        }
         int width2x2 = width / 2;
         int high2x2 = high / 2;
         int width3x3 = width / 3;
