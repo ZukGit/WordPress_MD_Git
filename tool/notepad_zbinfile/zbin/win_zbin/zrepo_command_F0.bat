@@ -2,4 +2,4 @@
 Setlocal ENABLEDELAYEDEXPANSION
 set b=%~dp0
 set path0=%cd%
-%userprofile%\Desktop\zbin\F0.bat  %path0%  %1  %2  %3  %4  %5  %6  %7 %8  
+%userprofile%\Desktop\zbin\F0.bat  %path0%  %1  %2  %3  %4  %5  %6  %7 %8  %9
