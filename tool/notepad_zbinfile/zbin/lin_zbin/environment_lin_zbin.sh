@@ -5,3 +5,4 @@
 export PATH=~/Desktop/zbin:~/Desktop/zbin/lin_zbin:$PATH
 alias cls='clear'
 alias tod='cd ~/Desktop/'
+alias cdd='cd ~/Desktop/'
