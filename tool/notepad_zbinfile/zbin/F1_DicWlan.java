@@ -10,17 +10,48 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class F1_DicWlan {
-    static int MAX_COUNT_CHAR_IN_ROW = 140;
-    static int MAX_COUNT_CHAR_IN_ROW_DEFAULT = 140;
+
     static HashMap<String, ArrayList<Dic_Item>> dictory_All = new HashMap<String, ArrayList<Dic_Item>>();
     static NumberFormat nf = new DecimalFormat("0.00");
+
+
+    enum OS_TYPE{
+        Windows,
+        Linux,
+        MacOS
+    }
+    static OS_TYPE curOS_TYPE = OS_TYPE.Windows;
 
 
     // 输入的参数列表
     static ArrayList<String> mKeyWordName = new ArrayList<>();
 
 
+    static void initSystemInfo(){
+        String osName = System.getProperties().getProperty("os.name").toLowerCase();
+        if(osName.contains("window")){
+            curOS_TYPE = OS_TYPE.Windows;
+        }else if(osName.contains("linux")){
+            curOS_TYPE = OS_TYPE.Linux;
+        }else if(osName.contains("mac")){
+            curOS_TYPE = OS_TYPE.MacOS;
+        }
+    }
+
+    // 随系统 动态调整大小
+    static void Dynic_MAX_COUNT_CHAR_IN_ROW(){
+        if(curOS_TYPE == OS_TYPE.Windows){
+            MAX_COUNT_CHAR_IN_ROW = 140;
+        }else if(curOS_TYPE == OS_TYPE.Linux ){
+            MAX_COUNT_CHAR_IN_ROW = 126;
+        }else if(curOS_TYPE == OS_TYPE.Linux ){
+            MAX_COUNT_CHAR_IN_ROW = 126;
+        }
+    }
+
     public static void main(String[] args) {
+        initSystemInfo();
+        Dynic_MAX_COUNT_CHAR_IN_ROW();
 
         long timestamp1 = System.currentTimeMillis();
         if (args != null) {
@@ -929,6 +960,10 @@ public class F1_DicWlan {
 
 
     // ArrayPrint ==============================Begin
+
+    static int MAX_COUNT_CHAR_IN_ROW = 140;
+    static int MAX_COUNT_CHAR_IN_ROW_DEFAULT = 140;
+
     static public void printArrObject(Object[] objArr, String title) {
         ArrayList<String> curPropStrArr = new ArrayList<String>();
         for (int i = 0; i < objArr.length; i++) {

@@ -29,6 +29,15 @@ public class F0_RepoCommand {
     static String curDirPath = "";   // 当前 SHELL  所在目录  默认是main中的第一个 arg[0] 就是shell路径
 
 
+    enum OS_TYPE{
+        Windows,
+        Linux,
+        MacOS
+    }
+    static OS_TYPE curOS_TYPE = OS_TYPE.Windows;
+
+
+
     static File F0_Properties_File = new File(System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin" + File.separator + "F0.properties");
     static InputStream F0_Properties_InputStream;
     static OutputStream F0_Properties_OutputStream;
@@ -113,7 +122,21 @@ public class F0_RepoCommand {
     static ArrayList<String> mKeyWordName = new ArrayList<>();
     static int DEFAULT_INPUT_NUM = 4;
 
+
+    static void initSystemInfo(){
+        String osName = System.getProperties().getProperty("os.name").toLowerCase();
+        if(osName.contains("window")){
+            curOS_TYPE = OS_TYPE.Windows;
+        }else if(osName.contains("linux")){
+            curOS_TYPE = OS_TYPE.Linux;
+        }else if(osName.contains("mac")){
+            curOS_TYPE = OS_TYPE.MacOS;
+        }
+    }
+
+
     public static void main(String[] args) {
+        initSystemInfo();
         if (args != null) {
             for (int i = 0; i < args.length; i++) {
                 System.out.println("args[" + i + "] = " + args[i]);
@@ -224,17 +247,31 @@ public class F0_RepoCommand {
         Repo_Meta_Data selectRepoMetaData = checkRepoMetaInProp(productName);
         if (selectRepoMetaData == null) {   //  如果当前的 项目名称不存在 prop 中 那么打印 传统的数据
             System.out.println("该 ProductName="+productName+" 【不存在于 prop】 中将打印可能的命令(也许会执行失败)");
+            showRepoInitFrameworkDexFlag();
+            System.out.println();
             showRepoInit();
+            System.out.println();
             showRebuildingCommand();
+            System.out.println();
             showBuildingAppCommand();
+            System.out.println();
             showCommitTip();
             showProperiesMap(productKey2ValueList);
 //            showProperiesMap(propKey2ValueList);
         } else {   // 如果在当前的 prop中  拿到数据 去解析
             System.out.println("该 ProductName="+productName+" 【存在于 prop】 中将打印所有的命令");
+
+            System.out.println();
+            showRepoInitFrameworkDexFlag(selectRepoMetaData);
+            System.out.println();
             showRepoInit(selectRepoMetaData);
+            System.out.println();
+            showRepoInitAddCpCommand(selectRepoMetaData);
+            System.out.println();
             showRebuildingCommand(selectRepoMetaData);
+            System.out.println();
             showBuildingAppCommand();
+            System.out.println();
             showCommitTip();
             showProperiesMap(productKey2ValueList);
 //            showProperiesMap(propKey2ValueList);
@@ -247,7 +284,7 @@ public class F0_RepoCommand {
         Repo_Meta_Data selectRepoMeta = null;
         for (int i = 0; i < propRepoMetaList.size(); i++) {
             Repo_Meta_Data itemData = propRepoMetaList.get(i);
-            if (itemData.productName.trim().equals(cproductName.trim()) || itemData.productName.contains(cproductName)) {
+            if (itemData.productName.trim().equals(cproductName.trim())) {
                 selectRepoMeta = itemData;
                 break;
             }
@@ -395,9 +432,9 @@ public class F0_RepoCommand {
                         BUILDING_COMMAND_RAW = BUILDING_COMMAND_RAW.replace("<br/>", "");
                         BUILDING_COMMAND_RAW = BUILDING_COMMAND_RAW.replace("<br>", "").trim();
                         BUILDING_COMMAND_RAW = BUILDING_COMMAND_RAW.replace(" -jX", " -j4").trim();
-                      if(!BUILDING_COMMAND_RAW.startsWith(common_BuildingCommand_TAG)){
-                          BUILDING_COMMAND_RAW = BUILDING_COMMAND_RAW.substring(BUILDING_COMMAND_RAW.indexOf(common_BuildingCommand_TAG));
-                      }
+                        if(!BUILDING_COMMAND_RAW.startsWith(common_BuildingCommand_TAG)){
+                            BUILDING_COMMAND_RAW = BUILDING_COMMAND_RAW.substring(BUILDING_COMMAND_RAW.indexOf(common_BuildingCommand_TAG));
+                        }
                         buildCommandList.add(BUILDING_COMMAND_RAW);
 
                     } else {
@@ -523,22 +560,25 @@ public class F0_RepoCommand {
 
     static void showRebuildingCommand(Repo_Meta_Data metaData) {
         printSchema("【 rebuilding 再次编译 命令】");
-      ArrayList<String> rebuildingList =   buildRebuildingCommand(metaData);
+        ArrayList<String> rebuildingList =   buildRebuildingCommand(metaData);
         for (int i = 0; i <rebuildingList.size() ; i++) {
-           String command =  rebuildingList.get(i);
+            String command =  rebuildingList.get(i);
             if(command.contains("-E oem-image")){
                 printLine();
                 System.out.println("【" + productName + "_retail" + " 【 Rebuilding -E = OEM+SW】 】");
                 System.out.println(command);
+                System.out.println();
 
             }else if(command.contains("-e oem-image")){
                 printLine();
                 System.out.println("【" + productName + "_retail" + " 【 Rebuilding -e = OEM+Only】 】");
                 System.out.println(command);
+                System.out.println();
             }else{
                 printLine();
                 System.out.println("【" + productName + "_retail" + " 【 Rebuilding retain_common】 】");
                 System.out.println(command);
+                System.out.println();
             }
 
         }
@@ -553,7 +593,7 @@ public class F0_RepoCommand {
         printLine();
 
         System.out.println("【rebuilding " + productName + "_retail" + " -e oem-image】 【 -e = OEM + Only 】");
-       String rebuild_retail_e = buildRebuildingCommand_OEM(gitRepoName, manifestBranchName, xmlbranchName, productName, "retail");
+        String rebuild_retail_e = buildRebuildingCommand_OEM(gitRepoName, manifestBranchName, xmlbranchName, productName, "retail");
         rebuild_retail_e = rebuild_retail_e.replace(" -E oem-image"," -e oem-image");
         rebuild_retail_e = rebuild_retail_e.replace("oem.log","oem_only.log");
         System.out.println(rebuild_retail_e);
@@ -568,8 +608,58 @@ public class F0_RepoCommand {
         printSchema("");
     }
 
+
+    static void showRepoInitFrameworkDexFlag() {
+        printSchema("【repo init + dexfalg-frameworks.jar  命令】");
+
+        String TAG = "repo start --all TEMP";
+        String TAG_TARGET = "repo start --all TEMP  &&  zadddex_flag_C8.sh  ";
+
+        // System.out.println("--------------------------------------------------");
+        printLine();
+        System.out.println("【"+productName+"_retain_common + frameworks.jar】");
+        String retain_common = buildInitAndCompileCommand(gitRepoName, manifestBranchName, xmlbranchName, productName, "retail");
+        retain_common = retain_common.replace(TAG,TAG_TARGET);
+        System.out.println(retain_common);
+        printLine();
+        System.out.println();
+
+        System.out.println("【"+productName+"_retail_e"+" -e = OEM-only  + frameworks.jar 】");
+        String oem_retain = buildInitAndCompileCommand_oemimage(gitRepoName, manifestBranchName, xmlbranchName, productName, "retail");
+        oem_retain = oem_retain.replace("-E oem-image","-e oem-image");
+        oem_retain = oem_retain.replace(TAG,TAG_TARGET);
+        System.out.println(oem_retain);
+        printLine();
+        System.out.println();
+
+        System.out.println("【"+productName+"_retail_E"+"  -E = OEM + SW + frameworks.jar 】");  // -E oem-image
+        String retail_E = buildInitAndCompileCommand_oemimage(gitRepoName, manifestBranchName, xmlbranchName, productName, "retail");
+        retail_E = retail_E.replace(TAG,TAG_TARGET);
+        System.out.println(retail_E);
+        printLine();
+
+
+
+
+        System.out.println( "【"+productName+"_factory_common】 ");
+        System.out.println(buildInitAndCompileCommand(gitRepoName, manifestBranchName, xmlbranchName, productName, "factory"));
+        printLine();
+
+        System.out.println("【"+productName+"_factory_e"+"  -e = OEM-only 】 ");
+        String oem_factory = buildInitAndCompileCommand_oemimage(gitRepoName, manifestBranchName, xmlbranchName, productName, "factory");
+        oem_factory = oem_factory.replace("-E oem-image","-e oem-image");
+        System.out.println(oem_factory);
+        printLine();
+
+        System.out.println("【"+productName+"__factory_E"+"  -E = OEM + SW 】 ");
+        System.out.println(buildInitAndCompileCommand_oemimage(gitRepoName, manifestBranchName, xmlbranchName, productName, "factory"));
+
+        printSchema("");
+
+    }
+
     static void showRepoInit() {
-        printSchema("【repo init 命令】");
+        printSchema("【repo init common 命令】");
         // System.out.println("--------------------------------------------------");
         printLine();
         System.out.println("【"+productName+"_retain_common】");
@@ -641,30 +731,112 @@ public class F0_RepoCommand {
         return buildcompileList;
     }
 
+    static void showRepoInitAddCpCommand(Repo_Meta_Data metaData) {
+        printSchema("【repo init cp-add 初始化复制命令】");
+        // System.out.println("--------------------------------------------------");
+        printLine();
+        String TAG = "repo start --all TEMP";
+        String TAG_TARGET = "repo start --all TEMP && cp -fr ../zukgit1.txt  ./ &&  cp -fr ../../zukgit2.txt  ./  ";
+        productName = metaData.productName;
+        gitRepoName = metaData.gitRepoName;
+        manifestBranchName = metaData.manifestBranchName;
+        xmlbranchName = metaData.xmlbranchName;
+        ArrayList<String> initandcompileCommand =  buildInitAndCompileCommandWithMetaData(metaData);
+        for (int i = 0; i < initandcompileCommand.size(); i++) {
+            String command = initandcompileCommand.get(i);
+            command = command.replace(TAG,TAG_TARGET);
+            if(command.contains("-E oem-image")){
+                printLine();
+                System.out.println("【" + productName + "_retail" + " 【-E = OEM+SW】 额外添加cp复制 】");
+                System.out.println(command);
+                System.out.println();
+            }else if(command.contains("-e oem-image")){
+                printLine();
+                System.out.println("【" + productName + "_retail" + " 【-e = OEM+Only】额外添加cp复制  】");
+                System.out.println(command);
+                System.out.println();
+            }else{
+                printLine();
+                System.out.println("【" + productName + "_retail" + " 【retain_common】 额外添加cp复制 】");
+                System.out.println(command);
+                System.out.println();
+            }
+        }
+
+        printSchema("");
+    }
+
+
+
+    static void showRepoInitFrameworkDexFlag(Repo_Meta_Data metaData) {
+
+        printSchema("【repo init + dexfalg-frameworks.jar 命令】");
+        // System.out.println("--------------------------------------------------");
+
+        String TAG = "repo start --all TEMP";
+        String TAG_TARGET = "repo start --all TEMP  &&  zadddex_flag_C8.sh  ";
+
+
+        printLine();
+        productName = metaData.productName;
+        gitRepoName = metaData.gitRepoName;
+        manifestBranchName = metaData.manifestBranchName;
+        xmlbranchName = metaData.xmlbranchName;
+        ArrayList<String> initandcompileCommand =  buildInitAndCompileCommandWithMetaData(metaData);
+        for (int i = 0; i < initandcompileCommand.size(); i++) {
+            String command = initandcompileCommand.get(i);
+            if(command.contains("-E oem-image")){
+                printLine();
+                System.out.println("【" + productName + "_retail" + " 【-E = OEM+SW + frameworks.jar 】 】");
+                command = command.replace(TAG,TAG_TARGET);
+                System.out.println(command);
+                System.out.println();
+
+            }else if(command.contains("-e oem-image")){
+                printLine();
+                System.out.println("【" + productName + "_retail" + " 【-e = OEM+Only + frameworks.jar 】 】");
+                command = command.replace(TAG,TAG_TARGET);
+                System.out.println(command);
+                System.out.println();
+            }else{
+                printLine();
+                System.out.println("【" + productName + "_retail" + " 【retain_common + frameworks.jar 】 】");
+                command = command.replace(TAG,TAG_TARGET);
+                System.out.println(command);
+                System.out.println();
+            }
+        }
+
+        printSchema("");
+
+    }
+
     static void showRepoInit(Repo_Meta_Data metaData) {
-        printSchema("【repo init 命令】");
+        printSchema("【repo init common 命令】");
         // System.out.println("--------------------------------------------------");
         printLine();
         productName = metaData.productName;
         gitRepoName = metaData.gitRepoName;
         manifestBranchName = metaData.manifestBranchName;
         xmlbranchName = metaData.xmlbranchName;
-       ArrayList<String> initandcompileCommand =  buildInitAndCompileCommandWithMetaData(metaData);
+        ArrayList<String> initandcompileCommand =  buildInitAndCompileCommandWithMetaData(metaData);
         for (int i = 0; i < initandcompileCommand.size(); i++) {
             String command = initandcompileCommand.get(i);
             if(command.contains("-E oem-image")){
                 printLine();
                 System.out.println("【" + productName + "_retail" + " 【-E = OEM+SW】 】");
                 System.out.println(command);
-
+                System.out.println();
             }else if(command.contains("-e oem-image")){
                 printLine();
                 System.out.println("【" + productName + "_retail" + " 【-e = OEM+Only】 】");
                 System.out.println(command);
+                System.out.println();
             }else{
                 printLine();
                 System.out.println("【" + productName + "_retail" + " 【retain_common】 】");
                 System.out.println(command);
+                System.out.println();
             }
         }
 
@@ -675,11 +847,15 @@ public class F0_RepoCommand {
 
 
     static void printLine() {
-        System.out.println("===================================================================");
+        System.out.println("———————————");
     }
 
     static void printSchema(String title) {
-        System.out.println("################################" + title + "#####################################");
+        if("".equals(title)){
+            System.out.println();
+            return;
+        }
+        System.out.println("════════════════════════════════════════════" + title + "════════════════════════════════════════════");
     }
 
 
@@ -885,12 +1061,45 @@ public class F0_RepoCommand {
 
     @SuppressWarnings("unchecked")
     static void showProperiesMap(Map<String,String> productName) {
-        System.out.println("==============================" + "Properities数据表" + "==============================");
+        System.out.println("════════════════════" + "Properities数据表" + "════════════════════");
         Map.Entry<String, String> entry;
-        String pre = "zrepo_command_F0  ";
+        String pre = "";
+        if(curOS_TYPE == OS_TYPE.Windows ){
+            pre = "zrepo_command_F0  ";
+        }else if(curOS_TYPE == OS_TYPE.Linux){
+            pre = "zrepo_command_F0.sh  ";
+        }else if(curOS_TYPE == OS_TYPE.MacOS){
+            pre = "zrepo_command_F0.sh  ";
+        }else{
+            pre = "zrepo_command_F0  ";
+        }
+
+
+        System.out.println("══════════Repo本地命令══════════");
+        StringBuilder sb  = new StringBuilder();
         if (productName != null) {
             Iterator iterator = productName.entrySet().iterator();
 
+            //     zrepo_command_F0  o.git mp r-sh2019.xml foles > foles.txt
+            while (iterator.hasNext()) {
+                entry = (Map.Entry<String, String>) iterator.next();
+                String key = entry.getKey();  //Map的Value
+                String value = entry.getValue();  //Map的Value
+                String fileName = value.substring(value.lastIndexOf(".xml")+".xml".length()).trim();
+                String target = "    > " + fileName+".txt &&  ";
+//                System.out.println(pre + value + target);
+                sb.append(pre + value + target);
+            }
+        }
+        String localGeneral = sb.toString().trim();
+        while(localGeneral.endsWith("&&")){
+            localGeneral = localGeneral.substring(0,localGeneral.length() -2);
+        }
+        System.out.println(localGeneral);
+        System.out.println("══════════Prop数据情况══════════");
+        if (productName != null) {
+            Iterator iterator = productName.entrySet().iterator();
+            //     zrepo_command_F0  o.git mp r-sh2019.xml foles > foles.txt
             while (iterator.hasNext()) {
                 entry = (Map.Entry<String, String>) iterator.next();
                 String key = entry.getKey();  //Map的Value

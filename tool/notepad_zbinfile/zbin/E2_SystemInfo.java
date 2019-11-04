@@ -30,23 +30,25 @@ import org.hyperic.sigar.Who;
 public class E2_SystemInfo {
 
 
-    enum OS_TYPE{
+    enum OS_TYPE {
         Windows,
         Linux,
         MacOS
     }
+
     static OS_TYPE curOS_TYPE = OS_TYPE.Windows;
     static NumberFormat nf = new DecimalFormat("0.00");
     static SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd hh:mm:ss");
     static File wifiLogFile = new File(System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin" + File.separator + "E2_WifiDetail.txt");
+
     public static void main(String[] args) {
 
         String osName = System.getProperties().getProperty("os.name").toLowerCase();
-        if(osName.contains("window")){
+        if (osName.contains("window")) {
             curOS_TYPE = OS_TYPE.Windows;
-        }else if(osName.contains("linux")){
+        } else if (osName.contains("linux")) {
             curOS_TYPE = OS_TYPE.Linux;
-        }else if(osName.contains("mac")){
+        } else if (osName.contains("mac")) {
             curOS_TYPE = OS_TYPE.MacOS;
         }
 
@@ -82,7 +84,7 @@ public class E2_SystemInfo {
             net();
             System.out.println("----------------------------------");
 // 以太网信息
-          //  ethernet();
+            //  ethernet();
             ethernetWireless();
             ethernetPC();
             System.out.println("----------------------------------");
@@ -95,79 +97,126 @@ public class E2_SystemInfo {
     }
 
 
-
-    public static void wifi(){
-        if(curOS_TYPE == OS_TYPE.Windows){
+    public static void wifi() {
+        if (curOS_TYPE == OS_TYPE.Windows) {
             String word1 = "上的配置文件";   // 接口 WLAN 上的配置文件 debugtheworld:
             String word2 = "关键内容";    // 关键内容            : 12345678
-            if(wifiLogFile.exists() && readStringFromFile(wifiLogFile).contains(word2)){
+            if (wifiLogFile.exists() && readStringFromFile(wifiLogFile).contains(word2)) {
                 //  System.out.println("wifiLogFile 文件存在");
                 readWifiObjectFromFile(wifiLogFile);
                 ArrayList<String> wifiList = transactWifiList(wifiItemList);
-                ArrayPrint(wifiList,"WIFI信息");
+                ArrayPrint(wifiList, "WIFI信息");
                 // System.out.println(readStringFromFile(wifiLogFile));
 
-            }else{
-
+            }
+        } else if (curOS_TYPE == OS_TYPE.Linux) {
+            String wifiPath = "/etc/NetworkManager/system-connections";
+            File wifiDir = new File(wifiPath);
+            if (!wifiDir.exists()) {
+                System.out.println("WiFi-Path: " + wifiPath + "  不存在!");
+                return;
             }
 
+            File[] wifiList = wifiDir.listFiles();
+            ArrayList<String> wifiLogList = new ArrayList<String>();
+            for (int i = 0; i < wifiList.length; i++) {
+                int index = i + 1;
+                String str0 = "WIFI索引:" + index;
+                wifiLogList.add(str0);
+                ArrayList<String> curWifiItemLog = translateLinuxWifi(wifiList[i]);
+                wifiLogList.addAll(curWifiItemLog);
+            }
+
+            ArrayPrint(wifiLogList, "WIFI信息["+wifiPath+"]");
+        } else if (curOS_TYPE == OS_TYPE.MacOS) {
+
+        } else {
+            System.out.println("UnKnow Operation System ! ");
         }
 
 
-
     }
 
 
-static class WifiItem{
-       String name;
-       String key;
-       WifiItem(){
+    static class WifiItem {
+        String name;
+        String key;
 
-       }
+        WifiItem() {
 
-    WifiItem(String name ,String key){
-this.name = name;
-this.key = key;
+        }
+
+        WifiItem(String name, String key) {
+            this.name = name;
+            this.key = key;
+        }
+
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public void setKey(String key) {
+            this.key = key;
+        }
+
+        public String getKey() {
+            return key;
+        }
+
+        public String getName() {
+            return name;
+        }
     }
 
+    static ArrayList<WifiItem> wifiItemList = new ArrayList<WifiItem>();
 
-    public void setName(String name) {
-        this.name = name;
+
+    static ArrayList<String> translateLinuxWifi(File wifiFile) {
+        ArrayList<String> strArr = new ArrayList<String>();
+        String wifiName = wifiFile.getName();
+        String wifiPsk = "";
+        String fileContent = readStringFromFile(wifiFile);
+
+        if (!fileContent.contains("psk=") || "".equals(fileContent)) {
+            wifiPsk = "无权限访问wifi文件:" + wifiFile.getAbsolutePath();
+        } else {
+            String mWifiPassword = fileContent.substring(fileContent.indexOf("psk=")).trim();
+            mWifiPassword = mWifiPassword.substring(0, mWifiPassword.indexOf("[")).trim();
+            mWifiPassword = mWifiPassword.replace("psk=", "").trim();
+            wifiPsk = mWifiPassword;
+
+        }
+//        psk=zhuminghe
+// [ipv4]
+
+        if(null == wifiPsk || "".equals(wifiPsk)){
+            wifiPsk = "[无密码]";
+        }
+        String str1 = "WIFI名称:" + wifiName;
+        String str2 = "WIFI密码:" + wifiPsk;
+        String str3 = "==================";
+        strArr.add(str1);
+        strArr.add(str2);
+        strArr.add(str3);
+        return strArr;
     }
 
-    public void setKey(String key) {
-        this.key = key;
-    }
-
-    public String getKey() {
-        return key;
-    }
-
-    public String getName() {
-        return name;
-    }
-}
-
-static ArrayList<WifiItem> wifiItemList = new ArrayList<WifiItem>();
-
-
-
-    static   ArrayList<String>  transactWifiList(ArrayList<WifiItem> wifiList) {
-        ArrayList<String> strArr = new    ArrayList<String>();
+    static ArrayList<String> transactWifiList(ArrayList<WifiItem> wifiList) {
+        ArrayList<String> strArr = new ArrayList<String>();
 
         for (int i = 0; i < wifiList.size(); i++) {
             WifiItem item = wifiList.get(i);
-            int index= i + 1;
-            String str0 = "WIFI索引:"+index;
-            String str1 = "WIFI名称:"+item.getName();
-            String str2 = "WIFI密码:"+item.getKey();
+            int index = i + 1;
+            String str0 = "WIFI索引:" + index;
+            String str1 = "WIFI名称:" + item.getName();
+            String str2 = "WIFI密码:" + item.getKey();
             String str3 = "==================";
             strArr.add(str0);
             strArr.add(str1);
             strArr.add(str2);
             strArr.add(str3);
         }
-
 
 
         return strArr;
@@ -196,31 +245,28 @@ static ArrayList<WifiItem> wifiItemList = new ArrayList<WifiItem>();
                 lineContent = lineContent.trim();
 
 
-
-                if(lineContent.contains(word1)){
-                    wifiName = lineContent.substring(lineContent.indexOf(word1)+word1.length(),lineContent.length()-1).trim();
+                if (lineContent.contains(word1)) {
+                    wifiName = lineContent.substring(lineContent.indexOf(word1) + word1.length(), lineContent.length() - 1).trim();
                     wifiNameReadyFlag = true;
                     wifiKeyReadyFlag = false;
-                    wifiKey="";
+                    wifiKey = "";
                 }
 
-                if(lineContent.contains(word2)){
-                    wifiKey= lineContent.substring(lineContent.indexOf(word2)+word2.length()).trim();
+                if (lineContent.contains(word2)) {
+                    wifiKey = lineContent.substring(lineContent.indexOf(word2) + word2.length()).trim();
                     wifiKey = wifiKey.substring(1).trim();
-                    if(wifiNameReadyFlag){
+                    if (wifiNameReadyFlag) {
                         wifiKeyReadyFlag = true;
                     }
-                    if(wifiNameReadyFlag && wifiNameReadyFlag){
-                        WifiItem  wifiItem = new WifiItem(wifiName , wifiKey);
+                    if (wifiNameReadyFlag && wifiNameReadyFlag) {
+                        WifiItem wifiItem = new WifiItem(wifiName, wifiKey);
                         wifiItemList.add(wifiItem);
                         wifiNameReadyFlag = false;
                         wifiKeyReadyFlag = false;
                     }
 
 
-
                 }
-
 
 
             }
@@ -230,10 +276,11 @@ static ArrayList<WifiItem> wifiItemList = new ArrayList<WifiItem>();
 
 
     }
-    static  String readStringFromFile(File fileItem) {
+
+    static String readStringFromFile(File fileItem) {
         StringBuilder sb = new StringBuilder();
         try {
-         //   BufferedReader curBR = new BufferedReader(new InputStreamReader(new FileInputStream(fileItem), "utf-8"));
+            //   BufferedReader curBR = new BufferedReader(new InputStreamReader(new FileInputStream(fileItem), "utf-8"));
             BufferedReader curBR = new BufferedReader(new InputStreamReader(new FileInputStream(fileItem)));
             String lineContent = "";
             while (lineContent != null) {
@@ -250,7 +297,6 @@ static ArrayList<WifiItem> wifiItemList = new ArrayList<WifiItem>();
     }
 
 
-
     // Linux 和 Windows 中的环境变量设置不同
     // Linux 冒号隔开
     // Windows 分号隔开  C:\Program Files\Java\jdk1.8.0_191\bin;C:\WINDOWS\Sun\Java\bin;
@@ -260,14 +306,14 @@ static ArrayList<WifiItem> wifiItemList = new ArrayList<WifiItem>();
         // String mE2_Dll_Path_Value = props.getProperty("user.home")+ File.separator+"Desktop"+File.separator+"zbin"+File.separator+"E2" ; // +File.separator+"sigar-amd64-winnt.dll";
         String curLibraryPath = props.getProperty("java.library.path");
         String newLibraryPath = "";
-        if(curOS_TYPE == OS_TYPE.Windows){
+        if (curOS_TYPE == OS_TYPE.Windows) {
             while (curLibraryPath.endsWith(";") || curLibraryPath.endsWith(".")) {
                 curLibraryPath = curLibraryPath.substring(0, curLibraryPath.length() - 1);
             }
-             newLibraryPath = curLibraryPath + ";" + value + ";;.";
+            newLibraryPath = curLibraryPath + ";" + value + ";;.";
 
-        }else if(curOS_TYPE == OS_TYPE.Linux ){
-            newLibraryPath = curLibraryPath + ":" + value ;
+        } else if (curOS_TYPE == OS_TYPE.Linux) {
+            newLibraryPath = curLibraryPath + ":" + value;
         }
 
         props.setProperty("java.library.path", newLibraryPath);
@@ -275,15 +321,15 @@ static ArrayList<WifiItem> wifiItemList = new ArrayList<WifiItem>();
         //加载库时搜索的路径列表:  C:\Program Files\Java\jdk1.8.0_191\bin;C:\WINDOWS\Sun\Java\bin;C:\WINDOWS\system32;C:\WINDOWS;C:\Program Files (x86)\Graphviz2.38\bin;C:\Program Files (x86)\Common Files\Oracle\Java\javapath;C:\Program Files (x86)\RSA SecurID Token Common;C:\Program Files\RSA SecurID Token Common;C:\Program Files (x86)\Intel\iCLS Client\;C:\Program Files\Intel\iCLS Client\;C:\windows\system32;C:\windows;C:\windows\System32\Wbem;C:\windows\System32\WindowsPowerShell\v1.0\;C:\Program Files (x86)\Intel\Intel(R) Management Engine Components\DAL;C:\Program Files\Intel\Intel(R) Management Engine Components\DAL;C:\Program Files (x86)\Intel\Intel(R) Management Engine Components\IPT;C:\Program Files\Intel\Intel(R) Management Engine Components\IPT;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\Program Files\Git\cmd;C:\Program Files\MacType;C:\Program Files\Java\jdk1.6.0_45\bin;D:\software\apache-maven-3.2.5\bin;C:\Program Files\Java\jdk1.8.0_191\bin;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\ProgramData\chocolatey\bin;C:\Program Files\osquery;C:\Program Files\Microsoft Network Monitor 3\;C:\Users\zhuzj5\AppData\Local\Programs\Python\Python37\Scripts\;C:\Users\zhuzj5\AppData\Local\Programs\Python\Python37\;C:\Users\zhuzj5\AppData\Local\Microsoft\WindowsApps;D:\fireware_stone\platform-tools;C:\Users\zhuzj5\AppData\Roaming\starrynote.cn\StarryNote\;D:\software\cmder171025\cmder;C:\Program Files (x86)\Graphviz2.38\bin;;.
     }
 
-    private static void   javaproperty(){
+    private static void javaproperty() {
         ArrayList<String> javaPropertyList = new ArrayList<String>();
         Properties props = System.getProperties();
-       Object[] keyObjs =  System.getProperties().stringPropertyNames().toArray();
+        Object[] keyObjs = System.getProperties().stringPropertyNames().toArray();
 
         for (int i = 0; i < keyObjs.length; i++) {
-            String key = keyObjs[i]+"";
+            String key = keyObjs[i] + "";
             String value = props.getProperty(key);
-            javaPropertyList.add("Index"+i+": Java-Property【 "+key +" 】"+ "  "+value);
+            javaPropertyList.add("Index" + i + ": Java-Property【 " + key + " 】" + "  " + value);
         }
         ArrayPrint(javaPropertyList, "System.getProperties()属性列表集合");
 
@@ -300,44 +346,44 @@ static ArrayList<WifiItem> wifiItemList = new ArrayList<WifiItem>();
         String userName = map.get("USERNAME");// 获取用户名
         String computerName = map.get("COMPUTERNAME");// 获取计算机名
         String userDomain = map.get("USERDOMAIN");// 获取计算机域名
-        propertyList.add("用户名:"+"【System.getenv().get(\"USERNAME\")"+"】" + userName);
+        propertyList.add("用户名:" + "【System.getenv().get(\"USERNAME\")" + "】" + userName);
         propertyList.add("计算机名:【System.getenv().get(\"COMPUTERNAME\")】" + computerName);
         propertyList.add("计算机域名:【System.getenv().get(\"USERDOMAIN\")\"】" + userDomain);
-        propertyList.add("本地ip地址:" +"【InetAddress.getLocalHost().getHostAddress()】 "+ ip);
-        propertyList.add("本地主机名:" +"【InetAddress.getLocalHost().getHostName()】 "+  addr.getHostName());
-        propertyList.add("JVM可以使用的总内存:" +"【Runtime.getRuntime().totalMemory()】 "+ r.totalMemory());  // 【Runtime.getRuntime().totalMemory()】
-        propertyList.add("JVM可以使用的剩余内存:" +"【Runtime.getRuntime().freeMemory()】 "+ r.freeMemory());
-        propertyList.add("JVM可以使用的处理器个数:"  +"【Runtime.getRuntime().availableProcessors()】 "+ r.availableProcessors());
-        propertyList.add("Java的运行环境版本:" + "【java.version】"+ props.getProperty("java.version"));
-        propertyList.add("Java的运行环境供应商:" + "【java.vendor】"+props.getProperty("java.vendor"));
-        propertyList.add("Java供应商的URL:" +"【java.vendor.url】"+ props.getProperty("java.vendor.url"));
-        propertyList.add("Java的安装路径:" +"【java.home】"+ props.getProperty("java.home"));
-        propertyList.add("Java的虚拟机规范版本:" +"【java.vm.specification.version】"+  props.getProperty("java.vm.specification.version"));
-        propertyList.add("Java的虚拟机规范供应商:"  +"【java.vm.specification.vendor】"+  props.getProperty("java.vm.specification.vendor"));
-        propertyList.add("Java的虚拟机规范名称:" +"【java.vm.specification.name】"+  props.getProperty("java.vm.specification.name"));
-        propertyList.add("Java的虚拟机实现版本:" +"【java.vm.version】"+ props.getProperty("java.vm.version"));
-        propertyList.add("Java的虚拟机实现供应商:" +"【java.vm.vendor】"+ props.getProperty("java.vm.vendor"));
-        propertyList.add("Java的虚拟机实现名称:" + "【java.vm.name】"+  props.getProperty("java.vm.name"));
-        propertyList.add("Java运行时环境规范版本:" + "【java.specification.version】"+  props.getProperty("java.specification.version"));
-        propertyList.add("Java运行时环境规范供应商:" + "【java.specification.vender】"+  props.getProperty("java.specification.vender"));
-        propertyList.add("Java运行时环境规范名称:" + "【java.specification.name】"+  props.getProperty("java.specification.name"));
-        propertyList.add("Java的类格式版本号:" + "【java.class.version】"+  props.getProperty("java.class.version"));
-        propertyList.add("Java的类路径:" + "【java.class.path】"+  props.getProperty("java.class.path"));
-        propertyList.add("加载库时搜索的路径列表:" + "【java.library.path】"+ props.getProperty("java.library.path"));
+        propertyList.add("本地ip地址:" + "【InetAddress.getLocalHost().getHostAddress()】 " + ip);
+        propertyList.add("本地主机名:" + "【InetAddress.getLocalHost().getHostName()】 " + addr.getHostName());
+        propertyList.add("JVM可以使用的总内存:" + "【Runtime.getRuntime().totalMemory()】 " + r.totalMemory());  // 【Runtime.getRuntime().totalMemory()】
+        propertyList.add("JVM可以使用的剩余内存:" + "【Runtime.getRuntime().freeMemory()】 " + r.freeMemory());
+        propertyList.add("JVM可以使用的处理器个数:" + "【Runtime.getRuntime().availableProcessors()】 " + r.availableProcessors());
+        propertyList.add("Java的运行环境版本:" + "【java.version】" + props.getProperty("java.version"));
+        propertyList.add("Java的运行环境供应商:" + "【java.vendor】" + props.getProperty("java.vendor"));
+        propertyList.add("Java供应商的URL:" + "【java.vendor.url】" + props.getProperty("java.vendor.url"));
+        propertyList.add("Java的安装路径:" + "【java.home】" + props.getProperty("java.home"));
+        propertyList.add("Java的虚拟机规范版本:" + "【java.vm.specification.version】" + props.getProperty("java.vm.specification.version"));
+        propertyList.add("Java的虚拟机规范供应商:" + "【java.vm.specification.vendor】" + props.getProperty("java.vm.specification.vendor"));
+        propertyList.add("Java的虚拟机规范名称:" + "【java.vm.specification.name】" + props.getProperty("java.vm.specification.name"));
+        propertyList.add("Java的虚拟机实现版本:" + "【java.vm.version】" + props.getProperty("java.vm.version"));
+        propertyList.add("Java的虚拟机实现供应商:" + "【java.vm.vendor】" + props.getProperty("java.vm.vendor"));
+        propertyList.add("Java的虚拟机实现名称:" + "【java.vm.name】" + props.getProperty("java.vm.name"));
+        propertyList.add("Java运行时环境规范版本:" + "【java.specification.version】" + props.getProperty("java.specification.version"));
+        propertyList.add("Java运行时环境规范供应商:" + "【java.specification.vender】" + props.getProperty("java.specification.vender"));
+        propertyList.add("Java运行时环境规范名称:" + "【java.specification.name】" + props.getProperty("java.specification.name"));
+        propertyList.add("Java的类格式版本号:" + "【java.class.version】" + props.getProperty("java.class.version"));
+        propertyList.add("Java的类路径:" + "【java.class.path】" + props.getProperty("java.class.path"));
+        propertyList.add("加载库时搜索的路径列表:" + "【java.library.path】" + props.getProperty("java.library.path"));
 
-        propertyList.add("默认的临时文件路径:" + "【java.io.tmpdir】"+ props.getProperty("java.io.tmpdir"));
-        propertyList.add("一个或多个扩展目录的路径:" + "【java.ext.dirs】"+ props.getProperty("java.ext.dirs"));
-        propertyList.add("操作系统的名称:" + "【os.name】"+ props.getProperty("os.name"));
-        propertyList.add("操作系统的构架:" + "【os.arch】"+ props.getProperty("os.arch"));
-        propertyList.add("操作系统的版本:" + "【os.version】"+ props.getProperty("os.version"));
-        propertyList.add("当前系统文件分隔符:" + "【file.separator】"+ props.getProperty("file.separator"));
-        propertyList.add("当前系统路径分隔符:" + "【path.separator】"+ props.getProperty("path.separator"));
-        propertyList.add("行分隔符:" + "【line.separator】"+ props.getProperty("line.separator"));
-        propertyList.add("用户的账户名称:" + "【user.name】"+ props.getProperty("user.name"));
-        propertyList.add("用户的主目录:" + "【user.home】"+ props.getProperty("user.home"));
-        propertyList.add("用户的Desktop目录:" + "【user.desktop】"+ props.getProperty("user.desktop"));
+        propertyList.add("默认的临时文件路径:" + "【java.io.tmpdir】" + props.getProperty("java.io.tmpdir"));
+        propertyList.add("一个或多个扩展目录的路径:" + "【java.ext.dirs】" + props.getProperty("java.ext.dirs"));
+        propertyList.add("操作系统的名称:" + "【os.name】" + props.getProperty("os.name"));
+        propertyList.add("操作系统的构架:" + "【os.arch】" + props.getProperty("os.arch"));
+        propertyList.add("操作系统的版本:" + "【os.version】" + props.getProperty("os.version"));
+        propertyList.add("当前系统文件分隔符:" + "【file.separator】" + props.getProperty("file.separator"));
+        propertyList.add("当前系统路径分隔符:" + "【path.separator】" + props.getProperty("path.separator"));
+        propertyList.add("行分隔符:" + "【line.separator】" + props.getProperty("line.separator"));
+        propertyList.add("用户的账户名称:" + "【user.name】" + props.getProperty("user.name"));
+        propertyList.add("用户的主目录:" + "【user.home】" + props.getProperty("user.home"));
+        propertyList.add("用户的Desktop目录:" + "【user.desktop】" + props.getProperty("user.desktop"));
 
-        propertyList.add("用户的当前工作目录:" + "【user.dir】"+ props.getProperty("user.dir"));
+        propertyList.add("用户的当前工作目录:" + "【user.dir】" + props.getProperty("user.dir"));
 
 
 
@@ -382,7 +428,7 @@ static ArrayList<WifiItem> wifiItemList = new ArrayList<WifiItem>();
         ArrayPrint(propertyList, "system-info");
     }
 
-    private static void memory()  {
+    private static void memory() {
         Sigar sigar = new Sigar();
         Mem mem = null;
         try {
@@ -472,7 +518,7 @@ static ArrayList<WifiItem> wifiItemList = new ArrayList<WifiItem>();
     private static void screen() {
         ArrayList<String> screenLogList = new ArrayList<String>();
         int width = getZScreenWeight();
-        int high =getZScreenHeight();
+        int high = getZScreenHeight();
         int width2x2 = width / 2;
         int high2x2 = high / 2;
         int width3x3 = width / 3;
@@ -514,7 +560,7 @@ static ArrayList<WifiItem> wifiItemList = new ArrayList<WifiItem>();
         ArrayPrint(screenLogList, "屏幕尺寸");
     }
 
-    private static void cpu()  {
+    private static void cpu() {
         Sigar sigar = new Sigar();
         ArrayList<String> cpuLogList = new ArrayList<String>();
         CpuInfo infos[] = new CpuInfo[0];
@@ -589,7 +635,7 @@ System.out.println("操作系统的版本号:  " + OS.getVersion());// 操作系
         ArrayPrint(OSLogList, "操作系统");
     }
 
-    private static void who()  {
+    private static void who() {
         Sigar sigar = new Sigar();
         ArrayList<String> WhoLogList = new ArrayList<String>();
 
@@ -621,7 +667,7 @@ System.out.println("操作系统的版本号:  " + OS.getVersion());// 操作系
 
     }
 
-    private static void file()  {
+    private static void file() {
         Sigar sigar = new Sigar();
         ArrayList<String> FileLogList = new ArrayList<String>();
         FileSystem fslist[] = new FileSystem[0];
@@ -769,7 +815,7 @@ System.out.println("操作系统的版本号:  " + OS.getVersion());// 操作系
         ArrayPrint(netLogList, "网络信息");
     }
 
-    private static void ethernetPC()  {
+    private static void ethernetPC() {
         Sigar sigar = null;
         sigar = new Sigar();
         ArrayList<String> ethernetLogList = new ArrayList<String>();
@@ -800,21 +846,21 @@ System.out.println("操作系统的版本号:  " + OS.getVersion());// 操作系
             System.out.println("网卡描述信息:" +cfg.getName() + "网卡描述信息:" + cfg.getDescription());// 网卡描述信息
             System.out.println( "网卡类型" +cfg.getName() + "网卡类型" + cfg.getType());//
             System.out.println(":=================================");*/
-            ethernetLogList.add("PC网卡名称:" +cfg.getName());// IP地址
-            ethernetLogList.add("IP地址:" +cfg.getName() + " IP地址:" + cfg.getAddress());// IP地址
-            ethernetLogList.add("网关广播地址:" +cfg.getName() + " 网关广播地址:" + cfg.getBroadcast());// 网关广播地址
-            ethernetLogList.add("网卡MAC地址:" +cfg.getName() + " 网卡MAC地址:" + cfg.getHwaddr());// 网卡MAC地址
-            ethernetLogList.add("子网掩码:" +cfg.getName() + " 子网掩码:" + cfg.getNetmask());// 子网掩码
-            ethernetLogList.add("网卡描述信息:" +cfg.getName() + " 网卡描述信息:" + cfg.getDescription());// 网卡描述信息
-            ethernetLogList.add("网卡类型" +cfg.getName() + " 网卡类型" + cfg.getType());//
+            ethernetLogList.add("PC网卡名称:" + cfg.getName());// IP地址
+            ethernetLogList.add("IP地址:" + cfg.getName() + " IP地址:" + cfg.getAddress());// IP地址
+            ethernetLogList.add("网关广播地址:" + cfg.getName() + " 网关广播地址:" + cfg.getBroadcast());// 网关广播地址
+            ethernetLogList.add("网卡MAC地址:" + cfg.getName() + " 网卡MAC地址:" + cfg.getHwaddr());// 网卡MAC地址
+            ethernetLogList.add("子网掩码:" + cfg.getName() + " 子网掩码:" + cfg.getNetmask());// 子网掩码
+            ethernetLogList.add("网卡描述信息:" + cfg.getName() + " 网卡描述信息:" + cfg.getDescription());// 网卡描述信息
+            ethernetLogList.add("网卡类型" + cfg.getName() + " 网卡类型" + cfg.getType());//
             ethernetLogList.add(":=================================");
-            ArrayPrint(ethernetLogList,"PC网卡信息");
+            ArrayPrint(ethernetLogList, "PC网卡信息");
             return; // 只打印 第一个网卡本身的信息
         }
 
     }
 
-    private static void ethernetWireless(){
+    private static void ethernetWireless() {
         Sigar sigar = null;
         sigar = new Sigar();
         ArrayList<String> ethernetLogList = new ArrayList<String>();
@@ -837,7 +883,7 @@ System.out.println("操作系统的版本号:  " + OS.getVersion());// 操作系
                 continue;
             }
             String desc = cfg.getDescription();
-            if(!desc.contains("802.11")){
+            if (!desc.contains("802.11")) {
                 continue;
             }
 /*            System.out.println("IP地址:" +cfg.getName() + "IP地址:" + cfg.getAddress());// IP地址
@@ -847,20 +893,20 @@ System.out.println("操作系统的版本号:  " + OS.getVersion());// 操作系
             System.out.println("网卡描述信息:" +cfg.getName() + "网卡描述信息:" + cfg.getDescription());// 网卡描述信息
             System.out.println( "网卡类型" +cfg.getName() + "网卡类型" + cfg.getType());//
             System.out.println(":=================================");*/
-            ethernetLogList.add("无线网卡名称:" +cfg.getName());// IP地址
-            ethernetLogList.add("IP地址:" +cfg.getName() + " IP地址:" + cfg.getAddress());// IP地址
-            ethernetLogList.add("网关广播地址:" +cfg.getName() + " 网关广播地址:" + cfg.getBroadcast());// 网关广播地址
-            ethernetLogList.add("网卡MAC地址:" +cfg.getName() + " 网卡MAC地址:" + cfg.getHwaddr());// 网卡MAC地址
-            ethernetLogList.add("子网掩码:" +cfg.getName() + " 子网掩码:" + cfg.getNetmask());// 子网掩码
-            ethernetLogList.add("网卡描述信息:" +cfg.getName() + " 网卡描述信息:" + cfg.getDescription());// 网卡描述信息
-            ethernetLogList.add("网卡类型" +cfg.getName() + " 网卡类型" + cfg.getType());//
+            ethernetLogList.add("无线网卡名称:" + cfg.getName());// IP地址
+            ethernetLogList.add("IP地址:" + cfg.getName() + " IP地址:" + cfg.getAddress());// IP地址
+            ethernetLogList.add("网关广播地址:" + cfg.getName() + " 网关广播地址:" + cfg.getBroadcast());// 网关广播地址
+            ethernetLogList.add("网卡MAC地址:" + cfg.getName() + " 网卡MAC地址:" + cfg.getHwaddr());// 网卡MAC地址
+            ethernetLogList.add("子网掩码:" + cfg.getName() + " 子网掩码:" + cfg.getNetmask());// 子网掩码
+            ethernetLogList.add("网卡描述信息:" + cfg.getName() + " 网卡描述信息:" + cfg.getDescription());// 网卡描述信息
+            ethernetLogList.add("网卡类型" + cfg.getName() + " 网卡类型" + cfg.getType());//
             ethernetLogList.add(":=================================");
 
         }
-        ArrayPrint(ethernetLogList,"无线网卡信息");
+        ArrayPrint(ethernetLogList, "无线网卡信息");
     }
 
-    private static void ethernet()  {
+    private static void ethernet() {
         Sigar sigar = null;
         sigar = new Sigar();
         ArrayList<String> ethernetLogList = new ArrayList<String>();
@@ -870,7 +916,7 @@ System.out.println("操作系统的版本号:  " + OS.getVersion());// 操作系
         } catch (SigarException e) {
             e.printStackTrace();
         }
-        ethernetLogList.add("网卡数量:"+ ifaces.length);
+        ethernetLogList.add("网卡数量:" + ifaces.length);
         for (int i = 0; i < ifaces.length; i++) {
             NetInterfaceConfig cfg = null;
             try {
@@ -889,17 +935,17 @@ System.out.println("操作系统的版本号:  " + OS.getVersion());// 操作系
             System.out.println("网卡描述信息:" +cfg.getName() + "网卡描述信息:" + cfg.getDescription());// 网卡描述信息
             System.out.println( "网卡类型" +cfg.getName() + "网卡类型" + cfg.getType());//
             System.out.println(":=================================");*/
-            ethernetLogList.add("网卡名称:" +cfg.getName());// IP地址
-            ethernetLogList.add("IP地址:" +cfg.getName() + " IP地址:" + cfg.getAddress());// IP地址
-            ethernetLogList.add("网关广播地址:" +cfg.getName() + " 网关广播地址:" + cfg.getBroadcast());// 网关广播地址
-            ethernetLogList.add("网卡MAC地址:" +cfg.getName() + " 网卡MAC地址:" + cfg.getHwaddr());// 网卡MAC地址
-            ethernetLogList.add("子网掩码:" +cfg.getName() + " 子网掩码:" + cfg.getNetmask());// 子网掩码
-            ethernetLogList.add("网卡描述信息:" +cfg.getName() + " 网卡描述信息:" + cfg.getDescription());// 网卡描述信息
-            ethernetLogList.add("网卡类型" +cfg.getName() + " 网卡类型" + cfg.getType());//
+            ethernetLogList.add("网卡名称:" + cfg.getName());// IP地址
+            ethernetLogList.add("IP地址:" + cfg.getName() + " IP地址:" + cfg.getAddress());// IP地址
+            ethernetLogList.add("网关广播地址:" + cfg.getName() + " 网关广播地址:" + cfg.getBroadcast());// 网关广播地址
+            ethernetLogList.add("网卡MAC地址:" + cfg.getName() + " 网卡MAC地址:" + cfg.getHwaddr());// 网卡MAC地址
+            ethernetLogList.add("子网掩码:" + cfg.getName() + " 子网掩码:" + cfg.getNetmask());// 子网掩码
+            ethernetLogList.add("网卡描述信息:" + cfg.getName() + " 网卡描述信息:" + cfg.getDescription());// 网卡描述信息
+            ethernetLogList.add("网卡类型" + cfg.getName() + " 网卡类型" + cfg.getType());//
             ethernetLogList.add(":=================================");
 
         }
-        ArrayPrint(ethernetLogList,"网卡信息");
+        ArrayPrint(ethernetLogList, "网卡信息");
     }
 
     public static String getPaddingEmptyString(int length) {
@@ -1047,41 +1093,41 @@ System.out.println("操作系统的版本号:  " + OS.getVersion());// 操作系
 
         beginRow = beginRow.replace(templateString, "╗");
         //  System.out.println(" fixStrArr.size() =" + fixStrArr.size());
-        beginRow =  resetBeginRowToDefaultSize(beginRow);
+        beginRow = resetBeginRowToDefaultSize(beginRow);
         System.out.println(beginRow);
         for (int i = 0; i < fixStrArr.size(); i++) {
             System.out.println(fixStrArr.get(i));
         }
-        endRow =  resetEndRowToDefaultSize(endRow);
+        endRow = resetEndRowToDefaultSize(endRow);
         System.out.println(endRow);
     }
 
-  static String resetBeginRowToDefaultSize(String beginRow){
+    static String resetBeginRowToDefaultSize(String beginRow) {
         String curBeginStr = new String(beginRow);
-       int curPaddingLength =  getPaddingChineseLength(curBeginStr);
-       int distance = 0 ;
-       if(curPaddingLength < MAX_COUNT_CHAR_IN_ROW){
-           distance = MAX_COUNT_CHAR_IN_ROW - curPaddingLength;
-       }
-       String paddingString = getRepeatString("═",distance + 3);
-      curBeginStr = curBeginStr.replace("╗",paddingString+"╗");
-      return curBeginStr;
-    }
-
-    static String resetEndRowToDefaultSize(String beginRow){
-        String curBeginStr = new String(beginRow);
-        int curPaddingLength =  getPaddingChineseLength(curBeginStr);
-        int distance = 0 ;
-        if(curPaddingLength < MAX_COUNT_CHAR_IN_ROW){
+        int curPaddingLength = getPaddingChineseLength(curBeginStr);
+        int distance = 0;
+        if (curPaddingLength < MAX_COUNT_CHAR_IN_ROW) {
             distance = MAX_COUNT_CHAR_IN_ROW - curPaddingLength;
         }
-        String paddingString = getRepeatString("═",distance + 3);
-        curBeginStr = curBeginStr.replace("╝",paddingString+"╝");
+        String paddingString = getRepeatString("═", distance + 3);
+        curBeginStr = curBeginStr.replace("╗", paddingString + "╗");
+        return curBeginStr;
+    }
+
+    static String resetEndRowToDefaultSize(String beginRow) {
+        String curBeginStr = new String(beginRow);
+        int curPaddingLength = getPaddingChineseLength(curBeginStr);
+        int distance = 0;
+        if (curPaddingLength < MAX_COUNT_CHAR_IN_ROW) {
+            distance = MAX_COUNT_CHAR_IN_ROW - curPaddingLength;
+        }
+        String paddingString = getRepeatString("═", distance + 3);
+        curBeginStr = curBeginStr.replace("╝", paddingString + "╝");
         return curBeginStr;
     }
 
 
-    static String   getRepeatString(String repeatSrc,int repeatCount){
+    static String getRepeatString(String repeatSrc, int repeatCount) {
         String src = "";
         for (int i = 0; i < repeatCount; i++) {
             src += repeatSrc;
@@ -1226,7 +1272,7 @@ System.out.println("操作系统的版本号:  " + OS.getVersion());// 操作系
         int chineseCount = getChineseCount(oriStr);
         paddingLength = paddingLength - chineseCount;
         if (paddingLength < 0) {
-           // return "curString:" + oriStr + "  length more than" + maxLength;
+            // return "curString:" + oriStr + "  length more than" + maxLength;
             return "";
         }
 

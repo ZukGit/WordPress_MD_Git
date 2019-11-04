@@ -22,6 +22,84 @@ public class C3_Zanalyze {
     static int mSumSingleFileNum = 0;
     static ArrayList<Zanalyze> mZanalyzeList = new ArrayList<>();  // 待分析类的集合
 
+
+
+    //=======================WIFI-BEGIN=================
+    // WIFI 相关目录
+    //wifi-1. 	/frameworks/opt/net/wifi/service/java/com/android/server/wifi/
+    static {
+        ArrayList<String> pathList = new ArrayList<String>();
+        pathList.add(curProjectPath + "/frameworks/opt/net/wifi/service/java/com/android/server/wifi");
+        ArrayList<String> filterList = new ArrayList<String>();
+        filterList.add(".java");
+        Zanalyze mZanalyze = new Zanalyze(pathList, filterList);
+        mZanalyzeList.add(mZanalyze);
+    }
+
+    //wifi-2.     /frameworks/base/wifi/java/android/net/wifi/
+    static {
+        ArrayList<String> pathList = new ArrayList<String>();
+        pathList.add(curProjectPath + "/frameworks/base/wifi/java/android/net/wifi");
+        ArrayList<String> filterList = new ArrayList<String>();
+        filterList.add(".java");
+        Zanalyze mZanalyze = new Zanalyze(pathList, filterList);
+        mZanalyzeList.add(mZanalyze);
+    }
+
+
+
+
+    //wifi-3.    /motorola/packages/apps/WpaConfig/src/com/motorola/config/wifi/
+    static {
+        ArrayList<String> pathList = new ArrayList<String>();
+        pathList.add(curProjectPath + "/motorola/packages/apps/WpaConfig/src/com/motorola/config/wifi");
+        ArrayList<String> filterList = new ArrayList<String>();
+        filterList.add(".java");
+        Zanalyze mZanalyze = new Zanalyze(pathList, filterList);
+        mZanalyzeList.add(mZanalyze);
+    }
+
+
+
+    // wifi-4.    /frameworks/base/packages/SettingsLib/src/com/android/settingslib/wifi/
+    static {
+        ArrayList<String> pathList = new ArrayList<String>();
+        pathList.add(curProjectPath + "/frameworks/base/packages/SettingsLib/src/com/android/settingslib/wifi");
+        ArrayList<String> filterList = new ArrayList<String>();
+        filterList.add(".java");
+        Zanalyze mZanalyze = new Zanalyze(pathList, filterList);
+        mZanalyzeList.add(mZanalyze);
+    }
+
+    // wifi-5. /frameworks/base/packages/SystemUI/src/com/android/systemui/statusbar/policy
+    static {
+        ArrayList<String> pathList = new ArrayList<String>();
+        pathList.add(curProjectPath + "/frameworks/base/packages/SystemUI/src/com/android/systemui/statusbar/policy");
+        ArrayList<String> filterList = new ArrayList<String>();
+        filterList.add("Wifi");
+        filterList.add("Ethernet");
+        Zanalyze mZanalyze = new Zanalyze(pathList, filterList);
+        mZanalyzeList.add(mZanalyze);
+    }
+
+
+// wifi-6    /packages/apps/Settings/src/com/android/settings/wifi/
+
+    static {
+        ArrayList<String> pathList = new ArrayList<String>();
+        pathList.add(curProjectPath + "/packages/apps/Settings/src/com/android/settings/wifi");
+        ArrayList<String> filterList = new ArrayList<String>();
+        filterList.add(".java");
+        Zanalyze mZanalyze = new Zanalyze(pathList, filterList);
+        mZanalyzeList.add(mZanalyze);
+    }
+
+//=======================WIFI-END=================
+
+
+
+
+	/*
     // 把 Settings下的java文件都打包成一个文件  输出 html 页面  以及 md文件
     //  文件名称为 packages-apps-Settings_java_Analysis.html
     //  文件名称为 packages-apps-Settings_java_Analysis.md
@@ -46,7 +124,7 @@ public class C3_Zanalyze {
         Zanalyze mZanalyze = new Zanalyze(pathList, filterList);
         mZanalyzeList.add(mZanalyze);
     }
-
+	*/
 
     static File current_juwuba_template_file = new File(System.getProperty("user.dir") + File.separator + "C3_juwuba_template.html");
     static String current_juwuba_html_template_content = "";

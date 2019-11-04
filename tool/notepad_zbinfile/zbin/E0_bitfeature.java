@@ -156,6 +156,8 @@ public class E0_bitfeature {
 
 
     static void toCheck64BitFeature(long flag) {
+        System.out.println();
+        System.out.println();
         System.out.println("#######=============解析   flag=" + getOxHexString(flag) + "   Begin ===========####");
         System.out.println("当前解析能力标记位Long(       16进制):" + getOxHexString(flag));
         System.out.println("当前解析能力标记位Long( 有符号10进制):" + flag   +"                 (无符号10进制):"+Long.toUnsignedString(flag) )  ;
@@ -177,6 +179,8 @@ public class E0_bitfeature {
         }
         System.out.println("=============解析能力结束===========");
         System.out.println("#######=============解析   flag=" + getOxHexString(flag) + "   End   ===========####");
+        System.out.println();
+        System.out.println();
     }
 
 
@@ -304,9 +308,15 @@ public class E0_bitfeature {
     static void showUsualFlagInfo() {
         toCheck64BitFeature(0x1);
         toCheck64BitFeature(0x6);
-        toCheck64BitFeature(0x16);
-        toCheck64BitFeature(0x196);
-
+        toCheck64BitFeature(0x192);
+        toCheck64BitFeature(0x168);
+        toCheck64BitFeature(0x1024);
+        toCheck64BitFeature(1024);
+        toCheck64BitFeature(0);
+        toCheck64BitFeature(1);
+        toCheck64BitFeature(-1);
+        toCheck64BitFeature(192);
+        toCheck64BitFeature(168);
     }
 
 

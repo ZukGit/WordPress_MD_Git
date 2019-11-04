@@ -54,10 +54,10 @@ public class D6_FileNameSearch {
                 }
                 String itemArgStr = args[i];
                 if (itemArgStr.startsWith(".")) {
-                    typeStr = itemArgStr;
+                    typeStr = itemArgStr.toLowerCase();
                     mTypeList = getSingleType(typeStr);
                 } else {
-                    mKeyWordName.add(itemArgStr);
+                    mKeyWordName.add(itemArgStr.toLowerCase());
                 }
             }
         }
@@ -67,7 +67,7 @@ public class D6_FileNameSearch {
 
             // 显示出当前文件夹 文件类型 以及文件个数
             initDirFileSet(curDirFile);
-            initSimpleFileSet();
+            initSimpleFileSetDetail();
             getFileTypeInfo();
             showMapSummaryDataStyle2();
             System.out.println("程序正常结束!");
@@ -208,6 +208,8 @@ public class D6_FileNameSearch {
     @SuppressWarnings("unchecked")
     public static void showMapSummaryDataStyle2() {
         int fileSum = 0 ;
+        System.out.println();
+        System.out.println();
         ArrayList<String> formatStringList = new  ArrayList<String>();
         Map.Entry<String, ArrayList<File>> entry;
         if (arrFileMap != null) {
@@ -226,6 +228,7 @@ public class D6_FileNameSearch {
         for(String infoItem: formatStringList){
             System.out.println(infoItem);
         }
+        System.out.println("文件夹总数:"+allSimpleFileSet.size());
         System.out.println("文件总数:"+fileSum);
     }
 
@@ -252,7 +255,7 @@ public class D6_FileNameSearch {
             File curFile = allSingleFileList.get(i);
 
             if (currentMode == SEARCH_MODE_NAME) {
-                String curFileName = curFile.getName();
+                String curFileName = curFile.getName().toLowerCase();
                 boolean matchNameFlag = CheckFileName(curFileName, nameList);
 
                 if (matchNameFlag) {
@@ -261,14 +264,14 @@ public class D6_FileNameSearch {
 
 
             } else if (currentMode == SEARCH_MODE_TYPE) {
-                String curFileName = curFile.getName();
+                String curFileName = curFile.getName().toLowerCase();
                 // 返回匹配到的类型  作为map的key 没有匹配到 就返回 null
                 String matchTypeKey = CheckFileType(curFileName, typeList);
                 if (matchTypeKey != null) {
                     addItemFileToMap(matchTypeKey, curFile);
                 }
             } else {  //  类型和 名称都要检查
-                String curFileName = curFile.getName();
+                String curFileName = curFile.getName().toLowerCase();
                 boolean matchNameFlag = CheckFileName(curFileName, nameList);
                 String matchTypeKey = CheckFileType(curFileName, typeList);
                 if (matchNameFlag && matchTypeKey != null) {
@@ -293,9 +296,9 @@ public class D6_FileNameSearch {
         boolean flag = false;
 
         for (int i = 0; i < nameList.size(); i++) {
-            String curNameItem = nameList.get(i).trim().toLowerCase();
+            String curNameItem = nameList.get(i);
 
-            if (curFileName.trim().toLowerCase().contains(curNameItem)) {
+            if (curFileName.contains(curNameItem)) {
                 flag = true;
                 break;
             }
@@ -364,14 +367,19 @@ public class D6_FileNameSearch {
     }
 
     static void getFileTypeInfo() {
+        int index = 1;
+        System.out.println();
+        System.out.println();
         for (File curFile : allSimpleFileSet) {
             String fileName = curFile.getName();
+            System.out.println("文件索引[ "+index+"]  路径: "+ curFile.getAbsolutePath() );
             if (!fileName.contains(".")) {
                 addFileMapItemWithKey("unknow", curFile);
             } else {
                 String suffix = fileName.substring(fileName.lastIndexOf(".")).trim().toLowerCase();
                 addFileMapItemWithKey(suffix, curFile);
             }
+            index++;
 
         }
     }
@@ -380,7 +388,27 @@ public class D6_FileNameSearch {
     static void initSimpleFileSet() {
         int fileIndex = 1;
         for (File dirFile : allDirFileSet) {
-            //    System.out.println("index=" + fileIndex + "   PATH:" + dirFile.getAbsolutePath());
+//              System.out.println("index=" + fileIndex + "   PATH:" + dirFile.getAbsolutePath());
+            File[] childFileList = dirFile.listFiles();
+            if (childFileList != null && childFileList.length > 0) {
+                for (int i = 0; i < childFileList.length; i++) {
+                    if (!childFileList[i].isDirectory()) {
+                        allSimpleFileSet.add(childFileList[i]);
+                    }
+                }
+
+            }
+            fileIndex++;
+        }
+    }
+
+
+    static void initSimpleFileSetDetail() {
+        int fileIndex = 1;
+        System.out.println();
+        System.out.println();
+        for (File dirFile : allDirFileSet) {
+            System.out.println("文件夹索引index=" + fileIndex + "   PATH: " + dirFile.getAbsolutePath());
             File[] childFileList = dirFile.listFiles();
             if (childFileList != null && childFileList.length > 0) {
                 for (int i = 0; i < childFileList.length; i++) {

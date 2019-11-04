@@ -587,7 +587,7 @@ return resultList;
                 ArrayList<String> fixA = null;
                 if (curMaxStr.contains("【") && curMaxStr.contains("】") ){
                     fixA = toSqlitWithhardBlock(curMaxStr );
-                } if (curMaxStr.contains(";")) {
+                } else if (curMaxStr.contains(";")) {
                     fixA = sqlitString(curMaxStr, ";");
                 } else if (curMaxStr.contains("。")) {
                     fixA = sqlitString(curMaxStr, "。");
