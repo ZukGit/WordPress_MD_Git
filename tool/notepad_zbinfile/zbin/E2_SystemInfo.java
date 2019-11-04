@@ -314,7 +314,9 @@ public class E2_SystemInfo {
 
         } else if (curOS_TYPE == OS_TYPE.Linux) {
             newLibraryPath = curLibraryPath + ":" + value;
-        }
+        } else if(curOS_TYPE == OS_TYPE.MacOS){
+	              newLibraryPath = curLibraryPath + ":" + value;
+	  }
 
         props.setProperty("java.library.path", newLibraryPath);
         //System.out.println("加载库时搜索的路径列表B:" + props.getProperty("java.library.path"));
