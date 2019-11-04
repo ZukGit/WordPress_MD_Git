@@ -10,5 +10,4 @@ alias cls='clear'
 alias cdd='cd $HOME/Desktop/'
 alias gits='git status'
 alias gts='git status'
-cdd
 clear
