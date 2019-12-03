@@ -1,11 +1,7 @@
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -13,6 +9,60 @@ public class F1_DicWlan {
 
     static HashMap<String, ArrayList<Dic_Item>> dictory_All = new HashMap<String, ArrayList<Dic_Item>>();
     static NumberFormat nf = new DecimalFormat("0.00");
+
+
+    static File F1_Properties_File = new File(System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin" + File.separator + "F1.properties");
+    static InputStream F1_Properties_InputStream;
+    static OutputStream F1_Properties_OutputStream;
+    static Properties F1_Properties = new Properties();
+
+    static {
+        try {
+            if(!F1_Properties_File.exists()){
+                F1_Properties_File.createNewFile();
+            }
+            F1_Properties_InputStream = new BufferedInputStream(new FileInputStream(F1_Properties_File.getAbsolutePath()));
+            F1_Properties.load(F1_Properties_InputStream);
+            Iterator<String> it = F1_Properties.stringPropertyNames().iterator();
+            while (it.hasNext()) {
+                String key = it.next();
+                //   System.out.println("key:" + key + " value: " + F1_Properties.getProperty(key));
+            }
+            F1_Properties_InputStream.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    static void setProperity() {
+        try {
+            F1_Properties_OutputStream = new BufferedOutputStream(new FileOutputStream(F1_Properties_File.getAbsolutePath()));
+            F1_Properties.store(F1_Properties_OutputStream, "");
+            F1_Properties_OutputStream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    static void setProperityInt(int value, String key) {
+        int fileCount_prop = 0;
+        String localFileCountStr = F1_Properties.getProperty(key);
+        if (localFileCountStr == null || "".equals(localFileCountStr) || "null".equals(localFileCountStr)) {
+            fileCount_prop = 0;
+        } else {
+            fileCount_prop = Integer.parseInt(localFileCountStr);
+        }
+        if (value != fileCount_prop) {
+            F1_Properties.setProperty(key, "" + value);
+        }
+    }
+
+    static void setProperityString(String key, String value) {
+        F1_Properties.setProperty(key, value);
+    }
+
 
 
     enum OS_TYPE{
@@ -71,9 +121,23 @@ public class F1_DicWlan {
         if (mKeyWordName.size() == 0) {
             System.out.println("用户输入的英文缩写参数为空-将打印所有保存的字典信息");
             showAllDicInfo();
+            showPropInfo();
             // z1 打印所有的字典信息
             // z2 打印对应的使用方法说明
             return;
+        }
+
+        //  如果只有一个输入并且包含等号
+        if(mKeyWordName.size() == 1 && mKeyWordName.get(0).contains("=")){
+            String input = mKeyWordName.get(0);
+            String key = input.substring(0,input.indexOf("="));
+            String value = input.substring(input.indexOf("=")+1);
+            System.out.println("临时保存缩写完成!  Key=【 "+key+" 】    value=【"+value+"】");
+            setProperityString(key.trim(),value.trim());
+            setProperity();
+            showPropInfo();
+
+          return;
         }
 
         for (int i = 0; i < mKeyWordName.size(); i++) {
@@ -97,6 +161,17 @@ public class F1_DicWlan {
                     break;
                 }
                 for (int j = 0; j < targetArr.size(); j++) {
+                    Dic_Item curDicItem = targetArr.get(j);
+                    if(F1_Properties.contains(curDicItem.shortWord) || F1_Properties.contains(curDicItem.shortWord.toLowerCase())
+                     || F1_Properties.contains(curDicItem.shortWord.toUpperCase()) ||
+                            F1_Properties.contains(curDicItem.firstUpShortWord)){
+
+                        //  如果在 prop 中 包含这个 说明已经有这个 缩写的详细说明  那么从Prop中删除这个
+                        F1_Properties.remove(curDicItem.shortWord);
+                        F1_Properties.remove(curDicItem.shortWord.toLowerCase());
+                        F1_Properties.remove(curDicItem.shortWord.toUpperCase());
+                        F1_Properties.remove(curDicItem.firstUpShortWord);
+                    }
                     String itemShort = targetArr.get(j).getShortWord().toLowerCase();  // 拿到保存的缩写
                     if (itemShort.startsWith(prefix)) {
                         printDicArr.add(targetArr.get(j));
@@ -112,7 +187,7 @@ public class F1_DicWlan {
         long timedistance = timestamp2 - timestamp1;
 
         System.out.println("程序执行花销 " + Double.parseDouble(nf.format((Double) (timedistance / (1024d)))) + "秒!");
-
+        setProperity();
 
     }
 
@@ -174,6 +249,34 @@ public class F1_DicWlan {
     }
 
 
+    static void showPropInfo(){
+     Set<String>  keySet =    F1_Properties.stringPropertyNames();
+     ArrayList<String> keyList = new ArrayList<String>();
+        ArrayList<String> logArr = new ArrayList<String>();
+        keyList.addAll(keySet);
+        for (int i = 0; i < keyList.size() ; i++) {
+String key = keyList.get(i);
+String value = F1_Properties.get(key)+"";
+            logArr.add("索引: "+ get5Str(i+1) + "  Key:【"+key +"】   value:【"+value+"】");
+        }
+
+        ArrayPrint(logArr,"Properties【"+keyList.size()+"】"+"临时保存列表");
+
+    }
+
+
+  static String   get5Str(int  value){
+        String result = " "+value;
+        if(value > 100000)
+            return value+"";
+        else{
+            int paddingLength = 6 - result.length();
+            for (int i = 0; i < paddingLength; i++) {
+                result = result + " ";
+            }
+return result;
+        }
+    }
     @SuppressWarnings("unchecked")
     public static void showAllDicInfo() {
         Map.Entry<String, ArrayList<Dic_Item>> entry;
@@ -899,6 +1002,7 @@ public class F1_DicWlan {
     static class Dic_Item {
         char firstChar;  // 首字母  以便分类
         String shortWord;  // 缩写
+        String firstUpShortWord ;  // 首字母大写的缩写
         String fullWorld_en; //  英文全拼
         String fullWorld_ch; //  中文全拼
         ArrayList<String> descList;  // 相关描述
@@ -907,6 +1011,7 @@ public class F1_DicWlan {
         Dic_Item(String mshortWord) {
             this.shortWord = mshortWord;
             this.firstChar = mshortWord.toLowerCase().trim().charAt(0);
+            this.firstUpShortWord = shortWord.substring(0,1).toUpperCase()+shortWord.substring(1);
         }
 
         public char getFirstChar() {

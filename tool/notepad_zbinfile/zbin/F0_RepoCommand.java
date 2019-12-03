@@ -23,6 +23,7 @@ public class F0_RepoCommand {
     static String productName = "";  // 产品名称
     static String xmlbranchName = "";  // .xml输入
     static String gitRepoName = "";  // .git 输入
+    static char mVersionChar = 'a';  // 产品名称
     static String manifestBranchName = "";  // manifest的分支
 
 
@@ -198,6 +199,7 @@ public class F0_RepoCommand {
             String productName = metaData.productName;
             String xmlbranchName = metaData.xmlbranchName;
             String gitRepoName = metaData.gitRepoName;
+            mVersionChar= gitRepoName.substring(0,1).charAt(0);
             String manifestBranchName = metaData.manifestBranchName;
             String key = productName.trim();
             String value = gitRepoName.trim() + " " + manifestBranchName.trim() + " " + xmlbranchName.trim() + " " + productName.trim();
@@ -245,6 +247,7 @@ public class F0_RepoCommand {
 
         // 查看当前输入的产品名称是否有保存在 prop中
         Repo_Meta_Data selectRepoMetaData = checkRepoMetaInProp(productName);
+
         if (selectRepoMetaData == null) {   //  如果当前的 项目名称不存在 prop 中 那么打印 传统的数据
             System.out.println("该 ProductName="+productName+" 【不存在于 prop】 中将打印可能的命令(也许会执行失败)");
             showRepoInitFrameworkDexFlag();
@@ -256,14 +259,18 @@ public class F0_RepoCommand {
             showBuildingAppCommand();
             System.out.println();
             showCommitTip();
+            showPathTip(productName,mVersionChar);
             showProperiesMap(productKey2ValueList);
 //            showProperiesMap(propKey2ValueList);
         } else {   // 如果在当前的 prop中  拿到数据 去解析
             System.out.println("该 ProductName="+productName+" 【存在于 prop】 中将打印所有的命令");
-
+            mVersionChar= selectRepoMetaData.gitRepoName.substring(0,1).toLowerCase().charAt(0);
             System.out.println();
             showRepoInitFrameworkDexFlag(selectRepoMetaData);
             System.out.println();
+            showRepoInitFrameworkDexFlagAndAddLog(selectRepoMetaData);
+            System.out.println();
+
             showRepoInit(selectRepoMetaData);
             System.out.println();
             showRepoInitAddCpCommand(selectRepoMetaData);
@@ -273,6 +280,7 @@ public class F0_RepoCommand {
             showBuildingAppCommand();
             System.out.println();
             showCommitTip();
+            showPathTip(productName,mVersionChar);
             showProperiesMap(productKey2ValueList);
 //            showProperiesMap(propKey2ValueList);
         }
@@ -532,7 +540,43 @@ public class F0_RepoCommand {
         System.out.println("示例1:  git push origin TEMP:refs/for/bp ");
         System.out.println("示例2:  git push origin TEMP:refs/for/bq ");
         System.out.println("示例3:  git push origin TEMP:refs/for/bp-mtk ");
+        printLine();
+        printSchema("");
     }
+
+
+    static void showPathTip(String productname , char versonChar ) {
+        printSchema("【 特殊文件 Path 提示】  ");
+        System.out.println("【1. framework/overlay/value/value.xml 资源覆盖版本路径】 ");
+        System.out.println("zzfile_3.sh  ./device/moto/"+productname+"/overlay/frameworks/base/core/res/res/values");
+        System.out.println("zzfile_3.sh  ./device/moto/"+productname+"/overlay_32/frameworks/base/core/res/res/values");
+        System.out.println("【2. prop覆盖宏配置文件 】 ");
+        System.out.println("zzfile_3.sh  ./vendor/moto/"+productname+"_oem_config/"+productname+"_retail/oem_reteu_"+productname+"/contents/oem.prop");
+        System.out.println("【3. out/framework.jar 文件 】 ");
+        System.out.println("zzfile_3.sh  ./out/target/product/"+productname+"/system/framework/framework.jar");
+        System.out.println("【4. out/wifi-service.jar  】 ");
+        System.out.println("zzfile_3.sh  ./out/target/product/"+productname+"/system/framework/wifi-service.jar");
+
+        if(versonChar <= 'p'){
+            System.out.println("【5. Settings.apk(P及以下) 文件 】 ");
+            System.out.println("zzfile_3.sh  ./out/target/product/"+productname+"/system/priv-app/Settings/Settings.apk");
+        }else{
+            System.out.println("【5. Settings.apk(Q及以上) 文件 】 ");
+            System.out.println("zzfile_3.sh  ./out/target/product/"+productname+"/product/priv-app/Settings/Settings.apk");
+        }
+
+        System.out.println("【6. framework/base/wifi/java/android/net/wifi 路径  wifimanager 】 ");
+        System.out.println("zzfile_3.sh  ./frameworks/base/wifi/java/android/net/wifi");
+
+
+        System.out.println("【7. framework/opt/wifi/service/wifi 路径 wifiservice 】 ");
+        System.out.println("zzfile_3.sh  ./frameworks/opt/net/wifi/service/java/com/android/server/wifi");
+
+
+        printLine();
+        printSchema("");
+    }
+
 
     static void showBuildingAppCommand() {
         printSchema("【 编译 apk jar so bin 命令】");
@@ -697,18 +741,22 @@ public class F0_RepoCommand {
     }
 
 
+    // buildType  分为 "retail"   "   source /opt/conf/moto.conf  会把java改为50版本  很多jar包无法再50版本使用
+
+
+
     // buildType  分为 "retail"   "
     static ArrayList<String> buildInitAndCompileCommandWithMetaData(Repo_Meta_Data metaData) {
         ArrayList<String>  buildcompileList = new ArrayList<String>();
         String logname = metaData.productName;
         String result = "";
         String str1_1 = "export PATH=/apps/android/python-2.7.6-x64/bin:$PATH  && export PATH=/apps/android/perl-5.1aclmsx8.4-x64/bin:$PATH && ";
-        String str1_2 = "source /opt/conf/moto.conf && ";
+
         String str2_1 = "repo init -u ssh://gerrit.mot.com/home/repo/dev/platform/android/platform/manifest/" + metaData.gitRepoName.trim()  + " " + "--repo-url=ssh://gerrit.mot.com/home/repo/dev/platform/android/repo.git ";
         String str2_2 = "--manifest-branch=" + metaData.manifestBranchName.trim() + "  ";
         String str2_3 = "-m " + metaData.xmlbranchName.trim() + "  && ";
         String str3_1 = "repo sync -j2  && repo start --all TEMP  && ";
-
+        String str4_1_1 = "source /opt/conf/moto.conf && ";
         for (int i = 0; i < metaData.BuildingCommandList.size(); i++) {
             String buildList = metaData.BuildingCommandList.get(i);
 
@@ -723,7 +771,7 @@ public class F0_RepoCommand {
             String str4_1 =  buildList;
             String str5_1 = " 2>&1 | tee " + getTimeStampDesc() + "_" + logname + ".log";
             logname = metaData.productName;  // 文件名称还原
-            result = str1_1 + str1_2 + str2_1 + str2_2 + str2_3 + str3_1 + str4_1 + str5_1;
+            result = str1_1  + str2_1 + str2_2 + str2_3 + str3_1 +str4_1_1 + str4_1 + str5_1;
             buildcompileList.add(result);
         }
         // motorola/build/bin/build_device.bash -b nightly -p lima_retail -g -jX -e oem-image
@@ -767,7 +815,47 @@ public class F0_RepoCommand {
     }
 
 
+    static void showRepoInitFrameworkDexFlagAndAddLog(Repo_Meta_Data metaData) {
+        printSchema("【repo init + dexfalg-frameworks.jar + logadd .java添加Log 命令】");
+        // System.out.println("--------------------------------------------------");
 
+        String TAG = "repo start --all TEMP";
+        String TAG_TARGET = "repo start --all TEMP  &&  zadddex_flag_C8.sh  && zlog_add_B8.sh ./packages/apps/Settings  ";
+
+
+        printLine();
+        productName = metaData.productName;
+        gitRepoName = metaData.gitRepoName;
+        manifestBranchName = metaData.manifestBranchName;
+        xmlbranchName = metaData.xmlbranchName;
+        ArrayList<String> initandcompileCommand =  buildInitAndCompileCommandWithMetaData(metaData);
+        for (int i = 0; i < initandcompileCommand.size(); i++) {
+            String command = initandcompileCommand.get(i);
+            if(command.contains("-E oem-image")){
+                printLine();
+                System.out.println("【" + productName + "_retail" + " 【-E = OEM+SW + frameworks.jar 】 】");
+                command = command.replace(TAG,TAG_TARGET);
+                System.out.println(command);
+                System.out.println();
+
+            }else if(command.contains("-e oem-image")){
+                printLine();
+                System.out.println("【" + productName + "_retail" + " 【-e = OEM+Only + frameworks.jar 】 】");
+                command = command.replace(TAG,TAG_TARGET);
+                System.out.println(command);
+                System.out.println();
+            }else{
+                printLine();
+                System.out.println("【" + productName + "_retail" + " 【retain_common + frameworks.jar 】 】");
+                command = command.replace(TAG,TAG_TARGET);
+                System.out.println(command);
+                System.out.println();
+            }
+        }
+
+        printSchema("");
+
+    }
     static void showRepoInitFrameworkDexFlag(Repo_Meta_Data metaData) {
 
         printSchema("【repo init + dexfalg-frameworks.jar 命令】");
