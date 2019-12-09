@@ -6666,10 +6666,6 @@ class F8_Dump_All {
 
         mAndroidVersion =   getSystemVersionFromFile(propFile);
 
-        if(mAndroidVersion == null || "".equals(mAndroidVersion.trim())){
-            System.out.println("读取到的 getprop.txt 文件中  配置项 ro.build.version.release 为空!  程序执行结束！" );
-            return false;
-        }
         String propContent = ReadFileContent(propFile);
         if(propContent != null){
             if(propContent.contains(".mtk") || propContent.contains("mtk.")){

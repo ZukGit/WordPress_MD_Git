@@ -15,11 +15,11 @@ adb wait-for-device
 md  %userprofile%\Desktop\zbin\F8\
 del /f/s/q %userprofile%\Desktop\zbin\F8\wifi.txt
 adb shell getprop > %userprofile%\Desktop\zbin\F8\getprop.txt
-adb shell dumpsys wifi > %userprofile%\Desktop\zbin\F8\wifi.txt
+adb shell dumpsys location > %userprofile%\Desktop\zbin\F8\location.txt
 
 
 
-@javac  -Xlint:unchecked -encoding UTF-8 %userprofile%\Desktop\zbin\F8_Dump_All.java
-@java -cp  %userprofile%\Desktop\zbin    F8_Dump_All %1  %2  %3 %4  %5  %6  %7  %8  %9 
+@javac  -Xlint:unchecked -encoding UTF-8 %userprofile%\Desktop\zbin\F8_Dump_Location.java
+@java -cp  %userprofile%\Desktop\zbin    F8_Dump_Location %1  %2  %3 %4  %5  %6  %7  %8  %9 
 
 Pause

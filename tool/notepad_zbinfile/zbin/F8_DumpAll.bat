@@ -8,7 +8,6 @@ ECHO init-ing
 :LOOP
 
 ECHO waiting conenct with USB
-
 adb wait-for-device
 
 del /f/s/q %userprofile%\Desktop\zbin\F8\F8_AllService.txt
