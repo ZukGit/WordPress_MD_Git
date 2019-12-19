@@ -22,16 +22,17 @@ if exist %userprofile%\Desktop\zbin\F8\F8_AllService.txt (
        set service=%%j
 	   set realservice=!service:~0,-1!
 	   echo count=!count! realservice=!realservice!
-       adb shell dumpsys !realservice! > %userprofile%\Desktop\zbin\F8\!realservice!.txt
-    
+	   
+	   
+	   	if not "!realservice!"=="bugreport" (
+	   adb shell dumpsys !realservice! > %userprofile%\Desktop\zbin\F8\!realservice!.txt
+	   )
+
 rem   call adb uninstall !str1!
   )
 ECHO all dumpsys service loaded at  %userprofile%\Desktop\zbin\F8\ !
 ) else (
 ECHO F8_AllService.txt file not exist !
 )
-
-@javac  -Xlint:unchecked -encoding UTF-8 %userprofile%\Desktop\zbin\F8_Dump_All.java
-@java -cp  %userprofile%\Desktop\zbin    F8_Dump_All %1  %2  %3 %4  %5  %6  %7  %8  %9 
 
 Pause

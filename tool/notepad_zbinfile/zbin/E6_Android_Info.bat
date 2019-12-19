@@ -21,7 +21,7 @@ del %userprofile%\Desktop\zbin\E6\9_2_settings_secure.txt
 del %userprofile%\Desktop\zbin\E6\9_3_settings_global.txt
 del %userprofile%\Desktop\zbin\E6\10_1_WCNSS_qcom_cfg.txt
 del %userprofile%\Desktop\zbin\E6\11_1_hostapd.txt
-
+del %userprofile%\Desktop\zbin\E6\12_1_softap.conf
 
 adb shell getprop                    > %userprofile%\Desktop\zbin/E6/1_Prop.txt
 
@@ -63,6 +63,10 @@ adb pull /vendor/etc/wifi/WCNSS_qcom_cfg.ini   %userprofile%\Desktop\zbin/E6/10_
 rem hostapd.conf
 adb pull /data/vendor/wifi/hostapd/hostapd.conf %userprofile%\Desktop\zbin/E6/11_1_hostapd.txt
 
+adb pull /data/misc/wifi/softap.conf  %userprofile%\Desktop\zbin/E6/12_1_softap.conf
+
+rem memdump.txt
+adb shell dumpsys meminfo        > %userprofile%\Desktop\zbin/E6/12_1_memdump.txt
 
 @javac -encoding UTF-8 %userprofile%\Desktop\zbin\E6_Android_Info.java
 @java -cp  %userprofile%\Desktop\zbin    E6_Android_Info 

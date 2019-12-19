@@ -287,7 +287,7 @@ class F8_Dump_Location {
             return AllDumpFileList;
         }
 
-        // Zukgit2  -- 依据版本生成 对 不同的 输入文件 进行解析  目前 支持 gps 
+        // Zukgit2  -- 依据版本生成 对 不同的 输入文件 进行解析  目前 支持 gps
         ArrayList<String> getVersionNeedAnalysisFileNameList(String versionStr){
             if(versionStr == null)
                 return null;
@@ -359,6 +359,43 @@ class F8_Dump_Location {
             location_1_1.classNameForShuxing = " LocationManagerService extends ILocationManager.Stub {}  ";
             location_1_1.printcode="LocationManagerService  void dump(FileDescriptor fd, PrintWriter pw, String[] args) {} ";
             location_1_1.printLogUrl="";
+            location_1_1.expain1="LOG示例: \n" +
+                    " Current System Time: 12-10 00:39:05.015 【当前手机系统时间(可能不正确)】 \n" +
+                    " Current Elapsed Time: +5d22h5m14s323ms  【当前手机开机持续时间  天时分秒】\n" +
+                    " \n" +
+                    " 经纬度查询: http://www.gpsspg.com/maps.htm\n" +
+                    " 位置provider类型:   adb shell settings get secure  location_providers_allowed    【gps,network】\n" +
+                    " \n" +
+                    "GPS定位模式:        adb shell settings get secure location_mode       【3】\n" +
+                    "adb shell settings put secure location_mode   0  【 关闭 GPS定位 】\n" +
+                    "adb shell settings put secure location_mode   3  【 打开 GPS定位 】\n" +
+                    "【0-GPS关闭 1-仅使用设备(GPS)定位  2-低功耗定位模式，仅使用网络定位(WiFi和基站定位)  3-高精度定位模式，GPS与网络综合定位】\n" +
+                    "\n" +
+                    "WIFI扫描定位:  adb shell settings get global wifi_scan_always_enabled       【0-WIFI扫描定位关闭】【1-WIFI扫描定位开启】\n" +
+                    "adb shell settings put global wifi_scan_always_enabled   0    【 关闭WIFI扫描定位 】\n" +
+                    "adb shell settings put global wifi_scan_always_enabled   1    【 开启WIFI扫描定位 】\n" +
+                    "\t \n" +
+                    "\n" +
+                    "蓝牙BLE扫描定位:  adb shell settings get ble_scan_always_enabled   【0-蓝牙扫描定位关闭】【1-蓝牙扫描定位开启】\n" +
+                    "adb shell settings put global ble_scan_always_enabled   0    【 关闭蓝牙扫描定位 】\n" +
+                    "adb shell settings put global ble_scan_always_enabled   1    【 开启蓝牙扫描定位 】\n" +
+                    "\n" +
+                    "\t\t\n" +
+                    " 搜索关键词:\n" +
+                    "【当前passtive 被动监听位置数据的APP 列表 】———————— 搜索 【     Reciever[】\n" +
+                    "LocationManagerService HashMap<String, ArrayList<UpdateRecord>>  mRecordsByProvide = \n" +
+                    "【key:【\"fused\",\"gps\",\"passive\",\"network\"】 value=【 ArrayList<UpdateRecord>】\n" +
+                    "【活跃的provide的location被请求记录集合】———————— 搜索 【Active Records by Provider: End】\n" +
+                    "【所有的Provider的location被请求记录集合 】———————— 搜索 【Historical Records by Provider: End】\n" +
+                    "【实现aidl接口 对GPS状态进行监听的APP统计(APP重启会打开新的PID进程ID) 】————— 搜索 【Active GnssStatus Listeners: End】\n" +
+                    "【对地址进行偏移的情况 】————— 搜索 【fudger: offset:】\n" +
+                    "【 GPS provider的情况 开启的时间 】————— 搜索 【gps provider: End】\n" +
+                    "【 GPS的功能bitfeature比特位 】————— 搜索 【mTopHalCapabilities=0x】\n" +
+                    "【 定位 卫星 北斗 GPS 等卫星信息 】————— 搜索 【native internal state: End═】\n" +
+                    "【 最近最新搜索到的GPS经纬度信息 】————— 搜索 【Gnss Location Data:: LatitudeDegrees:】";
+
+
+/*
             location_1_1.expain1="P:  http://androidxref.com/9.0.0_r3/xref/frameworks/base/services/core/java/com/android/server/LocationManagerService.java#3374\n" +
                     "Q:  https://www.androidos.net.cn/android/10.0.0_r6/xref/frameworks/base/services/core/java/com/android/server/LocationManagerService.java\n" +
                     "\t\n" +
@@ -614,9 +651,13 @@ class F8_Dump_Location {
                     "        }\n" +
                     "    }\n" +
                     "\t";
+
+            */
             keyWordList.add(location_1_1);
 
 
+
+/*
             KeyWordItem location_1_2 = new KeyWordItem();
             location_1_2.keyword = "  Current user:";
             location_1_2.explain="当前用户类型记录  0-系统用户  ";
@@ -625,7 +666,9 @@ class F8_Dump_Location {
                     "int[] mCurrentUserProfiles = new int[]{UserHandle.USER_SYSTEM【0】}; ";
             location_1_2.printcode="LocationManagerService  void dump(FileDescriptor fd, PrintWriter pw, String[] args) {} ";
             location_1_2.printLogUrl="";
-            location_1_2.expain1="public class LocationManagerService extends ILocationManager.Stub {\n" +
+            location_1_2.expain1="";
+
+               location_1_2.expain1="public class LocationManagerService extends ILocationManager.Stub {\n" +
                     "\n" +
                     "   // current active user on the device - other users are denied location data\n" +
                     "   int mCurrentUserId = UserHandle.USER_SYSTEM;\n" +
@@ -637,7 +680,11 @@ class F8_Dump_Location {
                     "\t...\n" +
                     "\t}\n" +
                     "\t}";
-            keyWordList.add(location_1_2);
+
+                     keyWordList.add(location_1_2);
+
+                    */
+
 
 
             KeyWordItem location_1_3 = new KeyWordItem();

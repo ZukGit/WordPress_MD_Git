@@ -3,7 +3,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-class F8_Dump_All {
+class F8_Dump_Wifi {
 
 //   getprop.txt  中读取 [ro.bui  ld.version.release]: [10]
 //getprop.txt   [ro.hardware.soc.manufacturer]: [qcom]   制造商
@@ -93,7 +93,7 @@ class F8_Dump_All {
             System.out.println("无法获得当前的设备安卓系统版本，以及对应的生产厂商， 退出!");
             return;
         }
-        F8_Dump_All mDumpAnalysis = new F8_Dump_All();
+        F8_Dump_Wifi mDumpAnalysis = new F8_Dump_Wifi();
         mDumpAnalysis.initAnalysisWithVersion();
         curAndroidAnalysis.analysisFile();
 
@@ -108,7 +108,7 @@ class F8_Dump_All {
         System.out.println("initAnalysisWithVersion version = "+ version);
         switch (version){
             case 9:
-                curAndroidAnalysis = new Android9Analysis(mAndroidVersion,mVerndor);
+                curAndroidAnalysis = new Android10Analysis(mAndroidVersion,mVerndor);
                 break;
             case 10:
                 curAndroidAnalysis = new Android10Analysis(mAndroidVersion,mVerndor);
@@ -289,6 +289,8 @@ class F8_Dump_All {
                     preAnalysisFile(name,curFile);
                     ArrayList<String> rawContent =  ReadFileRawContent(curFile);
                     // 读取每行
+					
+				
                     ArrayList<String> fixContent =   doAnalysisFile(name,curFile,rawContent,getKeyWordMap().get(name));
                     if(fixContent != null && fixContent.size() > 0){
                         endAnalysisFile(name,curFile,fixContent);
@@ -314,6 +316,8 @@ class F8_Dump_All {
             switch (version){
                 case 9:
                     listFilename.add(getpropFileName);
+                    listFilename.add(wifiFileName);
+                    listFilename.add("wifiscanner.txt");
 
                     break;
                 case 10:
@@ -323,7 +327,9 @@ class F8_Dump_All {
                     break;
 
                 case 11:
-                    listFilename.add(getpropFileName);
+                     listFilename.add(getpropFileName);
+                    listFilename.add(wifiFileName);
+                    listFilename.add("wifiscanner.txt");
 
                     break;
                 default:
@@ -372,6 +378,37 @@ class F8_Dump_All {
         ArrayList<KeyWordItem>     initWifiScannerkeyWordList(){
             ArrayList<KeyWordItem> wifiScanner_KeyWordList = new ArrayList<KeyWordItem>();
 
+
+            KeyWordItem wifisacnner_1_0 = new KeyWordItem();
+            wifisacnner_1_0.keyword = "WifiScanningService - Log Begin";
+            wifisacnner_1_0.explain="WIFI扫描实现类 ";
+            wifisacnner_1_0.printLogUrl="WifiScanningService => LocalLog mLocalLog = new LocalLog(512);  \n" +
+                    "WifiScanningService => void dump() {}\n" +
+                    "\n " +
+                    "pw.println(\"WifiScanningService - Log Begin ----\");\n" +
+                    "mLocalLog.dump(fd, pw, args);\n" +
+                    "pw.println(\"WifiScanningService - Log End ----\");";
+            wifisacnner_1_0.expain1="client connected \\ 标识 对应的UID 与 扫描服务建立起通信 \n" +
+                    "registerScanListene  \\ 每个UID 都有自己独立的 监听id  标识 对应的UID 开始监听扫描结果  id 标识( int handler ),来自 int handler = Message.arg2; 用于唯一标识客户监听类 \n" +
+                    "每当调用以下接口监听扫描 都会生成对应的 int key , 用于作为 监听类的 identify \n" +
+                    "1.每个APP都可以监听扫描结果,WifiScanner 被独立为一个单独的服务.\n" +
+                    "2.每个APP维护一个 key List, 这个 key 从1 开始递增, key=0 标识无效的 监听标识\n" +
+                    "  UID=1000 Setting 维护 1.2.3.4.5..... 自身的key 列表\n" +
+                    "  UID=10159 com.google.android.gms 也维护自身的 key 列表 \n" +
+                    "3.每一个key 标识一个在APP实现的监听接口   (uid,key) 唯一标识一个监听实现类\n" +
+                    "4.通过WifiScanner.java的 5个方式 来进行监听 并 获取 key \n" +
+                    "  void registerScanListener(ScanListener listener) { int key = addListener(listener);}\n" +
+                    "  void startBackgroundScan(ScanSettings settings, ScanListener listener,WorkSource workSource) { int key = addListener(listener);}\n" +
+                    "  void startScan(ScanSettings settings, ScanListener listener, WorkSource workSource) {int key = addListener(listener);}\n" +
+                    "  void startConnectedPnoScan(ScanSettings scanSettings, PnoSettings pnoSettings,PnoScanListener listener) {int key = addListener(listener);}\n" +
+                    "  void startDisconnectedPnoScan(ScanSettings scanSettings, PnoSettings pnoSettings,PnoScanListener listener) {int key = addListener(listener);}\n" +
+                    "5.registerScanListener 标识一个全监听,即如果有任何的扫描结果 都需要回调 fullsacn接口实现类\n" +
+                    "  addSingleScanRequest 仅标识 我这个接口 只进行一次 扫描监听就完成使命，再一下次不需要再次回调 singlescan的实现接口\n\n";
+            wifiScanner_KeyWordList.add(wifisacnner_1_0);
+
+
+
+
             KeyWordItem wifisacnner_1_1 = new KeyWordItem();
             wifisacnner_1_1.keyword = "WifiSingleScanStateMachine:";
             wifisacnner_1_1.explain="WIFI扫描实现类 ";
@@ -384,6 +421,274 @@ class F8_Dump_All {
                     "|| \n" +
                     "DefaultState";
             wifiScanner_KeyWordList.add(wifisacnner_1_1);
+
+
+
+            KeyWordItem wifisacnner_1_2 = new KeyWordItem();
+            wifisacnner_1_2.keyword = "clients:";
+            wifisacnner_1_2.explain="WIFI扫描监听接口实现类 的 集合  【uid && hashcode】作为标识符   WifiScanningServiceImpl.java  ArrayMap<Messenger, ClientInfo> mClients";
+            wifisacnner_1_2.printLogUrl="WifiScanningServiceImpl.java dump(FileDescriptor fd, PrintWriter pw, String[] args)";
+            wifisacnner_1_2.expain1="class WifiScanningServiceImpl extends IWifiScanner.Stub {\n" +
+                    "\n" +
+                    "ArrayMap<Messenger, ClientInfo> mClients;   // 打印实现监听接口的客户端信息\n" +
+                    "dump(){\n" +
+                    "\tpw.println(\"clients:\");\n" +
+                    "\tfor (ClientInfo client : mClients.values()) {\n" +
+                    "\t\tpw.println(\"  \" + client);\n" +
+                    "\t}\n" +
+                    "}\n" +
+                    "\n" +
+                    "}";
+            wifiScanner_KeyWordList.add(wifisacnner_1_2);
+
+
+
+            KeyWordItem wifisacnner_1_3 = new KeyWordItem();
+            wifisacnner_1_3.keyword = "listeners:";
+            wifisacnner_1_3.explain="打印后台扫描监听接口  以及 对应的扫描配置  ScanSettings  【uid && hashcode】作为标识符  ";
+            wifisacnner_1_3.printLogUrl=" WifiScanningServiceImpl.java   WifiBackgroundScanStateMachine mBackgroundScanStateMachine; // 后台扫描状态机";
+            wifisacnner_1_3.expain1="class WifiScanningServiceImpl extends IWifiScanner.Stub {\n" +
+                    "\n" +
+                    "WifiBackgroundScanStateMachine mBackgroundScanStateMachine; // 后台扫描状态机\n" +
+                    "dump(){\n" +
+                    "\n" +
+                    "\tpw.println(\"listeners:\");\n" +
+                    "\tfor (ClientInfo client : mClients.values()) {\n" +
+                    "\t\tCollection<ScanSettings> settingsList = mBackgroundScanStateMachine.getBackgroundScanSettings(client);\n" +
+                    "\t\tfor (ScanSettings settings : settingsList) {\n" +
+                    "\t\t\tpw.println(\"  \" + toString(client.mUid, settings));  // 打印UID 和 扫描配置ScanSettings信息\n" +
+                    "\t\t}\n" +
+                    "\t}\t\n" +
+                    "}\n" +
+                    "}\n" +
+                    "" +
+                    "  _-----=> StartedState\n" +
+                    " / _----=> PausedState\n" +
+                    "| /\n" +
+                    "|| \n" +
+                    "DefaultState\n" +
+                    "WifiBackgroundScanStateMachine 后台扫描状态机";
+            wifiScanner_KeyWordList.add(wifisacnner_1_3);
+
+
+
+
+            KeyWordItem wifisacnner_1_4 = new KeyWordItem();
+            wifisacnner_1_4.keyword = "schedule:";
+            wifisacnner_1_4.explain="BackgroundScanScheduler mBackgroundScheduler;  // 后台扫描计划schedule";
+            wifisacnner_1_4.printLogUrl="WifiScanningServiceImpl.java dump(FileDescriptor fd, PrintWriter pw, String[] args)";
+            wifisacnner_1_4.expain1="******************** BackgroundScanScheduler.Bucket Begin ********************\n" +
+                    "    /**\n" +
+                    "     * This class is an intermediate representation for scheduling. This maintins the channel\n" +
+                    "     * collection to be scanned by the bucket as settings are added to it.\n" +
+                    "     */ // 扫描配置信息的集合  \n" +
+                    "    private class Bucket {\n" +
+                    "        public int period;   // 进行扫描的间隔 \n" +
+                    "        public int bucketId;   //  桶的 id \n" +
+                    "        private final List<ScanSettings> mScanSettingsList = new ArrayList<>();\n" +
+                    "        private final ChannelCollection mChannelCollection;\n" +
+                    "\t}\n" +
+                    "******************** BackgroundScanScheduler.Bucket End ********************\n" +
+                    "\t\t\n" +
+                    "******************** WifiNative.ScanSettings Begin ********************\n" +
+                    "\n" +
+                    "    public static class ScanSettings {\n" +
+                    "        /**\n" +
+                    "         * Type of scan to perform. One of {@link ScanSettings#SCAN_TYPE_LOW_LATENCY},\n" +
+                    "         * {@link ScanSettings#SCAN_TYPE_LOW_POWER} or {@link ScanSettings#SCAN_TYPE_HIGH_ACCURACY}.\n" +
+                    "         */\n" +
+                    "        public int scanType;  // 高性能 HIGH_ACCURACY   // 低延时 LOW_LATENCY  // 低功耗 LOW_POWER \n" +
+                    "        public int base_period_ms;  // 间隔时间 毫秒\n" +
+                    "        public int max_ap_per_scan;  // 间隔时间 毫秒\n" +
+                    "        public int report_threshold_percent;  // 百分比 100% \n" +
+                    "        public int report_threshold_num_scans;  // int DEFAULT_MAX_SCANS_TO_BATCH = 10; \n" +
+                    "        public int num_buckets;  // int DEFAULT_MAX_BUCKETS = 8;   最大8个监听类获取wifi扫描结果? \n" +
+                    "\t\t\n" +
+                    "        /* Not used for bg scans. Only works for single scans. */\n" +
+                    "        public HiddenNetwork[] hiddenNetworks;\n" +
+                    "        public BucketSettings[] buckets;\n" +
+                    "    }\n" +
+                    "\t\n" +
+                    "******************** WifiNative.ScanSettings End ********************\n" +
+                    "\n" +
+                    "class WifiScanningServiceImpl extends IWifiScanner.Stub {\n" +
+                    "\n" +
+                    "BackgroundScanScheduler mBackgroundScheduler;  // 后台扫描计划schedule 其实是一个 WifiNative.ScanSettings \n" +
+                    "\n" +
+                    "dump(){\n" +
+                    "\n" +
+                    "        if (mBackgroundScheduler != null) {\n" +
+                    "            WifiNative.ScanSettings schedule = mBackgroundScheduler.getSchedule();\n" +
+                    "            if (schedule != null) {    //  打印后台扫描计划 schedule\n" +
+                    "                pw.println(\"schedule:\");\n" +
+                    "                pw.println(\"  base period: \" + schedule.base_period_ms);  // 扫描间隔时间 毫秒\n" +
+                    "                pw.println(\"  max ap per scan: \" + schedule.max_ap_per_scan);  // 间隔时间 毫秒 \n" +
+                    "                pw.println(\"  batched scans: \" + schedule.report_threshold_num_scans);   // 基本的上报扫描的个数，不能小于 int DEFAULT_MAX_SCANS_TO_BATCH = 10; \n" +
+                    "                pw.println(\"  buckets:\");\n" +
+                    "for (int b = 0; b < schedule.num_buckets; b++) {  // 打印   BucketSettings[]   只用于 singlescan\n" +
+                    " WifiNative.BucketSettings bucket = schedule.buckets[b];\n" +
+                    " pw.println(\"bucket \" + bucket.bucket + \"(\" + bucket.period_ms + \"ms)[\" + bucket.report_events + \"]:\"+ChannelHelper.toString(bucket));\n" +
+                    "}\n" +
+                    "            }\n" +
+                    "        }\n" +
+                    "}\n" +
+                    "}";
+            wifiScanner_KeyWordList.add(wifisacnner_1_4);
+
+
+
+
+            KeyWordItem wifisacnner_1_5 = new KeyWordItem();
+            wifisacnner_1_5.keyword = "WifiPnoScanStateMachine:";
+            wifisacnner_1_5.explain=" WifiPnoScanStateMachine 状态机 事件列表";
+            wifisacnner_1_5.printLogUrl="WifiScanningServiceImpl.WifiPnoScanStateMachine PNO扫描状态机";
+            wifisacnner_1_5.expain1="WifiScanningServiceImpl.WifiPnoScanStateMachine PNO扫描状态机\n" +
+                    "\n" +
+                    "**********************  boolean  config_wifi_background_scan_support **********************\n" +
+                    "// Check if the device supports HW PNO scans.  是否支持PNO 扫描\n" +
+                    "boolean mHwPnoScanSupported = mContext.getResources().getBoolean(R.bool.config_wifi_background_scan_support);\n" +
+                    "frameworks/base/core/res/res/values/config.xml\n" +
+                    "<!-- Boolean indicating whether the wifi chipset supports background scanning mechanism.\n" +
+                    "\t This mechanism allows the host to remain in suspend state and the dongle to actively\n" +
+                    "\t scan and wake the host when a configured SSID is detected by the dongle. This chipset\n" +
+                    "\t capability can provide power savings when wifi needs to be always kept on. -->\n" +
+                    "<bool translatable=\"false\" name=\"config_wifi_background_scan_support\">false</bool>  // PNO扫描支持开关  wifi芯片支持\n" +
+                    "**********************  boolean  config_wifi_background_scan_support **********************\n" +
+                    "\n" +
+                    "class WifiScanningServiceImpl extends IWifiScanner.Stub {\n" +
+                    "\t\t\t\t\n" +
+                    "WifiPnoScanStateMachine mPnoScanStateMachine;  // PNO扫描状态 \n" +
+                    "\n" +
+                    "\t\t\t\n" +
+                    "dump(){\n" +
+                    "if (mPnoScanStateMachine != null) {\n" +
+                    "\tmPnoScanStateMachine.dump(fd, pw, args);\n" +
+                    "}\n" +
+                    "}\n" +
+                    "}\n" +
+                    "\n" +
+                    "SingleScanState\n" +
+                    "   ||\n" +
+                    "HwPnoScanState\n" +
+                    "   || \n" +
+                    "StartedState\n" +
+                    "   || \n" +
+                    "DefaultState";
+            wifiScanner_KeyWordList.add(wifisacnner_1_5);
+
+
+
+            KeyWordItem wifisacnner_1_6 = new KeyWordItem();
+            wifisacnner_1_6.keyword = "Latest scan results:";
+            wifisacnner_1_6.explain=" 最新扫描结果 ==》 List<ScanResult> scanResults = mSingleScanStateMachine.getCachedScanResultsAsList()";
+            wifisacnner_1_6.printLogUrl="WifiScanningServiceImpl.java dump(FileDescriptor fd, PrintWriter pw, String[] args)";
+            wifisacnner_1_6.expain1=" _-----=> ScanningState\n" +
+                    "/  _----=> IdleState\n" +
+                    "| / \n" +
+                    "|| \n" +
+                    "DriverStartedState\n" +
+                    "|| \n" +
+                    "DefaultState\n" +
+                    "WifiSingleScanStateMachine  // 单扫描状态机  \n" +
+                    "\n" +
+                    "class WifiScanningServiceImpl extends IWifiScanner.Stub {\n" +
+                    "WifiSingleScanStateMachine mSingleScanStateMachine;  // 单扫描状态机  \n" +
+                    "\n" +
+                    "dump(){\n" +
+                    "  if (mSingleScanStateMachine != null) {\n" +
+                    "\t\tmSingleScanStateMachine.dump(fd, pw, args);\n" +
+                    "\t\tpw.println();\n" +
+                    "\t\tpw.println(\"Latest scan results:\");   // 打印最新的扫描结果 单扫描扫描结果\n" +
+                    "\t\tList<ScanResult> scanResults = mSingleScanStateMachine.getCachedScanResultsAsList();\n" +
+                    "\t\tlong nowMs = mClock.getElapsedSinceBootMillis();\n" +
+                    "\t\tScanResultUtil.dumpScanResults(pw, scanResults, nowMs);  // 可以查看它的对齐 实现方式  \n" +
+                    "\t\tpw.println();\n" +
+                    "\t}\n" +
+                    "}\n" +
+                    "}";
+            wifiScanner_KeyWordList.add(wifisacnner_1_6);
+
+
+
+            KeyWordItem wifisacnner_1_7 = new KeyWordItem();
+            wifisacnner_1_7.keyword = "Latest native scan results:";
+            wifisacnner_1_7.explain="底层扫描WIFI结果: WifiNative的扫描结果  【ArrayList<ScanDetail> mWifiNative.getScanResults(mIfaceName)】";
+            wifisacnner_1_7.printLogUrl="WifiScanningServiceImpl.java  【WifiScannerImpl mScannerImpl;  // 扫描真正实现类  WificondScannerImpl 】 ";
+            wifisacnner_1_7.expain1="********************* WificondScannerImpl extends  WifiScannerImpl  Begin  *********************\n" +
+                    "public class WificondScannerImpl extends WifiScannerImpl implements Handler.Callback {\n" +
+                    "\n" +
+                    "ArrayList<ScanDetail> mNativeScanResults;\n" +
+                    "\n" +
+                    "mNativeScanResults = mWifiNative.getScanResults(mIfaceName);   // ScanDetail 来自于 WifiNative\n" +
+                    "   \n" +
+                    "    protected void dump(FileDescriptor fd, PrintWriter pw, String[] args) {\n" +
+                    "        synchronized (mSettingsLock) {\n" +
+                    "            long nowMs = mClock.getElapsedSinceBootMillis();\n" +
+                    "            pw.println(\"Latest native scan results:\");  // WificondScannerImpl 内部扫描结果\n" +
+                    "            if (mNativeScanResults != null) {\n" +
+                    "                List<ScanResult> scanResults = mNativeScanResults.stream().map(r -> {\n" +
+                    "                    return r.getScanResult();   // ArrayList<ScanDetail>  转为    ArrayList<ScanResult>\n" +
+                    "                }).collect(Collectors.toList());\n" +
+                    "                ScanResultUtil.dumpScanResults(pw, scanResults, nowMs);  // 打印来自WifiNative的扫描结果\n" +
+                    "\t\t\t\t}\n" +
+                    "\t\t\t\t.....\n" +
+                    "\t\t   }\n" +
+                    "\t\t}\n" +
+                    "}\n" +
+                    "\t\n" +
+                    "********************* WificondScannerImpl extends  WifiScannerImpl  End  *********************\n" +
+                    "\n" +
+                    "class WifiScanningServiceImpl extends IWifiScanner.Stub {\n" +
+                    "WifiScannerImpl mScannerImpl;  // 扫描真正实现类  WificondScannerImpl \n" +
+                    "\n" +
+                    "dump(){\n" +
+                    "  if (mScannerImpl != null) {\n" +
+                    "      mScannerImpl.dump(fd, pw, args);\n" +
+                    "  }\n" +
+                    "}";
+            wifiScanner_KeyWordList.add(wifisacnner_1_7);
+
+
+
+            KeyWordItem wifisacnner_1_8 = new KeyWordItem();
+            wifisacnner_1_8.keyword = "Latest native pno scan results:";
+            wifisacnner_1_8.explain="最新的PNO扫描结果:  WificondScannerImpl.java  ArrayList<ScanDetail> mNativePnoScanResults ";
+            wifisacnner_1_8.printLogUrl=" ArrayList<ScanDetail> mNativePnoScanResults 来自 WifiNative getPnoScanResults 方法 =>   ArrayList<ScanDetail>  mNativePnoScanResults = mWifiNative.getPnoScanResults(mIfaceName);" ;
+            wifisacnner_1_8.expain1="class WifiScanningServiceImpl extends IWifiScanner.Stub {\n" +
+                    "WifiScannerImpl mScannerImpl;  // 扫描真正实现类  WificondScannerImpl \n" +
+                    "\n" +
+                    "dump(){\n" +
+                    "  if (mScannerImpl != null) {\n" +
+                    "      mScannerImpl.dump(fd, pw, args);\n" +
+                    "  }\n" +
+                    "}\n" +
+                    "\n" +
+                    "********************* WificondScannerImpl extends  WifiScannerImpl  Begin  *********************\n" +
+                    "public class WificondScannerImpl extends WifiScannerImpl implements Handler.Callback {\n" +
+                    "\n" +
+                    "ArrayList<ScanDetail> mNativePnoScanResults;\n" +
+                    "// Pno-ScanDetail 来自于 WifiNative 的 getPnoScanResults API\n" +
+                    "mNativePnoScanResults = ArrayList<ScanDetail> mWifiNative.getPnoScanResults(mIfaceName);   \n" +
+                    "   \n" +
+                    "    protected void dump(FileDescriptor fd, PrintWriter pw, String[] args) {\n" +
+                    "        synchronized (mSettingsLock) {\n" +
+                    "            long nowMs = mClock.getElapsedSinceBootMillis();\n" +
+                    "\n" +
+                    "\t\t\t pw.println(\"Latest native pno scan results:\");\n" +
+                    "            if (mNativePnoScanResults != null) {\n" +
+                    "                List<ScanResult> pnoScanResults = mNativePnoScanResults.stream().map(r -> {\n" +
+                    "                    return r.getScanResult();\n" +
+                    "                }).collect(Collectors.toList());  // ArrayList<ScanDetail>  转为    ArrayList<ScanResult>\n" +
+                    "                ScanResultUtil.dumpScanResults(pw, pnoScanResults, nowMs);  // 打印 \n" +
+                    "            }\n" +
+                    "\t\t\t\n" +
+                    "\t\t   }\n" +
+                    "\t\t}\n" +
+                    "}\n" +
+                    "\t\n" +
+                    "********************* WificondScannerImpl extends  WifiScannerImpl  End  *********************";
+            wifiScanner_KeyWordList.add(wifisacnner_1_8);
+
 
             return wifiScanner_KeyWordList;
         }
@@ -411,7 +716,8 @@ class F8_Dump_All {
                     "   Setting > System > Advanced > Developer options >Enable WiFi Verbose Logging  [toogle open] \n" +
                     "adb shell settings get global hs20_mncmcc_retail_saved_state  【passpoint-sim开关】 \n" +
                     "adb shell settings put global airplane_mode_on 0 【停止飞行模式】\n" +
-                    "adb shell settings get global airplane_mode_on   【获取飞行模式】";
+                    "adb shell settings get global airplane_mode_on   【获取飞行模式】\n" +
+                    "adb shell settings get secure location_mode  【获取位置模式】 ";
             keyWordList.add(wifi_1_1);
 
             KeyWordItem wifi_2_1 = new KeyWordItem();
@@ -1083,7 +1389,21 @@ class F8_Dump_All {
             keyWordList.add(wifi_19_11);
 
 
+          //  --Dump of SoftApManager--
 
+
+
+            KeyWordItem wifi_19_11_1 = new KeyWordItem();
+            wifi_19_11_1.keyword = "--Dump of SoftApManager--";
+            wifi_19_11_1.explain="【 current StateMachine mode 标识:  SoftApManager.java 的 内部类状态机 class SoftApStateMachine extends StateMachine {}】\n" +
+                    "current StateMachine mode  包含 【 IdleState-关闭状态   StartedState-启用状态 】\n" +
+                    "mMode: 1  【 热点打开 】    mMode: 0  【 热点关闭 】 \n" +
+                    "mApConfig.SSID  【 热点名称 】  apBand 【 -1:Any  0:2G  1:5G 】 hiddenSSID 【是否隐藏SSID】 \n" +
+                    "mNumAssociatedStations 【 关联的客户端数量 】 mReportedFrequency 【工作频率】  mTimeoutEnabled【是否打开无STA超时关闭功能】";
+            wifi_19_11_1.classNameForShuxing = " (WifiServiceImpl.java -> SoftApManager.java)  dump(FileDescriptor fd, PrintWriter pw, String[] args) {}  ";
+            wifi_19_11_1.shuxingDefine="(WifiServiceImpl.java SoftApManager.java )  class SoftApManager implements ActiveModeManager {} ";
+            wifi_19_11_1.printcode="[WifiServiceImpl.SoftApManager.java.dump 中]  pw.println(); ";
+            keyWordList.add(wifi_19_11_1);
 
             KeyWordItem wifi_19_12 = new KeyWordItem();
             wifi_19_12.keyword = "mRevertCountryCodeOnCellularLoss: ";
@@ -6666,6 +6986,10 @@ class F8_Dump_All {
 
         mAndroidVersion =   getSystemVersionFromFile(propFile);
 
+        if(mAndroidVersion == null || "".equals(mAndroidVersion.trim())){
+            System.out.println("读取到的 getprop.txt 文件中  配置项 ro.build.version.release 为空!  程序执行结束！" );
+            return false;
+        }
         String propContent = ReadFileContent(propFile);
         if(propContent != null){
             if(propContent.contains(".mtk") || propContent.contains("mtk.")){

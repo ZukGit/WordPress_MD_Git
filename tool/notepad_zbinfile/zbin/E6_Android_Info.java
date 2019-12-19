@@ -58,6 +58,9 @@ public class E6_Android_Info {
     static File qcom_hostapd_cfg_File = new File(System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin" + File.separator+"E6"+File.separator + "11_1_hostapd.txt");
 
 
+    static File dump_meminfo_File = new File(System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin" + File.separator+"E6"+File.separator + "12_1_memdump.txt");
+
+
     static class WIFI_DUMP_ITEM{
         String originLine;
         String mItemKey;
@@ -119,6 +122,140 @@ public class E6_Android_Info {
         public String getOriginLine() {
             return originLine;
         }
+    }
+
+
+    static class Mem_Hal_DUMP_ITEM{
+
+
+        String originInfo; // 20,421K: android.hardware.camera.provider@2.4-service (pid 853)
+        String proceNameIdetify  ;  // android.hardware.camera.provider@2.4-service
+        String memUsed_K_Str ; //  20,421K
+        long memUsed_K;  //  20,421K
+        double memUsed_M;  //  xxx M
+        String memUsed_M_Str  ; //  20,421K / 1024 = 19.94M
+        String halName;  // android.hardware.camera.provider
+        double halVersion ;  //  2.4 853
+        int pid; //   853
+
+
+
+        // 20,421K: android.hardware.camera.provider@2.4-service (pid 853)
+        Mem_Hal_DUMP_ITEM(String keyword){
+            originInfo =  keyword.trim();
+            String[] halInfoArr = originInfo.split(" ");
+//            System.out.println(" halInfoArr.size = " + halInfoArr.length );
+//            for (int i = 0; i < halInfoArr.length ; i++) {
+//                System.out.println("【"+i+"】 "+halInfoArr[i]);
+//            }
+
+
+//halInfoArr.size = 4
+//【0】 1,170K:
+//【1】 android.hardware.drm@1.0-service
+//【2】 (pid
+//【3】 1038)
+
+            if(halInfoArr.length == 4){
+                String info1 = halInfoArr[0];
+                info1 = info1.replace(":","");
+                memUsed_K_Str = info1;
+                info1 = info1.replace("K","");
+                info1 = info1.replace(",","");
+                memUsed_K = Long.parseLong(info1);
+                memUsed_M = (double)memUsed_K/1024;
+                memUsed_M_Str = nf.format(memUsed_M) + "M";
+
+                proceNameIdetify =  halInfoArr[1];
+                halName = proceNameIdetify.substring(0,proceNameIdetify.indexOf("@"));
+                String hal1 = proceNameIdetify.substring(proceNameIdetify.indexOf("@")+1).trim();  // 2.4-service
+                String halVersion1 = hal1.substring(0,hal1.indexOf("-")).trim();
+                halVersion = Double.parseDouble(halVersion1);
+
+                String pid1 =   halInfoArr[3];
+                pid1 = pid1.replace("(","");
+                pid1 = pid1.replace(")","");
+                pid1 = pid1.replace("pid","").trim();
+                pid = Integer.parseInt(pid1);
+            }
+
+
+
+
+
+        }
+
+
+        @Override
+        public String toString() {
+
+String strHalName = "HAL名称=[ "+halName+" ]";
+String strHalVersion = "HAL版本=[ "+halVersion+" ]";
+String processID = "进程ID=["+get4String(pid)+"]";
+String memInfo = "内存用量=["+get8String(memUsed_M_Str)+"]";
+            return  strHalVersion+" "+ processID+" " + memInfo + " "+  strHalName;
+        }
+    }
+
+    static String get4String(int pid){
+        String result = " "+pid;
+        int oriSize = (""+pid).length();
+        int paddingSize = 4 - oriSize;
+
+        if(paddingSize > 0){
+            for (int i = 0; i < paddingSize ; i++) {
+                result = result + " ";
+            }
+
+        }
+
+        return result;
+    }
+
+    static String get10String(double pid){
+        String result = " "+pid;
+        int oriSize = (""+pid).length();
+        int paddingSize = 10 - oriSize;
+
+        if(paddingSize > 0){
+            for (int i = 0; i < paddingSize ; i++) {
+                result = result + " ";
+            }
+
+        }
+
+        return result;
+    }
+
+
+    static String get8String(String meminfo){
+        String result = " "+meminfo;
+        int oriSize = (""+meminfo).length();
+        int paddingSize = 8 - oriSize;
+
+        if(paddingSize > 0){
+            for (int i = 0; i < paddingSize ; i++) {
+                result = result + " ";
+            }
+
+        }
+
+        return result;
+    }
+
+    static String get5String(String index){
+        String result = " "+index;
+        int oriSize = (""+index).length();
+        int paddingSize = 5 - oriSize;
+
+        if(paddingSize > 0){
+            for (int i = 0; i < paddingSize ; i++) {
+                result = result + " ";
+            }
+
+        }
+
+        return result;
     }
 
     abstract class Wifi_Dump_Base{
@@ -610,6 +747,9 @@ public class E6_Android_Info {
             System.out.println("----------------------------------");
             getQcomHostapdConfInfo();
             System.out.println("----------------------------------");
+            getHardWareHalInfo();
+            System.out.println("----------------------------------");
+
             getWifiNetworkInfo();
 
         } catch (Exception e1) {
@@ -1150,6 +1290,49 @@ String desc;
         }
     }
 
+
+
+    public static void getHardWareHalInfo(){
+        if(checkFileExist(dump_meminfo_File)){
+            ArrayList<Mem_Hal_DUMP_ITEM> halInfoDetail = readHalInfoFromMemDumpFile(dump_meminfo_File); // detail
+            ArrayList<Mem_Hal_DUMP_ITEM> simpleHalInfoDetail = new     ArrayList<Mem_Hal_DUMP_ITEM>();
+            ArrayList<String> originProcessName = new   ArrayList<String>();
+
+            for (int i = 0; i < halInfoDetail.size(); i++) {
+                Mem_Hal_DUMP_ITEM halItem = halInfoDetail.get(i);
+                if(!originProcessName.contains(halItem.proceNameIdetify)){
+                    originProcessName.add(halItem.proceNameIdetify);
+                    simpleHalInfoDetail.add(halItem);
+                }
+            }
+
+            simpleHalInfoDetail.sort(new Comparator<Mem_Hal_DUMP_ITEM>() {
+                @Override
+                public int compare(Mem_Hal_DUMP_ITEM o1, Mem_Hal_DUMP_ITEM o2) {
+
+                    if(o1.memUsed_K > o2.memUsed_K){
+                        return -1;
+                    }else if(o1.memUsed_K == o2.memUsed_K){
+                        return 0;
+                    }
+                    return  1;
+                }
+            });
+            ArrayList<String> halInfoStrList = new  ArrayList<String>();
+            for (int i = 0; i < simpleHalInfoDetail.size(); i++) {
+                int index = i + 1;
+                Mem_Hal_DUMP_ITEM halItem = simpleHalInfoDetail.get(i);
+                halInfoStrList.add("Hal索引:"+get4String(index) +" Hal详情 "+ halItem );
+//                halInfoStrList.add("Hal详情:"+halItem);
+//                halInfoStrList.add("===========");
+            }
+
+            ArrayPrint(halInfoStrList,"HAL-版本信息");
+
+        }
+    }
+
+
     public static void getWifiNetworkInfo(){
         if(checkFileExist(wifiConfigStorehFile)){
             ArrayList<WifiItem> wifiInfoDetail = readWifiNetworkInfoFromFile(wifiConfigStorehFile); // detail
@@ -1261,6 +1444,42 @@ String desc;
         }
     }
 
+
+
+
+    static   ArrayList<Mem_Hal_DUMP_ITEM>  readHalInfoFromMemDumpFile(File fileItem) {
+        ArrayList<Mem_Hal_DUMP_ITEM> Mem_Hal_List = new  ArrayList<Mem_Hal_DUMP_ITEM>();
+
+
+        try {
+            BufferedReader curBR = new BufferedReader(new InputStreamReader(new FileInputStream(fileItem)));
+            String lineContent = "";
+
+            while (lineContent != null) {
+                lineContent = curBR.readLine();
+                if (lineContent == null || lineContent.trim().isEmpty()) {
+                    continue;
+                }
+
+                // .hardware.   @  pid   包含三个关键词
+                if(lineContent.contains(".hardware.") &&  lineContent.contains("@") &&  lineContent.contains("pid") ){
+                    Mem_Hal_DUMP_ITEM halItem =  new Mem_Hal_DUMP_ITEM(lineContent);
+//                    System.out.println("000 :" + halItem);
+                    if(halItem.halVersion != 0){
+                        Mem_Hal_List.add(halItem);
+//                        System.out.println("111 :" + halItem);
+                    }
+
+                }
+
+            }
+            curBR.close();
+        } catch (Exception e) {
+            System.out.println("hal dump meminfo 异常:"+e.fillInStackTrace());
+            e.printStackTrace();
+        }
+        return Mem_Hal_List;
+    }
     static   ArrayList<WifiItem>  readWifiNetworkInfoFromFile(File fileItem) {
         ArrayList<WifiItem> wifiNetworkInfoList = new  ArrayList<WifiItem>();
         String word1 = "\"SSID\"";   // 接口 WLAN 上的配置文件 debugtheworld:
