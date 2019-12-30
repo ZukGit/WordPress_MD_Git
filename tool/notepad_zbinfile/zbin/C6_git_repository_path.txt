@@ -1,3 +1,3 @@
-/home/zhuzjx/Desktop/Code_Dir/ProductName/1Code/frameworks/base
-/home/zhuzjx/Desktop/Code_Dir/ProductName/1Code/packages/apps/Settings
-
+/home/zhuzj5/Desktop/Moto_Code/Astro/Code1/hardware/qcom/gps
+/home/zhuzj5/Desktop/Moto_Code/Astro/Code1/packages/apps/Settings
+/home/zhuzj5/Desktop/Moto_Code/Astro/Code1/frameworks/base

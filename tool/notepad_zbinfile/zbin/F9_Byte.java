@@ -11,6 +11,9 @@ class F9_Byte {
 
     static StringBuilder mHexSB = new StringBuilder();
     static StringBuilder mBinarySB = new StringBuilder();
+    // 每100个可读字符串 跳转到下一行
+//    ArrayList<String> humanReadableList = new  ArrayList<String>();
+    static StringBuilder mAsciiSB = new StringBuilder();
 
     // 把一个当前文件解析出 byte 字节信息
     public static void main(String[] args) {
@@ -70,6 +73,42 @@ class F9_Byte {
             mBinarySB = new StringBuilder();
         }
 
+        if(mAsciiSB.length() > 0){
+            System.out.println("\n\n\n\n");
+            System.out.println("ASCII长度: "+ mAsciiSB.length() );
+            System.out.println("══════════════════════ ASCII码 100长度一行 ══════════════════════ ");
+            int originSize = mAsciiSB.length();
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < originSize; i++) {
+                sb.append(mAsciiSB.charAt(i));
+                if(i%100 == 0){
+                    System.out.println(get12size(i)+"    "+sb.toString());
+                    sb =  new StringBuilder();
+                }
+                if(i == originSize-1 ){
+                    System.out.println(get12size(i)+"    "+sb);
+                }
+            }
+        }
+
+
+    }
+
+
+    static String get12size(int i){
+        String result = ""+i;
+        int padding = 12 - result.length();
+
+        if(padding > 0){
+
+            for (int j = 0; j < padding; j++) {
+                result = "0"+ result;
+
+            }
+
+        }
+
+        return result;
 
     }
 
@@ -191,10 +230,28 @@ class F9_Byte {
                 ArrayList<Byte> byteList= new ArrayList<Byte>();
                 for (int j = 0; j < 16; j++) {
                     byteList.add(line[j]);
-                    if (line[j] > ' ' && line[j] < '~') {
+                    if (line[j] >= ' ' && line[j] <= '~') {
                         result.append(new String(line, j, 1));
                     } else {
-                        result.append(".");
+
+                        if(line[j] == 0x00){  // 0x00   NUL(null)  空字符   ●
+
+                            result.append("●");
+                        }else if(line[j] == 0x0A){  // 0x0A 换行符  ▲
+                            result.append("▲");
+                        } else if(line[j] == 0x0D){   // 0D-■ 回车
+                            result.append("■");
+                        }else if( line[j] == 0x09 ){  // 09 - ◆水平制表符 相当于 Tab
+                            result.append("◆");
+                        }else if(line[j] == 0x0B ){  // 0x0B -┓  VT (vertical tab)  垂直制表符
+                            result.append("┓");
+                        }else if(line[j] == 0x1F ){   // █ 0x1F 单元分隔符
+                            result.append("█");
+                        } else if(line[j] == 0x0C){   //   0x0C ▼  FF (NP form feed, new page)   换页键
+                            result.append("▼");
+                          }else{
+                            result.append(".");
+                        }
                     }
                     if(j == 15){  // 最后字符显示一个分割线
                         result.append("  ║ ");  // 这里显示的是 字节信息
@@ -202,16 +259,40 @@ class F9_Byte {
                              byte curByte = byteList.get(k);
 
                              String targetChar = "";
-                            if (curByte > ' ' && curByte < '~') {
+                            if (curByte >= ' ' && curByte <= '~') {
                                 targetChar = new String(line, k, 1);
                             } else {
-                                targetChar = ".";
+//                                targetChar = ".";
+
+                                if(curByte == 0x00){
+//                                    result.append("●");
+                                    targetChar = "●";
+                                }else if(curByte == 0x0A){  // 0x0A 换行符  ▲
+//                                    result.append("♂");
+                                    targetChar = "▲";
+                                }else if(curByte == 0x0D){   // 0D-■ 回车
+//                                    result.append("∠");
+                                    targetChar = "■";
+                                }else if( curByte == 0x09 ){  // 09 - ◆水平制表符 相当于 Tab
+                                    targetChar = "◆";
+                                }else if(curByte == 0x0B ){  // 0x0B -┓  VT (vertical tab)  垂直制表符
+                                    targetChar = "┓";
+                                } else if(curByte == 0x1F ){   // █ 0x1F 单元分隔符
+                                    targetChar = "█";
+                                } else if(curByte == 0x0C) {   //   0x0C ▼  FF (NP form feed, new page)   换页键
+                                    targetChar = "▼";
+                                } else{
+//                                    result.append(".");
+                                    targetChar = ".";
+                                }
+
                             }
 
                             String byreStr = toHexString(curByte);
-
+                            mAsciiSB.append(targetChar);
                              if(k < 9){
                                  result.append("【 0"+k+"-"+toHexStringNoTen(byteIndex)+"-"+toTenString(byteIndex).trim()+"-"+byreStr+"-"+targetChar+" 】 " );
+
                              }else{
                                  result.append("【 "+k+"-"+toHexStringNoTen(byteIndex)+"-"+toTenString(byteIndex).trim()+"-"+byreStr+"-"+targetChar+" 】 " );
                              }
@@ -251,10 +332,30 @@ class F9_Byte {
             ArrayList<Byte> byteList= new ArrayList<Byte>();
             for (int i = 0; i < lineIndex; i++) {
                 byteList.add(line[i]);
-                if (line[i] > ' ' && line[i] < '~') {
+                if (line[i] >= ' ' && line[i] <= '~') {
                     result.append(new String(line, i, 1));
                 } else {
-                    result.append(".");
+//                    result.append(".");
+
+
+                    if(line[i] == 0x00){
+                        result.append("●");
+                    }else if(line[i] == 0x0A){  // 0x0A 换行符  ▲
+                        result.append("▲");
+                    }else if(line[i] == 0x0D){   // 0D-■回车
+                        result.append("■");
+                    }else if( line[i] == 0x09 ){  // 09 - ◆水平制表符 相当于 Tab
+                        result.append("◆");
+                    }else if(line[i] == 0x0B ){  // 0x0B -┓  VT (vertical tab)  垂直制表符
+                        result.append("┓");
+                    }else if(line[i] == 0x1F ){   // █ 0x1F 单元分隔符
+                        result.append("█");
+                    } else if(line[i] == 0x0C) {   //   0x0C ▼  FF (NP form feed, new page)   换页键
+                        result.append("▼");
+                    } else{
+                        result.append(".");
+                    }
+
                 }
 
                 if(i == lineIndex -1){  // 最后字符显示一个分割线
@@ -268,14 +369,32 @@ class F9_Byte {
                         byte curByte = byteList.get(k);
 
                         String targetChar = "";
-                        if (curByte > ' ' && curByte < '~') {
+                        if (curByte >= ' ' && curByte <= '~') {
                             targetChar = new String(line, k, 1);
                         } else {
-                            targetChar = ".";
+//                            targetChar = ".";
+
+                            if(curByte == 0x00){
+                                result.append("●");
+                            }else if(curByte == 0x0A){  // 0x0A 换行符  ▲
+                                targetChar = "▲";
+                            }else if(curByte == 0x0D){   // 0D-■ 回车
+                                targetChar = "■";
+                            }else if( curByte == 0x09 ){  // 09 - ◆水平制表符 相当于 Tab
+                                targetChar = "◆";
+                            }else if(curByte == 0x0B ){  // 0x0B -┓  VT (vertical tab)  垂直制表符
+                                targetChar = "┓";
+                            } else if(curByte == 0x1F ){   // █ 0x1F 单元分隔符
+                                targetChar = "█";
+                            } else if(curByte == 0x0C) {   //   0x0C ▼  FF (NP form feed, new page)   换页键
+                                targetChar = "▼";
+                            }  else {
+                               targetChar = ".";
+                            }
                         }
 
                         String byreStr = toHexString(curByte);
-
+                        mAsciiSB.append(targetChar);
                         if(k < 9){
                             result.append("【 0"+k+"-"+toHexStringNoTen(byteIndex)+"-"+toTenString(byteIndex).trim()+"-"+byreStr+"-"+targetChar+" 】 " );
                         }else{

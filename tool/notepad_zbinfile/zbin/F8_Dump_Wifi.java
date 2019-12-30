@@ -108,7 +108,7 @@ class F8_Dump_Wifi {
         System.out.println("initAnalysisWithVersion version = "+ version);
         switch (version){
             case 9:
-                curAndroidAnalysis = new Android10Analysis(mAndroidVersion,mVerndor);
+                curAndroidAnalysis = new Android9Analysis(mAndroidVersion,mVerndor);
                 break;
             case 10:
                 curAndroidAnalysis = new Android10Analysis(mAndroidVersion,mVerndor);
@@ -289,8 +289,6 @@ class F8_Dump_Wifi {
                     preAnalysisFile(name,curFile);
                     ArrayList<String> rawContent =  ReadFileRawContent(curFile);
                     // 读取每行
-					
-				
                     ArrayList<String> fixContent =   doAnalysisFile(name,curFile,rawContent,getKeyWordMap().get(name));
                     if(fixContent != null && fixContent.size() > 0){
                         endAnalysisFile(name,curFile,fixContent);
@@ -316,8 +314,6 @@ class F8_Dump_Wifi {
             switch (version){
                 case 9:
                     listFilename.add(getpropFileName);
-                    listFilename.add(wifiFileName);
-                    listFilename.add("wifiscanner.txt");
 
                     break;
                 case 10:
@@ -327,9 +323,7 @@ class F8_Dump_Wifi {
                     break;
 
                 case 11:
-                     listFilename.add(getpropFileName);
-                    listFilename.add(wifiFileName);
-                    listFilename.add("wifiscanner.txt");
+                    listFilename.add(getpropFileName);
 
                     break;
                 default:

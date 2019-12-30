@@ -1731,6 +1731,11 @@ class F8_Dump_Analysis {
 
                 String tx_retry = strArr[9];
 
+                if(!isNumeric(tx_retry) || !isNumeric(tx_good)){
+                    continue;
+                }
+
+
                 double tx_good_value = Double.parseDouble(tx_good);
                 double tx_retry_value = Double.parseDouble(tx_retry);
                 double retryRate = (tx_retry_value / (tx_retry_value + tx_good_value)) * 100;
@@ -2810,6 +2815,17 @@ class F8_Dump_Analysis {
         tmp = str.substring(4, 6);
         code += Integer.parseInt(tmp, 16);
         return (char) code;
+    }
+
+
+    public static boolean isNumeric(String str_param){
+            String str =str_param.replace(".","");
+            for (int i = str.length();--i>=0;){
+            if (!Character.isDigit(str.charAt(i))){
+                return false;
+            }
+        }
+        return true;
     }
 
 

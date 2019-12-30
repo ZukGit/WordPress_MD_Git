@@ -1,5 +1,9 @@
+import cn.hutool.json.JSONUtil;
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -18,7 +22,7 @@ public class F5_CreateSqliteTableTool {
     //    static String DB_NAME = "F5_ztest"+".db";
     static String SQLITE_DB_PATH = zbinPath + File.separator + DB_NAME;
     static String Tushare_Token = "43acb9a5ddc2cf73c6c4ea54796748f965457ed57daaa736bb778ea2";
-    static int Tushare_Score = 620;  //  当前的积分
+    static int Tushare_Score = 120;  //  当前的积分
 
     static String Tushare_Site = "http://api.tushare.pro";
     static String requestTeplateStr = "{\"api_name\": \"ZTABLE_NAME\", \"token\": \"ZTOKEN\",\"params\": ZPARAMS,\"fields\": \"ZFields\"}";
@@ -232,7 +236,7 @@ public class F5_CreateSqliteTableTool {
         PrintKeyAndValue(TSCODE_NAME_MAP);
     }
 
-    @SuppressWarnings("unchecked")
+
     public static void PrintKeyAndValue(Map<String, String> map) {
         Map.Entry<String, String> entry;
 
@@ -296,15 +300,6 @@ public class F5_CreateSqliteTableTool {
 //                return result;
 //            }
 
-            if (!JSONObject.isValid(res)) {
-
-                System.out.println("解析的字符串经过ascii2Native处理后不是Json BODY长度:" + res.length());
-
-                System.out.println("解析的字符串经过ascii2Native处理后不是Json BODY:" + res);
-                res = "";
-            }
-
-
             return res;
         } catch (IOException e) {
             // TODO Auto-generated catch block
@@ -314,43 +309,38 @@ public class F5_CreateSqliteTableTool {
     }
 
 
-//
-//
-//    public static String HttpPostWithBody(String RequestBodyJson) {
-//        String JsonResult = "";
-//        org.jsoup.Connection connection = Jsoup.connect(Tushare_Site);
-//        connection.header("Content-Type", "application/json; charset=UTF-8"); //这是重点
-//        connection.data("aaa", "ccc"); //这是重点
-//
-//        connection.header("Accept", "text/plain, */*; q=0.01");
-//        connection.header("Accept-Language", "zh-CN,zh;q=0.8,en-US;q=0.5,en;q=0.3");
-//        connection.postDataCharset("utf-8");
-//        connection.ignoreContentType(true);
-//        connection.timeout(15000);
-//        connection.requestBody(RequestBodyJson);
-//        try {
-//            Document document = connection.post();
-//            //    con.postDataCharset("GBK");
-//
-//            //  System.out.println("===========BODY身体===========");
-//            //   System.out.println(ascii2Native(document.body().text()));
-//            JsonResult = ascii2Native(document.body().text());
-//
-//            if (!JSONObject.isValid(JsonResult)) {
-//                JsonResult = "";
-//                System.out.println("解析的字符串经过ascii2Native处理后不是Json BODY长度:" + document.body().text().length());
-//
-//                System.out.println("解析的字符串经过ascii2Native处理后不是Json BODY:" + document.body().text());
-//            }
-//
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//
-//        return JsonResult;
-//    }
+    public static String HttpPostWithBody(String RequestBodyJson) {
+        String JsonResult = "";
+        org.jsoup.Connection connection = Jsoup.connect(Tushare_Site);
+        connection.header("Content-Type", "application/json; charset=UTF-8"); //这是重点
+        connection.data("aaa", "ccc"); //这是重点
 
+        connection.header("Accept", "text/plain, */*; q=0.01");
+        connection.header("Accept-Language", "zh-CN,zh;q=0.8,en-US;q=0.5,en;q=0.3");
+        connection.postDataCharset("utf-8");
+        connection.ignoreContentType(true);
+        connection.timeout(15000);
+        connection.requestBody(RequestBodyJson);
+        try {
+            Document document = connection.post();
+            //    con.postDataCharset("GBK");
 
+            //  System.out.println("===========BODY身体===========");
+            //   System.out.println(ascii2Native(document.body().text()));
+            JsonResult = ascii2Native(document.body().text());
+            if (!JSONUtil.isJson(JsonResult)) {
+                JsonResult = "";
+                System.out.println("解析的字符串经过ascii2Native处理后不是Json BODY长度:" + document.body().text().length());
+
+                System.out.println("解析的字符串经过ascii2Native处理后不是Json BODY:" + document.body().text());
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return JsonResult;
+    }
 
 
     public static boolean CheckFilePath(String path) {
@@ -368,83 +358,27 @@ public class F5_CreateSqliteTableTool {
             System.out.println("======================================");
 
             // 9 daily  日线行情   需要使用 TS_CODE_LIST
-            // 10 table_10_weekly    获取A股周线数据
-            // 11 table_11_monthly    获取A股月线数据
             // 12  adj_factor  复权因子   需要使用 TS_CODE_LIST
-            // 14 table_14_daily_basic  获取全部股票每日重要的基本面指标 【 您每分钟最多访问该接口 120 次 】
-            // 23 table_23_income  获取上市公司财务利润表数据  【您每分钟最多访问该接口80次】
-            // 24  table_24_balancesheet   获取上市公司资产负债表
-            // 25  table_25_cashflow 获取上市公司现金流量表
-            // 26  table_26_forecast   获取业绩预告数据
-            // 27  table_27_express  获取上市公司业绩快报
-            // 28 table_28_dividend  分红送股数据
-            // 29 table_29_fina_indicator
-            // 30 table_30_fina_audit  获取上市公司定期财务审计意见数据
-            // 31 table_31_fina_mainbz  获得上市公司主营业务构成，分地区和产品两种方式
-            // 36   Table_36_top10_holders     前10总股股东 Table_36_top10_holders
+            // 36   top10_holders    前10总股股东
             // 37   top10_floatholders  前10流通股东
-            // 40 table_40_pledge_stat  获取股权质押统计数据
-            // 41  table_41_pledge_detail   获取股权质押明细数据
-            // 44 table_44_concept_detail 获取概念股分类明细数据
-            // 51 table_51_index_daily   获取指数每日行情
-            // 52 table_52_index_weekly  获取指数周线行情
-            // 53 table_53_index_monthly  获取指数月线行情,每月更新一次
-            // ts_code全
-
-            if (table.tableIndex == 9  || table.tableIndex == 10   ||  table.tableIndex == 11  ||
-                    table.tableIndex == 12 || table.tableIndex == 14 ||
-                    table.tableIndex == 23 ||   table.tableIndex == 24 ||   table.tableIndex == 25 ||
-                    table.tableIndex == 26 ||  table.tableIndex == 27 ||  table.tableIndex == 28 ||
-                    table.tableIndex == 29  ||    table.tableIndex == 30  ||    table.tableIndex == 31  ||
-                    table.tableIndex == 36  || table.tableIndex == 37 ||    table.tableIndex == 40 ||
-                    table.tableIndex == 41 || table.tableIndex == 44 || table.tableIndex == 51 ||
-                    table.tableIndex == 52  || table.tableIndex == 53 ) {
-
+            if (table.tableIndex == 9 || table.tableIndex == 12 || table.tableIndex == 36
+                    || table.tableIndex == 37) {
                 System.out.println("当前接口:" + table.tableName + " 需要积分:" + table.scoreLimit + " 接口描述: " + table.tableDesc);
                 System.out.println("请求列表:" + table.createRequestBody());
 
                 Object[] ts_code = TS_CODE_List.toArray();
                 for (int j = 0; j < ts_code.length; j++) {
                     String tsCode = ts_code[j].toString();
-                    System.out.println("表索引:"+table.tableIndex +"   "+table.tableDesc + "下载中!   索引:" + j + "  总长:" + ts_code.length + "  当前股票:" + tsCode);
+                    System.out.println(table.tableDesc + "下载中!   索引:" + j + "  总长:" + ts_code.length + "  当前股票:" + tsCode);
                     long netTime1 = System.currentTimeMillis();
-                    table.initJsonData(HttpPostWithBody2(table.createRequestBodyWithTS_Code(tsCode)), table.tableName);
-
-                    if(table.requestLimitInMinutes == 100){
-                        try {
-                            //   您每分钟最多访问该接口100次 每次执行 休息 1000 毫秒
-                            Thread.sleep(700);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }else if(table.requestLimitInMinutes == 80){
-                        try {
-                            //   您每分钟最多访问该接口120次 每次执行 休息 800 毫秒
-                            Thread.sleep(800);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }else if(table.requestLimitInMinutes == 60){
-                        try {
-                            //   您每分钟最多访问该接口120次 每次执行 休息 950 毫秒
-                            Thread.sleep(950);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-
-                    }else{   // 默认每 分钟最多访问该接口120次    每次执行 休息500毫秒
-                        try {
-                            // 抱歉，您每分钟最多访问该接口120次    每次执行 休息500毫秒
-                            Thread.sleep(500);   //  每次执行 休息 500 毫秒
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-
+                    table.initJsonData(HttpPostWithBody(table.createRequestBodyWithTS_Code(tsCode)), table.tableName);
+                    try {
+                        Thread.sleep(800);   //  每次执行 休息 500 毫秒
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
                     }
-
-
-                    if (table.tableData.size() > 10000) {
-                        System.out.println("长度大于 10000 行执行插入  索引:" + j + "  总长:" + ts_code.length + "  当前股票:" + tsCode);
+                    if (table.tableData.size() > 1000) {
+                        System.out.println("长度大于30000行执行插入  索引:" + j + "  总长:" + ts_code.length + "  当前股票:" + tsCode);
 
                         long netTime2 = System.currentTimeMillis();
                         long netTimeDistance = netTime2 - netTime1;
@@ -482,13 +416,8 @@ public class F5_CreateSqliteTableTool {
                 if (table.scoreLimit <= Tushare_Score) {
                     // System.out.println("BODY0000:"+ HttpPostWithBody2(table.createRequestBody())); ;
                     // System.out.println("BODY1:"+ ascii2Native(HttpPostWithBody2(table.createRequestBody()))); ;
-
-
+                    table.initJsonData(HttpPostWithBody(table.createRequestBody()), table.tableName);
                     System.out.println("当前接口:" + table.tableName + " 需要积分:" + table.scoreLimit + " 接口描述: " + table.tableDesc);
-
-                    table.initJsonData(HttpPostWithBody2(table.createRequestBody()), table.tableName);
-
-//                    table.initJsonData(HttpPostWithBody(table.createRequestBody()), table.tableName);
                     System.out.println("请求列表:" + table.createRequestBody());
                     System.out.println(" table.tableData.size() = " + table.tableData.size());
 
@@ -576,7 +505,6 @@ public class F5_CreateSqliteTableTool {
         Connection c = null;
         try {
             Class.forName("org.sqlite.JDBC");  // 1. 首先把 JDBC 通过 Class.forName 加载到 JVM
-
             // 创建数据库的操作 如果没有该文件 那么创建该文件  有该文件就得到该db文件的链接
             SQLITE_CONNECT_URL = "jdbc:sqlite:" + DBPath;
             c = DriverManager.getConnection(SQLITE_CONNECT_URL);
@@ -1178,24 +1106,17 @@ public class F5_CreateSqliteTableTool {
 
     static {
 //  【 table_10_weekly】 获取A股周线行情
-        // https://tushare.pro/document/2?doc_id=144
-
         DB_Table Weekly = new DB_Table("weekly");
         Weekly.tableIndex = 10;
         Weekly.viceTableIndex = 1;
         Weekly.scoreLimit = 300;
         Weekly.tableDesc = "获10取A股周线行情";
-
-        Table_Input_Param Weekly_ts_code = new Table_Input_Param("ts_code", "str", "");
-        Weekly_ts_code.desc = "TS代码";
         Table_Input_Param Weekly_trade_date = new Table_Input_Param("trade_date", "str", "");
         Weekly_trade_date.desc = "交易日期每周五日期格式";
         Table_Input_Param Weekly_start_date = new Table_Input_Param("start_date", "str", "");
         Weekly_start_date.desc = "开始日期";
         Table_Input_Param Weekly_end_date = new Table_Input_Param("end_date", "str", "");
         Weekly_end_date.desc = "结束日期";
-        Weekly.addTableInputParam(Weekly_ts_code);
-
         Weekly.addTableInputParam(Weekly_trade_date);
         Weekly.addTableInputParam(Weekly_start_date);
         Weekly.addTableInputParam(Weekly_end_date);
@@ -1221,30 +1142,23 @@ public class F5_CreateSqliteTableTool {
         Weekly.addTableItem(Weekly_vol_out);
         Weekly.addTableItem(Weekly_amount_out);
 
-//        SQLite_Tables.add(Weekly);
+        SQLite_Tables.add(Weekly);
     }
 
 
     static {
 //  【 table_11_monthly 】 获取A股月线数据
-        //  https://tushare.pro/document/2?doc_id=145
-
         DB_Table Monthly = new DB_Table("monthly");
         Monthly.tableIndex = 11;
         Monthly.viceTableIndex = 1;
         Monthly.scoreLimit = 300;
         Monthly.tableDesc = "获取A股月线数据";
-
-        Table_Input_Param Monthly_ts_code = new Table_Input_Param("ts_code", "str", "");
-        Monthly_ts_code.desc = "TS代码";
-
         Table_Input_Param Monthly_trade_date = new Table_Input_Param("trade_date", "str", "");
         Monthly_trade_date.desc = "交易日期每月最后一个交易日日期格式";
         Table_Input_Param Monthly_start_date = new Table_Input_Param("start_date", "str", "");
         Monthly_start_date.desc = "开始日期";
         Table_Input_Param Monthly_end_date = new Table_Input_Param("end_date", "str", "");
         Monthly_end_date.desc = "结束日期";
-        Monthly.addTableInputParam(Monthly_ts_code);
         Monthly.addTableInputParam(Monthly_trade_date);
         Monthly.addTableInputParam(Monthly_start_date);
         Monthly.addTableInputParam(Monthly_end_date);
@@ -1272,7 +1186,7 @@ public class F5_CreateSqliteTableTool {
         Monthly.addTableItem(Monthly_vol_out);
         Monthly.addTableItem(Monthly_amount_out);
 
-//        SQLite_Tables.add(Monthly);
+        SQLite_Tables.add(Monthly);
     }
 
 
@@ -1438,7 +1352,7 @@ public class F5_CreateSqliteTableTool {
         Daily_Basic.addTableItem(Daily_Basic_total_mv_out);
         Daily_Basic.addTableItem(Daily_Basic_circ_mv_out);
 
-//        SQLite_Tables.add(Daily_Basic);
+        SQLite_Tables.add(Daily_Basic);
     }
 
 
@@ -1842,7 +1756,6 @@ public class F5_CreateSqliteTableTool {
         Income.tableIndex = 23;
         Income.viceTableIndex = 1;
         Income.scoreLimit = 500;
-        Income.requestLimitInMinutes = 80 ;
         Income.tableDesc = "获取上市公司财务利润表数据";
         Table_Input_Param Income_ts_code = new Table_Input_Param("ts_code", "str", "");
         Income_ts_code.desc = "股票代码";
@@ -1999,7 +1912,7 @@ public class F5_CreateSqliteTableTool {
         Income.addTableItem(Income_distable_profit_out);
         Income.addTableItem(Income_update_flag_out);
 
-//        SQLite_Tables.add(Income);
+        SQLite_Tables.add(Income);
     }
 
 
@@ -2009,7 +1922,6 @@ public class F5_CreateSqliteTableTool {
         Balancesheet.tableIndex = 24;
         Balancesheet.viceTableIndex = 1;
         Balancesheet.scoreLimit = 500;
-        Balancesheet.requestLimitInMinutes = 80;
         Balancesheet.tableDesc = "获取上市公司资产负债表";
         Table_Input_Param Balancesheet_ts_code = new Table_Input_Param("ts_code", "str", "");
         Balancesheet_ts_code.desc = "股票代码";
@@ -2310,7 +2222,7 @@ public class F5_CreateSqliteTableTool {
         Balancesheet.addTableItem(Balancesheet_hfs_sales_out);
         Balancesheet.addTableItem(Balancesheet_update_flag_out);
 
-//        SQLite_Tables.add(Balancesheet);
+        SQLite_Tables.add(Balancesheet);
     }
 
 
@@ -2320,7 +2232,6 @@ public class F5_CreateSqliteTableTool {
         Cashflow.tableIndex = 25;
         Cashflow.viceTableIndex = 1;
         Cashflow.scoreLimit = 500;
-        Cashflow.requestLimitInMinutes = 80;
         Cashflow.tableDesc = "获取上市公司现金流量表";
         Table_Input_Param Cashflow_ts_code = new Table_Input_Param("ts_code", "str", "");
         Cashflow_ts_code.desc = "股票代码";
@@ -2527,7 +2438,7 @@ public class F5_CreateSqliteTableTool {
         Cashflow.addTableItem(Cashflow_im_n_incr_cash_equ_out);
         Cashflow.addTableItem(Cashflow_update_flag_out);
 
-//        SQLite_Tables.add(Cashflow);
+        SQLite_Tables.add(Cashflow);
     }
 
 
@@ -2538,7 +2449,6 @@ public class F5_CreateSqliteTableTool {
         Forecast.viceTableIndex = 1;
         Forecast.scoreLimit = 600;
         Forecast.tableDesc = "获取业绩预告数据";
-        Forecast.requestLimitInMinutes = 80;
         Table_Input_Param Forecast_ts_code = new Table_Input_Param("ts_code", "str", "");
         Forecast_ts_code.desc = "股票代码二选一";
         Table_Input_Param Forecast_ann_date = new Table_Input_Param("ann_date", "str", "");
@@ -2583,7 +2493,7 @@ public class F5_CreateSqliteTableTool {
         Forecast.addTableItem(Forecast_summary_out);
         Forecast.addTableItem(Forecast_change_reason_out);
 
-//        SQLite_Tables.add(Forecast);
+        SQLite_Tables.add(Forecast);
     }
 
 
@@ -2593,7 +2503,6 @@ public class F5_CreateSqliteTableTool {
         Express.tableIndex = 27;
         Express.viceTableIndex = 1;
         Express.scoreLimit = 500;
-        Express.requestLimitInMinutes = 60;
         Express.tableDesc = "获取上市公司业绩快报";
         Table_Input_Param Express_ts_code = new Table_Input_Param("ts_code", "str", "");
         Express_ts_code.desc = "股票代码";
@@ -2676,7 +2585,7 @@ public class F5_CreateSqliteTableTool {
         Express.addTableItem(Express_is_audit_out);
         Express.addTableItem(Express_remark_out);
 
-//        SQLite_Tables.add(Express);
+        SQLite_Tables.add(Express);
     }
 
 
@@ -2687,10 +2596,6 @@ public class F5_CreateSqliteTableTool {
         Dividend.viceTableIndex = 1;
         Dividend.tableDesc = "分红送股数据";
         Dividend.scoreLimit = 300;
-        Dividend.requestLimitInMinutes = 80;
-        Table_Input_Param Dividend_ts_code = new Table_Input_Param("ts_code", "str", "");
-        Dividend_ts_code.desc = "股票TSCode";
-
         Table_Input_Param Dividend_ann_date = new Table_Input_Param("ann_date", "str", "");
         Dividend_ann_date.desc = "公告日";
         Table_Input_Param Dividend_record_date = new Table_Input_Param("record_date", "str", "");
@@ -2699,9 +2604,7 @@ public class F5_CreateSqliteTableTool {
         Dividend_ex_date.desc = "除权除息日";
         Table_Input_Param Dividend_imp_ann_date = new Table_Input_Param("imp_ann_date", "str", "");
         Dividend_imp_ann_date.desc = "实施公告日";
-
-
-        Dividend.addTableInputParam(Dividend_ts_code);
+        Dividend.addTableInputParam(Dividend_ann_date);
         Dividend.addTableInputParam(Dividend_record_date);
         Dividend.addTableInputParam(Dividend_ex_date);
         Dividend.addTableInputParam(Dividend_imp_ann_date);
@@ -2739,7 +2642,7 @@ public class F5_CreateSqliteTableTool {
         Dividend.addTableItem(Dividend_base_date_out);
         Dividend.addTableItem(Dividend_base_share_out);
 
-//        SQLite_Tables.add(Dividend);
+        SQLite_Tables.add(Dividend);
     }
 
 
@@ -2749,14 +2652,7 @@ public class F5_CreateSqliteTableTool {
         Fina_Indicator.tableIndex = 29;
         Fina_Indicator.viceTableIndex = 1;
         Fina_Indicator.scoreLimit = 500;
-        Fina_Indicator.requestLimitInMinutes = 80;
-
         Fina_Indicator.tableDesc = "获取上市公司财务指标数据，为避免服务器压力，现阶段每次请求最多返回60条记录，可通过设置日期多次请求获取更多数据。";
-
-
-        Table_Input_Param Fina_ts_code = new Table_Input_Param("ts_code", "str", "");
-        Fina_ts_code.desc = "股票TSCode";
-
         Table_Input_Param Fina_Indicator_ann_date = new Table_Input_Param("ann_date", "str", "");
         Fina_Indicator_ann_date.desc = "公告日期";
         Table_Input_Param Fina_Indicator_start_date = new Table_Input_Param("start_date", "str", "");
@@ -2765,9 +2661,6 @@ public class F5_CreateSqliteTableTool {
         Fina_Indicator_end_date.desc = "报告期结束日期";
         Table_Input_Param Fina_Indicator_period = new Table_Input_Param("period", "str", "");
         Fina_Indicator_period.desc = "报告期每个季度最后一天的日期比如表示年报";
-
-
-        Fina_Indicator.addTableInputParam(Fina_ts_code);
         Fina_Indicator.addTableInputParam(Fina_Indicator_ann_date);
         Fina_Indicator.addTableInputParam(Fina_Indicator_start_date);
         Fina_Indicator.addTableInputParam(Fina_Indicator_end_date);
@@ -3108,7 +3001,7 @@ public class F5_CreateSqliteTableTool {
         Fina_Indicator.addTableItem(Fina_Indicator_rd_exp_out);
         Fina_Indicator.addTableItem(Fina_Indicator_update_flag_out);
 
-//        SQLite_Tables.add(Fina_Indicator);
+        SQLite_Tables.add(Fina_Indicator);
     }
 
 
@@ -3118,8 +3011,6 @@ public class F5_CreateSqliteTableTool {
         Fina_Audit.tableIndex = 30;
         Fina_Audit.viceTableIndex = 1;
         Fina_Audit.scoreLimit = 500;
-        Fina_Audit.requestLimitInMinutes = 80;
-
         Fina_Audit.tableDesc = "获取上市公司定期财务审计意见数据";
         Table_Input_Param Fina_Audit_ts_code = new Table_Input_Param("ts_code", "str", "");
         Fina_Audit_ts_code.desc = "股票代码";
@@ -3152,23 +3043,18 @@ public class F5_CreateSqliteTableTool {
         Fina_Audit.addTableItem(Fina_Audit_audit_agency_out);
         Fina_Audit.addTableItem(Fina_Audit_audit_sign_out);
 
-//        SQLite_Tables.add(Fina_Audit);
+        SQLite_Tables.add(Fina_Audit);
     }
 
 
     static {
 //  【 table_31_fina_mainbz 】 获得上市公司主营业务构成，分地区和产品两种方式
-    // {"api_name": "fina_mainbz", "token": "43acb9a5ddc2cf73c6c4ea54796748f965457ed57daaa736bb778ea2","params": {"ts_code":"","period":"","type":"","start_date":"","end_date":""},"fields": "ts_code,end_date,bz_item,bz_sales,bz_profit,bz_cost,curr_type,update_flag"}
-
-
         DB_Table Fina_Mainbz = new DB_Table("fina_mainbz");
         Fina_Mainbz.tableIndex = 31;
         Fina_Mainbz.viceTableIndex = 1;
         Fina_Mainbz.scoreLimit = 500;
-        Fina_Mainbz.requestLimitInMinutes = 80;
-
         Fina_Mainbz.tableDesc = "获得上市公司主营业务构成，分地区和产品两种方式";
-        Table_Input_Param Fina_Mainbz_ts_code = new Table_Input_Param("ts_code", "str", "");
+        Table_Input_Param Fina_Mainbz_ts_code = new Table_Input_Param("period", "str", "");
         Fina_Mainbz_ts_code.desc = "股票代码";
         Table_Input_Param Fina_Mainbz_period = new Table_Input_Param("period", "str", "");
         Fina_Mainbz_period.desc = "报告期每个季度最后一天的日期比如表示年报";
@@ -3201,7 +3087,7 @@ public class F5_CreateSqliteTableTool {
         Fina_Mainbz.addTableItem(Fina_Mainbz_curr_type_out);
         Fina_Mainbz.addTableItem(Fina_Mainbz_update_flag_out);
 
-//        SQLite_Tables.add(Fina_Mainbz);
+        SQLite_Tables.add(Fina_Mainbz);
     }
 
 
@@ -3422,10 +3308,10 @@ public class F5_CreateSqliteTableTool {
 
 
         DB_Table Top10_Holders = new DB_Table("top10_holders");
-        Top10_Holders.tableIndex = 36;
+        Top10_Holders.tableIndex = 15;
         Top10_Holders.viceTableIndex = 1;
         Top10_Holders.tableDesc = "前十大股东数据";
-        Top10_Holders.requestLimitInMinutes = 80;
+
         Table_Input_Param Top10_Holders_ts_code = new Table_Input_Param("ts_code", "str", "");
         Top10_Holders_ts_code.desc = "TS代码";
         Table_Input_Param Top10_Holders_period = new Table_Input_Param("period", "str", "");
@@ -3472,10 +3358,10 @@ public class F5_CreateSqliteTableTool {
 
 
         DB_Table Top10_Floatholders = new DB_Table("top10_floatholders");
-        Top10_Floatholders.tableIndex = 37;
+        Top10_Floatholders.tableIndex = 16;
         Top10_Floatholders.viceTableIndex = 1;
         Top10_Floatholders.tableDesc = "前十大流通股股东数据";
-        Top10_Floatholders.requestLimitInMinutes = 80;
+
         Table_Input_Param Top10_Floatholders_ts_code = new Table_Input_Param("ts_code", "str", "");
         Top10_Floatholders_ts_code.desc = "TS代码";
         Table_Input_Param Top10_Floatholders_period = new Table_Input_Param("period", "str", "");
@@ -3509,7 +3395,7 @@ public class F5_CreateSqliteTableTool {
         Top10_Floatholders.addTableItem(Top10_Floatholders_out_hold_amount);
 
 
-//      SQLite_Tables.add(Top10_Floatholders);
+//       SQLite_Tables.add(Top10_Floatholders);
 
     }
 
@@ -3521,13 +3407,7 @@ public class F5_CreateSqliteTableTool {
         Top_List.viceTableIndex = 1;
         Top_List.scoreLimit = 300;
         Top_List.tableDesc = "龙虎榜每日交易明细";
-
-        DateFormat df = new SimpleDateFormat("yyyyMMdd");
-        Calendar calendar = Calendar.getInstance();
-//        String dateNameNow = df.format(calendar.getTime());
-        String dateNameNow = "20191018";
-
-        Table_Input_Param Top_List_trade_date = new Table_Input_Param("trade_date", "str", dateNameNow);
+        Table_Input_Param Top_List_trade_date = new Table_Input_Param("trade_date", "str", "");
         Top_List_trade_date.desc = "交易日期";
         Table_Input_Param Top_List_ts_code = new Table_Input_Param("ts_code", "str", "");
         Top_List_ts_code.desc = "股票代码";
@@ -3576,13 +3456,7 @@ public class F5_CreateSqliteTableTool {
         Top_Inst.viceTableIndex = 1;
         Top_Inst.scoreLimit = 300;
         Top_Inst.tableDesc = "龙虎榜机构成交明细";
-
-        DateFormat df = new SimpleDateFormat("yyyyMMdd");
-        Calendar calendar = Calendar.getInstance();
-//        String dateNameNow = df.format(calendar.getTime());
-        String dateNameNow = "20191018";
-
-        Table_Input_Param Top_Inst_trade_date = new Table_Input_Param("trade_date", "str", dateNameNow);
+        Table_Input_Param Top_Inst_trade_date = new Table_Input_Param("trade_date", "str", "");
         Top_Inst_trade_date.desc = "交易日期";
         Top_Inst.addTableInputParam(Top_Inst_trade_date);
 
@@ -3613,7 +3487,6 @@ public class F5_CreateSqliteTableTool {
         Pledge_Stat.tableIndex = 40;
         Pledge_Stat.viceTableIndex = 1;
         Pledge_Stat.scoreLimit = 300;
-        Pledge_Stat.requestLimitInMinutes = 80;
         Pledge_Stat.tableDesc = "获取股权质押统计数据";
         Table_Input_Param Pledge_Stat_ts_code = new Table_Input_Param("ts_code", "str", "");
         Pledge_Stat_ts_code.desc = "股票代码";
@@ -3634,7 +3507,7 @@ public class F5_CreateSqliteTableTool {
         Pledge_Stat.addTableItem(Pledge_Stat_total_share_out);
         Pledge_Stat.addTableItem(Pledge_Stat_pledge_ratio_out);
 
-//        SQLite_Tables.add(Pledge_Stat);
+        SQLite_Tables.add(Pledge_Stat);
     }
 
 
@@ -3644,7 +3517,6 @@ public class F5_CreateSqliteTableTool {
         Pledge_Detail.tableIndex = 41;
         Pledge_Detail.viceTableIndex = 1;
         Pledge_Detail.scoreLimit = 300;
-        Pledge_Detail.requestLimitInMinutes = 80;
         Pledge_Detail.tableDesc = "获取股权质押明细数据";
         Table_Input_Param Pledge_Detail_ts_code = new Table_Input_Param("ts_code", "str", "");
         Pledge_Detail_ts_code.desc = "股票代码";
@@ -3679,7 +3551,7 @@ public class F5_CreateSqliteTableTool {
         Pledge_Detail.addTableItem(Pledge_Detail_h_total_ratio_out);
         Pledge_Detail.addTableItem(Pledge_Detail_is_buyback_out);
 
-//        SQLite_Tables.add(Pledge_Detail);
+        SQLite_Tables.add(Pledge_Detail);
     }
 
 
@@ -3751,7 +3623,6 @@ public class F5_CreateSqliteTableTool {
         Concept_Detail.tableIndex = 44;
         Concept_Detail.viceTableIndex = 1;
         Concept_Detail.scoreLimit = 300;
-        Concept_Detail.requestLimitInMinutes = 100;
         Concept_Detail.tableDesc = "获取概念股分类明细数据";
         Table_Input_Param Concept_Detail_id = new Table_Input_Param("id", "str", "");
         Concept_Detail_id.desc = "概念分类来自概念股分类接口";
@@ -3773,7 +3644,7 @@ public class F5_CreateSqliteTableTool {
         Concept_Detail.addTableItem(Concept_Detail_in_date_out);
         Concept_Detail.addTableItem(Concept_Detail_out_date_out);
 
-//        SQLite_Tables.add(Concept_Detail);
+        SQLite_Tables.add(Concept_Detail);
     }
 
 
@@ -3845,14 +3716,7 @@ public class F5_CreateSqliteTableTool {
         Block_Trade.viceTableIndex = 1;
         Block_Trade.scoreLimit = 300;
         Block_Trade.tableDesc = "大宗交易";
-
-
-        DateFormat df = new SimpleDateFormat("yyyyMMdd");
-        Calendar calendar = Calendar.getInstance();
-//        String dateNameNow = df.format(calendar.getTime());
-        String dateNameNow = "20191018";
-
-        Table_Input_Param Block_Trade_trade_date = new Table_Input_Param("trade_date", "str", dateNameNow);
+        Table_Input_Param Block_Trade_trade_date = new Table_Input_Param("trade_date", "str", "");
         Block_Trade_trade_date.desc = "交易日期格式下同";
         Table_Input_Param Block_Trade_start_date = new Table_Input_Param("start_date", "str", "");
         Block_Trade_start_date.desc = "开始日期";
@@ -4172,7 +4036,7 @@ public class F5_CreateSqliteTableTool {
         Index_Daily.addTableItem(Index_Daily_vol_out);
         Index_Daily.addTableItem(Index_Daily_amount_out);
 
-//        SQLite_Tables.add(Index_Daily);
+        SQLite_Tables.add(Index_Daily);
     }
 
 
@@ -4183,25 +4047,12 @@ public class F5_CreateSqliteTableTool {
         Index_Weekly.viceTableIndex = 1;
         Index_Weekly.scoreLimit = 600;
         Index_Weekly.tableDesc = "获取指数周线行情";
-
-        DateFormat df = new SimpleDateFormat("yyyyMMdd");
-        Calendar calendar = Calendar.getInstance();
-//        String dateNameNow = df.format(calendar.getTime());
-        String dateNameNow = "20191018";
-
-
-        Table_Input_Param Index_Weekly_ts_code = new Table_Input_Param("ts_code", "str", "");
-        Index_Weekly_ts_code.desc = "指数代码";
-
         Table_Input_Param Index_Weekly_trade_date = new Table_Input_Param("trade_date", "str", "");
         Index_Weekly_trade_date.desc = "交易日期";
         Table_Input_Param Index_Weekly_start_date = new Table_Input_Param("start_date", "str", "");
         Index_Weekly_start_date.desc = "开始日期";
         Table_Input_Param Index_Weekly_end_date = new Table_Input_Param("end_date", "str", "");
         Index_Weekly_end_date.desc = "结束日期";
-
-
-        Index_Weekly.addTableInputParam(Index_Weekly_ts_code);
         Index_Weekly.addTableInputParam(Index_Weekly_trade_date);
         Index_Weekly.addTableInputParam(Index_Weekly_start_date);
         Index_Weekly.addTableInputParam(Index_Weekly_end_date);
@@ -4229,7 +4080,7 @@ public class F5_CreateSqliteTableTool {
         Index_Weekly.addTableItem(Index_Weekly_vol_out);
         Index_Weekly.addTableItem(Index_Weekly_amount_out);
 
-//        SQLite_Tables.add(Index_Weekly);
+        SQLite_Tables.add(Index_Weekly);
     }
 
 
@@ -4240,23 +4091,12 @@ public class F5_CreateSqliteTableTool {
         Index_Monthly.viceTableIndex = 1;
         Index_Monthly.scoreLimit = 600;
         Index_Monthly.tableDesc = "获取指数月线行情,每月更新一次";
-
-
-        DateFormat df = new SimpleDateFormat("yyyyMMdd");
-        Calendar calendar = Calendar.getInstance();
-//        String dateNameNow = df.format(calendar.getTime());
-        String dateNameNow = "20191018";
-
-        Table_Input_Param Index_Monthly_ts_code = new Table_Input_Param("ts_code", "str", "");
-        Index_Monthly_ts_code.desc = "股票代码";
-
         Table_Input_Param Index_Monthly_trade_date = new Table_Input_Param("trade_date", "str", "");
         Index_Monthly_trade_date.desc = "交易日期";
         Table_Input_Param Index_Monthly_start_date = new Table_Input_Param("start_date", "str", "");
         Index_Monthly_start_date.desc = "开始日期";
         Table_Input_Param Index_Monthly_end_date = new Table_Input_Param("end_date", "str", "");
         Index_Monthly_end_date.desc = "结束日期";
-        Index_Monthly.addTableInputParam(Index_Monthly_ts_code);
         Index_Monthly.addTableInputParam(Index_Monthly_trade_date);
         Index_Monthly.addTableInputParam(Index_Monthly_start_date);
         Index_Monthly.addTableInputParam(Index_Monthly_end_date);
@@ -4284,7 +4124,7 @@ public class F5_CreateSqliteTableTool {
         Index_Monthly.addTableItem(Index_Monthly_vol_out);
         Index_Monthly.addTableItem(Index_Monthly_amount_out);
 
-//        SQLite_Tables.add(Index_Monthly);
+        SQLite_Tables.add(Index_Monthly);
     }
 
 
@@ -4295,15 +4135,9 @@ public class F5_CreateSqliteTableTool {
         Index_Weight.viceTableIndex = 1;
         Index_Weight.scoreLimit = 400;
         Index_Weight.tableDesc = "获取各类指数成分和权重，月度数据 ，如需日度指数成分和权重，请联系 waditu@163.com";
-        DateFormat df = new SimpleDateFormat("yyyyMMdd");
-        Calendar calendar = Calendar.getInstance();
-//        String dateNameNow = df.format(calendar.getTime());
-        String dateNameNow = "20191018";
-
-
         Table_Input_Param Index_Weight_index_code = new Table_Input_Param("index_code", "str", "");
         Index_Weight_index_code.desc = "指数代码二选一";
-        Table_Input_Param Index_Weight_trade_date = new Table_Input_Param("trade_date", "str", dateNameNow);
+        Table_Input_Param Index_Weight_trade_date = new Table_Input_Param("trade_date", "str", "");
         Index_Weight_trade_date.desc = "交易日期二选一";
         Table_Input_Param Index_Weight_start_date = new Table_Input_Param("start_date", "str", "");
         Index_Weight_start_date.desc = "开始日期";
@@ -4334,24 +4168,12 @@ public class F5_CreateSqliteTableTool {
         Index_Dailybasic.viceTableIndex = 1;
         Index_Dailybasic.scoreLimit = 400;
         Index_Dailybasic.tableDesc = "目前只提供上证综指，深证成指，上证50，中证500，中小板指，创业板指的每日指标数据";
-
-        DateFormat df = new SimpleDateFormat("yyyyMMdd");
-        Calendar calendar = Calendar.getInstance();
-//        String dateNameNow = df.format(calendar.getTime());
-        String dateNameNow = "20191018";
-
-
-        Table_Input_Param Index_Dailybasic_ts_code = new Table_Input_Param("ts_code", "str", "");
-        Index_Dailybasic_ts_code.desc = "股票代码";
-
-        Table_Input_Param Index_Dailybasic_trade_date = new Table_Input_Param("trade_date", "str", dateNameNow);
+        Table_Input_Param Index_Dailybasic_trade_date = new Table_Input_Param("trade_date", "str", "");
         Index_Dailybasic_trade_date.desc = "交易日期格式比如下同";
         Table_Input_Param Index_Dailybasic_start_date = new Table_Input_Param("start_date", "str", "");
         Index_Dailybasic_start_date.desc = "开始日期";
         Table_Input_Param Index_Dailybasic_end_date = new Table_Input_Param("end_date", "str", "");
         Index_Dailybasic_end_date.desc = "结束日期";
-
-        Index_Dailybasic.addTableInputParam(Index_Dailybasic_ts_code);
         Index_Dailybasic.addTableInputParam(Index_Dailybasic_trade_date);
         Index_Dailybasic.addTableInputParam(Index_Dailybasic_start_date);
         Index_Dailybasic.addTableInputParam(Index_Dailybasic_end_date);
@@ -4460,7 +4282,6 @@ public class F5_CreateSqliteTableTool {
         int viceTableIndex;
         String tableDesc; //   当前数据说明
         int scoreLimit;   // 调用积分限制
-        int requestLimitInMinutes;   // 一分钟允许调用的次数
         boolean request_need_tscode;  // 调用参数是否需要 ts_code参数
 
         ArrayList<Table_Item> fieldList;    // 创建表的
@@ -4566,7 +4387,7 @@ public class F5_CreateSqliteTableTool {
 
             int resultCode = getCodeFromResultJson(mJsonData);
             if (resultCode != 0) {
-                System.out.println(" JsonData :" + ascii2Native(mJsonData));
+                System.out.println(" JsonData :" + mJsonData);
                 System.out.println("Json返回的 resultCode非0 调用不成功!   ");
             }
 
@@ -4887,7 +4708,7 @@ CREATE TABLE "search_history"(
             this.fieldAndValueMap = new LinkedHashMap<String, String>();
         }
 
-        @SuppressWarnings("unchecked")
+
         String buildInsertSql() {
             String insertSqlStr = "";
             String pre = "INSERT INTO " + this.tableName + "(";
