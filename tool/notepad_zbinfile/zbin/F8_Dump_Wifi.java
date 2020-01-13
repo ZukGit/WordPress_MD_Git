@@ -97,8 +97,36 @@ class F8_Dump_Wifi {
         mDumpAnalysis.initAnalysisWithVersion();
         curAndroidAnalysis.analysisFile();
 
+        NotePadOpenTargetFile();
 
+    }
 
+    static void NotePadOpenTargetFile(){
+        String absPath = F8DirPathStr+File.separator+wifiFileName;
+        String commandNotead = "";
+        if(curOS_TYPE == OS_TYPE.Windows){
+            commandNotead = "cmd.exe /c start   Notepad++.exe " + absPath;
+        }else if(curOS_TYPE == OS_TYPE.Linux){
+            commandNotead  = " gedit " + absPath;
+        }else if(curOS_TYPE == OS_TYPE.MacOS){
+            commandNotead  = " gedit " + absPath;
+        }
+        execCMD(commandNotead);
+    }
+
+    public static String execCMD(String command) {
+        StringBuilder sb = new StringBuilder();
+        try {
+            Process process = Runtime.getRuntime().exec(command);
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            String line;
+            while ((line = bufferedReader.readLine()) != null) {
+                sb.append(line + "\n");
+            }
+        } catch (Exception e) {
+            return e.toString();
+        }
+        return sb.toString();
     }
 
 

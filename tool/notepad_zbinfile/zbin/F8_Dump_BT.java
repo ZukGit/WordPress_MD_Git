@@ -77,11 +77,38 @@ class F8_Dump_BT {
         F8_Dump_BT mDumpAnalysis = new F8_Dump_BT();
         mDumpAnalysis.initAnalysisWithVersion();
         curAndroidAnalysis.analysisFile();
-
+        NotePadOpenTargetFile();
 
 
     }
 
+    static void NotePadOpenTargetFile(){
+        String absPath = F8DirPathStr+File.separator+btFileName;
+        String commandNotead = "";
+        if(curOS_TYPE == OS_TYPE.Windows){
+            commandNotead = "cmd.exe /c start   Notepad++.exe " + absPath;
+        }else if(curOS_TYPE == OS_TYPE.Linux){
+            commandNotead  = " gedit " + absPath;
+        }else if(curOS_TYPE == OS_TYPE.MacOS){
+            commandNotead  = " gedit " + absPath;
+        }
+        execCMD(commandNotead);
+    }
+
+    public static String execCMD(String command) {
+        StringBuilder sb = new StringBuilder();
+        try {
+            Process process = Runtime.getRuntime().exec(command);
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            String line;
+            while ((line = bufferedReader.readLine()) != null) {
+                sb.append(line + "\n");
+            }
+        } catch (Exception e) {
+            return e.toString();
+        }
+        return sb.toString();
+    }
 // Zukgit1  -- 依据版本生成 对不同版本的解析类  ( 目前只完成了 Android10Analysis )
     void initAnalysisWithVersion(){
 
@@ -868,16 +895,18 @@ class F8_Dump_BT {
             bluetooth_1_9.printcode="AdapterService  void dump(FileDescriptor fd, PrintWriter pw, String[] args) {} ";
             bluetooth_1_9.printLogUrl="AdapterService => ArrayList<ProfileService> mRegisteredProfiles ";
             bluetooth_1_9.expain1="已注册的配置服务:\n" +
-                    "Profile: GattService            extends ProfileService {}   /packages/apps/Bluetooth/src/com/android/bluetooth/gatt/\n" +
-                    "Profile: HeadsetService         extends ProfileService {}   /packages/apps/Bluetooth/src/com/android/bluetooth/hfp/\n" +
-                    "Profile: A2dpService            extends ProfileService {}   /packages/apps/Bluetooth/src/com/android/bluetooth/a2dp/\n" +
-                    "Profile: HidHostService         extends ProfileService {}  /packages/apps/Bluetooth/src/com/android/bluetooth/hid/\n" +
-                    "Profile: PanService             extends ProfileService {}  /packages/apps/Bluetooth/src/com/android/bluetooth/pan/\n" +
-                    "Profile: BluetoothMapService    extends ProfileService {}  /packages/apps/Bluetooth/src/com/android/bluetooth/map/\n" +
-                    "Profile: AvrcpControllerService extends ProfileService {}  /packages/apps/Bluetooth/src/com/android/bluetooth/avrcpcontroller/\n" +
-                    "Profile: SapService             extends ProfileService {}  /packages/apps/Bluetooth/src/com/android/bluetooth/sap/           \n" +
-                    "Profile: BluetoothOppService    extends ProfileService implements IObexConnectionHandler {}  /packages/apps/Bluetooth/src/com/android/bluetooth/opp/\n" +
-                    "Profile: BluetoothPbapService   extends ProfileService implements IObexConnectionHandler {}  /packages/apps/Bluetooth/src/com/android/bluetooth/pbap/\n" +
+                    "https://blog.csdn.net/sam0535/article/details/82967766    各种Profile的应用场景 \n" +
+                    "\n" +
+                    "Profile: GattService            extends ProfileService {} Gatt 通用扫描   /packages/apps/Bluetooth/src/com/android/bluetooth/gatt/\n" +
+                    "Profile: HeadsetService         extends ProfileService {} Headset 蓝牙耳机通话 语音播放 车载耳机   /packages/apps/Bluetooth/src/com/android/bluetooth/hfp/\n" +
+                    "Profile: A2dpService            extends ProfileService {} A2dp 无线蓝牙音箱  立体声蓝牙耳机  /packages/apps/Bluetooth/src/com/android/bluetooth/a2dp/\n" +
+                    "Profile: HidHostService         extends ProfileService {} HidHost 蓝牙鼠标  蓝牙键盘  /packages/apps/Bluetooth/src/com/android/bluetooth/hid/\n" +
+                    "Profile: PanService             extends ProfileService {} Pan 蓝牙共享网络 Bluetooth Personal Area Networking  /packages/apps/Bluetooth/src/com/android/bluetooth/pan/\n" +
+                    "Profile: BluetoothMapService    extends ProfileService {} Map 智能车载中同步短信,彩信等信息 Message Access Profile (MAP)   /packages/apps/Bluetooth/src/com/android/bluetooth/map/\n" +
+                    "Profile: AvrcpControllerService extends ProfileService {} Avrcp 音视频控制传输协议  暂停 开始 上一首 下一首 AVRCP Audio/VideoControl Transport Protocol Specification  /packages/apps/Bluetooth/src/com/android/bluetooth/avrcpcontroller/\n" +
+                    "Profile: SapService             extends ProfileService {} Sap 允许带有内置 GSM 收发器的车载电话之类的设备连接到 Bluetooth 电话中的 SIM 卡。因此车载电话本身并不需要单独的 SIM 卡 SIM Access Profile 《SIM卡访问规范》 /packages/apps/Bluetooth/src/com/android/bluetooth/sap/           \n" +
+                    "Profile: BluetoothOppService    extends ProfileService {} Opp 对象交换规范》。智能车载中 定义了诸如商务卡,约会提醒,任务等的交换功能. Object Push Profile implements IObexConnectionHandler {}  /packages/apps/Bluetooth/src/com/android/bluetooth/opp/\n" +
+                    "Profile: BluetoothPbapService   extends ProfileService {} Pbap 蓝牙电话本访问协议  智能车载中同步联系人等信息 其实,不仅可以同步联系人,还可以同步通话记录等信息。 Phone Book Access Profile implements IObexConnectionHandler {}  /packages/apps/Bluetooth/src/com/android/bluetooth/pbap/\n" +
                     "\t\n" +
                     "实现的 配置服务 但未注册列表\n" +
                     "PbapClientService    extends ProfileService {}   /packages/apps/Bluetooth/src/com/android/bluetooth/pbapclient/\n" +
@@ -889,24 +918,8 @@ class F8_Dump_BT {
                     "HidDeviceService     extends ProfileService {}   /packages/apps/Bluetooth/src/com/android/bluetooth/hid/\n" +
                     "BATService           extends ProfileService {}   /vendor/qcom/opensource/commonsys/bluetooth_ext/packages_apps_bluetooth_ext/src/ba/\n" +
                     "\n" +
-                    "\n" +
-                    "public class AdapterService extends Service {\n" +
-                    "\n" +
-                    "// 注册的BT配置文件 registerProfileService(ProfileService profile){往里加 mRegisteredProfiles.add(profile)}\n" +
-                    "ArrayList<ProfileService> mRegisteredProfiles = new ArrayList<>();  \n" +
-                    "\n" +
-                    "ArrayList<ProfileService> mRunningProfiles = new ArrayList<>();  // 正在运行的BT配置文件\n" +
-                    "\t\n" +
-                    "    protected void dump(FileDescriptor fd, PrintWriter writer, String[] args) {\n" +
-                    "\t..........\n" +
-                    "        StringBuilder sb = new StringBuilder();\n" +
-                    "        for (ProfileService profile : mRegisteredProfiles) {  // Profile: XXXXX\n" +
-                    "            profile.dump(sb);\n" +
-                    "        }\n" +
-                    "        writer.write(sb.toString());\n" +
-                    "        writer.flush();\n" +
-                    "\t\t}\n" +
-                    "}";
+                    "HFP\tHands Free Profile     《免提规范》。\n" +
+                    "典型配置如汽车使用手机作为网关设备。在车内，立体声系统用于电话音频，而车内安装的麦克风则用于通话时发送输出音频\n";
             keyWordList.add(bluetooth_1_9);
 
             KeyWordItem bluetooth_1_10 = new KeyWordItem();

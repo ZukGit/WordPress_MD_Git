@@ -76,9 +76,37 @@ class F8_Dump_Location {
         F8_Dump_Location mDumpAnalysis = new F8_Dump_Location();
         mDumpAnalysis.initAnalysisWithVersion();
         curAndroidAnalysis.analysisFile();
+        NotePadOpenTargetFile();
 
 
+    }
 
+    static void NotePadOpenTargetFile(){
+        String absPath = F8DirPathStr+File.separator+gpsFileName;
+        String commandNotead = "";
+        if(curOS_TYPE == OS_TYPE.Windows){
+            commandNotead = "cmd.exe /c start   Notepad++.exe " + absPath;
+        }else if(curOS_TYPE == OS_TYPE.Linux){
+            commandNotead  = " gedit " + absPath;
+        }else if(curOS_TYPE == OS_TYPE.MacOS){
+            commandNotead  = " gedit " + absPath;
+        }
+        execCMD(commandNotead);
+    }
+
+    public static String execCMD(String command) {
+        StringBuilder sb = new StringBuilder();
+        try {
+            Process process = Runtime.getRuntime().exec(command);
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            String line;
+            while ((line = bufferedReader.readLine()) != null) {
+                sb.append(line + "\n");
+            }
+        } catch (Exception e) {
+            return e.toString();
+        }
+        return sb.toString();
     }
 
 // Zukgit1  -- 依据版本生成 对不同版本的解析类  ( 目前只完成了 Android10Analysis )
