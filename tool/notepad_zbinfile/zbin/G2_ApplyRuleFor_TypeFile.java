@@ -1,12 +1,10 @@
+
 import java.io.*;
 
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.ArrayList;
+import java.util.*;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -21,6 +19,48 @@ public class G2_ApplyRuleFor_TypeFile {
     static String G2_Bat_Name = "zrule_apply_G2";
     static String Cur_Bat_Name = "zrule_apply_G2";
     static String zbinPath = System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin";
+
+
+    static File G2_Properties_File = new File(System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin" + File.separator + "G2.properties");
+    static InputStream G2_Properties_InputStream;
+    static OutputStream G2_Properties_OutputStream;
+    static Properties G2_Properties = new Properties();
+    static Map<String, String> propKey2ValueList = new HashMap<String, String>();
+
+
+
+    static {
+        try {
+            if (!G2_Properties_File.exists()) {
+                G2_Properties_File.createNewFile();
+            }
+            G2_Properties_InputStream = new BufferedInputStream(new FileInputStream(G2_Properties_File.getAbsolutePath()));
+            G2_Properties.load(G2_Properties_InputStream);
+            Iterator<String> it = G2_Properties.stringPropertyNames().iterator();
+            while (it.hasNext()) {
+                String key = it.next();
+                // System.out.println("key:" + key + " value: " + G2_Properties.getProperty(key));
+                propKey2ValueList.put(key, G2_Properties.getProperty(key));
+            }
+            G2_Properties_InputStream.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    static void setProperity() {
+        try {
+            G2_Properties_OutputStream = new BufferedOutputStream(new FileOutputStream(G2_Properties_File.getAbsolutePath()));
+            G2_Properties.store(G2_Properties_OutputStream, "");
+            G2_Properties_OutputStream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     enum OS_TYPE {
         Windows,
@@ -104,11 +144,14 @@ static  HashMap<String, ArrayList<File>> CurDirFileTypeMap = new  HashMap<String
                             File curFile =    new File(fileString);
                             if(!curFile.isDirectory()){
                                 allFile.add(curFile);
+                                break;
                             }
+
 
                         }else {
                             if (fileString.endsWith(type)) {
                                 allFile.add(new File(fileString));
+                                break;
 //                         System.out.println("file found at path: " + file.toAbsolutePath());
                             }
                         }
@@ -294,7 +337,7 @@ static  HashMap<String, ArrayList<File>> CurDirFileTypeMap = new  HashMap<String
 
         }
 
-
+        setProperity();
     }
 
 
@@ -374,25 +417,34 @@ static ArrayList<Rule> realTypeRuleList = new ArrayList<Rule>();  // 规则的�
     // 把 当前目录下所有的 jpg  mp4 gif  都转为 i_temp1_1.jpg    v_temp2_1.mp4   g_temp3_1.gif 的文件格式
     class AVI_Rule_5 extends Basic_Rule{
         String tempTag = "temp";
-        int jpgBeginIndex = 1;
-        int fixed_jpg_BeginIndex = 1;
+        boolean isRecovrty = false; //  当前是否是  读取当前目录  计算 ProPerities的值的操作
+        boolean isEnable = true;  // 当存在增量的时候  不起作用    不执行 记录的操作
+        boolean isExistAddPart = false;  // 是否存在增量
+        boolean executeNextStep = false;  // 当用户输入的 输入参数 包含 nextstep 时 执行 增量的 重置0操作 添加到index的操作
+
+
+        int jpgBeginIndex = 0;
+        int fixed_jpg_BeginIndex = 0;
         String jpgtag = "i";
-        int jpgDirTempIndex = 1;
+        int jpgDirTempIndex = 0;
         int jpgEndIndex = 1;
+        int nextStepCountJPG = 0 ; //  当前 JPG的 增量
 
 
-        int gifBeginIndex = 1;
+        int gifBeginIndex = 0;
         String giftag = "g";
-        int gifDirTempIndex = 1;
-        int fixed_gif_BeginIndex = 1;
+        int gifDirTempIndex = 0;
+        int fixed_gif_BeginIndex = 0;
         int gifEndIndex = 1;
+        int nextStepCountGIF = 0 ; //  当前 GIF的 增量
 
-
-        int mp4BeginIndex = 1;   // 从 Propertities 中读取到的值
+        int mp4BeginIndex = 0;   // 从 Propertities 中读取到的值
         String mp4tag = "v";    // mp4的前缀
-        int mp4DirTempIndex = 1;   //  依据 mp4BeginIndex 计算出的 temp1 temp2 .... temp100
-        int fixed_mp4_BeginIndex = 1;   // 在当前 tempx 中的索引   大小为 mp4BeginIndex%1000
+        int mp4DirTempIndex = 0;   //  依据 mp4BeginIndex 计算出的 temp1 temp2 .... temp100
+        int fixed_mp4_BeginIndex = 0;   // 在当前 tempx 中的索引   大小为 mp4BeginIndex%1000
         int mp4EndIndex = 1;   // 最后保存到 Propertities 中的 值
+        int nextStepCountMP4 = 0 ; //  当前 MP4 的 增量
+
 
         AVI_Rule_5() {
             super("jgm", 5, 3);
@@ -403,28 +455,368 @@ static ArrayList<Rule> realTypeRuleList = new ArrayList<Rule>();  // 规则的�
           //  jpgBeginIndex =
             // gifBeginIndex =
             // mp4BeginIndex =
-            jpgDirTempIndex = jpgBeginIndex/1000 + 1;
+            String strJPGBegin = G2_Properties.getProperty("jpgBeginIndex");
+            if(strJPGBegin == null){
+                strJPGBegin = "0";
+                G2_Properties.put("jpgBeginIndex","0");
+            }
+            jpgBeginIndex = Integer.parseInt(strJPGBegin);
+
+            String strGIFBegin = G2_Properties.getProperty("gifBeginIndex");
+            if(strGIFBegin == null){
+                strGIFBegin = "0";
+                G2_Properties.put("gifBeginIndex","0");
+            }
+            gifBeginIndex = Integer.parseInt(strGIFBegin);
+
+
+            String strMP4Begin = G2_Properties.getProperty("mp4BeginIndex");
+            if(strMP4Begin == null){
+                strMP4Begin = "0";
+                G2_Properties.put("mp4BeginIndex","0");
+            }
+            mp4BeginIndex = Integer.parseInt(strMP4Begin);
+
+
+            String strNextStepJPG = G2_Properties.getProperty("nextStepCountJPG");
+            if(strNextStepJPG == null){
+                strNextStepJPG = "0";
+                G2_Properties.put("nextStepCountJPG","0");
+            }
+            nextStepCountJPG = Integer.parseInt(strNextStepJPG);
+
+
+            String strNextStepGIF = G2_Properties.getProperty("nextStepCountGIF");
+            if(strNextStepGIF == null){
+                strNextStepGIF = "0";
+                G2_Properties.put("nextStepCountGIF","0");
+            }
+            nextStepCountGIF = Integer.parseInt(strNextStepGIF);
+
+
+            String strNextStepMP4 = G2_Properties.getProperty("nextStepCountMP4");
+            if(strNextStepMP4 == null){
+                strNextStepMP4 = "0";
+                G2_Properties.put("nextStepCountMP4","0");
+            }
+            nextStepCountMP4 = Integer.parseInt(strNextStepMP4);
+
+if( nextStepCountMP4 != 0 || nextStepCountGIF != 0 || nextStepCountJPG != 0 ){
+    isExistAddPart = true;
+}
+
+            jpgDirTempIndex = jpgBeginIndex/1000 ;
             fixed_jpg_BeginIndex = jpgBeginIndex%1000;
 
-            gifDirTempIndex = gifBeginIndex/1000 + 1;
+            gifDirTempIndex = gifBeginIndex/1000 ;
             fixed_gif_BeginIndex = gifBeginIndex%1000;
 
-            mp4DirTempIndex = mp4BeginIndex/1000 + 1;
+            mp4DirTempIndex = mp4BeginIndex/1000 ;
             fixed_mp4_BeginIndex = mp4BeginIndex%1000;
 
         }
 
         @Override
         String simpleDesc() {
-            return "把 当前目录下所有的 jpg  mp4 gif  都转为 i_temp1_1.jpg    v_temp2_1.mp4   g_temp3_1.gif 的文件格式";
+            return "把 当前目录下所有的 jpg  mp4 gif  都转为 i_temp1_1.jpg    v_temp2_1.mp4   g_temp3_1.gif 的文件格式\n" +
+                    Cur_Bat_Name + "  jgm_5_recovery  [索引5]   // 在当前 Z_VI 根目录 计算 当前的 JPG GIF MP4的起始值 \n" +
+                    Cur_Bat_Name + "  jgm_5_nextstep  [索引5]   //  JPG="+jpgBeginIndex+ " GIF="+gifBeginIndex+" MP4="+mp4BeginIndex+"  JPG增量="+nextStepCountJPG +"    GIF增量="+nextStepCountGIF + "   MP4增量="+nextStepCountMP4+" ▲【 把jpg gif png的增量添加到 beginIndex 然后增量置0 】 \n ";
         }
 
+
+        @Override
+        void initParams4InputParam(String inputParam) {
+            if(inputParam.contains("nextstep")){
+                executeNextStep = true;
+            }
+
+            if(inputParam.contains("_recovery")){
+                isRecovrty = true;
+                isEnable = false;
+                curFilterFileTypeList.add("*");  // 把当前所有文件都加入到列表中
+            }
+            System.out.println("OLD记录的Properties信息:(OLD)   "+" JPG="+jpgBeginIndex + "   GIF="+gifBeginIndex +"   MP4="+mp4BeginIndex+"  JPG增量="+nextStepCountJPG +"    GIF增量="+nextStepCountGIF + "   MP4增量="+nextStepCountMP4 );
+
+            if( executeNextStep){  // 如果存在增量 当前不执行   并且用户是输入的 nextstep的时候  执行 step的更新
+                jpgBeginIndex = jpgBeginIndex + nextStepCountJPG;
+                gifBeginIndex = gifBeginIndex + nextStepCountGIF;
+                mp4BeginIndex = mp4BeginIndex + nextStepCountMP4;
+                G2_Properties.setProperty("jpgBeginIndex",""+jpgBeginIndex);
+                G2_Properties.setProperty("gifBeginIndex",""+gifBeginIndex);
+                G2_Properties.setProperty("mp4BeginIndex",""+mp4BeginIndex);
+                G2_Properties.setProperty("nextStepCountJPG",""+0);
+                G2_Properties.setProperty("nextStepCountGIF",""+0);
+                G2_Properties.setProperty("nextStepCountMP4",""+0);
+                isEnable = false;
+            }
+
+            super.initParams4InputParam(inputParam);
+        }
+
+      void  tryDynamicCalCulateBeginIndex(ArrayList<File> subFileList ){
+
+            String jpg_pre = "i_temp";
+          ArrayList<File> jpgTempList = new ArrayList<File>();
+
+            String gif_pre = "g_temp";
+          ArrayList<File> gifTempList = new ArrayList<File>();
+
+            String mp4_pre = "v_temp";
+            ArrayList<File> mp4TempList = new ArrayList<File>();
+
+
+
+          for (int i = 0; i < subFileList.size(); i++) {
+              File curFile = subFileList.get(i);
+              if(curFile.getAbsolutePath().contains("Z_VI")){
+                  if(curFile.getName().startsWith(jpg_pre)){
+                      jpgTempList.add(curFile);
+                  }else if(curFile.getName().startsWith(gif_pre)){
+                      gifTempList.add(curFile);
+                  }else if(curFile.getName().startsWith(mp4_pre)){
+                      mp4TempList.add(curFile);
+                  }
+              }
+
+          }
+
+          if(jpgTempList.size() == 0 && gifTempList.size() == 0 && mp4TempList.size() == 0  ){
+              System.out.println("当前执行目录不在 Z_VI的根目录 Git_Dir , 请重新执行 "+Cur_Bat_Name);
+              return;
+          }
+
+          //  通过 搜索 计算得到的 type 文件的 长度  Count
+          //  通过 计算 文件最后的名字得到的  index = Count - 1
+          int jpgDynimicCount = jpgTempList.size() ;
+          int gifDynimicCount = gifTempList.size();
+          int mp4DynimicCount = mp4TempList.size();
+
+          jpgTempList.sort(new Comparator<File>() {
+              @Override
+              public int compare(File o1, File o2) {
+
+                  int o1Index =   calculIndexFromName(o1.getName());
+
+                  int o2Index =       calculIndexFromName(o2.getName());
+                  if(o1Index < o2Index ){
+                      return -1;
+                  }
+                  if(o1Index == o2Index){
+                      return 0;
+                  }
+                  return 1;
+              }
+          });
+
+          gifTempList.sort(new Comparator<File>() {
+              @Override
+              public int compare(File o1, File o2) {
+
+                  int o1Index =   calculIndexFromName(o1.getName());
+
+                  int o2Index =       calculIndexFromName(o2.getName());
+                  if(o1Index < o2Index ){
+                      return -1;
+                  }
+                  if(o1Index == o2Index){
+                      return 0;
+                  }
+                  return 1;
+              }
+          });
+
+          //          Comparable VICompare = new Comparable()
+          mp4TempList.sort(new Comparator<File>() {
+              @Override
+              public int compare(File o1, File o2) {
+
+                  int o1Index =   calculIndexFromName(o1.getName());
+
+                  int o2Index =       calculIndexFromName(o2.getName());
+                  if(o1Index < o2Index ){
+                      return -1;
+                  }
+                  if(o1Index == o2Index){
+                      return 0;
+                  }
+                  return 1;
+              }
+          });
+          File lastJPGFile = null;
+          File lastGIFFile = null;
+          File lastMP4File = null;
+
+          if(jpgTempList.size() > 0){
+              lastJPGFile = jpgTempList.get(jpgTempList.size()-1);
+          }
+
+          if(gifTempList.size() > 0){
+              lastGIFFile = gifTempList.get(gifTempList.size()-1);
+          }
+
+          if(mp4TempList.size() > 0){
+              lastMP4File = mp4TempList.get(mp4TempList.size()-1);
+          }
+
+          int jpgLastIndex = 0;
+          int gifLastIndex = 0;
+          int mp4LastIndex = 0;
+          if(lastJPGFile != null){
+              jpgLastIndex =  calculIndexFromName(lastJPGFile.getName());
+          }
+          if(lastGIFFile != null){
+              gifLastIndex =  calculIndexFromName(lastGIFFile.getName());
+
+          }
+          if(lastMP4File != null){
+              mp4LastIndex =  calculIndexFromName(lastMP4File.getName());
+          }
+
+
+
+          if(jpgDynimicCount != jpgBeginIndex || (jpgLastIndex+1) != jpgDynimicCount){  // 大小 和 记录的起始点 不一致 那么需要 重新该名称
+              for (int i = 0; i < jpgTempList.size() ; i++) {
+                  File jpgFile = jpgTempList.get(i);
+                  String jpgFileName = "i"+"_"+getPaddingIntStringWithDirIndexFileNameWithIndex(tempTag,gifDirTempIndex,0,i,3,"0",true);
+                  tryReName(jpgFile,jpgFileName);
+              }
+          }
+
+          if(gifDynimicCount != gifBeginIndex || (gifLastIndex+1) != gifDynimicCount){  // 大小 和 记录的起始点 不一致 那么需要 重新该名称
+              for (int i = 0; i < gifTempList.size() ; i++) {
+                  File gifFile = gifTempList.get(i);
+                  String gifFileName = "g"+"_"+getPaddingIntStringWithDirIndexFileNameWithIndex(tempTag,gifDirTempIndex,0,i,3,"0",true);
+                  tryReName(gifFile,gifFileName);
+              }
+          }
+
+
+          if(mp4DynimicCount != mp4BeginIndex || (mp4LastIndex+1) != mp4DynimicCount ){  // 大小 和 记录的起始点 不一致 那么需要 重新该名称
+              for (int i = 0; i < mp4TempList.size() ; i++) {
+                  File mp4File = mp4TempList.get(i);
+                  String mp4FileName = "v"+"_"+getPaddingIntStringWithDirIndexFileNameWithIndex(tempTag,gifDirTempIndex,0,i,3,"0",true);
+                  tryReName(mp4File,mp4FileName);
+              }
+          }
+
+
+
+          System.out.println("recovery 搜索到的文件 数量:" + subFileList.size()  );
+          if(lastJPGFile != null){
+              jpgLastIndex =  calculIndexFromName(lastJPGFile.getName());
+              System.out.println("最后一个 JPG 文件的名称为:"+ lastJPGFile.getName() + "  索引:"+jpgLastIndex + (jpgLastIndex !=(jpgBeginIndex -1) ? " 匹配不成功(改名操作)":"匹配成功"));
+
+          }
+          if(lastGIFFile != null){
+              gifLastIndex =  calculIndexFromName(lastGIFFile.getName());
+              System.out.println("最后一个 GIF 文件的名称为:"+ lastGIFFile.getName()+ "  索引:"+ gifLastIndex+ (gifLastIndex !=(gifBeginIndex-1)  ? " 匹配不成功(改名操作)":"匹配成功"));
+
+          }
+          if(lastMP4File != null){
+              mp4LastIndex =  calculIndexFromName(lastMP4File.getName());
+              System.out.println("最后一个 MP4 文件的名称为:"+ lastMP4File.getName() + "  索引:"+ mp4LastIndex+ (mp4LastIndex !=(mp4BeginIndex-1) ? " 匹配不成功(改名操作)":"匹配成功"));
+          }
+          System.out.println("jpgDynimicIndex(JPG动态计算文件数量)=" + getXsizeString(jpgDynimicCount,7) + "   (最后一个JPG文件名称索引+1)"+getXsizeString(jpgLastIndex+1,7)+" ||    Pro记录 jpgBeginIndex 为:"+ jpgBeginIndex );
+          System.out.println("gifDynimicIndex(GIF动态计算文件数量)=" + getXsizeString(gifDynimicCount,7) + "   (最后一个GIF文件名称索引+1)"+getXsizeString(gifLastIndex+1,7)+" ||    Pro记录 gifBeginIndex 为:"+ gifBeginIndex );
+          System.out.println("mp4DynimicIndex(MP4动态计算文件数量)=" + getXsizeString(mp4DynimicCount,7) + "   (最后一个MP4文件名称索引+1)"+getXsizeString(mp4LastIndex+1,7)+" ||    Pro记录 mp4BeginIndex 为:"+ mp4BeginIndex );
+
+         recoveryProperities(jpgDynimicCount,gifDynimicCount,mp4DynimicCount);
+          System.out.println();
+        }
+
+        int calculIndexFromName(String viName){
+
+          String valueA =   viName.replace("_","");
+            valueA =  valueA.replace("gif","");
+            valueA =  valueA.replace("jpg","");
+            valueA =  valueA.replace("mp4","");
+            valueA =  valueA.replace("mp3","");
+            valueA =  valueA.replace("png","");
+            valueA =  valueA.replace("temp","");
+            valueA =  valueA.replace("\"","");
+            valueA =  valueA.replace(".","");
+            valueA =  valueA.replace("(","");
+            valueA =  valueA.replace(")","");
+            valueA =  valueA.replace("）","");
+            valueA =  valueA.replace("（","");
+
+            valueA =  valueA.replace("a","");
+            valueA =  valueA.replace("b","");
+            valueA =  valueA.replace("c","");
+            valueA =  valueA.replace("d","");
+            valueA =  valueA.replace("e","");
+            valueA =  valueA.replace("f","");
+            valueA =  valueA.replace("g","");
+            valueA =  valueA.replace("h","");
+            valueA =  valueA.replace("i","");
+            valueA =  valueA.replace("j","");
+            valueA =  valueA.replace("k","");
+            valueA =  valueA.replace("l","");
+            valueA =  valueA.replace("m","");
+            valueA =  valueA.replace("n","");
+            valueA =  valueA.replace("o","");
+            valueA =  valueA.replace("p","");
+            valueA =  valueA.replace("q","");
+            valueA =  valueA.replace("r","");
+            valueA =  valueA.replace("s","");
+            valueA =  valueA.replace("t","");
+            valueA =  valueA.replace("u","");
+            valueA =  valueA.replace("v","");
+            valueA =  valueA.replace("w","");
+            valueA =  valueA.replace("x","");
+            valueA =  valueA.replace("y","");
+            valueA =  valueA.replace("z","");
+            valueA =  valueA.replace(" ","").trim();
+            int resultIndex = 0;
+         try{
+              resultIndex = Integer.parseInt(valueA) ;
+
+         }   catch(Exception e){
+               resultIndex = 0;
+            }
+
+         return resultIndex;
+        }
+      void  recoveryProperities(int jpg , int gif , int mp4){
+          jpgBeginIndex = jpg;
+          gifBeginIndex = gif;
+          mp4BeginIndex = mp4;
+          G2_Properties.setProperty("jpgBeginIndex",""+jpg);
+          G2_Properties.setProperty("gifBeginIndex",""+gif);
+          G2_Properties.setProperty("mp4BeginIndex",""+mp4);
+          G2_Properties.setProperty("nextStepCountJPG",""+0);
+          G2_Properties.setProperty("nextStepCountGIF",""+0);
+          G2_Properties.setProperty("nextStepCountMP4",""+0);
+
+
+          System.out.println(" Z_VI(Git_Dir)恢复Pro数:(New)    JPG="+jpgBeginIndex + "   GIF="+gifBeginIndex +"   MP4="+mp4BeginIndex+"  JPG增量=0    GIF增量=0   MP4增量=0");
+        }
 
         @SuppressWarnings("unchecked")
         @Override
         ArrayList<File> applyFileListRule3(ArrayList<File> subFileList, HashMap<String, ArrayList<File>> fileTypeMap) {
             boolean executeFlag = false;
+
+            if(isRecovrty){  //  如果是要恢复的的话
+                 tryDynamicCalCulateBeginIndex(subFileList);
+                return null;
+            }
+
+            String oldAddPart = "OLD 记录的Properties增量:(OLD)   "+" JPG="+jpgBeginIndex + "   GIF="+gifBeginIndex +"   MP4="+mp4BeginIndex+"  JPG增量="+nextStepCountJPG +"    GIF增量="+nextStepCountGIF + "   MP4增量="+nextStepCountMP4;
+            if(!isEnable){
+                System.out.println("当前 Rule5 规则上的增量已经置0  增量已得到确认  请开始累计新的资源! " );
+                System.out.println("当前记录到Prop的增量信息:(New)  "+" JPG="+jpgBeginIndex + "   GIF="+gifBeginIndex +"   MP4="+mp4BeginIndex+"  JPG增量="+0 +"    GIF增量="+0 + "   MP4增量="+0 );
+
+                return null;
+            }
+            if(isExistAddPart){
+                System.out.println("当前 Rule5 规则存在上次还未确认的增量 请执行如下命令来确认增量 使得NextStep完成\n" +
+                        Cur_Bat_Name + " jgm_5_nextstep      // ▲【 把jpg gif png的增量添加到 beginIndex 然后增量置0 】 \n ");
+            }
             Map.Entry<String, ArrayList<File>> entry;
+            int nextStepCountJPG_new = 0 ;
+            int nextStepCountGIF_new = 0 ;
+            int nextStepCountMP4_new = 0 ;
             if (fileTypeMap != null) {
                 Iterator iterator = fileTypeMap.entrySet().iterator();
                 while (iterator.hasNext()) {
@@ -433,49 +825,148 @@ static ArrayList<Rule> realTypeRuleList = new ArrayList<Rule>();  // 规则的�
                     ArrayList<File> fileArr = entry.getValue();  //Map的Value
                     String typeTag = jpgtag;
                     String dirTempIndex = tempTag+jpgDirTempIndex;
-                    int fixedFileIndex = fixed_jpg_BeginIndex ;
+                    int tempIndex = 1;
+                    int fixedFileIndex = 0 ;
                     if(".jpg".equals(typeStr)){
                         typeTag = jpgtag;
                         dirTempIndex = tempTag+jpgDirTempIndex;
-                        fixedFileIndex =  fixed_jpg_BeginIndex ;
+                        fixedFileIndex =  jpgBeginIndex;
+                        tempIndex = jpgDirTempIndex;
+                        nextStepCountJPG =  fileArr.size();
+                        nextStepCountJPG_new =  fileArr.size();
+                        G2_Properties.setProperty("nextStepCountJPG",""+nextStepCountJPG);
                         jpgEndIndex = jpgBeginIndex + fileArr.size();
+                        System.out.println("当前JPG起始值:"+fixedFileIndex+"    当前GIF的文件长度:"+ fileArr.size() );
                     } else if (".mp4".equals(typeStr)){
                         typeTag = mp4tag;
                         dirTempIndex = tempTag+mp4DirTempIndex;
-                        fixedFileIndex =  fixed_mp4_BeginIndex;
+                        fixedFileIndex =  mp4BeginIndex;
+                        tempIndex = mp4DirTempIndex;
+                        nextStepCountMP4 =  fileArr.size();
+                        nextStepCountMP4_new =  fileArr.size();
+                        G2_Properties.setProperty("nextStepCountMP4",""+nextStepCountMP4);
+
                         mp4EndIndex = mp4BeginIndex + fileArr.size();
+                        System.out.println("当前MP4起始值:"+fixedFileIndex+"    当前GIF的文件长度:"+ fileArr.size() );
                     } else if(".gif".equals(typeStr)) {
                         typeTag = giftag;
                         dirTempIndex = tempTag+gifDirTempIndex;
-                        fixedFileIndex =  fixed_gif_BeginIndex;
+                        fixedFileIndex =  gifBeginIndex;
+                        tempIndex = gifDirTempIndex;
+                        nextStepCountGIF =  fileArr.size();
+                        System.out.println("当前GIF起始值:"+fixedFileIndex+"    当前GIF的文件长度:"+ fileArr.size() );
+                        nextStepCountGIF_new =  fileArr.size();
+                        G2_Properties.setProperty("nextStepCountGIF",""+nextStepCountGIF);
                         gifEndIndex = gifBeginIndex + fileArr.size();
 
                     }else{
                         continue;
                     }
 
-                    fixedFileIndex = fixedFileIndex + 1;
+                    // 从 000 开始
+//                    fixedFileIndex = fixedFileIndex ;
 
 
                     for (int i = 0; i < fileArr.size(); i++) {
 
                         File curFile = fileArr.get(i);
                         //String curFileName = curFile.getName();
-                        String newName = typeTag+"_"+dirTempIndex+"_"+fixedFileIndex+typeStr;
+                        String newName = typeTag+"_"+getPaddingIntStringWithDirIndexFileNameWithIndex(tempTag,gifDirTempIndex,fixedFileIndex,i,3,"0",true)+typeStr;
+
+//                        String newName = typeTag+"_"+dirTempIndex+"_"+getPaddingIntString(fixedFileIndex,3,"0",true)+typeStr;
 
                         if(tryReName(curFile,newName)){
                             executeFlag = true;
                         }
-                        fixedFileIndex++;
+//                        fixedFileIndex++;
                     }
-
                 }
             }
-              if(executeFlag){
+
+            String NewAddPart = "New 记录的Properties增量:(New)   "+ " JPG="+jpgBeginIndex + "   GIF="+gifBeginIndex +"   MP4="+mp4BeginIndex+"  JPG增量="+nextStepCountJPG_new +"    GIF增量="+nextStepCountGIF_new + "   MP4增量="+nextStepCountMP4_new;
+
+            System.out.println("══════════确认增量信息 Begin══════════");
+            if(isExistAddPart){
+           //     System.out.println("Rule5 上次的增量情况:");
+                System.out.println(oldAddPart);
+            }else{
+                System.out.println("OLD     上次的不存在增量:(OLD)    JPG="+jpgBeginIndex + "   GIF="+gifBeginIndex +"   MP4="+mp4BeginIndex+" JPG增量=0     GIF增量=0     MP4增量=0");
+            }
+        //    System.out.println("\nRule5 现在的增量情况: ");
+            System.out.println(NewAddPart);
+
+            System.out.println("New 现在使用如下命令把 New 当前的增量进行确认! \n" +
+                    Cur_Bat_Name + " jgm_5_nextstep      // ▲【 把jpg gif png的增量添加到 beginIndex 然后增量置0 】 \n ");
+            System.out.println("══════════确认增量信息 End══════════");
+            if(executeFlag){
               return curFixedFileList;
               }
             return super.applyFileListRule3(subFileList, fileTypeMap);
         }
+
+
+        // 从 起始的地址  beginIndex 开始计算
+        String getPaddingIntStringWithDirIndexFileNameWithIndex(String cTempTag , int CurrentTempIndex,int beginIndex , int index , int padinglength , String oneStr , boolean dirPre){
+
+            int indexIdentify = beginIndex + index ;
+            int tempIndexResult =  (indexIdentify/1000) ;
+            String result = ""+getXsizeString((indexIdentify%1000),oneStr,padinglength,dirPre);
+            return cTempTag + tempIndexResult+"_"+ result;
+
+        }
+
+
+        //  不从起始的地址 计算    从0，1,2,3.... 开始计算
+          String  getPaddingIntStringWithDirIndexFileName(String cTempTag , int CurrentTempIndex,int index , int padinglength , String oneStr , boolean dirPre){
+
+            int tempIndexA =  (index/1000);
+            int tempIndexResult = CurrentTempIndex + tempIndexA;
+
+            String result = ""+getXsizeString((index%1000),oneStr,padinglength,dirPre);
+
+ /*           int length = (""+index).length();
+
+            if(length < padinglength){
+                int distance = padinglength  - length;
+                for (int i = 0; i < distance; i++) {
+                    if(dirPre){
+                        result = oneStr+result;
+                    }else{
+                        result = result + oneStr;
+                    }
+
+                }
+
+            }*/
+
+            return cTempTag + tempIndexResult+"_"+ result;
+
+        }
+
+
+        String  getXsizeString(int index , int paddingSize ){
+
+            return   getXsizeString(index," ",paddingSize,true);
+
+        }
+
+     String  getXsizeString(int index , String charOne , int paddingSize ,boolean directPre ){
+            String result = (""+index);
+         int length = (""+index).length();
+         if(length < paddingSize){
+             int distance = paddingSize  - length;
+             for (int i = 0; i < distance; i++) {
+                 if(directPre){
+                     result = charOne+result;
+                 }else{
+                     result = result+charOne;
+                 }
+
+             }
+         }
+         return result;
+        }
+
     }
 
     // 把 当前目录下所有的 png jpeg 都转为 jpg的格式
@@ -781,6 +1272,8 @@ static ArrayList<Rule> realTypeRuleList = new ArrayList<Rule>();  // 规则的�
 
 abstract  class Rule{
     // operation_type  操作类型     1--读取文件内容字符串 进行修改      2--对文件对文件内容(字节)--进行修改    3.对全体子文件进行的随性的操作 属性进行修改(文件名称)
+     // 4. 从shell 中获取到的路径 去对某一个文件进行操作
+
          int operation_type;
          String file_type;   // * 标识所有的文件类型   以及当前操作类型文件  或者 单独的文件过滤类型
          String identify;
@@ -904,6 +1397,26 @@ abstract  class Rule{
 
     }
 
+
+  static  String  getPaddingIntString(int index , int padinglength , String oneStr , boolean dirPre){
+        String result = ""+index;
+        int length = (""+index).length();
+
+        if(length < padinglength){
+            int distance = padinglength  - length;
+            for (int i = 0; i < distance; i++) {
+                if(dirPre){
+                    result = oneStr+result;
+                }else{
+                    result = result + oneStr;
+                }
+
+            }
+
+        }
+        return result;
+
+    }
 
 
 }
