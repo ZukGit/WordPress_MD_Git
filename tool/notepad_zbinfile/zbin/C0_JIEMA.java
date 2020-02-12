@@ -2224,7 +2224,7 @@ public class C0_JIEMA {
     static int copyIndex  = 1;
 
     public static void fileCopy(File origin, File target) {
-        System.out.println("复制中（当前索引:"+copyIndex+"  总长:"+allPointFile_mingwen.size()"）:  当前路径:" + origin.getAbsolutePath());
+        System.out.println("复制中（当前索引:"+copyIndex+"  总长:"+allPointFile_mingwen.size()+"）:  当前路径:" + origin.getAbsolutePath());
         copyIndex++;
         InputStream input = null;
         OutputStream output = null;
