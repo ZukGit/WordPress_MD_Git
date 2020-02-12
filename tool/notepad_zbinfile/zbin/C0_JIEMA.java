@@ -1,4 +1,6 @@
 import java.io.*;
+import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.security.Key;
 import java.security.Security;
 import java.util.ArrayList;
@@ -19,6 +21,20 @@ public class C0_JIEMA {
      * CBC 作为DES加密 操作模式的一种   明文与密文长度不一致  明文长度不需要保证一定是 8字节整数倍 会多出一个 IV block padding
      */
 
+    private static String curMIWEN_PATH =  System.getProperties().getProperty("user.dir") + File.separator + "mingwen" + File.separator;
+
+    private static String curMINGWEN_PATH =  System.getProperties().getProperty("user.dir") + File.separator + "mingwen" + File.separator;
+
+
+
+    static String curJPG_PATH =  System.getProperties().getProperty("user.dir") + File.separator + "mingwen" + File.separator + "i";
+    static String curGIF_PATH =     System.getProperties().getProperty("user.dir") + File.separator + "mingwen" + File.separator + "g";
+    static String curMP4_PATH =      System.getProperties().getProperty("user.dir") + File.separator + "mingwen" + File.separator + "v";
+ // html-begin
+
+    static String I_TAG = File.separator + "i"+File.separator ; //
+    static String G_TAG = File.separator + "g"+File.separator ; //
+    static String M_TAG = File.separator + "v"+File.separator ; //
 
     //================================ gif_begin===================
     //gif 1x1
@@ -99,14 +115,14 @@ public class C0_JIEMA {
     //================================ jpg_begin===================
 
     // jpg 1x1
-    static File htmlFile_jpg_1x1_flow_left = new File(System.getProperty("user.dir") + File.separator + "src" + File.separator + "C0_jpg_2x2_flow_left.html");
-    static File htmlFile_jpg_1x1_flow_right = new File(System.getProperty("user.dir") + File.separator + "src" + File.separator + "C0_jpg_2x2_flow_right.html");
+    static File htmlFile_jpg_1x1_flow_left = new File(System.getProperty("user.dir") + File.separator + "src" + File.separator + "C0_jpg_1x1_flow_left.html");
+    static File htmlFile_jpg_1x1_flow_right = new File(System.getProperty("user.dir") + File.separator + "src" + File.separator + "C0_jpg_1x1_flow_right.html");
 
 
 
     //jpg 2x2
-    static File htmlFile_jpg_2x2_flow_left = new File(System.getProperty("user.dir") + File.separator + "src" + File.separator + "C0_jpg_1x1_flow_left.html");
-    static File htmlFile_jpg_2x2_flow_right = new File(System.getProperty("user.dir") + File.separator + "src" + File.separator + "C0_jpg_1x1_flow_right.html");
+    static File htmlFile_jpg_2x2_flow_left = new File(System.getProperty("user.dir") + File.separator + "src" + File.separator + "C0_jpg_2x2_flow_left.html");
+    static File htmlFile_jpg_2x2_flow_right = new File(System.getProperty("user.dir") + File.separator + "src" + File.separator + "C0_jpg_2x2_flow_right.html");
 
     static File htmlFile_jpg_2x2 = new File(System.getProperty("user.dir") + File.separator + "src" + File.separator + "C0_jpg_2x2.html");
     static File htmlFile_jpg_2x2_same = new File(System.getProperty("user.dir") + File.separator + "src" + File.separator + "C0_jpg_2x2_same.html");
@@ -211,6 +227,7 @@ public class C0_JIEMA {
     public static ArrayList<File> jpgFileList_miwen = new ArrayList<File>();
     public static ArrayList<File> mp4FileList_miwen = new ArrayList<File>();
     public static ArrayList<File> gifFileList_miwen = new ArrayList<File>();
+
 
 
     public static ArrayList<File> jpgFileList_mingwen = new ArrayList<File>();
@@ -340,7 +357,10 @@ public class C0_JIEMA {
     public static ArrayList<File> mp4_0098yymyx_FileList_mingwen = new ArrayList<File>();
     public static ArrayList<File> mp4_0099wdxxx_FileList_mingwen = new ArrayList<File>();
     public static ArrayList<File> mp4_0100gqlxx_FileList_mingwen = new ArrayList<File>();
+
+    public static ArrayList<File> mp4_0101lyfxx_FileList_mingwen = new ArrayList<File>();
     public static ArrayList<File> mp4_8001suren_FileList_mingwen = new ArrayList<File>();
+
     static {
         arrFileMap.put("0001bdyjy", mp4_0001bdyjy_FileList_mingwen);
         arrFileMap.put("0002cjmyx", mp4_0002cjmyx_FileList_mingwen);
@@ -355,9 +375,9 @@ public class C0_JIEMA {
         arrFileMap.put("0011gyqyx", mp4_0011gyqyx_FileList_mingwen);
         arrFileMap.put("0012xcnyx", mp4_0012xcnyx_FileList_mingwen);
         arrFileMap.put("0013byyjx", mp4_0013byyjx_FileList_mingwen);
-        arrFileMap.put("0014ymxxx", mp4_0013byyjx_FileList_mingwen);
-        arrFileMap.put("0015tlyxx", mp4_0013byyjx_FileList_mingwen);
-        arrFileMap.put("0016mcyxx", mp4_0013byyjx_FileList_mingwen);
+        arrFileMap.put("0014ymxxx", mp4_0014ymxxx_FileList_mingwen);
+        arrFileMap.put("0015tlyxx", mp4_0015tlyxx_FileList_mingwen);
+        arrFileMap.put("0016mcyxx", mp4_0016mcyxx_FileList_mingwen);
         arrFileMap.put("0017ssyyx", mp4_0017ssyyx_FileList_mingwen);
         arrFileMap.put("0018lzllx", mp4_0018lzllx_FileList_mingwen);
         arrFileMap.put("0019sdfxx", mp4_0019sdfxx_FileList_mingwen);
@@ -441,14 +461,20 @@ public class C0_JIEMA {
         arrFileMap.put("0097yyzln", mp4_0097yyzln_FileList_mingwen);
         arrFileMap.put("0098yymyx", mp4_0098yymyx_FileList_mingwen);
         arrFileMap.put("0099wdxxx", mp4_0099wdxxx_FileList_mingwen);
-        arrFileMap.put("0100gqlxx", mp4_0099wdxxx_FileList_mingwen);
-        arrFileMap.put("0101lyfxx", mp4_0099wdxxx_FileList_mingwen);
-        arrFileMap.put("8001suren", mp4_0099wdxxx_FileList_mingwen);
+        arrFileMap.put("0100gqlxx", mp4_0100gqlxx_FileList_mingwen);
+        arrFileMap.put("0101lyfxx", mp4_0101lyfxx_FileList_mingwen);
+        arrFileMap.put("8001suren", mp4_8001suren_FileList_mingwen);
 
 
     }
 
     //-----------------indivisual-------------------
+
+    // html-begin
+
+
+
+    // 生成 Individual目录
 
     public static void todoIndivitualFile(ArrayList<File> mp4FileList_mingwen) {
         if (mp4FileList_mingwen == null) {
@@ -470,6 +496,7 @@ public class C0_JIEMA {
 
             // 从 name  以及 ArrayList<String>  获取 key；
             String strKey = toGetKeyFromName(nameKeyStr, fileName);
+            System.out.println("step4A: "+"strKey = "+ strKey + "   fileName = "+fileName);
             if (strKey == null || "".equals(strKey)) {
                 // 没有找到对应的Key  所以对应的这个mp4FileItem 不是需要收集的
                 continue;
@@ -2192,8 +2219,13 @@ public class C0_JIEMA {
         addGIFHtmlFile(System.getProperties().getProperty("user.dir") + File.separator + mingwenDir + File.separator + "g", gifFileList_mingwen.size());
     }
 
+
+
+    static int copyIndex  = 1;
+
     public static void fileCopy(File origin, File target) {
-        System.out.println("复制中:  当前路径:" + origin.getAbsolutePath());
+        System.out.println("复制中（当前索引:"+copyIndex+"  总长:"+allPointFile_mingwen.size()"）:  当前路径:" + origin.getAbsolutePath());
+        copyIndex++;
         InputStream input = null;
         OutputStream output = null;
         int lengthSize;
@@ -2233,7 +2265,11 @@ public class C0_JIEMA {
     // 检查对应的明文文件夹是存在
     public static boolean isFileReady() {   // 初始化静态变量 File1 原始mp3文件  File2-加密mp3文件   File3-解密mp3文件
         String usrDir = System.getProperties().getProperty("user.dir");
+
+        // /mingwen 是否存在
         File mingwenFileDir = new File(usrDir + mingwenDir);
+
+        // /miwen 是否存在
         File miwenFileDir = new File(usrDir + miwenDir);
         if (!miwenFileDir.exists()) {
             mingwenFileDir.mkdirs();
@@ -2250,7 +2286,9 @@ public class C0_JIEMA {
 //            System.out.println("-------------");
 //            System.out.println(itemFile.getName());
 //        }
-        AnalysisDir(miwenFileDir);   // 1. 列出所有文件夹 文件 路径 名称
+        // AnalysisDir(miwenFileDir);   // 1. 列出所有文件夹 文件 路径 名称   循环遍历
+        getAllSubFile(miwenFileDir);   //  nio 遍历
+        System.out.println("密文 minwen路径:"+ miwenFileDir.getAbsolutePath());
         InitMingweList();     // 解析 明文_明文的关系
         todoJIEMA();
         return true;
@@ -2260,6 +2298,8 @@ public class C0_JIEMA {
     public static void todoJIEMA() {
         Map.Entry<File, File> entryFile;
 
+        int mapSize = mingwen_miwen_Map.size();
+        int curIndex = 1 ;
         if (mingwen_miwen_Map != null && mingwen_miwen_Map.size() > 0) {
             Iterator iterator = mingwen_miwen_Map.entrySet().iterator();
 
@@ -2268,7 +2308,9 @@ public class C0_JIEMA {
                 entryFile = (Map.Entry<File, File>) iterator.next();
                 File miwenFile = entryFile.getKey(); //Map的Key
                 File mingwenFile = entryFile.getValue();  //Map的Value
+                System.out.println("当前解密索引:"+curIndex+"  总长度:"+mapSize+"  解密文件:"+mingwenFile.getAbsolutePath());
                 createDecryFile(miwenFile, mingwenFile);
+                curIndex++;
             }
         }
 
@@ -2307,7 +2349,7 @@ public class C0_JIEMA {
             }
 
             byte[] decrypt_bytes = decrypt(TEMP);  // 对加密文件的加密字节进行解密
-            System.out.println("密文加密字节大小:" + TEMP.length + "   解密密文之后的明文大小:" + decrypt_bytes.length);
+            System.out.println("文件大小:"+encryptFile.length()+"   密文加密字节大小:" + TEMP.length + "   解密密文之后的明文大小:" + decrypt_bytes.length);
 
             decryptBufferedOutputStream.write(decrypt_bytes);
             decryptBufferedOutputStream.flush();
@@ -2419,48 +2461,90 @@ public class C0_JIEMA {
 
     public static void InitMingweList() {
 
-        System.out.println("密文件夹+文件 总数 =  " + allFile_miwen.size());
-        System.out.println("密文件夹 总数 =  " + alldir_miwen.size());
-        System.out.println("密文件 总数 =  " + allPointFile_miwen.size());
+        System.out.println("step2A: 密文件夹+文件 总数 =  " + allFile_miwen.size());
+        System.out.println("step2B: 密文件夹 总数 =  " + alldir_miwen.size());
+        System.out.println("step2C: 密文件 总数 =  " + allPointFile_miwen.size());
+        System.out.println("step2C: 密文件 JPG总数 =  " + jpgFileList_miwen.size());
+        System.out.println("step2C: 密文件 GIF总数 =  " + gifFileList_miwen.size());
+        System.out.println("step2C: 密文件 MP4总数 =  " + mp4FileList_miwen.size());
+        System.out.println("=======密文文件夹列表 Begin   alldir_miwen.size()="+alldir_miwen.size()+" =======");
 
-        System.out.println("=======密文文件夹列表 Begin =======");
+
+
+        //  废弃--begin
+        // 获取 miwen 文件夹  然后把  miwen  替换为mingwen   当前 密文文件夹为0  所以 不执行 这里
         for (int i = 0; i < alldir_miwen.size(); i++) {
-            System.out.println("密文件夹" + (i + 1) + "  路径: " + alldir_miwen.get(i).getAbsolutePath());
+            System.out.println("step2D: 密文件夹" + (i + 1) + "  路径: " + alldir_miwen.get(i).getAbsolutePath());
             String miwenDir = alldir_miwen.get(i).getAbsolutePath();
             String mingwenDir = miwenDir.replace("miwen", "mingwen");
-            File mingwen_dirFile = new File(mingwenDir);
+            File mingwen_dirFile = new File(mingwenDir);   // 创建所有的 mingwen dir
             if (!mingwen_dirFile.exists()) {
                 mingwen_dirFile.mkdirs();
             }
             alldir_mingwen.add(mingwen_dirFile);
-
         }
+        //  废弃--end
+
+        File curJPGDirFile = new File(curJPG_PATH);
+        File curMP4DirFile = new File(curMP4_PATH);
+        File curGIFDirFile = new File(curGIF_PATH);
+
+        if(!curMP4DirFile.exists()){
+            curMP4DirFile.mkdirs();
+        }
+
+
+        if(!curJPGDirFile.exists()){
+            curJPGDirFile.mkdirs();
+        }
+
+        if(!curGIFDirFile.exists()){
+            curGIFDirFile.mkdirs();
+        }
+
+
+
+
         System.out.println("=======密文文件夹列表 End =======");
-        System.out.println("=======明文件夹列表 Begin =======");
+        System.out.println("=======明文件夹列表 Begin 长度:  alldir_mingwen.size() "+alldir_mingwen.size() +" =======");
+
         for (int i = 0; i < alldir_mingwen.size(); i++) {
-            System.out.println("明文件夹" + (i + 1) + "  路径: " + alldir_mingwen.get(i).getAbsolutePath());
+            System.out.println("step2E: 明文件夹" + (i + 1) + "  密文路径: " + alldir_mingwen.get(i).getAbsolutePath());
         }
         System.out.println("=======明文文件夹列表 End =======");
 
 
         System.out.println("=======密文件列表 Begin  文件总数:" + allPointFile_miwen.size() + " =======");
 
-        System.out.println("*********** jpg文件列表Begin*********** ");
+        System.out.println("*********** jpg文件列表Begin:"+jpgFileList_miwen.size()+ "*********** ");
         for (int i = 0; i < jpgFileList_miwen.size(); i++) {
-            System.out.println("密jpg文件 index:" + (i + 1) + "   路径: " + jpgFileList_miwen.get(i).getAbsolutePath());
+            System.out.println("step2F: 密jpg文件 index:" + (i + 1) + "   密文路径: " + jpgFileList_miwen.get(i).getAbsolutePath());
             String miwen_jpgFile = jpgFileList_miwen.get(i).getAbsolutePath();
-            String mingwenPointFile = miwen_jpgFile.replace("miwen", "mingwen");
+
+            //  应该是获取到  /i/的路径 然后 拿到它的剩余的名称的字符串
+            String endName = miwen_jpgFile.substring(miwen_jpgFile.indexOf(I_TAG)+I_TAG.length());
+            System.out.println("step2F_1 jpg :  miwen_jpgFile = "+miwen_jpgFile);
+            System.out.println("step2F_1  jpg:  endName = "+endName);
+            String mingwenPointFile = curJPGDirFile + File.separator+endName;
+
+
             String mingwenPointFile_xxx = mingwenPointFile.trim() + ".jpg";
 
             File mingwenFile = new File(mingwenPointFile_xxx);
+            System.out.println("step2G_0: 明文jpg文件 index:" + i + "    明文path:" + mingwenFile.getAbsolutePath());
+
             if (!mingwenFile.exists()) {
                 try {
+//                    mingwenFile.mkdirs();
+                    mingwenFile.getParentFile().mkdirs();
                     mingwenFile.createNewFile();
-                    System.out.println("明文jpg文件 index:" + i + "    path:" + mingwenFile.getAbsolutePath());
+                    System.out.println("step2G: 明文jpg文件 index:" + i + "    明文path:" + mingwenFile.getAbsolutePath());
                     jpgFileList_mingwen.add(mingwenFile);
                 } catch (IOException e) {
-                    System.out.println("明文 jpg创建失败！");
+                    System.out.println("step2G_1 :明文 jpg创建失败！"+ " 明文path:" + mingwenFile.getAbsolutePath());
                 }
+            }else{
+                jpgFileList_mingwen.add(mingwenFile);
             }
             allPointFile_mingwen.add(mingwenFile);
             mingwen_miwen_Map.put(jpgFileList_miwen.get(i), mingwenFile);
@@ -2469,18 +2553,30 @@ public class C0_JIEMA {
         System.out.println("*********** jpg文件列表End*********** ");
 
 
-        System.out.println("*********** mp4文件列表Begin*********** ");
+        System.out.println("*********** mp4文件列表Begin:"+mp4FileList_miwen.size()+"*********** ");
         for (int i = 0; i < mp4FileList_miwen.size(); i++) {
-            System.out.println("密mp4文件 index:" + (i + 1) + "   路径: " + mp4FileList_miwen.get(i).getAbsolutePath());
+            System.out.println("step2H: 密mp4文件 index:" + (i + 1) + "   密文path: " + mp4FileList_miwen.get(i).getAbsolutePath());
+
+          //E:\2020_GIT\miwen\Z_VI1\v\am\bei\am_0005zywxx014_bei_001
             String miwen_mp4File = mp4FileList_miwen.get(i).getAbsolutePath();
-            String mingwenPointFile = miwen_mp4File.replace("miwen", "mingwen");
+//            String mingwenPointFile = miwen_mp4File.replace("miwen", "mingwen");
+
+
+            // endName = \2020_GIT\miwen\Z_VI1\v\am\bei\am_0005zywxx014_bei_001
+            String endName = miwen_mp4File.substring(miwen_mp4File.indexOf(M_TAG)+M_TAG.length());
+            String mingwenPointFile = curMP4DirFile + File.separator+endName;
+
             String mingwenPointFile_xxx = mingwenPointFile.trim() + ".mp4";
+
+            System.out.println("step2F_1 mp4 :  miwen_mp4File = "+mingwenPointFile);
+            System.out.println("step2F_1  mp4:  endName = "+endName);
 
             File mingwenFile = new File(mingwenPointFile_xxx);
             if (!mingwenFile.exists()) {
                 try {
+                    mingwenFile.getParentFile().mkdirs();
                     mingwenFile.createNewFile();
-                    System.out.println("明文mp4文件 index:" + i + "    path:" + mingwenFile.getAbsolutePath());
+                    System.out.println("step2I: 明文mp4文件 index:" + i + "    明文path:" + mingwenFile.getAbsolutePath());
                     mp4FileList_mingwen.add(mingwenFile);
                     String name = mingwenFile.getName();
                     if (name.startsWith("wm")) {
@@ -2502,6 +2598,8 @@ public class C0_JIEMA {
                 } catch (IOException e) {
                     System.out.println("明文 mp4 创建失败！");
                 }
+            }else{
+                mp4FileList_mingwen.add(mingwenFile);
             }
             allPointFile_mingwen.add(mingwenFile);
             mingwen_miwen_Map.put(mp4FileList_miwen.get(i), mingwenFile);
@@ -2510,22 +2608,31 @@ public class C0_JIEMA {
         System.out.println("*********** mp4文件列表End*********** ");
 
 
-        System.out.println("*********** gif文件列表Begin*********** ");
+        System.out.println("*********** gif文件列表Begin:"+ gifFileList_miwen.size()+"*********** ");
         for (int i = 0; i < gifFileList_miwen.size(); i++) {
-            System.out.println("密gif文件 index:" + (i + 1) + "   路径: " + gifFileList_miwen.get(i).getAbsolutePath());
+            System.out.println("step2J: 密gif文件 index:" + (i + 1) + "   路径: " + gifFileList_miwen.get(i).getAbsolutePath());
             String miwen_gifFile = gifFileList_miwen.get(i).getAbsolutePath();
-            String mingwenPointFile = miwen_gifFile.replace("miwen", "mingwen");
+//            String mingwenPointFile = miwen_gifFile.replace("miwen", "mingwen");
+            String endName = miwen_gifFile.substring(miwen_gifFile.indexOf(G_TAG)+G_TAG.length());
+            String mingwenPointFile = curGIFDirFile + File.separator+endName;
+
+
             String mingwenPointFile_xxx = mingwenPointFile.trim() + ".gif";
 
             File mingwenFile = new File(mingwenPointFile_xxx);
             if (!mingwenFile.exists()) {
                 try {
+                    mingwenFile.getParentFile().mkdirs();
                     mingwenFile.createNewFile();
-                    System.out.println("明文gif文件 index:" + i + "    path:" + mingwenFile.getAbsolutePath());
+                    System.out.println("step2K:  明文gif文件 index:" + i + "    明文path:" + mingwenFile.getAbsolutePath());
                     gifFileList_mingwen.add(mingwenFile);
                 } catch (IOException e) {
                     System.out.println("明文 gif 创建失败！");
                 }
+            }else{
+
+                gifFileList_mingwen.add(mingwenFile);
+
             }
             allPointFile_mingwen.add(mingwenFile);
             mingwen_miwen_Map.put(gifFileList_miwen.get(i), mingwenFile);
@@ -2534,7 +2641,7 @@ public class C0_JIEMA {
         System.out.println("*********** gif文件列表End*********** ");
 
 
-        System.out.println("=======文件列表 End  文件总数:" + allPointFile_miwen.size() + " =======");
+        System.out.println("step2K: =======文件列表 End  文件总数:" + allPointFile_miwen.size() + " =======");
 
 
         todoIndivitualFile(mp4FileList_mingwen);
@@ -2583,6 +2690,66 @@ public class C0_JIEMA {
 
 
     }
+
+
+
+    static ArrayList<File> getAllSubFile(File dirFile) {
+        ArrayList<File> allFile = new ArrayList<File>();
+        Path curRootPath = Paths.get(dirFile.getAbsolutePath());
+
+        try {
+            Files.walkFileTree(curRootPath, new SimpleFileVisitor<Path>() {
+
+                @Override
+                public FileVisitResult visitFile(Path pathFile, BasicFileAttributes attrs) throws IOException {
+                    String fileString = pathFile.toAbsolutePath().toString();
+
+                    if(fileString.contains(File.separator+".git"+File.separator) || fileString.contains(".")){
+                        return FileVisitResult.CONTINUE;
+                    }
+                    File file = pathFile.toFile();
+                    allFile_miwen.add(file);
+                    if (file.isFile()) {
+                        allPointFile_miwen.add(file);
+                        System.out.println("stet1A: 密文件编号" + File_INDEX + "  FilePath=" + file.getAbsolutePath() + "  文件名:" + file.getName());
+                        File_INDEX++;
+
+                        //  包含 /v/ 这样的标识
+                        if (file.getAbsolutePath().contains(File.separator + "v" + File.separator)) {
+                            mp4FileList_miwen.add(file);
+                        } else if (file.getAbsolutePath().contains(File.separator + "i" + File.separator)) {
+                            //  包含 /i/ 这样的标识
+                            jpgFileList_miwen.add(file);
+                        } else if (file.getAbsolutePath().contains(File.separator + "g" + File.separator)) {
+                            //  包含 /g/ 这样的标识
+                            gifFileList_miwen.add(file);
+                        }
+                    } else {
+                        System.out.println("stet1B:【密文件夹" + DIR_INDEX + "】" + "DirPath=" + file.getAbsolutePath() + "  文件夹名:" + file.getName());
+                        DIR_INDEX++;
+                        alldir_miwen.add(file);
+                        File[] fileList = file.listFiles();
+                        for (int i = 0; i < fileList.length; i++) {
+                            AnalysisDir(fileList[i]);
+                        }
+                    }
+                    return FileVisitResult.CONTINUE;
+                }
+            });
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+        return allFile;
+
+
+    }
+
+
+    //   循环遍历
+
+
     public static void AnalysisDir(File file) {
         allFile_miwen.add(file);
         if (file.isFile()) {
