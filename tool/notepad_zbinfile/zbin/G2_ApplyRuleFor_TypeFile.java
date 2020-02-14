@@ -35,7 +35,7 @@ public class G2_ApplyRuleFor_TypeFile {
 
 
     static int BYTE_CONTENT_LENGTH_Rule7= 1024 * 10 * 10;   // 读取文件Head字节数常数
-    static String strDefaultKey_Rule7 = "********"; //  8-length
+    static String strDefaultKey_Rule7 = "zukgit12"; //  8-length
     public static byte[] TEMP_Rule7 = new byte[BYTE_CONTENT_LENGTH_Rule7];
 
 
