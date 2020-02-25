@@ -359,7 +359,33 @@ public class C0_JIEMA {
     public static ArrayList<File> mp4_0100gqlxx_FileList_mingwen = new ArrayList<File>();
 
     public static ArrayList<File> mp4_0101lyfxx_FileList_mingwen = new ArrayList<File>();
+
+
     public static ArrayList<File> mp4_8001suren_FileList_mingwen = new ArrayList<File>();
+
+
+
+
+    public static ArrayList<File> mp4_0102sgxyx_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0103ztalx_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0104sjyxx_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0105rionx_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0106mhlxx_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0107jlxxx_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0108dmxxx_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0109bcxsx_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0110hdlcx_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0111tnmxn_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0112slzxx_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_0113qblnx_FileList_mingwen = new ArrayList<File>();
+
+    public static ArrayList<File>  mp4_7000zhubo_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_8002ni001_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_8002ni002_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_8002ni003_FileList_mingwen = new ArrayList<File>();
+    public static ArrayList<File> mp4_8002ni004_FileList_mingwen = new ArrayList<File>();
+
+
 
     static {
         arrFileMap.put("0001bdyjy", mp4_0001bdyjy_FileList_mingwen);
@@ -465,6 +491,26 @@ public class C0_JIEMA {
         arrFileMap.put("0101lyfxx", mp4_0101lyfxx_FileList_mingwen);
         arrFileMap.put("8001suren", mp4_8001suren_FileList_mingwen);
 
+        arrFileMap.put("0102sgxyx", mp4_0102sgxyx_FileList_mingwen);
+        arrFileMap.put("0103ztalx", mp4_0103ztalx_FileList_mingwen);
+        arrFileMap.put("0104sjyxx", mp4_0104sjyxx_FileList_mingwen);
+        arrFileMap.put("0105rionx", mp4_0105rionx_FileList_mingwen);
+        arrFileMap.put("0106mhlxx", mp4_0106mhlxx_FileList_mingwen);
+        arrFileMap.put("0107jlxxx", mp4_0107jlxxx_FileList_mingwen);
+        arrFileMap.put("0108dmxxx", mp4_0108dmxxx_FileList_mingwen);
+        arrFileMap.put("0109bcxsx", mp4_0109bcxsx_FileList_mingwen);
+        arrFileMap.put("0110hdlcx", mp4_0110hdlcx_FileList_mingwen);
+        arrFileMap.put("0111tnmxn", mp4_0111tnmxn_FileList_mingwen);
+        arrFileMap.put("0112slzxx", mp4_0112slzxx_FileList_mingwen);
+        arrFileMap.put("0113qblnx", mp4_0113qblnx_FileList_mingwen);
+        arrFileMap.put("7000zhubo", mp4_7000zhubo_FileList_mingwen);
+
+        arrFileMap.put("8002ni001", mp4_8002ni001_FileList_mingwen);
+        arrFileMap.put("8002ni002", mp4_8002ni002_FileList_mingwen);
+        arrFileMap.put("8002ni003", mp4_8002ni003_FileList_mingwen);
+        arrFileMap.put("8002ni004", mp4_8002ni004_FileList_mingwen);
+
+
 
     }
 
@@ -492,10 +538,10 @@ public class C0_JIEMA {
 
         for (File mp4FileItem : mp4FileList_mingwen) {
             String fileName = mp4FileItem.getName();
-
+            String absPath =  mp4FileItem.getAbsolutePath();
 
             // 从 name  以及 ArrayList<String>  获取 key；
-            String strKey = toGetKeyFromName(nameKeyStr, fileName);
+            String strKey = toGetKeyFromName(nameKeyStr, fileName,absPath);
             System.out.println("step4A: "+"strKey = "+ strKey + "   fileName = "+fileName);
             if (strKey == null || "".equals(strKey)) {
                 // 没有找到对应的Key  所以对应的这个mp4FileItem 不是需要收集的
@@ -507,15 +553,15 @@ public class C0_JIEMA {
         }
     }
 
-    static String toGetKeyFromName(ArrayList<String> keyList, String fileName) {
+    static String toGetKeyFromName(ArrayList<String> keyList, String fileName , String absPath) {
         String keyStr = "";
         if (keyList == null) {
             return null;
         }
 
         for (int i = 0; i < keyList.size(); i++) {
-            String keyItem = keyList.get(i);
-            if (fileName.contains(keyItem)) {
+            String keyItem = keyList.get(i);  //  路径中包含该namekey
+            if (fileName.contains(keyItem) || absPath.contains(keyItem)) {
                 return keyItem;
             }
         }
