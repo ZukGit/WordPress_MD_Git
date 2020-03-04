@@ -1,4 +1,3 @@
-
 import java.io.*;
 
         import java.nio.file.*;
@@ -35,7 +34,7 @@ public class G2_ApplyRuleFor_TypeFile {
 
 
     static int BYTE_CONTENT_LENGTH_Rule7= 1024 * 10 * 10;   // 读取文件Head字节数常数
-    static String strDefaultKey_Rule7 = "zukgit12"; //  8-length
+    static String strDefaultKey_Rule7 = "********"; //  8-length
     public static byte[] TEMP_Rule7 = new byte[BYTE_CONTENT_LENGTH_Rule7];
 
 
@@ -104,6 +103,16 @@ public class G2_ApplyRuleFor_TypeFile {
 
 
 
+    private static String REGEX_CHINESE = "[\u4e00-\u9fa5]";
+
+    public static String clearChinese(String lineContent) {
+        if (lineContent == null || lineContent.trim().isEmpty()) {
+            return null;
+        }
+        Pattern pat = Pattern.compile(REGEX_CHINESE);
+        Matcher mat = pat.matcher(lineContent);
+        return mat.replaceAll(" ");
+    }
 
 
 
@@ -116,6 +125,55 @@ public class G2_ApplyRuleFor_TypeFile {
         realTypeRuleList.add( new AVI_Rule_5());
         realTypeRuleList.add( new SubDirRename_Rule_6());
         realTypeRuleList.add( new Encropty_Rule_7());
+        realTypeRuleList.add( new ClearChineseType_8());
+    }
+
+
+
+    // operation_type  操作类型     1--读取文件内容字符串 进行修改      2--对文件对文件内容(字节)--进行修改    3.对全体子文件进行的随性的操作 属性进行修改(文件名称)
+    //     // 4.对当前子文件(包括子目录 子文件 --不包含孙目录 孙文件) 5. 从shell 中获取到的路径 去对某一个文件进行操作
+
+
+
+    // 把文件后缀中的中文给去除掉  不包含文件夹   不包含孙文件
+    class ClearChineseType_8 extends Basic_Rule{
+
+
+        ClearChineseType_8() {
+            super("#", 8, 4);
+        }
+
+        @Override
+        ArrayList<File> applySubFileListRule4(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+
+            System.out.println("Rule8_ClearChineseType_8   搜索到的实体文件个数:" + curRealFileList.size());
+
+            for (int i = 0; i < curRealFileList.size() ; i++) {
+                File curFile = curRealFileList.get(i);
+                String currentFileName =  curFile.getName();
+                if(currentFileName.contains(".")){
+                    String typeStr = currentFileName.substring(currentFileName.lastIndexOf("."));
+                    if(isContainChinese(typeStr)){
+                     //        //清除中文  清除 空格
+                        String newType =  clearChinese(typeStr).replace(" ","");
+                        String newName = currentFileName.replace(typeStr,newType);  // 新名称
+                        System.out.println("newType = "+newType + "    newName="+newName);
+                        tryReName(curFile,newName);
+                    }
+                }
+
+
+            }
+
+
+            return curRealFileList;
+        }
+
+        @Override
+        String simpleDesc() {
+        return "把当前命令的文件包含.的文件的 后缀名称中的中文清除掉  例如 1.7啊z -> 1.7z   2.你zip -> 2.zip \n"+
+            Cur_Bat_Name + " 8     [索引8]   // 把当前目录下文件 后缀中文去除  \n";
+        }
     }
 
     // operation_type  操作类型     1--读取文件内容字符串 进行修改      2--对文件对文件内容(字节)--进行修改    3.对全体子文件进行的随性的操作 属性进行修改(文件名称)
@@ -275,6 +333,9 @@ public class G2_ApplyRuleFor_TypeFile {
     // 把 当前目录下所有的 jpg  mp4 gif  都转为 i_temp1_1.jpg    v_temp2_1.mp4   g_temp3_1.gif 的文件格式
     class AVI_Rule_5 extends Basic_Rule{
         String tempTag = "temp";
+        boolean isTemp;  // 是否是零时起的编号
+        int mTempBeginIndex = 0; //  零时编号的默认起始地址
+
         boolean isRecovrty = false; //  当前是否是  读取当前目录  计算 ProPerities的值的操作
         boolean isEnable = true;  // 当存在增量的时候  不起作用    不执行 记录的操作
         boolean isExistAddPart = false;  // 是否存在增量
@@ -377,13 +438,34 @@ public class G2_ApplyRuleFor_TypeFile {
         @Override
         String simpleDesc() {
             return "把 当前目录下所有的 jpg  mp4 gif  都转为 i_temp1_1.jpg    v_temp2_1.mp4   g_temp3_1.gif 的文件格式\n" +
-                    Cur_Bat_Name + "  jgm_5_recovery  [索引5]   // 在当前 Z_VI 根目录 计算 当前的 JPG GIF MP4的起始值 \n" +
+                    Cur_Bat_Name + "  jgm_5_temp0      [索引5]   // 零时把当前gif jpg mp4 类型 起始位置设置为0   \n" +
+                    Cur_Bat_Name + "  jgm_5_temp99      [索引5]   // 零时把当前gif jpg mp4 类型 起始位置设置为99   \n" +
+                    Cur_Bat_Name + "  jgm_5_reco very  [索引5]   // 在当前 Z_VI 根目录 计算 当前的 JPG GIF MP4的起始值 \n" +
                     Cur_Bat_Name + "  jgm_5_nextstep  [索引5]   //  JPG="+jpgBeginIndex+ " GIF="+gifBeginIndex+" MP4="+mp4BeginIndex+"  JPG增量="+nextStepCountJPG +"    GIF增量="+nextStepCountGIF + "   MP4增量="+nextStepCountMP4+" ▲【 把jpg gif png的增量添加到 beginIndex 然后增量置0 】 \n ";
         }
 
 
         @Override
         void initParams4InputParam(String inputParam) {
+
+            if(inputParam.contains("temp")){
+                int index = inputParam.indexOf("temp")+"temp".length() ;
+                String tempIndexStr = inputParam.substring(index);
+                if(isNumeric(tempIndexStr)){
+                    mTempBeginIndex = Integer.parseInt(tempIndexStr);
+                }else{
+                    if(tempIndexStr.contains("_")){
+                        String blankIndex = tempIndexStr.substring(0,tempIndexStr.indexOf("_"));
+                        if(isNumeric(blankIndex)){
+                            mTempBeginIndex = Integer.parseInt(blankIndex);
+                        }
+                    }else{
+                        mTempBeginIndex = 0 ;  //  默认为0
+                    }
+                }
+
+                isTemp = true;
+            }
             if(inputParam.contains("nextstep")){
                 executeNextStep = true;
             }
@@ -692,7 +774,7 @@ public class G2_ApplyRuleFor_TypeFile {
                         tempIndex = jpgDirTempIndex;
                         nextStepCountJPG =  fileArr.size();
                         nextStepCountJPG_new =  fileArr.size();
-                        G2_Properties.setProperty("nextStepCountJPG",""+nextStepCountJPG);
+                        if(!isTemp)   G2_Properties.setProperty("nextStepCountJPG",""+nextStepCountJPG);
                         jpgEndIndex = jpgBeginIndex + fileArr.size();
                         System.out.println("当前JPG起始值:"+fixedFileIndex+"    当前GIF的文件长度:"+ fileArr.size() );
                     } else if (".mp4".equals(typeStr)){
@@ -702,7 +784,7 @@ public class G2_ApplyRuleFor_TypeFile {
                         tempIndex = mp4DirTempIndex;
                         nextStepCountMP4 =  fileArr.size();
                         nextStepCountMP4_new =  fileArr.size();
-                        G2_Properties.setProperty("nextStepCountMP4",""+nextStepCountMP4);
+                        if(!isTemp)  G2_Properties.setProperty("nextStepCountMP4",""+nextStepCountMP4);
 
                         mp4EndIndex = mp4BeginIndex + fileArr.size();
                         System.out.println("当前MP4起始值:"+fixedFileIndex+"    当前GIF的文件长度:"+ fileArr.size() );
@@ -714,13 +796,19 @@ public class G2_ApplyRuleFor_TypeFile {
                         nextStepCountGIF =  fileArr.size();
                         System.out.println("当前GIF起始值:"+fixedFileIndex+"    当前GIF的文件长度:"+ fileArr.size() );
                         nextStepCountGIF_new =  fileArr.size();
-                        G2_Properties.setProperty("nextStepCountGIF",""+nextStepCountGIF);
+                        if(!isTemp)  G2_Properties.setProperty("nextStepCountGIF",""+nextStepCountGIF);
                         gifEndIndex = gifBeginIndex + fileArr.size();
 
                     }else{
                         continue;
                     }
 
+                    if(isTemp){
+                        fixedFileIndex = mTempBeginIndex ;  // 如果是 temp 那么 默认 就把  temp转为 index
+                       nextStepCountJPG_new = 0 ;
+                       nextStepCountGIF_new = 0 ;
+                       nextStepCountMP4_new = 0 ;
+                    }
                     // 从 000 开始
 //                    fixedFileIndex = fixedFileIndex ;
 
