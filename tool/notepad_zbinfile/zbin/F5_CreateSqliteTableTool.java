@@ -15,14 +15,84 @@ import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+
+//  https://getman.cn/     测试接口工具网站
 public class F5_CreateSqliteTableTool {
+/**
+ * 1.stock_basic  在市股票列表     https://tushare.pro/document/2?doc_id=25
+ * 2.trade_cal   交易日历        https://tushare.pro/document/2?doc_id=26
+ * 3.namechange   曾用名         https://tushare.pro/document/2?doc_id=100
+ * 4.hs_const  沪股通成份股    https://tushare.pro/document/2?doc_id=104
+ * 5.stock_company 上市公司基本信息  https://tushare.pro/document/2?doc_id=112
+ * 6. stk_managers    获取上市公司管理层【2000积分】 https://tushare.pro/document/2?doc_id=193
+ * 7.stk_rewards   获取上市公司管理层薪酬和持股【2000积分】 https://tushare.pro/document/2?doc_id=194
+ * 8.new_share  IPO新股列表 【单次最大2000条，总量不限制】 https://tushare.pro/document/2?doc_id=123
+ * 9.daily  日线行情   https://tushare.pro/document/2?doc_id=27
+ * 10.weekly  获取A股周线行情  https://tushare.pro/document/2?doc_id=144
+ * 11.monthly    获取A股月线数据  https://tushare.pro/document/2?doc_id=145
+ * 12.adj_factor  复权因子   https://tushare.pro/document/2?doc_id=28
+ * 13. suspend  停复牌信息   https://tushare.pro/document/2?doc_id=31
+ * 14.daily_basic  获取全部股票每日重要的基本面指标  https://tushare.pro/document/2?doc_id=32
+ * 15.moneyflow 获取沪深A股票资金流向数据 【1500积分】 https://tushare.pro/document/2?doc_id=170
+ * 16.stk_limit  获取全市场（包含A/B股和基金）每日涨跌停价格 https://tushare.pro/document/2?doc_id=183
+ * 17.limit_list  获取每日涨跌停股票统计【2000积分】 https://tushare.pro/document/2?doc_id=198
+ * 18.moneyflow_hsgt   沪深港通资金流向   https://tushare.pro/document/2?doc_id=47
+ * 19.hsgt_top10   获取沪股通、深股通每日前十大成交详细数据 https://tushare.pro/document/2?doc_id=48
+ * 20.hk_hold  沪深港股通持股明细   https://tushare.pro/document/2?doc_id=188
+ * 21.ggt_daily  获取港股通每日成交信息，数据从2014年开始【2000积分】  https://tushare.pro/document/2?doc_id=196
+ * 22.ggt_monthly 港股通每月成交信息，数据从2014年开始【5000积分】  https://tushare.pro/document/2?doc_id=197
+ * 23.income  获取上市公司财务利润表数据  https://tushare.pro/document/2?doc_id=33
+ * 24.balancesheet  获取上市公司资产负债表  https://tushare.pro/document/2?doc_id=36
+ * 25.cashflow   获取上市公司现金流量表  https://tushare.pro/document/2?doc_id=44
+ * 26.forecast   获取业绩预告数据 https://tushare.pro/document/2?doc_id=44
+ * 27.express  获取上市公司业绩快报  https://tushare.pro/document/2?doc_id=45
+ * 28.dividend   分红送股数据   https://tushare.pro/document/2?doc_id=103
+ * 29.fina_indicator 获取上市公司财务指标数据，每次请求最多返回60条记录  https://tushare.pro/document/2?doc_id=79
+ * 30.fina_audit 获取上市公司定期财务审计意见数据  https://tushare.pro/document/2?doc_id=80
+ * 31.fina_mainbz  获得上市公司主营业务构成，分地区和产品两种方式  https://tushare.pro/document/2?doc_id=81
+ * 32.disclosure_date  获取财报披露计划日期   https://tushare.pro/document/2?doc_id=162
+ * 33.ggt_top10   港股通十大成交股  https://tushare.pro/document/2?doc_id=49
+ * 34.margin   获取融资融券每日交易汇总数据  https://tushare.pro/document/2?doc_id=58
+ * 35.margin_detail  获取沪深两市每日融资融券明细  https://tushare.pro/document/2?doc_id=59
+ * 36.top10_holders  获取上市公司前十大股东数据，包括持有数量和比例等信息  https://tushare.pro/document/2?doc_id=61
+ * 37.top10_floatholders   获取上市公司前十大流通股东数据  https://tushare.pro/document/2?doc_id=62
+ * 38.top_list   龙虎榜每日交易明细  https://tushare.pro/document/2?doc_id=106
+ * 39.top_inst   龙虎榜机构成交明细  https://tushare.pro/document/2?doc_id=107
+ * 40.pledge_stat   获取股权质押统计数据  https://tushare.pro/document/2?doc_id=110
+ * 41.pledge_detail   获取股权质押明细数据  https://tushare.pro/document/2?doc_id=111
+ * 42.repurchase  获取上市公司回购股票数据  https://tushare.pro/document/2?doc_id=124
+ * 43.concept  获取概念股分类，目前只有ts一个来源，未来将逐步增加来源  https://tushare.pro/document/2?doc_id=125
+ * 44.concept_detail  获取概念股分类明细数据  https://tushare.pro/document/2?doc_id=126
+ * 45.share_float 限售股解禁  https://tushare.pro/document/2?doc_id=160
+ * 46.block_trade  大宗交易  https://tushare.pro/document/2?doc_id=161
+ * 47.stk_account  获取股票账户开户数据，统计周期为一周 https://tushare.pro/document/2?doc_id=164
+ * 48.stk_holdernumber   获取上市公司股东户数数据，数据不定期公布 https://tushare.pro/document/2?doc_id=166
+ * 49.stk_holdertrade  获取上市公司增减持数据，了解高管股份增减变化【2000积分】 https://tushare.pro/document/2?doc_id=175
+ * 50.index_basic  获取指数基础信息  https://tushare.pro/document/2?doc_id=94
+ * 51.index_daily  获取指数每日行情 https://tushare.pro/document/2?doc_id=95
+ * 52.index_weekly  获取指数周线行情 https://tushare.pro/document/2?doc_id=171
+ * 53.index_monthly  获取指数月线行情,每月更新一次  https://tushare.pro/document/2?doc_id=172
+ * 54.index_weight  获取各类指数成分和权重，月度数据 https://tushare.pro/document/2?doc_id=96
+ * 55.index_dailybasic  目前只提供上证综指，深证成指，上证50，中证500，中小板指，创业板指的每日指标数据  https://tushare.pro/document/2?doc_id=128
+ * 56.index_classify   获取申万行业分类【2000积分】包括申万28个一级分类，104个二级分类，227个三级分类  https://tushare.pro/document/2?doc_id=181
+ * 57.index_member   申万行业成分【2000积分】  https://tushare.pro/document/2?doc_id=182
+ * 58.index_global 国际指数   【2000积分】
+ *
+ *
+ *
+ *
+ */
+
 
     static String zbinPath = System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin" + File.separator;
+
+    static String F5_DIR_PATH = zbinPath + File.separator+"F5";
+    static File F5_Dir = new File(F5_DIR_PATH);
     static String DB_NAME = "F5_ztest" + System.currentTimeMillis() + ".db";
     //    static String DB_NAME = "F5_ztest"+".db";
     static String SQLITE_DB_PATH = zbinPath + File.separator + DB_NAME;
     static String Tushare_Token = "43acb9a5ddc2cf73c6c4ea54796748f965457ed57daaa736bb778ea2";
-    static int Tushare_Score = 120;  //  当前的积分
+    static int Tushare_Score = 620;  //  当前的积分
 
     static String Tushare_Site = "http://api.tushare.pro";
     static String requestTeplateStr = "{\"api_name\": \"ZTABLE_NAME\", \"token\": \"ZTOKEN\",\"params\": ZPARAMS,\"fields\": \"ZFields\"}";
@@ -31,10 +101,23 @@ public class F5_CreateSqliteTableTool {
 
     static String F5JsonPath = zbinPath + File.separator + "F5_stock_basic.json";
 
+    static String TEST_Site = "https://getman.cn/";
+
+    // 300497.SZ     664443.MI     600129.SH   000009.CZC
+    // h30524.CSI     S5RLST.SPI   CNT10.CN   DCEFCFI.DCE
+    // 放置所有从 json 过来的 ts_code
     static Set<String> TS_CODE_List = new HashSet<String>();
     static Map<String, String> TSCODE_NAME_MAP = new HashMap<String, String>();
 
+
+    static Set<String> shanghai_TS_Code_List =  new HashSet<String>();  // 沪市  .SH 末尾
+    static Set<String> shenzhen_TS_Code_List =  new HashSet<String>();  // 深市  .SZ 末尾
+    static Set<String> A_TS_Code_List =  new HashSet<String>();  // 中国 沪市+深市 A股市场
+
     static NumberFormat nf = new DecimalFormat("0.00");
+
+
+    // Table_13_suspend    依据日期   得到停复牌信息
 
 
 
@@ -217,17 +300,23 @@ public class F5_CreateSqliteTableTool {
 
 
     public static void main(String[] args) {
+
+        // 检查  zbin/F5_ztest.db 文件是否存在   1.存在那么初始化数据库
         if (!CheckFilePath(SQLITE_DB_PATH)) {
             InitTable(SQLITE_DB_PATH);
         }
+
+        // 2.初始化数据表内容
         InitTableData(SQLITE_DB_PATH);
 
 
+        // 所有的 股票代码
         System.out.println("TS_CODE_List.size = " + TS_CODE_List);
+        System.out.println("TS_CODE_List.size = " + TS_CODE_List.size());
 
+        Object[] ts_code = A_TS_Code_List.toArray();
 
-        Object[] ts_code = TS_CODE_List.toArray();
-
+        // 300497.SZ     664443.MI     600129.SH
         for (int i = 0; i < ts_code.length; i++) {
             System.out.println("索引" + i + " : " + ts_code[i].toString());
         }
@@ -309,7 +398,7 @@ public class F5_CreateSqliteTableTool {
     }
 
 
-    public static String HttpPostWithBody(String RequestBodyJson) {
+    public static String HttpPostWithBody(String RequestBodyJson,DB_Table table) {
         String JsonResult = "";
         org.jsoup.Connection connection = Jsoup.connect(Tushare_Site);
         connection.header("Content-Type", "application/json; charset=UTF-8"); //这是重点
@@ -327,13 +416,23 @@ public class F5_CreateSqliteTableTool {
 
             //  System.out.println("===========BODY身体===========");
             //   System.out.println(ascii2Native(document.body().text()));
+
             JsonResult = ascii2Native(document.body().text());
             if (!JSONUtil.isJson(JsonResult)) {
                 JsonResult = "";
                 System.out.println("解析的字符串经过ascii2Native处理后不是Json BODY长度:" + document.body().text().length());
 
                 System.out.println("解析的字符串经过ascii2Native处理后不是Json BODY:" + document.body().text());
+                return JsonResult;
             }
+
+
+            //  调试zukgit
+
+            // 在这里写入对应的文件
+            File tempFile = new File(F5_Dir.getAbsolutePath()+File.separator+table.tableIndex+"_"+table.tableName+"_"+System.currentTimeMillis()+".json");
+            writeContentToFile(tempFile,JsonResult);
+        // 往文件写 内容
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -355,7 +454,8 @@ public class F5_CreateSqliteTableTool {
 
         for (int i = 0; i < SQLite_Tables.size(); i++) {
             DB_Table table = SQLite_Tables.get(i);
-            System.out.println("======================================");
+            System.out.println("═════════"+"当前遍历索引:"+i+"  当前表索引tableIndex:"+table.tableIndex+"  数据库表总数 "+SQLite_Tables.size()+"═════════");
+
 
             // 9 daily  日线行情   需要使用 TS_CODE_LIST
             // 12  adj_factor  复权因子   需要使用 TS_CODE_LIST
@@ -363,15 +463,19 @@ public class F5_CreateSqliteTableTool {
             // 37   top10_floatholders  前10流通股东
             if (table.tableIndex == 9 || table.tableIndex == 12 || table.tableIndex == 36
                     || table.tableIndex == 37) {
+                System.out.println("当前表索引:"+i+"  数据库表总数 "+SQLite_Tables.size());
                 System.out.println("当前接口:" + table.tableName + " 需要积分:" + table.scoreLimit + " 接口描述: " + table.tableDesc);
+                System.out.println("POST 测试网站:  "+TEST_Site );
+                System.out.println("调用API网站:  "+Tushare_Site);
                 System.out.println("请求列表:" + table.createRequestBody());
 
-                Object[] ts_code = TS_CODE_List.toArray();
+                // 只 选择A股 进行 查询
+                Object[] ts_code = A_TS_Code_List.toArray();
                 for (int j = 0; j < ts_code.length; j++) {
                     String tsCode = ts_code[j].toString();
                     System.out.println(table.tableDesc + "下载中!   索引:" + j + "  总长:" + ts_code.length + "  当前股票:" + tsCode);
                     long netTime1 = System.currentTimeMillis();
-                    table.initJsonData(HttpPostWithBody(table.createRequestBodyWithTS_Code(tsCode)), table.tableName);
+                    table.initJsonData(HttpPostWithBody(table.createRequestBodyWithTS_Code(tsCode),table), table.tableName);
                     try {
                         Thread.sleep(800);   //  每次执行 休息 500 毫秒
                     } catch (InterruptedException e) {
@@ -413,27 +517,28 @@ public class F5_CreateSqliteTableTool {
 
             } else {
 
+                // 如果表的积分  小于当前用户的积分  那么这个表可以访问
                 if (table.scoreLimit <= Tushare_Score) {
                     // System.out.println("BODY0000:"+ HttpPostWithBody2(table.createRequestBody())); ;
                     // System.out.println("BODY1:"+ ascii2Native(HttpPostWithBody2(table.createRequestBody()))); ;
-                    table.initJsonData(HttpPostWithBody(table.createRequestBody()), table.tableName);
+                    table.initJsonData(HttpPostWithBody(table.createRequestBody(), table), table.tableName);
                     System.out.println("当前接口:" + table.tableName + " 需要积分:" + table.scoreLimit + " 接口描述: " + table.tableDesc);
-                    System.out.println("请求列表:" + table.createRequestBody());
+                    System.out.println("POST 测试网站:  "+TEST_Site );
+                    System.out.println("调用API网站:  "+Tushare_Site);
+                   System.out.println("请求列表:\n" + table.createRequestBody());
                     System.out.println(" table.tableData.size() = " + table.tableData.size());
 
                     if (table.tableData.size() > 0) {
                         table.insertTableData2DB();
                     }
 
-                } else {
+                } else {   //  当前积分 不够
                     System.out.println("当前接口:" + table.tableName + " 需要积分:" + table.scoreLimit + " 当前积分不够 无法调用!");
                     System.out.println("当前接口:" + table.tableName + " 需要积分:" + table.scoreLimit + " 接口描述: " + table.tableDesc);
-                    System.out.println("请求列表:" + table.createRequestBody());
+                    System.out.println("请求列表:\n" + table.createRequestBody());
                 }
 
             }
-            System.out.println("======================================");
-
 
         }
 
@@ -536,6 +641,7 @@ public class F5_CreateSqliteTableTool {
 
             Statement stmt = c.createStatement();
 
+            // 得到创建表的语句的集合
             ArrayList<String> tableSqlList = getCreateTableSql();
 
 
@@ -546,15 +652,14 @@ public class F5_CreateSqliteTableTool {
                 String tableSql = tableSqlList.get(i);
                 int returnValue = stmt.executeUpdate(tableSql);
                 if (returnValue == 0) {
-                    System.out.println("============================");
-                    System.out.println("创表语句: " + tableSql);
+                    System.out.println("════════"+"创表成功"+"顺序索引:"+i+"  当前表长度:"+tableSqlList.size()+"════════");
+                    System.out.println("创表语句:\n" + tableSql);
                     System.out.println("执行成功!");
-                    System.out.println("============================");
+
                 } else {
-                    System.out.println("============================");
-                    System.out.println("创表语句: " + tableSql);
+                    System.out.println("════════"+"创表成功"+"顺序索引:"+i+"  当前表长度:"+tableSqlList.size()+"════════");
+                    System.out.println("创表语句:\n" + tableSql);
                     System.out.println("执行失败!");
-                    System.out.println("============================");
                 }
             }
 
@@ -578,10 +683,13 @@ public class F5_CreateSqliteTableTool {
             c.close();
         } catch (Exception e) {
             System.err.println(e.getClass().getName() + ": " + e.getMessage());
+            System.out.println("InitTable 创建数据库表操作异常! ");
             // System.exit(0);
         }
     }
 
+
+    // 创建表的语句的集合
     public static ArrayList<String> getCreateTableSql() {
         ArrayList<String> createTableStrList = new ArrayList<String>();
         for (int i = 0; i < SQLite_Tables.size(); i++) {
@@ -598,6 +706,7 @@ public class F5_CreateSqliteTableTool {
     }
 
 
+    // 所有的 数据库表
     static ArrayList<DB_Table> SQLite_Tables = new ArrayList<DB_Table>();
 
     static {
@@ -617,6 +726,8 @@ public class F5_CreateSqliteTableTool {
 
 
         DB_Table StockBasic = new DB_Table("stock_basic");
+        StockBasic.tableDesc="查询所有目前还上市的股票  L上市 D退市 P暂停上市 ";
+        StockBasic.define_Site="https://tushare.pro/document/2?doc_id=25";
         Table_Item StockBasic_ts_code = new Table_Item("ts_code", SQLITE_TYPE.TEXT, "数字代码");
         StockBasic_ts_code.isPrimaryKey = true;
         Table_Item StockBasic_symbol = new Table_Item("symbol", SQLITE_TYPE.TEXT, "股票代码");
@@ -682,10 +793,12 @@ public class F5_CreateSqliteTableTool {
 
 
     static {
-        // 【table_2_trade_cal】  交易日历 trade_cal
+        // 【table_2_trade_cal】  交易日历 trade_cal  https://tushare.pro/document/2?doc_id=26
         //     RequestBody: {"api_name": "trade_cal", "token": "43acb9a5ddc2cf73c6c4ea54796748f965457ed57daaa736bb778ea2","params": {"exchange":"","start_date":"","end_date":"","is_open":""},"fields": "exchange,cal_date,is_open,pretrade_date"}
 
         DB_Table TradeCal = new DB_Table("trade_cal");
+        TradeCal.tableDesc="交易日历";
+        TradeCal.define_Site="https://tushare.pro/document/2?doc_id=26";
         Table_Input_Param TradeCal_exchange = new Table_Input_Param("exchange", "str", "");
         TradeCal_exchange.desc = "【交易所】 [SSE上交所] [SZSE深交所]";
         Table_Input_Param TradeCal_start_date = new Table_Input_Param("start_date", "str", "");
@@ -713,7 +826,7 @@ public class F5_CreateSqliteTableTool {
         TradeCal.tableIndex = 2;
         TradeCal.viceTableIndex = 1;
         TradeCal.scoreLimit = 120;
-//        SQLite_Tables.add(TradeCal);
+        SQLite_Tables.add(TradeCal);
 
     }
 
@@ -721,6 +834,8 @@ public class F5_CreateSqliteTableTool {
         //【table_3_namechange】  曾用名
 
         DB_Table NameChange = new DB_Table("namechange");
+        NameChange.tableDesc="曾用名";
+        NameChange.define_Site="https://tushare.pro/document/2?doc_id=100";
         Table_Input_Param NameChange_ts_code = new Table_Input_Param("ts_code", "str", "");
         NameChange_ts_code.desc = "TS代码";
         Table_Input_Param NameChange_start_date = new Table_Input_Param("start_date", "str", "");
@@ -748,7 +863,7 @@ public class F5_CreateSqliteTableTool {
 
         NameChange.tableIndex = 3;
         NameChange.viceTableIndex = 1;
-//        SQLite_Tables.add(NameChange);
+        SQLite_Tables.add(NameChange);
 
 
     }
@@ -757,7 +872,11 @@ public class F5_CreateSqliteTableTool {
         //【table_4_1_hs_const】   沪股通成份股
         //【table_4_2】   深股通成份股
         DB_Table Hu_GuTong = new DB_Table("hs_const");
+        Hu_GuTong.tableDesc="沪股通成份股";
+
         DB_Table Shen_GuTong = new DB_Table("hs_const");
+        Shen_GuTong.tableDesc="深股通成份股";
+
         Table_Input_Param GuTong_hs_type_Hu = new Table_Input_Param("hs_type", "str", "SH");
         GuTong_hs_type_Hu.isMustParam = true;
         GuTong_hs_type_Hu.paramValue = "SH";
@@ -974,7 +1093,7 @@ public class F5_CreateSqliteTableTool {
 
 
     static {
-        //【table_8_new_share】   new_share  上市公司基本信息  积分大于120 调用 // 积分2000
+        //【table_8_new_share】   new_share  IPO上市公司基本信息  积分大于120 调用 // 积分2000
 //        获取新股上市列表数据
 //        限量：单次最大2000条，总量不限制
 
@@ -1244,10 +1363,11 @@ public class F5_CreateSqliteTableTool {
         Suspend_2.tableIndex = 13;
         Suspend_2.viceTableIndex = 2;
 
+        Suspend.tableDesc="依据时间来得到每天【停牌】的股票  每日变化";
         DateFormat df = new SimpleDateFormat("yyyyMMdd");
         Calendar calendar = Calendar.getInstance();
-//        String dateNameNow = df.format(calendar.getTime());
-        String dateNameNow = "20191018";
+        String dateNameNow = df.format(calendar.getTime());  // 获得今天的日期
+//        String dateNameNow = "20191018";
         Table_Input_Param Suspend_ts_code = new Table_Input_Param("ts_code", "str", "");
         Suspend_ts_code.desc = "TS代码";
         Table_Input_Param Suspend_start_date = new Table_Input_Param("suspend_date", "str", dateNameNow);
@@ -1268,6 +1388,7 @@ public class F5_CreateSqliteTableTool {
         Suspend_2.addTableInputParam(Suspend_ts_code);
         Suspend_2.addTableInputParam(Suspend_start_date_1);
         Suspend_2.addTableInputParam(Suspend_end_date_1);
+        Suspend_2.tableDesc="依据时间来得到每天【复牌】的股票  每日变化";
 
 
         Table_Item Suspend_ts_code_out = new Table_Item("ts_code", SQLITE_TYPE.TEXT, "股票代码");
@@ -2493,7 +2614,7 @@ public class F5_CreateSqliteTableTool {
         Forecast.addTableItem(Forecast_summary_out);
         Forecast.addTableItem(Forecast_change_reason_out);
 
-        SQLite_Tables.add(Forecast);
+//        SQLite_Tables.add(Forecast);
     }
 
 
@@ -4274,16 +4395,33 @@ public class F5_CreateSqliteTableTool {
         SQLite_Tables.add(Index_Member);
     }
 
+    static {
+//  【 table_58_index_global 】 国际指数   2000积分
+        // 描述：获取国际主要指数日线行情  https://tushare.pro/document/2?doc_id=211
+
+
+    }
+
+
+
+    static {
+//  【 table_59_index_global 】 上市公司公告  5000积分
+        // 描述：获取上市公司公告数据及原文文本
+        //https://tushare.pro/document/2?doc_id=176
+
+    }
+
 
     static class DB_Table {
         String tableName;  //
         int tableIndex;  //主键 唯一的     用于区别哪个表
         // 副索引    用于区别 哪个是正的表    执行 创表的那个 表的索引 为 1   其他表的副索引不为1
-        int viceTableIndex;
+        int viceTableIndex;  // 1---那么执行创建表的语句
         String tableDesc; //   当前数据说明
         int scoreLimit;   // 调用积分限制
         boolean request_need_tscode;  // 调用参数是否需要 ts_code参数
 
+        String define_Site ;
         ArrayList<Table_Item> fieldList;    // 创建表的
         ArrayList<String> filedNameList;  // 项名称的集合
         ArrayList<Table_Data> tableData;    // 所有数据的集合
@@ -4331,6 +4469,7 @@ public class F5_CreateSqliteTableTool {
 
             this.inputParamList = new ArrayList<Table_Input_Param>();
             this.inputParamList.addAll(copyObj.inputParamList);
+            this.define_Site = copyObj.define_Site;
         }
 
 
@@ -4380,7 +4519,7 @@ public class F5_CreateSqliteTableTool {
         }
 
         void initJsonData(String mJsonData, String tableName) {
-            if ("".equals(mJsonData)) {
+            if (mJsonData == null || "".equals(mJsonData)) {
                 System.out.println("initJsonData 获取到的Json数据为空!");
                 return;
             }
@@ -4389,6 +4528,7 @@ public class F5_CreateSqliteTableTool {
             if (resultCode != 0) {
                 System.out.println(" JsonData :" + mJsonData);
                 System.out.println("Json返回的 resultCode非0 调用不成功!   ");
+                return;
             }
 
             String dataResult = getDataFromResultJson(mJsonData);
@@ -4431,6 +4571,13 @@ public class F5_CreateSqliteTableTool {
 
                     if ("ts_code".equals(fieldKey)) {
                         TS_CODE_List.add(value);
+                        if(value.trim().endsWith(".SH")){
+                            shanghai_TS_Code_List.add(value);
+                            A_TS_Code_List.add(value);
+                        }else if( value.trim().endsWith(".SZ")){
+                           shenzhen_TS_Code_List.add(value);
+                            A_TS_Code_List.add(value);
+                        }
                     }
 
 
@@ -4835,5 +4982,27 @@ CREATE TABLE "search_history"(
 
     // 创建表
 
+
+    static void writeContentToFile(File file, String strParam) {
+
+        try {
+            if (file != null && !file.exists()) {
+                file.mkdirs();
+                file.createNewFile();
+            }
+
+            if (file != null && file.exists()) {
+                BufferedWriter curBW = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "utf-8"));
+                curBW.write(strParam);
+                curBW.flush();
+                curBW.close();
+                System.out.println("write out File OK !  File = " + file.getAbsolutePath());
+            } else {
+                System.out.println("write out File  Failed !    File = " + file.getAbsolutePath());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
 }

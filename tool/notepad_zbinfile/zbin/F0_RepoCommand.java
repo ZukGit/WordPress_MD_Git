@@ -381,6 +381,8 @@ public class F0_RepoCommand {
         String PRODUCT_NAME_TAG = "<th>BUILD TARGET</th>";
         String PRODUCT_NAME_RAW = "";
         boolean product_name_begin = false;
+        boolean product_name_over = false;
+
 
         String XML_TAG = "<th>JOB NAME</th>";
         String XML_RAW = "";
@@ -412,8 +414,11 @@ public class F0_RepoCommand {
                     }
 //                    System.out.println("第" + index + "行读取到的字符串:" + oldOneLine);
 
-                    if (product_name_begin) {
+                    if (product_name_begin && !product_name_over) {
                         PRODUCT_NAME_RAW = oldOneLine;
+                        if(PRODUCT_NAME_RAW.contains("retail") ){
+                            product_name_over = true;
+                        }
 
                     } else if (xml_begin) {
                         XML_RAW = oldOneLine;
@@ -1136,6 +1141,7 @@ public class F0_RepoCommand {
     }
 
     static void showtip() {
+        System.out.println("当前需要 userdebug_retail 类型的 ReleaseNote文件! ");
         System.out.println("当前示例的格式为【四个参数】: zrepo_command_F0  q.git  bp  test.xml  sky   【打印对应命令】");
         System.out.println("当前示例的格式为【一个参数】: zrepo_command_F0  xxxxReleaseNotes.html   【解析对应html文件并保存在 properties 中】");
         System.out.println("q.git   【git仓库(.git结尾) (ReleaseNote.html 搜索 .git )】    ");

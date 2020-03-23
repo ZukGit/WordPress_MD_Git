@@ -1,15 +1,15 @@
 import java.io.*;
 
-        import java.nio.file.*;
-        import java.nio.file.attribute.BasicFileAttributes;
-        import java.text.SimpleDateFormat;
-        import java.util.*;
+import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
-        import java.util.regex.Matcher;
-        import java.util.regex.Pattern;
-        import javax.crypto.Cipher;
-        import java.security.Key;
-        import java.security.Security;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import javax.crypto.Cipher;
+import java.security.Key;
+import java.security.Security;
 
 
 // 对于  文件类型_操作Index  执行对应的操作逻辑
@@ -34,7 +34,7 @@ public class G2_ApplyRuleFor_TypeFile {
 
 
     static int BYTE_CONTENT_LENGTH_Rule7= 1024 * 10 * 10;   // 读取文件Head字节数常数
-    static String strDefaultKey_Rule7 = "********"; //  8-length
+    static String strDefaultKey_Rule7 = "zukgit12"; //  8-length
     public static byte[] TEMP_Rule7 = new byte[BYTE_CONTENT_LENGTH_Rule7];
 
 
@@ -126,6 +126,10 @@ public class G2_ApplyRuleFor_TypeFile {
         realTypeRuleList.add( new SubDirRename_Rule_6());
         realTypeRuleList.add( new Encropty_Rule_7());
         realTypeRuleList.add( new ClearChineseType_8());
+        realTypeRuleList.add( new FileType_Rule_9());
+        realTypeRuleList.add( new DirOperation_Rule_10());
+
+
     }
 
 
@@ -133,7 +137,346 @@ public class G2_ApplyRuleFor_TypeFile {
     // operation_type  操作类型     1--读取文件内容字符串 进行修改      2--对文件对文件内容(字节)--进行修改    3.对全体子文件进行的随性的操作 属性进行修改(文件名称)
     //     // 4.对当前子文件(包括子目录 子文件 --不包含孙目录 孙文件) 5. 从shell 中获取到的路径 去对某一个文件进行操作
 
+    // //  zrule_apply_G2.bat  #_9  _jpg   把没有类型的文件名称修改为 jpg格式名称
+    // //  zrule_apply_G2.bat  #_9  jpg_   去除当前jpg的格式 使得其文件格式未知
 
+
+
+    // //  zrule_apply_G2.bat  #_10_append  2001   往当前文件夹后缀增加 2001
+    // //  zrule_apply_G2.bat  #_10_prefix  2001   往当前文件夹前缀增加 2001
+    // //  zrule_apply_G2.bat  #_10_create  1_100   创建一个序列号从1到100的100个文件夹
+    // //  zrule_apply_G2.bat  #_10_create  temp_ 1_100   创建一个序列号从temp1到temp100的100个文件夹
+    // //  zrule_apply_G2.bat  #_10_create  _temp 1_100   创建一个序列号从1temp到100temp的100个文件夹
+    // //  zrule_apply_G2.bat  #_10_create  i_temp 1_100   创建一个序列号从i1temp到i100temp100的100个文件夹
+
+    // //  zrule_apply_G2.bat  #_10_create  7000_7100  创建一个序列号从7000开始的到7100结束的文件夹
+    // //  zrule_apply_G2.bat  #_10_replace  abc_DEF  创建一个序列号从7000开始的到7100结束的文件夹
+
+
+
+    class DirOperation_Rule_10 extends Basic_Rule{
+
+        String firstParamStr;  //  第一个参数
+
+        int DIR_OPERA_TYPE_APPEND = 1;  // 后缀增加
+        String appendStr_1 ;
+        int DIR_OPERA_TYPE_PREFIX = 2;  // 前缀增加
+        String prefixStr_2;
+
+        int DIR_OPERA_TYPE_CREATE = 3;  // 创建文件
+        int beginIndex_3;
+        int endIndex_3;
+        String prefixStr_3;
+        String appendStr_3;
+
+        int DIR_OPERA_TYPE_REPLACE = 4;  // 替换文件夹名称
+        String replacedStr_4;
+        String newNameStr_4;
+
+
+
+        int currentOperaType = 0;  // 识别当前用户 指定的操作类型
+
+        DirOperation_Rule_10() {
+            super("#", 10, 4);
+            prefixStr_3="";
+            appendStr_3="";
+        }
+
+        @Override
+        boolean initParamsWithInputList(ArrayList<String> inputParamList) {
+             boolean falg = true;
+            if(currentOperaType == 1){
+                appendStr_1 = inputParamList.get(inputParamList.size()-1);
+            }else  if(currentOperaType == 2){
+                prefixStr_2 = inputParamList.get(inputParamList.size()-1);
+            }else if(currentOperaType == 4 ){
+                String inputStr = inputParamList.get(inputParamList.size()-1);
+                if(!inputStr.contains("_")){
+                    falg = false;
+                }
+
+                String[] inputArr = inputStr.split("_");
+
+                if(inputArr.length >= 2){
+
+                    replacedStr_4 = inputArr[0];
+                    newNameStr_4 = inputArr[inputArr.length-1];
+                }else{
+                    falg = false;
+                }
+            }else if(currentOperaType == 3 ){
+
+                for (int i = 0; i < inputParamList.size(); i++) {
+
+                    String paramItem = inputParamList.get(i);
+                    if(paramItem != null && paramItem.equals(firstParamStr)){
+                        continue;   // 第一个参数不操作
+                    }
+
+                    if(!paramItem.contains("_")){
+                        falg = false;
+                        continue;
+                    }
+                    String fixedParam = paramItem.replace("_","");
+
+                    if(isNumeric(fixedParam)){  // 如果是 字母 说明是起始的那个参数
+                        String[] IndexArr = paramItem.split("_");
+
+                        if(IndexArr.length >= 2){
+
+                        String    beginIndex_3_Str = IndexArr[0];
+                            String    endIndex_3_Str = IndexArr[IndexArr.length-1];
+                            if(isNumeric(beginIndex_3_Str)){
+                                beginIndex_3 = Integer.parseInt(beginIndex_3_Str);
+
+                            }else{
+                                falg = false;
+                            }
+
+                            if(isNumeric(endIndex_3_Str)){
+                                endIndex_3 = Integer.parseInt(endIndex_3_Str);
+                            }else{
+                                falg = false;
+                            }
+
+                        }else{
+                            falg = false;
+                        }
+                    }else{  // 名称的参数
+                        if(paramItem.endsWith("_")){
+                             appendStr_3 = "";
+                            String[] NamePreArr = paramItem.split("_");
+                            prefixStr_3= NamePreArr[0];
+                            System.out.println("appendStr_3="+appendStr_3+"   prefixStr_3="+prefixStr_3 );
+
+
+                        }else{
+                            String[] NamePreArr = paramItem.split("_");
+                            if(NamePreArr.length >= 2){
+                                prefixStr_3= NamePreArr[0];
+                                appendStr_3= NamePreArr[1];
+                                System.out.println("appendStr_3="+appendStr_3+"   prefixStr_3="+prefixStr_3 );
+
+                            }
+
+                   }
+
+
+
+                    }
+
+
+
+
+                }
+
+
+            }
+
+
+            return super.initParamsWithInputList(inputParamList) || falg;
+        }
+
+
+        @Override
+        ArrayList<File> applySubFileListRule4(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+
+            switch ( currentOperaType){
+
+                case 1:
+                    for (int i = 0; i < curDirList.size(); i++) {
+                        File dirFile = curDirList.get(i);
+                        String dirName = dirFile.getName();
+                        String newName = dirName+appendStr_1;
+                        tryReName(dirFile,newName);
+                    }
+                    break;
+
+                case 2:
+                    for (int i = 0; i < curDirList.size(); i++) {
+                        File dirFile = curDirList.get(i);
+                        String dirName = dirFile.getName();
+                        String newName = prefixStr_2 + dirName;
+                        tryReName(dirFile,newName);
+                    }
+                    break;
+
+                case 3:
+                    for (int i = beginIndex_3; i < endIndex_3 + 1; i++) {
+                       String absDirPath = curDirFile.getAbsolutePath();
+                       String newDir = absDirPath + File.separator+prefixStr_3+i+appendStr_3;
+                      File curDirFileItem =  new File(newDir);
+                        curDirFileItem.mkdirs();
+                    }
+                    break;
+
+                case 4:
+
+                    for (int i = 0; i < curDirList.size(); i++) {
+                        File dirFile = curDirList.get(i);
+                        String dirName = dirFile.getName();
+                        String newName = dirName.replace(replacedStr_4,newNameStr_4);
+                        tryReName(dirFile,newName);
+                    }
+
+                    break;
+
+                    default:
+                        System.out.println("当前 currentOperaType = "+ currentOperaType+"  没有找到合适的操作类型去处理 ");
+            }
+
+
+
+            return curDirList;
+        }
+
+        @Override
+        boolean initParams4InputParam(String inputParam) {
+
+            firstParamStr = inputParam;
+            if(inputParam.contains("append")){
+                currentOperaType = 1;
+            }else if(inputParam.contains("prefix")){
+                currentOperaType = 2;
+
+            }else if(inputParam.contains("replace")){
+                currentOperaType = 4;
+
+
+            }else if(inputParam.contains("create")){
+                currentOperaType = 3;
+
+            }
+
+            return super.initParams4InputParam(inputParam);
+        }
+
+        @Override
+        String simpleDesc() {
+            return  "\n"+Cur_Bat_Name+ "  #_10_append  _over   往当前文件夹后缀增加 _over \n" +
+                    Cur_Bat_Name+ "  #_10_prefix  temp   往当前文件夹前缀增加 temp \n" +
+                    Cur_Bat_Name + " #_10_create  1_100   创建一个序列号从1到100的100个文件夹   \n" +
+                    Cur_Bat_Name + " #_10_create   temp_  1_100   创建一个序列号从temp1到temp100的100个文件夹 \n "+
+                    Cur_Bat_Name + " #_10_create   _temp  1_100   创建一个序列号从1temp到100temp的100个文件夹 \n "+
+                    Cur_Bat_Name + " #_10_create   j_temp  1_100   创建一个序列号从 j_1_temp 到100temp的 j_100_temp 个文件夹 \n "+
+                    Cur_Bat_Name + " #_10_create  7000_7100  创建一个序列号从7000开始的到7100结束的文件夹  \n " +
+                    Cur_Bat_Name + " #_10_replace  abc_DEF  创建一个序列号从7000开始的到7100结束的文件夹 \n "  ;
+        }
+
+
+
+    }
+
+
+    // 把 当前目录下子文件 进行格式的转换
+    // //  zrule_apply_G2.bat  #_9  _jpg   把没有类型的文件名称修改为 jpg格式名称
+    // //  zrule_apply_G2.bat  #_9  jpg_   去除当前jpg的格式 使得其文件格式未知
+    //    zrule_apply_G2.bat   #_9  jpg_png  把  jpg的格式转为png的格式
+    //    zrule_apply_G2.bat   #_9  png_jpg  把  jpg的格式转为png的格式
+    // //  zrule_apply_G2.bat  #_9  gif_   去除当前gif的格式 使得其文件格式未知
+    // //  zrule_apply_G2.bat  #_9  _gif   把没有类型的文件名称修改为 jpg格式名称
+    // //  zrule_apply_G2.bat  #_9  mp4_   去除当前mp4的格式 使得其文件格式未知
+    // //  zrule_apply_G2.bat  #_9  _mp4   把没有类型的文件名称修改为 mp4格式名称
+    // //  zrule_apply_G2.bat  #_9  原类型_目标类型   把没有类型的文件名称修改为 jpg格式名称
+    class FileType_Rule_9 extends Basic_Rule{
+        String originType;
+        String targetType;
+
+        FileType_Rule_9() {
+            super("#", 9, 3);
+        }
+
+
+
+        @Override
+        String simpleDesc() {
+            return  Cur_Bat_Name+ "  #_9  _jpg   把没有类型的文件名称修改为 jpg格式名称\n" +
+                    Cur_Bat_Name+ "  #_9  jpg_   去除当前jpg的格式 使得其文件格式未知 \n" +
+                    Cur_Bat_Name + " #_9  jpg_png  把  jpg的格式转为png的格式  \n" +
+                    Cur_Bat_Name + " #_9  png_jpg  把  jpg的格式转为png的格式 \n "+
+                    Cur_Bat_Name + " #_9  gif_   去除当前gif的格式 使得其文件格式未知  \n " +
+                    Cur_Bat_Name + " #_9  _gif   把没有类型的文件名称修改为 jpg格式名称  \n " +
+                    Cur_Bat_Name + " #_9  png_jpg  把  jpg的格式转为png的格式 \n " +
+                    Cur_Bat_Name + " #_9  mp4_   去除当前mp4的格式 使得其文件格式未知 \n " +
+                    Cur_Bat_Name + " #_9  _mp4   把没有类型的文件名称修改为 mp4格式名称 \n " +
+                    Cur_Bat_Name + " #_9  原类型_目标类型   把没有类型的文件名称【原类型】->【目标类型】 \n " ;
+        }
+
+        @Override
+        boolean initParamsWithInputList(ArrayList<String> inputParamList) {
+            boolean Flag = true;
+
+            // 获取到装换的类型
+            String inputFileTypeParams = inputParamList.get(inputParamList.size()-1);
+
+            if(!inputFileTypeParams.contains("_")){
+                Flag = false;
+                System.out.println("无法检测到当前 第9 Rule   原始类型_目标类型参数   请检查后重新执行");
+            }else{
+
+                if(inputFileTypeParams.endsWith("_")){
+                    String target = "";
+                    String[] parmas =   inputFileTypeParams.split("_");
+                    String origin = parmas[0];
+                    System.out.println("item="+inputFileTypeParams+"   origin="+origin +"     target="+target);
+                    originType = origin;
+                    targetType = target;
+
+                }else{
+                    String[] parmas =   inputFileTypeParams.split("_");
+                    System.out.println("item="+inputFileTypeParams+  "   origin="+parmas[0] +"     target="+parmas[1]);
+                    originType = parmas[0] ;
+                    targetType = parmas[1];
+                }
+
+                Flag = true;
+
+            }
+            curFilterFileTypeList.add(originType);
+
+            return super.initParamsWithInputList(inputParamList) && Flag;
+        }
+
+
+
+        @Override
+        ArrayList<File> applyFileListRule3(ArrayList<File> subFileList, HashMap<String, ArrayList<File>> fileTypeMap) {
+
+            for (int i = 0; i < subFileList.size(); i++) {
+                File curFIle = subFileList.get(i);
+                String originName = curFIle.getName();
+             // 执行 修改文件类型的操作
+
+                // 1. 如果当前文件 过滤类型是 空 那么 可能就是没有任何的类型了
+  // 如果当前过滤的类型是  originType 是"" 空的话  那么就会过滤出所有的文件 那么只操作 不包含.的那些文件
+                if("".equals(originType)){
+                    if(originName.contains(".")){
+                       continue; //  包含了 . 说明有类型 那么 不操作
+                    }
+                    String newName = originName + "."+targetType;
+                    tryReName(curFIle,newName);
+                }else{
+                    // 有具体的 过滤的文件
+                    String oldType = "."+originType;
+                    String newType = "."+targetType;
+                    if("".equals(targetType)){
+                        newType = "";
+                    }
+
+if(originName.contains(oldType)){
+    String newName =  originName.replace(oldType,newType);
+    tryReName(curFIle,newName);
+}
+
+
+                }
+
+            }
+
+            return subFileList;
+        }
+    }
 
     // 把文件后缀中的中文给去除掉  不包含文件夹   不包含孙文件
     class ClearChineseType_8 extends Basic_Rule{
@@ -154,7 +497,7 @@ public class G2_ApplyRuleFor_TypeFile {
                 if(currentFileName.contains(".")){
                     String typeStr = currentFileName.substring(currentFileName.lastIndexOf("."));
                     if(isContainChinese(typeStr)){
-                     //        //清除中文  清除 空格
+                        //        //清除中文  清除 空格
                         String newType =  clearChinese(typeStr).replace(" ","");
                         String newName = currentFileName.replace(typeStr,newType);  // 新名称
                         System.out.println("newType = "+newType + "    newName="+newName);
@@ -171,8 +514,8 @@ public class G2_ApplyRuleFor_TypeFile {
 
         @Override
         String simpleDesc() {
-        return "把当前命令的文件包含.的文件的 后缀名称中的中文清除掉  例如 1.7啊z -> 1.7z   2.你zip -> 2.zip \n"+
-            Cur_Bat_Name + " 8     [索引8]   // 把当前目录下文件 后缀中文去除  \n";
+            return "把当前命令的文件包含.的文件的 后缀名称中的中文清除掉  例如 1.7啊z -> 1.7z   2.你zip -> 2.zip \n"+
+                    Cur_Bat_Name + " 8     [索引8]   // 把当前目录下文件 后缀中文去除  \n";
         }
     }
 
@@ -189,13 +532,13 @@ public class G2_ApplyRuleFor_TypeFile {
         }
 
         @Override
-        void initParams4InputParam(String inputParam) {
+        boolean initParams4InputParam(String inputParam) {
             if(inputParam.contains("good")){
                 mEncroptyDirect = false;
             }else {
-                    mEncroptyDirect = true;
+                mEncroptyDirect = true;
             }
-            super.initParams4InputParam(inputParam);
+          return  super.initParams4InputParam(inputParam);
         }
 
         @Override
@@ -440,13 +783,13 @@ public class G2_ApplyRuleFor_TypeFile {
             return "把 当前目录下所有的 jpg  mp4 gif  都转为 i_temp1_1.jpg    v_temp2_1.mp4   g_temp3_1.gif 的文件格式\n" +
                     Cur_Bat_Name + "  jgm_5_temp0      [索引5]   // 零时把当前gif jpg mp4 类型 起始位置设置为0   \n" +
                     Cur_Bat_Name + "  jgm_5_temp99      [索引5]   // 零时把当前gif jpg mp4 类型 起始位置设置为99   \n" +
-                    Cur_Bat_Name + "  jgm_5_reco very  [索引5]   // 在当前 Z_VI 根目录 计算 当前的 JPG GIF MP4的起始值 \n" +
+                    Cur_Bat_Name + "  jgm_5_recovery  [索引5]   // 在当前 Z_VI 根目录 计算 当前的 JPG GIF MP4的起始值 \n" +
                     Cur_Bat_Name + "  jgm_5_nextstep  [索引5]   //  JPG="+jpgBeginIndex+ " GIF="+gifBeginIndex+" MP4="+mp4BeginIndex+"  JPG增量="+nextStepCountJPG +"    GIF增量="+nextStepCountGIF + "   MP4增量="+nextStepCountMP4+" ▲【 把jpg gif png的增量添加到 beginIndex 然后增量置0 】 \n ";
         }
 
 
         @Override
-        void initParams4InputParam(String inputParam) {
+        boolean initParams4InputParam(String inputParam) {
 
             if(inputParam.contains("temp")){
                 int index = inputParam.indexOf("temp")+"temp".length() ;
@@ -490,7 +833,7 @@ public class G2_ApplyRuleFor_TypeFile {
                 isEnable = false;
             }
 
-            super.initParams4InputParam(inputParam);
+           return super.initParams4InputParam(inputParam);
         }
 
         void  tryDynamicCalCulateBeginIndex(ArrayList<File> subFileList ){
@@ -805,9 +1148,9 @@ public class G2_ApplyRuleFor_TypeFile {
 
                     if(isTemp){
                         fixedFileIndex = mTempBeginIndex ;  // 如果是 temp 那么 默认 就把  temp转为 index
-                       nextStepCountJPG_new = 0 ;
-                       nextStepCountGIF_new = 0 ;
-                       nextStepCountMP4_new = 0 ;
+                        nextStepCountJPG_new = 0 ;
+                        nextStepCountGIF_new = 0 ;
+                        nextStepCountMP4_new = 0 ;
                     }
                     // 从 000 开始
 //                    fixedFileIndex = fixedFileIndex ;
@@ -1014,7 +1357,10 @@ public class G2_ApplyRuleFor_TypeFile {
         // key = type       value =  符合过滤文件规则的名称的文件的集合
         //   HashMap<String, ArrayList<File>> arrFileMap;
         boolean keepOriginalName = true;
+        int inputBeginIndex = 0;
 
+        // 是否是按 1.jpg 2,jpg  3.png  4.png 依次命名 而不是  1.jpg 2,jpg  1.png  2.png 类型来命名
+        boolean isOrder = false;
         File_Name_Rule_2() {
             super("*", 2, 3);  //
         }
@@ -1026,6 +1372,13 @@ public class G2_ApplyRuleFor_TypeFile {
         boolean   tryReNameOperation( HashMap<String, ArrayList<File>> arrFileMap ){
             boolean executeFlag = false;
             Map.Entry<String, ArrayList<File>> entry;
+            int fileOrderIndex = 0;
+//            System.out.println("1 fileOrderIndex = "+ fileOrderIndex);
+            if(fileOrderIndex != inputBeginIndex &&  inputBeginIndex != 0){
+                fileOrderIndex = inputBeginIndex - 1 ;
+            }
+//            System.out.println("2 fileOrderIndex = "+ fileOrderIndex);
+//            System.out.println("3 inputBeginIndex = "+ inputBeginIndex);
             if (arrFileMap != null) {
                 Iterator iterator = arrFileMap.entrySet().iterator();
                 while (iterator.hasNext()) {
@@ -1034,21 +1387,30 @@ public class G2_ApplyRuleFor_TypeFile {
                     ArrayList<File> fileArr = entry.getValue();  //Map的Value
 
                     for (int i = 0; i < fileArr.size(); i++) {
+                        fileOrderIndex++;
                         int index = i + 1;
                         String newNamePre = index+"_";
                         File curFile = fileArr.get(i);
                         String curFileName = curFile.getName();
                         String newName = "";
                         if( keepOriginalName ){
-                            newName = newNamePre + curFileName;
+                            if(isOrder){  // 按顺序依次  不按 type了  一直走
+                                newName = fileOrderIndex+"_"+curFileName;
+                            }else{
+                                newName = newNamePre + curFileName;
+                            }
                         }else{
                             // 如果不保留名称  那么没有类型的文件 将只有 序号  没有类型
                             if("unknow".equals(typeStr)){
                                 newName = index+"";
                             }else{
-                                newName = index+typeStr;
-                            }
+                                if(isOrder){  // 按顺序依次  不按 type了  一直走
+                                    newName = fileOrderIndex+typeStr;
+                                }else{
+                                    newName = index+typeStr;
+                                }
 
+                            }
                         }
                         if(tryReName(curFile,newName)){
                             executeFlag = true;
@@ -1076,27 +1438,57 @@ public class G2_ApplyRuleFor_TypeFile {
             return super.applyFileListRule3(subFileList , fileTypeMap );
         }
 
-        void  initParams4InputParam(String inputParams){
+        boolean  initParams4InputParam(String inputParams){
             if(inputParams.contains("_false")){
                 keepOriginalName = false;
             }else{
                 keepOriginalName = true;
             }
 
+            if(inputParams.contains("_order")){
+                isOrder = true;
+            }else{
+                keepOriginalName = false;
+            }
+
+            if(inputParams.contains("_")){
+                String[] inputParamArr = inputParams.split("_");
+                if(inputParamArr.length > 0 && isNumeric(inputParamArr[inputParamArr.length-1].trim())){
+                    inputBeginIndex = Integer.parseInt(inputParamArr[inputParamArr.length-1].trim());
+//                    System.out.println(" 0 inputBeginIndex = "+ inputBeginIndex);
+                }
+            }
+
+            return super.initParams4InputParam(inputParams);
+
+
+
+
         }
 
         String ruleTip(String type,int index , String batName,OS_TYPE curType){
             String itemDesc = "";
             String desc_true = " (保留原名称) 把当前的所有子文件(非目录)重命名为 【序号_原始名称.类型】的形式 例如 hello.jpg =》 1_hello.jpg  xx.jpg-》2_xx.jpg ";
-            String desc_false = "(清除原名称) 把当前的所有子文件(非目录)重命名为 【序号.类型】的形式 例如 hello.jpg =》 1.jpg  xx.jpg-》2_xx.jpg ";
+            String desc_true_1 = " (保留原名称_按类型依次从1开始 order ) 把当前的所有子文件(非目录)重命名为 【序号_原始名称.类型 走到底】的形式 例如 hello.jpg =》 1_hello.jpg  xx.jpg-》2_xx.jpg  aa.png -> 3.png 数字不按类型走到底 ";
+            String desc_true_2 = " (保留原名称_依照输入索引为起始 order ) 把当前的所有子文件(非目录)重命名为 【自定义序号_原始名称.类型 走到底】的形式 例如 *_2_false_order_50  hello.jpg =》 50_hello.jpg  xx.jpg-》51_xx.jpg  aa.png -> 52.png 数字不按类型走到底 ";
+
+            String desc_false = "(清除原名称) 把当前的所有子文件(非目录)重命名为 【序号.类型】的形式 例如 hello.jpg =》 1.jpg  xx.png-》1.jpg ";
+            String desc_false_1 = "(清除原名称_按类型依次 order ) 把当前的所有子文件(非目录)重命名为 【序号.类型 走到底 】的形式 例如 hello.jpg =》 1.jpg  xx.jpg-》2_xx.jpg  xx.png-》3.png  xx.png-》4.png  ";
+            String desc_false_2 = "(清除原名称_按类型 依照输入索引为起始 order ) 把当前的所有子文件(非目录)重命名为 【输入Begin序号.类型 走到底 】的形式 例如   *_2_false_order_10  hello.jpg =》 10.jpg  xx.jpg-》11_xx.jpg  xx.png-》12.png  xx.png-》13.png  ";
 
             if(curType == OS_TYPE.Windows){
                 itemDesc = batName.trim()+".bat  "+type+"_"+index+"_true" + "    [索引 "+index+"]  描述: "+ desc_true;
+                itemDesc += "\n"+batName.trim()+".bat  "+type+"_"+index+"_true_order" + "    [索引 "+index+"]  描述: "+ desc_true_1;
+                itemDesc += "\n"+batName.trim()+".bat  "+type+"_"+index+"_true_order_20" + "    [指定开始索引 "+index+"]  描述: "+ desc_true_1;
                 itemDesc +="\n"+ batName.trim()+".bat  "+type+"_"+index+"_false" + "    [索引 "+index+"]  描述:" + desc_false;
+                itemDesc +="\n"+ batName.trim()+".bat  "+type+"_"+index+"_false_order" + "    [索引 "+index+"]  描述:" + desc_false_1;
+                itemDesc +="\n"+ batName.trim()+".bat  "+type+"_"+index+"_false_order_10" + "    [指定开始索引 "+index+"]  描述:" + desc_false_2;
+
             }else{
                 itemDesc = batName.trim()+".sh "+type+"_"+index+"_true" + "    [索引 "+index+"]  描述:"+ desc_true;
+                itemDesc += "\n"+batName.trim()+".bat  "+type+"_"+index+"_true_order" + "    [索引 "+index+"]  描述: "+ desc_true_1;
                 itemDesc +="\n"+ batName.trim()+".sh  "+type+"_"+index+"_false" + "    [索引 "+index+"]  描述:"+ desc_false;
-
+                itemDesc +="\n"+ batName.trim()+".bat  "+type+"_"+index+"_false_order" + "    [索引 "+index+"]  描述:" + desc_false_1;
             }
 
             return itemDesc;
@@ -1182,7 +1574,12 @@ public class G2_ApplyRuleFor_TypeFile {
         }
 
 
-        void initParams4InputParam(String inputParam){}
+        boolean initParams4InputParam(String inputParam){ return true ; }
+
+        @Override
+        boolean initParamsWithInputList(ArrayList<String> inputParamList) {
+            return true;
+        }
 
         String simpleDesc(){
             return null;
@@ -1236,7 +1633,8 @@ public class G2_ApplyRuleFor_TypeFile {
         abstract    File applyFileByteOperationRule2(File originFile);
         abstract    ArrayList<File> applyFileListRule3(ArrayList<File> subFileList , HashMap<String, ArrayList<File>> fileTypeMap);
         abstract    ArrayList<File> applySubFileListRule4(ArrayList<File> curFileList , HashMap<String, ArrayList<File>> subFileTypeMap , ArrayList<File> curDirList ,ArrayList<File> curRealFileList);
-        abstract    void initParams4InputParam(String inputParam);  // 初始化Rule的参数 依据输入的字符串
+        abstract    boolean initParams4InputParam(String inputParam);  // 初始化Rule的参数 依据输入的字符串
+        abstract    boolean initParamsWithInputList(ArrayList<String> inputParamList);
         abstract   String ruleTip(String type,int index , String batName,OS_TYPE curType);  // 使用说明列表  如果覆盖 那么就不使用默认的说明 , 默认就一种情况
         abstract   String simpleDesc();  // 使用的简单描述  中文的该 rule的使用情况  默认会在 ruleTip 被调用
 
@@ -1409,7 +1807,7 @@ public class G2_ApplyRuleFor_TypeFile {
             }
 
 
-          //  System.out.println("原始文件字节大小:  " + generalBufferedInputStream.available());
+            //  System.out.println("原始文件字节大小:  " + generalBufferedInputStream.available());
             while (general_offset < BYTE_CONTENT_LENGTH_Rule7) {   // 读取原始文件的头 BYTE_CONTENT_LENGTH 个字节数进行加密
                 general_position = generalBufferedInputStream.read(TEMP_Rule7, general_offset, TEMP_Rule7.length - general_offset);
                 if (general_position == -1) {
@@ -1633,8 +2031,13 @@ public class G2_ApplyRuleFor_TypeFile {
                 return false;
             }
 
-            String type =  curInputStr.split("_")[0];
-            String index =  curInputStr.split("_")[1];
+
+             String[] paramsArr =    curInputStr.split("_");
+            if(paramsArr.length < 2){
+                continue;
+            }
+            String type =  paramsArr[0];
+            String index =  paramsArr[1];
 
 //          initParams4InputParam
             if(!isNumeric(index)){  //  第二个参数不是 数字 那么 输入格式错误
@@ -1642,7 +2045,8 @@ public class G2_ApplyRuleFor_TypeFile {
             }
             Rule matchRule = getRuleByIndex(Integer.parseInt(index));
             if(matchRule != null){
-                matchRule.initParams4InputParam(curInputStr);
+                inputOk =     matchRule.initParams4InputParam(curInputStr) &&  matchRule.initParamsWithInputList(Rule_Identify_TypeIndexList);
+                return inputOk;
             }
 
         }
@@ -1650,6 +2054,7 @@ public class G2_ApplyRuleFor_TypeFile {
         return inputOk;
     }
 
+    static Rule CurSelectedRule ;
     public static void main(String[] args) {
 
         initSystemInfo();
@@ -1696,15 +2101,28 @@ public class G2_ApplyRuleFor_TypeFile {
         for (int i = 0; i < Rule_Identify_TypeIndexList.size(); i++) {  //  依据文件类型 去找到文件
             // html_1
             String applyRuleString = Rule_Identify_TypeIndexList.get(i);
-            String curType = applyRuleString.split("_")[0];
-            String curApplyRule =  applyRuleString.split("_")[1];
+            String paramsArr[] = applyRuleString.split("_");
+            if(paramsArr.length <2){
+                continue;
+            }
+            String curType = paramsArr[0];
+            String curApplyRule =  paramsArr[1];
+            if(!isNumeric(curApplyRule)){
+                continue;
+            }
             int ruleIndex = Integer.parseInt(curApplyRule);
 
 
             Rule curApplayRule = getRuleByIndex(ruleIndex);
-            if(curApplayRule == null){
+            if(curApplayRule != null){
+                CurSelectedRule = curApplayRule;
+            }
+            if(curApplayRule == null && CurSelectedRule == null ){
                 System.out.println("无法匹配到 对应的 index="+ ruleIndex +"  对应的规则 Rule !   可能需要代码添加。");
                 continue;   // 继续下一个循环
+            }
+            if(curApplayRule == null && CurSelectedRule != null){
+                return;
             }
             if(curApplayRule.curFilterFileTypeList.size() == 0){
                 curApplayRule.curFilterFileTypeList.add(curType);
