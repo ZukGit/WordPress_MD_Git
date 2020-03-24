@@ -10,8 +10,42 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
+
+
+
 //
 public class G8_FFmpeg_Operation {
+
+    /*   FFMPEG的工具命令
+---------------------------------------------------------------
+
+        ffmpeg -i sky1.mp4 -b:a 128k output.mp3     // 把mp4文件的音频分离出来 单独生成 mp3 文件
+
+
+        ffmpeg -i sky1.mp4  image%d.jpg     //  把 mp4视频文件每个帧 都抠出来
+
+        ffmpeg -i sky1.mp4 -r 1 image%d.jpg   // 每秒输入一张图片
+        ffmpeg -i a.avi example.%b.jpg
+
+        ffmpeg -i 1.mp4 -vf "rotate=90*PI/180" 2.mp4        // 顺时针旋转90度
+        ffmpeg -i 1.mp4 -vf "rotate=PI"      3.mp4          // 顺时针旋转180度
+        ffmpeg -i 1.mp4 -vf "rotate=270*PI/180"  4.mp4      // 顺时针旋转270度
+
+        ffprobe.exe 123.mkv
+        ffprobe.exe 1.mp3
+        ffprobe.exe 1.mp4   // 查看文件信息
+
+//转MP3为wav
+        ffmpeg -i input.mp3 -acodec pcm_s16le -ac 2 -ar 44100 output.wav
+//转m4a为wav
+        ffmpeg -iinput.m4a -acodec pcm_s16le -ac 2 -ar 44100 output.wav
+//wav与PCM的相互转换，把raw改为pcm即可
+        ffmpeg -iinput.wav -f s16le -ar 44100 -acodec pcm_s16le output.raw
+//PCM转wav
+        ffmpeg -f s16le -ar 44100 -ac 2 -acodec pcm_s16le -i input.raw output.wav
+        ffmpeg -i 1.mp4 -vf delogo=0:0:220:90:100:1 x1.mp4    // 去掉水印
+        ---------------------------------------------------------------
+*/
 
 
     /*******************修改属性列表 ------Begin *********************/
@@ -82,6 +116,30 @@ public class G8_FFmpeg_Operation {
     static String[] EnvironmentList=JavaRuntimeInfoValue.getLibraryPathArray();
 
     static java.text.DateFormat DateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+
+
+    static ArrayList<String> videoTypeList = new  ArrayList<String>();
+    static {
+        videoTypeList.add(".avi");
+        videoTypeList.add(".mp4");
+        videoTypeList.add(".rmvb");
+        videoTypeList.add(".flv");
+
+    }
+
+
+    static ArrayList<String> mediaTypeList = new  ArrayList<String>();
+    static {
+        mediaTypeList.add(".avi");
+        mediaTypeList.add(".mp4");
+        mediaTypeList.add(".rmvb");
+        mediaTypeList.add(".flv");
+        mediaTypeList.add(".mp3");
+        mediaTypeList.add(".wav");
+        mediaTypeList.add(".aac");
+
+
+    }
 
 
     static boolean  isContainEnvironment(String program){
@@ -221,6 +279,10 @@ public class G8_FFmpeg_Operation {
         //   加入类型一一对应的 那些 规则
 
         CUR_RULE_LIST.add( new MergeMP4_Rule_1());
+        CUR_RULE_LIST.add( new GETMP3_Rule_2());
+        CUR_RULE_LIST.add( new GETJPGFrame4Video_Rule_3());
+
+        CUR_RULE_LIST.add( new VideoRoast_Rule_4());
 //        CUR_RULE_LIST.add( new File_Name_Rule_2());
 //        CUR_RULE_LIST.add( new Image2Jpeg_Rule_3());
 //        CUR_RULE_LIST.add( new Image2Png_Rule_4());
@@ -232,8 +294,324 @@ public class G8_FFmpeg_Operation {
     }
 
 
+    class VideoRoast_Rule_4 extends  Basic_Rule{
+        ArrayList<File> mInputMediaFileList ;  // 输入的 视频文件
+        int rotate = 90;
+
+        VideoRoast_Rule_4(){
+            super(4);
+            mInputMediaFileList = new  ArrayList<File>();
+            rotate = 90;
+        }
 
 
+        @Override
+        String ruleTip(String type, int index, String batName, OS_TYPE curType) {
+            return  "\n"+Cur_Bat_Name+ "  4       <mp4,flv,avi.rmvb 路径>      ## 把当前 mp4 avi flv rmvb 视频 旋转90度输出 sky.mp4 --> sky_90_20200304020201.mp4  \n"+
+                    "\n"+Cur_Bat_Name+ "  4_r90   <mp4,flv,avi.rmvb 路径>      ## 把当前 mp4 avi flv rmvb 视频 旋转90( r90 顺时针90度)度输出 sky.mp4 --> sky_90_20200304020201.mp4  \n" +
+                    "\n"+Cur_Bat_Name+ "  4_r180   <mp4,flv,avi.rmvb 路径>     ## 把当前 mp4 avi flv rmvb 视频 旋转180( r180 顺时针180度)度输出 sky.mp4 --> sky_180_20200304020201.mp4   \n" +
+                    "\n"+Cur_Bat_Name+ "  4_r270   <mp4,flv,avi.rmvb 路径>     ## 把当前 mp4 avi flv rmvb 视频 旋转270( r270 顺时针270度)度输出 sky.mp4 --> sky_270_20200304020201.mp4    \n" ;
+        }
+
+
+        @Override
+        boolean checkParamsOK(File shellDir, String type2Param, ArrayList<String> otherParams) {
+            System.out.println("rule4 shellDir = "+ shellDir);
+            System.out.println("rule4  otherParams = "+ otherParams.size());
+
+
+            if(otherParams == null || otherParams.size() ==0){
+                errorMsg = "用户输入的文件参数为空";
+                System.out.println(errorMsg);
+                return false;
+            }
+
+            if(type2Param.contains("r")){
+                String rotateStr = type2Param.substring(type2Param.indexOf("r")+1);
+                rotate = Integer.parseInt(rotateStr);
+            }else{
+                rotate = 90;
+            }
+
+
+            System.out.println("rule4 otherParams.size() = "+ otherParams.size());
+            for (int i = 0; i <otherParams.size() ; i++) {
+                String pre = "."+File.separator;
+                String curStringItem = otherParams.get(i).toString();
+                String curAbsPath = "";
+                if(curStringItem.startsWith(pre)){
+                    curStringItem = curStringItem.substring(2);
+                }
+                curAbsPath = shellDir.getAbsolutePath() + File.separator + curStringItem;
+                File curFIle = new File(curAbsPath) ;
+                System.out.println("curAbsPath  = "+ curAbsPath);
+                if(curFIle.exists() && videoTypeList.contains(getFileTypeWithPoint(curFIle.getName())) ){  // 判断
+                    mInputMediaFileList.add(curFIle);
+                }
+            }
+            if(mInputMediaFileList.size() == 0){
+                errorMsg = "当前从参数找不到对应的输入源 .mp4  .flv .rmvb .avi 文件 ";
+                System.out.println(errorMsg);
+                return false;
+            }
+            System.out.println("rule4 checkParamsOK mInputMediaFileList.size() = "+ mInputMediaFileList.size());
+            return  super.checkParamsOK(shellDir,type2Param,otherParams);
+        }
+
+
+        @Override
+        void operationRule(ArrayList<String> inputParamsList) {
+
+
+
+            //     ffmpeg -i sky1.mp4  image%d.jpg    抠图
+
+            String ffmpeg_path = getEnvironmentExePath("ffmpeg");
+            if(ffmpeg_path ==null){
+                errorMsg = "当前 ffmpeg 不在环境变量中 请下载该库 并添加到 环境变量中";
+                System.out.println(errorMsg);
+                return;
+            }
+            System.out.println("rule4 curInputFileList.size() = "+mInputMediaFileList.size());
+            System.out.println("rule4 ffmpeg_path = "+ffmpeg_path);
+            // 把 当前的 mp4 文件写入 G8_1_MergedRule.txt
+            for (int i = 0; i < mInputMediaFileList.size(); i++) {
+
+                File mp4File = mInputMediaFileList.get(i);
+                StringBuilder sb =new StringBuilder();
+
+                String originName = mp4File.getName();
+                String noPointFileName = getFileNameNoPoint(originName);
+                String type = getFileTypeWithPoint(mp4File.getName());
+//                File jpgDirFile = new File(CUR_Dir_1_PATH+File.separator+noPointFileName+"_"+DateFormat.format(new Date())+File.separator);
+//                jpgDirFile.mkdirs();
+//                String newFileName = originName+"_mp3_"+DateFormat.format(new Date())+".mp3";
+                String newFileName = originName.replace(type,"_"+rotate+"_"+DateFormat.format(new Date())+type);
+//                String newFileName = mp4File.getName().replace(".mp4","_x"+bigNum+"_"+DateFormat.format(new Date())+".mp4");     //  新的文件的名称  2.mp4 2_mergedxxxxxxxxxx.mp4
+//                String imageStr = noPointFileName+"_%d.jpg";
+//                String absImagePath = jpgDirFile.getAbsolutePath()+File.separator+imageStr;
+                String newFileAbsPath = mp4File.getParentFile().getAbsolutePath()+File.separator + newFileName;
+
+/*                ffmpeg -i 1.mp4 -vf "rotate=90*PI/180" 2.mp4        // 顺时针旋转90度
+                ffmpeg -i 1.mp4 -vf "rotate=PI"      3.mp4          // 顺时针旋转180度
+                ffmpeg -i 1.mp4 -vf "rotate=270*PI/180"  4.mp4      // 顺时针旋转270度*/
+
+
+                String command = ffmpeg_path +" -i "+ mp4File.getAbsolutePath() + " -vf \"rotate="+rotate+"*PI/180\" " + newFileAbsPath;
+
+                System.out.println(command);
+                execCMD(command);
+            }
+        }
+
+
+
+    }
+
+    // 传入视频文件  获取该视频文件的 所有 图片帧
+ //   ffmpeg -i sky1.mp4  image%d.jpg     //  把 mp4视频文件每个帧 都抠出来
+
+ //   ffmpeg -i sky1.mp4 -r 1 image%d.jpg   // 每秒输入一张图片
+    class GETJPGFrame4Video_Rule_3 extends  Basic_Rule{
+        ArrayList<File> mInputMediaFileList ;  // 输入的 视频文件
+        float  secondInteval = 0 ; //  视频截取图片  时间间隔
+        GETJPGFrame4Video_Rule_3(){
+            super(3);
+            mInputMediaFileList = new  ArrayList<File>();
+            secondInteval = 0 ;
+        }
+
+
+        @Override
+        String ruleTip(String type, int index, String batName, OS_TYPE curType) {
+            return  "\n"+Cur_Bat_Name+ "  3   <mp4,flv,avi.rmvb 路径>      ## 把当前 mp4 avi flv rmvb 视频文件的每个帧抠出来(默认 每秒25帧) 保存在 相同文件目录 sky.mp4 --> sky_20200304020201/sky_1.jpg sky_2.jpg  \n"+
+                    "\n"+Cur_Bat_Name+ "  3_s1   <mp4,flv,avi.rmvb 路径>      ## 把当前 mp4 avi flv rmvb 视频文件的每隔1秒( s1 每秒1帧) sky.mp4 --> sky_20200304020201/sky_1.jpg sky_2.jpg  \n" +
+                    "\n"+Cur_Bat_Name+ "  3_s0.2   <mp4,flv,avi.rmvb 路径>      ## 把当前 mp4 avi flv rmvb 视频文件的每隔1秒( s0.2  5秒一帧 每秒0.2帧 ) sky.mp4 --> sky_20200304020201/sky_1.jpg sky_2.jpg  \n" +
+                    "\n"+Cur_Bat_Name+ "  3_s0.1   <mp4,flv,avi.rmvb 路径>      ## 把当前 mp4 avi flv rmvb 视频文件的每隔1秒( s0.1  10秒一帧 每秒0.1帧 ) sky.mp4 --> sky_20200304020201/sky_1.jpg sky_2.jpg  \n" +
+            "\n"+Cur_Bat_Name+ "  3_s0.01   <mp4,flv,avi.rmvb 路径>      ## 把当前 mp4 avi flv rmvb 视频文件的每隔1秒( s0.01  100秒一帧  每秒0.01帧 ) sky.mp4 --> sky_20200304020201/sky_1.jpg sky_2.jpg  \n"
+                    ;
+        }
+
+        @Override
+        boolean checkParamsOK(File shellDir, String type2Param, ArrayList<String> otherParams) {
+            System.out.println("rule3 shellDir = "+ shellDir);
+            System.out.println("rule3  otherParams = "+ otherParams.size());
+
+
+            if(otherParams == null || otherParams.size() ==0){
+                errorMsg = "用户输入的文件参数为空";
+                System.out.println(errorMsg);
+                return false;
+            }
+
+            if(type2Param.contains("s")){
+                String bigNumStr = type2Param.substring(type2Param.indexOf("s")+1);
+                secondInteval = Float.parseFloat(bigNumStr);
+            }else{
+                secondInteval = 0;
+            }
+
+
+            System.out.println("rule3 otherParams.size() = "+ otherParams.size());
+            for (int i = 0; i <otherParams.size() ; i++) {
+                String pre = "."+File.separator;
+                String curStringItem = otherParams.get(i).toString();
+                String curAbsPath = "";
+                if(curStringItem.startsWith(pre)){
+                    curStringItem = curStringItem.substring(2);
+                }
+                curAbsPath = shellDir.getAbsolutePath() + File.separator + curStringItem;
+                File curFIle = new File(curAbsPath) ;
+                System.out.println("curAbsPath  = "+ curAbsPath);
+                if(curFIle.exists() && videoTypeList.contains(getFileTypeWithPoint(curFIle.getName())) ){  // 判断
+                    mInputMediaFileList.add(curFIle);
+                }
+            }
+            if(mInputMediaFileList.size() == 0){
+                errorMsg = "当前从参数找不到对应的输入源 .mp4  .flv .rmvb .avi 文件 ";
+                System.out.println(errorMsg);
+                return false;
+            }
+            System.out.println("rule3 checkParamsOK mInputMediaFileList.size() = "+ mInputMediaFileList.size());
+            return  super.checkParamsOK(shellDir,type2Param,otherParams);
+        }
+
+
+        @Override
+        void operationRule(ArrayList<String> inputParamsList) {
+
+
+
+       //     ffmpeg -i sky1.mp4  image%d.jpg    抠图
+
+            String ffmpeg_path = getEnvironmentExePath("ffmpeg");
+            if(ffmpeg_path ==null){
+                errorMsg = "当前 ffmpeg 不在环境变量中 请下载该库 并添加到 环境变量中";
+                System.out.println(errorMsg);
+                return;
+            }
+            System.out.println("rule3 curInputFileList.size() = "+mInputMediaFileList.size());
+            System.out.println("rule3 ffmpeg_path = "+ffmpeg_path);
+            // 把 当前的 mp4 文件写入 G8_1_MergedRule.txt
+            for (int i = 0; i < mInputMediaFileList.size(); i++) {
+
+                File mp4File = mInputMediaFileList.get(i);
+                StringBuilder sb =new StringBuilder();
+
+                String originName = mp4File.getName();
+                String noPointFileName = getFileNameNoPoint(originName);
+                String type = getFileTypeWithPoint(mp4File.getName());
+                File jpgDirFile = new File(CUR_Dir_1_PATH+File.separator+noPointFileName+"_"+DateFormat.format(new Date())+File.separator);
+                jpgDirFile.mkdirs();
+//                String newFileName = originName+"_mp3_"+DateFormat.format(new Date())+".mp3";
+//                String newFileName = originName.replace(type,"_mp3_"+DateFormat.format(new Date())+".mp3");
+//                String newFileName = mp4File.getName().replace(".mp4","_x"+bigNum+"_"+DateFormat.format(new Date())+".mp4");     //  新的文件的名称  2.mp4 2_mergedxxxxxxxxxx.mp4
+
+                String imageStr = noPointFileName+"_%d.jpg";
+                String absImagePath = jpgDirFile.getAbsolutePath()+File.separator+imageStr;
+
+
+
+                String command = ffmpeg_path +" -i "+ mp4File.getAbsolutePath() +(secondInteval == 0f ?"":" -r " + secondInteval)+"  " + absImagePath;
+
+                System.out.println(command);
+                execCMD(command);
+            }
+        }
+
+    }
+
+    //  提供一个 mp4 rmvb avi flv 文件  输入该文件音频mp3文件
+    class GETMP3_Rule_2 extends  Basic_Rule{
+        ArrayList<File> mInputMediaFileList ;  // 输入的 视频文件
+
+
+
+        GETMP3_Rule_2(){
+            super(2);
+            mInputMediaFileList = new  ArrayList<File>();
+        }
+
+        @Override
+        boolean checkParamsOK(File shellDir, String type2Param, ArrayList<String> otherParams) {
+            System.out.println("rule2 shellDir = "+ shellDir);
+            System.out.println("rule2  otherParams = "+ otherParams.size());
+
+
+            if(otherParams == null || otherParams.size() ==0){
+                errorMsg = "用户输入的文件参数为空";
+                System.out.println(errorMsg);
+                return false;
+            }
+
+
+            System.out.println("otherParams.size() = "+ otherParams.size());
+            for (int i = 0; i <otherParams.size() ; i++) {
+                String pre = "."+File.separator;
+                String curStringItem = otherParams.get(i).toString();
+                String curAbsPath = "";
+                if(curStringItem.startsWith(pre)){
+                    curStringItem = curStringItem.substring(2);
+                }
+                curAbsPath = shellDir.getAbsolutePath() + File.separator + curStringItem;
+                File curFIle = new File(curAbsPath) ;
+                System.out.println("curAbsPath  = "+ curAbsPath);
+                if(curFIle.exists() && videoTypeList.contains(getFileTypeWithPoint(curFIle.getName())) ){  // 判断
+                    mInputMediaFileList.add(curFIle);
+                }
+            }
+            if(mInputMediaFileList.size() == 0){
+                errorMsg = "当前从参数找不到对应的输入源 .mp4  .flv .rmvb .avi 文件 ";
+                System.out.println(errorMsg);
+                return false;
+            }
+            System.out.println("rule2 checkParamsOK mInputMediaFileList.size() = "+ mInputMediaFileList.size());
+            return  super.checkParamsOK(shellDir,type2Param,otherParams);
+        }
+
+
+        @Override
+        String ruleTip(String type, int index, String batName, OS_TYPE curType) {
+            return  "\n"+Cur_Bat_Name+ "  2   <mp4,flv,avi.rmvb 路径>       ## 把当前 mp4 avi flv rmvb 视频文件 分离出它的 mp3音频文件 \n" ;
+        }
+
+
+        @Override
+        void operationRule(ArrayList<String> inputParamsList) {
+
+
+          //  ffmpeg -i sky1.mp4 -b:a 128k output.mp3     // 把mp4文件的音频分离出来 单独生成 mp3 文件
+
+            String ffmpeg_path = getEnvironmentExePath("ffmpeg");
+            if(ffmpeg_path ==null){
+                errorMsg = "当前 ffmpeg 不在环境变量中 请下载该库 并添加到 环境变量中";
+                System.out.println(errorMsg);
+                return;
+            }
+            System.out.println("rule2 curInputFileList.size() = "+mInputMediaFileList.size());
+            System.out.println("rule2 ffmpeg_path = "+ffmpeg_path);
+            // 把 当前的 mp4 文件写入 G8_1_MergedRule.txt
+            for (int i = 0; i < mInputMediaFileList.size(); i++) {
+
+                File mp4File = mInputMediaFileList.get(i);
+                StringBuilder sb =new StringBuilder();
+
+                 String originName = mp4File.getName();
+                 String type = getFileTypeWithPoint(mp4File.getName());
+//                String newFileName = originName+"_mp3_"+DateFormat.format(new Date())+".mp3";
+                String newFileName = originName.replace(type,"_mp3_"+DateFormat.format(new Date())+".mp3");
+//                String newFileName = mp4File.getName().replace(".mp4","_x"+bigNum+"_"+DateFormat.format(new Date())+".mp4");     //  新的文件的名称  2.mp4 2_mergedxxxxxxxxxx.mp4
+
+                String command = ffmpeg_path +" -i "+ mp4File.getAbsolutePath() +" -b:a  128k  " + CUR_Dir_1_PATH+File.separator+newFileName;
+
+                System.out.println(command);
+                execCMD(command);
+            }
+        }
+
+
+
+    }
 
 
     //  提供一个 mp4 文件  输入该文件的两倍长度的文件
@@ -251,8 +629,8 @@ public class G8_FFmpeg_Operation {
 
         @Override
         boolean checkParamsOK(File shellDir, String type2Param, ArrayList<String> otherParams) {
-            System.out.println("shellDir = "+ shellDir);
-            System.out.println("otherParams = "+ otherParams.size());
+            System.out.println("rule1 shellDir = "+ shellDir);
+            System.out.println("rule1 otherParams = "+ otherParams.size());
             if(type2Param.contains("x")){
                 String bigNumStr = type2Param.substring(type2Param.indexOf("x")+1);
                 bigNum = Integer.parseInt(bigNumStr);
@@ -263,24 +641,19 @@ if(!G8_1_Rule_File.exists()){
     try {  //   创建  文件输入的    放置 file 'C:\Users\zhuzj5\Desktop\testA\1\1.mp4'
         G8_1_Rule_File.createNewFile();
     } catch (IOException e) {
-        System.out.println("创建文件 " + G8_1_Rule_File.getAbsolutePath() +"失败!");
+        System.out.println("rule1 创建文件 " + G8_1_Rule_File.getAbsolutePath() +"失败!");
         e.printStackTrace();
     }
 }
 
             if(otherParams == null || otherParams.size() ==0){
-                errorMsg = "用户输入的文件参数为空";
+                errorMsg = "rule1 用户输入的文件参数为空";
                 System.out.println(errorMsg);
                 return false;
             }
 
-            if(!isContainEnvironment("FFmpeg")){
-                errorMsg = " 当前 merge合并操作依赖环境变量 FFmpeg 请添加环境变量";
-                System.out.println(errorMsg);
-                return false;
-            }
 
-            System.out.println("otherParams.size() = "+ otherParams.size());
+            System.out.println("rule1 otherParams.size() = "+ otherParams.size());
             for (int i = 0; i <otherParams.size() ; i++) {
                 String pre = "."+File.separator;
                 String curStringItem = otherParams.get(i).toString();
@@ -290,25 +663,27 @@ if(!G8_1_Rule_File.exists()){
                 }
                 curAbsPath = shellDir.getAbsolutePath() + File.separator + curStringItem;
                 File curFIle = new File(curAbsPath) ;
-                System.out.println("curAbsPath  = "+ curAbsPath);
-                if(curFIle.exists() && curFIle.getName().endsWith(".mp4")){
+                System.out.println("rule1 curAbsPath  = "+ curAbsPath);
+                String curType = getFileTypeWithPoint(curFIle.getName());
+                System.out.println("rule1 curType  = "+ curType);
+                if(curFIle.exists() && mediaTypeList.contains(curType)){
                     curInputFileList.add(curFIle);
                 }
             }
             if(curInputFileList.size() == 0){
-                errorMsg = "当前从参数找不到对应的输入源 .mp4 文件 ";
+                errorMsg = "rule1 当前从参数找不到对应的输入源 .mp4 .mp3 .avi  ..多媒体文件 ";
                 System.out.println(errorMsg);
                 return false;
             }
-            System.out.println(" checkParamsOK curInputFileList.size() = "+ curInputFileList.size());
+            System.out.println("rule1  checkParamsOK curInputFileList.size() = "+ curInputFileList.size());
             return  super.checkParamsOK(shellDir,type2Param,otherParams);
         }
 
 
         @Override
         String ruleTip(String type, int index, String batName, OS_TYPE curType) {
-            return  "\n"+Cur_Bat_Name+ "  1   mp4路径       ## 把当前mp4文件重复显示合并 1分钟-》2分钟 \n" +
-                    "\n"+Cur_Bat_Name+ "  1_x10   mp4路径       ## 把当前mp4文件重复10变显示合并 1分钟-》10分钟 \n" ;
+            return  "\n"+Cur_Bat_Name+ "  1   <mp3,mp4,flv.avi,rmvb,wav,aac...路径>       ## 把当前多媒体<mp4...mp3>文件重复显示合并 1分钟-》2分钟 \n" +
+                    "\n"+Cur_Bat_Name+ "  1_x10   <mp3,mp4,flv.avi,rmvb,wav,aac...路径>   ## 把当前多媒体<mp4...mp3>文件重复10变显示合并 1分钟-》10分钟 \n" ;
         }
 
 
@@ -319,7 +694,7 @@ if(!G8_1_Rule_File.exists()){
             //
           //  ffmpeg -f concat -i G8_MergedRule1.txt -c copy output.mp4
 
- //  ffmpeg  -f concat -safe 0 -i C:\Users\zhuzj5\Desktop\zbin\G8_1_MergedRule.txt -c copy C:\Users\zhuzj5\Desktop\output2.mp4
+ //  ffmpeg  -f当前从参数找不到对应的输入源 concat -safe 0 -i C:\Users\zhuzj5\Desktop\zbin\G8_1_MergedRule.txt -c copy C:\Users\zhuzj5\Desktop\output2.mp4
 // file 'C:\Users\zhuzj5\Desktop\testA\1\1.mp4'
  // C:\Users\zhuzj5\Desktop\zbin\G8_1_MergedRule.txt
 
@@ -336,6 +711,7 @@ if(!G8_1_Rule_File.exists()){
 
                 File mp4File = curInputFileList.get(i);
                 StringBuilder sb =new StringBuilder();
+                String typePoint = getFileTypeWithPoint(mp4File.getName());
 //                sb.append("file '"+mp4File.getAbsolutePath()+"'\n");
                 for (int j = 0; j < bigNum; j++) {
                     sb.append("file '"+mp4File.getAbsolutePath()+"'\n");
@@ -343,7 +719,7 @@ if(!G8_1_Rule_File.exists()){
 
                 String originFIleTxt =sb.toString();
                 writeContentToFile(G8_1_Rule_File , originFIleTxt);
-                String newFileName = mp4File.getName().replace(".mp4","_x"+bigNum+"_"+DateFormat.format(new Date())+".mp4");     //  新的文件的名称  2.mp4 2_mergedxxxxxxxxxx.mp4
+                String newFileName = mp4File.getName().replace(typePoint,"_x"+bigNum+"_"+DateFormat.format(new Date())+typePoint);     //  新的文件的名称  2.mp4 2_mergedxxxxxxxxxx.mp4
 
                 String command = ffmpeg_path +"  -f concat -safe 0 -i "+ G8_1_Rule_File.getAbsolutePath() +" -c copy " + CUR_Dir_1_PATH+File.separator+newFileName;
 
@@ -768,6 +1144,12 @@ if(!G8_1_Rule_File.exists()){
 
         CUR_Selected_Rule = getRuleByIndex(CUR_TYPE_INDEX);  //  获取用户选中的 规则
 
+// 检测是否 包含 该文件
+        if(!isContainEnvironment("FFmpeg")){
+           String  errorMsg = " 当前 merge合并操作依赖环境变量 FFmpeg 请添加环境变量";
+            System.out.println(errorMsg);
+            return ;
+        }
 
         // 让各个规则自己去检测 自己需要的参数是否得到满足 并自己提示  给出 1.当前cmd路径下的文件  2.typeIndex 字符串   3.之后的输入参数
         if (CUR_Selected_Rule == null || !CUR_Selected_Rule.checkParamsOK(CUR_Dir_FILE,CUR_TYPE_2_ParamsStr,CUR_INPUT_3_ParamStrList)) {
@@ -852,7 +1234,7 @@ if(!G8_1_Rule_File.exists()){
     public static String execCMD(String command) {
         StringBuilder sb =new StringBuilder();
         try {
-            Process process=Runtime.getRuntime().exec(command);
+            Process process=Runtime.getRuntime().exec("cmd /c start "+command);
             BufferedReader bufferedReader=new BufferedReader(new InputStreamReader(process.getInputStream()));
             String line;
             while((line=bufferedReader.readLine())!=null)
@@ -874,4 +1256,25 @@ if(!G8_1_Rule_File.exists()){
         }
         return null;
     }
+
+    public  static String getFileNameNoPoint(String fileName){
+        String name = "";
+        if(fileName.contains(".")){
+            name = fileName.substring(0,fileName.lastIndexOf(".") ).trim().toLowerCase();
+        }else{
+            name = new String(fileName);
+        }
+        return name.toLowerCase().trim();
+    }
+
+    public  static String getFileTypeWithPoint(String fileName){
+        String name = "";
+        if(fileName.contains(".")){
+            name = fileName.substring(fileName.lastIndexOf(".") ).trim().toLowerCase();
+        }else{
+            name = "";
+        }
+        return name.toLowerCase().trim();
+    }
+
 }
