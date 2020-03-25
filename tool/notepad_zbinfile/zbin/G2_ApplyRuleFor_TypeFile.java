@@ -128,6 +128,8 @@ public class G2_ApplyRuleFor_TypeFile {
         realTypeRuleList.add( new ClearChineseType_8());
         realTypeRuleList.add( new FileType_Rule_9());
         realTypeRuleList.add( new DirOperation_Rule_10());
+        realTypeRuleList.add( new AllDirSubFile_Order_Rule_11());
+
 
 
     }
@@ -154,6 +156,109 @@ public class G2_ApplyRuleFor_TypeFile {
 
 
 
+    class AllDirSubFile_Order_Rule_11 extends Basic_Rule{
+
+        AllDirSubFile_Order_Rule_11() {
+            super("*", 11, 4);
+        }
+
+
+
+        @Override
+        String simpleDesc() {
+           return  "\n"+Cur_Bat_Name+ "  *_11    ## (清除原有名称)把当前所有子目录的文件 当前目录 下的实体文件依次按顺序重新命名!  \n" ;
+        }
+
+        @SuppressWarnings("unchecked")
+        @Override
+        ArrayList<File> applySubFileListRule4(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+
+            if(!curDirList.contains(curDirFile)){
+                curDirList.add(curDirFile);
+            }
+
+
+            for (int i = 0; i < curDirList.size(); i++) {
+                File dirFileItem = curDirList.get(i);
+                // 获取当前文件夹下的所有依据 文件类型为 .jpg .png .mp4 为key 进行的
+                Map<String , ArrayList<File>>  curDirSubRealFile = getCurSubFileMap(dirFileItem);
+
+                // 对文件依次重命名
+
+
+                Map.Entry<String, ArrayList<File>> entry;
+                // 不同的类型文件怎么处理?
+
+                if (curDirSubRealFile != null) {
+                    Iterator iterator = curDirSubRealFile.entrySet().iterator();
+                    while (iterator.hasNext()) {
+                        entry = (Map.Entry<String, ArrayList<File>>) iterator.next();
+                        String typeStr = entry.getKey();  //Map的Value
+                        String typeWithOutPot = typeStr.replace(".","");
+
+                        ArrayList<File> fileArr = entry.getValue();  //Map的Value
+
+                        // 从 000 开始
+//                    fixedFileIndex = fixedFileIndex ;
+                        ArrayList<File> curRenamePlace = new    ArrayList<File>();
+                        for (int m = 0; m < fileArr.size(); m++) {
+                            File curFile = fileArr.get(m);
+                            String oldName = curFile.getName();
+                            //String curFileName = curFile.getName();
+
+                            System.out.println("═════════════ m="+m+"═════════════");
+                            // 占位符  使得  所有文件都命名成功   避免那些已经有该名称了的文件
+                            String newName1 = "_ZHolder_"+m+("".equals(typeWithOutPot)?"":"."+typeWithOutPot);
+//                        String newName = typeTag+"_"+dirTempIndex+"_"+getPaddingIntString(fixedFileIndex,3,"0",true)+typeStr;
+                            if(tryReName(curFile,newName1)){
+                                System.out.println("成功 Index ="+m+"  命名( "+oldName+" => "+ newName1+")  => "+curFile.getAbsolutePath());
+                            }else{
+                                System.out.println("失败 Index ="+m+"  命名( "+oldName+" => "+ newName1+")  => "+curFile.getAbsolutePath());
+                            }
+                            File fileItem2 = new File(curFile.getParentFile().getAbsolutePath()+File.separator+newName1);
+                            if(fileItem2.exists()){
+                                curRenamePlace.add(fileItem2);
+
+
+/*                                System.out.println(fileItem2+ " fileItem2.exists() = "+ fileItem2.exists());
+                                String newName2 = newName1.replace("_ZHolder_","");
+
+                                if(tryReName(fileItem2,newName2)){
+                                    System.out.println("成功 Index ="+m+"  命名( "+oldName+" => "+ newName1+")  => "+curFile.getAbsolutePath());
+                                }else{
+                                    System.out.println("失败 Index ="+m+"  命名( "+oldName+" => "+ newName1+")  => "+curFile.getAbsolutePath());
+                                }  */
+
+                            }
+
+
+                        }
+                        System.out.println("════════════════════════════════════════════════════");
+
+                        for (int n = 0; n < curRenamePlace.size(); n++) {
+                            System.out.println("═════════════ n="+n+"═════════════");
+
+                            File fileItem2 = curRenamePlace.get(n);
+                            String newName2 = fileItem2.getName().replace("_ZHolder_","");
+                            if(tryReName(fileItem2,newName2)){
+                                System.out.println("成功 Index ="+n+"  命名( "+fileItem2.getName()+" => "+ newName2+")  => "+fileItem2.getAbsolutePath());
+                            }else{
+                                System.out.println("失败 Index ="+n+"  命名( "+fileItem2.getName()+" => "+ newName2+")  => "+fileItem2.getAbsolutePath());
+                            }
+                        }
+                        curRenamePlace.clear();
+
+
+                    }
+                }
+
+
+            }
+
+            return curDirList;
+        }
+    }
+
     class DirOperation_Rule_10 extends Basic_Rule{
 
         String firstParamStr;  //  第一个参数
@@ -176,6 +281,9 @@ public class G2_ApplyRuleFor_TypeFile {
 
 
         int currentOperaType = 0;  // 识别当前用户 指定的操作类型
+
+
+
 
         DirOperation_Rule_10() {
             super("#", 10, 4);
@@ -526,8 +634,10 @@ if(originName.contains(oldType)){
     // 对当前目录的文件进行加密 解密
     class Encropty_Rule_7 extends Basic_Rule{
         boolean mEncroptyDirect = true;  //  true---加密      false--解密
+        boolean isAllFileOperation = false;
         Encropty_Rule_7() {
             super("#", 7, 4);
+            isAllFileOperation = false;
 
         }
 
@@ -538,6 +648,13 @@ if(originName.contains(oldType)){
             }else {
                 mEncroptyDirect = true;
             }
+
+            if(inputParam.contains("*")){
+                isAllFileOperation = true;
+            }else {
+                isAllFileOperation = false;
+            }
+
           return  super.initParams4InputParam(inputParam);
         }
 
@@ -547,7 +664,10 @@ if(originName.contains(oldType)){
                     Cur_Bat_Name+ " #_7_bad   (默认--加密文件)  把当前目录下的所有文件(不包含文件夹  不包含孙文件)进行 加密bad\n" +
                     Cur_Bat_Name+ " #_7_good   (加密文件) 把当前目录下的所有文件(不包含文件夹  不包含孙文件)进行 解密good\n" +
                     Cur_Bat_Name + " jpg_7_bad  [索引7]   // 把当前目录下的 jpg文件 加密 \n" +
-                    Cur_Bat_Name + " jpg_7_good  [索引7]   // 把当前目录下的 jpg文件 解密 " ;
+                    Cur_Bat_Name + " jpg_7_good  [索引7]   // 把当前目录下的 jpg文件 解密 \n" +
+                    Cur_Bat_Name + " *_7_bad  [索引7]   // 把当前目录所有文件进行加密  加密文件在新的 时间戳文件夹中 \n" +
+                    Cur_Bat_Name + " *_7_good  [索引7]   // 把当前目录所有文件进行解密  解密文件在新的 时间戳文件夹中 \n" ;
+
         }
 
 //                    return "把 当前目录下所有的 jpg  mp4 gif  都转为 i_temp1_1.jpg    v_temp2_1.mp4   g_temp3_1.gif 的文件格式\n" +
@@ -555,9 +675,122 @@ if(originName.contains(oldType)){
 //        Cur_Bat_Name + "  jgm_5_nextstep  [索引5]   //  JPG="+jpgBeginIndex+ " GIF="+gifBeginIndex+" MP4="+mp4BeginIndex+"  JPG增量="+nextStepCountJPG +"    GIF增量="+nextStepCountGIF + "   MP4增量="+nextStepCountMP4+" ▲【 把jpg gif png的增量添加到 beginIndex 然后增量置0 】 \n ";
 
 
+       void jiamiAllDir(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+          // 1.创建一个时间戳文件夹
+           // 2.在当前文件夹的基础上
+
+           SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd_HHmmss");//设置日期格式
+           String date = df.format(new Date());
+           String CurBadDirName = "bad_AllFile_"+ date;
+           File curBadDirFile = new File(curDirFile.getAbsolutePath()+ File.separator+CurBadDirName);
+           curBadDirFile.mkdirs();
+           String oldBasePath = curDirFile.getAbsolutePath();
+           String newBasePath = curBadDirFile.getAbsolutePath();
+           System.out.println("执行当前所有文件 加密操作  ");
+
+           if(!curDirList.contains(curDirFile)){
+               curDirList.add(curDirFile);
+           }
+
+           for (int i = 0; i < curDirList.size(); i++) {
+               File oldDirFile = curDirList.get(i);
+               String newDirFilePath = oldDirFile.getAbsolutePath().replace(oldBasePath, newBasePath);
+               File newDirFile = new File(newDirFilePath);
+               newDirFile.mkdirs();
+
+
+               for (int j = 0; j < oldDirFile.listFiles().length; j++) {
+
+                   File oldRealFile = oldDirFile.listFiles()[j];
+                   if(oldRealFile.isDirectory()){
+                       continue;
+                   }
+
+                   String newRealFilePath = oldRealFile.getAbsolutePath().replace(oldBasePath, newBasePath);
+                   File newRealFile = new File(newRealFilePath);
+                   // 加密操作
+                   createEncryFile(oldRealFile,newRealFile);
+               }
+
+
+           }
+
+/*
+           for (int i = 0; i < curRealFileList.size(); i++) {
+               File oldRealFile = curRealFileList.get(i);
+               String newRealFilePath = oldRealFile.getAbsolutePath().replace(oldBasePath, newBasePath);
+               File newRealFile = new File(newRealFilePath);
+               // 加密操作
+               createEncryFile(oldRealFile,newRealFile);
+           }
+*/
+
+
+
+        }
+
+        void jiemiAllDir(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+
+            // 1.创建一个时间戳文件夹
+            // 2.在当前文件夹的基础上
+
+            SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd_HHmmss");//设置日期格式
+            String date = df.format(new Date());
+            String CurBadDirName = "good_AllFile_"+ date;
+            File curBadDirFile = new File(curDirFile.getAbsolutePath()+ File.separator+CurBadDirName);
+            curBadDirFile.mkdirs();
+            String oldBasePath = curDirFile.getAbsolutePath();
+            String newBasePath = curBadDirFile.getAbsolutePath();
+            if(!curDirList.contains(curDirFile)){
+                curDirList.add(curDirFile);
+            }
+            System.out.println("执行当前所有文件 解密操作 ");
+
+            for (int i = 0; i < curDirList.size(); i++) {
+                File oldDirFile = curDirList.get(i);
+                String newDirFilePath = oldDirFile.getAbsolutePath().replace(oldBasePath, newBasePath);
+                File newDirFile = new File(newDirFilePath);
+                newDirFile.mkdirs();
+
+                for (int j = 0; j < oldDirFile.listFiles().length; j++) {
+
+                    File oldRealFile = oldDirFile.listFiles()[j];
+                    if(oldRealFile.isDirectory()){
+                        continue;
+                    }
+
+                    String newRealFilePath = oldRealFile.getAbsolutePath().replace(oldBasePath, newBasePath);
+                    File newRealFile = new File(newRealFilePath);
+                    // 解密操作
+                    createDecryFile(oldRealFile,newRealFile);
+                }
+            }
+
+
+//            for (int i = 0; i < curRealFileList.size(); i++) {
+//                File oldRealFile = curRealFileList.get(i);
+//                String newRealFilePath = oldRealFile.getAbsolutePath().replace(oldBasePath, newBasePath);
+//                File newRealFile = new File(newRealFilePath);
+//                // 加密操作
+//                createDecryFile(oldRealFile,newRealFile);
+//            }
+
+        }
+
         @Override
         ArrayList<File> applySubFileListRule4(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+            System.out.println("Rule7 搜索到的实体文件个数:  curRealFileList.size() =" + curRealFileList.size());
+            if(isAllFileOperation){
+                if(mEncroptyDirect){
+                     // 加密所有文件夹
+                    jiamiAllDir(curFileList,subFileTypeMap,curDirList,curRealFileList);
+                }else{
+                    // 解密当前所有文件夹
+                    jiemiAllDir(curFileList,subFileTypeMap,curDirList,curRealFileList);
 
+                }
+                return null;
+            }
             boolean containUserType = curFilterFileTypeList.contains("#");  // 是否包含用户选中的了文件类型  没有包含 那么就把所有实体realty 加密
 
             SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd_HHmmss");//设置日期格式
@@ -613,13 +846,16 @@ if(originName.contains(oldType)){
     }
     class SubDirRename_Rule_6 extends Basic_Rule{
 
+
         SubDirRename_Rule_6() {
             super("#", 6, 4);
         }
 
         @Override
         String simpleDesc() {
-            return "#_6    // 修改当前的一级子目录下的文件夹 以及文件  按顺序命令  (不操作 孙文件 孙文件夹 )";
+
+            return  Cur_Bat_Name +" #_6    // 修改当前的一级子目录下的文件夹 以及文件  按顺序命令 【序号_原名称.类型】  (不操作 孙文件 孙文件夹 )  \n" +
+                    Cur_Bat_Name + " png_6    // 修改当前的一级子目录下的文件夹下的 png格式文件  按顺序命令 【序号_原名称.类型】  (不操作 孙文件 孙文件夹 ) \n";
         }
 
         @SuppressWarnings("unchecked")
@@ -1448,7 +1684,7 @@ if(originName.contains(oldType)){
             if(inputParams.contains("_order")){
                 isOrder = true;
             }else{
-                keepOriginalName = false;
+                isOrder = false;
             }
 
             if(inputParams.contains("_")){
@@ -1468,21 +1704,21 @@ if(originName.contains(oldType)){
 
         String ruleTip(String type,int index , String batName,OS_TYPE curType){
             String itemDesc = "";
-            String desc_true = " (保留原名称) 把当前的所有子文件(非目录)重命名为 【序号_原始名称.类型】的形式 例如 hello.jpg =》 1_hello.jpg  xx.jpg-》2_xx.jpg ";
-            String desc_true_1 = " (保留原名称_按类型依次从1开始 order ) 把当前的所有子文件(非目录)重命名为 【序号_原始名称.类型 走到底】的形式 例如 hello.jpg =》 1_hello.jpg  xx.jpg-》2_xx.jpg  aa.png -> 3.png 数字不按类型走到底 ";
-            String desc_true_2 = " (保留原名称_依照输入索引为起始 order ) 把当前的所有子文件(非目录)重命名为 【自定义序号_原始名称.类型 走到底】的形式 例如 *_2_false_order_50  hello.jpg =》 50_hello.jpg  xx.jpg-》51_xx.jpg  aa.png -> 52.png 数字不按类型走到底 ";
+            String desc_true = " (保留原名称) 把当前的所有子文件(非目录)重命名为 【序号_原始名称.类型】的形式 例如 hello.jpg =》 1_hello.jpg  xx.jpg-》2_xx.jpg    001/4.jpg -> 001/3_4.jpg(不同文件夹)   保留原有名称 相同类型文件不同文件夹 使用同一个序列号   ";
+            String desc_true_1 = " (保留原名称_按类型依次从1开始 order ) 把当前的所有子文件(非目录)重命名为 【序号_原始名称.类型 走到底】的形式 例如 hello.jpg =》 1_hello.jpg  xx.jpg-》2_xx.jpg   aa.png -> 3_aa.png  | 001/4.zip ->  001/4_4.zip  保留原有名称 不相同类型文件不同文件夹 使用同一个序列号 ";
+            String desc_true_2 = " (保留原名称_依照输入索引为起始 order ) 把当前的所有子文件(非目录)重命名为 【自定义序号_原始名称.类型 走到底】的形式 例如 *_2_false_order_50  hello.jpg =》 50_hello.jpg  xx.jpg-》51_xx.jpg   aa.png -> 52_aa.png 保留原有名称 不相同类型文件不同文件夹 使用同一个序列号(序号自定义) ";
 
-            String desc_false = "(清除原名称) 把当前的所有子文件(非目录)重命名为 【序号.类型】的形式 例如 hello.jpg =》 1.jpg  xx.png-》1.jpg ";
-            String desc_false_1 = "(清除原名称_按类型依次 order ) 把当前的所有子文件(非目录)重命名为 【序号.类型 走到底 】的形式 例如 hello.jpg =》 1.jpg  xx.jpg-》2_xx.jpg  xx.png-》3.png  xx.png-》4.png  ";
-            String desc_false_2 = "(清除原名称_按类型 依照输入索引为起始 order ) 把当前的所有子文件(非目录)重命名为 【输入Begin序号.类型 走到底 】的形式 例如   *_2_false_order_10  hello.jpg =》 10.jpg  xx.jpg-》11_xx.jpg  xx.png-》12.png  xx.png-》13.png  ";
+            String desc_false = "(清除原名称) 把当前的所有子文件(非目录)重命名为 【序号.类型】的形式 例如 hello.jpg =》 1.jpg  xx.png-》1.jpg   不保留原有名称 相同类型文件不同文件夹 使用同一个序列号";
+            String desc_false_1 = "(清除原名称_按类型依次 order ) 把当前的所有子文件(非目录)重命名为 【序号.类型 走到底 】的形式 例如 hello.jpg =》 1.jpg  xx.jpg-》2_xx.jpg  xx.png-》3.png  xx.png-》4.png  不保留原有名称 不相同类型文件不同文件夹 使用同一个序列号 ";
+            String desc_false_2 = "(清除原名称_按类型 依照输入索引为起始 order ) 把当前的所有子文件(非目录)重命名为 【输入Begin序号.类型 走到底 】的形式 例如   *_2_false_order_10  hello.jpg =》 10.jpg  xx.jpg-》11_xx.jpg  xx.png-》12.png  xx.png-》13.png  不保留原有名称 不相同类型文件不同文件夹 使用同一个序列号(序号自定义) ";
 
             if(curType == OS_TYPE.Windows){
-                itemDesc = batName.trim()+".bat  "+type+"_"+index+"_true" + "    [索引 "+index+"]  描述: "+ desc_true;
-                itemDesc += "\n"+batName.trim()+".bat  "+type+"_"+index+"_true_order" + "    [索引 "+index+"]  描述: "+ desc_true_1;
-                itemDesc += "\n"+batName.trim()+".bat  "+type+"_"+index+"_true_order_20" + "    [指定开始索引 "+index+"]  描述: "+ desc_true_1;
-                itemDesc +="\n"+ batName.trim()+".bat  "+type+"_"+index+"_false" + "    [索引 "+index+"]  描述:" + desc_false;
-                itemDesc +="\n"+ batName.trim()+".bat  "+type+"_"+index+"_false_order" + "    [索引 "+index+"]  描述:" + desc_false_1;
-                itemDesc +="\n"+ batName.trim()+".bat  "+type+"_"+index+"_false_order_10" + "    [指定开始索引 "+index+"]  描述:" + desc_false_2;
+                itemDesc = batName.trim()+".bat  "+type+"_"+index+"_true" + "    [索引 "+index+"]  描述: "+ desc_true +"\n";
+                itemDesc += "\n"+batName.trim()+".bat  "+type+"_"+index+"_true_order" + "    [索引 "+index+"]  描述: "+ desc_true_1+"\n";
+                itemDesc += "\n"+batName.trim()+".bat  "+type+"_"+index+"_true_order_20" + "    [指定开始索引 "+index+"]  描述: "+ desc_true_2+"\n";
+                itemDesc +="\n"+ batName.trim()+".bat  "+type+"_"+index+"_false" + "    [索引 "+index+"]  描述:" + desc_false+"\n";
+                itemDesc +="\n"+ batName.trim()+".bat  "+type+"_"+index+"_false_order" + "    [索引 "+index+"]  描述:" + desc_false_1+"\n";
+                itemDesc +="\n"+ batName.trim()+".bat  "+type+"_"+index+"_false_order_10" + "    [指定开始索引 "+index+"]  描述:" + desc_false_2+"\n";
 
             }else{
                 itemDesc = batName.trim()+".sh "+type+"_"+index+"_true" + "    [索引 "+index+"]  描述:"+ desc_true;
@@ -2279,6 +2515,42 @@ if(originName.contains(oldType)){
         }
 
 
+    }
+
+    static Map<String , ArrayList<File>>   getCurSubFileMap(File mDirFile){
+ HashMap<String, ArrayList<File>> realFileListMap = new  HashMap<String, ArrayList<File>>(); ;
+
+        for (File curFile : mDirFile.listFiles()) {
+            if(curFile.isDirectory()){
+                continue;
+            }
+            String fileName = curFile.getName();
+
+            if (!fileName.contains(".")) {
+                String type ="";   //  unknow  没有后缀名的文件
+                if (realFileListMap.containsKey(type)) {
+                    ArrayList<File> fileList = realFileListMap.get(type);
+                    fileList.add(curFile);
+                } else {
+                    ArrayList<File> fileList = new ArrayList<File>();
+                    fileList.add(curFile);
+                    realFileListMap.put(type, fileList);
+                }
+            } else {
+                String suffix = fileName.substring(fileName.lastIndexOf(".")).trim().toLowerCase();
+
+                if (realFileListMap.containsKey(suffix)) {
+                    ArrayList<File> fileList = realFileListMap.get(suffix);
+                    fileList.add(curFile);
+                } else {
+                    ArrayList<File> fileList = new ArrayList<File>();
+                    fileList.add(curFile);
+                    realFileListMap.put(suffix, fileList);
+                }
+            }
+        }
+
+return realFileListMap;
     }
 
     static String OriApplyOperationRule(String mType ,String index  , String mOriContent){
