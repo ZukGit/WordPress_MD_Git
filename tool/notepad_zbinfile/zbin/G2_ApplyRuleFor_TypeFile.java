@@ -1558,10 +1558,11 @@ if(!isMultiDirInput){ // 如果是单独的 文件
             if(isAllFileOperation){
                 if(mEncroptyDirect){
                     // 加密所有文件夹
-                    jiamiAllDir(curFileList,subFileTypeMap,curDirList,curRealFileList);
+
+                    jiamiAllDir(curFileList,subFileTypeMap,getAllSubDirFile(curDirFile),curRealFileList);
                 }else{
                     // 解密当前所有文件夹
-                    jiemiAllDir(curFileList,subFileTypeMap,curDirList,curRealFileList);
+                    jiemiAllDir(curFileList,subFileTypeMap,getAllSubDirFile(curDirFile),curRealFileList);
 
                 }
                 return null;
