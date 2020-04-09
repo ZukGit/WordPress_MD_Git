@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>xx</title>
+<style>
+.img_local {
+   width:49.5% ;
+   height:100px;
+   object-fit:fill;
+   float:left;
+}
+
+.div_left {
+width:99.9% ;
+height:100% ;
+object-fit:fill;
+float:left;
+overflow-x:hidden;
+overflow-y:hidden;
+
+}
+
+</style>
+</head>
+<body style="background-color:#101010; margin:0px">
+
+
+<div class="div_left">
+<img src="jpg/1.jpg" id="1"   class="img_local" />
+<img src="jpg/2.jpg" id="2"   class="img_local" />
+
+</div>
+
+
+
+<div class="div_left">
+<img src="jpg/3.jpg" id="3"   class="img_local" />
+<img src="jpg/4.jpg" id="4"   class="img_local" />
+
+</div>
+
+
+
+
+
+
+</body>
+
+<script>
+var countnum = zukgitPlaceHolderindex; // 总数
+var ImageArr =  document.getElementsByTagName("img");
+var DivArr =  document.getElementsByTagName("div");
+var DivNum = DivArr.length;
+var ImageNum = ImageArr.length;
+var curRowNum = 2;
+var curColumNum = 2;
+var windowWidth = document.documentElement.clientWidth; 
+var windowHeight = document.documentElement.clientHeight; 
+var curWindowWidth = windowWidth / curRowNum - 2;
+var curWindowHeight = windowHeight / curColumNum - 2;
+
+
+window.onload=function(){
+    //do something
+   //  window.setTimeout("changeImageDiff()", 5000);
+
+for (var i = 0; i < ImageArr.length; i++) {
+resetImgsize(i);
+}
+    changeImageDiff();
+}
+
+window.onresize = function(){
+var windowWidthNew = window.screen.width - 100; 
+var windowHeightNew = window.screen.height - 100; 
+var curWindowWidthNew = windowWidthNew / curRowNum - 2;
+var curWindowHeightNew = windowHeightNew / curColumNum -2;
+for (var i = 0; i < ImageArr.length; i++) {
+resetImgsizeParam(i,curWindowWidthNew,curWindowHeightNew);
+}
+}
+
+function  resetImgsizeParam(index , widthParam , heightParam){
+//ImageArr[index].setAttribute('width',curWindowWidth);
+//ImageArr[index].setAttribute('height',curWindowHeight);
+ImageArr[index].style.float = 'left';
+ImageArr[index].style.objectFit = 'fill';
+ImageArr[index].style.height = heightParam+'px';
+ImageArr[index].style.width = widthParam+'px';
+console.log("resetImgsizeParam ImageArr["+index+"].width="+ curWindowWidth + "  height = "+ curWindowHeight);
+};
+
+
+function  resetImgsize(index){
+//ImageArr[index].setAttribute('width',curWindowWidth);
+//ImageArr[index].setAttribute('height',curWindowHeight);
+ImageArr[index].style.float = 'left';
+ImageArr[index].style.objectFit = 'fill';
+ImageArr[index].style.height = curWindowHeight+'px';
+ImageArr[index].style.width = curWindowWidth+'px';
+
+
+
+console.log("resetImgsize  ImageArr["+index+"].width="+ curWindowWidth + "  height = "+ curWindowHeight);
+};
+
+
+
+
+
+function changeImageDiff() {
+var randomIndex1 = Math.floor(Math.random() *  (zukgitPlaceHolderindex- 1 + 1) + 1);  // 20 最大值
+var randomIndex2 = Math.floor(Math.random() *  (zukgitPlaceHolderindex- 1 + 1) + 1);
+var randomIndex3 = Math.floor(Math.random() *  (zukgitPlaceHolderindex- 1 + 1) + 1);
+var randomIndex4 = Math.floor(Math.random() *  (zukgitPlaceHolderindex- 1 + 1) + 1);
+
+
+
+    document.getElementsByTagName('img')[0].setAttribute('src','jpg/'+randomIndex1+'.jpg');
+    document.getElementsByTagName('img')[1].setAttribute('src','jpg/'+randomIndex2+'.jpg');
+    document.getElementsByTagName('img')[2].setAttribute('src','jpg/'+randomIndex3+'.jpg');
+    document.getElementsByTagName('img')[3].setAttribute('src','jpg/'+randomIndex4+'.jpg');
+
+
+    window.setTimeout("changeImageDiff()", 5000);
+    };
+
+
+
+
+</script>
+
+
+</html>
+
+
+
+
+

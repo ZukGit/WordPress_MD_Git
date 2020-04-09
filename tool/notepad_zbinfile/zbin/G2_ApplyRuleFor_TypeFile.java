@@ -1,5 +1,6 @@
 import java.io.*;
 
+import java.nio.channels.FileChannel;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.text.SimpleDateFormat;
@@ -130,6 +131,9 @@ public class G2_ApplyRuleFor_TypeFile {
         realTypeRuleList.add( new DirOperation_Rule_10());
         realTypeRuleList.add( new AllDirSubFile_Order_Rule_11());
 
+        realTypeRuleList.add( new CalCulMediaHtml_Rule_12());
+        realTypeRuleList.add( new CalMP4_DIR_HTML_Rule_13());
+
 
 
     }
@@ -139,34 +143,785 @@ public class G2_ApplyRuleFor_TypeFile {
     // operation_type  操作类型     1--读取文件内容字符串 进行修改      2--对文件对文件内容(字节)--进行修改    3.对全体子文件进行的随性的操作 属性进行修改(文件名称)
     //     // 4.对当前子文件(包括子目录 子文件 --不包含孙目录 孙文件) 5. 从shell 中获取到的路径 去对某一个文件进行操作
 
-    // //  zrule_apply_G2.bat  #_9  _jpg   把没有类型的文件名称修改为 jpg格式名称
-    // //  zrule_apply_G2.bat  #_9  jpg_   去除当前jpg的格式 使得其文件格式未知
 
 
 
-    // //  zrule_apply_G2.bat  #_10_append  2001   往当前文件夹后缀增加 2001
-    // //  zrule_apply_G2.bat  #_10_prefix  2001   往当前文件夹前缀增加 2001
-    // //  zrule_apply_G2.bat  #_10_create  1_100   创建一个序列号从1到100的100个文件夹
-    // //  zrule_apply_G2.bat  #_10_create  temp_ 1_100   创建一个序列号从temp1到temp100的100个文件夹
-    // //  zrule_apply_G2.bat  #_10_create  _temp 1_100   创建一个序列号从1temp到100temp的100个文件夹
-    // //  zrule_apply_G2.bat  #_10_create  i_temp 1_100   创建一个序列号从i1temp到i100temp100的100个文件夹
+    class CalMP4_DIR_HTML_Rule_13 extends Basic_Rule{
+        String Type_DIR_NAME = "";
+        ArrayList<File> inputDirList;
+        ArrayList<File> htmlModelList;
+        // G2_Rule13_mp4_3x5.html
+        File mp4_3x5_File ;
 
-    // //  zrule_apply_G2.bat  #_10_create  7000_7100  创建一个序列号从7000开始的到7100结束的文件夹
-    // //  zrule_apply_G2.bat  #_10_replace  abc_DEF  创建一个序列号从7000开始的到7100结束的文件夹
+//        G2_Rule13_mp4__3d.html
+File mp4_3d_File ;
 
+//        G2_Rule13_mp4_2x2.html
+File mp4_2x2_File ;
+//        G2_Rule13_mp4_3x3.html
+File mp4_3x3_File ;
+
+
+
+        String newReplaceName;  // G2_Rule13_mp4_3x5   期中  G2_Rule13 替换的名称
+
+
+        CalMP4_DIR_HTML_Rule_13() {
+            super("#", 13, 4);
+            inputDirList = new   ArrayList<File>();
+            htmlModelList = new   ArrayList<File>();
+            mp4_3x5_File = new File(zbinPath+File.separator+"G2_Rule13_mp4_3x5.html");
+            mp4_3d_File = new File(zbinPath+File.separator+"G2_Rule13_mp4__3d.html");
+            mp4_2x2_File= new File(zbinPath+File.separator+"G2_Rule13_mp4_2x2.html");
+            mp4_3x3_File= new File(zbinPath+File.separator+"G2_Rule13_mp4_3x3.html");
+
+            newReplaceName="";
+            htmlModelList.add(mp4_3x5_File);
+            htmlModelList.add(mp4_3d_File);
+            htmlModelList.add(mp4_2x2_File);
+            htmlModelList.add(mp4_3x3_File);
+
+        }
+
+
+        @Override
+        boolean initParamsWithInputList(ArrayList<String> inputParamList) {
+
+            for (int i = 0; i < inputParamList.size(); i++) {
+                String paramItem = inputParamList.get(i);
+                // 检查是否有 paramItem 名称的文件夹
+                System.out.println("paramItem = "+ paramItem);
+                File curDir = checkType2Dir(curDirFile,paramItem);
+                if(curDir != null && curDir.isDirectory()){
+                    inputDirList.add(curDir);  //
+                }
+
+            }
+
+            for (int i = 0; i < inputDirList.size(); i++) {
+               String dirName =  inputDirList.get(i).getName();
+                newReplaceName = newReplaceName+"_"+dirName;
+            }
+            while(newReplaceName.endsWith("_")){
+                newReplaceName =newReplaceName.substring(0,newReplaceName.length()-1);
+            }
+
+            while(newReplaceName.startsWith("_")){
+                newReplaceName =newReplaceName.substring(1,newReplaceName.length());
+            }
+
+
+            if("".equals(newReplaceName)){
+                newReplaceName = ""+curDirFile.getName();
+
+            }
+
+
+            return super.initParamsWithInputList(inputParamList);
+        }
+
+        @Override
+        boolean initParams4InputParam(String inputParam) {
+            if(!(inputParam.contains("jpg") || inputParam.contains("mp4")  || inputParam.contains("gif") )){
+                System.out.println("当前输入参数不包含 jpg || mp4 || gif  请重新输入");
+                return false;
+            }
+
+            String[] params= inputParam.split("_");
+            if(params == null){
+                System.out.println("当前输入参数不包含 jpg || mp4 || gif  请重新输入");
+                return false;
+            }
+            String TypeDir =  params[params.length -1];
+
+            if(!(("jpg").equals(TypeDir) || ("mp4").equals(TypeDir)  || ("gif").equals(TypeDir)) ){
+                System.out.println("当前输入参数不包含 jpg || mp4 || gif  请重新输入");
+                return false;
+            }
+            Type_DIR_NAME = TypeDir.toLowerCase().trim();
+            return super.initParams4InputParam(inputParam);
+        }
+
+        @Override
+        String simpleDesc() {
+            return  "\n"+Cur_Bat_Name+ "  #_13_mp4    ### 动态计算当前文件夹中所有子文件中的mp4文件夹中的 mp4文件个数  并在当前目录生成html文件 \n"+
+                    Cur_Bat_Name+ "  #_13_jpg    ### 动态计算当前文件夹中所有子文件中的jpg文件夹中的 jpg文件个数 并在当前目录生成html文件\n"+
+                    Cur_Bat_Name+ "  #_13_gif    ### 动态计算当前文件夹中所有子文件中的gif文件夹中的 gif文件个数 并在当前目录生成html文件\n" +
+                    Cur_Bat_Name+ "  #_13_mp4  <单个子件夹参数>  ### 同没有参数(但shell路径不同) 动态计算当前文件夹中所有子文件中的mp4文件夹中的 mp4文件个数 并在当前目录生成html文件\n"+
+                    Cur_Bat_Name+ "  #_13_jpg  <单个子件夹参数>  ### 同没有参数(但shell路径不同) 动态计算当前文件夹中所有子文件中的jpg文件夹中的 jpg文件个数 并在当前目录生成html文件\n"+
+                    Cur_Bat_Name+ "  #_13_gif  <单个子件夹参数>  ### 同没有参数(但shell路径不同) 动态计算当前文件夹中所有子文件中的gif文件夹中的 gif文件个数 并在当前目录生成html文件\n"+
+                    Cur_Bat_Name+ "  #_13_mp4  <子文件夹参数1> <子文件夹参数2> ....<子文件夹参数N>  ### 多输入参数 动态计算给定路径下的文件夹中所有子文件中的mp4文件夹中的 gif文件个数 并在当前目录生成html文件\n"+
+                    Cur_Bat_Name+ "  #_13_jpg <子文件夹参数1> <子文件夹参数2> ....<子文件夹参数N>   ### 同没有参数(但shell路径不同) 动态计算当前文件夹中所有子文件中的mp4文件夹中的 gif文件个数 并在当前目录生成html文件\n";
+        }
+
+
+        @Override
+        ArrayList<File> applySubFileListRule4(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+            ArrayList<File> operaDirList = new   ArrayList<File>();
+            boolean isMultiDirInput = false;
+            String curBasePath = "";
+
+
+            if(inputDirList.size() == 0){ // 如果没有输入Dir参数 那么 就在当前目录操作
+                operaDirList.addAll(curDirList);
+                curBasePath = curDirFile.getAbsolutePath();
+            }else if(inputDirList.size() == 1){  // 如果只有一个参数   那么operaDirList 放入 当前参数的子目录
+                File curInputDir =   inputDirList.get(0);
+                curBasePath = curInputDir.getAbsolutePath();
+                operaDirList.addAll(getCurrentSubDirFile(curInputDir));
+                System.out.println(" curInputDir = "+ curInputDir);
+            }else{
+                for (int i = 0; i < inputDirList.size(); i++) {
+                    operaDirList.addAll(getCurrentSubDirFile(inputDirList.get(i)));
+                }
+                isMultiDirInput = true;
+                curBasePath = curDirFile.getAbsolutePath();
+            }
+            System.out.println(" inputDirList.size = "+ inputDirList.size());
+            System.out.println(" curBasePath = "+ curBasePath);
+
+
+//// hoderplace -begin
+//zukgitPlaceHolderArrayDefine
+//var objectArr = [ zukgitPlaceHolderArrayAdd ];
+//// hoderplace -end
+
+
+            StringBuilder defineArrWord  = new StringBuilder();
+            StringBuilder defineAdd  = new StringBuilder();
+
+            //  如果有参数  那么 当前的 curDirList
+            int index = 0;
+            for (int i = 0; i < operaDirList.size(); i++) {
+                File cur1DirFileItem = operaDirList.get(i);
+                File mTypeDirFile  = checkType2Dir(cur1DirFileItem,Type_DIR_NAME);
+                int typeFileNum = 0;
+                if(mTypeDirFile != null &&  0 != (typeFileNum=checkType3File(mTypeDirFile,Type_DIR_NAME))){
+                    // 检测到了 对应的 type 文件
+                    // 1.获取当前 第一层目录名称
+                    String dir1DirName = cur1DirFileItem.getName();
+                    // 2. 获取对应命令的文件
+                    String dir2TypeDieName = dir1DirName + File.separator+Type_DIR_NAME;
+                    dir2TypeDieName = dir2TypeDieName.replace("\\","/");
+                    // 3. typeFileNum 对应的当前 孙子目录中的文件的个数
+                    int length  =typeFileNum;
+                    String people = "person"+index;
+
+//                    person0 = { index:0 , path:"./7001/mp4/",length:22,};
+//                    person0 = { index:0 , path:"./7001\mp4,length:22,};
+                    String defineItem = "";
+if(!isMultiDirInput){ // 如果是单独的 文件
+    defineItem = people+" = { index:"+index+" , path:\"./"+dir2TypeDieName+"/\",length:"+length+",};\n";
+}else{  // 如果是两个 量入的文件  那么 path就要加入对应的  当前目录的路径
+    String targetDirName = calculBeginDir(mTypeDirFile.getAbsolutePath());
+    if(!"".equals(targetDirName)){
+        targetDirName = targetDirName +"/";
+    }
+    defineItem = people+" = { index:"+index+" , path:\"./"+targetDirName+dir2TypeDieName+"/\",length:"+length+",};\n";
+}
+                    defineArrWord.append(defineItem);
+                    defineAdd.append(people+",");
+                    index++;
+                }
+
+            }
+
+            // 定义people
+            String defineArrWordStr = defineArrWord.toString().trim();
+            while(defineArrWordStr.endsWith(",")){
+                defineArrWordStr = defineArrWordStr.substring(0,defineArrWordStr.length()-1);
+            }
+
+            // 把 people 编为 数组 array
+            String defineAddStr = defineAdd.toString();
+
+
+            for (int i = 0; i < htmlModelList.size(); i++) {
+                //  获取 html文件的内容
+                File htmlModelFile = htmlModelList.get(i);
+
+                // G2_Rule13_mp4_3x5
+                String html_old_name = htmlModelFile.getName();
+                String readHtmlContent = ReadFileContent(htmlModelFile);
+
+//            String readHtmlContent = "";
+                System.out.println("defineAddStr  = "+ defineAddStr);
+                System.out.println("defineArrWordStr  = "+ defineArrWordStr);
+                readHtmlContent = readHtmlContent.replace("zukgitPlaceHolderArrayAdd",defineAddStr);
+                readHtmlContent = readHtmlContent.replace("zukgitPlaceHolderArrayDefine",defineArrWordStr);
+
+
+
+                //  把文件写入  对应的目录
+                // 当前 文件名称
+                String newName = html_old_name.replace("G2_Rule13",newReplaceName);
+
+                File curHtmlTargetFile =new File( curBasePath + File.separator+newName);
+
+                // 写入哪个文件夹
+
+                //1. 无参数   写入当前的 shell 路径下
+                //2. 一个参数的情况
+
+              writeContentToFile(curHtmlTargetFile,readHtmlContent);
+              System.out.println("输出文件:"+curHtmlTargetFile.getAbsolutePath());
+            }
+
+            return super.applySubFileListRule4(curFileList, subFileTypeMap, curDirList, curRealFileList);
+        }
+
+
+       String calculBeginDir(String mediaPath){
+            String inputDirStr = "";
+           for (int i = 0; i < inputDirList.size(); i++) {
+               File inputDir =  inputDirList.get(i);
+               String inputDirPath = inputDir.getAbsolutePath();
+               if(mediaPath.startsWith(inputDirPath)){
+                   inputDirStr = inputDir.getName();
+                   break;
+               }
+
+           }
+
+            return inputDirStr;
+
+        }
+        // 检测当前的 dirFile 目录中是否存在 第二个参数名称相同的文件名
+        File checkType2Dir(File dirFile , String typeName){
+            String dirNameA = typeName;
+            while(dirNameA.endsWith("\\")){
+                dirNameA = dirNameA.substring(0,dirNameA.length() -1);
+            }
+            File typeDirFile = null;
+            File[] fileList = dirFile.listFiles();
+            if(fileList == null){
+                return typeDirFile;
+            }
+            for (int i = 0; i < fileList.length; i++) {
+                File dirFileItem = fileList[i];
+                String dirName = dirFileItem.getName();
+                if(dirNameA.equals(dirName)){
+                    typeDirFile = dirFileItem;
+                    break;
+                }
+            }
+            return typeDirFile;
+        }
+
+
+        // 检查当前目录下是否存在对应类型typeName 的具体的文件 的文件名称的个数
+        int checkType3File(File dirFile , String typeName){
+            int existNum = 0;
+
+            File[] fileList = dirFile.listFiles();
+            if(fileList == null){
+                return existNum;
+            }
+            for (int i = 0; i < fileList.length; i++) {
+                File dirFileItem = fileList[i];
+                String dirName = dirFileItem.getName();
+                // 当前文件不是文件夹  并且当前文件名称的后缀 是 .【type】 例如 .gif  .jpg  .mp4
+                if(!dirFileItem.isDirectory() && dirFileItem.getName().endsWith("."+typeName)){
+                    existNum ++;
+                }
+
+            }
+            return existNum;
+        }
+
+    }
+    // //  zrule_apply_G2.bat  12_mp4   <目标文件夹目录>   ### 把当前目录mp4文件生成 html 播放文件
+    // //  zrule_apply_G2.bat  12_jpg   <目标文件夹目录>   ### 把没有类型的文件名称修改为 jpg格式名称
+    // //  zrule_apply_G2.bat  12_gif   <目标文件夹目录>   ### 把没有类型的文件名称修改为 jpg格式名称
+
+    class CalCulMediaHtml_Rule_12 extends Basic_Rule{
+
+        ArrayList<File>  operaDirFileList; // 当前从参数获得的目录文件集合
+        int operaType;  // 0-unknow  1--mp4   2--jpg    3--gif
+
+        ArrayList<File> mp4HtmlTemplate_FileList ;
+        ArrayList<File> jpgHtmlTemplate_FileList ;
+        ArrayList<File> gifHtmlTemplate_FileList ;
+
+        File Mp4_2x2_Html_TemplateFile ;
+        File Mp4_3x3_Html_TemplateFile ;
+        File Mp4_3x5_Html_TemplateFile ;
+        File Mp4_3d_Html_TemplateFile ;
+        File Mp4_2x2_Html_SameTempFile ;
+        File Mp4_3x3_Html_SameTempFile ;
+        File Mp4_3x5_Html_SameTempFile ;
+
+
+        File Gif_3d_Html_TemplateFile ;
+        File Gif_1x1_Html_TemplateFile_Left ;
+        File Gif_1x1_Html_TemplateFile_Right ;
+        File Gif_2x2_Html_TemplateFile;
+        File Gif_2x2_Html_TemplateFile_Left;
+        File Gif_2x2_Html_TemplateFile_Right;
+        File Gif_2x2_Html_SameTempFile;
+        File Gif_3x3_Html_TemplateFile ;
+        File Gif_3x3_Html_TemplateFile_Left ;
+        File Gif_3x3_Html_TemplateFile_Right ;
+        File Gif_3x3_Html_SameTempFile;
+        File Gif_3x5_Html_TemplateFile ;
+        File Gif_3x5_Html_SameTempFile;
+        File Gif_2x4_Html_TemplateFile_Left ;
+        File Gif_2x4_Html_TemplateFile_Right;
+        File Gif_4x3_Html_TemplateFile_Left ;
+        File Gif_4x3_Html_TemplateFile_Right;
+        File Gif_4x4_Html_TemplateFile_Left ;
+        File Gif_4x4_Html_TemplateFile_Right;
+        File Gif_3x5_Html_TemplateFile_Left ;
+        File Gif_3x5_Html_TemplateFile_Right;
+        File Gif_4x5_Html_TemplateFile_Left ;
+        File Gif_4x5_Html_TemplateFile_Right;
+
+        File Jpg_3d_Html_TemplateFile ;
+        File Jpg_4x3_Html_TemplateFile_Left ;
+        File Jpg_4x3_Html_TemplateFile_Right;
+        File Jpg_1x1_Html_TemplateFile_Left ;
+        File Jpg_1x1_Html_TemplateFile_Right ;
+        File Jpg_2x2_Html_TemplateFile;
+        File Jpg_2x2_Html_TemplateFile_Left;
+        File Jpg_2x2_Html_TemplateFile_Right;
+        File Jpg_2x2_Html_SameTempFile;
+        File Jpg_3x3_Html_TemplateFile ;
+        File Jpg_3x3_Html_TemplateFile_Left ;
+        File Jpg_3x3_Html_TemplateFile_Right ;
+        File Jpg_3x3_Html_SameTempFile;
+        File Jpg_3x5_Html_TemplateFile ;
+        File Jpg_3x5_Html_SameTempFile;
+        File Jpg_2x4_Html_TemplateFile_Left ;
+        File Jpg_2x4_Html_TemplateFile_Right;
+        File Jpg_4x4_Html_TemplateFile_Left ;
+        File Jpg_4x4_Html_TemplateFile_Right;
+        File Jpg_3x5_Html_TemplateFile_Left ;
+        File Jpg_3x5_Html_TemplateFile_Right;
+        File Jpg_4x5_Html_TemplateFile_Left ;
+        File Jpg_4x5_Html_TemplateFile_Right;
+
+
+        CalCulMediaHtml_Rule_12() {
+
+            super("#", 12, 4);
+            operaType = 0;
+            operaDirFileList = new  ArrayList<File>();
+            mp4HtmlTemplate_FileList  = new  ArrayList<File>();
+            jpgHtmlTemplate_FileList  = new  ArrayList<File>();
+            gifHtmlTemplate_FileList  = new  ArrayList<File>();
+
+            Mp4_2x2_Html_TemplateFile = new File(zbinPath+File.separator+"G2_Rule12_mp4_2x2.html");
+            Mp4_3x3_Html_TemplateFile = new File(zbinPath+File.separator+"G2_Rule12_mp4_3x3.html");
+            Mp4_3x5_Html_TemplateFile = new File(zbinPath+File.separator+"G2_Rule12_mp4_3x5.html");
+            Mp4_2x2_Html_SameTempFile = new File(zbinPath+File.separator+"G2_Rule12_mp4_2x2_same.html");
+            Mp4_3x3_Html_SameTempFile = new File(zbinPath+File.separator+"G2_Rule12_mp4_3x3_same.html");
+            Mp4_3x5_Html_SameTempFile = new File(zbinPath+File.separator+"G2_Rule12_mp4_3x5_same.html");
+            Mp4_3d_Html_TemplateFile  = new File(zbinPath+File.separator+"G2_Rule12_mp4__3d.html");
+            mp4HtmlTemplate_FileList.add(Mp4_2x2_Html_TemplateFile);
+            mp4HtmlTemplate_FileList.add(Mp4_3x3_Html_TemplateFile);
+            mp4HtmlTemplate_FileList.add(Mp4_3x5_Html_TemplateFile);
+            mp4HtmlTemplate_FileList.add(Mp4_2x2_Html_SameTempFile);
+            mp4HtmlTemplate_FileList.add(Mp4_3x3_Html_SameTempFile);
+            mp4HtmlTemplate_FileList.add(Mp4_3x5_Html_SameTempFile);
+            mp4HtmlTemplate_FileList.add(Mp4_3d_Html_TemplateFile);
+
+
+//-----------------------------JPG--------------------------------------
+
+            Jpg_3d_Html_TemplateFile  = new File(zbinPath+File.separator+"G2_Rule12_jpg__3d.html");
+            Jpg_1x1_Html_TemplateFile_Left      = new File(zbinPath+File.separator+"G2_Rule12_jpg_1x1_flow_left.html");
+            Jpg_1x1_Html_TemplateFile_Right= new File(zbinPath+File.separator+"G2_Rule12_jpg_1x1_flow_right.html");
+            Jpg_2x2_Html_TemplateFile = new File(zbinPath+File.separator+"G2_Rule12_jpg_2x2.html");
+            Jpg_2x2_Html_TemplateFile_Left= new File(zbinPath+File.separator+"G2_Rule12_jpg_2x2_flow_left.html");
+            Jpg_2x2_Html_TemplateFile_Right = new File(zbinPath+File.separator+"G2_Rule12_jpg_2x2_flow_right.html");
+            Jpg_2x2_Html_SameTempFile = new File(zbinPath+File.separator+"G2_Rule12_jpg_2x2_same.html");
+            Jpg_3x3_Html_TemplateFile = new File(zbinPath+File.separator+"G2_Rule12_jpg_3x3.html");
+            Jpg_3x3_Html_TemplateFile_Left= new File(zbinPath+File.separator+"G2_Rule12_jpg_3x3_flow_left.html");
+            Jpg_3x3_Html_TemplateFile_Right = new File(zbinPath+File.separator+"G2_Rule12_jpg_3x3_flow_right.html");
+            Jpg_3x3_Html_SameTempFile = new File(zbinPath+File.separator+"G2_Rule12_jpg_3x3_same.html");
+            Jpg_3x5_Html_TemplateFile = new File(zbinPath+File.separator+"G2_Rule12_jpg_3x5.html");
+            Jpg_3x5_Html_SameTempFile = new File(zbinPath+File.separator+"G2_Rule12_jpg_3x5_same.html");
+            Jpg_2x4_Html_TemplateFile_Left = new File(zbinPath+File.separator+"G2_Rule12_jpg_4x2_flow_left.html");
+            Jpg_2x4_Html_TemplateFile_Right = new File(zbinPath+File.separator+"G2_Rule12_jpg_4x2_flow_right.html");
+            Jpg_4x3_Html_TemplateFile_Left = new File(zbinPath+File.separator+"G2_Rule12_jpg_4x3_flow_left.html");
+            Jpg_4x3_Html_TemplateFile_Right = new File(zbinPath+File.separator+"G2_Rule12_jpg_4x3_flow_right.html");
+
+            Jpg_4x4_Html_TemplateFile_Left = new File(zbinPath+File.separator+"G2_Rule12_jpg_4x4_flow_left.html");
+            Jpg_4x4_Html_TemplateFile_Right = new File(zbinPath+File.separator+"G2_Rule12_jpg_4x4_flow_right.html");
+            Jpg_3x5_Html_TemplateFile_Left = new File(zbinPath+File.separator+"G2_Rule12_jpg_5x3_flow_left.html");
+            Jpg_3x5_Html_TemplateFile_Right = new File(zbinPath+File.separator+"G2_Rule12_jpg_5x3_flow_right.html");
+            Jpg_4x5_Html_TemplateFile_Left = new File(zbinPath+File.separator+"G2_Rule12_jpg_5x4_flow_right.html");
+            Jpg_4x5_Html_TemplateFile_Right = new File(zbinPath+File.separator+"G2_Rule12_jpg_5x4_flow_left.html");
+
+            jpgHtmlTemplate_FileList.add(Jpg_3d_Html_TemplateFile);
+            jpgHtmlTemplate_FileList.add(Jpg_1x1_Html_TemplateFile_Left   );
+            jpgHtmlTemplate_FileList.add(Jpg_1x1_Html_TemplateFile_Right  );
+            jpgHtmlTemplate_FileList.add(Jpg_2x2_Html_TemplateFile        );
+            jpgHtmlTemplate_FileList.add(Jpg_2x2_Html_TemplateFile_Left   );
+            jpgHtmlTemplate_FileList.add(Jpg_2x2_Html_TemplateFile_Right  );
+            jpgHtmlTemplate_FileList.add(Jpg_2x2_Html_SameTempFile        );
+            jpgHtmlTemplate_FileList.add(Jpg_3x3_Html_TemplateFile        );
+            jpgHtmlTemplate_FileList.add(Jpg_3x3_Html_TemplateFile_Left   );
+            jpgHtmlTemplate_FileList.add(Jpg_3x3_Html_TemplateFile_Right  );
+            jpgHtmlTemplate_FileList.add(Jpg_3x3_Html_SameTempFile        );
+            jpgHtmlTemplate_FileList.add(Jpg_3x5_Html_TemplateFile        );
+            jpgHtmlTemplate_FileList.add(Jpg_3x5_Html_SameTempFile        );
+            jpgHtmlTemplate_FileList.add(Jpg_2x4_Html_TemplateFile_Left   );
+            jpgHtmlTemplate_FileList.add(Jpg_2x4_Html_TemplateFile_Right  );
+            jpgHtmlTemplate_FileList.add(Jpg_4x3_Html_TemplateFile_Left);
+            jpgHtmlTemplate_FileList.add(Jpg_4x3_Html_TemplateFile_Right);
+            jpgHtmlTemplate_FileList.add(Jpg_4x4_Html_TemplateFile_Left   );
+            jpgHtmlTemplate_FileList.add(Jpg_4x4_Html_TemplateFile_Right  );
+            jpgHtmlTemplate_FileList.add(Jpg_3x5_Html_TemplateFile_Left   );
+            jpgHtmlTemplate_FileList.add(Jpg_3x5_Html_TemplateFile_Right  );
+            jpgHtmlTemplate_FileList.add(Jpg_4x5_Html_TemplateFile_Left   );
+            jpgHtmlTemplate_FileList.add(Jpg_4x5_Html_TemplateFile_Right  );
+
+            //--------------------GIF--------------------------
+
+
+
+            Gif_3d_Html_TemplateFile  = new File(zbinPath+File.separator+"G2_Rule12_gif__3d.html");
+            Gif_1x1_Html_TemplateFile_Left      = new File(zbinPath+File.separator+"G2_Rule12_gif_1x1_flow_left.html");
+            Gif_1x1_Html_TemplateFile_Right= new File(zbinPath+File.separator+"G2_Rule12_gif_1x1_flow_right.html");
+            Gif_2x2_Html_TemplateFile = new File(zbinPath+File.separator+"G2_Rule12_gif_2x2.html");
+            Gif_2x2_Html_TemplateFile_Left= new File(zbinPath+File.separator+"G2_Rule12_gif_2x2_flow_left.html");
+            Gif_2x2_Html_TemplateFile_Right = new File(zbinPath+File.separator+"G2_Rule12_gif_2x2_flow_right.html");
+            Gif_2x2_Html_SameTempFile = new File(zbinPath+File.separator+"G2_Rule12_gif_2x2_same.html");
+            Gif_3x3_Html_TemplateFile = new File(zbinPath+File.separator+"G2_Rule12_gif_3x3.html");
+            Gif_3x3_Html_TemplateFile_Left= new File(zbinPath+File.separator+"G2_Rule12_gif_3x3_flow_left.html");
+            Gif_3x3_Html_TemplateFile_Right = new File(zbinPath+File.separator+"G2_Rule12_gif_3x3_flow_right.html");
+            Gif_3x3_Html_SameTempFile = new File(zbinPath+File.separator+"G2_Rule12_gif_3x3_same.html");
+            Gif_3x5_Html_TemplateFile = new File(zbinPath+File.separator+"G2_Rule12_gif_3x5.html");
+            Gif_3x5_Html_SameTempFile = new File(zbinPath+File.separator+"G2_Rule12_gif_3x5_same.html");
+            Gif_2x4_Html_TemplateFile_Left = new File(zbinPath+File.separator+"G2_Rule12_gif_4x2_flow_left.html");
+            Gif_2x4_Html_TemplateFile_Right = new File(zbinPath+File.separator+"G2_Rule12_gif_4x2_flow_right.html");
+            Gif_4x3_Html_TemplateFile_Left = new File(zbinPath+File.separator+"G2_Rule12_gif_4x3_flow_left.html");
+            Gif_4x3_Html_TemplateFile_Right = new File(zbinPath+File.separator+"G2_Rule12_gif_4x3_flow_right.html");
+            Gif_4x4_Html_TemplateFile_Left = new File(zbinPath+File.separator+"G2_Rule12_gif_4x4_flow_left.html");
+            Gif_4x4_Html_TemplateFile_Right = new File(zbinPath+File.separator+"G2_Rule12_gif_4x4_flow_right.html");
+            Gif_3x5_Html_TemplateFile_Left = new File(zbinPath+File.separator+"G2_Rule12_gif_5x3_flow_left.html");
+            Gif_3x5_Html_TemplateFile_Right = new File(zbinPath+File.separator+"G2_Rule12_gif_5x3_flow_right.html");
+            Gif_4x5_Html_TemplateFile_Left = new File(zbinPath+File.separator+"G2_Rule12_gif_5x4_flow_right.html");
+            Gif_4x5_Html_TemplateFile_Right = new File(zbinPath+File.separator+"G2_Rule12_gif_5x4_flow_left.html");
+
+
+
+            gifHtmlTemplate_FileList.add(Gif_3d_Html_TemplateFile   );
+            gifHtmlTemplate_FileList.add(Gif_1x1_Html_TemplateFile_Left   );
+            gifHtmlTemplate_FileList.add(Gif_1x1_Html_TemplateFile_Right  );
+            gifHtmlTemplate_FileList.add(Gif_2x2_Html_TemplateFile        );
+            gifHtmlTemplate_FileList.add(Gif_2x2_Html_TemplateFile_Left   );
+            gifHtmlTemplate_FileList.add(Gif_2x2_Html_TemplateFile_Right  );
+            gifHtmlTemplate_FileList.add(Gif_2x2_Html_SameTempFile        );
+            gifHtmlTemplate_FileList.add(Gif_3x3_Html_TemplateFile        );
+            gifHtmlTemplate_FileList.add(Gif_3x3_Html_TemplateFile_Left   );
+            gifHtmlTemplate_FileList.add(Gif_3x3_Html_TemplateFile_Right  );
+            gifHtmlTemplate_FileList.add(Gif_3x3_Html_SameTempFile        );
+            gifHtmlTemplate_FileList.add(Gif_3x5_Html_TemplateFile        );
+            gifHtmlTemplate_FileList.add(Gif_3x5_Html_SameTempFile        );
+            gifHtmlTemplate_FileList.add(Gif_2x4_Html_TemplateFile_Left   );
+            gifHtmlTemplate_FileList.add(Gif_2x4_Html_TemplateFile_Right  );
+
+            gifHtmlTemplate_FileList.add(Gif_4x3_Html_TemplateFile_Left  );
+            gifHtmlTemplate_FileList.add(Gif_4x3_Html_TemplateFile_Right  );
+            gifHtmlTemplate_FileList.add(Gif_4x4_Html_TemplateFile_Left   );
+            gifHtmlTemplate_FileList.add(Gif_4x4_Html_TemplateFile_Right  );
+            gifHtmlTemplate_FileList.add(Gif_3x5_Html_TemplateFile_Left   );
+            gifHtmlTemplate_FileList.add(Gif_3x5_Html_TemplateFile_Right  );
+            gifHtmlTemplate_FileList.add(Gif_4x5_Html_TemplateFile_Left   );
+            gifHtmlTemplate_FileList.add(Gif_4x5_Html_TemplateFile_Right  );
+
+        }
+
+        @Override
+        boolean initParams4InputParam(String inputParam) {
+            if(inputParam.contains("_mp4")){
+                operaType = 1;
+            } else if(inputParam.contains("_jpg")){
+                operaType = 2;
+            } else if(inputParam.contains("_gif")){
+                operaType = 3;
+            }
+
+            return super.initParams4InputParam(inputParam);
+        }
+
+        @Override
+        boolean initParamsWithInputList(ArrayList<String> inputParamList) {
+            System.out.println("Rule12 inputDirPath [ length ] = " + inputParamList.size() );
+            for (int i = 0; i < inputParamList.size(); i++) {
+                String inputDirPath = inputParamList.get(i);
+                System.out.println("Rule12  inputDirPath [ "+ i+" ] = " + inputDirPath  +"  curDirFile = "+ curDirFile);
+                if(inputDirPath.endsWith("\\")){
+                    inputDirPath = inputDirPath.replace("\\","");
+                }
+
+
+
+                File inputDir = new File(curDirFile.getAbsoluteFile()+File.separator+inputDirPath);
+                if(inputDir != null &&  inputDir.exists() && inputDir.isDirectory()){
+                    operaDirFileList.add(inputDir);
+                }
+                System.out.println(" inputDir  = "+ inputDir.getAbsolutePath());
+            }
+            if(operaDirFileList.size() == 0){
+                System.out.println("当前用户没有输入执行的目录名称,请重新输入!");
+                return false;
+            }
+
+            return super.initParamsWithInputList(inputParamList);
+        }
+
+
+
+        @Override
+        ArrayList<File> applySubFileListRule4(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+            if(operaDirFileList.size() == 0){
+                System.out.println("当前用户没有输入执行的目录名称,请重新输入!");
+                return null;
+            }
+            for (int i = 0; i < operaDirFileList.size(); i++) {
+                File operaDirFile = operaDirFileList.get(i);
+                OperationHtmlMedia(operaDirFile);
+            }
+
+            return super.applySubFileListRule4(curFileList, subFileTypeMap, curDirList, curRealFileList);
+        }
+
+        void OperationHtmlMedia (File xdirFile){
+            switch (operaType){
+                case 1:   //  mp4
+                    ArrayList<File> mp4_mediaFileList =  getSubTypeFileWithPoint(xdirFile,".mp4");
+                    tryMediaFileRenameOperation(mp4_mediaFileList,".mp4");
+                    tryMP4HtmlOperation(xdirFile,mp4_mediaFileList.size());
+                    break;
+                case 2:    // jpg
+                    ArrayList<File> jpg_mediaFileList =  getSubTypeFileWithPoint(xdirFile,".jpg");
+                    tryMediaFileRenameOperation(jpg_mediaFileList,".jpg");
+                    tryJPGHtmlOperation(xdirFile,jpg_mediaFileList.size());
+                    break;
+                case 3:   //gif
+                    ArrayList<File> gif_mediaFileList =  getSubTypeFileWithPoint(xdirFile,".gif");
+                    tryMediaFileRenameOperation(gif_mediaFileList,".gif");
+                    tryGIFHtmlOperation(xdirFile,gif_mediaFileList.size());
+                    break;
+                default:
+            }
+
+        }
+
+        void tryMediaFileRenameOperation(ArrayList<File>  mp4FileList,String fileTypeWithPoint){
+            int index = 0;
+            ArrayList<File> tempFileList1 = new ArrayList<File>();
+
+            for (int i = 0; i < mp4FileList.size(); i++) {
+                index = i + 1;
+                String timeStamp = "";
+                String newName1 = index+"_"+getTimeStamp()+fileTypeWithPoint;
+                String newName2 = index+fileTypeWithPoint;
+                File curFile = mp4FileList.get(i);
+                String parrentFilePath = curFile.getParentFile().getAbsolutePath();
+                tryReName(curFile,newName1);   // 第一次改名   避免重复
+                File file1 = new File(parrentFilePath+File.separator+newName1);
+                tempFileList1.add(file1);
+            }
+            for (int i = 0; i < tempFileList1.size(); i++) {
+                index = i + 1;
+                File curFile = tempFileList1.get(i);
+                String newName = index+fileTypeWithPoint;
+                tryReName(curFile,newName);   // 第二次改名   实现顺序 1.xx  2.xx  3.xx  4.xx
+            }
+
+        }
+
+
+        void tryMP4HtmlOperation(File curDirFile , int num){
+// 把当前的html文件 中的  对应的 占位符 以 num 进行 替换
+// 把  html文件中 mp4/  转换为   当前目录名称  90890/
+// 把当前的 html  文件 放入到当前的 shell的 根 目录    html命令为   参数目录_原有名称
+            String curDirName = curDirFile.getName();
+
+
+            for (int i = 0; i < mp4HtmlTemplate_FileList.size(); i++) {
+                File HtmlFile = mp4HtmlTemplate_FileList.get(i);
+                if(!HtmlFile.exists()){
+                    System.out.println("注意当前Html文件不存在!  PATH:  " + HtmlFile.getAbsolutePath());
+                    continue;
+                }
+                String htmlname = HtmlFile.getName();
+                htmlname = htmlname.replace("G2_Rule12",curDirName);
+
+                String htmlContent = ReadFileContent(HtmlFile);
+                htmlContent =    htmlContent.replace("zukgitPlaceHolderindex",num+"");
+                htmlContent =    htmlContent.replace("mp4/",curDirName+"/");
+                File curShellHtmlFile = new File(curDirFile.getParentFile().getAbsolutePath()+File.separator+""+htmlname);
+                writeContentToFile(curShellHtmlFile,htmlContent);
+            }
+        }
+
+        void tryJPGHtmlOperation(File curDirFile , int num){
+            String curDirName = curDirFile.getName();
+
+
+            for (int i = 0; i < jpgHtmlTemplate_FileList.size(); i++) {
+                File HtmlFile = jpgHtmlTemplate_FileList.get(i);
+                if(!HtmlFile.exists()){
+                    System.out.println("注意当前Html文件不存在!  PATH:  " + HtmlFile.getAbsolutePath());
+                    continue;
+                }
+                String htmlname = HtmlFile.getName();
+                htmlname = htmlname.replace("G2_Rule12",curDirName);
+
+                String htmlContent = ReadFileContent(HtmlFile);
+                htmlContent =    htmlContent.replace("zukgitPlaceHolderindex",num+"");
+                htmlContent =    htmlContent.replace("jpg/",curDirName+"/");
+                File curShellHtmlFile = new File(curDirFile.getParentFile().getAbsolutePath()+File.separator+""+htmlname);
+                writeContentToFile(curShellHtmlFile,htmlContent);
+            }
+
+        }
+
+
+        void tryGIFHtmlOperation(File curDirFile , int num){
+            String curDirName = curDirFile.getName();
+            String curParentDirName = curDirFile.getParentFile().getName();
+            System.out.println("curDirFile = "+ curDirFile.getAbsolutePath());
+            System.out.println("ParentFile = "+ curDirFile.getParentFile().getAbsolutePath());
+
+            for (int i = 0; i < gifHtmlTemplate_FileList.size(); i++) {
+                File HtmlFile = gifHtmlTemplate_FileList.get(i);
+                if(!HtmlFile.exists()){
+                    System.out.println("注意当前Html文件不存在!  PATH:  " + HtmlFile.getAbsolutePath());
+                    continue;
+                }
+                String htmlname = HtmlFile.getName();
+                htmlname = htmlname.replace("G2_Rule12",curDirName);
+
+                String htmlContent = ReadFileContent(HtmlFile);
+                htmlContent =    htmlContent.replace("zukgitPlaceHolderindex",num+"");
+                htmlContent =    htmlContent.replace("gif/",curDirName+"/");
+                File curShellHtmlFile = new File(curDirFile.getParentFile().getAbsolutePath()+File.separator+""+htmlname);
+                writeContentToFile(curShellHtmlFile,htmlContent);
+            }
+
+        }
+
+
+        @Override
+        String simpleDesc() {
+            return  "\n"+Cur_Bat_Name+ "  #_12_mp4   <目标文件夹目录>   ### 把当前目录mp4文件生成 html 播放文件  \n" +
+                    Cur_Bat_Name+ "  #_12_gif   <目标文件夹目录>   ### 把当前目录gif文件生成 html 播放文件  \n" +
+                    Cur_Bat_Name+ "  #_12_jpg   <目标文件夹目录>   ### 把当前目录jpg文件生成 html 播放文件  \n" ;
+        }
+
+
+
+
+    }
 
 
     class AllDirSubFile_Order_Rule_11 extends Basic_Rule{
 
         AllDirSubFile_Order_Rule_11() {
-            super("*", 11, 4);
+            super("*", 11, 5);
         }
 
 
 
         @Override
         String simpleDesc() {
-           return  "\n"+Cur_Bat_Name+ "  *_11    ## (清除原有名称)把当前所有子目录的文件 当前目录 下的实体文件依次按顺序重新命名!  \n" ;
+            return  "\n"+Cur_Bat_Name+ "  *_11    ## (清除原有名称，序列从1开始)把当前所有子目录的文件 当前目录 下的实体文件依次按顺序按类型重新命名!  \n" ;
+        }
+
+        @SuppressWarnings("unchecked")
+        @Override
+        ArrayList<File> applyDir_SubFileListRule5(ArrayList<File> allSubDirFileList, ArrayList<File> allSubRealFileList) {
+
+            System.out.println("allSubDirFileList = "+ allSubDirFileList.size());
+            System.out.println("allSubRealFileList = "+ allSubRealFileList.size());
+            if(!allSubDirFileList.contains(curDirFile)){
+                allSubDirFileList.add(curDirFile);
+            }
+
+
+            for (int i = 0; i < allSubDirFileList.size(); i++) {
+                File dirFileItem = allSubDirFileList.get(i);
+                // 获取当前文件夹下的所有依据 文件类型为 .jpg .png .mp4 为key 进行的
+                Map<String , ArrayList<File>>  curDirSubRealFile = getCurSubFileMap(dirFileItem);
+
+                // 对文件依次重命名
+
+
+                Map.Entry<String, ArrayList<File>> entry;
+                // 不同的类型文件怎么处理?
+
+                if (curDirSubRealFile != null) {
+                    Iterator iterator = curDirSubRealFile.entrySet().iterator();
+                    while (iterator.hasNext()) {
+                        entry = (Map.Entry<String, ArrayList<File>>) iterator.next();
+                        String typeStr = entry.getKey();  //Map的Value
+                        String typeWithOutPot = typeStr.replace(".","");
+
+                        ArrayList<File> fileArr = entry.getValue();  //Map的Value
+
+                        // 从 000 开始
+//                    fixedFileIndex = fixedFileIndex ;
+                        ArrayList<File> curRenamePlace = new    ArrayList<File>();
+                        for (int m = 0; m < fileArr.size(); m++) {
+                            File curFile = fileArr.get(m);
+                            String oldName = curFile.getName();
+                            //String curFileName = curFile.getName();
+
+                            System.out.println("═════════════ m="+m+"═════════════");
+                            // 占位符  使得  所有文件都命名成功   避免那些已经有该名称了的文件
+                            String newName1 = "_ZHolder_"+(m+1)+("".equals(typeWithOutPot)?"":"."+typeWithOutPot);
+//                        String newName = typeTag+"_"+dirTempIndex+"_"+getPaddingIntString(fixedFileIndex,3,"0",true)+typeStr;
+                            if(tryReName(curFile,newName1)){
+                                System.out.println("成功 Index ="+m+"  命名( "+oldName+" => "+ newName1+")  => "+curFile.getAbsolutePath());
+                            }else{
+                                System.out.println("失败 Index ="+m+"  命名( "+oldName+" => "+ newName1+")  => "+curFile.getAbsolutePath());
+                            }
+                            File fileItem2 = new File(curFile.getParentFile().getAbsolutePath()+File.separator+newName1);
+                            if(fileItem2.exists()){
+                                curRenamePlace.add(fileItem2);
+
+
+/*                                System.out.println(fileItem2+ " fileItem2.exists() = "+ fileItem2.exists());
+                                String newName2 = newName1.replace("_ZHolder_","");
+
+                                if(tryReName(fileItem2,newName2)){
+                                    System.out.println("成功 Index ="+m+"  命名( "+oldName+" => "+ newName1+")  => "+curFile.getAbsolutePath());
+                                }else{
+                                    System.out.println("失败 Index ="+m+"  命名( "+oldName+" => "+ newName1+")  => "+curFile.getAbsolutePath());
+                                }  */
+
+                            }
+
+
+                        }
+                        System.out.println("════════════════════════════════════════════════════");
+
+                        for (int n = 0; n < curRenamePlace.size(); n++) {
+                            System.out.println("═════════════ n="+n+"═════════════");
+
+                            File fileItem2 = curRenamePlace.get(n);
+                            String newName2 = fileItem2.getName().replace("_ZHolder_","");
+                            if(tryReName(fileItem2,newName2)){
+                                System.out.println("成功 Index ="+n+"  命名( "+fileItem2.getName()+" => "+ newName2+")  => "+fileItem2.getAbsolutePath());
+                            }else{
+                                System.out.println("失败 Index ="+n+"  命名( "+fileItem2.getName()+" => "+ newName2+")  => "+fileItem2.getAbsolutePath());
+                            }
+                        }
+                        curRenamePlace.clear();
+
+
+                    }
+                }
+
+
+            }
+            return super.applyDir_SubFileListRule5(allSubDirFileList, allSubRealFileList);
         }
 
         @SuppressWarnings("unchecked")
@@ -259,6 +1014,21 @@ public class G2_ApplyRuleFor_TypeFile {
         }
     }
 
+
+
+
+    // //  zrule_apply_G2.bat  #_10_append  2001   往当前文件夹后缀增加 2001
+    // //  zrule_apply_G2.bat  #_10_prefix  2001   往当前文件夹前缀增加 2001
+    // //  zrule_apply_G2.bat  #_10_create  1_100   创建一个序列号从1到100的100个文件夹
+    // //  zrule_apply_G2.bat  #_10_create  temp_ 1_100   创建一个序列号从temp1到temp100的100个文件夹
+    // //  zrule_apply_G2.bat  #_10_create  _temp 1_100   创建一个序列号从1temp到100temp的100个文件夹
+    // //  zrule_apply_G2.bat  #_10_create  i_temp 1_100   创建一个序列号从i1temp到i100temp100的100个文件夹
+
+    // //  zrule_apply_G2.bat  #_10_create  7000_7100  创建一个序列号从7000开始的到7100结束的文件夹
+    // //  zrule_apply_G2.bat  #_10_replace  abc_DEF  创建一个序列号从7000开始的到7100结束的文件夹
+
+
+
     class DirOperation_Rule_10 extends Basic_Rule{
 
         String firstParamStr;  //  第一个参数
@@ -280,7 +1050,8 @@ public class G2_ApplyRuleFor_TypeFile {
 
 
 
-        int currentOperaType = 0;  // 识别当前用户 指定的操作类型
+        // 识别当前用户 指定的操作类型   1后缀增加  2前缀增加 3创建文件  4替换文件夹名称
+        int currentOperaType = 0;
 
 
 
@@ -293,7 +1064,7 @@ public class G2_ApplyRuleFor_TypeFile {
 
         @Override
         boolean initParamsWithInputList(ArrayList<String> inputParamList) {
-             boolean falg = true;
+            boolean falg = true;
             if(currentOperaType == 1){
                 appendStr_1 = inputParamList.get(inputParamList.size()-1);
             }else  if(currentOperaType == 2){
@@ -333,7 +1104,7 @@ public class G2_ApplyRuleFor_TypeFile {
 
                         if(IndexArr.length >= 2){
 
-                        String    beginIndex_3_Str = IndexArr[0];
+                            String    beginIndex_3_Str = IndexArr[0];
                             String    endIndex_3_Str = IndexArr[IndexArr.length-1];
                             if(isNumeric(beginIndex_3_Str)){
                                 beginIndex_3 = Integer.parseInt(beginIndex_3_Str);
@@ -353,7 +1124,7 @@ public class G2_ApplyRuleFor_TypeFile {
                         }
                     }else{  // 名称的参数
                         if(paramItem.endsWith("_")){
-                             appendStr_3 = "";
+                            appendStr_3 = "";
                             String[] NamePreArr = paramItem.split("_");
                             prefixStr_3= NamePreArr[0];
                             System.out.println("appendStr_3="+appendStr_3+"   prefixStr_3="+prefixStr_3 );
@@ -368,7 +1139,7 @@ public class G2_ApplyRuleFor_TypeFile {
 
                             }
 
-                   }
+                        }
 
 
 
@@ -412,9 +1183,9 @@ public class G2_ApplyRuleFor_TypeFile {
 
                 case 3:
                     for (int i = beginIndex_3; i < endIndex_3 + 1; i++) {
-                       String absDirPath = curDirFile.getAbsolutePath();
-                       String newDir = absDirPath + File.separator+prefixStr_3+i+appendStr_3;
-                      File curDirFileItem =  new File(newDir);
+                        String absDirPath = curDirFile.getAbsolutePath();
+                        String newDir = absDirPath + File.separator+prefixStr_3+i+appendStr_3;
+                        File curDirFileItem =  new File(newDir);
                         curDirFileItem.mkdirs();
                     }
                     break;
@@ -430,8 +1201,8 @@ public class G2_ApplyRuleFor_TypeFile {
 
                     break;
 
-                    default:
-                        System.out.println("当前 currentOperaType = "+ currentOperaType+"  没有找到合适的操作类型去处理 ");
+                default:
+                    System.out.println("当前 currentOperaType = "+ currentOperaType+"  没有找到合适的操作类型去处理 ");
             }
 
 
@@ -475,6 +1246,10 @@ public class G2_ApplyRuleFor_TypeFile {
 
 
     }
+
+
+    // //  zrule_apply_G2.bat  #_9  _jpg   把没有类型的文件名称修改为 jpg格式名称
+    // //  zrule_apply_G2.bat  #_9  jpg_   去除当前jpg的格式 使得其文件格式未知
 
 
     // 把 当前目录下子文件 进行格式的转换
@@ -554,13 +1329,13 @@ public class G2_ApplyRuleFor_TypeFile {
             for (int i = 0; i < subFileList.size(); i++) {
                 File curFIle = subFileList.get(i);
                 String originName = curFIle.getName();
-             // 执行 修改文件类型的操作
+                // 执行 修改文件类型的操作
 
                 // 1. 如果当前文件 过滤类型是 空 那么 可能就是没有任何的类型了
-  // 如果当前过滤的类型是  originType 是"" 空的话  那么就会过滤出所有的文件 那么只操作 不包含.的那些文件
+                // 如果当前过滤的类型是  originType 是"" 空的话  那么就会过滤出所有的文件 那么只操作 不包含.的那些文件
                 if("".equals(originType)){
                     if(originName.contains(".")){
-                       continue; //  包含了 . 说明有类型 那么 不操作
+                        continue; //  包含了 . 说明有类型 那么 不操作
                     }
                     String newName = originName + "."+targetType;
                     tryReName(curFIle,newName);
@@ -572,10 +1347,10 @@ public class G2_ApplyRuleFor_TypeFile {
                         newType = "";
                     }
 
-if(originName.contains(oldType)){
-    String newName =  originName.replace(oldType,newType);
-    tryReName(curFIle,newName);
-}
+                    if(originName.contains(oldType)){
+                        String newName =  originName.replace(oldType,newType);
+                        tryReName(curFIle,newName);
+                    }
 
 
                 }
@@ -655,7 +1430,7 @@ if(originName.contains(oldType)){
                 isAllFileOperation = false;
             }
 
-          return  super.initParams4InputParam(inputParam);
+            return  super.initParams4InputParam(inputParam);
         }
 
         @Override
@@ -675,45 +1450,45 @@ if(originName.contains(oldType)){
 //        Cur_Bat_Name + "  jgm_5_nextstep  [索引5]   //  JPG="+jpgBeginIndex+ " GIF="+gifBeginIndex+" MP4="+mp4BeginIndex+"  JPG增量="+nextStepCountJPG +"    GIF增量="+nextStepCountGIF + "   MP4增量="+nextStepCountMP4+" ▲【 把jpg gif png的增量添加到 beginIndex 然后增量置0 】 \n ";
 
 
-       void jiamiAllDir(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
-          // 1.创建一个时间戳文件夹
-           // 2.在当前文件夹的基础上
+        void jiamiAllDir(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+            // 1.创建一个时间戳文件夹
+            // 2.在当前文件夹的基础上
 
-           SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd_HHmmss");//设置日期格式
-           String date = df.format(new Date());
-           String CurBadDirName = "bad_AllFile_"+ date;
-           File curBadDirFile = new File(curDirFile.getAbsolutePath()+ File.separator+CurBadDirName);
-           curBadDirFile.mkdirs();
-           String oldBasePath = curDirFile.getAbsolutePath();
-           String newBasePath = curBadDirFile.getAbsolutePath();
-           System.out.println("执行当前所有文件 加密操作  ");
+            SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd_HHmmss");//设置日期格式
+            String date = df.format(new Date());
+            String CurBadDirName = "bad_AllFile_"+ date;
+            File curBadDirFile = new File(curDirFile.getAbsolutePath()+ File.separator+CurBadDirName);
+            curBadDirFile.mkdirs();
+            String oldBasePath = curDirFile.getAbsolutePath();
+            String newBasePath = curBadDirFile.getAbsolutePath();
+            System.out.println("执行当前所有文件 加密操作  ");
 
-           if(!curDirList.contains(curDirFile)){
-               curDirList.add(curDirFile);
-           }
+            if(!curDirList.contains(curDirFile)){
+                curDirList.add(curDirFile);
+            }
 
-           for (int i = 0; i < curDirList.size(); i++) {
-               File oldDirFile = curDirList.get(i);
-               String newDirFilePath = oldDirFile.getAbsolutePath().replace(oldBasePath, newBasePath);
-               File newDirFile = new File(newDirFilePath);
-               newDirFile.mkdirs();
-
-
-               for (int j = 0; j < oldDirFile.listFiles().length; j++) {
-
-                   File oldRealFile = oldDirFile.listFiles()[j];
-                   if(oldRealFile.isDirectory()){
-                       continue;
-                   }
-
-                   String newRealFilePath = oldRealFile.getAbsolutePath().replace(oldBasePath, newBasePath);
-                   File newRealFile = new File(newRealFilePath);
-                   // 加密操作
-                   createEncryFile(oldRealFile,newRealFile);
-               }
+            for (int i = 0; i < curDirList.size(); i++) {
+                File oldDirFile = curDirList.get(i);
+                String newDirFilePath = oldDirFile.getAbsolutePath().replace(oldBasePath, newBasePath);
+                File newDirFile = new File(newDirFilePath);
+                newDirFile.mkdirs();
 
 
-           }
+                for (int j = 0; j < oldDirFile.listFiles().length; j++) {
+
+                    File oldRealFile = oldDirFile.listFiles()[j];
+                    if(oldRealFile.isDirectory()){
+                        continue;
+                    }
+
+                    String newRealFilePath = oldRealFile.getAbsolutePath().replace(oldBasePath, newBasePath);
+                    File newRealFile = new File(newRealFilePath);
+                    // 加密操作
+                    createEncryFile(oldRealFile,newRealFile);
+                }
+
+
+            }
 
 /*
            for (int i = 0; i < curRealFileList.size(); i++) {
@@ -782,7 +1557,7 @@ if(originName.contains(oldType)){
             System.out.println("Rule7 搜索到的实体文件个数:  curRealFileList.size() =" + curRealFileList.size());
             if(isAllFileOperation){
                 if(mEncroptyDirect){
-                     // 加密所有文件夹
+                    // 加密所有文件夹
                     jiamiAllDir(curFileList,subFileTypeMap,curDirList,curRealFileList);
                 }else{
                     // 解密当前所有文件夹
@@ -1069,7 +1844,7 @@ if(originName.contains(oldType)){
                 isEnable = false;
             }
 
-           return super.initParams4InputParam(inputParam);
+            return super.initParams4InputParam(inputParam);
         }
 
         void  tryDynamicCalCulateBeginIndex(ArrayList<File> subFileList ){
@@ -1810,6 +2585,12 @@ if(originName.contains(oldType)){
         }
 
 
+        @Override
+        ArrayList<File> applyDir_SubFileListRule5(ArrayList<File> allSubDirFileList , ArrayList<File> allSubRealFileList){
+
+            return null;
+        }
+
         boolean initParams4InputParam(String inputParam){ return true ; }
 
         @Override
@@ -1869,6 +2650,8 @@ if(originName.contains(oldType)){
         abstract    File applyFileByteOperationRule2(File originFile);
         abstract    ArrayList<File> applyFileListRule3(ArrayList<File> subFileList , HashMap<String, ArrayList<File>> fileTypeMap);
         abstract    ArrayList<File> applySubFileListRule4(ArrayList<File> curFileList , HashMap<String, ArrayList<File>> subFileTypeMap , ArrayList<File> curDirList ,ArrayList<File> curRealFileList);
+        abstract    ArrayList<File> applyDir_SubFileListRule5(ArrayList<File> allSubDirFileList , ArrayList<File> allSubRealFileList);
+
         abstract    boolean initParams4InputParam(String inputParam);  // 初始化Rule的参数 依据输入的字符串
         abstract    boolean initParamsWithInputList(ArrayList<String> inputParamList);
         abstract   String ruleTip(String type,int index , String batName,OS_TYPE curType);  // 使用说明列表  如果覆盖 那么就不使用默认的说明 , 默认就一种情况
@@ -2119,6 +2902,13 @@ if(originName.contains(oldType)){
     }
 
 
+    static ArrayList<File> getAllSubFile(File dirFile ) {
+        ArrayList<String> typeList = new   ArrayList<String>();
+        typeList.add("*");
+        return  getAllSubFile( dirFile ,null , typeList);
+    }
+
+
     static ArrayList<File> getAllSubFile(File dirFile ,String aospPath , ArrayList<String> typeList) {
         if(aospPath == null || "".equals(aospPath)){
             return getAllSubFile(dirFile.getAbsolutePath(), "", typeList);
@@ -2138,6 +2928,7 @@ if(originName.contains(oldType)){
                 public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
                     String fileString = file.toAbsolutePath().toString();
                     //System.out.println("pathString = " + fileString);
+
                     for (int i = 0; i < typeList.size(); i++) {
                         String type =  typeList.get(i);
                         if("*".equals(type)){  // 如果 类型是 * 那么就把 所有的 非目录文件加入列表中
@@ -2165,6 +2956,43 @@ if(originName.contains(oldType)){
 
 
         return allFile;
+
+
+    }
+
+    static ArrayList<File> getCurrentSubDirFile(File  rootPath) {
+        ArrayList<File> allDirFile = new ArrayList<File>();
+        File[] files = rootPath.listFiles();
+        for (int i = 0; i < files.length; i++) {
+            File fileItem = files[i];
+            if(fileItem.isDirectory()){
+                allDirFile.add(fileItem);
+            }
+        }
+        return allDirFile;
+
+    }
+
+    static ArrayList<File> getAllSubDirFile(File  rootPath) {
+        ArrayList<File> allDirFile = new ArrayList<File>();
+        Path curRootPath = Paths.get(rootPath.getAbsolutePath() + File.separator );
+
+        try {
+            Files.walkFileTree(curRootPath, new SimpleFileVisitor<Path>() {
+
+                @Override
+                public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+                    allDirFile.add(dir.toFile());
+                    return super.postVisitDirectory(dir, exc);
+                }
+
+            });
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+        return allDirFile;
 
 
     }
@@ -2268,7 +3096,7 @@ if(originName.contains(oldType)){
             }
 
 
-             String[] paramsArr =    curInputStr.split("_");
+            String[] paramsArr =    curInputStr.split("_");
             if(paramsArr.length < 2){
                 continue;
             }
@@ -2310,6 +3138,9 @@ if(originName.contains(oldType)){
         G2_ApplyRuleFor_TypeFile  mG2_Object = new G2_ApplyRuleFor_TypeFile();
         mG2_Object.InitRule();
 
+        File mCurDirFile = new File(curDirPath);
+        curDirFile = new  File(curDirPath);
+
         if (mKeyWordName.size() == 0) {
             showTip();
             return;
@@ -2321,9 +3152,8 @@ if(originName.contains(oldType)){
         }
 
 
-        File mCurDirFile = new File(curDirPath);
-        curDirFile = new  File(curDirPath);
-        if (!mCurDirFile.exists() || !mCurDirFile.isDirectory() ) {
+
+        if (curDirFile == null || !mCurDirFile.exists() || !mCurDirFile.isDirectory() ) {
             System.out.println("当前执行替换逻辑的文件路径:" + curDirPath+"  不存在! ");
             return;
         }
@@ -2431,6 +3261,16 @@ if(originName.contains(oldType)){
                 }
 
 
+            } else if(curApplayRule.operation_type == 5){  // 对所有文件夹  所有子文件 孙文件 所有 子文件夹 孙文件夹
+
+                ArrayList<File> curAllDirFile =   getAllSubDirFile(curDirFile);  // 获取所有的 文件夹列表   包含 孙子 子文件夹
+                ArrayList<File> curAllRealFile =   getAllSubFile(curDirFile);   // 获取所有的 文件 列表 包含 孙子 子文件
+                //     FileChannel
+//  zukgit operation_type == 5
+                System.out.println(" curDirFile = "+ curDirFile.toString());
+                System.out.println(" curAllDirFile = "+ curAllDirFile.size());
+                System.out.println(" curAllRealFile = "+ curAllRealFile.size());
+                curApplayRule.applyDir_SubFileListRule5(curAllDirFile,curAllRealFile);
             }else{
 
                 for (int j = 0; j < typeFileList.size(); j++) {
@@ -2518,7 +3358,7 @@ if(originName.contains(oldType)){
     }
 
     static Map<String , ArrayList<File>>   getCurSubFileMap(File mDirFile){
- HashMap<String, ArrayList<File>> realFileListMap = new  HashMap<String, ArrayList<File>>(); ;
+        HashMap<String, ArrayList<File>> realFileListMap = new  HashMap<String, ArrayList<File>>(); ;
 
         for (File curFile : mDirFile.listFiles()) {
             if(curFile.isDirectory()){
@@ -2550,7 +3390,7 @@ if(originName.contains(oldType)){
             }
         }
 
-return realFileListMap;
+        return realFileListMap;
     }
 
     static String OriApplyOperationRule(String mType ,String index  , String mOriContent){
@@ -2577,6 +3417,31 @@ return realFileListMap;
 
 
 
+    ArrayList<File>  getSubTypeFileWithPoint(File dirFile , String pointType){
+        ArrayList<File>  targetFileList = new   ArrayList<File>();
+        String fillterFileStr = ""+pointType.toLowerCase();
+        if(!dirFile.isDirectory()){
+            return targetFileList;
+        }
+        File[] allSubFileList = dirFile.listFiles();
+        for (File curFile: allSubFileList ) {
+            String fileName = curFile.getName().toLowerCase();
+            if(fileName.endsWith(fillterFileStr)){
+                targetFileList.add(curFile) ;
+            }
+        }
+
+        return targetFileList;
+    }
+
+
+
+    static String getTimeStamp(){
+
+        SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd_HHmmss");//设置日期格式
+        String date = df.format(new Date());
+        return date;
+    }
     static  Rule getRuleByIdentify(String identify){
         for (int i = 0; i <realTypeRuleList.size() ; i++) {
             if(realTypeRuleList.get(i).identify.equals(identify)){
@@ -2585,4 +3450,5 @@ return realFileListMap;
         }
         return null;
     }
+
 }
