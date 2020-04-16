@@ -27,9 +27,10 @@ public class G8_FFmpeg_Operation {
         ffmpeg -i sky1.mp4 -r 1 image%d.jpg   // 每秒输入一张图片
         ffmpeg -i a.avi example.%b.jpg
 
-        ffmpeg -i 1.mp4 -vf "rotate=90*PI/180" 2.mp4        // 顺时针旋转90度
-        ffmpeg -i 1.mp4 -vf "rotate=PI"      3.mp4          // 顺时针旋转180度
-        ffmpeg -i 1.mp4 -vf "rotate=270*PI/180"  4.mp4      // 顺时针旋转270度
+
+ffmpeg -i 1.mp4 -vf "rotate=90*PI/180:ow=ih:oh=iw" 2.mp4        // 顺时针旋转90度
+ffmpeg -i 1.mp4 -vf "rotate=PI"      3.mp4          // 顺时针旋转180度
+ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋转270度
 
         ffprobe.exe 123.mkv
         ffprobe.exe 1.mp3
@@ -396,8 +397,13 @@ public class G8_FFmpeg_Operation {
                 ffmpeg -i 1.mp4 -vf "rotate=PI"      3.mp4          // 顺时针旋转180度
                 ffmpeg -i 1.mp4 -vf "rotate=270*PI/180"  4.mp4      // 顺时针旋转270度*/
 
+                String command = "";
+if(rotate == 90 || rotate == 270){
+    command = ffmpeg_path +" -i "+ mp4File.getAbsolutePath() + " -vf \"rotate="+rotate+"*PI/180:ow=ih:oh=iw\"  " + newFileAbsPath;
 
-                String command = ffmpeg_path +" -i "+ mp4File.getAbsolutePath() + " -vf \"rotate="+rotate+"*PI/180\" " + newFileAbsPath;
+}else{
+    command = ffmpeg_path +" -i "+ mp4File.getAbsolutePath() + " -vf \"rotate="+rotate+"*PI/180\" " + newFileAbsPath;
+}
 
                 System.out.println(command);
                 execCMD(command);

@@ -746,7 +746,9 @@ class F8_Dump_Wifi {
             wifi_2_1.keyword = "Verbose logging is";
             wifi_2_1.explain="WIFI详情Log开关是否打开 ";
             wifi_2_1.classNameForShuxing = "(WifiServiceImpl.java) boolean mVerboseLoggingEnabled";
-            wifi_2_1.printcode="pw.println(\"Verbose logging is \" + (mVerboseLoggingEnabled ? \"on\" : \"off\"));";
+            wifi_2_1.printcode="pw.println(\"Verbose logging is \" + (mVerboseLoggingEnabled ? \"on\" : \"off\"));\n" +
+                    "Settings >System > About phone > tap \"Build number\" 4 times >Developer options\n" +
+                    "Setting > System > Advanced > Developer options >Enable WiFi Verbose Logging  [toogle open] ";
             keyWordList.add(wifi_2_1);
 
 
@@ -2197,7 +2199,7 @@ class F8_Dump_Wifi {
                     "preloaded_forget = boolean preloaded_forget;  // 是否可以忘记delete的忘记   true--可以删除   false--不可以删除\n" +
                     "skip_auto_connect = int skip_auto_connect;   // 跳过自动连接 0-不跳过自动连接  1-要跳过自动连接\n" +
                     "eapRetryCount = int  eapRetryCount;  // eap 认证操作的重试次数   preloaded_ssid = boolean preloaded_ssid; //是否预置的网络 true-预置  false不是预置\n" +
-                    "recentFailure = int mAssociationStatus = NONE;  // 关联失败的原因  3离开自己leave   17热点满了 0-初始化值 reasonCode   断开原因列表  https://sse.am.mot.com/p_source/xref/mp-r-sh2019/vendor/qcom/opensource/wlan/qcacld-3.0/core/mac/inc/sir_mac_prot_def.h#745\n" +
+                    "recentFailure = int mAssociationStatus = NONE;  // 关联失败的原因  3离开自己leave   17热点满了 0-初始化值 reasonCode   断开原因列表  https://sse.am.mot.com/q_source/xref/mq-r-qsh2020/vendor/qcom/opensource/wlan/qcacld-3.0/core/mac/inc/sir_mac_prot_def.h#748\n" +
                     "linked =  HashMap<String, Integer>  linkedConfigurations.KeySet();  Key = \"D-Link_DIR-816\"WPA_PSK\"  \"D-Link_DIR-816_5G\"WPA_PSK\"  // key-String 是  configKey()标识一个网络  value是分数?  标识 \n" +
                     "noInternetAccessExpected = boolean noInternetAccessExpected;  //  true(预计不能联网)  false(预计能联网)  让用户选择的配置 预计当前config对应的网络wifi不能连接 \n" +
                     "userApproved = int userApproved = USER_UNSPECIFIED; // 连接用户的批准状态 [0-USER_UNSPECIFIED-缺省  1-USER_APPROVED-批准 2-USER_BANNED-拒绝 3-USER_PENDING-等待用户选择]\n" +
