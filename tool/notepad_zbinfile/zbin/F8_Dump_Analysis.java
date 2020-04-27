@@ -233,6 +233,12 @@ class F8_Dump_Analysis {
 // ./bluetooth_manager.txt:243:  mTetherOn: false   adb shell dumpsys bluetooth_manager > bluetooth_manager.txt
     // ./connectivity.txt:67:    Type: TETHERING_WIFI, Value: empty
 
+//    WIFI_AP_STATE_DISABLING  【10】
+//    WIFI_AP_STATE_DISABLED   【11】
+//    WIFI_AP_STATE_ENABLING  【12】
+//    WIFI_AP_STATE_ENABLED   【13】
+//    WIFI_AP_STATE_FAILED   【14】
+//
     /*  connectivity.txt     热点 打开 关闭的过程
         Line 111:     2019-12-12T06:10:44.716 - SET master tether settings: ON
         Line 140:     2019-12-12T06:10:46.412 - SET master tether settings: OFF
@@ -252,7 +258,11 @@ class F8_Dump_Analysis {
             this.mBeginKeyWord = "SET master tether settings:";
             this.mEndKeyWord = null;
             this.mUIPossition = " 【  this.mUIPossition =\"设置WIFI-Hotspot开关 WifiTetherSettings.java WifiTetherSwitchBarController.java  boolean onSwitchToggled(boolean isChecked)\"; SoftApManager.java int startSoftAp(WifiConfiguration config) 】";
-            this.desc = "WIFI热点无设置Item  有文件保存该设置项的配置 文件位置:  adb pull /data/misc/wifi/softap.conf .    ";
+            this.desc = "WIFI热点无设置Item  有文件保存该设置项的配置 文件位置:  adb pull /data/misc/wifi/softap.conf .    \n//    WIFI_AP_STATE_DISABLING  【10】\n" +
+                    "//    WIFI_AP_STATE_DISABLED   【11】\n" +
+                    "//    WIFI_AP_STATE_ENABLING  【12】\n" +
+                    "//    WIFI_AP_STATE_ENABLED   【13】\n" +
+                    "//    WIFI_AP_STATE_FAILED   【14】";
             this.showKey_Match = "WIFI热点-打开状态";
             this.showKey_NO_Match = "WIFI热点-关闭记录 ";
             this.srcFileName = "connectivity.txt"; // 资源文件来源
@@ -1005,6 +1015,14 @@ class F8_Dump_Analysis {
             mPackageUIDList.sort(new Comparator<String>() {
                 @Override
                 public int compare(String o1, String o2) {
+                    if(!isNumeric(o1)){  //  如果 o1 不是 integer 那么 在后面
+                        return 1;
+                    }
+
+                    if(!isNumeric(o2)){  //  如果 o2 不是 integer 那么 在后面
+                        return 1;
+                    }
+
                     Integer i1 = Integer.parseInt(o1);
                     Integer i2 = Integer.parseInt(o2);
                     if (i1 == i2) {
@@ -2830,3 +2848,7 @@ class F8_Dump_Analysis {
 
 
 }
+
+
+
+//java.lang.NumberFormatException: For input string: "1027/Flags: 0xc8be4d/Package:
