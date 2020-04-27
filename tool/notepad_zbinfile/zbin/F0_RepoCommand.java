@@ -23,7 +23,7 @@ public class F0_RepoCommand {
     static String productName = "";  // 产品名称
     static String xmlbranchName = "";  // .xml输入
     static String gitRepoName = "";  // .git 输入
-    static char mVersionChar = 'a';  // 产品名称
+    static char mVersionChar = 'q';  // 产品名称
     static String manifestBranchName = "";  // manifest的分支
 
 
@@ -565,6 +565,7 @@ public class F0_RepoCommand {
         if(versonChar <= 'p'){
             System.out.println("【5. Settings.apk(P及以下) 文件 】 ");
             System.out.println("zzfile_3.sh  ./out/target/product/"+productname+"/system/priv-app/Settings/Settings.apk");
+
         }else{
             System.out.println("【5. Settings.apk(Q及以上) 文件 】 ");
             System.out.println("zzfile_3.sh  ./out/target/product/"+productname+"/product/priv-app/Settings/Settings.apk");
