@@ -3,6 +3,7 @@
 import java.io.*;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -302,9 +303,14 @@ public class H1_TimeTool {
     }
 
 
-    static  String  getPaddingIntString(int index , int padinglength , String oneStr , boolean dirPre){
-        String result = ""+index;
-        int length = (""+index).length();
+    // strValue  是字符串
+
+    // padinglength 是需要的长度
+    // oneStr 是填充的字符 的那个字符
+    // dirPre true---前填充   false-后填充
+    static  String  getPaddingIntString(String strValue , int padinglength , String oneStr , boolean dirPre){
+        String result = ""+strValue;
+        int length = (""+strValue).length();
 
         if(length < padinglength){
             int distance = padinglength  - length;
@@ -387,14 +393,460 @@ public class H1_TimeTool {
         System.out.println("提示1:  时间戳使用格式: 2020-04-26_16:16:00.550  16:16:16.16  16:16:16   16:18 ");  // 输入 提示  输入格式 提示
         System.out.println("提示2:  标识时间长度使用  1000s 40h1000s 100000s  35d15h12m500s  Y-年   M-月  W-星期  D-天  H-小时 m-分钟 s-秒");
         System.out.println();
+        System.out.println("提示3:  "+Cur_Bat_Name+"  2020-04-26_16:16:00.550+7y66M35d15h12m500s   ## 时间戳+时间长度  ");
+        System.out.println("提示4:  "+Cur_Bat_Name+"  2020-04-26_16:16:00.550-7y66M35d15h12m500s   ## 时间戳-时间长度   ");
         System.out.println();
+        System.out.println("提示5:  "+Cur_Bat_Name+"  2020-04-26_16:16:00.550   ## 时间戳1   ");
+        System.out.println("提示5:  "+Cur_Bat_Name+"  2020-04-26_16:16:00       ## 时间戳2   ");
+        System.out.println("提示5:  "+Cur_Bat_Name+"  2020-04-26_16:16          ## 时间戳3   ");
+        System.out.println("提示5:  "+Cur_Bat_Name+"  2020-04-26_16             ## 时间戳4   ");
+        System.out.println("提示5:  "+Cur_Bat_Name+"  16:16:00.550              ## 时间戳5   ");
+        System.out.println("提示5:  "+Cur_Bat_Name+"  16:16:00                  ## 时间戳6   ");
+        System.out.println("提示5:  "+Cur_Bat_Name+"  16:16                     ## 时间戳7   ");
+        System.out.println("提示5:  "+Cur_Bat_Name+"  +7y66M35d15h12m500s       ## 时间长度1   ");
+        System.out.println("提示5:  "+Cur_Bat_Name+"  -7y66M35d15h12m500s       ## 时间长度2   ");
+        System.out.println("提示5:  "+Cur_Bat_Name+"  1y1M1w1d1h1m1s            ## 时间长度3   ");
+
         System.out.println();
+        System.out.println("额外提示信息:");
+        Calendar now = Calendar.getInstance();
+
+        now.set(now.DAY_OF_WEEK, now.MONDAY);
+
+
+        int year  = now.get(Calendar.YEAR);
+        int month  = now.get(Calendar.MONTH) + 1;
+        int day  = now.get(Calendar.DAY_OF_MONTH);
+        int hour  = now.get(Calendar.HOUR);
+        int mintus  = now.get(Calendar.MINUTE);
+        int second =  now.get(Calendar.SECOND);
+        int millsecond =  now.get(Calendar.MILLISECOND);
+        int week =  now.get(Calendar.WEEK_OF_MONTH);
+        int xinqi =  now.get(Calendar.DAY_OF_WEEK);  // 1是星知期日道，7是星期版六。
+        int weekNum =  now.get(Calendar.WEEK_OF_YEAR);
+        int weekNum1 =  now.get(Calendar.DAY_OF_WEEK_IN_MONTH);
+        int dayofYear =  now.get(Calendar.DAY_OF_YEAR);
+        int hourofday =  now.get(Calendar.HOUR_OF_DAY);
+        int date =  now.get(Calendar.DATE);
+        int monthDays = getDayForMonth_Year(year,month);   // 计算该月的天数
+        int monthHours = monthDays * 24;
+        int monthMintues = monthHours * 60;
+        int monthSecond = monthMintues * 60;
+
+        // 计算当前今日过去的 秒数  分钟数
+        Calendar beginTody = Calendar.getInstance();
+        beginTody.set(beginTody.DAY_OF_WEEK, beginTody.MONDAY);
+        beginTody.set(Calendar.HOUR_OF_DAY,0);
+        beginTody.set(Calendar.HOUR,0);  //  时分秒 毫秒 都设置0
+        beginTody.set(Calendar.MINUTE,0);  //  时分秒 毫秒 都设置0
+        beginTody.set(Calendar.SECOND,0);  //  时分秒 毫秒 都设置0
+        beginTody.set(Calendar.MILLISECOND,0);  //  时分秒 毫秒 都设置0
+        beginTody.set(Calendar.HOUR_OF_DAY,0);
+        long todaySecondsUse = (now.getTimeInMillis() - beginTody.getTimeInMillis())/1000;
+        long todayMinutes = (todaySecondsUse/60);
+        long second_minutes =(int)todaySecondsUse%60;
+        int todayMinutes_SecondPercent = (int)((((double)second_minutes)/60)* 100);
+
+
+
+
+        int daysForYear = calculRunYear(year); // 一年多少天
+        boolean isBigYear = (daysForYear==366);  // 是否是闰年
+        long   hourForYear  =  daysForYear * 24;
+        long mintuesForYear = hourForYear * 60;
+        long secondForYear = mintuesForYear * 60;
+        String xinqiStr = calculXinQi(xinqi);
+
+        long dayWeHave = daysForYear - dayofYear;
+        float dayUsePersent = ((float)dayofYear/daysForYear) * 100;
+        float dayWeHavePersent = ((float)dayWeHave/daysForYear)*100;
+/*
+        System.out.println("year = "+year);
+        System.out.println("month ="+month);
+        System.out.println("day = "+day);
+        System.out.println("hour = "+ hour);
+        System.out.println("mintus = "+mintus);
+        System.out.println("second = "+second);
+        System.out.println("millsecond = "+millsecond);
+        System.out.println("week = "+week);
+        System.out.println("xinqi = "+xinqi);
+        System.out.println("WEEK_OF_YEAR = "+ weekNum);
+        System.out.println("DAY_OF_WEEK_IN_MONTH = "+ weekNum1);
+        System.out.println("DAY_OF_YEAR = "+dayofYear);
+        System.out.println("HOUR_OF_DAY = "+hourofday);
+        System.out.println("Calendar.DATE = "+date);
+
+        year = 2020
+        month =3
+        day = 28
+        hour = 11
+        mintus = 37
+        second = 21
+        millsecond = 506
+        week = 5   // 第五周
+        xinqi = 3   // 周三
+        WEEK_OF_YEAR = 18   // 一年的第18个周
+        DAY_OF_WEEK_IN_MONTH = 4   //   在这个月已经过了几次 周X
+        DAY_OF_YEAR = 119    // 一年的第几天
+
+        HOUR_OF_DAY = 11   //  几点
+        Calendar.DATE = 28  //  日期
+                */
+
+
+/*
+
+══════════════ 2020润年 ═ 366天 ═ 8784小时 ═ 527040分钟 ═ 31622400秒 ══════════════
+        秒数级别(s):    ║ 已过: 10281600s ║ 剩余: 21340800s ║
+        分钟级别(m):    ║ 已过: 171360m   ║ 剩余: 355680m   ║
+        小时级别(h):    ║ 已过: 2856h     ║ 剩余: 5928h     ║
+        天数级别(d):    ║ 已过: 119d      ║ 剩余: 247d      ║
+        百分占比(%):    ║ 已过: 92.213%   ║ 剩余: 67.486%   ║
+
+
+══════════════ 2020.4月 ═ 30天 ═ 720小时 ═ 43200分钟 ═ 2592000秒 ══════════════
+        秒数级别(s):    ║ 已过: 2390158s  ║ 剩余: 201842s   ║
+        分钟级别(m):    ║ 已过: 39835.96m ║ 剩余: 3364.03m  ║
+        小时级别(h):    ║ 已过: 663.93h   ║ 剩余: 56.07h    ║
+        天数级别(d):    ║ 已过: 27.66d    ║ 剩余: 2.34d     ║
+        百分占比(%):    ║ 已过: 92.213%   ║ 剩余: 7.787%    ║
+
+
+══════════════ 2020年4月第5周 ═ 7天 ═ 168小时 ═ 10080分钟 ═604800秒 ══════════════
+        该月份有周数:    ║  共 5 周    ║
+        该周的周索引:    ║  第 5 周    ║
+        周一(星期一):    ║  2020.04.15 ║
+        周天(星期天):    ║  2020.04.22 ║
+        今日(星期X ):    ║  2020.04.18 ║ 该周日(星期X)该月出现第X次
+
+══════════════ 2020.04.28日 ═ 1天 ═ 24小时 ═ 1440分钟 ═ 86400秒 ══════════════
+        今日时刻(t):    ║ 时刻: 16:19:40.967 ║                ║
+        秒数级别(s):    ║ 已过: 57358s       ║ 剩余: 29042s   ║
+        分钟级别(m):    ║ 已过: 955.96m      ║ 剩余: 484.03m  ║
+        百分占比(%):    ║ 已过: 66.387%      ║ 剩余: 33.613%  ║
+        */
+
+int itemLength =  24;  //  一个框的长度
+
+
+        System.out.println("══════════════ "+"2020"+(isBigYear?"润":"平")+"年 ═ "+daysForYear+"天 ═ "+hourForYear+"小时 ═ "+mintuesForYear+"分钟 ═ "+secondForYear+"秒 ══════════════");
+//【1_1】        今年2020润年 : 366天 : 8784小时 : 527040分钟 : 31622400秒
+//══════════════ 2020润年 ═ 366天 ═ 8784小时 ═ 527040分钟 ═ 31622400秒 ══════════════
+
+ //【1_2】 今年已过 119 天:  剩余 247 天= 已过:2856小时  剩余:5928 小时 = 已过:171360分钟  剩余:355680 分钟 = 已过:10281600秒  剩余:21340800 秒 =    已使用:32.514% 剩余:67.486%
+ // 秒数级别(s):    ║ 已过: 10281600s ║ 剩余: 21340800s ║
+// 分钟级别(m):    ║ 已过: 171360m   ║ 剩余: 355680m   ║
+// 小时级别(h):    ║ 已过: 2856h     ║ 剩余: 5928h     ║
+//天数级别(d):    ║ 已过: 119d      ║ 剩余: 247d      ║
+ //百分占比(%):    ║ 已过: 92.213%   ║ 剩余: 67.486%   ║
+        String dayUsePersentStr = String.format("%.3f",dayUsePersent);
+        String dayWeHavePersentStr = String.format("%.3f",dayWeHavePersent);
+
+        System.out.println("秒数级别(s):    ║ 已过: "+padding20BlankStr((dayofYear*24*60*60)+"s")+"║ 剩余: "+padding20BlankStr((dayWeHave*24*60*60)+"s")+"║");
+        System.out.println("分钟级别(m):    ║ 已过: "+padding20BlankStr((dayofYear*24*60)+"m")+"║ 剩余: "+padding20BlankStr((dayWeHave*24*60)+"m")+"║");
+        System.out.println("小时级别(h):    ║ 已过: "+padding20BlankStr((dayofYear*24)+"h")+"║ 剩余: "+padding20BlankStr((dayWeHave*24)+"h")+"║");
+        System.out.println("天数级别(d):    ║ 已过: "+padding20BlankStr((dayofYear)+"d")+"║ 剩余: "+padding20BlankStr((dayWeHave)+"d")+"║");
+        System.out.println("百分占比(%):    ║ 已过: "+padding20BlankStr((dayUsePersentStr)+"%")+"║ 剩余: "+padding20BlankStr((dayWeHavePersentStr)+"%")+"║");
+
+
+        System.out.println();
+
+/*
+        System.out.println("今年"+ year+ (isBigYear?"润":"平")+"年 : "+daysForYear+"天 : "+hourForYear+"小时 : "+mintuesForYear+"分钟 : "+secondForYear+"秒");
+
+        System.out.println("今年已过 "+dayofYear+" 天:  剩余 "+dayWeHave+" 天"+"= "+
+              "已过:"+  (dayofYear*24)+"小时  剩余:"+(dayWeHave*24)+" 小时"+" = "+
+                "已过:"+  (dayofYear*24*60)+"分钟  剩余:"+(dayWeHave*24*60)+" 分钟"+" = "+
+                "已过:"+  (dayofYear*24*60*60)+"秒  剩余:"+(dayWeHave*24*60*60)+" 秒"+" = "+
+                "   已使用:"+dayUsePersentStr+"%"   + " 剩余:" +dayWeHavePersentStr+"%" );
+
+        */
+//        System.out.println("xxx月==xxx天===xxx小时===xxx分钟==xxx秒");
+
+
+        // 这个月  已过了 多少百分比
+        Calendar beginMonthCalendar = Calendar.getInstance();
+
+        beginMonthCalendar.set(beginMonthCalendar.DAY_OF_WEEK, beginMonthCalendar.MONDAY);
+
+        beginMonthCalendar.set(Calendar.DAY_OF_MONTH,1); // 设置成月初
+        beginMonthCalendar.set(Calendar.HOUR_OF_DAY,0);
+        beginMonthCalendar.set(Calendar.HOUR,0);  //  时分秒 毫秒 都设置0
+        beginMonthCalendar.set(Calendar.MINUTE,0);  //  时分秒 毫秒 都设置0
+        beginMonthCalendar.set(Calendar.SECOND,0);  //  时分秒 毫秒 都设置0
+        beginMonthCalendar.set(Calendar.MILLISECOND,0);  //  时分秒 毫秒 都设置0
+        beginMonthCalendar.set(Calendar.HOUR_OF_DAY,0);
+
+
+        // 这个月 从月初到现在的时间 秒数
+        long thisMonthSecondUse = (now.getTimeInMillis() - beginMonthCalendar.getTimeInMillis())/1000;
+
+
+        // 这个月 总的时间秒数
+        long thisMonthAllSecond = monthDays * 24 * 60 * 60;
+
+        // 这个月剩余的秒数
+        long thisMonthSecondWeHave = thisMonthAllSecond - thisMonthSecondUse;
+
+
+        float thisMonthMintuesUse = (float)thisMonthSecondUse/60;
+        float thisMonthMintusWeHave = (float)thisMonthSecondWeHave/60;
+
+
+        float thisMonthHourUse = (float)thisMonthMintuesUse/60;
+        float thisMonthHourWeHave = (float)thisMonthMintusWeHave/60;
+
+
+        float thisMonthDayUse = (float)thisMonthHourUse/24;
+        float thisMonthDayWeHave = (float)thisMonthHourWeHave/24;
+
+
+        String thisMonthMintuesUseStr = String.format("%.2f",thisMonthMintuesUse);
+        String thisMonthMintusWeHaveStr = String.format("%.2f",thisMonthMintusWeHave);
+
+        String thisMonthHourUseStr = String.format("%.2f",thisMonthHourUse);
+        String thisMonthHourWeHaveStr = String.format("%.2f",thisMonthHourWeHave);
+
+        String thisMonthDayUseStr = String.format("%.2f",thisMonthDayUse);
+        String thisMonthDayWeHaveStr = String.format("%.2f",thisMonthDayWeHave);
+
+
+        float monthUsePersent = ((float)thisMonthDayUse/monthDays) * 100;
+        float monthWeHavePersent = ((float)thisMonthDayWeHave/monthDays)*100;
+        String monthUsePersentStr = String.format("%.3f",monthUsePersent);
+        String monthWeHavePersentStr = String.format("%.3f",monthWeHavePersent);
+
+
+/*        ══════════════ 2020.4月 ═ 30天 ═ 720小时 ═ 43200分钟 ═ 2592000秒 ══════════════
+        秒数级别(s):    ║ 已过: 2390158s  ║ 剩余: 201842s   ║
+        分钟级别(m):    ║ 已过: 39835.96m ║ 剩余: 3364.03m  ║
+        小时级别(h):    ║ 已过: 663.93h   ║ 剩余: 56.07h    ║
+        天数级别(d):    ║ 已过: 27.66d    ║ 剩余: 2.34d     ║
+        百分占比(%):    ║ 已过: 92.213%   ║ 剩余: 7.787%    ║
+
+        */
+
+        System.out.println("══════════════ "+year+"."+padding2SizeStr(month)+"月 ═ "+monthDays+"天 ═ "+monthHours+"小时 ═ "+monthMintues+"分钟 ═ "+monthSecond+"秒 ══════════════");
+        System.out.println("秒数级别(s):    ║ 已过: "+padding20BlankStr((thisMonthSecondUse)+"s")+"║ 剩余: "+padding20BlankStr((thisMonthSecondWeHave)+"s")+"║");
+        System.out.println("分钟级别(m):    ║ 已过: "+padding20BlankStr((thisMonthMintuesUseStr)+"m")+"║ 剩余: "+padding20BlankStr((thisMonthMintusWeHaveStr)+"m")+"║");
+        System.out.println("小时级别(h):    ║ 已过: "+padding20BlankStr((thisMonthHourUseStr)+"h")+"║ 剩余: "+padding20BlankStr((thisMonthHourWeHaveStr)+"h")+"║");
+        System.out.println("天数级别(d):    ║ 已过: "+padding20BlankStr((thisMonthDayUseStr)+"d")+"║ 剩余: "+padding20BlankStr((thisMonthDayWeHaveStr)+"d")+"║");
+        System.out.println("百分占比(%):    ║ 已过: "+padding20BlankStr((monthUsePersentStr)+"%")+"║ 剩余: "+padding20BlankStr((monthWeHavePersentStr)+"%")+"║");
+
+        System.out.println();
+
+/*
+        System.out.println("今月"+month+"月 : "+monthDays+"天 : "+monthHours+"小时 : "+monthMintues+"分钟 : "+monthSecond+"秒");
+        System.out.println("今月已使用: "+ thisMonthSecondUse +"秒" +" 剩余 "+ thisMonthSecondWeHave+"秒  ="+
+                thisMonthMintuesUseStr +"分钟" +" 剩余 "+thisMonthMintusWeHaveStr+"分钟  = "   +
+                thisMonthHourUseStr +"小时" +" 剩余 "+thisMonthHourWeHaveStr+"小时  = " +
+                thisMonthDayUseStr +"天" +" 剩余 "+thisMonthDayWeHaveStr+"天 ="+
+                "该月已使用占比:"+monthUsePersentStr+"%" + " 未使用占比:"+monthWeHavePersentStr+"%"
+        );
+
+        */
+
+/*
+══════════════ 2020年4月第5周 ═ 7天 ═ 168小时 ═ 10080分钟 ═604800秒 ══════════════
+        该月份有周数:    ║  共 5 周    ║
+        该周的周索引:    ║  第 5 周    ║
+        周一(星期一):    ║  2020.04.15 ║
+        周天(星期天):    ║  2020.04.22 ║
+        今日(星期X ):    ║  2020.04.18 ║ 该周日(星期X)该月出现第X次
+*/
+
+//        System.out.println("一个月的第一个星期从第一个星期一开始!");
+        String tip1 = "一个月的第一个星期从第一个星期一开始!";
+String blankStr = "      ";
+        System.out.println("══════════════ "+year+"年"+month+"月共"+week+"周第"+weekNum1+"周 ═ 7天 ═ 168小时 ═ 10080分钟 ═604800秒 ══════════════" + tip1);
+        System.out.println("该月份有周数:   ║ 共 "+(week+"")    +" 周           "+blankStr+"║");
+        System.out.println("周一(星期一):   ║ "+padding20BlankStr(calculXinqiYi1())+blankStr+"║");
+        System.out.println("周天(星期天):   ║ "+padding20BlankStr(calculXinqiYi7())+blankStr+"║");
+        System.out.println("今日("+xinqiStr+"):   ║ "+padding20BlankStr(padding2SizeStr(year)+"-"+padding2SizeStr(month)+"-"+padding2SizeStr(day))+ blankStr+"║");
+        System.out.println("月过周"+calculXinQi2Chinese(xinqi)+"次数:   ║ 第 "+(weekNum1+"")+" 次           "+blankStr+"║");
+//        System.out.println();
+
+//        System.out.println("一个月的第一个星期从第一个星期一开始!");
+        printWeeks();
+        System.out.println();
+/*
+
+        System.out.println("今周 "+month+"月第"+week+"周"  + "  该月总共有"+week+"周" +"   1周 = 7天 = "+(24*7)+" 小时 =" + (24*7*60)+"分钟 = " + (24*7*60*60) +"秒"   );
+        System.out.println("今日 "+month+"月"+day+"日 "+xinqiStr + " 该月第 "+weekNum1+"个"+xinqiStr  +"  1天 = "+(24*1)+" 小时 =" + (24*60)+"分钟 = " + (24*60*60) +"秒");
+
+*/
+
+
+
+//        String   todayMinutes_SecondPercentStr =  String.format("%2f.",todayMinutes_SecondPercent);
+
+
+        long daySecondWehave = 86400 - todaySecondsUse;
+        float dayMintusWehave = ((float)daySecondWehave/60) ;
+        String dayMintusWehaveStr = String.format("%.2f",dayMintusWehave);
+
+        float todaySecondsUsePercent = ((float)todaySecondsUse/86400) * 100;
+        float monthWeHavePersentPercent = ((float)daySecondWehave/86400)*100;
+        String todaySecondsUsePercentStr = String.format("%.3f",todaySecondsUsePercent);
+        String monthWeHavePersentPercentStr = String.format("%.3f",monthWeHavePersentPercent);
+
+        float dayHourWehave = ((float)dayMintusWehave/60) ;
+        String dayHourWehaveStr = String.format("%.3f",dayHourWehave);
+/*
+
+══════════════ 2020.04.28日 ═ 1天 ═ 24小时 ═ 1440分钟 ═ 86400秒 ══════════════
+        今日时刻(t):    ║ 时刻: 16:19:40.967 ║                ║
+        秒数级别(s):    ║ 已过: 57358s       ║ 剩余: 29042s   ║
+        分钟级别(m):    ║ 已过: 955.96m      ║ 剩余: 484.03m  ║
+        百分占比(%):    ║ 已过: 66.387%      ║ 剩余: 33.613%  ║
+
+
+*/
+
+
+        System.out.println("══════════════ "+year+"-"+padding2SizeStr(month)+"-"+padding2SizeStr(day)+""+" ═ "+xinqiStr+" ═ 1天 ═ 24小时 ═ 1440分钟 ═ 86400秒 ══════════════");
+        System.out.println("今日时刻(t):    ║ 时刻: "+padding20BlankStr(padding2SizeStr(hourofday)+":"+padding2SizeStr(mintus)+":"+ padding2SizeStr(second)+"."+padding3SizeStr(millsecond)) +"║ 剩余: "+padding20BlankStr((dayHourWehaveStr+"h"))+"║");
+        System.out.println("秒数级别(s):    ║ 已过: "+padding20BlankStr((todaySecondsUse)+"s")+"║ 剩余: "+padding20BlankStr((daySecondWehave)+"s")+"║");
+        System.out.println("分钟级别(m):    ║ 已过: "+padding20BlankStr((todayMinutes)+"m")+"║ 剩余: "+padding20BlankStr((dayMintusWehaveStr)+"m")+"║");
+        System.out.println("百分占比(%):    ║ 已过: "+padding20BlankStr((todaySecondsUsePercentStr)+"%")+"║ 剩余: "+padding20BlankStr((monthWeHavePersentPercentStr)+"%")+"║");
+
+
+        System.out.println();
+
+
+/*        System.out.println("今时: "+padding2SizeStr(hourofday)+":"+padding2SizeStr(mintus)+":"+
+                padding2SizeStr(second)+"."+padding3SizeStr(millsecond) +
+                " 已过秒数="+ todaySecondsUse+"s" +
+                        " 已过分钟数="+ todayMinutes+"."+padding2SizeStr(todayMinutes_SecondPercent)+"m  " +
+                        todayMinutes+"分"+second_minutes+"秒" +" 剩余秒数:"+daySecondWehave+"秒"
+                        + "  剩余分钟数: "+ dayMintusWehaveStr+" 分 " +
+                " 今日已使用占比:" + todaySecondsUsePercentStr + "%" + "  未使用占比:"+monthWeHavePersentPercentStr+ "%");
+
+        */
+        // 显示今天的日期
+
     }
 
 
+    public static void printWeeks() {
+        SimpleDateFormat format = new SimpleDateFormat("yyyy.MM.dd");
+        Calendar calendar = Calendar.getInstance();
+
+        int CurMonth_1  = calendar.get(Calendar.MONTH) + 1;
+
+//        calendar.set(calendar.DAY_OF_WEEK, calendar.MONDAY);
+        calendar.set(Calendar.DATE, 1);
+        int month = calendar.get(Calendar.MONTH);
+        int count = 0;
+        while (calendar.get(Calendar.MONTH) == month) {
+            if (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.MONDAY) {
+                StringBuilder builder = new StringBuilder();
+                builder.append(padding2SizeStr(CurMonth_1)+"月");
+                builder.append("week");
+                builder.append(++count);
+                builder.append("   :   ║ ");
+//                builder.append(" (");
+                builder.append(format.format(calendar.getTime()));
+                builder.append(" - ");
+                calendar.add(Calendar.DATE, 6);
+                builder.append(format.format(calendar.getTime()));
+                builder.append(" ║");
+                System.out.println(builder.toString());
+            }
+            calendar.add(Calendar.DATE, 1);
+        }
+    }
 
 
+    static String calculXinqiYi1(){
+        Calendar xinqi1 = Calendar.getInstance();  //  现在的日期
+        xinqi1.set(xinqi1.DAY_OF_WEEK, xinqi1.MONDAY);
+        int year =  xinqi1.get(Calendar.YEAR);
+        int month =  xinqi1.get(Calendar.MONTH) + 1;
+       int day =  xinqi1.get(Calendar.DAY_OF_MONTH);
 
+        String dateStr = year+"-"+padding2SizeStr(month)+"-"+padding2SizeStr(day);
+//        System.out.println("周一:" + dateStr);
+        return dateStr;
+    }
+
+    static String calculXinqiYi7(){
+        Calendar xinqi7 = Calendar.getInstance();  //  现在的日期
+        xinqi7.set(xinqi7.DAY_OF_WEEK, xinqi7.MONDAY);
+        xinqi7.set(Calendar.DATE, xinqi7.get(xinqi7.DATE) + 6);
+
+        int year =  xinqi7.get(Calendar.YEAR);
+        int month =  xinqi7.get(Calendar.MONTH) + 1;
+        int day =  xinqi7.get(Calendar.DAY_OF_MONTH);
+        String dateStr = year+"-"+padding2SizeStr(month)+"-"+padding2SizeStr(day);
+//        System.out.println("周天:" + dateStr);
+        return dateStr;
+    }
+
+
+    static String   calculXinQi2Chinese(int xiniq){
+        String xinqiValue = "";
+        switch(xiniq){
+            case 1:
+                xinqiValue = "一";
+                break;
+            case 2:
+                xinqiValue = "二";
+                break;
+            case 3:
+                xinqiValue = "三";
+                break;
+            case 4:
+                xinqiValue = "四";
+                break;
+            case 5:
+                xinqiValue = "五";
+                break;
+            case 6:
+                xinqiValue = "六";
+                break;
+            case 7:
+                xinqiValue = "天";
+                break;
+            default:
+                xinqiValue = "一";  // 默认周一
+        }
+
+        return xinqiValue;
+
+    }
+
+  static String   calculXinQi(int xiniq){
+        String xinqiValue = "";
+//      System.out.println(" xiniq = "+ xiniq);
+        switch(xiniq){
+            case 1:
+                xinqiValue = "星期一";
+                break;
+            case 2:
+                xinqiValue = "星期二";
+                break;
+            case 3:
+                xinqiValue = "星期三";
+                break;
+            case 4:
+                xinqiValue = "星期四";
+                break;
+            case 5:
+                xinqiValue = "星期五";
+                break;
+            case 6:
+                xinqiValue = "星期六";
+                break;
+            case 7:
+                xinqiValue = "星期天";
+                break;
+            default:
+                xinqiValue = "星期一";  // 默认周一
+        }
+
+        return xinqiValue;
+    }
 
     static int calculInputTypeIndex(String inputParams){
         if(inputParams == null){
@@ -421,6 +873,41 @@ public class H1_TimeTool {
 
     }
 
+
+
+    static  String padding3SizeStr(int value){
+        String valueStr =  (value+"").trim();
+
+        if(valueStr.length() == 1){
+
+            valueStr = "00"+  valueStr;
+        }else if(valueStr.length() == 2){
+
+            valueStr = "0"+  valueStr;
+        }
+
+        return valueStr;
+
+    }
+
+    static  String padding20BlankStr(String value){
+        String valueStr =  (value+"").trim();
+        return getPaddingIntString(valueStr,18," ",false) ;
+    }
+
+
+
+  static  String padding2SizeStr(int value){
+        String valueStr =  (value+"").trim();
+
+        if(valueStr.length() == 1){
+
+            valueStr = "0"+  valueStr;
+        }
+
+        return valueStr;
+
+    }
 
 
     public static void main(String[] args) {
@@ -864,7 +1351,9 @@ static long Day_2_Year_365 = 365;    //365天是一年
             int curMonth =  curentDate.get(Calendar.MONTH) + 1;
             boolean direct = directup;
 
-            System.out.println("month_length = "+ month_length +" 转为"+ year2Month +"年 "+ monthCount+" 个月");
+            if(month_length != 0)
+            System.out.println(" month_length = "+ month_length +" 转为"+ year2Month +"年 "+ monthCount+" 个月");
+
             // 月份计算出的总的天数
           int monthDays =   calculMonthday(curYear,curMonth,monthCount,direct);
 
@@ -1045,6 +1534,34 @@ static long Day_2_Year_365 = 365;    //365天是一年
         }
 
         //     //Y-年   M-月  W-星期  D-天  H-小时 m-分钟 s-秒
+        // 输入格式5  只输入一个带有正负号 开头的时间长度     ztime_H1.bat  -8191s     转为  xx年xx月xx日xx小时xx分钟xx秒
+        // ztime_H1.bat  -1y5820m8191s
+        boolean checkType5(String param){
+            boolean flag = false;
+
+            // 1. 以  时间 参数为结尾
+            boolean  endflag =    param.endsWith("Y") || param.endsWith("y") ||
+                    param.endsWith("M") || param.endsWith("m") ||
+                    param.endsWith("D") || param.endsWith("d") ||
+                    param.endsWith("H") || param.endsWith("h") ||
+                    param.endsWith("W") || param.endsWith("w") ||
+                    param.endsWith("S") || param.endsWith("s");
+
+            boolean isMathBegin = param.trim().startsWith("+") || param.trim().startsWith("-");
+            //2. 去除时间参数后 剩下的 是一个数数字字符串
+            String numStr =  clearTimeChar(param);
+            numStr = numStr.replace("+","");
+            numStr = numStr.replace("-","");
+            boolean isOnlyNum = isNumeric(numStr);  //
+
+            //  1.以 字母为结尾    2.去除时间参数后  +- 剩下的 是一个数数字字符串  3. 以+- 开头
+            flag = endflag && isOnlyNum && isMathBegin ;
+
+            return flag;
+        }
+
+
+        //     //Y-年   M-月  W-星期  D-天  H-小时 m-分钟 s-秒
         // 输入格式4  只输入一个时间的长度        ztime_H1.bat  8191s     转为  xx年xx月xx日xx小时xx分钟xx秒
         boolean checkType4(String param){
             boolean flag = false;
@@ -1062,7 +1579,7 @@ static long Day_2_Year_365 = 365;    //365天是一年
             boolean isOnlyNum = isNumeric(numStr);  //
 
             //  1.以 字母为结尾    2.去除时间参数后 剩下的 是一个数数字字符串
-            flag = endflag && isOnlyNum;
+            flag = endflag && isOnlyNum ;
 
             return flag;
         }
@@ -1127,7 +1644,7 @@ static long Day_2_Year_365 = 365;    //365天是一年
                     System.out.println(zTimeLength);
                     System.out.println(" 时间长度 毫秒数:"+secondDistance +" 秒数:"+(secondDistance/1000));
 
-                    System.out.println("计算出的时间点: \n"+calculCalendar.get(Calendar.YEAR)+"年"+
+                    System.out.println("\n 计算出的时间点: \n"+calculCalendar.get(Calendar.YEAR)+"年"+
                             (calculCalendar.get(Calendar.MONTH) ==0 ? 12:calculCalendar.get(Calendar.MONTH))+"月"+
                             calculCalendar.get(Calendar.DAY_OF_MONTH)+"日"+
                             calculCalendar.get(Calendar.HOUR_OF_DAY)+"时"+
@@ -1251,6 +1768,46 @@ static long Day_2_Year_365 = 365;    //365天是一年
 
                     break;
 
+                case 5:   //  ztime   -4728h3131y
+                    initFlag = false;
+                    String params5 = inputParamList.get(0);
+                    boolean direct  = "+".equals(params5.substring(0,1));
+                    params5 = params5.replace("+","");
+                    params5 = params5.replace("-","");
+                    ZTimeLengthStamp  zTimeLength5 = getZtimeLength(params5,direct);
+
+                    // 从 timeLengthStr 得到 毫秒的数据  全部转为 毫秒
+                    long secondDistance5 = zTimeLength5.calculAllMillSecond(null);
+                    Calendar now5 = Calendar.getInstance();
+
+
+                    long calculDate5 = direct?now5.getTimeInMillis() + secondDistance5:now5.getTimeInMillis() - secondDistance5;
+                    Calendar mA_CalculCalendar = Calendar.getInstance();
+                    mA_CalculCalendar.setTimeInMillis(calculDate5);
+
+                    System.out.println(" 起始时间(now) : "+showCalendar(now5));
+                    System.out.println(" 时间长度字符  : "+params5);
+                    System.out.println(" 时间长度 毫秒数:"+secondDistance5 +" 秒数:"+(secondDistance5/1000));
+
+
+                    System.out.println("\n 计算出的时间点: \n"+mA_CalculCalendar.get(Calendar.YEAR)+"年"+
+                            (mA_CalculCalendar.get(Calendar.MONTH) ==0 ? 12:mA_CalculCalendar.get(Calendar.MONTH))+"月"+
+                            mA_CalculCalendar.get(Calendar.DAY_OF_MONTH)+"日"+
+                            mA_CalculCalendar.get(Calendar.HOUR_OF_DAY)+"时"+
+                            mA_CalculCalendar.get(Calendar.MINUTE)+"分"+
+                            mA_CalculCalendar.get(Calendar.SECOND)+"秒" );
+
+                    System.out.println("\n"
+                            +mA_CalculCalendar.get(Calendar.YEAR)+"-"+
+                            padding2SizeStr((mA_CalculCalendar.get(Calendar.MONTH) ==0 ? 12:mA_CalculCalendar.get(Calendar.MONTH)))+"-"+
+                            padding2SizeStr(mA_CalculCalendar.get(Calendar.DAY_OF_MONTH))+"_"+
+                            padding2SizeStr(mA_CalculCalendar.get(Calendar.HOUR_OF_DAY))+":"+
+                            padding2SizeStr(mA_CalculCalendar.get(Calendar.MINUTE))+":"+
+                            padding2SizeStr(mA_CalculCalendar.get(Calendar.SECOND))+"."+
+                            padding3SizeStr(mA_CalculCalendar.get(Calendar.MILLISECOND)) );
+
+
+                    break;
                     default:
                         initFlag = false;
             }
@@ -1284,33 +1841,6 @@ String showCalendar(Calendar calendar){
 }
 
 
-        String padding3SizeStr(int value){
-            String valueStr =  (value+"").trim();
-
-            if(valueStr.length() == 1){
-
-                valueStr = "00"+  valueStr;
-            }else if(valueStr.length() == 2){
-
-                valueStr = "0"+  valueStr;
-            }
-
-            return valueStr;
-
-        }
-
-
-String padding2SizeStr(int value){
-        String valueStr =  (value+"").trim();
-
-        if(valueStr.length() == 1){
-
-            valueStr = "0"+  valueStr;
-        }
-
-        return valueStr;
-
-}
         //  false:  当前须发解析参数      true:当前能正确解析参数
     boolean     checkInputParamListAndGetType(ArrayList<String> inputParamList){
         boolean flag = false;
@@ -1330,7 +1860,10 @@ String padding2SizeStr(int value){
             }else if(checkType4(onlyOneParam)){
                 inputType = 4;
                 flag = true;
-            }else{    // 其余的情况  输入类型为 0 标识无法识别
+            }else if(checkType5(onlyOneParam)){
+                inputType = 5;
+                flag = true;
+            }else {    // 其余的情况  输入类型为 0 标识无法识别
                 inputType = 0;
                 flag = false;
             }
