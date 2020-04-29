@@ -411,7 +411,7 @@ public class H1_TimeTool {
         System.out.println("额外提示信息:");
         Calendar now = Calendar.getInstance();
 
-        now.set(now.DAY_OF_WEEK, now.MONDAY);
+//        now.set(now.DAY_OF_WEEK, now.MONDAY);
 
 
         int year  = now.get(Calendar.YEAR);
@@ -422,7 +422,7 @@ public class H1_TimeTool {
         int second =  now.get(Calendar.SECOND);
         int millsecond =  now.get(Calendar.MILLISECOND);
         int week =  now.get(Calendar.WEEK_OF_MONTH);
-        int xinqi =  now.get(Calendar.DAY_OF_WEEK);  // 1是星知期日道，7是星期版六。
+        int xinqi =  now.get(Calendar.DAY_OF_WEEK) - 1 ;  //
         int weekNum =  now.get(Calendar.WEEK_OF_YEAR);
         int weekNum1 =  now.get(Calendar.DAY_OF_WEEK_IN_MONTH);
         int dayofYear =  now.get(Calendar.DAY_OF_YEAR);
@@ -435,7 +435,9 @@ public class H1_TimeTool {
 
         // 计算当前今日过去的 秒数  分钟数
         Calendar beginTody = Calendar.getInstance();
-        beginTody.set(beginTody.DAY_OF_WEEK, beginTody.MONDAY);
+
+//        beginTody.set(beginTody.DAY_OF_WEEK, beginTody.MONDAY);
+
         beginTody.set(Calendar.HOUR_OF_DAY,0);
         beginTody.set(Calendar.HOUR,0);  //  时分秒 毫秒 都设置0
         beginTody.set(Calendar.MINUTE,0);  //  时分秒 毫秒 都设置0
@@ -494,38 +496,6 @@ public class H1_TimeTool {
                 */
 
 
-/*
-
-══════════════ 2020润年 ═ 366天 ═ 8784小时 ═ 527040分钟 ═ 31622400秒 ══════════════
-        秒数级别(s):    ║ 已过: 10281600s ║ 剩余: 21340800s ║
-        分钟级别(m):    ║ 已过: 171360m   ║ 剩余: 355680m   ║
-        小时级别(h):    ║ 已过: 2856h     ║ 剩余: 5928h     ║
-        天数级别(d):    ║ 已过: 119d      ║ 剩余: 247d      ║
-        百分占比(%):    ║ 已过: 92.213%   ║ 剩余: 67.486%   ║
-
-
-══════════════ 2020.4月 ═ 30天 ═ 720小时 ═ 43200分钟 ═ 2592000秒 ══════════════
-        秒数级别(s):    ║ 已过: 2390158s  ║ 剩余: 201842s   ║
-        分钟级别(m):    ║ 已过: 39835.96m ║ 剩余: 3364.03m  ║
-        小时级别(h):    ║ 已过: 663.93h   ║ 剩余: 56.07h    ║
-        天数级别(d):    ║ 已过: 27.66d    ║ 剩余: 2.34d     ║
-        百分占比(%):    ║ 已过: 92.213%   ║ 剩余: 7.787%    ║
-
-
-══════════════ 2020年4月第5周 ═ 7天 ═ 168小时 ═ 10080分钟 ═604800秒 ══════════════
-        该月份有周数:    ║  共 5 周    ║
-        该周的周索引:    ║  第 5 周    ║
-        周一(星期一):    ║  2020.04.15 ║
-        周天(星期天):    ║  2020.04.22 ║
-        今日(星期X ):    ║  2020.04.18 ║ 该周日(星期X)该月出现第X次
-
-══════════════ 2020.04.28日 ═ 1天 ═ 24小时 ═ 1440分钟 ═ 86400秒 ══════════════
-        今日时刻(t):    ║ 时刻: 16:19:40.967 ║                ║
-        秒数级别(s):    ║ 已过: 57358s       ║ 剩余: 29042s   ║
-        分钟级别(m):    ║ 已过: 955.96m      ║ 剩余: 484.03m  ║
-        百分占比(%):    ║ 已过: 66.387%      ║ 剩余: 33.613%  ║
-        */
-
 int itemLength =  24;  //  一个框的长度
 
 
@@ -567,7 +537,7 @@ int itemLength =  24;  //  一个框的长度
         // 这个月  已过了 多少百分比
         Calendar beginMonthCalendar = Calendar.getInstance();
 
-        beginMonthCalendar.set(beginMonthCalendar.DAY_OF_WEEK, beginMonthCalendar.MONDAY);
+//        beginMonthCalendar.set(beginMonthCalendar.DAY_OF_WEEK, beginMonthCalendar.MONDAY);
 
         beginMonthCalendar.set(Calendar.DAY_OF_MONTH,1); // 设置成月初
         beginMonthCalendar.set(Calendar.HOUR_OF_DAY,0);
@@ -646,22 +616,16 @@ int itemLength =  24;  //  一个框的长度
 
         */
 
-/*
-══════════════ 2020年4月第5周 ═ 7天 ═ 168小时 ═ 10080分钟 ═604800秒 ══════════════
-        该月份有周数:    ║  共 5 周    ║
-        该周的周索引:    ║  第 5 周    ║
-        周一(星期一):    ║  2020.04.15 ║
-        周天(星期天):    ║  2020.04.22 ║
-        今日(星期X ):    ║  2020.04.18 ║ 该周日(星期X)该月出现第X次
-*/
 
 //        System.out.println("一个月的第一个星期从第一个星期一开始!");
         String tip1 = "一个月的第一个星期从第一个星期一开始!";
 String blankStr = "      ";
         System.out.println("══════════════ "+year+"年"+month+"月共"+week+"周第"+weekNum1+"周 ═ 7天 ═ 168小时 ═ 10080分钟 ═604800秒 ══════════════" + tip1);
         System.out.println("该月份有周数:   ║ 共 "+(week+"")    +" 周           "+blankStr+"║");
-        System.out.println("周一(星期一):   ║ "+padding20BlankStr(calculXinqiYi1())+blankStr+"║");
-        System.out.println("周天(星期天):   ║ "+padding20BlankStr(calculXinqiYi7())+blankStr+"║");
+        System.out.println(calculXinQi2Chinese(month)+"月一日星期:   ║ "+padding20BlankStr(calculXinqiYiForMonthBegin())+"   ║");
+
+        System.out.println("前个(星期一):   ║ "+padding20BlankStr(calculXinqiYi1())+blankStr+"║");
+        System.out.println("后个(星期天):   ║ "+padding20BlankStr(calculXinqiYi7())+blankStr+"║");
         System.out.println("今日("+xinqiStr+"):   ║ "+padding20BlankStr(padding2SizeStr(year)+"-"+padding2SizeStr(month)+"-"+padding2SizeStr(day))+ blankStr+"║");
         System.out.println("月过周"+calculXinQi2Chinese(xinqi)+"次数:   ║ 第 "+(weekNum1+"")+" 次           "+blankStr+"║");
 //        System.out.println();
@@ -692,16 +656,7 @@ String blankStr = "      ";
 
         float dayHourWehave = ((float)dayMintusWehave/60) ;
         String dayHourWehaveStr = String.format("%.3f",dayHourWehave);
-/*
 
-══════════════ 2020.04.28日 ═ 1天 ═ 24小时 ═ 1440分钟 ═ 86400秒 ══════════════
-        今日时刻(t):    ║ 时刻: 16:19:40.967 ║                ║
-        秒数级别(s):    ║ 已过: 57358s       ║ 剩余: 29042s   ║
-        分钟级别(m):    ║ 已过: 955.96m      ║ 剩余: 484.03m  ║
-        百分占比(%):    ║ 已过: 66.387%      ║ 剩余: 33.613%  ║
-
-
-*/
 
 
         System.out.println("══════════════ "+year+"-"+padding2SizeStr(month)+"-"+padding2SizeStr(day)+""+" ═ "+xinqiStr+" ═ 1天 ═ 24小时 ═ 1440分钟 ═ 86400秒 ══════════════");
@@ -713,16 +668,6 @@ String blankStr = "      ";
 
         System.out.println();
 
-
-/*        System.out.println("今时: "+padding2SizeStr(hourofday)+":"+padding2SizeStr(mintus)+":"+
-                padding2SizeStr(second)+"."+padding3SizeStr(millsecond) +
-                " 已过秒数="+ todaySecondsUse+"s" +
-                        " 已过分钟数="+ todayMinutes+"."+padding2SizeStr(todayMinutes_SecondPercent)+"m  " +
-                        todayMinutes+"分"+second_minutes+"秒" +" 剩余秒数:"+daySecondWehave+"秒"
-                        + "  剩余分钟数: "+ dayMintusWehaveStr+" 分 " +
-                " 今日已使用占比:" + todaySecondsUsePercentStr + "%" + "  未使用占比:"+monthWeHavePersentPercentStr+ "%");
-
-        */
         // 显示今天的日期
 
     }
@@ -757,6 +702,30 @@ String blankStr = "      ";
         }
     }
 
+    static String  calculXinqiYiForMonthBegin(){
+        //  计算月初 是星期几
+
+        // 这个月  已过了 多少百分比
+        Calendar beginMonthCalendar = Calendar.getInstance();
+
+//        beginMonthCalendar.set(beginMonthCalendar.DAY_OF_WEEK, beginMonthCalendar.MONDAY);
+
+        beginMonthCalendar.set(Calendar.DAY_OF_MONTH,1); // 设置成月初
+        beginMonthCalendar.set(Calendar.HOUR_OF_DAY,0);
+        beginMonthCalendar.set(Calendar.HOUR,0);  //  时分秒 毫秒 都设置0
+        beginMonthCalendar.set(Calendar.MINUTE,0);  //  时分秒 毫秒 都设置0
+        beginMonthCalendar.set(Calendar.SECOND,0);  //  时分秒 毫秒 都设置0
+        beginMonthCalendar.set(Calendar.MILLISECOND,0);  //  时分秒 毫秒 都设置0
+        beginMonthCalendar.set(Calendar.HOUR_OF_DAY,0);
+
+        int day = beginMonthCalendar.get(Calendar.DAY_OF_WEEK)  -1 ;
+
+        String monthBegin = calculXinQi(day);
+
+        return monthBegin;
+
+    }
+
 
     static String calculXinqiYi1(){
         Calendar xinqi1 = Calendar.getInstance();  //  现在的日期
@@ -786,6 +755,11 @@ String blankStr = "      ";
 
     static String   calculXinQi2Chinese(int xiniq){
         String xinqiValue = "";
+//        System.out.println(" Bxiniq = "+ xiniq);
+        // 0 ---> 周一
+        // 1 ---> 周二
+        // 2---> 周三
+        //
         switch(xiniq){
             case 1:
                 xinqiValue = "一";
@@ -818,7 +792,7 @@ String blankStr = "      ";
 
   static String   calculXinQi(int xiniq){
         String xinqiValue = "";
-//      System.out.println(" xiniq = "+ xiniq);
+//      System.out.println(" Axiniq = "+ xiniq);
         switch(xiniq){
             case 1:
                 xinqiValue = "星期一";
@@ -914,6 +888,7 @@ String blankStr = "      ";
 
         initSystemInfo();
 
+        Locale.setDefault(Locale.CHINESE);
         if (args != null) {
             for (int i = 0; i < args.length; i++) {
                 System.out.println("args[" + i + "] = " + args[i]);
