@@ -620,8 +620,8 @@ int itemLength =  24;  //  一个框的长度
 //        System.out.println("一个月的第一个星期从第一个星期一开始!");
         String tip1 = "一个月的第一个星期从第一个星期一开始!";
 String blankStr = "      ";
-        System.out.println("══════════════ "+year+"年"+month+"月共"+week+"周第"+weekNum1+"周 ═ 7天 ═ 168小时 ═ 10080分钟 ═604800秒 ══════════════" + tip1);
-        System.out.println("该月份有周数:   ║ 共 "+(week+"")    +" 周           "+blankStr+"║");
+        System.out.println("══════════════ "+year+"年"+month+"月共4"+"周第"+weekNum1+"周 ═ 7天 ═ 168小时 ═ 10080分钟 ═604800秒 ══════════════" + tip1);
+        System.out.println("该日月份周数:   ║ 第 "+((week-1)+"")    +" 周           "+blankStr+"║");
         System.out.println(calculXinQi2Chinese(month)+"月一日星期:   ║ "+padding20BlankStr(calculXinqiYiForMonthBegin())+"   ║");
 
         System.out.println("前个(星期一):   ║ "+padding20BlankStr(calculXinqiYi1())+blankStr+"║");
