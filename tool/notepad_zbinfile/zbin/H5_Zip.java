@@ -75,6 +75,8 @@ public class H5_Zip {
         zipFileTypeList.add(".zip");
         zipFileTypeList.add(".7z");
         zipFileTypeList.add(".rar");
+        zipFileTypeList.add(".gz");
+        zipFileTypeList.add(".tar");
     }
 
 
@@ -579,8 +581,8 @@ String fixAbsPath = rarFile.getAbsolutePath().replace(UNZIP_PRE,"");
         }
     }
 
-    static void JieYa7Z_Windows(ArrayList<File> z7List) {
-        String z7_JiaYa_EndFlag="_7z";  // 解压的文件夹 是以 _z7 为标识
+    static void JieYa7Z_Windows(ArrayList<File> z7List,String type) {
+        String z7_JiaYa_EndFlag="_"+type.replace(".","");  // 解压的文件夹 是以 _z7 为标识
 
         // 保存那些  无法依据  输入的 密码 还是无法保存的那些 z7 文件
         Set<File> existUnknowz7List = new HashSet<>();
@@ -906,9 +908,9 @@ String fixAbsPath = rarFile.getAbsolutePath().replace(UNZIP_PRE,"");
             if (".zip".equals(mFileType)) {
                 ArrayList<File> zipList = arrFileMap.get(mFileType);
                 JieYaZip_Windows(zipList);
-            } else if (".7z".equals(mFileType)) {
+            } else if (".7z".equals(mFileType) || ".gz".equals(mFileType) || ".tar".equals(mFileType)) {
                 ArrayList<File> z7_List = arrFileMap.get(mFileType);
-              JieYa7Z_Windows(z7_List);
+              JieYa7Z_Windows(z7_List,mFileType);
             } else if (".rar".equals(mFileType)) {
                 ArrayList<File> rarList = arrFileMap.get(mFileType);
 //                System.out.println("RAR 文件个数: "+ rarList.size());
@@ -2542,5 +2544,13 @@ https://www.cnblogs.com/fetty/p/4769279.html
 
 C:\Users\zhuzj5\Desktop\zbin\H5_7z.exe  -y -p  x "D:\A\failed\A1\ZFAILED_UNZIP_Wifi issues_20191127.7z"  -o"./Wifi issues_20191127_7z"
 
+
+C:\Users\zhuzj5\Desktop\zbin\H5_7z.exe  -y -p  x "D:\Version\LIMA\1.tar.gz"  -o"./1"
+
+"D:\Version\LIMA\1.tar_gz\test\ZFAILED_U NZIP_sparse-formats.tar"  -o"./sparse-formats_tar"
+
+C:\Users\zhuzj5\Desktop\zbin\H5_WinRAR.exe  -y x "D:\Version\LIMA\1.tar_gz\test\sparse-formats.t ar"  ".\sparse-formats_tar\"
+
+C:\Users\zhuzj5\Desktop\zbin\H5_7z.exe  -y -p""  x  "D:\Version\LIMA\1.tar_gz\test\sparse-formats.tar"  -o"./sparse-formats_tar"
 
  */

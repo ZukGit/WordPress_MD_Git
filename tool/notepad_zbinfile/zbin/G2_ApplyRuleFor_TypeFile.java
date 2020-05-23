@@ -1,3 +1,5 @@
+import net.jimmc.jshortcut.JShellLink;
+
 import java.io.*;
 
 import java.nio.channels.FileChannel;
@@ -133,9 +135,167 @@ public class G2_ApplyRuleFor_TypeFile {
 
         realTypeRuleList.add( new CalCulMediaHtml_Rule_12());
         realTypeRuleList.add( new CalMP4_DIR_HTML_Rule_13());
+        realTypeRuleList.add( new CreateIconFile_KuaiJieFangShi_Rule_14());
+
+    }
 
 
 
+    // operation_type  操作类型     1--读取文件内容字符串 进行修改      2--对文件对文件内容(字节)--进行修改    3.对全体子文件进行的随性的操作 属性进行修改(文件名称)
+    //     // 4.对当前子文件(包括子目录 子文件 --不包含孙目录 孙文件) 5. 从shell 中获取到的路径 去对某一个文件进行操作
+
+
+
+
+    // 创建快捷方式
+    static boolean makeShellLink(File targetFile,File iconFile){
+        boolean isOK = false;
+        String targetFilePath = targetFile.getAbsolutePath();
+        JShellLink link = new JShellLink();
+        if(!iconFile.exists()){
+/*            try {
+                iconFile.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }*/
+        }
+        String parentAbsPath = iconFile.getParentFile().getAbsolutePath();
+        link.setFolder(parentAbsPath);
+        String iconName = iconFile.getName();
+        link.setName(iconName);
+        link.setPath(targetFilePath);
+        link.save();
+        if(isKuaiJieIcon(iconFile)){
+            isOK = true;
+        }
+
+        return isOK;
+
+
+    }
+
+    static String getTargetFilePath(File iconFile){
+        String targetFilePath = "";
+        if(!isKuaiJieIcon(iconFile)){
+            return null;  // 不是 快捷方式 那么 返回 "" 或者 null
+        }
+        String parentAbsPath = iconFile.getParentFile().getAbsolutePath();
+        String fileName = iconFile.getName();
+        JShellLink linkFile = new JShellLink(parentAbsPath,fileName);
+        linkFile.load();
+        targetFilePath = linkFile.getPath();
+        return targetFilePath;
+    }
+
+    static boolean isKuaiJieIcon(File kuaijieFile){
+        String absPath = kuaijieFile.getAbsolutePath();
+        String parentAbsPath = kuaijieFile.getParentFile().getAbsolutePath();
+        String fileName = kuaijieFile.getName();
+        JShellLink linkFile = new JShellLink(parentAbsPath,fileName);
+        linkFile.load();
+        String linkedPath = linkFile.getPath();
+
+        if(absPath.equals(linkedPath)){
+            return  false;
+        }
+        return true;
+    }
+
+    class CreateIconFile_KuaiJieFangShi_Rule_14 extends Basic_Rule{
+
+        ArrayList<String> inputTypeList ;
+        // zrule_apply_G2.bat  *_14  jpg   把当前所有的jpg格式文件生成快捷方式到 jpg_时间戳 文件夹内
+
+
+        CreateIconFile_KuaiJieFangShi_Rule_14() {
+            super("*", 14, 3);
+            inputTypeList = new ArrayList<String>();
+        }
+
+        @Override
+        boolean initParamsWithInputList(ArrayList<String> inputParamList) {
+            for (int i = 0; i <inputParamList.size() ; i++) {
+                String strInput = inputParamList.get(i);
+                if(strInput.equals(firstInputIndexStr)){
+                    continue;
+                }
+                if(!strInput.startsWith(".")){
+                    inputTypeList.add("."+strInput.trim());
+                }else{
+                    inputTypeList.add(strInput.trim());
+                }
+            }
+            return super.initParamsWithInputList(inputParamList);
+        }
+
+
+
+
+        @Override
+        ArrayList<File> applyFileListRule3(ArrayList<File> subFileList, HashMap<String, ArrayList<File>> fileTypeMap) {
+
+            SimpleDateFormat df = new SimpleDateFormat("MMdd_HHmmss");//设置日期格式
+//            SimpleDateFormat df_hms = new SimpleDateFormat("HHmmss");//设置日期格式
+
+            Date curDate =    new Date();
+            String date = df.format(curDate);
+//            String preHMS = df.format(df_hms);
+            for (int i = 0; i < inputTypeList.size(); i++) {
+                String type = inputTypeList.get(i);
+
+                ArrayList<File> targetFileList = fileTypeMap.get(type) ;
+
+                if(targetFileList == null || targetFileList.size() == 0){
+                    System.out.println(" 当前路径 "+curDirPath+" 不存在类型 "+type +"的文件!");
+                }
+
+
+             int fileCount =    targetFileList.size() ;
+                // 创建文件夹  大小
+//                String dirName = preHMS+"_"+type.replace(".","").toUpperCase().trim()+"_"+date;
+                String dirName = date+"_"+type.replace(".","").toUpperCase().trim()+"["+fileCount+"]";
+                // MP4_4232414141
+                File iconDirFile = new File(curDirPath+File.separator+dirName);
+                iconDirFile.mkdirs();
+
+
+                System.out.println("════════"+"文件类型"+type+"创建快捷方式 Begin"+"════════");
+                for (int j = 0; j < targetFileList.size(); j++) {
+                    File   targetTypeFile = targetFileList.get(j);
+                    String targetName = targetTypeFile.getName();
+                    int IconIndex = j + 1;
+                    String targetOrderName = IconIndex+"_"+targetName;
+                   if( tryReName(targetTypeFile,targetOrderName)){
+                       targetTypeFile = new File(targetTypeFile.getParentFile().getAbsolutePath()+File.separator+targetOrderName);
+                   }
+                    
+                    String iconName = IconIndex+"_"+targetName;
+                    File iconFile = new File(iconDirFile.getAbsolutePath()+ File.separator+iconName);
+                    if(makeShellLink(targetTypeFile,iconFile)){
+               
+                        System.out.println("Index["+IconIndex+"]目标文件:"+targetTypeFile.getAbsolutePath()+" 创建快捷方式成功:"+"./"+dirName+File.separator+iconName);
+                    }else{
+                        System.out.println("Index["+IconIndex+"]目标文件:"+targetTypeFile.getAbsolutePath()+" 创建快捷方式失败:"+"./"+dirName+File.separator+iconName);
+                    }
+                }
+                System.out.println("════════"+"文件类型"+type+"创建快捷方式 End"+"════════");
+
+            }
+
+
+            return super.applyFileListRule3(subFileList, fileTypeMap);
+        }
+
+        @Override
+        String simpleDesc() {
+            return  "\n"+Cur_Bat_Name+ " *_14  mp4          ### 源文件被按顺序重命名 1_ 2_ 动态计算当前文件夹中所有子文件中的mp4文件 并在当前目录生成 MP4_20200522_154600 字样的文件夹 \n"+
+                    "\n"+Cur_Bat_Name+ " *_14  .mp4         ### 源文件被按顺序重命名 1_ 2_动态计算当前文件夹中所有子文件中的mp4文件 并在当前目录生成 MP4_20200522_154600 字样的文件夹 \n"+
+                    "\n"+Cur_Bat_Name+ " *_14  .gif         ### 源文件被按顺序重命名 1_ 2_动态计算当前文件夹中所有子文件中的gif文件 并在当前目录生成 GIF_20200522_154600 字样的文件夹 \n"+
+                    "\n"+Cur_Bat_Name+ " *_14  png          ### 源文件被按顺序重命名 1_ 2_ 动态计算当前文件夹中所有子文件中的png文件 并在当前目录生成 PNG_20200522_154600 字样的文件夹 \n"+
+                    "\n"+Cur_Bat_Name+ " *_14  zip  7z      ### 源文件被按顺序重命名 1_ 2_ 动态计算当前文件夹中所有子文件中的 文件夹中的 7z zip文件   并在当前目录生成 7Z_20200522_154600  ZIP_20200522_154600 字样的文件夹 \n"+
+                    "\n"+Cur_Bat_Name+ " *_14  .zip .7z     ### 源文件被按顺序重命名 1_ 2_ 动态计算当前文件夹中所有子文件中的 文件夹中的 7z zip文件   并在当前目录生成 7Z_20200522_154600  ZIP_20200522_154600 字样的文件夹 \n"+
+                    "\n"+Cur_Bat_Name+ " *_14  jpg          ### 源文件被按顺序重命名 1_ 2_ 动态计算当前文件夹中所有子文件中的JPG文件 并在当前目录生成 JPG_20200522_154600 字样的文件夹 \n"
+                    ;}
     }
 
 
@@ -153,13 +313,13 @@ public class G2_ApplyRuleFor_TypeFile {
         // G2_Rule13_mp4_3x5.html
         File mp4_3x5_File ;
 
-//        G2_Rule13_mp4__3d.html
-File mp4_3d_File ;
+        //        G2_Rule13_mp4__3d.html
+        File mp4_3d_File ;
 
-//        G2_Rule13_mp4_2x2.html
-File mp4_2x2_File ;
-//        G2_Rule13_mp4_3x3.html
-File mp4_3x3_File ;
+        //        G2_Rule13_mp4_2x2.html
+        File mp4_2x2_File ;
+        //        G2_Rule13_mp4_3x3.html
+        File mp4_3x3_File ;
 
 
 
@@ -199,7 +359,7 @@ File mp4_3x3_File ;
             }
 
             for (int i = 0; i < inputDirList.size(); i++) {
-               String dirName =  inputDirList.get(i).getName();
+                String dirName =  inputDirList.get(i).getName();
                 newReplaceName = newReplaceName+"_"+dirName;
             }
             while(newReplaceName.endsWith("_")){
@@ -310,15 +470,15 @@ File mp4_3x3_File ;
 //                    person0 = { index:0 , path:"./7001/mp4/",length:22,};
 //                    person0 = { index:0 , path:"./7001\mp4,length:22,};
                     String defineItem = "";
-if(!isMultiDirInput){ // 如果是单独的 文件
-    defineItem = people+" = { index:"+index+" , path:\"./"+dir2TypeDieName+"/\",length:"+length+",};\n";
-}else{  // 如果是两个 量入的文件  那么 path就要加入对应的  当前目录的路径
-    String targetDirName = calculBeginDir(mTypeDirFile.getAbsolutePath());
-    if(!"".equals(targetDirName)){
-        targetDirName = targetDirName +"/";
-    }
-    defineItem = people+" = { index:"+index+" , path:\"./"+targetDirName+dir2TypeDieName+"/\",length:"+length+",};\n";
-}
+                    if(!isMultiDirInput){ // 如果是单独的 文件
+                        defineItem = people+" = { index:"+index+" , path:\"./"+dir2TypeDieName+"/\",length:"+length+",};\n";
+                    }else{  // 如果是两个 量入的文件  那么 path就要加入对应的  当前目录的路径
+                        String targetDirName = calculBeginDir(mTypeDirFile.getAbsolutePath());
+                        if(!"".equals(targetDirName)){
+                            targetDirName = targetDirName +"/";
+                        }
+                        defineItem = people+" = { index:"+index+" , path:\"./"+targetDirName+dir2TypeDieName+"/\",length:"+length+",};\n";
+                    }
                     defineArrWord.append(defineItem);
                     defineAdd.append(people+",");
                     index++;
@@ -363,25 +523,25 @@ if(!isMultiDirInput){ // 如果是单独的 文件
                 //1. 无参数   写入当前的 shell 路径下
                 //2. 一个参数的情况
 
-              writeContentToFile(curHtmlTargetFile,readHtmlContent);
-              System.out.println("输出文件:"+curHtmlTargetFile.getAbsolutePath());
+                writeContentToFile(curHtmlTargetFile,readHtmlContent);
+                System.out.println("输出文件:"+curHtmlTargetFile.getAbsolutePath());
             }
 
             return super.applySubFileListRule4(curFileList, subFileTypeMap, curDirList, curRealFileList);
         }
 
 
-       String calculBeginDir(String mediaPath){
+        String calculBeginDir(String mediaPath){
             String inputDirStr = "";
-           for (int i = 0; i < inputDirList.size(); i++) {
-               File inputDir =  inputDirList.get(i);
-               String inputDirPath = inputDir.getAbsolutePath();
-               if(mediaPath.startsWith(inputDirPath)){
-                   inputDirStr = inputDir.getName();
-                   break;
-               }
+            for (int i = 0; i < inputDirList.size(); i++) {
+                File inputDir =  inputDirList.get(i);
+                String inputDirPath = inputDir.getAbsolutePath();
+                if(mediaPath.startsWith(inputDirPath)){
+                    inputDirStr = inputDir.getName();
+                    break;
+                }
 
-           }
+            }
 
             return inputDirStr;
 
@@ -2566,6 +2726,7 @@ if(!isMultiDirInput){ // 如果是单独的 文件
             this.identify = this.file_type+""+this.rule_index;
             curFilterFileTypeList = new ArrayList<String>();
             curFixedFileList = new ArrayList<File>();
+            firstInputIndexStr="";
         }
 
         String applyStringOperationRule1(String origin){
@@ -2592,7 +2753,7 @@ if(!isMultiDirInput){ // 如果是单独的 文件
             return null;
         }
 
-        boolean initParams4InputParam(String inputParam){ return true ; }
+        boolean initParams4InputParam(String inputParam){ firstInputIndexStr =inputParam ; return true ; }
 
         @Override
         boolean initParamsWithInputList(ArrayList<String> inputParamList) {
@@ -2640,7 +2801,7 @@ if(!isMultiDirInput){ // 如果是单独的 文件
     abstract  class Rule{
         // operation_type  操作类型     1--读取文件内容字符串 进行修改      2--对文件对文件内容(字节)--进行修改    3.对全体子文件进行的随性的操作 属性进行修改(文件名称)
         // 4.对当前子文件(包括子目录 子文件 --不包含孙目录 孙文件)   // 5. 从shell 中获取到的路径 去对某一个文件进行操作
-
+String firstInputIndexStr ;
         int operation_type;
         String file_type;   // * 标识所有的文件类型   以及当前操作类型文件  或者 单独的文件过滤类型
         String identify;
