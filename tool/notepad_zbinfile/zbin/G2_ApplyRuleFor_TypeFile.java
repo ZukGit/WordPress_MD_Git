@@ -146,10 +146,12 @@ public class G2_ApplyRuleFor_TypeFile {
 
 
 
-
+static ArrayList<File> targetFailedFileList_14 = new ArrayList<File>();
+static ArrayList<File> iconFailedFileList_14 = new ArrayList<File>();
     // 创建快捷方式
     static boolean makeShellLink(File targetFile,File iconFile){
         boolean isOK = false;
+		boolean isException = false;
         String targetFilePath = targetFile.getAbsolutePath();
         JShellLink link = new JShellLink();
         if(!iconFile.exists()){
@@ -164,7 +166,22 @@ public class G2_ApplyRuleFor_TypeFile {
         String iconName = iconFile.getName();
         link.setName(iconName);
         link.setPath(targetFilePath);
+		try{
         link.save();
+		} catch (Exception e) {
+			isException = true;
+            e.printStackTrace();
+        }finally{
+			if(isException){
+				
+				// 创建快捷方式失败  那么 可能是  文件名称 是  韩文  什么 的 重新 尝试重新命名!
+				targetFailedFileList_14.add(targetFile);
+				iconFailedFileList_14.add(iconFile);
+				return false;
+			}
+			
+		}
+		
         if(isKuaiJieIcon(iconFile)){
             isOK = true;
         }
@@ -258,12 +275,12 @@ public class G2_ApplyRuleFor_TypeFile {
                 File iconDirFile = new File(curDirPath+File.separator+dirName);
                 iconDirFile.mkdirs();
 
-
+                 int IconIndex = 0;
                 System.out.println("════════"+"文件类型"+type+"创建快捷方式 Begin"+"════════");
                 for (int j = 0; j < targetFileList.size(); j++) {
                     File   targetTypeFile = targetFileList.get(j);
                     String targetName = targetTypeFile.getName();
-                    int IconIndex = j + 1;
+                     IconIndex = IconIndex + 1;
                     String targetOrderName = IconIndex+"_"+targetName;
                    if( tryReName(targetTypeFile,targetOrderName)){
                        targetTypeFile = new File(targetTypeFile.getParentFile().getAbsolutePath()+File.separator+targetOrderName);
@@ -275,16 +292,38 @@ public class G2_ApplyRuleFor_TypeFile {
                
                         System.out.println("Index["+IconIndex+"]目标文件:"+targetTypeFile.getAbsolutePath()+" 创建快捷方式成功:"+"./"+dirName+File.separator+iconName);
                     }else{
+						IconIndex = IconIndex -1;  // false 那么 不自增
+						
                         System.out.println("Index["+IconIndex+"]目标文件:"+targetTypeFile.getAbsolutePath()+" 创建快捷方式失败:"+"./"+dirName+File.separator+iconName);
                     }
                 }
                 System.out.println("════════"+"文件类型"+type+"创建快捷方式 End"+"════════");
 
             }
+			
+			showFailedFile(targetFailedFileList_14,iconFailedFileList_14);
 
 
             return super.applyFileListRule3(subFileList, fileTypeMap);
         }
+		
+		void showFailedFile(ArrayList<File> failedTargetFileList , ArrayList<File>  failedIconFileList){
+			if(failedTargetFileList.size() == 0 || failedIconFileList.size() == 0 ){
+				return;
+			}
+	
+			         for (int j = 0; j < failedTargetFileList.size(); j++) {
+						 File targetFailed = failedTargetFileList.get(j);
+						 File iconFailed = failedIconFileList.get(j);
+			        System.out.println("════════"+"失败文件 "+j+" Begin"+"════════");
+			        System.out.println("失败目标文件:" +targetFailed.getAbsolutePath());			 
+	System.out.println("失败快捷文件:" +iconFailed.getAbsolutePath());	
+		        System.out.println("════════"+"失败文件 "+j+" End"+"════════");			
+					 }
+					 
+			
+		}
+		
 
         @Override
         String simpleDesc() {
