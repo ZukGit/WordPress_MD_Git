@@ -1,19 +1,23 @@
 public class H0_Tip {
-static String OneLine_Pre = "\n════════";
+    static String OneLine_Pre = "\n════════";
     static String OneLine_End = "════════\n";
     public static void main(String[] args) {
         SettingOperationTip();
         PullFileTip();
-      VerboseLogTip();
-      PrintLogTip();
+        VerboseLogTip();
+        PrintLogTip();
 
-      AdbCommandTip();
+        AdbCommandTip();
     }
 
     static void PrintLogTip(){
 
         System.out.println(OneLine_Pre + " 打印Log操作 "+ OneLine_End);
         System.out.println(" adb logcat | grep zukgit " );
+
+        for (int i = 0; i < 1; i++) {
+            continue;
+        }
 
     }
 
@@ -47,9 +51,9 @@ static String OneLine_Pre = "\n════════";
 
     static void VerboseLogTip(){
 
-       System.out.println(OneLine_Pre + " WIFI详情开关描述 "+ OneLine_End);
-       System.out.println("Settings >System > About phone > tap \"Build number\" 4 times >Developer options\n" +
-               "Setting > System > Advanced > Developer options >Enable WiFi Verbose Logging  [toogle open] ");
+        System.out.println(OneLine_Pre + " WIFI详情开关描述 "+ OneLine_End);
+        System.out.println("Settings >System > About phone > tap \"Build number\" 4 times >Developer options\n" +
+                "Setting > System > Advanced > Developer options >Enable WiFi Verbose Logging  [toogle open] ");
 
 
     }
@@ -119,9 +123,16 @@ static String OneLine_Pre = "\n════════";
 
 
     static void AdbCommandTip(){
-        
+
         System.out.println(OneLine_Pre + " Settings.apk 安装 push命令 "+ OneLine_End);
-        System.out.println("adb root && adb remount && adb push .\\Settings.apk /product/priv-app/Settings/  && adb push .\\oat  /product/priv-app/Settings    ##### 连续重启两遍    ");
+        System.out.println("adb root && adb remount && adb shell settings put global wifi_verbose_logging_enabled 1 && adb push .\\Settings.apk /product/priv-app/Settings/  && adb push .\\oat  /product/priv-app/Settings    ##### 连续重启两遍    ");
+
+//        adb root && adb disable-verity && adb reboot
+        System.out.println(OneLine_Pre + " adb disable-verity 提升权限命令 "+ OneLine_End);
+        System.out.println(" adb root && adb disable-verity && adb reboot ");
+        System.out.println(OneLine_Pre + " wifi-service.jar  push命令 "+ OneLine_End);
+        System.out.println("adb root && adb remount && adb shell settings put global wifi_verbose_logging_enabled 1 && adb push .\\wifi-service.jar /system/framework/   ##### 连续重启两遍?    ");
+
 
 
     }
