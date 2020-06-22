@@ -1,5 +1,7 @@
+import com.luciad.imageio.webp.WebPReadParam;
 import net.jimmc.jshortcut.JShellLink;
 
+import java.awt.image.BufferedImage;
 import java.io.*;
 
 import java.nio.channels.FileChannel;
@@ -11,6 +13,9 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.crypto.Cipher;
+import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
+import javax.imageio.stream.FileImageInputStream;
 import java.security.Key;
 import java.security.Security;
 
@@ -27,7 +32,7 @@ public class G2_ApplyRuleFor_TypeFile {
     static String G2_Bat_Name = "zrule_apply_G2";
     static String Cur_Bat_Name = "zrule_apply_G2";
     static String zbinPath = System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin";
-
+    static String G2_File_Path = zbinPath+File.separator+"G2";
 
     static File G2_Properties_File = new File(System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin" + File.separator + "G2.properties");
     static InputStream G2_Properties_InputStream;
@@ -80,6 +85,9 @@ public class G2_ApplyRuleFor_TypeFile {
         MacOS
     }
 
+    // JDK 的路径
+    static String JDK_BIN_PATH = "";
+
     static OS_TYPE curOS_TYPE = OS_TYPE.Windows;
     static ArrayList<String> mKeyWordName = new ArrayList<>();
 
@@ -88,17 +96,44 @@ public class G2_ApplyRuleFor_TypeFile {
 
     static void initSystemInfo() {
         String osName = System.getProperties().getProperty("os.name").toLowerCase();
+        String curLibraryPath =  System.getProperties().getProperty("java.library.path");
         if (osName.contains("window")) {
             curOS_TYPE = OS_TYPE.Windows;
             Cur_Bat_Name = Cur_Bat_Name+".bat";
+            initJDKPath_Windows(curLibraryPath);
         } else if (osName.contains("linux")) {
             curOS_TYPE = OS_TYPE.Linux;
             Cur_Bat_Name = Cur_Bat_Name+".sh";
+            initJDKPath_Linux_MacOS(curLibraryPath);
         } else if (osName.contains("mac")) {
             curOS_TYPE = OS_TYPE.MacOS;
             Cur_Bat_Name = Cur_Bat_Name+".sh";
+            initJDKPath_Linux_MacOS(curLibraryPath);
         }
     }
+
+    static void initJDKPath_Linux_MacOS(String environmentPath){
+        String[] environmentArr = environmentPath.split(":");
+        for (int i = 0; i < environmentArr.length; i++) {
+            String pathItem = environmentArr[i];
+            if(pathItem.contains("jdk")&&pathItem.contains("bin")){
+                JDK_BIN_PATH = pathItem;
+            }
+        }
+    }
+
+
+
+    static void initJDKPath_Windows(String environmentPath){
+        String[] environmentArr = environmentPath.split(";");
+        for (int i = 0; i < environmentArr.length; i++) {
+            String pathItem = environmentArr[i];
+            if(pathItem.contains("jdk")&&pathItem.contains("bin")){
+                JDK_BIN_PATH = pathItem;
+            }
+        }
+    }
+
 
 
     static String curDirPath = "";   // 当前 SHELL  所在目录  默认是main中的第一个 arg[0] 就是shell路径
@@ -136,7 +171,7 @@ public class G2_ApplyRuleFor_TypeFile {
         realTypeRuleList.add( new CalCulMediaHtml_Rule_12());
         realTypeRuleList.add( new CalMP4_DIR_HTML_Rule_13());
         realTypeRuleList.add( new CreateIconFile_KuaiJieFangShi_Rule_14());
-
+        realTypeRuleList.add( new Webp_To_Jpg_Gif_Rule_15());
     }
 
 
@@ -145,13 +180,157 @@ public class G2_ApplyRuleFor_TypeFile {
     //     // 4.对当前子文件(包括子目录 子文件 --不包含孙目录 孙文件) 5. 从shell 中获取到的路径 去对某一个文件进行操作
 
 
+ class Webp_To_Jpg_Gif_Rule_15 extends Basic_Rule{
+ArrayList<File> webpFileList ;
+ArrayList<File> gif_webpFileList ;
+String G2_webp2gif_exe_path = "";
 
-static ArrayList<File> targetFailedFileList_14 = new ArrayList<File>();
-static ArrayList<File> iconFailedFileList_14 = new ArrayList<File>();
+        Webp_To_Jpg_Gif_Rule_15() {
+            super("*", 15, 4);
+            webpFileList = new ArrayList<File>();
+            gif_webpFileList = new ArrayList<File>();
+            PushFile2JDKBIN();
+            if(curOS_TYPE == OS_TYPE.Windows ){
+                G2_webp2gif_exe_path = zbinPath + File.separator + "G2_webp2gif.exe";
+            }
+
+        }
+
+
+         void   PushFile2JDKBIN(){
+            if("".equals(JDK_BIN_PATH)){
+				 System.out.println("当前 库文件 JDK_BIN_PATH ="+JDK_BIN_PATH);
+                return;
+            }
+            String webpLibraryFilePath = null;
+            String G2_LibraryPath = null;
+            // G2_File_Path
+            if(curOS_TYPE == OS_TYPE.Windows){
+                webpLibraryFilePath = JDK_BIN_PATH + File.separator+"webp-imageio.dll";
+                G2_LibraryPath =  G2_File_Path +File.separator+"webp-imageio.dll";
+            }else if(curOS_TYPE == OS_TYPE.MacOS) {
+                webpLibraryFilePath = JDK_BIN_PATH + File.separator+"libwebp-imageio.dylib";
+                G2_LibraryPath =  G2_File_Path +File.separator+"libwebp-imageio.dylib";
+            }else if(curOS_TYPE == OS_TYPE.Linux){
+                webpLibraryFilePath = JDK_BIN_PATH + File.separator+"libwebp-imageio.so";
+                G2_LibraryPath =  G2_File_Path +File.separator+"libwebp-imageio.so";
+            }
+
+            File webpLibraryFile = new File(webpLibraryFilePath);
+            File G2_LibraryFile= new File (G2_LibraryPath);
+            if(!G2_LibraryFile.exists()){
+                System.out.println("本地 库文件 "+G2_LibraryPath +"不存在 请重新填充 zbin/G2/.so .dll 文件!");
+                return;
+            }
+            if(webpLibraryFile.exists() && webpLibraryFile.length() > 100){
+                System.out.println("当前 库文件 "+webpLibraryFilePath +"已经加载到 jre/bin 路径下!");
+                return;
+            }
+		 System.out.println("当前 库文件 G2_LibraryFile ="+G2_LibraryFile +"   webpLibraryFile="+webpLibraryFile +" 如果报错 请手动复制 ");
+            fileCopy(G2_LibraryFile,webpLibraryFile);
+        }
+
+
+     @Override
+     ArrayList<File> applySubFileListRule4(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+
+         ArrayList<File>  webpFile =    subFileTypeMap.get(".webp");
+         if(webpFile == null){
+             System.out.println("当前文件夹中不存在 webp文件的格式");
+             return null;
+         }
+         webpFileList.addAll(webpFile);
+         String stampStr = getTimeStamp();
+         for (int i = 0; i < webpFileList.size(); i++) {
+
+             File webpFileItem = webpFileList.get(i);
+             System.out.println("当前 webp索引["+i+"] = "+ webpFileItem.getAbsolutePath());
+             String newFilePath = webpFileItem.getAbsolutePath().replace(".webp",               "_"+stampStr+".jpg");
+             File jpgFileItem = new File(newFilePath);
+             revertWebp2Jpg(webpFileItem,jpgFileItem);
+
+         }
+
+         for (int i = 0; i < gif_webpFileList.size(); i++) {
+             File gif_webpFileItem = gif_webpFileList.get(i);
+             String originName = gif_webpFileItem.getName();
+             String curParentPath = gif_webpFileItem.getParent();
+             boolean needRename = false;
+             String absPath = gif_webpFileItem.getAbsolutePath();
+             String gif_absPath = absPath.replace(".webp",".gif");
+              File  gif_absPath_File = new File(gif_absPath);
+             String fileName = gif_webpFileItem.getName();
+
+             // 如果 加载后的gif 存在 那么 需要 添加时间戳  以免覆盖
+//             if(gif_absPath_File.exists()){
+
+                 fileName = fileName.replace(".webp","_"+stampStr+".webp");
+                 tryReName(gif_webpFileItem,fileName);
+                 needRename = true;
+//              }
+
+             System.out.println("动图 索引["+i+"] = "+ fileName);
+             System.out.println("执行动图转为 gif的命令! ");
+             if("".equals(G2_webp2gif_exe_path)){
+              System.out.println("当前 webp2gif 为空 请检查!  可能当前系统 Linux MacOS 还没实现该功能!");
+              return null;
+             }
+             String  command = G2_webp2gif_exe_path + " "+fileName;
+             execCMD(command);
+             if(needRename){
+                 tryReName(new File(curParentPath+File.separator+fileName),originName);
+             }
+
+         }
+
+            return super.applySubFileListRule4(curFileList, subFileTypeMap, curDirList, curRealFileList);
+     }
+
+
+
+     void   revertWebp2Jpg(File webpFile , File jpgFile){
+         // webp  动态图 会报错  Decode returned code VP8_STATUS_UNSUPPORTED_FEATURE
+         // Obtain a WebP ImageReader instance
+         ImageReader reader = ImageIO.getImageReadersByMIMEType("image/webp").next();
+
+         // Configure decoding parameters
+         WebPReadParam readParam = new WebPReadParam();
+         readParam.setBypassFiltering(true);
+         BufferedImage image = null;
+         try{
+
+             // Configure the input on the ImageReader
+             reader.setInput(new FileImageInputStream(webpFile));
+
+             // Decode the image
+             image = reader.read(0, readParam);
+         }catch (IOException e){
+
+             System.out.println("解析失败   可能是webp动图!   放入 ArrayList<File> gifList 列表中!");
+            gif_webpFileList.add(webpFile);
+         }
+
+
+   try {
+             ImageIO.write(image, "png", jpgFile);
+         }catch (Exception e){
+             System.out.println("写入文件 "+jpgFile.getAbsolutePath()+" 失败");
+         }
+
+        }
+        @Override
+        String simpleDesc() {
+            return  "\n"+Cur_Bat_Name+ " webp_15            ### 对当前目录下的 webp文件进行转换  静态图-> jpg   动态图-> gif \n";}
+
+    }
+
+
+
+
+
     // 创建快捷方式
     static boolean makeShellLink(File targetFile,File iconFile){
         boolean isOK = false;
-		boolean isException = false;
         String targetFilePath = targetFile.getAbsolutePath();
         JShellLink link = new JShellLink();
         if(!iconFile.exists()){
@@ -166,22 +345,7 @@ static ArrayList<File> iconFailedFileList_14 = new ArrayList<File>();
         String iconName = iconFile.getName();
         link.setName(iconName);
         link.setPath(targetFilePath);
-		try{
         link.save();
-		} catch (Exception e) {
-			isException = true;
-            e.printStackTrace();
-        }finally{
-			if(isException){
-				
-				// 创建快捷方式失败  那么 可能是  文件名称 是  韩文  什么 的 重新 尝试重新命名!
-				targetFailedFileList_14.add(targetFile);
-				iconFailedFileList_14.add(iconFile);
-				return false;
-			}
-			
-		}
-		
         if(isKuaiJieIcon(iconFile)){
             isOK = true;
         }
@@ -217,6 +381,7 @@ static ArrayList<File> iconFailedFileList_14 = new ArrayList<File>();
         }
         return true;
     }
+
 
     class CreateIconFile_KuaiJieFangShi_Rule_14 extends Basic_Rule{
 
@@ -275,55 +440,33 @@ static ArrayList<File> iconFailedFileList_14 = new ArrayList<File>();
                 File iconDirFile = new File(curDirPath+File.separator+dirName);
                 iconDirFile.mkdirs();
 
-                 int IconIndex = 0;
+
                 System.out.println("════════"+"文件类型"+type+"创建快捷方式 Begin"+"════════");
                 for (int j = 0; j < targetFileList.size(); j++) {
                     File   targetTypeFile = targetFileList.get(j);
                     String targetName = targetTypeFile.getName();
-                     IconIndex = IconIndex + 1;
+                    int IconIndex = j + 1;
                     String targetOrderName = IconIndex+"_"+targetName;
                    if( tryReName(targetTypeFile,targetOrderName)){
                        targetTypeFile = new File(targetTypeFile.getParentFile().getAbsolutePath()+File.separator+targetOrderName);
                    }
-                    
+
                     String iconName = IconIndex+"_"+targetName;
                     File iconFile = new File(iconDirFile.getAbsolutePath()+ File.separator+iconName);
                     if(makeShellLink(targetTypeFile,iconFile)){
-               
+
                         System.out.println("Index["+IconIndex+"]目标文件:"+targetTypeFile.getAbsolutePath()+" 创建快捷方式成功:"+"./"+dirName+File.separator+iconName);
                     }else{
-						IconIndex = IconIndex -1;  // false 那么 不自增
-						
                         System.out.println("Index["+IconIndex+"]目标文件:"+targetTypeFile.getAbsolutePath()+" 创建快捷方式失败:"+"./"+dirName+File.separator+iconName);
                     }
                 }
                 System.out.println("════════"+"文件类型"+type+"创建快捷方式 End"+"════════");
 
             }
-			
-			showFailedFile(targetFailedFileList_14,iconFailedFileList_14);
 
 
             return super.applyFileListRule3(subFileList, fileTypeMap);
         }
-		
-		void showFailedFile(ArrayList<File> failedTargetFileList , ArrayList<File>  failedIconFileList){
-			if(failedTargetFileList.size() == 0 || failedIconFileList.size() == 0 ){
-				return;
-			}
-	
-			         for (int j = 0; j < failedTargetFileList.size(); j++) {
-						 File targetFailed = failedTargetFileList.get(j);
-						 File iconFailed = failedIconFileList.get(j);
-			        System.out.println("════════"+"失败文件 "+j+" Begin"+"════════");
-			        System.out.println("失败目标文件:" +targetFailed.getAbsolutePath());			 
-	System.out.println("失败快捷文件:" +iconFailed.getAbsolutePath());	
-		        System.out.println("════════"+"失败文件 "+j+" End"+"════════");			
-					 }
-					 
-			
-		}
-		
 
         @Override
         String simpleDesc() {
@@ -2777,7 +2920,7 @@ static ArrayList<File> iconFailedFileList_14 = new ArrayList<File>();
         }
 
         ArrayList<File> applyFileListRule3(ArrayList<File> subFileList , HashMap<String, ArrayList<File>> fileTypeMap ){
-            return subFileList;
+            return null;
         }
 
         @Override
@@ -3652,4 +3795,90 @@ String firstInputIndexStr ;
         return null;
     }
 
+
+    public static void fileCopy(File origin, File target) {
+        InputStream input = null;
+        OutputStream output = null;
+        int lengthSize;
+        // 创建输入输出流对象
+        try {
+            input = new FileInputStream(origin);
+            output = new FileOutputStream(target);
+            // 获取文件长度
+            try {
+                lengthSize = input.available();
+                // 创建缓存区域
+                byte[] buffer = new byte[lengthSize];
+                // 将文件中的数据写入缓存数组
+                input.read(buffer);
+                // 将缓存数组中的数据输出到文件
+                output.write(buffer);
+
+            } catch (IOException e) {
+
+                e.printStackTrace();
+            }
+
+        } catch (Exception e) {
+
+        } finally {
+            if (input != null && output != null) {
+                try {
+                    input.close(); // 关闭流
+                    output.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    public static String execCMD(String command) {
+//        System.out.println("══════════════Begin ExE ");
+        StringBuilder sb =new StringBuilder();
+        StringBuilder errorSb =new StringBuilder();
+        try {
+
+            Process process=Runtime.getRuntime().exec("CMD.exe /c start /B "+command);
+
+            InputStreamReader inputReader =  new InputStreamReader(process.getInputStream(),"GBK");
+            BufferedReader bufferedReader=new BufferedReader(inputReader);
+            String line;
+            int waitFor =   process.waitFor();
+//            Stream<String> lines = bufferedReader.lines();
+//            lines.iterator();
+//            System.out.println("line Count = "+lines.count());
+
+            while((line=bufferedReader.readLine())!=null  )
+            {
+                sb.append(line+"\n");
+
+            }
+
+
+
+            boolean isAlive =   process.isAlive();
+            int errorSteamCode =  process.getErrorStream().read();
+
+            String errorStream =    process.getErrorStream().toString();
+            int exitValue =    process.exitValue();
+//            process.getErrorStream().
+            //杀掉进程
+//            System.out.println("exitValue ="+ exitValue);
+            sb.append("\nexitValue = "+ exitValue+
+                    "\nisAlive = "+ isAlive+
+                    "\nerrorStream = "+ errorStream+
+                    "\nerrorSteamCode = "+ errorSteamCode+
+                    "\nwaitFor = "+waitFor);
+//            process.destroy();
+
+        } catch (Exception e) {
+            System.out.println("execCMD 出现异常! ");
+            return e.toString();
+        }
+
+//        System.out.println("sb.toString() = "+ sb.toString());
+//        System.out.println("══════════════End ExE ");
+        return sb.toString();
+    }
 }
