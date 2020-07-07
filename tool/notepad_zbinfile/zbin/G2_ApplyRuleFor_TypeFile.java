@@ -339,13 +339,19 @@ String G2_webp2gif_exe_path = "";
             } catch (IOException e) {
                 e.printStackTrace();
             }*/
+			// return isOK;
         }
         String parentAbsPath = iconFile.getParentFile().getAbsolutePath();
         link.setFolder(parentAbsPath);
         String iconName = iconFile.getName();
         link.setName(iconName);
         link.setPath(targetFilePath);
+		     try {
         link.save();
+			 }catch (Exception e) {
+				 return false;
+			 }
+			 
         if(isKuaiJieIcon(iconFile)){
             isOK = true;
         }
@@ -470,13 +476,13 @@ String G2_webp2gif_exe_path = "";
 
         @Override
         String simpleDesc() {
-            return  "\n"+Cur_Bat_Name+ " *_14  mp4          ### 源文件被按顺序重命名 1_ 2_ 动态计算当前文件夹中所有子文件中的mp4文件 并在当前目录生成 MP4_20200522_154600 字样的文件夹 \n"+
-                    "\n"+Cur_Bat_Name+ " *_14  .mp4         ### 源文件被按顺序重命名 1_ 2_动态计算当前文件夹中所有子文件中的mp4文件 并在当前目录生成 MP4_20200522_154600 字样的文件夹 \n"+
-                    "\n"+Cur_Bat_Name+ " *_14  .gif         ### 源文件被按顺序重命名 1_ 2_动态计算当前文件夹中所有子文件中的gif文件 并在当前目录生成 GIF_20200522_154600 字样的文件夹 \n"+
-                    "\n"+Cur_Bat_Name+ " *_14  png          ### 源文件被按顺序重命名 1_ 2_ 动态计算当前文件夹中所有子文件中的png文件 并在当前目录生成 PNG_20200522_154600 字样的文件夹 \n"+
-                    "\n"+Cur_Bat_Name+ " *_14  zip  7z      ### 源文件被按顺序重命名 1_ 2_ 动态计算当前文件夹中所有子文件中的 文件夹中的 7z zip文件   并在当前目录生成 7Z_20200522_154600  ZIP_20200522_154600 字样的文件夹 \n"+
-                    "\n"+Cur_Bat_Name+ " *_14  .zip .7z     ### 源文件被按顺序重命名 1_ 2_ 动态计算当前文件夹中所有子文件中的 文件夹中的 7z zip文件   并在当前目录生成 7Z_20200522_154600  ZIP_20200522_154600 字样的文件夹 \n"+
-                    "\n"+Cur_Bat_Name+ " *_14  jpg          ### 源文件被按顺序重命名 1_ 2_ 动态计算当前文件夹中所有子文件中的JPG文件 并在当前目录生成 JPG_20200522_154600 字样的文件夹 \n"
+            return  "\n"+Cur_Bat_Name+ " *_14  mp4          ### 源文件被按顺序重命名 生成快捷icon 1_ 2_ 动态计算当前文件夹中所有子文件中的mp4文件 并在当前目录生成 MP4_20200522_154600 字样的文件夹 \n"+
+                    "\n"+Cur_Bat_Name+ " *_14  .mp4         ### 源文件被按顺序重命名 生成快捷icon 1_ 2_动态计算当前文件夹中所有子文件中的mp4文件 并在当前目录生成 MP4_20200522_154600 字样的文件夹 \n"+
+                    "\n"+Cur_Bat_Name+ " *_14  .gif         ### 源文件被按顺序重命名 生成快捷icon 1_ 2_动态计算当前文件夹中所有子文件中的gif文件 并在当前目录生成 GIF_20200522_154600 字样的文件夹 \n"+
+                    "\n"+Cur_Bat_Name+ " *_14  png          ### 源文件被按顺序重命名 生成快捷icon 1_ 2_ 动态计算当前文件夹中所有子文件中的png文件 并在当前目录生成 PNG_20200522_154600 字样的文件夹 \n"+
+                    "\n"+Cur_Bat_Name+ " *_14  zip  7z      ### 源文件被按顺序重命名 生成快捷icon 1_ 2_ 动态计算当前文件夹中所有子文件中的 文件夹中的 7z zip文件   并在当前目录生成 7Z_20200522_154600  ZIP_20200522_154600 字样的文件夹 \n"+
+                    "\n"+Cur_Bat_Name+ " *_14  .zip .7z     ### 源文件被按顺序重命名 生成快捷icon 1_ 2_ 动态计算当前文件夹中所有子文件中的 文件夹中的 7z zip文件   并在当前目录生成 7Z_20200522_154600  ZIP_20200522_154600 字样的文件夹 \n"+
+                    "\n"+Cur_Bat_Name+ " *_14  jpg          ### 源文件被按顺序重命名 生成快捷icon 1_ 2_ 动态计算当前文件夹中所有子文件中的JPG文件 并在当前目录生成 JPG_20200522_154600 字样的文件夹 \n"
                     ;}
     }
 
