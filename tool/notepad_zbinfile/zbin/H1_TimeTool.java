@@ -11,6 +11,7 @@ import java.util.regex.Pattern;
 // 1.  给出 xxxxx ms  给出时间
 // 2.  给出两个时间 算出差值
 //  3.  给出一个时间点  算出改点是今天的多少分  多少秒  多少小时
+// 4. 给出当前的时间戳
 
 public class H1_TimeTool {
 
@@ -24,7 +25,8 @@ public class H1_TimeTool {
 /*******************修改属性列表 ------End *********************/
 
 
-
+static int ShowCalYearInt = 2020;
+static int Now_YearInt = 2020;
     /*******************固定属性列表 ------Begin *********************/
 //  固定属性列表 ------Begin
 //固定1  zbin 的 字符串绝对路径
@@ -80,6 +82,57 @@ public class H1_TimeTool {
     static String EnvironmentValue= System.getProperties().getProperty("java.library.path");
 
 
+    static int MONTH_LENGTH_MAX = 26;   //   调节 每个月份之间的间隔
+
+    static String month_name_1 = "January_1";
+    static String month_name_2 = "February_2";
+    static String month_name_3 = "March_3";
+    static String month_name_4 = "April_4";
+    static String month_name_5 = "May_5";
+    static String month_name_6 = "June_6";
+    static String month_name_7 = "July_7";
+    static String month_name_8 = "August_8";
+    static String month_name_9 = "September_9";
+    static String month_name_10 = "October_10";
+    static String month_name_11 = "November_11";
+    static String month_name_12 = "December_12";
+    static  String[] Month_Name_Arr = {month_name_1 ,month_name_2 ,month_name_3 ,month_name_4 ,month_name_5 ,month_name_6 ,month_name_7 ,month_name_8 ,month_name_9 ,month_name_10 ,month_name_11 ,month_name_12  };
+    static String week_name_desc = "Su Mo Tu We Th Fr Sa  ";
+
+    static ArrayList<String> DayDescList = new ArrayList<String>();
+    static {
+        DayDescList.add(" 1");
+        DayDescList.add(" 2");
+        DayDescList.add(" 3");
+        DayDescList.add(" 4");
+        DayDescList.add(" 5");
+        DayDescList.add(" 6");
+        DayDescList.add(" 7");
+        DayDescList.add(" 8");
+        DayDescList.add(" 9");
+        DayDescList.add("10");
+        DayDescList.add("11");
+        DayDescList.add("12");
+        DayDescList.add("13");
+        DayDescList.add("14");
+        DayDescList.add("15");
+        DayDescList.add("16");
+        DayDescList.add("17");
+        DayDescList.add("18");
+        DayDescList.add("19");
+        DayDescList.add("20");
+        DayDescList.add("21");
+        DayDescList.add("22");
+        DayDescList.add("23");
+        DayDescList.add("24");
+        DayDescList.add("25");
+        DayDescList.add("26");
+        DayDescList.add("27");
+        DayDescList.add("28");
+        DayDescList.add("29");
+        DayDescList.add("30");
+        DayDescList.add("31");
+    }
 
 
     static boolean  isContainEnvironment(String program){
@@ -415,6 +468,7 @@ public class H1_TimeTool {
 
 
         int year  = now.get(Calendar.YEAR);
+        Now_YearInt = year;
         int month  = now.get(Calendar.MONTH) + 1;
         int day  = now.get(Calendar.DAY_OF_MONTH);
         int hour  = now.get(Calendar.HOUR);
@@ -622,7 +676,8 @@ int itemLength =  24;  //  一个框的长度
 String blankStr = "      ";
         System.out.println("══════════════ "+year+"年"+month+"月共4"+"周第"+weekNum1+"周 ═ 7天 ═ 168小时 ═ 10080分钟 ═604800秒 ══════════════" + tip1);
         System.out.println("该日月份周数:   ║ 第 "+((week-1)+"")    +" 周           "+blankStr+"║");
-        System.out.println(calculXinQi2Chinese(month)+"月一日星期:   ║ "+padding20BlankStr(calculXinqiYiForMonthBegin())+"   ║");
+//        System.out.println(calculXinQi2Chinese(month)+"月一日星期:   ║ "+padding20BlankStr(calculXinqiYiForMonthBegin())+"   ║");
+        System.out.println("该月一日星期:   ║ "+padding20BlankStr(calculXinqiYiForMonthBegin())+"   ║");
 
         System.out.println("前个(星期一):   ║ "+padding20BlankStr(calculXinqiYi1())+blankStr+"║");
         System.out.println("后个(星期天):   ║ "+padding20BlankStr(calculXinqiYi7())+blankStr+"║");
@@ -666,12 +721,34 @@ String blankStr = "      ";
         System.out.println("百分占比(%):    ║ 已过: "+padding20BlankStr((todaySecondsUsePercentStr)+"%")+"║ 剩余: "+padding20BlankStr((monthWeHavePersentPercentStr)+"%")+"║");
 
 
-        System.out.println();
 
+
+
+
+        showYearCal();
         // 显示今天的日期
+        System.out.println();
+        System.out.println("══════════════"+" 现在的时间戳(ms) = "+ now.getTimeInMillis()+" ══════════════");
+        System.out.println("══════════════"+" 现在的时间戳(s)  = "+ (now.getTimeInMillis()/1000)+"    ══════════════");
+
+
+
 
     }
 
+    public static void showYearCal() {
+
+        if(ShowCalYearInt != 2020){  //  如果不等于 默认值 那么就显示这个值
+            ZYear year2020 = new ZYear(ShowCalYearInt);
+            year2020.showYearInfo();
+        }else{   // 等于默认值就 就显示现在的日期
+
+            ZYear year2020 = new ZYear(Now_YearInt);
+            year2020.showYearInfo();
+        }
+
+
+    }
 
     public static void printWeeks() {
         SimpleDateFormat format = new SimpleDateFormat("yyyy.MM.dd");
@@ -700,6 +777,29 @@ String blankStr = "      ";
             }
             calendar.add(Calendar.DATE, 1);
         }
+    }
+
+
+    static int   calculXinqiYiForMonthBegin(int year ,  int month) {
+        //  计算月初 是星期几
+
+        // 这个月  已过了 多少百分比
+        Calendar beginMonthCalendar = Calendar.getInstance();
+
+//        beginMonthCalendar.set(beginMonthCalendar.DAY_OF_WEEK, beginMonthCalendar.MONDAY);
+        beginMonthCalendar.set(Calendar.YEAR, year); // 设置成年
+        beginMonthCalendar.set(Calendar.MONTH, month-1); // 设置成年
+        beginMonthCalendar.set(Calendar.DAY_OF_MONTH, 1); // 设置成月初
+        beginMonthCalendar.set(Calendar.HOUR_OF_DAY, 0);
+        beginMonthCalendar.set(Calendar.HOUR, 0);  //  时分秒 毫秒 都设置0
+        beginMonthCalendar.set(Calendar.MINUTE, 0);  //  时分秒 毫秒 都设置0
+        beginMonthCalendar.set(Calendar.SECOND, 0);  //  时分秒 毫秒 都设置0
+        beginMonthCalendar.set(Calendar.MILLISECOND, 0);  //  时分秒 毫秒 都设置0
+        beginMonthCalendar.set(Calendar.HOUR_OF_DAY, 0);
+
+        //0-周天  1-周一    6-周六
+        int day = beginMonthCalendar.get(Calendar.DAY_OF_WEEK) - 1;
+        return day;
     }
 
     static String  calculXinqiYiForMonthBegin(){
@@ -780,7 +880,7 @@ String blankStr = "      ";
                 xinqiValue = "六";
                 break;
             case 7:
-                xinqiValue = "天";
+                xinqiValue = "七";
                 break;
             default:
                 xinqiValue = "一";  // 默认周一
@@ -895,6 +995,11 @@ String blankStr = "      ";
                 if (i == 0) {   // 第一个参数永远是  当前 shell的目录
                     CUR_Dir_1_PATH = args[i];
                 }  else {
+                    String item = args[i] ;
+                    if(isNumeric(item)){
+                        ShowCalYearInt = Integer.parseInt(item);
+                        continue;   // 如果是 2020 那么 直接 continue
+                    }
                     CUR_INPUT_ParamStrList.add(args[i]);   // 当前cmd目录   第一个类型选项      之后所有的参数 保存在  CUR_INPUT_ParamStrList
                     //    Rule_Identify_TypeIndexList.add(args[i]);
                 }
@@ -1082,7 +1187,7 @@ if(dateStr == null ){
             String yearStr = dateStrArr[0];
             String monthStr = dateStrArr[1];
             String dayStr = dateStrArr[2];
-            ztimeStamp.year =  Long.parseLong(yearStr);;
+            ztimeStamp.year =  Long.parseLong(yearStr);
             ztimeStamp.month  = Long.parseLong(monthStr);
             ztimeStamp.day  = Long.parseLong(dayStr);
         }
@@ -1912,6 +2017,322 @@ String showCalendar(Calendar calendar){
     }
 
 
+
+
+
+    static class ZYear {
+        int year;
+        ZSession[] sessions;
+
+        ZYear(int xyear) {
+            sessions = new ZSession[4];
+            year = xyear;
+            initSessionData(xyear);
+        }
+
+        void initSessionData(int xyear) {
+            sessions[0] = new ZSession(xyear,1);
+            sessions[1] = new ZSession(xyear,2);
+            sessions[2] = new ZSession(xyear,3);
+            sessions[3] = new ZSession(xyear,4);
+        }
+
+        void showYearInfo(){
+            System.out.println(PaddingEndStr(" "," ",MONTH_LENGTH_MAX+9)+"【公元 " +year+" 年】");
+            System.out.println("══════════════════════════╦══════════════════════════════╦══════════════════════════════╗");
+            for (int i = 0; i < sessions.length; i++) {
+                sessions[i].showSessionInfo();
+                if(i != sessions.length - 1 ){
+                    System.out.println("══════════════════════════╬══════════════════════════════╬══════════════════════════════╣");
+                }
+            }
+            System.out.println("══════════════════════════╩══════════════════════════════╩══════════════════════════════╝");
+        }
+    }
+    // 季度
+    static  class ZSession {
+        int year;
+        int session_num;  // 第几个季度  1 , 2  ,  3  , 4 ,
+        MonthData[] sessionDatas ;
+
+        ZSession(int xyear , int xSession_num){
+            this.year = xyear;
+            this.session_num = xSession_num;
+            sessionDatas = new  MonthData[3];
+            initMonthData(xyear,session_num);
+        }
+
+        void initMonthData(int year , int sessionNum){
+            sessionDatas[0] = new MonthData(year,sessionNum*3-2);
+            sessionDatas[1] = new MonthData(year,sessionNum*3-1);
+            sessionDatas[2] = new MonthData(year,sessionNum*3);
+        }
+
+        void showSessionInfo(){
+            ArrayList<String> sessionInfoList  = new  ArrayList<String>();
+            ArrayList<ArrayList<String>> curSessionMonthList = new  ArrayList<ArrayList<String>>();
+            int monthContentLine = 0 ;
+            for (int i = 0; i < sessionDatas.length; i++) {
+                MonthData monthDataItem = sessionDatas[i];
+                ArrayList<String> monthInfoList = monthDataItem.showMonthInfo();
+                monthContentLine = monthInfoList.size();
+                curSessionMonthList.add(monthInfoList);
+            }
+
+
+            for (int i = 0; i < monthContentLine; i++) {
+                StringBuilder sb = new StringBuilder();
+                for (int j = 0; j < curSessionMonthList.size(); j++) {
+                    ArrayList<String> lineContent = curSessionMonthList.get(j);
+                    String curLine = lineContent.get(i);
+                    sb.append(curLine);
+                }
+                sessionInfoList.add(sb.toString());
+            }
+
+            for (int i = 0; i < sessionInfoList.size(); i++) {
+                String lineDate = sessionInfoList.get(i);
+                System.out.println(lineDate);
+            }
+
+        }
+
+    }
+
+
+    //   月份
+    static class MonthData{
+        int month_day_content_length = 20; // 14 15 16 17 18 19 20  月日数最大长度
+        int month_day_content_max_length = MONTH_LENGTH_MAX; // 14 15 16 17 18 19 20  加 后面两个空格  最大长度
+        int year;   //  该年
+        int month;  // 该月
+        int month_days_num;  // 该月有几日
+        int begin_week_day;    //   该月开始的星期
+        String month_name;
+        ArrayList<String> monthDayDesc;
+
+        MonthData(int year,int month){
+            this.year = year;
+            this.month = month;
+            this.month_days_num = getDayForMonth_Year(year,month);
+            this.begin_week_day = calculXinqiYiForMonthBegin(year,month);
+            month_name = getfixedMonthName(Month_Name_Arr[month -1]);  //  当前月数
+            month_day_content_length = 20;
+            month_day_content_max_length = MONTH_LENGTH_MAX;
+            monthDayDesc = getFixedMonthDaysDescList(month_days_num);
+        }
+
+
+        ArrayList<String> getFixedMonthDaysDescList(int month_days_num){
+            ArrayList<String> dayDescList = new    ArrayList<String>();
+            for (int i = 0; i <month_days_num ; i++) {
+//                System.out.println("month_days_num = "+ month_days_num + "DayDescList.length ="+ DayDescList.size());
+                dayDescList.add(DayDescList.get(i));
+            }
+            return dayDescList;
+        }
+
+
+        String getfixedMonthName(String commonMonthName){
+            return "      "+commonMonthName.trim()+"         ";
+        }
+
+
+        ArrayList<String>  showMonthInfo(){
+            ArrayList<String> fixed21Length = new  ArrayList<String>();
+            ArrayList<String>   cur8LineStrList = getShowMonthList_8_line();
+
+            for (int i = 0; i < cur8LineStrList.size(); i++) {
+                String itemStr = cur8LineStrList.get(i);
+                int paddingLength = month_day_content_max_length - itemStr.length();
+                String fixedStr = PaddingEndStr(itemStr," ",paddingLength);
+                fixed21Length.add(fixedStr+"║    ");
+            }
+
+            return fixed21Length;
+        }
+
+        ArrayList<String>  getShowMonthList_8_line(){
+            ArrayList<String> curMonthDescList = new  ArrayList<String>();
+
+
+            String blankStr = calculFirstBlankStr(begin_week_day);
+            int skipNum = blankStr.length()/3;
+            int content_1_indexEnd = 7 - skipNum;
+            int content_1_indexBegin =1;
+            String String1 = blankStr+calDayDescLine(content_1_indexBegin,content_1_indexEnd);
+
+//          System.out.println("content_1_indexBegin = "+ content_1_indexBegin + "  content_1_indexEnd = "+ content_1_indexEnd);
+//          System.out.println("String1 = "+ String1 );
+//          System.out.println("-------------");
+
+
+            int content_2_indexBegin =content_1_indexEnd + 1;
+            int content_2_indexEnd =content_2_indexBegin + 6;
+            String String2 = calDayDescLine(content_2_indexBegin,content_2_indexEnd);
+
+//          System.out.println("content_2_indexBegin = "+ content_2_indexBegin + "  content_2_indexEnd = "+ content_2_indexEnd);
+//          System.out.println("String2 = "+ String2 );
+//          System.out.println("-------------");
+
+            int content_3_indexBegin =content_2_indexEnd + 1;
+            int content_3_indexEnd =content_3_indexBegin + 6;
+            String String3 = calDayDescLine(content_3_indexBegin,content_3_indexEnd);
+
+//          System.out.println("content_3_indexBegin = "+ content_3_indexBegin + "  content_3_indexEnd = "+ content_3_indexEnd);
+//          System.out.println("String3 = "+ String3 );
+//          System.out.println("-------------");
+
+            int content_4_indexBegin =content_3_indexEnd + 1;
+            int content_4_indexEnd =content_4_indexBegin + 6;
+            String String4 = calDayDescLine(content_4_indexBegin,content_4_indexEnd);
+
+//          System.out.println("content_4_indexBegin = "+ content_4_indexBegin + "  content_4_indexEnd = "+ content_4_indexEnd);
+//          System.out.println("String4 = "+ String4 );
+//          System.out.println("-------------");
+
+            int content_5_indexBegin =content_4_indexEnd + 1;
+            int content_5_indexEnd =content_5_indexBegin + 6;
+            String String5 = calDayDescLine(content_5_indexBegin,content_5_indexEnd);
+
+//          System.out.println("content_5_indexBegin = "+ content_5_indexBegin + "  content_5_indexEnd = "+ content_5_indexEnd);
+//          System.out.println("String5 = "+ String5 );
+//          System.out.println("-------------");
+
+
+            int content_6_indexBegin =content_5_indexEnd + 1;
+            int content_6_indexEnd =content_6_indexBegin + 6;
+            String String6 = calDayDescLine(content_6_indexBegin,content_6_indexEnd);
+
+//          System.out.println("content_6_indexBegin = "+ content_6_indexBegin + "  content_6_indexEnd = "+ content_6_indexEnd);
+//          System.out.println("String6 = "+ String4 );
+//          System.out.println("-------------");
+
+
+
+/*
+          String dayDescLine = calDayDescLine();
+          String curAllContent = blankStr + dayDescLine;
+          int allContentLength = curAllContent.length();
+          System.out.println("curAllContent = "+ curAllContent);
+          System.out.println("allContentLength = "+ allContentLength);
+          int paddingLength = 120 - allContentLength;
+          String fix_120_curMonDesc = PaddingEndStr(curAllContent," ",paddingLength);
+          int fixed_content_length = fix_120_curMonDesc.length();
+
+          String String1 = fix_120_curMonDesc.substring(0,20);
+          String String2 = fix_120_curMonDesc.substring(20,40);
+          String String3 = fix_120_curMonDesc.substring(40,60);
+          String String4 = fix_120_curMonDesc.substring(60,80);
+          String String5 = fix_120_curMonDesc.substring(80,100);
+          String String6 = fix_120_curMonDesc.substring(100,120);
+
+*/
+
+//          System.out.println("String0 = "+month_name);
+//          System.out.println("String0 = "+week_name_desc);
+//          System.out.println("String1 = "+ String1);
+//          System.out.println("String2 = "+ String2);
+//          System.out.println("String3 = "+ String3);
+//          System.out.println("String4 = "+ String4);
+//          System.out.println("String5 = "+ String5);
+//          System.out.println("String6 = "+ String6);
+
+            curMonthDescList.add(month_name);   //  月份名称
+            curMonthDescList.add(week_name_desc);  //  周数名称
+            curMonthDescList.add(String1);  //
+            curMonthDescList.add(String2);  //
+            curMonthDescList.add(String3);  //
+            curMonthDescList.add(String4);  //
+            curMonthDescList.add(String5);  //
+            curMonthDescList.add(String6);  //
+            return curMonthDescList;
+        }
+
+
+
+        String calDayDescLine(int beginIndex , int EndIndex){
+            StringBuilder sb = new StringBuilder();
+            for (int i = beginIndex - 1   ; i < EndIndex; i++) {
+                String itemStr = "  ";
+                if(i < monthDayDesc.size()){
+                    itemStr =  monthDayDesc.get(i);
+                }
+                if(itemStr == null){
+                    itemStr = "  ";
+                }
+                if(i != EndIndex -1){
+                    sb.append(itemStr+" ");
+                }else{
+                    sb.append(itemStr);
+                }
+            }
+//            System.out.println("calDayDescLine("+beginIndex+","+EndIndex+") = "+  sb.toString());
+            return sb.toString();
+        }
+
+        String calDayDescLine(){
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < monthDayDesc.size(); i++) {
+                if(i != monthDayDesc.size() -1){
+                    sb.append(monthDayDesc.get(i)+" ");
+                }else{
+                    sb.append(monthDayDesc.get(i));
+                }
+            }
+            System.out.println("calDayDescLine() = "+  sb.toString());
+            return sb.toString();
+        }
+
+        ArrayList<String>    calculMonthDayDesc(String blankStr,int contentLength , int monthdays){
+            ArrayList<String> monthDescList = new  ArrayList<String>();
+            int index = 1;
+            int endIndex = monthdays;
+
+
+            return monthDescList;
+        }
+        String  calculFirstBlankStr(int begin_week_day){
+            String blankStr = "";
+            //0-周天  1-周一    6-周六
+            if(begin_week_day == 0){
+                blankStr =  "";
+            } else if(begin_week_day == 1){
+                blankStr =  "   "; // 3 个 空格
+            } else if(begin_week_day == 2){
+                blankStr =  "      "; // 6 个 空格
+            } else if(begin_week_day == 3){
+                blankStr =  "         "; // 9 个 空格
+            } else if(begin_week_day == 4){
+                blankStr =  "            ";   // 12 个 空格
+            } else if(begin_week_day == 5){
+                blankStr =  "               ";// 15 个 空格
+            } else if(begin_week_day == 6){
+                blankStr =  "                  ";     // 18 个 空格
+            }
+//          System.out.println("begin_week_day = "+begin_week_day + "   blankStr ="+blankStr+"=");
+            return blankStr;
+        }
+/*
+January
+Su Mo Tu We Th Fr Sa
+         1  2  3  4
+5  6  7  8  9 10 11
+12 13 14 15 16 17 18
+19 20 21 22 23 24 25
+26 27 28 29 30 31
+ */
+
+
+    }
+
+    static  String PaddingEndStr(String rawContent , String flagStr , int length){
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < length; i++) {
+            sb.append(flagStr);
+        }
+        return rawContent+sb.toString();
+    }
 
 
 

@@ -40,6 +40,8 @@ public class E2_SystemInfo {
     static NumberFormat nf = new DecimalFormat("0.00");
     static SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd hh:mm:ss");
     static File wifiLogFile = new File(System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin" + File.separator + "E2_WifiDetail.txt");
+    static File envFile = new File(System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin" + File.separator + "E2_env.txt");
+
 
     public static void main(String[] args) {
 
@@ -55,7 +57,13 @@ public class E2_SystemInfo {
 
         try {
             addEnvironmentPATH(System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin" + File.separator + "E2");
-// System信息，从jvm获取
+
+            //  通过 env 命令 读取 系统环境 变量
+            system_enviable();
+            System.out.println("----------------------------------");
+
+
+            // System信息，从jvm获取
             property();
             System.out.println("----------------------------------");
 
@@ -94,6 +102,35 @@ public class E2_SystemInfo {
         } catch (Exception e1) {
             e1.printStackTrace();
         }
+    }
+
+    private static void system_enviable() {
+        ArrayList<String> environment_list = new ArrayList<String>();
+
+//        readStringFromFile(envFile);
+        ArrayList<String>  rawContent =   readListFromFile(envFile);
+
+        if(rawContent != null && rawContent.size() > 0 ){
+
+            for (int i = 0; i < rawContent.size(); i++) {
+                String itemVariable = rawContent.get(i);
+                String fixedVariable = itemVariable;
+                if(curOS_TYPE == OS_TYPE.Windows){
+/*                  HOMEDRIVE=C:
+                    HOMEPATH=\Users\zhuzj5
+                    JAVA_HOME=C:\Program Files*/
+                    fixedVariable = ":: echo %"+fixedVariable;
+                    fixedVariable = fixedVariable.replace("=","% =");
+                }else{
+                    fixedVariable = ": echo $"+fixedVariable;
+                }
+                fixedVariable = " "+fixedVariable;
+                environment_list.add(fixedVariable);
+            }
+
+        }
+        ArrayPrint(environment_list, "env 系统环境变量");
+
     }
 
 
@@ -278,6 +315,26 @@ public class E2_SystemInfo {
 
 
     }
+
+    static ArrayList<String> readListFromFile(File fileItem) {
+        ArrayList<String>  contentList  = new ArrayList<String>();
+        try {
+            //   BufferedReader curBR = new BufferedReader(new InputStreamReader(new FileInputStream(fileItem), "utf-8"));
+            BufferedReader curBR = new BufferedReader(new InputStreamReader(new FileInputStream(fileItem)));
+            String lineContent = "";
+            while (lineContent != null) {
+                lineContent = curBR.readLine();
+                if (lineContent == null || lineContent.trim().isEmpty()) {
+                    continue;
+                }
+                contentList.add(lineContent);
+            }
+            curBR.close();
+        } catch (Exception e) {
+        }
+        return contentList;
+    }
+
 
     static String readStringFromFile(File fileItem) {
         StringBuilder sb = new StringBuilder();
