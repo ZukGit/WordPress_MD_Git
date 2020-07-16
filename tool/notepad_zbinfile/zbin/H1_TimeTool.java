@@ -135,6 +135,42 @@ static int Now_YearInt = 2020;
     }
 
 
+    static ArrayList<String> AnimalYearName = new ArrayList<String>();
+    static{
+        AnimalYearName.add(" 0申猴");
+        AnimalYearName.add(" 1酉鸡");
+        AnimalYearName.add(" 2戌狗");
+        AnimalYearName.add(" 3亥猪");
+        AnimalYearName.add(" 4子鼠");
+        AnimalYearName.add(" 5丑牛");
+        AnimalYearName.add(" 6寅虎");
+        AnimalYearName.add(" 7卯兔");
+        AnimalYearName.add(" 8辰龙");
+        AnimalYearName.add(" 9巳蛇");
+        AnimalYearName.add("10午马");
+        AnimalYearName.add("11未羊");
+    }
+
+
+    // 甲、乙、丙、丁、戊、己、庚、辛、壬、癸
+    public static final char[] skyBranch = new char[] { '甲','乙','丙','丁','戊','己','庚','辛','壬','癸'};
+
+    // 子、丑、寅、卯、辰、巳、午、未、申、酉、戌、亥
+    public static final char[] earthBranch = new char[] { '子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥' };
+
+    static int YearStrLength =  14 ; // 当前一个年份的最大标识长度\
+
+     static String calChineseYearName(int i) {
+        if (i < 4) {
+            throw new IllegalArgumentException("The starting year must be greater than 4");
+        }
+        int realYear = i - 4;
+
+//        System.out.print( skyBranch[realYear % 10] +""+ earthBranch[realYear % 12] );
+        return skyBranch[realYear % 10] +""+ earthBranch[realYear % 12];
+    }
+
+
     static boolean  isContainEnvironment(String program){
         boolean environmentExist = false;
         if(EnvironmentValue.contains(program)){
@@ -722,10 +758,13 @@ String blankStr = "      ";
 
 
 
-
-
-
+        System.out.println();
+        System.out.println();
+        showAnimalYearInfo();
+        System.out.println();
+        System.out.println();
         showYearCal();
+        System.out.println();
         // 显示今天的日期
         System.out.println();
         System.out.println("══════════════"+" 现在的时间戳(ms) = "+ now.getTimeInMillis()+" ══════════════");
@@ -2038,7 +2077,7 @@ String showCalendar(Calendar calendar){
         }
 
         void showYearInfo(){
-            System.out.println(PaddingEndStr(" "," ",MONTH_LENGTH_MAX+9)+"【公元 " +year+" 年】");
+            System.out.println(PaddingEndStr(" "," ",MONTH_LENGTH_MAX+1)+"【公元 " +year+"["+getAnimalNameForYear(year)+" "+ calChineseYearName(year)+" ]"+" 年】");
             System.out.println("══════════════════════════╦══════════════════════════════╦══════════════════════════════╗");
             for (int i = 0; i < sessions.length; i++) {
                 sessions[i].showSessionInfo();
@@ -2333,6 +2372,323 @@ Su Mo Tu We Th Fr Sa
         }
         return rawContent+sb.toString();
     }
+
+
+
+
+
+    static int AnimalYear_Begin = 1900;
+    static int AnimalYear_End =  Calendar.getInstance().get(Calendar.YEAR);
+
+
+    public static void showAnimalYearInfo() {
+
+        Z_AnimalYear animalYear = new   Z_AnimalYear(AnimalYear_Begin,AnimalYear_End);
+        animalYear.showAnimalYearInfo();
+
+    }
+
+    static String getAnimalNameForYear(int year){
+        return AnimalYearName.get(year%12);
+    }
+
+
+
+    static class Z_AnimalYear {
+        int  animalYear_begin;
+        int  animalYear_end;
+        int oneYearLineNum_Row ;   // 当前年份最多的那个生效的年的个数  用于对齐
+        int CurLineCount;
+        Z_AnimalData[] zsessions1;   // 0申猴  1酉鸡 2戌狗
+        Z_AnimalData[] zsessions2;   // 3亥猪  4子鼠 5丑牛
+        Z_AnimalData[] zsessions3;   // 6寅虎  7卯兔 8辰龙
+        Z_AnimalData[] zsessions4;   // 9巳蛇  10午马 11未羊
+
+        ArrayList<Z_AnimalData[]>  animalInfoList = new  ArrayList<Z_AnimalData[]>();
+        Z_AnimalYear(int beginYear,int endYear) {
+            zsessions1 = new Z_AnimalData[3];
+            zsessions2 = new Z_AnimalData[3];
+            zsessions3 = new Z_AnimalData[3];
+            zsessions4 = new Z_AnimalData[3];
+            animalYear_begin = beginYear;
+            animalYear_end = endYear;
+            initAnimalData(animalYear_begin ,animalYear_end );
+        }
+
+        void initAnimalData(int beginYear , int endYear) {
+            zsessions1[0] = new Z_AnimalData(0,beginYear,endYear);
+            zsessions1[1] = new Z_AnimalData(1,beginYear,endYear);
+            zsessions1[2] = new Z_AnimalData(2,beginYear,endYear);
+            zsessions2[0] = new Z_AnimalData(3,beginYear,endYear);
+            zsessions2[1] = new Z_AnimalData(4,beginYear,endYear);
+            zsessions2[2] = new Z_AnimalData(5,beginYear,endYear);
+            zsessions3[0] = new Z_AnimalData(6,beginYear,endYear);
+            zsessions3[1] = new Z_AnimalData(7,beginYear,endYear);
+            zsessions3[2] = new Z_AnimalData(8,beginYear,endYear);
+            zsessions4[0] = new Z_AnimalData(9,beginYear,endYear);
+            zsessions4[1] = new Z_AnimalData(10,beginYear,endYear);
+            zsessions4[2] = new Z_AnimalData(11,beginYear,endYear);
+
+            animalInfoList.add(zsessions1);
+            animalInfoList.add(zsessions2);
+            animalInfoList.add(zsessions3);
+            animalInfoList.add(zsessions4);
+            oneYearLineNum_Row = calculAndSetMaxAnimalYearSize();
+            CurLineCount = (oneYearLineNum_Row+1)/2;
+        }
+
+        int  calculAndSetMaxAnimalYearSize(){
+            int maxSize = 0;
+
+            for (int i = 0; i < animalInfoList.size(); i++) {
+                Z_AnimalData[] animalDataArr =   animalInfoList.get(i);
+
+                for (int j = 0; j < animalDataArr.length; j++) {
+                    Z_AnimalData animalYearData = animalDataArr[j];
+
+                    if(maxSize < animalYearData.OneAnimalYearSize){
+                        maxSize = animalYearData.OneAnimalYearSize;
+                    }
+                }
+            }
+
+            for (int i = 0; i < animalInfoList.size(); i++) {
+                Z_AnimalData[] animalDataArr =   animalInfoList.get(i);
+
+                for (int j = 0; j < animalDataArr.length; j++) {
+                    Z_AnimalData animalYearData = animalDataArr[j];
+                    animalYearData.setCurrentLineNum((maxSize+1)/2);
+                }
+            }
+
+            return maxSize;
+        }
+
+        void  showAnimalYearInfo(){
+            System.out.println("                                     "+"【公元 "+animalYear_end +" ["+getAnimalNameForYear(animalYear_end)+" "+calChineseYearName(animalYear_end)+" ]"+" 年】");
+
+            System.out.println("══════════════════════════════════╦══════════════════════════════════╦══════════════════════════════════╗");
+            for (int i = 0; i < animalInfoList.size(); i++) {
+                ArrayList<String>  logArr = new ArrayList<String>();
+                Z_AnimalData[] animalDataArr =   animalInfoList.get(i);
+                ArrayList<ArrayList<String>>  mSessionLogList = new ArrayList<ArrayList<String>>();
+                for (int j = 0; j < animalDataArr.length; j++) {
+                    Z_AnimalData animalYearData = animalDataArr[j];
+                    ArrayList<String>  animalYearDataInfoList = animalYearData.getAnimalInfoList();
+//                  System.out.println("animalYearDataInfoList.size = "+ animalYearDataInfoList.size());
+                    mSessionLogList.add(animalYearDataInfoList);
+                }
+
+                for (int j = 0; j < (CurLineCount+1); j++) {   //  每行 每行读取
+                    StringBuilder mLineSB = new StringBuilder();
+
+                    for (int k = 0; k < mSessionLogList.size(); k++) {
+                        ArrayList<String>  oneAnimalInfo = mSessionLogList.get(k);
+//                      System.out.println("CurLineCount = "+ CurLineCount);
+                        String oneLineStr = oneAnimalInfo.get(j)+"║";
+                        mLineSB.append(oneLineStr);
+                    }
+                    logArr.add(mLineSB.toString());
+                }
+
+                for (int j = 0; j < logArr.size(); j++) {
+                    System.out.println(logArr.get(j));
+
+                }
+
+                if(i != animalInfoList.size() -1 ){
+                    System.out.println("══════════════════════════════════╬══════════════════════════════════╬══════════════════════════════════╣");
+     }
+
+            }
+
+
+            System.out.println("══════════════════════════════════╩══════════════════════════════════╩══════════════════════════════════╝");
+
+        }
+
+    }
+
+
+
+    static class Z_AnimalData {
+        int animalIndex ;
+        String animalName;
+        ArrayList<Integer> currentAnimalYearList;
+        int OneAnimalYearSize ; // 当前生效 有多少个 年份的数据
+        int currentLineNum;   // 当前数据总的行数    不包括 标题
+        int curYearStrLength ;   // 当前一个年份的最大标识长度
+        Z_AnimalData(int pAnimalIndex , int beginYear , int endYear){
+            animalIndex = pAnimalIndex;
+            currentAnimalYearList = new  ArrayList<Integer>();
+            animalName = getAnimalNameForYear(animalIndex);
+            OneAnimalYearSize = 0;
+            currentLineNum = 0;
+            curYearStrLength = YearStrLength;
+            initAnimalYearData(beginYear ,endYear );
+        }
+
+        public void setCurrentLineNum(int currentLineNum) {
+            this.currentLineNum = currentLineNum;
+        }
+
+        void initAnimalYearData(int beginYear , int endYear){
+            for (int i = beginYear; i <= endYear ; i++) {
+                if(i % 12  == animalIndex ){     //  选中的年份
+                    currentAnimalYearList.add(i);
+                }
+            }
+            OneAnimalYearSize = currentAnimalYearList.size();
+        }
+
+        ArrayList<String> getAnimalInfoList(){
+            ArrayList<String> infoList = new   ArrayList<String>();
+            //1. 生肖名称
+            infoList.add(PaddingEndStr(""," ",curYearStrLength)+animalName+PaddingEndStr(""," ",curYearStrLength-animalName.length()+4));
+
+            ArrayList<YearPair>  yearPairList = new ArrayList<YearPair>();
+            YearPair yearPair = new YearPair();
+            for (int i = currentAnimalYearList.size()-1; i >= 0; i--) {
+                int curYear = currentAnimalYearList.get(i);
+                if(!yearPair.isStep1_Init()){
+                    yearPair.setPreYear(curYear);
+                    continue;
+                }
+                if(!yearPair.isStep2_Init()){
+                    yearPair.setEndYear(curYear);
+                    yearPairList.add(yearPair);
+                    yearPair = new YearPair();
+                    continue;
+                }
+
+            }
+            if(!yearPairList.contains(yearPair)){
+                yearPairList.add(yearPair);
+            }
+
+            while(yearPairList.size() < currentLineNum ){
+                yearPairList.add(new YearPair() );
+            }
+
+
+            for (int i = 0; i < yearPairList.size(); i++) {
+                YearPair mYearPairItem = yearPairList.get(i);
+//                 System.out.println("Index:"+i+"===="+mYearPairItem+"====");
+                infoList.add(mYearPairItem.toString());
+            }
+//            System.out.println("infoList.size = "+ infoList.size());
+            return infoList;
+        }
+
+
+
+
+    }
+
+
+
+
+    static class YearPair{
+        Integer OneYearSize ;
+
+        Integer preYear;
+        Integer endYear;
+
+        YearPair(){
+            preYear = null;
+            endYear = null;
+            OneYearSize = YearStrLength;
+        }
+
+        YearPair(int xpreYear ){
+            preYear = xpreYear;
+            endYear = 0;
+            OneYearSize = YearStrLength;
+        }
+
+        public void setEndYear(Integer endYear) {
+            this.endYear = endYear;
+        }
+
+        public void setPreYear(Integer preYear) {
+            this.preYear = preYear;
+        }
+
+        boolean isStep1_Init(){
+            return this.preYear != null && this.preYear != 0;
+        }
+
+
+        boolean isStep2_Init(){
+            return this.preYear != null  && this.preYear != 0 && this.endYear != null && this.endYear != 0;
+        }
+
+        @Override
+        public String toString() {
+//           return "【" +preYear+"年  -- "  +  endYear+"年】";
+            if(isStep1_Init() && isStep2_Init()){
+                return makeOneYearStr(preYear) +makeOneYearStr(endYear);
+            }
+            if(!isStep1_Init()){
+                return makeOneYearStr(preYear)+"  " +makeOneYearStr(endYear)+"  ";
+            } else if(!isStep2_Init()){
+                return makeOneYearStr(preYear)+"  " +makeOneYearStr(endYear);
+            }
+            return makeOneYearStr(preYear) +makeOneYearStr(endYear);
+        }
+
+        // 2016(  4岁)
+        String makeOneYearStr(Integer curYear){
+            if(curYear == null){
+                return PaddingEndStr(" "," ",OneYearSize);
+            }
+            String animalYearStr = "";
+            int age = Now_YearInt - curYear;
+            int ageStrLength = (""+age).length();
+            String ageStr = "("+PaddingPreStr(""+age," ",3-ageStrLength)+"岁)";
+
+            String year_age_str = " "+curYear+"_"+calChineseYearName(curYear)+ageStr;
+            int length_YearAgeStr = year_age_str.length();
+            int paddingLenth = OneYearSize - length_YearAgeStr;
+
+            animalYearStr = year_age_str + PaddingEndStr(""," ",paddingLenth);
+
+            return animalYearStr;
+
+        }
+    }
+
+    public static void main3(String[] args) {
+        Z_AnimalData data = new Z_AnimalData(4,1900,2020);
+        data.setCurrentLineNum((data.currentAnimalYearList.size()+1)/2);
+        for (int i = 0; i < data.currentAnimalYearList.size(); i++) {
+            int curYear = data.currentAnimalYearList.get(i);
+//            System.out.println(curYear +"年 = 鼠年");
+        }
+
+
+        ArrayList<String> log =  data.getAnimalInfoList();
+
+
+        for (int i = 0; i < log.size(); i++) {
+//            System.out.println(log.get(i));
+        }
+
+
+
+
+    }
+
+
+
+    static  String PaddingPreStr(String rawContent , String flagStr , int length){
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < length; i++) {
+            sb.append(flagStr);
+        }
+        return sb.toString()+rawContent;
+    }
+
 
 
 
