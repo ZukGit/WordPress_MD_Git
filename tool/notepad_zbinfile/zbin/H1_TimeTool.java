@@ -1071,7 +1071,7 @@ String blankStr = "      ";
         //1.  对参数进行过滤判断
         //2.  拿到参数再具体进行逻辑操作
 
-        TimeOperation timeOperation = new H1_TimeTool.TimeOperation();
+        TimeOperation timeOperation = new TimeOperation();
 
         if(!timeOperation.checkInputParamListAndGetType(CUR_INPUT_ParamStrList) || timeOperation.inputType == 0){
             System.out.println("用户输入的 参数无法正确解析 请重新输入\n");
@@ -2077,7 +2077,7 @@ String showCalendar(Calendar calendar){
         }
 
         void showYearInfo(){
-            System.out.println(PaddingEndStr(" "," ",MONTH_LENGTH_MAX+1)+"【公元 " +year+"["+getAnimalNameForYear(year)+" "+ calChineseYearName(year)+" ]"+" 年】");
+            System.out.println(PaddingEndStr(" "," ",MONTH_LENGTH_MAX+1)+"【公元 " +year+"["+getAnimalNameForYear(year)+" "+ (year>4?calChineseYearName(year):"")+" ]"+" 年】");
             System.out.println("══════════════════════════╦══════════════════════════════╦══════════════════════════════╗");
             for (int i = 0; i < sessions.length; i++) {
                 sessions[i].showSessionInfo();
