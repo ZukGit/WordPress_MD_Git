@@ -1,0 +1,304 @@
+
+**********************************************************
+MIB Browser Started at : Tue Jul 21 11:05:02 CST 2020
+**********************************************************
+Building tree..
+Adding file .\mibs\mib_core.txt..Done
+Adding file .\mibs\RFC1213-MIB.my..Done
+Adding file .\mibs\RFC1229-MIB.my..Done
+Adding file .\mibs\RFC1231-MIB.my..Done
+Adding file .\mibs\RFC1243-MIB.my..Done
+Adding file .\mibs\RFC1253-MIB.my..Done
+Adding file .\mibs\RFC1271-MIB.my..Done
+Adding file .\mibs\RFC1285-MIB.my..Done
+Adding file .\mibs\RFC1315-MIB.my..Done
+Adding file .\mibs\RFC1381-MIB.my..Done
+Adding file .\mibs\RFC1382-MIB.my..Done
+Adding file .\mibs\RFC1398-MIB.my..Done
+Adding file .\mibs\RFC1406-MIB.my..Done
+Adding file .\mibs\root_mib.txt..Done
+Updating orphans.
+..............Done
+Building OID Name resolution table...Updating variables table..
+Done
+*****COMPLETED******
+Adding file D:\software\jmibbrowser\jmibbrowser\802.11mib.txt..Done
+Updating orphans.
+...............Done
+Building OID Name resolution table...Updating variables table..
+Done
+
+**********************************************************
+MIB Browser Stopped at : Tue Jul 21 11:05:56 CST 2020
+**********************************************************
+
+**********************************************************
+MIB Browser Started at : Tue Jul 21 11:36:39 CST 2020
+**********************************************************
+Building tree..
+Adding file .\mibs\mib_core.txt..Done
+Adding file .\mibs\RFC1213-MIB.my..Done
+Adding file .\mibs\RFC1229-MIB.my..Done
+Adding file .\mibs\RFC1231-MIB.my..Done
+Adding file .\mibs\RFC1243-MIB.my..Done
+Adding file .\mibs\RFC1253-MIB.my..Done
+Adding file .\mibs\RFC1271-MIB.my..Done
+Adding file .\mibs\RFC1285-MIB.my..Done
+Adding file .\mibs\RFC1315-MIB.my..Done
+Adding file .\mibs\RFC1381-MIB.my..Done
+Adding file .\mibs\RFC1382-MIB.my..Done
+Adding file .\mibs\RFC1398-MIB.my..Done
+Adding file .\mibs\RFC1406-MIB.my..Done
+Adding file .\mibs\root_mib.txt..Done
+Updating orphans.
+..............Done
+Building OID Name resolution table...Updating variables table..
+Done
+*****COMPLETED******
+Adding file D:\software\jmibbrowser\IEEE802dot11-MIB.mib..Done
+Updating orphans.
+.Done
+Building OID Name resolution table...Updating variables table..
+Done
+
+**********************************************************
+MIB Browser Stopped at : Tue Jul 21 11:37:32 CST 2020
+**********************************************************
+
+**********************************************************
+MIB Browser Started at : Tue Jul 21 11:37:36 CST 2020
+**********************************************************
+Building tree..
+Adding file .\mibs\mib_core.txt..Done
+Adding file .\mibs\RFC1213-MIB.my..Done
+Adding file .\mibs\RFC1229-MIB.my..Done
+Adding file .\mibs\RFC1231-MIB.my..Done
+Adding file .\mibs\RFC1243-MIB.my..Done
+Adding file .\mibs\RFC1253-MIB.my..Done
+Adding file .\mibs\RFC1271-MIB.my..Done
+Adding file .\mibs\RFC1285-MIB.my..Done
+Adding file .\mibs\RFC1315-MIB.my..Done
+Adding file .\mibs\RFC1381-MIB.my..Done
+Adding file .\mibs\RFC1382-MIB.my..Done
+Adding file .\mibs\RFC1398-MIB.my..Done
+Adding file .\mibs\RFC1406-MIB.my..Done
+Adding file .\mibs\root_mib.txt..Done
+Updating orphans.
+..............Done
+Building OID Name resolution table...Updating variables table..
+Done
+*****COMPLETED******
+Adding file D:\software\jmibbrowser\IEEE802dot11-MIB.mib..Done
+Updating orphans.
+.Done
+Building OID Name resolution table...Updating variables table..
+Done
+Request : Walk .1.2.840.10036.1
+
+
+Received 0 record(s) in 3828 milliseconds.
+
+**********************************************************
+MIB Browser Stopped at : Tue Jul 21 11:38:24 CST 2020
+**********************************************************
+
+**********************************************************
+MIB Browser Started at : Tue Jul 21 12:33:58 CST 2020
+**********************************************************
+Building tree..
+Adding file .\mibs\mib_core.txt..Done
+Adding file .\mibs\RFC1213-MIB.my..Done
+Adding file .\mibs\RFC1229-MIB.my..Done
+Adding file .\mibs\RFC1231-MIB.my..Done
+Adding file .\mibs\RFC1243-MIB.my..Done
+Adding file .\mibs\RFC1253-MIB.my..Done
+Adding file .\mibs\RFC1271-MIB.my..Done
+Adding file .\mibs\RFC1285-MIB.my..Done
+Adding file .\mibs\RFC1315-MIB.my..Done
+Adding file .\mibs\RFC1381-MIB.my..Done
+Adding file .\mibs\RFC1382-MIB.my..Done
+Adding file .\mibs\RFC1398-MIB.my..Done
+Adding file .\mibs\RFC1406-MIB.my..Done
+Adding file .\mibs\root_mib.txt..Done
+Updating orphans.
+..............Done
+Building OID Name resolution table...Updating variables table..
+Done
+*****COMPLETED******
+Adding file D:\software\jmibbrowser\IEEE802dot11-MIB.mib..Done
+Updating orphans.
+.Done
+Building OID Name resolution table...Updating variables table..
+Done
+Request : Get  .1.2.840.10036.1.6
+
+
+Received 0 record(s) in 3811 milliseconds.
+Request : Set  .1.2.840.10036.1.1.1.14.(1 - n)  Value : 11
+
+
+Error in executing SET request : 
+java.lang.NumberFormatException: For input string: "(1 - n)"
+Set command executed...
+Getting new value of .1.2.840.10036.1.1.1.14.(1 - n) ...
+Request : Walk .1.2.840.10036.1.1.1.14
+
+
+Received 0 record(s) in 3005 milliseconds.
+Request : Walk .1.2.840.10036.1.1.1.14
+
+Request : Walk .1.2.840.10036.1.1.1.14
+
+Request : Walk .1.2.840.10036.1.1.1.14
+
+
+Received 0 record(s) in 3004 milliseconds.
+Request : Walk .1.2.840.10036.1.1.1.14
+
+Request : Walk .1.2.840.10036.1.1.1.14
+
+
+Received 0 record(s) in 3004 milliseconds.
+
+Received 0 record(s) in 3003 milliseconds.
+
+Received 0 record(s) in 3005 milliseconds.
+
+Received 0 record(s) in 3002 milliseconds.
+Request : Walk .1.2.840.10036.1.1.1.19
+
+Name   : dot11AuthenticateFailStatus
+Parent : dot11StationConfigEntry
+Number : 19
+Access :  read-only
+Syntax :  INTEGER(0..65535)
+Status :  current
+Description : 
+ "This attribute holds the most recently transmitted Status Code in a failed Authentication frame. If no failed Authentication frame has been transmitted, the value of this attribute shall be0."
+Type :3
+
+
+Received 0 record(s) in 3004 milliseconds.
+Name   : dot11AuthenticateFailStatus
+Parent : dot11StationConfigEntry
+Number : 19
+Access :  read-only
+Syntax :  INTEGER(0..65535)
+Status :  current
+Description : 
+ "This attribute holds the most recently transmitted Status Code in a failed Authentication frame. If no failed Authentication frame has been transmitted, the value of this attribute shall be0."
+Type :3
+
+Name   : dot11DesiredSSID
+Parent : dot11StationConfigEntry
+Number : 9
+Access :  read-write
+Syntax :  OCTET STRING (SIZE(0..32))
+Status :  current
+Description : 
+ "This attribute reflects the Service Set ID (SSID) used in the DesiredSSID parameter of the most recent MLME_Scan.request. This value may be modified by an external management entity and used by the local SME to make decisions about the Scanningprocess."
+Type :3
+
+Name   : dot11MediumOccupancyLimit
+Parent : dot11StationConfigEntry
+Number : 2
+Access :  read-write
+Syntax :  INTEGER (0..1000)
+Status :  current
+Description : 
+ "This attribute shall indicate the maximum amount of time, in TU, that a point coordinator (PC) may control the usage of the wireless medium (WM) without relinquishing control for long enough to allow at least one instance of DCF access to the medium. The default value of this attribute shall be 100, and the maximum value shall be1000."
+Type :3
+
+Name   : dot11MultiDomainCapabilityEnabled
+Parent : dot11StationConfigEntry
+Number : 22
+Access :  read-write
+Syntax :  TruthValue
+Status :  current
+Description : 
+ "This attribute, when TRUE, indicates that the capability of the station to operate in multiple regulatory domains is enabled. The capability is disabled, otherwise. The default value of this attribute isFALSE."
+Type :3
+
+Name   : dot11CFPMaxDuration
+Parent : dot11StationConfigEntry
+Number : 5
+Access :  read-write
+Syntax :  INTEGER (0..65535)
+Status :  current
+Description : 
+ "The attribute shall describe the maximum duration of the CFP in TU that may be generated by the PCF. It is modified by MLME-START.requestprimitive."
+Type :3
+
+
+**********************************************************
+MIB Browser Stopped at : Tue Jul 21 12:36:06 CST 2020
+**********************************************************
+
+**********************************************************
+MIB Browser Started at : Tue Jul 21 12:37:15 CST 2020
+**********************************************************
+Building tree..
+Adding file .\mibs\mib_core.txt..Done
+Adding file .\mibs\RFC1213-MIB.my..Done
+Adding file .\mibs\RFC1229-MIB.my..Done
+Adding file .\mibs\RFC1231-MIB.my..Done
+Adding file .\mibs\RFC1243-MIB.my..Done
+Adding file .\mibs\RFC1253-MIB.my..Done
+Adding file .\mibs\RFC1271-MIB.my..Done
+Adding file .\mibs\RFC1285-MIB.my..Done
+Adding file .\mibs\RFC1315-MIB.my..Done
+Adding file .\mibs\RFC1381-MIB.my..Done
+Adding file .\mibs\RFC1382-MIB.my..Done
+Adding file .\mibs\RFC1398-MIB.my..Done
+Adding file .\mibs\RFC1406-MIB.my..Done
+Adding file .\mibs\root_mib.txt..Done
+Updating orphans.
+..............Done
+Building OID Name resolution table...Updating variables table..
+Done
+*****COMPLETED******
+
+**********************************************************
+MIB Browser Stopped at : Tue Jul 21 12:37:17 CST 2020
+**********************************************************
+
+**********************************************************
+MIB Browser Started at : Tue Jul 21 12:37:49 CST 2020
+**********************************************************
+Building tree..
+Adding file .\mibs\mib_core.txt..Done
+Adding file .\mibs\RFC1213-MIB.my..Done
+Adding file .\mibs\RFC1229-MIB.my..Done
+Adding file .\mibs\RFC1231-MIB.my..Done
+Adding file .\mibs\RFC1243-MIB.my..Done
+Adding file .\mibs\RFC1253-MIB.my..Done
+Adding file .\mibs\RFC1271-MIB.my..Done
+Adding file .\mibs\RFC1285-MIB.my..Done
+Adding file .\mibs\RFC1315-MIB.my..Done
+Adding file .\mibs\RFC1381-MIB.my..Done
+Adding file .\mibs\RFC1382-MIB.my..Done
+Adding file .\mibs\RFC1398-MIB.my..Done
+Adding file .\mibs\RFC1406-MIB.my..Done
+Adding file .\mibs\root_mib.txt..Done
+Updating orphans.
+..............Done
+Building OID Name resolution table...Updating variables table..
+Done
+*****COMPLETED******
+
+**********************************************************
+MIB Browser Stopped at : Tue Jul 21 12:37:50 CST 2020
+**********************************************************
+
+**********************************************************
+MIB Browser Started at : Tue Jul 21 12:39:06 CST 2020
+**********************************************************
+Building tree..
+
+Directory ./mibs/ not found, or it is an empty directory!
+
+Error in loading MIB tree, quitting
+
+**********************************************************
+MIB Browser Stopped at : Tue Jul 21 12:39:18 CST 2020
+**********************************************************
