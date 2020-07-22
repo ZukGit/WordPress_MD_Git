@@ -22,11 +22,11 @@ public class H1_TimeTool {
     static String Cur_Bat_Name = "ztime_H1";
 
 
-/*******************修改属性列表 ------End *********************/
+    /*******************修改属性列表 ------End *********************/
 
 
-static int ShowCalYearInt = 2020;
-static int Now_YearInt = 2020;
+    static int ShowCalYearInt = 2020;
+    static int Now_YearInt = 2020;
     /*******************固定属性列表 ------Begin *********************/
 //  固定属性列表 ------Begin
 //固定1  zbin 的 字符串绝对路径
@@ -97,7 +97,7 @@ static int Now_YearInt = 2020;
     static String month_name_11 = "November_11";
     static String month_name_12 = "December_12";
     static  String[] Month_Name_Arr = {month_name_1 ,month_name_2 ,month_name_3 ,month_name_4 ,month_name_5 ,month_name_6 ,month_name_7 ,month_name_8 ,month_name_9 ,month_name_10 ,month_name_11 ,month_name_12  };
-    static String week_name_desc = "Su Mo Tu We Th Fr Sa  ";
+    static String week_name_desc = "Mo Tu We Th Fr Sa Su  ";
 
     static ArrayList<String> DayDescList = new ArrayList<String>();
     static {
@@ -160,7 +160,7 @@ static int Now_YearInt = 2020;
 
     static int YearStrLength =  14 ; // 当前一个年份的最大标识长度\
 
-     static String calChineseYearName(int i) {
+    static String calChineseYearName(int i) {
         if (i < 4) {
             throw new IllegalArgumentException("The starting year must be greater than 4");
         }
@@ -478,7 +478,7 @@ static int Now_YearInt = 2020;
 
 
     static void showNoTypeTip() {
-       System.out.println("用户输入的参数为空  或者 参数不符合规格  请参考如下 重新输入:");
+        System.out.println("用户输入的参数为空  或者 参数不符合规格  请参考如下 重新输入:");
         System.out.println("提示1:  时间戳使用格式: 2020-04-26_16:16:00.550  16:16:16.16  16:16:16   16:18 ");  // 输入 提示  输入格式 提示
         System.out.println("提示2:  标识时间长度使用  1000s 40h1000s 100000s  35d15h12m500s  Y-年   M-月  W-星期  D-天  H-小时 m-分钟 s-秒");
         System.out.println();
@@ -567,7 +567,6 @@ static int Now_YearInt = 2020;
         System.out.println("DAY_OF_YEAR = "+dayofYear);
         System.out.println("HOUR_OF_DAY = "+hourofday);
         System.out.println("Calendar.DATE = "+date);
-
         year = 2020
         month =3
         day = 28
@@ -580,25 +579,24 @@ static int Now_YearInt = 2020;
         WEEK_OF_YEAR = 18   // 一年的第18个周
         DAY_OF_WEEK_IN_MONTH = 4   //   在这个月已经过了几次 周X
         DAY_OF_YEAR = 119    // 一年的第几天
-
         HOUR_OF_DAY = 11   //  几点
         Calendar.DATE = 28  //  日期
                 */
 
 
-int itemLength =  24;  //  一个框的长度
+        int itemLength =  24;  //  一个框的长度
 
 
         System.out.println("══════════════ "+"2020"+(isBigYear?"润":"平")+"年 ═ "+daysForYear+"天 ═ "+hourForYear+"小时 ═ "+mintuesForYear+"分钟 ═ "+secondForYear+"秒 ══════════════");
 //【1_1】        今年2020润年 : 366天 : 8784小时 : 527040分钟 : 31622400秒
 //══════════════ 2020润年 ═ 366天 ═ 8784小时 ═ 527040分钟 ═ 31622400秒 ══════════════
 
- //【1_2】 今年已过 119 天:  剩余 247 天= 已过:2856小时  剩余:5928 小时 = 已过:171360分钟  剩余:355680 分钟 = 已过:10281600秒  剩余:21340800 秒 =    已使用:32.514% 剩余:67.486%
- // 秒数级别(s):    ║ 已过: 10281600s ║ 剩余: 21340800s ║
+        //【1_2】 今年已过 119 天:  剩余 247 天= 已过:2856小时  剩余:5928 小时 = 已过:171360分钟  剩余:355680 分钟 = 已过:10281600秒  剩余:21340800 秒 =    已使用:32.514% 剩余:67.486%
+        // 秒数级别(s):    ║ 已过: 10281600s ║ 剩余: 21340800s ║
 // 分钟级别(m):    ║ 已过: 171360m   ║ 剩余: 355680m   ║
 // 小时级别(h):    ║ 已过: 2856h     ║ 剩余: 5928h     ║
 //天数级别(d):    ║ 已过: 119d      ║ 剩余: 247d      ║
- //百分占比(%):    ║ 已过: 92.213%   ║ 剩余: 67.486%   ║
+        //百分占比(%):    ║ 已过: 92.213%   ║ 剩余: 67.486%   ║
         String dayUsePersentStr = String.format("%.3f",dayUsePersent);
         String dayWeHavePersentStr = String.format("%.3f",dayWeHavePersent);
 
@@ -613,13 +611,11 @@ int itemLength =  24;  //  一个框的长度
 
 /*
         System.out.println("今年"+ year+ (isBigYear?"润":"平")+"年 : "+daysForYear+"天 : "+hourForYear+"小时 : "+mintuesForYear+"分钟 : "+secondForYear+"秒");
-
         System.out.println("今年已过 "+dayofYear+" 天:  剩余 "+dayWeHave+" 天"+"= "+
               "已过:"+  (dayofYear*24)+"小时  剩余:"+(dayWeHave*24)+" 小时"+" = "+
                 "已过:"+  (dayofYear*24*60)+"分钟  剩余:"+(dayWeHave*24*60)+" 分钟"+" = "+
                 "已过:"+  (dayofYear*24*60*60)+"秒  剩余:"+(dayWeHave*24*60*60)+" 秒"+" = "+
                 "   已使用:"+dayUsePersentStr+"%"   + " 剩余:" +dayWeHavePersentStr+"%" );
-
         */
 //        System.out.println("xxx月==xxx天===xxx小时===xxx分钟==xxx秒");
 
@@ -683,7 +679,6 @@ int itemLength =  24;  //  一个框的长度
         小时级别(h):    ║ 已过: 663.93h   ║ 剩余: 56.07h    ║
         天数级别(d):    ║ 已过: 27.66d    ║ 剩余: 2.34d     ║
         百分占比(%):    ║ 已过: 92.213%   ║ 剩余: 7.787%    ║
-
         */
 
         System.out.println("══════════════ "+year+"."+padding2SizeStr(month)+"月 ═ "+monthDays+"天 ═ "+monthHours+"小时 ═ "+monthMintues+"分钟 ═ "+monthSecond+"秒 ══════════════");
@@ -703,13 +698,12 @@ int itemLength =  24;  //  一个框的长度
                 thisMonthDayUseStr +"天" +" 剩余 "+thisMonthDayWeHaveStr+"天 ="+
                 "该月已使用占比:"+monthUsePersentStr+"%" + " 未使用占比:"+monthWeHavePersentStr+"%"
         );
-
         */
 
 
 //        System.out.println("一个月的第一个星期从第一个星期一开始!");
         String tip1 = "一个月的第一个星期从第一个星期一开始!";
-String blankStr = "      ";
+        String blankStr = "      ";
         System.out.println("══════════════ "+year+"年"+month+"月共4"+"周第"+weekNum1+"周 ═ 7天 ═ 168小时 ═ 10080分钟 ═604800秒 ══════════════" + tip1);
         System.out.println("该日月份周数:   ║ 第 "+((week-1)+"")    +" 周           "+blankStr+"║");
 //        System.out.println(calculXinQi2Chinese(month)+"月一日星期:   ║ "+padding20BlankStr(calculXinqiYiForMonthBegin())+"   ║");
@@ -725,10 +719,8 @@ String blankStr = "      ";
         printWeeks();
         System.out.println();
 /*
-
         System.out.println("今周 "+month+"月第"+week+"周"  + "  该月总共有"+week+"周" +"   1周 = 7天 = "+(24*7)+" 小时 =" + (24*7*60)+"分钟 = " + (24*7*60*60) +"秒"   );
         System.out.println("今日 "+month+"月"+day+"日 "+xinqiStr + " 该月第 "+weekNum1+"个"+xinqiStr  +"  1天 = "+(24*1)+" 小时 =" + (24*60)+"分钟 = " + (24*60*60) +"秒");
-
 */
 
 
@@ -838,6 +830,10 @@ String blankStr = "      ";
 
         //0-周天  1-周一    6-周六
         int day = beginMonthCalendar.get(Calendar.DAY_OF_WEEK) - 1;
+
+        if(day ==0 ){   // 周0转为 周七  以中国人的方式显示
+            day =7 ;
+        }
         return day;
     }
 
@@ -871,7 +867,7 @@ String blankStr = "      ";
         xinqi1.set(xinqi1.DAY_OF_WEEK, xinqi1.MONDAY);
         int year =  xinqi1.get(Calendar.YEAR);
         int month =  xinqi1.get(Calendar.MONTH) + 1;
-       int day =  xinqi1.get(Calendar.DAY_OF_MONTH);
+        int day =  xinqi1.get(Calendar.DAY_OF_MONTH);
 
         String dateStr = year+"-"+padding2SizeStr(month)+"-"+padding2SizeStr(day);
 //        System.out.println("周一:" + dateStr);
@@ -929,7 +925,7 @@ String blankStr = "      ";
 
     }
 
-  static String   calculXinQi(int xiniq){
+    static String   calculXinQi(int xiniq){
         String xinqiValue = "";
 //      System.out.println(" Axiniq = "+ xiniq);
         switch(xiniq){
@@ -1010,7 +1006,7 @@ String blankStr = "      ";
 
 
 
-  static  String padding2SizeStr(int value){
+    static  String padding2SizeStr(int value){
         String valueStr =  (value+"").trim();
 
         if(valueStr.length() == 1){
@@ -1076,7 +1072,7 @@ String blankStr = "      ";
         if(!timeOperation.checkInputParamListAndGetType(CUR_INPUT_ParamStrList) || timeOperation.inputType == 0){
             System.out.println("用户输入的 参数无法正确解析 请重新输入\n");
             showNoTypeTip();
-              return;
+            return;
         }
 
         if(timeOperation.initParamWithType(timeOperation.inputType ,CUR_INPUT_ParamStrList)){
@@ -1125,7 +1121,7 @@ String blankStr = "      ";
 // ztime_H1.bat  18:30:17.560     转为今日的 分钟数   秒数  毫秒数
 
 
-class ZTimeStamp{  // 日历    不可能出现   61秒啊  10000毫秒   61分  33天  25小时的情况
+    class ZTimeStamp{  // 日历    不可能出现   61秒啊  10000毫秒   61分  33天  25小时的情况
         long  year;
         long month;
         long day;
@@ -1134,7 +1130,7 @@ class ZTimeStamp{  // 日历    不可能出现   61秒啊  10000毫秒   61分 
         long second;
         long microSecond;
 
-    Calendar targetCalendar ;
+        Calendar targetCalendar ;
 
         ZTimeStamp(){
             year    = 0 ;
@@ -1148,22 +1144,22 @@ class ZTimeStamp{  // 日历    不可能出现   61秒啊  10000毫秒   61分 
         }
 
 
-    @Override
-    public String toString() {
-        return "ZTimeStamp{" +
-                "year=" + year +
-                ", month=" + month +
-                ", day=" + day +
-                ", hour=" + hour +
-                ", mintus=" + mintus +
-                ", second=" + second +
-                ", microSecond=" + microSecond +
-                ", targetCalendar=" + targetCalendar +
-                '}';
+        @Override
+        public String toString() {
+            return "ZTimeStamp{" +
+                    "year=" + year +
+                    ", month=" + month +
+                    ", day=" + day +
+                    ", hour=" + hour +
+                    ", mintus=" + mintus +
+                    ", second=" + second +
+                    ", microSecond=" + microSecond +
+                    ", targetCalendar=" + targetCalendar +
+                    '}';
+        }
     }
-}
 
-  //  ztime_H1.bat  18:30:17.560+5938s
+    //  ztime_H1.bat  18:30:17.560+5938s
 
     // 2020-11-21_18:30:16.142
     static ZTimeStamp  getZtimeStamp(String timeStr){
@@ -1172,122 +1168,122 @@ class ZTimeStamp{  // 日历    不可能出现   61秒啊  10000毫秒   61分 
         ZTimeStamp ztimeStamp = new H1_TimeTool().new ZTimeStamp();
 
         Calendar calendar = Calendar.getInstance();
-     long   year1 =     calendar.get(Calendar.YEAR);
-     long   month1 =     calendar.get(Calendar.MONTH) +1 ;
-     long   day1 =  calendar.get(Calendar.DATE);
-     long   hour1 =  calendar.get(Calendar.HOUR_OF_DAY);
-     long   minutes1 =  calendar.get(Calendar.MINUTE);
-     long   seconds1 =  calendar.get(Calendar.SECOND);
-     long   microSeconds1 =  calendar.get(Calendar.MILLISECOND);
+        long   year1 =     calendar.get(Calendar.YEAR);
+        long   month1 =     calendar.get(Calendar.MONTH) +1 ;
+        long   day1 =  calendar.get(Calendar.DATE);
+        long   hour1 =  calendar.get(Calendar.HOUR_OF_DAY);
+        long   minutes1 =  calendar.get(Calendar.MINUTE);
+        long   seconds1 =  calendar.get(Calendar.SECOND);
+        long   microSeconds1 =  calendar.get(Calendar.MILLISECOND);
 
         String dateStr = null;
         String hourStr = null;
 
-if(timeStr.contains("_")){
-    dateStr = timeStr.substring(0,timeStr.lastIndexOf("_"));
-    hourStr = timeStr.substring(timeStr.lastIndexOf("_")+1);
-}else {
-    if(timeStr.contains("-")){
-        dateStr = timeStr;
-    }
-    if(timeStr.contains(":")){
-        hourStr = timeStr;
-    }
+        if(timeStr.contains("_")){
+            dateStr = timeStr.substring(0,timeStr.lastIndexOf("_"));
+            hourStr = timeStr.substring(timeStr.lastIndexOf("_")+1);
+        }else {
+            if(timeStr.contains("-")){
+                dateStr = timeStr;
+            }
+            if(timeStr.contains(":")){
+                hourStr = timeStr;
+            }
 
-}
+        }
 
         System.out.println("getZtimeStamp  -> dateStr = " + dateStr );
         System.out.println("getZtimeStamp  -> hourStr = " + hourStr );
-if(dateStr == null ){
-    ztimeStamp.year = year1;
-    ztimeStamp.month = month1;
-    ztimeStamp.day = day1;
-}else{
-    if(dateStr.contains("-")){
-       String[]  dateStrArr  = dateStr.split("-");
-
-       // 2020-11-21_18:30:16.142        11-12_18:30:16.142    12_18:30:16.142
-        if(dateStrArr.length == 1){
+        if(dateStr == null ){
             ztimeStamp.year = year1;
-            ztimeStamp.month  = month1;
-            String dayStr = dateStrArr[0];  //   12_18:30:16.142
-            ztimeStamp.day  = Long.parseLong(dayStr);
+            ztimeStamp.month = month1;
+            ztimeStamp.day = day1;
+        }else{
+            if(dateStr.contains("-")){
+                String[]  dateStrArr  = dateStr.split("-");
+
+                // 2020-11-21_18:30:16.142        11-12_18:30:16.142    12_18:30:16.142
+                if(dateStrArr.length == 1){
+                    ztimeStamp.year = year1;
+                    ztimeStamp.month  = month1;
+                    String dayStr = dateStrArr[0];  //   12_18:30:16.142
+                    ztimeStamp.day  = Long.parseLong(dayStr);
+                }
+
+                if(dateStrArr.length == 2){   // 11-12_18:30:16.142
+                    ztimeStamp.year = year1;
+                    String monthStr = dateStrArr[0];
+                    String dayStr = dateStrArr[1];
+                    ztimeStamp.month  = Long.parseLong(monthStr);
+                    ztimeStamp.day  = Long.parseLong(dayStr);
+                }
+
+                if(dateStrArr.length == 3){
+                    String yearStr = dateStrArr[0];
+                    String monthStr = dateStrArr[1];
+                    String dayStr = dateStrArr[2];
+                    ztimeStamp.year =  Long.parseLong(yearStr);
+                    ztimeStamp.month  = Long.parseLong(monthStr);
+                    ztimeStamp.day  = Long.parseLong(dayStr);
+                }
+            }else{   //  不包含-  只包含一个数值的话   那么就是   这个月的几号了
+                ztimeStamp.year = year1;
+                ztimeStamp.month  = month1;
+                ztimeStamp.day  = Long.parseLong(dateStr);
+            }
+            // 2020-11-21
+
+
         }
 
-       if(dateStrArr.length == 2){   // 11-12_18:30:16.142
-           ztimeStamp.year = year1;
-           String monthStr = dateStrArr[0];
-           String dayStr = dateStrArr[1];
-           ztimeStamp.month  = Long.parseLong(monthStr);
-           ztimeStamp.day  = Long.parseLong(dayStr);
-       }
 
-        if(dateStrArr.length == 3){
-            String yearStr = dateStrArr[0];
-            String monthStr = dateStrArr[1];
-            String dayStr = dateStrArr[2];
-            ztimeStamp.year =  Long.parseLong(yearStr);
-            ztimeStamp.month  = Long.parseLong(monthStr);
-            ztimeStamp.day  = Long.parseLong(dayStr);
-        }
-    }else{   //  不包含-  只包含一个数值的话   那么就是   这个月的几号了
-        ztimeStamp.year = year1;
-        ztimeStamp.month  = month1;
-        ztimeStamp.day  = Long.parseLong(dateStr);
-    }
-    // 2020-11-21
+        if(hourStr ==null){  // 时分秒
+            ztimeStamp.hour = hour1;
+            ztimeStamp.mintus = minutes1;
+            ztimeStamp.second = seconds1;
+        }else{
 
-
-}
-
-
-    if(hourStr ==null){  // 时分秒
-        ztimeStamp.hour = hour1;
-        ztimeStamp.mintus = minutes1;
-        ztimeStamp.second = seconds1;
-    }else{
-
-        String timeValue = hourStr.toString();
+            String timeValue = hourStr.toString();
 //        18:30:16.142
-         if(timeValue.contains(".")){  // 如果包含 . 点  毫秒
-             String miscSecondStr = timeValue.substring(timeValue.lastIndexOf(".")+1);
-             ztimeStamp.microSecond = Long.parseLong(miscSecondStr);
-             timeValue = hourStr.substring(0,timeValue.lastIndexOf("."));
-         }
+            if(timeValue.contains(".")){  // 如果包含 . 点  毫秒
+                String miscSecondStr = timeValue.substring(timeValue.lastIndexOf(".")+1);
+                ztimeStamp.microSecond = Long.parseLong(miscSecondStr);
+                timeValue = hourStr.substring(0,timeValue.lastIndexOf("."));
+            }
 
-        //        18:30:16
+            //        18:30:16
 
-        String[] hourArr = timeValue.split(":");
+            String[] hourArr = timeValue.split(":");
 
 
-         // 时   2020-11-21_18
-         if(hourArr.length == 1){
-             ztimeStamp.hour = Long.parseLong(hourArr[0]);
-             ztimeStamp.mintus = 0;
-             ztimeStamp.second = 0;
+            // 时   2020-11-21_18
+            if(hourArr.length == 1){
+                ztimeStamp.hour = Long.parseLong(hourArr[0]);
+                ztimeStamp.mintus = 0;
+                ztimeStamp.second = 0;
 
-         }
+            }
 
-         //时分   2020-11-21_18:30
-        if(hourArr.length == 2){
-            ztimeStamp.hour = Long.parseLong(hourArr[0]);
-            ztimeStamp.mintus =  Long.parseLong(hourArr[1]);
-            ztimeStamp.second = 0;
+            //时分   2020-11-21_18:30
+            if(hourArr.length == 2){
+                ztimeStamp.hour = Long.parseLong(hourArr[0]);
+                ztimeStamp.mintus =  Long.parseLong(hourArr[1]);
+                ztimeStamp.second = 0;
+            }
+
+            if(hourArr.length == 3){
+                ztimeStamp.hour = Long.parseLong(hourArr[0]);
+                ztimeStamp.mintus =  Long.parseLong(hourArr[1]);
+                ztimeStamp.second = Long.parseLong(hourArr[2]);
+
+            }
+
         }
 
-        if(hourArr.length == 3){
-            ztimeStamp.hour = Long.parseLong(hourArr[0]);
-            ztimeStamp.mintus =  Long.parseLong(hourArr[1]);
-            ztimeStamp.second = Long.parseLong(hourArr[2]);
-
-        }
-
-    }
-
-     // 设置对应的 calendoar 日历
-    ztimeStamp.targetCalendar.set((int)ztimeStamp.year,(int)ztimeStamp.month,(int)ztimeStamp.day);
-    ztimeStamp.targetCalendar.set((int)ztimeStamp.year,(int)ztimeStamp.month,(int)ztimeStamp.day,(int)ztimeStamp.hour,(int)ztimeStamp.mintus,(int)ztimeStamp.second);
-    ztimeStamp.targetCalendar.set(Calendar.MILLISECOND,(int)ztimeStamp.microSecond);
+        // 设置对应的 calendoar 日历
+        ztimeStamp.targetCalendar.set((int)ztimeStamp.year,(int)ztimeStamp.month,(int)ztimeStamp.day);
+        ztimeStamp.targetCalendar.set((int)ztimeStamp.year,(int)ztimeStamp.month,(int)ztimeStamp.day,(int)ztimeStamp.hour,(int)ztimeStamp.mintus,(int)ztimeStamp.second);
+        ztimeStamp.targetCalendar.set(Calendar.MILLISECOND,(int)ztimeStamp.microSecond);
 
         return ztimeStamp;
     }
@@ -1393,43 +1389,43 @@ if(dateStr == null ){
         return yearDaysSum;
     }
 
-  static int  calculRunYear(int year){
+    static int  calculRunYear(int year){
         int yearDay = 365;
-       if( year%4==0&&year%100!=0||year%400==0){
-          yearDay = 366;
-       }
+        if( year%4==0&&year%100!=0||year%400==0){
+            yearDay = 366;
+        }
 
         return yearDay;
-  }
-
-
-static int calculMonthday(int year , int month , int count , boolean direct){
-        int monthDay = 0;
-
-
-    System.out.println(" 需额外计算月数为: "+  count);
-    for (int i = 1; i < count +1 ; i++) {
-        int curMonth  =  direct? month+i:month-i; //  增加   减少
-        Year_Month curYearMonth = new H1_TimeTool().new Year_Month(year , curMonth);
-
-        int curDayCount = getDayForMonth_Year(curYearMonth.year,curYearMonth.month);
-        System.out.println(" 年 :"+ curYearMonth.year + "  月 :"+ curYearMonth.month +"  天数:"+ curDayCount);
-        monthDay += curDayCount;
     }
 
 
+    static int calculMonthday(int year , int month , int count , boolean direct){
+        int monthDay = 0;
 
-    System.out.println(" 需额外计算月数对应天数为: "+  monthDay);
+
+        System.out.println(" 需额外计算月数为: "+  count);
+        for (int i = 1; i < count +1 ; i++) {
+            int curMonth  =  direct? month+i:month-i; //  增加   减少
+            Year_Month curYearMonth = new H1_TimeTool().new Year_Month(year , curMonth);
+
+            int curDayCount = getDayForMonth_Year(curYearMonth.year,curYearMonth.month);
+            System.out.println(" 年 :"+ curYearMonth.year + "  月 :"+ curYearMonth.month +"  天数:"+ curDayCount);
+            monthDay += curDayCount;
+        }
+
+
+
+        System.out.println(" 需额外计算月数对应天数为: "+  monthDay);
         return  monthDay;
 
-}
+    }
 
-static long MicSecond_2_Second = 1000; //  1000  毫秒转为 1秒
-static long Second_2_Mintus = 60; //  60  秒转为 分钟
-static long Mintus_2_Hour = 60;  //  60 分钟 转为 1小时
-static long Hour_2_Day = 24;    // 24 小时转为1 天
-static long Day_2_Week = 7;    //7天时一周
-static long Day_2_Year_365 = 365;    //365天是一年
+    static long MicSecond_2_Second = 1000; //  1000  毫秒转为 1秒
+    static long Second_2_Mintus = 60; //  60  秒转为 分钟
+    static long Mintus_2_Hour = 60;  //  60 分钟 转为 1小时
+    static long Hour_2_Day = 24;    // 24 小时转为1 天
+    static long Day_2_Week = 7;    //7天时一周
+    static long Day_2_Year_365 = 365;    //365天是一年
     static long Day_2_Year_366 = 366;    //366天是一年
 // 一个月 有 几天 是 不确定的
 
@@ -1471,17 +1467,17 @@ static long Day_2_Year_365 = 365;    //365天是一年
             boolean direct = directup;
 
             if(month_length != 0)
-            System.out.println(" month_length = "+ month_length +" 转为"+ year2Month +"年 "+ monthCount+" 个月");
+                System.out.println(" month_length = "+ month_length +" 转为"+ year2Month +"年 "+ monthCount+" 个月");
 
             // 月份计算出的总的天数
-          int monthDays =   calculMonthday(curYear,curMonth,monthCount,direct);
+            int monthDays =   calculMonthday(curYear,curMonth,monthCount,direct);
 
-          if(monthDays > 0){
+            if(monthDays > 0){
 
-              // 月份计算
-              mAllSecond = mAllSecond + monthDays  * Hour_2_Day * Mintus_2_Hour * Second_2_Mintus * 1000;
+                // 月份计算
+                mAllSecond = mAllSecond + monthDays  * Hour_2_Day * Mintus_2_Hour * Second_2_Mintus * 1000;
 
-          }
+            }
 
             long curAllYear = year_length + year2Month;
             long AllYearDays = calculYearDays(curentDate.get(Calendar.YEAR),(int)curAllYear,directup);
@@ -1503,18 +1499,18 @@ static long Day_2_Year_365 = 365;    //365天是一年
 
 
 
-       long getSumSecond(){
+        long getSumSecond(){
             return sumMicroSecond/1000;
         }
 
 
         ZTimeLengthStamp(){
-                   year_length    = 0 ;
-                  month_length   = 0 ;
-                    day_length     = 0 ;
-                   hour_length    = 0 ;
-                 mintus_length  = 0 ;
-                 second_length  = 0 ;
+            year_length    = 0 ;
+            month_length   = 0 ;
+            day_length     = 0 ;
+            hour_length    = 0 ;
+            mintus_length  = 0 ;
+            second_length  = 0 ;
             microSecond_length = 0 ;
             directup = true;
 
@@ -1536,7 +1532,7 @@ static long Day_2_Year_365 = 365;    //365天是一年
     }
 
 
-  static  int getDayForMonth_Year(int year , int month){
+    static  int getDayForMonth_Year(int year , int month){
     /* if (month==1||month==3||month==5||month==7||month==8||month==10||month==12){
      System.out.println(year+"年"+month+"月"+"这个月是31天");
  }else if (month==4||month==6||month==9||month==11){
@@ -1550,27 +1546,27 @@ static long Day_2_Year_365 = 365;    //365天是一年
  }else {
      System.out.println("请输入正确的月份");
  }*/
-    //优化方法days天数
+        //优化方法days天数
 
 
 
-    int days = 0;
-    if (month==1||month==3||month==5||month==7||month==8||month==10||month==12){
-        days = 31;
-    }else if (month==4||month==6||month==9||month==11){
-        days = 30;
-    }else if (month==2){
-        if( year%4==0&&year%100!=0||year%400==0){
-            days = 29;
+        int days = 0;
+        if (month==1||month==3||month==5||month==7||month==8||month==10||month==12){
+            days = 31;
+        }else if (month==4||month==6||month==9||month==11){
+            days = 30;
+        }else if (month==2){
+            if( year%4==0&&year%100!=0||year%400==0){
+                days = 29;
+            }else {
+                days = 28;
+            }
         }else {
-            days = 28;
-        }
-    }else {
 //        System.out.println("请输入正确的月份");
-    }
+        }
 //    System.out.println(year+"年"+month+"月"+"这个月有"+days+"天");
-    return days;
-}
+        return days;
+    }
 
     // 输入格式4  只输入一个时间的长度
 // ztime_H1.bat  8191s     转为  xx年xx月xx日xx小时xx分钟xx秒
@@ -1579,8 +1575,8 @@ static long Day_2_Year_365 = 365;    //365天是一年
     //  ztime_H1.bat 11h23m41S    转为今日的 分钟数   秒数  毫秒数
 
     //Y-年   M-月  W-星期  D-天  H-小时 m-分钟 s-秒
-  static  class TimeOperation{
-// 输入格式1. 加减  ztime_H1.bat  18:30:17.560+5938s   2020-04-26_18:30:17.560-5938s  //1.没有年月日 默认今天   往后5938秒后的时间
+    static  class TimeOperation{
+        // 输入格式1. 加减  ztime_H1.bat  18:30:17.560+5938s   2020-04-26_18:30:17.560-5938s  //1.没有年月日 默认今天   往后5938秒后的时间
 // 输入格式2.  两个时间戳 //   两个时间点相差 距离 // ztime_H1.bat 18:30:17.560   18:22:03.465
 // 输入格式3. 只输入一个时间戳 ztime_H1.bat  18:30:17.560     转为今日的 分钟数   秒数  毫秒数   另一个默认和现在时间比较
 // 输入格式4  只输入一个时间的长度        ztime_H1.bat  100H8191s     转为  xx年xx月xx日xx小时xx分钟xx秒
@@ -1599,32 +1595,32 @@ static long Day_2_Year_365 = 365;    //365天是一年
         long microSeconds1;  // 毫秒
 
 
-         long year2;
-         long month2;
-         long day2;
-         long hour2;
-         long minutes2;  // 分钟
-         long seconds2;  // 秒
-         long microSeconds2;  // 毫秒
+        long year2;
+        long month2;
+        long day2;
+        long hour2;
+        long minutes2;  // 分钟
+        long seconds2;  // 秒
+        long microSeconds2;  // 毫秒
         //     //Y-年   M-月  W-星期  D-天  H-小时 m-分钟 s-秒
         boolean checkType1(String param){
             boolean flag = false;
 
             // 以  时间 参数为结尾
-         boolean  endflag =    param.endsWith("Y") || param.endsWith("y") ||
+            boolean  endflag =    param.endsWith("Y") || param.endsWith("y") ||
                     param.endsWith("M") || param.endsWith("m") ||
                     param.endsWith("D") || param.endsWith("d") ||
                     param.endsWith("H") || param.endsWith("h") ||
-                 param.endsWith("W") || param.endsWith("w") ||
+                    param.endsWith("W") || param.endsWith("w") ||
                     param.endsWith("S") || param.endsWith("s");
 
 // 输入格式1. 加减  ztime_H1.bat  18:30:17.560+5938s   2020-04-26_18:30:17.560-5938s  //1.没有年月日 默认今天   往后5938秒后的时间
 
             //  最后的 + - 索引 大于 : 好的索引
-         boolean addfalg =    param.contains(":") &&   param.lastIndexOf("+") >  param.lastIndexOf(":");
-         boolean downfalg =    param.contains(":") &&   param.lastIndexOf("-") >  param.lastIndexOf(":");
-         boolean dotfalg = addfalg || downfalg;
-         //  必须包含  时间结尾   必须包含 +- 号
+            boolean addfalg =    param.contains(":") &&   param.lastIndexOf("+") >  param.lastIndexOf(":");
+            boolean downfalg =    param.contains(":") &&   param.lastIndexOf("-") >  param.lastIndexOf(":");
+            boolean dotfalg = addfalg || downfalg;
+            //  必须包含  时间结尾   必须包含 +- 号
             return endflag && dotfalg;
         }
 
@@ -1693,7 +1689,7 @@ static long Day_2_Year_365 = 365;    //365天是一年
                     param.endsWith("W") || param.endsWith("w") ||
                     param.endsWith("S") || param.endsWith("s");
 
-         //2. 去除时间参数后 剩下的 是一个数数字字符串
+            //2. 去除时间参数后 剩下的 是一个数数字字符串
             String numStr =  clearTimeChar(param);
             boolean isOnlyNum = isNumeric(numStr);  //
 
@@ -1756,8 +1752,8 @@ static long Day_2_Year_365 = 365;    //365天是一年
                     long secondDistance = zTimeLength.calculAllMillSecond(zTimeStamp);
 
                     long calculDate = directUp?zTimeStamp.targetCalendar.getTimeInMillis() + secondDistance:zTimeStamp.targetCalendar.getTimeInMillis() - secondDistance;
-                 Calendar calculCalendar = Calendar.getInstance();
-                 calculCalendar.setTimeInMillis(calculDate);
+                    Calendar calculCalendar = Calendar.getInstance();
+                    calculCalendar.setTimeInMillis(calculDate);
 
                     System.out.println(zTimeStamp);
                     System.out.println(zTimeLength);
@@ -1767,8 +1763,8 @@ static long Day_2_Year_365 = 365;    //365天是一年
                             (calculCalendar.get(Calendar.MONTH) ==0 ? 12:calculCalendar.get(Calendar.MONTH))+"月"+
                             calculCalendar.get(Calendar.DAY_OF_MONTH)+"日"+
                             calculCalendar.get(Calendar.HOUR_OF_DAY)+"时"+
-                                    calculCalendar.get(Calendar.MINUTE)+"分"+
-                                    calculCalendar.get(Calendar.SECOND)+"秒" );
+                            calculCalendar.get(Calendar.MINUTE)+"分"+
+                            calculCalendar.get(Calendar.SECOND)+"秒" );
 
                     System.out.println("\n"
                             +calculCalendar.get(Calendar.YEAR)+"-"+
@@ -1856,9 +1852,9 @@ static long Day_2_Year_365 = 365;    //365天是一年
 
                 case 4:
                     // 输入格式4  只输入一个时间的长度        ztime_H1.bat  100H8191s     转为  xx年xx月xx日xx小时xx分钟xx秒
-                String params4 = inputParamList.get(0);
+                    String params4 = inputParamList.get(0);
                     ZTimeLengthStamp  zTimeLengthforType4 = getZtimeLength(params4,true);
-                   long millSecondForType4 =  zTimeLengthforType4.calculAllMillSecond(null);
+                    long millSecondForType4 =  zTimeLengthforType4.calculAllMillSecond(null);
 
                     long N4_distanceSecond = millSecondForType4/1000;
                     long N4_distanceMintus = millSecondForType4/(1000 * 60);
@@ -1927,74 +1923,74 @@ static long Day_2_Year_365 = 365;    //365天是一年
 
 
                     break;
-                    default:
-                        initFlag = false;
+                default:
+                    initFlag = false;
             }
 
 
-       return initFlag;
+            return initFlag;
 
 
 
-}
+        }
 
-String showCalendar(Calendar calendar){
+        String showCalendar(Calendar calendar){
             String desc = "";
-    int myear = calendar.get(Calendar.YEAR);
-    int mmonth = calendar.get(Calendar.MONTH);
-    int mday = calendar.get(Calendar.DAY_OF_MONTH);
-    int mhour = calendar.get(Calendar.HOUR_OF_DAY);
-    int mmintues = calendar.get(Calendar.MINUTE);
-    int msecond = calendar.get(Calendar.SECOND);
-    int mMillSecond = calendar.get(Calendar.MILLISECOND);
-    desc = myear+"-"+
-            padding2SizeStr(mmonth) +"-"+
-            padding2SizeStr(mday)+"_"+
-            padding2SizeStr(mhour)+":"+
-            padding2SizeStr(mmintues)+":"+
-            padding2SizeStr(msecond) +"."+
-            padding3SizeStr(mMillSecond);
+            int myear = calendar.get(Calendar.YEAR);
+            int mmonth = calendar.get(Calendar.MONTH);
+            int mday = calendar.get(Calendar.DAY_OF_MONTH);
+            int mhour = calendar.get(Calendar.HOUR_OF_DAY);
+            int mmintues = calendar.get(Calendar.MINUTE);
+            int msecond = calendar.get(Calendar.SECOND);
+            int mMillSecond = calendar.get(Calendar.MILLISECOND);
+            desc = myear+"-"+
+                    padding2SizeStr(mmonth) +"-"+
+                    padding2SizeStr(mday)+"_"+
+                    padding2SizeStr(mhour)+":"+
+                    padding2SizeStr(mmintues)+":"+
+                    padding2SizeStr(msecond) +"."+
+                    padding3SizeStr(mMillSecond);
             return desc;
 
 
-}
+        }
 
 
         //  false:  当前须发解析参数      true:当前能正确解析参数
-    boolean     checkInputParamListAndGetType(ArrayList<String> inputParamList){
-        boolean flag = false;
-        int paramSize = inputParamList.size();
-        if(paramSize == 2){
-            inputType = 2;
-            flag = true;
-        }else if(paramSize == 1){
-            String onlyOneParam = inputParamList.get(paramSize -1);
+        boolean     checkInputParamListAndGetType(ArrayList<String> inputParamList){
+            boolean flag = false;
+            int paramSize = inputParamList.size();
+            if(paramSize == 2){
+                inputType = 2;
+                flag = true;
+            }else if(paramSize == 1){
+                String onlyOneParam = inputParamList.get(paramSize -1);
 
-            if(checkType1(onlyOneParam)){
-                inputType = 1;
-                flag = true;
-            }else if(checkType3(onlyOneParam)){
-                inputType = 3;
-                flag = true;
-            }else if(checkType4(onlyOneParam)){
-                inputType = 4;
-                flag = true;
-            }else if(checkType5(onlyOneParam)){
-                inputType = 5;
-                flag = true;
-            }else {    // 其余的情况  输入类型为 0 标识无法识别
+                if(checkType1(onlyOneParam)){
+                    inputType = 1;
+                    flag = true;
+                }else if(checkType3(onlyOneParam)){
+                    inputType = 3;
+                    flag = true;
+                }else if(checkType4(onlyOneParam)){
+                    inputType = 4;
+                    flag = true;
+                }else if(checkType5(onlyOneParam)){
+                    inputType = 5;
+                    flag = true;
+                }else {    // 其余的情况  输入类型为 0 标识无法识别
+                    inputType = 0;
+                    flag = false;
+                }
+
+            }else{
+                System.out.println("当前输入的参数长度超过2个 ! ");
                 inputType = 0;
                 flag = false;
             }
 
-        }else{
-            System.out.println("当前输入的参数长度超过2个 ! ");
-            inputType = 0;
-            flag = false;
-        }
-
-        System.out.println("checkInputParamListAndGetType -> inputType = "+ inputType + "   flag = "+ flag);
-        return flag;
+            System.out.println("checkInputParamListAndGetType -> inputType = "+ inputType + "   flag = "+ flag);
+            return flag;
 
 
 
@@ -2013,12 +2009,12 @@ String showCalendar(Calendar calendar){
             microSeconds1 =  calendar.get(Calendar.MILLISECOND);
 
             year2 =     calendar.get(Calendar.YEAR);
-           month2 =     calendar.get(Calendar.MONTH) +1 ;
-             day2 =  calendar.get(Calendar.DATE);
+            month2 =     calendar.get(Calendar.MONTH) +1 ;
+            day2 =  calendar.get(Calendar.DATE);
             hour2 =  calendar.get(Calendar.HOUR_OF_DAY);
-         minutes2 =  calendar.get(Calendar.MINUTE);
-         seconds2 =  calendar.get(Calendar.SECOND);
-         microSeconds2 =  calendar.get(Calendar.MILLISECOND);
+            minutes2 =  calendar.get(Calendar.MINUTE);
+            seconds2 =  calendar.get(Calendar.SECOND);
+            microSeconds2 =  calendar.get(Calendar.MILLISECOND);
         }
 
 
@@ -2258,14 +2254,12 @@ String showCalendar(Calendar calendar){
           int paddingLength = 120 - allContentLength;
           String fix_120_curMonDesc = PaddingEndStr(curAllContent," ",paddingLength);
           int fixed_content_length = fix_120_curMonDesc.length();
-
           String String1 = fix_120_curMonDesc.substring(0,20);
           String String2 = fix_120_curMonDesc.substring(20,40);
           String String3 = fix_120_curMonDesc.substring(40,60);
           String String4 = fix_120_curMonDesc.substring(60,80);
           String String5 = fix_120_curMonDesc.substring(80,100);
           String String6 = fix_120_curMonDesc.substring(100,120);
-
 */
 
 //          System.out.println("String0 = "+month_name);
@@ -2333,34 +2327,26 @@ String showCalendar(Calendar calendar){
         }
         String  calculFirstBlankStr(int begin_week_day){
             String blankStr = "";
-            //0-周天  1-周一    6-周六
-            if(begin_week_day == 0){
+            //0-周天  1-周一    6-周六    7-周天
+            //  0  和 7 都表示 周天
+            if(begin_week_day == 1){
                 blankStr =  "";
-            } else if(begin_week_day == 1){
-                blankStr =  "   "; // 3 个 空格
             } else if(begin_week_day == 2){
-                blankStr =  "      "; // 6 个 空格
+                blankStr =  "   "; // 3 个 空格
             } else if(begin_week_day == 3){
-                blankStr =  "         "; // 9 个 空格
+                blankStr =  "      "; // 6 个 空格
             } else if(begin_week_day == 4){
-                blankStr =  "            ";   // 12 个 空格
+                blankStr =  "         "; // 9 个 空格
             } else if(begin_week_day == 5){
-                blankStr =  "               ";// 15 个 空格
+                blankStr =  "            ";   // 12 个 空格
             } else if(begin_week_day == 6){
+                blankStr =  "               ";// 15 个 空格
+            } else if(begin_week_day == 7 || begin_week_day == 0){
                 blankStr =  "                  ";     // 18 个 空格
             }
 //          System.out.println("begin_week_day = "+begin_week_day + "   blankStr ="+blankStr+"=");
             return blankStr;
         }
-/*
-January
-Su Mo Tu We Th Fr Sa
-         1  2  3  4
-5  6  7  8  9 10 11
-12 13 14 15 16 17 18
-19 20 21 22 23 24 25
-26 27 28 29 30 31
- */
 
 
     }
@@ -2498,7 +2484,7 @@ Su Mo Tu We Th Fr Sa
 
                 if(i != animalInfoList.size() -1 ){
                     System.out.println("══════════════════════════════════╬══════════════════════════════════╬══════════════════════════════════╣");
-     }
+                }
 
             }
 
