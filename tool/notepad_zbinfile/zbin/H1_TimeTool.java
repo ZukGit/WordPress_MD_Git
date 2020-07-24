@@ -342,16 +342,6 @@ public class H1_TimeTool {
 
     }
 
-    public static boolean isContainChinese(String str) {
-        Pattern p = Pattern.compile("[\u4e00-\u9fa5]");
-        Matcher m = p.matcher(str);
-        if (m.find()) {
-            return true;
-        }
-        return false;
-    }
-
-
 
 
 
@@ -477,7 +467,7 @@ public class H1_TimeTool {
 
 
 
-    static void showNoTypeTip() {
+    static void showNoTypeTip(H1_TimeTool timetool) {
         System.out.println("用户输入的参数为空  或者 参数不符合规格  请参考如下 重新输入:");
         System.out.println("提示1:  时间戳使用格式: 2020-04-26_16:16:00.550  16:16:16.16  16:16:16   16:18 ");  // 输入 提示  输入格式 提示
         System.out.println("提示2:  标识时间长度使用  1000s 40h1000s 100000s  35d15h12m500s  Y-年   M-月  W-星期  D-天  H-小时 m-分钟 s-秒");
@@ -750,9 +740,22 @@ public class H1_TimeTool {
 
 
 
+
         System.out.println();
         System.out.println();
         showAnimalYearInfo();
+        System.out.println();
+
+
+        if(isInputYearParam){  //  不等于默认值  说明有赋值
+            YearRecord record = timetool.new YearRecord(ShowCalYearInt);
+            record.initRecord(allRecordInProp);
+            record.showRecord(); //   如果用户手动 输入 那么显示 12个月的信息
+        }else{   // 等于默认值  显示三个月的信息
+            YearRecord record = timetool.new YearRecord(Now_YearInt);
+            record.initRecord(allRecordInProp);
+            record.showRecord(month); //      默认没有输入年份 那么 只显示 三个月的信息
+        }
         System.out.println();
         System.out.println();
         showYearCal();
@@ -811,31 +814,7 @@ public class H1_TimeTool {
     }
 
 
-    static int   calculXinqiYiForMonthBegin(int year ,  int month) {
-        //  计算月初 是星期几
 
-        // 这个月  已过了 多少百分比
-        Calendar beginMonthCalendar = Calendar.getInstance();
-
-//        beginMonthCalendar.set(beginMonthCalendar.DAY_OF_WEEK, beginMonthCalendar.MONDAY);
-        beginMonthCalendar.set(Calendar.YEAR, year); // 设置成年
-        beginMonthCalendar.set(Calendar.MONTH, month-1); // 设置成年
-        beginMonthCalendar.set(Calendar.DAY_OF_MONTH, 1); // 设置成月初
-        beginMonthCalendar.set(Calendar.HOUR_OF_DAY, 0);
-        beginMonthCalendar.set(Calendar.HOUR, 0);  //  时分秒 毫秒 都设置0
-        beginMonthCalendar.set(Calendar.MINUTE, 0);  //  时分秒 毫秒 都设置0
-        beginMonthCalendar.set(Calendar.SECOND, 0);  //  时分秒 毫秒 都设置0
-        beginMonthCalendar.set(Calendar.MILLISECOND, 0);  //  时分秒 毫秒 都设置0
-        beginMonthCalendar.set(Calendar.HOUR_OF_DAY, 0);
-
-        //0-周天  1-周一    6-周六
-        int day = beginMonthCalendar.get(Calendar.DAY_OF_WEEK) - 1;
-
-        if(day ==0 ){   // 周0转为 周七  以中国人的方式显示
-            day =7 ;
-        }
-        return day;
-    }
 
     static String  calculXinqiYiForMonthBegin(){
         //  计算月初 是星期几
@@ -1018,10 +997,15 @@ public class H1_TimeTool {
 
     }
 
+    static boolean isAddRecordOperation = false;
+    static boolean isInputYearParam = false;
+
+    static ArrayList<Record> allRecordInProp = new  ArrayList<Record>();
 
     public static void main(String[] args) {
-
-        initSystemInfo();
+H1_TimeTool timeTool = new H1_TimeTool();
+             initSystemInfo();
+        timeTool.initPropRecord();
 
         Locale.setDefault(Locale.CHINESE);
         if (args != null) {
@@ -1030,9 +1014,17 @@ public class H1_TimeTool {
                 if (i == 0) {   // 第一个参数永远是  当前 shell的目录
                     CUR_Dir_1_PATH = args[i];
                 }  else {
+
+                    // 以 day  month 开头的数据 那么执行 记录操作 把放到  H1.properties
+                    if(args[i].startsWith("day") || args[i].startsWith("month") ){
+                        isAddRecordOperation = true;
+                        CUR_INPUT_ParamStrList.add(args[i]);
+                        continue;
+                    }
                     String item = args[i] ;
                     if(isNumeric(item)){
                         ShowCalYearInt = Integer.parseInt(item);
+                        isInputYearParam = true;
                         continue;   // 如果是 2020 那么 直接 continue
                     }
                     CUR_INPUT_ParamStrList.add(args[i]);   // 当前cmd目录   第一个类型选项      之后所有的参数 保存在  CUR_INPUT_ParamStrList
@@ -1041,6 +1033,10 @@ public class H1_TimeTool {
             }
         }
 
+        if(isAddRecordOperation){   // 对  record数据 填充到 prop
+            // day_dalknkalglnma   month_faklfnalkfl
+            timeTool.operationRecord(timeTool);
+        }
         File mCUR_Dir_FILE = new File(CUR_Dir_1_PATH);
         CUR_Dir_FILE = new  File(CUR_Dir_1_PATH);
 
@@ -1050,7 +1046,7 @@ public class H1_TimeTool {
         // 用户没有输入参数
         if ( CUR_INPUT_ParamStrList.size() == 0) {
             System.out.println("用户没有输入参数  提示如下:");
-            showNoTypeTip();
+            showNoTypeTip(timeTool);
             return;
         }
 
@@ -1071,13 +1067,13 @@ public class H1_TimeTool {
 
         if(!timeOperation.checkInputParamListAndGetType(CUR_INPUT_ParamStrList) || timeOperation.inputType == 0){
             System.out.println("用户输入的 参数无法正确解析 请重新输入\n");
-            showNoTypeTip();
+            showNoTypeTip(timeTool);
             return;
         }
 
         if(timeOperation.initParamWithType(timeOperation.inputType ,CUR_INPUT_ParamStrList)){
             System.out.println("用户输入的 参数无法正确解析 请重新输入\n");
-            showNoTypeTip();
+            showNoTypeTip(timeTool);
             return;
 
         }
@@ -1085,6 +1081,45 @@ public class H1_TimeTool {
         setProperity();
     }
 
+    void operationRecord(H1_TimeTool timeTool){
+
+        ArrayList<Record> inputRecordList = new ArrayList<Record>();
+        for (int i = 0; i < CUR_INPUT_ParamStrList.size(); i++) {
+            String inputItem = CUR_INPUT_ParamStrList.get(i);
+            long timestamp = new Date().getTime();
+            Calendar now = Calendar.getInstance();
+            int curMonth  = now.get(Calendar.MONTH) + 1;
+            int curDay  = now.get(Calendar.DAY_OF_MONTH);
+
+            if(inputItem.toLowerCase().startsWith("day") && inputItem.contains("_")){
+                if(inputItem.toLowerCase().startsWith("day_")){
+                    String dayDesc = inputItem.split("_")[1];
+                    Record r = timeTool.new Record(curMonth,curDay,"",dayDesc,false,timestamp);
+                    r.timeStamp = timestamp;
+                    inputRecordList.add(r);
+                    continue;
+                }
+            }else if(inputItem.toLowerCase().startsWith("month") && inputItem.contains("_")){
+                String MonthDesc = inputItem.split("_")[1];
+                if(inputItem.toLowerCase().startsWith("month_")){
+                    String monthDesc = inputItem.split("_")[1];
+                    Record r = timeTool.new Record(curMonth,curDay,monthDesc,"",true,timestamp);
+                    inputRecordList.add(r);
+                    continue;
+                }
+
+            }
+
+        }
+        for (int i = 0; i < inputRecordList.size(); i++) {
+            Record recordItem = inputRecordList.get(i);
+            G8_Properties.put(recordItem.getProperityKey(),recordItem.timeStamp+"");
+        }
+
+        timeTool.initPropRecord();
+
+        setProperity();
+    }
     //Y-年   M-月  W-星期  D-天  H-小时 m-分钟 s-秒
 // 输入格式1. 加减
 //    ztime_H1.bat  18:30:17.560+5938s    //1.没有年月日 默认今天   往后5938秒后的时间
@@ -1121,6 +1156,15 @@ public class H1_TimeTool {
 // ztime_H1.bat  18:30:17.560     转为今日的 分钟数   秒数  毫秒数
 
 
+    void initPropRecord(){
+          Set<Object> recordSet = G8_Properties.keySet();
+          ArrayList<Object> propKeyList = new  ArrayList<Object>();
+       propKeyList.addAll(recordSet);
+       // allRecordInProp
+       for (int i = 0; i < propKeyList.size(); i++) {
+           allRecordInProp.add(new Record((String)propKeyList.get(i)));
+       }
+    }
     class ZTimeStamp{  // 日历    不可能出现   61秒啊  10000毫秒   61分  33天  25小时的情况
         long  year;
         long month;
@@ -2676,6 +2720,623 @@ public class H1_TimeTool {
     }
 
 
+    class YearRecord {
 
+        int year;  // 对应的年份
+
+        ArrayList<MonthRecord> monthRecordList;
+
+        YearRecord(int mYear) {
+            year = mYear;
+            monthRecordList = new ArrayList<MonthRecord>();
+            for (int i = 1; i <= 12; i++) {
+                monthRecordList.add(new MonthRecord(mYear, i));
+            }
+        }
+
+        void showRecord() {
+            for (int i = 0; i < monthRecordList.size(); i++) {
+                monthRecordList.get(i).showRecord();
+
+            }
+        }
+
+        void showRecord(int month) {
+            for (int i = 0; i < monthRecordList.size(); i++) {
+                monthRecordList.get(i).showRecord(month);
+
+            }
+        }
+
+        void initRecord(ArrayList<Record> allRecord) {
+            for (int i = 0; i < monthRecordList.size(); i++) {
+                monthRecordList.get(i).initRecord(allRecord);
+
+            }
+        }
+
+    }
+
+
+    /*    July_7
+        Mo Tu We Th Fr Sa Su
+           1  2  3  4  5
+        6  7  8  9 10 11 12
+        13 14 15 16 17 18 19
+        20 21 22 23 24 25 26
+        27 28 29 30 31
+        */
+    static int Default_MonthDescLength = 168 + 6;
+    static int Default_DayDescLength = 28 + 6;
+
+    class MonthRecord {
+        int monthDescLength;   //  月志的 长度
+        int dayDescLength;   //  日志的长度
+
+        int maxDayRecordCountLine;  // 在Map 中 的 Value的最大的长度  用于计算 日志显示的最大长度
+        int year;
+        int month;
+        int mDaySum;  // 一个月的天数
+        int beginDayOfWeek;  // 该月1日星期几   1 2 3 4 5 6 7
+        int firstWeekCount;   // 第1周的天数
+        ArrayList<ArrayList<Integer>> weekKeyList;  //  // index0:  { 1 ,2 ,3 ,4 ,5} // index1:  {6  7  8  9 10 11 12}
+
+        ArrayList<Record> OneMonthRecordList;    // 所有记录
+        ArrayList<Record> OneImportantRecordList;  // 重要记录
+        ArrayList<Record> OneCommonRecordList;  // 一般记录
+
+        Map<ArrayList<Integer>, ArrayList<Record>> weeksInMonthMap;  // 周的数据   对应周数的记录
+
+        void showRecord(int month) {
+
+            int preMonth = month - 1 ;
+            int stepMonth =  month + 1 ;
+
+            int  mPreMonth =  preMonth%12==0?12:preMonth%12;
+            int mCurMonth = month%12==0?12:month%12;
+            int  mStepMonth =  stepMonth%12==0?12:stepMonth%12;
+//            System.out.println("温顾");
+            showRecordWithMonth(mPreMonth,-1);
+//            System.out.println("正当时");
+            showRecordWithMonth(mCurMonth,0);
+//            System.out.println("知新");
+            showRecordWithMonth(mStepMonth,1);
+        }
+
+        void showRecordWithMonth(int monthParam,int index) {
+            if(month != monthParam){
+               return;
+            }
+            System.out.println();
+            String tip = "";
+            if(index == -1){
+                tip = "温故";
+            }else if(index == 0){
+                tip = "正当时";
+            }else if(index == 1){
+                tip = "知新";
+            }
+            String title = "╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗";
+            String tail = "╚══════════════════════════════════╩══════════════════════════════════╩══════════════════════════════════╩══════════════════════════════════╩══════════════════════════════════╝";
+//【202007月 活动记事日历】
+            String monthStr = month > 9 ? "" + month : "0" + month;
+            System.out.println("                                                                          " + "【" + year + "年" + monthStr + "《"+tip+"》"+ "月" + " 活动记事日历】");
+            // 1. 打印 title
+            System.out.println(title);
+
+            // 2. 打印 monthDesc Record        getPaddingString
+            if(OneImportantRecordList.size() > 0){
+                for (int i = 0; i < OneImportantRecordList.size(); i++) {
+                    Record recordItem = OneImportantRecordList.get(i);
+                    String recordStr = recordItem.monthStr + recordItem.dayStr + ": " + recordItem.monthDesc84Chinese;
+                    System.out.println("║" + getPaddingString(recordStr, monthDescLength, " ", false) + "║");
+                }
+            }else if(OneImportantRecordList.size() == 0){
+
+                System.out.println("║                                                                                                                                                                              ║");
+            }
+
+            System.out.println("╠══════════════════════════════════╦══════════════════════════════════╦══════════════════════════════════╦══════════════════════════════════╦══════════════════════════════════╣");
+
+            StringBuilder lineOne = new StringBuilder();
+            StringBuilder lineTwo = new StringBuilder();
+            for (int i = 0; i < weekKeyList.size(); i++) {
+                ArrayList<Integer> weekDays = weekKeyList.get(i);
+                int days = weekDays.size();
+                int weekNum = i + 1;
+                String descItem = weekNum + "w(" + days + "d)"+nowSelectTip(month,weekDays);
+                descItem = getPaddingString(descItem, 14 + descItem.length(), " ", true);
+                descItem = getPaddingString(descItem, 14 + descItem.length(), " ", false);
+                descItem = descItem + "║";
+                descItem = descItem.replace("〓  ","〓");
+//                System.out.println(descItem);
+                lineOne.append(descItem);
+
+                int beginDay = weekDays.get(0);
+                int endDay = weekDays.get(weekDays.size() - 1);
+
+                String beginDayStr = beginDay > 9 ? "" + beginDay : "0" + beginDay;
+                String endDayStr = endDay > 9 ? "" + endDay : "0" + endDay;
+                String dayDesc = monthStr + "." + beginDayStr + "══" + monthStr + "." + endDayStr;
+
+                dayDesc = getPaddingString(dayDesc, 11 + dayDesc.length(), " ", true);
+                dayDesc = getPaddingString(dayDesc, 11 + dayDesc.length(), " ", false);
+                dayDesc = dayDesc + "║";
+                lineTwo.append(dayDesc);
+
+            }
+            System.out.println("║" + lineOne);
+            System.out.println("║" + lineTwo);
+            System.out.println("╠══════════════════════════════════╬══════════════════════════════════╬══════════════════════════════════╬══════════════════════════════════╬══════════════════════════════════╣");
+
+            for (int i = 0; i < maxDayRecordCountLine; i++) {
+                StringBuilder sb = new StringBuilder();
+                for (int j = 0; j < weekKeyList.size(); j++) {
+                    ArrayList<Integer> weekKey = weekKeyList.get(j);
+                    ArrayList<Record>  recordList = weeksInMonthMap.get(weekKey);
+                    if(recordList == null){
+                        sb.append("                                  ║");
+                        continue;
+                    }
+                    Record recordItem = recordList.get(i);
+                    if(recordItem == null){
+                        sb.append("                                  ║");
+                    }else if(recordItem.isMonthDesc){
+                        sb.append("                                  ║");
+                    }
+                    else {
+
+                        sb.append(getPaddingString(recordItem.monthStr+recordItem.dayStr+": "+recordItem.dayDesc14Chinese,dayDescLength," ",false)+"║");
+                    }
+
+                }
+                System.out.println("║"+sb);
+
+            }
+            System.out.println(tail);
+
+        }
+
+        String nowSelectTip(int month ,ArrayList<Integer> weekDays ){
+            String tip = "";
+            Calendar now = Calendar.getInstance();
+            int now_month = now.get(Calendar.MONTH)+ 1;
+            int now_day = now.get(Calendar.DAY_OF_MONTH);
+
+            if(month == now_month &&  weekDays.contains(now_day)){
+                return "〓";
+            }
+
+            return tip;
+
+        }
+        void showRecord() {
+            System.out.println();
+            String title = "╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗";
+            String tail = "╚══════════════════════════════════╩══════════════════════════════════╩══════════════════════════════════╩══════════════════════════════════╩══════════════════════════════════╝";
+//【202007月 活动记事日历】
+            String monthStr = month > 9 ? "" + month : "0" + month;
+            System.out.println("                                                                          " + "【" + year + "年" + monthStr + "月" + " 活动记事日历】");
+            // 1. 打印 title
+            System.out.println(title);
+
+            // 2. 打印 monthDesc Record        getPaddingString
+            if(OneImportantRecordList.size() > 0){
+                for (int i = 0; i < OneImportantRecordList.size(); i++) {
+                    Record recordItem = OneImportantRecordList.get(i);
+                    String recordStr = recordItem.monthStr + recordItem.dayStr + ": " + recordItem.monthDesc84Chinese;
+                    System.out.println("║" + getPaddingString(recordStr, monthDescLength, " ", false) + "║");
+                }
+            }else if(OneImportantRecordList.size() == 0){
+
+                System.out.println("║                                                                                                                                                                              ║");
+            }
+
+            System.out.println("╠══════════════════════════════════╦══════════════════════════════════╦══════════════════════════════════╦══════════════════════════════════╦══════════════════════════════════╣");
+
+            StringBuilder lineOne = new StringBuilder();
+            StringBuilder lineTwo = new StringBuilder();
+            for (int i = 0; i < weekKeyList.size(); i++) {
+                ArrayList<Integer> weekDays = weekKeyList.get(i);
+                int days = weekDays.size();
+                int weekNum = i + 1;
+                String descItem = weekNum + "w(" + days + "d)";
+                descItem = getPaddingString(descItem, 14 + descItem.length(), " ", true);
+                descItem = getPaddingString(descItem, 14 + descItem.length(), " ", false);
+                descItem = descItem + "║";
+//                System.out.println(descItem);
+                lineOne.append(descItem);
+
+                int beginDay = weekDays.get(0);
+                int endDay = weekDays.get(weekDays.size() - 1);
+
+                String beginDayStr = beginDay > 9 ? "" + beginDay : "0" + beginDay;
+                String endDayStr = endDay > 9 ? "" + endDay : "0" + endDay;
+                String dayDesc = monthStr + "." + beginDayStr + "══" + monthStr + "." + endDayStr;
+
+                dayDesc = getPaddingString(dayDesc, 11 + dayDesc.length(), " ", true);
+                dayDesc = getPaddingString(dayDesc, 11 + dayDesc.length(), " ", false);
+                dayDesc = dayDesc + "║";
+                lineTwo.append(dayDesc);
+
+            }
+            System.out.println("║" + lineOne);
+            System.out.println("║" + lineTwo);
+            System.out.println("╠══════════════════════════════════╬══════════════════════════════════╬══════════════════════════════════╬══════════════════════════════════╬══════════════════════════════════╣");
+
+            for (int i = 0; i < maxDayRecordCountLine; i++) {
+                StringBuilder sb = new StringBuilder();
+                for (int j = 0; j < weekKeyList.size(); j++) {
+                    ArrayList<Integer> weekKey = weekKeyList.get(j);
+                    ArrayList<Record>  recordList = weeksInMonthMap.get(weekKey);
+                    if(recordList == null){
+                        sb.append("                                  ║");
+                        continue;
+                    }
+                    Record recordItem = recordList.get(i);
+                    if(recordItem == null){
+                        sb.append("                                  ║");
+                    }else if(recordItem.isMonthDesc){
+                        sb.append("                                  ║");
+                    }
+                    else {
+
+                        sb.append(getPaddingString(recordItem.monthStr+recordItem.dayStr+": "+recordItem.dayDesc14Chinese,dayDescLength," ",false)+"║");
+                    }
+
+                }
+                System.out.println("║"+sb);
+
+            }
+            System.out.println(tail);
+
+        }
+
+
+        void initRecord(ArrayList<Record> mRecord_Origin_DataList) {
+            OneMonthRecordList = new ArrayList<Record>();
+            OneImportantRecordList = new ArrayList<Record>();
+            OneCommonRecordList = new ArrayList<Record>();
+
+
+            for (int i = 0; i < mRecord_Origin_DataList.size(); i++) {
+                if (mRecord_Origin_DataList.get(i).month == month) {
+                    if (mRecord_Origin_DataList.get(i).isMonthDesc) {
+                        OneImportantRecordList.add(mRecord_Origin_DataList.get(i));
+                    } else {
+                        OneCommonRecordList.add(mRecord_Origin_DataList.get(i));
+                    }
+                    OneMonthRecordList.add(mRecord_Origin_DataList.get(i));
+                }
+            }
+
+            //           Map<ArrayList<Integer>,ArrayList<Record>> weeksInMonthMap;  // 周的数据   对应周数的记录
+            weeksInMonthMap = new HashMap<ArrayList<Integer>, ArrayList<Record>>();
+            for (int j = 0; j < OneMonthRecordList.size(); j++) {
+                Record recordItem = OneMonthRecordList.get(j);
+                int recordDay = recordItem.day;
+                int weekKeyIndex = calWeekForDay(weekKeyList, recordDay);
+                ArrayList<Integer> weekdayListkey = weekKeyList.get(weekKeyIndex);
+                ArrayList<Record> monthRecordList = weeksInMonthMap.get(weekdayListkey);
+                if (monthRecordList == null) {
+                    monthRecordList = new ArrayList<Record>();
+                    monthRecordList.add(recordItem);
+                    weeksInMonthMap.put(weekdayListkey, monthRecordList);
+                } else {
+                    monthRecordList.add(recordItem);
+                }
+            }
+
+
+            maxDayRecordCountLine = 0;
+            for (int i = 0; i < weekKeyList.size(); i++) {
+                ArrayList<Integer> weekKey = weekKeyList.get(i);
+                ArrayList<Record> recordList = weeksInMonthMap.get(weekKey);
+                if(recordList == null){continue;}
+                int currentDayRecordSize = calDayRecordSize(recordList);
+                if (maxDayRecordCountLine < currentDayRecordSize) {
+                    maxDayRecordCountLine = currentDayRecordSize;
+                }
+            }
+
+
+        }
+
+        int calDayRecordSize(ArrayList<Record> recordList){
+            int count  = 0;
+            for (int i = 0; i < recordList.size(); i++) {
+                if(!recordList.get(i).isMonthDesc){
+                    count++;
+                }
+            }
+            return count;
+        }
+
+        int calWeekForDay(ArrayList<ArrayList<Integer>> weekDayList, int day) {
+            int index = 0;
+            for (int i = 0; i < weekDayList.size(); i++) {
+                ArrayList<Integer> intList = weekDayList.get(i);
+                if (intList.contains(day)) {
+                    index = i;
+                    return index;
+                }
+            }
+            return index;
+        }
+
+        MonthRecord(int mYear, int mMonth) {
+            monthDescLength = Default_MonthDescLength;
+            dayDescLength = Default_DayDescLength;
+
+            year = mYear;
+            month = mMonth;
+            mDaySum = calculMonthDayCount(mYear, mMonth);
+            beginDayOfWeek = calculXinqiYiForMonthBegin(mYear, mMonth);
+            firstWeekCount = 7 - beginDayOfWeek + 1;
+            weekKeyList = new ArrayList<ArrayList<Integer>>();
+            ArrayList<Integer> firstWeek = new ArrayList<Integer>();
+
+            ArrayList<Integer> otherWeek = new ArrayList<Integer>();
+//            System.out.println("Year = "+ year + "    Month = "+ month + "  mDaySum = "+ mDaySum + "    beginDayOfWeek="+ beginDayOfWeek +"   firstWeekCount = "+ firstWeekCount );
+            for (int i = 1; i <= mDaySum; i++) {
+                if (i < firstWeekCount) {
+                    firstWeek.add(i);
+                    continue;
+                }
+                if (i == firstWeekCount) {
+                    firstWeek.add(i);
+                    weekKeyList.add(firstWeek);
+                    continue;
+                }
+                otherWeek.add(i);
+                if (otherWeek.size() == 7) {
+                    weekKeyList.add(otherWeek);
+                    otherWeek = new ArrayList<Integer>();
+                }
+            }
+            if (weekKeyList.size() == 4) {
+                weekKeyList.add(otherWeek);
+            } else if (weekKeyList.size() == 5) {
+                weekKeyList.get(weekKeyList.size() - 1).addAll(otherWeek);
+            }
+/*
+
+            if(weekKeyList.size() != 5 ){
+                System.out.println("weekKeyList.size = "+ weekKeyList.size() +"  tip: 只能为5");
+            }
+
+            for (int i = 0; i < weekKeyList.size(); i++) {
+                ArrayList<Integer> weekdays = weekKeyList.get(i);
+                System.out.println("week["+i+"] = "+ Arrays.toString(weekdays.toArray()));
+
+            }
+
+*/
+
+
+//        initRecord();
+
+        }
+// key
+// index0:  { 1 ,2 ,3 ,4 ,5}
+// index1:  {6  7  8  9 10 11 12}
+// index1:  {13 14 15 16 17 18 19}
+// index1:  {20 21 22 23 24 25 26}
+// index1:  {27 28 29 30 31}
+
+// value  就是 对应的需要显示在这个week下的记录了
+
+    }
+
+    class Record {
+
+        int month;    //  记录的 月份
+        int day;     //  记录的 日份    0 标识为    该月  覆盖整月
+        boolean isMonthDesc;   // 是否在 月份栏输出
+        String dayDesc14Chinese;  //  最多14个汉字的 周栏记录
+        String monthDesc84Chinese; // 月份记录 最多 84个汉字 isImportant 为 true 时  输出
+        String dayStr;
+        String monthStr;
+        long timeStamp;  //  写入的时间  也是 prop的 value的值
+
+        String getProperityKey(){
+            String monthDesc84ChineseWithOutBelowLine = monthDesc84Chinese.replaceAll("_","-");
+            String dayDesc14ChineseWithOutBelowLine = dayDesc14Chinese.replaceAll("_","-");
+
+            String key = month+"_"+day+"_"+monthDesc84ChineseWithOutBelowLine+"_"+dayDesc14ChineseWithOutBelowLine+"_"+isMonthDesc+"_"+timeStamp;
+
+            return key;
+        }
+
+        Record(String proKey){
+            if(!proKey.contains("_")){
+                System.out.println("当前 proKey "+proKey+"  无法解析为 Record");
+                return;
+            }
+            String[] params = proKey.split("_");
+
+            if(params.length !=  6){
+                System.out.println("当前 proKey "+proKey+"  正常解析为 5个部分!");
+                return;
+            }
+
+            String str0 = params[0];
+            String str1 = params[1];
+            String str2 = params[2];
+            String str3 = params[3];
+            String str4 = params[4];
+            String str5 = params[5];
+            if(isNumeric(str0)){
+                month = Integer.parseInt(str0);
+                 monthStr = month > 9 ? "" + month : "0" + month;
+            }
+
+            if(isNumeric(str1)){
+                day = Integer.parseInt(str1);
+                dayStr = day > 9 ? "" + day : "0" + day;
+            }
+            if(isNumeric(str5)){
+                timeStamp = Long.parseLong(str5);
+            }
+
+
+            monthDesc84Chinese = str2;
+            dayDesc14Chinese = str3;
+
+            if("true".equals(str4.trim()) || "false".equals(str4.trim())){
+                isMonthDesc =  Boolean.parseBoolean(str4);
+            }
+
+
+
+        }
+
+        Record(int mMonth, int mDay, String monthDesc, String dayDesc, boolean mIsMonthDesc,long mTimeStamp) {
+            month = mMonth;
+            day = mDay;
+            isMonthDesc = mIsMonthDesc;
+            monthDesc84Chinese = monthDesc;
+            dayDesc14Chinese = dayDesc;
+            dayStr = day + "";
+            if (dayStr.length() < 2) {
+                dayStr = "0" + dayStr;
+            }
+
+            monthStr = mMonth + "";
+            if (monthStr.length() < 2) {
+                monthStr = "0" + monthStr;
+            }
+
+            timeStamp =  mTimeStamp;
+        }
+
+
+        Record(int mMonth, int mDay, String monthDesc, String dayDesc, boolean mIsMonthDesc) {
+            month = mMonth;
+            day = mDay;
+            isMonthDesc = mIsMonthDesc;
+            monthDesc84Chinese = monthDesc;
+            dayDesc14Chinese = dayDesc;
+            dayStr = day + "";
+            if (dayStr.length() < 2) {
+                dayStr = "0" + dayStr;
+            }
+
+            monthStr = mMonth + "";
+            if (monthStr.length() < 2) {
+                monthStr = "0" + monthStr;
+            }
+
+        }
+
+    }
+
+
+    static int calculXinqiYiForMonthBegin(int year, int month) {
+        //  计算月初 是星期几
+
+        // 这个月  已过了 多少百分比
+        Calendar beginMonthCalendar = Calendar.getInstance();
+
+//        beginMonthCalendar.set(beginMonthCalendar.DAY_OF_WEEK, beginMonthCalendar.MONDAY);
+        beginMonthCalendar.set(Calendar.YEAR, year); // 设置成年
+        beginMonthCalendar.set(Calendar.MONTH, month - 1); // 设置成年
+        beginMonthCalendar.set(Calendar.DAY_OF_MONTH, 1); // 设置成月初
+        beginMonthCalendar.set(Calendar.HOUR_OF_DAY, 0);
+        beginMonthCalendar.set(Calendar.HOUR, 0);  //  时分秒 毫秒 都设置0
+        beginMonthCalendar.set(Calendar.MINUTE, 0);  //  时分秒 毫秒 都设置0
+        beginMonthCalendar.set(Calendar.SECOND, 0);  //  时分秒 毫秒 都设置0
+        beginMonthCalendar.set(Calendar.MILLISECOND, 0);  //  时分秒 毫秒 都设置0
+        beginMonthCalendar.set(Calendar.HOUR_OF_DAY, 0);
+
+        //0-周天  1-周一    6-周六
+        int day = beginMonthCalendar.get(Calendar.DAY_OF_WEEK) - 1;
+
+        if (day == 0) {   // 周0转为 周七  以中国人的方式显示
+            day = 7;
+        }
+        return day;
+    }
+
+
+    static int calculMonthDayCount(int year, int month) {
+        int days = 0;
+        if (month == 1 || month == 3 || month == 5 || month == 7 || month == 8 || month == 10 || month == 12) {
+            days = 31;
+        } else if (month == 4 || month == 6 || month == 9 || month == 11) {
+            days = 30;
+        } else if (month == 2) {
+            if (year % 4 == 0 && year % 100 != 0 || year % 400 == 0) {
+                days = 29;
+            } else {
+                days = 28;
+            }
+        } else {
+        }
+        return days;
+    }
+
+    public static int getPaddingChineseLength(String oriStr) {
+        int resultLength = 0;
+        int oriSize = oriStr.length();
+        int chinseSize = getChineseCount(oriStr);   // 所有中文的个数
+        int distanceSize = oriSize - chinseSize; // 所有英文的个数
+        resultLength = chinseSize * 2 + distanceSize;
+        return resultLength;
+
+    }
+
+    public static int getChineseCount(String oriStr) {
+        int count = 0;
+        for (int i = 0; i < oriStr.length(); i++) {
+            char itemChar = oriStr.charAt(i);
+
+            if ((itemChar + "").equals("：")
+                    || (itemChar + "").equals("】") || (itemChar + "").equals("【") || (itemChar + "").equals("）")
+                    || (itemChar + "").equals("（") || (itemChar + "").equals("￥") || (itemChar + "").equals("—")
+                    || (itemChar + "").equals("？") || (itemChar + "").equals("，") || (itemChar + "").equals("；")
+                    || (itemChar + "").equals("！") || (itemChar + "").equals("《")
+                    || (itemChar + "").equals("》") || (itemChar + "").equals("。") || (itemChar + "").equals("、")
+            ) {
+                count++;
+                continue;
+            }
+            boolean isChinese = isContainChinese(itemChar + "");
+            if (isChinese) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    public static boolean isContainChinese(String str) {
+        Pattern p = Pattern.compile("[\u4e00-\u9fa5]");
+        Matcher m = p.matcher(str);
+        if (m.find()) {
+            return true;
+        }
+        return false;
+    }
+
+    static String getPaddingString(String originStr, int padinglength, String oneStr, boolean dirPre) {
+        String result = "" + originStr;
+//        int length = ("" + originStr).length();
+        int length = getPaddingChineseLength("" + originStr);
+
+        if (length < padinglength) {
+            int distance = padinglength - length;
+            for (int i = 0; i < distance; i++) {
+                if (dirPre) {
+                    result = oneStr + result;
+                } else {
+                    result = result + oneStr;
+                }
+
+            }
+
+        }
+        return result;
+
+    }
 
 }
