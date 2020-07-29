@@ -1,7 +1,12 @@
 public class H0_Tip {
     static String OneLine_Pre = "\n════════";
     static String OneLine_End = "════════\n";
+    static String OneLine = "════════";
     public static void main(String[] args) {
+        PackageInfoTip();
+        BroadCastInfoTip();
+        StartAppInfoTip();
+        DumpInfoTip();
         SettingOperationTip();
         PullFileTip();
         VerboseLogTip();
@@ -10,15 +15,73 @@ public class H0_Tip {
         AdbCommandTip();
     }
 
+    static void DumpInfoTip(){
+        System.out.println(OneLine_Pre + " Dump 相关信息查询 "+ OneLine_End);
+        System.out.println("adb shell dumpsys media.camera                              【 查看camera的信息");
+        System.out.println("adb shell dumpsys activity                                  【 查看ActvityManagerService 所有信息    ");
+        System.out.println("adb shell dumpsys activity activities                       【 查看Activity组件信息                  ");
+        System.out.println("adb shell dumpsys activity services                         【 查看Service组件信息                   ");
+        System.out.println("adb shell dumpsys activity providers                        【 查看ContentProvider组件信息           ");
+        System.out.println("adb shell dumpsys activity broadcasts                       【 查看BraodcastReceiver信息             ");
+        System.out.println("adb shell dumpsys activity intents                          【 查看Intent信息                        ");
+        System.out.println("adb shell dumpsys activity processes                        【 查看进程信息                          ");
+        System.out.println("adb shell dumpsys activity provider com.android.settings    【 查看Settings相关的Provider信息        ");
+        System.out.println("adb shell pm list features                                  【 查看安卓feature                       ");
+
+
+    }
+    static void BroadCastInfoTip(){
+        System.out.println(OneLine_Pre + " 广播 BroadCast信息 查询 "+ OneLine_End);
+        System.out.println(OneLine+"WIFI 状态变化广播 ");
+        System.out.println("adb shell am broadcast -a com.Android.test --es<string> test_string \"this is test string\" —ei<int> test_int 100 —ez<boolean> test_boolean true\n" +
+                "【 -a com.Android.test  包名.Action的形式 】\n" +
+                "【 --es \"test_string\" \"this is test string\"    指定广播中携带字符串 字符串名称为 test_string 后面为值Value  】\n" +
+                "【 --ei test_int 100    指定广播中携带int整形  int名称为 test_int 后面为值Value 为 100 】\n" +
+                "【 --ez test_boolean true    指定广播中携带boolean变量   boolean名称为 test_boolean 后面为值Value 为 true 】\n" +
+                "adb shell am broadcast -a \"Android.net.wifi.WIFI_STATE_CHANGED\"  --ei \"wifi_state\" 0\n" +
+                "adb shell am broadcast -a \"Android.net.wifi.WIFI_STATE_CHANGED\"  --ei \"wifi_state\" 1 \n" +
+                "adb shell am broadcast -a \"Android.net.wifi.WIFI_STATE_CHANGED\"  --ei \"wifi_state\" 2 \n" +
+                "adb shell am broadcast -a \"Android.net.wifi.WIFI_STATE_CHANGED\"  --ei \"wifi_state\" 3 \n" +
+                "adb shell am broadcast -a \"Android.net.wifi.WIFI_STATE_CHANGED\"  --ei \"wifi_state\" 4 \n" +
+                "WifiManager.WIFI_STATE_DISABLED ==1\n" +
+                "WifiManager.WIFI_STATE_DISABLING ==0\n" +
+                "WifiManager.WIFI_STATE_ENABLED==3\n" +
+                "WifiManager.WIFI_STATE_ENABLING==2\n" +
+                "WifiManager.WIFI_STATE_UNKNOWN==4");
+
+
+
+
+    }
+
+    static void StartAppInfoTip(){
+        System.out.println(OneLine_Pre + " 启动应用信息 am start 查询 "+ OneLine_End);
+        System.out.println("adb shell am start -a android.settings.WIFI_SETTINGS     // 启动到WIFI设置界面");
+    }
+    static void PackageInfoTip(){
+
+        System.out.println(OneLine_Pre + " 安装包 Package 查询 "+ OneLine_End);
+
+        System.out.println("adb shell pm list packages                        【  查看所有安装包( 系统 + 三方  例如: package:com.miui.core )");
+        System.out.println("adb shell pm list packages -s                     【 只输出系统自带包 ");
+        System.out.println("adb shell pm list packages -3                     【 查看第三方应用 例如: package:com.sina.weibo " );
+        System.out.println("adb shell pm list packages -f                     【 输出包和包相关联的文件 例: package:/data/app/com.taobao.trip-RQc5gu_cTANljJA8vQ3kyg==/base.apk=com.taobao.trip");
+
+        System.out.println("adb shell pm list packages -i                     【 查看已安装应用信息和安装来源  例如: package:com.youdao.calculator  installer=null ");
+        System.out.println("adb shell pm list packages -e  sina <包名字符串>  【  查询包含 sina 关键字的包 ");
+        System.out.println("adb shell service list                            【  查询服务列表 ");
+//        System.out.println("");
+//        System.out.println("");
+//        System.out.println("");
+//        System.out.println("");
+
+    }
+
+
     static void PrintLogTip(){
 
         System.out.println(OneLine_Pre + " 打印Log操作 "+ OneLine_End);
         System.out.println(" adb logcat | grep zukgit " );
-
-        for (int i = 0; i < 1; i++) {
-            continue;
-        }
-
     }
 
 
