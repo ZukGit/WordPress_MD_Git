@@ -199,7 +199,6 @@ String G2_webp2gif_exe_path = "";
 
          void   PushFile2JDKBIN(){
             if("".equals(JDK_BIN_PATH)){
-				 System.out.println("当前 库文件 JDK_BIN_PATH ="+JDK_BIN_PATH);
                 return;
             }
             String webpLibraryFilePath = null;
@@ -226,7 +225,6 @@ String G2_webp2gif_exe_path = "";
                 System.out.println("当前 库文件 "+webpLibraryFilePath +"已经加载到 jre/bin 路径下!");
                 return;
             }
-		 System.out.println("当前 库文件 G2_LibraryFile ="+G2_LibraryFile +"   webpLibraryFile="+webpLibraryFile +" 如果报错 请手动复制 ");
             fileCopy(G2_LibraryFile,webpLibraryFile);
         }
 
@@ -339,19 +337,13 @@ String G2_webp2gif_exe_path = "";
             } catch (IOException e) {
                 e.printStackTrace();
             }*/
-			// return isOK;
         }
         String parentAbsPath = iconFile.getParentFile().getAbsolutePath();
         link.setFolder(parentAbsPath);
         String iconName = iconFile.getName();
         link.setName(iconName);
         link.setPath(targetFilePath);
-		     try {
         link.save();
-			 }catch (Exception e) {
-				 return false;
-			 }
-			 
         if(isKuaiJieIcon(iconFile)){
             isOK = true;
         }
@@ -435,6 +427,7 @@ String G2_webp2gif_exe_path = "";
 
                 if(targetFileList == null || targetFileList.size() == 0){
                     System.out.println(" 当前路径 "+curDirPath+" 不存在类型 "+type +"的文件!");
+                   continue;
                 }
 
 
@@ -476,13 +469,17 @@ String G2_webp2gif_exe_path = "";
 
         @Override
         String simpleDesc() {
-            return  "\n"+Cur_Bat_Name+ " *_14  mp4          ### 源文件被按顺序重命名 生成快捷icon 1_ 2_ 动态计算当前文件夹中所有子文件中的mp4文件 并在当前目录生成 MP4_20200522_154600 字样的文件夹 \n"+
-                    "\n"+Cur_Bat_Name+ " *_14  .mp4         ### 源文件被按顺序重命名 生成快捷icon 1_ 2_动态计算当前文件夹中所有子文件中的mp4文件 并在当前目录生成 MP4_20200522_154600 字样的文件夹 \n"+
-                    "\n"+Cur_Bat_Name+ " *_14  .gif         ### 源文件被按顺序重命名 生成快捷icon 1_ 2_动态计算当前文件夹中所有子文件中的gif文件 并在当前目录生成 GIF_20200522_154600 字样的文件夹 \n"+
-                    "\n"+Cur_Bat_Name+ " *_14  png          ### 源文件被按顺序重命名 生成快捷icon 1_ 2_ 动态计算当前文件夹中所有子文件中的png文件 并在当前目录生成 PNG_20200522_154600 字样的文件夹 \n"+
-                    "\n"+Cur_Bat_Name+ " *_14  zip  7z      ### 源文件被按顺序重命名 生成快捷icon 1_ 2_ 动态计算当前文件夹中所有子文件中的 文件夹中的 7z zip文件   并在当前目录生成 7Z_20200522_154600  ZIP_20200522_154600 字样的文件夹 \n"+
-                    "\n"+Cur_Bat_Name+ " *_14  .zip .7z     ### 源文件被按顺序重命名 生成快捷icon 1_ 2_ 动态计算当前文件夹中所有子文件中的 文件夹中的 7z zip文件   并在当前目录生成 7Z_20200522_154600  ZIP_20200522_154600 字样的文件夹 \n"+
-                    "\n"+Cur_Bat_Name+ " *_14  jpg          ### 源文件被按顺序重命名 生成快捷icon 1_ 2_ 动态计算当前文件夹中所有子文件中的JPG文件 并在当前目录生成 JPG_20200522_154600 字样的文件夹 \n"
+            return  "\n"+Cur_Bat_Name+ " *_14  mp4          ### 源文件被按顺序重命名 1_ 2_ 动态计算当前文件夹中所有子文件中的mp4文件 并在当前目录生成 MP4_20200522_154600 字样的文件夹 \n"+
+                    "\n"+Cur_Bat_Name+ " *_14  .mp4         ### 源文件被按顺序重命名 1_ 2_动态计算当前文件夹中所有子文件中的mp4文件 并在当前目录生成 MP4_20200522_154600 字样的文件夹 \n"+
+                    "\n"+Cur_Bat_Name+ " *_14  .gif         ### 源文件被按顺序重命名 1_ 2_动态计算当前文件夹中所有子文件中的gif文件 并在当前目录生成 GIF_20200522_154600 字样的文件夹 \n"+
+                    "\n"+Cur_Bat_Name+ " *_14  png          ### 源文件被按顺序重命名 1_ 2_ 动态计算当前文件夹中所有子文件中的png文件 并在当前目录生成 PNG_20200522_154600 字样的文件夹 \n"+
+                    "\n"+Cur_Bat_Name+ " *_14  zip  7z      ### 源文件被按顺序重命名 1_ 2_ 动态计算当前文件夹中所有子文件中的 文件夹中的 7z zip文件   并在当前目录生成 7Z_20200522_154600  ZIP_20200522_154600 字样的文件夹 \n"+
+                    "\n"+Cur_Bat_Name+ " *_14  .zip .7z     ### 源文件被按顺序重命名 1_ 2_ 动态计算当前文件夹中所有子文件中的 文件夹中的 7z zip文件   并在当前目录生成 7Z_20200522_154600  ZIP_20200522_154600 字样的文件夹 \n"+
+                    "\n"+Cur_Bat_Name+ " *_14  jpg          ### 源文件被按顺序重命名 1_ 2_ 动态计算当前文件夹中所有子文件中的JPG文件 并在当前目录生成 JPG_20200522_154600 字样的文件夹 \n" +
+                    "\n"+Cur_Bat_Name+ " *_14  .jpg  .png  .webp .gif                          ### 生成图片格式文件集合  PNG_时间戳  JPG_20200522_154600 字样的文件夹 \n" +
+                    "\n"+Cur_Bat_Name+ " *_14  .mp4  .avi   .wmv .rmvb  .flv .3gp              ### 生成视频格式文件集合    源文件被按顺序重命名 1_ 2_ 动态计算当前文件夹中所有子文件中的JPG文件 并在当前目录生成 MP4_20200522_154600 字样的文件夹 \n" +
+                    "\n"+Cur_Bat_Name+ " *_14  .jpg  .png  .gif  .webp .mp4 .avi .flv .wmv     ### 生成 视频 + 图片 格式文件集合  源文件被按顺序重命名 1_ 2_ 动态计算当前文件夹中所有子文件中的视频文件 并在当前目录生成 JPG_20200522_154600 MP4_20200522_154600 字样的文件夹 \n"
+
                     ;}
     }
 
@@ -3792,6 +3789,7 @@ String firstInputIndexStr ;
         String date = df.format(new Date());
         return date;
     }
+
     static  Rule getRuleByIdentify(String identify){
         for (int i = 0; i <realTypeRuleList.size() ; i++) {
             if(realTypeRuleList.get(i).identify.equals(identify)){

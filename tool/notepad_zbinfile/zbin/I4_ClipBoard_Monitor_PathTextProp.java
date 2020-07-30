@@ -453,8 +453,18 @@ public class I4_ClipBoard_Monitor_PathTextProp  implements ClipboardOwner{
             }
 
             if (file != null && file.exists()) {
-                BufferedWriter curBW = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "utf-8"));
+//                BufferedWriter curBW = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "utf-8"));
+
+                BufferedWriter curBW = null;
+                if(isContainChinese(strParam)){
+                     curBW = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "GBK"));
+
+                }else{
+                     curBW = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "utf-8"));
+                }
+
                 curBW.write(strParam);
+
                 curBW.flush();
                 curBW.close();
                 //    System.out.println("write out File OK !  File = " + file.getAbsolutePath());
@@ -695,9 +705,11 @@ public class I4_ClipBoard_Monitor_PathTextProp  implements ClipboardOwner{
         if(propKey2ValueList != null){
             Iterator iterator = propKey2ValueList.entrySet().iterator();
 
-            if(CUR_OS_TYPE == OS_TYPE.Windows){
-                sb.append("@echo off\n");
+            if(CUR_OS_TYPE == OS_TYPE.Windows){//bat 中 要使用 /r/n
+                sb.append("@echo off\r\n");
+                sb.append("\r\n");
             }
+
             int index = 0 ;
             while( iterator.hasNext() ){
                 entry = (Map.Entry<String , String>) iterator.next();
@@ -705,7 +717,13 @@ public class I4_ClipBoard_Monitor_PathTextProp  implements ClipboardOwner{
                 String value = entry.getValue();  //Map的Value
                 System.out.println("index["+index+"] = "+"move  "+key+" "+value);
                 if(CUR_OS_TYPE == OS_TYPE.Windows){
-                    sb.append("move  "+key+" "+value+"\n");
+                    String key_value_str = key+value;
+                    if(isContainChinese(key_value_str)){
+                        sb.append("move  "+"\""+key+"\"    "+"\""+value+"\""+"\r\n");
+                    }else{
+                        sb.append("move  "+key+"   "+value+"\r\n");
+                    }
+
                 }
                 index++;
 

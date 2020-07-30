@@ -3,6 +3,7 @@ import cn.hutool.system.JavaRuntimeInfo;
 
 import java.io.*;
 import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributeView;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -27,13 +28,13 @@ public class H8_OCR_Tool {
 //固定1  zbin 的 字符串绝对路径
     static String zbinPath = System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin";
 
-    static File H8_DIR_FILE = new File(System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin" + File.separator +"H8");
+    static File H8_DIR_FILE = new File(System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin" + File.separator + "H8");
 
     // "C:\Program Files\Tesseract-OCR\tesseract.exe  "
     static String tesseractFileName = "tesseract.exe";
     static String tesseractDirName = "Tesseract";
-    static File tesseractDirPath ;
-    static File tesseractExeFile ;
+    static File tesseractDirPath;
+    static File tesseractExeFile;
 
 
     // 固定2 当前执行文件的编号 A1  A2  A3   ... G1   G2   G3 ... Z9
@@ -46,10 +47,10 @@ public class H8_OCR_Tool {
     // 固定3   当前操作系统的类型
     static OS_TYPE CUR_OS_TYPE = OS_TYPE.Windows;
 
-    static JavaRuntimeInfo JavaRuntimeInfoValue =  new JavaRuntimeInfo();
+    static JavaRuntimeInfo JavaRuntimeInfoValue = new JavaRuntimeInfo();
     // PATH 环境变量值进行当前的保存处理
-    static String EnvironmentValue=JavaRuntimeInfoValue.getLibraryPath();
-    static String[] EnvironmentList=JavaRuntimeInfoValue.getLibraryPathArray();
+    static String EnvironmentValue = JavaRuntimeInfoValue.getLibraryPath();
+    static String[] EnvironmentList = JavaRuntimeInfoValue.getLibraryPathArray();
 
     //  固定4  从CMD窗口输入得到的 目录关键字参数
     // 当前 SHELL  所在目录  默认是main中的第一个 arg[0] 就是shell路径
@@ -84,8 +85,6 @@ public class H8_OCR_Tool {
 
     // 检测中文 编码序列
     static String REGEX_CHINESE = "[\u4e00-\u9fa5]";
-
-
 
 
     static boolean isContainEnvironment(String program) {
@@ -174,8 +173,6 @@ public class H8_OCR_Tool {
     }
 
 
-
-
     public static String clearChinese(String lineContent) {
         if (lineContent == null || lineContent.trim().isEmpty()) {
             return null;
@@ -208,27 +205,21 @@ public class H8_OCR_Tool {
     // 4.对当前子文件(包括子目录 子文件 --不包含孙目录 孙文件)   // 5. 从shell 中获取到的路径 去对某一个文件进行操作
 
 
-
-
     class CurDirImage2Text_Rule2 extends Basic_Rule {
         ArrayList<File> curInputFileList;
 
         CurDirImage2Text_Rule2() {
-            super("#",2,4);
-            curInputFileList = new    ArrayList<File>();
+            super("#", 2, 4);
+            curInputFileList = new ArrayList<File>();
         }
-
-
 
 
         @Override
         String ruleTip(String type, int index, String batName, OS_TYPE curType) {
-            return  "\n"+Cur_Bat_Name+ "  *_2        ####  识别当前目录(不包含子目录)所有的jpg文件 png文件 并进行识别 OCR操作!  \n";
+            return "\n" + Cur_Bat_Name + "  *_2        ####  识别当前目录(不包含子目录)所有的jpg文件 png文件 并进行识别 OCR操作!  \n";
         }
 
 //        void operationRule(ArrayList<String> inputParamsList)
-
-
 
 
 //        @Override
@@ -236,153 +227,151 @@ public class H8_OCR_Tool {
 
         @Override
         void operationRule(ArrayList<String> inputParamsList) {
-            Map<String , ArrayList<File>> cSubFileTypeMap = getCurSubFileMap(CUR_Dir_FILE);
+            Map<String, ArrayList<File>> cSubFileTypeMap = getCurSubFileMap(CUR_Dir_FILE);
             ArrayList<File> jpgFile = cSubFileTypeMap.get(".jpg");
             ArrayList<File> pngFile = cSubFileTypeMap.get(".png");
-            if(jpgFile != null){
+            if (jpgFile != null) {
                 for (int i = 0; i < jpgFile.size(); i++) {
                     curInputFileList.add(jpgFile.get(i));
                 }
             }
 
-            if(pngFile != null){
-            for (int i = 0; i < pngFile.size(); i++) {
-                curInputFileList.add(pngFile.get(i));
-            }
+            if (pngFile != null) {
+                for (int i = 0; i < pngFile.size(); i++) {
+                    curInputFileList.add(pngFile.get(i));
+                }
             }
 
 //            curInputFileList.addAll(jpgFile);
 //            curInputFileList.addAll(pngFile);
 
             String exePath = tesseractExeFile.getAbsolutePath();
-            ArrayList<File> inputFile_Failed = new   ArrayList<File>();
-            ArrayList<File> outFile_Failed = new   ArrayList<File>();
+            ArrayList<File> inputFile_Failed = new ArrayList<File>();
+            ArrayList<File> outFile_Failed = new ArrayList<File>();
 
-            ArrayList<File> inputFile_OK = new   ArrayList<File>();
-            ArrayList<File> outFile_OK = new   ArrayList<File>();
+            ArrayList<File> inputFile_OK = new ArrayList<File>();
+            ArrayList<File> outFile_OK = new ArrayList<File>();
 
             for (int i = 0; i < curInputFileList.size(); i++) {
                 String imagePath = curInputFileList.get(i).getAbsolutePath();
                 String outFileName = getFileNameNoPoint(curInputFileList.get(i).getName());
-                String outputPath = H8_DIR_FILE.getAbsolutePath()+File.separator+outFileName;
-                File outputFile = new File(outputPath+".txt");
+                String outputPath = H8_DIR_FILE.getAbsolutePath() + File.separator + outFileName;
+                File outputFile = new File(outputPath + ".txt");
 
-                String commandItem = "\""+exePath+"\""+" "+"\""+imagePath+"\""+" "+"\""+outputPath+"\"";
+                String commandItem = "\"" + exePath + "\"" + " " + "\"" + imagePath + "\"" + " " + "\"" + outputPath + "\"";
                 System.out.println(commandItem);
 
                 execCMD(commandItem);
-                if(outputFile.exists()){
+                if (outputFile.exists()) {
                     inputFile_OK.add(curInputFileList.get(i));
                     outFile_OK.add(outputFile);
-                }else{
+                } else {
                     inputFile_Failed.add(curInputFileList.get(i));
                     outFile_Failed.add(outputFile);
                 }
 
             }
-            showOCRResult(inputFile_OK,outFile_OK,inputFile_Failed,outFile_Failed);
+            showOCRResult(inputFile_OK, outFile_OK, inputFile_Failed, outFile_Failed);
 
 
             super.operationRule(inputParamsList);
         }
 
-        void  showOCRResult(ArrayList<File> inputFile_OK,ArrayList<File> outFile_OK,ArrayList<File> inputFile_Failed,ArrayList<File> outFile_Failed){
-            System.out.println("############ 总输入文件数量"+"  【"+(inputFile_OK.size()+inputFile_Failed.size())+"】"+" ############ ");
-            System.out.println("############ 识别成功列表如下"+"【"+outFile_OK.size()+"】"+" ############ ");
+
+        void showOCRResult(ArrayList<File> inputFile_OK, ArrayList<File> outFile_OK, ArrayList<File> inputFile_Failed, ArrayList<File> outFile_Failed) {
+            System.out.println("############ 总输入文件数量" + "  【" + (inputFile_OK.size() + inputFile_Failed.size()) + "】" + " ############ ");
+            System.out.println("############ 识别成功列表如下" + "【" + outFile_OK.size() + "】" + " ############ ");
             for (int i = 0; i < inputFile_OK.size(); i++) {
                 File input = inputFile_OK.get(i);
                 File output = outFile_OK.get(i);
-                System.out.println("═══════"+"识别成功["+(i+1)+"] = "+input.getAbsolutePath()+"═════════════");
-                System.out.println("OCR 成功识别输入文件 详情如下:    "+input.getAbsolutePath());
-                String outContent =ReadFileContent(output) ;
+                System.out.println("═══════" + "识别成功[" + (i + 1) + "] = " + input.getAbsolutePath() + "═════════════");
+                System.out.println("OCR 成功识别输入文件 详情如下:    " + input.getAbsolutePath());
+                String outContent = ReadFileContent(output);
                 System.out.println();
                 System.out.println(outContent);
 //              System.out.println("═══════════════════════");
                 System.out.println();
             }
-            System.out.println("############ 识别失败列表如下 "+"【"+inputFile_Failed.size()+"】"+" ############ ");
+            System.out.println("############ 识别失败列表如下 " + "【" + inputFile_Failed.size() + "】" + " ############ ");
 
             for (int i = 0; i < inputFile_Failed.size(); i++) {
                 File input_failed = inputFile_Failed.get(i);
-                System.out.println("═══"+"识别失败["+i+"] = "+input_failed.getAbsolutePath());
+                System.out.println("═══" + "识别失败[" + i + "] = " + input_failed.getAbsolutePath());
             }
-
-
 
 
         }
 
     }
+
     class InputImage2Text_Rule1 extends Basic_Rule {
         ArrayList<File> curInputFileList;
 
 
         InputImage2Text_Rule1() {
-            super("#",1,5);
+            super("#", 1, 5);
             curInputFileList = new ArrayList<File>();
         }
 
         @Override
         void operationRule(ArrayList<String> inputParamsList) {
-            if(inputParamsList.size() != 0 && curInputFileList.size() == 0){
+            if (inputParamsList.size() != 0 && curInputFileList.size() == 0) {
                 System.out.println("当前识别到的输入参数 不是 jpg  或者 png的文件路径 请重新输入！");
                 return;
             }
 
             String exePath = tesseractExeFile.getAbsolutePath();
-            ArrayList<File> inputFile_Failed = new   ArrayList<File>();
-            ArrayList<File> outFile_Failed = new   ArrayList<File>();
+            ArrayList<File> inputFile_Failed = new ArrayList<File>();
+            ArrayList<File> outFile_Failed = new ArrayList<File>();
 
-            ArrayList<File> inputFile_OK = new   ArrayList<File>();
-            ArrayList<File> outFile_OK = new   ArrayList<File>();
+            ArrayList<File> inputFile_OK = new ArrayList<File>();
+            ArrayList<File> outFile_OK = new ArrayList<File>();
 
             for (int i = 0; i < curInputFileList.size(); i++) {
                 String imagePath = curInputFileList.get(i).getAbsolutePath();
                 String outFileName = getFileNameNoPoint(curInputFileList.get(i).getName());
-                String outputPath = H8_DIR_FILE.getAbsolutePath()+File.separator+outFileName;
-                File outputFile = new File(outputPath+".txt");
+                String outputPath = H8_DIR_FILE.getAbsolutePath() + File.separator + outFileName;
+                File outputFile = new File(outputPath + ".txt");
 
-                String commandItem = "\""+exePath+"\""+" "+"\""+imagePath+"\""+" "+"\""+outputPath+"\"";
+                String commandItem = "\"" + exePath + "\"" + " " + "\"" + imagePath + "\"" + " " + "\"" + outputPath + "\"";
                 System.out.println(commandItem);
 
                 execCMD(commandItem);
-                if(outputFile.exists()){
+                if (outputFile.exists()) {
                     inputFile_OK.add(curInputFileList.get(i));
                     outFile_OK.add(outputFile);
-                }else{
+                } else {
                     inputFile_Failed.add(curInputFileList.get(i));
                     outFile_Failed.add(outputFile);
                 }
 
             }
-            showOCRResult(inputFile_OK,outFile_OK,inputFile_Failed,outFile_Failed);
+            showOCRResult(inputFile_OK, outFile_OK, inputFile_Failed, outFile_Failed);
 
 
             super.operationRule(inputParamsList);
         }
 
-      void  showOCRResult(ArrayList<File> inputFile_OK,ArrayList<File> outFile_OK,ArrayList<File> inputFile_Failed,ArrayList<File> outFile_Failed){
-          System.out.println("############ 总输入文件数量"+"  【"+(inputFile_OK.size()+inputFile_Failed.size())+"】"+" ############ ");
-          System.out.println("############ 识别成功列表如下"+"【"+outFile_OK.size()+"】"+" ############ ");
-          for (int i = 0; i < inputFile_OK.size(); i++) {
-              File input = inputFile_OK.get(i);
-              File output = outFile_OK.get(i);
-              System.out.println("═══════"+"识别成功["+(i+1)+"] = "+input.getAbsolutePath()+"═════════════");
-              System.out.println("OCR 成功识别输入文件 详情如下:    "+input.getAbsolutePath());
-              String outContent =ReadFileContent(output) ;
-              System.out.println();
-              System.out.println(outContent);
+        void showOCRResult(ArrayList<File> inputFile_OK, ArrayList<File> outFile_OK, ArrayList<File> inputFile_Failed, ArrayList<File> outFile_Failed) {
+            System.out.println("############ 总输入文件数量" + "  【" + (inputFile_OK.size() + inputFile_Failed.size()) + "】" + " ############ ");
+            System.out.println("############ 识别成功列表如下" + "【" + outFile_OK.size() + "】" + " ############ ");
+            for (int i = 0; i < inputFile_OK.size(); i++) {
+                File input = inputFile_OK.get(i);
+                File output = outFile_OK.get(i);
+                System.out.println("═══════" + "识别成功[" + (i + 1) + "] = " + input.getAbsolutePath() + "═════════════");
+                System.out.println("OCR 成功识别输入文件 详情如下:    " + input.getAbsolutePath());
+                String outContent = ReadFileContent(output);
+                System.out.println();
+                System.out.println(outContent);
 //              System.out.println("═══════════════════════");
-              System.out.println();
-          }
-          System.out.println("############ 识别失败列表如下 "+"【"+inputFile_Failed.size()+"】"+" ############ ");
+                System.out.println();
+            }
+            System.out.println("############ 识别失败列表如下 " + "【" + inputFile_Failed.size() + "】" + " ############ ");
 
-          for (int i = 0; i < inputFile_Failed.size(); i++) {
-              File input_failed = inputFile_Failed.get(i);
-              System.out.println("═══"+"识别失败["+i+"] = "+input_failed.getAbsolutePath());
-          }
-
-
+            for (int i = 0; i < inputFile_Failed.size(); i++) {
+                File input_failed = inputFile_Failed.get(i);
+                System.out.println("═══" + "识别失败[" + i + "] = " + input_failed.getAbsolutePath());
+            }
 
 
         }
@@ -404,7 +393,7 @@ public class H8_OCR_Tool {
 
         @Override
         String ruleTip(String type, int index, String batName, OS_TYPE curType) {
-            return  "\n"+Cur_Bat_Name+ "  #_1     xxx.jpg xxx.JPG  xxx.PNG xxx.png      #### 识别当前指定图片 然后放入到屏幕  \n";
+            return "\n" + Cur_Bat_Name + "  #_1     xxx.jpg xxx.JPG  xxx.PNG xxx.png      #### 识别当前指定图片 然后放入到屏幕  \n";
         }
 
         @Override
@@ -428,16 +417,16 @@ public class H8_OCR_Tool {
                 if (curFIle.exists() && !curFIle.isDirectory() && isImageType(curFIle)) {
                     curFliterList.add(curFIle);
                     continue;
-                }else{
-                    System.out.println("请检查当前输入文件参数路径是否正确 "+curFIle.getAbsolutePath());
+                } else {
+                    System.out.println("请检查当前输入文件参数路径是否正确 " + curFIle.getAbsolutePath());
                 }
 
                 // 绝对路径是 匹配
                 File curFIle1 = new File(curStringItem);
                 if (curFIle1.exists() && !curFIle1.isDirectory() && isImageType(curFIle)) {
                     curFliterList.add(curFIle1);
-                }else{
-                    System.out.println("请检查当前输入文件参数路径是否正确 "+curFIle1.getAbsolutePath());
+                } else {
+                    System.out.println("请检查当前输入文件参数路径是否正确 " + curFIle1.getAbsolutePath());
                 }
             }
             curInputFileList.addAll(curFliterList);
@@ -598,7 +587,6 @@ public class H8_OCR_Tool {
             e.printStackTrace();
         }
     }
-
 
 
     public static boolean isContainChinese(String str) {
@@ -791,10 +779,10 @@ public class H8_OCR_Tool {
                     CUR_Dir_1_PATH = args[i];
                 } else if (i == 1) {  // 第二个参数是用来 对 当前功能进行分类使用的
                     CUR_TYPE_2_ParamsStr = args[i];
-                    String firstParams = CUR_TYPE_2_ParamsStr.replace("_","");
-                    firstParams = firstParams.replace("*","");
-                    firstParams = firstParams.replace("#","");
-                    if(!isNumeric(firstParams)){  //  如果 这样 还不是 数字的话  那么可能是一个参数
+                    String firstParams = CUR_TYPE_2_ParamsStr.replace("_", "");
+                    firstParams = firstParams.replace("*", "");
+                    firstParams = firstParams.replace("#", "");
+                    if (!isNumeric(firstParams)) {  //  如果 这样 还不是 数字的话  那么可能是一个参数
                         CUR_INPUT_3_ParamStrList.add(args[i]);
                         continue;   //   第一个位置被参数占用 那么选用默认的 ruleIndex  这里是 1
                     }
@@ -811,7 +799,7 @@ public class H8_OCR_Tool {
         File mCUR_Dir_FILE = new File(CUR_Dir_1_PATH);
         CUR_Dir_FILE = new File(CUR_Dir_1_PATH);
 
-        if(!H8_DIR_FILE.exists()){
+        if (!H8_DIR_FILE.exists()) {
             H8_DIR_FILE.mkdirs();
         }
 
@@ -819,34 +807,43 @@ public class H8_OCR_Tool {
         H8_OCR_Tool mH8_Object = new H8_OCR_Tool();
         mH8_Object.InitRule();
 
-        if(!isContainEnvironment("Tesseract")){
+        if (!isContainEnvironment("Tesseract")) {
             System.out.println("当前执行 OCR 环境变量 $PATH 不存在 Tesseract 配置! ");
             showNoSoftTip();
             return;
         }
 
 
-        String TesseractDirPath =  getEnvironmentDefinePath(tesseractDirName);
+        String TesseractDirPath = getEnvironmentDefinePath(tesseractDirName);
         File dirFile = new File(TesseractDirPath);
-        if(!dirFile.exists()){
+        if (!dirFile.exists()) {
             System.out.println("当前执行 OCR 环境变量目录 不存在! ");
             showNoSoftTip();
             return;
         }
         tesseractDirPath = dirFile;
-        tesseractExeFile = new File(tesseractDirPath.getAbsolutePath()+File.separator+tesseractFileName);
+        tesseractExeFile = new File(tesseractDirPath.getAbsolutePath() + File.separator + tesseractFileName);
 
-        if(!tesseractExeFile.exists()){
-            System.out.println("当前执行 OCR 软件不存在 " + tesseractFileName +"不存在!");
+        if (!tesseractExeFile.exists()) {
+            System.out.println("当前执行 OCR 软件不存在 " + tesseractFileName + "不存在!");
             showNoSoftTip();
             return;
         }
 
 
-
         // 用户没有输入参数
-        if (CUR_TYPE_INDEX == 0 && CUR_INPUT_3_ParamStrList.size() == 0) {
+        if (CUR_TYPE_INDEX == 1 && CUR_INPUT_3_ParamStrList.size() == 0) {
+
             showTip();
+
+            File newImageFile = calculNewImageFile(CUR_Dir_FILE);
+            if(newImageFile == null){
+                System.out.println("用户输入的参数为空  默认检测最新的那个 png jpg 文件  但没有检测到那个 image文件!  请检查当前路径是否存在jpg png 文件");
+            }else{
+                System.out.println("用户输入的参数为空  默认检测最新的那个 png jpg 文件");
+                executeImage2Text(newImageFile);
+            }
+
             return;
         }
 
@@ -889,7 +886,28 @@ public class H8_OCR_Tool {
         setProperity();
     }
 
-    static void showNoSoftTip(){
+
+    static File calculNewImageFile(File dirFile) {
+        File newImageFile = null;
+
+        long max_time = 0;
+        File[] allSubFileList = dirFile.listFiles();
+        for (int i = 0; i < allSubFileList.length; i++) {
+            File fileItem = allSubFileList[i];
+            if (fileItem.getName().toLowerCase().endsWith(".jpg") ||
+                    fileItem.getName().toLowerCase().endsWith(".png")) {
+                long mFileTimeStamp = getFileCreateTime(fileItem.getAbsolutePath());
+                if (mFileTimeStamp > max_time) {
+                    max_time = mFileTimeStamp;
+                    newImageFile = fileItem;
+                }
+            }
+        }
+
+        return newImageFile;
+    }
+
+    static void showNoSoftTip() {
 
         System.out.println("请去去下载 Tesseract.exe 文件  目前暂时只支持 Windows环境");
         System.out.println("百度网盘下载路径:  https://pan.baidu.com/disk/home#/all?vmode=list&path=%2F%E7%A7%BB%E5%8A%A8%E7%A1%AC%E7%9B%98%2Fsoftware%2Fwin");
@@ -901,15 +919,15 @@ public class H8_OCR_Tool {
     // ffmpeg  -f concat -safe 0 -i C:\Users\zhuzj5\Desktop\zbin\G8_1_MergedRule.txt -c copy C:\Users\zhuzj5\Desktop\output2.mp4
     // D:\software\ffmpeg\bin
     // D:\software\ffmpeg\bin\ffmpeg.exe  -f concat -safe 0 -i C:\Users\zhuzj5\Desktop\zbin\G8_1_MergedRule.txt -c copy C:\Users\zhuzj5\Desktop\output3.mp4
-    static String  getEnvironmentExePath(String program){
+    static String getEnvironmentExePath(String program) {
         String exename = program.trim().toLowerCase();
         String executePath = null;
         for (int i = 0; i < EnvironmentList.length; i++) {
             String itemPath = EnvironmentList[i];
             String itemPathLower = itemPath.toLowerCase();
 
-            if(itemPathLower.contains(exename)){
-                executePath =   itemPath + File.separator + program + (CUR_OS_TYPE==OS_TYPE.Windows? ".exe" : "");
+            if (itemPathLower.contains(exename)) {
+                executePath = itemPath + File.separator + program + (CUR_OS_TYPE == OS_TYPE.Windows ? ".exe" : "");
                 break;
             }
         }
@@ -918,14 +936,14 @@ public class H8_OCR_Tool {
     }
 
 
-    static String  getEnvironmentDefinePath(String program){
+    static String getEnvironmentDefinePath(String program) {
         String exename = program.trim().toLowerCase();
         String executePath = null;
         for (int i = 0; i < EnvironmentList.length; i++) {
             String itemPath = EnvironmentList[i];
             String itemPathLower = itemPath.toLowerCase();
 
-            if(itemPathLower.contains(exename)){
+            if (itemPathLower.contains(exename)) {
 
                 return itemPath;
             }
@@ -991,16 +1009,15 @@ public class H8_OCR_Tool {
     }
 
     public static String execCMD(String command) {
-        StringBuilder sb =new StringBuilder();
+        StringBuilder sb = new StringBuilder();
         try {
-            Process process=Runtime.getRuntime().exec("  "+command);
+            Process process = Runtime.getRuntime().exec("  " + command);
 //            Process process=Runtime.getRuntime().exec(" cmd /c start  "+command);
 
-            BufferedReader bufferedReader=new BufferedReader(new InputStreamReader(process.getInputStream()));
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
             String line;
-            while((line=bufferedReader.readLine())!=null)
-            {
-                sb.append(line+"\n");
+            while ((line = bufferedReader.readLine()) != null) {
+                sb.append(line + "\n");
             }
         } catch (Exception e) {
             return e.toString();
@@ -1058,17 +1075,18 @@ public class H8_OCR_Tool {
     }
 
 
-   static Map<String , ArrayList<File>>   getCurSubFileMap(File mDirFile){
-        HashMap<String, ArrayList<File>> realFileListMap = new  HashMap<String, ArrayList<File>>(); ;
+    static Map<String, ArrayList<File>> getCurSubFileMap(File mDirFile) {
+        HashMap<String, ArrayList<File>> realFileListMap = new HashMap<String, ArrayList<File>>();
+        ;
 
         for (File curFile : mDirFile.listFiles()) {
-            if(curFile.isDirectory()){
+            if (curFile.isDirectory()) {
                 continue;
             }
             String fileName = curFile.getName();
 
             if (!fileName.contains(".")) {
-                String type ="";   //  unknow  没有后缀名的文件
+                String type = "";   //  unknow  没有后缀名的文件
                 if (realFileListMap.containsKey(type)) {
                     ArrayList<File> fileList = realFileListMap.get(type);
                     fileList.add(curFile);
@@ -1092,6 +1110,43 @@ public class H8_OCR_Tool {
         }
 
         return realFileListMap;
+    }
+
+    static Long getFileCreateTime(String filePath) {
+        File file = new File(filePath);
+        try {
+            Path path = Paths.get(filePath);
+            BasicFileAttributeView basicview = Files.getFileAttributeView(path, BasicFileAttributeView.class, LinkOption.NOFOLLOW_LINKS);
+            BasicFileAttributes attr = basicview.readAttributes();
+            return attr.creationTime().toMillis();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return file.lastModified();
+        }
+    }
+
+    static   void    executeImage2Text(File imageFile){
+        String exePath = tesseractExeFile.getAbsolutePath();
+        String imagePath = imageFile.getAbsolutePath();
+        String outFileName = getFileNameNoPoint(imageFile.getName());
+        String outputPath = H8_DIR_FILE.getAbsolutePath() + File.separator + outFileName;
+        File outputFile = new File(outputPath + ".txt");
+
+        String commandItem = "\"" + exePath + "\"" + " " + "\"" + imagePath + "\"" + " " + "\"" + outputPath + "\"";
+        System.out.println(commandItem);
+        execCMD(commandItem);
+
+        if (outputFile.exists()) {
+
+            System.out.println("═══════" + "识别成功[" +  " 默认最新的那个image( jpg  png ) 文件] = " + outputFile.getAbsolutePath() + "═════════════");
+            System.out.println("OCR 成功识别输入文件 详情如下:    " + outputFile.getAbsolutePath());
+            String outContent = ReadFileContent(outputFile);
+            System.out.println();
+            System.out.println(outContent);
+        } else {
+            System.out.println("═══════" + "识别解析失败 [" +  " 默认最新的那个image( jpg  png ) 文件] = " + imageFile.getAbsolutePath() + "═════════════");
+
+        }
     }
 
 }
