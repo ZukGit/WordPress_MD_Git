@@ -3,6 +3,7 @@ public class H0_Tip {
     static String OneLine_End = "════════\n";
     static String OneLine = "════════";
     public static void main(String[] args) {
+        WindowsTip();
         PackageInfoTip();
         BroadCastInfoTip();
         StartAppInfoTip();
@@ -13,6 +14,31 @@ public class H0_Tip {
         PrintLogTip();
 
         AdbCommandTip();
+    }
+
+    static void WindowsTip(){
+        CmderTip();  // cmder 下的环境变量设置 
+    }
+
+    static void CmderTip(){
+        System.out.println(OneLine_Pre + " Winddows下Cmder设置 Begin "+ OneLine_End);
+        System.out.println("Cmder 下载地址:"+"  https://pan.baidu.com/disk/home#/all?vmode=list&path=%2F%E7%A7%BB%E5%8A%A8%E7%A1%AC%E7%9B%98%2Fsoftware%2Fwin");
+        System.out.println("设置环境变量  Setting -> StartUp -> Environment  输入如下的配置信息: ");
+        System.out.println();
+        System.out.println("set PATH=%ConEmuBaseDir%\\Scripts;%PATH%\n" +
+                "set PATH=%USERPROFILE%\\Desktop\\zbin\\win_zbin;%USERPROFILE%\\Desktop\\zbin\\python;%PATH%\n" +
+                "set PATH=%USERPROFILE%\\Desktop\\zbin\\lin_zbin;%USERPROFILE%\\Desktop\\zbin\\mac_zbin;%PATH%\n" +
+                "\n" +
+                "alias gits=git status\n" +
+                "alias cdd=cd /D %USERPROFILE%\\Desktop\n" +
+                "alias cdz=cd /D %USERPROFILE%\\Desktop\\zbin\n" +
+                "\n" +
+                "set PATH=D:\\software\\ffmpeg\\bin;%PATH%\n" +
+                "set tessdata=C:\\Program Files\\Tesseract-OCR\\tessdata\n" +
+                "set PATH=C:\\Program Files\\Tesseract-OCR;%PATH%\n" +
+                "set PATH=%USERPROFILE%\\Desktop\\zbin\\win_soft\\Redis;%PATH%");
+        System.out.println();
+        System.out.println(OneLine_Pre + " Winddows下Cmder设置  End "+ OneLine_Pre);
     }
 
     static void DumpInfoTip(){

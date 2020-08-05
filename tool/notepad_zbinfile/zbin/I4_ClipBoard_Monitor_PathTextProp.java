@@ -188,7 +188,9 @@ public class I4_ClipBoard_Monitor_PathTextProp  implements ClipboardOwner{
     }
 
 
+
    static void initPropMap(){
+       propFileListSize = 0;
         try {
             if (!I4_Properties_File.exists()) {
                 I4_Properties_File.createNewFile();
@@ -198,6 +200,8 @@ public class I4_ClipBoard_Monitor_PathTextProp  implements ClipboardOwner{
             Iterator<String> it = I4_Properties.stringPropertyNames().iterator();
             while (it.hasNext()) {
                 String key = it.next();
+                File fileItem = new File(key);
+                propFileListSize += fileItem.length();
                 // System.out.println("key:" + key + " value: " + I4_Properties.getProperty(key));
                 propKey2ValueList.put(key, I4_Properties.getProperty(key));
             }
@@ -675,6 +679,7 @@ public class I4_ClipBoard_Monitor_PathTextProp  implements ClipboardOwner{
 
     @SuppressWarnings("unchecked")
     public static void showMapPathInfoWhenBegin(){
+        propFileListSize = 0;
         System.out.println("══════"+"当前Prop已保存操作集合 Begin"+"══════");
         Map.Entry<String , String> entry;
         StringBuilder sb=new StringBuilder();
@@ -685,6 +690,8 @@ public class I4_ClipBoard_Monitor_PathTextProp  implements ClipboardOwner{
             while( iterator.hasNext() ){
                 entry = (Map.Entry<String , String>) iterator.next();
                 String key = entry.getKey();  //Map的Value
+                File fileItem = new File(key);
+                propFileListSize += fileItem.length();
                 String value = entry.getValue();  //Map的Value
                 System.out.println("index["+index+"] = "+"move  "+key+" "+value);
                 index ++;
@@ -732,9 +739,14 @@ public class I4_ClipBoard_Monitor_PathTextProp  implements ClipboardOwner{
         if(CUR_OS_TYPE == OS_TYPE.Windows) {
             writeContentToFile(I4_BEACH_MOVE_BAT, sb.toString());
             System.out.println("════════ 请执行以下命令 以完成 文件 剪切操作!════════");
+            System.out.println(I4_BEACH_MOVE_BAT.getAbsolutePath()  + "         ## ★ 开始剪切文件 批操作 处理开始");
             System.out.println();
-            System.out.println(I4_BEACH_MOVE_BAT.getAbsolutePath()  + "       ## ★");
+            System.out.println(Cur_Bat_Name+"  clear"   +"              ## ★ 该命令清除当前已保存的所有 Prop操作集合 ！");
             System.out.println();
+            System.out.println(Cur_Bat_Name+" "   +"                    ## ★ 重新执行监听 系统剪切板 fuction  ！");
+            System.out.println();
+            System.out.println(I4_BEACH_MOVE_BAT.getAbsolutePath()  + "         ## ★ 开始剪切文件 批操作 处理开始");
+            System.out.println("════════════════════════════════");
         }
 
     }
@@ -809,6 +821,8 @@ public class I4_ClipBoard_Monitor_PathTextProp  implements ClipboardOwner{
         setProperity();
     }
 
+    static long propFileListSize = 0L;
+
     /************
      * 测试代码 *
      * **********
@@ -881,7 +895,11 @@ public class I4_ClipBoard_Monitor_PathTextProp  implements ClipboardOwner{
                     System.out.println("════════ shouting down info as below ════════");
                     System.out.println("════════"+"清除当前 pro记录操作如下"+"════════");
                     System.out.println();
+                    System.out.println(I4_BEACH_MOVE_BAT.getAbsolutePath()  + "       ## ★ 开始剪切文件 批操作 处理开始");
+                    System.out.println();
                     System.out.println(Cur_Bat_Name+"  clear"   +"   ## ★ 该命令清除当前已保存的所有 Prop操作集合 ！");
+                    System.out.println();
+                    System.out.println(Cur_Bat_Name+" "   +"   ## ★ 重新执行监听 系统剪切板 fuction  ！");
                     System.out.println();
                     System.out.println("════════"+"════════");
                     //some cleaning up code...
@@ -898,34 +916,42 @@ public class I4_ClipBoard_Monitor_PathTextProp  implements ClipboardOwner{
         });
 
     }
+static String[] operationTip = {"⊙","▲","〓","※","¤","☆","★","●","◎","◆"};
+    static int operationIndex = 0;
     static void Operation(String clipText){
-        System.out.println("════════"+clipText+"Begin════════");
-        System.out.println("time = ");
+        System.out.println();
+        System.out.println();
+        operationIndex++;
+        int curPropSIze = I4_Properties.size();
+        String diffTipStr = operationTip[operationIndex%10];
+        System.out.println(diffTipStr+"════════"+clipText+"Begin════════");
+        System.out.println(diffTipStr+" time = "+getTimeStamp()  +"   当前保存文件个数:"+ curPropSIze  + "  总文件大小:"+getFileSize(propFileListSize));
 //        System.out.println("clip_text = "+ clipText);
 
         File originMP4File = new File(clipText);
         if(!originMP4File.exists()){
-            System.out.println("【1】 当前剪切板文件 不存在! ");
+            System.out.println(diffTipStr+"【1】 当前剪切板文件 不存在! ");
+            System.out.println(diffTipStr+"════════"+clipText+" End Failed════════");
             return;
         }
-        System.out.println("【1】 当前剪切板文件存在!  Path -> "+ originMP4File.getAbsolutePath());
+        System.out.println(diffTipStr+"【1】 当前剪切板文件存在!  Path -> "+ originMP4File.getAbsolutePath());
 
         if(!isVideoFile(originMP4File)){
-            System.out.println("【2】 当前剪切板文件存在,但不是MP4文件  Path -> "+ originMP4File.getAbsolutePath());
-            System.out.println("════════"+clipText+" End Failed════════");
+            System.out.println(diffTipStr+"【2】 当前剪切板文件存在,但不是MP4文件  Path -> "+ originMP4File.getAbsolutePath());
+            System.out.println(diffTipStr+"════════"+clipText+" End Failed════════");
             return;
         }
-        System.out.println("【2】 当前剪切板文件存在! 并且是MP4文件!  Path -> "+ originMP4File.getAbsolutePath());
+        System.out.println(diffTipStr+"【2】 当前剪切板文件存在! 并且是MP4文件!  Path -> "+ originMP4File.getAbsolutePath());
 
 
         long fileSize = originMP4File.length();
 
         if(fileSize < 1024L*100){  // 小于 100K
-            System.out.println("【3】 MP4文件文件过小 小于1MB (不屑于保存)!  FileSize -> "+ getFileSize(originMP4File));
-            System.out.println("════════"+clipText+" End Failed════════");
+            System.out.println(diffTipStr+"【3】 MP4文件文件过小 小于1MB (不屑于保存)!  FileSize -> "+ getFileSize(originMP4File));
+            System.out.println(diffTipStr+"════════"+clipText+" End Failed════════");
             return;
         }
-        System.out.println("【3】 MP4文件文件小于正常 (能复制)!  FileSize -> "+ getFileSize(originMP4File));
+        System.out.println(diffTipStr+"【3】 MP4文件文件小于正常 (能复制)!  FileSize -> "+ getFileSize(originMP4File));
 
 
         String fileName = originMP4File.getName();
@@ -937,14 +963,24 @@ public class I4_ClipBoard_Monitor_PathTextProp  implements ClipboardOwner{
             newShellFile = new File(CUR_Dir_FILE.getAbsolutePath()+File.separator+getTimeStamp()+fileName);
         }
 //        System.out.println("【4】 MP4文件文件小于100MB  正常 (能复制)!  FileSize -> "+ getFileSize(originMP4File));
-        System.out.println("【5】 把需要转移的文件完整路径 保存到 Prop文件中  目标文件为当前 shell目录! ");
-        System.out.println(" 原始文件路径: "+ originMP4File.getAbsolutePath());
-        System.out.println(" 目标文件路径: "+ newShellFile.getAbsolutePath());
-        I4_Properties.put(originMP4File.getAbsolutePath(),newShellFile.getAbsolutePath());
 
+     if(I4_Properties.keySet().contains(originMP4File.getAbsolutePath())){
+         System.out.println(diffTipStr+"【4】 当前 Prop 已存储了当前文件路径 再加入失败  Path -> "+ originMP4File.getAbsolutePath());
+        System.out.println(diffTipStr+"════════"+clipText+" End Failed════════");
+         return;
+     }
+        System.out.println(diffTipStr+"【4】 当前 Prop 没有该文件路径 加入成功  Path -> "+ originMP4File.getAbsolutePath());
+
+
+        System.out.println(diffTipStr+"【5】 把需要转移的文件完整路径 保存到 Prop文件中  目标文件为当前 shell目录! ");
+        System.out.println(diffTipStr+" 原始文件路径: "+ originMP4File.getAbsolutePath());
+        System.out.println(diffTipStr+" 目标文件路径: "+ newShellFile.getAbsolutePath());
+
+        I4_Properties.put(originMP4File.getAbsolutePath(),newShellFile.getAbsolutePath());
+        propFileListSize+= originMP4File.length();
         setProperity();
 //        fileCopy(originMP4File,newShellFile);
-        System.out.println("════════"+clipText+" End Success════════");
+        System.out.println(diffTipStr+"【索引: "+curPropSIze+"】"+"════════"+clipText+" End Success════════");
     }
 
     static boolean isVideoFile(File file){
@@ -993,6 +1029,21 @@ public class I4_ClipBoard_Monitor_PathTextProp  implements ClipboardOwner{
                 }
             }
         }
+    }
+
+    static String getFileSize(long fileSize){
+        String sizeStr = "";
+        if(fileSize > 1024L &&  fileSize <= 1024L*1024L ){
+            sizeStr = fileSize/ (1024L) + "KB ";
+        } else if(fileSize > 1024L*1024L &&  fileSize <= 1024L*1024L*1024L){
+            sizeStr = fileSize/ (1024L*1024L) + "MB ";
+        }else if(fileSize > 1024L*1024L*1024L &&  fileSize <= 1024L*1024L*1024L*1024L){
+            sizeStr = fileSize/ (1024L*1024L*1024L) + "GB ";
+        }
+        if("".endsWith(sizeStr)){
+            sizeStr = fileSize+ "B";
+        }
+        return  sizeStr;
     }
 
     static String getFileSize(File file){

@@ -1,4 +1,5 @@
 
+import java.awt.*;
 import java.io.*;
 import java.net.URL;
 import java.net.URLConnection;
@@ -10,21 +11,31 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-
 //
-public class G2_Common_Template {
+//I6_HtmlRecord
+//创建一个程序  该程序对 当前用户保存的图片 语音 video txt 等 行 html的 展示  顺序 从上往下  依据 文件的时间顺序
+//1.每当 新增 了 图片到 该文件夹下 那么 重新 执行 该程序时 就会生成 新的 html 包含这个图片
+//
+//2.这个程序可以创建不同名称的目录 结构   每次打开  可能 需要 指定结构   有一个默认的打开的 目录 结构
+//
+//3. 程序在无参数调用 情况下  先打印 拥有的目录结构  再 打印 默认显示的 目录 结构
+//
+//4. 默认的目录  可选
+
+
+//5. 给定一个  相对路径文件
+
+public class I6_HtmlRecord {
 
 
     /*******************修改属性列表 ------Begin *********************/
-// 修改0.   全局修改 把 G8 改为当前应用的序号规则序号  当前类名称也需要修改
+// 修改0.   全局修改 把 I6 改为当前应用的序号规则序号  当前类名称也需要修改
 // 修改1.当前 执行代码的 bat sh 文件名称  最后必须是标识序号
- //修改2. G2_Common_Template  改为当前类名称  A1 Z9
- //修改2.1  G2 改为 对应的 标识符
 // 修改3.  当前是否有默认的规则   如果有默认的规则那么设置 CUR_TYPE_INDEX为对应index , 没有默认规则那么设置为默认的1
-    static String Cur_Bat_Name = "zmpeg_ffmpeg_G2";
+    static String Cur_Bat_Name = "zhtml_record_I6";
     // 当前用户选中的 操作的类型  0-默认标识没有选中打印帮助字符串    1-标识选中默认规则1
     static int CUR_TYPE_INDEX = 1;
-    static boolean  allowEmptyInputParam = false;    // 是否允许输入参数为空 执行 rule的apply方法
+    static boolean  allowEmptyInputParam = true;    // 是否允许输入参数为空 执行 rule的apply方法
 
 /*******************修改属性列表 ------End *********************/
 
@@ -41,11 +52,14 @@ public class G2_Common_Template {
     static String mac_zbinPath = System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin"+File.separator+"mac_zbin";
 
 
-    // 固定2 当前执行文件的编号 A1  A2  A3   ... G1   G2   G3 ... Z9
-    static File G8_Properties_File = new File(System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin" + File.separator + get_Bat_Sh_FlagNumber(Cur_Bat_Name)+".properties");
-    static InputStream G8_Properties_InputStream;
-    static OutputStream G8_Properties_OutputStream;
-    static Properties G8_Properties = new Properties();
+    // 固定2 当前执行文件的编号 A1  A2  A3   ... G1   I6   G3 ... Z9
+    static String defaultRecordKey = "I6_Default_Record_Path";
+    static String defaultRecordValue=zbinPath+File.separator+"I6_Default_Category_Dir";
+
+    static File I6_Properties_File = new File(System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin" + File.separator + get_Bat_Sh_FlagNumber(Cur_Bat_Name)+".properties");
+    static InputStream I6_Properties_InputStream;
+    static OutputStream I6_Properties_OutputStream;
+    static Properties I6_Properties = new Properties();
     static Map<String, String> propKey2ValueList = new HashMap<String, String>();
 
 
@@ -111,9 +125,9 @@ public class G2_Common_Template {
 
 
 
-    // ffmpeg  -f concat -safe 0 -i C:\Users\zhuzj5\Desktop\zbin\G8_1_MergedRule.txt -c copy C:\Users\zhuzj5\Desktop\output2.mp4
+    // ffmpeg  -f concat -safe 0 -i C:\Users\zhuzj5\Desktop\zbin\I6_1_MergedRule.txt -c copy C:\Users\zhuzj5\Desktop\output2.mp4
     // D:\software\ffmpeg\bin
-    // D:\software\ffmpeg\bin\ffmpeg.exe  -f concat -safe 0 -i C:\Users\zhuzj5\Desktop\zbin\G8_1_MergedRule.txt -c copy C:\Users\zhuzj5\Desktop\output3.mp4
+    // D:\software\ffmpeg\bin\ffmpeg.exe  -f concat -safe 0 -i C:\Users\zhuzj5\Desktop\zbin\I6_1_MergedRule.txt -c copy C:\Users\zhuzj5\Desktop\output3.mp4
     static String getEnvironmentExePath(String program) {
         String exename = program.trim().toLowerCase();
         String executePath = null;
@@ -172,18 +186,21 @@ public class G2_Common_Template {
 
     static {
         try {
-            if (!G8_Properties_File.exists()) {
-                G8_Properties_File.createNewFile();
+            if (!I6_Properties_File.exists()) {
+                I6_Properties_File.createNewFile();
             }
-            G8_Properties_InputStream = new BufferedInputStream(new FileInputStream(G8_Properties_File.getAbsolutePath()));
-            G8_Properties.load(G8_Properties_InputStream);
-            Iterator<String> it = G8_Properties.stringPropertyNames().iterator();
+            I6_Properties_InputStream = new BufferedInputStream(new FileInputStream(I6_Properties_File.getAbsolutePath()));
+            I6_Properties.load(I6_Properties_InputStream);
+            Iterator<String> it = I6_Properties.stringPropertyNames().iterator();
             while (it.hasNext()) {
                 String key = it.next();
-                // System.out.println("key:" + key + " value: " + G8_Properties.getProperty(key));
-                propKey2ValueList.put(key, G8_Properties.getProperty(key));
+                // System.out.println("key:" + key + " value: " + I6_Properties.getProperty(key));
+                propKey2ValueList.put(key, I6_Properties.getProperty(key));
             }
-            G8_Properties_InputStream.close();
+            I6_Properties_InputStream.close();
+            if(I6_Properties.keySet().contains(defaultRecordKey)){
+                I6_Properties.put(defaultRecordKey,defaultRecordValue);
+            }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -194,9 +211,9 @@ public class G2_Common_Template {
 
     static void setProperity() {
         try {
-            G8_Properties_OutputStream = new BufferedOutputStream(new FileOutputStream(G8_Properties_File.getAbsolutePath()));
-            G8_Properties.store(G8_Properties_OutputStream, "");
-            G8_Properties_OutputStream.close();
+            I6_Properties_OutputStream = new BufferedOutputStream(new FileOutputStream(I6_Properties_File.getAbsolutePath()));
+            I6_Properties.store(I6_Properties_OutputStream, "");
+            I6_Properties_OutputStream.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -287,7 +304,7 @@ public class G2_Common_Template {
     void InitRule(){
 
         //   加入类型一一对应的 那些 规则
-        CUR_RULE_LIST.add( new MergeMP4_Rule_1());
+        CUR_RULE_LIST.add( new ShowRecord_Rule_1());
 //        CUR_RULE_LIST.add( new File_Name_Rule_2());
 //        CUR_RULE_LIST.add( new Image2Jpeg_Rule_3());
 //        CUR_RULE_LIST.add( new Image2Png_Rule_4());
@@ -299,58 +316,216 @@ public class G2_Common_Template {
     }
 
 
+   static File userSelectedDir;
+
+    File   getDefaultRecordFile(){
+        File defaultCategoryDir = null;
+        String defaultRecordPath =   I6_Properties.getProperty(defaultRecordKey);
+        if(defaultRecordPath == null || "".equals(defaultRecordPath)){
+            defaultCategoryDir = new File(defaultRecordValue);
+        }else{
+            defaultCategoryDir = new File(defaultRecordPath);
+        }
+
+        if(userSelectedDir !=  null){
+            defaultCategoryDir = userSelectedDir;
+        }
+
+        return defaultCategoryDir;
+    }
 
 
+    class ShowRecord_Rule_1 extends  Basic_Rule{
+        ArrayList<File> allRecordFileList ;
+        File recordFile;    //  当前默认工作的目录 Dir I6_categoryName I6_80211
+        File I6_Html_Template_File ; //        I6_Html_Template.html    目标文件
+        File targetHtmlFile ;   // 生成的目标的 Html 文件
 
 
-    class MergeMP4_Rule_1 extends  Basic_Rule{
-        ArrayList<File> curInputFileList ;
-
-
-        MergeMP4_Rule_1(){
-            super(1);
-            curInputFileList = new  ArrayList<File>();
+        ShowRecord_Rule_1(){
+            super(1,false);
+            allRecordFileList = new  ArrayList<File>();
+            recordFile = getDefaultRecordFile();
+            I6_Html_Template_File = new File(zbinPath+File.separator+"I6_Html_Template.html");
+            targetHtmlFile = new File(recordFile.getAbsolutePath()+File.separator+recordFile.getName()+".html");
         }
 
 
         // 1. 完成参数的 自我客制化  实现  checkParamsOK 方法
         @Override
         boolean checkParamsOK(File shellDir, String type2Param, ArrayList<String> otherParams) {
-            ArrayList<File> curFliterList = new ArrayList<File>();
-
+/*           //  当前 Rule 可以接受  输入参数为空的参数
             if(otherParams == null || otherParams.size() ==0){
                 errorMsg = "用户输入的文件参数为空";
                 return false;
             }
-
-            for (int i = 0; i <otherParams.size() ; i++) {
-                String pre = "."+File.separator;
-                String curStringItem = otherParams.get(i).toString();
-                String curAbsPath = "";
-                if(curStringItem.startsWith(pre)){
-                    curStringItem = curStringItem.substring(2);
-                }
-                curAbsPath = shellDir.getAbsolutePath() + File.separator + curStringItem;
-                File curFIle = new File(curAbsPath) ;
-                if(curFIle.exists()){
-                    curFliterList.add(curFIle);
-                }
+            */
+            if(recordFile == null){
+                errorMsg = "当前 record 目录 为空  recordFile = "+ recordFile;
+                return false;
             }
+
+            if(!recordFile.exists()){
+                recordFile.mkdirs();
+            }
+
+            if(I6_Html_Template_File == null || !I6_Html_Template_File.exists()){
+                errorMsg = "当前 Html 模板文件为空   Path = "+ I6_Html_Template_File.getAbsolutePath();
+                return false;
+            }
+
+
+
+            allRecordFileList.addAll(Arrays.asList(recordFile.listFiles())) ;
+
+
+            allRecordFileList.sort(new Comparator<File>() {
+                @Override
+                public int compare(File o1, File o2) {
+                    long time1 = getFileModifyTime(o1);
+                    long time2 = getFileModifyTime(o2);
+                    if(time1 == time2){
+                        String o1Name = getFileNameNoPoint(o1.getName());
+                        String o2Name = getFileNameNoPoint(o2.getName());
+//                        System.out.println("o1Name = "+ o1Name +" o2Name ="+ o2Name);
+                        if(isNumeric(o1Name) && isNumeric(o2Name)){
+                            int o1_int = Integer.parseInt(o1Name);
+                            int o2_int = Integer.parseInt(o2Name);
+//                            System.out.println("o1_int = "+ o1_int +" o2_int ="+ o2_int);
+                            if(o1_int == o2_int){
+                                return 0;
+                            }
+                            return o1_int<o2_int? -1: 1;
+                        }
+                        return o1.getName().compareTo(o2.getName());
+                    }
+                    return time1 < time2 ? -1: 1;
+                }
+            });
+
+/*
+            for (int i = 0; i < allRecordFileList.size(); i++) {
+                File item = allRecordFileList.get(i);
+                System.out.println(item.getName() +"  修改时间= "+getFileModifyTime(item));
+            }
+            */
+
             return super.checkParamsOK(shellDir, type2Param, otherParams);
         }
 
         // 2. 对应的逻辑方法  实现方法  applyOperationRule
-
-
         @Override
         ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+
+            StringBuilder bodyContent = new StringBuilder();
+            for (int i = 0; i < allRecordFileList.size(); i++) {
+                File mFile = allRecordFileList.get(i);
+                String mFileHtmlCode = calculHtml4File(mFile);
+                bodyContent.append(mFileHtmlCode+"\n");
+            }
+
+            String htmlTemplate =   ReadFileContent(I6_Html_Template_File);
+            if(htmlTemplate == null){
+                System.out.println("当前从 "+I6_Html_Template_File.getAbsolutePath() +" 获得的模板为空! 执行失败");
+                return null;
+            }
+
+            String recordName = recordFile.getName();
+            String recordHtml =  htmlTemplate.replace("zukgitPlaceHolderTitle",recordName);
+
+            recordHtml = recordHtml.replace("zukgitPlaceHolderBody",bodyContent.toString());
+
+            writeContentToFile(targetHtmlFile,recordHtml);
+
+            openLocalHtml(targetHtmlFile.getAbsolutePath());
+
+            System.out.println("Open "+targetHtmlFile.getAbsolutePath() +" Over !");
+
+
+
             return super.applyOperationRule(curFileList, subFileTypeMap, curDirList, curRealFileList);
         }
 
+        String calculHtml4File(File resFile){
+            String htmlCode = "";  // 计算 当前文件对应在 html中显示的 html 代码
+            String fileType = getFileTypeWithPoint(resFile);
+            switch (fileType){
+
+                // <img src="./zimage/pc_wallpager_photo/1920x1080/4.jpg" />
+                // <li><img  src="jpg/1.jpg"  width="380" height="255"/></li>
+                //  图片的处理
+                case ".png":
+                case ".jpg":
+                case ".JPG":
+                case ".jpeg":
+                case ".PNG":
+                case ".gif":
+                case ".GIF":
+                case ".bmp":
+                case ".BMP":
+
+                    String imagePre = "<li><img src=\"";
+                    String imageEnd = "\" /></li>";
+
+                    String imageAbsPath = resFile.getAbsolutePath();
+                    htmlCode = imagePre+imageAbsPath+imageEnd;
+                    break;
+
+//<audio controls="controls"><source src="/storage/86A0-B878/Z_Music/master/music/chinese/deng_zi_qi/pao_mo.mp3" type="audio/mpeg"></audio>
+                //  语音的处理
+                case ".MP3":
+                case ".mp3":
+                case ".wav":
+                case ".WAV":
+                case ".ogg":
+                case ".OGG":
+                case ".m4a":
+                case ".M4A":
+
+                    String audioName = resFile.getName();
+                    String audioPre = "<li> "+"<label style=\"font-size:30px;\"> "+audioName+"</label>"+" <audio controls=\"controls\"><source src=\"";
+                    String audioEnd = "\" type=\"audio/mpeg\"></audio> </li>";
+                    String audioAbsPath = resFile.getAbsolutePath();
+                    htmlCode = audioPre+audioAbsPath+audioEnd;
+                    break;
+
+
+                //  视频的处理
+                // <video  controls="controls"> <source src="mp4/1.mp4" type="video/mp4" /> </video>
+                case ".mp4":
+                case ".MP4":
+                case ".AVI":
+                case ".avi":
+                case ".rmvb":
+                case ".RMVB":
+                case ".flv":
+                case ".FLV":
+                case ".wmv":
+                case ".WMV":
+                case ".mkv":
+                case ".MKV":
+                case ".3gp":
+                case ".3GP":
+
+                    String vidoeName = resFile.getName();
+                    String videoPre = "<li> "+"<label style=\"font-size:30px;\"> "+vidoeName+"</label>"+ " <video  controls=\"controls\"> <source src=\"";
+                    String videoEnd = "\" type=\"video/mp4\" /> </video> </li> ";
+                    String videoAbsPath = resFile.getAbsolutePath();
+                    htmlCode = videoPre+videoAbsPath+videoEnd;
+                    break;
+
+                default:
+                    htmlCode =  "";
+
+
+            }
+
+            return htmlCode;
+        }
         //3. 如果当前 执行 错误  checkParams 返回 false   那么 将 打印这个函数 说明错误的可能原因
         @Override
         void showWrongMessage() {
-            System.out.println("当前 type 索引 "+rule_index +" 执行错误  可能是输入参数错误 请检查输入参数!");
+            System.out.println("当前 type 索引 "+rule_index +" 执行错误  可能是输入参数错误 请检查输入参数!  ");
             System.out.println(" errorMsg = "+errorMsg );
         }
 
@@ -359,9 +534,10 @@ public class G2_Common_Template {
         String ruleTip(String type,int index , String batName,OS_TYPE curType){
             String itemDesc = "";
             if(curType == OS_TYPE.Windows){
-                itemDesc = batName.trim()+"  "+type+"_"+index + "    [索引 "+index+"]  描述:"+simpleDesc();
+                itemDesc = batName.trim() + " 【默认】    [索引 "+index+"]  描述:"+"打开当前默认的 Category的Html文件  默认文件:"+getDefaultRecordFile().getAbsolutePath();
+                itemDesc += batName.trim()+"  "+type+"_"+index + "    [索引 "+index+"]  描述:"+"打开当前默认的 Category的Html文件  默认文件:"+getDefaultRecordFile().getAbsolutePath();
             }else{
-                itemDesc = batName.trim()+" "+type+"_"+index + "    [索引 "+index+"]  描述:"+simpleDesc();
+                itemDesc = batName.trim()+" "+type+"_"+index + "    [索引 "+index+"]  描述:"+"打开当前默认的 Category的Html文件  默认文件:"+getDefaultRecordFile().getAbsolutePath();
             }
 
             return itemDesc;
@@ -377,8 +553,19 @@ public class G2_Common_Template {
             this.identify = this.file_type+""+this.rule_index;
             curFilterFileTypeList = new ArrayList<String>();
             curFixedFileList = new ArrayList<File>();
-            needAllFileFlag = true;
+            needAllFile = true;
         }
+
+        Basic_Rule(int ruleIndex,boolean mNeedAllFile){
+            this.rule_index = ruleIndex;
+            this.file_type = "*";   // 文件的处理类型  默认是 *
+            this.identify = this.file_type+""+this.rule_index;
+            curFilterFileTypeList = new ArrayList<String>();
+            curFixedFileList = new ArrayList<File>();
+            errorMsg = "";
+            needAllFile = mNeedAllFile;
+        }
+
 
         Basic_Rule(int ruleIndex){
             this.rule_index = ruleIndex;
@@ -387,17 +574,7 @@ public class G2_Common_Template {
             curFilterFileTypeList = new ArrayList<String>();
             curFixedFileList = new ArrayList<File>();
             errorMsg = "";
-            needAllFileFlag = true;
-        }
-
-        Basic_Rule(int ruleIndex , boolean mNeedAllFile){
-            this.rule_index = ruleIndex;
-            this.file_type = "*";   // 文件的处理类型  默认是 *
-            this.identify = this.file_type+""+this.rule_index;
-            curFilterFileTypeList = new ArrayList<String>();
-            curFixedFileList = new ArrayList<File>();
-            errorMsg = "";
-            needAllFileFlag = mNeedAllFile;
+            needAllFile = true;
         }
 
         @Override
@@ -409,12 +586,14 @@ public class G2_Common_Template {
             ArrayList<File> allFileList = new  ArrayList<File>();
             // 当前 shell 目录下的所有文件
             shellFileList.addAll(Arrays.asList(CUR_Dir_FILE.listFiles()));
-            if(needAllFileFlag){
+            if(needAllFile){
                 allFileList = getAllSubFile(CUR_Dir_FILE,null,null);
                 initFileTypeMap(allFileList);
             }
 
-          for (int j = 0; j < allFileList.size(); j++) {
+
+
+            for (int j = 0; j < allFileList.size(); j++) {
                 File curFile = allFileList.get(j);
                 if(curFile.isDirectory()){
                     subDirList.add(curFile);
@@ -489,22 +668,21 @@ public class G2_Common_Template {
         // operation_type  操作类型     1--读取文件内容字符串 进行修改      2--对文件对文件内容(字节)--进行修改    3.对全体子文件进行的随性的操作 属性进行修改(文件名称)
         // 4.对当前子文件(包括子目录 子文件 --不包含孙目录 孙文件)   // 5. 从shell 中获取到的路径 去对某一个文件进行操作
 
-
+        boolean needAllFile = true;
         String file_type;   // * 标识所有的文件类型   以及当前操作类型文件  或者 单独的文件过滤类型
         String identify;
         String errorMsg;
-        boolean needAllFileFlag ;
         ArrayList<String> curFilterFileTypeList;  //  当前的文件过滤类型   多种文件过滤类型  例如把 多种格式 jpeg png 转为 jpg 时 使用到
         ArrayList<File> curFixedFileList;  // 当前修改操作成功的集合
         ArrayList<File> inputFileList ;  // 从输入参数得到的文件的集合
         abstract    void operationRule(ArrayList<String> inputParamsList);
 
-//        abstract    String applyStringOperationRule1(String origin);   //  不要这样的方法了  只保留 最有用的 那个 applyOperationRule
+        //        abstract    String applyStringOperationRule1(String origin);   //  不要这样的方法了  只保留 最有用的 那个 applyOperationRule
 //        abstract    File applyFileByteOperationRule2(File originFile);
 //        abstract    ArrayList<File> applyFileListRule3(ArrayList<File> subFileList , HashMap<String, ArrayList<File>> fileTypeMap);
- // applyFileListRule4
+        // applyFileListRule4
         abstract    ArrayList<File> applyOperationRule(ArrayList<File> curFileList , HashMap<String, ArrayList<File>> subFileTypeMap , ArrayList<File> curDirList ,ArrayList<File> curRealFileList);
-//        abstract    void initParams4InputParam(String inputParam);  // 初始化Rule的参数 依据输入的字符串
+        //        abstract    void initParams4InputParam(String inputParam);  // 初始化Rule的参数 依据输入的字符串
         abstract    String ruleTip(String type,int index , String batName,OS_TYPE curType);  // 使用说明列表  如果覆盖 那么就不使用默认的说明 , 默认就一种情况
         abstract    String simpleDesc();  // 使用的简单描述  中文的该 rule的使用情况  默认会在 ruleTip 被调用
         abstract    boolean checkParamsOK(File shellDir,String type2Param,ArrayList<String> otherParams);
@@ -726,9 +904,9 @@ public class G2_Common_Template {
 /*
             String itemDesc = "";
            if(CUR_OS_TYPE == OS_TYPE.Windows){
-                itemDesc = "zrule_apply_G8.bat  "+type+"_"+index + "    [索引 "+count+"]  描述:"+desc;
+                itemDesc = "zrule_apply_I6.bat  "+type+"_"+index + "    [索引 "+count+"]  描述:"+desc;
            }else{
-               itemDesc = "zrule_apply_G8 "+type+"_"+index + "    [索引 "+count+"]  描述:"+desc;
+               itemDesc = "zrule_apply_I6 "+type+"_"+index + "    [索引 "+count+"]  描述:"+desc;
            }
            */
             System.out.println(desc+"\n");
@@ -749,7 +927,12 @@ public class G2_Common_Template {
 
         String absFilePath = CUR_Dir_1_PATH + File.separator + inputParams;
         File absFile = new File(absFilePath);
+
         if(absFile.exists()){
+            if(absFile.isDirectory()){
+                userSelectedDir = absFile;
+            }
+
             return 0;   //  如果输入的参数  和  shell目录 组成一个 存在的文件的话  那么说明 参数不是 选择 rule的参数
         }
 
@@ -1456,6 +1639,7 @@ public class G2_Common_Template {
         }
     }
 
+
     static Long getFileCreateTime(String filePath) {
         File file = new File(filePath);
         try {
@@ -1469,7 +1653,7 @@ public class G2_Common_Template {
         }
     }
 
-    public  static String getFileNameNoPoint(File file){
+    public  static String getFileAbsPathNameNoPoint(File file){
         return getFileNameNoPoint(file.getAbsolutePath());
     }
 
@@ -1594,8 +1778,8 @@ public class G2_Common_Template {
         initInputParams(args);
 
 
-        G2_Common_Template mG8_Object = new G2_Common_Template();
-        mG8_Object.InitRule();
+        I6_HtmlRecord mI6_Object = new I6_HtmlRecord();
+        mI6_Object.InitRule();
 
 
         // 用户没有输入参数
@@ -1639,8 +1823,20 @@ public class G2_Common_Template {
 
 
         CUR_Selected_Rule.operationRule(CUR_INPUT_3_ParamStrList);  // 传递参数列表 进行处理
+        System.out.println("Program Run "+" Over !");
+
 
         setProperity();
     }
+    void openLocalHtml(String htmlUrl){
+        Desktop desktop = Desktop.getDesktop();
+        try {
+            if (desktop.isSupported(Desktop.Action.BROWSE)) {
+                desktop.open(new File(htmlUrl));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
+    }
 }
