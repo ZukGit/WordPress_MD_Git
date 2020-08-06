@@ -722,7 +722,7 @@ public class I4_ClipBoard_Monitor_PathTextProp  implements ClipboardOwner{
                 if(CUR_OS_TYPE == OS_TYPE.Windows){
                     String key_value_str = key+value;
                     sb.append("echo \"index = "+index +"  ---> "+key+"\""+"\r\n");
-                    if(isContainChinese(key_value_str)){
+                    if(isContainChinese(key_value_str) || key.contains(" ")){
                         sb.append("move  "+"\""+key+"\"    "+"\""+value+"\""+"\r\n");
                     }else{
                         sb.append("move  "+key+"   "+value+"\r\n");

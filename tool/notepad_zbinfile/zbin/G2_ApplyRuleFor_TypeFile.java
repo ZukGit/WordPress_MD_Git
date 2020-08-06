@@ -172,12 +172,127 @@ public class G2_ApplyRuleFor_TypeFile {
         realTypeRuleList.add( new CalMP4_DIR_HTML_Rule_13());
         realTypeRuleList.add( new CreateIconFile_KuaiJieFangShi_Rule_14());
         realTypeRuleList.add( new Webp_To_Jpg_Gif_Rule_15());
+
+        realTypeRuleList.add( new File_TimeName_Rule_16());
+
     }
 
+
+// 3038年 5 月 3 日
+
+
+    // operation_type  操作类型     1--读取文件内容字符串 进行修改      2--对文件对文件内容(字节)--进行修改    3.对全体子文件进行的随性的操作 属性进行修改(文件名称)
+//     // 4.对当前子文件(包括子目录 子文件 --不包含孙目录 孙文件) 5. 从shell 中获取到的路径 去对某一个文件进行操作
+
+
+    class File_TimeName_Rule_16 extends Basic_Rule{
+
+        // key = type       value =  符合过滤文件规则的名称的文件的集合
+        //   HashMap<String, ArrayList<File>> arrFileMap;
+        boolean keepOriginalName = false;
+        int inputBeginIndex = 0;
+
+        // true   1.jpg 2,jpg  3.png  4.png 依次命名
+        // false   1.jpg 2,jpg   1.png  2.png 类型来命名
+        boolean isOrder = false;
+        File_TimeName_Rule_16() {
+            super("*", 16, 3);  //
+        }
+
+
+
+
+        @SuppressWarnings("unchecked")
+        boolean   tryReNameOperation( HashMap<String, ArrayList<File>> arrFileMap ){
+            boolean executeFlag = false;
+            Map.Entry<String, ArrayList<File>> entry;
+            int fileOrderIndex = 0;
+
+            if (arrFileMap != null) {
+                Iterator iterator = arrFileMap.entrySet().iterator();
+                while (iterator.hasNext()) {
+                    entry = (Map.Entry<String, ArrayList<File>>) iterator.next();
+                    String typeStr = entry.getKey();  //Map的Value
+                    ArrayList<File> fileArr = entry.getValue();  //Map的Value
+
+                    for (int i = 0; i < fileArr.size(); i++) {
+                        fileOrderIndex++;
+                        int index = i + 1;
+                        String newNamePre = index+"_"+getTimeStamp();
+                        File curFile = fileArr.get(i);
+                        String curFileName = curFile.getName();
+                        String newName = "";
+                        if( keepOriginalName ){
+                            if(isOrder){  // 按顺序依次  不按 type了  一直走
+                                newName = fileOrderIndex+"_"+curFileName+"_"+getTimeStampLong()+typeStr;
+                            }else{
+                                newName = newNamePre + curFileName+"_"+getTimeStampLong()+typeStr;
+                            }
+                        }else{
+                            // 如果不保留名称  那么没有类型的文件 将只有 序号  没有类型
+                            if("unknow".equals(typeStr)){
+                                newName = index+"_"+getTimeStamp()+"_"+getTimeStampLong();
+                            }else{
+                                if(isOrder){  // 按顺序依次  不按 type了  一直走
+                                    newName = fileOrderIndex+"_"+getTimeStampLong()+typeStr;
+                                }else{
+                                    newName = index+"_"+getTimeStampLong()+typeStr;
+                                }
+
+                            }
+                        }
+                        if(tryReName(curFile,newName)){
+                            executeFlag = true;
+                        }
+                    }
+
+                }
+            }
+
+            return executeFlag;
+        }
+
+
+
+
+
+
+        @Override
+        ArrayList<File> applyFileListRule3(ArrayList<File> subFileList , HashMap<String, ArrayList<File>> fileTypeMap ){
+
+            if(tryReNameOperation(fileTypeMap)){
+                return curFixedFileList;
+            }
+
+            return super.applyFileListRule3(subFileList , fileTypeMap );
+        }
+
+
+
+        String ruleTip(String type,int index , String batName,OS_TYPE curType){
+            String itemDesc = "";
+            String desc_true =   "  (不保留当前名称 按类型重命名当前目录下的文件) 文件命名格式为:    依据类型 序号_时间戳.类型   1_201841094.jpg 2_201841094.jpg 3_2018413131.jpg 1_201804021145.png";
+
+            if(curType == OS_TYPE.Windows){
+                itemDesc = batName.trim()+".bat  "+type+"_"+index+ "       【 index_timestamp.type 序号_时间戳.类型命名】  [索引 "+index+"]  描述: "+ desc_true +"\n";
+
+            }else{
+                itemDesc = batName.trim()+".sh "+type+"_"+index  + "       【 index_timestamp.type 序号_时间戳.类型命名】   [索引 "+index+"]  描述:"+ desc_true;
+            }
+
+            return itemDesc;
+        }
+
+
+
+
+
+    }
 
 
     // operation_type  操作类型     1--读取文件内容字符串 进行修改      2--对文件对文件内容(字节)--进行修改    3.对全体子文件进行的随性的操作 属性进行修改(文件名称)
     //     // 4.对当前子文件(包括子目录 子文件 --不包含孙目录 孙文件) 5. 从shell 中获取到的路径 去对某一个文件进行操作
+
 
 
  class Webp_To_Jpg_Gif_Rule_15 extends Basic_Rule{
@@ -332,20 +447,26 @@ String G2_webp2gif_exe_path = "";
         String targetFilePath = targetFile.getAbsolutePath();
         JShellLink link = new JShellLink();
         if(!iconFile.exists()){
+
 /*            try {
                 iconFile.createNewFile();
             } catch (IOException e) {
                 e.printStackTrace();
             }*/
         }
-        String parentAbsPath = iconFile.getParentFile().getAbsolutePath();
-        link.setFolder(parentAbsPath);
-        String iconName = iconFile.getName();
-        link.setName(iconName);
-        link.setPath(targetFilePath);
-        link.save();
-        if(isKuaiJieIcon(iconFile)){
-            isOK = true;
+
+        try {
+            String parentAbsPath = iconFile.getParentFile().getAbsolutePath();
+            link.setFolder(parentAbsPath);
+            String iconName = iconFile.getName();
+            link.setName(iconName);
+            link.setPath(targetFilePath);
+            link.save();
+            if (isKuaiJieIcon(iconFile)) {
+                isOK = true;
+            }
+        }catch (Exception e){
+            e.printStackTrace();
         }
 
         return isOK;
@@ -1585,7 +1706,7 @@ String G2_webp2gif_exe_path = "";
                     Cur_Bat_Name + " #_10_create   _temp  1_100   创建一个序列号从1temp到100temp的100个文件夹 \n "+
                     Cur_Bat_Name + " #_10_create   j_temp  1_100   创建一个序列号从 j_1_temp 到100temp的 j_100_temp 个文件夹 \n "+
                     Cur_Bat_Name + " #_10_create  7000_7100  创建一个序列号从7000开始的到7100结束的文件夹  \n " +
-                    Cur_Bat_Name + " #_10_replace  abc_DEF  创建一个序列号从7000开始的到7100结束的文件夹 \n "  ;
+                    Cur_Bat_Name + " #_10_replace  abc_DEF  把当前文件夹名称中的  abc 转为 DEF \n "  ;
         }
 
 
@@ -3779,6 +3900,14 @@ String firstInputIndexStr ;
         }
 
         return targetFileList;
+    }
+
+
+    static String getTimeStampLong(){
+
+        SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd_HHmmss_SSS");//设置日期格式
+        String date = df.format(new Date());
+        return date;
     }
 
 
