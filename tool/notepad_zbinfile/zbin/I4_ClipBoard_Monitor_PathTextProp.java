@@ -571,7 +571,6 @@ public class I4_ClipBoard_Monitor_PathTextProp  implements ClipboardOwner{
     static  String  getPaddingIntString(int index , int padinglength , String oneStr , boolean dirPre){
         String result = ""+index;
         int length = (""+index).length();
-
         if(length < padinglength){
             int distance = padinglength  - length;
             for (int i = 0; i < distance; i++) {
@@ -580,12 +579,9 @@ public class I4_ClipBoard_Monitor_PathTextProp  implements ClipboardOwner{
                 }else{
                     result = result + oneStr;
                 }
-
             }
-
         }
         return result;
-
     }
 
 
@@ -714,7 +710,7 @@ public class I4_ClipBoard_Monitor_PathTextProp  implements ClipboardOwner{
 
             if(CUR_OS_TYPE == OS_TYPE.Windows){//bat 中 要使用 /r/n
                 sb.append("@echo off\r\n");
-                sb.append("\r\n");
+                sb.append("Setlocal ENABLEDELAYEDEXPANSION"+"\r\n");
             }
 
             int index = 0 ;
@@ -725,12 +721,13 @@ public class I4_ClipBoard_Monitor_PathTextProp  implements ClipboardOwner{
                 System.out.println("index["+index+"] = "+"move  "+key+" "+value);
                 if(CUR_OS_TYPE == OS_TYPE.Windows){
                     String key_value_str = key+value;
+                    sb.append("echo \"index = "+index +"  ---> "+key+"\""+"\r\n");
                     if(isContainChinese(key_value_str)){
                         sb.append("move  "+"\""+key+"\"    "+"\""+value+"\""+"\r\n");
                     }else{
                         sb.append("move  "+key+"   "+value+"\r\n");
                     }
-
+                    sb.append("echo. "+"\r\n");
                 }
                 index++;
 
@@ -980,7 +977,9 @@ static String[] operationTip = {"⊙","▲","〓","※","¤","☆","★","●","
         propFileListSize+= originMP4File.length();
         setProperity();
 //        fileCopy(originMP4File,newShellFile);
-        System.out.println(diffTipStr+"【索引: "+curPropSIze+"】"+"════════"+clipText+" End Success════════");
+        int curPropSIze2 = I4_Properties.size();
+        String allSizeStr  = getFileSize(propFileListSize);
+        System.out.println(diffTipStr+"【索引: "+curPropSIze+"】"+"单文件大小● "+getJustFileSize(originMP4File)+"●" +" 当前个数〓"+curPropSIze2+"〓"+"  当前总大小▲ "+allSizeStr+"▲"+"═══"+clipText+" End Success════════");
     }
 
     static boolean isVideoFile(File file){
@@ -1061,6 +1060,23 @@ static String[] operationTip = {"⊙","▲","〓","※","¤","☆","★","●","
             sizeStr = fileSize+ "B";
         }
         return name+ " "+ sizeStr;
+    }
+
+    static String getJustFileSize(File file){
+        long fileSize = file.length();
+        String name = file.getName();
+        String sizeStr = "";
+        if(fileSize > 1024L &&  fileSize <= 1024L*1024L ){
+            sizeStr = fileSize/ (1024L) + "KB ";
+        } else if(fileSize > 1024L*1024L &&  fileSize <= 1024L*1024L*1024L){
+            sizeStr = fileSize/ (1024L*1024L) + "MB ";
+        }else if(fileSize > 1024L*1024L*1024L &&  fileSize <= 1024L*1024L*1024L*1024L){
+            sizeStr = fileSize/ (1024L*1024L*1024L) + "GB ";
+        }
+        if("".endsWith(sizeStr)){
+            sizeStr = fileSize+ "B";
+        }
+        return  sizeStr;
     }
 
     static String getTimeStamp(){
