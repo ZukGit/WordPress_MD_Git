@@ -1,7 +1,38 @@
+import java.io.File;
+
 public class H0_Tip {
     static String OneLine_Pre = "\n════════";
     static String OneLine_End = "════════\n";
     static String OneLine = "════════";
+
+    static String User_Home = System.getProperties().getProperty("user.home");
+
+    enum OS_TYPE {
+        Windows,
+        Linux,
+        MacOS
+    }
+
+    static String BAT_OR_SH_Point ;
+
+    static void initSystemInfo() {
+        String osName = System.getProperties().getProperty("os.name").toLowerCase();
+        if (osName.contains("window")) {
+            CUR_OS_TYPE = OS_TYPE.Windows;
+            BAT_OR_SH_Point = ".bat";
+        } else if (osName.contains("linux")) {
+            CUR_OS_TYPE = OS_TYPE.Linux;
+            BAT_OR_SH_Point = ".sh";
+        } else if (osName.contains("mac")) {
+            CUR_OS_TYPE = OS_TYPE.MacOS;
+            BAT_OR_SH_Point = ".sh";
+        }
+    }
+
+
+    // 固定3   当前操作系统的类型
+    static OS_TYPE CUR_OS_TYPE = OS_TYPE.Windows;
+
     public static void main(String[] args) {
         WindowsTip();
         PackageInfoTip();
@@ -17,9 +48,26 @@ public class H0_Tip {
     }
 
     static void WindowsTip(){
-        CmderTip();  // cmder 下的环境变量设置 
+        if(CUR_OS_TYPE == OS_TYPE.Windows){
+            CmderTip();  // cmder 下的环境变量设置
+            WindowsFilePathTip();  // 文件快捷方式提示
+        }
+
     }
 
+    static void  WindowsFilePathTip(){  // 文件快捷方式提示
+        System.out.println(OneLine_Pre + " Winddows下文件快捷方式 Begin "+ OneLine_End);
+        System.out.println("桌面壁纸相关");
+        System.out.println(" zzfile_3.bat "+ User_Home+ File.separator+"AppData\\Roaming\\Microsoft\\Windows\\Themes        // 当前壁纸位置 ");
+        System.out.println(" zzfile_3.bat "+"C:\\Windows\\Web\\Screen                                                      // 壁纸仓库   ");
+        System.out.println(" zzfile_3.bat "+ User_Home +File.separator+"AppData\\Local\\Packages\\Microsoft.Windows.ContentDeliveryManager_cw5n1h2txyewy\\LocalState\\Assets   // 锁屏壁纸1");
+        System.out.println(" zzfile_3.bat "+ User_Home +File.separator+"AppData\\Local\\Microsoft\\Windows\\Themes          // 锁屏壁纸2");
+        System.out.println();
+        System.out.println("网络配置Host");
+        System.out.println(" zzfile_3.bat C:\\WINDOWS\\system32\\drivers\\etc\\hosts    // Hosts文件的做用是把网址域名与对应的IP地址建立一个关联 数据库 ");
+        System.out.println(OneLine_Pre + " Winddows下文件快捷方式  End "+ OneLine_Pre);
+
+    }
     static void CmderTip(){
         System.out.println(OneLine_Pre + " Winddows下Cmder设置 Begin "+ OneLine_End);
         System.out.println("Cmder 下载地址:"+"  https://pan.baidu.com/disk/home#/all?vmode=list&path=%2F%E7%A7%BB%E5%8A%A8%E7%A1%AC%E7%9B%98%2Fsoftware%2Fwin");
