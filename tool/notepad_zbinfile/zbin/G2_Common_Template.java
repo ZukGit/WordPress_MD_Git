@@ -553,6 +553,59 @@ public class G2_Common_Template {
         }
     }
 
+    static void NotePadOpenTargetFile(String absPath){
+        String commandNotead = "";
+        if(CUR_OS_TYPE == OS_TYPE.Windows){
+            commandNotead = "cmd.exe /c start   Notepad++.exe " + absPath;
+        }else if(CUR_OS_TYPE == OS_TYPE.Linux){
+            commandNotead  = " gedit " + absPath;
+        }else if(CUR_OS_TYPE == OS_TYPE.MacOS){
+            commandNotead  = " gedit " + absPath;
+        }
+        execCMD(commandNotead);
+    }
+
+
+
+    public static ArrayList<String> ReadFileContentAsList( File mFilePath) {
+
+        if (mFilePath != null  && mFilePath.exists()) {
+            //  System.out.println("存在  当前文件 "+ mFilePath.getAbsolutePath());
+        } else {
+            System.out.println("不存在 当前文件 "+ mFilePath.getAbsolutePath() );
+
+            return null;
+        }
+        ArrayList<String> contentList= new ArrayList<String>();
+
+        try {
+            BufferedReader curBR = new BufferedReader(new InputStreamReader(new FileInputStream(mFilePath), "utf-8"));
+            String oldOneLine = "";
+            int index = 1;
+            while (oldOneLine != null) {
+
+                oldOneLine = curBR.readLine();
+                if (oldOneLine == null ) {
+                    continue;
+                }
+
+                contentList.add(oldOneLine);
+//                    System.out.println("第"+index+"行读取到的字符串:"+oldOneLine);
+                index++;
+
+            }
+            curBR.close();
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return contentList;
+
+    }
+
+
+
     public static String ReadFileContent( File mFilePath) {
 
         if (mFilePath != null  && mFilePath.exists()) {

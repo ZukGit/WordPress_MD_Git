@@ -1740,7 +1740,7 @@ String G2_webp2gif_exe_path = "";
 
         @Override
         String simpleDesc() {
-            return  Cur_Bat_Name+ "  #_9  _jpg   把没有类型的文件名称修改为 jpg格式名称\n" +
+            return  "\n"+Cur_Bat_Name+ "  #_9  _jpg   把没有类型的文件名称修改为 jpg格式名称\n" +
                     Cur_Bat_Name+ "  #_9  jpg_   去除当前jpg的格式 使得其文件格式未知 \n" +
                     Cur_Bat_Name + " #_9  jpg_png  把  jpg的格式转为png的格式  \n" +
                     Cur_Bat_Name + " #_9  png_jpg  把  jpg的格式转为png的格式 \n "+
@@ -3185,6 +3185,8 @@ String firstInputIndexStr ;
         return sb.toString();
 
     }
+
+
 
     public static boolean isContainChinese(String str) {
         Pattern p = Pattern.compile("[\u4e00-\u9fa5]");

@@ -1,7 +1,5 @@
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
-import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.URL;
 import java.net.URLConnection;
@@ -14,33 +12,24 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
-//  对当前 给定目录的图片 进行 尺寸上的分类 并 生成 MD文件   对应的 MD 文件 可以通过
-//  https://zukgit.github.io/Z_Wallpaper/  进行访问    遍历所有的 jpg JPEG png  webp 按照尺寸 进行分组
-
-
-// 1. 分为 PC壁纸 和 手机壁纸 , 等尺寸壁纸     特点是 PC壁纸的长度大于宽度     手机壁纸的 宽度 大于  长度  宽度=长度 等尺寸壁纸
-// 2. PC的壁纸 没有规定 使用默认的尺寸  2.  mobile 的 壁纸 使用 33.2% 的 缩放比例
-// 3. 使用 给定目录的相对地址  来作为 src的地址   d
-// 4. 当前的目标文件夹下的文件名称需要重新 命名 使得 方便显示
-// 5. 最后生成一个带有时间戳的 README_20200803.md   这个时间戳可以手动覆盖 原始的 README.md   避免强制覆盖的问题
 //
-
-
-public class I8_WallPaper {
+public class I9_TextRuleOperation {
 
 
     /*******************修改属性列表 ------Begin *********************/
-// 修改0.   全局修改 把 I8 改为当前应用的序号规则序号  当前类名称也需要修改
+// 修改0.   全局修改 把 I9 改为当前应用的序号规则序号  当前类名称也需要修改
 // 修改1.当前 执行代码的 bat sh 文件名称  最后必须是标识序号
-    //修改2. I8_WallPaper  改为当前类名称  A1 Z9
-    //修改2.1  I8 改为 对应的 标识符
+    //修改2. I9_TextRuleOperation  改为当前类名称  A1 Z9
+    //修改2.1  I9 改为 对应的 标识符
 // 修改3.  当前是否有默认的规则   如果有默认的规则那么设置 CUR_TYPE_INDEX为对应index , 没有默认规则那么设置为默认的1
-    static String Cur_Bat_Name = "zwallpaper_to_md_I8";
+    static String Cur_Bat_Name = "ztextrule_operation_I9";
     // 当前用户选中的 操作的类型  0-默认标识没有选中打印帮助字符串    1-标识选中默认规则1
     static int CUR_TYPE_INDEX = 1;
-    static boolean allowEmptyInputParam = false;    // 是否允许输入参数为空 执行 rule的apply方法
+    static boolean  allowEmptyInputParam = false;    // 是否允许输入参数为空 执行 rule的apply方法
 
 /*******************修改属性列表 ------End *********************/
+static String Default_Selected_Rule_Index_Key = "Default_Selected_Rule_Index_Key";
+
 
 
     /*******************固定属性列表 ------Begin *********************/
@@ -48,33 +37,35 @@ public class I8_WallPaper {
 //固定1  zbin 的 字符串绝对路径
     static String zbinPath = System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin";
 
-    static String cur_os_zbinPath;
-    static String win_zbinPath = System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin" + File.separator + "win_zbin";
-    static String lin_zbinPath = System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin" + File.separator + "lin_zbin";
-    static String mac_zbinPath = System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin" + File.separator + "mac_zbin";
+    static String cur_os_zbinPath ;
+    static String win_zbinPath = System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin"+File.separator+"win_zbin";
+    static String lin_zbinPath = System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin"+File.separator+"lin_zbin";
+    static String mac_zbinPath = System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin"+File.separator+"mac_zbin";
 
 
-    // 固定2 当前执行文件的编号 A1  A2  A3   ... G1   I8   G3 ... Z9
-    static File I8_Properties_File = new File(System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin" + File.separator + get_Bat_Sh_FlagNumber(Cur_Bat_Name) + ".properties");
-    static InputStream I8_Properties_InputStream;
-    static OutputStream I8_Properties_OutputStream;
-    static Properties I8_Properties = new Properties();
+    // 固定2 当前执行文件的编号 A1  A2  A3   ... G1   I9   G3 ... Z9
+    static File I9_Properties_File = new File(System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin" + File.separator + get_Bat_Sh_FlagNumber(Cur_Bat_Name)+".properties");
+
+    static File I9_Temp_Text_File = new File(System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin" + File.separator + get_Bat_Sh_FlagNumber(Cur_Bat_Name)+"_Temp_Text.txt");
+
+    static InputStream I9_Properties_InputStream;
+    static OutputStream I9_Properties_OutputStream;
+    static Properties I9_Properties = new Properties();
     static Map<String, String> propKey2ValueList = new HashMap<String, String>();
 
 
     // 当前Shell目录下的 文件类型列表  抽取出来  通用
-    static HashMap<String, ArrayList<File>> CurDirFileTypeMap = new HashMap<String, ArrayList<File>>();
-    ;
+    static  HashMap<String, ArrayList<File>> CurDirFileTypeMap = new  HashMap<String, ArrayList<File>>(); ;
 
 
     // 固定3   当前操作系统的类型
     static OS_TYPE CUR_OS_TYPE = OS_TYPE.Windows;
-    static String BAT_OR_SH_Point;
+    static String BAT_OR_SH_Point ;
     //  固定4  从CMD窗口输入得到的 目录关键字参数
     // 当前 SHELL  所在目录  默认是main中的第一个 arg[0] 就是shell路径
     static String CUR_Dir_1_PATH = "";    //  arg[0] 就是shell路径 String 类型
-    static File CUR_Dir_FILE;   // 当前 CMDER的路径 File 文件
-    static File targetDirFile;   //  从参数输入的目录文件
+    static File CUR_Dir_FILE ;   // 当前 CMDER的路径 File 文件
+    static File First_Input_Dir ;   // 用户第一次可能输入的文件夹
 
     // 固定5 从CMD窗口输入得到的 功能 tyoe 索引类型  以及依据索引 选中的 逻辑规则
     // 输入的第一个数值 是 rule的索引   同时搭配  * # 实现不同功能
@@ -82,7 +73,8 @@ public class I8_WallPaper {
     static boolean isDefaultOperation = false;    //  是否是 默认的操作
 
 
-    static Rule CUR_Selected_Rule;    // 当前默认选中的 操作规则 这里实现了具体的操作逻辑
+
+    static Rule CUR_Selected_Rule ;    // 当前默认选中的 操作规则 这里实现了具体的操作逻辑
 
     // 固定6  从shell 中获取到的 除了 args[0] 和 args[1] 之外的所有其他的输入参数类型
     static ArrayList<String> CUR_INPUT_3_ParamStrList = new ArrayList<>();
@@ -92,9 +84,12 @@ public class I8_WallPaper {
     static ArrayList<Rule> CUR_RULE_LIST = new ArrayList<Rule>();  // 规则的集合
 
 
+
     // 固定8 当前Shell目录下的 文件类型列表  抽取出来  通用  文件类型Str-文件及合
-    static HashMap<String, ArrayList<File>> CUR_Dir_FILETypeMap = new HashMap<String, ArrayList<File>>();
-    ;
+    static  HashMap<String, ArrayList<File>> CUR_Dir_FILETypeMap = new  HashMap<String, ArrayList<File>>(); ;
+
+
+
 
 
 //  固定属性列表 ------End
@@ -106,23 +101,24 @@ public class I8_WallPaper {
 
 
     // PATH 环境变量值进行当前的保存处理
-    static String EnvironmentValue = System.getProperties().getProperty("java.library.path");
+    static String EnvironmentValue=System.getProperties().getProperty("java.library.path");
     static String PathSeparator = System.getProperties().getProperty("path.separator");
     static String[] EnvironmentList = EnvironmentValue.split(PathSeparator);
 
 
-    static boolean isContainEnvironment(String program) {
+    static boolean  isContainEnvironment(String program){
         boolean environmentExist = false;
-        if (EnvironmentValue.contains(program)) {
+        if(EnvironmentValue.contains(program)){
             environmentExist = true;
         }
         return environmentExist;
     }
 
 
-    // ffmpeg  -f concat -safe 0 -i C:\Users\zhuzj5\Desktop\zbin\I8_1_MergedRule.txt -c copy C:\Users\zhuzj5\Desktop\output2.mp4
+
+    // ffmpeg  -f concat -safe 0 -i C:\Users\zhuzj5\Desktop\zbin\I9_1_MergedRule.txt -c copy C:\Users\zhuzj5\Desktop\output2.mp4
     // D:\software\ffmpeg\bin
-    // D:\software\ffmpeg\bin\ffmpeg.exe  -f concat -safe 0 -i C:\Users\zhuzj5\Desktop\zbin\I8_1_MergedRule.txt -c copy C:\Users\zhuzj5\Desktop\output3.mp4
+    // D:\software\ffmpeg\bin\ffmpeg.exe  -f concat -safe 0 -i C:\Users\zhuzj5\Desktop\zbin\I9_1_MergedRule.txt -c copy C:\Users\zhuzj5\Desktop\output3.mp4
     static String getEnvironmentExePath(String program) {
         String exename = program.trim().toLowerCase();
         String executePath = null;
@@ -158,20 +154,20 @@ public class I8_WallPaper {
 
 
     // A1  ..... A2.
-    static String get_Bat_Sh_FlagNumber(String mCur_Bat_Name) {
+    static String get_Bat_Sh_FlagNumber(String mCur_Bat_Name){
         String mCharNumber = "error";
-        String curBat = mCur_Bat_Name;
-        if (mCur_Bat_Name.contains(".sh")) {
-            curBat = curBat.replace(".sh", "");
+        String curBat =mCur_Bat_Name;
+        if(mCur_Bat_Name.contains(".sh")){
+            curBat = curBat.replace(".sh","");
         }
 
-        if (mCur_Bat_Name.contains(".bat")) {
-            curBat = curBat.replace(".bat", "");
+        if(mCur_Bat_Name.contains(".bat")){
+            curBat = curBat.replace(".bat","");
         }
-        if (curBat.contains("_")) {
-            String[] arrNameList = curBat.split("_");
-            mCharNumber = arrNameList[arrNameList.length - 1];
-        } else {
+        if(curBat.contains("_")){
+            String[] arrNameList =    curBat.split("_");
+            mCharNumber =   arrNameList[arrNameList.length-1];
+        }else{
             mCharNumber = curBat;
         }
 
@@ -181,18 +177,27 @@ public class I8_WallPaper {
 
     static {
         try {
-            if (!I8_Properties_File.exists()) {
-                I8_Properties_File.createNewFile();
+
+
+            if (!I9_Temp_Text_File.exists()) {
+                I9_Temp_Text_File.createNewFile();
             }
-            I8_Properties_InputStream = new BufferedInputStream(new FileInputStream(I8_Properties_File.getAbsolutePath()));
-            I8_Properties.load(I8_Properties_InputStream);
-            Iterator<String> it = I8_Properties.stringPropertyNames().iterator();
+
+            if (!I9_Properties_File.exists()) {
+                I9_Properties_File.createNewFile();
+            }
+            I9_Properties_InputStream = new BufferedInputStream(new FileInputStream(I9_Properties_File.getAbsolutePath()));
+            I9_Properties.load(I9_Properties_InputStream);
+            Iterator<String> it = I9_Properties.stringPropertyNames().iterator();
             while (it.hasNext()) {
                 String key = it.next();
-                // System.out.println("key:" + key + " value: " + I8_Properties.getProperty(key));
-                propKey2ValueList.put(key, I8_Properties.getProperty(key));
+                if(key.equals(Default_Selected_Rule_Index_Key)){
+                    CUR_TYPE_INDEX = Integer.parseInt(I9_Properties.getProperty(key));
+                }
+                // System.out.println("key:" + key + " value: " + I9_Properties.getProperty(key));
+                propKey2ValueList.put(key, I9_Properties.getProperty(key));
             }
-            I8_Properties_InputStream.close();
+            I9_Properties_InputStream.close();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -203,9 +208,9 @@ public class I8_WallPaper {
 
     static void setProperity() {
         try {
-            I8_Properties_OutputStream = new BufferedOutputStream(new FileOutputStream(I8_Properties_File.getAbsolutePath()));
-            I8_Properties.store(I8_Properties_OutputStream, "");
-            I8_Properties_OutputStream.close();
+            I9_Properties_OutputStream = new BufferedOutputStream(new FileOutputStream(I9_Properties_File.getAbsolutePath()));
+            I9_Properties.store(I9_Properties_OutputStream, "");
+            I9_Properties_OutputStream.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -219,44 +224,54 @@ public class I8_WallPaper {
     }
 
 
+    static boolean isFreshDefault_SelectedIndex = false;
+    static String FreshDefaultInputStr = "";
     //  初始化  从 bat sh   传输而来的参数
-    static void initInputParams(String[] args) {
+    static  void  initInputParams(String[] args){
         if (args != null) {
             for (int i = 0; i < args.length; i++) {
                 System.out.println("args[" + i + "] = " + args[i]);
                 if (i == 0) {   // 第一个参数永远是  当前 shell的目录
                     CUR_Dir_1_PATH = args[i];
-                } else if (i == 1) {  // 第二个参数是用来 对 当前功能进行分类使用的
+                } else if(i == 1){  // 第二个参数是用来 对 当前功能进行分类使用的
+                    if(args[i].contains("default_index_")){
+                        FreshDefaultInputStr = args[i];
+                        isFreshDefault_SelectedIndex = true;
+                        return ;
+                    }
                     CUR_TYPE_2_ParamsStr = args[i];
                     //zukgit1    计算得到 当前 索引的列表   首先遇到的第一个数字类型  1_2112  那就是索引1  附带参数 2112   temp_2_
                     int userSelectedIndex = calculInputTypeIndex(CUR_TYPE_2_ParamsStr);
-                    if (userSelectedIndex != 0 && userSelectedIndex != CUR_TYPE_INDEX) {
+                    if(userSelectedIndex != 0 && userSelectedIndex != CUR_TYPE_INDEX){
                         // 如果 当前 的操作规则 不是 0   并且 操作索引 和当前 索引 不一样  那么就寻找赋值给  CUR_TYPE_INDEX
-                        CUR_TYPE_INDEX = userSelectedIndex;
+                        CUR_TYPE_INDEX =  userSelectedIndex;
                         isDefaultOperation = false;
-                    } else if (userSelectedIndex == CUR_TYPE_INDEX) {
+                    }else if(userSelectedIndex == CUR_TYPE_INDEX){
                         // 显式的输入默认值
                         isDefaultOperation = true;   //  默认的操作
-                        CUR_TYPE_2_ParamsStr = CUR_TYPE_INDEX + "";
-                    } else {
+                        CUR_TYPE_2_ParamsStr = CUR_TYPE_INDEX+"";
+                    }else{
                         isDefaultOperation = true;   //  默认的操作
                         // 默认的操作没有index 选项 所以 index1 就是参数
                         CUR_INPUT_3_ParamStrList.add(args[i]);
-                        CUR_TYPE_2_ParamsStr = CUR_TYPE_INDEX + "";  //  默认参数 模拟的第二个参数
+                        CUR_TYPE_2_ParamsStr = CUR_TYPE_INDEX+"";  //  默认参数 模拟的第二个参数
                     }
-                } else {
+                }else {
+
+                    if(args[i].contains("default_index_")){
+                        FreshDefaultInputStr = args[i];
+                        isFreshDefault_SelectedIndex = true;
+                        return ;
+                    }
                     CUR_INPUT_3_ParamStrList.add(args[i]);   // 当前cmd目录   第一个类型选项      之后所有的参数 保存在  CUR_INPUT_3_ParamStrList
                     //    Rule_Identify_TypeIndexList.add(args[i]);
                 }
+
             }
         }
 
         File mCUR_Dir_FILE = new File(CUR_Dir_1_PATH);
-        CUR_Dir_FILE = new File(CUR_Dir_1_PATH);
-
-        if (targetDirFile != null) {
-            System.out.println("将对 目标目录 = " + targetDirFile.getAbsolutePath() + " 进行检索 生成依据 宽度高度分类的 README_时间戳.md 文件");
-        }
+        CUR_Dir_FILE = new  File(CUR_Dir_1_PATH);
 
     }
 
@@ -264,21 +279,27 @@ public class I8_WallPaper {
         String osName = System.getProperties().getProperty("os.name").toLowerCase();
         if (osName.contains("window")) {
             CUR_OS_TYPE = OS_TYPE.Windows;
-            Cur_Bat_Name = Cur_Bat_Name + ".bat";
+            Cur_Bat_Name = Cur_Bat_Name+".bat";
             BAT_OR_SH_Point = ".bat";
             cur_os_zbinPath = win_zbinPath;
         } else if (osName.contains("linux")) {
             CUR_OS_TYPE = OS_TYPE.Linux;
-            Cur_Bat_Name = Cur_Bat_Name + ".sh";
+            Cur_Bat_Name = Cur_Bat_Name+".sh";
             BAT_OR_SH_Point = ".sh";
             cur_os_zbinPath = lin_zbinPath;
         } else if (osName.contains("mac")) {
             CUR_OS_TYPE = OS_TYPE.MacOS;
-            Cur_Bat_Name = Cur_Bat_Name + ".sh";
+            Cur_Bat_Name = Cur_Bat_Name+".sh";
             BAT_OR_SH_Point = ".sh";
             cur_os_zbinPath = mac_zbinPath;
         }
     }
+
+
+
+
+
+
 
 
     public static String clearChinese(String lineContent) {
@@ -291,11 +312,11 @@ public class I8_WallPaper {
     }
 
 
-    void InitRule() {
+    void InitRule(){
 
         //   加入类型一一对应的 那些 规则
-        CUR_RULE_LIST.add(new MakeWallPaper_MD__Rule_1());
-//        CUR_RULE_LIST.add( new File_Name_Rule_2());
+        CUR_RULE_LIST.add( new OnlyGetFirstStr_InOneLine_Rule_1());
+        CUR_RULE_LIST.add( new OnlyGetFirstStr_AsOneLine_Rule_2());
 //        CUR_RULE_LIST.add( new Image2Jpeg_Rule_3());
 //        CUR_RULE_LIST.add( new Image2Png_Rule_4());
 //        CUR_RULE_LIST.add( new AVI_Rule_5());
@@ -306,227 +327,100 @@ public class I8_WallPaper {
     }
 
 
-    class PC_WallPaper extends Common_WallPaper {
+
+    class OnlyGetFirstStr_AsOneLine_Rule_2 extends  Basic_Rule{
 
 
-        PC_WallPaper(File imageFile,int mwidth,int mhight) {
-            super(imageFile,mwidth,mhight);
-            smallFlag = false;
-            html_pre = "<img src=\"";
-            html_end = "\" />";
-
+        OnlyGetFirstStr_AsOneLine_Rule_2(boolean mIsInputDirAsSearchPoint){
+            super(2);
+            isInputDirAsSearchPoint =  mIsInputDirAsSearchPoint;
         }
 
-        PC_WallPaper(File imageFile) {
-            super(imageFile);
-            smallFlag = false;
-            html_pre = "<img src=\"";
-            html_end = "\" />";
+        OnlyGetFirstStr_AsOneLine_Rule_2(){
+            super(2,false);
 
-        }
-    }
-
-
-    class Mobile_WallPaper extends Common_WallPaper {
-
-
-        Mobile_WallPaper(File imageFile,int mwidth,int mhight) {
-            super(imageFile, mwidth, mhight);
-            smallFlag = true;
-            html_pre = "<img src=\"";
-            html_end = "\" hight=\"33.3%\" width=\"33.3%\"/>";
-
-        }
-
-        Mobile_WallPaper(File imageFile) {
-            super(imageFile);
-            smallFlag = true;
-            html_pre = "<img src=\"";
-            html_end = "\" hight=\"33.3%\" width=\"33.3%\"/>";
-        }
-    }
-
-
-    class Same_Size_WallPaper extends Common_WallPaper {
-
-        Same_Size_WallPaper(File imageFile,int mwidth,int mhight) {
-            super(imageFile);
-            width =mwidth;
-            heigh =mhight;
-            smallFlag = false;
-            html_pre = "<img src=\"";
-            html_end = "\" />";
-
-        }
-        Same_Size_WallPaper(File imageFile) {
-            super(imageFile);
-            smallFlag = false;
-            html_pre = "<img src=\"";
-            html_end = "\" />";
-        }
-    }
-
-
-    class Common_WallPaper extends WallPaper {
-
-        Common_WallPaper(File imageFile) {
-            originFile = imageFile;
-
-            if(imageFile.getName().toLowerCase().endsWith(".webp")){
-                width = getWebpFileWidth(imageFile);
-                heigh = getWebpFileHigh(imageFile);
-            }else{
-                ImageIcon imageIcon = new ImageIcon(imageFile.getAbsolutePath());
-                width = getImageWidth(imageFile);
-                heigh = getImageHigh(imageFile);
-
-            }
-
-
-            sizeStr = width + "x" + heigh;
-            fileType = getFileTypeWithPoint(imageFile.getName());
-            newName = sizeStr + "_" + getTimeStampLong() + fileType;
-            newRenameFile = new File(imageFile.getParentFile().getAbsolutePath() + File.separator + newName);
-
-            String shellAbsPath = CUR_Dir_FILE.getAbsolutePath();
-            String imageAbsPath = newRenameFile.getAbsolutePath();
-            // ./zimage/pc_wallpager_photo/1440x900/1.jpg
-            relativePathSrc = imageAbsPath.replace(shellAbsPath, ".").replace("\"", "/");
-
-        }
-
-        Common_WallPaper(File imageFile,int mwidth,int mheight) {
-            originFile = imageFile;
-
-            ImageIcon imageIcon = new ImageIcon(imageFile.getAbsolutePath());
-            width = mwidth;
-            heigh =  mheight;
-//            width = getImageWidth(imageFile);
-//            heigh = getImageHigh(imageFile);
-
-            sizeStr = width + "x" + heigh;
-            fileType = getFileTypeWithPoint(imageFile.getName());
-            newName = sizeStr + "_" + getTimeStampLong() + fileType;
-            newRenameFile = new File(imageFile.getParentFile().getAbsolutePath() + File.separator + newName);
-
-            String shellAbsPath = CUR_Dir_FILE.getAbsolutePath();
-            String imageAbsPath = newRenameFile.getAbsolutePath();
-            // ./zimage/pc_wallpager_photo/1440x900/1.jpg
-            relativePathSrc = imageAbsPath.replace(shellAbsPath, ".").replace("\"", "/");
-
-        }
-
-        String getImageHtml() {
-            return html_pre + relativePathSrc + html_end;
-        }
-
-
-    }
-
-
-    abstract class WallPaper {
-        int width;
-        int heigh;
-        String relativePathSrc = "";   // 相对地址
-        boolean smallFlag;   // 是否需要 等比例 缩小    mobilepaper的 flag
-        String sizeStr;   //  hxw   长x宽
-        File originFile;  // 原始的文件
-        File newRenameFile;   // 重新命名后的文件
-        String newName;    // 重新命名的文件的名称  600_800_1.jpg   1020_1080_2.png  webp
-        String fileType;  // 文件的类型  .jpg .webp   .png .bmp .jpeg .JPEG   都小写
-        // 【<img src="】./zimage/mobile_wallpager_photo/3208x3208/1.jpg 【" />】
-        String html_pre;    // html 代码的 前后断
-        String html_end; // 【<img src="】./zimage/mobile_wallpager_photo/640x960/1.jpg 【" hight="33%" width="33%"/>】
-
-        abstract String getImageHtml();
-
-
-    }
-
-
-    class MakeWallPaper_MD__Rule_1 extends Basic_Rule {
-        File targetDir;
-        File out_md_file;
-
-        MakeWallPaper_MD__Rule_1() {
-            super(1);
         }
 
 
         // 1. 完成参数的 自我客制化  实现  checkParamsOK 方法
-        @Override
-        boolean checkParamsOK(File shellDir, String type2Param, ArrayList<String> otherParams) {
-
-            if (targetDirFile == null || !targetDirFile.exists()) {
-                return false;
-            }
-            targetDir = targetDirFile;
-            out_md_file = new File(CUR_Dir_FILE.getAbsolutePath() + File.separator + "README" + ".md");
-//            out_md_file = new File(CUR_Dir_FILE.getAbsolutePath() + File.separator + "README" + "_" + getTimeStamp() + ".md");
-            return super.checkParamsOK(shellDir, type2Param, otherParams);
-        }
 
         // 2. 对应的逻辑方法  实现方法  applyOperationRule
 
 
         @Override
         ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
-
-            Paper_Group mPC_Papper = new Paper_Group("PC_WallPaper");
-
-            Paper_Group mSame_Size_Paper = new Paper_Group("Same_Size_WallPaper");
-            Paper_Group mMobile_Papper = new Paper_Group("Mobile_WallPaper");
-
-            Paper_Group_List.add(mPC_Papper);
-            Paper_Group_List.add(mSame_Size_Paper);
-            Paper_Group_List.add(mMobile_Papper);
-            for (int i = 0; i < curRealFileList.size(); i++) {
-                File fileItem = curRealFileList.get(i);
-                if (isImageFile(fileItem)) {
-                    int width = 0;
-                    int heigh = 0;
-
-                    System.out.println("file = ["+i+"] = "+fileItem.getName().toLowerCase());
-                    if(fileItem.getName().toLowerCase().endsWith(".webp")){
-
-                        width = getWebpFileWidth(fileItem);
-                        heigh  = getWebpFileHigh(fileItem);
-                    }else{
-                        ImageIcon imageIcon = new ImageIcon(fileItem.getAbsolutePath());
-                         width = imageIcon.getIconWidth();
-                         heigh = imageIcon.getIconHeight();
-                    }
-
-//                    int width = getImageWidth(fileItem);
-//                    int heigh = getImageHigh(fileItem);
-
-                    if (width == heigh) {
-                        Same_Size_WallPaper samePaper = new Same_Size_WallPaper(fileItem,width,heigh);
-                        mSame_Size_Paper.add(samePaper);
-                    } else if (width > heigh) {
-                        PC_WallPaper pcPaper = new PC_WallPaper(fileItem,width,heigh);
-                        mPC_Papper.add(pcPaper);
-                    } else if (width < heigh) {
-                        Mobile_WallPaper mobilePaper = new Mobile_WallPaper(fileItem,width,heigh);
-                        mMobile_Papper.add(mobilePaper);
-                    }
-                }
+            for (int i = 0; i < curInputFileList.size(); i++) {
+                File fileItem = curInputFileList.get(i);
+                ArrayList<String> contentList = ReadFileContentAsList(fileItem);
+                ArrayList<String>  fixedStrArr =   clearOneBlankCharAsOneStr_Rule_2(contentList);
+                writeContentToFile(I9_Temp_Text_File,fixedStrArr);
+                NotePadOpenTargetFile(I9_Temp_Text_File.getAbsolutePath());
+                System.out.println("rule_2 -> 把当前文件内容的每行的第一个空格之后的字符串组成一个字符串 中间《等号=分割》 File="+ fileItem.getAbsolutePath());
             }
 
-            StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < Paper_Group_List.size(); i++) {
-                Paper_Group group = Paper_Group_List.get(i);
-                group.ReNameOperation();
-                group.initMapData();
-                sb.append(group.getMDConent());
+
+            return super.applyOperationRule(curFileList, subFileTypeMap, curDirList, curRealFileList);
+        }
+
+        @Override
+        String simpleDesc() {
+            return "把当前文件内容的每行的第一个空格之后的字符串组成一个字符串 《中间等号=分割》 《等号=分割》";
+        }
+
+        //3. 如果当前 执行 错误  checkParams 返回 false   那么 将 打印这个函数 说明错误的可能原因
+        @Override
+        void showWrongMessage() {
+            System.out.println("当前 type 索引 "+rule_index +" 执行错误  可能是输入参数错误 请检查输入参数!");
+            System.out.println(" errorMsg = "+errorMsg );
+        }
+
+        //4.  当前 rule的 说明  将会打印在  用户输入为空时的 提示语句！
+        @Override
+        String ruleTip(String type,int index , String batName,OS_TYPE curType){
+            String itemDesc = "";
+            if(curType == OS_TYPE.Windows){
+                itemDesc = batName.trim()+"  "+type+"_"+index + "    [索引 "+index+"]  描述:"+""+ simpleDesc();
+            }else{
+                itemDesc = batName.trim()+" "+type+"_"+index + "    [索引 "+index+"]  描述:"+""+ simpleDesc();
             }
 
-            writeContentToFile(out_md_file, sb.toString());
+            return itemDesc;
+        }
+    }
 
-            System.out.println("═════════ " + "输出内容" + "═════════ ");
-            System.out.println(sb.toString());
-            System.out.println();
-            System.out.println("输出路径 : " + out_md_file.getAbsolutePath());
+
+
+//只获取 每一行的第一个空格前的字符串 其余字符串 删除
+    class OnlyGetFirstStr_InOneLine_Rule_1 extends  Basic_Rule{
+
+
+    OnlyGetFirstStr_InOneLine_Rule_1(boolean mIsInputDirAsSearchPoint){
+            super(1);
+            isInputDirAsSearchPoint =  mIsInputDirAsSearchPoint;
+        }
+
+    OnlyGetFirstStr_InOneLine_Rule_1(){
+            super(1,false);
+
+        }
+
+
+        // 1. 完成参数的 自我客制化  实现  checkParamsOK 方法
+
+        // 2. 对应的逻辑方法  实现方法  applyOperationRule
+
+
+        @Override
+        ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+            for (int i = 0; i < curInputFileList.size(); i++) {
+                File fileItem = curInputFileList.get(i);
+               ArrayList<String> contentList = ReadFileContentAsList(fileItem);
+                ArrayList<String>  fixedStrArr =   clearOneBlankChar_Rule_1(contentList);
+                writeContentToFile(I9_Temp_Text_File,fixedStrArr);
+                NotePadOpenTargetFile(I9_Temp_Text_File.getAbsolutePath());
+                System.out.println("rule_1 -> 把当前文件内容的每行的第一个空格之后的字符串删除！ File="+ fileItem.getAbsolutePath());
+            }
+
 
             return super.applyOperationRule(curFileList, subFileTypeMap, curDirList, curRealFileList);
         }
@@ -534,89 +428,100 @@ public class I8_WallPaper {
         //3. 如果当前 执行 错误  checkParams 返回 false   那么 将 打印这个函数 说明错误的可能原因
         @Override
         void showWrongMessage() {
-            System.out.println("当前 type 索引 " + rule_index + " 执行错误  可能是输入参数错误 请检查输入参数!");
-            System.out.println(" errorMsg = " + errorMsg);
+            System.out.println("当前 type 索引 "+rule_index +" 执行错误  可能是输入参数错误 请检查输入参数!");
+            System.out.println(" errorMsg = "+errorMsg );
         }
 
         //4.  当前 rule的 说明  将会打印在  用户输入为空时的 提示语句！
         @Override
-        String ruleTip(String type, int index, String batName, OS_TYPE curType) {
+        String ruleTip(String type,int index , String batName,OS_TYPE curType){
             String itemDesc = "";
-            if (curType == OS_TYPE.Windows) {
-                itemDesc = batName.trim() + "  " + type + "_" + index + "    [索引 " + index + "]  描述:" + simpleDesc();
-            } else {
-                itemDesc = batName.trim() + " " + type + "_" + index + "    [索引 " + index + "]  描述:" + simpleDesc();
+            if(curType == OS_TYPE.Windows){
+                itemDesc = batName.trim()+"  "+type+"_"+index + "    [索引 "+index+"]  描述:"+" 只获取 每一行的第一个空格前的字符串 其余字符串 删除";
+            }else{
+                itemDesc = batName.trim()+" "+type+"_"+index + "    [索引 "+index+"]  描述:"+" 只获取 每一行的第一个空格前的字符串 其余字符串 删除";
             }
 
             return itemDesc;
         }
+
+    @Override
+    String simpleDesc() {
+        return "只获取 每一行的第一个空格前的字符串 其余字符串 删除";
+    }
+
     }
 
 
+
+
+
+
+
+
+
     class Basic_Rule extends Rule {
-        Basic_Rule(String ctype, int cindex, int opera_type) {
+        Basic_Rule(String ctype, int cindex,int opera_type){
             this.file_type = ctype;
             this.rule_index = cindex;
-            this.identify = this.file_type + "" + this.rule_index;
+            this.identify = this.file_type+""+this.rule_index;
             curFilterFileTypeList = new ArrayList<String>();
             curFixedFileList = new ArrayList<File>();
             needAllFileFlag = true;
+            curInputFileList  = new ArrayList<File>();
         }
 
-        Basic_Rule(int ruleIndex) {
+        Basic_Rule(int ruleIndex){
             this.rule_index = ruleIndex;
             this.file_type = "*";   // 文件的处理类型  默认是 *
-            this.identify = this.file_type + "" + this.rule_index;
+            this.identify = this.file_type+""+this.rule_index;
             curFilterFileTypeList = new ArrayList<String>();
             curFixedFileList = new ArrayList<File>();
             errorMsg = "";
             needAllFileFlag = true;
+            curInputFileList  = new ArrayList<File>();
         }
 
-        Basic_Rule(int ruleIndex, boolean mNeedAllFile) {
+        Basic_Rule(int ruleIndex , boolean mNeedAllFile){
             this.rule_index = ruleIndex;
             this.file_type = "*";   // 文件的处理类型  默认是 *
-            this.identify = this.file_type + "" + this.rule_index;
+            this.identify = this.file_type+""+this.rule_index;
             curFilterFileTypeList = new ArrayList<String>();
             curFixedFileList = new ArrayList<File>();
             errorMsg = "";
             needAllFileFlag = mNeedAllFile;
+            curInputFileList  = new ArrayList<File>();
         }
 
         @Override
-        void operationRule(ArrayList<String> inputParamsList) {
+        void operationRule(ArrayList<String> inputParamsList){
 
-            ArrayList<File> shellFileList = new ArrayList<File>();
-            ArrayList<File> subDirList = new ArrayList<File>();
-            ArrayList<File> realFileList = new ArrayList<File>();
-            ArrayList<File> allFileList = new ArrayList<File>();
+            ArrayList<File>  shellFileList = new  ArrayList<File>();
+            ArrayList<File> subDirList = new  ArrayList<File>();
+            ArrayList<File> realFileList = new  ArrayList<File>();
+            ArrayList<File> allFileList = new  ArrayList<File>();
             // 当前 shell 目录下的所有文件
-            if (targetDirFile != null) {
-                shellFileList.addAll(Arrays.asList(targetDirFile.listFiles()));
-                if (needAllFileFlag) {
-                    allFileList = getAllSubFile(targetDirFile, null, null);
+            shellFileList.addAll(Arrays.asList(CUR_Dir_FILE.listFiles()));
+            if(needAllFileFlag){
+                if(isInputDirAsSearchPoint && inputDirFile != null){
+                    allFileList = getAllSubFile(inputDirFile,null,null);
                     initFileTypeMap(allFileList);
-                }
-
-            } else {
-                shellFileList.addAll(Arrays.asList(CUR_Dir_FILE.listFiles()));
-                if (needAllFileFlag) {
-                    allFileList = getAllSubFile(CUR_Dir_FILE, null, null);
+                }else{
+                    allFileList = getAllSubFile(CUR_Dir_FILE,null,null);
                     initFileTypeMap(allFileList);
                 }
 
             }
-
 
             for (int j = 0; j < allFileList.size(); j++) {
                 File curFile = allFileList.get(j);
-                if (curFile.isDirectory()) {
+                if(curFile.isDirectory()){
                     subDirList.add(curFile);
-                } else {
+                }else{
                     realFileList.add(curFile);
                 }
             }
-            applyOperationRule(shellFileList, CUR_Dir_FILETypeMap, subDirList, realFileList);
+            applyOperationRule(shellFileList,CUR_Dir_FILETypeMap,subDirList,realFileList);
 
         }
 
@@ -626,88 +531,107 @@ public class I8_WallPaper {
         }
 
 
-        String simpleDesc() {
+        String simpleDesc(){
             return null;
         }
 
 
         @Override
         boolean checkParamsOK(File shellDir, String type2Param, ArrayList<String> otherParams) {
+
+            if(otherParams == null || otherParams.size() ==0){
+                errorMsg = "用户输入的文件参数为空";
+                return false;
+            }
+
+            for (int i = 0; i <otherParams.size() ; i++) {
+                String pre = "."+File.separator;
+                String curStringItem = otherParams.get(i).toString();
+                String curAbsPath = "";
+                if(curStringItem.startsWith(pre)){
+                    curStringItem = curStringItem.substring(2);
+                }
+                curAbsPath = shellDir.getAbsolutePath() + File.separator + curStringItem;
+                File curFIle = new File(curAbsPath) ;
+                if(curFIle.exists()){
+                    curInputFileList.add(curFIle);
+                }
+            }
             return true;  // 默认返回通过   不检查参数   如果有检查的需求 那么就实现它
         }
 
         @Override
         void showWrongMessage() {
-            System.out.println("当前 type 索引 " + rule_index + " 执行错误  可能是输入参数错误 请检查输入参数!");
-            System.out.println("ErrorMsg:" + errorMsg);
+            System.out.println("当前 type 索引 "+rule_index +" 执行错误  可能是输入参数错误 请检查输入参数!");
+            System.out.println("ErrorMsg:"+ errorMsg);
         }
 
-        String ruleTip(String type, int index, String batName, OS_TYPE curType) {
+        String ruleTip(String type,int index , String batName,OS_TYPE curType){
             String itemDesc = "";
-            if (curType == OS_TYPE.Windows) {
-                itemDesc = batName.trim() + "  " + type + "_" + index + "    [索引 " + index + "]  描述:" + simpleDesc();
-            } else {
-                itemDesc = batName.trim() + " " + type + "_" + index + "    [索引 " + index + "]  描述:" + simpleDesc();
+            if(curType == OS_TYPE.Windows){
+                itemDesc = batName.trim()+"  "+type+"_"+index + "    [索引 "+index+"]  描述:"+simpleDesc();
+            }else{
+                itemDesc = batName.trim()+" "+type+"_"+index + "    [索引 "+index+"]  描述:"+simpleDesc();
             }
 
             return itemDesc;
         }
 
-        boolean tryReName(File curFile, String newName) {
+        boolean tryReName(File curFile , String newName){
             String newFilePath = curFile.getParent() + File.separator + newName;
             String oldName = curFile.getName();
             File newFile = new File(newFilePath);
-            if (newFile.exists() && newFilePath.equals(curFile.getAbsolutePath())) {
+            if(newFile.exists() && newFilePath.equals(curFile.getAbsolutePath()) ){
 
 //           newFilePath = curFile.getParent() + File.separator +"重复_"+newName;
 //           newFile = new File(newFilePath);
-                System.out.println("当前目录已存在重命名后的文件  文件名称:" + curFile.getName());
+                System.out.println("当前目录已存在重命名后的文件  文件名称:"+ curFile.getName());
                 return false;    // 已经存在的文件不处理 直接返回
 
             }
-            boolean flag = curFile.renameTo(newFile);
-            if (flag) {
-                System.out.println(oldName + " 转为 " + newFilePath + " 成功！");
+            boolean flag =   curFile.renameTo(newFile);
+            if(flag){
+                System.out.println(oldName+" 转为 "+ newFilePath +" 成功！");
                 curFixedFileList.add(curFile);
-            } else {
-                System.out.println(oldName + " 转为 " + newFilePath + " 失败！");
+            }else{
+                System.out.println(oldName+" 转为 "+ newFilePath +" 失败！");
             }
             return flag;
         }
     }
 
-    abstract class Rule {
-
+    abstract  class Rule{
+        ArrayList<File> curInputFileList;
         int rule_index;   //  rule_index  组成了最基础的唯一键 rule_index 就是唯一的序号  1 2 3 4 5 6 7
 
         // operation_type  操作类型     1--读取文件内容字符串 进行修改      2--对文件对文件内容(字节)--进行修改    3.对全体子文件进行的随性的操作 属性进行修改(文件名称)
         // 4.对当前子文件(包括子目录 子文件 --不包含孙目录 孙文件)   // 5. 从shell 中获取到的路径 去对某一个文件进行操作
 
+        Rule(){inputDirFile = First_Input_Dir; if(inputDirFile == null){isInputDirAsSearchPoint = false; } }
 
         String file_type;   // * 标识所有的文件类型   以及当前操作类型文件  或者 单独的文件过滤类型
         String identify;
         String errorMsg;
-        boolean needAllFileFlag;
+        boolean needAllFileFlag ;
+
+        File inputDirFile; // 操作文件 目录
+        boolean isInputDirAsSearchPoint;  // 是否以 输入的 文件夹作为 全局搜索的 起点
+
         ArrayList<String> curFilterFileTypeList;  //  当前的文件过滤类型   多种文件过滤类型  例如把 多种格式 jpeg png 转为 jpg 时 使用到
         ArrayList<File> curFixedFileList;  // 当前修改操作成功的集合
-        ArrayList<File> inputFileList;  // 从输入参数得到的文件的集合
-
-        abstract void operationRule(ArrayList<String> inputParamsList);
+        ArrayList<File> inputFileList ;  // 从输入参数得到的文件的集合
+        abstract    void operationRule(ArrayList<String> inputParamsList);
 
         //        abstract    String applyStringOperationRule1(String origin);   //  不要这样的方法了  只保留 最有用的 那个 applyOperationRule
 //        abstract    File applyFileByteOperationRule2(File originFile);
 //        abstract    ArrayList<File> applyFileListRule3(ArrayList<File> subFileList , HashMap<String, ArrayList<File>> fileTypeMap);
         // applyFileListRule4
-        abstract ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList, ArrayList<File> curRealFileList);
-
+        abstract    ArrayList<File> applyOperationRule(ArrayList<File> curFileList , HashMap<String, ArrayList<File>> subFileTypeMap , ArrayList<File> curDirList ,ArrayList<File> curRealFileList);
         //        abstract    void initParams4InputParam(String inputParam);  // 初始化Rule的参数 依据输入的字符串
-        abstract String ruleTip(String type, int index, String batName, OS_TYPE curType);  // 使用说明列表  如果覆盖 那么就不使用默认的说明 , 默认就一种情况
-
-        abstract String simpleDesc();  // 使用的简单描述  中文的该 rule的使用情况  默认会在 ruleTip 被调用
-
-        abstract boolean checkParamsOK(File shellDir, String type2Param, ArrayList<String> otherParams);
-
-        abstract void showWrongMessage();
+        abstract    String ruleTip(String type,int index , String batName,OS_TYPE curType);  // 使用说明列表  如果覆盖 那么就不使用默认的说明 , 默认就一种情况
+        abstract    String simpleDesc();  // 使用的简单描述  中文的该 rule的使用情况  默认会在 ruleTip 被调用
+        abstract    boolean checkParamsOK(File shellDir,String type2Param,ArrayList<String> otherParams);
+        abstract    void showWrongMessage();
     }
 
     static void writeContentToFile(File file, String strParam) {
@@ -731,16 +655,54 @@ public class I8_WallPaper {
         }
     }
 
-    public static String ReadFileContent(File mFilePath) {
+    public static ArrayList<String> ReadFileContentAsList( File mFilePath) {
 
-        if (mFilePath != null && mFilePath.exists()) {
+        if (mFilePath != null  && mFilePath.exists()) {
             //  System.out.println("存在  当前文件 "+ mFilePath.getAbsolutePath());
         } else {
-            System.out.println("不存在 当前文件 " + mFilePath.getAbsolutePath());
+            System.out.println("不存在 当前文件 "+ mFilePath.getAbsolutePath() );
 
             return null;
         }
-        StringBuilder sb = new StringBuilder();
+        ArrayList<String> contentList= new ArrayList<String>();
+
+        try {
+            BufferedReader curBR = new BufferedReader(new InputStreamReader(new FileInputStream(mFilePath), "utf-8"));
+            String oldOneLine = "";
+            int index = 1;
+            while (oldOneLine != null) {
+
+                oldOneLine = curBR.readLine();
+                if (oldOneLine == null ) {
+                    continue;
+                }
+
+                contentList.add(oldOneLine);
+//                    System.out.println("第"+index+"行读取到的字符串:"+oldOneLine);
+                index++;
+
+            }
+            curBR.close();
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return contentList;
+
+    }
+
+
+    public static String ReadFileContent( File mFilePath) {
+
+        if (mFilePath != null  && mFilePath.exists()) {
+            //  System.out.println("存在  当前文件 "+ mFilePath.getAbsolutePath());
+        } else {
+            System.out.println("不存在 当前文件 "+ mFilePath.getAbsolutePath() );
+
+            return null;
+        }
+        StringBuilder sb= new StringBuilder();
 
         try {
             BufferedReader curBR = new BufferedReader(new InputStreamReader(new FileInputStream(mFilePath), "utf-8"));
@@ -753,7 +715,7 @@ public class I8_WallPaper {
                     continue;
                 }
 
-                sb.append(oldOneLine + "\n");
+                sb.append(oldOneLine+"\n");
 //                    System.out.println("第"+index+"行读取到的字符串:"+oldOneLine);
                 index++;
 
@@ -777,6 +739,9 @@ public class I8_WallPaper {
         }
         return false;
     }
+
+
+
 
 
     public static boolean isNumeric(String str) {
@@ -816,16 +781,16 @@ public class I8_WallPaper {
     }
 
 
-    static String getPaddingIntString(int index, int padinglength, String oneStr, boolean dirPre) {
-        String result = "" + index;
-        int length = ("" + index).length();
+    static  String  getPaddingIntString(int index , int padinglength , String oneStr , boolean dirPre){
+        String result = ""+index;
+        int length = (""+index).length();
 
-        if (length < padinglength) {
-            int distance = padinglength - length;
+        if(length < padinglength){
+            int distance = padinglength  - length;
             for (int i = 0; i < distance; i++) {
-                if (dirPre) {
-                    result = oneStr + result;
-                } else {
+                if(dirPre){
+                    result = oneStr+result;
+                }else{
                     result = result + oneStr;
                 }
 
@@ -836,14 +801,12 @@ public class I8_WallPaper {
 
     }
 
-
-    static ArrayList<File> getAllSubFile(File dirFile, String aospPath, ArrayList<String> typeList) {
-        if (typeList == null) {
+    static ArrayList<File> getAllSubFile(File dirFile ,String aospPath , ArrayList<String> typeList) {
+        if(typeList == null){
             typeList = new ArrayList<String>();
             typeList.add("*");
         }
-
-        if (aospPath == null || "".equals(aospPath)) {
+        if(aospPath == null || "".equals(aospPath)){
             return getAllSubFile(dirFile.getAbsolutePath(), "", typeList);
         }
 
@@ -851,7 +814,7 @@ public class I8_WallPaper {
 
     }
 
-    static ArrayList<File> getAllSubFile(String rootPath, String aospItemPath, ArrayList<String> typeList) {
+    static ArrayList<File> getAllSubFile(String rootPath, String aospItemPath,  ArrayList<String>  typeList) {
         ArrayList<File> allFile = new ArrayList<File>();
         Path curRootPath = Paths.get(rootPath + File.separator + aospItemPath);
 
@@ -864,16 +827,16 @@ public class I8_WallPaper {
                     String fileString = file.toAbsolutePath().toString();
                     //System.out.println("pathString = " + fileString);
                     for (int i = 0; i < typeList.size(); i++) {
-                        String type = typeList.get(i);
-                        if ("*".equals(type)) {  // 如果 类型是 * 那么就把 所有的 非目录文件加入列表中
-                            File curFile = new File(fileString);
-                            if (!curFile.isDirectory()) {
+                        String type =  typeList.get(i);
+                        if("*".equals(type)){  // 如果 类型是 * 那么就把 所有的 非目录文件加入列表中
+                            File curFile =    new File(fileString);
+                            if(!curFile.isDirectory()){
                                 allFile.add(curFile);
                                 break;
                             }
 
 
-                        } else {
+                        }else {
                             if (fileString.endsWith(type)) {
                                 allFile.add(new File(fileString));
                                 break;
@@ -895,67 +858,117 @@ public class I8_WallPaper {
     }
 
 
+
     static void showNoTypeTip(int ruleIndex) {
 
-        System.out.println("当前用户输入的 ruleIndex = " + ruleIndex + "  操作type无法检测到-它是一个int值  \n type 必须是当前 " + Cur_Bat_Name + " 的 第一个输入参数中的第一个int值 ");
+        System.out.println("当前用户输入的 ruleIndex = "+ruleIndex+"  操作type无法检测到-它是一个int值  \n type 必须是当前 " + Cur_Bat_Name+" 的 第一个输入参数中的第一个int值 ");
         System.out.println("请检查输入参数后重新执行命令!");
 
     }
-
     static void showTip() {
         System.out.println("对Type文件内容 进行 Index 规则的处理  identy=【 Type_Index 】【 文件后缀_当前操作逻辑索引】\n");
         System.out.println("当前已实现的替换逻辑如下:\n");
 
         int count = 1;
-        System.out.println("═══════════════════" + "使用方法列表 Begin" + "═══════════════════" + "\n");
-        for (int i = 0; i < CUR_RULE_LIST.size(); i++) {
+        System.out.println("═══════════════════"+"使用方法列表 Begin"+"═══════════════════"+"\n");
+        for (int i = 0; i < CUR_RULE_LIST.size() ; i++) {
             Rule itemRule = CUR_RULE_LIST.get(i);
-            String type = itemRule.file_type;
-            int index = itemRule.rule_index;
-            String desc = itemRule.ruleTip(type, index, Cur_Bat_Name, CUR_OS_TYPE);
+            String type =  itemRule.file_type;
+            int index =  itemRule.rule_index;
+            String desc =  itemRule.ruleTip(type , index ,Cur_Bat_Name,CUR_OS_TYPE);
 
 /*
             String itemDesc = "";
            if(CUR_OS_TYPE == OS_TYPE.Windows){
-                itemDesc = "zrule_apply_I8.bat  "+type+"_"+index + "    [索引 "+count+"]  描述:"+desc;
+                itemDesc = "zrule_apply_I9.bat  "+type+"_"+index + "    [索引 "+count+"]  描述:"+desc;
            }else{
-               itemDesc = "zrule_apply_I8 "+type+"_"+index + "    [索引 "+count+"]  描述:"+desc;
+               itemDesc = "zrule_apply_I9 "+type+"_"+index + "    [索引 "+count+"]  描述:"+desc;
            }
            */
-            System.out.println(desc + "\n");
+            System.out.println(desc+"\n");
             count++;
         }
-        System.out.println("═══════════════════" + "使用方法列表 End " + "═══════════════════" + "\n");
+        System.out.println("═══════════════════"+"使用方法列表 End "+"═══════════════════"+"\n");
+
+
+        if(isFreshDefault_SelectedIndex){   // 当前输入的参数 有更新 default 的操作
+            if(!"".equals(FreshDefaultInputStr)){
+                String fixedInputStr = FreshDefaultInputStr.replace("default_index_","");
+                fixedInputStr = fixedInputStr.replace(" ","");
+                if(isNumeric(fixedInputStr)){
+                    int curIndex = Integer.parseInt(fixedInputStr);
+                    if(curIndex <= 0 || curIndex > CUR_RULE_LIST.size()){
+                        System.out.println(" 当前输入的 default_index  不在已定义的规则索引序列中 当前索引参数: "+FreshDefaultInputStr );
+                        System.out.println(" 可选default_index 范围 [ 1 :" + CUR_RULE_LIST.size()+" ]    请检查输入的规则索引!");
+                    }else{
+
+                        CUR_TYPE_INDEX = curIndex;
+                        I9_Properties.setProperty(Default_Selected_Rule_Index_Key,""+CUR_TYPE_INDEX);
+                        setProperity();
+//                        System.out.println(" 设置新的 默认 Index 成功   Default_Selected_Index = "+ CUR_TYPE_INDEX );
+                    }
+                }else{
+                    System.out.println("当前过滤出的 default_index 不为数值  请检查输入!");
+                }
+            }else{
+                System.out.println("当前 输入的 更新 default_index 的参数参数没有获取到 请重新执行!  FreshDefaultInputStr = "+ FreshDefaultInputStr);
+
+            }
+
+
+        }
+
+        System.out.println("当前默认选中的 default_index_"+CUR_TYPE_INDEX);
+
+        String defaultSelectedStr = "【* 默认】";
+        for (int i = 0; i < CUR_RULE_LIST.size() ; i++) {
+            Rule itemRule = CUR_RULE_LIST.get(i);
+            String desc = itemRule.simpleDesc();
+            String curInfoitem = " default_index_"+(i+1)+"    "+((i+1)==CUR_TYPE_INDEX?defaultSelectedStr:"  ")+"  ## Desc:"+desc;
+            if(!curInfoitem.contains(defaultSelectedStr)){
+                curInfoitem = curInfoitem.replace("##","        ##");
+            }
+            System.out.println(Cur_Bat_Name + curInfoitem);
+        }
+
+        // 显示 当前默认的 default_index=1
+        //  ztextrule_operation_I9.bat default_index = 1      ## Desc:
+        // ztextrule_operation_I9.bat default_index=2      【* 默认】   ## Desc:
+        // ztextrule_operation_I9.bat default_index= 3       ## Desc:
+
 
     }
 
 
-    static int calculInputTypeIndex(String inputParams) {
-        if (inputParams == null) {
+
+
+
+    static int calculInputTypeIndex(String inputParams){
+        if(inputParams == null){
             return 0;
         }
 
         String absFilePath = CUR_Dir_1_PATH + File.separator + inputParams;
         File absFile = new File(absFilePath);
-        if (absFile.exists()) {
-            targetDirFile = absFile;
+        if(absFile.exists() && absFile.isDirectory() ){
+            First_Input_Dir =  absFile;
             return 0;   //  如果输入的参数  和  shell目录 组成一个 存在的文件的话  那么说明 参数不是 选择 rule的参数
         }
 
-        if (isNumeric(inputParams)) {
+        if(isNumeric(inputParams)){
             return Integer.parseInt(inputParams);
         }
 
-        if (inputParams.contains("_")) {
+        if(inputParams.contains("_")){
             String[] mTypeParamArr = inputParams.split("_");
-            if (mTypeParamArr.length == 0) {
+            if(mTypeParamArr.length == 0 ){
                 return 0;
             }
 
             for (int i = 0; i < mTypeParamArr.length; i++) {
                 String curPositionStr = mTypeParamArr[i];
-                if (isNumeric(curPositionStr)) {
-                    return Integer.parseInt(curPositionStr);
+                if(isNumeric(curPositionStr)){
+                    return  Integer.parseInt(curPositionStr);
                 }
             }
         }
@@ -965,7 +978,8 @@ public class I8_WallPaper {
     }
 
 
-    static void addCurFileTypeMapItemWithKey(String keyType, File curFile) {
+
+    static  void addCurFileTypeMapItemWithKey(String keyType, File curFile) {
         if (CUR_Dir_FILETypeMap.containsKey(keyType)) {
             ArrayList<File> fileList = CUR_Dir_FILETypeMap.get(keyType);
             fileList.add(curFile);
@@ -976,7 +990,7 @@ public class I8_WallPaper {
         }
     }
 
-    static void initFileTypeMap(ArrayList<File> subFileList) {
+    static void  initFileTypeMap(ArrayList<File> subFileList){
         for (File curFile : subFileList) {
             String fileName = curFile.getName();
             if (!fileName.contains(".")) {
@@ -991,9 +1005,12 @@ public class I8_WallPaper {
     }
 
 
-    static Rule getRuleByIndex(int index) {
-        for (int i = 0; i < CUR_RULE_LIST.size(); i++) {
-            if (CUR_RULE_LIST.get(i).rule_index == index) {
+
+
+
+    static Rule getRuleByIndex(int index){
+        for (int i = 0; i <CUR_RULE_LIST.size() ; i++) {
+            if(CUR_RULE_LIST.get(i).rule_index == index){
                 return CUR_RULE_LIST.get(i);
             }
         }
@@ -1001,14 +1018,16 @@ public class I8_WallPaper {
     }
 
 
-    static Rule getRuleByIdentify(String identify) {
-        for (int i = 0; i < CUR_RULE_LIST.size(); i++) {
-            if (CUR_RULE_LIST.get(i).identify.equals(identify)) {
+
+    static  Rule getRuleByIdentify(String identify){
+        for (int i = 0; i <CUR_RULE_LIST.size() ; i++) {
+            if(CUR_RULE_LIST.get(i).identify.equals(identify)){
                 return CUR_RULE_LIST.get(i);
             }
         }
         return null;
     }
+
 
 
     // ArrayPrint ==============================Begin
@@ -1576,14 +1595,14 @@ public class I8_WallPaper {
         return sb.toString();
     }
 
-    static String getTimeStamp() {
+    static String getTimeStamp(){
 
         SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd_HHmmss");//设置日期格式
         String date = df.format(new Date());
         return date;
     }
 
-    static String getTimeStampLong() {
+    static String getTimeStampLong(){
 
         SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd_HHmmss_SSS");//设置日期格式
         String date = df.format(new Date());
@@ -1591,7 +1610,7 @@ public class I8_WallPaper {
     }
 
 
-    static File getDirNewestFileWithPointTypeList(File dirFile, ArrayList<String> typeList) {
+    static File getDirNewestFileWithPointTypeList(File dirFile , ArrayList<String> typeList) {
         File newImageFile = null;
 
         long max_time = 0;
@@ -1652,30 +1671,29 @@ public class I8_WallPaper {
         }
     }
 
-    public static String getFileNameNoPoint(File file) {
+    public  static String getFileNameNoPoint(File file){
         return getFileNameNoPoint(file.getAbsolutePath());
     }
 
-    public static String getFileTypeWithPoint(File file) {
+    public  static String getFileTypeWithPoint(File file){
 
         return getFileTypeWithPoint(file.getAbsolutePath());
     }
-
-    public static String getFileNameNoPoint(String fileName) {
+    public  static String getFileNameNoPoint(String fileName){
         String name = "";
-        if (fileName.contains(".")) {
-            name = fileName.substring(0, fileName.lastIndexOf(".")).trim().toLowerCase();
-        } else {
+        if(fileName.contains(".")){
+            name = fileName.substring(0,fileName.lastIndexOf(".") ).trim().toLowerCase();
+        }else{
             name = new String(fileName);
         }
         return name.toLowerCase().trim();
     }
 
-    public static String getFileTypeWithPoint(String fileName) {
+    public  static String getFileTypeWithPoint(String fileName){
         String name = "";
-        if (fileName.contains(".")) {
-            name = fileName.substring(fileName.lastIndexOf(".")).trim().toLowerCase();
-        } else {
+        if(fileName.contains(".")){
+            name = fileName.substring(fileName.lastIndexOf(".") ).trim().toLowerCase();
+        }else{
             name = "";
         }
         return name.toLowerCase().trim();
@@ -1732,9 +1750,9 @@ public class I8_WallPaper {
         }
     }
 
-    static ArrayList<File> getAllSubDirFile(File rootPath) {
+    static ArrayList<File> getAllSubDirFile(File  rootPath) {
         ArrayList<File> allDirFile = new ArrayList<File>();
-        Path curRootPath = Paths.get(rootPath.getAbsolutePath() + File.separator);
+        Path curRootPath = Paths.get(rootPath.getAbsolutePath() + File.separator );
         try {
             Files.walkFileTree(curRootPath, new SimpleFileVisitor<Path>() {
 
@@ -1772,185 +1790,44 @@ public class I8_WallPaper {
     }
 
 
-    static ArrayList<Paper_Group> Paper_Group_List = new ArrayList<Paper_Group>();
-
-
-    class Paper_Group {
-        String tag;   // # PC_Wapper
-        ArrayList<WallPaper> paperAllList;
-        TreeMap<String, ArrayList<WallPaper>> sizeMap;
-
-        Paper_Group(String mTag) {
-
-            if (!mTag.startsWith("#")) {
-                tag = "# " + mTag;
-            } else {
-                tag = mTag;
-            }
-            paperAllList = new ArrayList<WallPaper>();
-            sizeMap = new TreeMap<String, ArrayList<WallPaper>>(new Comparator<String>() {
-                @Override
-                public int compare(String o1, String o2) {
-                    String o1SizeStr = o1.replace("x", "");
-                    String o2SizeStr = o2.replace("x", "");
-                    if (!isNumeric(o1SizeStr) || !isNumeric(o2SizeStr)) {
-                        return o1.compareTo(o2);
-                    }
-                    String[] o1Arr = o1.split("x");
-                    String[] o2Arr = o2.split("x");
-                    int width1 = Integer.parseInt(o1Arr[0]);
-                    int high1 = Integer.parseInt(o1Arr[1]);
-
-                    int width2 = Integer.parseInt(o2Arr[0]);
-                    int high2 = Integer.parseInt(o2Arr[1]);
-
-
-                    if (width1 > width2) {
-                        return -1;
-                    } else if (width1 < width2) {
-                        return 1;
-                    }
-
-                    if (width1 == width2 && high1 == high2) {
-                        return 0;
-                    } else if (width1 == width2 && high1 > high2) {
-                        return -1;
-                    } else if (width1 == width2 && high1 < high2) {
-                        return 1;
-                    }
-                    return 0;
-
-                }
-            });
-        }
-
-        void add(WallPaper wapper) {
-            paperAllList.add(wapper);
-        }
-
-        void ReNameOperation() {
-            for (int i = 0; i < paperAllList.size(); i++) {
-                WallPaper paper = paperAllList.get(i);
-                if(!paper.originFile.renameTo(paper.newRenameFile)){
-                    System.out.println("重命名失败!");
-                    paper.newRenameFile = paper.originFile;
-                    String shellAbsPath = CUR_Dir_FILE.getAbsolutePath();
-                    String imageAbsPath = paper.newRenameFile.getAbsolutePath();
-                    // ./zimage/pc_wallpager_photo/1440x900/1.jpg
-                    paper.relativePathSrc = imageAbsPath.replace(shellAbsPath, ".").replace("\"", "/");
-
-                };
-            }
-        }
-
-        void initMapData() {
-            paperAllList.sort(new Comparator<WallPaper>() {
-                @Override
-                public int compare(WallPaper o1, WallPaper o2) {
-
-                    if (o1.width > o2.width) {
-                        return -1;
-                    } else if (o1.width < o2.width) {
-                        return 1;
-                    }
-
-                    if (o1.width == o2.width && o1.heigh == o2.heigh) {
-                        return 0;
-                    } else if (o1.width == o2.width && o1.heigh > o2.heigh) {
-                        return -1;
-                    } else if (o1.width == o2.width && o1.heigh < o2.heigh) {
-                        return 1;
-                    }
-                    return 0;
-                }
-            });
-
-            for (int i = 0; i < paperAllList.size(); i++) {
-                WallPaper paper = paperAllList.get(i);
-                System.out.println(tag + "[" + i + "]" + paper.sizeStr);
-                if (sizeMap.containsKey(paper.sizeStr)) {
-                    ArrayList<WallPaper> sameSizeArr = sizeMap.get(paper.sizeStr);
-                    if (!sameSizeArr.contains(paper)) {
-                        sameSizeArr.add(paper);
-                    }
-                } else {
-                    ArrayList<WallPaper> mArrItem = new ArrayList<WallPaper>();
-                    mArrItem.add(paper);
-                    sizeMap.put(paper.sizeStr, mArrItem);
-                }
-            }
-
-
-        }
-
-
-        @SuppressWarnings("unchecked")
-        String getMDConent() {
-
-            StringBuilder sb = new StringBuilder();
-            sb.append(tag + "\n");
-            Map.Entry<String, ArrayList<WallPaper>> entry;
-            Iterator iterator = sizeMap.entrySet().iterator();
-            while (iterator.hasNext()) {
-                entry = (Map.Entry<String, ArrayList<WallPaper>>) iterator.next();
-                String sizeStrKey = entry.getKey();  //Map的Value
-                sb.append("## " + sizeStrKey + "\n\n");
-                ArrayList<WallPaper> wapperList = entry.getValue();  //Map的Value
-                sb.append("<div style=\"line-height:0;margin:-20px;\">");
-                // <div style="line-height:0;">
-                // </div>
-
-                for (int i = 0; i < wapperList.size(); i++) {
-
-
-                    WallPaper paper = wapperList.get(i);
-                    sb.append(paper.getImageHtml());
-                }
-                sb.append("</div>");
-                sb.append("\n");
-                sb.append("\n");
-            }
-
-            return sb.toString();
-        }
-    }
-
-
     public static void main(String[] args) {
 
         initSystemInfo();
+
         initInputParams(args);
 
 
-        I8_WallPaper mI8_Object = new I8_WallPaper();
-        mI8_Object.InitRule();
 
-
+        I9_TextRuleOperation mI9_Object = new I9_TextRuleOperation();
+        mI9_Object.InitRule();
         // 用户没有输入参数
-        if (CUR_INPUT_3_ParamStrList.size() == 0 && !allowEmptyInputParam) {
+        if (CUR_INPUT_3_ParamStrList.size() == 0 && !allowEmptyInputParam ) {
             showTip();
             return;
         }
 
         //   默认的索引同时也被修改  没有获得 当前 适配的规则索引
-        if (CUR_TYPE_INDEX <= 0 || CUR_TYPE_INDEX > CUR_RULE_LIST.size()) {
+        if(CUR_TYPE_INDEX <= 0 ||  CUR_TYPE_INDEX > CUR_RULE_LIST.size()){
             showNoTypeTip(CUR_TYPE_INDEX);
             return;
         }
 
 
+        System.out.println("Default_Selected_Index  = "+ CUR_TYPE_INDEX);
+
         CUR_Selected_Rule = getRuleByIndex(CUR_TYPE_INDEX);  //  获取用户选中的 规则
 
 
         // 让各个规则自己去检测 自己需要的参数是否得到满足 并自己提示  给出 1.当前cmd路径下的文件  2.typeIndex 字符串   3.之后的输入参数
-        if (CUR_Selected_Rule == null || !CUR_Selected_Rule.checkParamsOK(CUR_Dir_FILE, CUR_TYPE_2_ParamsStr, CUR_INPUT_3_ParamStrList)) {
+        if (CUR_Selected_Rule == null  ||  !CUR_Selected_Rule.checkParamsOK(CUR_Dir_FILE,CUR_TYPE_2_ParamsStr,CUR_INPUT_3_ParamStrList)) {
             CUR_Selected_Rule.showWrongMessage();   // 提示当前规则的错误信息
             return;
         }
 
 
-        if (!CUR_Dir_FILE.exists() || !CUR_Dir_FILE.isDirectory()) {
-            System.out.println("当前执行替换逻辑的文件路径:" + CUR_Dir_1_PATH + "  不存在! ");
+
+        if (!CUR_Dir_FILE.exists() || !CUR_Dir_FILE.isDirectory() ) {
+            System.out.println("当前执行替换逻辑的文件路径:" + CUR_Dir_1_PATH+"  不存在! ");
             return;
         }
 
@@ -1964,83 +1841,98 @@ public class I8_WallPaper {
 
 
         CUR_Selected_Rule.operationRule(CUR_INPUT_3_ParamStrList);  // 传递参数列表 进行处理
-
+I9_Properties.getProperty(Default_Selected_Rule_Index_Key,""+CUR_TYPE_INDEX);
         setProperity();
     }
 
-    static boolean isImageFile(File curFile) {
-        boolean flag = false;
-        if (curFile == null || curFile.isDirectory()) {
-            return false;
-        }
-
-        String curType = getFileTypeWithPoint(curFile.getName());
-        if (".jpg".equals(curType) || ".jpeg".equals(curType) || ".png".equals(curType)
-                || ".bmp".equals(curType) || ".webp".equals(curType) || ".WEBP".equals(curType)
-                || ".gif".equals(curType) || ".GIF".equals(curType)) {
-            flag = true;
-        }
-        return flag;
-    }
-
-
     public static int getImageHigh(File picture) {
         int high = 0;
-        try {
-            BufferedImage sourceImg = ImageIO.read(new FileInputStream(picture));
-            high = sourceImg.getHeight();
-        } catch (Exception e) {
+        ImageIcon imageIcon = new ImageIcon(picture.getAbsolutePath());
+        high = imageIcon.getIconHeight();
 
-        }
         return high;
     }
 
 
+
     public static int getImageWidth(File picture) {
         int width = 0;
-        try {
-            BufferedImage sourceImg = ImageIO.read(new FileInputStream(picture));
-            width = sourceImg.getWidth();
-        } catch (Exception e) {
-
-        }
+        ImageIcon imageIcon = new ImageIcon(picture.getAbsolutePath());
+        width = imageIcon.getIconWidth();
         return width;
     }
 
 
-    public static int getWebpFileHigh(File webpFile) {
-        int height = -1;
-
-        try {
-            FileInputStream file = new FileInputStream(webpFile.getAbsolutePath());
-            byte[] bytes = new byte[30];
-
-            file.read(bytes, 0, bytes.length);
-
-            height = ((int) bytes[29] & 0xff) << 8 | ((int) bytes[28] & 0xff);
-        }catch ( Exception e){
-            System.out.println("getWebpFileHigh Exception");
+    ArrayList<String> clearOneBlankCharAsOneStr_Rule_2(ArrayList<String> originStrList){
+        if(originStrList == null) return null;
+        ArrayList<String>  fixedStrArr = new   ArrayList<String>();
+        StringBuilder sb =new StringBuilder();
+        for (int i = 0; i < originStrList.size(); i++) {
+            String onrLineStr = originStrList.get(i).trim();
+            String curFixedLineStr = "";
+            if("".equals(onrLineStr.trim())){
+                continue;
+            }
+            if(onrLineStr.contains("\t")){
+                curFixedLineStr = (onrLineStr.split("\t")[0].trim());
+            }else if(onrLineStr.contains(" ")){
+                curFixedLineStr = (onrLineStr.split(" ")[0].trim());
+            }else{
+                curFixedLineStr = (onrLineStr);
+            }
+            curFixedLineStr = curFixedLineStr.replace("\n","");
+            sb.append(curFixedLineStr+"=");
         }
-        System.out.println("webpFile "+webpFile.getAbsolutePath() + " height = "+ height);
 
-        return height;
+        String allStr = sb.toString().trim();
+        while(allStr.endsWith("=")){
+            allStr = allStr.substring(0,allStr.length()-1);
+        }
+        fixedStrArr.add("《"+allStr+"》");
+        System.out.println("═════════════"+"输入到文件的新内容 Begin 如下:"+"═════════════");
+        System.out.println("《"+allStr+"》");
+        System.out.println("═════════════"+"输入到文件的新内容 End"+"═════════════");
+
+        return fixedStrArr;
     }
 
 
-    public static int getWebpFileWidth(File webpFile) {
 
-        int width = -1;
-        try {
-            FileInputStream file = new FileInputStream(webpFile.getAbsolutePath());
-            byte[] bytes = new byte[30];
-            file.read(bytes, 0, bytes.length);
-            width = ((int) bytes[27] & 0xff) << 8 | ((int) bytes[26] & 0xff);
-        }catch (Exception e){
-            System.out.println("getWebpFileWidth Exception");
+    static void NotePadOpenTargetFile(String absPath){
+        String commandNotead = "";
+        if(CUR_OS_TYPE == OS_TYPE.Windows){
+            commandNotead = "cmd.exe /c start   Notepad++.exe " + absPath;
+        }else if(CUR_OS_TYPE == OS_TYPE.Linux){
+            commandNotead  = " gedit " + absPath;
+        }else if(CUR_OS_TYPE == OS_TYPE.MacOS){
+            commandNotead  = " gedit " + absPath;
         }
-        System.out.println("webpFile "+webpFile.getAbsolutePath() + " width = "+ width);
-        return width;
+        execCMD(commandNotead);
     }
 
+    ArrayList<String> clearOneBlankChar_Rule_1(ArrayList<String> originStrList){
+        if(originStrList == null) return null;
+        ArrayList<String>  fixedStrArr = new   ArrayList<String>();
+        for (int i = 0; i < originStrList.size(); i++) {
+            String onrLineStr = originStrList.get(i).trim();
+            if("".equals(onrLineStr.trim())){
+                continue;
+            }
+            if(onrLineStr.contains("\t")){
+                fixedStrArr.add(onrLineStr.split("\t")[0].trim());
+            }else if(onrLineStr.contains(" ")){
+                fixedStrArr.add(onrLineStr.split(" ")[0].trim());
+            }else{
+                fixedStrArr.add(onrLineStr);
+            }
+        }
+        System.out.println("═════════════"+"输入到文件的新内容 Begin 如下:"+"═════════════");
+        for (int i = 0; i <fixedStrArr.size(); i++) {
+            System.out.println(fixedStrArr.get(i));
+        }
+        System.out.println("═════════════"+"输入到文件的新内容 End"+"═════════════");
+
+        return fixedStrArr;
+    }
 
 }
