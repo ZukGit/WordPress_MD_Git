@@ -51,12 +51,39 @@ public class H0_Tip {
         if(CUR_OS_TYPE == OS_TYPE.Windows){
             CmderTip();  // cmder 下的环境变量设置
             WindowsFilePathTip();  // 文件快捷方式提示
+            NotePadCommand();
+            Linux_BashTip();
+        }else if (CUR_OS_TYPE == OS_TYPE.Linux){
+            Linux_BashTip();
         }
 
     }
 
+    static void NotePadCommand(){
+        System.out.println(OneLine_Pre + " NotePad++  设置 Begin "+ OneLine_End);
+        System.out.println(" 用户设置 notepad运行   ztextrule_operation_I9.bat 的 快捷键为 F8:");
+        System.out.println("Name: text_rule   Key:  F8");
+        System.out.println(" cmd /K cd /d %userprofile%\\Desktop\\zbin & %userprofile%\\Desktop\\zbin\\I9.bat %userprofile%\\Desktop\\zbin  $(FULL_CURRENT_PATH)");
+        System.out.println("用户可通过 ztextrule_operation_I9.bat  命令来选择对应的 F8 快剪键 执行的 text_rule 逻辑!");
+        System.out.println(OneLine_Pre + " NotePad++ 设置  End "+ OneLine_Pre);
+    }
+
+
+    //
+
+    static void Linux_BashTip(){
+        System.out.println(OneLine_Pre + " Linux 下 Shell 设置 Begin "+ OneLine_End);
+        System.out.println(User_Home+ File.separator+"Desktop"+File.separator+"zbin" +"文件夹放置完成后执行 以下代码 添加环境变量:");
+        System.out.println("echo \"source ~/Desktop/zbin/lin_zbin/environment_lin_zbin.sh\" >> ~/.bashrc  && "+" echo \"source ~/Desktop/zbin/lin_zbin/environment_lin_zbin.sh\" >>  ~/.zshrc "+ " &&  chmod 777 -R ~/Desktop/zbin/ ");
+        System.out.println(OneLine_Pre + " Linux 下 Shell 设置  End "+ OneLine_Pre);
+    }
+
     static void  WindowsFilePathTip(){  // 文件快捷方式提示
         System.out.println(OneLine_Pre + " Winddows下文件快捷方式 Begin "+ OneLine_End);
+        System.out.println("Winddows下 Ubuntu子系统 路径:");
+        System.out.println(" zzfile_3.bat "+ User_Home+ File.separator+"AppData\\Local\\Packages\\CanonicalGroupLimited.UbuntuonWindows_79rhkp1fndgsc\\LocalState\\rootfs        // Ubuntu子系统根目录 ");
+
+
         System.out.println("桌面壁纸相关");
         System.out.println(" zzfile_3.bat "+ User_Home+ File.separator+"AppData\\Roaming\\Microsoft\\Windows\\Themes        // 当前壁纸位置 ");
         System.out.println(" zzfile_3.bat "+"C:\\Windows\\Web\\Screen                                                      // 壁纸仓库   ");

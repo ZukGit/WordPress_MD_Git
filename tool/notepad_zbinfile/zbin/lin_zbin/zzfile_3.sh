@@ -75,3 +75,4 @@ else
 
    nautilus -s $1/1
    exit
+fi

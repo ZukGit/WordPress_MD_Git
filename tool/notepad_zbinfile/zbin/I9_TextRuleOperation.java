@@ -67,6 +67,8 @@ static String Default_Selected_Rule_Index_Key = "Default_Selected_Rule_Index_Key
     static File CUR_Dir_FILE ;   // 当前 CMDER的路径 File 文件
     static File First_Input_Dir ;   // 用户第一次可能输入的文件夹
 
+    static File First_Input_RealFile;  // 用户第一次可能输入的文件  实体文件
+
     // 固定5 从CMD窗口输入得到的 功能 tyoe 索引类型  以及依据索引 选中的 逻辑规则
     // 输入的第一个数值 是 rule的索引   同时搭配  * # 实现不同功能
     static String CUR_TYPE_2_ParamsStr;  //  arg[1] 就是输入的第一个参数  固定 通过 tip输出
@@ -317,6 +319,11 @@ static String Default_Selected_Rule_Index_Key = "Default_Selected_Rule_Index_Key
         //   加入类型一一对应的 那些 规则
         CUR_RULE_LIST.add( new OnlyGetFirstStr_InOneLine_Rule_1());
         CUR_RULE_LIST.add( new OnlyGetFirstStr_AsOneLine_Rule_2());
+        CUR_RULE_LIST.add( new AddLineNumberChar_Rule_3());
+        CUR_RULE_LIST.add( new ClearChinese_Rule_4());
+        CUR_RULE_LIST.add( new Duiqi_Hang_Rule_5());
+
+
 //        CUR_RULE_LIST.add( new Image2Jpeg_Rule_3());
 //        CUR_RULE_LIST.add( new Image2Png_Rule_4());
 //        CUR_RULE_LIST.add( new AVI_Rule_5());
@@ -324,6 +331,186 @@ static String Default_Selected_Rule_Index_Key = "Default_Selected_Rule_Index_Key
 //        CUR_RULE_LIST.add( new Encropty_Rule_7());
 //        CUR_RULE_LIST.add( new ClearChineseType_8());
 
+    }
+
+
+
+    class Duiqi_Hang_Rule_5 extends  Basic_Rule{
+
+
+        Duiqi_Hang_Rule_5(boolean mIsInputDirAsSearchPoint){
+            super(5);
+            isInputDirAsSearchPoint =  mIsInputDirAsSearchPoint;
+        }
+
+        Duiqi_Hang_Rule_5(){
+            super(5,false);
+
+        }
+
+        @Override
+        ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+            for (int i = 0; i < curInputFileList.size(); i++) {
+                File fileItem = curInputFileList.get(i);
+
+//                ArrayList<String> contentList = calcul_duiqi_Rule_5(fileItem,I9_Temp_Text_File);
+                ArrayList<String>  fixedStrArr =   duiqi_Rule_5(fileItem,I9_Temp_Text_File);
+                System.out.println("════════════"+"输出文件 Begin " + "════════════");
+                for (int j = 0; j < fixedStrArr.size(); j++) {
+                    System.out.println(fixedStrArr.get(j));
+                }
+                System.out.println("════════════"+"输出文件 End "+"════════════");
+                writeContentToFile(I9_Temp_Text_File,fixedStrArr);
+                NotePadOpenTargetFile(I9_Temp_Text_File.getAbsolutePath());
+                System.out.println("rule_5 -> 把当前 表格数据 行对齐( 每行 数值项个数相等)  File="+ fileItem.getAbsolutePath());
+            }
+
+
+            return super.applyOperationRule(curFileList, subFileTypeMap, curDirList, curRealFileList);
+        }
+
+        @Override
+        String simpleDesc() {
+            return " 把当前 表格数据 行对齐( 需要每行 数值项个数相等)";
+        }
+
+        //3. 如果当前 执行 错误  checkParams 返回 false   那么 将 打印这个函数 说明错误的可能原因
+        @Override
+        void showWrongMessage() {
+            System.out.println("当前 type 索引 "+rule_index +" 执行错误  可能是输入参数错误 请检查输入参数!");
+            System.out.println(" errorMsg = "+errorMsg );
+        }
+
+        //4.  当前 rule的 说明  将会打印在  用户输入为空时的 提示语句！
+        @Override
+        String ruleTip(String type,int index , String batName,OS_TYPE curType){
+            String itemDesc = "";
+            if(curType == OS_TYPE.Windows){
+                itemDesc = batName.trim()+"  "+type+"_"+index + "    [索引 "+index+"]  描述:"+""+ simpleDesc();
+            }else{
+                itemDesc = batName.trim()+" "+type+"_"+index + "    [索引 "+index+"]  描述:"+""+ simpleDesc();
+            }
+
+            return itemDesc;
+        }
+    }
+
+
+
+    class ClearChinese_Rule_4 extends  Basic_Rule{
+
+
+        ClearChinese_Rule_4(boolean mIsInputDirAsSearchPoint){
+            super(4);
+            isInputDirAsSearchPoint =  mIsInputDirAsSearchPoint;
+        }
+
+        ClearChinese_Rule_4(){
+            super(4,false);
+
+        }
+
+        @Override
+        ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+            for (int i = 0; i < curInputFileList.size(); i++) {
+                File fileItem = curInputFileList.get(i);
+                ArrayList<String> contentList = ReadFileContentAsList(fileItem);
+                ArrayList<String>  fixedStrArr =   clearChinese_Rule_4(contentList);
+                writeContentToFile(I9_Temp_Text_File,fixedStrArr);
+                NotePadOpenTargetFile(I9_Temp_Text_File.getAbsolutePath());
+                System.out.println("rule_4 -> 把当前文件的中文去除  File="+ fileItem.getAbsolutePath());
+            }
+
+
+            return super.applyOperationRule(curFileList, subFileTypeMap, curDirList, curRealFileList);
+        }
+
+        @Override
+        String simpleDesc() {
+            return " 把当前文件的中文去除";
+        }
+
+        //3. 如果当前 执行 错误  checkParams 返回 false   那么 将 打印这个函数 说明错误的可能原因
+        @Override
+        void showWrongMessage() {
+            System.out.println("当前 type 索引 "+rule_index +" 执行错误  可能是输入参数错误 请检查输入参数!");
+            System.out.println(" errorMsg = "+errorMsg );
+        }
+
+        //4.  当前 rule的 说明  将会打印在  用户输入为空时的 提示语句！
+        @Override
+        String ruleTip(String type,int index , String batName,OS_TYPE curType){
+            String itemDesc = "";
+            if(curType == OS_TYPE.Windows){
+                itemDesc = batName.trim()+"  "+type+"_"+index + "    [索引 "+index+"]  描述:"+""+ simpleDesc();
+            }else{
+                itemDesc = batName.trim()+" "+type+"_"+index + "    [索引 "+index+"]  描述:"+""+ simpleDesc();
+            }
+
+            return itemDesc;
+        }
+    }
+
+
+
+    class AddLineNumberChar_Rule_3 extends  Basic_Rule{
+
+
+        AddLineNumberChar_Rule_3(boolean mIsInputDirAsSearchPoint){
+            super(3);
+            isInputDirAsSearchPoint =  mIsInputDirAsSearchPoint;
+        }
+
+        AddLineNumberChar_Rule_3(){
+            super(3,false);
+
+        }
+
+
+        // 1. 完成参数的 自我客制化  实现  checkParamsOK 方法
+
+        // 2. 对应的逻辑方法  实现方法  applyOperationRule
+
+
+        @Override
+        ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+            for (int i = 0; i < curInputFileList.size(); i++) {
+                File fileItem = curInputFileList.get(i);
+                ArrayList<String> contentList = ReadFileContentAsList(fileItem);
+                ArrayList<String>  fixedStrArr =   addLineNumberChar_Rule_3(contentList);
+                writeContentToFile(I9_Temp_Text_File,fixedStrArr);
+                NotePadOpenTargetFile(I9_Temp_Text_File.getAbsolutePath());
+                System.out.println("rule_3 -> 把当前文件加入行号  File="+ fileItem.getAbsolutePath());
+            }
+
+
+            return super.applyOperationRule(curFileList, subFileTypeMap, curDirList, curRealFileList);
+        }
+
+        @Override
+        String simpleDesc() {
+            return " 把当前文件加入行号";
+        }
+
+        //3. 如果当前 执行 错误  checkParams 返回 false   那么 将 打印这个函数 说明错误的可能原因
+        @Override
+        void showWrongMessage() {
+            System.out.println("当前 type 索引 "+rule_index +" 执行错误  可能是输入参数错误 请检查输入参数!");
+            System.out.println(" errorMsg = "+errorMsg );
+        }
+
+        //4.  当前 rule的 说明  将会打印在  用户输入为空时的 提示语句！
+        @Override
+        String ruleTip(String type,int index , String batName,OS_TYPE curType){
+            String itemDesc = "";
+            if(curType == OS_TYPE.Windows){
+                itemDesc = batName.trim()+"  "+type+"_"+index + "    [索引 "+index+"]  描述:"+""+ simpleDesc();
+            }else{
+                itemDesc = batName.trim()+" "+type+"_"+index + "    [索引 "+index+"]  描述:"+""+ simpleDesc();
+            }
+
+            return itemDesc;
+        }
     }
 
 
@@ -469,6 +656,9 @@ static String Default_Selected_Rule_Index_Key = "Default_Selected_Rule_Index_Key
             curFixedFileList = new ArrayList<File>();
             needAllFileFlag = true;
             curInputFileList  = new ArrayList<File>();
+            if(First_Input_RealFile != null){
+                curInputFileList.add(First_Input_RealFile);
+            }
         }
 
         Basic_Rule(int ruleIndex){
@@ -480,6 +670,9 @@ static String Default_Selected_Rule_Index_Key = "Default_Selected_Rule_Index_Key
             errorMsg = "";
             needAllFileFlag = true;
             curInputFileList  = new ArrayList<File>();
+            if(First_Input_RealFile != null){
+                curInputFileList.add(First_Input_RealFile);
+            }
         }
 
         Basic_Rule(int ruleIndex , boolean mNeedAllFile){
@@ -491,6 +684,9 @@ static String Default_Selected_Rule_Index_Key = "Default_Selected_Rule_Index_Key
             errorMsg = "";
             needAllFileFlag = mNeedAllFile;
             curInputFileList  = new ArrayList<File>();
+            if(First_Input_RealFile != null ){
+                curInputFileList.add(First_Input_RealFile);
+            }
         }
 
         @Override
@@ -553,8 +749,14 @@ static String Default_Selected_Rule_Index_Key = "Default_Selected_Rule_Index_Key
                 }
                 curAbsPath = shellDir.getAbsolutePath() + File.separator + curStringItem;
                 File curFIle = new File(curAbsPath) ;
-                if(curFIle.exists()){
-                    curInputFileList.add(curFIle);
+                if(curFIle.exists() && !curInputFileList.contains(curFIle)){
+                    if(First_Input_RealFile != null && First_Input_RealFile.getAbsolutePath().equals(curFIle.getAbsolutePath()) ){
+                        continue;
+                    }else{
+                        curInputFileList.add(curFIle);
+                    }
+
+                    System.out.println("curFIle = "+ curFIle.getAbsolutePath() + " TIme = "+getTimeStamp());
                 }
             }
             return true;  // 默认返回通过   不检查参数   如果有检查的需求 那么就实现它
@@ -615,6 +817,7 @@ static String Default_Selected_Rule_Index_Key = "Default_Selected_Rule_Index_Key
         boolean needAllFileFlag ;
 
         File inputDirFile; // 操作文件 目录
+
         boolean isInputDirAsSearchPoint;  // 是否以 输入的 文件夹作为 全局搜索的 起点
 
         ArrayList<String> curFilterFileTypeList;  //  当前的文件过滤类型   多种文件过滤类型  例如把 多种格式 jpeg png 转为 jpg 时 使用到
@@ -944,12 +1147,27 @@ static String Default_Selected_Rule_Index_Key = "Default_Selected_Rule_Index_Key
 
 
     static int calculInputTypeIndex(String inputParams){
+
+        File absFile_B = new File(inputParams);
+        if(absFile_B.exists() && absFile_B.isFile()){
+            First_Input_RealFile = absFile_B;
+            System.out.println("inputParams  = "+ inputParams + " absFilePath = "+ inputParams);
+            System.out.println(" First_Input_RealFile  = "+ First_Input_RealFile.getAbsolutePath());
+            return 0;
+        }
+
+
         if(inputParams == null){
             return 0;
         }
 
         String absFilePath = CUR_Dir_1_PATH + File.separator + inputParams;
         File absFile = new File(absFilePath);
+
+
+//        String absFilePath_B =  inputParams;
+
+
         if(absFile.exists() && absFile.isDirectory() ){
             First_Input_Dir =  absFile;
             return 0;   //  如果输入的参数  和  shell目录 组成一个 存在的文件的话  那么说明 参数不是 选择 rule的参数
@@ -1863,6 +2081,73 @@ I9_Properties.getProperty(Default_Selected_Rule_Index_Key,""+CUR_TYPE_INDEX);
     }
 
 
+    // 对齐行的操作  主要处理从浏览器复制到的表格数据 不对齐
+    ArrayList<String> duiqi_hang_Rule_5(ArrayList<String> originStrList){
+        if(originStrList == null) return null;
+        ArrayList<String>  fixedStrArr = new   ArrayList<String>();
+        for (int i = 0; i < originStrList.size(); i++) {
+            String onrLineStr = originStrList.get(i).trim();
+            if("".equals(onrLineStr.trim())){
+                continue;
+            }
+            String onrLineStr_clearChinese = clearChinese(onrLineStr);
+            fixedStrArr.add(onrLineStr_clearChinese);
+        }
+        System.out.println("═════════════"+"输入到文件的新内容 Begin 如下:"+"═════════════");
+        for (int i = 0; i <fixedStrArr.size(); i++) {
+            System.out.println(fixedStrArr.get(i));
+        }
+        System.out.println("═════════════"+"输入到文件的新内容 End"+"═════════════");
+
+        return fixedStrArr;
+    }
+
+
+
+    ArrayList<String> clearChinese_Rule_4(ArrayList<String> originStrList){
+        if(originStrList == null) return null;
+        ArrayList<String>  fixedStrArr = new   ArrayList<String>();
+        for (int i = 0; i < originStrList.size(); i++) {
+            String onrLineStr = originStrList.get(i).trim();
+            if("".equals(onrLineStr.trim())){
+                continue;
+            }
+            String onrLineStr_clearChinese = clearChinese(onrLineStr);
+            fixedStrArr.add(onrLineStr_clearChinese);
+        }
+        System.out.println("═════════════"+"输入到文件的新内容 Begin 如下:"+"═════════════");
+        for (int i = 0; i <fixedStrArr.size(); i++) {
+            System.out.println(fixedStrArr.get(i));
+        }
+        System.out.println("═════════════"+"输入到文件的新内容 End"+"═════════════");
+
+        return fixedStrArr;
+    }
+
+
+
+    ArrayList<String> addLineNumberChar_Rule_3(ArrayList<String> originStrList){
+        if(originStrList == null) return null;
+        ArrayList<String>  fixedStrArr = new   ArrayList<String>();
+        int lineNum = 1;
+        for (int i = 0; i < originStrList.size(); i++) {
+            String onrLineStr = originStrList.get(i).trim();
+            if("".equals(onrLineStr.trim())){
+                continue;
+            }
+            fixedStrArr.add(lineNum+" "+onrLineStr);
+            lineNum++;
+        }
+        System.out.println("═════════════"+"输入到文件的新内容 Begin 如下:"+"═════════════");
+        for (int i = 0; i <fixedStrArr.size(); i++) {
+            System.out.println(fixedStrArr.get(i));
+        }
+        System.out.println("═════════════"+"输入到文件的新内容 End"+"═════════════");
+
+        return fixedStrArr;
+    }
+
+
     ArrayList<String> clearOneBlankCharAsOneStr_Rule_2(ArrayList<String> originStrList){
         if(originStrList == null) return null;
         ArrayList<String>  fixedStrArr = new   ArrayList<String>();
@@ -1934,5 +2219,499 @@ I9_Properties.getProperty(Default_Selected_Rule_Index_Key,""+CUR_TYPE_INDEX);
 
         return fixedStrArr;
     }
+
+
+    // 自动判断输入文件中的一行有多少列字符串
+    public static int Rule5_NUM_ERERY_LINE_OLD = 0;     // 输入1.txt文件原本的每行列数  限制条件为 NEW/OLD 是正整数
+    public static int Rule5_NUM_ERERY_LINE_NEW = 0;    //  输出2.txt 文件需要自定义的产生的每行列数
+
+
+    public static final int Rule5_PADDING_COLOM = 5;         //  填充padding的距离  每个列之间的间距
+    public static final boolean Rule5_NEED_SORT = false;      //   输出是否需要进行A-Z的排序  默认为false    默认为按照1.txt的读取顺序显示
+    public static final boolean Rule5_DEBUG_LOG = true;       // 是否打印Log标识
+
+
+    public static String Rule5_SRC_FILE_NAME = "1.txt";   // 输入文件1.txt
+    public static String Rule5_DES_FILE_NAME = "2.txt";   // 输出文件1.txt
+
+
+    public static String[] Rule5_splitArr;    // 读取输入 1.txt每行  原始的split返回值字符串数组
+    public static String[] Rule5_retContentArr;   // 读取输入 1.txt每行  原始的split返回值经过过滤规格过滤后的返回值字符串数组
+
+    static String Rule5_Split_Str = " ";
+    public static long Rule5_fileSumLines;   // 输入文件1.txt 的总行数
+    public static long Rule5_newSumLines;    // 输出文件 2.txt 的总行数
+    public static long Rule5_stringNumOfInput_Max;    // 输入和输出文件中字符串的最大的个数
+
+    public static int[] Rule5_item_Max_Length = new int[Rule5_NUM_ERERY_LINE_NEW];  // 在1.txt输入文件每个列中字符串的最大长度的数组  默认为0
+    public static int[] Rule5_item_Max_Length_new = new int[Rule5_NUM_ERERY_LINE_NEW]; // 在2.txt文件中每个列的字符串最大长度 不足的补充padding
+
+    public static   ArrayList<String>  duiqi_Rule_5(File srcFile ,File targetFile ) {
+
+
+
+//        String mFilePath = System.getProperties().getProperty("user.dir")+File.separator+"1.txt";
+
+
+        Rule5_SRC_FILE_NAME =  srcFile.getAbsolutePath() ;
+        Rule5_DES_FILE_NAME =  targetFile.getAbsolutePath() ;
+        System.out.println("Rule5_DES_FILE_NAME =  "+ Rule5_DES_FILE_NAME);
+
+        getLineRow(srcFile);  // 获得当前输入的数据统计
+        if (Rule5_NUM_ERERY_LINE_NEW == 0 || Rule5_NUM_ERERY_LINE_OLD == 0) {
+            System.out.println("当前文件的列数检测失败  程序以失败姿态退出！ ");
+            return null;
+        } else {
+            Rule5_item_Max_Length = new int[Rule5_NUM_ERERY_LINE_NEW];  // 在1.txt输入文件每个列中字符串的最大长度的数组  默认为0
+            Rule5_item_Max_Length_new = new int[Rule5_NUM_ERERY_LINE_NEW]; // 在2.txt文件中每个列的字符串最大长度 不足的补充padding
+        }
+        getLineNum(srcFile);  // 获得当前输入的数据统计
+
+
+
+        try {
+
+            //链表数组 包含的是上面 LinkedList<String[]> 中的每一个String，这些String已经排序排好了
+            LinkedList<String> sortStringlist = getAllStringItemFromInput(srcFile);
+
+            // 依据标识位 对 所有的String 进行排序
+            sortStringlist = sortAllStringItemMethod(sortStringlist);
+
+            // 链表数组 成员都是 每一行字符串进行split分割后产生的字符串数组 并且每个Item 对应的String[] 长度是 Rule5_NUM_ERERY_LINE_NEW
+            LinkedList<String[]> list_StringArr = new LinkedList<String[]>();
+
+            // 填充输入到2.txt中的字符串数组的List
+            fill_List_StringArr(list_StringArr, sortStringlist);
+
+
+            // list_StringArr.length  就是 2.txt输出文件的行数
+            System.out.println("list_StringArr.length 输出文件  总行数:" + list_StringArr.size());
+
+            //int[] Rule5_item_Max_Length 数组进行查找  找到每列最大的字符串长度
+            getStringMaxLengthMethod(list_StringArr);
+
+            // 创建2.txt  并填充数据
+            return    calcul_duiqi_Rule_5(list_StringArr);
+
+        } catch (Exception e) {
+            System.out.println(e.fillInStackTrace());
+        }
+        return null;
+
+    }
+
+
+
+
+    public static void fill_List_StringArr(LinkedList<String[]> list_StringArr, LinkedList<String> sortStringlist) {
+        String[] newRow = new String[Rule5_NUM_ERERY_LINE_NEW];
+
+        for (int i = 0; i < sortStringlist.size(); i++) {
+
+            int index = i % Rule5_NUM_ERERY_LINE_NEW;
+            if (index == 0 && i > 0) {
+                list_StringArr.add(newRow);
+                newRow = new String[Rule5_NUM_ERERY_LINE_NEW];
+            }
+            newRow[index] = sortStringlist.get(i);
+        }
+        if (!list_StringArr.contains(newRow)) {
+            list_StringArr.add(newRow);
+        }
+
+
+    }
+
+
+    // 对 list_StringArr 内容进行重新填充 到  LinkedList<String[]> list_StringArr
+    public static void fixSortInStringArrList(LinkedList<String[]> list_StringArr, LinkedList<String> sortStringlist) {
+
+        int num = 0;
+        for (String[] item : list_StringArr) {
+
+            for (int i = 0; i < item.length; i++) {
+                if (num + i < sortStringlist.size()) {
+                    item[i] = sortStringlist.get(num + i);
+                }
+            }
+            num = num + item.length;
+
+        }
+
+    }
+
+    public static String[] getStringArr_From_EveryRow(String contentString, int num) {
+        Rule5_retContentArr = new String[num];
+        if (contentString != null && !"".equals(contentString)) {
+
+            if (num == 1) {
+
+                Rule5_splitArr = contentString.split(Rule5_Split_Str);
+                Rule5_splitArr = makeEmptyOut(Rule5_splitArr);  // 把数组中的空字符 完全剔除
+                if (Rule5_splitArr.length > num) {
+
+                    String contentLine = Rule5_splitArr[0];
+                    String fixString = fixStringMethod(contentLine);
+                    Rule5_retContentArr[0] = fixString;
+                    if (Rule5_DEBUG_LOG) System.out.println("只读取每行第一个字符串 = " + Rule5_splitArr[0]);
+                }
+
+            }
+
+            if (num == 2) {
+
+                Rule5_splitArr = contentString.split(Rule5_Split_Str);
+                Rule5_splitArr = makeEmptyOut(Rule5_splitArr);  // 把数组中的空字符 完全剔除
+                if (Rule5_splitArr.length > num) {
+                    Rule5_retContentArr[0] = Rule5_splitArr[0];
+                    Rule5_retContentArr[1] = Rule5_splitArr[Rule5_splitArr.length - 1];
+
+                } else if (Rule5_splitArr.length == num) {
+                    Rule5_retContentArr[0] = Rule5_splitArr[0];
+                    Rule5_retContentArr[1] = Rule5_splitArr[1];
+                }
+
+            } else {
+                Rule5_splitArr = contentString.split(Rule5_Split_Str);
+                if (Rule5_DEBUG_LOG) System.out.println("行数大于等于3: 值为“+ num+ ”  切割长度为 Rule5_splitArr.length =" + Rule5_splitArr.length);
+                Rule5_splitArr = makeEmptyOut(Rule5_splitArr);  // 把数组中的空字符 完全剔除
+                for (int x = 0; x < Rule5_splitArr.length; x++) {
+
+
+                    if (Rule5_DEBUG_LOG) System.out.println("index =" + x + "   content:" + Rule5_splitArr[x]);
+                    if (x == Rule5_splitArr.length - 1) {
+                        if (Rule5_DEBUG_LOG) System.out.println();
+                    }
+
+                }
+
+
+                if (Rule5_splitArr.length > num) {
+                    int i = 0;
+                    int j = 0;
+                    for (i = 0; i < num; i++) {
+
+                        Rule5_retContentArr[i] = Rule5_splitArr[i];
+
+                    }
+                } else if (Rule5_splitArr.length == num) {
+                    for (int x = 0; x < Rule5_splitArr.length; x++) {
+
+                        Rule5_retContentArr[x] = Rule5_splitArr[x];
+
+                    }
+
+                }
+
+
+            }
+
+        }
+        if (Rule5_DEBUG_LOG) {
+            for (String value : Rule5_retContentArr) {
+                System.out.println("value = " + value);
+            }
+        }
+
+        return Rule5_retContentArr;
+    }
+
+
+    public static String fixStringMethod(String contentString) {
+        int length = contentString.length();
+        //  System.out.println("contentString1"+ contentString);
+        if (contentString.contains("    ")) {
+            contentString = contentString.split("    ")[0].trim();
+        } else if (contentString.contains("\t")) {
+            contentString = contentString.split("\t")[0].trim();
+        }
+        System.out.println("contentString2  =  " + contentString);
+        return contentString;
+    }
+
+
+    public static String[] makeEmptyOut(String[] strArr) {
+        String[] validStrArrRet = null;
+        ArrayList<String> validStrArr = new ArrayList<String>();
+
+        if (strArr != null) {
+
+            for (String strItem : strArr) {
+                if (strItem == null || "".equals(strItem.trim())) {
+                    continue;
+                }
+                validStrArr.add(strItem);
+            }
+        }
+
+        if (validStrArr.size() > 0) {
+            validStrArrRet = new String[validStrArr.size()];
+
+
+            for (int x = 0; x < validStrArr.size(); x++) {
+                validStrArrRet[x] = validStrArr.get(x).trim();
+            }
+        }
+        return validStrArrRet;
+
+    }
+
+    public static boolean isArrEmpty(String[] strArr) {
+        boolean flag = false;
+
+        if (strArr != null) {
+            int i = 0;
+            for (i = 0; i < strArr.length; i++) {
+                if (strArr[i] != null && "".equals(strArr[i])) {
+                    flag = true;
+                    break;
+                }
+            }
+        } else {
+            flag = true;
+        }
+        return flag;
+    }
+
+    public static boolean checkInsert(int i, int j) {
+        boolean flag = false;
+        if (Rule5_retContentArr != null && Rule5_splitArr != null && i < Rule5_retContentArr.length && j < Rule5_splitArr.length) {
+            if ("".equals(Rule5_retContentArr[i]) && !"".equals(Rule5_splitArr[j])) {
+                flag = true;
+            }
+        }
+        return flag;
+    }
+
+
+    public static LinkedList<String> getAllStringItemFromInput(File srcFile) {
+
+
+        //链表数组 包含的是上面 LinkedList<String[]> 中的每一个String，这些String已经排序排好了
+        LinkedList<String> sortStringlist = new LinkedList<String>();
+
+
+        try {
+
+
+
+            BufferedReader txtBR  = new BufferedReader(new InputStreamReader(new FileInputStream(srcFile),"utf-8"));
+
+            String lineContentFirst = "";   // 读取到的输入文件 1.txt 的每一行字符串
+
+
+            // 一次性读出所有的字符串String   然后再重新编排？
+            while (lineContentFirst != null) {
+                lineContentFirst = txtBR.readLine(); // 从1.txt中读取一行字符串出来
+                if (lineContentFirst == null) { // 如果读取到的字符串为null 说明读取到了末尾了
+                    System.out.println("1.txt read to end!");
+                    break;
+                }
+                // 对读取到的每行字符串 进行分拆   得到每一个当前字符串分拆后的数组
+                String[] arrStr = getStringArr_From_EveryRow(lineContentFirst, Rule5_NUM_ERERY_LINE_OLD);
+                if (arrStr != null && arrStr.length == Rule5_NUM_ERERY_LINE_OLD) {
+
+                    for (String strItem : arrStr) {
+                        sortStringlist.add(strItem);  // 包含了所有切分出来的字符串
+                    }
+                }
+            }
+
+            txtBR.close();
+
+        } catch (Exception e) {
+            System.out.println(e.fillInStackTrace());
+        }
+
+        return sortStringlist;
+    }
+
+
+    public static LinkedList<String> sortAllStringItemMethod(LinkedList<String> sortStringlist) {
+
+        // sortStringlist.size()  是 2.txt 输出中所有字符串的数量
+//        System.out.println("sortStringlist.length :" + sortStringlist.size());
+        if (Rule5_NEED_SORT) {
+            sortStringlist.sort(new Comparator<String>() {   // 对字符串进行排序使得 aA-zZ这样的排序
+                @Override
+                public int compare(String o1, String o2) {
+                    return o1.toLowerCase().compareTo(o2.toLowerCase());
+                }
+            });
+        }
+
+        //  打印排序后的字符串
+        if (Rule5_DEBUG_LOG) {
+            for (String sortItem : sortStringlist) {
+                System.out.println("sortItem:" + sortItem);
+            }
+        }
+
+
+        return sortStringlist;
+    }
+
+    public static void getLineRow(File srcFile) {
+        try {
+
+
+            BufferedReader txtBR  = new BufferedReader(new InputStreamReader(new FileInputStream(srcFile),"utf-8"));
+            System.out.println("Rule5_NUM_ERERY_LINE_OLD=" + Rule5_NUM_ERERY_LINE_OLD + "  Rule5_NUM_ERERY_LINE_NEW=" + Rule5_NUM_ERERY_LINE_NEW);
+            String line = txtBR.readLine();
+            int index = 1;
+            int rowNum  = 0 ;
+            while (line == null ) {
+
+                line = txtBR.readLine();
+            }
+
+            while( line != null && line.trim().isEmpty()){
+                line = txtBR.readLine();
+
+            }
+            System.out.println("line["+index+"] = "+ line);
+            index++;
+            if(line != null ){
+                String numRow[] = null;
+                if(line.contains(" ") && !line.contains("\t")){
+                    numRow = line.trim().split(" ");
+                    Rule5_Split_Str = " ";
+                }else if(line.contains("\t")){
+                    numRow = line.trim().split("\t");
+                    Rule5_Split_Str = "\t";
+                }
+
+                if(numRow != null){
+                    for (int i = 0 ; i <numRow.length ; i++ ){
+                        System.out.println("row["+i+"] = "+numRow[i]);
+                        if(numRow[i].trim().isEmpty()){
+                            continue;
+                        }
+
+                        rowNum++;
+                    }
+                    System.out.println("rowNum = "+ rowNum);
+
+                    Rule5_NUM_ERERY_LINE_OLD = rowNum;
+                    Rule5_NUM_ERERY_LINE_NEW = rowNum;
+
+                }
+
+
+
+
+            }
+
+
+
+            System.out.println("Rule5_NUM_ERERY_LINE_OLD=" + Rule5_NUM_ERERY_LINE_OLD + "  Rule5_NUM_ERERY_LINE_NEW=" + Rule5_NUM_ERERY_LINE_NEW);
+            txtBR.close();
+        } catch (Exception e) {
+            System.out.println(e.fillInStackTrace());
+        }
+    }
+
+
+    public static void getLineNum(File srcFile) {
+        try {
+
+            BufferedReader txtBR  = new BufferedReader(new InputStreamReader(new FileInputStream(srcFile),"utf-8"));
+
+
+            Rule5_fileSumLines = txtBR.lines().count();  // 当前输入 1.txt的行数
+            // 当前输入 1.txt 所包含该的String字符串最大的数量  也是输入文件2.txt最大的字符串数量
+
+            Rule5_stringNumOfInput_Max = Rule5_fileSumLines * Rule5_NUM_ERERY_LINE_OLD;
+            Rule5_newSumLines = (Rule5_stringNumOfInput_Max / Rule5_NUM_ERERY_LINE_NEW) + 1;
+            System.out.println("old_txt_lines=" + Rule5_fileSumLines + "  Rule5_newSumLines=" + Rule5_newSumLines + "   AllStringNum = " + Rule5_stringNumOfInput_Max);
+            txtBR.close();
+        } catch (Exception e) {
+            System.out.println(e.fillInStackTrace());
+        }
+    }
+
+
+    public static void getStringMaxLengthMethod(LinkedList<String[]> list_StringArr) {
+        if (list_StringArr != null) {
+            int num = 0;
+            for (String[] item : list_StringArr) {  // 计算出每列的最长的字符串的长度
+                if (item == null) {
+                    if (Rule5_DEBUG_LOG) System.out.println("item == null");
+                    continue;
+                }
+                //  System.out.println("item != null  index:"+ (num++) +"item.length="+item.length);
+                for (int z = 0; z < item.length; z++) {
+                    if (item[z] == null) {
+                        if (Rule5_DEBUG_LOG) System.out.println("item[z] = null");
+                        continue;
+                    }
+
+                    if (item[z] != null && item[z].length() > Rule5_item_Max_Length[z]) {
+                        if (Rule5_DEBUG_LOG) System.out.println("item[z].length() = " + item[z].length());
+//                             Rule5_item_Max_Length[z] = item[z].length();
+                        boolean isContainChinese = isContainChinese(item[z]);
+                        Rule5_item_Max_Length[z] = isContainChinese?getFramePaddingChineseLength(item[z])+item[z].length():item[z].length();
+
+                    }
+                }
+
+            }
+
+            // 设置2.txt的每一列的长度值
+            for (int itemContentLength = 0; itemContentLength < Rule5_item_Max_Length.length; itemContentLength++) {
+                Rule5_item_Max_Length_new[itemContentLength] = Rule5_item_Max_Length[itemContentLength] + Rule5_PADDING_COLOM;  // 每一列的长度值最长值+1  避免内容重叠
+                if (Rule5_DEBUG_LOG)
+                    System.out.println("Rule5_item_Max_Length_new_index:" + itemContentLength + " Rule5_item_Max_Length_new_value:" + Rule5_item_Max_Length_new[itemContentLength]);
+            }
+
+        }
+
+    }
+
+
+    public static ArrayList<String> calcul_duiqi_Rule_5(LinkedList<String[]> list_StringArr) {
+        ArrayList<String> contentList = new        ArrayList<String>();
+        try {
+
+            //2.txt的内容进行填充 list_StringArr  中 每一个String【]  是 2.txt 中的一行】
+            for (String[] item : list_StringArr) {
+                StringBuilder sb = new StringBuilder("");
+                if (item == null) {
+                    if (Rule5_DEBUG_LOG) System.out.println("item == null");
+                    continue;
+                }
+                if (Rule5_DEBUG_LOG) {
+                    System.out.println("item != null  item.length=" + item.length);
+                    int index = 0;
+                    for (String str : item) {
+                        System.out.println("item[" + index + "] != null   " + "item[" + index + "]" + str);
+                        index++;
+                    }
+
+                }
+                for (int z = 0; z < item.length; z++) {
+                    if (item[z] == null) {
+                        continue;
+                    }
+
+                    int padding = Rule5_item_Max_Length_new[z] - getFramePaddingChineseLength(item[z]);
+//                    int padding = Rule5_item_Max_Length_new[z] - item[z].length();
+                    String paddingStr = "";
+                    for (int paddingNum = 0; paddingNum < padding; paddingNum++) {
+                        paddingStr += " ";
+                    }
+                    String content = item[z] + paddingStr;
+                    sb.append(content);
+                }
+                contentList.add(sb.toString());
+            }
+        } catch (Exception e) {
+            System.out.println(e.fillInStackTrace());
+        }
+        return contentList;
+    }
+
+    // Rule_5 对齐 End
+
 
 }
