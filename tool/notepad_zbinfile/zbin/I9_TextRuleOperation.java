@@ -1,13 +1,35 @@
 
+import cn.hutool.core.util.RuntimeUtil;
+import cn.hutool.core.util.StrUtil;
+import cn.hutool.extra.qrcode.QrCodeUtil;
+import cn.hutool.extra.qrcode.QrConfig;
+import cn.hutool.json.JSONUtil;
+import cn.hutool.system.JavaRuntimeInfo;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import net.sourceforge.pinyin4j.PinyinHelper;
+import net.sourceforge.pinyin4j.format.HanyuPinyinCaseType;
+import net.sourceforge.pinyin4j.format.HanyuPinyinOutputFormat;
+import net.sourceforge.pinyin4j.format.HanyuPinyinToneType;
+import net.sourceforge.pinyin4j.format.exception.BadHanyuPinyinOutputFormatCombination;
+
 import javax.swing.*;
+import java.awt.*;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
 import java.io.*;
+import java.math.BigDecimal;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributeView;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -48,6 +70,9 @@ static String Default_Selected_Rule_Index_Key = "Default_Selected_Rule_Index_Key
 
     static File I9_Temp_Text_File = new File(System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin" + File.separator + get_Bat_Sh_FlagNumber(Cur_Bat_Name)+"_Temp_Text.txt");
 
+    static String I9_OUT_DIR_PATH = zbinPath+File.separator+"I9_Out";
+    static File I9_OUT_DIR = new File(I9_OUT_DIR_PATH);
+
     static InputStream I9_Properties_InputStream;
     static OutputStream I9_Properties_OutputStream;
     static Properties I9_Properties = new Properties();
@@ -57,7 +82,7 @@ static String Default_Selected_Rule_Index_Key = "Default_Selected_Rule_Index_Key
     // 当前Shell目录下的 文件类型列表  抽取出来  通用
     static  HashMap<String, ArrayList<File>> CurDirFileTypeMap = new  HashMap<String, ArrayList<File>>(); ;
 
-
+    public static int Rule6_num_row = 0;   // 每行重组的个数
     // 固定3   当前操作系统的类型
     static OS_TYPE CUR_OS_TYPE = OS_TYPE.Windows;
     static String BAT_OR_SH_Point ;
@@ -180,6 +205,11 @@ static String Default_Selected_Rule_Index_Key = "Default_Selected_Rule_Index_Key
     static {
         try {
 
+
+
+            if (!I9_OUT_DIR.exists()) {
+                I9_OUT_DIR.mkdirs();
+            }
 
             if (!I9_Temp_Text_File.exists()) {
                 I9_Temp_Text_File.createNewFile();
@@ -322,6 +352,18 @@ static String Default_Selected_Rule_Index_Key = "Default_Selected_Rule_Index_Key
         CUR_RULE_LIST.add( new AddLineNumberChar_Rule_3());
         CUR_RULE_LIST.add( new ClearChinese_Rule_4());
         CUR_RULE_LIST.add( new Duiqi_Hang_Rule_5());
+        CUR_RULE_LIST.add( new PaiLie_2x2_Rule_6());
+        CUR_RULE_LIST.add( new PaiLie_3x3_Rule_7());
+        CUR_RULE_LIST.add( new PaiLie_4x4_Rule_8());
+        CUR_RULE_LIST.add( new PaiLie_5x5_Rule_9());
+        CUR_RULE_LIST.add( new Add_BeginStr_EndStr_Rule_10());
+        CUR_RULE_LIST.add( new Table_MDStyle_Rule_11());
+        CUR_RULE_LIST.add( new BoardCopy_ToLeft_Rule_12());
+        CUR_RULE_LIST.add( new ClearChinese_Rule_13());
+        CUR_RULE_LIST.add( new Chinese_To_PinYin_Rule_14());
+        CUR_RULE_LIST.add( new TextAs_QrCode_Rule_15());
+        CUR_RULE_LIST.add( new ReadStrFromFile_Rule_16());
+        CUR_RULE_LIST.add( new Make_Json_As_JavaFile_Graphviz2Jpg_Rule_17());
 
 
 //        CUR_RULE_LIST.add( new Image2Jpeg_Rule_3());
@@ -331,6 +373,522 @@ static String Default_Selected_Rule_Index_Key = "Default_Selected_Rule_Index_Key
 //        CUR_RULE_LIST.add( new Encropty_Rule_7());
 //        CUR_RULE_LIST.add( new ClearChineseType_8());
 
+    }
+
+
+    // Rule_17  End  对 Json 格式的文件 或者 以json格式保存的文件 生成bean文件 以及 Graphviz 绘图显示结构
+
+    class Make_Json_As_JavaFile_Graphviz2Jpg_Rule_17 extends  Basic_Rule{
+
+        Make_Json_As_JavaFile_Graphviz2Jpg_Rule_17(boolean mIsInputDirAsSearchPoint){
+            super(17);
+            isInputDirAsSearchPoint =  mIsInputDirAsSearchPoint;
+        }
+
+
+        Make_Json_As_JavaFile_Graphviz2Jpg_Rule_17(){
+            super(17,false);
+        }
+
+        @Override
+        ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+            for (int i = 0; i < curInputFileList.size(); i++) {
+                File fileItem = curInputFileList.get(i);
+                if(CUR_OS_TYPE == OS_TYPE.Windows){
+                    Make_Json_As_JavaFile_Rule_17(fileItem);
+                }else{
+                    System.out.println("无法在 Linux 和 MacOS 下实现  没有notepad++ 啊! ");
+                    System.out.println("无法实现对 Windows下 对 Json 格式的文件 或者 以json格式保存的文件 生成bean文件 以及 Graphviz 绘图显示结构 (B6)");
+                }
+
+            }
+            return super.applyOperationRule(curFileList, subFileTypeMap, curDirList, curRealFileList);
+        }
+
+        @Override
+        String simpleDesc() {
+            return " Windows下 对 Json 格式的文件 或者 以json格式保存的文件 生成bean文件 以及 Graphviz 绘图显示结构 (B6)";
+        }
+
+    }
+
+
+    class ReadStrFromFile_Rule_16 extends  Basic_Rule{
+
+        ReadStrFromFile_Rule_16(boolean mIsInputDirAsSearchPoint){
+            super(16);
+            isInputDirAsSearchPoint =  mIsInputDirAsSearchPoint;
+        }
+
+
+        ReadStrFromFile_Rule_16(){
+            super(16,false);
+        }
+
+        @Override
+        ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+            for (int i = 0; i < curInputFileList.size(); i++) {
+                File fileItem = curInputFileList.get(i);
+                if(CUR_OS_TYPE == OS_TYPE.Windows){
+                    ReadStrFromFile_Rule_16(fileItem);
+                }else{
+                    System.out.println("无法在 Linux 和 MacOS 下实现  没有notepad++ 啊! ");
+                }
+
+            }
+            return super.applyOperationRule(curFileList, subFileTypeMap, curDirList, curRealFileList);
+        }
+
+        @Override
+        String simpleDesc() {
+            return " Windows下 读物当前文件内容 并 播放 vbs 声音 (B3)";
+        }
+
+    }
+
+
+
+
+
+
+    // Rule_15   Begin  读取文件的第一行转为 二维码显示出来 B1
+//    public static void TextAs_QrCode_Rule_15(File srcFile) {
+
+    class TextAs_QrCode_Rule_15 extends  Basic_Rule{
+
+        TextAs_QrCode_Rule_15(boolean mIsInputDirAsSearchPoint){
+            super(15);
+            isInputDirAsSearchPoint =  mIsInputDirAsSearchPoint;
+        }
+
+
+        TextAs_QrCode_Rule_15(){
+            super(15,false);
+        }
+
+        @Override
+        ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+            for (int i = 0; i < curInputFileList.size(); i++) {
+                File fileItem = curInputFileList.get(i);
+                if(CUR_OS_TYPE == OS_TYPE.Windows){
+                    TextAs_QrCode_Rule_15(fileItem);
+                }else{
+                    System.out.println("无法在 Linux 和 MacOS 下实现  没有notepad++ 啊! ");
+                }
+
+             }
+            return super.applyOperationRule(curFileList, subFileTypeMap, curDirList, curRealFileList);
+        }
+
+        @Override
+        String simpleDesc() {
+            return " 读取文件的第一行转为 二维码显示出来 (B1)";
+        }
+
+    }
+
+
+    //     // Rule_14   Begin 汉字转换为拼音   周 zhou   中国 zhong_guo  (A9)
+    //    public static ArrayList<String> Chinese_To_PinYin_Rule_14(File srcFile) {
+
+    class Chinese_To_PinYin_Rule_14 extends  Basic_Rule{
+
+        Chinese_To_PinYin_Rule_14(boolean mIsInputDirAsSearchPoint){
+            super(14);
+            isInputDirAsSearchPoint =  mIsInputDirAsSearchPoint;
+        }
+
+
+        Chinese_To_PinYin_Rule_14(){
+            super(14,false);
+        }
+
+        @Override
+        ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+            for (int i = 0; i < curInputFileList.size(); i++) {
+                File fileItem = curInputFileList.get(i);
+
+                ArrayList<String>  fixedStrArr =   Chinese_To_PinYin_Rule_14(fileItem);
+                System.out.println("════════════"+"输出文件 Begin " + "════════════");
+                for (int j = 0; j < fixedStrArr.size(); j++) {
+                    System.out.println(fixedStrArr.get(j));
+                }
+                System.out.println("════════════"+"输出文件 End "+"════════════");
+                writeContentToFile(I9_Temp_Text_File,fixedStrArr);
+                NotePadOpenTargetFile(I9_Temp_Text_File.getAbsolutePath());
+                System.out.println("rule_"+rule_index+" ->汉字转换为拼音   周 zhou   中国 zhong_guo  (A9)   File="+ fileItem.getAbsolutePath());
+            }
+
+
+            return super.applyOperationRule(curFileList, subFileTypeMap, curDirList, curRealFileList);
+        }
+
+        @Override
+        String simpleDesc() {
+            return " 汉字转换为拼音   周 zhou   中国 zhong_guo  (A9)";
+        }
+
+        //3. 如果当前 执行 错误  checkParams 返回 false   那么 将 打印这个函数 说明错误的可能原因
+        @Override
+        void showWrongMessage() {
+            System.out.println("当前 type 索引 "+rule_index +" 执行错误  可能是输入参数错误 请检查输入参数!");
+            System.out.println(" errorMsg = "+errorMsg );
+        }
+
+        //4.  当前 rule的 说明  将会打印在  用户输入为空时的 提示语句！
+        @Override
+        String ruleTip(String type,int index , String batName,OS_TYPE curType){
+            String itemDesc = "";
+            if(curType == OS_TYPE.Windows){
+                itemDesc = batName.trim()+"  "+type+"_"+index + "    [索引 "+index+"]  描述:"+""+ simpleDesc();
+            }else{
+                itemDesc = batName.trim()+" "+type+"_"+index + "    [索引 "+index+"]  描述:"+""+ simpleDesc();
+            }
+
+            return itemDesc;
+        }
+    }
+
+
+
+    class ClearChinese_Rule_13 extends  Basic_Rule{
+
+        ClearChinese_Rule_13(boolean mIsInputDirAsSearchPoint){
+            super(13);
+            isInputDirAsSearchPoint =  mIsInputDirAsSearchPoint;
+        }
+
+
+        ClearChinese_Rule_13(){
+            super(13,false);
+        }
+
+        @Override
+        ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+            for (int i = 0; i < curInputFileList.size(); i++) {
+                File fileItem = curInputFileList.get(i);
+
+                ArrayList<String>  fixedStrArr =   clearChinese_Rule_13(fileItem);
+                System.out.println("════════════"+"输出文件 Begin " + "════════════");
+                for (int j = 0; j < fixedStrArr.size(); j++) {
+                    System.out.println(fixedStrArr.get(j));
+                }
+                System.out.println("════════════"+"输出文件 End "+"════════════");
+                writeContentToFile(I9_Temp_Text_File,fixedStrArr);
+                NotePadOpenTargetFile(I9_Temp_Text_File.getAbsolutePath());
+                System.out.println("rule_"+rule_index+" ->去除掉当前文件中的中文 每一个中文 以一个空格代替 （A7)   File="+ fileItem.getAbsolutePath());
+            }
+
+
+            return super.applyOperationRule(curFileList, subFileTypeMap, curDirList, curRealFileList);
+        }
+
+        @Override
+        String simpleDesc() {
+            return " 去除掉当前文件中的中文 每一个中文 以一个空格代替 （A7) ";
+        }
+
+        //3. 如果当前 执行 错误  checkParams 返回 false   那么 将 打印这个函数 说明错误的可能原因
+        @Override
+        void showWrongMessage() {
+            System.out.println("当前 type 索引 "+rule_index +" 执行错误  可能是输入参数错误 请检查输入参数!");
+            System.out.println(" errorMsg = "+errorMsg );
+        }
+
+        //4.  当前 rule的 说明  将会打印在  用户输入为空时的 提示语句！
+        @Override
+        String ruleTip(String type,int index , String batName,OS_TYPE curType){
+            String itemDesc = "";
+            if(curType == OS_TYPE.Windows){
+                itemDesc = batName.trim()+"  "+type+"_"+index + "    [索引 "+index+"]  描述:"+""+ simpleDesc();
+            }else{
+                itemDesc = batName.trim()+" "+type+"_"+index + "    [索引 "+index+"]  描述:"+""+ simpleDesc();
+            }
+
+            return itemDesc;
+        }
+    }
+
+
+    class BoardCopy_ToLeft_Rule_12 extends  Basic_Rule{
+
+        BoardCopy_ToLeft_Rule_12(boolean mIsInputDirAsSearchPoint){
+            super(12);
+            isInputDirAsSearchPoint =  mIsInputDirAsSearchPoint;
+        }
+
+
+        BoardCopy_ToLeft_Rule_12(){
+            super(12,false);
+        }
+
+        @Override
+        ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+            for (int i = 0; i < curInputFileList.size(); i++) {
+                File fileItem = curInputFileList.get(i);
+
+                ArrayList<String>  fixedStrArr =   BoardCopyStrToLeft_Rule_12(fileItem);
+                System.out.println("════════════"+"输出文件 Begin " + "════════════");
+                for (int j = 0; j < fixedStrArr.size(); j++) {
+                    System.out.println(fixedStrArr.get(j));
+                }
+                System.out.println("════════════"+"输出文件 End "+"════════════");
+                writeContentToFile(I9_Temp_Text_File,fixedStrArr);
+                NotePadOpenTargetFile(I9_Temp_Text_File.getAbsolutePath());
+                System.out.println("rule_"+rule_index+" -> 把 剪切板的字符串 逐行 复制 到当前 文本的 逐行 后边   A6   File="+ fileItem.getAbsolutePath());
+            }
+
+
+            return super.applyOperationRule(curFileList, subFileTypeMap, curDirList, curRealFileList);
+        }
+
+        @Override
+        String simpleDesc() {
+            return " 把 剪切板的字符串 逐行 复制 到当前 文本的 逐行 后边  (A6)";
+        }
+
+        //3. 如果当前 执行 错误  checkParams 返回 false   那么 将 打印这个函数 说明错误的可能原因
+        @Override
+        void showWrongMessage() {
+            System.out.println("当前 type 索引 "+rule_index +" 执行错误  可能是输入参数错误 请检查输入参数!");
+            System.out.println(" errorMsg = "+errorMsg );
+        }
+
+        //4.  当前 rule的 说明  将会打印在  用户输入为空时的 提示语句！
+        @Override
+        String ruleTip(String type,int index , String batName,OS_TYPE curType){
+            String itemDesc = "";
+            if(curType == OS_TYPE.Windows){
+                itemDesc = batName.trim()+"  "+type+"_"+index + "    [索引 "+index+"]  描述:"+""+ simpleDesc();
+            }else{
+                itemDesc = batName.trim()+" "+type+"_"+index + "    [索引 "+index+"]  描述:"+""+ simpleDesc();
+            }
+
+            return itemDesc;
+        }
+    }
+
+
+    // getMDtable_ForCommonText_Rule_11
+
+    class Table_MDStyle_Rule_11 extends  Basic_Rule{
+
+        Table_MDStyle_Rule_11(boolean mIsInputDirAsSearchPoint){
+            super(11);
+            isInputDirAsSearchPoint =  mIsInputDirAsSearchPoint;
+        }
+
+
+        Table_MDStyle_Rule_11(){
+            super(11,false);
+        }
+
+        @Override
+        ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+            for (int i = 0; i < curInputFileList.size(); i++) {
+                File fileItem = curInputFileList.get(i);
+
+                ArrayList<String>  fixedStrArr =   getMDtable_ForCommonText_Rule_11(fileItem);
+                System.out.println("════════════"+"输出文件 Begin " + "════════════");
+                for (int j = 0; j < fixedStrArr.size(); j++) {
+                    System.out.println(fixedStrArr.get(j));
+                }
+                System.out.println("════════════"+"输出文件 End "+"════════════");
+                writeContentToFile(I9_Temp_Text_File,fixedStrArr);
+                NotePadOpenTargetFile(I9_Temp_Text_File.getAbsolutePath());
+                System.out.println("rule_"+rule_index+" -> 把表格 2x2 3x3 4x4  ... 转为   MD文件格式 加入 |---| 分割符号  File="+ fileItem.getAbsolutePath());
+            }
+
+
+            return super.applyOperationRule(curFileList, subFileTypeMap, curDirList, curRealFileList);
+        }
+
+        @Override
+        String simpleDesc() {
+            return " 把表格 2x2 3x3 4x4  ... 转为   MD文件格式 加入 |---| 分割符号 (A5)";
+        }
+
+        //3. 如果当前 执行 错误  checkParams 返回 false   那么 将 打印这个函数 说明错误的可能原因
+        @Override
+        void showWrongMessage() {
+            System.out.println("当前 type 索引 "+rule_index +" 执行错误  可能是输入参数错误 请检查输入参数!");
+            System.out.println(" errorMsg = "+errorMsg );
+        }
+
+        //4.  当前 rule的 说明  将会打印在  用户输入为空时的 提示语句！
+        @Override
+        String ruleTip(String type,int index , String batName,OS_TYPE curType){
+            String itemDesc = "";
+            if(curType == OS_TYPE.Windows){
+                itemDesc = batName.trim()+"  "+type+"_"+index + "    [索引 "+index+"]  描述:"+""+ simpleDesc();
+            }else{
+                itemDesc = batName.trim()+" "+type+"_"+index + "    [索引 "+index+"]  描述:"+""+ simpleDesc();
+            }
+
+            return itemDesc;
+        }
+    }
+
+
+    // 往 每行的加入占位符   开头加入 【ZHead】   结尾加入【ZTail】 方便替换
+    class Add_BeginStr_EndStr_Rule_10 extends  Basic_Rule{
+
+        String beginStr ;
+        String endStr;
+        Add_BeginStr_EndStr_Rule_10(boolean mIsInputDirAsSearchPoint){
+            super(10);
+            isInputDirAsSearchPoint =  mIsInputDirAsSearchPoint;
+            beginStr = "【ZHead】";
+            endStr = "【ZTail】";
+        }
+
+
+        Add_BeginStr_EndStr_Rule_10(){
+            super(10,false);
+            beginStr = "【ZHead】";
+            endStr = "【ZTail】";
+        }
+
+        @Override
+        ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+            for (int i = 0; i < curInputFileList.size(); i++) {
+                File fileItem = curInputFileList.get(i);
+                ArrayList<String> contentList = ReadFileContentAsList(fileItem);
+                ArrayList<String>  fixedStrArr =   addZhanWeiFlag_Rule_10(contentList,beginStr,endStr);
+                writeContentToFile(I9_Temp_Text_File,fixedStrArr);
+                NotePadOpenTargetFile(I9_Temp_Text_File.getAbsolutePath());
+                System.out.println("rule_"+rule_index+" -> 往 每行的加入占位符   开头加入 【ZHead】   结尾加入【ZTail】 方便替换  File="+ fileItem.getAbsolutePath());
+            }
+
+
+            return super.applyOperationRule(curFileList, subFileTypeMap, curDirList, curRealFileList);
+        }
+
+        @Override
+        String simpleDesc() {
+            return " 往 每行的加入占位符   开头加入 【ZHead】   结尾加入【ZTail】 方便替换 (A4) ";
+        }
+
+        //3. 如果当前 执行 错误  checkParams 返回 false   那么 将 打印这个函数 说明错误的可能原因
+        @Override
+        void showWrongMessage() {
+            System.out.println("当前 type 索引 "+rule_index +" 执行错误  可能是输入参数错误 请检查输入参数!");
+            System.out.println(" errorMsg = "+errorMsg );
+        }
+
+        //4.  当前 rule的 说明  将会打印在  用户输入为空时的 提示语句！
+        @Override
+        String ruleTip(String type,int index , String batName,OS_TYPE curType){
+            String itemDesc = "";
+            if(curType == OS_TYPE.Windows){
+                itemDesc = batName.trim()+"  "+type+"_"+index + "    [索引 "+index+"]  描述:"+""+ simpleDesc();
+            }else{
+                itemDesc = batName.trim()+" "+type+"_"+index + "    [索引 "+index+"]  描述:"+""+ simpleDesc();
+            }
+
+            return itemDesc;
+        }
+    }
+
+
+    // ShuZhuangHang_PaiLie_Rule_6
+
+    class PaiLie_5x5_Rule_9 extends  PaiLie_2x2_Rule_6{
+        PaiLie_5x5_Rule_9(){
+            super(9);
+            Rule6_num_row = 5;
+            rowSize = 5;
+        }
+    }
+
+    class PaiLie_4x4_Rule_8 extends  PaiLie_2x2_Rule_6{
+        PaiLie_4x4_Rule_8(){
+            super(8);
+            Rule6_num_row = 4;
+            rowSize = 4;
+        }
+    }
+
+
+
+    class PaiLie_3x3_Rule_7 extends  PaiLie_2x2_Rule_6{
+        PaiLie_3x3_Rule_7(){
+            super(7);
+            Rule6_num_row = 3;
+            rowSize = 3;
+        }
+    }
+
+    class PaiLie_2x2_Rule_6 extends  Basic_Rule{
+        int rowSize = 0;
+
+
+        PaiLie_2x2_Rule_6(boolean mIsInputDirAsSearchPoint){
+            super(6);
+            isInputDirAsSearchPoint =  mIsInputDirAsSearchPoint;
+            Rule6_num_row = 2;
+            rowSize = Rule6_num_row;
+        }
+
+        PaiLie_2x2_Rule_6(int ruleIndex){
+            super(ruleIndex,false);
+            Rule6_num_row = 2;
+            rowSize = Rule6_num_row;
+        }
+
+
+        PaiLie_2x2_Rule_6(){
+            super(6,false);
+            Rule6_num_row = 2;
+            rowSize = Rule6_num_row;
+        }
+
+        @Override
+        ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+            Rule6_num_row = rowSize;
+            for (int i = 0; i < curInputFileList.size(); i++) {
+                File fileItem = curInputFileList.get(i);
+
+//                ArrayList<String> contentList = calcul_duiqi_Rule_5(fileItem,I9_Temp_Text_File);
+                ArrayList<String>  fixedStrArr =   ShuZhuangHang_PaiLie_Rule_6(fileItem);
+                System.out.println("════════════"+"输出文件 Begin " + "════════════");
+                for (int j = 0; j < fixedStrArr.size(); j++) {
+                    System.out.println(fixedStrArr.get(j));
+                }
+                System.out.println("════════════"+"输出文件 End "+"════════════");
+                writeContentToFile(I9_Temp_Text_File,fixedStrArr);
+                NotePadOpenTargetFile(I9_Temp_Text_File.getAbsolutePath());
+                System.out.println("rule_"+rule_index+" -> 把当前顺序排列的数据 转为每行"+rowSize+"个的排序方式  File="+ fileItem.getAbsolutePath());
+            }
+
+
+            return super.applyOperationRule(curFileList, subFileTypeMap, curDirList, curRealFileList);
+        }
+
+        @Override
+        String simpleDesc() {
+            return " 把当前顺序排列的数据 转为每行"+rowSize+"个的排序方式 (A3)";
+        }
+
+        //3. 如果当前 执行 错误  checkParams 返回 false   那么 将 打印这个函数 说明错误的可能原因
+        @Override
+        void showWrongMessage() {
+            System.out.println("当前 type 索引 "+rule_index +" 执行错误  可能是输入参数错误 请检查输入参数!");
+            System.out.println(" errorMsg = "+errorMsg );
+        }
+
+        //4.  当前 rule的 说明  将会打印在  用户输入为空时的 提示语句！
+        @Override
+        String ruleTip(String type,int index , String batName,OS_TYPE curType){
+            String itemDesc = "";
+            if(curType == OS_TYPE.Windows){
+                itemDesc = batName.trim()+"  "+type+"_"+index + "    [索引 "+index+"]  描述:"+""+ simpleDesc();
+            }else{
+                itemDesc = batName.trim()+" "+type+"_"+index + "    [索引 "+index+"]  描述:"+""+ simpleDesc();
+            }
+
+            return itemDesc;
+        }
     }
 
 
@@ -371,7 +929,7 @@ static String Default_Selected_Rule_Index_Key = "Default_Selected_Rule_Index_Key
 
         @Override
         String simpleDesc() {
-            return " 把当前 表格数据 行对齐( 需要每行 数值项个数相等)";
+            return " 把当前 表格数据 行对齐( 需要每行 数值项个数相等) (A2)";
         }
 
         //3. 如果当前 执行 错误  checkParams 返回 false   那么 将 打印这个函数 说明错误的可能原因
@@ -489,7 +1047,7 @@ static String Default_Selected_Rule_Index_Key = "Default_Selected_Rule_Index_Key
 
         @Override
         String simpleDesc() {
-            return " 把当前文件加入行号";
+            return " 把当前文件加入行号 (A1)";
         }
 
         //3. 如果当前 执行 错误  checkParams 返回 false   那么 将 打印这个函数 说明错误的可能原因
@@ -721,6 +1279,8 @@ static String Default_Selected_Rule_Index_Key = "Default_Selected_Rule_Index_Key
 
         }
 
+
+
         @Override
         ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
             return null;
@@ -762,18 +1322,21 @@ static String Default_Selected_Rule_Index_Key = "Default_Selected_Rule_Index_Key
             return true;  // 默认返回通过   不检查参数   如果有检查的需求 那么就实现它
         }
 
+        //3. 如果当前 执行 错误  checkParams 返回 false   那么 将 打印这个函数 说明错误的可能原因
         @Override
         void showWrongMessage() {
             System.out.println("当前 type 索引 "+rule_index +" 执行错误  可能是输入参数错误 请检查输入参数!");
-            System.out.println("ErrorMsg:"+ errorMsg);
+            System.out.println(" errorMsg = "+errorMsg );
         }
 
+        //4.  当前 rule的 说明  将会打印在  用户输入为空时的 提示语句！
+        @Override
         String ruleTip(String type,int index , String batName,OS_TYPE curType){
             String itemDesc = "";
             if(curType == OS_TYPE.Windows){
-                itemDesc = batName.trim()+"  "+type+"_"+index + "    [索引 "+index+"]  描述:"+simpleDesc();
+                itemDesc = batName.trim()+"  "+type+"_"+index + "    [索引 "+index+"]  描述:"+""+ simpleDesc();
             }else{
-                itemDesc = batName.trim()+" "+type+"_"+index + "    [索引 "+index+"]  描述:"+simpleDesc();
+                itemDesc = batName.trim()+" "+type+"_"+index + "    [索引 "+index+"]  描述:"+""+ simpleDesc();
             }
 
             return itemDesc;
@@ -1191,6 +1754,12 @@ static String Default_Selected_Rule_Index_Key = "Default_Selected_Rule_Index_Key
             }
         }
 
+        if( First_Input_RealFile == null){
+            System.out.println("═══════温馨提示═════════");
+            System.out.println("温馨提示 如果在 notepad++ F8 环境中 , First_Input_RealFile 没有取得对应的文件");
+            System.out.println("可能是由于当前文件名称中含有 空格 导致 输入参数错误!");
+            System.out.println("════════════════");
+        }
         return 0;
 
     }
@@ -1509,6 +2078,12 @@ static String Default_Selected_Rule_Index_Key = "Default_Selected_Rule_Index_Key
                 count++;
                 continue;
             }
+            if((itemChar + "").equals("\t")){
+                count =  count+4;
+                continue;
+            }
+
+
             boolean isChinese = isFrameContainChinese(itemChar + "");
             if (isChinese) {
                 count++;
@@ -1630,6 +2205,15 @@ static String Default_Selected_Rule_Index_Key = "Default_Selected_Rule_Index_Key
 
         }
     }
+
+    public static String getEmptyString(int length) {
+        String str = "";
+        for (int i = 0; i < length; i++) {
+            str += " ";
+        }
+        return str;
+    }
+
 
     public static String getPaddingEmptyString(int length) {
         String str = "";
@@ -2039,6 +2623,7 @@ static String Default_Selected_Rule_Index_Key = "Default_Selected_Rule_Index_Key
         // 让各个规则自己去检测 自己需要的参数是否得到满足 并自己提示  给出 1.当前cmd路径下的文件  2.typeIndex 字符串   3.之后的输入参数
         if (CUR_Selected_Rule == null  ||  !CUR_Selected_Rule.checkParamsOK(CUR_Dir_FILE,CUR_TYPE_2_ParamsStr,CUR_INPUT_3_ParamStrList)) {
             CUR_Selected_Rule.showWrongMessage();   // 提示当前规则的错误信息
+            System.out.println("当前输入参数可能 不能拼接成一个文件! 请检查输入参数!");
             return;
         }
 
@@ -2061,6 +2646,7 @@ static String Default_Selected_Rule_Index_Key = "Default_Selected_Rule_Index_Key
         CUR_Selected_Rule.operationRule(CUR_INPUT_3_ParamStrList);  // 传递参数列表 进行处理
 I9_Properties.getProperty(Default_Selected_Rule_Index_Key,""+CUR_TYPE_INDEX);
         setProperity();
+
     }
 
     public static int getImageHigh(File picture) {
@@ -2712,6 +3298,3598 @@ I9_Properties.getProperty(Default_Selected_Rule_Index_Key,""+CUR_TYPE_INDEX);
     }
 
     // Rule_5 对齐 End
+
+
+
+
+    // Rule_6  Begin     竖排列  转为 横竖排列    1xn   转为    4x(n/4)
+    public static String Rule6_SRC_FILE_NAME = "";
+    // 实现对  竖屏的字符  添加为 横屏排列的字符
+    public static int Rule6_rowItemMaxLength = 0;   // 最大item的长度
+    public static int Rule6_itemSpace = 5;
+
+    public static final ArrayList<String> Rule6_SrcStringArr = new ArrayList<>();  // 源数据的每行数据
+
+    public static final ArrayList<String> Rule6_DstStringArr = new ArrayList<>();  // 目的数据的每行数据
+
+
+
+
+    public static  ArrayList<String>  ShuZhuangHang_PaiLie_Rule_6(File srcFIle) {
+
+//        String mFilePath = System.getProperties().getProperty("user.dir") + File.separator + "1.txt";
+
+        Rule6_SRC_FILE_NAME = srcFIle.getAbsolutePath();
+        getSrcLineArray();
+        getMaxItemLength();
+        getDstLineArray();
+        return    getNewStringArr_Rule6();
+    }
+
+    public static void getMaxItemLength() {
+
+        for (String item : Rule6_SrcStringArr) {
+
+//            if (item.length() > Rule6_rowItemMaxLength) {
+//                Rule6_rowItemMaxLength = item.length();
+//                continue;
+//            }
+
+
+            if (getFrameChineseCount(item) > Rule6_rowItemMaxLength) {
+                Rule6_rowItemMaxLength = getFramePaddingChineseLength(item);
+                continue;
+            }
+
+            System.out.println("最大项item的长度:  Rule6_rowItemMaxLength =" + Rule6_rowItemMaxLength);
+        }
+
+    }
+
+    public static  ArrayList<String> getNewStringArr_Rule6() {
+        ArrayList<String> newContent = new    ArrayList<String>();
+        for (String item : Rule6_DstStringArr) {
+            if (!item.isEmpty()) {
+                newContent.add(item);
+            }
+        }
+
+        return newContent;
+    }
+
+
+    public static void getSrcLineArray() {
+        try {
+
+            BufferedReader txtBR = new BufferedReader(new InputStreamReader(new FileInputStream(new File(Rule6_SRC_FILE_NAME)), "utf-8"));
+            String lineContentFirst = "";   // 读取到的输入文件 1.txt 的每一行字符串
+
+
+            // 一次性读出所有的字符串String   然后再重新编排？
+            while (lineContentFirst != null) {
+                lineContentFirst = txtBR.readLine(); // 从1.txt中读取一行字符串出来
+                if (lineContentFirst == null) { // 如果读取到的字符串为null 说明读取到了末尾了
+                    System.out.println("文件读取完全");
+                    break;
+                }
+                if (lineContentFirst != null && !lineContentFirst.isEmpty())
+                    Rule6_SrcStringArr.add(lineContentFirst.trim());
+                //  System.out.println("lineContentFirst = " + lineContentFirst);
+            }
+
+            txtBR.close();
+        } catch (Exception e) {
+            System.out.println(e.fillInStackTrace());
+        }
+    }
+
+    public static void getDstLineArray() {
+
+        String dstLineString = "";
+        for (int i = 0; i < Rule6_SrcStringArr.size(); i++) {
+            String item = Rule6_SrcStringArr.get(i).trim();
+            String fixItem = fixItemString(item);
+            dstLineString = dstLineString + fixItem;
+            if ((i+1) % Rule6_num_row == 0) {
+                System.out.println("Rule6_num_row = "+ Rule6_num_row);
+                if (!dstLineString.trim().isEmpty()) {
+                    Rule6_DstStringArr.add(dstLineString.trim());
+                    System.out.println("dstLineString = " + dstLineString);
+                }
+                dstLineString = "";
+            }
+        }
+        Rule6_DstStringArr.add(dstLineString.trim());  // 添加剩下的那些 item
+
+
+    }
+
+
+    public static String fixItemString(String item) {
+        if (item == null) {
+            System.out.println("当前行为空1！");
+            return "";
+
+        }
+        if (item != null && item.isEmpty()) {
+
+            System.out.println("当前行为空2！");
+            return "";
+        }
+//        int fixSpace = Rule6_rowItemMaxLength - item.length();
+        int fixSpace = Rule6_rowItemMaxLength - getFramePaddingChineseLength(item );
+        String spaceString = "";
+        for (int j = 0; j < fixSpace + Rule6_itemSpace; j++) {
+
+            spaceString = spaceString + " ";
+        }
+        item = item + spaceString;
+        System.out.println("item = "+ item);
+        return item;
+
+    }
+    // Rule_6  End    竖排列  转为 横竖排列    1xn   转为    4x(n/4)
+
+
+
+    ArrayList<String>  addZhanWeiFlag_Rule_10(ArrayList<String> originStrList,String beginStr , String endStr){
+        ArrayList<String> newContentList = new    ArrayList<String>();
+        for (int i = 0; i < originStrList.size(); i++) {
+            newContentList.add(beginStr+originStrList.get(i).trim()+endStr);
+        }
+
+
+        return newContentList;
+
+    }
+
+
+
+
+
+
+    // Rule_11  Begin  把表格 3x3 转为   MD文件格式 加入 |---| 分割符号
+    public static final ArrayList<String> Rule11_tableItemList = new ArrayList<>();
+    public static int Rule11_rowInLine = 0;
+
+
+    public static String getRule11_rowInLine(File file) {
+
+        String titleString = null;
+        String sumString = "";
+        try {
+            BufferedReader curBR = new BufferedReader(new InputStreamReader(new FileInputStream(file), "utf-8"));
+            titleString = curBR.readLine().trim();
+            System.out.println("FirstLineA = " + titleString );
+
+            while ("\t".equals(titleString) || "".equals(titleString)) {
+                titleString = curBR.readLine().trim();
+                System.out.println("FirstLineA_A = " + titleString );
+            }
+            while (titleString.contains("\t")) {
+                titleString = titleString.replaceAll("\t", " ");
+            }
+            while (titleString.contains("  ")) {
+                titleString = titleString.replaceAll("  ", " ");
+            }
+
+
+            System.out.println("titleStringB = "+ titleString);
+            String[] strArr = titleString.split(" ");
+            Rule11_rowInLine = strArr.length;
+//            Rule11_rowInLine = getFramePaddingChineseLength(strArr);
+
+
+            for (String item : strArr) {
+                sumString = sumString + " | " + item;
+            }
+            sumString = sumString + " |";
+            Rule11_tableItemList.add(sumString);
+
+            String twoLine = "";
+            for (int i = 0; i < Rule11_rowInLine; i++) {
+
+                twoLine = twoLine + "| ---- ";
+            }
+            twoLine = twoLine + "| ";
+            Rule11_tableItemList.add(twoLine);
+
+
+            curBR.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+
+
+        }
+        return sumString;
+    }
+
+    public static  ArrayList<String> getMDtable_ForCommonText_Rule_11(File srcFile) {
+
+        ArrayList<String>  newContentList = new    ArrayList<String>();
+
+
+        String headLine  =  getRule11_rowInLine(srcFile);
+        System.out.println("Rule11_rowInLine = "+ Rule11_rowInLine);
+        if (srcFile != null) {
+            try {
+                BufferedReader curBR = new BufferedReader(new InputStreamReader(new FileInputStream(srcFile), "utf-8"));
+                String oldOneLine = "";
+
+                while ((oldOneLine = curBR.readLine()) != null && !oldOneLine.isEmpty()) {
+                    break;   // 跳过首行 当做标题的那行
+                }
+
+                oldOneLine = "";
+                int countLine = 1;
+                while (oldOneLine != null) {
+                    oldOneLine = curBR.readLine();
+                    if (oldOneLine == null || "\t".equals(oldOneLine.trim()) || oldOneLine.trim().isEmpty()) {
+                        System.out.println("oldOneLine = "+ oldOneLine + "   跳过!");
+                        continue;
+                    }
+                    String tableItem = new String(oldOneLine);
+
+
+                    while (tableItem.contains("\t")) {
+                        tableItem = tableItem.replaceAll("\t", " ");
+                    }
+
+                    while (tableItem.contains("  ")) {
+                        tableItem = tableItem.replaceAll("  ", " ");
+                    }
+                    String[] strArr = tableItem.split(" ");
+                    int length = 0;   //
+                    if (strArr.length >= Rule11_rowInLine) {
+                        length = Rule11_rowInLine;
+                    } else {
+                        length = strArr.length;
+//                        length = getFramePaddingChineseLength(strArr);
+                    }
+                    String sumString = "";
+                    for (int i = 0; i < length; i++) {
+                        sumString = sumString + " | " + strArr[i];
+                    }
+                    sumString = sumString + " |";
+                    if (length < Rule11_rowInLine) {
+                        int blankCount = Rule11_rowInLine - length;
+                        for (int j = 0; j < blankCount; j++) {
+                            sumString = sumString + "  | ";
+                        }
+                    }
+                    System.out.println("sumString["+countLine+"] = "+ sumString);
+                    countLine++;
+if(!Rule11_tableItemList.contains(sumString)){
+    System.out.println("加入 headLine = "+ headLine + "  sumString = "+sumString);
+    Rule11_tableItemList.add(sumString);
+}else{
+    System.out.println("头部相同 不加入! headLine = "+ headLine + "  sumString = "+sumString);
+}
+
+                }
+                curBR.close();
+
+
+//                BufferedWriter curBW = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(mFilePath)), "utf-8"));
+
+                for (int i = 0; i < Rule11_tableItemList.size(); i++) {
+//                    curBW.write(Rule11_tableItemList.get(i).trim());
+                    newContentList.add(Rule11_tableItemList.get(i).trim());
+//                    curBW.newLine();
+                }
+//                curBW.close();
+                System.out.println("OK !");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
+            System.out.println("Failed !");
+        }
+        return newContentList;
+    }
+
+    // Rule_11  End  把表格 2x2 3x3 4x4  ... 转为   MD文件格式 加入 |---| 分割符号
+
+
+
+
+
+
+    // Rule_12 Begin  把 剪切板的字符串 逐行 复制 到当前 文本的 逐行 后边   A6
+    static ArrayList<String> Rule12_curFileStringList = new ArrayList<String>();
+    static ArrayList<String> Rule12_clipStringList = new ArrayList<String>();
+    static int Rule12_SPACE = 12;
+    static int Rule12_MAX_LENGTH_CLIP = 0;   // 剪切板的行数
+    static int maxLength_old_line = 0 ;
+
+
+    public static ArrayList<String> BoardCopyStrToLeft_Rule_12(File srcFile) {
+
+
+        ArrayList<String> newContentList  =new       ArrayList<String>();
+
+
+        String clipStr = Rule12_getSysClipboardText().trim();
+        System.out.println("clipStr = " + clipStr);
+        if (clipStr.trim().equals("")) {
+            System.out.println("clip String is empty or null!");
+            newContentList.add("剪切板的内容为空!  请重新复制到剪切板!");
+            return newContentList ;
+        }
+
+        String[] arrLine = clipStr.split("\n");
+        int arrLength = arrLine.length;
+        int currentMaxLength = 0;
+        if (arrLine != null) {
+            currentMaxLength = Rule12_getMaxLengthInArr(arrLine);
+            Rule12_MAX_LENGTH_CLIP = currentMaxLength;
+        }
+
+        for (int i = 0; i < arrLength; i++) {
+            System.out.println("index = 【" + i + " 】   item=" + arrLine[i]);
+            Rule12_clipStringList.add(arrLine[i]);
+        }
+        //   String source = new String(clipStr.replaceAll("\r|\n", ""));
+
+        //
+
+        Rule12_tryReadContentFromFile(srcFile);   //  读取旧的文件内容
+        maxLength_old_line = Rule12_getMaxLengthInArr(Rule12_curFileStringList);
+
+        return   Rule12_tryWriteNewContentToFile(Rule12_clipStringList,Rule12_curFileStringList,srcFile);
+        //  对当前文件重新进行处理
+
+    }
+
+
+    static void Rule12_tryReadContentFromFile(File file) {
+
+        if (file != null && file.exists()) {
+
+            try {
+                BufferedReader curBR = new BufferedReader(new InputStreamReader(new FileInputStream(file), "utf-8"));
+                String lineStr = "";
+
+
+                while (lineStr != null) {
+                    lineStr = curBR.readLine();
+                    if (lineStr == null || lineStr.trim().isEmpty()) {
+                        continue;
+                    }
+                    lineStr = lineStr.replace("\t","    ");
+                    Rule12_curFileStringList.add(lineStr);
+                }
+                curBR.close();
+
+
+                System.out.println("read json File OK !");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
+            System.out.println("Failed !");
+        }
+    }
+
+
+    static String getRule12_SPACE(int num) {
+        String str = "";
+        for (int i = 0; i < num; i++) {
+            str = str + " ";
+        }
+
+
+        return str;
+    }
+
+
+    static  ArrayList<String> Rule12_tryWriteNewContentToFile(ArrayList<String> clipList, ArrayList<String> oldList, File file) {
+
+        ArrayList<String> newStrList  =new ArrayList<String>();
+        if (file != null && file.exists()) {
+
+
+// String curItem = "#  "+new String(netAddr);
+//                BufferedWriter curBW = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "utf-8"));
+            // curBW.write(curItem);
+
+            int clipListSize = clipList.size();
+            int oldListListSize = oldList.size();
+            int maxRow = 0;
+            if (clipListSize > oldListListSize) {
+                maxRow = clipListSize;
+
+
+            } else {
+                maxRow = oldListListSize;
+            }
+
+            for (int i = 0; i < maxRow; i++) {
+                String clipItem =null;
+                if(i >= clipList.size()){
+                    clipItem = getEmptyString(maxLength_old_line);
+                }else{
+                    clipItem = clipList.get(i).trim();
+                }
+
+                String oldItem =null;
+                if(i >= oldList.size()){
+                    oldItem = getEmptyString(maxLength_old_line);
+                }else{
+                    oldItem = oldList.get(i);
+                }
+
+                int currentNeedRule12_SPACE = maxLength_old_line - (oldItem != null ?getFramePaddingChineseLength(oldItem) : 0) + Rule12_SPACE;
+
+//                int currentNeedRule12_SPACE = Rule12_MAX_LENGTH_CLIP - (clipItem != null ? clipItem.length() : 0) + Rule12_SPACE;
+                String newItem =  oldItem+ getRule12_SPACE(currentNeedRule12_SPACE)+(clipItem != null ? clipItem.trim() : "") ;
+                System.out.println("xxxx");
+                System.out.println("原有的 oldItem.length = " + (oldItem != null ?getFramePaddingChineseLength(oldItem) : 0));
+                System.out.println("maxLength_old_line = "+ maxLength_old_line + " currentNeedRule12_SPACE = "+currentNeedRule12_SPACE );
+                System.out.println( " oldItem = "+ oldItem);
+                System.out.println( " newItem = "+ newItem);
+                System.out.println("xxxx");
+//                    curBW.write(newItem);
+//                    curBW.newLine();
+                newStrList.add(newItem);
+            }
+//                curBW.close();
+            System.out.println("write file OK !");
+
+        } else {
+            System.out.println("Failed !");
+            newStrList.add("操作执行失败!  请重新执行!");
+        }
+        return newStrList;
+    }
+
+
+    static int Rule12_getMaxLengthInArr(ArrayList<String> arr) {
+        int maxLength = 0;
+        if (arr != null) {
+            int arrlength = arr.size();
+
+            for (int i = 0; i < arrlength; i++) {
+                String item = arr.get(i);
+                // getFramePaddingChineseLength()
+                int curssidLength = getFramePaddingChineseLength(item);
+//                int curssidLength = item.length();
+                if (curssidLength > maxLength) {
+                    maxLength = curssidLength;
+                }
+            }
+
+        }
+        return maxLength;
+    }
+
+
+
+
+    static int Rule12_getMaxLengthInArr(String[] arr) {
+        int maxLength = 0;
+        if (arr != null) {
+            int arrlength = arr.length;
+
+            for (int i = 0; i < arrlength; i++) {
+                String item = arr[i];
+                // getFramePaddingChineseLength()
+                int curssidLength = getFramePaddingChineseLength(item);
+//                int curssidLength = item.length();
+                if (curssidLength > maxLength) {
+                    maxLength = curssidLength;
+                }
+            }
+
+        }
+        return maxLength;
+    }
+
+
+    public static String Rule12_getSysClipboardText() {
+        String ret = "";
+        Clipboard sysClip = Toolkit.getDefaultToolkit().getSystemClipboard();
+        // 获取剪切板中的内容
+        Transferable clipTf = sysClip.getContents(null);
+
+        if (clipTf != null) {
+            // 检查内容是否是文本类型
+            if (clipTf.isDataFlavorSupported(DataFlavor.stringFlavor)) {
+                try {
+                    ret = (String) clipTf
+                            .getTransferData(DataFlavor.stringFlavor);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        return ret;
+    }
+
+    // Rule_12 End  把 剪切板的字符串 逐行 复制 到当前 文本的 逐行 后边   A6
+
+
+
+
+
+
+
+    // Rule_13   Begin 去除掉当前文件中的中文 每一个中文 以一个空格代替 A7
+
+    private static String Rule13_REGEX_CHINESE = "[\u4e00-\u9fa5]";
+
+    public static ArrayList<String> clearChinese_Rule_13(File srcFile) {
+        ArrayList<String> newContent = new    ArrayList<String>();
+
+        File curFile = srcFile;
+
+        if (curFile != null) {
+
+            FileReader curReader;
+            try {
+
+                curReader = new FileReader(curFile);
+
+
+                BufferedReader curBR = new BufferedReader(new InputStreamReader(new FileInputStream(curFile), "utf-8"));
+                String oldOneLine = "";
+                String newOneLine = "";
+
+
+                while (oldOneLine != null) {
+
+                    oldOneLine = curBR.readLine();
+                    if (oldOneLine == null || oldOneLine.trim().isEmpty()) {
+                        continue;
+                    }
+
+                    newOneLine = new String(oldOneLine);
+                    if (Rule13_isContainChinese(newOneLine)) {
+                        newOneLine = Rule13_clearChinese(newOneLine);
+
+                    }
+                    newContent.add(newOneLine.trim());
+                }
+                curBR.close();
+
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
+            System.out.println("Failed !");
+        }
+        return newContent;
+    }
+
+    public static boolean Rule13_isContainChinese(String str) {
+        Pattern p = Pattern.compile(Rule13_REGEX_CHINESE);
+        Matcher m = p.matcher(str);
+        if (m.find()) {
+            return true;
+        }
+        return false;
+    }
+
+    public static String Rule13_clearChinese(String lineContent) {
+        if (lineContent == null || lineContent.trim().isEmpty()) {
+            return null;
+        }
+        Pattern pat = Pattern.compile(Rule13_REGEX_CHINESE);
+        Matcher mat = pat.matcher(lineContent);
+        return mat.replaceAll(" ");
+    }
+
+    // Rule_13   Begin 去除掉当前文件中的中文 每一个中文 以一个空格代替 A7
+
+
+
+    // Rule_14   Begin 汉字转换为拼音   周 zhou   中国 zhong_guo  (A9)
+    public static ArrayList<String> Chinese_To_PinYin_Rule_14(File srcFile) {
+
+        //System.out.println(Rule14_ToFirstChar("ABC  汉字转换为拼音CBA").toUpperCase()); //转为首字母大写
+        // System.out.println(Rule14_ToPinyinWithLine("A周 B杰 C伦"));
+        // System.out.println(Rule14_ToPinyinWithLine("ABC汉字转换为拼音CBA"));
+        ArrayList<String> StringArr = new ArrayList<>();
+
+
+        File curFile=   srcFile;
+
+
+        if (curFile != null) {
+            try {
+                BufferedReader curBR = new BufferedReader(new InputStreamReader(new FileInputStream(curFile), "utf-8"));
+                String oldOneLine = "";
+                String newOneLine = "";
+
+                while (oldOneLine != null) {
+
+                    oldOneLine = curBR.readLine();
+                    if (oldOneLine == null || oldOneLine.trim().isEmpty()) {
+                        continue;
+                    }
+
+                    newOneLine = new String(oldOneLine);
+                    newOneLine = Rule14_ToPinyinWithLine(newOneLine);
+                    if (newOneLine != null && !newOneLine.trim().isEmpty()) {
+                        StringArr.add(newOneLine);
+                    }
+
+                }
+                curBR.close();
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
+            System.out.println("Failed !");
+        }
+        return StringArr;
+    }
+
+    /**
+     * 获取字符串拼音的第一个字母
+     *
+     * @param chinese
+     * @return
+     */
+    public static String Rule14_ToFirstChar(String chinese) {
+        String pinyinStr = "";
+        char[] newChar = chinese.toCharArray();  //转为单个字符
+        HanyuPinyinOutputFormat defaultFormat = new HanyuPinyinOutputFormat();
+        defaultFormat.setCaseType(HanyuPinyinCaseType.LOWERCASE);
+        defaultFormat.setToneType(HanyuPinyinToneType.WITHOUT_TONE);
+        for (int i = 0; i < newChar.length; i++) {
+            if (newChar[i] > 128) {
+                try {
+                    pinyinStr += PinyinHelper.toHanyuPinyinStringArray(newChar[i], defaultFormat)[0].charAt(0);  // charAt(0)
+                } catch (BadHanyuPinyinOutputFormatCombination e) {
+                    e.printStackTrace();
+                }
+            } else {
+                pinyinStr += newChar[i];
+            }
+        }
+        return pinyinStr;
+    }
+
+    /**
+     * 汉字转为拼音
+     *
+     * @param chinese
+     * @return
+     */
+    public static String Rule14_ToPinyin(String chinese) {
+        if (chinese == null || chinese.trim().isEmpty()) {
+            return null;
+        }
+        String curItem = new String(chinese);
+        while (curItem.contains(" ")) {
+            curItem = curItem.replaceAll(" ", "");
+        }
+        String pinyinStr = "";
+        char[] newChar = curItem.toCharArray();
+        HanyuPinyinOutputFormat defaultFormat = new HanyuPinyinOutputFormat();
+        defaultFormat.setCaseType(HanyuPinyinCaseType.LOWERCASE);
+        defaultFormat.setToneType(HanyuPinyinToneType.WITHOUT_TONE);
+        for (int i = 0; i < newChar.length; i++) {
+            if (newChar[i] > 128) {
+                try {
+                    pinyinStr += PinyinHelper.toHanyuPinyinStringArray(newChar[i], defaultFormat)[0]; // [0] 标识当前拼音 汉-> han
+                } catch (BadHanyuPinyinOutputFormatCombination e) {
+                    e.printStackTrace();
+                }
+            } else {  // 汉字的编码是大于 128的 所以 小于 128编码的就直接认为是 ascii编码的
+                pinyinStr += newChar[i];
+            }
+        }
+        return pinyinStr;
+    }
+
+
+    /**
+     * 汉字转为拼音 空间以下划线_分割
+     * 1.每个汉字前面添加_
+     * 2.每个汉字后面添加_
+     * 3.把所有的两个__ 下划线转为 一个下划线
+     *
+     * @param chinese
+     * @return
+     */
+    public static String Rule14_ToPinyinWithLine(String chinese) {
+        if (chinese == null || chinese.trim().isEmpty()) {
+            return null;
+        }
+        String curItem = new String(chinese);
+        while (curItem.contains(" ")) {
+            curItem = curItem.replaceAll(" ", "");
+        }
+        String pinyinStr = "";
+        char[] newChar = curItem.toCharArray();
+        HanyuPinyinOutputFormat defaultFormat = new HanyuPinyinOutputFormat();
+        defaultFormat.setCaseType(HanyuPinyinCaseType.LOWERCASE);
+        defaultFormat.setToneType(HanyuPinyinToneType.WITHOUT_TONE);
+        for (int i = 0; i < newChar.length; i++) {
+            if (newChar[i] > 128) {
+                    try {
+                        // 《》，：“￥。，？。，；【 】。、
+
+                    System.out.println("xxxxxxxxxx");
+                    System.out.println("newChar["+i+"] = "+ newChar[i]);
+                    String charStr = newChar[i]+"";
+                    if(charStr.equals("《")  ){
+                        pinyinStr += "<";
+                        continue;
+                    }else  if(charStr.equals("》")  ){
+                        pinyinStr += ">";
+                        continue;
+                    }else  if(charStr.equals("，")  ){
+                        pinyinStr += ",";
+                        continue;
+                    }else  if(charStr.equals("：")  ){
+                        pinyinStr += ":";
+                        continue;
+                    }else  if(charStr.equals("“")  ){
+                        pinyinStr += "\"";
+                        continue;
+                    }else  if(charStr.equals("￥")  ){
+                        pinyinStr += "$";
+                        continue;
+                    }else  if(charStr.equals("？")  ){
+                        pinyinStr += "?";
+                        continue;
+                    }else  if(charStr.equals("；")  ){
+                        pinyinStr += ";";
+                        continue;
+                    }else  if(charStr.equals("【")  ){
+                        pinyinStr += "[";
+                        continue;
+                    }else  if(charStr.equals("】")  ){
+                        pinyinStr += "]";
+                        continue;
+                    }else  if(charStr.equals("、")  ){
+                        pinyinStr += ",";
+                        continue;
+                    }
+
+
+
+
+                    String[] arrChar =   PinyinHelper.toHanyuPinyinStringArray(newChar[i], defaultFormat);
+                    if(arrChar == null){
+                        System.out.println("pinyinStr = "+ null);
+                        continue;
+                    }
+                    pinyinStr += "_" + arrChar[0] + "_"; // [0] 标识当前拼音 汉-> han
+                    System.out.println("pinyinStr = "+ pinyinStr);
+                    System.out.println("xxxxxxxxxx ");
+                } catch (BadHanyuPinyinOutputFormatCombination e) {
+                    e.printStackTrace();
+                }
+            } else {  // 汉字的编码是大于 128的 所以 小于 128编码的就直接认为是 ascii编码的
+                pinyinStr += newChar[i];
+            }
+        }
+        while (pinyinStr.contains("__")) {
+            pinyinStr = pinyinStr.replaceAll("__", "_");
+            System.out.println("pinyinStr1 = " + pinyinStr);
+        }
+
+        while (pinyinStr.contains("u:")) {  // 女转为 nu:   绿 lu:   需要转为 nv  lv
+            pinyinStr = pinyinStr.replaceAll("u:", "v");
+            System.out.println("pinyinStr1 = " + pinyinStr);
+        }
+
+        while (pinyinStr.startsWith("_")) {
+            pinyinStr = pinyinStr.substring(1, pinyinStr.length());
+            System.out.println("pinyinStr2 = " + pinyinStr);
+        }
+        while (pinyinStr.endsWith("_")) {
+            pinyinStr = pinyinStr.substring(0, pinyinStr.length() - 1);
+            System.out.println("pinyinStr3 = " + pinyinStr);
+        }
+        return pinyinStr;
+    }
+    // Rule_14   End 汉字转换为拼音   周 zhou   中国 zhong_guo  (A9)
+
+    // Rule_15   Begin  读取文件的第一行转为 二维码显示出来 B1
+    public static void TextAs_QrCode_Rule_15(File srcFile) {
+        File curFile = srcFile;
+        if (curFile != null) {
+            try {
+                BufferedReader curBR = new BufferedReader(new InputStreamReader(new FileInputStream(curFile), "utf-8"));
+                String qrCodeString = "";
+
+                while (qrCodeString != null && qrCodeString.trim().isEmpty()) {
+                    qrCodeString = curBR.readLine();
+                }
+                System.out.println("把扫描到的第一行非空字符串转为二维码  qrCodeString = " + qrCodeString);
+
+                curBR.close();
+                QrConfig config = new QrConfig();
+
+                File targetFile = QrCodeUtil.generate
+                        (qrCodeString, config, new File(I9_OUT_DIR.getAbsolutePath() + File.separator + getFileNameNoPoint(srcFile.getName())+"_"+getTimeStampLong()+".jpg"));
+
+                RuntimeUtil.exec("rundll32.exe C:\\\\Windows\\\\System32\\\\shimgvw.dll,ImageView_Fullscreen  " + targetFile.getAbsolutePath());
+
+            } catch (Exception e) {
+                System.out.println("Exception !");
+            }
+        } else {
+            System.out.println("Failed !");
+        }
+    }
+    // Rule_15   End  读取文件的第一行转为 二维码显示出来 B1
+
+
+
+
+
+// Rule_16   Begin Windows 读物当前文件内容 并 播放 vbs 声音
+    public static void ReadStrFromFile_Rule_16(File srcFile) {
+        File curFile= srcFile;
+        String ReadCotent = ReadFileContent(srcFile);
+
+        String fixedStr = ReadCotent.replaceAll("\r|\n", "");
+        fixedStr = fixedStr.replaceAll(" ","");
+        System.out.println("读取内容 fixedStr = " + fixedStr);
+        String source = new String(fixedStr);
+
+        //  创建vbs  并执行它  CreateObject("SAPI.SpVoice").Speak "你好，2019"
+
+        String mVbsFilePath = I9_OUT_DIR_PATH + File.separator + getTimeStampLong()+"_voice.vbs";
+        String commadStr = "CreateObject(\"SAPI.SpVoice\").Speak \"" + source + "\"";
+
+        File file = new File(mVbsFilePath);
+        if (!file.exists()) {
+            try {
+                file.createNewFile();
+                BufferedWriter curBW = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "utf-8"));
+                curBW.write(commadStr);
+                curBW.close();
+            } catch (Exception e) {
+
+            }
+        } else {
+            try {
+                BufferedWriter curBW = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "utf-8"));
+                curBW.write(commadStr);
+                curBW.close();
+            } catch (Exception e) {
+            }
+
+            RuntimeUtil.exec("Wscript.exe  /x " + file);
+        }
+    }
+    // Rule_16   End Windows 读物当前文件内容 并 播放 vbs 声音
+
+
+
+
+    // Rule_17  Begin  对 Json 格式的文件 或者 以json格式保存的文件 生成bean文件 以及 Graphviz 绘图显示结构
+
+
+    // ProperityItem(String ownnerClassName, String properityName, String TypeName, String refClassName)
+
+    static ArrayList<String> Rule17_dotStringArr = new ArrayList<String>();
+    static ArrayList<HashMap<String, ArrayList<ProperityItem>>> Rule17_arrMapList = new ArrayList<HashMap<String, ArrayList<ProperityItem>>>();
+    // 对 ArrayList 进行 排序
+
+    static String Rule17_Rule17_outFilepath ="";
+    static File Rule17_outFile = null;
+    static String Rule17_dot_targetFilePath = "";
+    static String Rule17_dirPath = "";  // zbin 路径
+
+
+
+    static void Rule17_tryWriteJsonToFile( ArrayList<String> Rule17_dotStringArr , File file , String netAddr){
+
+        if (file != null && file.exists()) {
+
+            try {
+// String curItem = "#  "+new String(netAddr);
+                BufferedWriter curBW = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "utf-8"));
+                // curBW.write(curItem);
+                for (int i = 0; i < Rule17_dotStringArr.size(); i++) {
+                    curBW.write(Rule17_dotStringArr.get(i));
+                    curBW.newLine();
+                }
+                curBW.close();
+                System.out.println("OK !");
+                System.out.println("write json File OK !");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
+            System.out.println("Failed !");
+        }
+    }
+
+
+    public static String Rule17_decode(String url)
+    {
+        try {
+            String prevURL="";
+            String decodeURL=url;
+            while(!prevURL.equals(decodeURL))
+            {
+                prevURL=decodeURL;
+                decodeURL= URLDecoder.decode( decodeURL, "UTF-8" );
+            }
+            return decodeURL;
+        } catch (UnsupportedEncodingException e) {
+            return "Issue while decoding" +e.getMessage();
+        }
+    }
+    public static String Rule17_encode(String url)
+    {
+        try {
+            String encodeURL= URLEncoder.encode( url, "UTF-8" );
+            return encodeURL;
+        } catch (UnsupportedEncodingException e) {
+            return "Issue while encoding" +e.getMessage();
+        }
+    }
+
+    static void tryReadJsonFromFile(StringBuilder sb, File file){
+
+        if (file != null && file.exists()) {
+
+            try {
+                BufferedReader curBR = new BufferedReader(new InputStreamReader(new FileInputStream(file), "utf-8"));
+                String lineStr = "";
+
+
+                while (lineStr != null) {
+                    lineStr = curBR.readLine();
+                    if (lineStr == null || lineStr.trim().isEmpty()) {
+                        continue;
+                    }
+
+                    sb.append(lineStr.trim());
+                }
+                curBR.close();
+
+
+                System.out.println("read json File OK !");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
+            System.out.println("Failed !");
+        }
+    }
+
+
+    public static void Make_Json_As_JavaFile_Rule_17(File srcFile) {
+
+        try {
+            Rule17_dirPath = I9_OUT_DIR_PATH;
+
+            Rule17_Rule17_outFilepath =Rule17_dirPath + File.separator + getTimeStampLong()+".gv";
+
+            StringBuilder sb  = new StringBuilder();
+            System.out.println("curFile = "+ srcFile.getAbsolutePath());
+            tryReadJsonFromFile( sb ,  srcFile);
+
+            String firstArrChar = sb.toString().substring(0,1);
+            while( firstArrChar != null && !(firstArrChar.equals("{") || firstArrChar.equals("[" ))){
+
+                sb = new StringBuilder(sb.toString().trim().substring(1));
+                System.out.println("注意: 不是以{ 或者 [ 开头  firstArrChar="+ firstArrChar);
+                firstArrChar = sb.toString().substring(0,1);
+            }
+
+            boolean isArrJson = sb.toString().startsWith("[");
+            if(isArrJson){
+                sb = new StringBuilder("{ arr:"+sb.toString()+"}");
+                System.out.println("读取到的字符是[开头的!  firstArrChar="+ firstArrChar);
+            }else{
+                System.out.println("读取到的字符不是[开头的!  firstArrChar="+ firstArrChar);
+                // 读取到的字符不是[开头的!  firstArrChar=?
+            }
+
+
+            if(sb.toString().trim().equals("")){
+                System.out.println("读取到的Json 文件为空  退出!!");
+                return ;
+            }
+
+            String firstChar = sb.toString().substring(0,1);
+            while( firstChar != null && !firstChar.equals("{")){
+                sb = new StringBuilder(sb.toString().trim().substring(1));
+                System.out.println("注意: 不是以{ 开头  firstChar="+ firstChar);
+                firstChar = sb.toString().substring(0,1);
+
+            }
+            if(!JSONUtil.isJson(sb.toString().trim())){
+                System.out.println("读取到的文件不是标准的Json 格式 退出!  当前读取到的数据为:\n"+ sb.toString() );
+                System.out.println("读取到的文件不是标准的Json 格式 退出!  firstChar 第一个字符为:\n"+ sb.toString().substring(0,1) );
+                System.out.println("读取到的文件不是标准的Json 格式 退出!  第二个字符为:\n"+ sb.toString().substring(1,2) );
+                return ;
+            }
+
+            Rule17_outFile = new File(Rule17_Rule17_outFilepath);
+            Rule17_dot_targetFilePath = Rule17_outFile.getParentFile().getAbsolutePath()+File.separator+getFileNameNoPoint(Rule17_outFile.getName());
+            if(!Rule17_outFile.exists()){
+                Rule17_outFile.createNewFile();
+            }
+
+
+//            System.out.println(JsonFormat.format(s));
+//            new Json2Bean(s, "RootBean", new MyNameGenerator(), new MyJsonParser(), new MyBeanGenerator("com.test5")).execute();
+//
+//
+//            s = "{\"multyList\":[[[{\"name\":\"xm1\",\"age\":19}]]]}";
+
+
+            //   System.out.println(toujiaoJson);
+
+            I9_TextRuleOperation I9_Object = new I9_TextRuleOperation();
+            String result =    new Json2Bean(sb.toString(), "RootBean", null,new MyNameGenerator(), new MyJsonParser(), new MyBeanGenerator("com.zukgit")).execute();
+//            String result = new Json2Bean(sb.toString(), "RootBean", null, new MyNameGenerator(), new MyJsonParser(), new MyBeanGenerator("com.zukgit")).execute();
+
+
+            System.out.println("------------------------------");
+            System.out.println("result = " + result);
+//
+//            List<List<List<String>>> list = new ArrayList<>();
+//
+//            List<List<String>> li1 = new ArrayList<List<String>>();
+//            li1.add(Arrays.asList("d", "e", "f"));
+//            li1.add(Arrays.asList("d1", "e1", "f1"));
+//
+//            List<List<String>> li2 = new ArrayList<List<String>>();
+//            li2.add(Arrays.asList("d", "e", "f"));
+//            li2.add(Arrays.asList("d2", "e2", "f2"));
+//
+//            list.add(li1);
+//            list.add(li2);
+//
+//
+//            s = JSON.toJSONString(list);
+//            System.out.println(s);
+//            new Json2Bean(s, "RootBean", new MyNameGenerator(), new MyJsonParser(), new MyBeanGenerator("com.test3")).execute();
+//
+//            System.out.println("------------------------------");
+//
+//            s = "{\"post_message\":\"[:f002}[:f003}[:f003}[:f004}[:f004}\",\"intlist\":[1,2,3],\"str\":\"{}\"}";
+//            System.out.println(JsonFormat.format(s));
+//            new Json2Bean(s, "RootBean", new MyNameGenerator(), new MyJsonParser(), new MyBeanGenerator("com.test4")).execute();
+//
+//            s = "[[[{\"name\":\"xm1\",\"age\":19},{\"name\":\"[xm2\",\"age\":19},{\"name\":\"{xm3\",\"age\":19}],[{\"name\":\"[[xm4\",\"age\":19},{\"name\":\"{{xm5\",\"age\":19}]],[[{\"name\":\"xm6\",\"age\":19},{\"name\":\"xm7\",\"age\":19}],[{\"name\":\"xm8\",\"age\":19}]]]";
+//            System.out.println(JsonFormat.format(s));
+//            new Json2Bean(s, "RootBean", new MyNameGenerator(), new MyJsonParser(), new MyBeanGenerator("com.test5")).execute();
+//
+//
+//            s = "{\"multyList\":[[[{\"name\":\"xm1\",\"age\":19}]]]}";
+//            System.out.println(JsonFormat.format(s));
+//            new Json2Bean(s, "RootBean", new MyNameGenerator(), new MyJsonParser(), new MyBeanGenerator("com.test6")).execute();
+
+            System.out.println(" arrArrList.size()" + Rule17_arrMapList.size());
+            int index = 0;
+//            Rule17_arrMapList.sort(new Comparator<HashMap<String, ArrayList<ProperityItem>>>() {
+//                @Override
+//                public int compare(HashMap<String, ArrayList<ProperityItem>> o1, HashMap<String, ArrayList<ProperityItem>> o2) {
+//                    int lengthO1 = 0;
+//                    int lengthO2 = 0;
+//                    Iterator<Map.Entry<String, ArrayList<ProperityItem>>> itr_o1 = o1.entrySet().iterator();
+//                    while (itr_o1.hasNext()) {
+//                        Map.Entry<String, ArrayList<ProperityItem>> entry_o1 = itr_o1.next();
+//                        String k = entry_o1.getKey();
+//                        ArrayList<ProperityItem> o1Arr =  entry_o1.getValue();
+//                        lengthO1 = o1Arr.size() + lengthO1;
+//                    }
+//
+//                    Iterator<Map.Entry<String, ArrayList<ProperityItem>>> itr_o2 = o2.entrySet().iterator();
+//                    while (itr_o2.hasNext()) {
+//                        Map.Entry<String, ArrayList<ProperityItem>> entry_o2 = itr_o2.next();
+//                        String k = entry_o2.getKey();
+//                        ArrayList<ProperityItem> o2Arr =  entry_o2.getValue();
+//                        lengthO2 = o2Arr.size() + lengthO2;
+//                    }
+//                    if(lengthO1 > lengthO2){
+//                        return 1;
+//                    } else{
+//                        return -1;
+//                    }
+//                }
+//            });
+            // https://dreampuf.github.io/GraphvizOnline/#
+            Rule17_dotStringArr.add("digraph {");
+            Rule17_dotStringArr.add("#   zzfile_3.bat  " + Rule17_OutRealJava_Path  + "      ##  生成的java代码地址");
+            Rule17_dotStringArr.add("#    https://dreampuf.github.io/GraphvizOnline/  #      Giraphz图形地址 ");
+            Rule17_dotStringArr.add("#    http://www.bejson.com/jsonviewernew/    Json 数据 \n");
+            Rule17_dotStringArr.add("#     dot  "+Rule17_Rule17_outFilepath+" -Tpdf -o "+Rule17_dot_targetFilePath+".pdf  生成PDF \n");
+            Rule17_dotStringArr.add("#     dot  "+Rule17_Rule17_outFilepath+" -Tpng -o "+Rule17_dot_targetFilePath+".png    生成PNG   \n");
+            Rule17_dotStringArr.add("graph [rankdir=BT] \n");
+            System.out.println("===============index" + index + "=============== Begin");
+
+            for (Map<String, ArrayList<ProperityItem>> arr : Rule17_arrMapList) {
+
+                //System.out.println("===============index" + index + "=============== Begin");
+
+                Iterator<Map.Entry<String, ArrayList<ProperityItem>>> itr = arr.entrySet().iterator();
+
+                while (itr.hasNext()) {
+                    Map.Entry<String, ArrayList<ProperityItem>> entry = itr.next();
+                    String k = entry.getKey();
+                    ArrayList<ProperityItem> properArr = entry.getValue();
+                    int subindex = 0;
+                    // System.out.println("开始打印 ClassName = 【" + k + "】 ");
+                    for (ProperityItem properityItem : properArr) {
+                        System.out.println("ClassName = 【" + k + "】 index =【" + index + " 】   subIndex=【" + subindex + "】  str=" + properityItem.toString());
+//                        subindex++;
+                        System.out.println(properityItem.makeNodeString());
+                        Rule17_dotStringArr.add(properityItem.makeNodeString());
+
+
+                    }
+                    for (ProperityItem properityItem : properArr) {
+                        //    System.out.println(properityItem.makeNodeRelationString());
+                        Rule17_dotStringArr.add(properityItem.makeNodeRelationString());
+                    }
+
+                }
+                //   System.out.println("===============index" + index + "=============== End");
+                index++;
+
+            }
+            Rule17_dotStringArr.add("} \n");
+            System.out.println("==============Rule17_dotStringArr=============== Begin");
+            StringBuilder urlSB = new StringBuilder();
+            for (String item : Rule17_dotStringArr) {
+                System.out.println(item);
+                urlSB.append(item);
+            }
+            String encodeStr =  Rule17_encode(urlSB.toString());
+            encodeStr=encodeStr.replaceAll("\\+", "%20");
+
+            encodeStr=encodeStr.replaceAll("\\+", "%20");
+            encodeStr=encodeStr.replaceAll("%7B", "%7B%0A%0A%20%20");
+            encodeStr=encodeStr.replaceAll("%3B", "%3B%0A%20%20%20%20");
+
+            String netAddr = "https://dreampuf.github.io/GraphvizOnline/#"+encodeStr;
+            Rule17_tryWriteJsonToFile(Rule17_dotStringArr,Rule17_outFile,netAddr);
+//  浏览器地址最多接受 4096个字符  所以 无法通过编译 .gv 文件来跳转到 对应的 graviz页面
+
+
+            JavaRuntimeInfo javaRuntimeInfo = new JavaRuntimeInfo();
+            System.out.println("=========================runtimeInfo=========================\n"+ javaRuntimeInfo);
+            String libPath = javaRuntimeInfo.getLibraryPath();
+            String dotPath = "";
+            // ;C:\Program Files (x86)\Graphviz2.38\bin\dot.exe;
+
+            System.out.println("libPath = "+libPath);
+            if(libPath.contains("Graphviz")){
+//            if(libPath.contains("Graphviz") && libPath.contains("dot")){
+                String[] libArr =  libPath.split(";");
+                int length = libArr.length;
+
+                for (int i = 0; i < length; i++) {
+//                    if(libArr[i].contains("Graphviz") && libArr[i].contains("dot")){
+                    if(libArr[i].toLowerCase().contains("Graphviz".toLowerCase())){
+                        dotPath = libArr[i];
+                        break;
+                    }
+                }
+            }
+            if(!"".equals(dotPath) && dotPath.endsWith("dot")){
+                if(dotPath.endsWith(File.separator)){
+                    dotPath = dotPath + "dot";
+                }else{
+                    dotPath = dotPath +File.separator +"dot";
+                }
+            }
+
+            System.out.println("zukgit  dotPath.substring  dotPath ="+ dotPath);
+            String dotRule17_dirPath = "";
+            if(dotPath != null && !dotPath.isEmpty()){
+                dotRule17_dirPath = dotPath.substring(0,dotPath.lastIndexOf("\\"));
+                dotPath="\""+dotPath+"\"";
+                dotRule17_dirPath="\""+dotRule17_dirPath+"\"";
+                // dot  ./B6.gv -Tpdf -o B6.pdf
+                System.out.println("dotRule17_dirPath 1  = "+dotRule17_dirPath);
+                File outputPdfFile = new File(Rule17_outFile.getParentFile().getAbsolutePath()+File.separator+ getFileNameNoPoint(Rule17_outFile.getName())+".pdf");
+                String command = " cmd.exe /c cd " +dotRule17_dirPath+  "  &&  dot.exe  "+Rule17_outFile.getAbsolutePath() +" -Tpdf -o  " + Rule17_outFile.getParentFile().getAbsolutePath()+File.separator+ getFileNameNoPoint(Rule17_outFile.getName())+".pdf";
+
+                System.out.println("command = "+command);
+                // RuntimeUtil.exec(command);
+                String procResult = Rule17_execCMD(command); // 生成PDF 文件
+                System.out.println("command = "+command +" procResult="+ procResult);
+
+                // command =  cmd.exe /c    C:\Program Files (x86)\Graphviz2.38\bin  &&   dot.exe C:\work_space\eclipse_workplace\B6\B6.gv -Tpdf -o  C:\work_space\eclipse_workplace\B6\B6.pdf
+// cmd.exe /c cd "C:\Program Files (x86)\Graphviz2.38\bin"  &&  dot.exe  C:\work_space\eclipse_workplace\B6\B6.gv -Tpdf -o  C:\work_space\eclipse_workplace\B6\B6.pdf
+                String command2 = "cmd.exe /C start acrord32  "  +outputPdfFile.getAbsolutePath();
+                Thread.sleep(2000);
+                String procResult2 = Rule17_execCMD(command2); // 打开 acrord32 Adobe 阅读  PDF 文件
+                System.out.println("command2 = "+command2 +" procResult="+ procResult2);
+
+            }
+            String command3 = "cmd.exe /C start notepad++  "  +Rule17_outFile.getAbsolutePath();
+            String procResult3 = Rule17_execCMD(command3); // 使用notepad 打开 gv 文件
+            System.out.println("command3 = "+command3 +" procResult3="+ procResult3);
+
+            String command4 = "";
+            System.out.println("netAddr =   "+netAddr);
+            if(netAddr.length() > 4000){
+                command4 = "cmd.exe /C start chrome   https://dreampuf.github.io/GraphvizOnline/ " ;
+
+            }else{
+
+                command4 = "cmd.exe /C start chrome  "+ netAddr ;
+
+            }
+            //     String command4 = "cmd.exe /C start chrome  "  +netAddr;
+
+
+
+            String command5 = "cmd.exe /C start chrome   http://www.bejson.com/jsonviewernew/ " ;
+
+            String procResult5 = Rule17_execCMD(command5); //  使用 Chrome 打开 JSON在线解析
+
+            String procResult4 = Rule17_execCMD(command4); //  使用 Chrome 打开 Graphiz 在线解析网页
+            System.out.println("command5 = "+command5 +" procResult5="+ procResult5);
+            System.out.println("dotPath = "+ dotPath);
+            if(dotPath != null && !dotPath.isEmpty()){
+// command6   生成 Png 照片
+                // String command6 = "cmd.exe /C start chrome   http://www.bejson.com/jsonviewernew/ ";
+                File pngFile = new File(Rule17_outFile.getParentFile().getAbsolutePath()+File.separator+ getFileNameNoPoint(Rule17_outFile.getName())+".png");
+                //
+                //  String command6 = " cmd.exe /c cd " +dotRule17_dirPath+  "  &&  dot.exe  "+Rule17_outFile.getAbsolutePath() +" -Tpng -o  " + Rule17_outFile.getParentFile().getAbsolutePath()+File.separator+ "B6.png";
+                String command6 = " cmd.exe /c cd " +dotRule17_dirPath+  "  &&  dot.exe  "+Rule17_outFile.getAbsolutePath() +" -Tpng -o  " + pngFile.getAbsolutePath();
+                String procResult6 = Rule17_execCMD(command6);
+                System.out.println("command6 = "+command6 +" procResult6="+ procResult6);
+                // command7   使用照片浏览器打开照片
+                String command7 = "rundll32.exe C:\\\\Windows\\\\System32\\\\shimgvw.dll,ImageView_Fullscreen  " + pngFile.getAbsolutePath();
+                //    RuntimeUtil.exec("rundll32.exe C:\\\\Windows\\\\System32\\\\shimgvw.dll,ImageView_Fullscreen  " + pngFile.getAbsolutePath());
+                String procResult7 = Rule17_execCMD(command7);
+                System.out.println("command7 = "+command7 +" procResult7="+ procResult7);
+            }
+        } catch (Exception e) {
+
+        }
+
+        // System.out.println("Zukgit-----------End");
+
+
+    }
+
+    public static String Rule17_execCMD(String command) {
+        StringBuilder sb =new StringBuilder();
+        try {
+            Process process=Runtime.getRuntime().exec(command);
+            BufferedReader bufferedReader=new BufferedReader(new InputStreamReader(process.getInputStream()));
+            String line;
+            while((line=bufferedReader.readLine())!=null)
+            {
+                sb.append(line+"\n");
+            }
+        } catch (Exception e) {
+            return e.toString();
+        }
+        return sb.toString();
+    }
+
+    static class ProperityItem {
+        String properityName;
+        String TypeName;
+        String ownnerClassName;
+        String refClassName;  //   当 isClassType = true 时  它所指向引用的那个 类名的名字
+
+        String baseTypeInListName;  //   List<Double> 中的 基础类型数据的名称
+        String classTypeInListName;  //    List<Class> 中的 类的 名称
+
+        boolean isBaseType;       //  TypeName 是否基础数据类型 Array<String>  和 String  都是基础数据类型
+        boolean isClassType;        //  是否是 Class 引用数据类型
+        boolean isObjectNullList ;     //  是否是 List<Object> 的 空的数组
+
+        boolean isList;       //  是否是集合   List<>
+        boolean isBaseList;   // 是否是基础的数据类型集合  List<String>   List<Double>
+        int baseListCount;   // 该属性 包含 List的个数  嵌套数
+        boolean isClassList;   // 是否是对象的数据类型集合  List<A>   List<B>
+        int classListCount;   //该属性 包含 List的个数  嵌套数
+
+        @Override
+        public String toString() {
+            return "【 ownnerClassName=" + ownnerClassName + "  properityName=" + properityName + " TypeName=" + TypeName + " refClassName=" + refClassName + "  isBaseType=" + isBaseType + "  isClassType=" + isClassType + "  isList=" + isList + " baseListCount=" + baseListCount + " classListCount=" + classListCount + "  isObjectNullList "+ isObjectNullList+"】";
+        }
+
+        ProperityItem(String ownnerClassName, String properityName, String TypeName, String refClassName) {
+            if (ownnerClassName != null && !ownnerClassName.isEmpty()) {
+                this.ownnerClassName = ownnerClassName;
+            }
+            if (properityName != null && !properityName.isEmpty()) {
+                this.properityName = properityName;
+            }
+            if (TypeName != null && !TypeName.isEmpty()) {
+                this.TypeName = TypeName;
+            }
+            if (refClassName != null && !refClassName.isEmpty()) {
+                this.refClassName = refClassName;
+            }
+
+            if (TypeName != null && !TypeName.isEmpty()) {
+                isBaseType = true;
+                isClassType = false;
+                if (TypeName.contains("String") || TypeName.contains("Double") || TypeName.contains("Integer")) {
+                    isBaseType = true;
+                    isClassType = false;
+                } else {
+                    isClassType = true;
+                    isBaseType = false;
+                }
+            }
+
+            if (TypeName != null && !TypeName.isEmpty()) {
+                isList = false;
+                isBaseList = false;
+                isClassList = false;
+                baseListCount = 0;
+                classListCount = 0;
+                if (TypeName.contains("List")) {
+                    isList = true;
+                    if (TypeName.contains("String")) {
+                        isBaseList = true;
+                        isClassList = false;
+                        baseTypeInListName = "String";
+                        baseListCount = StrUtil.count(TypeName, "List");
+                    } else if (TypeName.contains("Double")) {
+                        isBaseList = true;
+                        isClassList = false;
+                        baseTypeInListName = "Double";
+                        baseListCount = StrUtil.count(TypeName, "List");
+                    } else if (TypeName.contains("Integer")) {
+                        isBaseList = true;
+                        isClassList = false;
+                        baseTypeInListName = "Integer";
+                        baseListCount = StrUtil.count(TypeName, "List");
+                    }else if(TypeName.contains("Object")){  // 包含 Object的 空数组
+                        isClassList = true;
+                        isBaseList = false;
+                        isList = true;
+                        classListCount = StrUtil.count(TypeName, "List");
+                        isObjectNullList = true;
+                        classTypeInListName = "Object";
+                    } else {       // List<List<List<SSSS>>>
+                        isBaseList = false;
+                        isClassList = true;
+                        classListCount = StrUtil.count(TypeName, "List");
+                        classTypeInListName = TypeName.replaceAll("List", "").replaceAll("<", "").replaceAll(">", "").replaceAll(" ", "").trim();
+
+                    }
+                }
+            }
+        }
+
+        String getLable() {
+            if (isClassType) {
+                return StrUtil.upperFirst(properityName.trim());
+            }
+            return "\"" + properityName + "\\n" + "【" + TypeName + "】" + "\"";
+        }
+
+        //  ArrayList<String>    =List-String   List【】  String【】 baseListCount == 1
+        //  ArrayList<String>   baseListCount == 1     ArrayList<List<String>>  baseListCount == 2
+        ArrayList<String> getLableArr() {
+            String item2 = "";
+            ArrayList<String> stringArr = null;
+            if (isList && isBaseType == true && baseListCount > 0) {
+
+
+                stringArr = new ArrayList<String>();
+                for (int i = 0; i < baseListCount; i++) {
+                    // stringArr.add("List"+"<【" + TypeName +"】>");
+
+                    stringArr.add("\"" + getBaseListShowString(properityName, TypeName, i) + "\"");
+                }
+                // baseTypeInListName String
+                stringArr.add("\"" + properityName + "_item" + "\\n" + baseTypeInListName + "\"");
+
+            } else if ( isList && isClassType  &&  isObjectNullList){  // 如果是空的列表的话 List<Object>
+                stringArr = new ArrayList<String>();
+
+                for (int i = 0; i < classListCount; i++) {
+                    String strItem = "\"" + getListShowString(properityName, TypeName, i) + "\"";
+                    // data\nList<【A___B___C】>
+                    stringArr.add(strItem);
+                    System.out.println(" properityName = " + properityName +"    TypeName="+ TypeName+"  index =" + i + "strItem = "+ strItem);
+
+                }
+                item2 =  "\"" +classTypeInListName + "\\n" + properityName + "\"" ;
+                stringArr.add(item2); // A  类名  \\n 属性名
+
+            }else if (isList && isClassType == true && classListCount > 0) {  // 如果是 List 列表的话
+                // // 获取 数组的  data 【List<A>】    properityName=data     TypeName=List<A>
+                // List<【List<A>】> data    List<>
+                stringArr = new ArrayList<String>();
+
+                for (int i = 0; i < classListCount; i++) {
+                    String strItem = "\"" + getListShowString(properityName, TypeName, i) + "\"";
+                    // data\nList<【A___B___C】>\nA[1][2][3][4][5][6][7][8][10][11][12][13][14][15][16][17][18]\nB[9][19]\nC[0]  tempstr=A___B___C
+                    stringArr.add(strItem);
+                    System.out.println(" properityName = " + properityName +"    TypeName="+ TypeName+"  index =" + i + "strItem = "+ strItem);
+                    // properityName = data
+                    // TypeName=List<A___B___C>\nA[1][2][3][4][5][6][7][8][10][11][12][13][14][15][16][17][18]\nB[9][19]\nC[0]
+                    // index =0
+                    // strItem = "data\nList<A___B___C\nA[1][2][3][4][5][6][7][8][10][11][12][13][14][15][16][17][18]\nB[9][19]\nC[0]>"
+                }
+                item2 =  "\"" +classTypeInListName + "\\n" + properityName + "\"" ;
+                stringArr.add(item2); // A  类名  \\n 属性名
+            }
+
+            System.out.println("classTypeInListName = "+ classTypeInListName +" properityName" + properityName );
+            System.out.println("item2 = "+ item2 +" stringArr.size()"+ stringArr.size());  // stringArr.size() =2
+
+            //classTypeInListName = A___B___C\nA[1][2][3][4][5][6][7][8][10][11][12][13][14][15][16][17][18]\nB[9][19]\nC[0] properityName = data
+            // item1 = data\nList<【A___B___C】>\nA[1][2][3][4][5][6][7][8][10][11][12][13][14][15][16][17][18]\nB[9][19]\nC[0]  tempstr=A___B___C
+            //  item2 = A___B___C\nA[1][2][3][4][5][6][7][8][10][11][12][13][14][15][16][17][18]\nB[9][19]\nC[0]\ndata
+            return stringArr;
+        }
+
+
+        String getBaseListShowString(String properityName, String strListTypeName, int index) {
+            int count = StrUtil.count(strListTypeName, "List");
+            if (count == 1 || index == 0) {
+                return properityName + "\\n" + getPretyTypeName(TypeName, baseTypeInListName, 0);
+                // data\nList<【A___B___C】>\nA[1][2][3][4][5][6][7][8][10][11][12][13][14][15][16][17][18]\nB[9][19]\nC[0]  tempstr=A___B___C
+            } else {
+                return getPretyTypeName(TypeName, baseTypeInListName, index);
+            }
+            //  properityName=data     TypeName=List<A>     classTypeInListName=A
+//List<List<List<String>>>   data    【 count 是总的List的个数】   【index =0 】 是显示的个数 显示的个数是 count - index
+// 【count 3 , index 0】  data \n List<【List<List<A>>】>
+// 【count 3 , index 1】  List<【<List<A>】>
+// 【count 3 , index 2】  List<【A】>
+
+
+        }
+
+
+        String getListShowString(String properityName, String strListTypeName, int index) {
+
+            // properityName = data
+            // TypeName=List<A___B___C>\nA[1][2][3][4][5][6][7][8][10][11][12][13][14][15][16][17][18]\nB[9][19]\nC[0]
+            // index =0
+            // strItem = "data\nList<A___B___C\nA[1][2][3][4][5][6][7][8][10][11][12][13][14][15][16][17][18]\nB[9][19]\nC[0]>"
+
+            int count = StrUtil.count(strListTypeName, "List");
+            if (count == 1 || index == 0) {  // 如果只包含一个List
+                //  strItem = "data\nList<A___B___C\nA[1][2][3][4][5][6][7][8][10][11][12][13][14][15][16][17][18]\nB[9][19]\nC[0]>"
+                String curItem = properityName + "\\n" + getPretyTypeName(TypeName, classTypeInListName, 0);
+                // data\nList<【A___B___C】>\nA[1][2][3][4][5][6][7][8][10][11][12][13][14][15][16][17][18]\nB[9][19]\nC[0]  tempstr=A___B___C
+                return curItem;
+            } else {
+                return getPretyTypeName(TypeName, classTypeInListName, index);
+            }
+            //  properityName=data     TypeName=List<A>     classTypeInListName=A
+//List<List<List<A>>>   data    【 count 是总的List的个数】   【index =0 】 是显示的个数 显示的个数是 count - index
+// 【count 3 , index 0】  data \n List<【List<List<A>>】>
+// 【count 3 , index 1】  List<【<List<A>】>
+// 【count 3 , index 2】  List<【A】>
+
+
+        }
+
+        String getPretyTypeName(String strListTypeName, String classTypeInListName, int index) {
+
+            // properityName = data
+            // TypeName=List<A___B___C>\nA[1][2][3][4][5][6][7][8][10][11][12][13][14][15][16][17][18]\nB[9][19]\nC[0]
+            // index =0
+            // strItem = "data\nList<A___B___C\nA[1][2][3][4][5][6][7][8][10][11][12][13][14][15][16][17][18]\nB[9][19]\nC[0]>"
+            // classTypeInListName
+            //  zclassTypeInListName  =A___B___C\nA[1][2][3][4][5][6][7][8][10][11][12][13][14][15][16][17][18]\nB[9][19]\nC[0]
+
+            System.out.println("zclassTypeInListName  =" + classTypeInListName);
+            int count = StrUtil.count(strListTypeName, "List");
+            if (index > count) {
+                System.out.println("getPretyTypeName 索引错误  index=" + index + "   count =" + count);
+            }
+// 【count 3 , index 0  keepListCount=3 】  data \n List<【List<List<A>>】>
+// 【count 3 , index 1  keepListCount=2 】  List<【<List<A>】>
+// 【count 3 , index 2 keepListCount=1 】  List<【A】>
+
+            // List<A___B___C\nA[1][2][3][4][5][6][7][8][10][11][12][13][14][15][16][17][18]\nB[9][19]\nC[0]>"
+            int keepListCount = count - index;
+            String fixClassTypeInListName = new String(classTypeInListName);
+//    // List<A___B___C>\nA[1][2][3][4][5][6][7][8][10][11][12][13][14][15][16][17][18]\nB[9][19]\nC[0]
+            String listString = buildListString(fixClassTypeInListName, keepListCount); //  List<A>   List<List<List<A>>>
+            System.out.println("zlistString " +listString);
+            String tempstr= "";
+            String resultStr="";
+            if(listString.contains("\\n") && listString.contains("___")){
+                tempstr =  classTypeInListName.substring(0,classTypeInListName.indexOf("\\n"));
+                resultStr = listString.replaceAll(tempstr, "【" + tempstr + "】"); //  List<【A】>   List<List<List<【A】>>>
+            } else{
+
+                resultStr = listString.replaceAll(classTypeInListName, "【" + classTypeInListName + "】"); //  List<【A】>   List<List<List<【A】>>>
+            }
+
+
+            // resultStr List<【A___B___C】>\nA[1][2][3][4][5][6][7][8][10][11][12][13][14][15][16][17][18]\nB[9][19]\nC[0]  tempstr=A___B___C
+            System.out.println("resultStr " +resultStr+"  tempstr="+ tempstr);
+            return resultStr;
+        }
+
+        String buildListString(String classTypeInListName, int listCount) {
+            // List<A___B___C\nA[1][2][3][4][5][6][7][8][10][11][12][13][14][15][16][17][18]\nB[9][19]\nC[0]>"
+
+
+
+            //  classTypeInListName  =A___B___C\nA[1][2][3][4][5][6][7][8][10][11][12][13][14][15][16][17][18]\nB[9][19]\nC[0]
+            //  classTypeInListNameX E
+            String arrEnd="";
+            String listNameWithoutN = "";
+            if(classTypeInListName.contains("\\n")  ){
+                arrEnd = classTypeInListName.substring(classTypeInListName.indexOf("\\n"),classTypeInListName.length());
+                listNameWithoutN =  classTypeInListName.substring(0,classTypeInListName.indexOf("\\n"));
+            }
+            System.out.println("classTypeInListNameX " +classTypeInListName);
+            String curStr = "";
+            String curStrKeep = "";
+            for (int i = 0; i < listCount; i++) {
+                if (i == 0) {
+                    curStr = "List<" + (listNameWithoutN.isEmpty()?classTypeInListName:listNameWithoutN) + ">" + curStrKeep;
+                    curStrKeep = curStr;
+                } else {
+                    curStr = "List<" + curStrKeep + ">";
+                    curStrKeep = curStr;
+                }
+            }
+// 【index 1  List<A>】
+// 【index 2  List<List<A>>】
+// 【index 3  List<List<List<A>>>】
+            String result =  curStrKeep+arrEnd;
+            // List<A___B___C>\nA[1][2][3][4][5][6][7][8][10][11][12][13][14][15][16][17][18]\nB[9][19]\nC[0]
+
+            //  zlistString List<>
+            System.out.println("result " +result);
+            return result;
+        }
+
+        ArrayList<String> getShapeArr() {
+
+//            boolean isBaseType;       //  TypeName 是否基础数据类型 Array<String>  和 String  都是基础数据类型
+////            boolean isClassType;        //  是否是 Class 引用数据类型
+////            boolean isList;       //  是否是集合   List<>
+////            boolean isBaseList;   // 是否是基础的数据类型集合  List<String>   List<Double>
+////            boolean isClassList;   // 是否是对象的数据类型集合  List<A>   List<B>
+// box【普通数据类型的数据】   doubleoctagon【普通数据类型的数组】     circle【 Class 引用 】     doublecircle 【List<Class 引用>】
+//            if(isBaseType == true && isList == false){
+//                return "box";
+//            } else if(isBaseType == true && isList == true){
+//                return "doubleoctagon";
+//            }else if(isBaseType == false && isList == false){
+//                return "circle";
+//            }else if(isBaseType == false && isList == true){
+//                return "doublecircle";
+//            }
+//            return "";
+            ArrayList<String> stringArr = null;
+            if (isList && isBaseType == true && baseListCount > 0) {
+
+                stringArr = new ArrayList<String>();
+                for (int i = 0; i < baseListCount; i++) {
+                    stringArr.add("shape=doubleoctagon");
+                }
+                stringArr.add("shape=box");
+            } else if ( isList && isClassType  &&  isObjectNullList){
+                for (int i = 0; i < classListCount; i++) {
+                    stringArr.add("shape=doubleoctagon");
+                }
+
+            } else if (isList && isClassType == true && classListCount > 0) {
+                stringArr = new ArrayList<String>();
+                for (int i = 0; i < classListCount; i++) {
+                    stringArr.add("shape=doubleoctagon");
+                }
+                stringArr.add("shape=circle");
+            }
+            return stringArr;
+        }
+
+
+        String getShape() {
+
+//            boolean isBaseType;       //  TypeName 是否基础数据类型 Array<String>  和 String  都是基础数据类型
+////            boolean isClassType;        //  是否是 Class 引用数据类型
+////            boolean isList;       //  是否是集合   List<>
+////            boolean isBaseList;   // 是否是基础的数据类型集合  List<String>   List<Double>
+////            boolean isClassList;   // 是否是对象的数据类型集合  List<A>   List<B>
+// box【普通数据类型的数据】   doubleoctagon【普通数据类型的数组】     circle【 Class 引用 】     doublecircle 【List<Class 引用>】
+            if (isBaseType == true && isList == false) {
+                return "shape=box";
+            } else if (isBaseType == true && isList == true) {
+                return "shape=doubleoctagon";
+            } else if (isBaseType == false && isList == false) {
+                return "shape=circle";
+            } else if (isBaseType == false && isList == true && !isObjectNullList) {
+                return "shape=doublecircle";
+            }else if (isBaseType == false && isList == true && isObjectNullList) {
+                return "shape=doubleoctagon";
+            }
+            return "";
+        }
+
+
+        String getStyle() {
+// box【普通数据类型的数据】   doubleoctagon【普通数据类型的数组】     circle【 Class 引用 】     doublecircle 【List<Class 引用>】
+            if (isBaseType == true && isList == false) {
+                return "";   // 基础数据类型没有颜色
+            } else if (isBaseType == true && isList == true) {
+                return "";  // 基础数据类型没有颜色
+            } else if (isBaseType == false && isList == false) {
+                return "style=filled";   // 单个 Class的 颜色是 红色
+            } else if (isBaseType == false && isList == true) {
+                return "style=filled";  // 多个 List<Class> 是 黄色
+            }
+            return "";
+        }
+
+
+        ArrayList<String> getStyleArr() {
+// box【普通数据类型的数据】   doubleoctagon【普通数据类型的数组】     circle【 Class 引用 】     doublecircle 【List<Class 引用>】
+            ArrayList<String> stringArr = null;
+            if (isList && isBaseType == true && baseListCount > 0) {  // 基础类型数据集合
+
+                stringArr = new ArrayList<String>();
+                for (int i = 0; i < baseListCount; i++) {
+                    stringArr.add("");
+                }
+                stringArr.add("");
+            } else if (isList && isClassType == true && classListCount > 0) {  // 对象类型颜色
+                stringArr = new ArrayList<String>();
+                for (int i = 0; i < classListCount; i++) {
+                    stringArr.add("style=filled");
+                }
+                stringArr.add("style=filled");
+            }
+            return stringArr;
+
+        }
+
+
+        ArrayList<String> getColorArr() {
+//// box【普通数据类型的数据】   doubleoctagon【普通数据类型的数组】     circle【 Class 引用 】     doublecircle 【List<Class 引用>】
+//            // box【普通数据类型的数据】   doubleoctagon【普通数据类型的数组】     circle【 Class 引用 】     doublecircle 【List<Class 引用>】
+//            if(isBaseType == true && isList == false){
+//                return "";   // 基础数据类型没有颜色
+//            } else if(isBaseType == true && isList == true){
+//                return "";  // 基础数据类型没有颜色
+//            }else if(isBaseType == false && isList == false){
+//                return "red";   // 单个 Class的 颜色是 红色
+//            }else if(isBaseType == false && isList == true){
+//                return "yellow";  // 多个 List<Class> 是 黄色
+//            }
+//            return "";
+
+
+            ArrayList<String> stringArr = null;
+            if (isList && isBaseType == true && baseListCount > 0) {  // 基础类型数据集合
+
+                stringArr = new ArrayList<String>();
+                for (int i = 0; i < baseListCount; i++) {
+                    stringArr.add("");
+                }
+                stringArr.add("");
+            }  else if ( isList && isClassType  &&  isObjectNullList) {
+                for (int i = 0; i < classListCount; i++) {
+                    stringArr.add("color=purple");
+                }
+
+            }else if (isList && isClassType == true && classListCount > 0) {  // 对象类型颜色
+                stringArr = new ArrayList<String>();
+                for (int i = 0; i < classListCount; i++) {
+                    stringArr.add("color=yellow");
+                }
+                stringArr.add("color=red");
+            }
+            return stringArr;
+
+        }
+
+
+        String getColor() {
+// box【普通数据类型的数据】   doubleoctagon【普通数据类型的数组】     circle【 Class 引用 】     doublecircle 【List<Class 引用>】
+            // box【普通数据类型的数据】   doubleoctagon【普通数据类型的数组】     circle【 Class 引用 】     doublecircle 【List<Class 引用>】
+            if (isBaseType == true && isList == false) {
+                return "";   // 基础数据类型没有颜色
+            } else if (isBaseType == true && isList == true) {
+                return "";  // 基础数据类型没有颜色
+            } else if (isBaseType == false && isList == false) {
+                return "color=red";   // 单个 Class的 颜色是 红色
+            } else if (isBaseType == false && isList == true && isObjectNullList) {
+                return "color=purple";  // 多个 json为[]  的 对象的 颜色是蓝色的
+            }else if (isBaseType == false && isList == true ) {
+                return "color=yellow";  // 多个 List<Class> 是 黄色
+            }
+            return "";
+        }
+
+        String getNodeName() {
+            if (TypeName.equals("Class")) {
+                return properityName;
+            }
+            String nodeName = ownnerClassName + "_" + properityName;
+            while (nodeName.startsWith("_")) {
+                nodeName = nodeName.substring(1, nodeName.length());
+            }
+            while (nodeName.endsWith("_")) {
+                nodeName = nodeName.substring(0, nodeName.length() - 1);
+            }
+
+            //  nodeName.get(0)=View_font-size-editor  在 .gv 文件中  不能以 - 命名变量
+
+            nodeName =  fixedName_Json2Bean(nodeName);
+            return nodeName;
+        }
+
+        ArrayList<String> getNodeNameArr() {
+            ArrayList<String> stringArr = null;
+            if (isList && isBaseType == true && baseListCount > 0) {
+
+                stringArr = new ArrayList<String>();
+                for (int i = 0; i < baseListCount; i++) {
+                    stringArr.add(ownnerClassName + "_" + properityName + "_Arr" + i);
+                }
+                // stringArr.add(ownnerClassName + "_" + properityName + "_ArrEnd" + "_" + baseTypeInListName);
+                stringArr.add(ownnerClassName + "_" + properityName + "_ArrEnd" + "_" + baseTypeInListName);
+            } else if (isList && isClassType == true && isObjectNullList ){
+                stringArr = new ArrayList<String>();
+                stringArr.add(ownnerClassName + "_" + properityName);
+            }else if (isList && isClassType == true && classListCount > 0 && !isObjectNullList) {
+                stringArr = new ArrayList<String>();
+                for (int i = 0; i < classListCount; i++) {
+                    stringArr.add(ownnerClassName + "_" + properityName + "_Arr" + i);
+                }
+                //  类名在处理的时候  使用 类自己的名字
+                stringArr.add(classTypeInListName);
+            }
+            return stringArr;
+        }
+
+
+        String getRefNodeName() {  //
+
+            return refClassName;
+        }
+
+
+        String makeNodeString() {  //
+            if (isBaseType == true && isList == false) {
+                // RootBean_doubleList_Double [label="Double" shape=box] 单独的 基础类型变量
+                return getNodeName() + " [label=" + getLable() + " " + getShape() + " ]";
+            } else if (isBaseType == true && isList == true) {
+                // RootBean_multyList_List [label="RootBean_multyList_List" shape=doubleoctagon] 基础类型变量 集合
+                ArrayList<String> nodeArr = getNodeNameArr();
+                ArrayList<String> labelArr = getLableArr();
+                ArrayList<String> colorArr = getColorArr();
+                ArrayList<String> shapeArr = getShapeArr();
+                ArrayList<String> styleArr = getStyleArr();
+
+                String item = "";
+                StringBuilder sb = new StringBuilder();
+                int length = nodeArr.size();
+                for (int i = 0; i < length; i++) {
+                    item = nodeArr.get(i).trim() + "[ label=" + labelArr.get(i).trim() + "  " + shapeArr.get(i).trim() + " " + styleArr.get(i).trim() + " " + colorArr.get(i) + "] \n ";
+                    sb.append(item);
+                }
+                return sb.toString();
+            } else if (isClassType == true && isList == false && isClassList == false && TypeName.equals("Class")) {
+                //RootBean_Data [label="RootBean_Data" shape=circle  style=filled color=red]  单独的类 引用的变量
+                return getNodeName() + " [label=" + getLable() + " " + getShape() + " " + getStyle() + " " + getColor() + " ]";
+
+            } else if(isClassType == true && isList == true && isClassList == true && isObjectNullList){
+
+                System.out.println("Test Here this.toString ="+ this.toString());
+                // 【 ownnerClassName=null  properityName=image_list TypeName=List<Object> refClassName=null  isBaseType=false  isClassType=true  isList=true baseListCount=0 classListCount=1  isObjectNullList true】
+// 【 ownnerClassName=Highlight  properityName=title TypeName=List<Object> refClassName=null  isBaseType=false  isClassType=true  isList=true baseListCount=0 classListCount=1  isObjectNullList true】
+
+
+                String returnNode = getNodeName() + " [label=" + getLable() + " " + getShape() + " " + getStyle() + " " + getColor() + " ]";
+                System.out.println("returnNodeX ="+ returnNode );
+                // B_source [label=Source shape=doublecircle style=filled color=blue ]
+                // 【 ownnerClassName=B  properityName=source TypeName=List<Object> refClassName=null
+                return returnNode;
+
+            }else if (isClassType == true && isList == true && isClassList == true && !isObjectNullList ) {
+                // RootBean_Data_Item [label="RootBean_Data_Item" shape=doublecircle style=filled color=yellow]
+                ArrayList<String> nodeArr = getNodeNameArr();
+                ArrayList<String> labelArr = getLableArr();
+                ArrayList<String> colorArr = getColorArr();
+                ArrayList<String> shapeArr = getShapeArr();
+                ArrayList<String> styleArr = getStyleArr();
+
+                String item = "";
+                StringBuilder sb = new StringBuilder();
+                int length = nodeArr.size();
+                for (int i = 0; i < length - 1; i++) {
+                    // 最后一个是类 Class 属性的话 那么 就 不再创建 Node
+                    String labelItem = labelArr.get(i).trim();   //  这里不正常
+                    System.out.println(" labelItemepre = "+ labelItem);
+                    System.out.println(" labelItemeback = "+ labelItem);
+                    // item1 = data\nList<【A___B___C】>\nA[1][2][3][4][5][6][7][8][10][11][12][13][14][15][16][17][18]\nB[9][19]\nC[0]  tempstr=A___B___C
+                    //  item2 = A___B___C\nA[1][2][3][4][5][6][7][8][10][11][12][13][14][15][16][17][18]\nB[9][19]\nC[0]\ndata
+                    item = nodeArr.get(i).trim() + "[ label=" + labelItem.trim() + "  " + shapeArr.get(i).trim() + "  " + styleArr.get(i).trim() + " " + colorArr.get(i) + "] \n ";
+                    sb.append(item);
+                }
+                return sb.toString();
+
+            }
+
+            return "";
+        }
+
+
+        String getWeight() {
+            if (TypeName.equals("Class")) {
+                return "[weight= 30]";
+            }
+            if (isClassType == true && isList == true && isClassList == true) {
+
+                return "[weight= 50]";
+            }
+
+            if (isClassType == true && isList == false && isClassList == false) {
+
+                return "[weight= 20 ]";
+            }
+
+            if (isBaseType == true && isList == true) {
+
+                return "[weight= 5]";
+            } else{
+
+                return "[weight= 1 ]";
+            }
+        }
+
+        String makeNodeRelationString() {  //
+
+            if (isBaseType == true && isList == false) {
+                // 单独的 基础类型变量 关系  	RootBean -> RootBean_code
+                if (ownnerClassName != null && !ownnerClassName.trim().isEmpty()) {
+                    System.out.println("make-> 7  ownnerClassName="+getNodeName()+"    nodeName.get(0)="+getNodeName());
+                    return ownnerClassName + " -> " + getNodeName() + " " + getWeight();
+                }
+
+
+            } else if (isBaseType == true && isList == true) {
+//                RootBean -> RootBean_multyList
+//                RootBean_multyList -> RootBean_multyList_List
+//                RootBean_multyList_List -> RootBean_multyList_List_List
+//                RootBean_multyList_List_List -> RootBean_multyList_List_List_Item
+
+                if (ownnerClassName != null && !ownnerClassName.trim().isEmpty()) {
+
+                    ArrayList<String> nodeName = getNodeNameArr();
+                    int length = getNodeNameArr().size();
+                    String item1 = "";
+                    String item2 = "";
+                    StringBuilder sb = new StringBuilder();
+                    if (length > 0) {
+                        System.out.println("make-> 6  ownnerClassName="+ownnerClassName+"    nodeName.get(0)="+nodeName.get(0));
+                        sb.append(ownnerClassName + " -> " + nodeName.get(0) + " " + getWeight() + "\n");
+                        for (int i = 1; i < length; i++) {
+                            item1 = nodeName.get(i - 1);
+                            item2 = nodeName.get(i);
+                            System.out.println("make-> 5  item1="+item1+"    item2="+item2);
+                            sb.append(item1 + " -> " + item2 + " " + getWeight() + "\n");
+                        }
+                    }
+
+                    return sb.toString();
+                }
+            } else if (isClassType == true && isList == false && isClassList == false && refClassName != null) {
+//   对于单独的 Class  它的 关系 已经 通过 属性 来设置了   所以 这里不用设置关系
+
+                System.out.println("make-> 4  refClassName="+refClassName+"    properityName="+properityName);
+                return refClassName + " -> " + properityName + " " + getWeight();
+
+//   refClassName=B   这里替换为   ownnerClassName 错误   寻找 new Preperty的地方
+                // ClassName = 【Extra】 index =【6 】   subIndex=【0】  str=【 ownnerClassName=Extra  properityName=topic TypeName=Topic refClassName=B  isBaseType=false  isClassType=true  isList=false baseListCount=0 classListCount=0】
+// make-> 4  refClassName=Extra    properityName=Topic_2048
+// make-> 4  refClassName=Extra    properityName=Topic
+// make-> 4  refClassName=B    properityName=topic
+// make-> 4  refClassName=B    properityName=topic_2048
+            } else if(isClassType == true && isList == true && isClassList == true && isObjectNullList){
+
+                System.out.println("make->x   refClassName="+refClassName+"    properityName="+properityName +" this.toString="+this.toString());
+
+                //make->x   refClassName=null    properityName=image_detail this.toString=【 ownnerClassName=B  properityName=image_detail TypeName=List<Object> refClassName=null  isBaseType=false  isClassType=true  isList=true baseListCount=0 classListCount=1  isObjectNullList true】
+
+// returnNodeX =Highlight_source [label=Source shape=doublecircle style=filled color=blue ]
+                ArrayList<String> arr = getNodeNameArr();
+                for(String nullArrStr : arr){
+                    System.out.println("nullArrStr = "+ nullArrStr);
+                }
+                String nullRela = ownnerClassName + " -> " + arr.get(0) + " " + getWeight();
+                System.out.println("nullRela = "+ nullRela);
+
+                //     Line 39: Highlight_source [label=Source shape=doublecircle style=filled color=blue ]
+                //    Line 43: Highlight -> Highlight_source_Arr0 [weight= 50]
+
+                return nullRela;
+
+            }else if (isClassType == true && isList == true && isClassList == true && !isObjectNullList) {
+//  对象数组 列表       RootBean.java 的   List<A> data;
+//  RootBean -> RootBean_Data  [weight=10]
+//  RootBean_Data  -> RootBean_Data_Count
+
+                ArrayList<String> nodeName = getNodeNameArr();
+                // makeNodeRelationString = [RootBean_data_Arr0, A___B___C]
+                System.out.println("makeNodeRelationString = " + nodeName);  // zzj
+                int length = getNodeNameArr().size();
+                String item1 = "";
+                String item2 = "";
+                StringBuilder sb = new StringBuilder();
+                if (length > 0) {
+                    System.out.println("make-> 3  ownnerClassName="+ownnerClassName+"    nodeName.get(0)="+nodeName.get(0));
+                    sb.append(ownnerClassName + " -> " + nodeName.get(0) + " " + getWeight() + "\n");
+                    for (int i = 1; i < length; i++) {
+                        item1 = nodeName.get(i - 1);
+                        item2 = nodeName.get(i);
+                        if(!item2.contains("___")){
+                            System.out.println("make-> 2  item1="+item1+"    item2="+item2);
+                            sb.append(item1 + " -> " + item2 + " " + getWeight() + "\n");
+                        } else{
+                            String[] subArr =   item2.split("___");
+                            int lengthSub = subArr.length;
+//make-> 1 item1=RootBean_data_Arr0    subArr[x]=A
+//make-> 1 item1=RootBean_data_Arr0    subArr[x]=B
+// make-> 1 item1=RootBean_data_Arr0    subArr[x]=C\nA[1][2][3][4][5][6][7][8][10][11][12][13][14][15][16][17][18]\nB[9][19]\nC[0]
+                            for (int x=0 ;x < lengthSub ; x++){
+
+                                String itemStr = new String(subArr[x]);
+                                System.out.println("make-> 1 item1="+item1+"    subArr[x]pre="+itemStr);
+                                if(itemStr.trim().contains("\\n")){
+                                    itemStr = itemStr.substring(0,itemStr.indexOf("\\n"));
+                                }
+                                System.out.println("make-> 1 item1="+item1+"    subArr[x]back="+itemStr);
+                                sb.append(item1 + " -> " + itemStr + " " + getWeight() + "\n");
+                            }
+                        }
+
+                    }
+                }
+                return sb.toString();
+            }
+            return "";
+        }
+
+
+    }
+
+    public interface BeanGenerator {
+
+        /**
+         * @param className 类名
+         * @param map       字段及类型
+         * @throws IOException
+         */
+        void writeBean(String className, Map<String, Object> map) throws IOException;
+
+        /**
+         * @param list List<....>
+         * @throws IOException
+         */
+        void writeList(String list) throws IOException;
+    }
+
+
+    public class CamelCaseBeanGenerator extends MyBeanGenerator {
+
+        public CamelCaseBeanGenerator(String packName) {
+            super(packName);
+        }
+
+        @Override
+        public void writeBean(String className, Map<String, Object> map) throws IOException {
+            System.out.println(" className1   = " + className);  // 找到对应的 Class 中的类    没有执行该类
+            File file = new File("src/" + packName.replace(".", "/"));
+            if (!file.exists() || file.exists() && file.isFile()) {
+                file.mkdirs();
+            }
+            System.out.println(" className2  = " + className);
+            BufferedWriter bw = new BufferedWriter(new FileWriter(new File(file, className + ".java")));
+            bw.write("package ");
+            bw.write(packName);
+            bw.write(";\n");
+            bw.write("import java.util.List;\n\n");
+
+            bw.write("/**\n");
+            bw.write(" *auto generate\n");
+            bw.write(" *\n");
+            bw.write(" *@author Zukgit\n");
+            bw.write(" *\n");
+            bw.write(" */\n");
+
+            bw.write("public class ");
+            bw.write(className);
+            bw.write("{\n");
+
+            map = sortMapByKey(map);
+            Set<Map.Entry<String, Object>> set = map.entrySet();
+
+            for (Map.Entry<String, Object> entry : set) {
+                bw.write("    ");
+                bw.write(entry.getValue().toString());
+                bw.write(" ");
+                bw.write(formatReference(entry.getKey()));
+                bw.write(";\n");
+            }
+            bw.write("\n");
+            set = map.entrySet();
+
+            for (Map.Entry<String, Object> entry : set) {
+
+                bw.write("    public ");
+                bw.write(entry.getValue().toString());
+                bw.write(" get");
+                bw.write(capitalUpper(entry.getKey()));
+                bw.write("(){\n");
+                bw.write("        ");
+                bw.write("return ");
+                bw.write(formatReference(entry.getKey()));
+
+                bw.write(";\n    }\n\n");
+
+                //////////////////////////
+
+                bw.write("    public void ");
+                bw.write("set");
+                bw.write(capitalUpper(entry.getKey()));
+                bw.write("(");
+                bw.write(entry.getValue().toString());
+                bw.write(" ");
+                bw.write(formatReference(entry.getKey()));
+                bw.write("){\n");
+                bw.write("        ");
+                bw.write("this.");
+                bw.write(formatReference(entry.getKey()));
+                bw.write("=");
+                bw.write(formatReference(entry.getKey()));
+                bw.write(";\n    }\n");
+
+                bw.write("\n");
+
+            }
+            bw.write("}");
+
+            bw.close();
+        }
+
+        public Map<String, Object> sortMapByKey(Map<String, Object> oriMap) {
+
+            Map<String, Object> sortedMap = new TreeMap<String, Object>(new Comparator<String>() {
+                public int compare(String key1, String key2) {
+
+                    return key1.compareTo(key2);
+                }
+            });
+            sortedMap.putAll(oriMap);
+            return sortedMap;
+        }
+
+        private String capitalUpper(String getset) {
+            String s = formatReference(getset);
+            char[] chs = s.toCharArray();
+            if (chs[0] > 'a' && chs[0] < 'z') {
+                chs[0] = (char) (chs[0] - 32);
+            }
+
+            return new String(chs);
+
+        }
+
+        private String formatReference(String ref) {
+
+            char[] chs = ref.toCharArray();
+
+            if (chs[0] >= 'A' && chs[0] <= 'Z') {
+                chs[0] = (char) (chs[0] + 32);
+            }
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.append(chs[0]);
+            for (int i = 1; i < chs.length; i++) {
+                if (chs[i] == '_') {
+                    continue;
+                }
+                if (chs[i - 1] == '_') {
+                    if (chs[i] >= 'a' && chs[i] <= 'z') {
+                        stringBuilder.append((char) (chs[i] - 32));
+                    } else {
+                        stringBuilder.append(chs[i]);
+                    }
+                } else {
+                    stringBuilder.append(chs[i]);
+                }
+            }
+
+            return stringBuilder.toString();
+        }
+    }
+
+	
+			public static String fixedName_Json2Bean(String originName){
+			
+			if(originName == null){
+				return originName;
+			}
+       String oldName = new String(originName);
+		String	nodeName = originName;
+			
+			            //  nodeName.get(0)=View_font-size-editor  在 .gv 文件中  不能以 - 命名变量
+            if(nodeName.contains("-")){
+                nodeName =  nodeName.replaceAll("-","_");
+            }
+
+			if(nodeName.contains("!")){
+                nodeName =  nodeName.replaceAll("!","_");
+            }
+                if(nodeName.contains("+")){
+                    nodeName =  nodeName.replace("+","_");
+                }
+
+                if(nodeName.contains("/")){
+                    nodeName =  nodeName.replace("/","_");
+                }
+
+
+                if(nodeName.contains("\\")){
+                    nodeName =  nodeName.replace("\\","_");
+                }
+
+                if(nodeName.contains("%")){
+                    nodeName =  nodeName.replace("%","_");
+                }
+
+			if(nodeName.contains("$")){
+                nodeName =  nodeName.replace("$","_");
+            }
+			
+			if(nodeName.contains(".")){
+                nodeName =  nodeName.replace(".","_");
+            }
+			
+			if(nodeName.contains("___")){
+                nodeName =  nodeName.replaceAll("___","_");
+            }
+			
+			if(nodeName.contains("__")){
+                nodeName =  nodeName.replaceAll("__","_");
+            }
+			
+			nodeName = nodeName.trim();
+			
+			String firstChar = nodeName.substring(0,1);
+			String secondChar = nodeName.replaceAll("_","").trim();
+			if(isNumeric(firstChar) || "".equals(secondChar)){
+				nodeName = "Z_"+getTimeStampLong()+"_"+nodeName;
+			}
+                System.out.println("oldName = "+ oldName + "  newName = "+nodeName);
+            return nodeName;
+			
+			
+		}
+		
+		
+    static  volatile String returnString ="";
+    static class Json2Bean {
+        public String json;
+        public static JsonParse jsonParse;
+        public String name;
+        public static NameGenerator nameGeneration;
+        public static BeanGenerator generationBean;
+        private ArrayList<ProperityItem> arrList;
+        public String fatherName;
+
+
+        @Override
+        public String toString() {
+            System.out.println("============== 打印 JavaBean: " + this.name+" 开始==============");
+            int index = 0 ;
+            for (ProperityItem  item: arrList){
+
+                System.out.println("index="+ index +"  item="+item);
+                index++;
+            }
+            System.out.println("============== 打印 JavaBean: " + this.name+" 结束==============");
+            return "this.name="+ this.name + "   this.fatherName="+ this.fatherName;
+        }
+
+        public Json2Bean(String json, String name, String fatherName, NameGenerator nameGeneration, JsonParse jsonParse, BeanGenerator generationBean) {
+            this.json = json;
+            this.name = fixedName_Json2Bean(name);
+            this.nameGeneration = nameGeneration;
+            this.jsonParse = jsonParse;
+            this.fatherName = fatherName;
+            this.generationBean = generationBean;
+            arrList = new ArrayList<ProperityItem>();
+            // ProperityItem(String ownnerClassName, String properityName, String TypeName, String refClassName)
+            // 类本身 所添加的 项
+            System.out.println(" 新建Bean类 X1  = " + this.name);
+            if(this.fatherName != null){
+                this.fatherName =  filter(this.fatherName);
+            }
+
+            if(this.name != null){
+                this.name =  filter(this.name);
+            }
+
+
+
+            while(this.fatherName != null && this.fatherName.contains(" ") ){
+                this.fatherName = this.fatherName.replaceAll(" ","");
+            }
+
+
+            while(this.name != null && this.name.contains(" ") ){
+                this.name = this.name.replaceAll(" ","");
+            }
+
+            arrList.add(new ProperityItem(null, this.name, "Class", this.fatherName));  // 类创建的Bean 所以该处  不可能 产生
+            // make-> 4  refClassName=B    properityName=topic
+            System.out.println(" 新建Bean类 X2  = " + this.name);
+        }
+
+
+        public static String filter(String content){
+            if (content != null && content.length() > 0) {
+                char[] contentCharArr = content.toCharArray();
+                for (int i = 0; i < contentCharArr.length; i++) {
+                    if (contentCharArr[i] < 0x20 || contentCharArr[i] == 0x7F) {
+                        contentCharArr[i] = 0x20;
+                    }
+                }
+                return new String(contentCharArr);
+            }
+            return "";
+        }
+
+
+        @SuppressWarnings("unchecked")
+        public String execute() {
+            String curRentName = "";
+            //
+            try {
+                if (this.name != null) {
+                    curRentName = this.name;
+                    System.out.println("开始解析Bean类: this.name  " + this.name +"  name ="+ name);
+                    System.out.println("zukgit4_1_1_非空  this.name :" + this.name+"  name ="+ name +" curRentName ="+ curRentName);
+
+                }else{
+                    System.out.println("zukgit4_1_2 空  this.name :" + this.name+"  name ="+ name +" curRentName ="+ curRentName);
+                }
+                // zukgit2  json ={"source":[],"abstract":[],"title":[[0,4]]}
+                System.out.println("zukgit2  json =" + json);
+                //zukgit2  json =[[[{"name":"xm1","age":19},{"name":"[xm2","age":19},{"name":"{xm3","age":19}],[{"name":"[[xm4","age":19},{"name":"{{xm5","age":19}]],[[{"name":"xm6","age":19},{"name":"xm7","age":19}],[{"name":"xm8","age":19}]]]
+                if(json.startsWith("{}")){ // 为空{} 的对象 创建 Bean    AA
+                    System.out.println("zukgit6_1  ");
+                    parseMap();
+                    HashMap curMap = new HashMap();
+                    arrList.sort(new Comparator<ProperityItem>() {
+                        @Override
+                        public int compare(ProperityItem o1, ProperityItem o2) {
+
+                            if(o1.isClassList && o2.isBaseList){ // 【类集合】大于【基础属性集合】
+                                return -1 ;
+                            } else if(o1.isClassType &&  o2.isBaseList){ // 【类基础】大于【基础属性集合】
+                                return -1 ;
+                            } else if(o1.isList && !o2.isList){  // 【列表】大于【非列表】
+                                return -1 ;
+                            } else if(o1.isClassType && o2.isBaseType){
+                                return -1;
+                            }else{
+                                return 0;
+                            }
+
+                        }
+                    });
+
+                    curMap.put(this.name, arrList);
+                    Rule17_arrMapList.add(curMap);
+                    return null;
+
+                } else if (json.startsWith("{")) {
+                    System.out.println("zukgit3   ");
+                    parseMap();
+                    System.out.println("zukgit3_1  ");
+                    HashMap curMap = new HashMap();
+                    // zukgit2  json ={"source":[],"abstract":[],"title":[[0,4]]}
+                    arrList.sort(new Comparator<ProperityItem>() {
+                        @Override
+                        public int compare(ProperityItem o1, ProperityItem o2) {
+
+                            if(o1.isClassList && o2.isBaseList){ // 【类集合】大于【基础属性集合】
+                                return -1 ;
+                            } else if(o1.isClassType &&  o2.isBaseList){ // 【类基础】大于【基础属性集合】
+                                return -1 ;
+                            } else if(o1.isList && !o2.isList){  // 【列表】大于【非列表】
+                                return -1 ;
+                            } else if(o1.isClassType && o2.isBaseType){
+                                return -1;
+                            }else{
+                                return 1;
+                            }
+
+                        }
+                    });
+                    curMap.put(this.name, arrList);
+                    Rule17_arrMapList.add(curMap);
+                    return null;
+                } else if(json.startsWith("[]")){  // 如果当前的 对象为 [] 即为空
+                    //  获取这个
+                    System.out.println("AA1 json= "+ json +" properItem="+ this.toString());  // [对象1, 对象2]
+                    return "Object";
+                }else if (json.startsWith("[") && json.length() > 2) {  //  ["小康","社会"]
+                    System.out.println("zukgit4  ");  // [对象1, 对象2]
+                    String clz = parseArray();  // 解析对象 返回  List<Onjext>  xxx  等等
+                    returnString = new String(clz)+this.fatherName;
+                    // father_name
+                    System.out.println("zukgitx8  ");
+                    if(this.fatherName != null && this.fatherName.equals("RootBean")){   // 继续点
+// RootBean_Arr Clz = List<A_B_C>  name= null  fathername=RootBean curRentName=
+                        System.out.println("ZZXX RootBean_Arr Clz = "+ clz +"   name= "+ name +"  fathername="+this.fatherName+" curRentName="+ curRentName);
+                    }
+                    if (name == null && curRentName.trim().isEmpty()) {
+                        System.out.println("zukgit4_1_2_空  this.name :" + this.name+"  name ="+ name +" curRentName ="+ curRentName+" clz="+clz+ "  不会执行 writeList(clz) 方法了  操蛋！");
+                        System.out.println("zukgitx7  ");
+                        return clz;
+                    } else{
+
+                        System.out.println("zukgit4_1_1_非空  this.name :" + this.name+"  name ="+ name +" curRentName ="+ curRentName+" clz="+clz);
+                    }
+
+//                    Line 214: zukgit4_1  clz =List<String>name =null
+//                    Line 299: zukgit4_1  clz =List<Integer>name =null
+//                    Line 301: zukgit4_1  clz =List<>name =null
+//                    Line 416: zukgit4_1  clz =List<D>name =null
+//                    Line 421: zukgit4_1  clz =List<A_B_C>name =null
+//                    Line 467: zukgit4_1  clz =List<E>name =null
+                    System.out.println("zukgitx6  ");
+                    System.out.println("zukgit4_2  name != null   非空的情况才会在这里 在这里书写 writeList  zzj");
+                    generationBean.writeList(clz);
+                    HashMap curMap = new HashMap();
+                    if(name != null){
+                        System.out.println("zukgitx5  ");
+                        arrList.sort(new Comparator<ProperityItem>() {
+                            @Override
+                            public int compare(ProperityItem o1, ProperityItem o2) {
+
+                                if(o1.isClassList && o2.isBaseList){ // 【类集合】大于【基础属性集合】
+                                    return -1 ;
+                                } else if(o1.isClassType &&  o2.isBaseList){ // 【类基础】大于【基础属性集合】
+                                    return -1 ;
+                                } else if(o1.isList && !o2.isList){  // 【列表】大于【非列表】
+                                    return -1 ;
+                                } else if(o1.isClassType && o2.isBaseType){
+                                    return -1;
+                                }else{
+                                    return 1;
+                                }
+
+                            }
+                        });
+                        curMap.put(name, arrList);
+                        Rule17_arrMapList.add(curMap);
+                        System.out.println("zukgitx4  ");
+                        return clz;
+                    } else if(curRentName != null && !curRentName.trim().isEmpty()){
+
+                        arrList.sort(new Comparator<ProperityItem>() {
+                            @Override
+                            public int compare(ProperityItem o1, ProperityItem o2) {
+
+                                if(o1.isClassList && o2.isBaseList){ // 【类集合】大于【基础属性集合】
+                                    return -1 ;
+                                } else if(o1.isClassType &&  o2.isBaseList){ // 【类基础】大于【基础属性集合】
+                                    return -1 ;
+                                } else if(o1.isList && !o2.isList){  // 【列表】大于【非列表】
+                                    return -1 ;
+                                } else if(o1.isClassType && o2.isBaseType){
+                                    return -1;
+                                }else{
+                                    return 1;
+                                }
+
+                            }
+                        });
+                        curMap.put(curRentName, arrList);
+                        Rule17_arrMapList.add(curMap);
+                        System.out.println("zukgitx3  ");
+                        return clz;
+
+                    }else{
+                        System.out.println("zukgitx2  ");
+                        return clz;
+                    }
+                } else {
+                    System.out.println("zukgitx1  ");
+                    System.out.println("开始解析Bean类:" + this.name + " 失败 ");
+                }
+                return null;
+            } catch (Exception e) {
+                e.fillInStackTrace();
+                System.out.println(" 发生异常 ！ Exception =");
+                e.printStackTrace();
+
+            } finally {
+                return curRentName;
+            }
+        }
+
+        private void parseMap() throws IOException {
+            //  parseMap() json={"source":[],"abstract":[],"title":[[0,4]]}
+            Map<String, Object> map = jsonParse.toMap(json);
+            System.out.println(" parseMap() json="+ json);
+            Iterator<Map.Entry<String, Object>> itr = map.entrySet().iterator();
+            String childName_arr = null;
+            while (itr.hasNext()) {
+                Map.Entry<String, Object> entry = itr.next();
+                String k = entry.getKey();
+                Object v = entry.getValue();
+                if (v == null || v.toString().equals("[]")) {
+                    // old 逻辑: 如果发现 当前的列表为空的话 就从  属性map 中删除它
+                    // new 逻辑: 如果发现 当前的列表为空的话 就设置它的属性是 List<Object> null  不需要创建类对象 但需要有 这个 Property
+                    System.out.println("AA  k ="+ k +"   v="+v + " this.toString()"+this.toString()+ "   json="+ json);
+//  AA  k =abstract   v=[] this.toString()this.name=Highlight   this.fatherName=B   json={"source":[],"abstract":[],"title":[[0,4]]}
+                    entry.setValue("List<Object>");
+
+//============== 打印 JavaBean: Highlight 开始==============
+//index=0  item=【 ownnerClassName=null  properityName=Highlight TypeName=Class refClassName=B  isBaseType=false  isClassType=true  isList=false baseListCount=0 classListCount=0】
+//============== 打印 JavaBean: Highlight 结束==============
+//  AA  k =image_list   v=[] this.toString()this.name=B   this.fatherName=null   json=
+                    //  itr.remove();         ProperityItem(String ownnerClassName, String properityName, String TypeName, String refClassName)
+
+// AA  k =source   v=[] this.toString()this.name=Highlight   this.fatherName=B   json={"source":[],"abstract":[],"title":[[0,4]]}
+                    String ownerClassName="";
+                    if(this.fatherName != null && this.name != null){
+                        ownerClassName = this.name;
+                    } else if(this.name == null && this.fatherName != null){
+                        ownerClassName = this.fatherName;
+
+                    } else if(this.name != null && this.fatherName == null ){
+
+                        ownerClassName = this.name;
+                    } else{
+                        ownerClassName = null;
+                    }
+                    ProperityItem item = new ProperityItem(ownerClassName, k, entry.getValue() + "", this.name == null ? this.fatherName:null);
+                    arrList.add(item);
+                    continue;
+                }
+                if (v instanceof Integer) {
+                    entry.setValue("Integer");
+                } else if (v instanceof BigDecimal) {
+                    entry.setValue("Double");
+                } else if (v instanceof String) {
+                    entry.setValue("String");
+                } else {
+                    String childJson = v.toString();  // key 是 对象中 非基础数据类型   value 可能还是空 需要设置
+                    if (childJson.endsWith("{}")) {  // 空的对象  那么 Object
+
+                        String childName = nameGeneration.formatName(k);  // nima
+                        entry.setValue(childName);
+                        String key = entry.getKey();
+                        String valueName =    new Json2Bean(childJson, childName, this.name, nameGeneration, jsonParse, generationBean).execute();
+                        // entry.setValue("valueName");
+                        System.out.println("zchildJson="+ childJson +"  valueName="+ valueName+"  key="+ key +"  childName="+ childName+"    this.name="+ this.name);
+                    } else if (childJson.startsWith("{")) {
+
+                        String childName = nameGeneration.formatName(k);
+                        entry.setValue(childName);
+                        new Json2Bean(childJson, childName, this.name, nameGeneration, jsonParse, generationBean).execute();
+                    }else if(childJson.startsWith("[]")){  // 是空的对象的话
+                        String childName = nameGeneration.formatName(k); // 产生名字
+                        entry.setValue(childName);
+                        new Json2Bean(childJson, childName, this.name, nameGeneration, jsonParse, generationBean).execute();
+
+                    } else if (childJson.startsWith("[")) {
+
+                        childName_arr = new Json2Bean(childJson, null, this.name, nameGeneration, jsonParse, generationBean).execute();
+
+                        if(childName_arr== null || childName_arr.trim().equals("")){
+
+                            if(returnString != null  &&  !returnString.trim().isEmpty() && returnString.contains(this.name) ){
+                                String item = new String( returnString);
+                                item = item.replaceAll(this.name,"");
+                                childName_arr = item;
+                            }
+                        }
+                        // List<A_B_C> 会走这里     zzj  继续点
+                        if(((String)k).equals("data")) {
+                            System.out.println("ZZXX childJson.startsWith parseMap    name[fatherName]="+ name + "    this.name[fatherName]="+ this.name +" key ="+ k+"   childName[Clz]="+ childName_arr);
+                            // childJson.startsWith parseMap    name=RootBean    this.name=RootBean key =data   childName=空  这里应该返回 List<A_B_C>
+                        }
+
+
+                        entry.setValue(childName_arr);
+
+
+
+                    } else {
+                        entry.setValue("String");
+                    }
+
+                }
+                //     // ProperityItem(String ownnerClassName, String properityName, String TypeName, String refClassName)
+                arrList.add(new ProperityItem(this.name, k, entry.getValue() + "", this.name == null ? this.fatherName:null));
+//         ProperityItem(String ownnerClassName, String properityName, String TypeName, String refClassName)
+                // zkey = topic zvalue = Topic this.fatherName=B childName = null  this.name=Extra
+                // zkey = topic_2048 zvalue = Topic_2048 this.fatherName=B childName = null  this.name=Extra
+                System.out.println(" zkey = " + k + " zvalue = " + entry.getValue() +" this.fatherName="+ this.fatherName +" childName = "+ childName_arr +"  this.name="+ this.name );
+
+            }
+
+            System.out.println("writeBean  Aname ="+ name);
+            generationBean.writeBean(name, map);
+
+
+        }
+
+        public static boolean isContainChinese(String str) {
+            Pattern p = Pattern.compile("[\u4e00-\u9fa5]");
+            Matcher m = p.matcher(str);
+            if (m.find()) {
+                return true;
+            }
+            return false;
+        }
+
+        private String parseArray() throws IOException {
+            List<Object> list = jsonParse.toArray(json);   //  ["小康","社会"]
+            if (list == null || list.size() == 0) {
+                return null;
+            }
+
+            Object firstObj = list.get(0);
+            System.out.println("Zukgit firstObj =  " + firstObj.toString());
+
+            if (firstObj instanceof Integer) {
+                for (int i = 1; i < list.size(); i++) {
+                    Object v = list.get(i);
+                    if (v instanceof BigDecimal) {
+                        System.out.println(" childName 4=  List<Double>");
+                        //    returnStr = "List<Double>";
+                        return "List<Double>";
+                    }
+                }
+                System.out.println(" childName 5 =  List<Integer>");
+                //   returnStr = "List<Double>";
+                return "List<Integer>";
+            } else if (firstObj instanceof BigDecimal) {
+                System.out.println(" childName 6=  List<Double>");
+                // returnStr = "List<Double>";
+                return "List<Double>";
+
+            } else if (firstObj instanceof String) {
+                System.out.println(" childName 7=  List<String>");
+                // returnStr = "List<Double>";
+                return "List<String>";
+            }
+
+
+            if (!firstObj.toString().startsWith("{") && !firstObj.toString().startsWith("[")) {
+
+
+                return "List<String>";
+            }
+
+            String childName = "";
+            String arrReturenString = "";
+            //   Object v = list.get(0);  // 只拿取  [{1},{2},{3} ....]  只拿取第一个 对象  但往往有些Json的 第一个位置  第二个位置 第三个位置 往往是不同的对象
+            // 在这里要判断  它的数组里面的属性是否是相同的  相同的话  取一个分析 就可以       数组对象属性不同的话 那么就要每个拿出来分析 并新创建对象
+
+            List<Object> diffObjectInArr = checkObjectSame(list);   //
+            System.out.println("diffObjectInArr  =  " + diffObjectInArr.size());
+            String returnStr = "";
+            if (diffObjectInArr != null) {
+                if (diffObjectInArr.size() == 1) {
+                    Object v = diffObjectInArr.get(0);
+                    if (v instanceof Integer) {
+                        for (int i = 1; i < list.size(); i++) {
+                            v = list.get(i);
+                            if (v instanceof BigDecimal) {
+                                System.out.println(" childName 8=  List<Double>");
+                                returnStr = "List<Double>";
+                                return "List<Double>";
+                            }
+                        }
+                        System.out.println(" childName 99 =  List<Integer>");
+                        returnStr = "List<Double>";
+                        return "List<Integer>";
+                    } else if (v instanceof BigDecimal) {
+                        System.out.println(" childName 10=  List<Double>");
+                        returnStr = "List<Double>";
+                        return "List<Double>";
+
+                    } else if (v instanceof String) {
+                        System.out.println(" childName 11=  List<String>");
+                        returnStr = "List<Double>";
+                        return "List<String>";
+                    } else {
+                        String childJson = v.toString();
+
+                        if (childJson.startsWith("{}")) {
+                            return "List<Object>";
+                        } else if (childJson.startsWith("{")) {
+                            childName = nameGeneration.nextName();
+
+                            new Json2Bean(childJson, childName, name, nameGeneration, jsonParse, generationBean).execute();
+                            System.out.println(" childName  12= " + childName);
+                            //  arrList.add("List<" + childName + ">");
+                            returnStr = "List<" + childName + ">";
+                            return "List<" + childName + ">";
+                        } else if (childJson.startsWith("[")) {
+                            childName = new Json2Bean(childJson, null, this.name, nameGeneration, jsonParse, generationBean).execute();
+                            System.out.println(" childName 13= " + childName); // 这里返回为空 curRentName = clz=List<>
+                            //  arrList.add("List<" + childName + ">");
+                            if(childName == null || childName.trim().isEmpty() || childName.trim().equals("null")){
+                                childName = "Object";
+                            }
+                            returnStr = "List<" + childName + ">";
+                            return "List<" + childName + ">";
+
+                        } else {
+                            System.out.println(" childName 14= " + childName);
+                            //    arrList.add("List<String>" + childName);
+                            returnStr = "List<" + childName + ">";
+                            return "List<String>";
+                        }
+
+                    }
+                } else {
+                    int ZCount = 0;
+//  对于多个 数组中 多个   Object的 处理
+
+                    for (Object object : diffObjectInArr) {
+
+//                        String childJson = object.toString();
+//                        String className = nameGeneration.nextName();
+//
+//                        System.out.println("ZCount=" + ZCount + " iffObjectInArr.size =" + diffObjectInArr.size() + " this.name=" + name + "    Zukgit  childName = " + childName + " className =" + className + " childJson=" + childJson);
+//                        new Json2Bean(childJson, className, this.name, nameGeneration, jsonParse, generationBean).execute();
+//                        System.out.println("ZCount=" + ZCount + "   Zukgit  childJson = " + childJson);
+//                        ZCount++;
+
+
+                        String childJson = object.toString();
+                        System.out.println("ZCount = "+ ZCount+"   Zukgit_Object  childJson= "+ childJson);
+                        System.out.println(" zukgit childJson = " + childJson);
+
+                        if (childJson.startsWith("{}")) {
+                            arrReturenString = "List<Object>";
+                        } else if (childJson.startsWith("{")) {
+                            childName = nameGeneration.nextName();
+
+                            new Json2Bean(childJson, childName, name, nameGeneration, jsonParse, generationBean).execute();
+
+                            //  arrList.add("List<" + childName + ">");
+                            curIndexStr =curIndexStr + "\\n"+childName  ;    // /nA[][][][]
+                            int diffObjectSize = diffObjectInArr.size();
+                            int indexArrSize =  classArr.size();   // <A___B___C>/nA[][][][]/nB[][][]/nC[][][] 的位置不对
+                            if(diffObjectSize == indexArrSize){
+                                ArrayList<Integer> curIndexArr = classArr.get(ZCount);
+                                for(Integer intx : curIndexArr){
+                                    curIndexStr=curIndexStr+"["+intx+"]";
+                                }
+                            }
+
+                            // A___B___C  ==> A[1]___B[2]___C[3]
+                            arrReturenString = arrReturenString+childName +  "___"; // <A___B___C>/nA[][][][]/nB[][][]/nC[][][]
+                            System.out.println("diffObjectInArr.size"+diffObjectInArr.size()+"   childName 1= " + childName+"  arrReturenString"+arrReturenString+"    childJson= "+ childJson);
+
+
+//                            diffObjectInArr.size3   childName 1= A  arrReturenStringA___
+//                            diffObjectInArr.size3   childName 1= B  arrReturenStringA___B___
+//                            diffObjectInArr.size3   childName 1= C  arrReturenStringA___B___C___
+
+
+                            //  return "List<" + childName + ">";     // 这里没有返回 "List<" + childName + ">"; 导致  程序中 缺 List<>
+                        } else if (childJson.startsWith("[")) {
+                            childName = new Json2Bean(childJson, null, this.name, nameGeneration, jsonParse, generationBean).execute();
+                            System.out.println(" childName 2= " + childName);
+                            //  arrList.add("List<" + childName + ">");
+                            arrReturenString = "【" + childName + "】" + arrReturenString;
+                            //       return "List<" + childName + ">";
+
+                        } else {
+                            System.out.println(" childName 3= " + childName);
+                            //    arrList.add("List<String>" + childName);
+                            arrReturenString = "【" + childName + "】";
+                            return "List<String>";
+                        }
+                        ZCount++;
+                    }
+                    classArr.clear();
+                }
+            }
+
+            while(arrReturenString.endsWith("_")){
+                arrReturenString = arrReturenString.substring(0,arrReturenString.length()-1);
+
+            }
+            if(arrReturenString.trim().isEmpty()){
+                arrReturenString = "Object";
+            }
+            String endResult = "List<"+arrReturenString+">";
+            if(!curIndexStr.trim().isEmpty()){
+                endResult = endResult+curIndexStr;
+            }
+
+            // endResult=List<【C】【B】【A】>\nA[1][2]\n[3][4][5]\n[6][7][8]
+            System.out.println("zendResult=" + endResult +  "arrReturenString ="+  arrReturenString +" nima ######################");
+            return endResult;
+        }
+
+        static String curIndexStr =""; //\nA[1][2]\nB[3]\nC[4]
+        static List<Object> checkObjectSame(List<Object> srcList) {  // 对象和对象相同
+            // 来到这里的都是 [{},{},{}] 样式的数据
+
+            boolean isDiffClass = false;
+            List<Object> temp = new ArrayList<Object>();
+            int length = srcList.size();
+            if (length == 0) {
+                return null;
+            }
+            int index_y = 0;
+            System.out.println("=========== Json 原始长度 srcList.length = " + srcList.size() + "===========Begin ");
+            for (Object object : srcList) {
+                System.out.println("index =" + index_y + "  object =" + object.toString());
+                index_y++;
+
+            }
+            System.out.println("=========== Json 原始长度 srcList.length = " + srcList.size() + "===========End ");
+            Object firstObject = srcList.get(0);
+            HashSet<Set<String>> diffObjSet = new HashSet<Set<String>>();
+            ArrayList<Integer> indexList = new ArrayList<Integer>();
+            for (int index = 0; index < length; index++) {
+                Object curObject = srcList.get(index);
+                if (curObject instanceof JSONObject && firstObject instanceof JSONObject) {
+                    Set<String> curKeySet = ((JSONObject) curObject).keySet();
+                    Set<String> firstKeySet = ((JSONObject) firstObject).keySet();
+
+
+                    if (!firstKeySet.equals(curKeySet)) {
+
+                        isDiffClass = true;
+                    } else {
+                        isDiffClass = false;
+                    }
+
+
+                    // 判断 数据列表中 有多少个 Object 的    缺斤少两的 同一归为一个Object
+//                    if (curKeySet.equals(firstKeySet)) {
+//                        if (!diffObjSet.contains(curKeySet)) {
+//                            indexList.add(index);
+//                            System.out.println("当前 index = " + index + "    相同的 KeySet 键值集合  ");
+//                            diffObjSet.add(curKeySet);  // 如果 相同 则 放入
+//                        }
+//                    } else {
+//                        if (!diffObjSet.contains(curKeySet) && checkMaxValue(diffObjSet, curKeySet)) {
+//                            diffObjSet.add(curKeySet);
+//                            indexList.add(index);
+//                            System.out.println("当前 index = " + index + "    不相同的 KeySet 键值集合  ");
+//                        }
+//                        System.out.println("难道这里会打印！ ");
+//                    }
+
+
+                } else {
+
+                    System.out.println("当前 index = " + index + "     不能转为  JSONObject?  curObject= " + curObject.toString());
+                }
+
+
+            }
+            System.out.println("isDiffClass = " + isDiffClass);
+
+            if (!isDiffClass) {
+                temp.add(srcList.get(0));
+                return temp;
+
+            }
+            //   处理 那些  不同  Object [{A:1,B:2},{C:3,D:4}......] 样式的数据
+            temp = toCheckDiff(srcList);
+
+            return temp;
+        }
+
+        static ArrayList<ArrayList<Integer>> classArr =new ArrayList<ArrayList<Integer>>();
+
+        @SuppressWarnings("unchecked")
+        static List<Object> toCheckDiff(List<Object> srcList) {
+            List<Object> temp = new ArrayList<Object>();
+            int length = srcList.size();
+            // 获取到 所有的 Key  以及 所有的Value
+//   两个集合的交集大于 当前size的一半  那么 就认为 它们是同一个类
+            // 两次 循环 找出 和自己 相似的那个 集合  然后 把 它们的 索引放到一起
+            Set<String> allSetKey = new HashSet<String>();
+            Map<Integer,Integer> intMap = new  HashMap<Integer,Integer>();
+            int classCategory = 0;
+            // 【1,3】  【1,4】 【1,5】  【1,6】
+            // 【2,7】【2，8】
+            // 【3,9】【3，10】
+
+            for(int i =0 ; i < length ; i++){
+                JSONObject curObjectA  = (JSONObject)srcList.get(i);
+                allSetKey.addAll(curObjectA.keySet());
+                for(int j =0 ; j < length ; j++){
+                    if(i == j){
+                        continue;
+                    }
+                    JSONObject curObjectB  = (JSONObject)srcList.get(j);
+                    Set<String>  aSet =  new HashSet<String>(curObjectA.keySet());
+                    Set<String>  bSet =  new HashSet<String>(curObjectB.keySet());
+                    int aSize = aSet.size();
+                    int bSize = aSet.size();
+                    if(aSet.size() >= bSet.size()){ // 总是以大Set去 交集 小的Set
+                        aSet.retainAll(bSet);
+                        if(aSet.size() > (aSize/2)){
+                            intMap.put(i,j);
+                        }
+                    } else{
+                        bSet.retainAll(aSet);
+                        if(bSet.size() > (bSize/2)){
+                            intMap.put(i,j);
+                        }
+                    }
+                }
+            }
+
+
+            Map.Entry<Integer , Integer> entry;
+
+            Iterator iterator = intMap.entrySet().iterator();
+
+
+            int xIndex = 0;
+            while( iterator.hasNext() ){
+                entry = (Map.Entry<Integer, Integer>) iterator.next();
+                Integer key = entry.getKey();  //Map的Value
+                Integer value = entry.getValue();  //Map的Value
+                System.out.println("【 key=" +key+"  value=" +value+"】");
+                if(xIndex == 0){
+                    ArrayList<Integer> arrItem = new  ArrayList<Integer>();
+                    arrItem.add(key);
+                    arrItem.add(value);
+                    classArr.add(arrItem);
+                    xIndex++;
+                    continue;
+                }
+
+
+                ListIterator<ArrayList<Integer>>  outArray =    classArr.listIterator();
+                //   for(ArrayList<Integer> arrBean : classArr){
+                while (outArray.hasNext()) {
+
+                    ArrayList<Integer>     arrBean = (ArrayList<Integer>)outArray.next();
+//                    for(Integer intIndex : arrBean){
+//                        System.out.println("intIndex = "+ intIndex);
+//
+// if(arrBean.contains(key) || arrBean.contains(value) || intIndex == key || intIndex == value){
+//                            arrBean.add(key);
+//                            arrBean.add(value);
+//                        }else{
+//                            ArrayList<Integer> newItem = new  ArrayList<Integer>();
+//                            newItem.add(key);
+//                            newItem.add(value);
+//     classArr.add(newItem);
+//                        }
+//
+
+                    //  Iterator<Integer> iteratorInteger = arrBean.iterator();
+                    ListIterator<Integer> iteratorInteger =     arrBean.listIterator();
+                    while (iteratorInteger.hasNext()) {
+                        Integer curInteger = iteratorInteger.next();
+                        System.out.println("curInteger  = "+ curInteger);
+                        if (arrBean.contains(key) || arrBean.contains(value) || curInteger == key || curInteger == value) {
+                            // 循环中 增加
+                            if(!arrBean.contains(key) && arrBean.contains(value) ){
+                                iteratorInteger.add(key);
+                                break;
+                            }
+                            if(!arrBean.contains(value) && arrBean.contains(key) ){
+                                iteratorInteger.add(value);
+                                break;
+                            }
+
+                        } else{
+
+// 【 key=9  value=19】
+//curInteger  = 1
+//
+//
+//【 key=19  value=9】
+// curInteger  = 1
+
+                            ArrayList<Integer> arrItemNew = new  ArrayList<Integer>();
+                            if(key < value) {
+                                arrItemNew.add(key);
+                                arrItemNew.add(value);
+                            }else{
+                                arrItemNew.add(value);
+                                arrItemNew.add(key);
+                            }
+                            if(!classArr.contains(arrItemNew)){
+                                outArray.add(arrItemNew);
+                                break;
+                            }
+                            continue;
+
+
+                        }
+                    }
+                    break;
+
+                }
+            }
+
+// 没有包含索引的那个类 是单独的类
+//  具有相同 Value , 以及 该Value 对应的 Key  为 相同的类
+            System.out.println("classArr.size = "+ classArr.size());
+
+            for(int index_value = 0 ; index_value < classArr.size() ; index_value++){
+                System.out.println("=============数组 ==" + index_value +" Begin=============");
+                Collections.sort(classArr.get(index_value));
+                for(Integer item : classArr.get(index_value)){
+                    System.out.println("item = "+ item);
+                }
+                System.out.println("=============数组 ==" + index_value +" End=============");
+            }
+
+            for(int y=0;y<length;y++){
+                if(intMap.get(y) == null){  // 说明 该索引对应的 {}  为单独存在的  不与其他的项相同
+                    temp.add(srcList.get(y));
+                }
+// 存在相同的项的话  就从  classArr 中寻找那个 KeySet 最大的
+            }
+
+            List<Object> sameObjectMax = getSameObjectMax(srcList ,classArr ) ;
+
+            for(int y=0;y<length;y++){
+                if(intMap.get(y) == null){  // 说明 该索引对应的 {}  为单独存在的  不与其他的项相同
+                    // 往   ArrayList<ArrayList<Integer>> classArr 也 添加这个索引 单独在一个ArrayList
+                    ArrayList<Integer> newItem_alone = new  ArrayList<Integer>();
+                    newItem_alone.add(y);
+                    classArr.add(newItem_alone);
+                }
+// 存在相同的项的话  就从  classArr 中寻找那个 KeySet 最大的
+            }
+
+            classArr.sort(new Comparator<ArrayList<Integer>>() {
+                @Override
+                public int compare(ArrayList<Integer> o1, ArrayList<Integer> o2) {
+                    int minIndexO1 = 0;
+                    int minIndexO2 = 0;
+
+                    for(int x =0 ; x < o1.size();x++){
+                        int temp = o1.get(x);
+                        if(x == 0){
+                            minIndexO1 = o1.get(x);
+                        }
+                        if(temp < minIndexO1){
+                            minIndexO1 = temp;
+                        }
+                    }
+                    for(int x =0 ; x < o2.size();x++){
+                        int temp = o2.get(x);
+                        if(x == 0){
+                            minIndexO2 = o2.get(x);
+                        }
+                        if(temp < minIndexO2){
+                            minIndexO2 = temp;
+                        }
+                    }
+
+                    if(minIndexO1 < minIndexO2){
+                        return -1;
+                    }else{
+                        return 1;
+                    }
+                }
+            });
+            if(sameObjectMax != null){
+
+                System.out.println("sameObjectMax.size = "+sameObjectMax.size());
+                temp.addAll(sameObjectMax);
+            }
+
+
+
+//【 key=1  value=18】
+//【 key=2  value=18】
+//【 key=3  value=18】
+//【 key=4  value=18】
+//【 key=5  value=18】
+//【 key=6  value=18】
+//【 key=7  value=18】
+//【 key=8  value=18】、
+//【 key=10  value=18】
+//【 key=11  value=18】
+//【 key=12  value=18】
+//【 key=13  value=18】
+//【 key=14  value=18】
+//【 key=15  value=18】
+//【 key=16  value=18】
+//【 key=17  value=18】
+//【 key=18  value=17】
+//
+//【 key=9  value=19】
+//【 key=19  value=9】
+            return temp;
+        }
+
+        static List<Object> getSameObjectMax(List<Object>  srcList ,  ArrayList<ArrayList<Integer>> classArr) {
+            List<Object> itemList = new ArrayList<Object>();
+            System.out.println("maxLenthObj= X2  classArr.size()="+ classArr.size()  +" srcList.size"+ srcList.size());
+            for (int index_value = 0; index_value < classArr.size(); index_value++) {
+                JSONObject maxLenthObj = null ;
+                System.out.println("maxLenthObj= X1");
+
+                for(Integer index_value_y :  classArr.get(index_value)){
+                    if(maxLenthObj == null){
+                        maxLenthObj = (JSONObject)srcList.get(classArr.get(index_value).get(0));
+                    }
+                    System.out.println("index_value:"+index_value+"    index_value_y="+index_value_y);
+                    JSONObject currentObj = (JSONObject)srcList.get(index_value_y);
+                    if(currentObj == null){
+                        System.out.println("尼玛 空 currentObj= "+currentObj);
+                        continue;
+                    }
+
+                    int curLength =  currentObj.keySet().size();
+                    int maxLength =   maxLenthObj.keySet().size();
+                    if(curLength >= maxLength){
+                        maxLenthObj = currentObj;
+                    }
+
+                }
+                itemList.add(maxLenthObj);
+                System.out.println("maxLenthObj= "+maxLenthObj);
+            }
+            System.out.println("maxLenthObj= X3");
+            return itemList;
+        }
+
+        static boolean checkMaxValue(HashSet<Set<String>> hashset, Set<String> itemSet) {
+            boolean flag = false;
+            Iterator<Set<String>> it = hashset.iterator();
+            while (it.hasNext()) {
+                Set<String> curSet = it.next();
+                // 如果当前 添加的到 hashset的 项 set<String>   包含 当前循环找到的 set<String>  那么删除 这个 当前循环到的  set<String>
+                if (itemSet.containsAll(curSet)) {
+                    hashset.remove(curSet);
+                    flag = true;
+                } else if (curSet.containsAll(itemSet)) { //  如果   添加的到 hashset的 已经有 item 完全 包含 那么就   不添加该项
+                    flag = false;
+                    return false;
+                } else {
+                    // 【data[16] 有 60项 】 data[13]有 56项   但是 data[16] 的 60项中却没有  data[13] 中的 summary 这项
+                    //   curSet.retainAll()
+                    // 那么 把当前的 扫描的 Item  和 当前参数的 Item  合并   并把 当前item 删除
+
+                    Set<String> result = new HashSet<String>();
+                    result.addAll(itemSet);
+                    result.addAll(curSet);
+                    hashset.remove(curSet);
+                    hashset.add(result);
+                    flag = false;
+                }
+            }
+
+
+            return flag;
+        }
+
+    }
+
+
+    static class JsonFormat {
+
+        /**
+         * 默认每次缩进两个空格
+         */
+        private static final String empty = "  ";
+
+        public static String format(String json) {
+            try {
+                json = removeUnUsedSpaces(json);
+                int empty = 0;
+                char[] chs = json.toCharArray();
+                StringBuilder stringBuilder = new StringBuilder();
+                for (int i = 0; i < chs.length; ) {
+                    //若是双引号，则为字符串，下面if语句会处理该字符串
+                    if (chs[i] == '\"') {
+
+                        stringBuilder.append(chs[i]);
+                        i++;
+                        //查找字符串结束位置
+                        for (; i < chs.length; ) {
+                            //如果当前字符是双引号，且前面有连续的偶数个\，说明字符串结束
+                            if (chs[i] == '\"' && isDoubleSerialBackslash(chs, i - 1)) {
+                                stringBuilder.append(chs[i]);
+                                i++;
+                                break;
+                            } else {
+                                stringBuilder.append(chs[i]);
+                                i++;
+                            }
+
+                        }
+                    } else if (chs[i] == ',') {
+                        stringBuilder.append(',').append('\n').append(getEmpty(empty));
+
+                        i++;
+                    } else if (chs[i] == '{' || chs[i] == '[') {
+                        empty++;
+                        stringBuilder.append(chs[i]).append('\n').append(getEmpty(empty));
+
+                        i++;
+                    } else if (chs[i] == '}' || chs[i] == ']') {
+                        empty--;
+                        stringBuilder.append('\n').append(getEmpty(empty)).append(chs[i]);
+
+                        i++;
+                    } else {
+                        stringBuilder.append(chs[i]);
+                        i++;
+                    }
+
+
+                }
+
+
+                return stringBuilder.toString();
+            } catch (Exception e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+                return json;
+            }
+
+        }
+
+        static boolean isDoubleSerialBackslash(char[] chs, int i) {
+            int count = 0;
+            for (int j = i; j > -1; j--) {
+                if (chs[j] == '\\') {
+                    count++;
+                } else {
+                    return count % 2 == 0;
+                }
+            }
+
+            return count % 2 == 0;
+        }
+
+        /**
+         * 缩进
+         *
+         * @param count
+         * @return
+         */
+        static String getEmpty(int count) {
+            StringBuilder stringBuilder = new StringBuilder();
+            for (int i = 0; i < count; i++) {
+                stringBuilder.append(empty);
+            }
+
+            return stringBuilder.toString();
+        }
+
+
+        static String removeUnUsedSpaces(String json) {
+            char[] chs = json.toCharArray();
+            StringBuilder stringBuilder = new StringBuilder();
+            for (int i = 0; i < chs.length; ) {
+                //若是双引号，则为字符串，下面if语句会处理该字符串
+                if (chs[i] == '\"') {
+
+                    stringBuilder.append(chs[i]);
+                    i++;
+                    //查找字符串结束位置
+                    for (; i < chs.length; ) {
+                        //如果当前字符是双引号，且前面有连续的偶数个\，说明字符串结束
+                        if (chs[i] == '\"' && isDoubleSerialBackslash(chs, i - 1)) {
+                            stringBuilder.append(chs[i]);
+                            i++;
+                            break;
+                        } else {
+                            stringBuilder.append(chs[i]);
+                            i++;
+                        }
+
+                    }
+                } else {
+
+                    if (chs[i] == ' ' || chs[i] == '\t' || chs[i] == '\n') {
+                        i++;
+                        continue;
+                    }
+
+                    stringBuilder.append(chs[i]);
+                    i++;
+                }
+
+            }
+
+            return stringBuilder.toString();
+        }
+
+    }
+
+    static String Rule17_OutJava_Dir_TimeStampStr = null;
+    static String Rule17_OutRealJava_Path = null;
+
+    public interface JsonParse {
+        Map<String, Object> toMap(String json);
+
+        List<Object> toArray(String json);
+    }
+
+
+    public static class MyBeanGenerator implements BeanGenerator {
+
+        String packName;
+
+        public MyBeanGenerator(String packName) {
+            // TODO Auto-generated constructor stub
+            this.packName = packName;
+        }
+
+
+        static  String[] javaCode={     "abstract",             "assert",               "boolean",
+                "break",                "byte",                 "case",                 "catch",
+                "char",                 "class",                "const",                "continue",
+                "default",              "do",                   "double",               "else",
+                "enum",                 "extends",              "final",                "finally",
+                "float",                "for",                  "goto",                 "if",
+                "implements",           "import",               "instanceof",           "int",
+                "interface",            "long",                 "native",               "new",
+                "package",              "private",              "protected",            "public",
+                "return",               "strictfp",             "short",                "static",
+                "super",                "switch",               "synchronized",         "this",
+                "throw",                "throws",               "transient",            "try",
+                "void",                 "volatile",             "while"                 };
+
+        static ArrayList<String> javaCodeArr = new ArrayList<String> ();
+        static{
+            Collections.addAll(javaCodeArr,javaCode);
+        }
+
+        @Override
+        public void writeBean(String className, Map<String, Object> map) throws IOException {
+// Topic048.java  zzj               执行该类
+if(Rule17_OutJava_Dir_TimeStampStr == null){
+    Rule17_OutJava_Dir_TimeStampStr = getTimeStampLong()+"";
+}
+            System.out.println(" MyBeanGenerator  className  ="+ className);
+            System.out.println("writeBean  className ="+ className + "packName = "+ packName);
+            while(className.contains(" ")){
+                className = className.replaceAll(" ","");
+            }
+            File file = new File(I9_OUT_DIR+File.separator+Rule17_OutJava_Dir_TimeStampStr+File.separator + packName.replace(".", "/"));
+            System.out.println("writeBean  file ="+ file.getAbsolutePath());
+            if (!file.exists() || file.exists() && file.isFile()) {
+                file.mkdirs();
+            }
+            if(Rule17_OutRealJava_Path == null){
+                Rule17_OutRealJava_Path = file.getAbsolutePath();
+            }
+          File javaFile =   new File(file, className + ".java");
+            System.out.println("javaFIle Path = "+ javaFile.getAbsolutePath());
+            BufferedWriter bw = new BufferedWriter(new FileWriter(javaFile));
+            bw.write("package ");
+            bw.write(packName);
+            bw.write(";\n");
+            bw.write("import java.util.List;\n\n");
+
+            bw.write("/**\n");
+            bw.write(" *auto generate\n");
+            bw.write(" *\n");
+            bw.write(" *@author Zukgit\n");
+            bw.write(" *\n");
+            bw.write(" */\n");
+
+            bw.write("public class ");
+            bw.write(className);
+            bw.write("{\n");
+            map = sortMapByKey(map);
+            Set<Map.Entry<String, Object>> set = map.entrySet();
+
+            for (Map.Entry<String, Object> entry : set) {
+                bw.write("    ");
+
+                String value =   entry.getValue().toString();
+                System.out.println(" zvaluepre = "+ value);
+                if(value.contains("\\n")){
+                    value = value.substring(0,value.indexOf("\\n"));
+                }
+                System.out.println(" zvalueback = "+ value);
+                if(value.contains("List") && value.contains("___")){
+                    //   List<A___B___C> == > List<Object>
+                    String pre = value.substring(0,value.indexOf("___")-1);
+                    String back = value.substring(value.lastIndexOf("___")+"___".length()+1,value.length());
+                    value = pre+"Object"+back;    //   List<AObject___B___C>
+                }
+                System.out.println(" zvalue = "+ value);
+                bw.write(value);
+// entry.getValue().key = abstract
+                System.out.println("X1  className  ="+ className+ " entry.getValue().toString() ="+ entry.getValue().toString()  + " entry.getValue().key = "+  entry.getKey());
+                //X1  MyBeanGenerator  className  =RootBean entry.getValue().toString() =List<A___B___C>\nA[1][2][3][4][5][6][7]
+                bw.write(" ");
+                String key = entry.getKey();
+                if(javaCodeArr.contains(key)){
+                    key = key+"_javacode";
+                }
+                bw.write(key);
+                bw.write(";\n");
+            }
+            bw.write("\n");
+
+            set = map.entrySet();
+
+            for (Map.Entry<String, Object> entry : set) {
+
+                bw.write("    public ");
+                String value1 =  entry.getValue().toString();
+                System.out.println(" zvaluepre  value1 = "+ value1);
+                if(value1.contains("\\n")){
+                    value1 = value1.substring(0,value1.indexOf("\\n"));
+                }
+                System.out.println(" zvalueback  value1 = "+ value1);
+                if(value1.contains("List") && value1.contains("___")){
+                    //   List<A___B___C> == > List<Object>
+                    String pre = value1.substring(0,value1.indexOf("___")-1);
+                    String back = value1.substring(value1.lastIndexOf("___")+"___".length()+1,value1.length());
+                    value1 = pre+"Object"+back;    // List<AObject___C>
+                }
+                bw.write(value1);
+                System.out.println(" zvalue1 = "+ value1);
+                // // entry.getValue().toString() = abstract
+                System.out.println("X2  MyBeanGenerator  x2 className  ="+ className+ " entry.getValue().toString() ="+ entry.getValue().toString());
+                bw.write(" get");
+                String key =entry.getKey();
+                if(javaCodeArr.contains(key)){
+                    key = key+"_javacode";
+                }
+
+                //  如果  当前的 value  包含 List 和 ___   那么获取  第一个 ___ 之前的位置    最后一个 ___之后的位置,  截取这个字符串 中间加 List<Object>
+
+// entry.getValue().toString() =List<A_B_C>
+                bw.write(capitalUpperCase(key));
+                System.out.println("X3  MyBeanGenerator x3  className  ="+ className+ " entry.getValue().toString() ="+ entry.getValue().toString() +"  capitalUpperCase(entry.getKey()) ="+ capitalUpperCase(entry.getKey()));
+
+                bw.write("(){\n");
+                bw.write("        ");
+                bw.write("return ");
+                bw.write(key);
+
+                bw.write(";\n    }\n\n");
+
+                //////////////////////////
+
+                bw.write("    public void ");
+                bw.write("set");  // 设置方法
+
+                String key_set =entry.getKey();
+                if(javaCodeArr.contains(key_set)){
+                    key_set = key_set+"_javacode";
+                }
+
+                bw.write(capitalUpperCase(key_set));
+
+
+                bw.write("(");
+                bw.write(value1);
+                bw.write(" ");
+                bw.write(key_set);
+                bw.write("){\n");
+                bw.write("        ");
+                bw.write("this.");
+                bw.write(key_set);
+                bw.write("=");
+                bw.write(key_set);
+                bw.write(";\n    }\n");
+
+                bw.write("\n");
+
+            }
+            bw.write("}");
+
+            bw.close();
+            System.out.println("javaFIle Path = "+ javaFile.getAbsolutePath());
+        }
+
+        private String capitalUpperCase(String s) {
+            char[] chs = s.toCharArray();
+            if (chs[0] >= 'a' && chs[0] <= 'z') {
+                chs[0] = (char) (chs[0] - 32);
+            }
+            return new String(chs);
+
+        }
+
+        @Override
+        public void writeList(String list) throws IOException {
+
+            System.out.println("className1  writeList  = " + list);  // zzj
+            File file = new File("src/" + packName.replace(".", "/"));
+            if (!file.exists() || file.exists() && file.isFile()) {
+                file.mkdirs();
+            }
+
+            BufferedWriter bw = new BufferedWriter(new FileWriter(new File(file, list.replaceAll("<|>", "_") + ".txt")));
+
+            bw.write(list);
+            bw.write(";");
+
+            bw.close();
+
+        }
+
+        public Map<String, Object> sortMapByKey(Map<String, Object> oriMap) {
+
+            Map<String, Object> sortedMap = new TreeMap<String, Object>(new Comparator<String>() {
+                public int compare(String key1, String key2) {
+
+                    return key1.compareTo(key2);
+                }
+            });
+            sortedMap.putAll(oriMap);
+            return sortedMap;
+        }
+
+    }
+
+
+    public static class MyJsonParser implements JsonParse {
+
+        @SuppressWarnings("unchecked")
+        @Override
+        public Map<String, Object> toMap(String json) {
+            return JSON.parseObject(json, Map.class);
+        }
+
+        @Override
+        public List<Object> toArray(String json) {
+            return JSON.parseArray(json, Object.class);
+        }
+
+
+    }
+
+
+    public static class MyNameGenerator implements NameGenerator {
+
+
+        String names[] = {"A", "B", "C", "D", "E", "F"
+                , "G", "H", "I", "J", "K", "L", "M"
+                , "N", "O", "P", "Q", "R", "S", "T"
+                , "U", "V", "W", "X", "Y", "Z"
+                , "AA", "BB", "CC", "DD", "EE", "FF", "GG", "HH", "JJ", "KK", "LL", "MM", "NN"};
+        int posiiotn;
+
+        @Override
+        public String nextName() {
+
+            return names[posiiotn++];
+        }
+
+        //字符串转换为ascii
+        public static String StringToA(String content){
+            String result = "";
+            int max = content.length();
+            for (int i=0; i<max; i++){
+                char c = content.charAt(i);
+                int b = (int)c;
+                result = result + b;
+            }
+            return result;
+        }
+
+        //ascii转换为string
+        public static String AToString(int i){
+            return Character.toString((char)i);
+        }
+
+
+
+        @Override
+        public  String formatName(String name) {
+            char[] chs = name.toCharArray();
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.append(chs[0]);
+            System.out.println("chs[0] ="+ +chs[0] );
+            for (int i = 1; i < chs.length; i++) {
+                System.out.println("chs["+i+"] ="+ +chs[i] );
+                if (chs[i - 1] == '_') { // 如果当前查询是_  那么就把后面的 转为大写  _  对应的ACSII码 是 95
+                    if(!isNum(AToString(chs[i])) && (""+AToString(chs[i])).matches("^[a-z,A-Z].*$")){
+                        stringBuilder.append((char) (chs[i] - 32));
+                        System.out.println("test run!  +chs[i] ="+ +chs[i] );
+                    }else{
+                        stringBuilder.append(chs[i]);
+                    }
+                } else
+                    stringBuilder.append(chs[i]);
+            }
+            //  String s = stringBuilder.toString().replace("_", "");
+            String s = stringBuilder.toString();
+            chs = s.toCharArray();
+            if (chs[0] >= 'a' && chs[0] <= 'z') {
+                chs[0] = (char) (chs[0] - 32);
+            }
+
+            return new String(chs);
+        }
+
+
+        public static boolean isNum(String str){
+            return str.matches("^[-+]?(([0-9]+)([.]([0-9]+))?|([.]([0-9]+))?)$");
+        }
+
+
+    }
+
+
+    public interface NameGenerator {
+        String nextName();
+
+        /**
+         * 格式化标识符，驼峰式写法
+         *
+         * @param name
+         * @return
+         */
+        String formatName(String name);
+    }
+
+
+    //    List<A_B_C>  需要把这个 创建了三个 JavaBean
+// A , B  ,C  这三个 对象的 execute()方法 会执行  parseMap();  zzj
+//         而不会执行  parseMap()  的  generationBean.writeList(clz);  去 生成
+//       WriteBean
+//
+//         Line 231: zukgit4_1_2_空  this.name :null  name =null curRentName = clz=List<String>  不会执行 writeList(clz) 方法了  操蛋！
+//        Line 339: zukgit4_1_2_空  this.name :null  name =null curRentName = clz=List<Integer>  不会执行 writeList(clz) 方法了  操蛋！
+//        Line 341: zukgit4_1_2_空  this.name :null  name =null curRentName = clz=List<Object>  不会执行 writeList(clz) 方法了  操蛋！
+//        Line 671: zukgit4_1_2_空  this.name :null  name =null curRentName = clz=List<D>  不会执行 writeList(clz) 方法了  操蛋！
+//        Line 684: zukgit4_1_2_空  this.name :null  name =null curRentName = clz=List<A_B_C>  不会执行 writeList(clz) 方法了  操蛋！
+//        Line 741: zukgit4_1_2_空  this.name :null  name =null curRentName = clz=List<E>  不会执行 writeList(clz) 方法了  操蛋！
+//      writeList(clz)  // 把 clz 写入一个 txt 文件  文件的名称为  List<Object>   转为  List_Object_     List_A_B_C_
+//     File file = new File("src/" + packName.replace(".", "/"));
+//        BufferedWriter bw = new BufferedWriter(new FileWriter(new File(file, list.replaceAll("<|>", "_") + ".txt")));
+//    bw.write(list);       写入 .txt  有什么作用?   这个从代码根本看不出来
+
+
+
+//  X2  MyBeanGenerator  className  =RootBean entry.getValue().toString() =
+//       X3  MyBeanGenerator  MyBeanGenerator  className  =RootBean entry.getValue().toString() = capitalUpperCase(entry.getKey()) =Data
+// 它的 key=data  , value 为空  map.put
+//  generationBean.writeBean(name, map 【 Map<String, Object> map = jsonParse.toMap(json) 】);  map的 数据来源于 Json
+
+
+//  [{类A}{类B}{类C}]    以什么方式     value =  List<A_B_C>   List<A___B___C>
+// X3  MyBeanGenerator  className  =RootBean entry.getValue().toString() =List<<A___B___C>>  capitalUpperCase(entry.getKey()) =Data
+//  如果  当前的 value  包含 List 和 ___   那么获取  第一个 ___ 之前的位置    最后一个 ___之后的位置,  截取这个字符串 中间加 List<Object>
+
+//  B -> topic_2048 [weight=6]
+//B -> topic [weight=6]    重复！
+// make-> 4  refClassName=B    properityName=topic_2048
+// make-> 4  refClassName=Extra    properityName=Topic_2048
+// make-> 4  refClassName=Extra    properityName=Topic
+// make-> 4  refClassName=B    properityName=topic
+// new ProperityItem
+//  ArrayList<HashMap<String, ArrayList<ProperityItem>>> Rule17_arrMapList  的 Item 排序
+
+// 对于 对象中 为 {  [] }  为 空的情况的处理
+    // Rule_17  End  对 Json 格式的文件 或者 以json格式保存的文件 生成bean文件 以及 Graphviz 绘图显示结构
+
+
+
 
 
 }
