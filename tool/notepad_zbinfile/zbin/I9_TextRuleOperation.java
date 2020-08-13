@@ -4152,16 +4152,9 @@ if(!Rule11_tableItemList.contains(sumString)){
             } catch (Exception e) {
 
             }
-        } else {
-            try {
-                BufferedWriter curBW = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "utf-8"));
-                curBW.write(commadStr);
-                curBW.close();
-            } catch (Exception e) {
-            }
-
-            RuntimeUtil.exec("Wscript.exe  /x " + file);
         }
+        RuntimeUtil.exec("Wscript.exe  /x " + file);
+        System.out.println("执行操作:   "+ "Wscript.exe  /x " + file);
     }
     // Rule_16   End Windows 读物当前文件内容 并 播放 vbs 声音
 
