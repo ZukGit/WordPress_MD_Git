@@ -8,4 +8,5 @@ alias tod='cd ~/Desktop/'
 alias cdd='cd ~/Desktop/'
 alias cdz='cd ~/Desktop/zbin'
 alias cdm='cd ~/Desktop/MotoCode'
+alias cdp='cd ~/Desktop/zproduct'
 chown -R zukgit ~/Desktop/zbin

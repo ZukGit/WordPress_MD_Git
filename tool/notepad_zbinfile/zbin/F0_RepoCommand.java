@@ -716,6 +716,13 @@ public class F0_RepoCommand {
         System.out.println(buildInitAndCompileCommand(gitRepoName, manifestBranchName, xmlbranchName, productName, "retail"));
         printLine();
 
+
+        printLine();
+        System.out.println("【"+productName+"_retain_common + F0_repo_init.sh 】");
+        System.out.println(buildInitAndCompileCommand_Init_Sh(gitRepoName, manifestBranchName, xmlbranchName, productName, "retail"));
+        printLine();
+
+
         System.out.println("【"+productName+"_retail_e"+" -e = OEM-only 】");
         String oem_retain = buildInitAndCompileCommand_oemimage(gitRepoName, manifestBranchName, xmlbranchName, productName, "retail");
         oem_retain = oem_retain.replace("-E oem-image","-e oem-image");
@@ -776,12 +783,23 @@ public class F0_RepoCommand {
 //            String str4_1 = " motorola/build/bin/build_device.bash -b nightly -p " + productName.toLowerCase().trim()  + "  -g -j4 ";
             String str4_1 =  buildList;
             String str5_1 = " 2>&1 | tee " + getTimeStampDesc() + "_" + logname + ".log";
-            logname = metaData.productName;  // 文件名称还原
+
             result = str1_1  + str2_1 + str2_2 + str2_3 + str3_1 +str4_1_1 + str4_1 + str5_1;
+
             buildcompileList.add(result);
+            if(!buildList.contains("-e oem-image") && !buildList.contains("-E oem-image")){
+
+                String result_new_1 = result.replace(str3_1,str3_1+" ../F0_repo_init.sh   &&  ");
+                result_new_1 = "cp  -fr ~/Deskto/zbin/F0_repo_init.sh  ../ && "+ result_new_1;
+               buildcompileList.add(result_new_1);
+//                System.out.println("result_new_1 = "+ result_new_1);
+            }
+            logname = metaData.productName;  // 文件名称还原
         }
         // motorola/build/bin/build_device.bash -b nightly -p lima_retail -g -jX -e oem-image
 
+        System.out.println("buildcompileList.size() = " + buildcompileList.size());
+        System.out.println("metaData.BuildingCommandList.size() = "+ metaData.BuildingCommandList.size());
         return buildcompileList;
     }
 
@@ -807,6 +825,11 @@ public class F0_RepoCommand {
             }else if(command.contains("-e oem-image")){
                 printLine();
                 System.out.println("【" + productName + "_retail" + " 【-e = OEM+Only】额外添加cp复制  】");
+                System.out.println(command);
+                System.out.println();
+            }else if(command.contains("F0_repo_init.sh")){
+                printLine();
+                System.out.println("【" + productName + "_retail" + " 【retain_common + F0_repo_init.sh 】 额外添加 可执行的 Project目录下的 F0_repo_init.sh 】");
                 System.out.println(command);
                 System.out.println();
             }else{
@@ -847,6 +870,12 @@ public class F0_RepoCommand {
             }else if(command.contains("-e oem-image")){
                 printLine();
                 System.out.println("【" + productName + "_retail" + " 【-e = OEM+Only + frameworks.jar 】 】");
+                command = command.replace(TAG,TAG_TARGET);
+                System.out.println(command);
+                System.out.println();
+            }else if(command.contains("F0_repo_init.sh")){
+                printLine();
+                System.out.println("【" + productName + "_retail" + " 【retain_common + frameworks.jar  + F0_repo_init.sh 】 额外添加  Project目录下的 F0_repo_init.sh 】");
                 command = command.replace(TAG,TAG_TARGET);
                 System.out.println(command);
                 System.out.println();
@@ -892,6 +921,12 @@ public class F0_RepoCommand {
                 command = command.replace(TAG,TAG_TARGET);
                 System.out.println(command);
                 System.out.println();
+            }else if(command.contains("F0_repo_init.sh")){
+                printLine();
+                System.out.println("【" + productName + "_retail" + " 【retain_common + frameworks.jar + F0_repo_init.sh 】 额外添加 可执行的 Project目录下的 F0_repo_init.sh 】");
+                command = command.replace(TAG,TAG_TARGET);
+                System.out.println(command);
+                System.out.println();
             }else{
                 printLine();
                 System.out.println("【" + productName + "_retail" + " 【retain_common + frameworks.jar 】 】");
@@ -916,6 +951,7 @@ public class F0_RepoCommand {
         ArrayList<String> initandcompileCommand =  buildInitAndCompileCommandWithMetaData(metaData);
         for (int i = 0; i < initandcompileCommand.size(); i++) {
             String command = initandcompileCommand.get(i);
+//            System.out.println("commands["+i+"] = "+ initandcompileCommand);
             if(command.contains("-E oem-image")){
                 printLine();
                 System.out.println("【" + productName + "_retail" + " 【-E = OEM+SW】 】");
@@ -924,6 +960,11 @@ public class F0_RepoCommand {
             }else if(command.contains("-e oem-image")){
                 printLine();
                 System.out.println("【" + productName + "_retail" + " 【-e = OEM+Only】 】");
+                System.out.println(command);
+                System.out.println();
+            }else if(command.contains("F0_repo_init.sh")){
+                printLine();
+                System.out.println("【" + productName + "_retail" + " 【retain_common + F0_repo_init.sh 】 额外添加 可执行的 Project目录下的 F0_repo_init.sh 】");
                 System.out.println(command);
                 System.out.println();
             }else{
@@ -952,6 +993,20 @@ public class F0_RepoCommand {
         System.out.println("════════════════════════════════════════════" + title + "════════════════════════════════════════════");
     }
 
+
+    static String buildInitAndCompileCommand_Init_Sh(String cGitRepoName, String cManifestBranchName, String cXmlbranchName, String productName, String buildType) {
+        String logname = productName + "_" + buildType;
+        String result = "";
+        String str1_1 = "cp  -fr ~/Deskto/zbin/F0_repo_init.sh  ../  && "+ "export PATH=/apps/android/python-2.7.6-x64/bin:$PATH  && export PATH=/apps/android/perl-5.1aclmsx8.4-x64/bin:$PATH && ";
+        String str1_2 = "source /opt/conf/moto.conf && ";
+        String str2_1 = "repo init -u ssh://gerrit.mot.com/home/repo/dev/platform/android/platform/manifest/" + cGitRepoName.trim() + " " + "--repo-url=ssh://gerrit.mot.com/home/repo/dev/platform/android/repo.git ";
+        String str2_2 = "--manifest-branch=" + cManifestBranchName.trim() + "  ";
+        String str2_3 = "-m " + cXmlbranchName.trim() + "  && ";
+        String str3_1 = "repo sync -j2  && repo start --all TEMP  &&  ../F0_repo_init.sh && ";
+        String str4_1 = " motorola/build/bin/build_device.bash -b nightly -p " + productName.toLowerCase().trim() + "_" + buildType + "  -g -j4 2>&1 | tee " + getTimeStampDesc() + "_" + logname + ".log";
+        result = str1_1 + str1_2 + str2_1 + str2_2 + str2_3 + str3_1 + str4_1;
+        return result;
+    }
 
     static String buildInitAndCompileCommand(String cGitRepoName, String cManifestBranchName, String cXmlbranchName, String productName, String buildType) {
         String logname = productName + "_" + buildType;

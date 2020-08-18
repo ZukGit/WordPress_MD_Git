@@ -302,8 +302,14 @@ public class H6_ZColor {
                 int red_value_int = rgb_list.get(0);
                 int green_value_int = rgb_list.get(1);
                 int blue_value_int = rgb_list.get(2);
-                int width_value_int = rgb_list.get(3);
-                int high_value_int = rgb_list.get(4);
+   
+                int width_value_int   =  Integer.parseInt(rgb_arr[rgb_arr.length-2]);
+                int high_value_int = Integer.parseInt(rgb_arr[rgb_arr.length-1]);
+                System.out.println("red_value_int = "+ red_value_int);
+                System.out.println("green_value_int = "+ green_value_int);
+                System.out.println("blue_value_int = "+ blue_value_int);
+                System.out.println("width_value_int = "+ width_value_int);
+                System.out.println("high_value_int = "+ high_value_int);
 
                 color = new Color(red_value_int, green_value_int, blue_value_int);
 
@@ -985,6 +991,8 @@ public class H6_ZColor {
         if (inputParams == null) {
             return 0;
         }
+        inputParams =  inputParams.replace("_","");
+        inputParams =  inputParams.replace("#","");
         if (isNumeric(inputParams)) {
             return Integer.parseInt(inputParams);
         }
@@ -1018,14 +1026,16 @@ public class H6_ZColor {
                 } else if (i == 1) {  // 第二个参数是用来 对 当前功能进行分类使用的
                     CUR_TYPE_2_ParamsStr = args[i];
 
-                    if (!CUR_TYPE_2_ParamsStr.contains("*") || !CUR_TYPE_2_ParamsStr.contains("#")) {
+                    if (!CUR_TYPE_2_ParamsStr.contains("*") && !CUR_TYPE_2_ParamsStr.contains("#")) {
+                        // CUR_TYPE_2_ParamsStr = #_3
+                        System.out.println("CUR_TYPE_2_ParamsStr = "+ CUR_TYPE_2_ParamsStr);
                         CUR_INPUT_3_ParamStrList.add(args[i]);  //  如果第一个参数不包含 * # 那么可能是一个餐胡 默认参数
                         continue;
                     }
 
                     //zukgit1    计算得到 当前 索引的列表   首先遇到的第一个数字类型  1_2112  那就是索引1  附带参数 2112   temp_2_
                     CUR_TYPE_INDEX = calculInputTypeIndex(CUR_TYPE_2_ParamsStr);
-
+                    System.out.println("CUR_TYPE_INDEX = "+ CUR_TYPE_INDEX);
                 } else {
                     CUR_INPUT_3_ParamStrList.add(args[i]);   // 当前cmd目录   第一个类型选项      之后所有的参数 保存在  CUR_INPUT_3_ParamStrList
                     //    Rule_Identify_TypeIndexList.add(args[i]);

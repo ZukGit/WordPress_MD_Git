@@ -1,2 +1,2 @@
 #!/bin/bash
-firefox http://10.4.69.153
+google-chrome http://10.4.69.153
