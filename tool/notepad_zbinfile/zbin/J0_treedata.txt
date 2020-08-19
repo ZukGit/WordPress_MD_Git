@@ -9,10 +9,14 @@ hushengupiao_jichushuju_
 〖 *exchange*  SSE 上交所  SZSE深交所  HKEX港交所
 hushengupiao_jichushuju_gupiaoliebiao  【120】[] <stock_basic> (is_hs{N,H,S}#list_status{L,D,P}#exchange{SSE,SZSE,HKEX}) 《ts_code=symbol=name=area=industry=fullname=enname=market=exchange=curr_type=list_status=list_date=delist_date=is_hs》
 
+
+
 〖 交易日历  https://tushare.pro/document/2?doc_id=26 
 〖 *exchange* 交易所 SSE上交所,SZSE 深交所,CFFEX 中金所,SHFE 上期所,CZCE 郑商所,DCE 大商所,INE 上能源,IB 银行间,XHKG 港交所
 〖 *start_date* 开始日期      end_date 结束日期  YYYYMMDD
 hushengupiao_jichushuju_jiaoyirili   【120】[] <trade_cal>(exchange{SSE,SZSE,CFFEX,SHFE,CZCE,DCE,INE,IB,XHKG}#start_date#end_date) 《exchange=cal_date=is_open=pretrade_date》
+
+
 
 〖 股票曾用名 https://tushare.pro/document/2?doc_id=100 
 〖 *ts_code*	  TS代码
@@ -20,35 +24,58 @@ hushengupiao_jichushuju_jiaoyirili   【120】[] <trade_cal>(exchange{SSE,SZSE,C
 〖 *end_date*	结束开始日期
 hushengupiao_jichushuju_gupiaocengyongming  【120】[]<namechange>(ts_code)  《ts_code=name=start_date=end_date=ann_date=change_reason》
 
+
+
 〖 沪深股通成份股  https://tushare.pro/document/2?doc_id=104 
 〖 *hs_type*	SH沪股通 SZ深股通
 〖 *is_new*	    是否最新 1 是 0 否 (默认1)
 hushengupiao_jichushuju_hushengutongchengfengu 【120】[] <hs_const>(hs_type{SH,SZ}#is_new{0,1}) 《ts_code=hs_type=in_date=out_date=is_new》
+
+
 
 〖上市公司基本信息   https://tushare.pro/document/2?doc_id=112
 〖*ts_code*	    	股票代码
 〖*exchange*		交易所代码 ，SSE上交所 SZSE深交所
 hushengupiao_jichushuju_shangshigongsijibenxinxi 【120】[4000]<stock_company>(ts_code#exchange{SSE,SZSE})《ts_code=exchange=chairman=manager=secretary=reg_capital=setup_date=province=city=introduction=website=email=office=employees=main_business=business_scope》
 
+
+
 〖上市公司管理层   https://tushare.pro/document/2?doc_id=193
 〖*xts_code*	str	N	股票代码，支持单个或多个股票输入  xts_code 标识可以多输入tscode 
-hushengupiao_jichushuju_shangshigongsiguanliceng 【2000】[4000] <stk_managers>(xts_code)《ts_code=ann_date=name=gender=lev=title=edu=national=birthday=begin_dat=end_date=resume》
+hushengupiao_jichushuju_shangshigongsiguanliceng 【2000】[4000] <stk_managers>(18xts_code)《ts_code=ann_date=name=gender=lev=title=edu=national=birthday=begin_date=end_date=resume》
+
+
+
 
 〖 https://tushare.pro/document/2?doc_id=194  管理层薪酬和持股
 〖 *xts_code*	str	Y	TS股票代码，支持单个或多个代码输入
-hushengupiao_jichushuju_guanlicengxinchouhechigu 【2000】 [2000]  <stk_rewards>(xts_code)《ts_code=ann_date=end_date=name=title=reward=hold_vol》
+hushengupiao_jichushuju_guanlicengxinchouhechigu 【2000】 [2000]  <stk_rewards>(6xts_code)《ts_code=ann_date=end_date=name=title=reward=hold_vol》
+
+
 
 〖 IPO新股列表  https://tushare.pro/document/2?doc_id=123 
 〖 *start_date*		上网发行开始日期
 〖*end_date*		上网发行结束日期
-hushengupiao_jichushuju_IPOxingushangshi【120】[2000]<new_share>(start_date#end_date)《ts_code=sub_code=name=ipo_date=issue_date=amount=market_amount=price=pe=limit_amount=funds=ballot》
+hushengupiao_jichushuju_IPOxingushangshi【120】[2000]├10┤<new_share>(10xstart_date#10xend_date)《ts_code=sub_code=name=ipo_date=issue_date=amount=market_amount=price=pe=limit_amount=funds=ballot》
 
-ZENDZ;  // 记录结束位置 
+
 
 〓〓hangqingshuju
 hushengupiao_hangqingshuju_
 
+〖 https://tushare.pro/document/2?doc_id=27  日线行情
+〖 *ts_code* 		股票代码
+〖 *trade_date*		交易日期(YYYYMMDD)
+〖 *start_date*		开始日期(YYYYMMDD)
+〖 *end_date*		结束日期(YYYYMMDD)
+hushengupiao_jichushuju_rixianhangqing  【120】[] <daily> (2xts_code) 《ts_code=trade_date=open=high=low=close=pre_close=change=pct_chg=vol=amount》
+
+
+
+
+
 ZENDZ;  // 记录结束位置 
+
 
 ▲ zhishu
 

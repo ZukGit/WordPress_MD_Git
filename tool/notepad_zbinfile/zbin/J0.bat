@@ -10,5 +10,5 @@ Setlocal ENABLEDELAYEDEXPANSION
 @rem echo 8=%8
 @rem echo 9=%9
 
-@javac   -cp %userprofile%\Desktop\zbin\J0_guava.jar -encoding UTF-8 %userprofile%\Desktop\zbin\J0_TushareTool.java
-@java  -cp  .;%userprofile%\Desktop\zbin\J0_guava.jar;%userprofile%\Desktop\zbin\ J0_TushareTool  %1  %2  %3 %4  %5  %6  %7  %8  %9 
+@javac   -cp %userprofile%\Desktop\zbin\J0_guava.jar;%userprofile%\Desktop\zbin\J0_dom4j-1.6.1.jar;%userprofile%\Desktop\zbin\J0_ojdbc6-11.jar;%userprofile%\Desktop\zbin\J0_poi-3.9.jar;%userprofile%\Desktop\zbin\J0_poi-ooxml-3.9.jar;%userprofile%\Desktop\zbin\J0_poi-ooxml-schemas-3.9.jar;%userprofile%\Desktop\zbin\J0_xercesImpl.jar;%userprofile%\Desktop\zbin\J0_xmlbeans-2.3.0.jar -encoding UTF-8 %userprofile%\Desktop\zbin\J0_TushareTool.java
+@java  -cp  .;%userprofile%\Desktop\zbin\J0_guava.jar;%userprofile%\Desktop\zbin\J0_dom4j-1.6.1.jar;%userprofile%\Desktop\zbin\J0_ojdbc6-11.jar;%userprofile%\Desktop\zbin\J0_poi-3.9.jar;%userprofile%\Desktop\zbin\J0_poi-ooxml-3.9.jar;%userprofile%\Desktop\zbin\J0_poi-ooxml-schemas-3.9.jar;%userprofile%\Desktop\zbin\J0_xercesImpl.jar;%userprofile%\Desktop\zbin\J0_xmlbeans-2.3.0.jar;%userprofile%\Desktop\zbin\ J0_TushareTool  %1  %2  %3 %4  %5  %6  %7  %8  %9 

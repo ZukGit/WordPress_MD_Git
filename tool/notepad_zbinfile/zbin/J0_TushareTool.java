@@ -1,5 +1,8 @@
 
 import com.google.common.collect.Maps;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import javax.swing.*;
 import java.io.*;
@@ -17,6 +20,9 @@ import java.util.regex.Pattern;
 //
 public class J0_TushareTool {
 
+
+
+static ArrayList<String> TScode_List = new ArrayList<String>();
 
     /*******************修改属性列表 ------Begin *********************/
 // 修改0.   全局修改 把 J0 改为当前应用的序号规则序号  当前类名称也需要修改
@@ -39,7 +45,8 @@ public class J0_TushareTool {
 //固定1  zbin 的 字符串绝对路径
     static String zbinPath = System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin";
 
-    static String TreeDataPath = zbinPath + File.separator + "J0_treedata.txt";
+
+
 
     static String cur_os_zbinPath;
     static String win_zbinPath = System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin" + File.separator + "win_zbin";
@@ -102,6 +109,27 @@ public class J0_TushareTool {
     static String EnvironmentValue = System.getProperties().getProperty("java.library.path");
     static String PathSeparator = System.getProperties().getProperty("path.separator");
     static String[] EnvironmentList = EnvironmentValue.split(PathSeparator);
+
+
+    static String TreeDataPath = zbinPath + File.separator + "J0_treedata.txt";
+    static String Python_HeadTemplate_Path = zbinPath + File.separator +"J0_python_head_template.py";
+    static String Python_BodyTemplate_1 = zbinPath + File.separator +"J0_python_body_template_1.py";
+
+    // 填充  ts_code 中文名称的模板
+    static String Python_BodyTemplate_2 = zbinPath + File.separator +"J0_python_body_template_2.py";
+
+    // 填充  ts_code 中文名称的模板  并且有检测 小于 xlsx最大行数  1048576 的判断
+    static String Python_BodyTemplate_3 = zbinPath + File.separator +"J0_python_body_template_3.py";
+
+    // 有限制 每分钟 访问次数的 判断
+    static String Python_BodyTemplate_4 = zbinPath + File.separator +"J0_python_body_template_4.py";
+
+
+
+    // 链式 Node 结点   用于 记录 当前 父节点
+    static ArrayList<TreeNode> AllNodeList = new ArrayList<TreeNode>();
+    static ArrayList<TreeNode> AllRootNode = new ArrayList<TreeNode>();
+    static ArrayList<TreeNode> AllLeafNode = new ArrayList<TreeNode>();
 
 
     static boolean isContainEnvironment(String program) {
@@ -249,6 +277,42 @@ public class J0_TushareTool {
 
     }
 
+
+    static void   makePythonFileFromLeafNode(){
+
+        File headFile = new File(Python_HeadTemplate_Path);
+        if(!headFile.exists()){
+            System.out.println("当前头部文件 "+Python_HeadTemplate_Path + " 不存在,请检查!");
+            return;
+        }
+
+
+        File bodyFile = new File(Python_BodyTemplate_1);
+        if(!bodyFile.exists()){
+            System.out.println("当前Body部文件 "+Python_BodyTemplate_1 + " 不存在,请检查!");
+            return;
+        }
+
+
+
+
+
+        for (int i = 0; i < AllLeafNode.size() ; i++) {
+            TreeNode leafNode = AllLeafNode.get(i);
+            ArrayList<String> pythonHeadStrList = ReadFileContentAsList(new File(getNodeHeadFile(leafNode.nodeName)));
+            ArrayList<String> pythonBodyStrList = ReadFileContentAsList(new File(getNodeBodyFilePath(leafNode.nodeName)));
+            System.out.println("Python-Item  = "+ leafNode.nodeName + "  "+((LeafNode)leafNode).leaf_chinese_title);
+            ((LeafNode)leafNode).pyhtonTemplate(pythonHeadStrList,pythonBodyStrList);
+
+        }
+
+
+
+    }
+
+
+
+
     static void initTreeData() {
         File treeDataFile = new File(TreeDataPath);
 
@@ -371,6 +435,8 @@ public class J0_TushareTool {
             TreeNode nodeItem = AllNodeList.get(i);
             if (nodeItem.isRoot) {
                 AllRootNode.add(nodeItem);
+            }else if(nodeItem.isLeaf){
+                AllLeafNode.add(nodeItem);
             }
             nodeItem.getAndInitDynamicDeep();
 //            System.out.println("index [ "+ i+" ] = "+ " NodeName="+nodeItem.nodeName +  "   "+ nodeItem.getOrganizationIdentify() + "   " +"Deepth = "+ nodeItem.deepth);
@@ -1864,7 +1930,19 @@ public class J0_TushareTool {
 
         initInputParams(args);
 
+
         initTreeData();
+        initTsCodeList();
+
+
+/*
+        for (int i = 0; i < TScode_List.size() ; i++) {
+            System.out.println("tscode["+i+"] = "+TScode_List.get(i));
+        }
+*/
+
+
+        makePythonFileFromLeafNode();
 
 
         J0_TushareTool mJ0_Object = new J0_TushareTool();
@@ -1956,9 +2034,7 @@ public class J0_TushareTool {
         return blockList;
     }
 
-    // 链式 Node 结点   用于 记录 当前 父节点
-    static ArrayList<TreeNode> AllNodeList = new ArrayList<TreeNode>();
-    static ArrayList<TreeNode> AllRootNode = new ArrayList<TreeNode>();
+
 
 
     // ArrayList<TreeNode> inputParentNodeList,
@@ -2064,12 +2140,23 @@ public class J0_TushareTool {
                         }
 
 
+
+
                         String pythonMethod = getStrWithPairChar(paramItem, "<", ">");
                         ((LeafNode) curNode).pythonMethodName = pythonMethod;
 
                         if (((LeafNode) curNode).methodParams_linkedHashMap == null) {
                             ((LeafNode) curNode).methodParams_linkedHashMap = Maps.newLinkedHashMap();
                         }
+
+                        String call_time_Str = getStrWithPairChar(paramItem, "├", "┤");
+                        if ("".equals(call_time_Str)) {
+                            ((LeafNode) curNode).callLimit_Num_OneMinutes = Integer.MAX_VALUE;
+                        } else {
+                            ((LeafNode) curNode).callLimit_Num_OneMinutes = Integer.parseInt(call_time_Str);
+                        }
+
+
 
                         String paramMap = getStrWithPairChar(paramItem, "(", ")");
                         ArrayList<String> OneOptionArr;
@@ -2154,6 +2241,585 @@ public class J0_TushareTool {
 
     class LeafNode extends TreeNode {
 
+        // https://tushare.pro/document/2?doc_id=25
+        String leaf_web_sit;   // 叶子节点 对应的 网站的位置
+        String leaf_chinese_title;  // 股票列表
+        Map<String, String> params_linkedHashMap = Maps.newLinkedHashMap();  //  参数列表  key是英文参数 value是中文说明
+
+        String inputIdentify;  // 从 treedata 读取的 标识
+
+        int score_permission_point;  // 积分起始点
+        int onceCallCount;  // 一次调用 返回的记录次数
+        int callLimit_Num_OneMinutes;   //   每分钟调用的次数
+        String pythonMethodName;  // python的函数名称
+
+        // 函数参数  以及参数的可选值  key 是参数名称   value 是可选值范围 ArrayList<String>
+        Map<String, ArrayList<String>> methodParams_linkedHashMap;
+
+        ArrayList<String> fieldList;  // 参数的集合
+
+        Map<String,String> python_holder_map;
+
+
+        // python_holder_map  key 放置 要替换的key   固定 死的
+        // 【ZHoldPlace_NodeName】   固定 死的
+        // 【ZHoldPlace_pythonMethodName】  固定 死的
+        // 【ZHoldPlace_fieldList】    固定 死的
+
+        // 【ZHoldPlace_start_date】  【ZHoldPlace_end_date】  动态变化的 调节的
+        // 【ZHoldPlace_propKey2ValueList_Index】  每次调用 都不一样的 灵活的
+        // 【ZHoldPlace_propKey2ValueList】 每次调用 都不一样的 灵活的
+        // 【ZHoldPlace_call_LimitNum_OneMinutes】 当前每分钟调用的限制次数
+
+        String  get_ZHoldPlace_Title(){
+            return leaf_chinese_title;
+        }
+
+        String  get_ZHoldPlace_pythonMethodName(){
+            return pythonMethodName;
+        }
+
+        String  get_ZHoldPlace_leaf_chinese_title(){
+            return leaf_chinese_title;
+        }
+        String   get_ZHoldPlace_call_LimitNum_OneMinutes(){
+            return ""+callLimit_Num_OneMinutes;
+        }
+
+
+        String  get_ZHoldPlace_fieldList(){
+            String fieldResult ="";
+            for (int i = 0; i < fieldList.size(); i++) {
+                String fieldItem = fieldList.get(i);
+                fieldResult = fieldResult + ","+fieldItem;
+            }
+            fieldResult = fieldResult.trim();
+            while(fieldResult.startsWith(",")){
+                fieldResult = fieldResult.substring(1);
+            }
+            return fieldResult;
+        }
+
+
+
+
+
+        void initHoldeMap(){
+            python_holder_map = new HashMap<String,String>();
+            python_holder_map.put("【ZHoldPlace_Title】",get_ZHoldPlace_Title());
+            python_holder_map.put("【ZHoldPlace_pythonMethodName】",get_ZHoldPlace_pythonMethodName());
+            python_holder_map.put("【ZHoldPlace_fieldList】",get_ZHoldPlace_fieldList());
+            python_holder_map.put("【ZHoldPlace_leaf_chinese_title】",get_ZHoldPlace_leaf_chinese_title());
+            python_holder_map.put("【ZHoldPlace_call_LimitNum_OneMinutes】",get_ZHoldPlace_call_LimitNum_OneMinutes());
+
+
+            // 【ZHoldPlace_propKey2ValueList_Index】  每次调用 都不一样的 灵活的
+            // 【ZHoldPlace_propKey2ValueList】 每次调用 都不一样的 灵活的
+
+        }
+
+
+        // 方法描述:void getKeyAndValue(Map<String,String> mMapParam) 迭代Map的Key和Value(通过 Iterator) //
+        @SuppressWarnings("unchecked")
+        String HolderReplaceOperation_Static(String codeStr){
+            String curCode = codeStr;
+            Map.Entry<String , String> entryItem;
+            if(python_holder_map != null){
+                Iterator iterator = python_holder_map.entrySet().iterator();
+                while( iterator.hasNext() ){
+                    entryItem = (Map.Entry<String , String>) iterator.next();
+//                    System.out.println("entryItem.getKey() = "+ entryItem.getKey() + "  entryItem.getValue() = "+ entryItem.getValue() );
+                    curCode =  curCode.replace(entryItem.getKey(),entryItem.getValue());
+                }
+            }
+            return curCode;
+        }
+
+
+
+
+        String First_Holder_Tag = "First_Define_Template_";
+        String Method_Holder_Tag = "Method_Call_Template_";
+        String Tail_Holder_Tag = "Tail_Define_Template_";
+
+        String getBlockValueFromTemplate(String str){
+            String resultStr = str;
+            if(!str.contains("=") || !str.contains("《")  ||  !str.contains("》")  ){
+                System.out.println("当前的 模板语句 存在错误!  resultStr = "+ resultStr);
+                return str;
+            }
+            String endStr = resultStr.substring(resultStr.indexOf("="));
+            resultStr =  getStrWithPairChar(endStr,"《","》");
+            return resultStr;
+        }
+
+
+        ArrayList<String>     getTemplateValue(ArrayList<String> templateStrList){
+            ArrayList<String> valueList = new  ArrayList<String>();
+
+            for (int i = 0; i < templateStrList.size() ; i++) {
+                String oneLine = templateStrList.get(i);
+                valueList.add(getBlockValueFromTemplate(oneLine));
+            }
+
+            return valueList;
+        }
+        Map<String,ArrayList<String>>   calculTemplateMap(ArrayList<String> headTemplateList ,ArrayList<String>   bodyTemplateList) {
+
+            ArrayList<String> allCodeList = new   ArrayList<String>();
+            allCodeList.addAll(headTemplateList);
+            allCodeList.addAll(bodyTemplateList);
+            Map<String,ArrayList<String>>  curTemplateMap =Maps.newLinkedHashMap();
+
+            ArrayList<String> firstDefineList = new   ArrayList<String>();
+            ArrayList<String> methodCallList = new   ArrayList<String>();
+            ArrayList<String> tailDefineList = new   ArrayList<String>();
+
+            for (int i = 0; i <allCodeList.size() ; i++) {
+                String codeStr = allCodeList.get(i);
+                System.out.println("codeStr [ "+i+"] = "+ codeStr);
+                if(codeStr.contains(First_Holder_Tag)){
+                    firstDefineList.add(codeStr);
+                }else if(codeStr.contains(Method_Holder_Tag)){
+                    methodCallList.add(codeStr);
+
+                }else if(codeStr.contains(Tail_Holder_Tag)){
+                    tailDefineList.add(codeStr);
+                }
+            }
+            curTemplateMap.put(First_Holder_Tag,getTemplateValue(firstDefineList));
+            curTemplateMap.put(Method_Holder_Tag,getTemplateValue(methodCallList));
+            curTemplateMap.put(Tail_Holder_Tag,getTemplateValue(tailDefineList));
+
+            return curTemplateMap;
+        }
+
+
+
+        void   pyhtonTemplate(ArrayList<String> headTemplateList ,ArrayList<String>   bodyTemplateList){
+
+            initHoldeMap();
+            ArrayList<String> pythonCodeList = new   ArrayList<String>();
+
+            Map<String,ArrayList<String>> mTemplate = calculTemplateMap(headTemplateList,bodyTemplateList);
+
+
+            ArrayList<String> firstList  = mTemplate.get(First_Holder_Tag);
+            System.out.println("firstList.size = "+ firstList.size());
+
+            ArrayList<String> firstList_Code = new  ArrayList<String>();
+            for (int i = 0; i < firstList.size() ; i++) {
+                String oneCode = firstList.get(i);
+                System.out.println("First_ori_Code["+i+"]  = "+ oneCode);
+                String fixedCode = HolderReplaceOperation_Static(oneCode);
+                System.out.println("First_ori_Code-> fixedCode ["+i+"]  = "+ fixedCode);
+                if(fixedCode.contains("【ZHoldPlace_")){
+                    System.out.println("当前 字符串还存在没有替换的 占位符  fixedCode = "+ fixedCode + "  fixedCode = "+ fixedCode);
+                }
+                firstList_Code.add(fixedCode);
+            }
+
+
+            ArrayList<String> tailList  = mTemplate.get(Tail_Holder_Tag);
+            System.out.println("tailList.size = "+ tailList.size());
+
+
+            ArrayList<String> tailList_Code = new  ArrayList<String>();
+            for (int i = 0; i < tailList.size() ; i++) {
+                String oneCode = tailList.get(i);
+//                System.out.println("Tail_ori_Code["+i+"]  = "+ oneCode);
+                String fixedCode = HolderReplaceOperation_Static(oneCode);
+                if(fixedCode.contains("【ZHoldPlace_")){
+                    System.out.println("当前 字符串还存在没有替换的 占位符  fixedCode = "+ fixedCode + "  fixedCode = "+ fixedCode);
+                }
+                tailList_Code.add(fixedCode);
+            }
+
+            //  默认0  可选参数的所有组合形式
+            //  1: 有一个 xts_code  通过 ts_code 多输入来查询  4000多个按x个为一组进行访问
+            // 2:  有一个 xstart_date  或者一个  xend_date   通过x 年份间隔 实现 按时间间隔查询
+            int  operation_type  = 0;
+
+
+//            ts_code='000001.SZ', start_date='', end_date=datestr
+            ArrayList<String> fieldParamList =      calculInputParamList();
+
+            System.out.println("fieldParamList.size = "+ fieldParamList.size() + "fieldParamList.get(0) = "+ fieldParamList.get(0));
+            String paramXcode = "";
+            int x_tscode_num = x_tscode_num_default;  // 默认是 50
+            int x_yearspace_num = default_space_year;
+
+            if(fieldParamList.size() ==1 && fieldParamList.get(0).contains("xts_code") ){
+                 paramXcode =  fieldParamList.get(0);
+                if(paramXcode.contains(",")){
+                  String[] paramsArr =   paramXcode.split(",");
+                    for (int i = 0; i < paramsArr.length; i++) {
+                        if(paramsArr[i].contains("xts_code")){
+                            String numStr = paramsArr[i].trim().replace("=","").replace("xtscode","").replace("'","");
+                            if("".endsWith(numStr)){
+                                x_tscode_num = x_tscode_num_default;
+                            }else{
+                                x_tscode_num = Integer.parseInt(numStr);
+                            }
+                            break;
+                        }
+                    }
+                }else{
+                    String numStr = paramXcode.replace("=","").replace("xts_code","").replace("'","");
+                  if("".endsWith(numStr)){
+                      x_tscode_num = x_tscode_num_default;
+                  }else{
+
+                      x_tscode_num = Integer.parseInt(numStr);
+                  }
+
+                }
+                operation_type = 1;
+            }else if(fieldParamList.size() ==1 && fieldParamList.get(0).contains("xstart_date")){
+                paramXcode =  fieldParamList.get(0);
+                if(paramXcode.contains(",")){
+                    String[] paramsArr =   paramXcode.split(",");
+                    for (int i = 0; i < paramsArr.length; i++) {
+                        if(paramsArr[i].contains("xstart_date")){
+                            String numStr = paramsArr[i].trim().replace("=","").replace("xstart_date","").replace("'","");
+                            if("".endsWith(numStr)){
+                                x_yearspace_num = default_space_year;
+                            }else if(isNumeric(numStr)){
+                                x_yearspace_num = Integer.parseInt(numStr);
+                            }
+                            break;
+                        }
+                    }
+                }else{
+                    String numStr = paramXcode.replace("=","").replace("xstart_date","").replace("'","");
+                    if("".endsWith(numStr)){
+                        x_yearspace_num = default_space_year;
+                    }else if(isNumeric(numStr)){
+                        x_yearspace_num = Integer.parseInt(numStr);
+                    }
+                }
+                operation_type = 2;
+            }
+            // 50xtscode 处理 地方 在这里
+
+
+            ArrayList<String> callMethodTemplateList  = mTemplate.get(Method_Holder_Tag);
+            System.out.println("callMethodTemplateList.size = "+ callMethodTemplateList.size());
+            ArrayList<String> python_method_call_List_Code = new  ArrayList<String>();
+
+
+            System.out.println("operation_type = "+ operation_type);
+            if(operation_type == 0){
+
+                for (int i = 0; i < fieldParamList.size() ; i++) {
+                    String fieldItem = fieldParamList.get(i);
+                    for (int j = 0; j < callMethodTemplateList.size(); j++) {
+                        String methodText = callMethodTemplateList.get(j);
+                        String fillText =  HolderReplaceOperation_Static(methodText);
+                        // get  定义接收变量的名称
+                        if(fillText.contains("【ZHoldPlace_propKey2ValueList_Index】")){
+                            String defineVariable = pythonMethodName+"_item_"+i;
+                            fillText =     fillText.replace("【ZHoldPlace_propKey2ValueList_Index】",defineVariable);
+                        }
+                        if(fillText.contains("【ZHoldPlace_propKey2ValueList】")){
+                            fillText =     fillText.replace("【ZHoldPlace_propKey2ValueList】",fieldItem);
+                        }
+                        System.out.println("Body_ori_Code["+i+"]  = "+ fillText);
+                        python_method_call_List_Code.add(fillText);
+
+                    }
+                    python_method_call_List_Code.add("\n");
+                }
+
+
+            } else if(operation_type == 1){
+                System.out.println("x_tscode_num = "+ x_tscode_num);
+                ArrayList<String> xcodeParams = calcul_XCode_List_Params(x_tscode_num);
+
+                for (int i = 0; i < xcodeParams.size(); i++) {
+                    String paramValueItem = xcodeParams.get(i);
+                    String paramKey =   paramXcode.replace(x_tscode_num+"xts_code","ts_code");
+                    paramKey = paramKey.replace("xts_code","ts_code");
+                    String fieldItem = paramKey.replace("ts_code=''","ts_code='"+paramValueItem+"'");
+
+                    for (int j = 0; j < callMethodTemplateList.size(); j++) {
+                        String methodText = callMethodTemplateList.get(j);
+                        String fillText =  HolderReplaceOperation_Static(methodText);
+                        // get  定义接收变量的名称
+                        if(fillText.contains("【ZHoldPlace_propKey2ValueList_Index】")){
+                            String defineVariable = pythonMethodName+"_item_"+i;
+                            fillText =     fillText.replace("【ZHoldPlace_propKey2ValueList_Index】",defineVariable);
+                        }
+
+                        if(fillText.contains("【ZHoldPlace_propKey2ValueList】")){
+                            fillText =     fillText.replace("【ZHoldPlace_propKey2ValueList】",fieldItem);
+                        }
+
+                        if(fillText.contains(x_tscode_num+"xts_code=''")){
+                            fillText =     fillText.replace(x_tscode_num+"xts_code=''","ts_code='"+fieldItem+"'");
+                        }else if(fillText.contains("xts_code=''")){
+                            fillText =     fillText.replace("ts_code=''","ts_code='"+fieldItem+"'");
+                        }
+                        python_method_call_List_Code.add(fillText);
+
+                    }
+                    python_method_call_List_Code.add("\n");
+
+                }
+
+            }else if(operation_type == 2){
+                System.out.println("x_tscode_num x_yearspace_num = "+ x_yearspace_num);
+                ArrayList<ArrayList<String>> dateArrList  = init_Year_Pair_List(x_yearspace_num);
+
+                for (int i = 0; i < dateArrList.size(); i++) {
+                    ArrayList<String> begin_end_List = dateArrList.get(i);
+                    String beginDateStr = begin_end_List.get(0);
+                    String endDateStr = begin_end_List.get(1);
+                    System.out.println("Date[ "+i+"]  beginDateStr = "+ beginDateStr + "   endDateStr = "+ endDateStr);
+                    String paramKey =   paramXcode.replace(x_yearspace_num+"xstart_date","start_date");
+                     paramKey =   paramKey.replace(x_yearspace_num+"xend_date","end_date");
+                    String fieldItem = paramKey.replace("start_date=''","start_date='"+beginDateStr+"'");
+                    fieldItem = fieldItem.replace("end_date=''","end_date='"+endDateStr+"'");
+
+                    for (int j = 0; j < callMethodTemplateList.size(); j++) {
+                        String methodText = callMethodTemplateList.get(j);
+                        String fillText =  HolderReplaceOperation_Static(methodText);
+                        // get  定义接收变量的名称
+                        if(fillText.contains("【ZHoldPlace_propKey2ValueList_Index】")){
+                            String defineVariable = pythonMethodName+"_item_"+i;
+                            fillText =     fillText.replace("【ZHoldPlace_propKey2ValueList_Index】",defineVariable);
+                        }
+
+                        if(fillText.contains("【ZHoldPlace_start_date】")){
+                            fillText =     fillText.replace("【ZHoldPlace_start_date】",beginDateStr);
+                        }
+                        if(fillText.contains("【ZHoldPlace_end_date】")){
+                            fillText =     fillText.replace("【ZHoldPlace_end_date】",endDateStr);
+                        }
+
+
+
+                        if(fillText.contains("【ZHoldPlace_propKey2ValueList】")){
+                            fillText =     fillText.replace("【ZHoldPlace_propKey2ValueList】",fieldItem);
+                        }
+
+                        if(fillText.contains(x_yearspace_num+"xstart_date=''")){
+                            fillText =     fillText.replace(x_yearspace_num+"xts_code=''","start_date='"+beginDateStr+"'");
+                        }else if(fillText.contains("xstart_date=''")){
+                            fillText =     fillText.replace("xstart_date=''","start_date='"+beginDateStr+"'");
+                        }
+
+                        if(fillText.contains(x_yearspace_num+"xend_date=''")){
+                            fillText =     fillText.replace(x_yearspace_num+"xend_date=''","end_date='"+endDateStr+"'");
+                        }else if(fillText.contains("xend_date=''")){
+                            fillText =     fillText.replace("xend_date=''","end_date='"+endDateStr+"'");
+                        }
+                        python_method_call_List_Code.add(fillText);
+                    }
+                    python_method_call_List_Code.add("\n");
+
+
+
+                }
+
+
+            }
+
+
+            showItemPythonCode( headTemplateList,firstList_Code,python_method_call_List_Code,tailList_Code);
+            // 函数参数  以及参数的可选值  key 是参数名称   value 是可选值范围 ArrayList<String>   Map<String, ArrayList<String>>
+
+
+// monthly_data = pro.monthly(ts_code='000001.SZ', start_date='', end_date=datestr)
+// monthly_data = pro.monthly(ts_code='000002.SZ', start_date='', end_date=datestr)
+
+
+
+
+
+
+
+        }
+
+      void  showItemPythonCode(ArrayList<String>  headList, ArrayList<String>  firstList , ArrayList<String>  bodyList , ArrayList<String> tailList){
+          System.out.println();
+          System.out.println();
+          System.out.println();
+          System.out.println("######## 打印Python 代码 Item = "+ leaf_chinese_title+"  网页:   "+ leaf_web_sit);
+            ArrayList<String> codeList = new    ArrayList<String>();
+          for (int i = 0; i < headList.size(); i++) {
+              String headItem = headList.get(i);
+              codeList.add(headItem);
+              System.out.println(headItem);
+
+          }
+
+          for (int i = 0; i < firstList.size(); i++) {
+              String firstListItem = firstList.get(i);
+              codeList.add(firstListItem);
+              System.out.println(firstListItem);
+
+          }
+
+          for (int i = 0; i < bodyList.size(); i++) {
+              String bodyItem = bodyList.get(i);
+              codeList.add(bodyItem);
+              System.out.println(bodyItem);
+
+          }
+
+          for (int i = 0; i < tailList.size(); i++) {
+              String tailItem = tailList.get(i);
+              codeList.add(tailItem);
+              System.out.println(tailItem);
+
+          }
+          System.out.println();
+          System.out.println();
+          System.out.println();
+
+
+        }
+
+
+        // ts_code='000001.SZ', start_date='', end_date=datestr
+        // ts_code='【tscode】',start_date='【start_date】',end_date='【end_date】'
+        ArrayList<String> calculInputParamList(){
+            ArrayList<String> inputParamTemplateList = new ArrayList<String>();
+            ArrayList<ArrayList<String>> optionValueList_List = new ArrayList<ArrayList<String>>();
+            ArrayList<ArrayList<String>> muchOption_ValueList_List = new ArrayList<ArrayList<String>>();
+            ArrayList<ArrayList<String>> oneOption_ValueList_List = new ArrayList<ArrayList<String>>();
+
+
+
+            ArrayList<String>  paramNameList  = new   ArrayList<String>();
+
+            ArrayList<String>  onParamKeyName  = new   ArrayList<String>();
+
+
+
+            Map.Entry<String , ArrayList<String>> entryItem;
+            if(methodParams_linkedHashMap != null){
+                Iterator iterator = methodParams_linkedHashMap.entrySet().iterator();
+                while( iterator.hasNext() ){
+                    entryItem = (Map.Entry<String , ArrayList<String>>) iterator.next();
+                    String keyName = entryItem.getKey();   //Map的Key
+
+                    ArrayList<String> valueOptionList = entryItem.getValue();  //Map的Value
+
+
+                    paramNameList.add(keyName);
+                    optionValueList_List.add(valueOptionList);
+                    if(valueOptionList.size() <= 1){
+                        oneOption_ValueList_List.add(valueOptionList);
+                        onParamKeyName.add(keyName);
+                    }else{
+                        muchOption_ValueList_List.add(valueOptionList);
+                    }
+                }
+            }
+
+            // 创建 参数列表的 模板  paramTemplate
+            // ts_code='【tscode】',start_date='【start_date】',end_date='【end_date】'
+            String paramTemplate = calculOneLine_InputParams(paramNameList);
+
+
+//            muchOption_ValueList_List =  getMuchOptionArr(optionValueList_List);
+//            oneOption_ValueList_List =  getOneOptionArr(optionValueList_List);
+
+            // 把只有一个 参数可选值的 option 设置出来 到  paramTemplate
+
+            paramTemplate = calculOneOptionParams(paramTemplate,onParamKeyName,oneOption_ValueList_List);
+
+            ArrayList<ArrayList<String>> allRankList = getAllRankRange(muchOption_ValueList_List);
+
+            for (int i = 0; i < allRankList.size(); i++) {
+                ArrayList<String>  resultItem =    allRankList.get(i);
+
+              String paramsItem =   toReplaceHolderPlace(resultItem,paramTemplate);
+                System.out.println("索引 [ "+i+" ] = "+ showResultItem(resultItem)+" 模板:"+ paramTemplate+"   替换后 paramsItem :  "+ paramsItem);
+                inputParamTemplateList.add(paramsItem);
+            }
+
+            return inputParamTemplateList;
+        }
+
+       String toReplaceHolderPlace(ArrayList<String> paramList , String template ){
+            String resultStr = "";
+            String operationStr = new String(template);
+          int charCount =  getCharCount(template,"【");
+          if(charCount != paramList.size()){
+              System.out.println("参数个数 paramList.size() = "+ paramList.size() + "  占位符个数不一致   charCount = "+ charCount);
+          }
+
+           for (int i = 0; i < paramList.size(); i++) {
+               String paramValue = paramList.get(i);
+              String contentItem = getStrWithPairChar(operationStr,"【","】");
+               contentItem = "【"+contentItem+"】";
+               operationStr = operationStr.replace(contentItem,paramValue);
+           }
+           resultStr = operationStr;
+           if(resultStr.contains("【")){
+               System.out.println(" resultStr = "+ resultStr + " 还包括深括号 可能出错!");
+           }
+
+           return resultStr;
+        }
+
+
+        ArrayList<ArrayList<String>>  getOneOptionArr( ArrayList<ArrayList<String>>  arrList_List){
+            ArrayList<ArrayList<String>>  subB = new      ArrayList<ArrayList<String>>();
+
+            for (int i = 0; i < arrList_List.size(); i++) {
+                ArrayList<String> arrItem = arrList_List.get(i);
+                if(arrItem == null || arrItem.size() ==0 || arrItem.size() ==1){
+                    subB.add(arrItem);
+                }
+
+            }
+            return subB;
+
+        }
+
+
+        ArrayList<ArrayList<String>>  getMuchOptionArr( ArrayList<ArrayList<String>>  arrList_List){
+            ArrayList<ArrayList<String>>  subA = new      ArrayList<ArrayList<String>>();
+
+            for (int i = 0; i < arrList_List.size(); i++) {
+                ArrayList<String> arrItem = arrList_List.get(i);
+                if(arrItem == null || arrItem.size() ==0 || arrItem.size() ==1){
+                    continue;
+                }
+                subA.add(arrItem);
+            }
+            return subA;
+
+        }
+
+        // ts_code='000001.SZ', start_date='', end_date=datestr
+        // ts_code='【tscode】',start_date='【start_date】',end_date='【end_date】'
+
+        String calculOneLine_InputParams(ArrayList<String> paramNameList){
+            String paramTemplate = "";
+
+            for (int i = 0; i < paramNameList.size(); i++) {
+                String oneParam = paramNameList.get(i);
+                String tempParam = oneParam+"="+"'【"+oneParam+"】',";
+                paramTemplate = paramTemplate + tempParam;
+            }
+
+            while(paramTemplate.endsWith(",")){
+                paramTemplate =  paramTemplate.substring(0,paramTemplate.length()-1);
+            }
+            return paramTemplate;
+
+        }
+
+
+
+
+
+
         LeafNode() {
 
         }
@@ -2166,6 +2832,7 @@ public class J0_TushareTool {
             System.out.println("score_permission_point = " + score_permission_point);
             System.out.println("onceCallCount = " + onceCallCount);
             System.out.println("pythonMethodName = " + pythonMethodName);
+            System.out.println("callLimit_Num_OneMinutes = " + callLimit_Num_OneMinutes);
             System.out.println("fieldList = " + Arrays.toString(fieldList.toArray()));
             showParamMap(params_linkedHashMap);
             showOptionMap(methodParams_linkedHashMap);
@@ -2201,21 +2868,7 @@ public class J0_TushareTool {
         }
 
 
-        // https://tushare.pro/document/2?doc_id=25
-        String leaf_web_sit;   // 叶子节点 对应的 网站的位置
-        String leaf_chinese_title;  // 股票列表
-        Map<String, String> params_linkedHashMap = Maps.newLinkedHashMap();  //  参数列表  key是英文参数 value是中文说明
 
-        String inputIdentify;  // 从 treedata 读取的 标识
-
-        int score_permission_point;  // 积分起始点
-        int onceCallCount;  // 一次调用 返回的记录次数
-        String pythonMethodName;  // python的函数名称
-
-        // 函数参数  以及参数的可选值  key 是参数名称   value 是可选值范围 ArrayList<String>
-        Map<String, ArrayList<String>> methodParams_linkedHashMap;
-
-        ArrayList<String> fieldList;  // 参数的集合
 
     }
 
@@ -2330,5 +2983,603 @@ public class J0_TushareTool {
         }
         return resultStr;
     }
+
+
+
+
+
+    static String  showResultItem(ArrayList<String>  logList){
+        StringBuilder sb  = new StringBuilder();
+        for (int i = 0; i < logList.size(); i++) {
+            sb.append(logList.get(i)+",");
+        }
+
+        String result = sb.toString();
+        while(result.endsWith(",")){
+            result = result.substring(0,result.length()-1);
+
+        }
+        return result;
+    }
+
+
+    static String  calculOneOptionParams (String template , ArrayList<String>  keyNameList, ArrayList<ArrayList<String>> oneOptionArr_Arr){
+        String fillOneOptionStr = new String(template);
+
+        for (int i = 0; i < keyNameList.size(); i++) {
+            ArrayList<String> oneParam =  oneOptionArr_Arr.get(i);
+            String oneKeyName = keyNameList.get(i);
+            String keyValue = "";
+            if(oneParam != null && oneParam.size() == 1){
+                keyValue =oneParam.get(0);
+            }
+            fillOneOptionStr = fillOneOptionStr.replace("【"+oneKeyName+"】",keyValue);
+        }
+        return fillOneOptionStr;
+
+    }
+
+    static ArrayList<ArrayList<String>> getAllRankRange(ArrayList<ArrayList<String>> arr_arr){
+        ArrayList<ArrayList<String>> newRankList = new  ArrayList<ArrayList<String>>();
+        ArrayList<int[]>  allSubIntList =     getAllRank(arr_arr);
+        for (int i = 0; i < allSubIntList.size(); i++) {
+            int[] intList =  allSubIntList.get(i);
+            ArrayList<String> onItemList = new  ArrayList<String>();
+            for (int j = 0; j < intList.length; j++) {
+                onItemList.add(arr_arr.get(j).get(intList[j]));
+            }
+            newRankList.add(onItemList);
+        }
+        return newRankList;
+    }
+
+
+    static ArrayList<int[]>  getAllRank(ArrayList<ArrayList<String>> arr_arr){
+        ArrayList<Integer> maxSizeList =  getMaxSizeInArr(arr_arr);
+        ArrayList<int[]> allRankList = new ArrayList<int[]>();
+        int minIndex  = 0 ;
+        int maxIndex = getMaxIndexValue(arr_arr);
+
+//        for (int i = 0; i < arr_arr.size(); i++) {
+//            int[] onrArr = new int[arr_arr.size()];
+//            allRankList.add(onrArr);
+//        }
+
+
+        first:   for (int i = minIndex; i <= maxIndex; i++) {
+            int curIndex = i;
+
+//            System.out.println("═════════════ i ="+ i);
+            int[] onrArr = new int[arr_arr.size()];
+            second:      for (int j = 0; j < arr_arr.size(); j++) {
+                int cur_jinzhi = getJinZhi(j,maxSizeList); // 获取当前索引的进制
+                int cur_Min_danyuan = getMin_DanYuanValue_InArr(j,arr_arr);
+
+//                System.out.println(" 当前 [ "+ i+" ] = "+ i +"  [j]="+j+"  cur_jinzhi="+cur_jinzhi+"   cur_Min_danyuan="+ cur_Min_danyuan );
+
+                // Index 【12】 = [0, 3, 0]       正确为 Index 【12】 = [0, 1, 1]
+
+//          ═════════════ i =12
+//          当前 [ 12 ] = 12  [j]=0  cur_jinzhi=3   cur_Min_danyuan=1
+//          当前 [ 12 ] = 12  [j]=1  cur_jinzhi=9   cur_Min_danyuan=3
+//          当前 [ 12 ] = 12  [j]=2  cur_jinzhi=27   cur_Min_danyuan=9
+
+                if(curIndex < cur_jinzhi){
+                    int positionValue = curIndex/cur_Min_danyuan ;
+                    onrArr[j] = positionValue;
+//                    curIndex = curIndex - positionValue*cur_jinzhi;
+                    break second;
+                }else if(curIndex == cur_jinzhi){
+                    onrArr[j+1] = onrArr[j+1] + 1;
+                    break second;
+                }else if (curIndex > cur_jinzhi){
+                    int positionValue = curIndex%cur_jinzhi;
+//                    System.out.println("positionValueA = "+ positionValue);
+
+                    if(positionValue >= cur_Min_danyuan){
+                        positionValue = positionValue/cur_Min_danyuan;
+                    }
+
+//                    System.out.println("positionValueB = "+ positionValue);
+                    onrArr[j] = positionValue;
+                    curIndex = curIndex - positionValue*cur_Min_danyuan;
+//                    System.out.println("curIndex = "+ curIndex);
+                }
+
+
+
+            }
+            allRankList.add(onrArr);
+        }
+
+        for (int i = 0; i <allRankList.size() ; i++) {
+            int[] intArr = allRankList.get(i);
+            System.out.println("Index 【" +i+"】 = "  +Arrays.toString(intArr));
+//            for (int j = 0; j <intArr.length ; j++) {
+//                System.out.println(" index = "+ j+"  "+(intArr[j]);
+//            }
+        }
+        return allRankList;
+    }
+
+    static  int getJinZhi(int ArrIndex ,  ArrayList<Integer> maxSizeList ){
+        int jinzhi = 1 ;
+        if(ArrIndex == 0){
+            jinzhi = maxSizeList.get(0);
+        }else{
+            return maxSizeList.get(ArrIndex) * getJinZhi(ArrIndex-1,maxSizeList);
+        }
+        return jinzhi;
+    }
+
+    //  size X size X size    最大的索引编号  每个队列相乘 得到总的数量  总的数量-1 就是最大索引
+    static int getMaxIndexValue( ArrayList<ArrayList<String>>  list_list_arr){
+        int max_index = 1 ;
+
+        for (int i = 0; i < list_list_arr.size() ; i++) {
+            if(list_list_arr.get(i).size() == 0){
+                continue;
+            }
+            max_index = max_index *  list_list_arr.get(i).size();
+        }
+
+
+        return max_index - 1;
+
+
+    }
+
+
+
+    static   int   getMin_DanYuanValue_InArr( int index , ArrayList<ArrayList<String>>  arrList_List) {
+        int min_danyuan_value = 1;
+        if (index == 0) {
+            return 1;
+        } else {
+            ArrayList<Integer> masxSizeArr =       getMaxSizeInArr(arrList_List);
+            return  getJinZhi (index - 1, masxSizeArr );
+
+        }
+    }
+
+
+
+    static   ArrayList<Integer>   getMaxSizeInArr( ArrayList<ArrayList<String>>  arrList_List){
+        ArrayList<Integer> intList = new      ArrayList<Integer>();
+
+        for (int i = 0; i < arrList_List.size(); i++) {
+            ArrayList<String> arrItem = arrList_List.get(i);
+            int curIndex = arrItem.size();
+            intList.add(curIndex);
+        }
+        return intList;
+    }
+
+
+    static  ArrayList<Integer>   getMaxIndexInArr( ArrayList<ArrayList<String>>  arrList_List){
+        ArrayList<Integer> intList = new      ArrayList<Integer>();
+
+        for (int i = 0; i < arrList_List.size(); i++) {
+            ArrayList<String> arrItem = arrList_List.get(i);
+            int curIndex = arrItem.size() -1;
+            intList.add(curIndex);
+        }
+        return intList;
+    }
+
+
+  static int  getCharCount(String originStr , String charStr){
+        int count  = 0 ;
+        if(originStr == null || charStr == null){
+
+            return count;
+        }
+      for (int i = 0; i < originStr.length(); i++) {
+          String charOne = originStr.substring(i,i+1);
+          if(charStr.equals(charOne)){
+              count++;
+          }
+      }
+      return count;
+
+    }
+
+    //读取excel
+    public static Workbook readExcel(String filePath){
+        Workbook wb = null;
+        if(filePath==null){
+            return null;
+        }
+        String extString = filePath.substring(filePath.lastIndexOf("."));
+        InputStream is = null;
+        try {
+            is = new FileInputStream(filePath);
+            if(".xls".equals(extString)){
+                return wb = new HSSFWorkbook(is);
+            }else if(".xlsx".equals(extString)){
+                return wb = new XSSFWorkbook(is);
+            }else{
+                return wb = null;
+            }
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return wb;
+    }
+
+    static String J0_GuPiaoLieBiao_Path = zbinPath+File.separator+"J0_股票列表.xlsx";
+    static void  initTsCodeList(){
+// TScode_List
+        File ts_code_File = new File(J0_GuPiaoLieBiao_Path);
+        if(!ts_code_File.exists()){
+            System.out.println("当前 没有 基础数据文件( 请添置该文件 ) J0_GuPiaoLieBiao_Path ="+ J0_GuPiaoLieBiao_Path);
+             return;
+        }
+
+        Workbook wb =null;
+        Sheet sheet = null;
+        Row row = null;
+        List<Map<String,String>> list = null;
+        String cellData = null;
+        String filePath = ts_code_File.getAbsolutePath();
+        System.out.println("xlsx Path = "+ filePath);
+        String columns[] = {"","ts_code","symbol","name","area","industry","fullname","enname","market","exchange","curr_type","list_status","list_date","delist_date","is_hs"};
+        wb = readExcel(filePath);
+
+        if(wb != null){
+            //用来存放表中数据
+            list = new ArrayList<Map<String,String>>();
+            //获取第一个sheet
+//            sheet = wb.getSheet("股票列表");
+//            sheet = wb.getSheetAt(0);
+            sheet = wb.getSheet("股票列表");
+            //获取最大行数
+            int rownum = sheet.getPhysicalNumberOfRows();
+            //获取第一行
+            row = sheet.getRow(0);
+            //获取最大列数
+            int colnum = row.getPhysicalNumberOfCells();
+            for (int i = 1; i<rownum; i++) {
+                Map<String,String> map = new LinkedHashMap<String,String>();
+                row = sheet.getRow(i);
+                if(row !=null){
+                    for (int j=0;j<colnum;j++){
+                        cellData = (String) getCellFormatValue(row.getCell(j));
+                        map.put(columns[j], cellData);
+                    }
+                }else{
+                    break;
+                }
+                list.add(map);
+            }
+        }
+        //遍历解析出来的list
+        for (Map<String,String> map : list) {
+            for (Map.Entry<String,String> entry : map.entrySet()) {
+//                System.out.print(entry.getKey()+":"+entry.getValue()+",");
+                if("ts_code".equals(entry.getKey())){
+                    TScode_List.add(entry.getValue());
+                }
+            //    System.out.println(" entry.getKey() = "+entry.getKey() + "   entry.getValue() = "+ entry.getValue()+"【Over】");
+            }
+//            System.out.println();
+        }
+
+
+        TScode_List.sort(new Comparator<String>() {
+            @Override
+            public int compare(String o1, String o2) {
+                return o1.compareTo(o2);
+            }
+        });
+
+
+    }
+
+
+    public static Object getCellFormatValue(Cell cell){
+        Object cellValue = null;
+        if(cell!=null){
+            //判断cell类型
+            switch(cell.getCellType()){
+                case Cell.CELL_TYPE_NUMERIC:{
+                    cellValue = String.valueOf(cell.getNumericCellValue());
+                    break;
+                }
+                case Cell.CELL_TYPE_FORMULA:{
+                    //判断cell是否为日期格式
+                    if(DateUtil.isCellDateFormatted(cell)){
+                        //转换为日期格式YYYY-mm-dd
+                        cellValue = cell.getDateCellValue();
+                    }else{
+                        //数字
+                        cellValue = String.valueOf(cell.getNumericCellValue());
+                    }
+                    break;
+                }
+                case Cell.CELL_TYPE_STRING:{
+                    cellValue = cell.getRichStringCellValue().getString();
+                    break;
+                }
+                default:
+                    cellValue = "";
+            }
+        }else{
+            cellValue = "";
+        }
+        return cellValue;
+    }
+
+    static ArrayList<String> calcul_XCode_List_Params(int count){
+        if(count <= 0){
+            count = x_tscode_num_default; // 默认值
+        }
+        ArrayList<String> xcodeParams = new   ArrayList<String>();
+        int numCount = 1;
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < TScode_List.size(); i++) {
+            if(numCount%count == 0){
+                String xcode_item = sb.toString();
+                while(xcode_item.endsWith(",")){
+                    xcode_item = xcode_item.substring(0,xcode_item.length()-1);
+                }
+                xcodeParams.add(xcode_item);
+                sb = new StringBuilder();
+            }
+            sb.append(TScode_List.get(i)+",");
+            numCount++;
+        }
+        String xCode_End = sb.toString();
+        while(xCode_End.endsWith(",")){
+            xCode_End = xCode_End.substring(0,xCode_End.length()-1);
+        }
+        if(!xcodeParams.contains(xCode_End)){
+            xcodeParams.add(xCode_End);
+        }
+
+        return xcodeParams;
+    }
+
+
+
+
+//  获取 从 1990年 到 现在年份的 20x9 年 之间 相隔 year_space 的时间组合 索引0 -beginStr 索引1-endStr
+//## 1990.01.01   --- 1999.12.31 Space=10
+// ArrayList<ArrayList<String>> init_Year_Pair_List(int year_space)  Begin
+//## 2000.01.01   ---- 2009.12.31
+//## 2010.01.01 -----2019.12.31
+//## 2020.01.01 ---- 2029.12.31
+//## 2030.01.01 ---- 2039.12.31
+
+//    ArrayList<ArrayList<String>>  yearPair =  init_Year_Pair_List(default_space_year);
+//        for (int i = 0; i < yearPair.size() ; i++) {
+//        ArrayList<String> pair_date = yearPair.get(i);
+//        System.out.println("Date[ "+ i+ "]   BeginDate= "+ pair_date.get(0)+"   EndDate = "+ pair_date.get(1));
+//    }
+
+
+
+    static ArrayList<ArrayList<String>> init_Year_Pair_List(int year_space){
+        Calendar curCalendar = Calendar.getInstance();
+        int beginYear = 1990;
+        int endYear = curCalendar.get(Calendar.YEAR)+10;
+
+        ArrayList<ArrayList<Calendar>>  tenYear_Calendar_List =   calcul_Ten_Year_DatePair(beginYear,endYear);
+        return calculDate_Begin_End_List(tenYear_Calendar_List ,year_space );
+    }
+
+
+    static ArrayList<ArrayList<String>> calculDate_Begin_End_List( ArrayList<ArrayList<Calendar>> tenYearList , int yearSpace ){
+        if(yearSpace == 10){
+            return calDateListWithCalendar(tenYearList);
+        }
+
+        int mBeginYear = tenYearList.get(0).get(0).get(Calendar.YEAR);
+        int mEndYear = tenYearList.get(tenYearList.size()-1).get(1).get(Calendar.YEAR);
+        Calendar cal = Calendar.getInstance();
+        int nextYear = cal.get(Calendar.YEAR)+1;
+        int future_less_year = mEndYear>nextYear?nextYear:mEndYear;
+        return calDateListWithCalendar(calcul_Space_Year(mBeginYear,future_less_year,yearSpace));
+
+    }
+
+    static    ArrayList<ArrayList<String>>  calDateListWithCalendar(ArrayList<ArrayList<Calendar>> calendarList){
+        ArrayList<ArrayList<String>> date_list_list = new  ArrayList<ArrayList<String>>();
+
+        SimpleDateFormat format=new SimpleDateFormat("YYYYMMdd");
+        for (int i = 0; i < calendarList.size(); i++) {
+            ArrayList<Calendar> calendarsList = calendarList.get(i);
+            if(calendarsList.size() != 2){
+                System.out.println("当前的时间配对 存在错误: calendarsList.size() = "+ calendarsList.size() + " 内容:"+Arrays.toString(calendarsList.toArray()));
+                continue;
+            }
+
+            ArrayList<String> dateList = new    ArrayList<String>();
+            Calendar beginCalendar = calendarsList.get(0);
+            Calendar endCalendar = calendarsList.get(1);
+            String beginDateStr = format.format(beginCalendar.getTime());
+            String endDateStr = format.format(endCalendar.getTime());
+            dateList.add(beginDateStr);
+            dateList.add(endDateStr);
+            date_list_list.add(dateList);
+        }
+
+        return date_list_list;
+
+    }
+
+    static ArrayList<ArrayList<Calendar>> calcul_Space_Year(int beginYear , int endYear , int year_step){
+        ArrayList<ArrayList<Calendar>> Date_Pair_List =new ArrayList<ArrayList<Calendar>>();
+        int curBeginYear = beginYear;
+        int curEndYear = endYear;
+        int index = 0 ;
+        SimpleDateFormat format=new SimpleDateFormat("YYYYMMdd");
+        while(curBeginYear < endYear){
+            ArrayList<Calendar> dateList = new ArrayList<Calendar>();
+            String beginStr = curBeginYear+"0101";
+            String endStr = getNextSpaceYear(curBeginYear,year_step)+"1231";
+            Calendar begincalendar= null;
+            Calendar endcalendar= null;
+            try {
+                Date beginDate=format.parse(beginStr);
+                Date endDate=format.parse(endStr);
+
+                begincalendar=Calendar.getInstance();
+                begincalendar.setTime(beginDate);
+
+                endcalendar=Calendar.getInstance();
+                endcalendar.setTime(endDate);
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            curBeginYear =  getNext_BeginYear(curBeginYear,year_step);
+            dateList.add(begincalendar);
+            dateList.add(endcalendar);
+//            System.out.println("Date["+index+"] beginStr = "+ beginStr + " endStr  =" + endStr);
+            Date_Pair_List.add(dateList);
+            index++;
+        }
+
+        return Date_Pair_List;
+
+
+    }
+
+    static int getNext_BeginYear(int year ,int year_step ){
+
+        return year+year_step;
+    }
+
+    static int getNextSpaceYear(int year ,int year_step ){
+
+        return year+year_step-1;
+    }
+
+    static ArrayList<ArrayList<Calendar>> calcul_Ten_Year_DatePair(int beginYear , int endYear ){
+        ArrayList<ArrayList<Calendar>> Date_Pair_List =new ArrayList<ArrayList<Calendar>>();
+        int curBeginYear = beginYear;
+        int curEndYear = endYear;
+        int index = 0 ;
+        SimpleDateFormat format=new SimpleDateFormat("yyyy-MM-dd");
+        while(curBeginYear < endYear){
+            ArrayList<Calendar> dateList = new ArrayList<Calendar>();
+            String beginStr = curBeginYear+"-01-01";
+            String endStr = getNextNightYear(curBeginYear)+"-12-31";
+            Calendar begincalendar= null;
+            Calendar endcalendar= null;
+
+            try {
+                Date beginDate=format.parse(beginStr);
+                Date endDate=format.parse(endStr);
+
+                begincalendar=Calendar.getInstance();
+                begincalendar.setTime(beginDate);
+
+                endcalendar=Calendar.getInstance();
+                endcalendar.setTime(endDate);
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+//            System.out.println("beginStr = "+beginStr + " begincalendar = "+ format.format(begincalendar.getTime())+"endStr = "+endStr + " endcalendar = "+ format.format(endcalendar.getTime()));
+            curBeginYear =  getTenYear(curBeginYear);
+            dateList.add(begincalendar);
+            dateList.add(endcalendar);
+//            System.out.println("Date["+index+"] beginStr = "+ beginStr + " endStr  =" + endStr);
+            Date_Pair_List.add(dateList);
+            index++;
+        }
+
+        return Date_Pair_List;
+    }
+
+    static int getTenYear(int year){
+        int one_year_num = year%10;
+        int result_year  = year;
+        if(one_year_num == 0){
+            return year+10;
+        }else{
+            int step_year =  10 - one_year_num ;
+            for (int i = 0; i < step_year; i++) {
+                result_year++;
+            }
+        }
+        return result_year;
+    }
+
+    static int getNextNightYear(int year){
+        int one_year_num = year%10;
+        int result_year = year;
+        int step_year =  9 - one_year_num ;
+        for (int i = 0; i < step_year; i++) {
+            result_year++;
+        }
+        return result_year;
+    }
+
+
+    //## 1990.01.01   --- 1999.12.31 Space=10   End
+// ArrayList<ArrayList<String>> init_Year_Pair_List(int year_space)  End
+
+    static  String getNodeBodyFilePath(String nodeName){
+        System.out.println("getNodeBodyFilePath nodeName = "+ nodeName);
+        String bodyPath = Python_BodyTemplate_1;
+        switch (nodeName){
+
+
+            case "?":
+                bodyPath = "?";
+                break;
+
+
+            //ValueError: This sheet is too large! Your sheet size is: 1166415, 8 Max sheet size is: 1048576, 1638
+            case "guanlicengxinchouhechigu":
+              bodyPath = Python_BodyTemplate_3;
+                break;
+
+
+            // Exception: 抱歉，您每分钟最多访问该接口10次，权限的具体详情访问
+            case "IPOxingushangshi":
+                bodyPath = Python_BodyTemplate_4;
+                break;
+
+
+            //  没有中文的 cname 所以添加额外的代码 添加 cname
+
+            case "rixianhangqing":
+            case "shangshigongsiguanliceng":
+            case "shangshigongsijibenxinxi":
+            case "hushengutongchengfengu":
+                bodyPath = Python_BodyTemplate_2;
+                break;
+
+            default:
+                bodyPath = Python_BodyTemplate_1;
+        }
+        return bodyPath;
+    }
+
+
+    static  String getNodeHeadFile(String nodeName){
+        System.out.println("getNodeHeadFile nodeName = "+ nodeName);
+        String headPath = Python_HeadTemplate_Path;
+        switch (nodeName){
+
+            case "?":
+                headPath = "?";
+                break;
+
+            default:
+                headPath = Python_HeadTemplate_Path;
+        }
+        return headPath;
+    }
+  static int  x_tscode_num_default = 50;   // xcode ts_code 的默认的个数
+    static int default_space_year = 10;   // 11xstart_date  11xend_date  时间间隔的长度 单位年
 
 }
