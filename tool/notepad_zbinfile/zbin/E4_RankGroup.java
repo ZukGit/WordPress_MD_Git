@@ -1,6 +1,8 @@
+import java.io.File;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Stack;
 import java.util.regex.Matcher;
@@ -13,10 +15,48 @@ public class E4_RankGroup {
     // 输入的参数列表
     static ArrayList<String> mKeyWordName = new ArrayList<>();
 
+    String batname = "";
+    static String BAT_OR_SH_Point ;
+    enum OS_TYPE {
+        Windows,
+        Linux,
+        MacOS
+    }
+
+    static String Cur_Bat_Name = "zrankgroup_E4";
+    // 固定3   当前操作系统的类型
+    static OS_TYPE CUR_OS_TYPE = OS_TYPE.Windows;
+
+    static String cur_os_zbinPath ;
+    static String win_zbinPath = System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin"+File.separator+"win_zbin";
+    static String lin_zbinPath = System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin"+File.separator+"lin_zbin";
+    static String mac_zbinPath = System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin"+File.separator+"mac_zbin";
+
+
+    static void initSystemInfo() {
+        String osName = System.getProperties().getProperty("os.name").toLowerCase();
+        if (osName.contains("window")) {
+            CUR_OS_TYPE = OS_TYPE.Windows;
+            Cur_Bat_Name = Cur_Bat_Name+".bat";
+            BAT_OR_SH_Point = ".bat";
+            cur_os_zbinPath = win_zbinPath;
+        } else if (osName.contains("linux")) {
+            CUR_OS_TYPE = OS_TYPE.Linux;
+            Cur_Bat_Name = Cur_Bat_Name+".sh";
+            BAT_OR_SH_Point = ".sh";
+            cur_os_zbinPath = lin_zbinPath;
+        } else if (osName.contains("mac")) {
+            CUR_OS_TYPE = OS_TYPE.MacOS;
+            Cur_Bat_Name = Cur_Bat_Name+".sh";
+            BAT_OR_SH_Point = ".sh";
+            cur_os_zbinPath = mac_zbinPath;
+        }
+    }
+
     public static void main(String[] args) {
         // System.out.println("Hello World!");
-
-long timestamp1 = System.currentTimeMillis();
+        initSystemInfo();
+         long timestamp1 = System.currentTimeMillis();
         if (args != null) {
             for (int i = 0; i < args.length; i++) {
                 System.out.println("args[" + i + "] = " + args[i]);
@@ -31,14 +71,40 @@ long timestamp1 = System.currentTimeMillis();
             }
         }
 
+        boolean isStype2 =   checkIsInputStyle2(mKeyWordName);
+
         if(mKeyWordName.size() == 0){
+            System.out.println("输入格式1:  ");
+            System.out.println(Cur_Bat_Name+"   ABCDEF     ###  对输入的字符串的每一个字符进行随机位置排列 ABCDEF->FEDCBA");
+            System.out.println("输入格式2:   tip: 起码在输入参数中包含一对大括号{} 才能调用输入格式2 否则默认调用输入格式1   ");
+            System.out.println(Cur_Bat_Name+"   {a-A} {b-B} {c-C} {black-red} {1-2-3-4-5}     ###  对输入的字符串数组 进行位置固定的排序 【abc black 1】【ABC red 5】");
+
             System.out.println("输入需要排列的字符串数值为空 默认排序【 ABCDEF 】!   zrank_group ABCDEF!");
             mKeyWordName.add("ABCDEF");
         }
 
+
+
+        if(isStype2){
+            ArrayList<String> fixedInputParamList = fixedInputParam(mKeyWordName);
+
+            ArrayList<ArrayList<String>> input_Rank_Arr = calculInputRankArr(fixedInputParamList);
+
+            showArrArrList(getAllRankRange(input_Rank_Arr));
+
+            long timestamp2 = System.currentTimeMillis();
+            long timedistance = timestamp2 - timestamp1;
+
+            System.out.println("程序执行花销 "+ Double.parseDouble(nf.format((Double) (timedistance / (1024d))))+ "秒!");
+
+
+            return;
+        }
+
+
         for (int z = 0; z < mKeyWordName.size(); z++) {
 
-            System.out.println("=================参数"+mKeyWordName.get(z)+"排列数据情况如下=================");
+            System.out.println("=================参数 【"+mKeyWordName.get(z)+"】排列数据情况如下=================");
 
             ArrayList<String> bianhuaArr = new ArrayList<String>();
             ArrayList<String> ArrGroupA = calculSortedGroup(mKeyWordName.get(z));
@@ -46,16 +112,34 @@ long timestamp1 = System.currentTimeMillis();
 
 
 
+            //   是否大小写 敏感
             ArrayList<String> allGroupArr =      calculGroupAll(mKeyWordName.get(z));
+
+
+
             int allCount = allGroupArr.size();
-            String bianhua_title = "参数"+mKeyWordName.get(z)+"位置散列序列数长度"+ allCount;
+            String bianhua_title = "参数【 "+mKeyWordName.get(z)+" 】(大小写变化)位置散列序列数长度"+ allCount;
           //  System.out.println("   位置散列序列数="+ allCount);
             for (int i = 0; i < allGroupArr.size(); i++) {
          //       System.out.println("位置散列序列数   Index="+i+ "   allCount="+ allCount+  "   Value =【"+ allGroupArr.get(i)+"】");
-          String bianhua_item =  "位置散列序列数索引:"+i+"   总长:  "+allCount + "  当前值: 【 " + allGroupArr.get(i)+" 】";
+          String bianhua_item =  "(大小写变化)位置散列序列数索引:"+i+"   总长:  "+allCount + "  当前值: 【 " + allGroupArr.get(i)+" 】";
                 bianhuaArr.add(bianhua_item);
            }
             ArrayPrint(bianhuaArr,bianhua_title);
+
+
+
+            ArrayList<String> No_BigSmall_Change_AllGroupArr =      calculGroupAll(mKeyWordName.get(z),false);
+            ArrayList<String> bianhuaArr_nochange = new ArrayList<String>();
+            int allCount_no_change = No_BigSmall_Change_AllGroupArr.size();
+            String bianhua_title_nochange = "参数【 "+mKeyWordName.get(z)+" 】(大小写不变)位置散列序列数长度"+ allCount_no_change;
+            //  System.out.println("   位置散列序列数="+ allCount);
+            for (int i = 0; i < No_BigSmall_Change_AllGroupArr.size(); i++) {
+                //       System.out.println("位置散列序列数   Index="+i+ "   allCount="+ allCount+  "   Value =【"+ allGroupArr.get(i)+"】");
+                String bianhua_item =  "(大小写不变)位置散列序列数索引:"+i+"   总长:  "+allCount_no_change + "  当前值: 【 " + No_BigSmall_Change_AllGroupArr.get(i)+" 】";
+                bianhuaArr_nochange.add(bianhua_item);
+            }
+            ArrayPrint(bianhuaArr_nochange,bianhua_title_nochange);
 
 
             ArrayList<String> gudingArr = new ArrayList<String>();
@@ -88,6 +172,167 @@ long timestamp1 = System.currentTimeMillis();
         cankaoArr.add("0123456789:X秒");
         ArrayPrint(cankaoArr,"花销参考时间");
     }
+
+
+
+
+    static  ArrayList<ArrayList<String>>  calculInputRankArr( ArrayList<String> inputArr ){
+
+        ArrayList<ArrayList<String>> rank_arr = new   ArrayList<ArrayList<String>>();
+
+//  zrankgroup_E4.bat {a-A} {b-B} {c-C} {black-red} {1-2-3-4-5}
+        for (int i = 0; i < inputArr.size(); i++) {
+            String arrItem = inputArr.get(i);
+            String getPairContent = getStrWithPairChar(arrItem,"{","}");
+            ArrayList<String> inputItem = new    ArrayList<String>();
+            String[] arr = getPairContent.split("-");
+            for (int j = 0; j < arr.length; j++) {
+                inputItem.add(arr[j]);
+            }
+
+            rank_arr.add(inputItem);
+        }
+
+        return rank_arr;
+
+    }
+
+    static String getStrWithPairChar(String inputStr, String pairStrA, String pairStrB) {
+        String resultStr = "";
+        if (inputStr.lastIndexOf(pairStrA) != -1 && inputStr.lastIndexOf(pairStrB) != -1) {
+
+            int firstIndex = inputStr.indexOf(pairStrA) + pairStrA.length();
+            String otherStr = inputStr.substring(firstIndex);
+            int secondIndex = otherStr.indexOf(pairStrB) + firstIndex;
+
+//            System.out.println("firstIndex = "+ firstIndex + "    secondIndex="+ secondIndex);
+            resultStr = inputStr.substring(firstIndex, secondIndex);
+            return resultStr;
+        }
+        return resultStr;
+    }
+
+
+
+    static ArrayList<String> fixedInputParam( ArrayList<String> inputArr ){
+        ArrayList<String> fixedInputArr =   new ArrayList<String>();
+
+        for (int i = 0; i < inputArr.size(); i++) {
+            String inputItem = new String(inputArr.get(i));
+
+            if(!inputItem.startsWith("{")){
+                inputItem = "{"+inputItem;
+            }
+            if(!inputItem.endsWith("}")){
+                inputItem = inputItem+"}";
+            }
+            fixedInputArr.add(inputItem);
+        }
+        return fixedInputArr;
+    }
+
+    static boolean checkIsInputStyle2( ArrayList<String> inputArr ){
+
+        boolean flag = false;
+
+        if(inputArr.size() == 0 ){
+            return  flag;
+        }
+
+        for (int i = 0; i < inputArr.size(); i++) {
+            String inputItem = inputArr.get(i);
+            if(inputItem.startsWith("{") && inputItem.endsWith("}")){
+                flag = true;
+                break;
+            }
+        }
+
+        return flag;
+
+    }
+
+/*    // big_small_flag---true   大小写替换       big_small_flag---false   大小写不替换
+    public static  ArrayList<String> calculGroupAll(String value , boolean big_small_flag){
+
+
+
+    }
+    */
+
+
+    public static  ArrayList<String> calculGroupAll(String value , boolean big_small_flag){
+        ArrayList<String> allResultStr = new  ArrayList<String>();
+        ArrayList<String> arr = calculSortedGroup(value,big_small_flag);
+        //   System.out.println(" X1 arr.size="+arr.size());
+        int length = value.length();
+        int[] arrLength = new int[length];
+        for (int i = 0; i < length; i++) {
+            arrLength[i] = i;
+        }
+
+        getIntRankGroup(arrLength,arrLength.length,0);
+        //  System.out.println(" X2 intArr.size="+intArr.size());
+        for (int i = 0; i < intArr.size(); i++) {
+            int[] intarr = intArr.get(i);
+            int intarrLength = intarr.length;
+//    System.out.print("[");
+//            for (int j = 0; j < intarrLength; j++) {
+//                System.out.print(intarr[j]+",");
+//            }
+//  System.out.println("]");
+            ArrayList<String>  temp =    calculStringArrAndIntArr(arr,intarr);
+            //      System.out.println("X3  temp.size() = "+ temp.size());
+            for (int j = 0; j < temp.size(); j++) {
+                String curItemStr = temp.get(j);
+                if(!allResultStr.contains(curItemStr)){
+                    allResultStr.add(curItemStr);
+                }
+            }
+        }
+        allResultStr.sort(new Comparator<String>() {
+            @Override
+            public int compare(String o1, String o2) {
+                int str1Length = o1.length();
+                int str2Length = o2.length();
+                int possibleSize = 0; // 拿到小的那个
+                if(str1Length >= str2Length ){
+                    possibleSize = str2Length;
+                }else{
+                    possibleSize = str1Length;
+                }
+
+                // az全小写
+                // a..Z 一个字母大写
+
+                for (int i = 0; i < possibleSize; i++) {
+                    char charA = o1.charAt(i);
+                    char charB = o2.charAt(i); //
+                    if(charA == charB ){ // 两个相同的字母  那么继续下一次循环
+                        continue;
+                    }else if(charB >= 97  && charA < 97 ){ // 一个大写 一个小写   大写在后
+                        return 1;
+                    }else if(charA >= 97  && charB < 97 ){  // 一个大写 一个小写   大写在后
+                        return -1;
+                    }else if(charA > charB && charA < 97 ){ // 两个字母都是大写 charA > charB        a[97]z[122]    A[65] 90[Z]
+                        return 1;   // 97 Z  == 66 B
+                    }else if(charB > charA && charB < 97){ //都是大写 谁小谁在前 // 97 Z  == 66 B
+                        return -1;
+                    }else if(charA > charB && charB >= 97){  // 都是小写 谁小谁在前
+                        return 1;
+                    }else if(charB > charA && charA >= 97){ // 都是小写  谁小谁在前
+                        return -1;
+                    }
+
+                }
+
+                return 0;
+
+            }
+        });
+
+        return allResultStr;
+    }
+
 
 
     public static  ArrayList<String> calculGroupAll(String value){
@@ -211,6 +456,17 @@ long timestamp1 = System.currentTimeMillis();
         return tempArr;
     }
 
+    public static ArrayList<String> calculSortedGroup(String value,boolean big_small_flag){
+        ArrayList<String> resut = calculGroup(value,big_small_flag);
+        resut.sort(new Comparator<String>() {
+            @Override
+            public int compare(String o1, String o2) {
+                return o2.compareTo(o1); // 小写在前
+            }
+        });
+        return resut;
+    }
+
 
     public static ArrayList<String> calculSortedGroup(String value){
         ArrayList<String> resut = calculGroup(value);
@@ -222,6 +478,36 @@ long timestamp1 = System.currentTimeMillis();
         });
         return resut;
     }
+
+    public static  ArrayList<String> calculGroup(String value,boolean big_small_flag){
+        ArrayList<String> tempArr = new ArrayList<String>();
+        if(value.length() == 1){
+
+            if(!tempArr.contains(value)){
+                tempArr.add(value);
+            }
+            
+        }else{
+
+            String otherStr = value.substring(1);
+            String firstStr = value.substring(0,1);
+
+            String curStr = firstStr;
+            ArrayList<String> NextArr = calculGroup(otherStr,false);
+            for (int i = 0; i < NextArr.size(); i++) {
+                String curTemp = (curStr+ NextArr.get(i)).trim();
+
+
+                if(!tempArr.contains(curTemp)){
+                    tempArr.add(curTemp);
+                }
+            }
+        }
+
+        return tempArr;
+    }
+
+
 
     public static  ArrayList<String> calculGroup(String value){
         ArrayList<String> tempArr = new ArrayList<String>();
@@ -769,4 +1055,214 @@ long timestamp1 = System.currentTimeMillis();
         return maoPosition;
     }
     // ArrayPrint ==============================End
+
+
+
+
+    static void showArrArrList(ArrayList<ArrayList<String>> rank_allArr ){
+        System.out.println();
+        System.out.println();
+        for (int i = 0; i < rank_allArr.size(); i++) {
+            ArrayList<String> arrItem =   rank_allArr.get(i);
+            ArrayList<Integer> intArr = new  ArrayList<Integer>();
+            int[] arrInt = curOpetaion_Index_list.get(i);
+            for (int j = 0; j <arrInt.length ; j++) {
+                intArr.add(arrInt[j]);
+            }
+
+            String pre = "下标索引排列 【" +getOver4size(i)+"】 = "  +getIntArrString(intArr);
+            String end = "序列内容显示 【"+getOver4size(i)+"】 = "+ Arrays.toString(arrItem.toArray());
+
+            System.out.println(pre+"  "+ end);
+        }
+    }
+
+
+   static  String getIntArrString(ArrayList<Integer> intString){
+        StringBuilder sb = new StringBuilder();
+        sb.append("[");
+        for (int i = 0; i < intString.size(); i++) {
+           int intItem = intString.get(i);
+            sb.append(getOversize(intItem,2," ")+",");
+        }
+        String result = sb.toString().trim();
+
+        while(result.endsWith(",")){
+            result = result.substring(0,result.length()-1);
+        }
+        result = result + "]";
+        return result;
+
+
+    }
+
+
+    static String getOversize(int i , int minLength ,String paddingStr){
+        String value = i+"";
+        int valueSize = value.length();
+        if(valueSize >= minLength ){
+            return value;
+        }
+
+        int padding = minLength - valueSize;
+        for (int j = 0; j < padding; j++) {
+            value = paddingStr+value;
+        }
+
+        return value;
+    }
+
+
+    static String getOver4size(int i){
+        String value = i+"";
+        int valueSize = value.length();
+        if(valueSize >= 4 ){
+            return value;
+        }
+
+        int padding = 4 - valueSize;
+        for (int j = 0; j < padding; j++) {
+            value = "0"+value;
+        }
+
+        return value;
+    }
+
+    static ArrayList<ArrayList<String>> getAllRankRange(ArrayList<ArrayList<String>> arr_arr){
+        ArrayList<ArrayList<String>> newRankList = new  ArrayList<ArrayList<String>>();
+        ArrayList<int[]>  allSubIntList =     getAllRank(arr_arr);
+        for (int i = 0; i < allSubIntList.size(); i++) {
+            int[] intList =  allSubIntList.get(i);
+            ArrayList<String> onItemList = new  ArrayList<String>();
+            for (int j = 0; j < intList.length; j++) {
+                onItemList.add(arr_arr.get(j).get(intList[j]));
+            }
+            newRankList.add(onItemList);
+        }
+        return newRankList;
+    }
+
+    static  ArrayList<int[]>  curOpetaion_Index_list = new ArrayList<int[]>();
+    static ArrayList<int[]>  getAllRank(ArrayList<ArrayList<String>> arr_arr){
+        ArrayList<Integer> maxSizeList =  getMaxSizeInArr(arr_arr);
+        ArrayList<int[]> allRankList = new ArrayList<int[]>();
+        int minIndex  = 0 ;
+        int maxIndex = getMaxIndexValue(arr_arr);
+
+//        for (int i = 0; i < arr_arr.size(); i++) {
+//            int[] onrArr = new int[arr_arr.size()];
+//            allRankList.add(onrArr);
+//        }
+
+
+        first:   for (int i = minIndex; i <= maxIndex; i++) {
+            int curIndex = i;
+
+//            System.out.println("═════════════ i ="+ i);
+            int[] onrArr = new int[arr_arr.size()];
+            second:      for (int j = 0; j < arr_arr.size(); j++) {
+                int cur_jinzhi = getJinZhi(j,maxSizeList); // 获取当前索引的进制
+                int cur_Min_danyuan = getMin_DanYuanValue_InArr(j,arr_arr);
+
+//                System.out.println(" 当前 [ "+ i+" ] = "+ i +"  [j]="+j+"  cur_jinzhi="+cur_jinzhi+"   cur_Min_danyuan="+ cur_Min_danyuan );
+
+                // Index 【12】 = [0, 3, 0]       正确为 Index 【12】 = [0, 1, 1]
+
+//          ═════════════ i =12
+//          当前 [ 12 ] = 12  [j]=0  cur_jinzhi=3   cur_Min_danyuan=1
+//          当前 [ 12 ] = 12  [j]=1  cur_jinzhi=9   cur_Min_danyuan=3
+//          当前 [ 12 ] = 12  [j]=2  cur_jinzhi=27   cur_Min_danyuan=9
+
+                if(curIndex < cur_jinzhi){
+                    int positionValue = curIndex/cur_Min_danyuan ;
+                    onrArr[j] = positionValue;
+//                    curIndex = curIndex - positionValue*cur_jinzhi;
+                    break second;
+                }else if(curIndex == cur_jinzhi){
+                    onrArr[j+1] = onrArr[j+1] + 1;
+                    break second;
+                }else if (curIndex > cur_jinzhi){
+                    int positionValue = curIndex%cur_jinzhi;
+//                    System.out.println("positionValueA = "+ positionValue);
+
+                    if(positionValue >= cur_Min_danyuan){
+                        positionValue = positionValue/cur_Min_danyuan;
+                    }
+
+//                    System.out.println("positionValueB = "+ positionValue);
+                    onrArr[j] = positionValue;
+                    curIndex = curIndex - positionValue*cur_Min_danyuan;
+//                    System.out.println("curIndex = "+ curIndex);
+                }
+
+
+
+            }
+            allRankList.add(onrArr);
+        }
+
+//        for (int i = 0; i <allRankList.size() ; i++) {
+//            int[] intArr = allRankList.get(i);
+//            System.out.println("下标索引排列 【" +getOver4size(i)+"】 = "  +Arrays.toString(intArr));
+//            for (int j = 0; j <intArr.length ; j++) {
+//                System.out.println(" index = "+ j+"  "+(intArr[j]);
+//            }
+//        }
+        curOpetaion_Index_list.addAll(allRankList);
+        return allRankList;
+    }
+
+    static  int getJinZhi(int ArrIndex ,  ArrayList<Integer> maxSizeList ){
+        int jinzhi = 1 ;
+        if(ArrIndex == 0){
+            jinzhi = maxSizeList.get(0);
+        }else{
+            return maxSizeList.get(ArrIndex) * getJinZhi(ArrIndex-1,maxSizeList);
+        }
+        return jinzhi;
+    }
+
+    //  size X size X size    最大的索引编号  每个队列相乘 得到总的数量  总的数量-1 就是最大索引
+    static int getMaxIndexValue( ArrayList<ArrayList<String>>  list_list_arr){
+        int max_index = 1 ;
+
+        for (int i = 0; i < list_list_arr.size() ; i++) {
+            if(list_list_arr.get(i).size() == 0){
+                continue;
+            }
+            max_index = max_index *  list_list_arr.get(i).size();
+        }
+
+
+        return max_index - 1;
+
+
+    }
+
+
+
+    static   int   getMin_DanYuanValue_InArr( int index , ArrayList<ArrayList<String>>  arrList_List) {
+        int min_danyuan_value = 1;
+        if (index == 0) {
+            return 1;
+        } else {
+            ArrayList<Integer> masxSizeArr =       getMaxSizeInArr(arrList_List);
+            return  getJinZhi (index - 1, masxSizeArr );
+
+        }
+    }
+
+
+
+    static   ArrayList<Integer>   getMaxSizeInArr( ArrayList<ArrayList<String>>  arrList_List){
+        ArrayList<Integer> intList = new      ArrayList<Integer>();
+
+        for (int i = 0; i < arrList_List.size(); i++) {
+            ArrayList<String> arrItem = arrList_List.get(i);
+            int curIndex = arrItem.size();
+            intList.add(curIndex);
+        }
+        return intList;
+    }
+
 }

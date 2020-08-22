@@ -2677,8 +2677,8 @@ static ArrayList<String> TScode_List = new ArrayList<String>();
           System.out.println();
           System.out.println();
           System.out.println();
-
-
+          String node_python_file = zbinPath +File.separator+"J0_"+blockIndex+"_"+nodeName+".py";
+          writeContentToFile(new File(node_python_file),codeList);
         }
 
 
