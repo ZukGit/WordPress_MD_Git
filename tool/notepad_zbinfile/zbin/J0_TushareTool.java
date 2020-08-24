@@ -3,6 +3,7 @@ import com.google.common.collect.Maps;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import sun.reflect.generics.tree.Tree;
 
 import javax.swing.*;
 import java.io.*;
@@ -22,7 +23,7 @@ public class J0_TushareTool {
 
 
 
-static ArrayList<String> TScode_List = new ArrayList<String>();
+    static ArrayList<String> TScode_List = new ArrayList<String>();
 
     /*******************修改属性列表 ------Begin *********************/
 // 修改0.   全局修改 把 J0 改为当前应用的序号规则序号  当前类名称也需要修改
@@ -54,6 +55,9 @@ static ArrayList<String> TScode_List = new ArrayList<String>();
     static String mac_zbinPath = System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin" + File.separator + "mac_zbin";
 
 
+//1. nodename_last_record_day=""  ;   // 当前记录的数据最大的时间
+//2. nodename_begin_record_day="";  // 当前查询记录的起始的时间
+//3. nodename_xxxxxx; // 记录当前node的 prop项  在 nodelist中自选中
     // 固定2 当前执行文件的编号 A1  A2  A3   ... G1   J0   G3 ... Z9
     static File J0_Properties_File = new File(System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin" + File.separator + get_Bat_Sh_FlagNumber(Cur_Bat_Name) + ".properties");
     static InputStream J0_Properties_InputStream;
@@ -210,7 +214,7 @@ static ArrayList<String> TScode_List = new ArrayList<String>();
             Iterator<String> it = J0_Properties.stringPropertyNames().iterator();
             while (it.hasNext()) {
                 String key = it.next();
-                // System.out.println("key:" + key + " value: " + J0_Properties.getProperty(key));
+                System.out.println("prokey:" + key + " propvalue: " + J0_Properties.getProperty(key));
                 propKey2ValueList.put(key, J0_Properties.getProperty(key));
             }
             J0_Properties_InputStream.close();
@@ -224,6 +228,15 @@ static ArrayList<String> TScode_List = new ArrayList<String>();
 
     static void setProperity() {
         try {
+
+            Map.Entry<String , String> entryItem;
+            if(propKey2ValueList != null){
+                Iterator iterator = propKey2ValueList.entrySet().iterator();
+                while( iterator.hasNext() ){
+                    entryItem = (Map.Entry<String , String>) iterator.next();
+                    J0_Properties.put(entryItem.getKey(), entryItem.getValue());
+                }
+            }
             J0_Properties_OutputStream = new BufferedOutputStream(new FileOutputStream(J0_Properties_File.getAbsolutePath()));
             J0_Properties.store(J0_Properties_OutputStream, "");
             J0_Properties_OutputStream.close();
@@ -504,6 +517,7 @@ static ArrayList<String> TScode_List = new ArrayList<String>();
 
 
         System.out.println("════════" + " 打印所有的TreeNode的showNodeInfo() " + "════════");
+        InitProp_TreeNode();
         for (int i = 0; i < AllNodeList.size(); i++) {
 
             TreeNode nodeItem = AllNodeList.get(i);
@@ -521,7 +535,10 @@ static ArrayList<String> TScode_List = new ArrayList<String>();
     }
 
     static void TrackNode(TreeNode curNode) {
-        System.out.println("node = " + curNode.nodeName + " Deepth = " + curNode.deepth + " Origanization = " + curNode.getOrganizationIdentify() +" blockIndex = "+ curNode.blockIndex);
+        boolean isLeafNode = curNode instanceof LeafNode;
+        String nodeTipA = isLeafNode?" 叶子结点 ":" 骨干结点 ";
+        nodeTipA = nodeTipA + " isLeaf = "+ curNode.isLeaf+"  &&   isRoot = "+curNode.isRoot;
+        System.out.println("node = " + curNode.nodeName + nodeTipA+  " Deepth = " + curNode.deepth + " Origanization = " + curNode.getOrganizationIdentify() +" blockIndex = "+ curNode.blockIndex);
         if (curNode.childArr == null || curNode.childArr.size() == 0) {
             return;
         }
@@ -784,6 +801,7 @@ static ArrayList<String> TScode_List = new ArrayList<String>();
 
         // operation_type  操作类型     1--读取文件内容字符串 进行修改      2--对文件对文件内容(字节)--进行修改    3.对全体子文件进行的随性的操作 属性进行修改(文件名称)
         // 4.对当前子文件(包括子目录 子文件 --不包含孙目录 孙文件)   // 5. 从shell 中获取到的路径 去对某一个文件进行操作
+
 
         Rule() {
             inputDirFile = First_Input_Dir;
@@ -1741,6 +1759,24 @@ static ArrayList<String> TScode_List = new ArrayList<String>();
         return date;
     }
 
+static void RestoreProp_TreeNode(){
+    for (int i = 0; i < AllLeafNode.size(); i++) {
+        TreeNode nodeItem = AllLeafNode.get(i);
+        nodeItem.RestoreToProp(propKey2ValueList);
+    }
+
+
+}
+
+    static void InitProp_TreeNode(){
+        for (int i = 0; i < AllLeafNode.size(); i++) {
+            TreeNode nodeItem = AllLeafNode.get(i);
+            System.out.println("InitProp_TreeNode ["+i+"] = "+ nodeItem.nodeName);
+            nodeItem.initProp(propKey2ValueList);
+        }
+
+    }
+
 
     static File getDirNewestFileWithPointTypeList(File dirFile, ArrayList<String> typeList) {
         File newImageFile = null;
@@ -1987,7 +2023,7 @@ static ArrayList<String> TScode_List = new ArrayList<String>();
 
 
         CUR_Selected_Rule.operationRule(CUR_INPUT_3_ParamStrList);  // 传递参数列表 进行处理
-
+        RestoreProp_TreeNode();
         setProperity();
     }
 
@@ -2228,18 +2264,18 @@ static ArrayList<String> TScode_List = new ArrayList<String>();
     }
 
 
-    class RootNode extends TreeNode {
+    class RootNode extends Common_TreeNode {
 
 
     }
 
-    class BranchNode extends TreeNode {
+    class BranchNode extends Common_TreeNode {
 
 
     }
 
 
-    class LeafNode extends TreeNode {
+    class LeafNode extends Common_TreeNode {
 
         // https://tushare.pro/document/2?doc_id=25
         String leaf_web_sit;   // 叶子节点 对应的 网站的位置
@@ -2450,9 +2486,9 @@ static ArrayList<String> TScode_List = new ArrayList<String>();
             int x_yearspace_num = default_space_year;
 
             if(fieldParamList.size() ==1 && fieldParamList.get(0).contains("xts_code") ){
-                 paramXcode =  fieldParamList.get(0);
+                paramXcode =  fieldParamList.get(0);
                 if(paramXcode.contains(",")){
-                  String[] paramsArr =   paramXcode.split(",");
+                    String[] paramsArr =   paramXcode.split(",");
                     for (int i = 0; i < paramsArr.length; i++) {
                         if(paramsArr[i].contains("xts_code")){
                             String numStr = paramsArr[i].trim().replace("=","").replace("xtscode","").replace("'","");
@@ -2466,12 +2502,12 @@ static ArrayList<String> TScode_List = new ArrayList<String>();
                     }
                 }else{
                     String numStr = paramXcode.replace("=","").replace("xts_code","").replace("'","");
-                  if("".endsWith(numStr)){
-                      x_tscode_num = x_tscode_num_default;
-                  }else{
+                    if("".endsWith(numStr)){
+                        x_tscode_num = x_tscode_num_default;
+                    }else{
 
-                      x_tscode_num = Integer.parseInt(numStr);
-                  }
+                        x_tscode_num = Integer.parseInt(numStr);
+                    }
 
                 }
                 operation_type = 1;
@@ -2577,7 +2613,7 @@ static ArrayList<String> TScode_List = new ArrayList<String>();
                     String endDateStr = begin_end_List.get(1);
                     System.out.println("Date[ "+i+"]  beginDateStr = "+ beginDateStr + "   endDateStr = "+ endDateStr);
                     String paramKey =   paramXcode.replace(x_yearspace_num+"xstart_date","start_date");
-                     paramKey =   paramKey.replace(x_yearspace_num+"xend_date","end_date");
+                    paramKey =   paramKey.replace(x_yearspace_num+"xend_date","end_date");
                     String fieldItem = paramKey.replace("start_date=''","start_date='"+beginDateStr+"'");
                     fieldItem = fieldItem.replace("end_date=''","end_date='"+endDateStr+"'");
 
@@ -2641,44 +2677,44 @@ static ArrayList<String> TScode_List = new ArrayList<String>();
 
         }
 
-      void  showItemPythonCode(ArrayList<String>  headList, ArrayList<String>  firstList , ArrayList<String>  bodyList , ArrayList<String> tailList){
-          System.out.println();
-          System.out.println();
-          System.out.println();
-          System.out.println("######## 打印Python 代码 Item = "+ leaf_chinese_title+"  网页:   "+ leaf_web_sit);
+        void  showItemPythonCode(ArrayList<String>  headList, ArrayList<String>  firstList , ArrayList<String>  bodyList , ArrayList<String> tailList){
+            System.out.println();
+            System.out.println();
+            System.out.println();
+            System.out.println("######## 打印Python 代码 Item = "+ leaf_chinese_title+"  网页:   "+ leaf_web_sit);
             ArrayList<String> codeList = new    ArrayList<String>();
-          for (int i = 0; i < headList.size(); i++) {
-              String headItem = headList.get(i);
-              codeList.add(headItem);
-              System.out.println(headItem);
+            for (int i = 0; i < headList.size(); i++) {
+                String headItem = headList.get(i);
+                codeList.add(headItem);
+                System.out.println(headItem);
 
-          }
+            }
 
-          for (int i = 0; i < firstList.size(); i++) {
-              String firstListItem = firstList.get(i);
-              codeList.add(firstListItem);
-              System.out.println(firstListItem);
+            for (int i = 0; i < firstList.size(); i++) {
+                String firstListItem = firstList.get(i);
+                codeList.add(firstListItem);
+                System.out.println(firstListItem);
 
-          }
+            }
 
-          for (int i = 0; i < bodyList.size(); i++) {
-              String bodyItem = bodyList.get(i);
-              codeList.add(bodyItem);
-              System.out.println(bodyItem);
+            for (int i = 0; i < bodyList.size(); i++) {
+                String bodyItem = bodyList.get(i);
+                codeList.add(bodyItem);
+                System.out.println(bodyItem);
 
-          }
+            }
 
-          for (int i = 0; i < tailList.size(); i++) {
-              String tailItem = tailList.get(i);
-              codeList.add(tailItem);
-              System.out.println(tailItem);
+            for (int i = 0; i < tailList.size(); i++) {
+                String tailItem = tailList.get(i);
+                codeList.add(tailItem);
+                System.out.println(tailItem);
 
-          }
-          System.out.println();
-          System.out.println();
-          System.out.println();
-          String node_python_file = zbinPath +File.separator+"J0_"+blockIndex+"_"+nodeName+".py";
-          writeContentToFile(new File(node_python_file),codeList);
+            }
+            System.out.println();
+            System.out.println();
+            System.out.println();
+            String node_python_file = zbinPath +File.separator+"J0_"+blockIndex+"_"+nodeName+".py";
+            writeContentToFile(new File(node_python_file),codeList);
         }
 
 
@@ -2736,7 +2772,7 @@ static ArrayList<String> TScode_List = new ArrayList<String>();
             for (int i = 0; i < allRankList.size(); i++) {
                 ArrayList<String>  resultItem =    allRankList.get(i);
 
-              String paramsItem =   toReplaceHolderPlace(resultItem,paramTemplate);
+                String paramsItem =   toReplaceHolderPlace(resultItem,paramTemplate);
                 System.out.println("索引 [ "+i+" ] = "+ showResultItem(resultItem)+" 模板:"+ paramTemplate+"   替换后 paramsItem :  "+ paramsItem);
                 inputParamTemplateList.add(paramsItem);
             }
@@ -2744,26 +2780,26 @@ static ArrayList<String> TScode_List = new ArrayList<String>();
             return inputParamTemplateList;
         }
 
-       String toReplaceHolderPlace(ArrayList<String> paramList , String template ){
+        String toReplaceHolderPlace(ArrayList<String> paramList , String template ){
             String resultStr = "";
             String operationStr = new String(template);
-          int charCount =  getCharCount(template,"【");
-          if(charCount != paramList.size()){
-              System.out.println("参数个数 paramList.size() = "+ paramList.size() + "  占位符个数不一致   charCount = "+ charCount);
-          }
+            int charCount =  getCharCount(template,"【");
+            if(charCount != paramList.size()){
+                System.out.println("参数个数 paramList.size() = "+ paramList.size() + "  占位符个数不一致   charCount = "+ charCount);
+            }
 
-           for (int i = 0; i < paramList.size(); i++) {
-               String paramValue = paramList.get(i);
-              String contentItem = getStrWithPairChar(operationStr,"【","】");
-               contentItem = "【"+contentItem+"】";
-               operationStr = operationStr.replace(contentItem,paramValue);
-           }
-           resultStr = operationStr;
-           if(resultStr.contains("【")){
-               System.out.println(" resultStr = "+ resultStr + " 还包括深括号 可能出错!");
-           }
+            for (int i = 0; i < paramList.size(); i++) {
+                String paramValue = paramList.get(i);
+                String contentItem = getStrWithPairChar(operationStr,"【","】");
+                contentItem = "【"+contentItem+"】";
+                operationStr = operationStr.replace(contentItem,paramValue);
+            }
+            resultStr = operationStr;
+            if(resultStr.contains("【")){
+                System.out.println(" resultStr = "+ resultStr + " 还包括深括号 可能出错!");
+            }
 
-           return resultStr;
+            return resultStr;
         }
 
 
@@ -2815,9 +2851,28 @@ static ArrayList<String> TScode_List = new ArrayList<String>();
 
         }
 
+        @Override
+        void initProp( Map<String, String>  propKey2ValueList){
+            System.out.println("执行 initProp ! ");
+            if(properity_holder_map == null){
+                properity_holder_map = new HashMap<String, String>();
+            }
+            Map.Entry<String , String> entryItem;
+            if(propKey2ValueList != null){
+                Iterator iterator = propKey2ValueList.entrySet().iterator();
+                while( iterator.hasNext() ){
+                    entryItem = (Map.Entry<String , String>) iterator.next();
+                    String keyStr = entryItem.getKey();   //Map的Key
+                    String valueStr = entryItem.getValue();  //Map的Value
+                    System.out.println("执行 initProp  nodeName = "+ nodeName + "  keyStr ="+ keyStr);
+                    if(keyStr.startsWith(nodeName)){
+                        System.out.println("中奖！");
+                        properity_holder_map.put(keyStr,valueStr);
+                    }
 
-
-
+                }
+            }
+        }
 
 
         LeafNode() {
@@ -2836,6 +2891,9 @@ static ArrayList<String> TScode_List = new ArrayList<String>();
             System.out.println("fieldList = " + Arrays.toString(fieldList.toArray()));
             showParamMap(params_linkedHashMap);
             showOptionMap(methodParams_linkedHashMap);
+            if(properity_holder_map != null && properity_holder_map.size() > 0 ){
+                showPropKeyAndValue(properity_holder_map);
+            }
         }
 
         @SuppressWarnings("unchecked")
@@ -2875,15 +2933,41 @@ static ArrayList<String> TScode_List = new ArrayList<String>();
 
     class Common_TreeNode extends TreeNode {
 
+        // 把 Prop 数据  过滤到 到  各个 TreeNode 中去
+        void initProp( Map<String, String>  propKey2ValueList){
+
+        }
+
+        // 把 TreeNode 中的 Prop数据 覆盖到 系统的 Prop中
+        void RestoreToProp( Map<String, String>  propKey2ValueList){
+            if(properity_holder_map == null || properity_holder_map.size() == 0){
+                return ;
+            }
+            Map.Entry<String , String> entryItem;
+            if(properity_holder_map != null){
+                Iterator iterator = properity_holder_map.entrySet().iterator();
+                while( iterator.hasNext() ){
+                    entryItem = (Map.Entry<String , String>) iterator.next();
+                    propKey2ValueList.put(entryItem.getKey(),entryItem.getValue());
+                }
+            }
+
+
+        }
 
     }
 
-    class TreeNode {
+    abstract class TreeNode {
         int blockIndex;  // 块索引   用于排序
         boolean isRoot;  // 是否是根节点
         boolean isLeaf;
         String nodeName;  // 结点名称
         int deepth;   // 深度
+        Map<String, String>  properity_holder_map;  // prop 文件包含的当前 node 数据集合
+
+        abstract void initProp( Map<String, String>  propKey2ValueList);
+
+        abstract void RestoreToProp( Map<String, String>  propKey2ValueList);
 
         void showNodeInfo() {
             System.out.println("NodeName = " + nodeName);
@@ -2893,6 +2977,21 @@ static ArrayList<String> TScode_List = new ArrayList<String>();
             System.out.println("getOrganizationIdentify() = " + getOrganizationIdentify());
             System.out.println("parentLinkList size = " + (isRoot ? 0 : parentLinkList.size()));
             System.out.println("childArr size = " + (isLeaf ? 0 : childArr.size()));
+
+        }
+
+        @SuppressWarnings("unchecked")
+        public  void showPropKeyAndValue(Map<String,String> mMapParam){
+            Map.Entry<String , String> entryItem;
+            int index_position = 0;
+            if(mMapParam != null){
+                Iterator iterator = mMapParam.entrySet().iterator();
+                while( iterator.hasNext() ){
+                    entryItem = (Map.Entry<String , String>) iterator.next();
+                    System.out.println("Prop["+index_position+"] = "+"Prop-Key: "+ entryItem.getKey() + "  Prop-Value:"+entryItem.getValue());
+                    index_position++;
+                }
+            }
         }
 
         ArrayList<TreeNode> parentLinkList;  // 当前结点的父类结点 第一个是根节点  最后是父亲节点 中间祖父 曾祖父
@@ -3168,19 +3267,19 @@ static ArrayList<String> TScode_List = new ArrayList<String>();
     }
 
 
-  static int  getCharCount(String originStr , String charStr){
+    static int  getCharCount(String originStr , String charStr){
         int count  = 0 ;
         if(originStr == null || charStr == null){
 
             return count;
         }
-      for (int i = 0; i < originStr.length(); i++) {
-          String charOne = originStr.substring(i,i+1);
-          if(charStr.equals(charOne)){
-              count++;
-          }
-      }
-      return count;
+        for (int i = 0; i < originStr.length(); i++) {
+            String charOne = originStr.substring(i,i+1);
+            if(charStr.equals(charOne)){
+                count++;
+            }
+        }
+        return count;
 
     }
 
@@ -3216,7 +3315,7 @@ static ArrayList<String> TScode_List = new ArrayList<String>();
         File ts_code_File = new File(J0_GuPiaoLieBiao_Path);
         if(!ts_code_File.exists()){
             System.out.println("当前 没有 基础数据文件( 请添置该文件 ) J0_GuPiaoLieBiao_Path ="+ J0_GuPiaoLieBiao_Path);
-             return;
+            return;
         }
 
         Workbook wb =null;
@@ -3263,7 +3362,7 @@ static ArrayList<String> TScode_List = new ArrayList<String>();
                 if("ts_code".equals(entry.getKey())){
                     TScode_List.add(entry.getValue());
                 }
-            //    System.out.println(" entry.getKey() = "+entry.getKey() + "   entry.getValue() = "+ entry.getValue()+"【Over】");
+                //    System.out.println(" entry.getKey() = "+entry.getKey() + "   entry.getValue() = "+ entry.getValue()+"【Over】");
             }
 //            System.out.println();
         }
@@ -3539,7 +3638,7 @@ static ArrayList<String> TScode_List = new ArrayList<String>();
 
             //ValueError: This sheet is too large! Your sheet size is: 1166415, 8 Max sheet size is: 1048576, 1638
             case "guanlicengxinchouhechigu":
-              bodyPath = Python_BodyTemplate_3;
+                bodyPath = Python_BodyTemplate_3;
                 break;
 
 
@@ -3579,7 +3678,7 @@ static ArrayList<String> TScode_List = new ArrayList<String>();
         }
         return headPath;
     }
-  static int  x_tscode_num_default = 50;   // xcode ts_code 的默认的个数
+    static int  x_tscode_num_default = 50;   // xcode ts_code 的默认的个数
     static int default_space_year = 10;   // 11xstart_date  11xend_date  时间间隔的长度 单位年
 
 }
