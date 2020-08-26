@@ -181,3 +181,58 @@ pro = ts.pro_api('43acb9a5ddc2cf73c6c4ea54796748f965457ed57daaa736bb778ea2')
 # print(J0_PROPS.get(tree_node_name+"record_date"))           #根据key读取value
 # J0_PROPS.put(tree_node_name+"record_date", now_yyyymmdd)       ###  覆盖原有的 key 和 value
 #  zukgit
+# jiaoyirili_zukgit_website  =   https://tushare.pro/document/2?doc_id=26
+createexcel('交易日历.xlsx')
+trade_cal_book = load_workbook('C:\\Users\\zhuzj5\\Desktop\\zbin\\J0\\C:\\Users\\zhuzj5\\Desktop\\zbin\\J0\\交易日历.xlsx')
+trade_cal_excel_writer = pd.ExcelWriter('交易日历.xlsx', engine='openpyxl')
+trade_cal_excel_writer.book = trade_cal_book
+trade_cal_excel_writer.sheets = dict((ws.title, ws) for ws in trade_cal_book.worksheets)
+trade_cal_data_List = pd.DataFrame()
+trade_cal_item_0 = pro.trade_cal(exchange='SSE',start_date='',end_date='', fields='exchange,cal_date,is_open,pretrade_date')
+print("trade_cal_item_0 返回数据 row 行数 = "+str(trade_cal_item_0.shape[0]))
+trade_cal_data_List = trade_cal_data_List.append(trade_cal_item_0)
+
+
+trade_cal_item_1 = pro.trade_cal(exchange='SZSE',start_date='',end_date='', fields='exchange,cal_date,is_open,pretrade_date')
+print("trade_cal_item_1 返回数据 row 行数 = "+str(trade_cal_item_1.shape[0]))
+trade_cal_data_List = trade_cal_data_List.append(trade_cal_item_1)
+
+
+trade_cal_item_2 = pro.trade_cal(exchange='CFFEX',start_date='',end_date='', fields='exchange,cal_date,is_open,pretrade_date')
+print("trade_cal_item_2 返回数据 row 行数 = "+str(trade_cal_item_2.shape[0]))
+trade_cal_data_List = trade_cal_data_List.append(trade_cal_item_2)
+
+
+trade_cal_item_3 = pro.trade_cal(exchange='SHFE',start_date='',end_date='', fields='exchange,cal_date,is_open,pretrade_date')
+print("trade_cal_item_3 返回数据 row 行数 = "+str(trade_cal_item_3.shape[0]))
+trade_cal_data_List = trade_cal_data_List.append(trade_cal_item_3)
+
+
+trade_cal_item_4 = pro.trade_cal(exchange='CZCE',start_date='',end_date='', fields='exchange,cal_date,is_open,pretrade_date')
+print("trade_cal_item_4 返回数据 row 行数 = "+str(trade_cal_item_4.shape[0]))
+trade_cal_data_List = trade_cal_data_List.append(trade_cal_item_4)
+
+
+trade_cal_item_5 = pro.trade_cal(exchange='DCE',start_date='',end_date='', fields='exchange,cal_date,is_open,pretrade_date')
+print("trade_cal_item_5 返回数据 row 行数 = "+str(trade_cal_item_5.shape[0]))
+trade_cal_data_List = trade_cal_data_List.append(trade_cal_item_5)
+
+
+trade_cal_item_6 = pro.trade_cal(exchange='INE',start_date='',end_date='', fields='exchange,cal_date,is_open,pretrade_date')
+print("trade_cal_item_6 返回数据 row 行数 = "+str(trade_cal_item_6.shape[0]))
+trade_cal_data_List = trade_cal_data_List.append(trade_cal_item_6)
+
+
+trade_cal_item_7 = pro.trade_cal(exchange='IB',start_date='',end_date='', fields='exchange,cal_date,is_open,pretrade_date')
+print("trade_cal_item_7 返回数据 row 行数 = "+str(trade_cal_item_7.shape[0]))
+trade_cal_data_List = trade_cal_data_List.append(trade_cal_item_7)
+
+
+trade_cal_item_8 = pro.trade_cal(exchange='XHKG',start_date='',end_date='', fields='exchange,cal_date,is_open,pretrade_date')
+print("trade_cal_item_8 返回数据 row 行数 = "+str(trade_cal_item_8.shape[0]))
+trade_cal_data_List = trade_cal_data_List.append(trade_cal_item_8)
+
+
+print("trade_cal_data_List.__len__() = "+str(trade_cal_data_List.__len__()))
+trade_cal_data_List.to_excel(trade_cal_excel_writer,'交易日历',index=False)
+trade_cal_excel_writer.save()

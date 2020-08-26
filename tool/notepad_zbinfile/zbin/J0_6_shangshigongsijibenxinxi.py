@@ -181,3 +181,43 @@ pro = ts.pro_api('43acb9a5ddc2cf73c6c4ea54796748f965457ed57daaa736bb778ea2')
 # print(J0_PROPS.get(tree_node_name+"record_date"))           #根据key读取value
 # J0_PROPS.put(tree_node_name+"record_date", now_yyyymmdd)       ###  覆盖原有的 key 和 value
 #  zukgit
+# shangshigongsijibenxinxi_zukgit_website  =   https://tushare.pro/document/2?doc_id=112
+createexcel('上市公司基本信息.xlsx')
+stock_company_book = load_workbook('C:\\Users\\zhuzj5\\Desktop\\zbin\\J0\\上市公司基本信息.xlsx')
+stock_company_excel_writer = pd.ExcelWriter('C:\\Users\\zhuzj5\\Desktop\\zbin\\J0\\上市公司基本信息.xlsx', engine='openpyxl')
+stock_company_excel_writer.book = stock_company_book
+stock_company_excel_writer.sheets = dict((ws.title, ws) for ws in stock_company_book.worksheets)
+stock_company_data_List = pd.DataFrame()
+stock_company_item_0_tscode_list = list() 
+stock_company_item_0 = pro.stock_company(ts_code='',exchange='SSE', fields='ts_code,exchange,chairman,manager,secretary,reg_capital,setup_date,province,city,introduction,website,email,office,employees,main_business,business_scope')
+print("stock_company_item_0 返回数据 row 行数 = "+str(stock_company_item_0.shape[0]))
+for ts_code_sh in stock_company_item_0['ts_code']:
+    stock_name = tscode_name_dict.get(ts_code_sh)
+    if stock_name is None:
+        stock_name = 'null'
+    stock_company_item_0_tscode_list.append(stock_name)
+stock_company_item_0_addname_dataframe=pd.DataFrame()
+stock_company_item_0_addname_dataframe['cname'] = stock_company_item_0_tscode_list
+for table_name in stock_company_item_0.columns.values.tolist():
+    stock_company_item_0_addname_dataframe[table_name] = stock_company_item_0[table_name]
+stock_company_data_List = stock_company_data_List.append(stock_company_item_0_addname_dataframe)
+
+
+stock_company_item_1_tscode_list = list() 
+stock_company_item_1 = pro.stock_company(ts_code='',exchange='SZSE', fields='ts_code,exchange,chairman,manager,secretary,reg_capital,setup_date,province,city,introduction,website,email,office,employees,main_business,business_scope')
+print("stock_company_item_1 返回数据 row 行数 = "+str(stock_company_item_1.shape[0]))
+for ts_code_sh in stock_company_item_1['ts_code']:
+    stock_name = tscode_name_dict.get(ts_code_sh)
+    if stock_name is None:
+        stock_name = 'null'
+    stock_company_item_1_tscode_list.append(stock_name)
+stock_company_item_1_addname_dataframe=pd.DataFrame()
+stock_company_item_1_addname_dataframe['cname'] = stock_company_item_1_tscode_list
+for table_name in stock_company_item_1.columns.values.tolist():
+    stock_company_item_1_addname_dataframe[table_name] = stock_company_item_1[table_name]
+stock_company_data_List = stock_company_data_List.append(stock_company_item_1_addname_dataframe)
+
+
+print("stock_company_data_List.__len__() = "+str(stock_company_data_List.__len__()))
+stock_company_data_List.to_excel(stock_company_excel_writer,'上市公司基本信息',index=False)
+stock_company_excel_writer.save()

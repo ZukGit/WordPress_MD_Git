@@ -56,25 +56,59 @@ hushengupiao_jichushuju_guanlicengxinchouhechigu 【2000】 [2000]  <stk_rewards
 〖 IPO新股列表  https://tushare.pro/document/2?doc_id=123 
 〖 *start_date*		上网发行开始日期
 〖*end_date*		上网发行结束日期
-hushengupiao_jichushuju_IPOxingushangshi【120】[2000]├10┤<new_share>(10xstart_date#10xend_date)《ts_code=sub_code=name=ipo_date=issue_date=amount=market_amount=price=pe=limit_amount=funds=ballot》
+hushengupiao_jichushuju_IPOxingushangshi【120】[2000]├10┤<new_share>(10ystart_date#10yend_date)《ts_code=sub_code=name=ipo_date=issue_date=amount=market_amount=price=pe=limit_amount=funds=ballot》
 
 
 
 〓〓hangqingshuju
 hushengupiao_hangqingshuju_
 
-〖 https://tushare.pro/document/2?doc_id=27  日线行情
+〖 https://tushare.pro/document/2?doc_id=27  日线行情-时间为序  
 〖 *ts_code* 		股票代码
 〖 *trade_date*		交易日期(YYYYMMDD)
 〖 *start_date*		开始日期(YYYYMMDD)
 〖 *end_date*		结束日期(YYYYMMDD)
-hushengupiao_jichushuju_rixianhangqing  【120】[] <daily> (2xts_code) 《ts_code=trade_date=open=high=low=close=pre_close=change=pct_chg=vol=amount》
+hushengupiao_jichushuju_rixianhangqing-time  【120】[5000] <daily> (1mstart_date#1mend_date#trade_date) 《ts_code=trade_date=open=high=low=close=pre_close=change=pct_chg=vol=amount》
 
+
+
+〖 https://tushare.pro/document/2?doc_id=144    周线行情-时间为序-每周周五的那个日子  
+〖*ts_code*	  TS代码（ts_code,trade_date两个参数任选一）
+〖*trade_date*  交易日期 （每周最后一个交易日期，YYYYMMDD格式）
+〖*start_date*  开始日期
+〖*end_date*	  结束日期
+hushengupiao_jichushuju_zhouxianhangqing-time  【300】[3700] <weekly> (wtrade_date) 《ts_code=trade_date=close=open=high=low=pre_close=change=pct_chg=vol=amount》
+
+
+〖 https://tushare.pro/document/2?doc_id=145  月线行情-每个交易月的最后一日
+〖 *ts_code* 		股票代码
+〖 *trade_date*		交易日期(YYYYMMDD)
+〖 *start_date*		开始日期(YYYYMMDD)
+〖 *end_date*		结束日期(YYYYMMDD)
+hushengupiao_jichushuju_yuexianhangqing-time  【120】[5000] <monthly> (mtrade_date) 《ts_code=trade_date=close=open=high=low=pre_close=change=pct_chg=vol=amount》
 
 
 
 
 ZENDZ;  // 记录结束位置 
+1.日线行情 以月份为分隔  201001  201012  202008 这样的时间分类   把当前日期 每月中包含每天的sheet  sheet的内容是当天的日志信息
+2.周线行情   把一年的数据写入到 一个 weekly_2010.xlsx  sheet 以 21_20181123  第几个星期5 来命名
+
+
+〖 https://tushare.pro/document/2?doc_id=27  日线行情-tscode为序 这个提供 tscode 的接口 给用户  输入 tscode 打开 日线_周线_年线的 xlsx 文件
+〖 *ts_code* 		股票代码
+〖 *trade_date*		交易日期(YYYYMMDD)
+〖 *start_date*		开始日期(YYYYMMDD)
+〖 *end_date*		结束日期(YYYYMMDD)
+hushengupiao_jichushuju_rixianhangqing-tscode  【120】[5000] <daily> (2xts_code) 《ts_code=trade_date=open=high=low=close=pre_close=change=pct_chg=vol=amount》
+
+
+
+
+
+
+
+
 
 
 ▲ zhishu

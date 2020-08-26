@@ -181,3 +181,73 @@ pro = ts.pro_api('43acb9a5ddc2cf73c6c4ea54796748f965457ed57daaa736bb778ea2')
 # print(J0_PROPS.get(tree_node_name+"record_date"))           #根据key读取value
 # J0_PROPS.put(tree_node_name+"record_date", now_yyyymmdd)       ###  覆盖原有的 key 和 value
 #  zukgit
+# hushengutongchengfengu_zukgit_website  =   https://tushare.pro/document/2?doc_id=104
+createexcel('沪深股通成份股.xlsx')
+hs_const_book = load_workbook('C:\\Users\\zhuzj5\\Desktop\\zbin\\J0\\沪深股通成份股.xlsx')
+hs_const_excel_writer = pd.ExcelWriter('C:\\Users\\zhuzj5\\Desktop\\zbin\\J0\\沪深股通成份股.xlsx', engine='openpyxl')
+hs_const_excel_writer.book = hs_const_book
+hs_const_excel_writer.sheets = dict((ws.title, ws) for ws in hs_const_book.worksheets)
+hs_const_data_List = pd.DataFrame()
+hs_const_item_0_tscode_list = list() 
+hs_const_item_0 = pro.hs_const(hs_type='SH',is_new='0', fields='ts_code,hs_type,in_date,out_date,is_new')
+print("hs_const_item_0 返回数据 row 行数 = "+str(hs_const_item_0.shape[0]))
+for ts_code_sh in hs_const_item_0['ts_code']:
+    stock_name = tscode_name_dict.get(ts_code_sh)
+    if stock_name is None:
+        stock_name = 'null'
+    hs_const_item_0_tscode_list.append(stock_name)
+hs_const_item_0_addname_dataframe=pd.DataFrame()
+hs_const_item_0_addname_dataframe['cname'] = hs_const_item_0_tscode_list
+for table_name in hs_const_item_0.columns.values.tolist():
+    hs_const_item_0_addname_dataframe[table_name] = hs_const_item_0[table_name]
+hs_const_data_List = hs_const_data_List.append(hs_const_item_0_addname_dataframe)
+
+
+hs_const_item_1_tscode_list = list() 
+hs_const_item_1 = pro.hs_const(hs_type='SZ',is_new='0', fields='ts_code,hs_type,in_date,out_date,is_new')
+print("hs_const_item_1 返回数据 row 行数 = "+str(hs_const_item_1.shape[0]))
+for ts_code_sh in hs_const_item_1['ts_code']:
+    stock_name = tscode_name_dict.get(ts_code_sh)
+    if stock_name is None:
+        stock_name = 'null'
+    hs_const_item_1_tscode_list.append(stock_name)
+hs_const_item_1_addname_dataframe=pd.DataFrame()
+hs_const_item_1_addname_dataframe['cname'] = hs_const_item_1_tscode_list
+for table_name in hs_const_item_1.columns.values.tolist():
+    hs_const_item_1_addname_dataframe[table_name] = hs_const_item_1[table_name]
+hs_const_data_List = hs_const_data_List.append(hs_const_item_1_addname_dataframe)
+
+
+hs_const_item_2_tscode_list = list() 
+hs_const_item_2 = pro.hs_const(hs_type='SH',is_new='1', fields='ts_code,hs_type,in_date,out_date,is_new')
+print("hs_const_item_2 返回数据 row 行数 = "+str(hs_const_item_2.shape[0]))
+for ts_code_sh in hs_const_item_2['ts_code']:
+    stock_name = tscode_name_dict.get(ts_code_sh)
+    if stock_name is None:
+        stock_name = 'null'
+    hs_const_item_2_tscode_list.append(stock_name)
+hs_const_item_2_addname_dataframe=pd.DataFrame()
+hs_const_item_2_addname_dataframe['cname'] = hs_const_item_2_tscode_list
+for table_name in hs_const_item_2.columns.values.tolist():
+    hs_const_item_2_addname_dataframe[table_name] = hs_const_item_2[table_name]
+hs_const_data_List = hs_const_data_List.append(hs_const_item_2_addname_dataframe)
+
+
+hs_const_item_3_tscode_list = list() 
+hs_const_item_3 = pro.hs_const(hs_type='SZ',is_new='1', fields='ts_code,hs_type,in_date,out_date,is_new')
+print("hs_const_item_3 返回数据 row 行数 = "+str(hs_const_item_3.shape[0]))
+for ts_code_sh in hs_const_item_3['ts_code']:
+    stock_name = tscode_name_dict.get(ts_code_sh)
+    if stock_name is None:
+        stock_name = 'null'
+    hs_const_item_3_tscode_list.append(stock_name)
+hs_const_item_3_addname_dataframe=pd.DataFrame()
+hs_const_item_3_addname_dataframe['cname'] = hs_const_item_3_tscode_list
+for table_name in hs_const_item_3.columns.values.tolist():
+    hs_const_item_3_addname_dataframe[table_name] = hs_const_item_3[table_name]
+hs_const_data_List = hs_const_data_List.append(hs_const_item_3_addname_dataframe)
+
+
+print("hs_const_data_List.__len__() = "+str(hs_const_data_List.__len__()))
+hs_const_data_List.to_excel(hs_const_excel_writer,'沪深股通成份股',index=False)
+hs_const_excel_writer.save()

@@ -181,3 +181,94 @@ pro = ts.pro_api('43acb9a5ddc2cf73c6c4ea54796748f965457ed57daaa736bb778ea2')
 # print(J0_PROPS.get(tree_node_name+"record_date"))           #根据key读取value
 # J0_PROPS.put(tree_node_name+"record_date", now_yyyymmdd)       ###  覆盖原有的 key 和 value
 #  zukgit
+# IPOxingushangshi_zukgit_website  =   https://tushare.pro/document/2?doc_id=123
+createexcel('IPO新股列表.xlsx')
+new_share_book = load_workbook('C:\\Users\\zhuzj5\\Desktop\\zbin\\J0\\IPO新股列表.xlsx')
+new_share_excel_writer = pd.ExcelWriter('C:\\Users\\zhuzj5\\Desktop\\zbin\\J0\\IPO新股列表.xlsx', engine='openpyxl')
+new_share_excel_writer.book = new_share_book
+new_share_excel_writer.sheets = dict((ws.title, ws) for ws in new_share_book.worksheets)
+new_share_data_List = pd.DataFrame()
+new_share_call_times = 1
+if new_share_call_times%10 == 0:
+    print("new_share_call_times = " + str(new_share_call_times-1) +"  休息一分钟 避免超过服务器限制 导致异常出现!")
+    time.sleep(60)
+print("开始第 new_share_call_times = " + str(new_share_call_times-1) +" 次调用接口 new_share start_date=19900101 end_date=20001231")
+new_share_item_0_tscode_list = list() 
+new_share_item_0 = pro.new_share(start_date='19900101',end_date='20001231', fields='ts_code,sub_code,name,ipo_date,issue_date,amount,market_amount,price,pe,limit_amount,funds,ballot')
+print("new_share_item_0 返回数据 row 行数 = "+str(new_share_item_0.shape[0]))
+for ts_code_sh in new_share_item_0['ts_code']:
+    stock_name = tscode_name_dict.get(ts_code_sh)
+    if stock_name is None:
+        stock_name = 'null'
+    new_share_item_0_tscode_list.append(stock_name)
+new_share_item_0_addname_dataframe=pd.DataFrame()
+new_share_item_0_addname_dataframe['cname'] = new_share_item_0_tscode_list
+for table_name in new_share_item_0.columns.values.tolist():
+    new_share_item_0_addname_dataframe[table_name] = new_share_item_0[table_name]
+new_share_data_List = new_share_data_List.append(new_share_item_0_addname_dataframe)
+new_share_call_times=new_share_call_times+1
+
+
+if new_share_call_times%10 == 0:
+    print("new_share_call_times = " + str(new_share_call_times-1) +"  休息一分钟 避免超过服务器限制 导致异常出现!")
+    time.sleep(60)
+print("开始第 new_share_call_times = " + str(new_share_call_times-1) +" 次调用接口 new_share start_date=20000101 end_date=20101231")
+new_share_item_1_tscode_list = list() 
+new_share_item_1 = pro.new_share(start_date='20000101',end_date='20101231', fields='ts_code,sub_code,name,ipo_date,issue_date,amount,market_amount,price,pe,limit_amount,funds,ballot')
+print("new_share_item_1 返回数据 row 行数 = "+str(new_share_item_1.shape[0]))
+for ts_code_sh in new_share_item_1['ts_code']:
+    stock_name = tscode_name_dict.get(ts_code_sh)
+    if stock_name is None:
+        stock_name = 'null'
+    new_share_item_1_tscode_list.append(stock_name)
+new_share_item_1_addname_dataframe=pd.DataFrame()
+new_share_item_1_addname_dataframe['cname'] = new_share_item_1_tscode_list
+for table_name in new_share_item_1.columns.values.tolist():
+    new_share_item_1_addname_dataframe[table_name] = new_share_item_1[table_name]
+new_share_data_List = new_share_data_List.append(new_share_item_1_addname_dataframe)
+new_share_call_times=new_share_call_times+1
+
+
+if new_share_call_times%10 == 0:
+    print("new_share_call_times = " + str(new_share_call_times-1) +"  休息一分钟 避免超过服务器限制 导致异常出现!")
+    time.sleep(60)
+print("开始第 new_share_call_times = " + str(new_share_call_times-1) +" 次调用接口 new_share start_date=20100101 end_date=20201231")
+new_share_item_2_tscode_list = list() 
+new_share_item_2 = pro.new_share(start_date='20100101',end_date='20201231', fields='ts_code,sub_code,name,ipo_date,issue_date,amount,market_amount,price,pe,limit_amount,funds,ballot')
+print("new_share_item_2 返回数据 row 行数 = "+str(new_share_item_2.shape[0]))
+for ts_code_sh in new_share_item_2['ts_code']:
+    stock_name = tscode_name_dict.get(ts_code_sh)
+    if stock_name is None:
+        stock_name = 'null'
+    new_share_item_2_tscode_list.append(stock_name)
+new_share_item_2_addname_dataframe=pd.DataFrame()
+new_share_item_2_addname_dataframe['cname'] = new_share_item_2_tscode_list
+for table_name in new_share_item_2.columns.values.tolist():
+    new_share_item_2_addname_dataframe[table_name] = new_share_item_2[table_name]
+new_share_data_List = new_share_data_List.append(new_share_item_2_addname_dataframe)
+new_share_call_times=new_share_call_times+1
+
+
+if new_share_call_times%10 == 0:
+    print("new_share_call_times = " + str(new_share_call_times-1) +"  休息一分钟 避免超过服务器限制 导致异常出现!")
+    time.sleep(60)
+print("开始第 new_share_call_times = " + str(new_share_call_times-1) +" 次调用接口 new_share start_date=20200101 end_date=20301231")
+new_share_item_3_tscode_list = list() 
+new_share_item_3 = pro.new_share(start_date='20200101',end_date='20301231', fields='ts_code,sub_code,name,ipo_date,issue_date,amount,market_amount,price,pe,limit_amount,funds,ballot')
+print("new_share_item_3 返回数据 row 行数 = "+str(new_share_item_3.shape[0]))
+for ts_code_sh in new_share_item_3['ts_code']:
+    stock_name = tscode_name_dict.get(ts_code_sh)
+    if stock_name is None:
+        stock_name = 'null'
+    new_share_item_3_tscode_list.append(stock_name)
+new_share_item_3_addname_dataframe=pd.DataFrame()
+new_share_item_3_addname_dataframe['cname'] = new_share_item_3_tscode_list
+for table_name in new_share_item_3.columns.values.tolist():
+    new_share_item_3_addname_dataframe[table_name] = new_share_item_3[table_name]
+new_share_data_List = new_share_data_List.append(new_share_item_3_addname_dataframe)
+new_share_call_times=new_share_call_times+1
+
+
+print("new_share_data_List.__len__() = "+str(new_share_data_List.__len__()))
+new_share_data_List.to_excel(new_share_excel_writer,'IPO新股列表',index=False)
+new_share_excel_writer.save()

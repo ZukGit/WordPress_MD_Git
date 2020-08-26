@@ -181,3 +181,18 @@ pro = ts.pro_api('43acb9a5ddc2cf73c6c4ea54796748f965457ed57daaa736bb778ea2')
 # print(J0_PROPS.get(tree_node_name+"record_date"))           #根据key读取value
 # J0_PROPS.put(tree_node_name+"record_date", now_yyyymmdd)       ###  覆盖原有的 key 和 value
 #  zukgit
+# gupiaocengyongming_zukgit_website  =   https://tushare.pro/document/2?doc_id=100
+createexcel('股票曾用名.xlsx')
+namechange_book = load_workbook('C:\\Users\\zhuzj5\\Desktop\\zbin\\J0\\C:\\Users\\zhuzj5\\Desktop\\zbin\\J0\\股票曾用名.xlsx')
+namechange_excel_writer = pd.ExcelWriter('股票曾用名.xlsx', engine='openpyxl')
+namechange_excel_writer.book = namechange_book
+namechange_excel_writer.sheets = dict((ws.title, ws) for ws in namechange_book.worksheets)
+namechange_data_List = pd.DataFrame()
+namechange_item_0 = pro.namechange(ts_code='', fields='ts_code,name,start_date,end_date,ann_date,change_reason')
+print("namechange_item_0 返回数据 row 行数 = "+str(namechange_item_0.shape[0]))
+namechange_data_List = namechange_data_List.append(namechange_item_0)
+
+
+print("namechange_data_List.__len__() = "+str(namechange_data_List.__len__()))
+namechange_data_List.to_excel(namechange_excel_writer,'股票曾用名',index=False)
+namechange_excel_writer.save()

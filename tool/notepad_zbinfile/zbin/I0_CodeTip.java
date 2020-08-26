@@ -9,8 +9,6 @@ public class I0_CodeTip {
 
     static ArrayList<Category> Category_List = new ArrayList<Category>();
 
-
-
     static {// 【 String (Category) static block 】   // Category 主要添加的内容   创作指导地方  布置作业的地方
         Category StringCategory_1 = new Category("String");
         // String_1 ->  获取 subString(begin,end) 子字符串方法
@@ -69,24 +67,6 @@ public class I0_CodeTip {
     //  Category为方法的操作类型  Index为方法序号  返回值String 是对这个  方法的描述
     TreeMap<CodeTip, ArrayList<Method>> mProgram_Method_Map;
 
-    static Map<String, String> zhushiMap = new HashMap<String, String>();
-
-    static {
-        zhushiMap.put("java", "//");// ## 1:java
-        zhushiMap.put("python", "#");// ## 2:python
-        zhushiMap.put("c", "//");// ## 3:c
-        zhushiMap.put("cpp", "//");// ## 4:cpp
-        zhushiMap.put("bat", "::");// ## 5:bat
-        zhushiMap.put("sh", "#");// ## 6:sh
-        zhushiMap.put("js", "//");// ## 7:js
-        zhushiMap.put("swift", "//");// ## 8:swift
-        zhushiMap.put("flutter", "//");// ## 9:flutter
-        zhushiMap.put("go", "//");// ## 10:go
-        zhushiMap.put("kotlin", "//");// ## 11:kotlin
-        zhushiMap.put("ruby", "#");// ## 12:ruby
-        zhushiMap.put("c#", "//");// ## 13:c#
-        zhushiMap.put("scala", "//");// ## 14:scala
-    }
 
     Map<String, Map<String, String>> mCategory_Map;
     // programs , category_index, methodDesc
@@ -357,6 +337,26 @@ public class I0_CodeTip {
                     "            }\n" +
                     "        }\n" +
                     "    }");
+            System.out.println();
+            System.out.println();
+
+            System.out.println("    @SuppressWarnings(\"unchecked\")\n" +
+                    "    public static void getKeyAndValue(Map<Integer,ArrayList<Integer>> mMapParam){\n" +
+                    "        Map.Entry<Integer , ArrayList<Integer>> entryItem;\n" +
+                    "        if(mMapParam != null){\n" +
+                    "            Iterator iterator = mMapParam.entrySet().iterator();\n" +
+                    "            while( iterator.hasNext() ){\n" +
+                    "                entryItem = (Map.Entry<Integer , ArrayList<Integer>>) iterator.next();\n" +
+                    "                Integer year =   entryItem.getKey();   //Map的Key\n" +
+                    "                ArrayList<Integer> year_day =  entryItem.getValue();  //Map的Value\n" +
+                    "                System.out.println(\"==========\"+year + \"  =========\");\n" +
+                    "                for (int i = 0; i <year_day.size() ; i++) {\n" +
+                    "                    System.out.println(\"key = \"+year + \"  value[\"+i+\"] = \"+ year_day.get(i) );\n" +
+                    "                }\n" +
+                    "            }\n" +
+                    "        }\n" +
+                    "    }");
+
 
             return "void getKeyAndValue(Map<String,String> mMapParam) 迭代Map的Key和Value(通过 Iterator)";
         }
@@ -1433,5 +1433,23 @@ public class I0_CodeTip {
         return maoPosition;
     }
     // ArrayPrint ==============================End
+    static Map<String, String> zhushiMap = new HashMap<String, String>();
+
+    static {
+        zhushiMap.put("java", "//");// ## 1:java
+        zhushiMap.put("python", "#");// ## 2:python
+        zhushiMap.put("c", "//");// ## 3:c
+        zhushiMap.put("cpp", "//");// ## 4:cpp
+        zhushiMap.put("bat", "::");// ## 5:bat
+        zhushiMap.put("sh", "#");// ## 6:sh
+        zhushiMap.put("js", "//");// ## 7:js
+        zhushiMap.put("swift", "//");// ## 8:swift
+        zhushiMap.put("flutter", "//");// ## 9:flutter
+        zhushiMap.put("go", "//");// ## 10:go
+        zhushiMap.put("kotlin", "//");// ## 11:kotlin
+        zhushiMap.put("ruby", "#");// ## 12:ruby
+        zhushiMap.put("c#", "//");// ## 13:c#
+        zhushiMap.put("scala", "//");// ## 14:scala
+    }
 
 }

@@ -46,6 +46,7 @@ public class J0_TushareTool {
 //固定1  zbin 的 字符串绝对路径
     static String zbinPath = System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin";
 
+    static String J0_Dir_Path = System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin"+File.separator+"J0"+File.separator;
 
 
 
@@ -55,7 +56,7 @@ public class J0_TushareTool {
     static String mac_zbinPath = System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin" + File.separator + "mac_zbin";
 
 
-//1. nodename_last_record_day=""  ;   // 当前记录的数据最大的时间
+    //1. nodename_last_record_day=""  ;   // 当前记录的数据最大的时间
 //2. nodename_begin_record_day="";  // 当前查询记录的起始的时间
 //3. nodename_xxxxxx; // 记录当前node的 prop项  在 nodelist中自选中
     // 固定2 当前执行文件的编号 A1  A2  A3   ... G1   J0   G3 ... Z9
@@ -127,6 +128,15 @@ public class J0_TushareTool {
 
     // 有限制 每分钟 访问次数的 判断
     static String Python_BodyTemplate_4 = zbinPath + File.separator +"J0_python_body_template_4.py";
+
+    // 依据时间月份分隔的 判断    以 每月为一个xlsx文件  每天为sheet 每天的交易数据为内容的  逻辑  日线行情
+    static String Python_BodyTemplate_5 = zbinPath + File.separator +"J0_python_body_template_5.py";
+
+    // 依据时间月份分隔的 判断    以一年中的每个周五为结点去测试 把一年的数据整合到一个xlsx 从2010年开始  周线行情
+    static String Python_BodyTemplate_6 = zbinPath + File.separator +"J0_python_body_template_6.py";
+
+    // 依据时间月份分隔的 判断    以一年中的每个月为sheet 把一年的数据整合到一个xlsx 从2010年开始 201001 201002  月线行情
+    static String Python_BodyTemplate_7 = zbinPath + File.separator +"J0_python_body_template_7.py";
 
 
 
@@ -262,7 +272,7 @@ public class J0_TushareTool {
                     CUR_Dir_1_PATH = args[i];
                 } else if (i == 1) {  // 第二个参数是用来 对 当前功能进行分类使用的
                     CUR_TYPE_2_ParamsStr = args[i];
-                    //zukgit1    计算得到 当前 索引的列表   首先遇到的第一个数字类型  1_2112  那就是索引1  附带参数 2112   temp_2_
+                    //   计算得到 当前 索引的列表   首先遇到的第一个数字类型  1_2112  那就是索引1  附带参数 2112   temp_2_
                     int userSelectedIndex = calculInputTypeIndex(CUR_TYPE_2_ParamsStr);
                     if (userSelectedIndex != 0 && userSelectedIndex != CUR_TYPE_INDEX) {
                         // 如果 当前 的操作规则 不是 0   并且 操作索引 和当前 索引 不一样  那么就寻找赋值给  CUR_TYPE_INDEX
@@ -1745,6 +1755,15 @@ public class J0_TushareTool {
         return sb.toString();
     }
 
+
+    static String getTimeStamp_YYYYMMDD() {
+
+        SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd");//设置日期格式
+        String date = df.format(new Date());
+        return date;
+    }
+
+
     static String getTimeStamp() {
 
         SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd_HHmmss");//设置日期格式
@@ -1759,14 +1778,14 @@ public class J0_TushareTool {
         return date;
     }
 
-static void RestoreProp_TreeNode(){
-    for (int i = 0; i < AllLeafNode.size(); i++) {
-        TreeNode nodeItem = AllLeafNode.get(i);
-        nodeItem.RestoreToProp(propKey2ValueList);
+    static void RestoreProp_TreeNode(){
+        for (int i = 0; i < AllLeafNode.size(); i++) {
+            TreeNode nodeItem = AllLeafNode.get(i);
+            nodeItem.RestoreToProp(propKey2ValueList);
+        }
+
+
     }
-
-
-}
 
     static void InitProp_TreeNode(){
         for (int i = 0; i < AllLeafNode.size(); i++) {
@@ -2294,13 +2313,24 @@ static void RestoreProp_TreeNode(){
 
         ArrayList<String> fieldList;  // 参数的集合
 
-        Map<String,String> python_holder_map;
+        Map<String,String> python_holder_map;   //  静态的 holderplace
+
+
+
+        //   从文件中读取到的循环调用的列表  key 为  Method_Call_Template_1  Method_Call_Template_2 Method_Call_Template_3
+        // value 为这个 key 对应的  python 代码的集合   这里包含 循环调用的意味
+        Map<String,ArrayList<String>> mMethod_Call_Template_Map;
 
 
         // python_holder_map  key 放置 要替换的key   固定 死的
         // 【ZHoldPlace_NodeName】   固定 死的
         // 【ZHoldPlace_pythonMethodName】  固定 死的
         // 【ZHoldPlace_fieldList】    固定 死的
+        // 【ZHoldPlace_Now_YYYYMMDD】    固定 死的   程序运行时的 now日期
+       // 【ZHoldPlace_J0_Dir_PATH】   J0 目录的Dir位置    固定 死的 J0_Dir_Path
+        // 【ZHoldPlace_ZBin_PATH】   J0 目录的Dir位置    固定 死的
+// 【ZHoldPlace_Node_Website】    当前的 叶子结点的  对应的网站
+
 
         // 【ZHoldPlace_start_date】  【ZHoldPlace_end_date】  动态变化的 调节的
         // 【ZHoldPlace_propKey2ValueList_Index】  每次调用 都不一样的 灵活的
@@ -2342,19 +2372,32 @@ static void RestoreProp_TreeNode(){
 
         void initHoldeMap(){
             python_holder_map = new HashMap<String,String>();
+
             python_holder_map.put("【ZHoldPlace_Title】",get_ZHoldPlace_Title());
             python_holder_map.put("【ZHoldPlace_pythonMethodName】",get_ZHoldPlace_pythonMethodName());
             python_holder_map.put("【ZHoldPlace_fieldList】",get_ZHoldPlace_fieldList());
             python_holder_map.put("【ZHoldPlace_leaf_chinese_title】",get_ZHoldPlace_leaf_chinese_title());
             python_holder_map.put("【ZHoldPlace_call_LimitNum_OneMinutes】",get_ZHoldPlace_call_LimitNum_OneMinutes());
+            python_holder_map.put("【ZHoldPlace_NodeName】",nodeName);
+            python_holder_map.put("【ZHoldPlace_Now_YYYYMMDD】",getTimeStamp_YYYYMMDD());
+            python_holder_map.put("【ZHoldPlace_J0_Dir_PATH】",fixedPythonFilePath(J0_Dir_Path));
+            python_holder_map.put("【ZHoldPlace_Node_Website】",leaf_web_sit);
+
+
+            // 【ZHoldPlace_J0_Dir_PATH】   J0 目录的Dir位置    固定 死的 J0_Dir_Path
+
 
 
             // 【ZHoldPlace_propKey2ValueList_Index】  每次调用 都不一样的 灵活的
             // 【ZHoldPlace_propKey2ValueList】 每次调用 都不一样的 灵活的
-
+        // 【ZHoldPlace_DayMonthIndex_Xinqi】    每个月的月   几号_星期  1_1   2_3
+            // 【ZHoldPlace_DayIndex】    每个月的 好数
         }
 
 
+     String   fixedPythonFilePath(String path){
+            return path.replace(File.separator,File.separator+File.separator);
+        }
         // 方法描述:void getKeyAndValue(Map<String,String> mMapParam) 迭代Map的Key和Value(通过 Iterator) //
         @SuppressWarnings("unchecked")
         String HolderReplaceOperation_Static(String codeStr){
@@ -2400,7 +2443,11 @@ static void RestoreProp_TreeNode(){
 
             return valueList;
         }
+
+
         Map<String,ArrayList<String>>   calculTemplateMap(ArrayList<String> headTemplateList ,ArrayList<String>   bodyTemplateList) {
+
+
 
             ArrayList<String> allCodeList = new   ArrayList<String>();
             allCodeList.addAll(headTemplateList);
@@ -2426,11 +2473,96 @@ static void RestoreProp_TreeNode(){
             curTemplateMap.put(First_Holder_Tag,getTemplateValue(firstDefineList));
             curTemplateMap.put(Method_Holder_Tag,getTemplateValue(methodCallList));
             curTemplateMap.put(Tail_Holder_Tag,getTemplateValue(tailDefineList));
+            initCallMap(methodCallList);
 
             return curTemplateMap;
         }
 
+      void initCallMap( ArrayList<String> methodCallList ){
 
+          mMethod_Call_Template_Map = new HashMap<String,ArrayList<String>>();
+
+          for (int i = 0; i < methodCallList.size(); i++) {
+              String cycleCallCodeItem = methodCallList.get(i);
+              String mapFlagKey = calculMapKey(cycleCallCodeItem);
+              String mapFlagValue = calculMapValue(cycleCallCodeItem);
+              if(mMethod_Call_Template_Map.get(mapFlagKey) == null){
+                  ArrayList<String>  keyList = new      ArrayList<String>();
+                  mMethod_Call_Template_Map.put(mapFlagKey,keyList);
+              }
+              ArrayList<String> Key_Match_List = mMethod_Call_Template_Map.get(mapFlagKey);
+              if(!Key_Match_List.contains(mapFlagValue)){
+                  Key_Match_List.add(mapFlagValue);
+              }
+          }
+          System.out.println("  ============   mMethod_Call_Template_Map "+nodeName+" ============ ");
+          showCycleMEthodCallMap(mMethod_Call_Template_Map);
+
+        }
+        // 返回数值1 数值2  数值3 这样 就能区分了    没有解析出数值 那么返回 空字符串 作为 key
+        String calculMapKey(String cycleCallCodeItem){
+            // #  《Method_Call_Template_1》= 《creat
+            String pre = cycleCallCodeItem.substring(0,cycleCallCodeItem.indexOf("="));
+            String flagStr = getStrWithPairChar(pre,"《","》");
+            flagStr = flagStr.replace(Method_Holder_Tag,"");
+            if(isNumeric(flagStr)){
+                return flagStr;
+            }
+            return "";
+        }
+
+
+        String calculMapValue(String cycleCallCodeItem){
+            // #  《Method_Call_Template_1》= 《creat
+            String pre = cycleCallCodeItem.substring(cycleCallCodeItem.indexOf("=")+1);
+            String flagStr = getStrWithPairChar(pre,"《","》");
+            return flagStr;
+        }
+
+
+
+        boolean isOperationType5_Mtrade_date(ArrayList<String> fieldParamList){
+            boolean weekTrade = false;
+            for (int i = 0; i < fieldParamList.size(); i++) {
+                String itemStr =fieldParamList.get(i);
+                if(itemStr.contains("mtrade_date")){
+                    weekTrade = true;
+                    return weekTrade;
+                }
+            }
+            return weekTrade;
+
+        }
+
+boolean isOperationType4_Wtrade_date(ArrayList<String> fieldParamList){
+    boolean weekTrade = false;
+    for (int i = 0; i < fieldParamList.size(); i++) {
+        String itemStr =fieldParamList.get(i);
+        if(itemStr.contains("wtrade_date")){
+            weekTrade = true;
+            return weekTrade;
+        }
+    }
+    return weekTrade;
+
+}
+
+        //            ts_code='000001.SZ', start_date='', end_date=datestr
+        int  isOperationType3_Xmstart_date( ArrayList<String> fieldParamList  ){
+            int resultSpaceMonth = 0;
+            for (int i = 0; i < fieldParamList.size(); i++) {
+                String itemStr =fieldParamList.get(i);
+                if(itemStr.contains("mstart_date")){
+                    String tempStr = itemStr.replace("mstart_date","");
+                    if(isNumeric(tempStr)){
+                        resultSpaceMonth = Math.abs(Integer.parseInt(tempStr));
+                    }else{
+                        resultSpaceMonth = 1;  //  默认当前 month 间距为 1
+                    }
+                }
+            }
+            return resultSpaceMonth;
+        }
 
         void   pyhtonTemplate(ArrayList<String> headTemplateList ,ArrayList<String>   bodyTemplateList){
 
@@ -2472,9 +2604,14 @@ static void RestoreProp_TreeNode(){
             }
 
             //  默认0  可选参数的所有组合形式
-            //  1: 有一个 xts_code  通过 ts_code 多输入来查询  4000多个按x个为一组进行访问
-            // 2:  有一个 xstart_date  或者一个  xend_date   通过x 年份间隔 实现 按时间间隔查询
-            int  operation_type  = 0;
+            //  1: 有一个 yts_code  通过 ts_code 多输入来查询  4000多个按x个为一组进行访问
+            // 2:  有一个 ystart_date  10ystart_date 或者一个  yend_date   通过x 年份间隔 实现 按时间间隔查询
+          // 3. 以 (1mstart_date#1mend_date#1dtrade_date) rixianhangqing-time  以每个月为  【日线行情】
+ // 3.1  以月份为分隔  201001  201012  202008 这样的时间分类   把当前日期 每月中包含每天的sheet  sheet的内容是当天的日志信息
+          // 4. 以(wtrade_date)   标识把当前的以 从 zhouxianhangqing-time_record_date=20101101 为起点 计算 每年 到现在的每个周五的集合
+            //
+
+           int  operation_type  = 0;    // zukgit    //  当前处理的类型分类
 
 
 //            ts_code='000001.SZ', start_date='', end_date=datestr
@@ -2484,6 +2621,8 @@ static void RestoreProp_TreeNode(){
             String paramXcode = "";
             int x_tscode_num = x_tscode_num_default;  // 默认是 50
             int x_yearspace_num = default_space_year;
+
+            int m_operatype_3_month_space = 0;  // type为3 时 标识的当前的时间 月份 间隔
 
             if(fieldParamList.size() ==1 && fieldParamList.get(0).contains("xts_code") ){
                 paramXcode =  fieldParamList.get(0);
@@ -2511,13 +2650,13 @@ static void RestoreProp_TreeNode(){
 
                 }
                 operation_type = 1;
-            }else if(fieldParamList.size() ==1 && fieldParamList.get(0).contains("xstart_date")){
+            }else if(fieldParamList.size() ==1 && fieldParamList.get(0).contains("ystart_date")){
                 paramXcode =  fieldParamList.get(0);
                 if(paramXcode.contains(",")){
                     String[] paramsArr =   paramXcode.split(",");
                     for (int i = 0; i < paramsArr.length; i++) {
-                        if(paramsArr[i].contains("xstart_date")){
-                            String numStr = paramsArr[i].trim().replace("=","").replace("xstart_date","").replace("'","");
+                        if(paramsArr[i].contains("ystart_date")){
+                            String numStr = paramsArr[i].trim().replace("=","").replace("ystart_date","").replace("'","");
                             if("".endsWith(numStr)){
                                 x_yearspace_num = default_space_year;
                             }else if(isNumeric(numStr)){
@@ -2527,7 +2666,7 @@ static void RestoreProp_TreeNode(){
                         }
                     }
                 }else{
-                    String numStr = paramXcode.replace("=","").replace("xstart_date","").replace("'","");
+                    String numStr = paramXcode.replace("=","").replace("ystart_date","").replace("'","");
                     if("".endsWith(numStr)){
                         x_yearspace_num = default_space_year;
                     }else if(isNumeric(numStr)){
@@ -2535,7 +2674,15 @@ static void RestoreProp_TreeNode(){
                     }
                 }
                 operation_type = 2;
+            }else if(fieldParamList.size() ==1 && (m_operatype_3_month_space = isOperationType3_Xmstart_date(fieldParamList)) != 0){
+                operation_type = 3;
+            }else if(fieldParamList.size() ==1 && isOperationType4_Wtrade_date(fieldParamList)){  // 周线
+                operation_type = 4;
+            }else if(fieldParamList.size() ==1 && isOperationType5_Mtrade_date(fieldParamList)){ // 月线
+                operation_type = 5;
+                paramXcode =  fieldParamList.get(0);
             }
+
             // 50xtscode 处理 地方 在这里
 
 
@@ -2612,8 +2759,8 @@ static void RestoreProp_TreeNode(){
                     String beginDateStr = begin_end_List.get(0);
                     String endDateStr = begin_end_List.get(1);
                     System.out.println("Date[ "+i+"]  beginDateStr = "+ beginDateStr + "   endDateStr = "+ endDateStr);
-                    String paramKey =   paramXcode.replace(x_yearspace_num+"xstart_date","start_date");
-                    paramKey =   paramKey.replace(x_yearspace_num+"xend_date","end_date");
+                    String paramKey =   paramXcode.replace(x_yearspace_num+"ystart_date","start_date");
+                    paramKey =   paramKey.replace(x_yearspace_num+"yend_date","end_date");
                     String fieldItem = paramKey.replace("start_date=''","start_date='"+beginDateStr+"'");
                     fieldItem = fieldItem.replace("end_date=''","end_date='"+endDateStr+"'");
 
@@ -2639,16 +2786,16 @@ static void RestoreProp_TreeNode(){
                             fillText =     fillText.replace("【ZHoldPlace_propKey2ValueList】",fieldItem);
                         }
 
-                        if(fillText.contains(x_yearspace_num+"xstart_date=''")){
+                        if(fillText.contains(x_yearspace_num+"ystart_date=''")){
                             fillText =     fillText.replace(x_yearspace_num+"xts_code=''","start_date='"+beginDateStr+"'");
-                        }else if(fillText.contains("xstart_date=''")){
-                            fillText =     fillText.replace("xstart_date=''","start_date='"+beginDateStr+"'");
+                        }else if(fillText.contains("ystart_date=''")){
+                            fillText =     fillText.replace("ystart_date=''","start_date='"+beginDateStr+"'");
                         }
 
-                        if(fillText.contains(x_yearspace_num+"xend_date=''")){
-                            fillText =     fillText.replace(x_yearspace_num+"xend_date=''","end_date='"+endDateStr+"'");
-                        }else if(fillText.contains("xend_date=''")){
-                            fillText =     fillText.replace("xend_date=''","end_date='"+endDateStr+"'");
+                        if(fillText.contains(x_yearspace_num+"yend_date=''")){
+                            fillText =     fillText.replace(x_yearspace_num+"yend_date=''","end_date='"+endDateStr+"'");
+                        }else if(fillText.contains("yend_date=''")){
+                            fillText =     fillText.replace("yend_date=''","end_date='"+endDateStr+"'");
                         }
                         python_method_call_List_Code.add(fillText);
                     }
@@ -2657,6 +2804,358 @@ static void RestoreProp_TreeNode(){
 
 
                 }
+
+
+            }else if(operation_type == 3){
+
+//                =======Method_Call_Template_1 Begin =======
+//                key = Method_Call_Template_1   value[0] = createexcel('【ZHoldPlace_pythonMethodName】_【ZHoldPlace_Mstart_date】.xlsx')
+//                key = Method_Call_Template_1   value[1] = 【ZHoldPlace_pythonMethodName】_【ZHoldPlace_Mstart_date】_book = load_workbook('【ZHoldPlace_pythonMethodName】_【ZHoldPlace_Mstart_date】.xlsx')
+//                key = Method_Call_Template_1   value[2] = 【ZHoldPlace_pythonMethodName】_【ZHoldPlace_Mstart_date】_excel_writer = pd.ExcelWriter('【ZHoldPlace_pythonMethodName】_【ZHoldPlace_Mstart_date】.xlsx', engine='openpyxl')
+//                key = Method_Call_Template_1   value[3] = 【ZHoldPlace_pythonMethodName】_【ZHoldPlace_Mstart_date】_excel_writer.book = 【ZHoldPlace_pythonMethodName】_【ZHoldPlace_Mstart_date】_book
+//                        key = Method_Call_Template_1   value[4] = 【ZHoldPlace_pythonMethodName】_【ZHoldPlace_Mstart_date】_excel_writer.sheets = dict((ws.title, ws) for ws in 【ZHoldPlace_pythonMethodName】_【ZHoldPlace_Mstart_date】_book.worksheets)
+//=======Method_Call_Template_1 End =======
+//=======Method_Call_Template_2 Begin =======
+//                key = Method_Call_Template_2   value[0] = 【ZHoldPlace_pythonMethodName】_【ZHoldPlace_Mstart_date】 = pro.【ZHoldPlace_pythonMethodName】(【ZHoldPlace_propKey2ValueList】, fields='【ZHoldPlace_fieldList】')
+//                key = Method_Call_Template_2   value[1] = print("【ZHoldPlace_pythonMethodName】_【ZHoldPlace_Mstart_date】 返回数据 row 行数 = "+str(【ZHoldPlace_pythonMethodName】_【ZHoldPlace_Mstart_date】.shape[0]))
+//                key = Method_Call_Template_2   value[2] = 【ZHoldPlace_pythonMethodName】_【ZHoldPlace_Mstart_date】.to_excel(【ZHoldPlace_pythonMethodName】_【ZHoldPlace_Mstart_date】_excel_writer,'【ZHoldPlace_day_date】',index=False)
+//                key = Method_Call_Template_2   value[3] = 【ZHoldPlace_pythonMethodName】_【ZHoldPlace_Mstart_date】_excel_writer.save()
+//                        =======Method_Call_Template_2 End =======
+
+                int month_space = m_operatype_3_month_space;  //  从 j0_treedata.txt  获取到的月份间隔
+                paramXcode =  fieldParamList.get(0);
+                // 1mstart_date#1mend_date#1dtrade_date
+                String propStartDay = getPropValue("start_date");   // prop 中设置的 起始日期 20010101
+                String propRecordDay = getPropValue("record_date");  // peop 中记录的record的日期 20200707
+                if(propRecordDay == null || "".equals(propRecordDay)){
+                    propRecordDay = "20100101";
+                }
+                if(propStartDay == null || "".equals(propStartDay)){
+                    propStartDay = "20100101";
+                }
+
+//                ArrayList<Integer> calculMonthArr = calculMonSpace(propRecordDay,month_space);
+                //  计算从 record_date 到 现在这个时间点的所有月份 间隔为 month_space
+                ArrayList<Integer> calculMonthArr = calculMonSpaceIntArr(propRecordDay,month_space);
+
+                int nowIntFlag = Integer.parseInt(getTimeStamp_YYYYMMDD());
+                for (int i = 0; i < calculMonthArr.size(); i++) {
+                    int curYear_Month = calculMonthArr.get(i);
+                    String yearStr = (""+curYear_Month).substring(0,4);
+                    String monthStr = (""+curYear_Month).substring(4);
+                    int yearInt = Integer.parseInt(yearStr);
+                    int monthInt = Integer.parseInt(monthStr);
+                    int days_month = getDayForMonth_Year(yearInt,monthInt);
+                    System.out.println("============="+yearStr+"   "+monthStr+"   "+days_month);
+
+                  ArrayList<String> code_template_1_List =   mMethod_Call_Template_Map.get("1");
+                    ArrayList<String> code_template_2_List =   mMethod_Call_Template_Map.get("2");
+                  ArrayList<String> headCodeList = new  ArrayList<String>();
+                    for (int j = 0; j < code_template_1_List.size(); j++) {
+                        String headCodeItem  = code_template_1_List.get(j);
+                        String fixed_headCodeItem =  HolderReplaceOperation_Static(headCodeItem);
+                        if(fixed_headCodeItem.contains("【ZHoldPlace_Mstart_date】")){
+                            // fixed_headCodeItem
+                            fixed_headCodeItem = fixed_headCodeItem.replace("【ZHoldPlace_Mstart_date】",""+curYear_Month);
+                        }
+                        python_method_call_List_Code.add(fixed_headCodeItem);
+                    }
+
+                    for (int j = 0; j < days_month; j++) {
+                        int day_index = j+1;
+
+//                        System.out.println("yearStr = "+yearStr+"  monthInt =  "+monthStr+"   day_index = "+day_index +" 星期:"+calculXinQi2Chinese(yearInt,monthInt,day_index));
+                        String daystr =  day_index>=10?day_index+"":"0"+day_index;
+                        String daydesc = ""+curYear_Month+daystr;
+                        int itemDay = Integer.parseInt(daydesc);
+                        if(itemDay > nowIntFlag){
+                            continue;
+                        }
+//                        System.out.println("days["+day_index+"] = "+daydesc);
+                        for (int k = 0; k < code_template_2_List.size(); k++) {
+                            String recyleCodeItem = code_template_2_List.get(k);
+                            String fixed_recyleCodeItem =  HolderReplaceOperation_Static(recyleCodeItem);
+                            if(fixed_recyleCodeItem.contains("【ZHoldPlace_Mstart_date】")){
+                                // fixed_headCodeItem
+                                fixed_recyleCodeItem = fixed_recyleCodeItem.replace("【ZHoldPlace_Mstart_date】",""+curYear_Month);
+                            }
+                            if(fixed_recyleCodeItem.contains("【ZHoldPlace_day_date】")){
+                                // fixed_headCodeItem
+                                fixed_recyleCodeItem = fixed_recyleCodeItem.replace("【ZHoldPlace_day_date】",""+daydesc);
+                            }
+
+                            if(fixed_recyleCodeItem.contains("【ZHoldPlace_propKey2ValueList】")){
+                                fixed_recyleCodeItem =     fixed_recyleCodeItem.replace("【ZHoldPlace_propKey2ValueList】",paramXcode);
+                            }
+
+                            if(fixed_recyleCodeItem.contains("【ZHoldPlace_DayIndex】")){
+                                fixed_recyleCodeItem =     fixed_recyleCodeItem.replace("【ZHoldPlace_DayIndex】",day_index+"");
+                            }
+
+                            if(fixed_recyleCodeItem.contains("【ZHoldPlace_DayMonthIndex_Xinqi】")){
+                                fixed_recyleCodeItem =     fixed_recyleCodeItem.replace("【ZHoldPlace_DayMonthIndex_Xinqi】",day_index+"_"+calculXinQi2Chinese(yearInt,monthInt,day_index)+"");
+                            }
+
+
+                            if(fixed_recyleCodeItem.contains(month_space+"mstart_date")){
+                                fixed_recyleCodeItem =     fixed_recyleCodeItem.replace(month_space+"mstart_date","start_date");
+                            }
+                            if(fixed_recyleCodeItem.contains(month_space+"mend_date")){
+                                fixed_recyleCodeItem =     fixed_recyleCodeItem.replace(month_space+"mend_date","end_date");
+                            }
+
+                            if(fixed_recyleCodeItem.contains("trade_date=''")){
+                                fixed_recyleCodeItem =     fixed_recyleCodeItem.replace("trade_date=''","trade_date='"+daydesc+"'");
+                            }
+
+
+                            python_method_call_List_Code.add(fixed_recyleCodeItem);
+
+                            // 1mstart_date#1mend_date#1dtrade_date
+
+                        }
+
+
+                    }
+                    python_method_call_List_Code.add("\n");
+                    python_method_call_List_Code.add("\n");
+                }
+
+
+            }else if(operation_type == 4){  //  周线行情 处理
+                paramXcode =  fieldParamList.get(0);
+                // 1mstart_date#1mend_date#1dtrade_date
+                String propStartDay = getPropValue("start_date");   // prop 中设置的 起始日期 20010101
+                String propRecordDay = getPropValue("record_date");  // peop 中记录的record的日期 20200707
+                if(propRecordDay == null || "".equals(propRecordDay)){
+                    propRecordDay = "20100101";
+                }
+                if(propStartDay == null || "".equals(propStartDay)){
+                    propStartDay = "20100101";
+                }
+                // 201001----201002-----201012
+                ArrayList<Integer> calculMonthArr = calculMonSpaceIntArr(propRecordDay,1);
+
+                int recordDayFlag = Integer.parseInt(propRecordDay);
+
+                ArrayList<Integer> fridayIntList = new  ArrayList<Integer>();
+                //  获取当前的时间戳
+                int nowIntFlag = Integer.parseInt(getTimeStamp_YYYYMMDD());
+                ArrayList<String> code_template_1_List =   mMethod_Call_Template_Map.get("1");
+                ArrayList<String> code_template_2_List =   mMethod_Call_Template_Map.get("2");
+
+                for (int i = 0; i < calculMonthArr.size(); i++) {
+                    int curYear_Month = calculMonthArr.get(i);
+                    String yearStr = ("" + curYear_Month).substring(0, 4);
+                    String monthStr = ("" + curYear_Month).substring(4);
+                    int yearInt = Integer.parseInt(yearStr);
+                    int monthInt = Integer.parseInt(monthStr);
+                    int days_month = getDayForMonth_Year(yearInt, monthInt);
+                    for (int j = 0; j < days_month ; j++) {
+                        int day_index = j+1;
+                      String curIXinqiStr = calculXinQi2Chinese(yearInt,monthInt,day_index);
+                      if("5".equals(curIXinqiStr)){
+                          String daystr =  day_index>=10?day_index+"":"0"+day_index;
+                          int cur_friday_int_flag = Integer.parseInt(yearStr+monthStr+daystr);
+                          if(cur_friday_int_flag > nowIntFlag || cur_friday_int_flag < recordDayFlag ){  // 当大于当前日期 那么不加入到列表
+                              continue;
+                          }
+                          fridayIntList.add(cur_friday_int_flag);
+                      }
+                    }
+                }
+
+             Map<Integer,ArrayList<Integer>> year_firday_map = fenlei_for_allFridayArr(fridayIntList);
+
+                // 【ZHoldPlace_Year_Int】 替换为当前年份
+                // 【ZHoldPlace_Weekly_Day】   替换为当前 执行的 查询日期
+                // 【ZHoldPlace_WeekIndex_DayDesc】 WeekIndex 是固定的应该,而不是 arrayList的index
+                Map.Entry<Integer , ArrayList<Integer>> entryItem;
+                if(year_firday_map != null){
+                    Iterator iterator = year_firday_map.entrySet().iterator();
+                    while( iterator.hasNext() ){
+                        entryItem = (Map.Entry<Integer , ArrayList<Integer>>) iterator.next();
+                        Integer year =   entryItem.getKey();   //Map的Key  【ZHoldPlace_Year_Int】
+                        ArrayList<Integer> year_day =  entryItem.getValue();  //Map的Value
+                        for (int i = 0; i < code_template_1_List.size(); i++) {
+
+                            String headCodeItem  = code_template_1_List.get(i);
+                            String fixed_headCodeItem =  HolderReplaceOperation_Static(headCodeItem);
+                            if(fixed_headCodeItem.contains("【ZHoldPlace_Year_Int】")){
+                                // fixed_headCodeItem
+                                fixed_headCodeItem = fixed_headCodeItem.replace("【ZHoldPlace_Year_Int】",""+year);
+                            }
+                            python_method_call_List_Code.add(fixed_headCodeItem);
+
+                        }
+//                        System.out.println("=========="+year + "  =========");
+                        for (int i = 0; i <year_day.size() ; i++) {
+//                            System.out.println("key = "+year + "  value["+i+"] = "+ year_day.get(i) );
+                            int curDayInt = year_day.get(i);  //  【ZHoldPlace_Weekly_Day】
+                            // 当前 星期5 对应的在该年的索引
+                            int friday_index = calculFridayIndex2Year(curDayInt);
+
+                            String sheet_name = friday_index+"_"+curDayInt;  // 【ZHoldPlace_WeekIndex_DayDesc】
+
+                            for (int j = 0; j < code_template_2_List.size() ; j++) {
+
+
+                                String recyleCodeItem = code_template_2_List.get(j);
+                                String fixed_recyleCodeItem =  HolderReplaceOperation_Static(recyleCodeItem);
+                                if(fixed_recyleCodeItem.contains("【ZHoldPlace_Weekly_Day】")){
+                                    // fixed_headCodeItem
+                                    fixed_recyleCodeItem = fixed_recyleCodeItem.replace("【ZHoldPlace_WeekIndex_DayDesc】",""+sheet_name);
+                                }
+
+                                if(fixed_recyleCodeItem.contains("【ZHoldPlace_propKey2ValueList】")){
+                                    fixed_recyleCodeItem =     fixed_recyleCodeItem.replace("【ZHoldPlace_propKey2ValueList】",paramXcode);
+                                }
+                                if(fixed_recyleCodeItem.contains("【ZHoldPlace_Weekly_Day】")){
+                                    // fixed_headCodeItem
+                                    fixed_recyleCodeItem = fixed_recyleCodeItem.replace("【ZHoldPlace_Weekly_Day】",""+curDayInt);
+                                }
+                                if(fixed_recyleCodeItem.contains("【ZHoldPlace_Year_Int】")){
+                                    // fixed_headCodeItem
+                                    fixed_recyleCodeItem = fixed_recyleCodeItem.replace("【ZHoldPlace_Year_Int】",""+year);
+                                }
+
+
+                                if(fixed_recyleCodeItem.contains("wtrade_date=''")){
+                                    fixed_recyleCodeItem =     fixed_recyleCodeItem.replace("wtrade_date=''","trade_date='"+curDayInt+"'");
+                                }
+
+
+
+                                python_method_call_List_Code.add(fixed_recyleCodeItem);
+                            }
+
+                            // zukgit
+
+
+                        }
+                    }
+                }
+            }else if(operation_type == 5){  //  周线行情 处理
+                paramXcode =  fieldParamList.get(0);
+                // 1mstart_date#1mend_date#1dtrade_date
+                String propStartDay = getPropValue("start_date");   // prop 中设置的 起始日期 20010101
+                String propRecordDay = getPropValue("record_date");  // peop 中记录的record的日期 20200707
+                if(propRecordDay == null || "".equals(propRecordDay)){
+                    propRecordDay = "20100101";
+                }
+                if(propStartDay == null || "".equals(propStartDay)){
+                    propStartDay = "20100101";
+                }
+                // 201001----201002-----201012
+                ArrayList<Integer> calculMonthArr = calculMonSpaceIntArr(propRecordDay,1);
+
+                // 每个月的最后一个非 星期6 星期7 的日子的集合
+                ArrayList<Integer> EndWorkDayInMonthList = new  ArrayList<Integer>();
+                //  获取当前的时间戳
+                int recordDayFlag = Integer.parseInt(propRecordDay);
+                int nowIntFlag = Integer.parseInt(getTimeStamp_YYYYMMDD());
+                ArrayList<String> code_template_1_List =   mMethod_Call_Template_Map.get("1");
+                ArrayList<String> code_template_2_List =   mMethod_Call_Template_Map.get("2");
+
+                for (int i = 0; i < calculMonthArr.size(); i++) {
+                    int curYear_Month = calculMonthArr.get(i);
+                    String yearStr = ("" + curYear_Month).substring(0, 4);
+                    String monthStr = ("" + curYear_Month).substring(4);
+                    int yearInt = Integer.parseInt(yearStr);
+                    int monthInt = Integer.parseInt(monthStr);
+
+                    // 每个月的最后一个工作日
+                    int end_work_day_for_month = getEndWorkDayForMonth(yearInt, monthInt);
+                    if(end_work_day_for_month < nowIntFlag && end_work_day_for_month >  recordDayFlag){
+                        EndWorkDayInMonthList.add(end_work_day_for_month);
+                    }
+
+                }
+
+                Map<Integer,ArrayList<Integer>> year_firday_map = fenlei_for_allFridayArr(EndWorkDayInMonthList);
+
+                // 【ZHoldPlace_Year_Int】 替换为当前年份
+                // 【ZHoldPlace_Weekly_Day】   替换为当前 执行的 查询日期
+                // 【ZHoldPlace_WeekIndex_DayDesc】 WeekIndex 是固定的应该,而不是 arrayList的index
+                Map.Entry<Integer , ArrayList<Integer>> entryItem;
+                if(year_firday_map != null){
+                    Iterator iterator = year_firday_map.entrySet().iterator();
+                    while( iterator.hasNext() ){
+                        entryItem = (Map.Entry<Integer , ArrayList<Integer>>) iterator.next();
+                        Integer year =   entryItem.getKey();   //Map的Key  【ZHoldPlace_Year_Int】
+                        ArrayList<Integer> end_workday_in_month_list =  entryItem.getValue();  //Map的Value
+                        for (int i = 0; i < code_template_1_List.size(); i++) {
+
+                            String headCodeItem  = code_template_1_List.get(i);
+                            String fixed_headCodeItem =  HolderReplaceOperation_Static(headCodeItem);
+                            if(fixed_headCodeItem.contains("【ZHoldPlace_Year_Int】")){
+                                // fixed_headCodeItem
+                                fixed_headCodeItem = fixed_headCodeItem.replace("【ZHoldPlace_Year_Int】",""+year);
+                            }
+                            python_method_call_List_Code.add(fixed_headCodeItem);
+
+                        }
+//                        System.out.println("=========="+year + "  =========");
+                        for (int i = 0; i <end_workday_in_month_list.size() ; i++) {
+//                            System.out.println("key = "+year + "  value["+i+"] = "+ year_day.get(i) );
+                            int endworkDay = end_workday_in_month_list.get(i);  //【ZHoldPlace_EndWorkDay_MonthDay】
+                            String monthDesc = (""+endworkDay).substring(4,6);
+                            int monthInt = Integer.parseInt(monthDesc);
+                            int yearInt = Integer.parseInt((""+endworkDay).substring(0,4));
+                            String sheet_name = monthInt+"";  // 【ZHoldPlace_Month_Index】
+                            String year_month_str = yearInt+monthDesc+"01";  // 【ZHoldPlace_Year_Month】
+
+                            // 【ZHoldPlace_Year_Month】
+
+                            for (int j = 0; j < code_template_2_List.size() ; j++) {
+
+
+                                String recyleCodeItem = code_template_2_List.get(j);
+                                String fixed_recyleCodeItem =  HolderReplaceOperation_Static(recyleCodeItem);
+                                if(fixed_recyleCodeItem.contains("【ZHoldPlace_Year_Month】")){
+                                    // fixed_headCodeItem
+                                    fixed_recyleCodeItem = fixed_recyleCodeItem.replace("【ZHoldPlace_Year_Month】",""+year_month_str);
+                                }
+
+                                if(fixed_recyleCodeItem.contains("【ZHoldPlace_EndWorkDay_MonthDay】")){
+                                    // fixed_headCodeItem
+                                    fixed_recyleCodeItem = fixed_recyleCodeItem.replace("【ZHoldPlace_EndWorkDay_MonthDay】",""+endworkDay);
+                                }
+
+
+
+                                if(fixed_recyleCodeItem.contains("【ZHoldPlace_propKey2ValueList】")){
+                                    fixed_recyleCodeItem =     fixed_recyleCodeItem.replace("【ZHoldPlace_propKey2ValueList】",paramXcode);
+                                }
+                                if(fixed_recyleCodeItem.contains("【ZHoldPlace_Month_Index】")){
+                                    // fixed_headCodeItem
+                                    fixed_recyleCodeItem = fixed_recyleCodeItem.replace("【ZHoldPlace_Month_Index】",""+sheet_name);
+                                }
+                                if(fixed_recyleCodeItem.contains("【ZHoldPlace_Year_Int】")){
+                                    // fixed_headCodeItem
+                                    fixed_recyleCodeItem = fixed_recyleCodeItem.replace("【ZHoldPlace_Year_Int】",""+year);
+                                }
+
+
+
+                                if(fixed_recyleCodeItem.contains("mtrade_date=''")){
+                                    fixed_recyleCodeItem =     fixed_recyleCodeItem.replace("mtrade_date=''","trade_date='"+endworkDay+"'");
+                                }
+
+
+
+                                python_method_call_List_Code.add(fixed_recyleCodeItem);
+                            }
+
+                            // zukgit
+
+
+                        }
+                    }
+                }
+
+
+
 
 
             }
@@ -2912,6 +3411,27 @@ static void RestoreProp_TreeNode(){
 
 
         @SuppressWarnings("unchecked")
+        public void showCycleMEthodCallMap(Map<String, ArrayList<String>> mMapParam) {
+            Map.Entry<String, ArrayList<String>> entryItem;
+            if (mMapParam != null) {
+                Iterator iterator = mMapParam.entrySet().iterator();
+                while (iterator.hasNext()) {
+                    entryItem = (Map.Entry<String, ArrayList<String>>) iterator.next();
+                    String key = entryItem.getKey();   //Map的Key
+                    ArrayList<String> valueList = entryItem.getValue();  //Map的Value
+                    String keyDec = "Method_Call_Template_"+key;
+                    System.out.println("=======" + keyDec+" Begin "+ "=======" );
+                    for (int i = 0; i < valueList.size(); i++) {
+                        String itemStr = valueList.get(i);
+                        System.out.println("key = "+keyDec +"   value["+i+"] = "+ itemStr);
+                    }
+                    System.out.println("=======" + keyDec+" End "+ "=======" );
+               }
+            }
+        }
+
+
+        @SuppressWarnings("unchecked")
         public void showOptionMap(Map<String, ArrayList<String>> mMapParam) {
             Map.Entry<String, ArrayList<String>> entryItem;
             if (mMapParam != null) {
@@ -2938,6 +3458,19 @@ static void RestoreProp_TreeNode(){
 
         }
 
+        String   getPropValue(String name){
+            if(properity_holder_map == null){
+                return null;
+            }
+            String fixed_key = nodeName+"_"+name;
+            String value = properity_holder_map.get(fixed_key);
+            if(value == null){
+                return null;
+            }
+
+            return value;
+
+        }
         // 把 TreeNode 中的 Prop数据 覆盖到 系统的 Prop中
         void RestoreToProp( Map<String, String>  propKey2ValueList){
             if(properity_holder_map == null || properity_holder_map.size() == 0){
@@ -2969,6 +3502,8 @@ static void RestoreProp_TreeNode(){
 
         abstract void RestoreToProp( Map<String, String>  propKey2ValueList);
 
+        abstract String   getPropValue(String name);
+
         void showNodeInfo() {
             System.out.println("NodeName = " + nodeName);
             System.out.println("isRoot = " + isRoot);
@@ -2998,6 +3533,8 @@ static void RestoreProp_TreeNode(){
         ArrayList<TreeNode> childArr;  // 当前结点的子结点的集合  // 叶子节点没有子节点
 
         String inputOrganizationIdentify;  // 从 treedata 获得的 组织名称
+
+
 
         public int getAndInitDynamicDeep() {
             if (getParentNode() != null) {
@@ -3622,6 +4159,232 @@ static void RestoreProp_TreeNode(){
     }
 
 
+
+    static int getEndWorkDayForMonth(int year, int month) {
+        int sumDays = getDayForMonth_Year(year,month);
+
+  while("6".equals(calculXinQi2Chinese(year,month,sumDays)) || "7".equals(calculXinQi2Chinese(year,month,sumDays))){
+    sumDays = sumDays - 1;
+}
+
+        String monthDesc =  month>=10?month+"":"0"+month;
+        int endDayIntFlag = Integer.parseInt(""+year+monthDesc+sumDays);
+
+        return endDayIntFlag;
+    }
+
+
+    static int getDayForMonth_Year(int year, int month) {
+        int days = 0;
+        if (month == 1 || month == 3 || month == 5 || month == 7 || month == 8 || month == 10 || month == 12) {
+            days = 31;
+        } else if (month == 4 || month == 6 || month == 9 || month == 11) {
+            days = 30;
+        } else if (month == 2) {
+            if (year % 4 == 0 && year % 100 != 0 || year % 400 == 0) {
+                days = 29;
+            } else {
+                days = 28;
+            }
+        } else {
+//        System.out.println("请输入正确的月份");
+        }
+//    System.out.println(year+"年"+month+"月"+"这个月有"+days+"天");
+        return days;
+    }
+
+    static Map<Integer,ArrayList<Integer>>  fenlei_for_allFridayArr(  ArrayList<Integer> fridayIntList){
+
+        Map<Integer,ArrayList<Integer>> year_friday_map = Maps.newLinkedHashMap();
+        for (int i = 0; i < fridayIntList.size(); i++) {
+            int day = fridayIntList.get(i);
+            int year = Integer.parseInt((""+day).substring(0,4));
+            if(year_friday_map.get(year) == null){
+                ArrayList<Integer> dayList = new ArrayList<Integer>();
+                year_friday_map.put(year,dayList);
+            }
+            ArrayList<Integer> curDayList =    year_friday_map.get(year);
+            curDayList.add(day);
+        }
+        return year_friday_map;
+    }
+
+    static ArrayList<Integer>  calculMonSpaceIntArr(String beginDayStr ,int monthSpace){
+        ArrayList<Integer> arrMonthArr = new  ArrayList<Integer>();
+        SimpleDateFormat format=new SimpleDateFormat("yyyyMMdd");
+        Calendar now_calitem =Calendar.getInstance();
+        int nowYear = now_calitem.get(Calendar.YEAR);
+        int nowMonth = now_calitem.get(Calendar.MONTH)+monthSpace;
+        int nowDay= now_calitem.get(Calendar.DAY_OF_MONTH);
+        now_calitem.set(Calendar.YEAR,nowYear);
+        now_calitem.set(Calendar.MONTH,nowMonth);
+        now_calitem.set(Calendar.DAY_OF_MONTH,nowDay);
+        nowYear = now_calitem.get(Calendar.YEAR);
+        nowMonth = now_calitem.get(Calendar.MONTH)+1;
+        nowDay= now_calitem.get(Calendar.DAY_OF_MONTH);
+
+        String nowMonthStr = nowMonth>=10?nowMonth+"":"0"+nowMonth;
+
+
+//       String nowDayStr = nowDay>=10?nowDay+"":"0"+nowDay;
+
+        int CurDateInt = Integer.parseInt(nowYear+nowMonthStr);
+        String beginDayStrItem = new String(beginDayStr);
+        int beginDayInt = 0;
+        Date beginDate= null;
+        Calendar calItem = null;
+        while(beginDayInt < CurDateInt ){
+            try {
+
+                if (beginDate == null) {
+                    beginDate =  format.parse(beginDayStrItem);
+                    calItem =Calendar.getInstance();
+                    calItem.setTime(beginDate);
+                    System.out.println("beginDate = "+ beginDate);
+
+                    int xYear = calItem.get(Calendar.YEAR);
+                    int xMonth = calItem.get(Calendar.MONTH)+1;
+                    String xMonthStr = xMonth>=10?xMonth+"":"0"+xMonth;
+                    beginDayInt = Integer.parseInt(xYear+""+xMonthStr);
+                    arrMonthArr.add(beginDayInt);
+                }
+
+
+                int curMonth = calItem.get(Calendar.MONTH);
+                curMonth = curMonth + monthSpace;
+                calItem.set(Calendar.MONTH,curMonth);
+
+                int xYear = calItem.get(Calendar.YEAR);
+                int xMonth = calItem.get(Calendar.MONTH)+1;
+                String xMonthStr = xMonth>=10?xMonth+"":"0"+xMonth;
+                beginDayInt = Integer.parseInt(xYear+""+xMonthStr);
+                arrMonthArr.add(beginDayInt);
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        return arrMonthArr;
+    }
+
+
+    static Calendar  calendar_object = Calendar.getInstance();
+
+    static String calculXinQi2Chinese(int year , int month ,int day) {
+        String xinqiValue = "";
+        calendar_object.set(Calendar.YEAR,year);
+        calendar_object.set(Calendar.MONTH,month-1);
+        calendar_object.set(Calendar.DAY_OF_MONTH,day);
+        int xinqi = calendar_object.get(Calendar.DAY_OF_WEEK) - 1;  //
+        System.out.println(" Bxiniq = "+ xinqi);
+        // 0 ---> 周一
+        // 1 ---> 周二
+        // 2---> 周三
+        //
+        switch (xinqi) {
+            case 0:
+                xinqiValue = "7";
+                break;
+            case 1:
+                xinqiValue = "1";
+                break;
+            case 2:
+                xinqiValue = "2";
+                break;
+            case 3:
+                xinqiValue = "3";
+                break;
+            case 4:
+                xinqiValue = "4";
+                break;
+            case 5:
+                xinqiValue = "5";
+                break;
+            case 6:
+                xinqiValue = "6";
+                break;
+            case 7:
+                xinqiValue = "7";
+                break;
+            default:
+                xinqiValue = "1";  // 默认周一
+        }
+        return xinqiValue;
+    }
+
+    static int getDayForYear(int year) {
+        int year_days = 365;
+        if (year % 4 == 0 && year % 100 != 0 || year % 400 == 0) {
+            year_days = 366;
+        } else {
+            year_days = 365;
+        }
+        return year_days;
+    }
+
+
+    // 1. day 和 xinqi 必须配对    2.拥挤计算当前xinqi(1.2.3.4.5.6.7) 对应的日子 day 在 今年的第几次出现
+    static int calculFridayIndex2Year( int day){
+        String YearStr = (""+day).substring(0,4);
+        String MonthStr = (""+day).substring(4,6);
+        String DayStr = (""+day).substring(6);
+        int index = 1;
+        int xyear = Integer.parseInt(YearStr);
+        int xmonth = Integer.parseInt(MonthStr);
+        int xday =  Integer.parseInt(DayStr);
+        int xinqi = Integer.parseInt(calculXinQi2Chinese(xyear,xmonth,xday));
+
+        int days_year = getDayForYear(xyear);
+
+        Calendar temp_calendar = Calendar.getInstance();
+        temp_calendar.set(Calendar.YEAR,xyear);
+        for (int i = 0; i < days_year ; i++) {
+            int day_index = i+1;
+            temp_calendar.set(Calendar.DAY_OF_YEAR,day_index);
+            int tempYear = temp_calendar.get(Calendar.YEAR);
+            int tempMonth  = temp_calendar.get(Calendar.MONTH)+1;
+            int temp_day_month =  temp_calendar.get(Calendar.DAY_OF_MONTH);
+
+            int temp_xiniq = temp_calendar.get(Calendar.DAY_OF_WEEK) - 1;  //
+            if(temp_xiniq != xinqi){
+                continue;   // 不是该星期那么 继续下一次循环
+            }
+
+            String temp_day_month_str =  temp_day_month>=10?temp_day_month+"":"0"+temp_day_month;
+            String tempMonth_str =  tempMonth>=10?tempMonth+"":"0"+tempMonth;
+            String dayIntFlag = tempYear+tempMonth_str+temp_day_month_str;
+            int temp_day_int_flag = Integer.parseInt(dayIntFlag);
+            //  System.out.println("tempYear = "+ tempYear + " tempMonth="+tempMonth+"   "+  "temp_day_int_flag = "+ temp_day_int_flag +"  temp_xiniq = "+ temp_xiniq   + "   day = "+ day);
+            if(temp_day_int_flag == day){
+                return  index;
+            }
+            index++;
+
+
+        }
+        return index;
+
+
+    }
+
+    @SuppressWarnings("unchecked")
+     static void getKeyAndValue(Map<Integer,ArrayList<Integer>> mMapParam){
+        Map.Entry<Integer , ArrayList<Integer>> entryItem;
+        if(mMapParam != null){
+            Iterator iterator = mMapParam.entrySet().iterator();
+            while( iterator.hasNext() ){
+                entryItem = (Map.Entry<Integer , ArrayList<Integer>>) iterator.next();
+                Integer year =   entryItem.getKey();   //Map的Key
+                ArrayList<Integer> year_day =  entryItem.getValue();  //Map的Value
+                System.out.println("=========="+year + "  =========");
+                for (int i = 0; i <year_day.size() ; i++) {
+                    System.out.println("key = "+year + "  value["+i+"] = "+ year_day.get(i) );
+                }
+            }
+        }
+    }
+
     //## 1990.01.01   --- 1999.12.31 Space=10   End
 // ArrayList<ArrayList<String>> init_Year_Pair_List(int year_space)  End
 
@@ -3650,7 +4413,21 @@ static void RestoreProp_TreeNode(){
 
             //  没有中文的 cname 所以添加额外的代码 添加 cname
 
-            case "rixianhangqing":
+
+            case "zhouxianhangqing-time":
+                bodyPath = Python_BodyTemplate_6;
+                break;
+
+            case "rixianhangqing-time":
+                bodyPath = Python_BodyTemplate_5;
+                break;
+
+
+            case "yuexianhangqing-time":
+                bodyPath = Python_BodyTemplate_7;
+                break;
+
+
             case "shangshigongsiguanliceng":
             case "shangshigongsijibenxinxi":
             case "hushengutongchengfengu":
@@ -3679,6 +4456,6 @@ static void RestoreProp_TreeNode(){
         return headPath;
     }
     static int  x_tscode_num_default = 50;   // xcode ts_code 的默认的个数
-    static int default_space_year = 10;   // 11xstart_date  11xend_date  时间间隔的长度 单位年
+    static int default_space_year = 10;   // 11ystart_date  11yend_date  时间间隔的长度 单位年 y  10ystart_date
 
 }
