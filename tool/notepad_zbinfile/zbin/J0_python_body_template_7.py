@@ -24,6 +24,7 @@
 #  《Method_Call_Template_2》= 《【ZHoldPlace_pythonMethodName】_【ZHoldPlace_Year_Int】_excel_writer.save()》
 
 
+#  《Tail_Define_Template_1》= 《J0_PROPS.put(tree_node_name+"record_date", "【ZHoldPlace_TomorrowDay_YYYYMMDD】")       ###  更新 记录日期》
 
 
 

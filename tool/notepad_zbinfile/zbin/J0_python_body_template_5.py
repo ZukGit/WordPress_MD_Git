@@ -23,8 +23,7 @@
 #  《Method_Call_Template_2》= 《【ZHoldPlace_pythonMethodName】_【ZHoldPlace_day_date】_addname_dataframe.to_excel(【ZHoldPlace_pythonMethodName】_【ZHoldPlace_Mstart_date】_excel_writer,'【ZHoldPlace_DayMonthIndex_Xinqi】',index=False)》
 #  《Method_Call_Template_2》= 《【ZHoldPlace_pythonMethodName】_【ZHoldPlace_Mstart_date】_excel_writer.save()》
 
-#  《Tail_Define_Template_2》= 《J0_PROPS.put(tree_node_name+"record_date", "【ZHoldPlace_Now_YYYYMMDD】")       ###  更新 记录日期》
-
+#  《Tail_Define_Template_1》= 《J0_PROPS.put(tree_node_name+"record_date", "【ZHoldPlace_TomorrowDay_YYYYMMDD】")       ###  更新 记录日期》
 
 
 

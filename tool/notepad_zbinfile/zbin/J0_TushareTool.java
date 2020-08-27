@@ -12,6 +12,7 @@ import java.net.URLConnection;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributeView;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -118,9 +119,13 @@ public class J0_TushareTool {
 
     static String TreeDataPath = zbinPath + File.separator + "J0_treedata.txt";
     static String Python_HeadTemplate_Path = zbinPath + File.separator +"J0_python_head_template.py";
+
+
+
+    //  没有 ts_code 列的 并且
     static String Python_BodyTemplate_1 = zbinPath + File.separator +"J0_python_body_template_1.py";
 
-    // 填充  ts_code 中文名称的模板
+    // 填充  ts_code 中文名称的模板  并且 持续追加到 一个 dataframe 中
     static String Python_BodyTemplate_2 = zbinPath + File.separator +"J0_python_body_template_2.py";
 
     // 填充  ts_code 中文名称的模板  并且有检测 小于 xlsx最大行数  1048576 的判断
@@ -137,6 +142,11 @@ public class J0_TushareTool {
 
     // 依据时间月份分隔的 判断    以一年中的每个月为sheet 把一年的数据整合到一个xlsx 从2010年开始 201001 201002  月线行情
     static String Python_BodyTemplate_7 = zbinPath + File.separator +"J0_python_body_template_7.py";
+
+
+    //  从  开年第一天  到目前的天数  十大港股通  以每个月为sheet 每个月中的数据 追加到 一个 sheet 中 (有 日线的特点 也有月线的特点)
+    static String Python_BodyTemplate_8 = zbinPath + File.separator +"J0_python_body_template_8.py";
+
 
 
 
@@ -1756,6 +1766,37 @@ public class J0_TushareTool {
     }
 
 
+
+
+
+    static int getTimeStamp_YYYYMMDD_BeginIntFlag() {
+
+        Calendar calendar = Calendar.getInstance();
+        int year = calendar.get(Calendar.YEAR);
+        String beginDayDesc = year+"0101";
+
+        return Integer.parseInt(beginDayDesc);
+    }
+
+
+    static int getTimeStamp_YYYYMMDD_EndIntFlag() {
+
+        Calendar calendar = Calendar.getInstance();
+        int year = calendar.get(Calendar.YEAR);
+        String beginDayDesc = year+"1231";
+
+        return Integer.parseInt(beginDayDesc);
+    }
+
+
+
+    static int getTimeStamp_YYYYMMDD_IntFlag() {
+
+        SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd");//设置日期格式
+        String date = df.format(new Date());
+        return Integer.parseInt(date);
+    }
+
     static String getTimeStamp_YYYYMMDD() {
 
         SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd");//设置日期格式
@@ -1987,7 +2028,10 @@ public class J0_TushareTool {
 
 
         initTreeData();
+        initTradeDayList();
+        SH_Tomorrow_WorkTrade_Day_Int = getTomorrowTradeDay(SH_Last_Trade_Day_Int);
         initTsCodeList();
+
 
 
 /*
@@ -2373,6 +2417,7 @@ public class J0_TushareTool {
         void initHoldeMap(){
             python_holder_map = new HashMap<String,String>();
 
+            // 在  template.py 中的静态变量
             python_holder_map.put("【ZHoldPlace_Title】",get_ZHoldPlace_Title());
             python_holder_map.put("【ZHoldPlace_pythonMethodName】",get_ZHoldPlace_pythonMethodName());
             python_holder_map.put("【ZHoldPlace_fieldList】",get_ZHoldPlace_fieldList());
@@ -2382,6 +2427,63 @@ public class J0_TushareTool {
             python_holder_map.put("【ZHoldPlace_Now_YYYYMMDD】",getTimeStamp_YYYYMMDD());
             python_holder_map.put("【ZHoldPlace_J0_Dir_PATH】",fixedPythonFilePath(J0_Dir_Path));
             python_holder_map.put("【ZHoldPlace_Node_Website】",leaf_web_sit);
+            python_holder_map.put("【ZHoldPlace_TomorrowDay_YYYYMMDD】",SH_Tomorrow_WorkTrade_Day_Int+"");
+
+
+            //在 treedata.txt 中的静态变量   固定的 指代当前最新的日期
+            python_holder_map.put("last_trade_date=''","trade_date="+"'"+SH_Last_Trade_Day_Int+"'");
+            python_holder_map.put("last_start_date=''","start_date="+"'"+SH_Last_Trade_Day_Int+"'");
+            python_holder_map.put("last_end_date=''","end_date="+"'"+SH_Last_Trade_Day_Int+"'");
+
+            //            last_trade_date
+            int old_1_day_intflag = getFutureDayFlag(SH_Last_Trade_Day_Int,-1);
+            int old_7_day_intflag = getFutureDayFlag(SH_Last_Trade_Day_Int,-7);
+            int old_30_day_intflag = getFutureDayFlag(SH_Last_Trade_Day_Int,-31);
+            int old_90_day_intflag = getFutureDayFlag(SH_Last_Trade_Day_Int,-90);
+
+            int future_1_day_intflag = getFutureDayFlag(SH_Last_Trade_Day_Int,1);
+            int future_7_day_intflag = getFutureDayFlag(SH_Last_Trade_Day_Int,7);
+            int future_30_day_intflag = getFutureDayFlag(SH_Last_Trade_Day_Int,31);
+            int future_90_day_intflag = getFutureDayFlag(SH_Last_Trade_Day_Int,90);
+
+            int old_yearbegin_day =  getYearBeginIntFlag(SH_Last_Trade_Day_Int);
+            int next_yearbegin_day =  getNextYearBeginIntFlag(SH_Last_Trade_Day_Int);
+
+            System.out.println("today = "+ SH_Last_Trade_Day_Int + " -7="+old_7_day_intflag+"   -31="+old_30_day_intflag+" -90="+old_90_day_intflag+"  7="+future_7_day_intflag+"  31="+future_30_day_intflag+"   90="+future_90_day_intflag);
+
+            //  当前日志 的  过去 1周  1个月 1个季度 以及未来的  1星期 1个月  1个季度
+            python_holder_map.put("onefuture_start_date=''","start_date="+"'"+future_1_day_intflag+"'");
+            python_holder_map.put("wfuture_start_date=''","start_date="+"'"+future_7_day_intflag+"'");
+            python_holder_map.put("mfuture_start_date=''","start_date="+"'"+future_30_day_intflag+"'");
+            python_holder_map.put("sfuture_start_date=''","start_date="+"'"+future_90_day_intflag+"'");
+            python_holder_map.put("curyearbegin_start_date=''","start_date="+"'"+old_yearbegin_day+"'");
+            python_holder_map.put("nextyearbegin_start_date=''","start_date="+"'"+next_yearbegin_day+"'");
+            python_holder_map.put("oneago_start_date=''","start_date="+"'"+ old_1_day_intflag+"'");
+            python_holder_map.put("wago_start_date=''","start_date="+"'"+old_7_day_intflag+"'");
+            python_holder_map.put("mago_start_date=''","start_date="+"'"+old_30_day_intflag+"'");
+            python_holder_map.put("sago_start_date=''","start_date="+"'"+old_90_day_intflag+"'");
+
+            python_holder_map.put("curyearbegin_end_date=''","end_date="+"'"+old_yearbegin_day+"'");
+            python_holder_map.put("nextyearbegin_end_date=''","end_date="+"'"+next_yearbegin_day+"'");
+            python_holder_map.put("nefuture_end_date=''","end_date="+"'"+future_1_day_intflag+"'");
+            python_holder_map.put("wfuture_end_date=''","end_date="+"'"+future_7_day_intflag+"'");
+            python_holder_map.put("mfuture_end_date=''","end_date="+"'"+future_30_day_intflag+"'");
+            python_holder_map.put("sfuture_end_date=''","end_date="+"'"+future_90_day_intflag+"'");
+            python_holder_map.put("oneago_end_date=''","end_date="+"'"+old_1_day_intflag+"'");
+            python_holder_map.put("wago_end_date=''","end_date="+"'"+old_7_day_intflag+"'");
+            python_holder_map.put("mago_end_date=''","end_date="+"'"+old_30_day_intflag+"'");
+            python_holder_map.put("sago_end_date=''","end_date="+"'"+old_90_day_intflag+"'");
+
+            python_holder_map.put("curyearbegin_trade_date=''","trade_date="+"'"+old_yearbegin_day+"'");
+            python_holder_map.put("nextyearbegin_trade_date=''","trade_date="+"'"+next_yearbegin_day+"'");
+            python_holder_map.put("onefuture_trade_date =''","trade_date ="+"'"+future_1_day_intflag+"'");
+            python_holder_map.put("wfuture_trade_date =''","trade_date ="+"'"+future_7_day_intflag+"'");
+            python_holder_map.put("mfuture_trade_date =''","trade_date ="+"'"+future_30_day_intflag+"'");
+            python_holder_map.put("sfuture_trade_date =''","trade_date ="+"'"+future_90_day_intflag+"'");
+            python_holder_map.put("oneago_trade_date =''","trade_date ="+"'"+old_1_day_intflag+"'");
+            python_holder_map.put("wago_trade_date =''","trade_date ="+"'"+old_7_day_intflag+"'");
+            python_holder_map.put("mago_trade_date =''","trade_date ="+"'"+old_30_day_intflag+"'");
+            python_holder_map.put("sago_trade_date =''","trade_date ="+"'"+old_90_day_intflag+"'");
 
 
             // 【ZHoldPlace_J0_Dir_PATH】   J0 目录的Dir位置    固定 死的 J0_Dir_Path
@@ -2393,6 +2495,25 @@ public class J0_TushareTool {
         // 【ZHoldPlace_DayMonthIndex_Xinqi】    每个月的月   几号_星期  1_1   2_3
             // 【ZHoldPlace_DayIndex】    每个月的 好数
         }
+
+
+
+        int     getNextYearBeginIntFlag(int dayFlagInt){
+            String yearStr = (""+dayFlagInt).substring(0,4);
+            int year = Integer.parseInt(yearStr) -1;
+            String nextYearBegin = year+"0101";
+            return Integer.parseInt(nextYearBegin);
+
+        }
+
+
+        int     getYearBeginIntFlag(int dayFlagInt){
+            String yearStr = (""+dayFlagInt).substring(0,4);
+            String dayDesc = yearStr+"0101";
+            return Integer.parseInt(dayDesc);
+
+        }
+
 
 
      String   fixedPythonFilePath(String path){
@@ -2609,8 +2730,9 @@ boolean isOperationType4_Wtrade_date(ArrayList<String> fieldParamList){
           // 3. 以 (1mstart_date#1mend_date#1dtrade_date) rixianhangqing-time  以每个月为  【日线行情】
  // 3.1  以月份为分隔  201001  201012  202008 这样的时间分类   把当前日期 每月中包含每天的sheet  sheet的内容是当天的日志信息
           // 4. 以(wtrade_date)   标识把当前的以 从 zhouxianhangqing-time_record_date=20101101 为起点 计算 每年 到现在的每个周五的集合
-            //
-
+            // 5. 月线行情 (mtrade_date)
+            //6. 最新复现因子  (last_trade_date)
+            // 7. 沪深股通十大成交股 (yeartonow_trade_date)
            int  operation_type  = 0;    // zukgit    //  当前处理的类型分类
 
 
@@ -2681,6 +2803,12 @@ boolean isOperationType4_Wtrade_date(ArrayList<String> fieldParamList){
             }else if(fieldParamList.size() ==1 && isOperationType5_Mtrade_date(fieldParamList)){ // 月线
                 operation_type = 5;
                 paramXcode =  fieldParamList.get(0);
+            }else if(fieldParamList.size() ==1 && fieldParamList.get(0).contains("last_trade_date")){ // 复权因子
+                operation_type = 6;
+                paramXcode =  fieldParamList.get(0);
+            }else if(fieldParamList.size() ==1 && fieldParamList.get(0).contains("yeartonow_trade_date")){ // 复权因子
+                operation_type = 7;
+                paramXcode =  fieldParamList.get(0);
             }
 
             // 50xtscode 处理 地方 在这里
@@ -2707,6 +2835,8 @@ boolean isOperationType4_Wtrade_date(ArrayList<String> fieldParamList){
                         if(fillText.contains("【ZHoldPlace_propKey2ValueList】")){
                             fillText =     fillText.replace("【ZHoldPlace_propKey2ValueList】",fieldItem);
                         }
+
+                        fillText =  HolderReplaceOperation_Static(fillText);
                         System.out.println("Body_ori_Code["+i+"]  = "+ fillText);
                         python_method_call_List_Code.add(fillText);
 
@@ -2863,13 +2993,20 @@ boolean isOperationType4_Wtrade_date(ArrayList<String> fieldParamList){
 
                     for (int j = 0; j < days_month; j++) {
                         int day_index = j+1;
+                        String daystr =  day_index>=10?day_index+"":"0"+day_index;
+
 
 //                        System.out.println("yearStr = "+yearStr+"  monthInt =  "+monthStr+"   day_index = "+day_index +" 星期:"+calculXinQi2Chinese(yearInt,monthInt,day_index));
-                        String daystr =  day_index>=10?day_index+"":"0"+day_index;
+
                         String daydesc = ""+curYear_Month+daystr;
                         int itemDay = Integer.parseInt(daydesc);
-                        if(itemDay > nowIntFlag){
+                        // 当前的调用日期 超过 今天   或者调用日期是 非交易日  那么 就不调用这个 日期
+                        if(itemDay > nowIntFlag || SH_No_TradeDayList.contains(itemDay)){
                             continue;
+                        }
+                        SH_TradeDayList_FromNow.add(itemDay);
+                        if(itemDay >= SH_Now_Year_BeginTradeDay_IntFlag && itemDay <= SH_Now_Year_EndTradeDay_IntFlag){
+                            SH_Now_Year_TradeDayList_FromNow.add(itemDay);
                         }
 //                        System.out.println("days["+day_index+"] = "+daydesc);
                         for (int k = 0; k < code_template_2_List.size(); k++) {
@@ -2962,6 +3099,8 @@ boolean isOperationType4_Wtrade_date(ArrayList<String> fieldParamList){
                           }
                           fridayIntList.add(cur_friday_int_flag);
                       }
+
+
                     }
                 }
 
@@ -3029,13 +3168,12 @@ boolean isOperationType4_Wtrade_date(ArrayList<String> fieldParamList){
                                 python_method_call_List_Code.add(fixed_recyleCodeItem);
                             }
 
-                            // zukgit
 
 
                         }
                     }
                 }
-            }else if(operation_type == 5){  //  周线行情 处理
+            }else if(operation_type == 5){  //  月线行情 处理
                 paramXcode =  fieldParamList.get(0);
                 // 1mstart_date#1mend_date#1dtrade_date
                 String propStartDay = getPropValue("start_date");   // prop 中设置的 起始日期 20010101
@@ -3067,9 +3205,14 @@ boolean isOperationType4_Wtrade_date(ArrayList<String> fieldParamList){
                     // 每个月的最后一个工作日
                     int end_work_day_for_month = getEndWorkDayForMonth(yearInt, monthInt);
                     if(end_work_day_for_month < nowIntFlag && end_work_day_for_month >  recordDayFlag){
+                        while(!SH_TradeDayList.contains(end_work_day_for_month)){
+                            end_work_day_for_month = end_work_day_for_month - 1;
+                        }
                         EndWorkDayInMonthList.add(end_work_day_for_month);
+                        if(!SH_EndMonth_TradeDayList.contains(end_work_day_for_month)){
+                            SH_EndMonth_TradeDayList.add(end_work_day_for_month);
+                        }
                     }
-
                 }
 
                 Map<Integer,ArrayList<Integer>> year_firday_map = fenlei_for_allFridayArr(EndWorkDayInMonthList);
@@ -3147,7 +3290,7 @@ boolean isOperationType4_Wtrade_date(ArrayList<String> fieldParamList){
                                 python_method_call_List_Code.add(fixed_recyleCodeItem);
                             }
 
-                            // zukgit
+
 
 
                         }
@@ -3157,6 +3300,162 @@ boolean isOperationType4_Wtrade_date(ArrayList<String> fieldParamList){
 
 
 
+
+            }else if(operation_type == 6){  //  adj_factor  复权因子 月线行情 处理
+
+//   zukgit
+               paramXcode =  fieldParamList.get(0);
+               int define_Index = 0;
+
+                for (int i = 0; i < callMethodTemplateList.size(); i++) {
+                    String methodText = callMethodTemplateList.get(i);
+                    String fillText =  HolderReplaceOperation_Static(methodText);
+                    // get  定义接收变量的名称
+
+                    if(fillText.contains("【ZHoldPlace_propKey2ValueList_Index】")){
+                        String defineVariable = pythonMethodName+"_item_"+define_Index;
+                        fillText =     fillText.replace("【ZHoldPlace_propKey2ValueList_Index】",defineVariable);
+                    }
+                    if(fillText.contains("【ZHoldPlace_propKey2ValueList】")){
+                        fillText =     fillText.replace("【ZHoldPlace_propKey2ValueList】",paramXcode);
+                    }
+
+                    fillText =  HolderReplaceOperation_Static(fillText);
+//                    System.out.println("operation_type == 6 -> fillText = "+ fillText);
+                    python_method_call_List_Code.add(fillText);
+
+                }
+                define_Index++;
+
+                python_method_call_List_Code.add("\n");
+
+                }else if(operation_type == 7){
+
+                paramXcode =  fieldParamList.get(0);
+                // 1mstart_date#1mend_date#1dtrade_date
+                String propStartDay = getPropValue("start_date");   // prop 中设置的 起始日期 20010101
+                String propRecordDay = getPropValue("record_date");  // peop 中记录的record的日期 20200707
+                if(propRecordDay == null || "".equals(propRecordDay)){
+                    propRecordDay = "20200101";
+                }
+                if(propStartDay == null || "".equals(propStartDay)){
+                    propStartDay = "20200101";
+                }
+
+
+                int nowFlag = getTimeStamp_YYYYMMDD_IntFlag();
+                int recordRecord = Integer.parseInt(propRecordDay);
+                String recordYearStr = propStartDay.substring(0,4);
+
+                // 在 今年的工作列表中 找到 比当前记录的大的那些列表 组成一个Map MAP的头为  月份数据 1 2 3 4
+
+                Map<Integer,ArrayList<Integer>> monthMapList = guolv_Month_TradeDay_Map(SH_Now_Year_TradeDayList_FromNow,recordRecord);
+
+                ArrayList<String> code_template_1_List =   mMethod_Call_Template_Map.get("1");
+                ArrayList<String> code_template_2_List =   mMethod_Call_Template_Map.get("2");
+                ArrayList<String> code_template_3_List =   mMethod_Call_Template_Map.get("3");
+                ArrayList<String> code_template_4_List =   mMethod_Call_Template_Map.get("4");
+
+
+                for (int i = 0; i < code_template_1_List.size() ; i++) {
+                    String methodText_1 = code_template_1_List.get(i);
+                    String fillText =  HolderReplaceOperation_Static(methodText_1);
+                    if(fillText.contains("【ZHoldPlace_Year_Int】")){
+                        fillText =     fillText.replace("【ZHoldPlace_Year_Int】",recordYearStr);
+                    }
+                    fillText =  HolderReplaceOperation_Static(fillText);
+//                    System.out.println("operation_type == 6 -> fillText = "+ fillText);
+                    python_method_call_List_Code.add(fillText);
+                }
+
+
+                Map.Entry<Integer , ArrayList<Integer>> entryItem;
+                if(monthMapList != null){
+                    Iterator iterator = monthMapList.entrySet().iterator();
+                    while( iterator.hasNext() ){
+                        entryItem = (Map.Entry<Integer , ArrayList<Integer>>) iterator.next();
+                        Integer MonthIndex =   entryItem.getKey();   //Map的Key    月份
+                        ArrayList<Integer> month_tradedayList =  entryItem.getValue();  //Map的Value   工作日
+
+                        for (int i = 0; i < code_template_2_List.size(); i++) {
+                            String methodText_2 = code_template_2_List.get(i);
+                            String fillText =  HolderReplaceOperation_Static(methodText_2);
+                            if(fillText.contains("【ZHoldPlace_Year_Int】")){
+                                fillText =     fillText.replace("【ZHoldPlace_Year_Int】",recordYearStr);
+                            }
+                            if(fillText.contains("【ZHoldPlace_Month_Index】")){
+                                fillText =     fillText.replace("【ZHoldPlace_Month_Index】",""+MonthIndex);
+                            }
+                            fillText =  HolderReplaceOperation_Static(fillText);
+//                    System.out.println("operation_type == 6 -> fillText = "+ fillText);
+                            python_method_call_List_Code.add(fillText);
+                        }
+
+
+//                        System.out.println("=========="+year + "  =========");
+                        for (int i = 0; i <month_tradedayList.size() ; i++) {
+                            int month_tradeday = month_tradedayList.get(i);
+
+
+                            for (int j = 0; j < code_template_3_List.size(); j++) {
+
+                                String methodText_3 = code_template_3_List.get(j);
+                                String fillText =  HolderReplaceOperation_Static(methodText_3);
+                                if(fillText.contains("【ZHoldPlace_Year_Int】")){
+                                    fillText =     fillText.replace("【ZHoldPlace_Year_Int】",recordYearStr);
+                                }
+                                if(fillText.contains("【ZHoldPlace_Month_Index】")){
+                                    fillText =     fillText.replace("【ZHoldPlace_Month_Index】",""+MonthIndex);
+                                }
+
+                                if(fillText.contains("【ZHoldPlace_OPERATION_DAY】")){
+                                    fillText =     fillText.replace("【ZHoldPlace_OPERATION_DAY】",""+month_tradeday);
+                                }
+
+                                if(fillText.contains("【ZHoldPlace_propKey2ValueList_Index】")){
+                                    String defineVariable = pythonMethodName+"_item_"+i;
+                                    fillText =     fillText.replace("【ZHoldPlace_propKey2ValueList_Index】",defineVariable);
+                                }
+                                if(fillText.contains("【ZHoldPlace_propKey2ValueList】")){
+                                    fillText =     fillText.replace("【ZHoldPlace_propKey2ValueList】",paramXcode);
+                                }
+
+                                if(fillText.contains("yeartonow_trade_date=''")){
+                                    fillText =     fillText.replace("yeartonow_trade_date=''","trade_date="+"'"+month_tradeday+"'");
+                                }
+
+
+
+
+
+                                fillText =  HolderReplaceOperation_Static(fillText);
+//                    System.out.println("operation_type == 6 -> fillText = "+ fillText);
+                                python_method_call_List_Code.add(fillText);
+                            }
+//                            System.out.println("key = "+year + "  value["+i+"] = "+ year_day.get(i) );
+
+
+
+
+                        }
+
+                        for (int i = 0; i < code_template_4_List.size(); i++) {
+                            String methodText_4 = code_template_4_List.get(i);
+                            String fillText =  HolderReplaceOperation_Static(methodText_4);
+                            if(fillText.contains("【ZHoldPlace_Year_Int】")){
+                                fillText =     fillText.replace("【ZHoldPlace_Year_Int】",recordYearStr);
+                            }
+                            if(fillText.contains("【ZHoldPlace_Month_Index】")){
+                                fillText =     fillText.replace("【ZHoldPlace_Month_Index】",""+MonthIndex);
+                            }
+
+                            fillText =  HolderReplaceOperation_Static(fillText);
+//                    System.out.println("operation_type == 6 -> fillText = "+ fillText);
+                            python_method_call_List_Code.add(fillText);
+
+                        }
+                    }
+                }
 
             }
 
@@ -3847,11 +4146,46 @@ boolean isOperationType4_Wtrade_date(ArrayList<String> fieldParamList){
     }
 
     static String J0_GuPiaoLieBiao_Path = zbinPath+File.separator+"J0_股票列表.xlsx";
-    static void  initTsCodeList(){
-// TScode_List
-        File ts_code_File = new File(J0_GuPiaoLieBiao_Path);
-        if(!ts_code_File.exists()){
-            System.out.println("当前 没有 基础数据文件( 请添置该文件 ) J0_GuPiaoLieBiao_Path ="+ J0_GuPiaoLieBiao_Path);
+    static String J0_JiaoYiRiQi_Path = zbinPath+File.separator+"J0_交易日历.xlsx";
+
+
+
+
+    static   ArrayList<Integer> HK_TradeDayList = new   ArrayList<Integer>();  // 香港股市交易日列表
+
+    static   ArrayList<Integer> HK_No_TradeDayList = new   ArrayList<Integer>();  // 香港股市 非 股市交易日列表
+
+    static   ArrayList<Integer> SH_TradeDayList = new   ArrayList<Integer>(); // 大陆 非交易日列表
+    static   ArrayList<Integer> SH_No_TradeDayList = new   ArrayList<Integer>(); // 大陆 股市非交易日列表
+
+    //  截止到目前的 交易日期
+    static   ArrayList<Integer> SH_TradeDayList_FromNow = new   ArrayList<Integer>(); // 大陆 交易日列表 截止到目前的
+
+   // SH_Now_Year_TradeDayList_FromNow
+
+    //    从今年年初 到现在的  交易的日集合
+    static   ArrayList<Integer> SH_Now_Year_TradeDayList_FromNow = new   ArrayList<Integer>(); // 大陆 交易日列表 截止到目前的
+
+
+
+    // 从2010.01.01 每周最后面那个交易日
+    static   ArrayList<Integer> SH_EndWeek_TradeDayList = new   ArrayList<Integer>(); // 大陆 股市非交易日列表
+    // 从2010.01.01 每月最后面那个交易日
+    static   ArrayList<Integer> SH_EndMonth_TradeDayList = new   ArrayList<Integer>(); // 大陆 股市非交易日列表
+
+    // 记录当前最新的交易日  今天是工作日的话 那么就是今天  如果不是交易日 那么就是离他最近的交易日
+    static int SH_Last_Trade_Day_Int = getTimeStamp_YYYYMMDD_IntFlag();
+    static int  SH_Tomorrow_WorkTrade_Day_Int = SH_Last_Trade_Day_Int+1;
+
+
+    static int SH_Now_Year_BeginTradeDay_IntFlag = getTimeStamp_YYYYMMDD_BeginIntFlag();
+    static int SH_Now_Year_EndTradeDay_IntFlag = getTimeStamp_YYYYMMDD_EndIntFlag();
+
+
+    static void  initTradeDayList(){
+        File tradeDayFile = new File(J0_JiaoYiRiQi_Path);
+        if(!tradeDayFile.exists()){
+            System.out.println("当前 没有 基础数据文件【交易日历.xlsx】( 请添置该文件 ) J0_JiaoYiRiQi_Path ="+ J0_JiaoYiRiQi_Path);
             return;
         }
 
@@ -3860,9 +4194,133 @@ boolean isOperationType4_Wtrade_date(ArrayList<String> fieldParamList){
         Row row = null;
         List<Map<String,String>> list = null;
         String cellData = null;
+        String filePath = tradeDayFile.getAbsolutePath();
+        System.out.println("J0_JiaoYiRiQi_Path xlsx Path = "+ filePath);
+        String columns[] = {"exchange","cal_date","is_open","pretrade_date"};
+        wb = readExcel(filePath);
+
+        if(wb != null){
+            //用来存放表中数据
+            list = new ArrayList<Map<String,String>>();
+            //获取第一个sheet
+//            sheet = wb.getSheet("股票列表");
+//            sheet = wb.getSheetAt(0);
+            sheet = wb.getSheet("交易日历");
+            //获取最大行数
+            int rownum = sheet.getPhysicalNumberOfRows();
+            //获取第一行
+            row = sheet.getRow(0);
+            //获取最大列数
+            int colnum = row.getPhysicalNumberOfCells();
+            for (int i = 1; i<rownum; i++) {
+                Map<String,String> map = new LinkedHashMap<String,String>();
+                row = sheet.getRow(i);
+                if(row !=null){
+                    for (int j=0;j<colnum;j++){
+                        cellData = (String) getCellFormatValue(row.getCell(j));
+                        map.put(columns[j], cellData);
+                    }
+                }else{
+                    break;
+                }
+                list.add(map);
+            }
+        }
+
+        String SH_TAG = "SSE";
+        String HK_TAG = "XHKG";
+        //遍历解析出来的list
+      first:  for (Map<String,String> map : list) {
+        second:     for (Map.Entry<String,String> entry : map.entrySet()) {
+//                System.out.print(entry.getKey()+":"+entry.getValue()+",");
+
+                if("exchange".equals(entry.getKey()) && SH_TAG.equals(entry.getValue()) ){
+                    addSHTradeDay(map);
+                     break ;
+                }else if("exchange".equals(entry.getKey()) && HK_TAG.equals(entry.getValue())  ){
+                    addHKTradeDay(map);
+                    break ;
+                }
+                //    System.out.println(" entry.getKey() = "+entry.getKey() + "   entry.getValue() = "+ entry.getValue()+"【Over】");
+            }
+//            System.out.println();
+        }
+
+        //    HK_TradeDayList =
+//    SH_TradeDayList =
+//    HK_No_TradeDayList
+//    SH_No_TradeDayList
+
+//        showTradeDayList(SH_TradeDayList,"上证交易日");
+//        showTradeDayList(SH_No_TradeDayList,"上证非交易日");
+//        showTradeDayList(HK_TradeDayList,"港市交易日");
+//        showTradeDayList(HK_No_TradeDayList,"港市非交易日");
+
+
+      while(!SH_TradeDayList.contains(SH_Last_Trade_Day_Int)){
+          SH_Last_Trade_Day_Int = SH_Last_Trade_Day_Int - 1;
+      }
+
+
+    }
+
+    static void showTradeDayList(ArrayList<Integer> tradeList ,String title){
+        System.out.println("═══════交易市场 "+title+"═════");
+        for (int i = 0; i < tradeList.size(); i++) {
+            int dayIntLag = tradeList.get(i);
+            System.out.println("交易日索引[ "+i+" ] = "+ dayIntLag + "   tip:"+title);
+        }
+    }
+
+    static void   addHKTradeDay(Map<String,String> map ){
+        String isopen = map.get("is_open").trim();
+        String cal_date =  map.get("cal_date").trim();
+        float isOpenInt = Float.parseFloat(isopen);
+        int dayIntFlag = Integer.parseInt(cal_date);
+        if(isOpenInt == 0){
+            HK_No_TradeDayList.add(dayIntFlag);
+        }else{
+            HK_TradeDayList.add(dayIntFlag);
+        }
+
+    }
+//    HK_TradeDayList =
+//    SH_TradeDayList =
+//    HK_No_TradeDayList
+//    SH_No_TradeDayList
+    static void   addSHTradeDay(Map<String,String> map ){
+        // addSHTradeDay  isopen = 1.0     cal_date = 19910418
+        // 1.0 转为 int  报错
+        String isopen = map.get("is_open").trim();
+        float isOpenInt = Float.parseFloat(isopen);
+        String cal_date =  map.get("cal_date").trim();
+     //   System.out.println("addSHTradeDay  isopen = "+isopen + "   isOpenInt ="+isOpenInt+  "     cal_date = "+ cal_date);
+        int dayIntFlag = Integer.parseInt(cal_date);
+        if(isOpenInt == 0){
+            SH_No_TradeDayList.add(dayIntFlag);
+        }else{
+            SH_TradeDayList.add(dayIntFlag);
+        }
+
+    }
+
+    static void  initTsCodeList(){
+// TScode_List
+        File ts_code_File = new File(J0_GuPiaoLieBiao_Path);
+        if(!ts_code_File.exists()){
+            System.out.println("当前 没有 基础数据文件【股票列表.xlsx】( 请添置该文件 ) J0_GuPiaoLieBiao_Path ="+ J0_GuPiaoLieBiao_Path);
+            return;
+        }
+
+
+        Workbook wb =null;
+        Sheet sheet = null;
+        Row row = null;
+        List<Map<String,String>> list = null;
+        String cellData = null;
         String filePath = ts_code_File.getAbsolutePath();
         System.out.println("xlsx Path = "+ filePath);
-        String columns[] = {"","ts_code","symbol","name","area","industry","fullname","enname","market","exchange","curr_type","list_status","list_date","delist_date","is_hs"};
+        String columns[] = {"ts_code","symbol","name","area","industry","fullname","enname","market","exchange","curr_type","list_status","list_date","delist_date","is_hs"};
         wb = readExcel(filePath);
 
         if(wb != null){
@@ -3893,12 +4351,17 @@ boolean isOperationType4_Wtrade_date(ArrayList<String> fieldParamList){
             }
         }
         //遍历解析出来的list
+
+
         for (Map<String,String> map : list) {
             for (Map.Entry<String,String> entry : map.entrySet()) {
 //                System.out.print(entry.getKey()+":"+entry.getValue()+",");
+
                 if("ts_code".equals(entry.getKey())){
                     TScode_List.add(entry.getValue());
                 }
+
+
                 //    System.out.println(" entry.getKey() = "+entry.getKey() + "   entry.getValue() = "+ entry.getValue()+"【Over】");
             }
 //            System.out.println();
@@ -4193,18 +4656,53 @@ boolean isOperationType4_Wtrade_date(ArrayList<String> fieldParamList){
         return days;
     }
 
+
+    static Map<Integer,ArrayList<Integer>>  guolv_Month_TradeDay_Map(  ArrayList<Integer> yearWorkDayIntList , int compareIntFlag ){
+        Map<Integer,ArrayList<Integer>> cur_month_tradeday_map = Maps.newLinkedHashMap();
+
+        int nowFlag = getTimeStamp_YYYYMMDD_IntFlag();
+        for (int i = 0; i < yearWorkDayIntList.size(); i++) {
+
+            int dayItem = yearWorkDayIntList.get(i);
+            if(dayItem < compareIntFlag || dayItem > nowFlag){
+                continue;
+            }
+            int monthDescInt = Integer.parseInt((""+dayItem).substring(4,6));
+            if(cur_month_tradeday_map.get(monthDescInt) == null){
+                ArrayList<Integer> dayList = new ArrayList<Integer>();
+                cur_month_tradeday_map.put(monthDescInt,dayList);
+            }
+            ArrayList<Integer> curDayList =    cur_month_tradeday_map.get(monthDescInt);
+            if(!curDayList.contains(dayItem)){
+                curDayList.add(dayItem);
+            }
+        }
+
+        return cur_month_tradeday_map;
+
+    }
     static Map<Integer,ArrayList<Integer>>  fenlei_for_allFridayArr(  ArrayList<Integer> fridayIntList){
 
         Map<Integer,ArrayList<Integer>> year_friday_map = Maps.newLinkedHashMap();
         for (int i = 0; i < fridayIntList.size(); i++) {
             int day = fridayIntList.get(i);
+              while(!SH_TradeDayList.contains(day)){   // 20201001 ---- 20201000 20200999  20200930
+                  day = day - 1;
+              }
+
             int year = Integer.parseInt((""+day).substring(0,4));
             if(year_friday_map.get(year) == null){
                 ArrayList<Integer> dayList = new ArrayList<Integer>();
                 year_friday_map.put(year,dayList);
             }
             ArrayList<Integer> curDayList =    year_friday_map.get(year);
-            curDayList.add(day);
+            if(!curDayList.contains(day)){
+                curDayList.add(day);
+                if(!SH_EndWeek_TradeDayList.contains(day)){
+                    SH_EndWeek_TradeDayList.add(day);
+                }
+            }
+
         }
         return year_friday_map;
     }
@@ -4368,6 +4866,49 @@ boolean isOperationType4_Wtrade_date(ArrayList<String> fieldParamList){
 
     }
 
+
+    static int  getTomorrowTradeDay(int dayFlagInt ){
+        int step = 1;
+        int tomorrow = getFutureDayFlag(dayFlagInt,step);
+        if(!SH_TradeDayList.contains(tomorrow)){
+
+            step++;
+            tomorrow = getFutureDayFlag(dayFlagInt,step);
+        }
+
+        return tomorrow;
+    }
+
+
+   static int getFutureDayFlag(int dayFlagInt , int DaySpace){
+        int curDay =  dayFlagInt;
+        int futureDay = dayFlagInt;
+        String daysDesc = dayFlagInt+"";
+        SimpleDateFormat simple = new SimpleDateFormat("yyyyMMdd");
+        try {
+            Date nowDate =    simple.parse(daysDesc);
+            Calendar    curCalendar =Calendar.getInstance();
+            curCalendar.setTime(nowDate);
+            int curDayYear =   curCalendar.get(Calendar.DAY_OF_YEAR);
+            int newDay2Year = curDayYear + DaySpace;
+            curCalendar.set(Calendar.DAY_OF_YEAR,newDay2Year);
+
+            int year = curCalendar.get(Calendar.YEAR);
+            int month = curCalendar.get(Calendar.MONTH)+1;
+            int day2month = curCalendar.get(Calendar.DAY_OF_MONTH);
+            String monthDesc = month>10?month+"":"0"+month;
+            String dayDesc = day2month>10?day2month+"":"0"+day2month;
+
+            String dayIntFalg = year+""+monthDesc+dayDesc;
+            futureDay = Integer.parseInt(dayIntFalg);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        return futureDay;
+    }
+
+
     @SuppressWarnings("unchecked")
      static void getKeyAndValue(Map<Integer,ArrayList<Integer>> mMapParam){
         Map.Entry<Integer , ArrayList<Integer>> entryItem;
@@ -4393,16 +4934,28 @@ boolean isOperationType4_Wtrade_date(ArrayList<String> fieldParamList){
         String bodyPath = Python_BodyTemplate_1;
         switch (nodeName){
 
+            case "hushengutongchigumingxi":
+            case "hushengutongshidachengjiaogu":
+                bodyPath = Python_BodyTemplate_8;
+                break;
 
-            case "?":
-                bodyPath = "?";
+            case "yuexianhangqing-time":
+                bodyPath = Python_BodyTemplate_7;
                 break;
 
 
-            //ValueError: This sheet is too large! Your sheet size is: 1166415, 8 Max sheet size is: 1048576, 1638
-            case "guanlicengxinchouhechigu":
-                bodyPath = Python_BodyTemplate_3;
+            case "zhouxianhangqing-time":
+                bodyPath = Python_BodyTemplate_6;
                 break;
+
+
+
+            case "geguzijinliuxiang":
+            case "meirizhibiao":
+            case "rixianhangqing-time":
+                bodyPath = Python_BodyTemplate_5;
+                break;
+
 
 
             // Exception: 抱歉，您每分钟最多访问该接口10次，权限的具体详情访问
@@ -4411,31 +4964,34 @@ boolean isOperationType4_Wtrade_date(ArrayList<String> fieldParamList){
                 break;
 
 
+
+            //ValueError: This sheet is too large! Your sheet size is: 1166415, 8 Max sheet size is: 1048576, 1638
+            case "guanlicengxinchouhechigu":
+                bodyPath = Python_BodyTemplate_3;
+                break;
+
+
             //  没有中文的 cname 所以添加额外的代码 添加 cname
-
-
-            case "zhouxianhangqing-time":
-                bodyPath = Python_BodyTemplate_6;
-                break;
-
-            case "rixianhangqing-time":
-                bodyPath = Python_BodyTemplate_5;
-                break;
-
-
-            case "yuexianhangqing-time":
-                bodyPath = Python_BodyTemplate_7;
-                break;
-
-
+            case "meirizhangdietingtongji":
+            case "meirizhangdietingjiage":
+            case "meiritingfupaixinxi":
+            case "fuquanyinzi":     //   ##  添加 ts_code 列
             case "shangshigongsiguanliceng":
             case "shangshigongsijibenxinxi":
             case "hushengutongchengfengu":
                 bodyPath = Python_BodyTemplate_2;
                 break;
 
-            default:
+            case "ganggutongmeirichengjiaotongji":
+            case "hushengangtongzijinliuxiang":
                 bodyPath = Python_BodyTemplate_1;
+                break;
+
+
+
+
+            default:
+                bodyPath = Python_BodyTemplate_1;    //  没有添加 ts_code 列
         }
         return bodyPath;
     }
