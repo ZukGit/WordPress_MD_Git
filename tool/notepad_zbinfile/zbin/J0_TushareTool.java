@@ -2144,7 +2144,8 @@ public class J0_TushareTool {
             System.out.println(mParamBlock);
         } else {
             String firstLine = mParamBlock.get(0).trim();
-            if (firstLine.startsWith("▲")) {
+            if (firstLine.contains("▲")) {
+                firstLine = firstLine.substring(firstLine.indexOf("▲"));
                 curNode = new RootNode();
                 curNode.isRoot = true;
                 curNode.isLeaf = false;
@@ -4971,6 +4972,8 @@ boolean isOperationType4_Wtrade_date(ArrayList<String> fieldParamList){
                 break;
 
 
+
+            case "lirunbiao":
             //  没有中文的 cname 所以添加额外的代码 添加 cname
             case "meirizhangdietingtongji":
             case "meirizhangdietingjiage":

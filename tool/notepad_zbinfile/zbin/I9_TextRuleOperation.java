@@ -49,8 +49,8 @@ public class I9_TextRuleOperation {
     static int CUR_TYPE_INDEX = 1;
     static boolean  allowEmptyInputParam = false;    // 是否允许输入参数为空 执行 rule的apply方法
 
-/*******************修改属性列表 ------End *********************/
-static String Default_Selected_Rule_Index_Key = "Default_Selected_Rule_Index_Key";
+    /*******************修改属性列表 ------End *********************/
+    static String Default_Selected_Rule_Index_Key = "Default_Selected_Rule_Index_Key";
 
 
 
@@ -364,7 +364,7 @@ static String Default_Selected_Rule_Index_Key = "Default_Selected_Rule_Index_Key
         CUR_RULE_LIST.add( new TextAs_QrCode_Rule_15());
         CUR_RULE_LIST.add( new ReadStrFromFile_Rule_16());
         CUR_RULE_LIST.add( new Make_Json_As_JavaFile_Graphviz2Jpg_Rule_17());
-
+        CUR_RULE_LIST.add( new Add_BeginStr_EndStr_Rule_18());
 
 //        CUR_RULE_LIST.add( new Image2Jpeg_Rule_3());
 //        CUR_RULE_LIST.add( new Image2Png_Rule_4());
@@ -373,6 +373,66 @@ static String Default_Selected_Rule_Index_Key = "Default_Selected_Rule_Index_Key
 //        CUR_RULE_LIST.add( new Encropty_Rule_7());
 //        CUR_RULE_LIST.add( new ClearChineseType_8());
 
+    }
+
+
+
+
+    // 往 每行的加入占位符   开头加入 〖*   第一个空格前加入*
+    class Add_BeginStr_EndStr_Rule_18 extends  Basic_Rule{
+
+        Add_BeginStr_EndStr_Rule_18(boolean mIsInputDirAsSearchPoint){
+            super(18);
+            isInputDirAsSearchPoint =  mIsInputDirAsSearchPoint;
+
+        }
+
+
+        Add_BeginStr_EndStr_Rule_18(){
+            super(18,false);
+
+        }
+
+        @Override
+        ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+            for (int i = 0; i < curInputFileList.size(); i++) {
+                File fileItem = curInputFileList.get(i);
+                ArrayList<String> contentList = ReadFileContentAsList(fileItem);
+                ArrayList<String>  fixedStrArr =   Tushare_TreeNodeData_Rule18(contentList);
+
+             writeContentToFile(I9_Temp_Text_File,fixedStrArr);
+                NotePadOpenTargetFile(I9_Temp_Text_File.getAbsolutePath());
+                System.out.println("rule_"+rule_index+" -> 把tushare的数据 接口 转为 J0_treedata.txt 的 TreeNode 注意格式(直接复制表格)!  结点 [ 中文名 + 网址 ] 开头  File="+ fileItem.getAbsolutePath());
+            }
+
+
+            return super.applyOperationRule(curFileList, subFileTypeMap, curDirList, curRealFileList);
+        }
+
+        @Override
+        String simpleDesc() {
+            return " 把tushare的数据 接口 转为 J0_treedata.txt 的 TreeNode 注意格式(直接复制表格)!  结点 [ 中文名 + 网址 ] 开头 https://tushare.pro/document/2?doc_id=103  ";
+        }
+
+        //3. 如果当前 执行 错误  checkParams 返回 false   那么 将 打印这个函数 说明错误的可能原因
+        @Override
+        void showWrongMessage() {
+            System.out.println("当前 type 索引 "+rule_index +" 执行错误  可能是输入参数错误 请检查输入参数!");
+            System.out.println(" errorMsg = "+errorMsg );
+        }
+
+        //4.  当前 rule的 说明  将会打印在  用户输入为空时的 提示语句！
+        @Override
+        String ruleTip(String type,int index , String batName,OS_TYPE curType){
+            String itemDesc = "";
+            if(curType == OS_TYPE.Windows){
+                itemDesc = batName.trim()+"  "+type+"_"+index + "    [索引 "+index+"]  描述:"+""+ simpleDesc();
+            }else{
+                itemDesc = batName.trim()+" "+type+"_"+index + "    [索引 "+index+"]  描述:"+""+ simpleDesc();
+            }
+
+            return itemDesc;
+        }
     }
 
 
@@ -476,7 +536,7 @@ static String Default_Selected_Rule_Index_Key = "Default_Selected_Rule_Index_Key
                     System.out.println("无法在 Linux 和 MacOS 下实现  没有notepad++ 啊! ");
                 }
 
-             }
+            }
             return super.applyOperationRule(curFileList, subFileTypeMap, curDirList, curRealFileList);
         }
 
@@ -1135,16 +1195,16 @@ static String Default_Selected_Rule_Index_Key = "Default_Selected_Rule_Index_Key
 
 
 
-//只获取 每一行的第一个空格前的字符串 其余字符串 删除
+    //只获取 每一行的第一个空格前的字符串 其余字符串 删除
     class OnlyGetFirstStr_InOneLine_Rule_1 extends  Basic_Rule{
 
 
-    OnlyGetFirstStr_InOneLine_Rule_1(boolean mIsInputDirAsSearchPoint){
+        OnlyGetFirstStr_InOneLine_Rule_1(boolean mIsInputDirAsSearchPoint){
             super(1);
             isInputDirAsSearchPoint =  mIsInputDirAsSearchPoint;
         }
 
-    OnlyGetFirstStr_InOneLine_Rule_1(){
+        OnlyGetFirstStr_InOneLine_Rule_1(){
             super(1,false);
 
         }
@@ -1159,7 +1219,7 @@ static String Default_Selected_Rule_Index_Key = "Default_Selected_Rule_Index_Key
         ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
             for (int i = 0; i < curInputFileList.size(); i++) {
                 File fileItem = curInputFileList.get(i);
-               ArrayList<String> contentList = ReadFileContentAsList(fileItem);
+                ArrayList<String> contentList = ReadFileContentAsList(fileItem);
                 ArrayList<String>  fixedStrArr =   clearOneBlankChar_Rule_1(contentList);
                 writeContentToFile(I9_Temp_Text_File,fixedStrArr);
                 NotePadOpenTargetFile(I9_Temp_Text_File.getAbsolutePath());
@@ -1190,10 +1250,10 @@ static String Default_Selected_Rule_Index_Key = "Default_Selected_Rule_Index_Key
             return itemDesc;
         }
 
-    @Override
-    String simpleDesc() {
-        return "只获取 每一行的第一个空格前的字符串 其余字符串 删除";
-    }
+        @Override
+        String simpleDesc() {
+            return "只获取 每一行的第一个空格前的字符串 其余字符串 删除";
+        }
 
     }
 
@@ -1431,6 +1491,7 @@ static String Default_Selected_Rule_Index_Key = "Default_Selected_Rule_Index_Key
             return null;
         }
         ArrayList<String> contentList= new ArrayList<String>();
+
 
         try {
             BufferedReader curBR = new BufferedReader(new InputStreamReader(new FileInputStream(mFilePath), "utf-8"));
@@ -2223,6 +2284,8 @@ static String Default_Selected_Rule_Index_Key = "Default_Selected_Rule_Index_Key
         return str;
     }
 
+
+
     // 加载库时搜索的路径列表AC-:\Program Files\Java\jdk1.8.0_191\bin
     // 加载库时搜索的路径列表A-:C\Program Files\Java\jdk1.8.0_191\bin
     public static String addMaoChinese(String oriStr) {
@@ -2644,7 +2707,7 @@ static String Default_Selected_Rule_Index_Key = "Default_Selected_Rule_Index_Key
 
 
         CUR_Selected_Rule.operationRule(CUR_INPUT_3_ParamStrList);  // 传递参数列表 进行处理
-I9_Properties.getProperty(Default_Selected_Rule_Index_Key,""+CUR_TYPE_INDEX);
+        I9_Properties.getProperty(Default_Selected_Rule_Index_Key,""+CUR_TYPE_INDEX);
         setProperity();
 
     }
@@ -2734,7 +2797,7 @@ I9_Properties.getProperty(Default_Selected_Rule_Index_Key,""+CUR_TYPE_INDEX);
     }
 
 
-    ArrayList<String> clearOneBlankCharAsOneStr_Rule_2(ArrayList<String> originStrList){
+   static ArrayList<String> clearOneBlankCharAsOneStr_Rule_2(ArrayList<String> originStrList){
         if(originStrList == null) return null;
         ArrayList<String>  fixedStrArr = new   ArrayList<String>();
         StringBuilder sb =new StringBuilder();
@@ -3432,6 +3495,185 @@ I9_Properties.getProperty(Default_Selected_Rule_Index_Key,""+CUR_TYPE_INDEX);
 
 
 
+    public static ArrayList<String>  Tushare_TreeNodeData_Rule18( ArrayList<String>  content ) {
+
+        //  showArrList(content);
+
+        ArrayList<String>  headList = getTushare_EndTagList(content,"","输入参数");
+        showArrList(headList);
+        String webSite = null;
+        String chineseTitle = null;
+        String pythonMethodName = null;
+        String chinesetitle_WebSite  = guolvArrList(headList,"https://"); // 包含 https的那一行
+
+        if(chinesetitle_WebSite != null && !"".equals(chinesetitle_WebSite) ){
+            webSite = clearChinese(chinesetitle_WebSite).trim();
+            chineseTitle = chinesetitle_WebSite.replace(webSite,"").trim();
+        }
+        String JieKou_Str  = guolvArrList(headList,"接口：");
+        if(JieKou_Str != null && !"".equals(JieKou_Str) ){
+            pythonMethodName = clearChinese(JieKou_Str).trim().replace("：","");
+        }
+
+
+        ArrayList<String>  input_params_list  = getTushare_EndTagList(content,"输入参数","输出参数");
+
+        ArrayList<String> inputList =  clearAllChineseLine(input_params_list);
+//        showArrList(inputList);
+//        System.out.println("--------------3--------------");
+        ArrayList<String>  output_params_list  = getTushare_EndTagList(content,"输出参数","");
+        ArrayList<String> outputList =  clearAllChineseLine(output_params_list);
+//        showArrList(outputList);
+
+        ArrayList<String> templateArr = new   ArrayList<String>();
+
+        templateArr.add("〖"+chineseTitle+"     "+webSite);
+        ArrayList<String>  paramA =    addTushare_Params_Flag_18(inputList,"〖*","*");
+        templateArr.addAll(paramA);
+        String title_pinyin = Rule14_ToPinyinWithLine(chineseTitle).replace("_","");
+        String methodLine_pre = title_pinyin+"       【】[] <"+pythonMethodName+"> ( ) ";
+        String methodLine_end =   clearOneBlankCharAsOneStr_Rule_2(outputList).get(0);
+        String methodLine = methodLine_pre+methodLine_end;
+        templateArr.add(methodLine);
+        showArrList(templateArr);
+        return templateArr;
+    }
+
+
+    public static ArrayList<String>    clearAllChineseLine(  ArrayList<String>  content) {
+        ArrayList<String>  clear_all_Chinese_Line_List = new   ArrayList<String>();
+
+
+        for (int i = 0; i < content.size(); i++) {
+            String item = content.get(i);
+            String fixed_item = clearChinese(item).trim();
+            fixed_item =  fixed_item.replace("\t","");
+            fixed_item =  fixed_item.replace("：","");
+            if("".equals(fixed_item)){
+                continue;
+            }
+            clear_all_Chinese_Line_List.add(item);
+        }
+
+        return clear_all_Chinese_Line_List;
+    }
+
+
+
+
+    public static String  guolvArrList( ArrayList<String> content,String tag){
+
+        String result = "";
+        for (int i = 0; i < content.size() ; i++) {
+            String item = content.get(i);
+            if(item.contains(tag)){
+                result = item;
+                return result;
+            }
+        }
+        return result;
+    }
+
+
+
+    public static ArrayList<String>    getTushare_EndTagList(  ArrayList<String>  content , String beginTag, String endTag){
+        ArrayList<String>  tagList = new   ArrayList<String>();
+
+
+        boolean isBegin = false;   //  是否从头开始读取
+        if(beginTag == null){
+            isBegin = true;
+        }else {
+            isBegin = "".equals(beginTag)?true:false;
+        }
+
+
+        for (int i = 0; i < content.size(); i++) {
+            String item = content.get(i);
+            if(!"".equals(beginTag) && item.contains(beginTag)){
+                isBegin = true;
+                continue;
+            }
+
+            if(!"".equals(endTag) && item.contains(endTag)){
+                isBegin = false;
+                break;
+            }
+            if(!isBegin){  //   如果没有开始 那么 不记录当前的字符串
+                continue;
+            }
+            if("".equals(item.trim())){
+                continue;
+            }
+            tagList.add(item);
+        }
+
+        return tagList;
+    }
+
+    public static void  showArrList(  ArrayList<String>  content){
+
+        for (int i = 0; i < content.size(); i++) {
+            String line = content.get(i);
+            System.out.println("[ "+i+" ] = "+ line);
+        }
+
+    }
+    // 往 每行开头加入〖*  第一个字符串后加入*  其余不变(方便生成tushare的输入参数格式)   ts_code -> 〖*ts_code*  描述
+  static  ArrayList<String>  addTushare_Params_Flag_18(ArrayList<String> originStrList,String beginStr , String endStr){
+        ArrayList<String> newContentList_Padding = new    ArrayList<String>();
+        ArrayList<String> newContentList = new    ArrayList<String>();
+        for (int i = 0; i < originStrList.size(); i++) {
+            String originStr = originStrList.get(i);
+            String item = new String(originStr);
+            item = item.replace("\t"," ").trim();
+            item = item.replace("："," ").trim();
+            item = item.replace("  "," ").trim();
+            String[] arr = item.split(" ");
+            String fixedStr = "";
+            String firstBlankStr = "";
+            if(arr == null){
+                firstBlankStr=endStr;
+                fixedStr = beginStr+item+firstBlankStr;
+            }else{
+                firstBlankStr=arr[0]+endStr;
+                fixedStr = item.replace(arr[0],firstBlankStr);
+                fixedStr =  beginStr+fixedStr;
+            }
+            newContentList.add(fixedStr);
+        }
+
+        int maxPointSize = calMaxItemCharPosition(newContentList , endStr)+2;
+
+        for (int i = 0; i < newContentList.size() ; i++) {
+            String item = newContentList.get(i);
+            int curIndex = item.lastIndexOf(endStr);
+            int paddingInt = maxPointSize - curIndex;
+            String paddingStr = getEmptyString(paddingInt);
+            item = item.replace(endStr+" ",endStr+" "+paddingStr);
+            newContentList_Padding.add(item);
+        }
+
+
+        return newContentList_Padding;
+
+    }
+
+   static int calMaxItemCharPosition(ArrayList<String> originStrList , String strFlag){
+
+        int maxSize = 0;
+        for (int i = 0; i < originStrList.size(); i++) {
+            String item = originStrList.get(i);
+            int curIndex = item.lastIndexOf(strFlag);
+            if(curIndex > maxSize ){
+                maxSize = curIndex;
+            }
+        }
+        return maxSize;
+    }
+
+
+
     ArrayList<String>  addZhanWeiFlag_Rule_10(ArrayList<String> originStrList,String beginStr , String endStr){
         ArrayList<String> newContentList = new    ArrayList<String>();
         for (int i = 0; i < originStrList.size(); i++) {
@@ -3559,12 +3801,12 @@ I9_Properties.getProperty(Default_Selected_Rule_Index_Key,""+CUR_TYPE_INDEX);
                     }
                     System.out.println("sumString["+countLine+"] = "+ sumString);
                     countLine++;
-if(!Rule11_tableItemList.contains(sumString)){
-    System.out.println("加入 headLine = "+ headLine + "  sumString = "+sumString);
-    Rule11_tableItemList.add(sumString);
-}else{
-    System.out.println("头部相同 不加入! headLine = "+ headLine + "  sumString = "+sumString);
-}
+                    if(!Rule11_tableItemList.contains(sumString)){
+                        System.out.println("加入 headLine = "+ headLine + "  sumString = "+sumString);
+                        Rule11_tableItemList.add(sumString);
+                    }else{
+                        System.out.println("头部相同 不加入! headLine = "+ headLine + "  sumString = "+sumString);
+                    }
 
                 }
                 curBR.close();
@@ -4012,8 +4254,8 @@ if(!Rule11_tableItemList.contains(sumString)){
         defaultFormat.setToneType(HanyuPinyinToneType.WITHOUT_TONE);
         for (int i = 0; i < newChar.length; i++) {
             if (newChar[i] > 128) {
-                    try {
-                        // 《》，：“￥。，？。，；【 】。、
+                try {
+                    // 《》，：“￥。，？。，；【 】。、
 
                     System.out.println("xxxxxxxxxx");
                     System.out.println("newChar["+i+"] = "+ newChar[i]);
@@ -4127,7 +4369,7 @@ if(!Rule11_tableItemList.contains(sumString)){
 
 
 
-// Rule_16   Begin Windows 读物当前文件内容 并 播放 vbs 声音
+    // Rule_16   Begin Windows 读物当前文件内容 并 播放 vbs 声音
     public static void ReadStrFromFile_Rule_16(File srcFile) {
         File curFile= srcFile;
         String ReadCotent = ReadFileContent(srcFile);
@@ -5405,70 +5647,70 @@ if(!Rule11_tableItemList.contains(sumString)){
         }
     }
 
-	
-			public static String fixedName_Json2Bean(String originName){
-			
-			if(originName == null){
-				return originName;
-			}
-       String oldName = new String(originName);
-		String	nodeName = originName;
-			
-			            //  nodeName.get(0)=View_font-size-editor  在 .gv 文件中  不能以 - 命名变量
-            if(nodeName.contains("-")){
-                nodeName =  nodeName.replaceAll("-","_");
-            }
 
-			if(nodeName.contains("!")){
-                nodeName =  nodeName.replaceAll("!","_");
-            }
-                if(nodeName.contains("+")){
-                    nodeName =  nodeName.replace("+","_");
-                }
+    public static String fixedName_Json2Bean(String originName){
 
-                if(nodeName.contains("/")){
-                    nodeName =  nodeName.replace("/","_");
-                }
+        if(originName == null){
+            return originName;
+        }
+        String oldName = new String(originName);
+        String	nodeName = originName;
+
+        //  nodeName.get(0)=View_font-size-editor  在 .gv 文件中  不能以 - 命名变量
+        if(nodeName.contains("-")){
+            nodeName =  nodeName.replaceAll("-","_");
+        }
+
+        if(nodeName.contains("!")){
+            nodeName =  nodeName.replaceAll("!","_");
+        }
+        if(nodeName.contains("+")){
+            nodeName =  nodeName.replace("+","_");
+        }
+
+        if(nodeName.contains("/")){
+            nodeName =  nodeName.replace("/","_");
+        }
 
 
-                if(nodeName.contains("\\")){
-                    nodeName =  nodeName.replace("\\","_");
-                }
+        if(nodeName.contains("\\")){
+            nodeName =  nodeName.replace("\\","_");
+        }
 
-                if(nodeName.contains("%")){
-                    nodeName =  nodeName.replace("%","_");
-                }
+        if(nodeName.contains("%")){
+            nodeName =  nodeName.replace("%","_");
+        }
 
-			if(nodeName.contains("$")){
-                nodeName =  nodeName.replace("$","_");
-            }
-			
-			if(nodeName.contains(".")){
-                nodeName =  nodeName.replace(".","_");
-            }
-			
-			if(nodeName.contains("___")){
-                nodeName =  nodeName.replaceAll("___","_");
-            }
-			
-			if(nodeName.contains("__")){
-                nodeName =  nodeName.replaceAll("__","_");
-            }
-			
-			nodeName = nodeName.trim();
-			
-			String firstChar = nodeName.substring(0,1);
-			String secondChar = nodeName.replaceAll("_","").trim();
-			if(isNumeric(firstChar) || "".equals(secondChar)){
-				nodeName = "Z_"+getTimeStampLong()+"_"+nodeName;
-			}
-                System.out.println("oldName = "+ oldName + "  newName = "+nodeName);
-            return nodeName;
-			
-			
-		}
-		
-		
+        if(nodeName.contains("$")){
+            nodeName =  nodeName.replace("$","_");
+        }
+
+        if(nodeName.contains(".")){
+            nodeName =  nodeName.replace(".","_");
+        }
+
+        if(nodeName.contains("___")){
+            nodeName =  nodeName.replaceAll("___","_");
+        }
+
+        if(nodeName.contains("__")){
+            nodeName =  nodeName.replaceAll("__","_");
+        }
+
+        nodeName = nodeName.trim();
+
+        String firstChar = nodeName.substring(0,1);
+        String secondChar = nodeName.replaceAll("_","").trim();
+        if(isNumeric(firstChar) || "".equals(secondChar)){
+            nodeName = "Z_"+getTimeStampLong()+"_"+nodeName;
+        }
+        System.out.println("oldName = "+ oldName + "  newName = "+nodeName);
+        return nodeName;
+
+
+    }
+
+
     static  volatile String returnString ="";
     static class Json2Bean {
         public String json;
@@ -6556,9 +6798,9 @@ if(!Rule11_tableItemList.contains(sumString)){
         @Override
         public void writeBean(String className, Map<String, Object> map) throws IOException {
 // Topic048.java  zzj               执行该类
-if(Rule17_OutJava_Dir_TimeStampStr == null){
-    Rule17_OutJava_Dir_TimeStampStr = getTimeStampLong()+"";
-}
+            if(Rule17_OutJava_Dir_TimeStampStr == null){
+                Rule17_OutJava_Dir_TimeStampStr = getTimeStampLong()+"";
+            }
             System.out.println(" MyBeanGenerator  className  ="+ className);
             System.out.println("writeBean  className ="+ className + "packName = "+ packName);
             while(className.contains(" ")){
@@ -6572,7 +6814,7 @@ if(Rule17_OutJava_Dir_TimeStampStr == null){
             if(Rule17_OutRealJava_Path == null){
                 Rule17_OutRealJava_Path = file.getAbsolutePath();
             }
-          File javaFile =   new File(file, className + ".java");
+            File javaFile =   new File(file, className + ".java");
             System.out.println("javaFIle Path = "+ javaFile.getAbsolutePath());
             BufferedWriter bw = new BufferedWriter(new FileWriter(javaFile));
             bw.write("package ");
