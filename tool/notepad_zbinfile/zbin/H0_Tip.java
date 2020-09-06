@@ -97,6 +97,9 @@ public class H0_Tip {
     }
     static void CmderTip(){
         System.out.println(OneLine_Pre + " Winddows下Cmder设置 Begin "+ OneLine_End);
+        System.out.println("添加CMDER.exe的Dir路径到 系统环境变量Path:   电脑(右击)》 属性 》高级系统设置(左面板) 》 环境变量 》 用户变量 》 Path( 添加cmder的dir )  ");
+        System.out.println("Cmder.exe /REGISTER ALL       // 鼠标目录右击出现cmder选项   ");
+        System.out.println("Cmder.exe /UNREGISTER ALL       // 鼠标目录右击删除cmder选项   ");
         System.out.println("Cmder 下载地址:"+"  https://pan.baidu.com/disk/home#/all?vmode=list&path=%2F%E7%A7%BB%E5%8A%A8%E7%A1%AC%E7%9B%98%2Fsoftware%2Fwin");
         System.out.println("设置环境变量  Setting -> StartUp -> Environment  输入如下的配置信息: ");
         System.out.println();
