@@ -365,6 +365,8 @@ public class I9_TextRuleOperation {
         CUR_RULE_LIST.add( new ReadStrFromFile_Rule_16());
         CUR_RULE_LIST.add( new Make_Json_As_JavaFile_Graphviz2Jpg_Rule_17());
         CUR_RULE_LIST.add( new Add_BeginStr_EndStr_Rule_18());
+        CUR_RULE_LIST.add( new FirstWord_MakeDir_Rule_19());
+        CUR_RULE_LIST.add( new Cal_Install_Command_Rule_20());
 
 //        CUR_RULE_LIST.add( new Image2Jpeg_Rule_3());
 //        CUR_RULE_LIST.add( new Image2Png_Rule_4());
@@ -376,6 +378,214 @@ public class I9_TextRuleOperation {
     }
 
 
+    // 往 每行的加入占位符   开头加入 〖*   第一个空格前加入*
+    class Cal_Install_Command_Rule_20 extends  Basic_Rule {
+        Cal_Install_Command_Rule_20(boolean mIsInputDirAsSearchPoint){
+            super(20);
+            isInputDirAsSearchPoint =  mIsInputDirAsSearchPoint;
+
+        }
+
+
+        Cal_Install_Command_Rule_20(){
+            super(20,true);
+        }
+
+        ArrayList<File>   getFileTypeList(File[] fileList ,String type){
+            ArrayList<File> fliterList = new     ArrayList<File>();
+            if(fileList == null){
+                return fliterList;
+            }
+            for (int i = 0; i <fileList.length; i++) {
+                if(fileList[i].getName().toLowerCase().endsWith(type.toLowerCase())){
+                    fliterList.add(fileList[i]);
+                }
+            }
+            return fliterList;
+        }
+        @Override
+        ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+            File dirFile =  curInputFileList.get(0).getParentFile();
+           File[] fileList =  dirFile.listFiles();
+            System.out.println("dirFile = "+ dirFile + "fileList = "+ fileList.length );
+            ArrayList<File>  exeFileList =     getFileTypeList(fileList,".exe");
+            ArrayList<File>  msiFileList =      getFileTypeList(fileList,".msi");
+            ArrayList<File> allOperationFile = new  ArrayList<File>();
+            if(exeFileList != null){
+                allOperationFile.addAll(exeFileList);
+            }
+
+            if(msiFileList != null){
+                allOperationFile.addAll(msiFileList);
+            }
+
+
+            if(allOperationFile.size() == 0){
+                System.out.println("当前没有 exe 和 msi 文件  程序 退出！");
+                return super.applyOperationRule(curFileList, subFileTypeMap, curDirList, curRealFileList);
+            }
+            System.out.println("allOperationFile.size = "+ allOperationFile.size());
+
+            ArrayList<String> command_ContentList = new ArrayList<String>();
+            String str_pre_1 = "start /wait /min ";
+            String str_end_1 = " /S /Q /D=E:\\Temp_Install\\";
+            String str_end_2 = " /quiet /norestart INSTALLDIR=\"E:\\Temp_Install\\";
+            for (int i = 0; i < allOperationFile.size(); i++) {
+                File fileItem = allOperationFile.get(i);
+                String fileName = fileItem.getName();
+                String newFileName = fileName;
+                String absPath = fileItem.getAbsolutePath();
+                if(fileName.contains(" ")){
+                    newFileName = fileName.replace(" ","");
+                    tryReName(fileItem,newFileName);
+                    System.out.println("  空格改名 "+fileName +"   -->  "+newFileName);
+                    absPath = absPath.replace(fileName,newFileName);
+                }
+                File fileItem_new  = new File(absPath);
+                if(fileItem_new.exists()){
+
+                    String fileName_Point = fileItem_new.getName();
+                    System.out.println("操作索引["+i+"]  = "+ fileName_Point);
+                    String nameStr_noPoint = getFileNameNoPoint(fileName_Point);
+
+                    String tip1 = "#### "+fileName_Point;
+                    String command1 = str_pre_1+ fileName_Point+" " + str_end_1 + nameStr_noPoint;
+
+                    String command2 = str_pre_1+ fileName_Point+" " + str_end_2 + nameStr_noPoint+"\"";
+
+
+                    command_ContentList.add(tip1);
+                    command_ContentList.add(command1);
+                    command_ContentList.add(command2);
+                    command_ContentList.add("\n");
+                }
+
+            }
+
+            System.out.println("command_ContentList.size = "+ command_ContentList.size());
+            writeContentToFile(I9_Temp_Text_File,command_ContentList);
+            NotePadOpenTargetFile(I9_Temp_Text_File.getAbsolutePath());
+
+
+            return super.applyOperationRule(curFileList, subFileTypeMap, curDirList, curRealFileList);
+        }
+
+        @Override
+        String simpleDesc() {
+            return " 读取当前的 exe 和 msi 文件 输出两种对应的安装命令 方便测试! ";
+        }
+
+
+    }
+
+        // 往 每行的加入占位符   开头加入 〖*   第一个空格前加入*
+    class FirstWord_MakeDir_Rule_19 extends  Basic_Rule{
+
+        FirstWord_MakeDir_Rule_19(boolean mIsInputDirAsSearchPoint){
+            super(19);
+            isInputDirAsSearchPoint =  mIsInputDirAsSearchPoint;
+
+        }
+
+
+        FirstWord_MakeDir_Rule_19(){
+            super(19,false);
+
+        }
+
+
+        @Override
+        ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+            for (int i = 0; i < curInputFileList.size(); i++) {
+                File fileItem = curInputFileList.get(i);
+                File  curDirFile = fileItem.getParentFile();
+
+              ArrayList<String> rawContentList =   ReadFileContentAsList(fileItem);
+                ArrayList<String> fixedPathDir = fixedFirstWordPath(rawContentList);
+
+                if(curDirFile != null){
+                    for (int j = 0; j < fixedPathDir.size(); j++) {
+                        String dirName = fixedPathDir.get(j);
+                        String dirAbsPath = curDirFile.getAbsolutePath()+File.separator+dirName;
+                        File newDirTemp =  new File(dirAbsPath);
+                        String fileName = newDirTemp.getName();
+                        boolean isDir = true;
+                        if(fileName.contains(".")){
+                            try {
+                                isDir = false;
+                                newDirTemp.getParentFile().mkdirs();
+                                newDirTemp.createNewFile();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }else{
+                            isDir = true;
+                            newDirTemp.mkdirs();
+                        }
+                         String filedesc = isDir?" 目录":"文件";
+                        System.out.println("创建 "+filedesc+"  "+ newDirTemp.getAbsolutePath() +" 成功! " );
+                    }
+                    return null;
+                }else{
+                    System.out.println("FirstWord_MakeDir_Rule_19   当前获取到的Shell目录为空!   无法创建 Z规则文件夹!  ");
+                }
+
+            }
+            return super.applyOperationRule(curFileList, subFileTypeMap, curDirList, curRealFileList);
+        }
+
+        @Override
+        String simpleDesc() {
+            return " 读取文件中的每一行的空格前路径 并以此生成在当前文件目录生成指定目录";
+        }
+
+
+        ArrayList<String>     fixedFirstWordPath(ArrayList<String> rawList){
+            ArrayList<String> fixedList = new  ArrayList<String>();
+
+            for (int i = 0; i < rawList.size(); i++) {
+                String itemStr = rawList.get(i).trim();
+                itemStr =   itemStr.replace("\\",File.separator);
+                itemStr =   itemStr.replace("/",File.separator);
+                itemStr =   itemStr.replace("?","");
+                itemStr =   itemStr.replace("!","");
+                itemStr =   itemStr.replace("！","");
+                itemStr =   itemStr.replace("？","");
+                itemStr =   itemStr.replace("#","");
+                itemStr =   itemStr.replace("@","");
+                itemStr =   itemStr.replace("￥","");
+                itemStr =   itemStr.replace("~","");
+                itemStr =   itemStr.replace("&","");
+                itemStr =   itemStr.replace("*","");
+                itemStr =   itemStr.replace("|","");
+                itemStr =   itemStr.replace("<","");
+                itemStr =   itemStr.replace(">","");
+                itemStr =   itemStr.replace("。","");
+                itemStr =   itemStr.replace(",","");
+                itemStr =   itemStr.replace("+","");
+                itemStr =   itemStr.replace("\"","");
+                itemStr =   itemStr.replace("：","");
+                itemStr =   itemStr.replace(":","");
+                itemStr =   itemStr.replace(File.separator+File.separator,File.separator);
+                itemStr =   itemStr.replace(File.separator+File.separator,File.separator);
+                itemStr =   itemStr.replace("\t"," ");
+                if("".equals(itemStr)){
+                    continue;
+                }
+                if(itemStr.contains(" ")){
+                    String[] arr = itemStr.split(" ");
+                    fixedList.add(arr[0]);
+                }else{
+                    fixedList.add(itemStr);
+                }
+            }
+
+            return fixedList;
+
+
+        }
+
+    }
 
 
     // 往 每行的加入占位符   开头加入 〖*   第一个空格前加入*

@@ -34,7 +34,10 @@ public class H0_Tip {
     static OS_TYPE CUR_OS_TYPE = OS_TYPE.Windows;
 
     public static void main(String[] args) {
+
+
         WindowsTip();
+
         PackageInfoTip();
         BroadCastInfoTip();
         StartAppInfoTip();
@@ -47,8 +50,50 @@ public class H0_Tip {
         AdbCommandTip();
     }
 
+
+
+    static void InstallWindowsTip(){
+
+            System.out.println(OneLine_Pre + " 安装三系统 Win10+Win7+Deepin 三系统 说明 Begin "+ OneLine_End);
+        System.out.println("准备材料:  1台正常运行电脑  2.一个空U盘(4G起步)  3.【win10.iso  win7.iso  deepin.iso macos.iso 】等系统镜像    ");
+        System.out.println("1.下载制作U盘PE启动软件  https://pan.baidu.com/s/1uyYxw_WUONyAQ_H4lzY_dw  提取码: rcrb ");
+        System.out.println("1.1 大白菜安装方法 https://www.dabaicai.com/booklet.html  Deepin系统  https://www.deepin.org/zh/installation/ ");
+        System.out.println("1.2 执行操作:  插入U盘  模式: USB-HDD    格式: NTFS   一键制作USB  【把要加载的 系统.iso镜像 复制到该U盘】 ");
+        System.out.println("1.3 插入U盘重启电脑   选择以USB盘为启动盘    HP-2570p 开机按住F2 以及 F8 选择启动盘");
+        System.out.println("1.4 进入到大白菜选项页面  选择   启动Win10 x64 PE PE(Preinstallation Environment)是带有有限服务的最小Win32子系统 系统 ");
+        System.out.println("1.5 进入到PE中 选中 大白菜一键装机 【可在这时 把系统安装目录硬盘格式化 并设置为活动分区 】");
+        System.out.println("1.5.1 我的电脑-> 右击 -> 管理 -> 磁盘管理 -> 选中安装硬盘-> 将分区标记为活动分区");
+        System.out.println("1.6 在选择镜像中选中 U盘中的系统镜像 ");
+        System.out.println("1.7 在弹出框中选中 系统的版本(家庭 专业 工作站)");
+        System.out.println("1.7.1  如果弹框 没没有找到硬盘驱动程序  那么转到 我的电脑-> 右击 -> 管理 -> 磁盘管理 -> 选中安装硬盘-> 将分区标记为活动分区");
+        System.out.println("1.8 选中当前的安装系统的盘符  点击执行   还原分区:C  引导分区:C  点击是 开始安装系统");
+
+        System.out.println("2.安装win10成功 拔掉U盘 重启进入新安装的 win10 系统 开始安装 win7子系统 ");
+        System.out.println("2.1 参考页面: https://jingyan.baidu.com/article/9f63fb91733a19c8410f0e59.html");
+        System.out.println("2.2 在 我的电脑-> 右击 -> 管理 -> 磁盘管理 新建一个硬盘区域 格式化 设置为活动分区 用于安装win7系统");
+        System.out.println("2.3 解压缩 Win7.iso 系统镜像到 新建硬盘  并解压缩");
+        System.out.println("2.4 zzfile_3.bat  C:\\Windows\\Boot\\EFI\\bootmgr.efi  ,  把当前的 bootmgr.efi 复制到桌面 并改名 bootx64.efi");
+        System.out.println("2.5 把桌面的 bootx64.efi 复制到  Win7_ISO解压目录\\efi\\microsoft\\boot 中");
+        System.out.println("2.6 点击 Win7_ISO解压目录\\ 中的 setup.exe 打开安装界面  后续选中当前新建的硬盘进行 win7系统的安装 ");
+        System.out.println("2.7 安装结束后 重启会出现两个 系统启动项一个 Win10  一个 Win7 至此 双系统安装完成! ");
+
+		
+		System.out.println("3.安装Deepin 制作Deepin 的 启动 U盘  【Deepin.iso】【U盘】【deepin-boot-maker.exe 深度启动盘制作工具】 ");
+		System.out.println("3.1 创建1个20GB的 ntfs的 deepin的 / 根目录盘  创建1个10GB的 deepin 的 /home 用户盘");
+		System.out.println("3.2 插入 Deepin的 U盘重启电脑   选择以USB盘为启动盘 选中安装Deepin系统");
+		
+		System.out.println("3.3 选择安装位置 -> 手动安装 -> 选择大于16GB的 ntfs空盘 以新文件系统 ext4 作为 根目录 / 的deepin系统安装目录");
+		System.out.println("3.4 选择安装位置 -> 手动安装 -> 选择大于10GB的 ntfs空盘 以新文件系统 ext4 作为 根目录 /home 的deepin系统安装目录");
+		System.out.println("3.5 安装Deepin系统 开始安装");
+		System.out.println("3.6 在新打开的 Deepin的 设置中 设置 默认引导分区为  win 10 !");
+        System.out.println(OneLine_Pre + " 安装三系统 Win10+Win7+Deepin 三系统 说明 End "+ OneLine_End);
+        }
+
+
     static void WindowsTip(){
         if(CUR_OS_TYPE == OS_TYPE.Windows){
+            InstallWindowsTip();  //  双系统安装 说明
+
             CmderTip();  // cmder 下的环境变量设置
             WindowsFilePathTip();  // 文件快捷方式提示
             NotePadCommand();

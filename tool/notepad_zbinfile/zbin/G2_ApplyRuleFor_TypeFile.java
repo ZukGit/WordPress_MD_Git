@@ -174,6 +174,8 @@ public class G2_ApplyRuleFor_TypeFile {
         realTypeRuleList.add( new Webp_To_Jpg_Gif_Rule_15());
 
         realTypeRuleList.add( new File_TimeName_Rule_16());
+        realTypeRuleList.add( new Make_ZRuleDir_Rule_17());
+
 
     }
 
@@ -184,6 +186,58 @@ public class G2_ApplyRuleFor_TypeFile {
     // operation_type  操作类型     1--读取文件内容字符串 进行修改      2--对文件对文件内容(字节)--进行修改    3.对全体子文件进行的随性的操作 属性进行修改(文件名称)
 //     // 4.对当前子文件(包括子目录 子文件 --不包含孙目录 孙文件) 5. 从shell 中获取到的路径 去对某一个文件进行操作
 
+    class Make_ZRuleDir_Rule_17 extends Basic_Rule{
+        ArrayList<String> dirNameList ;
+        Make_ZRuleDir_Rule_17() {
+            super("*", 17, 4);  //
+            dirNameList = new  ArrayList<String>();
+            dirNameList.add("0_Temp_Dir");
+            dirNameList.add("1_C_Install_Dir");
+            dirNameList.add("1_Loveon_Place");
+            dirNameList.add("2_WebSite_Download");
+            dirNameList.add("3_BaiduNetdiskDownload");
+            dirNameList.add("4_Software");
+            dirNameList.add("5_WorkCodePlace");
+            dirNameList.add("6_Jpg_Video");
+            dirNameList.add("7_Txt_PDF_DOC_Book");
+            dirNameList.add("8_Git_Dir");
+            dirNameList.add("9_Version");
+            dirNameList.add("10_Jira_Work");
+        }
+
+
+        @Override
+        ArrayList<File> applySubFileListRule4(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+ if(curDirFile != null){
+     for (int i = 0; i < dirNameList.size(); i++) {
+         String dirName = dirNameList.get(i);
+         String dirAbsPath = curDirFile.getAbsolutePath()+File.separator+dirName;
+         File newDirTemp =  new File(dirAbsPath);
+         newDirTemp.mkdirs();
+         System.out.println("创建目录 "+ newDirTemp.getAbsolutePath() +" 成功! " );
+     }
+     return null;
+ }else{
+     System.out.println("Make_ZRuleDir_Rule_17   当前获取到的Shell目录为空!   无法创建 Z规则文件夹!  ");
+ }
+            return super.applySubFileListRule4(curFileList, subFileTypeMap, curDirList, curRealFileList);
+        }
+
+        String ruleTip(String type, int index , String batName, OS_TYPE curType){
+            String itemDesc = "";
+            String desc_true =   " 在当前目录下创建 固定的文件夹 ZDir -> 《 0_Loveon_Place 1_C_Install_Dir  2_WebSite_Download  3_BaiduNetdiskDownload  4_Software  5_WorkPlace   6_Jpg_Video  7_Txt_PDF_DOC_Book  0_Temp_Dir  9_Version  10_Jira_Work  ";
+
+            if(curType == OS_TYPE.Windows){
+                itemDesc = batName.trim()+".bat  "+type+"_"+index+ "       【 创建 Z规则目录】 [索引 "+index+"]  描述: "+ desc_true +"\n";
+
+            }else{
+                itemDesc = batName.trim()+".sh "+type+"_"+index  + "       【 创建 Z规则目录】   [索引 "+index+"]  描述:"+ desc_true;
+            }
+
+            return itemDesc;
+        }
+
+    }
 
     class File_TimeName_Rule_16 extends Basic_Rule{
 
@@ -274,10 +328,10 @@ public class G2_ApplyRuleFor_TypeFile {
             String desc_true =   "  (不保留当前名称 按类型重命名当前目录下的文件) 文件命名格式为:    依据类型 序号_时间戳.类型   1_201841094.jpg 2_201841094.jpg 3_2018413131.jpg 1_201804021145.png";
 
             if(curType == OS_TYPE.Windows){
-                itemDesc = batName.trim()+".bat  "+type+"_"+index+ "       【 index_timestamp.type 序号_时间戳.类型命名】  [索引 "+index+"]  描述: "+ desc_true +"\n";
+                itemDesc = batName.trim()+".bat  "+type+"_"+index+ "       【 index_timestamp.type 序号_时间戳.类型 命名】针对所有文件  [索引 "+index+"]  描述: "+ desc_true +"\n";
 
             }else{
-                itemDesc = batName.trim()+".sh "+type+"_"+index  + "       【 index_timestamp.type 序号_时间戳.类型命名】   [索引 "+index+"]  描述:"+ desc_true;
+                itemDesc = batName.trim()+".sh "+type+"_"+index  + "       【 index_timestamp.type 序号_时间戳.类型 命名】针对所有文件   [索引 "+index+"]  描述:"+ desc_true;
             }
 
             return itemDesc;
