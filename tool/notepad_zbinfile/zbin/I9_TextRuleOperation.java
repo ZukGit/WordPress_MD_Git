@@ -104,7 +104,7 @@ public class I9_TextRuleOperation {
     static Rule CUR_Selected_Rule ;    // 当前默认选中的 操作规则 这里实现了具体的操作逻辑
 
     // 固定6  从shell 中获取到的 除了 args[0] 和 args[1] 之外的所有其他的输入参数类型
-    static ArrayList<String> CUR_INPUT_3_ParamStrList = new ArrayList<>();
+    static ArrayList<String> CUR_INPUT_3_ParamStrList = new ArrayList<String>();
 
 
     // 固定7  当前保存 Rule的集合
@@ -3581,9 +3581,9 @@ public class I9_TextRuleOperation {
     public static int Rule6_rowItemMaxLength = 0;   // 最大item的长度
     public static int Rule6_itemSpace = 5;
 
-    public static final ArrayList<String> Rule6_SrcStringArr = new ArrayList<>();  // 源数据的每行数据
+    public static final ArrayList<String> Rule6_SrcStringArr = new ArrayList<String>();  // 源数据的每行数据
 
-    public static final ArrayList<String> Rule6_DstStringArr = new ArrayList<>();  // 目的数据的每行数据
+    public static final ArrayList<String> Rule6_DstStringArr = new ArrayList<String>();  // 目的数据的每行数据
 
 
 
@@ -3901,7 +3901,7 @@ public class I9_TextRuleOperation {
 
 
     // Rule_11  Begin  把表格 3x3 转为   MD文件格式 加入 |---| 分割符号
-    public static final ArrayList<String> Rule11_tableItemList = new ArrayList<>();
+    public static final ArrayList<String> Rule11_tableItemList = new ArrayList<String>();
     public static int Rule11_rowInLine = 0;
 
 
@@ -4343,7 +4343,7 @@ public class I9_TextRuleOperation {
         //System.out.println(Rule14_ToFirstChar("ABC  汉字转换为拼音CBA").toUpperCase()); //转为首字母大写
         // System.out.println(Rule14_ToPinyinWithLine("A周 B杰 C伦"));
         // System.out.println(Rule14_ToPinyinWithLine("ABC汉字转换为拼音CBA"));
-        ArrayList<String> StringArr = new ArrayList<>();
+        ArrayList<String> StringArr = new ArrayList<String>();
 
 
         File curFile=   srcFile;
@@ -4780,7 +4780,7 @@ public class I9_TextRuleOperation {
             System.out.println("------------------------------");
             System.out.println("result = " + result);
 //
-//            List<List<List<String>>> list = new ArrayList<>();
+//            List<List<List<String>>> list = new ArrayList<String>();
 //
 //            List<List<String>> li1 = new ArrayList<List<String>>();
 //            li1.add(Arrays.asList("d", "e", "f"));
