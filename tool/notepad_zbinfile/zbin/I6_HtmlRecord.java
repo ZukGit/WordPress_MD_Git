@@ -35,7 +35,7 @@ public class I6_HtmlRecord {
     static String Cur_Bat_Name = "zhtml_record_I6";
     // 当前用户选中的 操作的类型  0-默认标识没有选中打印帮助字符串    1-标识选中默认规则1
     static int CUR_TYPE_INDEX = 1;
-    static boolean  allowEmptyInputParam = true;    // 是否允许输入参数为空 执行 rule的apply方法
+    static boolean  allowEmptyInputParam = false;    // 是否允许输入参数为空 执行 rule的apply方法
 
 /*******************修改属性列表 ------End *********************/
 
@@ -53,8 +53,12 @@ public class I6_HtmlRecord {
 
 
     // 固定2 当前执行文件的编号 A1  A2  A3   ... G1   I6   G3 ... Z9
-    static String defaultRecordKey = "I6_Default_Record_Path";
-    static String defaultRecordValue=zbinPath+File.separator+"I6_Default_Category_Dir";
+
+
+    static String defaultRecordDir=zbinPath+File.separator+"I6_Html_Record";
+    static String defaultRecordHtmlDir=zbinPath+File.separator+"I6_Html_Record"+File.separator+"template";
+    static File defaultRecordDirFile = new File(defaultRecordDir);
+    static ArrayList<File> HtmlRecordDirList = new   ArrayList<File>();
 
     static File I6_Properties_File = new File(System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin" + File.separator + get_Bat_Sh_FlagNumber(Cur_Bat_Name)+".properties");
     static InputStream I6_Properties_InputStream;
@@ -198,9 +202,7 @@ public class I6_HtmlRecord {
                 propKey2ValueList.put(key, I6_Properties.getProperty(key));
             }
             I6_Properties_InputStream.close();
-            if(I6_Properties.keySet().contains(defaultRecordKey)){
-                I6_Properties.put(defaultRecordKey,defaultRecordValue);
-            }
+
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -238,9 +240,9 @@ public class I6_HtmlRecord {
                     CUR_TYPE_2_ParamsStr = args[i];
                     //zukgit1    计算得到 当前 索引的列表   首先遇到的第一个数字类型  1_2112  那就是索引1  附带参数 2112   temp_2_
                     int userSelectedIndex = calculInputTypeIndex(CUR_TYPE_2_ParamsStr);
-                    if(userSelectedIndex != 0 && userSelectedIndex != CUR_TYPE_INDEX){
+                    if(userSelectedIndex != 0 && userSelectedIndex != CUR_TYPE_INDEX  && !isCurDirParams(CUR_TYPE_2_ParamsStr)){
                         // 如果 当前 的操作规则 不是 0   并且 操作索引 和当前 索引 不一样  那么就寻找赋值给  CUR_TYPE_INDEX
-                        CUR_TYPE_INDEX =  userSelectedIndex;
+                        //   CUR_TYPE_INDEX =  userSelectedIndex;   //  当前 永远 默认为 1 了
                         isDefaultOperation = false;
                     }else if(userSelectedIndex == CUR_TYPE_INDEX){
                         // 显式的输入默认值
@@ -261,6 +263,32 @@ public class I6_HtmlRecord {
 
         File mCUR_Dir_FILE = new File(CUR_Dir_1_PATH);
         CUR_Dir_FILE = new  File(CUR_Dir_1_PATH);
+
+    }
+
+
+    static void    initI6Record(){
+//        static String defaultRecordDir=zbinPath+File.separator+"I6_Html_Record";
+//        static String defaultRecordHtmlDir=zbinPath+File.separator+"I6_Html_Record"+File.separator+"template";
+//        static File defaultRecordDirFile = new File(defaultRecordDir);
+//        static ArrayList<File> HtmlRecordDirList = new   ArrayList<File>();
+
+        if(!defaultRecordDirFile.exists()){
+            System.out.println("注意:  当前 I6 保存 html文件的 路径不存在! ");
+            defaultRecordDirFile.mkdirs();
+        }
+
+
+      File[] htmlDirFileList =   defaultRecordDirFile.listFiles();
+        for (int i = 0; i < htmlDirFileList.length; i++) {
+                    if(htmlDirFileList[i].isDirectory()){
+                        HtmlRecordDirList.add(htmlDirFileList[i]);
+            }
+        }
+
+
+        System.out.println("当前保存 Html_Record 记录数:  "+ HtmlRecordDirList.size());
+                // HtmlRecordDirList =
 
     }
 
@@ -304,6 +332,7 @@ public class I6_HtmlRecord {
     void InitRule(){
 
         //   加入类型一一对应的 那些 规则
+        CUR_RULE_LIST.add( new Empty_Rule_0());
         CUR_RULE_LIST.add( new ShowRecord_Rule_1());
 //        CUR_RULE_LIST.add( new File_Name_Rule_2());
 //        CUR_RULE_LIST.add( new Image2Jpeg_Rule_3());
@@ -319,19 +348,7 @@ public class I6_HtmlRecord {
    static File userSelectedDir;
 
     File   getDefaultRecordFile(){
-        File defaultCategoryDir = null;
-        String defaultRecordPath =   I6_Properties.getProperty(defaultRecordKey);
-        if(defaultRecordPath == null || "".equals(defaultRecordPath)){
-            defaultCategoryDir = new File(defaultRecordValue);
-        }else{
-            defaultCategoryDir = new File(defaultRecordPath);
-        }
-
-        if(userSelectedDir !=  null){
-            defaultCategoryDir = userSelectedDir;
-        }
-
-        return defaultCategoryDir;
+        return userSelectedDir;
     }
 
 
@@ -341,10 +358,16 @@ public class I6_HtmlRecord {
         File I6_Html_Template_File ; //        I6_Html_Template.html    目标文件
         File targetHtmlFile ;   // 生成的目标的 Html 文件
 
+// 判断最后一个参数是否是  true  来判断 是否复制到 当前选中的文件夹的内容到 I6 默认文件夹
+        boolean isCopyToI6Dir;   //  是否复制当前选中的文件夹的内容到 I6 默认文件夹
+
+
 
         ShowRecord_Rule_1(){
             super(1,false);
             allRecordFileList = new  ArrayList<File>();
+
+            //  当前用户输入的  html文件夹
             recordFile = getDefaultRecordFile();
             I6_Html_Template_File = new File(zbinPath+File.separator+"I6_Html_Template.html");
             targetHtmlFile = new File(recordFile.getAbsolutePath()+File.separator+recordFile.getName()+".html");
@@ -360,13 +383,22 @@ public class I6_HtmlRecord {
                 return false;
             }
             */
+
+
+            System.out.println("shellDir = "+shellDir.getAbsolutePath());
+            System.out.println("type2Param = "+type2Param);
+            System.out.println("isCopyToI6Dir = "+isCopyToI6Dir);
+            showStringListWithTitle(otherParams,"剩余参数列");
+
+
             if(recordFile == null){
                 errorMsg = "当前 record 目录 为空  recordFile = "+ recordFile;
                 return false;
             }
 
             if(!recordFile.exists()){
-                recordFile.mkdirs();
+                System.out.println("当前用户输入的目录不存在! 将展示已保存在 "+defaultRecordDir+" 的 HtmlRecord 列表信息! ");
+                return false;
             }
 
             if(I6_Html_Template_File == null || !I6_Html_Template_File.exists()){
@@ -374,9 +406,48 @@ public class I6_HtmlRecord {
                 return false;
             }
 
-
-
             allRecordFileList.addAll(Arrays.asList(recordFile.listFiles())) ;
+            if(otherParams != null ){
+                String endParamItem = otherParams.get(otherParams.size()-1);
+                String recordAbsPath = recordFile.getAbsolutePath();
+
+
+// !recordAbsPath.contains(defaultRecordDir)   标识 当前的记录 不是在 默认路径里 才能复制
+                if("true".equals(endParamItem) && otherParams.size() != 1 && recordFile.exists() && !recordAbsPath.contains(defaultRecordDir)){
+                    isCopyToI6Dir = true;
+                    recordFile = new File(defaultRecordDir +File.separator+ otherParams.get(0));
+                    targetHtmlFile = new File(recordFile.getAbsolutePath()+File.separator+recordFile.getName()+".html");
+                    System.out.println("recordFile =" + recordFile);
+                }
+            }
+
+            //  如果用户当前输入的最后的一个参数为 true 那么就需要保存
+            if(isCopyToI6Dir){
+                ArrayList<File> I6_Record_Store_File_List = new ArrayList<File>();
+                for (int i = 0; i < allRecordFileList.size(); i++) {
+                    File fileItem = allRecordFileList.get(i);
+                    String absPathItem = fileItem.getAbsolutePath();
+                    String newPathItem = absPathItem.replace(CUR_Dir_1_PATH,"");
+                    newPathItem = defaultRecordDir+newPathItem;
+                    newPathItem = newPathItem.replace(File.separator+File.separator,File.separator);
+                    File fixedFile = new File(newPathItem);
+                    if(!fixedFile.getParentFile().exists()){
+                        fixedFile.getParentFile().mkdirs();
+                    }
+//                    System.out.println();
+//                    System.out.println("保存操作: oldpath:" + absPathItem );
+//                    System.out.println("保存操作: newpath:" + newPathItem);
+//                    System.out.println();
+                    fileCopy(fileItem,fixedFile);
+                    if(fixedFile.isFile()){
+                        I6_Record_Store_File_List.add(fixedFile);
+                    }
+
+                }
+                allRecordFileList.clear();
+                allRecordFileList.addAll(I6_Record_Store_File_List);
+            }
+
 
 
             allRecordFileList.sort(new Comparator<File>() {
@@ -417,28 +488,25 @@ public class I6_HtmlRecord {
         @Override
         ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 
+
+
+
             StringBuilder bodyContent = new StringBuilder();
             for (int i = 0; i < allRecordFileList.size(); i++) {
                 File mFile = allRecordFileList.get(i);
                 String mFileHtmlCode = calculHtml4File(mFile);
                 bodyContent.append(mFileHtmlCode+"\n");
             }
-
             String htmlTemplate =   ReadFileContent(I6_Html_Template_File);
             if(htmlTemplate == null){
                 System.out.println("当前从 "+I6_Html_Template_File.getAbsolutePath() +" 获得的模板为空! 执行失败");
                 return null;
             }
-
             String recordName = recordFile.getName();
             String recordHtml =  htmlTemplate.replace("zukgitPlaceHolderTitle",recordName);
-
             recordHtml = recordHtml.replace("zukgitPlaceHolderBody",bodyContent.toString());
-
             writeContentToFile(targetHtmlFile,recordHtml);
-
             openLocalHtml(targetHtmlFile.getAbsolutePath());
-
             System.out.println("Open "+targetHtmlFile.getAbsolutePath() +" Over !");
 
 
@@ -545,6 +613,15 @@ public class I6_HtmlRecord {
     }
 
 
+
+
+    class Empty_Rule_0 extends  Basic_Rule{
+
+        Empty_Rule_0(){
+            super(0,false);
+
+        }
+    }
 
     class Basic_Rule extends Rule {
         Basic_Rule(String ctype, int cindex,int opera_type){
@@ -889,6 +966,25 @@ public class I6_HtmlRecord {
         System.out.println("请检查输入参数后重新执行命令!");
 
     }
+    static void showRecordList() {
+
+        System.out.println("输出 当前 已保存的 htmlrecord 路径");
+        System.out.println("════════════════");
+        for (int i = 0; i < HtmlRecordDirList.size(); i++) {
+            File exist_html_record = HtmlRecordDirList.get(i);
+            String dirName = exist_html_record.getName();
+            System.out.println("【" + (i + 1) + "】    " + Cur_Bat_Name + " " + dirName);
+        }
+        System.out.println("════════════════");
+    }
+
+
+    static void showEmptyInputTip() {
+
+        System.out.println("当前用户输入的参数为空! ");
+        showRecordList();
+        System.out.println("tip1: 输入参数最后加入 true 标识 把当前记录保存到默认文件夹中 "+ defaultRecordDir);
+    }
     static void showTip() {
         System.out.println("对Type文件内容 进行 Index 规则的处理  identy=【 Type_Index 】【 文件后缀_当前操作逻辑索引】\n");
         System.out.println("当前已实现的替换逻辑如下:\n");
@@ -918,7 +1014,11 @@ public class I6_HtmlRecord {
 
 
 
-
+    static boolean  isCurDirParams(String dirName){
+        boolean flag = false;
+        File dirFile =   new File(CUR_Dir_1_PATH+File.separator+dirName);
+        return dirFile.exists();
+    }
 
     static int calculInputTypeIndex(String inputParams){
         if(inputParams == null){
@@ -1775,28 +1875,59 @@ public class I6_HtmlRecord {
     public static void main(String[] args) {
 
         initSystemInfo();
+
+        initI6Record();
+
+
         initInputParams(args);
 
+        // 用户没有输入参数
+        if (CUR_INPUT_3_ParamStrList.size() == 0 && !allowEmptyInputParam ) {
+            showEmptyInputTip();
+            return;
+        }
+
+
+        if(userSelectedDir == null){
+            System.out.println("当前用户输入的 当前文件夹  "+CUR_Dir_1_PATH+File.separator+CUR_TYPE_2_ParamsStr +" 【输入路径: 不存在】 ");
+
+     File checkExistFile = new File(defaultRecordDir+File.separator+CUR_INPUT_3_ParamStrList.get(0));
+            System.out.println("checkExistFile = "+ checkExistFile.getAbsolutePath());
+            if(checkExistFile.exists()){
+                userSelectedDir = checkExistFile;
+                System.out.println("将检测是否存在于 默认的 htmlRecord 路径 "+ defaultRecordDir +" 【存在默认路径:是】");
+            }else{
+                System.out.println("将检测是否存在于 默认的 htmlRecord 路径 "+ defaultRecordDir +" 【存在默认路径:否】");
+
+            }
+            showRecordList();
+            if(userSelectedDir == null){
+                userSelectedDir =  new File(defaultRecordHtmlDir);
+            }
+
+
+        }else{
+            System.out.println("当前用户输入的 当前文件夹  "+CUR_Dir_1_PATH+File.separator+CUR_TYPE_2_ParamsStr +" 【输入路径: 存在】 ");
+            showRecordList();
+        }
 
         I6_HtmlRecord mI6_Object = new I6_HtmlRecord();
         mI6_Object.InitRule();
 
 
-        // 用户没有输入参数
-        if (CUR_INPUT_3_ParamStrList.size() == 0 && !allowEmptyInputParam ) {
-            showTip();
-            return;
-        }
 
+
+
+/*
         //   默认的索引同时也被修改  没有获得 当前 适配的规则索引
         if(CUR_TYPE_INDEX <= 0 ||  CUR_TYPE_INDEX > CUR_RULE_LIST.size()){
             showNoTypeTip(CUR_TYPE_INDEX);
             return;
         }
+*/
 
 
-
-
+        System.out.println("CUR_TYPE_INDEX = "+ CUR_TYPE_INDEX);
         CUR_Selected_Rule = getRuleByIndex(CUR_TYPE_INDEX);  //  获取用户选中的 规则
 
 
@@ -1823,7 +1954,8 @@ public class I6_HtmlRecord {
 
 
         CUR_Selected_Rule.operationRule(CUR_INPUT_3_ParamStrList);  // 传递参数列表 进行处理
-        System.out.println("Program Run "+" Over !");
+        System.out.println("tip1: 输入参数最后加入 true 标识 把当前记录保存到默认文件夹中 "+ defaultRecordDir);
+        System.out.println("程序执行结束!  "+"  Over !");
 
 
         setProperity();
@@ -1837,6 +1969,18 @@ public class I6_HtmlRecord {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+    }
+
+
+  static void showStringListWithTitle(ArrayList<String> inputParamList,String title) {
+if(inputParamList == null){
+    System.out.println(title+ " 列表为空 无法打印!");
+    return ;
+}
+       for (int i = 0; i < inputParamList.size(); i++) {
+           System.out.println(title+"index[ "+i+"] = "+ inputParamList.get(i));
+       }
 
     }
 }
