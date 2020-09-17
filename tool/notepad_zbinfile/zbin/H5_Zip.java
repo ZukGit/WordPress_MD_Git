@@ -114,9 +114,19 @@ public class H5_Zip {
     }
 
 
-    public static void beginFliterFile(File shellDirFile) {
+    public static void beginFliterFile(File shellDirFile,boolean isAll_Search_Express) {
         ArrayList<File> allSingleFileList = new ArrayList<File>();
-        allSingleFileList.addAll(Arrays.asList(shellDirFile.listFiles()));
+        if(isAll_Search_Express){   //  全局搜索
+
+            allSingleFileList.addAll(getAllSubFile(shellDirFile));
+            System.out.println("isAll_Search_Express = true  子 孙 曾孙 文件 !");
+
+        }else{
+            System.out.println("isAll_Search_Express = false  子文件 ");
+            allSingleFileList.addAll(Arrays.asList(shellDirFile.listFiles()));
+
+        }
+
         for (int i = 0; i < allSingleFileList.size(); i++) {
             File curFile = allSingleFileList.get(i);
 
@@ -128,6 +138,9 @@ public class H5_Zip {
             }
 
         }
+
+
+
 
     }
 
@@ -216,6 +229,8 @@ public class H5_Zip {
     //  7z.exe 文件的
     static String WINEXE_WINRAR_PATH = zbinPath + File.separator+"H5_WinRAR.exe ";
 
+ //  用于标记当前 用户输入的最后一个参数是 all 用于判断是否需要把当前目录的所有文件 子文件 孙文件 都解压缩
+    static boolean  isAll_Search_Express = false;
     public static void main(String[] args) {
 
         initSystemInfo();
@@ -231,6 +246,13 @@ public class H5_Zip {
                 }
             }
         }
+        if(CUR_INPUT_ParamStrList.size() > 0){
+            String lastInputStr = CUR_INPUT_ParamStrList.get(CUR_INPUT_ParamStrList.size()-1);
+            if("all".endsWith(lastInputStr)){
+                isAll_Search_Express = true;
+            }
+        }
+
         PasswordList.add(""); // 加入一个 默认的 密码  空的密码
         PasswordList.addAll(CUR_INPUT_ParamStrList);
 
@@ -247,10 +269,14 @@ public class H5_Zip {
         // 用户没有输入参数
         if (CUR_INPUT_ParamStrList.size() == 0) {
             System.out.println("用户没有输入解压密码  默认当前 压缩文件无密码进行解压 ");
+            System.out.println("【 Tip1: 最后一个输入参数为 all ( "+Cur_Bat_Name+"  all "+ " ) 时 表示以当前shell目录为根目录的 全局 子文件 孙文件 曾孙文件搜索 ! 】");
 //            showNoTypeTip();
+            System.out.println("isAll_Search_Express = "+ isAll_Search_Express +"   仅仅子文件" );
 
         } else {
             System.out.println("当前用户输入的密码如下,将使用该密码集合解压当前 加密的 .zip .rar .7z 文件!");
+            System.out.println("【 Tip1: 最后一个输入参数为  all ( "+Cur_Bat_Name+"  all "+ " ) 时 表示以当前shell目录为根目录的 全局 子文件 孙文件 曾孙文件搜索 ! 】");
+            System.out.println("isAll_Search_Express = "+isAll_Search_Express+  (isAll_Search_Express == true?" 孙文件 孙孙文件搜索 ":" 仅子文件搜索"));
             for (int i = 0; i < PasswordList.size(); i++) {
                 String passwordItem = PasswordList.get(i);
                 int count = i + 1;
@@ -260,7 +286,7 @@ public class H5_Zip {
         }
 
 
-        beginFliterFile(CUR_Dir_FILE);
+        beginFliterFile(CUR_Dir_FILE,isAll_Search_Express);
         showMapSummaryData();
 /*     //.代码的方式 对文件的进行的解压  太慢了
         tryJieYaOperationWithCode();
@@ -283,6 +309,9 @@ public class H5_Zip {
         //2.  拿到参数再具体进行逻辑操作
 
         setProperity();
+        if(isAll_Search_Express && "ZWin_Software".equals(CUR_Dir_FILE.getName())){
+            System.out.println("Tip: 当前目录已执行完成 解压缩 可以在当前目录 "+CUR_Dir_FILE.getName()+ " 执行如下命令    \n zinstall_software_J1.bat " );
+        }
     }
 
 
@@ -373,6 +402,9 @@ public class H5_Zip {
 
 
     static void showUnKnowFile(Set<File> unknowPasswordFileList) {
+        if(isAll_Search_Express){
+           return;
+        }
         System.out.println("*******" + " 当前目录无法解压的文件个数 : 【" + unknowPasswordFileList.size() + "】 将改为以" + "【" + UNZIP_PRE + "】开头" + " *******");
 ArrayList<File> unknowList = new ArrayList<File>();
 boolean  isContainBlankName = false;
@@ -392,7 +424,10 @@ boolean  isContainBlankName = false;
                 newname = newname.replace("   ","_");
                 newname = newname.replace("  ","_");
                 newname = newname.replace(" ","_");
-                tryReName(fileItem, newname);
+
+                    tryReName(fileItem, newname);
+
+
             }
 
         }
@@ -449,10 +484,26 @@ boolean  isContainBlankName = false;
 //            boolean isJiaMi = isRarEncrypted(rarFile);
             boolean isJiaMi = true;  // 默认的 jima 都是 true的
             String rarTargetFilePath = rarFile.getParent() + File.separator + getFileNameNoPoint(rarFile.getName())+rar_JiaYa_EndFlag;
+
+            if(isAll_Search_Express){
+                rarTargetFilePath = rarFile.getParentFile().getAbsolutePath() + File.separator + getFileNameNoPoint(rarFile.getName());
+            }
+            System.out.println(" ZZZrarTargetFilePath = "+ rarTargetFilePath);
+
             //  把 ZFAILED_UNrar_  去除 再检查  是否存在 目标文件
             rarTargetFilePath = rarTargetFilePath.replace(UNZIP_PRE,"");
             File targetFile = new File(rarTargetFilePath);  // 解压的文件夹
+
+            // 目标文件夹
             String targetDirName = targetFile.getName().replace(UNZIP_PRE,"");
+
+            if(isAll_Search_Express){
+                String zipDirAbsPath = targetFile.getAbsolutePath();
+                targetDirName = zipDirAbsPath.replace(CUR_Dir_FILE.getAbsolutePath(),"");
+                targetDirName = targetDirName.replace(targetFile.getName(),"");
+                targetDirName = targetDirName.replace(File.separator+File.separator,File.separator);
+
+            }
             boolean isTargetDirExist = isTargetExist_BigBytes(targetFile);
             boolean isOK = false;
             String targetPassword = "";
@@ -487,6 +538,11 @@ boolean  isContainBlankName = false;
                     System.out.println("目标解压路径 rarTargetFilePath = " + rarTargetFilePath);
                     System.out.println("目标解压路径 targetDirName = " + targetDirName);
                     System.out.println("isJiaMi = "+ isJiaMi +"   password = "+password+"  command = \n" + commandRar);
+
+//目标解压路径 zipTargetFilePath = D:\Temp\ZWin_SoftWare_20200911\ZWin_Software\A0_Pre_Install_Soft\cmder
+//目标解压路径 targetDirName = cmder
+
+// command = C:\Users\zhuzj5\Desktop\zbin\H5_7z.exe  -y -p""  x "D:\Temp\ZWin_SoftWare_20200911\ZWin_Software\A0_Pre_Install_Soft\ZFAILED_UNZIP_cmder.zip"  -o"./cmder"
 
                     String commandResult = execCMD(commandRar);
                     System.out.println("══════════════Begin ExE ");
@@ -600,10 +656,24 @@ String fixAbsPath = rarFile.getAbsolutePath().replace(UNZIP_PRE,"");
             int indexCount = i + 1;
             boolean isJiaMi = is7zEncrypted(z7File);
             String z7TargetFilePath = z7File.getParent() + File.separator + getFileNameNoPoint(z7File.getName())+z7_JiaYa_EndFlag;
+           if(isAll_Search_Express){
+               z7TargetFilePath = z7File.getParentFile().getAbsolutePath() + File.separator + getFileNameNoPoint(z7File.getName());
+            }
+
+            System.out.println("ZZZz7TargetFilePath = "+ z7TargetFilePath);
             //  把 ZFAILED_UNZIP_  去除 再检查  是否存在 目标文件
             z7TargetFilePath = z7TargetFilePath.replace(UNZIP_PRE,"");
             File targetFile = new File(z7TargetFilePath);  // 解压的文件夹
             String targetDirName = targetFile.getName().replace(UNZIP_PRE,"");
+
+            if(isAll_Search_Express){
+                String zipDirAbsPath = targetFile.getAbsolutePath();
+                targetDirName = zipDirAbsPath.replace(CUR_Dir_FILE.getAbsolutePath(),"");
+                targetDirName = targetDirName.replace(targetFile.getName(),"");
+                targetDirName = targetDirName.replace(File.separator+File.separator,File.separator);
+
+            }
+
             boolean isTargetDirExist = isTargetExist_BigBytes(targetFile);
             boolean isOK = false;
             String targetPassword = "";
@@ -742,11 +812,23 @@ String fixAbsPath = rarFile.getAbsolutePath().replace(UNZIP_PRE,"");
             int indexCount = i + 1;
 //            boolean isJiaMi = isZipFileEncrypted(zipFile);
             boolean isJiaMi = true;
-                    String zipTargetFilePath = zipFile.getParent() + File.separator + getFileNameNoPoint(zipFile.getName())+zip_JiaYa_EndFlag;
+            String zipTargetFilePath = getFileNameNoPoint(zipFile.getName())+zip_JiaYa_EndFlag;
+            if(isAll_Search_Express){
+                zipTargetFilePath = zipFile.getParentFile().getAbsolutePath() + File.separator + getFileNameNoPoint(zipFile.getName());
+            }
+            System.out.println("ZZZzipTargetFilePath = "+ zipTargetFilePath);
          //  把 ZFAILED_UNZIP_  去除 再检查  是否存在 目标文件
             zipTargetFilePath = zipTargetFilePath.replace(UNZIP_PRE,"");
             File targetFile = new File(zipTargetFilePath);  // 解压的文件夹
             String targetDirName = targetFile.getName().replace(UNZIP_PRE,"");
+            if(isAll_Search_Express){
+                String zipDirAbsPath = targetFile.getAbsolutePath();
+                targetDirName = zipDirAbsPath.replace(CUR_Dir_FILE.getAbsolutePath(),"");
+                targetDirName = targetDirName.replace(targetFile.getName(),"");
+                targetDirName = targetDirName.replace(File.separator+File.separator,File.separator);
+            }
+
+
             boolean isTargetDirExist = isTargetExist_BigBytes(targetFile);
             boolean isOK = false;
             String targetPassword = "";
@@ -766,6 +848,10 @@ String fixAbsPath = rarFile.getAbsolutePath().replace(UNZIP_PRE,"");
                    String command7z = WINEXE_Z7_PATH + " -y -p\"" + password.trim() + "\"  x \"" + zipAbsPath + "\"  -o\"./" + targetDirName+"\"";
                    System.out.println("目标解压路径 zipTargetFilePath = " + zipTargetFilePath);
                    System.out.println("目标解压路径 targetDirName = " + targetDirName);
+
+//目标解压路径 zipTargetFilePath = D:\Temp\ZWin_SoftWare_20200911\ZWin_Software\A0_Pre_Install_Soft\cmder
+//目标解压路径 targetDirName = cmder
+
                    System.out.println("command = \n" + command7z);
 
                    String commandResult = execCMD(command7z);
@@ -795,6 +881,7 @@ String fixAbsPath = rarFile.getAbsolutePath().replace(UNZIP_PRE,"");
                        isJiaMi = true;
                        // 如果解压  失败 那么 把 解压出来的 目录 删掉
                        System.out.println("command 执行失败  密码错误!");
+                       System.out.println("删除 文件夹: "+ targetFile.getAbsolutePath());
                        deleteDirectory(targetFile.getAbsolutePath());
                    }
 
@@ -1315,8 +1402,9 @@ String fixAbsPath = rarFile.getAbsolutePath().replace(UNZIP_PRE,"");
             targetPath = RarFile.getParent() + File.separator + getFileNameNoPoint(RarFile.getName());
             targetFile = new File(targetPath);
 
-            // 目标文件夹 是否存在
+            // 目标文件夹 是否存在 SHELL 目录下
             boolean isExistTargetDir = checkExistDir(targetFile);
+
             long targetByte = isExistTargetDir ? getTotalSizeOfFilesInDir(targetFile) : 0L;
 
             if (isExistTargetDir && targetByte > 10) {
@@ -1576,11 +1664,17 @@ String fixAbsPath = rarFile.getAbsolutePath().replace(UNZIP_PRE,"");
         boolean flag = false;
         // 目标文件夹 是否存在
         boolean isExistTargetDir = checkExistDir(targetFile);
+        if(isAll_Search_Express){
+            isExistTargetDir = targetFile.exists();
+        }
         long targetByte = isExistTargetDir ? getTotalSizeOfFilesInDir(targetFile) : 0L;
 
-        if (isExistTargetDir && targetByte > 10) {
+        if (isExistTargetDir && targetByte > 3) {
+            System.out.println("isExistTargetDir"+isExistTargetDir+"  isTargetExist_BigBytes = true "+"targetFile = "+ targetFile.getAbsolutePath() + "  size = "+ targetByte);
             flag = true;
         }
+        System.out.println("isExistTargetDir"+isExistTargetDir+"  isTargetExist_BigBytes = false "+"targetFile = "+ targetFile.getAbsolutePath() + "  size = "+ targetByte);
+
         return flag;
     }
 
@@ -2289,6 +2383,35 @@ String fixAbsPath = rarFile.getAbsolutePath().replace(UNZIP_PRE,"");
         return getAllSubFile(dirFile.getAbsolutePath(), aospPath, typeList);
 
     }
+
+
+    static ArrayList<File> getAllSubFile(File rootPath) {
+        ArrayList<File> allFile = new ArrayList<File>();
+        Path curRootPath = Paths.get(rootPath.getAbsolutePath());
+
+        try {
+            Files.walkFileTree(curRootPath, new SimpleFileVisitor<Path>() {
+
+                @Override
+                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                    String fileString = file.toAbsolutePath().toString();
+
+                      allFile.add(new File(fileString));
+
+
+                    return FileVisitResult.CONTINUE;
+                }
+            });
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+        return allFile;
+
+
+    }
+
 
     static ArrayList<File> getAllSubFile(String rootPath, String aospItemPath, ArrayList<String> typeList) {
         ArrayList<File> allFile = new ArrayList<File>();

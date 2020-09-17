@@ -104,7 +104,7 @@ public class I9_TextRuleOperation {
     static Rule CUR_Selected_Rule ;    // 当前默认选中的 操作规则 这里实现了具体的操作逻辑
 
     // 固定6  从shell 中获取到的 除了 args[0] 和 args[1] 之外的所有其他的输入参数类型
-    static ArrayList<String> CUR_INPUT_3_ParamStrList = new ArrayList<String>();
+    static ArrayList<String> CUR_INPUT_3_ParamStrList = new ArrayList<>();
 
 
     // 固定7  当前保存 Rule的集合
@@ -407,7 +407,7 @@ public class I9_TextRuleOperation {
         ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
             File dirFile =  curInputFileList.get(0).getParentFile();
            File[] fileList =  dirFile.listFiles();
-            System.out.println("dirFile = "+ dirFile + "fileList = "+ fileList.length );
+            System.out.println("dirFile = "+ dirFile + "        fileList = "+ fileList.length );
             ArrayList<File>  exeFileList =     getFileTypeList(fileList,".exe");
             ArrayList<File>  msiFileList =      getFileTypeList(fileList,".msi");
             ArrayList<File> allOperationFile = new  ArrayList<File>();
@@ -426,10 +426,33 @@ public class I9_TextRuleOperation {
             }
             System.out.println("allOperationFile.size = "+ allOperationFile.size());
 
+            allOperationFile.sort(new Comparator<File>() {
+                @Override
+                public int compare(File o1, File o2) {
+                    long modify1 = o1.lastModified();
+                    long modify2 = o2.lastModified();
+                    if(modify1 == modify2) return 0;
+                    return modify1 > modify2 ? -1: 1 ;
+                }
+            });
+            String curShellPath = dirFile.getAbsolutePath();
             ArrayList<String> command_ContentList = new ArrayList<String>();
+
+            command_ContentList.add("@echo off");
+            command_ContentList.add("Setlocal ENABLEDELAYEDEXPANSION");
+
+
+
+
             String str_pre_1 = "start /wait /min ";
-            String str_end_1 = " /S /Q /D=E:\\Temp_Install\\";
-            String str_end_2 = " /quiet /norestart INSTALLDIR=\"E:\\Temp_Install\\";
+
+
+//            String str_end_1 = " /S /Q /D=E:\\Temp_Install\\";
+
+            String str_end_1 = " /S /Q /D="+curShellPath+File.separator;
+
+
+            String str_end_2 = " /quiet /norestart INSTALLDIR=\""+curShellPath+"\\";
             for (int i = 0; i < allOperationFile.size(); i++) {
                 File fileItem = allOperationFile.get(i);
                 String fileName = fileItem.getName();
@@ -448,15 +471,18 @@ public class I9_TextRuleOperation {
                     System.out.println("操作索引["+i+"]  = "+ fileName_Point);
                     String nameStr_noPoint = getFileNameNoPoint(fileName_Point);
 
-                    String tip1 = "#### "+fileName_Point;
+                    String tip1 = "rem #### "+fileName_Point;
                     String command1 = str_pre_1+ fileName_Point+" " + str_end_1 + nameStr_noPoint;
 
                     String command2 = str_pre_1+ fileName_Point+" " + str_end_2 + nameStr_noPoint+"\"";
 
 
                     command_ContentList.add(tip1);
+                    command_ContentList.add("echo  \"<type1_/S/Q/D> "+command1+"\"");
                     command_ContentList.add(command1);
+                    command_ContentList.add("echo  \" </quiet /norestart INSTALLDIR> "+command2+"\"");
                     command_ContentList.add(command2);
+
                     command_ContentList.add("\n");
                 }
 
@@ -3581,9 +3607,9 @@ public class I9_TextRuleOperation {
     public static int Rule6_rowItemMaxLength = 0;   // 最大item的长度
     public static int Rule6_itemSpace = 5;
 
-    public static final ArrayList<String> Rule6_SrcStringArr = new ArrayList<String>();  // 源数据的每行数据
+    public static final ArrayList<String> Rule6_SrcStringArr = new ArrayList<>();  // 源数据的每行数据
 
-    public static final ArrayList<String> Rule6_DstStringArr = new ArrayList<String>();  // 目的数据的每行数据
+    public static final ArrayList<String> Rule6_DstStringArr = new ArrayList<>();  // 目的数据的每行数据
 
 
 
@@ -3901,7 +3927,7 @@ public class I9_TextRuleOperation {
 
 
     // Rule_11  Begin  把表格 3x3 转为   MD文件格式 加入 |---| 分割符号
-    public static final ArrayList<String> Rule11_tableItemList = new ArrayList<String>();
+    public static final ArrayList<String> Rule11_tableItemList = new ArrayList<>();
     public static int Rule11_rowInLine = 0;
 
 
@@ -4343,7 +4369,7 @@ public class I9_TextRuleOperation {
         //System.out.println(Rule14_ToFirstChar("ABC  汉字转换为拼音CBA").toUpperCase()); //转为首字母大写
         // System.out.println(Rule14_ToPinyinWithLine("A周 B杰 C伦"));
         // System.out.println(Rule14_ToPinyinWithLine("ABC汉字转换为拼音CBA"));
-        ArrayList<String> StringArr = new ArrayList<String>();
+        ArrayList<String> StringArr = new ArrayList<>();
 
 
         File curFile=   srcFile;
@@ -4780,7 +4806,7 @@ public class I9_TextRuleOperation {
             System.out.println("------------------------------");
             System.out.println("result = " + result);
 //
-//            List<List<List<String>>> list = new ArrayList<String>();
+//            List<List<List<String>>> list = new ArrayList<>();
 //
 //            List<List<String>> li1 = new ArrayList<List<String>>();
 //            li1.add(Arrays.asList("d", "e", "f"));
