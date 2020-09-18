@@ -231,6 +231,10 @@ public class H5_Zip {
 
  //  用于标记当前 用户输入的最后一个参数是 all 用于判断是否需要把当前目录的所有文件 子文件 孙文件 都解压缩
     static boolean  isAll_Search_Express = false;
+
+    // 标记是否是在 J1.bat 文件中 被执行   以 J1_all 结尾
+    //1.  如果是 J1.bat 文件中  执行   当前路径不是 ZWin_Software 那么什么也不执行 提示报错
+    static boolean isExeCute_By_J1_Bat =  false;
     public static void main(String[] args) {
 
         initSystemInfo();
@@ -250,6 +254,10 @@ public class H5_Zip {
             String lastInputStr = CUR_INPUT_ParamStrList.get(CUR_INPUT_ParamStrList.size()-1);
             if("all".endsWith(lastInputStr)){
                 isAll_Search_Express = true;
+            }else if("J1_all".equals(lastInputStr)){
+                isAll_Search_Express = true;
+                isExeCute_By_J1_Bat = true;
+
             }
         }
 
@@ -263,6 +271,12 @@ public class H5_Zip {
 
         if (!mCUR_Dir_FILE.exists() || !mCUR_Dir_FILE.isDirectory()) {
             System.out.println("当前执行替换逻辑的文件路径:" + CUR_Dir_1_PATH + "  不存在! ");
+            return;
+        }
+
+
+        if(isExeCute_By_J1_Bat && !CUR_Dir_FILE.getName().equals("ZWin_Software")){
+            System.out.println("只有在 ZWin_Software 目录下 才能 执行 zinstall_software_J1.bat 的 解压缩功能!");
             return;
         }
 

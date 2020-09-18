@@ -69,6 +69,15 @@ public class J1_InstallSoftware {
     }
 
 
+    // 手动指定的 目录下的主 exe  对于 不是Path的 不是最大大小的 那些文件
+
+    static ArrayList<String> manualDefineMainSoft_List = new ArrayList<String>();
+
+    static {
+
+        manualDefineMainSoft_List.add("Eternity");
+    }
+
     // 需要添加到 PATH 中的 可执行文件
 
     static ArrayList<String> addPathExeFileNameList = new ArrayList<String>();
@@ -365,7 +374,7 @@ public class J1_InstallSoftware {
         try {
             linkFile.load();
         } catch (Exception e) {
-           System.out.println(e + " BPath:" + kuaijieFile);
+            System.out.println(e + " BPath:" + kuaijieFile);
             return null;
         }
 
@@ -492,30 +501,30 @@ public class J1_InstallSoftware {
         File Single_install_Dir;   //  当前文件的安装目录
 
 
-      public  String  toString(){
-          System.out.println();
-          System.out.println(category_key+" ****************************************" + rootFile);
-          System.out.println(" rootFile = "+ rootFile.getAbsolutePath());
-          System.out.println(" category_key = "+ category_key);
-          System.out.println(" targetExeFile = "+ targetExeFile);
+        public  String  toString(){
+            System.out.println();
+            System.out.println(category_key+" ****************************************" + rootFile);
+            System.out.println(" rootFile = "+ rootFile.getAbsolutePath());
+            System.out.println(" category_key = "+ category_key);
+            System.out.println(" targetExeFile = "+ targetExeFile);
 
-          System.out.println(" Single_install_Dir = "+ Single_install_Dir);
-          System.out.println(" target_relative_path = "+ target_relative_path);
+            System.out.println(" Single_install_Dir = "+ Single_install_Dir);
+            System.out.println(" target_relative_path = "+ target_relative_path);
 
-          System.out.println(" Desktop_Icon_File = "+ Desktop_Icon_File);
+            System.out.println(" Desktop_Icon_File = "+ Desktop_Icon_File);
 
-         if(rootFile.isDirectory()){
-             System.out.println(" subFileList.size() = "+ subFileList.size());
-             System.out.println(" allSubFileList.size() = "+ allSubFileList.size());
-             System.out.println(" addPathFileList.size() = "+ addPathFileList.size());
-             System.out.println(" exeAllFile.size() = "+ exeAllFile.size());
-             System.out.println(" addPathFileList.size() = "+ addPathFileList.size());
+            if(rootFile.isDirectory()){
+                System.out.println(" subFileList.size() = "+ subFileList.size());
+                System.out.println(" allSubFileList.size() = "+ allSubFileList.size());
+                System.out.println(" addPathFileList.size() = "+ addPathFileList.size());
+                System.out.println(" exeAllFile.size() = "+ exeAllFile.size());
+                System.out.println(" addPathFileList.size() = "+ addPathFileList.size());
 
-         }
-          System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+            }
+            System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
 
-              return "";
-          }
+            return "";
+        }
 
         ZWin_Software(String key, File crootFile) {
             category_key = key;
@@ -541,8 +550,19 @@ public class J1_InstallSoftware {
                     } else if (exeAllFile.size() == 1) {
                         targetExeFile = exeAllFile.get(0);
                     } else {
+                    File manualDefaineFile =     FluterManualMainExeFile(exeAllFile, manualDefineMainSoft_List);
+
+                    if(manualDefaineFile != null){
+                        System.out.println(" manualDefaineFile = "+ manualDefaineFile);
+                        targetExeFile = manualDefaineFile;
+
+                    }else{
                         System.out.println("当前目录存在多个 exe 文件夹  而且 无法判断 哪个是主文件夹 默认选中大小最大那个");
                         targetExeFile = getMaxSizeFile(exeAllFile);
+
+                    }
+
+
                     }
                 }
 
@@ -582,6 +602,31 @@ public class J1_InstallSoftware {
             return targetFile;
         }
 
+
+
+
+        File FluterManualMainExeFile(ArrayList<File> allFile, ArrayList<String> defineMainList) {
+            File curFile = null;
+            first1:
+            for (int i = 0; i < allFile.size(); i++) {
+                File fileItem = allFile.get(i);
+                String fileName = fileItem.getName().toLowerCase();
+
+                second2:
+                for (int j = 0; j < defineMainList.size(); j++) {
+                    String pathItem = defineMainList.get(j).toLowerCase();
+                    System.out.println(" AfileName = "+ fileName +"      pathItem ="+ pathItem);
+                    if (fileName.equals(pathItem) || fileName.startsWith(pathItem) ) {
+                        curFile = fileItem;
+                        break second2;
+                    }
+                }
+
+            }
+            return curFile;
+        }
+
+
         ArrayList<File> getPathFileList(ArrayList<File> allFile, ArrayList<String> pathExeList) {
             ArrayList<File> pathFileList = new ArrayList<File>();
             first1:
@@ -592,7 +637,7 @@ public class J1_InstallSoftware {
                 second2:
                 for (int j = 0; j < pathExeList.size(); j++) {
                     String pathItem = pathExeList.get(j);
-                    if (fileName.equals(pathItem)) {
+                    if (fileName.equals(pathItem) || fileName.startsWith(pathItem) ) {
                         pathFileList.add(fileItem);
                         break second2;
                     }
@@ -608,7 +653,7 @@ public class J1_InstallSoftware {
             for (int i = 0; i < allFile.size(); i++) {
                 File fileItem = allFile.get(i);
                 String fileName = fileItem.getName();
-                System.out.println("fileName = "+fileName.toLowerCase() +"     type ="+ type.toLowerCase());
+                System.out.println("fileName = "+fileName.toLowerCase() +"     type ="+ type.toLowerCase() +"  fileItem.abspath = "+ fileItem.getAbsolutePath());
                 if (fileName.toLowerCase().endsWith(type.toLowerCase())) {
                     arrFile.add(fileItem);
                 }
@@ -2001,6 +2046,14 @@ public class J1_InstallSoftware {
                     return super.postVisitDirectory(dir, exc);
                 }
 
+                @Override
+                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                    allDirFile.add(new File(file.toFile().getAbsolutePath()));
+                    return super.visitFile(file, attrs);
+                }
+
+
+
             });
         } catch (IOException e) {
             e.printStackTrace();
@@ -2078,12 +2131,19 @@ public class J1_InstallSoftware {
 
         TryInstallSoftware(zwin_soft_dir_Map);
 
+        ArrayList<String>  commandList = new ArrayList<String>();
+        commandList.add("@echo off");
+        commandList.add("Setlocal ENABLEDELAYEDEXPANSION");
 
         System.out.println("══════════════════" + " 安装命令 " + "══════════════════");
         for (int i = 0; i < ZWinSoft_Install_CommandList.size(); i++) {
             String commandItem = ZWinSoft_Install_CommandList.get(i);
+            commandList.add(commandItem);
             System.out.println(commandItem);
         }
+
+       File installBatFile = new File(CUR_Dir_FILE.getAbsolutePath()+File.separator+"J1_InstallSoft.bat");
+        writeContentToFile(installBatFile,commandList);
 
         if (true) {
             return;
@@ -2331,7 +2391,12 @@ public class J1_InstallSoftware {
                     System.out.println("toDoInstall  default DO-Nothing !");
 
             }
+            ZWinSoft_Install_CommandList.add("echo "+"\""+curCommand+"\"");
             ZWinSoft_Install_CommandList.add(curCommand);
+            ZWinSoft_Install_CommandList.add("echo=");
+            ZWinSoft_Install_CommandList.add("\n");
+
+
 
 
         }
