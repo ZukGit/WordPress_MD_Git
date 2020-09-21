@@ -1,8 +1,7 @@
 
-import com.google.common.collect.Maps;
-
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.URL;
@@ -15,29 +14,22 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-//1.   检查 当前的 PATH
-//2.  获取保存当前固定死的PATH路径  来自 .prop的PATH
-//3.  检查当前 PATH列表中 哪些已经在PATH路径中  哪些不在PATH路径中
-//4. 检查PATH路径中的文件夹 哪些PATH 包含有指定的 关键的 可执行文件
-//5. 尝试把 当前已经 安装成功的 软件  加入到PATH 列表
-//6. 输出当前没有成功加入到Path 列表的项
-//7. 在 zinstall_software_J1.bat 中会被调用   也可以单独调用  zpath_add_check_J1.bat
 
-
-
-public class J1_Add_Check_Path {
+//  往图片增加一个 高度 默认为1000(输入参数指定) 的宽度和原大小一致的白色照片与
+//  原有的照片(输入 合并为一个照片)
+public class J2_WhiteImage_Prefixed {
 
 
     /*******************修改属性列表 ------Begin *********************/
-// 修改0.   全局修改 把 J1 改为当前应用的序号规则序号  当前类名称也需要修改
+// 修改0.   全局修改 把 J2 改为当前应用的序号规则序号  当前类名称也需要修改
 // 修改1.当前 执行代码的 bat sh 文件名称  最后必须是标识序号
-    //修改2. J1_Add_Check_Path  改为当前类名称  A1 Z9
+    //修改2. J2_WhiteImage_Prefixed  改为当前类名称  A1 Z9
     //修改2.1  G2 改为 对应的 标识符
 // 修改3.  当前是否有默认的规则   如果有默认的规则那么设置 CUR_TYPE_INDEX为对应index , 没有默认规则那么设置为默认的1
-    static String Cur_Bat_Name = "zpath_add_check_J1";
+    static String Cur_Bat_Name = "zwhiteimage_padding_J2";
     // 当前用户选中的 操作的类型  0-默认标识没有选中打印帮助字符串    1-标识选中默认规则1
     static int CUR_TYPE_INDEX = 1;
-    static boolean  allowEmptyInputParam = true;    // 是否允许输入参数为空 执行 rule的apply方法
+    static boolean  allowEmptyInputParam = false;    // 是否允许输入参数为空 执行 rule的apply方法
 
 /*******************修改属性列表 ------End *********************/
 
@@ -53,15 +45,12 @@ public class J1_Add_Check_Path {
     static String lin_zbinPath = System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin"+File.separator+"lin_zbin";
     static String mac_zbinPath = System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin"+File.separator+"mac_zbin";
 
-    static File envFile = new File(System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin" + File.separator + "J1_env.txt");
-
-
 
     // 固定2 当前执行文件的编号 A1  A2  A3   ... G1   G2   G3 ... Z9
-    static File J1_Properties_File = new File(System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin" + File.separator + get_Bat_Sh_FlagNumber(Cur_Bat_Name)+".properties");
-    static InputStream J1_Properties_InputStream;
-    static OutputStream J1_Properties_OutputStream;
-    static Properties J1_Properties = new Properties();
+    static File J2_Properties_File = new File(System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin" + File.separator + get_Bat_Sh_FlagNumber(Cur_Bat_Name)+".properties");
+    static InputStream J2_Properties_InputStream;
+    static OutputStream J2_Properties_OutputStream;
+    static Properties J2_Properties = new Properties();
     static Map<String, String> propKey2ValueList = new HashMap<String, String>();
 
 
@@ -127,9 +116,9 @@ public class J1_Add_Check_Path {
 
 
 
-    // ffmpeg  -f concat -safe 0 -i C:\Users\zhuzj5\Desktop\zbin\J1_1_MergedRule.txt -c copy C:\Users\zhuzj5\Desktop\output2.mp4
+    // ffmpeg  -f concat -safe 0 -i C:\Users\zhuzj5\Desktop\zbin\J2_1_MergedRule.txt -c copy C:\Users\zhuzj5\Desktop\output2.mp4
     // D:\software\ffmpeg\bin
-    // D:\software\ffmpeg\bin\ffmpeg.exe  -f concat -safe 0 -i C:\Users\zhuzj5\Desktop\zbin\J1_1_MergedRule.txt -c copy C:\Users\zhuzj5\Desktop\output3.mp4
+    // D:\software\ffmpeg\bin\ffmpeg.exe  -f concat -safe 0 -i C:\Users\zhuzj5\Desktop\zbin\J2_1_MergedRule.txt -c copy C:\Users\zhuzj5\Desktop\output3.mp4
     static String getEnvironmentExePath(String program) {
         String exename = program.trim().toLowerCase();
         String executePath = null;
@@ -188,18 +177,18 @@ public class J1_Add_Check_Path {
 
     static {
         try {
-            if (!J1_Properties_File.exists()) {
-                J1_Properties_File.createNewFile();
+            if (!J2_Properties_File.exists()) {
+                J2_Properties_File.createNewFile();
             }
-            J1_Properties_InputStream = new BufferedInputStream(new FileInputStream(J1_Properties_File.getAbsolutePath()));
-            J1_Properties.load(J1_Properties_InputStream);
-            Iterator<String> it = J1_Properties.stringPropertyNames().iterator();
+            J2_Properties_InputStream = new BufferedInputStream(new FileInputStream(J2_Properties_File.getAbsolutePath()));
+            J2_Properties.load(J2_Properties_InputStream);
+            Iterator<String> it = J2_Properties.stringPropertyNames().iterator();
             while (it.hasNext()) {
                 String key = it.next();
-                // System.out.println("key:" + key + " value: " + J1_Properties.getProperty(key));
-                propKey2ValueList.put(key, J1_Properties.getProperty(key));
+                // System.out.println("key:" + key + " value: " + J2_Properties.getProperty(key));
+                propKey2ValueList.put(key, J2_Properties.getProperty(key));
             }
-            J1_Properties_InputStream.close();
+            J2_Properties_InputStream.close();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -210,9 +199,9 @@ public class J1_Add_Check_Path {
 
     static void setProperity() {
         try {
-            J1_Properties_OutputStream = new BufferedOutputStream(new FileOutputStream(J1_Properties_File.getAbsolutePath()));
-            J1_Properties.store(J1_Properties_OutputStream, "");
-            J1_Properties_OutputStream.close();
+            J2_Properties_OutputStream = new BufferedOutputStream(new FileOutputStream(J2_Properties_File.getAbsolutePath()));
+            J2_Properties.store(J2_Properties_OutputStream, "");
+            J2_Properties_OutputStream.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -225,29 +214,7 @@ public class J1_Add_Check_Path {
         MacOS
     }
 
-    static  void   initEnvironmentDir(){
 
-        if(CUR_Dir_FILE.getAbsolutePath().endsWith("ZWin_Software")){
-            isZwinDir = true;
-
-            File[] listFile = CUR_Dir_FILE.listFiles();
-            File environmentDir =  null;
-
-            for (int i = 0; i < listFile.length ; i++) {
-                File zSoftDir = listFile[i];
-                String zSoftDirName = zSoftDir.getName();
-                if(zSoftDirName.contains("Environment_Zip_Dir_Path")){
-                    environmentDir =  zSoftDir;
-                    break;
-                }
-            }
-            if(environmentDir != null && environmentDir.exists()){
-
-                Environment_Zip_Dir_Path = environmentDir;
-            }
-        }
-
-    }
     //  初始化  从 bat sh   传输而来的参数
     static  void  initInputParams(String[] args){
         if (args != null) {
@@ -325,7 +292,8 @@ public class J1_Add_Check_Path {
     void InitRule(){
 
         //   加入类型一一对应的 那些 规则
-        CUR_RULE_LIST.add( new MergeMP4_Rule_1());
+//        CUR_RULE_LIST.add( new MergeMP4_Rule_1());
+        CUR_RULE_LIST.add( new AddWhiteSpace_Rule_1());
 //        CUR_RULE_LIST.add( new File_Name_Rule_2());
 //        CUR_RULE_LIST.add( new Image2Jpeg_Rule_3());
 //        CUR_RULE_LIST.add( new Image2Png_Rule_4());
@@ -342,16 +310,16 @@ public class J1_Add_Check_Path {
 
     // boolean  isInputDirAsSearchPoint(默认为false) = true  First_Input_Dir存在时
 // 标识当前是以 输入参数构造的路径为上搜索起点路径  而不再以 shell目录为 搜索目录
-    class MergeMP4_Rule_1 extends  Basic_Rule{
+    class AddWhiteSpace_Rule_1 extends  Basic_Rule{
         ArrayList<File> curInputFileList ;
 
-        MergeMP4_Rule_1(boolean mIsInputDirAsSearchPoint){
+        AddWhiteSpace_Rule_1(boolean mIsInputDirAsSearchPoint){
             super(1);
             curInputFileList = new  ArrayList<File>();
             isInputDirAsSearchPoint =  mIsInputDirAsSearchPoint;
         }
 
-        MergeMP4_Rule_1(){
+        AddWhiteSpace_Rule_1(){
             super(1);
             curInputFileList = new  ArrayList<File>();
         }
@@ -380,6 +348,17 @@ public class J1_Add_Check_Path {
                     curFliterList.add(curFIle);
                 }
             }
+
+
+            String lastInputStr = otherParams.get(otherParams.size()-1);
+            if(isNumeric(lastInputStr)){
+                Default_PreFixed_Height = Integer.parseInt(lastInputStr);
+                Default_PreFixed_Height =  Math.abs(Default_PreFixed_Height);
+            }
+            curInputFileList.addAll(curFliterList);
+
+
+
             return super.checkParamsOK(shellDir, type2Param, otherParams);
         }
 
@@ -388,8 +367,58 @@ public class J1_Add_Check_Path {
 
         @Override
         ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+
+            for (int i = 0; i < curInputFileList.size(); i++) {
+                File fileitem = curInputFileList.get(i);
+                String fileName = fileitem.getName();
+                String fileName_low = fileName.toLowerCase().trim();
+                if(fileName_low.endsWith(".jpg") || fileName_low.endsWith(".png")  ){
+                    addWhiteSpace(fileitem);
+                }
+
+            }
+
             return super.applyOperationRule(curFileList, subFileTypeMap, curDirList, curRealFileList);
         }
+
+       void addWhiteSpace (File imageFile){
+            String imageType = getFileTypeWithPoint(imageFile.getName());
+         String type_fixed =   imageType.replace(".","").trim();
+         int originHigh =    getImageHigh(imageFile);
+         int originWidth =       getImageWidth(imageFile);
+
+           int whiteSpace_Heigh =         Default_PreFixed_Height;  // 默认的增加的高度
+           int whiteSpace_originWidth =   originWidth;
+
+           BufferedImage whiteSpace_BuffImage =   generalBufferedImage_WhitePicture(whiteSpace_originWidth,whiteSpace_Heigh);
+           BufferedImage originImage = getBufferedImage(imageFile);
+
+           BufferedImage combined = new BufferedImage(originWidth, originHigh+whiteSpace_Heigh,
+                   BufferedImage.TYPE_INT_RGB);
+
+
+           // paint both images, preserving the alpha channels
+           Graphics g = combined.getGraphics();
+
+           try {
+               g.drawImage(whiteSpace_BuffImage, 0, 0, null);
+               g.drawImage(originImage, 0, whiteSpace_Heigh, null);
+
+               // Save as new image
+               ImageIO.write(combined, type_fixed, imageFile);
+           }catch (Exception e){
+               System.out.println("发生异常! ");
+
+           }finally {
+               if (g != null) {
+                   g.dispose();
+               }
+           }
+
+           System.out.println("已完成对 "+imageFile.getName()+" 完成 高程 增加 "+ whiteSpace_Heigh+" 的操作!");
+
+        }
+
 
         //3. 如果当前 执行 错误  checkParams 返回 false   那么 将 打印这个函数 说明错误的可能原因
         @Override
@@ -403,7 +432,10 @@ public class J1_Add_Check_Path {
         String ruleTip(String type,int index , String batName,OS_TYPE curType){
             String itemDesc = "";
             if(curType == OS_TYPE.Windows){
-                itemDesc = batName.trim()+"  "+type+"_"+index + "    [索引 "+index+"]  描述:"+simpleDesc();
+                itemDesc = batName.trim() + "  xxx.png      [索引 "+index+"]  描述:"+simpleDesc()+"\n"+
+                        batName.trim() + "  xxx.png  333 " +"   [ 指定在图片头部增加一块 333(最后一个数值参数) 高程    宽度等高的白色区域! ] " +"\n"+
+                    batName.trim() + "  xxx.jpg  333 " +"   [ 指定在图片头部增加一块 333(最后一个数值参数) 高程    宽度等高的白色区域! ] ";
+
             }else{
                 itemDesc = batName.trim()+" "+type+"_"+index + "    [索引 "+index+"]  描述:"+simpleDesc();
             }
@@ -484,7 +516,7 @@ public class J1_Add_Check_Path {
 
 
         String simpleDesc(){
-            return null;
+            return "把参数输入的 .jpg 以及 .png 增加一块 高度为 1000 px 的 等宽的 白色区域";
         }
 
 
@@ -693,6 +725,8 @@ public class J1_Add_Check_Path {
 
 
     public static boolean isNumeric(String str) {
+        str = str.replace("+","");
+        str = str.replace("-","");
         for (int i = str.length(); --i >= 0; ) {
             if (!Character.isDigit(str.charAt(i))) {
                 return false;
@@ -828,9 +862,9 @@ public class J1_Add_Check_Path {
 /*
             String itemDesc = "";
            if(CUR_OS_TYPE == OS_TYPE.Windows){
-                itemDesc = "zrule_apply_J1.bat  "+type+"_"+index + "    [索引 "+count+"]  描述:"+desc;
+                itemDesc = "zrule_apply_J2.bat  "+type+"_"+index + "    [索引 "+count+"]  描述:"+desc;
            }else{
-               itemDesc = "zrule_apply_J1 "+type+"_"+index + "    [索引 "+count+"]  描述:"+desc;
+               itemDesc = "zrule_apply_J2 "+type+"_"+index + "    [索引 "+count+"]  描述:"+desc;
            }
            */
             System.out.println(desc+"\n");
@@ -1314,15 +1348,6 @@ public class J1_Add_Check_Path {
         }
     }
 
-     static String getPaddingEmptyString_empth(int length) {
-        String str = "";
-        for (int i = 0; i < length; i++) {
-            str += " ";
-        }
-        return str;
-    }
-
-
     public static String getPaddingEmptyString(int length) {
         String str = "";
         for (int i = 0; i < length; i++) {
@@ -1660,26 +1685,6 @@ public class J1_Add_Check_Path {
         }
     }
 
-
-    static ArrayList<File> getAllSubFile_WithPointType(File  rootPath,String type) {
-        ArrayList<File> allDirFile = new ArrayList<File>();
-        Path curRootPath = Paths.get(rootPath.getAbsolutePath() + File.separator );
-        try {
-            Files.walkFileTree(curRootPath, new SimpleFileVisitor<Path>() {
-                @Override
-                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                    if(file.toFile().getName().endsWith(type)){
-                        allDirFile.add(file.toFile());
-                    }
-                    return super.visitFile(file, attrs);
-                }
-            });
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return allDirFile;
-    }
-
     static ArrayList<File> getAllSubDirFile(File  rootPath) {
         ArrayList<File> allDirFile = new ArrayList<File>();
         Path curRootPath = Paths.get(rootPath.getAbsolutePath() + File.separator );
@@ -1720,683 +1725,16 @@ public class J1_Add_Check_Path {
     }
 
 
-    static String ZPATH = "";   // 系统环境变量 PATH的值
-    static ArrayList<String> PATH_ITEM_LIST = new   ArrayList<String>();
+    static int Default_PreFixed_Height = 1000;
 
-    static ArrayList<String> Failed_PATH_Item_LIST = new   ArrayList<String>();
-    static ArrayList<File> OK_PATH_File_LIST = new   ArrayList<File>();
-
-    // 最终也没找到 exe路径 的 指定的 应用
-    static  ArrayList<String> LOSS_PATH_END_LIST = new  ArrayList<String>();
-
-
-    static  void Create_AddPath_Operation(){
-
-        addPathCommand.add("@echo off");
-        addPathCommand.add("Setlocal ENABLEDELAYEDEXPANSION");
-
-        ArrayList<String> zenvironmrntAbsPathList = new ArrayList<String>();
-        if(Environment_Zip_Dir_Path != null){
-            File[] allZwinEnvDir = Environment_Zip_Dir_Path.listFiles();
-            for (int i = 0; i < allZwinEnvDir.length; i++) {
-                File itemFile = allZwinEnvDir[i];
-                if(itemFile.isDirectory()){
-                    zenvironmrntAbsPathList.add(itemFile.getAbsolutePath());
-                }
-            }
-        }
-
-
-        StringBuilder sb = new StringBuilder();
-        Set<String> installSet = new HashSet<String>();
-        installSet.addAll(install_software_path_list);
-        installSet.addAll(zenvironmrntAbsPathList);
-        ArrayList<String> fixedCommandList = new   ArrayList<String>();
-        fixedCommandList.addAll(installSet);
-
-        for (int i = 0; i < fixedCommandList.size(); i++) {
-            String absItem = fixedCommandList.get(i);
-            File exeFile = new File(absItem);
-            sb.append(exeFile.getParentFile().getAbsolutePath()+";");
-        }
-        String command = sb.toString();
-    String batCommand  ="SETX PATH  "+ "\""+command+"%PATH%"+"\""+"";
-        System.out.println();
-        System.out.println("添加 SETX PATH 命令乳如下:");
-        System.out.println(batCommand);
-        addPathCommand.add(batCommand);
-        System.out.println("执行结果:"+execCMD(batCommand));
-
-        System.out.println("Tip1: 在 Win+R 上 执行 加入 PATH 的 exe 文件 查看是否添加成功! ");
-        System.out.println("Tip2:  Cmder 下可能需要重启后才能生效!  以 Tip1 测试为准!");
-                /*
-        if(CUR_Dir_FILE.getAbsolutePath().contains("ZWin_Software")){
-            System.out.println("OK AddPath File ->  ZWin_Software 目录 创建并执行 .....ZWin_Software/J1_AddPath.bat");
-            File addPathBatFile = new File(CUR_Dir_FILE.getAbsolutePath()+File.separator+"J1_AddPath.bat");
-            writeContentToFile(addPathBatFile,addPathCommand);
-        }else{
-            System.out.println("Failed AddPath File ->  只在 ZWin_Software 目录 创建并执行 .....ZWin_Software/J1_AddPath.bat");
-            System.out.println("当前文件夹不是 ZWin_Software 文件夹 不会创建  J1_AddPath.bat 及 执行它");
-        }
-
-*/
-
-    }
-    static  void SystemFileSearch(){
-
-        System.out.println();
-        System.out.println();
-        System.out.println("══════════════════" + "侦查系统文件夹" + "══════════════════");
-
-        for (int i = 0; i < System_File.size(); i++) {
-            File item = System_File.get(i);
-            System.out.println("侦查系统文件夹["+i+"] = "+ item.getAbsolutePath());
-        }
-
-
-        ArrayList<File> searchFileList = new  ArrayList<File>();
-        for (int i = 0; i < System_File.size(); i++) {
-            File systemFile = System_File.get(i);
-            File[] fileArr = systemFile.listFiles();
-            for (int j = 0; j < fileArr.length; j++) {
-                File targetFile = fileArr[j];
-                if(targetFile.isDirectory()){
-                    String targetFileName = targetFile.getName();
-                    boolean isSearchDir = isSearch_CustomeDefine(targetFile,targetFileName);
-                    if(isSearchDir){
-                        searchFileList.add(targetFile);
-                    }
-                }
-            }
-        }
-
-
-
-        ArrayList<File> allCustoInstallExeFile = new ArrayList<File>();
-
-
-        for (int i = 0; i < searchFileList.size(); i++) {
-            File searchFile = searchFileList.get(i);
-            allCustoInstallExeFile.addAll(getAllSubFile_WithPointType(searchFile,".exe"));
-        }
-
-//        ZWorkSoft_Desc_Map
-
-        System.out.println();
-        System.out.println();
-        showMap_String_String(ZWorkSoft_Desc_Map,"当前定义的 应该添加到 PATH 的 EXE文件列表");
-
-        System.out.println();
-        System.out.println();
-        System.out.println("════════════════════════════════════"+"所有搜索到的 exe 文件数量 = "+allCustoInstallExeFile.size()+"════════════════════════════════════");
-Map<String,File> loss_exePath_Map = new HashMap<String,File>();
-ArrayList<String> loss_match_key = new ArrayList<String>();
-        for (int i = 0; i < allCustoInstallExeFile.size(); i++) {
-            File exeFile = allCustoInstallExeFile.get(i);
-            String exeFileName = exeFile.getName();
-            String matchLossFileName = calculLossFileName(exeFileName,LossTargetExeFileList);
-            if(matchLossFileName !=null && !"".equals(matchLossFileName)){
-                loss_match_key.add(matchLossFileName);
-                loss_exePath_Map.put(matchLossFileName,exeFile);
-            }
-//            System.out.println("exe["+i+"] = "+ exeFile.getAbsolutePath());
-        }
-
-/*        Map<String,String> LogMap_B = Maps.newConcurrentMap();
-        for (int i = 0; i < OK_PATH_File_LIST.size(); i++) {
-            File PathExeFile = OK_PATH_File_LIST.get(i);
-            String key = PathExeFile.getName();
-            String value = PathExeFile.getAbsolutePath();
-            LogMap_B.put(key,value);
-
-        }
-*/
-        System.out.println();
-        System.out.println();
-
-        showMap_String_String(InPathExeName_PathMap,"已添加到PATH中的 exe文件列表","已包含在PATH中的_exe");
-
-
-
-        System.out.println();
-        System.out.println();
-                System.out.println("════════════════════════════════════"+"Loss Path Exe Item List"+"════════════════════════════════════");
-
-        for (int i = 0; i < LossTargetExeFileList.size(); i++) {
-            LOSS_PATH_END_LIST.add(LossTargetExeFileList.get(i));
-            String paddingIndex =   getPaddingIntString(i+1,3," ",false );
-            System.out.println("在PATH中缺失的自定义exe文件 【"+paddingIndex+"】 = "+LossTargetExeFileList.get(i));
-        }
-
-        System.out.println();
-        System.out.println();
-//        System.out.println("════════════════════════════════════"+"搜索匹配到的需要添加到 PATH中的 Exe列表 Search Path Item List"+"════════════════════════════════════");
-
-
-        Map<String,String> LogMap_A = Maps.newConcurrentMap();
-
-        for (int i = 0; i < loss_match_key.size(); i++) {
-            String paddingIndex =   getPaddingIntString(i+1,3," ",false );
-           String match_key =  loss_match_key.get(i);
-//            LOSS_PATH_END_LIST =   ClearMatchItem(match_key,LOSS_PATH_END_LIST);
-            LOSS_PATH_END_LIST.remove(match_key);
-            File absFile = loss_exePath_Map.get(match_key);
-            LogMap_A.put(loss_match_key.get(i),absFile.getAbsolutePath());
-            install_software_path_list.add(absFile.getAbsolutePath());
-//            System.out.println("PATH缺失_搜索匹配["+paddingIndex+"] = "+loss_match_key.get(i) +"   路径:"+ absFile.getAbsolutePath());
-        }
-
-
-        showMap_String_String(LogMap_A,"搜索匹配到的需要添加到 PATH中的 Exe列表 Search Path Item List","PATH缺失_搜索匹配");
-        System.out.println();
-        System.out.println();
-        if(LOSS_PATH_END_LIST.size() > 0){
-            System.out.println("════════════════════════════════════"+"搜索匹配到的需要添加到 PATH中的 Exe列表 Search Path Item List"+"════════════════════════════════════");
-
-            for (int i = 0; i < LOSS_PATH_END_LIST.size() ; i++) {
-                String loss_end_item =  LOSS_PATH_END_LIST.get(i);
-                System.out.println("搜索后最终仍无法搜索到的添加到Path中的项【 "+(i+1)+" 】  ----> " +loss_end_item );
-            }
-        }else{
-
-            System.out.println("已完全找到 需要添加到 Path 中的 exe可执行文件!");
-        }
-
-
-
-    }
-
-   static ArrayList<String>  ClearMatchItem(String key ,ArrayList<String> exeNameList){
-
-        int selected = -1;
-        String key_low = key.toLowerCase().trim();
-        for (int i = 0; i < exeNameList.size(); i++) {
-            String exeitem = exeNameList.get(i).trim().toLowerCase();
-
-            if(key_low.equals(exeitem)){
-                i = selected;
-                break;
-            }
-        }
-        if(selected != -1){
-            exeNameList.remove(selected);
-        }
-        return exeNameList;
-    }
-    static String  calculLossFileName(String curExeName,ArrayList<String> lossPathExe){
-        String curExeName_low = curExeName.toLowerCase().trim();
-
-
-        for (int i = 0; i < lossPathExe.size() ; i++) {
-            String lossItem = lossPathExe.get(i);
-            String lossItem_low = lossItem.toLowerCase().trim();
-            if(curExeName_low.equals(lossItem_low)){
-                return lossItem;
-            }
-        }
-
-        return "";
-
-   }
-
-    static ArrayList<String> systemDirName = new ArrayList<String>();
-    // zukgit  判断当前文件夹名称是不是需要搜索  那些
-    // 不搜索的文件夹 windows  Microsoft  Packages Temp Tencent Intel
-
-    static{
-        systemDirName.add("windows");
-        systemDirName.add("Microsoft");
-        systemDirName.add("Temp");
-        systemDirName.add("Tencent");
-        systemDirName.add("Intel");
-        systemDirName.add("AMD");
-        systemDirName.add("HP");
-        systemDirName.add("Lenovo");
-        systemDirName.add("Dell");
-        systemDirName.add("Office");
-        systemDirName.add("Common Files");
-        systemDirName.add("Internet Explorer");
-        systemDirName.add("JetBrains");
-        systemDirName.add("Application Data");
-        systemDirName.add("History");
-    }
-   static boolean isSearch_CustomeDefine(File dirFile , String dirName){
-        boolean falg = true;
-        String absDirName_low = dirFile.getAbsolutePath().toLowerCase();
-       String curDirName_low = dirName.toLowerCase().trim();
-       for (int i = 0; i < systemDirName.size(); i++) {
-           String systemNameItem = systemDirName.get(i).trim().toLowerCase();
-
-           if(curDirName_low.equals(systemNameItem) || curDirName_low.startsWith(systemNameItem) || absDirName_low.contains(systemNameItem)){
-               return false;
-           }
-       }
-
-        return  falg;
-
-
-    }
-    static  void PathSumary(){
-        ZPATH = System.getProperties().getProperty("java.library.path");
-        String[] pathList = ZPATH.split(";");
-
-        System.out.println();
-        System.out.println();
-        System.out.println("════════════════════════════════════"+" java.library.path  Path Item List"+"════════════════════════════════════");
-
-        for (int i = 0; i < pathList.length; i++) {
-            String pathItem = pathList[i];
-            PATH_ITEM_LIST.add(pathItem);
-            File pathFile = new File(pathItem);
-            if(pathFile.exists()){
-                OK_PATH_File_LIST.add(pathFile);
-            }else{
-//                System.out.println(pathFile.getAbsolutePath() +"   不存在?  pathItem = "+ pathItem);
-                Failed_PATH_Item_LIST.add(pathItem);
-            }
-           String paddingIndex =   getPaddingIntString(i+1,3," ",false );
-            System.out.println("Path["+paddingIndex+"]   = "+  pathItem );
-        }
-
-        System.out.println();
-        System.out.println("════════════════════════════════════"+"不存在文件夹PATH列表 Failed Path Item List"+"════════════════════════════════════");
-        for (int i = 0; i < Failed_PATH_Item_LIST.size(); i++) {
-            String pathItem = Failed_PATH_Item_LIST.get(i);
-
-            String paddingIndex =   getPaddingIntString(i+1,3," ",false );
-            System.out.println("Failed_Path_Item["+paddingIndex+"] = "+ pathItem);
-        }
-        System.out.println();
-
-
-        ArrayList<String> logArr_A = new   ArrayList<String>();   // 放置Path
-        ArrayList<String> logArr_B = new   ArrayList<String>();   // 放置 包含的关键的CMder
-        Set<File> fixedSetFile =  new HashSet<File>();
-        fixedSetFile.addAll(OK_PATH_File_LIST);
-        ArrayList<File> fixedArrFile = new   ArrayList<File>();
-        fixedArrFile.addAll(fixedSetFile);
-        for (int i = 0; i < fixedArrFile.size(); i++) {
-            File pathFile = fixedArrFile.get(i);
-            File[] arr = pathFile.listFiles();
-            ArrayList<File> allSubFile = new  ArrayList<File>();
-            allSubFile.addAll(Arrays.asList(arr));
-
-            ArrayList<File> exeList = getTypeFileList(allSubFile,".exe");
-            allExeFileList.addAll(exeList);
-            Path_ExeWithBat_Map.put(pathFile,exeList);
-           String defineExe = getExeFromDefine(pathFile,exeList,ZWorkSoft_Desc_Map);
-if(defineExe != null && !"".equals(defineExe) && !"★".equals(defineExe)){
-    if(!defineExe.contains("-")){
-        TargetExeFileSet.add(defineExe);
-    }else{
-        String[] exeItemArr = defineExe.split("-");
-        for (int j = 0; j < exeItemArr.length; j++) {
-            if("".equals(exeItemArr[j])){
-                continue;
-            }
-//            System.out.println("defineExe = "+ defineExe +   "exeItemArr["+j+"] = "+ exeItemArr[j] );
-            TargetExeFileSet.add(exeItemArr[j].trim());
-        }
-
-    }
-
-}
-            String absPath = pathFile.getAbsolutePath();
-            String paddingIndex =   getPaddingIntString(i+1,3," ",false );
-//            System.out.println("OK_Path_Item["+paddingIndex+"] = "+ absPath);
-            logArr_A.add(("OK_Path_Item["+paddingIndex+"] = "+ absPath).trim());
-            logArr_B.add(defineExe);
-        }
-
-
-        ArrayList<String> allExeList = new ArrayList<String>();
-        allExeList.addAll(ZWorkSoft_Desc_Map.keySet());
-
-       selectedExeList = new ArrayList<String>();
-        selectedExeList.addAll(TargetExeFileSet);
-
-        firstA:   for (int i = 0; i < selectedExeList.size(); i++) {
-            String selectedStr = selectedExeList.get(i).trim().toLowerCase();
-            secondB:   for (int j = 0; j < allExeList.size() ; j++) {
-                String tempStr = allExeList.get(j).trim().toLowerCase();
-//                System.out.println("B  allExeList.remove(tempStr) = "+ tempStr + "  selectedStr = "+ selectedStr);
-
-                if(selectedStr.equals(tempStr)){
-                    allExeList.remove(tempStr);
-//                    System.out.println("B  allExeList.remove(tempStr) = "+ tempStr + "  selectedStr = "+ selectedStr);
-                    break secondB;
-                }
-            }
-
-        }
-//        System.out.println("allExeList.size() = "+ allExeList.size());
-        LossTargetExeFileList.addAll(allExeList);
-
-
-        System.out.println();
-
-        System.out.println();
-        System.out.println("════════════════════════════════════"+"OK Path Item List"+"════════════════════════════════════");
-
-        int MaxItemSize_A = getItemMaxLength(logArr_A) + 8;
-//        System.out.println("MaxItemSize_A = "+ MaxItemSize_A);
-        for (int i = 0; i < logArr_A.size(); i++) {
-            String itemStr = logArr_A.get(i);
-            int itemSize = getFramePaddingChineseLength(itemStr);
-            int paddingSize = MaxItemSize_A - itemSize;
-            String paddingStr = getPaddingEmptyString_empth(paddingSize);
-            String fluterLog = "[ "+logArr_B.get(i)+" ]";
-            System.out.println(itemStr+paddingStr+fluterLog);
-        }
-
-
-
-
-
-
-
-
-    }
-
-    static String   getExeFromDefine(File pathItem , ArrayList<File> allFile, Map<String,String> ZWorkSoft_Desc_Map){
-        String pathItemAbs = pathItem.getAbsolutePath();
-        // zukgit BIN
-        if(pathItemAbs.endsWith("win_zbin")){
-            return "★";
-        }
-        StringBuilder result = new StringBuilder();
-        ArrayList<String> defineExeList = new   ArrayList<String>();
-        defineExeList.addAll(ZWorkSoft_Desc_Map.keySet());
-
-        for (int i = 0; i < allFile.size() ; i++) {
-            File itemFile = allFile.get(i);
-            String filename= itemFile.getName();
-            String filename_low = filename.toLowerCase();
-
-            for (int j = 0; j < defineExeList.size() ; j++) {
-                String keiItem = defineExeList.get(j);
-                String defineFile_low = keiItem.toLowerCase();
-                if(defineFile_low.equals(filename_low)){
-                    // zukgit
-                    result.append(filename+" - ");
-                    InPathExeName_PathMap.put(keiItem,itemFile.getAbsolutePath());
-                    install_software_path_list.add(itemFile.getAbsolutePath());
-                }
-            }
-
-        }
-        String reultStr = result.toString().trim();
-        if(reultStr.endsWith("-")){
-            reultStr = reultStr.substring(0,reultStr.length()-1);
-        }
-        return reultStr;
-    }
-
-
-   static ArrayList<File> getTypeFileList(ArrayList<File> allFile, String type) {
-
-        ArrayList<File> arrFile = new ArrayList<File>();
-        for (int i = 0; i < allFile.size(); i++) {
-            File fileItem = allFile.get(i);
-            String fileName = fileItem.getName();
-//            System.out.println("fileName = "+fileName.toLowerCase() +"     type ="+ type.toLowerCase() +"  fileItem.abspath = "+ fileItem.getAbsolutePath());
-            if (fileName.toLowerCase().endsWith(type.toLowerCase())) {
-                arrFile.add(fileItem);
-            }
-        }
-//        System.out.println("allFile.size = "+ allFile.size() + "     exeFileSize="+arrFile.size());
-        return arrFile;
-    }
-
-
-
-    static ArrayList<File> allExeFileList = new  ArrayList<File>();
-    static Map<File,ArrayList<File>> Path_ExeWithBat_Map = new HashMap<File,ArrayList<File>>();
-
-    static Map<String,String> ZWorkSoft_Desc_Map = new  HashMap<String,String>();
-    static ArrayList<String> LossTargetExeFileList = new ArrayList<String>();
-    static Set<String> TargetExeFileSet = new HashSet<String>();
-
-    static ArrayList<String> selectedExeList = new  ArrayList<String>();
-    static Map<String,String> InPathExeName_PathMap = new  HashMap<String,String>();
-
-    static{
-        ZWorkSoft_Desc_Map.put("cmder.exe","Cmder_windows下较好使用的shell");
-        ZWorkSoft_Desc_Map.put("java.exe","jdk1.8");
-        ZWorkSoft_Desc_Map.put("javac.exe","jdk1.8");
-        ZWorkSoft_Desc_Map.put("notepad++.exe","文件编辑软件!_ zdump_wifi_F8.bat");
-        ZWorkSoft_Desc_Map.put("chrome.exe","Chrome浏览器!_打开Chrome浏览器_ztextrule_operation_I9.bat_解析地址");
-        ZWorkSoft_Desc_Map.put("dot.exe","Graphviz_绘图工具_ztextrule_operation_I9.bat_解析Json为图片");
-        ZWorkSoft_Desc_Map.put("adb.exe","adb调式工具!");
-        ZWorkSoft_Desc_Map.put("tesseract.exe","tesseract-ocr 语音识别工具_zimage2text_OCR_H8.bat");
-        ZWorkSoft_Desc_Map.put("ffmpeg.exe","ffmpeg_视频音频编辑_zmpeg_ffmpeg_G8.bat");
-
-
-    }
-
-
-
-    static ArrayList<String> readListFromFile(File fileItem) {
-        ArrayList<String>  contentList  = new ArrayList<String>();
-        try {
-            //   BufferedReader curBR = new BufferedReader(new InputStreamReader(new FileInputStream(fileItem), "utf-8"));
-            BufferedReader curBR = new BufferedReader(new InputStreamReader(new FileInputStream(fileItem)));
-            String lineContent = "";
-            while (lineContent != null) {
-                lineContent = curBR.readLine();
-                if (lineContent == null || lineContent.trim().isEmpty()) {
-                    continue;
-                }
-                contentList.add(lineContent);
-            }
-            curBR.close();
-        } catch (Exception e) {
-        }
-        return contentList;
-    }
-
-
-    static ArrayList<File>  System_File = new     ArrayList<File>();
-    //  %ProgramFiles(x86)%    -》  C:\Program Files (x86)
-      static String ProgramFiles_x86_Key_Str = "ProgramFiles(x86)";
-      static String ProgramFiles_x86_PATH = "";
-
-    //  %LOCALAPPDATA%  -》  C:\Users\zhuzj5\AppData\Local  LOCALAPPDATA=C:\Users\Administrator\AppData\Local
-    static String LOCALAPPDATA_Key_Str = "LOCALAPPDATA";
-    static String LOCALAPPDATA_PATH = "";
-
-    //    %PROGRAMFILES%  -》  C:\Program Files\       ProgramW6432=C:\Program Files
-    static Map<String,String> env_map = new  HashMap<String,String>();
-    static String ProgramW6432_Key_Str = "ProgramW6432";
-    static String ProgramW6432_PATH = "";
-
-     static void init_system_enviable() {
-        ArrayList<String> environment_list = new ArrayList<String>();
-
-//        readStringFromFile(envFile);
-        ArrayList<String> rawContent = readListFromFile(envFile);
-
-         for (int i = 0; i < rawContent.size(); i++) {
-             String envItem = rawContent.get(i);
-             if(!envItem.contains("=")){
-                 continue;
-             }
-             String key = envItem.substring(0,envItem.indexOf("="));
-             String value = envItem.substring(envItem.indexOf("=")+1);
-             if("PATH".equals(key)){
-                 String[] envPathArr = value.split(":");
-                 StringBuffer sb = new StringBuffer();
-                 sb.append("\n");
-                 for (int j = 0; j < envPathArr.length; j++) {
-                     sb.append(envPathArr[j]+"\n");
-                 }
-                 value = sb.toString();
-             }
-             if(ProgramFiles_x86_Key_Str.toLowerCase().equals(key.toLowerCase())){
-                 ProgramFiles_x86_PATH = value;  // C:\Program Files (x86)
-                 File Program_Files_x86_File = new File(ProgramFiles_x86_PATH);
-                 if(Program_Files_x86_File.exists()){
-                     System_File.add(Program_Files_x86_File);
-                 }
-
-             }
-             if(LOCALAPPDATA_Key_Str.toLowerCase().equals(key.toLowerCase())){
-                 LOCALAPPDATA_PATH = value;  // C:\Users\zhuzj5\AppData\Local
-                 File AppData_Local = new File(LOCALAPPDATA_PATH);
-                 if(AppData_Local.exists()){
-                     System_File.add(AppData_Local);
-                 }
-             }
-
-             if(ProgramW6432_Key_Str.toLowerCase().equals(key.toLowerCase())){
-                 ProgramW6432_PATH = value;   // C:\Program Files
-                 File Program_File = new File(ProgramW6432_PATH);
-                 if(Program_File.exists()){
-                     System_File.add(Program_File);
-                 }
-             }
-             if(Environment_Zip_Dir_Path != null){
-                 System_File.add(Environment_Zip_Dir_Path);
-             }
-
-             env_map.put(key,value);
-         }
-         showMap_String_String(env_map,"Env环境变量");
-
-
-         System.out.println();
-         System.out.println();
-
-    }
-    @SuppressWarnings("unchecked")
-    static void showMap_String_String(Map<String, String> arrFileMap, String title) {
-
-        System.out.println("══════════════════" + title + "══════════════════");
-
-        ArrayList<String> keyList = new   ArrayList<String>();
-        keyList.addAll(arrFileMap.keySet());
-        ArrayList<String> logArr_A = new   ArrayList<String>();
-        int MaxKeyLength = getItemMaxLength(keyList)+4;
-        for (int i = 0; i < keyList.size(); i++) {
-            String paddingIndex =   getPaddingIntString(i+1,3," ",false );
-            String Pre1 = "Index【"+paddingIndex+"】";
-            String keyItem =  keyList.get(i);
-            int keyItem_ChineseSize = getFramePaddingChineseLength(keyItem);
-            int PadingEmpty = MaxKeyLength - keyItem_ChineseSize;
-            String PaddingStr = getPaddingEmptyString_empth(PadingEmpty);
-            String keyStr = "【 "+ keyList.get(i)+PaddingStr+" 】";
-            logArr_A.add(Pre1+"  "+keyStr + " 【 "+ arrFileMap.get(keyList.get(i)) +" 】");
-
-        }
-
-
-        for (int i = 0; i < logArr_A.size(); i++) {
-            System.out.println(logArr_A.get(i));
-        }
-
-/*
-
-        Map.Entry<String, String> entry;
-        int map_index = 0;
-
-
-        if (arrFileMap != null) {
-            Iterator iterator = arrFileMap.entrySet().iterator();
-            while (iterator.hasNext()) {
-                entry = (Map.Entry<String, String>) iterator.next();
-                String keyStr = entry.getKey();  //Map的Value
-                String valueStr = entry.getValue();  //Map的Value
-                map_index++;
-                System.out.println("【" + map_index + "】" + "Key:【 " + keyStr + " 】" + "Value:【" + valueStr + "】" + "");
-
-
-            }
-        }
-*/
-
-    }
-
-    @SuppressWarnings("unchecked")
-    static void showMap_String_String(Map<String, String> arrFileMap, String title ,String indexDesc) {
-
-        System.out.println("══════════════════" + title + "══════════════════");
-
-        ArrayList<String> keyList = new   ArrayList<String>();
-        keyList.addAll(arrFileMap.keySet());
-        ArrayList<String> logArr_A = new   ArrayList<String>();
-        int MaxKeyLength = getItemMaxLength(keyList)+4;
-        for (int i = 0; i < keyList.size(); i++) {
-            String paddingIndex =   getPaddingIntString(i+1,3," ",false );
-            String Pre1 = indexDesc+"【"+paddingIndex+"】";
-            String keyItem =  keyList.get(i);
-            int keyItem_ChineseSize = getFramePaddingChineseLength(keyItem);
-            int PadingEmpty = MaxKeyLength - keyItem_ChineseSize;
-            String PaddingStr = getPaddingEmptyString_empth(PadingEmpty);
-            String keyStr = "【 "+ keyList.get(i)+PaddingStr+" 】";
-            logArr_A.add(Pre1+"  "+keyStr + " 【 "+ arrFileMap.get(keyList.get(i)) +" 】");
-
-        }
-
-
-        for (int i = 0; i < logArr_A.size(); i++) {
-            System.out.println(logArr_A.get(i));
-        }
-
-/*
-
-        Map.Entry<String, String> entry;
-        int map_index = 0;
-
-
-        if (arrFileMap != null) {
-            Iterator iterator = arrFileMap.entrySet().iterator();
-            while (iterator.hasNext()) {
-                entry = (Map.Entry<String, String>) iterator.next();
-                String keyStr = entry.getKey();  //Map的Value
-                String valueStr = entry.getValue();  //Map的Value
-                map_index++;
-                System.out.println("【" + map_index + "】" + "Key:【 " + keyStr + " 】" + "Value:【" + valueStr + "】" + "");
-
-
-            }
-        }
-*/
-
-    }
-
-    static ArrayList<String> addPathCommand = new    ArrayList<String>();
-     static ArrayList<String> install_software_path_list = new ArrayList<String>();
-
-    static    boolean isZwinDir = false;
-
-    static File Environment_Zip_Dir_Path = null;
     public static void main(String[] args) {
 
-            initSystemInfo();
-
-            initInputParams(args);
-            initEnvironmentDir();
-            init_system_enviable();
-            PathSumary();
-            SystemFileSearch();
-            Create_AddPath_Operation();
-            if (CUR_Dir_FILE != null && !CUR_Dir_FILE.getAbsolutePath().contains("ZWin_Software")) {
-                System.out.println("▲FAILED▲   当前执行程序目录不是  ZWin_Software , 安装程序失败!  仅仅显示 系统环境变量情况! ");
-                return;
-            }
+        initSystemInfo();
+        initInputParams(args);
 
 
-
-
-
-        if(true){
-            return;
-        }
-
-
-
-        J1_Add_Check_Path mJ1_Object = new J1_Add_Check_Path();
-        mJ1_Object.InitRule();
+        J2_WhiteImage_Prefixed mJ2_Object = new J2_WhiteImage_Prefixed();
+        mJ2_Object.InitRule();
 
 
         // 用户没有输入参数
@@ -2444,6 +1782,49 @@ if(defineExe != null && !"".equals(defineExe) && !"★".equals(defineExe)){
         setProperity();
     }
 
+
+
+
+    public static BufferedImage getBufferedImage(File file)  {
+        Image   img   = null;
+        try{
+             img = ImageIO.read(file); // 构造Image对象
+        }catch ( Exception e){
+            System.out.println(e);
+            return null;
+        }
+
+     int    width = img.getWidth(null); // 得到源图宽
+    int     height = img.getHeight(null); // 得到源图长
+
+//    return resizeFix(400, 492);
+        return resize(img,width, height);
+    }
+
+
+
+    public static BufferedImage resize(Image mImage , int w, int h)  {
+        // SCALE_SMOOTH 的缩略算法 生成缩略图片的平滑度的 优先级比速度高 生成的图片质量比较好 但速度慢
+        BufferedImage image = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
+        Graphics g = image.getGraphics();
+        try {
+            g.drawImage(mImage, 0, 0, w, h, null); // 绘制缩小后的图
+        } finally {
+            if (g != null) {
+                g.dispose();
+            }
+        }
+        return image;
+        // File destFile = new File("C:\\temp\\456.jpg");
+        // FileOutputStream out = new FileOutputStream(destFile); // 输出到文件流
+        // // 可以正常实现bmp、png、gif转jpg
+        // JPEGImageEncoder encoder = JPEGCodec.createJPEGEncoder(out);
+        // encoder.encode(image); // JPEG编码
+        // out.close();
+    }
+
+
+
     public static int getImageHigh(File picture) {
         int high = 0;
         ImageIcon imageIcon = new ImageIcon(picture.getAbsolutePath());
@@ -2453,11 +1834,54 @@ if(defineExe != null && !"".equals(defineExe) && !"★".equals(defineExe)){
     }
 
 
-
     public static int getImageWidth(File picture) {
         int width = 0;
         ImageIcon imageIcon = new ImageIcon(picture.getAbsolutePath());
         width = imageIcon.getIconWidth();
         return width;
     }
+
+
+    public static BufferedImage generalBufferedImage_WhitePicture( int p_width, int p_heigh) {
+        BufferedImage imgBuf = null;
+        int width = p_width;
+        int heigh = p_heigh;
+        Color currentColor = new Color(255, 255, 255);
+/*
+
+        BufferedImage bi = new BufferedImage(width,heigh, BufferedImage.TYPE_INT_RGB);//INT精确度达到一定,RGB三原色，高度70,宽度150
+//得到它的绘制环境(这张图片的笔)
+        Graphics2D g2 = (Graphics2D) bi.getGraphics();
+        int frontSize = 550;
+
+        g2.setBackground(currentColor);
+        g2.fillRect(0,0,width,heigh);//填充一个矩形 左上角坐标(0,0),宽500,高500;填充整张图片
+        g2.fillRect(0,0,width,heigh);//填充整张图片(其实就是设置背景颜色)
+         g2.setColor(currentColor);
+
+         */
+
+         imgBuf = new BufferedImage(width, heigh, BufferedImage.TYPE_INT_RGB);
+        Graphics curGraphic = imgBuf.getGraphics();
+        //设置颜色
+        curGraphic.setColor(currentColor);
+        //填充
+        curGraphic.fillRect(0, 0, imgBuf.getWidth(), imgBuf.getHeight());
+
+
+        return imgBuf;
+/*
+
+        try {
+            mCurFile.createNewFile();
+            ImageIO.write(imgBuf, "jpg", new FileOutputStream(mCurFile));//保存图片 JPEG表示保存格式
+//            System.out.println("创建 RGB "+"R="+r+"  G="+g+"  B="+b+" 图片成功！");
+
+        } catch (Exception e) {
+            System.out.println("创建 RGB 图片格式出现异常！"+ mCurFile.getAbsolutePath());
+        }
+*/
+
+    }
+
 }

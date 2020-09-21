@@ -550,17 +550,17 @@ public class J1_InstallSoftware {
                     } else if (exeAllFile.size() == 1) {
                         targetExeFile = exeAllFile.get(0);
                     } else {
-                    File manualDefaineFile =     FluterManualMainExeFile(exeAllFile, manualDefineMainSoft_List);
+                        File manualDefaineFile =     FluterManualMainExeFile(exeAllFile, manualDefineMainSoft_List);
 
-                    if(manualDefaineFile != null){
-                        System.out.println(" manualDefaineFile = "+ manualDefaineFile);
-                        targetExeFile = manualDefaineFile;
+                        if(manualDefaineFile != null){
+                            System.out.println(" manualDefaineFile = "+ manualDefaineFile);
+                            targetExeFile = manualDefaineFile;
 
-                    }else{
-                        System.out.println("当前目录存在多个 exe 文件夹  而且 无法判断 哪个是主文件夹 默认选中大小最大那个");
-                        targetExeFile = getMaxSizeFile(exeAllFile);
+                        }else{
+                            System.out.println("当前目录存在多个 exe 文件夹  而且 无法判断 哪个是主文件夹 默认选中大小最大那个");
+                            targetExeFile = getMaxSizeFile(exeAllFile);
 
-                    }
+                        }
 
 
                     }
@@ -2142,7 +2142,7 @@ public class J1_InstallSoftware {
             System.out.println(commandItem);
         }
 
-       File installBatFile = new File(CUR_Dir_FILE.getAbsolutePath()+File.separator+"J1_InstallSoft.bat");
+        File installBatFile = new File(CUR_Dir_FILE.getAbsolutePath()+File.separator+"J1_InstallSoft.bat");
         writeContentToFile(installBatFile,commandList);
 
         if (true) {

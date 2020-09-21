@@ -17,7 +17,7 @@ public class H1_TimeTool {
 
 
     /*******************修改属性列表 ------Begin *********************/
-// 修改0.   全局修改 把 G8 改为当前应用的序号规则序号  当前类名称也需要修改
+// 修改0.   全局修改 把 H1 改为当前应用的序号规则序号  当前类名称也需要修改
 // 修改1.当前 执行代码的 bat sh 文件名称  最后必须是标识序号
     static String Cur_Bat_Name = "ztime_H1";
 
@@ -33,10 +33,10 @@ public class H1_TimeTool {
     static String zbinPath = System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin";
 
     // 固定2 当前执行文件的编号 A1  A2  A3   ... G1   G2   G3 ... Z9
-    static File G8_Properties_File = new File(System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin" + File.separator + get_Bat_Sh_FlagNumber(Cur_Bat_Name) + ".properties");
-    static InputStream G8_Properties_InputStream;
-    static OutputStream G8_Properties_OutputStream;
-    static Properties G8_Properties = new Properties();
+    static File H1_Properties_File = new File(System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin" + File.separator + get_Bat_Sh_FlagNumber(Cur_Bat_Name) + ".properties");
+    static InputStream H1_Properties_InputStream;
+    static OutputStream H1_Properties_OutputStream;
+    static Properties H1_Properties = new Properties();
     static Map<String, String> propKey2ValueList = new HashMap<String, String>();
 
     // 固定3   当前操作系统的类型
@@ -203,18 +203,18 @@ public class H1_TimeTool {
 
     static {
         try {
-            if (!G8_Properties_File.exists()) {
-                G8_Properties_File.createNewFile();
+            if (!H1_Properties_File.exists()) {
+                H1_Properties_File.createNewFile();
             }
-            G8_Properties_InputStream = new BufferedInputStream(new FileInputStream(G8_Properties_File.getAbsolutePath()));
-            G8_Properties.load(G8_Properties_InputStream);
-            Iterator<String> it = G8_Properties.stringPropertyNames().iterator();
+            H1_Properties_InputStream = new BufferedInputStream(new FileInputStream(H1_Properties_File.getAbsolutePath()));
+            H1_Properties.load(H1_Properties_InputStream);
+            Iterator<String> it = H1_Properties.stringPropertyNames().iterator();
             while (it.hasNext()) {
                 String key = it.next();
-                // System.out.println("key:" + key + " value: " + G8_Properties.getProperty(key));
-                propKey2ValueList.put(key, G8_Properties.getProperty(key));
+                // System.out.println("key:" + key + " value: " + H1_Properties.getProperty(key));
+                propKey2ValueList.put(key, H1_Properties.getProperty(key));
             }
-            G8_Properties_InputStream.close();
+            H1_Properties_InputStream.close();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -225,9 +225,9 @@ public class H1_TimeTool {
 
     static void setProperity() {
         try {
-            G8_Properties_OutputStream = new BufferedOutputStream(new FileOutputStream(G8_Properties_File.getAbsolutePath()));
-            G8_Properties.store(G8_Properties_OutputStream, "");
-            G8_Properties_OutputStream.close();
+            H1_Properties_OutputStream = new BufferedOutputStream(new FileOutputStream(H1_Properties_File.getAbsolutePath()));
+            H1_Properties.store(H1_Properties_OutputStream, "");
+            H1_Properties_OutputStream.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -1024,8 +1024,22 @@ public class H1_TimeTool {
                         isAddRecordOperation = true;
                         CUR_INPUT_ParamStrList.add(args[i]);
                         continue;
+                    }else if(isContainChinese(args[i])){
+                        // 如果输入的参数包含中文 那么转为 record的类型
+                        int chineseLength = getPaddingChineseLength(args[i]);
+                        String record_item = "";
+                        if(chineseLength <= 24){
+                            record_item ="day_"+args[i];
+                        }else{
+                            record_item ="month_"+args[i];
+                        }
+                        isAddRecordOperation = true;
+                        CUR_INPUT_ParamStrList.add(record_item);
+                        continue;
                     }
+
                     String item = args[i];
+
                     if (isNumeric(item)) {
                         ShowCalYearInt = Integer.parseInt(item);
                         isInputYearParam = true;
@@ -1335,7 +1349,7 @@ public class H1_TimeTool {
         }
         for (int i = 0; i < inputRecordList.size(); i++) {
             Record recordItem = inputRecordList.get(i);
-            G8_Properties.put(recordItem.getProperityKey(), recordItem.timeStamp + "");
+            H1_Properties.put(recordItem.getProperityKey(), recordItem.timeStamp + "");
         }
 
         timeTool.initPropRecord();
@@ -1380,12 +1394,21 @@ public class H1_TimeTool {
 
 
     void initPropRecord() {
-        Set<Object> recordSet = G8_Properties.keySet();
+        Set<Object> recordSet = H1_Properties.keySet();
         ArrayList<Object> propKeyList = new ArrayList<Object>();
         propKeyList.addAll(recordSet);
         // allRecordInProp
+        System.out.println("ZZZ propKeyList.size() = "+ propKeyList.size());
+        Set<String> record_fixedSet = new HashSet<>();
         for (int i = 0; i < propKeyList.size(); i++) {
-            allRecordInProp.add(new Record((String) propKeyList.get(i)));
+            record_fixedSet.add((String) propKeyList.get(i));
+        }
+        allRecordInProp.clear();
+        ArrayList<String> record_fixedArr = new  ArrayList<String>();
+        record_fixedArr.addAll(record_fixedSet);
+        System.out.println("ZZZ record_fixedArr.size() = "+ record_fixedArr.size());
+        for (int i = 0; i < record_fixedArr.size(); i++) {
+            allRecordInProp.add(new Record((String) record_fixedArr.get(i)));
         }
     }
 
@@ -1497,7 +1520,10 @@ public class H1_TimeTool {
             } else {   //  不包含-  只包含一个数值的话   那么就是   这个月的几号了
                 ztimeStamp.year = year1;
                 ztimeStamp.month = month1;
-                ztimeStamp.day = Long.parseLong(dateStr);
+                if(isNumeric(dateStr)){
+                    ztimeStamp.day = Long.parseLong(dateStr);
+                }
+
             }
             // 2020-11-21
 
@@ -2245,7 +2271,7 @@ public class H1_TimeTool {
         boolean checkInputParamListAndGetType(ArrayList<String> inputParamList) {
             boolean flag = false;
             int paramSize = inputParamList.size();
-            if (paramSize == 2) {
+            if (paramSize == 2 && !isAddRecordOperation && !isDeleteRecordOperation) {
                 inputType = 2;
                 flag = true;
             } else if (paramSize == 1) {
@@ -3780,16 +3806,16 @@ public class H1_TimeTool {
     }
 
     static void clearAllRecord() {
-        G8_Properties.clear();
+        H1_Properties.clear();
         setProperity();
     }
 
     static void clearMonthRecord(int month) {
-        G8_Properties.clear();
+        H1_Properties.clear();
         for (int i = 0; i < allRecordInProp.size(); i++) {
             Record recordItem = allRecordInProp.get(i);
             if (recordItem.month != month) {
-                G8_Properties.put(recordItem.getProperityKey(), recordItem.timeStamp+"");
+                H1_Properties.put(recordItem.getProperityKey(), recordItem.timeStamp+"");
             }
 
         }
@@ -3798,7 +3824,7 @@ public class H1_TimeTool {
     }
 
     static void clearMontnWeekRecord(int month, int weekIndex) {
-        G8_Properties.clear();
+        H1_Properties.clear();
         boolean clearEndArrFor5 = false;
         if(weekIndex == 5){
             clearEndArrFor5 = true;
@@ -3809,7 +3835,7 @@ public class H1_TimeTool {
 
             if (recordItem.month == month && recordItem.weekIndex4Month != weekIndex) {
 
-                G8_Properties.put(recordItem.getProperityKey(), recordItem.timeStamp+"");
+                H1_Properties.put(recordItem.getProperityKey(), recordItem.timeStamp+"");
             }
 
         }
@@ -3819,13 +3845,13 @@ public class H1_TimeTool {
 
 
     static void clearMontnDayRecord(int month, int day) {
-        G8_Properties.clear();
+        H1_Properties.clear();
         for (int i = 0; i < allRecordInProp.size(); i++) {
             Record recordItem = allRecordInProp.get(i);
             if (recordItem.month != month) {
-                G8_Properties.put(recordItem.getProperityKey(), recordItem.timeStamp+"");
+                H1_Properties.put(recordItem.getProperityKey(), recordItem.timeStamp+"");
             } else if (recordItem.month == month && recordItem.day != day) {
-                G8_Properties.put(recordItem.getProperityKey(), recordItem.timeStamp+"");
+                H1_Properties.put(recordItem.getProperityKey(), recordItem.timeStamp+"");
             }
         }
         setProperity();

@@ -985,7 +985,7 @@ static String[] operationTip = {"⊙","▲","〓","※","¤","☆","★","●","
     static boolean isVideoFile(File file){
         boolean isVideoFlag = false;
         String fileName = file.getName().toLowerCase();
-        if(fileName.endsWith(".mp4") || fileName.endsWith(".flv") || fileName.endsWith(".rmvb")
+        if(fileName.endsWith(".mp4") || fileName.endsWith(".avi") || fileName.endsWith(".flv") || fileName.endsWith(".rmvb")
         ||   fileName.endsWith(".mkv")   ||   fileName.endsWith(".3gp")  ){
             isVideoFlag = true;
 
