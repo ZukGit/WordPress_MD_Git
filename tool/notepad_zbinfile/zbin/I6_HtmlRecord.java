@@ -345,7 +345,12 @@ public class I6_HtmlRecord {
     }
 
 
-   static File userSelectedDir;
+    //  如果当前文件夹目录中 含有 txt 描述文件 那么使用  模板1  ,  有 txt文件 使用模板2 , 默认使用模板 1
+    static  File  I6_Html_Template_File_1 = new File(zbinPath+File.separator+"I6_Html_Template_1.html");
+    static  File  I6_Html_Template_File_2 = new File(zbinPath+File.separator+"I6_Html_Template_2.html");
+
+
+    static File userSelectedDir;
 
     File   getDefaultRecordFile(){
         return userSelectedDir;
@@ -357,10 +362,10 @@ public class I6_HtmlRecord {
         File recordFile;    //  当前默认工作的目录 Dir I6_categoryName I6_80211
         File I6_Html_Template_File ; //        I6_Html_Template.html    目标文件
         File targetHtmlFile ;   // 生成的目标的 Html 文件
-
+        File targetMarkDownFile ;   // 生成的目标的 MarkDown 文件
 // 判断最后一个参数是否是  true  来判断 是否复制到 当前选中的文件夹的内容到 I6 默认文件夹
         boolean isCopyToI6Dir;   //  是否复制当前选中的文件夹的内容到 I6 默认文件夹
-
+        boolean isHasTxtFile ;   // 如果有 txt 文件 那么使用 模板2 的方式 显示
 
 
         ShowRecord_Rule_1(){
@@ -369,11 +374,25 @@ public class I6_HtmlRecord {
 
             //  当前用户输入的  html文件夹
             recordFile = getDefaultRecordFile();
-            I6_Html_Template_File = new File(zbinPath+File.separator+"I6_Html_Template.html");
+            I6_Html_Template_File = I6_Html_Template_File_1;
             targetHtmlFile = new File(recordFile.getAbsolutePath()+File.separator+recordFile.getName()+".html");
+            targetMarkDownFile = new File(recordFile.getAbsolutePath()+File.separator+recordFile.getName()+".md");
         }
 
 
+        boolean checkTxtInFileList(ArrayList<File> allFile){
+            boolean isHasTxt = false;
+
+            for (int i = 0; i <allFile.size() ; i++) {
+                String fileName = allFile.get(i).getName();
+                if(fileName.endsWith(".txt") ||  fileName.endsWith(".TXT")){
+                    return true;
+                }
+            }
+
+            return isHasTxt;
+
+        }
         // 1. 完成参数的 自我客制化  实现  checkParamsOK 方法
         @Override
         boolean checkParamsOK(File shellDir, String type2Param, ArrayList<String> otherParams) {
@@ -407,6 +426,10 @@ public class I6_HtmlRecord {
             }
 
             allRecordFileList.addAll(Arrays.asList(recordFile.listFiles())) ;
+              isHasTxtFile = checkTxtInFileList(allRecordFileList);
+              if(isHasTxtFile){
+                  I6_Html_Template_File = I6_Html_Template_File_2;
+              }
             if(otherParams != null ){
                 String endParamItem = otherParams.get(otherParams.size()-1);
                 String recordAbsPath = recordFile.getAbsolutePath();
@@ -417,6 +440,7 @@ public class I6_HtmlRecord {
                     isCopyToI6Dir = true;
                     recordFile = new File(defaultRecordDir +File.separator+ otherParams.get(0));
                     targetHtmlFile = new File(recordFile.getAbsolutePath()+File.separator+recordFile.getName()+".html");
+                    targetMarkDownFile =  new File(recordFile.getAbsolutePath()+File.separator+recordFile.getName()+".md");
                     System.out.println("recordFile =" + recordFile);
                 }
             }
@@ -455,9 +479,26 @@ public class I6_HtmlRecord {
                 public int compare(File o1, File o2) {
                     long time1 = getFileModifyTime(o1);
                     long time2 = getFileModifyTime(o2);
+                    String fileName1 =getFileNameNoPoint(o1.getName());
+                    String fileName2 =getFileNameNoPoint(o2.getName());
+                    if(fileName1.startsWith(fileName2)){
+                        return -1;
+                    }
+
+                    if(fileName2.startsWith(fileName1)){
+                        return 1;
+                    }
+
+                    String fixed_fileName1 = clearFileNamePoint(fileName1);
+                    String fixed_fileName2 = clearFileNamePoint(fileName2);
+                    if(isNumeric(fixed_fileName1) && isNumeric(fixed_fileName2)){
+                        return fixed_fileName1.compareTo(fixed_fileName2);
+                    }
+//                            clearFileNamePoint
                     if(time1 == time2){
                         String o1Name = getFileNameNoPoint(o1.getName());
                         String o2Name = getFileNameNoPoint(o2.getName());
+
 //                        System.out.println("o1Name = "+ o1Name +" o2Name ="+ o2Name);
                         if(isNumeric(o1Name) && isNumeric(o2Name)){
                             int o1_int = Integer.parseInt(o1Name);
@@ -477,9 +518,9 @@ public class I6_HtmlRecord {
 /*
             for (int i = 0; i < allRecordFileList.size(); i++) {
                 File item = allRecordFileList.get(i);
-                System.out.println(item.getName() +"  修改时间= "+getFileModifyTime(item));
+                System.out.println("allFile_Index[ "+i+" ] = "+item.getName() +"  修改时间= "+getFileModifyTime(item));
             }
-            */
+*/
 
             return super.checkParamsOK(shellDir, type2Param, otherParams);
         }
@@ -505,6 +546,7 @@ public class I6_HtmlRecord {
             String recordName = recordFile.getName();
             String recordHtml =  htmlTemplate.replace("zukgitPlaceHolderTitle",recordName);
             recordHtml = recordHtml.replace("zukgitPlaceHolderBody",bodyContent.toString());
+            writeContentToFile( targetMarkDownFile,bodyContent.toString());
             writeContentToFile(targetHtmlFile,recordHtml);
             openLocalHtml(targetHtmlFile.getAbsolutePath());
             System.out.println("Open "+targetHtmlFile.getAbsolutePath() +" Over !");
@@ -531,12 +573,18 @@ public class I6_HtmlRecord {
                 case ".GIF":
                 case ".bmp":
                 case ".BMP":
-
+                    String imageName = resFile.getName();
+                    String imageHeadStr = "<h1>" + imageName + "</h1> \n";
                     String imagePre = "<li><img src=\"";
                     String imageEnd = "\" /></li>";
 
                     String imageAbsPath = resFile.getAbsolutePath();
-                    htmlCode = imagePre+imageAbsPath+imageEnd;
+                    if(isHasTxtFile){
+                        htmlCode = imageHeadStr+imagePre+imageAbsPath+imageEnd;
+                    }else{
+                        htmlCode = imagePre+imageAbsPath+imageEnd;
+                    }
+
                     break;
 
 //<audio controls="controls"><source src="/storage/86A0-B878/Z_Music/master/music/chinese/deng_zi_qi/pao_mo.mp3" type="audio/mpeg"></audio>
@@ -551,10 +599,16 @@ public class I6_HtmlRecord {
                 case ".M4A":
 
                     String audioName = resFile.getName();
+                    String audioheadStr = "<h1>" + audioName + "</h1> \n";
                     String audioPre = "<li> "+"<label style=\"font-size:30px;\"> "+audioName+"</label>"+" <audio controls=\"controls\"><source src=\"";
                     String audioEnd = "\" type=\"audio/mpeg\"></audio> </li>";
                     String audioAbsPath = resFile.getAbsolutePath();
-                    htmlCode = audioPre+audioAbsPath+audioEnd;
+                    if(isHasTxtFile){
+                        htmlCode = audioheadStr+audioPre+audioAbsPath+audioEnd;
+                    }else{
+                        htmlCode = audioPre+audioAbsPath+audioEnd;
+                    }
+
                     break;
 
 
@@ -576,11 +630,40 @@ public class I6_HtmlRecord {
                 case ".3GP":
 
                     String vidoeName = resFile.getName();
+                    String videoheadStr = "<h1>" + vidoeName + "</h1> \n";
                     String videoPre = "<li> "+"<label style=\"font-size:30px;\"> "+vidoeName+"</label>"+ " <video  controls=\"controls\"> <source src=\"";
                     String videoEnd = "\" type=\"video/mp4\" /> </video> </li> ";
                     String videoAbsPath = resFile.getAbsolutePath();
-                    htmlCode = videoPre+videoAbsPath+videoEnd;
+                    if(isHasTxtFile) {
+                        htmlCode = videoheadStr + videoPre + videoAbsPath + videoEnd;
+                    }else{
+                        htmlCode =  videoPre + videoAbsPath + videoEnd;
+                    }
                     break;
+
+                case ".TXT":
+                case ".txt":
+                    String txtFileName = resFile.getName();
+                    String line_out = "\n";
+                    StringBuilder txtSB = new StringBuilder();
+                    ArrayList<String> contentList = ReadFileContent_List(resFile);
+                    String txtheadStr = "<h1>" + txtFileName + "</h1> \n";
+                    String code_pre = "<pre><code>\n";
+                    txtSB.append("FileName: "+ txtFileName + line_out);
+                    for (int i = 0; i < contentList.size(); i++) {
+                        String line = contentList.get(i);
+                        txtSB.append(line+line_out);
+                    }
+
+                    String code_end = "</code></pre>";
+
+                    if(isHasTxtFile) {
+                        htmlCode = txtheadStr+code_pre+txtSB.toString()+code_end;
+                    }else{
+                        htmlCode = code_pre+txtSB.toString()+code_end;
+                    }
+                    break;
+
 
                 default:
                     htmlCode =  "";
@@ -787,6 +870,47 @@ public class I6_HtmlRecord {
         }
     }
 
+    public static ArrayList<String> ReadFileContent_List( File mFilePath) {
+        ArrayList<String> contentArr = new  ArrayList<String>();
+        if (mFilePath != null  && mFilePath.exists()) {
+            //  System.out.println("存在  当前文件 "+ mFilePath.getAbsolutePath());
+        } else {
+            System.out.println("不存在 当前文件 "+ mFilePath.getAbsolutePath() );
+
+            return null;
+        }
+//        StringBuilder sb= new StringBuilder();
+
+        try {
+            BufferedReader curBR = new BufferedReader(new InputStreamReader(new FileInputStream(mFilePath), "utf-8"));
+            String oldOneLine = "";
+            int index = 1;
+            while (oldOneLine != null) {
+
+                oldOneLine = curBR.readLine();
+                if (oldOneLine == null ) {
+//                if (oldOneLine == null || oldOneLine.trim().isEmpty()) {
+                    continue;
+                }
+
+//                sb.append(oldOneLine+"\n");
+                contentArr.add(oldOneLine);
+//                    System.out.println("第"+index+"行读取到的字符串:"+oldOneLine);
+                index++;
+
+
+            }
+            curBR.close();
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return contentArr;
+
+    }
+
+
     public static String ReadFileContent( File mFilePath) {
 
         if (mFilePath != null  && mFilePath.exists()) {
@@ -984,6 +1108,8 @@ public class I6_HtmlRecord {
         System.out.println("当前用户输入的参数为空! ");
         showRecordList();
         System.out.println("tip1: 输入参数最后加入 true 标识 把当前记录保存到默认文件夹中 "+ defaultRecordDir);
+        System.out.println("tip2: 当前文件夹中包含 .txt 文件 将以模板2  "+I6_Html_Template_File_2.getName()+" 创建HTML文件");
+
     }
     static void showTip() {
         System.out.println("对Type文件内容 进行 Index 规则的处理  identy=【 Type_Index 】【 文件后缀_当前操作逻辑索引】\n");
@@ -1761,6 +1887,15 @@ public class I6_HtmlRecord {
 
         return getFileTypeWithPoint(file.getAbsolutePath());
     }
+
+    public  static String clearFileNamePoint(String fileName){
+
+       String fileName_new = fileName.replace(".","");
+        fileName_new = fileName_new.replace("-","");
+        fileName_new = fileName_new.replace("_","");
+        fileName_new = fileName_new.replace(":","");
+        return fileName_new;
+    }
     public  static String getFileNameNoPoint(String fileName){
         String name = "";
         if(fileName.contains(".")){
@@ -1955,6 +2090,8 @@ public class I6_HtmlRecord {
 
         CUR_Selected_Rule.operationRule(CUR_INPUT_3_ParamStrList);  // 传递参数列表 进行处理
         System.out.println("tip1: 输入参数最后加入 true 标识 把当前记录保存到默认文件夹中 "+ defaultRecordDir);
+        System.out.println("tip2: 当前文件夹中包含 .txt 文件 将以模板2  "+I6_Html_Template_File_2.getName()+" 创建HTML文件");
+
         System.out.println("程序执行结束!  "+"  Over !");
 
 
@@ -1983,4 +2120,7 @@ if(inputParamList == null){
        }
 
     }
+
+
+
 }

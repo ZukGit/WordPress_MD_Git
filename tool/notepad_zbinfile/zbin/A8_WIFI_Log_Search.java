@@ -2520,6 +2520,7 @@ static class Wifi_HAL_Start_Failed extends MeetPrintBase {
     }
 
 
+    static File notepad_command_File = null;
     public static void main(String[] args) {
         //===============real-test begin===============
         String mFilePath = null;
@@ -2542,6 +2543,7 @@ static class Wifi_HAL_Start_Failed extends MeetPrintBase {
         File curFile;
         if (mFilePath != null && !mFilePath.isEmpty() && (curFile = new File(mFilePath)).exists()) {
             System.out.println("input argument success ! ");
+            notepad_command_File = curFile;
         } else {
             System.out.println("input argument is invalid ! retry input again!");
             return;
@@ -2589,26 +2591,33 @@ ArrayList<File> dirFileList = new ArrayList<File>();
             analysisStringArr.clear();  // 对于下一个文件  先 处理  analysisStringArr 的数据  然后 迎接下一个文件的处理
         }
 
-        try {
 
-            BufferedWriter curBW = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(mFilePath)), "utf-8"));
+
+            ArrayList<String> appendLogArr = new   ArrayList<String>();
+            appendLogArr.add("════════════════Begin   WIFI 全文件LOG 搜索 ");
+
             int length = allFileAnalysisStringArr.size();
             for (int index = 0; index < length; index++) {
                 ArrayList<String> arritem = allFileAnalysisStringArr.get(index);
                 System.out.println("开始分析第 index = " + index + "个文件！");
                 for (int i = 0; i < arritem.size(); i++) {
+                    appendLogArr.add(arritem.get(i));
 
-                    curBW.write(arritem.get(i));
-                    curBW.newLine();
                 }
             }
-            curBW.close();
+        appendLogArr.add("════════════════End   WIFI 全文件LOG 搜索 \n\n\n\n");
             System.out.println("OK !");
 
-        } catch (Exception e) {
+        appendToFile(notepad_command_File,appendLogArr);
 
-
-        }
+//        try {
+//    BufferedWriter curBW = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(mFilePath)), "utf-8"));
+//                    curBW.write(arritem.get(i));
+//                    curBW.newLine();
+//        curBW.close();
+//        } catch (Exception e) {
+//
+//        }
 
 
 
@@ -2658,5 +2667,39 @@ ArrayList<File> dirFileList = new ArrayList<File>();
         }*/
 
 
+    }
+
+
+    public static void appendToFile(File file , ArrayList<String> logList) {
+        try {
+            if(!file.exists()){
+                file.createNewFile();
+            }
+
+
+
+            // 打开一个随机访问文件流，按读写方式
+            RandomAccessFile randomFile = new RandomAccessFile(file, "rwd");
+            // 文件长度，字节数
+            long fileLength = randomFile.length();
+            // 将写文件指针移到文件尾。
+            randomFile.seek(fileLength);
+
+
+            for (int i = 0; i < logList.size(); i++) {
+                String logItem = logList.get(i);
+                randomFile.write((logItem+"\n").getBytes("utf-8"));
+
+            }
+
+//            randomFile.write(("index = "+index+"============开机打印【"+DateUtil.now()+ "】========== \n").getBytes("utf-8"));
+
+
+            //  randomFile.write("\n".getBytes());  // 换行
+            randomFile.close();
+        } catch( Exception e ){
+
+
+        }
     }
 }

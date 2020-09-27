@@ -1,7 +1,4 @@
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.ParseException;
@@ -26,7 +23,7 @@ class F8_Dump_Analysis {
 
     static boolean isBugreportExist;  // 判断  当前目录下的 Bugreport 文件是否存在
     static String bugreportFileName = "bugreport.txt";
-    static String bugreportFileABSPATH = "";
+
     static int CatagoryIndexNum = 1;
 
     // 如果 是去 读取 bugreport.txt , 那么这里存放 bugreport的所有内容
@@ -48,6 +45,9 @@ class F8_Dump_Analysis {
     static String curDirPath = "";   // 当前 SHELL  所在目录  默认是main中的第一个 arg[0] 就是shell路径
 
 
+    static File notepad_cmd_File ;
+
+    static String mBugReportFileName;
     public static void main(String[] args) {
         initSystemInfo();
 
@@ -55,7 +55,13 @@ class F8_Dump_Analysis {
             for (int i = 0; i < args.length; i++) {
                 System.out.println("args[" + i + "] = " + args[i]);
                 if (i == 0) {
-                    curDirPath = args[i];
+                    File curOneInputFile = new File(args[i]);
+                    if(curOneInputFile.exists() && curOneInputFile.isFile()){
+                        notepad_cmd_File = curOneInputFile;
+                        curDirPath = curOneInputFile.getParentFile().getAbsolutePath();
+                    }else if(curOneInputFile.exists() && curOneInputFile.isDirectory()){
+                        curDirPath = args[i];
+                    }
                 } else {
                     mKeyWordName.add(args[i]);
                 }
@@ -63,17 +69,21 @@ class F8_Dump_Analysis {
         }
 
 
-        String bugrepot_ABSPATH = curDirPath + File.separator + bugreportFileName;
-        bugrepot_ABSPATH = bugrepot_ABSPATH.replace(File.separator + File.separator, File.separator);
-        File bugreportFile = new File(bugrepot_ABSPATH);
-        bugreportFileABSPATH = bugreportFile.getAbsolutePath();
-        isBugreportExist = bugreportFile.exists();
-
-        if (isBugreportExist) {
-            mBugreport_ExistFile = bugreportFile;
-        } else {
-            mBugreport_ExistFile = null;
+        File shellDirFile = new File(curDirPath);
+        if(!shellDirFile.exists()){
+            System.out.println("当前 shell路径 不存在: shellDirFile = "+ shellDirFile.getAbsolutePath());
+            return;
         }
+
+
+//        String bugrepot_ABSPATH = curDirPath + File.separator + bugreportFileName;
+//        bugrepot_ABSPATH = bugrepot_ABSPATH.replace(File.separator + File.separator, File.separator);
+//        File bugreportFile = new File(bugrepot_ABSPATH);
+
+        mBugreport_ExistFile = checkBugReportFile(shellDirFile);
+
+        isBugreportExist = (mBugreport_ExistFile != null );
+
 
 
         initCategoryList(mBugreport_ExistFile);
@@ -81,14 +91,41 @@ class F8_Dump_Analysis {
         beginShowMatchInfo();
     }
 
+    static File checkBugReportFile(File shellDir){
+      File[] subFileArr = shellDir.listFiles();
+      //   包含 bugreport 字样  并且 以 txt为 类型
+      String flag ="bugreport";
+      String report_type = ".txt";
+
+      File report_txt_File = null;
+        for (int i = 0; i < subFileArr.length; i++) {
+            File itemFile = subFileArr[i];
+            String fileName = itemFile.getName().toLowerCase();
+            if(itemFile.isDirectory() || !fileName.endsWith(report_type)){
+                continue;
+            }
+
+            if(fileName.contains(flag)){
+                report_txt_File = itemFile;
+                return report_txt_File;
+            }
+
+        }
+
+return report_txt_File;
+
+    }
+
     static void beginShowMatchInfo() {
         ArrayList<String> logList = new ArrayList<String>();
+        logList.add("════════════════Begin F8_Dump_Analysis  文件:"+mBugReportFileName+" 搜索 \n\n\n\n");
 
         for (int i = 0; i < categoryList.size(); i++) {
             CatagoryItem category = categoryList.get(i);
             ArrayList<AShowItem> showItemList = category.getmSameCategoryList();
             int catagorySize = category.getShowItemSize();
             int catagoryindex = category.mCatagoryIndex;
+            logList.add("═══════════════════" + "【" + category.mTitleName + "】【分类索引:" + catagoryindex + "】【显示长度:" + catagorySize + "】" + "═══════════════════");
             System.out.println("═══════════════════" + "【" + category.mTitleName + "】【分类索引:" + catagoryindex + "】【显示长度:" + catagorySize + "】" + "═══════════════════");
             int itemIndex = 1;
             for (int j = 0; j < showItemList.size(); j++) {
@@ -97,6 +134,8 @@ class F8_Dump_Analysis {
                 if (showItem.isAlwaysShow) {
                     System.out.println("【" + "[" + itemIndex + "]" + showItem.mUIPossition + "】");
                     System.out.println(showItemStr);
+                    logList.add("【" + "[" + itemIndex + "]" + showItem.mUIPossition + "】");
+                    logList.add(showItemStr);
                 }
 
 
@@ -106,6 +145,13 @@ class F8_Dump_Analysis {
 
         int showCount = calculShowItemSize();
         System.out.println("\n\n当前记录 SHowItem 总数: 【" + showCount + "】");
+        logList.add("\n\n当前记录 SHowItem 总数: 【" + showCount + "】");
+        logList.add("");
+        logList.add("════════════════End F8_Dump_Analysis  文件:"+mBugReportFileName+" 搜索 \n\n\n\n");
+        if(notepad_cmd_File != null){
+            appendToFile(notepad_cmd_File,logList);
+        }
+
 
     }
 
@@ -124,8 +170,10 @@ class F8_Dump_Analysis {
     static void initCategoryList(File bugrepotFile) {
         if (bugrepotFile != null) {
             initFileWithReportFile(bugrepotFile);
+            mBugReportFileName = bugrepotFile.getName();
         } else {
             initFileWithF8DumpDirPath(F8_Dump_DirPath);
+            mBugReportFileName = F8_Dump_DirPath+"【自创建 dump system】";
         }
     }
 
@@ -1494,7 +1542,18 @@ class F8_Dump_Analysis {
                     "class CompatibilityScorer implements WifiCandidates.CandidateScorer {}  // 性能计分\n" +
                     "class BubbleFunScorer implements WifiCandidates.CandidateScorer  {} // 冒泡分数\n" +
                     "CandidateScorer 接口主要在 WifiCandidates.java 的函数 【 ScoredCandidate choose(CandidateScorer candidateScorer) 中的参数接口】\n" +
-                    "实现函数 ScoredCandidate scoreCandidates( Collection<Candidate> group) 】";
+                    "实现函数 ScoredCandidate scoreCandidates( Collection<Candidate> group) 】\n" +
+                    "~~~~~~~~~~~~~ 代码逻辑 Begin ~~~~~~~~~~~~~\n" +
+                    "localLog(listenerName + \" onResults: start network selection\");  // 开始寻找候选网络\n" +
+                    "\n" +
+                    "WifiConfiguration candidate = mNetworkSelector.selectNetwork(scanDetails, buildBssidBlacklist(), mWifiInfo,mStateMachine.isConnected(), mStateMachine.isDisconnected(),mUntrustedConnectionAllowed);\n" +
+                    "\n" +
+                    "if (candidate != null) {\n" +
+                    "\tlocalLog(listenerName + \":  WNS candidate-\" + candidate.SSID);  // 如果不为空 那么找到候选网络\n" +
+                    "\tconnectToNetwork(candidate);\n" +
+                    "\treturn true;\n" +
+                    "}\n" +
+                    "~~~~~~~~~~~~~ 代码逻辑 End ~~~~~~~~~~~~~";
             this.showKey_Match = "对WIFI网络进行选择 管理 评估 候选网络的逻辑实现类 WifiConnectivityManager  ---匹配 OK ";
             this.showKey_NO_Match = "对WIFI网络进行选择 管理 评估 候选网络的逻辑实现类 WifiConnectivityManager  ---匹配 Failed";
             this.srcFileName = "wifi.txt"; // 资源文件来源
@@ -2846,6 +2905,40 @@ class F8_Dump_Analysis {
         return true;
     }
 
+
+
+    public static void appendToFile(File file , ArrayList<String> logList) {
+        try {
+            if(!file.exists()){
+                file.createNewFile();
+            }
+
+
+
+            // 打开一个随机访问文件流，按读写方式
+            RandomAccessFile randomFile = new RandomAccessFile(file, "rwd");
+            // 文件长度，字节数
+            long fileLength = randomFile.length();
+            // 将写文件指针移到文件尾。
+            randomFile.seek(fileLength);
+
+
+            for (int i = 0; i < logList.size(); i++) {
+                String logItem = logList.get(i);
+                randomFile.write((logItem+"\n").getBytes("utf-8"));
+
+            }
+
+//            randomFile.write(("index = "+index+"============开机打印【"+DateUtil.now()+ "】========== \n").getBytes("utf-8"));
+
+
+            //  randomFile.write("\n".getBytes());  // 换行
+            randomFile.close();
+        } catch( Exception e ){
+
+
+        }
+    }
 
 }
 

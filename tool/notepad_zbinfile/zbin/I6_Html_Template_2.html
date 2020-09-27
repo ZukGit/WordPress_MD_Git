@@ -1,0 +1,945 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<title>MarkdownPad Document</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<style type="text/css">
+/* GitHub stylesheet for MarkdownPad (http://markdownpad.com) */
+/* Author: Nicolas Hery - http://nicolashery.com */
+/* Version: b13fe65ca28d2e568c6ed5d7f06581183df8f2ff */
+/* Source: https://github.com/nicolahery/markdownpad-github */
+
+/* RESET
+=============================================================================*/
+
+html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, b, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, output, ruby, section, summary, time, mark, audio, video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+/* BODY
+=============================================================================*/
+
+body {
+  font-family: Helvetica, arial, freesans, clean, sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #333;
+  background-color: #fff;
+  padding: 20px;
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+body>*:first-child {
+  margin-top: 0 !important;
+}
+
+body>*:last-child {
+  margin-bottom: 0 !important;
+}
+
+/* BLOCKS
+=============================================================================*/
+
+p, blockquote, ul, ol, dl, table, pre {
+  margin: 15px 0;
+}
+
+/* HEADERS
+=============================================================================*/
+
+h1, h2, h3, h4, h5, h6 {
+  margin: 20px 0 10px;
+  padding: 0;
+  font-weight: bold;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1 tt, h1 code, h2 tt, h2 code, h3 tt, h3 code, h4 tt, h4 code, h5 tt, h5 code, h6 tt, h6 code {
+  font-size: inherit;
+}
+
+h1 {
+  font-size: 28px;
+  color: #000;
+}
+
+h2 {
+  font-size: 24px;
+  border-bottom: 1px solid #ccc;
+  color: #000;
+}
+
+h3 {
+  font-size: 18px;
+}
+
+h4 {
+  font-size: 16px;
+}
+
+h5 {
+  font-size: 14px;
+}
+
+h6 {
+  color: #777;
+  font-size: 14px;
+}
+
+body>h2:first-child, body>h1:first-child, body>h1:first-child+h2, body>h3:first-child, body>h4:first-child, body>h5:first-child, body>h6:first-child {
+  margin-top: 0;
+  padding-top: 0;
+}
+
+a:first-child h1, a:first-child h2, a:first-child h3, a:first-child h4, a:first-child h5, a:first-child h6 {
+  margin-top: 0;
+  padding-top: 0;
+}
+
+h1+p, h2+p, h3+p, h4+p, h5+p, h6+p {
+  margin-top: 10px;
+}
+
+/* LINKS
+=============================================================================*/
+
+a {
+  color: #4183C4;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* LISTS
+=============================================================================*/
+
+ul, ol {
+  padding-left: 30px;
+}
+
+ul li > :first-child, 
+ol li > :first-child, 
+ul li ul:first-of-type, 
+ol li ol:first-of-type, 
+ul li ol:first-of-type, 
+ol li ul:first-of-type {
+  margin-top: 0px;
+}
+
+ul ul, ul ol, ol ol, ol ul {
+  margin-bottom: 0;
+}
+
+dl {
+  padding: 0;
+}
+
+dl dt {
+  font-size: 14px;
+  font-weight: bold;
+  font-style: italic;
+  padding: 0;
+  margin: 15px 0 5px;
+}
+
+dl dt:first-child {
+  padding: 0;
+}
+
+dl dt>:first-child {
+  margin-top: 0px;
+}
+
+dl dt>:last-child {
+  margin-bottom: 0px;
+}
+
+dl dd {
+  margin: 0 0 15px;
+  padding: 0 15px;
+}
+
+dl dd>:first-child {
+  margin-top: 0px;
+}
+
+dl dd>:last-child {
+  margin-bottom: 0px;
+}
+
+/* CODE
+=============================================================================*/
+
+pre, code, tt {
+  font-size: 12px;
+  font-family: Consolas, "Liberation Mono", Courier, monospace;
+}
+
+code, tt {
+  margin: 0 0px;
+  padding: 0px 0px;
+  white-space: nowrap;
+  border: 1px solid #eaeaea;
+  background-color: #f8f8f8;
+  border-radius: 3px;
+}
+
+pre>code {
+  margin: 0;
+  padding: 0;
+  white-space: pre;
+  border: none;
+  background: transparent;
+}
+
+pre {
+  background-color: #f8f8f8;
+  border: 1px solid #ccc;
+  font-size: 13px;
+  line-height: 19px;
+  overflow: auto;
+  padding: 6px 10px;
+  border-radius: 3px;
+}
+
+pre code, pre tt {
+  background-color: transparent;
+  border: none;
+}
+
+kbd {
+    -moz-border-bottom-colors: none;
+    -moz-border-left-colors: none;
+    -moz-border-right-colors: none;
+    -moz-border-top-colors: none;
+    background-color: #DDDDDD;
+    background-image: linear-gradient(#F1F1F1, #DDDDDD);
+    background-repeat: repeat-x;
+    border-color: #DDDDDD #CCCCCC #CCCCCC #DDDDDD;
+    border-image: none;
+    border-radius: 2px 2px 2px 2px;
+    border-style: solid;
+    border-width: 1px;
+    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+    line-height: 10px;
+    padding: 1px 4px;
+}
+
+/* QUOTES
+=============================================================================*/
+
+blockquote {
+  border-left: 4px solid #DDD;
+  padding: 0 15px;
+  color: #777;
+}
+
+blockquote>:first-child {
+  margin-top: 0px;
+}
+
+blockquote>:last-child {
+  margin-bottom: 0px;
+}
+
+/* HORIZONTAL RULES
+=============================================================================*/
+
+hr {
+  clear: both;
+  margin: 15px 0;
+  height: 0px;
+  overflow: hidden;
+  border: none;
+  background: transparent;
+  border-bottom: 4px solid #ddd;
+  padding: 0;
+}
+
+/* TABLES
+=============================================================================*/
+
+table th {
+  font-weight: bold;
+}
+
+table th, table td {
+  border: 1px solid #ccc;
+  padding: 6px 13px;
+}
+
+table tr {
+  border-top: 1px solid #ccc;
+  background-color: #fff;
+}
+
+table tr:nth-child(2n) {
+  background-color: #f8f8f8;
+}
+
+/* IMAGES
+=============================================================================*/
+
+img {
+  max-width: 100%
+}
+</style>
+<style type="text/css">
+.highlight  { background: #ffffff; }
+.highlight .c { color: #999988; font-style: italic } /* Comment */
+.highlight .err { color: #a61717; background-color: #e3d2d2 } /* Error */
+.highlight .k { font-weight: bold } /* Keyword */
+.highlight .o { font-weight: bold } /* Operator */
+.highlight .cm { color: #999988; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #999999; font-weight: bold } /* Comment.Preproc */
+.highlight .c1 { color: #999988; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #999999; font-weight: bold; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #000000; background-color: #ffdddd } /* Generic.Deleted */
+.highlight .gd .x { color: #000000; background-color: #ffaaaa } /* Generic.Deleted.Specific */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #aa0000 } /* Generic.Error */
+.highlight .gh { color: #999999 } /* Generic.Heading */
+.highlight .gi { color: #000000; background-color: #ddffdd } /* Generic.Inserted */
+.highlight .gi .x { color: #000000; background-color: #aaffaa } /* Generic.Inserted.Specific */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #555555 } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #aaaaaa } /* Generic.Subheading */
+.highlight .gt { color: #aa0000 } /* Generic.Traceback */
+.highlight .kc { font-weight: bold } /* Keyword.Constant */
+.highlight .kd { font-weight: bold } /* Keyword.Declaration */
+.highlight .kp { font-weight: bold } /* Keyword.Pseudo */
+.highlight .kr { font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #445588; font-weight: bold } /* Keyword.Type */
+.highlight .m { color: #009999 } /* Literal.Number */
+.highlight .s { color: #d14 } /* Literal.String */
+.highlight .na { color: #008080 } /* Name.Attribute */
+.highlight .nb { color: #0086B3 } /* Name.Builtin */
+.highlight .nc { color: #445588; font-weight: bold } /* Name.Class */
+.highlight .no { color: #008080 } /* Name.Constant */
+.highlight .ni { color: #800080 } /* Name.Entity */
+.highlight .ne { color: #990000; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #990000; font-weight: bold } /* Name.Function */
+.highlight .nn { color: #555555 } /* Name.Namespace */
+.highlight .nt { color: #000080 } /* Name.Tag */
+.highlight .nv { color: #008080 } /* Name.Variable */
+.highlight .ow { font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mf { color: #009999 } /* Literal.Number.Float */
+.highlight .mh { color: #009999 } /* Literal.Number.Hex */
+.highlight .mi { color: #009999 } /* Literal.Number.Integer */
+.highlight .mo { color: #009999 } /* Literal.Number.Oct */
+.highlight .sb { color: #d14 } /* Literal.String.Backtick */
+.highlight .sc { color: #d14 } /* Literal.String.Char */
+.highlight .sd { color: #d14 } /* Literal.String.Doc */
+.highlight .s2 { color: #d14 } /* Literal.String.Double */
+.highlight .se { color: #d14 } /* Literal.String.Escape */
+.highlight .sh { color: #d14 } /* Literal.String.Heredoc */
+.highlight .si { color: #d14 } /* Literal.String.Interpol */
+.highlight .sx { color: #d14 } /* Literal.String.Other */
+.highlight .sr { color: #009926 } /* Literal.String.Regex */
+.highlight .s1 { color: #d14 } /* Literal.String.Single */
+.highlight .ss { color: #990073 } /* Literal.String.Symbol */
+.highlight .bp { color: #999999 } /* Name.Builtin.Pseudo */
+.highlight .vc { color: #008080 } /* Name.Variable.Class */
+.highlight .vg { color: #008080 } /* Name.Variable.Global */
+.highlight .vi { color: #008080 } /* Name.Variable.Instance */
+.highlight .il { color: #009999 } /* Literal.Number.Integer.Long */
+.pl-c {
+    color: #969896;
+}
+
+.pl-c1,.pl-mdh,.pl-mm,.pl-mp,.pl-mr,.pl-s1 .pl-v,.pl-s3,.pl-sc,.pl-sv {
+    color: #0086b3;
+}
+
+.pl-e,.pl-en {
+    color: #795da3;
+}
+
+.pl-s1 .pl-s2,.pl-smi,.pl-smp,.pl-stj,.pl-vo,.pl-vpf {
+    color: #333;
+}
+
+.pl-ent {
+    color: #63a35c;
+}
+
+.pl-k,.pl-s,.pl-st {
+    color: #a71d5d;
+}
+
+.pl-pds,.pl-s1,.pl-s1 .pl-pse .pl-s2,.pl-sr,.pl-sr .pl-cce,.pl-sr .pl-sra,.pl-sr .pl-sre,.pl-src,.pl-v {
+    color: #df5000;
+}
+
+.pl-id {
+    color: #b52a1d;
+}
+
+.pl-ii {
+    background-color: #b52a1d;
+    color: #f8f8f8;
+}
+
+.pl-sr .pl-cce {
+    color: #63a35c;
+    font-weight: bold;
+}
+
+.pl-ml {
+    color: #693a17;
+}
+
+.pl-mh,.pl-mh .pl-en,.pl-ms {
+    color: #1d3e81;
+    font-weight: bold;
+}
+
+.pl-mq {
+    color: #008080;
+}
+
+.pl-mi {
+    color: #333;
+    font-style: italic;
+}
+
+.pl-mb {
+    color: #333;
+    font-weight: bold;
+}
+
+.pl-md,.pl-mdhf {
+    background-color: #ffecec;
+    color: #bd2c00;
+}
+
+.pl-mdht,.pl-mi1 {
+    background-color: #eaffea;
+    color: #55a532;
+}
+
+.pl-mdr {
+    color: #795da3;
+    font-weight: bold;
+}
+
+.pl-mo {
+    color: #1d3e81;
+}
+.task-list {
+padding-left:10px;
+margin-bottom:0;
+}
+
+.task-list li {
+    margin-left: 20px;
+}
+
+.task-list-item {
+list-style-type:none;
+padding-left:10px;
+}
+
+.task-list-item label {
+font-weight:400;
+}
+
+.task-list-item.enabled label {
+cursor:pointer;
+}
+
+.task-list-item+.task-list-item {
+margin-top:3px;
+}
+
+.task-list-item-checkbox {
+display:inline-block;
+margin-left:-20px;
+margin-right:3px;
+vertical-align:1px;
+}
+</style>
+<script src="http://code.jquery.com/jquery-1.7.2.min.js"></script>
+<script type="text/javascript">
+ //是否显示导航栏
+ var showNavBar = true;
+ //是否展开导航栏
+ var expandNavBar = true;
+ var currentIndex = 0;
+ var currentScrollHigh = 0;
+ var currentContentScrollHigh = 0;
+ function sleep(numberMillis) {  
+    var now = new Date();  
+    var exitTime = now.getTime() + numberMillis;  
+    while (true) {  
+        now = new Date();  
+        if (now.getTime() > exitTime)  
+        return;  
+        }  
+}
+
+
+
+
+
+ $(window).load(function(){
+    var h1s = $("body").find("h1");
+    var h2s = $("body").find("h2");
+    var h3s = $("body").find("h3");
+    var h4s = $("body").find("h4");
+    var h5s = $("body").find("h5");
+    var h6s = $("body").find("h6");
+
+    var headCounts = [h1s.length, h2s.length, h3s.length, h4s.length, h5s.length, h6s.length];
+    var vH1Tag = null;  // 显示的最高层级
+    var vH2Tag = null;   // 显示的最低层级
+var sum = 0;
+
+
+    for(var i = 0; i < headCounts.length; i++){
+          if(headCounts[i] > 0){
+          for( var y = 0; y < headCounts[i]; y++)
+                 sum = sum + 1;
+          }
+    }
+    for(var i = 0; i < headCounts.length; i++){
+        if(headCounts[i] > 0){
+            if(vH1Tag == null){
+                vH1Tag = 'h' + (i + 1);
+            }else{
+                vH2Tag = 'h' + (i + 1);
+            }
+        }
+    }
+    if(vH1Tag == null){
+        return;
+    }
+
+    $("body").prepend('<div class="BlogAnchor">' + 
+        '<span style="color:red;position:absolute;top:-6px;left:0px;cursor:pointer;" onclick="$(\'.BlogAnchor\').hide();">×</span>' +
+        '<p>' + 
+            '<b id="AnchorContentToggle" title="收起" style="cursor:pointer;">目录▲</b>' + 
+        '</p>' + 
+        '<div class="AnchorContent" id="AnchorContent"> </div>' + 
+    '</div>' );
+
+    var vH1Index = 0;
+    var vH2Index = 0;
+
+
+    var vIndexH1 = 0;
+    var vIndexH2 = 0;
+    var vIndexH3 = 0;
+    var vIndexH4 = 0;
+    var vIndexH5 = 0;
+    var vIndexH6 = 0;
+    var headerALL = [];
+    var headerIDALL = [];
+    var headerHightALL = [];
+    $("body").find("h1,h2,h3,h4,h5,h6").each(function(i,item){
+
+        var id = '';
+        var name = '';
+        var tag = $(item).get(0).tagName.toLowerCase();
+        var className = '';
+        // i=0 tag=h1          i=1 tag=h2     i=2 tag=h2
+
+        if(tag == "h1"){
+            id = name = ++vIndexH1;
+    vIndexH2 = 0;
+    vIndexH3 = 0;
+    vIndexH4 = 0;
+    vIndexH5 = 0;
+    vIndexH6 = 0;
+    className = 'item_h1';
+
+//alert("tag ="+ tag +"----   i = "+ i + " name ="+ name +"    className= "+ className);
+//tag =h1----   i = 0 name =1    className= item_h1
+        }else if(tag == "h2"){
+
+            id = vIndexH1 + '_' + ++vIndexH2;
+            name = vIndexH1 + '.' + vIndexH2;
+            className = 'item_h2'; 
+    vIndexH3 = 0;
+    vIndexH4 = 0;
+    vIndexH5 = 0;
+    vIndexH6 = 0;
+
+       }else if(tag == "h3"){
+            id = vIndexH1 + '_' + vIndexH2+ '_' + ++vIndexH3;
+            name = vIndexH1 + '.' + vIndexH2+ '.' + +vIndexH3;
+            className = 'item_h3'; 
+    vIndexH4 = 0;
+    vIndexH5 = 0;
+    vIndexH6 = 0;
+
+       }
+
+       else if(tag == "h4"){
+            id = vIndexH1 + '_' + vIndexH2+ '_'  +vIndexH3 +'_'+ ++vIndexH4 ;
+            name =  vIndexH1 + '.' + vIndexH2+ '.'  +vIndexH3 +'.'+  vIndexH4 ;
+            className = 'item_h4';
+    vIndexH5 = 0;
+    vIndexH6 = 0; 
+       }
+
+       else if(tag == "h5"){
+            id = vIndexH1 + '_' + vIndexH2+ '_'  +vIndexH3 +'_' +vIndexH4+'_'+ ++vIndexH5;
+            name = vIndexH1 + '.' + vIndexH2+ '.'  +vIndexH3 +'.' +vIndexH4+'.'+ vIndexH5;
+            className = 'item_h5'; 
+            vIndexH6 = 0; 
+       }
+
+       else if(tag == "h6"){
+            id = vIndexH1 + '_' + vIndexH2+ '_'  +vIndexH3 +'_' +vIndexH4+'_' +vIndexH5+'_'+ ++vIndexH6;
+            name = vIndexH1 + '.' + vIndexH2+ '.'  +vIndexH3 +'.' +vIndexH4+'.' +vIndexH5+'.'+ vIndexH6;
+            className = 'item_h6'; 
+
+       }
+        if(name.length > 2){
+
+        var mFirstName = name.substring(0,2);
+        while(mFirstName == "0."){
+        name = name.substring(2,name.length);
+        mFirstName = name.substring(0,2);
+         }
+
+        }
+        $(item).attr("id","wow"+id+"_index_"+i);
+        $(item).addClass("wow_head");
+        var itemHeight = $(item).offset().top
+        $("#AnchorContent").css('max-height', ($(document).height()) + 'px');
+        $("#AnchorContent").css('height', ($(window).height()) + 'px');
+        $("#AnchorContent").css('overflow','auto');
+        $("#AnchorContent").append('<li><a class="nav_item '+className+' anchor-link"  href="#wow'+id+'_index_'+i+'" link="#wow'+id+'" index="'+i+'">'+name+"✶"+$(this).text()+" "+'</a></li>');
+        var str = "#wow"+id+"_index_"+i;
+        headerALL.push($(item));
+        headerIDALL.push(str);
+        console.log("  i = "+ i +"   id =" + id +"  itemHeight = "+ itemHeight);
+    });
+
+    // 1
+    // 1.1
+    // 1.1.1
+    // 1.1.1.1
+    // 1.1.1.1.1
+    // 1.1.1.1.1.1
+    $("#AnchorContentToggle").click(function(){
+        var text = $(this).html();
+        if(text=="目录▲"){
+            $(this).html("目录▼");
+            $(this).attr({"title":"展开"});
+        }else{
+            $(this).html("目录▲");
+            $(this).attr({"title":"收起"});
+        }
+        $("#AnchorContent").toggle();
+    });
+
+
+$(".anchor-link").click(function(){
+
+        //$("html,body").animate({scrollTop: $($(this).attr("link")).offset().top}, 10);
+        var index  = $(this).attr("index");
+                $(".BlogAnchor li .nav_item.current").removeClass('current');
+                $(headerNavs[index]).addClass('current');
+                      var scrollTop = $(window).scrollTop(); // 获得将要到达的点离顶距离
+                      currentScrollHigh = scrollTop;
+                      currentContentScrollHigh = headerHightALL[index];
+      var value = headerTops[index];
+      currentIndex = value;
+      console.log("index = "+ index+ "  headerTops["+index+"] ="+ value + "scrollTop="+ scrollTop);
+    });
+
+
+
+
+
+    var headerNavs = $(".BlogAnchor li .nav_item");
+    var headerTops = [];
+    var mHeight = 0;
+    $(".wow_head").each(function(i, n){
+    var value = $(n).offset().top;
+
+        headerTops.push($(n).offset().top);
+         console.log("i = "+ i+ "  offset().top ="+ value);
+    });
+    headerTops.push($(document).height());
+
+window.onresize = function(){
+
+headerTops = [];
+$.each(headerNavs, function(i, n){
+$(n).trigger("click"); 
+document.querySelector(headerIDALL[i]).scrollIntoView(true);
+//var high = $(n).offset().top;
+var scrollTop = $(window).scrollTop();
+headerTops.push(scrollTop);
+console.log("headerNavs_index="+i +"   scrollTop="+scrollTop +"  headerTops="+headerTops[i]);
+}
+);
+headerTops.push($(document).height());
+
+//$("#AnchorContent").height($(window).height());
+$("#AnchorContent").css('height', ($(window).height()) + 'px');
+var xcontentWidth =  $("#AnchorContent").width();
+var xWidth = $(window).width();
+var xlength = xWidth - xcontentWidth;
+$("body").css("marginLeft",xcontentWidth+'px');
+$("body").css("max-width",xlength);
+
+$(headerNavs[currentIndex]).trigger("click"); 
+document.querySelector(headerIDALL[i]).scrollIntoView(true);
+
+
+}
+
+
+
+
+
+
+
+
+
+$(window).scroll(function(){
+        var scrollTop = $(window).scrollTop(); // 获得将要到达的点离顶距离
+
+        $.each(headerTops, function(i, n){
+            if( (scrollTop >= (headerTops[i])  && scrollTop < (headerTops[i+1] -1))  ){
+                console.log("headerTops[i-1]"+headerTops[i-1]+"headerTops[i]"+headerTops[i]+"  scrollTop ="+ scrollTop+"  headerTops[i+1]= "+headerTops[i+1] +"  i ="+i);
+                $(".BlogAnchor li .nav_item.current").removeClass('current');
+                $(headerNavs[i]).addClass('current');
+                currentScrollHigh = scrollTop;
+                currentContentScrollHigh = headerHightALL[i];
+                currentIndex = i;
+                var mxxHeight = $("#AnchorContent").height()
+                var mscrollTop1 = $("#AnchorContent").scrollTop();  // 当前标签的高度
+            console.log("zukgit2 currentIndex="+ currentIndex );
+                console.log("zukgit2 windows.scrollTop="+ scrollTop );
+                console.log("zukgit2 $(window).height()="+ $(window).height() );
+                console.log("zukgit2 currentContentScrollHigh="+ currentContentScrollHigh );
+                console.log("zukgit2 AnchorContent.mscrollTop="+ mscrollTop1 );
+                console.log("zukgit2 AnchorContent.high="+ mxxHeight );
+                if((currentContentScrollHigh - mscrollTop1)>  ($(window).height()/2)){ //↓ // 如果当前index超出  界面的高度
+                //var sum =   Math.floor(headerHightALL(i) / $(window).height());
+                var dif = currentContentScrollHigh - mscrollTop1;
+                $("#AnchorContent").animate({scrollTop: (currentContentScrollHigh)}, 50);
+                console.log("  i(zukgit3) = "+ i +"   currentContentScrollHigh =" + currentContentScrollHigh +"  mscrollTop1 = "+ mscrollTop1);
+                console.log(" $(window).height()="+ $(window).height() );
+
+                } else if( ( mscrollTop1 - currentContentScrollHigh )>  0 ){  //↑
+                $("#AnchorContent").animate({scrollTop: currentContentScrollHigh-($("#AnchorContent").height()/3)}, 50);
+                console.log("  i(zukgit4) = "+ i +"   currentContentScrollHigh =" + currentContentScrollHigh +"  mscrollTop1 = "+ mscrollTop1);
+                console.log(" $(window).height()="+ $(window).height() +"   $(#AnchorContent).height()="+mxxHeight);
+                }
+
+                return false;
+            }
+        }
+        );
+        if(scrollTop == 0){
+        $("#AnchorContent").animate({scrollTop: 0}, 50);
+        }
+        if(scrollTop == $(document).height()){
+        $("#AnchorContent").animate({scrollTop: headerHightALL[headerHightALL.length-1]}, 50);
+        }
+    });
+
+
+$.each(headerNavs, function(i, n){
+var high = $(n).offset().top;
+headerHightALL.push(high);
+console.log("high"+high);
+}
+);
+
+
+headerTops = [];
+$.each(headerNavs, function(i, n){
+
+$(n).trigger("click"); 
+document.querySelector(headerIDALL[i]).scrollIntoView(true);
+
+var scrollTop = $(window).scrollTop();
+
+headerTops.push(scrollTop);
+console.log("headerNavs_index="+i +"   scrollTop="+scrollTop +"  headerTops="+headerTops[i]);
+
+}
+);
+
+
+
+headerTops.push($(document).height());
+$(headerNavs[0]).trigger("click"); 
+document.querySelector(headerIDALL[0]).scrollIntoView(true);
+
+
+
+
+var xcontentWidth =  $("#AnchorContent").width();
+var xWidth = $(window).width();
+var xlength = xWidth - xcontentWidth;
+$("body").css("marginLeft",xcontentWidth+'px');
+$("body").css("max-width",xlength);
+
+    if(!showNavBar){
+        $('.BlogAnchor').hide();
+    }
+    if(!expandNavBar){
+        $(this).html("目录▼");
+        $(this).attr({"title":"展开"});
+        $("#AnchorContent").hide();
+    }
+ });
+
+
+
+
+</script>
+<style>
+    /*导航*/
+    .BlogAnchor {
+        //background: #f1f1f1;
+        background: #ffffff;
+        //padding: 10px;
+        line-height: 180%;
+        position: fixed;
+        left: 0px;   // right: 48px;  
+        top: 0px;
+        border: 1px solid #aaaaaa;
+        width: 40%;
+        height:100%;
+    }
+    .BlogAnchor p {
+        font-size: 18px;
+        color: #15a230;
+        margin: 0 0 0.3rem 0;
+        text-align: right;
+    }
+    .BlogAnchor .AnchorContent {
+        //padding: 5px 0px;
+        overflow: auto;
+
+    }
+    .BlogAnchor li{
+        text-indent: 0.5rem;
+        font-size: 14px;
+        list-style: none;
+    }
+    .BlogAnchor li .nav_item{
+        padding: 3px;
+    }
+    .BlogAnchor li .item_h1{
+        margin-left: 0rem;
+    }
+    .BlogAnchor li .item_h2{
+        margin-left: 2rem;
+        font-size: 0.8rem;
+    }
+
+    .BlogAnchor li .item_h3{
+        margin-left: 4rem;
+        font-size: 0.8rem;
+    }
+
+    .BlogAnchor li .item_h4{
+        margin-left: 5rem;
+        font-size: 0.8rem;
+    }
+
+    .BlogAnchor li .item_h5{
+        margin-left: 6rem;
+        font-size: 0.8rem;
+    }
+
+
+    .BlogAnchor li .item_h6{
+        margin-left: 7rem;
+        font-size: 0.8rem;
+    }
+
+    .BlogAnchor li .nav_item.current{
+  //        color: white;
+  //      background-color: #5cc26f;    // zukgit 导航绿色背景
+    }
+    #AnchorContentToggle {
+        font-size: 13px;
+        font-weight: normal;
+        color: #FFF;
+        display: inline-block;
+        line-height: 20px;
+        background: #5cc26f;
+        font-style: normal;
+        padding: 1px 8px;
+    }
+    .BlogAnchor a:hover {
+        color: #5cc26f;
+    }
+    .BlogAnchor a {
+        text-decoration: none;
+    }
+</style>
+
+</head>
+
+<body>
+
+<div style="background-color:#FFFFFF">
+
+	<ul  id="ul1">
+zukgitPlaceHolderBody
+
+	</ul>
+
+
+</div>
+
+
+
+<Script>
+
+// ==UserScript==
+// @name        AutoScroll
+// @namespace   https://greasyfork.org/users/11909
+// @description AutoScroll - 双击切换自动滚屏
+// @include     http*
+// @version     2016.03.07.01
+// @author      OscarKoo
+// @grant       none
+// ==/UserScript==
+
+(function(document) {
+  var enable = false;
+  var handler = 0;
+
+  var dbclick = function() {
+    enable = !enable;
+    clearTimeout(handler);
+    if (enable) aScroll();
+  };
+
+  document.body.removeEventListener('dblclick', dbclick);
+  document.body.addEventListener('dblclick', dbclick);
+
+  var aScroll = function() {
+    if (enable) document.documentElement.scrollTop += 3;  // zukgit 速度
+    handler = setTimeout(aScroll, 25);
+  };
+})(document);
+</Script>
+
+</body>
+
+</html>
+
+

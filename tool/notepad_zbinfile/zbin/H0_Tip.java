@@ -108,10 +108,18 @@ public class H0_Tip {
 
     static void NotePadCommand(){
         System.out.println(OneLine_Pre + " NotePad++  设置 Begin "+ OneLine_End);
-        System.out.println(" 用户设置 notepad运行   ztextrule_operation_I9.bat 的 快捷键为 F8:");
+        System.out.println(" 用户设置 notepad运行【索引1】   ztextrule_operation_I9.bat 的 快捷键为 F8:");
         System.out.println("Name: text_rule   Key:  F8");
         System.out.println(" cmd /K cd /d %userprofile%\\Desktop\\zbin & %userprofile%\\Desktop\\zbin\\I9.bat %userprofile%\\Desktop\\zbin  $(FULL_CURRENT_PATH)");
         System.out.println("用户可通过 ztextrule_operation_I9.bat  命令来选择对应的 F8 快剪键 执行的 text_rule 逻辑!");
+
+        System.out.println();
+        System.out.println(" 用户设置 notepad运行【索引2】   A8.bat 进行Log分析 打印 的 快捷键为 【 Log_Check : F9 】");
+        System.out.println("Name: Log_Check   Key:  F9");
+        System.out.println("cmd /K cd /d %userprofile%\\Desktop\\zbin & %userprofile%\\Desktop\\zbin\\A8.bat %userprofile%\\Desktop\\zbin  $(FULL_CURRENT_PATH)  ");
+        System.out.println("可修改A8.bat 逻辑为: A8_WIFI_Log_Search.java  A8_GPS_Log_Search.java  F8_Dump_Analysis.java 先后运行 并输出到当前打开文件");
+
+
         System.out.println(OneLine_Pre + " NotePad++ 设置  End "+ OneLine_Pre);
     }
 
@@ -268,6 +276,15 @@ public class H0_Tip {
         System.out.println(OneLine_Pre + " WIFI详情开关描述 "+ OneLine_End);
         System.out.println("Settings >System > About phone > tap \"Build number\" 4 times >Developer options\n" +
                 "Setting > System > Advanced > Developer options >Enable WiFi Verbose Logging  [toogle open] ");
+
+
+
+        System.out.println(OneLine_Pre + " GPS Log_Mask 描述: "+ OneLine_End);
+        System.out.println(" modem log was collected using QC_default.cfg as log mask, so there is very few GNSS msg in QXDM log and we can not further check it from modem perspective ( whether there is any interferance, whether HW performance is good, whether any error from modem or GNSS engine... )");
+        System.out.println("can you please help to use GNSS_V9.cfg as log mask ");
+        System.out.println("( Bug2Go -> System Debug Settings -> diag_mdlog v2 -> Config file -> GNSS_V9.cfg ) to collect one more B2G log?");
+        System.out.println("and if possible, please help to side by side test it on REF device and collect pass log for comparison");
+        System.out.println("much appreciated");
 
 
     }
