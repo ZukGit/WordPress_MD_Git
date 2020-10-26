@@ -49,6 +49,11 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
 */
 
 
+    //  把 mp4 文件转为 .ts 文件  并生成  .m3u8 播放列表   然后对文件内容 进行操作
+
+    // 先创建文件夹   再 执行  解析命令  segment_time 指定 截取的每段时间长度为30秒
+//    ffmpeg -i 1.mp4 -c:v copy -c:a copy -bsf:v h264_mp4toannexb -f ssegment -segment_list .\2020_10_26\2020_10_26_out.m3u 8 -segment_time 30 .\2020_10_26\2020_10_26_out%03d.ts
+
     /*******************修改属性列表 ------Begin *********************/
 // 修改0.   全局修改 把 G8 改为当前应用的序号规则序号  当前类名称也需要修改
 // 修改1.当前 执行代码的 bat sh 文件名称  最后必须是标识序号
@@ -284,6 +289,8 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
         CUR_RULE_LIST.add( new GETJPGFrame4Video_Rule_3());
 
         CUR_RULE_LIST.add( new VideoRoast_Rule_4());
+
+        CUR_RULE_LIST.add( new MP4_To_TS_Rule_5());
 //        CUR_RULE_LIST.add( new File_Name_Rule_2());
 //        CUR_RULE_LIST.add( new Image2Jpeg_Rule_3());
 //        CUR_RULE_LIST.add( new Image2Png_Rule_4());
@@ -294,6 +301,197 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
 
     }
 
+
+//    ffmpeg -i 2.mp4 -c:v copy -c:a copy -bsf:v h264_mp4toannexb -f ssegment -segment_list ./out/2020_10_26_out.m3u8 -segment_time 10 ./out/TS_DIR/2020_10_26_out%03d.ts
+    //  对当前 给定的 Mp4文件进行切割为ts文件  文件结构为  当前目录 ./out 【输出文件夹 包含m3u8 文件】  ./out/TS_Dir 【TS文件的输出文件夹  包含 TS 文件】
+    //  对生成的 .m3du 文件  删除 .ts 后缀  增加 ./TS_Dir/前缀
+    // 对生成的 ts  文件  把 后缀.ts 文件删除
+    //  依据文件名  时间  2020_10_26_165720_文件名.m3u8    2020_10_26_165720_文件名_001.ts   2020_10_26_165720_文件名_002.ts   2020_10_26_165720_文件名_003.ts
+    class MP4_To_TS_Rule_5 extends  Basic_Rule{
+        ArrayList<File> mInputMediaFileList ;  // 输入的 视频文件
+        Map<File,File> InputFile_OutDirMap ;   //  输入的视频文件 和输出文件夹集合
+        File outDir ;  //  out 输出文件夹
+        File out_TS_Dir;   // out 目录下 ts 文件列表
+
+
+        MP4_To_TS_Rule_5(){
+            super(5);
+            mInputMediaFileList = new  ArrayList<File>();
+            InputFile_OutDirMap  = new  HashMap<File,File>();
+            outDir  = new File(CUR_Dir_FILE.getAbsolutePath()+File.separator+"VideoData");
+            out_TS_Dir = new File(CUR_Dir_FILE.getAbsolutePath()+File.separator+"VideoData"+File.separator+"TS_Dir");
+        }
+
+
+        @Override
+        String ruleTip(String type, int index, String batName, OS_TYPE curType) {
+            return  "\n"+Cur_Bat_Name+ "  5     <mp4 输入1路径>  <mp4 输入2路径> <多路径MP4文件>      ## 把当前 mp4 视频 裁剪为ts文件 输出到文件夹 sky.mp4 --> sky_20201026/sky_20201026.m3u8 xxx1.ts xxx2.ts  【  adb push ./VideoData  /sdcard/UCDownloads/   】   \n" +
+            "\n"+Cur_Bat_Name+ "  5_all    ##  把当前 shell 目录下所有.mp4文件 作为输入参数 进行 MP4 转 ts 的 剪切    ## 把当前 mp4 视频 裁剪为ts文件 输出到文件夹   【  adb push ./VideoData  /sdcard/UCDownloads/   】 \n"  ;
+        }
+
+
+        @Override
+        boolean checkParamsOK(File shellDir, String type2Param, ArrayList<String> otherParams) {
+            System.out.println("rule5 shellDir = "+ shellDir);
+            System.out.println("rule5  otherParams = "+ otherParams.size());
+
+            if(type2Param.contains("all")){
+                File[] shellDirList = CUR_Dir_FILE.listFiles();
+                for (int i = 0; i < shellDirList.length; i++) {
+                    File mp4Item = shellDirList[i];
+                    if(mp4Item.getName().toLowerCase().endsWith(".mp4")){
+                        mInputMediaFileList.add(mp4Item);
+                    }
+                }
+            }
+
+            if( mInputMediaFileList.size() == 0 && (otherParams == null || otherParams.size() ==0) ){
+                errorMsg = "用户输入的文件参数为空";
+                System.out.println(errorMsg);
+                return false;
+            }
+
+
+
+            System.out.println("rule5 otherParams.size() = "+ otherParams.size());
+
+
+            for (int i = 0; i <otherParams.size() ; i++) {
+                String pre = "."+File.separator;
+                String curStringItem = otherParams.get(i).toString();
+                String curAbsPath = "";
+                if(curStringItem.startsWith(pre)){
+                    curStringItem = curStringItem.substring(2);
+                }
+                curAbsPath = shellDir.getAbsolutePath() + File.separator + curStringItem;
+                File curFIle = new File(curAbsPath) ;
+                System.out.println("curAbsPath  = "+ curAbsPath);
+                if(curFIle.exists() && curFIle.getName().toLowerCase().endsWith(".mp4") ){  // 判断
+                    mInputMediaFileList.add(curFIle);
+                }
+            }
+            if(mInputMediaFileList.size() == 0){
+                errorMsg = "当前从参数找不到对应的输入源 .mp4  .flv .rmvb .avi 文件 ";
+                System.out.println(errorMsg);
+                return false;
+            }
+            System.out.println("rule5 checkParamsOK mInputMediaFileList.size() = "+ mInputMediaFileList.size());
+            return  super.checkParamsOK(shellDir,type2Param,otherParams);
+        }
+
+
+        @Override
+        void operationRule(ArrayList<String> inputParamsList) {
+
+            if(!outDir.exists()){
+                outDir.mkdirs();
+            }
+            if(!out_TS_Dir.exists()){
+                out_TS_Dir.mkdirs();
+            }
+
+            //     ffmpeg -i sky1.mp4  image%d.jpg    抠图
+
+            String ffmpeg_path = getEnvironmentExePath("ffmpeg");
+            if(ffmpeg_path ==null){
+                errorMsg = "当前 ffmpeg 不在环境变量中 请下载该库 并添加到 环境变量中";
+                System.out.println(errorMsg);
+                return;
+            }
+            System.out.println("rule5 curInputFileList.size() = "+mInputMediaFileList.size());
+            System.out.println("rule5 ffmpeg_path = "+ffmpeg_path);
+            // 把 当前的 mp4 文件写入 G8_1_MergedRule.txt
+            for (int i = 0; i < mInputMediaFileList.size(); i++) {
+
+//    ffmpeg -i 2.mp4 -c:v copy -c:a copy -bsf:v h264_mp4toannexb -f ssegment -segment_list ./out/2020_10_26_out.m3u8 -segment_time 30 ./out/TS_DIR/2020_10_26_out%03d.ts
+
+                File mp4File = mInputMediaFileList.get(i);
+                StringBuilder sb =new StringBuilder();
+
+                String originName = mp4File.getName();
+                String noPointFileName = getFileNameNoPoint(mp4File.getName());
+
+                String fileTimeStr =  getTimeStamp();
+                String m3u8FileName = "./VideoData/"+fileTimeStr+"_"+noPointFileName+".m3u8";// zzzz
+
+                String ts_FileName = "./VideoData/TS_DIR/"+fileTimeStr+"_"+noPointFileName+"_"+"%03d.ts";
+
+                String command = ffmpeg_path +" -i "+ mp4File.getAbsolutePath() + " -c:v copy -c:a copy -bsf:v h264_mp4toannexb -f ssegment -segment_list "+ m3u8FileName+" "+ " -segment_time 30 "+ ts_FileName;
+
+                System.out.println(command);
+                execCMD(command);
+            }
+            System.out.println("等待程序执行1秒");
+            try {
+                Thread.sleep(500);
+            }catch (Exception e){
+
+            }
+
+           tsFile_TryRename();
+            m3u8_Fixed();
+            System.out.println("导入 安卓 命令: ");
+            System.out.println("adb push ./VideoData  /sdcard/UCDownloads/");
+        }
+
+    void tsFile_TryRename(){
+       File[] TS_List = out_TS_Dir.listFiles();
+        System.out.println("TS_FILE_SIZE = "+TS_List.length);
+        for (int i = 0; i < TS_List.length ; i++) {
+            File fileItem = TS_List[i];
+            System.out.println("index["+i+"] : " + fileItem.getName());
+//            if(".ts".endsWith(fileItem.getName())){
+                if(fileItem.getName().endsWith(".ts")){
+                String newName = fileItem.getName().replace(".ts","");
+                System.out.println("index["+i+"] : oldName="+fileItem.getName() +"   newName:"+newName);
+                tryReName(fileItem,newName);
+
+            }
+        }
+    }
+
+    void m3u8_Fixed(){
+
+        File[] TS_List = outDir.listFiles();
+        System.out.println("outDir_Size  = "+TS_List.length);
+        for (int i = 0; i < TS_List.length ; i++) {
+            File fileItem = TS_List[i];
+            System.out.println("index["+i+"] : " + fileItem.getName());
+//            if(".m3u8".endsWith(fileItem.getName())){
+                if(fileItem.getName().endsWith(".m3u8")){
+                ArrayList<String> fixedStrArr = new  ArrayList<String>();
+                ArrayList<String> fixedM3U8_Content = ReadFileContentAsList(fileItem);
+
+                for (int j = 0; j < fixedM3U8_Content.size(); j++) {
+                    String item = fixedM3U8_Content.get(j);
+                    if(item.startsWith("#")){
+                        fixedStrArr.add(item);
+                        continue;
+                    }
+                    System.out.println("item = "+ item  + (item.endsWith(".ts")?"ts后缀":"非ts"));
+                    if(item.endsWith(".ts")){
+                        String newItem = item.replace(".ts","");
+                       String path_1 = "./TS_Dir/"+newItem;
+                        fixedStrArr.add(path_1);
+						        continue;
+                    }
+                    fixedStrArr.add(item);
+                }
+                System.out.println("index["+i+"] : " + fileItem.getName());
+                writeContentToFile(fileItem,fixedStrArr);
+            }
+        }
+
+    }
+
+    }
+
+    static String getTimeStamp(){
+
+        SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd_HHmmss");//设置日期格式
+        String date = df.format(new Date());
+        return date;
+    }
 
     class VideoRoast_Rule_4 extends  Basic_Rule{
         ArrayList<File> mInputMediaFileList ;  // 输入的 视频文件
@@ -629,7 +827,7 @@ if(rotate == 90 || rotate == 270){
             super(1);
             curInputFileList = new  ArrayList<File>();
             G8_1_Rule_File = new File(zbinPath+File.separator+"G8_1_MergedRule.txt");
-            bigNum = 2;
+            bigNum = 1;
         }
 
 
@@ -641,7 +839,7 @@ if(rotate == 90 || rotate == 270){
                 String bigNumStr = type2Param.substring(type2Param.indexOf("x")+1);
                 bigNum = Integer.parseInt(bigNumStr);
             }else{
-                bigNum = 2;
+                bigNum = 1;
             }
 if(!G8_1_Rule_File.exists()){
     try {  //   创建  文件输入的    放置 file 'C:\Users\zhuzj5\Desktop\testA\1\1.mp4'
@@ -877,6 +1075,44 @@ if(!G8_1_Rule_File.exists()){
         }
     }
 
+    public static ArrayList<String> ReadFileContentAsList( File mFilePath) {
+
+        if (mFilePath != null  && mFilePath.exists()) {
+            //  System.out.println("存在  当前文件 "+ mFilePath.getAbsolutePath());
+        } else {
+            System.out.println("不存在 当前文件 "+ mFilePath.getAbsolutePath() );
+
+            return null;
+        }
+        ArrayList<String> contentList= new ArrayList<String>();
+
+        try {
+            BufferedReader curBR = new BufferedReader(new InputStreamReader(new FileInputStream(mFilePath), "utf-8"));
+            String oldOneLine = "";
+            int index = 1;
+            while (oldOneLine != null) {
+
+                oldOneLine = curBR.readLine();
+                if (oldOneLine == null ) {
+                    continue;
+                }
+
+                contentList.add(oldOneLine);
+//                    System.out.println("第"+index+"行读取到的字符串:"+oldOneLine);
+                index++;
+
+            }
+            curBR.close();
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return contentList;
+
+    }
+
+
     public static String ReadFileContent( File mFilePath) {
 
         if (mFilePath != null  && mFilePath.exists()) {
@@ -1090,6 +1326,7 @@ if(!G8_1_Rule_File.exists()){
             return Integer.parseInt(inputParams);
         }
         if(inputParams.contains("_")){
+//            System.out.println("calculInputTypeIndexA  = "+ inputParams);
             String[] mTypeParamArr = inputParams.split("_");
             if(mTypeParamArr.length == 0 ){
                 return 0;
@@ -1097,6 +1334,7 @@ if(!G8_1_Rule_File.exists()){
 
             for (int i = 0; i < mTypeParamArr.length; i++) {
                 String curPositionStr = mTypeParamArr[i];
+//                System.out.println("calculInputTypeIndexB  = "+ curPositionStr);
                 if(isNumeric(curPositionStr)){
                     return  Integer.parseInt(curPositionStr);
                 }
@@ -1119,6 +1357,7 @@ if(!G8_1_Rule_File.exists()){
                     CUR_TYPE_2_ParamsStr = args[i];
                     //zukgit1    计算得到 当前 索引的列表   首先遇到的第一个数字类型  1_2112  那就是索引1  附带参数 2112   temp_2_
                     CUR_TYPE_INDEX = calculInputTypeIndex(CUR_TYPE_2_ParamsStr);
+                    System.out.println("calculInputTypeIndex - > CUR_TYPE_INDEX  = "+ CUR_TYPE_INDEX);
                 } else {
                     if(!"".equals(args[i])){
                         CUR_INPUT_3_ParamStrList.add(args[i]);   // 当前cmd目录   第一个类型选项      之后所有的参数 保存在  CUR_INPUT_3_ParamStrList
@@ -1134,7 +1373,7 @@ if(!G8_1_Rule_File.exists()){
         G8_FFmpeg_Operation mG8_Object = new G8_FFmpeg_Operation();
         mG8_Object.InitRule();
         // 用户没有输入参数
-        if (CUR_TYPE_INDEX == 0 ||  CUR_INPUT_3_ParamStrList.size() == 0) {
+        if (CUR_TYPE_INDEX == 0 &&  CUR_INPUT_3_ParamStrList.size() == 0) {
             showTip();
             return;
         }
