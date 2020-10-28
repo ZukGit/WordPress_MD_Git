@@ -1,4 +1,6 @@
 import cn.hutool.system.JavaRuntimeInfo;
+import it.sauronsoftware.jave.Encoder;
+import it.sauronsoftware.jave.MultimediaInfo;
 
 import java.io.*;
 import java.nio.file.*;
@@ -130,7 +132,7 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
         videoTypeList.add(".mp4");
         videoTypeList.add(".rmvb");
         videoTypeList.add(".flv");
-
+        videoTypeList.add(".mkv");
     }
 
 
@@ -143,7 +145,7 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
         mediaTypeList.add(".mp3");
         mediaTypeList.add(".wav");
         mediaTypeList.add(".aac");
-
+        mediaTypeList.add(".mkv");
 
     }
 
@@ -168,7 +170,7 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
     // D:\software\ffmpeg\bin
     // D:\software\ffmpeg\bin\ffmpeg.exe  -f concat -safe 0 -i C:\Users\zhuzj5\Desktop\zbin\G8_1_MergedRule.txt -c copy C:\Users\zhuzj5\Desktop\output3.mp4
     static String  getEnvironmentExePath(String program){
- String exename = program.trim().toLowerCase();
+        String exename = program.trim().toLowerCase();
         String executePath = null;
         for (int i = 0; i < EnvironmentList.length; i++) {
             String itemPath = EnvironmentList[i];
@@ -291,6 +293,11 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
         CUR_RULE_LIST.add( new VideoRoast_Rule_4());
 
         CUR_RULE_LIST.add( new MP4_To_TS_Rule_5());
+
+        CUR_RULE_LIST.add( new UC_OutPut_TS_Localized_6());
+        CUR_RULE_LIST.add( new CutDown_Video_Rule_7());
+
+
 //        CUR_RULE_LIST.add( new File_Name_Rule_2());
 //        CUR_RULE_LIST.add( new Image2Jpeg_Rule_3());
 //        CUR_RULE_LIST.add( new Image2Png_Rule_4());
@@ -302,7 +309,385 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
     }
 
 
-//    ffmpeg -i 2.mp4 -c:v copy -c:a copy -bsf:v h264_mp4toannexb -f ssegment -segment_list ./out/2020_10_26_out.m3u8 -segment_time 10 ./out/TS_DIR/2020_10_26_out%03d.ts
+
+
+    // ffmpeg -ss 00:00:00  -accurate_seek  -to 00:00:10  -i 1.mp4 -codec copy 1_output.mp4   //  截取视频
+    class CutDown_Video_Rule_7 extends  Basic_Rule{
+        ArrayList<File> mInputMediaFileList ;  // 输入的 视频文件
+
+        File targetInputMP4File ;  // 输入的 Mp4文件
+        String beginTimeStr;
+        String endTimeStr;
+        String outputFileName;  // 输出文件的名称
+
+
+        CutDown_Video_Rule_7(){
+            super(7);
+            mInputMediaFileList = new  ArrayList<File>();
+
+        }
+
+
+        @Override
+        String ruleTip(String type, int index, String batName, OS_TYPE curType) {
+            return
+                    "\n"+Cur_Bat_Name+ "  7   10-              <mp4,flv,avi.rmvb 路径>      ## 秒数往后截取视频   \n"+
+                            "\n"+Cur_Bat_Name+ "  7   -100              <mp4,flv,avi.rmvb 路径>    ## 秒数往后截取视频   \n"+
+                            "\n"+Cur_Bat_Name+ "  7  10-50              <mp4,flv,avi.rmvb 路径>    ## 秒数往后截取视频   \n"+
+                            "\n"+Cur_Bat_Name+ "  7  01:10-             <mp4,flv,avi.rmvb 路径>    ## 分钟数往后截取视频 \n"+
+                            "\n"+Cur_Bat_Name+ "  7  -01:10             <mp4,flv,avi.rmvb 路径>    ## 分钟数往后截取视频 \n"+
+                            "\n"+Cur_Bat_Name+ "  7  01:10-02:50        <mp4,flv,avi.rmvb 路径>    ## 分钟数往后截取视频 \n"+
+                            "\n"+Cur_Bat_Name+ "  7  00:00:10-          <mp4,flv,avi.rmvb 路径>    ## 时分秒往后截取视频 \n"+
+                            "\n"+Cur_Bat_Name+ "  7  -00:00:10          <mp4,flv,avi.rmvb 路径>    ## 时分秒往后截取视频 \n"+
+                            "\n"+Cur_Bat_Name+ "  7  00:00:10-00:00:50  <mp4,flv,avi.rmvb 路径>    ## 时分秒往后截取视频 \n"; }
+
+
+
+        // ffmpeg -ss 00:00:00  -accurate_seek  -to 00:00:10  -i 1.mp4 -codec copy 1_output.mp4    //  截取视频
+        @Override
+        boolean checkParamsOK(File shellDir, String type2Param, ArrayList<String> otherParams) {
+            System.out.println("rule7 shellDir = "+ shellDir);
+            System.out.println("rule7  otherParams = "+ otherParams.size());
+
+
+            if(otherParams == null || otherParams.size() ==0){
+                errorMsg = "用户输入的文件参数为空";
+                System.out.println(errorMsg);
+                return false;
+            }
+
+
+
+            System.out.println("rule7 otherParams.size() = "+ otherParams.size());
+
+            for (int i = 0; i <otherParams.size() ; i++) {
+                String pre = "."+File.separator;
+                String curStringItem = otherParams.get(i).toString();
+                String curAbsPath = "";
+                if(curStringItem.startsWith(pre)){
+                    curStringItem = curStringItem.substring(2);
+                }
+                curAbsPath = shellDir.getAbsolutePath() + File.separator + curStringItem;
+                File curFIle = new File(curAbsPath) ;
+                System.out.println("curAbsPath  = "+ curAbsPath);
+                if(curFIle.exists() && videoTypeList.contains(getFileTypeWithPoint(curFIle.getName())) ){  // 判断
+                    mInputMediaFileList.add(curFIle);
+                }
+            }
+            if(mInputMediaFileList.size() == 0){
+                errorMsg = "当前从参数找不到对应的输入源 .mp4  .flv .rmvb .avi 文件 ";
+                System.out.println(errorMsg);
+                return false;
+            }
+            System.out.println("rule7 checkParamsOK mInputMediaFileList.size() = "+ mInputMediaFileList.size());
+            targetInputMP4File = mInputMediaFileList.get(mInputMediaFileList.size()-1);
+            String tagFlag = otherParams.get(0);
+            System.out.println("targetInputMP4File = "+ targetInputMP4File.getAbsolutePath());
+            System.out.println("tagFlag = "+ tagFlag);
+
+            if(!tagFlag.contains("-"))
+            {
+                System.out.println("输入的 时间标识字符串 " +tagFlag +" 不包含分割符号 -  无法识别! 程序退出!");
+                return false;
+            }
+
+            if(tagFlag.startsWith("-")){
+                tagFlag = "00:00:00"+tagFlag;
+            }
+
+            if(tagFlag.endsWith("-")){
+                tagFlag = tagFlag+ReadVideoTime(targetInputMP4File);
+            }
+
+            String[] tagArr = tagFlag.split("-");
+            if(tagArr == null || tagArr.length != 2){
+                System.out.println("tagFlag = "+ tagFlag +" 分割符号 - 数组为空 或者长度不为2  程序退出!  tagArr.length = " + tagArr.length);
+                return false;
+            }
+
+
+
+            String pre_Str = tagArr[0];
+            if(!"".equals(pre_Str.trim())){
+                beginTimeStr =   fixedTimeStr(pre_Str);
+            }else{
+                beginTimeStr =  "00:00:00";
+            }
+
+
+
+            String end_Str = tagArr[1];
+            if(!"".equals(end_Str.trim())){
+                endTimeStr =   fixedTimeStr(end_Str);
+            }else{
+                endTimeStr =  ReadVideoTime(targetInputMP4File);
+            }
+
+
+            String originName = targetInputMP4File.getName();
+            String typeStr = getFileTypeWithPoint(originName);
+            String fileNameOnly = getFileNameNoPoint(originName);
+
+            outputFileName = fileNameOnly+"_"+beginTimeStr.replace(":","")+"_"+endTimeStr.replace(":","")+"_"+System.currentTimeMillis()/1000+typeStr;
+            outputFileName = outputFileName.replace(" ","");
+            String beginTemp1 = beginTimeStr.replace(":","");
+            String endTemp1 = endTimeStr.replace(":","");
+            int beginTemp1_int = Integer.parseInt(beginTemp1);
+            int endTemp1_int = Integer.parseInt(endTemp1);
+
+            System.out.println("beginTimeStr = "+ beginTimeStr +"   endTimeStr = "+ endTimeStr  +"   outputFileName =  "+ outputFileName  + "targetInputMP4File = "+ targetInputMP4File.getName());
+
+            if(beginTemp1_int > endTemp1_int){
+                System.out.println("开始时间大于结束时间! 请检查参数!   beginTimeStr = "+ beginTimeStr  +"       endTimeStr = "+ endTimeStr);
+            }
+
+            return  super.checkParamsOK(shellDir,type2Param,otherParams);
+        }
+
+
+
+        @Override
+        void operationRule(ArrayList<String> inputParamsList) {
+
+
+            System.out.println("beginTimeStr = "+ beginTimeStr +"   endTimeStr = "+ endTimeStr  +"   outputFileName =  "+ outputFileName  + "targetInputMP4File = "+ targetInputMP4File.getName());
+
+
+
+            //     ffmpeg -i sky1.mp4  image%d.jpg    抠图
+
+            String ffmpeg_path = getEnvironmentExePath("ffmpeg");
+            if(ffmpeg_path ==null){
+                errorMsg = "当前 ffmpeg 不在环境变量中 请下载该库 并添加到 环境变量中";
+                System.out.println(errorMsg);
+                return;
+            }
+            System.out.println("rule7 curInputFileList.size() = "+mInputMediaFileList.size());
+            System.out.println("rule7 ffmpeg_path = "+ffmpeg_path);
+            // 把 当前的 mp4 文件写入 G8_1_MergedRule.txt
+
+
+            // ffmpeg -ss 00:00:00  -accurate_seek  -to 00:00:10  -i 1.mp4 -codec copy 1_output.mp4
+             String command = ffmpeg_path +" -ss "+beginTimeStr  + " -accurate_seek  -to " + endTimeStr +"  -i " + "\""+targetInputMP4File.getName()+ "\"" +" "+ "  -codec copy -avoid_negative_ts 1 "+ outputFileName;
+
+
+            System.out.println(command);
+            execCMD(command);
+            System.out.println("裁剪输出文件完成 -》 " + outputFileName);
+
+/*            for (int i = 0; i < mInputMediaFileList.size(); i++) {
+
+                File mp4File = mInputMediaFileList.get(i);
+                StringBuilder sb =new StringBuilder();
+
+                String originName = mp4File.getName();
+                String noPointFileName = getFileNameNoPoint(originName);
+                String type = getFileTypeWithPoint(mp4File.getName());
+//                File jpgDirFile = new File(CUR_Dir_1_PATH+File.separator+noPointFileName+"_"+DateFormat.format(new Date())+File.separator);
+//                jpgDirFile.mkdirs();
+//                String newFileName = originName+"_mp3_"+DateFormat.format(new Date())+".mp3";
+                String newFileName = originName.replace(type,"_"+"_"+DateFormat.format(new Date())+type);
+//                String newFileName = mp4File.getName().replace(".mp4","_x"+bigNum+"_"+DateFormat.format(new Date())+".mp4");     //  新的文件的名称  2.mp4 2_mergedxxxxxxxxxx.mp4
+//                String imageStr = noPointFileName+"_%d.jpg";
+//                String absImagePath = jpgDirFile.getAbsolutePath()+File.separator+imageStr;
+                String newFileAbsPath = mp4File.getParentFile().getAbsolutePath()+File.separator + newFileName;
+
+*//*                ffmpeg -i 1.mp4 -vf "rotate=90*PI/180" 2.mp4        // 顺时针旋转90度
+                ffmpeg -i 1.mp4 -vf "rotate=PI"      3.mp4          // 顺时针旋转180度
+                ffmpeg -i 1.mp4 -vf "rotate=270*PI/180"  4.mp4      // 顺时针旋转270度*//*
+
+                String command = "";
+
+//                    command = ffmpeg_path +" -i "+ mp4File.getAbsolutePath() + " -vf \"rotate="+rotate+"*PI/180\" " + newFileAbsPath;
+
+
+                System.out.println(command);
+                execCMD(command);
+            }*/
+
+
+
+        }
+
+
+
+    }
+
+
+    static String ReadVideoTime(File source) {
+        Encoder encoder = new Encoder();
+        String length = "";
+        try {
+            MultimediaInfo m = encoder.getInfo(source);
+            long ls = m.getDuration()/1000;
+            int hour = (int) (ls/3600);
+            int minute = (int) (ls%3600)/60;
+            int second = (int) (ls-hour*3600-minute*60);
+
+            String hourStr =  hour >= 10?hour+"":"0"+hour;
+            String minutesStr =  minute >= 10?minute+"":"0"+minute;
+            String secondRestStr =  second >= 10?second+"":"0"+second;
+
+            length = hourStr+":"+minutesStr+":"+secondRestStr+":";
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return length;
+    }
+
+
+
+
+    // 对给定的 字符串 进行 时间 上的设置   总是输出  00:00:00 这样的字段
+    static  String fixedTimeStr(String originStr){
+        String fixedStr = originStr;
+        if(originStr.contains(":") && originStr.indexOf(":") != originStr.lastIndexOf(":") ){
+            // 输入的就是 时分秒
+               fixedStr =   fixedStr.replace(" ","").trim();
+          String[] timeStr =   fixedStr.split(":");
+
+
+            int hourInt = Integer.parseInt(timeStr[0]);
+            int minutes =  Integer.parseInt(timeStr[1]);
+            int secondInt = Integer.parseInt(timeStr[2]);
+
+            String hourStr =  hourInt >= 10?hourInt+"":"0"+hourInt;
+            String minutesStr =  minutes >= 10?minutes+"":"0"+minutes;
+            String secondRestStr =  secondInt >= 10?secondInt+"":"0"+secondInt;
+
+            fixedStr =  hourStr+":"+minutesStr+":"+secondRestStr;
+            return fixedStr;
+
+        }else if(originStr.contains(":") && originStr.indexOf(":") == originStr.lastIndexOf(":")){
+            // 输入的就是 分秒
+            fixedStr = fixedStr.replace(" ","").trim();
+            fixedStr = "00:"+fixedStr;
+            return fixedTimeStr(fixedStr);
+        }
+
+        if(!originStr.contains(":")){
+            // 输入的是秒数    需要转为  分秒:
+            if(isNumeric(originStr)){
+                int secondInt = Integer.parseInt(originStr);
+                int hourInt = secondInt/3600;
+                int minutes = secondInt/60;
+                int secondRest = secondInt%60;
+                String hourStr =  hourInt >= 10?hourInt+"":"0"+hourInt;
+                String minutesStr =  minutes >= 10?minutes+"":"0"+minutes;
+                String secondRestStr =  secondRest >= 10?secondRest+"":"0"+secondRest;
+
+                fixedStr =  hourStr+":"+minutesStr+":"+secondRestStr;
+                return fixedStr;
+
+            }
+
+        }
+
+        return  fixedStr;
+
+    }
+
+
+
+    // UC 本地化  使 绝对路径转为 相对路径  方便查看  adb pull  /storage/emulated/0/UCDownloads/VideoData/ .  【   /storage/emulated/0/UCDownloads/VideoData/  转为 .  】
+    class UC_OutPut_TS_Localized_6 extends  Basic_Rule{
+
+        File VideoDataDirFile ;  //  out 输出文件夹 VideoDataDirFile
+
+
+
+        UC_OutPut_TS_Localized_6(){
+            super(6);
+        }
+
+
+        @Override
+        String ruleTip(String type, int index, String batName, OS_TYPE curType) {
+            return  "\n"+Cur_Bat_Name+ "  6    ## 把从UC 拉取出来的 VideoData 本地化(绝对路径转为相对路径) \nadb pull  /storage/emulated/0/UCDownloads/VideoData . && cd  ./VideoData  && "+Cur_Bat_Name +" 6  " ;}
+
+
+        @Override
+        boolean checkParamsOK(File shellDir, String type2Param, ArrayList<String> otherParams) {
+            System.out.println("rule6 shellDir = "+ shellDir);
+            System.out.println("rule6  otherParams = "+ otherParams.size());
+            String curDirName = shellDir.getName();
+            if(!"VideoData".equals(curDirName)){
+                System.out.println("当前规则必须是在 UC 拉取下来的 VideoData文件中执行 ， 当前文件夹名字并不是 VideoData 而是 "+curDirName +" 请检查当前shell路径  程序退出!");
+                return false;
+            }
+            VideoDataDirFile =  shellDir;
+            return  super.checkParamsOK(shellDir,type2Param,otherParams);
+        }
+
+
+        @Override
+        void operationRule(ArrayList<String> inputParamsList) {
+
+
+            m3u8_Rename_PathFixed();
+            System.out.println("导入 安卓 命令: ");
+            System.out.println("adb push ./VideoData  /sdcard/UCDownloads/");
+            System.out.println("导出 安卓 命令: ");
+            System.out.println("adb push  /sdcard/UCDownloads/VideoData  .");
+            System.out.println("连续导出 && 导出 安卓 命令: ");
+            System.out.println("adb pull  /storage/emulated/0/UCDownloads/VideoData . && cd  ./VideoData  && "+Cur_Bat_Name +" 6  ");
+        }
+
+
+        void m3u8_Rename_PathFixed(){
+
+            File[] TS_List = VideoDataDirFile.listFiles();
+            System.out.println("outDir_Size  = "+TS_List.length);
+            for (int i = 0; i < TS_List.length ; i++) {
+                File fileItem = TS_List[i];
+                System.out.println("index["+i+"] : " + fileItem.getName());
+//            if(".m3u8".endsWith(fileItem.getName())){
+                if(fileItem.getName().endsWith(".m3u8")){
+                    ArrayList<String> fixedStrArr = new  ArrayList<String>();
+                    ArrayList<String> fixedM3U8_Content = ReadFileContentAsList(fileItem);
+
+                    for (int j = 0; j < fixedM3U8_Content.size(); j++) {
+                        String item = fixedM3U8_Content.get(j);
+                        if(item.startsWith("#")){
+                            fixedStrArr.add(item);
+                            continue;
+                        }
+                        System.out.println("item = "+ item  + (item.endsWith(".ts")?"ts后缀":"非ts"));
+
+/*                        if(item.endsWith(".ts")){
+                            String newItem = item.replace(".ts","");
+                            String path_1 = "./TS_Dir/"+newItem;
+                            fixedStrArr.add(path_1);
+                            continue;
+                        }*/
+
+                        if(item.startsWith("/storage/emulated/0/UCDownloads/VideoData/")){
+                            String fixedPathItem = item.replace("/storage/emulated/0/UCDownloads/VideoData/",".");
+                            fixedStrArr.add(fixedPathItem);
+                            continue;
+                        }
+                        fixedStrArr.add(item);
+                    }
+                    System.out.println("index["+i+"] : " + fileItem.getName());
+                    writeContentToFile(fileItem,fixedStrArr);
+                }
+                //  如果当前名字中包含中文   那么把中去去除
+
+                String fileName = fileItem.getName();
+                String type = getFileTypeWithPoint(fileName);
+                String fileNameOnly  = getFileNameNoPoint(fileName);
+                if(isContainChinese(fileName)){
+                    String englishName = clearChinese(fileNameOnly)+"_"+getTimeStamp()+type;
+                    tryReName(fileItem,englishName);
+                }
+            }
+
+        }
+
+    }
+
+
+    //    ffmpeg -i 2.mp4 -c:v copy -c:a copy -bsf:v h264_mp4toannexb -f ssegment -segment_list ./out/2020_10_26_out.m3u8 -segment_time 10 ./out/TS_DIR/2020_10_26_out%03d.ts
     //  对当前 给定的 Mp4文件进行切割为ts文件  文件结构为  当前目录 ./out 【输出文件夹 包含m3u8 文件】  ./out/TS_Dir 【TS文件的输出文件夹  包含 TS 文件】
     //  对生成的 .m3du 文件  删除 .ts 后缀  增加 ./TS_Dir/前缀
     // 对生成的 ts  文件  把 后缀.ts 文件删除
@@ -325,8 +710,8 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
 
         @Override
         String ruleTip(String type, int index, String batName, OS_TYPE curType) {
-            return  "\n"+Cur_Bat_Name+ "  5     <mp4 输入1路径>  <mp4 输入2路径> <多路径MP4文件>      ## 把当前 mp4 视频 裁剪为ts文件 输出到文件夹 sky.mp4 --> sky_20201026/sky_20201026.m3u8 xxx1.ts xxx2.ts  【  adb push ./VideoData  /sdcard/UCDownloads/   】   \n" +
-            "\n"+Cur_Bat_Name+ "  5_all    ##  把当前 shell 目录下所有.mp4文件 作为输入参数 进行 MP4 转 ts 的 剪切    ## 把当前 mp4 视频 裁剪为ts文件 输出到文件夹   【  adb push ./VideoData  /sdcard/UCDownloads/   】 \n"  ;
+            return  "\n"+Cur_Bat_Name+ "  5     <mp4 输入1路径>  <mp4 输入2路径> <多路径MP4文件>      ## 把当前 mp4 视频 裁剪为ts文件 输出到文件夹 sky.mp4 --> sky_20201026/sky_20201026.m3u8 xxx1.ts xxx2.ts  \n【  adb push ./VideoData  /sdcard/UCDownloads/   】   \n" +
+                    "\n"+Cur_Bat_Name+ "  5_all    ##  把当前 shell 目录下所有.mp4文件 作为输入参数 进行 MP4 转 ts 的 剪切    ## 把当前 mp4 视频 裁剪为ts文件 输出到文件夹  \n 【  adb push ./VideoData  /sdcard/UCDownloads/   】 \n"  ;
         }
 
 
@@ -428,61 +813,70 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
 
             }
 
-           tsFile_TryRename();
+            tsFile_TryRename();
             m3u8_Fixed();
             System.out.println("导入 安卓 命令: ");
             System.out.println("adb push ./VideoData  /sdcard/UCDownloads/");
         }
 
-    void tsFile_TryRename(){
-       File[] TS_List = out_TS_Dir.listFiles();
-        System.out.println("TS_FILE_SIZE = "+TS_List.length);
-        for (int i = 0; i < TS_List.length ; i++) {
-            File fileItem = TS_List[i];
-            System.out.println("index["+i+"] : " + fileItem.getName());
+        void tsFile_TryRename(){
+            File[] TS_List = out_TS_Dir.listFiles();
+            System.out.println("TS_FILE_SIZE = "+TS_List.length);
+            for (int i = 0; i < TS_List.length ; i++) {
+                File fileItem = TS_List[i];
+                System.out.println("index["+i+"] : " + fileItem.getName());
 //            if(".ts".endsWith(fileItem.getName())){
                 if(fileItem.getName().endsWith(".ts")){
-                String newName = fileItem.getName().replace(".ts","");
-                System.out.println("index["+i+"] : oldName="+fileItem.getName() +"   newName:"+newName);
-                tryReName(fileItem,newName);
+                    String newName = fileItem.getName().replace(".ts","");
+                    System.out.println("index["+i+"] : oldName="+fileItem.getName() +"   newName:"+newName);
+                    tryReName(fileItem,newName);
 
+                }
             }
         }
-    }
 
-    void m3u8_Fixed(){
+        void m3u8_Fixed(){
 
-        File[] TS_List = outDir.listFiles();
-        System.out.println("outDir_Size  = "+TS_List.length);
-        for (int i = 0; i < TS_List.length ; i++) {
-            File fileItem = TS_List[i];
-            System.out.println("index["+i+"] : " + fileItem.getName());
+            File[] TS_List = outDir.listFiles();
+            System.out.println("outDir_Size  = "+TS_List.length);
+            for (int i = 0; i < TS_List.length ; i++) {
+                File fileItem = TS_List[i];
+                System.out.println("index["+i+"] : " + fileItem.getName());
 //            if(".m3u8".endsWith(fileItem.getName())){
                 if(fileItem.getName().endsWith(".m3u8")){
-                ArrayList<String> fixedStrArr = new  ArrayList<String>();
-                ArrayList<String> fixedM3U8_Content = ReadFileContentAsList(fileItem);
+                    ArrayList<String> fixedStrArr = new  ArrayList<String>();
+                    ArrayList<String> fixedM3U8_Content = ReadFileContentAsList(fileItem);
 
-                for (int j = 0; j < fixedM3U8_Content.size(); j++) {
-                    String item = fixedM3U8_Content.get(j);
-                    if(item.startsWith("#")){
+                    for (int j = 0; j < fixedM3U8_Content.size(); j++) {
+                        String item = fixedM3U8_Content.get(j);
+                        if(item.startsWith("#")){
+                            fixedStrArr.add(item);
+                            continue;
+                        }
+                        System.out.println("item = "+ item  + (item.endsWith(".ts")?"ts后缀":"非ts"));
+                        if(item.endsWith(".ts")){
+                            String newItem = item.replace(".ts","");
+                            String path_1 = "./TS_Dir/"+newItem;
+                            fixedStrArr.add(path_1);
+                            continue;
+                        }
                         fixedStrArr.add(item);
-                        continue;
                     }
-                    System.out.println("item = "+ item  + (item.endsWith(".ts")?"ts后缀":"非ts"));
-                    if(item.endsWith(".ts")){
-                        String newItem = item.replace(".ts","");
-                       String path_1 = "./TS_Dir/"+newItem;
-                        fixedStrArr.add(path_1);
-						        continue;
-                    }
-                    fixedStrArr.add(item);
+                    System.out.println("index["+i+"] : " + fileItem.getName());
+                    writeContentToFile(fileItem,fixedStrArr);
                 }
-                System.out.println("index["+i+"] : " + fileItem.getName());
-                writeContentToFile(fileItem,fixedStrArr);
-            }
-        }
+                //  如果当前名字中包含中文   那么把中去去除
 
-    }
+                String fileName = fileItem.getName();
+                String type = getFileTypeWithPoint(fileName);
+                String fileNameOnly  = getFileNameNoPoint(fileName);
+                if(isContainChinese(fileName)){
+                    String englishName = clearChinese(fileNameOnly)+"_"+getTimeStamp()+type;
+                    tryReName(fileItem,englishName);
+                }
+            }
+
+        }
 
     }
 
@@ -596,12 +990,12 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
                 ffmpeg -i 1.mp4 -vf "rotate=270*PI/180"  4.mp4      // 顺时针旋转270度*/
 
                 String command = "";
-if(rotate == 90 || rotate == 270){
-    command = ffmpeg_path +" -i "+ mp4File.getAbsolutePath() + " -vf \"rotate="+rotate+"*PI/180:ow=ih:oh=iw\"  " + newFileAbsPath;
+                if(rotate == 90 || rotate == 270){
+                    command = ffmpeg_path +" -i "+ mp4File.getAbsolutePath() + " -vf \"rotate="+rotate+"*PI/180:ow=ih:oh=iw\"  " + newFileAbsPath;
 
-}else{
-    command = ffmpeg_path +" -i "+ mp4File.getAbsolutePath() + " -vf \"rotate="+rotate+"*PI/180\" " + newFileAbsPath;
-}
+                }else{
+                    command = ffmpeg_path +" -i "+ mp4File.getAbsolutePath() + " -vf \"rotate="+rotate+"*PI/180\" " + newFileAbsPath;
+                }
 
                 System.out.println(command);
                 execCMD(command);
@@ -613,9 +1007,9 @@ if(rotate == 90 || rotate == 270){
     }
 
     // 传入视频文件  获取该视频文件的 所有 图片帧
- //   ffmpeg -i sky1.mp4  image%d.jpg     //  把 mp4视频文件每个帧 都抠出来
+    //   ffmpeg -i sky1.mp4  image%d.jpg     //  把 mp4视频文件每个帧 都抠出来
 
- //   ffmpeg -i sky1.mp4 -r 1 image%d.jpg   // 每秒输入一张图片
+    //   ffmpeg -i sky1.mp4 -r 1 image%d.jpg   // 每秒输入一张图片
     class GETJPGFrame4Video_Rule_3 extends  Basic_Rule{
         ArrayList<File> mInputMediaFileList ;  // 输入的 视频文件
         float  secondInteval = 0 ; //  视频截取图片  时间间隔
@@ -632,7 +1026,7 @@ if(rotate == 90 || rotate == 270){
                     "\n"+Cur_Bat_Name+ "  3_s1   <mp4,flv,avi.rmvb 路径>      ## 把当前 mp4 avi flv rmvb 视频文件的每隔1秒( s1 每秒1帧) sky.mp4 --> sky_20200304020201/sky_1.jpg sky_2.jpg  \n" +
                     "\n"+Cur_Bat_Name+ "  3_s0.2   <mp4,flv,avi.rmvb 路径>      ## 把当前 mp4 avi flv rmvb 视频文件的每隔1秒( s0.2  5秒一帧 每秒0.2帧 ) sky.mp4 --> sky_20200304020201/sky_1.jpg sky_2.jpg  \n" +
                     "\n"+Cur_Bat_Name+ "  3_s0.1   <mp4,flv,avi.rmvb 路径>      ## 把当前 mp4 avi flv rmvb 视频文件的每隔1秒( s0.1  10秒一帧 每秒0.1帧 ) sky.mp4 --> sky_20200304020201/sky_1.jpg sky_2.jpg  \n" +
-            "\n"+Cur_Bat_Name+ "  3_s0.01   <mp4,flv,avi.rmvb 路径>      ## 把当前 mp4 avi flv rmvb 视频文件的每隔1秒( s0.01  100秒一帧  每秒0.01帧 ) sky.mp4 --> sky_20200304020201/sky_1.jpg sky_2.jpg  \n"
+                    "\n"+Cur_Bat_Name+ "  3_s0.01   <mp4,flv,avi.rmvb 路径>      ## 把当前 mp4 avi flv rmvb 视频文件的每隔1秒( s0.01  100秒一帧  每秒0.01帧 ) sky.mp4 --> sky_20200304020201/sky_1.jpg sky_2.jpg  \n"
                     ;
         }
 
@@ -686,7 +1080,7 @@ if(rotate == 90 || rotate == 270){
 
 
 
-       //     ffmpeg -i sky1.mp4  image%d.jpg    抠图
+            //     ffmpeg -i sky1.mp4  image%d.jpg    抠图
 
             String ffmpeg_path = getEnvironmentExePath("ffmpeg");
             if(ffmpeg_path ==null){
@@ -784,7 +1178,7 @@ if(rotate == 90 || rotate == 270){
         void operationRule(ArrayList<String> inputParamsList) {
 
 
-          //  ffmpeg -i sky1.mp4 -b:a 128k output.mp3     // 把mp4文件的音频分离出来 单独生成 mp3 文件
+            //  ffmpeg -i sky1.mp4 -b:a 128k output.mp3     // 把mp4文件的音频分离出来 单独生成 mp3 文件
 
             String ffmpeg_path = getEnvironmentExePath("ffmpeg");
             if(ffmpeg_path ==null){
@@ -800,8 +1194,8 @@ if(rotate == 90 || rotate == 270){
                 File mp4File = mInputMediaFileList.get(i);
                 StringBuilder sb =new StringBuilder();
 
-                 String originName = mp4File.getName();
-                 String type = getFileTypeWithPoint(mp4File.getName());
+                String originName = mp4File.getName();
+                String type = getFileTypeWithPoint(mp4File.getName());
 //                String newFileName = originName+"_mp3_"+DateFormat.format(new Date())+".mp3";
                 String newFileName = originName.replace(type,"_mp3_"+DateFormat.format(new Date())+".mp3");
 //                String newFileName = mp4File.getName().replace(".mp4","_x"+bigNum+"_"+DateFormat.format(new Date())+".mp4");     //  新的文件的名称  2.mp4 2_mergedxxxxxxxxxx.mp4
@@ -841,14 +1235,14 @@ if(rotate == 90 || rotate == 270){
             }else{
                 bigNum = 1;
             }
-if(!G8_1_Rule_File.exists()){
-    try {  //   创建  文件输入的    放置 file 'C:\Users\zhuzj5\Desktop\testA\1\1.mp4'
-        G8_1_Rule_File.createNewFile();
-    } catch (IOException e) {
-        System.out.println("rule1 创建文件 " + G8_1_Rule_File.getAbsolutePath() +"失败!");
-        e.printStackTrace();
-    }
-}
+            if(!G8_1_Rule_File.exists()){
+                try {  //   创建  文件输入的    放置 file 'C:\Users\zhuzj5\Desktop\testA\1\1.mp4'
+                    G8_1_Rule_File.createNewFile();
+                } catch (IOException e) {
+                    System.out.println("rule1 创建文件 " + G8_1_Rule_File.getAbsolutePath() +"失败!");
+                    e.printStackTrace();
+                }
+            }
 
             if(otherParams == null || otherParams.size() ==0){
                 errorMsg = "rule1 用户输入的文件参数为空";
@@ -896,11 +1290,11 @@ if(!G8_1_Rule_File.exists()){
         void operationRule(ArrayList<String> inputParamsList) {
 
             //
-          //  ffmpeg -f concat -i G8_MergedRule1.txt -c copy output.mp4
+            //  ffmpeg -f concat -i G8_MergedRule1.txt -c copy output.mp4
 
- //  ffmpeg  -f当前从参数找不到对应的输入源 concat -safe 0 -i C:\Users\zhuzj5\Desktop\zbin\G8_1_MergedRule.txt -c copy C:\Users\zhuzj5\Desktop\output2.mp4
+            //  ffmpeg  -f当前从参数找不到对应的输入源 concat -safe 0 -i C:\Users\zhuzj5\Desktop\zbin\G8_1_MergedRule.txt -c copy C:\Users\zhuzj5\Desktop\output2.mp4
 // file 'C:\Users\zhuzj5\Desktop\testA\1\1.mp4'
- // C:\Users\zhuzj5\Desktop\zbin\G8_1_MergedRule.txt
+            // C:\Users\zhuzj5\Desktop\zbin\G8_1_MergedRule.txt
 
             String ffmpeg_path = getEnvironmentExePath("ffmpeg");
             if(ffmpeg_path ==null){
@@ -1391,7 +1785,7 @@ if(!G8_1_Rule_File.exists()){
 
 // 检测是否 包含 该文件
         if(!isContainEnvironment("FFmpeg")){
-           String  errorMsg = " 当前 merge合并操作依赖环境变量 FFmpeg 请添加环境变量";
+            String  errorMsg = " 当前 merge合并操作依赖环境变量 FFmpeg 请添加环境变量";
             System.out.println(errorMsg);
             return ;
         }

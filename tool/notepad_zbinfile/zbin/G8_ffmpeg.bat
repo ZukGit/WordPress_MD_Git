@@ -10,5 +10,5 @@ Setlocal ENABLEDELAYEDEXPANSION
 @rem echo 8=%8
 @rem echo 9=%9
 
-@javac   -cp %userprofile%\Desktop\zbin\G8_hutool.jar -encoding UTF-8 %userprofile%\Desktop\zbin\G8_FFmpeg_Operation.java
-@java  -cp  .;%userprofile%\Desktop\zbin\G8_hutool.jar;%userprofile%\Desktop\zbin\ G8_FFmpeg_Operation  %1  %2  %3 %4  %5  %6  %7  %8  %9 
+@javac   -cp %userprofile%\Desktop\zbin\G8_hutool.jar;%userprofile%\Desktop\zbin\G8_jave.jar -encoding UTF-8 %userprofile%\Desktop\zbin\G8_FFmpeg_Operation.java
+@java  -cp  .;%userprofile%\Desktop\zbin\G8_hutool.jar;%userprofile%\Desktop\zbin\G8_jave.jar;%userprofile%\Desktop\zbin\ G8_FFmpeg_Operation  %1  %2  %3 %4  %5  %6  %7  %8  %9 
