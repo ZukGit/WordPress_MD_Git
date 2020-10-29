@@ -468,7 +468,7 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
 
 
             // ffmpeg -ss 00:00:00  -accurate_seek  -to 00:00:10  -i 1.mp4 -codec copy 1_output.mp4
-             String command = ffmpeg_path +" -ss "+beginTimeStr  + " -accurate_seek  -to " + endTimeStr +"  -i " + "\""+targetInputMP4File.getName()+ "\"" +" "+ "  -codec copy -avoid_negative_ts 1 "+ outputFileName;
+            String command = ffmpeg_path +" -ss "+beginTimeStr  + " -accurate_seek  -to " + endTimeStr +"  -i " + "\""+targetInputMP4File.getName()+ "\"" +" "+ "  -codec copy -avoid_negative_ts 1 "+ outputFileName;
 
 
             System.out.println(command);
@@ -543,8 +543,8 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
         String fixedStr = originStr;
         if(originStr.contains(":") && originStr.indexOf(":") != originStr.lastIndexOf(":") ){
             // 输入的就是 时分秒
-               fixedStr =   fixedStr.replace(" ","").trim();
-          String[] timeStr =   fixedStr.split(":");
+            fixedStr =   fixedStr.replace(" ","").trim();
+            String[] timeStr =   fixedStr.split(":");
 
 
             int hourInt = Integer.parseInt(timeStr[0]);
@@ -594,7 +594,8 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
 
         File VideoDataDirFile ;  //  out 输出文件夹 VideoDataDirFile
 
-
+        File origin_abspath_path_Dir;
+        File order_orgin_abspath_path_Dir;
 
         UC_OutPut_TS_Localized_6(){
             super(6);
@@ -603,7 +604,8 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
 
         @Override
         String ruleTip(String type, int index, String batName, OS_TYPE curType) {
-            return  "\n"+Cur_Bat_Name+ "  6    ## 把从UC 拉取出来的 VideoData 本地化(绝对路径转为相对路径) \nadb pull  /storage/emulated/0/UCDownloads/VideoData . && cd  ./VideoData  && "+Cur_Bat_Name +" 6  " ;}
+            return  "\n"+Cur_Bat_Name+ "  6    ## 把从UC 拉取出来的 VideoData 本地化(绝对路径转为相对路径) \nadb pull  /storage/emulated/0/UCDownloads/VideoData . && cd  ./VideoData  && "+Cur_Bat_Name +" 6  " +
+                    "\n移动原有无规则命名的m3du 到 origin_abspath_m3du 文件夹中 (保留绝对路径) \n移动原有无规则命名的m3du改为有规则命名的 到 order_origin_abspath_m3du 中(保留绝对路径)" ;}
 
 
         @Override
@@ -623,7 +625,19 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
         @Override
         void operationRule(ArrayList<String> inputParamsList) {
 
+            origin_abspath_path_Dir = new File(CUR_Dir_FILE.getAbsolutePath()+File.separator+"origin_abspath_m3du");
+            if(!origin_abspath_path_Dir.exists()){
+                origin_abspath_path_Dir.mkdirs();
+            }
 
+            order_orgin_abspath_path_Dir = new File(CUR_Dir_FILE.getAbsolutePath()+File.separator+"order_origin_abspath_m3du");
+            if(!order_orgin_abspath_path_Dir.exists()){
+                order_orgin_abspath_path_Dir.mkdirs();
+            }
+
+
+            origin_abosolution_path_Dir_Operation();
+            order_origin_abosolution_path_Dir_Operation();
             m3u8_Rename_PathFixed();
             System.out.println("导入 安卓 命令: ");
             System.out.println("adb push ./VideoData  /sdcard/UCDownloads/");
@@ -633,11 +647,69 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
             System.out.println("adb pull  /storage/emulated/0/UCDownloads/VideoData . && cd  ./VideoData  && "+Cur_Bat_Name +" 6  ");
         }
 
+        void  order_origin_abosolution_path_Dir_Operation(){
+            File[] TS_List = VideoDataDirFile.listFiles();
+            System.out.println("outDir_Size  = "+TS_List.length);
+
+            int curIndex = 0 ;
+            for (int i = 0; i < TS_List.length ; i++) {
+                File fileItem = TS_List[i];
+                System.out.println("index["+i+"] : " + fileItem.getName());
+                if(fileItem.getName().endsWith(".m3u8")) {
+                    ArrayList<String> fixedStrArr = new  ArrayList<String>();
+                    ArrayList<String> fixedM3U8_Content = ReadFileContentAsList(fileItem);
+
+                    File originFile = new File(order_orgin_abspath_path_Dir.getAbsolutePath()+File.separator+getPaddingIntString(curIndex,4,"0",true)+".m3u8");
+                    for (int j = 0; j < fixedM3U8_Content.size(); j++) {
+                        String item = fixedM3U8_Content.get(j);
+                        if(item.contains("./")){
+                            String fixedPathItem = item.replace("./","/storage/emulated/0/UCDownloads/VideoData/");
+                            fixedStrArr.add(fixedPathItem);
+                            continue;
+                        }
+                        fixedStrArr.add(item);
+                    }
+                    System.out.println("index["+i+"] : " + fileItem.getName());
+                    writeContentToFile(originFile,fixedStrArr);
+                    curIndex++;
+                }
+            }
+
+        }
+
+        void  origin_abosolution_path_Dir_Operation(){
+            File[] TS_List = VideoDataDirFile.listFiles();
+            System.out.println("outDir_Size  = "+TS_List.length);
+
+            for (int i = 0; i < TS_List.length ; i++) {
+                File fileItem = TS_List[i];
+                System.out.println("index["+i+"] : " + fileItem.getName());
+                if(fileItem.getName().endsWith(".m3u8")) {
+                    ArrayList<String> fixedStrArr = new  ArrayList<String>();
+                    ArrayList<String> fixedM3U8_Content = ReadFileContentAsList(fileItem);
+
+                    File originFile = new File(origin_abspath_path_Dir.getAbsolutePath()+File.separator+fileItem.getName());
+                    for (int j = 0; j < fixedM3U8_Content.size(); j++) {
+                        String item = fixedM3U8_Content.get(j);
+                        if(item.contains("./")){
+                            String fixedPathItem = item.replace("./","/storage/emulated/0/UCDownloads/VideoData/");
+                            fixedStrArr.add(fixedPathItem);
+                            continue;
+                        }
+                        fixedStrArr.add(item);
+                    }
+                    System.out.println("index["+i+"] : " + fileItem.getName());
+                    writeContentToFile(originFile,fixedStrArr);
+                }
+            }
+
+        }
 
         void m3u8_Rename_PathFixed(){
 
             File[] TS_List = VideoDataDirFile.listFiles();
             System.out.println("outDir_Size  = "+TS_List.length);
+            int curIndex = 0 ;
             for (int i = 0; i < TS_List.length ; i++) {
                 File fileItem = TS_List[i];
                 System.out.println("index["+i+"] : " + fileItem.getName());
@@ -645,6 +717,7 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
                 if(fileItem.getName().endsWith(".m3u8")){
                     ArrayList<String> fixedStrArr = new  ArrayList<String>();
                     ArrayList<String> fixedM3U8_Content = ReadFileContentAsList(fileItem);
+                    boolean isJiaMiKey = checkM3U8URL(fixedM3U8_Content);
 
                     for (int j = 0; j < fixedM3U8_Content.size(); j++) {
                         String item = fixedM3U8_Content.get(j);
@@ -662,7 +735,9 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
                         }*/
 
                         if(item.startsWith("/storage/emulated/0/UCDownloads/VideoData/")){
-                            String fixedPathItem = item.replace("/storage/emulated/0/UCDownloads/VideoData/",".");
+                            item =  item.replace("//","/");
+                            String fixedPathItem = item.replace("/storage/emulated/0/UCDownloads/VideoData//","./");
+                            fixedPathItem = fixedPathItem.replace("/storage/emulated/0/UCDownloads/VideoData/","./");
                             fixedStrArr.add(fixedPathItem);
                             continue;
                         }
@@ -670,27 +745,51 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
                     }
                     System.out.println("index["+i+"] : " + fileItem.getName());
                     writeContentToFile(fileItem,fixedStrArr);
-                }
-                //  如果当前名字中包含中文   那么把中去去除
-
-                String fileName = fileItem.getName();
-                String type = getFileTypeWithPoint(fileName);
-                String fileNameOnly  = getFileNameNoPoint(fileName);
-                if(isContainChinese(fileName)){
-String englishName = clearChinese(fileNameOnly)+"_"+getTimeStamp()+type;
-englishName = englishName.replace(" ","");
-englishName = englishName.replace("[","");
-englishName = englishName.replace("]","");
-englishName = englishName.replace("《","");
-englishName = englishName.replace("》","");
-englishName = englishName.replace("，","");
 
 
+             /*       //  如果当前名字中包含中文   那么把中去去除
+
+                    String fileName = fileItem.getName();
+                    String type = getFileTypeWithPoint(fileName);
+                    String fileNameOnly  = getFileNameNoPoint(fileName);
+                    if(isContainChinese(fileName)){
+                        String englishName = clearChinese(fileNameOnly)+"_"+getTimeStamp()+type;
+                        englishName = englishName.replace(" ","");
+                        englishName = englishName.replace("  ","");
+                        englishName = englishName.replace("  ","");
+                        englishName = englishName.replace(" ","");
+                        englishName = englishName.replace("[","");
+                        englishName = englishName.replace("]","");
+                        englishName = englishName.replace("《","");
+                        englishName = englishName.replace("》","");
+                        englishName = englishName.replace("，","");
+                        tryReName(fileItem,englishName);
+                    }*/
+                    String type = getFileTypeWithPoint(fileItem.getName());
+                    String englishName = getPaddingIntString(curIndex,4,"0",true)+type;
+                    if(isJiaMiKey){
+                        englishName  = getPaddingIntString(curIndex,4,"0",true)+"_Key"+type;
+                    }
                     tryReName(fileItem,englishName);
+                    curIndex++;
                 }
+
             }
 
         }
+
+
+        boolean checkM3U8URL(ArrayList<String> contentList){
+          boolean isUrlKey = false;
+            for (int i = 0; i < contentList.size() ; i++) {
+                String lineStr = contentList.get(i);
+                if(lineStr.contains("EXT-X-KEY") && lineStr.contains("URI") ){
+                    return true;
+                }
+            }
+            return isUrlKey;
+        }
+
 
     }
 

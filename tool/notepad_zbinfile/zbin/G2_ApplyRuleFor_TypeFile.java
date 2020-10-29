@@ -208,18 +208,18 @@ public class G2_ApplyRuleFor_TypeFile {
 
         @Override
         ArrayList<File> applySubFileListRule4(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
- if(curDirFile != null){
-     for (int i = 0; i < dirNameList.size(); i++) {
-         String dirName = dirNameList.get(i);
-         String dirAbsPath = curDirFile.getAbsolutePath()+File.separator+dirName;
-         File newDirTemp =  new File(dirAbsPath);
-         newDirTemp.mkdirs();
-         System.out.println("创建目录 "+ newDirTemp.getAbsolutePath() +" 成功! " );
-     }
-     return null;
- }else{
-     System.out.println("Make_ZRuleDir_Rule_17   当前获取到的Shell目录为空!   无法创建 Z规则文件夹!  ");
- }
+            if(curDirFile != null){
+                for (int i = 0; i < dirNameList.size(); i++) {
+                    String dirName = dirNameList.get(i);
+                    String dirAbsPath = curDirFile.getAbsolutePath()+File.separator+dirName;
+                    File newDirTemp =  new File(dirAbsPath);
+                    newDirTemp.mkdirs();
+                    System.out.println("创建目录 "+ newDirTemp.getAbsolutePath() +" 成功! " );
+                }
+                return null;
+            }else{
+                System.out.println("Make_ZRuleDir_Rule_17   当前获取到的Shell目录为空!   无法创建 Z规则文件夹!  ");
+            }
             return super.applySubFileListRule4(curFileList, subFileTypeMap, curDirList, curRealFileList);
         }
 
@@ -349,10 +349,10 @@ public class G2_ApplyRuleFor_TypeFile {
 
 
 
- class Webp_To_Jpg_Gif_Rule_15 extends Basic_Rule{
-ArrayList<File> webpFileList ;
-ArrayList<File> gif_webpFileList ;
-String G2_webp2gif_exe_path = "";
+    class Webp_To_Jpg_Gif_Rule_15 extends Basic_Rule{
+        ArrayList<File> webpFileList ;
+        ArrayList<File> gif_webpFileList ;
+        String G2_webp2gif_exe_path = "";
 
         Webp_To_Jpg_Gif_Rule_15() {
             super("*", 15, 4);
@@ -366,7 +366,7 @@ String G2_webp2gif_exe_path = "";
         }
 
 
-         void   PushFile2JDKBIN(){
+        void   PushFile2JDKBIN(){
             if("".equals(JDK_BIN_PATH)){
                 return;
             }
@@ -398,91 +398,91 @@ String G2_webp2gif_exe_path = "";
         }
 
 
-     @Override
-     ArrayList<File> applySubFileListRule4(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+        @Override
+        ArrayList<File> applySubFileListRule4(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 
-         ArrayList<File>  webpFile =    subFileTypeMap.get(".webp");
-         if(webpFile == null){
-             System.out.println("当前文件夹中不存在 webp文件的格式");
-             return null;
-         }
-         webpFileList.addAll(webpFile);
-         String stampStr = getTimeStamp();
-         for (int i = 0; i < webpFileList.size(); i++) {
+            ArrayList<File>  webpFile =    subFileTypeMap.get(".webp");
+            if(webpFile == null){
+                System.out.println("当前文件夹中不存在 webp文件的格式");
+                return null;
+            }
+            webpFileList.addAll(webpFile);
+            String stampStr = getTimeStamp();
+            for (int i = 0; i < webpFileList.size(); i++) {
 
-             File webpFileItem = webpFileList.get(i);
-             System.out.println("当前 webp索引["+i+"] = "+ webpFileItem.getAbsolutePath());
-             String newFilePath = webpFileItem.getAbsolutePath().replace(".webp",               "_"+stampStr+".jpg");
-             File jpgFileItem = new File(newFilePath);
-             revertWebp2Jpg(webpFileItem,jpgFileItem);
+                File webpFileItem = webpFileList.get(i);
+                System.out.println("当前 webp索引["+i+"] = "+ webpFileItem.getAbsolutePath());
+                String newFilePath = webpFileItem.getAbsolutePath().replace(".webp",               "_"+stampStr+".jpg");
+                File jpgFileItem = new File(newFilePath);
+                revertWebp2Jpg(webpFileItem,jpgFileItem);
 
-         }
+            }
 
-         for (int i = 0; i < gif_webpFileList.size(); i++) {
-             File gif_webpFileItem = gif_webpFileList.get(i);
-             String originName = gif_webpFileItem.getName();
-             String curParentPath = gif_webpFileItem.getParent();
-             boolean needRename = false;
-             String absPath = gif_webpFileItem.getAbsolutePath();
-             String gif_absPath = absPath.replace(".webp",".gif");
-              File  gif_absPath_File = new File(gif_absPath);
-             String fileName = gif_webpFileItem.getName();
+            for (int i = 0; i < gif_webpFileList.size(); i++) {
+                File gif_webpFileItem = gif_webpFileList.get(i);
+                String originName = gif_webpFileItem.getName();
+                String curParentPath = gif_webpFileItem.getParent();
+                boolean needRename = false;
+                String absPath = gif_webpFileItem.getAbsolutePath();
+                String gif_absPath = absPath.replace(".webp",".gif");
+                File  gif_absPath_File = new File(gif_absPath);
+                String fileName = gif_webpFileItem.getName();
 
-             // 如果 加载后的gif 存在 那么 需要 添加时间戳  以免覆盖
+                // 如果 加载后的gif 存在 那么 需要 添加时间戳  以免覆盖
 //             if(gif_absPath_File.exists()){
 
-                 fileName = fileName.replace(".webp","_"+stampStr+".webp");
-                 tryReName(gif_webpFileItem,fileName);
-                 needRename = true;
+                fileName = fileName.replace(".webp","_"+stampStr+".webp");
+                tryReName(gif_webpFileItem,fileName);
+                needRename = true;
 //              }
 
-             System.out.println("动图 索引["+i+"] = "+ fileName);
-             System.out.println("执行动图转为 gif的命令! ");
-             if("".equals(G2_webp2gif_exe_path)){
-              System.out.println("当前 webp2gif 为空 请检查!  可能当前系统 Linux MacOS 还没实现该功能!");
-              return null;
-             }
-             String  command = G2_webp2gif_exe_path + " "+fileName;
-             execCMD(command);
-             if(needRename){
-                 tryReName(new File(curParentPath+File.separator+fileName),originName);
-             }
+                System.out.println("动图 索引["+i+"] = "+ fileName);
+                System.out.println("执行动图转为 gif的命令! ");
+                if("".equals(G2_webp2gif_exe_path)){
+                    System.out.println("当前 webp2gif 为空 请检查!  可能当前系统 Linux MacOS 还没实现该功能!");
+                    return null;
+                }
+                String  command = G2_webp2gif_exe_path + " "+fileName;
+                execCMD(command);
+                if(needRename){
+                    tryReName(new File(curParentPath+File.separator+fileName),originName);
+                }
 
-         }
+            }
 
             return super.applySubFileListRule4(curFileList, subFileTypeMap, curDirList, curRealFileList);
-     }
+        }
 
 
 
-     void   revertWebp2Jpg(File webpFile , File jpgFile){
-         // webp  动态图 会报错  Decode returned code VP8_STATUS_UNSUPPORTED_FEATURE
-         // Obtain a WebP ImageReader instance
-         ImageReader reader = ImageIO.getImageReadersByMIMEType("image/webp").next();
+        void   revertWebp2Jpg(File webpFile , File jpgFile){
+            // webp  动态图 会报错  Decode returned code VP8_STATUS_UNSUPPORTED_FEATURE
+            // Obtain a WebP ImageReader instance
+            ImageReader reader = ImageIO.getImageReadersByMIMEType("image/webp").next();
 
-         // Configure decoding parameters
-         WebPReadParam readParam = new WebPReadParam();
-         readParam.setBypassFiltering(true);
-         BufferedImage image = null;
-         try{
+            // Configure decoding parameters
+            WebPReadParam readParam = new WebPReadParam();
+            readParam.setBypassFiltering(true);
+            BufferedImage image = null;
+            try{
 
-             // Configure the input on the ImageReader
-             reader.setInput(new FileImageInputStream(webpFile));
+                // Configure the input on the ImageReader
+                reader.setInput(new FileImageInputStream(webpFile));
 
-             // Decode the image
-             image = reader.read(0, readParam);
-         }catch (IOException e){
+                // Decode the image
+                image = reader.read(0, readParam);
+            }catch (IOException e){
 
-             System.out.println("解析失败   可能是webp动图!   放入 ArrayList<File> gifList 列表中!");
-            gif_webpFileList.add(webpFile);
-         }
+                System.out.println("解析失败   可能是webp动图!   放入 ArrayList<File> gifList 列表中!");
+                gif_webpFileList.add(webpFile);
+            }
 
 
-   try {
-             ImageIO.write(image, "png", jpgFile);
-         }catch (Exception e){
-             System.out.println("写入文件 "+jpgFile.getAbsolutePath()+" 失败");
-         }
+            try {
+                ImageIO.write(image, "png", jpgFile);
+            }catch (Exception e){
+                System.out.println("写入文件 "+jpgFile.getAbsolutePath()+" 失败");
+            }
 
         }
         @Override
@@ -602,11 +602,11 @@ String G2_webp2gif_exe_path = "";
 
                 if(targetFileList == null || targetFileList.size() == 0){
                     System.out.println(" 当前路径 "+curDirPath+" 不存在类型 "+type +"的文件!");
-                   continue;
+                    continue;
                 }
 
 
-             int fileCount =    targetFileList.size() ;
+                int fileCount =    targetFileList.size() ;
                 // 创建文件夹  大小
 //                String dirName = preHMS+"_"+type.replace(".","").toUpperCase().trim()+"_"+date;
                 String dirName = date+"_"+type.replace(".","").toUpperCase().trim()+"["+fileCount+"]";
@@ -621,9 +621,9 @@ String G2_webp2gif_exe_path = "";
                     String targetName = targetTypeFile.getName();
                     int IconIndex = j + 1;
                     String targetOrderName = IconIndex+"_"+targetName;
-                   if( tryReName(targetTypeFile,targetOrderName)){
-                       targetTypeFile = new File(targetTypeFile.getParentFile().getAbsolutePath()+File.separator+targetOrderName);
-                   }
+                    if( tryReName(targetTypeFile,targetOrderName)){
+                        targetTypeFile = new File(targetTypeFile.getParentFile().getAbsolutePath()+File.separator+targetOrderName);
+                    }
 
                     String iconName = IconIndex+"_"+targetName;
                     File iconFile = new File(iconDirFile.getAbsolutePath()+ File.separator+iconName);
@@ -2142,16 +2142,32 @@ String G2_webp2gif_exe_path = "";
     }
     class SubDirRename_Rule_6 extends Basic_Rule{
 
+        boolean isOrder_NoOriginName = false;
 
         SubDirRename_Rule_6() {
             super("#", 6, 4);
+            isOrder_NoOriginName = false;
         }
 
         @Override
         String simpleDesc() {
 
             return  Cur_Bat_Name +" #_6    // 修改当前的一级子目录下的文件夹 以及文件  按顺序命令 【序号_原名称.类型】  (不操作 孙文件 孙文件夹 )  \n" +
-                    Cur_Bat_Name + " png_6    // 修改当前的一级子目录下的文件夹下的 png格式文件  按顺序命令 【序号_原名称.类型】  (不操作 孙文件 孙文件夹 ) \n";
+                    Cur_Bat_Name + " png_6    // 修改当前的一级子目录下的文件夹下的 png格式文件  按顺序命令 【序号_原名称.类型】  (不操作 孙文件 孙文件夹 ) \n" +
+                    Cur_Bat_Name + " png_6_order    // 修改当前的一级子目录下的文件夹下的 png格式文件  按顺序命令 【0000.png 0001.png 0002.png ....】  (不操作 孙文件 孙文件夹 ) \n" +
+            Cur_Bat_Name +" m3u8_6_order  // 【type<可选>_6_order】 修改当前的目录下指定类型的 文件  按顺序命令[0000.m3u8 0001.m3u8] 【序号.类型】【不保留原名称】  (不操作 孙文件 孙文件夹 )  \n" ;
+        }
+
+
+        @Override
+        boolean initParams4InputParam(String inputParam) {
+            if(inputParam.contains("order")){
+                isOrder_NoOriginName = true;
+            }
+
+
+
+            return  super.initParams4InputParam(inputParam);
         }
 
         @SuppressWarnings("unchecked")
@@ -2194,6 +2210,10 @@ String G2_webp2gif_exe_path = "";
                         File curFile = fileArr.get(i);
                         //String curFileName = curFile.getName();
                         String newName = i+"_"+curFile.getName();
+                        String fileTypeStr =getFileTypeWithPoint(curFile.getName());
+                        if(isOrder_NoOriginName){
+                            newName = getPaddingIntString(i,4,"0",true)+fileTypeStr;
+                        }
 //                        String newName = typeTag+"_"+dirTempIndex+"_"+getPaddingIntString(fixedFileIndex,3,"0",true)+typeStr;
                         if(tryReName(curFile,newName)){
                             executeFlag = true;
@@ -2205,6 +2225,15 @@ String G2_webp2gif_exe_path = "";
         }
     }
 
+    public  static String getFileTypeWithPoint(String fileName){
+        String name = "";
+        if(fileName.contains(".")){
+            name = fileName.substring(fileName.lastIndexOf(".") ).trim().toLowerCase();
+        }else{
+            name = "";
+        }
+        return name.toLowerCase().trim();
+    }
     // 把 当前目录下所有的 jpg  mp4 gif  都转为 i_temp1_1.jpg    v_temp2_1.mp4   g_temp3_1.gif 的文件格式
     class AVI_Rule_5 extends Basic_Rule{
         String tempTag = "temp";
@@ -3161,7 +3190,7 @@ String G2_webp2gif_exe_path = "";
     abstract  class Rule{
         // operation_type  操作类型     1--读取文件内容字符串 进行修改      2--对文件对文件内容(字节)--进行修改    3.对全体子文件进行的随性的操作 属性进行修改(文件名称)
         // 4.对当前子文件(包括子目录 子文件 --不包含孙目录 孙文件)   // 5. 从shell 中获取到的路径 去对某一个文件进行操作
-String firstInputIndexStr ;
+        String firstInputIndexStr ;
         int operation_type;
         String file_type;   // * 标识所有的文件类型   以及当前操作类型文件  或者 单独的文件过滤类型
         String identify;
