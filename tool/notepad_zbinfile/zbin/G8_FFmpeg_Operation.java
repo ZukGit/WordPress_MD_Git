@@ -677,7 +677,15 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
                 String type = getFileTypeWithPoint(fileName);
                 String fileNameOnly  = getFileNameNoPoint(fileName);
                 if(isContainChinese(fileName)){
-                    String englishName = clearChinese(fileNameOnly)+"_"+getTimeStamp()+type;
+String englishName = clearChinese(fileNameOnly)+"_"+getTimeStamp()+type;
+englishName = englishName.replace(" ","");
+englishName = englishName.replace("[","");
+englishName = englishName.replace("]","");
+englishName = englishName.replace("《","");
+englishName = englishName.replace("》","");
+englishName = englishName.replace("，","");
+
+
                     tryReName(fileItem,englishName);
                 }
             }
