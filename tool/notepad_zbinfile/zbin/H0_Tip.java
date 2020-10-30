@@ -46,7 +46,7 @@ public class H0_Tip {
         PullFileTip();
         VerboseLogTip();
         PrintLogTip();
-
+        Security_File_Tip();
         AdbCommandTip();
     }
 
@@ -88,6 +88,7 @@ public class H0_Tip {
         System.out.println("3.4 选择安装位置 -> 手动安装 -> 选择大于10GB的 ntfs空盘 以新文件系统 ext4 作为 根目录 /home 的deepin系统安装目录");
         System.out.println("3.5 安装Deepin系统 开始安装");
         System.out.println("3.6 在新打开的 Deepin的 设置中 设置 默认引导分区为  win 10 !");
+        System.out.println("Windows 安装环境变量配置好后  Java环境还未配置  那么使用 zbin/win_zbin/zzinit_8.bat 或者本地的 zzinit_8.bat   配置好Java环境后使用 ztip 查看历史正文!");
         System.out.println(OneLine_Pre + " 安装三系统 Win10+Win7+Deepin 三系统 说明 End "+ OneLine_End);
     }
 
@@ -144,6 +145,9 @@ public class H0_Tip {
         System.out.println(" zzfile_3.bat "+"C:\\Windows\\Web\\Screen                                                      // 壁纸仓库   ");
         System.out.println(" zzfile_3.bat "+User_Home+File.separator+"AppData\\Local\\Packages\\Microsoft.Windows.ContentDeliveryManager_cw5n1h2txyewy\\LocalState\\Assets   // 锁屏壁纸1");
         System.out.println(" zzfile_3.bat "+User_Home+File.separator+"AppData\\Local\\Microsoft\\Windows\\Themes          // 锁屏壁纸2");
+        System.out.println("批量打开电脑壁纸相关的路径");
+        System.out.println(" zzfile_3.bat "+ User_Home+ File.separator+"AppData\\Roaming\\Microsoft\\Windows\\Themes" +"  C:\\Windows\\Web\\Screen  " +User_Home+File.separator+"AppData\\Local\\Packages\\Microsoft.Windows.ContentDeliveryManager_cw5n1h2txyewy\\LocalState\\Assets " +User_Home+File.separator+"AppData\\Local\\Microsoft\\Windows\\Themes"  );
+
         System.out.println();
         System.out.println("网络配置Host");
         System.out.println(" zzfile_3.bat C:\\WINDOWS\\system32\\drivers\\etc\\hosts    // Hosts文件的做用是把网址域名与对应的IP地址建立一个关联 数据库 ");
@@ -244,6 +248,31 @@ public class H0_Tip {
     }
 
 
+    static void Security_File_Tip(){
+
+        System.out.println("════════════════════════ 文件加密解密操作 ════════════════════════");
+        System.out.println("________________________ 加密批量操作 ________________________ ");
+        System.out.println("1. 先对当前文件内容进行改名    zrule_apply_G2.bat *_18 ");
+        System.out.println("2. 对当前文件夹下的文件进行加密 生成 bad_batch 加密文件夹  zrule_apply_G2.bat #_7_bad_batch ");
+        System.out.println("3. 进入 bad_batch 加密文件夹   cd ./bad_batch ");
+        System.out.println("4.把当前所有文件压缩为 .7z 格式 密码默认为 752025    zrule_apply_G2.bat *_19 ");
+        System.out.println("5.对当前.7z 文件进行 后缀名称处理  zrule_apply_G2.bat #_9  7z_7疫z ");
+        System.out.println("6.打开当前文件夹  zzfile_3.bat ");
+        System.out.println(" zrule_apply_G2.bat *_18  .mp4   &&   zrule_apply_G2.bat #_7_bad_batch && cd ./bad_batch  && zrule_apply_G2.bat *_19 &&  zrule_apply_G2.bat #_9  7z_7疫z   &&   zzfile_3.bat");
+
+        System.out.println("");
+        System.out.println("________________________ 解密批量操作 ________________________ ");
+        System.out.println("1.对当前文件中 后缀是包含中文的文件进行修复    zrule_apply_G2.bat  #_8");
+        System.out.println("2.对当前的压缩文件进行解压缩  zzip_H5.bat 752025 zukgit11");
+        System.out.println("3.对解压缩出来的文件进行解密   zrule_apply_G2.bat *_7_good_batch  ");
+        System.out.println("4.进入到解压文件夹 cd ./good_batch  ");
+        System.out.println("5.对解压的文件搜索输出快捷方式文件夹  zrule_apply_G2.bat *_14  .mp4  .avi   .wmv .rmvb  .flv .3gp");
+        System.out.println("6.打开当前文件    zzfile_3.bat ");
+        System.out.println("zrule_apply_G2.bat  #_8   &&   zzip_H5.bat 752025 zukgit11  &&  zrule_apply_G2.bat *_7_good_batch  && cd ./good_batch && zzfile_3.bat ");
+    }
+
+
+
     static void PullFileTip(){
 
         System.out.println(OneLine_Pre + " Pull 拉取文件的操作 "+ OneLine_End);
@@ -285,6 +314,19 @@ public class H0_Tip {
         System.out.println("( Bug2Go -> System Debug Settings -> diag_mdlog v2 -> Config file -> GNSS_V9.cfg ) to collect one more B2G log?");
         System.out.println("and if possible, please help to side by side test it on REF device and collect pass log for comparison");
         System.out.println("much appreciated");
+        System.out.println();
+
+        System.out.println();
+        System.out.println(" APP的 GPS定位权限查找:");
+        System.out.println("搜索bugreport.txt  关键字 Package [应用名称]    例如:  Package [com.whatsapp]");
+        System.out.println("runtime permissions:");
+        System.out.println("android.permission.ACCESS_FINE_LOCATION: granted=true    精确位置");
+        System.out.println("android.permission.ACCESS_COARSE_LOCATION: granted=true 模糊位置");
+        System.out.println("");
+
+        System.out.println(" QCAT 中 Displays > QCAT Sample > GNSS > GNSS RF Bp Amp Pga Gain Data");
+        System.out.println("tip1: Bp Amp应该在90-350  min-max 否则就有干扰");
+        System.out.println("tip2: 在 QCAT中 搜索 0x1476 GNSS 点击 <Process> 之后选中 Configuration 面板 查看 Output Directory 打开该路径就有谷歌地图 .kml 文件");
 
 
     }

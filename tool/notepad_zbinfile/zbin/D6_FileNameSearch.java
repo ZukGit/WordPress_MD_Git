@@ -1,4 +1,11 @@
+
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
 public class D6_FileNameSearch {
@@ -140,17 +147,50 @@ public class D6_FileNameSearch {
                 ArrayList<File> fileArr = entry.getValue();  //Map的Value
                 String fixedType = getFixedType(typeStr);
                 System.out.println("================" + fixedType + "Begin================");
+                String mdHex = "";
                 for (int i = 0; i < fileArr.size(); i++) {
                     File curFile = fileArr.get(i);
                     String Path = curFile.getAbsolutePath();
+                    try{
+
+                         mdHex =     getMD5Three(Path);
+                    }catch ( Exception e){
+
+                    }
+
                     int index2 = i + 1;
+                    int md5_Length = mdHex.length();
+                    boolean isPaddingEmpty = md5_Length == 31 ? true:false;
                     String fixedIndex = getFixedIndex(index2);
-                    System.out.println(" 【index : " + fixedIndex + "】   " + Path);
+                    System.out.println(" 【index : " + fixedIndex + "】   【 MD5("+md5_Length+"):  "+(isPaddingEmpty?" ":"")+mdHex+" 】 " + Path);
                 }
                 System.out.println("================" + fixedType + "End================");
             }
         }
     }
+
+    public static String getMD5Three(String path) {
+        BigInteger bi = null;
+        try {
+            byte[] buffer = new byte[8192];
+            int len = 0;
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            File f = new File(path);
+            FileInputStream fis = new FileInputStream(f);
+            while ((len = fis.read(buffer)) != -1) {
+                md.update(buffer, 0, len);
+            }
+            fis.close();
+            byte[] b = md.digest();
+            bi = new BigInteger(1, b);
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return bi.toString(16);
+    }
+
 
     static String get15FixedType(String type) {
         // type 最长保留10位
@@ -220,7 +260,7 @@ public class D6_FileNameSearch {
                 ArrayList<File> fileArr = entry.getValue();  //Map的Value
                 int curFileSize = fileArr.size();
                 fileSum = fileSum +  curFileSize;
-              //  System.out.println("文件类型:" + get15FixedType(typeStr) + "  匹配文件个数:" + fileArr.size());
+                //  System.out.println("文件类型:" + get15FixedType(typeStr) + "  匹配文件个数:" + fileArr.size());
                 formatStringList.add("文件类型:" + get15FixedType(typeStr) + "  匹配文件个数:" + curFileSize);
             }
         }

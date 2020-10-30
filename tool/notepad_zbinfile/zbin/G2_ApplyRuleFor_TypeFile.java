@@ -4,9 +4,12 @@ import net.jimmc.jshortcut.JShellLink;
 import java.awt.image.BufferedImage;
 import java.io.*;
 
+import java.math.BigInteger;
 import java.nio.channels.FileChannel;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -33,6 +36,7 @@ public class G2_ApplyRuleFor_TypeFile {
     static String Cur_Bat_Name = "zrule_apply_G2";
     static String zbinPath = System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin";
     static String G2_File_Path = zbinPath+File.separator+"G2";
+    static String Win_Lin_Mac_ZbinPath = "";
 
     static File G2_Properties_File = new File(System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin" + File.separator + "G2.properties");
     static InputStream G2_Properties_InputStream;
@@ -43,6 +47,8 @@ public class G2_ApplyRuleFor_TypeFile {
 
     static int BYTE_CONTENT_LENGTH_Rule7= 1024 * 10 * 10;   // 读取文件Head字节数常数
     static String strDefaultKey_Rule7 = "zukgit12"; //  8-length
+
+    static  String strZ7DefaultKey_PSW_Rule19 = "752025";  // 8-length
     public static byte[] TEMP_Rule7 = new byte[BYTE_CONTENT_LENGTH_Rule7];
 
 
@@ -89,6 +95,7 @@ public class G2_ApplyRuleFor_TypeFile {
     static String JDK_BIN_PATH = "";
 
     static OS_TYPE curOS_TYPE = OS_TYPE.Windows;
+    static String curOS_ExeTYPE = "";
     static ArrayList<String> mKeyWordName = new ArrayList<>();
 
     // 当前Shell目录下的 文件类型列表  抽取出来  通用
@@ -100,14 +107,17 @@ public class G2_ApplyRuleFor_TypeFile {
         if (osName.contains("window")) {
             curOS_TYPE = OS_TYPE.Windows;
             Cur_Bat_Name = Cur_Bat_Name+".bat";
+            curOS_ExeTYPE = ".exe";
             initJDKPath_Windows(curLibraryPath);
         } else if (osName.contains("linux")) {
             curOS_TYPE = OS_TYPE.Linux;
             Cur_Bat_Name = Cur_Bat_Name+".sh";
+            curOS_ExeTYPE = "";
             initJDKPath_Linux_MacOS(curLibraryPath);
         } else if (osName.contains("mac")) {
             curOS_TYPE = OS_TYPE.MacOS;
             Cur_Bat_Name = Cur_Bat_Name+".sh";
+            curOS_ExeTYPE = "";
             initJDKPath_Linux_MacOS(curLibraryPath);
         }
     }
@@ -175,6 +185,8 @@ public class G2_ApplyRuleFor_TypeFile {
 
         realTypeRuleList.add( new File_TimeName_Rule_16());
         realTypeRuleList.add( new Make_ZRuleDir_Rule_17());
+        realTypeRuleList.add( new MD_ReName_Rule_18());
+        realTypeRuleList.add( new ExpressTo7z_PassWord_Rule_19());
 
 
     }
@@ -182,7 +194,372 @@ public class G2_ApplyRuleFor_TypeFile {
 
 // 3038年 5 月 3 日
 
+    // operation_type  操作类型     1--读取文件内容字符串 进行修改      2--对文件对文件内容(字节)--进行修改    3.对全体子文件进行的随性的操作 属性进行修改(文件名称)
+//     // 4.对当前子文件(包括子目录 子文件 --不包含孙目录 孙文件) 5. 从shell 中获取到的路径 去对某一个文件进行操作
 
+    // 把当前 文件 使用 默认的 密码 752025 进行 压缩 成 7z 文件
+    class ExpressTo7z_PassWord_Rule_19 extends Basic_Rule{
+
+
+        ArrayList<String> inputTypeList ;
+        // zrule_apply_G2.bat  *_14  jpg   把当前所有的jpg格式文件生成快捷方式到 jpg_时间戳 文件夹内
+
+        // 可能从参数输入的 单一文件
+        ArrayList<File> inputParamFileList;
+        File z7exeFile ;
+
+        boolean isSearchAllFile2CurDirFlag = false;
+
+        ExpressTo7z_PassWord_Rule_19() {
+            super("*", 19, 3);
+            inputTypeList = new ArrayList<String>();
+            inputParamFileList  = new ArrayList<File>();
+        }
+
+        @Override
+        boolean initParamsWithInputList(ArrayList<String> inputParamList) {
+
+            for (int i = 0; i <inputParamList.size() ; i++) {
+                String strInput = inputParamList.get(i);
+                if(strInput.equals(firstInputIndexStr)){
+                    continue;
+                }
+                if(!strInput.startsWith(".")){
+                    inputTypeList.add("."+strInput.trim());
+                }else{
+                    inputTypeList.add(strInput.trim());
+                }
+
+                File tempFile = new File(curDirPath+File.separator+strInput);
+                if(tempFile.exists() && !tempFile.isDirectory()){
+                    inputParamFileList.add(tempFile);
+
+                }
+            }
+
+            if(inputTypeList.size() == 0 && inputParamFileList.size() == 0){
+                isSearchAllFile2CurDirFlag = true;
+
+            }
+
+                    z7exeFile = new File(Win_Lin_Mac_ZbinPath+File.separator+"7z"+curOS_ExeTYPE);
+
+            if(!z7exeFile.exists() || z7exeFile.isDirectory()){
+                System.out.println("当前 7z 压缩程序不存在! 请检查当前的 7z程序 一般位于 Desktop/zbin/win_zbin/  mac_zbin lin_zbin 中  z7exeFile = "+ z7exeFile.getAbsolutePath());
+                return false;
+            }
+            return super.initParamsWithInputList(inputParamList);
+        }
+
+
+
+
+        @Override
+        ArrayList<File> applyFileListRule3(ArrayList<File> subFileList, HashMap<String, ArrayList<File>> fileTypeMap) {
+
+
+            SimpleDateFormat df = new SimpleDateFormat("MMdd_HHmmss");//设置日期格式
+//            SimpleDateFormat df_hms = new SimpleDateFormat("HHmmss");//设置日期格式
+            Date curDate =    new Date();
+            String date = df.format(curDate);
+//            String preHMS = df.format(df_hms);
+
+            if(isSearchAllFile2CurDirFlag){
+                // 比那里所有 类型的 文件  并 重新命名
+                try7zExpressOperation(fileTypeMap);
+
+            }else{
+
+                for (int i = 0; i < inputTypeList.size(); i++) {
+                    String type = inputTypeList.get(i);
+
+                    ArrayList<File> targetFileList = fileTypeMap.get(type) ;
+
+                    if(targetFileList == null || targetFileList.size() == 0){
+                        System.out.println(" 当前路径 "+curDirPath+" 不存在类型 "+type +"的文件!");
+                        continue;
+                    }
+
+
+                    for (int j = 0; j < targetFileList.size(); j++) {
+                        File   targetTypeFile = targetFileList.get(j);
+                        String originName = targetTypeFile.getName();
+                        String noPointName = getFileNameNoPoint(targetTypeFile);
+//                        String mdName = getMD5Three(targetTypeFile.getAbsolutePath());
+//                        String mdtype = getFileTypeWithPoint(targetTypeFile.getName());
+//                        String new_md_Name = mdName+mdtype;
+//                        tryReName(targetTypeFile,new_md_Name);
+
+                        String z7_command = z7exeFile.getAbsolutePath() + "  a -tzip  " + noPointName+".7z" +" -p"+strZ7DefaultKey_PSW_Rule19  +"  "+ originName;
+                        System.out.println("执行\n");
+                        System.out.println(z7_command);
+                        execCMD(z7_command);
+                    }
+
+                }
+
+                for (int i = 0; i < inputParamFileList.size(); i++) {
+                    File   targetTypeFile = inputParamFileList.get(i);
+                    String originName = targetTypeFile.getName();
+                    String noPointName = getFileNameNoPoint(targetTypeFile);
+
+//                    tryReName(targetTypeFile,new_md_Name);
+
+                    String z7_command = z7exeFile.getAbsolutePath() + "  a -tzip  " + noPointName+".7z" +" -p"+strZ7DefaultKey_PSW_Rule19  +"  "+ originName;
+
+                    System.out.println("执行\n");
+                    System.out.println(z7_command);
+
+                    execCMD(z7_command);
+
+                }
+
+            }
+
+
+
+            return super.applyFileListRule3(subFileList, fileTypeMap);
+        }
+
+
+        @SuppressWarnings("unchecked")
+        boolean   try7zExpressOperation( HashMap<String, ArrayList<File>> arrFileMap ){
+            boolean executeFlag = false;
+            Map.Entry<String, ArrayList<File>> entry;
+
+            if (arrFileMap != null) {
+                Iterator iterator = arrFileMap.entrySet().iterator();
+                while (iterator.hasNext()) {
+                    entry = (Map.Entry<String, ArrayList<File>>) iterator.next();
+                    String typeStr = entry.getKey();  //Map的Value
+                    ArrayList<File> fileArr = entry.getValue();  //Map的Value
+
+                    for (int i = 0; i < fileArr.size(); i++) {
+                        File curFile = fileArr.get(i);
+//                        String curFileName = curFile.getName();
+//                        String mdName = getMD5Three(curFile.getAbsolutePath());
+//                        String mdtype = getFileTypeWithPoint(curFile.getName());
+//                        String new_md_Name = mdName+mdtype;
+//                        tryReName(curFile,new_md_Name);
+
+                        String originName = curFile.getName();
+                        String noPointName = getFileNameNoPoint(curFile);
+
+                        String z7_command = z7exeFile.getAbsolutePath() + "  a -tzip  " + noPointName+".7z" +" -p"+strZ7DefaultKey_PSW_Rule19  +"  "+ originName;
+
+                        System.out.println("执行\n");
+                        System.out.println(z7_command);
+                        execCMD(z7_command);
+                    }
+
+                }
+            }
+
+            return executeFlag;
+        }
+
+
+        @Override
+        String simpleDesc() {
+            return   "\n"+Cur_Bat_Name+ " *_19            ### 把当前文件夹下所有文件单独 压缩为 .7z 文件 文件名不变化   密码默认为 752025 !  "+
+                    "\n"+Cur_Bat_Name+ " *_19  mp4          ###  把当前文件夹下 .mp4   单独 压缩为 .7z 文件 文件名不变化   密码默认为 752025 !   "+
+                    "\n"+Cur_Bat_Name+ " *_19  .mp4         ### 把当前文件夹下 .mp4  单独 压缩为 .7z 文件 文件名不变化   密码默认为 752025 !   "+
+                    "\n"+Cur_Bat_Name+ " *_19  .gif         ### 把当前文件夹下 .gif  单独 压缩为 .7z 文件 文件名不变化   密码默认为 752025 !   "+
+                    "\n"+Cur_Bat_Name+ " *_19  png          ### 把当前文件夹下 .png  单独 压缩为 .7z 文件 文件名不变化   密码默认为 752025 !   "+
+                    "\n"+Cur_Bat_Name+ " *_19  zip  7z      ### 把当前文件夹下  .zip  .7z   单独 压缩为 .7z 文件 文件名不变化   密码默认为 752025 !   "+
+                    "\n"+Cur_Bat_Name+ " *_19  .zip .7z     ###  把当前文件夹下  .zip  .7z   单独 压缩为 .7z 文件 文件名不变化   密码默认为 752025 !   "+
+                    "\n"+Cur_Bat_Name+ " *_19  jpg          ###  把当前文件夹下  .jpg   单独压缩为 .7z 文件 文件名不变化   密码默认为 752025 !   "+
+                    "\n"+Cur_Bat_Name+ " *_19  .jpg  .png  .webp .gif                          ### 把当前文件夹下  .jpg  .png  .webp .gif  单独压缩为 .7z 文件 文件名不变化   密码默认为 752025 !   "+
+                    "\n"+Cur_Bat_Name+ " *_19  .mp4  .avi   .wmv .rmvb  .flv .3gp              ### 把当前文件夹下  .mp4  .avi   .wmv .rmvb  .flv .3gp  单独压缩为 .7z 文件 文件名不变化   密码默认为 752025 !   "+
+                    "\n"+Cur_Bat_Name+ " *_19  .jpg  .png  .gif  .webp .mp4 .avi .flv .wmv     ### 把当前文件夹下  .jpg  .png  .gif  .webp .mp4 .avi .flv .wmv  单独压缩为 .7z 文件 文件名不变化   密码默认为 752025 !   "+
+                    "\n"+Cur_Bat_Name+ " *_19  <指定文件A> <指定文件B>          ### 把当前文件夹下 指定文件名称 单独压缩为 .7z 文件 文件名不变化   密码默认为 752025 !   \"+ "
+
+                    ;}
+
+
+    }
+
+
+
+    // operation_type  操作类型     1--读取文件内容字符串 进行修改      2--对文件对文件内容(字节)--进行修改    3.对全体子文件进行的随性的操作 属性进行修改(文件名称)
+//     // 4.对当前子文件(包括子目录 子文件 --不包含孙目录 孙文件) 5. 从shell 中获取到的路径 去对某一个文件进行操作
+
+    // 以文件的md数字进行重命名 文件   改名字 改后缀 不影响 这个属性
+    class MD_ReName_Rule_18 extends Basic_Rule{
+
+        ArrayList<String> inputTypeList ;
+        // zrule_apply_G2.bat  *_14  jpg   把当前所有的jpg格式文件生成快捷方式到 jpg_时间戳 文件夹内
+
+        // 可能从参数输入的 单一文件
+        ArrayList<File> inputParamFileList;
+
+        boolean isSearchAllFile2CurDirFlag = false;
+
+        MD_ReName_Rule_18() {
+            super("*", 18, 3);
+            inputTypeList = new ArrayList<String>();
+            inputParamFileList  = new ArrayList<File>();
+        }
+
+        @Override
+        boolean initParamsWithInputList(ArrayList<String> inputParamList) {
+
+            for (int i = 0; i <inputParamList.size() ; i++) {
+                String strInput = inputParamList.get(i);
+                if(strInput.equals(firstInputIndexStr)){
+                    continue;
+                }
+                if(!strInput.startsWith(".")){
+                    inputTypeList.add("."+strInput.trim());
+                }else{
+                    inputTypeList.add(strInput.trim());
+                }
+
+                File tempFile = new File(curDirPath+File.separator+strInput);
+                if(tempFile.exists() && !tempFile.isDirectory()){
+                    inputParamFileList.add(tempFile);
+
+                }
+            }
+
+            if(inputTypeList.size() == 0 && inputParamFileList.size() == 0){
+                isSearchAllFile2CurDirFlag = true;
+
+            }
+            return super.initParamsWithInputList(inputParamList);
+        }
+
+
+
+
+        @Override
+        ArrayList<File> applyFileListRule3(ArrayList<File> subFileList, HashMap<String, ArrayList<File>> fileTypeMap) {
+
+
+            SimpleDateFormat df = new SimpleDateFormat("MMdd_HHmmss");//设置日期格式
+//            SimpleDateFormat df_hms = new SimpleDateFormat("HHmmss");//设置日期格式
+            Date curDate =    new Date();
+            String date = df.format(curDate);
+//            String preHMS = df.format(df_hms);
+
+            if(isSearchAllFile2CurDirFlag){
+                // 比那里所有 类型的 文件  并 重新命名
+                tryReNameOperation(fileTypeMap);
+
+            }else{
+
+                for (int i = 0; i < inputTypeList.size(); i++) {
+                    String type = inputTypeList.get(i);
+
+                    ArrayList<File> targetFileList = fileTypeMap.get(type) ;
+
+                    if(targetFileList == null || targetFileList.size() == 0){
+                        System.out.println(" 当前路径 "+curDirPath+" 不存在类型 "+type +"的文件!");
+                        continue;
+                    }
+
+
+                    for (int j = 0; j < targetFileList.size(); j++) {
+                        File   targetTypeFile = targetFileList.get(j);
+                        String originName = targetTypeFile.getName();
+                        String mdName = getMD5Three(targetTypeFile.getAbsolutePath());
+                        String mdtype = getFileTypeWithPoint(targetTypeFile.getName());
+                        String new_md_Name = mdName+mdtype;
+                        tryReName(targetTypeFile,new_md_Name);
+
+                    }
+
+                }
+
+                for (int i = 0; i < inputParamFileList.size(); i++) {
+                    File   targetTypeFile = inputParamFileList.get(i);
+                    String originName = targetTypeFile.getName();
+                    String mdName = getMD5Three(targetTypeFile.getAbsolutePath());
+                    String mdtype = getFileTypeWithPoint(targetTypeFile.getName());
+                    String new_md_Name = mdName+mdtype;
+                    tryReName(targetTypeFile,new_md_Name);
+                }
+
+            }
+
+
+
+            return super.applyFileListRule3(subFileList, fileTypeMap);
+        }
+
+
+        @SuppressWarnings("unchecked")
+        boolean   tryReNameOperation( HashMap<String, ArrayList<File>> arrFileMap ){
+            boolean executeFlag = false;
+            Map.Entry<String, ArrayList<File>> entry;
+
+            if (arrFileMap != null) {
+                Iterator iterator = arrFileMap.entrySet().iterator();
+                while (iterator.hasNext()) {
+                    entry = (Map.Entry<String, ArrayList<File>>) iterator.next();
+                    String typeStr = entry.getKey();  //Map的Value
+                    ArrayList<File> fileArr = entry.getValue();  //Map的Value
+
+                    for (int i = 0; i < fileArr.size(); i++) {
+                        File curFile = fileArr.get(i);
+//                        String curFileName = curFile.getName();
+                        String mdName = getMD5Three(curFile.getAbsolutePath());
+                        String mdtype = getFileTypeWithPoint(curFile.getName());
+                        String new_md_Name = mdName+mdtype;
+                        tryReName(curFile,new_md_Name);
+                    }
+
+                }
+            }
+
+            return executeFlag;
+        }
+
+
+        @Override
+        String simpleDesc() {
+            return   "\n"+Cur_Bat_Name+ " *_18            ### 把当前文件夹下 文件全部改名为 MD5属性命名的文件 【(32)位16进制.type】 32aeefa9924afb8be0da50976f1a2405.mp4 !  "+
+                    "\n"+Cur_Bat_Name+ " *_18  mp4          ###  把当前文件夹下 .mp4 文件全部改名为 MD5属性命名的文件 【(32)位16进制.type】 !   "+
+                    "\n"+Cur_Bat_Name+ " *_18  .mp4         ### 把当前文件夹下 .mp4 文件全部改名为 MD5属性命名的文件 【(32)位16进制.type】 !   "+
+                    "\n"+Cur_Bat_Name+ " *_18  .gif         ### 把当前文件夹下 .gif 文件全部改名为 MD5属性命名的文件 【(32)位16进制.type】 32aeefa9924afb8be0da50976f1a2405.gif !   "+
+                    "\n"+Cur_Bat_Name+ " *_18  png          ### 把当前文件夹下 .png 文件全部改名为 MD5属性命名的文件 【(32)位16进制.type】 !   "+
+                    "\n"+Cur_Bat_Name+ " *_18  zip  7z      ### 把当前文件夹下  .zip  .7z  文件全部改名为 MD5属性命名的文件 【(32)位16进制.type】 !   32aeefa9924afb8be0da50976f1a2405.7z  "+
+                    "\n"+Cur_Bat_Name+ " *_18  .zip .7z     ###  把当前文件夹下  .zip  .7z  文件全部改名为 MD5属性命名的文件 【(32)位16进制.type】 !   32aeefa9924afb8be0da50976f1a2405.7z "+
+                    "\n"+Cur_Bat_Name+ " *_18  jpg          ###  把当前文件夹下  .jpg  文件全部改名为 MD5属性命名的文件 【(32)位16进制.type】 !" +
+                    "\n"+Cur_Bat_Name+ " *_18  .jpg  .png  .webp .gif                          ### 把当前文件夹下  .jpg  .png  .webp .gif 文件全部改名为 MD5属性命名的文件 【(32)位16进制.type】 " +
+                    "\n"+Cur_Bat_Name+ " *_18  .mp4  .avi   .wmv .rmvb  .flv .3gp              ### 把当前文件夹下  .mp4  .avi   .wmv .rmvb  .flv .3gp 文件全部改名为 MD5属性命名的文件 【(32)位16进制.type】 " +
+                    "\n"+Cur_Bat_Name+ " *_18  .jpg  .png  .gif  .webp .mp4 .avi .flv .wmv     ### 把当前文件夹下  .jpg  .png  .gif  .webp .mp4 .avi .flv .wmv 文件全部改名为 MD5属性命名的文件 【(32)位16进制.type】 "+
+                    "\n"+Cur_Bat_Name+ " *_18  <指定文件A> <指定文件B>          ### 把当前文件夹下 指定文件名称  文件全部改名为 MD5属性命名的文件 【(32)位16进制.type】 "
+
+                    ;}
+
+
+    }
+
+
+
+
+    public static String getMD5Three(String path) {
+        BigInteger bi = null;
+        try {
+            byte[] buffer = new byte[8192];
+            int len = 0;
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            File f = new File(path);
+            FileInputStream fis = new FileInputStream(f);
+            while ((len = fis.read(buffer)) != -1) {
+                md.update(buffer, 0, len);
+            }
+            fis.close();
+            byte[] b = md.digest();
+            bi = new BigInteger(1, b);
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return bi.toString(16);
+    }
     // operation_type  操作类型     1--读取文件内容字符串 进行修改      2--对文件对文件内容(字节)--进行修改    3.对全体子文件进行的随性的操作 属性进行修改(文件名称)
 //     // 4.对当前子文件(包括子目录 子文件 --不包含孙目录 孙文件) 5. 从shell 中获取到的路径 去对某一个文件进行操作
 
@@ -376,12 +753,15 @@ public class G2_ApplyRuleFor_TypeFile {
             if(curOS_TYPE == OS_TYPE.Windows){
                 webpLibraryFilePath = JDK_BIN_PATH + File.separator+"webp-imageio.dll";
                 G2_LibraryPath =  G2_File_Path +File.separator+"webp-imageio.dll";
+                Win_Lin_Mac_ZbinPath = zbinPath+File.separator+"win_zbin";
             }else if(curOS_TYPE == OS_TYPE.MacOS) {
                 webpLibraryFilePath = JDK_BIN_PATH + File.separator+"libwebp-imageio.dylib";
                 G2_LibraryPath =  G2_File_Path +File.separator+"libwebp-imageio.dylib";
+                Win_Lin_Mac_ZbinPath = zbinPath+File.separator+"mac_zbin";
             }else if(curOS_TYPE == OS_TYPE.Linux){
                 webpLibraryFilePath = JDK_BIN_PATH + File.separator+"libwebp-imageio.so";
                 G2_LibraryPath =  G2_File_Path +File.separator+"libwebp-imageio.so";
+                Win_Lin_Mac_ZbinPath = zbinPath+File.separator+"lin_zbin";
             }
 
             File webpLibraryFile = new File(webpLibraryFilePath);
@@ -1803,6 +2183,7 @@ public class G2_ApplyRuleFor_TypeFile {
                     Cur_Bat_Name + " #_9  png_jpg  把  jpg的格式转为png的格式 \n " +
                     Cur_Bat_Name + " #_9  mp4_   去除当前mp4的格式 使得其文件格式未知 \n " +
                     Cur_Bat_Name + " #_9  _mp4   把没有类型的文件名称修改为 mp4格式名称 \n " +
+                    Cur_Bat_Name + " #_9  7z_7疫z   把当前 7z文件名后缀改为 7疫z 使得无法检测具体类型 \n " +
                     Cur_Bat_Name + " #_9  原类型_目标类型   把没有类型的文件名称【原类型】->【目标类型】 \n " ;
         }
 
@@ -1890,6 +2271,11 @@ public class G2_ApplyRuleFor_TypeFile {
         }
 
         @Override
+        boolean initParamsWithInputList(ArrayList<String> inputParamList) {
+            return super.initParamsWithInputList(inputParamList);
+        }
+
+        @Override
         ArrayList<File> applySubFileListRule4(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 
             System.out.println("Rule8_ClearChineseType_8   搜索到的实体文件个数:" + curRealFileList.size());
@@ -1918,7 +2304,7 @@ public class G2_ApplyRuleFor_TypeFile {
         @Override
         String simpleDesc() {
             return "把当前命令的文件包含.的文件的 后缀名称中的中文清除掉  例如 1.7啊z -> 1.7z   2.你zip -> 2.zip \n"+
-                    Cur_Bat_Name + " 8     [索引8]   // 把当前目录下文件 后缀中文去除  \n";
+                    Cur_Bat_Name + " #_8    <指定后缀有中文的文件>  [索引8]   // 把当前目录下文件 后缀中文去除  \n";
         }
     }
 
@@ -1930,10 +2316,12 @@ public class G2_ApplyRuleFor_TypeFile {
     class Encropty_Rule_7 extends Basic_Rule{
         boolean mEncroptyDirect = true;  //  true---加密      false--解密
         boolean isAllFileOperation = false;
+
+        boolean isBatchOperation = false ; //  是否你是批量处理  会生成固定的 bad_batch   good_batch 文件夹  而不是时间戳文件夹
         Encropty_Rule_7() {
             super("#", 7, 4);
             isAllFileOperation = false;
-
+            isBatchOperation = false;
         }
 
         @Override
@@ -1942,6 +2330,12 @@ public class G2_ApplyRuleFor_TypeFile {
                 mEncroptyDirect = false;
             }else {
                 mEncroptyDirect = true;
+            }
+
+            if(inputParam.contains("batch")){
+                isBatchOperation = true;
+            }else {
+                isBatchOperation = false;
             }
 
             if(inputParam.contains("*")){
@@ -1956,12 +2350,15 @@ public class G2_ApplyRuleFor_TypeFile {
         @Override
         String simpleDesc() {
             return "   默认bad(加密) 把当前目录下的所有文件(不包含文件夹  不包含孙文件)进行 加密bad/解密good\n" +
-                    Cur_Bat_Name+ " #_7_bad   (默认--加密文件)  把当前目录下的所有文件(不包含文件夹  不包含孙文件)进行 加密bad\n" +
-                    Cur_Bat_Name+ " #_7_good   (加密文件) 把当前目录下的所有文件(不包含文件夹  不包含孙文件)进行 解密good\n" +
+                    Cur_Bat_Name+ " #_7_bad   (默认--加密文件)  把当前目录下的所有文件(不包含文件夹  不包含孙文件)进行 加密bad 生成 【 time + bad 】 加密文件夹 \n" +
+                    Cur_Bat_Name+ " #_7_good   (解密文件) 把当前目录下的所有文件(不包含文件夹  不包含孙文件)进行 解密good 【 time + good 】 生成解密文件夹\n" +
                     Cur_Bat_Name + " jpg_7_bad  [索引7]   // 把当前目录下的 jpg文件 加密 \n" +
                     Cur_Bat_Name + " jpg_7_good  [索引7]   // 把当前目录下的 jpg文件 解密 \n" +
                     Cur_Bat_Name + " *_7_bad  [索引7]   // 把当前目录所有文件进行加密  加密文件在新的 时间戳文件夹中 \n" +
-                    Cur_Bat_Name + " *_7_good  [索引7]   // 把当前目录所有文件进行解密  解密文件在新的 时间戳文件夹中 \n" ;
+                    Cur_Bat_Name + " *_7_good  [索引7]   // 把当前目录所有文件进行解密  解密文件在新的 时间戳文件夹中 \n"+
+                    Cur_Bat_Name + " #_7_bad_batch   [索引7]   // 把当前目录所有文件进行加密  加密文件在新的【 固定文件夹 bad_batch 】中 适合批量处理 " +
+                    Cur_Bat_Name + " *_7_good_batch   [索引7]   // 把当前目录所有文件进行解密 解密文件在新的【 固定文件夹 good_batch 】中 适合批量处理 " +
+                    "\n" ;
 
         }
 
@@ -2032,20 +2429,35 @@ public class G2_ApplyRuleFor_TypeFile {
             SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd_HHmmss");//设置日期格式
             String date = df.format(new Date());
             String CurBadDirName = "good_AllFile_"+ date;
+
+            if(isBatchOperation){
+                if(mEncroptyDirect){
+                    CurBadDirName = "bad_batch";
+                }else{
+                    CurBadDirName = "good_batch";
+                }
+            }
+
             File curBadDirFile = new File(curDirFile.getAbsolutePath()+ File.separator+CurBadDirName);
             curBadDirFile.mkdirs();
-            String oldBasePath = curDirFile.getAbsolutePath();
-            String newBasePath = curBadDirFile.getAbsolutePath();
+            String oldBasePath = curDirFile.getAbsolutePath();   //  原有的路径  /C
+            String newBasePath = curBadDirFile.getAbsolutePath(); // 生成的 新路径 /C/good_batch
             if(!curDirList.contains(curDirFile)){
                 curDirList.add(curDirFile);
             }
             System.out.println("执行当前所有文件 解密操作 ");
 
             for (int i = 0; i < curDirList.size(); i++) {
-                File oldDirFile = curDirList.get(i);
-                String newDirFilePath = oldDirFile.getAbsolutePath().replace(oldBasePath, newBasePath);
-                File newDirFile = new File(newDirFilePath);
-                newDirFile.mkdirs();
+                File oldDirFile = curDirList.get(i);   // 原有的要解密文件
+
+
+                if(!isBatchOperation){  // 如果 不是 batch  那么会创建文件夹
+                    // 如果是当前目录下多  子文件夹  那么就把在* 的 情况下会 创建这个文件夹 事实上在 batch的情况下不需要这个文件夹
+                    String newDirFilePath = oldDirFile.getAbsolutePath().replace(oldBasePath, newBasePath);
+                    File newDirFile = new File(newDirFilePath);
+                    newDirFile.mkdirs();
+                }
+
 
                 for (int j = 0; j < oldDirFile.listFiles().length; j++) {
 
@@ -2054,10 +2466,24 @@ public class G2_ApplyRuleFor_TypeFile {
                         continue;
                     }
 
-                    String newRealFilePath = oldRealFile.getAbsolutePath().replace(oldBasePath, newBasePath);
-                    File newRealFile = new File(newRealFilePath);
-                    // 解密操作
-                    createDecryFile(oldRealFile,newRealFile);
+                    if(isExpressType(oldRealFile)){
+                        continue;
+                    }
+
+
+if(!isBatchOperation){  // 如果 不是 batch  那么会创建文件夹  和原来保持一致
+    String newRealFilePath = oldRealFile.getAbsolutePath().replace(oldBasePath, newBasePath);
+    File newRealFile = new File(newRealFilePath);
+    // 解密操作
+    createDecryFile(oldRealFile,newRealFile);
+}else{
+//    String newRealFilePath = oldRealFile.getAbsolutePath().replace(oldBasePath, newBasePath);
+    String batch_fileName = oldRealFile.getName();
+    File newRealFile = new File(newBasePath+File.separator+batch_fileName);
+    // 解密操作
+    createDecryFile(oldRealFile,newRealFile);
+}
+
                 }
             }
 
@@ -2101,6 +2527,13 @@ public class G2_ApplyRuleFor_TypeFile {
             if(!containUserType){
                 curNewDirName += "_"+curFilterFileTypeList.get(0);  //  1.如果所有文件都加密  那么没有后缀 如果某一个文件类型解密 那么添加后缀
             }
+            if(isBatchOperation){
+                if(mEncroptyDirect){
+                    curNewDirName = "bad_batch";
+                }else{
+                    curNewDirName = "good_batch";
+                }
+            }
 
             File tempDirFile = new File(curDirFile.getAbsolutePath()+File.separator+curNewDirName);
             tempDirFile.mkdirs();  // 创建文件夹
@@ -2139,6 +2572,23 @@ public class G2_ApplyRuleFor_TypeFile {
 
             return null;
         }
+    }
+
+    static boolean isExpressType(File targetFile){
+        boolean flag = false;
+
+        if(targetFile.isDirectory()){
+            return false;
+        }
+
+        String type = getFileTypeWithPoint(targetFile.getName());
+
+        if(".7z".equals(type) || ".zip".equals(type) || ".rar".equals(type)  ||  ".war".equals(type) ){
+            return true;
+        }
+
+        return flag;
+
     }
     class SubDirRename_Rule_6 extends Basic_Rule{
 
@@ -2225,6 +2675,20 @@ public class G2_ApplyRuleFor_TypeFile {
         }
     }
 
+
+    public  static String getFileNameNoPoint(File file){
+String type = getFileTypeWithPoint(file.getName());
+       String originname =  file.getName() ;
+     String resultName =    originname.replace(type,"");
+     return resultName;
+    }
+
+    public  static String getFileNameNoPoint(String  originName){
+        String type = getFileTypeWithPoint(originName);
+        return  originName.replace(type,"");
+    }
+
+
     public  static String getFileTypeWithPoint(String fileName){
         String name = "";
         if(fileName.contains(".")){
@@ -2234,6 +2698,10 @@ public class G2_ApplyRuleFor_TypeFile {
         }
         return name.toLowerCase().trim();
     }
+
+
+
+
     // 把 当前目录下所有的 jpg  mp4 gif  都转为 i_temp1_1.jpg    v_temp2_1.mp4   g_temp3_1.gif 的文件格式
     class AVI_Rule_5 extends Basic_Rule{
         String tempTag = "temp";
