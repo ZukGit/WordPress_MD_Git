@@ -468,7 +468,7 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
 
 
             // ffmpeg -ss 00:00:00  -accurate_seek  -to 00:00:10  -i 1.mp4 -codec copy 1_output.mp4
-            String command = ffmpeg_path +" -ss "+beginTimeStr  + " -accurate_seek  -to " + endTimeStr +"  -i " + "\""+targetInputMP4File.getName()+ "\"" +" "+ "  -codec copy -avoid_negative_ts 1 "+ outputFileName;
+            String command = ffmpeg_path +"  -i " + "\""+targetInputMP4File.getName()+ "\"" +" -ss "+beginTimeStr  + "   -to " + endTimeStr  +" "+ "  -codec copy -avoid_negative_ts 1 "+ outputFileName;
 
 
             System.out.println(command);
