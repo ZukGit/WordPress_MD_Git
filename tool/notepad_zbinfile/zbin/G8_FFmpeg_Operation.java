@@ -605,7 +605,7 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
         @Override
         String ruleTip(String type, int index, String batName, OS_TYPE curType) {
             return  "\n"+Cur_Bat_Name+ "  6    ## 把从UC 拉取出来的 VideoData 本地化(绝对路径转为相对路径) \nadb pull  /storage/emulated/0/UCDownloads/VideoData . && cd  ./VideoData  && "+Cur_Bat_Name +" 6  " +
-                    "\n移动原有无规则命名的m3du 到 origin_abspath_m3du 文件夹中 (保留绝对路径) \n移动原有无规则命名的m3du改为有规则命名的 到 order_origin_abspath_m3du 中(保留绝对路径) \n[拉取成型视频] adb push /sdcard/UCDownloads/VideoData/order_origin_abspath_m3du   .";
+                    "\n移动原有无规则命名的m3du 到 origin_abspath_m3du 文件夹中 (保留绝对路径) \n移动原有无规则命名的m3du改为有规则命名的 到 order_origin_abspath_m3du 中(保留绝对路径) \n[拉取成型视频] adb pull /sdcard/UCDownloads/VideoData/order_origin_abspath_m3du   .";
 					}
 
 
@@ -643,8 +643,8 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
             System.out.println("导入 安卓 命令: ");
             System.out.println("adb push ./VideoData  /sdcard/UCDownloads/");
             System.out.println("导出 安卓 命令: ");
-            System.out.println("adb push  /sdcard/UCDownloads/VideoData  .");
-			System.out.println("adb push  /sdcard/UCDownloads/VideoData/order_origin_abspath_m3du   .");
+            System.out.println("adb pull  /sdcard/UCDownloads/VideoData  .");
+			System.out.println("adb pull  /sdcard/UCDownloads/VideoData/order_origin_abspath_m3du   .");
             System.out.println("连续导出 && 导出 安卓 命令: ");
             System.out.println("adb pull  /storage/emulated/0/UCDownloads/VideoData . && cd  ./VideoData  && "+Cur_Bat_Name +" 6  ");
         }
