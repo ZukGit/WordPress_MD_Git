@@ -468,7 +468,7 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
 
 
             // ffmpeg -ss 00:00:00  -accurate_seek  -to 00:00:10  -i 1.mp4 -codec copy 1_output.mp4
-            String command = ffmpeg_path +"  -i " + "\""+targetInputMP4File.getName()+ "\"" +" -ss "+beginTimeStr  + "   -to " + endTimeStr  +" "+ "  -codec copy -avoid_negative_ts 1 "+ outputFileName;
+            String command = ffmpeg_path +" -ss "+beginTimeStr  + " -accurate_seek  -to " + endTimeStr +"  -i " + "\""+targetInputMP4File.getName()+ "\"" +" "+ "  -codec copy -avoid_negative_ts 1 "+ outputFileName;
 
 
             System.out.println(command);
@@ -605,8 +605,7 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
         @Override
         String ruleTip(String type, int index, String batName, OS_TYPE curType) {
             return  "\n"+Cur_Bat_Name+ "  6    ## 把从UC 拉取出来的 VideoData 本地化(绝对路径转为相对路径) \nadb pull  /storage/emulated/0/UCDownloads/VideoData . && cd  ./VideoData  && "+Cur_Bat_Name +" 6  " +
-                    "\n移动原有无规则命名的m3du 到 origin_abspath_m3du 文件夹中 (保留绝对路径) \n移动原有无规则命名的m3du改为有规则命名的 到 order_origin_abspath_m3du 中(保留绝对路径) \n[拉取成型视频] adb pull /sdcard/UCDownloads/VideoData/order_origin_abspath_m3du   .";
-					}
+                    "\n移动原有无规则命名的m3du 到 origin_abspath_m3du 文件夹中 (保留绝对路径) \n移动原有无规则命名的m3du改为有规则命名的 到 order_origin_abspath_m3du 中(保留绝对路径)" ;}
 
 
         @Override
@@ -643,8 +642,7 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
             System.out.println("导入 安卓 命令: ");
             System.out.println("adb push ./VideoData  /sdcard/UCDownloads/");
             System.out.println("导出 安卓 命令: ");
-            System.out.println("adb pull  /sdcard/UCDownloads/VideoData  .");
-			System.out.println("adb pull  /sdcard/UCDownloads/VideoData/order_origin_abspath_m3du   .");
+            System.out.println("adb push  /sdcard/UCDownloads/VideoData  .");
             System.out.println("连续导出 && 导出 安卓 命令: ");
             System.out.println("adb pull  /storage/emulated/0/UCDownloads/VideoData . && cd  ./VideoData  && "+Cur_Bat_Name +" 6  ");
         }
@@ -796,6 +794,10 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
     }
 
 
+    static int Rule5_Order_Index = 1;
+
+
+
     //    ffmpeg -i 2.mp4 -c:v copy -c:a copy -bsf:v h264_mp4toannexb -f ssegment -segment_list ./out/2020_10_26_out.m3u8 -segment_time 10 ./out/TS_DIR/2020_10_26_out%03d.ts
     //  对当前 给定的 Mp4文件进行切割为ts文件  文件结构为  当前目录 ./out 【输出文件夹 包含m3u8 文件】  ./out/TS_Dir 【TS文件的输出文件夹  包含 TS 文件】
     //  对生成的 .m3du 文件  删除 .ts 后缀  增加 ./TS_Dir/前缀
@@ -814,6 +816,11 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
             InputFile_OutDirMap  = new  HashMap<File,File>();
             outDir  = new File(CUR_Dir_FILE.getAbsolutePath()+File.separator+"VideoData");
             out_TS_Dir = new File(CUR_Dir_FILE.getAbsolutePath()+File.separator+"VideoData"+File.separator+"TS_Dir");
+        }
+
+
+     int   getNextOrderIndex(){
+            return Rule5_Order_Index++;
         }
 
 
@@ -906,6 +913,10 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
                 String noPointFileName = getFileNameNoPoint(mp4File.getName());
 
                 String fileTimeStr =  getTimeStamp();
+                String yyymmdd_str =  getTimeStamp_YYYMMDD();
+                String hhmmss_str =  getTimeStamp_HHmmss();
+                int orderIndex = getNextOrderIndex();
+                fileTimeStr = yyymmdd_str+"_"+ getPaddingIntString(orderIndex,5,"0",true)+"_"+hhmmss_str;
                 String m3u8FileName = "./VideoData/"+fileTimeStr+"_"+noPointFileName+".m3u8";// zzzz
 
                 String ts_FileName = "./VideoData/TS_DIR/"+fileTimeStr+"_"+noPointFileName+"_"+"%03d.ts";
@@ -987,6 +998,21 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
 
         }
 
+    }
+
+
+    static String getTimeStamp_YYYMMDD(){
+
+        SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd");//设置日期格式
+        String date = df.format(new Date());
+        return date;
+    }
+
+    static String getTimeStamp_HHmmss(){
+
+        SimpleDateFormat df = new SimpleDateFormat("HHmmss");//设置日期格式
+        String date = df.format(new Date());
+        return date;
     }
 
     static String getTimeStamp(){

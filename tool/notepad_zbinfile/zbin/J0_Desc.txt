@@ -1,0 +1,332 @@
+【1】 J0.properties 
+存储当前某个python-item 的当前记录到的时间参数(将以该时间参数为起步时间) 动态计算到 现在目前时间 之间获取数据的python代码 
+
+
+【2】 J0_treedata.txt
+对应 https://tushare.pro/document/2?doc_id=25 里的项  以 树型 结构 排列  
+ZENDZ;  // 记录结束位置 
+▲ 根节点
+
+〓〓jichushuju
+hushengupiao_jichushuju_  二级目录
+
+
+〖 https://tushare.pro/document/2?doc_id=25  股票列表    《三级获取数据的项 一对一对应 python 文件 》
+〖 *is_hs* 是否沪深港通标的，N否 H沪股通 S深股通  
+〖 *list_status* 上市状态： L上市 D退市 P暂停上市，默认L  
+〖 *exchange*  SSE 上交所  SZSE深交所  HKEX港交所
+hushengupiao_jichushuju_gupiaoliebiao  【120】[] <stock_basic> (is_hs{N,H,S}#list_status{L,D,P}#exchange{SSE,SZSE,HKEX}) 《ts_code=symbol=name=area=industry=fullname=enname=market=exchange=curr_type=list_status=list_date=delist_date=is_hs》
+
+
+
+
+【3】 J0_股票列表.xlsx 是提供给Java程序读取的文件 
+在Java文件生成的数据文件夹 ~/Desktop/zbin/J0/中会生成 股票列表.xlsx 文件  可用 该文件 替换 J0_股票列表.xlsx
+
+
+
+
+
+
+
+
+
+
+═══════════════════使用方法列表 Begin═══════════════════
+
+
+ ________________________________________________ 指定单个索引节点 仅执行一个 ________________________________________________ 
+名称: 【股票列表】  索引值:0002   【对指定索引 单一 single-python进行更新执行!】
+zstock_tushare_tool_J0.bat  0002_single &&   C:\Users\zhuzj5\Desktop\zbin\J0_Python\J0_0000_call_select_single_python.bat  0002
+
+名称: 【交易日历】  索引值:0003   【对指定索引 单一 single-python进行更新执行!】
+zstock_tushare_tool_J0.bat  0003_single &&   C:\Users\zhuzj5\Desktop\zbin\J0_Python\J0_0000_call_select_single_python.bat  0003
+
+名称: 【股票曾用名】  索引值:0004   【对指定索引 单一 single-python进行更新执行!】
+zstock_tushare_tool_J0.bat  0004_single &&   C:\Users\zhuzj5\Desktop\zbin\J0_Python\J0_0000_call_select_single_python.bat  0004
+
+名称: 【沪深股通成分股】  索引值:0005   【对指定索引 单一 single-python进行更新执行!】
+zstock_tushare_tool_J0.bat  0005_single &&   C:\Users\zhuzj5\Desktop\zbin\J0_Python\J0_0000_call_select_single_python.bat  0005
+
+名称: 【上市公司基本信息】  索引值:0006   【对指定索引 单一 single-python进行更新执行!】
+zstock_tushare_tool_J0.bat  0006_single &&   C:\Users\zhuzj5\Desktop\zbin\J0_Python\J0_0000_call_select_single_python.bat  0006
+
+名称: 【上市公司管理层】  索引值:0007   【对指定索引 单一 single-python进行更新执行!】
+zstock_tushare_tool_J0.bat  0007_single &&   C:\Users\zhuzj5\Desktop\zbin\J0_Python\J0_0000_call_select_single_python.bat  0007
+
+名称: 【管理层薪酬和持股】  索引值:0008   【对指定索引 单一 single-python进行更新执行!】
+zstock_tushare_tool_J0.bat  0008_single &&   C:\Users\zhuzj5\Desktop\zbin\J0_Python\J0_0000_call_select_single_python.bat  0008
+
+名称: 【IPO 新股上市】  索引值:0009   【对指定索引 单一 single-python进行更新执行!】
+zstock_tushare_tool_J0.bat  0009_single &&   C:\Users\zhuzj5\Desktop\zbin\J0_Python\J0_0000_call_select_single_python.bat  0009
+
+名称: 【日线行情-时间】  索引值:0011   【对指定索引 单一 single-python进行更新执行!】
+zstock_tushare_tool_J0.bat  0011_single &&   C:\Users\zhuzj5\Desktop\zbin\J0_Python\J0_0000_call_select_single_python.bat  0011
+
+名称: 【周线行情-时间】  索引值:0012   【对指定索引 单一 single-python进行更新执行!】
+zstock_tushare_tool_J0.bat  0012_single &&   C:\Users\zhuzj5\Desktop\zbin\J0_Python\J0_0000_call_select_single_python.bat  0012
+
+名称: 【月线行情-时间】  索引值:0013   【对指定索引 单一 single-python进行更新执行!】
+zstock_tushare_tool_J0.bat  0013_single &&   C:\Users\zhuzj5\Desktop\zbin\J0_Python\J0_0000_call_select_single_python.bat  0013
+
+名称: 【复权因子】  索引值:0014   【对指定索引 单一 single-python进行更新执行!】
+zstock_tushare_tool_J0.bat  0014_single &&   C:\Users\zhuzj5\Desktop\zbin\J0_Python\J0_0000_call_select_single_python.bat  0014
+
+名称: 【每日停复牌信息】  索引值:0015   【对指定索引 单一 single-python进行更新执行!】
+zstock_tushare_tool_J0.bat  0015_single &&   C:\Users\zhuzj5\Desktop\zbin\J0_Python\J0_0000_call_select_single_python.bat  0015
+
+名称: 【每日指标】  索引值:0016   【对指定索引 单一 single-python进行更新执行!】
+zstock_tushare_tool_J0.bat  0016_single &&   C:\Users\zhuzj5\Desktop\zbin\J0_Python\J0_0000_call_select_single_python.bat  0016
+
+名称: 【个股资金流量】  索引值:0017   【对指定索引 单一 single-python进行更新执行!】
+zstock_tushare_tool_J0.bat  0017_single &&   C:\Users\zhuzj5\Desktop\zbin\J0_Python\J0_0000_call_select_single_python.bat  0017
+
+名称: 【每日涨跌停价格】  索引值:0018   【对指定索引 单一 single-python进行更新执行!】
+zstock_tushare_tool_J0.bat  0018_single &&   C:\Users\zhuzj5\Desktop\zbin\J0_Python\J0_0000_call_select_single_python.bat  0018
+
+名称: 【每日涨跌停统计】  索引值:0019   【对指定索引 单一 single-python进行更新执行!】
+zstock_tushare_tool_J0.bat  0019_single &&   C:\Users\zhuzj5\Desktop\zbin\J0_Python\J0_0000_call_select_single_python.bat  0019
+
+名称: 【沪深港通资金流向】  索引值:0020   【对指定索引 单一 single-python进行更新执行!】
+zstock_tushare_tool_J0.bat  0020_single &&   C:\Users\zhuzj5\Desktop\zbin\J0_Python\J0_0000_call_select_single_python.bat  0020
+
+名称: 【沪深通十大成交股】  索引值:0021   【对指定索引 单一 single-python进行更新执行!】
+zstock_tushare_tool_J0.bat  0021_single &&   C:\Users\zhuzj5\Desktop\zbin\J0_Python\J0_0000_call_select_single_python.bat  0021
+
+名称: 【沪股通持股明细】  索引值:0022   【对指定索引 单一 single-python进行更新执行!】
+zstock_tushare_tool_J0.bat  0022_single &&   C:\Users\zhuzj5\Desktop\zbin\J0_Python\J0_0000_call_select_single_python.bat  0022
+
+名称: 【港股通每日成交统计】  索引值:0023   【对指定索引 单一 single-python进行更新执行!】
+zstock_tushare_tool_J0.bat  0023_single &&   C:\Users\zhuzj5\Desktop\zbin\J0_Python\J0_0000_call_select_single_python.bat  0023
+
+名称: 【利润表】  索引值:0025   【对指定索引 单一 single-python进行更新执行!】
+zstock_tushare_tool_J0.bat  0025_single &&   C:\Users\zhuzj5\Desktop\zbin\J0_Python\J0_0000_call_select_single_python.bat  0025
+
+名称: 【资产负债表】  索引值:0026   【对指定索引 单一 single-python进行更新执行!】
+zstock_tushare_tool_J0.bat  0026_single &&   C:\Users\zhuzj5\Desktop\zbin\J0_Python\J0_0000_call_select_single_python.bat  0026
+
+名称: 【现金流量表】  索引值:0027   【对指定索引 单一 single-python进行更新执行!】
+zstock_tushare_tool_J0.bat  0027_single &&   C:\Users\zhuzj5\Desktop\zbin\J0_Python\J0_0000_call_select_single_python.bat  0027
+
+名称: 【业绩快报】  索引值:0028   【对指定索引 单一 single-python进行更新执行!】
+zstock_tushare_tool_J0.bat  0028_single &&   C:\Users\zhuzj5\Desktop\zbin\J0_Python\J0_0000_call_select_single_python.bat  0028
+
+名称: 【分红送股数据】  索引值:0029   【对指定索引 单一 single-python进行更新执行!】
+zstock_tushare_tool_J0.bat  0029_single &&   C:\Users\zhuzj5\Desktop\zbin\J0_Python\J0_0000_call_select_single_python.bat  0029
+
+名称: 【分红送股数据】  索引值:0030   【对指定索引 单一 single-python进行更新执行!】
+zstock_tushare_tool_J0.bat  0030_single &&   C:\Users\zhuzj5\Desktop\zbin\J0_Python\J0_0000_call_select_single_python.bat  0030
+
+名称: 【财务指标数据】  索引值:0031   【对指定索引 单一 single-python进行更新执行!】
+zstock_tushare_tool_J0.bat  0031_single &&   C:\Users\zhuzj5\Desktop\zbin\J0_Python\J0_0000_call_select_single_python.bat  0031
+
+名称: 【财务审计意见】  索引值:0032   【对指定索引 单一 single-python进行更新执行!】
+zstock_tushare_tool_J0.bat  0032_single &&   C:\Users\zhuzj5\Desktop\zbin\J0_Python\J0_0000_call_select_single_python.bat  0032
+
+名称: 【主营业务构成】  索引值:0033   【对指定索引 单一 single-python进行更新执行!】
+zstock_tushare_tool_J0.bat  0033_single &&   C:\Users\zhuzj5\Desktop\zbin\J0_Python\J0_0000_call_select_single_python.bat  0033
+
+名称: 【财报披露日期标】  索引值:0034   【对指定索引 单一 single-python进行更新执行!】
+zstock_tushare_tool_J0.bat  0034_single &&   C:\Users\zhuzj5\Desktop\zbin\J0_Python\J0_0000_call_select_single_python.bat  0034
+
+名称: 【港股通十大成交股】  索引值:0036   【对指定索引 单一 single-python进行更新执行!】
+zstock_tushare_tool_J0.bat  0036_single &&   C:\Users\zhuzj5\Desktop\zbin\J0_Python\J0_0000_call_select_single_python.bat  0036
+
+名称: 【融资融券交易汇总】  索引值:0037   【对指定索引 单一 single-python进行更新执行!】
+zstock_tushare_tool_J0.bat  0037_single &&   C:\Users\zhuzj5\Desktop\zbin\J0_Python\J0_0000_call_select_single_python.bat  0037
+
+名称: 【龙虎榜机构信息】  索引值:0038   【对指定索引 单一 single-python进行更新执行!】
+zstock_tushare_tool_J0.bat  0038_single &&   C:\Users\zhuzj5\Desktop\zbin\J0_Python\J0_0000_call_select_single_python.bat  0038
+
+名称: 【前十大股东】  索引值:0039   【对指定索引 单一 single-python进行更新执行!】
+zstock_tushare_tool_J0.bat  0039_single &&   C:\Users\zhuzj5\Desktop\zbin\J0_Python\J0_0000_call_select_single_python.bat  0039
+
+名称: 【前十大流通股】  索引值:0040   【对指定索引 单一 single-python进行更新执行!】
+zstock_tushare_tool_J0.bat  0040_single &&   C:\Users\zhuzj5\Desktop\zbin\J0_Python\J0_0000_call_select_single_python.bat  0040
+
+名称: 【龙虎榜每日信息】  索引值:0041   【对指定索引 单一 single-python进行更新执行!】
+zstock_tushare_tool_J0.bat  0041_single &&   C:\Users\zhuzj5\Desktop\zbin\J0_Python\J0_0000_call_select_single_python.bat  0041
+
+名称: 【龙虎榜机构信息】  索引值:0042   【对指定索引 单一 single-python进行更新执行!】
+zstock_tushare_tool_J0.bat  0042_single &&   C:\Users\zhuzj5\Desktop\zbin\J0_Python\J0_0000_call_select_single_python.bat  0042
+
+名称: 【股权质押统计明细】  索引值:0043   【对指定索引 单一 single-python进行更新执行!】
+zstock_tushare_tool_J0.bat  0043_single &&   C:\Users\zhuzj5\Desktop\zbin\J0_Python\J0_0000_call_select_single_python.bat  0043
+
+名称: 【股权质押明细】  索引值:0044   【对指定索引 单一 single-python进行更新执行!】
+zstock_tushare_tool_J0.bat  0044_single &&   C:\Users\zhuzj5\Desktop\zbin\J0_Python\J0_0000_call_select_single_python.bat  0044
+
+名称: 【股票回购】  索引值:0045   【对指定索引 单一 single-python进行更新执行!】
+zstock_tushare_tool_J0.bat  0045_single &&   C:\Users\zhuzj5\Desktop\zbin\J0_Python\J0_0000_call_select_single_python.bat  0045
+
+名称: 【概念股分类】  索引值:0046   【对指定索引 单一 single-python进行更新执行!】
+zstock_tushare_tool_J0.bat  0046_single &&   C:\Users\zhuzj5\Desktop\zbin\J0_Python\J0_0000_call_select_single_python.bat  0046
+
+名称: 【概念股列表】  索引值:0047   【对指定索引 单一 single-python进行更新执行!】
+zstock_tushare_tool_J0.bat  0047_single &&   C:\Users\zhuzj5\Desktop\zbin\J0_Python\J0_0000_call_select_single_python.bat  0047
+
+名称: 【限售股解禁】  索引值:0048   【对指定索引 单一 single-python进行更新执行!】
+zstock_tushare_tool_J0.bat  0048_single &&   C:\Users\zhuzj5\Desktop\zbin\J0_Python\J0_0000_call_select_single_python.bat  0048
+
+名称: 【大宗交易】  索引值:0049   【对指定索引 单一 single-python进行更新执行!】
+zstock_tushare_tool_J0.bat  0049_single &&   C:\Users\zhuzj5\Desktop\zbin\J0_Python\J0_0000_call_select_single_python.bat  0049
+
+名称: 【股东人数】  索引值:0050   【对指定索引 单一 single-python进行更新执行!】
+zstock_tushare_tool_J0.bat  0050_single &&   C:\Users\zhuzj5\Desktop\zbin\J0_Python\J0_0000_call_select_single_python.bat  0050
+
+名称: 【股东增减持】  索引值:0051   【对指定索引 单一 single-python进行更新执行!】
+zstock_tushare_tool_J0.bat  0051_single &&   C:\Users\zhuzj5\Desktop\zbin\J0_Python\J0_0000_call_select_single_python.bat  0051
+
+
+
+ ________________________________________________ 指定起始索引节点 数据集合操作 ________________________________________________ 
+名称: 【股票列表】  索引值:0002   【把索引作为起始点 执行之后所有的代码更新及操作】
+zstock_tushare_tool_J0.bat  0002_rest  &&   C:\Users\zhuzj5\Desktop\zbin\J0_Python\J0_0000_call_select_rest_python.bat  0002
+
+名称: 【交易日历】  索引值:0003   【把索引作为起始点 执行之后所有的代码更新及操作】
+zstock_tushare_tool_J0.bat  0003_rest  &&   C:\Users\zhuzj5\Desktop\zbin\J0_Python\J0_0000_call_select_rest_python.bat  0003
+
+名称: 【股票曾用名】  索引值:0004   【把索引作为起始点 执行之后所有的代码更新及操作】
+zstock_tushare_tool_J0.bat  0004_rest  &&   C:\Users\zhuzj5\Desktop\zbin\J0_Python\J0_0000_call_select_rest_python.bat  0004
+
+名称: 【沪深股通成分股】  索引值:0005   【把索引作为起始点 执行之后所有的代码更新及操作】
+zstock_tushare_tool_J0.bat  0005_rest  &&   C:\Users\zhuzj5\Desktop\zbin\J0_Python\J0_0000_call_select_rest_python.bat  0005
+
+名称: 【上市公司基本信息】  索引值:0006   【把索引作为起始点 执行之后所有的代码更新及操作】
+zstock_tushare_tool_J0.bat  0006_rest  &&   C:\Users\zhuzj5\Desktop\zbin\J0_Python\J0_0000_call_select_rest_python.bat  0006
+
+名称: 【上市公司管理层】  索引值:0007   【把索引作为起始点 执行之后所有的代码更新及操作】
+zstock_tushare_tool_J0.bat  0007_rest  &&   C:\Users\zhuzj5\Desktop\zbin\J0_Python\J0_0000_call_select_rest_python.bat  0007
+
+名称: 【管理层薪酬和持股】  索引值:0008   【把索引作为起始点 执行之后所有的代码更新及操作】
+zstock_tushare_tool_J0.bat  0008_rest  &&   C:\Users\zhuzj5\Desktop\zbin\J0_Python\J0_0000_call_select_rest_python.bat  0008
+
+名称: 【IPO 新股上市】  索引值:0009   【把索引作为起始点 执行之后所有的代码更新及操作】
+zstock_tushare_tool_J0.bat  0009_rest  &&   C:\Users\zhuzj5\Desktop\zbin\J0_Python\J0_0000_call_select_rest_python.bat  0009
+
+名称: 【日线行情-时间】  索引值:0011   【把索引作为起始点 执行之后所有的代码更新及操作】
+zstock_tushare_tool_J0.bat  0011_rest  &&   C:\Users\zhuzj5\Desktop\zbin\J0_Python\J0_0000_call_select_rest_python.bat  0011
+
+名称: 【周线行情-时间】  索引值:0012   【把索引作为起始点 执行之后所有的代码更新及操作】
+zstock_tushare_tool_J0.bat  0012_rest  &&   C:\Users\zhuzj5\Desktop\zbin\J0_Python\J0_0000_call_select_rest_python.bat  0012
+
+名称: 【月线行情-时间】  索引值:0013   【把索引作为起始点 执行之后所有的代码更新及操作】
+zstock_tushare_tool_J0.bat  0013_rest  &&   C:\Users\zhuzj5\Desktop\zbin\J0_Python\J0_0000_call_select_rest_python.bat  0013
+
+名称: 【复权因子】  索引值:0014   【把索引作为起始点 执行之后所有的代码更新及操作】
+zstock_tushare_tool_J0.bat  0014_rest  &&   C:\Users\zhuzj5\Desktop\zbin\J0_Python\J0_0000_call_select_rest_python.bat  0014
+
+名称: 【每日停复牌信息】  索引值:0015   【把索引作为起始点 执行之后所有的代码更新及操作】
+zstock_tushare_tool_J0.bat  0015_rest  &&   C:\Users\zhuzj5\Desktop\zbin\J0_Python\J0_0000_call_select_rest_python.bat  0015
+
+名称: 【每日指标】  索引值:0016   【把索引作为起始点 执行之后所有的代码更新及操作】
+zstock_tushare_tool_J0.bat  0016_rest  &&   C:\Users\zhuzj5\Desktop\zbin\J0_Python\J0_0000_call_select_rest_python.bat  0016
+
+名称: 【个股资金流量】  索引值:0017   【把索引作为起始点 执行之后所有的代码更新及操作】
+zstock_tushare_tool_J0.bat  0017_rest  &&   C:\Users\zhuzj5\Desktop\zbin\J0_Python\J0_0000_call_select_rest_python.bat  0017
+
+名称: 【每日涨跌停价格】  索引值:0018   【把索引作为起始点 执行之后所有的代码更新及操作】
+zstock_tushare_tool_J0.bat  0018_rest  &&   C:\Users\zhuzj5\Desktop\zbin\J0_Python\J0_0000_call_select_rest_python.bat  0018
+
+名称: 【每日涨跌停统计】  索引值:0019   【把索引作为起始点 执行之后所有的代码更新及操作】
+zstock_tushare_tool_J0.bat  0019_rest  &&   C:\Users\zhuzj5\Desktop\zbin\J0_Python\J0_0000_call_select_rest_python.bat  0019
+
+名称: 【沪深港通资金流向】  索引值:0020   【把索引作为起始点 执行之后所有的代码更新及操作】
+zstock_tushare_tool_J0.bat  0020_rest  &&   C:\Users\zhuzj5\Desktop\zbin\J0_Python\J0_0000_call_select_rest_python.bat  0020
+
+名称: 【沪深通十大成交股】  索引值:0021   【把索引作为起始点 执行之后所有的代码更新及操作】
+zstock_tushare_tool_J0.bat  0021_rest  &&   C:\Users\zhuzj5\Desktop\zbin\J0_Python\J0_0000_call_select_rest_python.bat  0021
+
+名称: 【沪股通持股明细】  索引值:0022   【把索引作为起始点 执行之后所有的代码更新及操作】
+zstock_tushare_tool_J0.bat  0022_rest  &&   C:\Users\zhuzj5\Desktop\zbin\J0_Python\J0_0000_call_select_rest_python.bat  0022
+
+名称: 【港股通每日成交统计】  索引值:0023   【把索引作为起始点 执行之后所有的代码更新及操作】
+zstock_tushare_tool_J0.bat  0023_rest  &&   C:\Users\zhuzj5\Desktop\zbin\J0_Python\J0_0000_call_select_rest_python.bat  0023
+
+名称: 【利润表】  索引值:0025   【把索引作为起始点 执行之后所有的代码更新及操作】
+zstock_tushare_tool_J0.bat  0025_rest  &&   C:\Users\zhuzj5\Desktop\zbin\J0_Python\J0_0000_call_select_rest_python.bat  0025
+
+名称: 【资产负债表】  索引值:0026   【把索引作为起始点 执行之后所有的代码更新及操作】
+zstock_tushare_tool_J0.bat  0026_rest  &&   C:\Users\zhuzj5\Desktop\zbin\J0_Python\J0_0000_call_select_rest_python.bat  0026
+
+名称: 【现金流量表】  索引值:0027   【把索引作为起始点 执行之后所有的代码更新及操作】
+zstock_tushare_tool_J0.bat  0027_rest  &&   C:\Users\zhuzj5\Desktop\zbin\J0_Python\J0_0000_call_select_rest_python.bat  0027
+
+名称: 【业绩快报】  索引值:0028   【把索引作为起始点 执行之后所有的代码更新及操作】
+zstock_tushare_tool_J0.bat  0028_rest  &&   C:\Users\zhuzj5\Desktop\zbin\J0_Python\J0_0000_call_select_rest_python.bat  0028
+
+名称: 【分红送股数据】  索引值:0029   【把索引作为起始点 执行之后所有的代码更新及操作】
+zstock_tushare_tool_J0.bat  0029_rest  &&   C:\Users\zhuzj5\Desktop\zbin\J0_Python\J0_0000_call_select_rest_python.bat  0029
+
+名称: 【分红送股数据】  索引值:0030   【把索引作为起始点 执行之后所有的代码更新及操作】
+zstock_tushare_tool_J0.bat  0030_rest  &&   C:\Users\zhuzj5\Desktop\zbin\J0_Python\J0_0000_call_select_rest_python.bat  0030
+
+名称: 【财务指标数据】  索引值:0031   【把索引作为起始点 执行之后所有的代码更新及操作】
+zstock_tushare_tool_J0.bat  0031_rest  &&   C:\Users\zhuzj5\Desktop\zbin\J0_Python\J0_0000_call_select_rest_python.bat  0031
+
+名称: 【财务审计意见】  索引值:0032   【把索引作为起始点 执行之后所有的代码更新及操作】
+zstock_tushare_tool_J0.bat  0032_rest  &&   C:\Users\zhuzj5\Desktop\zbin\J0_Python\J0_0000_call_select_rest_python.bat  0032
+
+名称: 【主营业务构成】  索引值:0033   【把索引作为起始点 执行之后所有的代码更新及操作】
+zstock_tushare_tool_J0.bat  0033_rest  &&   C:\Users\zhuzj5\Desktop\zbin\J0_Python\J0_0000_call_select_rest_python.bat  0033
+
+名称: 【财报披露日期标】  索引值:0034   【把索引作为起始点 执行之后所有的代码更新及操作】
+zstock_tushare_tool_J0.bat  0034_rest  &&   C:\Users\zhuzj5\Desktop\zbin\J0_Python\J0_0000_call_select_rest_python.bat  0034
+
+名称: 【港股通十大成交股】  索引值:0036   【把索引作为起始点 执行之后所有的代码更新及操作】
+zstock_tushare_tool_J0.bat  0036_rest  &&   C:\Users\zhuzj5\Desktop\zbin\J0_Python\J0_0000_call_select_rest_python.bat  0036
+
+名称: 【融资融券交易汇总】  索引值:0037   【把索引作为起始点 执行之后所有的代码更新及操作】
+zstock_tushare_tool_J0.bat  0037_rest  &&   C:\Users\zhuzj5\Desktop\zbin\J0_Python\J0_0000_call_select_rest_python.bat  0037
+
+名称: 【龙虎榜机构信息】  索引值:0038   【把索引作为起始点 执行之后所有的代码更新及操作】
+zstock_tushare_tool_J0.bat  0038_rest  &&   C:\Users\zhuzj5\Desktop\zbin\J0_Python\J0_0000_call_select_rest_python.bat  0038
+
+名称: 【前十大股东】  索引值:0039   【把索引作为起始点 执行之后所有的代码更新及操作】
+zstock_tushare_tool_J0.bat  0039_rest  &&   C:\Users\zhuzj5\Desktop\zbin\J0_Python\J0_0000_call_select_rest_python.bat  0039
+
+名称: 【前十大流通股】  索引值:0040   【把索引作为起始点 执行之后所有的代码更新及操作】
+zstock_tushare_tool_J0.bat  0040_rest  &&   C:\Users\zhuzj5\Desktop\zbin\J0_Python\J0_0000_call_select_rest_python.bat  0040
+
+名称: 【龙虎榜每日信息】  索引值:0041   【把索引作为起始点 执行之后所有的代码更新及操作】
+zstock_tushare_tool_J0.bat  0041_rest  &&   C:\Users\zhuzj5\Desktop\zbin\J0_Python\J0_0000_call_select_rest_python.bat  0041
+
+名称: 【龙虎榜机构信息】  索引值:0042   【把索引作为起始点 执行之后所有的代码更新及操作】
+zstock_tushare_tool_J0.bat  0042_rest  &&   C:\Users\zhuzj5\Desktop\zbin\J0_Python\J0_0000_call_select_rest_python.bat  0042
+
+名称: 【股权质押统计明细】  索引值:0043   【把索引作为起始点 执行之后所有的代码更新及操作】
+zstock_tushare_tool_J0.bat  0043_rest  &&   C:\Users\zhuzj5\Desktop\zbin\J0_Python\J0_0000_call_select_rest_python.bat  0043
+
+名称: 【股权质押明细】  索引值:0044   【把索引作为起始点 执行之后所有的代码更新及操作】
+zstock_tushare_tool_J0.bat  0044_rest  &&   C:\Users\zhuzj5\Desktop\zbin\J0_Python\J0_0000_call_select_rest_python.bat  0044
+
+名称: 【股票回购】  索引值:0045   【把索引作为起始点 执行之后所有的代码更新及操作】
+zstock_tushare_tool_J0.bat  0045_rest  &&   C:\Users\zhuzj5\Desktop\zbin\J0_Python\J0_0000_call_select_rest_python.bat  0045
+
+名称: 【概念股分类】  索引值:0046   【把索引作为起始点 执行之后所有的代码更新及操作】
+zstock_tushare_tool_J0.bat  0046_rest  &&   C:\Users\zhuzj5\Desktop\zbin\J0_Python\J0_0000_call_select_rest_python.bat  0046
+
+名称: 【概念股列表】  索引值:0047   【把索引作为起始点 执行之后所有的代码更新及操作】
+zstock_tushare_tool_J0.bat  0047_rest  &&   C:\Users\zhuzj5\Desktop\zbin\J0_Python\J0_0000_call_select_rest_python.bat  0047
+
+名称: 【限售股解禁】  索引值:0048   【把索引作为起始点 执行之后所有的代码更新及操作】
+zstock_tushare_tool_J0.bat  0048_rest  &&   C:\Users\zhuzj5\Desktop\zbin\J0_Python\J0_0000_call_select_rest_python.bat  0048
+
+名称: 【大宗交易】  索引值:0049   【把索引作为起始点 执行之后所有的代码更新及操作】
+zstock_tushare_tool_J0.bat  0049_rest  &&   C:\Users\zhuzj5\Desktop\zbin\J0_Python\J0_0000_call_select_rest_python.bat  0049
+
+名称: 【股东人数】  索引值:0050   【把索引作为起始点 执行之后所有的代码更新及操作】
+zstock_tushare_tool_J0.bat  0050_rest  &&   C:\Users\zhuzj5\Desktop\zbin\J0_Python\J0_0000_call_select_rest_python.bat  0050
+
+名称: 【股东增减持】  索引值:0051   【把索引作为起始点 执行之后所有的代码更新及操作】
+zstock_tushare_tool_J0.bat  0051_rest  &&   C:\Users\zhuzj5\Desktop\zbin\J0_Python\J0_0000_call_select_rest_python.bat  0051
+
+
+
+
+ ________________________________________________ 初始化所有数据集合操作 ________________________________________________ 
+描述:  初始化执行所有 python文件的更新 并 按照次序执行 更新后的 python 拉取数据的代码! 
+zstock_tushare_tool_J0.bat  all &&   C:\Users\zhuzj5\Desktop\zbin\J0_Python\J0_0000_call_all_python.bat
+
+═══════════════════使用方法列表 End ═══════════════════
+

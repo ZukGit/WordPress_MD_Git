@@ -83,7 +83,7 @@ def createexcel(filename):    ### 创建本地文件名称为 filename的文件
     wb = Workbook()
     curPath = os.path.abspath('.')
     cur_desktop_path=os.path.join(os.path.expanduser("~"), 'Desktop')
-    curDir = cur_desktop_path+os.sep+"zbin"+os.sep+"J0"+os.sep  ## 创建~/Desktop/zbin/J0 这个 这个工作目录
+    curDir = cur_desktop_path+os.sep+"zbin"+os.sep+"J0_Data"+os.sep  ## 创建~/Desktop/zbin/J0_Data 这个 这个工作目录
     #curDir = curPath+os.sep
     if not os.path.exists(curDir):
         os.makedirs(curDir)
@@ -114,6 +114,25 @@ def getColumnIndex(table, columnName):   ## 返回 table 中 名称为  columnNa
 
 
 
+############################## Prop初始化 Begin ##############################
+
+#
+#Thu Aug 13 22:33:45 CST 2020
+#rixianhangqing-time_record_date=20200707
+#rixianhangqing-time_start_date=20010101
+
+desktop_path = os.path.join(os.path.expanduser("~"), 'Desktop')
+zbin_path = str(desktop_path)+os.sep+"zbin"
+j0_properties_path= str(zbin_path)+os.sep+"J0.properties"
+print("desktop_path = "+ str(desktop_path))
+print("zbin_path = "+ str(zbin_path))
+print("j0_properties_path = "+ str(j0_properties_path))
+J0_PROPS =  Properties(j0_properties_path)
+
+
+############################## Prop初始化 End ##############################
+
+
 ############## tscode_股票列表的初始化  Begin ##############
 #封装函数    https://blog.csdn.net/weixin_41267342/article/details/86634007
 def init_tscode_data(book_name, sheet_name,ts_code_set,tscode_name_dict):
@@ -136,7 +155,7 @@ def init_tscode_data(book_name, sheet_name,ts_code_set,tscode_name_dict):
 
 tscode_set = set()    #### 股票代码的集合   000001.SZ   .... 999999.SH
 tscode_name_dict = dict()  #### code-name 的 map的集合
-init_tscode_data("股票列表.xlsx","股票列表",tscode_set,tscode_name_dict)
+init_tscode_data(zbin_path+os.sep+"J0_Python"+os.sep+"J0_股票列表.xlsx","股票列表",tscode_set,tscode_name_dict)
 ############## tscode_股票列表的初始化  End  ##############
 
 
@@ -158,23 +177,7 @@ print("now_yyyymmdd = "+ str(now_yyyymmdd))
 ############################## 时间Date End ##############################
 
 
-############################## Prop初始化 Begin ##############################
 
-#
-#Thu Aug 13 22:33:45 CST 2020
-#rixianhangqing-time_record_date=20200707
-#rixianhangqing-time_start_date=20010101
-
-desktop_path = os.path.join(os.path.expanduser("~"), 'Desktop')
-zbin_path = str(desktop_path)+os.sep+"zbin"
-j0_properties_path= str(zbin_path)+os.sep+"J0.properties"
-print("desktop_path = "+ str(desktop_path))
-print("zbin_path = "+ str(zbin_path))
-print("j0_properties_path = "+ str(j0_properties_path))
-J0_PROPS =  Properties(j0_properties_path)
-
-
-############################## Prop初始化 End ##############################
 
 
 pro = ts.pro_api('43acb9a5ddc2cf73c6c4ea54796748f965457ed57daaa736bb778ea2')

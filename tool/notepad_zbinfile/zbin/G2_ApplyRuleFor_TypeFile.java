@@ -2356,7 +2356,7 @@ public class G2_ApplyRuleFor_TypeFile {
                     Cur_Bat_Name + " jpg_7_good  [索引7]   // 把当前目录下的 jpg文件 解密 \n" +
                     Cur_Bat_Name + " *_7_bad  [索引7]   // 把当前目录所有文件进行加密  加密文件在新的 时间戳文件夹中 \n" +
                     Cur_Bat_Name + " *_7_good  [索引7]   // 把当前目录所有文件进行解密  解密文件在新的 时间戳文件夹中 \n"+
-                    Cur_Bat_Name + " #_7_bad_batch   [索引7]   // 把当前目录所有文件进行加密  加密文件在新的【 固定文件夹 bad_batch 】中 适合批量处理 " +
+                    Cur_Bat_Name + " #_7_bad_batch   [索引7]   // 把当前目录所有文件进行加密  加密文件在新的【 固定文件夹 bad_batch 】中 适合批量处理 \n" +
                     Cur_Bat_Name + " *_7_good_batch   [索引7]   // 把当前目录所有文件进行解密 解密文件在新的【 固定文件夹 good_batch 】中 适合批量处理 " +
                     "\n" ;
 

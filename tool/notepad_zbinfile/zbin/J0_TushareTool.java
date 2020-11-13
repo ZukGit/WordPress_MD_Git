@@ -3,7 +3,6 @@ import com.google.common.collect.Maps;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import sun.reflect.generics.tree.Tree;
 
 import javax.swing.*;
 import java.io.*;
@@ -47,8 +46,18 @@ public class J0_TushareTool {
 //固定1  zbin 的 字符串绝对路径
     static String zbinPath = System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin";
 
-    static String J0_Dir_Path = System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin"+File.separator+"J0"+File.separator;
+    static String J0_Dir_Path = System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin"+File.separator+"J0_Data"+File.separator;
+    static String J0_Python_Dir_Path = System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin"+File.separator+"J0_Python"+File.separator;
+    static String J0_call_all_python_bat = System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin"+File.separator+"J0_0000_call_all_python.bat";
+    static String J0_call_select_rest_python_bat = System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin"+File.separator+"J0_0000_call_select_rest_python.bat";
+    static String J0_call_select_single_python_bat = System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin"+File.separator+"J0_0000_call_select_single_python.bat";
+   static File J0_call_all_python_bat_File ;
+    static File J0_call_rest_python_bat_File ;
+    static File J0_call_single_python_bat_File ;
 
+
+    static String J0_GuPiaoLieBiao_Path = zbinPath+File.separator+"J0_股票列表.xlsx";
+    static String J0_JiaoYiRiQi_Path = zbinPath+File.separator+"J0_交易日历.xlsx";
 
 
     static String cur_os_zbinPath;
@@ -229,6 +238,59 @@ public class J0_TushareTool {
 
     static {
         try {
+
+            File J0_Dir_Path_File = new File(J0_Dir_Path);
+            File J0_Python_Dir_Path_File = new File(J0_Python_Dir_Path);
+
+
+            File J0_GuPiaoLieBiao_Path_File  = new File( J0_GuPiaoLieBiao_Path);
+            File J0_JiaoYiRiQi_Path_File  = new File( J0_JiaoYiRiQi_Path);
+
+
+            if (!J0_Dir_Path_File.exists()) {
+                J0_Dir_Path_File.mkdirs();
+            }
+
+
+            if (!J0_Python_Dir_Path_File.exists()) {
+                J0_Python_Dir_Path_File.mkdirs();
+
+            }
+
+
+
+            File python_call_all_bat  = new File( J0_call_all_python_bat);
+            File python_call_bat_windows  = new File( J0_Python_Dir_Path_File + File.separator + python_call_all_bat.getName());
+            fileCopy(python_call_all_bat,python_call_bat_windows);  // 把 全局调用当前的 python文件的 .bat 文件复制到 当前 python 目录 方便 调试
+            J0_call_all_python_bat_File = python_call_bat_windows;
+
+            File python_call_rest_bat  = new File( J0_call_select_rest_python_bat);
+            File python_call_rest_bat_windows  = new File( J0_Python_Dir_Path_File + File.separator + python_call_rest_bat.getName());
+            fileCopy(python_call_rest_bat,python_call_rest_bat_windows);  // 把 全局调用当前的 python文件的 .bat 文件复制到 当前 python 目录 方便 调试
+            J0_call_rest_python_bat_File = python_call_rest_bat_windows;
+
+
+            File python_call_single_bat  = new File( J0_call_select_single_python_bat);
+            File python_call_single_bat_windows  = new File( J0_Python_Dir_Path_File + File.separator + python_call_single_bat.getName());
+            fileCopy(python_call_single_bat,python_call_single_bat_windows);  // 把 全局调用当前的 python文件的 .bat 文件复制到 当前 python 目录 方便 调试
+            J0_call_single_python_bat_File =  python_call_single_bat_windows;
+
+
+
+            if (J0_GuPiaoLieBiao_Path_File.exists() ) {
+                File python_GuPiaoLieBiao_Path_File  = new File( J0_Python_Dir_Path_File + File.separator + J0_GuPiaoLieBiao_Path_File.getName());
+                fileCopy(J0_GuPiaoLieBiao_Path_File,python_GuPiaoLieBiao_Path_File);  // 把 全局调用当前的 python文件的 .bat 文件复制到 当前 python 目录 方便 调试
+            }
+
+            if (J0_JiaoYiRiQi_Path_File.exists() ) {
+                File python_JiaoYiRiQi_Path_File  = new File( J0_Python_Dir_Path_File + File.separator + J0_JiaoYiRiQi_Path_File.getName());
+                fileCopy(J0_JiaoYiRiQi_Path_File,python_JiaoYiRiQi_Path_File);  // 把 全局调用当前的 python文件的 .bat 文件复制到 当前 python 目录 方便 调试
+            }
+
+
+
+
+
             if (!J0_Properties_File.exists()) {
                 J0_Properties_File.createNewFile();
             }
@@ -248,7 +310,7 @@ public class J0_TushareTool {
         }
     }
 
-
+    @SuppressWarnings("unchecked")
     static void setProperity() {
         try {
 
@@ -285,8 +347,14 @@ public class J0_TushareTool {
                     CUR_Dir_1_PATH = args[i];
                 } else if (i == 1) {  // 第二个参数是用来 对 当前功能进行分类使用的
                     CUR_TYPE_2_ParamsStr = args[i];
+
+                   int pythonType =   getPythonOperationType(CUR_TYPE_2_ParamsStr);
+                   PythonType_Input =   pythonType;
                     //   计算得到 当前 索引的列表   首先遇到的第一个数字类型  1_2112  那就是索引1  附带参数 2112   temp_2_
                     int userSelectedIndex = calculInputTypeIndex(CUR_TYPE_2_ParamsStr);
+                    PythonItem_Index = userSelectedIndex;
+
+                    System.out.println("userSelectedIndex = "+ userSelectedIndex);
                     if (userSelectedIndex != 0 && userSelectedIndex != CUR_TYPE_INDEX) {
                         // 如果 当前 的操作规则 不是 0   并且 操作索引 和当前 索引 不一样  那么就寻找赋值给  CUR_TYPE_INDEX
                         CUR_TYPE_INDEX = userSelectedIndex;
@@ -332,23 +400,58 @@ public class J0_TushareTool {
 
 
 
+if(PythonType_Input == 1 ){
 
-        for (int i = 0; i < AllLeafNode.size() ; i++) {
-            TreeNode leafNode = AllLeafNode.get(i);
+    for (int i = 0; i < AllLeafNode.size() ; i++) {
+        TreeNode leafNode = AllLeafNode.get(i);
+        ArrayList<String> pythonHeadStrList = ReadFileContentAsList(new File(getNodeHeadFile(leafNode.nodeName)));
+        ArrayList<String> pythonBodyStrList = ReadFileContentAsList(new File(getNodeBodyFilePath(leafNode.nodeName)));
+        System.out.println("Python-Item  = "+ leafNode.nodeName + "  "+((LeafNode)leafNode).leaf_chinese_title);
+        ((LeafNode)leafNode).pyhtonTemplate(pythonHeadStrList,pythonBodyStrList);
+    }
+
+}else if(PythonType_Input == 2 ){
+    for (int i = 0; i < AllLeafNode.size() ; i++) {
+        TreeNode leafNode = AllLeafNode.get(i);
+        int curNodeIndex = leafNode.blockIndex;
+        System.out.println("PythonType_Input = "+ PythonType_Input +   "           PythonItem_Index = "+ PythonItem_Index);
+
+        if(curNodeIndex >= PythonItem_Index  ){
             ArrayList<String> pythonHeadStrList = ReadFileContentAsList(new File(getNodeHeadFile(leafNode.nodeName)));
             ArrayList<String> pythonBodyStrList = ReadFileContentAsList(new File(getNodeBodyFilePath(leafNode.nodeName)));
             System.out.println("Python-Item  = "+ leafNode.nodeName + "  "+((LeafNode)leafNode).leaf_chinese_title);
             ((LeafNode)leafNode).pyhtonTemplate(pythonHeadStrList,pythonBodyStrList);
-
         }
 
+    }
+} else if(PythonType_Input == 3 ){
+    System.out.println("PythonType_Input = "+ PythonType_Input +   "           PythonItem_Index = "+ PythonItem_Index);
+    for (int i = 0; i < AllLeafNode.size() ; i++) {
+        TreeNode leafNode = AllLeafNode.get(i);
+        int curNodeIndex = leafNode.blockIndex;
+        if(curNodeIndex == PythonItem_Index  ){
 
+            ArrayList<String> pythonHeadStrList = ReadFileContentAsList(new File(getNodeHeadFile(leafNode.nodeName)));
+            ArrayList<String> pythonBodyStrList = ReadFileContentAsList(new File(getNodeBodyFilePath(leafNode.nodeName)));
+            System.out.println("Python-Item  = "+ leafNode.nodeName + "  "+((LeafNode)leafNode).leaf_chinese_title);
+            ((LeafNode)leafNode).pyhtonTemplate(pythonHeadStrList,pythonBodyStrList);
+        }
 
     }
 
 
 
+}
 
+
+
+
+ }
+
+
+
+
+    // 读取 J0_treedata.txt   形成树型Node
     static void initTreeData() {
         File treeDataFile = new File(TreeDataPath);
 
@@ -614,7 +717,7 @@ public class J0_TushareTool {
     void InitRule() {
 
         //   加入类型一一对应的 那些 规则
-        CUR_RULE_LIST.add(new MergeMP4_Rule_1());
+        CUR_RULE_LIST.add(new Operation_tip_Rule_1());
 //        CUR_RULE_LIST.add( new File_Name_Rule_2());
 //        CUR_RULE_LIST.add( new Image2Jpeg_Rule_3());
 //        CUR_RULE_LIST.add( new Image2Png_Rule_4());
@@ -628,16 +731,18 @@ public class J0_TushareTool {
 
     // boolean  isInputDirAsSearchPoint(默认为false) = true  First_Input_Dir存在时
 // 标识当前是以 输入参数构造的路径为上搜索起点路径  而不再以 shell目录为 搜索目录
-    class MergeMP4_Rule_1 extends Basic_Rule {
+
+
+    class Operation_tip_Rule_1 extends Basic_Rule {
         ArrayList<File> curInputFileList;
 
-        MergeMP4_Rule_1(boolean mIsInputDirAsSearchPoint) {
+        Operation_tip_Rule_1(boolean mIsInputDirAsSearchPoint) {
             super(1);
             curInputFileList = new ArrayList<File>();
             isInputDirAsSearchPoint = mIsInputDirAsSearchPoint;
         }
 
-        MergeMP4_Rule_1() {
+        Operation_tip_Rule_1() {
             super(1);
             curInputFileList = new ArrayList<File>();
         }
@@ -689,12 +794,78 @@ public class J0_TushareTool {
         String ruleTip(String type, int index, String batName, OS_TYPE curType) {
             String itemDesc = "";
             if (curType == OS_TYPE.Windows) {
-                itemDesc = batName.trim() + "  " + type + "_" + index + "    [索引 " + index + "]  描述:" + simpleDesc();
+                itemDesc =   buildTip();
+
             } else {
                 itemDesc = batName.trim() + " " + type + "_" + index + "    [索引 " + index + "]  描述:" + simpleDesc();
             }
 
             return itemDesc;
+        }
+
+
+        String  buildTip(){
+            StringBuilder sb = new StringBuilder();
+            String LinePre = "\n ________________________________________________ ";
+            String LineEnd = " ________________________________________________ \n";
+
+
+
+
+            sb.append(LinePre+"指定单个索引节点 仅执行一个"+LineEnd);
+
+//            sb.append("描述: "+" 依据索引对该索引对应的python文件进行创建 并 执行该python文件    单个文件的更新执行!\n");
+//            sb.append(Cur_Bat_Name+"  all &&  " + " "+ J0_call_single_python_bat_File.getAbsolutePath() );
+
+            for (int i = 0; i < AllLeafNode.size(); i++) {
+                TreeNode single_node = AllLeafNode.get(i);
+                int nodeIndex = single_node.blockIndex;  // 1
+                String paddingIndexStr= single_node.paddingBlockIndexStr;    // 0001
+                String single_block= paddingIndexStr + "_single";
+                String desc = getNodeDescWithName(single_node.nodeName,paddingIndexStr,true);
+                sb.append(desc+"\n");
+                sb.append(Cur_Bat_Name+ "  "+single_block+" &&  " + " "+ J0_call_single_python_bat_File.getAbsolutePath()  +"  "+ paddingIndexStr+"\n");
+                sb.append("\n");
+            }
+
+
+            sb.append("\n");
+
+
+            sb.append(LinePre+"指定起始索引节点 数据集合操作"+LineEnd);
+
+            for (int i = 0; i < AllLeafNode.size(); i++) {
+                TreeNode single_node = AllLeafNode.get(i);
+                int nodeIndex = single_node.blockIndex;  // 1
+                String paddingIndexStr= single_node.paddingBlockIndexStr;    // 0001
+                String single_block= paddingIndexStr + "_rest";
+                String desc = getNodeDescWithName(single_node.nodeName,paddingIndexStr,false);
+                sb.append(desc+"\n");
+                sb.append(Cur_Bat_Name+ "  "+single_block+"  &&  " + " "+ J0_call_rest_python_bat_File.getAbsolutePath()  +"  "+ paddingIndexStr+"\n");
+                sb.append("\n");
+            }
+
+
+            sb.append("\n");
+//
+//            sb.append("描述: "+" 按照给定的索引为起始索引 生成 python代码 并 执行 该后续python 代码  多文件的更新执行 \n");
+//            sb.append(Cur_Bat_Name+"  all &&  " + " "+ J0_call_rest_python_bat_File.getAbsolutePath() );
+
+
+            sb.append("\n");
+
+            sb.append(LinePre+"初始化所有数据集合操作"+LineEnd);
+            sb.append("描述: "+" 初始化执行所有 python文件的更新 并 按照次序执行 更新后的 python 拉取数据的代码! \n");
+            sb.append(Cur_Bat_Name+"  all &&  " + " "+ J0_call_all_python_bat_File.getAbsolutePath() );
+
+
+
+
+
+            return     sb.toString();
+
+
+
         }
     }
 
@@ -1119,6 +1290,24 @@ public class J0_TushareTool {
         }
         System.out.println("═══════════════════" + "使用方法列表 End " + "═══════════════════" + "\n");
 
+    }
+
+
+
+    static int getPythonOperationType(String inputParams) {
+        if (inputParams == null) {
+            return 0;
+        }
+
+        if(inputParams.contains("all")){
+            return 1;
+        }else if(inputParams.contains("rest")){
+            return 2;
+        }else if(inputParams.contains("single")){
+            return 3;
+        }
+
+        return 0;
     }
 
 
@@ -2022,6 +2211,20 @@ public class J0_TushareTool {
     }
 
 
+    // 输入的 PythonType_Input 操作类型
+    // 0  默认值   直接打印 tip
+    // 1 == all    // 标识当前 执行 所有的 数据操作
+    // 2 == rest   //  标识当前 执行指定 索引 及其 后的 数据操作
+    // 3== single 标识当前只是单一的索引操作
+
+
+   static int PythonType_Input = 0 ;
+
+
+    // 当前 用户选择的 当前的 指定的 索引  默认为 0
+    static int PythonItem_Index = 0;
+
+
     public static void main(String[] args) {
 
         initSystemInfo();
@@ -2030,42 +2233,66 @@ public class J0_TushareTool {
         initInputParams(args);
 
 
-        initTreeData();
-        initTradeDayList();
-        SH_Tomorrow_WorkTrade_Day_Int = getTomorrowTradeDay(SH_Last_Trade_Day_Int);
-        initTsCodeList();
-
 
 
 /*
+       //  输出 当前股票列表
         for (int i = 0; i < TScode_List.size() ; i++) {
             System.out.println("tscode["+i+"] = "+TScode_List.get(i));
         }
 */
 
 
-        makePythonFileFromLeafNode();
+        initTreeData();
+
+        System.out.println("PythonItem_Index = "+ PythonItem_Index);
+        System.out.println("PythonType_Input = "+ PythonType_Input);
+
+        if(PythonType_Input != 0){
+            initTsCodeList();
+            initTradeDayList();
+        }
+
+        SH_Tomorrow_WorkTrade_Day_Int = getTomorrowTradeDay(SH_Last_Trade_Day_Int);
 
 
         J0_TushareTool mJ0_Object = new J0_TushareTool();
         mJ0_Object.InitRule();
 
-
         // 用户没有输入参数
-        if (CUR_INPUT_3_ParamStrList.size() == 0 && !allowEmptyInputParam) {
+        if (CUR_INPUT_3_ParamStrList.size() == 0 && !allowEmptyInputParam && PythonType_Input == 0) {
             showTip();
             return;
         }
 
-        //   默认的索引同时也被修改  没有获得 当前 适配的规则索引
-        if (CUR_TYPE_INDEX <= 0 || CUR_TYPE_INDEX > CUR_RULE_LIST.size()) {
-            showNoTypeTip(CUR_TYPE_INDEX);
-            return;
+ //   默认的索引同时也被修改  没有获得 当前 适配的规则索引
+//        if (CUR_TYPE_INDEX <= 0 || CUR_TYPE_INDEX > CUR_RULE_LIST.size()) {
+//            showNoTypeTip(CUR_TYPE_INDEX);
+//            return;
+//        }
+
+
+
+
+
+
+        // 没有参数的执行 那么就 出事啊 所有的 python 类 并给出 调用 所有的python的批处理bat
+// 1. 可选 执行  哪一个项的 更新文件   项 是以 block_index 为依据
+// 2. only all 分别表示
+// only-只执行该次的python代码更新 其后面的python代码不运行
+// all-标识 当前代码进行更新 其后代码不更新, 但 python后的代码要一起运行
+        if(PythonType_Input != 0){
+            makePythonFileFromLeafNode();    // 当前创建 python的代码 需要索引来 处理了
         }
 
 
-        CUR_Selected_Rule = getRuleByIndex(CUR_TYPE_INDEX);  //  获取用户选中的 规则
 
+
+
+
+/*
+
+        CUR_Selected_Rule = getRuleByIndex(CUR_TYPE_INDEX);  //  获取用户选中的 规则
 
         // 让各个规则自己去检测 自己需要的参数是否得到满足 并自己提示  给出 1.当前cmd路径下的文件  2.typeIndex 字符串   3.之后的输入参数
         if (CUR_Selected_Rule == null || !CUR_Selected_Rule.checkParamsOK(CUR_Dir_FILE, CUR_TYPE_2_ParamsStr, CUR_INPUT_3_ParamStrList)) {
@@ -2073,6 +2300,7 @@ public class J0_TushareTool {
             return;
         }
 
+*/
 
         if (!CUR_Dir_FILE.exists() || !CUR_Dir_FILE.isDirectory()) {
             System.out.println("当前执行替换逻辑的文件路径:" + CUR_Dir_1_PATH + "  不存在! ");
@@ -2088,7 +2316,8 @@ public class J0_TushareTool {
 */
 
 
-        CUR_Selected_Rule.operationRule(CUR_INPUT_3_ParamStrList);  // 传递参数列表 进行处理
+//        CUR_Selected_Rule.operationRule(CUR_INPUT_3_ParamStrList);  // 传递参数列表 进行处理
+
         RestoreProp_TreeNode();
         setProperity();
     }
@@ -2116,9 +2345,9 @@ public class J0_TushareTool {
         for (int i = 0; i < fileContentList.size(); i++) {
             String lineStr = fileContentList.get(i).trim();
 
-            if (lineStr.startsWith("ZENDZ")) {
+            if (lineStr.startsWith("ZENDZ")) {  // ZENDZ 标识 读取 结束
                 return blockList;
-            } else if ("".equals(lineStr) && block.size() >= 1) {
+            } else if ("".equals(lineStr) && block.size() >= 1) {    // 如果读取到 空 行 那么 说明 是一个 Item 项  保存它 起始新的 项
 
                 blockList.add(block);
                 block = new ArrayList<String>();
@@ -2128,7 +2357,7 @@ public class J0_TushareTool {
                 if ("".equals(lineStr)) {
                     continue;
                 }
-                block.add(lineStr);
+                block.add(lineStr);   // 如果当前 不是空行  block.size() 为0  那么 添加它到 blockList
 
             }
 
@@ -2140,6 +2369,7 @@ public class J0_TushareTool {
 
 
     // ArrayList<TreeNode> inputParentNodeList,
+    @SuppressWarnings("unchecked")
     TreeNode CreateNode(ArrayList<String> mParamBlock ,int index) {
         TreeNode curNode = null;
         if (mParamBlock == null || mParamBlock.size() == 0) {
@@ -2329,6 +2559,7 @@ public class J0_TushareTool {
 
         }
         curNode.blockIndex = index;
+        curNode.paddingBlockIndexStr =  getPaddingIntString(curNode.blockIndex,4,"0",true);
         AllNodeList.add(curNode);
         return curNode;
     }
@@ -2616,8 +2847,14 @@ public class J0_TushareTool {
 
 
             ArrayList<String> allCodeList = new   ArrayList<String>();
-            allCodeList.addAll(headTemplateList);
-            allCodeList.addAll(bodyTemplateList);
+            if(headTemplateList != null){
+                allCodeList.addAll(headTemplateList);
+            }
+
+            if(bodyTemplateList != null){
+                allCodeList.addAll(bodyTemplateList);
+            }
+
             Map<String,ArrayList<String>>  curTemplateMap =Maps.newLinkedHashMap();
 
             ArrayList<String> firstDefineList = new   ArrayList<String>();
@@ -2714,6 +2951,7 @@ boolean isOperationType4_Wtrade_date(ArrayList<String> fieldParamList){
 }
 
         //            ts_code='000001.SZ', start_date='', end_date=datestr
+        @SuppressWarnings("unchecked")
         int  isOperationType3_Xmstart_date( ArrayList<String> fieldParamList  ){
             int resultSpaceMonth = 0;
             for (int i = 0; i < fieldParamList.size(); i++) {
@@ -2730,6 +2968,7 @@ boolean isOperationType4_Wtrade_date(ArrayList<String> fieldParamList){
             return resultSpaceMonth;
         }
 
+        @SuppressWarnings("unchecked")
         void   pyhtonTemplate(ArrayList<String> headTemplateList ,ArrayList<String>   bodyTemplateList){
 
             initHoldeMap();
@@ -3101,6 +3340,7 @@ boolean isBegin = ( null == cur_operation_tscode || "".equals(cur_operation_tsco
 
                             if(fixed_recyleCodeItem.contains("【ZHoldPlace_DayMonthIndex_Xinqi】")){
                                 fixed_recyleCodeItem =     fixed_recyleCodeItem.replace("【ZHoldPlace_DayMonthIndex_Xinqi】",day_index+"_"+calculXinQi2Chinese(yearInt,monthInt,day_index)+"");
+                                System.out.println("day_index_A2 = "+ day_index);
                             }
 
 
@@ -3161,20 +3401,27 @@ boolean isBegin = ( null == cur_operation_tscode || "".equals(cur_operation_tsco
                     for (int j = 0; j < days_month ; j++) {
                         int day_index = j+1;
                       String curIXinqiStr = calculXinQi2Chinese(yearInt,monthInt,day_index);
+                        System.out.println("curIXinqiStr_A3_1 = "+ curIXinqiStr);
+
                       if("5".equals(curIXinqiStr)){
                           String daystr =  day_index>=10?day_index+"":"0"+day_index;
                           int cur_friday_int_flag = Integer.parseInt(yearStr+monthStr+daystr);
                           if(cur_friday_int_flag > nowIntFlag || cur_friday_int_flag < recordDayFlag ){  // 当大于当前日期 那么不加入到列表
                               continue;
                           }
+                          System.out.println("curIXinqiStr_A3_2 = "+ curIXinqiStr);
                           fridayIntList.add(cur_friday_int_flag);
                       }
-
+                        System.out.println("curIXinqiStr_A3_4 = "+ curIXinqiStr);
 
                     }
                 }
 
+                System.out.println("curIXinqiStr_A3_5_nowIntFlag = "+ nowIntFlag);
+
              Map<Integer,ArrayList<Integer>> year_firday_map = fenlei_for_allFridayArr(fridayIntList);
+
+                System.out.println("curIXinqiStr_A3_6_nowIntFlag = "+ nowIntFlag);
 
                 // 【ZHoldPlace_Year_Int】 替换为当前年份
                 // 【ZHoldPlace_Weekly_Day】   替换为当前 执行的 查询日期
@@ -3581,13 +3828,24 @@ boolean isBegin = ( null == cur_operation_tscode || "".equals(cur_operation_tsco
             System.out.println();
             System.out.println();
             System.out.println();
-            String node_python_file = zbinPath +File.separator+"J0_"+blockIndex+"_"+nodeName+".py";
-            writeContentToFile(new File(node_python_file),codeList);
+
+            File targetPythonCodeFile = getNodePythonFile(this);
+
+            writeContentToFile(targetPythonCodeFile,codeList);
+            // xxxxxxxxxxxxxxxxxx
+            File subCopyFile = new File(J0_Python_Dir_Path + targetPythonCodeFile.getName());
+            fileCopy(targetPythonCodeFile,subCopyFile);
+
+
+            //  执行 python 程序的 操作
         }
+
+
 
 
         // ts_code='000001.SZ', start_date='', end_date=datestr
         // ts_code='【tscode】',start_date='【start_date】',end_date='【end_date】'
+        @SuppressWarnings("unchecked")
         ArrayList<String> calculInputParamList(){
             ArrayList<String> inputParamTemplateList = new ArrayList<String>();
             ArrayList<ArrayList<String>> optionValueList_List = new ArrayList<ArrayList<String>>();
@@ -3702,7 +3960,7 @@ boolean isBegin = ( null == cur_operation_tscode || "".equals(cur_operation_tsco
 
         // ts_code='000001.SZ', start_date='', end_date=datestr
         // ts_code='【tscode】',start_date='【start_date】',end_date='【end_date】'
-
+        @SuppressWarnings("unchecked")
         String calculOneLine_InputParams(ArrayList<String> paramNameList){
             String paramTemplate = "";
 
@@ -3720,6 +3978,7 @@ boolean isBegin = ( null == cur_operation_tscode || "".equals(cur_operation_tsco
         }
 
         @Override
+        @SuppressWarnings("unchecked")
         void initProp( Map<String, String>  propKey2ValueList){
             System.out.println("执行 initProp ! ");
             if(properity_holder_map == null){
@@ -3820,6 +4079,12 @@ boolean isBegin = ( null == cur_operation_tscode || "".equals(cur_operation_tsco
     }
 
 
+    static File getNodePythonFile(TreeNode node){
+        String node_python_file = zbinPath +File.separator+"J0_"+getPaddingIntString(node.blockIndex,4,"0",true)+"_"+node.nodeName+".py";
+//        String node_python_file = zbinPath +File.separator+"J0_"+getPaddingIntString(blockIndex,4,"0",true)+"_"+nodeName+".py";
+        return new File(node_python_file);
+    }
+
     class Common_TreeNode extends TreeNode {
 
         // 把 Prop 数据  过滤到 到  各个 TreeNode 中去
@@ -3841,6 +4106,7 @@ boolean isBegin = ( null == cur_operation_tscode || "".equals(cur_operation_tsco
 
         }
         // 把 TreeNode 中的 Prop数据 覆盖到 系统的 Prop中
+        @SuppressWarnings("unchecked")
         void RestoreToProp( Map<String, String>  propKey2ValueList){
             if(properity_holder_map == null || properity_holder_map.size() == 0){
                 return ;
@@ -3861,6 +4127,7 @@ boolean isBegin = ( null == cur_operation_tscode || "".equals(cur_operation_tsco
 
     abstract class TreeNode {
         int blockIndex;  // 块索引   用于排序
+        String paddingBlockIndexStr;
         boolean isRoot;  // 是否是根节点
         boolean isLeaf;
         String nodeName;  // 结点名称
@@ -4215,8 +4482,7 @@ boolean isBegin = ( null == cur_operation_tscode || "".equals(cur_operation_tsco
         return wb;
     }
 
-    static String J0_GuPiaoLieBiao_Path = zbinPath+File.separator+"J0_股票列表.xlsx";
-    static String J0_JiaoYiRiQi_Path = zbinPath+File.separator+"J0_交易日历.xlsx";
+
 
 
 
@@ -4698,6 +4964,7 @@ boolean isBegin = ( null == cur_operation_tscode || "".equals(cur_operation_tsco
 
   while("6".equals(calculXinQi2Chinese(year,month,sumDays)) || "7".equals(calculXinQi2Chinese(year,month,sumDays))){
     sumDays = sumDays - 1;
+      System.out.println("sumDays_A1 = "+ sumDays);
 }
 
         String monthDesc =  month>=10?month+"":"0"+month;
@@ -4761,6 +5028,8 @@ boolean isBegin = ( null == cur_operation_tscode || "".equals(cur_operation_tsco
         return cur_month_tradeday_map;
 
     }
+
+    // 周五归类
     static Map<Integer,ArrayList<Integer>>  fenlei_for_allFridayArr(  ArrayList<Integer> fridayIntList){
 
         Map<Integer,ArrayList<Integer>> year_friday_map = Maps.newLinkedHashMap();
@@ -4768,6 +5037,8 @@ boolean isBegin = ( null == cur_operation_tscode || "".equals(cur_operation_tsco
             int day = fridayIntList.get(i);
               while(!SH_TradeDayList.contains(day)){   // 20201001 ---- 20201000 20200999  20200930
                   day = day - 1;
+                  System.out.println("SH_TradeDayList.size = "+ SH_TradeDayList.size());
+                  System.out.println("day = "+ day + "   " + getTimeStamp());
               }
 
             int year = Integer.parseInt((""+day).substring(0,4));
@@ -4912,7 +5183,7 @@ boolean isBegin = ( null == cur_operation_tscode || "".equals(cur_operation_tsco
         int xmonth = Integer.parseInt(MonthStr);
         int xday =  Integer.parseInt(DayStr);
         int xinqi = Integer.parseInt(calculXinQi2Chinese(xyear,xmonth,xday));
-
+        System.out.println("xinqi_A4  =  "+xinqi);
         int days_year = getDayForYear(xyear);
 
         Calendar temp_calendar = Calendar.getInstance();
@@ -5128,6 +5399,237 @@ String[] arrStr = codePrams.split(",");
         }
         return bodyPath;
     }
+
+    static  String getNodeDescWithName(String nodeName ,String paddinggIndex , boolean isSingle){
+        StringBuilder  mDescSB = new StringBuilder();
+        mDescSB.append("名称: 【");
+
+        String descType = isSingle?"【对指定索引 单一 single-python进行更新执行!】":"【把索引作为起始点 执行之后所有的代码更新及操作】";
+
+        switch (nodeName){
+
+            //  把 所有的 数据 写入一个 sheet 采用 追加的 read_excel 的方式得到 dataframe
+
+
+
+
+            case "gupiaoliebiao":
+                mDescSB.append("股票列表");
+                break;
+
+
+
+            case "jiaoyirili":
+                mDescSB.append("交易日历");
+                break;
+
+
+            case "gupiaocengyongming":
+                mDescSB.append("股票曾用名");
+                break;
+
+            case "gainiangufenlei":
+                mDescSB.append("概念股分类");
+                break;
+            case "gainianguliebiao":
+                mDescSB.append("概念股列表");
+                break;
+
+                //     Default Over
+
+
+
+            case "gudongrenshu":
+                mDescSB.append("股东人数");
+             break;
+
+            case "guquanzhiyamingxi":
+                mDescSB.append("股权质押明细");
+                break;
+
+            case "guquanzhiyatongjishuju":
+                mDescSB.append("股权质押统计明细");
+                break;
+
+            case "qianshidaliutonggudong":
+                mDescSB.append("前十大流通股");
+                break;
+
+            case "qianshidagudong":
+                mDescSB.append("前十大股东");
+                break;
+            case "caibaopiluriqibiao":   // : Read timed out.    只调用到一次 !  财报披露计划
+                mDescSB.append("财报披露日期标");
+                break;
+
+
+            case "zhuyingyewugoucheng":    // : Read timed out.    一次都没调用到 !  主营业务构成
+                mDescSB.append("主营业务构成");
+                break;
+
+            case "caiwushenjiyijian":    //  每分钟调用2次?   Read timed out  财务审计意见
+                mDescSB.append("财务审计意见");
+                break;
+
+            case "caiwuzhibiaoshuju":
+                mDescSB.append("财务指标数据");
+                break;
+
+            case "fenhongsonggushuju":
+                mDescSB.append("分红送股数据");
+                break;
+
+            case "yejikuaibao":
+                mDescSB.append("分红送股数据");
+                break;
+
+            case "yejiyugao":
+                mDescSB.append("业绩快报");
+                break;
+
+            case "zichanfuzhaibiao":
+                mDescSB.append("资产负债表");
+                break;
+
+            case "xianjinliuliangbiao":
+                mDescSB.append("现金流量表");
+                break;
+
+            case "dazongjiaoyi":
+                mDescSB.append("大宗交易");
+                break;
+
+            case "longhubangmeirimingxi":
+                mDescSB.append("龙虎榜每日信息");
+                break;
+
+            case "longhubangjigoumingxi":
+                mDescSB.append("龙虎榜机构信息");
+                break;
+
+            case "rongzirongquanjiaoyimingxi":
+                mDescSB.append("龙虎榜机构信息");
+                break;
+
+            case "rongzirongquanjiaoyihuizong":
+                mDescSB.append("融资融券交易汇总");
+                break;
+
+            case "ganggutongshidachengjiaogu":    //  港股通十大成交股
+                mDescSB.append("港股通十大成交股");
+                break;
+
+            case "hushengutongchigumingxi":
+                mDescSB.append("沪股通持股明细");
+                break;
+
+            case "hushengutongshidachengjiaogu":    //   沪股通 十大成交股
+                mDescSB.append("沪深通十大成交股");
+                break;
+
+            case "yuexianhangqing-time":
+                mDescSB.append("月线行情-时间");
+                break;
+
+
+
+            case "zhouxianhangqing-time":
+                mDescSB.append("周线行情-时间");
+                break;
+
+            case "rixianhangqing-time":
+                mDescSB.append("日线行情-时间");
+                break;
+
+            case "geguzijinliuxiang":
+                mDescSB.append("个股资金流量");
+                break;
+
+            case "meirizhibiao":
+                mDescSB.append("每日指标");
+                break;
+
+
+            // Exception: 抱歉，您每分钟最多访问该接口10次，权限的具体详情访问
+            case "IPOxingushangshi":
+                mDescSB.append("IPO 新股上市");
+                break;
+
+
+
+            //ValueError: This sheet is too large! Your sheet size is: 1166415, 8 Max sheet size is: 1048576, 1638
+            case "guanlicengxinchouhechigu":
+                mDescSB.append("管理层薪酬和持股");
+                break;
+
+
+            //  没有中文的 cname 所以添加额外的代码 添加 cname
+
+
+            case "gudongzengjianchi":
+                mDescSB.append("股东增减持");
+                break;
+
+            case "xianshougujiejin":
+                mDescSB.append("限售股解禁");
+                break;
+
+            case "gupiaohuigou":
+                mDescSB.append("股票回购");
+                break;
+
+
+            case "lirunbiao":
+                mDescSB.append("利润表");
+                break;
+
+            case "meirizhangdietingtongji":
+                mDescSB.append("每日涨跌停统计");
+                break;
+
+            case "meirizhangdietingjiage":
+                mDescSB.append("每日涨跌停价格");
+                break;
+
+            case "meiritingfupaixinxi":
+                mDescSB.append("每日停复牌信息");
+                break;
+
+            case "fuquanyinzi":     //   ##  添加 ts_code 列
+                mDescSB.append("复权因子");
+                break;
+
+            case "shangshigongsiguanliceng":
+                mDescSB.append("上市公司管理层");
+                break;
+
+            case "shangshigongsijibenxinxi":
+                mDescSB.append("上市公司基本信息");
+                break;
+
+            case "hushengutongchengfengu":
+                mDescSB.append("沪深股通成分股");
+                break;
+
+            //  没有  ts_code  列的 返回 dataframe
+            case "ganggutongmeirichengjiaotongji":
+                mDescSB.append("港股通每日成交统计");
+                break;
+
+            case "hushengangtongzijinliuxiang":
+                mDescSB.append("沪深港通资金流向");
+                break;
+
+
+            default:
+
+        }
+
+
+        mDescSB.append("="+nodeName+"】  索引值:"+paddinggIndex+"   "+descType);
+        return mDescSB.toString();
+    }
+
 
 
     static  String getNodeHeadFile(String nodeName){

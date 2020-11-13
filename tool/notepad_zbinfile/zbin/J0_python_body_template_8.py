@@ -15,13 +15,17 @@
 #  《Method_Call_Template_3》= 《J0_PROPS.put(tree_node_name+"record_date", "【ZHoldPlace_OPERATION_DAY】")       ###  更新 记录日期》
 #  《Method_Call_Template_3》= 《【ZHoldPlace_pythonMethodName】_【ZHoldPlace_OPERATION_DAY】 = pro.【ZHoldPlace_pythonMethodName】(【ZHoldPlace_propKey2ValueList】, fields='【ZHoldPlace_fieldList】')》
 #  《Method_Call_Template_3》= 《【ZHoldPlace_pythonMethodName】_【ZHoldPlace_OPERATION_DAY】_tscode_list = list() 》
-#  《Method_Call_Template_3》= 《for ts_code_sh in 【ZHoldPlace_pythonMethodName】_【ZHoldPlace_OPERATION_DAY】['ts_code']:》
-#  《Method_Call_Template_3》= 《    stock_name = tscode_name_dict.get(ts_code_sh)》
-#  《Method_Call_Template_3》= 《    if stock_name is None:》
-#  《Method_Call_Template_3》= 《        stock_name = 'null'》
-#  《Method_Call_Template_3》= 《    【ZHoldPlace_pythonMethodName】_【ZHoldPlace_OPERATION_DAY】_tscode_list.append(stock_name)》
 #  《Method_Call_Template_3》= 《【ZHoldPlace_pythonMethodName】_【ZHoldPlace_OPERATION_DAY】_addname_dataframe=pd.DataFrame()》
-#  《Method_Call_Template_3》= 《【ZHoldPlace_pythonMethodName】_【ZHoldPlace_OPERATION_DAY】_addname_dataframe['cname'] = 【ZHoldPlace_pythonMethodName】_【ZHoldPlace_OPERATION_DAY】_tscode_list》
+
+#  《Method_Call_Template_3》= 《if 'ts_code'  in 【ZHoldPlace_pythonMethodName】_【ZHoldPlace_OPERATION_DAY】.columns.values.tolist():》
+#  《Method_Call_Template_3》= 《    for ts_code_sh in 【ZHoldPlace_pythonMethodName】_【ZHoldPlace_OPERATION_DAY】['ts_code']:》
+#  《Method_Call_Template_3》= 《        stock_name = tscode_name_dict.get(ts_code_sh)》
+#  《Method_Call_Template_3》= 《        if stock_name is None:》
+#  《Method_Call_Template_3》= 《            stock_name = 'null'》
+#  《Method_Call_Template_3》= 《        【ZHoldPlace_pythonMethodName】_【ZHoldPlace_OPERATION_DAY】_tscode_list.append(stock_name)》
+
+#  《Method_Call_Template_3》= 《    【ZHoldPlace_pythonMethodName】_【ZHoldPlace_OPERATION_DAY】_addname_dataframe['cname'] = 【ZHoldPlace_pythonMethodName】_【ZHoldPlace_OPERATION_DAY】_tscode_list》
+
 #  《Method_Call_Template_3》= 《for table_name in 【ZHoldPlace_pythonMethodName】_【ZHoldPlace_OPERATION_DAY】.columns.values.tolist():》
 #  《Method_Call_Template_3》= 《    【ZHoldPlace_pythonMethodName】_【ZHoldPlace_OPERATION_DAY】_addname_dataframe[table_name] = 【ZHoldPlace_pythonMethodName】_【ZHoldPlace_OPERATION_DAY】[table_name]》
 #  《Method_Call_Template_3》= 《print("【ZHoldPlace_pythonMethodName】_【ZHoldPlace_OPERATION_DAY】 返回数据 row 行数 = "+str(【ZHoldPlace_pythonMethodName】_【ZHoldPlace_OPERATION_DAY】.shape[0]))》 
