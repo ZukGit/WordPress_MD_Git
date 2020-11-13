@@ -282,6 +282,9 @@ ArrayList<String> pathExeList = new ArrayList<String>();
         if(CUR_OS_TYPE == OS_TYPE.Windows){
 
             File[] subFile = listFile.listFiles();
+			if(subFile == null){
+				return exeList;
+			}
 
             for (int i = 0; i < subFile.length; i++) {
                 File subFileItem = subFile[i];
