@@ -145,10 +145,10 @@ def init_tscode_data(book_name, sheet_name,ts_code_set,tscode_name_dict):
          if (i == 0 or i == 1):
              continue
          #print("i="+str(i)+" 总的列数:" + str(ws.max_row)+"  value:"+str(ws.cell(i,2).value))
-         tscode_item = str(ws.cell(i,2).value)
-         tscode_name_item = str(ws.cell(i,4).value)
+         tscode_item = str(ws.cell(i,1).value)  ##  20201010--> 2:ts_code    4_name   ##  20201116--> 1:ts_code    3_name 
+         tscode_name_item = str(ws.cell(i,3).value)
          #print("index="+str(i)+" tscode_item = "+ str(tscode_item) + "   tscode_name_item="+str(tscode_name_item))
-         ts_code_set.add(str(ws.cell(i,2).value))
+         ts_code_set.add(str(ws.cell(i,1).value))
          tscode_name_dict[tscode_item]=tscode_name_item
 
 

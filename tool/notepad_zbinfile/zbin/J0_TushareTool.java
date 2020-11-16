@@ -822,7 +822,7 @@ if(PythonType_Input == 1 ){
                 int nodeIndex = single_node.blockIndex;  // 1
                 String paddingIndexStr= single_node.paddingBlockIndexStr;    // 0001
                 String single_block= paddingIndexStr + "_single";
-                String desc = getNodeDescWithName(single_node.nodeName,paddingIndexStr,true);
+                String desc = getNodeDescWithName(single_node,paddingIndexStr,true);
                 sb.append(desc+"\n");
                 sb.append(Cur_Bat_Name+ "  "+single_block+" &&  " + " "+ J0_call_single_python_bat_File.getAbsolutePath()  +"  "+ paddingIndexStr+"\n");
                 sb.append("\n");
@@ -839,7 +839,7 @@ if(PythonType_Input == 1 ){
                 int nodeIndex = single_node.blockIndex;  // 1
                 String paddingIndexStr= single_node.paddingBlockIndexStr;    // 0001
                 String single_block= paddingIndexStr + "_rest";
-                String desc = getNodeDescWithName(single_node.nodeName,paddingIndexStr,false);
+                String desc = getNodeDescWithName(single_node,paddingIndexStr,false);
                 sb.append(desc+"\n");
                 sb.append(Cur_Bat_Name+ "  "+single_block+"  &&  " + " "+ J0_call_rest_python_bat_File.getAbsolutePath()  +"  "+ paddingIndexStr+"\n");
                 sb.append("\n");
@@ -3012,7 +3012,7 @@ boolean isOperationType4_Wtrade_date(ArrayList<String> fieldParamList){
             //  1: 有一个 yts_code  通过 ts_code 多输入来查询  4000多个按x个为一组进行访问
             // 2:  有一个 ystart_date  10ystart_date 或者一个  yend_date   通过x 年份间隔 实现 按时间间隔查询
           // 3. 以 (1mstart_date#1mend_date#1dtrade_date) rixianhangqing-time  以每个月为  【日线行情】
- // 3.1  以月份为分隔  201001  201012  202008 这样的时间分类   把当前日期 每月中包含每天的sheet  sheet的内容是当天的日志信息
+          // 3.1  以月份为分隔  201001  201012  202008 这样的时间分类   把当前日期 每月中包含每天的sheet  sheet的内容是当天的日志信息
           // 4. 以(wtrade_date)   标识把当前的以 从 zhouxianhangqing-time_record_date=20101101 为起点 计算 每年 到现在的每个周五的集合
             // 5. 月线行情 (mtrade_date)
             //6. 最新复现因子  (last_trade_date)
@@ -3646,7 +3646,7 @@ boolean isBegin = ( null == cur_operation_tscode || "".equals(cur_operation_tsco
 
                 python_method_call_List_Code.add("\n");
 
-                }else if(operation_type == 7){
+                }else if(operation_type == 7){   //  港股通 十大成交股
 
                 paramXcode =  fieldParamList.get(0);
                 // 1mstart_date#1mend_date#1dtrade_date
@@ -3666,12 +3666,30 @@ boolean isBegin = ( null == cur_operation_tscode || "".equals(cur_operation_tsco
 
                 // 在 今年的工作列表中 找到 比当前记录的大的那些列表 组成一个Map MAP的头为  月份数据 1 2 3 4
 
+                if(SH_Now_Year_TradeDayList_FromNow.size() == 0){
+
+                    initTradeDayList(); // zukgit xxx
+                }
+
                 Map<Integer,ArrayList<Integer>> monthMapList = guolv_Month_TradeDay_Map(SH_Now_Year_TradeDayList_FromNow,recordRecord);
+
+                System.out.println("operation_type == 7 -> monthMapList "+ monthMapList.size() );
+                System.out.println("operation_type == 7 -> SH_Now_Year_TradeDayList_FromNow.size =  "+ SH_Now_Year_TradeDayList_FromNow.size()   +"   recordRecord = " + recordRecord );
 
                 ArrayList<String> code_template_1_List =   mMethod_Call_Template_Map.get("1");
                 ArrayList<String> code_template_2_List =   mMethod_Call_Template_Map.get("2");
                 ArrayList<String> code_template_3_List =   mMethod_Call_Template_Map.get("3");
                 ArrayList<String> code_template_4_List =   mMethod_Call_Template_Map.get("4");
+
+
+
+                System.out.println("operation_type == 7 ->  code_template_1_List.size = "+ code_template_1_List.size() );
+                System.out.println("operation_type == 7 ->  code_template_2_List.size = "+ code_template_2_List.size() );
+
+                System.out.println("operation_type == 7 ->  code_template_3_List.size = "+ code_template_3_List.size() );
+
+                System.out.println("operation_type == 7 ->  code_template_4_List.size = "+ code_template_4_List.size() );
+
 
 
                 for (int i = 0; i < code_template_1_List.size() ; i++) {
@@ -3688,12 +3706,13 @@ boolean isBegin = ( null == cur_operation_tscode || "".equals(cur_operation_tsco
 
                 Map.Entry<Integer , ArrayList<Integer>> entryItem;
                 if(monthMapList != null){
+                    System.out.println("operation_type == 7 ->  monthMapList != null  monthMapList.size = "+ monthMapList.size());
                     Iterator iterator = monthMapList.entrySet().iterator();
                     while( iterator.hasNext() ){
                         entryItem = (Map.Entry<Integer , ArrayList<Integer>>) iterator.next();
                         Integer MonthIndex =   entryItem.getKey();   //Map的Key    月份
                         ArrayList<Integer> month_tradedayList =  entryItem.getValue();  //Map的Value   工作日
-
+                        System.out.println("operation_type == 7 ->  monthMapList != null  month_tradedayList. size = "+ month_tradedayList.size());
                         for (int i = 0; i < code_template_2_List.size(); i++) {
                             String methodText_2 = code_template_2_List.get(i);
                             String fillText =  HolderReplaceOperation_Static(methodText_2);
@@ -4636,9 +4655,21 @@ boolean isBegin = ( null == cur_operation_tscode || "".equals(cur_operation_tsco
             SH_No_TradeDayList.add(dayIntFlag);
         }else{
             SH_TradeDayList.add(dayIntFlag);
+            Add_SH_Now_TradeDayList_FromNow(dayIntFlag);
+
         }
 
     }
+
+
+    // 从年初 到 今天的 日期的集合
+    static void Add_SH_Now_TradeDayList_FromNow(int dayIntFlag){
+if(dayIntFlag >= SH_Now_Year_BeginTradeDay_IntFlag && dayIntFlag <=  SH_Tomorrow_WorkTrade_Day_Int){
+    SH_Now_Year_TradeDayList_FromNow.add(dayIntFlag);
+}
+
+    }
+
 
     static void  initTsCodeList(){
 // TScode_List
@@ -4994,6 +5025,7 @@ boolean isBegin = ( null == cur_operation_tscode || "".equals(cur_operation_tsco
     }
 
 
+    // 得到 记录日志 之后     当去日期之前的 那些   月份交易数据
     static Map<Integer,ArrayList<Integer>>  guolv_Month_TradeDay_Map(  ArrayList<Integer> yearWorkDayIntList , int compareIntFlag ){
         Map<Integer,ArrayList<Integer>> cur_month_tradeday_map = Maps.newLinkedHashMap();
 
@@ -5400,13 +5432,117 @@ String[] arrStr = codePrams.split(",");
         return bodyPath;
     }
 
-    static  String getNodeDescWithName(String nodeName ,String paddinggIndex , boolean isSingle){
+
+    static  String getLeafNodeTableName(LeafNode leafNode ){
+
+        String tableName =leafNode.leaf_chinese_title;
+
+        switch (leafNode.nodeName){
+
+            case "rixianhangqing-time":
+                tableName="daily_YYYYMM (日线行情保存在年月份xlsx中)";
+                break;
+
+            case "zhouxianhangqing-time":
+                tableName="weekly_YYYY (周线行情保存在 年份 xlsx中)";
+                break;
+
+            case "yuexianhangqing-time":
+                tableName="monthly_YYYY (月线行情保存在 年份 xlsx中)";
+                break;
+
+
+            case "meirizhibiao":
+                tableName="daily_basic_YYYYMM (每日指标数据保存在 年月份 xlsx中)";
+                break;
+
+
+            case "ganggutongshidachengjiaogu":
+                tableName="ggt_top10__YYYYMM (港股通十大成交股 年份保存 月份为sheet 内容为每日前十成交股)";
+                break;
+
+            case "rongzirongquanjiaoyihuizong":
+                tableName="margin__YYYYMM (融资融券交易汇总 年份保存 月份为sheet 内容为每日融资融券汇总信息)";
+                break;
+
+
+            case "rongzirongquanjiaoyimingxi":
+                tableName="margin_Detail_YYYYMM (融资融券交易明细 年份保存 月份为sheet 内容为每日融资融券交易信息)";
+                break;
+
+            case "longhubangmeirimingxi":
+                tableName="top_list_YYYY (龙虎榜每日信息 年份保存 月份为sheet 内容为每日龙虎榜每日信息 )";
+                break;
+
+
+            case "longhubangjigoumingxi":
+                tableName="top_inst_YYYY (龙虎榜机构信息 年份保存 月份为sheet 内容为每日龙虎榜机构信息息 )";
+                break;
+
+            case "dazongjiaoyi":
+                tableName="block_trade_YYYY (大宗交易 年份保存 月份为sheet 内容为每日大宗交易信息 )";
+                break;
+
+
+
+            default:
+                tableName =leafNode.leaf_chinese_title;
+        }
+        return tableName;
+    }
+
+
+    //  获取 数据的 mCaptureDataType 类型
+    // 0 ----  默认值  缺省值
+    // 0x01 ----  一次就就能调用成功的类型  与具体的   时间 和 具体的 ts_code  无关
+   // 0x02 ---- 需要依据 TS_CODE  但是能一次多输入 TS_CODE  能访问的类型   与 ts_code 有关
+ // 0x04  需要使用到起始时间 和结束时间  并且  只需要调用一次的 类型  简单的类型
+ // 0x08   以 每天时间标识为 唯一输入 进行一次请求  每天一次  输出以年月排序
+//  0x16   以 每天时间标识为 唯一输入 进行一次请求    输出以 年排序
+//  0x32   以 每天时间标识为 唯一输入 进行一次请求   直接把输出 以中文名称 显示 无需 按时间存储  需要累加
+// 0x0064 对 每一个 tscode (4000)个 轮流调用！
+    int  ONE_CALL_TYPE = 0x0001;   // 0002 股票列表  0003交易日历   0004股票曾用名  0005沪深股通成份股   0006上市公司基本信息    0046概念股分类  0047概念股列表        0048限售股解禁
+    int  TS_CODE_X_INPUT_ONE_TYPE = 0x0002; //   0007上市公司管理层    0008管理层薪酬和持股
+
+    //  0009新股列表IPO     0015每日停复牌信息   0020沪深股通资金流向  0023港股通每日成交统计    0045股票回购   0048限售股解禁  0051股东增减持
+    int  START_END_TIME_Call_ONCE_INPUT_ONE_TYPE = 0x0004 ;
+
+
+    //   0011每日行情     0016每日指标  0017个股资金流向
+    int  TRADE_DAY_ONE_INPUT_YYYYMM_OUTPUT_TYPE = 0x0008;
+
+    //   0012 周线行情    0013月线行情    0021沪深股通十大成交股  0022沪深股通持股明细  0036港股通十大成交股  0037融资融券交易汇总
+    int  TRADE_DAY_ONE_INPUT_YYYY_OUTPUT_TYPE = 0x0016;  // 0038融资融券交易明细     0041龙虎榜每日明细   0042龙虎榜机构明细    0049大宗交易
+
+    int  TRADE_DAY_ONE_INPUT_Collect_OUTPUT_TYPE = 0x0032; //  0018每日涨跌停价格    0019每日涨跌停统计
+
+    // 0025利润表  0026资产负债表   0027资产负债表  0028业绩预告  0029业绩快报  0030分红送股  0031财务指标数据  0032财务审计意见
+    int TS_CODE_ONE_Input_4000Call_Type =  0x0064;  // 0033主营业务构成   0034财报披露计划    0039前十大股东  0040前十大流通股通  0043股权质押统计数据  0044股权质押明细  0050股东人数
+
+
+    // 数据完全下载之后的更新操作
+
+    // 数据完整后的 查询操作
+    //  持续更新数据操作
+    // 天更新数据操作
+    //周更新数据操作
+    // 季度更新数据操作
+   // 年更新数据操作
+
+    // prop 文件数值的操作  清空 以及恢复
+
+    static  int getNodeDataCaptureType(TreeNode treeNode){
+        int mCaptureDataType = 0;
+
+        return mCaptureDataType;
+    }
+    static  String getNodeDescWithName(TreeNode treeNode ,String paddinggIndex , boolean isSingle){
         StringBuilder  mDescSB = new StringBuilder();
         mDescSB.append("名称: 【");
 
         String descType = isSingle?"【对指定索引 单一 single-python进行更新执行!】":"【把索引作为起始点 执行之后所有的代码更新及操作】";
 
-        switch (nodeName){
+        switch (treeNode.nodeName){
 
             //  把 所有的 数据 写入一个 sheet 采用 追加的 read_excel 的方式得到 dataframe
 
@@ -5508,7 +5644,7 @@ String[] arrStr = codePrams.split(",");
                 break;
 
             case "rongzirongquanjiaoyimingxi":
-                mDescSB.append("龙虎榜机构信息");
+                mDescSB.append("融资融券交易信息");
                 break;
 
             case "rongzirongquanjiaoyihuizong":
@@ -5625,8 +5761,16 @@ String[] arrStr = codePrams.split(",");
 
         }
 
+        if(treeNode instanceof  LeafNode){
+            LeafNode leafNode = (LeafNode)treeNode;
 
-        mDescSB.append("="+nodeName+"】  索引值:"+paddinggIndex+"   "+descType);
+            mDescSB.append(":"+treeNode.nodeName+"】【Python-函数:"+leafNode.pythonMethodName+"】 【xlsx中文表名: "+getLeafNodeTableName(leafNode)+"】 索引值:"+paddinggIndex+"   "+descType);
+        }else{
+            // pythonNode
+            mDescSB.append(":"+treeNode.nodeName+"】 索引值:"+paddinggIndex+"   "+descType);
+        }
+
+
         return mDescSB.toString();
     }
 

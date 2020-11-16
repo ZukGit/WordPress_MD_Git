@@ -1,7 +1,7 @@
 #  《First_Define_Template_1》= 《# 【ZHoldPlace_NodeName】_zukgit_website  =   【ZHoldPlace_Node_Website】》
-#  《First_Define_Template_1》= 《createexcel('【ZHoldPlace_pythonMethodName】.xlsx')》
-#  《First_Define_Template_2》= 《【ZHoldPlace_pythonMethodName】_book = load_workbook('【ZHoldPlace_J0_Dir_PATH】【ZHoldPlace_pythonMethodName】.xlsx')》
-#  《First_Define_Template_3》= 《【ZHoldPlace_pythonMethodName】_excel_writer = pd.ExcelWriter('【ZHoldPlace_J0_Dir_PATH】【ZHoldPlace_pythonMethodName】.xlsx', engine='openpyxl')》
+#  《First_Define_Template_1》= 《createexcel('【ZHoldPlace_Title】.xlsx')》
+#  《First_Define_Template_2》= 《【ZHoldPlace_pythonMethodName】_book = load_workbook('【ZHoldPlace_J0_Dir_PATH】【ZHoldPlace_Title】.xlsx')》
+#  《First_Define_Template_3》= 《【ZHoldPlace_pythonMethodName】_excel_writer = pd.ExcelWriter('【ZHoldPlace_J0_Dir_PATH】【ZHoldPlace_Title】.xlsx', engine='openpyxl')》
 #  《First_Define_Template_4》= 《【ZHoldPlace_pythonMethodName】_excel_writer.book = 【ZHoldPlace_pythonMethodName】_book》
 #  《First_Define_Template_5》= 《【ZHoldPlace_pythonMethodName】_excel_writer.sheets = dict((ws.title, ws) for ws in 【ZHoldPlace_pythonMethodName】_book.worksheets)》
 #  《First_Define_Template_6》= 《【ZHoldPlace_pythonMethodName】_data_List = pd.DataFrame()》
@@ -9,7 +9,7 @@
 
 
 #  《First_Define_Template_1》= 《if '【ZHoldPlace_leaf_chinese_title】' in 【ZHoldPlace_pythonMethodName】_excel_writer.sheets:》
-#  《First_Define_Template_1》= 《    【ZHoldPlace_pythonMethodName】_data_List=pd.read_excel('【ZHoldPlace_J0_Dir_PATH】【ZHoldPlace_pythonMethodName】.xlsx',sheet_name ='【ZHoldPlace_leaf_chinese_title】' , index=False)》
+#  《First_Define_Template_1》= 《    【ZHoldPlace_pythonMethodName】_data_List=pd.read_excel('【ZHoldPlace_J0_Dir_PATH】【ZHoldPlace_Title】.xlsx',sheet_name ='【ZHoldPlace_leaf_chinese_title】' , index=False)》
 
 #  《Method_Call_Template_1》= 《【ZHoldPlace_propKey2ValueList_Index】_tscode_list = list() 》
 #  《Method_Call_Template_1》= 《【ZHoldPlace_propKey2ValueList_Index】 = pro.【ZHoldPlace_pythonMethodName】(【ZHoldPlace_propKey2ValueList】, fields='【ZHoldPlace_fieldList】')》
