@@ -8,7 +8,7 @@
 
 # 《Method_Call_Template_1》= 《【ZHoldPlace_propKey2ValueList_Index】_tscode_list = list() 》
 #  《Method_Call_Template_1》= 《【ZHoldPlace_propKey2ValueList_Index】 = pro.【ZHoldPlace_pythonMethodName】(【ZHoldPlace_propKey2ValueList】, fields='【ZHoldPlace_fieldList】')》
-# 《Method_Call_Template_2》=  《print("【ZHoldPlace_propKey2ValueList_Index】 返回数据 row 行数 = "+str(【ZHoldPlace_propKey2ValueList_Index】.shape[0]))》 
+# 《Method_Call_Template_2》=  《print("【ZHoldPlace_leaf_chinese_title】   【ZHoldPlace_propKey2ValueList_Index】 返回数据 row 行数 = "+str(【ZHoldPlace_propKey2ValueList_Index】.shape[0])+"  all_size="+str(【ZHoldPlace_pythonMethodName】_data_List.__len__()))》 
 #  《Method_Call_Template_2》= 《for ts_code_sh in 【ZHoldPlace_propKey2ValueList_Index】['ts_code']:》
 #  《Method_Call_Template_2》= 《    stock_name = tscode_name_dict.get(ts_code_sh)》
 #  《Method_Call_Template_2》= 《    if stock_name is None:》
@@ -19,14 +19,14 @@
 #  《Method_Call_Template_2》= 《for table_name in 【ZHoldPlace_propKey2ValueList_Index】.columns.values.tolist():》
 #  《Method_Call_Template_2》= 《    【ZHoldPlace_propKey2ValueList_Index】_addname_dataframe[table_name] = 【ZHoldPlace_propKey2ValueList_Index】[table_name]》
 #  《Method_Call_Template_2》= 《【ZHoldPlace_pythonMethodName】_data_List = 【ZHoldPlace_pythonMethodName】_data_List.append(【ZHoldPlace_propKey2ValueList_Index】_addname_dataframe)》
-#  《Method_Call_Template_2》= 《if 【ZHoldPlace_pythonMethodName】_data_List.__len__() > 1160000:》
+#  《Method_Call_Template_2》= 《if 【ZHoldPlace_pythonMethodName】_data_List.__len__() > 1000000:》
 #  《Method_Call_Template_2》= 《    print("【ZHoldPlace_pythonMethodName】_data_List.__len__() = " + str(【ZHoldPlace_pythonMethodName】_data_List.__len__()))》
-#  《Method_Call_Template_2》= 《    【ZHoldPlace_pythonMethodName】_data_List.to_excel(【ZHoldPlace_pythonMethodName】_excel_writer, '【ZHoldPlace_leaf_chinese_title】')》
-#  《Method_Call_Template_2》= 《    【ZHoldPlace_pythonMethodName】_data_List.save()》
-#  《Method_Call_Template_2》= 《    exit();》
+#  《Method_Call_Template_2》= 《    【ZHoldPlace_pythonMethodName】_data_List.to_excel(【ZHoldPlace_pythonMethodName】_excel_writer, '【ZHoldPlace_leaf_chinese_title】_first',index=False)》
+#  《Method_Call_Template_2》= 《    【ZHoldPlace_pythonMethodName】_excel_writer.save()》
+#  《Method_Call_Template_2》= 《    【ZHoldPlace_pythonMethodName】_data_List = pd.DataFrame()》
 
-#  《Tail_Define_Template_1》=  《print("【ZHoldPlace_pythonMethodName】_data_List.__len__() = "+str(【ZHoldPlace_pythonMethodName】_data_List.__len__()))》
-#  《Tail_Define_Template_1》=  《【ZHoldPlace_pythonMethodName】_data_List.to_excel(【ZHoldPlace_pythonMethodName】_excel_writer,'【ZHoldPlace_leaf_chinese_title】,index=False')》
+#  《Tail_Define_Template_1》=  《print("【ZHoldPlace_leaf_chinese_title】  【ZHoldPlace_pythonMethodName】_data_List.__len__() = "+str(【ZHoldPlace_pythonMethodName】_data_List.__len__()))》
+#  《Tail_Define_Template_1》=  《【ZHoldPlace_pythonMethodName】_data_List.to_excel(【ZHoldPlace_pythonMethodName】_excel_writer,'【ZHoldPlace_leaf_chinese_title】',index=False)》
 #  《Tail_Define_Template_2》= 《【ZHoldPlace_pythonMethodName】_excel_writer.save()》
 
 

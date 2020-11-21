@@ -12,7 +12,7 @@ ECHO  curFile === %%i
 ECHO  temp_content_fixed1 === !temp_content!
 set "temp_content=!temp_content:%CURPATH%=!"
 ECHO  temp_content_fixed2 === !temp_content!
-set current_index=!temp_content:~3,4!
+set current_index=!temp_content:~4,8!
 
 ECHO  === input_index_1:!input_index_1!      index:!current_index!   input_index_1:%input_index_1% 
 

@@ -8,7 +8,7 @@
 
 # 《Method_Call_Template_1》= 《【ZHoldPlace_propKey2ValueList_Index】_tscode_list = list() 》
 #  《Method_Call_Template_1》= 《【ZHoldPlace_propKey2ValueList_Index】 = pro.【ZHoldPlace_pythonMethodName】(【ZHoldPlace_propKey2ValueList】, fields='【ZHoldPlace_fieldList】')》
-# 《Method_Call_Template_2》=  《print("【ZHoldPlace_propKey2ValueList_Index】 返回数据 row 行数 = "+str(【ZHoldPlace_propKey2ValueList_Index】.shape[0]))》 
+# 《Method_Call_Template_2》=  《print("【ZHoldPlace_leaf_chinese_title】  【ZHoldPlace_propKey2ValueList_Index】 返回数据 row 行数 = "+str(【ZHoldPlace_propKey2ValueList_Index】.shape[0]))》 
 #  《Method_Call_Template_2》= 《for ts_code_sh in 【ZHoldPlace_propKey2ValueList_Index】['ts_code']:》
 #  《Method_Call_Template_2》= 《    stock_name = tscode_name_dict.get(ts_code_sh)》
 #  《Method_Call_Template_2》= 《    if stock_name is None:》

@@ -19,7 +19,7 @@
 #  《Method_Call_Template_2》= 《【ZHoldPlace_pythonMethodName】_【ZHoldPlace_Weekly_Day】_addname_dataframe['cname'] = 【ZHoldPlace_pythonMethodName】_【ZHoldPlace_Weekly_Day】_tscode_list》
 #  《Method_Call_Template_2》= 《for table_name in 【ZHoldPlace_pythonMethodName】_【ZHoldPlace_Weekly_Day】.columns.values.tolist():》
 #  《Method_Call_Template_2》= 《    【ZHoldPlace_pythonMethodName】_【ZHoldPlace_Weekly_Day】_addname_dataframe[table_name] = 【ZHoldPlace_pythonMethodName】_【ZHoldPlace_Weekly_Day】[table_name]》
-#  《Method_Call_Template_2》= 《print("【ZHoldPlace_pythonMethodName】_【ZHoldPlace_Weekly_Day】 【ZHoldPlace_WeekIndex_DayDesc】 返回数据 row 行数 = "+str(【ZHoldPlace_pythonMethodName】_【ZHoldPlace_Weekly_Day】.shape[0]))》 
+#  《Method_Call_Template_2》= 《print("【ZHoldPlace_leaf_chinese_title】  【ZHoldPlace_pythonMethodName】_【ZHoldPlace_Weekly_Day】 【ZHoldPlace_WeekIndex_DayDesc】 返回数据 row 行数 = "+str(【ZHoldPlace_pythonMethodName】_【ZHoldPlace_Weekly_Day】.shape[0]))》 
 #  《Method_Call_Template_2》= 《【ZHoldPlace_pythonMethodName】_【ZHoldPlace_Weekly_Day】_addname_dataframe.to_excel(【ZHoldPlace_pythonMethodName】_【ZHoldPlace_Year_Int】_excel_writer,'【ZHoldPlace_WeekIndex_DayDesc】',index=False)》
 #  《Method_Call_Template_2》= 《【ZHoldPlace_pythonMethodName】_【ZHoldPlace_Year_Int】_excel_writer.save()》
 

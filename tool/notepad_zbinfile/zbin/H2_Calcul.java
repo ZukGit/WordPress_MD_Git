@@ -37,18 +37,246 @@ public class H2_Calcul {
     */
 
 
+
+   class Stock_Exp_Item{
+       float startPrice;
+       float endPrice;
+        Map<Float,Float> matchDayMap ;
+
+       float percentOfday_up_special = 0.2f;
+       float percentOfday_down_special = -0.2f;
+
+       float percentOfday_up_common = 0.1f;
+       float percentOfday_down_common = -0.1f;
+
+       float percentOfday_up_st = 0.05f;
+       float percentOfday_down_st = -0.05f;
+
+       Stock_Exp_Item(float mstartPrice,float mendPrice){
+           startPrice =  mstartPrice;
+           endPrice =    mendPrice;
+           matchDayMap = new HashMap<Float,Float>();
+           matchDayMap.put(percentOfday_up_special,percentOfday_down_special);
+           matchDayMap.put(percentOfday_up_common,percentOfday_down_common);
+           matchDayMap.put(percentOfday_up_st,percentOfday_down_st);
+           System.out.printf("startPrice = "+ String.format("%.2f", startPrice) + "    endPrice = "+ String.format("%.2f", endPrice));
+           System.out.println();
+       }
+
+
+
+
+       String getFloatPercent(float floatValue){
+           return   String.format("%.2f", floatValue*100)+"%";
+
+       }
+
+
+       String getFloatTwo(float floatValue){
+         return   String.format("%.2f", floatValue);
+
+       }
+
+       String   getPercentDesc(float floatValue){
+           String percentStr  = " 10%";
+           if(floatValue == 0.2f){
+               percentStr  = " 20%";
+           }else if(floatValue == 0.1f){
+               percentStr  = " 10%";
+           }else if(floatValue == 0.05f){
+               percentStr  = "  5%";
+           }
+
+           return percentStr;
+       }
+
+
+       @SuppressWarnings("unchecked")
+        void calProcess(  ) {
+
+
+           Map.Entry<Float , Float> entryItem;
+           System.out.println("\n════════════════ "+startPrice+"_"+endPrice+" ════════════════");
+           if(matchDayMap != null && matchDayMap.size() > 0){
+               Iterator iterator = matchDayMap.entrySet().iterator();
+               while( iterator.hasNext() ){
+                   StringBuilder sb = new StringBuilder();
+//                   sb.append("\n");
+                   entryItem = (Map.Entry<Float , Float>) iterator.next();
+                   float up_one_day = entryItem.getKey();
+                   float down_one_day = entryItem.getValue();
+                   String descTag = " 默认主板涨跌幅度为 10% ";
+                   if(up_one_day == 0.1f){
+                       descTag = " 默认主板涨跌幅度为 10% ";
+                   }   else if (up_one_day == 0.05f){
+                       descTag = " ST股票涨跌幅度为 5% ";
+                   }  else if (up_one_day == 0.2f){
+                       descTag = " 创业板股票涨跌幅度为 20% ";
+                   }
+
+
+                   float  start_temp_Value = startPrice;
+                   float  end_temp_value = endPrice;
+                   float step_percent = 0.1f;
+                   float distance_start_end = (start_temp_Value - end_temp_value) * -1;
+
+                   sb.append("\n "+ descTag+ " 起始位:"+getFloatTwo(start_temp_Value)+"  结束位:"+getFloatTwo(end_temp_value)+"  差距:"+getFloatTwo(distance_start_end) +" ");
+
+
+
+                   if(startPrice > endPrice){ //  跌的
+                       step_percent = down_one_day;
+                       sb.append(getPercentDesc(step_percent)+"跌落过程 =>  \n");
+                       int order_index = 0;
+//                       System.out.printf("step_percent = "+ String.format("%.2f", step_percent)+"跌落过程  start_temp_Value = "+ String.format("%.2f", start_temp_Value) + "    end_temp_value = "+ String.format("%.2f", end_temp_value));
+                       sb.append("【0"+"_:"+getFloatTwo(start_temp_Value)+"】═");
+                       ArrayList<Float> allRecordFloat = new     ArrayList<Float>();
+                       while(start_temp_Value > end_temp_value ){
+//                            System.out.printf("跌落过程  start_temp_Value = "+ String.format("%.2f", start_temp_Value) + "    end_temp_value = "+ String.format("%.2f", end_temp_value));
+
+                          float start_temp_Value_temp = start_temp_Value * (1 + step_percent);
+                          float distance_temp  =  start_temp_Value_temp  - start_temp_Value ;
+                           start_temp_Value = start_temp_Value_temp;
+
+                           allRecordFloat.add(start_temp_Value);
+                           order_index++;
+                           sb.append("【"+order_index+"_↓"+getFloatTwo(distance_temp)+":"+getFloatTwo(start_temp_Value)+"】═");
+                       }
+
+                       int down_count = order_index - 1;   // 跌停次数
+
+                       float  last_second_float = 0f ;
+                       if(allRecordFloat.size() >= 2){
+                           last_second_float = allRecordFloat.get(allRecordFloat.size()-2);   //  拿到倒数第二个 float   开盘
+                       }else if(allRecordFloat.size() == 1){
+//                           last_second_float  =allRecordFloat.get(0);
+                           last_second_float = startPrice;
+                       }
+                       float distance = end_temp_value - last_second_float   ; //  到期那天的开盘点 与目标点的差距
+                       float distance_percent =  distance/last_second_float;
+                       String distance_percent_str = getFloatPercent(distance_percent);
+
+
+                       sb.append("【"+order_index+"_"+distance_percent_str+"↓"+getFloatTwo(distance)+":"+getFloatTwo(end_temp_value)+"】═");
+                      float all_temp_percent =  step_percent * down_count + distance_percent;
+                       String all_temp_percent_str = getFloatPercent(all_temp_percent);
+
+                       float  percent_count = Math.abs(down_count*step_percent + distance) ;
+                       String percent_count_str = getFloatPercent(percent_count);
+                       float distance_count = startPrice-endPrice;
+
+                       sb.append(" \n■■■"+startPrice+"→"+endPrice+"="+getFloatTwo(distance_start_end) +" = ↓"+all_temp_percent_str+"■■■"+"________第"+down_count+"次跌停"+getFloatPercent(step_percent*-1)+"后再下跌"+getFloatTwo(distance)+"("+distance_percent_str+")");
+//                       sb.append("第"+down_count+"次跌停后再下跌"+getFloatTwo(distance)+"("+distance_percent_str+") 【"+startPrice+"_"+endPrice+"_"+percent_count_str+"_"+getFloatTwo(distance_count)+"】");
+
+                   }else{
+                       step_percent = up_one_day;  //  涨的
+                       sb.append(getPercentDesc(step_percent)+"上升过程 => \n");
+                       int order_index = 0;
+                       sb.append("【0"+"_:"+getFloatTwo(start_temp_Value)+"】═");
+                       ArrayList<Float> allRecordFloat = new     ArrayList<Float>();
+                       while(start_temp_Value <= end_temp_value ){
+//                           System.out.printf("上升过程  start_temp_Value = "+ String.format("%.2f", start_temp_Value) + "    end_temp_value = "+ String.format("%.2f", end_temp_value));
+
+                           float start_temp_Value_temp = start_temp_Value * (1 + step_percent);
+                           float distance_temp  = start_temp_Value_temp - start_temp_Value;
+                           start_temp_Value = start_temp_Value_temp;
+
+                           allRecordFloat.add(start_temp_Value);
+                           order_index++;
+                           sb.append("【"+order_index+"_↑"+getFloatTwo(distance_temp)+":"+getFloatTwo(start_temp_Value)+"】═");
+                       }
+                       int up_count = order_index - 1;
+                       float  last_second_float = 0f ;
+                       if(allRecordFloat.size() >= 2){
+                            last_second_float = allRecordFloat.get(allRecordFloat.size()-2);   //  拿到倒数第二个 float   开盘
+                       }else if(allRecordFloat.size() == 1){
+//                           last_second_float  =allRecordFloat.get(0);
+                           last_second_float = startPrice;
+                       }
+
+
+                       float distance = end_temp_value  - last_second_float   ; //  到期那天的开盘点 与目标点的差距
+                       float distance_percent =  distance/last_second_float;
+                       String distance_percent_str = getFloatPercent(distance_percent);
+
+                       sb.append("【"+order_index+"_"+distance_percent_str+"↑"+getFloatTwo(distance)+":"+getFloatTwo(end_temp_value)+"】═");
+
+                       float  percent_count = Math.abs(step_percent*step_percent + distance) ;
+                       String percent_count_str = getFloatPercent(percent_count);
+                       float distance_count = startPrice-endPrice;
+                       float all_temp_percent =  step_percent * up_count + distance_percent;
+                       String all_temp_percent_str = getFloatPercent(all_temp_percent);
+
+                       float  percent_count_up = Math.abs(up_count*step_percent + distance) ;
+                       String percent_count_up_str = getFloatPercent(percent_count_up);
+                       float distance_count_up = startPrice-endPrice;
+
+//                       sb.append("第"+up_count+"次涨停后再上涨"+getFloatTwo(distance)+" 【"+startPrice+"_"+endPrice+":"+percent_count_str+"_"+getFloatTwo(distance_count)+"】");
+//                       sb.append("第"+up_count+"次涨停后再上涨"+getFloatTwo(distance)+"("+distance_percent_str+") 【"+startPrice+"_"+endPrice+"_"+percent_count_str+"_"+getFloatTwo(distance_count)+"】");
+                       sb.append(" \n■■■"+startPrice+"→"+endPrice+"="+getFloatTwo(distance_start_end) +" = ↑"+all_temp_percent_str+"■■■"+"________第"+up_count+"次涨停"+getFloatPercent(step_percent)+"后再上涨"+getFloatTwo(distance)+"("+distance_percent_str+")");
+
+                   }
+
+
+                   System.out.println(sb.toString());
+
+               }
+               System.out.println("\n════════════════════════════════════════════════════════════════════════════════════════════════");
+           }
+
+
+
+
+
+
+       }
+
+
+    }
+
+    //   股票输入的表达式
+   static ArrayList<Stock_Exp_Item> Stock_Exp_List = new   ArrayList<Stock_Exp_Item>();
+
+
     public static void main(String[] args) {
 
         initSystemInfo();
 
         if (args != null) {
             for (int i = 0; i < args.length; i++) {
-                // System.out.println("args[" + i + "] = " + args[i]);
+                 System.out.println("args[" + i + "] = " + args[i]);
                 if (i == 0) {   // 第一个参数永远是  当前 shell的目录
                     CUR_Dir_1_PATH = args[i];
                 } else {
-                    CUR_INPUT_ParamStrList.add(args[i]);   // 当前cmd目录   第一个类型选项      之后所有的参数 保存在  CUR_INPUT_ParamStrList
-                    //    Rule_Identify_TypeIndexList.add(args[i]);
+
+                    if(args[i].contains("_") || args[i].contains("--") || args[i].contains("--")  || args[i].contains("——") || args[i].contains("—") ){
+                        
+                        String itemStr = args[i].replace("-","_");
+                        itemStr = itemStr.replace("—","_");
+                        itemStr = itemStr.replace("__","_");
+                        itemStr = itemStr.replace("__","_");
+                        String[]  expArr = itemStr.split("_");
+                        if(expArr != null && expArr.length ==2){
+
+                            String beginStr = expArr[0];
+                            String endStr = expArr[1];
+
+                            if(isNumeric(beginStr) && isNumeric(endStr)  ){
+                                float start = Float.parseFloat(beginStr);
+                                float end = Float.parseFloat(endStr);
+//                                System.out.printf("X1  start = "+ String.format("%.2f", start) +" end = "+  String.format("%.2f", end));
+
+
+                                Stock_Exp_Item stock_item  = new H2_Calcul().new Stock_Exp_Item(start,end);
+                                Stock_Exp_List.add(stock_item);
+                            }
+                        }
+
+                    }else{
+                        CUR_INPUT_ParamStrList.add(args[i]);   // 当前cmd目录   第一个类型选项      之后所有的参数 保存在  CUR_INPUT_ParamStrList
+                        //    Rule_Identify_TypeIndexList.add(args[i]);
+                    }
+
                 }
             }
         }
@@ -58,7 +286,7 @@ public class H2_Calcul {
 
 
         // 用户没有输入参数
-        if (CUR_INPUT_ParamStrList.size() == 0) {
+        if (CUR_INPUT_ParamStrList.size() == 0 && Stock_Exp_List.size() == 0) {
              System.out.println("用户没有输入参数  提示如下:");
             showNoTypeTip();
             return;
@@ -77,6 +305,9 @@ public class H2_Calcul {
 
         jisuan(CUR_INPUT_ParamStrList);
 
+        for (int i = 0; i < Stock_Exp_List.size(); i++) {
+            Stock_Exp_List.get(i).calProcess();
+        }
 
         setProperity();
     }
@@ -1311,6 +1542,10 @@ str_you_ad_kuohao = "}";
         }
         return false;
     }
+
+
+
+
 
 
     public static boolean isNumeric(String str) {

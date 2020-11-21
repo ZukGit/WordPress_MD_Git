@@ -26,7 +26,7 @@
 #  《Method_Call_Template_2》= 《【ZHoldPlace_pythonMethodName】_data_List = 【ZHoldPlace_pythonMethodName】_data_List.append(【ZHoldPlace_propKey2ValueList_Index】_addname_dataframe)》
 
 
-#  《Method_Call_Template_2》=  《print("【ZHoldPlace_pythonMethodName】_data_List.__len__() = "+str(【ZHoldPlace_pythonMethodName】_data_List.__len__()))》
+#  《Method_Call_Template_2》=  《print("【ZHoldPlace_leaf_chinese_title】  【ZHoldPlace_pythonMethodName】_data_List.__len__() = "+str(【ZHoldPlace_pythonMethodName】_data_List.__len__()))》
 #  《Method_Call_Template_2》=  《print("【ZHoldPlace_CUR_TSCODE】 执行开始!  不可以测试强制断开！！！!")》
 #  《Method_Call_Template_2》=  《【ZHoldPlace_pythonMethodName】_data_List.to_excel(【ZHoldPlace_pythonMethodName】_excel_writer,'【ZHoldPlace_leaf_chinese_title】',index=False)》
 #  《Method_Call_Template_2》= 《【ZHoldPlace_pythonMethodName】_excel_writer.save()》

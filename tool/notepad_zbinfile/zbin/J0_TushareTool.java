@@ -48,13 +48,21 @@ public class J0_TushareTool {
 
     static String J0_Dir_Path = System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin"+File.separator+"J0_Data"+File.separator;
     static String J0_Python_Dir_Path = System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin"+File.separator+"J0_Python"+File.separator;
+    static String J0_DailyPython_Path = System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin"+File.separator+"J0_DayPython"+File.separator;
+
+    static String J0_TscodePython_Path = System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin"+File.separator+"J0_TscodePython"+File.separator;
+
+
     static String J0_call_all_python_bat = System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin"+File.separator+"J0_0000_call_all_python.bat";
     static String J0_call_select_rest_python_bat = System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin"+File.separator+"J0_0000_call_select_rest_python.bat";
     static String J0_call_select_single_python_bat = System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin"+File.separator+"J0_0000_call_select_single_python.bat";
-   static File J0_call_all_python_bat_File ;
+
+    static String J0_call_day_python_bat = System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin"+File.separator+"J0_0000_call_day_python.bat";
+
+    static File J0_call_all_python_bat_File ;
     static File J0_call_rest_python_bat_File ;
     static File J0_call_single_python_bat_File ;
-
+    static File J0_call_day_python_bat_File ;
 
     static String J0_GuPiaoLieBiao_Path = zbinPath+File.separator+"J0_股票列表.xlsx";
     static String J0_JiaoYiRiQi_Path = zbinPath+File.separator+"J0_交易日历.xlsx";
@@ -86,7 +94,7 @@ public class J0_TushareTool {
     static OS_TYPE CUR_OS_TYPE = OS_TYPE.Windows;
     static String BAT_OR_SH_Point;
     //  固定4  从CMD窗口输入得到的 目录关键字参数
-    // 当前 SHELL  所在目录  默认是main中的第一个 arg[0] 就是shell路径
+    // 当前 SHELL  所在目录  默认是主函数中的第一个 arg[0] 就是shell路径
     static String CUR_Dir_1_PATH = "";    //  arg[0] 就是shell路径 String 类型
     static File CUR_Dir_FILE;   // 当前 CMDER的路径 File 文件
     static File First_Input_Dir;   // 用户第一次可能输入的文件夹
@@ -94,6 +102,7 @@ public class J0_TushareTool {
     // 固定5 从CMD窗口输入得到的 功能 tyoe 索引类型  以及依据索引 选中的 逻辑规则
     // 输入的第一个数值 是 rule的索引   同时搭配  * # 实现不同功能
     static String CUR_TYPE_2_ParamsStr;  //  arg[1] 就是输入的第一个参数  固定 通过 tip输出
+    static String Origin_TYPE_2_ParamsStr;  // 最原始的  arg[1]
     static boolean isDefaultOperation = false;    //  是否是 默认的操作
 
 
@@ -129,6 +138,7 @@ public class J0_TushareTool {
     static String TreeDataPath = zbinPath + File.separator + "J0_treedata.txt";
     static String Python_HeadTemplate_Path = zbinPath + File.separator +"J0_python_head_template.py";
 
+    static J0_TushareTool J0_TushareTool;
 
 
     //  没有 ts_code 列的 并且
@@ -166,6 +176,33 @@ public class J0_TushareTool {
     static ArrayList<TreeNode> AllNodeList = new ArrayList<TreeNode>();
     static ArrayList<TreeNode> AllRootNode = new ArrayList<TreeNode>();
     static ArrayList<TreeNode> AllLeafNode = new ArrayList<TreeNode>();
+
+
+
+    // 记录当前最新的交易日  今天是工作日的话 那么就是今天  如果不是交易日 那么就是离他最近的交易日
+    static int SH_Last_Trade_Day_Int = getTimeStamp_YYYYMMDD_IntFlag();
+    static int  SH_Tomorrow_WorkTrade_Day_Int = SH_Last_Trade_Day_Int+1;
+
+
+    // 20200101  20201231
+    static int SH_Now_Year_BeginTradeDay_IntFlag = getTimeStamp_YYYYMMDD_BeginIntFlag();
+    static int SH_Now_Year_EndTradeDay_IntFlag = getTimeStamp_YYYYMMDD_EndIntFlag();
+
+    // 获取一周期
+    //            last_trade_date
+ static   int old_1_day_intflag    = getFutureDayFlag(SH_Last_Trade_Day_Int,-1);
+ static   int old_7_day_intflag   = getFutureDayFlag(SH_Last_Trade_Day_Int,-7);
+ static   int old_30_day_intflag    = getFutureDayFlag(SH_Last_Trade_Day_Int,-31);
+ static   int old_90_day_intflag    = getFutureDayFlag(SH_Last_Trade_Day_Int,-90);
+ static   int future_1_day_intflag   = getFutureDayFlag(SH_Last_Trade_Day_Int,1);
+ static   int future_7_day_intflag   = getFutureDayFlag(SH_Last_Trade_Day_Int,7);
+ static   int future_30_day_intflag   = getFutureDayFlag(SH_Last_Trade_Day_Int,31);
+ static   int future_90_day_intflag = getFutureDayFlag(SH_Last_Trade_Day_Int,90);
+ static   int old_yearbegin_day        =  getYearBeginIntFlag(SH_Last_Trade_Day_Int);  // 今年年初 那一天
+ static   int old_preyearend_day      =  getPreYearBeginIntFlag(SH_Last_Trade_Day_Int); // 上一年年末 那一天
+ static   int old_preyearbegin_day       =  getPreYearEndIntFlag(SH_Last_Trade_Day_Int); // 上一年年初 那一天
+ static   int future_yearend_day      =  getYearEndIntFlag(SH_Last_Trade_Day_Int);    //  今年最后 那一天
+ static   int next_yearbegin_day =  getNextYearBeginIntFlag(SH_Last_Trade_Day_Int); // 下一年的开始日期
 
 
     static boolean isContainEnvironment(String program) {
@@ -241,10 +278,15 @@ public class J0_TushareTool {
 
             File J0_Dir_Path_File = new File(J0_Dir_Path);
             File J0_Python_Dir_Path_File = new File(J0_Python_Dir_Path);
+            File J0_DailyPython_File = new File(J0_DailyPython_Path);
 
+            File J0_TsCodePython_File = new File(J0_TscodePython_Path);
 
             File J0_GuPiaoLieBiao_Path_File  = new File( J0_GuPiaoLieBiao_Path);
             File J0_JiaoYiRiQi_Path_File  = new File( J0_JiaoYiRiQi_Path);
+
+
+
 
 
             if (!J0_Dir_Path_File.exists()) {
@@ -254,6 +296,16 @@ public class J0_TushareTool {
 
             if (!J0_Python_Dir_Path_File.exists()) {
                 J0_Python_Dir_Path_File.mkdirs();
+
+            }
+
+            if (!J0_DailyPython_File.exists()) {
+                J0_DailyPython_File.mkdirs();
+
+            }
+
+            if (!J0_TsCodePython_File.exists()) {
+                J0_TsCodePython_File.mkdirs();
 
             }
 
@@ -276,6 +328,12 @@ public class J0_TushareTool {
             J0_call_single_python_bat_File =  python_call_single_bat_windows;
 
 
+            File python_call_day_bat  = new File( J0_call_day_python_bat);
+            File python_call_day_windows  = new File( J0_DailyPython_File + File.separator + python_call_day_bat.getName());
+            fileCopy(python_call_day_bat,python_call_day_windows);  // J0_DayPython 中放入 文件  J0_0000_call_day_python.bat
+            J0_call_day_python_bat_File = python_call_day_windows;
+
+
 
             if (J0_GuPiaoLieBiao_Path_File.exists() ) {
                 File python_GuPiaoLieBiao_Path_File  = new File( J0_Python_Dir_Path_File + File.separator + J0_GuPiaoLieBiao_Path_File.getName());
@@ -286,6 +344,8 @@ public class J0_TushareTool {
                 File python_JiaoYiRiQi_Path_File  = new File( J0_Python_Dir_Path_File + File.separator + J0_JiaoYiRiQi_Path_File.getName());
                 fileCopy(J0_JiaoYiRiQi_Path_File,python_JiaoYiRiQi_Path_File);  // 把 全局调用当前的 python文件的 .bat 文件复制到 当前 python 目录 方便 调试
             }
+
+
 
 
 
@@ -308,6 +368,35 @@ public class J0_TushareTool {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    static void showMap(Map<String, String> propMap ) {
+
+
+        System.out.println(" ___________________ " +" Prop属性 "+"___________________ ");
+
+            Map.Entry<String , String> entryItem;
+
+            if(propMap != null && propMap.size() > 0){
+                Iterator iterator = propMap.entrySet().iterator();
+                while( iterator.hasNext() ){
+
+
+                    entryItem = (Map.Entry<String , String>) iterator.next();
+                    String propKey = entryItem.getKey();
+                    String propValue = entryItem.getValue();
+
+                    System.out.println("propKey = "+ propKey + "    propValue = "+ propValue);
+                }
+            }else{
+
+                System.out.println("当前 Prop 文件 为 空！ ");
+
+            }
+
+
+
     }
 
     @SuppressWarnings("unchecked")
@@ -347,6 +436,7 @@ public class J0_TushareTool {
                     CUR_Dir_1_PATH = args[i];
                 } else if (i == 1) {  // 第二个参数是用来 对 当前功能进行分类使用的
                     CUR_TYPE_2_ParamsStr = args[i];
+                    Origin_TYPE_2_ParamsStr =  args[i];
 
                    int pythonType =   getPythonOperationType(CUR_TYPE_2_ParamsStr);
                    PythonType_Input =   pythonType;
@@ -382,6 +472,200 @@ public class J0_TushareTool {
     }
 
 
+    class QueryItem{
+        int PythonType_Input ;  // 输入的 int 区分类型  default-0  all-1  rest-2  single-3    day-4  ts_code-5
+        String TsCode_Input;  // 输入的 ts_code
+
+
+        String inputPramsStr = "";
+        String start_day = getTimeStamp_YYYYMMDD();
+        String end_day = getTimeStamp_YYYYMMDD();
+        String trade_day = getTimeStamp_YYYYMMDD();
+
+
+
+
+        QueryItem(int mPythonType_Input){
+            PythonType_Input = mPythonType_Input;
+        }
+
+
+
+
+      boolean     isTradeDate(){
+
+                if(!SH_TradeDayList.contains(SH_Last_Trade_Day_Int)){
+                    System.out.println("当前 依据条件环境 选中的 时间 : "+ SH_Last_Trade_Day_Int + " 不是交易日！！ 请重新输入交易日!");
+                    return false;
+                }
+                return true;
+    }
+
+        QueryItem(int mPythonType_Input,String mInputParamsStr){
+            PythonType_Input = mPythonType_Input;
+            inputPramsStr =  mInputParamsStr;
+
+            if(mPythonType_Input == 4){  //   包含 day
+                System.out.println("mPythonType_Input == 4  mInputParamsStr = "+ mInputParamsStr);
+                if(mInputParamsStr.contains("-")){
+                    String dayNum = inputPramsStr.substring(inputPramsStr.indexOf("-")+1);
+                 //   zzzzzzzzzzzzzzzz
+                    System.out.println("mPythonType_Input == 4  dayNum = "+ dayNum);
+                    System.out.println("mPythonType_Input == 4  A  SH_Last_Trade_Day_Int = "+ SH_Last_Trade_Day_Int);
+
+                    if(isNumeric(dayNum)){
+                        int dayNumInt = Integer.parseInt(dayNum);
+                        SH_Last_Trade_Day_Int = getFutureDayFlag(SH_Last_Trade_Day_Int,-(dayNumInt));
+                    }
+                    System.out.println("mPythonType_Input == 4  B  SH_Last_Trade_Day_Int = "+ SH_Last_Trade_Day_Int);
+
+                }else if(mInputParamsStr.contains("_")){
+                    String timeStamp = inputPramsStr.substring(inputPramsStr.indexOf("_")+1);
+                    // 20100101   这样的字符串
+                    System.out.println("mPythonType_Input == 4  timeStamp = "+ timeStamp);
+                    if(isNumeric(timeStamp)){
+                        SH_Last_Trade_Day_Int = Integer.parseInt(timeStamp);
+                    }
+
+                }
+
+                 start_day = SH_Last_Trade_Day_Int+"";
+                 end_day = SH_Last_Trade_Day_Int+"";
+                 trade_day = SH_Last_Trade_Day_Int+"";
+
+
+            }
+        }
+
+
+        String   ZHoldPlace_J0_Dir_PATH(){
+            String xlsxName = "";
+            if(PythonType_Input == 4){
+                xlsxName = J0_Dir_Path;
+            } else if(PythonType_Input == 5){
+                xlsxName = J0_Dir_Path;
+            }
+            return xlsxName;
+        }
+
+
+
+        String ZHoldPlace_day_date(){
+            String xlsxName = "";
+            if(PythonType_Input == 4){
+                xlsxName = "day_"+trade_day;
+            } else if(PythonType_Input == 5){
+                xlsxName = "tscode_"+trade_day;
+            }
+            return xlsxName;
+        }
+
+
+
+
+
+        String ZHoldPlace_OPERATION_DAY(){
+            String xlsxName = "";
+            if(PythonType_Input == 4){
+                xlsxName = "day_"+trade_day;
+            } else if(PythonType_Input == 5){
+                xlsxName = "tscode_"+getTimeStamp();
+            }
+            return xlsxName;
+        }
+
+        String mstart_date(){
+            String dateStr = "";
+
+
+            return dateStr;
+
+        }
+
+
+        String ZHoldPlace_Title(){
+            String xlsxName = "";
+            if(PythonType_Input == 4){
+                xlsxName = "day_"+trade_day;
+            } else if(PythonType_Input == 5){
+                xlsxName = "tscode_"+getTimeStamp();
+            }
+            return xlsxName;
+        }
+
+        String ZHoldPlace_Year_Int(){
+            String xlsxName = "";
+            if(PythonType_Input == 4){
+                xlsxName = ""+trade_day;
+            } else if(PythonType_Input == 5){
+                xlsxName = ""+getTimeStamp();
+            }
+            return xlsxName;
+        }
+
+
+        String ZHoldPlace_Weekly_Day(){
+            String xlsxName = "";
+            if(PythonType_Input == 4){
+                xlsxName = ""+trade_day;
+            } else if(PythonType_Input == 5){
+                xlsxName = ""+getTimeStamp();
+            }
+            return xlsxName;
+        }
+
+        String ZHoldPlace_Year_Month(){
+            String xlsxName = "";
+            if(PythonType_Input == 4){
+                xlsxName = ""+trade_day;
+            } else if(PythonType_Input == 5){
+                xlsxName = ""+getTimeStamp();
+            }
+            return xlsxName;
+        }
+
+        String ZHoldPlace_Month_Index(){
+            String xlsxName = "";
+            if(PythonType_Input == 4){
+                xlsxName = ""+trade_day;
+            } else if(PythonType_Input == 5){
+                xlsxName = ""+getTimeStamp();
+            }
+            return xlsxName;
+        }
+
+        String ZHoldPlace_Mstart_date(){
+            String xlsxName = "";
+            if(PythonType_Input == 4){
+                xlsxName = ""+trade_day;
+            } else if(PythonType_Input == 5){
+                xlsxName = ""+getTimeStamp();
+            }
+            return xlsxName;
+        }
+
+
+
+
+        File getOutPutFile(){
+            File output_File = null;
+            if(PythonType_Input == 4){
+                output_File = new File(J0_DailyPython_Path+File.separator+"day_"+trade_day+".py");
+            } else if(PythonType_Input == 5){
+                output_File = new File(J0_DailyPython_Path+File.separator+"tscode_"+trade_day+".py");
+            }
+
+            return output_File;
+        }
+
+
+
+
+
+    }
+
+  static  QueryItem queryItem ;
+
     static void   makePythonFileFromLeafNode(){
 
         File headFile = new File(Python_HeadTemplate_Path);
@@ -407,7 +691,7 @@ if(PythonType_Input == 1 ){
         ArrayList<String> pythonHeadStrList = ReadFileContentAsList(new File(getNodeHeadFile(leafNode.nodeName)));
         ArrayList<String> pythonBodyStrList = ReadFileContentAsList(new File(getNodeBodyFilePath(leafNode.nodeName)));
         System.out.println("Python-Item  = "+ leafNode.nodeName + "  "+((LeafNode)leafNode).leaf_chinese_title);
-        ((LeafNode)leafNode).pyhtonTemplate(pythonHeadStrList,pythonBodyStrList);
+        ((LeafNode)leafNode).pyhtonTemplate(pythonHeadStrList,pythonBodyStrList,PythonType_Input);
     }
 
 }else if(PythonType_Input == 2 ){
@@ -420,7 +704,7 @@ if(PythonType_Input == 1 ){
             ArrayList<String> pythonHeadStrList = ReadFileContentAsList(new File(getNodeHeadFile(leafNode.nodeName)));
             ArrayList<String> pythonBodyStrList = ReadFileContentAsList(new File(getNodeBodyFilePath(leafNode.nodeName)));
             System.out.println("Python-Item  = "+ leafNode.nodeName + "  "+((LeafNode)leafNode).leaf_chinese_title);
-            ((LeafNode)leafNode).pyhtonTemplate(pythonHeadStrList,pythonBodyStrList);
+            ((LeafNode)leafNode).pyhtonTemplate(pythonHeadStrList,pythonBodyStrList,PythonType_Input);
         }
 
     }
@@ -434,12 +718,56 @@ if(PythonType_Input == 1 ){
             ArrayList<String> pythonHeadStrList = ReadFileContentAsList(new File(getNodeHeadFile(leafNode.nodeName)));
             ArrayList<String> pythonBodyStrList = ReadFileContentAsList(new File(getNodeBodyFilePath(leafNode.nodeName)));
             System.out.println("Python-Item  = "+ leafNode.nodeName + "  "+((LeafNode)leafNode).leaf_chinese_title);
-            ((LeafNode)leafNode).pyhtonTemplate(pythonHeadStrList,pythonBodyStrList);
+            ((LeafNode)leafNode).pyhtonTemplate(pythonHeadStrList,pythonBodyStrList,PythonType_Input);
         }
 
     }
 
 
+}else if(PythonType_Input == 4){
+
+
+    ArrayList<String> allDailyCode = new  ArrayList<String>();
+    ArrayList<String> allDailyBodyCode = new  ArrayList<String>();
+
+    ArrayList<String> allOriginCode = new  ArrayList<String>();
+    ArrayList<String> allOriginBodyCode = new  ArrayList<String>();
+
+    ArrayList<TreeNode> dailyQuery_NodeList = getNodeSelectedNode(dailyQueryNodeNameList);
+    if(dailyQuery_NodeList.size() == 0){
+        System.out.println("daily 查询选中的 查询 TreeNode列表为空!    dailyQuery_NodeList.size() = 0");
+        return;
+    }
+
+    ArrayList<String> pythonHeadStrList = null;
+    for (int i = 0; i <dailyQuery_NodeList.size() ; i++) {
+        TreeNode leafNode = dailyQuery_NodeList.get(i);
+         ReadFileContentAsList(new File(getNodeHeadFile(leafNode.nodeName)));
+        pythonHeadStrList = ReadFileContentAsList(new File(getNodeHeadFile(leafNode.nodeName)));
+        ArrayList<String> pythonBodyStrList = ReadFileContentAsList(new File(getNodeBodyFilePath(leafNode.nodeName)));
+        System.out.println("Python-Item  = "+ leafNode.nodeName + "  "+((LeafNode)leafNode).leaf_chinese_title);
+
+        allOriginBodyCode.addAll(pythonBodyStrList);  //   对 获取到的 pythonBodyStrList 进行 一对一的 处理
+
+        allDailyBodyCode.addAll(((LeafNode)leafNode).pyhtonDailyTemplate(pythonHeadStrList,pythonBodyStrList,queryItem));
+    }
+
+    if(pythonHeadStrList != null){
+        allDailyCode.addAll(pythonHeadStrList);
+        allOriginCode.addAll(pythonHeadStrList);
+    }else{
+        allDailyCode.addAll(ReadFileContentAsList(new File(getNodeHeadFile("gupiaoliebiao"))));
+        allOriginCode.addAll(ReadFileContentAsList(new File(getNodeHeadFile("gupiaoliebiao"))));
+    }
+
+    allDailyCode.addAll(allDailyBodyCode);
+File dailyPythonFile = new File(J0_DailyPython_Path+File.separator+"day_"+SH_Last_Trade_Day_Int+".py");
+File ori_dailyPythonFile = new File(J0_DailyPython_Path+File.separator+"day_"+SH_Last_Trade_Day_Int+"_oringin"+".py");
+
+    allOriginCode.addAll(allOriginBodyCode);
+
+writeContentToFile(dailyPythonFile,allDailyCode);
+// writeContentToFile(ori_dailyPythonFile,allOriginCode);   // 打印 原始的 模板  方便分析
 
 }
 
@@ -449,7 +777,19 @@ if(PythonType_Input == 1 ){
  }
 
 
+    static ArrayList<TreeNode> getNodeSelectedNode(ArrayList<String> nodeNameList){
+        ArrayList<TreeNode> selectedNodeList = new    ArrayList<TreeNode>();
+        for (int i = 0; i < AllLeafNode.size(); i++) {
+            TreeNode itemNode = AllLeafNode.get(i);
+            String itemNodeName = itemNode.nodeName;
+            if(nodeNameList.contains(itemNodeName)){
+                selectedNodeList.add(itemNode);
+            }
+        }
 
+        return selectedNodeList;
+
+    }
 
     // 读取 J0_treedata.txt   形成树型Node
     static void initTreeData() {
@@ -483,7 +823,7 @@ if(PythonType_Input == 1 ){
         // 链式 Node 结点   用于 记录 当前 父节点
         ArrayList<TreeNode> rootNodeList = new ArrayList<TreeNode>();
 
-        J0_TushareTool tool = new J0_TushareTool();
+        J0_TushareTool = new J0_TushareTool();
         TreeNode preNodeItem = null;
         for (int i = 0; i < blockList.size(); i++) {
             ArrayList<String> block = blockList.get(i);
@@ -493,7 +833,7 @@ if(PythonType_Input == 1 ){
                 System.out.println(block.get(j));
             }
             System.out.println("------------------");
-            TreeNode nodeItem = tool.CreateNode(block,i);
+            TreeNode nodeItem = J0_TushareTool.CreateNode(block,i);
             TreeNode endNodeInList = null;
             int endNodeDeep = 0;
             if (rootNodeList.size() >= 1) {
@@ -810,6 +1150,8 @@ if(PythonType_Input == 1 ){
             String LineEnd = " ________________________________________________ \n";
 
 
+            showMap(propKey2ValueList);
+
 
 
             sb.append(LinePre+"指定单个索引节点 仅执行一个"+LineEnd);
@@ -858,6 +1200,91 @@ if(PythonType_Input == 1 ){
             sb.append("描述: "+" 初始化执行所有 python文件的更新 并 按照次序执行 更新后的 python 拉取数据的代码! \n");
             sb.append(Cur_Bat_Name+"  all &&  " + " "+ J0_call_all_python_bat_File.getAbsolutePath() );
 
+
+
+            int nowInt =getTodayTradeDay();
+
+
+//            for (int i = 0; i < SH_TradeDayList.size(); i++) {
+//                System.out.println("交易所引:"+ i + "  值:"+  SH_TradeDayList.get(i));
+//            }
+
+
+
+
+            int tradeday_1_fromnow =  getPreDayTradeDay(nowInt);
+            int tradeday_2_fromnow =  getPreDayTradeDay(tradeday_1_fromnow);
+            int tradeday_3_fromnow =  getPreDayTradeDay(tradeday_2_fromnow);
+            int tradeday_4_fromnow =  getPreDayTradeDay(tradeday_3_fromnow);
+            int tradeday_5_fromnow =  getPreDayTradeDay(tradeday_4_fromnow);
+            int tradeday_6_fromnow =  getPreDayTradeDay(tradeday_5_fromnow);
+            int tradeday_7_fromnow =  getPreDayTradeDay(tradeday_6_fromnow);
+            int tradeday_8_fromnow =  getPreDayTradeDay(tradeday_7_fromnow);
+            int tradeday_9_fromnow = getPreDayTradeDay(tradeday_8_fromnow);
+            int tradeday_10_fromnow = getPreDayTradeDay(tradeday_9_fromnow);
+            int tradeday_11_fromnow = getPreDayTradeDay(tradeday_10_fromnow);
+            int tradeday_12_fromnow = getPreDayTradeDay(tradeday_11_fromnow);
+            int tradeday_13_fromnow = getPreDayTradeDay(tradeday_12_fromnow);
+            int tradeday_14_fromnow = getPreDayTradeDay(tradeday_13_fromnow);
+            int tradeday_15_fromnow = getPreDayTradeDay(tradeday_14_fromnow);
+
+
+            sb.append(LinePre+" 获取最近日期 day 数据 【 day_依赖日期 】"+LineEnd);
+
+            sb.append("\n【上 十五 日】交易日 day query  "+tradeday_15_fromnow+" 查询如下: \n");
+            sb.append(Cur_Bat_Name+"  day_"+tradeday_15_fromnow+"   &&  " + " "+ J0_call_day_python_bat_File.getAbsolutePath() + "  "+ tradeday_15_fromnow);
+
+
+            sb.append("\n【上 十四 日】交易日 day query  "+tradeday_14_fromnow+" 查询如下: \n");
+            sb.append(Cur_Bat_Name+"  day_"+tradeday_14_fromnow+"   &&  " + " "+ J0_call_day_python_bat_File.getAbsolutePath() + "  "+ tradeday_14_fromnow);
+
+
+            sb.append("\n【上 十三 日】交易日 day query  "+tradeday_13_fromnow+" 查询如下: \n");
+            sb.append(Cur_Bat_Name+"  day_"+tradeday_13_fromnow+"   &&  " + " "+ J0_call_day_python_bat_File.getAbsolutePath() + "  "+ tradeday_13_fromnow);
+
+
+            sb.append("\n【上 十二 日】交易日 day query  "+tradeday_12_fromnow+" 查询如下: \n");
+            sb.append(Cur_Bat_Name+"  day_"+tradeday_12_fromnow+"   &&  " + " "+ J0_call_day_python_bat_File.getAbsolutePath() + "  "+ tradeday_12_fromnow);
+
+
+            sb.append("\n【上 十一 日】交易日 day query  "+tradeday_11_fromnow+" 查询如下: \n");
+            sb.append(Cur_Bat_Name+"  day_"+tradeday_11_fromnow+"   &&  " + " "+ J0_call_day_python_bat_File.getAbsolutePath() + "  "+ tradeday_11_fromnow);
+
+
+            sb.append("\n【上 十 日】交易日 day query  "+tradeday_10_fromnow+" 查询如下: \n");
+            sb.append(Cur_Bat_Name+"  day_"+tradeday_10_fromnow+"   &&  " + " "+ J0_call_day_python_bat_File.getAbsolutePath() + "  "+ tradeday_10_fromnow);
+
+            sb.append("\n【上 九 日 】交易日 day query "+tradeday_9_fromnow+" 查询如下: \n");
+            sb.append(Cur_Bat_Name+"  day_"+tradeday_9_fromnow+"   &&  " + " "+ J0_call_day_python_bat_File.getAbsolutePath() + "  "+ tradeday_9_fromnow);
+
+            sb.append("\n【上 八 日】交易日 day query  "+tradeday_8_fromnow+ "查询如下: \n");
+            sb.append(Cur_Bat_Name+"  day_"+tradeday_8_fromnow+"   &&  " + " "+ J0_call_day_python_bat_File.getAbsolutePath() + "  "+ tradeday_8_fromnow);
+
+            sb.append("\n【上 七 日】交易日 day query "+tradeday_7_fromnow+ "查询如下: \n");
+            sb.append(Cur_Bat_Name+"  day_"+tradeday_7_fromnow+"   &&  " + " "+ J0_call_day_python_bat_File.getAbsolutePath() + "  "+ tradeday_9_fromnow);
+
+            sb.append("\n【上 六 日】交易日 day query "+tradeday_6_fromnow+ "查询如下: \n");
+            sb.append(Cur_Bat_Name+"  day_"+tradeday_6_fromnow+"   &&  " + " "+ J0_call_day_python_bat_File.getAbsolutePath() + "  "+ tradeday_6_fromnow);
+
+            sb.append("\n【上 五 日】交易日 day query "+tradeday_5_fromnow+ "查询如下: \n");
+            sb.append(Cur_Bat_Name+"  day_"+tradeday_5_fromnow+"   &&  " + " "+ J0_call_day_python_bat_File.getAbsolutePath() + "  "+ tradeday_5_fromnow);
+
+            sb.append("\n【上 四 日】交易日 day query  "+tradeday_4_fromnow+ "查询如下: \n");
+            sb.append(Cur_Bat_Name+"  day_"+tradeday_4_fromnow+"   &&  " + " "+ J0_call_day_python_bat_File.getAbsolutePath() + "  "+ tradeday_4_fromnow);
+
+            sb.append("\n【上 三 日】交易日 day query  "+tradeday_3_fromnow+ "查询如下: \n");
+            sb.append(Cur_Bat_Name+"  day_"+tradeday_3_fromnow+"   &&  " + " "+ J0_call_day_python_bat_File.getAbsolutePath() + "  "+ tradeday_3_fromnow);
+
+            sb.append("\n【上 两 日】交易日 day query  "+tradeday_2_fromnow+ "查询如下: \n");
+            sb.append(Cur_Bat_Name+"  day_"+tradeday_2_fromnow+"   &&  " + " "+ J0_call_day_python_bat_File.getAbsolutePath() + "  "+ tradeday_2_fromnow);
+
+
+            sb.append("\n【上 一 日】交易日 day query  "+tradeday_1_fromnow+ "查询如下: \n");
+            sb.append(Cur_Bat_Name+"  day_"+tradeday_1_fromnow+"   &&  " + " "+ J0_call_day_python_bat_File.getAbsolutePath() + "  "+ tradeday_1_fromnow);
+
+
+            sb.append("\n【最新最近】交易日 day query  "+nowInt+ "查询如下: \n");
+            sb.append(Cur_Bat_Name+"  day_"+nowInt+"   &&  " + " "+ J0_call_day_python_bat_File.getAbsolutePath() +"  "+ nowInt);
 
 
 
@@ -1305,7 +1732,10 @@ if(PythonType_Input == 1 ){
             return 2;
         }else if(inputParams.contains("single")){
             return 3;
+        }else if(inputParams.contains("day")){
+            return 4;
         }
+
 
         return 0;
     }
@@ -1368,6 +1798,54 @@ if(PythonType_Input == 1 ){
             }
         }
 
+
+    }
+
+
+
+
+    static  int     getNextYearBeginIntFlag(int dayFlagInt){
+        String yearStr = (""+dayFlagInt).substring(0,4);
+        int year = Integer.parseInt(yearStr) -1;
+        String nextYearBegin = year+"0101";
+        return Integer.parseInt(nextYearBegin);
+
+    }
+
+
+    static   int     getYearEndIntFlag(int dayFlagInt){
+        String yearStr = (""+dayFlagInt).substring(0,4);
+        String dayDesc = yearStr+"1231";
+        return Integer.parseInt(dayDesc);
+
+    }
+
+
+
+    static   int     getPreYearEndIntFlag(int dayFlagInt){
+        String yearStr = (""+dayFlagInt).substring(0,4);
+        int Year = Integer.parseInt(yearStr) -1 ;
+        String dayDesc = Year+"1231";
+        return Integer.parseInt(dayDesc);
+
+    }
+
+
+
+    static  int     getPreYearBeginIntFlag(int dayFlagInt){
+        String yearStr = (""+dayFlagInt).substring(0,4);
+        int Year = Integer.parseInt(yearStr) -1 ;
+        String dayDesc = Year+"0101";
+        return Integer.parseInt(dayDesc);
+
+    }
+
+
+
+    static     int     getYearBeginIntFlag(int dayFlagInt){
+        String yearStr = (""+dayFlagInt).substring(0,4);
+        String dayDesc = yearStr+"0101";
+        return Integer.parseInt(dayDesc);
 
     }
 
@@ -1989,6 +2467,15 @@ if(PythonType_Input == 1 ){
         return Integer.parseInt(date);
     }
 
+
+    static String getTimeStamp_YYYYMM() {
+
+        SimpleDateFormat df = new SimpleDateFormat("yyyyMM");//设置日期格式
+        String date = df.format(new Date());
+        return date;
+    }
+
+
     static String getTimeStamp_YYYYMMDD() {
 
         SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd");//设置日期格式
@@ -2003,6 +2490,14 @@ if(PythonType_Input == 1 ){
         String date = df.format(new Date());
         return date;
     }
+
+    static String getTimeStamp_yyyyMMddHH() {
+
+        SimpleDateFormat df = new SimpleDateFormat("yyyyMMddHH");//设置日期格式
+        String date = df.format(new Date());
+        return date;
+    }
+
 
     static String getTimeStampLong() {
 
@@ -2248,16 +2743,19 @@ if(PythonType_Input == 1 ){
         System.out.println("PythonItem_Index = "+ PythonItem_Index);
         System.out.println("PythonType_Input = "+ PythonType_Input);
 
+
+
+
         if(PythonType_Input != 0){
             initTsCodeList();
-            initTradeDayList();
         }
+        initTradeDayList();  // 打印tip时   检查 交易日期的时候 用到
 
         SH_Tomorrow_WorkTrade_Day_Int = getTomorrowTradeDay(SH_Last_Trade_Day_Int);
 
 
-        J0_TushareTool mJ0_Object = new J0_TushareTool();
-        mJ0_Object.InitRule();
+//        J0_TushareTool mJ0_Object = new J0_TushareTool();
+        J0_TushareTool.InitRule();
 
         // 用户没有输入参数
         if (CUR_INPUT_3_ParamStrList.size() == 0 && !allowEmptyInputParam && PythonType_Input == 0) {
@@ -2271,8 +2769,15 @@ if(PythonType_Input == 1 ){
 //            return;
 //        }
 
+        queryItem =  J0_TushareTool.new QueryItem(PythonType_Input,Origin_TYPE_2_ParamsStr);
 
 
+
+
+        if(!queryItem.isTradeDate()){
+            System.out.println("当前 依据条件环境 选中的 时间 : "+ SH_Last_Trade_Day_Int + " 不是交易日！！ 请重新输入交易日!");
+            return;
+        }
 
 
 
@@ -2650,6 +3155,95 @@ if(PythonType_Input == 1 ){
 
 
 
+/*
+
+        // 记录当前最新的交易日  今天是工作日的话 那么就是今天  如果不是交易日 那么就是离他最近的交易日
+        static int SH_Last_Trade_Day_Int = getTimeStamp_YYYYMMDD_IntFlag();
+        static int  SH_Tomorrow_WorkTrade_Day_Int = SH_Last_Trade_Day_Int+1;
+
+
+        // 20200101  20201231
+        static int SH_Now_Year_BeginTradeDay_IntFlag = getTimeStamp_YYYYMMDD_BeginIntFlag();
+        static int SH_Now_Year_EndTradeDay_IntFlag = getTimeStamp_YYYYMMDD_EndIntFlag();
+
+        // 获取一周期
+        //            last_trade_date
+
+*/
+
+        //zukgitmap
+        void fixed_MapForDaily(QueryItem queryItem){
+
+//            SH_Last_Trade_Day_Int    变化 那么其余也变化
+              int old_1_day_intflag    = getFutureDayFlag(SH_Last_Trade_Day_Int,-1);
+              int old_7_day_intflag   = getFutureDayFlag(SH_Last_Trade_Day_Int,-7);
+              int old_30_day_intflag    = getFutureDayFlag(SH_Last_Trade_Day_Int,-31);
+              int old_90_day_intflag    = getFutureDayFlag(SH_Last_Trade_Day_Int,-90);
+              int future_1_day_intflag   = getFutureDayFlag(SH_Last_Trade_Day_Int,1);
+              int future_7_day_intflag   = getFutureDayFlag(SH_Last_Trade_Day_Int,7);
+              int future_30_day_intflag   = getFutureDayFlag(SH_Last_Trade_Day_Int,31);
+              int future_90_day_intflag = getFutureDayFlag(SH_Last_Trade_Day_Int,90);
+              int old_yearbegin_day        =  getYearBeginIntFlag(SH_Last_Trade_Day_Int);  // 今年年初 那一天
+              int old_preyearend_day      =  getPreYearBeginIntFlag(SH_Last_Trade_Day_Int); // 上一年年末 那一天
+              int old_preyearbegin_day       =  getPreYearEndIntFlag(SH_Last_Trade_Day_Int); // 上一年年初 那一天
+              int future_yearend_day      =  getYearEndIntFlag(SH_Last_Trade_Day_Int);    //  今年最后 那一天
+              int next_yearbegin_day =  getNextYearBeginIntFlag(SH_Last_Trade_Day_Int); // 下一年的开始日期
+
+            python_holder_map.put("J0.properties","J0_Daily.properties");
+
+            python_holder_map.put("【ZHoldPlace_J0_Dir_PATH】",fixedPythonFilePath(queryItem.ZHoldPlace_J0_Dir_PATH()));
+            python_holder_map.put(pythonMethodName+"_【ZHoldPlace_Mstart_date】",queryItem.ZHoldPlace_Title());
+            python_holder_map.put(pythonMethodName+"_【ZHoldPlace_Year_Int】",queryItem.ZHoldPlace_Title());
+            python_holder_map.put("【ZHoldPlace_Year_Int】",queryItem.ZHoldPlace_Year_Int());
+            python_holder_map.put("【ZHoldPlace_Weekly_Day】",queryItem.ZHoldPlace_Weekly_Day());
+            python_holder_map.put("【ZHoldPlace_Year_Month】",queryItem.ZHoldPlace_Year_Month());
+            python_holder_map.put("_【ZHoldPlace_Month_Index】","_"+queryItem.ZHoldPlace_Month_Index());  // 作为 变量
+            python_holder_map.put("'【ZHoldPlace_Month_Index】'"," '"+leaf_chinese_title+"'");  // 作为 sheet 名称
+//            python_holder_map.put("'【ZHoldPlace_Month_Index】'"," '"+leaf_chinese_title+"'");  // 作为 sheet 名称
+
+
+            python_holder_map.put("【ZHoldPlace_EndWorkDay_MonthDay】",leaf_chinese_title);
+
+            python_holder_map.put("【ZHoldPlace_Mstart_date】",queryItem.ZHoldPlace_Mstart_date());
+            python_holder_map.put("【ZHoldPlace_day_date】",queryItem.ZHoldPlace_day_date());
+//             python_holder_map.put(pythonMethodName+"_"+SH_Last_Trade_Day_Int,queryItem.ZHoldPlace_Title());
+            python_holder_map.put("'"+pythonMethodName+"_"+SH_Last_Trade_Day_Int+".","'"+queryItem.ZHoldPlace_Title()+".");  //  weekly_20201118.columns.values.tolist():
+            python_holder_map.put("\\\\"+pythonMethodName+"_"+SH_Last_Trade_Day_Int+".","\\\\"+queryItem.ZHoldPlace_Title()+"."); //  load_workbook('C:\\Users\\zhuzj5\\Desktop\\zbin\\J0_Data\\monthly_20201118.xlsx')   day_20201118
+
+            System.out.println(pythonMethodName+"_"+SH_Last_Trade_Day_Int+"." +"   ---->>  "+queryItem.ZHoldPlace_Title()+"." );
+
+            python_holder_map.put("【ZHoldPlace_OPERATION_DAY】",queryItem.ZHoldPlace_OPERATION_DAY());
+//            python_holder_map.put(pythonMethodName+"_"+getTimeStamp_yyyyMMddHH(),queryItem.ZHoldPlace_Title());
+            python_holder_map.put("【ZHoldPlace_DayMonthIndex_Xinqi】",leaf_chinese_title);
+
+            python_holder_map.put("【ZHoldPlace_WeekIndex_DayDesc】",leaf_chinese_title);
+
+            python_holder_map.put("【ZHoldPlace_start_date】",queryItem.start_day);
+            python_holder_map.put("【ZHoldPlace_end_date】",queryItem.end_day);
+            python_holder_map.put("【ZHoldPlace_Title】",queryItem.ZHoldPlace_Title());
+
+            python_holder_map.put("10ystart_date=''","start_date='"+old_yearbegin_day+"'");
+            python_holder_map.put("10yend_date=''","end_date='"+future_yearend_day+"'");
+
+            // start_date='202001017',end_date='20201218',trade_date='20201117' 会导致 读取 服务器数据 失败  for daily
+            python_holder_map.put("start_date='',end_date='',trade_date=''",",start_date='',end_date='',trade_date='"+queryItem.start_day+"'");
+
+            python_holder_map.put("trade_date=''","trade_date='"+ SH_Last_Trade_Day_Int+"'");  //    没有 trade_date for daily_basic 会调用失败 缺少必要参数
+
+
+            python_holder_map.put("1mstart_date=''","start_date='"+old_30_day_intflag+"'");
+            python_holder_map.put("1mend_date=''","end_date='"+future_30_day_intflag+"'");
+
+            // pro.weekly(wtrade_date='20201117'
+            python_holder_map.put("(wtrade_date=''","(trade_date='"+ getNearestFriday(SH_Last_Trade_Day_Int)+"'");  // SH_Last_Trade_Day_Int 获取离当前时间最近的周五
+            python_holder_map.put("mtrade_date=''","trade_date='"+getLastTradeDate_In_Month(SH_Last_Trade_Day_Int)+"'");
+
+
+            python_holder_map.put("yeartonow_trade_date=''","trade_date='"+queryItem.start_day+"'");
+
+            python_holder_map.put("start_date='"+old_30_day_intflag+"'"+",end_date='"+future_30_day_intflag+"'"+",trade_date=''","start_date='',end_date='',trade_date='"+SH_Last_Trade_Day_Int+"'");
+
+        }
 
 
         void initHoldeMap(){
@@ -2662,7 +3256,7 @@ if(PythonType_Input == 1 ){
             python_holder_map.put("【ZHoldPlace_leaf_chinese_title】",get_ZHoldPlace_leaf_chinese_title());
             python_holder_map.put("【ZHoldPlace_call_LimitNum_OneMinutes】",get_ZHoldPlace_call_LimitNum_OneMinutes());
             python_holder_map.put("【ZHoldPlace_NodeName】",nodeName);
-            python_holder_map.put("【ZHoldPlace_Now_YYYYMMDD】",getTimeStamp_YYYYMMDD());
+            python_holder_map.put("【ZHoldPlace_Now_YYYYMMDD】",SH_Last_Trade_Day_Int+"");
             python_holder_map.put("【ZHoldPlace_J0_Dir_PATH】",fixedPythonFilePath(J0_Dir_Path));
             python_holder_map.put("【ZHoldPlace_Node_Website】",leaf_web_sit);
             python_holder_map.put("【ZHoldPlace_TomorrowDay_YYYYMMDD】",SH_Tomorrow_WorkTrade_Day_Int+"");
@@ -2689,8 +3283,8 @@ if(PythonType_Input == 1 ){
             int old_preyearbegin_day =  getPreYearEndIntFlag(SH_Last_Trade_Day_Int); // 上一年年初 那一天
             int future_yearend_day =  getYearEndIntFlag(SH_Last_Trade_Day_Int);    //  今年最后 那一天
 
+            int next_yearbegin_day =  getNextYearBeginIntFlag(SH_Last_Trade_Day_Int); // 下一年的开始日期
 
-            int next_yearbegin_day =  getNextYearBeginIntFlag(SH_Last_Trade_Day_Int);
 
             System.out.println("today = "+ SH_Last_Trade_Day_Int + " -7="+old_7_day_intflag+"   -31="+old_30_day_intflag+" -90="+old_90_day_intflag+"  7="+future_7_day_intflag+"  31="+future_30_day_intflag+"   90="+future_90_day_intflag);
 
@@ -2743,52 +3337,6 @@ if(PythonType_Input == 1 ){
             // 【ZHoldPlace_DayIndex】    每个月的 好数
         }
 
-
-
-        int     getNextYearBeginIntFlag(int dayFlagInt){
-            String yearStr = (""+dayFlagInt).substring(0,4);
-            int year = Integer.parseInt(yearStr) -1;
-            String nextYearBegin = year+"0101";
-            return Integer.parseInt(nextYearBegin);
-
-        }
-
-
-        int     getYearEndIntFlag(int dayFlagInt){
-            String yearStr = (""+dayFlagInt).substring(0,4);
-            String dayDesc = yearStr+"1231";
-            return Integer.parseInt(dayDesc);
-
-        }
-
-
-
-        int     getPreYearEndIntFlag(int dayFlagInt){
-            String yearStr = (""+dayFlagInt).substring(0,4);
-            int Year = Integer.parseInt(yearStr) -1 ;
-            String dayDesc = Year+"1231";
-            return Integer.parseInt(dayDesc);
-
-        }
-
-
-
-        int     getPreYearBeginIntFlag(int dayFlagInt){
-            String yearStr = (""+dayFlagInt).substring(0,4);
-            int Year = Integer.parseInt(yearStr) -1 ;
-            String dayDesc = Year+"0101";
-            return Integer.parseInt(dayDesc);
-
-        }
-
-
-
-        int     getYearBeginIntFlag(int dayFlagInt){
-            String yearStr = (""+dayFlagInt).substring(0,4);
-            String dayDesc = yearStr+"0101";
-            return Integer.parseInt(dayDesc);
-
-        }
 
 
 
@@ -2968,8 +3516,91 @@ boolean isOperationType4_Wtrade_date(ArrayList<String> fieldParamList){
             return resultSpaceMonth;
         }
 
+
+
         @SuppressWarnings("unchecked")
-        void   pyhtonTemplate(ArrayList<String> headTemplateList ,ArrayList<String>   bodyTemplateList){
+        ArrayList<String>   pyhtonDailyTemplate(ArrayList<String> headTemplateList ,ArrayList<String>   bodyTemplateList ,QueryItem queryItem){
+            ArrayList<String> pythonBodyCodeList = new   ArrayList<String>();
+            initHoldeMap();
+            fixed_MapForDaily(queryItem);
+            if(queryItem.PythonType_Input == 4){  // daily_query
+
+
+                Map<String,ArrayList<String>> mTemplate = calculTemplateMap(headTemplateList,bodyTemplateList);
+
+                ArrayList<String> firstList  = mTemplate.get(First_Holder_Tag);
+                System.out.println("firstList.size = "+ firstList.size());
+
+                ArrayList<String> firstList_Code = new  ArrayList<String>();
+                for (int i = 0; i < firstList.size() ; i++) {
+                    String oneCode = firstList.get(i);
+                    System.out.println("First_ori_Code["+i+"]  = "+ oneCode);
+                    String fixedCode = HolderReplaceOperation_Static(oneCode);
+                    System.out.println("First_ori_Code-> fixedCode ["+i+"]  = "+ fixedCode);
+                    if(fixedCode.contains("【ZHoldPlace_")){
+                        System.out.println("当前 字符串还存在没有替换的 占位符  fixedCode = "+ fixedCode + "  fixedCode = "+ fixedCode);
+                    }
+                    firstList_Code.add(fixedCode);
+                }
+
+
+
+                ArrayList<String> tailList  = mTemplate.get(Tail_Holder_Tag);
+                System.out.println("tailList.size = "+ tailList.size());
+
+
+                ArrayList<String> tailList_Code = new  ArrayList<String>();
+                for (int i = 0; i < tailList.size() ; i++) {
+                    String oneCode = tailList.get(i);
+//                System.out.println("Tail_ori_Code["+i+"]  = "+ oneCode);
+                    String fixedCode = HolderReplaceOperation_Static(oneCode);
+                    if(fixedCode.contains("【ZHoldPlace_")){
+                        System.out.println("当前 字符串还存在没有替换的 占位符  fixedCode = "+ fixedCode + "  fixedCode = "+ fixedCode);
+                    }
+                    tailList_Code.add(fixedCode);
+                }
+
+
+                ArrayList<String> fieldParamList =      calculInputParamList();
+
+
+                ArrayList<String> callMethodTemplateList  = mTemplate.get(Method_Holder_Tag);
+                System.out.println("callMethodTemplateList.size = "+ callMethodTemplateList.size());
+                ArrayList<String> python_method_call_List_Code = new  ArrayList<String>();
+
+                for (int i = 0; i < fieldParamList.size() ; i++) {
+                    String fieldItem = fieldParamList.get(i);
+                    for (int j = 0; j < callMethodTemplateList.size(); j++) {
+                        String methodText = callMethodTemplateList.get(j);
+                        String fillText =  HolderReplaceOperation_Static(methodText);
+                        // get  定义接收变量的名称
+                        if(fillText.contains("【ZHoldPlace_propKey2ValueList_Index】")){
+                            String defineVariable = pythonMethodName+"_item_"+i;
+                            fillText =     fillText.replace("【ZHoldPlace_propKey2ValueList_Index】",defineVariable);
+                        }
+                        if(fillText.contains("【ZHoldPlace_propKey2ValueList】")){
+                            fillText =     fillText.replace("【ZHoldPlace_propKey2ValueList】",fieldItem);
+                        }
+
+                        fillText =  HolderReplaceOperation_Static(fillText);
+                        System.out.println("Body_ori_Code["+i+"]  = "+ fillText);
+                        python_method_call_List_Code.add(fillText);
+
+                    }
+                    python_method_call_List_Code.add("\n");
+                }
+
+                return   showBodyPythonCode( null,firstList_Code,python_method_call_List_Code,tailList_Code);
+
+
+            }
+
+
+            return pythonBodyCodeList;
+        }
+
+        @SuppressWarnings("unchecked")
+        ArrayList<String>   pyhtonTemplate(ArrayList<String> headTemplateList ,ArrayList<String>   bodyTemplateList ,int InputPythonType){
 
             initHoldeMap();
             ArrayList<String> pythonCodeList = new   ArrayList<String>();
@@ -3795,8 +4426,13 @@ boolean isBegin = ( null == cur_operation_tscode || "".equals(cur_operation_tsco
 
             }
 
+            if(InputPythonType == 4){  // daily  query  那么 就把 所有的 ts_code 返回回去
 
-            showItemPythonCode( headTemplateList,firstList_Code,python_method_call_List_Code,tailList_Code);
+                return showBodyPythonCode(headTemplateList,firstList_Code,python_method_call_List_Code,tailList_Code);
+            }
+
+
+         return   showItemPythonCode( headTemplateList,firstList_Code,python_method_call_List_Code,tailList_Code);
             // 函数参数  以及参数的可选值  key 是参数名称   value 是可选值范围 ArrayList<String>   Map<String, ArrayList<String>>
 
 
@@ -3811,7 +4447,55 @@ boolean isBegin = ( null == cur_operation_tscode || "".equals(cur_operation_tsco
 
         }
 
-        void  showItemPythonCode(ArrayList<String>  headList, ArrayList<String>  firstList , ArrayList<String>  bodyList , ArrayList<String> tailList){
+
+        ArrayList<String>  showBodyPythonCode(ArrayList<String>  headList, ArrayList<String>  firstList , ArrayList<String>  bodyList , ArrayList<String> tailList){
+            System.out.println();
+            System.out.println();
+            System.out.println();
+            System.out.println("######## 打印Python 代码 Item = "+ leaf_chinese_title+"  网页:   "+ leaf_web_sit);
+            ArrayList<String> codeList = new    ArrayList<String>();
+
+//            for (int i = 0; i < headList.size(); i++) {
+//                String headItem = headList.get(i);
+//                codeList.add(headItem);
+//                System.out.println(headItem);
+//            }
+
+            for (int i = 0; i < firstList.size(); i++) {
+                String firstListItem = firstList.get(i);
+                codeList.add(firstListItem);
+                System.out.println(firstListItem);
+
+            }
+
+            for (int i = 0; i < bodyList.size(); i++) {
+                String bodyItem = bodyList.get(i);
+                codeList.add(bodyItem);
+                System.out.println(bodyItem);
+
+            }
+
+            for (int i = 0; i < tailList.size(); i++) {
+                String tailItem = tailList.get(i);
+                codeList.add(tailItem);
+                System.out.println(tailItem);
+
+            }
+            System.out.println();
+            System.out.println();
+            System.out.println();
+
+/*            File targetPythonCodeFile = getNodePythonFile(this);
+
+            writeContentToFile(targetPythonCodeFile,codeList);
+            // xxxxxxxxxxxxxxxxxx
+            File subCopyFile = new File(J0_Python_Dir_Path + targetPythonCodeFile.getName());
+            fileCopy(targetPythonCodeFile,subCopyFile);*/
+            //  执行 python 程序的 操作
+            return codeList;
+        }
+
+        ArrayList<String>  showItemPythonCode(ArrayList<String>  headList, ArrayList<String>  firstList , ArrayList<String>  bodyList , ArrayList<String> tailList){
             System.out.println();
             System.out.println();
             System.out.println();
@@ -3854,9 +4538,8 @@ boolean isBegin = ( null == cur_operation_tscode || "".equals(cur_operation_tsco
             // xxxxxxxxxxxxxxxxxx
             File subCopyFile = new File(J0_Python_Dir_Path + targetPythonCodeFile.getName());
             fileCopy(targetPythonCodeFile,subCopyFile);
-
-
             //  执行 python 程序的 操作
+            return codeList;
         }
 
 
@@ -4528,13 +5211,7 @@ boolean isBegin = ( null == cur_operation_tscode || "".equals(cur_operation_tsco
     // 从2010.01.01 每月最后面那个交易日
     static   ArrayList<Integer> SH_EndMonth_TradeDayList = new   ArrayList<Integer>(); // 大陆 股市非交易日列表
 
-    // 记录当前最新的交易日  今天是工作日的话 那么就是今天  如果不是交易日 那么就是离他最近的交易日
-    static int SH_Last_Trade_Day_Int = getTimeStamp_YYYYMMDD_IntFlag();
-    static int  SH_Tomorrow_WorkTrade_Day_Int = SH_Last_Trade_Day_Int+1;
 
-
-    static int SH_Now_Year_BeginTradeDay_IntFlag = getTimeStamp_YYYYMMDD_BeginIntFlag();
-    static int SH_Now_Year_EndTradeDay_IntFlag = getTimeStamp_YYYYMMDD_EndIntFlag();
 
 
     static void  initTradeDayList(){
@@ -5150,6 +5827,7 @@ if(dayIntFlag >= SH_Now_Year_BeginTradeDay_IntFlag && dayIntFlag <=  SH_Tomorrow
     }
 
 
+
     static Calendar  calendar_object = Calendar.getInstance();
 
     static String calculXinQi2Chinese(int year , int month ,int day) {
@@ -5205,6 +5883,60 @@ if(dayIntFlag >= SH_Now_Year_BeginTradeDay_IntFlag && dayIntFlag <=  SH_Tomorrow
     }
 
 
+
+    //  获取当前 月份的最后一个交易日
+    static int  getLastTradeDate_In_Month(int day){
+
+        String YearStr = (""+day).substring(0,4);
+        String MonthStr = (""+day).substring(4,6);
+        String DayStr = "31";
+        int xyear = Integer.parseInt(YearStr);
+        int xmonth = Integer.parseInt(MonthStr) ;
+        int xday =  Integer.parseInt(DayStr);
+
+        int preMonth = xmonth -1;
+        if(preMonth == 0){
+            preMonth = 12;
+            xyear = xyear - 1;
+        }
+        String newMonthDec = preMonth > 10?""+preMonth:"0"+preMonth;
+        YearStr = ""+xyear;
+        int newDay = Integer.parseInt(YearStr+""+newMonthDec+DayStr);
+        int tradeDay_lastday_inmonth = newDay;
+        while(!SH_TradeDayList.contains(newDay)){
+            newDay = getFutureDayFlag(newDay,-1);
+            tradeDay_lastday_inmonth = newDay;
+            System.out.println("tradeDay_lastday_inmonth = "+ tradeDay_lastday_inmonth);
+        }
+
+        return tradeDay_lastday_inmonth;
+
+    }
+
+
+    static int  getNearestFriday(int day){
+
+        String YearStr = (""+day).substring(0,4);
+        String MonthStr = (""+day).substring(4,6);
+        String DayStr = (""+day).substring(6);
+        int index = 1;
+        int xyear = Integer.parseInt(YearStr);
+        int xmonth = Integer.parseInt(MonthStr);
+        int xday =  Integer.parseInt(DayStr);
+        int xinqi = Integer.parseInt(calculXinQi2Chinese(xyear,xmonth,xday));
+        if(xinqi == 5 ){
+            return day;
+        }else{
+
+            int preday = getFutureDayFlag(day,-1);
+            System.out.println("preday = "+ preday);
+
+            return getNearestFriday(preday);
+        }
+
+
+    }
+
     // 1. day 和 xinqi 必须配对    2.拥挤计算当前xinqi(1.2.3.4.5.6.7) 对应的日子 day 在 今年的第几次出现
     static int calculFridayIndex2Year( int day){
         String YearStr = (""+day).substring(0,4);
@@ -5250,13 +5982,42 @@ if(dayIntFlag >= SH_Now_Year_BeginTradeDay_IntFlag && dayIntFlag <=  SH_Tomorrow
     }
 
 
+
+    static int  getPreDayTradeDay(int dayFlagInt ){
+        int step = -1;
+        int preday = getFutureDayFlag(dayFlagInt,step);
+        int firstInputDay = preday;
+        while(!SH_TradeDayList.contains(preday)){
+//            System.out.println("~~~~~~ preday = "+ preday);
+
+            preday = getFutureDayFlag(preday,step);
+        }
+//        System.out.println("getPreDayTradeDay  inputDay = "+dayFlagInt +"   outputDay = "+ preday  +"  firstInputDay = "+ firstInputDay);
+
+        return preday;
+    }
+
+
+
+    static int  getTodayTradeDay( ){
+        int step = -1;
+        int now_int = getTimeStamp_YYYYMMDD_IntFlag();
+        while(!SH_TradeDayList.contains(now_int)){
+
+            now_int = getFutureDayFlag(now_int,step);
+        }
+
+        return now_int;
+    }
+
+
+
     static int  getTomorrowTradeDay(int dayFlagInt ){
         int step = 1;
         int tomorrow = getFutureDayFlag(dayFlagInt,step);
-        if(!SH_TradeDayList.contains(tomorrow)){
+        while(!SH_TradeDayList.contains(tomorrow)){
 
-            step++;
-            tomorrow = getFutureDayFlag(dayFlagInt,step);
+            tomorrow = getFutureDayFlag(tomorrow,step);
         }
 
         return tomorrow;
@@ -5279,8 +6040,8 @@ if(dayIntFlag >= SH_Now_Year_BeginTradeDay_IntFlag && dayIntFlag <=  SH_Tomorrow
             int year = curCalendar.get(Calendar.YEAR);
             int month = curCalendar.get(Calendar.MONTH)+1;
             int day2month = curCalendar.get(Calendar.DAY_OF_MONTH);
-            String monthDesc = month>10?month+"":"0"+month;
-            String dayDesc = day2month>10?day2month+"":"0"+day2month;
+            String monthDesc = month>=10?month+"":"0"+month;
+            String dayDesc = day2month>=10?day2month+"":"0"+day2month;
 
             String dayIntFalg = year+""+monthDesc+dayDesc;
             futureDay = Integer.parseInt(dayIntFalg);
@@ -5504,21 +6265,57 @@ String[] arrStr = codePrams.split(",");
     int  ONE_CALL_TYPE = 0x0001;   // 0002 股票列表  0003交易日历   0004股票曾用名  0005沪深股通成份股   0006上市公司基本信息    0046概念股分类  0047概念股列表        0048限售股解禁
     int  TS_CODE_X_INPUT_ONE_TYPE = 0x0002; //   0007上市公司管理层    0008管理层薪酬和持股
 
-    //  0009新股列表IPO     0015每日停复牌信息   0020沪深股通资金流向  0023港股通每日成交统计    0045股票回购   0048限售股解禁  0051股东增减持
+    //  0009新股列表IPO【IPOxingushangshi】     0015每日停复牌信息【meiritingfupaixinxi】   0020沪深股通资金流向【hushengangtongzijinliuxiang】
+    //  0023港股通每日成交统计【ganggutongmeirichengjiaotongji】    0045股票回购【gupiaohuigou】   0048限售股解禁【xianshougujiejin】   0051股东增减持【gudongzengjianchi】
     int  START_END_TIME_Call_ONCE_INPUT_ONE_TYPE = 0x0004 ;
 
 
-    //   0011每日行情     0016每日指标  0017个股资金流向
+    //   0011每日行情【rixianhangqing-time】     0016每日指标【meirizhibiao】  0017个股资金流向【geguzijinliuxiang】
     int  TRADE_DAY_ONE_INPUT_YYYYMM_OUTPUT_TYPE = 0x0008;
 
-    //   0012 周线行情    0013月线行情    0021沪深股通十大成交股  0022沪深股通持股明细  0036港股通十大成交股  0037融资融券交易汇总
-    int  TRADE_DAY_ONE_INPUT_YYYY_OUTPUT_TYPE = 0x0016;  // 0038融资融券交易明细     0041龙虎榜每日明细   0042龙虎榜机构明细    0049大宗交易
+    //   0012 周线行情【zhouxianhangqing-time】    0013月线行情【yuexianhangqing-time】    0021沪深股通十大成交股【hushengutongshidachengjiaogu】
+    //   0022沪深股通持股明细 【hushengutongchigumingxi】   0036港股通十大成交股【ganggutongshidachengjiaogu】  0037融资融券交易汇总【rongzirongquanjiaoyihuizong】
+    // 0038 融资融券交易明细【rongzirongquanjiaoyimingxi】     0041龙虎榜每日明细【longhubangmeirimingxi】   0042龙虎榜机构明细【longhubangjigoumingxi】    0049大宗交易【dazongjiaoyi】
+    int  TRADE_DAY_ONE_INPUT_YYYY_OUTPUT_TYPE = 0x0016;
 
-    int  TRADE_DAY_ONE_INPUT_Collect_OUTPUT_TYPE = 0x0032; //  0018每日涨跌停价格    0019每日涨跌停统计
+    //  0018每日涨跌停价格【meirizhangdietingjiage】    0019每日涨跌停统计【meirizhangdietingtongji】
+    int  TRADE_DAY_ONE_INPUT_Collect_OUTPUT_TYPE = 0x0032;
 
     // 0025利润表  0026资产负债表   0027资产负债表  0028业绩预告  0029业绩快报  0030分红送股  0031财务指标数据  0032财务审计意见
     int TS_CODE_ONE_Input_4000Call_Type =  0x0064;  // 0033主营业务构成   0034财报披露计划    0039前十大股东  0040前十大流通股通  0043股权质押统计数据  0044股权质押明细  0050股东人数
 
+
+    // 获取当前日期的信息 如归当前没数据 那么获取昨天的数据 对数据进行一些分析输出  daily
+   //   START_END_TIME_Call_ONCE_INPUT_ONE_TYPE = 0x0004 ;
+    //  TRADE_DAY_ONE_INPUT_YYYYMM_OUTPUT_TYPE  = 0x0008;
+    //  TRADE_DAY_ONE_INPUT_YYYY_OUTPUT_TYPE = 0x0016;  0019每日涨跌停统计
+   static  ArrayList<String> dailyQueryNodeNameList = new   ArrayList<String>();
+
+   static{
+       dailyQueryNodeNameList.add("IPOxingushangshi");  //   0009新股列表IPO【IPOxingushangshi】
+       dailyQueryNodeNameList.add("meiritingfupaixinxi");  //   0015每日停复牌信息【meiritingfupaixinxi】
+       dailyQueryNodeNameList.add("hushengangtongzijinliuxiang"); //    0020沪深股通资金流向【hushengangtongzijinliuxiang】
+       dailyQueryNodeNameList.add("ganggutongmeirichengjiaotongji");  //  0023港股通每日成交统计【ganggutongmeirichengjiaotongji】
+       dailyQueryNodeNameList.add("gupiaohuigou");   //   0045股票回购【gupiaohuigou】
+       dailyQueryNodeNameList.add("xianshougujiejin");  //   0048限售股解禁【xianshougujiejin】
+       dailyQueryNodeNameList.add("gudongzengjianchi");  //   0051股东增减持【gudongzengjianchi】
+       dailyQueryNodeNameList.add("rixianhangqing-time");  // 0011每日行情【rixianhangqing-time】
+       dailyQueryNodeNameList.add("meirizhibiao");  //   0016每日指标【meirizhibiao】
+       dailyQueryNodeNameList.add("geguzijinliuxiang");  //  0017个股资金流向【geguzijinliuxiang】
+       dailyQueryNodeNameList.add("zhouxianhangqing-time");  // 0012 周线行情【zhouxianhangqing-time】
+       dailyQueryNodeNameList.add("yuexianhangqing-time");  //  0013月线行情【yuexianhangqing-time】
+       dailyQueryNodeNameList.add("hushengutongshidachengjiaogu");  //  0021沪深股通十大成交股【hushengutongshidachengjiaogu】
+       dailyQueryNodeNameList.add("hushengutongchigumingxi");  //   //   0022沪深股通持股明细 【hushengutongchigumingxi】
+       dailyQueryNodeNameList.add("ganggutongshidachengjiaogu");  // 0036港股通十大成交股【ganggutongshidachengjiaogu】
+       dailyQueryNodeNameList.add("rongzirongquanjiaoyihuizong");  // 0037融资融券交易汇总【rongzirongquanjiaoyihuizong】
+       dailyQueryNodeNameList.add("rongzirongquanjiaoyimingxi");  //0038 融资融券交易明细【rongzirongquanjiaoyimingxi】
+       dailyQueryNodeNameList.add("longhubangmeirimingxi");  // 0041龙虎榜每日明细【longhubangmeirimingxi】
+       dailyQueryNodeNameList.add("longhubangjigoumingxi");  //  0042龙虎榜机构明细【longhubangjigoumingxi】
+       dailyQueryNodeNameList.add("dazongjiaoyi");  //  0049大宗交易【dazongjiaoyi】
+       dailyQueryNodeNameList.add("meirizhangdietingjiage");  //  0018每日涨跌停价格【meirizhangdietingjiage】
+       dailyQueryNodeNameList.add("meirizhangdietingtongji");  //   0019每日涨跌停统计【meirizhangdietingtongji】
+   }
+    // 手动输入比 tscode 值 来进行查询
 
     // 数据完全下载之后的更新操作
 
@@ -5794,3 +6591,22 @@ String[] arrStr = codePrams.split(",");
     static int default_space_year = 10;   // 11ystart_date  11yend_date  时间间隔的长度 单位年 y  10ystart_date
 
 }
+
+
+// 管理层薪酬和持股 异常   J0_0008_guanlicengxinchouhechigu   Python_BodyTemplate_3     长度超过100w条 那么 另起别的sheet保存
+// Traceback (most recent call last):
+//   File "C:\Users\zhuzj5\Desktop\zbin\J0_Python\J0_0008_guanlicengxinchouhechigu.py", line 12889, in <module>
+//     stk_rewards_data_List.to_excel(stk_rewards_excel_writer, '管理层薪酬和持股')
+//   File "C:\Users\zhuzj5\AppData\Local\Programs\Python\Python37\lib\site-packages\pandas\core\generic.py", line 2256, in to_excel
+//     engine=engine,
+//   File "C:\Users\zhuzj5\AppData\Local\Programs\Python\Python37\lib\site-packages\pandas\io\formats\excel.py", line 724, in write
+//     + "Max sheet size is: {}, {}".format(self.max_rows, self.max_cols)
+// ValueError: This sheet is too large! Your sheet size is: 1160717, 8 Max sheet size is: 1048576, 16384
+
+
+//    Traceback (most recent call last):
+//        File "C:\Users\zhuzj5\Desktop\zbin\J0_Python\J0_0008_guanlicengxinchouhechigu.py", line 10490, in <module>
+//    stk_rewards_data_List.save()
+//            File "C:\Users\zhuzj5\AppData\Local\Programs\Python\Python37\lib\site-packages\pandas\core\generic.py", line 5179, in __getattr__
+//            return object.__getattribute__(self, name)
+//            AttributeError: 'DataFrame' object has no attribute 'save'

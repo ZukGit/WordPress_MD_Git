@@ -19,7 +19,7 @@
 #  《Method_Call_Template_2》= 《【ZHoldPlace_pythonMethodName】_【ZHoldPlace_Year_Month】_addname_dataframe['cname'] = 【ZHoldPlace_pythonMethodName】_【ZHoldPlace_Year_Month】_tscode_list》
 #  《Method_Call_Template_2》= 《for table_name in 【ZHoldPlace_pythonMethodName】_【ZHoldPlace_Year_Month】.columns.values.tolist():》
 #  《Method_Call_Template_2》= 《    【ZHoldPlace_pythonMethodName】_【ZHoldPlace_Year_Month】_addname_dataframe[table_name] = 【ZHoldPlace_pythonMethodName】_【ZHoldPlace_Year_Month】[table_name]》
-#  《Method_Call_Template_2》= 《print("【ZHoldPlace_pythonMethodName】_【ZHoldPlace_Year_Month】 【ZHoldPlace_EndWorkDay_MonthDay】 返回数据 row 行数 = "+str(【ZHoldPlace_pythonMethodName】_【ZHoldPlace_Year_Month】.shape[0]))》 
+#  《Method_Call_Template_2》= 《print("【ZHoldPlace_leaf_chinese_title】  【ZHoldPlace_pythonMethodName】_【ZHoldPlace_Year_Month】 【ZHoldPlace_EndWorkDay_MonthDay】 返回数据 row 行数 = "+str(【ZHoldPlace_pythonMethodName】_【ZHoldPlace_Year_Month】.shape[0]))》 
 #  《Method_Call_Template_2》= 《【ZHoldPlace_pythonMethodName】_【ZHoldPlace_Year_Month】_addname_dataframe.to_excel(【ZHoldPlace_pythonMethodName】_【ZHoldPlace_Year_Int】_excel_writer,'【ZHoldPlace_Month_Index】',index=False)》
 #  《Method_Call_Template_2》= 《【ZHoldPlace_pythonMethodName】_【ZHoldPlace_Year_Int】_excel_writer.save()》
 
