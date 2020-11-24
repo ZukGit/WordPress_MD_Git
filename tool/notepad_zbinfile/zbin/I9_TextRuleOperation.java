@@ -13,11 +13,13 @@ import net.sourceforge.pinyin4j.format.HanyuPinyinOutputFormat;
 import net.sourceforge.pinyin4j.format.HanyuPinyinToneType;
 import net.sourceforge.pinyin4j.format.exception.BadHanyuPinyinOutputFormatCombination;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
+import java.awt.image.BufferedImage;
 import java.io.*;
 import java.math.BigDecimal;
 import java.net.URL;
@@ -72,7 +74,7 @@ public class I9_TextRuleOperation {
 
     static String I9_OUT_DIR_PATH = zbinPath+File.separator+"I9_Out";
     static File I9_OUT_DIR = new File(I9_OUT_DIR_PATH);
-
+    static File I9_Qr_Black_Image_File = new File(zbinPath+File.separator+"I9_Qr_Black.jpg");
     static InputStream I9_Properties_InputStream;
     static OutputStream I9_Properties_OutputStream;
     static Properties I9_Properties = new Properties();
@@ -2870,6 +2872,20 @@ public class I9_TextRuleOperation {
         return allDirFile;
     }
 
+
+    public static boolean isValidUrl_String(String urlString) {
+        boolean flag = false;
+       if(urlString.startsWith("http:")){
+           flag = true;
+       } else  if(urlString.startsWith("https:")){
+           flag = true;
+       }    else  if(urlString.startsWith("www.")){
+            flag = true;
+        }
+
+        return flag;
+    }
+
     public static boolean isValidUrl(String urlString) {
         boolean flag = false;
         long lo = System.currentTimeMillis();
@@ -4571,8 +4587,9 @@ public class I9_TextRuleOperation {
     }
     // Rule_14   End 汉字转换为拼音   周 zhou   中国 zhong_guo  (A9)
 
+     // 默认 只显示 第一行的 字符串
     // Rule_15   Begin  读取文件的第一行转为 二维码显示出来 B1
-    public static void TextAs_QrCode_Rule_15(File srcFile) {
+    public static void  Pre50_TextAs_QrCode_Rule_15 (File srcFile) {
         File curFile = srcFile;
         if (curFile != null) {
             try {
@@ -4602,6 +4619,206 @@ public class I9_TextRuleOperation {
     // Rule_15   End  读取文件的第一行转为 二维码显示出来 B1
 
 
+
+    // 默认 只显示 第一行的 字符串
+    // Rule_15   Begin  读取文件的第一行转为 二维码显示出来 B1
+    public static void TextAs_QrCode_Rule_15(File srcFile) {
+        File curFile = srcFile;
+        ArrayList<String> TxtContent = new   ArrayList<String>();
+        ArrayList<String> Pre50_Content = new   ArrayList<String>();
+
+        if (curFile != null) {
+
+            try {
+                BufferedReader curBR = new BufferedReader(new InputStreamReader(new FileInputStream(curFile), "utf-8"));
+                String qrCodeString = "";
+
+//                while (qrCodeString != null && qrCodeString.trim().isEmpty()) {
+                    while (qrCodeString != null ) {
+                    qrCodeString = curBR.readLine();
+                        TxtContent.add(qrCodeString);
+                }
+                System.out.println("把扫描到的第一行非空字符串转为二维码  qrCodeString = " + qrCodeString);
+
+                curBR.close();
+
+                int lineNum = 1;
+                for (int i = 0; i < TxtContent.size(); i++) {
+
+                    String lineStr = TxtContent.get(i);
+                    System.out.println("line["+lineNum+"] = "+lineStr);
+                    lineNum++;
+                    if(Pre50_Content.size() < 50 && lineStr != null ){
+                        Pre50_Content.add(lineStr);
+                    }
+                }
+
+                QrConfig config = new QrConfig();
+                ArrayList<File> targetFileList = new  ArrayList<File>();
+                for (int i = 0; i < Pre50_Content.size(); i++) {
+                    int lineIndex = i + 1;
+                    String content = Pre50_Content.get(i).trim();
+                    boolean isEmpty = "".equals(content);
+                    boolean isUrl = isValidUrl_String(content);
+                    File targetFile = null;
+                    if(isEmpty){
+                        targetFile = calculBlankIndex(I9_Qr_Black_Image_File,lineIndex);
+                    }else{
+                         targetFile = QrCodeUtil.generate (content, config, new File(I9_OUT_DIR.getAbsolutePath() + File.separator + getFileNameNoPoint(srcFile.getName())+"_"+getTimeStampLong()+".jpg"));
+                    }
+               targetFileList.add(targetFile);
+
+                    System.out.println("operation -> "+ lineIndex);
+                }
+
+
+                if(targetFileList.size() == 1){
+                    RuntimeUtil.exec("rundll32.exe C:\\\\Windows\\\\System32\\\\shimgvw.dll,ImageView_Fullscreen  " + targetFileList.get(0).getAbsolutePath());
+
+                }else{
+
+                    int width = targetFileList.size() * 300 ;
+                    if(width >= 3000){
+                        width = 3000;
+                    }
+
+                    int high =   targetFileList.size()%10 == 0? (targetFileList.size()/10) * 300 : ((targetFileList.size()/10) * 300 + 300);
+                    if(high >= 1500){
+                        high = 1500;
+                    }
+
+                    BufferedImage combined = new BufferedImage(width, high, BufferedImage.TYPE_INT_RGB);
+                    Graphics g = combined.getGraphics();
+
+                    for (int i = 0; i < targetFileList.size() ; i++) {
+                        int LineNum = i+1;
+                        File QrFile = targetFileList.get(i);
+                        BufferedImage originImage = getBufferedImage(QrFile);
+                        int temp_x = 300*(i%10);
+                        int temp_y = 300*(i/10);
+
+                        System.out.println("绘制第 "+ LineNum +" 图片! "+"x="+temp_x+" y ="+temp_y+"   QrFile = "+ QrFile.exists() + "  路径:"+ QrFile.getAbsolutePath());
+
+                        g.drawImage(originImage,  temp_x, temp_y,null);
+                    }
+                   File endTargetFile =new File(I9_OUT_DIR.getAbsolutePath() + File.separator + "Qr_"+getFileNameNoPoint(srcFile.getName())+"_"+getTimeStampLong()+".jpg");
+                   endTargetFile.createNewFile();
+                    ImageIO.write(combined, "jpg", endTargetFile);
+                    System.out.println("rundll32.exe C:\\\\Windows\\\\System32\\\\shimgvw.dll,ImageView_Fullscreen  " + endTargetFile.getAbsolutePath());
+                    RuntimeUtil.exec("rundll32.exe C:\\\\Windows\\\\System32\\\\shimgvw.dll,ImageView_Fullscreen  " + endTargetFile.getAbsolutePath());
+
+                }
+
+
+//                File endTarget = calculQrEndTarget(targetFileList);
+//
+//                RuntimeUtil.exec("rundll32.exe C:\\\\Windows\\\\System32\\\\shimgvw.dll,ImageView_Fullscreen  " + endTarget.getAbsolutePath());
+
+/*                QrConfig config = new QrConfig();
+
+                File targetFile = QrCodeUtil.generate
+                        (qrCodeString, config, new File(I9_OUT_DIR.getAbsolutePath() + File.separator + getFileNameNoPoint(srcFile.getName())+"_"+getTimeStampLong()+".jpg"));
+
+                RuntimeUtil.exec("rundll32.exe C:\\\\Windows\\\\System32\\\\shimgvw.dll,ImageView_Fullscreen  " + targetFile.getAbsolutePath());*/
+
+            } catch (Exception e) {
+                System.out.println("Exception ! ");
+                e.printStackTrace();
+            }
+        } else {
+            System.out.println("Failed !");
+        }
+    }
+    // Rule_15   End  读取文件的第一行转为 二维码显示出来 B1
+
+
+    // zukgit
+    static  File calculBlankIndex( File imageFile,int Index ){
+        File blockFile = new File(I9_OUT_DIR.getAbsolutePath() + File.separator + "Block"+"_"+Index+"_"+getTimeStampLong()+".jpg");
+
+        String imageType = getFileTypeWithPoint(imageFile.getName());
+        String type_fixed =   imageType.replace(".","").trim();
+        int originHigh =    getImageHigh(imageFile);
+        int originWidth =       getImageWidth(imageFile);
+        BufferedImage originImage = getBufferedImage(imageFile);
+
+        BufferedImage combined = new BufferedImage(originWidth, originHigh, BufferedImage.TYPE_INT_RGB);
+        // paint both images, preserving the alpha channels
+        Graphics g = combined.getGraphics();
+        int padding = 20;
+
+        try {
+            g.setColor(Color.RED);
+            Font font = new Font("微软雅黑", Font.PLAIN, 100);
+            g.setFont(font);
+            FontMetrics metrics = g.getFontMetrics(font);
+            int x = 0 + (originWidth - metrics.stringWidth(""+Index)) / 2;
+            int y = 0 + ((originHigh - metrics.getHeight()) / 2) + metrics.getAscent();
+            g.drawImage(originImage, 0, 0, null);
+            g.drawString(Index+"",x,y);
+
+            // Save as new image
+            ImageIO.write(combined, type_fixed, blockFile);
+        }catch (Exception e){
+            System.out.println("发生异常! ");
+
+        }finally {
+            if (g != null) {
+                g.dispose();
+            }
+        }
+
+        return blockFile;
+    }
+
+
+    public static BufferedImage resize(Image mImage , int w, int h)  {
+        // SCALE_SMOOTH 的缩略算法 生成缩略图片的平滑度的 优先级比速度高 生成的图片质量比较好 但速度慢
+        BufferedImage image = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
+        Graphics g = image.getGraphics();
+        try {
+            g.drawImage(mImage, 0, 0, w, h, null); // 绘制缩小后的图
+        } finally {
+            if (g != null) {
+                g.dispose();
+            }
+        }
+        return image;
+        // File destFile = new File("C:\\temp\\456.jpg");
+        // FileOutputStream out = new FileOutputStream(destFile); // 输出到文件流
+        // // 可以正常实现bmp、png、gif转jpg
+        // JPEGImageEncoder encoder = JPEGCodec.createJPEGEncoder(out);
+        // encoder.encode(image); // JPEG编码
+        // out.close();
+    }
+
+
+    public static BufferedImage getBufferedImage(File file)  {
+        Image   img   = null;
+        try{
+            img = ImageIO.read(file); // 构造Image对象
+        }catch ( Exception e){
+            System.out.println(e);
+            return null;
+        }
+
+        int    width = img.getWidth(null); // 得到源图宽
+        int     height = img.getHeight(null); // 得到源图长
+
+//    return resizeFix(400, 492);
+        return resize(img,width, height);
+    }
+
+// zukgit
+   static  File calculQrEndTarget( ArrayList<File> srcFileList){
+        File targetFile = new File(I9_OUT_DIR.getAbsolutePath() + File.separator + "Qr"+"_"+getTimeStampLong()+".jpg");
+
+       for (int i = 0; i < srcFileList.size(); i++) {
+
+       }
+
+        return targetFile;
+    }
 
 
 
