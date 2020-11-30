@@ -336,3 +336,58 @@ Done
 **********************************************************
 MIB Browser Stopped at : Tue Jul 21 18:27:00 CST 2020
 **********************************************************
+
+**********************************************************
+MIB Browser Started at : Mon Nov 30 21:26:32 CST 2020
+**********************************************************
+Building tree..
+Adding file C:\Users\aaa\Desktop\zbin\I1_mibs\mib_core.txt..Done
+Adding file C:\Users\aaa\Desktop\zbin\I1_mibs\mib_demo.txt..Done
+Adding file C:\Users\aaa\Desktop\zbin\I1_mibs\RFC1213-MIB.my..Done
+Adding file C:\Users\aaa\Desktop\zbin\I1_mibs\RFC1229-MIB.my..Done
+Adding file C:\Users\aaa\Desktop\zbin\I1_mibs\RFC1231-MIB.my..Done
+Adding file C:\Users\aaa\Desktop\zbin\I1_mibs\RFC1243-MIB.my..Done
+Adding file C:\Users\aaa\Desktop\zbin\I1_mibs\RFC1253-MIB.my..Done
+Adding file C:\Users\aaa\Desktop\zbin\I1_mibs\RFC1271-MIB.my..Done
+Adding file C:\Users\aaa\Desktop\zbin\I1_mibs\RFC1285-MIB.my..Done
+Adding file C:\Users\aaa\Desktop\zbin\I1_mibs\RFC1315-MIB.my..Done
+Adding file C:\Users\aaa\Desktop\zbin\I1_mibs\RFC1381-MIB.my..Done
+Adding file C:\Users\aaa\Desktop\zbin\I1_mibs\RFC1382-MIB.my..Done
+Adding file C:\Users\aaa\Desktop\zbin\I1_mibs\RFC1398-MIB.my..Done
+Adding file C:\Users\aaa\Desktop\zbin\I1_mibs\RFC1406-MIB.my..Done
+Adding file C:\Users\aaa\Desktop\zbin\I1_mibs\root_mib.txt..Done
+Updating orphans.
+.................Done
+Building OID Name resolution table...Updating variables table..
+Done
+*****COMPLETED******
+Name   : dot11NonAPStationVideoOctetCount
+Parent : dot11InterworkingEntry
+Number : 29
+Access :  read-only
+Syntax :  Counter32
+Status :  current
+Description : 
+ "This is a status variable. It is written by the AP's MAC after the completion of an MA-UNITDATA.
+confirm or MA-UNITDATA.indication primitive. For EDCA operation, this counter shall be incremented b
+y the octet length of each MSDU successfully transmitted by the AP on the voice access category and 
+by the octet length of each MSDU successfully received on either user priority 4 or5."
+Type :3
+
+Name   : dot11NonAPStationAuthMaxVoiceOctets
+Parent : dot11InterworkingEntry
+Number : 12
+Access :  read-only
+Syntax :  Unsigned32 (0..4294967295)
+Status :  current
+Description : 
+ "This is a control variable. It is written by the SME after the AP receives the permissions for t
+he non-AP STA from the SSPN Interface. This attribute indicates the maximum authorized total octet c
+ount that a STA may use on the voice access category. If this octet count is exceeded, the AP should
+ disassociate the non-AP STA. A value of 0 indicates that there is no octetlimit."
+Type :3
+
+
+**********************************************************
+MIB Browser Stopped at : Mon Nov 30 21:27:03 CST 2020
+**********************************************************
