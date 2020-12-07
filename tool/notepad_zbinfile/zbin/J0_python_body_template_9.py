@@ -6,11 +6,13 @@
 #  《First_Define_Template_5》= 《【ZHoldPlace_pythonMethodName】_excel_writer.sheets = dict((ws.title, ws) for ws in 【ZHoldPlace_pythonMethodName】_book.worksheets)》
 #  《First_Define_Template_6》= 《【ZHoldPlace_pythonMethodName】_data_List = pd.DataFrame()》
 #  《First_Define_Template_1》= 《tree_node_name="【ZHoldPlace_NodeName】"+"_"》
-
+#  《First_Define_Template_6》= 《【ZHoldPlace_pythonMethodName】_call_times = 1》
 
 #  《First_Define_Template_1》= 《if '【ZHoldPlace_leaf_chinese_title】' in 【ZHoldPlace_pythonMethodName】_excel_writer.sheets:》
 #  《First_Define_Template_1》= 《    【ZHoldPlace_pythonMethodName】_data_List=pd.read_excel('【ZHoldPlace_J0_Dir_PATH】【ZHoldPlace_Title】.xlsx',sheet_name ='【ZHoldPlace_leaf_chinese_title】' , index=False)》
-
+# 《Method_Call_Template_1》= 《if 【ZHoldPlace_pythonMethodName】_call_times%【ZHoldPlace_call_LimitNum_OneMinutes】 == 0:》
+# 《Method_Call_Template_1》= 《    print("【ZHoldPlace_pythonMethodName】_call_times = " + str(【ZHoldPlace_pythonMethodName】_call_times-1) +"  休息一分钟 避免超过服务器限制 导致异常出现!")》
+# 《Method_Call_Template_1》= 《    time.sleep(60)》
 #  《Method_Call_Template_1》= 《【ZHoldPlace_propKey2ValueList_Index】_tscode_list = list() 》
 #  《Method_Call_Template_1》= 《【ZHoldPlace_propKey2ValueList_Index】 = pro.【ZHoldPlace_pythonMethodName】(【ZHoldPlace_propKey2ValueList】, fields='【ZHoldPlace_fieldList】')》
 # 《Method_Call_Template_2》=  《print("【ZHoldPlace_propKey2ValueList_Index】 【ZHoldPlace_CUR_TSCODE】  返回数据 row 行数 = "+str(【ZHoldPlace_propKey2ValueList_Index】.shape[0]))》 
@@ -28,10 +30,13 @@
 
 #  《Method_Call_Template_2》=  《print("【ZHoldPlace_leaf_chinese_title】  【ZHoldPlace_pythonMethodName】_data_List.__len__() = "+str(【ZHoldPlace_pythonMethodName】_data_List.__len__()))》
 #  《Method_Call_Template_2》=  《print("【ZHoldPlace_CUR_TSCODE】 执行开始!  不可以测试强制断开！！！!")》
-#  《Method_Call_Template_2》=  《【ZHoldPlace_pythonMethodName】_data_List.to_excel(【ZHoldPlace_pythonMethodName】_excel_writer,'【ZHoldPlace_leaf_chinese_title】',index=False)》
-#  《Method_Call_Template_2》= 《【ZHoldPlace_pythonMethodName】_excel_writer.save()》
+#  《Method_Call_Template_2》=  《#【ZHoldPlace_pythonMethodName】_data_List.to_excel(【ZHoldPlace_pythonMethodName】_excel_writer,'【ZHoldPlace_leaf_chinese_title】',index=False)》
+#  《Method_Call_Template_2》= 《#【ZHoldPlace_pythonMethodName】_excel_writer.save()》
 #  《Method_Call_Template_1》= 《J0_PROPS.put(tree_node_name+"cur_tscode", "【ZHoldPlace_CUR_TSCODE】") 》
 #  《Method_Call_Template_2》=  《print("【ZHoldPlace_CUR_TSCODE】 执行结束!  可以测试强制断开!")》
+#  《Method_Call_Template_2》= 《【ZHoldPlace_pythonMethodName】_call_times=【ZHoldPlace_pythonMethodName】_call_times+1》
+#  《Tail_Define_Template_1》=  《【ZHoldPlace_pythonMethodName】_data_List.to_excel(【ZHoldPlace_pythonMethodName】_excel_writer,'【ZHoldPlace_leaf_chinese_title】',index=False)》
+#  《Tail_Define_Template_1》= 《【ZHoldPlace_pythonMethodName】_excel_writer.save()》
 
 
 ############################## 头部定义  Begin ##############################

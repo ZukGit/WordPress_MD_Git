@@ -1,8 +1,8 @@
 import java.io.File;
 
 public class H0_Tip {
-    static String OneLine_Pre = "\n════════";
-    static String OneLine_End = "════════\n";
+    static String OneLine_Pre = "\n════════════════════════════════════════════════";
+    static String OneLine_End = "════════════════════════════════════════════════\n";
     static String OneLine = "════════";
 
     static String User_Home = System.getProperties().getProperty("user.home");
@@ -35,21 +35,22 @@ public class H0_Tip {
 
     public static void main(String[] args) {
 
+        initSystemInfo();
 
-        WindowsTip();
+        if(CUR_OS_TYPE == OS_TYPE.Windows){
+            InstallWindowsTip();  //  双系统安装 说明
 
-        PackageInfoTip();
-        BroadCastInfoTip();
-        StartAppInfoTip();
-        DumpInfoTip();
-        SettingOperationTip();
-        PullFileTip();
-        VerboseLogTip();
-        PrintLogTip();
-        Security_File_Tip();
-        AdbCommandTip();
+            CmderTip();  // cmder 下的环境变量设置
+            WindowsFilePathTip();  // 文件快捷方式提示
+            NotePadCommand();
+            Linux_BashTip();
+            Security_File_Tip();
+        }else if (CUR_OS_TYPE == OS_TYPE.Linux){
+            Linux_BashTip();
+        }
+
+
     }
-
 
 
     static void InstallWindowsTip(){
@@ -93,22 +94,18 @@ public class H0_Tip {
     }
 
 
-    static void WindowsTip(){
-        if(CUR_OS_TYPE == OS_TYPE.Windows){
-            InstallWindowsTip();  //  双系统安装 说明
 
-            CmderTip();  // cmder 下的环境变量设置
-            WindowsFilePathTip();  // 文件快捷方式提示
-            NotePadCommand();
-            Linux_BashTip();
-        }else if (CUR_OS_TYPE == OS_TYPE.Linux){
-            Linux_BashTip();
-        }
+
+    static void  PrintHead_End( String headStr ){
+        System.out.println(OneLine_Pre + ""+headStr+""+ OneLine_End);
 
     }
 
+
+
+
     static void NotePadCommand(){
-        System.out.println(OneLine_Pre + " NotePad++  设置 Begin "+ OneLine_End);
+        PrintHead_End("  NotePad++ 设置  Begin  ");
         System.out.println(" 用户设置 notepad运行【索引1】   ztextrule_operation_I9.bat 的 快捷键为 F8:");
         System.out.println("Name: text_rule   Key:  F8");
         System.out.println(" cmd /K cd /d %userprofile%\\Desktop\\zbin & %userprofile%\\Desktop\\zbin\\I9.bat %userprofile%\\Desktop\\zbin  $(FULL_CURRENT_PATH)");
@@ -120,22 +117,27 @@ public class H0_Tip {
         System.out.println("cmd /K cd /d %userprofile%\\Desktop\\zbin & %userprofile%\\Desktop\\zbin\\A8.bat %userprofile%\\Desktop\\zbin  $(FULL_CURRENT_PATH)  ");
         System.out.println("可修改A8.bat 逻辑为: A8_WIFI_Log_Search.java  A8_GPS_Log_Search.java  F8_Dump_Analysis.java 先后运行 并输出到当前打开文件");
 
-
-        System.out.println(OneLine_Pre + " NotePad++ 设置  End "+ OneLine_Pre);
+        PrintHead_End("  NotePad++ 设置  End  ");
     }
 
 
     //
 
     static void Linux_BashTip(){
-        System.out.println(OneLine_Pre + " Linux 下 Shell 设置 Begin "+ OneLine_End);
+
+        PrintHead_End("  Linux 下 Shell 设置 Begin  ");
         System.out.println(User_Home+ File.separator+"Desktop"+File.separator+"zbin" +"文件夹放置完成后执行 以下代码 添加环境变量:");
         System.out.println("echo \"source ~/Desktop/zbin/lin_zbin/environment_lin_zbin.sh\" >> ~/.bashrc  && "+" echo \"source ~/Desktop/zbin/lin_zbin/environment_lin_zbin.sh\" >>  ~/.zshrc "+ " &&  chmod 777 -R ~/Desktop/zbin/ ");
-        System.out.println(OneLine_Pre + " Linux 下 Shell 设置  End "+ OneLine_Pre);
+
+
+        PrintHead_End("  Linux 下 Shell 设置  End  ");
     }
 
     static void  WindowsFilePathTip(){  // 文件快捷方式提示
-        System.out.println(OneLine_Pre + " Winddows下文件快捷方式 Begin "+ OneLine_End);
+
+        PrintHead_End("  Winddows下文件快捷方式 Begin   ");
+
+
         System.out.println("Winddows下 Ubuntu子系统 路径:");
         System.out.println(" zzfile_3.bat "+ User_Home+ File.separator+"AppData\\Local\\Packages\\CanonicalGroupLimited.UbuntuonWindows_79rhkp1fndgsc\\LocalState\\rootfs        // Ubuntu子系统根目录 ");
 
@@ -151,11 +153,12 @@ public class H0_Tip {
         System.out.println();
         System.out.println("网络配置Host");
         System.out.println(" zzfile_3.bat C:\\WINDOWS\\system32\\drivers\\etc\\hosts    // Hosts文件的做用是把网址域名与对应的IP地址建立一个关联 数据库 ");
-        System.out.println(OneLine_Pre + " Winddows下文件快捷方式  End "+ OneLine_Pre);
-
+        PrintHead_End("  Winddows下文件快捷方式  End  ");
     }
     static void CmderTip(){
-        System.out.println(OneLine_Pre + " Winddows下Cmder设置 Begin "+ OneLine_End);
+        PrintHead_End(" Winddows下Cmder设置 Begin ");
+
+
         System.out.println("添加CMDER.exe的Dir路径到 系统环境变量Path:   电脑(右击)》 属性 》高级系统设置(左面板) 》 环境变量 》 用户变量 》 Path( 添加cmder的dir )  ");
         System.out.println("Cmder.exe /REGISTER ALL       // 鼠标目录右击出现cmder选项   ");
         System.out.println("Cmder.exe /UNREGISTER ALL       // 鼠标目录右击删除cmder选项   ");
@@ -175,82 +178,18 @@ public class H0_Tip {
                 "set PATH=C:\\Program Files\\Tesseract-OCR;%PATH%\n" +
                 "set PATH=%USERPROFILE%\\Desktop\\zbin\\win_soft\\Redis;%PATH%");
         System.out.println();
-        System.out.println(OneLine_Pre + " Winddows下Cmder设置  End "+ OneLine_Pre);
-    }
-
-    static void DumpInfoTip(){
-        System.out.println(OneLine_Pre + " Dump 相关信息查询 "+ OneLine_End);
-        System.out.println("adb shell dumpsys media.camera                              【 查看camera的信息");
-        System.out.println("adb shell dumpsys activity                                  【 查看ActvityManagerService 所有信息    ");
-        System.out.println("adb shell dumpsys activity activities                       【 查看Activity组件信息                  ");
-        System.out.println("adb shell dumpsys activity services                         【 查看Service组件信息                   ");
-        System.out.println("adb shell dumpsys activity providers                        【 查看ContentProvider组件信息           ");
-        System.out.println("adb shell dumpsys activity broadcasts                       【 查看BraodcastReceiver信息             ");
-        System.out.println("adb shell dumpsys activity intents                          【 查看Intent信息                        ");
-        System.out.println("adb shell dumpsys activity processes                        【 查看进程信息                          ");
-        System.out.println("adb shell dumpsys activity provider com.android.settings    【 查看Settings相关的Provider信息        ");
-        System.out.println("adb shell pm list features                                  【 查看安卓feature                       ");
-
-
-    }
-    static void BroadCastInfoTip(){
-        System.out.println(OneLine_Pre + " 广播 BroadCast信息 查询 "+ OneLine_End);
-        System.out.println(OneLine+"WIFI 状态变化广播 ");
-        System.out.println("adb shell am broadcast -a com.Android.test --es<string> test_string \"this is test string\" —ei<int> test_int 100 —ez<boolean> test_boolean true\n" +
-                "【 -a com.Android.test  包名.Action的形式 】\n" +
-                "【 --es \"test_string\" \"this is test string\"    指定广播中携带字符串 字符串名称为 test_string 后面为值Value  】\n" +
-                "【 --ei test_int 100    指定广播中携带int整形  int名称为 test_int 后面为值Value 为 100 】\n" +
-                "【 --ez test_boolean true    指定广播中携带boolean变量   boolean名称为 test_boolean 后面为值Value 为 true 】\n" +
-                "adb shell am broadcast -a \"Android.net.wifi.WIFI_STATE_CHANGED\"  --ei \"wifi_state\" 0\n" +
-                "adb shell am broadcast -a \"Android.net.wifi.WIFI_STATE_CHANGED\"  --ei \"wifi_state\" 1 \n" +
-                "adb shell am broadcast -a \"Android.net.wifi.WIFI_STATE_CHANGED\"  --ei \"wifi_state\" 2 \n" +
-                "adb shell am broadcast -a \"Android.net.wifi.WIFI_STATE_CHANGED\"  --ei \"wifi_state\" 3 \n" +
-                "adb shell am broadcast -a \"Android.net.wifi.WIFI_STATE_CHANGED\"  --ei \"wifi_state\" 4 \n" +
-                "WifiManager.WIFI_STATE_DISABLED ==1\n" +
-                "WifiManager.WIFI_STATE_DISABLING ==0\n" +
-                "WifiManager.WIFI_STATE_ENABLED==3\n" +
-                "WifiManager.WIFI_STATE_ENABLING==2\n" +
-                "WifiManager.WIFI_STATE_UNKNOWN==4");
-
-
-
-
-    }
-
-    static void StartAppInfoTip(){
-        System.out.println(OneLine_Pre + " 启动应用信息 am start 查询 "+ OneLine_End);
-        System.out.println("adb shell am start -a android.settings.WIFI_SETTINGS     // 启动到WIFI设置界面");
-    }
-    static void PackageInfoTip(){
-
-        System.out.println(OneLine_Pre + " 安装包 Package 查询 "+ OneLine_End);
-
-        System.out.println("adb shell pm list packages                        【  查看所有安装包( 系统 + 三方  例如: package:com.miui.core )");
-        System.out.println("adb shell pm list packages -s                     【 只输出系统自带包 ");
-        System.out.println("adb shell pm list packages -3                     【 查看第三方应用 例如: package:com.sina.weibo " );
-        System.out.println("adb shell pm list packages -f                     【 输出包和包相关联的文件 例: package:/data/app/com.taobao.trip-RQc5gu_cTANljJA8vQ3kyg==/base.apk=com.taobao.trip");
-
-        System.out.println("adb shell pm list packages -i                     【 查看已安装应用信息和安装来源  例如: package:com.youdao.calculator  installer=null ");
-        System.out.println("adb shell pm list packages -e  sina <包名字符串>  【  查询包含 sina 关键字的包 ");
-        System.out.println("adb shell service list                            【  查询服务列表 ");
-//        System.out.println("");
-//        System.out.println("");
-//        System.out.println("");
-//        System.out.println("");
-
+        PrintHead_End(" Winddows下Cmder设置 End   ");
     }
 
 
-    static void PrintLogTip(){
 
-        System.out.println(OneLine_Pre + " 打印Log操作 "+ OneLine_End);
-        System.out.println(" adb logcat | grep zukgit " );
-    }
+
+
 
 
     static void Security_File_Tip(){
 
-        System.out.println("════════════════════════ 文件加密解密操作 ════════════════════════");
+        PrintHead_End(" 文件加密解密操作 Begin    ");
         System.out.println("________________________ 加密批量操作 ________________________ ");
         System.out.println("1. 先对当前文件内容进行改名    zrule_apply_G2.bat *_18 ");
         System.out.println("2. 对当前文件夹下的文件进行加密 生成 bad_batch 加密文件夹  zrule_apply_G2.bat #_7_bad_batch ");
@@ -269,144 +208,18 @@ public class H0_Tip {
         System.out.println("5.对解压的文件搜索输出快捷方式文件夹  zrule_apply_G2.bat *_14  .mp4  .avi   .wmv .rmvb  .flv .3gp");
         System.out.println("6.打开当前文件    zzfile_3.bat ");
         System.out.println("zrule_apply_G2.bat  #_8   &&   zzip_H5.bat 752025 zukgit11  &&  zrule_apply_G2.bat *_7_good_batch  && cd ./good_batch && zzfile_3.bat ");
+        PrintHead_End(" 文件加密解密操作 End    ");
     }
 
 
 
-    static void PullFileTip(){
-
-        System.out.println(OneLine_Pre + " Pull 拉取文件的操作 "+ OneLine_End);
-        System.out.println("adb root & adb pull /data/system/users/0/settings_system.xml   \n");
-        System.out.println("adb root & adb pull /data/system/users/0/settings_secure.xml   \n");
-        System.out.println("adb root & adb pull /data/system/users/0/settings_global.xml   \n");
-        System.out.println("adb root & adb pull /vendor/etc/wifi/WCNSS_qcom_cfg.ini        \n");
-        System.out.println("adb root & adb pull /vendor/etc/wifi/wpa_supplicant.conf       \n");
-        System.out.println("adb root & adb pull /system/etc/wifi/p2p_supplicant.conf       \n");
-        System.out.println("adb root & adb pull /data/misc/wifi/WifiConfigStore.xml        \n");
-        System.out.println("adb root & adb pull /data/misc/wifi/softap.conf                \n");
-        System.out.println("adb root & adb pull /system/build.prop                         \n");
-        System.out.println("adb root & adb shell getprop >  ./prop.txt                     \n");
-        System.out.println("adb root & adb pull   /vendor/fireware_mnt/image/wlanmdsp.mbn  \n");
-        System.out.println("adb root & adb pull  /vendor/fireware_mnt/image/Data.msc       \n");
-        System.out.println("adb root & adb pull /vendor/rfs/msm/mpss/ramdumps              \n");
-        System.out.println("adb root & adb pull /storage/emulated/0/Pictures/Screenshots   \n");
-        System.out.println("adb root & adb pull /system/etc/hostapd/hostapd.deny           \n");
-        System.out.println("adb root & adb pull /system/etc/hostapd/hostapd.accept         \n");
-        System.out.println("adb root & adb pull /data/vendor/wifi/hostapd/hostapd.conf     \n");
-        System.out.println("adb root & adb pull /data/vendor/wifi/hostapd/hostapd.accept   \n");
-        System.out.println("adb root & adb pull /data/vendor/wifi/hostapd/hostapd.deny     \n");
-        System.out.println("adb root & adb pull /data/vendor/bug2go                        \n");
-    }
-
-
-
-    static void VerboseLogTip(){
-
-        System.out.println(OneLine_Pre + " WIFI详情开关描述 "+ OneLine_End);
-        System.out.println("Settings >System > About phone > tap \"Build number\" 4 times >Developer options\n" +
-                "Setting > System > Advanced > Developer options >Enable WiFi Verbose Logging  [toogle open] ");
-
-
-
-        System.out.println(OneLine_Pre + " GPS Log_Mask 描述: "+ OneLine_End);
-        System.out.println(" modem log was collected using QC_default.cfg as log mask, so there is very few GNSS msg in QXDM log and we can not further check it from modem perspective ( whether there is any interferance, whether HW performance is good, whether any error from modem or GNSS engine... )");
-        System.out.println("can you please help to use GNSS_V9.cfg as log mask ");
-        System.out.println("( Bug2Go -> System Debug Settings -> diag_mdlog v2 -> Config file -> GNSS_V9.cfg ) to collect one more B2G log?");
-        System.out.println("and if possible, please help to side by side test it on REF device and collect pass log for comparison");
-        System.out.println("much appreciated");
-        System.out.println();
-
-        System.out.println();
-        System.out.println(" APP的 GPS定位权限查找:");
-        System.out.println("搜索bugreport.txt  关键字 Package [应用名称]    例如:  Package [com.whatsapp]");
-        System.out.println("runtime permissions:");
-        System.out.println("android.permission.ACCESS_FINE_LOCATION: granted=true    精确位置");
-        System.out.println("android.permission.ACCESS_COARSE_LOCATION: granted=true 模糊位置");
-        System.out.println("");
-
-        System.out.println(" QCAT 中 Displays > QCAT Sample > GNSS > GNSS RF Bp Amp Pga Gain Data");
-        System.out.println("tip1: Bp Amp应该在90-350  min-max 否则就有干扰");
-        System.out.println("tip2: 在 QCAT中 搜索 0x1476 GNSS 点击 <Process> 之后选中 Configuration 面板 查看 Output Directory 打开该路径就有谷歌地图 .kml 文件");
-
-
-    }
-
-
-    static void SettingOperationTip(){
-
-        System.out.println(OneLine_Pre + " 设置开关操作 "+ OneLine_End);
-
-        System.out.println(OneLine_Pre+"WIFI");
-        System.out.println("adb shell svc wifi enable     【打开wifi命令】 ");
-        System.out.println("adb shell svc wifi disable     【关闭wifi命令】");
-
-        System.out.println("adb shell settings get global wifi_on    【查看当前 wifi 开关情况 】");
-        System.out.println("adb shell settings get global wifi_verbose_logging_enabled      【获取WIFI详情开关模式】     ");
-        System.out.println("adb shell settings put global wifi_verbose_logging_enabled 1 【设置wifi详情开关 0-关闭wifi详情 1-打开wifi详情 null-默认关闭wifi详情】");
-        System.out.println("adb shell dumpsys wifi > wifi.txt     # 【查看当前 wifi 服务情况 】");
-        System.out.println("adb shell dumpsys wifiscanner > wifiscanner.txt     # 【查看当前 wifiscanner 扫描服务情况 】");
-        System.out.println("adb shell dumpsys connectivity > connectivity.txt     # 【查看当前 connectivity 服务情况 】");
-        System.out.println("adb shell dumpsys connmetrics > connmetrics.txt     # 【查看当前 connmetrics 服务情况  断线 无网  】");
-        System.out.println("adb shell dumpsys netstats > netstats.txt     # 【查看当前 netstats 服务情况 】");
-
-
-
-
-
-        System.out.println(OneLine_Pre+"Hotspot热点");
-        System.out.println("adb shell settings get global tether_enable_legacy_dhcp_server     【查看用户是否可以配置热点dhcp的配置项  0-可设置dhcp 1-不可设置dhcp】 ");
-
-
-        System.out.println();
-        System.out.println("adb shell svc bluetooth enable     【打开蓝牙命令】 ");
-        System.out.println("adb shell svc bluetooth disable     【关闭蓝牙命令】");
-        System.out.println("adb shell settings get global bluetooth_on       【0-Bluetooth蓝牙开关关闭 1-Bluetooth蓝牙开关开启】");
-        System.out.println("adb shell settings get secure bluetooth_name     【本地蓝牙设备名称】 ");
-        System.out.println("adb shell settings get secure bluetooth_address     【本地蓝牙设备Mac地址】");
-        System.out.println("adb shell getprop persist.bluetooth.btsnooplogmode    【查看蓝牙snooplog模式   full-有snoopLog模式  empty-无Log模式  】");
-        System.out.println("adb shell dumpsys bluetooth_manager > bluetooth_manager.txt      【 bluetooth_manager 服务Log 】");
-
-
-
-        System.out.println();
-        System.out.println("adb shell settings get secure location_mode      【获取位置模式】 ");
-        System.out.println("adb shell settings put secure location_mode 0  【设置位置模式 0-关闭位置模式 1-打开位置模式 2-打开省电位置模式 3-打开高性能位置模式 】");
-        System.out.println("adb shell settings get global wifi_scan_always_enabled      【获取WIFI扫描定位开关】 ");
-        System.out.println("adb shell settings put global wifi_scan_always_enabled  0   【0-关闭WIFI扫描定位  1-开启WIFI扫描定位 】");
-        System.out.println("adb shell settings get global ble_scan_always_enabled       【获取蓝牙扫描定位开关】 ");
-        System.out.println("adb shell settings put global ble_scan_always_enabled   1   【0-关闭蓝牙扫描定位  1-开启蓝牙扫描定位 】");
 
 
 
 
 
 
-        System.out.println();
-        System.out.println("adb shell settings get global airplane_mode_on    ##【获取飞行模式】");
-        System.out.println("adb shell settings put global airplane_mode_on 0  ##【设置飞行模式  0-停止  1-开启】");
-
-        System.out.println();
-        System.out.println("adb shell svc data enable     【打开移动网络命令】 ");
-        System.out.println("adb shell svc data  disable     【关闭移动网络命令】");
-        System.out.println("adb shell settings get global mobile_data    【查看移动网络开关 0-移动网络关闭  1-移动网络开启】 ");
-
-
-    }
 
 
 
-    static void AdbCommandTip(){
-
-        System.out.println(OneLine_Pre + " Settings.apk 安装 push命令 "+ OneLine_End);
-        System.out.println("adb root && adb remount && adb shell settings put global wifi_verbose_logging_enabled 1 && adb push .\\Settings.apk /product/priv-app/Settings/  && adb push .\\oat  /product/priv-app/Settings    ##### 连续重启两遍    ");
-
-//        adb root && adb disable-verity && adb reboot
-        System.out.println(OneLine_Pre + " adb disable-verity 提升权限命令 "+ OneLine_End);
-        System.out.println(" adb root && adb disable-verity && adb reboot ");
-        System.out.println(OneLine_Pre + " wifi-service.jar  push命令 "+ OneLine_End);
-        System.out.println("adb root && adb remount && adb shell settings put global wifi_verbose_logging_enabled 1 && adb push .\\wifi-service.jar /system/framework/   ##### 连续重启两遍?    ");
-
-
-
-    }
 }

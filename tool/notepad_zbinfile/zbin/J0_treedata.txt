@@ -196,7 +196,7 @@ hushengupiao_caiwushuju_
 〖*period* 报告期(每个季度最后一天的日期，比如20171231表示年报)
 〖*report_type* 报告类型： 参考下表说明
 〖*comp_type* 公司类型：1一般工商业 2银行 3保险 4证券
-hushengupiao_caiwushuju_lirunbiao 【800】[3800] <income> (1xts_code) 《ts_code=ann_date=f_ann_date=end_date=report_type=comp_type=basic_eps=diluted_eps=total_revenue=revenue=int_income=prem_earned=comm_income=n_commis_income=n_oth_income=n_oth_b_income=prem_income=out_prem=une_prem_reser=reins_income=n_sec_tb_income=n_sec_uw_income=n_asset_mg_income=oth_b_income=fv_value_chg_gain=invest_income=ass_invest_income=forex_gain=total_cogs=oper_cost=int_exp=comm_exp=biz_tax_surchg=sell_exp=admin_exp=fin_exp=assets_impair_loss=prem_refund=compens_payout=reser_insur_liab=div_payt=reins_exp=oper_exp=compens_payout_refu=insur_reser_refu=reins_cost_refund=other_bus_cost=operate_profit=non_oper_income=non_oper_exp=nca_disploss=total_profit=income_tax=n_income=n_income_attr_p=minority_gain=oth_compr_income=t_compr_income=compr_inc_attr_p=compr_inc_attr_m_s=ebit=ebitda=insurance_exp=undist_profit=distable_profit=update_flag》
+hushengupiao_caiwushuju_lirunbiao 【800】[3800] ├200┤<income> (1xts_code) 《ts_code=ann_date=f_ann_date=end_date=report_type=comp_type=basic_eps=diluted_eps=total_revenue=revenue=int_income=prem_earned=comm_income=n_commis_income=n_oth_income=n_oth_b_income=prem_income=out_prem=une_prem_reser=reins_income=n_sec_tb_income=n_sec_uw_income=n_asset_mg_income=oth_b_income=fv_value_chg_gain=invest_income=ass_invest_income=forex_gain=total_cogs=oper_cost=int_exp=comm_exp=biz_tax_surchg=sell_exp=admin_exp=fin_exp=assets_impair_loss=prem_refund=compens_payout=reser_insur_liab=div_payt=reins_exp=oper_exp=compens_payout_refu=insur_reser_refu=reins_cost_refund=other_bus_cost=operate_profit=non_oper_income=non_oper_exp=nca_disploss=total_profit=income_tax=n_income=n_income_attr_p=minority_gain=oth_compr_income=t_compr_income=compr_inc_attr_p=compr_inc_attr_m_s=ebit=ebitda=insurance_exp=undist_profit=distable_profit=update_flag》
 
 
 
@@ -231,7 +231,7 @@ hushengupiao_caiwushuju_xianjinliuliangbiao     【800】[] <cashflow> (1xts_cod
 〖*end_date*     str N 公告结束日期
 〖*period*       str N 报告期(每个季度最后一天的日期，比如20171231表示年报)
 〖*type*         str N 预告类型(预增/预减/扭亏/首亏/续亏/续盈/略增/略减)
-hushengupiao_caiwushuju_yejiyugao  【800】[] <forecast> (1xts_code#start_date{20100101}#curyearend_end_date) 《ts_code=ann_date=end_date=type=p_change_min=p_change_max=net_profit_min=net_profit_max=last_parent_net=first_ann_date=summary=change_reason》
+hushengupiao_caiwushuju_yejiyugao  【800】[] ├200┤<forecast> (1xts_code#start_date{20100101}#curyearend_end_date) 《ts_code=ann_date=end_date=type=p_change_min=p_change_max=net_profit_min=net_profit_max=last_parent_net=first_ann_date=summary=change_reason》
 
 
 
@@ -242,7 +242,7 @@ hushengupiao_caiwushuju_yejiyugao  【800】[] <forecast> (1xts_code#start_date{
 〖*start_date*   str N 公告开始日期
 〖*end_date*     str N 公告结束日期
 〖*period*       str N 报告期(每个季度最后一天的日期,比如20171231表示年报)
-hushengupiao_caiwushuju_yejikuaibao     【800】[] <express> (1xts_code#start_date{20100101}#curyearend_end_date) 《ts_code=ann_date=end_date=revenue=operate_profit=total_profit=n_income=total_assets=total_hldr_eqy_exc_min_int=diluted_eps=diluted_roe=yoy_net_profit=bps=yoy_sales=yoy_op=yoy_tp=yoy_dedu_np=yoy_eps=yoy_roe=growth_assets=yoy_equity=growth_bps=or_last_year=op_last_year=tp_last_year=np_last_year=eps_last_year=open_net_assets=open_bps=perf_summary=is_audit=remark》
+hushengupiao_caiwushuju_yejikuaibao     【800】[] ├200┤<express> (1xts_code#start_date{20100101}#curyearend_end_date) 《ts_code=ann_date=end_date=revenue=operate_profit=total_profit=n_income=total_assets=total_hldr_eqy_exc_min_int=diluted_eps=diluted_roe=yoy_net_profit=bps=yoy_sales=yoy_op=yoy_tp=yoy_dedu_np=yoy_eps=yoy_roe=growth_assets=yoy_equity=growth_bps=or_last_year=op_last_year=tp_last_year=np_last_year=eps_last_year=open_net_assets=open_bps=perf_summary=is_audit=remark》
 
 
 
@@ -273,7 +273,7 @@ hushengupiao_caiwushuju_caiwuzhibiaoshuju  【】[] <fina_indicator> (1xts_code)
 〖*start_date*   str N 公告开始日期
 〖*end_date*     str N 公告结束日期
 〖*period*       str N 报告期(每个季度最后一天的日期,比如20171231表示年报)
-hushengupiao_caiwushuju_caiwushenjiyijian  【】[] <fina_audit> (1xts_code#start_date{20100101}#curyearend_end_date) 《ts_code=ann_date=end_date=audit_result=audit_fees=audit_agency=audit_sign》
+hushengupiao_caiwushuju_caiwushenjiyijian  【】[]├60┤ <fina_audit> (1xts_code#start_date{20100101}#curyearend_end_date) 《ts_code=ann_date=end_date=audit_result=audit_fees=audit_agency=audit_sign》
 
 
 
@@ -283,7 +283,7 @@ hushengupiao_caiwushuju_caiwushenjiyijian  【】[] <fina_audit> (1xts_code#star
 〖*type*         str N 类型：P按产品 D按地区（请输入大写字母P或者D）
 〖*start_date*   str N 报告期开始日期
 〖*end_date*     str N 报告期结束日期
-hushengupiao_caiwushuju_zhuyingyewugoucheng   【】[] <fina_mainbz> (1xts_code#start_date{20100101}#curyearend_end_date) 《ts_code=end_date=bz_item=bz_sales=bz_profit=bz_cost=curr_type=update_flag》
+hushengupiao_caiwushuju_zhuyingyewugoucheng   【】[] ├60┤<fina_mainbz> (1xts_code#start_date{20100101}#curyearend_end_date) 《ts_code=end_date=bz_item=bz_sales=bz_profit=bz_cost=curr_type=update_flag》
 
 
 
@@ -296,7 +296,7 @@ hushengupiao_caiwushuju_zhuyingyewugoucheng   【】[] <fina_mainbz> (1xts_code#
 〖*end_date*      str N 财报周期（比如20181231表示2018年年报，20180630表示中报)
 〖*pre_date*      str N 计划披露日期
 〖*actual_date*   str N 实际披露日期
-hushengupiao_caiwushuju_caibaopiluriqibiao  【】[] <disclosure_date> (1xts_code) 《ts_code=ann_date=end_date=pre_date=actual_date=modify_date》
+hushengupiao_caiwushuju_caibaopiluriqibiao  【】[] ├200┤<disclosure_date> (1xts_code) 《ts_code=ann_date=end_date=pre_date=actual_date=modify_date》
 
 
 
@@ -337,7 +337,7 @@ hushengupiao_shichangcaokaoshuju_rongzirongquanjiaoyimingxi       【】[] <marg
 〖*ann_date*      str N 公告日期
 〖*start_date*    str N 报告期开始日期
 〖*end_date*      str N 报告期结束日期
-hushengupiao_shichangcaokaoshuju_qianshidagudong       【】[] <top10_holders> (1xts_code#start_date{20100101}#curyearend_end_date) 《ts_code=ann_date=end_date=holder_name=hold_amount=hold_ratio》
+hushengupiao_shichangcaokaoshuju_qianshidagudong       【】[] ├200┤<top10_holders> (1xts_code#start_date{20100101}#curyearend_end_date) 《ts_code=ann_date=end_date=holder_name=hold_amount=hold_ratio》
 
 
 
@@ -347,7 +347,7 @@ hushengupiao_shichangcaokaoshuju_qianshidagudong       【】[] <top10_holders> 
 〖*ann_date*     str N 公告日期
 〖*start_date*   str N 报告期开始日期
 〖*end_date*     str N 报告期结束日期
-hushengupiao_shichangcaokaoshuju_qianshidaliutonggudong       【】[] <top10_floatholders> (1xts_code#start_date{20100101}#curyearend_end_date) 《ts_code=ann_date=end_date=holder_name=hold_amount》
+hushengupiao_shichangcaokaoshuju_qianshidaliutonggudong       【】[] ├200┤<top10_floatholders> (1xts_code#start_date{20100101}#curyearend_end_date) 《ts_code=ann_date=end_date=holder_name=hold_amount》
 
 
 
@@ -372,7 +372,7 @@ hushengupiao_shichangcaokaoshuju_guquanzhiyatongjishuju       【】[] <pledge_s
 
 〖股权质押明细     https://tushare.pro/document/2?doc_id=111
 〖*ts_code*   str Y 股票代码
-hushengupiao_shichangcaokaoshuju_guquanzhiyamingxi       【】[] <pledge_detail> (1xts_code) 《ts_code=ann_date=holder_name=pledge_amount=start_date=end_date=is_release=release_date=pledgor=holding_amount=pledged_amount=p_total_ratio=h_total_ratio=is_buyback》
+hushengupiao_shichangcaokaoshuju_guquanzhiyamingxi       【】[] ├200┤<pledge_detail> (1xts_code) 《ts_code=ann_date=holder_name=pledge_amount=start_date=end_date=is_release=release_date=pledgor=holding_amount=pledged_amount=p_total_ratio=h_total_ratio=is_buyback》
 
 
 〖股票回购     https://tushare.pro/document/2?doc_id=124
@@ -410,14 +410,14 @@ hushengupiao_shichangcaokaoshuju_xianshougujiejin       【】[] <share_float> (
 〖*trade_date*   str N 交易日期（格式 YYYYMMDD，下同）
 〖*start_date*   str N 开始日期
 〖*end_date*     str N 结束日期
-hushengupiao_shichangcaokaoshuju_dazongjiaoyi       【】[] <block_trade> (yeartonow_trade_date) 《ts_code=trade_date=price=vol=amount=buyer=seller》
+hushengupiao_shichangcaokaoshuju_dazongjiaoyi       【】[] ├300┤<block_trade> (yeartonow_trade_date) 《ts_code=trade_date=price=vol=amount=buyer=seller》
 
 〖股东人数     https://tushare.pro/document/2?doc_id=166
 〖*ts_code*      str N TS股票代码
 〖*enddate*      str N 截止日期
 〖*start_date*   str N 公告开始日期
 〖*end_date*     str N 公告结束日期
-hushengupiao_shichangcaokaoshuju_gudongrenshu       【】[] <stk_holdernumber> (1xts_code#curyearbegin_start_date#curyearend_end_date) 《ts_code=ann_date=end_date=holder_num》
+hushengupiao_shichangcaokaoshuju_gudongrenshu       【】[] ├300┤<stk_holdernumber> (1xts_code#curyearbegin_start_date#curyearend_end_date) 《ts_code=ann_date=end_date=holder_num》
 
 
 〖股东增减持     https://tushare.pro/document/2?doc_id=175
@@ -427,7 +427,7 @@ hushengupiao_shichangcaokaoshuju_gudongrenshu       【】[] <stk_holdernumber> 
 〖*end_date*      str N 公告结束日期
 〖*trade_type*    str N 交易类型IN增持DE减持
 〖*holder_type*   str N 股东类型C公司P个人G高管
-hushengupiao_shichangcaokaoshuju_gudongzengjianchi       【】[] <stk_holdertrade> (curyearbegin_start_date#last_end_date) 《ts_code=ann_date=holder_name=holder_type=in_de=change_vol=change_ratio=after_share=after_ratio=avg_price=total_share=begin_date=close_date》
+hushengupiao_shichangcaokaoshuju_gudongzengjianchi       【】[] ├300┤<stk_holdertrade> (curyearbegin_start_date#last_end_date) 《ts_code=ann_date=holder_name=holder_type=in_de=change_vol=change_ratio=after_share=after_ratio=avg_price=total_share=begin_date=close_date》
 
 
 

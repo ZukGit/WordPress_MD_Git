@@ -369,7 +369,7 @@ public class I9_TextRuleOperation {
         CUR_RULE_LIST.add( new Add_BeginStr_EndStr_Rule_18());
         CUR_RULE_LIST.add( new FirstWord_MakeDir_Rule_19());
         CUR_RULE_LIST.add( new Cal_Install_Command_Rule_20());
-
+        CUR_RULE_LIST.add( new System_Out_Print_Rule_21());    // 把当前文件的每一行 都 转为 System.out.println(xx) 的内容
 //        CUR_RULE_LIST.add( new Image2Jpeg_Rule_3());
 //        CUR_RULE_LIST.add( new Image2Png_Rule_4());
 //        CUR_RULE_LIST.add( new AVI_Rule_5());
@@ -379,6 +379,65 @@ public class I9_TextRuleOperation {
 
     }
 
+
+    class System_Out_Print_Rule_21 extends  Basic_Rule{
+
+        System_Out_Print_Rule_21(boolean mIsInputDirAsSearchPoint){
+            super(21);
+            isInputDirAsSearchPoint =  mIsInputDirAsSearchPoint;
+        }
+
+
+        System_Out_Print_Rule_21(){
+            super(21,false);
+        }
+
+        @Override
+        ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+            for (int i = 0; i < curInputFileList.size(); i++) {
+                File fileItem = curInputFileList.get(i);
+
+//                ArrayList<String>  fixedStrArr =   clearChinese_Rule_13(fileItem);
+                ArrayList<String>  fixedStrArr =   add_system_out_Rule_21(fileItem);
+                System.out.println("════════════"+"输出文件 Begin " + "════════════");
+                for (int j = 0; j < fixedStrArr.size(); j++) {
+                    System.out.println(fixedStrArr.get(j));
+                }
+                System.out.println("════════════"+"输出文件 End "+"════════════");
+                writeContentToFile(I9_Temp_Text_File,fixedStrArr);
+                NotePadOpenTargetFile(I9_Temp_Text_File.getAbsolutePath());
+                System.out.println("rule_"+rule_index+" ->  把当前文件的每一行 都 转为 System.out.println(xx) 的内容   File="+ fileItem.getAbsolutePath());
+            }
+
+
+            return super.applyOperationRule(curFileList, subFileTypeMap, curDirList, curRealFileList);
+        }
+
+        @Override
+        String simpleDesc() {
+            return "  把当前文件的每一行 都 转为 System.out.println(xx) 的内容 ";
+        }
+
+        //3. 如果当前 执行 错误  checkParams 返回 false   那么 将 打印这个函数 说明错误的可能原因
+        @Override
+        void showWrongMessage() {
+            System.out.println("当前 type 索引 "+rule_index +" 执行错误  可能是输入参数错误 请检查输入参数!");
+            System.out.println(" errorMsg = "+errorMsg );
+        }
+
+        //4.  当前 rule的 说明  将会打印在  用户输入为空时的 提示语句！
+        @Override
+        String ruleTip(String type,int index , String batName,OS_TYPE curType){
+            String itemDesc = "";
+            if(curType == OS_TYPE.Windows){
+                itemDesc = batName.trim()+"  "+type+"_"+index + "    [索引 "+index+"]  描述:"+""+ simpleDesc();
+            }else{
+                itemDesc = batName.trim()+" "+type+"_"+index + "    [索引 "+index+"]  描述:"+""+ simpleDesc();
+            }
+
+            return itemDesc;
+        }
+    }
 
     // 往 每行的加入占位符   开头加入 〖*   第一个空格前加入*
     class Cal_Install_Command_Rule_20 extends  Basic_Rule {
@@ -4312,6 +4371,56 @@ public class I9_TextRuleOperation {
     // Rule_13   Begin 去除掉当前文件中的中文 每一个中文 以一个空格代替 A7
 
     private static String Rule13_REGEX_CHINESE = "[\u4e00-\u9fa5]";
+
+    public static ArrayList<String>    add_system_out_Rule_21(File srcFile) {
+        ArrayList<String> newContent = new    ArrayList<String>();
+
+        File curFile = srcFile;
+
+        if (curFile != null) {
+
+            FileReader curReader;
+            try {
+
+                curReader = new FileReader(curFile);
+
+
+                BufferedReader curBR = new BufferedReader(new InputStreamReader(new FileInputStream(curFile), "utf-8"));
+                String oldOneLine = "";
+                String newOneLine = "";
+
+
+                while (oldOneLine != null) {
+
+                    oldOneLine = curBR.readLine();
+                    if (oldOneLine == null || oldOneLine.trim().isEmpty()) {
+                        newContent.add("System.out.println();");
+                        continue;
+                    }
+
+//                    System.out.println(" \"this is test string\" ");
+//                    System.out.println("adb shell am broadcast -a com.Android.test --es<string> test_string \"this is test string\" —ei<int> test_int 100 —ez<boolean> test_boolean true");
+                    newOneLine = new String(oldOneLine);
+
+                    newOneLine = newOneLine.replace("\"","\\\"");
+                    newOneLine = newOneLine.replace(".\\",".\\\\");   // .\w   .\w
+
+                    newOneLine = "System.out.println(\""+newOneLine.trim()+"\");";
+
+
+                    newContent.add(newOneLine.trim());
+                }
+                curBR.close();
+
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
+            System.out.println("Failed !");
+        }
+        return newContent;
+    }
 
     public static ArrayList<String> clearChinese_Rule_13(File srcFile) {
         ArrayList<String> newContent = new    ArrayList<String>();

@@ -6102,7 +6102,7 @@ String[] arrStr = codePrams.split(",");
 
             case "gudongrenshu":
             case "guquanzhiyamingxi":
-            case "guquanzhiyatongjishuju":
+//            case "guquanzhiyatongjishuju":
             case "qianshidaliutonggudong":
             case "qianshidagudong":
             case "caibaopiluriqibiao":   // : Read timed out.    只调用到一次 !  财报披露计划
@@ -6156,6 +6156,9 @@ String[] arrStr = codePrams.split(",");
 
 
             //ValueError: This sheet is too large! Your sheet size is: 1166415, 8 Max sheet size is: 1048576, 1638
+            // 超过100万行  无法保存在一个 sheet
+            case "guquanzhiyatongjishuju":
+//            case "guquanzhiyamingxi":
             case "guanlicengxinchouhechigu":
                 bodyPath = Python_BodyTemplate_3;
                 break;
