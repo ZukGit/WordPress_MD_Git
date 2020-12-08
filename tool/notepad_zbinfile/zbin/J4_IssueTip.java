@@ -347,7 +347,8 @@ public class J4_IssueTip {
         System.out.println("and if possible, please help to side by side test it on REF device and collect pass log for comparison");
         System.out.println("much appreciated");
         System.out.println();
-        System.out.println();
+        System.out.println("【打印搜星Log】");
+        System.out.println("adb logcat | grep \"Used In Fix:\"");
 
     }
 

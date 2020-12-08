@@ -663,7 +663,7 @@ public class F0_RepoCommand {
         printSchema("【repo init + dexfalg-frameworks.jar  命令】");
 
         String TAG = "repo start --all TEMP";
-        String TAG_TARGET = "repo start --all TEMP  &&  zadddex_flag_C8.sh  ";
+        String TAG_TARGET = "repo start --all TEMP  &&  zadddex_flag_C8.sh  &&  ztag_aosp_wifi_bt_gps_J6.sh  ";
 
         // System.out.println("--------------------------------------------------");
         printLine();
@@ -768,7 +768,7 @@ public class F0_RepoCommand {
         String str2_1 = "repo init -u ssh://gerrit.mot.com/home/repo/dev/platform/android/platform/manifest/" + metaData.gitRepoName.trim()  + " " + "--repo-url=ssh://gerrit.mot.com/home/repo/dev/platform/android/repo.git ";
         String str2_2 = "--manifest-branch=" + metaData.manifestBranchName.trim() + "  ";
         String str2_3 = "-m " + metaData.xmlbranchName.trim() + "  && ";
-        String str3_1 = "repo sync -j2  && repo start --all TEMP  && ";
+        String str3_1 = "repo sync -j2  && repo start --all TEMP  &&  ztag_aosp_wifi_bt_gps_J6.sh  &&  ";
         String str4_1_1 = "source /opt/conf/moto.conf && ";
         for (int i = 0; i < metaData.BuildingCommandList.size(); i++) {
             String buildList = metaData.BuildingCommandList.get(i);
@@ -808,7 +808,7 @@ public class F0_RepoCommand {
         // System.out.println("--------------------------------------------------");
         printLine();
         String TAG = "repo start --all TEMP";
-        String TAG_TARGET = "repo start --all TEMP && cp -fr ../zukgit1.txt  ./ &&  cp -fr ../../zukgit2.txt  ./  ";
+        String TAG_TARGET = "repo start --all TEMP  &&  ztag_aosp_wifi_bt_gps_J6.sh &&  cp -fr ../zukgit1.txt  ./ &&  cp -fr ../../zukgit2.txt  ./  ";
         productName = metaData.productName;
         gitRepoName = metaData.gitRepoName;
         manifestBranchName = metaData.manifestBranchName;
@@ -849,7 +849,7 @@ public class F0_RepoCommand {
         // System.out.println("--------------------------------------------------");
 
         String TAG = "repo start --all TEMP";
-        String TAG_TARGET = "repo start --all TEMP  &&  zadddex_flag_C8.sh  && zlog_add_B8.sh ./packages/apps/Settings  ";
+        String TAG_TARGET = "repo start --all TEMP  &&  zadddex_flag_C8.sh   &&  ztag_aosp_wifi_bt_gps_J6.sh && zlog_add_B8.sh ./packages/apps/Settings  ";
 
 
         printLine();
@@ -897,7 +897,7 @@ public class F0_RepoCommand {
         // System.out.println("--------------------------------------------------");
 
         String TAG = "repo start --all TEMP";
-        String TAG_TARGET = "repo start --all TEMP  &&  zadddex_flag_C8.sh  ";
+        String TAG_TARGET = "repo start --all TEMP  &&  zadddex_flag_C8.sh   &&  ztag_aosp_wifi_bt_gps_J6.sh ";
 
 
         printLine();
@@ -1002,7 +1002,7 @@ public class F0_RepoCommand {
         String str2_1 = "repo init -u ssh://gerrit.mot.com/home/repo/dev/platform/android/platform/manifest/" + cGitRepoName.trim() + " " + "--repo-url=ssh://gerrit.mot.com/home/repo/dev/platform/android/repo.git ";
         String str2_2 = "--manifest-branch=" + cManifestBranchName.trim() + "  ";
         String str2_3 = "-m " + cXmlbranchName.trim() + "  && ";
-        String str3_1 = "repo sync -j2  && repo start --all TEMP  &&  ../F0_repo_init.sh && ";
+        String str3_1 = "repo sync -j2  && repo start --all TEMP   &&  ztag_aosp_wifi_bt_gps_J6.sh  &&  ../F0_repo_init.sh && ";
         String str4_1 = " motorola/build/bin/build_device.bash -b nightly -p " + productName.toLowerCase().trim() + "_" + buildType + "  -g -j4 2>&1 | tee " + getTimeStampDesc() + "_" + logname + ".log";
         result = str1_1 + str1_2 + str2_1 + str2_2 + str2_3 + str3_1 + str4_1;
         return result;
@@ -1016,7 +1016,7 @@ public class F0_RepoCommand {
         String str2_1 = "repo init -u ssh://gerrit.mot.com/home/repo/dev/platform/android/platform/manifest/" + cGitRepoName.trim() + " " + "--repo-url=ssh://gerrit.mot.com/home/repo/dev/platform/android/repo.git ";
         String str2_2 = "--manifest-branch=" + cManifestBranchName.trim() + "  ";
         String str2_3 = "-m " + cXmlbranchName.trim() + "  && ";
-        String str3_1 = "repo sync -j2  && repo start --all TEMP  && ";
+        String str3_1 = "repo sync -j2  && repo start --all TEMP   &&  ztag_aosp_wifi_bt_gps_J6.sh  && ";
         String str4_1 = " motorola/build/bin/build_device.bash -b nightly -p " + productName.toLowerCase().trim() + "_" + buildType + "  -g -j4 2>&1 | tee " + getTimeStampDesc() + "_" + logname + ".log";
         result = str1_1 + str1_2 + str2_1 + str2_2 + str2_3 + str3_1 + str4_1;
         return result;
@@ -1031,7 +1031,7 @@ public class F0_RepoCommand {
         String str2_1 = "repo init -u ssh://gerrit.mot.com/home/repo/dev/platform/android/platform/manifest/" + cGitRepoName.trim() + " " + "--repo-url=ssh://gerrit.mot.com/home/repo/dev/platform/android/repo.git ";
         String str2_2 = "--manifest-branch=" + cManifestBranchName.trim() + "  ";
         String str2_3 = "-m " + cXmlbranchName.trim() + "  && ";
-        String str3_1 = "repo sync -j2  && repo start --all TEMP  && ";
+        String str3_1 = "repo sync -j2  && repo start --all TEMP   &&  ztag_aosp_wifi_bt_gps_J6.sh && ";
         String str4_1 = " motorola/build/bin/build_device.bash -b nightly -p " + productName.toLowerCase().trim() + "_" + buildType + "  -g -j4 -E oem-image 2>&1 | tee " + getTimeStampDesc() + "_" + logname + ".log";
 
         result = str1_1 + str1_2 + str2_1 + str2_2 + str2_3 + str3_1 + str4_1;

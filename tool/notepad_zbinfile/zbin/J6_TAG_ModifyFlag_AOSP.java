@@ -149,15 +149,18 @@ static {
     }
 
     static OS_TYPE curOS_TYPE = OS_TYPE.Windows;
-
+    static String BAT_SH_EndType ;
     static void initSystemInfo() {
         String osName = System.getProperties().getProperty("os.name").toLowerCase();
         if (osName.contains("window")) {
             curOS_TYPE = OS_TYPE.Windows;
+            BAT_SH_EndType = ".bat";
         } else if (osName.contains("linux")) {
             curOS_TYPE = OS_TYPE.Linux;
+            BAT_SH_EndType = ".sh";
         } else if (osName.contains("mac")) {
             curOS_TYPE = OS_TYPE.MacOS;
+            BAT_SH_EndType = ".sh";
         }
     }
 
@@ -217,13 +220,16 @@ static {
             return null;
         }
         while(curDir != null && curDir.exists()){
+
+            String curDirName = curDir.getName().toLowerCase();
+            System.out.println("curDirName  = "+ curDirName);
+            if(curDirName.startsWith("code")){
+                AOSP_Project_Root_DirFile = curDir;
+                break;
+            }
             curDir = curDir.getParentFile();
             if(curDir == null){
                 break;
-            }
-            String curDirName = curDir.getName().toLowerCase();
-            if(curDirName.startsWith("code")){
-                AOSP_Project_Root_DirFile = curDir;
             }
 
         }
@@ -376,7 +382,7 @@ static {
 
                 continue;
             } else {
-                System.out.println("" + ZParamClassList.get(i).classFile.getAbsolutePath());
+                System.out.println(" ["+i+"] = " + ZParamClassList.get(i).classFile.getAbsolutePath());
             }
 
 
@@ -408,6 +414,8 @@ static {
             //  System.out.println("═══════  格式化文件 如下: formatNewClassCode :" + formatNewClassCode);
             // 把当前的新构建的文件重新写入 .java 文件
             WriteToFile(ZParamClassList.get(i).classFile, formatNewClassCode);
+            System.out.println(" zzfile_3"+BAT_SH_EndType+"  " + ZParamClassList.get(i).classFile.getAbsolutePath());
+
         }
     }
 
