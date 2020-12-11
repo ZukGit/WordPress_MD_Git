@@ -370,6 +370,8 @@ public class I9_TextRuleOperation {
         CUR_RULE_LIST.add( new FirstWord_MakeDir_Rule_19());
         CUR_RULE_LIST.add( new Cal_Install_Command_Rule_20());
         CUR_RULE_LIST.add( new System_Out_Print_Rule_21());    // 把当前文件的每一行 都 转为 System.out.println(xx) 的内容
+
+        CUR_RULE_LIST.add( new ADB_Wireless_WIFI_Rule_22());    //  把 输入的四个参数 转为 无线 adb 连接的命令
 //        CUR_RULE_LIST.add( new Image2Jpeg_Rule_3());
 //        CUR_RULE_LIST.add( new Image2Png_Rule_4());
 //        CUR_RULE_LIST.add( new AVI_Rule_5());
@@ -378,6 +380,228 @@ public class I9_TextRuleOperation {
 //        CUR_RULE_LIST.add( new ClearChineseType_8());
 
     }
+
+
+// 6位数字为  验证码code  5位数字为端口(两个)  三位数字为IP地址最后一位  组成ADB命令 进行输出
+    class ADB_Wireless_WIFI_Rule_22 extends  Basic_Rule{
+
+        String pair_code_6tr = "";   // 配对的 6个peiduima
+
+        String pair_port_5str = "";   // 配对码的 端口 5位数
+
+        String adb_wireless_port_5str = "" ;  //  adb 连接的 端口 5 位数
+
+    String ipaddress_last_3str = "";     // IP地址的最后一个值
+
+    String IP_Addpress_Pre_1 = "192.168.0.";
+    String IP_Addpress_Pre_2 = "10.106.20.";
+
+    boolean isAllSuccess = false;
+
+        ADB_Wireless_WIFI_Rule_22(boolean mIsInputDirAsSearchPoint){
+            super(22);
+            isInputDirAsSearchPoint =  mIsInputDirAsSearchPoint;
+        }
+
+
+        ADB_Wireless_WIFI_Rule_22(){
+            super(22,false);
+        }
+
+        @Override
+        ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+            for (int i = 0; i < curInputFileList.size(); i++) {
+                File fileItem = curInputFileList.get(i);
+
+//                ArrayList<String>  fixedStrArr =   clearChinese_Rule_13(fileItem);
+//                ArrayList<String>  fixedStrArr =   add_system_out_Rule_21(fileItem);
+
+                ArrayList<String>  fixedStrArr = new  ArrayList<String>();
+                String fileContent = ReadFileContent(fileItem);
+                fileContent = fileContent.replace("\n"," ");
+                fixedStrArr.add("提示1: 手机和电脑 必须在 同一个 网络下才能完成 wireless adb 连接操作! ");
+                pair_code_6tr =     getDefineLengthDigital(fileContent,6);
+                if(pair_code_6tr == null){   // 一：if
+                    fixedStrArr.add("[1]->无法搜索到 6位 配对码");
+                }else{
+                    fixedStrArr.add("[1]-> 6位配对码: "+ pair_code_6tr);
+
+                    String fixed_1_content = fileContent.replace(pair_code_6tr,"");
+                    pair_port_5str  =     getDefineLengthDigital(fixed_1_content,5);
+
+                    System.out.println("fixed_1_content = "+ fixed_1_content);
+                    if(pair_port_5str == null){   // 一二：if
+                        fixedStrArr.add("[2]-> 无法搜索到 5位 配对端口码");
+                    }else{
+                        fixedStrArr.add("[2]-> 5位 配对端口码: "+ pair_port_5str);
+
+                        String fixed_2_content = fixed_1_content.replace(pair_port_5str,"");
+
+                        System.out.println("fixed_2_content = "+ fixed_2_content);
+                        adb_wireless_port_5str  =     getDefineLengthDigital(fixed_2_content,5);
+
+                        if(adb_wireless_port_5str == null) {   // 一二三：if
+                            fixedStrArr.add("[3]-> 无法搜索到 5位 连接端口码");
+                        }else{
+                            fixedStrArr.add("[3]-> 5位 连接端口码: "+ adb_wireless_port_5str.replace("\n",""));
+
+                            String fixed_3_content = fixed_2_content.replace(adb_wireless_port_5str,"");
+                            System.out.println("fixed_3_content = "+ fixed_3_content);
+                            ipaddress_last_3str  =     getDefineLengthDigital_Range(fixed_3_content,3);
+                            if(ipaddress_last_3str == null ){
+                                fixedStrArr.add("[4]-> 无法搜索到 IP地址最后值(最多三位)");
+                            }else{
+                                fixedStrArr.add("[4]->IP地址最后值(最多三位): "+ ipaddress_last_3str);
+                                isAllSuccess = true;
+
+                            }
+
+
+                        }
+                    }
+
+                }
+
+
+
+                if(isAllSuccess){
+                    String IP_Address_1 = IP_Addpress_Pre_1 + ipaddress_last_3str;
+                    fixedStrArr.add("\n");
+                    fixedStrArr.add("═════════════════════IP前缀:"+ IP_Addpress_Pre_1+"═════════════════════");
+                    String adbCommand_1_1 = calcul_Wireless_ADB_Command(IP_Address_1,adb_wireless_port_5str,pair_code_6tr,pair_port_5str);
+                    String adbCommand_1_2 = calcul_Wireless_ADB_Command(IP_Address_1,pair_port_5str,pair_code_6tr, adb_wireless_port_5str);
+
+                    fixedStrArr.add("连接命令1: \n"+ adbCommand_1_1);
+                    fixedStrArr.add("\n");
+                    fixedStrArr.add("连接命令2: \n"+ adbCommand_1_2);
+
+                    String IP_Address_2 = IP_Addpress_Pre_2 + ipaddress_last_3str;
+                    fixedStrArr.add("\n");
+                    fixedStrArr.add("═════════════════════ IP前缀:"+ IP_Addpress_Pre_2 + "═════════════════════");
+                    String adbCommand_2_1 = calcul_Wireless_ADB_Command(IP_Address_2,adb_wireless_port_5str,pair_code_6tr,pair_port_5str);
+                    String adbCommand_2_2 = calcul_Wireless_ADB_Command(IP_Address_2,pair_port_5str,pair_code_6tr, adb_wireless_port_5str);
+
+                    fixedStrArr.add("连接命令1: \n"+ adbCommand_2_1);
+                    fixedStrArr.add("\n");
+                    fixedStrArr.add("连接命令2: \n"+ adbCommand_2_2);
+                }
+
+
+/*
+
+                System.out.println("════════════"+"输出文件 Begin " + "════════════");
+                for (int j = 0; j < fixedStrArr.size(); j++) {
+                    System.out.println(fixedStrArr.get(j));
+                }
+                System.out.println("════════════"+"输出文件 End "+"════════════");
+
+                */
+                writeContentToFile(I9_Temp_Text_File,fixedStrArr);
+
+                NotePadOpenTargetFile(I9_Temp_Text_File.getAbsolutePath());
+                System.out.println("rule_"+rule_index+" ->  把当前文件的每一行 都 转为 System.out.println(xx) 的内容   File="+ fileItem.getAbsolutePath());
+            }
+
+
+            return super.applyOperationRule(curFileList, subFileTypeMap, curDirList, curRealFileList);
+        }
+
+        String calcul_Wireless_ADB_Command(String ipAddress, String port_5_ip,String pairCode_6,String pair_port_5){
+            String commandStr = "adb kill-server && "+"adb pair "+ipAddress+":"+pair_port_5 +"  "+ pairCode_6 + "  && " + " adb connect "+ ipAddress+":"+port_5_ip + " && "+ " adb -s "+ipAddress+":"+port_5_ip+" shell " ;
+            commandStr = commandStr.replace("\n","");
+            return commandStr;
+        }
+
+    String getDefineLengthDigital_Range(String content , int digitalLength){
+        String resultStr = null;
+        if(content == null || content.trim().length() <  digitalLength){
+            return resultStr;
+        }
+        if(content.contains(" ")){
+            String[] strArr = content.split(" ");
+            if(strArr == null || strArr.length == 0){
+                return resultStr;
+            }
+            System.out.println(" digitalLength = "+ digitalLength + "   Content=\n"+content);
+            System.out.println();
+            for (int i = 0; i < strArr.length; i++) {
+                System.out.println("split["+i+"] = "+ strArr[i]);
+            }
+
+            for (int i = 0; i < strArr.length; i++) {
+                System.out.println("split["+i+"] = "+ strArr[i]);
+                if(isNumeric(strArr[i]) && strArr[i].trim().length() <= digitalLength){
+                    System.out.println("split["+i+"] = "+ strArr[i] +"  Selected!");
+                    return strArr[i];
+                }
+
+            }
+
+
+        }
+
+        return resultStr;
+    }
+
+    String getDefineLengthDigital(String content , int digitalLength){
+           String resultStr = null;
+           if(content == null || content.trim().length() <  digitalLength){
+               return resultStr;
+           }
+
+           if(content.contains(" ")){
+               String[] strArr = content.split(" ");
+               if(strArr == null || strArr.length == 0){
+                   return resultStr;
+               }
+               System.out.println(" digitalLength = "+ digitalLength + "   Content=\n"+content);
+               System.out.println();
+               for (int i = 0; i < strArr.length; i++) {
+                   System.out.println("split["+i+"] = "+ strArr[i]);
+               }
+
+               for (int i = 0; i < strArr.length; i++) {
+                   System.out.println("split["+i+"] = "+ strArr[i]);
+                   if(isNumeric(strArr[i].trim()) && strArr[i].trim().length() == digitalLength){
+                       System.out.println("split["+i+"] = "+ strArr[i] +"  Selected!");
+                       return strArr[i];
+                   }
+
+               }
+
+
+           }
+
+           return resultStr;
+    }
+
+
+        @Override
+        String simpleDesc() {
+            return "  把 输入的四个参数 转为 无线 adb 连接的命令 1.IP地址 2.IP端口 3.6位配对码 4.配对端口";
+        }
+
+        //3. 如果当前 执行 错误  checkParams 返回 false   那么 将 打印这个函数 说明错误的可能原因
+        @Override
+        void showWrongMessage() {
+            System.out.println("当前 type 索引 "+rule_index +" 执行错误  可能是输入参数错误 请检查输入参数!");
+            System.out.println(" errorMsg = "+errorMsg );
+        }
+
+        //4.  当前 rule的 说明  将会打印在  用户输入为空时的 提示语句！
+        @Override
+        String ruleTip(String type,int index , String batName,OS_TYPE curType){
+            String itemDesc = "";
+            if(curType == OS_TYPE.Windows){
+                itemDesc = batName.trim()+"  "+type+"_"+index + "    [索引 "+index+"]  描述:"+""+ simpleDesc();
+            }else{
+                itemDesc = batName.trim()+" "+type+"_"+index + "    [索引 "+index+"]  描述:"+""+ simpleDesc();
+            }
+
+            return itemDesc;
+        }
+    }
+
 
 
     class System_Out_Print_Rule_21 extends  Basic_Rule{
@@ -4371,6 +4595,11 @@ public class I9_TextRuleOperation {
     // Rule_13   Begin 去除掉当前文件中的中文 每一个中文 以一个空格代替 A7
 
     private static String Rule13_REGEX_CHINESE = "[\u4e00-\u9fa5]";
+
+
+
+
+
 
     public static ArrayList<String>    add_system_out_Rule_21(File srcFile) {
         ArrayList<String> newContent = new    ArrayList<String>();

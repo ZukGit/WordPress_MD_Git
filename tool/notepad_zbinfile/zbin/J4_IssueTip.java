@@ -43,7 +43,9 @@ public class J4_IssueTip {
         Hotspot_Issue_Tip();
         BT_Issue_Tip();
         WIFI_Issue_Tip();
+        WIFI_Shell_Code_Tip();
         GPS_Issue_Tip();
+        GPS_Shell_Code_Tip();
         ADB_pull_Tip();
         ADB_Input_Tip();
         Other_Tip();
@@ -225,6 +227,166 @@ public class J4_IssueTip {
 
     }
 
+
+    static void  GPS_Shell_Code_Tip(){
+        System.out.println("════════════════════════ GPS shell 命令 adb shell cmd location xxxx ════════════════════════════════════════════════");
+        System.out.println("【 ADB Location 独立 命令 帮助文档  /frameworks/base/services/core/java/com/android/server/location/LocationShellCommand.java 】");
+        System.out.println("adb root & adb shell cmd location -h");
+        System.out.println("adb root & adb shell cmd -l");
+        System.out.println();
+        System.out.println("adb shell setprop log.tag.GnssLocationProvider D    《TAG 可见》");
+        System.out.println("adb shell setprop log.tag.NtpTimeHelper D");
+        System.out.println("adb logcat | grep -E \"GnssLocationProvider|NtpTimeHelper\"");
+        System.out.println();
+        System.out.println();
+        System.out.println("【冷启动  温启动  热启动 】");
+        System.out.println("热启动：就是在上一次GPS定位到的情况下。关掉GPS，然后再打开，然后打开GPS去定位。一般3秒左右");
+        System.out.println("nothing to do");
+        System.out.println();
+        System.out.println("温启动：就是在上一次GPS定位到的情况下。关掉GPS，然后清除星历数据，然后打开GPS去定位。一般30秒左右");
+        System.out.println("adb root & adb shell cmd  location send-extra-command gps delete_aiding_data  --ez ephemeris      true");
+        System.out.println();
+        System.out.println("冷启动：就是在上一次GPS定位到的情况下。关掉GPS，然后清除所有数据，然后重启手机（有的手机需要），然后打开GPS去定位。时间最长");
+        System.out.println("adb root & adb shell cmd  location send-extra-command gps delete_aiding_data");
+        System.out.println();
+        System.out.println("【GPS 位置模式开关 】");
+        System.out.println("adb root & adb shell cmd  location set-location-enabled  true                       《打开定位模式》");
+        System.out.println("adb root & adb shell cmd  location set-location-enabled  false                      《关闭定位模式》");
+        System.out.println();
+        System.out.println("【 LocationManagerService.java -> boolean sendExtraCommand(String provider, String command, Bundle extras) 】");
+        System.out.println("adb root & adb shell cmd  location send-extra-command gps force_time_injection      《GnssLocationProvider.java -> deleteAidingData(extras) -> NtpTimeHelper.java -> retrieveAndInjectNtpTime()  请求更新 NTP time Network Time Protocol 时间同步数据到GPS芯片》");
+        System.out.println();
+        System.out.println("adb root & adb shell cmd  location send-extra-command gps force_psds_injection      《GnssLocationProvider.java ->  boolean mSupportsPsds -> psdsDownloadRequest() 请求使用预置的辅助定位数据到GPS芯片》");
+        System.out.println();
+        System.out.println("adb root & adb shell cmd  location send-extra-command gps delete_aiding_data        《GnssLocationProvider.java ->    requestUtcTime()   请求删除预置的辅助定位数据》");
+        System.out.println();
+        System.out.println("adb root & adb shell cmd  location send-extra-command gps delete_aiding_data  --ez ephemeris      true");
+        System.out.println("adb root & adb shell cmd  location send-extra-command gps delete_aiding_data  --ez almanac        true");
+        System.out.println("adb root & adb shell cmd  location send-extra-command gps delete_aiding_data  --ez position       true");
+        System.out.println("adb root & adb shell cmd  location send-extra-command gps delete_aiding_data  --ez time           true");
+        System.out.println("adb root & adb shell cmd  location send-extra-command gps delete_aiding_data  --ez iono           true");
+        System.out.println("adb root & adb shell cmd  location send-extra-command gps delete_aiding_data  --ez utc            true");
+        System.out.println("adb root & adb shell cmd  location send-extra-command gps delete_aiding_data  --ez health         true");
+        System.out.println("adb root & adb shell cmd  location send-extra-command gps delete_aiding_data  --ez svdir          true");
+        System.out.println("adb root & adb shell cmd  location send-extra-command gps delete_aiding_data  --ez svsteer        true");
+        System.out.println("adb root & adb shell cmd  location send-extra-command gps delete_aiding_data  --ez sadata         true");
+        System.out.println("adb root & adb shell cmd  location send-extra-command gps delete_aiding_data  --ez rti            true");
+        System.out.println("adb root & adb shell cmd  location send-extra-command gps delete_aiding_data  --ez celldb-info    true");
+        System.out.println("adb root & adb shell cmd  location send-extra-command gps delete_aiding_data  --ez all            true");
+        System.out.println();
+        System.out.println();
+
+
+
+
+    }
+    static void  WIFI_Shell_Code_Tip(){
+        System.out.println("════════════════════════ WIFI shell 命令 adb shell cmd wifi xxxx ════════════════════════════════════════════════");
+        System.out.println("【 ADB WIFI 独立 命令 帮助文档  /frameworks/opt/net/wifi/service/java/com/android/server/wifi/WifiShellCommand.java 】");
+        System.out.println("adb root & adb shell cmd wifi -h");
+        System.out.println("adb root & adb shell cmd -l      《查询当前adb shell cmd service》");
+        System.out.println();
+        System.out.println("【获取设置 IPR 断连开关  ClientModeImpl.java   -》 boolean mIpReachabilityDisconnectEnabled = true; 】");
+        System.out.println("adb root & adb shell cmd wifi get-ipreach-disconnect       《IPREACH_DISCONNECT state is true || IPREACH_DISCONNECT state is false》");
+        System.out.println("adb root & adb shell cmd wifi set-ipreach-disconnect enabled");
+        System.out.println("adb root & adb shell cmd wifi set-ipreach-disconnect disabled");
+        System.out.println();
+        System.out.println("【获取设置 检测rssi信号间隔  ClientModeImpl.java   -》 int mPollRssiIntervalMsecs = -1;】");
+        System.out.println("【可选值 R.integer.config_wifiPollRssiIntervalMilliseconds = 3000  , int MAXIMUM_POLL_RSSI_INTERVAL_MSECS = 6000; 】");
+        System.out.println("adb root & adb shell cmd wifi get-poll-rssi-interval-msecs          《获取间隔时间》");
+        System.out.println("adb root & adb shell cmd wifi set-poll-rssi-interval-msecs 1000");
+        System.out.println("adb root & adb shell cmd wifi set-poll-rssi-interval-msecs 2000");
+        System.out.println("adb root & adb shell cmd wifi set-poll-rssi-interval-msecs 3000");
+        System.out.println("adb root & adb shell cmd wifi set-poll-rssi-interval-msecs 4000");
+        System.out.println("adb root & adb shell cmd wifi set-poll-rssi-interval-msecs 5000");
+        System.out.println();
+        System.out.println();
+        System.out.println("【一般获取信息命令集合 】");
+        System.out.println("adb root & adb shell cmd wifi  get-ipreach-disconnect");
+        System.out.println("adb root & adb shell cmd wifi  set-ipreach-disconnect enabled");
+        System.out.println("adb root & adb shell cmd wifi  set-ipreach-disconnect disabled     《ClientModeImpl.boolean mIpReachabilityDisconnectEnabled = true》");
+        System.out.println();
+        System.out.println("adb root & adb shell cmd wifi  get-poll-rssi-interval-msecs");
+        System.out.println("adb root & adb shell cmd wifi  set-poll-rssi-interval-msecs 2000   《ClientModeImpl.int mPollRssiIntervalMsecs = 3000;》");
+        System.out.println();
+        System.out.println("adb root & adb shell cmd wifi  get-country-code");
+        System.out.println("adb root & adb shell cmd wifi  force-country-code enabled cn       《WifiCountryCode.String mTelephonyCountryCode , mDriverCountryCode , mDefaultCountryCode 》");
+        System.out.println();
+        System.out.println("adb root & adb shell cmd wifi  force-hi-perf-mode enable");
+        System.out.println("adb root & adb shell cmd wifi  force-hi-perf-mode disabled");
+        System.out.println("adb root & adb shell cmd wifi  force-low-latency-mode enabled");
+        System.out.println("adb root & adb shell cmd wifi  force-low-latency-mode disabled     《WifiLockManager.boolean mForceHiPerfMode = false , mForceLowLatencyMode = false》");
+        System.out.println();
+        System.out.println("adb root & adb shell cmd wifi  set-wifi-enabled enabled");
+        System.out.println("adb root & adb shell cmd wifi  set-wifi-enabled disabled           《WifiServiceImpl.setWifiEnabled() -> WifiSettingsStore.int mPersistWifiState = 0 (0_disable,1_enable,2_飞行模式关闭导致enable,3_飞行模式开启导致disable)》");
+        System.out.println();
+        System.out.println("adb root & adb shell cmd wifi  set-scan-always-available enabled");
+        System.out.println("adb root & adb shell cmd wifi  set-scan-always-available disabled  《WifiServiceImpl.setScanAlwaysAvailable()-> WifiSettingsStore -> Settings.wifi_scan_always_enabled(Key-Str)》");
+        System.out.println();
+        System.out.println("adb root & adb shell cmd wifi  list-scan-results                   《List<ScanResult> WifiServiceImpl.getScanResults()  -> WifiThreadRunner.call( mScanRequestProxy::getScanResults )》");
+        System.out.println();
+        System.out.println("adb root & adb shell cmd wifi  status                              《WifiServiceImpl.getWifiEnabledState()  isScanAlwaysAvailable() WifiInfo->getConnectionInfo()   Network->WifiService.getCurrentNetwork()  NetworkCapabilities->ConnectivityManager.getNetworkCapabilities(network) 》");
+        System.out.println();
+        System.out.println("adb root & adb shell cmd wifi  set-verbose-logging enabled");
+        System.out.println("adb root & adb shell cmd wifi  set-verbose-logging disabled        《WifiService.enableVerboseLogging  ( adb shell settings put global wifi_verbose_logging_enabled 1 )  》");
+        System.out.println();
+        System.out.println("adb root & adb shell cmd wifi  list-suggestions                    《List<WifiNetworkSuggestion> -> WifiService.getNetworkSuggestions ->   WifiNetworkSuggestionsManager.get()》");
+        System.out.println();
+        System.out.println("adb root & adb shell cmd wifi  get-wifi-watchdog");
+        System.out.println("adb root & adb shell cmd wifi  set-wifi-watchdog enabled");
+        System.out.println("adb root & adb shell cmd wifi  set-wifi-watchdog disabled          《WifiLastResortWatchdog.getWifiWatchdogFeature() -> R.bool.config_wifi_watchdog_enabled 》");
+        System.out.println();
+        System.out.println("adb root & adb shell cmd wifi  get-softap-supported-features       《ApConfigUtil.isAcsSupported() ApConfigUtil.isWpa3SaeSupported() 》");
+        System.out.println();
+        System.out.println("adb root & adb shell cmd wifi  list-requests                       《WifiShellCommand.ConcurrentHashMap<String, Pair<NetworkRequest, ConnectivityManager.NetworkCallback>> sActiveRequests》");
+        System.out.println();
+        System.out.println();
+        System.out.println();
+        System.out.println();
+        System.out.println();
+        System.out.println("【一般操作WIFI集合 】");
+        System.out.println("adb root & adb shell cmd wifi  start-scan");
+        System.out.println("adb root & adb shell cmd wifi  set-connected-score 60     《0 - 60》");
+        System.out.println("adb root & adb shell cmd wifi  connect-network   <ssid> open|owe|wpa2|wpa3 [<passphrase>] [-m] [-d] [-b <bssid>]");
+        System.out.println("adb root & adb shell cmd wifi  add-network       <ssid> open|owe|wpa2|wpa3 [<passphrase>] [-m] [-d] [-b <bssid>]");
+        System.out.println("adb root & adb shell cmd wifi  forget-network    <networkId>");
+        System.out.println("adb root & adb shell cmd wifi  add-suggestion    <ssid> open|owe|wpa2|wpa3 [<passphrase>] [-u] [-m] [-s] [-d][-b <bssid>]");
+        System.out.println("adb root & adb shell cmd wifi  start-softap      <ssid> (open|wpa2) <passphrase> [-b 2|5|6|any]");
+        System.out.println("adb root & adb shell cmd wifi  remove-suggestion <ssid>");
+        System.out.println("adb root & adb shell cmd wifi  remove-all-suggestions");
+        System.out.println("adb root & adb shell cmd wifi  reset-connected-score");
+        System.out.println("adb root & adb shell cmd wifi  stop-softap");
+        System.out.println("adb root & adb shell cmd wifi  network-suggestions-set-user-approved <package name> yes");
+        System.out.println("adb root & adb shell cmd wifi  network-suggestions-set-user-approved <package name> no");
+        System.out.println("adb root & adb shell cmd wifi  network-suggestions-has-user-approved <package name>");
+        System.out.println("adb root & adb shell cmd wifi  imsi-protection-exemption-set-user-approved-for-carrier   <carrier id> yes");
+        System.out.println("adb root & adb shell cmd wifi  imsi-protection-exemption-set-user-approved-for-carrier   <carrier id> no");
+        System.out.println("adb root & adb shell cmd wifi  imsi-protection-exemption-has-user-approved-for-carrier   <carrier id>");
+        System.out.println("adb root & adb shell cmd wifi  imsi-protection-exemption-clear-user-approved-for-carrier <carrier id>");
+        System.out.println("adb root & adb shell cmd wifi  network-requests-remove-user-approved-access-points <package name>");
+        System.out.println("adb root & adb shell cmd wifi  clear-user-disabled-networks");
+        System.out.println("adb root & adb shell cmd wifi  send-link-probe    《手动发送一个probe请求》");
+        System.out.println("adb root & adb shell cmd wifi  force-softap-channel enabled <int>");
+        System.out.println("adb root & adb shell cmd wifi  force-softap-channel enabled 2412");
+        System.out.println("adb root & adb shell cmd wifi  force-softap-channel disabled <int>");
+        System.out.println("adb root & adb shell cmd wifi  force-softap-channel disabled 5785");
+        System.out.println("adb root & adb shell cmd wifi  force-country-code enabled <two-letter code>");
+        System.out.println("adb root & adb shell cmd wifi  force-country-code enabled br");
+        System.out.println("adb root & adb shell cmd wifi  force-country-code enabled us");
+        System.out.println("adb root & adb shell cmd wifi  force-country-code disabled <two-letter code>");
+        System.out.println("adb root & adb shell cmd wifi  settings-reset");
+        System.out.println("adb root & adb shell cmd wifi  add-request <ssid> open|owe|wpa2|wpa3 [<passphrase>] [-b <bssid>]");
+        System.out.println("adb root & adb shell cmd wifi  remove-request <ssid>");
+        System.out.println("adb root & adb shell cmd wifi  remove-all-requests");
+        System.out.println("adb root & adb shell cmd wifi  network-requests-set-user-approved <package name> yes");
+        System.out.println("adb root & adb shell cmd wifi  network-requests-set-user-approved <package name> no");
+        System.out.println("adb root & adb shell cmd wifi  network-requests-has-user-approved <package name>");
+        System.out.println();
+        System.out.println();
+
+
+
+    }
  static void  WIFI_Issue_Tip(){
      System.out.println("════════════════════════ WIFI PAGE ════════════════════════════════════════════════");
      System.out.println("【打开wifi命令】  adb shell svc wifi enable");
@@ -281,6 +443,8 @@ public class J4_IssueTip {
      System.out.println("5. 由于频繁arp request是网络中ARP攻击行为的典型表现，因此不止华为设备，其他厂商设备也会有类似的arp安全防护机制，唯一的不同只是各厂商的arp报文丢弃默认阈值设置不同。");
      System.out.println("IKLOCSEN-2833");
      System.out.println();
+     System.out.println();
+
      System.out.println();
      System.out.println("【 WIFI DUMP 相关命令】");
      System.out.println("adb shell dumpsys wifi         > wifi.txt                 # 【查看当前 wifi 服务情况 】");
@@ -346,6 +510,12 @@ public class J4_IssueTip {
         System.out.println("( Bug2Go -> System Debug Settings -> diag_mdlog v2 -> Config file -> GNSS_V9.cfg ) to collect one more B2G log?");
         System.out.println("and if possible, please help to side by side test it on REF device and collect pass log for comparison");
         System.out.println("much appreciated");
+        System.out.println();
+
+        System.out.println("【打印搜星Log】");
+        System.out.println("1.搜星慢 冷启动时间过长 40+秒");
+        System.out.println("2.定位不精确 导航方位不正确");
+        System.out.println("3.达不到标书要求情况，差于对比机情况，横竖屏信号差异");
         System.out.println();
         System.out.println("【打印搜星Log】");
         System.out.println("adb logcat | grep \"Used In Fix:\"");

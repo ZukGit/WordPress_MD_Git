@@ -6,7 +6,11 @@ import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.security.SecureRandom;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Objects;
+import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -178,6 +182,13 @@ public class G0_MacAddress {
                 }
             }
         }
+
+
+        MacAddress.showMac48_64(MacAddress.fromString("33:33:ff:03:63:bc"));
+        MacAddress.showMac48_64(MacAddress.fromString("72:62:a5:76:fe:86"));
+
+
+        MacAddress.showMac48_64(MacAddress.fromString("00:60:08:52:f9:d8"));
 
 
         if (mKeyWordName.size() == 0) {  // 如果输入除了 当前根目录外 没有其他的输入信息 那么 那么就分析当前目录
@@ -566,4 +577,389 @@ public class G0_MacAddress {
             return str;
         }
     }
+
+
+
+
+
+
+    // 执行命令  grep -rins "hdd_send_association_event: 1382:" .  得到原始的数据 放入输入文件中
+//   能不能在 java 中执行 grep
+// https://blog.csdn.net/zhaodecang/article/details/53572879
+// 直接提供 目录  然后输出这个 结果
+    static   class MacAddress {
+
+
+        public static final int ETHER_ADDR_LEN = 6;
+        public static final byte[] ETHER_ADDR_BROADCAST = addr(0xff, 0xff, 0xff, 0xff, 0xff, 0xff);
+        public static final MacAddress BROADCAST_ADDRESS = MacAddress.fromBytes(ETHER_ADDR_BROADCAST);
+        public static final long VALID_LONG_MASK = (1L << 48) - 1;
+
+        public static MacAddress BASE_GOOGLE_MAC = MacAddress.fromString("da:a1:19:0:0:0");
+
+
+        /** @hide Indicates a MAC address of unknown type. */
+        public static final int TYPE_UNKNOWN = 0;
+        /** Indicates a MAC address is a unicast address. */
+        public static final int TYPE_UNICAST = 1;
+        /** Indicates a MAC address is a multicast address. */
+        public static final int TYPE_MULTICAST = 2;
+        /** Indicates a MAC address is the broadcast address. */
+        public static final int TYPE_BROADCAST = 3;
+        private static final long LOCALLY_ASSIGNED_MASK = MacAddress.fromString("2:0:0:0:0:0").mAddr;
+        private static final long MULTICAST_MASK = MacAddress.fromString("1:0:0:0:0:0").mAddr;
+        private static final long OUI_MASK = MacAddress.fromString("ff:ff:ff:0:0:0").mAddr;
+        private static final long NIC_MASK = MacAddress.fromString("0:0:0:ff:ff:ff").mAddr;
+
+        // Internal representation of the MAC address as a single 8 byte long.
+        // The encoding scheme sets the two most significant bytes to 0. The 6 bytes of the
+        // MAC address are encoded in the 6 least significant bytes of the long, where the first
+        // byte of the array is mapped to the 3rd highest logical byte of the long, the second
+        // byte of the array is mapped to the 4th highest logical byte of the long, and so on.
+        static long mAddr;
+
+
+        static int INADDRSZ = 16;
+        static int INT16SZ = 2;
+        private MacAddress(long addr) {
+            mAddr = (VALID_LONG_MASK & addr);
+        }
+
+
+
+        private static long longAddrFromByteAddr(byte[] addr) {
+            return MacAddressUtils.longAddrFromByteAddr(addr);
+        }
+
+
+
+        public static MacAddress fromBytes(byte[] addr) {
+            return new MacAddress(longAddrFromByteAddr(addr));
+        }
+
+
+
+
+        private static byte[] addr(int... in) {
+            if (in.length != ETHER_ADDR_LEN) {
+                throw new IllegalArgumentException(Arrays.toString(in) + " was not an array with length equal to " + ETHER_ADDR_LEN);
+            }
+            byte[] out = new byte[ETHER_ADDR_LEN];
+            for (int i = 0; i < ETHER_ADDR_LEN; i++) {
+                out[i] = (byte) in[i];
+            }
+            return out;
+        }
+
+
+
+        public static MacAddress fromString(String addr) {
+            return new MacAddress(longAddrFromStringAddr(addr));
+        }
+
+
+        private static long longAddrFromStringAddr(String addr) {
+            if(addr == null){
+                return 0L;
+            }
+            String[] parts = addr.split(":");
+            if (parts.length != ETHER_ADDR_LEN) {
+                throw new IllegalArgumentException(addr + " was not a valid MAC address");
+            }
+            long longAddr = 0;
+            for (int i = 0; i < parts.length; i++) {
+                int x = Integer.valueOf(parts[i], 16);
+                if (x < 0 || 0xff < x) {
+                    throw new IllegalArgumentException(addr + "was not a valid MAC address");
+                }
+                longAddr = x + (longAddr << 8);
+            }
+            return longAddr;
+        }
+
+        public String toString() {
+            return stringAddrFromLongAddr(mAddr);
+        }
+
+
+
+
+
+        public byte[] toByteArray() {
+            return byteAddrFromLongAddr(mAddr);
+        }
+
+        public static byte[] byteAddrFromLongAddr(long addr) {
+            return MacAddressUtils.byteAddrFromLongAddr(addr);
+        }
+
+        public static boolean isMacAddress(byte[] addr) {
+            return MacAddressUtils.isMacAddress(addr);
+        }
+
+        public  String toOuiString() {
+            return String.format(
+                    "%02x:%02x:%02x", (mAddr >> 40) & 0xff, (mAddr >> 32) & 0xff, (mAddr >> 24) & 0xff);
+        }
+
+
+        public static  String stringAddrFromByteAddr(byte[] addr) {
+            if (!isMacAddress(addr)) {
+                return null;
+            }
+            return String.format("%02x:%02x:%02x:%02x:%02x:%02x",
+                    addr[0], addr[1], addr[2], addr[3], addr[4], addr[5]);
+        }
+
+        public boolean equals(Object o) {
+            return (o instanceof MacAddress) && ((MacAddress) o).mAddr == mAddr;
+        }
+
+        public boolean matches(MacAddress baseAddress, MacAddress mask) {
+            return (mAddr & mask.mAddr) == (baseAddress.mAddr & mask.mAddr);
+        }
+
+
+        public  int getAddressType() {
+            if (equals(BROADCAST_ADDRESS)) {
+                return TYPE_BROADCAST;
+            }
+            if ((mAddr & MULTICAST_MASK) != 0) {
+                return TYPE_MULTICAST;
+            }
+            return TYPE_UNICAST;
+        }
+
+
+        public  String getAddressTypeSting() {
+            int type = getAddressType();
+            String typeStr = "" ;
+            if(type == TYPE_BROADCAST ){
+                typeStr = "广播地址类型";
+            } else if (type == TYPE_MULTICAST ){
+                typeStr = "多播地址类型";
+            }else if(type == TYPE_UNICAST){
+
+                typeStr = "单播地址类型";
+            }else{
+                typeStr = "未知地址类型";
+            }
+            return typeStr;
+        }
+
+        public int hashCode() {
+            return (int) ((mAddr >> 32) ^ mAddr);
+        }
+
+
+
+        // 创建一个随机的Mac地址
+        public static MacAddress createRandomUnicastAddressWithGoogleBase() {
+            return MacAddressUtils.createRandomUnicastAddress(BASE_GOOGLE_MAC, new SecureRandom());
+        }
+
+
+        static  String stringAddrFromLongAddr(long addr) {
+            return String.format("%02x:%02x:%02x:%02x:%02x:%02x",
+                    (addr >> 40) & 0xff,
+                    (addr >> 32) & 0xff,
+                    (addr >> 24) & 0xff,
+                    (addr >> 16) & 0xff,
+                    (addr >> 8) & 0xff,
+                    addr & 0xff);
+        }
+
+
+        /**
+         * Create a link-local Inet6Address from the MAC address. The EUI-48 MAC address is converted
+         * to an EUI-64 MAC address per RFC 4291. The resulting EUI-64 is used to construct a link-local
+         * IPv6 address per RFC 4862.
+         *
+         * @return A link-local Inet6Address constructed from the MAC address.
+         */
+        public  String getLinkLocalIpv6FromEui48Mac() {
+            byte[] macEui48Bytes = toByteArray();
+            byte[] addr = new byte[16];
+
+            addr[0] = (byte) 0xfe;
+            addr[1] = (byte) 0x80;
+            addr[8] = (byte) (macEui48Bytes[0] ^ (byte) 0x02); // flip the link-local bit
+            addr[9] = macEui48Bytes[1];
+            addr[10] = macEui48Bytes[2];
+            addr[11] = (byte) 0xff;
+            addr[12] = (byte) 0xfe;
+            addr[13] = macEui48Bytes[3];
+            addr[14] = macEui48Bytes[4];
+            addr[15] = macEui48Bytes[5];
+
+            return    numericToTextFormat(addr);
+        }
+
+        public  String getSiteLocalIpv6FromEui48Mac() {
+            byte[] macEui48Bytes = toByteArray();
+            byte[] addr = new byte[16];
+
+            addr[0] = (byte) 0xfe;
+            addr[1] = (byte) 0xc0;
+            addr[8] = (byte) (macEui48Bytes[0] ^ (byte) 0x02); // flip the link-local bit
+            addr[9] = macEui48Bytes[1];
+            addr[10] = macEui48Bytes[2];
+            addr[11] = (byte) 0xff;
+            addr[12] = (byte) 0xfe;
+            addr[13] = macEui48Bytes[3];
+            addr[14] = macEui48Bytes[4];
+            addr[15] = macEui48Bytes[5];
+
+            return    numericToTextFormat(addr);
+        }
+
+
+        static String numericToTextFormat(byte[] src) {
+            StringBuilder sb = new StringBuilder(39);
+            for (int i = 0; i < (INADDRSZ / INT16SZ); i++) {
+                sb.append(Integer.toHexString(((src[i<<1]<<8) & 0xff00)
+                        | (src[(i<<1)+1] & 0xff)));
+                if (i < (INADDRSZ / INT16SZ) -1 ) {
+                    sb.append(":");
+                }
+            }
+            return sb.toString();
+        }
+
+
+        // EUI-64
+        public static void main_X(String[] args) {
+
+
+/*        for (int i = 0; i < 20 ; i++) {
+            MacAddress randomMac =      createRandomUnicastAddressWithGoogleBase();
+            System.out.println("随机Mac地址 [ "+i+" ] Mac: "+randomMac.toString()  + "    产商标识:"+randomMac.toOuiString() + "  地址类型:"+randomMac.getAddressTypeSting());
+        }*/
+
+/*
+        IPv6单播地址有以下六种类型：
+        https://blog.csdn.net/hrl7752/article/details/79710681?utm_source=blogxgwz6
+        1－Aggregate Global Unicast Address   2xxx:xxxxx/3 - 3FFF: :FFFF
+        2001::/16  IPV6因特网地址
+        2002::/16  6to4过渡地址
+        2－Link Local Address　　　           FE80::/10   (前10位以FE80开头)
+                3－Site Local Address (Private)       FEC0::/10
+        4－Unspecified Address　　            0:0:0:0:0:0:0:0/128 => ::/128
+        5－Loopback Address 　　　            0:0:0:0:0:0:0:1/128 => ::1/128
+        6－IPv4 Compatible Address            ::192.168.30.1 => ::C0A8:1E01*/
+//  206.123.31.2    ce7b:1f02
+//    ::192.168.30.1  => ::C0A8:1E01
+
+            showMac48_64(MacAddress.fromString("33:33:ff:03:63:bc"));
+            showMac48_64(MacAddress.fromString("72:62:a5:76:fe:86"));
+
+
+            showMac48_64(MacAddress.fromString("00:60:08:52:f9:d8"));
+        }
+
+
+         static void showMac48_64(MacAddress mac){
+            System.out.println("mac = "+ mac.toString() + " 本地IPv6：=" + mac.getLinkLocalIpv6FromEui48Mac() + "  私有地址IPv6:  "+mac.getSiteLocalIpv6FromEui48Mac());
+        }
+
+
+        static class MacAddressUtils {
+
+            static final long VALID_LONG_MASK = (1L << 48) - 1;
+            static final long LOCALLY_ASSIGNED_MASK = longAddrFromByteAddr(MacAddress.fromString("2:0:0:0:0:0").toByteArray());
+            static final long MULTICAST_MASK = longAddrFromByteAddr(MacAddress.fromString("1:0:0:0:0:0").toByteArray());
+            static final long OUI_MASK = longAddrFromByteAddr(MacAddress.fromString("ff:ff:ff:0:0:0").toByteArray());
+            static final long NIC_MASK = longAddrFromByteAddr(MacAddress.fromString("0:0:0:ff:ff:ff").toByteArray());
+            // Matches WifiInfo.DEFAULT_MAC_ADDRESS
+            static final String DEFAULT_MAC_ADDRESS = "02:00:00:00:00:00";
+            static final int ETHER_ADDR_LEN = 6;
+
+            /**
+             * @return true if this MacAddress is a multicast address.
+             */
+            public static boolean isMulticastAddress( MacAddress address) {
+                return (longAddrFromByteAddr(address.toByteArray()) & MULTICAST_MASK) != 0;
+            }
+
+            /**
+             * Returns a generated MAC address whose 46 bits, excluding the locally assigned bit and the
+             * unicast bit, are randomly selected.
+             * <p>
+             * The locally assigned bit is always set to 1. The multicast bit is always set to 0.
+             *
+             * @return a random locally assigned, unicast MacAddress.
+             */
+            public static MacAddress createRandomUnicastAddress() {
+                return createRandomUnicastAddress(null, new SecureRandom());
+            }
+
+            public static boolean isLocallyAssigned() {
+                return (mAddr & LOCALLY_ASSIGNED_MASK) != 0;
+            }
+
+
+
+
+            public static MacAddress createRandomUnicastAddress(MacAddress base, Random r) {
+                long addr;
+
+                if (base == null) {
+                    addr = r.nextLong() & VALID_LONG_MASK;
+                } else {
+                    addr = (longAddrFromByteAddr(base.toByteArray()) & OUI_MASK)
+                            | (NIC_MASK & r.nextLong());
+                }
+                addr |= LOCALLY_ASSIGNED_MASK;
+                addr &= ~MULTICAST_MASK;
+                MacAddress mac = MacAddress.fromBytes(byteAddrFromLongAddr(addr));
+                if (mac.equals(DEFAULT_MAC_ADDRESS)) {
+                    return createRandomUnicastAddress(base, r);
+                }
+                return mac;
+            }
+
+            /**
+             * Convert a byte address to long address.
+             */
+            public static long longAddrFromByteAddr(byte[] addr) {
+                Objects.requireNonNull(addr);
+                if (!isMacAddress(addr)) {
+                    throw new IllegalArgumentException(
+                            Arrays.toString(addr) + " was not a valid MAC address");
+                }
+                long longAddr = 0;
+                for (byte b : addr) {
+                    final int uint8Byte = b & 0xff;
+                    longAddr = (longAddr << 8) + uint8Byte;
+                }
+                return longAddr;
+            }
+
+            /**
+             * Convert a long address to byte address.
+             */
+            public static byte[] byteAddrFromLongAddr(long addr) {
+                byte[] bytes = new byte[ETHER_ADDR_LEN];
+                int index = ETHER_ADDR_LEN;
+                while (index-- > 0) {
+                    bytes[index] = (byte) addr;
+                    addr = addr >> 8;
+                }
+                return bytes;
+            }
+
+            /**
+             * Returns true if the given byte array is a valid MAC address.
+             * A valid byte array representation for a MacAddress is a non-null array of length 6.
+             *
+             * @param addr a byte array.
+             * @return true if the given byte array is not null and has the length of a MAC address.
+             */
+            public static boolean isMacAddress(byte[] addr) {
+                return addr != null && addr.length == ETHER_ADDR_LEN;
+            }
+        }
+
+    }
+
 }
