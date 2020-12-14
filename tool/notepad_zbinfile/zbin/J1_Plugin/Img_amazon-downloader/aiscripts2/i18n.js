@@ -1,0 +1,1 @@
+var i18n={zh:{intelligentScripts:"智能脚本",enable:"启用",update:"更新",updated:"已更新"},en:{intelligentScripts:"Intelligent Scripts",enable:"Enable",update:"Update",updated:"Updated"}},currentI18n=navigator.language.match("zh")?i18n.zh:i18n.en;

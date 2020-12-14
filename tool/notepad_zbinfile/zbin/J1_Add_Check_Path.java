@@ -2019,6 +2019,9 @@ ArrayList<String> loss_match_key = new ArrayList<String>();
             File pathFile = fixedArrFile.get(i);
             File[] arr = pathFile.listFiles();
             ArrayList<File> allSubFile = new  ArrayList<File>();
+			if(arr == null){
+				continue;
+			}
             allSubFile.addAll(Arrays.asList(arr));
 
             ArrayList<File> exeList = getTypeFileList(allSubFile,".exe");
@@ -2167,7 +2170,8 @@ if(defineExe != null && !"".equals(defineExe) && !"★".equals(defineExe)){
         ZWorkSoft_Desc_Map.put("notepad++.exe","文件编辑软件!_ zdump_wifi_F8.bat");
         ZWorkSoft_Desc_Map.put("chrome.exe","Chrome浏览器!_打开Chrome浏览器_ztextrule_operation_I9.bat_解析地址");
         ZWorkSoft_Desc_Map.put("dot.exe","Graphviz_绘图工具_ztextrule_operation_I9.bat_解析Json为图片");
-        ZWorkSoft_Desc_Map.put("adb.exe","adb调式工具!");
+        ZWorkSoft_Desc_Map.put("adb.exe","adb调试工具!");
+        ZWorkSoft_Desc_Map.put("fastboot.exe","刷机工具!");
         ZWorkSoft_Desc_Map.put("tesseract.exe","tesseract-ocr 语音识别工具_zimage2text_OCR_H8.bat");
         ZWorkSoft_Desc_Map.put("ffmpeg.exe","ffmpeg_视频音频编辑_zmpeg_ffmpeg_G8.bat");
 
@@ -2368,7 +2372,7 @@ if(defineExe != null && !"".equals(defineExe) && !"★".equals(defineExe)){
      static ArrayList<String> install_software_path_list = new ArrayList<String>();
 
     static    boolean isZwinDir = false;
-
+    static String User_Home = System.getProperties().getProperty("user.home");
     static File Environment_Zip_Dir_Path = null;
     public static void main(String[] args) {
 
@@ -2380,13 +2384,14 @@ if(defineExe != null && !"".equals(defineExe) && !"★".equals(defineExe)){
             PathSumary();
             SystemFileSearch();
             Create_AddPath_Operation();
-            if (CUR_Dir_FILE != null && !CUR_Dir_FILE.getAbsolutePath().contains("ZWin_Software")) {
+
+        System.out.println("Chrome 书签 插件 脚本 无法自动安装 请手动安装 资源备份如下:");
+        System.out.println("▲Tip▲ Chrome插件备份地址:\n zzfile_3.bat  "+zbinPath+File.separator+"J1_Plugin      【插件】【脚本】【书签】 先安装 AA_get-crx 方便插件安装");
+
+        if (CUR_Dir_FILE != null && !CUR_Dir_FILE.getAbsolutePath().contains("ZWin_Software")) {
                 System.out.println("▲FAILED▲   当前执行程序目录不是  ZWin_Software , 安装程序失败!  仅仅显示 系统环境变量情况! ");
                 return;
             }
-
-
-
 
 
         if(true){

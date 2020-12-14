@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>HIGHLIGHTY</title>
+
+    <!-- GOOGLE FONTS -->
+
+    <link
+      href="https://fonts.googleapis.com/css?family=Quicksand:300,500"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:ital,wght@0,200;0,300;0,400;0,600;0,700;0,900;1,200;1,300;1,400;1,600;1,700;1,900&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="../fonts/Phenomena-Regular.otf" />
+    <!-- GOOGLE FONTS END -->
+
+    <!-- PROJECT CSS -->
+    <link rel="stylesheet" href="./highlighter_style.css" />
+    <script src="../dependencies/jquery-3.5.1.js"></script>
+    <script src="../dependencies//notify.min.js"></script>
+    <!-- PROJECT CSS END -->
+  </head>
+
+  <body>
+    <div class="title">
+      <h1>
+        <span class="first-part">HIGH</span>
+
+        <span class="second-part"> LIGHTY</span>
+
+        <!-- HIGHLIGHTY -->
+      </h1>
+    </div>
+    <hr id="hr1" />
+    <div>
+      <p class="refresh-x" id="refresh-cancelled">X</p>
+
+      <p class="refresh1" id="refresh-pressed">
+        REFRESH PAGES TO ACTIVATE CHANGES
+      </p>
+    </div>
+    <!-- MACRO TITLE -->
+
+    <!-- APP TITLE + TOGGLE 2 -->
+    <div class="app-name highlighter-title">
+      <div class="dropdown-button pointer" id="menu-arrow">
+        <h2 class="h2-tweaks" id="menu-text">menu</h2>
+        <div class="roll-box"></div>
+      </div>
+
+      <div class="container-hi">
+        <label class="switch toggle-2">
+          <input type="checkbox" id="checkbox" checked />
+          <span class="slider round"></span>
+        </label>
+      </div>
+    </div>
+    <div class="tweaks-dropdown">
+      <div class="donation-container">
+        <p>
+          If you feel lost, check our tutorials
+          <a
+            class="patreon"
+            href="https://www.highlighty.app/how-to.html"
+            target="_blank"
+            id="tutorials"
+            ><b>here</b>.
+            <!-- ❤️ -->
+          </a>
+        </p>
+      </div>
+      <div class="tweaks-elem elem1">
+        <div class="tweak-name name-basic">
+          View mode:
+          <p class="small">(advanced features)</p>
+        </div>
+        <div class="on-off-both">
+          <div class="switch-btn pointer btn-fx advanced-off" id="view-basic">
+            Basic
+          </div>
+          <div class="switch-btn pointer btn-fx advanced-on" id="view-advanced">
+            Full
+          </div>
+        </div>
+      </div>
+
+      <div class="tweaks-elem elem2">
+        <div class="tweak-name name-basic">Query not found alert:</div>
+        <div class="on-off-both">
+          <div
+            class="off-btn switch-btn pointer btn-fx notfound-off"
+            id="query-NOT-found-OFF"
+          >
+            No
+          </div>
+          <div
+            class="on-btn switch-btn pointer btn-fx notfound-on"
+            id="query-NOT-found-ON"
+          >
+            Yes
+          </div>
+        </div>
+      </div>
+
+      <div class="tweaks-elem elem3">
+        <div class="tweak-name name-basic">Query found alert:</div>
+        <div class="on-off-both">
+          <div
+            class="off-btn switch-btn pointer btn-fx found-off"
+            id="query-Found-OFF"
+          >
+            No
+          </div>
+          <div
+            class="on-btn switch-btn pointer btn-fx found-on"
+            id="query-Found-ON"
+          >
+            Yes
+          </div>
+        </div>
+      </div>
+
+      <div class="tweaks-elem elem4">
+        <div class="tweak-name name-basic">
+          Min 2 char. limit:
+          <p class="small">(CPU saver)</p>
+        </div>
+        <div class="on-off-both">
+          <div
+            class="off-btn switch-btn pointer btn-fx minchar-off"
+            id="minCharacters-OFF"
+          >
+            No
+          </div>
+          <div
+            class="on-btn switch-btn pointer btn-fx minchar-on"
+            id="minCharacters-ON"
+          >
+            Yes
+          </div>
+        </div>
+      </div>
+
+      <div class="tweaks-elem elem6">
+        <div class="tweak-name name-basic">Navigation bar:</div>
+        <div class="on-off-both">
+          <div
+            class="off-btn switch-btn pointer btn-fx nav-off"
+            id="navigation-OFF"
+          >
+            No
+          </div>
+          <div
+            class="on-btn switch-btn pointer btn-fx nav-on"
+            id="navigation-ON"
+          >
+            Yes
+          </div>
+        </div>
+      </div>
+
+      <div class="advanced-features">
+        <hr id="hr0" />
+        <div class="advanced-title">ADVANCED FEATURES</div>
+        <div class="tweaks-elem elem5">
+          <div class="tweak-name name-basic-advanced">Case sensitivity:</div>
+          <div class="on-off-both">
+            <div
+              class="off-btn switch-btn pointer btn-fx case-off"
+              id="caseSensitive-OFF"
+            >
+              No
+            </div>
+            <div
+              class="on-btn switch-btn pointer btn-fx case-on"
+              id="caseSensitive-ON"
+            >
+              Yes
+            </div>
+          </div>
+        </div>
+
+        <div class="tweaks-elem elem7">
+          <div class="tweak-name name-basic-advanced">
+            Diacritic sensitivity
+          </div>
+          <div class="on-off-both">
+            <div
+              class="off-btn switch-btn pointer btn-fx dia-off"
+              id="diacritic-OFF"
+            >
+              No
+            </div>
+            <div
+              class="on-btn switch-btn pointer btn-fx dia-on"
+              id="diacritic-ON"
+            >
+              Yes
+            </div>
+          </div>
+        </div>
+        <div class="tweaks-elem elem8">
+          <div class="tweak-name name-basic-advanced">Split search</div>
+          <div class="on-off-both">
+            <div
+              class="off-btn switch-btn pointer btn-fx sepa-off"
+              id="ExactPhrase-OFF"
+            >
+              No
+            </div>
+            <div
+              class="on-btn switch-btn pointer btn-fx sepa-on"
+              id="ExactPhrase-ON"
+            >
+              Yes
+            </div>
+          </div>
+        </div>
+        <div class="tweaks-elem elem9">
+          <div class="tweak-name name-basic-advanced">Complete word search</div>
+          <div class="on-off-both">
+            <div
+              class="off-btn switch-btn pointer btn-fx accu-off"
+              id="accurate-OFF"
+            >
+              No
+            </div>
+            <div
+              class="on-btn switch-btn pointer btn-fx accu-on"
+              id="accurate-ON"
+            >
+              Yes
+            </div>
+          </div>
+        </div>
+
+        <div class="advanced-mid tweaks-elem">
+          <label class="tweak-name name-basic-advanced"
+            >Saved query lists:</label
+          >
+          <select class="query-list pointer">
+            <option value="current">main query</option>
+            <option value="preset">empty preset</option>
+          </select>
+
+          <div class="save pointer">💾</div>
+          <div class="delete pointer">🗑️</div>
+        </div>
+        <div class="advanced-bot tweaks-elem">
+          <div class="website-list name-basic-advanced">
+            Allowed websites (whitelist):
+            <p class="small sm-2">
+              (leave the boxes empty or turn off the advanced features to allow
+              the extension to search on all sites)
+            </p>
+          </div>
+          <div class="website">
+            <label class="labels">https://</label>
+            <input
+              class="input-web"
+              type="text"
+              placeholder="e.g. www.reddit.com"
+            />
+            <img
+              src="../images/round-98A1A2.png"
+              class="x-button pointer"
+              alt=""
+            />
+          </div>
+          <div class="website web-2">
+            <label class="labels">https://</label>
+            <input
+              class="input-web"
+              placeholder="e.g. www.linkedin.com"
+              type="text"
+            />
+            <img
+              src="../images/round-98A1A2.png"
+              class="x-button pointer"
+              alt=""
+            />
+          </div>
+          <div class="website web-3">
+            <label class="labels">https://</label>
+            <input
+              class="input-web"
+              placeholder="e.g. wikipedia.org"
+              type="text"
+            />
+            <img
+              src="../images/round-98A1A2.png"
+              class="x-button pointer"
+              alt=""
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- APP TITLE + TOGGLE 2 END -->
+
+    <div class="highlighter-grey">
+      <span class="text-over-area"
+        >Find and highlight multiple words on the web.
+      </span>
+      <!-- <br /> -->
+      <div class="nav-cont">
+        <div class="nav-instr">
+          <span class="x-button-bot">X</span> Right-click on any of the queries
+          to load a term.
+          <br />
+
+          Navigate through the results by pressing the <u>Arrow Up</u> and
+          <u>Arrow Down</u> buttons on your keyboard.
+        </div>
+        <div class="nav-buttons-flex">
+          <div class="up-nav nav-dir up"></div>
+          <div class="button">empty</div>
+          <div class="down-nav nav-dir down"></div>
+        </div>
+      </div>
+      <form autocomplete="off">
+        <input
+          type="text"
+          class="hi-lite"
+          placeholder="press Enter after each search query."
+        />
+        <div class="slidecontainer">
+          <input class="rangeInput" type="range" min="0" max="340" step="0.5" />
+        </div>
+      </form>
+      <form autocomplete="off" class="highlight-queries"></form>
+    </div>
+    <hr id="hr2" />
+
+    <!-- <button>fasz</button> -->
+
+    <div class="donation-container">
+      <p>
+        For more information, requests or bug reports, <br />
+        please visit our
+        <a
+          class="patreon"
+          href="https://www.highlighty.app"
+          target="_blank"
+          id="bottom-contact"
+          ><b>website</b>.
+          <!-- ❤️ -->
+        </a>
+      </p>
+    </div>
+
+    <!-- <script src="../js/popup_js.js"></script> -->
+    <script src="../js/popup.bundle.js"></script>
+    <!--  -->
+  </body>
+</html>

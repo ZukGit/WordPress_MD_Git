@@ -1,0 +1,10 @@
+@import url("custom.css");*{font-family:"Segoe UI Symbol","微软雅黑","宋体","Arial","sans-serif"}
+#pop_main{min-width:256px}
+.divider{overflow:hidden;height:1px;background-color:#ccc}
+#popup_user_info{float:right}
+#popup_avatar{height:19px}
+#newVersion{display:none;margin-left:5px;padding:0 5px;font-size:12px;border-radius:20px;color:#fff;background-color:#ff3f3f}
+.font-weight-light{font-weight:300 !important}
+.font-weight-normal{font-weight:400 !important}
+.font-weight-bold{font-weight:700 !important}
+.font-italic{font-style:italic !important}

@@ -1,0 +1,37 @@
+#header{
+    height: 40px;
+    background: #e7ecf3;
+    padding: 0 30px;
+    display: flex;
+}
+#logo{
+    height: 32px;
+    padding-top: 4px;
+    padding-right: 40px;
+    line-height: 1;
+    float: left;
+}
+#logo img{
+    vertical-align: middle;
+    margin-right: 8px;
+}
+#title{
+    display: inline-block;
+    vertical-align: middle;
+}
+#title-1{
+    font-size: 14px;
+    font-weight: bold;
+}
+#title-2{
+    font-size: 12px;
+}
+#header-slot{
+    flex-grow: 1;
+}
+#header-right{
+    display: flex;
+    align-items: center;
+    margin-left: 10px;
+    line-height: 1em;
+}

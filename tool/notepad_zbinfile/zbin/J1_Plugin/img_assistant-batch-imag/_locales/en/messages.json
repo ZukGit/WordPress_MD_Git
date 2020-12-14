@@ -1,0 +1,809 @@
+{
+	"_w_chore":{
+		"message":"More information about usage, <b><a target=\"_pullywood_\" href=\"http://www.pullywood.com/ImageAssistant/shortcut.html\">shortcut <span class=\"glyphicon glyphicon-paperclip\" /></a></b> and FAQ please visit Project Home(simplified chinese), or follow me on twitter to get latest version information."
+	},
+	"_w_fold":{
+		"message":"Stroke Text"
+	},
+	"_w_dent":{
+		"message":"Send To Image Editor(experimental)"
+	},
+	"_w_wink":{
+		"message":"Add all"
+	},
+	"_w_chisel":{
+		"message":"Generate QRCode for Selected Text"
+	},
+	"_w_ginger":{
+		"message":"Task URL: "
+	},
+	"_w_ivory":{
+		"message":"ImageAssistant"
+	},
+	"_w_seam":{
+		"message":"URL list is empty"
+	},
+	"_w_lancet":{
+		"message":"Wildcard minimum length:"
+	},
+	"_w_solace":{
+		"message":"Privacy Policy"
+	},
+	"_w_saliva":{
+		"message":" Options"
+	},
+	"_w_wraith":{
+		"message":"Text Transparency"
+	},
+	"_w_spell":{
+		"message":"Find Related Information On Sogou"
+	},
+	"_w_psyche":{
+		"message":"Fixed Watermark"
+	},
+	"_w_foible":{
+		"message":"Invalid URL wildcard expression"
+	},
+	"_w_entry":{
+		"message":"Generate QRCode for Current Page"
+	},
+	"_w_smirch":{
+		"message":"Tips: Pictures with resolution small than this will not shown in Pictures filter page."
+	},
+	"_w_flight":{
+		"message":"Please enter keywords, multiple keywords separated by spaces"
+	},
+	"_w_icing":{
+		"message":"Click To Preview"
+	},
+	"_w_bog":{
+		"message":"Start value"
+	},
+	"_w_girder":{
+		"message":"This feature requires client support. Please install the client first and start it first(Not Available Yet)."
+	},
+	"_w_split":{
+		"message":"URL characteristic 2"
+	},
+	"_w_scoff":{
+		"message":"Copyright"
+	},
+	"_w_import":{
+		"message":"Size Funnel: "
+	},
+	"_w_hail":{
+		"message":"Image Editor(experimental): Add Watermark"
+	},
+	"_w_salve":{
+		"message":"Target URL: "
+	},
+	"_w_flail":{
+		"message":"Current Progress:"
+	},
+	"_w_tycoon":{
+		"message":"&nbsp;Before executing&nbsp;\n<b>Bulk Processing</b>&nbsp;, make sure the \"Allow location for each file before download\" option is unchecked in your browser configuration.\n<br />"
+	},
+	"_w_axle":{
+		"message":"ImageAssistant multiple URL extractor"
+	},
+	"_w_ennui":{
+		"message":"URL characteristic 3:"
+	},
+	"manifest_description":{
+		"message":"An image extractor for sniffing, analyzing and batch downloading images from web page."
+	},
+	"_w_squash":{
+		"message":"&nbsp;Vertically Centered"
+	},
+	"_w_ruse":{
+		"message":"Type: "
+	},
+	"_w_cavern":{
+		"message":"close"
+	},
+	"_w_tumult":{
+		"message":" Download"
+	},
+	"_w_sermon":{
+		"message":"&nbsp;Reverse Transparency"
+	},
+	"manifest_extract_description":{
+		"message":"Extract images from current page"
+	},
+	"_w_eclat":{
+		"message":"Attribute sniffing concurrency: "
+	},
+	"_w_tempo":{
+		"message":"Extract"
+	},
+	"_w_blade":{
+		"message":" Extract images in batches"
+	},
+	"_w_sock":{
+		"message":"The maximum number of images loaded in the filter page. To avoid loading too many images and exhausting the system memory, the browser crashes. When the number of loaded images reaches this value, the page will pause loading more images until the image is manually processed and some images are deleted. The subsequent pages will continue to load the remaining image data until the upper limit is reached again."
+	},
+	"_w_felon":{
+		"message":"Preview"
+	},
+	"_w_clique":{
+		"message":" Extract images in new window (Recommend)"
+	},
+	"_w_gust":{
+		"message":"/privacy_en.md"
+	},
+	"manifest_short_name":{
+		"message":"IA"
+	},
+	"_w_morale":{
+		"message":" End value:"
+	},
+	"_w_cocoon":{
+		"message":"Add Item"
+	},
+	"_w_veneer":{
+		"message":"Watermark Scaling"
+	},
+	"_w_stigma":{
+		"message":" Save to Collection"
+	},
+	"_w_clout":{
+		"message":"Watermark Image"
+	},
+	"_w_consul":{
+		"message":"Generate QRCode for Link"
+	},
+	"_w_ranger":{
+		"message":"Guestbook"
+	},
+	"_w_dearth":{
+		"message":"  multi URL extractor"
+	},
+	"_w_freak":{
+		"message":" Generate cURL Download Script"
+	},
+	"_w_lounge":{
+		"message":"Finished!"
+	},
+	"_w_lease":{
+		"message":"Filter Page Image Dynamic Load Threshold"
+	},
+	"_w_hoist":{
+		"message":"Size Option"
+	},
+	"_w_safe":{
+		"message":"Watermark Text"
+	},
+	"_w_poster":{
+		"message":"BlobMode"
+	},
+	"_w_gait":{
+		"message":"Multi Extract From The Link"
+	},
+	"_w_browse":{
+		"message":"Reverse Select"
+	},
+	"_w_ruffle":{
+		"message":"close"
+	},
+	"_w_nicest":{
+		"message":"Delete Invisible"
+	},
+	"_w_cult":{
+		"message":"step value"
+	},
+	"_w_dart":{
+		"message":"Save selected"
+	},
+	"_w_gulch":{
+		"message":"Size sort switch"
+	},
+	"_w_impact":{
+		"message":"Keep selected"
+	},
+	"_w_stupor":{
+		"message":"cURL Download Script: "
+	},
+	"_w_fad":{
+		"message":"Download All"
+	},
+	"_w_jolt":{
+		"message":"Async request concurrency: "
+	},
+	"_w_colony":{
+		"message":" Pullywood Production"
+	},
+	"_w_merit":{
+		"message":"Original Image Resolution: "
+	},
+	"_w_hem":{
+		"message":"Generate Batch extract URL: "
+	},
+	"_w_veto":{
+		"message":"Charactistic extract URL:"
+	},
+	"_w_nick":{
+		"message":"Switch to original page"
+	},
+	"_w_outlet":{
+		"message":"URL characteristic 1"
+	},
+	"_w_lout":{
+		"message":"Automatic Downloading..."
+	},
+	"_w_fathom":{
+		"message":"Filter menu switch"
+	},
+	"_w_prose":{
+		"message":"Tile watermark"
+	},
+	"_w_unison":{
+		"message":" About"
+	},
+	"_w_gallop":{
+		"message":"Resolution subscript switch"
+	},
+	"_w_pastor":{
+		"message":"The URL wildcard expression is not valid. Please enter an expression that begins with http:// or https:// and contains a (*) wildcard."
+	},
+	"_w_eddy":{
+		"message":"Select All"
+	},
+	"_w_brim":{
+		"message":"Original Links"
+	},
+	"_w_paean":{
+		"message":" Pullywood Production"
+	},
+	"_w_quay":{
+		"message":"Add Tasks"
+	},
+	"_w_agony":{
+		"message":"By default (unchecked), clicking on the image will bring up the enlarged image preview window. If you want to click the image to select only, please check the box below."
+	},
+	"_w_tare":{
+		"message":"Image Watermark"
+	},
+	"_w_pygmy":{
+		"message":"Picture Zoom"
+	},
+	"_w_prop":{
+		"message":"Right(px)"
+	},
+	"_w_flak":{
+		"message":"Send To Image Editor As Watermark"
+	},
+	"_w_sprout":{
+		"message":"&nbsp;Open Download Directory"
+	},
+	"_w_muscle":{
+		"message":"Edge Addon Store: "
+	},
+	"_w_advent":{
+		"message":"Charactistic URL extract"
+	},
+	"_w_span":{
+		"message":"Text Color"
+	},
+	"_w_mien":{
+		"message":" Image Editor(experimental)"
+	},
+	"_w_rage":{
+		"message":"One URL per line"
+	},
+	"_w_lode":{
+		"message":"Extracting from extension web page is not allowed!"
+	},
+	"_w_spat":{
+		"message":"The test URL is illegal~"
+	},
+	"_w_tenet":{
+		"message":"step value:"
+	},
+	"_w_fetter":{
+		"message":"Pushing data..."
+	},
+	"_w_helm":{
+		"message":"Wildcard minimum length"
+	},
+	"_w_azure":{
+		"message":"Search Keywords On Google Image"
+	},
+	"_w_ore":{
+		"message":"The web page you want extract is not exist!"
+	},
+	"_w_bore":{
+		"message":"Pixel Enhancement"
+	},
+	"_w_crux":{
+		"message":"Background Transparency"
+	},
+	"_w_artery":{
+		"message":"Font"
+	},
+	"_w_fascia":{
+		"message":"Foreground Color"
+	},
+	"_w_fabric":{
+		"message":" default"
+	},
+	"_w_tremor":{
+		"message":"In new window"
+	},
+	"_w_verge":{
+		"message":"URL characteristic 2:"
+	},
+	"_w_combat":{
+		"message":"Larger"
+	},
+	"_w_rift":{
+		"message":"Project Home: "
+	},
+	"_w_repute":{
+		"message":"Is an image extractor for sniffing, analyzing and downloading images from web page, it's good compatibility allows users to easily extract images loaded by flash or ajax."
+	},
+	"_w_kin":{
+		"message":" Image Data was pushed successfully."
+	},
+	"_w_apex":{
+		"message":"Please Select Images First!"
+	},
+	"_w_cone":{
+		"message":" Retry"
+	},
+	"_w_minion":{
+		"message":"Reset Page"
+	},
+	"_w_attire":{
+		"message":"Text Watermark"
+	},
+	"_w_thrall":{
+		"message":"Close current page"
+	},
+	"_w_brunt":{
+		"message":"Number of URL tasks: "
+	},
+	"_w_venom":{
+		"message":"Size"
+	},
+	"_w_carp":{
+		"message":"Version: "
+	},
+	"_w_aspect":{
+		"message":"No Images selected to Download!"
+	},
+	"_w_wax":{
+		"message":" Extract Current Page"
+	},
+	"_w_grouse":{
+		"message":"Save Path"
+	},
+	"_w_tangle":{
+		"message":"Unable to Connect to Client"
+	},
+	"_w_sash":{
+		"message":"The client returns an abnormal information."
+	},
+	"_w_quack":{
+		"message":"Search Keywords On Baidu Image"
+	},
+	"_w_pucker":{
+		"message":" Charactistic extract URL"
+	},
+	"_w_elite":{
+		"message":"Start value: "
+	},
+	"_w_scurvy":{
+		"message":"Picture Cropping"
+	},
+	"_w_tango":{
+		"message":" End value"
+	},
+	"_w_icicle":{
+		"message":" Options"
+	},
+	"_w_rubble":{
+		"message":"QR Code Watermark"
+	},
+	"_w_coma":{
+		"message":"Extension only works on the web page with URL started with http:// or https://."
+	},
+	"_w_plight":{
+		"message":"Selected: "
+	},
+	"_w_quiver":{
+		"message":"Find Similar Images On Google"
+	},
+	"_w_flange":{
+		"message":" Image data push failed!"
+	},
+	"_w_pulpit":{
+		"message":"Extensions can only create QR codes on pages that start with http:// and https://."
+	},
+	"_w_tussle":{
+		"message":"ImageAssistant"
+	},
+	"_w_mite":{
+		"message":" About"
+	},
+	"_w_poise":{
+		"message":" Waiting for Available Image Data."
+	},
+	"_w_nomad":{
+		"message":" Options"
+	},
+	"_w_dagger":{
+		"message":"This content failed to load."
+	},
+	"_w_nadir":{
+		"message":"Extension does have needed authority to extract images from that page."
+	},
+	"_w_jamb":{
+		"message":"Top(px)"
+	},
+	"_w_snarl":{
+		"message":"Font Size"
+	},
+	"_w_yoke":{
+		"message":"Resolution: "
+	},
+	"_w_shroud":{
+		"message":"Reource list: "
+	},
+	"_w_saddle":{
+		"message":"One rule per line, using the separator <b>{#^_^#}</b> to isolate the regular matching part and the regular replacement part, starting with the behavior comment line, the emptying rule will restore the default value, the rules are in order from top to bottom After execution, the subsequent rules will not be checked after matching."
+	},
+	"_w_pastry":{
+		"message":"stop slideshow"
+	},
+	"_w_jest":{
+		"message":"Amount: "
+	},
+	"_w_helmet":{
+		"message":"URL:http://www.domain.com/path/path/character_(*).html, where (*) is a wildcard."
+	},
+	"_w_treaty":{
+		"message":"Custom Option"
+	},
+	"_w_reaper":{
+		"message":"About"
+	},
+	"_w_intent":{
+		"message":"Click To Select"
+	},
+	"_w_lore":{
+		"message":"&nbsp;Bulk Processing"
+	},
+	"_w_mania":{
+		"message":"&nbsp;Reset Parameters"
+	},
+	"_w_toil":{
+		"message":"Image selected: "
+	},
+	"_w_harbor":{
+		"message":"Extract"
+	},
+	"_w_regent":{
+		"message":"Pictures filter"
+	},
+	"_w_budget":{
+		"message":"Before the follow steping, please make sure the download configure option \"Ask where to save each file before downloading\" of chrome  has been unchecked, or the continuous pop <Save as> dialog may makes you feel confused."
+	},
+	"_w_clasp":{
+		"message":"This image failed to load."
+	},
+	"_w_grease":{
+		"message":"Down(px)"
+	},
+	"_w_acumen":{
+		"message":"(Press \"V\" to switch image preview mode)"
+	},
+	"_w_boom":{
+		"message":"Default Funnel Size"
+	},
+	"_w_slosh":{
+		"message":"Height"
+	},
+	"_w_arena":{
+		"message":"Options"
+	},
+	"_w_frieze":{
+		"message":"Convert to blob url before download, take more cpu and memory resource, but can bypass the anti-theft chain mechanism of some sites. "
+	},
+	"_w_gusher":{
+		"message":"Open Download Folder"
+	},
+	"_w_boor":{
+		"message":"The URL list is empty. Before executing the feature extraction URL, add the source URL data that needs to be extracted from the URL list."
+	},
+	"_w_tatter":{
+		"message":" Prefetch Links(Bomb)"
+	},
+	"_w_slew":{
+		"message":"Original URL: "
+	},
+	"_w_flare":{
+		"message":"Zoom: "
+	},
+	"_w_zest":{
+		"message":"Image URL Regexp Replacement Rule"
+	},
+	"_w_ditch":{
+		"message":"start slideshow"
+	},
+	"_w_attic":{
+		"message":" My Collections"
+	},
+	"_w_pastel":{
+		"message":"previous"
+	},
+	"_w_ripple":{
+		"message":"Group keyword filter:"
+	},
+	"_w_melody":{
+		"message":"Download location："
+	},
+	"manifest_ext_name":{
+		"message":"ImageAssistant Batch Image Downloader"
+	},
+	"_w_fidget":{
+		"message":"Background Color"
+	},
+	"_w_toupee":{
+		"message":"Additional Information"
+	},
+	"_w_crab":{
+		"message":"In new Window"
+	},
+	"_w_maxim":{
+		"message":"Filter Page Maximum Number of Images Loaded"
+	},
+	"_w_logjam":{
+		"message":"Test URL: "
+	},
+	"_w_gong":{
+		"message":"Auto"
+	},
+	"_w_fume":{
+		"message":"Find Related Information On Google"
+	},
+	"_w_lance":{
+		"message":"Developer: "
+	},
+	"_w_loom":{
+		"message":"&nbsp;Brightness to Transparency"
+	},
+	"_w_podium":{
+		"message":"Downloads"
+	},
+	"_w_prime":{
+		"message":"Please enter the newly opened tab page to automatically close the timeout when extracting(minimum 8 seconds):"
+	},
+	"_w_savant":{
+		"message":"Download Selected"
+	},
+	"_w_snivel":{
+		"message":"Find Other Sizes On Google"
+	},
+	"_w_grave":{
+		"message":"Generate URL"
+	},
+	"_w_rue":{
+		"message":"Image streaming is only useful when bulk extracting large numbers of images (such as thousands of images). Setting this value too small will affect the experience; therefore, in the absence of a filtered page crash, this value should be as large as possible, such as: 512, 1024 Etc., according to the actual machine memory conditions and extended usage."
+	},
+	"_w_vent":{
+		"message":" Continue"
+	},
+	"_w_gaiety":{
+		"message":"Resolution: "
+	},
+	"_w_cuff":{
+		"message":"ImageAssistant"
+	},
+	"_w_vault":{
+		"message":"X-axis Offset"
+	},
+	"_w_hoard":{
+		"message":"Image Editor"
+	},
+	"_w_ration":{
+		"message":"WatermarkImage(ImageAssistant)"
+	},
+	"_w_pawn":{
+		"message":"Restore Default Rules"
+	},
+	"_w_brat":{
+		"message":"Alert"
+	},
+	"_w_almond":{
+		"message":"Y-axis Offset"
+	},
+	"_w_magpie":{
+		"message":"Pullywood.com"
+	},
+	"_w_fell":{
+		"message":" Cancel"
+	},
+	"_w_pylon":{
+		"message":"Select None"
+	},
+	"_w_smut":{
+		"message":"Visible: "
+	},
+	"_w_gravel":{
+		"message":"next"
+	},
+	"_w_nib":{
+		"message":"Original Image"
+	},
+	"_w_pullet":{
+		"message":" Setting"
+	},
+	"_w_scar":{
+		"message":"&nbsp;Horizontal Centered"
+	},
+	"_w_puddle":{
+		"message":" Analyze Prefetch(Bomb+)"
+	},
+	"_w_deputy":{
+		"message":"image {current} of {total}"
+	},
+	"_w_warp":{
+		"message":"Rotation Angle"
+	},
+	"_w_temper":{
+		"message":"Load Image: "
+	},
+	"_w_mirth":{
+		"message":"Clear All"
+	},
+	"_w_mayhem":{
+		"message":"Chrome Web Store: "
+	},
+	"_w_morsel":{
+		"message":"Watermark Transparency"
+	},
+	"_w_pier":{
+		"message":"Y-axis Offset"
+	},
+	"_w_blur":{
+		"message":"Operation menu switch"
+	},
+	"_w_fast":{
+		"message":"Left(px)"
+	},
+	"_w_gutter":{
+		"message":"Y-axis Margin"
+	},
+	"_w_marvel":{
+		"message":"X-axis Margin"
+	},
+	"_w_nettle":{
+		"message":"URL characteristic 3"
+	},
+	"_w_crumb":{
+		"message":"Multi Extract From Current Page"
+	},
+	"_w_fiend":{
+		"message":"Filter Page Click Event Behavior"
+	},
+	"manifest_multi_extract_description":{
+		"message":"Multi Extract From Current Page"
+	},
+	"_w_acorn":{
+		"message":"Popup Menu"
+	},
+	"_w_lark":{
+		"message":"Please do not close before extraction finished!"
+	},
+	"_w_parity":{
+		"message":" Add to Collection"
+	},
+	"_w_cue":{
+		"message":"Multiple URL extraction"
+	},
+	"_w_howler":{
+		"message":"Find Other Sizes On Sogou"
+	},
+	"_w_coffer":{
+		"message":"X-axis Offset"
+	},
+	"_w_rudder":{
+		"message":" QRCode Current Page"
+	},
+	"_w_dandy":{
+		"message":"Save as"
+	},
+	"_w_glut":{
+		"message":"Joey"
+	},
+	"_w_tedium":{
+		"message":"Current browser does not open the download API, it is recommended to use the latest original Chrome browser for more comprehensive features."
+	},
+	"_w_blight":{
+		"message":"Image Type: "
+	},
+	"_w_poncho":{
+		"message":"Click Behavior"
+	},
+	"_w_anemia":{
+		"message":"&nbsp;\n<b>Bulk Processing</b>&nbsp;Features are only available in some browsers\n<br />Since all browser vendors in China have focused on the castration modification of the download function, this feature is only implemented in accordance with chrome.downloads. The browser defined by download."
+	},
+	"_w_larva":{
+		"message":"Generate QRCode for image"
+	},
+	"_w_skein":{
+		"message":"Generate QR Code"
+	},
+	"_w_roe":{
+		"message":"Target Image Resolution: "
+	},
+	"_w_wig":{
+		"message":"No rule match current URL~"
+	},
+	"_w_spin":{
+		"message":"The newly extracted image will be automatically downloaded according to the configuration. If you want to stop the automatic download, please close the dialog box."
+	},
+	"_w_miser":{
+		"message":"Ext all"
+	},
+	"_w_quill":{
+		"message":"Notice"
+	},
+	"_w_query":{
+		"message":"Border Width"
+	},
+	"_w_curd":{
+		"message":"QR Code Text"
+	},
+	"_w_flint":{
+		"message":" items not shown"
+	},
+	"_w_curb":{
+		"message":"Extract Images From Current Link"
+	},
+	"_w_valor":{
+		"message":"The download API is not detected and cannot invoke download function."
+	},
+	"_w_matrix":{
+		"message":"Firefox Addon Store: "
+	},
+	"_w_vista":{
+		"message":"The number of images loaded on the image filter page reaches this value to enable image streaming. Since the image on the page consumes a lot of memory, loading a large number of images on the page may cause the page to crash because the system can no longer allocate more memory for the page. The dynamic loading function will be uninstalled when the page area where the image is located is not visible, and the page area where the image is located is visible. Reload the image to save memory usage and allow the page to load more images."
+	},
+	"_w_guffaw":{
+		"message":" About"
+	},
+	"_w_schism":{
+		"message":"Delete Selected"
+	},
+	"_w_reel":{
+		"message":" ImageAssistant"
+	},
+	"_w_bane":{
+		"message":"URL characteristic 1:"
+	},
+	"_w_mime":{
+		"message":"URL wildcard expression: "
+	},
+	"_w_school":{
+		"message":"URL Filter:"
+	},
+	"_w_quest":{
+		"message":"Auto"
+	},
+	"_w_nova":{
+		"message":"Select All"
+	},
+	"_w_burial":{
+		"message":"All download tasks are queued. ^_^"
+	},
+	"_w_demise":{
+		"message":"Width"
+	},
+	"_w_mettle":{
+		"message":" Image data push failed and will be automatically retried."
+	},
+	"_w_recall":{
+		"message":" cancel"
+	}
+}

@@ -1,0 +1,29 @@
+@import url("custom.css");*{font-family:"Segoe UI Symbol","微软雅黑","宋体","Arial","sans-serif"}
+body{overflow-y:scroll}
+body::-webkit-scrollbar{width:8px}
+body::-webkit-scrollbar-track{background:#ccc}
+body::-webkit-scrollbar-thumb{background:#999}
+h1,h1 *{font-size:24px;vertical-align:middle}
+.sidebar{display:none}
+@media(min-width:768px){.sidebar{position:fixed;top:51px;bottom:0;left:0;z-index:1000;display:block;padding:20px;overflow-x:hidden;overflow-y:auto;border-right:1px solid #ccc}
+}
+.nav-sidebar{margin-right:-21px;margin-bottom:20px;margin-left:-20px}
+.nav-sidebar>li>a{padding-right:20px;padding-left:20px}
+.nav-sidebar>.active>a,.nav-sidebar>.active>a:hover,.nav-sidebar>.active>a:focus{color:#fff;background-color:#428bca}
+#brand_text{height:40px;margin-top:-10px;display:inline-block}
+.main{padding:32px 40px;max-width:1080px}
+.mainCnt{display:none}
+#sizeConfContainer{overflow:hidden}
+#sizeConfigure .btn-group,#sizeConfigurExt .btn-group{margin:2px 0;display:block;overflow:hidden}
+#sizeConfigure #defautlOperation{margin-bottom:5px}
+#defautlOperation .btn,.sizeItemOption{width:120px;overflow:hidden;display:inline-block}
+.sizeItemSelected{border-color:#666;color:#666}
+#size_item_add{margin:10px 0}
+.inline-icon{vertical-align:middle;display:inline-block}
+.share_bar{overflow:hidden;width:100%;margin:0;padding:0;border:0;height:48px}
+#popup_user_info{padding:0 5px;float:right}
+#newVersion{display:none;margin-left:5px;padding:0 5px;font-size:12px;border-radius:20px;color:#fff;background-color:#ff3f3f}
+#regexpUrlRule{border:1px solid #ccc;border-radius:6px;height:400px;overflow-y:auto;overflow-x:hidden;word-wrap:break-word;word-break:break-all;white-space:pre-line}
+#regexpUrlTestOutput{overflow-x:hidden;word-wrap:break-word;word-break:break-all;white-space:pre-line}
+crule{color:#fff;background:#f66}
+mrule{color:#fff;background:#6c6}

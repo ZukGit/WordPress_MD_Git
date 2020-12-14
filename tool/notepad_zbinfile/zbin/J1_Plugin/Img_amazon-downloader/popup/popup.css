@@ -1,0 +1,369 @@
+body{
+    color: #474747;
+    font-size: 12px;
+}
+body a{
+    color: #474747;
+    text-decoration: none;
+}
+body{
+    width: 260px;
+}
+h2{
+    margin: 0;
+}
+body.expand{
+    width: 314px;
+}
+.fl{
+    float: left;
+}
+.fr{
+    float: right;
+}
+[v-cloak]{
+    display: none;
+}
+#main-1{
+    width: 260px;
+    background: #fff;
+    position: relative;
+}
+#btn-switch-old{
+    position: absolute;
+    right: 16px;
+    font-size: 12px;
+    z-index: 1;
+    top: 14px;
+}
+.msg{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    font-size: 24px;
+    background: rgba(255,255,255,0.9);
+    color: red;
+    text-align: center;
+    padding-top: 150px;
+    box-sizing: border-box;
+    z-index: 222;
+}
+.msg .btn-close{
+    position: absolute;
+    right: 4px;
+    top: 4px;
+}
+#header{
+    padding: 16px 18px;
+    position: relative;
+}
+.logo{
+    margin-right: 12px;
+}
+
+#version{
+    position: absolute;
+    background:url(images/tag-version.png);
+    width: 44px;
+    height: 25px;
+    font-size: 12px;
+    text-align: center;
+    right: 90px;
+    top: 10px;
+}
+#help{
+    float: right;
+    height: 34px;
+    line-height: 34px;
+    font-size: 12px;
+}
+#help img, #help span{
+    vertical-align: middle;
+}
+#title{
+    display: inline-block;
+}
+#title-1{
+    font-size: 14px;
+    font-weight: bold;
+}
+#title-2{
+    font-size: 12px;
+}
+.dl-btn{
+    width: 222px;
+    height: 34px;
+    line-height: 34px;
+    border: 1px solid #ddd;
+    text-align: center;
+    border-radius: 3px;
+    cursor: pointer;
+}
+.dl-btn:hover{
+    background: #dedede;
+}
+.dl-btn .text-important{
+    color: #1b2f51;
+    font-weight: bold;
+}
+.dl-btn .short-key {
+    padding-left: 16px;
+}
+#current-btn{
+    margin-bottom:12px;
+}
+#all-btn{
+}
+.module{
+    border-top: 1px solid #e8eef6;
+    padding: 16px 18px;
+}
+.module h4{
+    font-size: 12px;
+    color: #162a4d;
+    margin: 0;
+}
+.sub-module{
+    padding-left: 22px;
+    margin: 12px 0;
+    line-height: 1;
+}
+.u-icon, .u-label{
+    vertical-align: middle;
+}
+.mod-more-fun{
+    position: relative;
+}
+.more-btn{
+    width: 36px;
+    height: 24px;
+    background: url(images/go-btn.png) no-repeat center;
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    margin-top: -12px;
+    cursor: pointer;
+}
+#email{
+    margin-bottom: 10px;
+}
+.mod-footer{
+    height: 46px;
+    line-height: 46px;
+    padding: 0 18px;
+    position: relative;
+}
+#app{
+    padding-bottom: 10px;
+}
+#settings{
+    float: left;
+    cursor: pointer;
+}
+#guanwang{
+    float: right;
+}
+
+#main-2{
+    width: 314px;
+    background: #fff;
+}
+#m2-header{
+    height: 45px;
+    line-height: 45px;
+    font-size: 16px;
+    text-align: center;
+    border-bottom: 1px solid #e8eef6;
+    position: relative;
+}
+#m2-header .btn-close{
+    position: absolute;
+    display: block;
+    height: 45px;
+    width: 45px;
+    text-align: center;
+    line-height: 45px;
+    top: 0px;
+    right: 0px;
+    font-size: 16px;
+    color: #dcdcdc;
+}
+#m2-header .btn-close:hover{
+    color: #ffce3d;
+}
+.m2-module{
+    padding: 0 20px;
+    margin-top: 20px;
+}
+.el-checkbox__input.is-checked+.el-checkbox__label{
+    color: inherit !important;
+}
+#main-2 .el-checkbox{
+    display: block;
+    margin-bottom: 4px;
+}
+.m2-module h4{
+    color: #162a4d;
+    margin: 12px 0;
+}
+#pic-size input{
+    width: 208px;
+    height: 26px;
+}
+.m2-input-union{
+    overflow: hidden;
+    margin-bottom: 6px;
+}
+.m2-input-union input{
+    border: 1px solid #e4e4e4;
+    float: right;
+}
+.m2-input-union .u-label{
+    display: inline-block;
+    height: 28px;
+    line-height: 28px;
+}
+.cb-container, #main-2 .r-container{
+    position: absolute;
+    height: 14px;
+    margin-top: -0.5em;
+    top: 7px;
+}
+.cb-container+.u-label, .r-container+.u-label{
+    margin-left: 20px;
+}
+.cb-union, .radio-union{
+    font-size: 12px;
+    position: relative;
+    line-height: 1;
+    padding-top: 5px;
+}
+.mod-more-fun .cb-union {
+    margin: 4px 0;
+}
+input{
+    outline: none;
+    color: #474747;
+}
+input:focus{
+    border-color: #ffce3d !important;
+    color: #000;
+}
+.input-1{
+    width: 160px;
+    height: 26px;
+    border: 1px solid #e4e4e4;
+    float: right;
+    box-sizing: border-box;
+    line-height: 24px;
+    padding-left: 8px;
+}
+#shortkey input{
+    border: 0;
+    outline: none;
+    height: 26px;
+    height: 24px;
+    width: 110px;
+    border: 0;
+    outline: none;
+    padding: 0;
+    float: left;
+}
+body.undownloadable{
+    height: 276px;
+    overflow: hidden;
+
+}
+.undownloadable .undownloadable-hide{
+    display: none;
+}
+#fixed-dir-input{
+    width: 160px;
+    height: 28px;
+    box-sizing: border-box;
+    border-radius: 14px;
+    padding: 0 8px;
+    float: right;
+    border: 1px solid #e4e4e4;
+    position: relative;
+    top: -7px;
+}
+.switcher{
+    width: 32px;
+    height: 14px;
+    background-color: #f4f4f4;
+    position: relative;
+    cursor: pointer;
+}
+.switcher input{
+    display: none;
+}
+.switcher label{
+    display: block;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+}
+.switcher label:after{
+    content: "";
+    position: absolute;
+    width: 16px;
+    height: 14px;
+    background-color: #cccccc;
+}
+.switcher input:checked + label:after{
+    right: 0;
+    background-color: #ffce3d;
+}
+#ai-scripts .ai-scripts-opts{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+#ai-scripts .el-button{
+    padding: 0;
+}
+.update-wrapper{
+    display: flex;
+    justify-content: space-between;
+    flex-flow: row-reverse;
+}
+#ai-scripts .update-desc{
+    color: #F56C6C;
+}
+.m2-module .item{
+    margin: 12px 20px;
+}
+#more-module a{
+    text-decoration: underline;
+}
+#advanced-mode-tip{
+    margin-left: 2px;
+}
+.btn-long{
+    width: 100%;
+    height: 34px;
+    padding: 0;
+}
+#multi-url-input{
+    margin-top: 8px;
+}
+#concurrent-wrapper .el-input-number--small{
+    line-height: 22px;
+}
+#concurrent-wrapper .el-input--small .el-input__inner{
+    height: 24px;
+    line-height: 24px;
+}
+#fixed-dir-radio{
+    margin-right: 0;
+}
+#drag-download-mode{
+    padding-left: 24px;
+}
+#drag-download-mode .el-radio{
+    display: block;
+    margin-bottom: 4px;
+}

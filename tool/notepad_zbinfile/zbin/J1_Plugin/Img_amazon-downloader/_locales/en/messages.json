@@ -1,0 +1,578 @@
+{
+  "sample": {
+    "message": "Sample"
+  },
+  "default_title": {
+    "message": "Amazon Image Downloader"
+  },
+  "default_title_desc": {
+    "message": "\nShortKey: Alt+Z"
+  },
+  "description": {
+    "message": "An useful image batch download extension.You can filter by resolution or link."
+  },
+  "min_display": {
+    "message": "Max Side"
+  },
+  "width_short": {
+    "message": "Min Width"
+  },
+  "height_short": {
+    "message": "Min Height"
+  },
+  "apply": {
+    "message": "Apply"
+  },
+  "inverse": {
+    "message": "Toggle"
+  },
+  "more_options": {
+    "message": "More Options"
+  },
+  "chrome_download_settings_url": {
+    "message": "Ask where to save each file before downloading"
+  },
+  "switch_view": {
+    "message": "Switch View"
+  },
+  "save_image": {
+    "message": "Save Image"
+  },
+  "donate": {
+    "message": "Donate"
+  },
+  "advise": {
+    "message": "blog"
+  },
+  "filter_link": {
+    "message": "Filter by link"
+  },
+  "sort": {
+    "message": "Sort"
+  },
+  "sort_normal": {
+    "message": "Sort by site"
+  },
+  "sort_big_first": {
+    "message": "Big image first"
+  },
+  "sort_small_first": {
+    "message": "Small image first"
+  },
+  "not_rename": {
+    "message": "Not rename"
+  },
+  "rename_by_this_format": {
+    "message": "Rename based on"
+  },
+  "rename_tips": {
+    "message": "You can use these variables: {NO} means sequence number；{EXT} means extended name"
+  },
+  "export_link": {
+    "message": "Export link"
+  },
+  "save_tips_do_not_check": {
+    "message": "DO NOT SELECT"
+  },
+  "save_tips": {
+    "message": " \"Ask where to save each file before downloading\" option in Chrome Downlods Setting.Otherwise, many many confirmation dialogs flock."
+  },
+  "save_tips_open_setting": {
+    "message": "Open Settings Page"
+  },
+  "save_tips_done": {
+    "message": "Save Image"
+  },
+  "save_tips_cancel": {
+    "message": "Cancel"
+  },
+  "do_not_show_again": {
+    "message": "I know it, not show this dialog any more."
+  },
+  "settings_download": {
+    "message": "Chrome Downloads Setting"
+  },
+  "right_click_to_open": {
+    "message": "(Right-click to open and check settings)"
+  },
+  "export_format": {
+    "message": "format"
+  },
+  "export_format_tips": {
+    "message": "You can use these variables: {NO} means sequence number；{LINK} means image link"
+  },
+  "export_btn": {
+    "message": "Export"
+  },
+  "export_close": {
+    "message": "Close"
+  },
+  "all_tab": {
+    "message": "All Tabs"
+  },
+  "active_tab": {
+    "message": "This Tab"
+  },
+  "open_multiple_page": {
+    "message": "Open multi page?"
+  },
+  "open_multiple_page_tips": {
+    "message": "Allow multi-rows urls and wildcard character. [01-10] means 01 to 10 page, for example:             http://abc.com?page=[1-4,a-z]"
+  },
+  "open_multiple_page_action": {
+    "message": "Open page"
+  },
+  "popup_tips": {
+    "message": "Short Key: Alt + Z"
+  },
+  "process_show_start": {
+    "message": ""
+  },
+  "process_end": {
+    "message": "images"
+  },
+  "process_unknow_image": {
+    "message": "image getting resolution"
+  },
+  "settings": {
+    "message": "Settings"
+  },
+  "settings_min_display": {
+    "message": "Default min resolution"
+  },
+  "width": {
+    "message": "Width"
+  },
+  "height": {
+    "message": "Height"
+  },
+  "settings_simple": {
+    "message": "Normal Settings"
+  },
+  "settings_show_website": {
+    "message": "Show link"
+  },
+  "settings_use_shortcut_key": {
+    "message": "Use Short Key: Alt + Z"
+  },
+  "settings_collect_one_page": {
+    "message": "Collect to on page"
+  },
+  "settings_save_folder": {
+    "message": "save folder name(for Ctrl + S)"
+  },
+  "settings_save_use_title": {
+    "message": "use website title"
+  },
+  "settings_save_use_fixed_name": {
+    "message": "use fixed name"
+  },
+  "save": {
+    "message": "Save"
+  },
+  "settings_special_support": {
+    "message": "Special support"
+  },
+  "settings_special_support_desc": {
+    "message": "Common Rule"
+  },
+  "settings_already_save": {
+    "message": "Setting saved."
+  },
+  "settings_rule_last_update_time": {
+    "message": "Last update:"
+  },
+  "settings_rule_last_update_time_none": {
+    "message": "None"
+  },
+  "sample_end": {
+    "message": ""
+  },
+  "update_title": {
+    "message": "Fatkun Batch Download Image version 1.8.3"
+  },
+  "update_description": {
+    "message": "1 English translation <br /> 2 Chrome downloading settings tooltips updated"
+  },
+  "update_declaration": {
+    "message": "This extension referenced some code of zzllrr's <a href=\"http://chrome.google.com/webstore/detail/gfjhimhkjmipphnaminnnnjpnlneeplk?hl=zh_cn\">小乐图客</a>"
+  },
+  "aimg_tooltip": {
+    "message": "Click Image to uncheck or check"
+  },
+  "settings_user_rule_desc": {
+    "message": "Custom rules"
+  },
+  "settings_update": {
+    "message": "Update now"
+  },
+  "settings_import_rules": {
+    "message": "Import rules"
+  },
+  "settings_add_rules": {
+    "message": "Add rules"
+  },
+  "settings_rule_name": {
+    "message": "Rule Name"
+  },
+  "settings_rule_imageUrl_pattern": {
+    "message": "Rule image url pattern"
+  },
+  "settings_rule_url_replace_code": {
+    "message": "Image url replace code"
+  },
+  "settings_rule_test": {
+    "message": "Test"
+  },
+  "settings_rule_delete": {
+    "message": "Delete"
+  },
+  "settings_rule_example": {
+    "message": "Rule example"
+  },
+  "settings_rule_example_title2": {
+    "message": "Rule support Regular Expression"
+  },
+  "settings_rules_empty": {
+    "message": "Empty"
+  },
+  "five_stars": {
+    "message": "5 stars rate"
+  },
+  "share_sina": {
+    "message": "Share to Sina Weibo"
+  },
+  "PickImagePageTitle": {
+    "message": "Pick Pictures"
+  },
+  "title": {
+    "message": "Batch Download Image"
+  },
+  "sortByDefault": {
+    "message": "Sort by Default"
+  },
+  "sortByBigFirst": {
+    "message": "Big First"
+  },
+  "sortBySmallFirst": {
+    "message": "Small First"
+  },
+  "view": {
+    "message": "View"
+  },
+  "size": {
+    "message": "Size"
+  },
+  "reset": {
+    "message": "Reset"
+  },
+  "filterByUrl": {
+    "message": "Filtered by Url"
+  },
+  "urlfilterPlaceholder": {
+    "message": "Contains keywords(Separated by commas)"
+  },
+  "toggle": {
+    "message": "Toggle"
+  },
+  "selectAll": {
+    "message": "Select All"
+  },
+  "exportLinks": {
+    "message": "Export Links"
+  },
+  "rename": {
+    "message": "Rename"
+  },
+  "resume": {
+    "message": "Resume"
+  },
+  "pause": {
+    "message": "Pause"
+  },
+  "unique": {
+    "message": "Remove Duplicates"
+  },
+  "selected": {
+    "message": "Selected"
+  },
+  "downloaded": {
+    "message": "Downloaded"
+  },
+  "total": {
+    "message": "Total"
+  },
+  "format": {
+    "message": "Format"
+  },
+  "renameTip": {
+    "message": "Some variables can be used: {NO} for serial number; {LINK} for image link"
+  },
+  "close": {
+    "message": "Close"
+  },
+  "filterByPage": {
+    "message": "Filter by Page"
+  },
+  "saveTips": {
+    "message": "DO NOT SELECT \"Ask where to save each file before downloading\" option in Chrome Downloads Setting. Otherwise, many many confirmation dialogs flock."
+  },
+  "openSettingPage": {
+    "message": "Open Setting Page"
+  },
+  "tipsDone": {
+    "message": "Download Image"
+  },
+  "tipsCancel": {
+    "message": "Cancel"
+  },
+  "doNotShowAgain": {
+    "message": "I know it, not show this dialog any more."
+  },
+  "downloadSetttings": {
+    "message": "Chrome Settings Page"
+  },
+  "saveTipsDialogTitle": {
+    "message": "Tips"
+  },
+  "remember": {
+    "message": "Remember"
+  },
+  "concurrent": {
+    "message": "Concurrency"
+  },
+  "others": {
+    "message": "Others"
+  },
+  "new_image_added": {
+    "message": "New Image Added"
+  },
+  "dragDownload": {
+    "message": "Dragged images"
+  },
+  "renameRule": {
+    "message": "Rule:"
+  },
+  "pleaseInput": {
+    "message": "Please Input"
+  },
+  "previewSize": {
+    "message": "Preview Size"
+  },
+  "previewSizeSmall": {
+    "message": "Small"
+  },
+  "previewSizeBig": {
+    "message": "Big"
+  },
+  "pagination": {
+    "message": "Pages"
+  },
+  "switchToOld": {
+    "message": "Old Fatkun"
+  },
+  "restartBrowser": {
+    "message": "Restart the browser to use old Fatkun"
+  },
+  "brand": {
+    "message": "<%=brand%>"
+  },
+  "help": {
+    "message": "Help"
+  },
+  "download": {
+    "message": "Download"
+  },
+  "currentTab": {
+    "message": "Current Tab"
+  },
+  "allTabs": {
+    "message": "All Tabs"
+  },
+  "baseSetting": {
+    "message": "Base Settings"
+  },
+  "downloadByDrag": {
+    "message": "Download by Dragging Image"
+  },
+  "site": {
+    "message": "Site"
+  },
+  "removeLimit": {
+    "message": "Remove Download Limit"
+  },
+  "enableAIScript": {
+    "message": "Enbale Intelligent Script"
+  },
+  "checkUpdate": {
+    "message": "Check Update"
+  },
+  "latest": {
+    "message": "Latest"
+  },
+  "update": {
+    "message": "Update"
+  },
+  "updated": {
+    "message": "Updated"
+  },
+  "defaultUpdateDesc": {
+    "message": "U can upgrade now!"
+  },
+  "gw": {
+    "message": "Official Website"
+  },
+  "imageFormat": {
+    "message": "Image Format"
+  },
+  "webpToJpgOrPng": {
+    "message": "Automatically convert WEBP images to JPG or PNG format"
+  },
+  "multiPages": {
+    "message": "Download All Tabs"
+  },
+  "collectedToSinglePage": {
+    "message": "Collect all images to one single output page"
+  },
+  "generalSettings": {
+    "message": "General Settings"
+  },
+  "dragSelect": {
+    "message": "Enable drag-select"
+  },
+  "showUrl": {
+    "message": "Show Url"
+  },
+  "advancedMode": {
+    "message": "Advanced Mode"
+  },
+  "advancedModeTip": {
+    "message": "Turn on this mode if there are some images cannot be downloaded"
+  },
+  "saveDir": {
+    "message": "Save Directory"
+  },
+  "useDocTitle": {
+    "message": "Page Title"
+  },
+  "useFixedName": {
+    "message": "Fixed Directory"
+  },
+  "shortkeySettings": {
+    "message": "Shortkey Settings"
+  },
+  "canceled": {
+    "message": "Canceled"
+  },
+  "more": {
+    "message": "More"
+  },
+  "editBigParserRule": {
+    "message": "Edit Big-Image-Parser Rule"
+  },
+  "viewAllAIScripts": {
+    "message": "View all Scripts"
+  },
+  "enableContextmenu": {
+    "message": "Enable Contextmenu"
+  },
+  "downloadInstantly": {
+    "message": "Download instantly"
+  },
+  "dragToFilterPage": {
+    "message": "Drag to Filter Page"
+  },
+  "pageTitle": {
+    "message": "Setting"
+  },
+  "intelligentScripts": {
+    "message": "Intelligent Scripts"
+  },
+  "enable": {
+    "message": "Enable"
+  },
+  "highResolution": {
+    "message": "High Resolution"
+  },
+  "smartScript": {
+    "message": "Smart Script"
+  },
+  "liftDownloadLimition": {
+    "message": "Lift Restriction"
+  },
+  "commonRules": {
+    "message": "Common Rules"
+  },
+  "customRuels": {
+    "message": "Custom Rules"
+  },
+  "ruleName": {
+    "message": "Rule Name"
+  },
+  "matchRegularExpression": {
+    "message": "Match Regular Expression"
+  },
+  "replacedWith": {
+    "message": "Replaced With"
+  },
+  "operation": {
+    "message": "Operation"
+  },
+  "test": {
+    "message": "Test"
+  },
+  "delete": {
+    "message": "Delete"
+  },
+  "add": {
+    "message": "Add"
+  },
+  "enabledList": {
+    "message": "Enabled List"
+  },
+  "liftLimitionPlaceholder": {
+    "message": "Please input the url"
+  },
+  "confirm": {
+    "message": "Confirm"
+  },
+  "LiftingDownloadRestrictions": {
+    "message": "Lifting download restrictions"
+  },
+  "LiftingDownloadRestrictionsDesc1": {
+    "message": "This option is only used when the download of images on the page is restricted. Under normal circumstances, there is no need to lift the download restriction."
+  },
+  "LiftingDownloadRestrictionsDesc2": {
+    "message": "Lifting the download restriction will affect the download speed or the computer running speed. Please use it when necessary."
+  },
+  "LiftingDownloadRestrictionsDesc3": {
+    "message": "Entering any URL of a website will unblock the entire website and does not need to be added once per page."
+  },
+  "scenesToBeUsed": {
+    "message": "scenes to be used"
+  },
+  "ImageDownloadFailed": {
+    "message": "Image download failed:"
+  },
+  "ProhibitionOfExternalLinks": {
+    "message": "Prohibition of external links:"
+  },
+  "downloadConfirm": {
+    "message": "Downloads"
+  },
+  "downloadConfirmDesc": {
+    "message": "If you are asked where to save each image before downloading, you should close \"Ask where to save each file before downloading\" in browser setting"
+  },
+  "goSetting": {
+    "message": "Go to setting"
+  },
+  "settingsPageTitle": {
+    "message": "Settings"
+  },
+  "outputDragDownloadTitle": {
+    "message": "Dragged images"
+  },
+  "outputPageTitle": {
+    "message": "Pick Pictures"
+  }
+}

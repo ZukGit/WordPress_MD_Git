@@ -1,0 +1,21 @@
+ul{
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+li{
+    list-style: none;
+}
+.script-item{
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+}
+.script-item.focused{
+    border: 2px solid red;
+}
+h5 .ico{
+    width: 16px;
+    height: 16px;
+    margin-right: 4px;
+    vertical-align: middle;
+}

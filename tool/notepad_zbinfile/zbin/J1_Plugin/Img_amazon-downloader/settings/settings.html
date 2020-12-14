@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" href="../lib/vue-element/index.css">
+    <link rel="stylesheet" href="settings.css">
+</head>
+<!--body给定宽高可以防止在main-12 main-2切换是出现闪烁-->
+
+<body>
+    <div id="app" v-cloak>
+        <f-header :brand="brand" :i18n="i18n" :gConfig="gConfig"></f-header>
+        <el-tabs type="" tab-position="left">
+            <el-tab-pane :label="i18n.settings">
+                <div class="m2-module">
+                    <h3>{{i18n.generalSettings}}</h3>
+                    <div class="cb-union">
+                        <el-checkbox v-model="config.autoConvertWebp">{{i18n.webpToJpgOrPng}}</el-checkbox>
+                    </div>
+                    <div class="cb-union">
+                        <el-checkbox v-model="config.singleOutput">{{i18n.collectedToSinglePage}}</el-checkbox>
+                    </div>
+                    <el-checkbox v-model="config.dragDownload">{{i18n.downloadByDrag}}</el-checkbox>
+                    <div v-if="config.dragDownload" id="drag-download-mode">
+                        <el-radio v-model="config.dragDownloadMode" label="download-instantly">
+                            {{i18n.downloadInstantly}}</el-radio>
+                        <el-radio v-model="config.dragDownloadMode" label="drag-to-filter-page">
+                            {{i18n.dragToFilterPage}}</el-radio>
+                    </div>
+                    <div class="cb-union">
+                        <el-checkbox v-model="config.dragSelect">{{i18n.dragSelect}}</el-checkbox>
+                    </div>
+                    <div class="cb-union">
+                        <el-checkbox v-model="config.showUrl">{{i18n.showUrl}}</el-checkbox>
+                    </div>
+                    <div class="cb-union">
+                        <el-checkbox v-model="config.enableContextmenu" @change="switchContextmenu">
+                            {{i18n.enableContextmenu}}</el-checkbox>
+                    </div>
+                    <div>
+                        <el-checkbox v-model="config.unique">{{i18n.unique}}</el-checkbox>
+                    </div>
+                </div>
+                <div class="m2-module download-confirm">
+                    <h3>{{i18n.downloadConfirm}}</h3>
+                    <p style="color: #E6A23C">{{i18n.downloadConfirmDesc}}
+                        <el-button type="text" icon="el-icon-setting" href="#" @click.prevent="openBrowserSetting">
+                            {{i18n.goSetting}}</el-button>
+                    </p>
+                </div>
+                <div class="m2-module">
+                    <h3>{{i18n.previewSize}}</h3>
+                    <div id="preview-size">
+                        <el-radio v-model="config.previewSize" label="small">{{i18n.previewSizeSmall}}</el-radio>
+                        <el-radio v-model="config.previewSize" label="big">{{i18n.previewSizeBig}}</el-radio>
+                    </div>
+                </div>
+                <div id="save-dir" class="m2-module">
+                    <h3>{{i18n.saveDir}}</h3>
+                    <div class="radio-union">
+                        <el-radio v-model="config.dirType" label="TITLE">{{i18n.useDocTitle}}</el-radio>
+                    </div>
+                    <div class="radio-union">
+                        <el-radio v-model="config.dirType" label="FIXED">{{i18n.useFixedName}}</el-radio>
+                    </div>
+                    <el-input id="fixed-dir-input" v-model="config.fixedDir" :disabled="config.dirType != 'FIXED'">
+                    </el-input>
+                </div>
+                <div class="m2-module" id="shortkey">
+                    <h3>{{i18n.shortkeySettings}}</h3>
+                    <div class="cb-union">
+                        <el-checkbox v-model="config.enableShortkey">{{i18n.enableShortkey}}</el-checkbox>
+                    </div>
+                    <div class="m2-input-union">
+                        <div class="u-label">{{i18n.currentTab}}</div>
+                        <el-input v-model="shortKeyCurrent" :placeholder="i18n.canceled"
+                            :disabled="!config.enableShortkey">
+                            <span slot="prefix">Alt&nbsp;+&nbsp</span>
+                        </el-input>
+                    </div>
+                    <div class="m2-input-union">
+                        <div class="u-label">{{i18n.allTabs}}</div>
+                        <el-input v-model="shortKeyAll" :placeholder="i18n.canceled" :disabled="!config.enableShortkey">
+                            <span slot="prefix">Alt&nbsp;+&nbsp</span>
+                        </el-input>
+                    </div>
+                </div>
+            </el-tab-pane>
+            <el-tab-pane :label="i18n.highResolution">
+                <div id="user-rules">
+                    <h3>{{i18n.customRules}}</h3>
+                    <el-table :data="userRules" border style="width: 100%">
+                        <el-table-column :label="i18n.ruleName" width="180">
+                            <template slot-scope="scope">
+                                <el-input type="textarea" v-model="scope.row.site"></el-input>
+                            </template>
+                        </el-table-column>
+                        <el-table-column :label="i18n.matchRegularExpression">
+                            <template slot-scope="scope">
+                                <el-input type="textarea" v-model="scope.row.srcPattern"></el-input>
+                            </template>
+                        </el-table-column>
+                        <el-table-column :label="i18n.replacedWith">
+                            <template slot-scope="scope">
+                                <el-input type="textarea" v-model="scope.row.replaceRule"></el-input>
+                            </template>
+                        </el-table-column>
+                        <el-table-column :label="i18n.operation" width="180">
+                            <template slot-scope="scope">
+                                <el-button size="mini" @click="test(scope.row)">{{i18n.test}}</el-button>
+                                <el-button size="mini" @click="deleteRule(scope.row)">{{i18n.delete}}</el-button>
+                            </template>
+                        </el-table-column>
+                    </el-table>
+                    <div class="btns">
+                        <el-button @click="addRule" class="btn btn-default btn-sm">{{i18n.add}}</el-button>
+                        <el-button @click="saveRules" class="btn btn-primary btn-sm">{{i18n.save}}</el-button>
+                    </div>
+                </div>
+                <div id="common-rules">
+                    <h3>{{i18n.commonRules}}</h3>
+                    <el-table :data="commonRules" border style="width: 100%">
+                        <el-table-column prop="site" :label="i18n.ruleName" width="180">
+                        </el-table-column>
+                        <el-table-column prop="srcPattern" :label="i18n.matchRegularExpression">
+                        </el-table-column>
+                        <el-table-column prop="replaceRule" :label="i18n.replacedWith">
+                        </el-table-column>
+                        <el-table-column :label="i18n.operation" width="180">
+                            <template slot-scope="scope">
+                                <el-button size="mini" @click="test(scope.row)">{{i18n.test}}</el-button>
+                                <el-checkbox v-model="scope.row.enabled" @change="saveCommonRules">{{i18n.enable}}
+                                </el-checkbox>
+                            </template>
+                        </el-table-column>
+                    </el-table>
+                </div>
+
+            </el-tab-pane>
+            <el-tab-pane :label="i18n.smartScript" :lazy="true">
+                <ul>
+                    <li :id="'s_'+script.id" :key="script.id" class="script-item" v-for="script in aiscripts">
+                        <h5>
+                            <img class="ico" :src="script.ico" />{{script.name}}
+                            <div class="options">
+                                <el-checkbox :id="'cb-'+script.id" :checked="script.status == 'enabled'"
+                                    @change="function(checked){switchAiScript(checked, script.id)}">{{i18n.enable}}
+                                </el-checkbox>
+                            </div>
+                        </h5>
+                        <p>{{script.description}}</p>
+                        <el-button v-if="script.latest" size="mini" @click="updateScript(script)">{{i18n.update}}
+                        </el-button>
+                        <el-button v-if="script.updated" size="mini" disabled>{{i18n.updated}}</el-button>
+                    </li>
+                </ul>
+            </el-tab-pane>
+            <el-tab-pane :label="i18n.liftDownloadLimition">
+                <div class="unlock-download-limit-wrapper">
+                    <div>
+                        <div class="add-wrapper">
+                            <el-input :placeholder="i18n.liftLimitionPlaceholder" v-model="addingDomain"></el-input>
+                            <el-button @click="addDomain">{{i18n.confirm}}</el-button>
+                        </div>
+                        <div v-if="config.needBlobDomains.length > 0">
+                            <h3>{{i18n.enabledList}}</h3>
+                            <ul>
+                                <li :key="domain" v-for="domain in config.needBlobDomains" class="domain-item">
+                                    <div> {{domain}} </div>
+                                    <el-button icon="el-icon-close" type="text" @click="removeDomain(domain)">
+                                    </el-button>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div>
+                        <h3>{{i18n.LiftingDownloadRestrictions}}</h3>
+                        <p>{{i18n.LiftingDownloadRestrictionsDesc1}}</p>
+                        <p>{{i18n.LiftingDownloadRestrictionsDesc2}}</p>
+                        <p>{{i18n.LiftingDownloadRestrictionsDesc3}}</p>
+                        <h3>{{i18n.scenesToBeUsed}}</h3>
+                        <ul>
+                            <li>
+                                <p>{{i18n.ImageDownloadFailed}}</p>
+                                <img src="/img/download-permitted.jpg" alt="">
+                            </li>
+                            <li>
+                                <p>{{i18n.ProhibitionOfExternalLinks}}</p>
+                                <img style="width: 100%;" src="/img/download-permitted2.jpg" alt="">
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+            </el-tab-pane>
+        </el-tabs>
+    </div>
+    <script src="../lib/lodash.min.js"></script>
+    <script src="../lib/vue.min.js"></script>
+    <script src="../lib/vue-element/index.js"></script>
+    <script src="../js/utils.js"></script>
+    <script src="../js/tj.js"></script>
+    <script src="../js/config.js"></script>
+    <script src="../js/appConfig.js"></script>
+    <script src="../js/aiscripts.js"></script>
+    <script src="../js/bigImgParser.js"></script>
+    <script src="../components/Header.js"></script>
+    <script src="settings.js"></script>
+</body>
+
+</html>

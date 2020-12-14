@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="content-language" content="zh-CN">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="../css/smoothness/jquery-ui-1.10.3.custom.min.css" />
+    <link rel="stylesheet" href="../vue-com/coms.css">
+    <link rel="stylesheet" href="output.css">
+    <link rel="stylesheet" href="../lib/vue-element/index.css">
+    <link id="favico" rel="shortcut icon" href="../icon-small.png" type="image/x-icon">
+    <script src="../js/wheel.js"></script>
+    <script src="../lib/vue.min.js"></script>
+    <script src="../lib/vue-element/index.js"></script>
+    <script src="../components/Header.js"></script>
+</head>
+
+<body>
+    <div id="app" v-cloak :style="'min-width:'+ minInnerWidth+'px;'">
+        <div class="fixed-top">
+            <f-header :brand="brand" :i18n="i18n" :gConfig="gConfig">
+                <el-button @click="download" size="small" type="primary" icon="el-icon-download"
+                    :disabled="downloader.status.match('started|resumed')">{{i18n.download}}</el-button>
+                <el-button @click="pauseDownload" size="small"
+                    :disabled="downloader.status.match('not-inited|complete')">
+                    {{downloader.status == 'paused'? i18n.resume: i18n.pause}}</el-button>
+                <el-button @click="toggle" size="small">{{i18n.toggle}}</el-button>
+                <el-button @click="selectAll" size="small">{{i18n.selectAll}}</el-button>
+                <div class="slide-num">
+                    <span class="slice-label">{{i18n.width}}: </span>
+                    <el-slider v-model="widthRange" range @change="saveWidthRange" :max="maxWidth">
+                    </el-slider>
+                </div>
+                <div class="slide-num">
+                    <span class="slice-label">{{i18n.height}}: </span>
+                    <el-slider v-model="heightRange" range @change="saveHeightRange" :max="maxHeight">
+                    </el-slider>
+                </div>
+                <el-button :icon="config.showMore?'el-icon-caret-top':'el-icon-caret-bottom'"
+                    style="float: right;margin-left: 10px; margin-top: 4px;" size="small"
+                    @click="config.showMore = !config.showMore"></el-button>
+                <div id="pic-num-tips">
+                    <span id="selected-num"> {{i18n.selected}} : {{selectedImgs.length}} / </span>
+                    <span id="total-num">{{i18n.total}} : {{showImgList.length}} / </span>
+                    <span id="downloaded-num" class="hide-in-qqbrowser">{{i18n.downloaded}} :
+                        {{downloadedImgs.length}}</span>
+                </div>
+            </f-header>
+            <div id="filter-size" class="module" v-if="config.showMore">
+                <div id="filter-url" class="module">
+                    <el-input size="mini" :placeholder="i18n.urlfilterPlaceholder" @focus="filterInputFocused = true"
+                        @blur="filterInputFocused = false" v-bind:class="{'input-focused': filterInputFocused}"
+                        v-model="urlfilter">
+                    </el-input>
+                    <el-select v-model="selectedTabs" multiple collapse-tags style="margin-left: 10px;"
+                        :placeholder="i18n.filterByPage">
+                        <el-option v-for="item in startedTabs" :key="item.id" :label="item.shortTitle" :value="item.id">
+                            <img :src="item.favIconUrl" alt="">
+                            <span>{{item.shortTitle}}</span>
+                        </el-option>
+                    </el-select>
+                </div>
+                <div id="rename-wrapper">
+                    <el-input size="mini" :disabled="!needRename && false" @focus="showRenameDialog = true"
+                        :placeholder="i18n.pleaseInput"
+                        :value="needRename?(renameRule || config.defaultConfig.renameRule): ''">
+                        <template slot="prepend">{{i18n.rename}}</template>
+                        <i slot="suffix" class="el-input__icon el-icon-edit" @click="showRenameDialog = true"></i>
+                    </el-input>
+
+                </div>
+                <el-dialog :title="i18n.rename" :visible.sync="showRenameDialog" :append-to-body="true" width="30%">
+                    <el-input v-model="renameRule" :placeholder="config.defaultConfig.renameRule">
+
+                        <template slot="prepend">
+                            <el-switch v-model="needRename">
+                            </el-switch>
+                        </template>
+                        <i slot="suffix" class="el-input__icon el-icon-close" @click="renameRule = ''"></i>
+                    </el-input>
+                    <div>
+                        <div style="display: flex;justify-content: space-between;">
+                            <p>
+                                {NO} 序号；{EXT} 后缀名；{NAME} 原文件名；{PAGETITLE} 页面标题;
+                            </p>
+                            <el-button @click="showRenameRuleDetail = !showRenameRuleDetail" type="text">
+                                {{showRenameRuleDetail?'收起详情':'详情'}}</el-button>
+                        </div>
+                        <p v-if="showRenameRuleDetail">
+                            pic_{NO001}.{EXT}</br>
+                            按这个格式来，{EXT}不要动就会保留图片本身的后缀名</br>
+                            "pic_"可以改成你想要的</br>
+                            可以使用以下变量:
+                            {NO}表示序号；{NO01}、{NO001}表示序号前面补0依次类推；{EXT}表示扩展名；{NAME}表示原文件名；{PAGETITLE}表示页面标题"</br>
+                            比如有dongman.jpg ， meijing.gif 2张图片</br>
+                            pic_{NO001}.{EXT}会重命名为</br>
+                            pic_001.jpg pic_002.gif</br>
+                            {NAME}_{NO001}.{EXT}会重命名为</br>
+                            dongman_001.jpg meijing_002.gif</br>
+                        </p>
+                    </div>
+                </el-dialog>
+                <el-button @click="resetFilter" size="small">{{i18n.reset}}</el-button>
+                <el-button @click="exportLinks" size="small" icon="el-icon-link">{{i18n.exportLinks}}</el-button>
+                <el-button @click="changeView" size="small" class="img-button">
+                    <img src="icons/icon_view.png" class="btn-img"></img><span class="btn-text">{{i18n.view}}</span>
+                </el-button>
+                <div id="btn-sort" @click="showSort = !showSort">
+                    <el-button class="img-button" size="small">
+                        <img src="icons/icon_order.png" class="btn-img"></img><span
+                            class="btn-text">{{i18n.sort}}</span>
+                    </el-button>
+                    <div id="sort-wrapper" v-bind:class="{active: showSort}">
+                        <div class="sort-item" v-bind:class="{selected: sortType == 'default'}"
+                            data-tj-btn="sort-by-default" @click.stop="sortBy('default')">
+                            <span></span>{{i18n.sortByDefault}}</div>
+                        <!--<div class="sort-item" v-bind:class="{selected: sortType == 'site'}"-->
+                        <!--data-tj-btn="sort-by-site"-->
+                        <!--@click.stop="sortBy('site')"><span></span>按网站排序</div>-->
+                        <div class="sort-item" v-bind:class="{selected: sortType == 'bigFirst'}"
+                            data-tj-btn="sort-by-big-first" @click.stop="sortBy('bigFirst')">
+                            <span></span>{{i18n.sortByBigFirst}}</div>
+                        <div class="sort-item" v-bind:class="{selected: sortType == 'smallFirst'}"
+                            data-tj-btn="sort-by-small-first" @click.stop="sortBy('smallFirst')">
+                            <span></span>{{i18n.sortBySmallFirst}}</div>
+                    </div>
+                </div>
+                <div id="preview-size">
+                    <span>{{i18n.previewSize}}</span>
+                    <el-radio v-model="config.previewSize" label="small">{{i18n.previewSizeSmall}}</el-radio>
+                    <el-radio v-model="config.previewSize" label="big">{{i18n.previewSizeBig}}</el-radio>
+                </div>
+                <div id="preview-pagination"
+                    v-if="groups.length == 0 && showImgList.length > pageSize && viewModel == 'normal'">
+                    <span>{{i18n.pagination}}</span>
+                    <el-switch v-model="config.pagination">
+                    </el-switch>
+                </div>
+            </div>
+        </div>
+        <div id="main-content" v-bind:class="{'big-view': bigView}" :style="'height:'+mainContentHeight+'px;'">
+            <div id="pic-list" class="group-pic-list" v-if="groups.length > 1" :style="'width:'+picListWidth+'px;'">
+                <div v-for="(group, groupIndex) in groupedImgs">
+                    <div class="group-header">
+                        <div class="group-title">{{group.title}}</div>
+                        <div>
+                            <el-checkbox :checked="true" @change="function(value){groupSelected(groupIndex, value)}">
+                            </el-checkbox>
+                            <el-button size="small" @click="downloadGroup(groupIndex)">下载</el-button>
+                        </div>
+                    </div>
+                    <div :id="item.id" class="img-item" v-bind:class="{selected: item.selected}"
+                        @click="itemClick(item)" :data-index="index" v-for="(item, index) in group.imgs">
+                        <svg class="icon status" aria-hidden="true" v-if="item.status == 'complete'">
+                            <use xlink:href="#icon-check-circle"></use>
+                        </svg>
+                        <div class="url-wrapper" v-if="config.showUrl">{{item.bigUrl}}</div>
+                        <div class="img-wrapper" v-if="item.type == 'IMG'">
+                            <img :src="item.blobUrl || item.smallUrl" alt="" :data-original-url="item.originalUrl">
+                            <div class="img-size">
+                                <span>{{item.width+'x'+item.height}}</span>
+                                <!--<span :class="'hide-in-qqbrowser status status-'+item.status">{{item.status}}</span>-->
+                            </div>
+                        </div>
+                        <div class="video-wrapper" v-if="item.type == 'VIDEO'">
+                            <video :src="item.originalUrl" controls></video>
+                        </div>
+                        <div class="btns" v-bind:class="{'v-btns': item.type=='VIDEO'}">
+                            <div v-if="item.type == 'IMG'" class="btn" id="btn-view-big"
+                                @click.stop="viewBig(index, group.imgs)">
+                                <div class="icon"></div>
+                            </div>
+                            <div class="btn" id="btn-weibo" @click.stop="share(item)">
+                                <div class="icon"></div>
+                            </div>
+                            <div class="btn" id="btn-link"
+                                @click.stop="openLink(item.type == 'IMG'?item.bigUrl: item.originalUrl)">
+                                <div class="icon"></div>
+                            </div>
+                            <div class="btn" id="btn-download-single" @click.stop="downloadSingle(item)">
+                                <div class="icon"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div v-else id="pic-list" v-bind:class="{spread: viewModel == 'spread'}"
+                :style="'width:'+picListWidth+'px;'">
+                <div :id="item.id" class="img-item" v-bind:class="{ selected: item.selected  }" v-bind:style="itemStyle"
+                    v-for="(item, index) in currentPageImgs" @click="itemClick(item)" :data-index="index">
+                    <svg class="icon status" aria-hidden="true" v-if="item.status == 'complete'">
+                        <use xlink:href="#icon-check-circle"></use>
+                    </svg>
+                    <div class="url-wrapper" v-if="config.showUrl">{{item.bigUrl}}</div>
+                    <div class="img-wrapper" v-if="item.type == 'IMG'">
+                        <img :src="item.blobUrl || item.smallUrl" alt="" :data-original-url="item.originalUrl">
+                        <div class="img-size">
+                            <span>{{item.width+'x'+item.height}}</span>
+                            <!--<span :class="'hide-in-qqbrowser status status-'+item.status">{{item.status}}</span>-->
+                        </div>
+                    </div>
+                    <div class="video-wrapper" v-if="item.type == 'VIDEO'">
+                        <video :src="item.originalUrl" controls></video>
+                    </div>
+                    <div class="btns">
+                        <div class="btn" id="btn-view-big" @click.stop="viewBig(index)">
+                            <div class="icon"></div>
+                        </div>
+                        <div class="btn" id="btn-weibo" @click.stop="share(item)">
+                            <div class="icon"></div>
+                        </div>
+                        <div class="btn" id="btn-link" @click.stop="openLink(item.bigUrl)">
+                            <div class="icon"></div>
+                        </div>
+                        <div class="btn" id="btn-download-single" @click.stop="downloadSingle(item)">
+                            <div class="icon"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div v-if="groups.length == 0" id="footer-pagination">
+            <el-pagination v-if="config.pagination && viewModel == 'normal' && showImgList.length > pageSize"
+                :current-page="currentPage" :page-size="pageSize" :pager-count="11" layout="prev, pager, next"
+                :total="showImgList.length" @current-change="changePage" :hide-on-single-page="true">
+            </el-pagination>
+        </div>
+        <div id="outputTextPanel" class="pop" v-if="showOutputTextPanel">
+            <div class="output-header">
+                <span data-msg="export_format">{{i18n.format}}</span>:
+                <el-input size="mini" v-model="outputTextFormat"></el-input>
+                <el-button size="mini" @click="closeLinksPanel">{{i18n.close}}</el-button>
+                <el-button size="mini" @click="resetOutputTextFormat">{{i18n.reset}}</el-button>
+            </div>
+            <el-input type="textarea" :value="outputText"></el-input>
+        </div>
+        <el-dialog :title="i18n.saveTipsDialogTitle" :visible.sync="showSaveTips" width="30%"
+            :before-close="saveTipsClose">
+            <span>{{i18n.saveTips}}</span>
+            </br>
+            </br>
+            <el-checkbox v-model="saveTipsDoNotShowAgain">{{i18n.doNotShowAgain}}</el-checkbox>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="showSaveTips = false">{{i18n.tipsCancel}}</el-button>
+                <el-button type="primary" @click="saveTipsSave">{{i18n.tipsDone}}</el-button>
+            </span>
+        </el-dialog>
+        <div v-if="config.dragSelect" class="selection" :style="selectionBoxStyling"></div>
+    </div>
+    <script src="../lib/lodash.min.js"></script>
+    <script src="../lib/jQuery.js"></script>
+    <script src="../lib/jquery-ui.custom.min.js"></script>
+    <script src="../lib/dragdrop/excanvas.min.js"></script>
+    <script src="../lib/dragdrop/jquery.event.drag-2.2.js"></script>
+    <script src="../lib/dragdrop/jquery.event.drag.live-2.2.js"></script>
+    <script src="../lib/dragdrop/jquery.event.drop-2.2.js"></script>
+    <script src="../lib/dragdrop/jquery.event.drop.live-2.2.js"></script>
+    <script src="../js/iconfont.js"></script>
+    <script src="../js/utils.js"></script>
+    <script src="../js/tj.js"></script>
+    <script src="../js/config.js"></script>
+    <script src="../js/appConfig.js"></script>
+    <script src="../js/downloader.js"></script>
+    <script src="../js/bigImgParser.js"></script>
+    <script src="../js/item.js"></script>
+    <script src="output.js"></script>
+    <div>
+        <link rel="stylesheet" href="../lib/photoswipe/photoswipe.css">
+        <link rel="stylesheet" href="../lib/photoswipe/default-skin/default-skin.css">
+        <script src="../lib/photoswipe/photoswipe.min.js"></script>
+        <script src="../lib/photoswipe/photoswipe-ui-default.min.js"></script>
+        <div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="pswp__bg"></div>
+            <div class="pswp__scroll-wrap">
+                <div class="pswp__container">
+                    <div class="pswp__item"></div>
+                    <div class="pswp__item"></div>
+                    <div class="pswp__item"></div>
+                </div>
+                <div class="pswp__ui pswp__ui--hidden">
+                    <div class="pswp__top-bar">
+                        <div class="pswp__counter"></div>
+                        <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+                        <button class="pswp__button pswp__button--share" title="Share"></button>
+                        <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+                        <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+                        <div class="pswp__preloader">
+                            <div class="pswp__preloader__icn">
+                                <div class="pswp__preloader__cut">
+                                    <div class="pswp__preloader__donut"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                        <div class="pswp__share-tooltip"></div>
+                    </div>
+
+                    <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+                    </button>
+
+                    <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+                    </button>
+
+                    <div class="pswp__caption">
+                        <div class="pswp__caption__center"></div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</body>
+
+</html>

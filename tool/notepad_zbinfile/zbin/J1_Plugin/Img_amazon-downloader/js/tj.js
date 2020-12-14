@@ -1,0 +1,1 @@
+var tj=function(){var r="",n={},a={};return{commonParams:{},init:function(i,o,f){for(var e in r=i,f)a[e]=f[e];for(var e in o)n[e]=o[e]},send:function(i,o){if(n[i]){var f=[];for(var e in a)f.push(e+"="+a[e]);if(o)for(var e in o)f.push(e+"="+JSON.stringify(o[e]).replace(/^"/,"").replace(/"$/,""));f.push("_="+Date.now());var t=r+n[i]+"?"+f.join("&");(new Image).src=t}}}}();

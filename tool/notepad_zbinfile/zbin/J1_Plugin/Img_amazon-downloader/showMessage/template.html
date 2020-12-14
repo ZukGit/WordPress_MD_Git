@@ -1,0 +1,73 @@
+<template id="temp">
+    <style>
+#message-panel{
+    width: 200px;
+    height: 100px;
+    border: 1px solid #ffce3d;
+    background: #fff;
+    box-shadow: 0px 0px 4px 0px #ffce3d;
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    margin-left: -100px;
+    margin-top: -50px;
+    z-index: 11111111;
+}
+#content{
+    font-size: 16px;
+    text-align: center;
+    padding-top: 20px;
+    color: red;
+}
+#header img{
+    width: 16px;
+    height: 16px;
+}
+#header{
+    overflow: hidden;
+    background: #eee;
+}
+.fl{
+    float: left;
+}
+.fr{
+    float: right;
+}
+.close-btn{
+    cursor: pointer;
+    font-size: 16px;
+}
+.logo{
+    vertical-align: middle;
+}
+.logo img{
+    vertical-align: middle;
+    padding: 0 2px;
+}
+    </style>
+    <div id="message-panel">
+        <div id="header">
+            <div class="fl logo">
+                <img src="@extension-url@icon-small.png" alt="">Fatkun
+            </div>
+            <div class="close-btn fr">×</div>
+        </div>
+        <div id="content">
+            请刷新后重试
+        </div>
+    </div>
+</template>
+<script>
+setTimeout(function(){
+    var host = document.querySelector('body');
+    var root = host.createShadowRoot();
+    var temp = document.querySelector('#temp');
+    var clone = document.importNode(temp.content, true);
+
+    root.appendChild(clone);
+    root.querySelector('.close-btn').addEventListener('click', function(e) {
+        root.querySelector('#message-panel').style.display = 'none';
+    });
+}, 100);
+</script>
+

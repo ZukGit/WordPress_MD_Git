@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="stylesheet" href="/css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="./index.css" />
+        <link id="favico" rel="shortcut icon" href="/icon-small.png" type="image/x-icon">
+    </head>
+    <body>
+        <div id="app" class="container">
+            <div id="installed">
+                <h3>{{i18n.installedScripts}}</h3>
+                <ul>
+                    <li :id="'s_'+script.id" :class="'script-item'+(script.focused? ' focused': '')" v-for="script in installedScripts">
+                        <h5><img class="ico" :src="script.ico" />{{script.name}}</h5>
+                        <p>{{script.description}}</p>
+                        <div>
+                            <button v-if="!script.text" class="btn btn-primary" @click="installScript(script)">{{i18n.install}}</button>
+                            <button v-else class="btn btn-primary" disabled>{{i18n.installed}}</button>
+                            <button v-if="script.text" class="btn btn-primary" @click="removeScript(script)">{{i18n.remove}}</button>
+                            <button v-if="script.latest" class="btn btn-primary" @click="updateScript(script)">{{i18n.update}}</button>
+                            <button v-if="script.updated" class="btn btn-primary" disabled>{{i18n.updated}}</button>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <div id="notInstalled">
+                <h3>{{i18n.notInstalledScripts}}</h3>
+                <ul>
+                    <li :id="'s_'+script.id" :class="'script-item'+(script.focused? ' focused': '')" v-for="script in notInstalledScripts">
+                        <h5><img class="ico" :src="script.ico" />{{script.name}}</h5>
+                        <p>{{script.description}}</p>
+                        <div>
+                            <button v-if="script.text" class="btn btn-primary" disabled>{{i18n.installed}}</button>
+                            <button v-else class="btn btn-primary" @click="installScript(script)">{{i18n.install}}</button>
+                            <button v-if="script.text" class="btn btn-primary" @click="removeScript(script)">{{i18n.remove}}</button>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+        </div>
+        <script type="text/javascript" src="/lib/vue.min.js"></script> 
+        <script type="text/javascript" src="/lib/jQuery.js"></script> 
+        <script type="text/javascript" src="/js/utils.js"></script> 
+        <script type="text/javascript" src="/js/config.js"></script> 
+        <script type="text/javascript" src="./i18n.js"></script> 
+        <script type="text/javascript" src="./index.js"></script> 
+    </body>
+</html>

@@ -1,0 +1,1 @@
+var i18n={zh:{installedScripts:"已安装的脚本",notInstalledScripts:"未安装的脚本",install:"安装",installed:"已安装",remove:"移除",update:"更新",updated:"已更新"},en:{installedScripts:"Installed Scripts",notInstalledScripts:"Not Installed Scripts",install:"Install",installed:"Installed",remove:"Remove",update:"Update",updated:"Updated"}},currentI18n=navigator.language.match("zh")?i18n.zh:i18n.en;

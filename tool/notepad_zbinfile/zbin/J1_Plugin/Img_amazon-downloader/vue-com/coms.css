@@ -1,0 +1,191 @@
+.switcher{
+    width: 32px;
+    height: 14px;
+    background-color: #f4f4f4;
+    position: relative;
+    cursor: pointer;
+}
+.switcher-block{
+    position: absolute;
+    width: 16px;
+    height: 14px;
+    background-color: #cccccc;
+}
+.switcher-on .switcher-block{
+    right: 0;
+    background-color: #ffce3d;
+}
+.switcher-off .switcher-block{
+    left: 0;
+    background-color: #cccccc;
+}
+.u-inline-block{
+    display: inline-block;
+}
+.switcher{
+    float: right;
+}
+
+html, body {
+    padding: 0;
+    margin: 0;
+    background-color: #fff;
+}
+
+.cb-container input {
+display: none; }
+.cb-container{
+    display: inline;
+}
+
+.cb-container span{
+    vertical-align: middle;
+}
+.cb-label {
+    height: 14px;
+    width: 14px;
+    background: #f9f9f9;
+    border: 1px solid #dedede;
+    position: relative;
+    display: inline-block;
+    box-sizing: border-box;
+    transition: border-color ease 0.2s;
+    -moz-transition: border-color ease 0.2s;
+    -o-transition: border-color ease 0.2s;
+    -webkit-transition: border-color ease 0.2s;
+    cursor: pointer;
+    vertical-align: middle;
+}
+.cb-label::before, .cb-label::after {
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    position: absolute;
+    height: 0;
+    width: 2px;
+    background: #fff;
+    display: inline-block;
+    -moz-transform-origin: left top;
+    -ms-transform-origin: left top;
+    -o-transform-origin: left top;
+    -webkit-transform-origin: left top;
+    transform-origin: left top;
+    content: '';
+    -webkit-transition: opacity ease 0.5s;
+    -moz-transition: opacity ease 0.5s;
+transition: opacity ease 0.5s; }
+.cb-label::before {
+    top: 10px;
+    left: 5px;
+    -moz-transform: rotate(-135deg);
+    -ms-transform: rotate(-135deg);
+    -o-transform: rotate(-135deg);
+    -webkit-transform: rotate(-135deg);
+transform: rotate(-135deg); }
+.cb-label::after {
+    top: 6px;
+    left: 0px;
+    -moz-transform: rotate(-45deg);
+    -ms-transform: rotate(-45deg);
+    -o-transform: rotate(-45deg);
+    -webkit-transform: rotate(-45deg);
+transform: rotate(-45deg); }
+
+input[type=checkbox]:checked + .cb-label,
+.cb-label.checked {
+    background: #ffce3d;
+border-color: #ffce3d; }
+input[type=checkbox]:checked + .cb-label::after,
+.cb-label.checked::after {
+    border-color: #fff;
+    height: 4px;
+    -moz-animation: dothabottomcheck 0.2s ease 0s forwards;
+    -o-animation: dothabottomcheck 0.2s ease 0s forwards;
+    -webkit-animation: dothabottomcheck 0.2s ease 0s forwards;
+animation: dothabottomcheck 0.2s ease 0s forwards; }
+input[type=checkbox]:checked + .cb-label::before,
+.cb-label.checked::before {
+    border-color: #fff;
+    height: 10px;
+    -moz-animation: dothatopcheck 0.4s ease 0s forwards;
+    -o-animation: dothatopcheck 0.4s ease 0s forwards;
+    -webkit-animation: dothatopcheck 0.4s ease 0s forwards;
+animation: dothatopcheck 0.4s ease 0s forwards; }
+
+@-moz-keyframes dothabottomcheck {
+    0% {
+    height: 0; }
+    100% {
+height: 5px; } }
+@-webkit-keyframes dothabottomcheck {
+    0% {
+    height: 0; }
+    100% {
+height: 5px; } }
+@keyframes dothabottomcheck {
+    0% {
+    height: 0; }
+    100% {
+height: 5px; } }
+@keyframes dothatopcheck {
+    0% {
+    height: 0; }
+    50% {
+    height: 0; }
+    100% {
+height: 10px; } }
+@-webkit-keyframes dothatopcheck {
+    0% {
+    height: 0; }
+    50% {
+    height: 0; }
+    100% {
+height: 10px; } }
+@-moz-keyframes dothatopcheck {
+    0% {
+    height: 0; }
+    50% {
+    height: 0; }
+    100% {
+height: 10px; } }
+
+/**radio start***/
+
+
+.r-container input[type=radio] {
+visibility: hidden; }
+
+.r-container {
+    position: relative;
+    display: inline-block;
+}
+.r-container label {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    border-radius: 50px;
+    width: 14px;
+    height: 14px;
+    box-sizing: border-box;
+    border: 1px solid #dedede;
+    background: #fff;
+
+}
+
+.r-container label:after {
+    content: '';
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    top: 2px;
+    left: 2px;
+    background: #ffce3d;
+    border-radius: 50px;
+    opacity: 0;
+}
+
+.r-container label:hover::after {
+opacity: 0.3; }
+
+.r-container input[type=radio]:checked + label:after {
+opacity: 1; }

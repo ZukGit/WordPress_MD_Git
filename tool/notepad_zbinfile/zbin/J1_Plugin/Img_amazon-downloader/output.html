@@ -1,0 +1,264 @@
+<!DOCTYPE HTML>
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="stylesheet" type="text/css" href="css/main.css" />
+        <link rel="stylesheet" type="text/css" href="css/smoothness/jquery-ui-1.10.3.custom.min.css" />
+        <link rel="stylesheet" href="../css/bootstrap.min.css">
+        <link id="favico" rel="shortcut icon" href="icon-small.png" type="image/x-icon">
+    </head>
+    <body>
+        <div id="app">
+            <div id="picloud-intro" style="display: none">
+                <div class="zh" style="display: none">
+                    <span>如果你想将图片保存到云端，然后在电脑、手机、Pad以及其他设备上查看，另一个扩展，<a target="_blank" href="https://chrome.google.com/webstore/detail/picloud/bihglmgabibjhgoapmnoddjmmjjpanid">云图在线</a>，将是一个不错的选择。</span>
+                    <a class="btn btn-primary" href="https://chrome.google.com/webstore/detail/picloud/bihglmgabibjhgoapmnoddjmmjjpanid" target="_blank">去看看</a>
+                    <label for="">
+                        不再提示：
+                        <input class="close-picloud-intro" type="checkbox">
+                    </label>
+                    <div>
+                        如果您无法访问谷歌，也可以通过<a href="https://yuntu88.oss-cn-beijing.aliyuncs.com/front/help/index.html" target="_blank">云图在线的帮助页面</a>获取下载链接,
+                        <a class="btn btn-primary" href="https://yuntu88.oss-cn-beijing.aliyuncs.com/front/help/index.html" target="_blank">去看看</a>
+                    </div>
+                </div>
+                <div class="en" style="display: none">
+                    <span>If you want to save pictures to cloud server and view them in PC\Phone\Pad and any other device, another extension, <a target="_blank" href="https://chrome.google.com/webstore/detail/picloud/bihglmgabibjhgoapmnoddjmmjjpanid">picloud</a>, is a good choice.</span>
+                    <a class="btn btn-primary" href="https://chrome.google.com/webstore/detail/picloud/bihglmgabibjhgoapmnoddjmmjjpanid" target="_blank">Check it !</a>
+                    <label for="">
+                        Close this tip：
+                        <input class="close-picloud-intro" type="checkbox">
+                    </label>
+                </div>
+            </div>    
+            <div id="new-feature" style="display: none">
+                <div class="zh" style="display: none">
+                    <span>现在添加了图片标号和拖拽下载图片的新功能，<a target="_blank" href="http://fatkun.static.8fenxiang.com/web/help/index.html#drag-to-download">查看帮助</a></span>
+                    <label for="" style="margin-left:16px;">
+                        不再提示：
+                        <input class="close-new-feature" type="checkbox">
+                    </label>
+                </div>
+                <div class="en" style="display: none">
+                    <span>New features added, 1: Show Number on Image 2: Download Image by Dragging Mouse，<a target="_blank" href="http://fatkun.static.8fenxiang.com/web/help/index-en.html#drag-to-download">Help Page</a></span>
+                    <label for="" style="margin-left:16px;">
+                        Close this tip：
+                        <input class="close-new-feature" type="checkbox">
+                    </label>
+                </div>
+            </div>
+
+            <div class="tools">
+                <div id="filterPanel">
+                    <div class="fl">
+                        <span data-msg="width_short">宽</span>:<div id="minWidthSlider" class="wh_slider"></div><span data-msg="height_short">高</span>:<div id="minHeightSlider" class="wh_slider"></div>
+                        <button id="btnInverse" type="button" class="btn btn-primary" style="margin-left:15px;" @click="inverseSelect"><span  data-msg="inverse">反选</span></button>
+                        <button id="btnMoreOption" class="btn btn-primary" style="margin-left:15px;"><span  data-msg="more_options">选项</span></button>
+                        <button id="btnSave" accesskey="S" title="ALT+S" class="btn btn-primary" style="margin-left:15px;"><span  data-msg="save_image">保存图片</span></button>
+                        <span id="imgnum">{{imgnum}}</span>
+                        <!--空的span导致了换行，不知道为什么-->
+                        <span id="downloaded" style="margin: 0 8px;">{{downloadedNum}}&nbsp;</span>
+                        <button id="btn-stop" class="btn btn-warning" style="margin-left:15px;display:none;"><span>STOP</span></button>
+                        <label for="" style="margin-left:16px;">
+                            <input id="showNumber" type="checkbox" v-model="showNumber" @click="switchShowNumber">
+                            {{i18n.showNumber}}
+                        </label>
+                    </div>
+                    <div id="loadding" class="fl" :style="'display: '+(processLeftNum >0 ? 'block': 'none')"><progress id="main_progress" class="main_progress"></progress></div>
+                    <div class="fr author_link">
+
+                    </div>
+                </div>
+                <div class="clear"></div>
+                <div id="proPanel">
+                    <div class="fl">
+
+                        <span data-msg="filter_link" >链接包含</span>:
+                        <input id="linktxt" type="text" value=""  style="height:28px" :placeholder="i18n.linktxtEnter"/>
+
+
+                    </div>
+                    <div id="sortPanel" class="fl tool_sep">
+                        <span data-msg="sort">排序</span>:
+                        <select id="sortSelect">
+                            <option value="site;asc" data-msg="sort_normal">网页顺序</option>
+                            <option value="whsum;desc" data-msg="sort_big_first">大图在前</option>
+                            <option value="whsum;asc" data-msg="sort_small_first">小图在前</option>
+                        </select>
+                    </div>
+                    <div id="renamePanel" class="fl tool_sep">
+                        <label><input type="radio" name="radioRename" value="1" checked="checked"/><span data-msg="not_rename">不重命名</span></label>
+                        <label title="可以使用一些变量：{NO}表示数字；{EXT}表示扩展名" data-msg-title="rename_tips">
+                            <input type="radio" name="radioRename" value="2"/><span data-msg="rename_by_this_format">按此重命名</span>
+                            <input id="renameRule" type="text" placeholder="pic_{NO001}.{EXT}" value="pic_{NO}.{EXT}"/>
+                        </label>
+                    </div>
+                    <div class="fl tool_sep" style="margin-left:15px;">
+                        <input id="btnOutputTextShow" type="button" value="导出链接" data-msg="export_link" class="btn btn-primary"/>
+                    </div>
+                    <button id="btnView" accesskey="V" title="ALT+V" class="btn btn-primary" style="margin-left:15px;"><span  data-msg="switch_view">切换视图</span></button>
+                </div>
+            </div>
+            <ul id="list" :class="showNumber?'show-number':''">
+                <li :id="item.site" :key="item.site" :class="'img-item selectedimg '+ (item.del?'delimg': '')" :data-index="item.index" v-for="(item, index) in allImgList1" @click="toggleDel(item.index)">
+                    <div :title="i18n.downloaded">
+                        <div class="marks">
+                            <div class="mark">{{item.mark}}</div>
+                            <ul class="repeated-marks">
+                                <li v-for="mark in item.repeatedMarks">
+                                    <div class="mark">{{mark}}</div>
+                                </li>
+                            </ul>
+                        </div>
+                        <svg class="icon status" aria-hidden="true" >
+                            <use xlink:href="#icon-check-circle"></use>
+                        </svg>
+                    </div>
+                    <div v-if="item.type == 'VIDEO'">
+                        <video :src="item.src" class="avideo aimg" :title="chromeI18n.getMessage('aimg_tooltip')" :data-src="item.src" :data-wh="item.width+'x'+item.height" :data-whsum="item.width*item.height" :data-ref="item.ref" :data-site="item.site" :data-index="item.index" controls/>
+                    </div>
+                    <div v-else>
+                        <img :src="item.needBlob? item.dataUrl :(item.smallImg || item.src)" :alt="item.alt" class="aimg" :title="chromeI18n.getMessage('aimg_tooltip')" :data-src="item.src" :data-data-url="item.dataUrl" :data-wh="item.width+'x'+item.height" :data-whsum="item.width*item.height" :data-ref="item.ref" :data-site="item.site" :data-ext="item.ext" :data-need-blob="item.needBlob? '1': ''" :data-index="item.index"/>
+                    </div>
+                    <span class="picurl">{{item.src}}</span>
+                    <span class="info">
+                        <a class="psview-btn simple_tool" @click.stop.prevent="psview(index)">
+                            <svg class="icon" aria-hidden="true" >
+                                <use xlink:href="#icon-fangda"></use>
+                            </svg>
+                        </a>
+                        <img class="share_sina simple_tool" src="../img/sina.png" :title="chromeI18n.getMessage('share_sina')" @click.stop="share(item.src)"/>
+                        <img class="open_link simple_tool" src="../img/link.png" title="Open Image in New Tab" @click.stop="openLink(item.src)">
+                        <span class="wh">{{item.width}}x{{item.height}}</span>
+                    </span>
+                </li>
+            </ul>
+            <ul id="view"></ul>
+            <div id="saveHelp" class="pop">
+                <p><strong><span data-msg="save_tips_do_not_check"></span></strong>
+                <span data-msg="save_tips_download_save_settings"></span>
+                <span data-msg="save_tips">保存提示</span>
+                </p>
+                <p>
+                <a id="chrome_download_settings_link" style="width: 400px; height: 326px;">
+                    <span data-msg="settings_download"></span></a>
+                </p>
+                <p>
+                <label><input id="cbSaveHelp" type="checkbox" /><span data-msg="do_not_show_again">不再提示此消息</span></label>
+                </p>
+                <button id="btnSaveHelpOk" class="btn btn-primary" style="margin-left:15px;"><span data-msg="save_tips_done">保存图片</span></button>
+                <button style="margin-left: 15px;" id="btnSaveHelpCancel" class="btn btn-primary"><span data-msg="save_tips_cancel">取消</span></button>
+            </div>
+
+            <div id="outputTextPanel" class="pop">
+                <span data-msg="export_format">格式</span>: 
+                <input id="outputTextFormat" type="text" value="{LINK}" title="可以使用一些变量：{NO}表示序号；{LINK}表示图片链接"  data-msg-title="export_format_tips"/>
+                <input id="btnOutputTextClose" type="button" value="关闭" data-msg="export_close" class="btn btn-primary" style="margin-left:15px;" />
+                <br/>
+                <textarea id="outputTextArea"></textarea>
+            </div>
+            <div id="ad">
+                <a class="close-btn" href="">×</a>
+                <iframe src="" frameborder="0" allowTransparency="true" scrolling="no"></iframe>
+            </div>
+        </div>
+        <script type="text/javascript" src="lib/jQuery.js"></script> 
+        <script type="text/javascript" src="lib/vue.min.js"></script> 
+        <script type="text/javascript" src="lib/dragdrop/excanvas.min.js"></script> 
+        <script type="text/javascript" src="lib/dragdrop/jquery.event.drag-2.2.js"></script> 
+        <script type="text/javascript" src="lib/dragdrop/jquery.event.drag.live-2.2.js"></script> 
+        <script type="text/javascript" src="lib/dragdrop/jquery.event.drop-2.2.js"></script> 
+        <script type="text/javascript" src="lib/dragdrop/jquery.event.drop.live-2.2.js"></script> 
+        <script type="text/javascript" src="js/iconfont.js"></script> 
+        <script type="text/javascript" src="lib/lodash.min.js"></script> 
+        <script type="text/javascript" src="js/config.js"></script>
+        <script type="text/javascript" src="js/common.js"></script>
+        <script type="text/javascript" src="lib/jquery.tinysort.min.js"></script>
+        <script type="text/javascript" src="lib/jquery-ui.custom.min.js"></script>
+        <script type="text/javascript" src="js/json2.js"></script> 
+        <!-- Core CSS file -->
+        <link rel="stylesheet" href="lib/photoswipe/photoswipe.css"> 
+
+        <!-- Skin CSS file (styling of UI - buttons, caption, etc.)
+            In the folder of skin CSS file there are also:
+            - .png and .svg icons sprite, 
+            - preloader.gif (for browsers that do not support CSS animations) -->
+        <link rel="stylesheet" href="lib/photoswipe/default-skin/default-skin.css"> 
+
+        <!-- Core JS file -->
+        <script src="lib/photoswipe/photoswipe.min.js"></script> 
+
+        <!-- UI JS file -->
+        <script src="lib/photoswipe/photoswipe-ui-default.min.js"></script>
+
+        <!-- Root element of PhotoSwipe. Must have class pswp. -->
+        <div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+            <!-- Background of PhotoSwipe. 
+                It's a separate element as animating opacity is faster than rgba(). -->
+                <div class="pswp__bg"></div>
+
+                <!-- Slides wrapper with overflow:hidden. -->
+                <div class="pswp__scroll-wrap">
+
+                    <!-- Container that holds slides. 
+                        PhotoSwipe keeps only 3 of them in the DOM to save memory.
+                        Don't modify these 3 pswp__item elements, data is added later on. -->
+                        <div class="pswp__container">
+                            <div class="pswp__item"></div>
+                            <div class="pswp__item"></div>
+                            <div class="pswp__item"></div>
+                        </div>
+
+                        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+                        <div class="pswp__ui pswp__ui--hidden">
+
+                            <div class="pswp__top-bar">
+
+                                <!--  Controls are self-explanatory. Order can be changed. -->
+
+                                <div class="pswp__counter"></div>
+
+                                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                                <!-- Preloader demo https://codepen.io/dimsemenov/pen/yyBWoR -->
+                                <!-- element will get class pswp__preloader--active when preloader is running -->
+                                <div class="pswp__preloader">
+                                    <div class="pswp__preloader__icn">
+                                        <div class="pswp__preloader__cut">
+                                            <div class="pswp__preloader__donut"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                                <div class="pswp__share-tooltip"></div> 
+                            </div>
+
+                            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+                            </button>
+
+                            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+                            </button>
+
+                            <div class="pswp__caption">
+                                <div class="pswp__caption__center"></div>
+                            </div>
+
+                        </div>
+
+                </div>
+
+        </div>
+        <script type="text/javascript" src="js/output.js"></script>
+
+    </body>
+</html>

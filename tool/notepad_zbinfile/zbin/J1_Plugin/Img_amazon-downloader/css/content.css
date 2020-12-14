@@ -1,0 +1,47 @@
+#fatkun-dl-all-btn{
+    position: fixed;
+    bottom: 8px;
+    right: 88px;
+    z-index: 99999999;
+    cursor: pointer;
+}
+#fatkun-dl-all-btn:hover {
+    opacity: 0.8;
+}
+.fmark{
+    display: none;
+}
+.show-number .fmark{
+    display: block;
+}
+.fatkun-content{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-50%);
+    width: 188px;
+    text-align: center;
+    display: block;
+}
+.fatkun-content svg{
+    width: 1em;
+    height: 1em;
+    vertical-align: middle;
+    fill: currentColor;
+    overflow: hidden;
+    font-size: 40px;
+    margin-bottom: 20px;
+}
+.fatkun-content .fatkun-title{
+    font-size: 16px !important;
+    font-weight: 500 !important;
+    margin-bottom: 10px !important;
+    color: #fff !important;
+}
+.fatkun-content .fatkun-desc{
+    font-size: 12px !important;
+    font-weight: 400 !important;
+    margin-bottom: 0 !important;
+    line-height: 1.5 !important;
+    color: #fff !important;
+}

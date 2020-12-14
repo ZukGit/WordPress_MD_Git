@@ -1,0 +1,33 @@
+#fatkun-drop-panel{
+    position: fixed;
+    top: -9999999999px;
+    z-index: 2147483647;
+    background: #409EFF;
+    overflow: hidden;
+    border-radius: 5px;
+    color: #fff;
+    font-family: -apple-system, BlinkMacSystemFont, Helvetica, Arial, sans-serif;
+    font-weight: 400;
+    z-index: 2147483647;
+    transition: opacity 0.2s cubic-bezier(0.6, 0, 0.4, 1) 0s, transform 0.2s ease-in-out 0s;
+}
+#fatkun-drop-panel-inner{
+    width: 206px;
+    height: 206px;
+    margin: 16px;
+    border: 1px dashed #fff;
+    border-radius: 5px;
+}
+#fatkun-drop-panel-close-btn{
+    display: block;
+    width: 24px;
+    height: 24px;
+    position: absolute;
+    right: 0px;
+    top: 0px;
+    font-size: 16px;
+    color: #fff;
+    text-align: center;
+    text-decoration: none;
+    line-height: 24px;
+}

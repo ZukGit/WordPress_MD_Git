@@ -1,0 +1,31 @@
+@import url("custom.css");*{font-family:"Segoe UI Symbol","微软雅黑","宋体","Arial","sans-serif"}
+body{overflow-y:scroll;background:url('../images/overlay.png');min-height:100%;margin:0}
+body::-webkit-scrollbar{width:8px}
+body::-webkit-scrollbar-track{background:#ccc}
+body::-webkit-scrollbar-thumb{background:#999}
+#header{min-height:0;background:#fff;border-bottom:2px solid #666;box-shadow:0 1px 6px 0 rgba(32,33,36,0.28);-moz-user-select:-moz-none;-khtml-user-select:none;-webkit-user-select:none;-ms-user-select:none;user-select:none}
+#menu{display:none;float:left;padding:5px;width:820px}
+#menu .btn-toolbar{margin-left:0}
+#filter_menu_type .btn,#filter_menu_size .btn,#filter_menu_regexp input{margin-bottom:5px}
+#filter_menu_regexp input{width:400px}
+.regexp_error{background:#fcc}
+#partner_show{overflow:hidden}
+#header-container{background:#f9f9f9;border-bottom:1px solid #999;padding:5px}
+#image_summary{overflow:hidden}
+#image_summary label{margin:1px 0}
+#pullywood_production{float:right;text-align:right}
+#popup_user_info{display:inline}
+#cboxContent,#cboxLoadedContent,#cboxLoadingOverlay{background:0;padding:0}
+#menu_switch .btn-group:nth-of-type(2){margin-left:32px}
+#ext_main{text-align:center;padding:10px;-moz-user-select:-moz-none;-khtml-user-select:none;-webkit-user-select:none;-ms-user-select:none;user-select:none}
+.ext_page_input{display:inline-block;margin:0 6px;padding:0 6px}
+.imageItem{display:inline-block;overflow:hidden;margin:10px;border:3px solid rgba(255,255,255,0);border-radius:4px;padding:2px;vertical-align:middle;text-align:center;text-decoration:none}
+.imageItem:hover{border:3px solid #0a0;box-shadow:#9f0 0 0 8px 0;text-decoration:none}
+.imageItem img{max-width:256px;max-height:256px;display:inline-block;vertical-align:middle;padding:0;margin:0 auto}
+.imageItem .imageItemResolution{line-height:20px;margin-top:-20px;background:rgba(118,185,0,0.8);color:#fff;position:relative;display:none}
+.selected,.preSelect{border:3px solid #0a0;background-color:#fff;box-shadow:#9f0 0 0 8px 0}
+.preUnSelect{border:3px solid #eee}
+.colorboxSelect{box-shadow:0 0 64px #6f0}
+#empty{margin:20px auto}
+.blobModeSwitchContainer{padding:0 0 0 50px}
+.continuousSwitchContainer{padding:0 5px 0 5px}

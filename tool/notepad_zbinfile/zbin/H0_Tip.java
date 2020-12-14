@@ -6,6 +6,7 @@ public class H0_Tip {
     static String OneLine = "════════";
 
     static String User_Home = System.getProperties().getProperty("user.home");
+    static String zbinPath = System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin";
 
     enum OS_TYPE {
         Windows,
@@ -44,6 +45,7 @@ public class H0_Tip {
             WindowsFilePathTip();  // 文件快捷方式提示
             NotePadCommand();
             Linux_BashTip();
+            Chrome_Tip();
             Security_File_Tip();
         }else if (CUR_OS_TYPE == OS_TYPE.Linux){
             Linux_BashTip();
@@ -123,6 +125,20 @@ public class H0_Tip {
 
     //
 
+
+    static void Chrome_Tip(){
+
+        PrintHead_End(" Chrome_Tip 插件 Begin  ");
+        System.out.println("Chrome插件安装位置( Windows 路径空格):\n  "+User_Home+ File.separator+"AppData\\Local\\Google\\Chrome\\User Data\\Default\\Extensions");
+        System.out.println("Chrome插件安装位置( Linux ):\n  zzfile_3.sh  \""+User_Home+ File.separator+".config/google-chrome1/Default/Extensions/\"");
+        System.out.println("Chrome插件安装位置( MacOS 路径空格):\n  zzfile_3.sh  "+User_Home+ File.separator+"Library/Application Support/Google/Chrome/Default/Extensions/");
+        System.out.println();
+        System.out.println("Chrome插件备份地址:\n  zzfile_3.bat  "+zbinPath+File.separator+"J1_Plugin      【插件】【脚本】【书签】 先安装 AA_get-crx 方便插件安装");
+        PrintHead_End("   Chrome_Tip 插件 Begin   End  ");
+    }
+
+
+
     static void Linux_BashTip(){
 
         PrintHead_End("  Linux 下 Shell 设置 Begin  ");
@@ -190,7 +206,7 @@ public class H0_Tip {
     static void Security_File_Tip(){
 
         PrintHead_End(" 文件加密解密操作 Begin    ");
-        System.out.println("________________________ 加密批量操作 ________________________ ");
+        System.out.println("________________________ MP4 加密批量操作 ________________________ ");
         System.out.println("1. 先对当前文件内容进行改名    zrule_apply_G2.bat *_18 ");
         System.out.println("2. 对当前文件夹下的文件进行加密 生成 bad_batch 加密文件夹  zrule_apply_G2.bat #_7_bad_batch ");
         System.out.println("3. 进入 bad_batch 加密文件夹   cd ./bad_batch ");
@@ -200,7 +216,7 @@ public class H0_Tip {
         System.out.println(" zrule_apply_G2.bat *_18  .mp4   &&   zrule_apply_G2.bat #_7_bad_batch && cd ./bad_batch  && zrule_apply_G2.bat *_19 &&  zrule_apply_G2.bat #_9  7z_7疫z   &&   zzfile_3.bat");
 
         System.out.println("");
-        System.out.println("________________________ 解密批量操作 ________________________ ");
+        System.out.println("________________________ MP4 解密批量操作 ________________________ ");
         System.out.println("1.对当前文件中 后缀是包含中文的文件进行修复    zrule_apply_G2.bat  #_8");
         System.out.println("2.对当前的压缩文件进行解压缩  zzip_H5.bat 752025 zukgit11");
         System.out.println("3.对解压缩出来的文件进行解密   zrule_apply_G2.bat *_7_good_batch  ");
@@ -208,6 +224,12 @@ public class H0_Tip {
         System.out.println("5.对解压的文件搜索输出快捷方式文件夹  zrule_apply_G2.bat *_14  .mp4  .avi   .wmv .rmvb  .flv .3gp");
         System.out.println("6.打开当前文件    zzfile_3.bat ");
         System.out.println("zrule_apply_G2.bat  #_8   &&   zzip_H5.bat 752025 zukgit11  &&  zrule_apply_G2.bat *_7_good_batch  && cd ./good_batch && zzfile_3.bat ");
+
+        System.out.println();
+        System.out.println();
+        System.out.println("________________________ jpg png webp 加密 解密 批量操作 ________________________ ");
+        System.out.println(" zrule_apply_G2.bat *_18  .jpg   && zrule_apply_G2.bat *_18  .png  && zrule_apply_G2.bat *_18  .webp  &&   zrule_apply_G2.bat #_7_bad_batch       【对img改名并加密】");
+        System.out.println(" zrule_apply_G2.bat *_7_good_batch     【对加密文件解密】");
         PrintHead_End(" 文件加密解密操作 End    ");
     }
 

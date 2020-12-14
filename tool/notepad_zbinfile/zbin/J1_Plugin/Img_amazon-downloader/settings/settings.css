@@ -1,0 +1,91 @@
+[v-cloak]{
+    display: none;
+}
+body{
+    margin: 0;
+}
+ul{
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+li{
+    list-style: none;
+}
+.script-item{
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+    position: relative;
+}
+.script-item button{
+    position: absolute;
+    right: 10px;
+    bottom: 20px;
+}
+.script-item.focused{
+    border: 2px solid red;
+}
+.download-confirm .el-button--text{
+    color: #606266;
+}
+.download-confirm .el-button--text:hover{
+    color: #303133;
+}
+h5 .ico{
+    width: 16px;
+    height: 16px;
+    margin-right: 4px;
+    vertical-align: middle;
+}
+.options{
+    float: right;
+}
+.options label{
+    margin-bottom: 0;
+}
+#shortkey .el-input--prefix{
+    line-height: 40px;
+}
+#shortkey .el-input__inner{
+    padding-left: 36px;
+}
+.u-label, .cb-union, .radio-union {
+    margin: 8px 0;
+}
+.unlock-download-limit-wrapper{
+    display: flex;
+    margin: 20px 0;
+}
+.unlock-download-limit-wrapper>div{
+    margin-right: 20px;
+}
+
+.unlock-download-limit-wrapper .add-wrapper{
+    display: flex;
+}
+.unlock-download-limit-wrapper .add-wrapper .el-input{
+    width: 30em;
+    margin-right: 8px;
+}
+.domain-item{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 16px;
+}
+.domain-item:nth-child(odd){
+    background: #e8eef6;
+}
+#drag-download-mode{
+    margin: 12px;
+}
+.el-checkbox__label{
+    color: inherit !important;
+}
+.el-radio__label{
+    color: inherit !important;
+}
+.el-tabs__content{
+    height: calc(100vh - 80px);
+    overflow: auto;
+}

@@ -1,0 +1,41 @@
+{
+"update_url": "https://clients2.google.com/service/update2/crx",
+
+  "manifest_version": 2,
+  "content_security_policy": "script-src  'self' https://www.google-analytics.com/analytics.js; object-src   'self'",
+  "name": "Highlighty: Search, Find, Multi-Highlight",
+  "version": "1.26",
+  "description": "Searching and highlighting multiple words on the web was never this easy. It's the most efficient finder and highlighter out there.",
+  "icons": {
+    "128": "./images/icon128.png",
+    "48": "./images/icon48.png",
+    "16": "./images/icon16.png"
+  },
+  "author": "K.S.",
+
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "exclude_matches": [
+        "https://sentry.io/organizations/*",
+        "https://analytics.google.com/*",
+        "https://console.cloud.google.com/*",
+        "https://docs.google.com/spreadsheets/*"
+      ],
+
+      "js": [
+        "./dependencies/mark.es6.min.js",
+        "./dependencies/jquery-3.5.1.js",
+        "./dependencies/notify.min.js",
+        "./js/content.bundle.js"
+      ]
+    }
+  ],
+  "browser_action": {
+    "default_popup": "./html-css/highlighter_popup.html",
+    "default_title": "Highlighty",
+
+    "default_icon": "./images/icon128.png"
+  },
+  "permissions": ["storage"]
+}

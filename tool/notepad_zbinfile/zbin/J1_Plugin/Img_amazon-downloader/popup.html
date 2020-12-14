@@ -1,0 +1,125 @@
+<!DOCTYPE HTML>
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <link rel="stylesheet" type="text/css" href="css/buttons.css" />
+
+        <link rel="stylesheet" href="../css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="css/popup.css" />
+    </head>
+    <body>
+        <div class="container">
+            <div class="box">
+                <button id="btnGetAllTab" class="btn btn-primary"><span data-msg="all_tab">所有标签</span></button>
+                <button id="btnGetCurrentTab" class="btn btn-primary" style="margin-left:20px;"><span data-msg="active_tab">当前标签</span></button>
+            </div>
+            <details class="details">
+                <summary class="panel-title"><span data-msg="open_multiple_page" >打开多个页面？</span></summary>
+                <div class="box">
+                    <textarea id="textPage" cols="30" rows="10" placeholder="可以填写多行，可以用通配符[01-10]表示第01到10页，例如：            http://abc.com?page=[1-4,a-z]" data-msg="open_multiple_page_tips" data-msg-attr="placeholder"></textarea>
+                    <div>
+                        <button id="btnOpenPage" class="btn btn-primary"><span data-msg="open_multiple_page_action">打开页面</span></button>
+                    </div>
+
+                </div>
+            </details>
+
+
+
+            <p class="tips">
+            <div class="zh">
+                <span>在页面按快捷键Alt</span> + 
+                <select class="hotkey"></select>获取当前标签图片
+            </div>
+            <div class="en">
+                <span>Short Key: Alt + </span>
+                <select class="hotkey"></select>
+            </div>
+            </p>
+            <div id="bg_more">
+                <div class="zh" style="display: none" title="如果有图片下载不到可以尝试勾选此项，需要*刷新页面*才能看到效果">
+                    <label for="">
+                        <input type="checkbox">
+                        <span>高级模式</span>
+                    </label>
+                </div>
+                <div class="en" style="display: none" title="Check this if there are pictures that cannot be downloaded. *Need Refresh Page*">
+                    <label for="">
+                        <input type="checkbox">
+                        <span>Advanced mode</span>
+                    </label>
+                </div>
+            </div>
+            <div id="drag_download">
+                <div class="zh" style="display: none" title="">
+                    <label for="">
+                        <input type="checkbox">
+                        <span>拖拽下载</span>
+                    </label>
+                </div>
+                <div class="en" style="display: none" title="">
+                    <label for="">
+                        <input type="checkbox">
+                        <span>Download Image by Dragging</span>
+                    </label>
+                </div>
+            </div>
+            <div id="aidownload" style="display: none">
+                <label for="">
+                    <input type="checkbox">
+                    <span class="current-domain"></span> <span class="aidownload-status"></span> <span class="aidownload-text"></span>
+                </label>
+            </div>
+            <div id="app" v-cloak>
+                <div id="aiscripts" v-if="aiscripts.length > 0">
+                    <ul>
+                        <li v-for="script in aiscripts">
+                            <span>{{script.name}}</span>
+                            <button v-if="script.text" class="btn btn-sm" disabled>{{i18n.installed}}</button>
+                            <button v-else class="btn btn-primary btn-sm" @click="installScript(script)">{{i18n.install}}</button>
+                            <button v-if="script.text" class="btn btn-sm btn-primary" @click="removeScript(script)">{{i18n.remove}}</button>
+                            <button v-if="script.latest" class="btn btn-primary btn-sm" @click="updateScript(script)">{{i18n.update}}</button>
+                            <button v-if="script.updated" class="btn btn-sm" disabled>已更新</button>
+                            <a :href="'aiscripts/index.html#s_'+script.id" class="btn btn-sm" target="_blank">{{i18n.check}}</a>
+                        </li>
+                    </ul>
+                </div>
+                <div v-else>
+                    {{i18n.noScriptForCurrentPage}}，<a href="aiscripts/index.html" target="_blank">{{i18n.checkOthers}}</a>
+                </div>
+                <div class="feedback">
+                    <h5 style="font-weight:bold;">Feedback</h5><p>
+                    Email: <a id="email" href=mailto:aituxiu@gmail.com>aituxiu@gmail.com</a>
+                    &nbsp;&nbsp;&nbsp;&nbsp;  
+                    QQ: <a id="qq" href="#">2141740095 </a></p>
+                </div>
+                <div id="version">
+                    <div style="float:left">{{i18n.version}}:{{version}}</div>
+                    <div style="float:right" id="new-version" v-if="switchedFromNew">
+                        <button @click="switchToNew" class="btn btn-primary btn-sm">{{i18n.newFatkun}}</button>
+                    </div>
+                </div>
+                <div id="footer">
+                    <div style="float:right">
+                        <a href="https://chrome.google.com/webstore/detail/nnjjahlikiabnchcpehcpkdeckfgnohf/reviews" target="_blank"><span data-msg="five_stars"></span></a>
+                        <a href="../options.html" target="_blank" style="margin-left:6px"><span data-msg="settings"></span></a>    
+                        <a href="http://fatkun.static.8fenxiang.com/web/help/index.html" target="_blank" style="margin-left:6px"><span>Help</span></a>    
+                    </div>
+                </div>
+                <div class="msg" v-if="showSwitchMsg">
+                    <a class="btn btn-close" href="" @click.prevent="showSwitchMsg = false">╳</a>
+                    <span>{{i18n.restartBrowser}}</span>
+                </div>
+            </div>
+        </div>
+        <script type="text/javascript" src="lib/vue.min.js"></script> 
+        <script type="text/javascript" src="lib/jQuery.js"></script> 
+        <script type="text/javascript" src="js/i18n.js"></script>
+        <script type="text/javascript" src="js/aidownload.js"></script>
+        <script type="text/javascript" src="js/config.js"></script>
+        <script type="text/javascript" src="js/common.js"></script>
+        <script type="text/javascript" src="js/utils.js"></script>
+        <script type="text/javascript" src="js/json2.js"></script> 
+        <script type="text/javascript" src="js/popup.js"></script>
+    </body>
+</html>
