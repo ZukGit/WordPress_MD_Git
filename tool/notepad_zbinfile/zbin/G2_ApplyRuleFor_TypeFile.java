@@ -1,3 +1,4 @@
+
 import com.luciad.imageio.webp.WebPReadParam;
 import net.jimmc.jshortcut.JShellLink;
 
@@ -202,7 +203,7 @@ public class G2_ApplyRuleFor_TypeFile {
 
 
         ArrayList<String> inputTypeList ;
-        // zrule_apply_G2.bat  *_14  jpg   把当前所有的jpg格式文件生成快捷方式到 jpg_时间戳 文件夹内
+        // zrule_apply_G2.bat  #_14  jpg   把当前所有的jpg格式文件生成快捷方式到 jpg_时间戳 文件夹内
 
         // 可能从参数输入的 单一文件
         ArrayList<File> inputParamFileList;
@@ -211,7 +212,7 @@ public class G2_ApplyRuleFor_TypeFile {
         boolean isSearchAllFile2CurDirFlag = false;
 
         ExpressTo7z_PassWord_Rule_19() {
-            super("*", 19, 3);
+            super("#", 19, 3);
             inputTypeList = new ArrayList<String>();
             inputParamFileList  = new ArrayList<File>();
         }
@@ -242,7 +243,7 @@ public class G2_ApplyRuleFor_TypeFile {
 
             }
 
-                    z7exeFile = new File(Win_Lin_Mac_ZbinPath+File.separator+"7z"+curOS_ExeTYPE);
+            z7exeFile = new File(Win_Lin_Mac_ZbinPath+File.separator+"7z"+curOS_ExeTYPE);
 
             if(!z7exeFile.exists() || z7exeFile.isDirectory()){
                 System.out.println("当前 7z 压缩程序不存在! 请检查当前的 7z程序 一般位于 Desktop/zbin/win_zbin/  mac_zbin lin_zbin 中  z7exeFile = "+ z7exeFile.getAbsolutePath());
@@ -361,18 +362,18 @@ public class G2_ApplyRuleFor_TypeFile {
 
         @Override
         String simpleDesc() {
-            return   "\n"+Cur_Bat_Name+ " *_19            ### 把当前文件夹下所有文件单独 压缩为 .7z 文件 文件名不变化   密码默认为 752025 !  "+
-                    "\n"+Cur_Bat_Name+ " *_19  mp4          ###  把当前文件夹下 .mp4   单独 压缩为 .7z 文件 文件名不变化   密码默认为 752025 !   "+
-                    "\n"+Cur_Bat_Name+ " *_19  .mp4         ### 把当前文件夹下 .mp4  单独 压缩为 .7z 文件 文件名不变化   密码默认为 752025 !   "+
-                    "\n"+Cur_Bat_Name+ " *_19  .gif         ### 把当前文件夹下 .gif  单独 压缩为 .7z 文件 文件名不变化   密码默认为 752025 !   "+
-                    "\n"+Cur_Bat_Name+ " *_19  png          ### 把当前文件夹下 .png  单独 压缩为 .7z 文件 文件名不变化   密码默认为 752025 !   "+
-                    "\n"+Cur_Bat_Name+ " *_19  zip  7z      ### 把当前文件夹下  .zip  .7z   单独 压缩为 .7z 文件 文件名不变化   密码默认为 752025 !   "+
-                    "\n"+Cur_Bat_Name+ " *_19  .zip .7z     ###  把当前文件夹下  .zip  .7z   单独 压缩为 .7z 文件 文件名不变化   密码默认为 752025 !   "+
-                    "\n"+Cur_Bat_Name+ " *_19  jpg          ###  把当前文件夹下  .jpg   单独压缩为 .7z 文件 文件名不变化   密码默认为 752025 !   "+
-                    "\n"+Cur_Bat_Name+ " *_19  .jpg  .png  .webp .gif                          ### 把当前文件夹下  .jpg  .png  .webp .gif  单独压缩为 .7z 文件 文件名不变化   密码默认为 752025 !   "+
-                    "\n"+Cur_Bat_Name+ " *_19  .mp4  .avi   .wmv .rmvb  .flv .3gp              ### 把当前文件夹下  .mp4  .avi   .wmv .rmvb  .flv .3gp  单独压缩为 .7z 文件 文件名不变化   密码默认为 752025 !   "+
-                    "\n"+Cur_Bat_Name+ " *_19  .jpg  .png  .gif  .webp .mp4 .avi .flv .wmv     ### 把当前文件夹下  .jpg  .png  .gif  .webp .mp4 .avi .flv .wmv  单独压缩为 .7z 文件 文件名不变化   密码默认为 752025 !   "+
-                    "\n"+Cur_Bat_Name+ " *_19  <指定文件A> <指定文件B>          ### 把当前文件夹下 指定文件名称 单独压缩为 .7z 文件 文件名不变化   密码默认为 752025 !   \"+ "
+            return   "\n"+Cur_Bat_Name+ " #_19            ### 把当前文件夹下所有文件单独 压缩为 .7z 文件 文件名不变化   密码默认为 752025 !  "+
+                    "\n"+Cur_Bat_Name+ " #_19  mp4          ###  把当前文件夹下 .mp4   单独 压缩为 .7z 文件 文件名不变化   密码默认为 752025 !   "+
+                    "\n"+Cur_Bat_Name+ " #_19  .mp4         ### 把当前文件夹下 .mp4  单独 压缩为 .7z 文件 文件名不变化   密码默认为 752025 !   "+
+                    "\n"+Cur_Bat_Name+ " #_19  .gif         ### 把当前文件夹下 .gif  单独 压缩为 .7z 文件 文件名不变化   密码默认为 752025 !   "+
+                    "\n"+Cur_Bat_Name+ " #_19  png          ### 把当前文件夹下 .png  单独 压缩为 .7z 文件 文件名不变化   密码默认为 752025 !   "+
+                    "\n"+Cur_Bat_Name+ " #_19  zip  7z      ### 把当前文件夹下  .zip  .7z   单独 压缩为 .7z 文件 文件名不变化   密码默认为 752025 !   "+
+                    "\n"+Cur_Bat_Name+ " #_19  .zip .7z     ###  把当前文件夹下  .zip  .7z   单独 压缩为 .7z 文件 文件名不变化   密码默认为 752025 !   "+
+                    "\n"+Cur_Bat_Name+ " #_19  jpg          ###  把当前文件夹下  .jpg   单独压缩为 .7z 文件 文件名不变化   密码默认为 752025 !   "+
+                    "\n"+Cur_Bat_Name+ " #_19  .jpg  .png  .webp .gif                          ### 把当前文件夹下  .jpg  .png  .webp .gif  单独压缩为 .7z 文件 文件名不变化   密码默认为 752025 !   "+
+                    "\n"+Cur_Bat_Name+ " #_19  .mp4  .avi   .wmv .rmvb  .flv .3gp              ### 把当前文件夹下  .mp4  .avi   .wmv .rmvb  .flv .3gp  单独压缩为 .7z 文件 文件名不变化   密码默认为 752025 !   "+
+                    "\n"+Cur_Bat_Name+ " #_19  .jpg  .png  .gif  .webp .mp4 .avi .flv .wmv     ### 把当前文件夹下  .jpg  .png  .gif  .webp .mp4 .avi .flv .wmv  单独压缩为 .7z 文件 文件名不变化   密码默认为 752025 !   "+
+                    "\n"+Cur_Bat_Name+ " #_19  <指定文件A> <指定文件B>          ### 把当前文件夹下 指定文件名称 单独压缩为 .7z 文件 文件名不变化   密码默认为 752025 !   \"+ "
 
                     ;}
 
@@ -388,7 +389,7 @@ public class G2_ApplyRuleFor_TypeFile {
     class MD_ReName_Rule_18 extends Basic_Rule{
 
         ArrayList<String> inputTypeList ;
-        // zrule_apply_G2.bat  *_14  jpg   把当前所有的jpg格式文件生成快捷方式到 jpg_时间戳 文件夹内
+        // zrule_apply_G2.bat  #_14  jpg   把当前所有的jpg格式文件生成快捷方式到 jpg_时间戳 文件夹内
 
         // 可能从参数输入的 单一文件
         ArrayList<File> inputParamFileList;
@@ -396,7 +397,7 @@ public class G2_ApplyRuleFor_TypeFile {
         boolean isSearchAllFile2CurDirFlag = false;
 
         MD_ReName_Rule_18() {
-            super("*", 18, 3);
+            super("#", 18, 3);
             inputTypeList = new ArrayList<String>();
             inputParamFileList  = new ArrayList<File>();
         }
@@ -518,18 +519,18 @@ public class G2_ApplyRuleFor_TypeFile {
 
         @Override
         String simpleDesc() {
-            return   "\n"+Cur_Bat_Name+ " *_18            ### 把当前文件夹下 文件全部改名为 MD5属性命名的文件 【(32)位16进制.type】 32aeefa9924afb8be0da50976f1a2405.mp4 !  "+
-                    "\n"+Cur_Bat_Name+ " *_18  mp4          ###  把当前文件夹下 .mp4 文件全部改名为 MD5属性命名的文件 【(32)位16进制.type】 !   "+
-                    "\n"+Cur_Bat_Name+ " *_18  .mp4         ### 把当前文件夹下 .mp4 文件全部改名为 MD5属性命名的文件 【(32)位16进制.type】 !   "+
-                    "\n"+Cur_Bat_Name+ " *_18  .gif         ### 把当前文件夹下 .gif 文件全部改名为 MD5属性命名的文件 【(32)位16进制.type】 32aeefa9924afb8be0da50976f1a2405.gif !   "+
-                    "\n"+Cur_Bat_Name+ " *_18  png          ### 把当前文件夹下 .png 文件全部改名为 MD5属性命名的文件 【(32)位16进制.type】 !   "+
-                    "\n"+Cur_Bat_Name+ " *_18  zip  7z      ### 把当前文件夹下  .zip  .7z  文件全部改名为 MD5属性命名的文件 【(32)位16进制.type】 !   32aeefa9924afb8be0da50976f1a2405.7z  "+
-                    "\n"+Cur_Bat_Name+ " *_18  .zip .7z     ###  把当前文件夹下  .zip  .7z  文件全部改名为 MD5属性命名的文件 【(32)位16进制.type】 !   32aeefa9924afb8be0da50976f1a2405.7z "+
-                    "\n"+Cur_Bat_Name+ " *_18  jpg          ###  把当前文件夹下  .jpg  文件全部改名为 MD5属性命名的文件 【(32)位16进制.type】 !" +
-                    "\n"+Cur_Bat_Name+ " *_18  .jpg  .png  .webp .gif                          ### 把当前文件夹下  .jpg  .png  .webp .gif 文件全部改名为 MD5属性命名的文件 【(32)位16进制.type】 " +
-                    "\n"+Cur_Bat_Name+ " *_18  .mp4  .avi   .wmv .rmvb  .flv .3gp              ### 把当前文件夹下  .mp4  .avi   .wmv .rmvb  .flv .3gp 文件全部改名为 MD5属性命名的文件 【(32)位16进制.type】 " +
-                    "\n"+Cur_Bat_Name+ " *_18  .jpg  .png  .gif  .webp .mp4 .avi .flv .wmv     ### 把当前文件夹下  .jpg  .png  .gif  .webp .mp4 .avi .flv .wmv 文件全部改名为 MD5属性命名的文件 【(32)位16进制.type】 "+
-                    "\n"+Cur_Bat_Name+ " *_18  <指定文件A> <指定文件B>          ### 把当前文件夹下 指定文件名称  文件全部改名为 MD5属性命名的文件 【(32)位16进制.type】 "
+            return  "\n"+Cur_Bat_Name+ " #_18            ### 把当前文件夹下 文件全部改名为 MD5属性命名的文件 【(32)位16进制.type】 32aeefa9924afb8be0da50976f1a2405.mp4 !  "+
+                    "\n"+Cur_Bat_Name+ " #_18  mp4          ###  把当前文件夹下 .mp4 文件全部改名为 MD5属性命名的文件 【(32)位16进制.type】 !   "+
+                    "\n"+Cur_Bat_Name+ " #_18  .mp4         ### 把当前文件夹下 .mp4 文件全部改名为 MD5属性命名的文件 【(32)位16进制.type】 !   "+
+                    "\n"+Cur_Bat_Name+ " #_18  .gif         ### 把当前文件夹下 .gif 文件全部改名为 MD5属性命名的文件 【(32)位16进制.type】 32aeefa9924afb8be0da50976f1a2405.gif !   "+
+                    "\n"+Cur_Bat_Name+ " #_18  png          ### 把当前文件夹下 .png 文件全部改名为 MD5属性命名的文件 【(32)位16进制.type】 !   "+
+                    "\n"+Cur_Bat_Name+ " #_18  zip  7z      ### 把当前文件夹下  .zip  .7z  文件全部改名为 MD5属性命名的文件 【(32)位16进制.type】 !   32aeefa9924afb8be0da50976f1a2405.7z  "+
+                    "\n"+Cur_Bat_Name+ " #_18  .zip .7z     ###  把当前文件夹下  .zip  .7z  文件全部改名为 MD5属性命名的文件 【(32)位16进制.type】 !   32aeefa9924afb8be0da50976f1a2405.7z "+
+                    "\n"+Cur_Bat_Name+ " #_18  jpg          ###  把当前文件夹下  .jpg  文件全部改名为 MD5属性命名的文件 【(32)位16进制.type】 !" +
+                    "\n"+Cur_Bat_Name+ " #_18  .jpg  .png  .webp .gif                          ### 把当前文件夹下  .jpg  .png  .webp .gif 文件全部改名为 MD5属性命名的文件 【(32)位16进制.type】 " +
+                    "\n"+Cur_Bat_Name+ " #_18  .mp4  .avi   .wmv .rmvb  .flv .3gp              ### 把当前文件夹下  .mp4  .avi   .wmv .rmvb  .flv .3gp 文件全部改名为 MD5属性命名的文件 【(32)位16进制.type】 " +
+                    "\n"+Cur_Bat_Name+ " #_18  .jpg  .png  .gif  .webp .mp4 .avi .flv .wmv     ### 把当前文件夹下  .jpg  .png  .gif  .webp .mp4 .avi .flv .wmv 文件全部改名为 MD5属性命名的文件 【(32)位16进制.type】 "+
+                    "\n"+Cur_Bat_Name+ " #_18  <指定文件A> <指定文件B>          ### 把当前文件夹下 指定文件名称  文件全部改名为 MD5属性命名的文件 【(32)位16进制.type】 "
 
                     ;}
 
@@ -566,7 +567,7 @@ public class G2_ApplyRuleFor_TypeFile {
     class Make_ZRuleDir_Rule_17 extends Basic_Rule{
         ArrayList<String> dirNameList ;
         Make_ZRuleDir_Rule_17() {
-            super("*", 17, 4);  //
+            super("#", 17, 4);  //
             dirNameList = new  ArrayList<String>();
             dirNameList.add("0_Temp_Dir");
             dirNameList.add("1_C_Install_Dir");
@@ -627,7 +628,7 @@ public class G2_ApplyRuleFor_TypeFile {
         // false   1.jpg 2,jpg   1.png  2.png 类型来命名
         boolean isOrder = false;
         File_TimeName_Rule_16() {
-            super("*", 16, 3);  //
+            super("#", 16, 3);  //
         }
 
 
@@ -732,7 +733,7 @@ public class G2_ApplyRuleFor_TypeFile {
         String G2_webp2gif_exe_path = "";
 
         Webp_To_Jpg_Gif_Rule_15() {
-            super("*", 15, 4);
+            super("#", 15, 4);
             webpFileList = new ArrayList<File>();
             gif_webpFileList = new ArrayList<File>();
             PushFile2JDKBIN();
@@ -939,11 +940,11 @@ public class G2_ApplyRuleFor_TypeFile {
     class CreateIconFile_KuaiJieFangShi_Rule_14 extends Basic_Rule{
 
         ArrayList<String> inputTypeList ;
-        // zrule_apply_G2.bat  *_14  jpg   把当前所有的jpg格式文件生成快捷方式到 jpg_时间戳 文件夹内
+        // zrule_apply_G2.bat  #_14  jpg   把当前所有的jpg格式文件生成快捷方式到 jpg_时间戳 文件夹内
 
 
         CreateIconFile_KuaiJieFangShi_Rule_14() {
-            super("*", 14, 3);
+            super("#", 14, 3);
             inputTypeList = new ArrayList<String>();
         }
 
@@ -1024,16 +1025,16 @@ public class G2_ApplyRuleFor_TypeFile {
 
         @Override
         String simpleDesc() {
-            return  "\n"+Cur_Bat_Name+ " *_14  mp4          ### 源文件被按顺序重命名 1_ 2_ 动态计算当前文件夹中所有子文件中的mp4文件 并在当前目录生成 MP4_20200522_154600 字样的文件夹 \n"+
-                    "\n"+Cur_Bat_Name+ " *_14  .mp4         ### 源文件被按顺序重命名 1_ 2_动态计算当前文件夹中所有子文件中的mp4文件 并在当前目录生成 MP4_20200522_154600 字样的文件夹 \n"+
-                    "\n"+Cur_Bat_Name+ " *_14  .gif         ### 源文件被按顺序重命名 1_ 2_动态计算当前文件夹中所有子文件中的gif文件 并在当前目录生成 GIF_20200522_154600 字样的文件夹 \n"+
-                    "\n"+Cur_Bat_Name+ " *_14  png          ### 源文件被按顺序重命名 1_ 2_ 动态计算当前文件夹中所有子文件中的png文件 并在当前目录生成 PNG_20200522_154600 字样的文件夹 \n"+
-                    "\n"+Cur_Bat_Name+ " *_14  zip  7z      ### 源文件被按顺序重命名 1_ 2_ 动态计算当前文件夹中所有子文件中的 文件夹中的 7z zip文件   并在当前目录生成 7Z_20200522_154600  ZIP_20200522_154600 字样的文件夹 \n"+
-                    "\n"+Cur_Bat_Name+ " *_14  .zip .7z     ### 源文件被按顺序重命名 1_ 2_ 动态计算当前文件夹中所有子文件中的 文件夹中的 7z zip文件   并在当前目录生成 7Z_20200522_154600  ZIP_20200522_154600 字样的文件夹 \n"+
-                    "\n"+Cur_Bat_Name+ " *_14  jpg          ### 源文件被按顺序重命名 1_ 2_ 动态计算当前文件夹中所有子文件中的JPG文件 并在当前目录生成 JPG_20200522_154600 字样的文件夹 \n" +
-                    "\n"+Cur_Bat_Name+ " *_14  .jpg  .png  .webp .gif                          ### 生成图片格式文件集合  PNG_时间戳  JPG_20200522_154600 字样的文件夹 \n" +
-                    "\n"+Cur_Bat_Name+ " *_14  .mp4  .avi   .wmv .rmvb  .flv .3gp              ### 生成视频格式文件集合    源文件被按顺序重命名 1_ 2_ 动态计算当前文件夹中所有子文件中的JPG文件 并在当前目录生成 MP4_20200522_154600 字样的文件夹 \n" +
-                    "\n"+Cur_Bat_Name+ " *_14  .jpg  .png  .gif  .webp .mp4 .avi .flv .wmv     ### 生成 视频 + 图片 格式文件集合  源文件被按顺序重命名 1_ 2_ 动态计算当前文件夹中所有子文件中的视频文件 并在当前目录生成 JPG_20200522_154600 MP4_20200522_154600 字样的文件夹 \n"
+            return  "\n"+Cur_Bat_Name+ " #_14  mp4          ### 源文件被按顺序重命名 1_ 2_ 动态计算当前文件夹中所有子文件中的mp4文件 并在当前目录生成 MP4_20200522_154600 字样的文件夹 \n"+
+                    "\n"+Cur_Bat_Name+ " #_14  .mp4         ### 源文件被按顺序重命名 1_ 2_动态计算当前文件夹中所有子文件中的mp4文件 并在当前目录生成 MP4_20200522_154600 字样的文件夹 \n"+
+                    "\n"+Cur_Bat_Name+ " #_14  .gif         ### 源文件被按顺序重命名 1_ 2_动态计算当前文件夹中所有子文件中的gif文件 并在当前目录生成 GIF_20200522_154600 字样的文件夹 \n"+
+                    "\n"+Cur_Bat_Name+ " #_14  png          ### 源文件被按顺序重命名 1_ 2_ 动态计算当前文件夹中所有子文件中的png文件 并在当前目录生成 PNG_20200522_154600 字样的文件夹 \n"+
+                    "\n"+Cur_Bat_Name+ " #_14  zip  7z      ### 源文件被按顺序重命名 1_ 2_ 动态计算当前文件夹中所有子文件中的 文件夹中的 7z zip文件   并在当前目录生成 7Z_20200522_154600  ZIP_20200522_154600 字样的文件夹 \n"+
+                    "\n"+Cur_Bat_Name+ " #_14  .zip .7z     ### 源文件被按顺序重命名 1_ 2_ 动态计算当前文件夹中所有子文件中的 文件夹中的 7z zip文件   并在当前目录生成 7Z_20200522_154600  ZIP_20200522_154600 字样的文件夹 \n"+
+                    "\n"+Cur_Bat_Name+ " #_14  jpg          ### 源文件被按顺序重命名 1_ 2_ 动态计算当前文件夹中所有子文件中的JPG文件 并在当前目录生成 JPG_20200522_154600 字样的文件夹 \n" +
+                    "\n"+Cur_Bat_Name+ " #_14  .jpg  .png  .webp .gif                          ### 生成图片格式文件集合  PNG_时间戳  JPG_20200522_154600 字样的文件夹 \n" +
+                    "\n"+Cur_Bat_Name+ " #_14  .mp4  .avi   .wmv .rmvb  .flv .3gp              ### 生成视频格式文件集合    源文件被按顺序重命名 1_ 2_ 动态计算当前文件夹中所有子文件中的JPG文件 并在当前目录生成 MP4_20200522_154600 字样的文件夹 \n" +
+                    "\n"+Cur_Bat_Name+ " #_14  .jpg  .png  .gif  .webp .mp4 .avi .flv .wmv     ### 生成 视频 + 图片 格式文件集合  源文件被按顺序重命名 1_ 2_ 动态计算当前文件夹中所有子文件中的视频文件 并在当前目录生成 JPG_20200522_154600 MP4_20200522_154600 字样的文件夹 \n"
 
                     ;}
     }
@@ -1724,14 +1725,14 @@ public class G2_ApplyRuleFor_TypeFile {
     class AllDirSubFile_Order_Rule_11 extends Basic_Rule{
 
         AllDirSubFile_Order_Rule_11() {
-            super("*", 11, 5);
+            super("#", 11, 5);
         }
 
 
 
         @Override
         String simpleDesc() {
-            return  "\n"+Cur_Bat_Name+ "  *_11    ## (清除原有名称，序列从1开始)把当前所有子目录的文件 当前目录 下的实体文件依次按顺序按类型重新命名!  \n" ;
+            return  "\n"+Cur_Bat_Name+ "  #_11    ## (清除原有名称，序列从1开始)把当前所有子目录的文件 当前目录 下的实体文件依次按顺序按类型重新命名!  \n" ;
         }
 
         @SuppressWarnings("unchecked")
@@ -2338,7 +2339,7 @@ public class G2_ApplyRuleFor_TypeFile {
                 isBatchOperation = false;
             }
 
-            if(inputParam.contains("*")){
+            if(inputParam.contains("#")){
                 isAllFileOperation = true;
             }else {
                 isAllFileOperation = false;
@@ -2354,10 +2355,10 @@ public class G2_ApplyRuleFor_TypeFile {
                     Cur_Bat_Name+ " #_7_good   (解密文件) 把当前目录下的所有文件(不包含文件夹  不包含孙文件)进行 解密good 【 time + good 】 生成解密文件夹\n" +
                     Cur_Bat_Name + " jpg_7_bad  [索引7]   // 把当前目录下的 jpg文件 加密 \n" +
                     Cur_Bat_Name + " jpg_7_good  [索引7]   // 把当前目录下的 jpg文件 解密 \n" +
-                    Cur_Bat_Name + " *_7_bad  [索引7]   // 把当前目录所有文件进行加密  加密文件在新的 时间戳文件夹中 \n" +
-                    Cur_Bat_Name + " *_7_good  [索引7]   // 把当前目录所有文件进行解密  解密文件在新的 时间戳文件夹中 \n"+
+                    Cur_Bat_Name + " #_7_bad  [索引7]   // 把当前目录所有文件进行加密  加密文件在新的 时间戳文件夹中 \n" +
+                    Cur_Bat_Name + " #_7_good  [索引7]   // 把当前目录所有文件进行解密  解密文件在新的 时间戳文件夹中 \n"+
                     Cur_Bat_Name + " #_7_bad_batch   [索引7]   // 把当前目录所有文件进行加密  加密文件在新的【 固定文件夹 bad_batch 】中 适合批量处理 \n" +
-                    Cur_Bat_Name + " *_7_good_batch   [索引7]   // 把当前目录所有文件进行解密 解密文件在新的【 固定文件夹 good_batch 】中 适合批量处理 " +
+                    Cur_Bat_Name + " #_7_good_batch   [索引7]   // 把当前目录所有文件进行解密 解密文件在新的【 固定文件夹 good_batch 】中 适合批量处理 " +
                     "\n" ;
 
         }
@@ -2471,18 +2472,18 @@ public class G2_ApplyRuleFor_TypeFile {
                     }
 
 
-if(!isBatchOperation){  // 如果 不是 batch  那么会创建文件夹  和原来保持一致
-    String newRealFilePath = oldRealFile.getAbsolutePath().replace(oldBasePath, newBasePath);
-    File newRealFile = new File(newRealFilePath);
-    // 解密操作
-    createDecryFile(oldRealFile,newRealFile);
-}else{
+                    if(!isBatchOperation){  // 如果 不是 batch  那么会创建文件夹  和原来保持一致
+                        String newRealFilePath = oldRealFile.getAbsolutePath().replace(oldBasePath, newBasePath);
+                        File newRealFile = new File(newRealFilePath);
+                        // 解密操作
+                        createDecryFile(oldRealFile,newRealFile);
+                    }else{
 //    String newRealFilePath = oldRealFile.getAbsolutePath().replace(oldBasePath, newBasePath);
-    String batch_fileName = oldRealFile.getName();
-    File newRealFile = new File(newBasePath+File.separator+batch_fileName);
-    // 解密操作
-    createDecryFile(oldRealFile,newRealFile);
-}
+                        String batch_fileName = oldRealFile.getName();
+                        File newRealFile = new File(newBasePath+File.separator+batch_fileName);
+                        // 解密操作
+                        createDecryFile(oldRealFile,newRealFile);
+                    }
 
                 }
             }
@@ -2605,7 +2606,7 @@ if(!isBatchOperation){  // 如果 不是 batch  那么会创建文件夹  和原
             return  Cur_Bat_Name +" #_6    // 修改当前的一级子目录下的文件夹 以及文件  按顺序命令 【序号_原名称.类型】  (不操作 孙文件 孙文件夹 )  \n" +
                     Cur_Bat_Name + " png_6    // 修改当前的一级子目录下的文件夹下的 png格式文件  按顺序命令 【序号_原名称.类型】  (不操作 孙文件 孙文件夹 ) \n" +
                     Cur_Bat_Name + " png_6_order    // 修改当前的一级子目录下的文件夹下的 png格式文件  按顺序命令 【0000.png 0001.png 0002.png ....】  (不操作 孙文件 孙文件夹 ) \n" +
-            Cur_Bat_Name +" m3u8_6_order  // 【type<可选>_6_order】 修改当前的目录下指定类型的 文件  按顺序命令[0000.m3u8 0001.m3u8] 【序号.类型】【不保留原名称】  (不操作 孙文件 孙文件夹 )  \n" ;
+                    Cur_Bat_Name +" m3u8_6_order  // 【type<可选>_6_order】 修改当前的目录下指定类型的 文件  按顺序命令[0000.m3u8 0001.m3u8] 【序号.类型】【不保留原名称】  (不操作 孙文件 孙文件夹 )  \n" ;
         }
 
 
@@ -2677,10 +2678,10 @@ if(!isBatchOperation){  // 如果 不是 batch  那么会创建文件夹  和原
 
 
     public  static String getFileNameNoPoint(File file){
-String type = getFileTypeWithPoint(file.getName());
-       String originname =  file.getName() ;
-     String resultName =    originname.replace(type,"");
-     return resultName;
+        String type = getFileTypeWithPoint(file.getName());
+        String originname =  file.getName() ;
+        String resultName =    originname.replace(type,"");
+        return resultName;
     }
 
     public  static String getFileNameNoPoint(String  originName){
@@ -2845,7 +2846,7 @@ String type = getFileTypeWithPoint(file.getName());
             if(inputParam.contains("_recovery")){
                 isRecovrty = true;
                 isEnable = false;
-                curFilterFileTypeList.add("*");  // 把当前所有文件都加入到列表中
+                curFilterFileTypeList.add("#");  // 把当前所有文件都加入到列表中
             }
             System.out.println("OLD记录的Properties信息:(OLD)   "+" JPG="+jpgBeginIndex + "   GIF="+gifBeginIndex +"   MP4="+mp4BeginIndex+"  JPG增量="+nextStepCountJPG +"    GIF增量="+nextStepCountGIF + "   MP4增量="+nextStepCountMP4 );
 
@@ -3379,7 +3380,7 @@ String type = getFileTypeWithPoint(file.getName());
     // 3--对集合文件属性进行修改(文件名称)  对所有子文件--进行修改 ArrayList<File> applyFileByteOperationRule(ArrayList<File> subFileList)
     // index  唯一指定的一种 rule规则
 
-    // file_name_2   *_2   对当前目录下的所有文件进行 文件名称的重新命名 命名规则  在头部添加序号
+    // file_name_2   #_2   对当前目录下的所有文件进行 文件名称的重新命名 命名规则  在头部添加序号
 
     class File_Name_Rule_2 extends Basic_Rule{
 
@@ -3391,7 +3392,7 @@ String type = getFileTypeWithPoint(file.getName());
         // 是否是按 1.jpg 2,jpg  3.png  4.png 依次命名 而不是  1.jpg 2,jpg  1.png  2.png 类型来命名
         boolean isOrder = false;
         File_Name_Rule_2() {
-            super("*", 2, 3);  //
+            super("#", 2, 3);  //
         }
 
 
@@ -3499,11 +3500,11 @@ String type = getFileTypeWithPoint(file.getName());
             String itemDesc = "";
             String desc_true = " (保留原名称) 把当前的所有子文件(非目录)重命名为 【序号_原始名称.类型】的形式 例如 hello.jpg =》 1_hello.jpg  xx.jpg-》2_xx.jpg    001/4.jpg -> 001/3_4.jpg(不同文件夹)   保留原有名称 相同类型文件不同文件夹 使用同一个序列号   ";
             String desc_true_1 = " (保留原名称_按类型依次从1开始 order ) 把当前的所有子文件(非目录)重命名为 【序号_原始名称.类型 走到底】的形式 例如 hello.jpg =》 1_hello.jpg  xx.jpg-》2_xx.jpg   aa.png -> 3_aa.png  | 001/4.zip ->  001/4_4.zip  保留原有名称 不相同类型文件不同文件夹 使用同一个序列号 ";
-            String desc_true_2 = " (保留原名称_依照输入索引为起始 order ) 把当前的所有子文件(非目录)重命名为 【自定义序号_原始名称.类型 走到底】的形式 例如 *_2_false_order_50  hello.jpg =》 50_hello.jpg  xx.jpg-》51_xx.jpg   aa.png -> 52_aa.png 保留原有名称 不相同类型文件不同文件夹 使用同一个序列号(序号自定义) ";
+            String desc_true_2 = " (保留原名称_依照输入索引为起始 order ) 把当前的所有子文件(非目录)重命名为 【自定义序号_原始名称.类型 走到底】的形式 例如 #_2_false_order_50  hello.jpg =》 50_hello.jpg  xx.jpg-》51_xx.jpg   aa.png -> 52_aa.png 保留原有名称 不相同类型文件不同文件夹 使用同一个序列号(序号自定义) ";
 
             String desc_false = "(清除原名称) 把当前的所有子文件(非目录)重命名为 【序号.类型】的形式 例如 hello.jpg =》 1.jpg  xx.png-》1.jpg   不保留原有名称 相同类型文件不同文件夹 使用同一个序列号";
             String desc_false_1 = "(清除原名称_按类型依次 order ) 把当前的所有子文件(非目录)重命名为 【序号.类型 走到底 】的形式 例如 hello.jpg =》 1.jpg  xx.jpg-》2_xx.jpg  xx.png-》3.png  xx.png-》4.png  不保留原有名称 不相同类型文件不同文件夹 使用同一个序列号 ";
-            String desc_false_2 = "(清除原名称_按类型 依照输入索引为起始 order ) 把当前的所有子文件(非目录)重命名为 【输入Begin序号.类型 走到底 】的形式 例如   *_2_false_order_10  hello.jpg =》 10.jpg  xx.jpg-》11_xx.jpg  xx.png-》12.png  xx.png-》13.png  不保留原有名称 不相同类型文件不同文件夹 使用同一个序列号(序号自定义) ";
+            String desc_false_2 = "(清除原名称_按类型 依照输入索引为起始 order ) 把当前的所有子文件(非目录)重命名为 【输入Begin序号.类型 走到底 】的形式 例如   #_2_false_order_10  hello.jpg =》 10.jpg  xx.jpg-》11_xx.jpg  xx.png-》12.png  xx.png-》13.png  不保留原有名称 不相同类型文件不同文件夹 使用同一个序列号(序号自定义) ";
 
             if(curType == OS_TYPE.Windows){
                 itemDesc = batName.trim()+".bat  "+type+"_"+index+"_true" + "    [索引 "+index+"]  描述: "+ desc_true +"\n";
@@ -3925,7 +3926,7 @@ String type = getFileTypeWithPoint(file.getName());
 
     static ArrayList<File> getAllSubFile(File dirFile ) {
         ArrayList<String> typeList = new   ArrayList<String>();
-        typeList.add("*");
+        typeList.add("#");
         return  getAllSubFile( dirFile ,null , typeList);
     }
 
@@ -3952,7 +3953,7 @@ String type = getFileTypeWithPoint(file.getName());
 
                     for (int i = 0; i < typeList.size(); i++) {
                         String type =  typeList.get(i);
-                        if("*".equals(type)){  // 如果 类型是 * 那么就把 所有的 非目录文件加入列表中
+                        if("#".equals(type)){  // 如果 类型是 * 那么就把 所有的 非目录文件加入列表中
                             File curFile =    new File(fileString);
                             if(!curFile.isDirectory()){
                                 allFile.add(curFile);
@@ -4308,8 +4309,8 @@ String type = getFileTypeWithPoint(file.getName());
 //                Rule applayRule2Identify = getRuleByIdentify(identy);
 
                     Rule applayRule4Index = getRuleByIndex(ruleIndex);
-//                如果对应相同的 index的 Rule *_2    出现了    MP3_2 的情况  那么就需要把当前的 所有的*的文件 过滤为 mp3的文件
-//                if("*".equals(applayRule2Identify.file_type) && !curType.equals(applayRule2Identify.file_type)){
+//                如果对应相同的 index的 Rule #_2    出现了    MP3_2 的情况  那么就需要把当前的 所有的*的文件 过滤为 mp3的文件
+//                if("#".equals(applayRule2Identify.file_type) && !curType.equals(applayRule2Identify.file_type)){
 //
 //                }
 
