@@ -38,9 +38,9 @@ public class H0_Tip {
     public static void main(String[] args) {
 
         initSystemInfo();
+        InstallWindowsTip();  //  双系统安装 说明
 
         if(CUR_OS_TYPE == OS_TYPE.Windows){
-            InstallWindowsTip();  //  双系统安装 说明
 
             CmderTip();  // cmder 下的环境变量设置
             WindowsFilePathTip();  // 文件快捷方式提示
@@ -155,7 +155,7 @@ public class H0_Tip {
         System.out.println("Chrome插件安装位置( Linux ):\n  zzfile_3.sh  \""+User_Home+ File.separator+".config/google-chrome1/Default/Extensions/\"");
         System.out.println("Chrome插件安装位置( MacOS 路径空格):\n  zzfile_3.sh  "+User_Home+ File.separator+"Library/Application Support/Google/Chrome/Default/Extensions/");
         System.out.println();
-        System.out.println("Chrome插件备份地址:\n  zzfile_3"+BAT_OR_SH_Point+"   "+zbinPath+File.separator+"J1_Plugin      【插件】【脚本】【书签】 先安装 AA_get-crx 方便插件安装");
+        System.out.println("Chrome插件备份地址:\n  zzfile_3.bat  "+zbinPath+File.separator+"J1_Plugin      【插件】【脚本】【书签】 先安装 AA_get-crx 方便插件安装");
         PrintHead_End("   Chrome_Tip 插件 Begin   End  ");
     }
 
