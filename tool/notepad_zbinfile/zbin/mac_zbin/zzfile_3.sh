@@ -5,7 +5,7 @@ echo "CUR_OS_UNAME="$CUR_OS_UNAME
 MAC_FLAG="Darwin"
 First_Param=$1
 final_dir_path=${First_Param%/*}
-echo "xxxxx"$1
+echo "1_input="$1
 
 ## $0 是当前 zzfile 文件路径 $1 是第一个输入的参数
 if [[ $CUR_OS_UNAME =~ $MAC_FLAG ]];then
@@ -75,3 +75,4 @@ else
 
    nautilus -s $1/1
    exit
+fi
