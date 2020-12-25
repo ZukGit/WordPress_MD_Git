@@ -382,7 +382,7 @@ public class I9_TextRuleOperation {
     }
 
 
-// 6位数字为  验证码code  5位数字为端口(两个)  三位数字为IP地址最后一位  组成ADB命令 进行输出
+    // 6位数字为  验证码code  5位数字为端口(两个)  三位数字为IP地址最后一位  组成ADB命令 进行输出
     class ADB_Wireless_WIFI_Rule_22 extends  Basic_Rule{
 
         String pair_code_6tr = "";   // 配对的 6个peiduima
@@ -391,12 +391,12 @@ public class I9_TextRuleOperation {
 
         String adb_wireless_port_5str = "" ;  //  adb 连接的 端口 5 位数
 
-    String ipaddress_last_3str = "";     // IP地址的最后一个值
+        String ipaddress_last_3str = "";     // IP地址的最后一个值
 
-    String IP_Addpress_Pre_1 = "192.168.0.";
-    String IP_Addpress_Pre_2 = "10.106.20.";
+        String IP_Addpress_Pre_1 = "192.168.0.";
+        String IP_Addpress_Pre_2 = "10.106.20.";
 
-    boolean isAllSuccess = false;
+        boolean isAllSuccess = false;
 
         ADB_Wireless_WIFI_Rule_22(boolean mIsInputDirAsSearchPoint){
             super(22);
@@ -512,68 +512,68 @@ public class I9_TextRuleOperation {
             return commandStr;
         }
 
-    String getDefineLengthDigital_Range(String content , int digitalLength){
-        String resultStr = null;
-        if(content == null || content.trim().length() <  digitalLength){
-            return resultStr;
-        }
-        if(content.contains(" ")){
-            String[] strArr = content.split(" ");
-            if(strArr == null || strArr.length == 0){
+        String getDefineLengthDigital_Range(String content , int digitalLength){
+            String resultStr = null;
+            if(content == null || content.trim().length() <  digitalLength){
                 return resultStr;
             }
-            System.out.println(" digitalLength = "+ digitalLength + "   Content=\n"+content);
-            System.out.println();
-            for (int i = 0; i < strArr.length; i++) {
-                System.out.println("split["+i+"] = "+ strArr[i]);
-            }
-
-            for (int i = 0; i < strArr.length; i++) {
-                System.out.println("split["+i+"] = "+ strArr[i]);
-                if(isNumeric(strArr[i]) && strArr[i].trim().length() <= digitalLength){
-                    System.out.println("split["+i+"] = "+ strArr[i] +"  Selected!");
-                    return strArr[i];
+            if(content.contains(" ")){
+                String[] strArr = content.split(" ");
+                if(strArr == null || strArr.length == 0){
+                    return resultStr;
+                }
+                System.out.println(" digitalLength = "+ digitalLength + "   Content=\n"+content);
+                System.out.println();
+                for (int i = 0; i < strArr.length; i++) {
+                    System.out.println("split["+i+"] = "+ strArr[i]);
                 }
 
+                for (int i = 0; i < strArr.length; i++) {
+                    System.out.println("split["+i+"] = "+ strArr[i]);
+                    if(isNumeric(strArr[i]) && strArr[i].trim().length() <= digitalLength){
+                        System.out.println("split["+i+"] = "+ strArr[i] +"  Selected!");
+                        return strArr[i];
+                    }
+
+                }
+
+
             }
 
-
+            return resultStr;
         }
 
-        return resultStr;
-    }
+        String getDefineLengthDigital(String content , int digitalLength){
+            String resultStr = null;
+            if(content == null || content.trim().length() <  digitalLength){
+                return resultStr;
+            }
 
-    String getDefineLengthDigital(String content , int digitalLength){
-           String resultStr = null;
-           if(content == null || content.trim().length() <  digitalLength){
-               return resultStr;
-           }
+            if(content.contains(" ")){
+                String[] strArr = content.split(" ");
+                if(strArr == null || strArr.length == 0){
+                    return resultStr;
+                }
+                System.out.println(" digitalLength = "+ digitalLength + "   Content=\n"+content);
+                System.out.println();
+                for (int i = 0; i < strArr.length; i++) {
+                    System.out.println("split["+i+"] = "+ strArr[i]);
+                }
 
-           if(content.contains(" ")){
-               String[] strArr = content.split(" ");
-               if(strArr == null || strArr.length == 0){
-                   return resultStr;
-               }
-               System.out.println(" digitalLength = "+ digitalLength + "   Content=\n"+content);
-               System.out.println();
-               for (int i = 0; i < strArr.length; i++) {
-                   System.out.println("split["+i+"] = "+ strArr[i]);
-               }
+                for (int i = 0; i < strArr.length; i++) {
+                    System.out.println("split["+i+"] = "+ strArr[i]);
+                    if(isNumeric(strArr[i].trim()) && strArr[i].trim().length() == digitalLength){
+                        System.out.println("split["+i+"] = "+ strArr[i] +"  Selected!");
+                        return strArr[i];
+                    }
 
-               for (int i = 0; i < strArr.length; i++) {
-                   System.out.println("split["+i+"] = "+ strArr[i]);
-                   if(isNumeric(strArr[i].trim()) && strArr[i].trim().length() == digitalLength){
-                       System.out.println("split["+i+"] = "+ strArr[i] +"  Selected!");
-                       return strArr[i];
-                   }
-
-               }
+                }
 
 
-           }
+            }
 
-           return resultStr;
-    }
+            return resultStr;
+        }
 
 
         @Override
@@ -691,7 +691,7 @@ public class I9_TextRuleOperation {
         @Override
         ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
             File dirFile =  curInputFileList.get(0).getParentFile();
-           File[] fileList =  dirFile.listFiles();
+            File[] fileList =  dirFile.listFiles();
             System.out.println("dirFile = "+ dirFile + "        fileList = "+ fileList.length );
             ArrayList<File>  exeFileList =     getFileTypeList(fileList,".exe");
             ArrayList<File>  msiFileList =      getFileTypeList(fileList,".msi");
@@ -789,7 +789,7 @@ public class I9_TextRuleOperation {
 
     }
 
-        // 往 每行的加入占位符   开头加入 〖*   第一个空格前加入*
+    // 往 每行的加入占位符   开头加入 〖*   第一个空格前加入*
     class FirstWord_MakeDir_Rule_19 extends  Basic_Rule{
 
         FirstWord_MakeDir_Rule_19(boolean mIsInputDirAsSearchPoint){
@@ -811,7 +811,7 @@ public class I9_TextRuleOperation {
                 File fileItem = curInputFileList.get(i);
                 File  curDirFile = fileItem.getParentFile();
 
-              ArrayList<String> rawContentList =   ReadFileContentAsList(fileItem);
+                ArrayList<String> rawContentList =   ReadFileContentAsList(fileItem);
                 ArrayList<String> fixedPathDir = fixedFirstWordPath(rawContentList);
 
                 if(curDirFile != null){
@@ -833,7 +833,7 @@ public class I9_TextRuleOperation {
                             isDir = true;
                             newDirTemp.mkdirs();
                         }
-                         String filedesc = isDir?" 目录":"文件";
+                        String filedesc = isDir?" 目录":"文件";
                         System.out.println("创建 "+filedesc+"  "+ newDirTemp.getAbsolutePath() +" 成功! " );
                     }
                     return null;
@@ -921,7 +921,7 @@ public class I9_TextRuleOperation {
                 ArrayList<String> contentList = ReadFileContentAsList(fileItem);
                 ArrayList<String>  fixedStrArr =   Tushare_TreeNodeData_Rule18(contentList);
 
-             writeContentToFile(I9_Temp_Text_File,fixedStrArr);
+                writeContentToFile(I9_Temp_Text_File,fixedStrArr);
                 NotePadOpenTargetFile(I9_Temp_Text_File.getAbsolutePath());
                 System.out.println("rule_"+rule_index+" -> 把tushare的数据 接口 转为 J0_treedata.txt 的 TreeNode 注意格式(直接复制表格)!  结点 [ 中文名 + 网址 ] 开头  File="+ fileItem.getAbsolutePath());
             }
@@ -2932,6 +2932,56 @@ public class I9_TextRuleOperation {
     // ArrayPrint ==============================End
 
 
+
+    public static String execCMD_Mac(String command) {
+//        System.out.println("══════════════Begin ExE ");
+        StringBuilder sb = new StringBuilder();
+        StringBuilder errorSb = new StringBuilder();
+        try {
+
+//            Process process = Runtime.getRuntime().exec("CMD.exe /c start  " + command);
+            Process process = Runtime.getRuntime().exec(" " + command);
+
+            InputStreamReader inputReader = new InputStreamReader(process.getInputStream(), "GBK");
+            BufferedReader bufferedReader = new BufferedReader(inputReader);
+            String line;
+            int waitFor = process.waitFor();
+//            Stream<String> lines = bufferedReader.lines();
+//            lines.iterator();
+//            System.out.println("line Count = "+lines.count());
+
+            while ((line = bufferedReader.readLine()) != null) {
+                sb.append(line + "\n");
+
+            }
+
+
+            boolean isAlive = process.isAlive();
+            int errorSteamCode = process.getErrorStream().read();
+
+            String errorStream = process.getErrorStream().toString();
+            int exitValue = process.exitValue();
+//            process.getErrorStream().
+            //杀掉进程
+//            System.out.println("exitValue ="+ exitValue);
+            sb.append("\nexitValue = " + exitValue +
+                    "\nisAlive = " + isAlive +
+                    "\nerrorStream = " + errorStream +
+                    "\nerrorSteamCode = " + errorSteamCode +
+                    "\nwaitFor = " + waitFor);
+//            process.destroy();
+
+        } catch (Exception e) {
+            System.out.println("execCMD 出现异常! ");
+            sb.append("execCMD 出现异常! ");
+            return sb.toString();
+        }
+
+//        System.out.println("sb.toString() = "+ sb.toString());
+//        System.out.println("══════════════End ExE ");
+        return sb.toString();
+    }
+
     public static String execCMD(String command) {
 //        System.out.println("══════════════Begin ExE ");
         StringBuilder sb = new StringBuilder();
@@ -3158,11 +3208,11 @@ public class I9_TextRuleOperation {
 
     public static boolean isValidUrl_String(String urlString) {
         boolean flag = false;
-       if(urlString.startsWith("http:")){
-           flag = true;
-       } else  if(urlString.startsWith("https:")){
-           flag = true;
-       }    else  if(urlString.startsWith("www.")){
+        if(urlString.startsWith("http:")){
+            flag = true;
+        } else  if(urlString.startsWith("https:")){
+            flag = true;
+        }    else  if(urlString.startsWith("www.")){
             flag = true;
         }
 
@@ -3332,7 +3382,7 @@ public class I9_TextRuleOperation {
     }
 
 
-   static ArrayList<String> clearOneBlankCharAsOneStr_Rule_2(ArrayList<String> originStrList){
+    static ArrayList<String> clearOneBlankCharAsOneStr_Rule_2(ArrayList<String> originStrList){
         if(originStrList == null) return null;
         ArrayList<String>  fixedStrArr = new   ArrayList<String>();
         StringBuilder sb =new StringBuilder();
@@ -3371,12 +3421,14 @@ public class I9_TextRuleOperation {
         String commandNotead = "";
         if(CUR_OS_TYPE == OS_TYPE.Windows){
             commandNotead = "cmd.exe /c start   Notepad++.exe " + absPath;
+            execCMD(commandNotead);
+
         }else if(CUR_OS_TYPE == OS_TYPE.Linux){
             commandNotead  = " gedit " + absPath;
         }else if(CUR_OS_TYPE == OS_TYPE.MacOS){
-            commandNotead  = " gedit " + absPath;
+            commandNotead  = "/Applications/UltraEdit  " + absPath;
+            execCMD_Mac(commandNotead);
         }
-        execCMD(commandNotead);
     }
 
     ArrayList<String> clearOneBlankChar_Rule_1(ArrayList<String> originStrList){
@@ -4155,7 +4207,7 @@ public class I9_TextRuleOperation {
 
     }
     // 往 每行开头加入〖*  第一个字符串后加入*  其余不变(方便生成tushare的输入参数格式)   ts_code -> 〖*ts_code*  描述
-  static  ArrayList<String>  addTushare_Params_Flag_18(ArrayList<String> originStrList,String beginStr , String endStr){
+    static  ArrayList<String>  addTushare_Params_Flag_18(ArrayList<String> originStrList,String beginStr , String endStr){
         ArrayList<String> newContentList_Padding = new    ArrayList<String>();
         ArrayList<String> newContentList = new    ArrayList<String>();
         for (int i = 0; i < originStrList.size(); i++) {
@@ -4194,7 +4246,7 @@ public class I9_TextRuleOperation {
 
     }
 
-   static int calMaxItemCharPosition(ArrayList<String> originStrList , String strFlag){
+    static int calMaxItemCharPosition(ArrayList<String> originStrList , String strFlag){
 
         int maxSize = 0;
         for (int i = 0; i < originStrList.size(); i++) {
@@ -4925,7 +4977,7 @@ public class I9_TextRuleOperation {
     }
     // Rule_14   End 汉字转换为拼音   周 zhou   中国 zhong_guo  (A9)
 
-     // 默认 只显示 第一行的 字符串
+    // 默认 只显示 第一行的 字符串
     // Rule_15   Begin  读取文件的第一行转为 二维码显示出来 B1
     public static void  Pre50_TextAs_QrCode_Rule_15 (File srcFile) {
         File curFile = srcFile;
@@ -4972,9 +5024,9 @@ public class I9_TextRuleOperation {
                 String qrCodeString = "";
 
 //                while (qrCodeString != null && qrCodeString.trim().isEmpty()) {
-                    while (qrCodeString != null ) {
+                while (qrCodeString != null ) {
                     qrCodeString = curBR.readLine();
-                        TxtContent.add(qrCodeString);
+                    TxtContent.add(qrCodeString);
                 }
                 System.out.println("把扫描到的第一行非空字符串转为二维码  qrCodeString = " + qrCodeString);
 
@@ -5002,9 +5054,9 @@ public class I9_TextRuleOperation {
                     if(isEmpty){
                         targetFile = calculBlankIndex(I9_Qr_Black_Image_File,lineIndex);
                     }else{
-                         targetFile = QrCodeUtil.generate (content, config, new File(I9_OUT_DIR.getAbsolutePath() + File.separator + getFileNameNoPoint(srcFile.getName())+"_"+getTimeStampLong()+".jpg"));
+                        targetFile = QrCodeUtil.generate (content, config, new File(I9_OUT_DIR.getAbsolutePath() + File.separator + getFileNameNoPoint(srcFile.getName())+"_"+getTimeStampLong()+".jpg"));
                     }
-               targetFileList.add(targetFile);
+                    targetFileList.add(targetFile);
 
                     System.out.println("operation -> "+ lineIndex);
                 }
@@ -5039,8 +5091,8 @@ public class I9_TextRuleOperation {
 
                         g.drawImage(originImage,  temp_x, temp_y,null);
                     }
-                   File endTargetFile =new File(I9_OUT_DIR.getAbsolutePath() + File.separator + "Qr_"+getFileNameNoPoint(srcFile.getName())+"_"+getTimeStampLong()+".jpg");
-                   endTargetFile.createNewFile();
+                    File endTargetFile =new File(I9_OUT_DIR.getAbsolutePath() + File.separator + "Qr_"+getFileNameNoPoint(srcFile.getName())+"_"+getTimeStampLong()+".jpg");
+                    endTargetFile.createNewFile();
                     ImageIO.write(combined, "jpg", endTargetFile);
                     System.out.println("rundll32.exe C:\\\\Windows\\\\System32\\\\shimgvw.dll,ImageView_Fullscreen  " + endTargetFile.getAbsolutePath());
                     RuntimeUtil.exec("rundll32.exe C:\\\\Windows\\\\System32\\\\shimgvw.dll,ImageView_Fullscreen  " + endTargetFile.getAbsolutePath());
@@ -5147,13 +5199,13 @@ public class I9_TextRuleOperation {
         return resize(img,width, height);
     }
 
-// zukgit
-   static  File calculQrEndTarget( ArrayList<File> srcFileList){
+    // zukgit
+    static  File calculQrEndTarget( ArrayList<File> srcFileList){
         File targetFile = new File(I9_OUT_DIR.getAbsolutePath() + File.separator + "Qr"+"_"+getTimeStampLong()+".jpg");
 
-       for (int i = 0; i < srcFileList.size(); i++) {
+        for (int i = 0; i < srcFileList.size(); i++) {
 
-       }
+        }
 
         return targetFile;
     }

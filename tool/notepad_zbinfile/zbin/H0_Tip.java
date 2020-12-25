@@ -1,3 +1,4 @@
+
 import java.io.File;
 
 public class H0_Tip {
@@ -45,12 +46,33 @@ public class H0_Tip {
             WindowsFilePathTip();  // 文件快捷方式提示
             NotePadCommand();
             Linux_BashTip();
-            Chrome_Tip();
+
             Security_File_Tip();
         }else if (CUR_OS_TYPE == OS_TYPE.Linux){
             Linux_BashTip();
+        }else if (CUR_OS_TYPE == OS_TYPE.MacOS){
+            Mac_Tip();
         }
 
+        Chrome_Tip();
+
+
+    }
+
+    static void Mac_Tip(){
+        PrintHead_End("  Mac下 UltraEdit设置  Begin  ");
+
+        System.out.println("1. UltraEdit 使用  【工具】【工具配置】【命令行】执行 TextOperation");
+        System.out.println("$HOME/Desktop/zbin/I9.sh  $HOME/Desktop/zbin %f");
+        System.out.println();
+        System.out.println("2. windows 到 Mac 存在  sh文件编码的问题 使用 dos2unix 来 转换");
+        System.out.println("brew install dos2unix");
+        System.out.println("dos2unix *.sh");
+        System.out.println();
+        System.out.println("3. 在Mac 下 使用 什么东西来打开 Temp 文件");
+        System.out.println("/Applications/UltraEdit I9_Temp_Text.txt");
+        System.out.println();
+        PrintHead_End("   Mac下 UltraEdit设置  End  ");
 
     }
 
