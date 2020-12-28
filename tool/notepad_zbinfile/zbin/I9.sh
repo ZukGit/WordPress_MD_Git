@@ -10,3 +10,4 @@ echo classpath=$classpath
 javac -classpath $classpath -encoding UTF-8 $HOME/Desktop/zbin/I9_TextRuleOperation.java 
 echo classes=$classes
 java  -classpath $classpath I9_TextRuleOperation $1 $2 $3 $4 $5
+read -n 1

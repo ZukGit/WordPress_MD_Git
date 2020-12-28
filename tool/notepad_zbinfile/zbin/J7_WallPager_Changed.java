@@ -1449,6 +1449,76 @@ public class J7_WallPager_Changed {
     // ArrayPrint ==============================End
 
 
+    /**
+     * 执行 mac(unix) 脚本命令~
+     * @param command
+     * @return
+     */
+    public static int execute_Mac(String command) {
+        String[] cmd = {"/bin/bash"};
+        Runtime rt = Runtime.getRuntime();
+        Process proc = null;
+        try {
+            proc = rt.exec(cmd);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        // 打开流
+        OutputStream os = proc.getOutputStream();
+        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(os));
+
+        try {
+            bw.write(command);
+
+            bw.flush();
+            bw.close();
+
+            /** 真奇怪，把控制台的输出打印一遍之后竟然能正常终止了~ */
+            readConsole(proc);
+
+            /** waitFor() 的作用在于 java 程序是否等待 Terminal 执行脚本完毕~ */
+            proc.waitFor();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        int retCode = proc.exitValue();
+        if (retCode != 0) {
+                   System.out.println("unix script retCode = " + retCode);
+
+            System.out.println(readConsole(proc));
+            System.out.println("UnixScriptUil.execute 出错了!!");
+        }
+        return retCode;
+    }
+
+    /**
+     * 读取控制命令的输出结果
+     * 原文链接：http://lavasoft.blog.51cto.com/62575/15599
+     * @param
+     * @return 控制命令的输出结果
+     * @throws IOException
+     */
+    public static String readConsole(Process process) {
+        StringBuffer cmdOut = new StringBuffer();
+        InputStream fis = process.getInputStream();
+        BufferedReader br = new BufferedReader(new InputStreamReader(fis));
+
+        String line = null;
+        try {
+            while ((line = br.readLine()) != null) {
+                cmdOut.append(line).append(System.getProperty("line.separator"));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+//       System.out.println("执行系统命令后的控制台输出为：\n" + cmdOut.toString());
+        return cmdOut.toString().trim();
+    }
+
+
+
+
     public static String execCMD(String command) {
 //        System.out.println("══════════════Begin ExE ");
         StringBuilder sb = new StringBuilder();
@@ -1704,16 +1774,30 @@ public class J7_WallPager_Changed {
      * @param
      */
     public static void changeBackGround(File imgFile){
-//        imgFile = new File("D:\\software\\Z_Wallpaper-master\\zimage\\pc_wallpager_photo\\1920x1080\\8.jpg");
-        Advapi32Util.registrySetStringValue(WinReg.HKEY_CURRENT_USER,
-                "Control Panel\\Desktop", "Wallpaper", imgFile.getAbsolutePath());
-        Advapi32Util.registrySetStringValue(WinReg.HKEY_CURRENT_USER,
-                "Control Panel\\Desktop", "WallpaperStyle", "10");
-        Advapi32Util.registrySetStringValue(WinReg.HKEY_CURRENT_USER,
-                "Control Panel\\Desktop", "TileWallpaper", "0");
+        if(CUR_OS_TYPE == OS_TYPE.Windows){
 
-        MyUser32.INSTANCE.SystemParametersInfoA(0x14, 0,
-                imgFile.getAbsolutePath(), 0x01 | 0x02 );
+            //        imgFile = new File("D:\\software\\Z_Wallpaper-master\\zimage\\pc_wallpager_photo\\1920x1080\\8.jpg");
+            Advapi32Util.registrySetStringValue(WinReg.HKEY_CURRENT_USER,
+                    "Control Panel\\Desktop", "Wallpaper", imgFile.getAbsolutePath());
+            Advapi32Util.registrySetStringValue(WinReg.HKEY_CURRENT_USER,
+                    "Control Panel\\Desktop", "WallpaperStyle", "10");
+            Advapi32Util.registrySetStringValue(WinReg.HKEY_CURRENT_USER,
+                    "Control Panel\\Desktop", "TileWallpaper", "0");
+
+            MyUser32.INSTANCE.SystemParametersInfoA(0x14, 0,
+                    imgFile.getAbsolutePath(), 0x01 | 0x02 );
+        }else if(CUR_OS_TYPE == OS_TYPE.MacOS){
+
+            String changeCommand = " osascript -e 'tell application \"Finder\" to set desktop picture to POSIX file \""+imgFile.getAbsolutePath()+"\"'\n";
+
+//           String result =
+                   execute_Mac(changeCommand);
+            System.out.println("切换背景命令:\n"+changeCommand);
+//            System.out.println("执行结果:\n"+result);
+
+
+        }
+
     }
 
 
@@ -1792,8 +1876,7 @@ public class J7_WallPager_Changed {
             return ;
         }
 
-
-        System.out.println("当前系统分辨率: "+dirTag  + "    当前分辨率壁纸收藏个数: "+ imageFile.size() + "  步数:"+ number_wallpager_int + "  文件索引标识: " +number_wallpager_int%imageFile.size()+"/"+imageFile.size() );
+        System.out.println("════════════ 当前系统分辨率: "+dirTag  + "    当前分辨率壁纸收藏个数: "+ imageFile.size() + "  步数:"+ number_wallpager_int + "  文件索引标识: " +number_wallpager_int%imageFile.size()+"/"+imageFile.size() );
         System.out.println("当前设置桌面文件路径 :  \n"+Cur_Bat_Name +"   "+  targetFile.getAbsolutePath());
          changeBackGround(targetFile);
         number_wallpager_int = number_wallpager_int + 1;
@@ -1857,7 +1940,7 @@ public class J7_WallPager_Changed {
 
         for (int i = 0; i < imageFile.size(); i++) {
           File  targetFile = imageFile.get(i);
-            System.out.println("当前系统分辨率: "+dirTag  + "    当前分辨率壁纸收藏个数: "+ imageFile.size() + "  步数:"+ i + "  文件索引标识: " +i%imageFile.size()+"/"+imageFile.size() );
+            System.out.println("════════════ 当前系统分辨率: "+dirTag  + "    当前分辨率壁纸收藏个数: "+ imageFile.size() + "  步数:"+ i + "  文件索引标识: " +i%imageFile.size()+"/"+imageFile.size() );
             System.out.println("当前设置桌面文件路径 :  \n"+Cur_Bat_Name+"  "+  targetFile.getAbsolutePath());
 
             changeBackGround(targetFile);
@@ -1926,7 +2009,7 @@ if(intStepNum < 0  ||  intStepNum >= imageFile.size() ){
             }
             File  targetFile = imageFile.get(i);
             System.out.println();
-            System.out.println("当前系统分辨率: "+dirTag  + "    当前分辨率壁纸收藏个数: "+ imageFile.size() + "  步数:"+ i + "  文件索引标识: " +i%imageFile.size()+"/"+imageFile.size() );
+            System.out.println("════════════ 当前系统分辨率: "+dirTag  + "    当前分辨率壁纸收藏个数: "+ imageFile.size() + "  步数:"+ i + "  文件索引标识: " +i%imageFile.size()+"/"+imageFile.size() );
             System.out.println("当前设置桌面文件路径 :  \n  "+ Cur_Bat_Name+"  "+  targetFile.getAbsolutePath());
 
             changeBackGround(targetFile);

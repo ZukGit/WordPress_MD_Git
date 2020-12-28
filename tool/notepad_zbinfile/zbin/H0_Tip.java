@@ -47,18 +47,48 @@ public class H0_Tip {
             NotePadCommand();
             Linux_BashTip();
 
-            Security_File_Tip();
         }else if (CUR_OS_TYPE == OS_TYPE.Linux){
             Linux_BashTip();
         }else if (CUR_OS_TYPE == OS_TYPE.MacOS){
             Mac_Tip();
+            Mac_Item2_Tip();
         }
 
         Chrome_Tip();
-
+        Security_File_Tip();
 
     }
 
+    static void Mac_Item2_Tip(){
+
+        System.out.println();
+        System.out.println("══════════ MacOS 下 iterm2-SHELL头缀只显示PC名称不显示路径 && 自定义别名问题 ══════════");
+        System.out.println();
+        System.out.println("iterm2预置环境变量");
+        System.out.println("PS1='%d%'");
+        System.out.println("https://www.jianshu.com/p/bf488bf22cba");
+        System.out.println();
+        System.out.println("ITERM2 恢复默认设置");
+        System.out.println("defaults delete com.googlecode.iterm2");
+        System.out.println();
+        System.out.println();
+        System.out.println();
+        System.out.println("Iterm2预置环境变量 添加自定义别名  添加自定义目录/Desktop/zbin/mac_zbin 到系统环境变量PATH");
+        System.out.println("Iterm2-Preference--Profile--Send Text At Start");
+        System.out.println("=====");
+        System.out.println("export CLICOLOR=1");
+        System.out.println("export LSCOLORS=gxfxcxdxbxegedabagacad");
+        System.out.println("export PS1='%d$'");
+        System.out.println("alias cls='clear'");
+        System.out.println("alias cdd='cd $HOME/Desktop/'");
+        System.out.println("export PATH=\"$HOME/Desktop/zbin/mac_zbin:$PATH\"");
+        System.out.println("clear");
+        System.out.println("════════════════════════════════════════ MacOS item2 End ════════════════════════════════════════");
+        System.out.println();
+
+
+
+    }
     static void Mac_Tip(){
         PrintHead_End("  Mac下 UltraEdit设置  Begin  ");
 
@@ -72,9 +102,30 @@ public class H0_Tip {
         System.out.println("3. 在Mac 下 使用 什么东西来打开 Temp 文件");
         System.out.println("/Applications/UltraEdit I9_Temp_Text.txt");
         System.out.println();
+
+
+
+        System.out.println("4. 在Mac 下壁纸的路径");
+        System.out.println();
+        System.out.println("open  /System/Library/Screen\" \"Savers/Default\" \"Collections && open  /Library/Desktop\" \"Pictures  ");
+
+//        /System/Library/Screen\ Savers/Default\ Collections    // 终端
+//      /System/Library/Screen Savers/Default Collections     // UNIX
+
+        // cd   /Library/Desktop" "Pictures
+//      cd  /System/Library/Screen" "Savers/Default" "Collections    // OK  把 空白转意
+        //       MacOS:System:Library:Screen Savers:Default Collections    //HFS
+        //  file:///System/Library/Screen%20Savers/Default%20Collections/     //URL
+
+
+        //   /Library/Desktop\ Pictures         // 终端
+//        /Library/Desktop Pictures      // UNIX
+
+
         PrintHead_End("   Mac下 UltraEdit设置  End  ");
 
     }
+
 
 
     static void InstallWindowsTip(){
@@ -153,7 +204,7 @@ public class H0_Tip {
         PrintHead_End(" Chrome_Tip 插件 Begin  ");
         System.out.println("Chrome插件安装位置( Windows 路径空格):\n  "+User_Home+ File.separator+"AppData\\Local\\Google\\Chrome\\User Data\\Default\\Extensions");
         System.out.println("Chrome插件安装位置( Linux ):\n  zzfile_3.sh  \""+User_Home+ File.separator+".config/google-chrome1/Default/Extensions/\"");
-        System.out.println("Chrome插件安装位置( MacOS 路径空格):\n  zzfile_3.sh  "+User_Home+ File.separator+"Library/Application Support/Google/Chrome/Default/Extensions/");
+        System.out.println("Chrome插件安装位置( MacOS 路径空格):\n  open  "+User_Home+ File.separator+"Library/Application\" \"Support/Google/Chrome/Default/Extensions/");
         System.out.println();
         System.out.println("Chrome插件备份地址:\n  zzfile_3.bat  "+zbinPath+File.separator+"J1_Plugin      【插件】【脚本】【书签】 先安装 AA_get-crx 方便插件安装");
         PrintHead_End("   Chrome_Tip 插件 Begin   End  ");
@@ -229,29 +280,54 @@ public class H0_Tip {
 
         PrintHead_End(" 文件加密解密操作 Begin    ");
         System.out.println("________________________ MP4 加密批量操作 ________________________ ");
-        System.out.println("1. 先对当前文件内容进行改名    zrule_apply_G2.bat *_18 ");
-        System.out.println("2. 对当前文件夹下的文件进行加密 生成 bad_batch 加密文件夹  zrule_apply_G2.bat #_7_bad_batch ");
+        System.out.println("1. 先对当前文件内容进行改名    zrule_apply_G2"+BAT_OR_SH_Point+" #_18 ");
+        System.out.println("2. 对当前文件夹下的文件进行加密 生成 bad_batch 加密文件夹  zrule_apply_G2"+BAT_OR_SH_Point+" #_7_bad_batch ");
         System.out.println("3. 进入 bad_batch 加密文件夹   cd ./bad_batch ");
-        System.out.println("4.把当前所有文件压缩为 .7z 格式 密码默认为 752025    zrule_apply_G2.bat *_19 ");
-        System.out.println("5.对当前.7z 文件进行 后缀名称处理  zrule_apply_G2.bat #_9  7z_7疫z ");
-        System.out.println("6.打开当前文件夹  zzfile_3.bat ");
-        System.out.println(" zrule_apply_G2.bat *_18  .mp4   &&   zrule_apply_G2.bat #_7_bad_batch && cd ./bad_batch  && zrule_apply_G2.bat *_19 &&  zrule_apply_G2.bat #_9  7z_7疫z   &&   zzfile_3.bat");
+        System.out.println("4.把当前所有文件压缩为 .7z 格式 密码默认为 752025    zrule_apply_G2"+BAT_OR_SH_Point+" #_19 ");
+        System.out.println("5.对当前.7z 文件进行 后缀名称处理  zrule_apply_G2"+BAT_OR_SH_Point+" #_9  7z_7疫z ");
+        System.out.println("6.打开当前文件夹  zzfile_3"+BAT_OR_SH_Point);
+        System.out.println(" zrule_apply_G2"+BAT_OR_SH_Point+" #_18  .mp4   &&   zrule_apply_G2"+BAT_OR_SH_Point+" #_7_bad_batch && cd ./bad_batch  && zrule_apply_G2"+BAT_OR_SH_Point+" #_19 &&  zrule_apply_G2"+BAT_OR_SH_Point+" #_9  7z_7疫z   &&   zzfile_3"+BAT_OR_SH_Point);
 
         System.out.println("");
         System.out.println("________________________ MP4 解密批量操作 ________________________ ");
-        System.out.println("1.对当前文件中 后缀是包含中文的文件进行修复    zrule_apply_G2.bat  #_8");
-        System.out.println("2.对当前的压缩文件进行解压缩  zzip_H5.bat 752025 zukgit11");
-        System.out.println("3.对解压缩出来的文件进行解密   zrule_apply_G2.bat *_7_good_batch  ");
+        System.out.println("1.对当前文件中 后缀是包含中文的文件进行修复    zrule_apply_G2"+BAT_OR_SH_Point+"  #_8");
+        System.out.println("2.对当前的压缩文件进行解压缩  zzip_H5"+BAT_OR_SH_Point+" 752025 zukgit11");
+        System.out.println("3.对解压缩出来的文件进行解密   zrule_apply_G2"+BAT_OR_SH_Point+" #_7_good_batch  ");
         System.out.println("4.进入到解压文件夹 cd ./good_batch  ");
-        System.out.println("5.对解压的文件搜索输出快捷方式文件夹  zrule_apply_G2.bat *_14  .mp4  .avi   .wmv .rmvb  .flv .3gp");
-        System.out.println("6.打开当前文件    zzfile_3.bat ");
-        System.out.println("zrule_apply_G2.bat  #_8   &&   zzip_H5.bat 752025 zukgit11  &&  zrule_apply_G2.bat *_7_good_batch  && cd ./good_batch && zzfile_3.bat ");
+        System.out.println("5.对解压的文件搜索输出快捷方式文件夹  zrule_apply_G2"+BAT_OR_SH_Point+" #_14  .mp4  .avi   .wmv .rmvb  .flv .3gp");
+        System.out.println("6.打开当前文件    zzfile_3"+BAT_OR_SH_Point);
+        System.out.println("zrule_apply_G2"+BAT_OR_SH_Point+"  #_8   &&   zzip_H5"+BAT_OR_SH_Point+" 752025 zukgit11  &&  zrule_apply_G2"+BAT_OR_SH_Point+" #_7_good_batch  && cd ./good_batch && zzfile_3"+BAT_OR_SH_Point);
+
+        System.out.println();
+//        zrule_apply_G2.sh  #_9  jpg_
+        //        zrule_apply_G2.sh  #_9  _jpg
+        //        zrule_apply_G2.sh  #_9  _gif
+
+//        zrule_apply_G2.sh  #_9  webp_
+//        zrule_apply_G2.sh  #_9  gif_
+//        zrule_apply_G2.sh  #_9 png_
+
+        System.out.println();
+        System.out.println("________________________ jpg png webp 加密 解密 改名 无类型批量操作 ________________________ ");
+        System.out.println("【对 jpg png webp 改名并加密 生产加密文件夹 】");
+        System.out.println(" zrule_apply_G2"+BAT_OR_SH_Point+" #_18  .jpg   && zrule_apply_G2"+BAT_OR_SH_Point+" #_18  .png  && zrule_apply_G2"+BAT_OR_SH_Point+" #_18  .webp  && "+ "zrule_apply_G2"+BAT_OR_SH_Point+" #_9  jpg_ && zrule_apply_G2"+BAT_OR_SH_Point+" #_9  webp_ && zrule_apply_G2"+BAT_OR_SH_Point+" #_9  gif_ &&  zrule_apply_G2"+BAT_OR_SH_Point+" #_9 png_"+" &&   zrule_apply_G2"+BAT_OR_SH_Point+" #_7_bad_batch       ");
+        System.out.println("【 对 jpg png webp  对加密文件解密】");
+        System.out.println("zrule_apply_G2"+BAT_OR_SH_Point+" #_9  _jpg"+ "  &&  zrule_apply_G2"+BAT_OR_SH_Point+" #_7_good_batch  "+"  ");
+
 
         System.out.println();
         System.out.println();
-        System.out.println("________________________ jpg png webp 加密 解密 批量操作 ________________________ ");
-        System.out.println(" zrule_apply_G2.bat *_18  .jpg   && zrule_apply_G2.bat *_18  .png  && zrule_apply_G2.bat *_18  .webp  &&   zrule_apply_G2.bat #_7_bad_batch       【对img改名并加密】");
-        System.out.println(" zrule_apply_G2.bat *_7_good_batch     【对加密文件解密】");
+        System.out.println("________________________ gif 动态文件 加密 解密 无类型批量操作 批量操作 ________________________ ");
+        System.out.println("【对gif 改名并加密 生产加密文件夹】");
+        System.out.println(" zrule_apply_G2"+BAT_OR_SH_Point+" #_18  .gif    && zrule_apply_G2"+BAT_OR_SH_Point+" #_18  .webp  &&   zrule_apply_G2"+BAT_OR_SH_Point+" "+"zrule_apply_G2"+BAT_OR_SH_Point+" #_9  gif_ && zrule_apply_G2"+BAT_OR_SH_Point+" #_9  webp_"
+                + " #_7_bad_batch       ");
+        System.out.println("【 gif 对加密文件解密】");
+        System.out.println("zrule_apply_G2"+BAT_OR_SH_Point+" #_9  _gif"+ "  &&  zrule_apply_G2"+BAT_OR_SH_Point+" #_7_good_batch     ");
+
+
+
+
+
         PrintHead_End(" 文件加密解密操作 End    ");
     }
 

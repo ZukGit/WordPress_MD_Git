@@ -39,6 +39,7 @@ public class G2_ApplyRuleFor_TypeFile {
     static String G2_File_Path = zbinPath+File.separator+"G2";
     static String Win_Lin_Mac_ZbinPath = "";
 
+
     static File G2_Properties_File = new File(System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin" + File.separator + "G2.properties");
     static InputStream G2_Properties_InputStream;
     static OutputStream G2_Properties_OutputStream;
@@ -110,17 +111,26 @@ public class G2_ApplyRuleFor_TypeFile {
             Cur_Bat_Name = Cur_Bat_Name+".bat";
             curOS_ExeTYPE = ".exe";
             initJDKPath_Windows(curLibraryPath);
+            Win_Lin_Mac_ZbinPath = zbinPath+File.separator+"win_zbin";
+
         } else if (osName.contains("linux")) {
             curOS_TYPE = OS_TYPE.Linux;
             Cur_Bat_Name = Cur_Bat_Name+".sh";
             curOS_ExeTYPE = "";
             initJDKPath_Linux_MacOS(curLibraryPath);
+            Win_Lin_Mac_ZbinPath = zbinPath+File.separator+"lin_zbin";
+
         } else if (osName.contains("mac")) {
             curOS_TYPE = OS_TYPE.MacOS;
             Cur_Bat_Name = Cur_Bat_Name+".sh";
             curOS_ExeTYPE = "";
             initJDKPath_Linux_MacOS(curLibraryPath);
+            Win_Lin_Mac_ZbinPath = zbinPath+File.separator+"mac_zbin";
+
         }
+
+
+
     }
 
     static void initJDKPath_Linux_MacOS(String environmentPath){
@@ -243,8 +253,9 @@ public class G2_ApplyRuleFor_TypeFile {
 
             }
 
-            z7exeFile = new File(Win_Lin_Mac_ZbinPath+File.separator+"7z"+curOS_ExeTYPE);
 
+            z7exeFile = new File(Win_Lin_Mac_ZbinPath+File.separator+"7z"+curOS_ExeTYPE);
+            System.out.println("Win_Lin_Mac_ZbinPath = "+ Win_Lin_Mac_ZbinPath);
             if(!z7exeFile.exists() || z7exeFile.isDirectory()){
                 System.out.println("当前 7z 压缩程序不存在! 请检查当前的 7z程序 一般位于 Desktop/zbin/win_zbin/  mac_zbin lin_zbin 中  z7exeFile = "+ z7exeFile.getAbsolutePath());
                 return false;
@@ -4520,7 +4531,11 @@ public class G2_ApplyRuleFor_TypeFile {
         }
     }
 
-    public static String execCMD(String command) {
+
+   
+
+
+    public static String execCMD_Windows(String command) {
 //        System.out.println("══════════════Begin ExE ");
         StringBuilder sb =new StringBuilder();
         StringBuilder errorSb =new StringBuilder();
@@ -4567,5 +4582,65 @@ public class G2_ApplyRuleFor_TypeFile {
 //        System.out.println("sb.toString() = "+ sb.toString());
 //        System.out.println("══════════════End ExE ");
         return sb.toString();
+    }
+
+
+    /**
+     * 执行 mac(unix) 脚本命令~
+     * @param command
+     * @return
+     */
+    public static String execCMD_Mac(String command) {
+        String[] cmd = {"/bin/bash"};
+        Runtime rt = Runtime.getRuntime();
+        Process proc = null;
+        try {
+            proc = rt.exec(cmd);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        // 打开流
+        OutputStream os = proc.getOutputStream();
+        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(os));
+
+        try {
+            bw.write(command);
+
+            bw.flush();
+            bw.close();
+
+            /** 真奇怪，把控制台的输出打印一遍之后竟然能正常终止了~ */
+//            readConsole(proc);
+
+            /** waitFor() 的作用在于 java 程序是否等待 Terminal 执行脚本完毕~ */
+            proc.waitFor();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        int retCode = proc.exitValue();
+        if (retCode != 0) {
+            System.out.println("unix script retCode = " + retCode);
+
+//            System.out.println(readConsole(proc));
+            System.out.println("UnixScriptUil.execute 出错了!!");
+        }
+        return retCode+"";
+    }
+
+    
+    public static String execCMD(String command) {
+        
+        String result = "";
+        if(curOS_TYPE == OS_TYPE.Windows){
+        return execCMD_Windows(command);
+        }else if(curOS_TYPE == OS_TYPE.MacOS){
+
+            return execCMD_Mac(command);
+        }else{
+
+            execCMD_Mac(command);
+        }
+        return result;
     }
 }

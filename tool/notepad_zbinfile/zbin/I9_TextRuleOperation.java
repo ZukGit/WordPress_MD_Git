@@ -977,9 +977,14 @@ public class I9_TextRuleOperation {
                 File fileItem = curInputFileList.get(i);
                 if(CUR_OS_TYPE == OS_TYPE.Windows){
                     Make_Json_As_JavaFile_Rule_17(fileItem);
-                }else{
-                    System.out.println("无法在 Linux 和 MacOS 下实现  没有notepad++ 啊! ");
+                }else if(CUR_OS_TYPE == OS_TYPE.MacOS){
+                    System.out.println("无法在 Linux下实现  没有notepad++ 啊! ");
                     System.out.println("无法实现对 Windows下 对 Json 格式的文件 或者 以json格式保存的文件 生成bean文件 以及 Graphviz 绘图显示结构 (B6)");
+                }else if(CUR_OS_TYPE == OS_TYPE.Linux){
+                    System.out.println("无法在 Linux下实现  没有notepad++ 啊! ");
+                    System.out.println("无法实现对 Windows下 对 Json 格式的文件 或者 以json格式保存的文件 生成bean文件 以及 Graphviz 绘图显示结构 (B6)");
+
+
                 }
 
             }
@@ -1052,9 +1057,13 @@ public class I9_TextRuleOperation {
             for (int i = 0; i < curInputFileList.size(); i++) {
                 File fileItem = curInputFileList.get(i);
                 if(CUR_OS_TYPE == OS_TYPE.Windows){
-                    TextAs_QrCode_Rule_15(fileItem);
-                }else{
-                    System.out.println("无法在 Linux 和 MacOS 下实现  没有notepad++ 啊! ");
+                    TextAs_QrCode_Rule_15_Win(fileItem);
+                }else if(CUR_OS_TYPE == OS_TYPE.MacOS){
+                    // 实现  Mac 下 显示 二维码
+                    TextAs_QrCode_Rule_15_Mac(fileItem);
+
+                }else if(CUR_OS_TYPE == OS_TYPE.Linux){
+                    System.out.println("无法在 Linux  下实现  没有notepad++ 啊! ");
                 }
 
             }
@@ -2933,55 +2942,6 @@ public class I9_TextRuleOperation {
 
 
 
-    public static String execCMD_Mac(String command) {
-//        System.out.println("══════════════Begin ExE ");
-        StringBuilder sb = new StringBuilder();
-        StringBuilder errorSb = new StringBuilder();
-        try {
-
-//            Process process = Runtime.getRuntime().exec("CMD.exe /c start  " + command);
-            Process process = Runtime.getRuntime().exec(" " + command);
-
-            InputStreamReader inputReader = new InputStreamReader(process.getInputStream(), "GBK");
-            BufferedReader bufferedReader = new BufferedReader(inputReader);
-            String line;
-            int waitFor = process.waitFor();
-//            Stream<String> lines = bufferedReader.lines();
-//            lines.iterator();
-//            System.out.println("line Count = "+lines.count());
-
-            while ((line = bufferedReader.readLine()) != null) {
-                sb.append(line + "\n");
-
-            }
-
-
-            boolean isAlive = process.isAlive();
-            int errorSteamCode = process.getErrorStream().read();
-
-            String errorStream = process.getErrorStream().toString();
-            int exitValue = process.exitValue();
-//            process.getErrorStream().
-            //杀掉进程
-//            System.out.println("exitValue ="+ exitValue);
-            sb.append("\nexitValue = " + exitValue +
-                    "\nisAlive = " + isAlive +
-                    "\nerrorStream = " + errorStream +
-                    "\nerrorSteamCode = " + errorSteamCode +
-                    "\nwaitFor = " + waitFor);
-//            process.destroy();
-
-        } catch (Exception e) {
-            System.out.println("execCMD 出现异常! ");
-            sb.append("execCMD 出现异常! ");
-            return sb.toString();
-        }
-
-//        System.out.println("sb.toString() = "+ sb.toString());
-//        System.out.println("══════════════End ExE ");
-        return sb.toString();
-    }
-
     public static String execCMD(String command) {
 //        System.out.println("══════════════Begin ExE ");
         StringBuilder sb = new StringBuilder();
@@ -3427,7 +3387,7 @@ public class I9_TextRuleOperation {
             commandNotead  = " gedit " + absPath;
         }else if(CUR_OS_TYPE == OS_TYPE.MacOS){
             commandNotead  = "/Applications/UltraEdit  " + absPath;
-            execCMD_Mac(commandNotead);
+            execute_Mac(commandNotead);
         }
     }
 
@@ -4686,6 +4646,15 @@ public class I9_TextRuleOperation {
                     newOneLine = newOneLine.replace("\"","\\\"");
                     newOneLine = newOneLine.replace(".\\",".\\\\");   // .\w   .\w
 
+                    
+                    // 把 [.bat ]  转为   ["+BAT_OR_SH_Point+"]
+                    // 把 [.sh ]  转为   ["+BAT_OR_SH_Point+"]
+
+
+                    newOneLine = newOneLine.replace(".bat ","\"+BAT_OR_SH_Point+\"");
+                    newOneLine = newOneLine.replace(".sh ","\"+BAT_OR_SH_Point+\"");
+
+                    
                     newOneLine = "System.out.println(\""+newOneLine.trim()+"\");";
 
 
@@ -4979,7 +4948,7 @@ public class I9_TextRuleOperation {
 
     // 默认 只显示 第一行的 字符串
     // Rule_15   Begin  读取文件的第一行转为 二维码显示出来 B1
-    public static void  Pre50_TextAs_QrCode_Rule_15 (File srcFile) {
+    public static void  Pre50_TextAs_QrCode_Rule_15_Win (File srcFile) {
         File curFile = srcFile;
         if (curFile != null) {
             try {
@@ -5010,9 +4979,211 @@ public class I9_TextRuleOperation {
 
 
 
+
+
+
     // 默认 只显示 第一行的 字符串
     // Rule_15   Begin  读取文件的第一行转为 二维码显示出来 B1
-    public static void TextAs_QrCode_Rule_15(File srcFile) {
+    public static void TextAs_QrCode_Rule_15_Mac(File srcFile) {
+        File curFile = srcFile;
+        ArrayList<String> TxtContent = new   ArrayList<String>();
+        ArrayList<String> Pre50_Content = new   ArrayList<String>();
+
+        if (curFile != null) {
+
+            try {
+                BufferedReader curBR = new BufferedReader(new InputStreamReader(new FileInputStream(curFile), "utf-8"));
+                String qrCodeString = "";
+
+//                while (qrCodeString != null && qrCodeString.trim().isEmpty()) {
+                while (qrCodeString != null ) {
+                    qrCodeString = curBR.readLine();
+                    TxtContent.add(qrCodeString);
+                }
+                System.out.println("把扫描到的第一行非空字符串转为二维码  qrCodeString = " + qrCodeString);
+
+                curBR.close();
+
+                int lineNum = 1;
+                for (int i = 0; i < TxtContent.size(); i++) {
+
+                    String lineStr = TxtContent.get(i);
+                    System.out.println("line["+lineNum+"] = "+lineStr);
+                    lineNum++;
+                    if(Pre50_Content.size() < 50 && lineStr != null ){
+                        Pre50_Content.add(lineStr);
+                    }
+                }
+
+                QrConfig config = new QrConfig();
+                ArrayList<File> targetFileList = new  ArrayList<File>();
+                for (int i = 0; i < Pre50_Content.size(); i++) {
+                    int lineIndex = i + 1;
+                    String content = Pre50_Content.get(i).trim();
+                    boolean isEmpty = "".equals(content);
+                    boolean isUrl = isValidUrl_String(content);
+                    File targetFile = null;
+                    if(isEmpty){
+                        targetFile = calculBlankIndex(I9_Qr_Black_Image_File,lineIndex);
+                    }else{
+                        targetFile = QrCodeUtil.generate (content, config, new File(I9_OUT_DIR.getAbsolutePath() + File.separator + getFileNameNoPoint(srcFile.getName())+"_"+getTimeStampLong()+".jpg"));
+                    }
+                    targetFileList.add(targetFile);
+
+                    System.out.println("operation -> "+ lineIndex);
+                }
+
+
+                if(targetFileList.size() == 1){
+                    String commandOne = " open  " + targetFileList.get(0).getAbsolutePath();
+//                    RuntimeUtil.exec(" open  " + targetFileList.get(0).getAbsolutePath());
+                    execute_Mac(commandOne);
+
+                }else{
+
+                    int width = targetFileList.size() * 300 ;
+                    if(width >= 3000){
+                        width = 3000;
+                    }
+
+                    int high =   targetFileList.size()%10 == 0? (targetFileList.size()/10) * 300 : ((targetFileList.size()/10) * 300 + 300);
+                    if(high >= 1500){
+                        high = 1500;
+                    }
+
+                    BufferedImage combined = new BufferedImage(width, high, BufferedImage.TYPE_INT_RGB);
+                    Graphics g = combined.getGraphics();
+
+                    for (int i = 0; i < targetFileList.size() ; i++) {
+                        int LineNum = i+1;
+                        File QrFile = targetFileList.get(i);
+                        BufferedImage originImage = getBufferedImage(QrFile);
+                        int temp_x = 300*(i%10);
+                        int temp_y = 300*(i/10);
+
+                        System.out.println("绘制第 "+ LineNum +" 图片! "+"x="+temp_x+" y ="+temp_y+"   QrFile = "+ QrFile.exists() + "  路径:"+ QrFile.getAbsolutePath());
+
+                        g.drawImage(originImage,  temp_x, temp_y,null);
+                    }
+                    File endTargetFile =new File(I9_OUT_DIR.getAbsolutePath() + File.separator + "Qr_"+getFileNameNoPoint(srcFile.getName())+"_"+getTimeStampLong()+".jpg");
+                    endTargetFile.createNewFile();
+                    ImageIO.write(combined, "jpg", endTargetFile);
+                    String showJpgCommand = "open  "+ endTargetFile.getAbsolutePath();
+//                    System.out.println("rundll32.exe C:\\\\Windows\\\\System32\\\\shimgvw.dll,ImageView_Fullscreen  " + endTargetFile.getAbsolutePath());
+                    System.out.println("命令: "+ showJpgCommand );
+                    execute_Mac(showJpgCommand);
+//                    RuntimeUtil.exec("rundll32.exe C:\\\\Windows\\\\System32\\\\shimgvw.dll,ImageView_Fullscreen  " + endTargetFile.getAbsolutePath());
+
+                }
+
+
+//                File endTarget = calculQrEndTarget(targetFileList);
+//
+//                RuntimeUtil.exec("rundll32.exe C:\\\\Windows\\\\System32\\\\shimgvw.dll,ImageView_Fullscreen  " + endTarget.getAbsolutePath());
+
+/*                QrConfig config = new QrConfig();
+
+                File targetFile = QrCodeUtil.generate
+                        (qrCodeString, config, new File(I9_OUT_DIR.getAbsolutePath() + File.separator + getFileNameNoPoint(srcFile.getName())+"_"+getTimeStampLong()+".jpg"));
+
+                RuntimeUtil.exec("rundll32.exe C:\\\\Windows\\\\System32\\\\shimgvw.dll,ImageView_Fullscreen  " + targetFile.getAbsolutePath());*/
+
+            } catch (Exception e) {
+                System.out.println("Exception ! ");
+                e.printStackTrace();
+            }
+        } else {
+            System.out.println("Failed !");
+        }
+    }
+    // Rule_15   End  读取文件的第一行转为 二维码显示出来 B1
+
+
+
+
+    /**
+     * 执行 mac(unix) 脚本命令~
+     * @param command
+     * @return
+     */
+    public static int execute_Mac(String command) {
+        String[] cmd = {"/bin/bash","-c",command};
+        Runtime rt = Runtime.getRuntime();
+        Process proc = null;
+        try {
+            proc = rt.exec(cmd);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        // 打开流
+//        OutputStream os = proc.getOutputStream();
+//        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(os));
+
+        try {
+//            String newCommand = "/bin/bash -c "+"\""+command+"\"";
+//            System.out.println("newCommand = " + newCommand);
+
+//            bw.write(newCommand);
+
+//
+//            bw.flush();
+//            bw.close();
+
+            /** 真奇怪，把控制台的输出打印一遍之后竟然能正常终止了~ */
+//            readConsole(proc);
+
+            /** waitFor() 的作用在于 java 程序是否等待 Terminal 执行脚本完毕~ */
+            proc.waitFor();
+            Thread.sleep(100000);
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+//        int retCode = proc.exitValue();
+//        if (retCode != 0) {
+//            System.out.println("unix script retCode = " + retCode);
+//
+//            System.out.println(readConsole(proc));
+//            System.out.println("UnixScriptUil.execute 出错了!!");
+//        }
+
+        return 0;
+    }
+
+    /**
+     * 读取控制命令的输出结果
+     * 原文链接：http://lavasoft.blog.51cto.com/62575/15599
+     * @param
+     * @return 控制命令的输出结果
+     * @throws IOException
+     */
+    public static String readConsole(Process process) {
+        StringBuffer cmdOut = new StringBuffer();
+        InputStream fis = process.getInputStream();
+        BufferedReader br = new BufferedReader(new InputStreamReader(fis));
+
+        String line = null;
+        try {
+            while ((line = br.readLine()) != null) {
+                cmdOut.append(line).append(System.getProperty("line.separator"));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+//       System.out.println("执行系统命令后的控制台输出为：\n" + cmdOut.toString());
+        return cmdOut.toString().trim();
+    }
+
+
+
+
+
+
+    // 默认 只显示 第一行的 字符串
+    // Rule_15   Begin  读取文件的第一行转为 二维码显示出来 B1
+    public static void TextAs_QrCode_Rule_15_Win(File srcFile) {
         File curFile = srcFile;
         ArrayList<String> TxtContent = new   ArrayList<String>();
         ArrayList<String> Pre50_Content = new   ArrayList<String>();

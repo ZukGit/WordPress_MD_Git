@@ -229,7 +229,13 @@ public class H5_Zip {
     //  7z.exe 文件的
     static String WINEXE_WINRAR_PATH = zbinPath + File.separator+"H5_WinRAR.exe ";
 
- //  用于标记当前 用户输入的最后一个参数是 all 用于判断是否需要把当前目录的所有文件 子文件 孙文件 都解压缩
+    // Mac下 7z 文件的路径
+
+    static String Mac_Z7_PATH = zbinPath + File.separator+"H5_Mac_7z ";
+
+
+
+    //  用于标记当前 用户输入的最后一个参数是 all 用于判断是否需要把当前目录的所有文件 子文件 孙文件 都解压缩
     static boolean  isAll_Search_Express = false;
 
     // 标记是否是在 J1.bat 文件中 被执行   以 J1_all 结尾
@@ -478,6 +484,147 @@ boolean  isContainBlankName = false;
         return flag;
     }
 
+
+
+    static void JieYaRar_MacOS(ArrayList<File> rarList) {
+        String rar_JiaYa_EndFlag="_rar";  // 解压的文件夹 是以 _rar 为标识
+        System.out.println("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
+        // 保存那些  无法依据  输入的 密码 还是无法保存的那些 rar 文件
+        Set<File> existUnknowrarList = new HashSet<File>();
+        if (rarList == null) {
+            return;
+        }
+
+        System.out.println("══════════════" + ".rar 文件大小:" + rarList.size() + "══════════════");
+
+        for (int i = 0; i < rarList.size(); i++) {
+            File rarFile = rarList.get(i);
+            String rarAbsPath = rarFile.getAbsolutePath();
+            // windows  7z.exe  不需要 把 文件名 重置
+//            rarFile = fixedFailedName(rarFile);   // xxx.rar 文件
+            int indexCount = i + 1;
+//            boolean isJiaMi = isRarEncrypted(rarFile);
+            boolean isJiaMi = true;  // 默认的 jima 都是 true的
+            String rarTargetFilePath = rarFile.getParent() + File.separator + getFileNameNoPoint(rarFile.getName())+rar_JiaYa_EndFlag;
+
+            if(isAll_Search_Express){
+                rarTargetFilePath = rarFile.getParentFile().getAbsolutePath() + File.separator + getFileNameNoPoint(rarFile.getName());
+            }
+            System.out.println(" ZZZrarTargetFilePath = "+ rarTargetFilePath);
+
+            //  把 ZFAILED_UNrar_  去除 再检查  是否存在 目标文件
+            rarTargetFilePath = rarTargetFilePath.replace(UNZIP_PRE,"");
+            File targetFile = new File(rarTargetFilePath);  // 解压的文件夹
+
+            // 目标文件夹
+            String targetDirName = targetFile.getName().replace(UNZIP_PRE,"");
+
+            if(isAll_Search_Express){
+                String zipDirAbsPath = targetFile.getAbsolutePath();
+                targetDirName = zipDirAbsPath.replace(CUR_Dir_FILE.getAbsolutePath(),"");
+                targetDirName = targetDirName.replace(targetFile.getName(),"");
+                targetDirName = targetDirName.replace(File.separator+File.separator,File.separator);
+
+            }
+            boolean isTargetDirExist = isTargetExist_BigBytes(targetFile);
+            boolean isOK = false;
+            String targetPassword = "";
+            System.out.println(indexCount + " <<<<<<<<<<<<<<<<<<< " + " 解压rar文件:" + rarFile.getName() + "  Begin" + "══════════════");
+            System.out.println("目标目录是否存在:" + isTargetDirExist);
+            if(!isTargetDirExist) {
+                out:
+                for (int j = 0; j < PasswordList.size(); j++) {
+                    String password = PasswordList.get(j);
+                    // 7z.exe -y -p111  x 111_pw.rar -o./111_pw_rar       解压rar 密码
+                    //
+                    // WINEXE_Z7_PATH(7z执行文件) rarTargetFilePath(目标文件夹_绝对路径) targetDirName(目标文件夹名称)
+                    // password(密码)     rarAbsPath( rar 文件的绝对路径)
+
+//                C:\Users\zhuzj5\Desktop\zbin\H5_7z.exe  -y -p111  x C:\Users\zhuzj5\Desktop\H5\111\3\ZFAILED_UNrar_111_pw.rar  -o./zfailed_unrar_111_pw_rar
+
+                    // WinRAR_H5.exe -p111 -y x 111_pw.rar  .\111_pw_rar\
+
+                    String commandRar = "";
+// 无密码解压
+//  C:\Users\zhuzj5\Desktop\zbin\H5_WinRAR.exe   -y  x C:\Users\zhuzj5\Desktop\H5\111\3\111_no.rar  .\111_no_rar\
+
+// C:\Users\zhuzj5\Desktop\zbin\H5_WinRAR.exe  -y  x C:\Users\zhuzj5\Desktop\H5\111\3\test1\111_pw.rar  .\111_pw_rar\
+// 使用无密码  解压有密码的 rar文件
+                    if(!"".equals(password.trim())){
+                        commandRar = Mac_Z7_PATH  + " -p\"" + password.trim() + "\" -y  x \"" + rarAbsPath + "\"  \".\\" + targetDirName+"\\"+"\"";
+
+                    }else{
+                        commandRar = Mac_Z7_PATH +  "-p00 -y  x \"" + rarAbsPath + "\"  \".\\" + targetDirName+"\\"+"\"";
+
+                    }
+
+                    // Mac 下 使用 7z 去尝试解析 rar文件
+                    commandRar = Mac_Z7_PATH + " -y -p\"" + password.trim() + "\"  x  \"" + rarAbsPath + "\"  -o\"./" + targetDirName+"\"";
+
+
+// 正确  Users/zhuzhengjie/Desktop/zbin/H5_Mac_7z  -y -p"2257"  x  "/Users/zhuzhengjie/Desktop/zip_rar_7z/7z/7z_jpg_mimaB.7z"  -o"./7z_jpg_mimaB_7z"
+// 错误 Users/zhuzhengjie/Desktop/zbin/H5_Mac_7z -p00 -y  x "/Users/zhuzhengjie/Desktop/zip_rar_7z/rar/dahua.rar"  ".\dahua_rar\"
+                    System.out.println("目标解压路径 rarTargetFilePath = " + rarTargetFilePath);
+                    System.out.println("目标解压路径 targetDirName = " + targetDirName);
+                    System.out.println("isJiaMi = "+ isJiaMi +"   password = "+password+"  command = \n" + commandRar);
+
+//目标解压路径 zipTargetFilePath = D:\Temp\ZWin_SoftWare_20200911\ZWin_Software\A0_Pre_Install_Soft\cmder
+//目标解压路径 targetDirName = cmder
+
+// command = C:\Users\zhuzj5\Desktop\zbin\H5_7z.exe  -y -p""  x "D:\Temp\ZWin_SoftWare_20200911\ZWin_Software\A0_Pre_Install_Soft\ZFAILED_UNZIP_cmder.zip"  -o"./cmder"
+
+                    String commandResult = execCMD_Mac(commandRar);
+                    System.out.println("══════════════Begin ExE ");
+                    System.out.println(commandResult);
+                    System.out.println("══════════════End ExE ");
+//               targetPassword = password;
+
+
+                    // 解压完成后  查看当前目标目录是否存在  大小是否大于 10 字节
+                    if (isTargetExist_BigBytes(targetFile)) {
+                        isOK = true;
+                        targetPassword = password;
+                        if(!"".equals(targetPassword)){  // 如果 密码 不为 空  那么  JiaMi的 就是 true
+                            isJiaMi = true;
+                        }else{
+                            isJiaMi = false;
+                        }
+                        //  如果成功 解压  当前 rar文件 含有 ZFailed_Unrar字样 那么重命名
+                        rarFile = fixedFailedName_BackCommon(rarFile);
+                        String fixAbsPath = rarFile.getAbsolutePath().replace(UNZIP_PRE,"");
+                        ZIP_Path_Password_Map.put(fixAbsPath,"".equals(targetPassword.trim())?"无密码":targetPassword);
+                        System.out.println("══》 【 解压成功 】 rar 文件  Password【 " + (isJiaMi ? targetPassword : "") + " 】   Path【 " + rarFile.getName() + " 】");
+                        break out;
+                    } else {
+                        // 如果解压  失败 那么 把 解压出来的 目录 删掉
+                        System.out.println("command 执行失败  密码错误!");
+                        isJiaMi = false;
+                        deleteDirectory(targetFile.getAbsolutePath());
+                    }
+
+
+                }
+            }else{
+                if(isJiaMi){
+                    ZIP_Path_Password_Map.put(rarFile.getAbsolutePath(),"已有解压文件夹-不知密码");
+                }else{
+                    ZIP_Path_Password_Map.put(rarFile.getAbsolutePath(),"无密码");
+                }
+            }
+            if (!isOK) {
+                System.out.println("══》【 所有密码解压失败 】 rar 文件 :" + rarFile.getName());
+
+                if (!existUnknowrarList.contains(rarFile) && !isTargetDirExist)
+                    existUnknowrarList.add(rarFile);  //   保存那些 不知道密码的  并且没有对应解压缩文件夹的 rar 的 文件
+            }
+            System.out.println("══════════════" + " 解压rar文件:" + rarFile.getName() + "  End" + isOkTip(isOK) + (isJiaMi ? (isTargetDirExist ? "password【加密文件 但已解压 不知密码】" : showPassword(targetPassword)) : " password【无密码锁】") + "══════════════");
+            System.out.println();
+            UnKnowFileList.addAll(existUnknowrarList);
+        }
+
+    }
+
+
     static void JieYaRar_Windows(ArrayList<File> rarList) {
         String rar_JiaYa_EndFlag="_rar";  // 解压的文件夹 是以 _rar 为标识
         System.out.println("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
@@ -651,6 +798,117 @@ String fixAbsPath = rarFile.getAbsolutePath().replace(UNZIP_PRE,"");
         }
     }
 
+
+
+    static void JieYa7Z_MacOS(ArrayList<File> z7List,String type) {
+        String z7_JiaYa_EndFlag="_"+type.replace(".","");  // 解压的文件夹 是以 _z7 为标识
+
+        // 保存那些  无法依据  输入的 密码 还是无法保存的那些 z7 文件
+        Set<File> existUnknowz7List = new HashSet<>();
+        if (z7List == null) {
+            return;
+        }
+
+        System.out.println("══════════════" + ".7z 文件个数:" + z7List.size() + "══════════════");
+
+        for (int i = 0; i < z7List.size(); i++) {
+            File z7File = z7List.get(i);
+            String z7AbsPath = z7File.getAbsolutePath();
+            // windows  7z.exe  不需要 把 文件名 重置
+//            z7File = fixedFailedName(z7File);   // xxx.z7 文件
+            int indexCount = i + 1;
+            boolean isJiaMi = is7zEncrypted(z7File);
+            String z7TargetFilePath = z7File.getParent() + File.separator + getFileNameNoPoint(z7File.getName())+z7_JiaYa_EndFlag;
+            if(isAll_Search_Express){
+                z7TargetFilePath = z7File.getParentFile().getAbsolutePath() + File.separator + getFileNameNoPoint(z7File.getName());
+            }
+
+            System.out.println("ZZZz7TargetFilePath = "+ z7TargetFilePath);
+            //  把 ZFAILED_UNZIP_  去除 再检查  是否存在 目标文件
+            z7TargetFilePath = z7TargetFilePath.replace(UNZIP_PRE,"");
+            File targetFile = new File(z7TargetFilePath);  // 解压的文件夹
+            String targetDirName = targetFile.getName().replace(UNZIP_PRE,"");
+
+            if(isAll_Search_Express){
+                String zipDirAbsPath = targetFile.getAbsolutePath();
+                targetDirName = zipDirAbsPath.replace(CUR_Dir_FILE.getAbsolutePath(),"");
+                targetDirName = targetDirName.replace(targetFile.getName(),"");
+                targetDirName = targetDirName.replace(File.separator+File.separator,File.separator);
+
+            }
+
+            boolean isTargetDirExist = isTargetExist_BigBytes(targetFile);
+            boolean isOK = false;
+            String targetPassword = "";
+            System.out.println(indexCount + " <<<<<<<<<<<<<<<<<<< " + " 解压 7z文件:" + z7File.getName() + "  Begin" + "══════════════");
+            System.out.println("目标目录是否存在:" + isTargetDirExist);
+            if(!isTargetDirExist) {
+                out:
+                for (int j = 0; j < PasswordList.size(); j++) {
+                    String password = PasswordList.get(j);
+                    // 7z.exe -y -p111  x 111_pw.z7 -o./111_pw_z7       解压z7 密码
+                    //
+                    // WINEXE_Z7_PATH(7z执行文件) z7TargetFilePath(目标文件夹_绝对路径) targetDirName(目标文件夹名称)
+                    // password(密码)     z7AbsPath( z7 文件的绝对路径)
+
+//                C:\Users\zhuzj5\Desktop\zbin\H5_7z.exe  -y -p111  x C:\Users\zhuzj5\Desktop\H5\111\3\ZFAILED_UNz7_111_pw.z7  -o./zfailed_unz7_111_pw_z7
+
+                    String command7z = Mac_Z7_PATH + " -y -p\"" + password.trim() + "\"  x  \"" + z7AbsPath + "\"  -o\"./" + targetDirName+"\"";
+                    System.out.println("目标解压路径 7ZTargetFilePath = " + z7TargetFilePath);
+                    System.out.println("目标解压路径 targetDirName = " + targetDirName);
+                    System.out.println("command = \n" + command7z);
+
+                    String commandResult = execCMD_Mac(command7z);
+                    System.out.println("══════════════Begin ExE ");
+                    System.out.println(commandResult);
+                    System.out.println("══════════════End ExE ");
+//               targetPassword = password;
+                    try {
+                        Thread.sleep(1000);   // 歇息1秒
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
+                    // 解压完成后  查看当前目标目录是否存在  大小是否大于 10 字节
+                    if (isTargetExist_BigBytes(targetFile)) {
+                        isOK = true;
+                        targetPassword = password;
+                        //  如果成功 解压  当前 z7文件 含有 ZFailed_Unz7字样 那么重命名
+                        z7File = fixedFailedName_BackCommon(z7File);
+                        String fixedAbsPath =     z7File.getAbsolutePath().replace(UNZIP_PRE,"");
+                        ZIP_Path_Password_Map.put(fixedAbsPath,"".equals(targetPassword.trim())?"无密码":targetPassword);
+                        System.out.println("══》 【 解压成功 】 7z 文件  Password【 " + (isJiaMi ? targetPassword : "") + " 】   Path【 " + z7File.getName() + " 】");
+                        break out;
+                    } else {
+                        // 如果解压  失败 那么 把 解压出来的 目录 删掉
+                        System.out.println("command 执行失败  密码错误!");
+                        deleteDirectory(targetFile.getAbsolutePath());
+                    }
+
+
+                }
+            }else{
+                if(isJiaMi){
+                    ZIP_Path_Password_Map.put(z7File.getAbsolutePath(),"已有解压文件夹-不知密码");
+                }else{
+                    ZIP_Path_Password_Map.put(z7File.getAbsolutePath(),"无密码");
+                }
+            }
+            if (!isOK) {
+                System.out.println("══》【 所有密码解压失败 】 7z 文件 :" + z7File.getName());
+
+                if (!existUnknowz7List.contains(z7File) && !isTargetDirExist)
+                    existUnknowz7List.add(z7File);  //   保存那些 不知道密码的  并且没有对应解压缩文件夹的 z7 的 文件
+            }
+            System.out.println("══════════════" + " 解压7z文件:" + z7File.getName() + "  End" + isOkTip(isOK) + (isJiaMi ? (isTargetDirExist ? "password【加密文件 但已解压 不知密码】" : showPassword(targetPassword)) : " password【无密码锁】") + "══════════════");
+            System.out.println();
+            UnKnowFileList.addAll(existUnknowz7List);
+        }
+
+    }
+
+
+
     static void JieYa7Z_Windows(ArrayList<File> z7List,String type) {
         String z7_JiaYa_EndFlag="_"+type.replace(".","");  // 解压的文件夹 是以 _z7 为标识
 
@@ -807,6 +1065,7 @@ String fixAbsPath = rarFile.getAbsolutePath().replace(UNZIP_PRE,"");
     }
 
 
+
     static void JieYaZip_Windows(ArrayList<File> zipList) {
         String zip_JiaYa_EndFlag="_zip";  // 解压的文件夹 是以 _zip 为标识
 
@@ -922,6 +1181,123 @@ String fixAbsPath = rarFile.getAbsolutePath().replace(UNZIP_PRE,"");
     }
 
 
+
+    static void JieYaZip_MacOS(ArrayList<File> zipList) {
+        String zip_JiaYa_EndFlag="_zip";  // 解压的文件夹 是以 _zip 为标识
+
+        // 保存那些  无法依据  输入的 密码 还是无法保存的那些 zip 文件
+        Set<File> existUnknowZipList = new HashSet<File>();
+        if (zipList == null) {
+            return;
+        }
+
+        System.out.println("══════════════" + ".zip 文件大小:" + zipList.size() + "══════════════");
+
+        for (int i = 0; i < zipList.size(); i++) {
+            File zipFile = zipList.get(i);
+            String zipAbsPath = zipFile.getAbsolutePath();
+            // windows  7z.exe  不需要 把 文件名 重置
+//            zipFile = fixedFailedName(zipFile);   // xxx.zip 文件
+            int indexCount = i + 1;
+//            boolean isJiaMi = isZipFileEncrypted(zipFile);
+            boolean isJiaMi = true;
+            String zipTargetFilePath = getFileNameNoPoint(zipFile.getName())+zip_JiaYa_EndFlag;
+            if(isAll_Search_Express){
+                zipTargetFilePath = zipFile.getParentFile().getAbsolutePath() + File.separator + getFileNameNoPoint(zipFile.getName());
+            }
+            System.out.println("ZZZzipTargetFilePath = "+ zipTargetFilePath);
+            //  把 ZFAILED_UNZIP_  去除 再检查  是否存在 目标文件
+            zipTargetFilePath = zipTargetFilePath.replace(UNZIP_PRE,"");
+            File targetFile = new File(zipTargetFilePath);  // 解压的文件夹
+            String targetDirName = targetFile.getName().replace(UNZIP_PRE,"");
+            if(isAll_Search_Express){
+                String zipDirAbsPath = targetFile.getAbsolutePath();
+                targetDirName = zipDirAbsPath.replace(CUR_Dir_FILE.getAbsolutePath(),"");
+                targetDirName = targetDirName.replace(targetFile.getName(),"");
+                targetDirName = targetDirName.replace(File.separator+File.separator,File.separator);
+            }
+
+
+            boolean isTargetDirExist = isTargetExist_BigBytes(targetFile);
+            boolean isOK = false;
+            String targetPassword = "";
+            System.out.println(indexCount + " <<<<<<<<<<<<<<<<<<< " + " 解压zip文件:" + zipFile.getName() + "  Begin" + "══════════════");
+            System.out.println("目标目录是否存在:" + isTargetDirExist);
+            if(!isTargetDirExist) {
+                out:
+                for (int j = 0; j < PasswordList.size(); j++) {
+                    String password = PasswordList.get(j);
+                    // 7z.exe -y -p111  x 111_pw.zip -o./111_pw_zip       解压zip 密码
+                    //
+                    // WINEXE_Z7_PATH(7z执行文件) zipTargetFilePath(目标文件夹_绝对路径) targetDirName(目标文件夹名称)
+                    // password(密码)     zipAbsPath( zip 文件的绝对路径)
+
+//                C:\Users\zhuzj5\Desktop\zbin\H5_7z.exe  -y -p111  x C:\Users\zhuzj5\Desktop\H5\111\3\ZFAILED_UNZIP_111_pw.zip  -o./zfailed_unzip_111_pw_zip
+
+                    String command7z = Mac_Z7_PATH + " -y -p\"" + password.trim() + "\"  x \"" + zipAbsPath + "\"  -o\"./" + targetDirName+"\"";
+                    System.out.println("目标解压路径 zipTargetFilePath = " + zipTargetFilePath);
+                    System.out.println("目标解压路径 targetDirName = " + targetDirName);
+
+//目标解压路径 zipTargetFilePath = D:\Temp\ZWin_SoftWare_20200911\ZWin_Software\A0_Pre_Install_Soft\cmder
+//目标解压路径 targetDirName = cmder
+
+                    System.out.println("command = \n" + command7z);
+
+                    String commandResult = execCMD_Mac(command7z);
+                    System.out.println("══════════════Begin ExE ");
+                    System.out.println(commandResult);
+                    System.out.println("══════════════End ExE ");
+//               targetPassword = password;
+
+
+                    // 解压完成后  查看当前目标目录是否存在  大小是否大于 10 字节
+                    if (isTargetExist_BigBytes(targetFile)) {
+                        isOK = true;
+                        targetPassword = password;
+                        if(!"".equals(password)){
+                            isJiaMi = true;
+                        }else{
+                            isJiaMi = false;
+                        }
+
+                        //  如果成功 解压  当前 zip文件 含有 ZFailed_UnZIP字样 那么重命名
+                        zipFile = fixedFailedName_BackCommon(zipFile);
+                        String fixedAbsPath =     zipFile.getAbsolutePath().replace(UNZIP_PRE,"");
+                        ZIP_Path_Password_Map.put(fixedAbsPath,"".equals(targetPassword.trim())?"无密码":targetPassword);
+                        System.out.println("══》 【 解压成功 】 zip 文件  Password【 " + (isJiaMi ? targetPassword : "") + " 】   Path【 " + zipFile.getName() + " 】");
+                        break out;
+                    } else {
+                        isJiaMi = true;
+                        // 如果解压  失败 那么 把 解压出来的 目录 删掉
+                        System.out.println("command 执行失败  密码错误!");
+                        System.out.println("删除 文件夹: "+ targetFile.getAbsolutePath());
+                        deleteDirectory(targetFile.getAbsolutePath());
+                    }
+
+
+                }
+            }else{
+                if(isJiaMi){
+                    ZIP_Path_Password_Map.put(zipFile.getAbsolutePath(),"已有解压文件夹-不知密码");
+                }else{
+                    ZIP_Path_Password_Map.put(zipFile.getAbsolutePath(),"无密码");
+                }
+            }
+            if (!isOK) {
+                System.out.println("══》【 所有密码解压失败 】 zip 文件 :" + zipFile.getName());
+
+                if (!existUnknowZipList.contains(zipFile) && !isTargetDirExist)
+                    existUnknowZipList.add(zipFile);  //   保存那些 不知道密码的  并且没有对应解压缩文件夹的 zip 的 文件
+            }
+            System.out.println("══════════════" + " 解压zip文件:" + zipFile.getName() + "  End" + isOkTip(isOK) + (isJiaMi ? (isTargetDirExist ? "password【加密文件 但已解压 不知密码】" : showPassword(targetPassword)) : " password【无密码锁】") + "══════════════");
+            System.out.println();
+            UnKnowFileList.addAll(existUnknowZipList);
+        }
+
+    }
+
+
+
     static void JieYaZip(ArrayList<File> zipList) {
 
         // 保存那些  无法依据  输入的 密码 还是无法保存的那些 zip 文件
@@ -998,9 +1374,38 @@ String fixAbsPath = rarFile.getAbsolutePath().replace(UNZIP_PRE,"");
         } else if(CUR_OS_TYPE ==OS_TYPE.MacOS){
 //  MacOS 的  解压方式  未实现
             System.out.println("未实现 MacOS的 解压方法!");
+            tryJieYaOperation_MacOS();
         }
 
     }
+
+
+
+    public static void tryJieYaOperation_MacOS() {
+        for (int i = 0; i < zipFileTypeList.size(); i++) {
+            String mFileType = zipFileTypeList.get(i);
+
+            if (".zip".equals(mFileType)) {
+                ArrayList<File> zipList = arrFileMap.get(mFileType);
+//                JieYaZip_Windows(zipList);
+                JieYaZip_MacOS(zipList);
+
+            } else if (".7z".equals(mFileType) || ".gz".equals(mFileType) || ".tar".equals(mFileType)) {
+                ArrayList<File> z7_List = arrFileMap.get(mFileType);
+                JieYa7Z_MacOS(z7_List,mFileType);
+
+            } else if (".rar".equals(mFileType)) {
+                ArrayList<File> rarList = arrFileMap.get(mFileType);
+//                System.out.println("RAR 文件个数: "+ rarList.size());
+                JieYaRar_MacOS(rarList);
+            }
+            System.out.println("index["+i+"]   mFileType  =" + mFileType);
+
+        }
+
+
+    }
+
 
     public static void tryJieYaOperation_Windows() {
         for (int i = 0; i < zipFileTypeList.size(); i++) {
@@ -2532,6 +2937,51 @@ String fixAbsPath = rarFile.getAbsolutePath().replace(UNZIP_PRE,"");
     }
 
 
+
+
+
+    /**
+     * 执行 mac(unix) 脚本命令~
+     * @param command
+     * @return
+     */
+    public static String execCMD_Mac(String command) {
+        String[] cmd = {"/bin/bash"};
+        Runtime rt = Runtime.getRuntime();
+        Process proc = null;
+        try {
+            proc = rt.exec(cmd);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        // 打开流
+        OutputStream os = proc.getOutputStream();
+        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(os));
+
+        try {
+            bw.write(command);
+
+            bw.flush();
+            bw.close();
+
+            /** 真奇怪，把控制台的输出打印一遍之后竟然能正常终止了~ */
+//            readConsole(proc);
+
+            /** waitFor() 的作用在于 java 程序是否等待 Terminal 执行脚本完毕~ */
+            proc.waitFor();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        int retCode = proc.exitValue();
+        if (retCode != 0) {
+            System.out.println("unix script retCode = " + retCode);
+
+//            System.out.println(readConsole(proc));
+            System.out.println("UnixScriptUil.execute 出错了!!");
+        }
+        return retCode+"";
+    }
 
     public static String execCMD(String command) {
 //        System.out.println("══════════════Begin ExE ");

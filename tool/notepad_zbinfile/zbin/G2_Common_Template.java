@@ -557,12 +557,14 @@ public class G2_Common_Template {
         String commandNotead = "";
         if(CUR_OS_TYPE == OS_TYPE.Windows){
             commandNotead = "cmd.exe /c start   Notepad++.exe " + absPath;
+            execCMD_Win(commandNotead);
         }else if(CUR_OS_TYPE == OS_TYPE.Linux){
             commandNotead  = " gedit " + absPath;
+            execCMD_Mac(commandNotead);
         }else if(CUR_OS_TYPE == OS_TYPE.MacOS){
             commandNotead  = " gedit " + absPath;
         }
-        execCMD(commandNotead);
+
     }
 
 
@@ -1412,7 +1414,77 @@ public class G2_Common_Template {
     // ArrayPrint ==============================End
 
 
-    public static String execCMD(String command) {
+
+    /**
+     * 执行 mac(unix) 脚本命令~
+     * @param command
+     * @return
+     */
+    public static String execCMD_Mac(String command) {
+        String[] cmd = {"/bin/bash"};
+        Runtime rt = Runtime.getRuntime();
+        Process proc = null;
+        try {
+            proc = rt.exec(cmd);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        // 打开流
+        OutputStream os = proc.getOutputStream();
+        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(os));
+
+        try {
+            bw.write(command);
+
+            bw.flush();
+            bw.close();
+
+            /** 真奇怪，把控制台的输出打印一遍之后竟然能正常终止了~ */
+            readConsole(proc);
+
+            /** waitFor() 的作用在于 java 程序是否等待 Terminal 执行脚本完毕~ */
+            proc.waitFor();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        int retCode = proc.exitValue();
+        if (retCode != 0) {
+            System.out.println("unix script retCode = " + retCode);
+
+            System.out.println(readConsole(proc));
+            System.out.println("UnixScriptUil.execute 出错了!!");
+        }
+        return retCode+"";
+    }
+
+    /**
+     * 读取控制命令的输出结果
+     * 原文链接：http://lavasoft.blog.51cto.com/62575/15599
+     * @param
+     * @return 控制命令的输出结果
+     * @throws IOException
+     */
+    public static String readConsole(Process process) {
+        StringBuffer cmdOut = new StringBuffer();
+        InputStream fis = process.getInputStream();
+        BufferedReader br = new BufferedReader(new InputStreamReader(fis));
+
+        String line = null;
+        try {
+            while ((line = br.readLine()) != null) {
+                cmdOut.append(line).append(System.getProperty("line.separator"));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+//       System.out.println("执行系统命令后的控制台输出为：\n" + cmdOut.toString());
+        return cmdOut.toString().trim();
+    }
+
+
+
+    public static String execCMD_Win(String command) {
 //        System.out.println("══════════════Begin ExE ");
         StringBuilder sb = new StringBuilder();
         StringBuilder errorSb = new StringBuilder();
