@@ -557,14 +557,30 @@ public class G2_Common_Template {
         String commandNotead = "";
         if(CUR_OS_TYPE == OS_TYPE.Windows){
             commandNotead = "cmd.exe /c start   Notepad++.exe " + absPath;
-            execCMD_Win(commandNotead);
         }else if(CUR_OS_TYPE == OS_TYPE.Linux){
             commandNotead  = " gedit " + absPath;
-            execCMD_Mac(commandNotead);
         }else if(CUR_OS_TYPE == OS_TYPE.MacOS){
-            commandNotead  = " gedit " + absPath;
-        }
+            commandNotead  = "/Applications/UltraEdit  " + absPath;
 
+        }
+        execCMD(commandNotead);
+    }
+
+
+
+    public static String execCMD(String command) {
+
+        String result = "";
+        if(CUR_OS_TYPE == OS_TYPE.Windows){
+            return execCMD_Win(command);
+        }else if(CUR_OS_TYPE == OS_TYPE.MacOS){
+
+            return execCMD_Mac(command);
+        }else{  // Linux
+
+            execCMD_Mac(command);
+        }
+        return result;
     }
 
 

@@ -963,18 +963,20 @@ public class J1_InstallSoftware {
         }
     }
 
-    static void NotePadOpenTargetFile(String absPath) {
+
+    static void NotePadOpenTargetFile(String absPath){
         String commandNotead = "";
-        if (CUR_OS_TYPE == OS_TYPE.Windows) {
+        if(CUR_OS_TYPE == OS_TYPE.Windows){
             commandNotead = "cmd.exe /c start   Notepad++.exe " + absPath;
-        } else if (CUR_OS_TYPE == OS_TYPE.Linux) {
-            commandNotead = " gedit " + absPath;
-        } else if (CUR_OS_TYPE == OS_TYPE.MacOS) {
-            commandNotead = " gedit " + absPath;
+
+        }else if(CUR_OS_TYPE == OS_TYPE.Linux){
+            commandNotead  = " gedit " + absPath;
+        }else if(CUR_OS_TYPE == OS_TYPE.MacOS){
+            commandNotead  = "/Applications/UltraEdit  " + absPath;
         }
         execCMD(commandNotead);
-    }
 
+    }
 
     public static ArrayList<String> ReadFileContentAsList(File mFilePath) {
 
@@ -1829,54 +1831,6 @@ public class J1_InstallSoftware {
     // ArrayPrint ==============================End
 
 
-    public static String execCMD(String command) {
-//        System.out.println("══════════════Begin ExE ");
-        StringBuilder sb = new StringBuilder();
-        StringBuilder errorSb = new StringBuilder();
-        try {
-
-//            Process process = Runtime.getRuntime().exec("CMD.exe /c start  " + command);
-            Process process = Runtime.getRuntime().exec("CMD.exe /c start /B " + command);
-
-            InputStreamReader inputReader = new InputStreamReader(process.getInputStream(), "GBK");
-            BufferedReader bufferedReader = new BufferedReader(inputReader);
-            String line;
-            int waitFor = process.waitFor();
-//            Stream<String> lines = bufferedReader.lines();
-//            lines.iterator();
-//            System.out.println("line Count = "+lines.count());
-
-            while ((line = bufferedReader.readLine()) != null) {
-                sb.append(line + "\n");
-
-            }
-
-
-            boolean isAlive = process.isAlive();
-            int errorSteamCode = process.getErrorStream().read();
-
-            String errorStream = process.getErrorStream().toString();
-            int exitValue = process.exitValue();
-//            process.getErrorStream().
-            //杀掉进程
-//            System.out.println("exitValue ="+ exitValue);
-            sb.append("\nexitValue = " + exitValue +
-                    "\nisAlive = " + isAlive +
-                    "\nerrorStream = " + errorStream +
-                    "\nerrorSteamCode = " + errorSteamCode +
-                    "\nwaitFor = " + waitFor);
-//            process.destroy();
-
-        } catch (Exception e) {
-            System.out.println("execCMD 出现异常! ");
-            sb.append("execCMD 出现异常! ");
-            return sb.toString();
-        }
-
-//        System.out.println("sb.toString() = "+ sb.toString());
-//        System.out.println("══════════════End ExE ");
-        return sb.toString();
-    }
 
     static String getTimeStamp() {
 
@@ -2108,7 +2062,7 @@ public class J1_InstallSoftware {
 
         if (CUR_Dir_FILE != null && !isZWinSoft(CUR_Dir_FILE)) {
             System.out.println("当前目录不在 ZWin_SoftWare 不是指定 软件保存安装 目录 ! ");
-            System.out.println("百度网盘 ZWin_SoftWared 地址:  " + "https://pan.baidu.com/disk/home#/all?vmode=list&path=%2F%E7%A7%BB%E5%8A%A8%E7%A1%AC%E7%9B%98%2Fsoftware%2FZWin_Software");
+            System.out.println("百度网盘 ZWin_SoftWared 地址:  \n" + "https://pan.baidu.com/disk/home#/all?vmode=list&path=%2F%E7%A7%BB%E5%8A%A8%E7%A1%AC%E7%9B%98%2Fsoftware%2FZWin_Software");
             return;
         }
         showWinSoftMap(zwin_soft_dir_Map);
@@ -2178,6 +2132,121 @@ public class J1_InstallSoftware {
 
         setProperity();
     }
+
+
+
+
+    public static String execCMD(String command) {
+
+        String result = "";
+        if(CUR_OS_TYPE == OS_TYPE.Windows){
+            return execCMD_Win(command);
+        }else if(CUR_OS_TYPE == OS_TYPE.MacOS){
+
+            return execCMD_Mac(command);
+        }else{  // Linux
+
+            execCMD_Mac(command);
+        }
+        return result;
+    }
+
+
+    /**
+     * 执行 mac(unix) 脚本命令~
+     * @param command
+     * @return
+     */
+    public static String execCMD_Mac(String command) {
+        String[] cmd = {"/bin/bash"};
+        Runtime rt = Runtime.getRuntime();
+        Process proc = null;
+        try {
+            proc = rt.exec(cmd);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        // 打开流
+        OutputStream os = proc.getOutputStream();
+        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(os));
+
+        try {
+            bw.write(command);
+
+            bw.flush();
+            bw.close();
+
+            /** 真奇怪，把控制台的输出打印一遍之后竟然能正常终止了~ */
+//            readConsole(proc);
+
+            /** waitFor() 的作用在于 java 程序是否等待 Terminal 执行脚本完毕~ */
+            proc.waitFor();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        int retCode = proc.exitValue();
+        if (retCode != 0) {
+            System.out.println("unix script retCode = " + retCode);
+
+//            System.out.println(readConsole(proc));
+            System.out.println("UnixScriptUil.execute 出错了!!");
+        }
+        return retCode+"";
+    }
+
+
+
+    public static String execCMD_Win(String command) {
+//        System.out.println("══════════════Begin ExE ");
+        StringBuilder sb = new StringBuilder();
+        StringBuilder errorSb = new StringBuilder();
+        try {
+
+//            Process process = Runtime.getRuntime().exec("CMD.exe /c start  " + command);
+            Process process = Runtime.getRuntime().exec("CMD.exe /c start /B " + command);
+
+            InputStreamReader inputReader = new InputStreamReader(process.getInputStream(), "GBK");
+            BufferedReader bufferedReader = new BufferedReader(inputReader);
+            String line;
+            int waitFor = process.waitFor();
+//            Stream<String> lines = bufferedReader.lines();
+//            lines.iterator();
+//            System.out.println("line Count = "+lines.count());
+
+            while ((line = bufferedReader.readLine()) != null) {
+                sb.append(line + "\n");
+
+            }
+
+
+            boolean isAlive = process.isAlive();
+            int errorSteamCode = process.getErrorStream().read();
+
+            String errorStream = process.getErrorStream().toString();
+            int exitValue = process.exitValue();
+//            process.getErrorStream().
+            //杀掉进程
+//            System.out.println("exitValue ="+ exitValue);
+            sb.append("\nexitValue = " + exitValue +
+                    "\nisAlive = " + isAlive +
+                    "\nerrorStream = " + errorStream +
+                    "\nerrorSteamCode = " + errorSteamCode +
+                    "\nwaitFor = " + waitFor);
+//            process.destroy();
+
+        } catch (Exception e) {
+            System.out.println("execCMD 出现异常! ");
+            sb.append("execCMD 出现异常! ");
+            return sb.toString();
+        }
+
+//        System.out.println("sb.toString() = "+ sb.toString());
+//        System.out.println("══════════════End ExE ");
+        return sb.toString();
+    }
+
+
 
     static Map<File, ArrayList<File>> zwin_soft_dir_Map = Maps.newConcurrentMap();
     static ArrayList<File> zwin_soft_zip_FileList = new ArrayList<File>();

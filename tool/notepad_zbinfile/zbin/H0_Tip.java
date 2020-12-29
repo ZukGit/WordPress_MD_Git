@@ -1,5 +1,7 @@
 
-import java.io.File;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.Comparator;
 
 public class H0_Tip {
     static String OneLine_Pre = "\n════════════════════════════════════════════════";
@@ -8,6 +10,12 @@ public class H0_Tip {
 
     static String User_Home = System.getProperties().getProperty("user.home");
     static String zbinPath = System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin";
+
+
+    static String J1_IDEA_PATH = System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin"+ File.separator+"J1_IDEA";
+    static File J1_IDEA_File = new File(J1_IDEA_PATH);
+
+
 
     enum OS_TYPE {
         Windows,
@@ -39,7 +47,7 @@ public class H0_Tip {
 
         initSystemInfo();
         InstallWindowsTip();  //  双系统安装 说明
-
+        Common_IDEA_tip();  // 破解IDEA 说明
         if(CUR_OS_TYPE == OS_TYPE.Windows){
 
             CmderTip();  // cmder 下的环境变量设置
@@ -52,10 +60,241 @@ public class H0_Tip {
         }else if (CUR_OS_TYPE == OS_TYPE.MacOS){
             Mac_Tip();
             Mac_Item2_Tip();
+            Linux_BashTip();
         }
 
         Chrome_Tip();
         Security_File_Tip();
+
+    }
+
+
+
+  static  ArrayList<File> search_Ideavmoptions_FileList(){
+      ArrayList<File> idea_vmoption_FileList = new ArrayList<File>();
+
+      if(CUR_OS_TYPE == OS_TYPE.Windows){  // // Windows 下寻找  idea.vmoptions
+
+
+
+
+
+      }else if (CUR_OS_TYPE == OS_TYPE.MacOS){  // // MacOS 下寻找  idea.vmoptions
+          String path1 = "/Applications/IntelliJ IDEA.app/Contents/bin/idea.vmoptions";
+          File path1_File = new File(path1);
+          if(path1_File.exists()){
+              idea_vmoption_FileList.add(path1_File);
+          }
+
+          // User_Home =  /Users/zhuzhengjie/
+          // Library = /Users/zhuzhengjie/Library
+          File IntelijIDEA_PrefencesFile = null;
+          File IntelijIDEA_PrefencesFile_ideaFile = null;
+
+          // /Users/zhuzhengjie/Library/Preferences
+          String path2_Perferences =User_Home + File.separator + "Library"+ File.separator +"Preferences";
+          File PerferencesFile = new File(path2_Perferences);
+          if(PerferencesFile.exists()){
+              File[] PerferencesSubFileList = PerferencesFile.listFiles();
+
+
+              // IntelliJIdea
+              for (int i = 0; i < PerferencesSubFileList.length; i++) {
+                  File PerferencesFileItem = PerferencesSubFileList[i];
+                  if(PerferencesFileItem.isFile()){
+                      continue;
+                  }
+
+                  String dirName = PerferencesFileItem.getName().toLowerCase();
+//                  System.out.println("dirName = "+PerferencesFileItem.getAbsolutePath() +"  ");
+
+                  // IntelliJIdea
+                  if(dirName.contains("intellijidea")){
+                      IntelijIDEA_PrefencesFile = PerferencesFileItem;
+                      break;
+                  }
+              }
+
+
+          }else{
+
+              System.out.println("PerferencesFile = "+PerferencesFile.getAbsolutePath() +"  不存在！");
+          }
+
+          if(IntelijIDEA_PrefencesFile != null){
+              IntelijIDEA_PrefencesFile_ideaFile =  new File(IntelijIDEA_PrefencesFile.getAbsolutePath()+File.separator+"idea.vmoptions");
+
+//              System.out.println("IntelijIDEA_PrefencesFile_ideaFile = "+IntelijIDEA_PrefencesFile_ideaFile.getAbsolutePath() +"  存在="+ IntelijIDEA_PrefencesFile_ideaFile.exists());
+
+              if(IntelijIDEA_PrefencesFile_ideaFile.exists()){
+                  idea_vmoption_FileList.add(IntelijIDEA_PrefencesFile_ideaFile);
+              }
+          }else {
+              System.out.println("IntelijIDEA_PrefencesFile 为空 ！！");
+
+          }
+
+
+
+      } else {   // Linux 下寻找  idea.vmoptions
+          System.out.println("Linux 的 IDEA 破解方法没有实现  return!");
+
+      }
+
+
+
+
+      return idea_vmoption_FileList;
+
+
+  }
+
+    static  void Common_IDEA_tip(){
+
+        System.out.println(OneLine_Pre + " IDEA 破解方法 Begin "+ OneLine_End);
+
+        if(!J1_IDEA_File.exists() || J1_IDEA_File.listFiles() == null){
+            System.out.println("当前保存JetBrain.jar 破解IDEA 的保存文件路径不存在! 请检查 PATH = "+J1_IDEA_File.getAbsolutePath());
+        return;
+        }
+
+
+        File[] filelist =  J1_IDEA_File.listFiles();
+        File descTxtFile = null;
+        ArrayList<File> allJarFileList = new     ArrayList<File>();
+
+        for (int i = 0; i < filelist.length; i++) {
+            File item = filelist[i];
+            String fileName = item.getName().toLowerCase();
+            if(fileName.endsWith(".jar")){
+                allJarFileList.add(item);
+            }else if(fileName.endsWith(".txt")){
+                descTxtFile = item;
+            }
+        }
+
+
+
+//        echo "-javaagent:/Applications/IntelliJ IDEA.app/Contents/bin/Jetbrains-agent_1.jar" >> /Applications/IntelliJ IDEA.app/Contents/bin/idea.vmoptions
+//
+
+/*
+
+"-javaagent:/Applications/IntelliJ\ IDEA.app/Contents/bin/Jetbrains-agent_2.jar" >>
+
+/Applications/IntelliJ\ IDEA.app/Contents/bin/idea.vmoptions
+
+
+/Applications/IntelliJ IDEA.app/Contents/bin/idea.vmoptions
+
+/Applications/IntelliJ\ IDEA.app/Contents/bin/idea.vmoptions
+
+                -javaagent:/Applications/IntelliJ IDEA.app/Contents/bin/Jetbrains-agent_1.jar
+                -javaagent:/Applications/IntelliJ IDEA.app/Contents/bin/Jetbrains-agent_2.jar
+                -javaagent:/Applications/IntelliJ IDEA.app/Contents/bin/JetbrainsCrack-2.8-release-enc.jar
+                -javaagent:/Applications/IntelliJ IDEA.app/Contents/bin/JetbrainsCrack-2.10-release-enc.jar
+                -javaagent:/Applications/IntelliJ IDEA.app/Contents/bin/JetbrainsCrack-3.1-release-enc.jar
+                -javaagent:/Applications/IntelliJ IDEA.app/Contents/bin/JetbrainsCrack3.4.jar
+                -javaagent:/Applications/IntelliJ IDEA.app/Contents/bin/JetbrainsIdesCrack-4.2.jar
+*/
+
+        ArrayList<String> javaAgentStrList = new  ArrayList<String> ();
+        for (int i = 0; i < allJarFileList.size(); i++) {
+            File jarFile = allJarFileList.get(i);
+            String javaagentStr = "#-javaagent:"+jarFile.getAbsolutePath()+"\\n";
+
+//            if(i == allJarFileList.size() -1 ){
+//                javaagentStr = "\\n-javaagent:"+jarFile.getAbsolutePath()+"\\n";
+//                javaAgentStrList.add(0,javaagentStr);
+//            }
+
+            javaAgentStrList.add(javaagentStr);
+        }
+        javaAgentStrList.sort(new Comparator<String>() {
+            @Override
+            public int compare(String o1, String o2) {
+                return o1.compareTo(o2);
+            }
+        });
+
+        ArrayList<File> idea_vmoption_FileList = search_Ideavmoptions_FileList();
+        if(idea_vmoption_FileList == null || idea_vmoption_FileList.size() ==0){
+            System.out.println(" 当前系统下没有找到 Mac(idea.vmoptions)  Windows【idea.exe.vmoptions  idea64.exe.vmoptions】 返回  ");
+            return;
+        }
+
+
+
+//        echo -n "xxxxsadaa" >> /Applications/IntelliJ\ IDEA.app/Contents/bin/idea.vmoptions
+        String openTxtCommand = "";
+
+        for (int i = 0; i < idea_vmoption_FileList.size() ; i++) {
+            File ideaFile = idea_vmoption_FileList.get(i);
+            String ideaFileAbsPath = ideaFile.getAbsolutePath();
+            ideaFileAbsPath = ideaFileAbsPath.replace(" ","\\ ");
+//            ArrayList<String> contentList = ReadFileContentAsList(ideaFile);
+
+            StringBuilder sb_AppendComamnd = new StringBuilder();
+
+
+            for (int j = 0; j < javaAgentStrList.size(); j++) {
+
+                String  jarPath = javaAgentStrList.get(j);
+                if(j == 0 ){
+                    jarPath = "\\n"+jarPath.replace("#","");
+                }
+                String commandItem = " echo -n \""+jarPath+"\" >>  "+ ideaFileAbsPath ;
+
+                sb_AppendComamnd.append(commandItem+"  &&  ");
+
+            }
+
+            String command_fixed = sb_AppendComamnd.toString().trim();
+            if(command_fixed.endsWith("&&")){
+
+                command_fixed = command_fixed.substring(0,command_fixed.length()-2);
+            }
+            String openFileCommand = "";
+
+            if(CUR_OS_TYPE == OS_TYPE.Windows){
+                openFileCommand = " cmd.exe /c start   Notepad++.exe " + ideaFileAbsPath;
+                if(descTxtFile != null)
+                openTxtCommand  = " cmd.exe /c start   Notepad++.exe " + descTxtFile.getAbsolutePath();
+            }else if(CUR_OS_TYPE ==OS_TYPE.MacOS){
+                openFileCommand = " /Applications/UltraEdit  " + ideaFileAbsPath;
+
+                if(descTxtFile != null)
+                    openTxtCommand  = "/Applications/UltraEdit  " + descTxtFile.getAbsolutePath();
+            }else{
+                openFileCommand = " gedit " + ideaFileAbsPath;
+                if(descTxtFile != null)
+                    openTxtCommand  = "gedit " + descTxtFile.getAbsolutePath();
+
+            }
+
+//            /Applications/UltraEdit
+            System.out.println(ideaFileAbsPath+" 执行加入 javaagent 操作命令如下_______________________");
+            System.out.println(command_fixed+" && "+ openFileCommand );
+            System.out.println();
+            System.out.println();
+
+        }
+
+
+        if(descTxtFile != null){
+            System.out.println("________________ 激活码执行如下步骤查询 进行 ________________ ");
+            System.out.println("cat "+ descTxtFile.getAbsolutePath()  );
+            System.out.println(openTxtCommand );
+
+        }
+
+
+
+
+
+        System.out.println(OneLine_Pre + " IDEA 破解方法 End "+ OneLine_End);
+
+
 
     }
 
@@ -206,7 +445,7 @@ public class H0_Tip {
         System.out.println("Chrome插件安装位置( Linux ):\n  zzfile_3.sh  \""+User_Home+ File.separator+".config/google-chrome1/Default/Extensions/\"");
         System.out.println("Chrome插件安装位置( MacOS 路径空格):\n  open  "+User_Home+ File.separator+"Library/Application\" \"Support/Google/Chrome/Default/Extensions/");
         System.out.println();
-        System.out.println("Chrome插件备份地址:\n  zzfile_3.bat  "+zbinPath+File.separator+"J1_Plugin      【插件】【脚本】【书签】 先安装 AA_get-crx 方便插件安装");
+        System.out.println("Chrome插件备份地址:\n  zzfile_3.sh  "+zbinPath+File.separator+"J1_Plugin      【插件】【脚本】【书签】 先安装 AA_get-crx 方便插件安装");
         PrintHead_End("   Chrome_Tip 插件 Begin   End  ");
     }
 
@@ -329,6 +568,74 @@ public class H0_Tip {
 
 
         PrintHead_End(" 文件加密解密操作 End    ");
+    }
+
+
+
+
+    public static ArrayList<String> ReadFileContentAsList( File mFilePath) {
+
+        if (mFilePath != null  && mFilePath.exists()) {
+            //  System.out.println("存在  当前文件 "+ mFilePath.getAbsolutePath());
+        } else {
+            System.out.println("不存在 当前文件 "+ mFilePath.getAbsolutePath() );
+
+            return null;
+        }
+        ArrayList<String> contentList= new ArrayList<String>();
+
+        try {
+            BufferedReader curBR = new BufferedReader(new InputStreamReader(new FileInputStream(mFilePath), "utf-8"));
+            String oldOneLine = "";
+            int index = 1;
+            while (oldOneLine != null) {
+
+                oldOneLine = curBR.readLine();
+                if (oldOneLine == null ) {
+                    continue;
+                }
+
+                contentList.add(oldOneLine);
+//                    System.out.println("第"+index+"行读取到的字符串:"+oldOneLine);
+                index++;
+
+            }
+            curBR.close();
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return contentList;
+
+    }
+
+
+
+    static void writeContentToFile(File file, ArrayList<String> strList) {
+
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < strList.size(); i++) {
+            sb.append(strList.get(i) + "\n");
+        }
+        try {
+            if (file != null && !file.exists()) {
+                file.createNewFile();
+            }
+
+            if (file != null && file.exists()) {
+                BufferedWriter curBW = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "utf-8"));
+                curBW.write(sb.toString());
+                curBW.flush();
+                curBW.close();
+                System.out.println("write out File OK !  File = " + file.getAbsolutePath());
+            } else {
+                System.out.println("write out File  Failed !    File = " + file.getAbsolutePath());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
 
