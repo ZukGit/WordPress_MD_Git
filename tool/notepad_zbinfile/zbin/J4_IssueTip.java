@@ -34,7 +34,10 @@ public class J4_IssueTip {
     static OS_TYPE CUR_OS_TYPE = OS_TYPE.Windows;
 
     public static void main(String[] args) {
-        initSystemInfo();
+        initSystemInfo();   // 必须 第一位置
+
+        AOSP_PATH_Tip();
+
         Package_Tip();
         Air_mode_Tip();
         Mobile_Data_Tip();
@@ -46,12 +49,73 @@ public class J4_IssueTip {
         WIFI_Shell_Code_Tip();
         GPS_Issue_Tip();
         GPS_Shell_Code_Tip();
+        GPS_NMEA_Tip();
         ADB_pull_Tip();
         ADB_Input_Tip();
         Other_Tip();
     }
 
+    static void  AOSP_PATH_Tip(){
+        System.out.println("════════════════════════ AOSP 模块路径 ════════════════════════════════════════════════");
+        System.out.println();
+        System.out.println("【Settings相关路径】");
+        System.out.println("zzfile_3"+BAT_OR_SH_Point+" " +"./packages/apps//Settings/");
+        System.out.println("zzfile_3"+BAT_OR_SH_Point+" " +"./packages/apps/Settings/src/com/android/settings/bluetooth/");
+        System.out.println("zzfile_3"+BAT_OR_SH_Point+" " +"./packages/apps/Settings/src/com/android/settings/location/");
+        System.out.println("zzfile_3"+BAT_OR_SH_Point+" " +"./packages/apps/Settings/src/com/android/settings/nfc/");
+        System.out.println("zzfile_3"+BAT_OR_SH_Point+" " +"./packages/apps/Settings/src/com/android/settings/wallpaper/");
+        System.out.println();
+        System.out.println();
+        System.out.println("【 NFC 相关代码路径】");
+        System.out.println("zzfile_3"+BAT_OR_SH_Point+" " +"./packages/apps/Settings/src/com/android/settings/nfc/");
+        System.out.println("zzfile_3"+BAT_OR_SH_Point+" " +"./packages/apps/Nfc/src/com/android/nfc/");
+        System.out.println("zzfile_3"+BAT_OR_SH_Point+" " +"./frameworks/base/core/java/android/nfc/");
+        System.out.println("zzfile_3"+BAT_OR_SH_Point+" " +"./hardware/interfaces/nfc/");
+        System.out.println("zzfile_3"+BAT_OR_SH_Point+" " +"./vendor/nxp/opensource/nfc/");
+        System.out.println("zzfile_3"+BAT_OR_SH_Point+" " +"./vendor/nxp/opensource/nfc/frameworks/com/nxp/nfc/");
+        System.out.println("zzfile_3"+BAT_OR_SH_Point+" " +"./vendor/st/nfc/packages/apps/Nfc/src/com/android/nfc/");
+        System.out.println();
+        System.out.println();
+        System.out.println("【 BT 相关代码路径】");
+        System.out.println("zzfile_3"+BAT_OR_SH_Point+" " +"./packages/apps/Settings/src/com/android/settings/bluetooth/");
+        System.out.println("zzfile_3"+BAT_OR_SH_Point+" " +"./packages/apps/Bluetooth/");
+        System.out.println("zzfile_3"+BAT_OR_SH_Point+" " +"./frameworks/base/packages/SettingsLib/src/com/android/settingslib/bluetooth/");
+        System.out.println("zzfile_3"+BAT_OR_SH_Point+" " +"./frameworks/base/core/java/android/bluetooth/");
+        System.out.println("zzfile_3"+BAT_OR_SH_Point+" " +"./system/bt");
+        System.out.println("zzfile_3"+BAT_OR_SH_Point+" " +"./hardware/interfaces/bluetooth/");
+        System.out.println("zzfile_3"+BAT_OR_SH_Point+" " +"./kernel/msm-5.4/drivers/bluetooth/");
+        System.out.println("zzfile_3"+BAT_OR_SH_Point+" " +"./kernel/xxxxxxx/drivers/bluetooth/");
+        System.out.println("zzfile_3"+BAT_OR_SH_Point+" " +"./kernel/msm-5.4/net/bluetooth/");
+        System.out.println("zzfile_3"+BAT_OR_SH_Point+" " +"./vendor/qcom/opensource/commonsys/system/bt/");
+        System.out.println("zzfile_3"+BAT_OR_SH_Point+" " +"./vendor/qcom/proprietary/bluetooth/");
+        System.out.println("zzfile_3"+BAT_OR_SH_Point+" " +"./vendor/qcom/proprietary/bluetooth");
+        System.out.println();
+        System.out.println();
+        System.out.println("【 GNSS 相关代码路径】");
+        System.out.println("zzfile_3"+BAT_OR_SH_Point+" " +"./packages/apps/Settings/src/com/android/settings/location/");
+        System.out.println("zzfile_3"+BAT_OR_SH_Point+" " +"./frameworks/base/services/core/java/com/android/server/location/");
+        System.out.println("zzfile_3"+BAT_OR_SH_Point+" " +"./hardware/interfaces/gnss/");
+        System.out.println("zzfile_3"+BAT_OR_SH_Point+" " +"./hardware/qcom/gps");
+        System.out.println("zzfile_3"+BAT_OR_SH_Point+" " +"./vendor/qcom/proprietary/gps");
+        System.out.println("zzfile_3"+BAT_OR_SH_Point+" " +"./vendor/qcom/proprietary/gps-commonsys");
+        System.out.println("zzfile_3"+BAT_OR_SH_Point+" " +"./vendor/qcom/proprietary/gps-release");
+        System.out.println("zzfile_3"+BAT_OR_SH_Point+" " +"./vendor/qcom/opensource/location");
+        System.out.println();
+        System.out.println("【 WIFI 相关代码路径】");
+        System.out.println("zzfile_3"+BAT_OR_SH_Point+" " +"./packages/apps/Settings/src/com/android/settings/wifi/");
+        System.out.println("zzfile_3"+BAT_OR_SH_Point+" " +"./frameworks/base/packages/SettingsLib/src/com/android/settingslib/wifi/");
+        System.out.println("zzfile_3"+BAT_OR_SH_Point+" " +"./frameworks/base/core/java/android/net/");
+        System.out.println("zzfile_3"+BAT_OR_SH_Point+" " +"./frameworks/base/wifi/Java/android/net/wifi/");
+        System.out.println("zzfile_3"+BAT_OR_SH_Point+" " +"./frameworks/opt/net/wifi/service/java/com/android/server/wifi");
+        System.out.println("zzfile_3"+BAT_OR_SH_Point+" " +"./hardware/interfaces/wifi/");
+        System.out.println("zzfile_3"+BAT_OR_SH_Point+" " +"./external/wpa_supplicant_8/");
+        System.out.println("zzfile_3"+BAT_OR_SH_Point+" " +"./kernel/msm-5.4/net/wireless/");
+        System.out.println("zzfile_3"+BAT_OR_SH_Point+" " +"./kernel/xxxxxxx/net/wireless");
+        System.out.println("zzfile_3"+BAT_OR_SH_Point+" " +"./vendor/qcom/opensource/wlan/prima");
+        System.out.println("zzfile_3"+BAT_OR_SH_Point+" " +"./vendor/qcom/opensource/wlan/qcacld-3.0");
+        System.out.println();
 
+    }
 
     static void  Package_Tip(){
         System.out.println("════════════════════════ Package Manager 查询 ════════════════════════════════════════════════");
@@ -227,6 +291,136 @@ public class J4_IssueTip {
 
     }
 
+    static void  GPS_NMEA_Tip(){
+
+        System.out.println("════════════════════════ GPS NMEA 定位命令 $GPGGA $GPGSA $GPGSV $GPRMC ══════════════════════════════════════════════");
+        System.out.println("https://blog.csdn.net/u013232740/article/details/45029245");
+        System.out.println("https://gpsd.gitlab.io/gpsd/NMEA.html");
+        System.out.println();
+        System.out.println("$GPZDA 【Zone Time Date UTC               (ZDA)UTC时间 日期】【 $GPZDA, <1>,<2>,<3>,<4>,<5>,<6>*hh 】");
+        System.out.println("$GPGGA 【Global Positioning Fix Data      (GGA)卫星定位信息】【 $GPGGA, <1>,<2>,<3>,<4>,<5>,<6>,<7>,<8>,<9>,M,<10>,M,<11>,<12>*hh】");
+        System.out.println("$GPGLL 【Geographic Position Lat/Long     (GLL)地理定位信息】【 $GPGLL, <1>,<2>,<3>,<4>,<5>,<6>,<7>,<8>*hh】");
+        System.out.println("$GPVTG 【Track Made Good and Ground Speed (VTG)地面速度信息】【 $GPVTG, <1>,T,<2>,M,<3>,N,<4>,K,<5>*hh 】");
+        System.out.println("$GPGSA 【GPS DOP and Active Satellites    (GSA)当前卫星信息】【 $GPGSA, <1>,<2>,<3>,<3>,,,,,<3>,<3>,<3>,<4>,<5>,<6>*hh    】");
+        System.out.println("$GPGSV 【GPS Satellites in View           (GSV)可见卫星信息】【 $GPGSV, <1>,<2>,<3>,<4>,<5>,<6>,<7>,<4>,<5>,<6>,<7>,<8>*hh  】");
+        System.out.println("$GPGSV 【GPS Satellites in View           (GSV)可见卫星信息】【 $GPGSV, <1>,<2>,<3>,<4>,<5>,<6>,<7>,?<4>,<5>,<6>,<7>,<8>*hh  】");
+        System.out.println("$GPGSV 【GPS Satellites in View           (GSV)可见卫星信息】【 $GPGSV, <1>,<2>,<3>,<4>,<5>,<6>,<7>,?<4>,<5>,<6>,<7>,<8>*hh 】");
+        System.out.println("$GPRMC 【Recommended Minimum Data         (RMC)推荐定位信息】【 $GPRMC, <1>,<2>,<3>,<4>,<5>,<6>,<7>,<8>,<9>,<10>,<11>,<12>*hh 】");
+        System.out.println();
+        System.out.println();
+        System.out.println("$GPZDA, <1>,<2>,<3>,<4>,<5>,<6>*hh   (ZDA)UTC时间 日期");
+        System.out.println("字段1：UTC 时间， hhmmss.sss ，时分秒格式");
+        System.out.println("字段2：日期 dd=0~31");
+        System.out.println("字段3：月，mm=1~12");
+        System.out.println("字段4：yyyy 年");
+        System.out.println("字段5：xx 当地时域描述，单位：小时，xx=-13~13");
+        System.out.println("字段6：当地时域描述，   单位：分，  yy=0~59");
+        System.out.println();
+        System.out.println();
+        System.out.println("$GPGGA, <1>,<2>,<3>,<4>,<5>,<6>,<7>,<8>,<9>,M,<10>,M,<11>,<12>*hh   (GGA)卫星定位信息");
+        System.out.println("$GPGGA,092201.00,3112.312832,N,12134.879544,E,1,17,0.8,12.6,M,10.0,M,,*50");
+        System.out.println("$GPGGA,092111.00,,,,,0,00,300.0,,M,,M,,*6F");
+        System.out.println("$GPGGA,092122.00,3112.318862,N,12134.877608,E,1,15,2.4,17.6,M,10.0,M,,*51");
+        System.out.println("字段1：UTC 时间， hhmmss.sss ，时分秒格式");
+        System.out.println("字段2：纬度ddmm.mmmm ，度分格式（前导位数不足则补0）");
+        System.out.println("字段3：纬度N（北纬）或S（南纬）");
+        System.out.println("字段4：经度dddmm.mmmm ，度分格式（前导位数不足则补0）");
+        System.out.println("字段5：经度E（东经）或W（西经）");
+        System.out.println("字段6：GPS状态， 0= 未定位， 1= 非差分定位， 2= 差分定位， 3= 无效PPS， 6= 正在估算");
+        System.out.println("字段7：正在使用的卫星数量（ 00 - 12 ）（前导位数不足则补0）");
+        System.out.println("字段8：HDOP 水平精度因子（ 0.5 - 99.9 ）");
+        System.out.println("字段9：海拔高度（ -9999.9 - 99999.9 ）");
+        System.out.println("字段10：地球椭球面相对大地水准面的高度");
+        System.out.println("字段11：差分时间（从最近一次接收到差分信号开始的秒数，如果不是差分定位将为空）");
+        System.out.println("字段12：差分站ID 号0000 - 1023 （前导位数不足则补0，如果不是差分定位将为空）");
+        System.out.println();
+        System.out.println();
+        System.out.println("$GPGLL, <1>,<2>,<3>,<4>,<5>,<6>*hh                                  (GLL)地理定位信息");
+        System.out.println("$GPGLL,4250.5589,S,14718.5084,E,092204.999,A*2D");
+        System.out.println("字段1：纬度ddmm.mmmm ，度分格式（前导位数不足则补0）");
+        System.out.println("字段2：纬度N（北纬）或S（南纬）");
+        System.out.println("字段3：经度dddmm.mmmm ，度分格式（前导位数不足则补0）");
+        System.out.println("字段4：经度E（东经）或W（西经）");
+        System.out.println("字段5：UTC时间， hhmmss.sss 格式");
+        System.out.println("字段6：状态， A= 定位， V= 未定位");
+        System.out.println();
+        System.out.println();
+        System.out.println("$GPVTG, <1>,T,<2>,M,<3>,N,<4>,K*hh");
+        System.out.println("字段1：运动角度， 000 - 359 ，（前导位数不足则补0）");
+        System.out.println("字段2：运动角度， 000 - 359 ，（前导位数不足则补0）");
+        System.out.println("字段3：水平运动速度（ 0.00 ）（前导位数不足则补0）");
+        System.out.println("字段4：水平运动速度（ 0.00 ）（前导位数不足则补0）");
+        System.out.println("T=真北参照系   M=磁北参照系   N=节  K=公里/时-km/h");
+        System.out.println();
+        System.out.println();
+        System.out.println("$GPGSA, <1>,<2>,<3>,<3>,,,,,<3>,<3>,<3>,<4>,<5>,<6>*hh   (GSA)当前卫星信息");
+        System.out.println("$GPGSA,A,1,,,,,,,,,,,,,140.0,99.0,99.0*35");
+        System.out.println("$GPGSA,A,1,,,,,,,,,,,,,3.4,2.5,2.3*31");
+        System.out.println("$GPGSA,A,3,04,09,16,26,27,,,,,,,,2.1,1.6,1.3*3F");
+        System.out.println("字段1：定位模式， A= 自动手动2D/3D ，M= 手动2D/3D");
+        System.out.println("字段2：定位类型， 1= 未定位， 2=2D 定位， 3=3D 定位");
+        System.out.println("字段3：PRN码（伪随机噪声码），第1 信道正在使用的卫星PRN码编号（ 00）（前导位数不足则补0）");
+        System.out.println("字段3：PRN码（伪随机噪声码），第2 信道正在使用的卫星PRN码编号（ 00）（前导位数不足则补0）");
+        System.out.println("字段3：PRN码（伪随机噪声码），第3 信道正在使用的卫星PRN码编号（ 00）（前导位数不足则补0）");
+        System.out.println("字段3：PRN码（伪随机噪声码），第4 信道正在使用的卫星PRN码编号（ 00）（前导位数不足则补0）");
+        System.out.println("字段3：PRN码（伪随机噪声码），第5 信道正在使用的卫星PRN码编号（ 00）（前导位数不足则补0）");
+        System.out.println("字段3：PRN码（伪随机噪声码），第6 信道正在使用的卫星PRN码编号（ 00）（前导位数不足则补0）");
+        System.out.println("字段3：PRN码（伪随机噪声码），第7 信道正在使用的卫星PRN码编号（ 00）（前导位数不足则补0）");
+        System.out.println("字段3：PRN码（伪随机噪声码），第8 信道正在使用的卫星PRN码编号（ 00）（前导位数不足则补0）");
+        System.out.println("字段3：PRN码（伪随机噪声码），第9 信道正在使用的卫星PRN码编号（ 00）（前导位数不足则补0）");
+        System.out.println("字段3：PRN码（伪随机噪声码），第10 信道正在使用的卫星PRN码编号（ 00）（前导位数不足则补0）");
+        System.out.println("字段3：PRN码（伪随机噪声码），第11 信道正在使用的卫星PRN码编号（ 00）（前导位数不足则补0）");
+        System.out.println("字段3：PRN码（伪随机噪声码），第12 信道正在使用的卫星PRN码编号（ 00）（前导位数不足则补0）");
+        System.out.println("字段4：PDOP 综合位置精度因子（ 0.5 - 99.9 ）");
+        System.out.println("字段5：HDOP 水平精度因子（ 0.5 - 99.9 ）");
+        System.out.println("字段6：VDOP 垂直精度因子（ 0.5 - 99.9 ）");
+        System.out.println();
+        System.out.println();
+        System.out.println("$GPGSV, <1>,<2>,<3>,<4>,<5>,<6>,<7>,?<4>,<5>,<6>,<7>,*hh        (GSV)可见卫星信息");
+        System.out.println("$GPGSV,3,1,09,16,58,011,38,26,38,053,31,09,29,303,34,18,14,059,33*7D");
+        System.out.println("$GPGSV,3,2,09,07,04,310,,27,78,187,,04,52,260,,08,39,213,*71");
+        System.out.println("$GPGSV,3,3,09,31,25,118,*4D");
+        System.out.println("$GAGSV,2,1,07,127,58,350,,115,41,113,,130,31,065,,121,25,290,*6D");
+        System.out.println("$GAGSV,2,2,07,107,25,196,,119,21,306,,113,20,169,*60");
+        System.out.println("字段1：本次GSV语句的总数目（ 1 - 3 ）");
+        System.out.println("字段2：本条GSV语句是本次GSV语句的第几条（ 1 - 3 ）");
+        System.out.println("字段3：当前可见卫星总数（ 00 - 12 ）（前导位数不足则补0）");
+        System.out.println("字段4：PRN 码（伪随机噪声码）（ 01 - 32 ）（前导位数不足则补0）");
+        System.out.println("字段5：卫星仰角（ 00 - 90 ）度（前导位数不足则补0）");
+        System.out.println("字段6：卫星方位角（ 00 - 359 ）度（前导位数不足则补0）");
+        System.out.println("字段7：信噪比（ 00 －99）dbHz");
+        System.out.println("字段4：PRN 码（伪随机噪声码）（ 01 - 32 ）（前导位数不足则补0）");
+        System.out.println("字段5：卫星仰角（ 00 - 90 ）度（前导位数不足则补0）");
+        System.out.println("字段6：卫星方位角（ 00 - 359 ）度（前导位数不足则补0）");
+        System.out.println("字段7：信噪比（ 00－99）dbHz");
+        System.out.println("字段4：PRN 码（伪随机噪声码）（ 01 - 32 ）（前导位数不足则补0）");
+        System.out.println("字段5：卫星仰角（ 00 - 90 ）度（前导位数不足则补0）");
+        System.out.println("字段6：卫星方位角（ 00 - 359 ）度（前导位数不足则补0）");
+        System.out.println("字段7：信噪比（ 00－99）dbHz");
+        System.out.println();
+        System.out.println();
+        System.out.println();
+        System.out.println("$GPRMC,<1>,<2>,<3>,<4>,<5>,<6>,<7>,<8>,<9>,<10>,<11>,<12>*hh   (RMC)推荐定位信息");
+        System.out.println("$GPRMC,092110.00,V,,,,,,,040121,,,N*70");
+        System.out.println("$GPRMC,092127.00,A,3112.316508,N,12134.878718,E,000.1,310.3,040121,,,A*53");
+        System.out.println("$GPRMC,092159.00,A,3112.311732,N,12134.879623,E,000.1,258.5,040121,,,A*55");
+        System.out.println("字段1：UTC时间， hhmmss.sss 格式");
+        System.out.println("字段2：状态， A= 定位， V= 未定位");
+        System.out.println("字段3：纬度ddmm.mmmm ，度分格式（前导位数不足则补0）");
+        System.out.println("字段4：纬度N（北纬）或S（南纬）");
+        System.out.println("字段5：经度dddmm.mmmm ，度分格式（前导位数不足则补0）");
+        System.out.println("字段6：经度E（东经）或W（西经）");
+        System.out.println("字段7：速度，节， Knots");
+        System.out.println("字段8：方位角，度");
+        System.out.println("字段9：UTC日期， DDMMYY 格式");
+        System.out.println("字段10：磁偏角，（ 000 - 180 ）度（前导位数不足则补0）");
+        System.out.println("字段11：磁偏角方向， E=东W=西");
+        System.out.println("字段12：FAA mode indicator (NMEA 2.3 and later)  N=none  A=auto?");
+        System.out.println();
+
+
+
+    }
 
     static void  GPS_Shell_Code_Tip(){
         System.out.println("════════════════════════ GPS shell 命令 adb shell cmd location xxxx ════════════════════════════════════════════════");

@@ -4646,15 +4646,15 @@ public class I9_TextRuleOperation {
                     newOneLine = newOneLine.replace("\"","\\\"");
                     newOneLine = newOneLine.replace(".\\",".\\\\");   // .\w   .\w
 
-                    
+
                     // 把 [.bat ]  转为   ["+BAT_OR_SH_Point+"]
                     // 把 [.sh ]  转为   ["+BAT_OR_SH_Point+"]
 
 
-                    newOneLine = newOneLine.replace(".bat ","\"+BAT_OR_SH_Point+\"");
-                    newOneLine = newOneLine.replace(".sh ","\"+BAT_OR_SH_Point+\"");
+                    newOneLine = newOneLine.replace(".bat ","\"+BAT_OR_SH_Point+\""+" \" +\"");
+                    newOneLine = newOneLine.replace(".sh ","\"+BAT_OR_SH_Point+\""+" \" +\"");
 
-                    
+
                     newOneLine = "System.out.println(\""+newOneLine.trim()+"\");";
 
 
