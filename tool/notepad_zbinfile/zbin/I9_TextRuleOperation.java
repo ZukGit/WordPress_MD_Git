@@ -447,7 +447,7 @@ public class I9_TextRuleOperation {
             String curShellPath = dirFile.getAbsolutePath();
             ArrayList<String> command_ContentList = new ArrayList<String>();
 
-            File rule23_template_bat_file =  new File(zbinPath+File.separator+"I9_Template_Rule23.bat");
+            File rule23_template_bat_file =  new File(zbinPath+File.separator+"I9_Template_Rule23.txt");
             if(!rule23_template_bat_file.exists()){
                 System.out.println("当前模板文件不存在! 请检查  执行失败!  rule23_template_bat_file = "+ rule23_template_bat_file.getAbsolutePath());
                 return null;

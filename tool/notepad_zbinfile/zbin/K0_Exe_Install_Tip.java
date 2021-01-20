@@ -220,7 +220,7 @@ public class K0_Exe_Install_Tip {
                     CUR_Dir_1_PATH = args[i];
                 } else if(i == 1){  // 第二个参数是用来 对 当前功能进行分类使用的
                     CUR_TYPE_2_ParamsStr = args[i];
-                    //zukgit1    计算得到 当前 索引的列表   首先遇到的第一个数字类型  1_2112  那就是索引1  附带参数 2112   temp_2_
+/*                    //zukgit1    计算得到 当前 索引的列表   首先遇到的第一个数字类型  1_2112  那就是索引1  附带参数 2112   temp_2_
                     int userSelectedIndex = calculInputTypeIndex(CUR_TYPE_2_ParamsStr);
                     if(userSelectedIndex != 0 && userSelectedIndex != CUR_TYPE_INDEX){
                         // 如果 当前 的操作规则 不是 0   并且 操作索引 和当前 索引 不一样  那么就寻找赋值给  CUR_TYPE_INDEX
@@ -235,7 +235,7 @@ public class K0_Exe_Install_Tip {
                         // 默认的操作没有index 选项 所以 index1 就是参数
                         CUR_INPUT_3_ParamStrList.add(args[i]);
                         CUR_TYPE_2_ParamsStr = CUR_TYPE_INDEX+"";  //  默认参数 模拟的第二个参数
-                    }
+                    }*/
                 }else {
                     CUR_INPUT_3_ParamStrList.add(args[i]);   // 当前cmd目录   第一个类型选项      之后所有的参数 保存在  CUR_INPUT_3_ParamStrList
                     //    Rule_Identify_TypeIndexList.add(args[i]);
@@ -1744,6 +1744,9 @@ public class K0_Exe_Install_Tip {
 
     static File calculInputFile(String shellDir, String firstParam){
         File firstFile = null ;
+        if(firstParam == null){
+            return firstFile;
+        }
          firstFile = new File(firstParam);
         if(firstFile.exists()){
            return firstFile;
@@ -1751,6 +1754,7 @@ public class K0_Exe_Install_Tip {
             String firstPathStr = firstParam.replace("./","");
             firstPathStr = firstParam.replace(".\\","");
             firstFile = new File(shellDir+ File.separator+firstPathStr);
+            System.out.println("firstFileA ="+ firstFile.getAbsolutePath());
             if(firstFile.exists()){
                 return firstFile;
             }
@@ -1800,15 +1804,55 @@ if(firstFile != null  && firstFile.exists() ){
 
         ArrayList<File> inputFileList = calculInputFile(CUR_Dir_1_PATH,CUR_TYPE_2_ParamsStr,CUR_INPUT_3_ParamStrList);
 
-        if(inputFileList == null || inputFileList.size() == 0){
+        if((inputFileList == null || inputFileList.size() == 0 ) && CUR_TYPE_2_ParamsStr != null){
 
-            System.out.println("当前没有输入 查询的 exe  msi文件");
+            System.out.println("当前没有输入 查询的 exe  msi文件 请重新查询！");
+            return;
 
-            return ;
+        }else  if( ("".equals(CUR_TYPE_2_ParamsStr) || CUR_TYPE_2_ParamsStr ==null)){
+            System.out.println("用户空参数输入 将创建 zAll_Install.bat 文件到本地！");
+
+            CUR_Dir_FILE = new File(CUR_Dir_1_PATH);
+          File[] fileList =   CUR_Dir_FILE.listFiles();
+          if(fileList != null){
+
+              for (int i = 0; i < fileList.length; i++) {
+                  File itemFile = fileList[i];
+                  String fileNmae = itemFile.getName().toLowerCase();
+                  if(fileNmae.endsWith(".exe") || fileNmae.endsWith(".msi") ){
+                      inputFileList.add(itemFile);
+
+                  }
+              }
+
+
+          }
+        }
+        if(inputFileList.size() == 0){
+            System.out.println("当前目录没有可执行文件 exe 或者 msi 安装文件！");
+            return;
+        }
+
+        ArrayList<String> installAllList =  new   ArrayList<String>();
+        ArrayList<String> curTemplateList  =  new   ArrayList<String>();
+        File template_bat_file =  new File(zbinPath+File.separator+"K0_Install_Template.txt");
+        boolean template_flag = false;
+        if(template_bat_file.exists()){
+            System.out.println("当前模板文件不存在! 将无法创建 zAll_Install.bat 文件到本地!  K0_Install_Template = "+ template_bat_file.getAbsolutePath());
+            template_flag = true;
+            curTemplateList.addAll(ReadFileContentAsList(template_bat_file));
         }
 
 
+
+        ArrayList<String> allCommand_In_RawBat =   new ArrayList<String>();
+        ArrayList<String> allCommand_In_Fixed_Bat =   new ArrayList<String>();
+        allCommand_In_Fixed_Bat.add("@echo off");
+        allCommand_In_Fixed_Bat.add("Setlocal ENABLEDELAYEDEXPANSION");
+
         for (int i = 0; i < inputFileList.size(); i++) {
+
+
             File fileItem = inputFileList.get(i);
             String FileName = fileItem.getName().toLowerCase();
             if(FileName.endsWith(".exe") || FileName.endsWith(".msi") ){
@@ -1823,22 +1867,43 @@ if(firstFile != null  && firstFile.exists() ){
 //                System.out.println("fileName_NoPOint = "+ fileName_NoPOint + "  fileItem.getParentFile() = "+ fileItem.getParentFile() +"  fileItem="+ fileItem.getAbsolutePath());
                 String absPath_NoPoint = parentPath+File.separator+fileName_NoPOint;  // 【ZABSPATH_NOPOINT】
                 System.out.println("════════════════════════════════════════════");
-
                 System.out.println(" ___________________"+fileName+" 【type1】___________________");
                 System.out.println("start /wait /min "+fileName+"  /S /Q /D= "+absPath_NoPoint+"  ");
-
                 System.out.println(" ___________________"+fileName+" 【type2】___________________");
                 System.out.println("start /wait /min ./"+fileName+ " /quiet /norestart INSTALLDIR=\""+absPath_NoPoint+"\"  ");
-
                 System.out.println(" ___________________"+fileName+" 【type3】___________________");
                 System.out.println("start "+absPath+" /VERYSILENT /SUPPRESSMSGBOXES /NORESTART /SP-    ");
                 System.out.println();
                 System.out.println();
 
+                allCommand_In_RawBat.add("echo ==============="+absPath+"===============");
+                if(template_flag){
+                    for (int j = 0; j < curTemplateList.size() ; j++) {
+                        String oneCode = curTemplateList.get(j);
+                        oneCode =  oneCode.replace("【ZCUR_NAME】",fileName);
+                        oneCode =  oneCode.replace("【ZABSPATH】",absPath);
+                        oneCode =  oneCode.replace("【ZABSPATH_NOPOINT】",absPath_NoPoint);
+                        allCommand_In_RawBat.add(oneCode);
+                    }
+                    allCommand_In_RawBat.add("");
+                    allCommand_In_RawBat.add("");
+                }
+
+
+
 //   start /wait /min 【ZCUR_NAME】  /S /Q /D=【ZABSPATH_NOPOINT】
 
             }
         }
+
+        if(template_flag){
+            allCommand_In_Fixed_Bat.addAll(allCommand_In_RawBat);
+            String newBatFile =  CUR_Dir_1_PATH+File.separator+"zAll_Install.bat";
+          File batAllFile =   new File(newBatFile);
+            writeContentToFile(batAllFile,allCommand_In_Fixed_Bat);    // 对当前文件的文件进行 bat创建
+            System.out.println("当前已经生成本地安装 批处理文件 \n "+ batAllFile.getAbsolutePath());
+        }
+
         if(true){
 
             return ;

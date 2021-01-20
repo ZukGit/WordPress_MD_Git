@@ -1,109 +1,289 @@
 @ECHO off
 setlocal enabledelayedexpansion 
+%1 mshta vbscript:CreateObject("Shell.Application").ShellExecute("cmd.exe","/c %~s0 ::","","runas",1)(window.close)&&exit
 set cur_path=%cd%
+echo cd /d "%~dp0"
+cd /d "%~dp0"
 set cur_Desktop=%USERPROFILE%
-set cur_jdk_path=%JAVA_HOME%
-set notepad_desc="       cmd /K cd /d %%userprofile%%\Desktop\zbin & %%userprofile%%\Desktop\zbin\I9.bat %%userprofile%%\Desktop\zbin  $(FULL_CURRENT_PATH)                                      			  "
-echo=
-echo ___________Notepad++ TextRule Command___________
-echo Name: text_rule   Key:  F8
-echo  %notepad_desc%
- 
-echo=
-echo ___________CMDER REGISTER___________
-echo Cmder.exe /REGISTER ALL
-echo=
-echo=
-echo ___________CMDER1___________
-echo=
+echo cur_Desktop=%cur_Desktop%  cur_path=%cd% ~dp0=%~dp0
+set exe_count=1
+set Environment_java_exe=""
+set Environment_javac=""
+set java_exe_file=""
+set javac_run_file=""
+set Environment_win_zbin="%cur_Desktop%\Desktop\zbin\win_zbin"
+set Environment_notepad=""
+set notepad_exe_file=""
+
+rem call :search_java_envirppnment
+rem echo Environment_java_exe_end = %Environment_java_exe%
+rem echo Environment_javac_end = %Environment_javac%
+rem echo Environment_win_zbin = %Environment_win_zbin%
+rem echo java_exe_file = %java_exe_file%
+rem echo javac_run_file = %javac_run_file%
+rem 
+rem echo %javac_run_file%  -cp %cur_Desktop%\Desktop\zbin\J1_guava.jar;%cur_Desktop%\Desktop\zbin\J1_jshortcut_oberzalek.jar -Xlint:unchecked  -encoding UTF-8   %cur_Desktop%\Desktop\zbin\J1_InstallSoftware.java
+rem call %javac_run_file%  -cp %cur_Desktop%\Desktop\zbin\J1_guava.jar;%cur_Desktop%\Desktop\zbin\J1_jshortcut_oberzalek.jar -Xlint:unchecked  -encoding UTF-8  %cur_Desktop%\Desktop\zbin\J1_InstallSoftware.java
+rem echo;
+rem echo %java_exe_file% -cp %cur_Desktop%\Desktop\zbin\J1_guava.jar;%cur_Desktop%\Desktop\zbin\J1_jshortcut_oberzalek.jar;%cur_Desktop%\Desktop\zbin  J1_InstallSoftware  %~dp0
+rem call %java_exe_file% -cp %cur_Desktop%\Desktop\zbin\J1_guava.jar;%cur_Desktop%\Desktop\zbin\J1_jshortcut_oberzalek.jar;%cur_Desktop%\Desktop\zbin  J1_InstallSoftware  %~dp0
+rem pause
+
+
+
+
+
+
+
+
+
+call :express_all_zip
+call :copy_zbin
+call :search_java_envirppnment
+call :search_notepad_envirppnment
+call :add_all_environment
+call :showCmderCommand
+
+
+echo Environment_java_exe_end = %Environment_java_exe%
+echo Environment_javac_end = %Environment_javac%
+echo Environment_win_zbin = %Environment_win_zbin%
+echo java_exe_file = %java_exe_file%
+echo javac_run_file = %javac_run_file%
+echo Environment_notepad = %Environment_notepad%
+echo notepad_exe_file = %notepad_exe_file%
+
+echo %javac_run_file%  -cp %cur_Desktop%\Desktop\zbin\J1_guava.jar;%cur_Desktop%\Desktop\zbin\J1_jshortcut_oberzalek.jar -Xlint:unchecked  -encoding UTF-8   %cur_Desktop%\Desktop\zbin\J1_InstallSoftware.java
+call %javac_run_file%  -cp %cur_Desktop%\Desktop\zbin\J1_guava.jar;%cur_Desktop%\Desktop\zbin\J1_jshortcut_oberzalek.jar -Xlint:unchecked  -encoding UTF-8  %cur_Desktop%\Desktop\zbin\J1_InstallSoftware.java
+echo;
+echo %java_exe_file% -cp %cur_Desktop%\Desktop\zbin\J1_guava.jar;%cur_Desktop%\Desktop\zbin\J1_jshortcut_oberzalek.jar;%cur_Desktop%\Desktop\zbin  J1_InstallSoftware  %~dp0
+call %java_exe_file% -cp %cur_Desktop%\Desktop\zbin\J1_guava.jar;%cur_Desktop%\Desktop\zbin\J1_jshortcut_oberzalek.jar;%cur_Desktop%\Desktop\zbin  J1_InstallSoftware  %~dp0
+call J1_InstallSoft.bat
+pause
+goto:eof
+
+
+
+:express_all_zip
+rem  express all zip file
+for /f "delims=" %%i in ('dir /b /a-d /s "*.zip"') do (
+rem set cur_file_path=%%i
+rem echo %%i
+rem echo cur_file_path=%cur_file_path%
+call :show_7z_command %%i
+rem call :showfile %%i
+)
+goto:eof
+
+
+
+:add_all_environment
+echo  setx "Path" "%Environment_win_zbin%;%Environment_java_exe%;%Environment_javac%;%Environment_notepad%;%path%" /m
+setx "Path" "%Environment_win_zbin%;%Environment_java_exe%;%Environment_javac%;%Environment_notepad%;%path%" /m
+goto:eof
+
+
+:showCmderCommand
+for /f "delims=" %%j in ('dir /b /a-d /s "*Cmder.exe"') do (
+echo num=!exe_count! %%j 
+
+echo  %%j /REGISTER ALL  
+%%j /REGISTER ALL  
+start %%j
+echo;
+echo;
+echo ========= please add command as environment settings in Cmder.exe =========
+echo;
+echo set PATH=%%ConEmuBaseDir%%\Scripts;%%PATH%%
 echo set PATH=%%USERPROFILE%%\Desktop\zbin\win_zbin;%%PATH%%
-echo alias gits=git status
 echo alias cdd=cd /D %%USERPROFILE%%\Desktop
 echo alias cdz=cd /D %%USERPROFILE%%\Desktop\zbin
-
-echo=
-echo=
-set cur_Path=%PATH%
-set remain=%cur_Path%
-set cur_path_index=1
-set cur_jdk_path=
-set cur_ffmpeg_path=
-set cur_Tesseract_path=
-
-echo ___________Print And Search Environment_Path___________
-:loop
-for /f "tokens=1* delims=;" %%a in ("%remain%") do (
-	echo [%cur_path_index%]    %%a
-	
-	
-    set JDK_EXISTS_FLAG=false
-	echo %%a |find "jdk">nul&&set JDK_EXISTS_FLAG=true
-	set  temp_path_jdk="%%a"
-	set  temp_path_ffmpeg="%%a"
-	set  temp_path_Tesseract="%%a"
-			
-    if "%JDK_EXISTS_FLAG%"=="true" (
-        set  cur_jdk_path=%temp_path_jdk%
-		rem echo [JDK_EXISTS_FLAG]=%JDK_EXISTS_FLAG%
-		rem echo [cur_jdk_path]=%cur_jdk_path%
-    )
-	
-	set ffmpeg_EXISTS_FLAG=false
-	echo %%a |find "ffmpeg">nul&&set ffmpeg_EXISTS_FLAG=true
-    set  temp_path_ffmpeg="%%a"
-    if "%ffmpeg_EXISTS_FLAG%"=="true" (
-        set  cur_ffmpeg_path=%temp_path_ffmpeg%
-    )
-	
-	set Tesseract_EXISTS_FLAG=false
-	echo %%a |find "Tesseract">nul&&set Tesseract_EXISTS_FLAG=true
-    set  temp_path_Tesseract="%%a"
-    if "%Tesseract_EXISTS_FLAG%"=="true" (
-        set  cur_Tesseract_path=%temp_path_Tesseract%
-    )
-	
-	
-	set remain=%%b
-	set /a cur_path_index  = !cur_path_index! + 1 
+echo;
+rem echo set PATH=%ConEmuBaseDir%\Scripts;%PATH%
+rem echo set PATH=E:\Temp_Install\jdk\bin;%PATH%
+rem echo set PATH=%USERPROFILE%\Desktop\zbin\win_zbin;%PATH%
 )
-::
-if defined remain goto :loop
+goto:eof
 
 
-echo [JAVA_HOME] ==== %cur_jdk_path%
-echo [cur_jdk_path]=%cur_jdk_path:~1,-1%
-echo [curPath]   ==== %cur_path%
-echo [win_zbin] ==== %cur_Desktop%\zbin\win_zbin
-echo=
-echo ___________CMDER2___________
-echo set PATH=%%USERPROFILE%%\Desktop\zbin\win_zbin;%%PATH%%
-echo alias gits=git status
-echo alias cdd=cd /D %%USERPROFILE%%\Desktop
-echo alias cdz=cd /D %USERPROFILE%\Desktop\zbin
-echo set PATH=%cur_jdk_path:~1,-1%;%%PATH%%
-echo set PATH=%cur_ffmpeg_path:~1,-1%;%%PATH%%
-echo set PATH=%cur_Tesseract_path:~1,-1%;%%PATH%%
-echo=
-echo=
-echo ___________SHOW PATH___________
-echo %cur_jdk_path:~1,-1%
-echo %cur_ffmpeg_path:~1,-1%
-echo %cur_Tesseract_path:~1,-1%
-echo=
 
-echo ___________SETX WIN_ZBIN_PATH___________
-echo SETX PATH %USERPROFILE%\Desktop\zbin\win_zbin;%PATH%
-echo=
 
-echo ___________SETX JDK_PATH___________
-echo SETX PATH %cur_jdk_path%;%PATH%
-echo=
 
-echo ___________SETX FFMPEG_PATH___________
-echo SETX PATH %cur_ffmpeg_path%;%PATH%
-echo=
+:copy_zbin
+echo xcopy /y /c /h /r /s ".\zbin\*.*" "%cur_Desktop%\Desktop\zbin\"
+xcopy /y /c /h /r /s ".\zbin\*.*" "%cur_Desktop%\Desktop\zbin\"
+goto:eof
 
-echo ___________SETX Tesseract_PATH___________
-echo SETX PATH %cur_Tesseract_path%;%PATH%
-echo 
 
+
+:search_notepad_envirppnment
+for /f "delims=" %%j in ('dir /b /a-d /s "*notepad++.exe"') do (
+echo num=!exe_count! %%j 
+set /a exe_count  = !exe_count! + 1
+set notepad_exe_file=%%j 
+call :add_path_environment_file_notepad %%j 
+)
+
+goto:eof
+
+
+
+:search_java_envirppnment
+for /f "delims=" %%j in ('dir /b /a-d /s "*java.exe"') do (
+echo num=!exe_count! %%j 
+set /a exe_count  = !exe_count! + 1
+set java_exe_file=%%j 
+call :add_path_environment_file_java %%j 
+)
+
+set /a exe_count  = 1
+for /f "delims=" %%j in ('dir /b /a-d /s "*javac.exe"') do (
+echo num=!exe_count! %%j 
+set /a exe_count  = !exe_count! + 1
+set javac_run_file=%%j 
+call :add_path_environment_file_javaC %%j 
+)
+goto:eof
+
+
+:add_path_environment_file_notepad
+set str2_dp=%~dp1 
+echo notepad_environment_path=%str2_dp%    for  %1
+rem setx "Path" "%str2_dp%;%path%" /m
+call :add_path_environment_dir_notepad %str2_dp%
+goto:eof
+
+
+:add_path_environment_dir_notepad
+rem call :showfile %1  
+set str2_dp_dir=%~dp1
+
+rem set str_temp=123456789
+rem echo last_str = %str_temp:~0,-1%
+
+echo str2_dp_dir="%str2_dp_dir%"
+set fixed_path=%str2_dp_dir:~0,-1%
+echo fixed_path="%fixed_path%"
+echo setx_command---------setx "Path" "%fixed_path%;%path%" /m
+rem setx "Path" "%fixed_path%;%path%" /m
+echo Environment_notepad = %fixed_path%
+set Environment_notepad=%fixed_path%
+goto:eof
+
+
+
+
+
+:add_path_environment_file_java
+set str2_dp=%~dp1 
+echo add_environment_path=%str2_dp%    for  %1
+rem setx "Path" "%str2_dp%;%path%" /m
+call :add_path_environment_dir_java %str2_dp%
+goto:eof
+
+
+
+:add_path_environment_dir_java
+rem call :showfile %1  
+set str2_dp_dir=%~dp1
+
+rem set str_temp=123456789
+rem echo last_str = %str_temp:~0,-1%
+
+echo str2_dp_dir="%str2_dp_dir%"
+set fixed_path=%str2_dp_dir:~0,-1%
+echo fixed_path="%fixed_path%"
+echo setx_command---------setx "Path" "%fixed_path%;%path%" /m
+rem setx "Path" "%fixed_path%;%path%" /m
+echo Environment_java_exe = %fixed_path%
+set Environment_java_exe=%fixed_path%
+goto:eof
+
+
+
+
+:add_path_environment_file_javaC
+set str2_dp=%~dp1 
+echo add_environment_path=%str2_dp%    for  %1
+rem setx "Path" "%str2_dp%;%path%" /m
+call :add_path_environment_dir_javaC %str2_dp%
+goto:eof
+
+
+:add_path_environment_dir_javaC
+rem call :showfile %1  
+set str2_dp_dir=%~dp1
+
+rem set str_temp=123456789
+rem echo last_str = %str_temp:~0,-1%
+
+echo str2_dp_dir="%str2_dp_dir%"
+set fixed_path=%str2_dp_dir:~0,-1%
+echo fixed_path="%fixed_path%"
+echo setx_command---------setx "Path" "%fixed_path%;%path%" /m
+rem setx "Path" "%fixed_path%;%path%" /m
+
+echo Environment_javac = %fixed_path%
+set Environment_javac=%fixed_path%
+goto:eof
+
+
+
+
+
+
+:show_7z_command
+set str2_dp=%~dp1   
+rem echo str2_dp=%str2_dp%
+rem set cur_item_dir_path=%str2_dp%
+rem echo cur_item_dir_path=%cur_item_dir_path%
+echo  7z.exe -y -p""  x "%1" -o%str2_dp%
+7z.exe -y -p""  x "%1" -o%str2_dp%
+goto:eof
+
+rem  fileAbsPath=D:\zbin_model\Software\ZWin_Software\E1_No_Slient_Zip_Dir_Path\sourceinsight4.0.zip
+rem  ~a=--a--------
+rem  ~d=D:
+rem  ~f=D:\zbin_model\Software\ZWin_Software\E1_No_Slient_Zip_Dir_Path\sourceinsight4.0.zip
+rem  ~n=sourceinsight4.0
+rem  ~s=D:\zbin_model\Software\ZWin_Software\E1_No_Slient_Zip_Dir_Path\sourceinsight4.0.zip
+rem  ~p=\zbin_model\Software\ZWin_Software\E1_No_Slient_Zip_Dir_Path\
+rem  ~x=.zip
+rem  ~z=22173677
+rem  ~dp=D:\zbin_model\Software\ZWin_Software\E1_No_Slient_Zip_Dir_Path\
+rem  ~nx=sourceinsight4.0.zip
+rem  ~fs=D:\zbin_model\Software\ZWin_Software\E1_No_Slient_Zip_Dir_Path\sourceinsight4.0.zip
+rem  ~dpn=D:\zbin_model\Software\ZWin_Software\E1_No_Slient_Zip_Dir_Path\sourceinsight4.0
+
+
+
+
+:showfile
+set str1_a=%~a1
+set str1_d=%~d1
+set str1_f=%~f1
+set str1_n=%~n1
+set str1_s=%~s1
+set str1_t=%~t1
+set str1_p=%~p1
+set str1_x=%~x1
+set str1_z=%~z1
+set str2_dp=%~dp1
+set str2_nx=%~nx1
+set str2_fs=%~fs1
+set str3_dpn=%~dpn1
+echo;
+echo fileAbsPath=%1
+echo ~a=%str1_a%
+echo ~d=%str1_d%
+echo ~f=%str1_f%
+echo ~n=%str1_n%
+echo ~s=%str1_s%
+echo ~p=%str1_p%
+echo ~x=%str1_x%
+echo ~z=%str1_z%
+echo ~dp=%str2_dp%
+echo ~nx=%str2_nx%
+echo ~fs=%str2_fs%
+echo ~dpn=%str3_dpn%
+goto:eof

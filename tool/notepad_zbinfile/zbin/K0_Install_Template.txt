@@ -1,0 +1,20 @@
+rem    ___________________【ZCUR_NAME】 type3___________________
+   【ZABSPATH】 /VERYSILENT /SUPPRESSMSGBOXES /NORESTART /SP-                                
+  if %errorlevel%==0 ( echo  【ZCUR_NAME】 -- OK[type3_/VERYSILENT]  ) else (
+   echo  【ZCUR_NAME】 -- Error[type3_/S/Q/D]
+rem    ___________________【ZCUR_NAME】 type2___________________
+   start /wait /min ./【ZCUR_NAME】  /quiet /norestart INSTALLDIR="【ZABSPATH_NOPOINT】"    
+     if %errorlevel%==0 (
+     echo  【ZCUR_NAME】 -- OK[type2_/quiet]
+     ) else (
+	   echo  【ZCUR_NAME】 -- Error[type2_/quiet]
+rem    ___________________【ZCUR_NAME】 type1___________________
+       start /wait /min 【ZCUR_NAME】  /S /Q /D=【ZABSPATH_NOPOINT】                       
+     if %errorlevel%==0 (
+        echo  【ZCUR_NAME】 -- OK[type1_/S/Q/D]
+        ) else (
+        echo  【ZCUR_NAME】 -- error[type1_type2_type3] try only abs_path execute
+		【ZABSPATH】
+        )
+      )
+  )
