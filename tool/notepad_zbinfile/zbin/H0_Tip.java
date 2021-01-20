@@ -68,86 +68,176 @@ public class H0_Tip {
 
     }
 
+    // C:\Program Files\JetBrains\IntelliJ IDEA 2018.3.5\bin\idea64.exe.vmoptions
+    static  File search_idea64_exe_vmoptions_1(){
+        File idea64_exe_vmoptions = null;
+
+        String  JetBrains_Program_Path = "C:\\Program Files\\JetBrains\\";
+        File jetBrainDir = new File(JetBrains_Program_Path);
+        if(!jetBrainDir.exists()){
+            System.out.println(" 路径 "+ JetBrains_Program_Path + "为空(1) 找不到 idea64.exe.vmoptions ！");
+            return null;
+        }
+        //            IDEA
+        File[]  jetBrainFileList = jetBrainDir.listFiles();
+        File IDEA_Dir = null;
+        if(jetBrainFileList == null){
+            System.out.println(" 路径 "+ JetBrains_Program_Path + "为空(2) 找不到 idea64.exe.vmoptions ！");
+            return null;
+        }
+
+        for (int i = 0; i < jetBrainFileList.length; i++) {
+            File dirFileItem = jetBrainFileList[i];
+            String dirName = dirFileItem.getName().toLowerCase();
+            if(dirName.contains("idea")){
+                IDEA_Dir = dirFileItem;
+            }
+        }
+
+        if(IDEA_Dir == null){
+            System.out.println(" 路径 "+ JetBrains_Program_Path + "为空(3) 找不到 idea64.exe.vmoptions ！");
+            return null;
+        }
+
+        File idea64_exe_vmoptions_1 = new File(IDEA_Dir.getAbsolutePath()+File.separator+"bin"+File.separator+"idea64.exe.vmoptions");
+        if(!idea64_exe_vmoptions_1.exists()){
+            System.out.println(" 路径 "+ JetBrains_Program_Path + "为空(4) 找不到 idea64.exe.vmoptions ！");
+            return null;
+        }
+
+        return idea64_exe_vmoptions;
+    }
+
+    // C:\Users\zhuzj5\.IntelliJIdea2018.3\config\idea64.exe.vmoptions
+    static  File search_idea64_exe_vmoptions_2(){
+        File idea64_exe_vmoptions = null;
+        File userHomeDir = new File(User_Home);
+        File[] homeListFile = userHomeDir.listFiles();
+        if(homeListFile == null || homeListFile.length == 0){
+            System.out.println(" 路径 "+ userHomeDir + " 用户目录为空(1) 找不到 idea64.exe.vmoptions ！");
+            return null;
+        }
+
+        File intelijDir = null;
+        // IntelliJIdea
+        for (int i = 0; i < homeListFile.length; i++) {
+            File dirItem = homeListFile[i];
+            if(dirItem.isFile()){
+                continue;
+            }
+            String dirItemName = dirItem.getName().toLowerCase();
+            if(dirItemName.contains("intellijidea")){
+                intelijDir = dirItem;
+            }
+        }
+        if(intelijDir == null){
+            System.out.println(" 路径 "+ userHomeDir + "下 intelij 目录为空(2) 找不到 idea64.exe.vmoptions ！");
+            return null;
+        }
+      File targetFile =   new File(intelijDir.getAbsolutePath()+File.separator+"config"+File.separator+"idea64.exe.vmoptions");
+
+        if(!targetFile.exists()){
+            System.out.println(" 路径 "+ targetFile.getAbsolutePath() + "下idea64.exe.vmoptions 为空(3) 找不到 idea64.exe.vmoptions ！");
+            return null;
+        }
+        idea64_exe_vmoptions = targetFile;
+        return idea64_exe_vmoptions;
+    }
+
+    static  ArrayList<File> search_Ideavmoptions_FileList(){
+        ArrayList<File> idea_vmoption_FileList = new ArrayList<File>();
+
+        if(CUR_OS_TYPE == OS_TYPE.Windows){  // // Windows 下寻找  idea.vmoptions
 
 
-  static  ArrayList<File> search_Ideavmoptions_FileList(){
-      ArrayList<File> idea_vmoption_FileList = new ArrayList<File>();
+          File file_idea64_1 = search_idea64_exe_vmoptions_1();
+            File file_idea64_2 = search_idea64_exe_vmoptions_2();
+if(file_idea64_1 != null) {
+    idea_vmoption_FileList.add(file_idea64_1);
+}
 
-      if(CUR_OS_TYPE == OS_TYPE.Windows){  // // Windows 下寻找  idea.vmoptions
-
-
-
-
-
-      }else if (CUR_OS_TYPE == OS_TYPE.MacOS){  // // MacOS 下寻找  idea.vmoptions
-          String path1 = "/Applications/IntelliJ IDEA.app/Contents/bin/idea.vmoptions";
-          File path1_File = new File(path1);
-          if(path1_File.exists()){
-              idea_vmoption_FileList.add(path1_File);
-          }
-
-          // User_Home =  /Users/zhuzhengjie/
-          // Library = /Users/zhuzhengjie/Library
-          File IntelijIDEA_PrefencesFile = null;
-          File IntelijIDEA_PrefencesFile_ideaFile = null;
-
-          // /Users/zhuzhengjie/Library/Preferences
-          String path2_Perferences =User_Home + File.separator + "Library"+ File.separator +"Preferences";
-          File PerferencesFile = new File(path2_Perferences);
-          if(PerferencesFile.exists()){
-              File[] PerferencesSubFileList = PerferencesFile.listFiles();
+if(file_idea64_2 != null) {
+    idea_vmoption_FileList.add(file_idea64_2);
+}
 
 
-              // IntelliJIdea
-              for (int i = 0; i < PerferencesSubFileList.length; i++) {
-                  File PerferencesFileItem = PerferencesSubFileList[i];
-                  if(PerferencesFileItem.isFile()){
-                      continue;
-                  }
 
-                  String dirName = PerferencesFileItem.getName().toLowerCase();
+
+
+
+
+
+
+
+        }else if (CUR_OS_TYPE == OS_TYPE.MacOS){  // // MacOS 下寻找  idea.vmoptions
+            String path1 = "/Applications/IntelliJ IDEA.app/Contents/bin/idea.vmoptions";
+            File path1_File = new File(path1);
+            if(path1_File.exists()){
+                idea_vmoption_FileList.add(path1_File);
+            }
+
+            // User_Home =  /Users/zhuzhengjie/
+            // Library = /Users/zhuzhengjie/Library
+            File IntelijIDEA_PrefencesFile = null;
+            File IntelijIDEA_PrefencesFile_ideaFile = null;
+
+            // /Users/zhuzhengjie/Library/Preferences
+            String path2_Perferences =User_Home + File.separator + "Library"+ File.separator +"Preferences";
+            File PerferencesFile = new File(path2_Perferences);
+            if(PerferencesFile.exists()){
+                File[] PerferencesSubFileList = PerferencesFile.listFiles();
+
+
+                // IntelliJIdea
+                for (int i = 0; i < PerferencesSubFileList.length; i++) {
+                    File PerferencesFileItem = PerferencesSubFileList[i];
+                    if(PerferencesFileItem.isFile()){
+                        continue;
+                    }
+
+                    String dirName = PerferencesFileItem.getName().toLowerCase();
 //                  System.out.println("dirName = "+PerferencesFileItem.getAbsolutePath() +"  ");
 
-                  // IntelliJIdea
-                  if(dirName.contains("intellijidea")){
-                      IntelijIDEA_PrefencesFile = PerferencesFileItem;
-                      break;
-                  }
-              }
+                    // IntelliJIdea
+                    if(dirName.contains("intellijidea")){
+                        IntelijIDEA_PrefencesFile = PerferencesFileItem;
+                        break;
+                    }
+                }
 
 
-          }else{
+            }else{
 
-              System.out.println("PerferencesFile = "+PerferencesFile.getAbsolutePath() +"  不存在！");
-          }
+                System.out.println("PerferencesFile = "+PerferencesFile.getAbsolutePath() +"  不存在！");
+            }
 
-          if(IntelijIDEA_PrefencesFile != null){
-              IntelijIDEA_PrefencesFile_ideaFile =  new File(IntelijIDEA_PrefencesFile.getAbsolutePath()+File.separator+"idea.vmoptions");
+            if(IntelijIDEA_PrefencesFile != null){
+                IntelijIDEA_PrefencesFile_ideaFile =  new File(IntelijIDEA_PrefencesFile.getAbsolutePath()+File.separator+"idea.vmoptions");
 
 //              System.out.println("IntelijIDEA_PrefencesFile_ideaFile = "+IntelijIDEA_PrefencesFile_ideaFile.getAbsolutePath() +"  存在="+ IntelijIDEA_PrefencesFile_ideaFile.exists());
 
-              if(IntelijIDEA_PrefencesFile_ideaFile.exists()){
-                  idea_vmoption_FileList.add(IntelijIDEA_PrefencesFile_ideaFile);
-              }
-          }else {
-              System.out.println("IntelijIDEA_PrefencesFile 为空 ！！");
+                if(IntelijIDEA_PrefencesFile_ideaFile.exists()){
+                    idea_vmoption_FileList.add(IntelijIDEA_PrefencesFile_ideaFile);
+                }
+            }else {
+                System.out.println("IntelijIDEA_PrefencesFile 为空 ！！");
 
-          }
-
-
-
-      } else {   // Linux 下寻找  idea.vmoptions
-          System.out.println("Linux 的 IDEA 破解方法没有实现  return!");
-
-      }
+            }
 
 
 
+        } else {   // Linux 下寻找  idea.vmoptions
+            System.out.println("Linux 的 IDEA 破解方法没有实现  return!");
 
-      return idea_vmoption_FileList;
+        }
 
 
-  }
+
+
+        return idea_vmoption_FileList;
+
+
+    }
 
     static  void Common_IDEA_tip(){
 
@@ -155,7 +245,7 @@ public class H0_Tip {
 
         if(!J1_IDEA_File.exists() || J1_IDEA_File.listFiles() == null){
             System.out.println("当前保存JetBrain.jar 破解IDEA 的保存文件路径不存在! 请检查 PATH = "+J1_IDEA_File.getAbsolutePath());
-        return;
+            return;
         }
 
 
@@ -213,7 +303,7 @@ public class H0_Tip {
         javaAgentStrList.sort(new Comparator<String>() {
             @Override
             public int compare(String o1, String o2) {
-                return o1.compareTo(o2);
+                return o2.compareTo(o1);
             }
         });
 
@@ -237,15 +327,30 @@ public class H0_Tip {
             StringBuilder sb_AppendComamnd = new StringBuilder();
 
 
-            for (int j = 0; j < javaAgentStrList.size(); j++) {
-
-                String  jarPath = javaAgentStrList.get(j);
-                if(j == 0 ){
-                    jarPath = "\\n"+jarPath.replace("#","");
+            if(CUR_OS_TYPE == OS_TYPE.MacOS){
+                for (int j = 0; j < javaAgentStrList.size(); j++) {
+                    String  jarPath = javaAgentStrList.get(j);
+                    if(j == 0 ){
+                        jarPath = "\\n"+jarPath.replace("#","");
+                    }
+                    String commandItem = " echo -n \""+jarPath+"\" >>  "+ ideaFileAbsPath ;
+                    sb_AppendComamnd.append(commandItem+"  &&  ");
                 }
-                String commandItem = " echo -n \""+jarPath+"\" >>  "+ ideaFileAbsPath ;
 
-                sb_AppendComamnd.append(commandItem+"  &&  ");
+
+            }else if(CUR_OS_TYPE == OS_TYPE.Windows){
+                for (int j = 0; j < javaAgentStrList.size(); j++) {
+                    String  jarPath = javaAgentStrList.get(j);
+                    if(j == 0 ){
+                        jarPath = ""+jarPath.replace("#","");
+                    }
+                    String commandItem = " echo "+jarPath+" >> "+ ideaFileAbsPath ;
+                    commandItem =  commandItem.replace("\\ ","");
+                    commandItem =  commandItem.replace("\\n","");
+
+                    sb_AppendComamnd.append(commandItem+"  &&  ");
+                }
+
 
             }
 
@@ -259,7 +364,7 @@ public class H0_Tip {
             if(CUR_OS_TYPE == OS_TYPE.Windows){
                 openFileCommand = " cmd.exe /c start   Notepad++.exe " + ideaFileAbsPath;
                 if(descTxtFile != null)
-                openTxtCommand  = " cmd.exe /c start   Notepad++.exe " + descTxtFile.getAbsolutePath();
+                    openTxtCommand  = " cmd.exe /c start   Notepad++.exe " + descTxtFile.getAbsolutePath();
             }else if(CUR_OS_TYPE ==OS_TYPE.MacOS){
                 openFileCommand = " /Applications/UltraEdit  " + ideaFileAbsPath;
 
@@ -274,6 +379,7 @@ public class H0_Tip {
 
 //            /Applications/UltraEdit
             System.out.println(ideaFileAbsPath+" 执行加入 javaagent 操作命令如下_______________________");
+            System.out.println("help 》 Edit Custom  VM Options 》 idea64.exe.vmoptions ");
             System.out.println(command_fixed+" && "+ openFileCommand );
             System.out.println();
             System.out.println();
@@ -283,6 +389,7 @@ public class H0_Tip {
 
         if(descTxtFile != null){
             System.out.println("________________ 激活码执行如下步骤查询 进行 ________________ ");
+            System.out.println("help 》 register 》 ActivationCode");
             System.out.println("cat "+ descTxtFile.getAbsolutePath()  );
             System.out.println(openTxtCommand );
 
@@ -422,7 +529,7 @@ public class H0_Tip {
         PrintHead_End("  NotePad++ 设置  Begin  ");
         System.out.println(" 用户设置 notepad运行【索引1】   ztextrule_operation_I9.bat 的 快捷键为 F8:");
         System.out.println("Name: text_rule   Key:  F8");
-        System.out.println(" cmd /K cd /d %userprofile%\\Desktop\\zbin & %userprofile%\\Desktop\\zbin\\I9.bat %userprofile%\\Desktop\\zbin  $(FULL_CURRENT_PATH)");
+        System.out.println("cmd /K cd /d %userprofile%\\Desktop\\zbin & %userprofile%\\Desktop\\zbin\\I9.bat %userprofile%\\Desktop\\zbin  $(FULL_CURRENT_PATH)");
         System.out.println("用户可通过 ztextrule_operation_I9.bat  命令来选择对应的 F8 快剪键 执行的 text_rule 逻辑!");
 
         System.out.println();

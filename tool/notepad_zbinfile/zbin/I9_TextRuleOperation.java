@@ -372,6 +372,10 @@ public class I9_TextRuleOperation {
         CUR_RULE_LIST.add( new System_Out_Print_Rule_21());    // 把当前文件的每一行 都 转为 System.out.println(xx) 的内容
 
         CUR_RULE_LIST.add( new ADB_Wireless_WIFI_Rule_22());    //  把 输入的四个参数 转为 无线 adb 连接的命令
+
+        CUR_RULE_LIST.add( new Create_Install_Command_Rule_23());    //  把当前目录的 exe  和 msi  输出 安装的 zbat_xxxx.bat 命令  测试安装命令
+
+
 //        CUR_RULE_LIST.add( new Image2Jpeg_Rule_3());
 //        CUR_RULE_LIST.add( new Image2Png_Rule_4());
 //        CUR_RULE_LIST.add( new AVI_Rule_5());
@@ -380,6 +384,145 @@ public class I9_TextRuleOperation {
 //        CUR_RULE_LIST.add( new ClearChineseType_8());
 
     }
+
+
+
+    // 往 每行的加入占位符   开头加入 〖*   第一个空格前加入*
+    class Create_Install_Command_Rule_23 extends  Basic_Rule {
+        Create_Install_Command_Rule_23(boolean mIsInputDirAsSearchPoint){
+            super(23);
+            isInputDirAsSearchPoint =  mIsInputDirAsSearchPoint;
+
+        }
+
+
+        Create_Install_Command_Rule_23(){
+            super(23,true);
+        }
+
+        ArrayList<File>   getFileTypeList(File[] fileList ,String type){
+            ArrayList<File> fliterList = new     ArrayList<File>();
+            if(fileList == null){
+                return fliterList;
+            }
+            for (int i = 0; i <fileList.length; i++) {
+                if(fileList[i].getName().toLowerCase().endsWith(type.toLowerCase())){
+                    fliterList.add(fileList[i]);
+                }
+            }
+            return fliterList;
+        }
+        @Override
+        ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+            File dirFile =  curInputFileList.get(0).getParentFile();
+            File[] fileList =  dirFile.listFiles();
+            System.out.println("dirFile = "+ dirFile + "        fileList = "+ fileList.length );
+            ArrayList<File>  exeFileList =     getFileTypeList(fileList,".exe");
+            ArrayList<File>  msiFileList =      getFileTypeList(fileList,".msi");
+            ArrayList<File> allOperationFile = new  ArrayList<File>();
+            if(exeFileList != null){
+                allOperationFile.addAll(exeFileList);
+            }
+
+            if(msiFileList != null){
+                allOperationFile.addAll(msiFileList);
+            }
+
+
+            if(allOperationFile.size() == 0){
+                System.out.println("当前没有 exe 和 msi 文件  程序 退出！");
+                return super.applyOperationRule(curFileList, subFileTypeMap, curDirList, curRealFileList);
+            }
+            System.out.println("allOperationFile.size = "+ allOperationFile.size());
+
+            allOperationFile.sort(new Comparator<File>() {
+                @Override
+                public int compare(File o1, File o2) {
+                    long modify1 = o1.lastModified();
+                    long modify2 = o2.lastModified();
+                    if(modify1 == modify2) return 0;
+                    return modify1 > modify2 ? -1: 1 ;
+                }
+            });
+            String curShellPath = dirFile.getAbsolutePath();
+            ArrayList<String> command_ContentList = new ArrayList<String>();
+
+            File rule23_template_bat_file =  new File(zbinPath+File.separator+"I9_Template_Rule23.bat");
+            if(!rule23_template_bat_file.exists()){
+                System.out.println("当前模板文件不存在! 请检查  执行失败!  rule23_template_bat_file = "+ rule23_template_bat_file.getAbsolutePath());
+                return null;
+            }
+          ArrayList<String> templateStrList =   ReadFileContentAsList(rule23_template_bat_file);
+
+            ArrayList<String> allCommand_InNotepad =   new ArrayList<String>();
+            ArrayList<String> allCommand_In_RawBat =   new ArrayList<String>();
+            for (int i = 0; i < allOperationFile.size(); i++) {
+                ArrayList<String> curTemplateList = new    ArrayList<String>();
+                ArrayList<String> targetTemplateList = new    ArrayList<String>();
+//                Collections.copy(curTemplateList, templateStrList);
+
+                curTemplateList.add("@echo off");
+                curTemplateList.add("Setlocal ENABLEDELAYEDEXPANSION");
+
+                for (int j = 0; j < templateStrList.size() ; j++) {
+                    String newItem = new String(templateStrList.get(j));
+
+                    curTemplateList.add(newItem);
+                }
+
+
+                File fileItem = allOperationFile.get(i);
+                String fileName = fileItem.getName();   // 【ZCUR_NAME】
+                String absPath =  fileItem.getAbsolutePath();// 【ZABSPATH】
+                String fileName_NoPOint = getFileNameNoPoint(fileName);
+                String absPath_NoPoint = fileItem.getParentFile().getAbsolutePath()+File.separator+fileName_NoPOint;  // 【ZABSPATH_NOPOINT】
+
+                allCommand_In_RawBat.add("echo ==============="+absPath+"===============");
+
+                for (int j = 0; j < curTemplateList.size() ; j++) {
+                    String oneCode = curTemplateList.get(j);
+                    oneCode =  oneCode.replace("【ZCUR_NAME】",fileName);
+                    oneCode =  oneCode.replace("【ZABSPATH】",absPath);
+                    oneCode =  oneCode.replace("【ZABSPATH_NOPOINT】",absPath_NoPoint);
+                    targetTemplateList.add(oneCode);
+                    allCommand_In_RawBat.add(oneCode);
+                }
+
+                String newBatFile =  fileItem.getParentFile().getAbsolutePath()+File.separator+"zbat_"+fileName_NoPOint+".bat";
+
+                writeContentToFile(new File(newBatFile),targetTemplateList);    // 对当前文件的文件进行 bat创建
+                allCommand_InNotepad.add("==============="+absPath+"===============");
+                allCommand_InNotepad.addAll(targetTemplateList);
+                allCommand_InNotepad.add("\n\n");
+
+                allCommand_In_RawBat.add("");
+                allCommand_In_RawBat.add("");
+
+            }
+
+            ArrayList<String> allCommand_In_Bat_Fixed =   new ArrayList<String>();
+            allCommand_In_Bat_Fixed.add("@echo off");
+            allCommand_In_Bat_Fixed.add("Setlocal ENABLEDELAYEDEXPANSION");
+            allCommand_In_Bat_Fixed.addAll(allCommand_In_RawBat);
+            writeContentToFile(new File(curShellPath+File.separator+"zAll_Install.bat"),allCommand_In_Bat_Fixed);
+            System.out.println("command_ContentList.size = "+ command_ContentList.size());
+            writeContentToFile(I9_Temp_Text_File,allCommand_InNotepad);
+            NotePadOpenTargetFile(I9_Temp_Text_File.getAbsolutePath());
+
+
+            return super.applyOperationRule(curFileList, subFileTypeMap, curDirList, curRealFileList);
+        }
+
+        @Override
+        String simpleDesc() {
+            return "读取当前目录的 exe  和 msi  输出 安装的 zbat_xxxx.bat 命令  测试静默安装命令 ";
+        }
+
+
+    }
+
+
+
 
 
     // 6位数字为  验证码code  5位数字为端口(两个)  三位数字为IP地址最后一位  组成ADB命令 进行输出
@@ -738,6 +881,8 @@ public class I9_TextRuleOperation {
 
 
             String str_end_2 = " /quiet /norestart INSTALLDIR=\""+curShellPath+"\\";
+
+            String str_end_3 = " /VERYSILENT /SUPPRESSMSGBOXES /NORESTART /SP-";
             for (int i = 0; i < allOperationFile.size(); i++) {
                 File fileItem = allOperationFile.get(i);
                 String fileName = fileItem.getName();
@@ -762,11 +907,17 @@ public class I9_TextRuleOperation {
                     String command2 = str_pre_1+ fileName_Point+" " + str_end_2 + nameStr_noPoint+"\"";
 
 
+                    String command3 = fileItem_new.getAbsolutePath()+str_end_3;
                     command_ContentList.add(tip1);
                     command_ContentList.add("echo  \"<type1_/S/Q/D> "+command1+"\"");
                     command_ContentList.add(command1);
+                    command_ContentList.add("");
                     command_ContentList.add("echo  \" </quiet /norestart INSTALLDIR> "+command2+"\"");
                     command_ContentList.add(command2);
+                    command_ContentList.add("");
+                    command_ContentList.add("echo  \" </VERYSILENT /SUPPRESSMSGBOXES /NORESTART /SP->  "+command3+"\"");
+                    command_ContentList.add(command3);
+                    command_ContentList.add("");
 
                     command_ContentList.add("\n");
                 }
@@ -788,6 +939,32 @@ public class I9_TextRuleOperation {
 
 
     }
+
+
+
+
+/*    @echo off
+    Setlocal ENABLEDELAYEDEXPANSION
+    start /wait /min Git-2.30.0-64-bit.exe  /S /Q /D=D:\zbin_model\Software\ZWin_Software\E0_No_Slient_OneExe\git-2.30.0-64-bit
+  if %errorlevel%==0 ( echo  Git-2.30.0-64-bit.exe -- OK[type1_/S/Q/D] ) else (
+    echo  Git-2.30.0-64-bit.exe -- Error[type1_/S/Q/D]
+    start /wait /min ./Git-2.30.0-64-bit.exe  /quiet /norestart INSTALLDIR="D:\zbin_model\Software\ZWin_Software\E0_No_Slient_OneExe\git-2.30.0-64-bit"
+     if %errorlevel%==0 (
+    echo  Git-2.30.0-64-bit.exe -- OK[type2_/quiet]
+            ) else (
+    echo  Git-2.30.0-64-bit.exe -- Error[type2_/quiet]
+    D:\zbin_model\Software\ZWin_Software\E0_No_Slient_OneExe\Git-2.30.0-64-bit.exe /VERYSILENT /SUPPRESSMSGBOXES /NORESTART /SP-
+            if %errorlevel%==0 (
+    echo  Git-2.30.0-64-bit.exe -- OK[type3_/VERYSILENT]
+            ) else (
+    echo  Git-2.30.0-64-bit.exe -- error[type1_type2_type3]
+            )
+            )
+            )*/
+
+
+
+
 
     // 往 每行的加入占位符   开头加入 〖*   第一个空格前加入*
     class FirstWord_MakeDir_Rule_19 extends  Basic_Rule{

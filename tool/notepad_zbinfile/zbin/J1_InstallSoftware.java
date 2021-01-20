@@ -2061,7 +2061,7 @@ public class J1_InstallSoftware {
 
 
         if (CUR_Dir_FILE != null && !isZWinSoft(CUR_Dir_FILE)) {
-            System.out.println("当前目录不在 ZWin_SoftWare 不是指定 软件保存安装 目录 ! ");
+            System.out.println("当前目录不在 ZWin_Software 不是指定 软件保存安装 目录 ! ");
             System.out.println("百度网盘 ZWin_SoftWared 地址:  \n" + "https://pan.baidu.com/disk/home#/all?vmode=list&path=%2F%E7%A7%BB%E5%8A%A8%E7%A1%AC%E7%9B%98%2Fsoftware%2FZWin_Software");
             return;
         }
@@ -2248,6 +2248,7 @@ public class J1_InstallSoftware {
 
 
 
+    //  Key-----当前目录    Value--------当前目录下的 exe文件  msi文件  子文件夹
     static Map<File, ArrayList<File>> zwin_soft_dir_Map = Maps.newConcurrentMap();
     static ArrayList<File> zwin_soft_zip_FileList = new ArrayList<File>();
     static ArrayList<File> zwin_soft_unzip_FileList = new ArrayList<File>();
@@ -2384,7 +2385,7 @@ public class J1_InstallSoftware {
     static int toDoIndex = 1;
 
     static void toDoInstall(String dirName, ArrayList<File> softwareList) {
-        String key = calculFileOringinKey(dirName, zwin_soft_key_list);
+        String key = calculFileOringinKey(dirName, zwin_soft_key_list);    // 是 哪一种目录下的文件   绿色当文件   绿色文件夹    可静默安装exe  添加到环境变量的文件
         if (key == null) {
             System.out.println("当前 dirName =" + dirName + " 没有在  zwin_soft_key_list  找到对应的Key");
             return;
@@ -2398,19 +2399,19 @@ public class J1_InstallSoftware {
             allZWInSoftList.add(winSoftItem);
         }
 
-        // 把  转为 更为 方面操作的 ZWin_Soft 类去执行   key   和  File
+        // 把 文件File 转为 更为 方面操作的 ZWin_Soft 类去执行   key   和  File
         ZWinSoft_Install_CommandList.add("");
         ZWinSoft_Install_CommandList.add("rem ############################ index[" + toDoIndex + "]  key = " + key);
         toDoIndex++;
 
         for (int i = 0; i < allZWInSoftList.size(); i++) {
             ZWin_Software winSoftItem = allZWInSoftList.get(i);
-            String switchKey = winSoftItem.category_key;
+            String switchKey = winSoftItem.category_key; // Pre_Install_Soft    // Slient1_OneExe_Local_Install   // Environment_Zip_Dir_Path 等类型
             File targetFile = winSoftItem.targetExeFile;
             File rootFile = winSoftItem.rootFile;
             File single_install_Dir = winSoftItem.Single_install_Dir;
             File desktop_icon_file = winSoftItem.Desktop_Icon_File;
-            String relativePath = winSoftItem.target_relative_path;
+            String relativePath = winSoftItem.target_relative_path;         //   相对于  当前 shell 目录的 相对路径
             if (targetFile == null) {
                 System.out.println("当前 root目录 " + rootFile.getAbsolutePath() + "的 targetFile为空!");
                 continue;
@@ -2418,6 +2419,7 @@ public class J1_InstallSoftware {
 
             String targetAbsPath = targetFile.getAbsolutePath();
             String clearChineseABsPath = clearChinese(targetAbsPath);
+            ArrayList<String> OtherCommandList = new     ArrayList<String>();
             String curCommand = "";
 
             switch (switchKey) {
@@ -2427,14 +2429,18 @@ public class J1_InstallSoftware {
 
                 case "Slient1_OneExe_Local_Install":
                     curCommand = "start /wait /min  ." + relativePath + " /S /Q /D=" + single_install_Dir;
+                    OtherCommandList.add("if %errorlevel%==0 (echo  "+relativePath+" -- OK) else (echo  "+relativePath+" -- error)");
+
                     break;
 
                 case "Silent1_OneExe_System_Install":
                     curCommand = "start /wait /min  ." + relativePath + " /S /Q /D=" + single_install_Dir;
+                    OtherCommandList.add("if %errorlevel%==0 (echo  "+relativePath+" -- OK) else (echo  "+relativePath+" -- error)");
                     break;
 
                 case "Slient2_OneMsi_System_Install":
                     curCommand = "start /wait /min  ." + relativePath + "  /quiet /norestart INSTALLDIR=\"" + single_install_Dir + "\"";
+                    OtherCommandList.add("if %errorlevel%==0 (echo  "+relativePath+" -- OK) else (echo  "+relativePath+" -- error)");
                     break;
                 case "Green_OneExe":
                     makeShellLink(targetFile, desktop_icon_file);
@@ -2462,6 +2468,9 @@ public class J1_InstallSoftware {
             }
             ZWinSoft_Install_CommandList.add("echo "+"\""+curCommand+"\"");
             ZWinSoft_Install_CommandList.add(curCommand);
+            if( OtherCommandList.size() > 0 ){
+                ZWinSoft_Install_CommandList.addAll(OtherCommandList);
+            }
             ZWinSoft_Install_CommandList.add("echo=");
             ZWinSoft_Install_CommandList.add("\n");
 
