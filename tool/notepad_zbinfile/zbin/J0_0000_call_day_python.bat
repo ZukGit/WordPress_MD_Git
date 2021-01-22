@@ -18,7 +18,7 @@ ECHO  === input_index_1:!input_index_1!      index:!current_index!   input_index
 
 if "%input_index_1%"=="!current_index!" (
 	ECHO  === temp_content:!temp_content!      index:!current_index!   input_index_1:%input_index_1%   Flag: Success and Run ! ===
-	@py  "%%i"
+	@python  "%%i"
 	goto end
 )
 

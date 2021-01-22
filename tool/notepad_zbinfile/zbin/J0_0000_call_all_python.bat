@@ -6,7 +6,7 @@ echo CURPATH=%CURPATH%
 
 FOR %%i IN (%CURPATH%*.py) DO ( 
 ECHO python-execute: %%i
-@py  "%%i"
+@python  "%%i"
 )
 pwd
 

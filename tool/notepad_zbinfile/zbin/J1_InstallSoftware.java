@@ -462,13 +462,13 @@ public class J1_InstallSoftware {
 // 5_No_Slient_Manual_Install               //  必须手动安装 并没有静态安装命令的软件
 
     //  当前目录下的所有的 zip文件
-    ArrayList<File> software_allZipFileList;
+    static   ArrayList<File> software_allZipFileList = new   ArrayList<File> ();
 
     //  当前目录下的所有的 exe文件
-    ArrayList<File> software_allExeFileList;
+    static   ArrayList<File> software_allExeFileList= new   ArrayList<File> ();
 
     //  当前目录下的所有的 msi文件
-    ArrayList<File> software_allMsiFileList;
+ static   ArrayList<File> software_allMsiFileList= new   ArrayList<File> ();
 
 
     class ZWin_Software {
@@ -488,7 +488,7 @@ public class J1_InstallSoftware {
         ArrayList<File> allSubFileList;  //  当前如果是一个目录  那么这就是当前目录的所有子文件 孙文件
         // 需要添加到 环境变量的文件   添加的是它的父目录的路径
         ArrayList<File> addPathFileList;
-        ArrayList<File> exeAllFile;
+        ArrayList<File> exeAllFile;  //zukgit
 
         //   相对于  当前 shell 目录的 相对路径
         String target_relative_path;
@@ -537,7 +537,10 @@ public class J1_InstallSoftware {
                 addPathFileList = new ArrayList<File>();
                 subFileList.addAll(Arrays.asList(rootFile.listFiles()));
                 allSubFileList.addAll(getAllSubDirFile(rootFile));
-                exeAllFile.addAll(getTypeFileList(allSubFileList, ".exe"));
+                exeAllFile.addAll(getTypeFileList(allSubFileList, ".exe"));    // zukgit
+                if(exeAllFile != null){
+                    software_allExeFileList.addAll(exeAllFile);
+                }
                 addPathFileList.addAll(getPathFileList(exeAllFile, addPathExeFileNameList));
 
                 //  如果有 加入  环境变量的 exe 文件  那么 这个 exe 文件 就是执行文件
@@ -2099,6 +2102,27 @@ public class J1_InstallSoftware {
         File installBatFile = new File(CUR_Dir_FILE.getAbsolutePath()+File.separator+"J1_InstallSoft.bat");
         writeContentToFile(installBatFile,commandList);
 
+
+        File notepad_exe_File = searchExeFile("NotePad++.exe");
+        if (notepad_exe_File != null) {
+            System.out.println("reg.reg  != null will create a  reg.reg");
+            ArrayList<String> notepad_reg_List = new  ArrayList<String>();
+            notepad_reg_List.add("Windows Registry Editor Version 5.00");
+            notepad_reg_List.add("[HKEY_CLASSES_ROOT\\*\\Shell\\NotePad++]");
+            notepad_reg_List.add("[HKEY_CLASSES_ROOT\\*\\Shell\\NotePad++\\Command]");
+            String notepad_path = notepad_exe_File.getAbsolutePath().replace("\\","\\\\");
+            notepad_reg_List.add("@=\"\\\""+notepad_path+"\\\" \\\"%1\\\"\"");
+            File regFile = new File(CUR_Dir_FILE.getAbsolutePath()+File.separator+"reg.reg");
+            writeContentToFile(regFile,notepad_reg_List);
+        }else{
+            System.out.println("reg.reg  is NULL");
+        }
+
+
+
+
+
+
         if (true) {
             return;
         }
@@ -2136,6 +2160,22 @@ public class J1_InstallSoftware {
 
 
 
+    public static File searchExeFile(String exeName) {
+        File targetFile = null;
+
+        String fileName = exeName.toLowerCase().trim();
+
+        for (int i = 0; i < software_allExeFileList.size() ; i++) {
+            File exeFie = software_allExeFileList.get(i);
+            String exeName_lower = exeFie.getName().toLowerCase().trim();
+            System.out.println("searchExeFile   fileName=["+fileName+"]  exeName_lower=["+exeName_lower+"]" );
+            if(exeName_lower.endsWith(fileName)){
+                return exeFie;
+            }
+        }
+
+        return    targetFile;
+    }
     public static String execCMD(String command) {
 
         String result = "";
@@ -2271,11 +2311,15 @@ public class J1_InstallSoftware {
                     if (softFile.getName().endsWith(".zip") || softFile.getName().endsWith(".rar")
                             || softFile.getName().endsWith(".7z")) {
                         zwin_soft_zip_FileList.add(softFile);
+                        if(softFile.getName().endsWith(".zip") && !software_allZipFileList.contains(softFile)){
+                            software_allZipFileList.add(softFile);
+                        }
                         continue;
                     }
 
                     if (softFile.getName().endsWith(".exe") || softFile.getName().endsWith(".msi")) {
                         softwareList.add(softFile);
+
                         continue;
                     }
                     if (softFile.isDirectory()) {
@@ -2385,6 +2429,7 @@ public class J1_InstallSoftware {
     static int toDoIndex = 1;
 
     static void toDoInstall(String dirName, ArrayList<File> softwareList) {
+
         String key = calculFileOringinKey(dirName, zwin_soft_key_list);    // 是 哪一种目录下的文件   绿色当文件   绿色文件夹    可静默安装exe  添加到环境变量的文件
         if (key == null) {
             System.out.println("当前 dirName =" + dirName + " 没有在  zwin_soft_key_list  找到对应的Key");
@@ -2395,6 +2440,7 @@ public class J1_InstallSoftware {
 
         for (int i = 0; i < softwareList.size(); i++) {
             File itemFile = softwareList.get(i);
+            // zukgit
             ZWin_Software winSoftItem = J1_Object.new ZWin_Software(key, itemFile);
             allZWInSoftList.add(winSoftItem);
         }

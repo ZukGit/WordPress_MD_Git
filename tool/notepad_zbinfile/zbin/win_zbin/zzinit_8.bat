@@ -9,6 +9,10 @@ echo cur_Desktop=%cur_Desktop%  cur_path=%cd% ~dp0=%~dp0
 set exe_count=1
 set Environment_java_exe=""
 set Environment_javac=""
+
+set Environment_python_exe=""
+set python_exe_file=""
+
 set java_exe_file=""
 set javac_run_file=""
 set Environment_win_zbin="%cur_Desktop%\Desktop\zbin\win_zbin"
@@ -40,14 +44,19 @@ rem pause
 call :express_all_zip
 call :copy_zbin
 call :search_java_envirppnment
+call :search_python_envirppnment
 call :search_notepad_envirppnment
 call :add_all_environment
-call :showCmderCommand
 
 
-echo Environment_java_exe_end = %Environment_java_exe%
-echo Environment_javac_end = %Environment_javac%
+
+
+echo Environment_java_exe_dir = %Environment_java_exe%
+echo Environment_javac_dir= %Environment_javac%
 echo Environment_win_zbin = %Environment_win_zbin%
+echo Environment_python_exe_dir = %Environment_python_exe%
+echo python_exe_file = %python_exe_file%
+
 echo java_exe_file = %java_exe_file%
 echo javac_run_file = %javac_run_file%
 echo Environment_notepad = %Environment_notepad%
@@ -58,9 +67,27 @@ call %javac_run_file%  -cp %cur_Desktop%\Desktop\zbin\J1_guava.jar;%cur_Desktop%
 echo;
 echo %java_exe_file% -cp %cur_Desktop%\Desktop\zbin\J1_guava.jar;%cur_Desktop%\Desktop\zbin\J1_jshortcut_oberzalek.jar;%cur_Desktop%\Desktop\zbin  J1_InstallSoftware  %~dp0
 call %java_exe_file% -cp %cur_Desktop%\Desktop\zbin\J1_guava.jar;%cur_Desktop%\Desktop\zbin\J1_jshortcut_oberzalek.jar;%cur_Desktop%\Desktop\zbin  J1_InstallSoftware  %~dp0
+
+
+
+
+
+
+
+rem    *********** python  network operation begin  ***********
+rem  python  get-pip.py 
+call %python_exe_file% %Environment_python_exe%\get-pip.py      
+
+rem    *********** python network operation end  ***********
+
+
+
 call J1_InstallSoft.bat
+call :showCmderCommand 
+call reg.reg
 pause
 goto:eof
+rem  end**************end**************end**************end**************end**************end**************
 
 
 
@@ -78,8 +105,11 @@ goto:eof
 
 
 :add_all_environment
-echo  setx "Path" "%Environment_win_zbin%;%Environment_java_exe%;%Environment_javac%;%Environment_notepad%;%path%" /m
-setx "Path" "%Environment_win_zbin%;%Environment_java_exe%;%Environment_javac%;%Environment_notepad%;%path%" /m
+rem echo  setx "Path" "%path%;%Environment_win_zbin%;%Environment_java_exe%;%Environment_javac%;%Environment_notepad%;%Environment_python_exe%;%Environment_python_exe%/Scripts" /m
+rem setx "Path" "%path%;%Environment_win_zbin%;%Environment_java_exe%;%Environment_javac%;%Environment_notepad%;%Environment_python_exe%;%Environment_python_exe%/Scripts" /m
+
+echo  setx "Path" "%Environment_win_zbin%;%Environment_java_exe%;%Environment_javac%;%Environment_notepad%;%Environment_python_exe%;%Environment_python_exe%/Scripts;%path%" /m
+setx "Path" "%Environment_win_zbin%;%Environment_java_exe%;%Environment_javac%;%Environment_notepad%;%Environment_python_exe%;%Environment_python_exe%/Scripts;%path%" /m
 goto:eof
 
 
@@ -124,6 +154,43 @@ set notepad_exe_file=%%j
 call :add_path_environment_file_notepad %%j 
 )
 
+goto:eof
+
+
+
+:search_python_envirppnment
+for /f "delims=" %%j in ('dir /b /a-d /s "*python.exe"') do (
+echo num=!exe_count! %%j 
+set python_exe_file=%%j
+call :add_path_environment_file_python %%j 
+)
+goto:eof
+
+
+
+:add_path_environment_file_python
+set str2_dp=%~dp1 
+echo add_environment_python_path=%str2_dp%    for  %1
+rem setx "Path" "%str2_dp%;%path%" /m
+
+call :add_path_environment_dir_python %str2_dp%
+goto:eof
+
+
+:add_path_environment_dir_python
+rem call :showfile %1  
+set str2_dp_dir=%~dp1
+
+rem set str_temp=123456789
+rem echo last_str = %str_temp:~0,-1%
+
+echo str2_dp_dir="%str2_dp_dir%"
+set fixed_path=%str2_dp_dir:~0,-1%
+echo fixed_path="%fixed_path%"
+echo setx_command---------setx "Path" "%fixed_path%;%path%" /m
+rem setx "Path" "%fixed_path%;%path%" /m
+echo Environment_python_exe = %fixed_path%
+set Environment_python_exe=%fixed_path%
 goto:eof
 
 

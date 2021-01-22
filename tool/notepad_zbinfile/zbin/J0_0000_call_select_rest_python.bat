@@ -31,7 +31,7 @@ if "!match_index_flag!"=="false" (
 rem echo match_index_flag = !match_index_flag! index:!current_index!
 if "!match_index_flag!"=="true" (
 ECHO  === temp_content:!temp_content!      index:!current_index!   input_index_1:%input_index_1%   Flag: Success and Run ! === Run_Run 
-@py  "%%i"
+@python  "%%i"
 )
 
 )
