@@ -21,10 +21,11 @@ adb root
 adb remount
 adb pull /data/system/users/0/settings_system.xml ./file_%CURRENT_DATE_TIME_STAMP%
 adb pull /data/system/users/0/settings_secure.xml ./file_%CURRENT_DATE_TIME_STAMP%
-adb pull /data/system/users/0/settings_global.xml
+adb pull /data/system/users/0/settings_global.xml ./file_%CURRENT_DATE_TIME_STAMP%
 adb pull /vendor/etc/wifi/WCNSS_qcom_cfg.ini ./file_%CURRENT_DATE_TIME_STAMP%
 adb pull /vendor/etc/wifi/wpa_supplicant.conf  ./file_%CURRENT_DATE_TIME_STAMP%
 adb pull /system/etc/wifi/p2p_supplicant.conf ./file_%CURRENT_DATE_TIME_STAMP%
+adb pull /system/etc/gps_debug.conf ./file_%CURRENT_DATE_TIME_STAMP%
 adb pull /data/misc/wifi/WifiConfigStore.xml ./file_%CURRENT_DATE_TIME_STAMP%
 adb pull /data/misc/wifi/softap.conf ./file_%CURRENT_DATE_TIME_STAMP%
 adb pull /system/build.prop ./file_%CURRENT_DATE_TIME_STAMP%
@@ -39,6 +40,7 @@ adb pull /data/vendor/wifi/hostapd/hostapd.conf ./file_%CURRENT_DATE_TIME_STAMP%
 adb pull /data/vendor/wifi/hostapd/hostapd.accept ./file_%CURRENT_DATE_TIME_STAMP%/vendor_wifi_hostapd.accept
 adb pull /data/vendor/wifi/hostapd/hostapd.deny ./file_%CURRENT_DATE_TIME_STAMP%/vendor_wifi_hostapd.deny
 adb pull /data/vendor/bug2go/ ./file_%CURRENT_DATE_TIME_STAMP%/bug2go
+adb pull /data/vendor/diag_mdlog  ./file_%CURRENT_DATE_TIME_STAMP%/bug2go/diag_mdlog
 ECHO   END! 
 PAUSE
 GOTO LOOP

@@ -1,39 +1,39 @@
 
 import cn.hutool.core.util.RuntimeUtil;
-import cn.hutool.core.util.StrUtil;
-import cn.hutool.extra.qrcode.QrCodeUtil;
-import cn.hutool.extra.qrcode.QrConfig;
-import cn.hutool.json.JSONUtil;
-import cn.hutool.system.JavaRuntimeInfo;
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
-import net.sourceforge.pinyin4j.PinyinHelper;
-import net.sourceforge.pinyin4j.format.HanyuPinyinCaseType;
-import net.sourceforge.pinyin4j.format.HanyuPinyinOutputFormat;
-import net.sourceforge.pinyin4j.format.HanyuPinyinToneType;
-import net.sourceforge.pinyin4j.format.exception.BadHanyuPinyinOutputFormatCombination;
+        import cn.hutool.core.util.StrUtil;
+        import cn.hutool.extra.qrcode.QrCodeUtil;
+        import cn.hutool.extra.qrcode.QrConfig;
+        import cn.hutool.json.JSONUtil;
+        import cn.hutool.system.JavaRuntimeInfo;
+        import com.alibaba.fastjson.JSON;
+        import com.alibaba.fastjson.JSONObject;
+        import net.sourceforge.pinyin4j.PinyinHelper;
+        import net.sourceforge.pinyin4j.format.HanyuPinyinCaseType;
+        import net.sourceforge.pinyin4j.format.HanyuPinyinOutputFormat;
+        import net.sourceforge.pinyin4j.format.HanyuPinyinToneType;
+        import net.sourceforge.pinyin4j.format.exception.BadHanyuPinyinOutputFormatCombination;
 
-import javax.imageio.ImageIO;
-import javax.swing.*;
-import java.awt.*;
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.Transferable;
-import java.awt.image.BufferedImage;
-import java.io.*;
-import java.math.BigDecimal;
-import java.net.URL;
-import java.net.URLConnection;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
-import java.nio.file.*;
-import java.nio.file.attribute.BasicFileAttributeView;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+        import javax.imageio.ImageIO;
+        import javax.swing.*;
+        import java.awt.*;
+        import java.awt.datatransfer.Clipboard;
+        import java.awt.datatransfer.DataFlavor;
+        import java.awt.datatransfer.Transferable;
+        import java.awt.image.BufferedImage;
+        import java.io.*;
+        import java.math.BigDecimal;
+        import java.net.URL;
+        import java.net.URLConnection;
+        import java.net.URLDecoder;
+        import java.net.URLEncoder;
+        import java.nio.file.*;
+        import java.nio.file.attribute.BasicFileAttributeView;
+        import java.nio.file.attribute.BasicFileAttributes;
+        import java.text.SimpleDateFormat;
+        import java.util.*;
+        import java.util.List;
+        import java.util.regex.Matcher;
+        import java.util.regex.Pattern;
 
 
 //
@@ -447,12 +447,12 @@ public class I9_TextRuleOperation {
             String curShellPath = dirFile.getAbsolutePath();
             ArrayList<String> command_ContentList = new ArrayList<String>();
 
-            File rule23_template_bat_file =  new File(zbinPath+File.separator+"I9_Template_Rule23.txt");
+            File rule23_template_bat_file =  new File(zbinPath+File.separator+"I9_Template_Rule23.bat");
             if(!rule23_template_bat_file.exists()){
                 System.out.println("当前模板文件不存在! 请检查  执行失败!  rule23_template_bat_file = "+ rule23_template_bat_file.getAbsolutePath());
                 return null;
             }
-          ArrayList<String> templateStrList =   ReadFileContentAsList(rule23_template_bat_file);
+            ArrayList<String> templateStrList =   ReadFileContentAsList(rule23_template_bat_file);
 
             ArrayList<String> allCommand_InNotepad =   new ArrayList<String>();
             ArrayList<String> allCommand_In_RawBat =   new ArrayList<String>();
@@ -4819,6 +4819,9 @@ public class I9_TextRuleOperation {
 //                    System.out.println(" \"this is test string\" ");
 //                    System.out.println("adb shell am broadcast -a com.Android.test --es<string> test_string \"this is test string\" —ei<int> test_int 100 —ez<boolean> test_boolean true");
                     newOneLine = new String(oldOneLine);
+
+
+                    newOneLine = newOneLine.replace("\\","\\\\");
 
                     newOneLine = newOneLine.replace("\"","\\\"");
                     newOneLine = newOneLine.replace(".\\",".\\\\");   // .\w   .\w
