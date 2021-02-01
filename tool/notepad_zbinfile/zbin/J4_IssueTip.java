@@ -262,6 +262,8 @@ public class J4_IssueTip {
         System.out.println();
         System.out.println("adb root & adb pull /data/vendor/bug2go");
         System.out.println();
+        System.out.println("adb root & adb pull  /data/vendor/diag_mdlog  ");
+        System.out.println();
     }
 
     static void  Hotspot_Issue_Tip(){
@@ -581,73 +583,73 @@ public class J4_IssueTip {
 
 
     }
- static void  WIFI_Issue_Tip(){
-     System.out.println("════════════════════════ WIFI PAGE ════════════════════════════════════════════════");
-     System.out.println("【打开wifi命令】  adb shell svc wifi enable");
-     System.out.println("【关闭wifi命令】  adb shell svc wifi disable");
-     System.out.println();
-     System.out.println();
-     System.out.println("【WIFI-Verbose 开关】");
-     System.out.println("adb shell settings get global wifi_verbose_logging_enabled 0");
-     System.out.println("adb shell settings put global wifi_verbose_logging_enabled 0");
-     System.out.println("adb shell settings put global wifi_verbose_logging_enabled 1");
-     System.out.println();
-     System.out.println("【WIFI详情开关描述】");
-     System.out.println("Settings >System > About phone > tap \"Build number\" 4 times >Developer options");
-     System.out.println("Setting > System > Advanced > Developer options >Enable WiFi Verbose Logging  [toogle open]");
-     System.out.println();
-     System.out.println("【Passpoint-sim开关】");
-     System.out.println("adb shell settings get global hs20_mncmcc_retail_saved_state");
-     System.out.println("adb shell settings put global hs20_mncmcc_retail_saved_state 0");
-     System.out.println("adb shell settings put global hs20_mncmcc_retail_saved_state 1");
-     System.out.println();
-     System.out.println("【 wifi-service.jar  push命令】");
-     System.out.println("adb root && adb remount && adb shell settings put global wifi_verbose_logging_enabled 1 && adb push .\\wifi-service.jar /system/framework/   ##### 连续重启两遍?");
-     System.out.println();
-     System.out.println("【广播启动到WIFI设置界面】");
-     System.out.println("adb shell am start -a android.settings.WIFI_SETTINGS");
-     System.out.println();
-     System.out.println();
-     System.out.println("【WIFI 状态变化广播】");
-     System.out.println("adb shell am broadcast -a com.Android.test --es<string> test_string \"this is test string\" —ei<int> test_int 100 —ez<boolean> test_boolean true");
-     System.out.println("【 -a com.Android.test  包名.Action的形式 】");
-     System.out.println("【 --es \"test_string\" \"this is test string\"    指定广播中携带字符串 字符串名称为 test_string 后面为值Value  】");
-     System.out.println("【 --ei test_int 100    指定广播中携带int整形  int名称为 test_int 后面为值Value 为 100 】");
-     System.out.println("【 --ez test_boolean true    指定广播中携带boolean变量   boolean名称为 test_boolean 后面为值Value 为 true 】");
-     System.out.println("adb shell am broadcast -a \"Android.net.wifi.WIFI_STATE_CHANGED\"  --ei \"wifi_state\" 0");
-     System.out.println("adb shell am broadcast -a \"Android.net.wifi.WIFI_STATE_CHANGED\"  --ei \"wifi_state\" 1");
-     System.out.println("adb shell am broadcast -a \"Android.net.wifi.WIFI_STATE_CHANGED\"  --ei \"wifi_state\" 2");
-     System.out.println("adb shell am broadcast -a \"Android.net.wifi.WIFI_STATE_CHANGED\"  --ei \"wifi_state\" 3");
-     System.out.println("adb shell am broadcast -a \"Android.net.wifi.WIFI_STATE_CHANGED\"  --ei \"wifi_state\" 4");
-     System.out.println("WifiManager.WIFI_STATE_DISABLED ==1");
-     System.out.println("WifiManager.WIFI_STATE_DISABLING ==0");
-     System.out.println("WifiManager.WIFI_STATE_ENABLED==3");
-     System.out.println("WifiManager.WIFI_STATE_ENABLING==2");
-     System.out.println("WifiManager.WIFI_STATE_UNKNOWN==4");
-     System.out.println();
-     System.out.println();
-     System.out.println("【IPR断线问题】");
-     System.out.println("问题现象：终端设备连续三次发送arp request而网关无回复，触发终端设备主动断开无线连接");
-     System.out.println("根本原因：华为网关交换机CPU-defend安全防护机制触发而导致arp request报文丢弃");
-     System.out.println("原因分析：");
-     System.out.println("1. 华为交换机默认启用CPU-defend机制，该机制能防止交换机因为频繁响应arp request报文导致的CPU利用率异常飙高；");
-     System.out.println("2. 当终端设备arp报文达到默认阈值上限，就会触发华为CPU-defend，对超出阈值的arp request报文不进行响应，直接drop；");
-     System.out.println("3. 客户端设备的arp老化时间是为30s，因此客户端arp request报文是30s发送一个，而无线用户的arp报文都是由无线控制器转发，所以在用户多的时候掉线问题很容易复现，用户少的时候则无法复现；");
-     System.out.println("4. 正常情况下arp request报文的丢弃并不影响用户的正常网络使用；");
-     System.out.println("5. 由于频繁arp request是网络中ARP攻击行为的典型表现，因此不止华为设备，其他厂商设备也会有类似的arp安全防护机制，唯一的不同只是各厂商的arp报文丢弃默认阈值设置不同。");
-     System.out.println("IKLOCSEN-2833");
-     System.out.println();
-     System.out.println();
+    static void  WIFI_Issue_Tip(){
+        System.out.println("════════════════════════ WIFI PAGE ════════════════════════════════════════════════");
+        System.out.println("【打开wifi命令】  adb shell svc wifi enable");
+        System.out.println("【关闭wifi命令】  adb shell svc wifi disable");
+        System.out.println();
+        System.out.println();
+        System.out.println("【WIFI-Verbose 开关】");
+        System.out.println("adb shell settings get global wifi_verbose_logging_enabled 0");
+        System.out.println("adb shell settings put global wifi_verbose_logging_enabled 0");
+        System.out.println("adb shell settings put global wifi_verbose_logging_enabled 1");
+        System.out.println();
+        System.out.println("【WIFI详情开关描述】");
+        System.out.println("Settings >System > About phone > tap \"Build number\" 4 times >Developer options");
+        System.out.println("Setting > System > Advanced > Developer options >Enable WiFi Verbose Logging  [toogle open]");
+        System.out.println();
+        System.out.println("【Passpoint-sim开关】");
+        System.out.println("adb shell settings get global hs20_mncmcc_retail_saved_state");
+        System.out.println("adb shell settings put global hs20_mncmcc_retail_saved_state 0");
+        System.out.println("adb shell settings put global hs20_mncmcc_retail_saved_state 1");
+        System.out.println();
+        System.out.println("【 wifi-service.jar  push命令】");
+        System.out.println("adb root && adb remount && adb shell settings put global wifi_verbose_logging_enabled 1 && adb push .\\wifi-service.jar /system/framework/   ##### 连续重启两遍?");
+        System.out.println();
+        System.out.println("【广播启动到WIFI设置界面】");
+        System.out.println("adb shell am start -a android.settings.WIFI_SETTINGS");
+        System.out.println();
+        System.out.println();
+        System.out.println("【WIFI 状态变化广播】");
+        System.out.println("adb shell am broadcast -a com.Android.test --es<string> test_string \"this is test string\" —ei<int> test_int 100 —ez<boolean> test_boolean true");
+        System.out.println("【 -a com.Android.test  包名.Action的形式 】");
+        System.out.println("【 --es \"test_string\" \"this is test string\"    指定广播中携带字符串 字符串名称为 test_string 后面为值Value  】");
+        System.out.println("【 --ei test_int 100    指定广播中携带int整形  int名称为 test_int 后面为值Value 为 100 】");
+        System.out.println("【 --ez test_boolean true    指定广播中携带boolean变量   boolean名称为 test_boolean 后面为值Value 为 true 】");
+        System.out.println("adb shell am broadcast -a \"Android.net.wifi.WIFI_STATE_CHANGED\"  --ei \"wifi_state\" 0");
+        System.out.println("adb shell am broadcast -a \"Android.net.wifi.WIFI_STATE_CHANGED\"  --ei \"wifi_state\" 1");
+        System.out.println("adb shell am broadcast -a \"Android.net.wifi.WIFI_STATE_CHANGED\"  --ei \"wifi_state\" 2");
+        System.out.println("adb shell am broadcast -a \"Android.net.wifi.WIFI_STATE_CHANGED\"  --ei \"wifi_state\" 3");
+        System.out.println("adb shell am broadcast -a \"Android.net.wifi.WIFI_STATE_CHANGED\"  --ei \"wifi_state\" 4");
+        System.out.println("WifiManager.WIFI_STATE_DISABLED ==1");
+        System.out.println("WifiManager.WIFI_STATE_DISABLING ==0");
+        System.out.println("WifiManager.WIFI_STATE_ENABLED==3");
+        System.out.println("WifiManager.WIFI_STATE_ENABLING==2");
+        System.out.println("WifiManager.WIFI_STATE_UNKNOWN==4");
+        System.out.println();
+        System.out.println();
+        System.out.println("【IPR断线问题】");
+        System.out.println("问题现象：终端设备连续三次发送arp request而网关无回复，触发终端设备主动断开无线连接");
+        System.out.println("根本原因：华为网关交换机CPU-defend安全防护机制触发而导致arp request报文丢弃");
+        System.out.println("原因分析：");
+        System.out.println("1. 华为交换机默认启用CPU-defend机制，该机制能防止交换机因为频繁响应arp request报文导致的CPU利用率异常飙高；");
+        System.out.println("2. 当终端设备arp报文达到默认阈值上限，就会触发华为CPU-defend，对超出阈值的arp request报文不进行响应，直接drop；");
+        System.out.println("3. 客户端设备的arp老化时间是为30s，因此客户端arp request报文是30s发送一个，而无线用户的arp报文都是由无线控制器转发，所以在用户多的时候掉线问题很容易复现，用户少的时候则无法复现；");
+        System.out.println("4. 正常情况下arp request报文的丢弃并不影响用户的正常网络使用；");
+        System.out.println("5. 由于频繁arp request是网络中ARP攻击行为的典型表现，因此不止华为设备，其他厂商设备也会有类似的arp安全防护机制，唯一的不同只是各厂商的arp报文丢弃默认阈值设置不同。");
+        System.out.println("IKLOCSEN-2833");
+        System.out.println();
+        System.out.println();
 
-     System.out.println();
-     System.out.println("【 WIFI DUMP 相关命令】");
-     System.out.println("adb shell dumpsys wifi         > wifi.txt                 # 【查看当前 wifi 服务情况 】");
-     System.out.println("adb shell dumpsys wifiscanner  > wifiscanner.txt          # 【查看当前 wifiscanner 扫描服务情况 】");
-     System.out.println("adb shell dumpsys connectivity > connectivity.txt         # 【查看当前 connectivity 服务情况 】");
-     System.out.println("adb shell dumpsys connmetrics  > connmetrics.txt          # 【查看当前 connmetrics 服务情况  断线 无网  】");
-     System.out.println("adb shell dumpsys netstats     > netstats.txt             # 【查看当前 netstats 服务情况 】");
-     System.out.println();
- }
+        System.out.println();
+        System.out.println("【 WIFI DUMP 相关命令】");
+        System.out.println("adb shell dumpsys wifi         > wifi.txt                 # 【查看当前 wifi 服务情况 】");
+        System.out.println("adb shell dumpsys wifiscanner  > wifiscanner.txt          # 【查看当前 wifiscanner 扫描服务情况 】");
+        System.out.println("adb shell dumpsys connectivity > connectivity.txt         # 【查看当前 connectivity 服务情况 】");
+        System.out.println("adb shell dumpsys connmetrics  > connmetrics.txt          # 【查看当前 connmetrics 服务情况  断线 无网  】");
+        System.out.println("adb shell dumpsys netstats     > netstats.txt             # 【查看当前 netstats 服务情况 】");
+        System.out.println();
+    }
 
 
 

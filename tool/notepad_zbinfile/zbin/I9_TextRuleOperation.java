@@ -1,39 +1,45 @@
 
 import cn.hutool.core.util.RuntimeUtil;
-        import cn.hutool.core.util.StrUtil;
-        import cn.hutool.extra.qrcode.QrCodeUtil;
-        import cn.hutool.extra.qrcode.QrConfig;
-        import cn.hutool.json.JSONUtil;
-        import cn.hutool.system.JavaRuntimeInfo;
-        import com.alibaba.fastjson.JSON;
-        import com.alibaba.fastjson.JSONObject;
-        import net.sourceforge.pinyin4j.PinyinHelper;
-        import net.sourceforge.pinyin4j.format.HanyuPinyinCaseType;
-        import net.sourceforge.pinyin4j.format.HanyuPinyinOutputFormat;
-        import net.sourceforge.pinyin4j.format.HanyuPinyinToneType;
-        import net.sourceforge.pinyin4j.format.exception.BadHanyuPinyinOutputFormatCombination;
+import cn.hutool.core.util.StrUtil;
+import cn.hutool.extra.qrcode.BufferedImageLuminanceSource;
+import cn.hutool.extra.qrcode.QrCodeUtil;
+import cn.hutool.extra.qrcode.QrConfig;
+import cn.hutool.json.JSONUtil;
+import cn.hutool.system.JavaRuntimeInfo;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.google.zxing.BinaryBitmap;
+import com.google.zxing.EncodeHintType;
+import com.google.zxing.MultiFormatReader;
+import com.google.zxing.Result;
+import com.google.zxing.common.HybridBinarizer;
+import net.sourceforge.pinyin4j.PinyinHelper;
+import net.sourceforge.pinyin4j.format.HanyuPinyinCaseType;
+import net.sourceforge.pinyin4j.format.HanyuPinyinOutputFormat;
+import net.sourceforge.pinyin4j.format.HanyuPinyinToneType;
+import net.sourceforge.pinyin4j.format.exception.BadHanyuPinyinOutputFormatCombination;
 
-        import javax.imageio.ImageIO;
-        import javax.swing.*;
-        import java.awt.*;
-        import java.awt.datatransfer.Clipboard;
-        import java.awt.datatransfer.DataFlavor;
-        import java.awt.datatransfer.Transferable;
-        import java.awt.image.BufferedImage;
-        import java.io.*;
-        import java.math.BigDecimal;
-        import java.net.URL;
-        import java.net.URLConnection;
-        import java.net.URLDecoder;
-        import java.net.URLEncoder;
-        import java.nio.file.*;
-        import java.nio.file.attribute.BasicFileAttributeView;
-        import java.nio.file.attribute.BasicFileAttributes;
-        import java.text.SimpleDateFormat;
-        import java.util.*;
-        import java.util.List;
-        import java.util.regex.Matcher;
-        import java.util.regex.Pattern;
+import javax.imageio.ImageIO;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.image.BufferedImage;
+import java.io.*;
+import java.math.BigDecimal;
+import java.net.URL;
+import java.net.URLConnection;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributeView;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 //
@@ -374,6 +380,7 @@ public class I9_TextRuleOperation {
         CUR_RULE_LIST.add( new ADB_Wireless_WIFI_Rule_22());    //  把 输入的四个参数 转为 无线 adb 连接的命令
 
         CUR_RULE_LIST.add( new Create_Install_Command_Rule_23());    //  把当前目录的 exe  和 msi  输出 安装的 zbat_xxxx.bat 命令  测试安装命令
+        CUR_RULE_LIST.add( new Image2QrCode_Rule_24());    // 读取当前目录下的照片  并在临时文件显示 二维码信息
 
 
 //        CUR_RULE_LIST.add( new Image2Jpeg_Rule_3());
@@ -385,6 +392,86 @@ public class I9_TextRuleOperation {
 
     }
 
+
+
+
+    // 读取当前目录的文件夹 里面的 jpg 和 png  把 读取到的二维码打印出来 到当前 页面
+    class Image2QrCode_Rule_24 extends  Basic_Rule{
+
+        Image2QrCode_Rule_24(boolean mIsInputDirAsSearchPoint){
+            super(24);
+            isInputDirAsSearchPoint =  mIsInputDirAsSearchPoint;
+        }
+
+
+        Image2QrCode_Rule_24(){
+            super(24,false);
+        }
+
+        @Override
+        ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+
+            ArrayList<String> AllQrStrList = new  ArrayList<String>();
+            ArrayList<String> CommonQrStrList = new  ArrayList<String>();
+            ArrayList<String> manageStrList  = new  ArrayList<String>();
+            File dirFile =  curInputFileList.get(0).getParentFile();
+            File[] fileList =  dirFile.listFiles();
+            System.out.println("dirFile = "+ dirFile + "        fileList = "+ fileList.length );
+            ArrayList<File>  CurImageFileList = new  ArrayList<File>();
+
+            CurImageFileList.addAll(Arrays.asList(fileList));
+
+            for (int i = 0; i < CurImageFileList.size(); i++) {
+                File fileItem = CurImageFileList.get(i);
+                String fileName_lower = fileItem.getName().toLowerCase();
+                String qrStr = "";
+                if(fileName_lower.endsWith(".jpg") || fileName_lower.endsWith(".png")){
+
+                    if(CUR_OS_TYPE == OS_TYPE.Windows){
+                        qrStr =   Image2QrCode_Rule_24_Win(fileItem);
+                    }else if(CUR_OS_TYPE == OS_TYPE.MacOS){
+                        // 实现  Mac 下  读取 二维码
+//                        TextAs_QrCode_Rule_15_Mac(fileItem);
+                        qrStr =   Image2QrCode_Rule_24_Win(fileItem);
+
+                    }else if(CUR_OS_TYPE == OS_TYPE.Linux){
+                        System.out.println("无法在 Linux  下实现  没有notepad++ 啊! ");
+                    }
+
+                }
+
+
+                // magnet:?xt=urn:btih:
+                if(qrStr != null && !"".equals(qrStr)){
+                    if(qrStr.startsWith("magnet:")){
+                        manageStrList.add(qrStr);
+                    }else{
+                        CommonQrStrList.add(qrStr);
+                    }
+
+                }
+            }
+
+            AllQrStrList.addAll(manageStrList);
+            AllQrStrList.add("");
+            AllQrStrList.add("");
+            if(CommonQrStrList.size() > 0){
+                AllQrStrList.add("═════════ 普通二维码 ═════════");
+                AllQrStrList.addAll(CommonQrStrList);
+            }
+
+            writeContentToFile(I9_Temp_Text_File,AllQrStrList);
+            NotePadOpenTargetFile(I9_Temp_Text_File.getAbsolutePath());
+
+            return super.applyOperationRule(curFileList, subFileTypeMap, curDirList, curRealFileList);
+        }
+
+        @Override
+        String simpleDesc() {
+            return " 把当前路径下的图片中的QrCode png jpg二维码打印出来";
+        }
+
+    }
 
 
     // 往 每行的加入占位符   开头加入 〖*   第一个空格前加入*
@@ -1249,7 +1336,7 @@ public class I9_TextRuleOperation {
 
         @Override
         String simpleDesc() {
-            return " 读取文件的第一行转为 二维码显示出来 (B1)";
+            return " 读取文件的第一行转为 二维码 QrCode 显示出来 (B1)";
         }
 
     }
@@ -5357,6 +5444,32 @@ public class I9_TextRuleOperation {
     }
 
 
+
+
+    // 默认 只显示 第一行的 字符串
+    // Rule_15   Begin  读取文件的第一行转为 二维码显示出来 B1
+    @SuppressWarnings("unchecked")
+    public static String Image2QrCode_Rule_24_Win(File srcFile) {
+         String qrStr = "";
+
+        try {
+            MultiFormatReader formatReader = new MultiFormatReader();
+            BufferedImage bufferedImage = ImageIO.read(srcFile);
+            BinaryBitmap binaryBitmap = new BinaryBitmap(new HybridBinarizer(new BufferedImageLuminanceSource(bufferedImage)));
+            //定义二维码参数
+//            Map hints = new HashMap<>();
+//            hints.put(EncodeHintType.CHARACTER_SET, "utf-8");
+//            Result result = formatReader.decode(binaryBitmap, hints);
+            Result result = formatReader.decode(binaryBitmap);
+            qrStr =  result.getText();
+            System.out.println("解析二维码数据成功 对于  File---> " + srcFile.getAbsolutePath()+"  【"+qrStr+"】");
+        } catch (Exception e){
+            System.out.println("解析二维码数据失败 对于  File---> " + srcFile.getAbsolutePath());
+        }
+        return qrStr;
+
+    }
+    // Rule_15   End  读取文件的第一行转为 二维码显示出来 B1
 
 
 
