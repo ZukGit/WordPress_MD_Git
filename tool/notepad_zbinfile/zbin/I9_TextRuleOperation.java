@@ -370,17 +370,20 @@ public class I9_TextRuleOperation {
         CUR_RULE_LIST.add( new ClearChinese_Rule_13());
         CUR_RULE_LIST.add( new Chinese_To_PinYin_Rule_14());
         CUR_RULE_LIST.add( new TextAs_QrCode_Rule_15());
-        CUR_RULE_LIST.add( new ReadStrFromFile_Rule_16());
+        CUR_RULE_LIST.add( new Image2QrCode_Rule_16());    // 读取当前目录下的照片  并在临时文件显示 二维码信息
         CUR_RULE_LIST.add( new Make_Json_As_JavaFile_Graphviz2Jpg_Rule_17());
         CUR_RULE_LIST.add( new Add_BeginStr_EndStr_Rule_18());
         CUR_RULE_LIST.add( new FirstWord_MakeDir_Rule_19());
         CUR_RULE_LIST.add( new Cal_Install_Command_Rule_20());
         CUR_RULE_LIST.add( new System_Out_Print_Rule_21());    // 把当前文件的每一行 都 转为 System.out.println(xx) 的内容
-
         CUR_RULE_LIST.add( new ADB_Wireless_WIFI_Rule_22());    //  把 输入的四个参数 转为 无线 adb 连接的命令
-
         CUR_RULE_LIST.add( new Create_Install_Command_Rule_23());    //  把当前目录的 exe  和 msi  输出 安装的 zbat_xxxx.bat 命令  测试安装命令
-        CUR_RULE_LIST.add( new Image2QrCode_Rule_24());    // 读取当前目录下的照片  并在临时文件显示 二维码信息
+        CUR_RULE_LIST.add( new ReadStrFromFile_Rule_24());
+        CUR_RULE_LIST.add( new LS_Shell_RealFile_Rule_25());  // //读取当前文件下的 实体文件的文件名称 输出到列表中
+        CUR_RULE_LIST.add( new Fliter_Copy_File_WithName_Rule_26());  // //读取当前文件的内容 并在当前文件夹下内寻找该文件 复制到指定目录
+
+
+
 
 
 //        CUR_RULE_LIST.add( new Image2Jpeg_Rule_3());
@@ -392,20 +395,179 @@ public class I9_TextRuleOperation {
 
     }
 
+    // 读取当前文件的内容 并在当前文件夹下内寻找该文件 复制到输入文件名称_时间戳目录
+    class Fliter_Copy_File_WithName_Rule_26 extends  Basic_Rule{
+
+        Fliter_Copy_File_WithName_Rule_26(boolean mIsInputDirAsSearchPoint){
+            super(26);
+            isInputDirAsSearchPoint =  mIsInputDirAsSearchPoint;
+
+        }
+
+
+        Fliter_Copy_File_WithName_Rule_26(){
+            super(26,false);
+
+        }
+
+
+        @Override
+        ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+            ArrayList<File> realShellFileList = new   ArrayList<File>();
+            ArrayList<String> logInfo = new ArrayList<String>();
+            for (int i = 0; i < curInputFileList.size(); i++) {
+                File fileItem = curInputFileList.get(i);
+                File  curDirFile = fileItem.getParentFile();
+                logInfo.add("==============记录文件"+curDirFile.getName()+"==============");
+               String curDirPath = curDirFile.getAbsolutePath();
+                String new_dir_name = (curDirPath+File.separator+fileItem.getName()+"_"+getTimeStamp()).replace(".","_");
+                ArrayList<String> rawContentList =   ReadFileContentAsList(fileItem);
+                ArrayList<String> fixedPathDir = fixedFirstWordPath(rawContentList);
+
+                if(curDirFile != null){
+                    for (int j = 0; j < fixedPathDir.size(); j++) {
+                        String lineName = fixedPathDir.get(j);
+                        File realFileItem = new File(curDirPath+File.separator+lineName);
+
+                        if(realFileItem.exists() && realFileItem.isFile()){
+
+                            realShellFileList.add(realFileItem);
+                        }
+                       }
+                }
+
+                if(realShellFileList.size() > 0){
+                    File curOperationDirFile = new File(new_dir_name);
+                    curOperationDirFile.mkdirs();
+                    String targetDirPath  = curOperationDirFile.getAbsolutePath();
+                    for (int j = 0; j < realShellFileList.size(); j++) {
+                        File srcFile = realShellFileList.get(j);
+                        String fileName = srcFile.getName();
+                        File targetFile = new File(targetDirPath+File.separator+fileName);
+                         fileCopy(srcFile,targetFile);
+                        logInfo.add("复制过滤文件["+j+"] = "+ targetFile.getAbsolutePath());
+                    }
+                }
+
+                writeContentToFile(I9_Temp_Text_File,logInfo);
+                NotePadOpenTargetFile(I9_Temp_Text_File.getAbsolutePath());
+
+
+            }
 
 
 
-    // 读取当前目录的文件夹 里面的 jpg 和 png  把 读取到的二维码打印出来 到当前 页面
-    class Image2QrCode_Rule_24 extends  Basic_Rule{
+            return super.applyOperationRule(curFileList, subFileTypeMap, curDirList, curRealFileList);
+        }
 
-        Image2QrCode_Rule_24(boolean mIsInputDirAsSearchPoint){
-            super(24);
+        @Override
+        String simpleDesc() {
+            return " 读取当前文件的内容 并在当前文件夹下内寻找该文件 复制到输入文件名称_时间戳目录";
+        }
+
+
+        ArrayList<String>     fixedFirstWordPath(ArrayList<String> rawList){
+            ArrayList<String> fixedList = new  ArrayList<String>();
+
+            for (int i = 0; i < rawList.size(); i++) {
+                String itemStr = rawList.get(i).trim();
+                itemStr =   itemStr.replace("\\",File.separator);
+                itemStr =   itemStr.replace("/",File.separator);
+                itemStr =   itemStr.replace("?","");
+                itemStr =   itemStr.replace("!","");
+                itemStr =   itemStr.replace("！","");
+                itemStr =   itemStr.replace("？","");
+                itemStr =   itemStr.replace("#","");
+                itemStr =   itemStr.replace("@","");
+                itemStr =   itemStr.replace("￥","");
+                itemStr =   itemStr.replace("~","");
+                itemStr =   itemStr.replace("&","");
+                itemStr =   itemStr.replace("*","");
+                itemStr =   itemStr.replace("|","");
+                itemStr =   itemStr.replace("<","");
+                itemStr =   itemStr.replace(">","");
+                itemStr =   itemStr.replace("。","");
+                itemStr =   itemStr.replace(",","");
+                itemStr =   itemStr.replace("+","");
+                itemStr =   itemStr.replace("\"","");
+                itemStr =   itemStr.replace("：","");
+                itemStr =   itemStr.replace(":","");
+                itemStr =   itemStr.replace(File.separator+File.separator,File.separator);
+                itemStr =   itemStr.replace(File.separator+File.separator,File.separator);
+                itemStr =   itemStr.replace("\t"," ");
+                if("".equals(itemStr)){
+                    continue;
+                }
+
+                    fixedList.add(itemStr);
+
+            }
+
+            return fixedList;
+
+
+        }
+
+    }
+
+    //读取当前文件下的 实体文件的文件名称 输出到列表中
+    class LS_Shell_RealFile_Rule_25 extends  Basic_Rule{
+
+        LS_Shell_RealFile_Rule_25(boolean mIsInputDirAsSearchPoint){
+            super(25);
             isInputDirAsSearchPoint =  mIsInputDirAsSearchPoint;
         }
 
 
-        Image2QrCode_Rule_24(){
-            super(24,false);
+        LS_Shell_RealFile_Rule_25(){
+            super(25,false);
+        }
+
+        @Override
+        ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+            ArrayList<String>  realFileNameList = new  ArrayList<String>();
+
+            File dirFile =  curInputFileList.get(0).getParentFile();
+            File[] fileList =  dirFile.listFiles();
+            System.out.println("dirFile = "+ dirFile + "        fileList = "+ fileList.length );
+            ArrayList<File>  CurRealFileList = new  ArrayList<File>();
+
+            CurRealFileList.addAll(Arrays.asList(fileList));
+
+            for (int i = 0; i < CurRealFileList.size(); i++) {
+                File fileItem = CurRealFileList.get(i);
+                String fileName = fileItem.getName();
+                if(fileItem.isFile() && fileItem.exists()){
+                    realFileNameList.add(fileName);
+                }
+            }
+            writeContentToFile(I9_Temp_Text_File,realFileNameList);
+            NotePadOpenTargetFile(I9_Temp_Text_File.getAbsolutePath());
+
+            return super.applyOperationRule(curFileList, subFileTypeMap, curDirList, curRealFileList);
+        }
+
+        @Override
+        String simpleDesc() {
+            return " 把当前 目录下的实体文件 的 文件名称打印出来 !";
+        }
+
+    }
+
+
+
+
+    // 读取当前目录的文件夹 里面的 jpg 和 png  把 读取到的二维码打印出来 到当前 页面
+    class Image2QrCode_Rule_16 extends  Basic_Rule{
+
+        Image2QrCode_Rule_16(boolean mIsInputDirAsSearchPoint){
+            super(16);
+            isInputDirAsSearchPoint =  mIsInputDirAsSearchPoint;
+        }
+
+
+        Image2QrCode_Rule_16(){
+            super(16,false);
         }
 
         @Override
@@ -1263,16 +1425,16 @@ public class I9_TextRuleOperation {
     }
 
 
-    class ReadStrFromFile_Rule_16 extends  Basic_Rule{
+    class ReadStrFromFile_Rule_24 extends  Basic_Rule{
 
-        ReadStrFromFile_Rule_16(boolean mIsInputDirAsSearchPoint){
-            super(16);
+        ReadStrFromFile_Rule_24(boolean mIsInputDirAsSearchPoint){
+            super(24);
             isInputDirAsSearchPoint =  mIsInputDirAsSearchPoint;
         }
 
 
-        ReadStrFromFile_Rule_16(){
-            super(16,false);
+        ReadStrFromFile_Rule_24(){
+            super(24,false);
         }
 
         @Override

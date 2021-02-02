@@ -1,0 +1,5449 @@
+User---------------------------------------------------------------------------------------
+	Log Codes Supported by QCAT 06.30.93 patch 01
+
+	Confidential - Qualcomm Technologies, Inc.and / or its affiliated companies - May Contain Trade Secrets
+---------------------------------------------------------------------------------------
+
+0x1001	AGC Power Control (Obsolete)
+0x1002	Forward Link Frame Types (Obsolete)
+0x1004	Access Channel Message
+0x1005	Reverse Channel Traffic Message
+0x1006	Sync Channel Traffic Message
+0x1007	Paging Channel Message
+0x1008	Forward Channel Traffic Message
+0x1009	Forward Link Vocoder Packet
+0x100A	Reverse Link Vocoder Packet
+0x100B	Finger Information (Obsolete)
+0x100C	Dense Pack Searcher Information
+0x100D	Reserved
+0x100E	Markov Statistics
+0x100F	Searcher Information 2 (Obsolete)
+0x1010	Handset Status (Obsolete)
+0x1011	Reserved
+0x1012	Reserved
+0x1013	Access Probe Information
+0x1014	Reserved
+0x1015	Test Mobile Command
+0x1016	Sparse AGC Power Control
+0x1017	Band Change
+0x1018	Debug Message
+0x1019	General TA Information
+0x101A	General TA with SCH Information
+0x101C	Reserved
+0x101D	Reserved
+0x101E	Analog Handoff Entry
+0x101F	FM Slot Statistics Entry
+0x1020	FOCC Word Sync Count
+0x1025	RLP RX Frames
+0x1026	RLP TX Frames
+0x1029	Forward Link Frame Types
+0x102A	Reverse Link Frame Types
+0x102B	Fast Forward Power Control
+0x102C	Reverse Power Control
+0x102D	Searcher and Finger Information
+0x102E	Service Configuration
+0x102F	Active Set and Channel Configuration
+0x1030	Quick Paging Channel
+0x1031	RLP Statistics
+0x1032	Simple TDSO Counters
+0x1033	Reserved
+0x1034	Reserved
+0x1035	Reserved
+0x1036	IS-801 Forward Link
+0x1037	IS-801 Reverse Link
+0x1038	Reserved
+0x1039	Reserved
+0x103A	Reserved
+0x103B	Reserved
+0x103C	Reserved
+0x103D	Full TDSO Counters
+0x103E	Bluetooth General
+0x103F	Bluetooth Baseband General
+0x1040	Bluetooth Baseband Device-specific
+0x1041	Bluetooth Link Manager Protocol
+0x1042	Bluetooth L2CAP
+0x1043	Bluetooth Service Discovery
+0x1044	Bluetooth RFCOMM Session Specific
+0x1045	Reserved
+0x1046	Bluetooth Audio Gateway
+0x1048	Bluetooth LMP Signaling Received
+0x1049	Bluetooth LMP Signaling Transmitted
+0x104A	Reserved
+0x104B	Reserved
+0x104C	Bluetooth L2CAP Signaling Received
+0x104D	Bluetooth L2CAP Signaling Transmitted
+0x104E	Reserved
+0x104F	Reserved
+0x1052	Bluetooth RFCOMM Signaling Received
+0x1053	Bluetooth RFCOMM Signaling Transmitted
+0x1054	Reserved
+0x1055	Reserved
+0x105D	1xEV Searcher Data
+0x105E	1xEV Handoff State
+0x105F	1xEV Active Set Pilot
+0x1060	1xEV Reverse Link Packet Summary
+0x1061	1xEV DRC-ARQ Buffer
+0x1062	1xEV Reverse Traffic Rate Count
+0x1063	1xEV Reverse Power Control
+0x1064	1xEV Finger Data
+0x1065	1xEV Debug Hex Dump
+0x1066	1xEV ARQ Effective Receive Rate
+0x1067	1xEV Forward Traffic Rate Slot Count
+0x1068	1xEV Air Link Summary
+0x1069	1xEV Power
+0x106A	1xEV Forward Link Packet Snapshot
+0x106B	1xEV Session Attempt
+0x106C	1xEV Access Attempt
+0x106D	1xEV Reverse Activity Bits Buffer
+0x106E	1xEV Connection Attempt
+0x106F	1xEV Page Message
+0x1070	1xEV RLP Statistics
+0x1071	1xEV Connection Release
+0x1072	1xEV Reverse Activity Bits Information
+0x1073	1xEV High Resolution Temporal Analyzer
+0x1074	1xEV Reverse Link Packet Snapshot
+0x1076	1xEV Signaling Access Channel
+0x1077	1xEV Signaling Reverse Traffic Channel
+0x1078	1xEV Signaling Control Channel Directed
+0x1079	1xEV Signaling Forward Traffic Channel
+0x107A	1xEV Pilot Sets
+0x107B	1xEV Traffic Channel Assignment Info
+0x107C	1xEV Signaling Control Channel Broadcast
+0x107E	1xEV State Information
+0x107F	1xEV Forward Rate Statistics
+0x1080	1xEV Sector Information
+0x1082	1xEV Rx Partial RLP
+0x1083	1xEV Tx Partial RLP
+0x1084	1xEV Forward Statistics Summary
+0x1085	1xEV AC MAC Capsule
+0x1086	1xEV CC MAC Packet
+0x1087	1xEV Receive ATI List
+0x1088	1xEV Session Attempt Version 2
+0x1089	1xEV Searcher Data Version 2
+0x108A	1xEV Finger Data Version 2
+0x108B	1xEV Pilot Sets Version 2
+0x108C	1xEV DRC-ARQ Buffer Version 2
+0x108D	1xEV Acquisition Info
+0x108E	1xEV Reacquisition Info
+0x108F	1xEV Sleep Info
+0x1090	Forward Dedicated Control Channel Message
+0x1091	Reverse Dedicated Control Channel Message
+0x1092	Reserved
+0x1093	Active Set Information
+0x1094	Reserved
+0x1095	Reserved
+0x1096	GPS Visit Parameters
+0x1097	Log GPS Measurement
+0x1098	RUIM Debug
+0x1099	Simple TDSO Counter for DCCH
+0x109A	Full TDSO Counter for DCCH
+0x109B	Reserved
+0x109C	PPP Tx Frames
+0x109D	PPP Rx Frames
+0x109E	Security PKX MM Statistics
+0x109F	Reserved
+0x10A0	Security Encoding Statistics
+0x10A1	Reserved
+0x10A2	Reserved
+0x10A3	Reserved
+0x10A4	Reserved
+0x10A5	Reserved
+0x10A6	Security Hashing Statistics
+0x10A7	Reserved
+0x10A8	Reserved
+0x10A9	Security SSL Session
+0x10AA	Security SSL Session Server Certification
+0x10AB	Reserved
+0x10AC	Security SSL Session Statistics
+0x10AD	Security SSL Transmitted Statistics
+0x10AE	Reserved
+0x10AF	Security SSL Handshake Protocol Hello Request
+0x10B0	Security SSL Handshake Protocol Client Hello
+0x10B1	Security SSL Handshake Protocol Server Hello
+0x10B2	Security SSL Handshake Protocol Server DH Key Exchange
+0x10B3	Security SSL Handshake Protocol Server RSA Key Exchange
+0x10B4	Security SSL Handshake Protocol Server Hello Done
+0x10B5	Security SSL Handshake Protocol Client DH Key Exchange
+0x10B6	Security SSL Handshake Protocol Client RSA Key Exchange
+0x10B7	Security SSL Handshake Protocol Client Finished
+0x10B8	Security SSL Handshake Protocol Server Finished
+0x10B9	Security SSL Cypherspec Protocol Change
+0x10BA	Security SSL Alert Protocol Alert
+0x10BC	Quick Paging Channel Ver2
+0x10BD	Enhanced Access Probe
+0x10BE	BCCH Frame Information
+0x10BF	FCCCH Frame Information
+0x10C0	FDCH Frame Information
+0x10C1	RDCH Frame Information
+0x10C2	Fast Forward Power Control Version 2
+0x10C3	Reverse Power Control Version 2
+0x10C4	Searcher and Finger Information Version 2
+0x10C5	Service Configuration Version 2
+0x10C6	Active Set Information Version 2
+0x10C7	Reduced Active Set Information
+0x10C8	Triage Log
+0x10C9	RDA Frame Information
+0x10CA	Reserved
+0x10CB	Reserved
+0x10CC	Reserved
+0x10CD	Reserved
+0x10CE	Reserved
+0x10CF	Reserved
+0x10D0	System Arbitration Module
+0x10D1	Reserved
+0x10D2	System Determination Last Main Action
+0x10D3	System Determination Last Hybrid Action
+0x10D6	Broadcast Control Channel Message
+0x10D7	Reverse Enhanced Access Channel Message
+0x10D8	Forward Common Control Channel Message
+0x10D9	RDA Frame Information Version 2
+0x10DA	Reserved
+0x10DB	Position Engine Full Log
+0x10DC	Position Engine Partial Log
+0x10DD	Reserved
+0x10DE	Reserved
+0x10DF	Reserved
+0x10E0	Reserved
+0x10E1	Reserved
+0x10E2	MPEG4 YUV Frame
+0x10E3	MPEG4 Clip Statistics
+0x10E4	MPEG4 Clip Statistics Ver2
+0x10F2	BREW Bucket 0
+0x10F3	Reserved
+0x10F4	Reserved
+0x10F5	Reserved
+0x10F6	Reserved
+0x10F7	Reserved
+0x10F8	Reserved
+0x10F9	Reserved
+0x10FA	Reserved
+0x10FB	Reserved
+0x10FC	Reserved
+0x10FD	Reserved
+0x10FE	Reserved
+0x10FF	Reserved
+0x1100	Reserved
+0x1101	Reserved
+0x1102	Reserved
+0x1103	Reserved
+0x1104	Reserved
+0x1105	Reserved
+0x1106	Reserved
+0x1107	Reserved
+0x1108	Reserved
+0x1109	Reserved
+0x110A	Reserved
+0x110B	Reserved
+0x110C	Reserved
+0x110D	Reserved
+0x110E	Reserved
+0x110F	Reserved
+0x1110	Reserved
+0x1111	Reserved
+0x1112	Reserved
+0x1113	PPP Rx frames, Um iface framed
+0x1114	PPP Rx frames, Rm iface framed
+0x1115	PPP Rx frames, An iface framed
+0x1123	PPP Tx frames, Um iface framed
+0x1124	PPP Tx frames, Rm iface framed
+0x1125	PPP Tx frames, An iface framed
+0x1133	PPP Rx frames, Um iface unframed
+0x1134	PPP Rx frames, Rm iface unframed
+0x1135	PPP Rx frames, An iface unframed
+0x1143	PPP Tx frames, Um iface unframed
+0x1144	PPP Tx frames, Rm iface unframed
+0x1145	PPP Tx frames, An iface unframed
+0x1154	Position Engine Full Log Extended
+0x1155	Reserved
+0x1156	System Level Task Profiling
+0x1157	Per Task Profiling
+0x1158	Reserved
+0x115E	Position Engine Partial Log Extended
+0x115F	Diag Stress Test
+0x1160	Reserved
+0x1162	RLP RX FDCH Frames
+0x1163	RLP TX FDCH Frames
+0x1164	QTV Streaming Rx Statistics
+0x1165	QTV RTSP Describe
+0x1166	QTV RTSP Setup
+0x1167	QTV RTSP Play
+0x1168	QTV RTSP Pause
+0x1169	QTV RTSP Teardown
+0x116A	QTV RTSP Server Response
+0x116B	QTV RTCP Receiver Report
+0x116C	QTV RTCP Sender Report
+0x116D	QTV RTP Statistics
+0x116E	QTV SDP File
+0x116F	QTV RTSP Client Response
+0x1170	QTV RTP Header Only
+0x1171	QTV RTP Entire Packet
+0x1172	QTV RTP Audio Samples
+0x1173	QTV RTP Video Samples (All Layers)
+0x1174	Searcher4 - 1x CDMA
+0x1175	Searcher Sleep Statistics
+0x1176	Service Configuration, Version 3
+0x1177	Searcher4 - HDR
+0x1178	Searcher4 - AFLT
+0x1179	Enhanced Finger Information
+0x117A	DV Info
+0x117B	Reserved
+0x117C	Bluetooth FTM Log
+0x117D	Reserved
+0x117E	Reserved
+0x117F	1xEV Multicast Packet Rate Metrics
+0x1180	1xEV Multicast Physical Channel Metrics
+0x1181	1xEV Multicast ECB Status
+0x1182	1xEV Multicast Logical Channel Metrics
+0x1183	1xEV Debug Display
+0x1184	1xEV Tune Away Info
+0x1185	1xEV Tune Away RRI Info
+0x1186	1xEV Connection Term Info
+0x1187	1xEV Connected State Protocol Info
+0x1188	1xEV Connected State TX Info
+0x1189	1xEV Connected State RMAC Info
+0x118A	1xEV Connected State Search Info
+0x118B	1xEV FTC Physical Layer
+0x118C	1xEV RTC Physical Layer
+0x1192	1xEV Rev-A Single-User Forward Statistics Summary
+0x1193	1xEV Rev-A Multi-User Forward Statistics Summary
+0x1196	Reserved
+0x1197	Reserved
+0x1198	MPEG4 Clip Statistics Ver3
+0x1199	Mobile IP Performance
+0x119A	Srch TNG Finger Status
+	Subpacket -1	Unknown Subpkt [Version 1]
+	Subpacket 1	Status Subpkt [Version 1]
+	Subpacket 2	RF Subpkt [Version 2]
+	Subpacket 3	Active Info Subpkt [Version 1]
+	Subpacket 4	Finger Info Subpkt [Version 1]
+	Subpacket 5	Filtered Pilot Symbol Subpkt [Version 1]
+	Subpacket 6	Searcher1 Subpkt [Version 1]
+	Subpacket 7	Searcher4 Subpkt [Version 1]
+	Subpacket 8	Sleep Stats Subpkt [Version 1]
+	Subpacket 9	QPCH Subpkt [Version 1]
+	Subpacket 10	AFC Subpkt [Version 1]
+	Subpacket 11	Traffic Demod Status Subpkt [Version 3]
+	Subpacket 12	Channel Estimator Subpkt [Version 1]
+	Subpacket 13	Acquisition Info Subpkt [Version 2]
+	Subpacket 14	TC Call Statistics Subpkt [Version 1]
+	Subpacket 18	Idle Demod Stats Subpkt [Version 1]
+0x119B	Srch TNG 1x Searcher Dump
+	Subpacket -1	Unknown Subpkt [Version 1]
+	Subpacket 1	Status Subpkt [Version 1]
+	Subpacket 2	RF Subpkt [Version 2]
+	Subpacket 3	Active Info Subpkt [Version 1]
+	Subpacket 4	Finger Info Subpkt [Version 1]
+	Subpacket 5	Filtered Pilot Symbol Subpkt [Version 1]
+	Subpacket 6	Searcher1 Subpkt [Version 1]
+	Subpacket 7	Searcher4 Subpkt [Version 1]
+	Subpacket 8	Sleep Stats Subpkt [Version 1]
+	Subpacket 9	QPCH Subpkt [Version 1]
+	Subpacket 10	AFC Subpkt [Version 1]
+	Subpacket 11	Traffic Demod Status Subpkt [Version 3]
+	Subpacket 12	Channel Estimator Subpkt [Version 1]
+	Subpacket 13	Acquisition Info Subpkt [Version 2]
+	Subpacket 14	TC Call Statistics Subpkt [Version 1]
+	Subpacket 18	Idle Demod Stats Subpkt [Version 1]
+0x119C	Srch TNG General Status
+	Subpacket -1	Unknown Subpkt [Version 1]
+	Subpacket 1	Status Subpkt [Version 1]
+	Subpacket 2	RF Subpkt [Version 2]
+	Subpacket 3	Active Info Subpkt [Version 1]
+	Subpacket 4	Finger Info Subpkt [Version 1]
+	Subpacket 5	Filtered Pilot Symbol Subpkt [Version 1]
+	Subpacket 6	Searcher1 Subpkt [Version 1]
+	Subpacket 7	Searcher4 Subpkt [Version 1]
+	Subpacket 8	Sleep Stats Subpkt [Version 1]
+	Subpacket 9	QPCH Subpkt [Version 1]
+	Subpacket 10	AFC Subpkt [Version 1]
+	Subpacket 11	Traffic Demod Status Subpkt [Version 3]
+	Subpacket 12	Channel Estimator Subpkt [Version 1]
+	Subpacket 13	Acquisition Info Subpkt [Version 2]
+	Subpacket 14	TC Call Statistics Subpkt [Version 1]
+	Subpacket 18	Idle Demod Stats Subpkt [Version 1]
+0x119D	Srch TNG Demod Info
+	Subpacket -1	Unknown Subpkt [Version 1]
+	Subpacket 1	Status Subpkt [Version 1]
+	Subpacket 2	RF Subpkt [Version 2]
+	Subpacket 3	Active Info Subpkt [Version 1]
+	Subpacket 4	Finger Info Subpkt [Version 1]
+	Subpacket 5	Filtered Pilot Symbol Subpkt [Version 1]
+	Subpacket 6	Searcher1 Subpkt [Version 1]
+	Subpacket 7	Searcher4 Subpkt [Version 1]
+	Subpacket 8	Sleep Stats Subpkt [Version 1]
+	Subpacket 9	QPCH Subpkt [Version 1]
+	Subpacket 10	AFC Subpkt [Version 1]
+	Subpacket 11	Traffic Demod Status Subpkt [Version 3]
+	Subpacket 12	Channel Estimator Subpkt [Version 1]
+	Subpacket 13	Acquisition Info Subpkt [Version 2]
+	Subpacket 14	TC Call Statistics Subpkt [Version 1]
+	Subpacket 18	Idle Demod Stats Subpkt [Version 1]
+0x119E	Srch TNG Sleep Stats
+	Subpacket -1	Unknown Subpkt [Version 1]
+	Subpacket 1	Status Subpkt [Version 1]
+	Subpacket 2	RF Subpkt [Version 2]
+	Subpacket 3	Active Info Subpkt [Version 1]
+	Subpacket 4	Finger Info Subpkt [Version 1]
+	Subpacket 5	Filtered Pilot Symbol Subpkt [Version 1]
+	Subpacket 6	Searcher1 Subpkt [Version 1]
+	Subpacket 7	Searcher4 Subpkt [Version 1]
+	Subpacket 8	Sleep Stats Subpkt [Version 1]
+	Subpacket 9	QPCH Subpkt [Version 1]
+	Subpacket 10	AFC Subpkt [Version 1]
+	Subpacket 11	Traffic Demod Status Subpkt [Version 3]
+	Subpacket 12	Channel Estimator Subpkt [Version 1]
+	Subpacket 13	Acquisition Info Subpkt [Version 2]
+	Subpacket 14	TC Call Statistics Subpkt [Version 1]
+	Subpacket 18	Idle Demod Stats Subpkt [Version 1]
+0x119F	Srch TNG Quick Paging Channel Info
+	Subpacket -1	Unknown Subpkt [Version 1]
+	Subpacket 1	Status Subpkt [Version 1]
+	Subpacket 2	RF Subpkt [Version 2]
+	Subpacket 3	Active Info Subpkt [Version 1]
+	Subpacket 4	Finger Info Subpkt [Version 1]
+	Subpacket 5	Filtered Pilot Symbol Subpkt [Version 1]
+	Subpacket 6	Searcher1 Subpkt [Version 1]
+	Subpacket 7	Searcher4 Subpkt [Version 1]
+	Subpacket 8	Sleep Stats Subpkt [Version 1]
+	Subpacket 9	QPCH Subpkt [Version 1]
+	Subpacket 10	AFC Subpkt [Version 1]
+	Subpacket 11	Traffic Demod Status Subpkt [Version 3]
+	Subpacket 12	Channel Estimator Subpkt [Version 1]
+	Subpacket 13	Acquisition Info Subpkt [Version 2]
+	Subpacket 14	TC Call Statistics Subpkt [Version 1]
+	Subpacket 18	Idle Demod Stats Subpkt [Version 1]
+0x11A0	Srch TNG AFC Info
+	Subpacket -1	Unknown Subpkt [Version 1]
+	Subpacket 1	Status Subpkt [Version 1]
+	Subpacket 2	RF Subpkt [Version 2]
+	Subpacket 3	Active Info Subpkt [Version 1]
+	Subpacket 4	Finger Info Subpkt [Version 1]
+	Subpacket 5	Filtered Pilot Symbol Subpkt [Version 1]
+	Subpacket 6	Searcher1 Subpkt [Version 1]
+	Subpacket 7	Searcher4 Subpkt [Version 1]
+	Subpacket 8	Sleep Stats Subpkt [Version 1]
+	Subpacket 9	QPCH Subpkt [Version 1]
+	Subpacket 10	AFC Subpkt [Version 1]
+	Subpacket 11	Traffic Demod Status Subpkt [Version 3]
+	Subpacket 12	Channel Estimator Subpkt [Version 1]
+	Subpacket 13	Acquisition Info Subpkt [Version 2]
+	Subpacket 14	TC Call Statistics Subpkt [Version 1]
+	Subpacket 18	Idle Demod Stats Subpkt [Version 1]
+0x11A1	Srch TNG Acquisition Info
+	Subpacket 1	Status Subpkt [Version 1]
+	Subpacket 2	RF Subpkt [Version 2]
+	Subpacket 3	Active Info Subpkt [Version 1]
+	Subpacket 4	Finger Info Subpkt [Version 1]
+	Subpacket 5	Filtered Pilot Symbol Subpkt [Version 1]
+	Subpacket 6	Searcher1 Subpkt [Version 1]
+	Subpacket 7	Searcher4 Subpkt [Version 1]
+	Subpacket 8	Sleep Stats Subpkt [Version 1]
+	Subpacket 9	QPCH Subpkt [Version 1]
+	Subpacket 10	AFC Subpkt [Version 1]
+	Subpacket 11	Traffic Demod Status Subpkt [Version 2]
+	Subpacket 12	Channel Estimator Subpkt [Version 1]
+	Subpacket 13	Acquisition Info Subpkt [Version 3]
+	Subpacket 14	TC Call Statistics Subpkt [Version 1]
+	Subpacket 18	Idle Demod Stats Subpkt [Version 1]
+0x11A2	Srch TNG Finger Channel Estimate
+	Subpacket -1	Unknown Subpkt [Version 1]
+	Subpacket 1	Status Subpkt [Version 1]
+	Subpacket 2	RF Subpkt [Version 2]
+	Subpacket 3	Active Info Subpkt [Version 1]
+	Subpacket 4	Finger Info Subpkt [Version 1]
+	Subpacket 5	Filtered Pilot Symbol Subpkt [Version 1]
+	Subpacket 6	Searcher1 Subpkt [Version 1]
+	Subpacket 7	Searcher4 Subpkt [Version 1]
+	Subpacket 8	Sleep Stats Subpkt [Version 1]
+	Subpacket 9	QPCH Subpkt [Version 1]
+	Subpacket 10	AFC Subpkt [Version 1]
+	Subpacket 11	Traffic Demod Status Subpkt [Version 3]
+	Subpacket 12	Channel Estimator Subpkt [Version 1]
+	Subpacket 13	Acquisition Info Subpkt [Version 2]
+	Subpacket 14	TC Call Statistics Subpkt [Version 1]
+	Subpacket 18	Idle Demod Stats Subpkt [Version 1]
+0x11A3	Srch TNG TC Call Statistics
+	Subpacket -1	Unknown Subpkt [Version 1]
+	Subpacket 1	Status Subpkt [Version 1]
+	Subpacket 2	RF Subpkt [Version 2]
+	Subpacket 3	Active Info Subpkt [Version 1]
+	Subpacket 4	Finger Info Subpkt [Version 1]
+	Subpacket 5	Filtered Pilot Symbol Subpkt [Version 1]
+	Subpacket 6	Searcher1 Subpkt [Version 1]
+	Subpacket 7	Searcher4 Subpkt [Version 1]
+	Subpacket 8	Sleep Stats Subpkt [Version 1]
+	Subpacket 9	QPCH Subpkt [Version 1]
+	Subpacket 10	AFC Subpkt [Version 1]
+	Subpacket 11	Traffic Demod Status Subpkt [Version 3]
+	Subpacket 12	Channel Estimator Subpkt [Version 1]
+	Subpacket 13	Acquisition Info Subpkt [Version 2]
+	Subpacket 14	TC Call Statistics Subpkt [Version 1]
+	Subpacket 18	Idle Demod Stats Subpkt [Version 1]
+0x11A6	Srch TNG Asdiv [Version 1]
+	Subpacket 25	Asdiv Subpkt [Version 3]
+0x11A7	Reserved
+0x11A9	Reserved
+0x11AA	Reserved
+0x11AB	Reserved
+0x11AC	Reserved
+0x11AD	Reserved
+0x11AE	Reserved
+0x11AF	Reserved
+0x11B0	QTV RTP Text Samples
+0x11B1	QTV Player Timed Text
+0x11B2	QTV Frame Decode Information
+0x11B3	QTV Frame Render Information
+0x11B4	QTV A/V Sync Information
+0x11B5	QTV Streaming SDP Parameters
+0x11B6	Reserved
+0x11B7	Reserved
+0x11B8	Reserved
+0x11BA	QTV CMX Audio Input Data
+0x11BB	QTV RTSP Options
+0x11BC	QTV RTSP Get Parameter
+0x11BD	QTV RTSP Set Parameter
+0x11BE	Reserved
+0x11BF	Reserved
+0x11C1	QTV Cmd Logging
+0x11C2	Reserved
+0x11C3	QTV Video Frame Decode Information
+0x11C4	QTV RTCP Compound RR
+0x11C5	Reserved
+0x11C6	Reserved
+0x11C7	QTV RTP Entire Decrypted Packet
+0x11C8	Reserved
+0x11E1	GPS PDSM Position Report Callback
+0x11E2	GPS PDSM PD Event Callback
+0x11E3	GPS PDSM PA Event Callback
+0x11E4	GPS PDSM Notify Verify Request
+0x11E5	Reserved
+0x11E6	GPS PDSM Reserved 2
+0x11E9	GPS MS MPC Forward Link
+0x11EA	GPS MS MPC Reverse Link
+0x11EB	Data Protocol Logging
+0x11EC	Reserved
+0x11ED	Reserved
+0x11EE	Reserved
+0x11EF	MFLO MLC Location Dynamic Params
+0x11F0	Reserved
+0x11F1	Reserved
+0x11F2	Reserved
+0x11F3	Reserved
+0x11F4	Reserved
+0x11F5	MFLO RSSI Value Dynamic Params
+0x11F6	MFLO Code Block Erasure Info Dynamic Params
+0x11F7	Reserved
+0x11F8	MFLO Wide Local Dynamic Params
+0x11F9	MFLO MLC PLP Stats per Frame Prers Params
+0x11FA	MFLO OIS PLPs Statistics Dynamic Params
+0x11FB	Reserved
+0x11FC	MFLO OIS Info Static Params
+0x11FD	Reserved
+0x11FE	Reserved
+0x11FF	MFLO Stream Layer Header Info Static Params
+0x1200	MFLO MAC Layer Header Info Static Params
+0x1201	Reserved
+0x1202	Reserved
+0x1203	Reserved
+0x1204	Reserved
+0x1205	Reserved
+0x1206	Reserved
+0x1207	Reserved
+0x1208	Reserved
+0x1209	Reserved
+0x120A	MFLO Bound Stream List Params
+0x120B	MFLO MLC PLP Stats Post Params
+0x120C	MFLO FTAP Packet Record Header Params
+0x120D	MFLO FTAP Packet Record Params
+0x120E	MFLO FTAP WOIS Params
+0x120F	MFLO FTAP LOIS Params
+0x1210	MFLO FTAP WID LID Params
+0x1211	MFLO OIS PLPs Statistics Dynamic Params Ver2
+0x1212	MFLO OIS Info Static Params Ver2
+0x1213	MFLO MLC PLP Stats Post Params Ver2
+0x1214	MFLO MLC Location Dynamic Params Ver2
+0x1215	MFLO Bound Stream List Params Ver2
+0x1216	MFLO Stream Layer Header Info Static Params
+0x1218	Reserved
+0x1219	MFLO Stream PLP Stats
+0x121A	Reserved
+0x121B	Reserved
+0x121C	Reserved
+0x121D	Reserved
+0x121E	Reserved
+0x121F	Reserved
+0x1220	Reserved
+0x1221	Reserved
+0x1222	Reserved
+0x1223	Reserved
+0x1224	Reserved
+0x1225	Reserved
+0x1226	Reserved
+0x1227	Reserved
+0x1228	Reserved
+0x1229	Reserved
+0x122A	MFLO UBM Wide Local Dynamic params
+0x122B	Reserved
+0x122C	Reserved
+0x122D	Reserved
+0x122E	Reserved
+0x122F	Reserved
+0x1230	Reserved
+0x1231	Reserved
+0x1232	Reserved
+0x1233	Reserved
+0x1234	Reserved
+0x1235	Reserved
+0x1236	Reserved
+0x1237	Reserved
+0x1238	Reserved
+0x1239	Reserved
+0x123A	MFLO UBM2 DSP Channel Estimates
+0x123B	Reserved
+0x123C	Reserved
+0x123D	MFLO Superframe Error Rate (SFER)
+0x1241	Interference Estimation Based On TPC
+0x1250	GPS Demodulation Tracking Header
+0x1251	GPS Demodulation Tracking Results
+0x1252	GPS Demodulation Bit Edge
+0x1253	GPS Demodulation Soft Decisions
+0x1254	GPS Post-Processed Demodulation Tracking Results
+0x1255	GPS Demodulation Subframe
+0x1273	CM Phone Event
+0x1275	1xEV Multi RLP Rev Statistics
+0x1276	1xEV Multi RLP Fwd Statistics
+0x1277	1xEV Rx Partial MultiRLP Packet
+0x1278	1xEV Tx Partial MultiRLP Packet
+0x1279	1xEV Equalizer Data Log Packet
+0x127A	1xEV Equalizer C/I log Packet
+0x127C	1xEV Searcher Data Version 3
+0x127D	1xEV Rev-A RL Gains
+0x127E	1xEV Rev-A RL Metrics
+0x127F	1xEV Rev-A T2P Resource Info
+0x1280	1xEV Rev-A RMAC3 Packet Info
+0x1281	1xEV Rev-A RAB Update Info
+0x1282	1xEV Rev-A DRC-ARQ-DSC Buffer
+0x1283	1xEV Rev-A MUP User Statistics
+0x1284	1xEV Rev-A Fwd Link Packet Header Info
+0x1285	1xEV Rev-A RL ARQ Status
+0x1286	1xEV Rev-A RL Packet Status
+0x1289	1xEV Rev-A PCP Packet Statistics
+0x128A	Subtype Stream Config
+0x128B	1xEV Rev-A Route Update Trigger Code List
+0x128C	1x EV Enhanced Multi RLP Fwd Stats
+0x128D	1x EV Enhanced Multi RLP Rev Stats
+0x128E	1x EV Rx Partial Enhanced Multi RLP Packet
+0x128F	1x EV Tx Partial Enhanced Multi RLP Packet
+0x1290	Reserved
+0x1291	1xEV-DO Platinum Multicast Timing Synchronization
+0x1292	1x EV Enhanced Access Attempt
+0x1293	1x EV Access Probe
+0x1294	1xEV-DO Multi Carrier Forward Link Packet Header Information
+0x1295	Reserved
+0x1296	1xEV-DO Multi Carrier Air Link Summary
+0x1297	1xEV-DO Multi Carrier Searcher Data
+0x1298	1xEV-DO Multi Carrier DRC ARQ DSC Buffer
+0x1299	1xEV-DO Multi Carrier RMAC4 T2P Resource
+0x129A	1xEV-DO Multi Carrier RMAC4 Packet Information
+0x129B	Reserved
+0x129C	1xEV-DO Multi Carrier Power
+0x129D	1xEV-DO Multi Carrier Reverse Link Gains
+0x129E	1xEV-DO Multi Carrier Reverse Link ARQ Status
+0x129F	1xEV-DO Multi Carrier Reverse Link Metrics
+0x12A0	1xEV-DO Multi Carrier RAB Update Information
+0x12A1	1xEV-DO Multi Carrier Pilot Sets
+0x12A2	1xEV-DO Multi Carrier Single User Packet Forward Statistics
+0x12A3	1xEV-DO Multi Carrier Multiple User Forward Statistics
+0x12A4	HDR Enh Sleep Info
+0x12A5	HDR Multi Link MRLP Fwd Stats
+0x12A6	HDR Multi Link MRLP Rev Stats
+0x12A7	HDR Multi Link MRLP Partial Rx
+0x12A8	HDR Multi Link MRLP Partial Tx
+0x12A9	HDR Multi Link MRLP Rx Processing
+0x12AA	1xEV-DO Multi Carrier Reverse Link Packet Status
+0x12AB	1xEV-DO Multi Carrier Equalizer C/I
+0x12AC	Reserved
+0x12AD	1xEV-DO Multi Carrier Equalizer Data
+0x12AE	1xEV-DO Platinum Multicast Channel Est Algorithm
+0x12AF	Reserved
+0x12B0	HDR FL Physical Layer Packet
+0x12B1	HDR RL Physical Layer Packet
+0x12B2	Reserved
+0x12B3	HDR PCP Packet Stats
+0x12B4	Reserved
+0x12B5	HDR Overhead Cache Summary Log
+0x12B6	HDR Pilot Sets Version 3 [Version 3]
+0x12B7	HDR MRLP Partial Rx [Version 0]
+0x12B8	HDR MRLP Partial Tx [Version 0]
+0x12B9	HDR Adaptive Receiver Diversity [Version 1]
+0x12BA	HDR SRCH RF TxD Event  [Version 5]
+0x12BB	HDR RevA FlexConn  [Version 2]
+0x12BC	HDR RevA DTX  [Version 3]
+0x12BD	HDR RevB FlexConn
+0x12BE	HDR RevB DTX  [Version 3]
+0x12BF	HDR NLB Stats
+0x12C0	HDR Tuneaway Info [Version 1]
+0x12C1	CM Call Event
+0x12E3	Reserved
+0x12E4	Reserved
+0x12E5	MDDI Host Statistics
+0x12E6	GPS Decoded Ephemeris
+0x12E7	GPS Decoded Almanac
+0x12E8	TRM
+0x12E9	Reserved
+0x12EA	MobileView Configuration
+0x12EB	Reserved
+0x12EC	MobileView Position
+0x12ED	MobileView Status
+0x12EE	MobileView Occurrence
+0x12EF	MobileView Threshold
+0x12F0	MobileView AccessProbe
+0x12F1	MobileView GPS Position
+0x12F2	MobileView StatusEX
+0x12F3	MobileView Session
+0x12F4	MobileView AccessProbeEX
+0x12F5	MobileView SessionEX
+0x12F6	MobileView MTA Status
+0x12F7	Reserved
+0x12F8	MobileView IApp Log
+0x12F9	MobileView EFS Operations
+0x12FA	MobileView MCRA Log
+0x12FB	MobileView Error Message
+0x12FC	MobileView Status Exx
+0x12FD	MobileView App Data Usage Statistics
+0x12FE	MobileView Device RLP Summary
+0x12FF	Hardware Type Information
+0x132B	Logging Requested QOS
+0x132C	Granted QOS Logging
+0x132D	QOS State Logging
+0x132E	Modified QOS Logging
+0x132F	QDJ Enqueue
+0x1330	QDJ Dequeue
+0x1331	QDJ Update
+0x1332	QDTX Encoder
+0x1333	QDTX Decoder
+0x1335	Global IPV4 Stats
+0x1336	Global IPV6 Stats
+0x1337	Global ICMPV4 Stats
+0x1338	Global ICMPV6 Stats
+0x1339	Global TCP Stats
+0x133A	Global UDP Stats
+0x133B	TCP Stats
+0x133C	MEM Stats
+0x133D	IFACE Stats
+0x133E	PPP Stats
+0x133F	ARP Stats
+0x1340	Delta Stats
+0x1341	TCP Instance Stats
+0x1342	UDP Instance Stats
+0x1343	PPP Instance Stats
+0x1344	Interface Instance Stats
+0x1345	MEM Instance Stats
+0x1346	FLOW Instance Stats
+0x1347	Physical Link Instance Stats
+0x1348	ARP Instance Stats
+0x1349	IPHC Instance Stats
+0x134A	LLC Instance Stats
+0x134B	ROHC Instance Stats
+0x134C	RSVP Instance Stats
+0x134D	LLC Stats
+0x134E	RSVP Stats
+0x134F	CM SS Event
+0x1350	TCXOMGR AFC Data
+0x1351	Reserved
+0x1352	GPS Processed Peak
+0x1353	Reserved
+0x1354	Reserved
+0x1355	Reserved
+0x1356	QOS State Logging, Ver2
+0x1359	Reserved
+0x135A	Logging Requested QOS, Ver2
+0x135B	Granted QOS Logging, Ver 2
+0x135C	Modified QOS Logging, Ver 2
+0x135D	Bus Monitor Profiling Info
+0x135E	Reserved
+0x135F	Reserved
+0x1360	Reserved
+0x1361	Reserved
+0x1362	Reserved
+0x1363	Reserved
+0x1364	Reserved
+0x1365	BT HCI Command
+0x1366	BT HCI Event
+0x136A	UMTS To CDMA Handover Message
+0x136D	Reserved
+0x136E	Reserved
+0x136F	Converged GPS Clock Report
+0x1370	Converged GPS Position Report
+0x1371	Converged GPS Measurement Report
+0x1372	Converged GPS RF Status Report [Version 1]
+0x1373	VOIP To CDMA Handover Message
+0x1374	Converged GPS PD Results [Version 101]
+0x1375	Reserved
+0x1376	Reserved
+0x1377	Reserved
+0x1378	Reserved
+0x1379	Reserved
+0x137A	Reserved
+0x137B	Reserved
+0x137C	CGPS PDSM Position Report Callback
+0x137D	Reserved
+0x137E	Reserved
+0x137F	Reserved
+0x1380	Reserved
+0x1381	Reserved
+0x1382	Reserved
+0x1383	Reserved
+0x1384	CGPS PDSM External Status NMEA Report [Version 50]
+0x1385	Reserved
+0x1386	CGPS Report Server Tx
+0x1387	CGPS Report Server Rx
+0x1388	UMTS To CDMA Handover Paging Channel Message
+0x1389	UMTS To CDMA Handover Traffic Channel Message
+0x138A	CGPS IQ Report [Version 100]
+0x138B	VOIP To CDMA Handover Paging Channel Message
+0x138C	VOIP To CDMA Handover Access Channel Message
+0x138D	VOIP To CDMA Handover Forward Traffic Channel Message
+0x138E	QMI Link 1 RX PDU
+0x138F	QMI Link 1 TX PDU
+0x1390	QMI Link 2 RX PDU
+0x1391	QMI Link 2 TX PDU
+0x1392	QMI Link 3 RX PDU
+0x1393	QMI Link 3 TX PDU
+0x1394	QMI Link 4 RX PDU
+0x1395	QMI Link 4 TX PDU
+0x1396	QMI Link 5 RX PDU
+0x1397	QMI Link 5 TX PDU
+0x1398	QMI Link 6 RX PDU
+0x1399	QMI Link 6 TX PDU
+0x139A	QMI Link 7 RX PDU
+0x139B	QMI Link 7 TX PDU
+0x139C	QMI Link 8 RX PDU
+0x139D	QMI Link 8 TX PDU
+0x139E	QMI Link 9 RX PDU
+0x139F	QMI Link 9  TX PDU
+0x13A0	QMI Link 10 RX PDU
+0x13A1	QMI Link 10 TX PDU
+0x13A2	QMI Link 11 RX PDU
+0x13A3	QMI Link 11 TX PDU
+0x13A4	QMI Link 12 RX PDU
+0x13A5	QMI Link 12 TX PDU
+0x13A6	QMI Link 13 RX PDU
+0x13A7	QMI Link 13 TX PDU 
+0x13A8	QMI Link 14 RX PDU 
+0x13A9	QMI Link 14 TX PDU 
+0x13AA	QMI Link 15 RX PDU 
+0x13AB	QMI Link 15 TX PDU 
+0x13AC	QMI Link 16 RX PDU 
+0x13AD	QMI Link 16 TX PDU 
+0x13AF	QOS Info Code Update Logging
+0x13B0	Audio Vocoder Data Paths [Version 1]
+0x13B1	Audio Vocoder Rx PCM  [Version 1]
+0x13B2	Decode CRC Frame
+0x13B3	Reserved
+0x13B4	Reserved
+0x13B5	Reserved
+0x13B6	Reserved
+0x13B7	Reserved
+0x13B8	Reserved
+0x13BA	Reserved
+0x13BB	Reserved
+0x13BE	Reserved
+0x13BF	Reserved
+0x13C0	Reserved
+0x13C1	Reserved
+0x13C2	Reserved
+0x13C3	Reserved
+0x13C4	Reserved
+0x13C5	Reserved
+0x13C6	Reserved
+0x13C7	Reserved
+0x13CB	Reserved
+0x13CE	Reserved
+0x13CF	Reserved
+0x13D0	Reserved
+0x13D1	XO Frequency Estimation [Version 18]
+0x13DB	Reserved
+0x13DC	CGPS ME RF Linearity Status
+0x13DD	Reserved
+0x13DE	Reserved
+0x13DF	ROHC Compressor Statistics
+0x13E0	ROHC Decompressor Statistics
+0x13E1	Sensors - Kalman Filter Info [Version 7]
+0x13E2	Sensors - Integrated Measurements [Version 4]
+0x13E3	Sensors - Bias Calibration Values [Version 2]
+0x13E4	DTV ISDB TS Packet Statistics
+0x13E5	DTV ISDB PES Packet Statistics
+0x13E6	DTV ISDB Sections Statistics
+0x13E7	DTV ISDB PES Buffering Statistics
+0x13E8	Reserved
+0x13E9	Reserved
+0x13EA	Reserved
+0x13EB	Reserved
+0x13EC	Reserved
+0x13ED	Reserved
+0x13EE	Reserved
+0x13EF	Reserved
+0x13F0	Reserved
+0x13F1	Reserved
+0x13F2	Reserved
+0x13F3	Reserved
+0x13F4	Reserved
+0x13F5	Reserved
+0x13F6	Reserved
+0x13F7	Reserved
+0x13F8	Reserved
+0x13F9	Reserved
+0x13FA	Reserved
+0x13FB	Reserved
+0x13FC	Reserved
+0x13FD	Reserved
+0x13FE	Reserved
+0x13FF	Reserved
+0x1400	Reserved
+0x1401	Reserved
+0x1402	Reserved
+0x1403	Reserved
+0x1404	Reserved
+0x1405	Reserved
+0x1406	Reserved
+0x1407	Reserved
+0x1408	Reserved
+0x1409	Reserved
+0x140A	Reserved
+0x140B	Reserved
+0x140C	Reserved
+0x140D	Reserved
+0x140E	Reserved
+0x140F	Reserved
+0x1410	Reserved
+0x1411	Reserved
+0x1412	Reserved
+0x1413	Reserved
+0x1414	Reserved
+0x1415	Reserved
+0x1416	Reserved
+0x1417	Reserved
+0x1418	Reserved
+0x141B	UMB RLL Fwd Signaling Message
+0x141C	UMB RLL Rev Signaling Message
+0x141D	Reserved
+0x141E	Reserved
+0x141F	Reserved
+0x1420	Reserved
+0x1421	Reserved
+0x1422	Reserved
+0x1423	Reserved
+0x1424	Reserved
+0x1425	Reserved
+0x1426	Reserved
+0x1427	Reserved
+0x1428	Reserved
+0x1429	Reserved
+0x142A	Reserved
+0x142B	Reserved
+0x142C	Reserved
+0x142D	Reserved
+0x142E	Reserved
+0x142F	Reserved
+0x1430	Reserved
+0x1431	Reserved
+0x1432	Reserved
+0x1433	Reserved
+0x1434	Reserved
+0x1435	Reserved
+0x1436	ARM 11 Performance Counters Profiling Information [Version 1]
+0x1437	FLOW Stats
+0x1438	Physical Link Stats
+0x1439	UDP Stats
+0x143A	Searcher4 Multiple Carrier Log
+0x143B	IPHC Stats
+0x143C	ROHC Stats
+0x143D	DVB-H BCast Security Add Program Info
+0x143E	DVB-H BCast Security Add Program Complete
+0x143F	DVB-H BCast Security SDP Parse
+0x1440	CGPS ME Dynamic Power Optimization Status
+0x1441	Reserved
+0x1442	Reserved
+0x1443	Reserved
+0x1444	Reserved
+0x1445	DTV ISDB-T TMCC Information [Version 1]
+0x1446	Reserved
+0x1455	CGPS Diag Successful Fix Count [Version 0]
+0x1456	CGPS MC Tracking DPO Status [Version 0]
+0x1457	Reserved
+0x1458	Reserved
+0x145B	Reserved
+0x145C	Reserved
+0x145D	Reserved
+0x145E	Reserved
+0x1460	Reserved
+0x1461	Reserved
+0x1474	Stationary Detector Output
+0x1475	CGPS PDSM EXT Status MEAS Report PPM
+0x1476	GNSS Position Report
+0x1477	GNSS GPS Measurement Report
+0x1478	GNSS Clock Report
+0x1479	Reserved
+0x147A	Reserved
+0x147B	GNSS CD DB Report
+0x147C	Reserved
+0x147D	Reserved
+0x147E	GNSS PRX RF HW Status Report [Version 6]
+0x147F	GNSS DRX RF HW Status Report
+0x1480	GNSS Glonass Measurement Report
+0x1481	GNSS GPS HBW RXD Measurement
+0x1482	GNSS PDSM Position Report Callback
+0x1483	Reserved
+0x1484	Reserved
+0x1485	Reserved
+0x1486	Reserved
+0x1487	CGPS WB FFT Stats [Version 2]
+0x1488	CGPS Slow Clock Calibration Report [Version 2]
+0x1489	Reserved
+0x148A	Reserved
+0x148C	Reserved
+0x148D	Reserved
+0x148E	Reserved
+0x148F	Reserved
+0x1490	GNSS PDSM PD Event Callback
+0x1491	Reserved
+0x1494	Reserved
+0x1495	Reserved
+0x1496	Reserved
+0x1497	Reserved
+0x1498	Reserved
+0x1499	Reserved
+0x149A	Reserved
+0x149B	Reserved
+0x149C	Reserved
+0x149D	Reserved
+0x149E	Reserved
+0x149F	Reserved
+0x14A0	Reserved
+0x14A1	Reserved
+0x14A2	Reserved
+0x14A6	Reserved
+0x14A7	Reserved
+0x14A8	Reserved
+0x14A9	Reserved
+0x14AA	Reserved
+0x14AB	Reserved
+0x14AC	Reserved
+0x14AD	Reserved
+0x14B0	Reserved
+0x14B1	Reserved
+0x14B2	Reserved
+0x14B3	Reserved
+0x14B4	Reserved
+0x14B5	Reserved
+0x14B6	Reserved
+0x14B7	Reserved
+0x14B8	Reserved
+0x14B9	Reserved
+0x14BA	XO IQ Data
+0x14BB	DTV CMMB Control Table Update [Version 1]
+0x14BC	DTV CMMB Media Buffering Status [Version 1]
+0x14BD	DTV CMMB Control Emergency Bcast [Version 1]
+0x14BE	DTV CMMB CAS EMM ECM [Version 1]
+0x14BF	DTV CMMB HW Performance [Version 1]
+0x14C0	DTV CMMB ESG Program Indication Information [Version 1]
+0x14C1	SNS Converted Sensor Data [Version 6]
+0x14C2	CM Subscription Event
+0x14C3	Reserved
+0x14C4	Reserved
+0x14C5	Reserved
+0x14C6	Reserved
+0x14C7	Reserved
+0x14C8	Reserved
+0x14C9	Reserved
+0x14CA	BLAST Task Profiling [Version 3]
+0x14CB	BLAST System Profiling [Version 1]
+0x14CC	FM Radio FTM Messages
+0x14CD	FM Radio Debug Messages
+0x14CE	UIM DS Data
+0x14CF	Reserved
+0x14D0	APR Modem
+0x14D1	Reserved
+0x14D2	APR ADSP
+0x14D3	Data MUX RX Raw Packet [Version 0]
+0x14D4	Data MUX TX Raw Packet [Version 0]
+0x14D5	Data MUX RX Frame Packet [Version 0]
+0x14D6	Data MUX TX Frame Packet [Version 0]
+0x14D7	Reserved
+0x14D8	Temperature Monitor Log [Version 1]
+0x14D9	Reserved
+0x14DA	Reserved
+0x14DB	Reserved
+0x14DC	Reserved
+0x14DD	Reserved
+0x14DE	GNSS OEMDRE Measurement Report
+0x14E0	GNSS OEMDRE Position Report [Version 2]
+0x14E1	GNSS OEMDRE SVPoly Report [Version 2]
+0x14E2	GNSS OEMDRE Sync [Version 0]
+0x14E3	Reserved
+0x14E4	Reserved
+0x14E5	Reserved
+0x14E6	Reserved
+0x14E7	Reserved
+0x14E8	Reserved
+0x14E9	Reserved
+0x14EA	Reserved
+0x14EB	Watermarks Tracing [Version 1]
+0x14EC	1x Advanced FET Stats [Version 0]
+0x14ED	1x Advanced L1 Performance [Version 2]
+0x14EE	Reserved
+0x14EF	Reserved
+0x14F0	SNS Sensor1 Request [Version 2]
+0x14F1	SNS Sensor1 Response [Version 2]
+0x14F2	SNS Sensor1 Indication [Version 2]
+0x14F3	Reserved
+0x14F4	Reserved
+0x14F5	Reserved
+0x14F6	Reserved
+0x14F7	Reserved
+0x14F8	ADSP External Tx Audio PCM
+0x14F9	ADSP External Rx Audio PCM
+0x14FA	ADSP FM Rx Audio PCM
+0x14FB	ADSP HDMI Rx Audio PCM
+0x14FC	Reserved
+0x14FD	Reserved
+0x14FE	Reserved
+0x14FF	Reserved
+0x1501	Reserved
+0x1502	Reserved
+0x1503	Reserved
+0x1504	Reserved
+0x1505	XTM HTTP Response Status [Version 0]
+0x1506	XTM XTA Response Status [Version 0]
+0x1507	TLM Failed Lookup [Version 0]
+0x1508	Sensors SDP Virgo [Version 1]
+0x1509	Sensors SDP SSD [Version 1]
+0x150A	Sensors SDP CRD [Version 1]
+0x150B	Sensors SDP Time Sync [Version 1]
+0x150C	Sensors SDP MSD [Version 1]
+0x150D	GNSS Sensor Streaming Ready Status [Version 1]
+0x150E	GNSS Time Sync Request [Version 1]
+0x150F	GNSS Inject Time Sync Data [Version 1]
+0x1510	GNSS Inject Sensor Data [Version 3]
+0x1511	GNSS Get Sensor Config Response [Version 1]
+0x1512	GNSS Set Sensor Config [Version 1]
+0x1513	GNSS PE Heading Filter [Version 0]
+0x1514	Reserved
+0x1515	GNSS PE CRD [Version 1]
+0x1516	Reserved
+0x1517	Reserved
+0x1518	Reserved
+0x1519	Reserved
+0x151A	Reserved
+0x151B	Reserved
+0x151C	Reserved
+0x151D	Reserved
+0x151E	Reserved
+0x151F	Reserved
+0x1520	GNSS BP AMP Info
+0x1521	Reserved
+0x1522	Reserved
+0x1523	Reserved
+0x1524	Reserved
+0x1525	Reserved
+0x1526	Reserved
+0x1527	ADSP Performance Monitor log
+0x1528	Reserved
+0x1529	Reserved
+0x152A	Reserved
+0x152B	Reserved
+0x152C	Reserved
+0x152D	Reserved
+0x152E	ADSP Audio Decoder Input Log
+0x152F	ADSP Audio Per Object Post Processing Input Log
+0x1530	ADSP Audio Rx Matrix Mixer Input Log
+0x1531	ADSP Audio Common Object Post Processing Input Log
+0x1532	ADSP Audio Common Object Pre Processing Input Log
+0x1533	ADSP Audio Tx Matrix Mixer Input Log
+0x1534	ADSP Audio Per Object Pre Processing Input Log
+0x1535	ADSP Audio Encoder Input Log
+0x1536	ADSP Audio Encoder Output Log
+0x1537	QTV Http Buffer Occupancy
+0x1538	QTV Http Incoming DataRate
+0x1539	QTV Http Download BitRate Switch
+0x153A	QTV Http Playback BitRate Switch
+0x153B	Reserved
+0x153C	Reserved
+0x153D	Reserved
+0x153E	Reserved
+0x153F	Reserved
+0x1540	Reserved
+0x1541	Reserved
+0x1542	Reserved
+0x1543	Reserved
+0x1544	QMI_MCS_QCSI_PKT
+	Subpacket 0	Service_CTL [Version 1]
+	Subpacket 1	Service_WDS [Version 1]
+	Subpacket 2	Service_DMS [Version 1]
+	Subpacket 3	Service_NAS [Version 1]
+	Subpacket 4	Service_QOS [Version 1]
+	Subpacket 5	Service_WMS [Version 1]
+	Subpacket 6	Service_PDS [Version 1]
+	Subpacket 7	Service_AUTH [Version 1]
+	Subpacket 8	Service_AT [Version 1]
+	Subpacket 9	Service_VOICE [Version 2]
+	Subpacket 10	Service_CAT [Version 2]
+	Subpacket 11	Service_UIM [Version 1]
+	Subpacket 12	Service_PBM [Version 1]
+	Subpacket 15	Service_TEST [Version 1]
+	Subpacket 16	Service_LOC [Version 2]
+	Subpacket 17	Service_SAR [Version 1]
+	Subpacket 18	Service_IMSS [Version 1]
+	Subpacket 26	Service_WDA [Version 1]
+	Subpacket 29	Service_CSVT [Version 1]
+	Subpacket 31	Service_IMSP [Version 1]
+	Subpacket 33	Service_IMSA [Version 1]
+	Subpacket 34	Service_COEXIST [Version 1]
+	Subpacket 36	Service_PDC [Version 1]
+	Subpacket 39	Service_BIT [Version 1]
+	Subpacket 40	Service_IMRTP [Version 1]
+	Subpacket 42	Service_DSD [Version 1]
+	Subpacket 46	Reserved [Version 1]
+	Subpacket 47	Reserved [Version 1]
+	Subpacket 48	Service_DFS [Version 1]
+	Subpacket 50	Service_UIMRMT [Version 1]
+	Subpacket 68	Service_OTT [Version 1]
+	Subpacket 70	Service_LTE_INTERFACE [Version 1]
+	Subpacket 73	Reserved [Version 1]
+	Subpacket 76	Reserved [Version 1]
+	Subpacket 77	Reserved [Version 1]
+	Subpacket 78	Reserved [Version 1]
+	Subpacket 79	Service_IMS_IOT [Version 1]
+	Subpacket 80	Service_LOC_IOT [Version 2]
+	Subpacket 82	Service_MSE [Version 1]
+	Subpacket 770	Service_IMS_DCM [Version 1]
+	Subpacket 1055	Service_OW_EXT [Version 1]
+	Subpacket 1056	Reserved [Version 1]
+0x1545	QBI Context 0 RX Message
+0x1546	QBI Context 0 TX Message
+0x1547	QBI Context 1 RX message
+0x1548	QBI Context 1 TX Message
+0x1549	QBI Context 2 RX message
+0x154A	QBI Context 2 TX Message
+0x154B	QBI Context 3 RX message
+0x154C	QBI Context 3 TX Message
+0x154D	QBI Context 4 RX message
+0x154E	QBI Context 4 TX Message
+0x154F	QBI Context 5 RX message
+0x1550	QBI Context 5 TX Message
+0x1551	QBI Context 6 RX message
+0x1552	QBI Context 6 TX message
+0x1553	QBI Context 7 RX message
+0x1554	QBI Context 7 TX message
+0x1555	Wakeup Manager Log
+0x1556	DS Memory Packets [Version 1]
+0x1557	Reserved
+0x1558	Wireless Connectivity Audio Data [Version 1]
+0x1559	Reserved
+0x155A	Reserved
+0x155B	Reserved
+0x155C	SNS MAG CAL Report [Version 1]
+0x155D	Reserved
+0x155E	Reserved
+0x155F	Reserved
+0x1560	Reserved
+0x1561	Reserved
+0x1562	Reserved
+0x1563	Reserved
+0x1564	Reserved
+0x1565	Reserved
+0x1566	Reserved
+0x1567	GNSS Fast TCAL [Version 1]
+0x1568	IMS RTP SN and Payload [Version 13]
+0x1569	IMS RTP Packet Loss [Version 9]
+0x156A	IMS RTCP [Version 6]
+0x156B	IMS QDJ Enqueue [Version 1]
+0x156C	IMS QDJ Dequeue [Version 2]
+0x156D	IMS QDJ Update [Version 1]
+0x156E	IMS SIP Message [Version 1]
+0x156F	Reserved
+0x1570	Reserved
+0x1571	IMS AMR Redundancy [Version 1]
+0x1572	Network IP Rm Tx 100 Bytes
+0x1573	Network IP Rm Rx 100 Bytes
+0x1574	Network IP Rm Tx Full
+0x1575	Network IP Rm Rx Full
+0x1576	Network IP Um Tx 100 Bytes
+0x1577	Network IP Um Rx 100 Bytes
+0x1578	Network IP Um Tx Full
+0x1579	Network IP Um Rx Full
+0x1586	ADSP AFE Rx/Tx PCM Log
+0x1587	Reserved
+0x1588	Qmi Supported Interfaces
+0x1589	GNSS SAP SDP Events [Version 0]
+0x158A	Voice FW Processing Rx/Tx Log
+0x158B	Voice FW Stream Rx/Tx Log
+0x158C	XO ADC [Version 1]
+0x158D	Reserved
+0x158E	Reserved
+0x158F	Reserved
+0x1590	CxM BT Control Plane Messages
+0x1591	CxM WLAN Control Plane Messages
+0x1592	CxM LTE Control Plane Messages
+0x1593	CxM BT Data Plane Messages
+0x1594	CxM WLAN Data Plane Messages
+0x1595	CxM LTE Data Plane Messages
+0x1596	Reserved
+0x1597	Tcxo Manager IFC Summary
+0x1598	Tcxo Manager IFC RPUSH data
+0x1599	GNSS LOC LTE OTDOA PRS RSTD MEAS [Version 7]
+0x159A	Reserved
+0x159B	Reserved
+0x159C	Reserved
+0x159D	Reserved
+0x159E	Reserved
+0x159F	Reserved
+0x15A0	Reserved
+0x15A1	Reserved
+0x15A2	Reserved
+0x15A3	Reserved
+0x15A4	SNS Facing Config [Version 2]
+0x15A5	Reserved
+0x15A6	Reserved
+0x15A7	Reserved
+0x15A8	Reserved
+0x15A9	Reserved
+0x15AA	Reserved
+0x15AB	Reserved
+0x15AC	Reserved
+0x15AD	Reserved
+0x15AE	Reserved
+0x15AF	Reserved
+0x15B0	Reserved
+0x15B1	GNSS PDSM Best Available Info [Version 1]
+0x15B2	GNSS PDSM EXT Status Best Available Info [Version 1]
+0x15B3	Kernal Task Profile V3
+0x15B4	Kernal System Profile V3
+0x15B5	Reserved
+0x15B6	Reserved
+0x15B7	Reserved
+0x15B8	Reserved
+0x15B9	Reserved
+0x15BA	Reserved
+0x15BB	Reserved
+0x15BC	Reserved
+0x15BD	RGS Log Packet
+0x15BE	RFIC PMIC Status [Version 1]
+0x15BF	HDR RF Warmpup
+0x15C0	HDR RF Power Limiting
+0x15C1	HDR RF State
+0x15C2	HDR RF Sleep
+0x15C3	HDR RF Tx State
+0x15C4	HDR RF IntelliCeiver State
+0x15C5	HDR RF LNA Switch Point
+0x15C6	HDR Rx Calibration
+0x15C7	HDR RF API
+0x15C8	HDR RF Rx PLL Locking Status
+0x15C9	HDR RF Rx Quality
+0x15CA	1X RF Rx Quality
+0x15CB	IMS VDJ Enqueue [Version 1]
+0x15CC	IMS VDJ Dequeue [Version 3]
+0x15CD	Reserved
+0x15CE	Reserved
+0x15CF	Reserved
+0x15D0	Reserved
+0x15D1	Reserved
+0x15D2	DSDA MCDO TX  [Version 256]
+0x15D3	DSDA MCDO RX  [Version 256]
+0x15D4	Reserved
+0x15D5	Reserved
+0x15D7	Reserved
+0x15D8	Reserved
+0x15D9	HDR DO2W QTA [Version 1]
+0x1601	Reserved
+0x1602	FW CDMA1x RX Timing
+0x1603	FW CDMA1x Finger State Machine
+0x1604	Reserved
+0x1605	FW CDMA1x Demfront Finger Configuration
+0x1606	Reserved
+0x1607	Reserved
+0x1608	FW CDMA1x  RxAGC 1/6 PCG
+0x1609	FW CDMA1x RxAGC 1/12 PCG
+0x1610	FW CDMA1x RPC
+0x1611	FW CDMA1x FL ACK
+0x1613	Reserved
+0x1615	Reserved
+0x1616	FW CDMA1x FL DRX
+0x1617	Reserved
+0x1618	FW CDMA1x TX 1/2 PCG
+0x1619	FW CDMA1x TX Per-Update
+0x161A	DSDA CDMA1x RX  [Version 1]
+0x161B	DSDA CDMA1x TX  [Version 2]
+0x161C	FW CDMA1x TX Frame Configuration
+0x1620	FW CDMA1x  I/Q Sample Dump
+0x1628	Reserved
+0x1629	Reserved
+0x1630	FW CDMA1x AFC
+0x1631	FW CDMA1x RX Sync
+0x1633	Reserved
+0x1634	Reserved
+0x1635	Reserved
+0x1636	Reserved
+0x1637	Reserved
+0x1638	Reserved
+0x1639	Reserved
+0x163A	Reserved
+0x163B	Reserved
+0x163C	Reserved
+0x163D	Reserved
+0x163E	Reserved
+0x163F	Reserved
+0x1640	Reserved
+0x1641	Reserved
+0x1642	Reserved
+0x1643	MCS QCSI Event Packet
+0x1644	QURT Task Profile [Version 1]
+0x1645	QURT PM [Version 1]
+0x1646	TCXOMGR RGS Retrieval Log
+0x1647	Reserved
+0x1648	Indoor Info
+0x1649	Reserved
+0x164A	Reserved
+0x1650	Indoor Active Scan
+0x1651	Reserved
+0x1652	Reserved
+0x1653	Reserved
+0x1654	Reserved
+0x167A	LOWI-LP [Version 1]
+	Subpacket 56	Service_LOWI [Version 1]
+	Subpacket 58	Service_WLS [Version 1]
+0x1748	Reserved
+0x1749	ANT HCI Command Log
+0x1750	ANT HCI EV Log
+0x1751	IMS Camera [Version 1]
+0x1752	IMS Video Encoder [Version 2]
+0x1753	IMS Video Playout [Version 4]
+0x1754	IRAT List Manager [Version 4]
+0x1755	Reserved
+0x1756	GNSS BDS Measurement Report [Version 1]
+0x1757	EMBMS Service Layer Session  [Version 0]
+0x1758	EMBMS Service Layer Flute [Version 1]
+0x1759	EMBMS Service Layer Local HTTP Server [Version 2]
+0x175A	EMBMS Service Layer Bootstrap [Version 2]
+0x175B	EMBMS Service Layer Service Discovery [Version 0]
+0x175C	EMBMS Service Layer I2 [Version 0]
+0x175D	EMBMS Service Layer I1 Common [Version 1]
+0x175E	EMBMS Service Layer I1 Streaming [Version 1]
+0x175F	EMBMS Service Layer Streaming [Version 1]
+0x1760	EMBMS Service Layer I1 File Download [Version 1]
+0x1761	EMBMS Service Layer Session/File Schedule [Version 0]
+0x1762	EMBMS Service Layer File Repair [Version 1]
+0x1763	EMBMS Service Layer Reception Reporting [Version 0]
+0x1764	EMBMS Service Layer MSP Common [Version 1]
+0x1765	EMBMS Service Layer USD Data [Version 0]
+0x1766	EMBMS Configuration [Version 0]
+0x1767	EMBMS FD Store [Version 0]
+0x1768	EMBMS Generic Dump [Version 0]
+0x1769	Reserved
+0x176A	Reserved
+0x17D8	Audio Front End (AFE) Calibration Data Logging
+0x17D9	RFA Device PA
+0x17DA	RFA Device ASM
+0x17DB	RFA Device PAPM
+0x17DC	RFA Device Transceiver
+0x17DD	RFA Device Tuner
+0x17DE	RFA Device THERM
+0x17DF	RFA Device HDET Log
+0x17E0	RFA RFC Signals
+0x17E1	RFA RFC Devices
+0x17E2	RFA GSM CMN
+0x17E3	RFA GSM RX
+0x17E4	RFA GSM TX
+0x17E5	RFA GSM Temp Comp
+0x17E6	RFA GSM VBATT Comp
+0x17E7	RFA GSM IRAT
+0x17E8	RFA GSM FTM
+0x17E9	RFA GSM Cal
+0x17EA	Reserved
+0x17EB	Reserved
+0x17EC	Reserved
+0x17ED	Reserved
+0x17EE	Reserved
+0x17EF	Reserved
+0x17F0	Reserved
+0x17F1	Reserved
+0x17F2	IMS Voice Call Statistics [Version 8]
+0x17F3	Reserved
+0x17F4	Reserved
+0x17F5	Reserved
+0x17F6	WWCoex Action Info 
+0x17F7	WWCoex Power Info [Version 5]
+0x17F8	Reserved
+0x17F9	Reserved
+0x17FA	Reserved
+0x17FB	Reserved
+0x17FC	Reserved
+0x17FD	Reserved
+0x17FE	Reserved
+0x17FF	Reserved
+0x1800	Reserved
+0x1801	Reserved
+0x1802	Near Field Communication
+0x1803	TCXOMGR Coarse DC Cal
+0x1804	ADSP Core Voice Driver Stream Tx
+0x1805	ADSP Core Voice Driver Stream Rx
+0x1806	Reserved
+0x1807	Reserved
+0x1808	Reserved
+0x1809	Reserved
+0x180A	Reserved
+0x180B	QMI Link 17 RX PDU
+0x180C	QMI Link 17 TX PDU
+0x180D	QMI Link 18 RX PDU
+0x180E	QMI Link 18 TX PDU
+0x180F	QMI Link 19 RX PDU
+0x1810	QMI Link 19 TX PDU
+0x1811	QMI Link 20 RX PDU
+0x1812	QMI Link 20 TX PDU
+0x182C	Reserved
+0x182D	RF WCDMA Rx/Tx AGC Parameters
+0x182E	ROHC Decompressor Input [Version 2]
+0x182F	ROHC Compressor Output [Version 2]
+0x1830	IMS VoLTE Session Setup [Version 3]
+0x1831	IMS VoLTE Session End [Version 3]
+0x1832	IMS Registration [Version 1]
+0x1833	Reserved
+0x1834	Reserved
+0x1835	Reserved
+0x1836	Reserved
+0x1837	Reserved
+0x1838	GNSS ME DPO Status Report Log [Version 116]
+0x1839	Reserved
+0x183A	Reserved
+0x183B	Reserved
+0x183C	Reserved
+0x183D	Reserved
+0x183E	IPDC Compressor Stats [Version 2]
+0x183F	ROHC Compressor Statistics Ex [Version 1]
+0x1840	ROHC Decompressor Statistics Ex [Version 1]
+0x1841	RF ASDIV
+0x1842	Reserved
+0x1843	Reserved
+0x1844	Reserved
+0x1845	Reserved
+0x1846	Reserved
+0x1847	Reserved
+0x1848	Reserved
+0x1849	RFLM FBRX Packet [Version 9]
+0x184A	RFLM FBRX Sample Capture
+0x184B	ADSP VCP VOICEPROC RTM
+0x184C	LTE RF FED Tx AGC
+0x184D	Reserved
+0x184E	Call Manager Serving System MSIM Event [Version 3]
+0x184F	Data Modem IPA Stats [Version 8]
+0x1850	Data Modem IPA IP Filter Stats [Version 3]
+0x1851	Reserved
+0x1852	Reserved
+0x1853	Data Modem IPA SIO Config [Version 5]
+0x1854	Reserved
+0x1855	Reserved
+0x1856	Reserved
+0x1857	Reserved
+0x1858	Reserved
+0x1859	DS First Reorig IP Packet Header [Version 1]
+0x185A	Reserved
+0x185B	Reserved
+0x185C	Reserved
+0x185D	Reserved
+0x185E	Reserved
+0x185F	Reserved
+0x1860	Reserved
+0x1861	Reserved
+0x1862	Reserved
+0x1863	Reserved
+0x1864	Reserved
+0x1865	Reserved
+0x1866	Reserved
+0x1867	Reserved
+0x1868	RFLM TDSCDMA Uplink Report
+0x1869	RFLM TDSCDMA Downlink Report
+0x186A	Reserved
+0x186B	Reserved
+0x186C	Reserved
+0x186D	Reserved
+0x186E	Reserved
+0x186F	Reserved
+0x1870	WWCOEX Band Avoidance Serv Power Info  [Version 1]
+0x1871	WWCOEX BA Blacklist Info  [Version 1]
+0x1872	AOSTLM Report
+0x1873	Reserved
+0x1874	Reserved
+0x1875	Reserved
+0x1876	MCPM Idle Awake Power Info
+0x1877	Reserved
+0x1878	Reserved
+0x1879	Reserved
+0x187A	WCDMA Session Power Info
+0x187B	Reserved
+0x187C	Reserved
+0x187D	LTE Session Power Info
+0x187E	Reserved
+0x187F	PA Power
+0x1880	Reserved
+0x1881	Reserved
+0x1882	ADSP Listen Output
+0x1883	Reserved
+0x1884	Reserved
+0x1885	Reserved
+0x1886	GNSS GAL Measurement Report [Version 0]
+0x1887	Reserved
+0x1888	Reserved
+0x1889	Reserved
+0x188A	Reserved
+0x188B	Reserved
+0x188C	Reserved
+0x188D	SNS UIMG Mode [Version 3]
+0x188E	Reserved
+0x188F	Reserved
+0x1890	Reserved
+0x1892	MCS CxM SMEM Data
+0x1893	MCS CxM Low Prio
+0x1894	MCS CxM Medium Prio
+0x1895	MCS CxM High Prio
+0x1896	Reserved
+0x1897	Reserved
+0x1898	MCS WWCOEX Slot Activity Timeline Info [Version 3]
+0x1899	GNSS Geofence Motion Detection WiFi State [Version 2]
+0x189A	Reserved
+0x189B	Reserved
+0x189C	Reserved
+0x189D	Reserved
+0x189E	Reserved
+0x189F	MCS WWCOEX Spur Info
+0x18A0	Reserved
+0x18A1	GNSS LOC LTE TDP TimeStamped Meas [Version 0]
+0x18A2	Reserved
+0x18A3	Reserved
+0x18A4	Reserved
+0x18A5	SNS Generic Message
+0x18A6	Reserved
+0x18A7	MCS CFCM Monitor Info [Version 2]
+0x18A8	MCS CFCM Command Info [Version 2]
+0x18A9	Policy Manager Config Info [Version 3]
+0x18AA	Policy Manager Subscription Info [Version 3]
+0x18AB	Reserved
+0x18AC	GNSS GTS Time Update [Version 4]
+0x18AD	Reserved
+0x18AE	GNSS Global Time Services Events [Version 4]
+0x18AF	Reserved
+0x18B0	Reserved
+0x18B1	Reserved
+0x18B2	Reserved
+0x18B3	Reserved
+0x18B4	Reserved
+0x18B5	Reserved
+0x18B6	Reserved
+0x18B7	Reserved
+0x18B8	Reserved
+0x18B9	Reserved
+0x18BA	Reserved
+0x18BB	Reserved
+0x18BC	Reserved
+0x18BD	Reserved
+0x18BE	Reserved
+0x18BF	Reserved
+0x18C0	ANT HCI Data Tx
+0x18C1	ANT HCI Data Rx
+0x18C2	Reserved
+0x18C3	ATuner Info Data [Version 4]
+0x18C4	ATuner Internal Data  [Version 1]
+0x18C5	Reserved
+0x18C6	Reserved
+0x18C7	Reserved
+0x18C8	GNSS LocMW ALS IOD Data [Version 1]
+0x18C9	Reserved
+0x18CA	Searcher Reserved Code 1
+0x18CB	Searcher Reserved Code 2
+0x18CC	Reserved
+0x18CD	Reserved
+0x18CE	Searcher Reserved Code 5
+0x18CF	Searcher Reserved Code 6
+0x18D0	Searcher Reserved Code 7
+0x18D1	Searcher Reserved Code 8
+0x18D2	Searcher Reserved Code 9
+0x18D3	Searcher Reserved Code 10
+0x18D4	Searcher Reserved Code 11
+0x18D5	Searcher Reserved Code 12
+0x18D6	Searcher Reserved Code 13
+0x18D7	Searcher Reserved Code 14
+0x18D8	Searcher Reserved Code 15
+0x18D9	Reserved
+0x18DA	GPS LOC PRS FD Buffer
+0x18DB	GPS LOC PRS PROG Params
+0x18DC	BT LE LLP TX
+0x18DD	BT LE LLP RX
+0x18DE	RF Concurrency Manager
+0x18DF	Reserved
+0x18E0	Reserved
+0x18E1	Reserved
+0x18E2	Reserved
+0x18E3	Reserved
+0x18E4	Reserved
+0x18E5	Reserved
+0x18E6	Reserved
+0x18E7	Reserved
+0x18E8	Reserved
+0x18E9	Reserved
+0x18EA	Reserved
+0x18EB	GNSS Geofencing ALS IOD Sensor State [Version 1]
+0x18EC	Reserved
+0x18ED	Reserved
+0x18EE	Reserved
+0x18EF	Reserved
+0x18F0	GNSS Geofence statistics [Version 1]
+0x18F1	Reserved
+0x18F2	Reserved
+0x18F3	PS Filter Info [Version 1]
+0x18F4	Reserved
+0x18F5	GNSS QZSS SBAS Measurement Report [Version 0]
+0x18F6	Reserved
+0x18F7	RFLM FBRx Basic Param Updates [Version 3]
+0x18F8	MCS VBATT Info [Version 2]
+0x18F9	Reserved
+0x18FA	GNSS APDR Diag message [Version 1]
+0x18FB	Reserved
+0x18FC	Reserved
+0x18FD	Reserved
+0x18FE	Reserved
+0x18FF	MCS Wwcoex Chnl Cflt  [Version 2]
+0x1900	MCS Wwcoex FW Query [Version 2]
+0x1901	MMGSDI Bootup Message [Version 1]
+0x1902	Reserved
+0x1903	UIM Powerup Message [Version 0]
+0x1904	IMS Video Call Statistics
+0x1905	IMS SIP Video Established
+0x1906	IMS SIP Video Session EST Failed
+0x1907	IMS SIP Video Upgrade Successful
+0x1908	IMS SIP Video Upgrade Failure
+0x1909	IMS SIP Video Downgrade Successful
+0x190A	IMS SIP Video Abnormal Session Release
+0x190B	IMS SIP Video Session Drop
+0x190C	Network Physical Link Tx 100 Bytes
+0x190D	Network Physical Link Rx 100 Bytes
+0x190E	Network Physical Link Tx Full
+0x190F	Network Physical Link Rx Full
+0x1910	Network IP Header Rm Tx
+0x1911	Network IP Header Rm Rx
+0x1912	Network IP Header Um Tx
+0x1913	Network IP Header Um Rx
+0x1914	Modem Voice Services UL Vocoder Packet
+0x1915	Modem Voice Services DL Vocoder Packet
+0x1916	Reserved
+0x1917	Reserved
+0x1918	Reserved
+0x1919	Reserved
+0x191A	Reserved
+0x191B	Reserved
+0x191C	Reserved
+0x191D	Reserved
+0x191E	PMIC ECM [Version 1]
+0x191F	Reserved
+0x1920	RFA Device Coupler
+0x1921	RFA Device LNA
+0x1922	Reserved
+0x192A	Reserved
+0x192B	QMI Link 21 RX PDU
+0x192C	QMI Link 21 TX PDU
+0x192D	ULog Payload
+0x192E	Reserved
+0x1930	WLAN Offload Statistics
+0x1931	WLAN FW MCC Utilization [Version 1]
+0x1932	WLAN FW BEACON TX Statistics [Version 1]
+0x1933	WLAN FW BEACON RX Statistics [Version 1]
+0x1934	WLAN FW SCAN Report [Version 1]
+0x1935	WLAN Channel Cache [Version 1]
+0x1936	WLAN RSSI Update [Version 1]
+0x1937	WLAN Candidate List [Version 1]
+0x1938	WLAN FW DFS Allowed Channels [Version 1]
+0x1939	WLAN FW TDLS Statistics [Version 1]
+0x193A	WLAN FW RTT Measurement Request [Version 1]
+0x193B	WLAN FW RTT Response [Version 1]
+0x193C	WLAN HALPHY RSSI Report [Version 1]
+0x193D	WLAN HALPHY PHY Stats Report [Version 1]
+0x193E	WLAN HALPHY Chan Info Report [Version 1]
+0x193F	WLAN HALPHY TX Power Report [Version 1]
+0x1940	WLAN HALPHY CAL Time Report [Version 1]
+0x1941	WLAN OTA Association RX [Version 1]
+0x1942	WLAN OTA Beacon RX [Version 1]
+0x1943	WLAN OTA Beacon TX [Version 1]
+0x1944	WLAN OTA TX Probe Request [Version 1]
+0x1945	WLAN OTA RX Probe Request [Version 1]
+0x1946	WLAN OTA RX Probe Response [Version 1]
+0x1947	WLAN OTA TX Probe Response [Version 1]
+0x1948	WLAN OTA TX Action Frame [Version 1]
+0x1949	WLAN OTA RX Action Frame [Version 1]
+0x194A	Reserved
+0x194B	Reserved
+0x194C	WLAN OTA TX [Version 1]
+0x194D	WLAN OTA RX [Version 1]
+0x194E	Reserved
+0x194F	Reserved
+0x1950	Reserved
+0x1951	Reserved
+0x1952	Reserved
+0x1953	Reserved
+0x1954	Reserved
+0x1955	Reserved
+0x1956	Reserved
+0x1957	Reserved
+0x1958	Reserved
+0x1959	QDR DR RAW Sensor Data [Version 6]
+0x195A	Reserved
+0x195B	QDR NAV Report [Version 7]
+0x195C	Reserved
+0x195D	QDR DR Status [Version 20]
+0x195E	QDR DR NAV State [Version 20]
+0x195F	Reserved
+0x1960	Reserved
+0x1961	Reserved
+0x1962	Reserved
+0x1963	Reserved
+0x1964	SNS HDRLL Data Packet  [Version 4]
+0x1965	Reserved
+0x1966	Reserved
+0x1967	Prose DISC Request Info Message [Version 1]
+0x1968	Prose DISC Announce Info Message [Version 1]
+0x1969	Prose DISC Monitor Info Message [Version 1]
+0x196A	Prose DISC Match Info Message [Version 1]
+0x196B	Prose DISC Outcoming PC3 Message [Version 1]
+0x196C	Prose DISC Incoming PC3 Message [Version 1]
+0x196D	Reserved
+0x196E	Reserved
+0x196F	SNS EEW Config
+0x1970	SNS EEW Result
+0x1971	SNS EEW Result2
+0x1972	SNS EEW Report
+0x1973	Reserved
+0x1974	Reserved
+0x1975	Reserved
+0x1976	Reserved
+0x1977	Reserved
+0x1978	Reserved
+0x1979	Reserved
+0x197A	Reserved
+0x197B	Reserved
+0x197C	Reserved
+0x197D	Reserved
+0x197E	Reserved
+0x197F	Reserved
+0x1980	Reserved
+0x1981	Reserved
+0x1982	Reserved
+0x1983	Reserved
+0x1984	Reserved
+0x1985	Reserved
+0x1986	Reserved
+0x1987	Reserved
+0x1988	MPSSPERF Modem Heap Profile
+0x1989	MPSSPERF AMSS Heap Profile
+0x198A	Modem Memory Profile1
+0x198B	Modem Memory Profile2
+0x198C	Modem Memory Profile3
+0x198D	Modem Memory Profile4
+0x198E	Reserved
+0x198F	Reserved
+0x1990	Reserved
+0x1991	Call Manager Stats Event [Version 2]
+0x1992	SDSR EQPRL Packet [Version 1]
+0x1993	Reserved
+0x1994	SDSR List Print Packet [Version 1]
+0x1995	APR Modem UserPD
+0x1996	APR ADSP UserPD
+0x1997	PM SS History Info [Version 1]
+0x1998	PM PH History Info [Version 1]
+0x1999	PM UIM History Info [Version 1]
+0x199A	PM Call History Info [Version 1]
+0x199B	PM Policy Stats Info [Version 3]
+0x199C	Reserved
+0x199D	Reserved
+0x199E	Reserved
+0x199F	Reserved
+0x19A0	Reserved
+0x19A1	Reserved
+0x19A2	WLAN WDI IPA TX State [Version 1]
+0x19A3	WLAN WDI IPA RX State [Version 1]
+0x19A4	Reserved
+0x19A5	Reserved
+0x19A6	Reserved
+0x19A7	Reserved
+0x19A8	Reserved
+0x19A9	PDR3.0 Technology Event Report
+0x19AA	Reserved
+0x19AB	Reserved
+0x19AC	Reserved
+0x19AD	I15P4 Response
+0x19AE	Reserved
+0x19AF	ADSP Audio Decoder Output
+0x19B0	ADSP Audio Common Object PPO
+0x19B1	ADSP Audio Per Object PPO
+0x19B2	Reserved
+0x19B3	Reserved
+0x19B4	Reserved
+0x19B5	RF MAAT Internal Data [Version 3]
+0x19B6	Reserved
+0x19B7	UIM APDU [Version 1]
+0x19B8	Atuner Closed Loop Data [Version 3]
+0x19B9	SNS HDRLL Data Client  [Version 4]
+0x19BA	Reserved
+0x19BB	Reserved
+0x19BC	Reserved
+0x19BD	Reserved
+0x19BE	Reserved
+0x19BF	Reserved
+0x19C0	Reserved
+0x19C1	Reserved
+0x19C2	MCS CXM Metrics Info [Version 1]
+0x19C3	Reserved
+0x19C4	Reserved
+0x19C5	SNS Client API Request
+0x19C6	SNS Client API Response
+0x19C7	SNS Client API Event
+0x19C8	SNS Sensor API Request
+0x19C9	SNS Sensor API Event
+0x19CA	Reserved
+0x19CB	SNS Sensor API State Ext
+0x19CC	SNS HW Interrupt
+0x19CD	Reserved
+0x19CE	Reserved
+0x19CF	GNSS GPS L2 Measurement Report [Version 0]
+0x19D0	Reserved
+0x19D1	Reserved
+0x19D2	Reserved
+0x19D3	ADSP USB In Out PCM Log
+0x19D4	Reserved
+0x19D5	Reserved
+0x19D6	SNS Island Transition
+0x19D7	Reserved
+0x19D8	SNS Memory Utilization
+0x19D9	SNS HLOS Request [Version 1]
+0x19DA	SNS HLOS Event [Version 1]
+0x19DB	Reserved
+0x19DC	Reserved
+0x19DD	Reserved
+0x19DE	Reserved
+0x19DF	Reserved
+0x19E0	Reserved
+0x19E1	Reserved
+0x19E2	Reserved
+0x19E3	Reserved
+0x19E4	Reserved
+0x19E5	Reserved
+0x19E6	Reserved
+0x19E7	RoHC TCP Compressor [Version 3]
+0x19E8	RoHC TCP Decompressor [Version 2]
+0x19E9	RoHC TCP Feedback Compressor [Version 1]
+0x19EA	RoHC TCP Feedback Decompressor [Version 1]
+0x19EB	GNSS GPS L5 Measurement Report [Version 1]
+0x19EC	Reserved
+0x19ED	Atuner Detune Info [Version 1]
+0x19EE	Reserved
+0x19EF	DS Flow Control Trigger [Version 2]
+0x19F0	Reserved
+0x19F1	Reserved
+0x19F2	Reserved
+0x19F3	Reserved
+0x19F4	Reserved
+0x19F5	Reserved
+0x19F6	Reserved
+0x19F7	Reserved
+0x19F8	Reserved
+0x19F9	Reserved
+0x19FA	Reserved
+0x19FB	Reserved
+0x19FC	Reserved
+0x19FD	Reserved
+0x19FE	Reserved
+0x19FF	Reserved
+0x1A00	Reserved
+0x1A01	Reserved
+0x1A02	Reserved
+0x1A03	Reserved
+0x1A04	Reserved
+0x1A05	Reserved
+0x1A06	Reserved
+0x1A07	Reserved
+0x1A08	Reserved
+0x1A09	Reserved
+0x1A0A	Reserved
+0x1A0B	Reserved
+0x1A0C	WLAN PA Muting [Version 1]
+0x1A0D	Reserved
+0x1A0E	Reserved
+0x1A0F	WLAN FW P2P NOA Change
+0x1A10	WLAN FW Keepalive Beaconing Device
+0x1A11	WLAN FW Keepalive Client Device
+0x1A12	WLAN IP Header Info
+0x1A13	Reserved
+0x1A14	Reserved
+0x1A15	Reserved
+0x1A16	Reserved
+0x1A17	Reserved
+0x1A18	Reserved
+0x1A19	Reserved
+0x1A1A	Reserved
+0x1A1B	Reserved
+0x1A1C	Reserved
+0x1A1D	Reserved
+0x1A1E	Reserved
+0x1C00	NR5G Main Control Sequence  [Version 2]
+	Subpacket 0	Reserved [Version 1]
+	Subpacket 1	Reserved [Version 1]
+	Subpacket 2	Reserved [Version 3]
+	Subpacket 3	Reserved [Version 2]
+	Subpacket 4	Reserved [Version 1]
+	Subpacket 5	Reserved [Version 1]
+	Subpacket 6	Reserved [Version 1]
+	Subpacket 7	Reserved [Version 1]
+	Subpacket 8	Reserved [Version 1]
+	Subpacket 9	Tune [Version 1]
+	Subpacket 13	Reserved [Version 1]
+	Subpacket 14	Reserved [Version 1]
+	Subpacket 15	Reserved [Version 1]
+	Subpacket 16	Reserved [Version 1]
+	Subpacket 17	Reserved [Version 1]
+	Subpacket 18	Reserved [Version 1]
+0x1C01	Reserved
+0x1C02	Reserved
+0x1C03	Reserved
+0x1C04	Reserved
+0x1C05	Reserved
+0x1C06	Reserved
+0x1C07	NR5G Sub6 TxAGC [Version 5]
+0x1C08	NR5G  MMW TxAGC [Version 3]
+0x1C09	NR5G  MMW RxAGC [Version 4]
+0x1C0A	Reserved
+0x1C0B	Reserved
+0x1C0C	NR5G Sub6 RxAGC [Version 5]
+0x1C0D	NR5G SDRIU Info [Version 5]
+	Subpacket 10	SDRIU Info [Version 1]
+0x1C0E	Reserved
+0x1C0F	NR5G MMW AFC  [Version 1]
+0x1C10	Reserved
+0x1C11	Reserved
+0x1C12	Reserved
+0x1C13	NR5G PDET Status [Version 2]
+0x1C15	Reserved
+0x1C16	Reserved
+0x1C17	Reserved
+0x1C18	NR5G RF Third Party PA [Version 1]
+	Subpacket 27	Third Party PA Info [Version 1]
+0x1C40	Reserved
+0x1C41	IMS ICS User Settings [Version 0]
+0x1C42	IMS ICS PM Config [Version 0]
+0x1C43	IMS ICS Network Conditions [Version 0]
+0x1C44	IMS ICS TRM [Version 0]
+0x1C45	IMS ICS NW Connectivity [Version 0]
+0x1C46	IMS ICS Timer [Version 0]
+0x1C47	IMS ICS Measurements [Version 0]
+0x1C48	IMS ICS Call States [Version 0]
+0x1C49	IMS ICS PDN State [Version 0]
+0x1C4A	Reserved
+0x1C4B	Reserved
+0x1C4C	Reserved
+0x1C4D	Reserved
+0x1C4E	Reserved
+0x1C4F	Reserved
+0x1C50	Reserved
+0x1C51	Reserved
+0x1C52	Reserved
+0x1C53	Reserved
+0x1C54	GNSS HLOS EP Engine Message [Version 3]
+0x1C55	Reserved
+0x1C56	Reserved
+0x1C57	Reserved
+0x1C58	Reserved
+0x1C59	Reserved
+0x1C5A	Reserved
+0x1C5B	Reserved
+0x1C5C	Reserved
+0x1C5D	Reserved
+0x1C5E	Reserved
+0x1C5F	GNSS BDS B2 Measurements [Version 1]
+0x1C60	GNSS GAL E5A Measurements [Version 1]
+0x1C61	Reserved
+0x1C62	Reserved
+0x1C63	Reserved
+0x1C64	Reserved
+0x1C65	Reserved
+0x1C66	Reserved
+0x1C67	GNSS CC CCP Status [Version 3]
+0x1C68	GNSS CC DCP Status [Version 3]
+0x1C69	Reserved
+0x1C6A	GNSS EH Aggregator State And Output [Version 2]
+0x1C6B	Reserved
+0x1C6C	Reserved
+0x1C6D	Reserved
+0x1C6E	IPA Common Stats [Version 2]
+0x1C6F	IPA DL Common Stats [Version 2]
+0x1C70	Reserved
+0x1C71	IPA UL Common Stats [Version 4]
+0x1C72	Reserved
+0x1C73	Reserved
+0x1C74	Reserved
+0x1C75	Reserved
+0x1C76	APSS Audio FFV [Version 0]
+0x1C77	Reserved
+0x1C78	Reserved
+0x1C7B	Reserved
+0x1C7C	Reserved
+0x1C7D	Reserved
+0x1C7E	Reserved
+0x1C7F	Reserved
+0x1C80	Reserved
+0x1C81	Reserved
+0x1C82	Reserved
+0x1C83	Reserved
+0x1C84	Reserved
+0x1C85	Reserved
+0x1C86	Reserved
+0x1C87	Reserved
+0x1C88	Reserved
+0x1C89	Reserved
+0x1C8A	Reserved
+0x1C8B	Reserved
+0x1C8C	Reserved
+0x1C8D	QCSI Event Packet [Version 1]
+	Subpacket 0	Service_CTL [Version 1]
+	Subpacket 1	Service_WDS [Version 1]
+	Subpacket 2	Service_DMS [Version 1]
+	Subpacket 3	Service_NAS [Version 1]
+	Subpacket 4	Service_QOS [Version 1]
+	Subpacket 5	Service_WMS [Version 1]
+	Subpacket 6	Service_PDS [Version 1]
+	Subpacket 7	Service_AUTH [Version 1]
+	Subpacket 8	Service_AT [Version 1]
+	Subpacket 9	Service_VOICE [Version 2]
+	Subpacket 10	Service_CAT [Version 2]
+	Subpacket 11	Service_UIM [Version 1]
+	Subpacket 12	Service_PBM [Version 1]
+	Subpacket 15	Service_TEST [Version 1]
+	Subpacket 16	Service_LOC [Version 2]
+	Subpacket 17	Service_SAR [Version 1]
+	Subpacket 18	Service_IMSS [Version 1]
+	Subpacket 26	Service_WDA [Version 1]
+	Subpacket 29	Service_CSVT [Version 1]
+	Subpacket 31	Service_IMSP [Version 1]
+	Subpacket 33	Service_IMSA [Version 1]
+	Subpacket 34	Service_COEXIST [Version 1]
+	Subpacket 36	Service_PDC [Version 1]
+	Subpacket 39	Service_BIT [Version 1]
+	Subpacket 40	Service_IMRTP [Version 1]
+	Subpacket 42	Service_DSD [Version 1]
+	Subpacket 46	Reserved [Version 1]
+	Subpacket 47	Reserved [Version 1]
+	Subpacket 48	Service_DFS [Version 1]
+	Subpacket 50	Service_UIMRMT [Version 1]
+	Subpacket 68	Service_OTT [Version 1]
+	Subpacket 70	Service_LTE_INTERFACE [Version 1]
+	Subpacket 73	Reserved [Version 1]
+	Subpacket 76	Reserved [Version 1]
+	Subpacket 77	Reserved [Version 1]
+	Subpacket 78	Reserved [Version 1]
+	Subpacket 79	Service_IMS_IOT [Version 1]
+	Subpacket 80	Service_LOC_IOT [Version 2]
+	Subpacket 82	Service_MSE [Version 1]
+	Subpacket 770	Service_IMS_DCM [Version 1]
+	Subpacket 1055	Service_OW_EXT [Version 1]
+	Subpacket 1056	Reserved [Version 1]
+0x1C8E	Reserved
+0x1C8F	GNSS Client API Location Report [Version 3]
+0x1C90	GNSS Client API SV Report [Version 3]
+0x1C93	GNSS ME NAVIC Measurement Report [Version 0]
+0x1C94	IMS SIP Message Report [Version 1]
+0x1C95	Reserved
+0x1C96	Reserved
+0x1C97	GNSS QZSS L1S Measurement Report [Version 0]
+0x1C98	Reserved
+0x1C99	Reserved
+0x1C9B	Reserved
+0x1C9C	Reserved
+0x1C9D	Reserved
+0x1C9E	Reserved
+0x1C9F	Reserved
+0x1CA0	Reserved
+0x1CA1	Reserved
+0x1CA2	Reserved
+0x1CA3	Reserved
+0x1CA4	Reserved
+0x1CA5	Reserved
+0x1CA6	Reserved
+0x1CA7	Reserved
+0x1CA8	Reserved
+0x1CA9	Reserved
+0x1CAA	Reserved
+0x1CAB	Reserved
+0x1CAC	Reserved
+0x1CAD	Reserved
+0x1CAE	Reserved
+0x1CAF	Reserved
+0x1CB0	Reserved
+0x1CB1	Reserved
+0x1CB2	Reserved
+0x1CB3	Reserved
+0x1CB4	Reserved
+0x1CB5	Reserved
+0x1CB6	Reserved
+0x1CB7	GNSS client API Measurement Report [Version 2]
+0x1CB8	Reserved
+0x1CB9	IPA CV2X Stats [Version 1]
+0x1CBA	Reserved
+0x1CBB	Reserved
+0x1CBC	GNSS EP REPORT STATUS RESP [Version 1]
+0x1CBD	Reserved
+0x1CC0	RFLM ENDC SLNA Info [Version 2]
+0x1CC1	Reserved
+0x1CC2	Reserved
+0x1CC3	Reserved
+0x1CC4	Reserved
+0x1CC5	Reserved
+0x1CC6	Gnss BDS B1C Measurement Report [Version 1]
+0x1CC7	Gnss Client API SV Poly Report [Version 1]
+0x1CC8	Reserved
+0x1CC9	Reserved
+0x1CCA	Reserved
+0x1CCB	Reserved
+0x1CCC	Reserved
+0x1CCD	Reserved
+0x1CCE	Reserved
+0x1CCF	Reserved
+0x1CD0	Reserved
+0x1CD1	Reserved
+0x1CD2	Reserved
+0x1CD3	Reserved
+0x1CD4	Reserved
+0x1CD5	Reserved
+0x1CD6	Reserved
+0x1CD7	GNSS EP Factory Info [Version 2]
+0x1CD8	NAS Registration Status Info [Version 3]
+0x1CD9	Smart Transmit Information [Version 1]
+0x1CDA	GNSS EP QWES Data Info [Version 2]
+0x1CDB	Reserved
+0x1CDC	Reserved
+0x1CDD	Reserved
+0x1CDE	Reserved
+0x1CDF	Reserved
+0x1CE0	GNSS GAL E5B Measurement Report [Version 1]
+0x1CE1	Reserved
+0x1CE2	Reserved
+0x1CE3	Reserved
+0x1CE4	Reserved
+0x1CE5	Reserved
+0x1CE6	Reserved
+0x1CE7	Reserved
+0x1CE8	Reserved
+0x1CEA	Reserved
+0x1CEB	Reserved
+0x1CEC	Reserved
+0x1CED	Reserved
+0x1FD0	Encapsulated Streaming Download Requests
+0x1FD1	Encapsulated Streaming Download Responses
+0x1FD2	Encapsulated Download Requests
+0x1FD3	Encapsulated Download Responses
+0x1FD4	Reserved
+0x1FE8	QTrace Messages
+0x1FE9	DMC Information Log [Version 1]
+0x1FEA	Diagnostic Request
+0x1FEB	Extended Debug Message
+0x1FEC	Debug Message
+0x1FED	PC Polling Time
+0x1FEE	3D GPS Info
+0x1FEF	DM-generated HTML Page
+0x1FF0	Diagnostic Response Status
+0x1FF1	GPS Information
+0x1FF2	Log File Summary
+0x1FF7	Status Snapshot
+0x1FF9	Extended Logmask
+0x1FFB	Event
+0x1FFC	Annotation
+0x1FFD	Diagnostic Version
+0x1FFE	Status 2
+0x4000	WCDMA Compressed Mode GSM Measurements
+0x4001	WCDMA Compressed Mode Power Control
+0x4002	WCDMA MAC UL Traffic Volume Measurement Report
+0x4003	WCDMA Finger Info for TA
+0x4004	WCDMA DRX Mode, Ver 2
+0x4005	WCDMA Search Cell Reselection Rank [Version 2]
+0x4006	WCDMA ASET & Neighbor Finger TA Info
+0x4008	WCDMA Rx Diversity Antenna Radiation Status
+0x4010	WCDMA Uplink and Downlink Power Control
+0x4011	WCDMA Mutli-Combiner Power Control
+0x4012	WCDMA Sample Server
+0x4013	WCDMA CM BLER
+0x4014	Reserved
+0x4015	WCDMA AGC Ver3
+0x4016	WCDMA Temporal Analysis
+0x4017	WCDMA List Search Ver3
+0x4018	WCDMA Step 1 Search Ver2
+0x4019	WCDMA Step 2 Search Ver2
+0x401A	WCDMA Step 3 Search Ver2
+0x401B	Reserved
+0x401C	WCDMA List Search Ver5
+0x401D	Reserved
+0x401E	Reserved
+0x401F	WCDMA Closed-Loop Transmit Diversity
+0x4023	WCDMA Uplink and Downlink Power Control Edition 2
+0x4024	Reserved
+0x4025	Reserved
+0x4026	Reserved
+0x4027	WCDMA Absolute Priority Cell Reselection [Version 5]
+0x4030	Reserved
+0x4031	WCDMA AGC dB10
+0x4032	Reserved
+0x4033	Reserved
+0x4034	Reserved
+0x4035	Reserved
+0x4105	WCDMA AGC
+0x4106	WCDMA RACH Parameters
+0x4107	WCDMA DRX Mode
+0x4108	WCDMA Transport Channels Downlink
+0x4109	WCDMA Transport Channels Uplink
+0x410A	WCDMA Common Physical Channels Downlink
+0x410B	WCDMA Dedicated Physical Channels Downlink
+0x410C	WCDMA Physical Channels Uplink
+0x410D	WCDMA PRACH
+0x410E	WCDMA RM UL
+0x4110	WCDMA Active Set
+0x4111	WCDMA Neighbor Set
+0x4112	WCDMA Downlink Transport Channel Debugging
+0x4113	WCDMA TB Set Status (CRC)
+0x4115	WCDMA Downlink Transport Format Combination
+0x4116	WCDMA BLER
+0x4117	WCDMA Uplink MAC Logical Channel Parameters
+0x4119	WCDMA RLC UL States
+0x411A	WCDMA RLC UL TM
+0x411B	WCDMA RLC UL UM
+0x411C	WCDMA RLC UL AM
+0x411D	WCDMA DL MAC Logical Channel Parameters
+0x411F	WCDMA RLC DL States
+0x4120	WCDMA RLC DL TM
+0x4121	WCDMA RLC DL UM
+0x4122	WCDMA RLC DL AM
+0x4123	WCDMA RACH Control Parameters
+0x4124	WCDMA Uplink Transport Format Combination
+0x4125	WCDMA RRC States
+0x4126	WCDMA RRC Protocol Errors
+0x4127	WCDMA Cell ID
+0x4128	WCDMA UL Channel Mapping
+0x4129	WCDMA DL Channel Mapping
+0x412A	WCDMA CSG Finger Print Info [Version 0]
+0x412B	WCDMA SIB
+0x412C	WCDMA CMAC DL R99 [Version 1]
+0x412F	WCDMA Signaling Messages
+0x4132	WCDMA RLC DL AM
+0x4133	WCDMA RLC UL AM
+0x4134	WCDMA RLC DL AM PDU
+0x4135	WCDMA RLC DL AM Signaling PDU
+0x4138	WCDMA RLC UL AM Statistics, Ver 2
+0x4139	WCDMA RLC UL AM Statistics
+0x413A	WCDMA Radio Bearer Rates
+0x413B	WCDMA RLC UL AM PDU
+0x413C	WCDMA RLC UL AM Signaling PDU
+0x413F	WCDMA List Search
+0x4144	WCDMA RLC DL AM PDU
+0x4145	WCDMA RLC UL AM Control PDU LOG
+0x4146	WCDMA RLC DL AM Control PDU LOG
+0x4147	WCDMA Finger Info for TA
+0x4149	WCDMA RLC UL AM Statistics
+0x414A	WCDMA RLC DL AM Statistics
+0x414B	WCDMA RLC UL AM PDU
+0x414C	WCDMA Step 1 Search
+0x414D	WCDMA Step 2 Search
+0x414E	WCDMA Step 3 Search
+0x414F	WCDMA List Search
+0x4150	WCDMA Uplink and Downlink Power Control
+0x4151	WCDMA RLC UL Ciphering
+0x4152	WCDMA RLC DL Ciphering
+0x4153	WCDMA L1 Ciphering Packet
+0x4155	WCDMA Inter-Frequency Step 1 Search
+0x4156	WCDMA Inter-Frequency List Search
+0x4158	WCDMA RLC DL PDU Cipher Packet
+0x4159	WCDMA RLC UL PDU Cipher Packet
+0x4160	WCDMA RACH Parameters, Ver2
+0x4161	WCDMA RLC UL Ciphering
+0x4162	WCDMA RLC DL Ciphering
+0x4163	Reserved
+0x4165	WCDMA AGC Ver2
+0x4166	WCDMA L1 UL DPCH Power Info
+0x4168	WCDMA RLC DL PDU Cipher Packet
+0x4169	WCDMA RLC UL PDU Cipher Packet
+0x416B	Reserved
+0x4170	WCDMA List Search Ver6
+0x4171	WCDMA Transport Channels Downlink, Ver 2
+0x4172	WCDMA Downlink Transport Channel Debugging, Ver 2
+0x4173	WCDMA Downlink Transport Format Combination, Ver 2
+0x4174	WCDMA CM Interf Step1 Version 2
+0x4175	WCDMA CM Interf PN Version 2
+0x4176	WCDMA AGC Edition 2 [Version 3]
+0x4177	WCDMA Step 1  Edition 2  [Version 12]
+0x4178	WCDMA NAS-TT Edition 2 [Version 8]
+0x4179	WCDMA PN Search Edition 2 [Version 8]
+0x417A	WCDMA CM Interf PN [Version 2]
+0x417B	Reserved
+0x417C	WCDMA Search History
+0x417D	WCDMA NASTT Search History
+0x417E	WCDMA NASTT Detect History
+0x417F	WCDMA Uplink Data Dump 
+0x4180	WCDMA RACH Preamble
+0x4181	WCDMA RACH Timing
+0x4182	Reserved
+0x4183	WCDMA Step1 Search V10
+0x4184	WCDMA NASTT Search
+0x4185	WCDMA PN Search
+0x4186	WCDMA Temporal Analysis Edition 2
+0x4187	WCDMA ASET Filter History
+0x4188	Reserved
+0x4189	Reserved
+0x418A	Reserved
+0x418B	WCDMA Flexible DL RLC AM PDU [Version 2]
+0x418C	WCDMA SIRT Filter History
+0x418D	WCDMA Ec/I0 Filter History
+0x418E	WCDMA RxD Filter History
+0x4190	Reserved
+0x4191	Reserved
+0x4192	Reserved
+0x4193	Reserved
+0x4194	WCDMA Uplink HSRACH Configuration [Version 1]
+0x4195	WCDMA Uplink HSRACH EDCH Resource Parameters [Version 1]
+0x4196	Reserved
+0x4197	WCDMA Uplink HSRACH Preamble Status [Version 1]
+0x4198	WCDMA ULTPC Debug [Version 2]
+0x4199	Reserved
+0x419A	HS Decode Status Compact Log Packet [Version 1]
+0x419B	HS DPCCH Compact Log Packet [Version 1]
+0x419C	EUL E-TFC Restriction Compact Log Packet [Version 1]
+0x419D	Reserved
+0x419E	Reserved
+0x419F	Reserved
+0x41A0	Reserved
+0x41A1	Reserved
+0x41A2	WCDMA ASET Filter History [Version 1]
+0x41A3	WCDMA SIRT Filter History [Version 1]
+0x41A4	WCDMA Ec/I0 Filter History [Version 1]
+0x41A5	WCDMA RxD Filter History [Version 1]
+0x41A6	MAC UL CIPHER Parameters [Version 1]
+0x41AA	WCDMA DRX PICH Log Packet [Version 8]
+0x41AC	WCDMA Active Set [Version 1]
+0x41AD	WCDMA ASET Snapshot Log Packet [Version 1]
+0x41AE	WCDMA CSG ASF Measurement Request [Version 1]
+0x41AF	WCDMA CSG Cell Reselection [Version 1]
+0x41B0	WCDMA Freq Scan [Version 1]
+0x41B1	Reserved
+0x41B2	WCDMA Mutli-Combiner Power Control
+0x41B3	WCDMA Neighbor Search Optimization [Version 1]
+0x41B4	Reserved
+0x41B5	Reserved
+0x41B6	WCDMA CxM Log Packet [Version 4]
+0x41B7	WCDMA Tuneaway Log Packet [Version 2]
+0x41B9	WCDMA CTCH Enhancement [Version 1]
+0x41BA	Reserved
+0x41BB	WCDMA CM Pattern Activity [Version 1]
+0x41BC	Reserved
+0x41BD	WCDMA RLC AM [Version 1]
+0x41BE	WCDMA CMAC UL R99 [Version 2]
+0x41BF	WCDMA CMAC UL HS [Version 1]
+0x41C0	WCDMA CMAC DL HS [Version 1]
+0x41C1	Reserved
+0x41C2	EUL MAC-e/i Configuration [Version 2]
+0x41C4	Reserved
+0x41C5	Reserved
+0x41C6	WCDMA CM Interf Step1 Version 3 [Version 1]
+0x41C7	WCDMA RLC UL TM [Version 2]
+0x41C8	WCDMA RLC UL UM [Version 1]
+0x41C9	WCDMA RLC DL TM [Version 1]
+0x41CA	WCDMA RLC DL UM [Version 1]
+0x41CB	WCDMA RLC UL AM [Version 1]
+0x41CC	WCDMA RLC DL AM [Version 1]
+0x41CD	Reserved
+0x41CE	MAC UL Cipher Configuration [Version 2]
+0x41CF	Reserved
+0x41D0	Reserved
+0x41D1	Reserved
+0x41D2	SRP And Boosting Log Packet [Version 2]
+0x41D3	WCDMA UL Fixed AM SIG PDU [Version 1]
+0x41D4	WCDMA UL Fixed AM USR PDU [Version 1]
+0x41D5	WCDMA UL Fixed UM PDU [Version 1]
+0x41D6	Reserved
+0x41D7	WCDMA X2W Step1 Search Results  [Version 2]
+0x41D8	WCDMA X2W NAS-TT Search Results  [Version 2]
+0x41D9	WCDMA X2W List Search Results [Version 3]
+0x41DA	WCDMA Online RSB Calibration Debug Log Packet [Version 1]
+0x41DB	Reserved
+0x41DC	WCDMA W2G Gap Information [Version 1]
+0x41DD	WCDMA W2G Measurements [Version 1]
+0x41DE	Reserved
+0x41DF	Reserved
+0x41E0	Reserved
+0x41E1	Reserved
+0x41E2	WCDMA L1 MCVS Log [Version 1]
+0x4200	HSDPA Configuration
+0x4201	HSDPA UL Beta Gain Table
+0x4202	WCDMA Finger TA with HS Info
+0x4203	HSDPA Demodulator Control Table
+0x4204	HSDPA Modulator Control Table
+0x4205	HS Decode Status
+0x4206	HS Decode Status With Data
+0x4207	HS-SCCH Statistics
+0x4208	HS-DSCH HARQ Statistics
+0x4209	Reserved
+0x420A	UL HS DPCCH Information
+0x420B	UL HS DPCCH Debug Information
+0x420C	WCDMA TB Set Status (CRC), Ver 2
+0x420D	Reserved
+0x420E	Reserved
+0x420F	Reserved
+0x4210	MAC HS Configuration
+0x4211	MAC HS Header
+0x4212	MAC HS Status Report
+0x4213	MAC HS Reset
+0x4214	HS Decode Status With Data, Ver 2
+0x4215	Reserved
+0x4216	Reserved
+0x4217	WCDMA TB Set Status (CRC), Ver 3
+0x4218	Reserved
+0x4219	Reserved
+0x421A	WCDMA TB Set Status (CRC), Ver 4
+0x421B	WCDMA TB Set Status (CRC), Ver 5
+0x421C	UL HS DPCCH Information Log Packet Edition 2 [Version 4]
+0x421D	Reserved
+0x421E	WCDMA MAC-ehs Reassembly [Version 2]
+0x421F	HS SCCH Statistics [Version 2]
+0x4220	WCDMA MAC HS Configuration Log Packet Edition 2 [Version 4]
+0x4221	HS-DSCH HARQ Statistics Log Packet Edition 2 [Version 5]
+0x4222	HS Decode Status Log Packet with Data Edition 3
+0x4223	Reserved
+0x4224	Reserved
+0x4225	HSDPA Configuration Log Packet Edition 2
+0x4226	Reserved
+0x4227	Reserved
+0x4228	Reserved
+0x4229	Reserved
+0x422A	Reserved
+0x422B	CPC DTX (Re)-Configuration [Version 1]
+0x422C	CPC DTX State Machine [Version 5]
+0x422E	HS CQI Statistics [Version 2]
+0x4230	MBMS Configuration
+0x4231	MBMS MICH Demodulation Info
+0x4232	MBMS TFCI Log Packet
+0x4233	Reserved
+0x4235	WCDMA CSoHS Downlink Voice Data Information
+0x4236	WCDMA CSoHS Uplink Voice Data Information
+0x4237	WCDMA SCHIC Packet [Version 1]
+0x4238	EWC Regular Info  [Version 3]
+0x4239	Downlink Datapath [Version 1]
+0x423A	CPC-DRX State Machine [Version 2]
+0x423B	CPC DRX Config [Version 1]
+0x423C	MAC HS TRESET Expiry [Version 1]
+0x423D	MAC HS Status Edition2 [Version 2]
+0x423E	Reserved
+0x423F	HS-SCCH Decode Status with data  [Version 3]
+0x4301	EUL DL Channel Configuration
+0x4302	Reserved
+0x4303	EUL UL Channel Configuration
+0x4304	Reserved
+0x4305	EUL UL E-DPCH
+0x4306	Reserved
+0x4307	EUL E-TFC Restriction
+0x4308	Reserved
+0x4309	EUL Combined L1/MAC
+0x430A	DRX in Enh Cell FACH State Machine [Version 3]
+0x430B	DRX in Enh Cell FACH Configuration
+0x430C	Reserved
+0x430D	WCDMA Rx Diversity Controller Information [Version 3]
+0x430E	EUL MAC-i\is Log Packet [Version 3]
+0x430F	WCDMA Flexible UL RLC PDU [Version 4]
+0x4311	EUL Link Statistics
+0x4312	Reserved
+0x4313	Reserved
+0x4314	Reserved
+0x4317	WCDMA PLUS L1 UL Config [Version 2]
+0x4318	Reserved
+0x4319	Reserved
+0x431A	Reserved
+0x431B	Reserved
+0x431C	WCDMA UL MAC TFC Config [Version 1]
+0x431D	Reserved
+0x431E	WCDMA MAC UL Rave [Version 1]
+0x4321	EUL MAC-e/es Configuration
+0x4322	EUL MAC-e/es Header
+0x4323	Reserved
+0x4324	Reserved
+0x4325	Reserved
+0x4326	Reserved
+0x4331	Reserved
+0x4332	Reserved
+0x4333	Reserved
+0x4336	Reserved
+0x4340	WCDMA Multi Carrier EUL DL Channel Configuration [Version 1]
+0x4341	WCDMA Multi Carrier EUL UL Channel Configuration [Version 4]
+0x4342	WCDMA Multi Carrier EUL UL E-DPCH [Version 2]
+0x4343	Reserved
+0x4344	WCDMA Multi Carrier EUL Combined L1 MAC  [Version 6]
+0x4345	WCDMA Multi Carrier EUL Link Statistics [Version 2]
+0x4346	Reserved
+0x4347	Reserved
+0x4348	Reserved
+0x4349	Reserved
+0x435A	Reserved
+0x435B	Reserved
+0x435C	Reserved
+0x435D	WCDMA EUL E-TFC Restriction  [Version 1]
+0x435E	Reserved
+0x4721	FACH Measurement Occasion Info [Version 2]
+0x4722	WCDMA L1 FACH Inter RAT Measurements [Version 1]
+0x4727	Reserved
+0x4745	Reserved
+0x4760	Reserved
+0x4770	Reserved
+0x4771	Reserved
+0x4773	Reserved
+0x4774	Reserved
+0x4775	Reserved
+0x4776	WCDMA XO Log Packet [Version 2]
+0x4778	Reserved
+0x4800	WCDMA RRC Search Request Information  [Version 1]
+0x4801	WCDMA RRC ACQ Summary Information [Version 1]
+0x4802	WCDMA RRC ACQ DB Information  [Version 1]
+0x4803	WCDMA RRC Search Confirmation  [Version 1]
+0x4804	WCDMA Hanging RB Info [Version 1]
+0x4805	WCDMA Intra Frequency Measurement Info [Version 1]
+0x4806	WCDMA Inter Frequency Measurement Info [Version 1]
+0x4807	WCDMA Inter RAT Measurement Info [Version 1]
+0x4808	WCDMA Standalone Hanging RB Info [Version 1]
+0x4809	WCDMA RRC AMR Codec Info [Version 1]
+0x480A	Reserved
+0x4810	WCDMA QSH SIB Read Failure Event Logging [Version 1]
+0x4812	Reserved
+0x4900	Reserved
+0x4901	Reserved
+0x4902	Reserved
+0x4903	Reserved
+0x4904	Reserved
+0x4905	Reserved
+0x4906	Reserved
+0x4907	Reserved
+0x4908	Reserved
+0x4909	Reserved
+0x490A	Reserved
+0x490B	Reserved
+0x490C	Reserved
+0x4FF6	WCDMA Status Report
+0x5000	GSM PLT Packet
+0x5001	GSM CFA Packet
+0x5064	GSM Power Scan Results
+0x5065	GSM L1 FCCH Acquisition
+0x5066	GSM L1 SCH Acquisition
+0x5069	Reserved
+0x506A	GSM L1 New Burst Metrics [Version 4]
+0x506B	GSM L1 Message Metrics
+0x506C	GSM L1 Burst Metrics
+0x506F	GSM Paging Data
+0x5070	GSM Surround Cell Engine Mode
+0x5071	GSM Surround Cell BA List
+0x5072	GSM L1 Serving Cell Info
+0x5073	GSM L1 GSTMR ADJ
+0x5074	GSM L1 PDM ADJ
+0x5075	GSM L1 Neighbor Cell Acquisition
+0x5076	GSM L1 TxLev Timing Advance
+0x5077	GSM L1 Neighbor BCCH Decode
+0x5078	GSM L1 PDM Adjust, Ver2
+0x5079	GSM L1 Enhanced Message Metrics
+0x507A	GSM L1 Serving Auxiliary Measurments
+0x507B	GSM L1 Neighbor Cell Auxiliary Measurments
+0x507C	GSM AFC  Adjust
+0x507D	GSM Ncell Metrics
+0x5082	GSM L1 Monitor Bursts
+0x5083	GSM L1 Neighbor Cell SCH Burst Metrics
+0x5084	GSM L1 Neighbor Cell SCH Message Metrics
+0x5085	GSM L1 Neighbor Cell BCCH Burst Metrics
+0x5086	GSM L1 Neighbor Cell BCCH Message Metrics
+0x5087	GSM L1 Neighbor Cell SCH Metrics V2
+0x5088	GSM L1 Transmit Burst Metrics
+0x5089	GSM L1 New Transmit Burst Metrics 
+0x508A	GSM Antenna Switch Diversity [Version 3]
+0x508C	GSM MDSP Command
+0x508D	GSM GL1 HW Command
+0x508E	GSM MDSP Scaling Factors
+0x508F	GSM FW Debug Buffer
+0x5090	GSM MDSP Applications
+0x5091	Reserved
+0x5092	Reserved
+0x5094	GSM CXM [Version 2]
+0x5095	GSM DFT ACI Metric [Version 2]
+0x5096	GSM L1 RX Diversity Metrics  [Version 6]
+0x5097	Reserved
+0x5098	GSM Parallel SCH Metrics [Version 1]
+0x5099	Reserved
+0x509A	GSM L1 HW HL LL Metrics [Version 1]
+0x509B	Reserved
+0x509C	Reserved
+0x509D	Reserved
+0x509E	Reserved
+0x509F	Reserved
+0x50A0	GSM L1 SACCH Burst Metrics 
+0x50A1	GSM L1 Message Metrics Compact [Version 1]
+0x50A2	GSM AMR PD And DTX Burst Metrics  [Version 1]
+0x50A3	GSM AMR PD And DTX Message Metrics [Version 1]
+0x50A4	GSM L1 G2X Tune Away [Version 1]
+0x50A6	GSM Sleep WMGR Info [Version 1]
+0x50C8	GSM L2 States
+0x50C9	GSM L2 Transmission Status
+0x50CA	GSM L2 Outstanding Frame
+0x512C	GSM RR State
+0x512D	GSM RR Link Failure Detection
+0x512E	GSM RR Protocol Error
+0x512F	GSM RR Signaling Message
+0x5130	GSM RR Cell Selection and Reselection Parameters
+0x5131	GSM RR RACH Control Parameters
+0x5132	GSM RR Control Channel Desc Parameters
+0x5133	GSM RR Cell Options
+0x5134	GSM RR Cell Information
+0x5135	GSM RR Channel Configuration
+0x5136	GSM RR Ciphering Mode
+0x5137	GSM RR Cell Selection and Reselection Measurements
+0x5138	GSM RR Downlink Signal Counter
+0x5139	GSM RR Radio Link Timeout
+0x513A	GSM RR SACCH Measurement Report
+0x513B	Reserved
+0x513C	GSM RR BA List
+0x513E	GSM RR IRAT Measurements [Version 2]
+0x513F	Reserved
+0x5140	GSM RR SI2Quater Reselection Parameters [Version 1]
+0x5141	GSM RR SI2Quater Measurement Parameters [Version 1]
+0x5142	GSM RR CSI Cache Flush Data [Version 1]
+0x5143	GSM RR X2G Redir Cell List [Version 1]
+0x5144	Reserved
+0x5145	Reserved
+0x5146	Reserved
+0x5190	GSM CS Data Rx Frames
+0x5191	GSM CS Data Tx Frames
+0x51F4	GPRS Indicators
+0x51F5	GPRS General Parameters
+0x51F6	GPRS Cell Options
+0x51F7	GPRS Power Control Parameters
+0x51F8	GPRS Mobile Allocation
+0x51F9	GPRS PBCCH Description
+0x51FA	GPRS GRR State
+0x51FB	Reserved
+0x51FC	GSM RR Cell Reselection Measmnts
+0x51FD	GPRS RR Packet System Information 1
+0x51FE	GPRS RR Packet System Information 2
+0x51FF	GPRS RR Packet System Information 3
+0x5200	GPRS RLC-UL Abnormal Release Counts
+0x5201	GPRS RLC-UL Event Counts
+0x5202	GPRS RLC-UL Statistics
+0x5203	GPRS RLC Uplink Config [Version 1]
+0x5204	GPRS RLC Downlink Config [Version 1]
+0x5205	EGPRS Uplink Header
+0x5206	EGPRS Downlink Header
+0x5207	EGPRS RLC Uplink Statistics
+0x5208	EGPRS RLC Downlink Statistics
+0x5209	EGPRS RLC EPUAN
+0x520A	GPRS RLC-DL Statistics
+0x520B	GPRS RLC-UL AckNack Parameters
+0x520C	GPRS RLC-DL AckNack Parameters
+0x520D	GPRS RLC-UL Release Indication
+0x520E	GPRS RLC-DL Release Indication
+0x520F	GPRS RLC-UL AckNack Parameters
+0x5210	GPRS RLC-DL AckNack Parameters
+0x5211	EGPRS RLC EPDAN
+0x5212	GPRS LLC ME (LLME) Information
+0x5213	GPRS LLC SAPI States
+0x5214	GPRS LLC XID Information
+0x5215	GPRS LLC PDU Statistics
+0x5216	GPRS LLC Periodic Statistics
+0x5217	GPRS LLC Ready Timer Status
+0x5218	GPRS LLC UI Send PDU
+0x5219	GPRS LLC UI Receive PDU
+0x521A	Reserved
+0x521B	Reserved
+0x521C	GPRS SNDCP Active PDP Contexts
+0x521D	GPRS SNDCP PDP CONTEXT Information
+0x521E	GPRS SNDCP States
+0x521F	GPRS SNDCP PDU Statistics
+0x5220	GPRS SNDCP UL TCP Header
+0x5221	GPRS SNDCP DL TCP Header
+0x5222	GPRS RLC Uplink Statistics [Version 2]
+0x5223	GPRS RLC Downlink Statistics [Version 1]
+0x5226	GPRS MAC Signaling Message
+0x5227	GPRS MAC State
+0x5228	GPRS MAC UL TBF Establishment
+0x5229	GPRS MAC UL TBF Release
+0x522A	GPRS MAC DL TBF Establishment
+0x522B	GPRS MAC DL TBF Release
+0x522C	EGPRS MAC EPUAN
+0x522D	EGPRS MAC EPDAN
+0x522E	GPRS DL SRB Loopback Mode Bit Stream
+0x522F	MDSP IQ Samples
+0x5230	GPRS SM/GMM OTA Signaling Message
+0x5231	GPRS Air Interface Summary
+0x5232	GPRS AGC
+0x5233	GPRS Timing Advance
+0x5234	GPRS Power Control
+0x5235	GPRS L1 Transfer Summary
+0x5236	GPRS L1 Hopping ARFCNs
+0x5237	GPRS Tx Schedule
+0x523A	GPRS Frame Scheduler Information
+0x523F	Reserved
+0x5245	GPRS Receive Burst Metrics A
+0x5246	GPRS Receive Burst Metrics B
+0x5247	GPRS Receive Burst Metrics C
+0x5248	GPRS Receive Burst Metrics D
+0x5249	GPRS Receive Burst Metrics E
+0x524A	GPRS Receive Message Metrics F
+0x524D	GPRS Receive Message Metrics A
+0x524E	GPRS Receive Message Metrics B
+0x524F	GPRS Receive Message Metrics C
+0x5250	GPRS Receive Message Metrics D
+0x5251	GPRS DLPTCCH Burst Metric
+0x5252	GPRS DL PTCCH Message Metric
+0x5253	GPRS Receive Message Metrics E
+0x5254	GPRS L1 Burst Metrics A  [Version 2]
+0x5255	GPRS L1 Burst Metrics B [Version 2]
+0x5256	GPRS L1 Burst Metrics C [Version 2]
+0x5257	GPRS L1 Burst Metrics D [Version 2]
+0x5258	GSM Idle Mode WCDMA Known List
+0x5259	GSM WCDMA Fill Sample RAM
+0x525A	GSM dedicated mode WCDMA cell list
+0x525B	GSM Dedicated Mode 3G Measurements
+0x525C	GSM Idle Mode 3G Reselect Reject
+0x525D	G2W Step1 Search
+0x525E	G2W Step2 Search
+0x525F	G2W Step3 Search
+0x5260	G2W List Search
+0x5261	Reserved
+0x5262	GPRS RR 3G Measurement Params
+0x5263	GPRS RR 3G Reselection Measurements
+0x5264	GERAN F3 Messages [Version 1]
+0x5270	GSM G2T IRAT Meas Req [Version 1]
+0x5271	GSM G2T IRAT Meas Resp [Version 1]
+0x5272	GSM G2T IRAT Acq Req [Version 1]
+0x5273	GSM G2T IRAT Acq Resp [Version 1]
+0x5284	GPRS WMS Cell Broadcast Receive
+0x5384	GSM WMS CB Receive
+0x5385	GSM WMS Event Notify [Version 1]
+0x5386	GSM WMS Ind Notify [Version 1]
+0x5400	GSM Frame Number Adjustment
+0x5408	GSM Monitor Metrics
+0x5410	GSM SACCH Reports Rev 0
+0x5411	GSM SACCH Report
+0x5412	GSM L1 New SCH Acquisition Metrics [Version 2]
+0x5413	GSM L1 New FCCH Decode Metrics [Version 1]
+0x5A00	GSM DSDS PLT Packet
+0x5A01	GSM DSDS CFA Packet
+0x5A64	GSM DSDS Power Scan Results
+0x5A65	GSM DSDS L1 FCCH Acquisition
+0x5A66	GSM DSDS L1 SCH Acquisition
+0x5A6A	GSM DSDS New Burst Metrics
+0x5A6B	GSM DSDS L1 Message Metrics
+0x5A6C	GSM DSDS L1 Burst Metrics
+0x5A6F	GSM DSDS Paging Data
+0x5A70	GSM DSDS Surround Cell Engine Mode
+0x5A71	GSM DSDS Surround Cell BA List
+0x5A72	GSM DSDS L1 Serving Cell Info
+0x5A73	GSM DSDS L1 GSTMR ADJ
+0x5A74	GSM DSDS L1 PDM ADJ
+0x5A75	GSM DSDS L1 Neighbor Cell Acquisition
+0x5A76	GSM DSDS L1 TxLev Timing Advance
+0x5A77	GSM DSDS L1 Neighbor BCCH Decode
+0x5A78	GSM DSDS L1 PDM Adjust, Ver2
+0x5A79	GSM DSDS L1 Enhanced Message Metrics
+0x5A7A	GSM DSDS L1 Serving Auxiliary Measurements
+0x5A7B	GSM DSDS L1 Neighbor Cell Auxiliary Measurements
+0x5A7C	GSM DSDS AFC Adjust
+0x5A7D	GSM DSDS Ncell Metrics
+0x5A82	GSM DSDS L1 Monitor Bursts
+0x5A83	GSM DSDS L1 Neighbor Cell SCH Burst Metrics
+0x5A84	GSM DSDS L1 Neighbor Cell SCH Message Metrics
+0x5A85	GSM DSDS L1 Neighbor Cell BCCH Burst Metrics
+0x5A86	GSM DSDS L1 Neighbor Cell BCCH Message Metrics
+0x5A87	GSM DSDS L1 neighbor cell SCH Metrics V2
+0x5A88	GSM DSDS L1 Transmit Burst Metrics
+0x5A8A	GSM DSDS Antenna Switch Diversity
+0x5A8C	GSM DSDS MDSP Command
+0x5A8D	GSM DSDS GL1 HW Command
+0x5A8E	GSM DSDS MDSP scaling factors
+0x5A90	GSM DSDS MDSP Applications
+0x5A91	Reserved
+0x5A94	GSM DSDS CXM
+0x5A95	GSM DSDS DFT ACI Metric
+0x5A96	Reserved
+0x5A97	Reserved
+0x5A98	GSM DSDS Parallel SCH Metrics
+0x5A9D	Reserved
+0x5A9F	Reserved
+0x5AA0	GSM DSDS L1 SACCH Burst Metrics
+0x5AA1	GSM DSDS L1 Message Metrics Compact [Version 1]
+0x5AA6	GSM DSDS Sleep WMGR Info
+0x5AA7	GSM DSDS Log IQ [Version 1]
+0x5AC8	GSM DSDS L2 States
+0x5AC9	GSM DSDS L2 Transmission Status
+0x5ACA	GSM DSDS L2 Outstanding Frame
+0x5B2C	GSM DSDS RR State
+0x5B2D	GSM DSDS RR Link Failure Detection
+0x5B2E	GSM DSDS RR Protocol Error
+0x5B2F	GSM DSDS RR Signaling Message
+0x5B30	GSM DSDS RR Cell Selection And Reselection Parameters
+0x5B31	GSM DSDS RR RACH Control Parameters
+0x5B32	GSM DSDS RR Control Channel Desc Parameters
+0x5B33	GSM DSDS RR Cell Options
+0x5B34	GSM DSDS RR Cell Information
+0x5B35	GSM DSDS RR Channel Configuration
+0x5B36	GSM DSDS RR Ciphering Mode
+0x5B37	GSM DSDS RR Cell Selection and Reselection Measurements
+0x5B38	GSM DSDS RR Downlink Signaling Counter
+0x5B39	GSM DSDS RR Radio Link Timeout
+0x5B3A	GSM DSDS RR SACCH Report
+0x5B3B	Reserved
+0x5B3C	GSM DSDS RR BA List
+0x5B3E	GSM DSDS RR IRAT Measurements [Version 2]
+0x5B3F	Reserved
+0x5B40	GSM DSDS RR SI2Quater Reselection Parameters [Version 1]
+0x5B41	GSM DSDS RR SI2Quater Measurement Parameters [Version 1]
+0x5B43	GSM DSDS X2G Redir Cell List [Version 1]
+0x5B44	Reserved
+0x5B46	Reserved
+0x5B90	GSM DSDS CS Data Rx Frames
+0x5B91	GSM DSDS CS Data Tx Frames
+0x5BF4	GPRS DSDS Indicators
+0x5BF5	GPRS DSDS General Parameters
+0x5BF6	GPRS DSDS Cell Options
+0x5BF7	GPRS DSDS Power Control Parameters
+0x5BF8	GPRS DSDS Mobile Allocation
+0x5BF9	GPRS DSDS PBCCH Description
+0x5BFA	GPRS DSDS GRR State
+0x5BFB	Reserved
+0x5BFC	GSM DSDS RR Cell Reselection Measmnts
+0x5BFD	GPRS DSDS RR Packet System Information 1
+0x5BFE	GPRS DSDS RR Packet System Information 2
+0x5BFF	GPRS DSDS RR Packet System Information 3
+0x5C00	GPRS DSDS RLC-UL Abnormal Release Counts
+0x5C01	GPRS DSDS RLC-UL Event Counts
+0x5C02	GPRS DSDS RLC-UL Statistics
+0x5C03	GPRS DSDS RLC Uplink Config [Version 1]
+0x5C04	GPRS DSDS RLC Downlink Config [Version 1]
+0x5C05	EGPRS DSDS Uplink Header
+0x5C06	EGPRS DSDS Downlink Header
+0x5C07	EGPRS DSDS RLC Uplink Statistics
+0x5C08	EGPRS DSDS RLC Downlink Statistics
+0x5C09	EGPRS DSDS RLC-UL AckNack 
+0x5C0A	GPRS DSDS RLC-DL Statistics
+0x5C0D	GPRS DSDS RLC-UL Release Indication
+0x5C0E	GPRS DSDS RLC-DL Release Indication
+0x5C0F	GPRS DSDS RLC-UL AckNack Parameters
+0x5C10	GPRS DSDS RLC-DL AckNack Parameters
+0x5C11	EGPRS DSDS RLC DL AckNack
+0x5C12	GPRS DSDS LLC ME (LLME) Information
+0x5C13	GPRS DSDS LLC SAPI States
+0x5C14	GPRS DSDS LLC XID Information
+0x5C15	GPRS DSDS LLC PDU Statistics
+0x5C16	GPRS DSDS LLC Periodic Statistics
+0x5C17	GPRS DSDS LLC Ready Timer Status
+0x5C18	GPRS DSDS LLC UI Send PDU
+0x5C19	GPRS DSDS LLC UI Receive PDU
+0x5C1A	GPRS DSDS LLC Ready Timer Status V2
+0x5C1B	Reserved
+0x5C1C	GPRS DSDS SNDCP Active PDP Contexts
+0x5C1D	GPRS DSDS SNDCP PDP CONTEXT Information
+0x5C1E	GPRS DSDS SNDCP States
+0x5C1F	GPRS DSDS SNDCP PDU Statistics
+0x5C20	GPRS DSDS SNDCP UL TCP Header
+0x5C21	GPRS DSDS SNDCP DL TCP Header
+0x5C22	GPRS DSDS RLC Uplink Statistics [Version 2]
+0x5C23	GPRS DSDS RLC Downlink Statistics [Version 1]
+0x5C26	GPRS DSDS MAC Signaling Message
+0x5C27	GPRS DSDS MAC State
+0x5C28	GPRS DSDS MAC UL TBF Establishment
+0x5C29	GPRS DSDS MAC UL TBF Release
+0x5C2A	GPRS DSDS MAC DL TBF Establishment
+0x5C2B	GPRS DSDS MAC DL TBF Release
+0x5C2C	EGPRS DSDS MAC EPUAN
+0x5C2D	EGPRS DSDS MAC EPDAN
+0x5C2E	GPRS DSDS DL SRB Loopback Mode Bit Stream
+0x5C30	GPRS DSDS SM/GMM OTA Signaling Message
+0x5C31	GPRS DSDS Air Interface Summary
+0x5C32	GPRS DSDS AGC
+0x5C33	GPRS DSDS Timing Advance
+0x5C34	GPRS DSDS Power Control
+0x5C35	GPRS DSDS L1 Transfer Summary
+0x5C36	GPRS DSDS L1 Hopping ARFCNs
+0x5C37	GPRS DSDS Tx Schedule
+0x5C3A	GPRS DSDS Frame Scheduler Information
+0x5C3F	Reserved
+0x5C45	GPRS DSDS L1 Burst metrics A 
+0x5C46	GPRS DSDS L1 Burst Metrics B 
+0x5C47	GPRS DSDS L1 Burst Metrics C 
+0x5C48	GPRS DSDS L1 Burst Metrics D 
+0x5C49	GPRS DSDS L1 Burst Metrics E
+0x5C4D	GPRS DSDS L1 Message Metrics A
+0x5C4E	GPRS DSDS L1 Message Metrics B
+0x5C4F	GPRS DSDS L1 Message Metrics C
+0x5C50	GPRS DSDS L1 Message Metrics D
+0x5C51	GPRS DSDS DLPTCCH Burst Metric
+0x5C52	GPRS DSDS DL PTCCH Message Metric
+0x5C53	GPRS DSDS L1 Message Metrics E
+0x5C58	GSM DSDS Idle Mode WCDMA Known List
+0x5C59	GSM DSDS WCDMA Fill Sample RAM
+0x5C5A	GSM DSDS dedicated mode WCDMA cell list
+0x5C5B	GSM DSDS Dedicated Mode 3G Measurements
+0x5C5C	GSM DSDS RR 3G Rejected Cells
+0x5C5D	G2W DSDS Step1 Search
+0x5C5E	G2W DSDS Step2 Search
+0x5C5F	G2W DSDS Step3 Search
+0x5C60	G2W DSDS List Search
+0x5C62	GPRS DSDS GRR 3G Measurement Parameter
+0x5C63	GPRS DSDS GRR 3G Reselection Measurements
+0x5C64	GERAN DSDS F3 Messages [Version 1]
+0x5C70	GSM DSDS G2T IRAT Meas Req [Version 1]
+0x5C71	GSM DSDS G2T IRAT Meas Resp [Version 1]
+0x5C72	GSM DSDS G2T IRAT Acq Req [Version 1]
+0x5C73	GSM DSDS G2T IRAT Acq Resp [Version 1]
+0x5D84	GSM DSDS WMS Receive CB
+0x5E00	GSM DSDS Frame Number Adjustment
+0x5E08	GSM DSDS Monitor Metrics
+0x5E11	GSM DSDS SACCH Report
+0x5E12	GSM DSDS L1 New SCH Acquisition Metrics
+0x5E13	GSM L1 New FCCH Decode Metrics
+0x5FF6	GSM Status Report
+0x6000	Atlantis NI Start Parameters TSn3
+0x6001	Atlantis NI MLP LIR TSn4
+0x6002	Atlantis NI MLP LIA TSn5
+0x6003	Atlantis NI Per Attempt Statistics TSn5
+0x6004	Atlantis NI Final Statistics TSn6
+0x6005	Atlantis NI Test Completion Notification TSn7
+0x6014	Atlantis WAP-Based Start Parameters TSw3
+0x6015	Atlantis WAP-Based MLP LIR TSw4
+0x6016	Atlantis WAP-Based Trigger Of LBS TSw5
+0x6017	Atlantis WAP-Based MLP LIA TSw6
+0x6018	Atlantis WAP-Based IS801 Fix Results TSw7
+0x6019	Atlantis WAP-Based Per Attempt Statistics TSw8
+0x601A	Atlantis WAP-Based Final Statistics TSw8
+0x601B	Atlantis WAP-Based Test Completion Notification TSw9
+0x7001	UMTS Call Flow Analysis
+0x7002	MMGPS Report Clock
+0x7003	MMGPS Report Position
+0x7005	MMGPS Report Measurement
+0x7008	MMGPS Report RF Status
+0x7009	MMGPS Report Freq Cal
+0x700A	Reserved
+0x700B	Reserved
+0x700C	MMGPS Report Measurement Type 2
+0x700D	MMGPS Report Prescribed Dwell Results
+0x7012	LSM Report Event
+0x7013	Reserved
+0x7014	Reserved
+0x7015	Reserved
+0x7016	Reserved
+0x7017	LSM PDSM Position Report Callback
+0x7018	Reserved
+0x7019	Reserved
+0x701A	Reserved
+0x701B	Reserved
+0x701C	Reserved
+0x701D	Reserved
+0x701E	MMGPS Report Position Type 2
+0x701F	MMGPS Report Measurement Type 3
+0x7130	UMTS NAS_GMM State
+0x7131	UMTS NAS_MM State
+0x7132	UMTS NAS_REG State
+0x7133	UMTS NAS CS Connection Management Call Setup
+0x7134	UMTS NAS PS Connection Management
+0x7135	UMTS NAS MM Characteristics
+0x7136	UMTS NAS QoS
+0x7137	UMTS NAS Connection Bearer Capability
+0x7138	UMTS UE Dynamic ID
+0x7139	UMTS UE Static ID
+0x713A	UMTS UE OTA
+0x713C	Reserved
+0x713D	UMTS NAS CS Connection Management Call Release Information
+0x713E	UMTS NAS CS Connection Management Call Change Information
+0x713F	UMTS UL (Tx) Vocoder Packet Characteristics
+0x7140	UMTS DL (Rx) Vocoder Packet Characteristics
+0x7141	UMTS CS Data Rx Frames
+0x7142	UMTS CS Data Tx Frames
+0x7143	UMTS UL (Tx) Vocoder Packet Characteristics v2
+0x7144	UMTS DL (Rx) Vocoder Packet Characteristics v2
+0x7150	UMTS NAS EPLMN List Log Packet
+0x7151	UMTS NAS FPLMN List Update
+0x7152	UMTS NAS FPLMN List
+0x7153	UMTS NAS HPLMN Search Timer Start
+0x7154	UMTS NAS HPLMN Search Timer Expire
+0x7155	UMTS NAS HPLMN Search Start
+0x7156	UMTS NAS HPLMN Search End
+0x7157	UMTS NAS CSG White List [Version 1]
+0x7158	UMTS NAS Available CSG List [Version 1]
+0x7159	UMTS NAS CB Ota log packet
+0x7160	UMTS NAS PPLMN List [Version 2]
+0x7161	UMTS NAS LTE Cell List [Version 1]
+0x7162	UMTS NAS Reg EFS [Version 1]
+0x7163	UMTS NAS MM EMM EFS [Version 1]
+0x7167	Reserved
+0x7168	UMTS NAS WWAN Advance Scan Param
+0x7169	Reserved
+0x716A	Reserved
+0x7401	UMTS Response Notify
+0x7404	Reserved
+0x7B30	UMTS DSDS NAS GMM State
+0x7B31	UMTS DSDS NAS MM State
+0x7B32	UMTS DSDS NAS REG State
+0x7B33	UMTS DSDS NAS CS Connection Management Call Setup
+0x7B34	UMTS DSDS NAS PS Connection Management
+0x7B35	UMTS DSDS NAS MM Characteristics
+0x7B36	UMTS DSDS NAS QoS
+0x7B37	UMTS DSDS NAS Connection Bearer Capability
+0x7B38	UMTS DSDS UE Dynamic ID
+0x7B39	UMTS DSDS UE Static ID
+0x7B3A	UMTS DSDS NAS Signaling Messages
+0x7B3C	Reserved
+0x7B3D	UMTS DSDS NAS CS Connection Management Call Release Info
+0x7B3E	UMTS DSDS NAS CS Connection Management Call Change Info
+0x7B41	UMTS DSDS CS Data Rx Frames
+0x7B42	UMTS DSDS CS Data Tx Frames
+0x7B50	UMTS DSDS NAS EPLMN List
+0x7B51	UMTS DSDS NAS FPLMN List Update
+0x7B52	UMTS DSDS NAS FPLMN List
+0x7B53	UMTS DSDS NAS HPLMN Search Timer Start
+0x7B54	UMTS DSDS NAS HPLMN Search Timer Expire
+0x7B55	UMTS DSDS NAS HPLMN Search Start
+0x7B56	UMTS DSDS NAS HPLMN Search End
+0x9000	Reserved
+0x9001	Reserved
+0x9002	Reserved
+0x9003	Reserved
+0x9004	Reserved
+0x9005	Reserved
+0x9006	Reserved
+0x9007	Reserved
+0x9008	Reserved
+0x9009	Reserved
+0x900A	Reserved
+0x900B	Reserved
+0x900C	Reserved
+0x900D	Reserved
+0x900E	Reserved
+0x900F	Reserved
+0x9010	Reserved
+0x9011	UTRAN FDPCH PC Const [Version 0]
+0x9012	UTRAN FDPCH Info [Version 0]
+0x9013	UTRAN MICH Info [Version 0]
+0x9014	UTRAN SCCH Scheduling [Version 1]
+0x9015	UTRAN SCCH Driver Slot Interrupt [Version 1]
+0x9016	UTRAN SCCH Driver Encoder Task Block [Version 1]
+0x9017	UTRAN PDSCH Scheduling [Version 1]
+0x9018	UTRAN PDSCH Driver Slot Interrupt [Version 1]
+0x9019	UTRAN PDSCH Driver ISR Data [Version 1]
+0x901A	UTRAN PDSCH Driver Encoder Task Block [Version 1]
+0x901B	UTRAN PDSCH Drive 2 MS UE Info [Version 1]
+0x901C	UTRAN PDSCH Drive 2 MS Transport Block [Version 3]
+0x901D	UTRAN HS RoundTrip [Version 4]
+0x901E	UTRAN HS CM [Version 1]
+0x901F	UTRAN HS CQI [Version 4]
+0x9020	UTRAN HS Ack Nack [Version 2]
+0x9021	UTRAN Send HS Data Ind [Version 1]
+0x9022	UTRAN HS Scheduling Pattern Detail [Version 1]
+0x9024	UTRAN EDCH L2 Traffic Frame [Version 3]
+0x9025	UTRAN EDCH L2 Traffic Frame Cont [Version 1]
+0x9026	UTRAN EDCH L1 Control Frame [Version 13]
+0x9027	UTRAN EDCH L1 Traffic Frame [Version 6]
+0x9028	UTRAN EDCH L1 Traffic Frame Cont [Version 1]
+0x9029	UTRAN AGCH Drv Frame [Version 1]
+0x902A	UTRAN AGCH Drv ISR [Version 1]
+0x902B	UTRAN SRGCH Drv Frame [Version 3]
+0x902C	UTRAN NSRGCH Drv Frame [Version 1]
+0x902D	UTRAN HICH Drv Frame [Version 1]
+0x902E	UTRAN HSDPA UE Plan [Version 4]
+0x902F	UTRAN HS MAC-HS PDU [Version 1]
+0x9030	UTRAN MAC HS PDU [Version 2]
+0x9031	UTRAN MAC EHS PDU [Version 1]
+0x9032	UTRAN HS MAC-EHS Header [Version 4]
+0x9033	UTRAN SCCPCH TrCH Data [Version 1]
+0x9034	UTRAN HS L2 CQI [Version 2]
+0x9035	UTRAN HS-DSCH Priority Queue Data Status [Version 1]
+0x9036	UTRAN HS-DSCH HARQ Scheduling Info [Version 1]
+0x9037	UTRAN HS DSCH Requested TB Status [Version 2]
+0x9039	UTRAN EDCH DTX Detect [Version 2]
+0x903A	UTRAN CPC DTX Cycle State Change [Version 1]
+0x903B	UTRAN CPC Data Mode State Change [Version 1]
+0x903C	UTRAN CPC DTX CQI Mode State Change [Version 2]
+0x903D	UTRAN CPC DTX State Info [Version 1]
+0x903E	UTRAN CPC DRX State Change [Version 1]
+0x903F	UTRAN CPC DRX State Info [Version 1]
+0x9040	UTRAN CPC DRX CM State Info [Version 1]
+0x9041	UTRAN HS MAC-EUE Channel Info [Version 1]
+0x9042	UTRAN UDCH Finger Slew Stats [Version 2]
+0x9043	UTRAN DDCH TrCH Data [Version 258]
+0x9044	UTRAN UDCH BER Stats [Version 1]
+0x9045	UTRAN UDCH Frame [Version 261]
+0x9046	UTRAN UDCH InSync or OutSync [Version 2]
+0x9047	UTRAN RSC DIRAM Stats [Version 1]
+0x9048	UTRAN RSC HWBAR Stats  [Version 1]
+0x9049	UTRAN RSC IRAMStats [Version 1]
+0x904A	UTRAN Node B OVSF Tracking [Version 3]
+0x904C	UTRAN UDCH Finger Stats [Version 4]
+0x904D	UTRAN UDCH Decoder Status [Version 3]
+0x904E	UTRAN UDCH TFCI Stats [Version 260]
+0x904F	UTRAN UDCH Search Results [Version 4]
+0x9050	UTRAN CPU Utilization [Version 0]
+0x9052	UTRAN API Parameter  [Version 0]
+	Subpacket 114	SubPkt_SetDiagSrcMaskParamType [Version 1]
+	Subpacket 141	SubPkt_ReconfigSmpIdParamType [Version 0]
+	Subpacket 142	SubPkt_QnbTxPowerProectionType [Version 0]
+	Subpacket 700	SubPkt_SccpchAllocateParamType [Version 2]
+	Subpacket 4000	SubPkt_CommonMeasurementInitReqType [Version 2]
+	Subpacket 4005	SubPkt_CommonMeasurementTerminateReqType [Version 0]
+	Subpacket 4006	SubPkt_DedicatedMeasurementInitReqType [Version 0]
+	Subpacket 4011	SubPkt_DedicatedMeasurementTerminationType [Version 0]
+	Subpacket 4012	SubPkt_SetRTWPMappingReqType [Version 0]
+	Subpacket 5000	SubPkt_NodeBInitializationRequestParam [Version 3]
+	Subpacket 5002	SubPkt_CellSetupRequestParam [Version 3]
+	Subpacket 5003	SubPkt_CellReconfigurationRequestParam [Version 2]
+	Subpacket 5004	SubPkt_CellDeletionRequestParam [Version 2]
+	Subpacket 5005	SubPkt_PhysicalSharedChannelSetupParam [Version 21]
+	Subpacket 5006	SubPkt_PhySharedCHReconfigParam [Version 8]
+	Subpacket 5007	SubPkt_SystemInfoUpdateRequest [Version 2]
+	Subpacket 5008	SubPkt_CommonDlTrchSetupRequestParam [Version 5]
+	Subpacket 5009	SubPkt_CommonDlTrchReconfigRequestParam [Version 2]
+	Subpacket 5010	SubPkt_CommonDlTrchDeletionRequestParam [Version 2]
+	Subpacket 5011	SubPkt_CommonUlTrchSetupRequestParam [Version 5]
+	Subpacket 5012	SubPkt_CommonUlTrchReconfigRequestParam [Version 2]
+	Subpacket 5014	SubPkt_RadioLinkSetupRequestParam [Version 37]
+	Subpacket 5015	SubPkt_RadioLinkActivationParam [Version 1]
+	Subpacket 5016	SubPkt_RadioLinkDeletionRequestParam [Version 0]
+	Subpacket 5017	SubPkt_DLPowerControlRequestParam [Version 1]
+	Subpacket 5018	SubPkt_CompressedModeCommandParam [Version 0]
+	Subpacket 5019	SubPkt_RadioLinkReconfigurationPrepareParam [Version 35]
+	Subpacket 5020	SubPkt_RadioLinkReconfigurationCommit_1 [Version 1]
+	Subpacket 5021	SubPkt_RadioLinkReconfigurationCancelParam [Version 0]
+0x9053	UTRAN DDCH Info (CM and PC) [Version 261]
+0x9054	UTRAN SCCPCH TFCI [Version 1]
+0x9055	UTRAN PRACH Search Results [Version 4]
+0x9057	UTRAN PRACH Finger Stats [Version 2]
+0x9058	UTRAN AICH Data [Version 3]
+0x9059	UTRAN PRACH TFCI Stats [Version 2]
+0x905A	UTRAN PRACH Decoder Status [Version 2]
+0x905B	UTRAN FDPCH Info (CM and PC) [Version 3]
+0x905C	UTRAN RSC EUL2DIRAM Stats  [Version 1]
+0x905D	UTRAN HS OLPC UE Log  [Version 2]
+0x905E	UTRAN RSC SWBAR Stats  [Version 1]
+0x905F	UTRAN RSC HARQBAR Stats [Version 1]
+0x9061	UTRAN RSC R99DIRAM Stats  [Version 1]
+0x9062	UTRAN DDCH PC Const [Version 0]
+0x9063	UTRAN UDCH BLER Stats  [Version 1]
+0x9064	UTRAN Node B Config [Version 0]
+0x9065	UTRAN Handover State [Version 0]
+0x9066	UTRAN RSC Buffer Pool Buffer Stats [Version 2]
+0x9067	UTRAN FSMCPU Utilization [Version 0]
+0x9068	UTRAN Status Report [Version 0]
+0x9069	UTRAN FDPCH PC Const [Version 0]
+0x906A	UTRAN  Dropped Log Packets [Version 0]
+0x906B	UTRAN EDCH L2 MACi Header Frame [Version 2]
+0x906C	UTRAN EDCH L2 MACi Traffic Frame  [Version 1]
+0x906F	UTRAN CPU Profile [Version 1]
+0x9070	UTRAN RACH Frame  [Version 0]
+0x9071	UTRAN EDCH L1 Data Frame [Version 0]
+0x9072	UTRAN FSM Memory Tracking  [Version 0]
+0x9073	UTRAN OCNS Manager [Version 0]
+0x9074	UTRAN EDCH EUL Demand Adjusted Scheduler Cell Info  [Version 9]
+0x9075	UTRAN EDCH EUL Demand Adjusted Scheduler UE Info [Version 12]
+0x9077	UTRAN HS Priority Queue Flow Control Info  [Version 2]
+0x9078	UTRAN UDCH TrCH Data Cont  [Version 0]
+0x9079	UTRAN Transmit Tx Power  [Version 0]
+0x907A	UTRAN Common Meas [Version 1]
+0x907B	UTRAN Cell Rot Info  [Version 0]
+0x907C	UTRAN Dedicated Meas [Version 0]
+0x907F	UTRAN Dynamic HS Power [Version 3]
+0x9080	UTRAN Event Queue Stats [Version 0]
+0x9081	UTRAN Event Queue Late Event [Version 0]
+0x9082	UTRAN HS UE Priority [Version 3]
+0x9084	UTRAN Data Plane Logging [Version 0]
+0x9085	UTRAN FP SYNC Logging [Version 2]
+0x9086	UTRAN Data Plane Dump Logging [Version 0]
+0x9087	UTRAN MNR HSDPA Meas [Version 0]
+0x9088	UTRAN UDCH Doppler Stats [Version 0]
+0x9089	UTRAN EDCH Decoder Status [Version 0]
+0x908A	UTRAN PICH Translation Body Type [Version 0]
+0x908D	UTRAN QNB Tx Power Protection Info [Version 1]
+0x9100	Reserved
+0x9101	Reserved
+0x9102	Reserved
+0x9103	Reserved
+0x9104	Reserved
+0x9110	Reserved
+0x9111	Reserved
+0x9112	Reserved
+0x9113	Reserved
+0x9114	Reserved
+0x9115	Reserved
+0x9116	Reserved
+0x9117	Reserved
+0x9118	Reserved
+0x9119	Reserved
+0x911A	Reserved
+0x911B	Reserved
+0x911C	Reserved
+0x911D	Reserved
+0x911E	Reserved
+0x911F	Reserved
+0x9120	Reserved
+0x9121	Reserved
+0x9122	Reserved
+0x9123	Reserved
+0x9124	Reserved
+0x9125	Reserved
+0x9258	Reserved
+0x9300	Reserved
+0x9302	Reserved
+0x9308	Reserved
+0x9309	Reserved
+0x930A	Reserved
+0x930B	Reserved
+0x9400	Reserved
+0x9401	Reserved
+0x9402	Reserved
+0x9403	Reserved
+0x9404	Reserved
+0x9405	Reserved
+0x9406	Reserved
+0x9407	Reserved
+0x9408	Reserved
+0x9409	Reserved
+0x94A0	Reserved
+0x94A1	Reserved
+0x94DF	Reserved
+0x94FD	Reserved
+0x94FE	Reserved
+0x94FF	Reserved
+0x9600	Reserved
+0x9800	Cell DL Traffic Stats
+0x9801	Cell DL Failure Stats
+0x9802	Cell Pucch CQI Pilot
+0x9803	Cell Pucch Ack Despread pilot
+0x9804	Cell Pucch CQI LLR
+0x9805	Cell FTL
+0x9806	Cell Pusch SNR
+0x9807	Cell RSSI
+0x9808	Cell TOC
+0x9809	Cell CQI Rpt
+0x980A	Cell SRS Rpt
+0x980B	Cell UI Ack Rpt
+0x980C	Cell Sr Rpt
+0x980D	Cell Phich TX Rpt
+0x980E	Cell PSS TX Rpt
+0x980F	Cell SSS TX Rpt
+0x9810	Cell Pcfich TX Rpt
+0x9811	Cell Pdcch TX Rpt
+0x9812	Cell Pbch TX Rpt
+0x9813	Cell Pdsch TX Rpt
+0x9814	Cell Pusch Constellation
+0x9815	Cell Time Domain Channel Est
+0x9D00	Reserved
+0xA000	Reserved
+0xA100	Reserved
+0xA101	Reserved
+0xA102	Reserved
+0xA103	Reserved
+0xA104	Reserved
+0xA105	Reserved
+0xA106	Reserved
+0xA107	Reserved
+0xA108	Reserved
+0xA109	Reserved
+0xA10A	Reserved
+0xA10B	Reserved
+0xA10C	Reserved
+0xA10D	Reserved
+0xA10E	Reserved
+0xA10F	Reserved
+0xA110	Reserved
+0xA120	DTV DVB-H MPE Frame Stats
+0xA121	Reserved
+0xA122	Reserved
+0xA150	DTV DVB-H Security STKM Info
+0xA151	DTV DVB-H Security CID Info
+0xA152	DTV DVB-H Security STKM Parse
+0xA209	Reserved
+0xA301	Reserved
+0xA302	Reserved
+0xA303	Reserved
+0xA304	Reserved
+0xA305	Reserved
+0xA306	Reserved
+0xA307	Reserved
+0xA308	Reserved
+0xA309	Reserved
+0xA30A	Reserved
+0xA30B	Reserved
+0xA30C	Reserved
+0xA30D	Reserved
+0xA30E	Reserved
+0xA30F	Reserved
+0xA310	Reserved
+0xA311	Reserved
+0xA312	Reserved
+0xA313	Reserved
+0xA314	ChOrd Status V1
+0xA315	ChOrd Tx Activity
+0xB001	APU Task Profiling - System Info
+0xB002	APU Task Profiling - Task Info
+0xB010	Reserved
+0xB011	Reserved
+0xB012	Reserved
+0xB013	Reserved
+0xB014	Reserved
+0xB015	Reserved
+0xB016	Reserved
+0xB017	Reserved
+0xB018	Reserved
+0xB019	Reserved
+0xB01A	Reserved
+0xB01B	Reserved
+0xB01C	Reserved
+0xB01D	Reserved
+0xB01E	Reserved
+0xB01F	Reserved
+0xB020	Reserved
+0xB021	Reserved
+0xB022	Reserved
+0xB023	Reserved
+0xB024	Reserved
+0xB025	Reserved
+0xB026	Reserved
+0xB027	Reserved
+0xB028	Reserved
+0xB029	Reserved
+0xB030	Reserved
+0xB031	Reserved
+0xB032	Reserved
+0xB033	Reserved
+0xB060	LTE MAC Configuration [Version 1]
+	Subpacket 0	SubPacket - ( Config Type SubPacket ) [Version 2]
+	Subpacket 1	SubPacket - ( DL Config SubPacket ) [Version 2]
+	Subpacket 2	SubPacket - ( UL Config Subpacket ) [Version 3]
+	Subpacket 3	SubPacket - ( RACH Config Subpacket ) [Version 7]
+	Subpacket 4	SubPacket - ( LC Config Subpacket ) [Version 3]
+	Subpacket 5	SubPacket - ( RACH Reason Subpacket ) [Version 4]
+	Subpacket 6	SubPacket - ( RACH Attempt Subpacket ) [Version 5, 48]
+	Subpacket 7	SubPacket - ( DL Transport Block Subpacket ) [Version 4]
+	Subpacket 8	SubPacket - ( UL Transport Block Subpacket ) [Version 2]
+	Subpacket 9	Reserved [Version 2, 48]
+	Subpacket 10	Reserved [Version 5, 24, 48]
+	Subpacket 11	SubPacket - (UL Tx Stats SubPacket ) [Version 2]
+	Subpacket 12	SubPacket - (eMBMS Stats SubPacket) [Version 2]
+	Subpacket 13	SubPacket - (eMBMS Config SubPacket) [Version 2]
+	Subpacket 14	SubPacket - (All Rach Config SubPacket) [Version 1]
+	Subpacket 15	SubPacket - (PAC Match Report) [Version 32]
+	Subpacket 16	Reserved [Version 2, 48]
+	Subpacket 17	Reserved [Version 2, 48]
+	Subpacket 18	Reserved [Version 1]
+	Subpacket 19	Reserved [Version 1, 48]
+0xB061	LTE MAC Rach Trigger [Version 1]
+	Subpacket 0	SubPacket - ( Config Type SubPacket ) [Version 2]
+	Subpacket 1	SubPacket - ( DL Config SubPacket ) [Version 2]
+	Subpacket 2	SubPacket - ( UL Config Subpacket ) [Version 3]
+	Subpacket 3	SubPacket - ( RACH Config Subpacket ) [Version 7]
+	Subpacket 4	SubPacket - ( LC Config Subpacket ) [Version 3]
+	Subpacket 5	SubPacket - ( RACH Reason Subpacket ) [Version 4]
+	Subpacket 6	SubPacket - ( RACH Attempt Subpacket ) [Mismatched Version: 48 (db) vs 49 (packet class)]
+	Subpacket 7	SubPacket - ( DL Transport Block Subpacket ) [Version 4]
+	Subpacket 8	SubPacket - ( UL Transport Block Subpacket ) [Version 2]
+	Subpacket 9	Reserved [Version 2, 48]
+	Subpacket 10	Reserved [Version 5, 24, 48]
+	Subpacket 11	SubPacket - (UL Tx Stats SubPacket ) [Version 2]
+	Subpacket 12	SubPacket - (eMBMS Stats SubPacket) [Version 2]
+	Subpacket 13	SubPacket - (eMBMS Config SubPacket) [Version 2]
+	Subpacket 14	SubPacket - (All Rach Config SubPacket) [Version 1]
+	Subpacket 15	SubPacket - (PAC Match Report) [Version 32]
+	Subpacket 16	Reserved [Version 2, 48]
+	Subpacket 17	Reserved [Version 2, 48]
+	Subpacket 18	Reserved [Version 1]
+	Subpacket 19	Reserved [Version 1, 48]
+0xB062	LTE MAC Rach Attempt [Version 1]
+	Subpacket 0	SubPacket - ( Config Type SubPacket ) [Version 2]
+	Subpacket 1	SubPacket - ( DL Config SubPacket ) [Version 2]
+	Subpacket 2	SubPacket - ( UL Config Subpacket ) [Version 3]
+	Subpacket 3	SubPacket - ( RACH Config Subpacket ) [Version 7]
+	Subpacket 4	SubPacket - ( LC Config Subpacket ) [Version 3]
+	Subpacket 5	SubPacket - ( RACH Reason Subpacket ) [Version 4]
+	Subpacket 6	SubPacket - ( RACH Attempt Subpacket ) [Version 5, 49]
+	Subpacket 7	SubPacket - ( DL Transport Block Subpacket ) [Version 4]
+	Subpacket 8	SubPacket - ( UL Transport Block Subpacket ) [Version 2]
+	Subpacket 9	Reserved [Version 2, 48]
+	Subpacket 10	Reserved [Version 5, 24, 48]
+	Subpacket 11	SubPacket - (UL Tx Stats SubPacket ) [Version 2]
+	Subpacket 12	SubPacket - (eMBMS Stats SubPacket) [Version 2]
+	Subpacket 13	SubPacket - (eMBMS Config SubPacket) [Version 2]
+	Subpacket 14	SubPacket - (All Rach Config SubPacket) [Version 1]
+	Subpacket 15	SubPacket - (PAC Match Report) [Version 32]
+	Subpacket 16	Reserved [Version 2, 48]
+	Subpacket 17	Reserved [Version 2, 48]
+	Subpacket 18	Reserved [Version 1]
+	Subpacket 19	Reserved [Version 1, 48]
+0xB063	LTE MAC DL Transport Block [Version 1, 50]
+	Subpacket 0	SubPacket - ( Config Type SubPacket ) [Version 2]
+	Subpacket 1	SubPacket - ( DL Config SubPacket ) [Version 2]
+	Subpacket 2	SubPacket - ( UL Config Subpacket ) [Version 3]
+	Subpacket 3	SubPacket - ( RACH Config Subpacket ) [Version 7]
+	Subpacket 4	SubPacket - ( LC Config Subpacket ) [Version 3]
+	Subpacket 5	SubPacket - ( RACH Reason Subpacket ) [Version 4]
+	Subpacket 6	SubPacket - ( RACH Attempt Subpacket ) [Version 5, 49]
+	Subpacket 7	SubPacket - ( DL Transport Block Subpacket ) [Version 4]
+	Subpacket 8	SubPacket - ( UL Transport Block Subpacket ) [Version 2]
+	Subpacket 9	Reserved [Version 2, 48]
+	Subpacket 10	Reserved [Version 5, 24, 48]
+	Subpacket 11	SubPacket - (UL Tx Stats SubPacket ) [Version 2]
+	Subpacket 12	SubPacket - (eMBMS Stats SubPacket) [Version 2]
+	Subpacket 13	SubPacket - (eMBMS Config SubPacket) [Version 2]
+	Subpacket 14	SubPacket - (All Rach Config SubPacket) [Version 1]
+	Subpacket 15	SubPacket - (PAC Match Report) [Version 32]
+	Subpacket 16	Reserved [Version 2, 48]
+	Subpacket 17	Reserved [Version 2, 48]
+	Subpacket 18	Reserved [Version 1]
+	Subpacket 19	Reserved [Version 1, 48]
+0xB064	LTE MAC UL Transport Block [Version 1]
+	Subpacket 0	SubPacket - ( Config Type SubPacket ) [Version 2]
+	Subpacket 1	SubPacket - ( DL Config SubPacket ) [Version 2]
+	Subpacket 2	SubPacket - ( UL Config Subpacket ) [Version 3]
+	Subpacket 3	SubPacket - ( RACH Config Subpacket ) [Version 7]
+	Subpacket 4	SubPacket - ( LC Config Subpacket ) [Version 3]
+	Subpacket 5	SubPacket - ( RACH Reason Subpacket ) [Version 4]
+	Subpacket 6	SubPacket - ( RACH Attempt Subpacket ) [Mismatched Version: 48 (db) vs 49 (packet class)]
+	Subpacket 7	SubPacket - ( DL Transport Block Subpacket ) [Version 4]
+	Subpacket 8	SubPacket - ( UL Transport Block Subpacket ) [Version 2]
+	Subpacket 9	Reserved [Version 2, 48]
+	Subpacket 10	Reserved [Version 5, 24, 48]
+	Subpacket 11	SubPacket - (UL Tx Stats SubPacket ) [Version 2]
+	Subpacket 12	SubPacket - (eMBMS Stats SubPacket) [Version 2]
+	Subpacket 13	SubPacket - (eMBMS Config SubPacket) [Version 2]
+	Subpacket 14	SubPacket - (All Rach Config SubPacket) [Version 1]
+	Subpacket 15	SubPacket - (PAC Match Report) [Version 32]
+	Subpacket 16	Reserved [Version 2, 48]
+	Subpacket 17	Reserved [Version 2, 48]
+	Subpacket 18	Reserved [Version 1]
+	Subpacket 19	Reserved [Version 1, 48]
+0xB065	Reserved
+0xB066	Reserved
+0xB067	LTE Mac UL Tx Statistics [Version 1]
+	Subpacket 0	SubPacket - ( Config Type SubPacket ) [Version 2]
+	Subpacket 1	SubPacket - ( DL Config SubPacket ) [Version 2]
+	Subpacket 2	SubPacket - ( UL Config Subpacket ) [Version 3]
+	Subpacket 3	SubPacket - ( RACH Config Subpacket ) [Version 7]
+	Subpacket 4	SubPacket - ( LC Config Subpacket ) [Version 3]
+	Subpacket 5	SubPacket - ( RACH Reason Subpacket ) [Version 4]
+	Subpacket 6	SubPacket - ( RACH Attempt Subpacket ) [Mismatched Version: 48 (db) vs 49 (packet class)]
+	Subpacket 7	SubPacket - ( DL Transport Block Subpacket ) [Version 4]
+	Subpacket 8	SubPacket - ( UL Transport Block Subpacket ) [Version 2]
+	Subpacket 9	Reserved [Version 2, 48]
+	Subpacket 10	Reserved [Version 5, 24, 48]
+	Subpacket 11	SubPacket - (UL Tx Stats SubPacket ) [Version 2]
+	Subpacket 12	SubPacket - (eMBMS Stats SubPacket) [Version 2]
+	Subpacket 13	SubPacket - (eMBMS Config SubPacket) [Version 2]
+	Subpacket 14	SubPacket - (All Rach Config SubPacket) [Version 1]
+	Subpacket 15	SubPacket - (PAC Match Report) [Version 32]
+	Subpacket 16	Reserved [Version 2, 48]
+	Subpacket 17	Reserved [Version 2, 48]
+	Subpacket 18	Reserved [Version 1]
+	Subpacket 19	Reserved [Version 1, 48]
+0xB068	LTE MAC eMBMS Statistics [Version 1]
+	Subpacket 0	SubPacket - ( Config Type SubPacket ) [Version 2]
+	Subpacket 1	SubPacket - ( DL Config SubPacket ) [Version 2]
+	Subpacket 2	SubPacket - ( UL Config Subpacket ) [Version 3]
+	Subpacket 3	SubPacket - ( RACH Config Subpacket ) [Version 7]
+	Subpacket 4	SubPacket - ( LC Config Subpacket ) [Version 3]
+	Subpacket 5	SubPacket - ( RACH Reason Subpacket ) [Version 4]
+	Subpacket 6	SubPacket - ( RACH Attempt Subpacket ) [Version 5, 48]
+	Subpacket 7	SubPacket - ( DL Transport Block Subpacket ) [Version 4]
+	Subpacket 8	SubPacket - ( UL Transport Block Subpacket ) [Version 2]
+	Subpacket 9	Reserved [Version 2, 48]
+	Subpacket 10	Reserved [Version 5, 24, 48]
+	Subpacket 11	SubPacket - (UL Tx Stats SubPacket ) [Version 2]
+	Subpacket 12	SubPacket - (eMBMS Stats SubPacket) [Version 2]
+	Subpacket 13	SubPacket - (eMBMS Config SubPacket) [Version 2]
+	Subpacket 14	SubPacket - (All Rach Config SubPacket) [Version 1]
+	Subpacket 15	SubPacket - (PAC Match Report) [Version 32]
+	Subpacket 16	Reserved [Version 2, 48]
+	Subpacket 17	Reserved [Version 2, 48]
+	Subpacket 18	Reserved [Version 1]
+	Subpacket 19	Reserved [Version 1, 48]
+0xB069	LTE MAC PAC Match Report [Version 1]
+	Subpacket 0	SubPacket - ( Config Type SubPacket ) [Version 2]
+	Subpacket 1	SubPacket - ( DL Config SubPacket ) [Version 2]
+	Subpacket 2	SubPacket - ( UL Config Subpacket ) [Version 3]
+	Subpacket 3	SubPacket - ( RACH Config Subpacket ) [Version 7]
+	Subpacket 4	SubPacket - ( LC Config Subpacket ) [Version 3]
+	Subpacket 5	SubPacket - ( RACH Reason Subpacket ) [Version 4]
+	Subpacket 6	SubPacket - ( RACH Attempt Subpacket ) [Version 5, 48]
+	Subpacket 7	SubPacket - ( DL Transport Block Subpacket ) [Version 4]
+	Subpacket 8	SubPacket - ( UL Transport Block Subpacket ) [Version 2]
+	Subpacket 9	Reserved [Version 2, 48]
+	Subpacket 10	Reserved [Version 5, 24, 48]
+	Subpacket 11	SubPacket - (UL Tx Stats SubPacket ) [Version 2]
+	Subpacket 12	SubPacket - (eMBMS Stats SubPacket) [Version 2]
+	Subpacket 13	SubPacket - (eMBMS Config SubPacket) [Version 2]
+	Subpacket 14	SubPacket - (All Rach Config SubPacket) [Version 1]
+	Subpacket 15	SubPacket - (PAC Match Report) [Version 32]
+	Subpacket 16	Reserved [Version 2, 48]
+	Subpacket 17	Reserved [Version 2, 48]
+	Subpacket 18	Reserved [Version 1]
+	Subpacket 19	Reserved [Version 1, 48]
+0xB06A	Reserved
+0xB06B	Reserved
+0xB06C	Reserved
+0xB06D	Reserved
+0xB06E	LTE MAC DL RAR Transport Block [Version 48]
+	Subpacket -1	SubPacket - (DL Transport Block Subpacket) [Version 1]
+0xB06F	Reserved
+0xB081	LTE RLC DL Config Log packet  [Version 1, 49]
+	Subpacket 64	SubPacket - ( RLCDL Configuration ) [Version 3]
+	Subpacket 65	SubPacket - ( RLCDL PDU ) [Version 4]
+	Subpacket 66	SubPacket - ( DL Statistics ) [Version 3]
+	Subpacket 69	SubPacket - ( RLCUL Configuration ) [Version 3]
+	Subpacket 70	SubPacket - ( RLCUL PDU ) [Version 4]
+	Subpacket 71	SubPacket - ( UL Statistics   ) [Version 3]
+	Subpacket 74	SubPacket - ( LTE RLC eMBMS Data PDU ) [Version 2]
+	Subpacket 75	SubPacket - ( RLC eMBMS Stats ) [Version 2]
+	Subpacket 76	SubPacket - ( RLC eMBMS Config ) [Version 2]
+0xB082	LTE RLC DL AM All PDU [Mismatched Version: 1, 48 (db) vs 1, N/A (packet class)]
+	Subpacket 64	SubPacket - ( RLCDL Configuration ) [Version 3]
+	Subpacket 65	SubPacket - ( RLCDL PDU ) [Version 4]
+	Subpacket 66	SubPacket - ( DL Statistics ) [Version 3]
+	Subpacket 69	SubPacket - ( RLCUL Configuration ) [Version 3]
+	Subpacket 70	SubPacket - ( RLCUL PDU ) [Version 4]
+	Subpacket 71	SubPacket - ( UL Statistics   ) [Version 3]
+	Subpacket 74	SubPacket - ( LTE RLC eMBMS Data PDU ) [Version 2]
+	Subpacket 75	SubPacket - ( RLC eMBMS Stats ) [Version 2]
+	Subpacket 76	SubPacket - ( RLC eMBMS Config ) [Version 2]
+0xB083	LTE RLC DL AM Control PDU [Version 1, 48]
+	Subpacket 64	SubPacket - ( RLCDL Configuration ) [Version 3]
+	Subpacket 65	SubPacket - ( RLCDL PDU ) [Version 4]
+	Subpacket 66	SubPacket - ( DL Statistics ) [Version 3]
+	Subpacket 69	SubPacket - ( RLCUL Configuration ) [Version 3]
+	Subpacket 70	SubPacket - ( RLCUL PDU ) [Version 4]
+	Subpacket 71	SubPacket - ( UL Statistics   ) [Version 3]
+	Subpacket 74	SubPacket - ( LTE RLC eMBMS Data PDU ) [Version 2]
+	Subpacket 75	SubPacket - ( RLC eMBMS Stats ) [Version 2]
+	Subpacket 76	SubPacket - ( RLC eMBMS Config ) [Version 2]
+0xB084	LTE RLC DL AM Polling PDU [Version 1, 48]
+	Subpacket 64	SubPacket - ( RLCDL Configuration ) [Version 3]
+	Subpacket 65	SubPacket - ( RLCDL PDU ) [Version 4]
+	Subpacket 66	SubPacket - ( DL Statistics ) [Version 3]
+	Subpacket 69	SubPacket - ( RLCUL Configuration ) [Version 3]
+	Subpacket 70	SubPacket - ( RLCUL PDU ) [Version 4]
+	Subpacket 71	SubPacket - ( UL Statistics   ) [Version 3]
+	Subpacket 74	SubPacket - ( LTE RLC eMBMS Data PDU ) [Version 2]
+	Subpacket 75	SubPacket - ( RLC eMBMS Stats ) [Version 2]
+	Subpacket 76	SubPacket - ( RLC eMBMS Config ) [Version 2]
+0xB085	LTE RLC DL AM Signaling PDU [Version 1, 48]
+	Subpacket 64	SubPacket - ( RLCDL Configuration ) [Version 3]
+	Subpacket 65	SubPacket - ( RLCDL PDU ) [Version 4]
+	Subpacket 66	SubPacket - ( DL Statistics ) [Version 3]
+	Subpacket 69	SubPacket - ( RLCUL Configuration ) [Version 3]
+	Subpacket 70	SubPacket - ( RLCUL PDU ) [Version 4]
+	Subpacket 71	SubPacket - ( UL Statistics   ) [Version 3]
+	Subpacket 74	SubPacket - ( LTE RLC eMBMS Data PDU ) [Version 2]
+	Subpacket 75	SubPacket - ( RLC eMBMS Stats ) [Version 2]
+	Subpacket 76	SubPacket - ( RLC eMBMS Config ) [Version 2]
+0xB086	LTE RLC DL UM Data PDU [Version 1]
+	Subpacket 65	SubPacket - (RLCDL UM PDU  ) [Version 4]
+	Subpacket 70	SubPacket - ( RLCUL UM PDU  ) [Version 4]
+0xB087	LTE RLC DL Statistics [Mismatched Version: 1, 49 (db) vs 1, 1 (packet class)]
+	Subpacket 64	SubPacket - ( RLCDL Configuration ) [Version 3]
+	Subpacket 65	SubPacket - ( RLCDL PDU ) [Version 4]
+	Subpacket 66	SubPacket - ( DL Statistics ) [Version 3]
+	Subpacket 69	SubPacket - ( RLCUL Configuration ) [Version 3]
+	Subpacket 70	SubPacket - ( RLCUL PDU ) [Version 4]
+	Subpacket 71	SubPacket - ( UL Statistics   ) [Version 3]
+	Subpacket 74	SubPacket - ( LTE RLC eMBMS Data PDU ) [Version 2]
+	Subpacket 75	SubPacket - ( RLC eMBMS Stats ) [Version 2]
+	Subpacket 76	SubPacket - ( RLC eMBMS Config ) [Version 2]
+0xB088	Reserved
+0xB089	LTE RLC eMBMS DATA PDU [Version 1, 48]
+	Subpacket 64	SubPacket - ( RLCDL Configuration ) [Version 3]
+	Subpacket 65	SubPacket - ( RLCDL PDU ) [Version 4]
+	Subpacket 66	SubPacket - ( DL Statistics ) [Version 3]
+	Subpacket 69	SubPacket - ( RLCUL Configuration ) [Version 3]
+	Subpacket 70	SubPacket - ( RLCUL PDU ) [Version 4]
+	Subpacket 71	SubPacket - ( UL Statistics   ) [Version 3]
+	Subpacket 74	SubPacket - ( LTE RLC eMBMS Data PDU ) [Version 2]
+	Subpacket 75	SubPacket - ( RLC eMBMS Stats ) [Version 2]
+	Subpacket 76	SubPacket - ( RLC eMBMS Config ) [Version 2]
+0xB08A	LTE RLC eMBMS Statistics [Version 1, 48]
+	Subpacket 64	SubPacket - ( RLCDL Configuration ) [Version 3]
+	Subpacket 65	SubPacket - ( RLCDL PDU ) [Version 4]
+	Subpacket 66	SubPacket - ( DL Statistics ) [Version 3]
+	Subpacket 69	SubPacket - ( RLCUL Configuration ) [Version 3]
+	Subpacket 70	SubPacket - ( RLCUL PDU ) [Version 4]
+	Subpacket 71	SubPacket - ( UL Statistics   ) [Version 3]
+	Subpacket 74	SubPacket - ( LTE RLC eMBMS Data PDU ) [Version 2]
+	Subpacket 75	SubPacket - ( RLC eMBMS Stats ) [Version 2]
+	Subpacket 76	SubPacket - ( RLC eMBMS Config ) [Version 2]
+0xB08B	LTE RLC eMBMS Config Log Packet [Version 1, 48]
+	Subpacket 64	SubPacket - ( RLCDL Configuration ) [Version 3]
+	Subpacket 65	SubPacket - ( RLCDL PDU ) [Version 4]
+	Subpacket 66	SubPacket - ( DL Statistics ) [Version 3]
+	Subpacket 69	SubPacket - ( RLCUL Configuration ) [Version 3]
+	Subpacket 70	SubPacket - ( RLCUL PDU ) [Version 4]
+	Subpacket 71	SubPacket - ( UL Statistics   ) [Version 3]
+	Subpacket 74	SubPacket - ( LTE RLC eMBMS Data PDU ) [Version 2]
+	Subpacket 75	SubPacket - ( RLC eMBMS Stats ) [Version 2]
+	Subpacket 76	SubPacket - ( RLC eMBMS Config ) [Version 2]
+0xB08C	Reserved
+0xB08D	Reserved
+0xB091	LTE RLC UL Config Log packet [Mismatched Version: 1, 48 (db) vs 1, 1 (packet class)]
+	Subpacket 64	SubPacket - ( RLCDL Configuration ) [Version 3]
+	Subpacket 65	SubPacket - ( RLCDL PDU ) [Version 4]
+	Subpacket 66	SubPacket - ( DL Statistics ) [Version 3]
+	Subpacket 69	SubPacket - ( RLCUL Configuration ) [Version 3]
+	Subpacket 70	SubPacket - ( RLCUL PDU ) [Version 4]
+	Subpacket 71	SubPacket - ( UL Statistics   ) [Version 3]
+	Subpacket 74	SubPacket - ( LTE RLC eMBMS Data PDU ) [Version 2]
+	Subpacket 75	SubPacket - ( RLC eMBMS Stats ) [Version 2]
+	Subpacket 76	SubPacket - ( RLC eMBMS Config ) [Version 2]
+0xB092	LTE RLC UL AM All PDU  [Mismatched Version: 1, 56 (db) vs 1, 1 (packet class)]
+	Subpacket 64	SubPacket - ( RLCDL Configuration ) [Version 3]
+	Subpacket 65	SubPacket - ( RLCDL PDU ) [Version 4]
+	Subpacket 66	SubPacket - ( DL Statistics ) [Version 3]
+	Subpacket 69	SubPacket - ( RLCUL Configuration ) [Version 3]
+	Subpacket 70	SubPacket - ( RLCUL PDU ) [Version 4]
+	Subpacket 71	SubPacket - ( UL Statistics   ) [Version 3]
+	Subpacket 74	SubPacket - ( LTE RLC eMBMS Data PDU ) [Version 2]
+	Subpacket 75	SubPacket - ( RLC eMBMS Stats ) [Version 2]
+	Subpacket 76	SubPacket - ( RLC eMBMS Config ) [Version 2]
+0xB093	LTE RLC UL AM Control PDU [Version 1, 48]
+	Subpacket 64	SubPacket - ( RLCDL Configuration ) [Version 3]
+	Subpacket 65	SubPacket - ( RLCDL PDU ) [Version 4]
+	Subpacket 66	SubPacket - ( DL Statistics ) [Version 3]
+	Subpacket 69	SubPacket - ( RLCUL Configuration ) [Version 3]
+	Subpacket 70	SubPacket - ( RLCUL PDU ) [Version 4]
+	Subpacket 71	SubPacket - ( UL Statistics   ) [Version 3]
+	Subpacket 74	SubPacket - ( LTE RLC eMBMS Data PDU ) [Version 2]
+	Subpacket 75	SubPacket - ( RLC eMBMS Stats ) [Version 2]
+	Subpacket 76	SubPacket - ( RLC eMBMS Config ) [Version 2]
+0xB094	LTE RLC UL AM Polling PDU [Version 1, 48]
+	Subpacket 64	SubPacket - ( RLCDL Configuration ) [Version 3]
+	Subpacket 65	SubPacket - ( RLCDL PDU ) [Version 4]
+	Subpacket 66	SubPacket - ( DL Statistics ) [Version 3]
+	Subpacket 69	SubPacket - ( RLCUL Configuration ) [Version 3]
+	Subpacket 70	SubPacket - ( RLCUL PDU ) [Version 4]
+	Subpacket 71	SubPacket - ( UL Statistics   ) [Version 3]
+	Subpacket 74	SubPacket - ( LTE RLC eMBMS Data PDU ) [Version 2]
+	Subpacket 75	SubPacket - ( RLC eMBMS Stats ) [Version 2]
+	Subpacket 76	SubPacket - ( RLC eMBMS Config ) [Version 2]
+0xB095	LTE RLC UL AM Signaling PDU [Version 1, 48]
+	Subpacket 64	SubPacket - ( RLCDL Configuration ) [Version 3]
+	Subpacket 65	SubPacket - ( RLCDL PDU ) [Version 4]
+	Subpacket 66	SubPacket - ( DL Statistics ) [Version 3]
+	Subpacket 69	SubPacket - ( RLCUL Configuration ) [Version 3]
+	Subpacket 70	SubPacket - ( RLCUL PDU ) [Version 4]
+	Subpacket 71	SubPacket - ( UL Statistics   ) [Version 3]
+	Subpacket 74	SubPacket - ( LTE RLC eMBMS Data PDU ) [Version 2]
+	Subpacket 75	SubPacket - ( RLC eMBMS Stats ) [Version 2]
+	Subpacket 76	SubPacket - ( RLC eMBMS Config ) [Version 2]
+0xB096	LTE RLC UL UM Data PDU [Version 1]
+	Subpacket 65	SubPacket - (RLCDL UM PDU  ) [Version 4]
+	Subpacket 70	SubPacket - ( RLCUL UM PDU  ) [Version 4]
+0xB097	LTE RLC UL Statistics [Mismatched Version: 1, 48 (db) vs 1, 1 (packet class)]
+	Subpacket 64	SubPacket - ( RLCDL Configuration ) [Version 3]
+	Subpacket 65	SubPacket - ( RLCDL PDU ) [Version 4]
+	Subpacket 66	SubPacket - ( DL Statistics ) [Version 3]
+	Subpacket 69	SubPacket - ( RLCUL Configuration ) [Version 3]
+	Subpacket 70	SubPacket - ( RLCUL PDU ) [Version 4]
+	Subpacket 71	SubPacket - ( UL Statistics   ) [Version 3]
+	Subpacket 74	SubPacket - ( LTE RLC eMBMS Data PDU ) [Version 2]
+	Subpacket 75	SubPacket - ( RLC eMBMS Stats ) [Version 2]
+	Subpacket 76	SubPacket - ( RLC eMBMS Config ) [Version 2]
+0xB098	Reserved
+0xB099	Reserved
+0xB09A	LTE RLC UL Conn Statistics [Version 1, 48]
+	Subpacket 64	SubPacket - ( RLCDL Configuration ) [Version 3]
+	Subpacket 65	SubPacket - ( RLCDL PDU ) [Version 4]
+	Subpacket 66	SubPacket - ( DL Statistics ) [Version 3]
+	Subpacket 69	SubPacket - ( RLCUL Configuration ) [Version 3]
+	Subpacket 70	SubPacket - ( RLCUL PDU ) [Version 4]
+	Subpacket 71	SubPacket - ( UL Statistics   ) [Version 3]
+	Subpacket 74	SubPacket - ( LTE RLC eMBMS Data PDU ) [Version 2]
+	Subpacket 75	SubPacket - ( RLC eMBMS Stats ) [Version 2]
+	Subpacket 76	SubPacket - ( RLC eMBMS Config ) [Version 2]
+0xB0A0	LTE PDCP DL Config [Version 1]
+	Subpacket 192	SubPkt_1 [Version 4, 40]
+0xB0A1	LTE PDCP DL Data PDU [Version 1, 51]
+	Subpacket 194	DL Data PDU Subpacket [Version 2, 24]
+	Subpacket 195	DL Cipher Data PDU Subpacket [Version 1]
+	Subpacket 198	DL SRB Integrity Data PDU Subpacket [Version 1]
+0xB0A2	LTE PDCP DL Ctrl PDU [Version 1, 49]
+	Subpacket 194	DL PDU Subpacket [Version 1, 40, 41]
+0xB0A3	LTE PDCP DL Cipher Data PDU [Version 1]
+	Subpacket 194	DL Data PDU Subpacket [Version 1]
+	Subpacket 195	DL Cipher Data PDU Subpacket [Version 3, 40]
+	Subpacket 198	DL SRB Integrity Data PDU Subpacket [Version 1]
+0xB0A4	LTE PDCP DL Statistics Pkt [Version 1, 51]
+	Subpacket 196	SubPacket - ( DL Statistics ) [Version 3, 40, 41]
+	Subpacket 197	SubPacket - ( UL Statistics ) [Version 3, 26]
+0xB0A5	LTE PDCP DL SRB Integrity Data PDU [Version 1]
+	Subpacket 194	DL Data PDU Subpacket [Version 2, 24]
+	Subpacket 195	DL Cipher Data PDU Subpacket [Version 1]
+	Subpacket 198	DL SRB Integrity Data PDU Subpacket [Version 1, 40]
+0xB0A6	LTE PDCP DL SDU [Version 1]
+	Subpacket 201	DL SDU Subpacket [Version 1]
+0xB0A7	LTE PDCP DL Meta [Version 1]
+	Subpacket 202	DL Meta Subpacket [Version 1]
+0xB0A8	Reserved
+0xB0B0	LTE PDCP UL Config [Version 1]
+	Subpacket 193	SubPkt_1 [Version 3, 40, 48]
+0xB0B1	LTE PDCP UL Data PDU [Version 1]
+	Subpacket 194	UL PDU Subpacket [Version 2, 24]
+	Subpacket 195	UL Cipher Data PDU Subpacket [Version 1]
+	Subpacket 199	UL SRB Integrity Data PDU Subpacket [Version 1]
+0xB0B2	LTE PDCP UL Ctrl PDU [Version 1]
+	Subpacket 194	PDCPUL Ctrl PDU Subpacket [Version 2, 40, 41]
+0xB0B3	LTE PDCP UL Cipher Data PDU [Version 1]
+	Subpacket 194	UL PDU Subpacket [Version 1]
+	Subpacket 195	UL Cipher Data PDU Subpacket [Version 3, 40, 41]
+	Subpacket 199	UL SRB Integrity Data PDU Subpacket [Version 1]
+0xB0B4	LTE PDCP UL Statistics Pkt [Version 1]
+	Subpacket 196	SubPacket - ( DL Statistics ) [Version 3, 40, 41]
+	Subpacket 197	SubPacket - ( UL Statistics ) [Version 3, 27]
+0xB0B5	LTE PDCP UL SRB Integrity Data PDU [Version 1]
+	Subpacket 194	UL PDU Subpacket [Version 2, 24]
+	Subpacket 195	UL Cipher Data PDU Subpacket [Version 1]
+	Subpacket 199	UL SRB Integrity Data PDU Subpacket [Version 1, 40]
+0xB0B6	LTE PDCP UL Delay Statistics [Version 1]
+	Subpacket 200	 Subpackets- (UL  Delay Stats) [Version 2]
+0xB0B7	LTE PDCP UL Discard RTP Data [Version 1]
+	Subpacket 201	Ul Discard Rtp Data [Version 1]
+0xB0C0	LTE RRC OTA Packet
+0xB0C1	LTE RRC MIB Message Log Packet [Version 17]
+0xB0C2	LTE RRC Serving Cell Info Log Pkt [Version 3]
+0xB0C3	LTE PLMN Search Request [Version 16, 24, 162]
+0xB0C4	LTE PLMN Search Response [Version 3]
+0xB0C5	Reserved
+0xB0C6	LTE RRC eMBMS Bearer Info List [Version 2]
+0xB0C7	LTE eMBMS OOS Warning Indication [Version 1]
+0xB0C8	Reserved
+0xB0C9	LTE RRC Logged Meas Config
+0xB0CA	LTE RRC Log Meas Info [Version 2]
+0xB0CB	LTE RRC Paging UE [Version 2]
+0xB0CC	Reserved
+0xB0CD	LTE RRC Supported CA Combos [Version 40, 41]
+0xB0CE	Reserved
+0xB0CF	Reserved
+0xB0D0	Reserved
+0xB0D1	LTE RRC Cap Related Info [Version 40]
+0xB0D2	Reserved
+0xB0D3	LTE RRC Connection Release Info [Version 1]
+0xB0E0	LTE NAS ESM Security Protected Incoming Msg
+0xB0E1	LTE NAS ESM Security Protected Outgoing Msg
+0xB0E2	LTE NAS ESM Plain OTA Incoming Message
+0xB0E3	LTE NAS ESM Plain OTA Outgoing Message
+0xB0E4	LTE NAS ESM Bearer Context State  [Version 1]
+0xB0E5	LTE NAS ESM Bearer Context Info
+0xB0E6	LTE NAS ESM Procedure State [Version 1]
+0xB0EA	LTE NAS EMM Security Protected Incoming Msg
+0xB0EB	LTE NAS EMM Security Protected Outgoing Msg
+0xB0EC	LTE NAS EMM Plain OTA Incoming Message
+0xB0ED	LTE NAS EMM Plain OTA Outgoing Message
+0xB0EE	LTE NAS EMM State [Version 2]
+0xB0EF	LTE NAS EMM USIM card mode [Version 1]
+0xB0F2	Reserved
+0xB0F3	Reserved
+0xB0F4	Reserved
+0xB0F5	LTE NAS EMM USIM Service Table [Version 2]
+0xB0F6	LTE NAS EMM Forbidden TAI List [Version 1]
+0xB0F7	LTE NAS EMM RRC Service Request [Version 32]
+0xB0F8	Reserved
+0xB0F9	LTE NAS WWAN Scan Result M1
+0xB110	Reserved
+0xB111	LTE LL1 Rx Agc Log [Version 3, 24, 101, 122, 141, 162]
+0xB112	Reserved
+0xB113	LTE LL1 PSS Results [Version 2, 24, 121, 142]
+0xB114	LTE LL1 Serving Cell Frame Timing [Version 2, 43, 101, 122, 141, 161]
+0xB115	LTE LL1 SSS Results [Version 2, 24, 41, 122]
+0xB116	LTE LL1 Serving Cell Measurement Results [Version 1, 21]
+0xB117	Reserved
+0xB118	Reserved
+0xB119	LTE LL1 Neighbor Cell Measurements and Tracking [Version 142]
+0xB11A	Reserved
+0xB11B	Reserved
+0xB11C	LTE LL1 FAP UL Timing [Version 2]
+0xB11D	LTE LL1 Serving Cell TTL Results [Version 2, 23, 45, 101, 143, 161]
+0xB11E	Reserved
+0xB11F	Reserved
+0xB120	LTE LL1 RS Signal Correlation [Version 1, 21, 121, 161]
+0xB121	LTE LL1 Serving Cell COM Loop [Version 22, 41, 161]
+0xB122	LTE LL1 Serving Cell CER [Version 1, 21, 42, 142, 161]
+0xB123	LTE LL1 Neighbor Cell CER [Version 1, 41, 101]
+0xB124	Reserved
+0xB125	LTE LL1 eMBMS Whitened Matrices [Version 1, 21, 141]
+0xB126	LTE LL1 PDSCH Demapper Configuration [Version 2, 28, 105, 124, 144, 163]
+0xB127	LTE LL1 eMBMS CER [Version 1, 23, 141]
+0xB128	Reserved
+0xB129	Reserved
+0xB12A	LTE LL1 PCFICH Decoding Results [Version 1, 23, 43, 161]
+0xB12B	Reserved
+0xB12C	LTE LL1 PHICH Decoding Results [Version 4, 101, 121]
+0xB12D	Reserved
+0xB12E	LTE LL1 PBCH Decoding Results [Version 4, 101, 121, 142]
+0xB12F	Reserved
+0xB130	LTE LL1 PDCCH Decoding Result [Version 5, 24, 43, 101, 123, 141, 163]
+0xB131	LTE LL1 Serving Cell PETL Loop [Version 21]
+0xB132	LTE LL1 PDSCH Decoding Results [Version 3, 32, 44, 107, 127, 160, 165]
+0xB133	Reserved
+0xB134	Reserved
+0xB135	Reserved
+0xB136	Reserved
+0xB137	Reserved
+0xB138	Reserved
+0xB139	LTE LL1 PUSCH Tx Report [Mismatched Version: 6, 26, 43, 103, 125, 145, 161 (db) vs 6, 26, 43, 103, 125, 145, N/A (packet class)]
+0xB13A	LTE LL1 Multi RAT DL Report [Version 1, 141]
+0xB13B	LTE LL1 Multi RAT UL Report [Version 3, 141]
+0xB13C	LTE LL1 PUCCH Tx Report [Version 5, 22, 43, 101, 122, 143, 161]
+0xB13D	Reserved
+0xB13E	Reserved
+0xB13F	Reserved
+0xB140	LTE LL1 SRS Tx Report [Version 3, 121, 142, 161]
+0xB141	Reserved
+0xB142	LTE LL1 CoExistence Status [Version 3, 101, 141]
+0xB143	Reserved
+0xB144	LTE LL1 RACH Tx Report [Version 7, 122, 161]
+0xB145	Reserved
+0xB146	LTE LL1 UL AGC Tx Report [Version 5, 44, 101, 122, 163]
+0xB147	Reserved
+0xB148	Reserved
+0xB149	Reserved
+0xB14A	Reserved
+0xB14B	Reserved
+0xB14C	Reserved
+0xB14D	LTE LL1 PUCCH CSF [Version 2, 25, 43, 103, 142, 162]
+0xB14E	LTE LL1 PUSCH CSF [Version 2, 24, 42, 103, 142, 163]
+0xB14F	LTE LL1 UERS SNR [Version 4, 23, 43, 102, 121, 143, 162]
+0xB150	Reserved
+0xB151	LTE LL1 Corr Est Results [Version 121, 161]
+0xB152	Reserved
+0xB153	Reserved
+0xB154	Reserved
+0xB155	Reserved
+0xB156	Reserved
+0xB157	Reserved
+0xB158	Reserved
+0xB159	Reserved
+0xB15A	Reserved
+0xB15B	LTE LL1 RX Antenna Info
+0xB15C	Reserved
+0xB15D	Reserved
+0xB15E	Reserved
+0xB15F	Reserved
+0xB160	LTE Downlink Common Configuration [Version 2]
+0xB161	LTE Downlink Dedicated Configuration [Version 1]
+0xB162	LTE Uplink Common Configuration [Version 2]
+0xB163	LTE Uplink Dedicated Configuration [Version 3]
+0xB164	LTE Grant Manager Common Configuration [Version 2, 40]
+0xB165	LTE Grant Manager Dedicated Configuration [Version 5]
+0xB166	LTE PRACH Configuration [Version 3, 32, 40]
+0xB167	LTE Random Access Request (MSG1) Report [Version 7, 32, 40]
+0xB168	LTE Random Access Response (MSG2) Report [Version 1, 24]
+0xB169	LTE UE Identification Message (MSG3) Report [Version 3, 32, 40]
+0xB16A	LTE Contention Resolution Message (MSG4) Report [Version 1]
+0xB16B	LTE PDCCH-PHICH Indication Report [Mismatched Version: 6, 32, 48, 49 (db) vs 6, 32, 42, N/A (packet class)]
+0xB16C	LTE DCI Information Report [Version 10, 32, 48, 49]
+0xB16D	LTE GM TX Report [Version 16, 32, 48, 49]
+0xB16E	LTE PUSCH Power Control [Version 5, 26, 48]
+0xB16F	LTE PUCCH Power Control [Version 4, 24, 48, 49]
+0xB170	LTE SRS TX Report [Version 4, 24, 48, 49]
+0xB171	LTE SRS Power Control Report [Version 3, 24]
+0xB172	LTE Uplink PKT Build Indication [Version 2, 32]
+0xB173	LTE PDSCH Stat Indication [Version 16, 32, 48, 49]
+0xB174	Reserved
+0xB175	Reserved
+0xB176	LTE Initial Acquisition Results [Version 16, 32]
+0xB177	LTE ML1 Connected Mode Measurement Configuration [Version 1]
+	Subpacket 1	Idle Meas Common Config [Version 2]
+	Subpacket 2	Idle Meas Resel Common Params [Version 1]
+	Subpacket 3	Idle Meas Mobility Params [Version 1]
+	Subpacket 4	Idle Meas Cell Select Request [Version 4]
+	Subpacket 5	Idle Meas Serving Frequency Resel Info [Version 16, 25]
+	Subpacket 6	Idle Meas Intra Frequency Common Config Resel Info [Version 3, 48]
+	Subpacket 7	Idle Meas Intra Frequency Whitelist Info [Version 1]
+	Subpacket 8	Idle Meas Intra Frequency Blacklist Cells [Version 1]
+	Subpacket 9	Idle Meas Serving Cell Measurements [Version 2]
+	Subpacket 10	Idle Mode Reselection Measurements Common [Version 2]
+	Subpacket 11	Idle Mode Reselection Measurements LTE Frequency [Version 16, 32, 40]
+	Subpacket 12	Idle Meas CDMA Config [Version 1]
+	Subpacket 13	Reserved [Version 2]
+	Subpacket 15	Reserved [Version 2]
+	Subpacket 16	Serving Cell Info [Version 16, 32, 40]
+	Subpacket 17	Measurement ID Configuration [Version 16, 32, 48]
+	Subpacket 18	Measurement Object Configuration [Version 3, 32, 44]
+	Subpacket 19	Reporting Configuration [Version 16, 32, 48]
+	Subpacket 20	Quantity Configuration [Version 16, 32, 40]
+	Subpacket 21	Measurement Gap Configuration [Version 16, 32, 48]
+	Subpacket 22	s-Measure Configuration [Version 16, 32, 41]
+	Subpacket 23	Neighbor Cell Configuration [Version 16, 32, 40]
+	Subpacket 24	Speed-Dependent Scaling Parameters [Version 16, 32, 40]
+	Subpacket 25	Serving Cell Measurement Result [Version 16, 32, 48]
+	Subpacket 26	Idle Mode Neighbor Cell Measurement Request [Version 2]
+	Subpacket 27	Neighbor Cell Meas Result [Version 4]
+	Subpacket 28	Neighbor Cell Search Request [Version 16, 32, 40]
+	Subpacket 29	Neighbor Cell Search Response [Version 16, 40]
+	Subpacket 30	Connected Neighbor Meas Request [Version 3, 32, 40]
+	Subpacket 31	Connected Neighbor Meas Response [Version 4, 24, 40]
+	Subpacket 32	Reserved [Version 4]
+	Subpacket 33	Reserved [Version 16, 32, 40]
+	Subpacket 34	Idle Meas WCDMA Config [Version 1]
+	Subpacket 35	WCDMA MDB [Version 2, 24]
+	Subpacket 36	Idle GSM Meas Config [Version 24]
+	Subpacket 37	Conn Meas Config Bitmasks [Version 16, 32, 42]
+	Subpacket 38	GSM RSSI Measurements [Version 4]
+	Subpacket 39	GSM FCCH Detection [Version 3]
+	Subpacket 40	GSM SCH Decode [Version 4]
+	Subpacket 41	1x MDB [Version 1]
+	Subpacket 42	GSM MDB [Version 1]
+	Subpacket 43	Reserved [Version 2]
+	Subpacket 44	Reserved [Version 2]
+	Subpacket 45	Reserved [Version 3]
+	Subpacket 46	Reserved [Version 2]
+	Subpacket 47	TDSCDMA Conn Mode Acq Request [Version 1]
+	Subpacket 48	TDSCDMA Conn Mode Meas Request [Version 1]
+	Subpacket 49	GSM Gap Info [Version 2]
+	Subpacket 50	Gsm Handover Info [Version 1]
+	Subpacket 54	HRPD And 1x Results [Version 16]
+	Subpacket 55	Idle Irat Meas Request [Version 16]
+0xB178	Reserved
+0xB179	LTE ML1 Connected Mode LTE Intra-Freq Meas Results [Version 4]
+0xB17A	LTE ML1 S Criteria Check Procedure [Version 1]
+	Subpacket 1	Idle Meas Common Config [Version 2]
+	Subpacket 2	Idle Meas Resel Common Params [Version 1]
+	Subpacket 3	Idle Meas Mobility Params [Version 1]
+	Subpacket 4	Idle Meas Cell Select Request [Version 4]
+	Subpacket 5	Idle Meas Serving Frequency Resel Info [Version 16, 25]
+	Subpacket 6	Idle Meas Intra Frequency Common Config Resel Info [Version 3, 48]
+	Subpacket 7	Idle Meas Intra Frequency Whitelist Info [Version 1]
+	Subpacket 8	Idle Meas Intra Frequency Blacklist Cells [Version 1]
+	Subpacket 9	Idle Meas Serving Cell Measurements [Version 2]
+	Subpacket 10	Idle Mode Reselection Measurements Common [Version 2]
+	Subpacket 11	Idle Mode Reselection Measurements LTE Frequency [Version 16, 32, 40]
+	Subpacket 12	Idle Meas CDMA Config [Version 1]
+	Subpacket 13	Reserved [Version 2]
+	Subpacket 15	Reserved [Version 2]
+	Subpacket 16	Serving Cell Info [Version 16, 32, 40]
+	Subpacket 17	Measurement ID Configuration [Version 16, 32, 48]
+	Subpacket 18	Measurement Object Configuration [Version 3, 32, 44]
+	Subpacket 19	Reporting Configuration [Version 16, 32, 48]
+	Subpacket 20	Quantity Configuration [Version 16, 32, 40]
+	Subpacket 21	Measurement Gap Configuration [Version 16, 32, 48]
+	Subpacket 22	s-Measure Configuration [Version 16, 32, 41]
+	Subpacket 23	Neighbor Cell Configuration [Version 16, 32, 40]
+	Subpacket 24	Speed-Dependent Scaling Parameters [Version 16, 32, 40]
+	Subpacket 25	Serving Cell Measurement Result [Version 16, 32, 48]
+	Subpacket 26	Idle Mode Neighbor Cell Measurement Request [Version 2]
+	Subpacket 27	Neighbor Cell Meas Result [Version 4]
+	Subpacket 28	Neighbor Cell Search Request [Version 16, 32, 40]
+	Subpacket 29	Neighbor Cell Search Response [Version 16, 40]
+	Subpacket 30	Connected Neighbor Meas Request [Version 3, 32, 40]
+	Subpacket 31	Connected Neighbor Meas Response [Version 4, 24, 40]
+	Subpacket 32	Reserved [Version 4]
+	Subpacket 33	Reserved [Version 16, 32, 40]
+	Subpacket 34	Idle Meas WCDMA Config [Version 1]
+	Subpacket 35	WCDMA MDB [Version 2, 24]
+	Subpacket 36	Idle GSM Meas Config [Version 24]
+	Subpacket 37	Conn Meas Config Bitmasks [Version 16, 32, 42]
+	Subpacket 38	GSM RSSI Measurements [Version 4]
+	Subpacket 39	GSM FCCH Detection [Version 3]
+	Subpacket 40	GSM SCH Decode [Version 4]
+	Subpacket 41	1x MDB [Version 1]
+	Subpacket 42	GSM MDB [Version 1]
+	Subpacket 43	Reserved [Version 2]
+	Subpacket 44	Reserved [Version 2]
+	Subpacket 45	Reserved [Version 3]
+	Subpacket 46	Reserved [Version 2]
+	Subpacket 47	TDSCDMA Conn Mode Acq Request [Version 1]
+	Subpacket 48	TDSCDMA Conn Mode Meas Request [Version 1]
+	Subpacket 49	GSM Gap Info [Version 2]
+	Subpacket 50	Gsm Handover Info [Version 1]
+	Subpacket 54	HRPD And 1x Results [Version 16]
+	Subpacket 55	Idle Irat Meas Request [Version 16]
+0xB17B	LTE ML1 RSB Offset [Version 32]
+0xB17C	LTE ML1 Paging DRX Request   [Version 3, 40]
+0xB17D	LTE ML1 Idle Measurement Request [Version 1]
+	Subpacket 1	Idle Meas Common Config [Version 2]
+	Subpacket 2	Idle Meas Resel Common Params [Version 1]
+	Subpacket 3	Idle Meas Mobility Params [Version 1]
+	Subpacket 4	Idle Meas Cell Select Request [Version 4]
+	Subpacket 5	Idle Meas Serving Frequency Resel Info [Version 16, 25]
+	Subpacket 6	Idle Meas Intra Frequency Common Config Resel Info [Version 3, 48]
+	Subpacket 7	Idle Meas Intra Frequency Whitelist Info [Version 1]
+	Subpacket 8	Idle Meas Intra Frequency Blacklist Cells [Version 1]
+	Subpacket 9	Idle Meas Serving Cell Measurements [Version 2]
+	Subpacket 10	Idle Mode Reselection Measurements Common [Version 2]
+	Subpacket 11	Idle Mode Reselection Measurements LTE Frequency [Version 16, 32, 40]
+	Subpacket 12	Idle Meas CDMA Config [Version 1]
+	Subpacket 13	Reserved [Version 2]
+	Subpacket 15	Reserved [Version 2]
+	Subpacket 16	Serving Cell Info [Version 16, 32, 40]
+	Subpacket 17	Measurement ID Configuration [Version 16, 32, 48]
+	Subpacket 18	Measurement Object Configuration [Version 3, 32, 44]
+	Subpacket 19	Reporting Configuration [Version 16, 32, 48]
+	Subpacket 20	Quantity Configuration [Version 16, 32, 40]
+	Subpacket 21	Measurement Gap Configuration [Version 16, 32, 48]
+	Subpacket 22	s-Measure Configuration [Version 16, 32, 41]
+	Subpacket 23	Neighbor Cell Configuration [Version 16, 32, 40]
+	Subpacket 24	Speed-Dependent Scaling Parameters [Version 16, 32, 40]
+	Subpacket 25	Serving Cell Measurement Result [Version 16, 32, 48]
+	Subpacket 26	Idle Mode Neighbor Cell Measurement Request [Version 2]
+	Subpacket 27	Neighbor Cell Meas Result [Version 4]
+	Subpacket 28	Neighbor Cell Search Request [Version 16, 32, 40]
+	Subpacket 29	Neighbor Cell Search Response [Version 16, 40]
+	Subpacket 30	Connected Neighbor Meas Request [Version 3, 32, 40]
+	Subpacket 31	Connected Neighbor Meas Response [Version 4, 24, 40]
+	Subpacket 32	Reserved [Version 4]
+	Subpacket 33	Reserved [Version 16, 32, 40]
+	Subpacket 34	Idle Meas WCDMA Config [Version 1]
+	Subpacket 35	WCDMA MDB [Version 2, 24]
+	Subpacket 36	Idle GSM Meas Config [Version 24]
+	Subpacket 37	Conn Meas Config Bitmasks [Version 16, 32, 42]
+	Subpacket 38	GSM RSSI Measurements [Version 4]
+	Subpacket 39	GSM FCCH Detection [Version 3]
+	Subpacket 40	GSM SCH Decode [Version 4]
+	Subpacket 41	1x MDB [Version 1]
+	Subpacket 42	GSM MDB [Version 1]
+	Subpacket 43	Reserved [Version 2]
+	Subpacket 44	Reserved [Version 2]
+	Subpacket 45	Reserved [Version 3]
+	Subpacket 46	Reserved [Version 2]
+	Subpacket 47	TDSCDMA Conn Mode Acq Request [Version 1]
+	Subpacket 48	TDSCDMA Conn Mode Meas Request [Version 1]
+	Subpacket 49	GSM Gap Info [Version 2]
+	Subpacket 50	Gsm Handover Info [Version 1]
+	Subpacket 54	HRPD And 1x Results [Version 16]
+	Subpacket 55	Idle Irat Meas Request [Version 16]
+0xB17E	LTE ML1 UE Mobility State change 
+0xB17F	LTE ML1 Serving Cell Meas and Eval [Version 5]
+0xB180	LTE ML1 Neighbor Measurements [Version 5]
+0xB181	LTE ML1 Intra Frequency Cell Reselection [Version 1]
+	Subpacket 1	Idle Meas Common Config [Version 2]
+	Subpacket 2	Idle Meas Resel Common Params [Version 1]
+	Subpacket 3	Idle Meas Mobility Params [Version 1]
+	Subpacket 4	Idle Meas Cell Select Request [Version 4]
+	Subpacket 5	Idle Meas Serving Frequency Resel Info [Version 16, 25]
+	Subpacket 6	Idle Meas Intra Frequency Common Config Resel Info [Version 3, 48]
+	Subpacket 7	Idle Meas Intra Frequency Whitelist Info [Version 1]
+	Subpacket 8	Idle Meas Intra Frequency Blacklist Cells [Version 1]
+	Subpacket 9	Idle Meas Serving Cell Measurements [Version 2]
+	Subpacket 10	Idle Mode Reselection Measurements Common [Version 2]
+	Subpacket 11	Idle Mode Reselection Measurements LTE Frequency [Version 16, 32, 40]
+	Subpacket 12	Idle Meas CDMA Config [Version 1]
+	Subpacket 13	Reserved [Version 2]
+	Subpacket 15	Reserved [Version 2]
+	Subpacket 16	Serving Cell Info [Version 16, 32, 40]
+	Subpacket 17	Measurement ID Configuration [Version 16, 32, 48]
+	Subpacket 18	Measurement Object Configuration [Version 3, 32, 44]
+	Subpacket 19	Reporting Configuration [Version 16, 32, 48]
+	Subpacket 20	Quantity Configuration [Version 16, 32, 40]
+	Subpacket 21	Measurement Gap Configuration [Version 16, 32, 48]
+	Subpacket 22	s-Measure Configuration [Version 16, 32, 41]
+	Subpacket 23	Neighbor Cell Configuration [Version 16, 32, 40]
+	Subpacket 24	Speed-Dependent Scaling Parameters [Version 16, 32, 40]
+	Subpacket 25	Serving Cell Measurement Result [Version 16, 32, 48]
+	Subpacket 26	Idle Mode Neighbor Cell Measurement Request [Version 2]
+	Subpacket 27	Neighbor Cell Meas Result [Version 4]
+	Subpacket 28	Neighbor Cell Search Request [Version 16, 32, 40]
+	Subpacket 29	Neighbor Cell Search Response [Version 16, 40]
+	Subpacket 30	Connected Neighbor Meas Request [Version 3, 32, 40]
+	Subpacket 31	Connected Neighbor Meas Response [Version 4, 24, 40]
+	Subpacket 32	Reserved [Version 4]
+	Subpacket 33	Reserved [Version 16, 32, 40]
+	Subpacket 34	Idle Meas WCDMA Config [Version 1]
+	Subpacket 35	WCDMA MDB [Version 2, 24]
+	Subpacket 36	Idle GSM Meas Config [Version 24]
+	Subpacket 37	Conn Meas Config Bitmasks [Version 16, 32, 42]
+	Subpacket 38	GSM RSSI Measurements [Version 4]
+	Subpacket 39	GSM FCCH Detection [Version 3]
+	Subpacket 40	GSM SCH Decode [Version 4]
+	Subpacket 41	1x MDB [Version 1]
+	Subpacket 42	GSM MDB [Version 1]
+	Subpacket 43	Reserved [Version 2]
+	Subpacket 44	Reserved [Version 2]
+	Subpacket 45	Reserved [Version 3]
+	Subpacket 46	Reserved [Version 2]
+	Subpacket 47	TDSCDMA Conn Mode Acq Request [Version 1]
+	Subpacket 48	TDSCDMA Conn Mode Meas Request [Version 1]
+	Subpacket 49	GSM Gap Info [Version 2]
+	Subpacket 50	Gsm Handover Info [Version 1]
+	Subpacket 54	HRPD And 1x Results [Version 16]
+	Subpacket 55	Idle Irat Meas Request [Version 16]
+0xB182	LTE ML1 Multisim Packet [Version 16, 29, 48, 49]
+0xB183	Reserved
+0xB184	LTE ML1 CA Metrics Log Packet [Version 1, 25, 48, 50]
+0xB185	LTE ML1 CDMA Neighbor Measurements [Version 1]
+	Subpacket 1	Idle Meas Common Config [Version 2]
+	Subpacket 2	Idle Meas Resel Common Params [Version 1]
+	Subpacket 3	Idle Meas Mobility Params [Version 1]
+	Subpacket 4	Idle Meas Cell Select Request [Version 4]
+	Subpacket 5	Idle Meas Serving Frequency Resel Info [Version 16, 25]
+	Subpacket 6	Idle Meas Intra Frequency Common Config Resel Info [Version 3, 48]
+	Subpacket 7	Idle Meas Intra Frequency Whitelist Info [Version 1]
+	Subpacket 8	Idle Meas Intra Frequency Blacklist Cells [Version 1]
+	Subpacket 9	Idle Meas Serving Cell Measurements [Version 2]
+	Subpacket 10	Idle Mode Reselection Measurements Common [Version 2]
+	Subpacket 11	Idle Mode Reselection Measurements LTE Frequency [Version 16, 32, 40]
+	Subpacket 12	Idle Meas CDMA Config [Version 1]
+	Subpacket 13	Reserved [Version 2]
+	Subpacket 15	Reserved [Version 2]
+	Subpacket 16	Serving Cell Info [Version 16, 32, 40]
+	Subpacket 17	Measurement ID Configuration [Version 16, 32, 48]
+	Subpacket 18	Measurement Object Configuration [Version 3, 32, 44]
+	Subpacket 19	Reporting Configuration [Version 16, 32, 48]
+	Subpacket 20	Quantity Configuration [Version 16, 32, 40]
+	Subpacket 21	Measurement Gap Configuration [Version 16, 32, 48]
+	Subpacket 22	s-Measure Configuration [Version 16, 32, 41]
+	Subpacket 23	Neighbor Cell Configuration [Version 16, 32, 40]
+	Subpacket 24	Speed-Dependent Scaling Parameters [Version 16, 32, 40]
+	Subpacket 25	Serving Cell Measurement Result [Version 16, 32, 48]
+	Subpacket 26	Idle Mode Neighbor Cell Measurement Request [Version 2]
+	Subpacket 27	Neighbor Cell Meas Result [Version 4]
+	Subpacket 28	Neighbor Cell Search Request [Version 16, 32, 40]
+	Subpacket 29	Neighbor Cell Search Response [Version 16, 40]
+	Subpacket 30	Connected Neighbor Meas Request [Version 3, 32, 40]
+	Subpacket 31	Connected Neighbor Meas Response [Version 4, 24, 40]
+	Subpacket 32	Reserved [Version 4]
+	Subpacket 33	Reserved [Version 16, 32, 40]
+	Subpacket 34	Idle Meas WCDMA Config [Version 1]
+	Subpacket 35	WCDMA MDB [Version 2, 24]
+	Subpacket 36	Idle GSM Meas Config [Version 24]
+	Subpacket 37	Conn Meas Config Bitmasks [Version 16, 32, 42]
+	Subpacket 38	GSM RSSI Measurements [Version 4]
+	Subpacket 39	GSM FCCH Detection [Version 3]
+	Subpacket 40	GSM SCH Decode [Version 4]
+	Subpacket 41	1x MDB [Version 1]
+	Subpacket 42	GSM MDB [Version 1]
+	Subpacket 43	Reserved [Version 2]
+	Subpacket 44	Reserved [Version 2]
+	Subpacket 45	Reserved [Version 3]
+	Subpacket 46	Reserved [Version 2]
+	Subpacket 47	TDSCDMA Conn Mode Acq Request [Version 1]
+	Subpacket 48	TDSCDMA Conn Mode Meas Request [Version 1]
+	Subpacket 49	GSM Gap Info [Version 2]
+	Subpacket 50	Gsm Handover Info [Version 1]
+	Subpacket 54	HRPD And 1x Results [Version 16]
+	Subpacket 55	Idle Irat Meas Request [Version 16]
+0xB186	LTE ML1 Reselection Candidates [Version 16, 41]
+0xB187	LTE Ml1 Idle IRAT Measurement Request [Version 1]
+	Subpacket 1	Idle Meas Common Config [Version 2]
+	Subpacket 2	Idle Meas Resel Common Params [Version 1]
+	Subpacket 3	Idle Meas Mobility Params [Version 1]
+	Subpacket 4	Idle Meas Cell Select Request [Version 4]
+	Subpacket 5	Idle Meas Serving Frequency Resel Info [Version 16, 25]
+	Subpacket 6	Idle Meas Intra Frequency Common Config Resel Info [Version 3, 48]
+	Subpacket 7	Idle Meas Intra Frequency Whitelist Info [Version 1]
+	Subpacket 8	Idle Meas Intra Frequency Blacklist Cells [Version 1]
+	Subpacket 9	Idle Meas Serving Cell Measurements [Version 2]
+	Subpacket 10	Idle Mode Reselection Measurements Common [Version 2]
+	Subpacket 11	Idle Mode Reselection Measurements LTE Frequency [Version 16, 32, 40]
+	Subpacket 12	Idle Meas CDMA Config [Version 1]
+	Subpacket 13	Reserved [Version 2]
+	Subpacket 15	Reserved [Version 2]
+	Subpacket 16	Serving Cell Info [Version 16, 32, 40]
+	Subpacket 17	Measurement ID Configuration [Version 16, 32, 48]
+	Subpacket 18	Measurement Object Configuration [Version 3, 32, 44]
+	Subpacket 19	Reporting Configuration [Version 16, 32, 48]
+	Subpacket 20	Quantity Configuration [Version 16, 32, 40]
+	Subpacket 21	Measurement Gap Configuration [Version 16, 32, 48]
+	Subpacket 22	s-Measure Configuration [Version 16, 32, 41]
+	Subpacket 23	Neighbor Cell Configuration [Version 16, 32, 40]
+	Subpacket 24	Speed-Dependent Scaling Parameters [Version 16, 32, 40]
+	Subpacket 25	Serving Cell Measurement Result [Version 16, 32, 48]
+	Subpacket 26	Idle Mode Neighbor Cell Measurement Request [Version 2]
+	Subpacket 27	Neighbor Cell Meas Result [Version 4]
+	Subpacket 28	Neighbor Cell Search Request [Version 16, 32, 40]
+	Subpacket 29	Neighbor Cell Search Response [Version 16, 40]
+	Subpacket 30	Connected Neighbor Meas Request [Version 3, 32, 40]
+	Subpacket 31	Connected Neighbor Meas Response [Version 4, 24, 40]
+	Subpacket 32	Reserved [Version 4]
+	Subpacket 33	Reserved [Version 16, 32, 40]
+	Subpacket 34	Idle Meas WCDMA Config [Version 1]
+	Subpacket 35	WCDMA MDB [Version 2, 24]
+	Subpacket 36	Idle GSM Meas Config [Version 24]
+	Subpacket 37	Conn Meas Config Bitmasks [Version 16, 32, 42]
+	Subpacket 38	GSM RSSI Measurements [Version 4]
+	Subpacket 39	GSM FCCH Detection [Version 3]
+	Subpacket 40	GSM SCH Decode [Version 4]
+	Subpacket 41	1x MDB [Version 1]
+	Subpacket 42	GSM MDB [Version 1]
+	Subpacket 43	Reserved [Version 2]
+	Subpacket 44	Reserved [Version 2]
+	Subpacket 45	Reserved [Version 3]
+	Subpacket 46	Reserved [Version 2]
+	Subpacket 47	TDSCDMA Conn Mode Acq Request [Version 1]
+	Subpacket 48	TDSCDMA Conn Mode Meas Request [Version 1]
+	Subpacket 49	GSM Gap Info [Version 2]
+	Subpacket 50	Gsm Handover Info [Version 1]
+	Subpacket 54	HRPD And 1x Results [Version 16]
+	Subpacket 55	Idle Irat Meas Request [Version 16]
+0xB188	LTE ML1 IRAT MDB [Version 1]
+	Subpacket 1	Idle Meas Common Config [Version 2]
+	Subpacket 2	Idle Meas Resel Common Params [Version 1]
+	Subpacket 3	Idle Meas Mobility Params [Version 1]
+	Subpacket 4	Idle Meas Cell Select Request [Version 4]
+	Subpacket 5	Idle Meas Serving Frequency Resel Info [Version 16, 25]
+	Subpacket 6	Idle Meas Intra Frequency Common Config Resel Info [Version 3, 48]
+	Subpacket 7	Idle Meas Intra Frequency Whitelist Info [Version 1]
+	Subpacket 8	Idle Meas Intra Frequency Blacklist Cells [Version 1]
+	Subpacket 9	Idle Meas Serving Cell Measurements [Version 2]
+	Subpacket 10	Idle Mode Reselection Measurements Common [Version 2]
+	Subpacket 11	Idle Mode Reselection Measurements LTE Frequency [Version 16, 32, 40]
+	Subpacket 12	Idle Meas CDMA Config [Version 1]
+	Subpacket 13	Reserved [Version 2]
+	Subpacket 15	Reserved [Version 2]
+	Subpacket 16	Serving Cell Info [Version 16, 32, 40]
+	Subpacket 17	Measurement ID Configuration [Version 16, 32, 48]
+	Subpacket 18	Measurement Object Configuration [Version 3, 32, 44]
+	Subpacket 19	Reporting Configuration [Version 16, 32, 48]
+	Subpacket 20	Quantity Configuration [Version 16, 32, 40]
+	Subpacket 21	Measurement Gap Configuration [Version 16, 32, 48]
+	Subpacket 22	s-Measure Configuration [Version 16, 32, 41]
+	Subpacket 23	Neighbor Cell Configuration [Version 16, 32, 40]
+	Subpacket 24	Speed-Dependent Scaling Parameters [Version 16, 32, 40]
+	Subpacket 25	Serving Cell Measurement Result [Version 16, 32, 48]
+	Subpacket 26	Idle Mode Neighbor Cell Measurement Request [Version 2]
+	Subpacket 27	Neighbor Cell Meas Result [Version 4]
+	Subpacket 28	Neighbor Cell Search Request [Version 16, 32, 40]
+	Subpacket 29	Neighbor Cell Search Response [Version 16, 40]
+	Subpacket 30	Connected Neighbor Meas Request [Version 3, 32, 40]
+	Subpacket 31	Connected Neighbor Meas Response [Version 4, 24, 40]
+	Subpacket 32	Reserved [Version 4]
+	Subpacket 33	Reserved [Version 16, 32, 40]
+	Subpacket 34	Idle Meas WCDMA Config [Version 1]
+	Subpacket 35	WCDMA MDB [Version 2, 24]
+	Subpacket 36	Idle GSM Meas Config [Version 24]
+	Subpacket 37	Conn Meas Config Bitmasks [Version 16, 32, 42]
+	Subpacket 38	GSM RSSI Measurements [Version 4]
+	Subpacket 39	GSM FCCH Detection [Version 3]
+	Subpacket 40	GSM SCH Decode [Version 4]
+	Subpacket 41	1x MDB [Version 1]
+	Subpacket 42	GSM MDB [Version 1]
+	Subpacket 43	Reserved [Version 2]
+	Subpacket 44	Reserved [Version 2]
+	Subpacket 45	Reserved [Version 3]
+	Subpacket 46	Reserved [Version 2]
+	Subpacket 47	TDSCDMA Conn Mode Acq Request [Version 1]
+	Subpacket 48	TDSCDMA Conn Mode Meas Request [Version 1]
+	Subpacket 49	GSM Gap Info [Version 2]
+	Subpacket 50	Gsm Handover Info [Version 1]
+	Subpacket 54	HRPD And 1x Results [Version 16]
+	Subpacket 55	Idle Irat Meas Request [Version 16]
+0xB189	Reserved
+0xB18A	LTE ML1 RLM Report [Version 1]
+0xB18B	LTE ML1 Sleep [Version 2, 32, 48]
+0xB18C	Reserved
+0xB18D	LTE ML1 Band Scan Results [Version 2, 48]
+0xB18E	LTE ML1 System Scan Results [Version 2, 32, 41]
+0xB18F	LTE ML1 AdvRx IC Cell List [Version 2, 32, 48]
+0xB190	Reserved
+0xB191	Reserved
+0xB192	LTE ML1 Neighbor Cell Meas Request/Response [Version 1]
+	Subpacket 1	Idle Meas Common Config [Version 2]
+	Subpacket 2	Idle Meas Resel Common Params [Version 1]
+	Subpacket 3	Idle Meas Mobility Params [Version 1]
+	Subpacket 4	Idle Meas Cell Select Request [Version 4]
+	Subpacket 5	Idle Meas Serving Frequency Resel Info [Version 16, 25]
+	Subpacket 6	Idle Meas Intra Frequency Common Config Resel Info [Version 3, 48]
+	Subpacket 7	Idle Meas Intra Frequency Whitelist Info [Version 1]
+	Subpacket 8	Idle Meas Intra Frequency Blacklist Cells [Version 1]
+	Subpacket 9	Idle Meas Serving Cell Measurements [Version 2]
+	Subpacket 10	Idle Mode Reselection Measurements Common [Version 2]
+	Subpacket 11	Idle Mode Reselection Measurements LTE Frequency [Version 16, 32, 40]
+	Subpacket 12	Idle Meas CDMA Config [Version 1]
+	Subpacket 13	Reserved [Version 2]
+	Subpacket 15	Reserved [Version 2]
+	Subpacket 16	Serving Cell Info [Version 16, 32, 40]
+	Subpacket 17	Measurement ID Configuration [Version 16, 32, 48]
+	Subpacket 18	Measurement Object Configuration [Version 3, 32, 44]
+	Subpacket 19	Reporting Configuration [Version 16, 32, 48]
+	Subpacket 20	Quantity Configuration [Version 16, 32, 40]
+	Subpacket 21	Measurement Gap Configuration [Version 16, 32, 48]
+	Subpacket 22	s-Measure Configuration [Version 16, 32, 41]
+	Subpacket 23	Neighbor Cell Configuration [Version 16, 32, 40]
+	Subpacket 24	Speed-Dependent Scaling Parameters [Version 16, 32, 40]
+	Subpacket 25	Serving Cell Measurement Result [Version 16, 32, 48]
+	Subpacket 26	Idle Mode Neighbor Cell Measurement Request [Version 2]
+	Subpacket 27	Neighbor Cell Meas Result [Version 4]
+	Subpacket 28	Neighbor Cell Search Request [Version 16, 32, 40]
+	Subpacket 29	Neighbor Cell Search Response [Version 16, 40]
+	Subpacket 30	Connected Neighbor Meas Request [Version 3, 32, 40]
+	Subpacket 31	Connected Neighbor Meas Response [Version 4, 24, 40]
+	Subpacket 32	Reserved [Version 4]
+	Subpacket 33	Reserved [Version 16, 32, 40]
+	Subpacket 34	Idle Meas WCDMA Config [Version 1]
+	Subpacket 35	WCDMA MDB [Version 2, 24]
+	Subpacket 36	Idle GSM Meas Config [Version 24]
+	Subpacket 37	Conn Meas Config Bitmasks [Version 16, 32, 42]
+	Subpacket 38	GSM RSSI Measurements [Version 4]
+	Subpacket 39	GSM FCCH Detection [Version 3]
+	Subpacket 40	GSM SCH Decode [Version 4]
+	Subpacket 41	1x MDB [Version 1]
+	Subpacket 42	GSM MDB [Version 1]
+	Subpacket 43	Reserved [Version 2]
+	Subpacket 44	Reserved [Version 2]
+	Subpacket 45	Reserved [Version 3]
+	Subpacket 46	Reserved [Version 2]
+	Subpacket 47	TDSCDMA Conn Mode Acq Request [Version 1]
+	Subpacket 48	TDSCDMA Conn Mode Meas Request [Version 1]
+	Subpacket 49	GSM Gap Info [Version 2]
+	Subpacket 50	Gsm Handover Info [Version 1]
+	Subpacket 54	HRPD And 1x Results [Version 16]
+	Subpacket 55	Idle Irat Meas Request [Version 16]
+0xB193	LTE ML1 Serving Cell Meas Response [Version 1]
+	Subpacket 1	Idle Meas Common Config [Version 2]
+	Subpacket 2	Idle Meas Resel Common Params [Version 1]
+	Subpacket 3	Idle Meas Mobility Params [Version 1]
+	Subpacket 4	Idle Meas Cell Select Request [Version 4]
+	Subpacket 5	Idle Meas Serving Frequency Resel Info [Version 16, 25]
+	Subpacket 6	Idle Meas Intra Frequency Common Config Resel Info [Version 3, 48]
+	Subpacket 7	Idle Meas Intra Frequency Whitelist Info [Version 1]
+	Subpacket 8	Idle Meas Intra Frequency Blacklist Cells [Version 1]
+	Subpacket 9	Idle Meas Serving Cell Measurements [Version 2]
+	Subpacket 10	Idle Mode Reselection Measurements Common [Version 2]
+	Subpacket 11	Idle Mode Reselection Measurements LTE Frequency [Version 16, 32, 40]
+	Subpacket 12	Idle Meas CDMA Config [Version 1]
+	Subpacket 13	Reserved [Version 2]
+	Subpacket 15	Reserved [Version 2]
+	Subpacket 16	Serving Cell Info [Version 16, 32, 40]
+	Subpacket 17	Measurement ID Configuration [Version 16, 32, 48]
+	Subpacket 18	Measurement Object Configuration [Version 3, 32, 44]
+	Subpacket 19	Reporting Configuration [Version 16, 32, 48]
+	Subpacket 20	Quantity Configuration [Version 16, 32, 40]
+	Subpacket 21	Measurement Gap Configuration [Version 16, 32, 48]
+	Subpacket 22	s-Measure Configuration [Version 16, 32, 41]
+	Subpacket 23	Neighbor Cell Configuration [Version 16, 32, 40]
+	Subpacket 24	Speed-Dependent Scaling Parameters [Version 16, 32, 40]
+	Subpacket 25	Serving Cell Measurement Result [Version 16, 32, 48]
+	Subpacket 26	Idle Mode Neighbor Cell Measurement Request [Version 2]
+	Subpacket 27	Neighbor Cell Meas Result [Version 4]
+	Subpacket 28	Neighbor Cell Search Request [Version 16, 32, 40]
+	Subpacket 29	Neighbor Cell Search Response [Version 16, 40]
+	Subpacket 30	Connected Neighbor Meas Request [Version 3, 32, 40]
+	Subpacket 31	Connected Neighbor Meas Response [Version 4, 24, 40]
+	Subpacket 32	Reserved [Version 4]
+	Subpacket 33	Reserved [Version 16, 32, 40]
+	Subpacket 34	Idle Meas WCDMA Config [Version 1]
+	Subpacket 35	WCDMA MDB [Version 2, 24]
+	Subpacket 36	Idle GSM Meas Config [Version 24]
+	Subpacket 37	Conn Meas Config Bitmasks [Version 16, 32, 42]
+	Subpacket 38	GSM RSSI Measurements [Version 4]
+	Subpacket 39	GSM FCCH Detection [Version 3]
+	Subpacket 40	GSM SCH Decode [Version 4]
+	Subpacket 41	1x MDB [Version 1]
+	Subpacket 42	GSM MDB [Version 1]
+	Subpacket 43	Reserved [Version 2]
+	Subpacket 44	Reserved [Version 2]
+	Subpacket 45	Reserved [Version 3]
+	Subpacket 46	Reserved [Version 2]
+	Subpacket 47	TDSCDMA Conn Mode Acq Request [Version 1]
+	Subpacket 48	TDSCDMA Conn Mode Meas Request [Version 1]
+	Subpacket 49	GSM Gap Info [Version 2]
+	Subpacket 50	Gsm Handover Info [Version 1]
+	Subpacket 54	HRPD And 1x Results [Version 16]
+	Subpacket 55	Idle Irat Meas Request [Version 16]
+0xB194	LTE ML1 Search Request/Response [Version 1]
+	Subpacket 1	Idle Meas Common Config [Version 2]
+	Subpacket 2	Idle Meas Resel Common Params [Version 1]
+	Subpacket 3	Idle Meas Mobility Params [Version 1]
+	Subpacket 4	Idle Meas Cell Select Request [Version 4]
+	Subpacket 5	Idle Meas Serving Frequency Resel Info [Version 16, 25]
+	Subpacket 6	Idle Meas Intra Frequency Common Config Resel Info [Version 3, 48]
+	Subpacket 7	Idle Meas Intra Frequency Whitelist Info [Version 1]
+	Subpacket 8	Idle Meas Intra Frequency Blacklist Cells [Version 1]
+	Subpacket 9	Idle Meas Serving Cell Measurements [Version 2]
+	Subpacket 10	Idle Mode Reselection Measurements Common [Version 2]
+	Subpacket 11	Idle Mode Reselection Measurements LTE Frequency [Version 16, 32, 40]
+	Subpacket 12	Idle Meas CDMA Config [Version 1]
+	Subpacket 13	Reserved [Version 2]
+	Subpacket 15	Reserved [Version 2]
+	Subpacket 16	Serving Cell Info [Version 16, 32, 40]
+	Subpacket 17	Measurement ID Configuration [Version 16, 32, 48]
+	Subpacket 18	Measurement Object Configuration [Version 3, 32, 44]
+	Subpacket 19	Reporting Configuration [Version 16, 32, 48]
+	Subpacket 20	Quantity Configuration [Version 16, 32, 40]
+	Subpacket 21	Measurement Gap Configuration [Version 16, 32, 48]
+	Subpacket 22	s-Measure Configuration [Version 16, 32, 41]
+	Subpacket 23	Neighbor Cell Configuration [Version 16, 32, 40]
+	Subpacket 24	Speed-Dependent Scaling Parameters [Version 16, 32, 40]
+	Subpacket 25	Serving Cell Measurement Result [Version 16, 32, 48]
+	Subpacket 26	Idle Mode Neighbor Cell Measurement Request [Version 2]
+	Subpacket 27	Neighbor Cell Meas Result [Version 4]
+	Subpacket 28	Neighbor Cell Search Request [Version 16, 32, 40]
+	Subpacket 29	Neighbor Cell Search Response [Version 16, 40]
+	Subpacket 30	Connected Neighbor Meas Request [Version 3, 32, 40]
+	Subpacket 31	Connected Neighbor Meas Response [Version 4, 24, 40]
+	Subpacket 32	Reserved [Version 4]
+	Subpacket 33	Reserved [Version 16, 32, 40]
+	Subpacket 34	Idle Meas WCDMA Config [Version 1]
+	Subpacket 35	WCDMA MDB [Version 2, 24]
+	Subpacket 36	Idle GSM Meas Config [Version 24]
+	Subpacket 37	Conn Meas Config Bitmasks [Version 16, 32, 42]
+	Subpacket 38	GSM RSSI Measurements [Version 4]
+	Subpacket 39	GSM FCCH Detection [Version 3]
+	Subpacket 40	GSM SCH Decode [Version 4]
+	Subpacket 41	1x MDB [Version 1]
+	Subpacket 42	GSM MDB [Version 1]
+	Subpacket 43	Reserved [Version 2]
+	Subpacket 44	Reserved [Version 2]
+	Subpacket 45	Reserved [Version 3]
+	Subpacket 46	Reserved [Version 2]
+	Subpacket 47	TDSCDMA Conn Mode Acq Request [Version 1]
+	Subpacket 48	TDSCDMA Conn Mode Meas Request [Version 1]
+	Subpacket 49	GSM Gap Info [Version 2]
+	Subpacket 50	Gsm Handover Info [Version 1]
+	Subpacket 54	HRPD And 1x Results [Version 16]
+	Subpacket 55	Idle Irat Meas Request [Version 16]
+0xB195	LTE ML1 Connected Neighbor Meas Request/Response [Version 1]
+	Subpacket 1	Idle Meas Common Config [Version 2]
+	Subpacket 2	Idle Meas Resel Common Params [Version 1]
+	Subpacket 3	Idle Meas Mobility Params [Version 1]
+	Subpacket 4	Idle Meas Cell Select Request [Version 4]
+	Subpacket 5	Idle Meas Serving Frequency Resel Info [Version 16, 25]
+	Subpacket 6	Idle Meas Intra Frequency Common Config Resel Info [Version 3, 48]
+	Subpacket 7	Idle Meas Intra Frequency Whitelist Info [Version 1]
+	Subpacket 8	Idle Meas Intra Frequency Blacklist Cells [Version 1]
+	Subpacket 9	Idle Meas Serving Cell Measurements [Version 2]
+	Subpacket 10	Idle Mode Reselection Measurements Common [Version 2]
+	Subpacket 11	Idle Mode Reselection Measurements LTE Frequency [Version 16, 32, 40]
+	Subpacket 12	Idle Meas CDMA Config [Version 1]
+	Subpacket 13	Reserved [Version 2]
+	Subpacket 15	Reserved [Version 2]
+	Subpacket 16	Serving Cell Info [Version 16, 32, 40]
+	Subpacket 17	Measurement ID Configuration [Version 16, 32, 48]
+	Subpacket 18	Measurement Object Configuration [Version 3, 32, 44]
+	Subpacket 19	Reporting Configuration [Version 16, 32, 48]
+	Subpacket 20	Quantity Configuration [Version 16, 32, 40]
+	Subpacket 21	Measurement Gap Configuration [Version 16, 32, 48]
+	Subpacket 22	s-Measure Configuration [Version 16, 32, 41]
+	Subpacket 23	Neighbor Cell Configuration [Version 16, 32, 40]
+	Subpacket 24	Speed-Dependent Scaling Parameters [Version 16, 32, 40]
+	Subpacket 25	Serving Cell Measurement Result [Version 16, 32, 48]
+	Subpacket 26	Idle Mode Neighbor Cell Measurement Request [Version 2]
+	Subpacket 27	Neighbor Cell Meas Result [Version 4]
+	Subpacket 28	Neighbor Cell Search Request [Version 16, 32, 40]
+	Subpacket 29	Neighbor Cell Search Response [Version 16, 40]
+	Subpacket 30	Connected Neighbor Meas Request [Version 3, 32, 40]
+	Subpacket 31	Connected Neighbor Meas Response [Version 4, 24, 40]
+	Subpacket 32	Reserved [Version 4]
+	Subpacket 33	Reserved [Version 16, 32, 40]
+	Subpacket 34	Idle Meas WCDMA Config [Version 1]
+	Subpacket 35	WCDMA MDB [Version 2, 24]
+	Subpacket 36	Idle GSM Meas Config [Version 24]
+	Subpacket 37	Conn Meas Config Bitmasks [Version 16, 32, 42]
+	Subpacket 38	GSM RSSI Measurements [Version 4]
+	Subpacket 39	GSM FCCH Detection [Version 3]
+	Subpacket 40	GSM SCH Decode [Version 4]
+	Subpacket 41	1x MDB [Version 1]
+	Subpacket 42	GSM MDB [Version 1]
+	Subpacket 43	Reserved [Version 2]
+	Subpacket 44	Reserved [Version 2]
+	Subpacket 45	Reserved [Version 3]
+	Subpacket 46	Reserved [Version 2]
+	Subpacket 47	TDSCDMA Conn Mode Acq Request [Version 1]
+	Subpacket 48	TDSCDMA Conn Mode Meas Request [Version 1]
+	Subpacket 49	GSM Gap Info [Version 2]
+	Subpacket 50	Gsm Handover Info [Version 1]
+	Subpacket 54	HRPD And 1x Results [Version 16]
+	Subpacket 55	Idle Irat Meas Request [Version 16]
+0xB196	LTE ML1 Cell Measurement Results [Version 3, 32, 41]
+0xB197	LTE ML1 Serving Cell Information [Version 3]
+0xB198	LTE ML1 CDRX Events Info [Version 2]
+0xB199	LTE ML1 Frequency Scan Confirmation [Version 1]
+0xB19A	Reserved
+0xB19B	LTE ML1 Conn Mode WCDMA Meas Results [Version 1, 25]
+0xB19C	Reserved
+0xB19D	LTE ML1 GSM Measurements [Version 1]
+	Subpacket 1	Idle Meas Common Config [Version 2]
+	Subpacket 2	Idle Meas Resel Common Params [Version 1]
+	Subpacket 3	Idle Meas Mobility Params [Version 1]
+	Subpacket 4	Idle Meas Cell Select Request [Version 4]
+	Subpacket 5	Idle Meas Serving Frequency Resel Info [Version 16, 25]
+	Subpacket 6	Idle Meas Intra Frequency Common Config Resel Info [Version 3, 48]
+	Subpacket 7	Idle Meas Intra Frequency Whitelist Info [Version 1]
+	Subpacket 8	Idle Meas Intra Frequency Blacklist Cells [Version 1]
+	Subpacket 9	Idle Meas Serving Cell Measurements [Version 2]
+	Subpacket 10	Idle Mode Reselection Measurements Common [Version 2]
+	Subpacket 11	Idle Mode Reselection Measurements LTE Frequency [Version 16, 32, 40]
+	Subpacket 12	Idle Meas CDMA Config [Version 1]
+	Subpacket 13	Reserved [Version 2]
+	Subpacket 15	Reserved [Version 2]
+	Subpacket 16	Serving Cell Info [Version 16, 32, 40]
+	Subpacket 17	Measurement ID Configuration [Version 16, 32, 48]
+	Subpacket 18	Measurement Object Configuration [Version 3, 32, 44]
+	Subpacket 19	Reporting Configuration [Version 16, 32, 48]
+	Subpacket 20	Quantity Configuration [Version 16, 32, 40]
+	Subpacket 21	Measurement Gap Configuration [Version 16, 32, 48]
+	Subpacket 22	s-Measure Configuration [Version 16, 32, 41]
+	Subpacket 23	Neighbor Cell Configuration [Version 16, 32, 40]
+	Subpacket 24	Speed-Dependent Scaling Parameters [Version 16, 32, 40]
+	Subpacket 25	Serving Cell Measurement Result [Version 16, 32, 48]
+	Subpacket 26	Idle Mode Neighbor Cell Measurement Request [Version 2]
+	Subpacket 27	Neighbor Cell Meas Result [Version 4]
+	Subpacket 28	Neighbor Cell Search Request [Version 16, 32, 40]
+	Subpacket 29	Neighbor Cell Search Response [Version 16, 40]
+	Subpacket 30	Connected Neighbor Meas Request [Version 3, 32, 40]
+	Subpacket 31	Connected Neighbor Meas Response [Version 4, 24, 40]
+	Subpacket 32	Reserved [Version 4]
+	Subpacket 33	Reserved [Version 16, 32, 40]
+	Subpacket 34	Idle Meas WCDMA Config [Version 1]
+	Subpacket 35	WCDMA MDB [Version 2, 24]
+	Subpacket 36	Idle GSM Meas Config [Version 24]
+	Subpacket 37	Conn Meas Config Bitmasks [Version 16, 32, 42]
+	Subpacket 38	GSM RSSI Measurements [Version 4]
+	Subpacket 39	GSM FCCH Detection [Version 3]
+	Subpacket 40	GSM SCH Decode [Version 4]
+	Subpacket 41	1x MDB [Version 1]
+	Subpacket 42	GSM MDB [Version 1]
+	Subpacket 43	Reserved [Version 2]
+	Subpacket 44	Reserved [Version 2]
+	Subpacket 45	Reserved [Version 3]
+	Subpacket 46	Reserved [Version 2]
+	Subpacket 47	TDSCDMA Conn Mode Acq Request [Version 1]
+	Subpacket 48	TDSCDMA Conn Mode Meas Request [Version 1]
+	Subpacket 49	GSM Gap Info [Version 2]
+	Subpacket 50	Gsm Handover Info [Version 1]
+	Subpacket 54	HRPD And 1x Results [Version 16]
+	Subpacket 55	Idle Irat Meas Request [Version 16]
+0xB19E	LTE ML1 Inter Frequency Log [Version 2]
+0xB19F	LTE ML1 Coex Tx Power [Version 1]
+0xB1A0	LTE ML1 BPLMN Start Request [Version 3, 32, 48]
+0xB1A1	LTE ML1 BPLMN Cell Request [Version 4]
+0xB1A2	LTE ML1 BPLMN Cell Confirm [Version 16, 32]
+0xB1A3	LTE ML1 BPLMN Time Available Indication [Version 1]
+0xB1A4	LTE ML1 BPLMN Complete Indication [Version 4]
+0xB1A5	LTE ML1 BPLMN Stop Request [Version 1]
+0xB1A6	LTE ML1 BPLMN Stop Confirm [Version 2, 40]
+0xB1A7	Reserved
+0xB1A8	Reserved
+0xB1A9	Reserved
+0xB1AA	Reserved
+0xB1AB	Reserved
+0xB1AC	LTE ML1 GM ACH Tput Report [Version 16, 40]
+0xB1AD	Reserved
+0xB1B0	LTE ML1 TDD Configuration [Version 1]
+0xB1B1	LTE ML1 TDD ACK NAK Report [Version 1]
+0xB1B2	LTE ML1 Common DC Offset [Version 4, 32, 48, 49]
+0xB1B3	Reserved
+0xB1B4	Reserved
+0xB1B5	Reserved
+0xB1B6	Reserved
+0xB1B7	LTE ML1 Coex Frame Timing [Version 1]
+0xB1B8	LTE ML1 Coex Event Indication [Version 1]
+0xB1B9	LTE ML1 Coex State Info [Version 2]
+0xB1BA	LET ML1 MSI Config [Version 2]
+0xB1BB	LTE ML1 EMBMS Config [Version 1]
+0xB1BC	LTE ML1 PMCH Decode Results [Version 2, 32, 40]
+0xB1BD	Reserved
+0xB1BE	LTE ML1 PMCH Results Statistics [Version 1]
+0xB1BF	LTE ML1 Coex Indication [Version 2]
+0xB1C0	Reserved
+0xB1C1	Reserved
+0xB1C2	LTE ML1 TDS Conn Mode ACQ Request [Version 1]
+	Subpacket 1	Idle Meas Common Config [Version 2]
+	Subpacket 2	Idle Meas Resel Common Params [Version 1]
+	Subpacket 3	Idle Meas Mobility Params [Version 1]
+	Subpacket 4	Idle Meas Cell Select Request [Version 4]
+	Subpacket 5	Idle Meas Serving Frequency Resel Info [Version 16, 25]
+	Subpacket 6	Idle Meas Intra Frequency Common Config Resel Info [Version 3, 48]
+	Subpacket 7	Idle Meas Intra Frequency Whitelist Info [Version 1]
+	Subpacket 8	Idle Meas Intra Frequency Blacklist Cells [Version 1]
+	Subpacket 9	Idle Meas Serving Cell Measurements [Version 2]
+	Subpacket 10	Idle Mode Reselection Measurements Common [Version 2]
+	Subpacket 11	Idle Mode Reselection Measurements LTE Frequency [Version 16, 32, 40]
+	Subpacket 12	Idle Meas CDMA Config [Version 1]
+	Subpacket 13	Reserved [Version 2]
+	Subpacket 15	Reserved [Version 2]
+	Subpacket 16	Serving Cell Info [Version 16, 32, 40]
+	Subpacket 17	Measurement ID Configuration [Version 16, 32, 48]
+	Subpacket 18	Measurement Object Configuration [Version 3, 32, 44]
+	Subpacket 19	Reporting Configuration [Version 16, 32, 48]
+	Subpacket 20	Quantity Configuration [Version 16, 32, 40]
+	Subpacket 21	Measurement Gap Configuration [Version 16, 32, 48]
+	Subpacket 22	s-Measure Configuration [Version 16, 32, 41]
+	Subpacket 23	Neighbor Cell Configuration [Version 16, 32, 40]
+	Subpacket 24	Speed-Dependent Scaling Parameters [Version 16, 32, 40]
+	Subpacket 25	Serving Cell Measurement Result [Version 16, 32, 48]
+	Subpacket 26	Idle Mode Neighbor Cell Measurement Request [Version 2]
+	Subpacket 27	Neighbor Cell Meas Result [Version 4]
+	Subpacket 28	Neighbor Cell Search Request [Version 16, 32, 40]
+	Subpacket 29	Neighbor Cell Search Response [Version 16, 40]
+	Subpacket 30	Connected Neighbor Meas Request [Version 3, 32, 40]
+	Subpacket 31	Connected Neighbor Meas Response [Version 4, 24, 40]
+	Subpacket 32	Reserved [Version 4]
+	Subpacket 33	Reserved [Version 16, 32, 40]
+	Subpacket 34	Idle Meas WCDMA Config [Version 1]
+	Subpacket 35	WCDMA MDB [Version 2, 24]
+	Subpacket 36	Idle GSM Meas Config [Version 24]
+	Subpacket 37	Conn Meas Config Bitmasks [Version 16, 32, 42]
+	Subpacket 38	GSM RSSI Measurements [Version 4]
+	Subpacket 39	GSM FCCH Detection [Version 3]
+	Subpacket 40	GSM SCH Decode [Version 4]
+	Subpacket 41	1x MDB [Version 1]
+	Subpacket 42	GSM MDB [Version 1]
+	Subpacket 43	Reserved [Version 2]
+	Subpacket 44	Reserved [Version 2]
+	Subpacket 45	Reserved [Version 3]
+	Subpacket 46	Reserved [Version 2]
+	Subpacket 47	TDSCDMA Conn Mode Acq Request [Version 1]
+	Subpacket 48	TDSCDMA Conn Mode Meas Request [Version 1]
+	Subpacket 49	GSM Gap Info [Version 2]
+	Subpacket 50	Gsm Handover Info [Version 1]
+	Subpacket 54	HRPD And 1x Results [Version 16]
+	Subpacket 55	Idle Irat Meas Request [Version 16]
+0xB1C3	LTE ML1 TDS Conn Mode Meas Request [Version 1]
+	Subpacket 1	Idle Meas Common Config [Version 2]
+	Subpacket 2	Idle Meas Resel Common Params [Version 1]
+	Subpacket 3	Idle Meas Mobility Params [Version 1]
+	Subpacket 4	Idle Meas Cell Select Request [Version 4]
+	Subpacket 5	Idle Meas Serving Frequency Resel Info [Version 16, 25]
+	Subpacket 6	Idle Meas Intra Frequency Common Config Resel Info [Version 3, 48]
+	Subpacket 7	Idle Meas Intra Frequency Whitelist Info [Version 1]
+	Subpacket 8	Idle Meas Intra Frequency Blacklist Cells [Version 1]
+	Subpacket 9	Idle Meas Serving Cell Measurements [Version 2]
+	Subpacket 10	Idle Mode Reselection Measurements Common [Version 2]
+	Subpacket 11	Idle Mode Reselection Measurements LTE Frequency [Version 16, 32, 40]
+	Subpacket 12	Idle Meas CDMA Config [Version 1]
+	Subpacket 13	Reserved [Version 2]
+	Subpacket 15	Reserved [Version 2]
+	Subpacket 16	Serving Cell Info [Version 16, 32, 40]
+	Subpacket 17	Measurement ID Configuration [Version 16, 32, 48]
+	Subpacket 18	Measurement Object Configuration [Version 3, 32, 44]
+	Subpacket 19	Reporting Configuration [Version 16, 32, 48]
+	Subpacket 20	Quantity Configuration [Version 16, 32, 40]
+	Subpacket 21	Measurement Gap Configuration [Version 16, 32, 48]
+	Subpacket 22	s-Measure Configuration [Version 16, 32, 41]
+	Subpacket 23	Neighbor Cell Configuration [Version 16, 32, 40]
+	Subpacket 24	Speed-Dependent Scaling Parameters [Version 16, 32, 40]
+	Subpacket 25	Serving Cell Measurement Result [Version 16, 32, 48]
+	Subpacket 26	Idle Mode Neighbor Cell Measurement Request [Version 2]
+	Subpacket 27	Neighbor Cell Meas Result [Version 4]
+	Subpacket 28	Neighbor Cell Search Request [Version 16, 32, 40]
+	Subpacket 29	Neighbor Cell Search Response [Version 16, 40]
+	Subpacket 30	Connected Neighbor Meas Request [Version 3, 32, 40]
+	Subpacket 31	Connected Neighbor Meas Response [Version 4, 24, 40]
+	Subpacket 32	Reserved [Version 4]
+	Subpacket 33	Reserved [Version 16, 32, 40]
+	Subpacket 34	Idle Meas WCDMA Config [Version 1]
+	Subpacket 35	WCDMA MDB [Version 2, 24]
+	Subpacket 36	Idle GSM Meas Config [Version 24]
+	Subpacket 37	Conn Meas Config Bitmasks [Version 16, 32, 42]
+	Subpacket 38	GSM RSSI Measurements [Version 4]
+	Subpacket 39	GSM FCCH Detection [Version 3]
+	Subpacket 40	GSM SCH Decode [Version 4]
+	Subpacket 41	1x MDB [Version 1]
+	Subpacket 42	GSM MDB [Version 1]
+	Subpacket 43	Reserved [Version 2]
+	Subpacket 44	Reserved [Version 2]
+	Subpacket 45	Reserved [Version 3]
+	Subpacket 46	Reserved [Version 2]
+	Subpacket 47	TDSCDMA Conn Mode Acq Request [Version 1]
+	Subpacket 48	TDSCDMA Conn Mode Meas Request [Version 1]
+	Subpacket 49	GSM Gap Info [Version 2]
+	Subpacket 50	Gsm Handover Info [Version 1]
+	Subpacket 54	HRPD And 1x Results [Version 16]
+	Subpacket 55	Idle Irat Meas Request [Version 16]
+0xB1C4	Reserved
+0xB1C6	LTE ML1 GM CSF Tx Report [Version 1, 24, 40]
+0xB1C7	Reserved
+0xB1C8	Reserved
+0xB1C9	LTE ML1 DL BLER Stats [Version 1]
+0xB1CA	Reserved
+0xB1CB	Reserved
+0xB1CC	Reserved
+0xB1CD	Reserved
+0xB1CE	LTE ML1 DLM Ho Rxd Status [Version 16, 32]
+0xB1CF	LTE ML1 DLM Ho Rxd Ard Statistics [Version 16, 32]
+0xB1D0	LTE ML1 DLM Measurement [Version 16]
+0xB1D1	LTE ML1 DLM Ho Rxd Spef Params [Version 16]
+0xB1D2	LTE ML1 GM LTED Tx Report [Version 25]
+0xB1D3	LTE ML1 GM LTED Rx Report [Version 25]
+0xB1D4	Reserved
+0xB1D5	Reserved
+0xB1D6	Reserved
+0xB1D7	Reserved
+0xB1D8	Reserved
+0xB1D9	LTE ML1 Handover Timeline Info [Version 32]
+0xB1DA	LTE ML1 Antenna Switch Diversity [Version 32, 48, 51]
+0xB1DB	LTE ML1 Resource Manager [Version 32, 48, 49]
+0xB1DC	Reserved
+0xB1DD	Reserved
+0xB1DE	Reserved
+0xB1DF	Reserved
+0xB1E0	LTE ML1 eDRX SLEEP [Version 16, 18]
+0xB1E1	Reserved
+0xB1E2	Reserved
+0xB1E3	LTE ML1 DLM BIMC Stats [Version 32, 33]
+0xB1E4	Reserved
+0xB1E5	LTE ML1 Flow Control  [Version 32, 48, 49]
+0xB1E6	Reserved
+0xB1E7	Reserved
+0xB1E8	LTE PLT KPI PHICH Result
+0xB1E9	Reserved
+0xB1EA	Reserved
+0xB1EB	LTE ML1 Sleep Manager Summary [Version 32]
+0xB1EC	Reserved
+0xB1ED	Reserved
+0xB1EE	Reserved
+0xB1EF	Reserved
+0xB1F0	Reserved
+0xB1F1	Reserved
+0xB1F2	Reserved
+0xB1F3	Reserved
+0xB1F4	Reserved
+0xB1F5	LTE ML1 IRAT NR Meas Results [Version 1]
+	Subpacket 1	Idle Meas Common Config [Version 2]
+	Subpacket 2	Idle Meas Resel Common Params [Version 1]
+	Subpacket 3	Idle Meas Mobility Params [Version 1]
+	Subpacket 4	Idle Meas Cell Select Request [Version 4]
+	Subpacket 5	Idle Meas Serving Frequency Resel Info [Version 16, 25]
+	Subpacket 6	Idle Meas Intra Frequency Common Config Resel Info [Version 3, 48]
+	Subpacket 7	Idle Meas Intra Frequency Whitelist Info [Version 1]
+	Subpacket 8	Idle Meas Intra Frequency Blacklist Cells [Version 1]
+	Subpacket 9	Idle Meas Serving Cell Measurements [Version 2]
+	Subpacket 10	Idle Mode Reselection Measurements Common [Version 2]
+	Subpacket 11	Idle Mode Reselection Measurements LTE Frequency [Version 16, 32, 40]
+	Subpacket 12	Idle Meas CDMA Config [Version 1]
+	Subpacket 13	Reserved [Version 2]
+	Subpacket 15	Reserved [Version 2]
+	Subpacket 16	Serving Cell Info [Version 16, 32, 40]
+	Subpacket 17	Measurement ID Configuration [Version 16, 32, 48]
+	Subpacket 18	Measurement Object Configuration [Version 3, 32, 44]
+	Subpacket 19	Reporting Configuration [Version 16, 32, 48]
+	Subpacket 20	Quantity Configuration [Version 16, 32, 40]
+	Subpacket 21	Measurement Gap Configuration [Version 16, 32, 48]
+	Subpacket 22	s-Measure Configuration [Version 16, 32, 41]
+	Subpacket 23	Neighbor Cell Configuration [Version 16, 32, 40]
+	Subpacket 24	Speed-Dependent Scaling Parameters [Version 16, 32, 40]
+	Subpacket 25	Serving Cell Measurement Result [Version 16, 32, 48]
+	Subpacket 26	Idle Mode Neighbor Cell Measurement Request [Version 2]
+	Subpacket 27	Neighbor Cell Meas Result [Version 4]
+	Subpacket 28	Neighbor Cell Search Request [Version 16, 32, 40]
+	Subpacket 29	Neighbor Cell Search Response [Version 16, 40]
+	Subpacket 30	Connected Neighbor Meas Request [Version 3, 32, 40]
+	Subpacket 31	Connected Neighbor Meas Response [Version 4, 24, 40]
+	Subpacket 32	Reserved [Version 4]
+	Subpacket 33	Reserved [Version 16, 32, 40]
+	Subpacket 34	Idle Meas WCDMA Config [Version 1]
+	Subpacket 35	WCDMA MDB [Version 2, 24]
+	Subpacket 36	Idle GSM Meas Config [Version 24]
+	Subpacket 37	Conn Meas Config Bitmasks [Version 16, 32, 42]
+	Subpacket 38	GSM RSSI Measurements [Version 4]
+	Subpacket 39	GSM FCCH Detection [Version 3]
+	Subpacket 40	GSM SCH Decode [Version 4]
+	Subpacket 41	1x MDB [Version 1]
+	Subpacket 42	GSM MDB [Version 1]
+	Subpacket 43	Reserved [Version 2]
+	Subpacket 44	Reserved [Version 2]
+	Subpacket 45	Reserved [Version 3]
+	Subpacket 46	Reserved [Version 2]
+	Subpacket 47	TDSCDMA Conn Mode Acq Request [Version 1]
+	Subpacket 48	TDSCDMA Conn Mode Meas Request [Version 1]
+	Subpacket 49	GSM Gap Info [Version 2]
+	Subpacket 50	Gsm Handover Info [Version 1]
+	Subpacket 54	HRPD And 1x Results [Version 16]
+	Subpacket 55	Idle Irat Meas Request [Version 16]
+0xB1F6	Reserved
+0xB1F7	Reserved
+0xB1F8	Reserved
+0xB1F9	Reserved
+0xB1FA	Reserved
+0xB1FB	LTE ML1 MTPL Flow Control [Version 48]
+0xB1FC	Reserved
+0xB1FD	Reserved
+0xB1FE	Reserved
+0xB1FF	Reserved
+0xB200	Reserved
+0xB201	Reserved
+0xB202	Reserved
+0xB203	Reserved
+0xB204	Reserved
+0xB206	Reserved
+0xB208	Reserved
+0xB209	Reserved
+0xB20A	Reserved
+0xB20B	Reserved
+0xB20C	Reserved
+0xB20D	Reserved
+0xB210	Reserved
+0xB211	Reserved
+0xB212	Reserved
+0xB213	Reserved
+0xB214	Reserved
+0xB215	Reserved
+0xB216	Reserved
+0xB217	Reserved
+0xB218	Reserved
+0xB219	Reserved
+0xB21A	Reserved
+0xB21B	Reserved
+0xB21C	Reserved
+0xB220	Reserved
+0xB221	Reserved
+0xB222	Reserved
+0xB223	Reserved
+0xB224	Reserved
+0xB225	Reserved
+0xB226	Reserved
+0xB227	Reserved
+0xB228	Reserved
+0xB229	Reserved
+0xB22A	Reserved
+0xB22B	Reserved
+0xB22C	Reserved
+0xB22D	Reserved
+0xB22E	Reserved
+0xB22F	Reserved
+0xB230	Reserved
+0xB231	Reserved
+0xB240	LTE NB1 Random Access Request (MSG1) Report [Version 2]
+0xB241	LTE NB1 Random Access Response (MSG2) Report [Version 1]
+0xB242	LTE NB1 UE Identification Message (MSG3) Report [Version 1]
+0xB243	LTE NB1 Contention Resolution Message (MSG4) Report [Version 2]
+0xB244	LTE NB1 ML1 GM DCI Info [Version 6]
+0xB245	LTE NB1 ML1 GM TX Report [Version 4]
+0xB246	LTE NB1 ML1 GM PDSCH STAT Ind [Version 3]
+0xB247	Reserved
+0xB248	LTE NB1 ML1 CDRX Events Info [Version 3]
+0xB249	Reserved
+0xB24B	LTE NB1 ML1 Sum Sys Info [Version 1]
+0xB24C	LTE NB1 ML1 Cell Resel [Version 5]
+0xB24D	LTE NB1 ML1 Serv Cell Meas Response [Version 5]
+0xB24E	LTE NB1 NBR Cell Meas [Version 3]
+0xB24F	Reserved
+0xB250	LTE NB1 ML1 Search PBCH Decode [Version 1]
+0xB251	LTE NB1 ML1 DLM Decode Page [Version 3]
+0xB300	Reserved
+0xB301	Reserved
+0xB302	Reserved
+0xB303	Reserved
+0xB304	Reserved
+0xB305	Reserved
+0xB306	Reserved
+0xB307	Reserved
+0xB308	Reserved
+0xB309	Reserved
+0xB30A	Reserved
+0xB30B	Reserved
+0xB30C	LTE LL1 NB Hop Info [Version 0]
+0xB30D	Reserved
+0xB30E	Reserved
+0xB30F	Reserved
+0xB310	Reserved
+0xB311	Reserved
+0xB312	Reserved
+0xB800	NR5G NAS SM5G Plain OTA Incoming Msg
+0xB801	NR5G NAS SM5G Plain OTA Outgoing Msg
+0xB808	NR5G NAS MM5G Security Protected OTA Incoming Msg [Version 1]
+0xB809	NR5G NAS MM5G Security Protected OTA Outgoing Msg [Version 1]
+0xB80A	NR5G NAS MM5G Plain OTA Incoming Msg
+0xB80B	NR5G NAS MM5G Plain OTA Outgoing Msg
+0xB80C	NR5G NAS MM5G State [Version 1]
+0xB80D	NR5G NAS MM5G Service Request [Version 1]
+0xB80E	NR5G NAS MM5G Current Security Context [Version 1]
+0xB80F	NR5G NAS MM5G Security Context Keys [Version 2]
+0xB810	NR5G NAS MM5G Native Security Context [Version 2]
+0xB811	NR5G NAS MM5G Authentication Keys [Version 1]
+0xB812	NR5G NAS MM5G Forbidden TAI List [Version 1]
+0xB813	NR5G NAS MM5G Service Area List [Version 1]
+0xB814	NR5G NAS Plain Message Container 
+0xB815	NR5G NAS MM5G NSSAI Info [Version 2]
+0xB816	Reserved
+0xB821	NR5G RRC OTA Packet
+0xB822	NR5G RRC MIB Info [Version 3]
+0xB823	NR5G RRC Serving Cell Info [Version 4]
+0xB824	Reserved
+0xB825	NR5G RRC Configuration Info [Version 9]
+0xB826	NR5G RRC Supported CA Combos [Version 7]
+0xB827	NR5G RRC PLMN Search Request [Version 3]
+0xB828	NR5G RRC PLMN Search Response [Version 3]
+0xB829	Reserved
+0xB82A	Reserved
+0xB82B	NR5G RRC Detected Cell Info [Version 2]
+0xB82C	NR5G RRC Blacklist Update [Version 1]
+0xB82D	Reserved
+0xB840	NR5G PDCP DL Data Pdu [Version 6]
+0xB841	NR5G PDCP DL Control Pdu [Version 4]
+0xB842	NR5G PDCP DL Rbs Stats [Version 6]
+0xB843	Reserved
+0xB844	Reserved
+0xB845	Reserved
+0xB846	Reserved
+0xB847	Reserved
+0xB848	Reserved
+0xB849	Reserved
+0xB84A	Reserved
+0xB84B	NR5G L2 DL Config [Version 5]
+0xB84C	NR5G RLC DL Control PDU [Version 2]
+0xB84D	NR5G RLC DL Stats [Version 4]
+0xB84E	NR5G RLC DL Status PDU [Version 1]
+0xB84F	Reserved
+0xB850	Reserved
+0xB851	Reserved
+0xB852	Reserved
+0xB853	Reserved
+0xB854	Reserved
+0xB855	Reserved
+0xB856	Reserved
+0xB857	NR5G L2 DL DATA PDU [Version 6]
+0xB858	NR5G L2 DL MCE [Version 2]
+0xB859	Reserved
+0xB85A	Reserved
+0xB85B	Reserved
+0xB85C	Reserved
+0xB85D	Reserved
+0xB85E	Reserved
+0xB85F	Reserved
+0xB860	NR5G PDCP UL Stats [Version 9]
+0xB861	NR5G PDCP UL Control Pdu [Version 1]
+0xB862	Reserved
+0xB863	Reserved
+0xB864	Reserved
+0xB865	Reserved
+0xB866	Reserved
+0xB867	Reserved
+0xB868	NR5G RLC UL Stats [Version 4]
+0xB869	NR5G RLC UL Status PDU [Version 3]
+0xB86A	Reserved
+0xB86B	Reserved
+0xB86C	Reserved
+0xB86D	Reserved
+0xB86E	Reserved
+0xB86F	Reserved
+0xB870	NR5G L2 UL Data Pdu [Version 3]
+0xB871	NR5G L2 UL Config [Version 5]
+0xB872	NR5G L2 UL TB [Version 5]
+0xB873	NR5G L2 UL BSR [Version 2]
+0xB874	Reserved
+0xB875	Reserved
+0xB876	Reserved
+0xB877	Reserved
+0xB880	NR5G MAC UL TB  [Version 0]
+0xB881	NR5G MAC UL TB Stats [Version 131073]
+0xB882	Reserved
+0xB883	NR5G MAC UL Physical Channel Schedule Report [Version 131083]
+0xB884	NR5G MAC UL Physical Channel Power Control [Version 196608]
+0xB885	NR5G MAC DCI Info [Version 131078]
+0xB886	NR5G MAC DL TB Report [Version 131076]
+0xB887	NR5G MAC PDSCH Status [Version 131077]
+0xB888	NR5G MAC PDSCH Stats [Version 131074]
+0xB889	NR5G MAC RACH Trigger [Version 131073]
+0xB88A	NR5G MAC RACH Attempt [Version 131079]
+0xB88B	Reserved
+0xB88C	Reserved
+0xB88D	Reserved
+0xB88E	Reserved
+0xB88F	Reserved
+0xB890	NR5G MAC CDRX Events Info [Version 131074]
+0xB891	NR5G MAC LL1 CSF Indication [Version 65539]
+0xB892	Reserved
+0xB893	Reserved
+0xB894	Reserved
+0xB895	Reserved
+0xB896	NR5G MAC UCI Payload Information [Version 131072]
+0xB897	Reserved
+0xB898	Reserved
+0xB899	Reserved
+0xB89A	Reserved
+0xB89B	NR5G MAC UCI Information [Version 131074]
+0xB89C	NR5G MAC Flow Control [Version 131073]
+0xB89D	Reserved
+0xB89E	Reserved
+0xB89F	Reserved
+0xB8A0	NR5G MAC LL1 PUSCH Tx [Version 65538]
+0xB8A1	Reserved
+0xB8A2	Reserved
+0xB8A3	Reserved
+0xB8A4	Reserved
+0xB8A5	Reserved
+0xB8A6	Reserved
+0xB8A7	NR5G MAC CSF Report [Version 131073]
+0xB8A8	Reserved
+0xB8A9	Reserved
+0xB8AA	Reserved
+0xB8AB	Reserved
+0xB8AC	Reserved
+0xB8AD	Reserved
+0xB8AE	Reserved
+0xB8AF	Reserved
+0xB8B0	Reserved
+0xB8C0	Reserved
+0xB8C4	Reserved
+0xB8C5	Reserved
+0xB8C6	Reserved
+0xB8C7	Reserved
+0xB8C8	Reserved
+0xB8C9	NR5G LL1 FW RX Control AGC [Version 65537]
+	Subpacket 4	Control AGC Sub Packet [Version 1]
+0xB8CA	Reserved
+0xB8CB	Reserved
+0xB8CC	Reserved
+0xB8CD	Reserved
+0xB8CE	Reserved
+0xB8CF	Reserved
+0xB8D0	Reserved
+0xB8D1	NR5G LL1 FW TX IU RF [Version 65536]
+	Subpacket 0	Sub6 Per Symbol [Version 5]
+	Subpacket 1	MMW Per Symbol [Version 3]
+	Subpacket 2	MTPL [Version 3]
+	Subpacket 3	Sub6 Veto Deveto QSleep [Version 0]
+0xB8D2	NR5G LL1 FW MAC TX IU Power [Version 65536]
+	Subpacket 90	TX IU Power Sub Packet [Version 4]
+	Subpacket 91	DPS Info Sub Packet [Version 4]
+	Subpacket 92	Reserved [Version 3]
+	Subpacket 93	Reserved [Version 3]
+0xB8D3	Reserved
+0xB8D7	Reserved
+0xB8D9	Reserved
+0xB8DA	Reserved
+0xB8DB	Reserved
+0xB8DC	Reserved
+0xB8DD	NR5G LL1 FW Serving FTL [Version 7]
+0xB8DE	Reserved
+0xB8DF	Reserved
+0xB8E0	Reserved
+0xB8E1	Reserved
+0xB8E2	NR5G LL1 FW CSF Reports [Version 6]
+0xB8E3	Reserved
+0xB8E4	Reserved
+0xB8E5	Reserved
+0xB8E6	Reserved
+0xB8E7	Reserved
+0xB8E8	Reserved
+0xB8E9	Reserved
+0xB8EA	Reserved
+0xB8EB	Reserved
+0xB8EC	Reserved
+0xB8ED	Reserved
+0xB8EE	Reserved
+0xB8EF	Reserved
+0xB8F0	Reserved
+0xB8F1	Reserved
+0xB8FB	Reserved
+0xB8FC	Reserved
+0xB8FD	Reserved
+0xB8FE	Reserved
+0xB8FF	Reserved
+0xB900	Reserved
+0xB901	Reserved
+0xB902	Reserved
+0xB903	Reserved
+0xB920	Reserved
+0xB921	Reserved
+0xB922	Reserved
+0xB923	Reserved
+0xB924	Reserved
+0xB925	Reserved
+0xB926	Reserved
+0xB927	Reserved
+0xB928	Reserved
+0xB929	Reserved
+0xB92A	Reserved
+0xB92B	Reserved
+0xB92C	Reserved
+0xB92D	Reserved
+0xB92E	Reserved
+0xB92F	Reserved
+0xB930	Reserved
+0xB931	Reserved
+0xB932	Reserved
+0xB940	Reserved
+0xB941	Reserved
+0xB942	Reserved
+0xB943	Reserved
+0xB944	Reserved
+0xB945	Reserved
+0xB950	NR5G ML1 DL Common Config [Version 131078]
+0xB951	NR5G ML1 DL Dedicated Config [Version 131078]
+0xB952	NR5G ML1 DL Handover [Version 131078]
+0xB953	Reserved
+0xB954	Reserved
+0xB955	Reserved
+0xB956	Reserved
+0xB957	Reserved
+0xB958	Reserved
+0xB959	NR5G ML1 RLM Stats [Version 131077]
+0xB95A	Reserved
+0xB95B	Reserved
+0xB95C	Reserved
+0xB95D	Reserved
+0xB95E	Reserved
+0xB95F	Reserved
+0xB960	Reserved
+0xB961	Reserved
+0xB962	Reserved
+0xB963	Reserved
+0xB964	Reserved
+0xB965	Reserved
+0xB966	Reserved
+0xB967	Reserved
+0xB968	Reserved
+0xB969	Reserved
+0xB96A	Reserved
+0xB96B	Reserved
+0xB96C	Reserved
+0xB96D	NR5G ML1 Searcher ACQ Config And Response [Version 131076]
+0xB96E	NR5G ML1 Searcher Measurement Config [Version 131074]
+0xB96F	NR5G ML1 Searcher Conn Eval [Version 131074]
+0xB970	NR5G ML1 Searcher Idle S Criteria [Version 131074]
+0xB971	Reserved
+0xB972	Reserved
+0xB973	Reserved
+0xB974	Reserved
+0xB975	NR5G ML1 Serving Cell Beam Management [Version 131075]
+0xB976	Reserved
+0xB977	Reserved
+0xB979	Reserved
+0xB97C	Reserved
+0xB97E	Reserved
+0xB97F	NR5G ML1 Searcher Measurement Database Update Ext [Version 131079]
+0xB980	Reserved
+0xB981	NR5G ML1 FC Information [Version 131081]
+0xB982	Reserved
+0xB983	Reserved
+0xB984	Reserved
+0xB985	Reserved
+0xB986	Reserved
+0xB987	Reserved
+0xB988	Reserved
+0xB989	Reserved
+0xB98A	Reserved
+0xB98B	NR5G ML1 QMI Handler [Version 65537]
+0xB98C	Reserved
+0xB98D	Reserved
+0xB98E	Reserved
+0xB98F	NR5G ML1 Antenna Switch Diversity [Version 131075]
+0xB990	Reserved
+0xB991	Reserved
+0xB992	NR5G ML1 AFC Services [Version 131074]
+0xB993	Reserved
+0xB994	Reserved
+0xB9A0	Reserved
+0xB9A1	Reserved
+0xB9A2	Reserved
+0xB9A3	Reserved
+0xB9A4	NR5G ML1 BFR Ind [Version 131072]
+0xB9A5	NR5G ML1 RLM BFD IND [Version 131073]
+0xB9A6	Reserved
+0xB9A7	NR5G ML1 DLM2 CA Metrics Request [Version 131073]
+0xB9A8	Reserved
+0xB9B8	Reserved
+0xB9B9	Reserved
+0xB9BA	Reserved
+0xB9BB	Reserved
+0xB9BC	Reserved
+0xB9BD	Reserved
+0xB9BE	NR5G ML1 Search HO Acq Req [Version 131073]
+0xB9BF	NR5G ML1 Search HO Acq Confirm [Version 131077]
+0xB9C0	Reserved
+0xD000	TDSCDMA Sync DL Mid Detect [Version 2]
+0xD001	TDSCDMA Measurement RSCP [Version 1]
+0xD002	TDSCDMA Measurement ISCP [Version 1]
+0xD003	TDSCDMA GAP Detect [Version 3]
+0xD004	TDSCDMA Cell Reselection Configuration [Version 1]
+0xD005	TDSCDMA Measurement Internal Configuration [Version 1]
+0xD006	TDSCDMA Measurement Quality Configuration [Version 1]
+0xD007	TDSCDMA Measurement Internal Result [Version 1]
+0xD008	TDSCDMA Measurement Schedule  [Version 3]
+0xD009	TDSCDMA Cell Reselection Rank [Version 1]
+0xD00A	TDSCDMA Measurement Accumulated RSCP [Version 4]
+0xD00B	TDSCDMA Measurement Accumulated ISCP [Version 1]
+0xD00C	TDSCDMA Measurement Quality Result [Version 1]
+0xD00D	TDSCDMA Measurement Configuration [Version 1]
+0xD00E	TDSCDMA Measurement  GSM Result [Version 1]
+0xD00F	TDSCDMA Measurement GSM Timing and Intermediate Result [Version 3]
+0xD010	TDSCDMA L1 DL TrCh Configuration [Version 1]
+0xD011	TDSCDMA L1 DL TFC Configuration [Version 1]
+0xD012	TDSCDMA L1 DL Common Phychan Configuration [Version 1]
+0xD013	TDSCDMA L1 DL DPCH Configuration [Version 1]
+0xD014	TDSCDMA L1 DL FMO Configuration [Version 1]
+0xD015	TDSCDMA L1 DL FPACH Decode Result [Version 2]
+0xD016	TDSCDMA L1 DL BLER [Version 4]
+0xD017	TDSCDMA L1 DL FW Midamble Config Command [Version 1]
+0xD018	TDSCDMA L1 DL FW PICH Config Command [Version 1]
+0xD019	TDSCDMA L1 DL FW PCCPCH Config Command [Version 1]
+0xD01A	TDSCDMA L1 DL FW SCCPCH Config Command [Version 3]
+0xD01B	TDSCDMA L1 DL FW DPCH Config Command [Version 121]
+0xD01C	TDSCDMA L1 DL FW Rx Time Sync Config Command [Version 1]
+0xD01D	TDSCDMA L1 DL FW CCTRCH Config Command [Version 1]
+0xD01E	TDSCDMA L1 DL FW PICH Decode Result [Version 3]
+0xD01F	TDSCDMA L1 DL FW DPCH PCCPCH SCCPCH Decode Result [Version 122]
+0xD020	TDSCDMA L1 UL DCH Configuration [Version 1]
+0xD021	TDSCDMA L1 UL DCH Gain Factor Configuration [Version 1]
+0xD022	TDSCDMA L1 UL TFC Configuration [Version 1]
+0xD023	TDSCDMA L1 UL DPCH Configuration [Version 1]
+0xD024	TDSCDMA L1 UL RACH Configuration [Version 1]
+0xD025	TDSCDMA L1 UL PRACH FPACH Configuration [Version 1]
+0xD026	TDSCDMA L1 UL Random Access Configuration [Version 1]
+0xD027	TDSCDMA L1 UL FW UpPCH FPACH Configuration Command [Version 2]
+0xD028	TDSCDMA L1 UL FW PRACH Config Command [Version 1]
+0xD029	TDSCDMA L1 UL FW DPCH Config Command [Version 1]
+0xD02D	TDSCDMA L1 TF Pool Parameter [Version 1]
+0xD02F	TDSCDMA L1 TFC Pool Parameter [Version 1]
+0xD030	TDSCDMA L1 HSDPA Configuration [Version 1]
+0xD031	TDSCDMA L1 HSDPA Decode Status [Version 4, 121]
+0xD032	TDSCDMA L1 HSDPA HSSCCH Statistics [Version 2]
+0xD033	TDSCDMA L1 HSDPA HARQ Statistics [Version 4]
+0xD034	TDSCDMA L1 HSDPA MAChs Header [Version 1]
+0xD035	TDSCDMA L1 HSDPA Outer Loop CQI  [Version 1]
+0xD040	TDSCDMA L1 UPA EAGCH Channel Info [Version 1]
+0xD041	TDSCDMA L1 UPA Sched EHICH Channel Info [Version 1]
+0xD042	TDSCDMA L1 UPA Non Sched EHICH Channel Info [Version 1]
+0xD043	TDSCDMA L1 UPA Non Sched Grant Info [Version 1]
+0xD044	TDSCDMA L1 UPA ETFC Restriction Info [Version 4]
+0xD045	TDSCDMA L1 UPA HARQ Db Info [Version 1]
+0xD046	TDSCDMA L1 UPA EDL Dec And SG Info [Version 2]
+0xD047	TDSCDMA L1 UPA Pwr Ctrl Info [Version 2]
+0xD048	TDSCDMA L1 UPA Statistics Info [Version 4]
+0xD049	TDSCDMA L1 UPA EUL Configuration [Version 1]
+0xD050	TDSCDMA DRX Cycle [Version 1]
+0xD052	TDSCDMA TS0 Cell Update [Version 3]
+0xD053	TDSCDMA TS0 Cell Table [Version 2]
+0xD054	TDSCDMA Non TS0 Cell Update [Version 2]
+0xD055	TDSCDMA Non TS0 Cell Table [Version 2]
+0xD056	TDSCDMA Accumulate TS0 Cell Table [Version 1]
+0xD057	TDSCDMA Accumulate Non TS0 Cell Table [Version 2]
+0xD058	TDSCDMA TS0 Cell Update Shorten [Version 3]
+0xD059	TDSCDMA Measurement SIB19 [Version 1]
+0xD05A	TDSCDMA Measurement Eutra Cells [Version 1]
+0xD05B	TDSCDMA Absolute Priority Cell Rank [Version 1]
+0xD05C	TDSCDMA L1 PICH Idle Info [Version 1]
+0xD05D	TDSCDMA L1 PCH Idle Info [Version 1]
+0xD05F	TDSCDMA IRAT RSCP [Version 1, 21]
+0xD060	TDSCDMA OLPC Config [Version 1]
+0xD061	TDSCDMA OLPC Update [Version 1]
+0xD062	TDSCDMA L1 DL Sync Detec
+0xD063	TDSCDMA L1 Int PCCPCH [Version 0]
+0xD064	TDSCDMA L1 L1M Profiling Result [Version 7]
+0xD066	TDSCDMA Inter Sys Eutra Measurement Control [Version 1]
+0xD067	TDSCDMA Inter Sys Eutra Idle Interval [Version 1]
+0xD068	TDSCDMA Dmo Config [Version 1]
+0xD069	TDSCDMA T2L TFW Gap Cfg [Version 1]
+0xD06A	TDSCDMA T2L Eutra Measurement Result [Version 1]
+0xD06B	TDSCDMA T2L Time Meas Srch Req [Version 1]
+0xD06C	TDSCDMA T2L Eutra Measurement Accumulate Result [Version 1]
+0xD06D	TDSCDMA RXD Table [Version 1]
+0xD06E	TDSCDMA L1 DSDS QTA Report [Version 21]
+0xD06F	TDSCDMA L1 UL FW UpPCH TX Power Timing Config [Version 1]
+0xD070	TDSCDMA L1 UL FW DPCH TX Power Timing Config [Version 1]
+0xD071	TDSCDMA L1 UL ERUCCH SI Data [Version 1]
+0xD072	TDSCDMA L1 UL FW ERUCCH Config Command [Version 1]
+0xD074	TDSCDMA L1 ULDPCH Data Info [Version 1]
+0xD075	TDSCDMA L1 DRX PCH PATTERN DET [Version 1]
+0xD076	TDSCDMA L1 DSDS DTA Report
+0xD077	TDSCDMA L1 ASDIV Switch [Version 122]
+0xD078	TDSCDMA L1 ASDIV NV [Version 1]
+0xD080	TDSCDMA UL RLC State [Version 1]
+0xD081	TDSCDMA UL RLC TM Configuration [Version 1]
+0xD082	TDSCDMA UL RLC UM Configuration [Version 1]
+0xD083	TDSCDMA DL RLC State [Version 1]
+0xD084	TDSCDMA DL RLC TM Configuration [Version 1]
+0xD085	TDSCDMA DL RLC UM Configuration [Version 1]
+0xD086	TDSCDMA DL RLC AM Configuration [Version 1]
+0xD087	TDSCDMA UL RLC AM Configuration [Version 1]
+0xD088	TDSCDMA DL RLC AM PDU [Version 1]
+0xD089	TDSCDMA DL RLC AM Signaling PDU [Version 1]
+0xD08A	TDSCDMA UL RLC AM Statistics [Version 1]
+0xD08B	TDSCDMA UL RLC AM  PDU [Version 2]
+0xD08C	TDSCDMA UL RLC AM Signaling PDU [Version 2]
+0xD08D	TDSCDMA UL RLC AM Control PDU [Version 1]
+0xD08E	TDSCDMA DL RLC AM Control PDU [Version 1]
+0xD08F	TDSCDMA DL RLC AM Statistics [Version 1]
+0xD090	TDSCDMA UL RLC Ciphering Configuration [Version 1]
+0xD091	TDSCDMA DL RLC Ciphering Configuration [Version 1]
+0xD092	TDSCDMA DL RLC PDU Cipher Packet [Version 1]
+0xD093	TDSCDMA UL RLC PDU Cipher Packet [Version 1]
+0xD094	TDSCDMA DL Flexible RLC AM PDU [Version 1]
+0xD095	TDSCDMA UL RLC UM PDU [Version 1]
+0xD096	TDSCDMA DL RLC UM PDU [Version 1]
+0xD0B0	TDSCDMA MAC UL TVM Report [Version 1]
+0xD0B1	TDSCDMA MAC UL TVM Configuration [Version 1]
+0xD0B2	TDSCDMA UL MAC Configuration [Version 1]
+0xD0B3	TDSCDMA DL MAC Configuration [Version 1]
+0xD0B4	TDSCDMA MAC RACH Configuration [Version 1]
+0xD0B5	TDSCDMA MAC UL TFCS Configuration [Version 1]
+0xD0B6	TDSCDMA MAChs Config [Version 1]
+0xD0B7	TDSCDMA MAChs Status Report [Version 2]
+0xD0B8	TDSCDMA MAChs Reset [Version 1]
+0xD0B9	TDSCDMA MAChs Reassembly [Version 1]
+0xD0BA	TDSCDMA MAChs UL Config [Version 1]
+0xD0BB	TDSCDMA MAChs UL Header Status [Version 1]
+0xD0BC	TDSCDMA MAChs UL ETFCI Status [Version 1]
+0xD0E0	TDSCDMA RRC Modes And States [Version 1]
+0xD0E1	TDSCDMA RRC Protocol Errors [Version 1]
+0xD0E2	TDSCDMA RRC Cell Id [Version 1]
+0xD0E3	TDSCDMA RRC Signaling Packet
+0xD0E4	TDSCDMA RRC RB Rate Info [Version 1]
+0xD0E5	TDSCDMA RRC ACQ Info [Version 1]
+0xD0E6	TDSCDMA RRC DSDS LTA [Version 23, 82, 101]
+0xD100	TDSCDMA FW Tracking Mode [Version 10, 23, 44, 85, 123, 141]
+0xD101	TDSCDMA FW AGC Power Scan [Version 6, 21]
+0xD102	TDSCDMA FW AGC Gap Detection [Version 6, 22, 41]
+0xD103	TDSCDMA FW AGC ACQ Step12 [Version 4, 21]
+0xD104	TDSCDMA FW Reacquisition Results [Version 2, 22]
+0xD105	TDSCDMA FW DL SYNC Code Results [Version 3]
+0xD106	TDSCDMA FW TS0 Midamble Detection Results [Version 3, 141]
+0xD107	TDSCDMA TFW TS-RSP Result
+0xD108	TDSCDMA FW Tracking Loop Results [Version 12]
+0xD109	TDSCDMA FW Step3 Results [Version 2]
+0xD10A	TDSCDMA TFW Serving Cell Frame Timing
+0xD10B	TDSCDMA FW Demfront Configuration [Version 3]
+0xD10C	TDSCDMA FW Demfront Cell Configuration [Version 2]
+0xD10D	TDSCDMA FW Channel Estimation Short [Version 5, 21]
+0xD10E	TDSCDMA FW Equalizer Weight Computation [Version 2]
+0xD10F	TDSCDMA FW AE Results [Version 4, 22]
+0xD110	TDSCDMA FW Special Burst Detection Results [Version 3, 21]
+0xD111	TDSCDMA FW TPC SS Decoding Results [Version 4]
+0xD112	TDSCDMA FW TFCI Decoding Results [Version 4]
+0xD113	TDSCDMA FW EHICH decoding results [Version 2]
+0xD114	TDSCDMA FW EAGCH decoding results [Version 21]
+0xD115	TDSCDMA FW UL DPCH Encoding Results [Version 4]
+0xD116	TDSCDMA TFW PRACH ENCODING RESULTS
+0xD117	TDSCDMA FW UPPCH Encoding Results [Version 1]
+0xD118	TDSCDMA FW HSSICH Encoding Results [Version 1]
+0xD119	TDSCDMA FW EPUCH encoding results [Version 2]
+0xD11A	TDSCDMA TFW E-RUCCH Encoding Result
+0xD11B	TDSCDMA FW UPLINK Report [Version 8, 23, 44, 101, 121]
+0xD11C	TDSCDMA TFW TPC Report
+0xD11D	TDSCDMA FW Uplink Timing [Version 2]
+0xD11E	TDSCDMA FW Channel Estimation Long [Version 4]
+0xD11F	TDSCDMA FW SIR Results [Version 4]
+0xD120	TDSCDMA FW Memory Dump
+0xD121	TDSCDMA FW CQI [Version 3, 23]
+0xD122	TDSCDMA FW MSG [Version 1]
+0xD123	TDSCDMA FW Dynamic Switch [Version 3]
+0xD124	TDSCDMA FW HSSCCH Decoding Results  [Version 2]
+0xD125	TDSCDMA IRAT T2X [Version 1, 21, 42]
+0xD126	TDSCDMA Timeline Profile [Version 3, 22, 43]
+0xD127	TDSCDMA CE And Demfront Profile [Version 2, 21]
+0xD128	TDSCDMA FW IRAT X2T [Version 1, 44]
+0xD129	TDSCDMA FW Enhance Non TS0 Pruning Results [Version 1]
+0xD12A	TDSCDMA FW DSDX CXM Slot Status [Version 25, 42]
+	Subpacket -1	UnknownVersions [Version 3, 21]
+0xD12B	TDSCDMA FW MULTI SIM CFG MSG [Version 23]
+0xD12C	TDSCDMA FW DSDS TG QTA GAP [Version 21, 121]
+0xD12D	TDSCDMA FW Rx AGC [Version 1, 41]
+0xD12E	TDSCDMA FW RFC Slot Update [Version 48, 80, 81, 101, 123]
+0xD12F	TDSCDMA FW RFC Slot Events [Version 46, 121]
+0xD130	TDSCDMA TFW Exceptional Events
+0xD131	TDSCDMA FW VPE Information [Version 21]
+0xD132	TDSCDMA TFW TX AGC
+0xD133	TDSCDMA TFW Debug
+0xD134	TDSCDMA TFW Command
+0xD135	TDSCDMA TFW Response
+0xD136	TDSCDMA TFW TXFE
+0xD137	TDSCDMA TFW WAV
+0xD138	TDSCDMA FW HS Result [Version 1]
+0xD139	TDSCDMA FW DSDA TG Power Scan [Version 22]
+0xD13A	TDSCDMA FW FBRx [Version 41]
+0xD13B	TDSCDMA FW DSDA ACQ-IRAT CXM Results [Version 41]
+0xD13C	TDSCDMA FW SPUR Mitigation Slot Info [Version 42]
+0xD13D	TDSCDMA FW SPUR Mitigation Int Handler [Version 42]
+0xD13E	TDSCDMA FW Enhanced Channel Estimation [Version 102]
+0xD13F	Reserved
+0xD140	TDSCDMA FW MCJD IC INFO [Version 81, 121]
