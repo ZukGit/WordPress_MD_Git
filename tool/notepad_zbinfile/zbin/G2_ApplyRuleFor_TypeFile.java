@@ -20,6 +20,7 @@ import javax.crypto.Cipher;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.stream.FileImageInputStream;
+import javax.swing.*;
 import java.security.Key;
 import java.security.Security;
 
@@ -33,6 +34,7 @@ public class G2_ApplyRuleFor_TypeFile {
     static ArrayList<String> Rule_Identify_TypeIndexList = new ArrayList<String>();
 
 
+    static String Cur_Batch_End = ".bat";
     static String G2_Bat_Name = "zrule_apply_G2";
     static String Cur_Bat_Name = "zrule_apply_G2";
     static String zbinPath = System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin";
@@ -109,6 +111,7 @@ public class G2_ApplyRuleFor_TypeFile {
         if (osName.contains("window")) {
             curOS_TYPE = OS_TYPE.Windows;
             Cur_Bat_Name = Cur_Bat_Name+".bat";
+            Cur_Batch_End = ".bat";
             curOS_ExeTYPE = ".exe";
             initJDKPath_Windows(curLibraryPath);
             Win_Lin_Mac_ZbinPath = zbinPath+File.separator+"win_zbin";
@@ -117,6 +120,7 @@ public class G2_ApplyRuleFor_TypeFile {
             curOS_TYPE = OS_TYPE.Linux;
             Cur_Bat_Name = Cur_Bat_Name+".sh";
             curOS_ExeTYPE = "";
+            Cur_Batch_End = ".sh";
             initJDKPath_Linux_MacOS(curLibraryPath);
             Win_Lin_Mac_ZbinPath = zbinPath+File.separator+"lin_zbin";
 
@@ -124,6 +128,7 @@ public class G2_ApplyRuleFor_TypeFile {
             curOS_TYPE = OS_TYPE.MacOS;
             Cur_Bat_Name = Cur_Bat_Name+".sh";
             curOS_ExeTYPE = "";
+            Cur_Batch_End = ".sh";
             initJDKPath_Linux_MacOS(curLibraryPath);
             Win_Lin_Mac_ZbinPath = zbinPath+File.separator+"mac_zbin";
 
@@ -198,15 +203,354 @@ public class G2_ApplyRuleFor_TypeFile {
         realTypeRuleList.add( new Make_ZRuleDir_Rule_17());
         realTypeRuleList.add( new MD_ReName_Rule_18());
         realTypeRuleList.add( new ExpressTo7z_PassWord_Rule_19());
-
-
+        realTypeRuleList.add( new Land_Port_Classify_Rule_20());
+        realTypeRuleList.add( new Rename_Img_WithSize_Rule_21());
     }
 
 
 // 3038年 5 月 3 日
 
+
     // operation_type  操作类型     1--读取文件内容字符串 进行修改      2--对文件对文件内容(字节)--进行修改    3.对全体子文件进行的随性的操作 属性进行修改(文件名称)
 //     // 4.对当前子文件(包括子目录 子文件 --不包含孙目录 孙文件) 5. 从shell 中获取到的路径 去对某一个文件进行操作
+
+
+    class Rename_Img_WithSize_Rule_21 extends Basic_Rule{
+
+        ArrayList<String> fliterTypeList ;
+        ArrayList<File> mSrcFileImage;  // 符合 过滤 条件的 当前目录的文件夹的集合
+
+        Rename_Img_WithSize_Rule_21() {
+            super("#", 21, 4);  //
+            fliterTypeList = new ArrayList<String>();
+            mSrcFileImage = new  ArrayList<File>();
+        }
+
+        @Override
+        boolean initParams4InputParam(String inputParam) {
+            boolean isEmptyTypeInput  = false;
+
+            boolean isGifInput = false;
+            if(inputParam.contains("gif")){
+                fliterTypeList.add(".gif");
+                isGifInput = true;
+            }
+
+            boolean isJpgInput = false;
+            if(inputParam.contains("jpg")){
+                fliterTypeList.add(".jpg");
+                isJpgInput = true;
+            }
+
+            boolean isPngInput = false;
+            if(inputParam.contains("png")){
+                fliterTypeList.add(".png");
+                isPngInput = true;
+            }
+
+            boolean isWebpInput = false;
+            if(inputParam.contains("webp")){
+                fliterTypeList.add(".webp");
+                isWebpInput = true;
+            }
+
+            isEmptyTypeInput = !(isGifInput || isWebpInput ||  isPngInput || isJpgInput);
+            if(isEmptyTypeInput){
+                fliterTypeList.add(".webp");
+                fliterTypeList.add(".jpg");
+                fliterTypeList.add(".png");
+                fliterTypeList.add(".gif");
+            }
+
+            return  super.initParams4InputParam(inputParam);
+        }
+
+
+        boolean checkInFlitterList(String fileName){
+            boolean result = false;
+
+            for (int i = 0; i < fliterTypeList.size(); i++) {
+                if(fileName.endsWith(fliterTypeList.get(i))){
+                    result = true;
+                    break;
+                }
+            }
+            return result;
+        }
+
+
+        @Override
+        ArrayList<File> applySubFileListRule4(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+
+            for (int i = 0; i < curRealFileList.size(); i++) {
+                File fileItem = curRealFileList.get(i);
+                String fileName = fileItem.getName();
+                String fileName_lower = fileName.toLowerCase();
+
+                boolean isTypeInList = checkInFlitterList(fileName_lower);
+                if(isTypeInList){
+                    mSrcFileImage.add(fileItem);
+                }
+            }
+           StringBuffer typtSb  = new StringBuffer();
+            for (int i = 0; i < mSrcFileImage.size(); i++) {
+                typtSb.append(mSrcFileImage.get(i)+" ");
+            }
+            System.out.println("══════════开始执行 "+typtSb.toString()+"类型 1960x1280 宽x高操作 "+"══════════");
+
+            for (int i = 0; i < mSrcFileImage.size(); i++) {
+                File imageFile = mSrcFileImage.get(i);
+                String fileName = imageFile.getName();
+                ImageIcon imageIcon = new ImageIcon(imageFile.getAbsolutePath());
+                int high = imageIcon.getIconHeight();
+                int width = imageIcon.getIconWidth();
+
+                // 当前文件的 宽高
+                String str_width_x_high = calculateSizeStr(width,high);
+                String newName = str_width_x_high + "_"+fileName;
+                tryReName(imageFile,newName);
+                System.out.println("File["+i+"] =  SrcName【"+fileName+"】  TargetName【"+newName+"】");
+
+            }
+
+            System.out.println("Img Size Rename 执行完成! ");
+
+
+
+            return super.applySubFileListRule4(curFileList, subFileTypeMap, curDirList, curRealFileList);
+        }
+
+
+        // 宽x高    1000x0900    1280x0720
+        String calculateSizeStr(int widthValue , int highValue){
+            String sizeStr = "";
+            int fixWidthValue = 0;
+            int fixHighValue = 0;
+
+            if(widthValue > 9999){   // 宽高最大只能 9999 大了 受不了
+                fixWidthValue = 9999;
+            }else{
+                fixWidthValue = widthValue;
+            }
+            if(highValue > 9999){   // 宽高最大只能 9999 大了 受不了
+                fixHighValue = 9999;
+            }else{
+                fixHighValue = highValue;
+            }
+            String widthStr = addForZeroStr(fixWidthValue);
+            String highStr = addForZeroStr(fixHighValue);
+
+            // fixWidthValue 和 fixHighValue  进行补零操作
+
+            return widthStr+"x"+highStr;
+
+        }
+
+
+
+        String addForZeroStr(int value){
+            String valueStr = "";
+            if(value > 9999){
+                valueStr = "9999";
+            }else if(value >= 1000){
+                valueStr =  (value+"").trim();
+            }else if( value >= 100 ){
+                valueStr =  ("0"+value).trim();
+            }else if( value >= 10 ){
+                valueStr =  ("00"+value).trim();
+            }else if(value >= 0 ){
+                valueStr =  ("000"+value).trim();
+            }
+            return valueStr;
+        }
+
+
+        String ruleTip(String type, int index , String batName, OS_TYPE curType){
+            String itemDesc = "";
+            String desc_A =   " 对当前目录下的图片文件 指定类型图片(参数输入)(png)(jpg)(webp)(gif)进行 进行以 宽x高 类似 1960x1280_原名 的操作";
+
+            if(curType == OS_TYPE.Windows){
+                itemDesc =   batName.trim()+Cur_Batch_End+"  "+type+"_"+index+""+ "    #### [索引 "+index+"]  描述: "+ desc_A +"\n";
+                itemDesc +=  batName.trim()+Cur_Batch_End+"  "+type+"_"+index+"_jpg"+ "    #### [索引 "+index+"]  描述: "+ desc_A +"\n";
+                itemDesc +=  batName.trim()+Cur_Batch_End+"  "+type+"_"+index+"_png"+ "    #### [索引 "+index+"]  描述: "+ desc_A +"\n";
+                itemDesc +=  batName.trim()+Cur_Batch_End+"  "+type+"_"+index+"_gif"+ "    #### [索引 "+index+"]  描述: "+ desc_A +"\n";
+                itemDesc +=  batName.trim()+Cur_Batch_End+"  "+type+"_"+index+"_webp"+ "    #### [索引 "+index+"]  描述: "+ desc_A +"\n";
+                itemDesc +=  batName.trim()+Cur_Batch_End+"  "+type+"_"+index+"_jpg_png"+ "    #### [索引 "+index+"]  描述: "+ desc_A +"\n";
+                itemDesc +=  batName.trim()+Cur_Batch_End+"  "+type+"_"+index+"_jpg_png_gif_webp"+ "    #### [索引 "+index+"]  描述: "+ desc_A +"\n";
+
+            }else {
+                itemDesc = batName.trim() + Cur_Batch_End + "  " + type + "_" + index + "" + "    #### [索引 " + index + "]  描述: " + desc_A + "\n";
+                itemDesc += batName.trim() + Cur_Batch_End + "  " + type + "_" + index + "_jpg" + "    #### [索引 " + index + "]  描述: " + desc_A + "\n";
+                itemDesc += batName.trim() + Cur_Batch_End + "  " + type + "_" + index + "_png" + "    #### [索引 " + index + "]  描述: " + desc_A + "\n";
+                itemDesc += batName.trim() + Cur_Batch_End + "  " + type + "_" + index + "_gif" + "    #### [索引 " + index + "]  描述: " + desc_A + "\n";
+                itemDesc += batName.trim() + Cur_Batch_End + "  " + type + "_" + index + "_webp" + "    #### [索引 " + index + "]  描述: " + desc_A + "\n";
+                itemDesc += batName.trim() + Cur_Batch_End + "  " + type + "_" + index + "_jpg_png" + "    #### [索引 " + index + "]  描述: " + desc_A + "\n";
+                itemDesc += batName.trim() + Cur_Batch_End + "  " + type + "_" + index + "_jpg_png_gif_webp" + "    #### [索引 " + index + "]  描述: " + desc_A + "\n";
+            }
+            return itemDesc;
+
+        }
+
+
+
+
+
+    }
+
+
+
+
+    class Land_Port_Classify_Rule_20 extends Basic_Rule{
+
+
+
+        boolean isTimeStampDir = true ; //  Land_Port 新建的文件夹是否存有时间戳
+
+        //  false   ---》 对 png 和 jpg 文件进行过滤
+        boolean isGifClassfly = false;   //  true   ---》 只对 gif 文件 进行 过滤
+
+
+ArrayList<File> mSrcFileImage;   // Shell 目录下原始文件目录
+ArrayList<File> mLandImageFileList;  // Shell/Land_Port_TimeStamp/Land/ 文件夹下的文件
+ArrayList<File> mPortImageFileList;  // Shell/Land_Port_TimeStamp/Land/ 文件夹下的文件
+HashMap<File,File> src_target_FileMap ; // src为 原始文件  target为目标文件 进行 copy时 会使用到
+
+
+
+        Land_Port_Classify_Rule_20() {
+            super("#", 20, 4);  //
+            isTimeStampDir = true ;
+
+            mSrcFileImage = new ArrayList<File>();
+            mLandImageFileList = new ArrayList<File>();
+            mPortImageFileList = new ArrayList<File>();
+
+            src_target_FileMap = new HashMap<File,File>();
+        }
+
+        @Override
+        boolean initParams4InputParam(String inputParam) {
+            if(inputParam.contains("notime")){
+                isTimeStampDir = false;
+            }else {
+                isTimeStampDir = true;
+            }
+
+            if(inputParam.contains("gif")){
+                isGifClassfly = true;
+            }else {
+                isGifClassfly = false;
+            }
+
+            return  super.initParams4InputParam(inputParam);
+        }
+
+
+
+
+        @Override
+        ArrayList<File> applySubFileListRule4(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+
+            for (int i = 0; i < curRealFileList.size(); i++) {
+                File fileItem = curRealFileList.get(i);
+                String fileName = fileItem.getName();
+                String fileName_lower = fileName.toLowerCase();
+                if(isGifClassfly){
+                    if(fileName_lower.endsWith(".gif") ){
+                        mSrcFileImage.add(fileItem);
+                    }
+                }else{
+                    if(fileName_lower.endsWith(".jpg") || fileName_lower.endsWith(".png") ){
+                        mSrcFileImage.add(fileItem);
+                    }
+                }
+
+            }
+
+
+            for (int i = 0; i < mSrcFileImage.size(); i++) {
+                File imageFile = mSrcFileImage.get(i);
+                ImageIcon imageIcon = new ImageIcon(imageFile.getAbsolutePath());
+                int high = imageIcon.getIconHeight();
+                int width = imageIcon.getIconWidth();
+
+                if(high >= width){
+                    mPortImageFileList.add(imageFile);
+                }else{
+                    mLandImageFileList.add(imageFile);
+                }
+            }
+
+            String PreDirName = "Land_Port_";
+            if(isGifClassfly){
+                PreDirName += "Gif";
+            }else{
+                PreDirName += "Img";
+            }
+
+
+            String dir_1 = isTimeStampDir?PreDirName+"_"+getTimeStamp():PreDirName;
+            String dir_1_Land_str = dir_1+File.separator+"Land";
+            String dir_1_Port_str = dir_1+File.separator+"Port";
+            File dir_Port = new File(curDirFile.getAbsoluteFile()+File.separator+dir_1_Port_str);
+            File dir_Land = new File(curDirFile.getAbsoluteFile()+File.separator+dir_1_Land_str);
+            System.out.println("══════════"+dir_Land.getAbsolutePath()+"  Land文件开始过滤执行"+"══════════");
+            TryClassifyImage(mLandImageFileList,dir_Land);
+            System.out.println("══════════"+dir_Port.getAbsolutePath()+"  Port文件开始过滤执行"+"══════════");
+            TryClassifyImage(mPortImageFileList,dir_Port);
+
+
+            System.out.println("zzfile_3"+Cur_Batch_End+"  "+ curDirFile.getAbsoluteFile()+File.separator+dir_1+"                        ####  过滤 Land  Port 文件夹已经生成！");
+
+            return super.applySubFileListRule4(curFileList, subFileTypeMap, curDirList, curRealFileList);
+        }
+
+       void TryClassifyImage(ArrayList<File>  srcFileImageList , File targetDirFile){
+           if(!targetDirFile.exists()){
+               targetDirFile.mkdirs();
+           }
+            for (int i = 0; i < srcFileImageList.size() ; i++) {
+               File imgFile = srcFileImageList.get(i);
+               String fileName = imgFile.getName();
+               File targetFile = new File(targetDirFile.getAbsoluteFile()+File.separator+fileName);
+
+               fileCopy(imgFile,targetFile);
+                System.out.println("File["+i+"] = "+"SrcFile【"+imgFile.getAbsolutePath()+"】"+" TargetFile【"+targetFile.getAbsolutePath()+"】");
+           }
+
+        }
+
+
+        String ruleTip(String type, int index , String batName, OS_TYPE curType){
+            String itemDesc = "";
+            String desc_A =   " 对当前目录下的图片文件(png)(jpg)进行 Land横屏 和 Port竖直 分类 并放置在新建Land_Port_Img_TimeStamp 文件夹中";
+            String desc_B =   " 对当前目录下的图片文件(png)(jpg)进行 Land横屏 和 Port竖直 分类 并放置在新建Land_Port_Img文件夹中(文件夹名称固定)";
+            String desc_C =   " 对当前目录下的图片文件(gif)进行 Land横屏 和 Port竖直 分类 并放置在新建Land_Port_Gif_TimeStamp 文件夹中";
+            String desc_D =   " 对当前目录下的图片文件(gif)进行 Land横屏 和 Port竖直 分类 并放置在新建Land_Port_Gif 文件夹中(文件夹名称固定)";
+
+            if(curType == OS_TYPE.Windows){
+                itemDesc = batName.trim()+".bat  "+type+"_"+index+""+ "    #### [索引 "+index+"]  描述: "+ desc_A +"\n";
+                itemDesc +=  batName.trim()+".bat  "+type+"_"+index+"_notime"+ "    #### [索引 "+index+"]  描述: "+ desc_B +"\n";
+                itemDesc +=  batName.trim()+".bat  "+type+"_"+index+"_gif"+ "    #### [索引 "+index+"]  描述: "+ desc_C +"\n";
+                itemDesc +=  batName.trim()+".bat  "+type+"_"+index+"_gif_notime"+ "    #### [索引 "+index+"]  描述: "+ desc_D +"\n";
+
+            }else{
+                itemDesc = batName.trim()+ Cur_Batch_End+" "+type+"_"+index  + "       ### [索引 "+index+"]  描述:"+ desc_A+"\n";
+                itemDesc += batName.trim()+ Cur_Batch_End+" "+type+"_"+index+"_notime"  + "       ### [索引 "+index+"]  描述:"+ desc_B+"\n";
+                itemDesc += batName.trim()+ Cur_Batch_End+" "+type+"_"+index+"_gif"  + "       ### [索引 "+index+"]  描述:"+ desc_C+"\n";
+                itemDesc += batName.trim()+ Cur_Batch_End+" "+type+"_"+index+"_gif_notime"  + "       ### [索引 "+index+"]  描述:"+ desc_C;
+            }
+
+            return itemDesc;
+        }
+
+
+
+
+
+    }
+
+
 
     // 把当前 文件 使用 默认的 密码 752025 进行 压缩 成 7z 文件
     class ExpressTo7z_PassWord_Rule_19 extends Basic_Rule{
@@ -4532,7 +4876,7 @@ public class G2_ApplyRuleFor_TypeFile {
     }
 
 
-   
+
 
 
     public static String execCMD_Windows(String command) {
@@ -4628,12 +4972,12 @@ public class G2_ApplyRuleFor_TypeFile {
         return retCode+"";
     }
 
-    
+
     public static String execCMD(String command) {
-        
+
         String result = "";
         if(curOS_TYPE == OS_TYPE.Windows){
-        return execCMD_Windows(command);
+            return execCMD_Windows(command);
         }else if(curOS_TYPE == OS_TYPE.MacOS){
 
             return execCMD_Mac(command);
