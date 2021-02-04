@@ -1,7 +1,11 @@
 
+import cn.hutool.core.util.ImageUtil;
 import com.luciad.imageio.webp.WebPReadParam;
 import net.jimmc.jshortcut.JShellLink;
 
+import java.awt.*;
+import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.io.*;
 
@@ -205,6 +209,7 @@ public class G2_ApplyRuleFor_TypeFile {
         realTypeRuleList.add( new ExpressTo7z_PassWord_Rule_19());
         realTypeRuleList.add( new Land_Port_Classify_Rule_20());
         realTypeRuleList.add( new Rename_Img_WithSize_Rule_21());
+        realTypeRuleList.add( new ReSize_Img_Rule_22());
     }
 
 
@@ -213,6 +218,433 @@ public class G2_ApplyRuleFor_TypeFile {
 
     // operation_type  操作类型     1--读取文件内容字符串 进行修改      2--对文件对文件内容(字节)--进行修改    3.对全体子文件进行的随性的操作 属性进行修改(文件名称)
 //     // 4.对当前子文件(包括子目录 子文件 --不包含孙目录 孙文件) 5. 从shell 中获取到的路径 去对某一个文件进行操作
+
+
+    // 对 图片文件进行 裁剪   -20_-20_20_20
+    // 上下左右的padding   上 -20   20 图片往下移动20 显示20的空白
+    // 上    正-》 显示20的空白    负》 图片缩进20 去掉图片的20距离
+    // 下    正-》 下显示20的空白    负》 下图片缩进20 去掉图片的20距离
+    // 左    正-》 左显示20的空白    负》 左图片缩进20 去掉图片的20距离
+    // 右    正-》 右显示20的空白    负》 右图片缩进20 去掉图片的20距离
+
+    class ReSize_Img_Rule_22 extends Basic_Rule{
+
+        ArrayList<String> fliterTypeList ;
+        ArrayList<File> mSrcFileImage;  // 符合 过滤 条件的 当前目录的文件夹的集合
+        ArrayList<Integer> up_down_left_right;
+
+        ReSize_Img_Rule_22() {
+            super("#", 22, 4);  //
+            mSrcFileImage = new  ArrayList<File>();
+            fliterTypeList = new ArrayList<String>();
+            up_down_left_right = new  ArrayList<Integer>();
+
+            fliterTypeList.add(".jpg");
+            fliterTypeList.add(".png");
+        }
+
+
+        @Override
+        boolean initParamsWithInputList(ArrayList<String> inputParamList) {
+
+            for (int i = 0; i < inputParamList.size(); i++) {
+                System.out.println("initParamsWithInputList_inputParamList["+i+"] = "+inputParamList.get(i) );
+
+               if(i == 1){
+                   String one_param = inputParamList.get(1);
+                   if(!one_param.contains("_")){  // 当前的第一个参数不是 上_下_左_右 参数
+                       System.out.println("当前的第二个参数不是 上_下_左_右 参数");
+                       return false;
+                   }
+                 up_down_left_right = calculSize(one_param);
+                   continue;
+               }
+
+                System.out.println("File["+i+"] = "+ curDirPath+File.separator+inputParamList.get(i));
+               File inputFile = new File(curDirPath+File.separator+inputParamList.get(i));
+               String fileName_lower = inputFile.getName().toLowerCase();
+               if(inputFile.exists() && ( fileName_lower.endsWith(".jpg") || fileName_lower.endsWith(".png"))){
+                   mSrcFileImage.add(inputFile);
+                }
+            }
+            if(mSrcFileImage.size() == 0 && inputParamList.size() >= 3){
+                System.out.println("用户输入了 无效的文件  请检查输入的文件名称！ ");
+                return false;
+            }
+            return super.initParamsWithInputList(inputParamList);
+        }
+
+       //   -20_-20_-20_-20
+        ArrayList<Integer> calculSize(String size_str){
+            ArrayList<Integer> size_4_List = new     ArrayList<Integer>();
+            String checkStr = size_str.replaceAll("_","").replace("+","").replaceAll("-","");
+            if(!isNumeric(checkStr.trim())){
+                System.out.println("当前的 上_下_左_右 参数 输入错误(1):"+ size_str);
+                return size_4_List;
+            }
+            String[] arr = size_str.split("_");
+            if(arr == null || arr.length != 4){
+                System.out.println("当前的 上_下_左_右 参数 输入错误(2):"+ size_str);
+                return size_4_List;
+            }
+
+            Integer up_int = Integer.parseInt(arr[0]);
+            Integer down_int = Integer.parseInt(arr[1]);
+            Integer left_int = Integer.parseInt(arr[2]);
+            Integer right_int = Integer.parseInt(arr[3]);
+
+            size_4_List.add(up_int);
+            size_4_List.add(down_int);
+            size_4_List.add(left_int);
+            size_4_List.add(right_int);
+
+            return size_4_List;
+
+        }
+        boolean checkInFlitterList(String fileName){
+            boolean result = false;
+
+            for (int i = 0; i < fliterTypeList.size(); i++) {
+                if(fileName.endsWith(fliterTypeList.get(i))){
+                    result = true;
+                    break;
+                }
+            }
+            return result;
+        }
+
+
+        @Override
+        ArrayList<File> applySubFileListRule4(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+
+            ArrayList<File> operationFileList = new   ArrayList<File>();
+            ArrayList<File> newOperationFileList = new   ArrayList<File>();
+            if(mSrcFileImage.size() > 0){
+                System.out.println("═══════════════════ 只对当前输入 Img 文件进行处理");
+                operationFileList.addAll(mSrcFileImage);
+                for (int i = 0; i < operationFileList.size(); i++) {
+                    File inputFile = operationFileList.get(i);
+                    System.out.println("inputFile["+i+"] = "+ inputFile.getName() );
+                }
+            }else{
+                System.out.println("═══════════════════ 用户输入文件为空--对本地所有Img jpg png 文件进行处理");
+
+                for (int i = 0; i < curRealFileList.size(); i++) {
+                    File fileItem = curRealFileList.get(i);
+                    String fileName = fileItem.getName();
+                    String fileName_lower = fileName.toLowerCase();
+
+                    boolean isTypeInList = checkInFlitterList(fileName_lower);
+                    if(isTypeInList){
+                        operationFileList.add(fileItem);
+                    }
+                }
+
+            }
+
+            String Dir_Name_Padding = "Img_Padding_"+getTimeStamp();
+            File dirPaddingFile = new File(curDirPath+File.separator+Dir_Name_Padding);
+            if(!dirPaddingFile.exists()){
+                dirPaddingFile.mkdirs();
+            }
+
+            for (int i = 0; i < operationFileList.size(); i++) {
+                File srcFile = operationFileList.get(i);
+                String fileName = srcFile.getName();
+                File newFileItem = new File(dirPaddingFile.getAbsolutePath()+File.separator+fileName);
+                fileCopy(srcFile,newFileItem);
+                newOperationFileList.add(newFileItem);
+            }
+
+
+            int up_int = up_down_left_right.get(0);
+            int down_int = up_down_left_right.get(1);
+            int left_int = up_down_left_right.get(2);
+            int right_int = up_down_left_right.get(3);
+            String up_str = up_int > 0?"【上增加"+up_int+"空白】":"【上减少"+up_int+"内容】";
+            String down_str = down_int > 0?"【下增加"+down_int+"空白】":"【下减少"+down_int+"内容】";
+            String left_str = left_int > 0?"【左增加"+left_int+"空白】":"【左减少"+left_int+"内容】";
+            String right_str = right_int > 0?"【右增加"+right_int+"空白】":"【右减少"+right_int+"内容】";
+
+            System.out.println("当前批操作集合:"+ up_str+down_str+left_str+right_str);
+            System.out.println("当前操作文件数量: "+newOperationFileList.size());
+            for (int i = 0; i < newOperationFileList.size(); i++) {
+                File imageFile = newOperationFileList.get(i);
+                String fileName = imageFile.getName();
+                System.out.println("FIle["+i+"] ="+ fileName+"  开始执行操作！ ");
+                ImageIcon imageIcon = new ImageIcon(imageFile.getAbsolutePath());
+
+                BufferedImage originImage = getBufferedImage(imageFile);
+                int h =    originImage.getHeight();
+                int w =    originImage.getWidth();
+                int high = originImage.getHeight();
+                int width = originImage.getWidth();
+                int up_down_sum = up_int + down_int;
+                int left_right_sum = left_int + right_int;
+
+                int target_width = width + left_right_sum;
+                int target_high = high + up_down_sum;
+                // 显示图片的起始位置
+
+              int  width_input = target_width;
+                int  height_input = target_high;
+
+
+                int srcImage_x = left_int;   // 原画的 起始x坐标
+                int srcImage_width = width+right_int;   // 原画的 起始坐标
+
+                int  srcImage_y = up_int;    // 原画的 起始y坐标
+                int  srcImage_high = high + down_int;    // 原画的 起始y坐标
+
+
+
+
+                double ratiox = 1.0;
+                double ratioy = 1.0;
+
+
+                ratiox = w * ratiox / width_input;
+                ratioy = h * ratioy / height_input;
+
+                // 缩小图片
+                if (ratiox >= 1) {
+                    if (ratioy < 1) {
+                        ratiox = height_input * 1.0 / h;
+                    } else {
+                        if (ratiox > ratioy) {
+                            ratiox = height_input * 1.0 / h;
+                        } else {
+                            ratiox = width_input * 1.0 / w;
+                        }
+                    }
+                } else {
+                    // 放大图片
+                    if (ratioy < 1) {
+                        if (ratiox > ratioy) {
+                            ratiox = height_input * 1.0 / h;
+                        } else {
+                            ratiox = width_input * 1.0 / w;
+                        }
+                    } else {
+                        ratiox = width_input * 1.0 / w;
+                    }
+                }
+
+                // 子截图 先搞定
+                // X的起始坐标 如果大于0的话 那么就使用原有的坐标系0
+                // 如果小于0的话 说明x起始坐标需要移动到 Math.abs(left_int)
+                int origin_subImage_x = left_int >= 0? 0:Math.abs(left_int);
+                int origin_subImage_y = up_int >= 0 ?  0:Math.abs(up_int);
+
+                int origin_subImage_width = width;  //  默认为图片的宽度
+                if(left_int < 0 &&  right_int < 0){
+                    origin_subImage_width = width + left_int + right_int ;
+                } else if(left_int < 0 ){
+                    origin_subImage_width = width + left_int;
+                }else if( right_int < 0){
+                    origin_subImage_width = width + right_int;
+                }
+
+                int origin_subImage_high = high;
+                if(up_int < 0 &&  down_int < 0){
+                    origin_subImage_high = high + up_int + down_int  ;
+                } else if(up_int < 0){
+                    origin_subImage_high = high  + up_int ;
+                }else if( down_int < 0){
+                    origin_subImage_high = high + down_int ;
+                }
+
+
+
+             //   AffineTransformOp op = new AffineTransformOp(AffineTransform.getScaleInstance(ratiox, ratiox), null);
+          //      originImage = op.filter(originImage, null);
+                System.out.println("width="+width +"    high="+high);
+
+                System.out.println("up_int="+up_int +"    down_int="+down_int+"     left_int="+left_int+"     right_int="+ right_int);
+      System.out.println("origin_subImage_x="+origin_subImage_x +"    origin_subImage_y="+origin_subImage_y +"  origin_subImage_width ="+ origin_subImage_width  + "  origin_subImage_high="+ origin_subImage_high);
+
+//                originImage = originImage.getSubimage(0, origin_subImage_y, width, origin_subImage_high);
+//                originImage = originImage.getSubimage(origin_subImage_x, 0, origin_subImage_width, originImage.getHeight());
+
+
+          //      originImage = originImage.getSubimage(origin_subImage_x, origin_subImage_y, origin_subImage_width, origin_subImage_high);
+
+
+
+
+
+                BufferedImage whiteSpace_BuffImage =   generalBufferedImage_WhitePicture(target_width,target_high);
+
+                BufferedImage combined = new BufferedImage(target_width, target_high, BufferedImage.TYPE_INT_RGB);
+                // paint both images, preserving the alpha channels
+                Graphics g = combined.getGraphics();
+//                g.setColor(new Color(255, 255, 255));
+                try {
+
+
+//                    int fixed_width = srcImage_width>width?width:srcImage_width;
+//                    int fixed_high = srcImage_high>high?high:srcImage_high;
+//                    System.out.println("src_width="+width +"    src_high="+high);
+//                    System.out.println("WhitePicture_target_width="+target_width +"    WhitePicture_target_high="+target_high);
+//                    System.out.println("up_int="+up_int +"    down_int="+down_int+"     left_int="+left_int+"     right_int="+ right_int);
+//                    System.out.println("srcImage_x="+srcImage_x +"    srcImage_y="+srcImage_y+"   fixed_width="+fixed_width+ "  fixed_high="+ fixed_high);
+//
+//                    g.drawImage(originImage, srcImage_x,srcImage_y,fixed_width , fixed_high ,null);
+//                    // Save as new image
+//                    ImageIO.write(combined, "jpg", imageFile);
+
+
+
+                 //   ImageIO.write(originImage, "jpg", imageFile);
+                    int big_rect_y = up_int >= 0 ? up_int:0;
+                    int big_rect_x = left_int >= 0? left_int:0;
+
+                    System.out.println("输出路径下宽:"+whiteSpace_BuffImage.getWidth()+"   输出路径下高:"+whiteSpace_BuffImage.getHeight());
+                    ImageUtil.cut(imageFile,imageFile,new Rectangle(origin_subImage_x,origin_subImage_y,origin_subImage_width,origin_subImage_high));
+
+                    //        BufferedImage originImage = getBufferedImage(imageFile);
+                    BufferedImage originImage_fixed = getBufferedImage(imageFile);
+                    g.drawImage(whiteSpace_BuffImage, 0, 0, null);
+                    g.drawImage(originImage_fixed, big_rect_x, big_rect_y, null);
+                    System.out.println("big_rect_x = "+ big_rect_x + "    big_rect_y="+ big_rect_y);
+                    ImageIO.write(combined, "jpg", imageFile);
+
+                }catch (Exception e){
+                    System.out.println("发生异常! ");
+
+                }finally {
+//                    if (g != null) {
+//                        g.dispose();
+//                    }
+                }
+
+
+
+
+            }
+
+            System.out.println(" Img Padding 执行完成! ");
+
+
+
+            return super.applySubFileListRule4(curFileList, subFileTypeMap, curDirList, curRealFileList);
+        }
+
+
+        public  BufferedImage getBufferedImage(File file)  {
+            Image   img   = null;
+            try{
+                img = ImageIO.read(file); // 构造Image对象
+            }catch ( Exception e){
+                System.out.println(e);
+                return null;
+            }
+
+            int    width = img.getWidth(null); // 得到源图宽
+            int     height = img.getHeight(null); // 得到源图长
+
+//    return resizeFix(400, 492);
+            return resize(img,width, height);
+        }
+
+
+
+        public  BufferedImage resize(Image mImage , int w, int h)  {
+            // SCALE_SMOOTH 的缩略算法 生成缩略图片的平滑度的 优先级比速度高 生成的图片质量比较好 但速度慢
+            BufferedImage image = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
+            Graphics g = image.getGraphics();
+            try {
+                g.drawImage(mImage, 0, 0, w, h, null); // 绘制缩小后的图
+            } finally {
+                if (g != null) {
+                    g.dispose();
+                }
+            }
+            return image;
+            // File destFile = new File("C:\\temp\\456.jpg");
+            // FileOutputStream out = new FileOutputStream(destFile); // 输出到文件流
+            // // 可以正常实现bmp、png、gif转jpg
+            // JPEGImageEncoder encoder = JPEGCodec.createJPEGEncoder(out);
+            // encoder.encode(image); // JPEG编码
+            // out.close();
+        }
+
+
+        public  BufferedImage generalBufferedImage_WhitePicture( int p_width, int p_heigh) {
+            BufferedImage imgBuf = null;
+            int width = p_width;
+            int heigh = p_heigh;
+            Color currentColor = new Color(255, 255, 255);
+/*
+
+        BufferedImage bi = new BufferedImage(width,heigh, BufferedImage.TYPE_INT_RGB);//INT精确度达到一定,RGB三原色，高度70,宽度150
+//得到它的绘制环境(这张图片的笔)
+        Graphics2D g2 = (Graphics2D) bi.getGraphics();
+        int frontSize = 550;
+
+        g2.setBackground(currentColor);
+        g2.fillRect(0,0,width,heigh);//填充一个矩形 左上角坐标(0,0),宽500,高500;填充整张图片
+        g2.fillRect(0,0,width,heigh);//填充整张图片(其实就是设置背景颜色)
+         g2.setColor(currentColor);
+
+         */
+
+            imgBuf = new BufferedImage(width, heigh, BufferedImage.TYPE_INT_RGB);
+            Graphics curGraphic = imgBuf.getGraphics();
+            //设置颜色
+            curGraphic.setColor(currentColor);
+            //填充
+            curGraphic.fillRect(0, 0, imgBuf.getWidth(), imgBuf.getHeight());
+
+
+            return imgBuf;
+/*
+
+        try {
+            mCurFile.createNewFile();
+            ImageIO.write(imgBuf, "jpg", new FileOutputStream(mCurFile));//保存图片 JPEG表示保存格式
+//            System.out.println("创建 RGB "+"R="+r+"  G="+g+"  B="+b+" 图片成功！");
+
+        } catch (Exception e) {
+            System.out.println("创建 RGB 图片格式出现异常！"+ mCurFile.getAbsolutePath());
+        }
+*/
+
+        }
+
+
+
+
+        String ruleTip(String type, int index , String batName, OS_TYPE curType){
+            String itemDesc = "";
+            String desc_A =   " 无输入参数 默认对本目录下的所有 png jpg  进行 20_20_20_20 上_下_左_右的裁剪";
+            String desc_B =   " 对给定的图片进行 20_20_20_20 上_下_左_右的裁剪  ";
+            String desc_C =   " 对给定的图片进行 200_0_0_0 上_下_左_右的裁剪(顶部增加200空白像素空间)  ";
+            String desc_D =   " 对给定的图片进行 0_0_0_200 上_下_左_右的裁剪(底部增加200空白像素空间)  ";
+            String desc_E =   " 对给定的图片进行 0_200_0_200 上_下_左_右的裁剪(底部增加200 右部增加200 空白像素空间)  ";
+            String desc_F =   " 对给定的图片进行 -100_-100_-100_-100 上_下_左_右的裁剪(上下左右 都裁剪100 空白像素空间)  ";
+            String desc_G =   " 对给定的图片进行 0_-125_0_0 上_下_左_右的裁剪( 底部裁剪125 像素空间)  ";
+            String desc_H =   " 对给定的图片进行 0_-110_0_0 上_下_左_右的裁剪( 底部裁剪110 像素空间)  ";
+            itemDesc = batName.trim() + Cur_Batch_End + "  " + type + "_" + index + "  20_20_20_20" + "    #### [索引 " + index + "]  描述: " + desc_A + "\n";
+                itemDesc += batName.trim() + Cur_Batch_End + "  " + type + "_" + index + "  20_20_20_20" + "   <ImgFile>  "+"    #### [索引 " + index + "]  描述: " + desc_B + "\n";
+                itemDesc += batName.trim() + Cur_Batch_End + "  " + type + "_" + index + "  200_0_0_0" + "    <ImgFile>   #### [索引 " + index + "]  描述: " + desc_C + "\n";
+            itemDesc += batName.trim() + Cur_Batch_End + "  " + type + "_" + index + "  0_0_0_200" + "    <ImgFile>   #### [索引 " + index + "]  描述: " + desc_D + "\n";
+            itemDesc += batName.trim() + Cur_Batch_End + "  " + type + "_" + index + "  0_200_0_200" + "    <ImgFile>   #### [索引 " + index + "]  描述: " + desc_E + "\n";
+            itemDesc += batName.trim() + Cur_Batch_End + "  " + type + "_" + index + "  -100_-100_-100_-100" + "    <ImgFile>   #### [索引 " + index + "]  描述: " + desc_F + "\n";
+            itemDesc += batName.trim() + Cur_Batch_End + "  " + type + "_" + index + "  0_-125_0_0" + "    <ImgFile>   #### [索引 " + index + "]  描述: " + desc_G + "\n";
+            itemDesc += batName.trim() + Cur_Batch_End + "  " + type + "_" + index + "  0_-110_0_0" + "    <ImgFile>   #### [索引 " + index + "]  描述: " + desc_H + "\n";
+
+            return itemDesc;
+
+        }
+
+
+
+
+
+    }
+
+
 
 
     class Rename_Img_WithSize_Rule_21 extends Basic_Rule{
