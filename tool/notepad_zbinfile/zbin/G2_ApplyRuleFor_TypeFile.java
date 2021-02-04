@@ -27,8 +27,7 @@ import javax.imageio.stream.FileImageInputStream;
 import javax.swing.*;
 import java.security.Key;
 import java.security.Security;
-
-
+import com.sun.crypto.provider.*;
 // 对于  文件类型_操作Index  执行对应的操作逻辑
 public class G2_ApplyRuleFor_TypeFile {
 
@@ -250,21 +249,21 @@ public class G2_ApplyRuleFor_TypeFile {
             for (int i = 0; i < inputParamList.size(); i++) {
                 System.out.println("initParamsWithInputList_inputParamList["+i+"] = "+inputParamList.get(i) );
 
-               if(i == 1){
-                   String one_param = inputParamList.get(1);
-                   if(!one_param.contains("_")){  // 当前的第一个参数不是 上_下_左_右 参数
-                       System.out.println("当前的第二个参数不是 上_下_左_右 参数");
-                       return false;
-                   }
-                 up_down_left_right = calculSize(one_param);
-                   continue;
-               }
+                if(i == 1){
+                    String one_param = inputParamList.get(1);
+                    if(!one_param.contains("_")){  // 当前的第一个参数不是 上_下_左_右 参数
+                        System.out.println("当前的第二个参数不是 上_下_左_右 参数");
+                        return false;
+                    }
+                    up_down_left_right = calculSize(one_param);
+                    continue;
+                }
 
                 System.out.println("File["+i+"] = "+ curDirPath+File.separator+inputParamList.get(i));
-               File inputFile = new File(curDirPath+File.separator+inputParamList.get(i));
-               String fileName_lower = inputFile.getName().toLowerCase();
-               if(inputFile.exists() && ( fileName_lower.endsWith(".jpg") || fileName_lower.endsWith(".png"))){
-                   mSrcFileImage.add(inputFile);
+                File inputFile = new File(curDirPath+File.separator+inputParamList.get(i));
+                String fileName_lower = inputFile.getName().toLowerCase();
+                if(inputFile.exists() && ( fileName_lower.endsWith(".jpg") || fileName_lower.endsWith(".png"))){
+                    mSrcFileImage.add(inputFile);
                 }
             }
             if(mSrcFileImage.size() == 0 && inputParamList.size() >= 3){
@@ -274,7 +273,7 @@ public class G2_ApplyRuleFor_TypeFile {
             return super.initParamsWithInputList(inputParamList);
         }
 
-       //   -20_-20_-20_-20
+        //   -20_-20_-20_-20
         ArrayList<Integer> calculSize(String size_str){
             ArrayList<Integer> size_4_List = new     ArrayList<Integer>();
             String checkStr = size_str.replaceAll("_","").replace("+","").replaceAll("-","");
@@ -386,7 +385,7 @@ public class G2_ApplyRuleFor_TypeFile {
                 int target_high = high + up_down_sum;
                 // 显示图片的起始位置
 
-              int  width_input = target_width;
+                int  width_input = target_width;
                 int  height_input = target_high;
 
 
@@ -456,18 +455,18 @@ public class G2_ApplyRuleFor_TypeFile {
 
 
 
-             //   AffineTransformOp op = new AffineTransformOp(AffineTransform.getScaleInstance(ratiox, ratiox), null);
-          //      originImage = op.filter(originImage, null);
+                //   AffineTransformOp op = new AffineTransformOp(AffineTransform.getScaleInstance(ratiox, ratiox), null);
+                //      originImage = op.filter(originImage, null);
                 System.out.println("width="+width +"    high="+high);
 
                 System.out.println("up_int="+up_int +"    down_int="+down_int+"     left_int="+left_int+"     right_int="+ right_int);
-      System.out.println("origin_subImage_x="+origin_subImage_x +"    origin_subImage_y="+origin_subImage_y +"  origin_subImage_width ="+ origin_subImage_width  + "  origin_subImage_high="+ origin_subImage_high);
+                System.out.println("origin_subImage_x="+origin_subImage_x +"    origin_subImage_y="+origin_subImage_y +"  origin_subImage_width ="+ origin_subImage_width  + "  origin_subImage_high="+ origin_subImage_high);
 
 //                originImage = originImage.getSubimage(0, origin_subImage_y, width, origin_subImage_high);
 //                originImage = originImage.getSubimage(origin_subImage_x, 0, origin_subImage_width, originImage.getHeight());
 
 
-          //      originImage = originImage.getSubimage(origin_subImage_x, origin_subImage_y, origin_subImage_width, origin_subImage_high);
+                //      originImage = originImage.getSubimage(origin_subImage_x, origin_subImage_y, origin_subImage_width, origin_subImage_high);
 
 
 
@@ -495,7 +494,7 @@ public class G2_ApplyRuleFor_TypeFile {
 
 
 
-                 //   ImageIO.write(originImage, "jpg", imageFile);
+                    //   ImageIO.write(originImage, "jpg", imageFile);
                     int big_rect_y = up_int >= 0 ? up_int:0;
                     int big_rect_x = left_int >= 0? left_int:0;
 
@@ -626,8 +625,8 @@ public class G2_ApplyRuleFor_TypeFile {
             String desc_G =   " 对给定的图片进行 0_-125_0_0 上_下_左_右的裁剪( 底部裁剪125 像素空间)  ";
             String desc_H =   " 对给定的图片进行 0_-110_0_0 上_下_左_右的裁剪( 底部裁剪110 像素空间)  ";
             itemDesc = batName.trim() + Cur_Batch_End + "  " + type + "_" + index + "  20_20_20_20" + "    #### [索引 " + index + "]  描述: " + desc_A + "\n";
-                itemDesc += batName.trim() + Cur_Batch_End + "  " + type + "_" + index + "  20_20_20_20" + "   <ImgFile>  "+"    #### [索引 " + index + "]  描述: " + desc_B + "\n";
-                itemDesc += batName.trim() + Cur_Batch_End + "  " + type + "_" + index + "  200_0_0_0" + "    <ImgFile>   #### [索引 " + index + "]  描述: " + desc_C + "\n";
+            itemDesc += batName.trim() + Cur_Batch_End + "  " + type + "_" + index + "  20_20_20_20" + "   <ImgFile>  "+"    #### [索引 " + index + "]  描述: " + desc_B + "\n";
+            itemDesc += batName.trim() + Cur_Batch_End + "  " + type + "_" + index + "  200_0_0_0" + "    <ImgFile>   #### [索引 " + index + "]  描述: " + desc_C + "\n";
             itemDesc += batName.trim() + Cur_Batch_End + "  " + type + "_" + index + "  0_0_0_200" + "    <ImgFile>   #### [索引 " + index + "]  描述: " + desc_D + "\n";
             itemDesc += batName.trim() + Cur_Batch_End + "  " + type + "_" + index + "  0_200_0_200" + "    <ImgFile>   #### [索引 " + index + "]  描述: " + desc_E + "\n";
             itemDesc += batName.trim() + Cur_Batch_End + "  " + type + "_" + index + "  -100_-100_-100_-100" + "    <ImgFile>   #### [索引 " + index + "]  描述: " + desc_F + "\n";
@@ -724,7 +723,7 @@ public class G2_ApplyRuleFor_TypeFile {
                     mSrcFileImage.add(fileItem);
                 }
             }
-           StringBuffer typtSb  = new StringBuffer();
+            StringBuffer typtSb  = new StringBuffer();
             for (int i = 0; i < mSrcFileImage.size(); i++) {
                 typtSb.append(mSrcFileImage.get(i)+" ");
             }
@@ -842,10 +841,10 @@ public class G2_ApplyRuleFor_TypeFile {
         boolean isGifClassfly = false;   //  true   ---》 只对 gif 文件 进行 过滤
 
 
-ArrayList<File> mSrcFileImage;   // Shell 目录下原始文件目录
-ArrayList<File> mLandImageFileList;  // Shell/Land_Port_TimeStamp/Land/ 文件夹下的文件
-ArrayList<File> mPortImageFileList;  // Shell/Land_Port_TimeStamp/Land/ 文件夹下的文件
-HashMap<File,File> src_target_FileMap ; // src为 原始文件  target为目标文件 进行 copy时 会使用到
+        ArrayList<File> mSrcFileImage;   // Shell 目录下原始文件目录
+        ArrayList<File> mLandImageFileList;  // Shell/Land_Port_TimeStamp/Land/ 文件夹下的文件
+        ArrayList<File> mPortImageFileList;  // Shell/Land_Port_TimeStamp/Land/ 文件夹下的文件
+        HashMap<File,File> src_target_FileMap ; // src为 原始文件  target为目标文件 进行 copy时 会使用到
 
 
 
@@ -937,18 +936,18 @@ HashMap<File,File> src_target_FileMap ; // src为 原始文件  target为目标�
             return super.applySubFileListRule4(curFileList, subFileTypeMap, curDirList, curRealFileList);
         }
 
-       void TryClassifyImage(ArrayList<File>  srcFileImageList , File targetDirFile){
-           if(!targetDirFile.exists()){
-               targetDirFile.mkdirs();
-           }
+        void TryClassifyImage(ArrayList<File>  srcFileImageList , File targetDirFile){
+            if(!targetDirFile.exists()){
+                targetDirFile.mkdirs();
+            }
             for (int i = 0; i < srcFileImageList.size() ; i++) {
-               File imgFile = srcFileImageList.get(i);
-               String fileName = imgFile.getName();
-               File targetFile = new File(targetDirFile.getAbsoluteFile()+File.separator+fileName);
+                File imgFile = srcFileImageList.get(i);
+                String fileName = imgFile.getName();
+                File targetFile = new File(targetDirFile.getAbsoluteFile()+File.separator+fileName);
 
-               fileCopy(imgFile,targetFile);
+                fileCopy(imgFile,targetFile);
                 System.out.println("File["+i+"] = "+"SrcFile【"+imgFile.getAbsolutePath()+"】"+" TargetFile【"+targetFile.getAbsolutePath()+"】");
-           }
+            }
 
         }
 
@@ -4676,7 +4675,7 @@ HashMap<File,File> src_target_FileMap ; // src为 原始文件  target为目标�
 
     static {
         try {
-            Security.addProvider(new com.sun.crypto.provider.SunJCE());
+            Security.addProvider(new SunJCE());
             Key key = getKey(strDefaultKey_Rule7.getBytes());
             encryptCipher = Cipher.getInstance("DES/ECB/NoPadding");
             encryptCipher.init(Cipher.ENCRYPT_MODE, key);
