@@ -625,7 +625,7 @@ if(file_idea64_2 != null) {
     static void Security_File_Tip(){
 
         PrintHead_End(" 文件加密解密操作 Begin    ");
-        System.out.println("________________________ MP4 加密批量操作 ________________________ ");
+        System.out.println("________________________ MP4 .7疫z 压缩加密批量操作 ________________________ ");
         System.out.println("1. 先对当前文件内容进行改名    zrule_apply_G2"+BAT_OR_SH_Point+" #_18 ");
         System.out.println("2. 对当前文件夹下的文件进行加密 生成 bad_batch 加密文件夹  zrule_apply_G2"+BAT_OR_SH_Point+" #_7_bad_batch ");
         System.out.println("3. 进入 bad_batch 加密文件夹   cd ./bad_batch ");
@@ -635,7 +635,7 @@ if(file_idea64_2 != null) {
         System.out.println(" zrule_apply_G2"+BAT_OR_SH_Point+" #_18  .mp4   &&   zrule_apply_G2"+BAT_OR_SH_Point+" #_7_bad_batch && cd ./bad_batch  && zrule_apply_G2"+BAT_OR_SH_Point+" #_19 &&  zrule_apply_G2"+BAT_OR_SH_Point+" #_9  7z_7疫z   &&   zzfile_3"+BAT_OR_SH_Point);
 
         System.out.println("");
-        System.out.println("________________________ MP4 解密批量操作 ________________________ ");
+        System.out.println("________________________ MP4 .7疫z 解压缩解密批量操作 ________________________ ");
         System.out.println("1.对当前文件中 后缀是包含中文的文件进行修复    zrule_apply_G2"+BAT_OR_SH_Point+"  #_8");
         System.out.println("2.对当前的压缩文件进行解压缩  zzip_H5"+BAT_OR_SH_Point+" 752025 zukgit11");
         System.out.println("3.对解压缩出来的文件进行解密   zrule_apply_G2"+BAT_OR_SH_Point+" #_7_good_batch  ");
@@ -654,14 +654,20 @@ if(file_idea64_2 != null) {
 //        zrule_apply_G2.sh  #_9 png_
 
         System.out.println();
-        System.out.println("________________________ jpg png webp 加密 解密 改名 无类型批量操作 ________________________ ");
-        System.out.println("【对 jpg png webp 改名并加密 生产加密文件夹 】");
-        System.out.println(" zrule_apply_G2"+BAT_OR_SH_Point+" #_18  .jpg   && zrule_apply_G2"+BAT_OR_SH_Point+" #_18  .png  && zrule_apply_G2"+BAT_OR_SH_Point+" #_18  .webp  && "+ "zrule_apply_G2"+BAT_OR_SH_Point+" #_9  jpg_ && zrule_apply_G2"+BAT_OR_SH_Point+" #_9  webp_ && zrule_apply_G2"+BAT_OR_SH_Point+" #_9  gif_ &&  zrule_apply_G2"+BAT_OR_SH_Point+" #_9 png_"+" &&   zrule_apply_G2"+BAT_OR_SH_Point+" #_7_bad_batch       ");
-        System.out.println("【 对 jpg png webp  对加密文件解密】");
-        System.out.println("zrule_apply_G2"+BAT_OR_SH_Point+" #_9  _jpg"+ "  &&  zrule_apply_G2"+BAT_OR_SH_Point+" #_7_good_batch  "+"  ");
-
-
+        System.out.println("________________________ MP4 【加密】【不压缩】 ________________________");
+        System.out.println("zrule_apply_G2"+BAT_OR_SH_Point+" " +"#_18  .mp4  && zrule_apply_G2"+BAT_OR_SH_Point+" " +"#_7_bad_batch &&  cd ./bad_batch  &&  zrule_apply_G2"+BAT_OR_SH_Point+" " +"#_9  mp4_");
         System.out.println();
+        System.out.println("________________________ MP4 【解密】【不压缩】 ________________________");
+        System.out.println("zrule_apply_G2"+BAT_OR_SH_Point+" " +"#_7_good_batch  && cd ./good_batch && zrule_apply_G2"+BAT_OR_SH_Point+" " +"#_9  _mp4");
+        System.out.println();
+        System.out.println("________________________ jpg png webp 加密 解密 改名 无类型批量操作 ________________________");
+        System.out.println("【对 jpg png webp 改名并加密 生产加密文件夹 】");
+        System.out.println("zrule_apply_G2"+BAT_OR_SH_Point+" " +"#_18  .jpg   && zrule_apply_G2"+BAT_OR_SH_Point+" " +"#_18  .png  && zrule_apply_G2"+BAT_OR_SH_Point+" " +"#_18  .webp  && zrule_apply_G2"+BAT_OR_SH_Point+" " +"#_7_bad_batch &&  cd ./bad_batch  &&  zrule_apply_G2"+BAT_OR_SH_Point+" " +"#_9  jpg_ && zrule_apply_G2"+BAT_OR_SH_Point+" " +"#_9  webp_ &&  zrule_apply_G2"+BAT_OR_SH_Point+" " +"#_9 png_");
+        System.out.println("【 对 jpg png webp  对加密文件解密】");
+        System.out.println("zrule_apply_G2"+BAT_OR_SH_Point+" " +"#_7_good_batch && cd ./good_batch && zrule_apply_G2"+BAT_OR_SH_Point+" " +"#_9  _jpg");
+        System.out.println();
+
+
         System.out.println();
         System.out.println("________________________ gif 动态文件 加密 解密 无类型批量操作 批量操作 ________________________ ");
         System.out.println("【对gif 改名并加密 生产加密文件夹】");

@@ -384,7 +384,7 @@ public class I9_TextRuleOperation {
 
 
 
-
+        CUR_RULE_LIST.add( new Copy_Port_WithZ_Rule27());  //   把当前文件内容以  ZZZZZZZZZZZZZZZZZZZZZ 分割     专门生成剪切内容保存到零时txt文件
 
 //        CUR_RULE_LIST.add( new Image2Jpeg_Rule_3());
 //        CUR_RULE_LIST.add( new Image2Png_Rule_4());
@@ -393,6 +393,74 @@ public class I9_TextRuleOperation {
 //        CUR_RULE_LIST.add( new Encropty_Rule_7());
 //        CUR_RULE_LIST.add( new ClearChineseType_8());
 
+    }
+    
+    //  把当前文件内容以  ZZZZZZZZZZZZZZZZZZZZZ 分割     专门生成剪切内容保存到零时txt文件
+    class Copy_Port_WithZ_Rule27 extends  Basic_Rule{
+    	
+    	int begin_Z_lineNum = 0;
+    	int end_Z_lineNum = 0;
+    	Copy_Port_WithZ_Rule27(){
+            super(27,false);
+         	 begin_Z_lineNum = 0;
+        	 end_Z_lineNum = 0;
+        }
+    	
+        @Override
+        ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+            for (int i = 0; i < curInputFileList.size(); i++) {
+                File fileItem = curInputFileList.get(i);
+                ArrayList<String> contentList = ReadFileContentAsList(fileItem);
+                
+                // 找到  起始为ZZZZZ 开头的 行数 
+   
+                
+           for (int j = 0; j < contentList.size(); j++) {
+        	String lineContent =    contentList.get(j);
+        	if(lineContent.startsWith("Z") || lineContent.startsWith("z")) {
+        		
+        		if(lineContent.startsWith("z") || lineContent.startsWith("Z")) {
+        			
+        			String clearZ_Str =  lineContent.replace("z", "").replace("Z", "").trim();
+        			if(lineContent.length() >= 5 && "".equals(clearZ_Str)) {
+        				  if(begin_Z_lineNum == 0 && end_Z_lineNum  == 0  ) {
+        					  begin_Z_lineNum = j;
+        					  continue;
+        				  } if(begin_Z_lineNum != 0 && end_Z_lineNum  == 0 ) {
+        					  end_Z_lineNum = j;
+        					  if(begin_Z_lineNum > 0 && end_Z_lineNum >0 && begin_Z_lineNum < end_Z_lineNum) {
+        						  break;
+        					  }
+        				  }
+        			   }
+        			}
+        		}
+		   }
+           System.out.println("begin_Z_lineNum = "+ begin_Z_lineNum +"  end_Z_lineNum = "+ end_Z_lineNum+ "   contentList.size() ="+ contentList.size());
+           if(begin_Z_lineNum > 0 && end_Z_lineNum >0 && begin_Z_lineNum < end_Z_lineNum &&  end_Z_lineNum <= contentList.size()) {
+               ArrayList<String> fixedStrArr =new    ArrayList<String> (); 
+               for (int j = begin_Z_lineNum; j <= end_Z_lineNum; j++) {
+            	   fixedStrArr.add(contentList.get(j));
+			}
+               writeContentToFile(I9_Temp_Text_File,fixedStrArr);
+               NotePadOpenTargetFile(I9_Temp_Text_File.getAbsolutePath());
+               System.out.println("rule_"+rule_index+" -> 已经截取了 ZZZZZZ之间的【"+(end_Z_lineNum - begin_Z_lineNum)+"行】内容到 TEMP TXT 文件");
+
+           }
+
+      }
+
+
+            return super.applyOperationRule(curFileList, subFileTypeMap, curDirList, curRealFileList);
+        }
+        
+
+    	
+        @Override
+        String simpleDesc() {
+            return " 读取当前文件的内容 并寻找上下以ZZZZZZZ标记的行, 复制两行ZZZZ标记的之间的内容到零时txt文件 ";
+        }
+        
     }
 
     // 读取当前文件的内容 并在当前文件夹下内寻找该文件 复制到输入文件名称_时间戳目录
