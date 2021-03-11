@@ -3283,6 +3283,16 @@ HashMap<File,File> src_target_FileMap ; // src为 原始文件  target为目标�
             SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd_HHmmss");//设置日期格式
             String date = df.format(new Date());
             String CurBadDirName = "bad_AllFile_"+ date;
+			
+			if(isBatchOperation){
+                if(mEncroptyDirect){
+                    CurBadDirName = "bad_batch";
+                }else{
+                    CurBadDirName = "good_batch";
+                }
+            }
+
+
             File curBadDirFile = new File(curDirFile.getAbsolutePath()+ File.separator+CurBadDirName);
             curBadDirFile.mkdirs();
             String oldBasePath = curDirFile.getAbsolutePath();

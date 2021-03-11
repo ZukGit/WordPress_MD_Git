@@ -660,6 +660,12 @@ if(file_idea64_2 != null) {
         System.out.println("________________________ MP4 【解密】【不压缩】 ________________________");
         System.out.println("zrule_apply_G2"+BAT_OR_SH_Point+" " +"#_7_good_batch  && cd ./good_batch && zrule_apply_G2"+BAT_OR_SH_Point+" " +"#_9  _mp4");
         System.out.println();
+        
+        
+        System.out.println();
+        System.out.println("________________________ 【JPG_Top】jpg png【Jpg Top Land Port 自动分类并加密】加密 改名 无类型批量操作 ________________________");
+        System.out.println("zrule_apply_G2"+BAT_OR_SH_Point+" " +"#_18  .jpg   && zrule_apply_G2"+BAT_OR_SH_Point+" " +"#_18  .png  && zrule_apply_G2"+BAT_OR_SH_Point+" " +" #_20_notime && cd ./Land_Port_Img/Port/ && zrule_apply_G2"+BAT_OR_SH_Point+" " +"#_7_bad_batch &&  cd ./bad_batch && zrule_apply_G2"+BAT_OR_SH_Point+" " +"#_9  jpg_ && zrule_apply_G2"+BAT_OR_SH_Point+" " +"#_9 png_ && cd ../../../ && cd ./Land_Port_Img/Land/ && zrule_apply_G2"+BAT_OR_SH_Point+" " +"#_7_bad_batch &&  cd ./bad_batch && zrule_apply_G2"+BAT_OR_SH_Point+" " +"#_9  jpg_ && zrule_apply_G2"+BAT_OR_SH_Point+" " +"#_9 png_");
+        System.out.println();
         System.out.println("________________________ jpg png webp 加密 解密 改名 无类型批量操作 ________________________");
         System.out.println("【对 jpg png webp 改名并加密 生产加密文件夹 】");
         System.out.println("zrule_apply_G2"+BAT_OR_SH_Point+" " +"#_18  .jpg   && zrule_apply_G2"+BAT_OR_SH_Point+" " +"#_18  .png  && zrule_apply_G2"+BAT_OR_SH_Point+" " +"#_18  .webp  && zrule_apply_G2"+BAT_OR_SH_Point+" " +"#_7_bad_batch &&  cd ./bad_batch  &&  zrule_apply_G2"+BAT_OR_SH_Point+" " +"#_9  jpg_ && zrule_apply_G2"+BAT_OR_SH_Point+" " +"#_9  webp_ &&  zrule_apply_G2"+BAT_OR_SH_Point+" " +"#_9 png_");
