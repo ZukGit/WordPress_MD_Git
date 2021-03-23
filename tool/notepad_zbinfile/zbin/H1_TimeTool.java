@@ -3094,9 +3094,14 @@ public class H1_TimeTool {
 
             StringBuilder lineOne = new StringBuilder();
             StringBuilder lineTwo = new StringBuilder();
+          //zz  System.out.println("weekKeyList.size() = "+ weekKeyList.size());
+      
             for (int i = 0; i < weekKeyList.size(); i++) {
                 ArrayList<Integer> weekDays = weekKeyList.get(i);
                 int days = weekDays.size();
+                if(days == 0) {
+                	continue;
+                }
                 int weekNum = i + 1;
                 String descItem = weekNum + "w(" + days + "d)" + nowSelectTip(month, weekDays);
                 descItem = getPaddingString(descItem, 14 + descItem.length(), " ", true);
@@ -3106,6 +3111,7 @@ public class H1_TimeTool {
 //                System.out.println(descItem);
                 lineOne.append(descItem);
 
+//                System.out.println("weekKeyList.size() = "+ weekKeyList.size()+"  "+"weekDays.size() days = "+ days);
                 int beginDay = weekDays.get(0);
                 int endDay = weekDays.get(weekDays.size() - 1);
 

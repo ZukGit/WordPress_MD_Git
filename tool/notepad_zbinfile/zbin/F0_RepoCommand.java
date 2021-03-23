@@ -35,11 +35,14 @@ public class F0_RepoCommand {
         Linux,
         MacOS
     }
+    static String Cur_Batch_End = ".bat";  // .sh 或者 .bat
     static OS_TYPE curOS_TYPE = OS_TYPE.Windows;
 
 
 
     static File F0_Properties_File = new File(System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin" + File.separator + "F0.properties");
+    static File F0_Repo_Init_File_Origin = new File(System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin" + File.separator + "F0_repo_init.sh");
+    
     static InputStream F0_Properties_InputStream;
     static OutputStream F0_Properties_OutputStream;
     static Properties F0_Properties = new Properties();
@@ -128,10 +131,13 @@ public class F0_RepoCommand {
         String osName = System.getProperties().getProperty("os.name").toLowerCase();
         if(osName.contains("window")){
             curOS_TYPE = OS_TYPE.Windows;
+            Cur_Batch_End = ".bat";
         }else if(osName.contains("linux")){
             curOS_TYPE = OS_TYPE.Linux;
+            Cur_Batch_End = ".sh";
         }else if(osName.contains("mac")){
             curOS_TYPE = OS_TYPE.MacOS;
+            Cur_Batch_End = ".sh";
         }
     }
 
@@ -163,6 +169,23 @@ public class F0_RepoCommand {
             return;
         } else if (mKeyWordName.size() == 1) {  //  传递一个 ReleaseNote文件进来进行解析
             String releaseNoteHtmlPath = mKeyWordName.get(0);
+            
+            // 如果传入的只有一个参数  并且 这个参数的 开头是 init 那么 就把 F0_repo_init.sh   复制到当前文件夹路径下
+            if(releaseNoteHtmlPath.toLowerCase().equals("init")) {
+            	System.out.println("!! F0_repo_init.sh 文件复制到当前路径: "+ curDirPath);
+              
+            	String init_fileName = F0_Repo_Init_File_Origin.getName();
+            	File curShell_Init_File = new File(curDirPath+File.separator+init_fileName);
+            	fileCopy(F0_Repo_Init_File_Origin, curShell_Init_File);
+            //	System.out.println("F0_Repo_Init_File_Origin.exist() = "+ F0_Repo_Init_File_Origin.exists());
+            	
+            	if(curShell_Init_File.exists() && curShell_Init_File.length() > 10) {
+                    System.out.println("init 命令 复制 F0_repo_init.sh 文件 到本地 【成功】");
+            	}else {
+                    System.out.println("init 命令 复制 F0_repo_init.sh 文件 到本地 【失败】");
+            	}
+            	return;
+            }
 
             if (!releaseNoteHtmlPath.endsWith("ReleaseNotes.html")) {
                 System.out.println("当前输入的一个参数并不是  **ReleaseNotes.html 无法进行下一步解析 请检查重新执行!");
@@ -1255,6 +1278,46 @@ public class F0_RepoCommand {
                 String key = entry.getKey();  //Map的Value
                 String value = entry.getValue();  //Map的Value
                 System.out.println(pre + value);
+            }
+        }
+        System.out.println("══════════Tip══════════");
+        
+        System.out.println("zrepo_command_F0"+Cur_Batch_End+ "  init   ## 把当前文件 "+F0_Repo_Init_File_Origin.getName()+"初始化到本地！");
+    }
+    
+    public static void fileCopy(File origin, File target) {
+        InputStream input = null;
+        OutputStream output = null;
+        int lengthSize;
+        // 创建输入输出流对象
+        try {
+            input = new FileInputStream(origin);
+            output = new FileOutputStream(target);
+            // 获取文件长度
+            try {
+                lengthSize = input.available();
+                // 创建缓存区域
+                byte[] buffer = new byte[lengthSize];
+                // 将文件中的数据写入缓存数组
+                input.read(buffer);
+                // 将缓存数组中的数据输出到文件
+                output.write(buffer);
+
+            } catch (IOException e) {
+
+                e.printStackTrace();
+            }
+
+        } catch (Exception e) {
+
+        } finally {
+            if (input != null && output != null) {
+                try {
+                    input.close(); // 关闭流
+                    output.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }

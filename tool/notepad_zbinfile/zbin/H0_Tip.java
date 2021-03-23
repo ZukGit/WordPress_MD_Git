@@ -549,10 +549,10 @@ if(file_idea64_2 != null) {
 
         PrintHead_End(" Chrome_Tip 插件 Begin  ");
         System.out.println("Chrome插件安装位置( Windows 路径空格):\n  "+User_Home+ File.separator+"AppData\\Local\\Google\\Chrome\\User Data\\Default\\Extensions");
-        System.out.println("Chrome插件安装位置( Linux ):\n  zzfile_3.sh  \""+User_Home+ File.separator+".config/google-chrome1/Default/Extensions/\"");
+        System.out.println("Chrome插件安装位置( Linux ):\n  zzfile_3.sh "+"  \""+User_Home+ File.separator+".config/google-chrome1/Default/Extensions/\"");
         System.out.println("Chrome插件安装位置( MacOS 路径空格):\n  open  "+User_Home+ File.separator+"Library/Application\" \"Support/Google/Chrome/Default/Extensions/");
         System.out.println();
-        System.out.println("Chrome插件备份地址:\n  zzfile_3.sh  "+zbinPath+File.separator+"J1_Plugin      【插件】【脚本】【书签】 先安装 AA_get-crx 方便插件安装");
+        System.out.println("Chrome插件备份地址:\n  zzfile_3"+BAT_OR_SH_Point+"  "+zbinPath+File.separator+"J1_Plugin      【插件】【脚本】【书签】 先安装 AA_get-crx 方便插件安装");
         PrintHead_End("   Chrome_Tip 插件 Begin   End  ");
     }
 
@@ -612,6 +612,7 @@ if(file_idea64_2 != null) {
                 "set tessdata=C:\\Program Files\\Tesseract-OCR\\tessdata\n" +
                 "set PATH=C:\\Program Files\\Tesseract-OCR;%PATH%\n" +
                 "set PATH=%USERPROFILE%\\Desktop\\zbin\\win_soft\\Redis;%PATH%");
+        System.out.println("set LANG=zh_CN.UTF-8");
         System.out.println();
         PrintHead_End(" Winddows下Cmder设置 End   ");
     }
