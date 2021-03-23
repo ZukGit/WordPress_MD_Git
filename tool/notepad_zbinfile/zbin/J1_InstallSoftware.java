@@ -89,6 +89,7 @@ public class J1_InstallSoftware {
         addPathExeFileNameList.add("adb.exe");
         addPathExeFileNameList.add("chrome.exe");
         addPathExeFileNameList.add("javac.exe");
+        addPathExeFileNameList.add("python.exe");
         addPathExeFileNameList.add("dot.exe");  // graphviz
         addPathExeFileNameList.add("tesseract.exe");  // tesseract OCR 图像文字识别
 
@@ -656,9 +657,9 @@ public class J1_InstallSoftware {
             for (int i = 0; i < allFile.size(); i++) {
                 File fileItem = allFile.get(i);
                 String fileName = fileItem.getName();
-                System.out.println("fileName = "+fileName.toLowerCase() +"     type ="+ type.toLowerCase() +"  fileItem.abspath = "+ fileItem.getAbsolutePath());
                 if (fileName.toLowerCase().endsWith(type.toLowerCase())) {
                     arrFile.add(fileItem);
+                    System.out.println("fileName = "+fileName.toLowerCase() +"     type ="+ type.toLowerCase() +"  fileItem.abspath = "+ fileItem.getAbsolutePath());
                 }
             }
             System.out.println("allFile.size = "+ allFile.size() + "     exeFileSize="+arrFile.size());
@@ -2455,6 +2456,10 @@ public class J1_InstallSoftware {
             String switchKey = winSoftItem.category_key; // Pre_Install_Soft    // Slient1_OneExe_Local_Install   // Environment_Zip_Dir_Path 等类型
             File targetFile = winSoftItem.targetExeFile;
             File rootFile = winSoftItem.rootFile;
+
+            // 当前 winSoftItem.targetExeFile  =  M:\ZWin_Software\D0_Environment_Zip_Dir_Path\python-3.7.9-embed-amd64\Lib\site-packages\pip\_vendor\distlib\t32.exe
+            System.out.println("当前 winSoftItem.targetExeFile  =  " + targetFile.getAbsolutePath() );
+
             File single_install_Dir = winSoftItem.Single_install_Dir;
             File desktop_icon_file = winSoftItem.Desktop_Icon_File;
             String relativePath = winSoftItem.target_relative_path;         //   相对于  当前 shell 目录的 相对路径
@@ -2464,6 +2469,7 @@ public class J1_InstallSoftware {
             }
 
             String targetAbsPath = targetFile.getAbsolutePath();
+            String targetParentDirAbsPath = targetFile.getParentFile().getAbsolutePath();
             String clearChineseABsPath = clearChinese(targetAbsPath);
             ArrayList<String> OtherCommandList = new     ArrayList<String>();
             String curCommand = "";
@@ -2498,9 +2504,10 @@ public class J1_InstallSoftware {
 
                     break;
                 case "Environment_Zip_Dir_Path":
-                    curCommand = "rem  AddPath[" + i + "]  setx  PATH   " + clearChineseABsPath + "%PATH%";
-
+                    curCommand = "rem  AddPath[" + i + "]  setx  PATH   " + targetParentDirAbsPath + ";%PATH%";
+                    OtherCommandList.add("setx  PATH   " + targetParentDirAbsPath + ";%PATH%");
                     break;
+
                 case "No_Slient_OneExe":
                     curCommand = "rem No_Slient_OneExe[" + i + "]  " + clearChineseABsPath;
                     break;
