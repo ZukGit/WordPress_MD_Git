@@ -1,9 +1,9 @@
 
 
 public class J4_IssueTip {
-    static String OneLine_Pre = "\nâ•â•â•â•â•â•â•â•";
-    static String OneLine_End = "â•â•â•â•â•â•â•â•\n";
-    static String OneLine = "â•â•â•â•â•â•â•â•";
+    static String OneLine_Pre = "\n¨T¨T¨T¨T¨T¨T¨T¨T";
+    static String OneLine_End = "¨T¨T¨T¨T¨T¨T¨T¨T\n";
+    static String OneLine = "¨T¨T¨T¨T¨T¨T¨T¨T";
 
     static String User_Home = System.getProperties().getProperty("user.home");
 
@@ -30,11 +30,11 @@ public class J4_IssueTip {
     }
 
 
-    // å›ºå®š3   å½“å‰æ“ä½œç³»ç»Ÿçš„ç±»å‹
+    // ¹Ì¶¨3   µ±Ç°²Ù×÷ÏµÍ³µÄÀàĞÍ
     static OS_TYPE CUR_OS_TYPE = OS_TYPE.Windows;
 
     public static void main(String[] args) {
-        initSystemInfo();   // å¿…é¡» ç¬¬ä¸€ä½ç½®
+        initSystemInfo();   // ±ØĞë µÚÒ»Î»ÖÃ
 
         AOSP_PATH_Tip();
 
@@ -56,9 +56,9 @@ public class J4_IssueTip {
     }
 
     static void  AOSP_PATH_Tip(){
-        System.out.println("â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• AOSP æ¨¡å—è·¯å¾„ â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•");
+        System.out.println("¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T AOSP Ä£¿éÂ·¾¶ ¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T");
         System.out.println();
-        System.out.println("ã€Settingsç›¸å…³è·¯å¾„ã€‘");
+        System.out.println("¡¾SettingsÏà¹ØÂ·¾¶¡¿");
         System.out.println("zzfile_3"+BAT_OR_SH_Point+" " +"./packages/apps//Settings/");
         System.out.println("zzfile_3"+BAT_OR_SH_Point+" " +"./packages/apps/Settings/src/com/android/settings/bluetooth/");
         System.out.println("zzfile_3"+BAT_OR_SH_Point+" " +"./packages/apps/Settings/src/com/android/settings/location/");
@@ -66,7 +66,7 @@ public class J4_IssueTip {
         System.out.println("zzfile_3"+BAT_OR_SH_Point+" " +"./packages/apps/Settings/src/com/android/settings/wallpaper/");
         System.out.println();
         System.out.println();
-        System.out.println("ã€ NFC ç›¸å…³ä»£ç è·¯å¾„ã€‘");
+        System.out.println("¡¾ NFC Ïà¹Ø´úÂëÂ·¾¶¡¿");
         System.out.println("zzfile_3"+BAT_OR_SH_Point+" " +"./packages/apps/Settings/src/com/android/settings/nfc/");
         System.out.println("zzfile_3"+BAT_OR_SH_Point+" " +"./packages/apps/Nfc/src/com/android/nfc/");
         System.out.println("zzfile_3"+BAT_OR_SH_Point+" " +"./frameworks/base/core/java/android/nfc/");
@@ -76,7 +76,7 @@ public class J4_IssueTip {
         System.out.println("zzfile_3"+BAT_OR_SH_Point+" " +"./vendor/st/nfc/packages/apps/Nfc/src/com/android/nfc/");
         System.out.println();
         System.out.println();
-        System.out.println("ã€ BT ç›¸å…³ä»£ç è·¯å¾„ã€‘");
+        System.out.println("¡¾ BT Ïà¹Ø´úÂëÂ·¾¶¡¿");
         System.out.println("zzfile_3"+BAT_OR_SH_Point+" " +"./packages/apps/Settings/src/com/android/settings/bluetooth/");
         System.out.println("zzfile_3"+BAT_OR_SH_Point+" " +"./packages/apps/Bluetooth/");
         System.out.println("zzfile_3"+BAT_OR_SH_Point+" " +"./frameworks/base/packages/SettingsLib/src/com/android/settingslib/bluetooth/");
@@ -91,7 +91,7 @@ public class J4_IssueTip {
         System.out.println("zzfile_3"+BAT_OR_SH_Point+" " +"./vendor/qcom/proprietary/bluetooth");
         System.out.println();
         System.out.println();
-        System.out.println("ã€ GNSS ç›¸å…³ä»£ç è·¯å¾„ã€‘");
+        System.out.println("¡¾ GNSS Ïà¹Ø´úÂëÂ·¾¶¡¿");
         System.out.println("zzfile_3"+BAT_OR_SH_Point+" " +"./packages/apps/Settings/src/com/android/settings/location/");
         System.out.println("zzfile_3"+BAT_OR_SH_Point+" " +"./frameworks/base/services/core/java/com/android/server/location/");
         System.out.println("zzfile_3"+BAT_OR_SH_Point+" " +"./hardware/interfaces/gnss/");
@@ -101,7 +101,7 @@ public class J4_IssueTip {
         System.out.println("zzfile_3"+BAT_OR_SH_Point+" " +"./vendor/qcom/proprietary/gps-release");
         System.out.println("zzfile_3"+BAT_OR_SH_Point+" " +"./vendor/qcom/opensource/location");
         System.out.println();
-        System.out.println("ã€ WIFI ç›¸å…³ä»£ç è·¯å¾„ã€‘");
+        System.out.println("¡¾ WIFI Ïà¹Ø´úÂëÂ·¾¶¡¿");
         System.out.println("zzfile_3"+BAT_OR_SH_Point+" " +"./packages/apps/Settings/src/com/android/settings/wifi/");
         System.out.println("zzfile_3"+BAT_OR_SH_Point+" " +"./frameworks/base/packages/SettingsLib/src/com/android/settingslib/wifi/");
         System.out.println("zzfile_3"+BAT_OR_SH_Point+" " +"./frameworks/base/core/java/android/net/");
@@ -118,22 +118,22 @@ public class J4_IssueTip {
     }
 
     static void  Package_Tip(){
-        System.out.println("â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• Package Manager æŸ¥è¯¢ â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•");
-        System.out.println("adb shell pm list packages                      ã€  æŸ¥çœ‹æ‰€æœ‰å®‰è£…åŒ…( ç³»ç»Ÿ + ä¸‰æ–¹  ä¾‹å¦‚: package:com.miui.core )");
-        System.out.println("adb shell pm list packages -s                   ã€ åªè¾“å‡ºç³»ç»Ÿè‡ªå¸¦åŒ…");
-        System.out.println("adb shell pm list packages -3                   ã€ æŸ¥çœ‹ç¬¬ä¸‰æ–¹åº”ç”¨ ä¾‹å¦‚: package:com.sina.weibo");
-        System.out.println("adb shell pm list packages -f                   ã€ åŒ…ç›¸å…³è”çš„æ–‡ä»¶ ä¾‹: package:/data/app/com.taobao.trip-xxxx==/base.apk=com.taobao.trip");
-        System.out.println("adb shell pm list packages -i                   ã€ æŸ¥çœ‹å·²å®‰è£…åº”ç”¨ä¿¡æ¯å’Œå®‰è£…æ¥æº  ä¾‹å¦‚: package:com.youdao.calculator  installer=null");
-        System.out.println("adb shell pm list packages -e  sina <åŒ…åå­—ç¬¦ä¸²>ã€  æŸ¥è¯¢åŒ…å« sina å…³é”®å­—çš„åŒ…");
-        System.out.println("adb shell service list                          ã€  æŸ¥è¯¢æœåŠ¡åˆ—è¡¨");
+        System.out.println("¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T Package Manager ²éÑ¯ ¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T");
+        System.out.println("adb shell pm list packages                      ¡¾  ²é¿´ËùÓĞ°²×°°ü( ÏµÍ³ + Èı·½  ÀıÈç: package:com.miui.core )");
+        System.out.println("adb shell pm list packages -s                   ¡¾ Ö»Êä³öÏµÍ³×Ô´ø°ü");
+        System.out.println("adb shell pm list packages -3                   ¡¾ ²é¿´µÚÈı·½Ó¦ÓÃ ÀıÈç: package:com.sina.weibo");
+        System.out.println("adb shell pm list packages -f                   ¡¾ °üÏà¹ØÁªµÄÎÄ¼ş Àı: package:/data/app/com.taobao.trip-xxxx==/base.apk=com.taobao.trip");
+        System.out.println("adb shell pm list packages -i                   ¡¾ ²é¿´ÒÑ°²×°Ó¦ÓÃĞÅÏ¢ºÍ°²×°À´Ô´  ÀıÈç: package:com.youdao.calculator  installer=null");
+        System.out.println("adb shell pm list packages -e  sina <°üÃû×Ö·û´®>¡¾  ²éÑ¯°üº¬ sina ¹Ø¼ü×ÖµÄ°ü");
+        System.out.println("adb shell service list                          ¡¾  ²éÑ¯·şÎñÁĞ±í");
         System.out.println();
         System.out.println();
 
     }
     static void  Air_mode_Tip(){
-        System.out.println("â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• AirPlane PAGE â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•");
-        System.out.println("adb shell settings put global airplane_mode_on 0 ã€åœæ­¢é£è¡Œæ¨¡å¼ã€‘");
-        System.out.println("adb shell settings get global airplane_mode_on   ã€è·å–é£è¡Œæ¨¡å¼ã€‘");
+        System.out.println("¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T AirPlane PAGE ¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T");
+        System.out.println("adb shell settings put global airplane_mode_on 0 ¡¾Í£Ö¹·ÉĞĞÄ£Ê½¡¿");
+        System.out.println("adb shell settings get global airplane_mode_on   ¡¾»ñÈ¡·ÉĞĞÄ£Ê½¡¿");
         System.out.println();
         System.out.println();
 
@@ -143,12 +143,12 @@ public class J4_IssueTip {
 
 
     static void  Mobile_Data_Tip(){
-        System.out.println("â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• Mobile Data PAGE â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•");
-        System.out.println("ã€æ‰“å¼€-å…³é—­ ç§»åŠ¨ç½‘ç»œå‘½ä»¤ã€‘");
+        System.out.println("¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T Mobile Data PAGE ¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T");
+        System.out.println("¡¾´ò¿ª-¹Ø±Õ ÒÆ¶¯ÍøÂçÃüÁî¡¿");
         System.out.println("adb shell svc data enable");
         System.out.println("adb shell svc data disable");
         System.out.println();
-        System.out.println("ã€æŸ¥çœ‹ç§»åŠ¨ç½‘ç»œå¼€å…³ 0-ç§»åŠ¨ç½‘ç»œå…³é—­  1-ç§»åŠ¨ç½‘ç»œå¼€å¯ã€‘");
+        System.out.println("¡¾²é¿´ÒÆ¶¯ÍøÂç¿ª¹Ø 0-ÒÆ¶¯ÍøÂç¹Ø±Õ  1-ÒÆ¶¯ÍøÂç¿ªÆô¡¿");
         System.out.println("adb shell settings get global mobile_data");
         System.out.println("adb shell settings put global mobile_data 0");
         System.out.println("adb shell settings put global mobile_data 1");
@@ -159,26 +159,26 @@ public class J4_IssueTip {
 
     static void  BT_Issue_Tip(){
 
-        System.out.println("â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• BlueTooth PAGE â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•");
-        System.out.println("ã€ å…³é—­ æ‰“å¼€è“ç‰™ æ“ä½œå‘½ä»¤ ã€‘");
+        System.out.println("¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T BlueTooth PAGE ¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T");
+        System.out.println("¡¾ ¹Ø±Õ ´ò¿ªÀ¶ÑÀ ²Ù×÷ÃüÁî ¡¿");
         System.out.println("adb shell svc bluetooth enable");
         System.out.println("adb shell svc bluetooth disable");
         System.out.println();
-        System.out.println("ã€0-Bluetoothè“ç‰™å¼€å…³å…³é—­ 1-Bluetoothè“ç‰™å¼€å…³å¼€å¯ã€‘");
+        System.out.println("¡¾0-BluetoothÀ¶ÑÀ¿ª¹Ø¹Ø±Õ 1-BluetoothÀ¶ÑÀ¿ª¹Ø¿ªÆô¡¿");
         System.out.println("adb shell settings get global bluetooth_on");
         System.out.println("adb shell settings put global bluetooth_on 0");
         System.out.println("adb shell settings put global bluetooth_on 1");
         System.out.println();
-        System.out.println("ã€æœ¬åœ°è“ç‰™è®¾å¤‡åç§°ã€‘");
+        System.out.println("¡¾±¾µØÀ¶ÑÀÉè±¸Ãû³Æ¡¿");
         System.out.println("adb shell settings get secure bluetooth_name");
         System.out.println();
-        System.out.println("ã€æœ¬åœ°è“ç‰™è®¾å¤‡Macåœ°å€ã€‘");
+        System.out.println("¡¾±¾µØÀ¶ÑÀÉè±¸MacµØÖ·¡¿");
         System.out.println("adb shell settings get secure bluetooth_address");
         System.out.println();
-        System.out.println("ã€æŸ¥çœ‹è“ç‰™snooplogæ¨¡å¼   full-æœ‰snoopLogæ¨¡å¼  empty-æ— Logæ¨¡å¼  ã€‘");
+        System.out.println("¡¾²é¿´À¶ÑÀsnooplogÄ£Ê½   full-ÓĞsnoopLogÄ£Ê½  empty-ÎŞLogÄ£Ê½  ¡¿");
         System.out.println("adb shell getprop persist.bluetooth.btsnooplogmode");
         System.out.println();
-        System.out.println("ã€BT dump å‘½ä»¤ã€‘");
+        System.out.println("¡¾BT dump ÃüÁî¡¿");
         System.out.println("adb shell dumpsys bluetooth_manager > bluetooth_manager.txt");
         System.out.println();
 
@@ -189,29 +189,29 @@ public class J4_IssueTip {
 
     static void  Other_Tip(){
 
-        System.out.println("â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• Other PAGE â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•");
-        System.out.println("ã€æ‰“å°LOGæ“ä½œã€‘");
+        System.out.println("¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T Other PAGE ¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T");
+        System.out.println("¡¾´òÓ¡LOG²Ù×÷¡¿");
         System.out.println("adb logcat | grep zukgit");
         System.out.println();
-        System.out.println("ã€å®‰å“è®¾ç½® TAG ç­‰çº§ä¸ºæ‰“å° D=3  (V=2 D=3 I=4 W=5 E=6 A=7) ã€‘");
-        System.out.println("adb shell setprop log.tag.ã€TAGã€‘ D       ||||||    ä¾‹å¦‚:    adb shell setprop log.tag.SettingsInjector  D");
-        System.out.println("adb shell getprop | grep log.tag.        ã€æŸ¥çœ‹å½“å‰é…ç½®çš„TAGçš„æ˜¾ç¤ºç­‰çº§ã€‘");
+        System.out.println("¡¾°²×¿ÉèÖÃ TAG µÈ¼¶Îª´òÓ¡ D=3  (V=2 D=3 I=4 W=5 E=6 A=7) ¡¿");
+        System.out.println("adb shell setprop log.tag.¡¾TAG¡¿ D       ||||||    ÀıÈç:    adb shell setprop log.tag.SettingsInjector  D");
+        System.out.println("adb shell getprop | grep log.tag.        ¡¾²é¿´µ±Ç°ÅäÖÃµÄTAGµÄÏÔÊ¾µÈ¼¶¡¿");
         System.out.println();
 
-        System.out.println("ã€Settings.apk å®‰è£… pushå‘½ä»¤ã€‘");
-        System.out.println("adb root && adb remount && adb shell settings put global wifi_verbose_logging_enabled 1 && adb push .\\Settings.apk /product/priv-app/Settings/  && adb push .\\oat  /product/priv-app/Settings    ##### è¿ç»­é‡å¯ä¸¤é");
+        System.out.println("¡¾Settings.apk °²×° pushÃüÁî¡¿");
+        System.out.println("adb root && adb remount && adb shell settings put global wifi_verbose_logging_enabled 1 && adb push .\\Settings.apk /product/priv-app/Settings/  && adb push .\\oat  /product/priv-app/Settings    ##### Á¬ĞøÖØÆôÁ½±é");
         System.out.println();
-        System.out.println("ã€adb disable-verity æå‡æƒé™å‘½ä»¤ã€‘");
+        System.out.println("¡¾adb disable-verity ÌáÉıÈ¨ÏŞÃüÁî¡¿");
         System.out.println("adb root && adb disable-verity && adb reboot");
         System.out.println();
-        System.out.println("ã€ wifi-service.jar  pushå‘½ä»¤ã€‘");
-        System.out.println("adb root && adb remount && adb shell settings put global wifi_verbose_logging_enabled 1 && adb push .\\wifi-service.jar /system/framework/   ##### è¿ç»­é‡å¯ä¸¤é?");
+        System.out.println("¡¾ wifi-service.jar  pushÃüÁî¡¿");
+        System.out.println("adb root && adb remount && adb shell settings put global wifi_verbose_logging_enabled 1 && adb push .\\wifi-service.jar /system/framework/   ##### Á¬ĞøÖØÆôÁ½±é?");
         System.out.println();
 
     }
 
     static void  ADB_Input_Tip(){
-        System.out.println("â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• adb å‘½ä»¤ è¾“å…¥å­—ç¬¦ â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•");
+        System.out.println("¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T adb ÃüÁî ÊäÈë×Ö·û ¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T");
         System.out.println();
         System.out.println("adb shell input text 0123456789012345678901234567890123456789012345678901234567891234");
         System.out.println();
@@ -221,7 +221,7 @@ public class J4_IssueTip {
 
     static void  ADB_pull_Tip(){
 
-        System.out.println("â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• adb pull æ‹‰å–æ–‡ä»¶çš„æ“ä½œâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•");
+        System.out.println("¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T adb pull À­È¡ÎÄ¼şµÄ²Ù×÷¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T");
         System.out.println("adb root & adb pull /data/system/users/0/settings_system.xml");
         System.out.println();
         System.out.println("adb root & adb pull /data/system/users/0/settings_secure.xml");
@@ -267,27 +267,27 @@ public class J4_IssueTip {
     }
 
     static void  Hotspot_Issue_Tip(){
-        System.out.println("â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•HotSpot PAGE â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•");
+        System.out.println("¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨THotSpot PAGE ¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T");
         System.out.println();
-        System.out.println("ã€æŸ¥çœ‹ç”¨æˆ·æ˜¯å¦å¯ä»¥é…ç½®çƒ­ç‚¹dhcpçš„é…ç½®é¡¹  0-å¯è®¾ç½®dhcp 1-ä¸å¯è®¾ç½®dhcpã€‘");
+        System.out.println("¡¾²é¿´ÓÃ»§ÊÇ·ñ¿ÉÒÔÅäÖÃÈÈµãdhcpµÄÅäÖÃÏî  0-¿ÉÉèÖÃdhcp 1-²»¿ÉÉèÖÃdhcp¡¿");
         System.out.println("adb shell settings get global tether_enable_legacy_dhcp_server");
         System.out.println();
 
     }
 
     static void  ADB_Dump_Tip(){
-        System.out.println("â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• Dump ç›¸å…³ä¿¡æ¯æŸ¥è¯¢ â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•");
+        System.out.println("¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T Dump Ïà¹ØĞÅÏ¢²éÑ¯ ¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T");
         System.out.println();
-        System.out.println("adb shell dumpsys media.camera                              ã€ æŸ¥çœ‹cameraçš„ä¿¡æ¯");
-        System.out.println("adb shell dumpsys activity                                  ã€ æŸ¥çœ‹ActvityManagerService æ‰€æœ‰ä¿¡æ¯");
-        System.out.println("adb shell dumpsys activity activities                       ã€ æŸ¥çœ‹Activityç»„ä»¶ä¿¡æ¯");
-        System.out.println("adb shell dumpsys activity services                         ã€ æŸ¥çœ‹Serviceç»„ä»¶ä¿¡æ¯");
-        System.out.println("adb shell dumpsys activity providers                        ã€ æŸ¥çœ‹ContentProviderç»„ä»¶ä¿¡æ¯");
-        System.out.println("adb shell dumpsys activity broadcasts                       ã€ æŸ¥çœ‹BraodcastReceiverä¿¡æ¯");
-        System.out.println("adb shell dumpsys activity intents                          ã€ æŸ¥çœ‹Intentä¿¡æ¯");
-        System.out.println("adb shell dumpsys activity processes                        ã€ æŸ¥çœ‹è¿›ç¨‹ä¿¡æ¯");
-        System.out.println("adb shell dumpsys activity provider com.android.settings    ã€ æŸ¥çœ‹Settingsç›¸å…³çš„Providerä¿¡æ¯");
-        System.out.println("adb shell pm list features                                  ã€ æŸ¥çœ‹å®‰å“feature");
+        System.out.println("adb shell dumpsys media.camera                              ¡¾ ²é¿´cameraµÄĞÅÏ¢");
+        System.out.println("adb shell dumpsys activity                                  ¡¾ ²é¿´ActvityManagerService ËùÓĞĞÅÏ¢");
+        System.out.println("adb shell dumpsys activity activities                       ¡¾ ²é¿´Activity×é¼şĞÅÏ¢");
+        System.out.println("adb shell dumpsys activity services                         ¡¾ ²é¿´Service×é¼şĞÅÏ¢");
+        System.out.println("adb shell dumpsys activity providers                        ¡¾ ²é¿´ContentProvider×é¼şĞÅÏ¢");
+        System.out.println("adb shell dumpsys activity broadcasts                       ¡¾ ²é¿´BraodcastReceiverĞÅÏ¢");
+        System.out.println("adb shell dumpsys activity intents                          ¡¾ ²é¿´IntentĞÅÏ¢");
+        System.out.println("adb shell dumpsys activity processes                        ¡¾ ²é¿´½ø³ÌĞÅÏ¢");
+        System.out.println("adb shell dumpsys activity provider com.android.settings    ¡¾ ²é¿´SettingsÏà¹ØµÄProviderĞÅÏ¢");
+        System.out.println("adb shell pm list features                                  ¡¾ ²é¿´°²×¿feature");
         System.out.println();
         System.out.println();
 
@@ -295,129 +295,129 @@ public class J4_IssueTip {
 
     static void  GPS_NMEA_Tip(){
 
-        System.out.println("â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• GPS NMEA å®šä½å‘½ä»¤ $GPGGA $GPGSA $GPGSV $GPRMC â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•");
+        System.out.println("¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T GPS NMEA ¶¨Î»ÃüÁî $GPGGA $GPGSA $GPGSV $GPRMC ¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T");
         System.out.println("https://blog.csdn.net/u013232740/article/details/45029245");
         System.out.println("https://gpsd.gitlab.io/gpsd/NMEA.html");
         System.out.println();
-        System.out.println("$GPZDA ã€Zone Time Date UTC               (ZDA)UTCæ—¶é—´ æ—¥æœŸã€‘ã€ $GPZDA, <1>,<2>,<3>,<4>,<5>,<6>*hh ã€‘");
-        System.out.println("$GPGGA ã€Global Positioning Fix Data      (GGA)å«æ˜Ÿå®šä½ä¿¡æ¯ã€‘ã€ $GPGGA, <1>,<2>,<3>,<4>,<5>,<6>,<7>,<8>,<9>,M,<10>,M,<11>,<12>*hhã€‘");
-        System.out.println("$GPGLL ã€Geographic Position Lat/Long     (GLL)åœ°ç†å®šä½ä¿¡æ¯ã€‘ã€ $GPGLL, <1>,<2>,<3>,<4>,<5>,<6>,<7>,<8>*hhã€‘");
-        System.out.println("$GPVTG ã€Track Made Good and Ground Speed (VTG)åœ°é¢é€Ÿåº¦ä¿¡æ¯ã€‘ã€ $GPVTG, <1>,T,<2>,M,<3>,N,<4>,K,<5>*hh ã€‘");
-        System.out.println("$GPGSA ã€GPS DOP and Active Satellites    (GSA)å½“å‰å«æ˜Ÿä¿¡æ¯ã€‘ã€ $GPGSA, <1>,<2>,<3>,<3>,,,,,<3>,<3>,<3>,<4>,<5>,<6>*hh    ã€‘");
-        System.out.println("$GPGSV ã€GPS Satellites in View           (GSV)å¯è§å«æ˜Ÿä¿¡æ¯ã€‘ã€ $GPGSV, <1>,<2>,<3>,<4>,<5>,<6>,<7>,<4>,<5>,<6>,<7>,<8>*hh  ã€‘");
-        System.out.println("$GPGSV ã€GPS Satellites in View           (GSV)å¯è§å«æ˜Ÿä¿¡æ¯ã€‘ã€ $GPGSV, <1>,<2>,<3>,<4>,<5>,<6>,<7>,?<4>,<5>,<6>,<7>,<8>*hh  ã€‘");
-        System.out.println("$GPGSV ã€GPS Satellites in View           (GSV)å¯è§å«æ˜Ÿä¿¡æ¯ã€‘ã€ $GPGSV, <1>,<2>,<3>,<4>,<5>,<6>,<7>,?<4>,<5>,<6>,<7>,<8>*hh ã€‘");
-        System.out.println("$GPRMC ã€Recommended Minimum Data         (RMC)æ¨èå®šä½ä¿¡æ¯ã€‘ã€ $GPRMC, <1>,<2>,<3>,<4>,<5>,<6>,<7>,<8>,<9>,<10>,<11>,<12>*hh ã€‘");
+        System.out.println("$GPZDA ¡¾Zone Time Date UTC               (ZDA)UTCÊ±¼ä ÈÕÆÚ¡¿¡¾ $GPZDA, <1>,<2>,<3>,<4>,<5>,<6>*hh ¡¿");
+        System.out.println("$GPGGA ¡¾Global Positioning Fix Data      (GGA)ÎÀĞÇ¶¨Î»ĞÅÏ¢¡¿¡¾ $GPGGA, <1>,<2>,<3>,<4>,<5>,<6>,<7>,<8>,<9>,M,<10>,M,<11>,<12>*hh¡¿");
+        System.out.println("$GPGLL ¡¾Geographic Position Lat/Long     (GLL)µØÀí¶¨Î»ĞÅÏ¢¡¿¡¾ $GPGLL, <1>,<2>,<3>,<4>,<5>,<6>,<7>,<8>*hh¡¿");
+        System.out.println("$GPVTG ¡¾Track Made Good and Ground Speed (VTG)µØÃæËÙ¶ÈĞÅÏ¢¡¿¡¾ $GPVTG, <1>,T,<2>,M,<3>,N,<4>,K,<5>*hh ¡¿");
+        System.out.println("$GPGSA ¡¾GPS DOP and Active Satellites    (GSA)µ±Ç°ÎÀĞÇĞÅÏ¢¡¿¡¾ $GPGSA, <1>,<2>,<3>,<3>,,,,,<3>,<3>,<3>,<4>,<5>,<6>*hh    ¡¿");
+        System.out.println("$GPGSV ¡¾GPS Satellites in View           (GSV)¿É¼ûÎÀĞÇĞÅÏ¢¡¿¡¾ $GPGSV, <1>,<2>,<3>,<4>,<5>,<6>,<7>,<4>,<5>,<6>,<7>,<8>*hh  ¡¿");
+        System.out.println("$GPGSV ¡¾GPS Satellites in View           (GSV)¿É¼ûÎÀĞÇĞÅÏ¢¡¿¡¾ $GPGSV, <1>,<2>,<3>,<4>,<5>,<6>,<7>,?<4>,<5>,<6>,<7>,<8>*hh  ¡¿");
+        System.out.println("$GPGSV ¡¾GPS Satellites in View           (GSV)¿É¼ûÎÀĞÇĞÅÏ¢¡¿¡¾ $GPGSV, <1>,<2>,<3>,<4>,<5>,<6>,<7>,?<4>,<5>,<6>,<7>,<8>*hh ¡¿");
+        System.out.println("$GPRMC ¡¾Recommended Minimum Data         (RMC)ÍÆ¼ö¶¨Î»ĞÅÏ¢¡¿¡¾ $GPRMC, <1>,<2>,<3>,<4>,<5>,<6>,<7>,<8>,<9>,<10>,<11>,<12>*hh ¡¿");
         System.out.println();
         System.out.println();
-        System.out.println("$GPZDA, <1>,<2>,<3>,<4>,<5>,<6>*hh   (ZDA)UTCæ—¶é—´ æ—¥æœŸ");
-        System.out.println("å­—æ®µ1ï¼šUTC æ—¶é—´ï¼Œ hhmmss.sss ï¼Œæ—¶åˆ†ç§’æ ¼å¼");
-        System.out.println("å­—æ®µ2ï¼šæ—¥æœŸ dd=0~31");
-        System.out.println("å­—æ®µ3ï¼šæœˆï¼Œmm=1~12");
-        System.out.println("å­—æ®µ4ï¼šyyyy å¹´");
-        System.out.println("å­—æ®µ5ï¼šxx å½“åœ°æ—¶åŸŸæè¿°ï¼Œå•ä½ï¼šå°æ—¶ï¼Œxx=-13~13");
-        System.out.println("å­—æ®µ6ï¼šå½“åœ°æ—¶åŸŸæè¿°ï¼Œ   å•ä½ï¼šåˆ†ï¼Œ  yy=0~59");
+        System.out.println("$GPZDA, <1>,<2>,<3>,<4>,<5>,<6>*hh   (ZDA)UTCÊ±¼ä ÈÕÆÚ");
+        System.out.println("×Ö¶Î1£ºUTC Ê±¼ä£¬ hhmmss.sss £¬Ê±·ÖÃë¸ñÊ½");
+        System.out.println("×Ö¶Î2£ºÈÕÆÚ dd=0~31");
+        System.out.println("×Ö¶Î3£ºÔÂ£¬mm=1~12");
+        System.out.println("×Ö¶Î4£ºyyyy Äê");
+        System.out.println("×Ö¶Î5£ºxx µ±µØÊ±ÓòÃèÊö£¬µ¥Î»£ºĞ¡Ê±£¬xx=-13~13");
+        System.out.println("×Ö¶Î6£ºµ±µØÊ±ÓòÃèÊö£¬   µ¥Î»£º·Ö£¬  yy=0~59");
         System.out.println();
         System.out.println();
-        System.out.println("$GPGGA, <1>,<2>,<3>,<4>,<5>,<6>,<7>,<8>,<9>,M,<10>,M,<11>,<12>*hh   (GGA)å«æ˜Ÿå®šä½ä¿¡æ¯");
+        System.out.println("$GPGGA, <1>,<2>,<3>,<4>,<5>,<6>,<7>,<8>,<9>,M,<10>,M,<11>,<12>*hh   (GGA)ÎÀĞÇ¶¨Î»ĞÅÏ¢");
         System.out.println("$GPGGA,092201.00,3112.312832,N,12134.879544,E,1,17,0.8,12.6,M,10.0,M,,*50");
         System.out.println("$GPGGA,092111.00,,,,,0,00,300.0,,M,,M,,*6F");
         System.out.println("$GPGGA,092122.00,3112.318862,N,12134.877608,E,1,15,2.4,17.6,M,10.0,M,,*51");
-        System.out.println("å­—æ®µ1ï¼šUTC æ—¶é—´ï¼Œ hhmmss.sss ï¼Œæ—¶åˆ†ç§’æ ¼å¼");
-        System.out.println("å­—æ®µ2ï¼šçº¬åº¦ddmm.mmmm ï¼Œåº¦åˆ†æ ¼å¼ï¼ˆå‰å¯¼ä½æ•°ä¸è¶³åˆ™è¡¥0ï¼‰");
-        System.out.println("å­—æ®µ3ï¼šçº¬åº¦Nï¼ˆåŒ—çº¬ï¼‰æˆ–Sï¼ˆå—çº¬ï¼‰");
-        System.out.println("å­—æ®µ4ï¼šç»åº¦dddmm.mmmm ï¼Œåº¦åˆ†æ ¼å¼ï¼ˆå‰å¯¼ä½æ•°ä¸è¶³åˆ™è¡¥0ï¼‰");
-        System.out.println("å­—æ®µ5ï¼šç»åº¦Eï¼ˆä¸œç»ï¼‰æˆ–Wï¼ˆè¥¿ç»ï¼‰");
-        System.out.println("å­—æ®µ6ï¼šGPSçŠ¶æ€ï¼Œ 0= æœªå®šä½ï¼Œ 1= éå·®åˆ†å®šä½ï¼Œ 2= å·®åˆ†å®šä½ï¼Œ 3= æ— æ•ˆPPSï¼Œ 6= æ­£åœ¨ä¼°ç®—");
-        System.out.println("å­—æ®µ7ï¼šæ­£åœ¨ä½¿ç”¨çš„å«æ˜Ÿæ•°é‡ï¼ˆ 00 - 12 ï¼‰ï¼ˆå‰å¯¼ä½æ•°ä¸è¶³åˆ™è¡¥0ï¼‰");
-        System.out.println("å­—æ®µ8ï¼šHDOP æ°´å¹³ç²¾åº¦å› å­ï¼ˆ 0.5 - 99.9 ï¼‰");
-        System.out.println("å­—æ®µ9ï¼šæµ·æ‹”é«˜åº¦ï¼ˆ -9999.9 - 99999.9 ï¼‰");
-        System.out.println("å­—æ®µ10ï¼šåœ°çƒæ¤­çƒé¢ç›¸å¯¹å¤§åœ°æ°´å‡†é¢çš„é«˜åº¦");
-        System.out.println("å­—æ®µ11ï¼šå·®åˆ†æ—¶é—´ï¼ˆä»æœ€è¿‘ä¸€æ¬¡æ¥æ”¶åˆ°å·®åˆ†ä¿¡å·å¼€å§‹çš„ç§’æ•°ï¼Œå¦‚æœä¸æ˜¯å·®åˆ†å®šä½å°†ä¸ºç©ºï¼‰");
-        System.out.println("å­—æ®µ12ï¼šå·®åˆ†ç«™ID å·0000 - 1023 ï¼ˆå‰å¯¼ä½æ•°ä¸è¶³åˆ™è¡¥0ï¼Œå¦‚æœä¸æ˜¯å·®åˆ†å®šä½å°†ä¸ºç©ºï¼‰");
+        System.out.println("×Ö¶Î1£ºUTC Ê±¼ä£¬ hhmmss.sss £¬Ê±·ÖÃë¸ñÊ½");
+        System.out.println("×Ö¶Î2£ºÎ³¶Èddmm.mmmm £¬¶È·Ö¸ñÊ½£¨Ç°µ¼Î»Êı²»×ãÔò²¹0£©");
+        System.out.println("×Ö¶Î3£ºÎ³¶ÈN£¨±±Î³£©»òS£¨ÄÏÎ³£©");
+        System.out.println("×Ö¶Î4£º¾­¶Èdddmm.mmmm £¬¶È·Ö¸ñÊ½£¨Ç°µ¼Î»Êı²»×ãÔò²¹0£©");
+        System.out.println("×Ö¶Î5£º¾­¶ÈE£¨¶«¾­£©»òW£¨Î÷¾­£©");
+        System.out.println("×Ö¶Î6£ºGPS×´Ì¬£¬ 0= Î´¶¨Î»£¬ 1= ·Ç²î·Ö¶¨Î»£¬ 2= ²î·Ö¶¨Î»£¬ 3= ÎŞĞ§PPS£¬ 6= ÕıÔÚ¹ÀËã");
+        System.out.println("×Ö¶Î7£ºÕıÔÚÊ¹ÓÃµÄÎÀĞÇÊıÁ¿£¨ 00 - 12 £©£¨Ç°µ¼Î»Êı²»×ãÔò²¹0£©");
+        System.out.println("×Ö¶Î8£ºHDOP Ë®Æ½¾«¶ÈÒò×Ó£¨ 0.5 - 99.9 £©");
+        System.out.println("×Ö¶Î9£ºº£°Î¸ß¶È£¨ -9999.9 - 99999.9 £©");
+        System.out.println("×Ö¶Î10£ºµØÇòÍÖÇòÃæÏà¶Ô´óµØË®×¼ÃæµÄ¸ß¶È");
+        System.out.println("×Ö¶Î11£º²î·ÖÊ±¼ä£¨´Ó×î½üÒ»´Î½ÓÊÕµ½²î·ÖĞÅºÅ¿ªÊ¼µÄÃëÊı£¬Èç¹û²»ÊÇ²î·Ö¶¨Î»½«Îª¿Õ£©");
+        System.out.println("×Ö¶Î12£º²î·ÖÕ¾ID ºÅ0000 - 1023 £¨Ç°µ¼Î»Êı²»×ãÔò²¹0£¬Èç¹û²»ÊÇ²î·Ö¶¨Î»½«Îª¿Õ£©");
         System.out.println();
         System.out.println();
-        System.out.println("$GPGLL, <1>,<2>,<3>,<4>,<5>,<6>*hh                                  (GLL)åœ°ç†å®šä½ä¿¡æ¯");
+        System.out.println("$GPGLL, <1>,<2>,<3>,<4>,<5>,<6>*hh                                  (GLL)µØÀí¶¨Î»ĞÅÏ¢");
         System.out.println("$GPGLL,4250.5589,S,14718.5084,E,092204.999,A*2D");
-        System.out.println("å­—æ®µ1ï¼šçº¬åº¦ddmm.mmmm ï¼Œåº¦åˆ†æ ¼å¼ï¼ˆå‰å¯¼ä½æ•°ä¸è¶³åˆ™è¡¥0ï¼‰");
-        System.out.println("å­—æ®µ2ï¼šçº¬åº¦Nï¼ˆåŒ—çº¬ï¼‰æˆ–Sï¼ˆå—çº¬ï¼‰");
-        System.out.println("å­—æ®µ3ï¼šç»åº¦dddmm.mmmm ï¼Œåº¦åˆ†æ ¼å¼ï¼ˆå‰å¯¼ä½æ•°ä¸è¶³åˆ™è¡¥0ï¼‰");
-        System.out.println("å­—æ®µ4ï¼šç»åº¦Eï¼ˆä¸œç»ï¼‰æˆ–Wï¼ˆè¥¿ç»ï¼‰");
-        System.out.println("å­—æ®µ5ï¼šUTCæ—¶é—´ï¼Œ hhmmss.sss æ ¼å¼");
-        System.out.println("å­—æ®µ6ï¼šçŠ¶æ€ï¼Œ A= å®šä½ï¼Œ V= æœªå®šä½");
+        System.out.println("×Ö¶Î1£ºÎ³¶Èddmm.mmmm £¬¶È·Ö¸ñÊ½£¨Ç°µ¼Î»Êı²»×ãÔò²¹0£©");
+        System.out.println("×Ö¶Î2£ºÎ³¶ÈN£¨±±Î³£©»òS£¨ÄÏÎ³£©");
+        System.out.println("×Ö¶Î3£º¾­¶Èdddmm.mmmm £¬¶È·Ö¸ñÊ½£¨Ç°µ¼Î»Êı²»×ãÔò²¹0£©");
+        System.out.println("×Ö¶Î4£º¾­¶ÈE£¨¶«¾­£©»òW£¨Î÷¾­£©");
+        System.out.println("×Ö¶Î5£ºUTCÊ±¼ä£¬ hhmmss.sss ¸ñÊ½");
+        System.out.println("×Ö¶Î6£º×´Ì¬£¬ A= ¶¨Î»£¬ V= Î´¶¨Î»");
         System.out.println();
         System.out.println();
         System.out.println("$GPVTG, <1>,T,<2>,M,<3>,N,<4>,K*hh");
-        System.out.println("å­—æ®µ1ï¼šè¿åŠ¨è§’åº¦ï¼Œ 000 - 359 ï¼Œï¼ˆå‰å¯¼ä½æ•°ä¸è¶³åˆ™è¡¥0ï¼‰");
-        System.out.println("å­—æ®µ2ï¼šè¿åŠ¨è§’åº¦ï¼Œ 000 - 359 ï¼Œï¼ˆå‰å¯¼ä½æ•°ä¸è¶³åˆ™è¡¥0ï¼‰");
-        System.out.println("å­—æ®µ3ï¼šæ°´å¹³è¿åŠ¨é€Ÿåº¦ï¼ˆ 0.00 ï¼‰ï¼ˆå‰å¯¼ä½æ•°ä¸è¶³åˆ™è¡¥0ï¼‰");
-        System.out.println("å­—æ®µ4ï¼šæ°´å¹³è¿åŠ¨é€Ÿåº¦ï¼ˆ 0.00 ï¼‰ï¼ˆå‰å¯¼ä½æ•°ä¸è¶³åˆ™è¡¥0ï¼‰");
-        System.out.println("T=çœŸåŒ—å‚ç…§ç³»   M=ç£åŒ—å‚ç…§ç³»   N=èŠ‚  K=å…¬é‡Œ/æ—¶-km/h");
+        System.out.println("×Ö¶Î1£ºÔË¶¯½Ç¶È£¬ 000 - 359 £¬£¨Ç°µ¼Î»Êı²»×ãÔò²¹0£©");
+        System.out.println("×Ö¶Î2£ºÔË¶¯½Ç¶È£¬ 000 - 359 £¬£¨Ç°µ¼Î»Êı²»×ãÔò²¹0£©");
+        System.out.println("×Ö¶Î3£ºË®Æ½ÔË¶¯ËÙ¶È£¨ 0.00 £©£¨Ç°µ¼Î»Êı²»×ãÔò²¹0£©");
+        System.out.println("×Ö¶Î4£ºË®Æ½ÔË¶¯ËÙ¶È£¨ 0.00 £©£¨Ç°µ¼Î»Êı²»×ãÔò²¹0£©");
+        System.out.println("T=Õæ±±²ÎÕÕÏµ   M=´Å±±²ÎÕÕÏµ   N=½Ú  K=¹«Àï/Ê±-km/h");
         System.out.println();
         System.out.println();
-        System.out.println("$GPGSA, <1>,<2>,<3>,<3>,,,,,<3>,<3>,<3>,<4>,<5>,<6>*hh   (GSA)å½“å‰å«æ˜Ÿä¿¡æ¯");
+        System.out.println("$GPGSA, <1>,<2>,<3>,<3>,,,,,<3>,<3>,<3>,<4>,<5>,<6>*hh   (GSA)µ±Ç°ÎÀĞÇĞÅÏ¢");
         System.out.println("$GPGSA,A,1,,,,,,,,,,,,,140.0,99.0,99.0*35");
         System.out.println("$GPGSA,A,1,,,,,,,,,,,,,3.4,2.5,2.3*31");
         System.out.println("$GPGSA,A,3,04,09,16,26,27,,,,,,,,2.1,1.6,1.3*3F");
-        System.out.println("å­—æ®µ1ï¼šå®šä½æ¨¡å¼ï¼Œ A= è‡ªåŠ¨æ‰‹åŠ¨2D/3D ï¼ŒM= æ‰‹åŠ¨2D/3D");
-        System.out.println("å­—æ®µ2ï¼šå®šä½ç±»å‹ï¼Œ 1= æœªå®šä½ï¼Œ 2=2D å®šä½ï¼Œ 3=3D å®šä½");
-        System.out.println("å­—æ®µ3ï¼šPRNç ï¼ˆä¼ªéšæœºå™ªå£°ç ï¼‰ï¼Œç¬¬1 ä¿¡é“æ­£åœ¨ä½¿ç”¨çš„å«æ˜ŸPRNç ç¼–å·ï¼ˆ 00ï¼‰ï¼ˆå‰å¯¼ä½æ•°ä¸è¶³åˆ™è¡¥0ï¼‰");
-        System.out.println("å­—æ®µ3ï¼šPRNç ï¼ˆä¼ªéšæœºå™ªå£°ç ï¼‰ï¼Œç¬¬2 ä¿¡é“æ­£åœ¨ä½¿ç”¨çš„å«æ˜ŸPRNç ç¼–å·ï¼ˆ 00ï¼‰ï¼ˆå‰å¯¼ä½æ•°ä¸è¶³åˆ™è¡¥0ï¼‰");
-        System.out.println("å­—æ®µ3ï¼šPRNç ï¼ˆä¼ªéšæœºå™ªå£°ç ï¼‰ï¼Œç¬¬3 ä¿¡é“æ­£åœ¨ä½¿ç”¨çš„å«æ˜ŸPRNç ç¼–å·ï¼ˆ 00ï¼‰ï¼ˆå‰å¯¼ä½æ•°ä¸è¶³åˆ™è¡¥0ï¼‰");
-        System.out.println("å­—æ®µ3ï¼šPRNç ï¼ˆä¼ªéšæœºå™ªå£°ç ï¼‰ï¼Œç¬¬4 ä¿¡é“æ­£åœ¨ä½¿ç”¨çš„å«æ˜ŸPRNç ç¼–å·ï¼ˆ 00ï¼‰ï¼ˆå‰å¯¼ä½æ•°ä¸è¶³åˆ™è¡¥0ï¼‰");
-        System.out.println("å­—æ®µ3ï¼šPRNç ï¼ˆä¼ªéšæœºå™ªå£°ç ï¼‰ï¼Œç¬¬5 ä¿¡é“æ­£åœ¨ä½¿ç”¨çš„å«æ˜ŸPRNç ç¼–å·ï¼ˆ 00ï¼‰ï¼ˆå‰å¯¼ä½æ•°ä¸è¶³åˆ™è¡¥0ï¼‰");
-        System.out.println("å­—æ®µ3ï¼šPRNç ï¼ˆä¼ªéšæœºå™ªå£°ç ï¼‰ï¼Œç¬¬6 ä¿¡é“æ­£åœ¨ä½¿ç”¨çš„å«æ˜ŸPRNç ç¼–å·ï¼ˆ 00ï¼‰ï¼ˆå‰å¯¼ä½æ•°ä¸è¶³åˆ™è¡¥0ï¼‰");
-        System.out.println("å­—æ®µ3ï¼šPRNç ï¼ˆä¼ªéšæœºå™ªå£°ç ï¼‰ï¼Œç¬¬7 ä¿¡é“æ­£åœ¨ä½¿ç”¨çš„å«æ˜ŸPRNç ç¼–å·ï¼ˆ 00ï¼‰ï¼ˆå‰å¯¼ä½æ•°ä¸è¶³åˆ™è¡¥0ï¼‰");
-        System.out.println("å­—æ®µ3ï¼šPRNç ï¼ˆä¼ªéšæœºå™ªå£°ç ï¼‰ï¼Œç¬¬8 ä¿¡é“æ­£åœ¨ä½¿ç”¨çš„å«æ˜ŸPRNç ç¼–å·ï¼ˆ 00ï¼‰ï¼ˆå‰å¯¼ä½æ•°ä¸è¶³åˆ™è¡¥0ï¼‰");
-        System.out.println("å­—æ®µ3ï¼šPRNç ï¼ˆä¼ªéšæœºå™ªå£°ç ï¼‰ï¼Œç¬¬9 ä¿¡é“æ­£åœ¨ä½¿ç”¨çš„å«æ˜ŸPRNç ç¼–å·ï¼ˆ 00ï¼‰ï¼ˆå‰å¯¼ä½æ•°ä¸è¶³åˆ™è¡¥0ï¼‰");
-        System.out.println("å­—æ®µ3ï¼šPRNç ï¼ˆä¼ªéšæœºå™ªå£°ç ï¼‰ï¼Œç¬¬10 ä¿¡é“æ­£åœ¨ä½¿ç”¨çš„å«æ˜ŸPRNç ç¼–å·ï¼ˆ 00ï¼‰ï¼ˆå‰å¯¼ä½æ•°ä¸è¶³åˆ™è¡¥0ï¼‰");
-        System.out.println("å­—æ®µ3ï¼šPRNç ï¼ˆä¼ªéšæœºå™ªå£°ç ï¼‰ï¼Œç¬¬11 ä¿¡é“æ­£åœ¨ä½¿ç”¨çš„å«æ˜ŸPRNç ç¼–å·ï¼ˆ 00ï¼‰ï¼ˆå‰å¯¼ä½æ•°ä¸è¶³åˆ™è¡¥0ï¼‰");
-        System.out.println("å­—æ®µ3ï¼šPRNç ï¼ˆä¼ªéšæœºå™ªå£°ç ï¼‰ï¼Œç¬¬12 ä¿¡é“æ­£åœ¨ä½¿ç”¨çš„å«æ˜ŸPRNç ç¼–å·ï¼ˆ 00ï¼‰ï¼ˆå‰å¯¼ä½æ•°ä¸è¶³åˆ™è¡¥0ï¼‰");
-        System.out.println("å­—æ®µ4ï¼šPDOP ç»¼åˆä½ç½®ç²¾åº¦å› å­ï¼ˆ 0.5 - 99.9 ï¼‰");
-        System.out.println("å­—æ®µ5ï¼šHDOP æ°´å¹³ç²¾åº¦å› å­ï¼ˆ 0.5 - 99.9 ï¼‰");
-        System.out.println("å­—æ®µ6ï¼šVDOP å‚ç›´ç²¾åº¦å› å­ï¼ˆ 0.5 - 99.9 ï¼‰");
+        System.out.println("×Ö¶Î1£º¶¨Î»Ä£Ê½£¬ A= ×Ô¶¯ÊÖ¶¯2D/3D £¬M= ÊÖ¶¯2D/3D");
+        System.out.println("×Ö¶Î2£º¶¨Î»ÀàĞÍ£¬ 1= Î´¶¨Î»£¬ 2=2D ¶¨Î»£¬ 3=3D ¶¨Î»");
+        System.out.println("×Ö¶Î3£ºPRNÂë£¨Î±Ëæ»úÔëÉùÂë£©£¬µÚ1 ĞÅµÀÕıÔÚÊ¹ÓÃµÄÎÀĞÇPRNÂë±àºÅ£¨ 00£©£¨Ç°µ¼Î»Êı²»×ãÔò²¹0£©");
+        System.out.println("×Ö¶Î3£ºPRNÂë£¨Î±Ëæ»úÔëÉùÂë£©£¬µÚ2 ĞÅµÀÕıÔÚÊ¹ÓÃµÄÎÀĞÇPRNÂë±àºÅ£¨ 00£©£¨Ç°µ¼Î»Êı²»×ãÔò²¹0£©");
+        System.out.println("×Ö¶Î3£ºPRNÂë£¨Î±Ëæ»úÔëÉùÂë£©£¬µÚ3 ĞÅµÀÕıÔÚÊ¹ÓÃµÄÎÀĞÇPRNÂë±àºÅ£¨ 00£©£¨Ç°µ¼Î»Êı²»×ãÔò²¹0£©");
+        System.out.println("×Ö¶Î3£ºPRNÂë£¨Î±Ëæ»úÔëÉùÂë£©£¬µÚ4 ĞÅµÀÕıÔÚÊ¹ÓÃµÄÎÀĞÇPRNÂë±àºÅ£¨ 00£©£¨Ç°µ¼Î»Êı²»×ãÔò²¹0£©");
+        System.out.println("×Ö¶Î3£ºPRNÂë£¨Î±Ëæ»úÔëÉùÂë£©£¬µÚ5 ĞÅµÀÕıÔÚÊ¹ÓÃµÄÎÀĞÇPRNÂë±àºÅ£¨ 00£©£¨Ç°µ¼Î»Êı²»×ãÔò²¹0£©");
+        System.out.println("×Ö¶Î3£ºPRNÂë£¨Î±Ëæ»úÔëÉùÂë£©£¬µÚ6 ĞÅµÀÕıÔÚÊ¹ÓÃµÄÎÀĞÇPRNÂë±àºÅ£¨ 00£©£¨Ç°µ¼Î»Êı²»×ãÔò²¹0£©");
+        System.out.println("×Ö¶Î3£ºPRNÂë£¨Î±Ëæ»úÔëÉùÂë£©£¬µÚ7 ĞÅµÀÕıÔÚÊ¹ÓÃµÄÎÀĞÇPRNÂë±àºÅ£¨ 00£©£¨Ç°µ¼Î»Êı²»×ãÔò²¹0£©");
+        System.out.println("×Ö¶Î3£ºPRNÂë£¨Î±Ëæ»úÔëÉùÂë£©£¬µÚ8 ĞÅµÀÕıÔÚÊ¹ÓÃµÄÎÀĞÇPRNÂë±àºÅ£¨ 00£©£¨Ç°µ¼Î»Êı²»×ãÔò²¹0£©");
+        System.out.println("×Ö¶Î3£ºPRNÂë£¨Î±Ëæ»úÔëÉùÂë£©£¬µÚ9 ĞÅµÀÕıÔÚÊ¹ÓÃµÄÎÀĞÇPRNÂë±àºÅ£¨ 00£©£¨Ç°µ¼Î»Êı²»×ãÔò²¹0£©");
+        System.out.println("×Ö¶Î3£ºPRNÂë£¨Î±Ëæ»úÔëÉùÂë£©£¬µÚ10 ĞÅµÀÕıÔÚÊ¹ÓÃµÄÎÀĞÇPRNÂë±àºÅ£¨ 00£©£¨Ç°µ¼Î»Êı²»×ãÔò²¹0£©");
+        System.out.println("×Ö¶Î3£ºPRNÂë£¨Î±Ëæ»úÔëÉùÂë£©£¬µÚ11 ĞÅµÀÕıÔÚÊ¹ÓÃµÄÎÀĞÇPRNÂë±àºÅ£¨ 00£©£¨Ç°µ¼Î»Êı²»×ãÔò²¹0£©");
+        System.out.println("×Ö¶Î3£ºPRNÂë£¨Î±Ëæ»úÔëÉùÂë£©£¬µÚ12 ĞÅµÀÕıÔÚÊ¹ÓÃµÄÎÀĞÇPRNÂë±àºÅ£¨ 00£©£¨Ç°µ¼Î»Êı²»×ãÔò²¹0£©");
+        System.out.println("×Ö¶Î4£ºPDOP ×ÛºÏÎ»ÖÃ¾«¶ÈÒò×Ó£¨ 0.5 - 99.9 £©");
+        System.out.println("×Ö¶Î5£ºHDOP Ë®Æ½¾«¶ÈÒò×Ó£¨ 0.5 - 99.9 £©");
+        System.out.println("×Ö¶Î6£ºVDOP ´¹Ö±¾«¶ÈÒò×Ó£¨ 0.5 - 99.9 £©");
         System.out.println();
         System.out.println();
-        System.out.println("$GPGSV, <1>,<2>,<3>,<4>,<5>,<6>,<7>,?<4>,<5>,<6>,<7>,*hh        (GSV)å¯è§å«æ˜Ÿä¿¡æ¯");
+        System.out.println("$GPGSV, <1>,<2>,<3>,<4>,<5>,<6>,<7>,?<4>,<5>,<6>,<7>,*hh        (GSV)¿É¼ûÎÀĞÇĞÅÏ¢");
         System.out.println("$GPGSV,3,1,09,16,58,011,38,26,38,053,31,09,29,303,34,18,14,059,33*7D");
         System.out.println("$GPGSV,3,2,09,07,04,310,,27,78,187,,04,52,260,,08,39,213,*71");
         System.out.println("$GPGSV,3,3,09,31,25,118,*4D");
         System.out.println("$GAGSV,2,1,07,127,58,350,,115,41,113,,130,31,065,,121,25,290,*6D");
         System.out.println("$GAGSV,2,2,07,107,25,196,,119,21,306,,113,20,169,*60");
-        System.out.println("å­—æ®µ1ï¼šæœ¬æ¬¡GSVè¯­å¥çš„æ€»æ•°ç›®ï¼ˆ 1 - 3 ï¼‰");
-        System.out.println("å­—æ®µ2ï¼šæœ¬æ¡GSVè¯­å¥æ˜¯æœ¬æ¬¡GSVè¯­å¥çš„ç¬¬å‡ æ¡ï¼ˆ 1 - 3 ï¼‰");
-        System.out.println("å­—æ®µ3ï¼šå½“å‰å¯è§å«æ˜Ÿæ€»æ•°ï¼ˆ 00 - 12 ï¼‰ï¼ˆå‰å¯¼ä½æ•°ä¸è¶³åˆ™è¡¥0ï¼‰");
-        System.out.println("å­—æ®µ4ï¼šPRN ç ï¼ˆä¼ªéšæœºå™ªå£°ç ï¼‰ï¼ˆ 01 - 32 ï¼‰ï¼ˆå‰å¯¼ä½æ•°ä¸è¶³åˆ™è¡¥0ï¼‰");
-        System.out.println("å­—æ®µ5ï¼šå«æ˜Ÿä»°è§’ï¼ˆ 00 - 90 ï¼‰åº¦ï¼ˆå‰å¯¼ä½æ•°ä¸è¶³åˆ™è¡¥0ï¼‰");
-        System.out.println("å­—æ®µ6ï¼šå«æ˜Ÿæ–¹ä½è§’ï¼ˆ 00 - 359 ï¼‰åº¦ï¼ˆå‰å¯¼ä½æ•°ä¸è¶³åˆ™è¡¥0ï¼‰");
-        System.out.println("å­—æ®µ7ï¼šä¿¡å™ªæ¯”ï¼ˆ 00 ï¼99ï¼‰dbHz");
-        System.out.println("å­—æ®µ4ï¼šPRN ç ï¼ˆä¼ªéšæœºå™ªå£°ç ï¼‰ï¼ˆ 01 - 32 ï¼‰ï¼ˆå‰å¯¼ä½æ•°ä¸è¶³åˆ™è¡¥0ï¼‰");
-        System.out.println("å­—æ®µ5ï¼šå«æ˜Ÿä»°è§’ï¼ˆ 00 - 90 ï¼‰åº¦ï¼ˆå‰å¯¼ä½æ•°ä¸è¶³åˆ™è¡¥0ï¼‰");
-        System.out.println("å­—æ®µ6ï¼šå«æ˜Ÿæ–¹ä½è§’ï¼ˆ 00 - 359 ï¼‰åº¦ï¼ˆå‰å¯¼ä½æ•°ä¸è¶³åˆ™è¡¥0ï¼‰");
-        System.out.println("å­—æ®µ7ï¼šä¿¡å™ªæ¯”ï¼ˆ 00ï¼99ï¼‰dbHz");
-        System.out.println("å­—æ®µ4ï¼šPRN ç ï¼ˆä¼ªéšæœºå™ªå£°ç ï¼‰ï¼ˆ 01 - 32 ï¼‰ï¼ˆå‰å¯¼ä½æ•°ä¸è¶³åˆ™è¡¥0ï¼‰");
-        System.out.println("å­—æ®µ5ï¼šå«æ˜Ÿä»°è§’ï¼ˆ 00 - 90 ï¼‰åº¦ï¼ˆå‰å¯¼ä½æ•°ä¸è¶³åˆ™è¡¥0ï¼‰");
-        System.out.println("å­—æ®µ6ï¼šå«æ˜Ÿæ–¹ä½è§’ï¼ˆ 00 - 359 ï¼‰åº¦ï¼ˆå‰å¯¼ä½æ•°ä¸è¶³åˆ™è¡¥0ï¼‰");
-        System.out.println("å­—æ®µ7ï¼šä¿¡å™ªæ¯”ï¼ˆ 00ï¼99ï¼‰dbHz");
+        System.out.println("×Ö¶Î1£º±¾´ÎGSVÓï¾äµÄ×ÜÊıÄ¿£¨ 1 - 3 £©");
+        System.out.println("×Ö¶Î2£º±¾ÌõGSVÓï¾äÊÇ±¾´ÎGSVÓï¾äµÄµÚ¼¸Ìõ£¨ 1 - 3 £©");
+        System.out.println("×Ö¶Î3£ºµ±Ç°¿É¼ûÎÀĞÇ×ÜÊı£¨ 00 - 12 £©£¨Ç°µ¼Î»Êı²»×ãÔò²¹0£©");
+        System.out.println("×Ö¶Î4£ºPRN Âë£¨Î±Ëæ»úÔëÉùÂë£©£¨ 01 - 32 £©£¨Ç°µ¼Î»Êı²»×ãÔò²¹0£©");
+        System.out.println("×Ö¶Î5£ºÎÀĞÇÑö½Ç£¨ 00 - 90 £©¶È£¨Ç°µ¼Î»Êı²»×ãÔò²¹0£©");
+        System.out.println("×Ö¶Î6£ºÎÀĞÇ·½Î»½Ç£¨ 00 - 359 £©¶È£¨Ç°µ¼Î»Êı²»×ãÔò²¹0£©");
+        System.out.println("×Ö¶Î7£ºĞÅÔë±È£¨ 00 £­99£©dbHz");
+        System.out.println("×Ö¶Î4£ºPRN Âë£¨Î±Ëæ»úÔëÉùÂë£©£¨ 01 - 32 £©£¨Ç°µ¼Î»Êı²»×ãÔò²¹0£©");
+        System.out.println("×Ö¶Î5£ºÎÀĞÇÑö½Ç£¨ 00 - 90 £©¶È£¨Ç°µ¼Î»Êı²»×ãÔò²¹0£©");
+        System.out.println("×Ö¶Î6£ºÎÀĞÇ·½Î»½Ç£¨ 00 - 359 £©¶È£¨Ç°µ¼Î»Êı²»×ãÔò²¹0£©");
+        System.out.println("×Ö¶Î7£ºĞÅÔë±È£¨ 00£­99£©dbHz");
+        System.out.println("×Ö¶Î4£ºPRN Âë£¨Î±Ëæ»úÔëÉùÂë£©£¨ 01 - 32 £©£¨Ç°µ¼Î»Êı²»×ãÔò²¹0£©");
+        System.out.println("×Ö¶Î5£ºÎÀĞÇÑö½Ç£¨ 00 - 90 £©¶È£¨Ç°µ¼Î»Êı²»×ãÔò²¹0£©");
+        System.out.println("×Ö¶Î6£ºÎÀĞÇ·½Î»½Ç£¨ 00 - 359 £©¶È£¨Ç°µ¼Î»Êı²»×ãÔò²¹0£©");
+        System.out.println("×Ö¶Î7£ºĞÅÔë±È£¨ 00£­99£©dbHz");
         System.out.println();
         System.out.println();
         System.out.println();
-        System.out.println("$GPRMC,<1>,<2>,<3>,<4>,<5>,<6>,<7>,<8>,<9>,<10>,<11>,<12>*hh   (RMC)æ¨èå®šä½ä¿¡æ¯");
+        System.out.println("$GPRMC,<1>,<2>,<3>,<4>,<5>,<6>,<7>,<8>,<9>,<10>,<11>,<12>*hh   (RMC)ÍÆ¼ö¶¨Î»ĞÅÏ¢");
         System.out.println("$GPRMC,092110.00,V,,,,,,,040121,,,N*70");
         System.out.println("$GPRMC,092127.00,A,3112.316508,N,12134.878718,E,000.1,310.3,040121,,,A*53");
         System.out.println("$GPRMC,092159.00,A,3112.311732,N,12134.879623,E,000.1,258.5,040121,,,A*55");
-        System.out.println("å­—æ®µ1ï¼šUTCæ—¶é—´ï¼Œ hhmmss.sss æ ¼å¼");
-        System.out.println("å­—æ®µ2ï¼šçŠ¶æ€ï¼Œ A= å®šä½ï¼Œ V= æœªå®šä½");
-        System.out.println("å­—æ®µ3ï¼šçº¬åº¦ddmm.mmmm ï¼Œåº¦åˆ†æ ¼å¼ï¼ˆå‰å¯¼ä½æ•°ä¸è¶³åˆ™è¡¥0ï¼‰");
-        System.out.println("å­—æ®µ4ï¼šçº¬åº¦Nï¼ˆåŒ—çº¬ï¼‰æˆ–Sï¼ˆå—çº¬ï¼‰");
-        System.out.println("å­—æ®µ5ï¼šç»åº¦dddmm.mmmm ï¼Œåº¦åˆ†æ ¼å¼ï¼ˆå‰å¯¼ä½æ•°ä¸è¶³åˆ™è¡¥0ï¼‰");
-        System.out.println("å­—æ®µ6ï¼šç»åº¦Eï¼ˆä¸œç»ï¼‰æˆ–Wï¼ˆè¥¿ç»ï¼‰");
-        System.out.println("å­—æ®µ7ï¼šé€Ÿåº¦ï¼ŒèŠ‚ï¼Œ Knots");
-        System.out.println("å­—æ®µ8ï¼šæ–¹ä½è§’ï¼Œåº¦");
-        System.out.println("å­—æ®µ9ï¼šUTCæ—¥æœŸï¼Œ DDMMYY æ ¼å¼");
-        System.out.println("å­—æ®µ10ï¼šç£åè§’ï¼Œï¼ˆ 000 - 180 ï¼‰åº¦ï¼ˆå‰å¯¼ä½æ•°ä¸è¶³åˆ™è¡¥0ï¼‰");
-        System.out.println("å­—æ®µ11ï¼šç£åè§’æ–¹å‘ï¼Œ E=ä¸œW=è¥¿");
-        System.out.println("å­—æ®µ12ï¼šFAA mode indicator (NMEA 2.3 and later)  N=none  A=auto?");
+        System.out.println("×Ö¶Î1£ºUTCÊ±¼ä£¬ hhmmss.sss ¸ñÊ½");
+        System.out.println("×Ö¶Î2£º×´Ì¬£¬ A= ¶¨Î»£¬ V= Î´¶¨Î»");
+        System.out.println("×Ö¶Î3£ºÎ³¶Èddmm.mmmm £¬¶È·Ö¸ñÊ½£¨Ç°µ¼Î»Êı²»×ãÔò²¹0£©");
+        System.out.println("×Ö¶Î4£ºÎ³¶ÈN£¨±±Î³£©»òS£¨ÄÏÎ³£©");
+        System.out.println("×Ö¶Î5£º¾­¶Èdddmm.mmmm £¬¶È·Ö¸ñÊ½£¨Ç°µ¼Î»Êı²»×ãÔò²¹0£©");
+        System.out.println("×Ö¶Î6£º¾­¶ÈE£¨¶«¾­£©»òW£¨Î÷¾­£©");
+        System.out.println("×Ö¶Î7£ºËÙ¶È£¬½Ú£¬ Knots");
+        System.out.println("×Ö¶Î8£º·½Î»½Ç£¬¶È");
+        System.out.println("×Ö¶Î9£ºUTCÈÕÆÚ£¬ DDMMYY ¸ñÊ½");
+        System.out.println("×Ö¶Î10£º´ÅÆ«½Ç£¬£¨ 000 - 180 £©¶È£¨Ç°µ¼Î»Êı²»×ãÔò²¹0£©");
+        System.out.println("×Ö¶Î11£º´ÅÆ«½Ç·½Ïò£¬ E=¶«W=Î÷");
+        System.out.println("×Ö¶Î12£ºFAA mode indicator (NMEA 2.3 and later)  N=none  A=auto?");
         System.out.println();
 
 
@@ -425,36 +425,36 @@ public class J4_IssueTip {
     }
 
     static void  GPS_Shell_Code_Tip(){
-        System.out.println("â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• GPS shell å‘½ä»¤ adb shell cmd location xxxx â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•");
-        System.out.println("ã€ ADB Location ç‹¬ç«‹ å‘½ä»¤ å¸®åŠ©æ–‡æ¡£  /frameworks/base/services/core/java/com/android/server/location/LocationShellCommand.java ã€‘");
+        System.out.println("¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T GPS shell ÃüÁî adb shell cmd location xxxx ¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T");
+        System.out.println("¡¾ ADB Location ¶ÀÁ¢ ÃüÁî °ïÖúÎÄµµ  /frameworks/base/services/core/java/com/android/server/location/LocationShellCommand.java ¡¿");
         System.out.println("adb root & adb shell cmd location -h");
         System.out.println("adb root & adb shell cmd -l");
         System.out.println();
-        System.out.println("adb shell setprop log.tag.GnssLocationProvider D    ã€ŠTAG å¯è§ã€‹");
+        System.out.println("adb shell setprop log.tag.GnssLocationProvider D    ¡¶TAG ¿É¼û¡·");
         System.out.println("adb shell setprop log.tag.NtpTimeHelper D");
         System.out.println("adb logcat | grep -E \"GnssLocationProvider|NtpTimeHelper\"");
         System.out.println();
         System.out.println();
-        System.out.println("ã€å†·å¯åŠ¨  æ¸©å¯åŠ¨  çƒ­å¯åŠ¨ ã€‘");
-        System.out.println("çƒ­å¯åŠ¨ï¼šå°±æ˜¯åœ¨ä¸Šä¸€æ¬¡GPSå®šä½åˆ°çš„æƒ…å†µä¸‹ã€‚å…³æ‰GPSï¼Œç„¶åå†æ‰“å¼€ï¼Œç„¶åæ‰“å¼€GPSå»å®šä½ã€‚ä¸€èˆ¬3ç§’å·¦å³");
+        System.out.println("¡¾ÀäÆô¶¯  ÎÂÆô¶¯  ÈÈÆô¶¯ ¡¿");
+        System.out.println("ÈÈÆô¶¯£º¾ÍÊÇÔÚÉÏÒ»´ÎGPS¶¨Î»µ½µÄÇé¿öÏÂ¡£¹ØµôGPS£¬È»ºóÔÙ´ò¿ª£¬È»ºó´ò¿ªGPSÈ¥¶¨Î»¡£Ò»°ã3Ãë×óÓÒ");
         System.out.println("nothing to do");
         System.out.println();
-        System.out.println("æ¸©å¯åŠ¨ï¼šå°±æ˜¯åœ¨ä¸Šä¸€æ¬¡GPSå®šä½åˆ°çš„æƒ…å†µä¸‹ã€‚å…³æ‰GPSï¼Œç„¶åæ¸…é™¤æ˜Ÿå†æ•°æ®ï¼Œç„¶åæ‰“å¼€GPSå»å®šä½ã€‚ä¸€èˆ¬30ç§’å·¦å³");
+        System.out.println("ÎÂÆô¶¯£º¾ÍÊÇÔÚÉÏÒ»´ÎGPS¶¨Î»µ½µÄÇé¿öÏÂ¡£¹ØµôGPS£¬È»ºóÇå³ıĞÇÀúÊı¾İ£¬È»ºó´ò¿ªGPSÈ¥¶¨Î»¡£Ò»°ã30Ãë×óÓÒ");
         System.out.println("adb root & adb shell cmd  location send-extra-command gps delete_aiding_data  --ez ephemeris      true");
         System.out.println();
-        System.out.println("å†·å¯åŠ¨ï¼šå°±æ˜¯åœ¨ä¸Šä¸€æ¬¡GPSå®šä½åˆ°çš„æƒ…å†µä¸‹ã€‚å…³æ‰GPSï¼Œç„¶åæ¸…é™¤æ‰€æœ‰æ•°æ®ï¼Œç„¶åé‡å¯æ‰‹æœºï¼ˆæœ‰çš„æ‰‹æœºéœ€è¦ï¼‰ï¼Œç„¶åæ‰“å¼€GPSå»å®šä½ã€‚æ—¶é—´æœ€é•¿");
+        System.out.println("ÀäÆô¶¯£º¾ÍÊÇÔÚÉÏÒ»´ÎGPS¶¨Î»µ½µÄÇé¿öÏÂ¡£¹ØµôGPS£¬È»ºóÇå³ıËùÓĞÊı¾İ£¬È»ºóÖØÆôÊÖ»ú£¨ÓĞµÄÊÖ»úĞèÒª£©£¬È»ºó´ò¿ªGPSÈ¥¶¨Î»¡£Ê±¼ä×î³¤");
         System.out.println("adb root & adb shell cmd  location send-extra-command gps delete_aiding_data");
         System.out.println();
-        System.out.println("ã€GPS ä½ç½®æ¨¡å¼å¼€å…³ ã€‘");
-        System.out.println("adb root & adb shell cmd  location set-location-enabled  true                       ã€Šæ‰“å¼€å®šä½æ¨¡å¼ã€‹");
-        System.out.println("adb root & adb shell cmd  location set-location-enabled  false                      ã€Šå…³é—­å®šä½æ¨¡å¼ã€‹");
+        System.out.println("¡¾GPS Î»ÖÃÄ£Ê½¿ª¹Ø ¡¿");
+        System.out.println("adb root & adb shell cmd  location set-location-enabled  true                       ¡¶´ò¿ª¶¨Î»Ä£Ê½¡·");
+        System.out.println("adb root & adb shell cmd  location set-location-enabled  false                      ¡¶¹Ø±Õ¶¨Î»Ä£Ê½¡·");
         System.out.println();
-        System.out.println("ã€ LocationManagerService.java -> boolean sendExtraCommand(String provider, String command, Bundle extras) ã€‘");
-        System.out.println("adb root & adb shell cmd  location send-extra-command gps force_time_injection      ã€ŠGnssLocationProvider.java -> deleteAidingData(extras) -> NtpTimeHelper.java -> retrieveAndInjectNtpTime()  è¯·æ±‚æ›´æ–° NTP time Network Time Protocol æ—¶é—´åŒæ­¥æ•°æ®åˆ°GPSèŠ¯ç‰‡ã€‹");
+        System.out.println("¡¾ LocationManagerService.java -> boolean sendExtraCommand(String provider, String command, Bundle extras) ¡¿");
+        System.out.println("adb root & adb shell cmd  location send-extra-command gps force_time_injection      ¡¶GnssLocationProvider.java -> deleteAidingData(extras) -> NtpTimeHelper.java -> retrieveAndInjectNtpTime()  ÇëÇó¸üĞÂ NTP time Network Time Protocol Ê±¼äÍ¬²½Êı¾İµ½GPSĞ¾Æ¬¡·");
         System.out.println();
-        System.out.println("adb root & adb shell cmd  location send-extra-command gps force_psds_injection      ã€ŠGnssLocationProvider.java ->  boolean mSupportsPsds -> psdsDownloadRequest() è¯·æ±‚ä½¿ç”¨é¢„ç½®çš„è¾…åŠ©å®šä½æ•°æ®åˆ°GPSèŠ¯ç‰‡ã€‹");
+        System.out.println("adb root & adb shell cmd  location send-extra-command gps force_psds_injection      ¡¶GnssLocationProvider.java ->  boolean mSupportsPsds -> psdsDownloadRequest() ÇëÇóÊ¹ÓÃÔ¤ÖÃµÄ¸¨Öú¶¨Î»Êı¾İµ½GPSĞ¾Æ¬¡·");
         System.out.println();
-        System.out.println("adb root & adb shell cmd  location send-extra-command gps delete_aiding_data        ã€ŠGnssLocationProvider.java ->    requestUtcTime()   è¯·æ±‚åˆ é™¤é¢„ç½®çš„è¾…åŠ©å®šä½æ•°æ®ã€‹");
+        System.out.println("adb root & adb shell cmd  location send-extra-command gps delete_aiding_data        ¡¶GnssLocationProvider.java ->    requestUtcTime()   ÇëÇóÉ¾³ıÔ¤ÖÃµÄ¸¨Öú¶¨Î»Êı¾İ¡·");
         System.out.println();
         System.out.println("adb root & adb shell cmd  location send-extra-command gps delete_aiding_data  --ez ephemeris      true");
         System.out.println("adb root & adb shell cmd  location send-extra-command gps delete_aiding_data  --ez almanac        true");
@@ -477,19 +477,19 @@ public class J4_IssueTip {
 
     }
     static void  WIFI_Shell_Code_Tip(){
-        System.out.println("â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• WIFI shell å‘½ä»¤ adb shell cmd wifi xxxx â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•");
-        System.out.println("ã€ ADB WIFI ç‹¬ç«‹ å‘½ä»¤ å¸®åŠ©æ–‡æ¡£  /frameworks/opt/net/wifi/service/java/com/android/server/wifi/WifiShellCommand.java ã€‘");
+        System.out.println("¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T WIFI shell ÃüÁî adb shell cmd wifi xxxx ¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T");
+        System.out.println("¡¾ ADB WIFI ¶ÀÁ¢ ÃüÁî °ïÖúÎÄµµ  /frameworks/opt/net/wifi/service/java/com/android/server/wifi/WifiShellCommand.java ¡¿");
         System.out.println("adb root & adb shell cmd wifi -h");
-        System.out.println("adb root & adb shell cmd -l      ã€ŠæŸ¥è¯¢å½“å‰adb shell cmd serviceã€‹");
+        System.out.println("adb root & adb shell cmd -l      ¡¶²éÑ¯µ±Ç°adb shell cmd service¡·");
         System.out.println();
-        System.out.println("ã€è·å–è®¾ç½® IPR æ–­è¿å¼€å…³  ClientModeImpl.java   -ã€‹ boolean mIpReachabilityDisconnectEnabled = true; ã€‘");
-        System.out.println("adb root & adb shell cmd wifi get-ipreach-disconnect       ã€ŠIPREACH_DISCONNECT state is true || IPREACH_DISCONNECT state is falseã€‹");
+        System.out.println("¡¾»ñÈ¡ÉèÖÃ IPR ¶ÏÁ¬¿ª¹Ø  ClientModeImpl.java   -¡· boolean mIpReachabilityDisconnectEnabled = true; ¡¿");
+        System.out.println("adb root & adb shell cmd wifi get-ipreach-disconnect       ¡¶IPREACH_DISCONNECT state is true || IPREACH_DISCONNECT state is false¡·");
         System.out.println("adb root & adb shell cmd wifi set-ipreach-disconnect enabled");
         System.out.println("adb root & adb shell cmd wifi set-ipreach-disconnect disabled");
         System.out.println();
-        System.out.println("ã€è·å–è®¾ç½® æ£€æµ‹rssiä¿¡å·é—´éš”  ClientModeImpl.java   -ã€‹ int mPollRssiIntervalMsecs = -1;ã€‘");
-        System.out.println("ã€å¯é€‰å€¼ R.integer.config_wifiPollRssiIntervalMilliseconds = 3000  , int MAXIMUM_POLL_RSSI_INTERVAL_MSECS = 6000; ã€‘");
-        System.out.println("adb root & adb shell cmd wifi get-poll-rssi-interval-msecs          ã€Šè·å–é—´éš”æ—¶é—´ã€‹");
+        System.out.println("¡¾»ñÈ¡ÉèÖÃ ¼ì²ârssiĞÅºÅ¼ä¸ô  ClientModeImpl.java   -¡· int mPollRssiIntervalMsecs = -1;¡¿");
+        System.out.println("¡¾¿ÉÑ¡Öµ R.integer.config_wifiPollRssiIntervalMilliseconds = 3000  , int MAXIMUM_POLL_RSSI_INTERVAL_MSECS = 6000; ¡¿");
+        System.out.println("adb root & adb shell cmd wifi get-poll-rssi-interval-msecs          ¡¶»ñÈ¡¼ä¸ôÊ±¼ä¡·");
         System.out.println("adb root & adb shell cmd wifi set-poll-rssi-interval-msecs 1000");
         System.out.println("adb root & adb shell cmd wifi set-poll-rssi-interval-msecs 2000");
         System.out.println("adb root & adb shell cmd wifi set-poll-rssi-interval-msecs 3000");
@@ -497,52 +497,52 @@ public class J4_IssueTip {
         System.out.println("adb root & adb shell cmd wifi set-poll-rssi-interval-msecs 5000");
         System.out.println();
         System.out.println();
-        System.out.println("ã€ä¸€èˆ¬è·å–ä¿¡æ¯å‘½ä»¤é›†åˆ ã€‘");
+        System.out.println("¡¾Ò»°ã»ñÈ¡ĞÅÏ¢ÃüÁî¼¯ºÏ ¡¿");
         System.out.println("adb root & adb shell cmd wifi  get-ipreach-disconnect");
         System.out.println("adb root & adb shell cmd wifi  set-ipreach-disconnect enabled");
-        System.out.println("adb root & adb shell cmd wifi  set-ipreach-disconnect disabled     ã€ŠClientModeImpl.boolean mIpReachabilityDisconnectEnabled = trueã€‹");
+        System.out.println("adb root & adb shell cmd wifi  set-ipreach-disconnect disabled     ¡¶ClientModeImpl.boolean mIpReachabilityDisconnectEnabled = true¡·");
         System.out.println();
         System.out.println("adb root & adb shell cmd wifi  get-poll-rssi-interval-msecs");
-        System.out.println("adb root & adb shell cmd wifi  set-poll-rssi-interval-msecs 2000   ã€ŠClientModeImpl.int mPollRssiIntervalMsecs = 3000;ã€‹");
+        System.out.println("adb root & adb shell cmd wifi  set-poll-rssi-interval-msecs 2000   ¡¶ClientModeImpl.int mPollRssiIntervalMsecs = 3000;¡·");
         System.out.println();
         System.out.println("adb root & adb shell cmd wifi  get-country-code");
-        System.out.println("adb root & adb shell cmd wifi  force-country-code enabled cn       ã€ŠWifiCountryCode.String mTelephonyCountryCode , mDriverCountryCode , mDefaultCountryCode ã€‹");
+        System.out.println("adb root & adb shell cmd wifi  force-country-code enabled cn       ¡¶WifiCountryCode.String mTelephonyCountryCode , mDriverCountryCode , mDefaultCountryCode ¡·");
         System.out.println();
         System.out.println("adb root & adb shell cmd wifi  force-hi-perf-mode enable");
         System.out.println("adb root & adb shell cmd wifi  force-hi-perf-mode disabled");
         System.out.println("adb root & adb shell cmd wifi  force-low-latency-mode enabled");
-        System.out.println("adb root & adb shell cmd wifi  force-low-latency-mode disabled     ã€ŠWifiLockManager.boolean mForceHiPerfMode = false , mForceLowLatencyMode = falseã€‹");
+        System.out.println("adb root & adb shell cmd wifi  force-low-latency-mode disabled     ¡¶WifiLockManager.boolean mForceHiPerfMode = false , mForceLowLatencyMode = false¡·");
         System.out.println();
         System.out.println("adb root & adb shell cmd wifi  set-wifi-enabled enabled");
-        System.out.println("adb root & adb shell cmd wifi  set-wifi-enabled disabled           ã€ŠWifiServiceImpl.setWifiEnabled() -> WifiSettingsStore.int mPersistWifiState = 0 (0_disable,1_enable,2_é£è¡Œæ¨¡å¼å…³é—­å¯¼è‡´enable,3_é£è¡Œæ¨¡å¼å¼€å¯å¯¼è‡´disable)ã€‹");
+        System.out.println("adb root & adb shell cmd wifi  set-wifi-enabled disabled           ¡¶WifiServiceImpl.setWifiEnabled() -> WifiSettingsStore.int mPersistWifiState = 0 (0_disable,1_enable,2_·ÉĞĞÄ£Ê½¹Ø±Õµ¼ÖÂenable,3_·ÉĞĞÄ£Ê½¿ªÆôµ¼ÖÂdisable)¡·");
         System.out.println();
         System.out.println("adb root & adb shell cmd wifi  set-scan-always-available enabled");
-        System.out.println("adb root & adb shell cmd wifi  set-scan-always-available disabled  ã€ŠWifiServiceImpl.setScanAlwaysAvailable()-> WifiSettingsStore -> Settings.wifi_scan_always_enabled(Key-Str)ã€‹");
+        System.out.println("adb root & adb shell cmd wifi  set-scan-always-available disabled  ¡¶WifiServiceImpl.setScanAlwaysAvailable()-> WifiSettingsStore -> Settings.wifi_scan_always_enabled(Key-Str)¡·");
         System.out.println();
-        System.out.println("adb root & adb shell cmd wifi  list-scan-results                   ã€ŠList<ScanResult> WifiServiceImpl.getScanResults()  -> WifiThreadRunner.call( mScanRequestProxy::getScanResults )ã€‹");
+        System.out.println("adb root & adb shell cmd wifi  list-scan-results                   ¡¶List<ScanResult> WifiServiceImpl.getScanResults()  -> WifiThreadRunner.call( mScanRequestProxy::getScanResults )¡·");
         System.out.println();
-        System.out.println("adb root & adb shell cmd wifi  status                              ã€ŠWifiServiceImpl.getWifiEnabledState()  isScanAlwaysAvailable() WifiInfo->getConnectionInfo()   Network->WifiService.getCurrentNetwork()  NetworkCapabilities->ConnectivityManager.getNetworkCapabilities(network) ã€‹");
+        System.out.println("adb root & adb shell cmd wifi  status                              ¡¶WifiServiceImpl.getWifiEnabledState()  isScanAlwaysAvailable() WifiInfo->getConnectionInfo()   Network->WifiService.getCurrentNetwork()  NetworkCapabilities->ConnectivityManager.getNetworkCapabilities(network) ¡·");
         System.out.println();
         System.out.println("adb root & adb shell cmd wifi  set-verbose-logging enabled");
-        System.out.println("adb root & adb shell cmd wifi  set-verbose-logging disabled        ã€ŠWifiService.enableVerboseLogging  ( adb shell settings put global wifi_verbose_logging_enabled 1 )  ã€‹");
+        System.out.println("adb root & adb shell cmd wifi  set-verbose-logging disabled        ¡¶WifiService.enableVerboseLogging  ( adb shell settings put global wifi_verbose_logging_enabled 1 )  ¡·");
         System.out.println();
-        System.out.println("adb root & adb shell cmd wifi  list-suggestions                    ã€ŠList<WifiNetworkSuggestion> -> WifiService.getNetworkSuggestions ->   WifiNetworkSuggestionsManager.get()ã€‹");
+        System.out.println("adb root & adb shell cmd wifi  list-suggestions                    ¡¶List<WifiNetworkSuggestion> -> WifiService.getNetworkSuggestions ->   WifiNetworkSuggestionsManager.get()¡·");
         System.out.println();
         System.out.println("adb root & adb shell cmd wifi  get-wifi-watchdog");
         System.out.println("adb root & adb shell cmd wifi  set-wifi-watchdog enabled");
-        System.out.println("adb root & adb shell cmd wifi  set-wifi-watchdog disabled          ã€ŠWifiLastResortWatchdog.getWifiWatchdogFeature() -> R.bool.config_wifi_watchdog_enabled ã€‹");
+        System.out.println("adb root & adb shell cmd wifi  set-wifi-watchdog disabled          ¡¶WifiLastResortWatchdog.getWifiWatchdogFeature() -> R.bool.config_wifi_watchdog_enabled ¡·");
         System.out.println();
-        System.out.println("adb root & adb shell cmd wifi  get-softap-supported-features       ã€ŠApConfigUtil.isAcsSupported() ApConfigUtil.isWpa3SaeSupported() ã€‹");
+        System.out.println("adb root & adb shell cmd wifi  get-softap-supported-features       ¡¶ApConfigUtil.isAcsSupported() ApConfigUtil.isWpa3SaeSupported() ¡·");
         System.out.println();
-        System.out.println("adb root & adb shell cmd wifi  list-requests                       ã€ŠWifiShellCommand.ConcurrentHashMap<String, Pair<NetworkRequest, ConnectivityManager.NetworkCallback>> sActiveRequestsã€‹");
-        System.out.println();
-        System.out.println();
+        System.out.println("adb root & adb shell cmd wifi  list-requests                       ¡¶WifiShellCommand.ConcurrentHashMap<String, Pair<NetworkRequest, ConnectivityManager.NetworkCallback>> sActiveRequests¡·");
         System.out.println();
         System.out.println();
         System.out.println();
-        System.out.println("ã€ä¸€èˆ¬æ“ä½œWIFIé›†åˆ ã€‘");
+        System.out.println();
+        System.out.println();
+        System.out.println("¡¾Ò»°ã²Ù×÷WIFI¼¯ºÏ ¡¿");
         System.out.println("adb root & adb shell cmd wifi  start-scan");
-        System.out.println("adb root & adb shell cmd wifi  set-connected-score 60     ã€Š0 - 60ã€‹");
+        System.out.println("adb root & adb shell cmd wifi  set-connected-score 60     ¡¶0 - 60¡·");
         System.out.println("adb root & adb shell cmd wifi  connect-network   <ssid> open|owe|wpa2|wpa3 [<passphrase>] [-m] [-d] [-b <bssid>]");
         System.out.println("adb root & adb shell cmd wifi  add-network       <ssid> open|owe|wpa2|wpa3 [<passphrase>] [-m] [-d] [-b <bssid>]");
         System.out.println("adb root & adb shell cmd wifi  forget-network    <networkId>");
@@ -561,7 +561,7 @@ public class J4_IssueTip {
         System.out.println("adb root & adb shell cmd wifi  imsi-protection-exemption-clear-user-approved-for-carrier <carrier id>");
         System.out.println("adb root & adb shell cmd wifi  network-requests-remove-user-approved-access-points <package name>");
         System.out.println("adb root & adb shell cmd wifi  clear-user-disabled-networks");
-        System.out.println("adb root & adb shell cmd wifi  send-link-probe    ã€Šæ‰‹åŠ¨å‘é€ä¸€ä¸ªprobeè¯·æ±‚ã€‹");
+        System.out.println("adb root & adb shell cmd wifi  send-link-probe    ¡¶ÊÖ¶¯·¢ËÍÒ»¸öprobeÇëÇó¡·");
         System.out.println("adb root & adb shell cmd wifi  force-softap-channel enabled <int>");
         System.out.println("adb root & adb shell cmd wifi  force-softap-channel enabled 2412");
         System.out.println("adb root & adb shell cmd wifi  force-softap-channel disabled <int>");
@@ -584,38 +584,38 @@ public class J4_IssueTip {
 
     }
     static void  WIFI_Issue_Tip(){
-        System.out.println("â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• WIFI PAGE â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•");
-        System.out.println("ã€æ‰“å¼€wifiå‘½ä»¤ã€‘  adb shell svc wifi enable");
-        System.out.println("ã€å…³é—­wifiå‘½ä»¤ã€‘  adb shell svc wifi disable");
+        System.out.println("¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T WIFI PAGE ¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T");
+        System.out.println("¡¾´ò¿ªwifiÃüÁî¡¿  adb shell svc wifi enable");
+        System.out.println("¡¾¹Ø±ÕwifiÃüÁî¡¿  adb shell svc wifi disable");
         System.out.println();
         System.out.println();
-        System.out.println("ã€WIFI-Verbose å¼€å…³ã€‘");
+        System.out.println("¡¾WIFI-Verbose ¿ª¹Ø¡¿");
         System.out.println("adb shell settings get global wifi_verbose_logging_enabled 0");
         System.out.println("adb shell settings put global wifi_verbose_logging_enabled 0");
         System.out.println("adb shell settings put global wifi_verbose_logging_enabled 1");
         System.out.println();
-        System.out.println("ã€WIFIè¯¦æƒ…å¼€å…³æè¿°ã€‘");
+        System.out.println("¡¾WIFIÏêÇé¿ª¹ØÃèÊö¡¿");
         System.out.println("Settings >System > About phone > tap \"Build number\" 4 times >Developer options");
         System.out.println("Setting > System > Advanced > Developer options >Enable WiFi Verbose Logging  [toogle open]");
         System.out.println();
-        System.out.println("ã€Passpoint-simå¼€å…³ã€‘");
+        System.out.println("¡¾Passpoint-sim¿ª¹Ø¡¿");
         System.out.println("adb shell settings get global hs20_mncmcc_retail_saved_state");
         System.out.println("adb shell settings put global hs20_mncmcc_retail_saved_state 0");
         System.out.println("adb shell settings put global hs20_mncmcc_retail_saved_state 1");
         System.out.println();
-        System.out.println("ã€ wifi-service.jar  pushå‘½ä»¤ã€‘");
-        System.out.println("adb root && adb remount && adb shell settings put global wifi_verbose_logging_enabled 1 && adb push .\\wifi-service.jar /system/framework/   ##### è¿ç»­é‡å¯ä¸¤é?");
+        System.out.println("¡¾ wifi-service.jar  pushÃüÁî¡¿");
+        System.out.println("adb root && adb remount && adb shell settings put global wifi_verbose_logging_enabled 1 && adb push .\\wifi-service.jar /system/framework/   ##### Á¬ĞøÖØÆôÁ½±é?");
         System.out.println();
-        System.out.println("ã€å¹¿æ’­å¯åŠ¨åˆ°WIFIè®¾ç½®ç•Œé¢ã€‘");
+        System.out.println("¡¾¹ã²¥Æô¶¯µ½WIFIÉèÖÃ½çÃæ¡¿");
         System.out.println("adb shell am start -a android.settings.WIFI_SETTINGS");
         System.out.println();
         System.out.println();
-        System.out.println("ã€WIFI çŠ¶æ€å˜åŒ–å¹¿æ’­ã€‘");
-        System.out.println("adb shell am broadcast -a com.Android.test --es<string> test_string \"this is test string\" â€”ei<int> test_int 100 â€”ez<boolean> test_boolean true");
-        System.out.println("ã€ -a com.Android.test  åŒ…å.Actionçš„å½¢å¼ ã€‘");
-        System.out.println("ã€ --es \"test_string\" \"this is test string\"    æŒ‡å®šå¹¿æ’­ä¸­æºå¸¦å­—ç¬¦ä¸² å­—ç¬¦ä¸²åç§°ä¸º test_string åé¢ä¸ºå€¼Value  ã€‘");
-        System.out.println("ã€ --ei test_int 100    æŒ‡å®šå¹¿æ’­ä¸­æºå¸¦intæ•´å½¢  intåç§°ä¸º test_int åé¢ä¸ºå€¼Value ä¸º 100 ã€‘");
-        System.out.println("ã€ --ez test_boolean true    æŒ‡å®šå¹¿æ’­ä¸­æºå¸¦booleanå˜é‡   booleanåç§°ä¸º test_boolean åé¢ä¸ºå€¼Value ä¸º true ã€‘");
+        System.out.println("¡¾WIFI ×´Ì¬±ä»¯¹ã²¥¡¿");
+        System.out.println("adb shell am broadcast -a com.Android.test --es<string> test_string \"this is test string\" ¡ªei<int> test_int 100 ¡ªez<boolean> test_boolean true");
+        System.out.println("¡¾ -a com.Android.test  °üÃû.ActionµÄĞÎÊ½ ¡¿");
+        System.out.println("¡¾ --es \"test_string\" \"this is test string\"    Ö¸¶¨¹ã²¥ÖĞĞ¯´ø×Ö·û´® ×Ö·û´®Ãû³ÆÎª test_string ºóÃæÎªÖµValue  ¡¿");
+        System.out.println("¡¾ --ei test_int 100    Ö¸¶¨¹ã²¥ÖĞĞ¯´øintÕûĞÎ  intÃû³ÆÎª test_int ºóÃæÎªÖµValue Îª 100 ¡¿");
+        System.out.println("¡¾ --ez test_boolean true    Ö¸¶¨¹ã²¥ÖĞĞ¯´øboolean±äÁ¿   booleanÃû³ÆÎª test_boolean ºóÃæÎªÖµValue Îª true ¡¿");
         System.out.println("adb shell am broadcast -a \"Android.net.wifi.WIFI_STATE_CHANGED\"  --ei \"wifi_state\" 0");
         System.out.println("adb shell am broadcast -a \"Android.net.wifi.WIFI_STATE_CHANGED\"  --ei \"wifi_state\" 1");
         System.out.println("adb shell am broadcast -a \"Android.net.wifi.WIFI_STATE_CHANGED\"  --ei \"wifi_state\" 2");
@@ -628,62 +628,62 @@ public class J4_IssueTip {
         System.out.println("WifiManager.WIFI_STATE_UNKNOWN==4");
         System.out.println();
         System.out.println();
-        System.out.println("ã€IPRæ–­çº¿é—®é¢˜ã€‘");
-        System.out.println("é—®é¢˜ç°è±¡ï¼šç»ˆç«¯è®¾å¤‡è¿ç»­ä¸‰æ¬¡å‘é€arp requestè€Œç½‘å…³æ— å›å¤ï¼Œè§¦å‘ç»ˆç«¯è®¾å¤‡ä¸»åŠ¨æ–­å¼€æ— çº¿è¿æ¥");
-        System.out.println("æ ¹æœ¬åŸå› ï¼šåä¸ºç½‘å…³äº¤æ¢æœºCPU-defendå®‰å…¨é˜²æŠ¤æœºåˆ¶è§¦å‘è€Œå¯¼è‡´arp requestæŠ¥æ–‡ä¸¢å¼ƒ");
-        System.out.println("åŸå› åˆ†æï¼š");
-        System.out.println("1. åä¸ºäº¤æ¢æœºé»˜è®¤å¯ç”¨CPU-defendæœºåˆ¶ï¼Œè¯¥æœºåˆ¶èƒ½é˜²æ­¢äº¤æ¢æœºå› ä¸ºé¢‘ç¹å“åº”arp requestæŠ¥æ–‡å¯¼è‡´çš„CPUåˆ©ç”¨ç‡å¼‚å¸¸é£™é«˜ï¼›");
-        System.out.println("2. å½“ç»ˆç«¯è®¾å¤‡arpæŠ¥æ–‡è¾¾åˆ°é»˜è®¤é˜ˆå€¼ä¸Šé™ï¼Œå°±ä¼šè§¦å‘åä¸ºCPU-defendï¼Œå¯¹è¶…å‡ºé˜ˆå€¼çš„arp requestæŠ¥æ–‡ä¸è¿›è¡Œå“åº”ï¼Œç›´æ¥dropï¼›");
-        System.out.println("3. å®¢æˆ·ç«¯è®¾å¤‡çš„arpè€åŒ–æ—¶é—´æ˜¯ä¸º30sï¼Œå› æ­¤å®¢æˆ·ç«¯arp requestæŠ¥æ–‡æ˜¯30så‘é€ä¸€ä¸ªï¼Œè€Œæ— çº¿ç”¨æˆ·çš„arpæŠ¥æ–‡éƒ½æ˜¯ç”±æ— çº¿æ§åˆ¶å™¨è½¬å‘ï¼Œæ‰€ä»¥åœ¨ç”¨æˆ·å¤šçš„æ—¶å€™æ‰çº¿é—®é¢˜å¾ˆå®¹æ˜“å¤ç°ï¼Œç”¨æˆ·å°‘çš„æ—¶å€™åˆ™æ— æ³•å¤ç°ï¼›");
-        System.out.println("4. æ­£å¸¸æƒ…å†µä¸‹arp requestæŠ¥æ–‡çš„ä¸¢å¼ƒå¹¶ä¸å½±å“ç”¨æˆ·çš„æ­£å¸¸ç½‘ç»œä½¿ç”¨ï¼›");
-        System.out.println("5. ç”±äºé¢‘ç¹arp requestæ˜¯ç½‘ç»œä¸­ARPæ”»å‡»è¡Œä¸ºçš„å…¸å‹è¡¨ç°ï¼Œå› æ­¤ä¸æ­¢åä¸ºè®¾å¤‡ï¼Œå…¶ä»–å‚å•†è®¾å¤‡ä¹Ÿä¼šæœ‰ç±»ä¼¼çš„arpå®‰å…¨é˜²æŠ¤æœºåˆ¶ï¼Œå”¯ä¸€çš„ä¸åŒåªæ˜¯å„å‚å•†çš„arpæŠ¥æ–‡ä¸¢å¼ƒé»˜è®¤é˜ˆå€¼è®¾ç½®ä¸åŒã€‚");
+        System.out.println("¡¾IPR¶ÏÏßÎÊÌâ¡¿");
+        System.out.println("ÎÊÌâÏÖÏó£ºÖÕ¶ËÉè±¸Á¬ĞøÈı´Î·¢ËÍarp request¶øÍø¹ØÎŞ»Ø¸´£¬´¥·¢ÖÕ¶ËÉè±¸Ö÷¶¯¶Ï¿ªÎŞÏßÁ¬½Ó");
+        System.out.println("¸ù±¾Ô­Òò£º»ªÎªÍø¹Ø½»»»»úCPU-defend°²È«·À»¤»úÖÆ´¥·¢¶øµ¼ÖÂarp request±¨ÎÄ¶ªÆú");
+        System.out.println("Ô­Òò·ÖÎö£º");
+        System.out.println("1. »ªÎª½»»»»úÄ¬ÈÏÆôÓÃCPU-defend»úÖÆ£¬¸Ã»úÖÆÄÜ·ÀÖ¹½»»»»úÒòÎªÆµ·±ÏìÓ¦arp request±¨ÎÄµ¼ÖÂµÄCPUÀûÓÃÂÊÒì³£ì­¸ß£»");
+        System.out.println("2. µ±ÖÕ¶ËÉè±¸arp±¨ÎÄ´ïµ½Ä¬ÈÏãĞÖµÉÏÏŞ£¬¾Í»á´¥·¢»ªÎªCPU-defend£¬¶Ô³¬³öãĞÖµµÄarp request±¨ÎÄ²»½øĞĞÏìÓ¦£¬Ö±½Ódrop£»");
+        System.out.println("3. ¿Í»§¶ËÉè±¸µÄarpÀÏ»¯Ê±¼äÊÇÎª30s£¬Òò´Ë¿Í»§¶Ëarp request±¨ÎÄÊÇ30s·¢ËÍÒ»¸ö£¬¶øÎŞÏßÓÃ»§µÄarp±¨ÎÄ¶¼ÊÇÓÉÎŞÏß¿ØÖÆÆ÷×ª·¢£¬ËùÒÔÔÚÓÃ»§¶àµÄÊ±ºòµôÏßÎÊÌâºÜÈİÒ×¸´ÏÖ£¬ÓÃ»§ÉÙµÄÊ±ºòÔòÎŞ·¨¸´ÏÖ£»");
+        System.out.println("4. Õı³£Çé¿öÏÂarp request±¨ÎÄµÄ¶ªÆú²¢²»Ó°ÏìÓÃ»§µÄÕı³£ÍøÂçÊ¹ÓÃ£»");
+        System.out.println("5. ÓÉÓÚÆµ·±arp requestÊÇÍøÂçÖĞARP¹¥»÷ĞĞÎªµÄµäĞÍ±íÏÖ£¬Òò´Ë²»Ö¹»ªÎªÉè±¸£¬ÆäËû³§ÉÌÉè±¸Ò²»áÓĞÀàËÆµÄarp°²È«·À»¤»úÖÆ£¬Î¨Ò»µÄ²»Í¬Ö»ÊÇ¸÷³§ÉÌµÄarp±¨ÎÄ¶ªÆúÄ¬ÈÏãĞÖµÉèÖÃ²»Í¬¡£");
         System.out.println("IKLOCSEN-2833");
         System.out.println();
         System.out.println();
 
         System.out.println();
-        System.out.println("ã€ WIFI DUMP ç›¸å…³å‘½ä»¤ã€‘");
-        System.out.println("adb shell dumpsys wifi         > wifi.txt                 # ã€æŸ¥çœ‹å½“å‰ wifi æœåŠ¡æƒ…å†µ ã€‘");
-        System.out.println("adb shell dumpsys wifiscanner  > wifiscanner.txt          # ã€æŸ¥çœ‹å½“å‰ wifiscanner æ‰«ææœåŠ¡æƒ…å†µ ã€‘");
-        System.out.println("adb shell dumpsys connectivity > connectivity.txt         # ã€æŸ¥çœ‹å½“å‰ connectivity æœåŠ¡æƒ…å†µ ã€‘");
-        System.out.println("adb shell dumpsys connmetrics  > connmetrics.txt          # ã€æŸ¥çœ‹å½“å‰ connmetrics æœåŠ¡æƒ…å†µ  æ–­çº¿ æ— ç½‘  ã€‘");
-        System.out.println("adb shell dumpsys netstats     > netstats.txt             # ã€æŸ¥çœ‹å½“å‰ netstats æœåŠ¡æƒ…å†µ ã€‘");
+        System.out.println("¡¾ WIFI DUMP Ïà¹ØÃüÁî¡¿");
+        System.out.println("adb shell dumpsys wifi         > wifi.txt                 # ¡¾²é¿´µ±Ç° wifi ·şÎñÇé¿ö ¡¿");
+        System.out.println("adb shell dumpsys wifiscanner  > wifiscanner.txt          # ¡¾²é¿´µ±Ç° wifiscanner É¨Ãè·şÎñÇé¿ö ¡¿");
+        System.out.println("adb shell dumpsys connectivity > connectivity.txt         # ¡¾²é¿´µ±Ç° connectivity ·şÎñÇé¿ö ¡¿");
+        System.out.println("adb shell dumpsys connmetrics  > connmetrics.txt          # ¡¾²é¿´µ±Ç° connmetrics ·şÎñÇé¿ö  ¶ÏÏß ÎŞÍø  ¡¿");
+        System.out.println("adb shell dumpsys netstats     > netstats.txt             # ¡¾²é¿´µ±Ç° netstats ·şÎñÇé¿ö ¡¿");
         System.out.println();
     }
 
 
 
     static void  GPS_Issue_Tip(){
-        System.out.println("â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• GPS PAGE â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•");
-        System.out.println("ã€è®¾ç½®ä½ç½®æ¨¡å¼ 0-å…³é—­ä½ç½®æ¨¡å¼ 1-æ‰“å¼€ä½ç½®æ¨¡å¼ 2-æ‰“å¼€çœç”µä½ç½®æ¨¡å¼ 3-æ‰“å¼€é«˜æ€§èƒ½ä½ç½®æ¨¡å¼ ã€‘");
+        System.out.println("¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T GPS PAGE ¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T");
+        System.out.println("¡¾ÉèÖÃÎ»ÖÃÄ£Ê½ 0-¹Ø±ÕÎ»ÖÃÄ£Ê½ 1-´ò¿ªÎ»ÖÃÄ£Ê½ 2-´ò¿ªÊ¡µçÎ»ÖÃÄ£Ê½ 3-´ò¿ª¸ßĞÔÄÜÎ»ÖÃÄ£Ê½ ¡¿");
         System.out.println("adb shell settings get secure location_mode");
         System.out.println("adb shell settings put secure location_mode 0");
         System.out.println("adb shell settings put secure location_mode 1");
         System.out.println("adb shell settings put secure location_mode 2");
         System.out.println("adb shell settings put secure location_mode 3");
         System.out.println();
-        System.out.println("ã€WIFI-Scan WIFIæ‰«æå®šä½  0-å…³é—­WIFIæ‰«æå®šä½  1-å¼€å¯WIFIæ‰«æå®šä½ ã€‘");
+        System.out.println("¡¾WIFI-Scan WIFIÉ¨Ãè¶¨Î»  0-¹Ø±ÕWIFIÉ¨Ãè¶¨Î»  1-¿ªÆôWIFIÉ¨Ãè¶¨Î» ¡¿");
         System.out.println("adb shell settings get global wifi_scan_always_enabled");
         System.out.println("adb shell settings put global wifi_scan_always_enabled  0");
         System.out.println("adb shell settings put global wifi_scan_always_enabled  1");
         System.out.println();
         System.out.println();
-        System.out.println("ã€BT-Scan BTæ‰«æå®šä½  0-å…³é—­BTæ‰«æå®šä½  1-å¼€å¯BTæ‰«æå®šä½ ã€‘");
+        System.out.println("¡¾BT-Scan BTÉ¨Ãè¶¨Î»  0-¹Ø±ÕBTÉ¨Ãè¶¨Î»  1-¿ªÆôBTÉ¨Ãè¶¨Î» ¡¿");
         System.out.println("adb shell settings get global ble_scan_always_enabled");
         System.out.println("adb shell settings put global ble_scan_always_enabled   0");
         System.out.println("adb shell settings put global ble_scan_always_enabled   1");
         System.out.println();
         System.out.println();
-        System.out.println("ã€APPçš„ GPSå®šä½æƒé™æŸ¥æ‰¾:ã€‘");
-        System.out.println("æœç´¢bugreport.txt  å…³é”®å­— Package [åº”ç”¨åç§°]    ä¾‹å¦‚:  Package [com.whatsapp]");
+        System.out.println("¡¾APPµÄ GPS¶¨Î»È¨ÏŞ²éÕÒ:¡¿");
+        System.out.println("ËÑË÷bugreport.txt  ¹Ø¼ü×Ö Package [Ó¦ÓÃÃû³Æ]    ÀıÈç:  Package [com.whatsapp]");
         System.out.println("runtime permissions:");
-        System.out.println("android.permission.ACCESS_FINE_LOCATION: granted=true    ç²¾ç¡®ä½ç½®");
-        System.out.println("android.permission.ACCESS_COARSE_LOCATION: granted=true  æ¨¡ç³Šä½ç½®");
+        System.out.println("android.permission.ACCESS_FINE_LOCATION: granted=true    ¾«È·Î»ÖÃ");
+        System.out.println("android.permission.ACCESS_COARSE_LOCATION: granted=true  Ä£ºıÎ»ÖÃ");
         System.out.println();
-        System.out.println("ã€GPSå®šä½çš„Provideråˆ—è¡¨ã€‘");
+        System.out.println("¡¾GPS¶¨Î»µÄProviderÁĞ±í¡¿");
         System.out.println("adb shell su 0 settings get secure location_providers_allowed          ->   gps,network");
         System.out.println();
-        System.out.println("ã€GPSå®šä½çš„Provideråˆ—è¡¨ä¸­å»é™¤ networkçš„æ“ä½œ Tipã€‘");
+        System.out.println("¡¾GPS¶¨Î»µÄProviderÁĞ±íÖĞÈ¥³ı networkµÄ²Ù×÷ Tip¡¿");
         System.out.println("In order to get location details in simulated environment, please disable Network Location so test continues on GPS. Below are the steps:");
         System.out.println("(1) Go to settings->Location->Advanced->Google Location Accuracy and change it from ON to OFF");
         System.out.println("(2) adb reboot (or power cycle the device)");
@@ -695,11 +695,21 @@ public class J4_IssueTip {
         System.out.println("and it should output gps");
         System.out.println();
         System.out.println();
-        System.out.println("ã€QCAT ä¸­ Displays > QCAT Sample > GNSS > GNSS RF Bp Amp Pga Gain Data QCAT-GNSS-å¤©çº¿å¹²æ‰°ã€‘");
-        System.out.println("tip1: Bp Ampåº”è¯¥åœ¨90-350  min-max å¦åˆ™å°±æœ‰å¹²æ‰°");
-        System.out.println("tip2: åœ¨ QCATä¸­ æœç´¢ 0x1476 GNSS ç‚¹å‡» <Process> ä¹‹åé€‰ä¸­ Configuration é¢æ¿ æŸ¥çœ‹ Output Directory æ‰“å¼€è¯¥è·¯å¾„å°±æœ‰è°·æ­Œåœ°å›¾ .kml æ–‡ä»¶");
+        System.out.println("¡¾QCAT ÖĞ Displays > QCAT Sample > GNSS > GNSS RF Bp Amp Pga Gain Data QCAT-GNSS-ÌìÏß¸ÉÈÅ¡¿");
+        System.out.println("tip1: Bp AmpÓ¦¸ÃÔÚ90-350  min-max ·ñÔò¾ÍÓĞ¸ÉÈÅ");
+        System.out.println("tip2: ÔÚ QCATÖĞ ËÑË÷ 0x1476 GNSS µã»÷ <Process> Ö®ºóÑ¡ÖĞ Configuration Ãæ°å ²é¿´ Output Directory ´ò¿ª¸ÃÂ·¾¶¾ÍÓĞ¹È¸èµØÍ¼ .kml ÎÄ¼ş");
         System.out.println();
-        System.out.println("ã€Bug2go GNSS_V9.cfg æŠ“å–Modem LOG æç¤ºã€‘");
+        System.out.println("¡¾CMAS(Commercial mobile alert system)ÒÆ¶¯ÉÌÒµ±¨¾¯ÏµÍ³    WEA(Wireless Emergency Alerts)¡¿");
+        System.out.println("https://blog.csdn.net/aaa111/article/details/79361595          ÍøÒ³ËµÃ÷");
+        System.out.println("WEA ÊÇ»ùÓÚĞ¡Çø¹ã²¥·şÎñµÄ£¬ÄÇËüµÄ½ÓÊÕÒ²ÊÇºÍĞ¡Çø¹ã²¥Ò»Ñù£¨ÊÖ»ú¶Ë£©Ëü¶ÀÓĞµÄµØ·½ÔÚÓÚÒªÅäÖÃWEA Ïà¹ØµÄmids£¨Message ID£©»òÕßËµChannel ID µ½modem");
+        System.out.println("¶øModem¶ËµÄmidsÀ´Ô´ÓÚ´úÂë£¬SIM¿¨£¬NVÖµµÈ");
+        System.out.println("QCAT ÖĞËÑËÑ");
+        System.out.println("0x1386 (CGPS Report Server Tx)");
+        System.out.println("0x1387 (CGPS Report Server Rx) ½øĞĞ¹ıÂË");
+        System.out.println("0xB0ED (LTE NAS EMM Plain OTA outgoing Message)");
+        System.out.println("0xB0EC (LTE NAS EMM Plain OTA incoming Message)  ½øĞĞ¹ıÂË");
+        System.out.println();
+        System.out.println("¡¾Bug2go GNSS_V9.cfg ×¥È¡Modem LOG ÌáÊ¾¡¿");
         System.out.println("modem log was collected using QC_default.cfg as log mask, so there is very few GNSS msg in QXDM log and we can not further check it from modem perspective");
         System.out.println("( whether there is any interferance, whether HW performance is good, whether any error from modem or GNSS engine... )");
         System.out.println("can you please help to use GNSS_V9.cfg as log mask");
@@ -708,12 +718,12 @@ public class J4_IssueTip {
         System.out.println("much appreciated");
         System.out.println();
 
-        System.out.println("ã€æ‰“å°æœæ˜ŸLogã€‘");
-        System.out.println("1.æœæ˜Ÿæ…¢ å†·å¯åŠ¨æ—¶é—´è¿‡é•¿ 40+ç§’");
-        System.out.println("2.å®šä½ä¸ç²¾ç¡® å¯¼èˆªæ–¹ä½ä¸æ­£ç¡®");
-        System.out.println("3.è¾¾ä¸åˆ°æ ‡ä¹¦è¦æ±‚æƒ…å†µï¼Œå·®äºå¯¹æ¯”æœºæƒ…å†µï¼Œæ¨ªç«–å±ä¿¡å·å·®å¼‚");
+        System.out.println("¡¾´òÓ¡ËÑĞÇLog¡¿");
+        System.out.println("1.ËÑĞÇÂı ÀäÆô¶¯Ê±¼ä¹ı³¤ 40+Ãë");
+        System.out.println("2.¶¨Î»²»¾«È· µ¼º½·½Î»²»ÕıÈ·");
+        System.out.println("3.´ï²»µ½±êÊéÒªÇóÇé¿ö£¬²îÓÚ¶Ô±È»úÇé¿ö£¬ºáÊúÆÁĞÅºÅ²îÒì");
         System.out.println();
-        System.out.println("ã€æ‰“å°æœæ˜ŸLogã€‘");
+        System.out.println("¡¾´òÓ¡ËÑĞÇLog¡¿");
         System.out.println("adb logcat | grep \"Used In Fix:\"");
 
     }

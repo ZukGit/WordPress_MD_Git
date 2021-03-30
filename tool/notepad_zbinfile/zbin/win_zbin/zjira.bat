@@ -16,7 +16,7 @@ set itemPath=D:\jira_work\%input_1%\
 set itemPath_txt="D:\jira_work\%input_1%\fenxi.asm"
 echo itemPath=%itemPath%
 md %itemPath%
-echo  > %itemPath_txt%
+echo  ''> %itemPath_txt%
 notepad++.exe   %itemPath_txt%
 rem ######################################
 
@@ -33,8 +33,9 @@ pwd
 echo =============== pwd end ===============
 echo ===============  zwisl_log_search_J9 ===============
 echo  %userprofile%\Desktop\zbin\win_zbin\zwisl_log_search_J9.bat  %jira_log_path%
-%userprofile%\Desktop\zbin\win_zbin\zwisl_log_search_J9.bat  %jira_log_path%
-%userprofile%\Desktop\zbin\K2.bat 
+call %userprofile%\Desktop\zbin\win_zbin\zwisl_log_search_J9.bat  %jira_log_path% && echo ===============  notepad++ search tip =============== && %userprofile%\Desktop\zbin\K2.bat 
+
+
 goto:eof
 
 
