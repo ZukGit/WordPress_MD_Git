@@ -467,7 +467,7 @@ public class F0_RepoCommand {
                         BUILDING_COMMAND_RAW = BUILDING_COMMAND_RAW.replace("<br />", "");
                         BUILDING_COMMAND_RAW = BUILDING_COMMAND_RAW.replace("<br/>", "");
                         BUILDING_COMMAND_RAW = BUILDING_COMMAND_RAW.replace("<br>", "").trim();
-                        BUILDING_COMMAND_RAW = BUILDING_COMMAND_RAW.replace(" -jX", " -j4").trim();
+                        BUILDING_COMMAND_RAW = BUILDING_COMMAND_RAW.replace(" -jX", " -jX").trim();
                         if(!BUILDING_COMMAND_RAW.startsWith(common_BuildingCommand_TAG)){
                             BUILDING_COMMAND_RAW = BUILDING_COMMAND_RAW.substring(BUILDING_COMMAND_RAW.indexOf(common_BuildingCommand_TAG));
                         }
@@ -803,7 +803,7 @@ public class F0_RepoCommand {
             }else{
                 logname = logname+"_COMMON";
             }
-//            String str4_1 = " motorola/build/bin/build_device.bash -b nightly -p " + productName.toLowerCase().trim()  + "  -g -j4 ";
+//            String str4_1 = " motorola/build/bin/build_device.bash -b nightly -p " + productName.toLowerCase().trim()  + "  -g -jX ";
             String str4_1 =  buildList;
             String str5_1 = " 2>&1 | tee " + getTimeStampDesc() + "_" + logname + ".log";
 
@@ -813,7 +813,7 @@ public class F0_RepoCommand {
             if(!buildList.contains("-e oem-image") && !buildList.contains("-E oem-image")){
 
                 String result_new_1 = result.replace(str3_1,str3_1+" ../F0_repo_init.sh   &&  ");
-                result_new_1 = "cp  -fr ~/Deskto/zbin/F0_repo_init.sh  ../ && "+ result_new_1;
+                result_new_1 = "cp  -fr ~/Desktop/zbin/F0_repo_init.sh  ../ && "+ result_new_1;
                buildcompileList.add(result_new_1);
 //                System.out.println("result_new_1 = "+ result_new_1);
             }
@@ -821,8 +821,8 @@ public class F0_RepoCommand {
         }
         // motorola/build/bin/build_device.bash -b nightly -p lima_retail -g -jX -e oem-image
 
-        System.out.println("buildcompileList.size() = " + buildcompileList.size());
-        System.out.println("metaData.BuildingCommandList.size() = "+ metaData.BuildingCommandList.size());
+       // System.out.println("buildcompileList.size() = " + buildcompileList.size());
+      //  System.out.println("metaData.BuildingCommandList.size() = "+ metaData.BuildingCommandList.size());
         return buildcompileList;
     }
 
@@ -1020,13 +1020,13 @@ public class F0_RepoCommand {
     static String buildInitAndCompileCommand_Init_Sh(String cGitRepoName, String cManifestBranchName, String cXmlbranchName, String productName, String buildType) {
         String logname = productName + "_" + buildType;
         String result = "";
-        String str1_1 = "cp  -fr ~/Deskto/zbin/F0_repo_init.sh  ../  && "+ "export PATH=/apps/android/python-2.7.6-x64/bin:$PATH  && export PATH=/apps/android/perl-5.1aclmsx8.4-x64/bin:$PATH && ";
+        String str1_1 = "cp  -fr ~/Desktop/zbin/F0_repo_init.sh  ../  && "+ "export PATH=/apps/android/python-2.7.6-x64/bin:$PATH  && export PATH=/apps/android/perl-5.1aclmsx8.4-x64/bin:$PATH && ";
         String str1_2 = "source /opt/conf/moto.conf && ";
         String str2_1 = "repo init -u ssh://gerrit.mot.com/home/repo/dev/platform/android/platform/manifest/" + cGitRepoName.trim() + " " + "--repo-url=ssh://gerrit.mot.com/home/repo/dev/platform/android/repo.git ";
         String str2_2 = "--manifest-branch=" + cManifestBranchName.trim() + "  ";
         String str2_3 = "-m " + cXmlbranchName.trim() + "  && ";
         String str3_1 = "repo sync -j2  && repo start --all TEMP   &&  ztag_aosp_wifi_bt_gps_J6.sh  &&  ../F0_repo_init.sh && ";
-        String str4_1 = " motorola/build/bin/build_device.bash -b nightly -p " + productName.toLowerCase().trim() + "_" + buildType + "  -g -j4 2>&1 | tee " + getTimeStampDesc() + "_" + logname + ".log";
+        String str4_1 = " motorola/build/bin/build_device.bash -b nightly -p " + productName.toLowerCase().trim() + "_" + buildType + "  -g -jX 2>&1 | tee " + getTimeStampDesc() + "_" + logname + ".log";
         result = str1_1 + str1_2 + str2_1 + str2_2 + str2_3 + str3_1 + str4_1;
         return result;
     }
@@ -1040,7 +1040,7 @@ public class F0_RepoCommand {
         String str2_2 = "--manifest-branch=" + cManifestBranchName.trim() + "  ";
         String str2_3 = "-m " + cXmlbranchName.trim() + "  && ";
         String str3_1 = "repo sync -j2  && repo start --all TEMP   &&  ztag_aosp_wifi_bt_gps_J6.sh  && ";
-        String str4_1 = " motorola/build/bin/build_device.bash -b nightly -p " + productName.toLowerCase().trim() + "_" + buildType + "  -g -j4 2>&1 | tee " + getTimeStampDesc() + "_" + logname + ".log";
+        String str4_1 = " motorola/build/bin/build_device.bash -b nightly -p " + productName.toLowerCase().trim() + "_" + buildType + "  -g -jX 2>&1 | tee " + getTimeStampDesc() + "_" + logname + ".log";
         result = str1_1 + str1_2 + str2_1 + str2_2 + str2_3 + str3_1 + str4_1;
         return result;
     }
@@ -1055,7 +1055,7 @@ public class F0_RepoCommand {
         String str2_2 = "--manifest-branch=" + cManifestBranchName.trim() + "  ";
         String str2_3 = "-m " + cXmlbranchName.trim() + "  && ";
         String str3_1 = "repo sync -j2  && repo start --all TEMP   &&  ztag_aosp_wifi_bt_gps_J6.sh && ";
-        String str4_1 = " motorola/build/bin/build_device.bash -b nightly -p " + productName.toLowerCase().trim() + "_" + buildType + "  -g -j4 -E oem-image 2>&1 | tee " + getTimeStampDesc() + "_" + logname + ".log";
+        String str4_1 = " motorola/build/bin/build_device.bash -b nightly -p " + productName.toLowerCase().trim() + "_" + buildType + "  -g -jX -E oem-image 2>&1 | tee " + getTimeStampDesc() + "_" + logname + ".log";
 
         result = str1_1 + str1_2 + str2_1 + str2_2 + str2_3 + str3_1 + str4_1;
         return result;
@@ -1071,7 +1071,7 @@ public class F0_RepoCommand {
         String result = "";
         String str1_1 = "export PATH=/apps/android/python-2.7.6-x64/bin:$PATH  && export PATH=/apps/android/perl-5.1aclmsx8.4-x64/bin:$PATH && ";
         String str2_1 = "source build/envsetup.sh && source /opt/android.conf  &&   source /opt/conf/moto.conf  &&  ";
-//        String str3_1 = " motorola/build/bin/build_device.bash -b nightly -p " + productName.toLowerCase().trim() + "_" + buildType + "  -g -j4"
+//        String str3_1 = " motorola/build/bin/build_device.bash -b nightly -p " + productName.toLowerCase().trim() + "_" + buildType + "  -g -jX"
         for (int i = 0; i < metaData.BuildingCommandList.size(); i++) {
             String buildingCommand = metaData.BuildingCommandList.get(i);
 
@@ -1100,7 +1100,7 @@ public class F0_RepoCommand {
         String result = "";
         String str1_1 = "export PATH=/apps/android/python-2.7.6-x64/bin:$PATH  && export PATH=/apps/android/perl-5.1aclmsx8.4-x64/bin:$PATH && ";
         String str2_1 = "source build/envsetup.sh && source /opt/android.conf  &&   source /opt/conf/moto.conf  &&  ";
-        String str3_1 = " motorola/build/bin/build_device.bash -b nightly -p " + productName.toLowerCase().trim() + "_" + buildType + "  -g -j4  2>&1 | tee " + getTimeStampDesc() + "_" + logname + ".log";
+        String str3_1 = " motorola/build/bin/build_device.bash -b nightly -p " + productName.toLowerCase().trim() + "_" + buildType + "  -g -jX  2>&1 | tee " + getTimeStampDesc() + "_" + logname + ".log";
         result = str1_1 + str2_1 + str3_1;
         return result;
     }
@@ -1111,7 +1111,7 @@ public class F0_RepoCommand {
         String result = "";
         String str1_1 = "export PATH=/apps/android/python-2.7.6-x64/bin:$PATH  && export PATH=/apps/android/perl-5.1aclmsx8.4-x64/bin:$PATH && ";
         String str2_1 = "source build/envsetup.sh && source /opt/android.conf  &&   source /opt/conf/moto.conf  &&  ";
-        String str3_1 = " motorola/build/bin/build_device.bash -b nightly -p " + productName.toLowerCase().trim() + "_" + buildType + "  -g -j4 -E oem-image 2>&1 | tee " + getTimeStampDesc() + "_" + logname + ".log";
+        String str3_1 = " motorola/build/bin/build_device.bash -b nightly -p " + productName.toLowerCase().trim() + "_" + buildType + "  -g -jX -E oem-image 2>&1 | tee " + getTimeStampDesc() + "_" + logname + ".log";
         result = str1_1 + str2_1 + str3_1;
         return result;
     }
