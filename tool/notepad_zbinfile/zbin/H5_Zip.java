@@ -44,7 +44,7 @@ public class H5_Zip {
     /*******************修改属性列表 ------Begin *********************/
 // 修改0.   全局修改 把 H5 改为当前应用的序号规则序号  当前类名称也需要修改
 // 修改1.当前 执行代码的 bat sh 文件名称  最后必须是标识序号
-    static String Cur_Bat_Name = "ztime_H1";
+    static String Cur_Bat_Name = "zzip_H5";
 
     static String UNZIP_PRE = "ZFAILED_UNZIP_";   //
     /*******************修改属性列表 ------End *********************/
