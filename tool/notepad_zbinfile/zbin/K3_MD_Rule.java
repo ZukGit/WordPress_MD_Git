@@ -28,6 +28,7 @@ import java.security.Key;
 import java.security.Security;
 import com.sun.crypto.provider.SunJCE;
 
+
 // 对于  文件类型_操作Index  执行对应的操作逻辑
 public class K3_MD_Rule {
 
@@ -184,7 +185,13 @@ public class K3_MD_Rule {
 
 
     void InitRule(){
-    	 realTypeRuleList.add( new Default_MD_Rule_1());
+    	 realTypeRuleList.add( new FixedImgSrc_Rule_1());
+    	 realTypeRuleList.add( new Head_AddOne_Rule_2());
+    	 realTypeRuleList.add( new Head_DeleteOne_Rule_3());
+    	 
+//    	 1. 为每个代码块 起始  添加  code 字样 
+//    	 2. 为 每个代码块开头 去除 字样
+    	 
 //    	  realTypeRuleList.add( new HTML_Rule_1());
     	  
 //        realTypeRuleList.add( new HTML_Rule_1());
@@ -221,38 +228,522 @@ public class K3_MD_Rule {
 
 
     // operation_type  操作类型     1--读取文件内容字符串 进行修改      2--对文件对文件内容(字节)--进行修改    3.对全体子文件进行的随性的操作 属性进行修改(文件名称)
-//     // 4.对当前子文件(包括子目录 子文件 --不包含孙目录 孙文件) 5. 从shell 中获取到的路径 去对某一个文件进行操作
+//     // 4.对当前子文件(包括子目录 子文件 --不包含孙目录 孙文件)   5. 所有文件 目录进行操作
 
 
     
-    //  默认的 md rule 规则  对当前文件夹下的  _post 所有MD文件进行合规处理
-    class Default_MD_Rule_1 extends Basic_Rule{
-    	Default_MD_Rule_1(){
-             super("#",1,4);
+    
+    class Head_DeleteOne_Rule_3 extends Basic_Rule{
+    	
+
+		
+    	Head_DeleteOne_Rule_3(){
+             super("#",3,5);
          }
     	
+ 	   String simpleDesc(){
+           return "对当前的 所有md 文件的 #标签自减一  h2>h1 h3->h2   h4->h3 h5>h6  h6>h5   h1不变";
+       }
+	
+
+ 	   
+   	
+   	@Override
+   	ArrayList<File> applyDir_SubFileListRule5(ArrayList<File> allSubDirFileList, ArrayList<File> allSubRealFileList) {
+   	// TODO Auto-generated method stub
+   		
+   		ArrayList<File>  mdFileList	 = getSubFileList(allSubRealFileList,".md");
+       	
+   		if(mdFileList == null) {
+       		System.out.println("当前 检测到的 md 文件的数量为空 null ! 无法执行规则#1 mdFileList.size() = null ");	
+       		return super.applyDir_SubFileListRule5(allSubDirFileList, allSubRealFileList);
+   	
+   		}
+   		System.out.println("mdFileList.size() = "+ mdFileList.size());
+   	 
+   		if(mdFileList.size() == 0) {
+       		System.out.println("当前 检测到的 md 文件的数量为空! 无法执行规则#1 mdFileList.size() = "+ mdFileList.size());	
+       		return super.applyDir_SubFileListRule5(allSubDirFileList, allSubRealFileList);
+   		}
+   		for (int i = 0; i < mdFileList.size(); i++) {
+   			File mdFile = mdFileList.get(i);
+   			
+   			ArrayList<String> mdContentList = readListFromFile(mdFile);
+   	 		System.out.println("Rule3 test ------------- ");
+   			ArrayList<String> fixedMdContentList = try_Add_H_level(mdContentList);
+   
+   			if(!fixedMdContentList.equals(mdContentList)) {
+   	 			writeContentToFile(mdFile, fixedMdContentList);
+   			}
+  
+			}
+   		
+   	
+   		return super.applyDir_SubFileListRule5(allSubDirFileList, allSubRealFileList);
+
+   	}
+   	
+   	ArrayList<String> 	try_Add_H_level(ArrayList<String>  originList ){
+   		ArrayList<String>  resultList = new ArrayList<String> ();
+   		
+
+
+   		for (int i = 0; i < originList.size(); i++) {
+				String oneLine = originList.get(i);
+				
+				if(!isAllowOperation(oneLine)) {
+					resultList.add(oneLine);
+					continue;
+				}
+			      
+				if(isHeadLine(oneLine)){
+					System.out.println("isImageInLine = "+true);
+					String fixedOneLine = delete_Head_OneTag(oneLine);
+					resultList.add(fixedOneLine);
+					System.out.println("原图片语句 = "+oneLine);
+					System.out.println("经修复语句 = " + fixedOneLine);
+					continue;
+				}
+				System.out.println("isImageInLine = "+false+"  OneLine = \n "+oneLine+"\n");
+				resultList.add(oneLine);
+   			
+			}
+   		
+   		return resultList;
+   	}
+   	
+   	String delete_Head_OneTag(String oneLine) {
+   		String charOne = oneLine.trim().substring(0, 1);
+   		if("#".equals(charOne)) {
+   			return oneLine.trim().substring(1);
+   		}
+   	
+   		return oneLine;
+   		
+   	}
+   	
+
+   	volatile	int code_block_tag_count = 0  ;  // ``` 的 个数 偶数 能操作  奇数 不能操作！  
+		
+   	
+   	boolean isAllowOperation(String oneLine ) {
+   		boolean isInBlock = true;
+   		
+   		
+   		if(oneLine.trim().startsWith("```") ) {
+   			code_block_tag_count++;
+   		} 
+   		
+   		return code_block_tag_count%2 == 0;
+   		
+   	}
+   	
+   	
+   	
+   	boolean isHeadLine(String oneLine) {
+   		boolean flag = false;
+   		String trim_line = oneLine.trim();
+   		if( trim_line.startsWith("## ") || trim_line.startsWith("### ") || 
+   				trim_line.startsWith("#### ") || trim_line.startsWith("##### ") || trim_line.startsWith("###### ")) {
+   			flag = true;
+   		}
+   		
+		if(trim_line.startsWith("##") && trim_line.contains("简介") ) {
+			 flag = false;
+		}
+   		return flag;
+   	}
+ 	   
+    }
+
+    
+    //  对当前的 所有md 文件的 #标签自增一  h1>h2  #->##  ## > ### h2->h3   h5->h6   h6不变
+    
+    class Head_AddOne_Rule_2 extends Basic_Rule{
+    	
+
+		
+    	Head_AddOne_Rule_2(){
+             super("#",2,5);
+         }
+    	
+ 	   String simpleDesc(){
+           return "对当前的 所有md 文件的 #标签自增一  h1>h2  #->##  ## > ### h2->h3   h5->h6   h6不变";
+       }
+	
+	   
+ 	   
     	
     	@Override
-    	ArrayList<File> applySubFileListRule4(ArrayList<File> curFileList,
-    		HashMap<java.lang.String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList,
-    		ArrayList<File> curRealFileList) {
+    	ArrayList<File> applyDir_SubFileListRule5(ArrayList<File> allSubDirFileList, ArrayList<File> allSubRealFileList) {
     	// TODO Auto-generated method stub
     		
-    		ArrayList<File>  mdFileList = 	subFileTypeMap.get(".md");
-    		
+    		ArrayList<File>  mdFileList	 = getSubFileList(allSubRealFileList,".md");
+        	
+    		if(mdFileList == null) {
+        		System.out.println("当前 检测到的 md 文件的数量为空 null ! 无法执行规则#1 mdFileList.size() = null ");	
+        		return super.applyDir_SubFileListRule5(allSubDirFileList, allSubRealFileList);
+    	
+    		}
     		System.out.println("mdFileList.size() = "+ mdFileList.size());
-    		  
+    	 
+    		if(mdFileList.size() == 0) {
+        		System.out.println("当前 检测到的 md 文件的数量为空! 无法执行规则#1 mdFileList.size() = "+ mdFileList.size());	
+        		return super.applyDir_SubFileListRule5(allSubDirFileList, allSubRealFileList);
+    		}
+    		for (int i = 0; i < mdFileList.size(); i++) {
+    			File mdFile = mdFileList.get(i);
+    			
+    			ArrayList<String> mdContentList = readListFromFile(mdFile);
+    	 		System.out.println("Rule2 test ------------- ");
+    			ArrayList<String> fixedMdContentList = try_Add_H_level(mdContentList);
+    
+    			if(!fixedMdContentList.equals(mdContentList)) {
+    	 			writeContentToFile(mdFile, fixedMdContentList);
+    			}
+   
+			}
     		
-    	return super.applySubFileListRule4(curFileList, subFileTypeMap, curDirList, curRealFileList);
+    	
+    		return super.applyDir_SubFileListRule5(allSubDirFileList, allSubRealFileList);
+
+    	}
+    	
+    	ArrayList<String> 	try_Add_H_level(ArrayList<String>  originList ){
+    		ArrayList<String>  resultList = new ArrayList<String> ();
+    		
+
+
+    		for (int i = 0; i < originList.size(); i++) {
+				String oneLine = originList.get(i);
+				
+				if(!isAllowOperation(oneLine)) {
+					resultList.add(oneLine);
+					continue;
+				}
+			      
+				if(isHeadLine(oneLine)){
+					System.out.println("isImageInLine = "+true);
+					String fixedOneLine = Add_Head_OneTag(oneLine);
+					resultList.add(fixedOneLine);
+					System.out.println("原图片语句 = "+oneLine);
+					System.out.println("经修复语句 = " + fixedOneLine);
+					continue;
+				}
+				System.out.println("isImageInLine = "+false+"  OneLine = \n "+oneLine+"\n");
+				resultList.add(oneLine);
+    			
+			}
+    		
+    		return resultList;
+    	}
+    	
+    	String Add_Head_OneTag(String oneLine) {
+    		
+    		return "#"+oneLine.trim();
+    		
+    	}
+    	
+
+    	volatile	int code_block_tag_count = 0  ;  // ``` 的 个数 偶数 能操作  奇数 不能操作！  
+		
+    	
+    	boolean isAllowOperation(String oneLine ) {
+    		boolean isInBlock = true;
+    		
+    		
+    		if(oneLine.trim().startsWith("```") ) {
+    			code_block_tag_count++;
+    		} 
+    		
+    		return code_block_tag_count%2 == 0;
+    		
     	}
     	
     	
     	
+    	boolean isHeadLine(String oneLine) {
+    		boolean flag = false;
+    		String trim_line = oneLine.trim();
+    		if(trim_line.startsWith("# ") || trim_line.startsWith("## ") || trim_line.startsWith("### ") || 
+    				trim_line.startsWith("#### ") || trim_line.startsWith("##### ") ) {
+    			flag = true;
+    		}
+
+    		if(trim_line.startsWith("##") && trim_line.contains("简介") ) {
+    			 flag = false;
+    		}
+    		return flag;
+    	}
+    	
+    }
+    
+    
+ // <img src="//../zimage/architect/01_sorttable.jpg"> 转为 <img src="/public/zimage/architect/01_sorttable.jpg">
+//  检测每行的 img  
+// 如果有  那么就得到 zimage之后的字符串  并重新 替换为  /public/zimage 字样
+    
+    class FixedImgSrc_Rule_1 extends Basic_Rule{
+    	FixedImgSrc_Rule_1(){
+             super("#",1,5);
+         }
+    	
+
+    	
+    	@Override
+    	ArrayList<File> applyDir_SubFileListRule5(ArrayList<File> allSubDirFileList, ArrayList<File> allSubRealFileList) {
+    	// TODO Auto-generated method stub
+       
+    		ArrayList<File>  mdFileList	 = getSubFileList(allSubRealFileList,".md");
+    	
+    		
+
+    		if(mdFileList == null) {
+        		System.out.println("当前 检测到的 md 文件的数量为空 null ! 无法执行规则#1 mdFileList.size() = null ");	
+        		return super.applyDir_SubFileListRule5(allSubDirFileList, allSubRealFileList);
+    	
+    		}
+    		System.out.println("mdFileList.size() = "+ mdFileList.size());
+    	 
+    		if(mdFileList.size() == 0) {
+        		System.out.println("当前 检测到的 md 文件的数量为空! 无法执行规则#1 mdFileList.size() = "+ mdFileList.size());	
+        		return super.applyDir_SubFileListRule5(allSubDirFileList, allSubRealFileList);
+    		}
+    		
+    		for (int i = 0; i < mdFileList.size(); i++) {
+    			File mdFile = mdFileList.get(i);
+    			
+    			ArrayList<String> mdContentList = readListFromFile(mdFile);
+    	 		System.out.println("test ------------- ");
+    			ArrayList<String> fixedMdContentList = tryFixImageSrc(mdContentList);
+    
+    			if(!fixedMdContentList.equals(mdContentList)) {
+    	 			writeContentToFile(mdFile, fixedMdContentList);
+    			}
+   
+			}
+    		
+    		
+    		return super.applyDir_SubFileListRule5(allSubDirFileList, allSubRealFileList);
+    	}
+    	
+		/*
+		 * @Override ArrayList<File> applySubFileListRule4(ArrayList<File> curFileList,
+		 * HashMap<java.lang.String, ArrayList<File>> subFileTypeMap, ArrayList<File>
+		 * curDirList, ArrayList<File> curRealFileList) { // TODO Auto-generated method
+		 * stub
+		 * 
+		 * ArrayList<File> mdFileList = subFileTypeMap.get(".md"); if(mdFileList ==
+		 * null) { System.out.
+		 * println("当前 检测到的 md 文件的数量为空 null ! 无法执行规则#1 mdFileList.size() = null ");
+		 * return super.applySubFileListRule4(curFileList, subFileTypeMap, curDirList,
+		 * curRealFileList);
+		 * 
+		 * } System.out.println("mdFileList.size() = "+ mdFileList.size());
+		 * 
+		 * if(mdFileList.size() == 0) {
+		 * System.out.println("当前 检测到的 md 文件的数量为空! 无法执行规则#1 mdFileList.size() = "+
+		 * mdFileList.size()); return super.applySubFileListRule4(curFileList,
+		 * subFileTypeMap, curDirList, curRealFileList); }
+		 * 
+		 * for (int i = 0; i < mdFileList.size(); i++) { File mdFile =
+		 * mdFileList.get(i);
+		 * 
+		 * ArrayList<String> mdContentList = readListFromFile(mdFile);
+		 * System.out.println("test ------------- "); ArrayList<String>
+		 * fixedMdContentList = tryFixImageSrc(mdContentList);
+		 * 
+		 * writeContentToFile(mdFile, fixedMdContentList); }
+		 * 
+		 * 
+		 * return super.applySubFileListRule4(curFileList, subFileTypeMap, curDirList,
+		 * curRealFileList); }
+		 */
+    	
+    	ArrayList<String> 	tryFixImageSrc(ArrayList<String> originList ){
+    		ArrayList<String>  resultList = new ArrayList<String> ();
+    		
+    		for (int i = 0; i < originList.size(); i++) {
+				String oneLine = originList.get(i);
+				if(isImageInLine(oneLine)){
+					System.out.println("isImageInLine = "+true);
+					String fixedOneLine = tryFixedOneLine(oneLine);
+					resultList.add(fixedOneLine);
+					System.out.println("原图片语句 = "+oneLine);
+					System.out.println("经修复语句 = " + fixedOneLine);
+					continue;
+				}
+				System.out.println("isImageInLine = "+false+"  OneLine = \n "+oneLine+"\n");
+				resultList.add(oneLine);
+    			
+			}
+    		return resultList;
+    	}
+    	
+		// ![](/public/zimage/architect/01_sorttable.jpg)   
+    	// <img src="//../zimage/architect/01_sorttable.jpg"><img src="//../zimage/architect/01_sorttable.jpg"> ![](/public/zimage/architect/01_sorttable.jpg)  ![](/public/zimage/architect/01_sorttable.jpg) 
+    	// <img src="//../zimage/architect/01_sorttable.jpg">
+    	// <img src="//../zimage/architect/01_sorttable.jpg"><img src="//../zimage/architect/01_sorttable.jpg">
+    	// <img src="//../zimage/architect/01_sorttable.jpg"> ![](/public/zimage/architect/01_sorttable.jpg) 
+    	String tryFixedOneLine(String imageLine) {
+    		String fixedLine = imageLine;
+    		
+    		// 依次 处理 image  和 ![] 
+    		int all_image_count = getCharCount(imageLine, "zimage");  // 当前行所有格式图片的个数
+    		
+    		//  处理 <image  标签 的数量
+    		int image_tag_count = getCharCount(imageLine, "<image");  // 
+    		int markdown_image_count_A =  getCharCount(imageLine, "![");  // 
+    		int markdown_image_count_B =  getCharCount(imageLine, "](");  // 
+    		int markdown_image_count = markdown_image_count_A < markdown_image_count_B ? markdown_image_count_A:markdown_image_count_B;
+    		
+    		System.out.println("【"+imageLine+"】"+"\nall_image_count = "+ all_image_count + "   image_tag_count= "+ image_tag_count + "   markdown_image_count= + markdown_image_count");
+    		
+    		if((markdown_image_count + image_tag_count) != all_image_count ) {
+    			System.out.println("当前的图片个数 总数 计算错误！！！");
+        		System.out.println("xxxxxx->【"+imageLine+"】"+"\nall_image_count = "+ all_image_count + "   image_tag_count= "+ image_tag_count + "   markdown_image_count=" + markdown_image_count);
+    		}
+    		
+    		String fixedStr_A = fixImageTagSrc(imageLine);  // 修复 <img 的 src 
+    		System.out.println("fixedStr_A = "+ fixedStr_A);   // 修复 img 的 src
+    		String fixedStr_B = fixMarkDownImageTagSrc(fixedStr_A);  // 修复 ![]() 的 src 
+    		System.out.println("fixedStr_B = "+  fixedStr_B);   // 修复 img 的 src
+    		
+    		
+    		return fixedStr_B;
+    		
+    	}
+    	
+	boolean isImageInLine(String oneLineStr){ 
+		
+		boolean existflag = false;
+		 
+		// ![]()    <img src="//../zimage/architect/01_sorttable.jpg">
+		if((oneLineStr.contains("<img") && oneLineStr.contains("src") && oneLineStr.contains("zimage"))
+				|| (oneLineStr.contains("![") && oneLineStr.contains("zimage")  ) ) {
+			existflag = true;
+		}
+    		return existflag;
+    	}
+    	
+    	 
     	
     	   String simpleDesc(){
-               return "对当前的 git 管理的 md 文件 进行 合规处理！";
+               return "<img src=\"//../zimage/xx.jpg\"> 转为 <img src=\"/public/zimage/xx.jpg\">";
            }
     	
+    	   
+
+    		
+    String fixMarkDownImageTagSrc(String imageLine) {
+    			String strResult = imageLine;
+    			if(!imageLine.contains("](") || !imageLine.contains("zimage") || !imageLine.contains("![")) {
+    				System.out.println("当前行不包括!()[] 图片 原路返回");
+    				return imageLine;
+    			}
+    	int count_tagA = getCharCount(imageLine,"](");
+
+    	int count_tagB = getCharCount(imageLine,"![");
+
+    	if(count_tagA != count_tagB) {
+    		System.out.println("当前行包括图片  但图片个数 ](  和 ![ 匹配到的个数不一致 ！！ 不处理 原路返回");
+    		return imageLine;
+    	}
+
+    	Map<String,String> origin_fixed_Map = new HashMap<String,String>();
+    	ArrayList<String> originSrcList = new 	ArrayList<String>();
+    	String[] strArr = imageLine.split("\\]\\(");
+    	for (int i = 1; i < strArr.length; i++) {  // i 从0 开始  因为 strArr[0] 是 <img 之前的 内容
+    		System.out.println("BBB-strArr["+i+"] = "+ strArr[i]);
+    		String originStr =  strArr[i];
+    		if(!originStr.startsWith("/public/zimage")) {
+    			String zimageStr = originStr.substring(originStr.indexOf("zimage"));
+    			String fixedSrc = "/public/"+zimageStr;
+    			System.out.println("zimageStr = "+ zimageStr);
+    			System.out.println("fixedSrc = "+ fixedSrc);
+    			origin_fixed_Map.put(originStr, fixedSrc);
+    		}
+    		
+    	}
+
+
+    	System.out.println("MarkDown!()[]-->_origin_fixed_Map.size() = "+ origin_fixed_Map.size());
+
+
+    	Map.Entry<String , String> entryItem;
+    	if(origin_fixed_Map != null){
+    	    Iterator iterator = origin_fixed_Map.entrySet().iterator();
+    	    while( iterator.hasNext() ){
+    	        entryItem = (Map.Entry<String , String>) iterator.next();
+    	       String originStr =  entryItem.getKey();   //Map的Key
+    	       String fixedOriginStr =   entryItem.getValue();  //Map的Value
+    	       strResult = strResult.replace(originStr, fixedOriginStr);
+    	    }
+    	}
+
+    	System.out.println("fixMarkDownImageTagSrc = "+ strResult);
+
+
+    							
+    			return strResult;
+    		}
+    		
+    		
+    		
+   String fixImageTagSrc(String imageLine) {
+    			String strResult = imageLine;
+    			if(!imageLine.contains("<img")) {
+    				return imageLine;
+    			}
+    			
+
+    			Map<String,String> origin_fixed_Map = new HashMap<String,String>();
+    			ArrayList<String> originSrcList = new 	ArrayList<String>();
+    			String[] strArr = imageLine.split("<img");
+    			for (int i = 1; i < strArr.length; i++) {  // i 从0 开始  因为 strArr[0] 是 <img 之前的 内容
+    				System.out.println("strArr["+i+"] = "+ strArr[i]);
+    				// <img src ="//../zimage/system/android/02_detailnode/public.jpg"> 
+    			 if(strArr[i].contains("src") && strArr[i].contains("=") && strArr[i].contains(">")) {
+    				 String originSrc = strArr[i].substring(strArr[i].indexOf("=")+"=".length(),strArr[i].indexOf(">"));
+    				 System.out.println("originSrc == "+ originSrc);
+    				 originSrcList.add(originSrc);
+    			 }
+    			}
+    			System.out.println("originSrcList.size() = "+ originSrcList.size());
+    			for (int i = 0; i < originSrcList.size(); i++) {
+    				String  originStr = originSrcList.get(i);
+    				System.out.println("originStr["+i+"] = "+ originStr);
+    				if(!originStr.startsWith("/public/zimage")) {
+    					String zimageStr = originStr.substring(originStr.indexOf("zimage"));
+    					String fixedSrc = "\"/public/"+zimageStr;
+    					System.out.println("zimageStr = "+ zimageStr);
+    					System.out.println("fixedSrc = "+ fixedSrc);
+    					origin_fixed_Map.put(originStr, fixedSrc);
+    				}
+    				
+    			}
+    			
+    			System.out.println("<img > tag origin_fixed_Map.size() = "+ origin_fixed_Map.size());
+    			
+    			
+    	        Map.Entry<String , String> entryItem;
+    	        if(origin_fixed_Map != null){
+    	            Iterator iterator = origin_fixed_Map.entrySet().iterator();
+    	            while( iterator.hasNext() ){
+    	                entryItem = (Map.Entry<String , String>) iterator.next();
+    	               String originStr =  entryItem.getKey();   //Map的Key
+    	               String fixedOriginStr =   entryItem.getValue();  //Map的Value
+    	               strResult = strResult.replace(originStr, fixedOriginStr);
+    	            }
+    	        }
+    	        
+    			System.out.println("strResult = "+ strResult);
+    					
+    			return strResult;
+    			
+    		}
+    		
+    	   
     }
 
 
@@ -302,12 +793,27 @@ public class K3_MD_Rule {
             return null;
         }
 
+	ArrayList<File> getSubFileList(ArrayList<File> originFile, String type){
+		ArrayList<File>  SubTypeFileList  = new ArrayList<File> ();
+		
+		
+		for (int i = 0; i < originFile.size(); i++) {
+		File subFile = 	originFile.get(i);
+	   String fileName = subFile.getName().toLowerCase();
+	   if(fileName.endsWith(type.toLowerCase())) {
+		   SubTypeFileList.add(subFile);
+	   }
+		}
+		
+		return  SubTypeFileList;
+	}
+		
         String ruleTip(String type,int index , String batName,OS_TYPE curType){
             String itemDesc = "";
             if(curType == OS_TYPE.Windows){
-                itemDesc = batName.trim()+".bat  "+type+"_"+index + "    [索引 "+index+"]  描述:"+simpleDesc();
+                itemDesc = batName.trim()+" "+type+"_"+index + "    [索引 "+index+"]  描述:"+simpleDesc();
             }else{
-                itemDesc = batName.trim()+".sh "+type+"_"+index + "    [索引 "+index+"]  描述:"+simpleDesc();
+                itemDesc = batName.trim()+""+type+"_"+index + "    [索引 "+index+"]  描述:"+simpleDesc();
             }
 
             return itemDesc;
@@ -459,9 +965,9 @@ public class K3_MD_Rule {
                 curBW.write(sb.toString());
                 curBW.flush();
                 curBW.close();
-                System.out.println("write out File OK !  File = " + file.getAbsolutePath());
+                System.out.println("write out File OKAA !  File = " + file.getAbsolutePath());
             } else {
-                System.out.println("write out File  Failed !    File = " + file.getAbsolutePath());
+                System.out.println("write out File  FailedAA !    File = " + file.getAbsolutePath());
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -1586,6 +2092,26 @@ public class K3_MD_Rule {
         }
         return flag;
     }
+   
+   static ArrayList<String> readListFromFile(File fileItem) {
+       ArrayList<String> contentList = new ArrayList<String>();
+       try {
+              BufferedReader curBR = new BufferedReader(new InputStreamReader(new FileInputStream(fileItem), "utf-8"));
+//           BufferedReader curBR = new BufferedReader(new InputStreamReader(new FileInputStream(fileItem)));
+           String lineContent = "";
+           while (lineContent != null) {
+               lineContent = curBR.readLine();
+               if (lineContent == null || lineContent.trim().isEmpty()) {
+                   continue;
+               }
+               contentList.add(lineContent);
+           }
+           curBR.close();
+       } catch (Exception e) {
+       }
+       return contentList;
+   }
+   
     
     public static String execCMD(String command) {
 
