@@ -15,6 +15,8 @@ import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.crypto.Cipher;
@@ -26,8 +28,10 @@ import javax.swing.*;
 
 import java.security.Key;
 import java.security.Security;
-import com.sun.crypto.provider.SunJCE;
 
+//import com.google.common.collect.Maps;
+import com.sun.crypto.provider.SunJCE;
+//import com.google.common.collect.Maps;2
 
 // 对于  文件类型_操作Index  执行对应的操作逻辑
 public class K3_MD_Rule {
@@ -189,6 +193,9 @@ public class K3_MD_Rule {
     	 realTypeRuleList.add( new Head_AddOne_Rule_2());
     	 realTypeRuleList.add( new Head_DeleteOne_Rule_3());
     	 
+    	 realTypeRuleList.add( new Fixed_Table_Rule_4());
+    	 
+    	 
 //    	 1. 为每个代码块 起始  添加  code 字样 
 //    	 2. 为 每个代码块开头 去除 字样
     	 
@@ -233,6 +240,309 @@ public class K3_MD_Rule {
 
     
     
+    
+    class Fixed_Table_Rule_4 extends Basic_Rule{
+    	Fixed_Table_Rule_4(){
+            super("#",4,5);
+        }
+   	
+	   String simpleDesc(){
+          return "对当前的 table 形式的 表格字符串进行合规检查 并 修复 不合格 table字符串";
+      }
+	
+	   
+	   	@Override
+	   	ArrayList<File> applyDir_SubFileListRule5(ArrayList<File> allSubDirFileList, ArrayList<File> allSubRealFileList) {
+	   	// TODO Auto-generated method stub
+	   	
+	   		
+	   		ArrayList<File>  mdFileList	 = getSubFileList(allSubRealFileList,".md");
+	       	
+	   		if(mdFileList == null) {
+	       		System.out.println("当前 Rule4  检测到的 md 文件的数量为空 null ! 无法执行规则#1 mdFileList.size() = null ");	
+	       		return super.applyDir_SubFileListRule5(allSubDirFileList, allSubRealFileList);
+	   	
+	   		}
+	   		System.out.println("mdFileList.size() = "+ mdFileList.size());
+	   	 
+	   		if(mdFileList.size() == 0) {
+	       		System.out.println("当前 Rule4  检测到的 md 文件的数量为空! 无法执行规则#1 mdFileList.size() = "+ mdFileList.size());	
+	       		return super.applyDir_SubFileListRule5(allSubDirFileList, allSubRealFileList);
+	   		}
+	   		
+	   		
+	   		for (int i = 0; i < mdFileList.size(); i++) {
+	   			File mdFile = mdFileList.get(i);
+	   			
+	   			ArrayList<String> mdContentList = readListFromFile(mdFile);
+	   			ArrayList<String> raw_mdContentList = new ArrayList<String> ();
+	   			raw_mdContentList.addAll(mdContentList);
+	   	 		System.out.println("Rule4 test ------------- ");
+	   			ArrayList<String> fixedMdContentList = try_fixed_table(mdContentList);
+	   
+	   			if(!fixedMdContentList.equals(raw_mdContentList)) {
+	   	 			writeContentToFile(mdFile, fixedMdContentList);
+	   				System.out.println("xx 检查异常 需要重新写入! ->"+ mdFile.getAbsolutePath());
+
+	   			}else {
+	   				System.out.println("vv 检查正常 未重新写入! ->"+ mdFile.getAbsolutePath());
+	   			}
+	  
+				}
+	   		
+	   		return super.applyDir_SubFileListRule5(allSubDirFileList, allSubRealFileList);
+
+	   	}
+	   	
+	   	
+	   	volatile  	 boolean isTableBegin = false;
+	   	volatile	boolean isInCodeBlock = false;
+			
+	   	ArrayList<String>  try_fixed_table(ArrayList<String> rawMdList ){
+	   		ArrayList<String>  resultList = new ArrayList<String> ();
+	   	
+	   		
+	   		ArrayList<ArrayList<String>> fixedTableList_List = new  	ArrayList<ArrayList<String>>();
+	   		
+	   		ArrayList<Map<Integer , String>> index_fixContent_MapList = new ArrayList<Map<Integer , String>>  ();
+//	   		Map<Integer , String> oneTableList = new HashMap<Integer , String>();
+	  		Map<Integer , String> oneTableList =  new LinkedHashMap<Integer , String>();
+	   		
+	   		for (int i = 0; i < rawMdList.size(); i++) {
+				
+	
+	   			String oneLine = rawMdList.get(i);
+	   			isTableBegin = isTableContent(oneLine);
+//	   			isInCodeBlock = isInCodeBlock(oneLine);
+//	   			System.out.println();
+//	   			System.out.println("isInCodeBlock = "+ isInCodeBlock + "  isTableBegin ="+ isTableBegin);
+//	   			System.out.println("oneLine = "+ oneLine);
+	   			
+	   		if(!isInCodeBlock(oneLine) && isTableBegin ) {
+	   			// 如果不是在 codeblock 内   并且 是  ||| 样子类型的 
+	   			System.out.println("  indexKey:"+i+"   value:"+oneLine);
+	   			oneTableList.put(i, oneLine);
+	   		}else {
+	   			if(oneTableList.size() > 0) {
+	   				index_fixContent_MapList.add(oneTableList)	;
+	   		   	     oneTableList =  new LinkedHashMap<Integer , String>();
+	   			}
+	   			
+	   		}
+
+		}
+	   		
+	   	  	ArrayList<Map<Integer , String>> fixedMap_list = 	FixedTableMap(index_fixContent_MapList);
+	   		
+//	   	 resultList = 	 getFixedList(fixedMap_list,rawMdList);
+	   	resultList.addAll(getFixedList(fixedMap_list,rawMdList));
+	   	  	
+	   	  	
+	   		return  rawMdList;
+	   		
+	   	}
+	   	
+	   	
+	   	//  把 修复  写进 md 文件中
+	   	ArrayList<String> getFixedList(ArrayList<Map<Integer , String>> table_Map_List ,ArrayList<String> rawMdList  ){
+	   		
+	   		
+	   		for (int i = 0; i < table_Map_List.size(); i++) {
+
+	
+	   		HashMap<Integer , String> tableMap = (LinkedHashMap<Integer , String>)table_Map_List.get(i);
+	       	Map.Entry<Integer , String> entryItem;
+	       	int index = 0 ;
+	       	int map_size = tableMap.size();
+	    	if(tableMap != null){
+	    	    Iterator iterator = tableMap.entrySet().iterator();
+	    	    while( iterator.hasNext() ){
+	    	        entryItem = (Map.Entry<Integer , String>) iterator.next();
+	    	        Integer indexLine =  entryItem.getKey();   //Map的Key
+	    	       String tableLine =   entryItem.getValue();  //Map的Value
+//    	    	   System.out.println(indexLine+":"+" 需要修复的行!!!  = "+ tableLine);
+
+	    	       if(index == 0 ) {  // 说明是 表头  需要 添加 /r/n  来 确保 表格 上下是空行
+	    	    	   int preLine_index = indexLine -1;
+	    	    	   if(rawMdList.size() >= preLine_index  && "".equals(rawMdList.get(preLine_index).trim())) {
+	    	    		   rawMdList.set(indexLine, tableLine);
+	    	    		   index ++;
+	    	    		   continue;
+	    	    	   }
+	    	    	   rawMdList.set(indexLine, "\n"+tableLine);  
+	    	       	   System.out.println("prefixed !! indexLine  = "+ indexLine + "   tableLine= "+ tableLine);
+
+	    	    	   index ++;
+	    	    	   continue;
+	    	       }else if(index == map_size -1) {  // 如果 是 最后一行 那么检查 下一行是否是空格  确保是空格
+	    	    	   int backLine_index = indexLine + 1;
+	    	 
+	    	    	   if(rawMdList.size() >= backLine_index  && "".equals(rawMdList.get(backLine_index).trim())) {
+	    	    		   rawMdList.set(indexLine, tableLine);
+	    	    		   index ++;
+	    	    		   continue;
+	    	    	   }
+	    	       	   System.out.println("append !! indexLine  = "+ indexLine + "   tableLine= "+ tableLine);
+	    	       	   
+	    	    	   rawMdList.set(indexLine, tableLine+"\n");  
+	    	    	   index ++;
+	    	    	   continue;
+	    	       }
+	    	       
+		    	   rawMdList.set(indexLine, tableLine);  
+		    	   index ++;
+	   		
+	    	    }
+	    	}
+
+
+	    	
+	   	}
+	   		return rawMdList;
+	   		
+	   	}
+	   	
+	   	
+	   	void ShowTableMap(ArrayList<Map<Integer , String>> table_Map_List ){
+	   		
+	   		
+	   		for (int i = 0; i < table_Map_List.size(); i++) {
+
+	
+		   		LinkedHashMap<Integer, String> tableMap = (LinkedHashMap<Integer , String>)table_Map_List.get(i);
+	   		   System.out.println("════════"+i+" fixed table begin ════════");
+//	   		Map<Integer , String> fixed_map_item = Maps.newConcurrentMap();
+	       	Map.Entry<Integer , String> entryItem;
+	    	if(tableMap != null){
+	    	    Iterator iterator = tableMap.entrySet().iterator();
+	    	    while( iterator.hasNext() ){
+	    	        entryItem = (Map.Entry<Integer , String>) iterator.next();
+	    	        Integer indexLine =  entryItem.getKey();   //Map的Key
+	    	       String tableLine =   entryItem.getValue();  //Map的Value
+	    	       int tabletag_count = getCharCount(tableLine, "|");
+	    	       System.out.println(indexLine+"["+tabletag_count+"]: "+ tableLine);
+	   		
+	    	    }
+	    	}
+	    	
+	   	}
+	   }
+    	
+	   	ArrayList<Map<Integer , String>> FixedTableMap(ArrayList<Map<Integer , String>> table_Map_List ){
+	   		ArrayList<Map<Integer , String>> fixed_table_Map_List = new 	ArrayList<Map<Integer , String>>();
+	   	      //  把	修改后的 元素 保存在 这里 
+	   		int current_tabletag_count = 0;
+	   		
+	     
+	   		
+	   		for (int i = 0; i < table_Map_List.size(); i++) {
+	   		LinkedHashMap<Integer, String> tableMap = (LinkedHashMap<Integer , String>)table_Map_List.get(i);
+	   		   System.out.println("════════"+i+" table begin ════════");
+	   		   
+	   			Map<Integer , String> fixed_map_item = new LinkedHashMap<Integer , String>();
+	       	Map.Entry<Integer , String> entryItem;
+	    	if(tableMap != null){
+	    	    Iterator iterator = tableMap.entrySet().iterator();
+	    	    
+	    	    while( iterator.hasNext() ){
+	    	        entryItem = (Map.Entry<Integer , String>) iterator.next();
+	    	        Integer indexLine =  entryItem.getKey();   //Map的Key
+	    	       String tableLine =   entryItem.getValue();  //Map的Value
+	    	       int tabletag_count = getCharCount(tableLine, "|");
+	    	       if(current_tabletag_count == 0) {
+	    	    	   current_tabletag_count = tabletag_count;   // 取到 表头的  | 线 
+	    	       }
+	    	       System.out.println(indexLine+"["+tabletag_count+"]: "+ tableLine);
+	    	   
+	    	       if(tabletag_count != current_tabletag_count) {
+	    	    	   System.out.println("需要修复的行!!!  = "+ tableLine);
+	    	    	   System.out.println("tabletag_count = "+ tabletag_count + "    current_tabletag_count="+ current_tabletag_count);
+	    	    	   // 当前表格 列表格式  缺失 |=== ---- |
+	    	    	   String fixed_table_line  = "";
+	    	    	   if(current_tabletag_count > tabletag_count) {  // 当前表格缺失
+	    	    		    fixed_table_line = tableLine+getCopyStr("      |",current_tabletag_count-tabletag_count);
+	    	    		   
+	    	    	   }else {   // 当前存在的 行 多了   需要去除   多余的 | 
+	    	    		   
+	    	    		   int big_number = tabletag_count - current_tabletag_count;
+	    	    		   
+	    	    		   while(tabletag_count != current_tabletag_count) {
+	    	    			   System.out.println("tableLine = "+ tableLine);
+	    	    			   fixed_table_line = 	tableLine.substring(0, tableLine.lastIndexOf("|"));
+	    	    			   fixed_table_line =     fixed_table_line.substring(0, fixed_table_line.lastIndexOf("|")+1);
+	    	    			   tabletag_count =  getCharCount(fixed_table_line, "|");
+	    	    		   }
+	   
+	    	    	   }
+	    	    	   System.out.println("put["+indexLine+"] = " + fixed_table_line);
+	    	    	   
+	    	    	   // | 9    | 38     | Data数据包     | 113 bytes | 52  bytes      把 多余的 后缀去掉
+	    	    	   fixed_table_line = fixed_table_line.substring(0,fixed_table_line.lastIndexOf("|")+1);
+	    	    	   fixed_map_item.put(indexLine, fixed_table_line);
+	    	    	   continue;
+	    	       }
+	    		   // | 9    | 38     | Data数据包     | 113 bytes | 52  bytes      把 多余的 后缀去掉
+	    	       tableLine = tableLine.substring(0,tableLine.lastIndexOf("|")+1);
+	 	    	   fixed_map_item.put(indexLine, tableLine);
+    	    	   System.out.println("put["+indexLine+"] = " + tableLine);
+
+	    	    }
+	    	    
+	    	    if(fixed_map_item.size() > 0 ) {
+	    	    	fixed_table_Map_List.add(fixed_map_item);
+	    	   		System.out.println("fixed_map_item.size() = "+fixed_map_item.size());
+	    	    }
+	    	}
+			}
+	   		
+	   		System.out.println("fixed_table_Map_List.size() = "+fixed_table_Map_List.size());
+	   		ShowTableMap(fixed_table_Map_List);
+	   		
+	   		return fixed_table_Map_List;
+	   		
+	   	}
+	   	
+	   	String getCopyStr(String raw , int copyCount) {
+	   		StringBuilder sb = new StringBuilder();
+	   		
+	   		for (int i = 0; i < copyCount; i++) {
+	   			sb.append(raw);
+			}
+	   		
+	   		return sb.toString();
+	   	}
+	   	
+	   	
+	   	//  对于 那些 不满足 的  异常的 table 列  | 12   | 34   | 56     不是  |  结尾的
+	   	boolean isTableContent(String oneLine ){
+	   		boolean flag = false;
+	   		String oneLine_trim = oneLine.trim();
+	   		if(getCharCount(oneLine, "|") >= 2 && 
+	   				oneLine_trim.startsWith("|") ) {
+	   			
+	   			flag = true;
+	   		}
+	   		
+	   		
+	   		return flag;
+	   		
+	   		
+	   	}
+	   	
+	   	volatile	int code_block_tag_count = 0  ;  // ``` 的 个数 偶数 能操作  奇数 不能操作！ 
+	   	
+	   	boolean isInCodeBlock(String oneLine ) {
+
+	   		if(oneLine.trim().startsWith("```") ) {
+	   			code_block_tag_count++;
+//	   			System.out.println("oneLine   ="+ oneLine  + "  code_block_tag_count = "+ code_block_tag_count);
+	   		} 
+	   		
+	   		return code_block_tag_count%2 != 0;
+	   		
+	   	}
+	   
+    }
     class Head_DeleteOne_Rule_3 extends Basic_Rule{
     	
 
@@ -904,12 +1214,16 @@ public class K3_MD_Rule {
             while (oldOneLine != null) {
 
                 oldOneLine = curBR.readLine();
-                if (oldOneLine == null || oldOneLine.trim().isEmpty()) {
+                if (oldOneLine == null ) {
                     continue;
                 }
+                
+//                if(oldOneLine.trim().isEmpty()) {
+//                	
+//                }
 
                 sb.append(oldOneLine+"\n");
-//                    System.out.println("第"+index+"行读取到的字符串:"+oldOneLine);
+                    System.out.println("第"+index+"行读取到的字符串:"+oldOneLine);
                 index++;
 
 
@@ -2101,7 +2415,8 @@ public class K3_MD_Rule {
            String lineContent = "";
            while (lineContent != null) {
                lineContent = curBR.readLine();
-               if (lineContent == null || lineContent.trim().isEmpty()) {
+               if (lineContent == null ) {
+            	
                    continue;
                }
                contentList.add(lineContent);
