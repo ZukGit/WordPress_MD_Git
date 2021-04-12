@@ -34,10 +34,10 @@ import org.apache.pdfbox.multipdf.PDFMergerUtility;
 import java.security.Key;
 import java.security.Security;
 
-// ¶ÔÓÚ  ÎÄ¼şÀàĞÍ_²Ù×÷Index  Ö´ĞĞ¶ÔÓ¦µÄ²Ù×÷Âß¼­
+// å¯¹äº  æ–‡ä»¶ç±»å‹_æ“ä½œIndex  æ‰§è¡Œå¯¹åº”çš„æ“ä½œé€»è¾‘
 public class G2_ApplyRuleFor_TypeFile {
 
-	// ÀàĞÍ_Ë÷Òı £¬¶Ôµ±Ç°ÀàĞÍµÄÎÄ¼şÖ´ĞĞË÷ÒıÖ´ĞĞµÄ²Ù×÷ html1---¶ÔhtmlÀàĞÍµÄ×ÓÎÄ¼şÖ´ĞĞ Ë÷ÒıÎª1 µÄÂß¼­²Ù×÷ String
+	// ç±»å‹_ç´¢å¼• ï¼Œå¯¹å½“å‰ç±»å‹çš„æ–‡ä»¶æ‰§è¡Œç´¢å¼•æ‰§è¡Œçš„æ“ä½œ html1---å¯¹htmlç±»å‹çš„å­æ–‡ä»¶æ‰§è¡Œ ç´¢å¼•ä¸º1 çš„é€»è¾‘æ“ä½œ String
 	// apply(String)
 	static ArrayList<String> Rule_Identify_TypeIndexList = new ArrayList<String>();
 
@@ -56,7 +56,7 @@ public class G2_ApplyRuleFor_TypeFile {
 	static Properties G2_Properties = new Properties();
 	static Map<String, String> propKey2ValueList = new HashMap<String, String>();
 
-	static int BYTE_CONTENT_LENGTH_Rule7 = 1024 * 10 * 10; // ¶ÁÈ¡ÎÄ¼şHead×Ö½ÚÊı³£Êı
+	static int BYTE_CONTENT_LENGTH_Rule7 = 1024 * 10 * 10; // è¯»å–æ–‡ä»¶Headå­—èŠ‚æ•°å¸¸æ•°
 	static String strDefaultKey_Rule7 = "zukgit12"; // 8-length
 
 	static String strZ7DefaultKey_PSW_Rule19 = "752025"; // 8-length
@@ -100,14 +100,14 @@ public class G2_ApplyRuleFor_TypeFile {
 		Windows, Linux, MacOS
 	}
 
-	// JDK µÄÂ·¾¶
+	// JDK çš„è·¯å¾„
 	static String JDK_BIN_PATH = "";
 
 	static OS_TYPE curOS_TYPE = OS_TYPE.Windows;
 	static String curOS_ExeTYPE = "";
 	static ArrayList<String> mKeyWordName = new ArrayList<>();
 
-	// µ±Ç°ShellÄ¿Â¼ÏÂµÄ ÎÄ¼şÀàĞÍÁĞ±í ³éÈ¡³öÀ´ Í¨ÓÃ
+	// å½“å‰Shellç›®å½•ä¸‹çš„ æ–‡ä»¶ç±»å‹åˆ—è¡¨ æŠ½å–å‡ºæ¥ é€šç”¨
 	static HashMap<String, ArrayList<File>> CurDirFileTypeMap = new HashMap<String, ArrayList<File>>();;
 
 	static void initSystemInfo() {
@@ -161,7 +161,7 @@ public class G2_ApplyRuleFor_TypeFile {
 		}
 	}
 
-	static String curDirPath = ""; // µ±Ç° SHELL ËùÔÚÄ¿Â¼ Ä¬ÈÏÊÇmainÖĞµÄµÚÒ»¸ö arg[0] ¾ÍÊÇshellÂ·¾¶
+	static String curDirPath = ""; // å½“å‰ SHELL æ‰€åœ¨ç›®å½• é»˜è®¤æ˜¯mainä¸­çš„ç¬¬ä¸€ä¸ª arg[0] å°±æ˜¯shellè·¯å¾„
 	static File curDirFile;
 
 	private static String REGEX_CHINESE = "[\u4e00-\u9fa5]";
@@ -201,27 +201,27 @@ public class G2_ApplyRuleFor_TypeFile {
 		realTypeRuleList.add(new Land_Port_Classify_Rule_20());
 		realTypeRuleList.add(new Rename_Img_WithSize_Rule_21());
 		realTypeRuleList.add(new ReSize_Img_Rule_22());
-		realTypeRuleList.add(new Append_Pdf_Rule_23()); // °Ñ pdf ÎÄ¼ş ×·¼Ó ºÏ²¢Îª Ò»¸öÎÄ¼ş
+		realTypeRuleList.add(new Append_Pdf_Rule_23()); // æŠŠ pdf æ–‡ä»¶ è¿½åŠ  åˆå¹¶ä¸º ä¸€ä¸ªæ–‡ä»¶
 		
-		realTypeRuleList.add(new add_Middle_Dir_Rule_24()); // ÔÚµ±Ç°µÄÄ¿Â¼ Óë ×ÓÄ¿Â¼ Ö®¼ä ĞÂÔö Ò»²ãÎÄ¼ş¼Ğ , ÎÄ¼ş¼ĞÃû³ÆÈÎÒâ ÓÃ»§ÊäÈë
+		realTypeRuleList.add(new add_Middle_Dir_Rule_24()); // åœ¨å½“å‰çš„ç›®å½• ä¸ å­ç›®å½• ä¹‹é—´ æ–°å¢ ä¸€å±‚æ–‡ä»¶å¤¹ , æ–‡ä»¶å¤¹åç§°ä»»æ„ ç”¨æˆ·è¾“å…¥
 		
 		
 	}
 
-// 3038Äê 5 ÔÂ 3 ÈÕ
+// 3038å¹´ 5 æœˆ 3 æ—¥
 
-	// operation_type ²Ù×÷ÀàĞÍ 1--¶ÁÈ¡ÎÄ¼şÄÚÈİ×Ö·û´® ½øĞĞĞŞ¸Ä 2--¶ÔÎÄ¼ş¶ÔÎÄ¼şÄÚÈİ(×Ö½Ú)--½øĞĞĞŞ¸Ä 3.¶ÔÈ«Ìå×ÓÎÄ¼ş½øĞĞµÄËæĞÔµÄ²Ù×÷
-	// ÊôĞÔ½øĞĞĞŞ¸Ä(ÎÄ¼şÃû³Æ)
-//     // 4.¶Ôµ±Ç°×ÓÎÄ¼ş(°üÀ¨×ÓÄ¿Â¼ ×ÓÎÄ¼ş --²»°üº¬ËïÄ¿Â¼ ËïÎÄ¼ş) 5. ´Óshell ÖĞ»ñÈ¡µ½µÄÂ·¾¶ È¥¶ÔÄ³Ò»¸öÎÄ¼ş½øĞĞ²Ù×÷
+	// operation_type æ“ä½œç±»å‹ 1--è¯»å–æ–‡ä»¶å†…å®¹å­—ç¬¦ä¸² è¿›è¡Œä¿®æ”¹ 2--å¯¹æ–‡ä»¶å¯¹æ–‡ä»¶å†…å®¹(å­—èŠ‚)--è¿›è¡Œä¿®æ”¹ 3.å¯¹å…¨ä½“å­æ–‡ä»¶è¿›è¡Œçš„éšæ€§çš„æ“ä½œ
+	// å±æ€§è¿›è¡Œä¿®æ”¹(æ–‡ä»¶åç§°)
+//     // 4.å¯¹å½“å‰å­æ–‡ä»¶(åŒ…æ‹¬å­ç›®å½• å­æ–‡ä»¶ --ä¸åŒ…å«å­™ç›®å½• å­™æ–‡ä»¶) 5. ä»shell ä¸­è·å–åˆ°çš„è·¯å¾„ å»å¯¹æŸä¸€ä¸ªæ–‡ä»¶è¿›è¡Œæ“ä½œ
 
-	// ¶Ô Í¼Æ¬ÎÄ¼ş½øĞĞ ²Ã¼ô -20_-20_20_20
-	// ÉÏÏÂ×óÓÒµÄpadding ÉÏ -20 20 Í¼Æ¬ÍùÏÂÒÆ¶¯20 ÏÔÊ¾20µÄ¿Õ°×
-	// ÉÏ Õı-¡· ÏÔÊ¾20µÄ¿Õ°× ¸º¡· Í¼Æ¬Ëõ½ø20 È¥µôÍ¼Æ¬µÄ20¾àÀë
-	// ÏÂ Õı-¡· ÏÂÏÔÊ¾20µÄ¿Õ°× ¸º¡· ÏÂÍ¼Æ¬Ëõ½ø20 È¥µôÍ¼Æ¬µÄ20¾àÀë
-	// ×ó Õı-¡· ×óÏÔÊ¾20µÄ¿Õ°× ¸º¡· ×óÍ¼Æ¬Ëõ½ø20 È¥µôÍ¼Æ¬µÄ20¾àÀë
-	// ÓÒ Õı-¡· ÓÒÏÔÊ¾20µÄ¿Õ°× ¸º¡· ÓÒÍ¼Æ¬Ëõ½ø20 È¥µôÍ¼Æ¬µÄ20¾àÀë
+	// å¯¹ å›¾ç‰‡æ–‡ä»¶è¿›è¡Œ è£å‰ª -20_-20_20_20
+	// ä¸Šä¸‹å·¦å³çš„padding ä¸Š -20 20 å›¾ç‰‡å¾€ä¸‹ç§»åŠ¨20 æ˜¾ç¤º20çš„ç©ºç™½
+	// ä¸Š æ­£-ã€‹ æ˜¾ç¤º20çš„ç©ºç™½ è´Ÿã€‹ å›¾ç‰‡ç¼©è¿›20 å»æ‰å›¾ç‰‡çš„20è·ç¦»
+	// ä¸‹ æ­£-ã€‹ ä¸‹æ˜¾ç¤º20çš„ç©ºç™½ è´Ÿã€‹ ä¸‹å›¾ç‰‡ç¼©è¿›20 å»æ‰å›¾ç‰‡çš„20è·ç¦»
+	// å·¦ æ­£-ã€‹ å·¦æ˜¾ç¤º20çš„ç©ºç™½ è´Ÿã€‹ å·¦å›¾ç‰‡ç¼©è¿›20 å»æ‰å›¾ç‰‡çš„20è·ç¦»
+	// å³ æ­£-ã€‹ å³æ˜¾ç¤º20çš„ç©ºç™½ è´Ÿã€‹ å³å›¾ç‰‡ç¼©è¿›20 å»æ‰å›¾ç‰‡çš„20è·ç¦»
 
-	// ÔÚµ±Ç°µÄÄ¿Â¼ Óë ×ÓÄ¿Â¼ Ö®¼ä ĞÂÔö Ò»²ãÎÄ¼ş¼Ğ , ÎÄ¼ş¼ĞÃû³ÆÈÎÒâ ÓÃ»§ÊäÈë
+	// åœ¨å½“å‰çš„ç›®å½• ä¸ å­ç›®å½• ä¹‹é—´ æ–°å¢ ä¸€å±‚æ–‡ä»¶å¤¹ , æ–‡ä»¶å¤¹åç§°ä»»æ„ ç”¨æˆ·è¾“å…¥
 	class add_Middle_Dir_Rule_24 extends Basic_Rule {
 
 		add_Middle_Dir_Rule_24() {
@@ -229,22 +229,22 @@ public class G2_ApplyRuleFor_TypeFile {
 			middle_dir_name = "mp4";
 		}
 
-		// ÖĞ¼äÎÄ¼ş¼ĞµÄÃû³Æ
+		// ä¸­é—´æ–‡ä»¶å¤¹çš„åç§°
 		String middle_dir_name;
 
 		@Override
 		String simpleDesc() {
-			return "\n" + Cur_Bat_Name + "  #_24  jpg   ##ÔÚµ±Ç°Ä¿Â¼Óë×ÓÄ¿Â¼Ö®¼ä¼ÓÒ»²ãÄ¿Â¼jpg  1/1.jpg -> 1/jpg/1.jpg \n" + Cur_Bat_Name
-					+ "  #_24  mp4   ##ÔÚµ±Ç°Ä¿Â¼Óë×ÓÄ¿Â¼Ö®¼ä¼ÓÒ»²ãÄ¿Â¼jpg  1/1.mp4 -> 1/mp4/1.mp4  1/1.jpg -> 1/mp4/1.jpg \n"
+			return "\n" + Cur_Bat_Name + "  #_24  jpg   ##åœ¨å½“å‰ç›®å½•ä¸å­ç›®å½•ä¹‹é—´åŠ ä¸€å±‚ç›®å½•jpg  1/1.jpg -> 1/jpg/1.jpg \n" + Cur_Bat_Name
+					+ "  #_24  mp4   ##åœ¨å½“å‰ç›®å½•ä¸å­ç›®å½•ä¹‹é—´åŠ ä¸€å±‚ç›®å½•jpg  1/1.mp4 -> 1/mp4/1.mp4  1/1.jpg -> 1/mp4/1.jpg \n"
 					+ Cur_Bat_Name
-					+ " #_24  gif  ##ÔÚµ±Ç°Ä¿Â¼Óë×ÓÄ¿Â¼Ö®¼ä¼ÓÒ»²ãÄ¿Â¼jpg  1/1.mp4 -> 1/gif/1.mp4  1/1.jpg -> 1/gif/1.jpg \\n ";
+					+ " #_24  gif  ##åœ¨å½“å‰ç›®å½•ä¸å­ç›®å½•ä¹‹é—´åŠ ä¸€å±‚ç›®å½•jpg  1/1.mp4 -> 1/gif/1.mp4  1/1.jpg -> 1/gif/1.jpg \\n ";
 		}
 
 		@Override
 		boolean initParamsWithInputList(ArrayList<String> inputParamList) {
 			boolean Flag = true;
 
-			// »ñÈ¡µ½×°»»µÄÀàĞÍ
+			// è·å–åˆ°è£…æ¢çš„ç±»å‹
 			String inputFileTypeParams = inputParamList.get(inputParamList.size() - 1);
 
 			if (inputFileTypeParams == null || "".equals(inputFileTypeParams) || inputFileTypeParams.contains("#")
@@ -263,7 +263,7 @@ public class G2_ApplyRuleFor_TypeFile {
 
 				Flag = false;
 				System.out.println(
-						"ÎŞ·¨¼ì²âµ½µ±Ç° µÚ24 Rule  ´´½¨ÖĞ¼ä¼Ğ²ãÄ¿Â¼µÄÃû³Æ²»ºÏ¹æ Çë¼ì²é   Çë¼ì²éºóÖØĞÂÖ´ĞĞ inputParams = " + inputFileTypeParams);
+						"æ— æ³•æ£€æµ‹åˆ°å½“å‰ ç¬¬24 Rule  åˆ›å»ºä¸­é—´å¤¹å±‚ç›®å½•çš„åç§°ä¸åˆè§„ è¯·æ£€æŸ¥   è¯·æ£€æŸ¥åé‡æ–°æ‰§è¡Œ inputParams = " + inputFileTypeParams);
 			} else {
 				middle_dir_name = inputFileTypeParams;
 			}
@@ -322,7 +322,7 @@ public class G2_ApplyRuleFor_TypeFile {
 
 	class Append_Pdf_Rule_23 extends Basic_Rule {
 
-		ArrayList<File> mPdfFileList; // µ±Ç° cmd ²ÎÊı¸ø³öµÄ pdf ÎÄ¼şÁĞ±í ÒÀ´ÎºÏ²¢
+		ArrayList<File> mPdfFileList; // å½“å‰ cmd å‚æ•°ç»™å‡ºçš„ pdf æ–‡ä»¶åˆ—è¡¨ ä¾æ¬¡åˆå¹¶
 
 		Append_Pdf_Rule_23() {
 			super("#", 23, 3); //
@@ -345,7 +345,7 @@ public class G2_ApplyRuleFor_TypeFile {
 			}
 
 			if (mPdfFileList.size() < 2) {
-				System.out.println("µ±Ç° ÃüÁîĞĞÊäÈëµÄ pdf ÎÄ¼ş¸öÊı Ğ¡ÓÚ2¸öÎŞ·¨ Ö´ĞĞºÏ²¢ ²Ù×÷!");
+				System.out.println("å½“å‰ å‘½ä»¤è¡Œè¾“å…¥çš„ pdf æ–‡ä»¶ä¸ªæ•° å°äº2ä¸ªæ— æ³• æ‰§è¡Œåˆå¹¶ æ“ä½œ!");
 				return false;
 			}
 			return super.initParamsWithInputList(inputParamList);
@@ -355,7 +355,7 @@ public class G2_ApplyRuleFor_TypeFile {
 		ArrayList<File> applyFileListRule3(ArrayList<File> subFileList, HashMap<String, ArrayList<File>> fileTypeMap) {
 			// TODO Auto-generated method stub
 			if (mPdfFileList.size() < 2) {
-				System.out.println("µ±Ç° ÃüÁîĞĞÊäÈëµÄ pdf ÎÄ¼ş¸öÊı Ğ¡ÓÚ2¸öÎŞ·¨ Ö´ĞĞºÏ²¢ ²Ù×÷!");
+				System.out.println("å½“å‰ å‘½ä»¤è¡Œè¾“å…¥çš„ pdf æ–‡ä»¶ä¸ªæ•° å°äº2ä¸ªæ— æ³• æ‰§è¡Œåˆå¹¶ æ“ä½œ!");
 				return null;
 			}
 
@@ -367,7 +367,7 @@ public class G2_ApplyRuleFor_TypeFile {
 
 				File newPdfFile = new File(curDirPath + File.separator + newPdfFileName);
 				File mergedFIle = mulFile2One(mPdfFileList, newPdfFile.getAbsolutePath());
-				System.out.println(" ĞÂ ºÏ²¢ÎÄ¼ş´óĞ¡:" + mergedFIle.length());
+				System.out.println(" æ–° åˆå¹¶æ–‡ä»¶å¤§å°:" + mergedFIle.length());
 
 				if (mergedFIle.length() > 0) {
 					for (int i = 0; i < mPdfFileList.size(); i++) {
@@ -378,10 +378,10 @@ public class G2_ApplyRuleFor_TypeFile {
 					tryReName(mergedFIle, originName);
 				}
 
-				System.out.println("OK!  PDF ÎÄ¼ş ÒÑ¾­ Éú³É --> " + originName);
+				System.out.println("OK!  PDF æ–‡ä»¶ å·²ç» ç”Ÿæˆ --> " + originName);
 
 			} catch (Exception e) {
-				System.out.println("µ±Ç° Ö´ĞĞ pdf ºÏ²¢²Ù×÷±¨´í£¡" + e.getLocalizedMessage());
+				System.out.println("å½“å‰ æ‰§è¡Œ pdf åˆå¹¶æ“ä½œæŠ¥é”™ï¼" + e.getLocalizedMessage());
 
 			}
 
@@ -390,15 +390,15 @@ public class G2_ApplyRuleFor_TypeFile {
 
 		String ruleTip(String type, int index, String batName, OS_TYPE curType) {
 			String itemDesc = "";
-			String desc_true = "  ¶Ô¸ø¶¨µÄ pdfÎÄ¼şA   pdfÎÄ¼şB  pdfÎÄ¼şC ÎÄ¼ş½øĞĞºÏ²¢ ºÏ²¢µÄpdfÎÄ¼şÃû³ÆÎª pdfAÎÄ¼şÃû³Æ,²¢É¾³ıÔ­pdfÎÄ¼ş ";
+			String desc_true = "  å¯¹ç»™å®šçš„ pdfæ–‡ä»¶A   pdfæ–‡ä»¶B  pdfæ–‡ä»¶C æ–‡ä»¶è¿›è¡Œåˆå¹¶ åˆå¹¶çš„pdfæ–‡ä»¶åç§°ä¸º pdfAæ–‡ä»¶åç§°,å¹¶åˆ é™¤åŸpdfæ–‡ä»¶ ";
 
 			if (curType == OS_TYPE.Windows) {
 				itemDesc = batName.trim() + ".bat  " + type + "_" + index
-						+ "      <Ö¸¶¨PdfÎÄ¼şA> <Ö¸¶¨PdfÎÄ¼şB>   <Ö¸¶¨PdfÎÄ¼şC>     ## [Ë÷Òı " + index + "]  ÃèÊö: " + desc_true + "\n";
+						+ "      <æŒ‡å®šPdfæ–‡ä»¶A> <æŒ‡å®šPdfæ–‡ä»¶B>   <æŒ‡å®šPdfæ–‡ä»¶C>     ## [ç´¢å¼• " + index + "]  æè¿°: " + desc_true + "\n";
 
 			} else {
 				itemDesc = batName.trim() + ".sh " + type + "_" + index
-						+ "     <Ö¸¶¨PdfÎÄ¼şA>  <Ö¸¶¨PdfÎÄ¼şB>   <Ö¸¶¨PdfÎÄ¼şC>    ##   [Ë÷Òı " + index + "]  ÃèÊö:" + desc_true;
+						+ "     <æŒ‡å®šPdfæ–‡ä»¶A>  <æŒ‡å®šPdfæ–‡ä»¶B>   <æŒ‡å®šPdfæ–‡ä»¶C>    ##   [ç´¢å¼• " + index + "]  æè¿°:" + desc_true;
 			}
 
 			return itemDesc;
@@ -407,17 +407,17 @@ public class G2_ApplyRuleFor_TypeFile {
 	}
 
 	public static File mulFile2One(List<File> files, String targetPath) throws IOException {
-		// pdfºÏ²¢¹¤¾ßÀà
+		// pdfåˆå¹¶å·¥å…·ç±»
 		PDFMergerUtility mergePdf = new PDFMergerUtility();
 		for (File f : files) {
 			if (f.exists() && f.isFile()) {
-				// Ñ­»·Ìí¼ÓÒªºÏ²¢µÄpdf
+				// å¾ªç¯æ·»åŠ è¦åˆå¹¶çš„pdf
 				mergePdf.addSource(f);
 			}
 		}
-		// ÉèÖÃºÏ²¢Éú³ÉpdfÎÄ¼şÃû³Æ
+		// è®¾ç½®åˆå¹¶ç”Ÿæˆpdfæ–‡ä»¶åç§°
 		mergePdf.setDestinationFileName(targetPath);
-		// ºÏ²¢pdf
+		// åˆå¹¶pdf
 		mergePdf.mergeDocuments(MemoryUsageSetting.setupMainMemoryOnly());
 		return new File(targetPath);
 	}
@@ -425,7 +425,7 @@ public class G2_ApplyRuleFor_TypeFile {
 	class ReSize_Img_Rule_22 extends Basic_Rule {
 
 		ArrayList<String> fliterTypeList;
-		ArrayList<File> mSrcFileImage; // ·ûºÏ ¹ıÂË Ìõ¼şµÄ µ±Ç°Ä¿Â¼µÄÎÄ¼ş¼ĞµÄ¼¯ºÏ
+		ArrayList<File> mSrcFileImage; // ç¬¦åˆ è¿‡æ»¤ æ¡ä»¶çš„ å½“å‰ç›®å½•çš„æ–‡ä»¶å¤¹çš„é›†åˆ
 		ArrayList<Integer> up_down_left_right;
 
 		ReSize_Img_Rule_22() {
@@ -446,8 +446,8 @@ public class G2_ApplyRuleFor_TypeFile {
 
 				if (i == 1) {
 					String one_param = inputParamList.get(1);
-					if (!one_param.contains("_")) { // µ±Ç°µÄµÚÒ»¸ö²ÎÊı²»ÊÇ ÉÏ_ÏÂ_×ó_ÓÒ ²ÎÊı
-						System.out.println("µ±Ç°µÄµÚ¶ş¸ö²ÎÊı²»ÊÇ ÉÏ_ÏÂ_×ó_ÓÒ ²ÎÊı");
+					if (!one_param.contains("_")) { // å½“å‰çš„ç¬¬ä¸€ä¸ªå‚æ•°ä¸æ˜¯ ä¸Š_ä¸‹_å·¦_å³ å‚æ•°
+						System.out.println("å½“å‰çš„ç¬¬äºŒä¸ªå‚æ•°ä¸æ˜¯ ä¸Š_ä¸‹_å·¦_å³ å‚æ•°");
 						return false;
 					}
 					up_down_left_right = calculSize(one_param);
@@ -462,7 +462,7 @@ public class G2_ApplyRuleFor_TypeFile {
 				}
 			}
 			if (mSrcFileImage.size() == 0 && inputParamList.size() >= 3) {
-				System.out.println("ÓÃ»§ÊäÈëÁË ÎŞĞ§µÄÎÄ¼ş  Çë¼ì²éÊäÈëµÄÎÄ¼şÃû³Æ£¡ ");
+				System.out.println("ç”¨æˆ·è¾“å…¥äº† æ— æ•ˆçš„æ–‡ä»¶  è¯·æ£€æŸ¥è¾“å…¥çš„æ–‡ä»¶åç§°ï¼ ");
 				return false;
 			}
 			return super.initParamsWithInputList(inputParamList);
@@ -473,12 +473,12 @@ public class G2_ApplyRuleFor_TypeFile {
 			ArrayList<Integer> size_4_List = new ArrayList<Integer>();
 			String checkStr = size_str.replaceAll("_", "").replace("+", "").replaceAll("-", "");
 			if (!isNumeric(checkStr.trim())) {
-				System.out.println("µ±Ç°µÄ ÉÏ_ÏÂ_×ó_ÓÒ ²ÎÊı ÊäÈë´íÎó(1):" + size_str);
+				System.out.println("å½“å‰çš„ ä¸Š_ä¸‹_å·¦_å³ å‚æ•° è¾“å…¥é”™è¯¯(1):" + size_str);
 				return size_4_List;
 			}
 			String[] arr = size_str.split("_");
 			if (arr == null || arr.length != 4) {
-				System.out.println("µ±Ç°µÄ ÉÏ_ÏÂ_×ó_ÓÒ ²ÎÊı ÊäÈë´íÎó(2):" + size_str);
+				System.out.println("å½“å‰çš„ ä¸Š_ä¸‹_å·¦_å³ å‚æ•° è¾“å…¥é”™è¯¯(2):" + size_str);
 				return size_4_List;
 			}
 
@@ -516,14 +516,14 @@ public class G2_ApplyRuleFor_TypeFile {
 			ArrayList<File> operationFileList = new ArrayList<File>();
 			ArrayList<File> newOperationFileList = new ArrayList<File>();
 			if (mSrcFileImage.size() > 0) {
-				System.out.println("¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T Ö»¶Ôµ±Ç°ÊäÈë Img ÎÄ¼ş½øĞĞ´¦Àí");
+				System.out.println("â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• åªå¯¹å½“å‰è¾“å…¥ Img æ–‡ä»¶è¿›è¡Œå¤„ç†");
 				operationFileList.addAll(mSrcFileImage);
 				for (int i = 0; i < operationFileList.size(); i++) {
 					File inputFile = operationFileList.get(i);
 					System.out.println("inputFile[" + i + "] = " + inputFile.getName());
 				}
 			} else {
-				System.out.println("¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T ÓÃ»§ÊäÈëÎÄ¼şÎª¿Õ--¶Ô±¾µØËùÓĞImg jpg png ÎÄ¼ş½øĞĞ´¦Àí");
+				System.out.println("â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• ç”¨æˆ·è¾“å…¥æ–‡ä»¶ä¸ºç©º--å¯¹æœ¬åœ°æ‰€æœ‰Img jpg png æ–‡ä»¶è¿›è¡Œå¤„ç†");
 
 				for (int i = 0; i < curRealFileList.size(); i++) {
 					File fileItem = curRealFileList.get(i);
@@ -556,17 +556,17 @@ public class G2_ApplyRuleFor_TypeFile {
 			int down_int = up_down_left_right.get(1);
 			int left_int = up_down_left_right.get(2);
 			int right_int = up_down_left_right.get(3);
-			String up_str = up_int > 0 ? "¡¾ÉÏÔö¼Ó" + up_int + "¿Õ°×¡¿" : "¡¾ÉÏ¼õÉÙ" + up_int + "ÄÚÈİ¡¿";
-			String down_str = down_int > 0 ? "¡¾ÏÂÔö¼Ó" + down_int + "¿Õ°×¡¿" : "¡¾ÏÂ¼õÉÙ" + down_int + "ÄÚÈİ¡¿";
-			String left_str = left_int > 0 ? "¡¾×óÔö¼Ó" + left_int + "¿Õ°×¡¿" : "¡¾×ó¼õÉÙ" + left_int + "ÄÚÈİ¡¿";
-			String right_str = right_int > 0 ? "¡¾ÓÒÔö¼Ó" + right_int + "¿Õ°×¡¿" : "¡¾ÓÒ¼õÉÙ" + right_int + "ÄÚÈİ¡¿";
+			String up_str = up_int > 0 ? "ã€ä¸Šå¢åŠ " + up_int + "ç©ºç™½ã€‘" : "ã€ä¸Šå‡å°‘" + up_int + "å†…å®¹ã€‘";
+			String down_str = down_int > 0 ? "ã€ä¸‹å¢åŠ " + down_int + "ç©ºç™½ã€‘" : "ã€ä¸‹å‡å°‘" + down_int + "å†…å®¹ã€‘";
+			String left_str = left_int > 0 ? "ã€å·¦å¢åŠ " + left_int + "ç©ºç™½ã€‘" : "ã€å·¦å‡å°‘" + left_int + "å†…å®¹ã€‘";
+			String right_str = right_int > 0 ? "ã€å³å¢åŠ " + right_int + "ç©ºç™½ã€‘" : "ã€å³å‡å°‘" + right_int + "å†…å®¹ã€‘";
 
-			System.out.println("µ±Ç°Åú²Ù×÷¼¯ºÏ:" + up_str + down_str + left_str + right_str);
-			System.out.println("µ±Ç°²Ù×÷ÎÄ¼şÊıÁ¿: " + newOperationFileList.size());
+			System.out.println("å½“å‰æ‰¹æ“ä½œé›†åˆ:" + up_str + down_str + left_str + right_str);
+			System.out.println("å½“å‰æ“ä½œæ–‡ä»¶æ•°é‡: " + newOperationFileList.size());
 			for (int i = 0; i < newOperationFileList.size(); i++) {
 				File imageFile = newOperationFileList.get(i);
 				String fileName = imageFile.getName();
-				System.out.println("FIle[" + i + "] =" + fileName + "  ¿ªÊ¼Ö´ĞĞ²Ù×÷£¡ ");
+				System.out.println("FIle[" + i + "] =" + fileName + "  å¼€å§‹æ‰§è¡Œæ“ä½œï¼ ");
 				ImageIcon imageIcon = new ImageIcon(imageFile.getAbsolutePath());
 
 				BufferedImage originImage = getBufferedImage(imageFile);
@@ -579,16 +579,16 @@ public class G2_ApplyRuleFor_TypeFile {
 
 				int target_width = width + left_right_sum;
 				int target_high = high + up_down_sum;
-				// ÏÔÊ¾Í¼Æ¬µÄÆğÊ¼Î»ÖÃ
+				// æ˜¾ç¤ºå›¾ç‰‡çš„èµ·å§‹ä½ç½®
 
 				int width_input = target_width;
 				int height_input = target_high;
 
-				int srcImage_x = left_int; // Ô­»­µÄ ÆğÊ¼x×ø±ê
-				int srcImage_width = width + right_int; // Ô­»­µÄ ÆğÊ¼×ø±ê
+				int srcImage_x = left_int; // åŸç”»çš„ èµ·å§‹xåæ ‡
+				int srcImage_width = width + right_int; // åŸç”»çš„ èµ·å§‹åæ ‡
 
-				int srcImage_y = up_int; // Ô­»­µÄ ÆğÊ¼y×ø±ê
-				int srcImage_high = high + down_int; // Ô­»­µÄ ÆğÊ¼y×ø±ê
+				int srcImage_y = up_int; // åŸç”»çš„ èµ·å§‹yåæ ‡
+				int srcImage_high = high + down_int; // åŸç”»çš„ èµ·å§‹yåæ ‡
 
 				double ratiox = 1.0;
 				double ratioy = 1.0;
@@ -596,7 +596,7 @@ public class G2_ApplyRuleFor_TypeFile {
 				ratiox = w * ratiox / width_input;
 				ratioy = h * ratioy / height_input;
 
-				// ËõĞ¡Í¼Æ¬
+				// ç¼©å°å›¾ç‰‡
 				if (ratiox >= 1) {
 					if (ratioy < 1) {
 						ratiox = height_input * 1.0 / h;
@@ -608,7 +608,7 @@ public class G2_ApplyRuleFor_TypeFile {
 						}
 					}
 				} else {
-					// ·Å´óÍ¼Æ¬
+					// æ”¾å¤§å›¾ç‰‡
 					if (ratioy < 1) {
 						if (ratiox > ratioy) {
 							ratiox = height_input * 1.0 / h;
@@ -620,13 +620,13 @@ public class G2_ApplyRuleFor_TypeFile {
 					}
 				}
 
-				// ×Ó½ØÍ¼ ÏÈ¸ã¶¨
-				// XµÄÆğÊ¼×ø±ê Èç¹û´óÓÚ0µÄ»° ÄÇÃ´¾ÍÊ¹ÓÃÔ­ÓĞµÄ×ø±êÏµ0
-				// Èç¹ûĞ¡ÓÚ0µÄ»° ËµÃ÷xÆğÊ¼×ø±êĞèÒªÒÆ¶¯µ½ Math.abs(left_int)
+				// å­æˆªå›¾ å…ˆæå®š
+				// Xçš„èµ·å§‹åæ ‡ å¦‚æœå¤§äº0çš„è¯ é‚£ä¹ˆå°±ä½¿ç”¨åŸæœ‰çš„åæ ‡ç³»0
+				// å¦‚æœå°äº0çš„è¯ è¯´æ˜xèµ·å§‹åæ ‡éœ€è¦ç§»åŠ¨åˆ° Math.abs(left_int)
 				int origin_subImage_x = left_int >= 0 ? 0 : Math.abs(left_int);
 				int origin_subImage_y = up_int >= 0 ? 0 : Math.abs(up_int);
 
-				int origin_subImage_width = width; // Ä¬ÈÏÎªÍ¼Æ¬µÄ¿í¶È
+				int origin_subImage_width = width; // é»˜è®¤ä¸ºå›¾ç‰‡çš„å®½åº¦
 				if (left_int < 0 && right_int < 0) {
 					origin_subImage_width = width + left_int + right_int;
 				} else if (left_int < 0) {
@@ -684,7 +684,7 @@ public class G2_ApplyRuleFor_TypeFile {
 					int big_rect_y = up_int >= 0 ? up_int : 0;
 					int big_rect_x = left_int >= 0 ? left_int : 0;
 
-					System.out.println("Êä³öÂ·¾¶ÏÂ¿í:" + whiteSpace_BuffImage.getWidth() + "   Êä³öÂ·¾¶ÏÂ¸ß:"
+					System.out.println("è¾“å‡ºè·¯å¾„ä¸‹å®½:" + whiteSpace_BuffImage.getWidth() + "   è¾“å‡ºè·¯å¾„ä¸‹é«˜:"
 							+ whiteSpace_BuffImage.getHeight());
 					ImageUtil.cut(imageFile, imageFile, new Rectangle(origin_subImage_x, origin_subImage_y,
 							origin_subImage_width, origin_subImage_high));
@@ -697,7 +697,7 @@ public class G2_ApplyRuleFor_TypeFile {
 					ImageIO.write(combined, "jpg", imageFile);
 
 				} catch (Exception e) {
-					System.out.println("·¢ÉúÒì³£! ");
+					System.out.println("å‘ç”Ÿå¼‚å¸¸! ");
 
 				} finally {
 //                    if (g != null) {
@@ -707,7 +707,7 @@ public class G2_ApplyRuleFor_TypeFile {
 
 			}
 
-			System.out.println(" Img Padding Ö´ĞĞÍê³É! ");
+			System.out.println(" Img Padding æ‰§è¡Œå®Œæˆ! ");
 
 			return super.applySubFileListRule4(curFileList, subFileTypeMap, curDirList, curRealFileList);
 		}
@@ -715,25 +715,25 @@ public class G2_ApplyRuleFor_TypeFile {
 		public BufferedImage getBufferedImage(File file) {
 			Image img = null;
 			try {
-				img = ImageIO.read(file); // ¹¹ÔìImage¶ÔÏó
+				img = ImageIO.read(file); // æ„é€ Imageå¯¹è±¡
 			} catch (Exception e) {
 				System.out.println(e);
 				return null;
 			}
 
-			int width = img.getWidth(null); // µÃµ½Ô´Í¼¿í
-			int height = img.getHeight(null); // µÃµ½Ô´Í¼³¤
+			int width = img.getWidth(null); // å¾—åˆ°æºå›¾å®½
+			int height = img.getHeight(null); // å¾—åˆ°æºå›¾é•¿
 
 //    return resizeFix(400, 492);
 			return resize(img, width, height);
 		}
 
 		public BufferedImage resize(Image mImage, int w, int h) {
-			// SCALE_SMOOTH µÄËõÂÔËã·¨ Éú³ÉËõÂÔÍ¼Æ¬µÄÆ½»¬¶ÈµÄ ÓÅÏÈ¼¶±ÈËÙ¶È¸ß Éú³ÉµÄÍ¼Æ¬ÖÊÁ¿±È½ÏºÃ µ«ËÙ¶ÈÂı
+			// SCALE_SMOOTH çš„ç¼©ç•¥ç®—æ³• ç”Ÿæˆç¼©ç•¥å›¾ç‰‡çš„å¹³æ»‘åº¦çš„ ä¼˜å…ˆçº§æ¯”é€Ÿåº¦é«˜ ç”Ÿæˆçš„å›¾ç‰‡è´¨é‡æ¯”è¾ƒå¥½ ä½†é€Ÿåº¦æ…¢
 			BufferedImage image = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
 			Graphics g = image.getGraphics();
 			try {
-				g.drawImage(mImage, 0, 0, w, h, null); // »æÖÆËõĞ¡ºóµÄÍ¼
+				g.drawImage(mImage, 0, 0, w, h, null); // ç»˜åˆ¶ç¼©å°åçš„å›¾
 			} finally {
 				if (g != null) {
 					g.dispose();
@@ -741,10 +741,10 @@ public class G2_ApplyRuleFor_TypeFile {
 			}
 			return image;
 			// File destFile = new File("C:\\temp\\456.jpg");
-			// FileOutputStream out = new FileOutputStream(destFile); // Êä³öµ½ÎÄ¼şÁ÷
-			// // ¿ÉÒÔÕı³£ÊµÏÖbmp¡¢png¡¢gif×ªjpg
+			// FileOutputStream out = new FileOutputStream(destFile); // è¾“å‡ºåˆ°æ–‡ä»¶æµ
+			// // å¯ä»¥æ­£å¸¸å®ç°bmpã€pngã€gifè½¬jpg
 			// JPEGImageEncoder encoder = JPEGCodec.createJPEGEncoder(out);
-			// encoder.encode(image); // JPEG±àÂë
+			// encoder.encode(image); // JPEGç¼–ç 
 			// out.close();
 		}
 
@@ -756,30 +756,30 @@ public class G2_ApplyRuleFor_TypeFile {
 			/*
 			 * 
 			 * BufferedImage bi = new BufferedImage(width,heigh,
-			 * BufferedImage.TYPE_INT_RGB);//INT¾«È·¶È´ïµ½Ò»¶¨,RGBÈıÔ­É«£¬¸ß¶È70,¿í¶È150 //µÃµ½ËüµÄ»æÖÆ»·¾³(ÕâÕÅÍ¼Æ¬µÄ±Ê)
+			 * BufferedImage.TYPE_INT_RGB);//INTç²¾ç¡®åº¦è¾¾åˆ°ä¸€å®š,RGBä¸‰åŸè‰²ï¼Œé«˜åº¦70,å®½åº¦150 //å¾—åˆ°å®ƒçš„ç»˜åˆ¶ç¯å¢ƒ(è¿™å¼ å›¾ç‰‡çš„ç¬”)
 			 * Graphics2D g2 = (Graphics2D) bi.getGraphics(); int frontSize = 550;
 			 * 
-			 * g2.setBackground(currentColor); g2.fillRect(0,0,width,heigh);//Ìî³äÒ»¸ö¾ØĞÎ
-			 * ×óÉÏ½Ç×ø±ê(0,0),¿í500,¸ß500;Ìî³äÕûÕÅÍ¼Æ¬ g2.fillRect(0,0,width,heigh);//Ìî³äÕûÕÅÍ¼Æ¬(ÆäÊµ¾ÍÊÇÉèÖÃ±³¾°ÑÕÉ«)
+			 * g2.setBackground(currentColor); g2.fillRect(0,0,width,heigh);//å¡«å……ä¸€ä¸ªçŸ©å½¢
+			 * å·¦ä¸Šè§’åæ ‡(0,0),å®½500,é«˜500;å¡«å……æ•´å¼ å›¾ç‰‡ g2.fillRect(0,0,width,heigh);//å¡«å……æ•´å¼ å›¾ç‰‡(å…¶å®å°±æ˜¯è®¾ç½®èƒŒæ™¯é¢œè‰²)
 			 * g2.setColor(currentColor);
 			 * 
 			 */
 
 			imgBuf = new BufferedImage(width, heigh, BufferedImage.TYPE_INT_RGB);
 			Graphics curGraphic = imgBuf.getGraphics();
-			// ÉèÖÃÑÕÉ«
+			// è®¾ç½®é¢œè‰²
 			curGraphic.setColor(currentColor);
-			// Ìî³ä
+			// å¡«å……
 			curGraphic.fillRect(0, 0, imgBuf.getWidth(), imgBuf.getHeight());
 
 			return imgBuf;
 			/*
 			 * 
 			 * try { mCurFile.createNewFile(); ImageIO.write(imgBuf, "jpg", new
-			 * FileOutputStream(mCurFile));//±£´æÍ¼Æ¬ JPEG±íÊ¾±£´æ¸ñÊ½ //
-			 * System.out.println("´´½¨ RGB "+"R="+r+"  G="+g+"  B="+b+" Í¼Æ¬³É¹¦£¡");
+			 * FileOutputStream(mCurFile));//ä¿å­˜å›¾ç‰‡ JPEGè¡¨ç¤ºä¿å­˜æ ¼å¼ //
+			 * System.out.println("åˆ›å»º RGB "+"R="+r+"  G="+g+"  B="+b+" å›¾ç‰‡æˆåŠŸï¼");
 			 * 
-			 * } catch (Exception e) { System.out.println("´´½¨ RGB Í¼Æ¬¸ñÊ½³öÏÖÒì³££¡"+
+			 * } catch (Exception e) { System.out.println("åˆ›å»º RGB å›¾ç‰‡æ ¼å¼å‡ºç°å¼‚å¸¸ï¼"+
 			 * mCurFile.getAbsolutePath()); }
 			 */
 
@@ -787,30 +787,30 @@ public class G2_ApplyRuleFor_TypeFile {
 
 		String ruleTip(String type, int index, String batName, OS_TYPE curType) {
 			String itemDesc = "";
-			String desc_A = " ÎŞÊäÈë²ÎÊı Ä¬ÈÏ¶Ô±¾Ä¿Â¼ÏÂµÄËùÓĞ png jpg  ½øĞĞ 20_20_20_20 ÉÏ_ÏÂ_×ó_ÓÒµÄ²Ã¼ô";
-			String desc_B = " ¶Ô¸ø¶¨µÄÍ¼Æ¬½øĞĞ 20_20_20_20 ÉÏ_ÏÂ_×ó_ÓÒµÄ²Ã¼ô  ";
-			String desc_C = " ¶Ô¸ø¶¨µÄÍ¼Æ¬½øĞĞ 200_0_0_0 ÉÏ_ÏÂ_×ó_ÓÒµÄ²Ã¼ô(¶¥²¿Ôö¼Ó200¿Õ°×ÏñËØ¿Õ¼ä)  ";
-			String desc_D = " ¶Ô¸ø¶¨µÄÍ¼Æ¬½øĞĞ 0_0_0_200 ÉÏ_ÏÂ_×ó_ÓÒµÄ²Ã¼ô(µ×²¿Ôö¼Ó200¿Õ°×ÏñËØ¿Õ¼ä)  ";
-			String desc_E = " ¶Ô¸ø¶¨µÄÍ¼Æ¬½øĞĞ 0_200_0_200 ÉÏ_ÏÂ_×ó_ÓÒµÄ²Ã¼ô(µ×²¿Ôö¼Ó200 ÓÒ²¿Ôö¼Ó200 ¿Õ°×ÏñËØ¿Õ¼ä)  ";
-			String desc_F = " ¶Ô¸ø¶¨µÄÍ¼Æ¬½øĞĞ -100_-100_-100_-100 ÉÏ_ÏÂ_×ó_ÓÒµÄ²Ã¼ô(ÉÏÏÂ×óÓÒ ¶¼²Ã¼ô100 ¿Õ°×ÏñËØ¿Õ¼ä)  ";
-			String desc_G = " ¶Ô¸ø¶¨µÄÍ¼Æ¬½øĞĞ 0_-125_0_0 ÉÏ_ÏÂ_×ó_ÓÒµÄ²Ã¼ô( µ×²¿²Ã¼ô125 ÏñËØ¿Õ¼ä)  ";
-			String desc_H = " ¶Ô¸ø¶¨µÄÍ¼Æ¬½øĞĞ 0_-110_0_0 ÉÏ_ÏÂ_×ó_ÓÒµÄ²Ã¼ô( µ×²¿²Ã¼ô110 ÏñËØ¿Õ¼ä)  ";
-			itemDesc = batName.trim() + Cur_Batch_End + "  " + type + "_" + index + "  20_20_20_20" + "    #### [Ë÷Òı "
-					+ index + "]  ÃèÊö: " + desc_A + "\n";
+			String desc_A = " æ— è¾“å…¥å‚æ•° é»˜è®¤å¯¹æœ¬ç›®å½•ä¸‹çš„æ‰€æœ‰ png jpg  è¿›è¡Œ 20_20_20_20 ä¸Š_ä¸‹_å·¦_å³çš„è£å‰ª";
+			String desc_B = " å¯¹ç»™å®šçš„å›¾ç‰‡è¿›è¡Œ 20_20_20_20 ä¸Š_ä¸‹_å·¦_å³çš„è£å‰ª  ";
+			String desc_C = " å¯¹ç»™å®šçš„å›¾ç‰‡è¿›è¡Œ 200_0_0_0 ä¸Š_ä¸‹_å·¦_å³çš„è£å‰ª(é¡¶éƒ¨å¢åŠ 200ç©ºç™½åƒç´ ç©ºé—´)  ";
+			String desc_D = " å¯¹ç»™å®šçš„å›¾ç‰‡è¿›è¡Œ 0_0_0_200 ä¸Š_ä¸‹_å·¦_å³çš„è£å‰ª(åº•éƒ¨å¢åŠ 200ç©ºç™½åƒç´ ç©ºé—´)  ";
+			String desc_E = " å¯¹ç»™å®šçš„å›¾ç‰‡è¿›è¡Œ 0_200_0_200 ä¸Š_ä¸‹_å·¦_å³çš„è£å‰ª(åº•éƒ¨å¢åŠ 200 å³éƒ¨å¢åŠ 200 ç©ºç™½åƒç´ ç©ºé—´)  ";
+			String desc_F = " å¯¹ç»™å®šçš„å›¾ç‰‡è¿›è¡Œ -100_-100_-100_-100 ä¸Š_ä¸‹_å·¦_å³çš„è£å‰ª(ä¸Šä¸‹å·¦å³ éƒ½è£å‰ª100 ç©ºç™½åƒç´ ç©ºé—´)  ";
+			String desc_G = " å¯¹ç»™å®šçš„å›¾ç‰‡è¿›è¡Œ 0_-125_0_0 ä¸Š_ä¸‹_å·¦_å³çš„è£å‰ª( åº•éƒ¨è£å‰ª125 åƒç´ ç©ºé—´)  ";
+			String desc_H = " å¯¹ç»™å®šçš„å›¾ç‰‡è¿›è¡Œ 0_-110_0_0 ä¸Š_ä¸‹_å·¦_å³çš„è£å‰ª( åº•éƒ¨è£å‰ª110 åƒç´ ç©ºé—´)  ";
+			itemDesc = batName.trim() + Cur_Batch_End + "  " + type + "_" + index + "  20_20_20_20" + "    #### [ç´¢å¼• "
+					+ index + "]  æè¿°: " + desc_A + "\n";
 			itemDesc += batName.trim() + Cur_Batch_End + "  " + type + "_" + index + "  20_20_20_20" + "   <ImgFile>  "
-					+ "    #### [Ë÷Òı " + index + "]  ÃèÊö: " + desc_B + "\n";
+					+ "    #### [ç´¢å¼• " + index + "]  æè¿°: " + desc_B + "\n";
 			itemDesc += batName.trim() + Cur_Batch_End + "  " + type + "_" + index + "  200_0_0_0"
-					+ "    <ImgFile>   #### [Ë÷Òı " + index + "]  ÃèÊö: " + desc_C + "\n";
+					+ "    <ImgFile>   #### [ç´¢å¼• " + index + "]  æè¿°: " + desc_C + "\n";
 			itemDesc += batName.trim() + Cur_Batch_End + "  " + type + "_" + index + "  0_0_0_200"
-					+ "    <ImgFile>   #### [Ë÷Òı " + index + "]  ÃèÊö: " + desc_D + "\n";
+					+ "    <ImgFile>   #### [ç´¢å¼• " + index + "]  æè¿°: " + desc_D + "\n";
 			itemDesc += batName.trim() + Cur_Batch_End + "  " + type + "_" + index + "  0_200_0_200"
-					+ "    <ImgFile>   #### [Ë÷Òı " + index + "]  ÃèÊö: " + desc_E + "\n";
+					+ "    <ImgFile>   #### [ç´¢å¼• " + index + "]  æè¿°: " + desc_E + "\n";
 			itemDesc += batName.trim() + Cur_Batch_End + "  " + type + "_" + index + "  -100_-100_-100_-100"
-					+ "    <ImgFile>   #### [Ë÷Òı " + index + "]  ÃèÊö: " + desc_F + "\n";
+					+ "    <ImgFile>   #### [ç´¢å¼• " + index + "]  æè¿°: " + desc_F + "\n";
 			itemDesc += batName.trim() + Cur_Batch_End + "  " + type + "_" + index + "  0_-125_0_0"
-					+ "    <ImgFile>   #### [Ë÷Òı " + index + "]  ÃèÊö: " + desc_G + "\n";
+					+ "    <ImgFile>   #### [ç´¢å¼• " + index + "]  æè¿°: " + desc_G + "\n";
 			itemDesc += batName.trim() + Cur_Batch_End + "  " + type + "_" + index + "  0_-110_0_0"
-					+ "    <ImgFile>   #### [Ë÷Òı " + index + "]  ÃèÊö: " + desc_H + "\n";
+					+ "    <ImgFile>   #### [ç´¢å¼• " + index + "]  æè¿°: " + desc_H + "\n";
 
 			return itemDesc;
 
@@ -821,7 +821,7 @@ public class G2_ApplyRuleFor_TypeFile {
 	class Rename_Img_WithSize_Rule_21 extends Basic_Rule {
 
 		ArrayList<String> fliterTypeList;
-		ArrayList<File> mSrcFileImage; // ·ûºÏ ¹ıÂË Ìõ¼şµÄ µ±Ç°Ä¿Â¼µÄÎÄ¼ş¼ĞµÄ¼¯ºÏ
+		ArrayList<File> mSrcFileImage; // ç¬¦åˆ è¿‡æ»¤ æ¡ä»¶çš„ å½“å‰ç›®å½•çš„æ–‡ä»¶å¤¹çš„é›†åˆ
 
 		Rename_Img_WithSize_Rule_21() {
 			super("#", 21, 4); //
@@ -899,7 +899,7 @@ public class G2_ApplyRuleFor_TypeFile {
 			for (int i = 0; i < mSrcFileImage.size(); i++) {
 				typtSb.append(mSrcFileImage.get(i) + " ");
 			}
-			System.out.println("¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¿ªÊ¼Ö´ĞĞ " + typtSb.toString() + "ÀàĞÍ 1960x1280 ¿íx¸ß²Ù×÷ " + "¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T");
+			System.out.println("â•â•â•â•â•â•â•â•â•â•å¼€å§‹æ‰§è¡Œ " + typtSb.toString() + "ç±»å‹ 1960x1280 å®½xé«˜æ“ä½œ " + "â•â•â•â•â•â•â•â•â•â•");
 
 			for (int i = 0; i < mSrcFileImage.size(); i++) {
 				File imageFile = mSrcFileImage.get(i);
@@ -908,31 +908,31 @@ public class G2_ApplyRuleFor_TypeFile {
 				int high = imageIcon.getIconHeight();
 				int width = imageIcon.getIconWidth();
 
-				// µ±Ç°ÎÄ¼şµÄ ¿í¸ß
+				// å½“å‰æ–‡ä»¶çš„ å®½é«˜
 				String str_width_x_high = calculateSizeStr(width, high);
 				String newName = str_width_x_high + "_" + fileName;
 				tryReName(imageFile, newName);
-				System.out.println("File[" + i + "] =  SrcName¡¾" + fileName + "¡¿  TargetName¡¾" + newName + "¡¿");
+				System.out.println("File[" + i + "] =  SrcNameã€" + fileName + "ã€‘  TargetNameã€" + newName + "ã€‘");
 
 			}
 
-			System.out.println("Img Size Rename Ö´ĞĞÍê³É! ");
+			System.out.println("Img Size Rename æ‰§è¡Œå®Œæˆ! ");
 
 			return super.applySubFileListRule4(curFileList, subFileTypeMap, curDirList, curRealFileList);
 		}
 
-		// ¿íx¸ß 1000x0900 1280x0720
+		// å®½xé«˜ 1000x0900 1280x0720
 		String calculateSizeStr(int widthValue, int highValue) {
 			String sizeStr = "";
 			int fixWidthValue = 0;
 			int fixHighValue = 0;
 
-			if (widthValue > 9999) { // ¿í¸ß×î´óÖ»ÄÜ 9999 ´óÁË ÊÜ²»ÁË
+			if (widthValue > 9999) { // å®½é«˜æœ€å¤§åªèƒ½ 9999 å¤§äº† å—ä¸äº†
 				fixWidthValue = 9999;
 			} else {
 				fixWidthValue = widthValue;
 			}
-			if (highValue > 9999) { // ¿í¸ß×î´óÖ»ÄÜ 9999 ´óÁË ÊÜ²»ÁË
+			if (highValue > 9999) { // å®½é«˜æœ€å¤§åªèƒ½ 9999 å¤§äº† å—ä¸äº†
 				fixHighValue = 9999;
 			} else {
 				fixHighValue = highValue;
@@ -940,7 +940,7 @@ public class G2_ApplyRuleFor_TypeFile {
 			String widthStr = addForZeroStr(fixWidthValue);
 			String highStr = addForZeroStr(fixHighValue);
 
-			// fixWidthValue ºÍ fixHighValue ½øĞĞ²¹Áã²Ù×÷
+			// fixWidthValue å’Œ fixHighValue è¿›è¡Œè¡¥é›¶æ“ä½œ
 
 			return widthStr + "x" + highStr;
 
@@ -964,39 +964,39 @@ public class G2_ApplyRuleFor_TypeFile {
 
 		String ruleTip(String type, int index, String batName, OS_TYPE curType) {
 			String itemDesc = "";
-			String desc_A = " ¶Ôµ±Ç°Ä¿Â¼ÏÂµÄÍ¼Æ¬ÎÄ¼ş Ö¸¶¨ÀàĞÍÍ¼Æ¬(²ÎÊıÊäÈë)(png)(jpg)(webp)(gif)½øĞĞ ½øĞĞÒÔ ¿íx¸ß ÀàËÆ 1960x1280_Ô­Ãû µÄ²Ù×÷";
+			String desc_A = " å¯¹å½“å‰ç›®å½•ä¸‹çš„å›¾ç‰‡æ–‡ä»¶ æŒ‡å®šç±»å‹å›¾ç‰‡(å‚æ•°è¾“å…¥)(png)(jpg)(webp)(gif)è¿›è¡Œ è¿›è¡Œä»¥ å®½xé«˜ ç±»ä¼¼ 1960x1280_åŸå çš„æ“ä½œ";
 
 			if (curType == OS_TYPE.Windows) {
-				itemDesc = batName.trim() + Cur_Batch_End + "  " + type + "_" + index + "" + "    #### [Ë÷Òı " + index
-						+ "]  ÃèÊö: " + desc_A + "\n";
-				itemDesc += batName.trim() + Cur_Batch_End + "  " + type + "_" + index + "_jpg" + "    #### [Ë÷Òı "
-						+ index + "]  ÃèÊö: " + desc_A + "\n";
-				itemDesc += batName.trim() + Cur_Batch_End + "  " + type + "_" + index + "_png" + "    #### [Ë÷Òı "
-						+ index + "]  ÃèÊö: " + desc_A + "\n";
-				itemDesc += batName.trim() + Cur_Batch_End + "  " + type + "_" + index + "_gif" + "    #### [Ë÷Òı "
-						+ index + "]  ÃèÊö: " + desc_A + "\n";
-				itemDesc += batName.trim() + Cur_Batch_End + "  " + type + "_" + index + "_webp" + "    #### [Ë÷Òı "
-						+ index + "]  ÃèÊö: " + desc_A + "\n";
-				itemDesc += batName.trim() + Cur_Batch_End + "  " + type + "_" + index + "_jpg_png" + "    #### [Ë÷Òı "
-						+ index + "]  ÃèÊö: " + desc_A + "\n";
+				itemDesc = batName.trim() + Cur_Batch_End + "  " + type + "_" + index + "" + "    #### [ç´¢å¼• " + index
+						+ "]  æè¿°: " + desc_A + "\n";
+				itemDesc += batName.trim() + Cur_Batch_End + "  " + type + "_" + index + "_jpg" + "    #### [ç´¢å¼• "
+						+ index + "]  æè¿°: " + desc_A + "\n";
+				itemDesc += batName.trim() + Cur_Batch_End + "  " + type + "_" + index + "_png" + "    #### [ç´¢å¼• "
+						+ index + "]  æè¿°: " + desc_A + "\n";
+				itemDesc += batName.trim() + Cur_Batch_End + "  " + type + "_" + index + "_gif" + "    #### [ç´¢å¼• "
+						+ index + "]  æè¿°: " + desc_A + "\n";
+				itemDesc += batName.trim() + Cur_Batch_End + "  " + type + "_" + index + "_webp" + "    #### [ç´¢å¼• "
+						+ index + "]  æè¿°: " + desc_A + "\n";
+				itemDesc += batName.trim() + Cur_Batch_End + "  " + type + "_" + index + "_jpg_png" + "    #### [ç´¢å¼• "
+						+ index + "]  æè¿°: " + desc_A + "\n";
 				itemDesc += batName.trim() + Cur_Batch_End + "  " + type + "_" + index + "_jpg_png_gif_webp"
-						+ "    #### [Ë÷Òı " + index + "]  ÃèÊö: " + desc_A + "\n";
+						+ "    #### [ç´¢å¼• " + index + "]  æè¿°: " + desc_A + "\n";
 
 			} else {
-				itemDesc = batName.trim() + Cur_Batch_End + "  " + type + "_" + index + "" + "    #### [Ë÷Òı " + index
-						+ "]  ÃèÊö: " + desc_A + "\n";
-				itemDesc += batName.trim() + Cur_Batch_End + "  " + type + "_" + index + "_jpg" + "    #### [Ë÷Òı "
-						+ index + "]  ÃèÊö: " + desc_A + "\n";
-				itemDesc += batName.trim() + Cur_Batch_End + "  " + type + "_" + index + "_png" + "    #### [Ë÷Òı "
-						+ index + "]  ÃèÊö: " + desc_A + "\n";
-				itemDesc += batName.trim() + Cur_Batch_End + "  " + type + "_" + index + "_gif" + "    #### [Ë÷Òı "
-						+ index + "]  ÃèÊö: " + desc_A + "\n";
-				itemDesc += batName.trim() + Cur_Batch_End + "  " + type + "_" + index + "_webp" + "    #### [Ë÷Òı "
-						+ index + "]  ÃèÊö: " + desc_A + "\n";
-				itemDesc += batName.trim() + Cur_Batch_End + "  " + type + "_" + index + "_jpg_png" + "    #### [Ë÷Òı "
-						+ index + "]  ÃèÊö: " + desc_A + "\n";
+				itemDesc = batName.trim() + Cur_Batch_End + "  " + type + "_" + index + "" + "    #### [ç´¢å¼• " + index
+						+ "]  æè¿°: " + desc_A + "\n";
+				itemDesc += batName.trim() + Cur_Batch_End + "  " + type + "_" + index + "_jpg" + "    #### [ç´¢å¼• "
+						+ index + "]  æè¿°: " + desc_A + "\n";
+				itemDesc += batName.trim() + Cur_Batch_End + "  " + type + "_" + index + "_png" + "    #### [ç´¢å¼• "
+						+ index + "]  æè¿°: " + desc_A + "\n";
+				itemDesc += batName.trim() + Cur_Batch_End + "  " + type + "_" + index + "_gif" + "    #### [ç´¢å¼• "
+						+ index + "]  æè¿°: " + desc_A + "\n";
+				itemDesc += batName.trim() + Cur_Batch_End + "  " + type + "_" + index + "_webp" + "    #### [ç´¢å¼• "
+						+ index + "]  æè¿°: " + desc_A + "\n";
+				itemDesc += batName.trim() + Cur_Batch_End + "  " + type + "_" + index + "_jpg_png" + "    #### [ç´¢å¼• "
+						+ index + "]  æè¿°: " + desc_A + "\n";
 				itemDesc += batName.trim() + Cur_Batch_End + "  " + type + "_" + index + "_jpg_png_gif_webp"
-						+ "    #### [Ë÷Òı " + index + "]  ÃèÊö: " + desc_A + "\n";
+						+ "    #### [ç´¢å¼• " + index + "]  æè¿°: " + desc_A + "\n";
 			}
 			return itemDesc;
 
@@ -1006,15 +1006,15 @@ public class G2_ApplyRuleFor_TypeFile {
 
 	class Land_Port_Classify_Rule_20 extends Basic_Rule {
 
-		boolean isTimeStampDir = true; // Land_Port ĞÂ½¨µÄÎÄ¼ş¼ĞÊÇ·ñ´æÓĞÊ±¼ä´Á
+		boolean isTimeStampDir = true; // Land_Port æ–°å»ºçš„æ–‡ä»¶å¤¹æ˜¯å¦å­˜æœ‰æ—¶é—´æˆ³
 
-		// false ---¡· ¶Ô png ºÍ jpg ÎÄ¼ş½øĞĞ¹ıÂË
-		boolean isGifClassfly = false; // true ---¡· Ö»¶Ô gif ÎÄ¼ş ½øĞĞ ¹ıÂË
+		// false ---ã€‹ å¯¹ png å’Œ jpg æ–‡ä»¶è¿›è¡Œè¿‡æ»¤
+		boolean isGifClassfly = false; // true ---ã€‹ åªå¯¹ gif æ–‡ä»¶ è¿›è¡Œ è¿‡æ»¤
 
-		ArrayList<File> mSrcFileImage; // Shell Ä¿Â¼ÏÂÔ­Ê¼ÎÄ¼şÄ¿Â¼
-		ArrayList<File> mLandImageFileList; // Shell/Land_Port_TimeStamp/Land/ ÎÄ¼ş¼ĞÏÂµÄÎÄ¼ş
-		ArrayList<File> mPortImageFileList; // Shell/Land_Port_TimeStamp/Land/ ÎÄ¼ş¼ĞÏÂµÄÎÄ¼ş
-		HashMap<File, File> src_target_FileMap; // srcÎª Ô­Ê¼ÎÄ¼ş targetÎªÄ¿±êÎÄ¼ş ½øĞĞ copyÊ± »áÊ¹ÓÃµ½
+		ArrayList<File> mSrcFileImage; // Shell ç›®å½•ä¸‹åŸå§‹æ–‡ä»¶ç›®å½•
+		ArrayList<File> mLandImageFileList; // Shell/Land_Port_TimeStamp/Land/ æ–‡ä»¶å¤¹ä¸‹çš„æ–‡ä»¶
+		ArrayList<File> mPortImageFileList; // Shell/Land_Port_TimeStamp/Land/ æ–‡ä»¶å¤¹ä¸‹çš„æ–‡ä»¶
+		HashMap<File, File> src_target_FileMap; // srcä¸º åŸå§‹æ–‡ä»¶ targetä¸ºç›®æ ‡æ–‡ä»¶ è¿›è¡Œ copyæ—¶ ä¼šä½¿ç”¨åˆ°
 
 		Land_Port_Classify_Rule_20() {
 			super("#", 20, 4); //
@@ -1090,13 +1090,13 @@ public class G2_ApplyRuleFor_TypeFile {
 			String dir_1_Port_str = dir_1 + File.separator + "Port";
 			File dir_Port = new File(curDirFile.getAbsoluteFile() + File.separator + dir_1_Port_str);
 			File dir_Land = new File(curDirFile.getAbsoluteFile() + File.separator + dir_1_Land_str);
-			System.out.println("¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T" + dir_Land.getAbsolutePath() + "  LandÎÄ¼ş¿ªÊ¼¹ıÂËÖ´ĞĞ" + "¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T");
+			System.out.println("â•â•â•â•â•â•â•â•â•â•" + dir_Land.getAbsolutePath() + "  Landæ–‡ä»¶å¼€å§‹è¿‡æ»¤æ‰§è¡Œ" + "â•â•â•â•â•â•â•â•â•â•");
 			TryClassifyImage(mLandImageFileList, dir_Land);
-			System.out.println("¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T" + dir_Port.getAbsolutePath() + "  PortÎÄ¼ş¿ªÊ¼¹ıÂËÖ´ĞĞ" + "¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T");
+			System.out.println("â•â•â•â•â•â•â•â•â•â•" + dir_Port.getAbsolutePath() + "  Portæ–‡ä»¶å¼€å§‹è¿‡æ»¤æ‰§è¡Œ" + "â•â•â•â•â•â•â•â•â•â•");
 			TryClassifyImage(mPortImageFileList, dir_Port);
 
 			System.out.println("zzfile_3" + Cur_Batch_End + "  " + curDirFile.getAbsoluteFile() + File.separator + dir_1
-					+ "                        ####  ¹ıÂË Land  Port ÎÄ¼ş¼ĞÒÑ¾­Éú³É£¡");
+					+ "                        ####  è¿‡æ»¤ Land  Port æ–‡ä»¶å¤¹å·²ç»ç”Ÿæˆï¼");
 
 			return super.applySubFileListRule4(curFileList, subFileTypeMap, curDirList, curRealFileList);
 		}
@@ -1111,38 +1111,38 @@ public class G2_ApplyRuleFor_TypeFile {
 				File targetFile = new File(targetDirFile.getAbsoluteFile() + File.separator + fileName);
 
 				fileCopy(imgFile, targetFile);
-				System.out.println("File[" + i + "] = " + "SrcFile¡¾" + imgFile.getAbsolutePath() + "¡¿" + " TargetFile¡¾"
-						+ targetFile.getAbsolutePath() + "¡¿");
+				System.out.println("File[" + i + "] = " + "SrcFileã€" + imgFile.getAbsolutePath() + "ã€‘" + " TargetFileã€"
+						+ targetFile.getAbsolutePath() + "ã€‘");
 			}
 
 		}
 
 		String ruleTip(String type, int index, String batName, OS_TYPE curType) {
 			String itemDesc = "";
-			String desc_A = " ¶Ôµ±Ç°Ä¿Â¼ÏÂµÄÍ¼Æ¬ÎÄ¼ş(png)(jpg)½øĞĞ LandºáÆÁ ºÍ PortÊúÖ± ·ÖÀà ²¢·ÅÖÃÔÚĞÂ½¨Land_Port_Img_TimeStamp ÎÄ¼ş¼ĞÖĞ";
-			String desc_B = " ¶Ôµ±Ç°Ä¿Â¼ÏÂµÄÍ¼Æ¬ÎÄ¼ş(png)(jpg)½øĞĞ LandºáÆÁ ºÍ PortÊúÖ± ·ÖÀà ²¢·ÅÖÃÔÚĞÂ½¨Land_Port_ImgÎÄ¼ş¼ĞÖĞ(ÎÄ¼ş¼ĞÃû³Æ¹Ì¶¨)";
-			String desc_C = " ¶Ôµ±Ç°Ä¿Â¼ÏÂµÄÍ¼Æ¬ÎÄ¼ş(gif)½øĞĞ LandºáÆÁ ºÍ PortÊúÖ± ·ÖÀà ²¢·ÅÖÃÔÚĞÂ½¨Land_Port_Gif_TimeStamp ÎÄ¼ş¼ĞÖĞ";
-			String desc_D = " ¶Ôµ±Ç°Ä¿Â¼ÏÂµÄÍ¼Æ¬ÎÄ¼ş(gif)½øĞĞ LandºáÆÁ ºÍ PortÊúÖ± ·ÖÀà ²¢·ÅÖÃÔÚĞÂ½¨Land_Port_Gif ÎÄ¼ş¼ĞÖĞ(ÎÄ¼ş¼ĞÃû³Æ¹Ì¶¨)";
+			String desc_A = " å¯¹å½“å‰ç›®å½•ä¸‹çš„å›¾ç‰‡æ–‡ä»¶(png)(jpg)è¿›è¡Œ Landæ¨ªå± å’Œ Portç«–ç›´ åˆ†ç±» å¹¶æ”¾ç½®åœ¨æ–°å»ºLand_Port_Img_TimeStamp æ–‡ä»¶å¤¹ä¸­";
+			String desc_B = " å¯¹å½“å‰ç›®å½•ä¸‹çš„å›¾ç‰‡æ–‡ä»¶(png)(jpg)è¿›è¡Œ Landæ¨ªå± å’Œ Portç«–ç›´ åˆ†ç±» å¹¶æ”¾ç½®åœ¨æ–°å»ºLand_Port_Imgæ–‡ä»¶å¤¹ä¸­(æ–‡ä»¶å¤¹åç§°å›ºå®š)";
+			String desc_C = " å¯¹å½“å‰ç›®å½•ä¸‹çš„å›¾ç‰‡æ–‡ä»¶(gif)è¿›è¡Œ Landæ¨ªå± å’Œ Portç«–ç›´ åˆ†ç±» å¹¶æ”¾ç½®åœ¨æ–°å»ºLand_Port_Gif_TimeStamp æ–‡ä»¶å¤¹ä¸­";
+			String desc_D = " å¯¹å½“å‰ç›®å½•ä¸‹çš„å›¾ç‰‡æ–‡ä»¶(gif)è¿›è¡Œ Landæ¨ªå± å’Œ Portç«–ç›´ åˆ†ç±» å¹¶æ”¾ç½®åœ¨æ–°å»ºLand_Port_Gif æ–‡ä»¶å¤¹ä¸­(æ–‡ä»¶å¤¹åç§°å›ºå®š)";
 
 			if (curType == OS_TYPE.Windows) {
-				itemDesc = batName.trim() + ".bat  " + type + "_" + index + "" + "    #### [Ë÷Òı " + index + "]  ÃèÊö: "
+				itemDesc = batName.trim() + ".bat  " + type + "_" + index + "" + "    #### [ç´¢å¼• " + index + "]  æè¿°: "
 						+ desc_A + "\n";
-				itemDesc += batName.trim() + ".bat  " + type + "_" + index + "_notime" + "    #### [Ë÷Òı " + index
-						+ "]  ÃèÊö: " + desc_B + "\n";
-				itemDesc += batName.trim() + ".bat  " + type + "_" + index + "_gif" + "    #### [Ë÷Òı " + index
-						+ "]  ÃèÊö: " + desc_C + "\n";
-				itemDesc += batName.trim() + ".bat  " + type + "_" + index + "_gif_notime" + "    #### [Ë÷Òı " + index
-						+ "]  ÃèÊö: " + desc_D + "\n";
+				itemDesc += batName.trim() + ".bat  " + type + "_" + index + "_notime" + "    #### [ç´¢å¼• " + index
+						+ "]  æè¿°: " + desc_B + "\n";
+				itemDesc += batName.trim() + ".bat  " + type + "_" + index + "_gif" + "    #### [ç´¢å¼• " + index
+						+ "]  æè¿°: " + desc_C + "\n";
+				itemDesc += batName.trim() + ".bat  " + type + "_" + index + "_gif_notime" + "    #### [ç´¢å¼• " + index
+						+ "]  æè¿°: " + desc_D + "\n";
 
 			} else {
-				itemDesc = batName.trim() + Cur_Batch_End + " " + type + "_" + index + "       ### [Ë÷Òı " + index
-						+ "]  ÃèÊö:" + desc_A + "\n";
-				itemDesc += batName.trim() + Cur_Batch_End + " " + type + "_" + index + "_notime" + "       ### [Ë÷Òı "
-						+ index + "]  ÃèÊö:" + desc_B + "\n";
-				itemDesc += batName.trim() + Cur_Batch_End + " " + type + "_" + index + "_gif" + "       ### [Ë÷Òı "
-						+ index + "]  ÃèÊö:" + desc_C + "\n";
+				itemDesc = batName.trim() + Cur_Batch_End + " " + type + "_" + index + "       ### [ç´¢å¼• " + index
+						+ "]  æè¿°:" + desc_A + "\n";
+				itemDesc += batName.trim() + Cur_Batch_End + " " + type + "_" + index + "_notime" + "       ### [ç´¢å¼• "
+						+ index + "]  æè¿°:" + desc_B + "\n";
+				itemDesc += batName.trim() + Cur_Batch_End + " " + type + "_" + index + "_gif" + "       ### [ç´¢å¼• "
+						+ index + "]  æè¿°:" + desc_C + "\n";
 				itemDesc += batName.trim() + Cur_Batch_End + " " + type + "_" + index + "_gif_notime"
-						+ "       ### [Ë÷Òı " + index + "]  ÃèÊö:" + desc_C;
+						+ "       ### [ç´¢å¼• " + index + "]  æè¿°:" + desc_C;
 			}
 
 			return itemDesc;
@@ -1150,13 +1150,13 @@ public class G2_ApplyRuleFor_TypeFile {
 
 	}
 
-	// °Ñµ±Ç° ÎÄ¼ş Ê¹ÓÃ Ä¬ÈÏµÄ ÃÜÂë 752025 ½øĞĞ Ñ¹Ëõ ³É 7z ÎÄ¼ş
+	// æŠŠå½“å‰ æ–‡ä»¶ ä½¿ç”¨ é»˜è®¤çš„ å¯†ç  752025 è¿›è¡Œ å‹ç¼© æˆ 7z æ–‡ä»¶
 	class ExpressTo7z_PassWord_Rule_19 extends Basic_Rule {
 
 		ArrayList<String> inputTypeList;
-		// zrule_apply_G2.bat #_14 jpg °Ñµ±Ç°ËùÓĞµÄjpg¸ñÊ½ÎÄ¼şÉú³É¿ì½İ·½Ê½µ½ jpg_Ê±¼ä´Á ÎÄ¼ş¼ĞÄÚ
+		// zrule_apply_G2.bat #_14 jpg æŠŠå½“å‰æ‰€æœ‰çš„jpgæ ¼å¼æ–‡ä»¶ç”Ÿæˆå¿«æ·æ–¹å¼åˆ° jpg_æ—¶é—´æˆ³ æ–‡ä»¶å¤¹å†…
 
-		// ¿ÉÄÜ´Ó²ÎÊıÊäÈëµÄ µ¥Ò»ÎÄ¼ş
+		// å¯èƒ½ä»å‚æ•°è¾“å…¥çš„ å•ä¸€æ–‡ä»¶
 		ArrayList<File> inputParamFileList;
 		File z7exeFile;
 
@@ -1198,7 +1198,7 @@ public class G2_ApplyRuleFor_TypeFile {
 			System.out.println("Win_Lin_Mac_ZbinPath = " + Win_Lin_Mac_ZbinPath);
 			if (!z7exeFile.exists() || z7exeFile.isDirectory()) {
 				System.out.println(
-						"µ±Ç° 7z Ñ¹Ëõ³ÌĞò²»´æÔÚ! Çë¼ì²éµ±Ç°µÄ 7z³ÌĞò Ò»°ãÎ»ÓÚ Desktop/zbin/win_zbin/  mac_zbin lin_zbin ÖĞ  z7exeFile = "
+						"å½“å‰ 7z å‹ç¼©ç¨‹åºä¸å­˜åœ¨! è¯·æ£€æŸ¥å½“å‰çš„ 7zç¨‹åº ä¸€èˆ¬ä½äº Desktop/zbin/win_zbin/  mac_zbin lin_zbin ä¸­  z7exeFile = "
 								+ z7exeFile.getAbsolutePath());
 				return false;
 			}
@@ -1208,14 +1208,14 @@ public class G2_ApplyRuleFor_TypeFile {
 		@Override
 		ArrayList<File> applyFileListRule3(ArrayList<File> subFileList, HashMap<String, ArrayList<File>> fileTypeMap) {
 
-			SimpleDateFormat df = new SimpleDateFormat("MMdd_HHmmss");// ÉèÖÃÈÕÆÚ¸ñÊ½
-//            SimpleDateFormat df_hms = new SimpleDateFormat("HHmmss");//ÉèÖÃÈÕÆÚ¸ñÊ½
+			SimpleDateFormat df = new SimpleDateFormat("MMdd_HHmmss");// è®¾ç½®æ—¥æœŸæ ¼å¼
+//            SimpleDateFormat df_hms = new SimpleDateFormat("HHmmss");//è®¾ç½®æ—¥æœŸæ ¼å¼
 			Date curDate = new Date();
 			String date = df.format(curDate);
 //            String preHMS = df.format(df_hms);
 
 			if (isSearchAllFile2CurDirFlag) {
-				// ±ÈÄÇÀïËùÓĞ ÀàĞÍµÄ ÎÄ¼ş ²¢ ÖØĞÂÃüÃû
+				// æ¯”é‚£é‡Œæ‰€æœ‰ ç±»å‹çš„ æ–‡ä»¶ å¹¶ é‡æ–°å‘½å
 				try7zExpressOperation(fileTypeMap);
 
 			} else {
@@ -1226,7 +1226,7 @@ public class G2_ApplyRuleFor_TypeFile {
 					ArrayList<File> targetFileList = fileTypeMap.get(type);
 
 					if (targetFileList == null || targetFileList.size() == 0) {
-						System.out.println(" µ±Ç°Â·¾¶ " + curDirPath + " ²»´æÔÚÀàĞÍ " + type + "µÄÎÄ¼ş!");
+						System.out.println(" å½“å‰è·¯å¾„ " + curDirPath + " ä¸å­˜åœ¨ç±»å‹ " + type + "çš„æ–‡ä»¶!");
 						continue;
 					}
 
@@ -1241,7 +1241,7 @@ public class G2_ApplyRuleFor_TypeFile {
 
 						String z7_command = z7exeFile.getAbsolutePath() + "  a -tzip  " + noPointName + ".7z" + " -p"
 								+ strZ7DefaultKey_PSW_Rule19 + "  " + originName;
-						System.out.println("Ö´ĞĞ\n");
+						System.out.println("æ‰§è¡Œ\n");
 						System.out.println(z7_command);
 						execCMD(z7_command);
 					}
@@ -1258,7 +1258,7 @@ public class G2_ApplyRuleFor_TypeFile {
 					String z7_command = z7exeFile.getAbsolutePath() + "  a -tzip  " + noPointName + ".7z" + " -p"
 							+ strZ7DefaultKey_PSW_Rule19 + "  " + originName;
 
-					System.out.println("Ö´ĞĞ\n");
+					System.out.println("æ‰§è¡Œ\n");
 					System.out.println(z7_command);
 
 					execCMD(z7_command);
@@ -1279,8 +1279,8 @@ public class G2_ApplyRuleFor_TypeFile {
 				Iterator iterator = arrFileMap.entrySet().iterator();
 				while (iterator.hasNext()) {
 					entry = (Map.Entry<String, ArrayList<File>>) iterator.next();
-					String typeStr = entry.getKey(); // MapµÄValue
-					ArrayList<File> fileArr = entry.getValue(); // MapµÄValue
+					String typeStr = entry.getKey(); // Mapçš„Value
+					ArrayList<File> fileArr = entry.getValue(); // Mapçš„Value
 
 					for (int i = 0; i < fileArr.size(); i++) {
 						File curFile = fileArr.get(i);
@@ -1296,7 +1296,7 @@ public class G2_ApplyRuleFor_TypeFile {
 						String z7_command = z7exeFile.getAbsolutePath() + "  a -tzip  " + noPointName + ".7z" + " -p"
 								+ strZ7DefaultKey_PSW_Rule19 + "  " + originName;
 
-						System.out.println("Ö´ĞĞ\n");
+						System.out.println("æ‰§è¡Œ\n");
 						System.out.println(z7_command);
 						execCMD(z7_command);
 					}
@@ -1309,43 +1309,43 @@ public class G2_ApplyRuleFor_TypeFile {
 
 		@Override
 		String simpleDesc() {
-			return "\n" + Cur_Bat_Name + " #_19            ### °Ñµ±Ç°ÎÄ¼ş¼ĞÏÂËùÓĞÎÄ¼şµ¥¶À Ñ¹ËõÎª .7z ÎÄ¼ş ÎÄ¼şÃû²»±ä»¯   ÃÜÂëÄ¬ÈÏÎª 752025 !  "
+			return "\n" + Cur_Bat_Name + " #_19            ### æŠŠå½“å‰æ–‡ä»¶å¤¹ä¸‹æ‰€æœ‰æ–‡ä»¶å•ç‹¬ å‹ç¼©ä¸º .7z æ–‡ä»¶ æ–‡ä»¶åä¸å˜åŒ–   å¯†ç é»˜è®¤ä¸º 752025 !  "
 					+ "\n" + Cur_Bat_Name
-					+ " #_19  mp4          ###  °Ñµ±Ç°ÎÄ¼ş¼ĞÏÂ .mp4   µ¥¶À Ñ¹ËõÎª .7z ÎÄ¼ş ÎÄ¼şÃû²»±ä»¯   ÃÜÂëÄ¬ÈÏÎª 752025 !   " + "\n"
-					+ Cur_Bat_Name + " #_19  .mp4         ### °Ñµ±Ç°ÎÄ¼ş¼ĞÏÂ .mp4  µ¥¶À Ñ¹ËõÎª .7z ÎÄ¼ş ÎÄ¼şÃû²»±ä»¯   ÃÜÂëÄ¬ÈÏÎª 752025 !   "
+					+ " #_19  mp4          ###  æŠŠå½“å‰æ–‡ä»¶å¤¹ä¸‹ .mp4   å•ç‹¬ å‹ç¼©ä¸º .7z æ–‡ä»¶ æ–‡ä»¶åä¸å˜åŒ–   å¯†ç é»˜è®¤ä¸º 752025 !   " + "\n"
+					+ Cur_Bat_Name + " #_19  .mp4         ### æŠŠå½“å‰æ–‡ä»¶å¤¹ä¸‹ .mp4  å•ç‹¬ å‹ç¼©ä¸º .7z æ–‡ä»¶ æ–‡ä»¶åä¸å˜åŒ–   å¯†ç é»˜è®¤ä¸º 752025 !   "
 					+ "\n" + Cur_Bat_Name
-					+ " #_19  .gif         ### °Ñµ±Ç°ÎÄ¼ş¼ĞÏÂ .gif  µ¥¶À Ñ¹ËõÎª .7z ÎÄ¼ş ÎÄ¼şÃû²»±ä»¯   ÃÜÂëÄ¬ÈÏÎª 752025 !   " + "\n"
-					+ Cur_Bat_Name + " #_19  png          ### °Ñµ±Ç°ÎÄ¼ş¼ĞÏÂ .png  µ¥¶À Ñ¹ËõÎª .7z ÎÄ¼ş ÎÄ¼şÃû²»±ä»¯   ÃÜÂëÄ¬ÈÏÎª 752025 !   "
+					+ " #_19  .gif         ### æŠŠå½“å‰æ–‡ä»¶å¤¹ä¸‹ .gif  å•ç‹¬ å‹ç¼©ä¸º .7z æ–‡ä»¶ æ–‡ä»¶åä¸å˜åŒ–   å¯†ç é»˜è®¤ä¸º 752025 !   " + "\n"
+					+ Cur_Bat_Name + " #_19  png          ### æŠŠå½“å‰æ–‡ä»¶å¤¹ä¸‹ .png  å•ç‹¬ å‹ç¼©ä¸º .7z æ–‡ä»¶ æ–‡ä»¶åä¸å˜åŒ–   å¯†ç é»˜è®¤ä¸º 752025 !   "
 					+ "\n" + Cur_Bat_Name
-					+ " #_19  zip  7z      ### °Ñµ±Ç°ÎÄ¼ş¼ĞÏÂ  .zip  .7z   µ¥¶À Ñ¹ËõÎª .7z ÎÄ¼ş ÎÄ¼şÃû²»±ä»¯   ÃÜÂëÄ¬ÈÏÎª 752025 !   " + "\n"
+					+ " #_19  zip  7z      ### æŠŠå½“å‰æ–‡ä»¶å¤¹ä¸‹  .zip  .7z   å•ç‹¬ å‹ç¼©ä¸º .7z æ–‡ä»¶ æ–‡ä»¶åä¸å˜åŒ–   å¯†ç é»˜è®¤ä¸º 752025 !   " + "\n"
 					+ Cur_Bat_Name
-					+ " #_19  .zip .7z     ###  °Ñµ±Ç°ÎÄ¼ş¼ĞÏÂ  .zip  .7z   µ¥¶À Ñ¹ËõÎª .7z ÎÄ¼ş ÎÄ¼şÃû²»±ä»¯   ÃÜÂëÄ¬ÈÏÎª 752025 !   " + "\n"
-					+ Cur_Bat_Name + " #_19  jpg          ###  °Ñµ±Ç°ÎÄ¼ş¼ĞÏÂ  .jpg   µ¥¶ÀÑ¹ËõÎª .7z ÎÄ¼ş ÎÄ¼şÃû²»±ä»¯   ÃÜÂëÄ¬ÈÏÎª 752025 !   "
+					+ " #_19  .zip .7z     ###  æŠŠå½“å‰æ–‡ä»¶å¤¹ä¸‹  .zip  .7z   å•ç‹¬ å‹ç¼©ä¸º .7z æ–‡ä»¶ æ–‡ä»¶åä¸å˜åŒ–   å¯†ç é»˜è®¤ä¸º 752025 !   " + "\n"
+					+ Cur_Bat_Name + " #_19  jpg          ###  æŠŠå½“å‰æ–‡ä»¶å¤¹ä¸‹  .jpg   å•ç‹¬å‹ç¼©ä¸º .7z æ–‡ä»¶ æ–‡ä»¶åä¸å˜åŒ–   å¯†ç é»˜è®¤ä¸º 752025 !   "
 					+ "\n" + Cur_Bat_Name
-					+ " #_19  .jpg  .png  .webp .gif                          ### °Ñµ±Ç°ÎÄ¼ş¼ĞÏÂ  .jpg  .png  .webp .gif  µ¥¶ÀÑ¹ËõÎª .7z ÎÄ¼ş ÎÄ¼şÃû²»±ä»¯   ÃÜÂëÄ¬ÈÏÎª 752025 !   "
+					+ " #_19  .jpg  .png  .webp .gif                          ### æŠŠå½“å‰æ–‡ä»¶å¤¹ä¸‹  .jpg  .png  .webp .gif  å•ç‹¬å‹ç¼©ä¸º .7z æ–‡ä»¶ æ–‡ä»¶åä¸å˜åŒ–   å¯†ç é»˜è®¤ä¸º 752025 !   "
 					+ "\n" + Cur_Bat_Name
-					+ " #_19  .mp4  .avi   .wmv .rmvb  .flv .3gp              ### °Ñµ±Ç°ÎÄ¼ş¼ĞÏÂ  .mp4  .avi   .wmv .rmvb  .flv .3gp  µ¥¶ÀÑ¹ËõÎª .7z ÎÄ¼ş ÎÄ¼şÃû²»±ä»¯   ÃÜÂëÄ¬ÈÏÎª 752025 !   "
+					+ " #_19  .mp4  .avi   .wmv .rmvb  .flv .3gp              ### æŠŠå½“å‰æ–‡ä»¶å¤¹ä¸‹  .mp4  .avi   .wmv .rmvb  .flv .3gp  å•ç‹¬å‹ç¼©ä¸º .7z æ–‡ä»¶ æ–‡ä»¶åä¸å˜åŒ–   å¯†ç é»˜è®¤ä¸º 752025 !   "
 					+ "\n" + Cur_Bat_Name
-					+ " #_19  .jpg  .png  .gif  .webp .mp4 .avi .flv .wmv     ### °Ñµ±Ç°ÎÄ¼ş¼ĞÏÂ  .jpg  .png  .gif  .webp .mp4 .avi .flv .wmv  µ¥¶ÀÑ¹ËõÎª .7z ÎÄ¼ş ÎÄ¼şÃû²»±ä»¯   ÃÜÂëÄ¬ÈÏÎª 752025 !   "
+					+ " #_19  .jpg  .png  .gif  .webp .mp4 .avi .flv .wmv     ### æŠŠå½“å‰æ–‡ä»¶å¤¹ä¸‹  .jpg  .png  .gif  .webp .mp4 .avi .flv .wmv  å•ç‹¬å‹ç¼©ä¸º .7z æ–‡ä»¶ æ–‡ä»¶åä¸å˜åŒ–   å¯†ç é»˜è®¤ä¸º 752025 !   "
 					+ "\n" + Cur_Bat_Name
-					+ " #_19  <Ö¸¶¨ÎÄ¼şA> <Ö¸¶¨ÎÄ¼şB>          ### °Ñµ±Ç°ÎÄ¼ş¼ĞÏÂ Ö¸¶¨ÎÄ¼şÃû³Æ µ¥¶ÀÑ¹ËõÎª .7z ÎÄ¼ş ÎÄ¼şÃû²»±ä»¯   ÃÜÂëÄ¬ÈÏÎª 752025 !   \"+ "
+					+ " #_19  <æŒ‡å®šæ–‡ä»¶A> <æŒ‡å®šæ–‡ä»¶B>          ### æŠŠå½“å‰æ–‡ä»¶å¤¹ä¸‹ æŒ‡å®šæ–‡ä»¶åç§° å•ç‹¬å‹ç¼©ä¸º .7z æ–‡ä»¶ æ–‡ä»¶åä¸å˜åŒ–   å¯†ç é»˜è®¤ä¸º 752025 !   \"+ "
 
 			;
 		}
 
 	}
 
-	// operation_type ²Ù×÷ÀàĞÍ 1--¶ÁÈ¡ÎÄ¼şÄÚÈİ×Ö·û´® ½øĞĞĞŞ¸Ä 2--¶ÔÎÄ¼ş¶ÔÎÄ¼şÄÚÈİ(×Ö½Ú)--½øĞĞĞŞ¸Ä 3.¶ÔÈ«Ìå×ÓÎÄ¼ş½øĞĞµÄËæĞÔµÄ²Ù×÷
-	// ÊôĞÔ½øĞĞĞŞ¸Ä(ÎÄ¼şÃû³Æ)
-//     // 4.¶Ôµ±Ç°×ÓÎÄ¼ş(°üÀ¨×ÓÄ¿Â¼ ×ÓÎÄ¼ş --²»°üº¬ËïÄ¿Â¼ ËïÎÄ¼ş) 5. ´Óshell ÖĞ»ñÈ¡µ½µÄÂ·¾¶ È¥¶ÔÄ³Ò»¸öÎÄ¼ş½øĞĞ²Ù×÷
+	// operation_type æ“ä½œç±»å‹ 1--è¯»å–æ–‡ä»¶å†…å®¹å­—ç¬¦ä¸² è¿›è¡Œä¿®æ”¹ 2--å¯¹æ–‡ä»¶å¯¹æ–‡ä»¶å†…å®¹(å­—èŠ‚)--è¿›è¡Œä¿®æ”¹ 3.å¯¹å…¨ä½“å­æ–‡ä»¶è¿›è¡Œçš„éšæ€§çš„æ“ä½œ
+	// å±æ€§è¿›è¡Œä¿®æ”¹(æ–‡ä»¶åç§°)
+//     // 4.å¯¹å½“å‰å­æ–‡ä»¶(åŒ…æ‹¬å­ç›®å½• å­æ–‡ä»¶ --ä¸åŒ…å«å­™ç›®å½• å­™æ–‡ä»¶) 5. ä»shell ä¸­è·å–åˆ°çš„è·¯å¾„ å»å¯¹æŸä¸€ä¸ªæ–‡ä»¶è¿›è¡Œæ“ä½œ
 
-	// ÒÔÎÄ¼şµÄmdÊı×Ö½øĞĞÖØÃüÃû ÎÄ¼ş ¸ÄÃû×Ö ¸Äºó×º ²»Ó°Ïì Õâ¸öÊôĞÔ
+	// ä»¥æ–‡ä»¶çš„mdæ•°å­—è¿›è¡Œé‡å‘½å æ–‡ä»¶ æ”¹åå­— æ”¹åç¼€ ä¸å½±å“ è¿™ä¸ªå±æ€§
 	class MD_ReName_Rule_18 extends Basic_Rule {
 
 		ArrayList<String> inputTypeList;
-		// zrule_apply_G2.bat #_14 jpg °Ñµ±Ç°ËùÓĞµÄjpg¸ñÊ½ÎÄ¼şÉú³É¿ì½İ·½Ê½µ½ jpg_Ê±¼ä´Á ÎÄ¼ş¼ĞÄÚ
+		// zrule_apply_G2.bat #_14 jpg æŠŠå½“å‰æ‰€æœ‰çš„jpgæ ¼å¼æ–‡ä»¶ç”Ÿæˆå¿«æ·æ–¹å¼åˆ° jpg_æ—¶é—´æˆ³ æ–‡ä»¶å¤¹å†…
 
-		// ¿ÉÄÜ´Ó²ÎÊıÊäÈëµÄ µ¥Ò»ÎÄ¼ş
+		// å¯èƒ½ä»å‚æ•°è¾“å…¥çš„ å•ä¸€æ–‡ä»¶
 		ArrayList<File> inputParamFileList;
 
 		boolean isSearchAllFile2CurDirFlag = false;
@@ -1387,14 +1387,14 @@ public class G2_ApplyRuleFor_TypeFile {
 		@Override
 		ArrayList<File> applyFileListRule3(ArrayList<File> subFileList, HashMap<String, ArrayList<File>> fileTypeMap) {
 
-			SimpleDateFormat df = new SimpleDateFormat("MMdd_HHmmss");// ÉèÖÃÈÕÆÚ¸ñÊ½
-//            SimpleDateFormat df_hms = new SimpleDateFormat("HHmmss");//ÉèÖÃÈÕÆÚ¸ñÊ½
+			SimpleDateFormat df = new SimpleDateFormat("MMdd_HHmmss");// è®¾ç½®æ—¥æœŸæ ¼å¼
+//            SimpleDateFormat df_hms = new SimpleDateFormat("HHmmss");//è®¾ç½®æ—¥æœŸæ ¼å¼
 			Date curDate = new Date();
 			String date = df.format(curDate);
 //            String preHMS = df.format(df_hms);
 
 			if (isSearchAllFile2CurDirFlag) {
-				// ±ÈÄÇÀïËùÓĞ ÀàĞÍµÄ ÎÄ¼ş ²¢ ÖØĞÂÃüÃû
+				// æ¯”é‚£é‡Œæ‰€æœ‰ ç±»å‹çš„ æ–‡ä»¶ å¹¶ é‡æ–°å‘½å
 				tryReNameOperation(fileTypeMap);
 
 			} else {
@@ -1405,7 +1405,7 @@ public class G2_ApplyRuleFor_TypeFile {
 					ArrayList<File> targetFileList = fileTypeMap.get(type);
 
 					if (targetFileList == null || targetFileList.size() == 0) {
-						System.out.println(" µ±Ç°Â·¾¶ " + curDirPath + " ²»´æÔÚÀàĞÍ " + type + "µÄÎÄ¼ş!");
+						System.out.println(" å½“å‰è·¯å¾„ " + curDirPath + " ä¸å­˜åœ¨ç±»å‹ " + type + "çš„æ–‡ä»¶!");
 						continue;
 					}
 
@@ -1444,8 +1444,8 @@ public class G2_ApplyRuleFor_TypeFile {
 				Iterator iterator = arrFileMap.entrySet().iterator();
 				while (iterator.hasNext()) {
 					entry = (Map.Entry<String, ArrayList<File>>) iterator.next();
-					String typeStr = entry.getKey(); // MapµÄValue
-					ArrayList<File> fileArr = entry.getValue(); // MapµÄValue
+					String typeStr = entry.getKey(); // Mapçš„Value
+					ArrayList<File> fileArr = entry.getValue(); // Mapçš„Value
 
 					for (int i = 0; i < fileArr.size(); i++) {
 						File curFile = fileArr.get(i);
@@ -1465,28 +1465,28 @@ public class G2_ApplyRuleFor_TypeFile {
 		@Override
 		String simpleDesc() {
 			return "\n" + Cur_Bat_Name
-					+ " #_18            ### °Ñµ±Ç°ÎÄ¼ş¼ĞÏÂ ÎÄ¼şÈ«²¿¸ÄÃûÎª MD5ÊôĞÔÃüÃûµÄÎÄ¼ş ¡¾(32)Î»16½øÖÆ.type¡¿ 32aeefa9924afb8be0da50976f1a2405.mp4 !  "
+					+ " #_18            ### æŠŠå½“å‰æ–‡ä»¶å¤¹ä¸‹ æ–‡ä»¶å…¨éƒ¨æ”¹åä¸º MD5å±æ€§å‘½åçš„æ–‡ä»¶ ã€(32)ä½16è¿›åˆ¶.typeã€‘ 32aeefa9924afb8be0da50976f1a2405.mp4 !  "
 					+ "\n" + Cur_Bat_Name
-					+ " #_18  mp4          ###  °Ñµ±Ç°ÎÄ¼ş¼ĞÏÂ .mp4 ÎÄ¼şÈ«²¿¸ÄÃûÎª MD5ÊôĞÔÃüÃûµÄÎÄ¼ş ¡¾(32)Î»16½øÖÆ.type¡¿ !   " + "\n"
-					+ Cur_Bat_Name + " #_18  .mp4         ### °Ñµ±Ç°ÎÄ¼ş¼ĞÏÂ .mp4 ÎÄ¼şÈ«²¿¸ÄÃûÎª MD5ÊôĞÔÃüÃûµÄÎÄ¼ş ¡¾(32)Î»16½øÖÆ.type¡¿ !   "
+					+ " #_18  mp4          ###  æŠŠå½“å‰æ–‡ä»¶å¤¹ä¸‹ .mp4 æ–‡ä»¶å…¨éƒ¨æ”¹åä¸º MD5å±æ€§å‘½åçš„æ–‡ä»¶ ã€(32)ä½16è¿›åˆ¶.typeã€‘ !   " + "\n"
+					+ Cur_Bat_Name + " #_18  .mp4         ### æŠŠå½“å‰æ–‡ä»¶å¤¹ä¸‹ .mp4 æ–‡ä»¶å…¨éƒ¨æ”¹åä¸º MD5å±æ€§å‘½åçš„æ–‡ä»¶ ã€(32)ä½16è¿›åˆ¶.typeã€‘ !   "
 					+ "\n" + Cur_Bat_Name
-					+ " #_18  .gif         ### °Ñµ±Ç°ÎÄ¼ş¼ĞÏÂ .gif ÎÄ¼şÈ«²¿¸ÄÃûÎª MD5ÊôĞÔÃüÃûµÄÎÄ¼ş ¡¾(32)Î»16½øÖÆ.type¡¿ 32aeefa9924afb8be0da50976f1a2405.gif !   "
+					+ " #_18  .gif         ### æŠŠå½“å‰æ–‡ä»¶å¤¹ä¸‹ .gif æ–‡ä»¶å…¨éƒ¨æ”¹åä¸º MD5å±æ€§å‘½åçš„æ–‡ä»¶ ã€(32)ä½16è¿›åˆ¶.typeã€‘ 32aeefa9924afb8be0da50976f1a2405.gif !   "
 					+ "\n" + Cur_Bat_Name
-					+ " #_18  png          ### °Ñµ±Ç°ÎÄ¼ş¼ĞÏÂ .png ÎÄ¼şÈ«²¿¸ÄÃûÎª MD5ÊôĞÔÃüÃûµÄÎÄ¼ş ¡¾(32)Î»16½øÖÆ.type¡¿ !   " + "\n"
+					+ " #_18  png          ### æŠŠå½“å‰æ–‡ä»¶å¤¹ä¸‹ .png æ–‡ä»¶å…¨éƒ¨æ”¹åä¸º MD5å±æ€§å‘½åçš„æ–‡ä»¶ ã€(32)ä½16è¿›åˆ¶.typeã€‘ !   " + "\n"
 					+ Cur_Bat_Name
-					+ " #_18  zip  7z      ### °Ñµ±Ç°ÎÄ¼ş¼ĞÏÂ  .zip  .7z  ÎÄ¼şÈ«²¿¸ÄÃûÎª MD5ÊôĞÔÃüÃûµÄÎÄ¼ş ¡¾(32)Î»16½øÖÆ.type¡¿ !   32aeefa9924afb8be0da50976f1a2405.7z  "
+					+ " #_18  zip  7z      ### æŠŠå½“å‰æ–‡ä»¶å¤¹ä¸‹  .zip  .7z  æ–‡ä»¶å…¨éƒ¨æ”¹åä¸º MD5å±æ€§å‘½åçš„æ–‡ä»¶ ã€(32)ä½16è¿›åˆ¶.typeã€‘ !   32aeefa9924afb8be0da50976f1a2405.7z  "
 					+ "\n" + Cur_Bat_Name
-					+ " #_18  .zip .7z     ###  °Ñµ±Ç°ÎÄ¼ş¼ĞÏÂ  .zip  .7z  ÎÄ¼şÈ«²¿¸ÄÃûÎª MD5ÊôĞÔÃüÃûµÄÎÄ¼ş ¡¾(32)Î»16½øÖÆ.type¡¿ !   32aeefa9924afb8be0da50976f1a2405.7z "
+					+ " #_18  .zip .7z     ###  æŠŠå½“å‰æ–‡ä»¶å¤¹ä¸‹  .zip  .7z  æ–‡ä»¶å…¨éƒ¨æ”¹åä¸º MD5å±æ€§å‘½åçš„æ–‡ä»¶ ã€(32)ä½16è¿›åˆ¶.typeã€‘ !   32aeefa9924afb8be0da50976f1a2405.7z "
 					+ "\n" + Cur_Bat_Name
-					+ " #_18  jpg          ###  °Ñµ±Ç°ÎÄ¼ş¼ĞÏÂ  .jpg  ÎÄ¼şÈ«²¿¸ÄÃûÎª MD5ÊôĞÔÃüÃûµÄÎÄ¼ş ¡¾(32)Î»16½øÖÆ.type¡¿ !" + "\n"
+					+ " #_18  jpg          ###  æŠŠå½“å‰æ–‡ä»¶å¤¹ä¸‹  .jpg  æ–‡ä»¶å…¨éƒ¨æ”¹åä¸º MD5å±æ€§å‘½åçš„æ–‡ä»¶ ã€(32)ä½16è¿›åˆ¶.typeã€‘ !" + "\n"
 					+ Cur_Bat_Name
-					+ " #_18  .jpg  .png  .webp .gif                          ### °Ñµ±Ç°ÎÄ¼ş¼ĞÏÂ  .jpg  .png  .webp .gif ÎÄ¼şÈ«²¿¸ÄÃûÎª MD5ÊôĞÔÃüÃûµÄÎÄ¼ş ¡¾(32)Î»16½øÖÆ.type¡¿ "
+					+ " #_18  .jpg  .png  .webp .gif                          ### æŠŠå½“å‰æ–‡ä»¶å¤¹ä¸‹  .jpg  .png  .webp .gif æ–‡ä»¶å…¨éƒ¨æ”¹åä¸º MD5å±æ€§å‘½åçš„æ–‡ä»¶ ã€(32)ä½16è¿›åˆ¶.typeã€‘ "
 					+ "\n" + Cur_Bat_Name
-					+ " #_18  .mp4  .avi   .wmv .rmvb  .flv .3gp              ### °Ñµ±Ç°ÎÄ¼ş¼ĞÏÂ  .mp4  .avi   .wmv .rmvb  .flv .3gp ÎÄ¼şÈ«²¿¸ÄÃûÎª MD5ÊôĞÔÃüÃûµÄÎÄ¼ş ¡¾(32)Î»16½øÖÆ.type¡¿ "
+					+ " #_18  .mp4  .avi   .wmv .rmvb  .flv .3gp              ### æŠŠå½“å‰æ–‡ä»¶å¤¹ä¸‹  .mp4  .avi   .wmv .rmvb  .flv .3gp æ–‡ä»¶å…¨éƒ¨æ”¹åä¸º MD5å±æ€§å‘½åçš„æ–‡ä»¶ ã€(32)ä½16è¿›åˆ¶.typeã€‘ "
 					+ "\n" + Cur_Bat_Name
-					+ " #_18  .jpg  .png  .gif  .webp .mp4 .avi .flv .wmv     ### °Ñµ±Ç°ÎÄ¼ş¼ĞÏÂ  .jpg  .png  .gif  .webp .mp4 .avi .flv .wmv ÎÄ¼şÈ«²¿¸ÄÃûÎª MD5ÊôĞÔÃüÃûµÄÎÄ¼ş ¡¾(32)Î»16½øÖÆ.type¡¿ "
+					+ " #_18  .jpg  .png  .gif  .webp .mp4 .avi .flv .wmv     ### æŠŠå½“å‰æ–‡ä»¶å¤¹ä¸‹  .jpg  .png  .gif  .webp .mp4 .avi .flv .wmv æ–‡ä»¶å…¨éƒ¨æ”¹åä¸º MD5å±æ€§å‘½åçš„æ–‡ä»¶ ã€(32)ä½16è¿›åˆ¶.typeã€‘ "
 					+ "\n" + Cur_Bat_Name
-					+ " #_18  <Ö¸¶¨ÎÄ¼şA> <Ö¸¶¨ÎÄ¼şB>          ### °Ñµ±Ç°ÎÄ¼ş¼ĞÏÂ Ö¸¶¨ÎÄ¼şÃû³Æ  ÎÄ¼şÈ«²¿¸ÄÃûÎª MD5ÊôĞÔÃüÃûµÄÎÄ¼ş ¡¾(32)Î»16½øÖÆ.type¡¿ "
+					+ " #_18  <æŒ‡å®šæ–‡ä»¶A> <æŒ‡å®šæ–‡ä»¶B>          ### æŠŠå½“å‰æ–‡ä»¶å¤¹ä¸‹ æŒ‡å®šæ–‡ä»¶åç§°  æ–‡ä»¶å…¨éƒ¨æ”¹åä¸º MD5å±æ€§å‘½åçš„æ–‡ä»¶ ã€(32)ä½16è¿›åˆ¶.typeã€‘ "
 
 			;
 		}
@@ -1514,9 +1514,9 @@ public class G2_ApplyRuleFor_TypeFile {
 		}
 		return bi.toString(16);
 	}
-	// operation_type ²Ù×÷ÀàĞÍ 1--¶ÁÈ¡ÎÄ¼şÄÚÈİ×Ö·û´® ½øĞĞĞŞ¸Ä 2--¶ÔÎÄ¼ş¶ÔÎÄ¼şÄÚÈİ(×Ö½Ú)--½øĞĞĞŞ¸Ä 3.¶ÔÈ«Ìå×ÓÎÄ¼ş½øĞĞµÄËæĞÔµÄ²Ù×÷
-	// ÊôĞÔ½øĞĞĞŞ¸Ä(ÎÄ¼şÃû³Æ)
-//     // 4.¶Ôµ±Ç°×ÓÎÄ¼ş(°üÀ¨×ÓÄ¿Â¼ ×ÓÎÄ¼ş --²»°üº¬ËïÄ¿Â¼ ËïÎÄ¼ş) 5. ´Óshell ÖĞ»ñÈ¡µ½µÄÂ·¾¶ È¥¶ÔÄ³Ò»¸öÎÄ¼ş½øĞĞ²Ù×÷
+	// operation_type æ“ä½œç±»å‹ 1--è¯»å–æ–‡ä»¶å†…å®¹å­—ç¬¦ä¸² è¿›è¡Œä¿®æ”¹ 2--å¯¹æ–‡ä»¶å¯¹æ–‡ä»¶å†…å®¹(å­—èŠ‚)--è¿›è¡Œä¿®æ”¹ 3.å¯¹å…¨ä½“å­æ–‡ä»¶è¿›è¡Œçš„éšæ€§çš„æ“ä½œ
+	// å±æ€§è¿›è¡Œä¿®æ”¹(æ–‡ä»¶åç§°)
+//     // 4.å¯¹å½“å‰å­æ–‡ä»¶(åŒ…æ‹¬å­ç›®å½• å­æ–‡ä»¶ --ä¸åŒ…å«å­™ç›®å½• å­™æ–‡ä»¶) 5. ä»shell ä¸­è·å–åˆ°çš„è·¯å¾„ å»å¯¹æŸä¸€ä¸ªæ–‡ä»¶è¿›è¡Œæ“ä½œ
 
 	class Make_ZRuleDir_Rule_17 extends Basic_Rule {
 		ArrayList<String> dirNameList;
@@ -1548,25 +1548,25 @@ public class G2_ApplyRuleFor_TypeFile {
 					String dirAbsPath = curDirFile.getAbsolutePath() + File.separator + dirName;
 					File newDirTemp = new File(dirAbsPath);
 					newDirTemp.mkdirs();
-					System.out.println("´´½¨Ä¿Â¼ " + newDirTemp.getAbsolutePath() + " ³É¹¦! ");
+					System.out.println("åˆ›å»ºç›®å½• " + newDirTemp.getAbsolutePath() + " æˆåŠŸ! ");
 				}
 				return null;
 			} else {
-				System.out.println("Make_ZRuleDir_Rule_17   µ±Ç°»ñÈ¡µ½µÄShellÄ¿Â¼Îª¿Õ!   ÎŞ·¨´´½¨ Z¹æÔòÎÄ¼ş¼Ğ!  ");
+				System.out.println("Make_ZRuleDir_Rule_17   å½“å‰è·å–åˆ°çš„Shellç›®å½•ä¸ºç©º!   æ— æ³•åˆ›å»º Zè§„åˆ™æ–‡ä»¶å¤¹!  ");
 			}
 			return super.applySubFileListRule4(curFileList, subFileTypeMap, curDirList, curRealFileList);
 		}
 
 		String ruleTip(String type, int index, String batName, OS_TYPE curType) {
 			String itemDesc = "";
-			String desc_true = " ÔÚµ±Ç°Ä¿Â¼ÏÂ´´½¨ ¹Ì¶¨µÄÎÄ¼ş¼Ğ ZDir -> ¡¶ 0_Loveon_Place 1_C_Install_Dir  2_WebSite_Download  3_BaiduNetdiskDownload  4_Software  5_WorkPlace   6_Jpg_Video  7_Txt_PDF_DOC_Book  0_Temp_Dir  9_Version  10_Jira_Work  ";
+			String desc_true = " åœ¨å½“å‰ç›®å½•ä¸‹åˆ›å»º å›ºå®šçš„æ–‡ä»¶å¤¹ ZDir -> ã€Š 0_Loveon_Place 1_C_Install_Dir  2_WebSite_Download  3_BaiduNetdiskDownload  4_Software  5_WorkPlace   6_Jpg_Video  7_Txt_PDF_DOC_Book  0_Temp_Dir  9_Version  10_Jira_Work  ";
 
 			if (curType == OS_TYPE.Windows) {
-				itemDesc = batName.trim() + ".bat  " + type + "_" + index + "       ¡¾ ´´½¨ Z¹æÔòÄ¿Â¼¡¿ [Ë÷Òı " + index
-						+ "]  ÃèÊö: " + desc_true + "\n";
+				itemDesc = batName.trim() + ".bat  " + type + "_" + index + "       ã€ åˆ›å»º Zè§„åˆ™ç›®å½•ã€‘ [ç´¢å¼• " + index
+						+ "]  æè¿°: " + desc_true + "\n";
 
 			} else {
-				itemDesc = batName.trim() + ".sh " + type + "_" + index + "       ¡¾ ´´½¨ Z¹æÔòÄ¿Â¼¡¿   [Ë÷Òı " + index + "]  ÃèÊö:"
+				itemDesc = batName.trim() + ".sh " + type + "_" + index + "       ã€ åˆ›å»º Zè§„åˆ™ç›®å½•ã€‘   [ç´¢å¼• " + index + "]  æè¿°:"
 						+ desc_true;
 			}
 
@@ -1577,13 +1577,13 @@ public class G2_ApplyRuleFor_TypeFile {
 
 	class File_TimeName_Rule_16 extends Basic_Rule {
 
-		// key = type value = ·ûºÏ¹ıÂËÎÄ¼ş¹æÔòµÄÃû³ÆµÄÎÄ¼şµÄ¼¯ºÏ
+		// key = type value = ç¬¦åˆè¿‡æ»¤æ–‡ä»¶è§„åˆ™çš„åç§°çš„æ–‡ä»¶çš„é›†åˆ
 		// HashMap<String, ArrayList<File>> arrFileMap;
 		boolean keepOriginalName = false;
 		int inputBeginIndex = 0;
 
-		// true 1.jpg 2,jpg 3.png 4.png ÒÀ´ÎÃüÃû
-		// false 1.jpg 2,jpg 1.png 2.png ÀàĞÍÀ´ÃüÃû
+		// true 1.jpg 2,jpg 3.png 4.png ä¾æ¬¡å‘½å
+		// false 1.jpg 2,jpg 1.png 2.png ç±»å‹æ¥å‘½å
 		boolean isOrder = false;
 
 		File_TimeName_Rule_16() {
@@ -1600,8 +1600,8 @@ public class G2_ApplyRuleFor_TypeFile {
 				Iterator iterator = arrFileMap.entrySet().iterator();
 				while (iterator.hasNext()) {
 					entry = (Map.Entry<String, ArrayList<File>>) iterator.next();
-					String typeStr = entry.getKey(); // MapµÄValue
-					ArrayList<File> fileArr = entry.getValue(); // MapµÄValue
+					String typeStr = entry.getKey(); // Mapçš„Value
+					ArrayList<File> fileArr = entry.getValue(); // Mapçš„Value
 
 					for (int i = 0; i < fileArr.size(); i++) {
 						fileOrderIndex++;
@@ -1611,17 +1611,17 @@ public class G2_ApplyRuleFor_TypeFile {
 						String curFileName = curFile.getName();
 						String newName = "";
 						if (keepOriginalName) {
-							if (isOrder) { // °´Ë³ĞòÒÀ´Î ²»°´ typeÁË Ò»Ö±×ß
+							if (isOrder) { // æŒ‰é¡ºåºä¾æ¬¡ ä¸æŒ‰ typeäº† ä¸€ç›´èµ°
 								newName = fileOrderIndex + "_" + curFileName + "_" + getTimeStampLong() + typeStr;
 							} else {
 								newName = newNamePre + curFileName + "_" + getTimeStampLong() + typeStr;
 							}
 						} else {
-							// Èç¹û²»±£ÁôÃû³Æ ÄÇÃ´Ã»ÓĞÀàĞÍµÄÎÄ¼ş ½«Ö»ÓĞ ĞòºÅ Ã»ÓĞÀàĞÍ
+							// å¦‚æœä¸ä¿ç•™åç§° é‚£ä¹ˆæ²¡æœ‰ç±»å‹çš„æ–‡ä»¶ å°†åªæœ‰ åºå· æ²¡æœ‰ç±»å‹
 							if ("unknow".equals(typeStr)) {
 								newName = index + "_" + getTimeStamp() + "_" + getTimeStampLong();
 							} else {
-								if (isOrder) { // °´Ë³ĞòÒÀ´Î ²»°´ typeÁË Ò»Ö±×ß
+								if (isOrder) { // æŒ‰é¡ºåºä¾æ¬¡ ä¸æŒ‰ typeäº† ä¸€ç›´èµ°
 									newName = fileOrderIndex + "_" + getTimeStampLong() + typeStr;
 								} else {
 									newName = index + "_" + getTimeStampLong() + typeStr;
@@ -1652,16 +1652,16 @@ public class G2_ApplyRuleFor_TypeFile {
 
 		String ruleTip(String type, int index, String batName, OS_TYPE curType) {
 			String itemDesc = "";
-			String desc_true = "  (²»±£Áôµ±Ç°Ãû³Æ °´ÀàĞÍÖØÃüÃûµ±Ç°Ä¿Â¼ÏÂµÄÎÄ¼ş) ÎÄ¼şÃüÃû¸ñÊ½Îª:    ÒÀ¾İÀàĞÍ ĞòºÅ_Ê±¼ä´Á.ÀàĞÍ   1_201841094.jpg 2_201841094.jpg 3_2018413131.jpg 1_201804021145.png";
+			String desc_true = "  (ä¸ä¿ç•™å½“å‰åç§° æŒ‰ç±»å‹é‡å‘½åå½“å‰ç›®å½•ä¸‹çš„æ–‡ä»¶) æ–‡ä»¶å‘½åæ ¼å¼ä¸º:    ä¾æ®ç±»å‹ åºå·_æ—¶é—´æˆ³.ç±»å‹   1_201841094.jpg 2_201841094.jpg 3_2018413131.jpg 1_201804021145.png";
 
 			if (curType == OS_TYPE.Windows) {
 				itemDesc = batName.trim() + ".bat  " + type + "_" + index
-						+ "       ¡¾ index_timestamp.type ĞòºÅ_Ê±¼ä´Á.ÀàĞÍ ÃüÃû¡¿Õë¶ÔËùÓĞÎÄ¼ş  [Ë÷Òı " + index + "]  ÃèÊö: " + desc_true
+						+ "       ã€ index_timestamp.type åºå·_æ—¶é—´æˆ³.ç±»å‹ å‘½åã€‘é’ˆå¯¹æ‰€æœ‰æ–‡ä»¶  [ç´¢å¼• " + index + "]  æè¿°: " + desc_true
 						+ "\n";
 
 			} else {
 				itemDesc = batName.trim() + ".sh " + type + "_" + index
-						+ "       ¡¾ index_timestamp.type ĞòºÅ_Ê±¼ä´Á.ÀàĞÍ ÃüÃû¡¿Õë¶ÔËùÓĞÎÄ¼ş   [Ë÷Òı " + index + "]  ÃèÊö:" + desc_true;
+						+ "       ã€ index_timestamp.type åºå·_æ—¶é—´æˆ³.ç±»å‹ å‘½åã€‘é’ˆå¯¹æ‰€æœ‰æ–‡ä»¶   [ç´¢å¼• " + index + "]  æè¿°:" + desc_true;
 			}
 
 			return itemDesc;
@@ -1669,9 +1669,9 @@ public class G2_ApplyRuleFor_TypeFile {
 
 	}
 
-	// operation_type ²Ù×÷ÀàĞÍ 1--¶ÁÈ¡ÎÄ¼şÄÚÈİ×Ö·û´® ½øĞĞĞŞ¸Ä 2--¶ÔÎÄ¼ş¶ÔÎÄ¼şÄÚÈİ(×Ö½Ú)--½øĞĞĞŞ¸Ä 3.¶ÔÈ«Ìå×ÓÎÄ¼ş½øĞĞµÄËæĞÔµÄ²Ù×÷
-	// ÊôĞÔ½øĞĞĞŞ¸Ä(ÎÄ¼şÃû³Æ)
-	// // 4.¶Ôµ±Ç°×ÓÎÄ¼ş(°üÀ¨×ÓÄ¿Â¼ ×ÓÎÄ¼ş --²»°üº¬ËïÄ¿Â¼ ËïÎÄ¼ş) 5. ´Óshell ÖĞ»ñÈ¡µ½µÄÂ·¾¶ È¥¶ÔÄ³Ò»¸öÎÄ¼ş½øĞĞ²Ù×÷
+	// operation_type æ“ä½œç±»å‹ 1--è¯»å–æ–‡ä»¶å†…å®¹å­—ç¬¦ä¸² è¿›è¡Œä¿®æ”¹ 2--å¯¹æ–‡ä»¶å¯¹æ–‡ä»¶å†…å®¹(å­—èŠ‚)--è¿›è¡Œä¿®æ”¹ 3.å¯¹å…¨ä½“å­æ–‡ä»¶è¿›è¡Œçš„éšæ€§çš„æ“ä½œ
+	// å±æ€§è¿›è¡Œä¿®æ”¹(æ–‡ä»¶åç§°)
+	// // 4.å¯¹å½“å‰å­æ–‡ä»¶(åŒ…æ‹¬å­ç›®å½• å­æ–‡ä»¶ --ä¸åŒ…å«å­™ç›®å½• å­™æ–‡ä»¶) 5. ä»shell ä¸­è·å–åˆ°çš„è·¯å¾„ å»å¯¹æŸä¸€ä¸ªæ–‡ä»¶è¿›è¡Œæ“ä½œ
 
 	class Webp_To_Jpg_Gif_Rule_15 extends Basic_Rule {
 		ArrayList<File> webpFileList;
@@ -1713,11 +1713,11 @@ public class G2_ApplyRuleFor_TypeFile {
 			File webpLibraryFile = new File(webpLibraryFilePath);
 			File G2_LibraryFile = new File(G2_LibraryPath);
 			if (!G2_LibraryFile.exists()) {
-				System.out.println("±¾µØ ¿âÎÄ¼ş " + G2_LibraryPath + "²»´æÔÚ ÇëÖØĞÂÌî³ä zbin/G2/.so .dll ÎÄ¼ş!");
+				System.out.println("æœ¬åœ° åº“æ–‡ä»¶ " + G2_LibraryPath + "ä¸å­˜åœ¨ è¯·é‡æ–°å¡«å…… zbin/G2/.so .dll æ–‡ä»¶!");
 				return;
 			}
 			if (webpLibraryFile.exists() && webpLibraryFile.length() > 100) {
-				System.out.println("µ±Ç° ¿âÎÄ¼ş " + webpLibraryFilePath + "ÒÑ¾­¼ÓÔØµ½ jre/bin Â·¾¶ÏÂ!");
+				System.out.println("å½“å‰ åº“æ–‡ä»¶ " + webpLibraryFilePath + "å·²ç»åŠ è½½åˆ° jre/bin è·¯å¾„ä¸‹!");
 				return;
 			}
 			fileCopy(G2_LibraryFile, webpLibraryFile);
@@ -1730,7 +1730,7 @@ public class G2_ApplyRuleFor_TypeFile {
 
 			ArrayList<File> webpFile = subFileTypeMap.get(".webp");
 			if (webpFile == null) {
-				System.out.println("µ±Ç°ÎÄ¼ş¼ĞÖĞ²»´æÔÚ webpÎÄ¼şµÄ¸ñÊ½");
+				System.out.println("å½“å‰æ–‡ä»¶å¤¹ä¸­ä¸å­˜åœ¨ webpæ–‡ä»¶çš„æ ¼å¼");
 				return null;
 			}
 			webpFileList.addAll(webpFile);
@@ -1738,7 +1738,7 @@ public class G2_ApplyRuleFor_TypeFile {
 			for (int i = 0; i < webpFileList.size(); i++) {
 
 				File webpFileItem = webpFileList.get(i);
-				System.out.println("µ±Ç° webpË÷Òı[" + i + "] = " + webpFileItem.getAbsolutePath());
+				System.out.println("å½“å‰ webpç´¢å¼•[" + i + "] = " + webpFileItem.getAbsolutePath());
 				String newFilePath = webpFileItem.getAbsolutePath().replace(".webp", "_" + stampStr + ".jpg");
 				File jpgFileItem = new File(newFilePath);
 				revertWebp2Jpg(webpFileItem, jpgFileItem);
@@ -1755,7 +1755,7 @@ public class G2_ApplyRuleFor_TypeFile {
 				File gif_absPath_File = new File(gif_absPath);
 				String fileName = gif_webpFileItem.getName();
 
-				// Èç¹û ¼ÓÔØºóµÄgif ´æÔÚ ÄÇÃ´ ĞèÒª Ìí¼ÓÊ±¼ä´Á ÒÔÃâ¸²¸Ç
+				// å¦‚æœ åŠ è½½åçš„gif å­˜åœ¨ é‚£ä¹ˆ éœ€è¦ æ·»åŠ æ—¶é—´æˆ³ ä»¥å…è¦†ç›–
 //             if(gif_absPath_File.exists()){
 
 				fileName = fileName.replace(".webp", "_" + stampStr + ".webp");
@@ -1763,10 +1763,10 @@ public class G2_ApplyRuleFor_TypeFile {
 				needRename = true;
 //              }
 
-				System.out.println("¶¯Í¼ Ë÷Òı[" + i + "] = " + fileName);
-				System.out.println("Ö´ĞĞ¶¯Í¼×ªÎª gifµÄÃüÁî! ");
+				System.out.println("åŠ¨å›¾ ç´¢å¼•[" + i + "] = " + fileName);
+				System.out.println("æ‰§è¡ŒåŠ¨å›¾è½¬ä¸º gifçš„å‘½ä»¤! ");
 				if ("".equals(G2_webp2gif_exe_path)) {
-					System.out.println("µ±Ç° webp2gif Îª¿Õ Çë¼ì²é!  ¿ÉÄÜµ±Ç°ÏµÍ³ Linux MacOS »¹Ã»ÊµÏÖ¸Ã¹¦ÄÜ!");
+					System.out.println("å½“å‰ webp2gif ä¸ºç©º è¯·æ£€æŸ¥!  å¯èƒ½å½“å‰ç³»ç»Ÿ Linux MacOS è¿˜æ²¡å®ç°è¯¥åŠŸèƒ½!");
 					return null;
 				}
 				String command = G2_webp2gif_exe_path + " " + fileName;
@@ -1781,7 +1781,7 @@ public class G2_ApplyRuleFor_TypeFile {
 		}
 
 		void revertWebp2Jpg(File webpFile, File jpgFile) {
-			// webp ¶¯Ì¬Í¼ »á±¨´í Decode returned code VP8_STATUS_UNSUPPORTED_FEATURE
+			// webp åŠ¨æ€å›¾ ä¼šæŠ¥é”™ Decode returned code VP8_STATUS_UNSUPPORTED_FEATURE
 			// Obtain a WebP ImageReader instance
 			ImageReader reader = ImageIO.getImageReadersByMIMEType("image/webp").next();
 
@@ -1798,26 +1798,26 @@ public class G2_ApplyRuleFor_TypeFile {
 				image = reader.read(0, readParam);
 			} catch (IOException e) {
 
-				System.out.println("½âÎöÊ§°Ü   ¿ÉÄÜÊÇwebp¶¯Í¼!   ·ÅÈë ArrayList<File> gifList ÁĞ±íÖĞ!");
+				System.out.println("è§£æå¤±è´¥   å¯èƒ½æ˜¯webpåŠ¨å›¾!   æ”¾å…¥ ArrayList<File> gifList åˆ—è¡¨ä¸­!");
 				gif_webpFileList.add(webpFile);
 			}
 
 			try {
 				ImageIO.write(image, "png", jpgFile);
 			} catch (Exception e) {
-				System.out.println("Ğ´ÈëÎÄ¼ş " + jpgFile.getAbsolutePath() + " Ê§°Ü");
+				System.out.println("å†™å…¥æ–‡ä»¶ " + jpgFile.getAbsolutePath() + " å¤±è´¥");
 			}
 
 		}
 
 		@Override
 		String simpleDesc() {
-			return "\n" + Cur_Bat_Name + " webp_15            ### ¶Ôµ±Ç°Ä¿Â¼ÏÂµÄ webpÎÄ¼ş½øĞĞ×ª»»  ¾²Ì¬Í¼-> jpg   ¶¯Ì¬Í¼-> gif \n";
+			return "\n" + Cur_Bat_Name + " webp_15            ### å¯¹å½“å‰ç›®å½•ä¸‹çš„ webpæ–‡ä»¶è¿›è¡Œè½¬æ¢  é™æ€å›¾-> jpg   åŠ¨æ€å›¾-> gif \n";
 		}
 
 	}
 
-	// ´´½¨¿ì½İ·½Ê½
+	// åˆ›å»ºå¿«æ·æ–¹å¼
 	static boolean makeShellLink(File targetFile, File iconFile) {
 		boolean isOK = false;
 		String targetFilePath = targetFile.getAbsolutePath();
@@ -1851,7 +1851,7 @@ public class G2_ApplyRuleFor_TypeFile {
 	static String getTargetFilePath(File iconFile) {
 		String targetFilePath = "";
 		if (!isKuaiJieIcon(iconFile)) {
-			return null; // ²»ÊÇ ¿ì½İ·½Ê½ ÄÇÃ´ ·µ»Ø "" »òÕß null
+			return null; // ä¸æ˜¯ å¿«æ·æ–¹å¼ é‚£ä¹ˆ è¿”å› "" æˆ–è€… null
 		}
 		String parentAbsPath = iconFile.getParentFile().getAbsolutePath();
 		String fileName = iconFile.getName();
@@ -1878,7 +1878,7 @@ public class G2_ApplyRuleFor_TypeFile {
 	class CreateIconFile_KuaiJieFangShi_Rule_14 extends Basic_Rule {
 
 		ArrayList<String> inputTypeList;
-		// zrule_apply_G2.bat #_14 jpg °Ñµ±Ç°ËùÓĞµÄjpg¸ñÊ½ÎÄ¼şÉú³É¿ì½İ·½Ê½µ½ jpg_Ê±¼ä´Á ÎÄ¼ş¼ĞÄÚ
+		// zrule_apply_G2.bat #_14 jpg æŠŠå½“å‰æ‰€æœ‰çš„jpgæ ¼å¼æ–‡ä»¶ç”Ÿæˆå¿«æ·æ–¹å¼åˆ° jpg_æ—¶é—´æˆ³ æ–‡ä»¶å¤¹å†…
 
 		CreateIconFile_KuaiJieFangShi_Rule_14() {
 			super("#", 14, 3);
@@ -1904,8 +1904,8 @@ public class G2_ApplyRuleFor_TypeFile {
 		@Override
 		ArrayList<File> applyFileListRule3(ArrayList<File> subFileList, HashMap<String, ArrayList<File>> fileTypeMap) {
 
-			SimpleDateFormat df = new SimpleDateFormat("MMdd_HHmmss");// ÉèÖÃÈÕÆÚ¸ñÊ½
-//            SimpleDateFormat df_hms = new SimpleDateFormat("HHmmss");//ÉèÖÃÈÕÆÚ¸ñÊ½
+			SimpleDateFormat df = new SimpleDateFormat("MMdd_HHmmss");// è®¾ç½®æ—¥æœŸæ ¼å¼
+//            SimpleDateFormat df_hms = new SimpleDateFormat("HHmmss");//è®¾ç½®æ—¥æœŸæ ¼å¼
 
 			Date curDate = new Date();
 			String date = df.format(curDate);
@@ -1916,19 +1916,19 @@ public class G2_ApplyRuleFor_TypeFile {
 				ArrayList<File> targetFileList = fileTypeMap.get(type);
 
 				if (targetFileList == null || targetFileList.size() == 0) {
-					System.out.println(" µ±Ç°Â·¾¶ " + curDirPath + " ²»´æÔÚÀàĞÍ " + type + "µÄÎÄ¼ş!");
+					System.out.println(" å½“å‰è·¯å¾„ " + curDirPath + " ä¸å­˜åœ¨ç±»å‹ " + type + "çš„æ–‡ä»¶!");
 					continue;
 				}
 
 				int fileCount = targetFileList.size();
-				// ´´½¨ÎÄ¼ş¼Ğ ´óĞ¡
+				// åˆ›å»ºæ–‡ä»¶å¤¹ å¤§å°
 //                String dirName = preHMS+"_"+type.replace(".","").toUpperCase().trim()+"_"+date;
 				String dirName = date + "_" + type.replace(".", "").toUpperCase().trim() + "[" + fileCount + "]";
 				// MP4_4232414141
 				File iconDirFile = new File(curDirPath + File.separator + dirName);
 				iconDirFile.mkdirs();
 
-				System.out.println("¨T¨T¨T¨T¨T¨T¨T¨T" + "ÎÄ¼şÀàĞÍ" + type + "´´½¨¿ì½İ·½Ê½ Begin" + "¨T¨T¨T¨T¨T¨T¨T¨T");
+				System.out.println("â•â•â•â•â•â•â•â•" + "æ–‡ä»¶ç±»å‹" + type + "åˆ›å»ºå¿«æ·æ–¹å¼ Begin" + "â•â•â•â•â•â•â•â•");
 				for (int j = 0; j < targetFileList.size(); j++) {
 					File targetTypeFile = targetFileList.get(j);
 					String targetName = targetTypeFile.getName();
@@ -1943,14 +1943,14 @@ public class G2_ApplyRuleFor_TypeFile {
 					File iconFile = new File(iconDirFile.getAbsolutePath() + File.separator + iconName);
 					if (makeShellLink(targetTypeFile, iconFile)) {
 
-						System.out.println("Index[" + IconIndex + "]Ä¿±êÎÄ¼ş:" + targetTypeFile.getAbsolutePath()
-								+ " ´´½¨¿ì½İ·½Ê½³É¹¦:" + "./" + dirName + File.separator + iconName);
+						System.out.println("Index[" + IconIndex + "]ç›®æ ‡æ–‡ä»¶:" + targetTypeFile.getAbsolutePath()
+								+ " åˆ›å»ºå¿«æ·æ–¹å¼æˆåŠŸ:" + "./" + dirName + File.separator + iconName);
 					} else {
-						System.out.println("Index[" + IconIndex + "]Ä¿±êÎÄ¼ş:" + targetTypeFile.getAbsolutePath()
-								+ " ´´½¨¿ì½İ·½Ê½Ê§°Ü:" + "./" + dirName + File.separator + iconName);
+						System.out.println("Index[" + IconIndex + "]ç›®æ ‡æ–‡ä»¶:" + targetTypeFile.getAbsolutePath()
+								+ " åˆ›å»ºå¿«æ·æ–¹å¼å¤±è´¥:" + "./" + dirName + File.separator + iconName);
 					}
 				}
-				System.out.println("¨T¨T¨T¨T¨T¨T¨T¨T" + "ÎÄ¼şÀàĞÍ" + type + "´´½¨¿ì½İ·½Ê½ End" + "¨T¨T¨T¨T¨T¨T¨T¨T");
+				System.out.println("â•â•â•â•â•â•â•â•" + "æ–‡ä»¶ç±»å‹" + type + "åˆ›å»ºå¿«æ·æ–¹å¼ End" + "â•â•â•â•â•â•â•â•");
 
 			}
 
@@ -1960,33 +1960,33 @@ public class G2_ApplyRuleFor_TypeFile {
 		@Override
 		String simpleDesc() {
 			return "\n" + Cur_Bat_Name
-					+ " #_14  mp4          ### Ô´ÎÄ¼ş±»°´Ë³ĞòÖØÃüÃû 1_ 2_ ¶¯Ì¬¼ÆËãµ±Ç°ÎÄ¼ş¼ĞÖĞËùÓĞ×ÓÎÄ¼şÖĞµÄmp4ÎÄ¼ş ²¢ÔÚµ±Ç°Ä¿Â¼Éú³É MP4_20200522_154600 ×ÖÑùµÄÎÄ¼ş¼Ğ \n"
+					+ " #_14  mp4          ### æºæ–‡ä»¶è¢«æŒ‰é¡ºåºé‡å‘½å 1_ 2_ åŠ¨æ€è®¡ç®—å½“å‰æ–‡ä»¶å¤¹ä¸­æ‰€æœ‰å­æ–‡ä»¶ä¸­çš„mp4æ–‡ä»¶ å¹¶åœ¨å½“å‰ç›®å½•ç”Ÿæˆ MP4_20200522_154600 å­—æ ·çš„æ–‡ä»¶å¤¹ \n"
 					+ "\n" + Cur_Bat_Name
-					+ " #_14  .mp4         ### Ô´ÎÄ¼ş±»°´Ë³ĞòÖØÃüÃû 1_ 2_¶¯Ì¬¼ÆËãµ±Ç°ÎÄ¼ş¼ĞÖĞËùÓĞ×ÓÎÄ¼şÖĞµÄmp4ÎÄ¼ş ²¢ÔÚµ±Ç°Ä¿Â¼Éú³É MP4_20200522_154600 ×ÖÑùµÄÎÄ¼ş¼Ğ \n"
+					+ " #_14  .mp4         ### æºæ–‡ä»¶è¢«æŒ‰é¡ºåºé‡å‘½å 1_ 2_åŠ¨æ€è®¡ç®—å½“å‰æ–‡ä»¶å¤¹ä¸­æ‰€æœ‰å­æ–‡ä»¶ä¸­çš„mp4æ–‡ä»¶ å¹¶åœ¨å½“å‰ç›®å½•ç”Ÿæˆ MP4_20200522_154600 å­—æ ·çš„æ–‡ä»¶å¤¹ \n"
 					+ "\n" + Cur_Bat_Name
-					+ " #_14  .gif         ### Ô´ÎÄ¼ş±»°´Ë³ĞòÖØÃüÃû 1_ 2_¶¯Ì¬¼ÆËãµ±Ç°ÎÄ¼ş¼ĞÖĞËùÓĞ×ÓÎÄ¼şÖĞµÄgifÎÄ¼ş ²¢ÔÚµ±Ç°Ä¿Â¼Éú³É GIF_20200522_154600 ×ÖÑùµÄÎÄ¼ş¼Ğ \n"
+					+ " #_14  .gif         ### æºæ–‡ä»¶è¢«æŒ‰é¡ºåºé‡å‘½å 1_ 2_åŠ¨æ€è®¡ç®—å½“å‰æ–‡ä»¶å¤¹ä¸­æ‰€æœ‰å­æ–‡ä»¶ä¸­çš„gifæ–‡ä»¶ å¹¶åœ¨å½“å‰ç›®å½•ç”Ÿæˆ GIF_20200522_154600 å­—æ ·çš„æ–‡ä»¶å¤¹ \n"
 					+ "\n" + Cur_Bat_Name
-					+ " #_14  png          ### Ô´ÎÄ¼ş±»°´Ë³ĞòÖØÃüÃû 1_ 2_ ¶¯Ì¬¼ÆËãµ±Ç°ÎÄ¼ş¼ĞÖĞËùÓĞ×ÓÎÄ¼şÖĞµÄpngÎÄ¼ş ²¢ÔÚµ±Ç°Ä¿Â¼Éú³É PNG_20200522_154600 ×ÖÑùµÄÎÄ¼ş¼Ğ \n"
+					+ " #_14  png          ### æºæ–‡ä»¶è¢«æŒ‰é¡ºåºé‡å‘½å 1_ 2_ åŠ¨æ€è®¡ç®—å½“å‰æ–‡ä»¶å¤¹ä¸­æ‰€æœ‰å­æ–‡ä»¶ä¸­çš„pngæ–‡ä»¶ å¹¶åœ¨å½“å‰ç›®å½•ç”Ÿæˆ PNG_20200522_154600 å­—æ ·çš„æ–‡ä»¶å¤¹ \n"
 					+ "\n" + Cur_Bat_Name
-					+ " #_14  zip  7z      ### Ô´ÎÄ¼ş±»°´Ë³ĞòÖØÃüÃû 1_ 2_ ¶¯Ì¬¼ÆËãµ±Ç°ÎÄ¼ş¼ĞÖĞËùÓĞ×ÓÎÄ¼şÖĞµÄ ÎÄ¼ş¼ĞÖĞµÄ 7z zipÎÄ¼ş   ²¢ÔÚµ±Ç°Ä¿Â¼Éú³É 7Z_20200522_154600  ZIP_20200522_154600 ×ÖÑùµÄÎÄ¼ş¼Ğ \n"
+					+ " #_14  zip  7z      ### æºæ–‡ä»¶è¢«æŒ‰é¡ºåºé‡å‘½å 1_ 2_ åŠ¨æ€è®¡ç®—å½“å‰æ–‡ä»¶å¤¹ä¸­æ‰€æœ‰å­æ–‡ä»¶ä¸­çš„ æ–‡ä»¶å¤¹ä¸­çš„ 7z zipæ–‡ä»¶   å¹¶åœ¨å½“å‰ç›®å½•ç”Ÿæˆ 7Z_20200522_154600  ZIP_20200522_154600 å­—æ ·çš„æ–‡ä»¶å¤¹ \n"
 					+ "\n" + Cur_Bat_Name
-					+ " #_14  .zip .7z     ### Ô´ÎÄ¼ş±»°´Ë³ĞòÖØÃüÃû 1_ 2_ ¶¯Ì¬¼ÆËãµ±Ç°ÎÄ¼ş¼ĞÖĞËùÓĞ×ÓÎÄ¼şÖĞµÄ ÎÄ¼ş¼ĞÖĞµÄ 7z zipÎÄ¼ş   ²¢ÔÚµ±Ç°Ä¿Â¼Éú³É 7Z_20200522_154600  ZIP_20200522_154600 ×ÖÑùµÄÎÄ¼ş¼Ğ \n"
+					+ " #_14  .zip .7z     ### æºæ–‡ä»¶è¢«æŒ‰é¡ºåºé‡å‘½å 1_ 2_ åŠ¨æ€è®¡ç®—å½“å‰æ–‡ä»¶å¤¹ä¸­æ‰€æœ‰å­æ–‡ä»¶ä¸­çš„ æ–‡ä»¶å¤¹ä¸­çš„ 7z zipæ–‡ä»¶   å¹¶åœ¨å½“å‰ç›®å½•ç”Ÿæˆ 7Z_20200522_154600  ZIP_20200522_154600 å­—æ ·çš„æ–‡ä»¶å¤¹ \n"
 					+ "\n" + Cur_Bat_Name
-					+ " #_14  jpg          ### Ô´ÎÄ¼ş±»°´Ë³ĞòÖØÃüÃû 1_ 2_ ¶¯Ì¬¼ÆËãµ±Ç°ÎÄ¼ş¼ĞÖĞËùÓĞ×ÓÎÄ¼şÖĞµÄJPGÎÄ¼ş ²¢ÔÚµ±Ç°Ä¿Â¼Éú³É JPG_20200522_154600 ×ÖÑùµÄÎÄ¼ş¼Ğ \n"
+					+ " #_14  jpg          ### æºæ–‡ä»¶è¢«æŒ‰é¡ºåºé‡å‘½å 1_ 2_ åŠ¨æ€è®¡ç®—å½“å‰æ–‡ä»¶å¤¹ä¸­æ‰€æœ‰å­æ–‡ä»¶ä¸­çš„JPGæ–‡ä»¶ å¹¶åœ¨å½“å‰ç›®å½•ç”Ÿæˆ JPG_20200522_154600 å­—æ ·çš„æ–‡ä»¶å¤¹ \n"
 					+ "\n" + Cur_Bat_Name
-					+ " #_14  .jpg  .png  .webp .gif                          ### Éú³ÉÍ¼Æ¬¸ñÊ½ÎÄ¼ş¼¯ºÏ  PNG_Ê±¼ä´Á  JPG_20200522_154600 ×ÖÑùµÄÎÄ¼ş¼Ğ \n"
+					+ " #_14  .jpg  .png  .webp .gif                          ### ç”Ÿæˆå›¾ç‰‡æ ¼å¼æ–‡ä»¶é›†åˆ  PNG_æ—¶é—´æˆ³  JPG_20200522_154600 å­—æ ·çš„æ–‡ä»¶å¤¹ \n"
 					+ "\n" + Cur_Bat_Name
-					+ " #_14  .mp4  .avi   .wmv .rmvb  .flv .3gp              ### Éú³ÉÊÓÆµ¸ñÊ½ÎÄ¼ş¼¯ºÏ    Ô´ÎÄ¼ş±»°´Ë³ĞòÖØÃüÃû 1_ 2_ ¶¯Ì¬¼ÆËãµ±Ç°ÎÄ¼ş¼ĞÖĞËùÓĞ×ÓÎÄ¼şÖĞµÄJPGÎÄ¼ş ²¢ÔÚµ±Ç°Ä¿Â¼Éú³É MP4_20200522_154600 ×ÖÑùµÄÎÄ¼ş¼Ğ \n"
+					+ " #_14  .mp4  .avi   .wmv .rmvb  .flv .3gp              ### ç”Ÿæˆè§†é¢‘æ ¼å¼æ–‡ä»¶é›†åˆ    æºæ–‡ä»¶è¢«æŒ‰é¡ºåºé‡å‘½å 1_ 2_ åŠ¨æ€è®¡ç®—å½“å‰æ–‡ä»¶å¤¹ä¸­æ‰€æœ‰å­æ–‡ä»¶ä¸­çš„JPGæ–‡ä»¶ å¹¶åœ¨å½“å‰ç›®å½•ç”Ÿæˆ MP4_20200522_154600 å­—æ ·çš„æ–‡ä»¶å¤¹ \n"
 					+ "\n" + Cur_Bat_Name
-					+ " #_14  .jpg  .png  .gif  .webp .mp4 .avi .flv .wmv     ### Éú³É ÊÓÆµ + Í¼Æ¬ ¸ñÊ½ÎÄ¼ş¼¯ºÏ  Ô´ÎÄ¼ş±»°´Ë³ĞòÖØÃüÃû 1_ 2_ ¶¯Ì¬¼ÆËãµ±Ç°ÎÄ¼ş¼ĞÖĞËùÓĞ×ÓÎÄ¼şÖĞµÄÊÓÆµÎÄ¼ş ²¢ÔÚµ±Ç°Ä¿Â¼Éú³É JPG_20200522_154600 MP4_20200522_154600 ×ÖÑùµÄÎÄ¼ş¼Ğ \n"
+					+ " #_14  .jpg  .png  .gif  .webp .mp4 .avi .flv .wmv     ### ç”Ÿæˆ è§†é¢‘ + å›¾ç‰‡ æ ¼å¼æ–‡ä»¶é›†åˆ  æºæ–‡ä»¶è¢«æŒ‰é¡ºåºé‡å‘½å 1_ 2_ åŠ¨æ€è®¡ç®—å½“å‰æ–‡ä»¶å¤¹ä¸­æ‰€æœ‰å­æ–‡ä»¶ä¸­çš„è§†é¢‘æ–‡ä»¶ å¹¶åœ¨å½“å‰ç›®å½•ç”Ÿæˆ JPG_20200522_154600 MP4_20200522_154600 å­—æ ·çš„æ–‡ä»¶å¤¹ \n"
 
 			;
 		}
 	}
 
-	// operation_type ²Ù×÷ÀàĞÍ 1--¶ÁÈ¡ÎÄ¼şÄÚÈİ×Ö·û´® ½øĞĞĞŞ¸Ä 2--¶ÔÎÄ¼ş¶ÔÎÄ¼şÄÚÈİ(×Ö½Ú)--½øĞĞĞŞ¸Ä 3.¶ÔÈ«Ìå×ÓÎÄ¼ş½øĞĞµÄËæĞÔµÄ²Ù×÷
-	// ÊôĞÔ½øĞĞĞŞ¸Ä(ÎÄ¼şÃû³Æ)
-	// // 4.¶Ôµ±Ç°×ÓÎÄ¼ş(°üÀ¨×ÓÄ¿Â¼ ×ÓÎÄ¼ş --²»°üº¬ËïÄ¿Â¼ ËïÎÄ¼ş) 5. ´Óshell ÖĞ»ñÈ¡µ½µÄÂ·¾¶ È¥¶ÔÄ³Ò»¸öÎÄ¼ş½øĞĞ²Ù×÷
+	// operation_type æ“ä½œç±»å‹ 1--è¯»å–æ–‡ä»¶å†…å®¹å­—ç¬¦ä¸² è¿›è¡Œä¿®æ”¹ 2--å¯¹æ–‡ä»¶å¯¹æ–‡ä»¶å†…å®¹(å­—èŠ‚)--è¿›è¡Œä¿®æ”¹ 3.å¯¹å…¨ä½“å­æ–‡ä»¶è¿›è¡Œçš„éšæ€§çš„æ“ä½œ
+	// å±æ€§è¿›è¡Œä¿®æ”¹(æ–‡ä»¶åç§°)
+	// // 4.å¯¹å½“å‰å­æ–‡ä»¶(åŒ…æ‹¬å­ç›®å½• å­æ–‡ä»¶ --ä¸åŒ…å«å­™ç›®å½• å­™æ–‡ä»¶) 5. ä»shell ä¸­è·å–åˆ°çš„è·¯å¾„ å»å¯¹æŸä¸€ä¸ªæ–‡ä»¶è¿›è¡Œæ“ä½œ
 
 	class CalMP4_DIR_HTML_Rule_13 extends Basic_Rule {
 		String Type_DIR_NAME = "";
@@ -2003,7 +2003,7 @@ public class G2_ApplyRuleFor_TypeFile {
 		// G2_Rule13_mp4_3x3.html
 		File mp4_3x3_File;
 
-		String newReplaceName; // G2_Rule13_mp4_3x5 ÆÚÖĞ G2_Rule13 Ìæ»»µÄÃû³Æ
+		String newReplaceName; // G2_Rule13_mp4_3x5 æœŸä¸­ G2_Rule13 æ›¿æ¢çš„åç§°
 
 		CalMP4_DIR_HTML_Rule_13() {
 			super("#", 13, 4);
@@ -2027,7 +2027,7 @@ public class G2_ApplyRuleFor_TypeFile {
 
 			for (int i = 0; i < inputParamList.size(); i++) {
 				String paramItem = inputParamList.get(i);
-				// ¼ì²éÊÇ·ñÓĞ paramItem Ãû³ÆµÄÎÄ¼ş¼Ğ
+				// æ£€æŸ¥æ˜¯å¦æœ‰ paramItem åç§°çš„æ–‡ä»¶å¤¹
 				System.out.println("paramItem = " + paramItem);
 				File curDir = checkType2Dir(curDirFile, paramItem);
 				if (curDir != null && curDir.isDirectory()) {
@@ -2059,19 +2059,19 @@ public class G2_ApplyRuleFor_TypeFile {
 		@Override
 		boolean initParams4InputParam(String inputParam) {
 			if (!(inputParam.contains("jpg") || inputParam.contains("mp4") || inputParam.contains("gif"))) {
-				System.out.println("µ±Ç°ÊäÈë²ÎÊı²»°üº¬ jpg || mp4 || gif  ÇëÖØĞÂÊäÈë");
+				System.out.println("å½“å‰è¾“å…¥å‚æ•°ä¸åŒ…å« jpg || mp4 || gif  è¯·é‡æ–°è¾“å…¥");
 				return false;
 			}
 
 			String[] params = inputParam.split("_");
 			if (params == null) {
-				System.out.println("µ±Ç°ÊäÈë²ÎÊı²»°üº¬ jpg || mp4 || gif  ÇëÖØĞÂÊäÈë");
+				System.out.println("å½“å‰è¾“å…¥å‚æ•°ä¸åŒ…å« jpg || mp4 || gif  è¯·é‡æ–°è¾“å…¥");
 				return false;
 			}
 			String TypeDir = params[params.length - 1];
 
 			if (!(("jpg").equals(TypeDir) || ("mp4").equals(TypeDir) || ("gif").equals(TypeDir))) {
-				System.out.println("µ±Ç°ÊäÈë²ÎÊı²»°üº¬ jpg || mp4 || gif  ÇëÖØĞÂÊäÈë");
+				System.out.println("å½“å‰è¾“å…¥å‚æ•°ä¸åŒ…å« jpg || mp4 || gif  è¯·é‡æ–°è¾“å…¥");
 				return false;
 			}
 			Type_DIR_NAME = TypeDir.toLowerCase().trim();
@@ -2080,19 +2080,19 @@ public class G2_ApplyRuleFor_TypeFile {
 
 		@Override
 		String simpleDesc() {
-			return "\n" + Cur_Bat_Name + "  #_13_mp4    ### ¶¯Ì¬¼ÆËãµ±Ç°ÎÄ¼ş¼ĞÖĞËùÓĞ×ÓÎÄ¼şÖĞµÄmp4ÎÄ¼ş¼ĞÖĞµÄ mp4ÎÄ¼ş¸öÊı  ²¢ÔÚµ±Ç°Ä¿Â¼Éú³ÉhtmlÎÄ¼ş \n"
-					+ Cur_Bat_Name + "  #_13_jpg    ### ¶¯Ì¬¼ÆËãµ±Ç°ÎÄ¼ş¼ĞÖĞËùÓĞ×ÓÎÄ¼şÖĞµÄjpgÎÄ¼ş¼ĞÖĞµÄ jpgÎÄ¼ş¸öÊı ²¢ÔÚµ±Ç°Ä¿Â¼Éú³ÉhtmlÎÄ¼ş\n"
-					+ Cur_Bat_Name + "  #_13_gif    ### ¶¯Ì¬¼ÆËãµ±Ç°ÎÄ¼ş¼ĞÖĞËùÓĞ×ÓÎÄ¼şÖĞµÄgifÎÄ¼ş¼ĞÖĞµÄ gifÎÄ¼ş¸öÊı ²¢ÔÚµ±Ç°Ä¿Â¼Éú³ÉhtmlÎÄ¼ş\n"
+			return "\n" + Cur_Bat_Name + "  #_13_mp4    ### åŠ¨æ€è®¡ç®—å½“å‰æ–‡ä»¶å¤¹ä¸­æ‰€æœ‰å­æ–‡ä»¶ä¸­çš„mp4æ–‡ä»¶å¤¹ä¸­çš„ mp4æ–‡ä»¶ä¸ªæ•°  å¹¶åœ¨å½“å‰ç›®å½•ç”Ÿæˆhtmlæ–‡ä»¶ \n"
+					+ Cur_Bat_Name + "  #_13_jpg    ### åŠ¨æ€è®¡ç®—å½“å‰æ–‡ä»¶å¤¹ä¸­æ‰€æœ‰å­æ–‡ä»¶ä¸­çš„jpgæ–‡ä»¶å¤¹ä¸­çš„ jpgæ–‡ä»¶ä¸ªæ•° å¹¶åœ¨å½“å‰ç›®å½•ç”Ÿæˆhtmlæ–‡ä»¶\n"
+					+ Cur_Bat_Name + "  #_13_gif    ### åŠ¨æ€è®¡ç®—å½“å‰æ–‡ä»¶å¤¹ä¸­æ‰€æœ‰å­æ–‡ä»¶ä¸­çš„gifæ–‡ä»¶å¤¹ä¸­çš„ gifæ–‡ä»¶ä¸ªæ•° å¹¶åœ¨å½“å‰ç›®å½•ç”Ÿæˆhtmlæ–‡ä»¶\n"
 					+ Cur_Bat_Name
-					+ "  #_13_mp4  <µ¥¸ö×Ó¼ş¼Ğ²ÎÊı>  ### Í¬Ã»ÓĞ²ÎÊı(µ«shellÂ·¾¶²»Í¬) ¶¯Ì¬¼ÆËãµ±Ç°ÎÄ¼ş¼ĞÖĞËùÓĞ×ÓÎÄ¼şÖĞµÄmp4ÎÄ¼ş¼ĞÖĞµÄ mp4ÎÄ¼ş¸öÊı ²¢ÔÚµ±Ç°Ä¿Â¼Éú³ÉhtmlÎÄ¼ş\n"
+					+ "  #_13_mp4  <å•ä¸ªå­ä»¶å¤¹å‚æ•°>  ### åŒæ²¡æœ‰å‚æ•°(ä½†shellè·¯å¾„ä¸åŒ) åŠ¨æ€è®¡ç®—å½“å‰æ–‡ä»¶å¤¹ä¸­æ‰€æœ‰å­æ–‡ä»¶ä¸­çš„mp4æ–‡ä»¶å¤¹ä¸­çš„ mp4æ–‡ä»¶ä¸ªæ•° å¹¶åœ¨å½“å‰ç›®å½•ç”Ÿæˆhtmlæ–‡ä»¶\n"
 					+ Cur_Bat_Name
-					+ "  #_13_jpg  <µ¥¸ö×Ó¼ş¼Ğ²ÎÊı>  ### Í¬Ã»ÓĞ²ÎÊı(µ«shellÂ·¾¶²»Í¬) ¶¯Ì¬¼ÆËãµ±Ç°ÎÄ¼ş¼ĞÖĞËùÓĞ×ÓÎÄ¼şÖĞµÄjpgÎÄ¼ş¼ĞÖĞµÄ jpgÎÄ¼ş¸öÊı ²¢ÔÚµ±Ç°Ä¿Â¼Éú³ÉhtmlÎÄ¼ş\n"
+					+ "  #_13_jpg  <å•ä¸ªå­ä»¶å¤¹å‚æ•°>  ### åŒæ²¡æœ‰å‚æ•°(ä½†shellè·¯å¾„ä¸åŒ) åŠ¨æ€è®¡ç®—å½“å‰æ–‡ä»¶å¤¹ä¸­æ‰€æœ‰å­æ–‡ä»¶ä¸­çš„jpgæ–‡ä»¶å¤¹ä¸­çš„ jpgæ–‡ä»¶ä¸ªæ•° å¹¶åœ¨å½“å‰ç›®å½•ç”Ÿæˆhtmlæ–‡ä»¶\n"
 					+ Cur_Bat_Name
-					+ "  #_13_gif  <µ¥¸ö×Ó¼ş¼Ğ²ÎÊı>  ### Í¬Ã»ÓĞ²ÎÊı(µ«shellÂ·¾¶²»Í¬) ¶¯Ì¬¼ÆËãµ±Ç°ÎÄ¼ş¼ĞÖĞËùÓĞ×ÓÎÄ¼şÖĞµÄgifÎÄ¼ş¼ĞÖĞµÄ gifÎÄ¼ş¸öÊı ²¢ÔÚµ±Ç°Ä¿Â¼Éú³ÉhtmlÎÄ¼ş\n"
+					+ "  #_13_gif  <å•ä¸ªå­ä»¶å¤¹å‚æ•°>  ### åŒæ²¡æœ‰å‚æ•°(ä½†shellè·¯å¾„ä¸åŒ) åŠ¨æ€è®¡ç®—å½“å‰æ–‡ä»¶å¤¹ä¸­æ‰€æœ‰å­æ–‡ä»¶ä¸­çš„gifæ–‡ä»¶å¤¹ä¸­çš„ gifæ–‡ä»¶ä¸ªæ•° å¹¶åœ¨å½“å‰ç›®å½•ç”Ÿæˆhtmlæ–‡ä»¶\n"
 					+ Cur_Bat_Name
-					+ "  #_13_mp4  <×ÓÎÄ¼ş¼Ğ²ÎÊı1> <×ÓÎÄ¼ş¼Ğ²ÎÊı2> ....<×ÓÎÄ¼ş¼Ğ²ÎÊıN>  ### ¶àÊäÈë²ÎÊı ¶¯Ì¬¼ÆËã¸ø¶¨Â·¾¶ÏÂµÄÎÄ¼ş¼ĞÖĞËùÓĞ×ÓÎÄ¼şÖĞµÄmp4ÎÄ¼ş¼ĞÖĞµÄ gifÎÄ¼ş¸öÊı ²¢ÔÚµ±Ç°Ä¿Â¼Éú³ÉhtmlÎÄ¼ş\n"
+					+ "  #_13_mp4  <å­æ–‡ä»¶å¤¹å‚æ•°1> <å­æ–‡ä»¶å¤¹å‚æ•°2> ....<å­æ–‡ä»¶å¤¹å‚æ•°N>  ### å¤šè¾“å…¥å‚æ•° åŠ¨æ€è®¡ç®—ç»™å®šè·¯å¾„ä¸‹çš„æ–‡ä»¶å¤¹ä¸­æ‰€æœ‰å­æ–‡ä»¶ä¸­çš„mp4æ–‡ä»¶å¤¹ä¸­çš„ gifæ–‡ä»¶ä¸ªæ•° å¹¶åœ¨å½“å‰ç›®å½•ç”Ÿæˆhtmlæ–‡ä»¶\n"
 					+ Cur_Bat_Name
-					+ "  #_13_jpg <×ÓÎÄ¼ş¼Ğ²ÎÊı1> <×ÓÎÄ¼ş¼Ğ²ÎÊı2> ....<×ÓÎÄ¼ş¼Ğ²ÎÊıN>   ### Í¬Ã»ÓĞ²ÎÊı(µ«shellÂ·¾¶²»Í¬) ¶¯Ì¬¼ÆËãµ±Ç°ÎÄ¼ş¼ĞÖĞËùÓĞ×ÓÎÄ¼şÖĞµÄmp4ÎÄ¼ş¼ĞÖĞµÄ gifÎÄ¼ş¸öÊı ²¢ÔÚµ±Ç°Ä¿Â¼Éú³ÉhtmlÎÄ¼ş\n";
+					+ "  #_13_jpg <å­æ–‡ä»¶å¤¹å‚æ•°1> <å­æ–‡ä»¶å¤¹å‚æ•°2> ....<å­æ–‡ä»¶å¤¹å‚æ•°N>   ### åŒæ²¡æœ‰å‚æ•°(ä½†shellè·¯å¾„ä¸åŒ) åŠ¨æ€è®¡ç®—å½“å‰æ–‡ä»¶å¤¹ä¸­æ‰€æœ‰å­æ–‡ä»¶ä¸­çš„mp4æ–‡ä»¶å¤¹ä¸­çš„ gifæ–‡ä»¶ä¸ªæ•° å¹¶åœ¨å½“å‰ç›®å½•ç”Ÿæˆhtmlæ–‡ä»¶\n";
 		}
 
 		@Override
@@ -2103,10 +2103,10 @@ public class G2_ApplyRuleFor_TypeFile {
 			boolean isMultiDirInput = false;
 			String curBasePath = "";
 
-			if (inputDirList.size() == 0) { // Èç¹ûÃ»ÓĞÊäÈëDir²ÎÊı ÄÇÃ´ ¾ÍÔÚµ±Ç°Ä¿Â¼²Ù×÷
+			if (inputDirList.size() == 0) { // å¦‚æœæ²¡æœ‰è¾“å…¥Dirå‚æ•° é‚£ä¹ˆ å°±åœ¨å½“å‰ç›®å½•æ“ä½œ
 				operaDirList.addAll(curDirList);
 				curBasePath = curDirFile.getAbsolutePath();
-			} else if (inputDirList.size() == 1) { // Èç¹ûÖ»ÓĞÒ»¸ö²ÎÊı ÄÇÃ´operaDirList ·ÅÈë µ±Ç°²ÎÊıµÄ×ÓÄ¿Â¼
+			} else if (inputDirList.size() == 1) { // å¦‚æœåªæœ‰ä¸€ä¸ªå‚æ•° é‚£ä¹ˆoperaDirList æ”¾å…¥ å½“å‰å‚æ•°çš„å­ç›®å½•
 				File curInputDir = inputDirList.get(0);
 				curBasePath = curInputDir.getAbsolutePath();
 				operaDirList.addAll(getCurrentSubDirFile(curInputDir));
@@ -2129,30 +2129,30 @@ public class G2_ApplyRuleFor_TypeFile {
 			StringBuilder defineArrWord = new StringBuilder();
 			StringBuilder defineAdd = new StringBuilder();
 
-			// Èç¹ûÓĞ²ÎÊı ÄÇÃ´ µ±Ç°µÄ curDirList
+			// å¦‚æœæœ‰å‚æ•° é‚£ä¹ˆ å½“å‰çš„ curDirList
 			int index = 0;
 			for (int i = 0; i < operaDirList.size(); i++) {
 				File cur1DirFileItem = operaDirList.get(i);
 				File mTypeDirFile = checkType2Dir(cur1DirFileItem, Type_DIR_NAME);
 				int typeFileNum = 0;
 				if (mTypeDirFile != null && 0 != (typeFileNum = checkType3File(mTypeDirFile, Type_DIR_NAME))) {
-					// ¼ì²âµ½ÁË ¶ÔÓ¦µÄ type ÎÄ¼ş
-					// 1.»ñÈ¡µ±Ç° µÚÒ»²ãÄ¿Â¼Ãû³Æ
+					// æ£€æµ‹åˆ°äº† å¯¹åº”çš„ type æ–‡ä»¶
+					// 1.è·å–å½“å‰ ç¬¬ä¸€å±‚ç›®å½•åç§°
 					String dir1DirName = cur1DirFileItem.getName();
-					// 2. »ñÈ¡¶ÔÓ¦ÃüÁîµÄÎÄ¼ş
+					// 2. è·å–å¯¹åº”å‘½ä»¤çš„æ–‡ä»¶
 					String dir2TypeDieName = dir1DirName + File.separator + Type_DIR_NAME;
 					dir2TypeDieName = dir2TypeDieName.replace("\\", "/");
-					// 3. typeFileNum ¶ÔÓ¦µÄµ±Ç° Ëï×ÓÄ¿Â¼ÖĞµÄÎÄ¼şµÄ¸öÊı
+					// 3. typeFileNum å¯¹åº”çš„å½“å‰ å­™å­ç›®å½•ä¸­çš„æ–‡ä»¶çš„ä¸ªæ•°
 					int length = typeFileNum;
 					String people = "person" + index;
 
 //                    person0 = { index:0 , path:"./7001/mp4/",length:22,};
 //                    person0 = { index:0 , path:"./7001\mp4,length:22,};
 					String defineItem = "";
-					if (!isMultiDirInput) { // Èç¹ûÊÇµ¥¶ÀµÄ ÎÄ¼ş
+					if (!isMultiDirInput) { // å¦‚æœæ˜¯å•ç‹¬çš„ æ–‡ä»¶
 						defineItem = people + " = { index:" + index + " , path:\"./" + dir2TypeDieName + "/\",length:"
 								+ length + ",};\n";
-					} else { // Èç¹ûÊÇÁ½¸ö Á¿ÈëµÄÎÄ¼ş ÄÇÃ´ path¾ÍÒª¼ÓÈë¶ÔÓ¦µÄ µ±Ç°Ä¿Â¼µÄÂ·¾¶
+					} else { // å¦‚æœæ˜¯ä¸¤ä¸ª é‡å…¥çš„æ–‡ä»¶ é‚£ä¹ˆ pathå°±è¦åŠ å…¥å¯¹åº”çš„ å½“å‰ç›®å½•çš„è·¯å¾„
 						String targetDirName = calculBeginDir(mTypeDirFile.getAbsolutePath());
 						if (!"".equals(targetDirName)) {
 							targetDirName = targetDirName + "/";
@@ -2167,17 +2167,17 @@ public class G2_ApplyRuleFor_TypeFile {
 
 			}
 
-			// ¶¨Òåpeople
+			// å®šä¹‰people
 			String defineArrWordStr = defineArrWord.toString().trim();
 			while (defineArrWordStr.endsWith(",")) {
 				defineArrWordStr = defineArrWordStr.substring(0, defineArrWordStr.length() - 1);
 			}
 
-			// °Ñ people ±àÎª Êı×é array
+			// æŠŠ people ç¼–ä¸º æ•°ç»„ array
 			String defineAddStr = defineAdd.toString();
 
 			for (int i = 0; i < htmlModelList.size(); i++) {
-				// »ñÈ¡ htmlÎÄ¼şµÄÄÚÈİ
+				// è·å– htmlæ–‡ä»¶çš„å†…å®¹
 				File htmlModelFile = htmlModelList.get(i);
 
 				// G2_Rule13_mp4_3x5
@@ -2190,19 +2190,19 @@ public class G2_ApplyRuleFor_TypeFile {
 				readHtmlContent = readHtmlContent.replace("zukgitPlaceHolderArrayAdd", defineAddStr);
 				readHtmlContent = readHtmlContent.replace("zukgitPlaceHolderArrayDefine", defineArrWordStr);
 
-				// °ÑÎÄ¼şĞ´Èë ¶ÔÓ¦µÄÄ¿Â¼
-				// µ±Ç° ÎÄ¼şÃû³Æ
+				// æŠŠæ–‡ä»¶å†™å…¥ å¯¹åº”çš„ç›®å½•
+				// å½“å‰ æ–‡ä»¶åç§°
 				String newName = html_old_name.replace("G2_Rule13", newReplaceName);
 
 				File curHtmlTargetFile = new File(curBasePath + File.separator + newName);
 
-				// Ğ´ÈëÄÄ¸öÎÄ¼ş¼Ğ
+				// å†™å…¥å“ªä¸ªæ–‡ä»¶å¤¹
 
-				// 1. ÎŞ²ÎÊı Ğ´Èëµ±Ç°µÄ shell Â·¾¶ÏÂ
-				// 2. Ò»¸ö²ÎÊıµÄÇé¿ö
+				// 1. æ— å‚æ•° å†™å…¥å½“å‰çš„ shell è·¯å¾„ä¸‹
+				// 2. ä¸€ä¸ªå‚æ•°çš„æƒ…å†µ
 
 				writeContentToFile(curHtmlTargetFile, readHtmlContent);
-				System.out.println("Êä³öÎÄ¼ş:" + curHtmlTargetFile.getAbsolutePath());
+				System.out.println("è¾“å‡ºæ–‡ä»¶:" + curHtmlTargetFile.getAbsolutePath());
 			}
 
 			return super.applySubFileListRule4(curFileList, subFileTypeMap, curDirList, curRealFileList);
@@ -2224,7 +2224,7 @@ public class G2_ApplyRuleFor_TypeFile {
 
 		}
 
-		// ¼ì²âµ±Ç°µÄ dirFile Ä¿Â¼ÖĞÊÇ·ñ´æÔÚ µÚ¶ş¸ö²ÎÊıÃû³ÆÏàÍ¬µÄÎÄ¼şÃû
+		// æ£€æµ‹å½“å‰çš„ dirFile ç›®å½•ä¸­æ˜¯å¦å­˜åœ¨ ç¬¬äºŒä¸ªå‚æ•°åç§°ç›¸åŒçš„æ–‡ä»¶å
 		File checkType2Dir(File dirFile, String typeName) {
 			String dirNameA = typeName;
 			while (dirNameA.endsWith("\\")) {
@@ -2246,7 +2246,7 @@ public class G2_ApplyRuleFor_TypeFile {
 			return typeDirFile;
 		}
 
-		// ¼ì²éµ±Ç°Ä¿Â¼ÏÂÊÇ·ñ´æÔÚ¶ÔÓ¦ÀàĞÍtypeName µÄ¾ßÌåµÄÎÄ¼ş µÄÎÄ¼şÃû³ÆµÄ¸öÊı
+		// æ£€æŸ¥å½“å‰ç›®å½•ä¸‹æ˜¯å¦å­˜åœ¨å¯¹åº”ç±»å‹typeName çš„å…·ä½“çš„æ–‡ä»¶ çš„æ–‡ä»¶åç§°çš„ä¸ªæ•°
 		int checkType3File(File dirFile, String typeName) {
 			int existNum = 0;
 
@@ -2257,7 +2257,7 @@ public class G2_ApplyRuleFor_TypeFile {
 			for (int i = 0; i < fileList.length; i++) {
 				File dirFileItem = fileList[i];
 				String dirName = dirFileItem.getName();
-				// µ±Ç°ÎÄ¼ş²»ÊÇÎÄ¼ş¼Ğ ²¢ÇÒµ±Ç°ÎÄ¼şÃû³ÆµÄºó×º ÊÇ .¡¾type¡¿ ÀıÈç .gif .jpg .mp4
+				// å½“å‰æ–‡ä»¶ä¸æ˜¯æ–‡ä»¶å¤¹ å¹¶ä¸”å½“å‰æ–‡ä»¶åç§°çš„åç¼€ æ˜¯ .ã€typeã€‘ ä¾‹å¦‚ .gif .jpg .mp4
 				if (!dirFileItem.isDirectory() && dirFileItem.getName().endsWith("." + typeName)) {
 					existNum++;
 				}
@@ -2267,13 +2267,13 @@ public class G2_ApplyRuleFor_TypeFile {
 		}
 
 	}
-	// // zrule_apply_G2.bat 12_mp4 <Ä¿±êÎÄ¼ş¼ĞÄ¿Â¼> ### °Ñµ±Ç°Ä¿Â¼mp4ÎÄ¼şÉú³É html ²¥·ÅÎÄ¼ş
-	// // zrule_apply_G2.bat 12_jpg <Ä¿±êÎÄ¼ş¼ĞÄ¿Â¼> ### °ÑÃ»ÓĞÀàĞÍµÄÎÄ¼şÃû³ÆĞŞ¸ÄÎª jpg¸ñÊ½Ãû³Æ
-	// // zrule_apply_G2.bat 12_gif <Ä¿±êÎÄ¼ş¼ĞÄ¿Â¼> ### °ÑÃ»ÓĞÀàĞÍµÄÎÄ¼şÃû³ÆĞŞ¸ÄÎª jpg¸ñÊ½Ãû³Æ
+	// // zrule_apply_G2.bat 12_mp4 <ç›®æ ‡æ–‡ä»¶å¤¹ç›®å½•> ### æŠŠå½“å‰ç›®å½•mp4æ–‡ä»¶ç”Ÿæˆ html æ’­æ”¾æ–‡ä»¶
+	// // zrule_apply_G2.bat 12_jpg <ç›®æ ‡æ–‡ä»¶å¤¹ç›®å½•> ### æŠŠæ²¡æœ‰ç±»å‹çš„æ–‡ä»¶åç§°ä¿®æ”¹ä¸º jpgæ ¼å¼åç§°
+	// // zrule_apply_G2.bat 12_gif <ç›®æ ‡æ–‡ä»¶å¤¹ç›®å½•> ### æŠŠæ²¡æœ‰ç±»å‹çš„æ–‡ä»¶åç§°ä¿®æ”¹ä¸º jpgæ ¼å¼åç§°
 
 	class CalCulMediaHtml_Rule_12 extends Basic_Rule {
 
-		ArrayList<File> operaDirFileList; // µ±Ç°´Ó²ÎÊı»ñµÃµÄÄ¿Â¼ÎÄ¼ş¼¯ºÏ
+		ArrayList<File> operaDirFileList; // å½“å‰ä»å‚æ•°è·å¾—çš„ç›®å½•æ–‡ä»¶é›†åˆ
 		int operaType; // 0-unknow 1--mp4 2--jpg 3--gif
 
 		ArrayList<File> mp4HtmlTemplate_FileList;
@@ -2495,7 +2495,7 @@ public class G2_ApplyRuleFor_TypeFile {
 				System.out.println(" inputDir  = " + inputDir.getAbsolutePath());
 			}
 			if (operaDirFileList.size() == 0) {
-				System.out.println("µ±Ç°ÓÃ»§Ã»ÓĞÊäÈëÖ´ĞĞµÄÄ¿Â¼Ãû³Æ,ÇëÖØĞÂÊäÈë!");
+				System.out.println("å½“å‰ç”¨æˆ·æ²¡æœ‰è¾“å…¥æ‰§è¡Œçš„ç›®å½•åç§°,è¯·é‡æ–°è¾“å…¥!");
 				return false;
 			}
 
@@ -2507,7 +2507,7 @@ public class G2_ApplyRuleFor_TypeFile {
 				HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList,
 				ArrayList<File> curRealFileList) {
 			if (operaDirFileList.size() == 0) {
-				System.out.println("µ±Ç°ÓÃ»§Ã»ÓĞÊäÈëÖ´ĞĞµÄÄ¿Â¼Ãû³Æ,ÇëÖØĞÂÊäÈë!");
+				System.out.println("å½“å‰ç”¨æˆ·æ²¡æœ‰è¾“å…¥æ‰§è¡Œçš„ç›®å½•åç§°,è¯·é‡æ–°è¾“å…¥!");
 				return null;
 			}
 			for (int i = 0; i < operaDirFileList.size(); i++) {
@@ -2551,7 +2551,7 @@ public class G2_ApplyRuleFor_TypeFile {
 				String newName2 = index + fileTypeWithPoint;
 				File curFile = mp4FileList.get(i);
 				String parrentFilePath = curFile.getParentFile().getAbsolutePath();
-				tryReName(curFile, newName1); // µÚÒ»´Î¸ÄÃû ±ÜÃâÖØ¸´
+				tryReName(curFile, newName1); // ç¬¬ä¸€æ¬¡æ”¹å é¿å…é‡å¤
 				File file1 = new File(parrentFilePath + File.separator + newName1);
 				tempFileList1.add(file1);
 			}
@@ -2559,21 +2559,21 @@ public class G2_ApplyRuleFor_TypeFile {
 				index = i + 1;
 				File curFile = tempFileList1.get(i);
 				String newName = index + fileTypeWithPoint;
-				tryReName(curFile, newName); // µÚ¶ş´Î¸ÄÃû ÊµÏÖË³Ğò 1.xx 2.xx 3.xx 4.xx
+				tryReName(curFile, newName); // ç¬¬äºŒæ¬¡æ”¹å å®ç°é¡ºåº 1.xx 2.xx 3.xx 4.xx
 			}
 
 		}
 
 		void tryMP4HtmlOperation(File curDirFile, int num) {
-// °Ñµ±Ç°µÄhtmlÎÄ¼ş ÖĞµÄ  ¶ÔÓ¦µÄ Õ¼Î»·û ÒÔ num ½øĞĞ Ìæ»»
-// °Ñ  htmlÎÄ¼şÖĞ mp4/  ×ª»»Îª   µ±Ç°Ä¿Â¼Ãû³Æ  90890/
-// °Ñµ±Ç°µÄ html  ÎÄ¼ş ·ÅÈëµ½µ±Ç°µÄ shellµÄ ¸ù Ä¿Â¼    htmlÃüÁîÎª   ²ÎÊıÄ¿Â¼_Ô­ÓĞÃû³Æ
+// æŠŠå½“å‰çš„htmlæ–‡ä»¶ ä¸­çš„  å¯¹åº”çš„ å ä½ç¬¦ ä»¥ num è¿›è¡Œ æ›¿æ¢
+// æŠŠ  htmlæ–‡ä»¶ä¸­ mp4/  è½¬æ¢ä¸º   å½“å‰ç›®å½•åç§°  90890/
+// æŠŠå½“å‰çš„ html  æ–‡ä»¶ æ”¾å…¥åˆ°å½“å‰çš„ shellçš„ æ ¹ ç›®å½•    htmlå‘½ä»¤ä¸º   å‚æ•°ç›®å½•_åŸæœ‰åç§°
 			String curDirName = curDirFile.getName();
 
 			for (int i = 0; i < mp4HtmlTemplate_FileList.size(); i++) {
 				File HtmlFile = mp4HtmlTemplate_FileList.get(i);
 				if (!HtmlFile.exists()) {
-					System.out.println("×¢Òâµ±Ç°HtmlÎÄ¼ş²»´æÔÚ!  PATH:  " + HtmlFile.getAbsolutePath());
+					System.out.println("æ³¨æ„å½“å‰Htmlæ–‡ä»¶ä¸å­˜åœ¨!  PATH:  " + HtmlFile.getAbsolutePath());
 					continue;
 				}
 				String htmlname = HtmlFile.getName();
@@ -2594,7 +2594,7 @@ public class G2_ApplyRuleFor_TypeFile {
 			for (int i = 0; i < jpgHtmlTemplate_FileList.size(); i++) {
 				File HtmlFile = jpgHtmlTemplate_FileList.get(i);
 				if (!HtmlFile.exists()) {
-					System.out.println("×¢Òâµ±Ç°HtmlÎÄ¼ş²»´æÔÚ!  PATH:  " + HtmlFile.getAbsolutePath());
+					System.out.println("æ³¨æ„å½“å‰Htmlæ–‡ä»¶ä¸å­˜åœ¨!  PATH:  " + HtmlFile.getAbsolutePath());
 					continue;
 				}
 				String htmlname = HtmlFile.getName();
@@ -2619,7 +2619,7 @@ public class G2_ApplyRuleFor_TypeFile {
 			for (int i = 0; i < gifHtmlTemplate_FileList.size(); i++) {
 				File HtmlFile = gifHtmlTemplate_FileList.get(i);
 				if (!HtmlFile.exists()) {
-					System.out.println("×¢Òâµ±Ç°HtmlÎÄ¼ş²»´æÔÚ!  PATH:  " + HtmlFile.getAbsolutePath());
+					System.out.println("æ³¨æ„å½“å‰Htmlæ–‡ä»¶ä¸å­˜åœ¨!  PATH:  " + HtmlFile.getAbsolutePath());
 					continue;
 				}
 				String htmlname = HtmlFile.getName();
@@ -2637,9 +2637,9 @@ public class G2_ApplyRuleFor_TypeFile {
 
 		@Override
 		String simpleDesc() {
-			return "\n" + Cur_Bat_Name + "  #_12_mp4   <Ä¿±êÎÄ¼ş¼ĞÄ¿Â¼>   ### °Ñµ±Ç°Ä¿Â¼mp4ÎÄ¼şÉú³É html ²¥·ÅÎÄ¼ş  \n" + Cur_Bat_Name
-					+ "  #_12_gif   <Ä¿±êÎÄ¼ş¼ĞÄ¿Â¼>   ### °Ñµ±Ç°Ä¿Â¼gifÎÄ¼şÉú³É html ²¥·ÅÎÄ¼ş  \n" + Cur_Bat_Name
-					+ "  #_12_jpg   <Ä¿±êÎÄ¼ş¼ĞÄ¿Â¼>   ### °Ñµ±Ç°Ä¿Â¼jpgÎÄ¼şÉú³É html ²¥·ÅÎÄ¼ş  \n";
+			return "\n" + Cur_Bat_Name + "  #_12_mp4   <ç›®æ ‡æ–‡ä»¶å¤¹ç›®å½•>   ### æŠŠå½“å‰ç›®å½•mp4æ–‡ä»¶ç”Ÿæˆ html æ’­æ”¾æ–‡ä»¶  \n" + Cur_Bat_Name
+					+ "  #_12_gif   <ç›®æ ‡æ–‡ä»¶å¤¹ç›®å½•>   ### æŠŠå½“å‰ç›®å½•gifæ–‡ä»¶ç”Ÿæˆ html æ’­æ”¾æ–‡ä»¶  \n" + Cur_Bat_Name
+					+ "  #_12_jpg   <ç›®æ ‡æ–‡ä»¶å¤¹ç›®å½•>   ### æŠŠå½“å‰ç›®å½•jpgæ–‡ä»¶ç”Ÿæˆ html æ’­æ”¾æ–‡ä»¶  \n";
 		}
 
 	}
@@ -2652,7 +2652,7 @@ public class G2_ApplyRuleFor_TypeFile {
 
 		@Override
 		String simpleDesc() {
-			return "\n" + Cur_Bat_Name + "  #_11    ## (Çå³ıÔ­ÓĞÃû³Æ£¬ĞòÁĞ´Ó1¿ªÊ¼)°Ñµ±Ç°ËùÓĞ×ÓÄ¿Â¼µÄÎÄ¼ş µ±Ç°Ä¿Â¼ ÏÂµÄÊµÌåÎÄ¼şÒÀ´Î°´Ë³Ğò°´ÀàĞÍÖØĞÂÃüÃû!  \n";
+			return "\n" + Cur_Bat_Name + "  #_11    ## (æ¸…é™¤åŸæœ‰åç§°ï¼Œåºåˆ—ä»1å¼€å§‹)æŠŠå½“å‰æ‰€æœ‰å­ç›®å½•çš„æ–‡ä»¶ å½“å‰ç›®å½• ä¸‹çš„å®ä½“æ–‡ä»¶ä¾æ¬¡æŒ‰é¡ºåºæŒ‰ç±»å‹é‡æ–°å‘½å!  \n";
 		}
 
 		@SuppressWarnings("unchecked")
@@ -2668,24 +2668,24 @@ public class G2_ApplyRuleFor_TypeFile {
 
 			for (int i = 0; i < allSubDirFileList.size(); i++) {
 				File dirFileItem = allSubDirFileList.get(i);
-				// »ñÈ¡µ±Ç°ÎÄ¼ş¼ĞÏÂµÄËùÓĞÒÀ¾İ ÎÄ¼şÀàĞÍÎª .jpg .png .mp4 Îªkey ½øĞĞµÄ
+				// è·å–å½“å‰æ–‡ä»¶å¤¹ä¸‹çš„æ‰€æœ‰ä¾æ® æ–‡ä»¶ç±»å‹ä¸º .jpg .png .mp4 ä¸ºkey è¿›è¡Œçš„
 				Map<String, ArrayList<File>> curDirSubRealFile = getCurSubFileMap(dirFileItem);
 
-				// ¶ÔÎÄ¼şÒÀ´ÎÖØÃüÃû
+				// å¯¹æ–‡ä»¶ä¾æ¬¡é‡å‘½å
 
 				Map.Entry<String, ArrayList<File>> entry;
-				// ²»Í¬µÄÀàĞÍÎÄ¼şÔõÃ´´¦Àí?
+				// ä¸åŒçš„ç±»å‹æ–‡ä»¶æ€ä¹ˆå¤„ç†?
 
 				if (curDirSubRealFile != null) {
 					Iterator iterator = curDirSubRealFile.entrySet().iterator();
 					while (iterator.hasNext()) {
 						entry = (Map.Entry<String, ArrayList<File>>) iterator.next();
-						String typeStr = entry.getKey(); // MapµÄValue
+						String typeStr = entry.getKey(); // Mapçš„Value
 						String typeWithOutPot = typeStr.replace(".", "");
 
-						ArrayList<File> fileArr = entry.getValue(); // MapµÄValue
+						ArrayList<File> fileArr = entry.getValue(); // Mapçš„Value
 
-						// ´Ó 000 ¿ªÊ¼
+						// ä» 000 å¼€å§‹
 //                    fixedFileIndex = fixedFileIndex ;
 						ArrayList<File> curRenamePlace = new ArrayList<File>();
 						for (int m = 0; m < fileArr.size(); m++) {
@@ -2693,16 +2693,16 @@ public class G2_ApplyRuleFor_TypeFile {
 							String oldName = curFile.getName();
 							// String curFileName = curFile.getName();
 
-							System.out.println("¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T m=" + m + "¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T");
-							// Õ¼Î»·û Ê¹µÃ ËùÓĞÎÄ¼ş¶¼ÃüÃû³É¹¦ ±ÜÃâÄÇĞ©ÒÑ¾­ÓĞ¸ÃÃû³ÆÁËµÄÎÄ¼ş
+							System.out.println("â•â•â•â•â•â•â•â•â•â•â•â•â• m=" + m + "â•â•â•â•â•â•â•â•â•â•â•â•â•");
+							// å ä½ç¬¦ ä½¿å¾— æ‰€æœ‰æ–‡ä»¶éƒ½å‘½åæˆåŠŸ é¿å…é‚£äº›å·²ç»æœ‰è¯¥åç§°äº†çš„æ–‡ä»¶
 							String newName1 = "_ZHolder_" + (m + 1)
 									+ ("".equals(typeWithOutPot) ? "" : "." + typeWithOutPot);
 //                        String newName = typeTag+"_"+dirTempIndex+"_"+getPaddingIntString(fixedFileIndex,3,"0",true)+typeStr;
 							if (tryReName(curFile, newName1)) {
-								System.out.println("³É¹¦ Index =" + m + "  ÃüÃû( " + oldName + " => " + newName1 + ")  => "
+								System.out.println("æˆåŠŸ Index =" + m + "  å‘½å( " + oldName + " => " + newName1 + ")  => "
 										+ curFile.getAbsolutePath());
 							} else {
-								System.out.println("Ê§°Ü Index =" + m + "  ÃüÃû( " + oldName + " => " + newName1 + ")  => "
+								System.out.println("å¤±è´¥ Index =" + m + "  å‘½å( " + oldName + " => " + newName1 + ")  => "
 										+ curFile.getAbsolutePath());
 							}
 							File fileItem2 = new File(
@@ -2715,27 +2715,27 @@ public class G2_ApplyRuleFor_TypeFile {
 								 * String newName2 = newName1.replace("_ZHolder_","");
 								 * 
 								 * if(tryReName(fileItem2,newName2)){
-								 * System.out.println("³É¹¦ Index ="+m+"  ÃüÃû( "+oldName+" => "+
+								 * System.out.println("æˆåŠŸ Index ="+m+"  å‘½å( "+oldName+" => "+
 								 * newName1+")  => "+curFile.getAbsolutePath()); }else{
-								 * System.out.println("Ê§°Ü Index ="+m+"  ÃüÃû( "+oldName+" => "+
+								 * System.out.println("å¤±è´¥ Index ="+m+"  å‘½å( "+oldName+" => "+
 								 * newName1+")  => "+curFile.getAbsolutePath()); }
 								 */
 
 							}
 
 						}
-						System.out.println("¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T");
+						System.out.println("â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•");
 
 						for (int n = 0; n < curRenamePlace.size(); n++) {
-							System.out.println("¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T n=" + n + "¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T");
+							System.out.println("â•â•â•â•â•â•â•â•â•â•â•â•â• n=" + n + "â•â•â•â•â•â•â•â•â•â•â•â•â•");
 
 							File fileItem2 = curRenamePlace.get(n);
 							String newName2 = fileItem2.getName().replace("_ZHolder_", "");
 							if (tryReName(fileItem2, newName2)) {
-								System.out.println("³É¹¦ Index =" + n + "  ÃüÃû( " + fileItem2.getName() + " => " + newName2
+								System.out.println("æˆåŠŸ Index =" + n + "  å‘½å( " + fileItem2.getName() + " => " + newName2
 										+ ")  => " + fileItem2.getAbsolutePath());
 							} else {
-								System.out.println("Ê§°Ü Index =" + n + "  ÃüÃû( " + fileItem2.getName() + " => " + newName2
+								System.out.println("å¤±è´¥ Index =" + n + "  å‘½å( " + fileItem2.getName() + " => " + newName2
 										+ ")  => " + fileItem2.getAbsolutePath());
 							}
 						}
@@ -2760,24 +2760,24 @@ public class G2_ApplyRuleFor_TypeFile {
 
 			for (int i = 0; i < curDirList.size(); i++) {
 				File dirFileItem = curDirList.get(i);
-				// »ñÈ¡µ±Ç°ÎÄ¼ş¼ĞÏÂµÄËùÓĞÒÀ¾İ ÎÄ¼şÀàĞÍÎª .jpg .png .mp4 Îªkey ½øĞĞµÄ
+				// è·å–å½“å‰æ–‡ä»¶å¤¹ä¸‹çš„æ‰€æœ‰ä¾æ® æ–‡ä»¶ç±»å‹ä¸º .jpg .png .mp4 ä¸ºkey è¿›è¡Œçš„
 				Map<String, ArrayList<File>> curDirSubRealFile = getCurSubFileMap(dirFileItem);
 
-				// ¶ÔÎÄ¼şÒÀ´ÎÖØÃüÃû
+				// å¯¹æ–‡ä»¶ä¾æ¬¡é‡å‘½å
 
 				Map.Entry<String, ArrayList<File>> entry;
-				// ²»Í¬µÄÀàĞÍÎÄ¼şÔõÃ´´¦Àí?
+				// ä¸åŒçš„ç±»å‹æ–‡ä»¶æ€ä¹ˆå¤„ç†?
 
 				if (curDirSubRealFile != null) {
 					Iterator iterator = curDirSubRealFile.entrySet().iterator();
 					while (iterator.hasNext()) {
 						entry = (Map.Entry<String, ArrayList<File>>) iterator.next();
-						String typeStr = entry.getKey(); // MapµÄValue
+						String typeStr = entry.getKey(); // Mapçš„Value
 						String typeWithOutPot = typeStr.replace(".", "");
 
-						ArrayList<File> fileArr = entry.getValue(); // MapµÄValue
+						ArrayList<File> fileArr = entry.getValue(); // Mapçš„Value
 
-						// ´Ó 000 ¿ªÊ¼
+						// ä» 000 å¼€å§‹
 //                    fixedFileIndex = fixedFileIndex ;
 						ArrayList<File> curRenamePlace = new ArrayList<File>();
 						for (int m = 0; m < fileArr.size(); m++) {
@@ -2785,15 +2785,15 @@ public class G2_ApplyRuleFor_TypeFile {
 							String oldName = curFile.getName();
 							// String curFileName = curFile.getName();
 
-							System.out.println("¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T m=" + m + "¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T");
-							// Õ¼Î»·û Ê¹µÃ ËùÓĞÎÄ¼ş¶¼ÃüÃû³É¹¦ ±ÜÃâÄÇĞ©ÒÑ¾­ÓĞ¸ÃÃû³ÆÁËµÄÎÄ¼ş
+							System.out.println("â•â•â•â•â•â•â•â•â•â•â•â•â• m=" + m + "â•â•â•â•â•â•â•â•â•â•â•â•â•");
+							// å ä½ç¬¦ ä½¿å¾— æ‰€æœ‰æ–‡ä»¶éƒ½å‘½åæˆåŠŸ é¿å…é‚£äº›å·²ç»æœ‰è¯¥åç§°äº†çš„æ–‡ä»¶
 							String newName1 = "_ZHolder_" + m + ("".equals(typeWithOutPot) ? "" : "." + typeWithOutPot);
 //                        String newName = typeTag+"_"+dirTempIndex+"_"+getPaddingIntString(fixedFileIndex,3,"0",true)+typeStr;
 							if (tryReName(curFile, newName1)) {
-								System.out.println("³É¹¦ Index =" + m + "  ÃüÃû( " + oldName + " => " + newName1 + ")  => "
+								System.out.println("æˆåŠŸ Index =" + m + "  å‘½å( " + oldName + " => " + newName1 + ")  => "
 										+ curFile.getAbsolutePath());
 							} else {
-								System.out.println("Ê§°Ü Index =" + m + "  ÃüÃû( " + oldName + " => " + newName1 + ")  => "
+								System.out.println("å¤±è´¥ Index =" + m + "  å‘½å( " + oldName + " => " + newName1 + ")  => "
 										+ curFile.getAbsolutePath());
 							}
 							File fileItem2 = new File(
@@ -2806,27 +2806,27 @@ public class G2_ApplyRuleFor_TypeFile {
 								 * String newName2 = newName1.replace("_ZHolder_","");
 								 * 
 								 * if(tryReName(fileItem2,newName2)){
-								 * System.out.println("³É¹¦ Index ="+m+"  ÃüÃû( "+oldName+" => "+
+								 * System.out.println("æˆåŠŸ Index ="+m+"  å‘½å( "+oldName+" => "+
 								 * newName1+")  => "+curFile.getAbsolutePath()); }else{
-								 * System.out.println("Ê§°Ü Index ="+m+"  ÃüÃû( "+oldName+" => "+
+								 * System.out.println("å¤±è´¥ Index ="+m+"  å‘½å( "+oldName+" => "+
 								 * newName1+")  => "+curFile.getAbsolutePath()); }
 								 */
 
 							}
 
 						}
-						System.out.println("¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T");
+						System.out.println("â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•");
 
 						for (int n = 0; n < curRenamePlace.size(); n++) {
-							System.out.println("¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T n=" + n + "¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T");
+							System.out.println("â•â•â•â•â•â•â•â•â•â•â•â•â• n=" + n + "â•â•â•â•â•â•â•â•â•â•â•â•â•");
 
 							File fileItem2 = curRenamePlace.get(n);
 							String newName2 = fileItem2.getName().replace("_ZHolder_", "");
 							if (tryReName(fileItem2, newName2)) {
-								System.out.println("³É¹¦ Index =" + n + "  ÃüÃû( " + fileItem2.getName() + " => " + newName2
+								System.out.println("æˆåŠŸ Index =" + n + "  å‘½å( " + fileItem2.getName() + " => " + newName2
 										+ ")  => " + fileItem2.getAbsolutePath());
 							} else {
-								System.out.println("Ê§°Ü Index =" + n + "  ÃüÃû( " + fileItem2.getName() + " => " + newName2
+								System.out.println("å¤±è´¥ Index =" + n + "  å‘½å( " + fileItem2.getName() + " => " + newName2
 										+ ")  => " + fileItem2.getAbsolutePath());
 							}
 						}
@@ -2841,37 +2841,37 @@ public class G2_ApplyRuleFor_TypeFile {
 		}
 	}
 
-	// // zrule_apply_G2.bat #_10_append 2001 Íùµ±Ç°ÎÄ¼ş¼Ğºó×ºÔö¼Ó 2001
-	// // zrule_apply_G2.bat #_10_prefix 2001 Íùµ±Ç°ÎÄ¼ş¼ĞÇ°×ºÔö¼Ó 2001
-	// // zrule_apply_G2.bat #_10_create 1_100 ´´½¨Ò»¸öĞòÁĞºÅ´Ó1µ½100µÄ100¸öÎÄ¼ş¼Ğ
-	// // zrule_apply_G2.bat #_10_create temp_ 1_100 ´´½¨Ò»¸öĞòÁĞºÅ´Ótemp1µ½temp100µÄ100¸öÎÄ¼ş¼Ğ
-	// // zrule_apply_G2.bat #_10_create _temp 1_100 ´´½¨Ò»¸öĞòÁĞºÅ´Ó1tempµ½100tempµÄ100¸öÎÄ¼ş¼Ğ
+	// // zrule_apply_G2.bat #_10_append 2001 å¾€å½“å‰æ–‡ä»¶å¤¹åç¼€å¢åŠ  2001
+	// // zrule_apply_G2.bat #_10_prefix 2001 å¾€å½“å‰æ–‡ä»¶å¤¹å‰ç¼€å¢åŠ  2001
+	// // zrule_apply_G2.bat #_10_create 1_100 åˆ›å»ºä¸€ä¸ªåºåˆ—å·ä»1åˆ°100çš„100ä¸ªæ–‡ä»¶å¤¹
+	// // zrule_apply_G2.bat #_10_create temp_ 1_100 åˆ›å»ºä¸€ä¸ªåºåˆ—å·ä»temp1åˆ°temp100çš„100ä¸ªæ–‡ä»¶å¤¹
+	// // zrule_apply_G2.bat #_10_create _temp 1_100 åˆ›å»ºä¸€ä¸ªåºåˆ—å·ä»1tempåˆ°100tempçš„100ä¸ªæ–‡ä»¶å¤¹
 	// // zrule_apply_G2.bat #_10_create i_temp 1_100
-	// ´´½¨Ò»¸öĞòÁĞºÅ´Ói1tempµ½i100temp100µÄ100¸öÎÄ¼ş¼Ğ
+	// åˆ›å»ºä¸€ä¸ªåºåˆ—å·ä»i1tempåˆ°i100temp100çš„100ä¸ªæ–‡ä»¶å¤¹
 
-	// // zrule_apply_G2.bat #_10_create 7000_7100 ´´½¨Ò»¸öĞòÁĞºÅ´Ó7000¿ªÊ¼µÄµ½7100½áÊøµÄÎÄ¼ş¼Ğ
-	// // zrule_apply_G2.bat #_10_replace abc_DEF ´´½¨Ò»¸öĞòÁĞºÅ´Ó7000¿ªÊ¼µÄµ½7100½áÊøµÄÎÄ¼ş¼Ğ
+	// // zrule_apply_G2.bat #_10_create 7000_7100 åˆ›å»ºä¸€ä¸ªåºåˆ—å·ä»7000å¼€å§‹çš„åˆ°7100ç»“æŸçš„æ–‡ä»¶å¤¹
+	// // zrule_apply_G2.bat #_10_replace abc_DEF åˆ›å»ºä¸€ä¸ªåºåˆ—å·ä»7000å¼€å§‹çš„åˆ°7100ç»“æŸçš„æ–‡ä»¶å¤¹
 
 	class DirOperation_Rule_10 extends Basic_Rule {
 
-		String firstParamStr; // µÚÒ»¸ö²ÎÊı
+		String firstParamStr; // ç¬¬ä¸€ä¸ªå‚æ•°
 
-		int DIR_OPERA_TYPE_APPEND = 1; // ºó×ºÔö¼Ó
+		int DIR_OPERA_TYPE_APPEND = 1; // åç¼€å¢åŠ 
 		String appendStr_1;
-		int DIR_OPERA_TYPE_PREFIX = 2; // Ç°×ºÔö¼Ó
+		int DIR_OPERA_TYPE_PREFIX = 2; // å‰ç¼€å¢åŠ 
 		String prefixStr_2;
 
-		int DIR_OPERA_TYPE_CREATE = 3; // ´´½¨ÎÄ¼ş
+		int DIR_OPERA_TYPE_CREATE = 3; // åˆ›å»ºæ–‡ä»¶
 		int beginIndex_3;
 		int endIndex_3;
 		String prefixStr_3;
 		String appendStr_3;
 
-		int DIR_OPERA_TYPE_REPLACE = 4; // Ìæ»»ÎÄ¼ş¼ĞÃû³Æ
+		int DIR_OPERA_TYPE_REPLACE = 4; // æ›¿æ¢æ–‡ä»¶å¤¹åç§°
 		String replacedStr_4;
 		String newNameStr_4;
 
-		// Ê¶±ğµ±Ç°ÓÃ»§ Ö¸¶¨µÄ²Ù×÷ÀàĞÍ 1ºó×ºÔö¼Ó 2Ç°×ºÔö¼Ó 3´´½¨ÎÄ¼ş 4Ìæ»»ÎÄ¼ş¼ĞÃû³Æ
+		// è¯†åˆ«å½“å‰ç”¨æˆ· æŒ‡å®šçš„æ“ä½œç±»å‹ 1åç¼€å¢åŠ  2å‰ç¼€å¢åŠ  3åˆ›å»ºæ–‡ä»¶ 4æ›¿æ¢æ–‡ä»¶å¤¹åç§°
 		int currentOperaType = 0;
 
 		DirOperation_Rule_10() {
@@ -2908,7 +2908,7 @@ public class G2_ApplyRuleFor_TypeFile {
 
 					String paramItem = inputParamList.get(i);
 					if (paramItem != null && paramItem.equals(firstParamStr)) {
-						continue; // µÚÒ»¸ö²ÎÊı²»²Ù×÷
+						continue; // ç¬¬ä¸€ä¸ªå‚æ•°ä¸æ“ä½œ
 					}
 
 					if (!paramItem.contains("_")) {
@@ -2917,7 +2917,7 @@ public class G2_ApplyRuleFor_TypeFile {
 					}
 					String fixedParam = paramItem.replace("_", "");
 
-					if (isNumeric(fixedParam)) { // Èç¹ûÊÇ ×ÖÄ¸ ËµÃ÷ÊÇÆğÊ¼µÄÄÇ¸ö²ÎÊı
+					if (isNumeric(fixedParam)) { // å¦‚æœæ˜¯ å­—æ¯ è¯´æ˜æ˜¯èµ·å§‹çš„é‚£ä¸ªå‚æ•°
 						String[] IndexArr = paramItem.split("_");
 
 						if (IndexArr.length >= 2) {
@@ -2940,7 +2940,7 @@ public class G2_ApplyRuleFor_TypeFile {
 						} else {
 							falg = false;
 						}
-					} else { // Ãû³ÆµÄ²ÎÊı
+					} else { // åç§°çš„å‚æ•°
 						if (paramItem.endsWith("_")) {
 							appendStr_3 = "";
 							String[] NamePreArr = paramItem.split("_");
@@ -3013,7 +3013,7 @@ public class G2_ApplyRuleFor_TypeFile {
 				break;
 
 			default:
-				System.out.println("µ±Ç° currentOperaType = " + currentOperaType + "  Ã»ÓĞÕÒµ½ºÏÊÊµÄ²Ù×÷ÀàĞÍÈ¥´¦Àí ");
+				System.out.println("å½“å‰ currentOperaType = " + currentOperaType + "  æ²¡æœ‰æ‰¾åˆ°åˆé€‚çš„æ“ä½œç±»å‹å»å¤„ç† ");
 			}
 
 			return curDirList;
@@ -3041,31 +3041,31 @@ public class G2_ApplyRuleFor_TypeFile {
 
 		@Override
 		String simpleDesc() {
-			return "\n" + Cur_Bat_Name + "  #_10_append  _over   Íùµ±Ç°ÎÄ¼ş¼Ğºó×ºÔö¼Ó _over \n" + Cur_Bat_Name
-					+ "  #_10_prefix  temp   Íùµ±Ç°ÎÄ¼ş¼ĞÇ°×ºÔö¼Ó temp \n" + Cur_Bat_Name
-					+ " #_10_create  1_100   ´´½¨Ò»¸öĞòÁĞºÅ´Ó1µ½100µÄ100¸öÎÄ¼ş¼Ğ   \n" + Cur_Bat_Name
-					+ " #_10_create   temp_  1_100   ´´½¨Ò»¸öĞòÁĞºÅ´Ótemp1µ½temp100µÄ100¸öÎÄ¼ş¼Ğ \n " + Cur_Bat_Name
-					+ " #_10_create   _temp  1_100   ´´½¨Ò»¸öĞòÁĞºÅ´Ó1tempµ½100tempµÄ100¸öÎÄ¼ş¼Ğ \n " + Cur_Bat_Name
-					+ " #_10_create   j_temp  1_100   ´´½¨Ò»¸öĞòÁĞºÅ´Ó j_1_temp µ½100tempµÄ j_100_temp ¸öÎÄ¼ş¼Ğ \n " + Cur_Bat_Name
-					+ " #_10_create  7000_7100  ´´½¨Ò»¸öĞòÁĞºÅ´Ó7000¿ªÊ¼µÄµ½7100½áÊøµÄÎÄ¼ş¼Ğ  \n " + Cur_Bat_Name
-					+ " #_10_replace  abc_DEF  °Ñµ±Ç°ÎÄ¼ş¼ĞÃû³ÆÖĞµÄ  abc ×ªÎª DEF \n ";
+			return "\n" + Cur_Bat_Name + "  #_10_append  _over   å¾€å½“å‰æ–‡ä»¶å¤¹åç¼€å¢åŠ  _over \n" + Cur_Bat_Name
+					+ "  #_10_prefix  temp   å¾€å½“å‰æ–‡ä»¶å¤¹å‰ç¼€å¢åŠ  temp \n" + Cur_Bat_Name
+					+ " #_10_create  1_100   åˆ›å»ºä¸€ä¸ªåºåˆ—å·ä»1åˆ°100çš„100ä¸ªæ–‡ä»¶å¤¹   \n" + Cur_Bat_Name
+					+ " #_10_create   temp_  1_100   åˆ›å»ºä¸€ä¸ªåºåˆ—å·ä»temp1åˆ°temp100çš„100ä¸ªæ–‡ä»¶å¤¹ \n " + Cur_Bat_Name
+					+ " #_10_create   _temp  1_100   åˆ›å»ºä¸€ä¸ªåºåˆ—å·ä»1tempåˆ°100tempçš„100ä¸ªæ–‡ä»¶å¤¹ \n " + Cur_Bat_Name
+					+ " #_10_create   j_temp  1_100   åˆ›å»ºä¸€ä¸ªåºåˆ—å·ä» j_1_temp åˆ°100tempçš„ j_100_temp ä¸ªæ–‡ä»¶å¤¹ \n " + Cur_Bat_Name
+					+ " #_10_create  7000_7100  åˆ›å»ºä¸€ä¸ªåºåˆ—å·ä»7000å¼€å§‹çš„åˆ°7100ç»“æŸçš„æ–‡ä»¶å¤¹  \n " + Cur_Bat_Name
+					+ " #_10_replace  abc_DEF  æŠŠå½“å‰æ–‡ä»¶å¤¹åç§°ä¸­çš„  abc è½¬ä¸º DEF \n ";
 		}
 
 	}
 
-	// // zrule_apply_G2.bat #_9 _jpg °ÑÃ»ÓĞÀàĞÍµÄÎÄ¼şÃû³ÆĞŞ¸ÄÎª jpg¸ñÊ½Ãû³Æ
-	// // zrule_apply_G2.bat #_9 jpg_ È¥³ıµ±Ç°jpgµÄ¸ñÊ½ Ê¹µÃÆäÎÄ¼ş¸ñÊ½Î´Öª
+	// // zrule_apply_G2.bat #_9 _jpg æŠŠæ²¡æœ‰ç±»å‹çš„æ–‡ä»¶åç§°ä¿®æ”¹ä¸º jpgæ ¼å¼åç§°
+	// // zrule_apply_G2.bat #_9 jpg_ å»é™¤å½“å‰jpgçš„æ ¼å¼ ä½¿å¾—å…¶æ–‡ä»¶æ ¼å¼æœªçŸ¥
 
-	// °Ñ µ±Ç°Ä¿Â¼ÏÂ×ÓÎÄ¼ş ½øĞĞ¸ñÊ½µÄ×ª»»
-	// // zrule_apply_G2.bat #_9 _jpg °ÑÃ»ÓĞÀàĞÍµÄÎÄ¼şÃû³ÆĞŞ¸ÄÎª jpg¸ñÊ½Ãû³Æ
-	// // zrule_apply_G2.bat #_9 jpg_ È¥³ıµ±Ç°jpgµÄ¸ñÊ½ Ê¹µÃÆäÎÄ¼ş¸ñÊ½Î´Öª
-	// zrule_apply_G2.bat #_9 jpg_png °Ñ jpgµÄ¸ñÊ½×ªÎªpngµÄ¸ñÊ½
-	// zrule_apply_G2.bat #_9 png_jpg °Ñ jpgµÄ¸ñÊ½×ªÎªpngµÄ¸ñÊ½
-	// // zrule_apply_G2.bat #_9 gif_ È¥³ıµ±Ç°gifµÄ¸ñÊ½ Ê¹µÃÆäÎÄ¼ş¸ñÊ½Î´Öª
-	// // zrule_apply_G2.bat #_9 _gif °ÑÃ»ÓĞÀàĞÍµÄÎÄ¼şÃû³ÆĞŞ¸ÄÎª jpg¸ñÊ½Ãû³Æ
-	// // zrule_apply_G2.bat #_9 mp4_ È¥³ıµ±Ç°mp4µÄ¸ñÊ½ Ê¹µÃÆäÎÄ¼ş¸ñÊ½Î´Öª
-	// // zrule_apply_G2.bat #_9 _mp4 °ÑÃ»ÓĞÀàĞÍµÄÎÄ¼şÃû³ÆĞŞ¸ÄÎª mp4¸ñÊ½Ãû³Æ
-	// // zrule_apply_G2.bat #_9 Ô­ÀàĞÍ_Ä¿±êÀàĞÍ °ÑÃ»ÓĞÀàĞÍµÄÎÄ¼şÃû³ÆĞŞ¸ÄÎª jpg¸ñÊ½Ãû³Æ
+	// æŠŠ å½“å‰ç›®å½•ä¸‹å­æ–‡ä»¶ è¿›è¡Œæ ¼å¼çš„è½¬æ¢
+	// // zrule_apply_G2.bat #_9 _jpg æŠŠæ²¡æœ‰ç±»å‹çš„æ–‡ä»¶åç§°ä¿®æ”¹ä¸º jpgæ ¼å¼åç§°
+	// // zrule_apply_G2.bat #_9 jpg_ å»é™¤å½“å‰jpgçš„æ ¼å¼ ä½¿å¾—å…¶æ–‡ä»¶æ ¼å¼æœªçŸ¥
+	// zrule_apply_G2.bat #_9 jpg_png æŠŠ jpgçš„æ ¼å¼è½¬ä¸ºpngçš„æ ¼å¼
+	// zrule_apply_G2.bat #_9 png_jpg æŠŠ jpgçš„æ ¼å¼è½¬ä¸ºpngçš„æ ¼å¼
+	// // zrule_apply_G2.bat #_9 gif_ å»é™¤å½“å‰gifçš„æ ¼å¼ ä½¿å¾—å…¶æ–‡ä»¶æ ¼å¼æœªçŸ¥
+	// // zrule_apply_G2.bat #_9 _gif æŠŠæ²¡æœ‰ç±»å‹çš„æ–‡ä»¶åç§°ä¿®æ”¹ä¸º jpgæ ¼å¼åç§°
+	// // zrule_apply_G2.bat #_9 mp4_ å»é™¤å½“å‰mp4çš„æ ¼å¼ ä½¿å¾—å…¶æ–‡ä»¶æ ¼å¼æœªçŸ¥
+	// // zrule_apply_G2.bat #_9 _mp4 æŠŠæ²¡æœ‰ç±»å‹çš„æ–‡ä»¶åç§°ä¿®æ”¹ä¸º mp4æ ¼å¼åç§°
+	// // zrule_apply_G2.bat #_9 åŸç±»å‹_ç›®æ ‡ç±»å‹ æŠŠæ²¡æœ‰ç±»å‹çš„æ–‡ä»¶åç§°ä¿®æ”¹ä¸º jpgæ ¼å¼åç§°
 	class FileType_Rule_9 extends Basic_Rule {
 		String originType;
 		String targetType;
@@ -3076,27 +3076,27 @@ public class G2_ApplyRuleFor_TypeFile {
 
 		@Override
 		String simpleDesc() {
-			return "\n" + Cur_Bat_Name + "  #_9  _jpg   °ÑÃ»ÓĞÀàĞÍµÄÎÄ¼şÃû³ÆĞŞ¸ÄÎª jpg¸ñÊ½Ãû³Æ\n" + Cur_Bat_Name
-					+ "  #_9  jpg_   È¥³ıµ±Ç°jpgµÄ¸ñÊ½ Ê¹µÃÆäÎÄ¼ş¸ñÊ½Î´Öª \n" + Cur_Bat_Name + " #_9  jpg_png  °Ñ  jpgµÄ¸ñÊ½×ªÎªpngµÄ¸ñÊ½  \n"
-					+ Cur_Bat_Name + " #_9  png_jpg  °Ñ  jpgµÄ¸ñÊ½×ªÎªpngµÄ¸ñÊ½ \n " + Cur_Bat_Name
-					+ " #_9  gif_   È¥³ıµ±Ç°gifµÄ¸ñÊ½ Ê¹µÃÆäÎÄ¼ş¸ñÊ½Î´Öª  \n " + Cur_Bat_Name
-					+ " #_9  _gif   °ÑÃ»ÓĞÀàĞÍµÄÎÄ¼şÃû³ÆĞŞ¸ÄÎª jpg¸ñÊ½Ãû³Æ  \n " + Cur_Bat_Name + " #_9  png_jpg  °Ñ  jpgµÄ¸ñÊ½×ªÎªpngµÄ¸ñÊ½ \n "
-					+ Cur_Bat_Name + " #_9  mp4_   È¥³ıµ±Ç°mp4µÄ¸ñÊ½ Ê¹µÃÆäÎÄ¼ş¸ñÊ½Î´Öª \n " + Cur_Bat_Name
-					+ " #_9  _mp4   °ÑÃ»ÓĞÀàĞÍµÄÎÄ¼şÃû³ÆĞŞ¸ÄÎª mp4¸ñÊ½Ãû³Æ \n " + Cur_Bat_Name
-					+ " #_9  7z_7Òßz   °Ñµ±Ç° 7zÎÄ¼şÃûºó×º¸ÄÎª 7Òßz Ê¹µÃÎŞ·¨¼ì²â¾ßÌåÀàĞÍ \n " + Cur_Bat_Name
-					+ " #_9  Ô­ÀàĞÍ_Ä¿±êÀàĞÍ   °ÑÃ»ÓĞÀàĞÍµÄÎÄ¼şÃû³Æ¡¾Ô­ÀàĞÍ¡¿->¡¾Ä¿±êÀàĞÍ¡¿ \n ";
+			return "\n" + Cur_Bat_Name + "  #_9  _jpg   æŠŠæ²¡æœ‰ç±»å‹çš„æ–‡ä»¶åç§°ä¿®æ”¹ä¸º jpgæ ¼å¼åç§°\n" + Cur_Bat_Name
+					+ "  #_9  jpg_   å»é™¤å½“å‰jpgçš„æ ¼å¼ ä½¿å¾—å…¶æ–‡ä»¶æ ¼å¼æœªçŸ¥ \n" + Cur_Bat_Name + " #_9  jpg_png  æŠŠ  jpgçš„æ ¼å¼è½¬ä¸ºpngçš„æ ¼å¼  \n"
+					+ Cur_Bat_Name + " #_9  png_jpg  æŠŠ  jpgçš„æ ¼å¼è½¬ä¸ºpngçš„æ ¼å¼ \n " + Cur_Bat_Name
+					+ " #_9  gif_   å»é™¤å½“å‰gifçš„æ ¼å¼ ä½¿å¾—å…¶æ–‡ä»¶æ ¼å¼æœªçŸ¥  \n " + Cur_Bat_Name
+					+ " #_9  _gif   æŠŠæ²¡æœ‰ç±»å‹çš„æ–‡ä»¶åç§°ä¿®æ”¹ä¸º jpgæ ¼å¼åç§°  \n " + Cur_Bat_Name + " #_9  png_jpg  æŠŠ  jpgçš„æ ¼å¼è½¬ä¸ºpngçš„æ ¼å¼ \n "
+					+ Cur_Bat_Name + " #_9  mp4_   å»é™¤å½“å‰mp4çš„æ ¼å¼ ä½¿å¾—å…¶æ–‡ä»¶æ ¼å¼æœªçŸ¥ \n " + Cur_Bat_Name
+					+ " #_9  _mp4   æŠŠæ²¡æœ‰ç±»å‹çš„æ–‡ä»¶åç§°ä¿®æ”¹ä¸º mp4æ ¼å¼åç§° \n " + Cur_Bat_Name
+					+ " #_9  7z_7ç–«z   æŠŠå½“å‰ 7zæ–‡ä»¶ååç¼€æ”¹ä¸º 7ç–«z ä½¿å¾—æ— æ³•æ£€æµ‹å…·ä½“ç±»å‹ \n " + Cur_Bat_Name
+					+ " #_9  åŸç±»å‹_ç›®æ ‡ç±»å‹   æŠŠæ²¡æœ‰ç±»å‹çš„æ–‡ä»¶åç§°ã€åŸç±»å‹ã€‘->ã€ç›®æ ‡ç±»å‹ã€‘ \n ";
 		}
 
 		@Override
 		boolean initParamsWithInputList(ArrayList<String> inputParamList) {
 			boolean Flag = true;
 
-			// »ñÈ¡µ½×°»»µÄÀàĞÍ
+			// è·å–åˆ°è£…æ¢çš„ç±»å‹
 			String inputFileTypeParams = inputParamList.get(inputParamList.size() - 1);
 
 			if (!inputFileTypeParams.contains("_")) {
 				Flag = false;
-				System.out.println("ÎŞ·¨¼ì²âµ½µ±Ç° µÚ9 Rule   Ô­Ê¼ÀàĞÍ_Ä¿±êÀàĞÍ²ÎÊı   Çë¼ì²éºóÖØĞÂÖ´ĞĞ");
+				System.out.println("æ— æ³•æ£€æµ‹åˆ°å½“å‰ ç¬¬9 Rule   åŸå§‹ç±»å‹_ç›®æ ‡ç±»å‹å‚æ•°   è¯·æ£€æŸ¥åé‡æ–°æ‰§è¡Œ");
 			} else {
 
 				if (inputFileTypeParams.endsWith("_")) {
@@ -3129,18 +3129,18 @@ public class G2_ApplyRuleFor_TypeFile {
 			for (int i = 0; i < subFileList.size(); i++) {
 				File curFIle = subFileList.get(i);
 				String originName = curFIle.getName();
-				// Ö´ĞĞ ĞŞ¸ÄÎÄ¼şÀàĞÍµÄ²Ù×÷
+				// æ‰§è¡Œ ä¿®æ”¹æ–‡ä»¶ç±»å‹çš„æ“ä½œ
 
-				// 1. Èç¹ûµ±Ç°ÎÄ¼ş ¹ıÂËÀàĞÍÊÇ ¿Õ ÄÇÃ´ ¿ÉÄÜ¾ÍÊÇÃ»ÓĞÈÎºÎµÄÀàĞÍÁË
-				// Èç¹ûµ±Ç°¹ıÂËµÄÀàĞÍÊÇ originType ÊÇ"" ¿ÕµÄ»° ÄÇÃ´¾Í»á¹ıÂË³öËùÓĞµÄÎÄ¼ş ÄÇÃ´Ö»²Ù×÷ ²»°üº¬.µÄÄÇĞ©ÎÄ¼ş
+				// 1. å¦‚æœå½“å‰æ–‡ä»¶ è¿‡æ»¤ç±»å‹æ˜¯ ç©º é‚£ä¹ˆ å¯èƒ½å°±æ˜¯æ²¡æœ‰ä»»ä½•çš„ç±»å‹äº†
+				// å¦‚æœå½“å‰è¿‡æ»¤çš„ç±»å‹æ˜¯ originType æ˜¯"" ç©ºçš„è¯ é‚£ä¹ˆå°±ä¼šè¿‡æ»¤å‡ºæ‰€æœ‰çš„æ–‡ä»¶ é‚£ä¹ˆåªæ“ä½œ ä¸åŒ…å«.çš„é‚£äº›æ–‡ä»¶
 				if ("".equals(originType)) {
 					if (originName.contains(".")) {
-						continue; // °üº¬ÁË . ËµÃ÷ÓĞÀàĞÍ ÄÇÃ´ ²»²Ù×÷
+						continue; // åŒ…å«äº† . è¯´æ˜æœ‰ç±»å‹ é‚£ä¹ˆ ä¸æ“ä½œ
 					}
 					String newName = originName + "." + targetType;
 					tryReName(curFIle, newName);
 				} else {
-					// ÓĞ¾ßÌåµÄ ¹ıÂËµÄÎÄ¼ş
+					// æœ‰å…·ä½“çš„ è¿‡æ»¤çš„æ–‡ä»¶
 					String oldType = "." + originType;
 					String newType = "." + targetType;
 					if ("".equals(targetType)) {
@@ -3160,7 +3160,7 @@ public class G2_ApplyRuleFor_TypeFile {
 		}
 	}
 
-	// °ÑÎÄ¼şºó×ºÖĞµÄÖĞÎÄ¸øÈ¥³ıµô ²»°üº¬ÎÄ¼ş¼Ğ ²»°üº¬ËïÎÄ¼ş
+	// æŠŠæ–‡ä»¶åç¼€ä¸­çš„ä¸­æ–‡ç»™å»é™¤æ‰ ä¸åŒ…å«æ–‡ä»¶å¤¹ ä¸åŒ…å«å­™æ–‡ä»¶
 	class ClearChineseType_8 extends Basic_Rule {
 
 		ClearChineseType_8() {
@@ -3177,7 +3177,7 @@ public class G2_ApplyRuleFor_TypeFile {
 				HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList,
 				ArrayList<File> curRealFileList) {
 
-			System.out.println("Rule8_ClearChineseType_8   ËÑË÷µ½µÄÊµÌåÎÄ¼ş¸öÊı:" + curRealFileList.size());
+			System.out.println("Rule8_ClearChineseType_8   æœç´¢åˆ°çš„å®ä½“æ–‡ä»¶ä¸ªæ•°:" + curRealFileList.size());
 
 			for (int i = 0; i < curRealFileList.size(); i++) {
 				File curFile = curRealFileList.get(i);
@@ -3185,9 +3185,9 @@ public class G2_ApplyRuleFor_TypeFile {
 				if (currentFileName.contains(".")) {
 					String typeStr = currentFileName.substring(currentFileName.lastIndexOf("."));
 					if (isContainChinese(typeStr)) {
-						// //Çå³ıÖĞÎÄ Çå³ı ¿Õ¸ñ
+						// //æ¸…é™¤ä¸­æ–‡ æ¸…é™¤ ç©ºæ ¼
 						String newType = clearChinese(typeStr).replace(" ", "");
-						String newName = currentFileName.replace(typeStr, newType); // ĞÂÃû³Æ
+						String newName = currentFileName.replace(typeStr, newType); // æ–°åç§°
 						System.out.println("newType = " + newType + "    newName=" + newName);
 						tryReName(curFile, newName);
 					}
@@ -3200,21 +3200,21 @@ public class G2_ApplyRuleFor_TypeFile {
 
 		@Override
 		String simpleDesc() {
-			return "°Ñµ±Ç°ÃüÁîµÄÎÄ¼ş°üº¬.µÄÎÄ¼şµÄ ºó×ºÃû³ÆÖĞµÄÖĞÎÄÇå³ıµô  ÀıÈç 1.7°¡z -> 1.7z   2.Äãzip -> 2.zip \n" + Cur_Bat_Name
-					+ " #_8    <Ö¸¶¨ºó×ºÓĞÖĞÎÄµÄÎÄ¼ş>  [Ë÷Òı8]   // °Ñµ±Ç°Ä¿Â¼ÏÂÎÄ¼ş ºó×ºÖĞÎÄÈ¥³ı  \n";
+			return "æŠŠå½“å‰å‘½ä»¤çš„æ–‡ä»¶åŒ…å«.çš„æ–‡ä»¶çš„ åç¼€åç§°ä¸­çš„ä¸­æ–‡æ¸…é™¤æ‰  ä¾‹å¦‚ 1.7å•Šz -> 1.7z   2.ä½ zip -> 2.zip \n" + Cur_Bat_Name
+					+ " #_8    <æŒ‡å®šåç¼€æœ‰ä¸­æ–‡çš„æ–‡ä»¶>  [ç´¢å¼•8]   // æŠŠå½“å‰ç›®å½•ä¸‹æ–‡ä»¶ åç¼€ä¸­æ–‡å»é™¤  \n";
 		}
 	}
 
-	// operation_type ²Ù×÷ÀàĞÍ 1--¶ÁÈ¡ÎÄ¼şÄÚÈİ×Ö·û´® ½øĞĞĞŞ¸Ä 2--¶ÔÎÄ¼ş¶ÔÎÄ¼şÄÚÈİ(×Ö½Ú)--½øĞĞĞŞ¸Ä 3.¶ÔÈ«Ìå×ÓÎÄ¼ş½øĞĞµÄËæĞÔµÄ²Ù×÷
-	// ÊôĞÔ½øĞĞĞŞ¸Ä(ÎÄ¼şÃû³Æ)
-	// // 4.¶Ôµ±Ç°×ÓÎÄ¼ş(°üÀ¨×ÓÄ¿Â¼ ×ÓÎÄ¼ş --²»°üº¬ËïÄ¿Â¼ ËïÎÄ¼ş) 5. ´Óshell ÖĞ»ñÈ¡µ½µÄÂ·¾¶ È¥¶ÔÄ³Ò»¸öÎÄ¼ş½øĞĞ²Ù×÷
+	// operation_type æ“ä½œç±»å‹ 1--è¯»å–æ–‡ä»¶å†…å®¹å­—ç¬¦ä¸² è¿›è¡Œä¿®æ”¹ 2--å¯¹æ–‡ä»¶å¯¹æ–‡ä»¶å†…å®¹(å­—èŠ‚)--è¿›è¡Œä¿®æ”¹ 3.å¯¹å…¨ä½“å­æ–‡ä»¶è¿›è¡Œçš„éšæ€§çš„æ“ä½œ
+	// å±æ€§è¿›è¡Œä¿®æ”¹(æ–‡ä»¶åç§°)
+	// // 4.å¯¹å½“å‰å­æ–‡ä»¶(åŒ…æ‹¬å­ç›®å½• å­æ–‡ä»¶ --ä¸åŒ…å«å­™ç›®å½• å­™æ–‡ä»¶) 5. ä»shell ä¸­è·å–åˆ°çš„è·¯å¾„ å»å¯¹æŸä¸€ä¸ªæ–‡ä»¶è¿›è¡Œæ“ä½œ
 
-	// ¶Ôµ±Ç°Ä¿Â¼µÄÎÄ¼ş½øĞĞ¼ÓÃÜ ½âÃÜ
+	// å¯¹å½“å‰ç›®å½•çš„æ–‡ä»¶è¿›è¡ŒåŠ å¯† è§£å¯†
 	class Encropty_Rule_7 extends Basic_Rule {
-		boolean mEncroptyDirect = true; // true---¼ÓÃÜ false--½âÃÜ
+		boolean mEncroptyDirect = true; // true---åŠ å¯† false--è§£å¯†
 		boolean isAllFileOperation = false;
 
-		boolean isBatchOperation = false; // ÊÇ·ñÄãÊÇÅúÁ¿´¦Àí »áÉú³É¹Ì¶¨µÄ bad_batch good_batch ÎÄ¼ş¼Ğ ¶ø²»ÊÇÊ±¼ä´ÁÎÄ¼ş¼Ğ
+		boolean isBatchOperation = false; // æ˜¯å¦ä½ æ˜¯æ‰¹é‡å¤„ç† ä¼šç”Ÿæˆå›ºå®šçš„ bad_batch good_batch æ–‡ä»¶å¤¹ è€Œä¸æ˜¯æ—¶é—´æˆ³æ–‡ä»¶å¤¹
 
 		Encropty_Rule_7() {
 			super("#", 7, 4);
@@ -3247,28 +3247,28 @@ public class G2_ApplyRuleFor_TypeFile {
 
 		@Override
 		String simpleDesc() {
-			return "   Ä¬ÈÏbad(¼ÓÃÜ) °Ñµ±Ç°Ä¿Â¼ÏÂµÄËùÓĞÎÄ¼ş(²»°üº¬ÎÄ¼ş¼Ğ  ²»°üº¬ËïÎÄ¼ş)½øĞĞ ¼ÓÃÜbad/½âÃÜgood\n" + Cur_Bat_Name
-					+ " #_7_bad   (Ä¬ÈÏ--¼ÓÃÜÎÄ¼ş)  °Ñµ±Ç°Ä¿Â¼ÏÂµÄËùÓĞÎÄ¼ş(²»°üº¬ÎÄ¼ş¼Ğ  ²»°üº¬ËïÎÄ¼ş)½øĞĞ ¼ÓÃÜbad Éú³É ¡¾ time + bad ¡¿ ¼ÓÃÜÎÄ¼ş¼Ğ \n"
-					+ Cur_Bat_Name + " #_7_good   (½âÃÜÎÄ¼ş) °Ñµ±Ç°Ä¿Â¼ÏÂµÄËùÓĞÎÄ¼ş(²»°üº¬ÎÄ¼ş¼Ğ  ²»°üº¬ËïÎÄ¼ş)½øĞĞ ½âÃÜgood ¡¾ time + good ¡¿ Éú³É½âÃÜÎÄ¼ş¼Ğ\n"
-					+ Cur_Bat_Name + " jpg_7_bad  [Ë÷Òı7]   // °Ñµ±Ç°Ä¿Â¼ÏÂµÄ jpgÎÄ¼ş ¼ÓÃÜ \n" + Cur_Bat_Name
-					+ " jpg_7_good  [Ë÷Òı7]   // °Ñµ±Ç°Ä¿Â¼ÏÂµÄ jpgÎÄ¼ş ½âÃÜ \n" + Cur_Bat_Name
-					+ " #_7_bad  [Ë÷Òı7]   // °Ñµ±Ç°Ä¿Â¼ËùÓĞÎÄ¼ş½øĞĞ¼ÓÃÜ  ¼ÓÃÜÎÄ¼şÔÚĞÂµÄ Ê±¼ä´ÁÎÄ¼ş¼ĞÖĞ \n" + Cur_Bat_Name
-					+ " #_7_good  [Ë÷Òı7]   // °Ñµ±Ç°Ä¿Â¼ËùÓĞÎÄ¼ş½øĞĞ½âÃÜ  ½âÃÜÎÄ¼şÔÚĞÂµÄ Ê±¼ä´ÁÎÄ¼ş¼ĞÖĞ \n" + Cur_Bat_Name
-					+ " #_7_bad_batch   [Ë÷Òı7]   // °Ñµ±Ç°Ä¿Â¼ËùÓĞÎÄ¼ş½øĞĞ¼ÓÃÜ  ¼ÓÃÜÎÄ¼şÔÚĞÂµÄ¡¾ ¹Ì¶¨ÎÄ¼ş¼Ğ bad_batch ¡¿ÖĞ ÊÊºÏÅúÁ¿´¦Àí \n" + Cur_Bat_Name
-					+ " #_7_good_batch   [Ë÷Òı7]   // °Ñµ±Ç°Ä¿Â¼ËùÓĞÎÄ¼ş½øĞĞ½âÃÜ ½âÃÜÎÄ¼şÔÚĞÂµÄ¡¾ ¹Ì¶¨ÎÄ¼ş¼Ğ good_batch ¡¿ÖĞ ÊÊºÏÅúÁ¿´¦Àí " + "\n";
+			return "   é»˜è®¤bad(åŠ å¯†) æŠŠå½“å‰ç›®å½•ä¸‹çš„æ‰€æœ‰æ–‡ä»¶(ä¸åŒ…å«æ–‡ä»¶å¤¹  ä¸åŒ…å«å­™æ–‡ä»¶)è¿›è¡Œ åŠ å¯†bad/è§£å¯†good\n" + Cur_Bat_Name
+					+ " #_7_bad   (é»˜è®¤--åŠ å¯†æ–‡ä»¶)  æŠŠå½“å‰ç›®å½•ä¸‹çš„æ‰€æœ‰æ–‡ä»¶(ä¸åŒ…å«æ–‡ä»¶å¤¹  ä¸åŒ…å«å­™æ–‡ä»¶)è¿›è¡Œ åŠ å¯†bad ç”Ÿæˆ ã€ time + bad ã€‘ åŠ å¯†æ–‡ä»¶å¤¹ \n"
+					+ Cur_Bat_Name + " #_7_good   (è§£å¯†æ–‡ä»¶) æŠŠå½“å‰ç›®å½•ä¸‹çš„æ‰€æœ‰æ–‡ä»¶(ä¸åŒ…å«æ–‡ä»¶å¤¹  ä¸åŒ…å«å­™æ–‡ä»¶)è¿›è¡Œ è§£å¯†good ã€ time + good ã€‘ ç”Ÿæˆè§£å¯†æ–‡ä»¶å¤¹\n"
+					+ Cur_Bat_Name + " jpg_7_bad  [ç´¢å¼•7]   // æŠŠå½“å‰ç›®å½•ä¸‹çš„ jpgæ–‡ä»¶ åŠ å¯† \n" + Cur_Bat_Name
+					+ " jpg_7_good  [ç´¢å¼•7]   // æŠŠå½“å‰ç›®å½•ä¸‹çš„ jpgæ–‡ä»¶ è§£å¯† \n" + Cur_Bat_Name
+					+ " #_7_bad  [ç´¢å¼•7]   // æŠŠå½“å‰ç›®å½•æ‰€æœ‰æ–‡ä»¶è¿›è¡ŒåŠ å¯†  åŠ å¯†æ–‡ä»¶åœ¨æ–°çš„ æ—¶é—´æˆ³æ–‡ä»¶å¤¹ä¸­ \n" + Cur_Bat_Name
+					+ " #_7_good  [ç´¢å¼•7]   // æŠŠå½“å‰ç›®å½•æ‰€æœ‰æ–‡ä»¶è¿›è¡Œè§£å¯†  è§£å¯†æ–‡ä»¶åœ¨æ–°çš„ æ—¶é—´æˆ³æ–‡ä»¶å¤¹ä¸­ \n" + Cur_Bat_Name
+					+ " #_7_bad_batch   [ç´¢å¼•7]   // æŠŠå½“å‰ç›®å½•æ‰€æœ‰æ–‡ä»¶è¿›è¡ŒåŠ å¯†  åŠ å¯†æ–‡ä»¶åœ¨æ–°çš„ã€ å›ºå®šæ–‡ä»¶å¤¹ bad_batch ã€‘ä¸­ é€‚åˆæ‰¹é‡å¤„ç† \n" + Cur_Bat_Name
+					+ " #_7_good_batch   [ç´¢å¼•7]   // æŠŠå½“å‰ç›®å½•æ‰€æœ‰æ–‡ä»¶è¿›è¡Œè§£å¯† è§£å¯†æ–‡ä»¶åœ¨æ–°çš„ã€ å›ºå®šæ–‡ä»¶å¤¹ good_batch ã€‘ä¸­ é€‚åˆæ‰¹é‡å¤„ç† " + "\n";
 
 		}
 
-//                    return "°Ñ µ±Ç°Ä¿Â¼ÏÂËùÓĞµÄ jpg  mp4 gif  ¶¼×ªÎª i_temp1_1.jpg    v_temp2_1.mp4   g_temp3_1.gif µÄÎÄ¼ş¸ñÊ½\n" +
-//        Cur_Bat_Name + "  jgm_5_recovery  [Ë÷Òı5]   // ÔÚµ±Ç° Z_VI ¸ùÄ¿Â¼ ¼ÆËã µ±Ç°µÄ JPG GIF MP4µÄÆğÊ¼Öµ \n" +
-//        Cur_Bat_Name + "  jgm_5_nextstep  [Ë÷Òı5]   //  JPG="+jpgBeginIndex+ " GIF="+gifBeginIndex+" MP4="+mp4BeginIndex+"  JPGÔöÁ¿="+nextStepCountJPG +"    GIFÔöÁ¿="+nextStepCountGIF + "   MP4ÔöÁ¿="+nextStepCountMP4+" ¡ø¡¾ °Ñjpg gif pngµÄÔöÁ¿Ìí¼Óµ½ beginIndex È»ºóÔöÁ¿ÖÃ0 ¡¿ \n ";
+//                    return "æŠŠ å½“å‰ç›®å½•ä¸‹æ‰€æœ‰çš„ jpg  mp4 gif  éƒ½è½¬ä¸º i_temp1_1.jpg    v_temp2_1.mp4   g_temp3_1.gif çš„æ–‡ä»¶æ ¼å¼\n" +
+//        Cur_Bat_Name + "  jgm_5_recovery  [ç´¢å¼•5]   // åœ¨å½“å‰ Z_VI æ ¹ç›®å½• è®¡ç®— å½“å‰çš„ JPG GIF MP4çš„èµ·å§‹å€¼ \n" +
+//        Cur_Bat_Name + "  jgm_5_nextstep  [ç´¢å¼•5]   //  JPG="+jpgBeginIndex+ " GIF="+gifBeginIndex+" MP4="+mp4BeginIndex+"  JPGå¢é‡="+nextStepCountJPG +"    GIFå¢é‡="+nextStepCountGIF + "   MP4å¢é‡="+nextStepCountMP4+" â–²ã€ æŠŠjpg gif pngçš„å¢é‡æ·»åŠ åˆ° beginIndex ç„¶åå¢é‡ç½®0 ã€‘ \n ";
 
 		void jiamiAllDir(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
 				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
-			// 1.´´½¨Ò»¸öÊ±¼ä´ÁÎÄ¼ş¼Ğ
-			// 2.ÔÚµ±Ç°ÎÄ¼ş¼ĞµÄ»ù´¡ÉÏ
+			// 1.åˆ›å»ºä¸€ä¸ªæ—¶é—´æˆ³æ–‡ä»¶å¤¹
+			// 2.åœ¨å½“å‰æ–‡ä»¶å¤¹çš„åŸºç¡€ä¸Š
 
-			SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd_HHmmss");// ÉèÖÃÈÕÆÚ¸ñÊ½
+			SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd_HHmmss");// è®¾ç½®æ—¥æœŸæ ¼å¼
 			String date = df.format(new Date());
 			String CurBadDirName = "bad_AllFile_" + date;
 
@@ -3284,7 +3284,7 @@ public class G2_ApplyRuleFor_TypeFile {
 			curBadDirFile.mkdirs();
 			String oldBasePath = curDirFile.getAbsolutePath();
 			String newBasePath = curBadDirFile.getAbsolutePath();
-			System.out.println("Ö´ĞĞµ±Ç°ËùÓĞÎÄ¼ş ¼ÓÃÜ²Ù×÷  ");
+			System.out.println("æ‰§è¡Œå½“å‰æ‰€æœ‰æ–‡ä»¶ åŠ å¯†æ“ä½œ  ");
 
 			if (!curDirList.contains(curDirFile)) {
 				curDirList.add(curDirFile);
@@ -3305,7 +3305,7 @@ public class G2_ApplyRuleFor_TypeFile {
 
 					String newRealFilePath = oldRealFile.getAbsolutePath().replace(oldBasePath, newBasePath);
 					File newRealFile = new File(newRealFilePath);
-					// ¼ÓÃÜ²Ù×÷
+					// åŠ å¯†æ“ä½œ
 					createEncryFile(oldRealFile, newRealFile);
 				}
 
@@ -3315,7 +3315,7 @@ public class G2_ApplyRuleFor_TypeFile {
 			 * for (int i = 0; i < curRealFileList.size(); i++) { File oldRealFile =
 			 * curRealFileList.get(i); String newRealFilePath =
 			 * oldRealFile.getAbsolutePath().replace(oldBasePath, newBasePath); File
-			 * newRealFile = new File(newRealFilePath); // ¼ÓÃÜ²Ù×÷
+			 * newRealFile = new File(newRealFilePath); // åŠ å¯†æ“ä½œ
 			 * createEncryFile(oldRealFile,newRealFile); }
 			 */
 
@@ -3324,10 +3324,10 @@ public class G2_ApplyRuleFor_TypeFile {
 		void jiemiAllDir(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
 				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 
-			// 1.´´½¨Ò»¸öÊ±¼ä´ÁÎÄ¼ş¼Ğ
-			// 2.ÔÚµ±Ç°ÎÄ¼ş¼ĞµÄ»ù´¡ÉÏ
+			// 1.åˆ›å»ºä¸€ä¸ªæ—¶é—´æˆ³æ–‡ä»¶å¤¹
+			// 2.åœ¨å½“å‰æ–‡ä»¶å¤¹çš„åŸºç¡€ä¸Š
 
-			SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd_HHmmss");// ÉèÖÃÈÕÆÚ¸ñÊ½
+			SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd_HHmmss");// è®¾ç½®æ—¥æœŸæ ¼å¼
 			String date = df.format(new Date());
 			String CurBadDirName = "good_AllFile_" + date;
 
@@ -3341,18 +3341,18 @@ public class G2_ApplyRuleFor_TypeFile {
 
 			File curBadDirFile = new File(curDirFile.getAbsolutePath() + File.separator + CurBadDirName);
 			curBadDirFile.mkdirs();
-			String oldBasePath = curDirFile.getAbsolutePath(); // Ô­ÓĞµÄÂ·¾¶ /C
-			String newBasePath = curBadDirFile.getAbsolutePath(); // Éú³ÉµÄ ĞÂÂ·¾¶ /C/good_batch
+			String oldBasePath = curDirFile.getAbsolutePath(); // åŸæœ‰çš„è·¯å¾„ /C
+			String newBasePath = curBadDirFile.getAbsolutePath(); // ç”Ÿæˆçš„ æ–°è·¯å¾„ /C/good_batch
 			if (!curDirList.contains(curDirFile)) {
 				curDirList.add(curDirFile);
 			}
-			System.out.println("Ö´ĞĞµ±Ç°ËùÓĞÎÄ¼ş ½âÃÜ²Ù×÷ ");
+			System.out.println("æ‰§è¡Œå½“å‰æ‰€æœ‰æ–‡ä»¶ è§£å¯†æ“ä½œ ");
 
 			for (int i = 0; i < curDirList.size(); i++) {
-				File oldDirFile = curDirList.get(i); // Ô­ÓĞµÄÒª½âÃÜÎÄ¼ş
+				File oldDirFile = curDirList.get(i); // åŸæœ‰çš„è¦è§£å¯†æ–‡ä»¶
 
-				if (!isBatchOperation) { // Èç¹û ²»ÊÇ batch ÄÇÃ´»á´´½¨ÎÄ¼ş¼Ğ
-					// Èç¹ûÊÇµ±Ç°Ä¿Â¼ÏÂ¶à ×ÓÎÄ¼ş¼Ğ ÄÇÃ´¾Í°ÑÔÚ* µÄ Çé¿öÏÂ»á ´´½¨Õâ¸öÎÄ¼ş¼Ğ ÊÂÊµÉÏÔÚ batchµÄÇé¿öÏÂ²»ĞèÒªÕâ¸öÎÄ¼ş¼Ğ
+				if (!isBatchOperation) { // å¦‚æœ ä¸æ˜¯ batch é‚£ä¹ˆä¼šåˆ›å»ºæ–‡ä»¶å¤¹
+					// å¦‚æœæ˜¯å½“å‰ç›®å½•ä¸‹å¤š å­æ–‡ä»¶å¤¹ é‚£ä¹ˆå°±æŠŠåœ¨* çš„ æƒ…å†µä¸‹ä¼š åˆ›å»ºè¿™ä¸ªæ–‡ä»¶å¤¹ äº‹å®ä¸Šåœ¨ batchçš„æƒ…å†µä¸‹ä¸éœ€è¦è¿™ä¸ªæ–‡ä»¶å¤¹
 					String newDirFilePath = oldDirFile.getAbsolutePath().replace(oldBasePath, newBasePath);
 					File newDirFile = new File(newDirFilePath);
 					newDirFile.mkdirs();
@@ -3369,16 +3369,16 @@ public class G2_ApplyRuleFor_TypeFile {
 						continue;
 					}
 
-					if (!isBatchOperation) { // Èç¹û ²»ÊÇ batch ÄÇÃ´»á´´½¨ÎÄ¼ş¼Ğ ºÍÔ­À´±£³ÖÒ»ÖÂ
+					if (!isBatchOperation) { // å¦‚æœ ä¸æ˜¯ batch é‚£ä¹ˆä¼šåˆ›å»ºæ–‡ä»¶å¤¹ å’ŒåŸæ¥ä¿æŒä¸€è‡´
 						String newRealFilePath = oldRealFile.getAbsolutePath().replace(oldBasePath, newBasePath);
 						File newRealFile = new File(newRealFilePath);
-						// ½âÃÜ²Ù×÷
+						// è§£å¯†æ“ä½œ
 						createDecryFile(oldRealFile, newRealFile);
 					} else {
 //    String newRealFilePath = oldRealFile.getAbsolutePath().replace(oldBasePath, newBasePath);
 						String batch_fileName = oldRealFile.getName();
 						File newRealFile = new File(newBasePath + File.separator + batch_fileName);
-						// ½âÃÜ²Ù×÷
+						// è§£å¯†æ“ä½œ
 						createDecryFile(oldRealFile, newRealFile);
 					}
 
@@ -3389,7 +3389,7 @@ public class G2_ApplyRuleFor_TypeFile {
 //                File oldRealFile = curRealFileList.get(i);
 //                String newRealFilePath = oldRealFile.getAbsolutePath().replace(oldBasePath, newBasePath);
 //                File newRealFile = new File(newRealFilePath);
-//                // ¼ÓÃÜ²Ù×÷
+//                // åŠ å¯†æ“ä½œ
 //                createDecryFile(oldRealFile,newRealFile);
 //            }
 
@@ -3399,23 +3399,23 @@ public class G2_ApplyRuleFor_TypeFile {
 		ArrayList<File> applySubFileListRule4(ArrayList<File> curFileList,
 				HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList,
 				ArrayList<File> curRealFileList) {
-			System.out.println("Rule7 ËÑË÷µ½µÄÊµÌåÎÄ¼ş¸öÊı:  curRealFileList.size() =" + curRealFileList.size());
+			System.out.println("Rule7 æœç´¢åˆ°çš„å®ä½“æ–‡ä»¶ä¸ªæ•°:  curRealFileList.size() =" + curRealFileList.size());
 			if (isAllFileOperation) {
 				if (mEncroptyDirect) {
-					// ¼ÓÃÜËùÓĞÎÄ¼ş¼Ğ
+					// åŠ å¯†æ‰€æœ‰æ–‡ä»¶å¤¹
 
 					jiamiAllDir(curFileList, subFileTypeMap, getAllSubDirFile(curDirFile), curRealFileList);
 				} else {
-					// ½âÃÜµ±Ç°ËùÓĞÎÄ¼ş¼Ğ
+					// è§£å¯†å½“å‰æ‰€æœ‰æ–‡ä»¶å¤¹
 					jiemiAllDir(curFileList, subFileTypeMap, getAllSubDirFile(curDirFile), curRealFileList);
 
 				}
 				return null;
 			}
-			boolean containUserType = curFilterFileTypeList.contains("#"); // ÊÇ·ñ°üº¬ÓÃ»§Ñ¡ÖĞµÄÁËÎÄ¼şÀàĞÍ Ã»ÓĞ°üº¬ ÄÇÃ´¾Í°ÑËùÓĞÊµÌårealty ¼ÓÃÜ
+			boolean containUserType = curFilterFileTypeList.contains("#"); // æ˜¯å¦åŒ…å«ç”¨æˆ·é€‰ä¸­çš„äº†æ–‡ä»¶ç±»å‹ æ²¡æœ‰åŒ…å« é‚£ä¹ˆå°±æŠŠæ‰€æœ‰å®ä½“realty åŠ å¯†
 
-			SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd_HHmmss");// ÉèÖÃÈÕÆÚ¸ñÊ½
-			String date = df.format(new Date());// new Date()Îª»ñÈ¡µ±Ç°ÏµÍ³Ê±¼ä£¬Ò²¿ÉÊ¹ÓÃµ±Ç°Ê±¼ä´Á
+			SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd_HHmmss");// è®¾ç½®æ—¥æœŸæ ¼å¼
+			String date = df.format(new Date());// new Date()ä¸ºè·å–å½“å‰ç³»ç»Ÿæ—¶é—´ï¼Œä¹Ÿå¯ä½¿ç”¨å½“å‰æ—¶é—´æˆ³
 			String curNewDirName = date;
 			if (mEncroptyDirect) {
 				curNewDirName += "_bad";
@@ -3424,7 +3424,7 @@ public class G2_ApplyRuleFor_TypeFile {
 			}
 
 			if (!containUserType) {
-				curNewDirName += "_" + curFilterFileTypeList.get(0); // 1.Èç¹ûËùÓĞÎÄ¼ş¶¼¼ÓÃÜ ÄÇÃ´Ã»ÓĞºó×º Èç¹ûÄ³Ò»¸öÎÄ¼şÀàĞÍ½âÃÜ ÄÇÃ´Ìí¼Óºó×º
+				curNewDirName += "_" + curFilterFileTypeList.get(0); // 1.å¦‚æœæ‰€æœ‰æ–‡ä»¶éƒ½åŠ å¯† é‚£ä¹ˆæ²¡æœ‰åç¼€ å¦‚æœæŸä¸€ä¸ªæ–‡ä»¶ç±»å‹è§£å¯† é‚£ä¹ˆæ·»åŠ åç¼€
 			}
 			if (isBatchOperation) {
 				if (mEncroptyDirect) {
@@ -3435,16 +3435,16 @@ public class G2_ApplyRuleFor_TypeFile {
 			}
 
 			File tempDirFile = new File(curDirFile.getAbsolutePath() + File.separator + curNewDirName);
-			tempDirFile.mkdirs(); // ´´½¨ÎÄ¼ş¼Ğ
+			tempDirFile.mkdirs(); // åˆ›å»ºæ–‡ä»¶å¤¹
 			String tempDirPath = tempDirFile.getAbsolutePath();
-			System.out.println("Rule7 ËÑË÷µ½µÄÊµÌåÎÄ¼ş¸öÊı:" + curRealFileList.size());
+			System.out.println("Rule7 æœç´¢åˆ°çš„å®ä½“æ–‡ä»¶ä¸ªæ•°:" + curRealFileList.size());
 
 			for (int i = 0; i < curRealFileList.size(); i++) {
 				File curFile = curRealFileList.get(i);
 				String currentFileName = File.separator + curFile.getName();
 
 //                System.out.println("currentFileName = "+ currentFileName);
-				if (mEncroptyDirect) { // ¼ÓÃÜÊ± Èç¹ûÊÇ ÒÔ i_temp ¿ªÍ· ²¢ÇÒ ÒÔ .jpg Îª½áÎ²Ê± ¼ÓÃÜµÄÀàĞÍÈ¥µô
+				if (mEncroptyDirect) { // åŠ å¯†æ—¶ å¦‚æœæ˜¯ ä»¥ i_temp å¼€å¤´ å¹¶ä¸” ä»¥ .jpg ä¸ºç»“å°¾æ—¶ åŠ å¯†çš„ç±»å‹å»æ‰
 					if (currentFileName.contains(".jpg") && currentFileName.contains("i_temp")) {
 						currentFileName = currentFileName.replace(".jpg", "");
 					} else if (currentFileName.contains(".mp4") && currentFileName.contains("v_temp")) {
@@ -3455,7 +3455,7 @@ public class G2_ApplyRuleFor_TypeFile {
 
 					File badFile = new File(tempDirPath + File.separator + currentFileName);
 					createEncryFile(curFile, badFile);
-				} else { // ½âÃÜ Èç¹ûµ±Ç°ÎÄ¼ş ²»°üº¬ .
+				} else { // è§£å¯† å¦‚æœå½“å‰æ–‡ä»¶ ä¸åŒ…å« .
 					if (!currentFileName.contains(".") && currentFileName.contains("i_temp")) {
 						currentFileName = currentFileName + ".jpg";
 					} else if (!currentFileName.contains(".") && currentFileName.contains("v_temp")) {
@@ -3501,12 +3501,12 @@ public class G2_ApplyRuleFor_TypeFile {
 		@Override
 		String simpleDesc() {
 
-			return Cur_Bat_Name + " #_6    // ĞŞ¸Äµ±Ç°µÄÒ»¼¶×ÓÄ¿Â¼ÏÂµÄÎÄ¼ş¼Ğ ÒÔ¼°ÎÄ¼ş  °´Ë³ĞòÃüÁî ¡¾ĞòºÅ_Ô­Ãû³Æ.ÀàĞÍ¡¿  (²»²Ù×÷ ËïÎÄ¼ş ËïÎÄ¼ş¼Ğ )  \n"
-					+ Cur_Bat_Name + " png_6    // ĞŞ¸Äµ±Ç°µÄÒ»¼¶×ÓÄ¿Â¼ÏÂµÄÎÄ¼ş¼ĞÏÂµÄ png¸ñÊ½ÎÄ¼ş  °´Ë³ĞòÃüÁî ¡¾ĞòºÅ_Ô­Ãû³Æ.ÀàĞÍ¡¿  (²»²Ù×÷ ËïÎÄ¼ş ËïÎÄ¼ş¼Ğ ) \n"
+			return Cur_Bat_Name + " #_6    // ä¿®æ”¹å½“å‰çš„ä¸€çº§å­ç›®å½•ä¸‹çš„æ–‡ä»¶å¤¹ ä»¥åŠæ–‡ä»¶  æŒ‰é¡ºåºå‘½ä»¤ ã€åºå·_åŸåç§°.ç±»å‹ã€‘  (ä¸æ“ä½œ å­™æ–‡ä»¶ å­™æ–‡ä»¶å¤¹ )  \n"
+					+ Cur_Bat_Name + " png_6    // ä¿®æ”¹å½“å‰çš„ä¸€çº§å­ç›®å½•ä¸‹çš„æ–‡ä»¶å¤¹ä¸‹çš„ pngæ ¼å¼æ–‡ä»¶  æŒ‰é¡ºåºå‘½ä»¤ ã€åºå·_åŸåç§°.ç±»å‹ã€‘  (ä¸æ“ä½œ å­™æ–‡ä»¶ å­™æ–‡ä»¶å¤¹ ) \n"
 					+ Cur_Bat_Name
-					+ " png_6_order    // ĞŞ¸Äµ±Ç°µÄÒ»¼¶×ÓÄ¿Â¼ÏÂµÄÎÄ¼ş¼ĞÏÂµÄ png¸ñÊ½ÎÄ¼ş  °´Ë³ĞòÃüÁî ¡¾0000.png 0001.png 0002.png ....¡¿  (²»²Ù×÷ ËïÎÄ¼ş ËïÎÄ¼ş¼Ğ ) \n"
+					+ " png_6_order    // ä¿®æ”¹å½“å‰çš„ä¸€çº§å­ç›®å½•ä¸‹çš„æ–‡ä»¶å¤¹ä¸‹çš„ pngæ ¼å¼æ–‡ä»¶  æŒ‰é¡ºåºå‘½ä»¤ ã€0000.png 0001.png 0002.png ....ã€‘  (ä¸æ“ä½œ å­™æ–‡ä»¶ å­™æ–‡ä»¶å¤¹ ) \n"
 					+ Cur_Bat_Name
-					+ " m3u8_6_order  // ¡¾type<¿ÉÑ¡>_6_order¡¿ ĞŞ¸Äµ±Ç°µÄÄ¿Â¼ÏÂÖ¸¶¨ÀàĞÍµÄ ÎÄ¼ş  °´Ë³ĞòÃüÁî[0000.m3u8 0001.m3u8] ¡¾ĞòºÅ.ÀàĞÍ¡¿¡¾²»±£ÁôÔ­Ãû³Æ¡¿  (²»²Ù×÷ ËïÎÄ¼ş ËïÎÄ¼ş¼Ğ )  \n";
+					+ " m3u8_6_order  // ã€type<å¯é€‰>_6_orderã€‘ ä¿®æ”¹å½“å‰çš„ç›®å½•ä¸‹æŒ‡å®šç±»å‹çš„ æ–‡ä»¶  æŒ‰é¡ºåºå‘½ä»¤[0000.m3u8 0001.m3u8] ã€åºå·.ç±»å‹ã€‘ã€ä¸ä¿ç•™åŸåç§°ã€‘  (ä¸æ“ä½œ å­™æ–‡ä»¶ å­™æ–‡ä»¶å¤¹ )  \n";
 		}
 
 		@Override
@@ -3526,7 +3526,7 @@ public class G2_ApplyRuleFor_TypeFile {
 
 			boolean executeFlag = false;
 			boolean isFixedAllSubFlag = curFilterFileTypeList.contains("#");
-			if (isFixedAllSubFlag) { // Ö»ÓĞ°üº¬ #_6 ²Å¶Ô ÎÄ¼ş¼Ğ½øĞĞ²Ù×÷ png_6 ÄÇÃ´¾ÍÖ»¶Ô µ±Ç°ÎÄ¼ş¼ĞÏÂµÄ pngÎÄ¼ş½øĞĞ²Ù×÷
+			if (isFixedAllSubFlag) { // åªæœ‰åŒ…å« #_6 æ‰å¯¹ æ–‡ä»¶å¤¹è¿›è¡Œæ“ä½œ png_6 é‚£ä¹ˆå°±åªå¯¹ å½“å‰æ–‡ä»¶å¤¹ä¸‹çš„ pngæ–‡ä»¶è¿›è¡Œæ“ä½œ
 				for (int i = 0; i < curDirList.size(); i++) {
 					File dir = curDirList.get(i);
 					String dirName = dir.getName();
@@ -3536,25 +3536,25 @@ public class G2_ApplyRuleFor_TypeFile {
 			}
 
 			Map.Entry<String, ArrayList<File>> entry;
-			// ²»Í¬µÄÀàĞÍÎÄ¼şÔõÃ´´¦Àí?
+			// ä¸åŒçš„ç±»å‹æ–‡ä»¶æ€ä¹ˆå¤„ç†?
 
 			if (subFileTypeMap != null) {
 				Iterator iterator = subFileTypeMap.entrySet().iterator();
 				while (iterator.hasNext()) {
 					entry = (Map.Entry<String, ArrayList<File>>) iterator.next();
-					String typeStr = entry.getKey(); // MapµÄValue
+					String typeStr = entry.getKey(); // Mapçš„Value
 					String typeWithOutPot = typeStr.replace(".", "");
 
 					if (!isFixedAllSubFlag && !curFilterFileTypeList.contains(typeWithOutPot)) {
-						// Èç¹û µ±Ç°²Ù×÷²»ÊÇ²Ù×÷ËùÓĞÎÄ¼ş ²¢ÇÒÕâ¸öÀàĞÍ²»ÔÚÆ¥ÅäÁĞ±íÖĞ ÄÇÃ´ ²»Ö´ĞĞ ·µ»Ønext
-						// Èç¹ûÊÇ È« ²Ù×÷ ÄÇÃ´ ÍùÏÂÖ´ĞĞ
-						// Èç¹û²»ÊÇÈ«²Ù×÷ µ±Ç°ÀàĞÍ°üº¬ ÄÇÃ´ÍùÏÂÖ´ĞĞ
+						// å¦‚æœ å½“å‰æ“ä½œä¸æ˜¯æ“ä½œæ‰€æœ‰æ–‡ä»¶ å¹¶ä¸”è¿™ä¸ªç±»å‹ä¸åœ¨åŒ¹é…åˆ—è¡¨ä¸­ é‚£ä¹ˆ ä¸æ‰§è¡Œ è¿”å›next
+						// å¦‚æœæ˜¯ å…¨ æ“ä½œ é‚£ä¹ˆ å¾€ä¸‹æ‰§è¡Œ
+						// å¦‚æœä¸æ˜¯å…¨æ“ä½œ å½“å‰ç±»å‹åŒ…å« é‚£ä¹ˆå¾€ä¸‹æ‰§è¡Œ
 						continue;
 					}
 
-					ArrayList<File> fileArr = entry.getValue(); // MapµÄValue
+					ArrayList<File> fileArr = entry.getValue(); // Mapçš„Value
 
-					// ´Ó 000 ¿ªÊ¼
+					// ä» 000 å¼€å§‹
 //                    fixedFileIndex = fixedFileIndex ;
 					for (int i = 0; i < fileArr.size(); i++) {
 						File curFile = fileArr.get(i);
@@ -3598,44 +3598,44 @@ public class G2_ApplyRuleFor_TypeFile {
 		return name.toLowerCase().trim();
 	}
 
-	// °Ñ µ±Ç°Ä¿Â¼ÏÂËùÓĞµÄ jpg mp4 gif ¶¼×ªÎª i_temp1_1.jpg v_temp2_1.mp4 g_temp3_1.gif µÄÎÄ¼ş¸ñÊ½
+	// æŠŠ å½“å‰ç›®å½•ä¸‹æ‰€æœ‰çš„ jpg mp4 gif éƒ½è½¬ä¸º i_temp1_1.jpg v_temp2_1.mp4 g_temp3_1.gif çš„æ–‡ä»¶æ ¼å¼
 	class AVI_Rule_5 extends Basic_Rule {
 		String tempTag = "temp";
-		boolean isTemp; // ÊÇ·ñÊÇÁãÊ±ÆğµÄ±àºÅ
-		int mTempBeginIndex = 0; // ÁãÊ±±àºÅµÄÄ¬ÈÏÆğÊ¼µØÖ·
+		boolean isTemp; // æ˜¯å¦æ˜¯é›¶æ—¶èµ·çš„ç¼–å·
+		int mTempBeginIndex = 0; // é›¶æ—¶ç¼–å·çš„é»˜è®¤èµ·å§‹åœ°å€
 
-		boolean isRecovrty = false; // µ±Ç°ÊÇ·ñÊÇ ¶ÁÈ¡µ±Ç°Ä¿Â¼ ¼ÆËã ProPeritiesµÄÖµµÄ²Ù×÷
-		boolean isEnable = true; // µ±´æÔÚÔöÁ¿µÄÊ±ºò ²»Æğ×÷ÓÃ ²»Ö´ĞĞ ¼ÇÂ¼µÄ²Ù×÷
-		boolean isExistAddPart = false; // ÊÇ·ñ´æÔÚÔöÁ¿
-		boolean executeNextStep = false; // µ±ÓÃ»§ÊäÈëµÄ ÊäÈë²ÎÊı °üº¬ nextstep Ê± Ö´ĞĞ ÔöÁ¿µÄ ÖØÖÃ0²Ù×÷ Ìí¼Óµ½indexµÄ²Ù×÷
+		boolean isRecovrty = false; // å½“å‰æ˜¯å¦æ˜¯ è¯»å–å½“å‰ç›®å½• è®¡ç®— ProPeritiesçš„å€¼çš„æ“ä½œ
+		boolean isEnable = true; // å½“å­˜åœ¨å¢é‡çš„æ—¶å€™ ä¸èµ·ä½œç”¨ ä¸æ‰§è¡Œ è®°å½•çš„æ“ä½œ
+		boolean isExistAddPart = false; // æ˜¯å¦å­˜åœ¨å¢é‡
+		boolean executeNextStep = false; // å½“ç”¨æˆ·è¾“å…¥çš„ è¾“å…¥å‚æ•° åŒ…å« nextstep æ—¶ æ‰§è¡Œ å¢é‡çš„ é‡ç½®0æ“ä½œ æ·»åŠ åˆ°indexçš„æ“ä½œ
 
 		int jpgBeginIndex = 0;
 		int fixed_jpg_BeginIndex = 0;
 		String jpgtag = "i";
 		int jpgDirTempIndex = 0;
 		int jpgEndIndex = 1;
-		int nextStepCountJPG = 0; // µ±Ç° JPGµÄ ÔöÁ¿
+		int nextStepCountJPG = 0; // å½“å‰ JPGçš„ å¢é‡
 
 		int gifBeginIndex = 0;
 		String giftag = "g";
 		int gifDirTempIndex = 0;
 		int fixed_gif_BeginIndex = 0;
 		int gifEndIndex = 1;
-		int nextStepCountGIF = 0; // µ±Ç° GIFµÄ ÔöÁ¿
+		int nextStepCountGIF = 0; // å½“å‰ GIFçš„ å¢é‡
 
-		int mp4BeginIndex = 0; // ´Ó Propertities ÖĞ¶ÁÈ¡µ½µÄÖµ
-		String mp4tag = "v"; // mp4µÄÇ°×º
-		int mp4DirTempIndex = 0; // ÒÀ¾İ mp4BeginIndex ¼ÆËã³öµÄ temp1 temp2 .... temp100
-		int fixed_mp4_BeginIndex = 0; // ÔÚµ±Ç° tempx ÖĞµÄË÷Òı ´óĞ¡Îª mp4BeginIndex%1000
-		int mp4EndIndex = 1; // ×îºó±£´æµ½ Propertities ÖĞµÄ Öµ
-		int nextStepCountMP4 = 0; // µ±Ç° MP4 µÄ ÔöÁ¿
+		int mp4BeginIndex = 0; // ä» Propertities ä¸­è¯»å–åˆ°çš„å€¼
+		String mp4tag = "v"; // mp4çš„å‰ç¼€
+		int mp4DirTempIndex = 0; // ä¾æ® mp4BeginIndex è®¡ç®—å‡ºçš„ temp1 temp2 .... temp100
+		int fixed_mp4_BeginIndex = 0; // åœ¨å½“å‰ tempx ä¸­çš„ç´¢å¼• å¤§å°ä¸º mp4BeginIndex%1000
+		int mp4EndIndex = 1; // æœ€åä¿å­˜åˆ° Propertities ä¸­çš„ å€¼
+		int nextStepCountMP4 = 0; // å½“å‰ MP4 çš„ å¢é‡
 
 		AVI_Rule_5() {
 			super("jgm", 5, 3);
 			curFilterFileTypeList.add("jpg");
 			curFilterFileTypeList.add("gif");
 			curFilterFileTypeList.add("mp4");
-			// ´Ó Proprietary ÄÃµ½µ±Ç°µÄ×ÜµÄË÷Òı Öµ
+			// ä» Proprietary æ‹¿åˆ°å½“å‰çš„æ€»çš„ç´¢å¼• å€¼
 			// jpgBeginIndex =
 			// gifBeginIndex =
 			// mp4BeginIndex =
@@ -3698,13 +3698,13 @@ public class G2_ApplyRuleFor_TypeFile {
 
 		@Override
 		String simpleDesc() {
-			return "°Ñ µ±Ç°Ä¿Â¼ÏÂËùÓĞµÄ jpg  mp4 gif  ¶¼×ªÎª i_temp1_1.jpg    v_temp2_1.mp4   g_temp3_1.gif µÄÎÄ¼ş¸ñÊ½\n" + Cur_Bat_Name
-					+ "  jgm_5_temp0      [Ë÷Òı5]   // ÁãÊ±°Ñµ±Ç°gif jpg mp4 ÀàĞÍ ÆğÊ¼Î»ÖÃÉèÖÃÎª0   \n" + Cur_Bat_Name
-					+ "  jgm_5_temp99      [Ë÷Òı5]   // ÁãÊ±°Ñµ±Ç°gif jpg mp4 ÀàĞÍ ÆğÊ¼Î»ÖÃÉèÖÃÎª99   \n" + Cur_Bat_Name
-					+ "  jgm_5_recovery  [Ë÷Òı5]   // ÔÚµ±Ç° Z_VI ¸ùÄ¿Â¼ ¼ÆËã µ±Ç°µÄ JPG GIF MP4µÄÆğÊ¼Öµ \n" + Cur_Bat_Name
-					+ "  jgm_5_nextstep  [Ë÷Òı5]   //  JPG=" + jpgBeginIndex + " GIF=" + gifBeginIndex + " MP4="
-					+ mp4BeginIndex + "  JPGÔöÁ¿=" + nextStepCountJPG + "    GIFÔöÁ¿=" + nextStepCountGIF + "   MP4ÔöÁ¿="
-					+ nextStepCountMP4 + " ¡ø¡¾ °Ñjpg gif pngµÄÔöÁ¿Ìí¼Óµ½ beginIndex È»ºóÔöÁ¿ÖÃ0 ¡¿ \n ";
+			return "æŠŠ å½“å‰ç›®å½•ä¸‹æ‰€æœ‰çš„ jpg  mp4 gif  éƒ½è½¬ä¸º i_temp1_1.jpg    v_temp2_1.mp4   g_temp3_1.gif çš„æ–‡ä»¶æ ¼å¼\n" + Cur_Bat_Name
+					+ "  jgm_5_temp0      [ç´¢å¼•5]   // é›¶æ—¶æŠŠå½“å‰gif jpg mp4 ç±»å‹ èµ·å§‹ä½ç½®è®¾ç½®ä¸º0   \n" + Cur_Bat_Name
+					+ "  jgm_5_temp99      [ç´¢å¼•5]   // é›¶æ—¶æŠŠå½“å‰gif jpg mp4 ç±»å‹ èµ·å§‹ä½ç½®è®¾ç½®ä¸º99   \n" + Cur_Bat_Name
+					+ "  jgm_5_recovery  [ç´¢å¼•5]   // åœ¨å½“å‰ Z_VI æ ¹ç›®å½• è®¡ç®— å½“å‰çš„ JPG GIF MP4çš„èµ·å§‹å€¼ \n" + Cur_Bat_Name
+					+ "  jgm_5_nextstep  [ç´¢å¼•5]   //  JPG=" + jpgBeginIndex + " GIF=" + gifBeginIndex + " MP4="
+					+ mp4BeginIndex + "  JPGå¢é‡=" + nextStepCountJPG + "    GIFå¢é‡=" + nextStepCountGIF + "   MP4å¢é‡="
+					+ nextStepCountMP4 + " â–²ã€ æŠŠjpg gif pngçš„å¢é‡æ·»åŠ åˆ° beginIndex ç„¶åå¢é‡ç½®0 ã€‘ \n ";
 		}
 
 		@Override
@@ -3722,7 +3722,7 @@ public class G2_ApplyRuleFor_TypeFile {
 							mTempBeginIndex = Integer.parseInt(blankIndex);
 						}
 					} else {
-						mTempBeginIndex = 0; // Ä¬ÈÏÎª0
+						mTempBeginIndex = 0; // é»˜è®¤ä¸º0
 					}
 				}
 
@@ -3735,13 +3735,13 @@ public class G2_ApplyRuleFor_TypeFile {
 			if (inputParam.contains("_recovery")) {
 				isRecovrty = true;
 				isEnable = false;
-				curFilterFileTypeList.add("#"); // °Ñµ±Ç°ËùÓĞÎÄ¼ş¶¼¼ÓÈëµ½ÁĞ±íÖĞ
+				curFilterFileTypeList.add("#"); // æŠŠå½“å‰æ‰€æœ‰æ–‡ä»¶éƒ½åŠ å…¥åˆ°åˆ—è¡¨ä¸­
 			}
-			System.out.println("OLD¼ÇÂ¼µÄPropertiesĞÅÏ¢:(OLD)   " + " JPG=" + jpgBeginIndex + "   GIF=" + gifBeginIndex
-					+ "   MP4=" + mp4BeginIndex + "  JPGÔöÁ¿=" + nextStepCountJPG + "    GIFÔöÁ¿=" + nextStepCountGIF
-					+ "   MP4ÔöÁ¿=" + nextStepCountMP4);
+			System.out.println("OLDè®°å½•çš„Propertiesä¿¡æ¯:(OLD)   " + " JPG=" + jpgBeginIndex + "   GIF=" + gifBeginIndex
+					+ "   MP4=" + mp4BeginIndex + "  JPGå¢é‡=" + nextStepCountJPG + "    GIFå¢é‡=" + nextStepCountGIF
+					+ "   MP4å¢é‡=" + nextStepCountMP4);
 
-			if (executeNextStep) { // Èç¹û´æÔÚÔöÁ¿ µ±Ç°²»Ö´ĞĞ ²¢ÇÒÓÃ»§ÊÇÊäÈëµÄ nextstepµÄÊ±ºò Ö´ĞĞ stepµÄ¸üĞÂ
+			if (executeNextStep) { // å¦‚æœå­˜åœ¨å¢é‡ å½“å‰ä¸æ‰§è¡Œ å¹¶ä¸”ç”¨æˆ·æ˜¯è¾“å…¥çš„ nextstepçš„æ—¶å€™ æ‰§è¡Œ stepçš„æ›´æ–°
 				jpgBeginIndex = jpgBeginIndex + nextStepCountJPG;
 				gifBeginIndex = gifBeginIndex + nextStepCountGIF;
 				mp4BeginIndex = mp4BeginIndex + nextStepCountMP4;
@@ -3783,12 +3783,12 @@ public class G2_ApplyRuleFor_TypeFile {
 			}
 
 			if (jpgTempList.size() == 0 && gifTempList.size() == 0 && mp4TempList.size() == 0) {
-				System.out.println("µ±Ç°Ö´ĞĞÄ¿Â¼²»ÔÚ Z_VIµÄ¸ùÄ¿Â¼ Git_Dir , ÇëÖØĞÂÖ´ĞĞ " + Cur_Bat_Name);
+				System.out.println("å½“å‰æ‰§è¡Œç›®å½•ä¸åœ¨ Z_VIçš„æ ¹ç›®å½• Git_Dir , è¯·é‡æ–°æ‰§è¡Œ " + Cur_Bat_Name);
 				return;
 			}
 
-			// Í¨¹ı ËÑË÷ ¼ÆËãµÃµ½µÄ type ÎÄ¼şµÄ ³¤¶È Count
-			// Í¨¹ı ¼ÆËã ÎÄ¼ş×îºóµÄÃû×ÖµÃµ½µÄ index = Count - 1
+			// é€šè¿‡ æœç´¢ è®¡ç®—å¾—åˆ°çš„ type æ–‡ä»¶çš„ é•¿åº¦ Count
+			// é€šè¿‡ è®¡ç®— æ–‡ä»¶æœ€åçš„åå­—å¾—åˆ°çš„ index = Count - 1
 			int jpgDynimicCount = jpgTempList.size();
 			int gifDynimicCount = gifTempList.size();
 			int mp4DynimicCount = mp4TempList.size();
@@ -3874,8 +3874,8 @@ public class G2_ApplyRuleFor_TypeFile {
 				mp4LastIndex = calculIndexFromName(lastMP4File.getName());
 			}
 
-			if (jpgDynimicCount != jpgBeginIndex || (jpgLastIndex + 1) != jpgDynimicCount) { // ´óĞ¡ ºÍ ¼ÇÂ¼µÄÆğÊ¼µã ²»Ò»ÖÂ ÄÇÃ´ĞèÒª
-																								// ÖØĞÂ¸ÃÃû³Æ
+			if (jpgDynimicCount != jpgBeginIndex || (jpgLastIndex + 1) != jpgDynimicCount) { // å¤§å° å’Œ è®°å½•çš„èµ·å§‹ç‚¹ ä¸ä¸€è‡´ é‚£ä¹ˆéœ€è¦
+																								// é‡æ–°è¯¥åç§°
 				for (int i = 0; i < jpgTempList.size(); i++) {
 					File jpgFile = jpgTempList.get(i);
 					String jpgFileName = "i" + "_" + getPaddingIntStringWithDirIndexFileNameWithIndex(tempTag,
@@ -3884,8 +3884,8 @@ public class G2_ApplyRuleFor_TypeFile {
 				}
 			}
 
-			if (gifDynimicCount != gifBeginIndex || (gifLastIndex + 1) != gifDynimicCount) { // ´óĞ¡ ºÍ ¼ÇÂ¼µÄÆğÊ¼µã ²»Ò»ÖÂ ÄÇÃ´ĞèÒª
-																								// ÖØĞÂ¸ÃÃû³Æ
+			if (gifDynimicCount != gifBeginIndex || (gifLastIndex + 1) != gifDynimicCount) { // å¤§å° å’Œ è®°å½•çš„èµ·å§‹ç‚¹ ä¸ä¸€è‡´ é‚£ä¹ˆéœ€è¦
+																								// é‡æ–°è¯¥åç§°
 				for (int i = 0; i < gifTempList.size(); i++) {
 					File gifFile = gifTempList.get(i);
 					String gifFileName = "g" + "_" + getPaddingIntStringWithDirIndexFileNameWithIndex(tempTag,
@@ -3894,8 +3894,8 @@ public class G2_ApplyRuleFor_TypeFile {
 				}
 			}
 
-			if (mp4DynimicCount != mp4BeginIndex || (mp4LastIndex + 1) != mp4DynimicCount) { // ´óĞ¡ ºÍ ¼ÇÂ¼µÄÆğÊ¼µã ²»Ò»ÖÂ ÄÇÃ´ĞèÒª
-																								// ÖØĞÂ¸ÃÃû³Æ
+			if (mp4DynimicCount != mp4BeginIndex || (mp4LastIndex + 1) != mp4DynimicCount) { // å¤§å° å’Œ è®°å½•çš„èµ·å§‹ç‚¹ ä¸ä¸€è‡´ é‚£ä¹ˆéœ€è¦
+																								// é‡æ–°è¯¥åç§°
 				for (int i = 0; i < mp4TempList.size(); i++) {
 					File mp4File = mp4TempList.get(i);
 					String mp4FileName = "v" + "_" + getPaddingIntStringWithDirIndexFileNameWithIndex(tempTag,
@@ -3904,33 +3904,33 @@ public class G2_ApplyRuleFor_TypeFile {
 				}
 			}
 
-			System.out.println("recovery ËÑË÷µ½µÄÎÄ¼ş ÊıÁ¿:" + subFileList.size());
+			System.out.println("recovery æœç´¢åˆ°çš„æ–‡ä»¶ æ•°é‡:" + subFileList.size());
 			if (lastJPGFile != null) {
 				jpgLastIndex = calculIndexFromName(lastJPGFile.getName());
-				System.out.println("×îºóÒ»¸ö JPG ÎÄ¼şµÄÃû³ÆÎª:" + lastJPGFile.getName() + "  Ë÷Òı:" + jpgLastIndex
-						+ (jpgLastIndex != (jpgBeginIndex - 1) ? " Æ¥Åä²»³É¹¦(¸ÄÃû²Ù×÷)" : "Æ¥Åä³É¹¦"));
+				System.out.println("æœ€åä¸€ä¸ª JPG æ–‡ä»¶çš„åç§°ä¸º:" + lastJPGFile.getName() + "  ç´¢å¼•:" + jpgLastIndex
+						+ (jpgLastIndex != (jpgBeginIndex - 1) ? " åŒ¹é…ä¸æˆåŠŸ(æ”¹åæ“ä½œ)" : "åŒ¹é…æˆåŠŸ"));
 
 			}
 			if (lastGIFFile != null) {
 				gifLastIndex = calculIndexFromName(lastGIFFile.getName());
-				System.out.println("×îºóÒ»¸ö GIF ÎÄ¼şµÄÃû³ÆÎª:" + lastGIFFile.getName() + "  Ë÷Òı:" + gifLastIndex
-						+ (gifLastIndex != (gifBeginIndex - 1) ? " Æ¥Åä²»³É¹¦(¸ÄÃû²Ù×÷)" : "Æ¥Åä³É¹¦"));
+				System.out.println("æœ€åä¸€ä¸ª GIF æ–‡ä»¶çš„åç§°ä¸º:" + lastGIFFile.getName() + "  ç´¢å¼•:" + gifLastIndex
+						+ (gifLastIndex != (gifBeginIndex - 1) ? " åŒ¹é…ä¸æˆåŠŸ(æ”¹åæ“ä½œ)" : "åŒ¹é…æˆåŠŸ"));
 
 			}
 			if (lastMP4File != null) {
 				mp4LastIndex = calculIndexFromName(lastMP4File.getName());
-				System.out.println("×îºóÒ»¸ö MP4 ÎÄ¼şµÄÃû³ÆÎª:" + lastMP4File.getName() + "  Ë÷Òı:" + mp4LastIndex
-						+ (mp4LastIndex != (mp4BeginIndex - 1) ? " Æ¥Åä²»³É¹¦(¸ÄÃû²Ù×÷)" : "Æ¥Åä³É¹¦"));
+				System.out.println("æœ€åä¸€ä¸ª MP4 æ–‡ä»¶çš„åç§°ä¸º:" + lastMP4File.getName() + "  ç´¢å¼•:" + mp4LastIndex
+						+ (mp4LastIndex != (mp4BeginIndex - 1) ? " åŒ¹é…ä¸æˆåŠŸ(æ”¹åæ“ä½œ)" : "åŒ¹é…æˆåŠŸ"));
 			}
 			System.out.println(
-					"jpgDynimicIndex(JPG¶¯Ì¬¼ÆËãÎÄ¼şÊıÁ¿)=" + getXsizeString(jpgDynimicCount, 7) + "   (×îºóÒ»¸öJPGÎÄ¼şÃû³ÆË÷Òı+1)"
-							+ getXsizeString(jpgLastIndex + 1, 7) + " ||    Pro¼ÇÂ¼ jpgBeginIndex Îª:" + jpgBeginIndex);
+					"jpgDynimicIndex(JPGåŠ¨æ€è®¡ç®—æ–‡ä»¶æ•°é‡)=" + getXsizeString(jpgDynimicCount, 7) + "   (æœ€åä¸€ä¸ªJPGæ–‡ä»¶åç§°ç´¢å¼•+1)"
+							+ getXsizeString(jpgLastIndex + 1, 7) + " ||    Proè®°å½• jpgBeginIndex ä¸º:" + jpgBeginIndex);
 			System.out.println(
-					"gifDynimicIndex(GIF¶¯Ì¬¼ÆËãÎÄ¼şÊıÁ¿)=" + getXsizeString(gifDynimicCount, 7) + "   (×îºóÒ»¸öGIFÎÄ¼şÃû³ÆË÷Òı+1)"
-							+ getXsizeString(gifLastIndex + 1, 7) + " ||    Pro¼ÇÂ¼ gifBeginIndex Îª:" + gifBeginIndex);
+					"gifDynimicIndex(GIFåŠ¨æ€è®¡ç®—æ–‡ä»¶æ•°é‡)=" + getXsizeString(gifDynimicCount, 7) + "   (æœ€åä¸€ä¸ªGIFæ–‡ä»¶åç§°ç´¢å¼•+1)"
+							+ getXsizeString(gifLastIndex + 1, 7) + " ||    Proè®°å½• gifBeginIndex ä¸º:" + gifBeginIndex);
 			System.out.println(
-					"mp4DynimicIndex(MP4¶¯Ì¬¼ÆËãÎÄ¼şÊıÁ¿)=" + getXsizeString(mp4DynimicCount, 7) + "   (×îºóÒ»¸öMP4ÎÄ¼şÃû³ÆË÷Òı+1)"
-							+ getXsizeString(mp4LastIndex + 1, 7) + " ||    Pro¼ÇÂ¼ mp4BeginIndex Îª:" + mp4BeginIndex);
+					"mp4DynimicIndex(MP4åŠ¨æ€è®¡ç®—æ–‡ä»¶æ•°é‡)=" + getXsizeString(mp4DynimicCount, 7) + "   (æœ€åä¸€ä¸ªMP4æ–‡ä»¶åç§°ç´¢å¼•+1)"
+							+ getXsizeString(mp4LastIndex + 1, 7) + " ||    Proè®°å½• mp4BeginIndex ä¸º:" + mp4BeginIndex);
 
 			recoveryProperities(jpgDynimicCount, gifDynimicCount, mp4DynimicCount);
 			System.out.println();
@@ -3949,8 +3949,8 @@ public class G2_ApplyRuleFor_TypeFile {
 			valueA = valueA.replace(".", "");
 			valueA = valueA.replace("(", "");
 			valueA = valueA.replace(")", "");
-			valueA = valueA.replace("£©", "");
-			valueA = valueA.replace("£¨", "");
+			valueA = valueA.replace("ï¼‰", "");
+			valueA = valueA.replace("ï¼ˆ", "");
 
 			valueA = valueA.replace("a", "");
 			valueA = valueA.replace("b", "");
@@ -4001,8 +4001,8 @@ public class G2_ApplyRuleFor_TypeFile {
 			G2_Properties.setProperty("nextStepCountGIF", "" + 0);
 			G2_Properties.setProperty("nextStepCountMP4", "" + 0);
 
-			System.out.println(" Z_VI(Git_Dir)»Ö¸´ProÊı:(New)    JPG=" + jpgBeginIndex + "   GIF=" + gifBeginIndex
-					+ "   MP4=" + mp4BeginIndex + "  JPGÔöÁ¿=0    GIFÔöÁ¿=0   MP4ÔöÁ¿=0");
+			System.out.println(" Z_VI(Git_Dir)æ¢å¤Proæ•°:(New)    JPG=" + jpgBeginIndex + "   GIF=" + gifBeginIndex
+					+ "   MP4=" + mp4BeginIndex + "  JPGå¢é‡=0    GIFå¢é‡=0   MP4å¢é‡=0");
 		}
 
 		@SuppressWarnings("unchecked")
@@ -4010,24 +4010,24 @@ public class G2_ApplyRuleFor_TypeFile {
 		ArrayList<File> applyFileListRule3(ArrayList<File> subFileList, HashMap<String, ArrayList<File>> fileTypeMap) {
 			boolean executeFlag = false;
 
-			if (isRecovrty) { // Èç¹ûÊÇÒª»Ö¸´µÄµÄ»°
+			if (isRecovrty) { // å¦‚æœæ˜¯è¦æ¢å¤çš„çš„è¯
 				tryDynamicCalCulateBeginIndex(subFileList);
 				return null;
 			}
 
-			String oldAddPart = "OLD ¼ÇÂ¼µÄPropertiesÔöÁ¿:(OLD)   " + " JPG=" + jpgBeginIndex + "   GIF=" + gifBeginIndex
-					+ "   MP4=" + mp4BeginIndex + "  JPGÔöÁ¿=" + nextStepCountJPG + "    GIFÔöÁ¿=" + nextStepCountGIF
-					+ "   MP4ÔöÁ¿=" + nextStepCountMP4;
+			String oldAddPart = "OLD è®°å½•çš„Propertieså¢é‡:(OLD)   " + " JPG=" + jpgBeginIndex + "   GIF=" + gifBeginIndex
+					+ "   MP4=" + mp4BeginIndex + "  JPGå¢é‡=" + nextStepCountJPG + "    GIFå¢é‡=" + nextStepCountGIF
+					+ "   MP4å¢é‡=" + nextStepCountMP4;
 			if (!isEnable) {
-				System.out.println("µ±Ç° Rule5 ¹æÔòÉÏµÄÔöÁ¿ÒÑ¾­ÖÃ0  ÔöÁ¿ÒÑµÃµ½È·ÈÏ  Çë¿ªÊ¼ÀÛ¼ÆĞÂµÄ×ÊÔ´! ");
-				System.out.println("µ±Ç°¼ÇÂ¼µ½PropµÄÔöÁ¿ĞÅÏ¢:(New)  " + " JPG=" + jpgBeginIndex + "   GIF=" + gifBeginIndex
-						+ "   MP4=" + mp4BeginIndex + "  JPGÔöÁ¿=" + 0 + "    GIFÔöÁ¿=" + 0 + "   MP4ÔöÁ¿=" + 0);
+				System.out.println("å½“å‰ Rule5 è§„åˆ™ä¸Šçš„å¢é‡å·²ç»ç½®0  å¢é‡å·²å¾—åˆ°ç¡®è®¤  è¯·å¼€å§‹ç´¯è®¡æ–°çš„èµ„æº! ");
+				System.out.println("å½“å‰è®°å½•åˆ°Propçš„å¢é‡ä¿¡æ¯:(New)  " + " JPG=" + jpgBeginIndex + "   GIF=" + gifBeginIndex
+						+ "   MP4=" + mp4BeginIndex + "  JPGå¢é‡=" + 0 + "    GIFå¢é‡=" + 0 + "   MP4å¢é‡=" + 0);
 
 				return null;
 			}
 			if (isExistAddPart) {
-				System.out.println("µ±Ç° Rule5 ¹æÔò´æÔÚÉÏ´Î»¹Î´È·ÈÏµÄÔöÁ¿ ÇëÖ´ĞĞÈçÏÂÃüÁîÀ´È·ÈÏÔöÁ¿ Ê¹µÃNextStepÍê³É\n" + Cur_Bat_Name
-						+ " jgm_5_nextstep      // ¡ø¡¾ °Ñjpg gif pngµÄÔöÁ¿Ìí¼Óµ½ beginIndex È»ºóÔöÁ¿ÖÃ0 ¡¿ \n ");
+				System.out.println("å½“å‰ Rule5 è§„åˆ™å­˜åœ¨ä¸Šæ¬¡è¿˜æœªç¡®è®¤çš„å¢é‡ è¯·æ‰§è¡Œå¦‚ä¸‹å‘½ä»¤æ¥ç¡®è®¤å¢é‡ ä½¿å¾—NextStepå®Œæˆ\n" + Cur_Bat_Name
+						+ " jgm_5_nextstep      // â–²ã€ æŠŠjpg gif pngçš„å¢é‡æ·»åŠ åˆ° beginIndex ç„¶åå¢é‡ç½®0 ã€‘ \n ");
 			}
 			Map.Entry<String, ArrayList<File>> entry;
 			int nextStepCountJPG_new = 0;
@@ -4037,8 +4037,8 @@ public class G2_ApplyRuleFor_TypeFile {
 				Iterator iterator = fileTypeMap.entrySet().iterator();
 				while (iterator.hasNext()) {
 					entry = (Map.Entry<String, ArrayList<File>>) iterator.next();
-					String typeStr = entry.getKey(); // MapµÄValue
-					ArrayList<File> fileArr = entry.getValue(); // MapµÄValue
+					String typeStr = entry.getKey(); // Mapçš„Value
+					ArrayList<File> fileArr = entry.getValue(); // Mapçš„Value
 					String typeTag = jpgtag;
 					String dirTempIndex = tempTag + jpgDirTempIndex;
 					int tempIndex = 1;
@@ -4053,7 +4053,7 @@ public class G2_ApplyRuleFor_TypeFile {
 						if (!isTemp)
 							G2_Properties.setProperty("nextStepCountJPG", "" + nextStepCountJPG);
 						jpgEndIndex = jpgBeginIndex + fileArr.size();
-						System.out.println("µ±Ç°JPGÆğÊ¼Öµ:" + fixedFileIndex + "    µ±Ç°GIFµÄÎÄ¼ş³¤¶È:" + fileArr.size());
+						System.out.println("å½“å‰JPGèµ·å§‹å€¼:" + fixedFileIndex + "    å½“å‰GIFçš„æ–‡ä»¶é•¿åº¦:" + fileArr.size());
 					} else if (".mp4".equals(typeStr)) {
 						typeTag = mp4tag;
 						dirTempIndex = tempTag + mp4DirTempIndex;
@@ -4065,14 +4065,14 @@ public class G2_ApplyRuleFor_TypeFile {
 							G2_Properties.setProperty("nextStepCountMP4", "" + nextStepCountMP4);
 
 						mp4EndIndex = mp4BeginIndex + fileArr.size();
-						System.out.println("µ±Ç°MP4ÆğÊ¼Öµ:" + fixedFileIndex + "    µ±Ç°GIFµÄÎÄ¼ş³¤¶È:" + fileArr.size());
+						System.out.println("å½“å‰MP4èµ·å§‹å€¼:" + fixedFileIndex + "    å½“å‰GIFçš„æ–‡ä»¶é•¿åº¦:" + fileArr.size());
 					} else if (".gif".equals(typeStr)) {
 						typeTag = giftag;
 						dirTempIndex = tempTag + gifDirTempIndex;
 						fixedFileIndex = gifBeginIndex;
 						tempIndex = gifDirTempIndex;
 						nextStepCountGIF = fileArr.size();
-						System.out.println("µ±Ç°GIFÆğÊ¼Öµ:" + fixedFileIndex + "    µ±Ç°GIFµÄÎÄ¼ş³¤¶È:" + fileArr.size());
+						System.out.println("å½“å‰GIFèµ·å§‹å€¼:" + fixedFileIndex + "    å½“å‰GIFçš„æ–‡ä»¶é•¿åº¦:" + fileArr.size());
 						nextStepCountGIF_new = fileArr.size();
 						if (!isTemp)
 							G2_Properties.setProperty("nextStepCountGIF", "" + nextStepCountGIF);
@@ -4083,12 +4083,12 @@ public class G2_ApplyRuleFor_TypeFile {
 					}
 
 					if (isTemp) {
-						fixedFileIndex = mTempBeginIndex; // Èç¹ûÊÇ temp ÄÇÃ´ Ä¬ÈÏ ¾Í°Ñ temp×ªÎª index
+						fixedFileIndex = mTempBeginIndex; // å¦‚æœæ˜¯ temp é‚£ä¹ˆ é»˜è®¤ å°±æŠŠ tempè½¬ä¸º index
 						nextStepCountJPG_new = 0;
 						nextStepCountGIF_new = 0;
 						nextStepCountMP4_new = 0;
 					}
-					// ´Ó 000 ¿ªÊ¼
+					// ä» 000 å¼€å§‹
 //                    fixedFileIndex = fixedFileIndex ;
 
 					for (int i = 0; i < fileArr.size(); i++) {
@@ -4108,31 +4108,31 @@ public class G2_ApplyRuleFor_TypeFile {
 				}
 			}
 
-			String NewAddPart = "New ¼ÇÂ¼µÄPropertiesÔöÁ¿:(New)   " + " JPG=" + jpgBeginIndex + "   GIF=" + gifBeginIndex
-					+ "   MP4=" + mp4BeginIndex + "  JPGÔöÁ¿=" + nextStepCountJPG_new + "    GIFÔöÁ¿="
-					+ nextStepCountGIF_new + "   MP4ÔöÁ¿=" + nextStepCountMP4_new;
+			String NewAddPart = "New è®°å½•çš„Propertieså¢é‡:(New)   " + " JPG=" + jpgBeginIndex + "   GIF=" + gifBeginIndex
+					+ "   MP4=" + mp4BeginIndex + "  JPGå¢é‡=" + nextStepCountJPG_new + "    GIFå¢é‡="
+					+ nextStepCountGIF_new + "   MP4å¢é‡=" + nextStepCountMP4_new;
 
-			System.out.println("¨T¨T¨T¨T¨T¨T¨T¨T¨T¨TÈ·ÈÏÔöÁ¿ĞÅÏ¢ Begin¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T");
+			System.out.println("â•â•â•â•â•â•â•â•â•â•ç¡®è®¤å¢é‡ä¿¡æ¯ Beginâ•â•â•â•â•â•â•â•â•â•");
 			if (isExistAddPart) {
-				// System.out.println("Rule5 ÉÏ´ÎµÄÔöÁ¿Çé¿ö:");
+				// System.out.println("Rule5 ä¸Šæ¬¡çš„å¢é‡æƒ…å†µ:");
 				System.out.println(oldAddPart);
 			} else {
-				System.out.println("OLD     ÉÏ´ÎµÄ²»´æÔÚÔöÁ¿:(OLD)    JPG=" + jpgBeginIndex + "   GIF=" + gifBeginIndex
-						+ "   MP4=" + mp4BeginIndex + " JPGÔöÁ¿=0     GIFÔöÁ¿=0     MP4ÔöÁ¿=0");
+				System.out.println("OLD     ä¸Šæ¬¡çš„ä¸å­˜åœ¨å¢é‡:(OLD)    JPG=" + jpgBeginIndex + "   GIF=" + gifBeginIndex
+						+ "   MP4=" + mp4BeginIndex + " JPGå¢é‡=0     GIFå¢é‡=0     MP4å¢é‡=0");
 			}
-			// System.out.println("\nRule5 ÏÖÔÚµÄÔöÁ¿Çé¿ö: ");
+			// System.out.println("\nRule5 ç°åœ¨çš„å¢é‡æƒ…å†µ: ");
 			System.out.println(NewAddPart);
 
-			System.out.println("New ÏÖÔÚÊ¹ÓÃÈçÏÂÃüÁî°Ñ New µ±Ç°µÄÔöÁ¿½øĞĞÈ·ÈÏ! \n" + Cur_Bat_Name
-					+ " jgm_5_nextstep      // ¡ø¡¾ °Ñjpg gif pngµÄÔöÁ¿Ìí¼Óµ½ beginIndex È»ºóÔöÁ¿ÖÃ0 ¡¿ \n ");
-			System.out.println("¨T¨T¨T¨T¨T¨T¨T¨T¨T¨TÈ·ÈÏÔöÁ¿ĞÅÏ¢ End¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T");
+			System.out.println("New ç°åœ¨ä½¿ç”¨å¦‚ä¸‹å‘½ä»¤æŠŠ New å½“å‰çš„å¢é‡è¿›è¡Œç¡®è®¤! \n" + Cur_Bat_Name
+					+ " jgm_5_nextstep      // â–²ã€ æŠŠjpg gif pngçš„å¢é‡æ·»åŠ åˆ° beginIndex ç„¶åå¢é‡ç½®0 ã€‘ \n ");
+			System.out.println("â•â•â•â•â•â•â•â•â•â•ç¡®è®¤å¢é‡ä¿¡æ¯ Endâ•â•â•â•â•â•â•â•â•â•");
 			if (executeFlag) {
 				return curFixedFileList;
 			}
 			return super.applyFileListRule3(subFileList, fileTypeMap);
 		}
 
-		// ´Ó ÆğÊ¼µÄµØÖ· beginIndex ¿ªÊ¼¼ÆËã
+		// ä» èµ·å§‹çš„åœ°å€ beginIndex å¼€å§‹è®¡ç®—
 		String getPaddingIntStringWithDirIndexFileNameWithIndex(String cTempTag, int CurrentTempIndex, int beginIndex,
 				int index, int padinglength, String oneStr, boolean dirPre) {
 
@@ -4143,7 +4143,7 @@ public class G2_ApplyRuleFor_TypeFile {
 
 		}
 
-		// ²»´ÓÆğÊ¼µÄµØÖ· ¼ÆËã ´Ó0£¬1,2,3.... ¿ªÊ¼¼ÆËã
+		// ä¸ä»èµ·å§‹çš„åœ°å€ è®¡ç®— ä»0ï¼Œ1,2,3.... å¼€å§‹è®¡ç®—
 		String getPaddingIntStringWithDirIndexFileName(String cTempTag, int CurrentTempIndex, int index,
 				int padinglength, String oneStr, boolean dirPre) {
 
@@ -4193,7 +4193,7 @@ public class G2_ApplyRuleFor_TypeFile {
 
 	}
 
-	// °Ñ µ±Ç°Ä¿Â¼ÏÂËùÓĞµÄ png jpeg ¶¼×ªÎª jpgµÄ¸ñÊ½
+	// æŠŠ å½“å‰ç›®å½•ä¸‹æ‰€æœ‰çš„ png jpeg éƒ½è½¬ä¸º jpgçš„æ ¼å¼
 	class Image2Png_Rule_4 extends Basic_Rule {
 		String targetFileType = ".png";
 
@@ -4231,11 +4231,11 @@ public class G2_ApplyRuleFor_TypeFile {
 
 		@Override
 		String simpleDesc() {
-			return " °Ñµ±Ç°Ä¿Â¼(°üº¬×ÓÄ¿Â¼)ËùÓĞµÄ .jpg .jpeg µÄÎÄ¼şºó×º¸ÄÎª .png µÄÎÄ¼şºó×º";
+			return " æŠŠå½“å‰ç›®å½•(åŒ…å«å­ç›®å½•)æ‰€æœ‰çš„ .jpg .jpeg çš„æ–‡ä»¶åç¼€æ”¹ä¸º .png çš„æ–‡ä»¶åç¼€";
 		}
 	}
 
-	// °Ñ µ±Ç°Ä¿Â¼ÏÂËùÓĞµÄ png jpeg ¶¼×ªÎª jpgµÄ¸ñÊ½
+	// æŠŠ å½“å‰ç›®å½•ä¸‹æ‰€æœ‰çš„ png jpeg éƒ½è½¬ä¸º jpgçš„æ ¼å¼
 	class Image2Jpeg_Rule_3 extends Basic_Rule {
 		String targetFileType = ".jpg";
 
@@ -4273,29 +4273,29 @@ public class G2_ApplyRuleFor_TypeFile {
 
 		@Override
 		String simpleDesc() {
-			return " °Ñµ±Ç°Ä¿Â¼(°üº¬×ÓÄ¿Â¼)ËùÓĞµÄ .png .jpeg µÄÎÄ¼şºó×º¸ÄÎª .jpg µÄÎÄ¼şºó×º";
+			return " æŠŠå½“å‰ç›®å½•(åŒ…å«å­ç›®å½•)æ‰€æœ‰çš„ .png .jpeg çš„æ–‡ä»¶åç¼€æ”¹ä¸º .jpg çš„æ–‡ä»¶åç¼€";
 		}
 	}
 
-	// Ö¸¶¨Ê²Ã´ÀàĞÍµÄÎÄ¼şÔÚµ±Ç°Ê¹ÓÃÊ²Ã´ÑùµÄ¹æÔò
-	// operation_type ²Ù×÷ÀàĞÍ
-	// 1--¶ÁÈ¡ÎÄ¼şÄÚÈİ×Ö·û´® ½øĞĞĞŞ¸Ä String applyOperationRule(String origin)
-	// 2--¶Ôµ¥¸öÎÄ¼şÊôĞÔ½øĞĞĞŞ¸Ä(ÎÄ¼şÃû³Æ) ¶ÔÎÄ¼şÄÚÈİ(×Ö½Ú)--½øĞĞĞŞ¸Ä File applyFileByteOperationRule(File
+	// æŒ‡å®šä»€ä¹ˆç±»å‹çš„æ–‡ä»¶åœ¨å½“å‰ä½¿ç”¨ä»€ä¹ˆæ ·çš„è§„åˆ™
+	// operation_type æ“ä½œç±»å‹
+	// 1--è¯»å–æ–‡ä»¶å†…å®¹å­—ç¬¦ä¸² è¿›è¡Œä¿®æ”¹ String applyOperationRule(String origin)
+	// 2--å¯¹å•ä¸ªæ–‡ä»¶å±æ€§è¿›è¡Œä¿®æ”¹(æ–‡ä»¶åç§°) å¯¹æ–‡ä»¶å†…å®¹(å­—èŠ‚)--è¿›è¡Œä¿®æ”¹ File applyFileByteOperationRule(File
 	// originFile)
-	// 3--¶Ô¼¯ºÏÎÄ¼şÊôĞÔ½øĞĞĞŞ¸Ä(ÎÄ¼şÃû³Æ) ¶ÔËùÓĞ×ÓÎÄ¼ş--½øĞĞĞŞ¸Ä ArrayList<File>
+	// 3--å¯¹é›†åˆæ–‡ä»¶å±æ€§è¿›è¡Œä¿®æ”¹(æ–‡ä»¶åç§°) å¯¹æ‰€æœ‰å­æ–‡ä»¶--è¿›è¡Œä¿®æ”¹ ArrayList<File>
 	// applyFileByteOperationRule(ArrayList<File> subFileList)
-	// index Î¨Ò»Ö¸¶¨µÄÒ»ÖÖ rule¹æÔò
+	// index å”¯ä¸€æŒ‡å®šçš„ä¸€ç§ ruleè§„åˆ™
 
-	// file_name_2 #_2 ¶Ôµ±Ç°Ä¿Â¼ÏÂµÄËùÓĞÎÄ¼ş½øĞĞ ÎÄ¼şÃû³ÆµÄÖØĞÂÃüÃû ÃüÃû¹æÔò ÔÚÍ·²¿Ìí¼ÓĞòºÅ
+	// file_name_2 #_2 å¯¹å½“å‰ç›®å½•ä¸‹çš„æ‰€æœ‰æ–‡ä»¶è¿›è¡Œ æ–‡ä»¶åç§°çš„é‡æ–°å‘½å å‘½åè§„åˆ™ åœ¨å¤´éƒ¨æ·»åŠ åºå·
 
 	class File_Name_Rule_2 extends Basic_Rule {
 
-		// key = type value = ·ûºÏ¹ıÂËÎÄ¼ş¹æÔòµÄÃû³ÆµÄÎÄ¼şµÄ¼¯ºÏ
+		// key = type value = ç¬¦åˆè¿‡æ»¤æ–‡ä»¶è§„åˆ™çš„åç§°çš„æ–‡ä»¶çš„é›†åˆ
 		// HashMap<String, ArrayList<File>> arrFileMap;
 		boolean keepOriginalName = true;
 		int inputBeginIndex = 0;
 
-		// ÊÇ·ñÊÇ°´ 1.jpg 2,jpg 3.png 4.png ÒÀ´ÎÃüÃû ¶ø²»ÊÇ 1.jpg 2,jpg 1.png 2.png ÀàĞÍÀ´ÃüÃû
+		// æ˜¯å¦æ˜¯æŒ‰ 1.jpg 2,jpg 3.png 4.png ä¾æ¬¡å‘½å è€Œä¸æ˜¯ 1.jpg 2,jpg 1.png 2.png ç±»å‹æ¥å‘½å
 		boolean isOrder = false;
 
 		File_Name_Rule_2() {
@@ -4317,8 +4317,8 @@ public class G2_ApplyRuleFor_TypeFile {
 				Iterator iterator = arrFileMap.entrySet().iterator();
 				while (iterator.hasNext()) {
 					entry = (Map.Entry<String, ArrayList<File>>) iterator.next();
-					String typeStr = entry.getKey(); // MapµÄValue
-					ArrayList<File> fileArr = entry.getValue(); // MapµÄValue
+					String typeStr = entry.getKey(); // Mapçš„Value
+					ArrayList<File> fileArr = entry.getValue(); // Mapçš„Value
 
 					for (int i = 0; i < fileArr.size(); i++) {
 						fileOrderIndex++;
@@ -4328,17 +4328,17 @@ public class G2_ApplyRuleFor_TypeFile {
 						String curFileName = curFile.getName();
 						String newName = "";
 						if (keepOriginalName) {
-							if (isOrder) { // °´Ë³ĞòÒÀ´Î ²»°´ typeÁË Ò»Ö±×ß
+							if (isOrder) { // æŒ‰é¡ºåºä¾æ¬¡ ä¸æŒ‰ typeäº† ä¸€ç›´èµ°
 								newName = fileOrderIndex + "_" + curFileName;
 							} else {
 								newName = newNamePre + curFileName;
 							}
 						} else {
-							// Èç¹û²»±£ÁôÃû³Æ ÄÇÃ´Ã»ÓĞÀàĞÍµÄÎÄ¼ş ½«Ö»ÓĞ ĞòºÅ Ã»ÓĞÀàĞÍ
+							// å¦‚æœä¸ä¿ç•™åç§° é‚£ä¹ˆæ²¡æœ‰ç±»å‹çš„æ–‡ä»¶ å°†åªæœ‰ åºå· æ²¡æœ‰ç±»å‹
 							if ("unknow".equals(typeStr)) {
 								newName = index + "";
 							} else {
-								if (isOrder) { // °´Ë³ĞòÒÀ´Î ²»°´ typeÁË Ò»Ö±×ß
+								if (isOrder) { // æŒ‰é¡ºåºä¾æ¬¡ ä¸æŒ‰ typeäº† ä¸€ç›´èµ°
 									newName = fileOrderIndex + typeStr;
 								} else {
 									newName = index + typeStr;
@@ -4394,37 +4394,37 @@ public class G2_ApplyRuleFor_TypeFile {
 
 		String ruleTip(String type, int index, String batName, OS_TYPE curType) {
 			String itemDesc = "";
-			String desc_true = " (±£ÁôÔ­Ãû³Æ) °Ñµ±Ç°µÄËùÓĞ×ÓÎÄ¼ş(·ÇÄ¿Â¼)ÖØÃüÃûÎª ¡¾ĞòºÅ_Ô­Ê¼Ãû³Æ.ÀàĞÍ¡¿µÄĞÎÊ½ ÀıÈç hello.jpg =¡· 1_hello.jpg  xx.jpg-¡·2_xx.jpg    001/4.jpg -> 001/3_4.jpg(²»Í¬ÎÄ¼ş¼Ğ)   ±£ÁôÔ­ÓĞÃû³Æ ÏàÍ¬ÀàĞÍÎÄ¼ş²»Í¬ÎÄ¼ş¼Ğ Ê¹ÓÃÍ¬Ò»¸öĞòÁĞºÅ   ";
-			String desc_true_1 = " (±£ÁôÔ­Ãû³Æ_°´ÀàĞÍÒÀ´Î´Ó1¿ªÊ¼ order ) °Ñµ±Ç°µÄËùÓĞ×ÓÎÄ¼ş(·ÇÄ¿Â¼)ÖØÃüÃûÎª ¡¾ĞòºÅ_Ô­Ê¼Ãû³Æ.ÀàĞÍ ×ßµ½µ×¡¿µÄĞÎÊ½ ÀıÈç hello.jpg =¡· 1_hello.jpg  xx.jpg-¡·2_xx.jpg   aa.png -> 3_aa.png  | 001/4.zip ->  001/4_4.zip  ±£ÁôÔ­ÓĞÃû³Æ ²»ÏàÍ¬ÀàĞÍÎÄ¼ş²»Í¬ÎÄ¼ş¼Ğ Ê¹ÓÃÍ¬Ò»¸öĞòÁĞºÅ ";
-			String desc_true_2 = " (±£ÁôÔ­Ãû³Æ_ÒÀÕÕÊäÈëË÷ÒıÎªÆğÊ¼ order ) °Ñµ±Ç°µÄËùÓĞ×ÓÎÄ¼ş(·ÇÄ¿Â¼)ÖØÃüÃûÎª ¡¾×Ô¶¨ÒåĞòºÅ_Ô­Ê¼Ãû³Æ.ÀàĞÍ ×ßµ½µ×¡¿µÄĞÎÊ½ ÀıÈç #_2_false_order_50  hello.jpg =¡· 50_hello.jpg  xx.jpg-¡·51_xx.jpg   aa.png -> 52_aa.png ±£ÁôÔ­ÓĞÃû³Æ ²»ÏàÍ¬ÀàĞÍÎÄ¼ş²»Í¬ÎÄ¼ş¼Ğ Ê¹ÓÃÍ¬Ò»¸öĞòÁĞºÅ(ĞòºÅ×Ô¶¨Òå) ";
+			String desc_true = " (ä¿ç•™åŸåç§°) æŠŠå½“å‰çš„æ‰€æœ‰å­æ–‡ä»¶(éç›®å½•)é‡å‘½åä¸º ã€åºå·_åŸå§‹åç§°.ç±»å‹ã€‘çš„å½¢å¼ ä¾‹å¦‚ hello.jpg =ã€‹ 1_hello.jpg  xx.jpg-ã€‹2_xx.jpg    001/4.jpg -> 001/3_4.jpg(ä¸åŒæ–‡ä»¶å¤¹)   ä¿ç•™åŸæœ‰åç§° ç›¸åŒç±»å‹æ–‡ä»¶ä¸åŒæ–‡ä»¶å¤¹ ä½¿ç”¨åŒä¸€ä¸ªåºåˆ—å·   ";
+			String desc_true_1 = " (ä¿ç•™åŸåç§°_æŒ‰ç±»å‹ä¾æ¬¡ä»1å¼€å§‹ order ) æŠŠå½“å‰çš„æ‰€æœ‰å­æ–‡ä»¶(éç›®å½•)é‡å‘½åä¸º ã€åºå·_åŸå§‹åç§°.ç±»å‹ èµ°åˆ°åº•ã€‘çš„å½¢å¼ ä¾‹å¦‚ hello.jpg =ã€‹ 1_hello.jpg  xx.jpg-ã€‹2_xx.jpg   aa.png -> 3_aa.png  | 001/4.zip ->  001/4_4.zip  ä¿ç•™åŸæœ‰åç§° ä¸ç›¸åŒç±»å‹æ–‡ä»¶ä¸åŒæ–‡ä»¶å¤¹ ä½¿ç”¨åŒä¸€ä¸ªåºåˆ—å· ";
+			String desc_true_2 = " (ä¿ç•™åŸåç§°_ä¾ç…§è¾“å…¥ç´¢å¼•ä¸ºèµ·å§‹ order ) æŠŠå½“å‰çš„æ‰€æœ‰å­æ–‡ä»¶(éç›®å½•)é‡å‘½åä¸º ã€è‡ªå®šä¹‰åºå·_åŸå§‹åç§°.ç±»å‹ èµ°åˆ°åº•ã€‘çš„å½¢å¼ ä¾‹å¦‚ #_2_false_order_50  hello.jpg =ã€‹ 50_hello.jpg  xx.jpg-ã€‹51_xx.jpg   aa.png -> 52_aa.png ä¿ç•™åŸæœ‰åç§° ä¸ç›¸åŒç±»å‹æ–‡ä»¶ä¸åŒæ–‡ä»¶å¤¹ ä½¿ç”¨åŒä¸€ä¸ªåºåˆ—å·(åºå·è‡ªå®šä¹‰) ";
 
-			String desc_false = "(Çå³ıÔ­Ãû³Æ) °Ñµ±Ç°µÄËùÓĞ×ÓÎÄ¼ş(·ÇÄ¿Â¼)ÖØÃüÃûÎª ¡¾ĞòºÅ.ÀàĞÍ¡¿µÄĞÎÊ½ ÀıÈç hello.jpg =¡· 1.jpg  xx.png-¡·1.jpg   ²»±£ÁôÔ­ÓĞÃû³Æ ÏàÍ¬ÀàĞÍÎÄ¼ş²»Í¬ÎÄ¼ş¼Ğ Ê¹ÓÃÍ¬Ò»¸öĞòÁĞºÅ";
-			String desc_false_1 = "(Çå³ıÔ­Ãû³Æ_°´ÀàĞÍÒÀ´Î order ) °Ñµ±Ç°µÄËùÓĞ×ÓÎÄ¼ş(·ÇÄ¿Â¼)ÖØÃüÃûÎª ¡¾ĞòºÅ.ÀàĞÍ ×ßµ½µ× ¡¿µÄĞÎÊ½ ÀıÈç hello.jpg =¡· 1.jpg  xx.jpg-¡·2_xx.jpg  xx.png-¡·3.png  xx.png-¡·4.png  ²»±£ÁôÔ­ÓĞÃû³Æ ²»ÏàÍ¬ÀàĞÍÎÄ¼ş²»Í¬ÎÄ¼ş¼Ğ Ê¹ÓÃÍ¬Ò»¸öĞòÁĞºÅ ";
-			String desc_false_2 = "(Çå³ıÔ­Ãû³Æ_°´ÀàĞÍ ÒÀÕÕÊäÈëË÷ÒıÎªÆğÊ¼ order ) °Ñµ±Ç°µÄËùÓĞ×ÓÎÄ¼ş(·ÇÄ¿Â¼)ÖØÃüÃûÎª ¡¾ÊäÈëBeginĞòºÅ.ÀàĞÍ ×ßµ½µ× ¡¿µÄĞÎÊ½ ÀıÈç   #_2_false_order_10  hello.jpg =¡· 10.jpg  xx.jpg-¡·11_xx.jpg  xx.png-¡·12.png  xx.png-¡·13.png  ²»±£ÁôÔ­ÓĞÃû³Æ ²»ÏàÍ¬ÀàĞÍÎÄ¼ş²»Í¬ÎÄ¼ş¼Ğ Ê¹ÓÃÍ¬Ò»¸öĞòÁĞºÅ(ĞòºÅ×Ô¶¨Òå) ";
+			String desc_false = "(æ¸…é™¤åŸåç§°) æŠŠå½“å‰çš„æ‰€æœ‰å­æ–‡ä»¶(éç›®å½•)é‡å‘½åä¸º ã€åºå·.ç±»å‹ã€‘çš„å½¢å¼ ä¾‹å¦‚ hello.jpg =ã€‹ 1.jpg  xx.png-ã€‹1.jpg   ä¸ä¿ç•™åŸæœ‰åç§° ç›¸åŒç±»å‹æ–‡ä»¶ä¸åŒæ–‡ä»¶å¤¹ ä½¿ç”¨åŒä¸€ä¸ªåºåˆ—å·";
+			String desc_false_1 = "(æ¸…é™¤åŸåç§°_æŒ‰ç±»å‹ä¾æ¬¡ order ) æŠŠå½“å‰çš„æ‰€æœ‰å­æ–‡ä»¶(éç›®å½•)é‡å‘½åä¸º ã€åºå·.ç±»å‹ èµ°åˆ°åº• ã€‘çš„å½¢å¼ ä¾‹å¦‚ hello.jpg =ã€‹ 1.jpg  xx.jpg-ã€‹2_xx.jpg  xx.png-ã€‹3.png  xx.png-ã€‹4.png  ä¸ä¿ç•™åŸæœ‰åç§° ä¸ç›¸åŒç±»å‹æ–‡ä»¶ä¸åŒæ–‡ä»¶å¤¹ ä½¿ç”¨åŒä¸€ä¸ªåºåˆ—å· ";
+			String desc_false_2 = "(æ¸…é™¤åŸåç§°_æŒ‰ç±»å‹ ä¾ç…§è¾“å…¥ç´¢å¼•ä¸ºèµ·å§‹ order ) æŠŠå½“å‰çš„æ‰€æœ‰å­æ–‡ä»¶(éç›®å½•)é‡å‘½åä¸º ã€è¾“å…¥Beginåºå·.ç±»å‹ èµ°åˆ°åº• ã€‘çš„å½¢å¼ ä¾‹å¦‚   #_2_false_order_10  hello.jpg =ã€‹ 10.jpg  xx.jpg-ã€‹11_xx.jpg  xx.png-ã€‹12.png  xx.png-ã€‹13.png  ä¸ä¿ç•™åŸæœ‰åç§° ä¸ç›¸åŒç±»å‹æ–‡ä»¶ä¸åŒæ–‡ä»¶å¤¹ ä½¿ç”¨åŒä¸€ä¸ªåºåˆ—å·(åºå·è‡ªå®šä¹‰) ";
 
 			if (curType == OS_TYPE.Windows) {
-				itemDesc = batName.trim() + ".bat  " + type + "_" + index + "_true" + "    [Ë÷Òı " + index + "]  ÃèÊö: "
+				itemDesc = batName.trim() + ".bat  " + type + "_" + index + "_true" + "    [ç´¢å¼• " + index + "]  æè¿°: "
 						+ desc_true + "\n";
-				itemDesc += "\n" + batName.trim() + ".bat  " + type + "_" + index + "_true_order" + "    [Ë÷Òı " + index
-						+ "]  ÃèÊö: " + desc_true_1 + "\n";
-				itemDesc += "\n" + batName.trim() + ".bat  " + type + "_" + index + "_true_order_20" + "    [Ö¸¶¨¿ªÊ¼Ë÷Òı "
-						+ index + "]  ÃèÊö: " + desc_true_2 + "\n";
-				itemDesc += "\n" + batName.trim() + ".bat  " + type + "_" + index + "_false" + "    [Ë÷Òı " + index
-						+ "]  ÃèÊö:" + desc_false + "\n";
-				itemDesc += "\n" + batName.trim() + ".bat  " + type + "_" + index + "_false_order" + "    [Ë÷Òı " + index
-						+ "]  ÃèÊö:" + desc_false_1 + "\n";
-				itemDesc += "\n" + batName.trim() + ".bat  " + type + "_" + index + "_false_order_10" + "    [Ö¸¶¨¿ªÊ¼Ë÷Òı "
-						+ index + "]  ÃèÊö:" + desc_false_2 + "\n";
+				itemDesc += "\n" + batName.trim() + ".bat  " + type + "_" + index + "_true_order" + "    [ç´¢å¼• " + index
+						+ "]  æè¿°: " + desc_true_1 + "\n";
+				itemDesc += "\n" + batName.trim() + ".bat  " + type + "_" + index + "_true_order_20" + "    [æŒ‡å®šå¼€å§‹ç´¢å¼• "
+						+ index + "]  æè¿°: " + desc_true_2 + "\n";
+				itemDesc += "\n" + batName.trim() + ".bat  " + type + "_" + index + "_false" + "    [ç´¢å¼• " + index
+						+ "]  æè¿°:" + desc_false + "\n";
+				itemDesc += "\n" + batName.trim() + ".bat  " + type + "_" + index + "_false_order" + "    [ç´¢å¼• " + index
+						+ "]  æè¿°:" + desc_false_1 + "\n";
+				itemDesc += "\n" + batName.trim() + ".bat  " + type + "_" + index + "_false_order_10" + "    [æŒ‡å®šå¼€å§‹ç´¢å¼• "
+						+ index + "]  æè¿°:" + desc_false_2 + "\n";
 
 			} else {
-				itemDesc = batName.trim() + ".sh " + type + "_" + index + "_true" + "    [Ë÷Òı " + index + "]  ÃèÊö:"
+				itemDesc = batName.trim() + ".sh " + type + "_" + index + "_true" + "    [ç´¢å¼• " + index + "]  æè¿°:"
 						+ desc_true;
-				itemDesc += "\n" + batName.trim() + ".bat  " + type + "_" + index + "_true_order" + "    [Ë÷Òı " + index
-						+ "]  ÃèÊö: " + desc_true_1;
-				itemDesc += "\n" + batName.trim() + ".sh  " + type + "_" + index + "_false" + "    [Ë÷Òı " + index
-						+ "]  ÃèÊö:" + desc_false;
-				itemDesc += "\n" + batName.trim() + ".bat  " + type + "_" + index + "_false_order" + "    [Ë÷Òı " + index
-						+ "]  ÃèÊö:" + desc_false_1;
+				itemDesc += "\n" + batName.trim() + ".bat  " + type + "_" + index + "_true_order" + "    [ç´¢å¼• " + index
+						+ "]  æè¿°: " + desc_true_1;
+				itemDesc += "\n" + batName.trim() + ".sh  " + type + "_" + index + "_false" + "    [ç´¢å¼• " + index
+						+ "]  æè¿°:" + desc_false;
+				itemDesc += "\n" + batName.trim() + ".bat  " + type + "_" + index + "_false_order" + "    [ç´¢å¼• " + index
+						+ "]  æè¿°:" + desc_false_1;
 			}
 
 			return itemDesc;
@@ -4434,7 +4434,7 @@ public class G2_ApplyRuleFor_TypeFile {
 
 	// html_1
 	/*
-	 * 1.¶ÁÈ¡µ±Ç°µÄ htmlÎÄ¼ş È»ºó°ÑËùÓĞµÄ htmlÎÄ¼şµÄ <script> </script> ÖØĞÂ·Åµ½ </body> ºóÃæ <script>
+	 * 1.è¯»å–å½“å‰çš„ htmlæ–‡ä»¶ ç„¶åæŠŠæ‰€æœ‰çš„ htmlæ–‡ä»¶çš„ <script> </script> é‡æ–°æ”¾åˆ° </body> åé¢ <script>
 	 * </script> </body>
 	 */
 
@@ -4447,9 +4447,9 @@ public class G2_ApplyRuleFor_TypeFile {
 		String applyOperationRule(String origin) {
 			StringBuilder sb = new StringBuilder();
 			if (origin.contains("<script>") && origin.contains("</script>") && origin.contains("</body>")
-					&& origin.indexOf("</body>") > origin.indexOf("<script>") && // <script> </body> // script Ë÷ÒıĞ¡ÓÚ
-																					// </body>µÄË÷Òı
-					origin.indexOf("</script>") == origin.lastIndexOf("</script>")) { // Ö»°üº¬Ò»¸ö </script>
+					&& origin.indexOf("</body>") > origin.indexOf("<script>") && // <script> </body> // script ç´¢å¼•å°äº
+																					// </body>çš„ç´¢å¼•
+					origin.indexOf("</script>") == origin.lastIndexOf("</script>")) { // åªåŒ…å«ä¸€ä¸ª </script>
 				int scriptBegin = origin.indexOf("<script>");
 				int scriptEnd = origin.indexOf("</script>") + "</script>".length();
 				int bodyEnd = origin.indexOf("</body>");
@@ -4467,7 +4467,7 @@ public class G2_ApplyRuleFor_TypeFile {
 		}
 
 		String simpleDesc() {
-			return " ¶ÁÈ¡µ±Ç°µÄ htmlÎÄ¼ş  È»ºó°ÑËùÓĞµÄ htmlÎÄ¼şµÄ <script> </script>  ÖØĞÂ·Åµ½ </body> ºóÃæ";
+			return " è¯»å–å½“å‰çš„ htmlæ–‡ä»¶  ç„¶åæŠŠæ‰€æœ‰çš„ htmlæ–‡ä»¶çš„ <script> </script>  é‡æ–°æ”¾åˆ° </body> åé¢";
 		}
 
 	}
@@ -4526,10 +4526,10 @@ public class G2_ApplyRuleFor_TypeFile {
 		String ruleTip(String type, int index, String batName, OS_TYPE curType) {
 			String itemDesc = "";
 			if (curType == OS_TYPE.Windows) {
-				itemDesc = batName.trim() + ".bat  " + type + "_" + index + "    [Ë÷Òı " + index + "]  ÃèÊö:"
+				itemDesc = batName.trim() + ".bat  " + type + "_" + index + "    [ç´¢å¼• " + index + "]  æè¿°:"
 						+ simpleDesc();
 			} else {
-				itemDesc = batName.trim() + ".sh " + type + "_" + index + "    [Ë÷Òı " + index + "]  ÃèÊö:" + simpleDesc();
+				itemDesc = batName.trim() + ".sh " + type + "_" + index + "    [ç´¢å¼• " + index + "]  æè¿°:" + simpleDesc();
 			}
 
 			return itemDesc;
@@ -4541,34 +4541,34 @@ public class G2_ApplyRuleFor_TypeFile {
 			File newFile = new File(newFilePath);
 			if (newFile.exists() && newFilePath.equals(curFile.getAbsolutePath())) {
 
-//           newFilePath = curFile.getParent() + File.separator +"ÖØ¸´_"+newName;
+//           newFilePath = curFile.getParent() + File.separator +"é‡å¤_"+newName;
 //           newFile = new File(newFilePath);
-				System.out.println("µ±Ç°Ä¿Â¼ÒÑ´æÔÚÖØÃüÃûºóµÄÎÄ¼ş  ÎÄ¼şÃû³Æ:" + curFile.getName());
-				return false; // ÒÑ¾­´æÔÚµÄÎÄ¼ş²»´¦Àí Ö±½Ó·µ»Ø
+				System.out.println("å½“å‰ç›®å½•å·²å­˜åœ¨é‡å‘½ååçš„æ–‡ä»¶  æ–‡ä»¶åç§°:" + curFile.getName());
+				return false; // å·²ç»å­˜åœ¨çš„æ–‡ä»¶ä¸å¤„ç† ç›´æ¥è¿”å›
 
 			}
 			boolean flag = curFile.renameTo(newFile);
 			if (flag) {
-				System.out.println(oldName + " ×ªÎª " + newFilePath + " ³É¹¦£¡");
+				System.out.println(oldName + " è½¬ä¸º " + newFilePath + " æˆåŠŸï¼");
 				curFixedFileList.add(curFile);
 			} else {
-				System.out.println(oldName + " ×ªÎª " + newFilePath + " Ê§°Ü£¡");
+				System.out.println(oldName + " è½¬ä¸º " + newFilePath + " å¤±è´¥ï¼");
 			}
 			return flag;
 		}
 	}
 
 	abstract class Rule {
-		// operation_type ²Ù×÷ÀàĞÍ 1--¶ÁÈ¡ÎÄ¼şÄÚÈİ×Ö·û´® ½øĞĞĞŞ¸Ä 2--¶ÔÎÄ¼ş¶ÔÎÄ¼şÄÚÈİ(×Ö½Ú)--½øĞĞĞŞ¸Ä 3.¶ÔÈ«Ìå×ÓÎÄ¼ş½øĞĞµÄËæĞÔµÄ²Ù×÷
-		// ÊôĞÔ½øĞĞĞŞ¸Ä(ÎÄ¼şÃû³Æ)
-		// 4.¶Ôµ±Ç°×ÓÎÄ¼ş(°üÀ¨×ÓÄ¿Â¼ ×ÓÎÄ¼ş --²»°üº¬ËïÄ¿Â¼ ËïÎÄ¼ş) // 5. ´Óshell ÖĞ»ñÈ¡µ½µÄÂ·¾¶ È¥¶ÔÄ³Ò»¸öÎÄ¼ş½øĞĞ²Ù×÷
+		// operation_type æ“ä½œç±»å‹ 1--è¯»å–æ–‡ä»¶å†…å®¹å­—ç¬¦ä¸² è¿›è¡Œä¿®æ”¹ 2--å¯¹æ–‡ä»¶å¯¹æ–‡ä»¶å†…å®¹(å­—èŠ‚)--è¿›è¡Œä¿®æ”¹ 3.å¯¹å…¨ä½“å­æ–‡ä»¶è¿›è¡Œçš„éšæ€§çš„æ“ä½œ
+		// å±æ€§è¿›è¡Œä¿®æ”¹(æ–‡ä»¶åç§°)
+		// 4.å¯¹å½“å‰å­æ–‡ä»¶(åŒ…æ‹¬å­ç›®å½• å­æ–‡ä»¶ --ä¸åŒ…å«å­™ç›®å½• å­™æ–‡ä»¶) // 5. ä»shell ä¸­è·å–åˆ°çš„è·¯å¾„ å»å¯¹æŸä¸€ä¸ªæ–‡ä»¶è¿›è¡Œæ“ä½œ
 		String firstInputIndexStr;
 		int operation_type;
-		String file_type; // * ±êÊ¶ËùÓĞµÄÎÄ¼şÀàĞÍ ÒÔ¼°µ±Ç°²Ù×÷ÀàĞÍÎÄ¼ş »òÕß µ¥¶ÀµÄÎÄ¼ş¹ıÂËÀàĞÍ
+		String file_type; // * æ ‡è¯†æ‰€æœ‰çš„æ–‡ä»¶ç±»å‹ ä»¥åŠå½“å‰æ“ä½œç±»å‹æ–‡ä»¶ æˆ–è€… å•ç‹¬çš„æ–‡ä»¶è¿‡æ»¤ç±»å‹
 		String identify;
-		int rule_index; // (type,index) ×é³ÉÁË×î»ù´¡µÄÎ¨Ò»¼ü
-		ArrayList<String> curFilterFileTypeList; // µ±Ç°µÄÎÄ¼ş¹ıÂËÀàĞÍ ¶àÖÖÎÄ¼ş¹ıÂËÀàĞÍ ÀıÈç°Ñ ¶àÖÖ¸ñÊ½ jpeg png ×ªÎª jpg Ê± Ê¹ÓÃµ½
-		ArrayList<File> curFixedFileList; // µ±Ç°ĞŞ¸Ä²Ù×÷³É¹¦µÄ¼¯ºÏ
+		int rule_index; // (type,index) ç»„æˆäº†æœ€åŸºç¡€çš„å”¯ä¸€é”®
+		ArrayList<String> curFilterFileTypeList; // å½“å‰çš„æ–‡ä»¶è¿‡æ»¤ç±»å‹ å¤šç§æ–‡ä»¶è¿‡æ»¤ç±»å‹ ä¾‹å¦‚æŠŠ å¤šç§æ ¼å¼ jpeg png è½¬ä¸º jpg æ—¶ ä½¿ç”¨åˆ°
+		ArrayList<File> curFixedFileList; // å½“å‰ä¿®æ”¹æ“ä½œæˆåŠŸçš„é›†åˆ
 
 		abstract String applyStringOperationRule1(String origin);
 
@@ -4584,14 +4584,14 @@ public class G2_ApplyRuleFor_TypeFile {
 		abstract ArrayList<File> applyDir_SubFileListRule5(ArrayList<File> allSubDirFileList,
 				ArrayList<File> allSubRealFileList);
 
-		abstract boolean initParams4InputParam(String inputParam); // ³õÊ¼»¯RuleµÄ²ÎÊı ÒÀ¾İÊäÈëµÄ×Ö·û´®
+		abstract boolean initParams4InputParam(String inputParam); // åˆå§‹åŒ–Ruleçš„å‚æ•° ä¾æ®è¾“å…¥çš„å­—ç¬¦ä¸²
 
 		abstract boolean initParamsWithInputList(ArrayList<String> inputParamList);
 
-		abstract String ruleTip(String type, int index, String batName, OS_TYPE curType); // Ê¹ÓÃËµÃ÷ÁĞ±í Èç¹û¸²¸Ç ÄÇÃ´¾Í²»Ê¹ÓÃÄ¬ÈÏµÄËµÃ÷ ,
-																							// Ä¬ÈÏ¾ÍÒ»ÖÖÇé¿ö
+		abstract String ruleTip(String type, int index, String batName, OS_TYPE curType); // ä½¿ç”¨è¯´æ˜åˆ—è¡¨ å¦‚æœè¦†ç›– é‚£ä¹ˆå°±ä¸ä½¿ç”¨é»˜è®¤çš„è¯´æ˜ ,
+																							// é»˜è®¤å°±ä¸€ç§æƒ…å†µ
 
-		abstract String simpleDesc(); // Ê¹ÓÃµÄ¼òµ¥ÃèÊö ÖĞÎÄµÄ¸Ã ruleµÄÊ¹ÓÃÇé¿ö Ä¬ÈÏ»áÔÚ ruleTip ±»µ÷ÓÃ
+		abstract String simpleDesc(); // ä½¿ç”¨çš„ç®€å•æè¿° ä¸­æ–‡çš„è¯¥ ruleçš„ä½¿ç”¨æƒ…å†µ é»˜è®¤ä¼šåœ¨ ruleTip è¢«è°ƒç”¨
 
 	}
 
@@ -4619,9 +4619,9 @@ public class G2_ApplyRuleFor_TypeFile {
 	public static String ReadFileContent(File mFilePath) {
 
 		if (mFilePath != null && mFilePath.exists()) {
-			// System.out.println("´æÔÚ µ±Ç°ÎÄ¼ş "+ mFilePath.getAbsolutePath());
+			// System.out.println("å­˜åœ¨ å½“å‰æ–‡ä»¶ "+ mFilePath.getAbsolutePath());
 		} else {
-			System.out.println("²»´æÔÚ µ±Ç°ÎÄ¼ş " + mFilePath.getAbsolutePath());
+			System.out.println("ä¸å­˜åœ¨ å½“å‰æ–‡ä»¶ " + mFilePath.getAbsolutePath());
 
 			return null;
 		}
@@ -4639,7 +4639,7 @@ public class G2_ApplyRuleFor_TypeFile {
 				}
 
 				sb.append(oldOneLine + "\n");
-//                    System.out.println("µÚ"+index+"ĞĞ¶ÁÈ¡µ½µÄ×Ö·û´®:"+oldOneLine);
+//                    System.out.println("ç¬¬"+index+"è¡Œè¯»å–åˆ°çš„å­—ç¬¦ä¸²:"+oldOneLine);
 				index++;
 
 			}
@@ -4741,41 +4741,41 @@ public class G2_ApplyRuleFor_TypeFile {
 					encryptBufferedOutputStream.write(TEMP_Rule7, 0, general_position);
 					encryptBufferedOutputStream.flush();
 				}
-				// ¹Ø±ÕÁ÷
+				// å…³é—­æµ
 				generalBufferedInputStream.close();
 				encryptBufferedOutputStream.close();
 				return;
 
 			}
 
-			// System.out.println("Ô­Ê¼ÎÄ¼ş×Ö½Ú´óĞ¡: " + generalBufferedInputStream.available());
-			while (general_offset < BYTE_CONTENT_LENGTH_Rule7) { // ¶ÁÈ¡Ô­Ê¼ÎÄ¼şµÄÍ· BYTE_CONTENT_LENGTH ¸ö×Ö½ÚÊı½øĞĞ¼ÓÃÜ
+			// System.out.println("åŸå§‹æ–‡ä»¶å­—èŠ‚å¤§å°: " + generalBufferedInputStream.available());
+			while (general_offset < BYTE_CONTENT_LENGTH_Rule7) { // è¯»å–åŸå§‹æ–‡ä»¶çš„å¤´ BYTE_CONTENT_LENGTH ä¸ªå­—èŠ‚æ•°è¿›è¡ŒåŠ å¯†
 				general_position = generalBufferedInputStream.read(TEMP_Rule7, general_offset,
 						TEMP_Rule7.length - general_offset);
 				if (general_position == -1) {
 					break;
 				}
 				general_offset += general_position;
-				// byteTo16(TEMP, general_position); // ¿ÉÒÔ²é¿´ Ö¸¶¨ Ç° general_position ¸öÔÚ
-				// TEMPÊı×éÖĞµÄ×Ö½ÚÊı¾İ Ì«¶à ×¢ÊÍµô
+				// byteTo16(TEMP, general_position); // å¯ä»¥æŸ¥çœ‹ æŒ‡å®š å‰ general_position ä¸ªåœ¨
+				// TEMPæ•°ç»„ä¸­çš„å­—èŠ‚æ•°æ® å¤ªå¤š æ³¨é‡Šæ‰
 			}
 
-			// ¶Ô¶ÁÈ¡µ½µÄTEMP×Ö½ÚÊı×é BYTE_CONTENT_LENGTH ¸ö×Ö½Ú½øĞĞ ECBÄ£Ê½¼ÓÃÜ Ã÷ÎÄ´óĞ¡ÓëÃÜÎÄ´óĞ¡Ò»ÖÂ
+			// å¯¹è¯»å–åˆ°çš„TEMPå­—èŠ‚æ•°ç»„ BYTE_CONTENT_LENGTH ä¸ªå­—èŠ‚è¿›è¡Œ ECBæ¨¡å¼åŠ å¯† æ˜æ–‡å¤§å°ä¸å¯†æ–‡å¤§å°ä¸€è‡´
 
 			byte[] encrypt_bytes = encrypt(TEMP_Rule7);
 
-			System.out.println("¼ÓÃÜÔ­Ê¼ÎÄ¼ş:" + generalFile.getName() + "  ¼ÓÃÜÇ°Ã÷ÎÄ´óĞ¡:" + TEMP_Rule7.length + "   ¼ÓÃÜºóÃÜÎÄ´óĞ¡:"
+			System.out.println("åŠ å¯†åŸå§‹æ–‡ä»¶:" + generalFile.getName() + "  åŠ å¯†å‰æ˜æ–‡å¤§å°:" + TEMP_Rule7.length + "   åŠ å¯†åå¯†æ–‡å¤§å°:"
 					+ encrypt_bytes.length);
 
-			// ¼ÓÃÜºóµÄÃÜÎÄ Ìî³ä encryptFileÎÄ¼şµÄÍ·Ê×²¿
+			// åŠ å¯†åçš„å¯†æ–‡ å¡«å…… encryptFileæ–‡ä»¶çš„å¤´é¦–éƒ¨
 			encryptBufferedOutputStream.write(encrypt_bytes, 0, encrypt_bytes.length);
 			encryptBufferedOutputStream.flush();
-			// ´ÓÕı³£µÄ generalÎÄ¼ş ¶ÁÈ¡ BYTE_CONTENT_LENGTH ×Ö½ÚÊıÖ®ºóµÄËùÓĞ×Ö½ÚĞ´Èëµ½ ¼ÓÃÜFile(HeadÒÑ¾­¼ÓÃÜ)ÎÄ¼şÖĞÈ¥
+			// ä»æ­£å¸¸çš„ generalæ–‡ä»¶ è¯»å– BYTE_CONTENT_LENGTH å­—èŠ‚æ•°ä¹‹åçš„æ‰€æœ‰å­—èŠ‚å†™å…¥åˆ° åŠ å¯†File(Headå·²ç»åŠ å¯†)æ–‡ä»¶ä¸­å»
 			while ((general_position = generalBufferedInputStream.read(TEMP_Rule7, 0, TEMP_Rule7.length)) != -1) {
 				encryptBufferedOutputStream.write(TEMP_Rule7, 0, general_position);
 				encryptBufferedOutputStream.flush();
 			}
-			// ¹Ø±ÕÁ÷
+			// å…³é—­æµ
 			generalBufferedInputStream.close();
 			encryptBufferedOutputStream.close();
 
@@ -4803,21 +4803,21 @@ public class G2_ApplyRuleFor_TypeFile {
 	}
 
 	private static Key getKey(byte[] arrBTmp) throws Exception {
-		byte[] arrB = new byte[8]; // ÈÏÄ¬Îª0
+		byte[] arrB = new byte[8]; // è®¤é»˜ä¸º0
 		for (int i = 0; i < arrBTmp.length && i < arrB.length; ++i) {
 			arrB[i] = arrBTmp[i];
 		}
-		// Éú³ÉÃÜ³×
+		// ç”Ÿæˆå¯†åŒ™
 		Key key = new javax.crypto.spec.SecretKeySpec(arrB, "DES");
 		return key;
 	}
 
-	// ¼ÓÃÜ×Ö½ÚÊı×é
+	// åŠ å¯†å­—èŠ‚æ•°ç»„
 	public static byte[] encrypt(byte[] arrB) throws Exception {
 		return encryptCipher.doFinal(arrB);
 	}
 
-	// ÃÜ½â×Ö½ÚÊı×é
+	// å¯†è§£å­—èŠ‚æ•°ç»„
 	public static byte[] decrypt(byte[] arrB) throws Exception {
 		return decryptCipher.doFinal(arrB);
 	}
@@ -4850,7 +4850,7 @@ public class G2_ApplyRuleFor_TypeFile {
 
 					for (int i = 0; i < typeList.size(); i++) {
 						String type = typeList.get(i);
-						if ("#".equals(type)) { // Èç¹û ÀàĞÍÊÇ * ÄÇÃ´¾Í°Ñ ËùÓĞµÄ ·ÇÄ¿Â¼ÎÄ¼ş¼ÓÈëÁĞ±íÖĞ
+						if ("#".equals(type)) { // å¦‚æœ ç±»å‹æ˜¯ * é‚£ä¹ˆå°±æŠŠ æ‰€æœ‰çš„ éç›®å½•æ–‡ä»¶åŠ å…¥åˆ—è¡¨ä¸­
 							File curFile = new File(fileString);
 							if (!curFile.isDirectory()) {
 								allFile.add(curFile);
@@ -4911,7 +4911,7 @@ public class G2_ApplyRuleFor_TypeFile {
 
 	}
 
-	// ¶ÁÈ¡¼ÓÃÜÎÄ¼ş ¶Ô¼ÓÃÜ²¿·Ö½øĞĞ½âÃÜ È»ºóÉú³É½âÃÜÖ®ºóµÄÎÄ¼ş decryptFile
+	// è¯»å–åŠ å¯†æ–‡ä»¶ å¯¹åŠ å¯†éƒ¨åˆ†è¿›è¡Œè§£å¯† ç„¶åç”Ÿæˆè§£å¯†ä¹‹åçš„æ–‡ä»¶ decryptFile
 	public static void createDecryFile(File encryptFile, File decryptFile) {
 
 		FileOutputStream decryptileOutputStream = null;
@@ -4932,7 +4932,7 @@ public class G2_ApplyRuleFor_TypeFile {
 
 			int encrypt_offset = 0;
 			int encrypt_position = 0;
-			while (encrypt_offset < BYTE_CONTENT_LENGTH_Rule7) { // ¶ÁÈ¡µ½¼ÓÃÜÎÄ¼şµÄ ¼ÓÃÜ×Ö½Ú²¿·Ö ´óĞ¡Îª BYTE_CONTENT_LENGTH
+			while (encrypt_offset < BYTE_CONTENT_LENGTH_Rule7) { // è¯»å–åˆ°åŠ å¯†æ–‡ä»¶çš„ åŠ å¯†å­—èŠ‚éƒ¨åˆ† å¤§å°ä¸º BYTE_CONTENT_LENGTH
 				encrypt_position = encryptBufferedInputStream.read(TEMP_Rule7, encrypt_offset,
 						TEMP_Rule7.length - encrypt_offset);
 
@@ -4940,19 +4940,19 @@ public class G2_ApplyRuleFor_TypeFile {
 					break;
 				}
 				encrypt_offset += encrypt_position;
-				// byteTo16(TEMP, general_position); // ¿ÉÒÔ²é¿´ Ö¸¶¨ Ç° general_position ¸öÔÚ
-				// TEMPÊı×éÖĞµÄ×Ö½ÚÊı¾İ Ì«¶à ×¢ÊÍµô
+				// byteTo16(TEMP, general_position); // å¯ä»¥æŸ¥çœ‹ æŒ‡å®š å‰ general_position ä¸ªåœ¨
+				// TEMPæ•°ç»„ä¸­çš„å­—èŠ‚æ•°æ® å¤ªå¤š æ³¨é‡Šæ‰
 			}
 
-			byte[] decrypt_bytes = decrypt(TEMP_Rule7); // ¶Ô¼ÓÃÜÎÄ¼şµÄ¼ÓÃÜ×Ö½Ú½øĞĞ½âÃÜ
-			System.out.println("½âÃÜÎÄ¼ş:" + decryptFile.getName() + "  ÃÜÎÄ¼ÓÃÜ×Ö½Ú´óĞ¡:" + TEMP_Rule7.length + "   ½âÃÜÃÜÎÄÖ®ºóµÄÃ÷ÎÄ´óĞ¡:"
+			byte[] decrypt_bytes = decrypt(TEMP_Rule7); // å¯¹åŠ å¯†æ–‡ä»¶çš„åŠ å¯†å­—èŠ‚è¿›è¡Œè§£å¯†
+			System.out.println("è§£å¯†æ–‡ä»¶:" + decryptFile.getName() + "  å¯†æ–‡åŠ å¯†å­—èŠ‚å¤§å°:" + TEMP_Rule7.length + "   è§£å¯†å¯†æ–‡ä¹‹åçš„æ˜æ–‡å¤§å°:"
 					+ decrypt_bytes.length);
 
 			decryptBufferedOutputStream.write(decrypt_bytes);
 			decryptBufferedOutputStream.flush();
 
-			// ¶ÁÈ¡ encryptFile¼ÓÃÜÎÄ¼şÖĞÕı³£µÄ×Ö½Ú BYTE_CONTENT_LENGTH ×Ö½ÚÊıÖ®ºóµÄËùÓĞ×Ö½ÚĞ´Èëµ½
-			// ½âÃÜFile(HeadÒÑ¾­½âÃÜ)ÎÄ¼şÖĞÈ¥
+			// è¯»å– encryptFileåŠ å¯†æ–‡ä»¶ä¸­æ­£å¸¸çš„å­—èŠ‚ BYTE_CONTENT_LENGTH å­—èŠ‚æ•°ä¹‹åçš„æ‰€æœ‰å­—èŠ‚å†™å…¥åˆ°
+			// è§£å¯†File(Headå·²ç»è§£å¯†)æ–‡ä»¶ä¸­å»
 			while ((encrypt_offset = encryptBufferedInputStream.read(TEMP_Rule7, 0, TEMP_Rule7.length)) != -1) {
 				decryptBufferedOutputStream.write(TEMP_Rule7, 0, encrypt_offset);
 				decryptBufferedOutputStream.flush();
@@ -4968,11 +4968,11 @@ public class G2_ApplyRuleFor_TypeFile {
 	}
 
 	static void showTip() {
-		System.out.println("¶ÔTypeÎÄ¼şÄÚÈİ ½øĞĞ Index ¹æÔòµÄ´¦Àí  identy=¡¾ Type_Index ¡¿¡¾ ÎÄ¼şºó×º_µ±Ç°²Ù×÷Âß¼­Ë÷Òı¡¿\n");
-		System.out.println("µ±Ç°ÒÑÊµÏÖµÄÌæ»»Âß¼­ÈçÏÂ:\n");
+		System.out.println("å¯¹Typeæ–‡ä»¶å†…å®¹ è¿›è¡Œ Index è§„åˆ™çš„å¤„ç†  identy=ã€ Type_Index ã€‘ã€ æ–‡ä»¶åç¼€_å½“å‰æ“ä½œé€»è¾‘ç´¢å¼•ã€‘\n");
+		System.out.println("å½“å‰å·²å®ç°çš„æ›¿æ¢é€»è¾‘å¦‚ä¸‹:\n");
 
 		int count = 1;
-		System.out.println("¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T" + "Ê¹ÓÃ·½·¨ÁĞ±í Begin" + "¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T" + "\n");
+		System.out.println("â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•" + "ä½¿ç”¨æ–¹æ³•åˆ—è¡¨ Begin" + "â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•" + "\n");
 		for (int i = 0; i < realTypeRuleList.size(); i++) {
 			Rule itemRule = realTypeRuleList.get(i);
 			String type = itemRule.file_type;
@@ -4981,14 +4981,14 @@ public class G2_ApplyRuleFor_TypeFile {
 
 			/*
 			 * String itemDesc = ""; if(curOS_TYPE == OS_TYPE.Windows){ itemDesc =
-			 * "zrule_apply_G2.bat  "+type+"_"+index + "    [Ë÷Òı "+count+"]  ÃèÊö:"+desc;
+			 * "zrule_apply_G2.bat  "+type+"_"+index + "    [ç´¢å¼• "+count+"]  æè¿°:"+desc;
 			 * }else{ itemDesc = "zrule_apply_G2 "+type+"_"+index +
-			 * "    [Ë÷Òı "+count+"]  ÃèÊö:"+desc; }
+			 * "    [ç´¢å¼• "+count+"]  æè¿°:"+desc; }
 			 */
 			System.out.println(desc + "\n");
 			count++;
 		}
-		System.out.println("¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T" + "Ê¹ÓÃ·½·¨ÁĞ±í End " + "¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T" + "\n");
+		System.out.println("â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•" + "ä½¿ç”¨æ–¹æ³•åˆ—è¡¨ End " + "â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•" + "\n");
 
 	}
 
@@ -5009,7 +5009,7 @@ public class G2_ApplyRuleFor_TypeFile {
 			String index = paramsArr[1];
 
 //          initParams4InputParam
-			if (!isNumeric(index)) { // µÚ¶ş¸ö²ÎÊı²»ÊÇ Êı×Ö ÄÇÃ´ ÊäÈë¸ñÊ½´íÎó
+			if (!isNumeric(index)) { // ç¬¬äºŒä¸ªå‚æ•°ä¸æ˜¯ æ•°å­— é‚£ä¹ˆ è¾“å…¥æ ¼å¼é”™è¯¯
 				return false;
 			}
 			Rule matchRule = getRuleByIndex(Integer.parseInt(index));
@@ -5054,20 +5054,20 @@ public class G2_ApplyRuleFor_TypeFile {
 		}
 
 		if (!checkInputParamsOK()) {
-			System.out.println("µ±Ç°ÓÃ»§ÊäÈëµÄ¸ñÊ½´íÎó   input=¡¾ÀàĞÍ_Ë÷Òı¡¿  ÀıÈç    html_1   html_2    html_3  ");
+			System.out.println("å½“å‰ç”¨æˆ·è¾“å…¥çš„æ ¼å¼é”™è¯¯   input=ã€ç±»å‹_ç´¢å¼•ã€‘  ä¾‹å¦‚    html_1   html_2    html_3  ");
 			return;
 		}
 
 		if (curDirFile == null || !mCurDirFile.exists() || !mCurDirFile.isDirectory()) {
-			System.out.println("µ±Ç°Ö´ĞĞÌæ»»Âß¼­µÄÎÄ¼şÂ·¾¶:" + curDirPath + "  ²»´æÔÚ! ");
+			System.out.println("å½“å‰æ‰§è¡Œæ›¿æ¢é€»è¾‘çš„æ–‡ä»¶è·¯å¾„:" + curDirPath + "  ä¸å­˜åœ¨! ");
 			return;
 		}
 
-		// Í¨¹ı shellÖĞÊäÈë²ÎÊıÀ´½øĞĞ²Ù×÷
-		// Rule_Identify_TypeIndexList.add("html_1"); // 1.Ìí¼Ó´¦ÀíµÄÀàĞÍÎÄ¼ş ÀàĞÍ_¸ÃÀàĞÍµÄ´¦ÀíÂß¼­Ë÷Òı
-		// Ë÷Òı´Ó1¿ªÊ¼
+		// é€šè¿‡ shellä¸­è¾“å…¥å‚æ•°æ¥è¿›è¡Œæ“ä½œ
+		// Rule_Identify_TypeIndexList.add("html_1"); // 1.æ·»åŠ å¤„ç†çš„ç±»å‹æ–‡ä»¶ ç±»å‹_è¯¥ç±»å‹çš„å¤„ç†é€»è¾‘ç´¢å¼•
+		// ç´¢å¼•ä»1å¼€å§‹
 
-		for (int i = 0; i < Rule_Identify_TypeIndexList.size(); i++) { // ÒÀ¾İÎÄ¼şÀàĞÍ È¥ÕÒµ½ÎÄ¼ş
+		for (int i = 0; i < Rule_Identify_TypeIndexList.size(); i++) { // ä¾æ®æ–‡ä»¶ç±»å‹ å»æ‰¾åˆ°æ–‡ä»¶
 			// html_1
 			String applyRuleString = Rule_Identify_TypeIndexList.get(i);
 			String paramsArr[] = applyRuleString.split("_");
@@ -5086,8 +5086,8 @@ public class G2_ApplyRuleFor_TypeFile {
 				CurSelectedRule = curApplayRule;
 			}
 			if (curApplayRule == null && CurSelectedRule == null) {
-				System.out.println("ÎŞ·¨Æ¥Åäµ½ ¶ÔÓ¦µÄ index=" + ruleIndex + "  ¶ÔÓ¦µÄ¹æÔò Rule !   ¿ÉÄÜĞèÒª´úÂëÌí¼Ó¡£");
-				continue; // ¼ÌĞøÏÂÒ»¸öÑ­»·
+				System.out.println("æ— æ³•åŒ¹é…åˆ° å¯¹åº”çš„ index=" + ruleIndex + "  å¯¹åº”çš„è§„åˆ™ Rule !   å¯èƒ½éœ€è¦ä»£ç æ·»åŠ ã€‚");
+				continue; // ç»§ç»­ä¸‹ä¸€ä¸ªå¾ªç¯
 			}
 			if (curApplayRule == null && CurSelectedRule != null) {
 				return;
@@ -5098,21 +5098,21 @@ public class G2_ApplyRuleFor_TypeFile {
 
 			ArrayList<File> typeFileList = new ArrayList<File>();
 
-			if (curApplayRule.operation_type == 4) { // ¶ÔÓÚ ÀàĞÍÊÇ 4 µÄ²Ù×÷ Ö»»ñÈ¡µ±Ç° shell ÏÂµÄÎÄ¼ş
+			if (curApplayRule.operation_type == 4) { // å¯¹äº ç±»å‹æ˜¯ 4 çš„æ“ä½œ åªè·å–å½“å‰ shell ä¸‹çš„æ–‡ä»¶
 				typeFileList.addAll(Arrays.asList(mCurDirFile.listFiles()));
-				System.out.println("operation_type == 4 ×ÓÄ¿Â¼´óĞ¡: " + typeFileList.size());
+				System.out.println("operation_type == 4 å­ç›®å½•å¤§å°: " + typeFileList.size());
 			} else {
 				typeFileList = getAllSubFile(mCurDirFile, null, curApplayRule.curFilterFileTypeList);
 			}
 
 			if (typeFileList.size() == 0) {
-				System.out.println("Î´ÄÜËÑË÷µ½ÀàĞÍÁĞ±íÆ¥ÅäµÄÎÄ¼ş:  " + Rule_Identify_TypeIndexList.get(i));
+				System.out.println("æœªèƒ½æœç´¢åˆ°ç±»å‹åˆ—è¡¨åŒ¹é…çš„æ–‡ä»¶:  " + Rule_Identify_TypeIndexList.get(i));
 				continue;
 			}
 			initFileTypeMap(typeFileList);
 
-			if (curApplayRule.operation_type == 4) { // Ö»¶Ô µ±Ç°µÄ ×Ó ÎÄ¼ş(Ä¿Â¼ ÎÄ¼ş)²Ù×÷
-				// ¶Ôµ±Ç°ÎÄ¼ş½øĞĞÕûÀí
+			if (curApplayRule.operation_type == 4) { // åªå¯¹ å½“å‰çš„ å­ æ–‡ä»¶(ç›®å½• æ–‡ä»¶)æ“ä½œ
+				// å¯¹å½“å‰æ–‡ä»¶è¿›è¡Œæ•´ç†
 				ArrayList<File> subDirList = new ArrayList<File>();
 				ArrayList<File> realFileList = new ArrayList<File>();
 
@@ -5143,25 +5143,25 @@ public class G2_ApplyRuleFor_TypeFile {
 				ArrayList<File> resultFileList = curApplayRule.applySubFileListRule4(typeFileList, CurDirFileTypeMap,
 						subDirList, realFileList);
 				if (resultFileList != typeFileList) {
-					System.out.println("Ó¦ÓÃ¹æÔò:  " + applyRuleString + " ³É¹¦!");
+					System.out.println("åº”ç”¨è§„åˆ™:  " + applyRuleString + " æˆåŠŸ!");
 				} else {
-					System.out.println("Ó¦ÓÃ¹æÔò:  " + applyRuleString + " Ê§°Ü!");
+					System.out.println("åº”ç”¨è§„åˆ™:  " + applyRuleString + " å¤±è´¥!");
 				}
 
-			} else if (curApplayRule.operation_type == 3) { // ¶ÔËùÓĞÎÄ¼ş½øĞĞµÄ Í³Ò»´¦ÀíµÄ ÀàĞÍ
+			} else if (curApplayRule.operation_type == 3) { // å¯¹æ‰€æœ‰æ–‡ä»¶è¿›è¡Œçš„ ç»Ÿä¸€å¤„ç†çš„ ç±»å‹
 
 				ArrayList<File> resultFileList = curApplayRule.applyFileListRule3(typeFileList, CurDirFileTypeMap);
 				if (resultFileList != typeFileList) {
 
-					System.out.println("Ó¦ÓÃ¹æÔò:  " + applyRuleString + " ³É¹¦!");
+					System.out.println("åº”ç”¨è§„åˆ™:  " + applyRuleString + " æˆåŠŸ!");
 				} else {
-					System.out.println("Ó¦ÓÃ¹æÔò:  " + applyRuleString + " Ê§°Ü!");
+					System.out.println("åº”ç”¨è§„åˆ™:  " + applyRuleString + " å¤±è´¥!");
 				}
 
-			} else if (curApplayRule.operation_type == 5) { // ¶ÔËùÓĞÎÄ¼ş¼Ğ ËùÓĞ×ÓÎÄ¼ş ËïÎÄ¼ş ËùÓĞ ×ÓÎÄ¼ş¼Ğ ËïÎÄ¼ş¼Ğ
+			} else if (curApplayRule.operation_type == 5) { // å¯¹æ‰€æœ‰æ–‡ä»¶å¤¹ æ‰€æœ‰å­æ–‡ä»¶ å­™æ–‡ä»¶ æ‰€æœ‰ å­æ–‡ä»¶å¤¹ å­™æ–‡ä»¶å¤¹
 
-				ArrayList<File> curAllDirFile = getAllSubDirFile(curDirFile); // »ñÈ¡ËùÓĞµÄ ÎÄ¼ş¼ĞÁĞ±í °üº¬ Ëï×Ó ×ÓÎÄ¼ş¼Ğ
-				ArrayList<File> curAllRealFile = getAllSubFile(curDirFile); // »ñÈ¡ËùÓĞµÄ ÎÄ¼ş ÁĞ±í °üº¬ Ëï×Ó ×ÓÎÄ¼ş
+				ArrayList<File> curAllDirFile = getAllSubDirFile(curDirFile); // è·å–æ‰€æœ‰çš„ æ–‡ä»¶å¤¹åˆ—è¡¨ åŒ…å« å­™å­ å­æ–‡ä»¶å¤¹
+				ArrayList<File> curAllRealFile = getAllSubFile(curDirFile); // è·å–æ‰€æœ‰çš„ æ–‡ä»¶ åˆ—è¡¨ åŒ…å« å­™å­ å­æ–‡ä»¶
 				// FileChannel
 //  zukgit operation_type == 5
 				System.out.println(" curDirFile = " + curDirFile.toString());
@@ -5173,17 +5173,17 @@ public class G2_ApplyRuleFor_TypeFile {
 				for (int j = 0; j < typeFileList.size(); j++) {
 					File itemFile = typeFileList.get(j);
 					String fileCOntent = ReadFileContent(itemFile).trim();
-					// 2.applyOperationRule Ìí¼Ó´¦Àí¹æÔò
+					// 2.applyOperationRule æ·»åŠ å¤„ç†è§„åˆ™
 
 					String resultStr = OriApplyOperationRule(curType, curApplyRule, fileCOntent).trim();
 
-					int currentOperationType = 1; // Ä¬ÈÏ²Ù×÷ÀàĞÍÊÇ ¶ÁÈ¡×Ö·û´®µÄÄÚÈİ ½øĞĞ´¦Àí
+					int currentOperationType = 1; // é»˜è®¤æ“ä½œç±»å‹æ˜¯ è¯»å–å­—ç¬¦ä¸²çš„å†…å®¹ è¿›è¡Œå¤„ç†
 
 					String identy = curType.trim() + curApplyRule.trim();
 //                Rule applayRule2Identify = getRuleByIdentify(identy);
 
 					Rule applayRule4Index = getRuleByIndex(ruleIndex);
-//                Èç¹û¶ÔÓ¦ÏàÍ¬µÄ indexµÄ Rule #_2    ³öÏÖÁË    MP3_2 µÄÇé¿ö  ÄÇÃ´¾ÍĞèÒª°Ñµ±Ç°µÄ ËùÓĞµÄ*µÄÎÄ¼ş ¹ıÂËÎª mp3µÄÎÄ¼ş
+//                å¦‚æœå¯¹åº”ç›¸åŒçš„ indexçš„ Rule #_2    å‡ºç°äº†    MP3_2 çš„æƒ…å†µ  é‚£ä¹ˆå°±éœ€è¦æŠŠå½“å‰çš„ æ‰€æœ‰çš„*çš„æ–‡ä»¶ è¿‡æ»¤ä¸º mp3çš„æ–‡ä»¶
 //                if("#".equals(applayRule2Identify.file_type) && !curType.equals(applayRule2Identify.file_type)){
 //
 //                }
@@ -5191,19 +5191,19 @@ public class G2_ApplyRuleFor_TypeFile {
 					if (applayRule4Index != null) {
 						currentOperationType = applayRule4Index.operation_type;
 					} else {
-						System.out.println("ÎŞ·¨Æ¥Åäµ½ ¶ÔÓ¦µÄ identy=" + identy + "  ¶ÔÓ¦µÄ¹æÔò Rule !   ¿ÉÄÜĞèÒª´úÂëÌí¼Ó¡£");
+						System.out.println("æ— æ³•åŒ¹é…åˆ° å¯¹åº”çš„ identy=" + identy + "  å¯¹åº”çš„è§„åˆ™ Rule !   å¯èƒ½éœ€è¦ä»£ç æ·»åŠ ã€‚");
 						return;
 					}
 
-					if (currentOperationType == 1) { // ¶Ô×Ö·û´®½øĞĞÂß¼­´¦ÀíµÄÀàĞÍ
+					if (currentOperationType == 1) { // å¯¹å­—ç¬¦ä¸²è¿›è¡Œé€»è¾‘å¤„ç†çš„ç±»å‹
 
 						if (!fileCOntent.equals(resultStr)) {
 							writeContentToFile(itemFile, resultStr);
-							System.out.println("itemFile[" + j + "] ·ûºÏ¹æÔò(String-Content) Ó¦ÓÃRule³É¹¦ " + applyRuleString
+							System.out.println("itemFile[" + j + "] ç¬¦åˆè§„åˆ™(String-Content) åº”ç”¨RuleæˆåŠŸ " + applyRuleString
 									+ "  = " + itemFile.getAbsolutePath());
 						} else {
 							System.out.println(
-									"itemFile[" + j + "] ²»·ûºÏ¹æÔò(String-Content) = " + itemFile.getAbsolutePath());
+									"itemFile[" + j + "] ä¸ç¬¦åˆè§„åˆ™(String-Content) = " + itemFile.getAbsolutePath());
 						}
 
 					} else if (currentOperationType == 2) {
@@ -5211,10 +5211,10 @@ public class G2_ApplyRuleFor_TypeFile {
 						File resultFile = applayRule4Index.applyFileByteOperationRule2(itemFile);
 
 						if (resultFile != itemFile) {
-							System.out.println("itemFile[" + j + "] ·ûºÏ¹æÔò(File) Ó¦ÓÃRule³É¹¦ " + applyRuleString + "  = "
+							System.out.println("itemFile[" + j + "] ç¬¦åˆè§„åˆ™(File) åº”ç”¨RuleæˆåŠŸ " + applyRuleString + "  = "
 									+ itemFile.getAbsolutePath());
 						} else {
-							System.out.println("itemFile[" + j + "] ²»·ûºÏ¹æÔò(File) = " + itemFile.getAbsolutePath());
+							System.out.println("itemFile[" + j + "] ä¸ç¬¦åˆè§„åˆ™(File) = " + itemFile.getAbsolutePath());
 						}
 
 					}
@@ -5263,7 +5263,7 @@ public class G2_ApplyRuleFor_TypeFile {
 			String fileName = curFile.getName();
 
 			if (!fileName.contains(".")) {
-				String type = ""; // unknow Ã»ÓĞºó×ºÃûµÄÎÄ¼ş
+				String type = ""; // unknow æ²¡æœ‰åç¼€åçš„æ–‡ä»¶
 				if (realFileListMap.containsKey(type)) {
 					ArrayList<File> fileList = realFileListMap.get(type);
 					fileList.add(curFile);
@@ -5293,13 +5293,13 @@ public class G2_ApplyRuleFor_TypeFile {
 		String identy = mType.trim() + index.trim();
 		Rule applayRule = getRuleByIdentify(identy);
 		if (applayRule == null) {
-			System.out.println("Ã»ÓĞ²éÑ¯µ½ identy =" + identy + "¶ÔÓ¦µÄ´¦Àí¹æÔò");
+			System.out.println("æ²¡æœ‰æŸ¥è¯¢åˆ° identy =" + identy + "å¯¹åº”çš„å¤„ç†è§„åˆ™");
 			return mOriContent;
 		}
 		return applayRule.applyStringOperationRule1(mOriContent);
 	}
 
-	static ArrayList<Rule> realTypeRuleList = new ArrayList<Rule>(); // ¹æÔòµÄ¼¯ºÏ
+	static ArrayList<Rule> realTypeRuleList = new ArrayList<Rule>(); // è§„åˆ™çš„é›†åˆ
 
 	static Rule getRuleByIndex(int index) {
 		for (int i = 0; i < realTypeRuleList.size(); i++) {
@@ -5329,14 +5329,14 @@ public class G2_ApplyRuleFor_TypeFile {
 
 	static String getTimeStampLong() {
 
-		SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd_HHmmss_SSS");// ÉèÖÃÈÕÆÚ¸ñÊ½
+		SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd_HHmmss_SSS");// è®¾ç½®æ—¥æœŸæ ¼å¼
 		String date = df.format(new Date());
 		return date;
 	}
 
 	static String getTimeStamp() {
 
-		SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd_HHmmss");// ÉèÖÃÈÕÆÚ¸ñÊ½
+		SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd_HHmmss");// è®¾ç½®æ—¥æœŸæ ¼å¼
 		String date = df.format(new Date());
 		return date;
 	}
@@ -5354,18 +5354,18 @@ public class G2_ApplyRuleFor_TypeFile {
 		InputStream input = null;
 		OutputStream output = null;
 		int lengthSize;
-		// ´´½¨ÊäÈëÊä³öÁ÷¶ÔÏó
+		// åˆ›å»ºè¾“å…¥è¾“å‡ºæµå¯¹è±¡
 		try {
 			input = new FileInputStream(origin);
 			output = new FileOutputStream(target);
-			// »ñÈ¡ÎÄ¼ş³¤¶È
+			// è·å–æ–‡ä»¶é•¿åº¦
 			try {
 				lengthSize = input.available();
-				// ´´½¨»º´æÇøÓò
+				// åˆ›å»ºç¼“å­˜åŒºåŸŸ
 				byte[] buffer = new byte[lengthSize];
-				// ½«ÎÄ¼şÖĞµÄÊı¾İĞ´Èë»º´æÊı×é
+				// å°†æ–‡ä»¶ä¸­çš„æ•°æ®å†™å…¥ç¼“å­˜æ•°ç»„
 				input.read(buffer);
-				// ½«»º´æÊı×éÖĞµÄÊı¾İÊä³öµ½ÎÄ¼ş
+				// å°†ç¼“å­˜æ•°ç»„ä¸­çš„æ•°æ®è¾“å‡ºåˆ°æ–‡ä»¶
 				output.write(buffer);
 
 			} catch (IOException e) {
@@ -5378,7 +5378,7 @@ public class G2_ApplyRuleFor_TypeFile {
 		} finally {
 			if (input != null && output != null) {
 				try {
-					input.close(); // ¹Ø±ÕÁ÷
+					input.close(); // å…³é—­æµ
 					output.close();
 				} catch (IOException e) {
 					e.printStackTrace();
@@ -5388,7 +5388,7 @@ public class G2_ApplyRuleFor_TypeFile {
 	}
 
 	public static String execCMD_Windows(String command) {
-//        System.out.println("¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨TBegin ExE ");
+//        System.out.println("â•â•â•â•â•â•â•â•â•â•â•â•â•â•Begin ExE ");
 		StringBuilder sb = new StringBuilder();
 		StringBuilder errorSb = new StringBuilder();
 		try {
@@ -5414,24 +5414,24 @@ public class G2_ApplyRuleFor_TypeFile {
 			String errorStream = process.getErrorStream().toString();
 			int exitValue = process.exitValue();
 //            process.getErrorStream().
-			// É±µô½ø³Ì
+			// æ€æ‰è¿›ç¨‹
 //            System.out.println("exitValue ="+ exitValue);
 			sb.append("\nexitValue = " + exitValue + "\nisAlive = " + isAlive + "\nerrorStream = " + errorStream
 					+ "\nerrorSteamCode = " + errorSteamCode + "\nwaitFor = " + waitFor);
 //            process.destroy();
 
 		} catch (Exception e) {
-			System.out.println("execCMD ³öÏÖÒì³£! ");
+			System.out.println("execCMD å‡ºç°å¼‚å¸¸! ");
 			return e.toString();
 		}
 
 //        System.out.println("sb.toString() = "+ sb.toString());
-//        System.out.println("¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨T¨TEnd ExE ");
+//        System.out.println("â•â•â•â•â•â•â•â•â•â•â•â•â•â•End ExE ");
 		return sb.toString();
 	}
 
 	/**
-	 * Ö´ĞĞ mac(unix) ½Å±¾ÃüÁî~
+	 * æ‰§è¡Œ mac(unix) è„šæœ¬å‘½ä»¤~
 	 * 
 	 * @param command
 	 * @return
@@ -5446,7 +5446,7 @@ public class G2_ApplyRuleFor_TypeFile {
 			e.printStackTrace();
 		}
 
-		// ´ò¿ªÁ÷
+		// æ‰“å¼€æµ
 		OutputStream os = proc.getOutputStream();
 		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(os));
 
@@ -5456,10 +5456,10 @@ public class G2_ApplyRuleFor_TypeFile {
 			bw.flush();
 			bw.close();
 
-			/** ÕæÆæ¹Ö£¬°Ñ¿ØÖÆÌ¨µÄÊä³ö´òÓ¡Ò»±éÖ®ºó¾¹È»ÄÜÕı³£ÖÕÖ¹ÁË~ */
+			/** çœŸå¥‡æ€ªï¼ŒæŠŠæ§åˆ¶å°çš„è¾“å‡ºæ‰“å°ä¸€éä¹‹åç«Ÿç„¶èƒ½æ­£å¸¸ç»ˆæ­¢äº†~ */
 //            readConsole(proc);
 
-			/** waitFor() µÄ×÷ÓÃÔÚÓÚ java ³ÌĞòÊÇ·ñµÈ´ı Terminal Ö´ĞĞ½Å±¾Íê±Ï~ */
+			/** waitFor() çš„ä½œç”¨åœ¨äº java ç¨‹åºæ˜¯å¦ç­‰å¾… Terminal æ‰§è¡Œè„šæœ¬å®Œæ¯•~ */
 			proc.waitFor();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -5469,7 +5469,7 @@ public class G2_ApplyRuleFor_TypeFile {
 			System.out.println("unix script retCode = " + retCode);
 
 //            System.out.println(readConsole(proc));
-			System.out.println("UnixScriptUil.execute ³ö´íÁË!!");
+			System.out.println("UnixScriptUil.execute å‡ºé”™äº†!!");
 		}
 		return retCode + "";
 	}
