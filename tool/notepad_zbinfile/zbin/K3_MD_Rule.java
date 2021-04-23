@@ -1747,12 +1747,18 @@ public class K3_MD_Rule {
     	writeContentToFile(mdFile, newContentMD);
     	
     	}else if(hasHead && exist_separator_count !=0  && exist_separator_count != separator_count ) {
-    		 //    如果当前的  相对 路径  不正确 那么 需要 置换 
+    		 //    如果当前的  相对 路径  不正确 那么 需要 置换
+//			typora-root-url:..\..\..\
+//			typora-copy-images-to:..\..\..\public\zimage  冒号后必须有 空格 否则 解析错误
     		System.out.println("!!!!!! 当前文件 "+mdFile.getAbsolutePath()+"相对路径错误！ 将修复！！");
-    		String newHeadTag = exist_head_tag.replace(exist_separator_tag, separator_tag);
+
+    		String newHeadTag = exist_head_tag.replace(exist_separator_tag, " "+separator_tag);
     		
     		String newContentMD = mdFileContent.replace(exist_head_tag, newHeadTag);
-    		
+			System.out.println("exist_separator_tag  = " +exist_separator_tag );
+			System.out.println("separator_tag  = " +separator_tag );
+			System.out.println("exist_head_tag  = " +exist_head_tag );
+			System.out.println("newHeadTag  = " +newHeadTag );
         	writeContentToFile(mdFile, newContentMD);
     		
     	}
