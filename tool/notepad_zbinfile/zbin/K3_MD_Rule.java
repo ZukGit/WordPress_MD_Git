@@ -1665,7 +1665,18 @@ public class K3_MD_Rule {
     	String exist_head_tag = "";  //  当前  读取 到的 已经 存在的 headtag
     	int exist_separator_count = 0;
    		String exist_separator_tag = "..\\";
-   		
+
+/*		---
+		layout: post
+		title: Windows_C代码Demo
+		category: 代码
+		tags: Windows_C Windows
+		keywords:
+		typora-root-url: ..\..\..\
+		typora-copy-images-to: ..\..\..\public\zimage
+---*/
+
+   		boolean is7Blank = false;  // 在headTag中所有的冒号后都必须为空格 否则解析失败！
    		int separator_count = 1;  // 默认的  相对路径  ..\\
    		String separator_tag = "..\\";
    		
@@ -1694,7 +1705,7 @@ public class K3_MD_Rule {
    			System.out.println("realtivePathTag = "+ realtivePathTag);
    			exist_separator_tag = realtivePathTag;
    			exist_separator_count = getCharCount(realtivePathTag, File.separator);
-   		     
+			is7Blank = getCharCount(realtivePathTag, ": ") == 7?true:false;  //正常 tag 含有 7个 【: 】 冒号空格  没有的话 需要解析充值
    		}
    		
    	
@@ -1753,7 +1764,11 @@ public class K3_MD_Rule {
     		System.out.println("!!!!!! 当前文件 "+mdFile.getAbsolutePath()+"相对路径错误！ 将修复！！");
 
     		String newHeadTag = exist_head_tag.replace(exist_separator_tag, " "+separator_tag);
-    		
+    		if(getCharCount(newHeadTag, ": ") != 7){  // 如果 格式错误 那么 一并处理
+				newHeadTag = newHeadTag.replace(": ",":");  // 先把 :好 恢复一个
+				newHeadTag = newHeadTag.replace(":",": ");  // 再把 冒号 全都转为 空冒号格
+			}
+
     		String newContentMD = mdFileContent.replace(exist_head_tag, newHeadTag);
 			System.out.println("exist_separator_tag  = " +exist_separator_tag );
 			System.out.println("separator_tag  = " +separator_tag );
@@ -1761,7 +1776,13 @@ public class K3_MD_Rule {
 			System.out.println("newHeadTag  = " +newHeadTag );
         	writeContentToFile(mdFile, newContentMD);
     		
-    	}
+    	} else if(!is7Blank && hasHead ){  // 相对路径正确  但是冒号格式错误
+			System.out.println("相对路径正确  但是冒号格式错误  exist_head_tag = " +exist_head_tag );
+		String fixedTag   = exist_head_tag.replace(": ",":");  // 先把 :好 恢复一个
+			fixedTag = fixedTag.replace(":",": ");  // 再把 冒号 全都转为 空冒号格
+			String newContentMD = mdFileContent.replace(exist_head_tag, fixedTag);
+			writeContentToFile(mdFile, newContentMD);
+		}
     	
     	if(!isTimeName) {
     		String newTimeFileName = getDayStamp()+"-"+mdFile.getName();
