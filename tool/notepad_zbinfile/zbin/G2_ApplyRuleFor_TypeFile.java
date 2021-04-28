@@ -96,6 +96,8 @@ public class G2_ApplyRuleFor_TypeFile {
 		}
 	}
 
+
+    
 	enum OS_TYPE {
 		Windows, Linux, MacOS
 	}
@@ -103,7 +105,10 @@ public class G2_ApplyRuleFor_TypeFile {
 	// JDK 的路径
 	static String JDK_BIN_PATH = "";
 
-	static OS_TYPE curOS_TYPE = OS_TYPE.Windows;
+    static File G2_Temp_Text_File = new File(System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin" + File.separator + get_Bat_Sh_FlagNumber(Cur_Bat_Name)+"_Temp_Text.txt");
+
+    
+	static OS_TYPE CUR_OS_TYPE = OS_TYPE.Windows;
 	static String curOS_ExeTYPE = "";
 	static ArrayList<String> mKeyWordName = new ArrayList<>();
 
@@ -114,7 +119,7 @@ public class G2_ApplyRuleFor_TypeFile {
 		String osName = System.getProperties().getProperty("os.name").toLowerCase();
 		String curLibraryPath = System.getProperties().getProperty("java.library.path");
 		if (osName.contains("window")) {
-			curOS_TYPE = OS_TYPE.Windows;
+			CUR_OS_TYPE = OS_TYPE.Windows;
 			Cur_Bat_Name = Cur_Bat_Name + ".bat";
 			Cur_Batch_End = ".bat";
 			curOS_ExeTYPE = ".exe";
@@ -122,7 +127,7 @@ public class G2_ApplyRuleFor_TypeFile {
 			Win_Lin_Mac_ZbinPath = zbinPath + File.separator + "win_zbin";
 
 		} else if (osName.contains("linux")) {
-			curOS_TYPE = OS_TYPE.Linux;
+			CUR_OS_TYPE = OS_TYPE.Linux;
 			Cur_Bat_Name = Cur_Bat_Name + ".sh";
 			curOS_ExeTYPE = "";
 			Cur_Batch_End = ".sh";
@@ -130,7 +135,7 @@ public class G2_ApplyRuleFor_TypeFile {
 			Win_Lin_Mac_ZbinPath = zbinPath + File.separator + "lin_zbin";
 
 		} else if (osName.contains("mac")) {
-			curOS_TYPE = OS_TYPE.MacOS;
+			CUR_OS_TYPE = OS_TYPE.MacOS;
 			Cur_Bat_Name = Cur_Bat_Name + ".sh";
 			curOS_ExeTYPE = "";
 			Cur_Batch_End = ".sh";
@@ -205,11 +210,139 @@ public class G2_ApplyRuleFor_TypeFile {
 		
 		realTypeRuleList.add(new add_Middle_Dir_Rule_24()); // 在当前的目录 与 子目录 之间 新增 一层文件夹 , 文件夹名称任意 用户输入
 		
+		// 从上往下打印 年月 标示   接受来自 输入的参数  打开 临时文件
+		//  ## 2020
+		//  ### 2020.01
+		//  ### 2020.02
+		// zrule_apply_G2.bat #_25  1992_2021 这样 
+		realTypeRuleList.add(new Time_Head_Rule_25()); 
 		
 	}
 
 // 3038年 5 月 3 日
 
+	
+	// operation_type 操作类型 1--读取文件内容字符串 进行修改 2--对文件对文件内容(字节)--进行修改 3.对全体子文件进行的随性的操作
+	// 属性进行修改(文件名称)
+//     // 4.对当前子文件(包括子目录 子文件 --不包含孙目录 孙文件) 5. 从shell 中获取到的路径 去对某一个文件进行操作
+
+	
+	class Time_Head_Rule_25 extends Basic_Rule {
+		int originType;
+		int targetType;
+
+		Time_Head_Rule_25() {
+			super("#", 25, 5);
+			originType = -1;
+			targetType = -1;
+		}
+
+		@Override
+		String simpleDesc() {
+			return "\n" + Cur_Bat_Name + "  #_25  1992_2020   ##打开notepad输出当前1992年至2020年 年月历  \n" + Cur_Bat_Name
+					+ "  #_25  1990_   ##打开notepad输出当前1990年至今年"+getCurrentYear()+" 年月历 \n" 
+					+ Cur_Bat_Name + " #_25  _2010   ##打开notepad输出 1992(默认)至2010年年月历 \n ";
+		}
+		
+
+		@Override
+		boolean initParamsWithInputList(ArrayList<String> inputParamList) {
+			boolean Flag = true;
+
+			// 获取到装换的类型
+			String inputFileTypeParams = inputParamList.get(inputParamList.size() - 1);
+
+			if (!inputFileTypeParams.contains("_")) {
+				Flag = false;
+				System.out.println("无法检测到当前 第25 Rule   起始年份_截止年份   请检查后重新执行");
+			} else {
+
+				if (inputFileTypeParams.endsWith("_")) {
+					String target = "";
+					String[] parmas = inputFileTypeParams.split("_");
+					String origin = parmas[0];
+					System.out.println("item=" + inputFileTypeParams + "   origin=" + origin + "     target=" + target);
+					if(isNumeric(origin) && !"".equals(origin)) {
+						originType = Integer.parseInt(origin);
+					}
+				
+					if(isNumeric(target) && !"".equals(target)) {
+						targetType = Integer.parseInt(target);
+					}
+	           } else {
+					String[] parmas = inputFileTypeParams.split("_");
+					System.out.println(
+							"item=" + inputFileTypeParams + "   origin=" + parmas[0] + "     target=" + parmas[1]);
+					if(parmas.length >= 2) {
+
+						if(isNumeric(parmas[0]) ) {
+							originType = Integer.parseInt(parmas[0]);
+						}
+					
+						if(isNumeric(parmas[1])) {
+							targetType = Integer.parseInt(parmas[1]);
+						}		
+						
+					}
+	
+				}
+
+				Flag = true;
+
+			}
+
+
+			return super.initParamsWithInputList(inputParamList) && Flag;
+		}
+		
+		@Override
+		ArrayList<File> applyDir_SubFileListRule5(ArrayList<File> allSubDirFileList, ArrayList<File> allSubRealFileList) {
+			// TODO Auto-generated method stub
+			// TODO Auto-generated method stub
+			if(originType == -1 ) {  // 没有获取到 初始化值 那么 默认就是 1992
+				originType = 1992;
+			}
+			
+			if(targetType == -1 ) {  // 没有获取到 初始化值 那么 默认就是 1992
+				targetType =  getCurrentYear();
+			}
+			
+			// 确保  origin 是 小于 targetType 的
+			if(originType > targetType) {
+				targetType = originType + targetType;
+				originType = targetType - originType;
+				targetType = targetType - originType;
+			}
+			StringBuilder sb = new StringBuilder();
+			
+			for (int i = targetType; i >= originType; i--) {
+				sb.append("   \n");
+				sb.append("   \n");
+				sb.append("   \n");
+
+				for (int j = 12; j <= 1 ; j--) {
+					sb.append("### "+i+"."+(j>9?""+j:"0"+j));
+
+					sb.append("   \n");
+					sb.append("   \n");
+				}
+
+				sb.append("## "+i);
+				sb.append("   \n");
+				sb.append("   \n");
+
+
+			}
+			writeContentToFile(G2_Temp_Text_File, sb.toString());
+            NotePadOpenTargetFile(G2_Temp_Text_File.getAbsolutePath());
+		return super.applyDir_SubFileListRule5(allSubDirFileList, allSubRealFileList);
+		}
+
+
+		
+
+
+	}
 	// operation_type 操作类型 1--读取文件内容字符串 进行修改 2--对文件对文件内容(字节)--进行修改 3.对全体子文件进行的随性的操作
 	// 属性进行修改(文件名称)
 //     // 4.对当前子文件(包括子目录 子文件 --不包含孙目录 孙文件) 5. 从shell 中获取到的路径 去对某一个文件进行操作
@@ -1683,7 +1816,7 @@ public class G2_ApplyRuleFor_TypeFile {
 			webpFileList = new ArrayList<File>();
 			gif_webpFileList = new ArrayList<File>();
 			PushFile2JDKBIN();
-			if (curOS_TYPE == OS_TYPE.Windows) {
+			if (CUR_OS_TYPE == OS_TYPE.Windows) {
 				G2_webp2gif_exe_path = zbinPath + File.separator + "G2_webp2gif.exe";
 			}
 
@@ -1696,15 +1829,15 @@ public class G2_ApplyRuleFor_TypeFile {
 			String webpLibraryFilePath = null;
 			String G2_LibraryPath = null;
 			// G2_File_Path
-			if (curOS_TYPE == OS_TYPE.Windows) {
+			if (CUR_OS_TYPE == OS_TYPE.Windows) {
 				webpLibraryFilePath = JDK_BIN_PATH + File.separator + "webp-imageio.dll";
 				G2_LibraryPath = G2_File_Path + File.separator + "webp-imageio.dll";
 				Win_Lin_Mac_ZbinPath = zbinPath + File.separator + "win_zbin";
-			} else if (curOS_TYPE == OS_TYPE.MacOS) {
+			} else if (CUR_OS_TYPE == OS_TYPE.MacOS) {
 				webpLibraryFilePath = JDK_BIN_PATH + File.separator + "libwebp-imageio.dylib";
 				G2_LibraryPath = G2_File_Path + File.separator + "libwebp-imageio.dylib";
 				Win_Lin_Mac_ZbinPath = zbinPath + File.separator + "mac_zbin";
-			} else if (curOS_TYPE == OS_TYPE.Linux) {
+			} else if (CUR_OS_TYPE == OS_TYPE.Linux) {
 				webpLibraryFilePath = JDK_BIN_PATH + File.separator + "libwebp-imageio.so";
 				G2_LibraryPath = G2_File_Path + File.separator + "libwebp-imageio.so";
 				Win_Lin_Mac_ZbinPath = zbinPath + File.separator + "lin_zbin";
@@ -4661,11 +4794,19 @@ public class G2_ApplyRuleFor_TypeFile {
 		return false;
 	}
 
-	public static boolean isNumeric(String str) {
+	public static boolean isNumeric(String str ) {
+		
+		if(str == null ) {
+			return false;
+		}
+		
 		for (int i = str.length(); --i >= 0;) {
 			if (!Character.isDigit(str.charAt(i))) {
 				return false;
 			}
+		}
+		if(str.equals("")) {
+			return false;
 		}
 		return true;
 	}
@@ -4977,7 +5118,7 @@ public class G2_ApplyRuleFor_TypeFile {
 			Rule itemRule = realTypeRuleList.get(i);
 			String type = itemRule.file_type;
 			int index = itemRule.rule_index;
-			String desc = itemRule.ruleTip(type, index, G2_Bat_Name, curOS_TYPE);
+			String desc = itemRule.ruleTip(type, index, G2_Bat_Name, CUR_OS_TYPE);
 
 			/*
 			 * String itemDesc = ""; if(curOS_TYPE == OS_TYPE.Windows){ itemDesc =
@@ -5474,12 +5615,41 @@ public class G2_ApplyRuleFor_TypeFile {
 		return retCode + "";
 	}
 
+	static int getCurrentYear() {
+
+		SimpleDateFormat df = new SimpleDateFormat("YYYY");
+	
+		return Integer.parseInt(df.format(new Date()));
+		
+	}
+	
+    // A1  ..... A2.
+    static String get_Bat_Sh_FlagNumber(String mCur_Bat_Name){
+        String mCharNumber = "error";
+        String curBat =mCur_Bat_Name;
+        if(mCur_Bat_Name.contains(".sh")){
+            curBat = curBat.replace(".sh","");
+        }
+
+        if(mCur_Bat_Name.contains(".bat")){
+            curBat = curBat.replace(".bat","");
+        }
+        if(curBat.contains("_")){
+            String[] arrNameList =    curBat.split("_");
+            mCharNumber =   arrNameList[arrNameList.length-1];
+        }else{
+            mCharNumber = curBat;
+        }
+
+        return mCharNumber;
+    }
+    
 	public static String execCMD(String command) {
 
 		String result = "";
-		if (curOS_TYPE == OS_TYPE.Windows) {
+		if (CUR_OS_TYPE == OS_TYPE.Windows) {
 			return execCMD_Windows(command);
-		} else if (curOS_TYPE == OS_TYPE.MacOS) {
+		} else if (CUR_OS_TYPE == OS_TYPE.MacOS) {
 
 			return execCMD_Mac(command);
 		} else {
@@ -5488,4 +5658,72 @@ public class G2_ApplyRuleFor_TypeFile {
 		}
 		return result;
 	}
+	
+    /**
+     * 执行 mac(unix) 脚本命令~
+     * @param command
+     * @return
+     */
+    public static int execute_Mac(String command) {
+        String[] cmd = {"/bin/bash","-c",command};
+        Runtime rt = Runtime.getRuntime();
+        Process proc = null;
+        try {
+            proc = rt.exec(cmd);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        // 打开流
+//        OutputStream os = proc.getOutputStream();
+//        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(os));
+
+        try {
+//            String newCommand = "/bin/bash -c "+"\""+command+"\"";
+//            System.out.println("newCommand = " + newCommand);
+
+//            bw.write(newCommand);
+
+//
+//            bw.flush();
+//            bw.close();
+
+            /** 真奇怪，把控制台的输出打印一遍之后竟然能正常终止了~ */
+//            readConsole(proc);
+
+            /** waitFor() 的作用在于 java 程序是否等待 Terminal 执行脚本完毕~ */
+            proc.waitFor();
+            Thread.sleep(100000);
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+//        int retCode = proc.exitValue();
+//        if (retCode != 0) {
+//            System.out.println("unix script retCode = " + retCode);
+//
+//            System.out.println(readConsole(proc));
+//            System.out.println("UnixScriptUil.execute 出错了!!");
+//        }
+
+        return 0;
+    }
+
+    
+	
+    static void NotePadOpenTargetFile(String absPath){
+        String commandNotead = "";
+        if(CUR_OS_TYPE == OS_TYPE.Windows){
+            commandNotead = "cmd.exe /c start   Notepad++.exe " + absPath;
+            execCMD(commandNotead);
+
+        }else if(CUR_OS_TYPE == OS_TYPE.Linux){
+            commandNotead  = " gedit " + absPath;
+        }else if(CUR_OS_TYPE == OS_TYPE.MacOS){
+            commandNotead  = "/Applications/UltraEdit  " + absPath;
+            execute_Mac(commandNotead);
+        }
+    }
+    
 }
