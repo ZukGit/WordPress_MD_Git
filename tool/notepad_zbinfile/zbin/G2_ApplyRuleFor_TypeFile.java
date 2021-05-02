@@ -216,7 +216,7 @@ public class G2_ApplyRuleFor_TypeFile {
 		//  ### 2020.02
 		// zrule_apply_G2.bat #_25  1992_2021 这样 
 		realTypeRuleList.add(new Time_Head_Rule_25());
-
+		realTypeRuleList.add(new Rename_By_Dir_Rule_26());
 	}
 
 // 3038年 5 月 3 日
@@ -226,6 +226,271 @@ public class G2_ApplyRuleFor_TypeFile {
 	// 属性进行修改(文件名称)
 //     // 4.对当前子文件(包括子目录 子文件 --不包含孙目录 孙文件) 5. 从shell 中获取到的路径 去对某一个文件进行操作
 
+
+
+
+
+
+	class Rename_By_Dir_Rule_26 extends Basic_Rule {
+
+		ArrayList<String> inputTypeList;
+		// zrule_apply_G2.bat #_26 jpg 把当前所有的jpg格式文件生在该文件夹下依次重命名
+
+		// 可能从参数输入的 单一文件
+		ArrayList<File> inputParamFileList; //  .mp4  .jpg     对单独类型进行重命名
+
+		boolean isSearchAllFile2CurDirFlag = false;  //是否检索 所有类型(空输入就是检索所有类型)
+
+		Rename_By_Dir_Rule_26() {
+			super("#", 26, 5);
+			inputTypeList = new ArrayList<String>();
+			inputParamFileList = new ArrayList<File>();
+		}
+
+		@Override
+		boolean initParamsWithInputList(ArrayList<String> inputParamList) {
+
+			for (int i = 0; i < inputParamList.size(); i++) {
+				String strInput = inputParamList.get(i);
+				if (strInput.equals(firstInputIndexStr)) {
+					continue;
+				}
+				if (!strInput.startsWith(".")) {
+					inputTypeList.add("." + strInput.trim());
+				} else {
+					inputTypeList.add(strInput.trim());
+				}
+
+				File tempFile = new File(curDirPath + File.separator + strInput);
+				if (tempFile.exists() && !tempFile.isDirectory()) {
+					inputParamFileList.add(tempFile);
+
+				}
+			}
+
+			if (inputTypeList.size() == 0 && inputParamFileList.size() == 0) {
+				isSearchAllFile2CurDirFlag = true;
+			}
+			return super.initParamsWithInputList(inputParamList);
+		}
+
+		@Override
+		ArrayList<File> applyDir_SubFileListRule5(ArrayList<File> allSubDirFileList, ArrayList<File> allSubRealFileList) {
+			if (isSearchAllFile2CurDirFlag) {
+				// 比那里所有 类型的 文件 并 重新命名
+				tryReNameByDir(allSubDirFileList);
+
+			} else {
+				tryReNameByDir_Type(allSubDirFileList,inputTypeList);
+/*				for (int i = 0; i < inputTypeList.size(); i++) {
+					String type = inputTypeList.get(i);
+
+					ArrayList<File> targetFileList = fileTypeMap.get(type);
+
+					if (targetFileList == null || targetFileList.size() == 0) {
+						System.out.println(" 当前路径 " + curDirPath + " 不存在类型 " + type + "的文件!");
+						continue;
+					}
+
+					for (int j = 0; j < targetFileList.size(); j++) {
+						File targetTypeFile = targetFileList.get(j);
+						String originName = targetTypeFile.getName();
+						String mdName = getMD5Three(targetTypeFile.getAbsolutePath());
+						String mdtype = getFileTypeWithPoint(targetTypeFile.getName());
+						String new_md_Name = mdName + mdtype;
+						tryReName(targetTypeFile, new_md_Name);
+
+					}
+
+				}
+
+				for (int i = 0; i < inputParamFileList.size(); i++) {
+					File targetTypeFile = inputParamFileList.get(i);
+					String originName = targetTypeFile.getName();
+					String mdName = getMD5Three(targetTypeFile.getAbsolutePath());
+					String mdtype = getFileTypeWithPoint(targetTypeFile.getName());
+					String new_md_Name = mdName + mdtype;
+					tryReName(targetTypeFile, new_md_Name);
+				}*/
+
+			}
+
+
+			return super.applyDir_SubFileListRule5(allSubDirFileList, allSubRealFileList);
+		}
+
+
+
+
+		@Override
+		ArrayList<File> applyFileListRule3(ArrayList<File> subFileList, HashMap<String, ArrayList<File>> fileTypeMap) {
+
+			SimpleDateFormat df = new SimpleDateFormat("MMdd_HHmmss");// 设置日期格式
+//            SimpleDateFormat df_hms = new SimpleDateFormat("HHmmss");//设置日期格式
+			Date curDate = new Date();
+			String date = df.format(curDate);
+//            String preHMS = df.format(df_hms);
+
+			if (isSearchAllFile2CurDirFlag) {
+				// 比那里所有 类型的 文件 并 重新命名
+				tryReNameOperation(fileTypeMap);
+
+			} else {
+
+				for (int i = 0; i < inputTypeList.size(); i++) {
+					String type = inputTypeList.get(i);
+
+					ArrayList<File> targetFileList = fileTypeMap.get(type);
+
+					if (targetFileList == null || targetFileList.size() == 0) {
+						System.out.println(" 当前路径 " + curDirPath + " 不存在类型 " + type + "的文件!");
+						continue;
+					}
+
+					for (int j = 0; j < targetFileList.size(); j++) {
+						File targetTypeFile = targetFileList.get(j);
+						String originName = targetTypeFile.getName();
+						String mdName = getMD5Three(targetTypeFile.getAbsolutePath());
+						String mdtype = getFileTypeWithPoint(targetTypeFile.getName());
+						String new_md_Name = mdName + mdtype;
+						tryReName(targetTypeFile, new_md_Name);
+
+					}
+
+				}
+
+				for (int i = 0; i < inputParamFileList.size(); i++) {
+					File targetTypeFile = inputParamFileList.get(i);
+					String originName = targetTypeFile.getName();
+					String mdName = getMD5Three(targetTypeFile.getAbsolutePath());
+					String mdtype = getFileTypeWithPoint(targetTypeFile.getName());
+					String new_md_Name = mdName + mdtype;
+					tryReName(targetTypeFile, new_md_Name);
+				}
+
+			}
+
+			return super.applyFileListRule3(subFileList, fileTypeMap);
+		}
+
+
+		void tryReNameByDir_Type( ArrayList<File> allDirFile , ArrayList<String> mInputTypes) {
+
+			for (int i = 0; i < allDirFile.size(); i++) {
+				File dirFile = allDirFile.get(i);
+				File[] subFile = dirFile.listFiles();
+				if(subFile == null || subFile.length <= 0){
+
+					continue;
+				}
+
+				// 用于计数
+				Map<String,Integer> orderMap = new HashMap<String,Integer>() ;
+
+				for (int j = 0; j < subFile.length; j++) {
+					File realFileItem = subFile[j];
+					if(realFileItem.isDirectory()){
+						continue;
+					}
+
+					String FileTypeStr = getFileTypeWithPoint_unknow(realFileItem.getName());
+					if(!mInputTypes.contains(FileTypeStr)){   // 如果 有输入类型  那么把不满足输入类型的 文件过滤掉
+						continue;
+					}
+					Integer curIndex = orderMap.get(FileTypeStr);
+					if(curIndex == null){
+						orderMap.put(FileTypeStr,1);
+						curIndex = 0;
+					}
+
+					curIndex = curIndex + 1;
+					orderMap.put(FileTypeStr,curIndex);
+					String newName = curIndex+FileTypeStr;
+					System.out.println("依据文件夹 单独重命名文件");
+					tryReName(realFileItem,newName);
+
+
+				}
+			}
+
+		}
+
+		void tryReNameByDir( ArrayList<File> allDirFile) {
+
+			for (int i = 0; i < allDirFile.size(); i++) {
+				File dirFile = allDirFile.get(i);
+				File[] subFile = dirFile.listFiles();
+				if(subFile == null || subFile.length <= 0){
+
+					continue;
+				}
+
+				// 用于计数
+				Map<String,Integer> orderMap = new HashMap<String,Integer>() ;
+
+				for (int j = 0; j < subFile.length; j++) {
+					File realFileItem = subFile[j];
+					if(realFileItem.isDirectory()){
+						continue;
+					}
+
+					String FileTypeStr = getFileTypeWithPoint_unknow(realFileItem.getName());
+					Integer curIndex = orderMap.get(FileTypeStr);
+					if(curIndex == null){
+						orderMap.put(FileTypeStr,1);
+						curIndex = 0;
+					}
+
+					curIndex = curIndex + 1;
+					orderMap.put(FileTypeStr,curIndex);
+					String newName = curIndex+FileTypeStr;
+					System.out.println("依据文件夹 单独重命名文件");
+					tryReName(realFileItem,newName);
+
+
+				}
+			}
+
+		}
+
+		@SuppressWarnings("unchecked")
+		boolean tryReNameOperation(HashMap<String, ArrayList<File>> arrFileMap) {
+			boolean executeFlag = false;
+			Map.Entry<String, ArrayList<File>> entry;
+
+			if (arrFileMap != null) {
+				Iterator iterator = arrFileMap.entrySet().iterator();
+				while (iterator.hasNext()) {
+					entry = (Map.Entry<String, ArrayList<File>>) iterator.next();
+					String typeStr = entry.getKey(); // Map的Value
+					ArrayList<File> fileArr = entry.getValue(); // Map的Value
+
+					for (int i = 0; i < fileArr.size(); i++) {
+						File curFile = fileArr.get(i);
+//                        String curFileName = curFile.getName();
+						String mdName = getMD5Three(curFile.getAbsolutePath());
+						String mdtype = getFileTypeWithPoint(curFile.getName());
+						String new_md_Name = mdName + mdtype;
+						tryReName(curFile, new_md_Name);
+					}
+
+				}
+			}
+
+			return executeFlag;
+		}
+
+		@Override
+		String simpleDesc() {
+			return "\n" + Cur_Bat_Name +
+					 "\n"+	 Cur_Bat_Name + " #_26           ### 把当前所有文件夹下 依据文件夹重新开始把实体文件重命名  ./A/aa.mp4  ./A/bb.mp4   ./A/xx.jpg >>> ./A/1.mp4  ./A/2.mp4   ./A/3.mp4  ./A/1.jpg (依据文件夹重新1开始)!  " +
+			         "\n"+	 Cur_Bat_Name +"#_26  .mp4         ### 把当前所有文件夹下 依据文件夹重新开始把实体文件重命名 .mp4类型文件 其他类型不变  ./A/aa.mp4  ./A/bb.mp4   ./A/xx.jpg >>> ./A/1.mp4  ./A/2.mp4   ./A/3.mp4  ./A/xx.jpg (依据文件夹 mp4类型文件重新1开始)!  "+
+
+
+					"";
+		}
+
+	}
 
 	class Time_Head_Rule_25 extends Basic_Rule {
 		int originType;
@@ -2471,7 +2736,7 @@ public class G2_ApplyRuleFor_TypeFile {
 
 		CalCulMediaHtml_Rule_12() {
 
-			super("#", 12, 4);
+			super("#", 12, 5);
 			operaType = 0;
 			operaDirFileList = new ArrayList<File>();
 			mp4HtmlTemplate_FileList = new ArrayList<File>();
@@ -2628,11 +2893,51 @@ public class G2_ApplyRuleFor_TypeFile {
 				System.out.println(" inputDir  = " + inputDir.getAbsolutePath());
 			}
 			if (operaDirFileList.size() == 0) {
-				System.out.println("当前用户没有输入执行的目录名称,请重新输入!");
-				return false;
+				 // ### 检测当前所目录是否存在mp4文件夹 如果有生成 html 播放文件
+
+
+				System.out.println("当前用户没有输入执行的目录名称,进行检测是否有 mp4文件夹!");
+				return true;
 			}
 
 			return super.initParamsWithInputList(inputParamList);
+		}
+
+		@Override
+		ArrayList<File> applyDir_SubFileListRule5(ArrayList<File> allSubDirFileList, ArrayList<File> allSubRealFileList) {
+			if (operaDirFileList.size() == 0) {
+				System.out.println("当前用户没有输入执行的目录名称,请重新输入B!");
+
+				for (int i = 0; i <allSubDirFileList.size() ; i++) {
+				File dirFile = allSubDirFileList.get(i);
+				String dirName = dirFile.getName().toLowerCase();
+//					int operaType; // 0-unknow 1--mp4 2--jpg 3--gif
+					if(operaType == 1 && "mp4".equals(dirName)){
+						operaDirFileList.add(dirFile);
+					}else if(operaType == 2 && "jpg".equals(dirName)){
+						operaDirFileList.add(dirFile);
+					}else if(operaType == 3 && "gif".equals(dirName)){
+						operaDirFileList.add(dirFile);
+					}
+
+
+			}
+
+
+
+
+			}
+			if (operaDirFileList.size() == 0) {
+				System.out.println("当前用户没有输入执行的目录名称,请重新输入C!");
+				return null;
+			}
+
+			for (int i = 0; i < operaDirFileList.size(); i++) {
+				File operaDirFile = operaDirFileList.get(i);
+				OperationHtmlMedia(operaDirFile);
+			}
+
+			return super.applyDir_SubFileListRule5(allSubDirFileList, allSubRealFileList);
 		}
 
 		@Override
@@ -2640,7 +2945,7 @@ public class G2_ApplyRuleFor_TypeFile {
 											  HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList,
 											  ArrayList<File> curRealFileList) {
 			if (operaDirFileList.size() == 0) {
-				System.out.println("当前用户没有输入执行的目录名称,请重新输入!");
+				System.out.println("当前用户没有输入执行的目录名称,请重新输入C!");
 				return null;
 			}
 			for (int i = 0; i < operaDirFileList.size(); i++) {
@@ -2770,9 +3075,13 @@ public class G2_ApplyRuleFor_TypeFile {
 
 		@Override
 		String simpleDesc() {
-			return "\n" + Cur_Bat_Name + "  #_12_mp4   <目标文件夹目录>   ### 把当前目录mp4文件生成 html 播放文件  \n" + Cur_Bat_Name
-					+ "  #_12_gif   <目标文件夹目录>   ### 把当前目录gif文件生成 html 播放文件  \n" + Cur_Bat_Name
-					+ "  #_12_jpg   <目标文件夹目录>   ### 把当前目录jpg文件生成 html 播放文件  \n";
+			return "\n"
+					+ Cur_Bat_Name + "  #_12_mp4      ### 把当前可能的目录mp4文件生成 html 播放文件  \n"
+					+ Cur_Bat_Name + "  #_12_gif      ### 把当前可能的目录gif文件生成 html 播放文件  \n"
+					+ Cur_Bat_Name + "  #_12_jpg      ### 把当前可能的目录jpg文件生成 html 播放文件  \n"
+					+ Cur_Bat_Name + "  #_12_mp4   <目标文件夹目录>   ### 把当前目录mp4文件生成 html 播放文件  \n"
+					+ Cur_Bat_Name + "  #_12_gif   <目标文件夹目录>   ### 把当前目录gif文件生成 html 播放文件  \n"
+					+ Cur_Bat_Name + "  #_12_jpg   <目标文件夹目录>   ### 把当前目录jpg文件生成 html 播放文件  \n";
 		}
 
 	}
@@ -3740,6 +4049,16 @@ newRealFile=D:\BaiduNetdiskDownload\公式\bad_batch\good_batch\A.pdf
 		return originName.replace(type, "");
 	}
 
+	public static String getFileTypeWithPoint_unknow(String fileName) {
+		String name = "";
+		if (fileName.contains(".")) {
+			name = fileName.substring(fileName.lastIndexOf(".")).trim().toLowerCase();
+		} else {
+			name = "";
+		}
+		return name.toLowerCase().trim();
+	}
+
 	public static String getFileTypeWithPoint(String fileName) {
 		String name = "";
 		if (fileName.contains(".")) {
@@ -4553,6 +4872,8 @@ newRealFile=D:\BaiduNetdiskDownload\公式\bad_batch\good_batch\A.pdf
 			String desc_false = "(清除原名称) 把当前的所有子文件(非目录)重命名为 【序号.类型】的形式 例如 hello.jpg =》 1.jpg  xx.png-》1.jpg   不保留原有名称 相同类型文件不同文件夹 使用同一个序列号";
 			String desc_false_1 = "(清除原名称_按类型依次 order ) 把当前的所有子文件(非目录)重命名为 【序号.类型 走到底 】的形式 例如 hello.jpg =》 1.jpg  xx.jpg-》2_xx.jpg  xx.png-》3.png  xx.png-》4.png  不保留原有名称 不相同类型文件不同文件夹 使用同一个序列号 ";
 			String desc_false_2 = "(清除原名称_按类型 依照输入索引为起始 order ) 把当前的所有子文件(非目录)重命名为 【输入Begin序号.类型 走到底 】的形式 例如   #_2_false_order_10  hello.jpg =》 10.jpg  xx.jpg-》11_xx.jpg  xx.png-》12.png  xx.png-》13.png  不保留原有名称 不相同类型文件不同文件夹 使用同一个序列号(序号自定义) ";
+			String desc_false_3 = "(清除原名称_按类型 每个文件夹单独作为新的起点 以类型重新命名  ) 把当前的所有子文件(以目录分割)重命名实体文件(目录名称不变)为 A/A/aa.jpg  A/A/bb.jpg  A/A/cc.png  A/A/dd.png -> A/A/1.jpg  A/A/2.jpg  A/A/1.png  A/A/2.png  ";
+
 
 			if (curType == OS_TYPE.Windows) {
 				itemDesc = batName.trim() + ".bat  " + type + "_" + index + "_true" + "    [索引 " + index + "]  描述: "
@@ -4568,6 +4889,7 @@ newRealFile=D:\BaiduNetdiskDownload\公式\bad_batch\good_batch\A.pdf
 				itemDesc += "\n" + batName.trim() + ".bat  " + type + "_" + index + "_false_order_10" + "    [指定开始索引 "
 						+ index + "]  描述:" + desc_false_2 + "\n";
 
+
 			} else {
 				itemDesc = batName.trim() + ".sh " + type + "_" + index + "_true" + "    [索引 " + index + "]  描述:"
 						+ desc_true;
@@ -4575,8 +4897,10 @@ newRealFile=D:\BaiduNetdiskDownload\公式\bad_batch\good_batch\A.pdf
 						+ "]  描述: " + desc_true_1;
 				itemDesc += "\n" + batName.trim() + ".sh  " + type + "_" + index + "_false" + "    [索引 " + index
 						+ "]  描述:" + desc_false;
-				itemDesc += "\n" + batName.trim() + ".bat  " + type + "_" + index + "_false_order" + "    [索引 " + index
+				itemDesc += "\n" + batName.trim() + ".sh  " + type + "_" + index + "_false_order" + "    [索引 " + index
 						+ "]  描述:" + desc_false_1;
+				itemDesc += "\n" + batName.trim() + ".sh  " + type + "_" + index + "_false_order_10" + "    [指定开始索引 "
+						+ index + "]  描述:" + desc_false_2 + "\n";
 			}
 
 			return itemDesc;

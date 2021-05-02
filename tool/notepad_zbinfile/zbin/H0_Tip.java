@@ -134,7 +134,7 @@ public class H0_Tip {
             System.out.println(" 路径 "+ userHomeDir + "下 intelij 目录为空(2) 找不到 idea64.exe.vmoptions ！");
             return null;
         }
-      File targetFile =   new File(intelijDir.getAbsolutePath()+File.separator+"config"+File.separator+"idea64.exe.vmoptions");
+        File targetFile =   new File(intelijDir.getAbsolutePath()+File.separator+"config"+File.separator+"idea64.exe.vmoptions");
 
         if(!targetFile.exists()){
             System.out.println(" 路径 "+ targetFile.getAbsolutePath() + "下idea64.exe.vmoptions 为空(3) 找不到 idea64.exe.vmoptions ！");
@@ -150,15 +150,15 @@ public class H0_Tip {
         if(CUR_OS_TYPE == OS_TYPE.Windows){  // // Windows 下寻找  idea.vmoptions
 
 
-          File file_idea64_1 = search_idea64_exe_vmoptions_1();
+            File file_idea64_1 = search_idea64_exe_vmoptions_1();
             File file_idea64_2 = search_idea64_exe_vmoptions_2();
-if(file_idea64_1 != null) {
-    idea_vmoption_FileList.add(file_idea64_1);
-}
+            if(file_idea64_1 != null) {
+                idea_vmoption_FileList.add(file_idea64_1);
+            }
 
-if(file_idea64_2 != null) {
-    idea_vmoption_FileList.add(file_idea64_2);
-}
+            if(file_idea64_2 != null) {
+                idea_vmoption_FileList.add(file_idea64_2);
+            }
 
 
 
@@ -625,27 +625,30 @@ if(file_idea64_2 != null) {
 
     static void Security_File_Tip(){
 
-        PrintHead_End(" 文件加密解密操作 Begin    ");
-        System.out.println("________________________ MP4 .7疫z 压缩加密批量操作 ________________________ ");
-        System.out.println("1. 先对当前文件内容进行改名    zrule_apply_G2"+BAT_OR_SH_Point+" #_18 ");
-        System.out.println("2. 对当前文件夹下的文件进行加密 生成 bad_batch 加密文件夹  zrule_apply_G2"+BAT_OR_SH_Point+" #_7_bad_batch ");
-        System.out.println("3. 进入 bad_batch 加密文件夹   cd ./bad_batch ");
-        System.out.println("4.把当前所有文件压缩为 .7z 格式 密码默认为 752025    zrule_apply_G2"+BAT_OR_SH_Point+" #_19 ");
-        System.out.println("5.对当前.7z 文件进行 后缀名称处理  zrule_apply_G2"+BAT_OR_SH_Point+" #_9  7z_7疫z ");
-        System.out.println("6.打开当前文件夹  zzfile_3"+BAT_OR_SH_Point);
-        System.out.println(" zrule_apply_G2"+BAT_OR_SH_Point+" #_18  .mp4   &&   zrule_apply_G2"+BAT_OR_SH_Point+" #_7_bad_batch && cd ./bad_batch  && zrule_apply_G2"+BAT_OR_SH_Point+" #_19 &&  zrule_apply_G2"+BAT_OR_SH_Point+" #_9  7z_7疫z   &&   zzfile_3"+BAT_OR_SH_Point);
-
-        System.out.println("");
-        System.out.println("________________________ MP4 .7疫z 解压缩解密批量操作 ________________________ ");
-        System.out.println("1.对当前文件中 后缀是包含中文的文件进行修复    zrule_apply_G2"+BAT_OR_SH_Point+"  #_8");
-        System.out.println("2.对当前的压缩文件进行解压缩  zzip_H5"+BAT_OR_SH_Point+" 752025 zukgit11");
-        System.out.println("3.对解压缩出来的文件进行解密   zrule_apply_G2"+BAT_OR_SH_Point+" #_7_good_batch  ");
-        System.out.println("4.进入到解压文件夹 cd ./good_batch  ");
-        System.out.println("5.对解压的文件搜索输出快捷方式文件夹  zrule_apply_G2"+BAT_OR_SH_Point+" #_14  .mp4  .avi   .wmv .rmvb  .flv .3gp");
-        System.out.println("6.打开当前文件    zzfile_3"+BAT_OR_SH_Point);
-        System.out.println("zrule_apply_G2"+BAT_OR_SH_Point+"  #_8   &&   zzip_H5"+BAT_OR_SH_Point+" 752025 zukgit11  &&  zrule_apply_G2"+BAT_OR_SH_Point+" #_7_good_batch  && cd ./good_batch && zzfile_3"+BAT_OR_SH_Point);
-
+        System.out.println("________________________ ZVI_Position 【解压】【生成Html】 ________________________");
+        System.out.println("zrule_apply_G2"+BAT_OR_SH_Point+" " +"#_7_good_batch  ******原封不动解码");
+        System.out.println("cd ./good_batch                    ******进入解码文件夹");
+        System.out.println("zrule_apply_G2"+BAT_OR_SH_Point+" " +"#_9  _mp4       ******把无类型转为mp4类型");
+        System.out.println("cd ./ZVI_Position                  ******进入ZVI_Position文件夹");
+        System.out.println("zrule_apply_G2"+BAT_OR_SH_Point+" " +" #_24  mp4      ******在ZVI_Position执行在子目录与孙目录构建中间文件夹 mp4");
+        System.out.println("zrule_apply_G2"+BAT_OR_SH_Point+" " +" #_26 mp4       ******依据文件夹把每个文件夹下的mp4 依次从1..n开始重命名");
+        System.out.println("zrule_apply_G2"+BAT_OR_SH_Point+" " +" #_13_mp4       ******在当前ZVI_Position生成时间30秒间隔轮换 html文件");
+        System.out.println("zrule_apply_G2"+BAT_OR_SH_Point+" " +" #_12_mp4       ******在当前ZVI_Position搜索mp4文件 生成对应html播放文件");
+        System.out.println("zrule_apply_G2"+BAT_OR_SH_Point+" " +"#_7_good_batch  && cd ./good_batch && zrule_apply_G2"+BAT_OR_SH_Point+" " +"#_9  _mp4  && cd ./ZVI_Position  && zrule_apply_G2"+BAT_OR_SH_Point+" " +" #_24  mp4  && zrule_apply_G2"+BAT_OR_SH_Point+" " +"#_26 mp4 && zrule_apply_G2"+BAT_OR_SH_Point+" " +" #_13_mp4 && zrule_apply_G2"+BAT_OR_SH_Point+" " +" #_12_mp4");
         System.out.println();
+        System.out.println();
+        System.out.println();
+        System.out.println("________________________ ZVI_Individual 【解压】【生成Html】 ________________________");
+        System.out.println("zrule_apply_G2"+BAT_OR_SH_Point+" " +"#_7_good_batch  ******原封不动解码");
+        System.out.println("cd ./good_batch                    ******进入解码文件夹");
+        System.out.println("zrule_apply_G2"+BAT_OR_SH_Point+" " +"#_9  _mp4       ******把无类型转为mp4类型");
+        System.out.println("cd ./ZVI_Individual                  ******进入ZVI_Individual文件夹");
+        System.out.println("zrule_apply_G2"+BAT_OR_SH_Point+" " +" #_26 mp4       ******依据文件夹把每个文件夹下的mp4 依次从1..n开始重命名");
+        System.out.println("zrule_apply_G2"+BAT_OR_SH_Point+" " +" #_13_mp4       ******在当前ZVI_Individual生成时间30秒间隔轮换 html文件");
+        System.out.println("zrule_apply_G2"+BAT_OR_SH_Point+" " +" #_12_mp4       ******在当前ZVI_Individual搜索mp4文件 生成对应html播放文件");
+        System.out.println("zrule_apply_G2"+BAT_OR_SH_Point+" " +"#_7_good_batch  && cd ./good_batch && zrule_apply_G2"+BAT_OR_SH_Point+" " +"#_9  _mp4  && cd ./ZVI_Individual   && zrule_apply_G2"+BAT_OR_SH_Point+" " +"#_26 mp4 && zrule_apply_G2"+BAT_OR_SH_Point+" " +" #_13_mp4 && zrule_apply_G2"+BAT_OR_SH_Point+" " +" #_12_mp4");
+        System.out.println();
+
 //        zrule_apply_G2.sh  #_9  jpg_
         //        zrule_apply_G2.sh  #_9  _jpg
         //        zrule_apply_G2.sh  #_9  _gif
@@ -661,8 +664,8 @@ if(file_idea64_2 != null) {
         System.out.println("________________________ MP4 【解密】【不压缩】 ________________________");
         System.out.println("zrule_apply_G2"+BAT_OR_SH_Point+" " +"#_7_good_batch  && cd ./good_batch && zrule_apply_G2"+BAT_OR_SH_Point+" " +"#_9  _mp4");
         System.out.println();
-        
-        
+
+
         System.out.println();
         System.out.println("________________________ 【JPG_Top】jpg png【Jpg Top Land Port 自动分类并加密】加密 改名 无类型批量操作 ________________________");
         System.out.println("zrule_apply_G2"+BAT_OR_SH_Point+" " +"#_18  .jpg   && zrule_apply_G2"+BAT_OR_SH_Point+" " +"#_18  .png  && zrule_apply_G2"+BAT_OR_SH_Point+" " +" #_20_notime && cd ./Land_Port_Img/Port/ && zrule_apply_G2"+BAT_OR_SH_Point+" " +"#_7_bad_batch &&  cd ./bad_batch && zrule_apply_G2"+BAT_OR_SH_Point+" " +"#_9  jpg_ && zrule_apply_G2"+BAT_OR_SH_Point+" " +"#_9 png_ && cd ../../../ && cd ./Land_Port_Img/Land/ && zrule_apply_G2"+BAT_OR_SH_Point+" " +"#_7_bad_batch &&  cd ./bad_batch && zrule_apply_G2"+BAT_OR_SH_Point+" " +"#_9  jpg_ && zrule_apply_G2"+BAT_OR_SH_Point+" " +"#_9 png_");
