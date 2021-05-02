@@ -97,7 +97,7 @@ public class G2_ApplyRuleFor_TypeFile {
 	}
 
 
-    
+
 	enum OS_TYPE {
 		Windows, Linux, MacOS
 	}
@@ -105,9 +105,9 @@ public class G2_ApplyRuleFor_TypeFile {
 	// JDK 的路径
 	static String JDK_BIN_PATH = "";
 
-    static File G2_Temp_Text_File = new File(System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin" + File.separator + get_Bat_Sh_FlagNumber(Cur_Bat_Name)+"_Temp_Text.txt");
+	static File G2_Temp_Text_File = new File(System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin" + File.separator + get_Bat_Sh_FlagNumber(Cur_Bat_Name)+"_Temp_Text.txt");
 
-    
+
 	static OS_TYPE CUR_OS_TYPE = OS_TYPE.Windows;
 	static String curOS_ExeTYPE = "";
 	static ArrayList<String> mKeyWordName = new ArrayList<>();
@@ -207,26 +207,26 @@ public class G2_ApplyRuleFor_TypeFile {
 		realTypeRuleList.add(new Rename_Img_WithSize_Rule_21());
 		realTypeRuleList.add(new ReSize_Img_Rule_22());
 		realTypeRuleList.add(new Append_Pdf_Rule_23()); // 把 pdf 文件 追加 合并为 一个文件
-		
+
 		realTypeRuleList.add(new add_Middle_Dir_Rule_24()); // 在当前的目录 与 子目录 之间 新增 一层文件夹 , 文件夹名称任意 用户输入
-		
+
 		// 从上往下打印 年月 标示   接受来自 输入的参数  打开 临时文件
 		//  ## 2020
 		//  ### 2020.01
 		//  ### 2020.02
 		// zrule_apply_G2.bat #_25  1992_2021 这样 
-		realTypeRuleList.add(new Time_Head_Rule_25()); 
-		
+		realTypeRuleList.add(new Time_Head_Rule_25());
+
 	}
 
 // 3038年 5 月 3 日
 
-	
+
 	// operation_type 操作类型 1--读取文件内容字符串 进行修改 2--对文件对文件内容(字节)--进行修改 3.对全体子文件进行的随性的操作
 	// 属性进行修改(文件名称)
 //     // 4.对当前子文件(包括子目录 子文件 --不包含孙目录 孙文件) 5. 从shell 中获取到的路径 去对某一个文件进行操作
 
-	
+
 	class Time_Head_Rule_25 extends Basic_Rule {
 		int originType;
 		int targetType;
@@ -240,10 +240,10 @@ public class G2_ApplyRuleFor_TypeFile {
 		@Override
 		String simpleDesc() {
 			return "\n" + Cur_Bat_Name + "  #_25  1992_2020   ##打开notepad输出当前1992年至2020年 年月历  \n" + Cur_Bat_Name
-					+ "  #_25  1990_   ##打开notepad输出当前1990年至今年"+getCurrentYear()+" 年月历 \n" 
+					+ "  #_25  1990_   ##打开notepad输出当前1990年至今年"+getCurrentYear()+" 年月历 \n"
 					+ Cur_Bat_Name + " #_25  _2010   ##打开notepad输出 1992(默认)至2010年年月历 \n ";
 		}
-		
+
 
 		@Override
 		boolean initParamsWithInputList(ArrayList<String> inputParamList) {
@@ -265,11 +265,11 @@ public class G2_ApplyRuleFor_TypeFile {
 					if(isNumeric(origin) && !"".equals(origin)) {
 						originType = Integer.parseInt(origin);
 					}
-				
+
 					if(isNumeric(target) && !"".equals(target)) {
 						targetType = Integer.parseInt(target);
 					}
-	           } else {
+				} else {
 					String[] parmas = inputFileTypeParams.split("_");
 					System.out.println(
 							"item=" + inputFileTypeParams + "   origin=" + parmas[0] + "     target=" + parmas[1]);
@@ -278,13 +278,13 @@ public class G2_ApplyRuleFor_TypeFile {
 						if(isNumeric(parmas[0]) ) {
 							originType = Integer.parseInt(parmas[0]);
 						}
-					
+
 						if(isNumeric(parmas[1])) {
 							targetType = Integer.parseInt(parmas[1]);
-						}		
-						
+						}
+
 					}
-	
+
 				}
 
 				Flag = true;
@@ -294,7 +294,7 @@ public class G2_ApplyRuleFor_TypeFile {
 
 			return super.initParamsWithInputList(inputParamList) && Flag;
 		}
-		
+
 		@Override
 		ArrayList<File> applyDir_SubFileListRule5(ArrayList<File> allSubDirFileList, ArrayList<File> allSubRealFileList) {
 			// TODO Auto-generated method stub
@@ -302,11 +302,11 @@ public class G2_ApplyRuleFor_TypeFile {
 			if(originType == -1 ) {  // 没有获取到 初始化值 那么 默认就是 1992
 				originType = 1992;
 			}
-			
+
 			if(targetType == -1 ) {  // 没有获取到 初始化值 那么 默认就是 1992
 				targetType =  getCurrentYear();
 			}
-			
+
 			// 确保  origin 是 小于 targetType 的
 			if(originType > targetType) {
 				targetType = originType + targetType;
@@ -314,7 +314,7 @@ public class G2_ApplyRuleFor_TypeFile {
 				targetType = targetType - originType;
 			}
 			StringBuilder sb = new StringBuilder();
-			
+
 			for (int i = targetType; i >= originType; i--) {
 				sb.append("   \n");
 				sb.append("   \n");
@@ -334,12 +334,12 @@ public class G2_ApplyRuleFor_TypeFile {
 
 			}
 			writeContentToFile(G2_Temp_Text_File, sb.toString());
-            NotePadOpenTargetFile(G2_Temp_Text_File.getAbsolutePath());
-		return super.applyDir_SubFileListRule5(allSubDirFileList, allSubRealFileList);
+			NotePadOpenTargetFile(G2_Temp_Text_File.getAbsolutePath());
+			return super.applyDir_SubFileListRule5(allSubDirFileList, allSubRealFileList);
 		}
 
 
-		
+
 
 
 	}
@@ -403,49 +403,49 @@ public class G2_ApplyRuleFor_TypeFile {
 
 			return super.initParamsWithInputList(inputParamList) && Flag;
 		}
-		
+
 		@Override
 		ArrayList<File> applySubFileListRule4(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
-			ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
-		// TODO Auto-generated method stub
-			
-			for (int i = 0; i < curFileList.size(); i++) {
-			File sonFile = curFileList.get(i);
-			
-			
-			File middle_dir = new File(sonFile.getAbsoluteFile() + File.separator + middle_dir_name);
-			if (!middle_dir.exists()) {
-				middle_dir.mkdirs();
-				System.out.println(" FFFFF  middle_dir = "+ middle_dir.getAbsolutePath());
-			}
-			
-			File sunFile = new File(middle_dir.getAbsolutePath() + File.separator + sonFile.getName());
+											  ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+			// TODO Auto-generated method stub
 
-			if (sonFile.isDirectory()) {
-			
-				ArrayList<File> searchRealList =getAllSubFile(sonFile);
-				String sonFile_abs = sonFile.getAbsolutePath();
-				
-				for (int j = 0; j < searchRealList.size(); j++) {
-					File realFile = searchRealList.get(j);
-					String realFile_abs = realFile.getAbsolutePath();
-					String fixed_realFile_abs = realFile_abs.replace(sonFile_abs, middle_dir.getAbsolutePath());
-					File targetFile = new File(fixed_realFile_abs);
-					fileCopy(realFile, targetFile);
-					realFile.delete();
+			for (int i = 0; i < curFileList.size(); i++) {
+				File sonFile = curFileList.get(i);
+
+
+				File middle_dir = new File(sonFile.getAbsoluteFile() + File.separator + middle_dir_name);
+				if (!middle_dir.exists()) {
+					middle_dir.mkdirs();
+					System.out.println(" FFFFF  middle_dir = "+ middle_dir.getAbsolutePath());
 				}
-			
-			} else {
+
+				File sunFile = new File(middle_dir.getAbsolutePath() + File.separator + sonFile.getName());
+
+				if (sonFile.isDirectory()) {
+
+					ArrayList<File> searchRealList =getAllSubFile(sonFile);
+					String sonFile_abs = sonFile.getAbsolutePath();
+
+					for (int j = 0; j < searchRealList.size(); j++) {
+						File realFile = searchRealList.get(j);
+						String realFile_abs = realFile.getAbsolutePath();
+						String fixed_realFile_abs = realFile_abs.replace(sonFile_abs, middle_dir.getAbsolutePath());
+						File targetFile = new File(fixed_realFile_abs);
+						fileCopy(realFile, targetFile);
+						realFile.delete();
+					}
+
+				} else {
 //				copyFile(sonFile, sunFile);
-				fileCopy(sonFile, sunFile);
+					fileCopy(sonFile, sunFile);
+				}
+				sonFile.delete();
+				System.out.println(" EEEEEE ");
+
 			}
-			sonFile.delete();
-			System.out.println(" EEEEEE ");
-				
-			}
-			
-			
-		return super.applySubFileListRule4(curFileList, subFileTypeMap, curDirList, curRealFileList);
+
+
+			return super.applySubFileListRule4(curFileList, subFileTypeMap, curDirList, curRealFileList);
 		}
 
 
@@ -643,8 +643,8 @@ public class G2_ApplyRuleFor_TypeFile {
 
 		@Override
 		ArrayList<File> applySubFileListRule4(ArrayList<File> curFileList,
-				HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList,
-				ArrayList<File> curRealFileList) {
+											  HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList,
+											  ArrayList<File> curRealFileList) {
 
 			ArrayList<File> operationFileList = new ArrayList<File>();
 			ArrayList<File> newOperationFileList = new ArrayList<File>();
@@ -887,15 +887,15 @@ public class G2_ApplyRuleFor_TypeFile {
 			int heigh = p_heigh;
 			Color currentColor = new Color(255, 255, 255);
 			/*
-			 * 
+			 *
 			 * BufferedImage bi = new BufferedImage(width,heigh,
 			 * BufferedImage.TYPE_INT_RGB);//INT精确度达到一定,RGB三原色，高度70,宽度150 //得到它的绘制环境(这张图片的笔)
 			 * Graphics2D g2 = (Graphics2D) bi.getGraphics(); int frontSize = 550;
-			 * 
+			 *
 			 * g2.setBackground(currentColor); g2.fillRect(0,0,width,heigh);//填充一个矩形
 			 * 左上角坐标(0,0),宽500,高500;填充整张图片 g2.fillRect(0,0,width,heigh);//填充整张图片(其实就是设置背景颜色)
 			 * g2.setColor(currentColor);
-			 * 
+			 *
 			 */
 
 			imgBuf = new BufferedImage(width, heigh, BufferedImage.TYPE_INT_RGB);
@@ -907,11 +907,11 @@ public class G2_ApplyRuleFor_TypeFile {
 
 			return imgBuf;
 			/*
-			 * 
+			 *
 			 * try { mCurFile.createNewFile(); ImageIO.write(imgBuf, "jpg", new
 			 * FileOutputStream(mCurFile));//保存图片 JPEG表示保存格式 //
 			 * System.out.println("创建 RGB "+"R="+r+"  G="+g+"  B="+b+" 图片成功！");
-			 * 
+			 *
 			 * } catch (Exception e) { System.out.println("创建 RGB 图片格式出现异常！"+
 			 * mCurFile.getAbsolutePath()); }
 			 */
@@ -1015,8 +1015,8 @@ public class G2_ApplyRuleFor_TypeFile {
 
 		@Override
 		ArrayList<File> applySubFileListRule4(ArrayList<File> curFileList,
-				HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList,
-				ArrayList<File> curRealFileList) {
+											  HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList,
+											  ArrayList<File> curRealFileList) {
 
 			for (int i = 0; i < curRealFileList.size(); i++) {
 				File fileItem = curRealFileList.get(i);
@@ -1179,8 +1179,8 @@ public class G2_ApplyRuleFor_TypeFile {
 
 		@Override
 		ArrayList<File> applySubFileListRule4(ArrayList<File> curFileList,
-				HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList,
-				ArrayList<File> curRealFileList) {
+											  HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList,
+											  ArrayList<File> curRealFileList) {
 
 			for (int i = 0; i < curRealFileList.size(); i++) {
 				File fileItem = curRealFileList.get(i);
@@ -1463,7 +1463,7 @@ public class G2_ApplyRuleFor_TypeFile {
 					+ "\n" + Cur_Bat_Name
 					+ " #_19  <指定文件A> <指定文件B>          ### 把当前文件夹下 指定文件名称 单独压缩为 .7z 文件 文件名不变化   密码默认为 752025 !   \"+ "
 
-			;
+					;
 		}
 
 	}
@@ -1621,7 +1621,7 @@ public class G2_ApplyRuleFor_TypeFile {
 					+ "\n" + Cur_Bat_Name
 					+ " #_18  <指定文件A> <指定文件B>          ### 把当前文件夹下 指定文件名称  文件全部改名为 MD5属性命名的文件 【(32)位16进制.type】 "
 
-			;
+					;
 		}
 
 	}
@@ -1673,8 +1673,8 @@ public class G2_ApplyRuleFor_TypeFile {
 
 		@Override
 		ArrayList<File> applySubFileListRule4(ArrayList<File> curFileList,
-				HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList,
-				ArrayList<File> curRealFileList) {
+											  HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList,
+											  ArrayList<File> curRealFileList) {
 			if (curDirFile != null) {
 				for (int i = 0; i < dirNameList.size(); i++) {
 					String dirName = dirNameList.get(i);
@@ -1858,8 +1858,8 @@ public class G2_ApplyRuleFor_TypeFile {
 
 		@Override
 		ArrayList<File> applySubFileListRule4(ArrayList<File> curFileList,
-				HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList,
-				ArrayList<File> curRealFileList) {
+											  HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList,
+											  ArrayList<File> curRealFileList) {
 
 			ArrayList<File> webpFile = subFileTypeMap.get(".webp");
 			if (webpFile == null) {
@@ -2113,7 +2113,7 @@ public class G2_ApplyRuleFor_TypeFile {
 					+ "\n" + Cur_Bat_Name
 					+ " #_14  .jpg  .png  .gif  .webp .mp4 .avi .flv .wmv     ### 生成 视频 + 图片 格式文件集合  源文件被按顺序重命名 1_ 2_ 动态计算当前文件夹中所有子文件中的视频文件 并在当前目录生成 JPG_20200522_154600 MP4_20200522_154600 字样的文件夹 \n"
 
-			;
+					;
 		}
 	}
 
@@ -2230,8 +2230,8 @@ public class G2_ApplyRuleFor_TypeFile {
 
 		@Override
 		ArrayList<File> applySubFileListRule4(ArrayList<File> curFileList,
-				HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList,
-				ArrayList<File> curRealFileList) {
+											  HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList,
+											  ArrayList<File> curRealFileList) {
 			ArrayList<File> operaDirList = new ArrayList<File>();
 			boolean isMultiDirInput = false;
 			String curBasePath = "";
@@ -2637,8 +2637,8 @@ public class G2_ApplyRuleFor_TypeFile {
 
 		@Override
 		ArrayList<File> applySubFileListRule4(ArrayList<File> curFileList,
-				HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList,
-				ArrayList<File> curRealFileList) {
+											  HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList,
+											  ArrayList<File> curRealFileList) {
 			if (operaDirFileList.size() == 0) {
 				System.out.println("当前用户没有输入执行的目录名称,请重新输入!");
 				return null;
@@ -2653,22 +2653,22 @@ public class G2_ApplyRuleFor_TypeFile {
 
 		void OperationHtmlMedia(File xdirFile) {
 			switch (operaType) {
-			case 1: // mp4
-				ArrayList<File> mp4_mediaFileList = getSubTypeFileWithPoint(xdirFile, ".mp4");
-				tryMediaFileRenameOperation(mp4_mediaFileList, ".mp4");
-				tryMP4HtmlOperation(xdirFile, mp4_mediaFileList.size());
-				break;
-			case 2: // jpg
-				ArrayList<File> jpg_mediaFileList = getSubTypeFileWithPoint(xdirFile, ".jpg");
-				tryMediaFileRenameOperation(jpg_mediaFileList, ".jpg");
-				tryJPGHtmlOperation(xdirFile, jpg_mediaFileList.size());
-				break;
-			case 3: // gif
-				ArrayList<File> gif_mediaFileList = getSubTypeFileWithPoint(xdirFile, ".gif");
-				tryMediaFileRenameOperation(gif_mediaFileList, ".gif");
-				tryGIFHtmlOperation(xdirFile, gif_mediaFileList.size());
-				break;
-			default:
+				case 1: // mp4
+					ArrayList<File> mp4_mediaFileList = getSubTypeFileWithPoint(xdirFile, ".mp4");
+					tryMediaFileRenameOperation(mp4_mediaFileList, ".mp4");
+					tryMP4HtmlOperation(xdirFile, mp4_mediaFileList.size());
+					break;
+				case 2: // jpg
+					ArrayList<File> jpg_mediaFileList = getSubTypeFileWithPoint(xdirFile, ".jpg");
+					tryMediaFileRenameOperation(jpg_mediaFileList, ".jpg");
+					tryJPGHtmlOperation(xdirFile, jpg_mediaFileList.size());
+					break;
+				case 3: // gif
+					ArrayList<File> gif_mediaFileList = getSubTypeFileWithPoint(xdirFile, ".gif");
+					tryMediaFileRenameOperation(gif_mediaFileList, ".gif");
+					tryGIFHtmlOperation(xdirFile, gif_mediaFileList.size());
+					break;
+				default:
 			}
 
 		}
@@ -2791,7 +2791,7 @@ public class G2_ApplyRuleFor_TypeFile {
 		@SuppressWarnings("unchecked")
 		@Override
 		ArrayList<File> applyDir_SubFileListRule5(ArrayList<File> allSubDirFileList,
-				ArrayList<File> allSubRealFileList) {
+												  ArrayList<File> allSubRealFileList) {
 
 			System.out.println("allSubDirFileList = " + allSubDirFileList.size());
 			System.out.println("allSubRealFileList = " + allSubRealFileList.size());
@@ -2846,7 +2846,7 @@ public class G2_ApplyRuleFor_TypeFile {
 								/*
 								 * System.out.println(fileItem2+ " fileItem2.exists() = "+ fileItem2.exists());
 								 * String newName2 = newName1.replace("_ZHolder_","");
-								 * 
+								 *
 								 * if(tryReName(fileItem2,newName2)){
 								 * System.out.println("成功 Index ="+m+"  命名( "+oldName+" => "+
 								 * newName1+")  => "+curFile.getAbsolutePath()); }else{
@@ -2884,8 +2884,8 @@ public class G2_ApplyRuleFor_TypeFile {
 		@SuppressWarnings("unchecked")
 		@Override
 		ArrayList<File> applySubFileListRule4(ArrayList<File> curFileList,
-				HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList,
-				ArrayList<File> curRealFileList) {
+											  HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList,
+											  ArrayList<File> curRealFileList) {
 
 			if (!curDirList.contains(curDirFile)) {
 				curDirList.add(curDirFile);
@@ -2937,7 +2937,7 @@ public class G2_ApplyRuleFor_TypeFile {
 								/*
 								 * System.out.println(fileItem2+ " fileItem2.exists() = "+ fileItem2.exists());
 								 * String newName2 = newName1.replace("_ZHolder_","");
-								 * 
+								 *
 								 * if(tryReName(fileItem2,newName2)){
 								 * System.out.println("成功 Index ="+m+"  命名( "+oldName+" => "+
 								 * newName1+")  => "+curFile.getAbsolutePath()); }else{
@@ -3102,51 +3102,51 @@ public class G2_ApplyRuleFor_TypeFile {
 
 		@Override
 		ArrayList<File> applySubFileListRule4(ArrayList<File> curFileList,
-				HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList,
-				ArrayList<File> curRealFileList) {
+											  HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList,
+											  ArrayList<File> curRealFileList) {
 
 			switch (currentOperaType) {
 
-			case 1:
-				for (int i = 0; i < curDirList.size(); i++) {
-					File dirFile = curDirList.get(i);
-					String dirName = dirFile.getName();
-					String newName = dirName + appendStr_1;
-					tryReName(dirFile, newName);
-				}
-				break;
+				case 1:
+					for (int i = 0; i < curDirList.size(); i++) {
+						File dirFile = curDirList.get(i);
+						String dirName = dirFile.getName();
+						String newName = dirName + appendStr_1;
+						tryReName(dirFile, newName);
+					}
+					break;
 
-			case 2:
-				for (int i = 0; i < curDirList.size(); i++) {
-					File dirFile = curDirList.get(i);
-					String dirName = dirFile.getName();
-					String newName = prefixStr_2 + dirName;
-					tryReName(dirFile, newName);
-				}
-				break;
+				case 2:
+					for (int i = 0; i < curDirList.size(); i++) {
+						File dirFile = curDirList.get(i);
+						String dirName = dirFile.getName();
+						String newName = prefixStr_2 + dirName;
+						tryReName(dirFile, newName);
+					}
+					break;
 
-			case 3:
-				for (int i = beginIndex_3; i < endIndex_3 + 1; i++) {
-					String absDirPath = curDirFile.getAbsolutePath();
-					String newDir = absDirPath + File.separator + prefixStr_3 + i + appendStr_3;
-					File curDirFileItem = new File(newDir);
-					curDirFileItem.mkdirs();
-				}
-				break;
+				case 3:
+					for (int i = beginIndex_3; i < endIndex_3 + 1; i++) {
+						String absDirPath = curDirFile.getAbsolutePath();
+						String newDir = absDirPath + File.separator + prefixStr_3 + i + appendStr_3;
+						File curDirFileItem = new File(newDir);
+						curDirFileItem.mkdirs();
+					}
+					break;
 
-			case 4:
+				case 4:
 
-				for (int i = 0; i < curDirList.size(); i++) {
-					File dirFile = curDirList.get(i);
-					String dirName = dirFile.getName();
-					String newName = dirName.replace(replacedStr_4, newNameStr_4);
-					tryReName(dirFile, newName);
-				}
+					for (int i = 0; i < curDirList.size(); i++) {
+						File dirFile = curDirList.get(i);
+						String dirName = dirFile.getName();
+						String newName = dirName.replace(replacedStr_4, newNameStr_4);
+						tryReName(dirFile, newName);
+					}
 
-				break;
+					break;
 
-			default:
-				System.out.println("当前 currentOperaType = " + currentOperaType + "  没有找到合适的操作类型去处理 ");
+				default:
+					System.out.println("当前 currentOperaType = " + currentOperaType + "  没有找到合适的操作类型去处理 ");
 			}
 
 			return curDirList;
@@ -3307,8 +3307,8 @@ public class G2_ApplyRuleFor_TypeFile {
 
 		@Override
 		ArrayList<File> applySubFileListRule4(ArrayList<File> curFileList,
-				HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList,
-				ArrayList<File> curRealFileList) {
+											  HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList,
+											  ArrayList<File> curRealFileList) {
 
 			System.out.println("Rule8_ClearChineseType_8   搜索到的实体文件个数:" + curRealFileList.size());
 
@@ -3397,7 +3397,7 @@ public class G2_ApplyRuleFor_TypeFile {
 //        Cur_Bat_Name + "  jgm_5_nextstep  [索引5]   //  JPG="+jpgBeginIndex+ " GIF="+gifBeginIndex+" MP4="+mp4BeginIndex+"  JPG增量="+nextStepCountJPG +"    GIF增量="+nextStepCountGIF + "   MP4增量="+nextStepCountMP4+" ▲【 把jpg gif png的增量添加到 beginIndex 然后增量置0 】 \n ";
 
 		void jiamiAllDir(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
-				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+						 ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 			// 1.创建一个时间戳文件夹
 			// 2.在当前文件夹的基础上
 
@@ -3455,7 +3455,7 @@ public class G2_ApplyRuleFor_TypeFile {
 		}
 
 		void jiemiAllDir(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
-				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+						 ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 
 			// 1.创建一个时间戳文件夹
 			// 2.在当前文件夹的基础上
@@ -3479,11 +3479,13 @@ public class G2_ApplyRuleFor_TypeFile {
 			if (!curDirList.contains(curDirFile)) {
 				curDirList.add(curDirFile);
 			}
-			System.out.println("执行当前所有文件 解密操作 ");
+			System.out.println("执行当前所有文件 解密操作  curDirList.size() = "+ curDirList.size());
 
 			for (int i = 0; i < curDirList.size(); i++) {
 				File oldDirFile = curDirList.get(i); // 原有的要解密文件
 
+//				执行当前所有文件  解密操作  [0] = D:\BaiduNetdiskDownload\公式\bad_batch\A
+				System.out.println("执行当前所有文件  解密操作  ["+i+"] = "+ oldDirFile.getAbsolutePath());
 				if (!isBatchOperation) { // 如果 不是 batch 那么会创建文件夹
 					// 如果是当前目录下多 子文件夹 那么就把在* 的 情况下会 创建这个文件夹 事实上在 batch的情况下不需要这个文件夹
 					String newDirFilePath = oldDirFile.getAbsolutePath().replace(oldBasePath, newBasePath);
@@ -3508,10 +3510,25 @@ public class G2_ApplyRuleFor_TypeFile {
 						// 解密操作
 						createDecryFile(oldRealFile, newRealFile);
 					} else {
-//    String newRealFilePath = oldRealFile.getAbsolutePath().replace(oldBasePath, newBasePath);
+    String newRealFilePath = oldRealFile.getAbsolutePath().replace(oldBasePath, newBasePath);
+
+/*
+执行当前 解密操作
+执行当前所有文件  解密操作  [0] = D:\BaiduNetdiskDownload\公式\bad_batch\A  == oldDirFile.getAbsolutePath()
+batch_fileName = A.pdf  == batch_fileName
+newBasePath=D:\BaiduNetdiskDownload\公式\bad_batch\good_batch
+newBasePath=D:\BaiduNetdiskDownload\公式\bad_batch\good_batch\A  =====> newBasePath 应该还有一个 A
+newRealFilePath = D:\BaiduNetdiskDownload\公式\bad_batch\good_batch\A\A.pdf
+newRealFile=D:\BaiduNetdiskDownload\公式\bad_batch\good_batch\A.pdf
+*/
+
+
 						String batch_fileName = oldRealFile.getName();
-						File newRealFile = new File(newBasePath + File.separator + batch_fileName);
+//						File newRealFile = new File(newBasePath + File.separator + batch_fileName);   //  子文件夹取消 消失
+						File newRealFile = new File(newRealFilePath);  //  子文件夹存在
 						// 解密操作
+						System.out.println("执行当前 解密操作  batch_fileName = "+ batch_fileName +"     newBasePath="+newBasePath+"    newRealFile="+newRealFile.getAbsolutePath());
+						System.out.println(" newRealFilePath = "+ newRealFilePath);
 						createDecryFile(oldRealFile, newRealFile);
 					}
 
@@ -3530,8 +3547,8 @@ public class G2_ApplyRuleFor_TypeFile {
 
 		@Override
 		ArrayList<File> applySubFileListRule4(ArrayList<File> curFileList,
-				HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList,
-				ArrayList<File> curRealFileList) {
+											  HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList,
+											  ArrayList<File> curRealFileList) {
 			System.out.println("Rule7 搜索到的实体文件个数:  curRealFileList.size() =" + curRealFileList.size());
 			if (isAllFileOperation) {
 				if (mEncroptyDirect) {
@@ -3587,6 +3604,7 @@ public class G2_ApplyRuleFor_TypeFile {
 					}
 
 					File badFile = new File(tempDirPath + File.separator + currentFileName);
+
 					createEncryFile(curFile, badFile);
 				} else { // 解密 如果当前文件 不包含 .
 					if (!currentFileName.contains(".") && currentFileName.contains("i_temp")) {
@@ -3597,6 +3615,7 @@ public class G2_ApplyRuleFor_TypeFile {
 						currentFileName = currentFileName + ".gif";
 					}
 					File goodFile = new File(tempDirPath + File.separator + currentFileName);
+					System.out.println("createDecryFile goodFile = "+goodFile.getAbsolutePath()  +"tempDirPath = "+tempDirPath);
 					createDecryFile(curFile, goodFile);
 				}
 			}
@@ -3654,8 +3673,8 @@ public class G2_ApplyRuleFor_TypeFile {
 		@SuppressWarnings("unchecked")
 		@Override
 		ArrayList<File> applySubFileListRule4(ArrayList<File> curFileList,
-				HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList,
-				ArrayList<File> curRealFileList) {
+											  HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList,
+											  ArrayList<File> curRealFileList) {
 
 			boolean executeFlag = false;
 			boolean isFixedAllSubFlag = curFilterFileTypeList.contains("#");
@@ -4008,7 +4027,7 @@ public class G2_ApplyRuleFor_TypeFile {
 			}
 
 			if (jpgDynimicCount != jpgBeginIndex || (jpgLastIndex + 1) != jpgDynimicCount) { // 大小 和 记录的起始点 不一致 那么需要
-																								// 重新该名称
+				// 重新该名称
 				for (int i = 0; i < jpgTempList.size(); i++) {
 					File jpgFile = jpgTempList.get(i);
 					String jpgFileName = "i" + "_" + getPaddingIntStringWithDirIndexFileNameWithIndex(tempTag,
@@ -4018,7 +4037,7 @@ public class G2_ApplyRuleFor_TypeFile {
 			}
 
 			if (gifDynimicCount != gifBeginIndex || (gifLastIndex + 1) != gifDynimicCount) { // 大小 和 记录的起始点 不一致 那么需要
-																								// 重新该名称
+				// 重新该名称
 				for (int i = 0; i < gifTempList.size(); i++) {
 					File gifFile = gifTempList.get(i);
 					String gifFileName = "g" + "_" + getPaddingIntStringWithDirIndexFileNameWithIndex(tempTag,
@@ -4028,7 +4047,7 @@ public class G2_ApplyRuleFor_TypeFile {
 			}
 
 			if (mp4DynimicCount != mp4BeginIndex || (mp4LastIndex + 1) != mp4DynimicCount) { // 大小 和 记录的起始点 不一致 那么需要
-																								// 重新该名称
+				// 重新该名称
 				for (int i = 0; i < mp4TempList.size(); i++) {
 					File mp4File = mp4TempList.get(i);
 					String mp4FileName = "v" + "_" + getPaddingIntStringWithDirIndexFileNameWithIndex(tempTag,
@@ -4267,7 +4286,7 @@ public class G2_ApplyRuleFor_TypeFile {
 
 		// 从 起始的地址 beginIndex 开始计算
 		String getPaddingIntStringWithDirIndexFileNameWithIndex(String cTempTag, int CurrentTempIndex, int beginIndex,
-				int index, int padinglength, String oneStr, boolean dirPre) {
+																int index, int padinglength, String oneStr, boolean dirPre) {
 
 			int indexIdentify = beginIndex + index;
 			int tempIndexResult = (indexIdentify / 1000);
@@ -4278,7 +4297,7 @@ public class G2_ApplyRuleFor_TypeFile {
 
 		// 不从起始的地址 计算 从0，1,2,3.... 开始计算
 		String getPaddingIntStringWithDirIndexFileName(String cTempTag, int CurrentTempIndex, int index,
-				int padinglength, String oneStr, boolean dirPre) {
+													   int padinglength, String oneStr, boolean dirPre) {
 
 			int tempIndexA = (index / 1000);
 			int tempIndexResult = CurrentTempIndex + tempIndexA;
@@ -4287,13 +4306,13 @@ public class G2_ApplyRuleFor_TypeFile {
 
 			/*
 			 * int length = (""+index).length();
-			 * 
+			 *
 			 * if(length < padinglength){ int distance = padinglength - length; for (int i =
 			 * 0; i < distance; i++) { if(dirPre){ result = oneStr+result; }else{ result =
 			 * result + oneStr; }
-			 * 
+			 *
 			 * }
-			 * 
+			 *
 			 * }
 			 */
 
@@ -4581,7 +4600,7 @@ public class G2_ApplyRuleFor_TypeFile {
 			StringBuilder sb = new StringBuilder();
 			if (origin.contains("<script>") && origin.contains("</script>") && origin.contains("</body>")
 					&& origin.indexOf("</body>") > origin.indexOf("<script>") && // <script> </body> // script 索引小于
-																					// </body>的索引
+					// </body>的索引
 					origin.indexOf("</script>") == origin.lastIndexOf("</script>")) { // 只包含一个 </script>
 				int scriptBegin = origin.indexOf("<script>");
 				int scriptEnd = origin.indexOf("</script>") + "</script>".length();
@@ -4630,14 +4649,14 @@ public class G2_ApplyRuleFor_TypeFile {
 
 		@Override
 		ArrayList<File> applySubFileListRule4(ArrayList<File> curFileList,
-				HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList,
-				ArrayList<File> curRealFileList) {
+											  HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList,
+											  ArrayList<File> curRealFileList) {
 			return curFileList;
 		}
 
 		@Override
 		ArrayList<File> applyDir_SubFileListRule5(ArrayList<File> allSubDirFileList,
-				ArrayList<File> allSubRealFileList) {
+												  ArrayList<File> allSubRealFileList) {
 
 			return null;
 		}
@@ -4708,21 +4727,21 @@ public class G2_ApplyRuleFor_TypeFile {
 		abstract File applyFileByteOperationRule2(File originFile);
 
 		abstract ArrayList<File> applyFileListRule3(ArrayList<File> subFileList,
-				HashMap<String, ArrayList<File>> fileTypeMap);
+													HashMap<String, ArrayList<File>> fileTypeMap);
 
 		abstract ArrayList<File> applySubFileListRule4(ArrayList<File> curFileList,
-				HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList,
-				ArrayList<File> curRealFileList);
+													   HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList,
+													   ArrayList<File> curRealFileList);
 
 		abstract ArrayList<File> applyDir_SubFileListRule5(ArrayList<File> allSubDirFileList,
-				ArrayList<File> allSubRealFileList);
+														   ArrayList<File> allSubRealFileList);
 
 		abstract boolean initParams4InputParam(String inputParam); // 初始化Rule的参数 依据输入的字符串
 
 		abstract boolean initParamsWithInputList(ArrayList<String> inputParamList);
 
 		abstract String ruleTip(String type, int index, String batName, OS_TYPE curType); // 使用说明列表 如果覆盖 那么就不使用默认的说明 ,
-																							// 默认就一种情况
+		// 默认就一种情况
 
 		abstract String simpleDesc(); // 使用的简单描述 中文的该 rule的使用情况 默认会在 ruleTip 被调用
 
@@ -4795,11 +4814,11 @@ public class G2_ApplyRuleFor_TypeFile {
 	}
 
 	public static boolean isNumeric(String str ) {
-		
+
 		if(str == null ) {
 			return false;
 		}
-		
+
 		for (int i = str.length(); --i >= 0;) {
 			if (!Character.isDigit(str.charAt(i))) {
 				return false;
@@ -5062,6 +5081,10 @@ public class G2_ApplyRuleFor_TypeFile {
 		BufferedInputStream encryptBufferedInputStream = null;
 
 		try {
+			if (!decryptFile.getParentFile().exists()) {
+				decryptFile.getParentFile().mkdirs();
+			}
+
 			if (!decryptFile.exists()) {
 				decryptFile.createNewFile();
 			}
@@ -5086,7 +5109,7 @@ public class G2_ApplyRuleFor_TypeFile {
 			}
 
 			byte[] decrypt_bytes = decrypt(TEMP_Rule7); // 对加密文件的加密字节进行解密
-			System.out.println("解密文件:" + decryptFile.getName() + "  密文加密字节大小:" + TEMP_Rule7.length + "   解密密文之后的明文大小:"
+			System.out.println("源文件:"+encryptFile.getAbsolutePath()+"    解密文件:" + decryptFile.getAbsolutePath() + "  密文加密字节大小:" + TEMP_Rule7.length + "   解密密文之后的明文大小:"
 					+ decrypt_bytes.length);
 
 			decryptBufferedOutputStream.write(decrypt_bytes);
@@ -5573,7 +5596,7 @@ public class G2_ApplyRuleFor_TypeFile {
 
 	/**
 	 * 执行 mac(unix) 脚本命令~
-	 * 
+	 *
 	 * @param command
 	 * @return
 	 */
@@ -5618,32 +5641,32 @@ public class G2_ApplyRuleFor_TypeFile {
 	static int getCurrentYear() {
 
 		SimpleDateFormat df = new SimpleDateFormat("YYYY");
-	
+
 		return Integer.parseInt(df.format(new Date()));
-		
+
 	}
-	
-    // A1  ..... A2.
-    static String get_Bat_Sh_FlagNumber(String mCur_Bat_Name){
-        String mCharNumber = "error";
-        String curBat =mCur_Bat_Name;
-        if(mCur_Bat_Name.contains(".sh")){
-            curBat = curBat.replace(".sh","");
-        }
 
-        if(mCur_Bat_Name.contains(".bat")){
-            curBat = curBat.replace(".bat","");
-        }
-        if(curBat.contains("_")){
-            String[] arrNameList =    curBat.split("_");
-            mCharNumber =   arrNameList[arrNameList.length-1];
-        }else{
-            mCharNumber = curBat;
-        }
+	// A1  ..... A2.
+	static String get_Bat_Sh_FlagNumber(String mCur_Bat_Name){
+		String mCharNumber = "error";
+		String curBat =mCur_Bat_Name;
+		if(mCur_Bat_Name.contains(".sh")){
+			curBat = curBat.replace(".sh","");
+		}
 
-        return mCharNumber;
-    }
-    
+		if(mCur_Bat_Name.contains(".bat")){
+			curBat = curBat.replace(".bat","");
+		}
+		if(curBat.contains("_")){
+			String[] arrNameList =    curBat.split("_");
+			mCharNumber =   arrNameList[arrNameList.length-1];
+		}else{
+			mCharNumber = curBat;
+		}
+
+		return mCharNumber;
+	}
+
 	public static String execCMD(String command) {
 
 		String result = "";
@@ -5658,27 +5681,27 @@ public class G2_ApplyRuleFor_TypeFile {
 		}
 		return result;
 	}
-	
-    /**
-     * 执行 mac(unix) 脚本命令~
-     * @param command
-     * @return
-     */
-    public static int execute_Mac(String command) {
-        String[] cmd = {"/bin/bash","-c",command};
-        Runtime rt = Runtime.getRuntime();
-        Process proc = null;
-        try {
-            proc = rt.exec(cmd);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
 
-        // 打开流
+	/**
+	 * 执行 mac(unix) 脚本命令~
+	 * @param command
+	 * @return
+	 */
+	public static int execute_Mac(String command) {
+		String[] cmd = {"/bin/bash","-c",command};
+		Runtime rt = Runtime.getRuntime();
+		Process proc = null;
+		try {
+			proc = rt.exec(cmd);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		// 打开流
 //        OutputStream os = proc.getOutputStream();
 //        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(os));
 
-        try {
+		try {
 //            String newCommand = "/bin/bash -c "+"\""+command+"\"";
 //            System.out.println("newCommand = " + newCommand);
 
@@ -5688,17 +5711,17 @@ public class G2_ApplyRuleFor_TypeFile {
 //            bw.flush();
 //            bw.close();
 
-            /** 真奇怪，把控制台的输出打印一遍之后竟然能正常终止了~ */
+			/** 真奇怪，把控制台的输出打印一遍之后竟然能正常终止了~ */
 //            readConsole(proc);
 
-            /** waitFor() 的作用在于 java 程序是否等待 Terminal 执行脚本完毕~ */
-            proc.waitFor();
-            Thread.sleep(100000);
+			/** waitFor() 的作用在于 java 程序是否等待 Terminal 执行脚本完毕~ */
+			proc.waitFor();
+			Thread.sleep(100000);
 
 
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 //        int retCode = proc.exitValue();
 //        if (retCode != 0) {
 //            System.out.println("unix script retCode = " + retCode);
@@ -5707,23 +5730,23 @@ public class G2_ApplyRuleFor_TypeFile {
 //            System.out.println("UnixScriptUil.execute 出错了!!");
 //        }
 
-        return 0;
-    }
+		return 0;
+	}
 
-    
-	
-    static void NotePadOpenTargetFile(String absPath){
-        String commandNotead = "";
-        if(CUR_OS_TYPE == OS_TYPE.Windows){
-            commandNotead = "cmd.exe /c start   Notepad++.exe " + absPath;
-            execCMD(commandNotead);
 
-        }else if(CUR_OS_TYPE == OS_TYPE.Linux){
-            commandNotead  = " gedit " + absPath;
-        }else if(CUR_OS_TYPE == OS_TYPE.MacOS){
-            commandNotead  = "/Applications/UltraEdit  " + absPath;
-            execute_Mac(commandNotead);
-        }
-    }
-    
+
+	static void NotePadOpenTargetFile(String absPath){
+		String commandNotead = "";
+		if(CUR_OS_TYPE == OS_TYPE.Windows){
+			commandNotead = "cmd.exe /c start   Notepad++.exe " + absPath;
+			execCMD(commandNotead);
+
+		}else if(CUR_OS_TYPE == OS_TYPE.Linux){
+			commandNotead  = " gedit " + absPath;
+		}else if(CUR_OS_TYPE == OS_TYPE.MacOS){
+			commandNotead  = "/Applications/UltraEdit  " + absPath;
+			execute_Mac(commandNotead);
+		}
+	}
+
 }
