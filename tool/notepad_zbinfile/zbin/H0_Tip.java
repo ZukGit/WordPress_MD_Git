@@ -625,6 +625,22 @@ public class H0_Tip {
 
     static void Security_File_Tip(){
 
+
+        System.out.println();
+        System.out.println("________________________ 【zapp】【解密】【Html】 ________________________");
+        System.out.println("zrule_apply_G2"+BAT_OR_SH_Point+" " +"#_7_good_batch  ******原封不动解码");
+        System.out.println("cd ./good_batch                       ******进入解码文件夹");
+        System.out.println("zrule_apply_G2"+BAT_OR_SH_Point+" " +" #_27  _jpg     ******文件名包含jpg文件夹中的无类型改为jpg");
+        System.out.println("zrule_apply_G2"+BAT_OR_SH_Point+" " +" #_27  _mp4     ******文件名包含gif文件夹中的无类型改为gif");
+        System.out.println("zrule_apply_G2"+BAT_OR_SH_Point+" " +" #_27  _gif     ******文件名包含mp4文件夹中的无类型改为mp4");
+        System.out.println("zrule_apply_G2"+BAT_OR_SH_Point+" " +" #_12_jpg       ******文件名包含jpg文件夹生成 jpg-html文件");
+        System.out.println("zrule_apply_G2"+BAT_OR_SH_Point+" " +" #_12_mp4       ******文件名包含mp4文件夹生成 mp4-html文件");
+        System.out.println("zrule_apply_G2"+BAT_OR_SH_Point+" " +" #_12_gif       ******文件名包含gif文件夹生成 gif-html文件");
+        System.out.println("zrule_apply_G2"+BAT_OR_SH_Point+" " +"#_7_good_batch && cd ./good_batch  &&  zrule_apply_G2"+BAT_OR_SH_Point+" " +" #_27  _jpg  &&  zrule_apply_G2"+BAT_OR_SH_Point+" " +" #_27  _mp4  &&  zrule_apply_G2"+BAT_OR_SH_Point+" " +" #_27  _gif &&  zrule_apply_G2"+BAT_OR_SH_Point+" " +" #_12_jpg  &&  zrule_apply_G2"+BAT_OR_SH_Point+" " +" #_12_mp4 &&  zrule_apply_G2"+BAT_OR_SH_Point+" " +" #_12_gif");
+        System.out.println();
+
+
+
         System.out.println("________________________ ZVI_Position 【解压】【生成Html】 ________________________");
         System.out.println("zrule_apply_G2"+BAT_OR_SH_Point+" " +"#_7_good_batch  ******原封不动解码");
         System.out.println("cd ./good_batch                    ******进入解码文件夹");
@@ -681,12 +697,12 @@ public class H0_Tip {
         System.out.println();
         System.out.println("________________________ gif 动态文件 加密 解密 无类型批量操作 批量操作 ________________________ ");
         System.out.println("【对gif 改名并加密 生产加密文件夹】");
-        System.out.println(" zrule_apply_G2"+BAT_OR_SH_Point+" #_18  .gif    && zrule_apply_G2"+BAT_OR_SH_Point+" #_18  .webp  &&   zrule_apply_G2"+BAT_OR_SH_Point+" "+"zrule_apply_G2"+BAT_OR_SH_Point+" #_9  gif_ && zrule_apply_G2"+BAT_OR_SH_Point+" #_9  webp_"
-                + " #_7_bad_batch       ");
+        System.out.println("zrule_apply_G2"+BAT_OR_SH_Point+" " +"#_18  .gif    && zrule_apply_G2"+BAT_OR_SH_Point+" " +"#_18  .webp  && zrule_apply_G2"+BAT_OR_SH_Point+" " +" #_7_bad_batch && cd ./bad_batch  &&   zrule_apply_G2"+BAT_OR_SH_Point+" " +"#_9  gif_");
+
+
         System.out.println("【 gif 对加密文件解密】");
-        System.out.println("zrule_apply_G2"+BAT_OR_SH_Point+" #_9  _gif"+ "  &&  zrule_apply_G2"+BAT_OR_SH_Point+" #_7_good_batch     ");
-
-
+        System.out.println("zrule_apply_G2"+BAT_OR_SH_Point+" " +"#_7_good_batch && cd ./good_batch && zrule_apply_G2"+BAT_OR_SH_Point+" " +"#_9  _gif");
+        System.out.println();
 
 
 

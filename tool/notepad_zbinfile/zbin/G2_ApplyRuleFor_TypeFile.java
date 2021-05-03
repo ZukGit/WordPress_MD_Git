@@ -217,9 +217,150 @@ public class G2_ApplyRuleFor_TypeFile {
 		// zrule_apply_G2.bat #_25  1992_2021 这样 
 		realTypeRuleList.add(new Time_Head_Rule_25());
 		realTypeRuleList.add(new Rename_By_Dir_Rule_26());
+		realTypeRuleList.add(new Rercovery_Type_By_DirName_Rule_27());
+
+
 	}
 
 // 3038年 5 月 3 日
+
+
+	// operation_type 操作类型 1--读取文件内容字符串 进行修改 2--对文件对文件内容(字节)--进行修改 3.对全体子文件进行的随性的操作
+	// 属性进行修改(文件名称)
+//     // 4.对当前子文件(包括子目录 子文件 --不包含孙目录 孙文件) 5. 从shell 中获取到的路径 去对某一个文件进行操作
+
+
+
+// 在  包含 mp4 文件夹名称 把 无类型的文件 改为 mp4 , 对应 gif  jpg
+	class Rercovery_Type_By_DirName_Rule_27 extends Basic_Rule {
+		String originType;
+		String targetType;
+
+		Rercovery_Type_By_DirName_Rule_27() {
+			super("#", 27, 5);
+		}
+
+		@Override
+		String simpleDesc() {
+			return "\n" + Cur_Bat_Name + "  #_27  _jpg   把包含 jpg 文件夹名称中的无类型文件改为 jpg格式名称\n"
+					+ Cur_Bat_Name + " #_27  _gif  把包含 gif 文件夹名称中的无类型文件改为 gif格式名称\n"
+					+ Cur_Bat_Name + " #_27  _mp4  把包含 mp4 文件夹名称中的无类型文件改为 mp4格式名称\n"
+					;
+		}
+
+		@Override
+		boolean initParamsWithInputList(ArrayList<String> inputParamList) {
+			boolean Flag = true;
+
+			// 获取到装换的类型
+			String inputFileTypeParams = inputParamList.get(inputParamList.size() - 1);
+
+			if (!inputFileTypeParams.contains("_")) {
+				Flag = false;
+				System.out.println("无法检测到当前 第27 Rule   原始类型_目标类型参数   请检查后重新执行");
+			} else {
+
+				if (inputFileTypeParams.endsWith("_")) {
+					String target = "";
+					String[] parmas = inputFileTypeParams.split("_");
+					String origin = parmas[0];
+					System.out.println("item=" + inputFileTypeParams + "   origin=" + origin + "     target=" + target);
+					originType = origin;
+					targetType = target;
+
+				} else {
+					String[] parmas = inputFileTypeParams.split("_");
+					System.out.println(
+							"item=" + inputFileTypeParams + "   origin=" + parmas[0] + "     target=" + parmas[1]);
+					originType = parmas[0];
+					targetType = parmas[1];
+				}
+
+				Flag = true;
+
+			}
+			curFilterFileTypeList.add(originType);
+
+			return super.initParamsWithInputList(inputParamList) && Flag;
+		}
+
+
+	@Override
+	ArrayList<File> applyDir_SubFileListRule5(ArrayList<File> allSubDirFileList, ArrayList<File> allSubRealFileList) {
+
+		for (int i = 0; i < allSubDirFileList.size(); i++) {
+			File curDirFile = allSubDirFileList.get(i);
+			String curDirName = curDirFile.getName();
+
+			// 如果当前文件夹 包含 过滤类型的名称 如 mp4   gif  jpg  那么才往下走
+			if(!curDirName.contains(targetType)){
+				continue;
+			}
+
+
+		File[] listFile = 	curDirFile.listFiles();
+
+			if(listFile == null || listFile.length <= 0){
+
+				continue;
+			}
+
+			for (int j = 0; j < listFile.length; j++) {
+				File mRealFile= listFile[j];
+				if(mRealFile.isFile() && !mRealFile.isDirectory() ){
+					String  realFileNmae = mRealFile.getName();
+					String type = getFileTypeWithPoint(realFileNmae);
+                   if("".equals(type)){
+					   String newName = realFileNmae+"."+targetType;
+					   tryReName(mRealFile, newName);
+				   }
+
+				}
+			}
+
+
+		}
+
+		return super.applyDir_SubFileListRule5(allSubDirFileList, allSubRealFileList);
+	}
+
+	@Override
+		ArrayList<File> applyFileListRule3(ArrayList<File> subFileList, HashMap<String, ArrayList<File>> fileTypeMap) {
+
+			for (int i = 0; i < subFileList.size(); i++) {
+				File curFIle = subFileList.get(i);
+				String originName = curFIle.getName();
+				// 执行 修改文件类型的操作
+
+				// 1. 如果当前文件 过滤类型是 空 那么 可能就是没有任何的类型了
+				// 如果当前过滤的类型是 originType 是"" 空的话 那么就会过滤出所有的文件 那么只操作 不包含.的那些文件
+				if ("".equals(originType)) {
+					if (originName.contains(".")) {
+						continue; // 包含了 . 说明有类型 那么 不操作
+					}
+					String newName = originName + "." + targetType;
+					tryReName(curFIle, newName);
+				} else {
+					// 有具体的 过滤的文件
+					String oldType = "." + originType;
+					String newType = "." + targetType;
+					if ("".equals(targetType)) {
+						newType = "";
+					}
+
+					if (originName.contains(oldType)) {
+						String newName = originName.replace(oldType, newType);
+						tryReName(curFIle, newName);
+					}
+
+				}
+
+			}
+
+			return subFileList;
+		}
+	}
+
 
 
 	// operation_type 操作类型 1--读取文件内容字符串 进行修改 2--对文件对文件内容(字节)--进行修改 3.对全体子文件进行的随性的操作
@@ -2912,11 +3053,11 @@ public class G2_ApplyRuleFor_TypeFile {
 				File dirFile = allSubDirFileList.get(i);
 				String dirName = dirFile.getName().toLowerCase();
 //					int operaType; // 0-unknow 1--mp4 2--jpg 3--gif
-					if(operaType == 1 && "mp4".equals(dirName)){
+					if(operaType == 1 && dirName.contains("mp4")){
 						operaDirFileList.add(dirFile);
-					}else if(operaType == 2 && "jpg".equals(dirName)){
+					}else if(operaType == 2 &&  dirName.contains("jpg")){
 						operaDirFileList.add(dirFile);
-					}else if(operaType == 3 && "gif".equals(dirName)){
+					}else if(operaType == 3 &&  dirName.contains("gif")){
 						operaDirFileList.add(dirFile);
 					}
 
