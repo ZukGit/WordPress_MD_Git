@@ -599,8 +599,8 @@ return report_txt_File;
             this.desc = "查看GPS开关设置属性: adb shell settings get secure location_mode \n" +
                     "设置GPS开关属性: adb shell settings put secure location_mode 0 (关闭GPS开关)\n" +
                     "设置GPS开关属性: adb shell settings put secure location_mode 1 (打开GPS开关 仅使用设备(GPS)定位 LOCATION_MODE_SENSORS_ONLY)\n" +
-                    "设置GPS开关属性: adb shell settings put secure location_mode 2 (关闭GPS开关 低功耗定位模式，仅使用网络定位(WiFi和基站定位) LOCATION_MODE_BATTERY_SAVING )\n" +
-                    "设置GPS开关属性: adb shell settings put secure location_mode 3 (关闭GPS开关 【默认】高精度定位模式，GPS与网络综合定位 LOCATION_MODE_HIGH_ACCURACY )\n";
+                    "设置GPS开关属性: adb shell settings put secure location_mode 2 (打开GPS开关 低功耗定位模式，仅使用网络定位(WiFi和基站定位) LOCATION_MODE_BATTERY_SAVING )\n" +
+                    "设置GPS开关属性: adb shell settings put secure location_mode 3 (打开GPS开关 【默认】高精度定位模式，GPS与网络综合定位 LOCATION_MODE_HIGH_ACCURACY )\n";
             this.showKey_Match = "GPS开关: open打开状态";
             this.showKey_NO_Match = "GPS开关: close状态";
             this.srcFileName = "location.txt"; // 资源文件来源
