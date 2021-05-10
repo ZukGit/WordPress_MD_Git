@@ -386,6 +386,11 @@ public class I9_TextRuleOperation {
 
         CUR_RULE_LIST.add( new Copy_Port_WithZ_Rule27());  //   把当前文件内容以  ZZZZZZZZZZZZZZZZZZZZZ 分割     专门生成剪切内容保存到零时txt文件
 
+        CUR_RULE_LIST.add( new Bat_Revert_MD_Rule28()); // 读取当前.bat 文件内容 进行 解析生成 MD文件的下半部分
+        
+        CUR_RULE_LIST.add( new Show_JavaTest_File_Rule_29());  //  读取 Java模板文件(包含初始化模块)  然后在notepad++打开它 
+      
+        
 //        CUR_RULE_LIST.add( new Image2Jpeg_Rule_3());
 //        CUR_RULE_LIST.add( new Image2Png_Rule_4());
 //        CUR_RULE_LIST.add( new AVI_Rule_5());
@@ -395,6 +400,150 @@ public class I9_TextRuleOperation {
 
     }
     
+    
+    
+
+//  生成java Test模板文件 读取 Java模板文件(包含初始化模块)  然后在notepad++打开它 
+  class Show_JavaTest_File_Rule_29 extends  Basic_Rule{
+    	File java_template_file ;
+ 
+    	Show_JavaTest_File_Rule_29(){
+            super(29,false);
+            java_template_file = new File(zbinPath+File.separator+"I9_TestJavaTemplate_Rule29.java");
+
+        }
+    	
+        @Override
+        ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+        	 ArrayList<String> result_list = new  ArrayList<String>();
+        	if(!java_template_file.exists()) {
+        		result_list.add("当前 模板文件 " +java_template_file.getAbsolutePath()+" 不存在 请检查该文件！");
+        		   System.out.println("失败 无法 读取 I9_TestJavaTemplate_Rule29.java 模板文件! "+java_template_file.getAbsolutePath());
+        	}else {
+                ArrayList<String> contentList = ReadFileContentAsList(java_template_file);
+                
+                for (int i = 0; i < contentList.size(); i++) {
+					String oneLine = contentList.get(i);
+					if(oneLine.contains("public class I9_TestJavaTemplate_Rule29")) {
+					
+						oneLine = oneLine.replace("public class I9_TestJavaTemplate_Rule29", "public class Test_"+getTimeStampMMdd());
+					}
+					result_list.add(oneLine);
+				}
+                System.out.println("成功读取 I9_TestJavaTemplate_Rule29.java 模板文件! ");
+        		
+                // public class I9_TestJavaTemplate_Rule29   把这个文件改名为  Test_0510 这样的日期
+        	}
+   
+   
+                
+   
+            writeContentToFile(I9_Temp_Text_File,result_list);
+            NotePadOpenTargetFile(I9_Temp_Text_File.getAbsolutePath());
+          
+            return super.applyOperationRule(curFileList, subFileTypeMap, curDirList, curRealFileList);
+        }
+        
+
+    	
+        @Override
+        String simpleDesc() {
+            return "  生成java Test模板文件 读取 Java模板文件(包含初始化模块)  然后在notepad++打开它  ";
+        }
+        
+    }
+  
+    
+    
+    class Bat_Revert_MD_Rule28 extends  Basic_Rule{
+    	String batHead_1 = "@ECHO off";
+    	String batHead_2 = "setlocal enabledelayedexpansion";
+    	
+    	Bat_Aera system_init_aera = null;
+    	Bat_Aera program_execute_aera = null;
+    	Bat_Aera func_define_aera = null;
+    	
+ 
+       	// Bat_Method_Aera {  Bat_Operation_A{MethodA,MethodB}    Bat_Operation_B{MethodC,MethodD} }
+    	
+    	class Bat_Aera{
+    		int aera_index;   // 从0  开始的区域索引   0.system_init   1.program_exe_area 2.method_define 
+    		String aera_name ;   // 区域的名称  System_Init_Aera
+    		String desc;    // 该区域的说明
+    		// rem ══════════════════════════════════════════ System_Init_Aera_Begin  ═════
+    		// 1.  含有 rem   2. 含有 area标识 ══ _area_  3. 含有当前area的名字 
+    		ArrayList<String> aera_beginTagCharList ;  // 起始区域 起始 那行字符串 所含的 标识字符
+    		ArrayList<String> aera_endTagCharList ; 
+    		
+    		ArrayList<String> aera_raw_content;  //    从 bat 读取到的 原始的 内容
+            ArrayList<Bat_Operation> defineOperationList ;  // 只有 index=2 的 method_define 才有这个函数列表 
+    		
+    	}
+    	
+    	
+ 
+    	class Bat_Operation{
+    		// rem ================================================  Test_Operation_End =====
+    		String operation_name ;   // 操作类型 名称 
+    		String operation_desc;   // 操作说明 
+    		ArrayList<String> operation_raw_content;  // Operation 区域的原始内容
+      		// 1.  含有 rem   2. 含有 area标识 ====  _Operation_  3. 含有当前_Operation_的名字  4. begin 
+    		ArrayList<String> operation_beginTagCharList ;  // 区域定义的 起始 字符串 集合 
+    		ArrayList<String> operation_endTagCharList ; // 区域定义的 结束 字符串 集合 
+    		
+    		ArrayList<Bat_Method> MethodList ;   // 当前定义的方法的集合 
+    	}
+    	
+    	class Bat_Method{
+    		String Pre_SETLOCAL = "::SETLOCAL";
+    		String End_SETLOCAL = "::ENDLOCAL";
+    		String End_Method_Tag = "goto:eof";
+    		// 方法的起始标示  1. 以:开头 并且第二个字符不是:  2. 包含 _func_  3.包含 x  4.trim() 后 不包含空格
+    		ArrayList<String> method_beginTagCharList ;
+    		
+    	
+    		
+    		String bat_method_name;   // bat 方法 的 名称  recordFileNameToFile_func_1x1
+    		String bat_method_name_nofunc;  //  没有 func 标示的方法的名字 
+    		ArrayList<String> method_raw_content;   // bat的原始的读取到的内容
+    		int input_param_count ;  // 输入的参数的个数
+    		int output_param_count;   // 输出参数的个数
+    		ArrayList<String> output_value_nameList;  // 输出参数的个数  func_return_1 ... func_return_2
+    		
+    		
+    		
+    		
+    	}
+    	
+    	
+    	Bat_Revert_MD_Rule28(){
+            super(28,false);
+
+        }
+    	
+        @Override
+        ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+            for (int i = 0; i < curInputFileList.size(); i++) {
+                File fileItem = curInputFileList.get(i);
+                ArrayList<String> contentList = ReadFileContentAsList(fileItem);
+                
+                // 找到  开始解析 .bat 文件 
+                     
+
+
+         }
+
+            return super.applyOperationRule(curFileList, subFileTypeMap, curDirList, curRealFileList);
+        }
+        
+    	
+        @Override
+        String simpleDesc() {
+            return " 读取当前.bat 文件内容 进行 解析生成 MD文件的下半部分 ";
+        }
+        
+    	
+    }
     //  把当前文件内容以  ZZZZZZZZZZZZZZZZZZZZZ 分割     专门生成剪切内容保存到零时txt文件
     class Copy_Port_WithZ_Rule27 extends  Basic_Rule{
     	
@@ -3492,6 +3641,14 @@ public class I9_TextRuleOperation {
         return date;
     }
 
+    
+    static String getTimeStampMMdd(){
+
+        SimpleDateFormat df = new SimpleDateFormat("MMdd");//设置日期格式
+        String date = df.format(new Date());
+        return date;
+    }
+    
     static String getTimeStampLong(){
 
         SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd_HHmmss_SSS");//设置日期格式
