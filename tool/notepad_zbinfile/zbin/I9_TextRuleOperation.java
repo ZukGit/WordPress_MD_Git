@@ -463,7 +463,7 @@ public class I9_TextRuleOperation {
 
                  
                  //  如果 是一个 比 模板文件大 的文件 那么解析 这个文件  生成 这个文件的模板 
-                 if(InputFile_rawConentList.size() >TemplateFile_rawConentList.size()) {
+                 if(InputFile_rawConentList.size() >= TemplateFile_rawConentList.size()) {
                 	 
                      // 找到  开始解析 .bat 文件 
                      ArrayList<String> InputFile_formatAllBatCodeList  = Bat_To_Format(InputFile_rawConentList);

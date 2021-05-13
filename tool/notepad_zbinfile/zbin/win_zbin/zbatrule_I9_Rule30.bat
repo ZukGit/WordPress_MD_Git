@@ -1501,7 +1501,7 @@ goto:eof
 
 :rule3vadbscreen_func_1x0
 rem ======================================== rule3vadbscreen_func_1x0
-rem rule_tip: zbatrule_I9_Rule30.bat _3_  500  ##手机执行adbshellinputswipe340800340100命令向下滑动两下 向上滑动一下
+rem rule_tip: zbatrule_I9_Rule30.bat _3_  500##手机执行adbshellinputswipe340800340100命令向下滑动两下向上滑动一下
 
 rem desc: Bussiness_Rule打印程序用于打印batrule规则序列
 rem sample: 
@@ -1510,35 +1510,24 @@ rem sample_out:
 echo ______________Method_In rule3vadbscreen_func_1x0
 set rule3vadbscreen_dynamic_param1=
 if "%init_input_2%"=="" (
-set  rule3vadbscreen_dynamic_param1=1000
 ) else (
-set rule3vadbscreen_dynamic_param1=%init_input_2% 
 )
-echo [rule3vadbscreen_func_1x0 ]    output=[__empty__] dynamic_param1=[!rule3vadbscreen_dynamic_param1!]   
-for /l %%i in (1, 1, !rule3vadbscreen_dynamic_param1!) do (
 echo i == %%i   _todown        
 adb shell input swipe 340 1200 340 400  
 ping -n 3 127.0.0.1>nul
-
 adb shell input swipe 340 1200 340 400  
 ping -n 3 127.0.0.1>nul
-
 adb shell input swipe 340 400 340 800
 ping -n 3 127.0.0.1>nul
 )
-
-for /l %%i in (1, 1, !rule3vadbscreen_dynamic_param1!) do (
 echo i == %%i  _toup        
 adb shell input swipe  340 400  340 1200
 ping -n 3 127.0.0.1>nul
-
 adb shell input swipe  340 400  340 1200
 ping -n 3 127.0.0.1>nul
-
 adb shell input swipe  340 800 340 400
 ping -n 3 127.0.0.1>nul
 )
-
 echo [rule3vadbscreen_func_1x0 EndPrintCode]    output=[__empty__] dynamic_param1=[!rule3vadbscreen_dynamic_param1!]   
 echo ______________Method_Out rule3vadbscreen_func_1x0
 ::ENDLOCAL
@@ -1558,7 +1547,7 @@ echo zbatrule_I9_Rule30.bat _1_  ##安装本地目录下的所有apkadbinstall*.
 
 echo zbatrule_I9_Rule30.bat _2_  ##获取手机当前正在运行的APK到本地
 
-echo zbatrule_I9_Rule30.bat _3_  500##手机执行adbshellinputswipe340800340100命令向上滑动
+echo zbatrule_I9_Rule30.bat _3_  500##手机执行adbshellinputswipe340800340100命令向下滑动两下向上滑动一下
 echo [ruletipprint_func_0x0 EndPrintCode]   output=[__empty__]  param1=[__empty__] 
 echo ______________Method_Out ruletipprint_func_0x0
 ::ENDLOCAL
