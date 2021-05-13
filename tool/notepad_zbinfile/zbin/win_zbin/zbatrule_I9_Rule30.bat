@@ -1510,8 +1510,12 @@ rem sample_out:
 echo ______________Method_In rule3vadbscreen_func_1x0
 set rule3vadbscreen_dynamic_param1=
 if "%init_input_2%"=="" (
+set  rule3vadbscreen_dynamic_param1=1000
 ) else (
+set rule3vadbscreen_dynamic_param1=%init_input_2% 
 )
+echo [rule3vadbscreen_func_1x0 ]    output=[__empty__] dynamic_param1=[!rule3vadbscreen_dynamic_param1!]   
+for /l %%i in (1, 1, !rule3vadbscreen_dynamic_param1!) do (
 echo i == %%i   _todown        
 adb shell input swipe 340 1200 340 400  
 ping -n 3 127.0.0.1>nul
@@ -1520,6 +1524,7 @@ ping -n 3 127.0.0.1>nul
 adb shell input swipe 340 400 340 800
 ping -n 3 127.0.0.1>nul
 )
+for /l %%i in (1, 1, !rule3vadbscreen_dynamic_param1!) do (
 echo i == %%i  _toup        
 adb shell input swipe  340 400  340 1200
 ping -n 3 127.0.0.1>nul

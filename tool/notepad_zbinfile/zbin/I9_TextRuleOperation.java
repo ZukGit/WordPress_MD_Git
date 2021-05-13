@@ -1304,7 +1304,9 @@ public class I9_TextRuleOperation {
                 	   continue;  //  去掉函数分隔符  rem ======================== helloworld_func_0x0
                    }
                    
-                   if(batCodeOneLine.toLowerCase().contains(bat_method_name_nofunc.toLowerCase()+"_dynamic_param") ) {
+                   if(batCodeOneLine.toLowerCase().contains(bat_method_name_nofunc.toLowerCase()+"_dynamic_param") && batCodeOneLine.trim().endsWith("=") ) {
+// set rule3vadbscreen_dynamic_param1=  【删除】
+//set rule3vadbscreen_dynamic_param1=1000 不删除
                 	   continue;  //  去掉函数分隔符  set rule1vbankupapk_dynamic_param
                    }
                    
