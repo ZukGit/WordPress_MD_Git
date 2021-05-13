@@ -386,11 +386,13 @@ public class I9_TextRuleOperation {
 
         CUR_RULE_LIST.add( new Copy_Port_WithZ_Rule27());  //   把当前文件内容以  ZZZZZZZZZZZZZZZZZZZZZ 分割     专门生成剪切内容保存到零时txt文件
 
-        CUR_RULE_LIST.add( new Bat_Revert_MD_Rule28()); // 读取当前.bat 文件内容 进行 解析生成 MD文件的下半部分
+
+        CUR_RULE_LIST.add( new Show_JavaTest_File_Rule_28());  //  读取 Java模板文件(包含初始化模块)  然后在notepad++打开它 
+    
         
-        CUR_RULE_LIST.add( new Show_JavaTest_File_Rule_29());  //  读取 Java模板文件(包含初始化模块)  然后在notepad++打开它 
-      
-        
+        CUR_RULE_LIST.add( new Bat_Revert_MD_Rule29()); // 读取当前.bat 文件内容 进行 解析生成 MD文件的下半部分 并会解析新增的Method到模板文件  zzbattest_I9.bat
+        CUR_RULE_LIST.add( new Show_Bat_Template_OnDir_Rule_30()); //  把当前模板文件 zzbattest_I9.bat 内容写进当前目录下 Test_xx.bat文档 并打开它
+        CUR_RULE_LIST.add( new Bat_Format_Rule_31()); // 对当前 bat 文件进行 format 如果不是bat文件不操作 增项假如模板zbatrule_I9_Rule30.bat中
 //        CUR_RULE_LIST.add( new Image2Jpeg_Rule_3());
 //        CUR_RULE_LIST.add( new Image2Png_Rule_4());
 //        CUR_RULE_LIST.add( new AVI_Rule_5());
@@ -401,14 +403,1677 @@ public class I9_TextRuleOperation {
     }
     
     
+    class Bat_Format_Rule_31 extends  Basic_Rule{
+
+    	
+    	 ArrayList<Bat_Method> allMethodList = new ArrayList<Bat_Method> ();
+    	
+     	String batHead_1 = "@ECHO off";
+     	String batHead_2 = "setlocal enabledelayedexpansion";
+     	String batHead_3 = "chcp 65001";   // 为了支持中文打印 
+
+     	 File bat_template_file = null;
+     	 File bat_ruleMethodName_file =null; // 保存业务函数名称的方法
+     
+     	// echo zbatrule_I9_Rule30.bat _1_   ##安装本地目录下的所有apkadbinstall*.apk
+     	// echo zbatrule_I9_Rule30.bat _2_   ##获取手机当前正在运行的APK到本地
+      ArrayList<String> allRuleMethodNameList = new ArrayList<String> ();
+      ArrayList<String> allRuleTipStrList = new ArrayList<String> ();
+      
+     	Bat_Format_Rule_31(){
+             super(31,false);
+	            bat_template_file = new File(zbinPath+File.separator+"win_zbin"+File.separator+"zbatrule_I9_Rule30.bat");
+	            bat_ruleMethodName_file  = new File(zbinPath+File.separator+"win_zbin"+File.separator+"zbatrule_I9_Rule30_method.txt");
+         }
+     	
+         @Override
+         ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+            
+
+        	 
+        	 
+        	 
+        	 for (int i = 0; i < curInputFileList.size(); i++) {
+                 File fileItem = curInputFileList.get(i);
+                 String fileName = fileItem.getName().toLowerCase();
+                 if(!fileName.endsWith(".bat")) {
+                 	System.out.println("当前输入的文件不是 .bat文件无法进行 format 操作!  file="+fileItem.getAbsolutePath());
+                 	continue;
+                 }
+                 if(fileItem.equals(bat_template_file)) {
+                	 System.out.println("!!!!模板文件本身的Format!!!!");
+                 }
+                 ArrayList<String> InputFile_rawConentList = ReadFileContentAsList(fileItem);
+                 
+                 
+                 // 一个 空的 bat文件   ,  那么 使用 format 填充它 
+                 if(InputFile_rawConentList.size() < 10) {
+                   	 System.out.println("!!!!写入模板!!!!");
+                     ArrayList<String> TemplateFile_rawConentList =   ReadFileContentAsList(bat_template_file);
+
+                        ArrayList<String> TemplateFile_FormatBatCodeList  = Bat_To_Format(TemplateFile_rawConentList);
+                		writeContentToFile(fileItem,TemplateFile_FormatBatCodeList);
+                	 continue;
+                 }
+                 
+                 
+                 ArrayList<String> TemplateFile_rawConentList =   ReadFileContentAsList(bat_template_file);
+                 
+//                 ArrayList<String> TemplateFile_FormatBatCodeList  = Bat_To_Format(TemplateFile_rawConentList);
+
+                 
+                 //  如果 是一个 比 模板文件大 的文件 那么解析 这个文件  生成 这个文件的模板 
+                 if(InputFile_rawConentList.size() >TemplateFile_rawConentList.size()) {
+                	 
+                     // 找到  开始解析 .bat 文件 
+                     ArrayList<String> InputFile_formatAllBatCodeList  = Bat_To_Format(InputFile_rawConentList);
+
+      			   showStringList_WithHead(InputFile_formatAllBatCodeList, "当前格式化bat文件最终代码情况");
+         			
+         
+         			
+         			writeContentToFile(fileItem,InputFile_formatAllBatCodeList);	 
+                	 
+                	 
+                 }
+                 
+                 if(InputFile_rawConentList.size() > 10 && InputFile_rawConentList.size() < TemplateFile_rawConentList.size() ) {
+                	 System.out.println("输入的文件不是模板文件! file="+fileItem.getAbsolutePath());
+
+                 }
+                 
+                  //  如果 是 自己和 自己 比较  那么 更新  method 方法 文件 
+                 if(fileItem.equals(bat_template_file)) {
+         			writeContentToFile(bat_ruleMethodName_file,allRuleMethodNameList);
+                	 
+                 }
+    			
+
+          }
+
+             return super.applyOperationRule(curFileList, subFileTypeMap, curDirList, curRealFileList);
+         }
+         
+     	
+         @Override
+         String simpleDesc() {
+             return " 对当前 bat 文件进行 format 如果不是bat文件不操作 增项假如模板zbatrule_I9_Rule30.bat中 ";
+         }
+         
+    	// Bat_Method_Aera { Bat_Operation_A{MethodA,MethodB}
+    	// Bat_Operation_B{MethodC,MethodD} }
+    	// 用于解析当前 解析的文件的方法的个数 
+//    	ArrayList<Bat_Method> allMethodList_InCommonFile = new ArrayList<Bat_Method> ();
+    	// 用于解析当前 模板文件 zzbattest_I9.bat 中 方法的 个数
+//    	ArrayList<Bat_Method> allMethodList_InTemplate = new ArrayList<Bat_Method> ();
+    	class Bat_Aera {
+    		int aera_index; // 从0 开始的区域索引 0.system_init 1.program_exe_area 2.method_define
+    		String aera_name; // 区域的名称 System_Init_Aera
+    		String desc; // 该区域的说明
+    		String begin_Word = "rem ";
+    		String end_Word = "rem ";
+    		boolean isdefine_method = false; // 在 area 内部是否有定义 函数
+
+    		// rem ══════════════════════════════════════════ System_Init_Aera_Begin  ══════════════════════════════════════════
+    		String aera_Begin_Tag;
+    		// rem ══════════════════════════════════════════ System_Init_Aera_End═════
+    		String aera_End_Tag;
+    		// 1. 含有 rem 2. 含有 area标识 ══ _area_ 3. 含有当前area的名字
+    		ArrayList<String> aera_beginTagCharList; // 起始区域 起始 那行字符串 所含的 标识字符
+    		ArrayList<String> aera_endTagCharList;
+    		ArrayList<String> aera_raw_content; // 从 bat 读取到的 原始的 内容
+    		ArrayList<Bat_Operation> defineOperationList; // 只有 index=2 的 method_define 才有这个函数列表
+
+    		
+    		Bat_Aera(int index, String mArea_Name) {
+    			aera_index = index;
+    			aera_name = mArea_Name;
+    			begin_Word = "rem ";
+    			end_Word = "rem ";
+
+    			aera_beginTagCharList = new ArrayList<String>();
+    			aera_beginTagCharList.add("rem");
+    			aera_beginTagCharList.add("══");
+    			aera_beginTagCharList.add("_aera");
+    			aera_beginTagCharList.add("begin");
+    			aera_beginTagCharList.add(aera_name);
+
+    			aera_endTagCharList = new ArrayList<String>();
+    			aera_endTagCharList.add("rem");
+    			aera_endTagCharList.add("══");
+    			aera_endTagCharList.add("_aera");
+    			aera_endTagCharList.add("end");
+    			aera_endTagCharList.add(aera_name);
+    			aera_raw_content = new ArrayList<String>();
+    			aera_Begin_Tag = "rem "+"══════════════════════════════════════════"+aera_name.toUpperCase()+" Begin"+"══════════════════════════════════════════";
+    	
+    			aera_End_Tag = "rem "+"══════════════════════════════════════════"+aera_name.toUpperCase()+" End"+"══════════════════════════════════════════";
+
+    		}
+
+    		
+    		Bat_Aera(int index, String mArea_Name, boolean isMethodDefine) {
+    			this(index, mArea_Name);
+    			isdefine_method = isMethodDefine;
+    			if (isdefine_method) {
+    				defineOperationList = new ArrayList<Bat_Operation>();
+
+    			}
+    		}
+
+    		
+    		ArrayList<String>  getAreaFormatContent(){
+    			ArrayList<String> allAreaContent = new ArrayList<String>();
+    			if(!isdefine_method) {
+    				return aera_raw_content;
+    			}
+    			
+    			allAreaContent.add("\n");
+    			allAreaContent.add(aera_Begin_Tag);
+    			allAreaContent.add("\n");
+    			for (int i = 0; i < defineOperationList.size(); i++) {
+    				Bat_Operation bat_operation = defineOperationList.get(i);
+    				ArrayList<String> curOperationFormatContent = bat_operation.getOperationFormatContent();
+    				allAreaContent.addAll(curOperationFormatContent);
+    				
+    			}
+    			
+    			allAreaContent.add(aera_End_Tag);
+    			
+    			
+    			
+    			return allAreaContent;
+    		}
+    		
+    		
+    	
+    		HashMap<String, ArrayList<String>> operationName_RawData_Map;
+//    		operationName_RawData_Map = new 	  HashMap<String,ArrayList<String>>();
+
+    		/*
+    		 * ======== File_Operation_Begin ====================================
+    		 * ================================= File_Operation_End =============
+    		 * ================================= System_Operation_Begin =========
+    		 * ================================= System_Operation_End ===========
+    		 * ================================= String_Operation_Begin =========
+    		 * ================================== String_Operation_End ==========
+    		 * ================================== Test_Operation_Begin ==========
+    		 * ================== Test_Operation_End ============================
+    		 */
+
+    		void initOperationAndMethodWithRawContent(ArrayList<String> rawContentList) {
+    			ArrayList<String> operationNameList = new ArrayList<String>();
+
+    			for (int i = 0; i < rawContentList.size(); i++) {
+    				String oneLine = rawContentList.get(i).toLowerCase().trim();
+    				if (oneLine.startsWith("rem ") && oneLine.contains("_operation") && oneLine.contains("====")
+    						&& oneLine.contains("begin")) {
+
+    					String OperationName = oneLine.replace("rem ", "");
+    					OperationName = OperationName.replace(" ", "");
+    					OperationName = OperationName.replace("=", "");
+    					OperationName = OperationName.replace("begin", "");
+    					OperationName = OperationName.toLowerCase().trim();
+    					operationNameList.add(OperationName);
+    				}
+
+    			}
+
+    			showStringList(operationNameList, "Operation名称");
+
+    			// defineOperationList = new ArrayList<Bat_Operation>();
+    			for (int i = 0; i < operationNameList.size(); i++) {
+    				String operation_name = operationNameList.get(i);
+    				Bat_Operation curOperation = new Bat_Operation(i, operation_name);
+    				defineOperationList.add(curOperation);
+
+    			}
+    			System.out.println("defineOperationList.size() = " + defineOperationList.size()
+    					+ "  rawContentList.size() = " + rawContentList.size());
+    			for (int i = 0; i < defineOperationList.size(); i++) {
+    				Bat_Operation curOperation = defineOperationList.get(i);
+    				ArrayList<String> Operation_raw_contentList = new ArrayList<String>();
+
+    				for (int j = 0; j < rawContentList.size(); j++) {
+    					String oneLineStr = rawContentList.get(j);
+
+    					isOperationBegin = curOperation.isOperationBegin(oneLineStr);
+    					if (isOperationBegin) {
+    						isOperationRawBegin = true;
+    					}
+    					isOperationEnd = curOperation.isOperationEnd(oneLineStr);
+    					if (isOperationEnd) {
+    						isOperationRawBegin = false;
+    						Operation_raw_contentList.add(oneLineStr);
+    					}
+
+    					if (isOperationRawBegin) {
+    						Operation_raw_contentList.add(oneLineStr);
+    					}
+    					// System.out.println("isOperationBegin="+ isOperationBegin + "
+    					// isOperationEnd="+ isOperationEnd + " isOperationRawBegin="+
+    					// isOperationRawBegin +" Line="+oneLineStr);
+
+    				}
+    				isOperationBegin = false;
+    				isOperationEnd = false;
+    				isOperationRawBegin = false;
+    				System.out.println("Operation_raw_contentList.size() = " + Operation_raw_contentList.size());
+    				curOperation.operation_raw_content.addAll(Operation_raw_contentList);
+
+    				showStringList(curOperation.operation_raw_content, curOperation.operation_name + "_raw内容");
+    			}
+
+    			// 实现解析 Operation 初始化 Operation里面的 method
+    			for (int i = 0; i < defineOperationList.size(); i++) {
+    				Bat_Operation curOperation = defineOperationList.get(i);
+    				curOperation.initMethodDataWithRawContent(curOperation.operation_raw_content);
+    			}
+
+    		}
+
+    		boolean initDataWithRawContent(ArrayList<String> rawContentList) {
+    			boolean initFlag = false;
+
+    			// 定义函数 的 area 区域 包含 operation
+    			if (isdefine_method) {
+
+    				initOperationAndMethodWithRawContent(rawContentList);
+
+    			}
+
+    			return initFlag;
+    		}
+
+    		boolean isAreaEnd(String oneLine) {
+    			boolean isEndLine = false;
+    			String oneLine_trim = oneLine.toLowerCase().trim();
+    			if (!oneLine_trim.startsWith(end_Word)) {
+    				return isEndLine;
+    			}
+
+    			for (int i = 0; i < aera_endTagCharList.size(); i++) {
+    				String endTagChar = aera_endTagCharList.get(i);
+    				if (!oneLine_trim.contains(endTagChar)) {
+
+//    					System.out.println(" endTagChar = "+ endTagChar + " 不包含在:"+oneLine_trim);
+
+    					return isEndLine;
+    				}
+    			}
+
+    			// rem ══════════════════════════════════════════ System_Init_Aera_End ═════
+    			// 满足 包含 开始 条件的 所有 情况
+    			isEndLine = true;
+    			return isEndLine;
+
+    		}
+
+    		boolean isAreaBegin(String oneLine) {
+    			boolean isBeginLine = false;
+    			String oneLine_trim = oneLine.toLowerCase().trim();
+    			if (!oneLine_trim.startsWith(begin_Word)) {
+    				return isBeginLine;
+    			}
+
+    			for (int i = 0; i < aera_beginTagCharList.size(); i++) {
+    				String beginTagChar = aera_beginTagCharList.get(i);
+    				if (!oneLine_trim.contains(beginTagChar)) {
+//    					System.out.println(" beginTagChar = "+ beginTagChar + " 不包含在:"+oneLine_trim);
+    					return isBeginLine;
+    				}
+    			}
+
+    			// rem ══════════════════════════════════════════ System_Init_Aera_Begin ═════
+    			// 满足 包含 开始 条件的 所有 情况
+    			isBeginLine = true;
+
+    			return isBeginLine;
+
+    		}
+    	}
+
+    	class Bat_Operation {
+    		// rem ================================================ Test_Operation_End =====
+    		String begin_Word = "rem ";
+    		String end_Word = "rem ";
+
+    		int operation_index;
+    		String operation_name; // 操作类型 名称
+    		String operation_desc; // 操作说明
+    		ArrayList<String> operation_raw_content; // Operation 区域的原始内容
+    		// 1. 含有 rem 2. 含有 area标识 ==== _Operation_ 3. 含有当前_Operation_的名字 4. begin
+    		ArrayList<String> operation_beginTagCharList; // 区域定义的 起始 字符串 集合
+    		ArrayList<String> operation_endTagCharList; // 区域定义的 结束 字符串 集合
+
+    		ArrayList<Bat_Method> operation_MethodList; // 当前定义的方法的集合
+
+    		// rem ===============================  File_Operation_Begin ===============================
+    			String operation_begin_tag;
+    			String operation_end_tag;
+//          rem ========================   File_Operation_Begin ================================================
+//    		rem =========================  File_Operation_End ===================================
+    		Bat_Operation(int index, String operationName) {
+    			operation_index = index;
+    			operation_name = operationName;
+    			operation_raw_content = new ArrayList<String>();
+    			operation_MethodList = new ArrayList<Bat_Method>();
+    			operation_beginTagCharList = new ArrayList<String>();
+
+    			operation_beginTagCharList.add("rem");
+    			operation_beginTagCharList.add("====");
+    			operation_beginTagCharList.add("begin");
+    			operation_beginTagCharList.add("_operation");
+    			operation_beginTagCharList.add(operation_name);
+
+    			operation_endTagCharList = new ArrayList<String>();
+    			operation_endTagCharList.add("rem");
+    			operation_endTagCharList.add("====");
+    			operation_endTagCharList.add("end");
+    			operation_endTagCharList.add("_operation");
+    			operation_endTagCharList.add(operation_name);
+    			
+    			operation_begin_tag = "rem "+"======================== "+operation_name.toUpperCase()+" Begin"+"======================== ";
+    			operation_end_tag = "rem "+"======================== "+operation_name.toUpperCase()+" End"+"======================== ";
+
+
+    		}
+
+    		
+    	ArrayList<String>	getOperationFormatContent(){
+    		ArrayList<String> curOperationFormatList = new 		ArrayList<String> ();
+    		curOperationFormatList.add(operation_begin_tag);
+    		curOperationFormatList.add("\n");
+    		for (int i = 0; i < operation_MethodList.size(); i++) {
+    			Bat_Method  cur_method = operation_MethodList.get(i);
+    			curOperationFormatList.addAll(cur_method.method_format_content);
+    			curOperationFormatList.add("\n");
+    			curOperationFormatList.add("\n");
+    		}
+    		curOperationFormatList.add(operation_end_tag);
+    		
+    		
+    		return curOperationFormatList;
+    		}
+    		
+    		
+    		
+    		boolean isOperationEnd(String oneLine) {
+    			boolean isEndLine = false;
+    			String oneLine_trim = oneLine.toLowerCase().trim();
+    			if (!oneLine_trim.startsWith(end_Word)) {
+    				return isEndLine;
+    			}
+
+    			for (int i = 0; i < operation_endTagCharList.size(); i++) {
+    				String endTagChar = operation_endTagCharList.get(i);
+    				if (!oneLine_trim.contains(endTagChar)) {
+
+//    					System.out.println(" endTagChar = "+ endTagChar + " 不包含在:"+oneLine_trim);
+
+    					return isEndLine;
+    				}
+    			}
+
+    			// rem ══════════════════════════════════════════ System_Init_Aera_End ═════
+    			// 满足 包含 开始 条件的 所有 情况
+    			isEndLine = true;
+    			return isEndLine;
+
+    		}
+
+    		boolean isOperationBegin(String oneLine) {
+    			boolean isBeginLine = false;
+    			String oneLine_trim = oneLine.toLowerCase().trim();
+    			if (!oneLine_trim.startsWith(begin_Word)) {
+    				return isBeginLine;
+    			}
+
+    			for (int i = 0; i < operation_beginTagCharList.size(); i++) {
+    				String beginTagChar = operation_beginTagCharList.get(i);
+    				if (!oneLine_trim.contains(beginTagChar)) {
+//    					System.out.println(" beginTagChar = "+ beginTagChar + " 不包含在:"+oneLine_trim);
+    					return isBeginLine;
+    				}
+    			}
+
+    			// rem ══════════════════════════════════════════ System_Init_Aera_Begin ═════
+    			// 满足 包含 开始 条件的 所有 情况
+    			isBeginLine = true;
+
+    			return isBeginLine;
+
+    		}
+
+    		void initMethodDataWithRawContent(ArrayList<String> rawOperationDataList) {
+
+//        	System.out.println("rawOperationDataList.size() = "+ rawOperationDataList.size());
+
+    			// 在 Operation 寻找 Method
+    			ArrayList<String> methodNameList = new ArrayList<String>();
+    			for (int i = 0; i < rawOperationDataList.size(); i++) {
+    				String oneLine = rawOperationDataList.get(i).toLowerCase().trim();
+
+    				if (oneLine.startsWith(":") && !oneLine.startsWith("::") && oneLine.contains("_func_")
+    						&& oneLine.contains("x") && !oneLine.contains(" ")) { // 以: 开头 并不以 :: 开头
+
+    					String[] splitArr = oneLine.split("_");
+    					if (splitArr != null) {
+    						String lastPartStr = splitArr[splitArr.length - 1];
+
+    						String inputParamStr = lastPartStr.substring(0, lastPartStr.indexOf("x"));
+    						String outputParamStr = lastPartStr.substring(lastPartStr.indexOf("x") + "x".length());
+    						if (isNumeric(outputParamStr) && isNumeric(inputParamStr)) {
+
+    							String methodName = oneLine.replace(":", "");
+    							methodNameList.add(methodName);
+
+    						}
+    					}
+
+    				}
+
+    			}
+
+    			showStringList(methodNameList, operation_name + "[MethodItem]");
+
+    			for (int i = 0; i < methodNameList.size(); i++) {
+    				String methodName = methodNameList.get(i);
+    				Bat_Method curMethod = new Bat_Method(i, methodName);
+    				operation_MethodList.add(curMethod);
+    				allMethodList.add(curMethod);
+
+    			}
+
+    			for (int i = 0; i < operation_MethodList.size(); i++) {
+    				Bat_Method curMethod = operation_MethodList.get(i);
+    				ArrayList<String> Method_raw_contentList = new ArrayList<String>();
+
+    				System.out.println("═════════════════════════════════" + curMethod.bat_method_name
+    						+ " method_revert_begin  raw_string[" + rawOperationDataList.size() + "]"
+    						+ "═════════════════════════════════");
+
+    				for (int j = 0; j < rawOperationDataList.size(); j++) {
+    					String oneLineStr = rawOperationDataList.get(j);
+    					System.out.println("________________________________________________  ");
+    					isMethodBegin = curMethod.isMethodBegin(oneLineStr);
+    					if (isMethodBegin && !isMethodEnd) {
+    						isMethodRawBegin = true;
+    					}
+    					System.out
+    							.println("A1 isMethodBegin = " + isMethodBegin + "  isMethodRawBegin=" + isMethodRawBegin);
+    					isMethodEnd = curMethod.isMethodEnd(oneLineStr);
+//      				 System.out.println("X1 methodName="+curMethod.bat_method_name+"   isMethodBegin="+ isMethodBegin + "   isMethodEnd="+ isMethodEnd + "  isMethodRawBegin="+ isMethodRawBegin +" Line["+j+"]["+rawOperationDataList.size()+"]="+oneLineStr);
+    					System.out.println("A2 isMethodBegin = " + isMethodBegin + "  isMethodRawBegin=" + isMethodRawBegin
+    							+ " isMethodEnd=" + isMethodEnd);
+
+    					if (isMethodEnd) {
+    						isMethodRawBegin = false;
+    					}
+
+    					System.out.println("A3 isMethodBegin = " + isMethodBegin + "  isMethodRawBegin=" + isMethodRawBegin
+    							+ " isMethodEnd=" + isMethodEnd);
+
+    					if (isMethodRawBegin) {
+    						System.out.println("A3_1 添加代码语句  oneLineStr=" + oneLineStr + "  Method_raw_contentList.size()="
+    								+ Method_raw_contentList.size());
+    						Method_raw_contentList.add(oneLineStr);
+    					}
+    					System.out.println("A4 methodName=" + curMethod.bat_method_name + " isMethodBegin=" + isMethodBegin
+    							+ "   isMethodEnd=" + isMethodEnd + "  isMethodRawBegin=" + isMethodRawBegin + " Line[" + j
+    							+ "][" + rawOperationDataList.size() + "]=" + oneLineStr);
+
+    				}
+
+    				isMethodBegin = false;
+    				isMethodEnd = false;
+    				isMethodRawBegin = false;
+
+    				curMethod.method_raw_content.addAll(Method_raw_contentList);
+    				System.out.println("curMethod = " + curMethod.bat_method_name + "  curMethod.method_raw_content.size()"
+    						+ curMethod.method_raw_content.size());
+    				showStringList(curMethod.method_raw_content, curMethod.bat_method_name + "raw方法");
+    				System.out
+    						.println("═════════════════════════════════" + curMethod.bat_method_name + " method_revert_end["
+    								+ curMethod.method_raw_content.size() + "]" + "═════════════════════════════════");
+
+    			}
+
+    			BeginMethodFormat_In_Operation();
+
+    		}
+
+    		void BeginMethodFormat_In_Operation() {
+
+    			for (int i = 0; i < operation_MethodList.size(); i++) {
+    				Bat_Method batMethod = operation_MethodList.get(i);
+    				batMethod.doFormat();
+    			}
+
+    		}
+
+    	}
+    	
+
+    	class Bat_Method {
+    		String Pre_SETLOCAL = "::SETLOCAL";
+    		String End_SETLOCAL = "::ENDLOCAL";
+    		String End_Method_Tag = "goto:eof";
+    		String Method_Return_Tag = "_return_";
+    		String Method_In_Tag  = "______________Method_In";
+    		String Method_Out_Tag = "______________Method_Out";
+
+    		int methodIndex;
+    		
+    		String Rule_Bat_File_Name = "zbatrule_I9_Rule30.bat";
+    		int ruleIndex;   // 业务的序号
+    		boolean isRuleMethod;   // 是否是业务方法 
+    		String ruleIndex_Tag;   // zbatrule_I9.bat  _1_ 
+    		ArrayList<String> method_ruletip_list; // 当前 ruletip 规则 
+
+    		String bat_method_name; // bat 方法 的 名称 recordFileNameToFile_func_1x1
+    		String bat_method_name_nofunc; // 没有 func 标示的方法的名字
+    		int input_param_count; // 输入的参数的个数
+    		int output_param_count; // 输出参数的个数
+    		
+    		String endPrintCode; // 代码最后输出结果的代码     添加对 isRuleMethod 的 支持
+    // 正常的 endPrintCode 
+    // echo [ruletipanalysis_func_0x1 EndPrintCode] ruletipanalysis_return_1=[!ruletipanalysis_return_1!]   param1=[__empty__] 
+    // 对于  rule11vtryMethod_func_1x0 // 这样的 规则函数  是没有 输入参数的   输入参数要自己动态计算
+    //  规定  ruleMethod的输入参数名称为   ruletipanalysis_return_1  dynamic1=[__empty__] 
+    //  rule1vbankupapk_func_1x0   echo [rule1vbankupapk_func_1x0 EndPrintCode]    output=[__empty__] param1=[%1]   
+    //   echo [rule1vbankupapk_func_1x0 EndPrintCode]    output=[__empty__]  dynamic_param1=[!rule1vbankupapk_dynamic_param1!]   dynamic_param2=[!rule1vbankupapk_dynamic_param2!]
+    	
+    		
+    		
+    		String method_seperate_line; //  在函数定义下面出现用以分隔符的作用  rem ======================== getTimeNona_func_0x1
+    		ArrayList<String> method_beginTagCharList;
+
+    		ArrayList<String> method_raw_content; // bat的原始的读取到的内容
+    		
+    		//  // 1.去除函数定义语句  2.去除 rem注释开头 :: 开头的语句  (暗含 ::SETLOCAL  ::ENDLOCAL)
+    		ArrayList<String> method_firstfixed_content;  
+    		ArrayList<String> method_desc_list; // rem desc: 开头的对函数进行描述的中文集合   rem  desc: 注意空格
+    		
+    		ArrayList<String> method_Sample_list;  // rem sample:  开头的字样  用来模拟函数调用的情况 一般都是代码
+    		ArrayList<String> method_SampleOut_list;   // 用来描述函数Sample的返回值的情况 
+    		
+    		ArrayList<String> method_format_content; // 对 bat method 进行 格式化后的字符串集合
+
+    		// 方法的起始标示 1. 以:开头 并且第二个字符不是: 2. 包含 _func_ 3.包含 x 4.trim() 后 不包含空格
+
+    String method_In_PrintCode;  // 函数进入打印代码
+    String method_Out_PrintCode; // 函数离开打印代码
+    //echo ______________Method_In_searchOneTargetFile4Dir4Type_func_2x1:
+    //echo ______________Method_Out_searchOneTargetFile4Dir4Type_func_2x1:
+    			
+
+    Bat_Method(int cMethodIndex, String methodName) {
+
+    	methodIndex = cMethodIndex;
+    	bat_method_name = methodName; // clearstringpadding_func_1x1
+    	bat_method_name_nofunc = methodName.substring(0, methodName.indexOf("_func_"));
+    	initRuleTag();
+//    	System.out.println("AA bat_method_name_nofunc =" + bat_method_name_nofunc);
+    	method_seperate_line = "rem ======================================== "+methodName;
+    	initParamsCount(methodName);
+    	buildEndPrintCode(methodName, bat_method_name_nofunc, input_param_count, output_param_count,isRuleMethod);
+    	method_raw_content = new ArrayList<String>();
+    	method_firstfixed_content  = new ArrayList<String>();
+    	method_Sample_list =  new ArrayList<String>();
+    	method_SampleOut_list =  new ArrayList<String>();
+    	
+    	method_desc_list = new ArrayList<String>();
+    	method_ruletip_list = new ArrayList<String>();
+    	method_beginTagCharList = new ArrayList<String>();
+    	method_beginTagCharList.add("_func_");
+
+    	method_beginTagCharList.add(":");
+    	method_beginTagCharList.add("x");
+    	
+    	method_format_content = new ArrayList<String>();
+    	
+
+
+    	method_In_PrintCode = "echo "+Method_In_Tag+" "+ bat_method_name;  // 函数进入打印代码
+    	 method_Out_PrintCode= "echo "+Method_Out_Tag+" "+bat_method_name;  // 函数离开打印代码
+    	//echo ______________Method_In_searchOneTargetFile4Dir4Type_func_2x1:
+    	//echo ______________Method_Out_searchOneTargetFile4Dir4Type_func_2x1:
+    	
+    }
+
+    void 	initRuleTag() {
+    	String bat_method_name_nofunc_trim_lower =  bat_method_name_nofunc.trim().toLowerCase();
+    	boolean flagA =bat_method_name_nofunc_trim_lower.startsWith("rule") && bat_method_name_nofunc_trim_lower.contains("v");
+    	
+    	if(!flagA) {
+    		
+    		isRuleMethod = false;
+    		ruleIndex = -1;
+    		ruleIndex_Tag = "";
+    		System.out.println("bat_method_name_nofunc = "+bat_method_name_nofunc+" [isRuleMethod = "+ isRuleMethod);
+    		return ;
+    	}
+    	
+    	 
+    	String preVStr =bat_method_name_nofunc_trim_lower.substring(0, bat_method_name_nofunc_trim_lower.indexOf("v"));
+    	preVStr = preVStr.replace("rule", "");
+    	
+    	if(isNumeric(preVStr)) {
+    		isRuleMethod = true;
+    		ruleIndex = Integer.parseInt(preVStr);
+    		ruleIndex_Tag = Rule_Bat_File_Name +" _"+ruleIndex+"_ ";
+    		System.out.println("bat_method_name_nofunc = "+bat_method_name_nofunc+" [isRuleMethod = "+ isRuleMethod + " ruleIndex="+ruleIndex + " ruleIndex_Tag="+ruleIndex_Tag);
+
+    	}
+    	
+    }
+
+    		void InitFormatContent(){
+    			
+    			if(method_firstfixed_content.size() == 0) {
+    				System.out.println("当前Method "+bat_method_name+ " 出错 读取到的内容为空"+"method_firstfixed_content.size() = "+ method_firstfixed_content.size() + "  method_raw_content.size()="+ method_raw_content.size());
+    				return;
+    			}
+    			
+    			// 第一步 添加 函数定义的名称 
+    			method_format_content.add(":"+bat_method_name);
+    			
+    			// 2. 添加 函数分隔提示符
+    			method_format_content.add(method_seperate_line);
+    			
+    			//  如果 当前 函数 是  rule  函数  那么  需要添加 rule_tip:
+    			if(isRuleMethod) {
+    				if(!allRuleMethodNameList.contains(bat_method_name)) {
+    					allRuleMethodNameList.add(bat_method_name);
+    				}
+    		
+    				if(method_ruletip_list.size() > 0) {
+    					for (int i = 0; i < method_ruletip_list.size(); i++) {
+    						String  rule_tip = method_ruletip_list.get(i);
+    						String addToFormat_ruleStr = rule_tip;
+    						if(!rule_tip.contains("#")) {
+    							addToFormat_ruleStr =rule_tip.replace("#", "");
+    							addToFormat_ruleStr = "## "+rule_tip;
+    						}
+    						
+    						if(addToFormat_ruleStr.contains(ruleIndex_Tag.replace(" ", ""))) {
+    							
+    							addToFormat_ruleStr = addToFormat_ruleStr.replace(ruleIndex_Tag.replace(" ", ""), "");
+    						}
+    						
+
+    						
+    						if(!addToFormat_ruleStr.contains(ruleIndex_Tag) ) {
+    							method_format_content.add("rem rule_tip: "+ruleIndex_Tag+" "+addToFormat_ruleStr);
+    							allRuleTipStrList.add(ruleIndex_Tag+" "+addToFormat_ruleStr);
+    						}else {
+    							method_format_content.add("rem rule_tip: "+addToFormat_ruleStr);
+    							allRuleTipStrList.add(addToFormat_ruleStr);
+    						}
+    					
+    					}
+    				}else{
+    					method_format_content.add("rem rule_tip: "+ruleIndex_Tag);
+    				}
+
+    			}
+    			
+    			// 3. 添加 rem:desc 的语句
+    			if(method_desc_list.size() > 0) {
+    				for (int i = 0; i < method_desc_list.size(); i++) {
+    					String  desc = method_desc_list.get(i);
+    					method_format_content.add("rem desc: "+desc);
+    				}
+    			}else{
+    				method_format_content.add("rem desc: ");
+    			}
+    	
+    			
+    			// 4. 添加 rem:sample 的语句
+
+    			if(method_Sample_list.size() > 0) {
+    				for (int i = 0; i < method_Sample_list.size(); i++) {
+    					String  sample = method_Sample_list.get(i);
+    					method_format_content.add("rem sample: "+sample);
+    				}
+    			}else{
+    				method_format_content.add("rem sample: ");
+    			}
+    			
+    			
+    			// 5. 添加 rem:sample_out: 的语句
+
+    			if(method_SampleOut_list.size() > 0) {
+    				for (int i = 0; i < method_SampleOut_list.size(); i++) {
+    					String  sample_out = method_SampleOut_list.get(i);
+    					method_format_content.add("rem sample_out: "+sample_out);
+    				}
+    			}else{
+    				method_format_content.add("rem sample_out: ");
+    			}
+    			
+    			//6. 增加 setlocal
+    			method_format_content.add(Pre_SETLOCAL);
+    			
+    			method_format_content.add(method_In_PrintCode);   // 添加进入函数的代码
+    			
+    			//   如果是 ruleIndex  那么 需要定义 它的  动态计算的参数
+    			if(isRuleMethod) {
+    				for (int i = 0; i < input_param_count; i++) {
+    					method_format_content.add("set "+bat_method_name_nofunc+"_dynamic_param"+(i+1)+"=");
+    				}
+    			}
+    			for (int i = 0; i < method_firstfixed_content.size(); i++) {
+    				String realCodeOne = method_firstfixed_content.get(i);
+    				String realCodeOne_lower_trim = realCodeOne.trim().toLowerCase();
+    				// 如果当前实体代码中遇到  goto: eof 之类的 那么在它之前 添加一个 endprint代码
+    				if(realCodeOne_lower_trim.startsWith(End_Method_Tag)) {
+    					// 检测之前的 代码是否是 endPrintCode
+    					int pre_index = i-1;
+    					if(pre_index >=0 && pre_index < method_firstfixed_content.size()-1) {
+    						String preOneCode = method_firstfixed_content.get(pre_index).trim();
+//    						if(!preOneCode.startsWith(endPrintCode.trim())) {
+    						// 如果上一行不是 输出打印的话 是打印 输出 end_return语句的话  那么就只添加 一个  method_Out_PrintCode
+    							if(!preOneCode.equals(method_Out_PrintCode.trim()) && preOneCode.equals(endPrintCode.trim())) {
+    							   method_format_content.add(method_Out_PrintCode);
+    						    }else if(!preOneCode.equals(method_Out_PrintCode.trim()) && !preOneCode.equals(endPrintCode.trim())){
+    						    	//  如果 既不是 endcode  也不是 outcode  那么 两行 语句 都要 添加
+    						 	   method_format_content.add(endPrintCode);
+    						 	   method_format_content.add(method_Out_PrintCode);
+    						    }
+    					}
+    		
+    				
+    				}
+    						
+    				method_format_content.add(realCodeOne);
+    			}
+    			
+    			String lastCode = method_format_content.get(method_format_content.size()-1).trim();
+    			System.out.println("lastCode = 【"+ lastCode + "】 !lastCode.equals(endPrintCode.trim()) = 【"+!lastCode.equals(endPrintCode.trim())+ "】  methodname=【"+bat_method_name + "】  endPrintCode=【"+endPrintCode.trim()+"】");
+    			if(!lastCode.equals(endPrintCode.trim())) {
+    				// end3. 添加 endprint 代码 	
+    				method_format_content.add(endPrintCode);
+    			}
+
+    			
+    			// 添加离开函数的Log
+    			method_format_content.add(method_Out_PrintCode); 
+    			// end2 .  添加
+    			method_format_content.add(End_SETLOCAL);
+    			// end1.  添加 Goto:eof 
+    			method_format_content.add(End_Method_Tag);
+    			
+    			
+    			ArrayList<String> fixedChineseFormatList = new 	ArrayList<String> ();
+    			
+    			for (int i = 0; i < method_format_content.size(); i++) {
+    				String formatItem = method_format_content.get(i);
+    				String preLine = "";
+    				if(i > 0) {
+    					preLine =  method_format_content.get(i-1);
+    				}
+    			    if(isContainChinese(formatItem) && isContainChinese(preLine)) {
+    			    	fixedChineseFormatList.add(""); // 打印的时候 自动 添加 /r/n 意味着多添加了 一行 
+    			    	fixedChineseFormatList.add(formatItem);
+    			    	System.out.println("preLine = "+preLine+"   formatItem="+formatItem);
+    			    	continue;
+    			    }
+    			    if(!"".equals(formatItem.trim())) {
+    			    	fixedChineseFormatList.add(formatItem);
+    			    	System.out.println("formatItem=["+formatItem+"]");
+    			    }
+    		    
+    				
+    			}
+    			method_format_content.clear();
+    			method_format_content.addAll(fixedChineseFormatList);
+    			showStringList(method_format_content, bat_method_name+"-Format格式完成后样子");
+    		}
+
+    		
+//          tag=[helloworld_func_0x0raw方法] Line[1]   :helloworld_func_0x0
+//    		tag=[helloworld_func_0x0raw方法] Line[2]   ::SETLOCAL
+//    		tag=[helloworld_func_0x0raw方法] Line[3]   echo hello_world zukgit
+//    		tag=[helloworld_func_0x0raw方法] Line[4]   ::ENDLOCAL
+//    		tag=[helloworld_func_0x0raw方法] Line[5]   goto:eof
+//    		tag=[helloworld_func_0x0raw方法] Line[6]   
+//    		tag=[helloworld_func_0x0raw方法] Line[7]   rem ================================  Test_Operation_End ============================
+
+    				
+    		// 对当前的代码进行 format 格式化 
+    		// 第一行:  函数定义        :xxx_funx_0x0
+    		// 第二行:  函数显示分割符号  rem ================================ xxx_funx_0x0
+    		// 第三行:  函数说明的集合    rem desc:  xxxxxx
+    		// 第x行:  函数说明的集合    ::SETLOCAL
+    		//......                【自由发挥空间】
+    		//......                【自由发挥空间】
+    		//......                【自由发挥空间】
+    		// 倒数第三行              echo isFileExist_return_1=[%isFileExist_return_1%]  param1=[%1] 
+    		// 倒数第二行             ::ENDLOCAL
+    		// 最后一行               goto:eof
+    		
+    		//  // 1.去除函数定义语句  2.去除 rem注释开头 :: 开头的语句  (暗含 ::SETLOCAL  ::ENDLOCAL)
+    		void initFirstFixedConent () {
+    			
+    			for (int i = 0; i < method_raw_content.size(); i++) {
+    				String rawContent =  method_raw_content.get(i);
+                   String  batCodeOneLine = method_raw_content.get(i).trim().toLowerCase();
+                   String  batCodeOneLine_clearblank = batCodeOneLine.replace(" ", "");
+                   if("".equals(batCodeOneLine)) {
+                	   continue;   // 去掉空行
+                   }
+                   if(batCodeOneLine.startsWith(":"+bat_method_name.toLowerCase())) {
+                	   continue;  //  去掉函数定义的 首行
+                   }
+                   
+                   if(batCodeOneLine.startsWith("rem ") &&  batCodeOneLine_clearblank.startsWith("remdesc:")) {
+                	   continue;  //  去掉函数定义rem:desc
+                   }
+                   
+                   if(batCodeOneLine.startsWith("rem ") &&  batCodeOneLine_clearblank.startsWith("remrule_tip:")) {
+                	   continue;  //  去掉函数定义rem:desc
+                   }
+                   
+                   if(batCodeOneLine.startsWith("echo ") &&  batCodeOneLine.contains(method_In_PrintCode.toLowerCase().trim())) {
+                	   continue;  //  去掉函数定义 echo  echo ______________Method_In_searchOneTargetFile4Dir4Type_func_2x1 这样的字符串 进入函数字符串
+                   }
+                   
+                   if(batCodeOneLine.startsWith("echo ") &&  batCodeOneLine.contains(method_Out_PrintCode.toLowerCase().trim())) {
+                	   continue;  //  去掉函数定义 echo ______________Method_Out_searchOneTargetFile4Dir4Type_func_2x1:
+                   }
+                   
+                   
+                   if(batCodeOneLine.startsWith("rem ") &&  batCodeOneLine_clearblank.startsWith("remsample:")) {
+                	   continue;  //  去掉函数定义rem:desc
+                   }
+                   if(batCodeOneLine.startsWith("rem ") &&  batCodeOneLine_clearblank.startsWith("remsample_out:")) {
+                	   continue;  //  去掉函数定义rem:desc
+                   }
+                   
+                   //去除掉原始的 EndPrintCode
+                   if(batCodeOneLine.toLowerCase().contains("EndPrintCode".toLowerCase()) ) {
+                	   continue;  //  去掉函数分隔符  rem ======================== helloworld_func_0x0
+                   }
+                   
+                   if(batCodeOneLine.toLowerCase().contains("Method_In".toLowerCase()) ) {
+                	   continue;  //  去掉函数分隔符  rem ======================== helloworld_func_0x0
+                   }
+                   if(batCodeOneLine.toLowerCase().contains("Method_Out".toLowerCase()) ) {
+                	   continue;  //  去掉函数分隔符  rem ======================== helloworld_func_0x0
+                   }
+                   
+                   if(batCodeOneLine.toLowerCase().contains(bat_method_name_nofunc.toLowerCase()+"_dynamic_param") ) {
+                	   continue;  //  去掉函数分隔符  set rule1vbankupapk_dynamic_param
+                   }
+                   
+                   //去除掉原始的 EndPrintCode
+                   if(batCodeOneLine.toLowerCase().startsWith("rem =====".toLowerCase()) ) {
+                	   continue;  //  去掉函数分隔符  rem ======================== helloworld_func_0x0
+                   }
+                   
+                		   
+                   
+                   if(batCodeOneLine.startsWith("rem ")  && batCodeOneLine_clearblank.contains(bat_method_name_nofunc)) {
+                	   continue;  //  去掉函数分隔符  rem ======================== helloworld_func_0x0
+                   }
+                   
+                   if(batCodeOneLine.startsWith("::setlocal") || batCodeOneLine.startsWith("::endlocal") ) {
+                	   continue;  //  去掉::SETLOCAL  和  ::ENDLOCAL
+                   }
+                   
+                   if(batCodeOneLine.startsWith("echo ") && isContainChinese(batCodeOneLine) ) {  //  如果当前包含中文的 echo 开头的
+//                       method_firstfixed_content.add(""); // 在中文前面 添加一个空格  空行 使得 输出不乱码	  
+                       method_firstfixed_content.add(rawContent);	  
+                   }else {
+                       method_firstfixed_content.add(rawContent);	   
+                   }
+
+    			}
+    			showStringList(method_firstfixed_content, "清头清空清set的函数内容 bat_method_name="+bat_method_name);
+
+//           echo recordFileNameToFile_return_1=[%recordFileNameToFile_return_1%]  param1=[%1]  
+//    		 goto:eof
+//    		 rem ======================== searchLastFile_func_1x1
+//    		 rem 检测当前目录下 时间最新的那么文件 
+//    		 rem searchLastFile_func_1x1 接受一个路径参数  给出该路径下 最新的那个 实体文件名称   函数的返回值 一致 定义为 函数名_return 
+//    		 rem searchLastFile_return=K3_MD_Rule.class
+
+    			// 检测在 ArrayList 列表中是否有以 goto:eof 为内容的Item
+    			boolean isContain_GoTo_Eof = isStartWith_lower_trim_InArr(method_firstfixed_content,"goto:eof");
+    	
+    				
+    			// 如果 没有 包含 goto:eof  那么也就 不用去除那最后的字符串了 
+    			if(method_firstfixed_content.size() > 0 && isContain_GoTo_Eof ) {
+    				String lastCodeStr = method_firstfixed_content.get(method_firstfixed_content.size()-1).toLowerCase().trim();
+    				//  确保当前最后一行 是 goto:eof
+    				while(!lastCodeStr.startsWith("goto:eof")  ) {
+    					method_firstfixed_content.remove(method_firstfixed_content.size()-1);
+    					if(method_firstfixed_content.size() == 0) {
+    						break;
+    					}
+    					 lastCodeStr = method_firstfixed_content.get(method_firstfixed_content.size()-1).toLowerCase().trim();
+    				}
+    				
+    				// 确保删除了 这 最后一行的 goto:eof  , 如果下一行 还是 goto:eof 继续删除它
+    				lastCodeStr = method_firstfixed_content.get(method_firstfixed_content.size()-1).toLowerCase().trim();
+    				while(lastCodeStr.startsWith("goto:eof") || "".equals(lastCodeStr) ) {  // 如果当前的最后一行 是 goto:eof 那么删除该行
+    					method_firstfixed_content.remove(method_firstfixed_content.size()-1);
+    					if(method_firstfixed_content.size() == 0) {
+    						break;
+    					}
+    					lastCodeStr = method_firstfixed_content.get(method_firstfixed_content.size()-1).toLowerCase().trim();
+    				}
+    			}
+    			
+    			showStringList(method_firstfixed_content, "清头清空清set的函数内容并且以goto:eof结尾的函数  bat_method_name="+bat_method_name);
+    		  
+    			String lastOneCode = method_firstfixed_content.get(method_firstfixed_content.size()-1);
+    			if(!method_firstfixed_content.contains(endPrintCode)) {  // 如果最后打印有 不包含 endprintCode 那么假如 endprintCode
+//    				method_firstfixed_content.add(endPrintCode);
+    				System.out.println("最后一句代码就是 不是EndprintCode  需要加入！！");
+
+    			}else {
+    				System.out.println("最后一句代码就是 EndprintCode  不加入！！");
+    			}
+
+    			showStringList(method_firstfixed_content, "清头清空清set的函数内容并且以goto:eof结尾的函数 添加EndPrintCode的函数  bat_method_name="+bat_method_name);
+
+    		    
+    		}
+    		
+    		void initRemDesc_Sample_SampleOut_RuleTip() {
+    			
+    			
+    			for (int i = 0; i < method_raw_content.size(); i++) {
+    				String oneMethodStr = method_raw_content.get(i);
+    				String clearBlank = oneMethodStr.replace(" ", "");
+    				if(clearBlank.startsWith("remdesc:") && oneMethodStr.startsWith("rem ")) {
+    					String descStr = clearBlank.replace("remdesc:", "");
+    					
+    					if(!"".equals(descStr.trim())) {
+    						method_desc_list.add(descStr);
+    					}
+    		
+    				}
+    			}
+    			showStringList(method_desc_list, "方法说明");
+    			
+    			if(isRuleMethod) {
+    				for (int i = 0; i < method_raw_content.size(); i++) {
+    					String oneMethodStr = method_raw_content.get(i);
+    					String clearBlank = oneMethodStr.replace(" ", "");
+    					if(clearBlank.startsWith("remrule_tip:") && oneMethodStr.startsWith("rem ")) {
+    						String descStr = clearBlank.replace("remrule_tip:", "");
+    						
+    						if(!"".equals(descStr.trim())) {
+    							method_ruletip_list.add(descStr);
+    						}
+    			
+    					}
+    				}
+    				showStringList(method_ruletip_list, "ruleTip说明");
+    				
+    			}
+
+    			
+    			
+    			for (int i = 0; i < method_raw_content.size(); i++) {
+    				String oneMethodStr = method_raw_content.get(i);
+    				String clearBlank = oneMethodStr.replace(" ", "");
+    				if(clearBlank.startsWith("remsample:") && oneMethodStr.startsWith("rem ")) {
+    					String descStr = clearBlank.replace("remsample:", "");
+    					
+    					if(!"".equals(descStr.trim())) {
+    						method_Sample_list.add(descStr);
+    					}
+    			
+    				}
+    			}
+    			showStringList(method_Sample_list, "方法实例");
+    			
+    			
+    			for (int i = 0; i < method_raw_content.size(); i++) {
+    				String oneMethodStr = method_raw_content.get(i);
+    				String clearBlank = oneMethodStr.replace(" ", "");
+    				if(clearBlank.startsWith("remsample_out:") && oneMethodStr.startsWith("rem ")) {
+    					String descStr = clearBlank.replace("remsample_out:", "");
+    					if(!"".equals(descStr.trim())) {
+    						method_SampleOut_list.add(descStr);
+    					}
+    	
+    				}
+    			}
+    			showStringList(method_SampleOut_list, "方法实例输出");
+    			
+    		}
+    		
+    		void clearAllData() {
+    			method_raw_content.clear();
+    			method_firstfixed_content.clear();
+    			method_desc_list.clear();
+    			method_Sample_list.clear();
+    			method_SampleOut_list.clear();
+    			method_format_content.clear();
+    		}
+    		
+    		
+    		void doFormat() {
+    			// 1. 获取 所有  rem desc: 开头的字符串 
+    			// 2. 检测 rawMethod中 最后一行是否是 goto:eof  
+    			      // 如果不是 2.1如果否代码  不是 rem开头的话  那么直接删除 
+    			      //  2.2如果是代码  那么手动 添加 goto:eof
+    			// 3. 检测 倒数第二行 是否是 ::ENDLOCAL
+    			     // 3.1 检测当前rawMethod是否包含 ::ENDLOCAL 如果不包含 那么添加  如果包含  那么删除原有的  ::ENDLOCAL  再添加到这里
+    			//4. 把 自由发挥空间 过滤出来 导出来到  format_list 中
+    			//zzzzzzzzzzz
+
+    			
+    			if (method_raw_content.size() == 0) {
+    				System.out.println("当前 method_raw_content 为空, 无法执行 Method的 format 方法!");
+    				return;
+    			}
+    			initRemDesc_Sample_SampleOut_RuleTip();
+    			initFirstFixedConent();
+    			InitFormatContent();  // 开始拼凑  formatList 了 
+    			
+    		}
+
+
+
+    		// 检测 Method 结束 遇到新的 Method的标识符就意味着结束
+    		// 检测 Method 开始
+    		boolean isMethodEnd(String oneLine) {
+    			boolean isMethodEndLine = false;
+    			String oneLine_trim = oneLine.toLowerCase().trim();
+    			// 必须以: 开头 并且 不以:: 开头
+    			if (!oneLine_trim.startsWith(":") || oneLine_trim.startsWith("::")) {
+    				System.out.println("ZZZZBBBB_isMethodEnd  beginTagChar =:" + oneLine_trim + "isMethodEndLine = "
+    						+ isMethodEndLine);
+
+    				return isMethodEndLine;
+    			}
+
+    			for (int i = 0; i < method_beginTagCharList.size(); i++) {
+    				String beginTagChar = method_beginTagCharList.get(i);
+    				if (!oneLine_trim.contains(beginTagChar)) {
+//          					System.out.println(" beginTagChar = "+ beginTagChar + " 不包含在:"+oneLine_trim);
+    					System.out.println("ZZZZAAA_isMethodEnd  beginTagChar =:" + oneLine_trim + "isMethodEndLine = "
+    							+ isMethodEndLine);
+
+    					return isMethodEndLine;
+    				}
+
+    			}
+
+    			System.out.println("ZZZZAAA_isMethodEnd  oneLine_trim=" + oneLine_trim + "    oneLine=" + oneLine);
+    			// :searchlastfile_func_1x1
+    			if (oneLine_trim.startsWith(":") && !oneLine_trim.startsWith("::") && oneLine_trim.contains("_func_")
+    					&& oneLine_trim.contains("x") && !oneLine_trim.contains(" ")) { // 以: 开头 并不以 :: 开头
+
+    				String[] splitArr = oneLine.split("_");
+    				if (splitArr != null) {
+    					String lastPartStr = splitArr[splitArr.length - 1];
+    					// :helloworld_func_0x0
+    					String firstPartStr = splitArr[0].toLowerCase().trim();
+
+    					String inputParamStr = lastPartStr.substring(0, lastPartStr.indexOf("x"));
+    					String outputParamStr = lastPartStr.substring(lastPartStr.indexOf("x") + "x".length());
+    					// 如果检测到一个新的 方法 这个方法的名字 和 当前的名字 不一样 那么就意味着 这个函数定义的结束
+    					
+    //ZZZZAAA_isMethodEnd  oneLine_trim=:string_test_func_0x0    oneLine=:string_test_func_0x0
+    //ZZZZ1111_isMethodEnd  outputParamStr = 0isNumeric(outputParamStr)=true  inputParamStr =0  isNumeric(inputParamStr)=true !firstPartStr.contains(bat_method_name_nofunc)=true  beginTagChar =::string_test_func_0x0   isMethodEndLine = false  firstPartStr = :string   bat_method_name_nofunc=string_test
+    //ZZZZ2222_isMethodEnd  beginTagChar =:string_test_func_0x0   isMethodEndLine = true  firstPartStr = :string   bat_method_name_nofunc=string_test
+    //ZZZZ5555__isMethodEnd  beginTagChar =:string_test_func_0x0   isMethodEndLine = true
+
+    					System.out.println("ZZZZ1111_isMethodEnd  outputParamStr = " + outputParamStr
+    							+ "isNumeric(outputParamStr)=" + isNumeric(outputParamStr) + "  inputParamStr ="
+    							+ inputParamStr + "  isNumeric(inputParamStr)=" + isNumeric(inputParamStr)
+    							+ " !firstPartStr.contains(bat_method_name_nofunc)="
+    							+ !firstPartStr.contains(bat_method_name_nofunc) + "  beginTagChar =:" + oneLine_trim
+    							+ "   isMethodEndLine = " + isMethodEndLine + "  firstPartStr = " + firstPartStr
+    							+ "   bat_method_name_nofunc=" + bat_method_name_nofunc);
+
+    					if (isNumeric(outputParamStr.trim()) && isNumeric(inputParamStr.trim())
+    							&& !firstPartStr.contains(bat_method_name_nofunc)) {
+
+    						isMethodEndLine = true;
+    						System.out.println("ZZZZ2222_isMethodEnd  beginTagChar =" + oneLine_trim
+    								+ "   isMethodEndLine = " + isMethodEndLine + "  firstPartStr = " + firstPartStr
+    								+ "   bat_method_name_nofunc=" + bat_method_name_nofunc);
+
+    					} else {
+    						System.out.println("ZZZZ3333_isMethodEnd  beginTagChar =" + oneLine_trim
+    								+ "   isMethodEndLine = " + isMethodEndLine + "  firstPartStr = " + firstPartStr
+    								+ "   bat_method_name_nofunc=" + bat_method_name_nofunc);
+
+    					}
+    				}
+
+    			} else {
+    				System.out.println("ZZZZ4444__isMethodEnd  beginTagChar =" + oneLine_trim + "   isMethodEndLine = "
+    						+ isMethodEndLine);
+
+    			}
+    			System.out.println(
+    					"ZZZZ5555__isMethodEnd  beginTagChar =" + oneLine_trim + "isMethodEndLine = " + isMethodEndLine);
+
+    			return isMethodEndLine;
+
+    		}
+
+    		// 检测 Method 开始
+    		boolean isMethodBegin(String oneLine) {
+    			boolean isMethodBeginLine = false;
+    			String oneLine_trim = oneLine.toLowerCase().trim();
+    			// 必须以: 开头 并且 不以:: 开头
+    			if (!oneLine_trim.startsWith(":") || oneLine_trim.startsWith("::")) {
+
+    				System.out.println("ZZZZZ0000_isMethodBegin   oneLine_trim=" + oneLine_trim + "    bat_method_name="
+    						+ bat_method_name);
+
+    				return isMethodBeginLine;
+    			}
+
+    			for (int i = 0; i < method_beginTagCharList.size(); i++) {
+    				String beginTagChar = method_beginTagCharList.get(i);
+    				if (!oneLine_trim.contains(beginTagChar)) {
+//    					System.out.println(" beginTagChar = "+ beginTagChar + " 不包含在:"+oneLine_trim);
+    					System.out.println("ZZZZZ1111_isMethodBegin   oneLine_trim=" + oneLine_trim + "    bat_method_name="
+    							+ bat_method_name);
+
+    					return isMethodBeginLine;
+    				}
+//    				method_beginTagCharList.add(methodName);
+    				if (!oneLine_trim.contains(bat_method_name)) { // 把 名字单独提出来
+    					System.out.println("ZZZZZ2222_isMethodBegin   oneLine_trim=" + oneLine_trim + "    bat_method_name="
+    							+ bat_method_name + " isMethodBeginLine=" + isMethodBeginLine);
+
+    					return isMethodBeginLine;
+    				}
+    			}
+
+    			if (oneLine_trim.startsWith(":") && !oneLine_trim.startsWith("::") && oneLine_trim.contains("_func_")
+    					&& oneLine_trim.contains("x") && !oneLine_trim.contains(" ")) { // 以: 开头 并不以 :: 开头
+
+    				String[] splitArr = oneLine.split("_");
+    				if (splitArr != null) {
+    					String lastPartStr = splitArr[splitArr.length - 1];
+
+    					String inputParamStr = lastPartStr.substring(0, lastPartStr.indexOf("x"));
+    					String outputParamStr = lastPartStr.substring(lastPartStr.indexOf("x") + "x".length());
+    					if (isNumeric(outputParamStr.trim()) && isNumeric(inputParamStr.trim())) {
+    						System.out.println("ZZZZZ33333_isMethodBegin isMethodBeginLine = true   oneLine_trim="
+    								+ oneLine_trim + "    bat_method_name=" + bat_method_name + " isMethodBeginLine="
+    								+ isMethodBeginLine);
+    						isMethodBeginLine = true;
+    					}
+    				}
+
+    			} else {
+
+    				System.out.println("ZZZZZ333AAA_isMethodBegin   oneLine_trim=" + oneLine_trim + "    bat_method_name="
+    						+ bat_method_name + " isMethodBeginLine=" + isMethodBeginLine);
+
+    			}
+    			System.out.println("ZZZZZ4444_isMethodBegin   oneLine_trim=" + oneLine_trim + "    bat_method_name="
+    					+ bat_method_name + " isMethodBeginLine=" + isMethodBeginLine);
+
+    			return isMethodBeginLine;
+
+    		}
+
+    		// getFileNameNoPointWithFullPath_return_1=[Z_TEMP]
+    		// param1=[C:\Users\zhuzj5\Desktop\zbin\Z_TEMP.txt]
+    		void buildEndPrintCode(String methodName, String methodName_nofunc, int inputParamCount, int outputParamCount, boolean isRuleMethod) {
+    			endPrintCode = "";
+    			String preCode = "echo ["+methodName+" EndPrintCode] ";
+    			if (inputParamCount == 0 && outputParamCount == 0) {
+    				// stringTrim_func_1x1 input_1_param ==[%1]
+    				endPrintCode = preCode  + "  output=[__empty__]  param1=[__empty__] ";
+    				return;
+    			}
+
+    			// 没有输入参数 但有输出参数
+    			if (inputParamCount == 0 && outputParamCount > 0) {
+    				StringBuilder sb = new StringBuilder();
+    				for (int i = 1; i < outputParamCount + 1; i++) {
+    					String returnItem = methodName_nofunc + Method_Return_Tag + i;
+    					String currentCode = returnItem + "=[!" + returnItem + "!]" + "   ";
+    					sb.append(currentCode);
+    				}
+    	
+    				if(isRuleMethod) {
+    					sb.append("dynamic_param1=[__empty__] ");
+    					
+    				}else {
+    					sb.append("param1=[__empty__] ");
+    				}
+    				endPrintCode = preCode + sb.toString();
+    				return;
+    			}
+
+    			// 有输入参数 但有没输出参数
+    			if (inputParamCount > 0 && outputParamCount == 0) {
+    				StringBuilder sb = new StringBuilder();
+    				for (int i = 1; i < inputParamCount + 1; i++) {
+    					String paramItem = "param" + i;
+    					String currentCode = paramItem + "=[%" + i + "]" + "   ";
+    					
+    					if(isRuleMethod) {
+    						paramItem = "dynamic_param" + i;
+    						currentCode = paramItem + "=[!" + methodName_nofunc+"_dynamic_param"+i + "!]" + "   ";
+    					}
+    					sb.append(currentCode);
+    				}
+
+    				endPrintCode = preCode + "   output=[__empty__] " + sb.toString();
+    				return;
+    			}
+
+    			// 有输入参数 也有 输出参数
+    			if (inputParamCount > 0 && outputParamCount > 0) {
+    				StringBuilder sb = new StringBuilder();
+
+    				for (int i = 1; i < outputParamCount + 1; i++) {
+    					String returnItem = methodName_nofunc + Method_Return_Tag + i;
+    					String currentCode = returnItem + "=[!" + returnItem + "!]" + "   ";
+    					sb.append(currentCode);
+    				}
+
+    				for (int i = 1; i < inputParamCount + 1; i++) {
+    					String paramItem = "param" + i;
+    					String currentCode = paramItem + "=[%" + i + "]" + "   ";
+    					if(isRuleMethod) {
+    						paramItem = "dynamic_param" + i;
+    						currentCode = paramItem + "=[!" + methodName_nofunc+"_dynamic_param"+i + "!]" + "   ";
+    					}
+    					
+    					sb.append(currentCode);
+    				}
+
+    				endPrintCode = preCode + "  " + sb.toString();
+    				return;
+    			}
+
+    		}
+
+    		// getsubstringwithpre_func_2x1 得到输入的参数个数2 以及要输出的参数个数1
+    		void initParamsCount(String methodName) {
+    			String[] splitArr = methodName.split("_");
+    			if (splitArr != null) {
+    				String lastPartStr = splitArr[splitArr.length - 1];
+    				String inputParamStr = lastPartStr.substring(0, lastPartStr.indexOf("x"));
+    				String outputParamStr = lastPartStr.substring(lastPartStr.indexOf("x") + "x".length());
+
+    				if (isNumeric(inputParamStr)) {
+    					input_param_count = Integer.parseInt(inputParamStr);
+    				}
+
+    				if (isNumeric(outputParamStr)) {
+    					output_param_count = Integer.parseInt(outputParamStr);
+    				}
+    			}
+    		}
+
+    	}
+
+
+
+          boolean isContainChinese(String str) {
+            Pattern p = Pattern.compile("[\u4e00-\u9fa5]");
+            Matcher m = p.matcher(str);
+            if (m.find()) {
+                return true;
+            }
+            return false;
+        }
+        
+        
+
+
+          ArrayList<String> Bat_To_Format(ArrayList<String> batContentList) {
+//    		Bat_Aera system_init_aera = null;
+//    		Bat_Aera program_execute_aera = null;
+//    		Bat_Aera func_define_aera = null;
+
+    		// rem ══════════════════════════════════════════ System_Init_Aera_Begin
+    		// ══════════════════════════════════════════
+
+    		// 1. 含有 rem 并以它为开头 2. 含有 area标识 ══ _area_ 3. 含有当前area的名字
+    		Bat_Aera system_init_aera = new Bat_Aera(0, "system_init_aera");
+    		Bat_Aera program_execute_aera = new Bat_Aera(1, "program_execute_aera");
+    		Bat_Aera func_define_aera = new Bat_Aera(2, "func_define_aera", true);
+    		Bat_Aera main_enter_aera = new Bat_Aera(3, "main_enter_aera");
+    		ArrayList<Bat_Aera> areaList = new ArrayList<Bat_Aera>();
+    		areaList.add(system_init_aera);
+    		areaList.add(program_execute_aera);
+    		areaList.add(func_define_aera);
+    		areaList.add(main_enter_aera);
+    		initRawContentInArea(batContentList, areaList);
+    		
+    		 ArrayList<String> formatAllBatCodeList = buildAllBatFormatContent(areaList);
+
+
+    		 showStringList(allRuleTipStrList, "RuleTip列表");
+    		 Bat_Method rulePrintMethod = getMethodByName("ruletipprint");
+    		  build_rulePrintMethod(rulePrintMethod,allRuleTipStrList);  // 重绘 rawContent 
+    		 
+
+
+    	        formatAllBatCodeList = buildAllBatFormatContent(areaList);
+    		 
+    		 
+   
+    			
+    			return formatAllBatCodeList;
+//    			
+    	}
+    	
+    	void build_rulePrintMethod(Bat_Method rulePrintMethod,ArrayList<String> tipList){
+    		
+    		ArrayList<String> newRulePrintMethodRaw = new 	ArrayList<String> ();
+    		newRulePrintMethodRaw.add(":"+rulePrintMethod.bat_method_name);
+    		newRulePrintMethodRaw.add("rem desc: Bussiness_Rule打印程序用于打印batrule规则序列");
+    		
+//    		newRulePrintMethodRaw.addAll(tipList);
+    		
+    		for (int i = 0; i < tipList.size(); i++) {
+    			String tipStr = tipList.get(i);
+    			if(isContainChinese(tipStr)) {
+//    				newRulePrintMethodRaw.add("\n");
+    				newRulePrintMethodRaw.add("echo "+tipList.get(i));
+    			}else {
+    				newRulePrintMethodRaw.add("echo "+tipList.get(i));
+    			}
+
+    		}
+    		
+    		newRulePrintMethodRaw.add("goto:eof");
+    		rulePrintMethod.clearAllData();
+    		rulePrintMethod.method_raw_content = newRulePrintMethodRaw;
+    		showStringList(rulePrintMethod.method_raw_content, rulePrintMethod.bat_method_name+"新的rawContent");
+
+    		rulePrintMethod.doFormat();
+    	}
+
+    	
+    	 ArrayList<String>	buildAllBatFormatContent(ArrayList<Bat_Aera> areaList ){
+    		 ArrayList<String> allFormatList = new  ArrayList<String>();
+    		 if(areaList == null || areaList.size() == 0) {
+    			 System.out.println("当前解析到的 ArrayList<Bat_Aera> 为空 无法执行format bat 代码的操作!");
+    			 return null;
+    		 }
+    		 
+    		 allFormatList.add(batHead_1);  //  @ECHO off
+    		 allFormatList.add(batHead_2);  //  setlocal enabledelayedexpansion
+    		 allFormatList.add(batHead_3);  //  chcp 65001
+    			for (int i = 0; i < areaList.size(); i++) {
+    				Bat_Aera batArea_Item = areaList.get(i);
+    				 ArrayList<String>  AreaContent = batArea_Item.getAreaFormatContent();
+    				 allFormatList.addAll(AreaContent);
+    			}
+    			
+
+
+    			return allFormatList;
+    		
+    	}
+    	
+
+     void showStringList(ArrayList<String> strList) {
+
+    		if (strList == null || strList.size() == 0) {
+    			System.out.println("当前调用 showStringList 显示的  ArrayList<String>() 字符串数组为空!! ");
+    			return;
+    		}
+
+    		int line_num = 0;
+    		System.out.println(
+    				"════════════════════ ArrayList<String>  " + strList.size() + " 行字符串" + "════════════════════ ");
+    		for (int i = 0; i < strList.size(); i++) {
+    			line_num++;
+    			String oneStr = strList.get(i);
+    			System.out.println("Line[" + line_num + "]   " + oneStr);
+
+    		}
+    		System.out.println();
+    	}
+
+    	
+    	 void showStringList_WithHead(ArrayList<String> strList, String tag) {
+
+    		if (strList == null || strList.size() == 0) {
+    			System.out.println("当前调用 showStringList 显示的  ArrayList<String>() 字符串数组为空!! ");
+    			return;
+    		}
+
+    		int line_num = 0;
+    		System.out.println("════════════════════ showStringList_WithHead  ArrayList<String>  " + strList.size() + " 行字符串 " +tag+" begin " +  "════════════════════ ");
+    		System.out.println("ZZZZZZZZZZZZZZZZZZZZ");
+    		for (int i = 0; i < strList.size(); i++) {
+    			line_num++;
+    			String oneStr = strList.get(i);
+    			System.out.println(oneStr);
+
+    		}
+    		System.out.println("ZZZZZZZZZZZZZZZZZZZZ");
+
+    		System.out.println("════════════════════ showStringList_WithHead  ArrayList<String>  " + strList.size() + " 行字符串 " +tag+" end " +  "════════════════════ ");
+
+    		System.out.println();
+    	}
+    	
+    	
+    	
+    void showStringList(ArrayList<String> strList, String tag) {
+
+    		if (strList == null || strList.size() == 0) {
+    			System.out.println("当前调用 showStringList 显示的  ArrayList<String>() 字符串数组为空!! ");
+    			return;
+    		}
+
+    		int line_num = 0;
+    		System.out.println(
+    				"════════════════════ ArrayList<String>  " + strList.size() + " 行字符串" + "════════════════════ ");
+    		for (int i = 0; i < strList.size(); i++) {
+    			line_num++;
+    			String oneStr = strList.get(i);
+    			System.out.println("tag=[" + tag + "] Line[" + line_num + "]   " + oneStr);
+
+    		}
+    		System.out.println();
+    	}
+
+    	public  boolean isNumeric(String string) {
+    		String str = string.trim();
+    		for (int i = str.length(); --i >= 0;) {
+    			if (!Character.isDigit(str.charAt(i))) {
+    				return false;
+    			}
+    		}
+    		return true;
+    	}
+
+    	void initRawContentInArea(ArrayList<String> batContentList, ArrayList<Bat_Aera> areaList) {
+
+    		for (int i = 0; i < areaList.size(); i++) {
+    			Bat_Aera curArea = areaList.get(i);
+    			ArrayList<String> area_raw_contentList = new ArrayList<String>();
+
+    			for (int j = 0; j < batContentList.size(); j++) {
+    				String oneLineStr = batContentList.get(j);
+    				isAreaBegin = curArea.isAreaBegin(oneLineStr);
+    				if (isAreaBegin) {
+    					isAreaRawBegin = true;
+    				}
+    				isAreaEnd = curArea.isAreaEnd(oneLineStr);
+    				if (isAreaEnd) {
+    					isAreaRawBegin = false;
+    					area_raw_contentList.add(oneLineStr);
+    				}
+
+    				if (isAreaRawBegin) {
+//    				System.out.println("isAreaBegin="+ isAreaBegin + "   isAreaEnd="+ isAreaEnd + "  isRawBegin="+ isRawBegin);
+    					area_raw_contentList.add(oneLineStr);
+    				}
+
+//    			System.out.println("index["+j+"] "+"isAreaBegin="+ isAreaBegin + "   isAreaEnd="+ isAreaEnd + "  isRawBegin="+ isRawBegin);
+
+    			}
+    			curArea.aera_raw_content.addAll(area_raw_contentList);
+    			isAreaBegin = false;
+    			isAreaEnd = false;
+    			isAreaRawBegin = false;
+    			System.out.println(curArea.aera_name + " 的 raw列表如下");
+    			showStringList(curArea.aera_raw_content, curArea.aera_name);
+
+    			curArea.initDataWithRawContent(area_raw_contentList);
+    		}
+
+    	}
+
+    	
+
+    	 Bat_Method	getMethodByName(String methodName){
+    		Bat_Method selectedMethod = null;
+    		
+    		for (int i = 0; i < allMethodList.size(); i++) {
+    			Bat_Method currentMethod = allMethodList.get(i);
+    			if(currentMethod.bat_method_name_nofunc.trim().toLowerCase().equals(methodName.toLowerCase().trim())) {
+    				return currentMethod;
+    			}
+    		}
+    		return selectedMethod;
+    	}
+    	
+    	volatile boolean isAreaBegin = false;
+    	volatile boolean isAreaEnd = false;
+    	volatile boolean isAreaRawBegin = false;
+
+    	volatile boolean isOperationBegin = false;
+    	volatile boolean isOperationEnd = false;
+    	volatile boolean isOperationRawBegin = false;
+
+    	volatile boolean isMethodBegin = false;
+    	volatile boolean isMethodEnd = false;
+    	volatile boolean isMethodRawBegin = false;
+
+    	
+
+        
+    	
+    }
+    
+    
+//  把当前模板文件 zbatrule_I9_Rule30.bat 内容写进当前目录下 Test_20200201_xxx(时间戳).bat 文档 并打开它
+  class Show_Bat_Template_OnDir_Rule_30 extends  Basic_Rule{
+    	File bat_template_file ;
+ 
+    	
+    	Show_Bat_Template_OnDir_Rule_30(){
+            super(30,false);
+            bat_template_file = new File(zbinPath+File.separator+"win_zbin"+File.separator+"zbatrule_I9_Rule30.bat");
+        }
+    	
+        @Override
+        ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+        	 ArrayList<String> result_list = new  ArrayList<String>();
+        	if(!bat_template_file.exists()) {
+        		result_list.add("当前 模板文件 " +bat_template_file.getAbsolutePath()+" 不存在 请检查该文件！");
+        		   System.out.println("失败 无法 读取 zbatrule_I9_Rule30.bat 模板文件! "+bat_template_file.getAbsolutePath());
+        	}else {
+                ArrayList<String> contentList = ReadFileContentAsList(bat_template_file);
+                
+                for (int i = 0; i < contentList.size(); i++) {
+					String oneLine = contentList.get(i);
+					/*    //  bat 文件 不需要在文件中的名字  没有名字
+					 * if(oneLine.contains("public class I9_TestJavaTemplate_Rule29")) {
+					 * 
+					 * oneLine = oneLine.replace("public class I9_TestJavaTemplate_Rule29",
+					 * "public class Test_"+getTimeStampMMdd()); }
+					 */
+					result_list.add(oneLine);
+				}
+                System.out.println("成功读取 I9_TextRuleOperation  Show_Bat_Template_OnDir_Rule_30.java "+bat_template_file.getAbsolutePath()+" 模板文件! ");
+        		
+                // public class I9_TestJavaTemplate_Rule29   把这个文件改名为  Test_0510 这样的日期
+        	}
+
+
+        	
+            // 找到  开始解析 .bat 文件 
+            for (int i = 0; i < curInputFileList.size(); i++) {
+                File fileItem = curInputFileList.get(i);
+
+            	String curBatName = "test_"+getTimeStampLong()+".bat";
+            	File curBatFile = new File(fileItem.getParentFile().getAbsolutePath()+File.separator+curBatName);
+                writeContentToFile(curBatFile,result_list);
+                NotePadOpenTargetFile(curBatFile.getAbsolutePath());
+
+         }
+            
+                
+   
+
+          
+            return super.applyOperationRule(curFileList, subFileTypeMap, curDirList, curRealFileList);
+        }
+        
+
+    	
+        @Override
+        String simpleDesc() {
+            return " 把当前模板文件 zbatrule_I9_Rule30.bat 内容写进当前目录下 Test_20200201_xxx(时间戳).bat 文档 并打开它  ";
+        }
+        
+    }
+  
+    
+    
+    
+    class Bat_Revert_MD_Rule29 extends  Basic_Rule{
+
+    	
+    	
+    	Bat_Revert_MD_Rule29(){
+            super(29,false);
+
+        }
+    	
+        @Override
+        ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+            for (int i = 0; i < curInputFileList.size(); i++) {
+                File fileItem = curInputFileList.get(i);
+                ArrayList<String> contentList = ReadFileContentAsList(fileItem);
+                
+                // 找到  开始解析 .bat 文件 
+                     
+
+
+         }
+
+            return super.applyOperationRule(curFileList, subFileTypeMap, curDirList, curRealFileList);
+        }
+        
+    	
+        @Override
+        String simpleDesc() {
+            return " 读取当前.bat 文件内容 进行 解析生成 MD文件的下半部分 ";
+        }
+        
+    	
+    }
+    
     
 
 //  生成java Test模板文件 读取 Java模板文件(包含初始化模块)  然后在notepad++打开它 
-  class Show_JavaTest_File_Rule_29 extends  Basic_Rule{
+  class Show_JavaTest_File_Rule_28 extends  Basic_Rule{
     	File java_template_file ;
  
-    	Show_JavaTest_File_Rule_29(){
-            super(29,false);
+    	Show_JavaTest_File_Rule_28(){
+            super(28,false);
             java_template_file = new File(zbinPath+File.separator+"I9_TestJavaTemplate_Rule29.java");
 
         }
@@ -454,96 +2119,7 @@ public class I9_TextRuleOperation {
     }
   
     
-    
-    class Bat_Revert_MD_Rule28 extends  Basic_Rule{
-    	String batHead_1 = "@ECHO off";
-    	String batHead_2 = "setlocal enabledelayedexpansion";
-    	
-    	Bat_Aera system_init_aera = null;
-    	Bat_Aera program_execute_aera = null;
-    	Bat_Aera func_define_aera = null;
-    	
- 
-       	// Bat_Method_Aera {  Bat_Operation_A{MethodA,MethodB}    Bat_Operation_B{MethodC,MethodD} }
-    	
-    	class Bat_Aera{
-    		int aera_index;   // 从0  开始的区域索引   0.system_init   1.program_exe_area 2.method_define 
-    		String aera_name ;   // 区域的名称  System_Init_Aera
-    		String desc;    // 该区域的说明
-    		// rem ══════════════════════════════════════════ System_Init_Aera_Begin  ═════
-    		// 1.  含有 rem   2. 含有 area标识 ══ _area_  3. 含有当前area的名字 
-    		ArrayList<String> aera_beginTagCharList ;  // 起始区域 起始 那行字符串 所含的 标识字符
-    		ArrayList<String> aera_endTagCharList ; 
-    		
-    		ArrayList<String> aera_raw_content;  //    从 bat 读取到的 原始的 内容
-            ArrayList<Bat_Operation> defineOperationList ;  // 只有 index=2 的 method_define 才有这个函数列表 
-    		
-    	}
-    	
-    	
- 
-    	class Bat_Operation{
-    		// rem ================================================  Test_Operation_End =====
-    		String operation_name ;   // 操作类型 名称 
-    		String operation_desc;   // 操作说明 
-    		ArrayList<String> operation_raw_content;  // Operation 区域的原始内容
-      		// 1.  含有 rem   2. 含有 area标识 ====  _Operation_  3. 含有当前_Operation_的名字  4. begin 
-    		ArrayList<String> operation_beginTagCharList ;  // 区域定义的 起始 字符串 集合 
-    		ArrayList<String> operation_endTagCharList ; // 区域定义的 结束 字符串 集合 
-    		
-    		ArrayList<Bat_Method> MethodList ;   // 当前定义的方法的集合 
-    	}
-    	
-    	class Bat_Method{
-    		String Pre_SETLOCAL = "::SETLOCAL";
-    		String End_SETLOCAL = "::ENDLOCAL";
-    		String End_Method_Tag = "goto:eof";
-    		// 方法的起始标示  1. 以:开头 并且第二个字符不是:  2. 包含 _func_  3.包含 x  4.trim() 后 不包含空格
-    		ArrayList<String> method_beginTagCharList ;
-    		
-    	
-    		
-    		String bat_method_name;   // bat 方法 的 名称  recordFileNameToFile_func_1x1
-    		String bat_method_name_nofunc;  //  没有 func 标示的方法的名字 
-    		ArrayList<String> method_raw_content;   // bat的原始的读取到的内容
-    		int input_param_count ;  // 输入的参数的个数
-    		int output_param_count;   // 输出参数的个数
-    		ArrayList<String> output_value_nameList;  // 输出参数的个数  func_return_1 ... func_return_2
-    		
-    		
-    		
-    		
-    	}
-    	
-    	
-    	Bat_Revert_MD_Rule28(){
-            super(28,false);
 
-        }
-    	
-        @Override
-        ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
-            for (int i = 0; i < curInputFileList.size(); i++) {
-                File fileItem = curInputFileList.get(i);
-                ArrayList<String> contentList = ReadFileContentAsList(fileItem);
-                
-                // 找到  开始解析 .bat 文件 
-                     
-
-
-         }
-
-            return super.applyOperationRule(curFileList, subFileTypeMap, curDirList, curRealFileList);
-        }
-        
-    	
-        @Override
-        String simpleDesc() {
-            return " 读取当前.bat 文件内容 进行 解析生成 MD文件的下半部分 ";
-        }
-        
-    	
-    }
     //  把当前文件内容以  ZZZZZZZZZZZZZZZZZZZZZ 分割     专门生成剪切内容保存到零时txt文件
     class Copy_Port_WithZ_Rule27 extends  Basic_Rule{
     	
@@ -591,6 +2167,10 @@ public class I9_TextRuleOperation {
                for (int j = begin_Z_lineNum; j <= end_Z_lineNum; j++) {
             	   fixedStrArr.add(contentList.get(j));
 			}
+               if(fixedStrArr.size() >= 2) {
+            	   fixedStrArr.remove(0);
+            	   fixedStrArr.remove(fixedStrArr.size()-1);
+               }
                writeContentToFile(I9_Temp_Text_File,fixedStrArr);
                NotePadOpenTargetFile(I9_Temp_Text_File.getAbsolutePath());
                System.out.println("rule_"+rule_index+" -> 已经截取了 ZZZZZZ之间的【"+(end_Z_lineNum - begin_Z_lineNum)+"行】内容到 TEMP TXT 文件");
@@ -2755,10 +4335,19 @@ public class I9_TextRuleOperation {
 
 
     static void writeContentToFile(File file, ArrayList<String> strList) {
-
-        StringBuilder sb = new StringBuilder();
+    	// PC 以 \r\n 结尾
+    	// Unix  以 \n  结尾 
+    	// dos2unix 是在末尾把 \r 去掉   所以 文件会变小
+    	// unix2dos 是在文件末尾把 \n 之前加上  \r\n  所以文件会变大 
+//    	System.setProperty(“line.separator", "\r\n")"
+    	String endTagDefault = "\n";  // 默认是 Linux下的 换行符   
+    	if(CUR_OS_TYPE == OS_TYPE.Windows) {
+    		endTagDefault = "\r\n";    // 如果操作系统是 Windows 那么改变换行符为  \r\n 
+    	}
+    	StringBuilder sb = new StringBuilder();
         for (int i = 0; i < strList.size(); i++) {
-            sb.append(strList.get(i) + "\n");
+        
+            sb.append(strList.get(i) + endTagDefault);
         }
         try {
             if (file != null && !file.exists()) {
@@ -8776,6 +10365,26 @@ public class I9_TextRuleOperation {
         String formatName(String name);
     }
 
+	static boolean isStartWith_lower_trim_InArr(ArrayList<String> strList,String strValue) {
+		boolean isContain = false;
+		if(strList == null  || strList.size() == 0) {
+			return isContain;
+		}
+		for (int i = 0; i < strList.size(); i++) {
+			String strItem = strList.get(i).toLowerCase().trim();
+			
+			if(strItem.startsWith(strValue.toLowerCase().trim())) {
+				return true;
+			}
+			
+		}
+		
+
+		
+		
+		return isContain;
+	}
+	
 
     //    List<A_B_C>  需要把这个 创建了三个 JavaBean
 // A , B  ,C  这三个 对象的 execute()方法 会执行  parseMap();  zzj

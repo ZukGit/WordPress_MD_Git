@@ -1,11 +1,19 @@
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+
 
 public class I9_TestJavaTemplate_Rule29 {
 
@@ -36,15 +44,8 @@ public class I9_TestJavaTemplate_Rule29 {
 		Windows, Linux, MacOS
 	}
 
-	static void initSystemInfo(String[] args) {
-
-		if (args != null) {
-			for (int i = 0; i < args.length; i++) {
-				System.out.println("args[" + i + "] = " + args[i]);
-
-			}
-		}
-
+	
+	static {
 		String osName = System.getProperties().getProperty("os.name").toLowerCase();
 		String curLibraryPath = System.getProperties().getProperty("java.library.path");
 		if (osName.contains("window")) {
@@ -72,6 +73,27 @@ public class I9_TestJavaTemplate_Rule29 {
 			Win_Lin_Mac_ZbinPath = zbinPath + File.separator + "mac_zbin";
 
 		}
+		
+		
+	}
+	
+    public static boolean isContainChinese(String str) {
+        Pattern p = Pattern.compile("[\u4e00-\u9fa5]");
+        Matcher m = p.matcher(str);
+        if (m.find()) {
+            return true;
+        }
+        return false;
+    }
+    
+	
+	static void initSystemInfo(String[] args) {
+		if (args != null) {
+			for (int i = 0; i < args.length; i++) {
+				System.out.println("args[" + i + "] = " + args[i]);
+
+			}
+		}
 
 	}
 
@@ -84,6 +106,43 @@ public class I9_TestJavaTemplate_Rule29 {
 			}
 		}
 	}
+	
+    static void writeContentToFile(File file, ArrayList<String> strList) {
+    	// PC 以 \r\n 结尾
+    	// Unix  以 \n  结尾 
+    	// dos2unix 是在末尾把 \r 去掉   所以 文件会变小
+    	// unix2dos 是在文件末尾把 \n 之前加上  \r\n  所以文件会变大 
+//    	System.setProperty(“line.separator", "\r\n")"
+    	String endTagDefault = "\n";  // 默认是 Linux下的 换行符   
+    	if(CUR_OS_TYPE == OS_TYPE.Windows) {
+    		endTagDefault = "\r\n";    // 如果操作系统是 Windows 那么改变换行符为  \r\n 
+    	}
+    	StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < strList.size(); i++) {
+        
+            sb.append(strList.get(i) + endTagDefault);
+        }
+        try {
+            if (file != null && !file.exists()) {
+                file.createNewFile();
+            }
+
+            if (file != null && file.exists()) {
+                BufferedWriter curBW = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "utf-8"));
+                curBW.write(sb.toString());
+                curBW.flush();
+                curBW.close();
+                System.out.println("write out File OK !  File = " + file.getAbsolutePath());
+            } else {
+                System.out.println("write out File  Failed !    File = " + file.getAbsolutePath());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    
 
 	public static ArrayList<String> ReadFileContentAsList(File mFilePath) {
 
@@ -121,7 +180,35 @@ public class I9_TestJavaTemplate_Rule29 {
 
 	}
 	
-  static void showStringList( ArrayList<String> strList) {
+	 public static boolean isNumeric(String string) {
+		 String str = string.trim();
+	     for (int i = str.length(); --i >= 0; ) {
+	         if (!Character.isDigit(str.charAt(i))) {
+	             return false;
+	         }
+	     }
+	     return true;
+	 }
+    
+		boolean isStartWith_lower_trim_InArr(ArrayList<String> strList,String strValue) {
+			boolean isContain = false;
+			if(strList == null  || strList.size() == 0) {
+				return isContain;
+			}
+			for (int i = 0; i < strList.size(); i++) {
+				String strItem = strList.get(i).toLowerCase().trim();
+				
+				if(strItem.startsWith(strValue.toLowerCase().trim())) {
+					return true;
+				}
+				
+			}
+
+			return isContain;
+		}
+
+		
+	 static void showStringList( ArrayList<String> strList , String tag) {
 		 
 		 if(strList == null || strList.size() == 0) {
 			 System.out.println("当前调用 showStringList 显示的  ArrayList<String>() 字符串数组为空!! ");
@@ -133,17 +220,17 @@ public class I9_TestJavaTemplate_Rule29 {
 		 for (int i = 0; i < strList.size(); i++) {
 			 line_num++;
 			 String oneStr = strList.get(i);
-			 System.out.println("Line["+line_num+"]   "+oneStr);
+			 System.out.println("tag=["+tag+"] Line["+line_num+"]   "+oneStr);
 			
 		}
 		 System.out.println();
 	 }
-  
- static void showStringList( ArrayList<String> strList , String tag) {
+	 
+	static void showStringList( ArrayList<String> strList) {
 	 
 	 if(strList == null || strList.size() == 0) {
 		 System.out.println("当前调用 showStringList 显示的  ArrayList<String>() 字符串数组为空!! ");
-	 return;
+	     return;
 	 }
 	 
 	 int line_num = 0 ;
@@ -151,7 +238,7 @@ public class I9_TestJavaTemplate_Rule29 {
 	 for (int i = 0; i < strList.size(); i++) {
 		 line_num++;
 		 String oneStr = strList.get(i);
-		 System.out.println("tag=["+tag+"] Line["+line_num+"]   "+oneStr);
+		 System.out.println("Line["+line_num+"]   "+oneStr);
 		
 	}
 	 System.out.println();
