@@ -255,3 +255,4 @@ public class I9_TestJavaTemplate_Rule29 {
 	}
 
 }
+

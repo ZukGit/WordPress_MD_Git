@@ -69,11 +69,69 @@ public class K2_NotepadTip {
 
     }
     
+    static void  PrintADB_Logcat( String fliterStr ){
+    	System.out.println();
+        System.out.println("══════════════════"+ " logcat 过滤执行 "+ "══════════════════" );
+        System.out.println("adb logcat | grep -E  "+"\""+fliterStr+"\"");
+
+    }
+    
     
     static void ShowNotepad_Search_Tip(){
     	PrintHead_End("【Windos----NotePad++】搜索Tip");
         System.out.println(OneLine+" GPS 相关 正则表达式搜索Tip:");
-        PrintRule("GPS_STATUS_SESSION_BEGIN|GPS_STATUS_SESSION_END|Used In Fix|GnssLocationProvider: TTFF:|UpdateRecord for com.android.phone|new cell broadcast message|incoming location: Location|Sending Location to com.android.phone");
+        ArrayList<String> logKeyList = new   ArrayList<String> ();
+        logKeyList.add("GPS_STATUS_SESSION_BEGIN");
+        logKeyList.add("GPS_STATUS_SESSION_END");
+        logKeyList.add("Used In Fix:");
+        logKeyList.add("GnssLocationProvider: TTFF:");
+        logKeyList.add("UpdateRecord for com.android.phone");
+        logKeyList.add("new cell broadcast message");
+        logKeyList.add("incoming location: Location");
+        logKeyList.add("Sending Location to com.android.phone");
+        logKeyList.add("Type Search Begin");
+        logKeyList.add("Sending Location to com.google.android.apps.maps");
+        logKeyList.add("Sending Location to com.waze");
+        logKeyList.add("GnssLocationProvider: SNR");
+        logKeyList.add("Sending Location to com.baidu.BaiduMap, Provider: gps");
+        logKeyList.add("Sending Location to com.autonavi.minimap, Provider: gps");
+
+        StringBuilder printSB = new StringBuilder();
+        
+        for (int i = 0; i < logKeyList.size(); i++) {
+        	String logItem = logKeyList.get(i);
+        	printSB.append(logItem.trim()+"|");
+		}
+        
+        String printTip = printSB.toString();
+        while(printTip.endsWith("|")) {
+        	printTip = printTip.substring(0, printTip.length()-1);
+
+        }
+        
+        PrintRule(printTip);
+        
+        PrintADB_Logcat(printTip);
+        
+        
+        
+        
+        
+        
+//        PrintRule("GPS_STATUS_SESSION_BEGIN|"
+//        		+ "GPS_STATUS_SESSION_END|"
+//        		+ "Used In Fix:|"
+//        		+ "GnssLocationProvider: TTFF:|"
+//        		+ "UpdateRecord for com.android.phone|"
+//        		+ "new cell broadcast message|"
+//        		+ "incoming location: Location|"
+//        		+ "Sending Location to com.android.phone|"
+//        		+ "Type Search Begin|"
+//        		+ "Sending Location to com.google.android.apps.maps|"
+//        		+ "Sending Location to com.waze|"
+//        		+ "GnssLocationProvider: SNR|"
+//        		+ "Sending Location to com.baidu.BaiduMap, Provider: gps"
+//        		+ "Sending Location to com.autonavi.minimap, Provider: gps");
         System.out.println();
     }
 

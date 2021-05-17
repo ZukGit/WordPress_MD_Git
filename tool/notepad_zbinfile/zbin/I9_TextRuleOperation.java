@@ -381,15 +381,8 @@ public class I9_TextRuleOperation {
         CUR_RULE_LIST.add( new ReadStrFromFile_Rule_24());
         CUR_RULE_LIST.add( new LS_Shell_RealFile_Rule_25());  // //读取当前文件下的 实体文件的文件名称 输出到列表中
         CUR_RULE_LIST.add( new Fliter_Copy_File_WithName_Rule_26());  // //读取当前文件的内容 并在当前文件夹下内寻找该文件 复制到指定目录
-
-
-
         CUR_RULE_LIST.add( new Copy_Port_WithZ_Rule27());  //   把当前文件内容以  ZZZZZZZZZZZZZZZZZZZZZ 分割     专门生成剪切内容保存到零时txt文件
-
-
         CUR_RULE_LIST.add( new Show_JavaTest_File_Rule_28());  //  读取 Java模板文件(包含初始化模块)  然后在notepad++打开它 
-    
-        
         CUR_RULE_LIST.add( new Bat_Revert_MD_Rule29()); // 读取当前.bat 文件内容 进行 解析生成 MD文件的下半部分 并会解析新增的Method到模板文件  zzbattest_I9.bat
         CUR_RULE_LIST.add( new Show_Bat_Template_OnDir_Rule_30()); //  把当前模板文件 zzbattest_I9.bat 内容写进当前目录下 Test_xx.bat文档 并打开它
         CUR_RULE_LIST.add( new Bat_Format_Rule_31()); // 对当前 bat 文件进行 format 如果不是bat文件不操作 增项假如模板zbatrule_I9_Rule30.bat中
@@ -423,7 +416,7 @@ public class I9_TextRuleOperation {
      	Bat_Format_Rule_31(){
              super(31,false);
 	            bat_template_file = new File(zbinPath+File.separator+"win_zbin"+File.separator+"zbatrule_I9_Rule30.bat");
-	            bat_ruleMethodName_file  = new File(zbinPath+File.separator+"win_zbin"+File.separator+"zbatrule_I9_Rule30_method.txt");
+//	            bat_ruleMethodName_file  = new File(zbinPath+File.separator+"win_zbin"+File.separator+"zbatrule_I9_Rule30_method.txt");
          }
      	
          @Override
@@ -482,11 +475,11 @@ public class I9_TextRuleOperation {
 
                  }
                  
-                  //  如果 是 自己和 自己 比较  那么 更新  method 方法 文件 
-                 if(fileItem.equals(bat_template_file)) {
-         			writeContentToFile(bat_ruleMethodName_file,allRuleMethodNameList);
-                	 
-                 }
+//  如果 是 自己和 自己 比较  那么 更新  method 方法 文件 【 已经不需要 bat_ruleMethodName_file ， 这个文件了 】
+//                 if(fileItem.equals(bat_template_file)) {
+//         			writeContentToFile(bat_ruleMethodName_file,allRuleMethodNameList);
+//                	 
+//                 }
     			
 
           }
@@ -1062,7 +1055,10 @@ public class I9_TextRuleOperation {
     	if(isNumeric(preVStr)) {
     		isRuleMethod = true;
     		ruleIndex = Integer.parseInt(preVStr);
-    		ruleIndex_Tag = Rule_Bat_File_Name +" _"+ruleIndex+"_ ";
+//    		ruleIndex_Tag = Rule_Bat_File_Name +" _"+ruleIndex+"_ "; 
+    		ruleIndex_Tag = "%init_input_0%" +" _"+ruleIndex+"_ ";
+    		
+    		
     		System.out.println("bat_method_name_nofunc = "+bat_method_name_nofunc+" [isRuleMethod = "+ isRuleMethod + " ruleIndex="+ruleIndex + " ruleIndex_Tag="+ruleIndex_Tag);
 
     	}
@@ -1092,29 +1088,36 @@ public class I9_TextRuleOperation {
     					for (int i = 0; i < method_ruletip_list.size(); i++) {
     						String  rule_tip = method_ruletip_list.get(i);
     						String addToFormat_ruleStr = rule_tip;
+    						//  如果当前 tip 不包含 #
     						if(!rule_tip.contains("#")) {
-    							addToFormat_ruleStr =rule_tip.replace("#", "");
+    				
     							addToFormat_ruleStr = "## "+rule_tip;
     						}
     						
-    						if(addToFormat_ruleStr.contains(ruleIndex_Tag.replace(" ", ""))) {
-    							
-    							addToFormat_ruleStr = addToFormat_ruleStr.replace(ruleIndex_Tag.replace(" ", ""), "");
-    						}
-    						
+    						//  把 空格转为 null? 
+							/*
+							 * if(addToFormat_ruleStr.contains(ruleIndex_Tag.replace(" ", ""))) {
+							 * 
+							 * addToFormat_ruleStr = addToFormat_ruleStr.replace(ruleIndex_Tag.replace(" ",
+							 * ""), ""); }
+							 */
 
     						
+    						// 如果 当前 tip 不包含   zbatrule_I9_Rule30.bat _3_ 这样的字样  
+    						// 那么直接   zbatrule_I9_Rule30.bat _3_  ##
     						if(!addToFormat_ruleStr.contains(ruleIndex_Tag) ) {
-    							method_format_content.add("rem rule_tip: "+ruleIndex_Tag+" "+addToFormat_ruleStr);
-    							allRuleTipStrList.add(ruleIndex_Tag+" "+addToFormat_ruleStr);
+    							method_format_content.add("rem rule_tip: "+ruleIndex_Tag+" "+addToFormat_ruleStr.trim());
+    							allRuleTipStrList.add(ruleIndex_Tag+" "+addToFormat_ruleStr.trim());
     						}else {
-    							method_format_content.add("rem rule_tip: "+addToFormat_ruleStr);
+    							//  如果当前tip 包含  zbatrule_I9_Rule30.bat _3_ 那么变成
+    							//  rem rule_tip: zbatrule_I9_Rule30.bat _3_ 
+    							method_format_content.add("rem rule_tip: "+addToFormat_ruleStr.trim());
     							allRuleTipStrList.add(addToFormat_ruleStr);
     						}
     					
     					}
-    				}else{
-    					method_format_content.add("rem rule_tip: "+ruleIndex_Tag);
+    				}else{  // 当前没有 rule_tip:时   直接 输出  rem rule_tip: zbatrule_I9_Rule30.bat _3_ 
+    					method_format_content.add("rem rule_tip: "+ruleIndex_Tag+"  ## ");
     				}
 
     			}
@@ -1371,7 +1374,12 @@ public class I9_TextRuleOperation {
     			
     			showStringList(method_firstfixed_content, "清头清空清set的函数内容并且以goto:eof结尾的函数  bat_method_name="+bat_method_name);
     		  
-    			String lastOneCode = method_firstfixed_content.get(method_firstfixed_content.size()-1);
+    			String lastOneCode = "";
+    			if(method_firstfixed_content.size()-1 < 0) {
+    				lastOneCode = "rem ";
+    			}else {
+        			 lastOneCode = method_firstfixed_content.get(method_firstfixed_content.size()-1);
+    			}
     			if(!method_firstfixed_content.contains(endPrintCode)) {  // 如果最后打印有 不包含 endprintCode 那么假如 endprintCode
 //    				method_firstfixed_content.add(endPrintCode);
     				System.out.println("最后一句代码就是 不是EndprintCode  需要加入！！");
@@ -1405,10 +1413,19 @@ public class I9_TextRuleOperation {
     			if(isRuleMethod) {
     				for (int i = 0; i < method_raw_content.size(); i++) {
     					String oneMethodStr = method_raw_content.get(i);
+    					// 把 所有的 
+// rem rule_tip: zbatrule_I9_Rule30.bat _3_  500 ##手机执行adbshellinputswipe340800340100命令向下滑动两下向上滑动一下
+ 
     					String clearBlank = oneMethodStr.replace(" ", "");
     					if(clearBlank.startsWith("remrule_tip:") && oneMethodStr.startsWith("rem ")) {
-    						String descStr = clearBlank.replace("remrule_tip:", "");
-    						
+    				
+    						if(oneMethodStr.startsWith("rem ")) {
+    							oneMethodStr = oneMethodStr.substring(4);
+    						}
+    						String descStr = oneMethodStr.replace("remrule_tip:", "");
+    						 descStr = descStr.replace("rem rule_tip:", "");
+    						 descStr = descStr.replace("rule_tip:", "");
+    						// rem rule_tip:
     						if(!"".equals(descStr.trim())) {
     							method_ruletip_list.add(descStr);
     						}
@@ -2011,7 +2028,8 @@ public class I9_TextRuleOperation {
 
             	String curBatName = "test_"+getTimeStampLong()+".bat";
             	File curBatFile = new File(fileItem.getParentFile().getAbsolutePath()+File.separator+curBatName);
-                writeContentToFile(curBatFile,result_list);
+            	result_list.add("rem ___CMD_Commond__  cmd /k "+curBatFile.getAbsolutePath());
+            	writeContentToFile(curBatFile,result_list);
                 NotePadOpenTargetFile(curBatFile.getAbsolutePath());
 
          }
@@ -2083,6 +2101,8 @@ public class I9_TextRuleOperation {
         @Override
         ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
         	 ArrayList<String> result_list = new  ArrayList<String>();
+        	 String Test_Java_FileName ="Test_"+getTimeStampMMdd()+"_"+getTimeStampHHmmss();
+        	 String public_class_declare = "public class "+Test_Java_FileName;
         	if(!java_template_file.exists()) {
         		result_list.add("当前 模板文件 " +java_template_file.getAbsolutePath()+" 不存在 请检查该文件！");
         		   System.out.println("失败 无法 读取 I9_TestJavaTemplate_Rule29.java 模板文件! "+java_template_file.getAbsolutePath());
@@ -2093,7 +2113,7 @@ public class I9_TextRuleOperation {
 					String oneLine = contentList.get(i);
 					if(oneLine.contains("public class I9_TestJavaTemplate_Rule29")) {
 					
-						oneLine = oneLine.replace("public class I9_TestJavaTemplate_Rule29", "public class Test_"+getTimeStampMMdd());
+						oneLine = oneLine.replace("public class I9_TestJavaTemplate_Rule29", public_class_declare);
 					}
 					result_list.add(oneLine);
 				}
@@ -2103,10 +2123,42 @@ public class I9_TextRuleOperation {
         	}
    
    
+            // 开始复制到 本地 java 文件 
+            for (int i = 0; i < curInputFileList.size(); i++) {
+                File fileItem = curInputFileList.get(i);
+
+       String java_end_file = Test_Java_FileName+".java";
+       String class_end_file = Test_Java_FileName+".class";
+            	File javaFile = new File(fileItem.getParentFile().getAbsolutePath()+File.separator+java_end_file);
+            	String classAbsPath = fileItem.getParentFile().getAbsolutePath() + File.separator+class_end_file;
+                String parentPath = fileItem.getParentFile().getAbsolutePath();
+                /*
+                Run绝对路径:
+                javac  -encoding UTF-8 D:\Test\Test_0514_160618.java &&  java -cp .;D:\Test Test_0514_160618
+                Run相对路径:
+                javac -encoding UTF-8 Test_0514_160618.java && java -cp .; Test_0514_160618
+                notepad++: 执行快捷键  alt+j
+                notepad运行java命令:
+                javac  -encoding UTF-8 $(FULL_CURRENT_PATH) &&  java .;$(CURRENT_DIRECTORY) $(NAME_PART)
+                */
+            	
+            	result_list.add("/*");
+              	result_list.add("cmder_Run绝对路径:");
+            	result_list.add("javac  -encoding UTF-8 "+javaFile.getAbsolutePath()+" && "+ " java -cp .;"+parentPath+" " + Test_Java_FileName);
+              	result_list.add("cmder_Run相对路径:");
+              	result_list.add("javac -encoding UTF-8 "+ java_end_file+" && java -cp .;"+" "+Test_Java_FileName);
+               	result_list.add("notepad++: 执行快捷键  alt+j");
+               	result_list.add("notepad运行java命令:");
+               	result_list.add("cmd /K cd /d $(CURRENT_DIRECTORY) && javac  -encoding UTF-8 $(FULL_CURRENT_PATH) && java -cp .;$(CURRENT_DIRECTORY) $(NAME_PART)");
+              	result_list.add("*/");
+            	writeContentToFile(javaFile,result_list);
+                NotePadOpenTargetFile(javaFile.getAbsolutePath());
+
+         }
+            
                 
-   
-            writeContentToFile(I9_Temp_Text_File,result_list);
-            NotePadOpenTargetFile(I9_Temp_Text_File.getAbsolutePath());
+
+
           
             return super.applyOperationRule(curFileList, subFileTypeMap, curDirList, curRealFileList);
         }
@@ -5232,6 +5284,13 @@ public class I9_TextRuleOperation {
         return date;
     }
 
+    
+    static String getTimeStampHHmmss(){
+
+        SimpleDateFormat df = new SimpleDateFormat("HHmmss");//设置日期格式
+        String date = df.format(new Date());
+        return date;
+    }
     
     static String getTimeStampMMdd(){
 

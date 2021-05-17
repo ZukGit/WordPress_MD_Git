@@ -11,8 +11,8 @@ set init_f0=%~f0
 set init_path=%path%
 set init_input_0=%0
 echo init_cd=%init_cd%               rem %cd% === 当前执行命令的当前路径  C:\Users\zhuxx  
-echo init_f0=%init_f0%               rem %~f0 === 当前执行文件的全路径       C:\Users\zhuzj5\Desktop\zbin\win_zbin\zzbattest_10.bat   
-echo init_input_0=%init_input_0%     rem %0 ===当前执行文件的名称 init_input_0=zzbattest_10.bat  
+echo init_f0=%init_f0%               rem %~f0 === 当前执行文件的全路径       C:\Users\zhuzj5\Desktop\zbin\win_zbin\init_input_0.bat   
+echo init_input_0=%init_input_0%     rem %0 ===当前执行文件的名称 init_input_0=[zbatrule_I9_Rule30.bat]     init_input_0=[zbatrule_I9_Rule30.bat]
 echo init_dp0=%init_dp0%             rem %~dp0 ===  当前执行文件的文件夹名称  init_dp0 = C:\Users\zhuxx\Desktop\zbin\win_zbin\  
 echo init_path=%init_path%           rem %path% === 当前的系统坏境变量PATH
 rem init_path=D:\ZWin_Software\C1_GreenSoft_Zip_Dir\cmder\bin;C:\Users\zhuzj5\Desktop\zbin\win_soft\Redis;C:\Program Files\Tesseract-OCR;D:\software\ffmpeg\bin;C:\Users\zhuzj5\Desktop\zbin\lin_zbin;C:\Swift\bin\;C:\Users\zhuzj5\Desktop\zbin\mac_zbin;C:\Users\zhuzj5\Desktop\zbin\win_zbin;C:\Users\zhuzj5\Desktop\zbin\python;
@@ -47,7 +47,7 @@ echo=
 echo=
 echo=
 
-rem ________________ 输入参数打印  input_0=[zzbattest_10.bat]     init_input_0=[zzbattest_10.bat]  
+rem ________________ 输入参数打印  init_input_0=[zbatrule_I9_Rule30.bat]     init_input_0=[zbatrule_I9_Rule30.bat]
 set init_input_0=%0
 set init_input_1=%1
 set init_input_2=%2
@@ -77,6 +77,10 @@ echo=
 rem ══════════════════════════════════════════ System_Init_Aera End  ══════════════════════════════════════════  
 rem ══════════════════════════════════════════ Program_Execute_Aera Begin  ════════════════════════════ 
 call :ruletipanalysis_func_0x1
+echo=
+echo=
+echo=
+echo=
 call :____Main____
 
 goto:eof
@@ -577,6 +581,23 @@ goto:eof
 
 
 
+:gettimehhmmsss_func_0x1
+rem ======================================== gettimehhmmsss_func_0x1
+rem desc: 
+rem sample: 
+rem sample_out: 
+::SETLOCAL
+echo ______________Method_In gettimehhmmsss_func_0x1
+set gettimehhmmsss_return_1=%DATE:~5,2%-%DATE:~8,2%-%DATE:~11,2%_%TIME:~0,2%_%TIME:~3,2%_%TIME:~6,2%_%TIME:~9,2%
+echo gettimehhmmsss_return_1=%getTimeNona_return_1%
+echo [gettimehhmmsss_func_0x1 EndPrintCode] gettimehhmmsss_return_1=[!gettimehhmmsss_return_1!]   param1=[__empty__] 
+echo ______________Method_Out gettimehhmmsss_func_0x1
+::ENDLOCAL
+goto:eof
+
+
+
+
 :gettimenona_func_0x1
 rem ======================================== gettimenona_func_0x1
 rem desc: 
@@ -736,6 +757,87 @@ goto:eof
 
 
 
+:getpaddingstringlength_func_1x1
+rem ======================================== getpaddingstringlength_func_1x1
+rem desc: 
+rem sample: 
+rem sample_out: 
+::SETLOCAL
+echo ______________Method_In getpaddingstringlength_func_1x1
+echo  getpaddingstringlength_func_1x1 input_1_param ==[%1]
+set /a getStringLength_numsize = 0
+set getStringLength_str=%1
+:getStringPaddingLength_length_block
+if not "!getStringLength_str!"=="" (
+ set /a getStringLength_numsize+=1
+ set "getStringLength_str=!getStringLength_str:~1!"
+ goto getStringPaddingLength_length_block
+)
+set /a getpaddingstringlength_return_1=%getStringLength_numsize%
+echo getpaddingstringlength_return_1=[!getpaddingstringlength_return_1!]  param1=[%1] 
+echo [getpaddingstringlength_func_1x1 EndPrintCode]   getpaddingstringlength_return_1=[!getpaddingstringlength_return_1!]   param1=[%1]   
+echo ______________Method_Out getpaddingstringlength_func_1x1
+::ENDLOCAL
+goto:eof
+
+
+
+
+:stringspecialrecovery_func_1x1
+rem ======================================== stringspecialrecovery_func_1x1
+rem desc: 
+rem sample: 
+rem sample_out: 
+::SETLOCAL
+echo ______________Method_In stringspecialrecovery_func_1x1
+set temp_str=%1
+set stringspecialrecovery_return_1=%temp_str:z_deng_z==%
+echo [stringspecialrecovery_func_1x1 EndPrintCode]   stringspecialrecovery_return_1=[!stringspecialrecovery_return_1!]   param1=[%1]   
+echo ______________Method_Out stringspecialrecovery_func_1x1
+::ENDLOCAL
+goto:eof
+
+
+
+
+:stringspecialchange_func_1x1
+rem ======================================== stringspecialchange_func_1x1
+rem desc: 
+rem sample: 
+rem sample_out: 
+::SETLOCAL
+echo ______________Method_In stringspecialchange_func_1x1
+echo [stringspecialchange_func_1x1 ]   param1=[%1] 
+set origin_str=%1
+set temp_str=%1
+echo param_str_1_nopadding=[!param_str_1_nopadding!]   origin_str=[%origin_str%]    temp_str=[%temp_str%]
+call :getpaddingstringlength_func_1x1  %1
+set /a str1_length=!getpaddingstringlength_return_1!
+echo str1_length==%str1_length%
+set order_str=
+for /l %%i in (1, 1, %str1_length%) do (
+set first_char=!temp_str:~0,1!
+echo i == %%i    first_char=[!first_char!]   temp_str=[!temp_str!]  order_str=[!order_str!]
+set  temp_str=!origin_str:~%%i!
+if "!first_char!" equ "=" (
+echo 当前是空格=  需要替换为 z_deng_z 符号  索引=%%i
+set order_str=!order_str!z_deng_z
+) else (
+set order_str=!order_str!!first_char!
+)
+)
+echo order_str_end=[!order_str!]
+set order_str_fixed=%order_str:z_deng_z==%
+echo order_str_fixed=[%order_str_fixed%]
+set stringspecialchange_return_1=!order_str!
+echo [stringspecialchange_func_1x1 EndPrintCode]   stringspecialchange_return_1=[!stringspecialchange_return_1!]   param1=[%1]   
+echo ______________Method_Out stringspecialchange_func_1x1
+::ENDLOCAL
+goto:eof
+
+
+
+
 :getsubstringwithpre_func_2x1
 rem ======================================== getsubstringwithpre_func_2x1
 rem desc: 
@@ -756,6 +858,7 @@ set getSubStringWithPre_param_str_trim2=%getSubStringWithPre_param_str_2: =%
 set getSubStringWithPre_param_str_2_existflag=false
 set getSubStringWithPre_return_1=
 rem 如果第一个字符串为空 输入的要截取的字符串是空的话  那么直接返回空
+echo X2_getSubStringWithPre_param_str_trim1==%getSubStringWithPre_param_str_trim1%
 if "%getSubStringWithPre_param_str_trim1%"=="" (
 echo [getsubstringwithpre_func_2x1 EndPrintCode]   getsubstringwithpre_return_1=[!getsubstringwithpre_return_1!]   param1=[%1]   param2=[%2]   
 echo ______________Method_Out getsubstringwithpre_func_2x1
@@ -944,7 +1047,7 @@ echo  getSubStringWithPreEndTag_func_3x1--param_str_trim2 is null is empty!
 
             rem 先取到 preFlag之后的字符串
             set getSubStringWithPre_return_1=
-            echo xxxxxxaaaaa1 getSubStringWithPre_return_1=%getSubStringWithPre_return_1%  param_str_trim1_nopadding=[%param_str_trim1_nopadding%]  param_str_trim2_nopadding=[%param_str_trim2_nopadding%]
+            echo xxxxxxaaaaaA getSubStringWithPre_return_1=%getSubStringWithPre_return_1%  param_str_trim1_nopadding=[%param_str_trim1_nopadding%]  param_str_trim2_nopadding=[%param_str_trim2_nopadding%]
             call :getSubStringWithPre_func_2x1  "%param_str_trim1_nopadding%"   "%param_str_trim2_nopadding%"
             echo x3_getSubStringWithPre_return_1=!getSubStringWithPre_return_1!
             echo x2_getSubStringWithPre_return_1=!getSubStringWithPre_return_1!
@@ -1462,60 +1565,193 @@ rem ======================== TEST_OPERATION End========================
 rem ======================== BUSSINESS_OPERATION Begin======================== 
 
 
-:rule1vbankupapk_func_1x0
-rem ======================================== rule1vbankupapk_func_1x0
-rem rule_tip: zbatrule_I9_Rule30.bat _1_  ##安装本地目录下的所有apkadbinstall*.apk
+:rule1vbankupapk_func_0x0
+rem ======================================== rule1vbankupapk_func_0x0
+rem rule_tip: %init_input_0% _1_   ## 备份bankup所有当前手机安装的apk本地PC本地目录
 rem desc: 
 rem sample: 
 rem sample_out: 
 ::SETLOCAL
-echo ______________Method_In rule1vbankupapk_func_1x0
-set rule1vbankupapk_dynamic_param1=
-echo  安装当前目录apk
-echo [rule1vbankupapk_func_1x0 EndPrintCode]    output=[__empty__] dynamic_param1=[!rule1vbankupapk_dynamic_param1!]   
-echo ______________Method_Out rule1vbankupapk_func_1x0
-::ENDLOCAL
-goto:eof
-
-
-
-
-:rule2vgetapk_func_1x0
-rem ======================================== rule2vgetapk_func_1x0
-rem rule_tip: zbatrule_I9_Rule30.bat _2_  ##获取手机当前正在运行的APK到本地
-
-rem desc: Bussiness_Rule打印程序用于打印batrule规则序列
-rem sample: 
-rem sample_out: 
-::SETLOCAL
-echo ______________Method_In rule2vgetapk_func_1x0
-set rule2vgetapk_dynamic_param1=
-echo  获取当前正在运行的APK 
-echo [rule2vgetapk_func_1x0 EndPrintCode]    output=[__empty__] dynamic_param1=[!rule2vgetapk_dynamic_param1!]   
-echo ______________Method_Out rule2vgetapk_func_1x0
-::ENDLOCAL
-goto:eof
-
-
-
-
-:rule3vadbscreen_func_1x0
-rem ======================================== rule3vadbscreen_func_1x0
-rem rule_tip: zbatrule_I9_Rule30.bat _3_  500##手机执行adbshellinputswipe340800340100命令向下滑动两下向上滑动一下
-
-rem desc: Bussiness_Rule打印程序用于打印batrule规则序列
-rem sample: 
-rem sample_out: 
-::SETLOCAL
-echo ______________Method_In rule3vadbscreen_func_1x0
-set rule3vadbscreen_dynamic_param1=
-if "%init_input_2%"=="" (
-set  rule3vadbscreen_dynamic_param1=1000
-) else (
-set rule3vadbscreen_dynamic_param1=%init_input_2% 
+echo ______________Method_In rule1vbankupapk_func_0x0
+echo  bankup当前目录apk
+set rule1_num=1
+adb shell pm list packages -3 -f > rule1.txt
+for /f %%l in (rule1.txt) do (
+set /a rule1_num+=1 
+echo third_app[!rule1_num!]=%%l
+call :stringspecialchange_func_1x1 "%%l"
+rem 对读取到的内容 进行 =等号替换
+set local_stringspecialchange_return_1=!stringspecialchange_return_1!
+echo third_app[!rule1_num!]=%%l
+echo local_stringspecialchange_return_1=[!local_stringspecialchange_return_1!]
+call :getsubstringwithpreendtag_func_3x1 !local_stringspecialchange_return_1! "package:"  ".apk"
+echo getsubstringwithpreendtag_return_1=[%getsubstringwithpreendtag_return_1%]
+echo getsubstringwithpreendtag_return_2=[!getsubstringwithpreendtag_return_1!]
+call :stringspecialrecovery_func_1x1  !getsubstringwithpreendtag_return_1!
+set local_fixed_stringspecialrecovery_return_1=!stringspecialrecovery_return_1!
+set third_app_path=!local_fixed_stringspecialrecovery_return_1!.apk
+echo third_app_path=[!third_app_path!]
+call :getsubstringwithpreendtag_func_3x1 !local_stringspecialchange_return_1! ".apk"  ""
+echo getsubstringwithpreendtag_return_1_name=[%getsubstringwithpreendtag_return_1%]
+echo getsubstringwithpreendtag_return_2_name=[!getsubstringwithpreendtag_return_1!]
+call :stringspecialrecovery_func_1x1  !getsubstringwithpreendtag_return_1!
+set local_fixed_stringspecialrecovery_return_1_name=!stringspecialrecovery_return_1!
+echo local_fixed_stringspecialrecovery_return_1_name=[!local_fixed_stringspecialrecovery_return_1_name!]
+set no_blank_name=!local_fixed_stringspecialrecovery_return_1_name:~1!
+echo  third_app_path=[!third_app_path!]   no_blank_name=[!no_blank_name!]  
+echo 拉取apk命令如下:
+echo app[!rule1_num!]  adb pull !third_app_path!   !no_blank_name!.apk
+adb pull !third_app_path!   !no_blank_name!.apk
 )
-echo [rule3vadbscreen_func_1x0 ]    output=[__empty__] dynamic_param1=[!rule3vadbscreen_dynamic_param1!]   
-for /l %%i in (1, 1, !rule3vadbscreen_dynamic_param1!) do (
+rem del rule1.txt
+echo [rule1vbankupapk_func_0x0 EndPrintCode]   output=[__empty__]  param1=[__empty__] 
+echo ______________Method_Out rule1vbankupapk_func_0x0
+::ENDLOCAL
+goto:eof
+
+
+
+
+:rule2vgetapk_func_0x0
+rem ======================================== rule2vgetapk_func_0x0
+rem rule_tip: %init_input_0% _2_   ## 获取手机当前正在运行的APK到本地
+
+rem desc: Bussiness_Rule打印程序用于打印batrule规则序列
+rem sample: 
+rem sample_out: 
+::SETLOCAL
+echo ______________Method_In rule2vgetapk_func_0x0
+:rule2vgetapk_getapp_block
+rem del rule2.txt
+rem del rule2_3app.txt
+echo  获取当前正在运行的APK 
+rem adb shell dumpsys window | findstr "mCurrentFocus"
+rem mCurrentFocus=Window{52b526e u0 com.autonavi.minimap/com.autonavi.map.activity.NewMapActivity}
+adb shell dumpsys window | findstr "mCurrentFocus" > rule2.txt 
+set isscreenon=false
+set /a Index_F_1 = 0
+for  /f "delims=" %%l in (rule2.txt) do (
+set /a Index_F_1+=1
+echo Index_F_1[!Index_F_1!] == %%l          
+rem   亮屏 Index_F_1[1] ==   mCurrentFocus=Window{52b526e u0 com.autonavi.minimap/com.autonavi.map.activity.NewMapActivity}    
+
+rem   灭屏 mCurrentFocus=Window{9cfe782 u0 AOD}
+
+rem     mCurrentFocus=Window{87b6a8d u0 com.android.launcher3/com.android.launcher3} 主页  
+
+rem  使用 /  来判断当前是否是灭屏状态 
+set current_app_name=%%l
+echo current_app_name=!current_app_name!
+call :isContainString_func_2x1 "!current_app_name!"  /
+set isscreenon=!isContainString_return_1!
+echo local_isscreenon=[!isscreenon!]
+if "!local_isscreenon!"=="false" (
+echo 当前的APP没有过滤到正在运行的APP 可能屏幕为黑屏,清重新测算
+echo [rule2vgetapk_func_0x0 EndPrintCode]   output=[__empty__]  param1=[__empty__] 
+echo ______________Method_Out rule2vgetapk_func_0x0
+goto:eof
+)
+call :stringspecialchange_func_1x1 "!current_app_name!"
+rem 对读取到的内容 进行 =等号替换
+set current_app_name_specialchange=!stringspecialchange_return_1!
+echo current_app_name_specialchange=[!current_app_name_specialchange!]
+call :getsubstringwithpreendtag_func_3x1 !current_app_name_specialchange!  "u0"  "/"
+echo getsubstringwithpreendtag_return_1=[%getsubstringwithpreendtag_return_1%]
+echo getsubstringwithpreendtag_return_2=[!getsubstringwithpreendtag_return_1!]
+adb shell pm list packages -3 -f | findstr !getsubstringwithpreendtag_return_1! > rule2_3app.txt
+rem  package:/data/app/~~KLeJf_gsGhiZkGf37dk1hQ==/com.autonavi.minimap-2lHoHfzlz0XYX3ZcVJ-G2A==/base.apk=com.autonavi.minimap
+for /f %%a in (rule2_3app.txt) do (
+set /a rule1_num+=1 
+echo third_app[!rule1_num!]=%%a
+call :stringspecialchange_func_1x1 "%%a"
+rem 对读取到的内容 进行 =等号替换
+set local_stringspecialchange_return_1=!stringspecialchange_return_1!
+echo third_app[!rule1_num!]=%%a
+echo local_stringspecialchange_return_1=[!local_stringspecialchange_return_1!]
+call :getsubstringwithpreendtag_func_3x1 !local_stringspecialchange_return_1! "package:"  ".apk"
+echo getsubstringwithpreendtag_return_1=[%getsubstringwithpreendtag_return_1%]
+echo getsubstringwithpreendtag_return_2=[!getsubstringwithpreendtag_return_1!]
+call :stringspecialrecovery_func_1x1  !getsubstringwithpreendtag_return_1!
+set local_fixed_stringspecialrecovery_return_1=!stringspecialrecovery_return_1!
+set third_app_path=!local_fixed_stringspecialrecovery_return_1!.apk
+echo third_app_path=[!third_app_path!]
+call :getsubstringwithpreendtag_func_3x1 !local_stringspecialchange_return_1! ".apk"  ""
+echo getsubstringwithpreendtag_return_1_name=[%getsubstringwithpreendtag_return_1%]
+echo getsubstringwithpreendtag_return_2_name=[!getsubstringwithpreendtag_return_1!]
+call :stringspecialrecovery_func_1x1  !getsubstringwithpreendtag_return_1!
+set local_fixed_stringspecialrecovery_return_1_name=!stringspecialrecovery_return_1!
+echo local_fixed_stringspecialrecovery_return_1_name=[!local_fixed_stringspecialrecovery_return_1_name!]
+set no_blank_name=!local_fixed_stringspecialrecovery_return_1_name:~1!
+echo  third_app_path=[!third_app_path!]   no_blank_name=[!no_blank_name!]  
+echo 拉取apk命令如下:
+echo app[!rule1_num!]  adb pull !third_app_path!   !no_blank_name!.apk
+adb pull !third_app_path!   !no_blank_name!.apk
+)
+echo 按住回车继续下一次执行 导出正在运行的app到PC本地:
+rem del rule2.txt
+rem del rule2_3app.txt
+pause
+goto rule2vgetapk_getapp_block
+)
+echo 按住回车继续下一次执行 导出正在运行的app到PC本地:
+pause
+goto rule2vgetapk_getapp_block
+echo [rule2vgetapk_func_0x0 EndPrintCode]   output=[__empty__]  param1=[__empty__] 
+echo ______________Method_Out rule2vgetapk_func_0x0
+::ENDLOCAL
+goto:eof
+
+
+
+
+:rule3vinstalldirapk_func_1x0
+rem ======================================== rule3vinstalldirapk_func_1x0
+rem rule_tip: %init_input_0% _3_  ##安装当前目录的apk到手机
+
+rem desc: Bussiness_Rule打印程序用于打印batrule规则序列
+rem sample: 
+rem sample_out: 
+::SETLOCAL
+echo ______________Method_In rule3vinstalldirapk_func_1x0
+set rule3vinstalldirapk_dynamic_param1=
+if "%init_input_2%"=="" (
+set  rule3vinstalldirapk_dynamic_param1=!init_cd!
+) else (
+set rule3vinstalldirapk_dynamic_param1=!init_cd!%init_input_2% 
+)
+echo [rule3vadbscreen_func_1x0 ]    output=[__empty__] dynamic_param1=[!rule3vinstalldirapk_dynamic_param1!]   
+set /a Index_NoParam = 0
+for  %%i in (!rule3vinstalldirapk_dynamic_param1!\*.apk) do (
+set /a Index_NoParam+=1
+echo install_index[!Index_NoParam!] == %%i   [ commonad: adb install -r  %%i ]
+echo adb install -r  %%i
+adb install -r  %%i
+)
+echo [rule3vinstalldirapk_func_1x0 EndPrintCode]    output=[__empty__] dynamic_param1=[!rule3vinstalldirapk_dynamic_param1!]   
+echo ______________Method_Out rule3vinstalldirapk_func_1x0
+::ENDLOCAL
+goto:eof
+
+
+
+
+:rule4vscreendown_func_1x0
+rem ======================================== rule4vscreendown_func_1x0
+rem rule_tip: %init_input_0% _4_ 3000   ##手机执行 adb shell input swipe 340 800 340 100命令向下滑动两下向上滑动一下 默认3000次
+
+rem desc: Bussiness_Rule打印程序用于打印batrule规则序列
+rem sample: 
+rem sample_out: 
+::SETLOCAL
+echo ______________Method_In rule4vscreendown_func_1x0
+set rule4vscreendown_dynamic_param1=
+if "%init_input_2%"=="" (
+set  rule4vscreendown_dynamic_param1=3000
+) else (
+set rule4vscreendown_dynamic_param1=%init_input_2% 
+)
+echo [rule3vadbscreen_func_1x0 ]    output=[__empty__] dynamic_param1=[!rule4vscreendown_dynamic_param1!]   
+for /l %%i in (1, 1, !rule4vscreendown_dynamic_param1!) do (
 echo i == %%i   _todown        
 adb shell input swipe 340 1200 340 400  
 ping -n 3 127.0.0.1>nul
@@ -1524,7 +1760,7 @@ ping -n 3 127.0.0.1>nul
 adb shell input swipe 340 400 340 800
 ping -n 3 127.0.0.1>nul
 )
-for /l %%i in (1, 1, !rule3vadbscreen_dynamic_param1!) do (
+for /l %%i in (1, 1, !rule4vscreendown_dynamic_param1!) do (
 echo i == %%i  _toup        
 adb shell input swipe  340 400  340 1200
 ping -n 3 127.0.0.1>nul
@@ -1533,8 +1769,315 @@ ping -n 3 127.0.0.1>nul
 adb shell input swipe  340 800 340 400
 ping -n 3 127.0.0.1>nul
 )
-echo [rule3vadbscreen_func_1x0 EndPrintCode]    output=[__empty__] dynamic_param1=[!rule3vadbscreen_dynamic_param1!]   
-echo ______________Method_Out rule3vadbscreen_func_1x0
+echo [rule4vscreendown_func_1x0 EndPrintCode]    output=[__empty__] dynamic_param1=[!rule4vscreendown_dynamic_param1!]   
+echo ______________Method_Out rule4vscreendown_func_1x0
+::ENDLOCAL
+goto:eof
+
+
+
+
+:rule5vscreen2end_func_1x0
+rem ======================================== rule5vscreen2end_func_1x0
+rem rule_tip: %init_input_0% _5_  1000000  ##手机执行 adb shell input swipe 340 1800 340 100 10 快速往下滑动 不打印Log了 默认执行百万次
+rem desc: 
+rem sample: 
+rem sample_out: 
+::SETLOCAL
+echo ______________Method_In rule5vscreen2end_func_1x0
+set rule5vscreen2end_dynamic_param1=
+if "%init_input_2%"=="" (
+set  rule5vscreen2end_dynamic_param1=1000000
+) else (
+set rule5vscreen2end_dynamic_param1=%init_input_2% 
+)
+for /l %%i in (1, 1, !rule5vscreen2end_dynamic_param1!) do (
+rem echo i == %%i   _todown        
+adb shell input swipe 340 1500 340 200  30
+)
+echo [rule5vscreen2end_func_1x0 EndPrintCode]    output=[__empty__] dynamic_param1=[!rule5vscreen2end_dynamic_param1!]   
+echo ______________Method_Out rule5vscreen2end_func_1x0
+::ENDLOCAL
+goto:eof
+
+
+
+
+:rule6vclearapk_func_0x0
+rem ======================================== rule6vclearapk_func_0x0
+rem rule_tip: %init_input_0% _6_  ## 执行清空apk的操作
+rem desc: 
+rem sample: 
+rem sample_out: 
+::SETLOCAL
+echo ______________Method_In rule6vclearapk_func_0x0
+:rule6_clearapp_loop
+ECHO waiting conenct with USB
+adb wait-for-device
+adb shell pm list packages -3 > rule6.txt
+if exist rule6.txt (
+  for /f %%l in (rule6.txt) do ( 
+       set /a num+=1 
+	   set s=%%l
+       set str1=!s:~8!
+	   ECHO  s=!str1!
+       ECHO install-packages :  !str1!
+       call adb uninstall !str1!
+  )
+ECHO all third-part APP uninstall !
+) else (
+ECHO B7_uninstallpacket.txt file not exist !
+)
+ECHO 更换一个设备去执行 清空apk的 操作！
+del rule6.txt
+pause
+GOTO rule6_clearapp_loop
+echo [rule6vclearapk_func_0x0 EndPrintCode]   output=[__empty__]  param1=[__empty__] 
+echo ______________Method_Out rule6vclearapk_func_0x0
+::ENDLOCAL
+goto:eof
+
+
+
+
+:rule7vbtonoff_func_1x0
+rem ======================================== rule7vbtonoff_func_1x0
+rem rule_tip: %init_input_0% _7_  ## 蓝牙开启关闭 默认执行1000次
+rem desc: 
+rem sample: 
+rem sample_out: 
+::SETLOCAL
+echo ______________Method_In rule7vbtonoff_func_1x0
+set rule7vbtonoff_dynamic_param1=
+if "%init_input_2%"=="" (
+set  rule7vbtonoff_dynamic_param1=1000000
+) else (
+set rule7vbtonoff_dynamic_param1=%init_input_2% 
+)
+for /l %%i in (1, 1, !rule7vbtonoff_dynamic_param1!) do (
+echo i == %%i   open_bt
+adb shell svc bluetooth enable
+echo i == %%i   close_bt
+adb shell svc bluetooth disable
+rem ping -n 1  127.0.0.1 >nul 
+)
+echo [rule7vbtonoff_func_1x0 EndPrintCode]    output=[__empty__] dynamic_param1=[!rule7vbtonoff_dynamic_param1!]   
+echo ______________Method_Out rule7vbtonoff_func_1x0
+::ENDLOCAL
+goto:eof
+
+
+
+
+:rule8vtapxy_func_3x0
+rem ======================================== rule8vtapxy_func_3x0
+rem rule_tip: %init_input_0% _8_ 400 800 1000  ## 点击屏幕位置 x y repeat 重复 repeat次 默认1000次
+rem desc: 
+rem sample: 
+rem sample_out: 
+::SETLOCAL
+echo ______________Method_In rule8vtapxy_func_3x0
+set rule8vtapxy_dynamic_param1=
+set rule8vtapxy_dynamic_param2=
+set rule8vtapxy_dynamic_param3=
+if "%init_input_2%"=="" (
+set  rule8vtapxy_dynamic_param1=400
+) else (
+set rule8vtapxy_dynamic_param1=%init_input_2% 
+)
+if "%init_input_3%"=="" (
+set  rule8vtapxy_dynamic_param2=800
+) else (
+set rule8vtapxy_dynamic_param2=%init_input_3% 
+)
+if "%init_input_4%"=="" (
+set  rule8vtapxy_dynamic_param3=1000
+) else (
+set rule8vtapxy_dynamic_param3=%init_input_4% 
+)
+echo [rule8vtapxy_func_3x0]   dynamic_param1=[!rule8vtapxy_dynamic_param1!]   dynamic_param2=[!rule8vtapxy_dynamic_param2!]   dynamic_param3=[!rule8vtapxy_dynamic_param3!]   
+for /l %%i in (1, 1, !rule8vtapxy_dynamic_param3!) do (
+echo adb shell input tap !rule8vtapxy_dynamic_param1!  !rule8vtapxy_dynamic_param2!  index=[%%i]
+adb shell input tap !rule8vtapxy_dynamic_param1!  !rule8vtapxy_dynamic_param2!
+rem ping  127.0.0.1 >nul 
+)
+echo [rule8vtapxy_func_3x0 EndPrintCode]    output=[__empty__] dynamic_param1=[!rule8vtapxy_dynamic_param1!]   dynamic_param2=[!rule8vtapxy_dynamic_param2!]   dynamic_param3=[!rule8vtapxy_dynamic_param3!]   
+echo ______________Method_Out rule8vtapxy_func_3x0
+::ENDLOCAL
+goto:eof
+
+
+
+
+:rule9vwifionoff_func_1x0
+rem ======================================== rule9vwifionoff_func_1x0
+rem rule_tip: %init_input_0% _9_  ## wifi开启关闭  默认1000次
+rem desc: 
+rem sample: 
+rem sample_out: 
+::SETLOCAL
+echo ______________Method_In rule9vwifionoff_func_1x0
+set rule9vwifionoff_dynamic_param1=
+if "%init_input_2%"=="" (
+set  rule9vwifionoff_dynamic_param1=1000
+) else (
+set rule9vwifionoff_dynamic_param1=%init_input_2% 
+)
+for /l %%i in (1, 1, !rule9vwifionoff_dynamic_param1!) do (
+echo i == %%i   open_wifi 
+adb shell svc wifi enable
+echo i == %%i   close_wifi
+adb shell svc wifi disable
+rem ping   127.0.0.1 >nul 
+)
+echo [rule9vwifionoff_func_1x0 EndPrintCode]    output=[__empty__] dynamic_param1=[!rule9vwifionoff_dynamic_param1!]   
+echo ______________Method_Out rule9vwifionoff_func_1x0
+::ENDLOCAL
+goto:eof
+
+
+
+
+:rule10vgpsonoff_func_1x0
+rem ======================================== rule10vgpsonoff_func_1x0
+rem rule_tip: %init_input_0% _10_  1000  ## GPS开启关闭  默认1000次
+rem desc: 
+rem sample: 
+rem sample_out: 
+::SETLOCAL
+echo ______________Method_In rule10vgpsonoff_func_1x0
+set rule10vgpsonoff_dynamic_param1=
+if "%init_input_2%"=="" (
+set  rule10vgpsonoff_dynamic_param1=1000
+) else (
+set rule10vgpsonoff_dynamic_param1=%init_input_2% 
+)
+for /l %%i in (1, 1, !rule10vgpsonoff_dynamic_param1!) do (
+echo i == %%i   open_gps 
+adb root & adb shell cmd  location set-location-enabled  true
+echo i == %%i   close_gps 
+adb root & adb shell cmd  location set-location-enabled  false
+rem ping   127.0.0.1 >nul 
+)
+echo [rule10vgpsonoff_func_1x0 EndPrintCode]    output=[__empty__] dynamic_param1=[!rule10vgpsonoff_dynamic_param1!]   
+echo ______________Method_Out rule10vgpsonoff_func_1x0
+::ENDLOCAL
+goto:eof
+
+
+
+
+:rule11vgowifipage_func_1x0
+rem ======================================== rule11vgowifipage_func_1x0
+rem rule_tip: %init_input_0% _11_   ## 开启wifi连接WPS网络
+rem desc: 
+rem sample: 
+rem sample_out: 
+::SETLOCAL
+echo ______________Method_In rule11vgowifipage_func_1x0
+set rule11vgowifipage_dynamic_param1=
+rem 进入设置主界面
+adb shell am start com.android.settings/com.android.settings.SubSettings 
+rem 进行WIFI列表页面
+adb shell am start com.android.settings/com.android.settings.wifi.WifiPickerActivity   
+adb shell svc wifi disable
+adb shell svc wifi enable
+adb shell cmd wifi  connect-network WPS网络  wpa2 87654321  && adb shell cmd wifi  connect-network WPS网络5G  wpa2 87654321
+echo [rule11vgowifipage_func_1x0 EndPrintCode]    output=[__empty__] dynamic_param1=[!rule11vgowifipage_dynamic_param1!]   
+echo ______________Method_Out rule11vgowifipage_func_1x0
+::ENDLOCAL
+goto:eof
+
+
+
+
+:rule12vinputtext_func_1x0
+rem ======================================== rule12vinputtext_func_1x0
+rem rule_tip: %init_input_0% _12_  www.baidu.com  ## adb输入字符串 默认为 www.baidu.com
+rem desc: 
+rem sample: 
+rem sample_out: 
+::SETLOCAL
+echo ______________Method_In rule12vinputtext_func_1x0
+set rule12vinputtext_dynamic_param1=
+if "%init_input_2%"=="" (
+set  rule12vinputtext_dynamic_param1=www.baidu.com
+) else (
+set rule12vinputtext_dynamic_param1=%init_input_2% 
+)
+echo shell input text !rule12vinputtext_dynamic_param1!
+adb shell input text !rule12vinputtext_dynamic_param1!
+echo [rule12vinputtext_func_1x0 EndPrintCode]    output=[__empty__] dynamic_param1=[!rule12vinputtext_dynamic_param1!]   
+echo ______________Method_Out rule12vinputtext_func_1x0
+::ENDLOCAL
+goto:eof
+
+
+
+
+:rule13vtakepicture_func_1x0
+rem ======================================== rule13vtakepicture_func_1x0
+rem rule_tip: %init_input_0% _13_   ## 对当前手机屏幕截屏并拉取到手机本地
+rem desc: 
+rem sample: 
+rem sample_out: 
+::SETLOCAL
+echo ______________Method_In rule13vtakepicture_func_1x0
+set rule13vtakepicture_dynamic_param1=
+:rule13vtakepicture_loop
+adb wait-for-device
+rem set hh=%time:~0,2%
+rem if /i %hh% LSS 10 (set hh=0%time:~1,1%)
+rem set CURRENT_DATE_TIME_STAMP=%date:~0,4%%date:~5,2%%date:~8,2%_%hh%%time:~3,2%%time:~6,2%
+call :gettimehhmmsss_func_0x1
+set CURRENT_DATE_TIME_STAMP=!gettimehhmmsss_return_1!
+echo CURRENT_DATE_TIME_STAMP=!CURRENT_DATE_TIME_STAMP!
+adb shell screencap -p /sdcard/Pictures/B7_zscreenshot_%CURRENT_DATE_TIME_STAMP%.png
+ECHO Picture_Name: /sdcard/Pictures/B7_zscreenshot_%CURRENT_DATE_TIME_STAMP%.png 
+adb pull /sdcard/Pictures/B7_zscreenshot_%CURRENT_DATE_TIME_STAMP%.png  ./B7_zscreenshot_%CURRENT_DATE_TIME_STAMP%.png
+echo  对当前文件截屏成功 请继续截屏 否则 ctrl+c 停止软件运行 
+PAUSE
+goto rule13vtakepicture_loop
+echo [rule13vtakepicture_func_1x0 EndPrintCode]    output=[__empty__] dynamic_param1=[!rule13vtakepicture_dynamic_param1!]   
+echo ______________Method_Out rule13vtakepicture_func_1x0
+::ENDLOCAL
+goto:eof
+
+
+
+
+:rule14vtakevideo_func_1x0
+rem ======================================== rule14vtakevideo_func_1x0
+rem rule_tip: %init_input_0% _14_     ## 对当前手机屏幕录屏 然后拔出插入 使得mp4文件拉取到手机本地
+rem desc: 
+rem sample: 
+rem sample_out: 
+::SETLOCAL
+echo ______________Method_In rule14vtakevideo_func_1x0
+set rule14vtakevideo_dynamic_param1=
+:rule14vtakevideo_loop
+adb wait-for-device
+adb root
+adb remount
+call :gettimehhmmsss_func_0x1
+set CURRENT_DATE_TIME_STAMP=!gettimehhmmsss_return_1!
+echo 创建文件夹  mp4_!CURRENT_DATE_TIME_STAMP!
+md  mp4_!CURRENT_DATE_TIME_STAMP!
+ECHO  take screen video nowing Please remove device with USB  to stop video shot when you finish takescreen!
+echo  正在进行屏幕录像操作,如果想停止录像请拔掉USB连接线 使得录屏程序停止!
+adb shell screenrecord --bit-rate 4000000 /sdcard/Pictures/rule14_!CURRENT_DATE_TIME_STAMP!.mp4
+ECHO   take screen video stop ! 
+ECHO MP4_Name: /sdcard/Pictures/rule14_!CURRENT_DATE_TIME_STAMP!.mp4
+ECHO   请重新插入USB 使得拉取当前录像文件 /sdcard/Pictures/rule14_!CURRENT_DATE_TIME_STAMP!.mp4
+adb wait-for-device
+adb root
+adb remount
+adb pull /sdcard/Pictures/rule14_%CURRENT_DATE_TIME_STAMP%.mp4  ./mp4_!CURRENT_DATE_TIME_STAMP!/rule14_!CURRENT_DATE_TIME_STAMP!.mp4 
+ECHO   请输入 Entry 键 使得开始下一个录屏操作！ 
+PAUSE
+GOTO rule14vtakevideo_loop
+echo [rule14vtakevideo_func_1x0 EndPrintCode]    output=[__empty__] dynamic_param1=[!rule14vtakevideo_dynamic_param1!]   
+echo ______________Method_Out rule14vtakevideo_func_1x0
 ::ENDLOCAL
 goto:eof
 
@@ -1548,11 +2091,33 @@ rem sample:
 rem sample_out: 
 ::SETLOCAL
 echo ______________Method_In ruletipprint_func_0x0
-echo zbatrule_I9_Rule30.bat _1_  ##安装本地目录下的所有apkadbinstall*.apk
+echo  %init_input_0% _1_   ## 备份bankup所有当前手机安装的apk本地PC本地目录
 
-echo zbatrule_I9_Rule30.bat _2_  ##获取手机当前正在运行的APK到本地
+echo  %init_input_0% _2_   ## 获取手机当前正在运行的APK到本地
 
-echo zbatrule_I9_Rule30.bat _3_  500##手机执行adbshellinputswipe340800340100命令向下滑动两下向上滑动一下
+echo  %init_input_0% _3_  ##安装当前目录的apk到手机
+
+echo  %init_input_0% _4_ 3000   ##手机执行 adb shell input swipe 340 800 340 100命令向下滑动两下向上滑动一下 默认3000次
+
+echo  %init_input_0% _5_  1000000  ##手机执行 adb shell input swipe 340 1800 340 100 10 快速往下滑动 不打印Log了 默认执行百万次
+
+echo  %init_input_0% _6_  ## 执行清空apk的操作
+
+echo  %init_input_0% _7_  ## 蓝牙开启关闭 默认执行1000次
+
+echo  %init_input_0% _8_ 400 800 1000  ## 点击屏幕位置 x y repeat 重复 repeat次 默认1000次
+
+echo  %init_input_0% _9_  ## wifi开启关闭  默认1000次
+
+echo  %init_input_0% _10_  1000  ## GPS开启关闭  默认1000次
+
+echo  %init_input_0% _11_   ## 开启wifi连接WPS网络
+
+echo  %init_input_0% _12_  www.baidu.com  ## adb输入字符串 默认为 www.baidu.com
+
+echo  %init_input_0% _13_   ## 对当前手机屏幕截屏并拉取到手机本地
+
+echo  %init_input_0% _14_     ## 对当前手机屏幕录屏 然后拔出插入 使得mp4文件拉取到手机本地
 echo [ruletipprint_func_0x0 EndPrintCode]   output=[__empty__]  param1=[__empty__] 
 echo ______________Method_Out ruletipprint_func_0x0
 ::ENDLOCAL
@@ -1576,24 +2141,27 @@ echo ______________Method_Out ruletipanalysis_func_0x1
 goto:eof
 )
 set  rule_tip_index=%init_input_1:~1,-1%
+findstr "^:rule%rule_tip_index%v*" %init_f0% > zzZZzz.txt
 echo rule_tip_index=[%rule_tip_index%]
-set selecte_method_name=rule%rule_tip_index%v
+set selecte_method_name=:rule%rule_tip_index%v
 echo selecte_method_name=[%selecte_method_name%]
-for /f %%i in (%win_zbin%\zbatrule_I9_Rule30_method.txt) do (
+for /f %%i in (zzZZzz.txt) do (
 set /a Index_F_1+=1
 call :isstartwith_func_2x1 %%i  %selecte_method_name%
 set local_isstartwith_return_1=!isstartwith_return_1!
-echo zbatrule_I9[!Index_F_1!] == %%i    
+echo %init_f0%[!Index_F_1!] == %%i    
 if "!local_isstartwith_return_1!"=="true" (
 echo  selected_method_name = [%%i] 
 set ruletipanalysis_return_1=%%i
-echo _____________ 执行选中方法【 call :!ruletipanalysis_return_1! 】 _____________
+echo _____________________________________________________________________ 执行选中方法【 call :!ruletipanalysis_return_1! 】 _______________________________________
 call :!ruletipanalysis_return_1!
+del zzZZzz.txt
 echo [ruletipanalysis_func_0x1 EndPrintCode] ruletipanalysis_return_1=[!ruletipanalysis_return_1!]   param1=[__empty__] 
 echo ______________Method_Out ruletipanalysis_func_0x1
 goto:eof
 )
 )
+del zzZZzz.txt
 echo _____________ 【 未找到输入参数方法 】 _____________
 echo [ruletipanalysis_func_0x1 EndPrintCode] ruletipanalysis_return_1=[!ruletipanalysis_return_1!]   param1=[__empty__] 
 echo ______________Method_Out ruletipanalysis_func_0x1
@@ -1609,14 +2177,7 @@ rem ═════════════════════════�
 rem ======================== 主函数main函数入口   rem Tip:  methodName_func_xx  中 MethodName不能包含下划线 _
 :____Main____
 echo __________________ Main_Method Begin _______________________
-rem call :test_func_0x0
-rem call :searchonetargetfile4dir4type_func_2x1 %zbin%  J9_Log
-rem echo local_searchonetargetfile4dir4type_return_1A=[%searchonetargetfile4dir4type_return_1%]
-rem  call :helloworld_func_0x0
-rem  call :isstartwith_func_2x1 J9_Log_14141  J9_Log
-rem  echo isstartwith_func_2x1=[%isstartwith_return_1%]
 call :helloworld_func_0x0
-
 
 echo __________________ Main_Method End _______________________
 goto:eof
