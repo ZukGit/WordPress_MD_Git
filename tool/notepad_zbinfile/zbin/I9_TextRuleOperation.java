@@ -13,6 +13,8 @@ import com.google.zxing.EncodeHintType;
 import com.google.zxing.MultiFormatReader;
 import com.google.zxing.Result;
 import com.google.zxing.common.HybridBinarizer;
+
+
 import net.sourceforge.pinyin4j.PinyinHelper;
 import net.sourceforge.pinyin4j.format.HanyuPinyinCaseType;
 import net.sourceforge.pinyin4j.format.HanyuPinyinOutputFormat;
@@ -407,7 +409,7 @@ public class I9_TextRuleOperation {
 
      	 File bat_template_file = null;
      	 File bat_ruleMethodName_file =null; // 保存业务函数名称的方法
-     
+ 		ArrayList<Bat_Aera> mAreaList;
      	// echo zbatrule_I9_Rule30.bat _1_   ##安装本地目录下的所有apkadbinstall*.apk
      	// echo zbatrule_I9_Rule30.bat _2_   ##获取手机当前正在运行的APK到本地
       ArrayList<String> allRuleMethodNameList = new ArrayList<String> ();
@@ -417,7 +419,8 @@ public class I9_TextRuleOperation {
              super(31,false);
 	            bat_template_file = new File(zbinPath+File.separator+"win_zbin"+File.separator+"zbatrule_I9_Rule30.bat");
 //	            bat_ruleMethodName_file  = new File(zbinPath+File.separator+"win_zbin"+File.separator+"zbatrule_I9_Rule30_method.txt");
-         }
+	            mAreaList = new ArrayList<Bat_Aera> ();
+     	}
      	
          @Override
          ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
@@ -1398,12 +1401,16 @@ public class I9_TextRuleOperation {
     			
     			for (int i = 0; i < method_raw_content.size(); i++) {
     				String oneMethodStr = method_raw_content.get(i);
+    				// 把空格转为 空 导致 注释 时  必须存在 空格消失了  挤在一块 
     				String clearBlank = oneMethodStr.replace(" ", "");
+//    				String clearBlank = oneMethodStr.trim();
     				if(clearBlank.startsWith("remdesc:") && oneMethodStr.startsWith("rem ")) {
-    					String descStr = clearBlank.replace("remdesc:", "");
-    					
+    					String descStr = oneMethodStr.replace("rem desc:", "");
+    					descStr = descStr.replace("rem  desc:", "");
+    					descStr = descStr.replace("rem   desc:", "");
+    					descStr = descStr.replace("rem   desc:", "");
     					if(!"".equals(descStr.trim())) {
-    						method_desc_list.add(descStr);
+    						method_desc_list.add(descStr.trim());
     					}
     		
     				}
@@ -1423,11 +1430,13 @@ public class I9_TextRuleOperation {
     							oneMethodStr = oneMethodStr.substring(4);
     						}
     						String descStr = oneMethodStr.replace("remrule_tip:", "");
-    						 descStr = descStr.replace("rem rule_tip:", "");
+    						 descStr = descStr.replace("rem  rule_tip:", "");
+    						 descStr = descStr.replace("rem   rule_tip:", "");
+    						 descStr = descStr.replace("rule_tip:", "");
     						 descStr = descStr.replace("rule_tip:", "");
     						// rem rule_tip:
     						if(!"".equals(descStr.trim())) {
-    							method_ruletip_list.add(descStr);
+    							method_ruletip_list.add(descStr.trim());
     						}
     			
     					}
@@ -1442,10 +1451,14 @@ public class I9_TextRuleOperation {
     				String oneMethodStr = method_raw_content.get(i);
     				String clearBlank = oneMethodStr.replace(" ", "");
     				if(clearBlank.startsWith("remsample:") && oneMethodStr.startsWith("rem ")) {
-    					String descStr = clearBlank.replace("remsample:", "");
-    					
+    					String descStr = oneMethodStr.replace("remsample:", "");
+    					 descStr = descStr.replace("rem sample:", "");
+    					 descStr = descStr.replace("rem  sample:", "");
+    					 descStr = descStr.replace("rem   sample:", "");
+						 descStr = descStr.replace("sample:", "");
+	
     					if(!"".equals(descStr.trim())) {
-    						method_Sample_list.add(descStr);
+    						method_Sample_list.add(descStr.trim());
     					}
     			
     				}
@@ -1457,9 +1470,14 @@ public class I9_TextRuleOperation {
     				String oneMethodStr = method_raw_content.get(i);
     				String clearBlank = oneMethodStr.replace(" ", "");
     				if(clearBlank.startsWith("remsample_out:") && oneMethodStr.startsWith("rem ")) {
-    					String descStr = clearBlank.replace("remsample_out:", "");
+    					String descStr = oneMethodStr.replace("remsample_out:", "");
+   					 descStr = descStr.replace("rem sample_out:", "");
+   					 descStr = descStr.replace("rem  sample_out:", "");
+   					 descStr = descStr.replace("rem   sample_out:", "");
+ 					 descStr = descStr.replace("sample_out:", "");
+    					
     					if(!"".equals(descStr.trim())) {
-    						method_SampleOut_list.add(descStr);
+    						method_SampleOut_list.add(descStr.trim());
     					}
     	
     				}
@@ -1765,14 +1783,14 @@ public class I9_TextRuleOperation {
     		Bat_Aera program_execute_aera = new Bat_Aera(1, "program_execute_aera");
     		Bat_Aera func_define_aera = new Bat_Aera(2, "func_define_aera", true);
     		Bat_Aera main_enter_aera = new Bat_Aera(3, "main_enter_aera");
-    		ArrayList<Bat_Aera> areaList = new ArrayList<Bat_Aera>();
-    		areaList.add(system_init_aera);
-    		areaList.add(program_execute_aera);
-    		areaList.add(func_define_aera);
-    		areaList.add(main_enter_aera);
-    		initRawContentInArea(batContentList, areaList);
+
+    		mAreaList.add(system_init_aera);
+    		mAreaList.add(program_execute_aera);
+    		mAreaList.add(func_define_aera);
+    		mAreaList.add(main_enter_aera);
+    		initRawContentInArea(batContentList, mAreaList);
     		
-    		 ArrayList<String> formatAllBatCodeList = buildAllBatFormatContent(areaList);
+    		 ArrayList<String> formatAllBatCodeList = buildAllBatFormatContent(mAreaList);
 
 
     		 showStringList(allRuleTipStrList, "RuleTip列表");
@@ -1781,7 +1799,7 @@ public class I9_TextRuleOperation {
     		 
 
 
-    	        formatAllBatCodeList = buildAllBatFormatContent(areaList);
+    	        formatAllBatCodeList = buildAllBatFormatContent(mAreaList);
     		 
     		 
    
@@ -2054,33 +2072,174 @@ public class I9_TextRuleOperation {
     
     
     class Bat_Revert_MD_Rule29 extends  Basic_Rule{
-
+    	Bat_Format_Rule_31 revertTool;
+    	File batTemplateFile;    //  bat 模板文件 
     	
     	
     	Bat_Revert_MD_Rule29(){
             super(29,false);
+            revertTool = new Bat_Format_Rule_31();
+            batTemplateFile =  new File(zbinPath+File.separator+"win_zbin"+File.separator+"zbatrule_I9_Rule30.bat");
 
         }
     	
         @Override
         ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
-            for (int i = 0; i < curInputFileList.size(); i++) {
-                File fileItem = curInputFileList.get(i);
-                ArrayList<String> contentList = ReadFileContentAsList(fileItem);
-                
-                // 找到  开始解析 .bat 文件 
-                     
-
-
-         }
-
-            return super.applyOperationRule(curFileList, subFileTypeMap, curDirList, curRealFileList);
+          
+        	ArrayList<String> MDAllContentList = new ArrayList<String> ();
+        	
+         	ArrayList<String> MDHeadRawList = new ArrayList<String> ();
+         	MDHeadRawList.add("---");
+         	MDHeadRawList.add("layout: post");
+         	MDHeadRawList.add("title: Bat技巧记载");
+         	MDHeadRawList.add("category: 代码");
+         	MDHeadRawList.add("tags: Bat");
+         	MDHeadRawList.add("keywords: Code Bat");
+         	MDHeadRawList.add("typora-root-url: ..\\..\\..\\");
+         	MDHeadRawList.add("typora-copy-images-to: ..\\..\\..\\public\\zimage");
+        	MDHeadRawList.add("");
+         	MDHeadRawList.add("---");
+         	MDHeadRawList.add("");
+         	MDHeadRawList.add("## 简介                                           ");
+         	MDHeadRawList.add(" * TOC                                            ");
+         	MDHeadRawList.add(" {:toc}                                           ");
+         	MDHeadRawList.add("");
+        	
+        	ArrayList<String> MDBodyRawList = new ArrayList<String> ();
+        	
+            ArrayList<String> RawContentList = ReadFileContentAsList(batTemplateFile);
+            // 解析 模板 文件 生成 format 格式   并 尝试 解析为 MD文件
+            
+            
+            
+            // 解析好格式的 formatList  作为源码 保存在 最后 
+            ArrayList<String> formatRawBatList =    revertTool.Bat_To_Format(RawContentList);
+            ArrayList<Bat_Format_Rule_31.Bat_Aera> batAreaList =    revertTool.mAreaList;
+        
+            
+            for (int i = 0; i < batAreaList.size(); i++) {
+            	Bat_Format_Rule_31.Bat_Aera  batAreaItem = batAreaList.get(i);
+            	String areName = batAreaItem.aera_name;
+            	ArrayList<String> areaRawConent = batAreaItem.getAreaFormatContent();
+            	MDBodyRawList.add("");
+            	MDBodyRawList.add("## "+areName);
+               	MDBodyRawList.add("");
+            	if(batAreaItem.defineOperationList == null || batAreaItem.defineOperationList.size() == 0) {
+                   	MDBodyRawList.add("");
+                	MDBodyRawList.add("**代码区域**");
+                  	MDBodyRawList.add("```");
+            		MDBodyRawList.addAll(areaRawConent);
+                 	MDBodyRawList.add("```");
+                   	MDBodyRawList.add("");
+            		continue;
+            	}
+            	
+            
+            	
+            	for (int j = 0; j < batAreaItem.defineOperationList.size(); j++) {
+            		Bat_Format_Rule_31.Bat_Operation curOperation = batAreaItem.defineOperationList.get(j);
+            		
+            		String operationName = curOperation.operation_name;
+            	   	MDBodyRawList.add("");
+                   	MDBodyRawList.add("### "+operationName);
+                   	MDBodyRawList.add("");
+                   	
+            		for (int k = 0; k < curOperation.operation_MethodList.size(); k++) {
+						
+            			Bat_Format_Rule_31.Bat_Method  methodItem = curOperation.operation_MethodList.get(k);
+            			
+            			String methodName = methodItem.bat_method_name;
+                 	   	MDBodyRawList.add("");
+                 	   	MDBodyRawList.add("");
+                    	MDBodyRawList.add("#### "+methodName);
+            
+                 	   	
+                 	   	
+                 	     	ArrayList<String>  methodRuleTip = methodItem.method_ruletip_list;
+                			ArrayList<String>  methodDescList = methodItem.method_desc_list;
+                			ArrayList<String>  methodFormatContentList = methodItem.method_format_content;
+                			ArrayList<String>  methodSampleList = methodItem.method_Sample_list;
+                			ArrayList<String>  methodSampleOutList = methodItem.method_SampleOut_list;
+                			addListToMDList(MDBodyRawList,methodRuleTip,"提示");
+                			addListToMDList(MDBodyRawList,methodDescList,"描述");
+                			addListToMDList(MDBodyRawList,methodSampleList,"代码实例");
+                			addListToMDList(MDBodyRawList,methodSampleOutList,"实例输出");
+                			addCodeListToMDList(MDBodyRawList,methodFormatContentList,"代码区域");
+                			
+                	
+					}
+            		
+            		
+				}
+			}
+            
+            MDBodyRawList.add("");
+            MDBodyRawList.add("## "+"bat代码环境");
+            MDBodyRawList.add("");
+            MDBodyRawList.add("```");
+            MDBodyRawList.addAll(formatRawBatList);
+            MDBodyRawList.add("```");
+            MDBodyRawList.add("");
+            
+            MDAllContentList.addAll(MDHeadRawList);
+            MDAllContentList.addAll(MDBodyRawList);
+            
+         	writeContentToFile(I9_Temp_Text_File,MDAllContentList);
+            NotePadOpenTargetFile(I9_Temp_Text_File.getAbsolutePath());
+            
+            
+			/*
+			 * for (int i = 0; i < curInputFileList.size(); i++) { File fileItem =
+			 * curInputFileList.get(i); ArrayList<String> contentList =
+			 * ReadFileContentAsList(fileItem); }
+			 */
+            return super.applyOperationRule(curFileList, subFileTypeMap, curDirList, curRealFileList );
         }
         
+       void addListToMDList(ArrayList<String> originList ,ArrayList<String> addList , String tag ){
+        	
+    	   if(addList.size() > 0 && originList.size() > 0) {
+    	   	   originList.add("");
+        	   originList.add("**"+tag+"**");
+        	   originList.add("");
+        	   originList.add("```");
+
+        	   for (int i = 0; i < addList.size(); i++) {
+				String addItemStr = addList.get(i);
+				String fixedItem = addItemStr.replace("rem rule_tip:","");
+				fixedItem= fixedItem.replace("rem desc:","");
+				fixedItem= fixedItem.replace("rem sample:","");
+				fixedItem= fixedItem.replace("rem sample_out:","");
+				originList.add(fixedItem);
+			}
+        	   originList.add("```"); 
+    	   }
+    	   originList.add("");
+
+        }
     	
+       void addCodeListToMDList(ArrayList<String> originList ,ArrayList<String> addList , String tag ){
+       	
+    	   if(addList.size() > 0 && originList.size() > 0) {
+    		   
+        	   originList.add("**"+tag+"**");
+        	   originList.add("");
+        	   originList.add("```");
+
+        	   for (int i = 0; i < addList.size(); i++) {
+				String addItemStr = addList.get(i);
+
+				originList.add(addItemStr);
+			}
+        	   originList.add("```"); 
+    	   }
+    	   originList.add("");
+
+        }
+       
         @Override
         String simpleDesc() {
-            return " 读取当前.bat 文件内容 进行 解析生成 MD文件的下半部分 ";
+            return " 读取当前指定模板文件 win_zbin/zbatrule_I9_Rule30.bat 生成解析的MD文件 ";
         }
         
     	

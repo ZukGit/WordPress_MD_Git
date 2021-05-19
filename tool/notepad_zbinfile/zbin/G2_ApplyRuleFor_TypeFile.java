@@ -1,12 +1,22 @@
 
 import cn.hutool.core.util.ImageUtil;
 import com.luciad.imageio.webp.WebPReadParam;
+import com.spire.presentation.FileFormat;
+import com.spire.presentation.IAutoShape;
+import com.spire.presentation.IEmbedImage;
+import com.spire.presentation.ISlide;
+import com.spire.presentation.PortionEx;
 //import com.sun.tools.sjavac.CopyFile;
+import com.spire.presentation.Presentation;
+import com.spire.presentation.ShapeType;
+import com.spire.presentation.TextFont;
+import com.spire.presentation.drawing.FillFormatType;
 
 import net.jimmc.jshortcut.JShellLink;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.io.*;
@@ -26,6 +36,7 @@ import javax.crypto.Cipher;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.stream.FileImageInputStream;
+import javax.imageio.stream.ImageOutputStream;
 import javax.swing.*;
 
 import org.apache.pdfbox.io.MemoryUsageSetting;
@@ -218,7 +229,9 @@ public class G2_ApplyRuleFor_TypeFile {
 		realTypeRuleList.add(new Time_Head_Rule_25());
 		realTypeRuleList.add(new Rename_By_Dir_Rule_26());
 		realTypeRuleList.add(new Rercovery_Type_By_DirName_Rule_27());
-
+		//  把当前的 图片 文件  jpg png 等 转为 一个 PPTX 文件 方便 分享 查看 
+		realTypeRuleList.add(new makeJpg2PPTX_Rule_28());
+		
 
 	}
 
@@ -229,6 +242,264 @@ public class G2_ApplyRuleFor_TypeFile {
 	// 属性进行修改(文件名称)
 //     // 4.对当前子文件(包括子目录 子文件 --不包含孙目录 孙文件) 5. 从shell 中获取到的路径 去对某一个文件进行操作
 
+	
+	class makeJpg2PPTX_Rule_28 extends Basic_Rule {
+		// 把文件后缀中的中文给去除掉 不包含文件夹 不包含孙文件
+
+		File TemplatePPTX_File ;
+
+		boolean isShowName ;
+		int rotate_value;  //旋转的角度
+        boolean bigkeep;  //  那些 与 电脑尺寸相同的 照片 保持正向的 比例
+		makeJpg2PPTX_Rule_28() {
+				super("#", 28, 4);
+				TemplatePPTX_File = new File(zbinPath+File.separator+"G2_EmptyPPTX_Rule28.pptx");
+				rotate_value = 0;
+				isShowName = false;
+				bigkeep = false;
+			}
+
+			@Override
+			boolean initParamsWithInputList(ArrayList<String> inputParamList) {
+				
+//				param0[#_28]
+//				param1[name_90]
+						
+				for (int i = 0; i < inputParamList.size(); i++) {
+					String paramStr = inputParamList.get(i);
+					System.out.println("param"+i+"["+paramStr+"] ");
+					if(paramStr.toLowerCase().contains("name")) {
+						isShowName = true;
+					}
+					if(paramStr.toLowerCase().contains("keepbig")) {
+						bigkeep = true;
+					}
+				}
+				String lastParams = inputParamList.get(inputParamList.size()-1);
+				if(lastParams != null && !lastParams.startsWith("#") && lastParams.contains("_")) {
+					String[] arrStr = lastParams.split("_");
+					if(arrStr != null && arrStr.length > 0) {
+						String lastNumStr = arrStr[arrStr.length-1];
+						if(isNumeric(lastNumStr)) {
+							rotate_value = Integer.parseInt(lastNumStr);
+						}
+					}
+
+				}else if(lastParams != null && isNumeric(lastParams.trim())){
+					
+					rotate_value = Integer.parseInt(lastParams.trim());
+				}
+				
+				
+				
+				System.out.println("isShowName="+isShowName+"   rotate_value="+rotate_value);
+				return super.initParamsWithInputList(inputParamList);
+			}
+
+			@Override
+			ArrayList<File> applySubFileListRule4(ArrayList<File> curFileList,
+												  HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList,
+												  ArrayList<File> curRealFileList) {
+
+				System.out.println("makeJpg2PPTX_Rule_28   搜索到的实体文件个数:" + curRealFileList.size());
+
+				ArrayList<File> pictureFileList = new 	ArrayList<File> ();
+				int picture_index = 1 ;
+				for (int i = 0; i < curRealFileList.size(); i++) {
+					File curFile = curRealFileList.get(i);
+					String currentFileName = curFile.getName().toLowerCase();
+					if (currentFileName.endsWith(".jpg") || currentFileName.endsWith(".png") ) {
+						pictureFileList.add(curFile);
+						System.out.println("picture_index["+picture_index+"] = "+ curFile.getAbsolutePath());
+						picture_index++;
+					}
+
+				}
+				
+				if(pictureFileList.size() > 0) {
+					Presentation ppt = new Presentation();
+					File tempPPTXFile = null;
+					try {
+					 tempPPTXFile = new File(TemplatePPTX_File.getAbsolutePath());
+					if(!tempPPTXFile.exists()) {
+						System.out.println(" 当前 PPTX的模板文件不存在 PATH = "+ tempPPTXFile.getAbsolutePath());
+						tempPPTXFile.createNewFile();
+					}
+		
+				
+						ppt.loadFromFile(tempPPTXFile.getAbsolutePath());
+	
+					
+				
+					Rectangle2D rect_fullSize = new Rectangle2D.Double(0, 0, ppt.getSlideSize().getSize().getWidth(), ppt.getSlideSize().getSize().getHeight());
+					double PPT_Width = rect_fullSize.getWidth();
+					double PPT_Height = rect_fullSize.getHeight();
+
+					System.out.println("PPT_Width = "+ PPT_Width + "   PPT_Height="+PPT_Height);
+					ISlide slide = ppt.getSlides().get(0);
+					
+					for (int i = 0; i < pictureFileList.size(); i++) {
+						File imageFile = pictureFileList.get(i);
+						String FileName = imageFile.getName();
+						String fileNameNoPoint = getFileNameNoPoint(FileName);
+						Image img = ImageIO.read(imageFile); // 构造Image对象
+					  int picture_width = 	img.getWidth(null);
+					  int picture_height = 	img.getHeight(null);
+					if(picture_width >= picture_height ) {
+						// 横屏的情况  使用全覆盖
+						  System.out.println("fullSize(0,0,"+PPT_Width+","+PPT_Height+") -> "+"PictureIndex["+(i+1)+"]   " +" picture_width=["+picture_width+"]  picture_height=["+picture_height+"]  "+"PPT_Width =["+ PPT_Width + "]   PPT_Height=["+PPT_Height+"]" );
+
+							BufferedImage buffImage = rotate(img, bigkeep==true?0:rotate_value);
+
+							ByteArrayOutputStream bs = new ByteArrayOutputStream();
+							ImageOutputStream imOut = ImageIO.createImageOutputStream(bs);
+							ImageIO.write(buffImage, "jpg", imOut);
+							InputStream ImageInputStream = new ByteArrayInputStream(bs.toByteArray());
+							
+							
+						   IEmbedImage image = slide.getShapes().appendEmbedImage(ShapeType.RECTANGLE, ImageInputStream, rect_fullSize);
+						   image.getLine().setFillType(FillFormatType.PICTURE);
+						   
+						   //获取第一张幻灯片，添加指定大小和位置的矩形文本框
+						   
+						   if(isShowName) {
+							   
+						        IAutoShape shape = ppt.getSlides().get(i).getShapes().appendShape(ShapeType.RECTANGLE,new Rectangle((int)(PPT_Width/2-PPT_Width/2), 0, (int)PPT_Width, 50));
+
+						        
+						        //设置shape样式
+						        shape.getFill().setFillType(FillFormatType.NONE);
+						        shape.getShapeStyle().getLineColor().setColor(Color.red);
+//						        shape.setRotation(-45);
+						        shape.getLocking().setSelectionProtection(true);
+						        shape.getLine().setFillType(FillFormatType.NONE);
+		
+						        //添加文本到shape
+						        shape.getTextFrame().setText(fileNameNoPoint);
+						        PortionEx textRange = shape.getTextFrame().getTextRange();
+
+						        //设置文本水印样式
+						        textRange.getFill().setFillType(FillFormatType.SOLID);
+						        textRange.getFill().getSolidColor().setColor(Color.red);
+						        textRange.setFontHeight(50);
+						        System.out.println(" fileNameNoPoint = "+ fileNameNoPoint);   
+							   
+							   
+						   }
+
+					        
+					}else {
+						
+						BufferedImage buffImage = rotate(img, rotate_value);
+						System.out.println("rotate90(0,0,"+PPT_Width+","+PPT_Height+") -> "+"PictureIndex["+(i+1)+"]   " +" picture_width=["+picture_width+"]  picture_height=["+picture_height+"]  "+" rotate_width=["+buffImage.getWidth()+"]  rotate_height=["+buffImage.getHeight()+"]  "+"PPT_Width =["+ PPT_Width + "]   PPT_Height=["+PPT_Height+"]" );
+
+						ByteArrayOutputStream bs = new ByteArrayOutputStream();
+						ImageOutputStream imOut = ImageIO.createImageOutputStream(bs);
+						ImageIO.write(buffImage, "jpg", imOut);
+						InputStream ImageInputStream = new ByteArrayInputStream(bs.toByteArray());
+						
+						// 方式1 竖屏的情况  保持比例   宽 小于 长   		// 从 原有的 高 变为  最高的情况
+						// 把 图片旋转 90 °   再  全尺寸加入 
+						int picture_height_fixed = (int)PPT_Height;
+						int picture_width_fixed = (int)(picture_width*(PPT_Height/picture_height));
+						Rectangle2D selected_rect = null;
+						if(rotate_value == 0 || rotate_value == 180) {
+							 selected_rect = new Rectangle2D.Double(PPT_Width/2-picture_width_fixed/2, 0,picture_width_fixed  , picture_height_fixed);
+							
+						} else {
+							
+							selected_rect = rect_fullSize;
+						}
+						
+						System.out.println("selectedSize("+(PPT_Width/2-picture_width_fixed/2)+",0,"+picture_width_fixed+","+picture_height_fixed+") -> "+"PictureIndex["+(i+1)+"]   " +" picture_width=["+picture_width+"]  picture_height=["+picture_height+"]  "+"PPT_Width =["+ PPT_Width + "]   PPT_Height=["+PPT_Height+"]" );
+
+						
+			
+						IEmbedImage image = slide.getShapes().appendEmbedImage(ShapeType.RECTANGLE, ImageInputStream, selected_rect);
+						image.getLine().setFillType(FillFormatType.PICTURE);
+						
+						
+
+
+			/*
+			 * // 方式2 IEmbedImage image =
+			 * slide.getShapes().appendEmbedImage(ShapeType.RECTANGLE, ImageInputStream,rect_fullSize); 
+			 *  image.getLine().setFillType(FillFormatType.PICTURE);
+			 */
+						
+						
+						   if(isShowName) {
+							   
+						        IAutoShape shape = ppt.getSlides().get(i).getShapes().appendShape(ShapeType.RECTANGLE,new Rectangle((int)(PPT_Width/2-PPT_Width/2), 0, (int)PPT_Width, 50));
+
+						        
+						        //设置shape样式
+						        shape.getFill().setFillType(FillFormatType.NONE);
+						        shape.getShapeStyle().getLineColor().setColor(Color.red);
+//						        shape.setRotation(-45);
+						        shape.getLocking().setSelectionProtection(true);
+						        shape.getLine().setFillType(FillFormatType.NONE);
+		
+						        //添加文本到shape
+						        shape.getTextFrame().setText(fileNameNoPoint);
+						        PortionEx textRange = shape.getTextFrame().getTextRange();
+
+						        //设置文本水印样式
+						        textRange.getFill().setFillType(FillFormatType.SOLID);
+						        textRange.getFill().getSolidColor().setColor(Color.red);
+						        textRange.setFontHeight(50);
+						        System.out.println(" fileNameNoPoint = "+ fileNameNoPoint);   
+							   
+							   
+						   }
+						   
+					}
+
+					if(i != pictureFileList.size()-1) {
+						
+					    slide = ppt.getSlides().append();
+					}
+				
+					
+					}
+					String local_pptx_path = curDirPath+File.separator+"PPTX_"+getTimeStamp()+".pptx";
+					ppt.saveToFile(local_pptx_path, FileFormat.PPTX_2013);
+					
+					System.out.println("当前目录所有图片的 PPTX 文件以及生成!  PATH = "+local_pptx_path );
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}else {
+					System.out.println("当前目录下 "+curDirPath+" 不存在 jpg 和 png 照片 无法合成 pptx文件!");
+				}
+	
+
+				return curRealFileList;
+			}
+
+			@Override
+			String simpleDesc() {
+				return " // 把当前目录下文件 下的picture媒体文件 生成 PPTX文件   \n" 
+						+ Cur_Bat_Name	+ " #_28     [索引28]   // 把当前目录下文件 旋转0度 不显示文件名 下的picture媒体文件 生成 PPTX文件   \n"
+						+ Cur_Bat_Name+ " #_28 0     [索引28]   // 把当前目录下文件 下的picture媒体文件 旋转0度 生成 PPTX文件   \n"
+						+ Cur_Bat_Name+ " #_28 90     [索引28]   // 把当前目录下文件 下的picture媒体文件 旋转90度 生成 PPTX文件   \n"
+						+ Cur_Bat_Name+ " #_28 180     [索引28]   // 把当前目录下文件 下的picture媒体文件 旋转180度 生成 PPTX文件   \n"
+						+ Cur_Bat_Name	+ " #_28 270     [索引28]   // 把当前目录下文件 下的picture媒体文件 并旋转270度 生成 PPTX文件   \n"
+						+ Cur_Bat_Name+ " #_28 name     [索引28]   // 把当前目录下文件 下的picture媒体文件 并添加文件名 生成 PPTX文件   \n"
+						+ Cur_Bat_Name   + " #_28 name_0     [索引28]   // 把当前目录下文件 下的picture媒体文件 旋转0度 并添加文件名 生成 PPTX文件   \n"
+						+ Cur_Bat_Name  + " #_28 name_90     [索引28]   // 把当前目录下文件 下的picture媒体文件 旋转90度 并添加文件名 生成 PPTX文件   \n"
+						+ Cur_Bat_Name  + " #_28 name_180     [索引28]   // 把当前目录下文件 下的picture媒体文件 旋转180度 并添加文件名 生成 PPTX文件   \n"
+						+ Cur_Bat_Name  + " #_28 name_270     [索引28]   // 把当前目录下文件 下的picture媒体文件 旋转270度 并添加文件名 生成 PPTX文件   \n"
+				  		+ Cur_Bat_Name  + " #_28 keepbig name_0     [索引28]   // 把当前目录下文件  图片比例与电脑尺寸相同(PC 宽>高)的保持正向 比例不同的(手机 宽<高) 旋转0度 并添加文件名 生成 PPTX文件   \n"
+				   		+ Cur_Bat_Name  + " #_28 keepbig name_90     [索引28]   // 把当前目录下文件  图片比例与电脑尺寸相同(PC 宽>高)的保持正向 比例不同的(手机 宽<高) 旋转90度 并添加文件名 生成 PPTX文件   \n"
+				   		+ Cur_Bat_Name  + " #_28 keepbig name_180     [索引28]   // 把当前目录下文件  图片比例与电脑尺寸相同(PC 宽>高)的保持正向 比例不同的(手机 宽<高) 旋转180度 并添加文件名 生成 PPTX文件   \n"
+						+ Cur_Bat_Name  + " #_28 keepbig name_270     [索引28]   // 把当前目录下文件  图片比例与电脑尺寸相同(PC 宽>高)的保持正向 比例不同的(手机 宽<高) 旋转270度 并添加文件名 生成 PPTX文件   \n"
+
+						;
+				
+			}
+		}
 
 
 // 在  包含 mp4 文件夹名称 把 无类型的文件 改为 mp4 , 对应 gif  jpg
@@ -6199,7 +6470,56 @@ newRealFile=D:\BaiduNetdiskDownload\公式\bad_batch\good_batch\A.pdf
 	}
 
 
+	/**
+     * 计算转换后目标矩形的宽高
+     * @param src 源矩形
+     * @param angel 角度
+     * @return 目标矩形
+     */
+     static Rectangle CalcRotatedSize(Rectangle src, int angel) {
+        double cos = Math.abs(Math.cos(Math.toRadians(angel)));
+        double sin = Math.abs(Math.sin(Math.toRadians(angel)));
+        int des_width = (int)(src.width *  cos) + (int)(src.height * sin);
+        int des_height =  (int)(src.height *  cos) + (int)(src.width * sin);
+        return new java.awt.Rectangle(new Dimension(des_width, des_height));
+    }
 
+    /**
+     * 旋转角度
+     * @param src 源图片
+     * @param angel 角度
+     * @return 目标图片
+     */
+    public static BufferedImage rotate(Image src, int angel) {
+        int src_width = src.getWidth(null);
+        int src_height = src.getHeight(null);
+        // calculate the new image size
+        
+        Rectangle rect_des = CalcRotatedSize(new Rectangle(new Dimension(src_width, src_height)), angel);
+
+        BufferedImage res = null;
+        res = new BufferedImage(rect_des.width, rect_des.height,
+                BufferedImage.TYPE_INT_RGB);
+        Graphics2D g2 = res.createGraphics();
+        // transform(这里先平移、再旋转比较方便处理；绘图时会采用这些变化，绘图默认从画布的左上顶点开始绘画，源图片的左上顶点与画布左上顶点对齐，然后开始绘画，修改坐标原点后，绘画对应的画布起始点改变，起到平移的效果；然后旋转图片即可)
+
+        g2.translate((rect_des.width - src_width) / 2, (rect_des.height - src_height) / 2);
+
+
+        g2.rotate(Math.toRadians(angel), src_width / 2, src_height / 2); 
+
+//        //先旋转（以目标区域中心点为旋转中心点，源图片左上顶点对准目标区域中心点，然后旋转）
+//        g2.translate(rect_des.width/2,rect_des.height/ 2);
+//        g2.rotate(Math.toRadians(angel));
+//        //再平移（原点恢复到源图的左上顶点处（现在的右上顶点处），否则只能画出1/4）
+//        g2.translate(-src_width/2,-src_height/2);
+
+
+
+        g2.drawImage(src, null, null);
+        return res;
+    }
+    
 	static void NotePadOpenTargetFile(String absPath){
 		String commandNotead = "";
 		if(CUR_OS_TYPE == OS_TYPE.Windows){
