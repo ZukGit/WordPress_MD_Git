@@ -95,7 +95,8 @@ public class K2_NotepadTip {
         logKeyList.add("GnssLocationProvider: SNR");
         logKeyList.add("Sending Location to com.baidu.BaiduMap, Provider: gps");
         logKeyList.add("Sending Location to com.autonavi.minimap, Provider: gps");
-
+        logKeyList.add("Location UpdateRecord for");
+        
         StringBuilder printSB = new StringBuilder();
         
         for (int i = 0; i < logKeyList.size(); i++) {

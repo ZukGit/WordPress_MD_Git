@@ -15,6 +15,7 @@ import com.spire.presentation.drawing.FillFormatType;
 import net.jimmc.jshortcut.JShellLink;
 
 import java.awt.*;
+import java.awt.font.FontRenderContext;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.AffineTransformOp;
@@ -27,6 +28,7 @@ import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.text.Collator;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.List;
@@ -41,7 +43,8 @@ import javax.swing.*;
 
 import org.apache.pdfbox.io.MemoryUsageSetting;
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
-
+import org.apache.poi.xslf.usermodel.XMLSlideShow;
+import org.apache.poi.xslf.usermodel.XSLFSlide;
 import java.security.Key;
 import java.security.Security;
 
@@ -232,7 +235,14 @@ public class G2_ApplyRuleFor_TypeFile {
 		//  把当前的 图片 文件  jpg png 等 转为 一个 PPTX 文件 方便 分享 查看 
 		realTypeRuleList.add(new makeJpg2PPTX_Rule_28());
 		
-
+		//  把 当前 目录的 多个 pptx 合并成 一个 pptx 文件 
+		realTypeRuleList.add(new mergeSomePPTXAsOne_Rule_29());
+		
+		// 对文件的名称进行修改
+		realTypeRuleList.add(new FileRenameOperation_Rule_30());
+		
+		// 创建文件 创建模板文件 
+		realTypeRuleList.add(new MakeFile_E5_Rule_31());
 	}
 
 // 3038年 5 月 3 日
@@ -241,22 +251,788 @@ public class G2_ApplyRuleFor_TypeFile {
 	// operation_type 操作类型 1--读取文件内容字符串 进行修改 2--对文件对文件内容(字节)--进行修改 3.对全体子文件进行的随性的操作
 	// 属性进行修改(文件名称)
 //     // 4.对当前子文件(包括子目录 子文件 --不包含孙目录 孙文件) 5. 从shell 中获取到的路径 去对某一个文件进行操作
+	
+	class MakeFile_E5_Rule_31 extends Basic_Rule {
+		ArrayList<String> fliterTypeList ;
+		int fileCount ;   //创建文件的个数 
+		
+		//	jpg_wordcolor_255_255_255; 
+		int jpg_R;   // 如果是jpg的话 那么  文笔的 颜色 
+		int jpg_G;
+		int jpg_B;
+		
+		//	jpg_background_255_255_255; 
+		int jpg_Back_R;   // 如果是jpg的话 那么  背景的 颜色 
+		int jpg_Back_G;
+		int jpg_Back_B;
+		
+		//	jpg_frontsize_500; 默认500
+		int jpg_front_size;   // 字体的大小  默认 500 
+		
+		// jpg_wxh_255_500 
+		int jpg_width;  // 生成 照片的宽度
+		int jpg_hight;  // 生成 照片的高度
+		
+		//	  jpg_shownumber_true;  
+		boolean isShowNumber ; // 是否显示 字母
+		
+
+ 
+		
+		MakeFile_E5_Rule_31() {
+			super("#", 31, 4);
+	
+
+			fliterTypeList = new ArrayList<String>();
+			jpg_R =255;
+			jpg_G = 0;
+			jpg_B = 0;
+			
+			jpg_Back_R = 255;
+			jpg_Back_G = 255;
+			jpg_Back_B = 255;
+			
+			jpg_front_size = 500;
+			jpg_width = 1200;
+			jpg_hight = 1200;
+			
+			isShowNumber = false;
+			
+		}
+		
+		@Override
+		boolean allowEmptyDirFileList() {
+			return true;
+		}
+		
+		@Override
+		String simpleDesc() {
+			return "\n"
+		            + Cur_Bat_Name + "  #_31  100 .jpg     ## 创建100个.jpg文件 白底 默认宽高1200x1200 默认文字颜色 红色 默认背景颜色白色  默认字体大小500  默认不打印数值 \n"
+					 + Cur_Bat_Name + "  #_31  100 .png     ## 创建100个.png文件 默认宽高1200x1200 默认文字颜色 红色 默认背景颜色白色  默认字体大小500  默认不打印数值 \n"
+					 + Cur_Bat_Name + "  #_31  100 .png .jpg    ## 创建100个.png文件 和 100个.png文件  默认宽高1200x1200 默认文字颜色 红色 默认背景颜色白色  默认字体大小500  默认不打印数值 \n"
+		            + Cur_Bat_Name + "  #_31  100 .pptx     ## 创建100个.pptx文件 \n"
+                    + Cur_Bat_Name + "  #_31   .pptx     ## 默认创建1个.pptx文件 \n"
+                    + Cur_Bat_Name + "  #_31  100 .jpg  jpg_shownumber_true     ## 创建100个白底红字的 jpg图片 默认图片大小1200x1200 \n"
+                   + Cur_Bat_Name + "  #_31   .【任意类型】    ## 默认创建1个.【任意类型】格式的文件 \n"
+		            + Cur_Bat_Name + " #_31  100 .jpg jpg_shownumber_true jpg_background_255_255_255 jpg_wordcolor_0_0_0 jpg_frontsize_600 jpg_wxh_1000_1000   ##创建100个依据参数确定的.jpg图片  白底黑字\n"
+		      		 + Cur_Bat_Name + " #_31  100 .jpg jpg_shownumber_true jpg_background_0_0_0 jpg_wordcolor_255_255_255 jpg_frontsize_600 jpg_wxh_1000_1000   ##创建100个依据参数确定的.jpg图片  白字黑底\n"
+		            + Cur_Bat_Name + " #_31  100 .jpg jpg_shownumber_true jpg_background_0_0_0  jpg_frontsize_600 jpg_wxh_1000_1000   ##创建100个依据参数确定的.jpg图片 黑底红字  \n"
+		            + Cur_Bat_Name + " #_31  100 .jpg jpg_shownumber_true jpg_background_255_0_0 jpg_wordcolor_0_0_0  jpg_frontsize_600 jpg_wxh_1000_1000   ##创建100个依据参数确定的.jpg图片 红底黑字  \n"
+		            + Cur_Bat_Name + " #_31  100 .jpg jpg_shownumber_true jpg_background_0_0_255 jpg_wordcolor_0_0_0  jpg_frontsize_600 jpg_wxh_1000_1000   ##创建100个依据参数确定的.jpg图片 蓝底黑字  \n"
+		            + Cur_Bat_Name + " #_31  100 .jpg jpg_shownumber_true jpg_background_0_0_255 jpg_wordcolor_255_255_255  jpg_frontsize_600 jpg_wxh_1000_1000   ##创建100个依据参数确定的.jpg图片 蓝底白字  \n"
+					 + Cur_Bat_Name + " #_31  100 .jpg jpg_shownumber_true jpg_background_0_0_255 jpg_wordcolor_255_0_0  jpg_frontsize_600 jpg_wxh_1000_1000   ##创建100个依据参数确定的.jpg图片 蓝底红字  \n"
+		           	 + Cur_Bat_Name + " #_31  100 .jpg jpg_shownumber_true jpg_background_0_0_255 jpg_wordcolor_255_255_0  jpg_frontsize_600 jpg_wxh_1000_1000   ##创建100个依据参数确定的.jpg图片 蓝底黄字  \n"
+		           	 + Cur_Bat_Name + " #_31  100 .jpg jpg_shownumber_true jpg_background_255_255_0 jpg_wordcolor_0_0_0  jpg_frontsize_600 jpg_wxh_1000_1000   ##创建100个依据参数确定的.jpg图片 黄底黑字  \n"
+		           	 + Cur_Bat_Name + " #_31  100 .jpg jpg_shownumber_true jpg_background_0_255_0 jpg_wordcolor_0_0_0  jpg_frontsize_600 jpg_wxh_1000_1000   ##创建100个依据参数确定的.jpg图片 绿底黑字  \n"
+
+					            ;
+		}
+		
+		
+	 void	showParams(){
+			System.out.println("═════════════ "+"showParams Rule31--MakeFile"+" ═════════════ ");	
+			System.out.println("isShowNumber = "+isShowNumber);
+			System.out.println("jpg_width = "+jpg_width);
+			System.out.println("jpg_hight = "+jpg_hight);
+			System.out.println("jpg_front_size = "+jpg_front_size);
+			System.out.println("jpg_R = "+jpg_R);
+			System.out.println("jpg_G = "+jpg_G);
+			System.out.println("jpg_B = "+jpg_B);
+			System.out.println("RGB=("+jpg_R+","+jpg_G+","+jpg_B+")");
+			System.out.println("jpg_Back_R = "+jpg_Back_R);
+			System.out.println("jpg_Back_G = "+jpg_Back_G);
+			System.out.println("jpg_Back_B = "+jpg_Back_B);
+			System.out.println("Back_RGB=("+jpg_Back_R+","+jpg_Back_G+","+jpg_Back_B+")");
+
+		}
+		
+		@Override
+		boolean initParamsWithInputList(ArrayList<String> inputParamList) {
+			
+			for (int i = 0; i < inputParamList.size(); i++) {
+				String param = inputParamList.get(i);
+				if(isNumeric(param)) {
+					fileCount = Integer.parseInt(param);
+				}
+				
+				if(param.startsWith(".")) {
+					fliterTypeList.add(param);
+				}
+				
+				
+				// //	jpg_frontsize_500;
+				if(param.startsWith("jpg_frontsize_500")) {
+					String fixedStr = param.replace("jpg_frontsize_", "");
+					if(isNumeric(fixedStr)) {
+						jpg_front_size	 =  Integer.parseInt(fixedStr);
+					}
+				}
+				
+				// jpg_shownumber_true;  
+				if(param.startsWith("jpg_shownumber_")) {
+					String fixedStr = param.replace("jpg_shownumber_", "").toLowerCase().trim();
+					if("true".endsWith(fixedStr) || "false".equals(fixedStr)) {
+						isShowNumber =  Boolean.parseBoolean(fixedStr);
+					}
+				}
+				
+				// 	// jpg_wxh_255_500 
+				if(param.startsWith("jpg_wxh_")) {
+				String fixedStr = param.replace("jpg_wxh_", "");
+				if(fixedStr.contains("_")) {
+					String[] rectArr = fixedStr.split("_");
+					if(rectArr != null && rectArr.length == 2) {
+						
+								if(isNumeric(rectArr[0])) {
+									jpg_width = Integer.parseInt(rectArr[0]);
+								}
+								
+								if(isNumeric(rectArr[1])) {
+									jpg_hight = Integer.parseInt(rectArr[1]);
+								}
+								
+		
+					}
+				}
+			}
+				
+				if(param.startsWith("jpg_wordcolor_")) {
+				String fixedStr = param.replace("jpg_wordcolor_", "");
+				if(fixedStr.contains("_")) {
+					String[] colorArr = fixedStr.split("_");
+					if(colorArr != null && colorArr.length == 3) {
+						
+								if(isNumeric(colorArr[0])) {
+									jpg_R = Integer.parseInt(colorArr[0]);
+								}
+								
+								if(isNumeric(colorArr[1])) {
+									jpg_G = Integer.parseInt(colorArr[1]);
+								}
+								
+								if(isNumeric(colorArr[2])) {
+									jpg_B = Integer.parseInt(colorArr[2]);
+								}
+					}
+				}
+			}
+				
+				// jpg_background_255_255_255
+				if(param.startsWith("jpg_background_")) {
+				String fixedStr = param.replace("jpg_background_", "");
+				if(fixedStr.contains("_")) {
+					String[] backcolorArr = fixedStr.split("_");
+					if(backcolorArr != null && backcolorArr.length == 3) {
+						
+								if(isNumeric(backcolorArr[0])) {
+									jpg_Back_R = Integer.parseInt(backcolorArr[0]);
+								}
+								
+								if(isNumeric(backcolorArr[1])) {
+									jpg_Back_G = Integer.parseInt(backcolorArr[1]);
+								}
+								
+								if(isNumeric(backcolorArr[2])) {
+									jpg_Back_B = Integer.parseInt(backcolorArr[2]);
+								}
+					}
+				}
+			}
+				
+				
+				
+				
+		}
+			if(fileCount == 0) {
+				System.out.println("当前没有创建文件的个数  默认设置为 1 ");
+				fileCount = 1;
+			}
+			
+			if(fliterTypeList.size() == 0) {
+				System.out.println("当前没有需要创建的文件类型 .xx   请检查输入参数!");
+				return false;
+			}
+		// TODO Auto-generated method stub
+		return super.initParamsWithInputList(inputParamList);
+		}
+		
+		@Override
+		ArrayList<File> applySubFileListRule4(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
+			ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+		// TODO Auto-generated method stub
+			
+			
+			for (int i = 0; i < fliterTypeList.size(); i++) {
+				String type = fliterTypeList.get(i);
+				ArrayList<File> mTypeFileList = getTypeFileListRule31( curDirFile.getAbsolutePath(),  type , fileCount);
+				 tryDoFillFile(mTypeFileList , type);
+
+			}
+			
+
+			
+		return super.applySubFileListRule4(curFileList, subFileTypeMap, curDirList, curRealFileList);
+		}
+		
+	 void tryDoFillFile(ArrayList<File> curFile , String pointtype){
+	    	File curTempFile = null;
+	    	String type = pointtype.replace(".", "");
+
+//	    	        Readers: [JPG, jpg, tiff, pcx, PCX, bmp, BMP, gif, GIF, WBMP, png, PNG, raw, RAW, JPEG, pnm, PNM, tif, TIF, TIFF, wbmp, jpeg]
+//	    	        Writers: [JPG, jpg, tiff, bmp, BMP, pcx, PCX, gif, GIF, WBMP, png, PNG, raw, RAW, JPEG, pnm, PNM, tif, TIF, TIFF, wbmp, jpeg]
+	    	        if("jpg".equals(type) || "png".equals(type) || "jpeg".equals(type) || "bmp".equals(type) || "gif".equals(type)
+	    	                 ){  // 动态创建文件  文件的内容是数值
+	    	//  不支持的格式      || "wbmp".equals(type) || "raw".equals(type)
+	    	            generalPicture(curFile , type );
+
+	    	        }else if("wbmp".equals(type) || "raw".equals(type)){  // 不能通过 ImageIO 来创建的图片格式  wbmp  raw
+
+	    	            // 待定
+	    	        } else if (isSupportType(type)){  // 从 G2  目录读取模板 然后输入输出 完成文件的创建
+	    	        File typeFile = getCurrentTemplateTypeFile(type);
+	    	            generalTemplateFile(curFile , type ,typeFile);
+	    	        }else{ // 其他格式 创建空的 后缀文件
+	    	            generalTemplateEmptyFile(curFile , type );
+	    	        }
+
+	    	    }
+	    
+	 void generalTemplateEmptyFile(ArrayList<File> picFileList , String pointtype ) {
+	    	String type = pointtype.replace(".", "");
+	        for (int i = 0; i < picFileList.size(); i++) {
+	            File curFile = picFileList.get(i);
+	            try {
+	                curFile.createNewFile();
+	            } catch (IOException e) {
+	                e.printStackTrace();
+	            }
+	        }
+
+	    }
+	    
+	 
+	 void generalTemplateFile(ArrayList<File> picFileList , String type , File templateFile)  {
+	    	 if(templateFile == null){
+	    	     return ;
+	    	 }
+	    	        for (int i = 0; i < picFileList.size(); i++) {
+	    	            int mCurIndex = i ;
+	    	            File mCurFile = picFileList.get(i);
+	    	            fileCopy(templateFile,mCurFile);
+	    	        }
+
+	    	    }
+	    
+	 
+	       File getCurrentTemplateTypeFile(String pointtype){
+		    	String type = pointtype.replace(".", "");
+	        String curType = type.toLowerCase();  // zbin/E5/txt/txt.txt
+	        File typeFile = new File(getG2ZbinDirPath()+File.separator+curType+File.separator+curType+"."+curType);
+	        if(!typeFile.exists()){
+	            System.out.println("当前类型文件:  type:"+type +" 模板文件缺失无法批量创建文件 请创建模板！ 执行失败！");
+	            return null;
+	        }
+	        return typeFile;
+	    }
+	    
+	  String getG2ZbinDirPath(){
+	           String path =System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin"+File.separator+"G2";
+	           return path;
+	       }
+	       
+	 
+	      void generalPicture(ArrayList<File> picFileList , String pointtype)  {
+
+	    	  showParams();
+		    	String type = pointtype.replace(".", "");
+	        for (int i = 0; i < picFileList.size(); i++) {
+	            int mCurIndex = i ;
+	            File mCurFile = picFileList.get(i);
+	            int width = jpg_width;
+	            int heigh = jpg_width;
+	            BufferedImage bi = new BufferedImage(width,heigh, BufferedImage.TYPE_INT_RGB);//INT精确度达到一定,RGB三原色，高度70,宽度150
+	//得到它的绘制环境(这张图片的笔)
+	            Graphics2D g2 = (Graphics2D) bi.getGraphics();
+	            g2.fillRect(0,0,jpg_width,jpg_width);//填充一个矩形 左上角坐标(0,0),宽500,高500;填充整张图片
+	            g2.setColor(new Color(jpg_Back_R,jpg_Back_G,jpg_Back_B));//设置颜色
+	            g2.fillRect(0,0,width,heigh);//填充整张图片(其实就是设置背景颜色)
+	            int frontSize = jpg_front_size;
+	            int centerx = jpg_width/2;
+	            int centery = jpg_hight/2;
+	            int showIndex = i + 1;
+	            g2.setColor(new Color(jpg_R,jpg_G,jpg_B));
+	            Font f =  new Font("宋体",Font.BOLD,frontSize);
+	            g2.setFont(f); //设置字体:字体、字号、大小
+	            FontRenderContext context = g2.getFontRenderContext();
+	            Rectangle2D bounds = f.getStringBounds(showIndex+"", context);
+	            if(isShowNumber) {
+		            g2.drawString(showIndex+"",(float)(centerx-bounds.getCenterX()),(float)(centery-bounds.getCenterY())); //向图片上写字符串
+	            }
+	            try {
+	                mCurFile.createNewFile();
+	                ImageIO.write(bi,type,new FileOutputStream(mCurFile));//保存图片 JPEG表示保存格式
+	                System.out.println("创建文件["+i+"]  = "+mCurFile.getAbsolutePath()+"成功");
+	            }catch (Exception e){
+	                System.out.println("复制图片格式出现异常！");
+	            }
+
+	        }
+	  	  showParams();
+
+	    }
+	    
+		
+	    public  ArrayList<File> getTypeFileListRule31(String dirAbsPath , String typeName , int fileCount) {
+	        ArrayList<File> curFileList = new ArrayList<File>();
+	        String typeNameNoPoint = typeName.replace(".", "");
+
+	        SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd_HHmmss");//设置日期格式
+	        String date = df.format(new Date());// new Date()为获取当前系统时间，也可使用当前时间戳
+	        String typeDir =  dirAbsPath + File.separator + typeNameNoPoint+"_"+date;
+	        File typeDirFile = new File(typeDir);
+	        typeDirFile.mkdirs();
+	        for (int i = 1; i < fileCount + 1; i++) {
+	            String itemFileStr = typeDirFile.getAbsolutePath()+File.separator+i+"."+typeNameNoPoint;
+	            File itemFile = new File(itemFileStr);
+	            curFileList.add(itemFile);
+	        }
+	         return curFileList;
+
+	    }
+	    
+		
+		boolean isSupportType( String type){
+	        boolean flag = false ;
+	        if("jpg".equals(type) || "jpeg".equals(type)  || "bmp".equals(type)  ||  "png".equals(type)  ||
+	                "wbmp".equals(type) || "gif".equals(type)
+	        || ("txt".equals(type)) || ("md".equals(type))  || ("java".equals(type)) || ("cpp".equals(type))
+	         || ("c".equals(type))  || ("xml".equals(type)) || ("json".equals(type)) || ("bat".equals(type))
+	                || ("sh".equals(type))   || ("zip".equals(type)) || ("rar".equals(type))
+	                || ("xlsx".equals(type))  || ("xls".equals(type))  || ("html".equals(type))
+	                || ("db".equals(type))  || ("js".equals(type))  || ("dll".equals(type)) || ("exe".equals(type))
+	                || ("gitignore".equals(type))   || ("h".equals(type))    || ("jar".equals(type))
+	                || ("py".equals(type))  || ("pkt".equals(type))  || ("7z".equals(type)) || ("pdf".equals(type))
+	                || ("doc".equals(type))  || ("apk".equals(type))  || ("pcapng".equals(type))
+	                || ("conf".equals(type))   || ("properties".equals(type))   || ("prop".equals(type)) || ("css".equals(type))
+	                || ("so".equals(type))     || ("bin".equals(type)) || ("raw".equals(type))
+	                || ("ppt".equals(type))     || ("pptx".equals(type))|| ("docx".equals(type))
+
+	        ){
+	            flag = true;
+	        }
+
+	        return flag;
+
+	    }
+		
+
+		
+	}
+	// 对文件的名称进行修改
+	class FileRenameOperation_Rule_30 extends Basic_Rule {
+
+
+		String firstParamStr; // 第一个参数
+
+		int DIR_OPERA_TYPE_APPEND = 1; // 后缀增加
+		String appendStr_1;
+		int DIR_OPERA_TYPE_PREFIX = 2; // 前缀增加
+		String prefixStr_2;
+
+		int DIR_OPERA_TYPE_CREATE = 3; // 创建文件
+		int beginIndex_3;
+		int endIndex_3;
+		String prefixStr_3;
+		String appendStr_3;
+
+		int DIR_OPERA_TYPE_REPLACE = 4; // 替换文件夹名称
+		String replacedStr_4;
+		String newNameStr_4;
+
+		// 识别当前用户 指定的操作类型 1后缀增加 2前缀增加 3创建文件 4替换文件夹名称
+		int currentOperaType = 0;
+
+		
+		ArrayList<String> fliterTypeList ;
+		
+		FileRenameOperation_Rule_30() {
+			super("#", 30, 4);
+			prefixStr_3 = "";
+			appendStr_3 = "";
+			fliterTypeList = new ArrayList<String>();
+		}
+
+		@Override
+		boolean initParamsWithInputList(ArrayList<String> inputParamList) {
+			boolean falg = true;
+			
+			for (int i = 0; i < inputParamList.size(); i++) {
+				String inputTypeItem = inputParamList.get(i).trim();
+				if(inputTypeItem.startsWith(".")) {
+					fliterTypeList.add(inputTypeItem);
+					
+				}
+			}
+			if (currentOperaType == 1) {
+				appendStr_1 = inputParamList.get(inputParamList.size() - 1);
+			} else if (currentOperaType == 2) {
+				prefixStr_2 = inputParamList.get(inputParamList.size() - 1);
+			} else if (currentOperaType == 4) {
+				String inputStr = inputParamList.get(inputParamList.size() - 1);
+				if (!inputStr.contains("_")) {
+					falg = false;
+				}
+		
+				if(inputStr.endsWith("_")  ) {
+					
+					replacedStr_4 = inputStr.substring(0,inputStr.length()-1);
+					newNameStr_4="";
+					
+				}else {
+					String[] inputArr = inputStr.split("_");
+					// item__ 
+			
+
+					if (inputArr.length >= 2) {
+
+						replacedStr_4 = inputArr[0];
+						newNameStr_4 = inputArr[inputArr.length - 1];
+					} else {
+						falg = false;
+					}
+					
+				}
+
+			} else if (currentOperaType == 3) {
+
+				for (int i = 0; i < inputParamList.size(); i++) {
+
+					String paramItem = inputParamList.get(i);
+					if (paramItem != null && paramItem.equals(firstParamStr)) {
+						continue; // 第一个参数不操作
+					}
+
+					if (!paramItem.contains("_")) {
+						falg = false;
+						continue;
+					}
+					String fixedParam = paramItem.replace("_", "");
+
+					if (isNumeric(fixedParam)) { // 如果是 字母 说明是起始的那个参数
+						String[] IndexArr = paramItem.split("_");
+
+						if (IndexArr.length >= 2) {
+
+							String beginIndex_3_Str = IndexArr[0];
+							String endIndex_3_Str = IndexArr[IndexArr.length - 1];
+							if (isNumeric(beginIndex_3_Str)) {
+								beginIndex_3 = Integer.parseInt(beginIndex_3_Str);
+
+							} else {
+								falg = false;
+							}
+
+							if (isNumeric(endIndex_3_Str)) {
+								endIndex_3 = Integer.parseInt(endIndex_3_Str);
+							} else {
+								falg = false;
+							}
+
+						} else {
+							falg = false;
+						}
+					} else { // 名称的参数
+						if (paramItem.endsWith("_")) {
+							appendStr_3 = "";
+							String[] NamePreArr = paramItem.split("_");
+							prefixStr_3 = NamePreArr[0];
+							System.out.println("appendStr_3=" + appendStr_3 + "   prefixStr_3=" + prefixStr_3);
+
+						} else {
+							String[] NamePreArr = paramItem.split("_");
+							if (NamePreArr.length >= 2) {
+								prefixStr_3 = NamePreArr[0];
+								appendStr_3 = NamePreArr[1];
+								System.out.println("appendStr_3=" + appendStr_3 + "   prefixStr_3=" + prefixStr_3);
+
+							}
+
+						}
+
+					}
+
+				}
+
+			}
+
+			return super.initParamsWithInputList(inputParamList) || falg;
+		}
+
+		@Override
+		ArrayList<File> applySubFileListRule4(ArrayList<File> curFileList,
+											  HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList,
+											  ArrayList<File> curRealFileList) {
+// 	// 识别当前用户 指定的操作类型 1后缀增加 2前缀增加 3创建文件 4替换文件夹名称 
+			
+			ArrayList<File> slectedFileList = getRealFileWithDirAndPointType(curDirFile,fliterTypeList);
+		
+			System.out.println("Rule30 修改文件  currentOperaType = "+currentOperaType+"   ");
+
+			switch (currentOperaType) {
+
+				case 1:
+					for (int i = 0; i < slectedFileList.size(); i++) {
+						File selectFile = slectedFileList.get(i);
+						String selectFileName = selectFile.getName();
+						String pointType = getFileTypeWithPoint(selectFileName);
+						String FileNameWithNoLower = getFileNameNoPoint(selectFileName);
+						String newselectFileName = FileNameWithNoLower + appendStr_1 +pointType;
+						tryReName(selectFile, newselectFileName);
+					}
+					break;
+
+				case 2:
+					for (int i = 0; i < slectedFileList.size(); i++) {
+						File selectFile = slectedFileList.get(i);
+						String selectFileName = selectFile.getName();
+						String newselectFileName = prefixStr_2 + selectFileName;
+						tryReName(selectFile, newselectFileName);
+					}
+					break;
+
+				case 3:
+					System.out.println("beginIndex_3 = "+beginIndex_3+"   endIndex_3="+endIndex_3);
+					for (int j = 0; j < fliterTypeList.size(); j++) {
+						String typeStr = fliterTypeList.get(j);
+					for (int i = beginIndex_3; i < endIndex_3 + 1; i++) {
+						String absDirPath = curDirFile.getAbsolutePath();
+				
+						
+							String selectFilePath = absDirPath + File.separator + prefixStr_3 + i + appendStr_3+typeStr;	
+							File curFileItem = new File(selectFilePath);
+							System.out.println("创建空 "+typeStr+" 文件 ["+i+"] = "+curFileItem.getName());
+							try {
+								curFileItem.createNewFile();
+							} catch (IOException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+						}
+	
+					}
+			
+					break;
+
+					// 4替换文件夹名称  
+				case 4:
+					System.out.println("replacedStr_4 = "+replacedStr_4+"   newNameStr_4="+newNameStr_4);
+
+					for (int i = 0; i < slectedFileList.size(); i++) {
+						File realFile = slectedFileList.get(i);
+						String realFileName = realFile.getName();
+						
+						String newRealName = realFileName.replace(replacedStr_4, newNameStr_4==null?"":newNameStr_4);
+						tryReName(realFile, newRealName);
+					}
+
+					break;
+
+				default:
+					System.out.println("当前 currentOperaType = " + currentOperaType + "  没有找到合适的操作类型去处理 Rule30 ");
+			}
+
+			return curDirList;
+		}
+
+		@Override
+		boolean initParams4InputParam(String inputParam) {
+
+			firstParamStr = inputParam;
+			if (inputParam.contains("append")) {
+				currentOperaType = 1;
+			} else if (inputParam.contains("prefix")) {
+				currentOperaType = 2;
+
+			} else if (inputParam.contains("replace")) {
+				currentOperaType = 4;
+
+			} else if (inputParam.contains("create")) {
+				currentOperaType = 3;
+
+			}
+
+			return super.initParams4InputParam(inputParam);
+		}
+
+		@Override
+		String simpleDesc() {
+			return "只对文件的文件名进行操作"+"\n" + Cur_Bat_Name + "  #_30_append  _over   ###往当前文件夹后缀增加 _over \n" + Cur_Bat_Name
+					+ "  #_30_append .jpg  _over   ###往当前所有文件前缀增加 xx_over.png \n" + Cur_Bat_Name
+					+ "  #_30_prefix  temp   ###往当前所有文件前缀增加 temp \n" + Cur_Bat_Name
+					+ "  #_30_prefix .jpg temp   ###往当前所有png文件前缀增加 temp tempxxx.png \n" + Cur_Bat_Name
+					+ " #_30_create .jpg 1_100   ###创建一个序列号从1.jpg到100.jpg的100个文件   \n" + Cur_Bat_Name
+					+ " #_30_create  .pptx   temp_  1_100   ###创建一个序列号从temp1.pptx到temp100.pptx的100个文件 \n" + Cur_Bat_Name
+					+ " #_30_create .doc .jpg  _temp  1_100   ###创建一个序列号从1temp.doc到100temp.doc 1temp.jpg到100temp.jpg 的100个文件 \n" + Cur_Bat_Name
+					+ " #_30_create .jpg  j_temp  1_100   ###创建一个序列号从 j_1_temp.jpg 到100temp的 j_100_temp.jpg 的文件 \n" + Cur_Bat_Name
+					+ " #_30_create .jpg   7000_7100  ###创建一个序列号从7000.png开始的到7100.png结束的文件  \n" + Cur_Bat_Name
+					+ " #_30_replace  abc_DEF  ###把当前文件名称中的  abc 转为 DEF \n"+ Cur_Bat_Name
+					+ " #_30_replace .jpg .png abc_DEF  ###把当前文件夹下的.jpg .png 名称中的  abc 转为 DEF \n"
+					;
+		}
+
+	}
 
 	
+	
+	class mergeSomePPTXAsOne_Rule_29 extends Basic_Rule { 	//  把 当前 目录的 多个 pptx 合并成 一个 pptx 文件 
+		boolean isDeteleOrigin = false;   // 是否把原pptx文件删除
+		mergeSomePPTXAsOne_Rule_29() {
+			super("#", 29, 4);
+			isDeteleOrigin = false;
+		}
+		
+		@Override
+		boolean initParamsWithInputList(ArrayList<String> inputParamList) {
+			
+//			param0[#_28]
+//			param1[name_90]
+					
+			for (int i = 0; i < inputParamList.size(); i++) {
+				String paramStr = inputParamList.get(i);
+				String paramStr_lower_trim= paramStr.toLowerCase().trim();
+				System.out.println("param"+i+"["+paramStr+"] ");
+
+				if(paramStr_lower_trim.startsWith("delete")) {
+					isDeteleOrigin = true;
+					
+				}
+			}
+
+			return super.initParamsWithInputList(inputParamList);
+		}
+		
+		@Override
+		ArrayList<File> applySubFileListRule4(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
+			ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+			
+			ArrayList<File> pptxFileList = new 	ArrayList<File> ();
+			int pptx_index = 1 ;
+			for (int i = 0; i < curRealFileList.size(); i++) {
+				File curFile = curRealFileList.get(i);
+				String currentFileName = curFile.getName().toLowerCase();
+				if (currentFileName.endsWith(".pptx") || currentFileName.endsWith(".ppt") ) {
+					pptxFileList.add(curFile);
+					System.out.println("pptx_index["+pptx_index+"] = "+ curFile.getAbsolutePath());
+					pptx_index++;
+				}
+
+			}
+			
+			if(pptxFileList.size() == 0) {
+				System.out.println("当前目录就没有  pptx文件 请检查! PATH = "+curDirPath);
+				return null;
+			}
+			
+			if(pptxFileList.size() == 1) {
+				System.out.println("当前目录只有1个  pptx文件  无需合并pptx操作! PATH = "+curDirPath);
+				return null;
+			}
+			
+			if(pptxFileList.size() > 1) {
+				try {
+		        XMLSlideShow ppt = new XMLSlideShow();
+				for (int i = 0; i < pptxFileList.size(); i++) {
+					File pptxFileItem = pptxFileList.get(i);
+				    FileInputStream inputstream;
+			
+						inputstream = new FileInputStream(pptxFileItem);
+			
+				    XMLSlideShow src;
+
+						src = new XMLSlideShow(inputstream);
+						int currentWidth = src.getPageSize().width;
+						int currentHeight = src.getPageSize().height;
+				        ppt.setPageSize(new Dimension(currentWidth,currentHeight));
+//				        System.out.println("currentWidth = "+currentWidth+"    currentHeight="+currentHeight);
+						
+						
+						
+				    for (XSLFSlide srcSlide : src.getSlides()) {
+				        ppt.createSlide().importContent(srcSlide);
+				  
+				    }
+				}
+				
+			    String result_pptx = curDirPath+File.separator+"Z_Merge"+pptxFileList.size()+"_"+getTimeStamp()+".pptx";
+			   File resultPPTX_File =  new File(result_pptx);
+			    // creating the file object
+			    FileOutputStream out = new FileOutputStream(resultPPTX_File);
+
+			    // saving the changes to a file
+			    ppt.write(out);
+			    System.out.println("Merging done successfully");
+			    out.close();
+			    
+			    if(resultPPTX_File.exists() && resultPPTX_File.length() > 100 && isDeteleOrigin) {
+					for (int i = 0; i < pptxFileList.size(); i++) {
+						File pptxFileItem = pptxFileList.get(i);
+						System.out.println("删除原始 pptx_"+i+"=["+pptxFileItem.getAbsolutePath()+"]");
+
+						pptxFileItem.delete();
+					}
+			    	
+			    	
+			    }
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					System.out.println("当前程序出现异常！！ Rule29 合并多 pdf操作 ");
+				}
+				
+				
+			}
+			
+
+		return super.applySubFileListRule4(curFileList, subFileTypeMap, curDirList, curRealFileList);
+		}
+		
+		
+		@Override
+		String simpleDesc() {
+			return "\n" + Cur_Bat_Name + "  #_29     ## 把当前目录下的 pptx文件合并为一个 pptx文件  【保留原有】的pptx文件 \n"
+					+ Cur_Bat_Name + " #_29  delete  ##把当前目录下的 pptx文件合并为一个 pptx文件  【删除原有】的pptx文件 \n"
+
+					;
+		}
+		
+		
+	}
+
+	
+//  把当前的 图片 文件  jpg png 等 转为 一个 PPTX 文件 方便 分享 查看 
 	class makeJpg2PPTX_Rule_28 extends Basic_Rule {
 		// 把文件后缀中的中文给去除掉 不包含文件夹 不包含孙文件
 
 		File TemplatePPTX_File ;
+		int begin_index;   // 由于 免费版本的 Presentation 最大创建 pptx页面为 10页 所以 才出现这些属性 尼玛 
+		int end_index;   // 由于 免费版本的 Presentation 最大创建 pptx页面为 10页 所以 才出现这些属性 尼玛 
 
 		boolean isShowName ;
 		int rotate_value;  //旋转的角度
         boolean bigkeep;  //  那些 与 电脑尺寸相同的 照片 保持正向的 比例
+        
+        ArrayList<String> mInputParamList;  // 记录当前的所有输入的参数
+        
 		makeJpg2PPTX_Rule_28() {
 				super("#", 28, 4);
 				TemplatePPTX_File = new File(zbinPath+File.separator+"G2_EmptyPPTX_Rule28.pptx");
 				rotate_value = 0;
 				isShowName = false;
 				bigkeep = false;
+				begin_index = 0;
+				end_index = 0;
+				mInputParamList = new ArrayList<String> ();
 			}
 
 			@Override
@@ -264,6 +1040,7 @@ public class G2_ApplyRuleFor_TypeFile {
 				
 //				param0[#_28]
 //				param1[name_90]
+				mInputParamList.addAll(inputParamList);
 						
 				for (int i = 0; i < inputParamList.size(); i++) {
 					String paramStr = inputParamList.get(i);
@@ -274,21 +1051,41 @@ public class G2_ApplyRuleFor_TypeFile {
 					if(paramStr.toLowerCase().contains("keepbig")) {
 						bigkeep = true;
 					}
-				}
-				String lastParams = inputParamList.get(inputParamList.size()-1);
-				if(lastParams != null && !lastParams.startsWith("#") && lastParams.contains("_")) {
-					String[] arrStr = lastParams.split("_");
-					if(arrStr != null && arrStr.length > 0) {
-						String lastNumStr = arrStr[arrStr.length-1];
-						if(isNumeric(lastNumStr)) {
-							rotate_value = Integer.parseInt(lastNumStr);
-						}
-					}
-
-				}else if(lastParams != null && isNumeric(lastParams.trim())){
 					
-					rotate_value = Integer.parseInt(lastParams.trim());
+					if(paramStr.contains("_") && isNumeric(paramStr.replace("_", "").trim())) {
+						String[] indesArr = paramStr.split("_");
+						if(indesArr != null && indesArr.length == 2) {
+							if(isNumeric(indesArr[0])) {
+								begin_index = Integer.parseInt(indesArr[0]);
+							}
+							
+							if(isNumeric(indesArr[1])) {
+								end_index = Integer.parseInt(indesArr[1]);
+							}
+							
+							
+						}
+						
+						
+					}
+					
+					if(paramStr != null && isNumeric(paramStr.trim())){
+						
+						rotate_value = Integer.parseInt(paramStr.trim());
+					}
 				}
+				/*
+				 * String lastParams = inputParamList.get(inputParamList.size()-1);
+				 * if(lastParams != null && !lastParams.startsWith("#") &&
+				 * lastParams.contains("_")) { String[] arrStr = lastParams.split("_");
+				 * if(arrStr != null && arrStr.length > 0) { String lastNumStr =
+				 * arrStr[arrStr.length-1]; if(isNumeric(lastNumStr)) { rotate_value =
+				 * Integer.parseInt(lastNumStr); } }
+				 * 
+				 * }else
+				 */
+					
+	
 				
 				
 				
@@ -338,7 +1135,33 @@ public class G2_ApplyRuleFor_TypeFile {
 					System.out.println("PPT_Width = "+ PPT_Width + "   PPT_Height="+PPT_Height);
 					ISlide slide = ppt.getSlides().get(0);
 					
+					// 
+					if(begin_index == 0 && end_index == 0 && pictureFileList.size() > 10 ) {
+						// 通过长度 计算   以及 输入 参数 inputParamList 动态计算 全部解析的命令
+						// buildCommandWIth(pictureFileList.size()，inputParamList)
+						System.out.println("当前目录图片文件大于10 个 !! 需要动态 动态创建 pptx 文件 请执行如下文件");
+						buildDynamic(pictureFileList.size(),mInputParamList);
+						
+						return null;
+					}
+					System.out.println("begin_index = "+ begin_index + "   end_index="+end_index);
+					
+			 
+					SortFileWithName(pictureFileList);
 					for (int i = 0; i < pictureFileList.size(); i++) {
+						System.out.println("Format_Index["+i+"] = "+pictureFileList.get(i).getAbsolutePath());
+					}
+					
+					for (int i = 0; i < pictureFileList.size(); i++) {
+						if(pictureFileList.size() > 10) {
+							if(i < begin_index ) {
+								continue;
+							}else if(i > end_index) {
+								continue;
+							}
+						}
+		
+						System.out.println("For_Index_i="+i);
 						File imageFile = pictureFileList.get(i);
 						String FileName = imageFile.getName();
 						String fileNameNoPoint = getFileNameNoPoint(FileName);
@@ -363,8 +1186,8 @@ public class G2_ApplyRuleFor_TypeFile {
 						   //获取第一张幻灯片，添加指定大小和位置的矩形文本框
 						   
 						   if(isShowName) {
-							   
-						        IAutoShape shape = ppt.getSlides().get(i).getShapes().appendShape(ShapeType.RECTANGLE,new Rectangle((int)(PPT_Width/2-PPT_Width/2), 0, (int)PPT_Width, 50));
+							   System.out.println("i-begin_index = "+ (i-begin_index));
+						        IAutoShape shape = ppt.getSlides().get(i-begin_index).getShapes().appendShape(ShapeType.RECTANGLE,new Rectangle((int)(PPT_Width/2-PPT_Width/2), 0, (int)PPT_Width, 50));
 
 						        
 						        //设置shape样式
@@ -430,7 +1253,7 @@ public class G2_ApplyRuleFor_TypeFile {
 						
 						   if(isShowName) {
 							   
-						        IAutoShape shape = ppt.getSlides().get(i).getShapes().appendShape(ShapeType.RECTANGLE,new Rectangle((int)(PPT_Width/2-PPT_Width/2), 0, (int)PPT_Width, 50));
+						        IAutoShape shape = ppt.getSlides().get(i-begin_index).getShapes().appendShape(ShapeType.RECTANGLE,new Rectangle((int)(PPT_Width/2-PPT_Width/2), 0, (int)PPT_Width, 50));
 
 						        
 						        //设置shape样式
@@ -455,10 +1278,17 @@ public class G2_ApplyRuleFor_TypeFile {
 						   
 					}
 
-					if(i != pictureFileList.size()-1) {
-						
+					if(i == 0) {
 					    slide = ppt.getSlides().append();
+					  System.out.println("AA for 1 ppt.getSlides().size() = "+ppt.getSlides().size());	
+					  continue;
 					}
+					if(i != pictureFileList.size()-1 && i != end_index ) {
+					    slide = ppt.getSlides().append();
+						System.out.println("AA ppt.getSlides().size() = "+ppt.getSlides().size());
+
+					}
+					System.out.println("BB ppt.getSlides().size() = "+ppt.getSlides().size());
 				
 					
 					}
@@ -478,6 +1308,53 @@ public class G2_ApplyRuleFor_TypeFile {
 				return curRealFileList;
 			}
 
+			
+		void	buildDynamic(int size , ArrayList<String> params){
+			System.out.println("═══════════════════════════════════"+"动态命令"+"═══════════════════════════════════");
+				int forCount = (int)(size/10) + 1;  // 
+
+				StringBuilder allCommandSB = new StringBuilder();
+				for (int i = 0; i < forCount; i++) {
+					ArrayList<String> commandList = new 	ArrayList<String>();
+					StringBuilder tempSB = new StringBuilder();
+					commandList.add(Cur_Bat_Name);
+					commandList.addAll(params);
+		
+					int begin_index = i*10;
+					int end_index = i*10 + 9;
+					if(end_index > size ) {
+						end_index = size - 1;
+					}
+					
+					if(begin_index > end_index) {
+						continue;
+					}
+					String order_str = begin_index+"_"+end_index;
+	
+					commandList.add(" "+order_str+"");
+					
+					for (int j = 0; j < commandList.size(); j++) {
+						String itemStr = commandList.get(j);
+						tempSB.append(itemStr+"  ");
+					}
+			
+					if(i != forCount -1) {
+						tempSB.append("  &&  ");
+					}
+			
+					allCommandSB.append(tempSB.toString());
+					
+					
+				}
+				if(allCommandSB.toString().trim().endsWith("&&")) {
+					System.out.println(allCommandSB +"   "+Cur_Bat_Name +"  #_29  delete");
+				}else {
+					System.out.println(allCommandSB +"  &&  "+Cur_Bat_Name +"  #_29  delete");
+				}
+			
+				
+				
+			}
 			@Override
 			String simpleDesc() {
 				return " // 把当前目录下文件 下的picture媒体文件 生成 PPTX文件   \n" 
@@ -487,14 +1364,14 @@ public class G2_ApplyRuleFor_TypeFile {
 						+ Cur_Bat_Name+ " #_28 180     [索引28]   // 把当前目录下文件 下的picture媒体文件 旋转180度 生成 PPTX文件   \n"
 						+ Cur_Bat_Name	+ " #_28 270     [索引28]   // 把当前目录下文件 下的picture媒体文件 并旋转270度 生成 PPTX文件   \n"
 						+ Cur_Bat_Name+ " #_28 name     [索引28]   // 把当前目录下文件 下的picture媒体文件 并添加文件名 生成 PPTX文件   \n"
-						+ Cur_Bat_Name   + " #_28 name_0     [索引28]   // 把当前目录下文件 下的picture媒体文件 旋转0度 并添加文件名 生成 PPTX文件   \n"
-						+ Cur_Bat_Name  + " #_28 name_90     [索引28]   // 把当前目录下文件 下的picture媒体文件 旋转90度 并添加文件名 生成 PPTX文件   \n"
-						+ Cur_Bat_Name  + " #_28 name_180     [索引28]   // 把当前目录下文件 下的picture媒体文件 旋转180度 并添加文件名 生成 PPTX文件   \n"
-						+ Cur_Bat_Name  + " #_28 name_270     [索引28]   // 把当前目录下文件 下的picture媒体文件 旋转270度 并添加文件名 生成 PPTX文件   \n"
-				  		+ Cur_Bat_Name  + " #_28 keepbig name_0     [索引28]   // 把当前目录下文件  图片比例与电脑尺寸相同(PC 宽>高)的保持正向 比例不同的(手机 宽<高) 旋转0度 并添加文件名 生成 PPTX文件   \n"
-				   		+ Cur_Bat_Name  + " #_28 keepbig name_90     [索引28]   // 把当前目录下文件  图片比例与电脑尺寸相同(PC 宽>高)的保持正向 比例不同的(手机 宽<高) 旋转90度 并添加文件名 生成 PPTX文件   \n"
-				   		+ Cur_Bat_Name  + " #_28 keepbig name_180     [索引28]   // 把当前目录下文件  图片比例与电脑尺寸相同(PC 宽>高)的保持正向 比例不同的(手机 宽<高) 旋转180度 并添加文件名 生成 PPTX文件   \n"
-						+ Cur_Bat_Name  + " #_28 keepbig name_270     [索引28]   // 把当前目录下文件  图片比例与电脑尺寸相同(PC 宽>高)的保持正向 比例不同的(手机 宽<高) 旋转270度 并添加文件名 生成 PPTX文件   \n"
+						+ Cur_Bat_Name   + " #_28 name 0     [索引28]   // 把当前目录下文件 下的picture媒体文件 旋转0度 并添加文件名 生成 PPTX文件   \n"
+						+ Cur_Bat_Name  + " #_28 name 90     [索引28]   // 把当前目录下文件 下的picture媒体文件 旋转90度 并添加文件名 生成 PPTX文件   \n"
+						+ Cur_Bat_Name  + " #_28 name 180     [索引28]   // 把当前目录下文件 下的picture媒体文件 旋转180度 并添加文件名 生成 PPTX文件   \n"
+						+ Cur_Bat_Name  + " #_28 name 270     [索引28]   // 把当前目录下文件 下的picture媒体文件 旋转270度 并添加文件名 生成 PPTX文件   \n"
+				  		+ Cur_Bat_Name  + " #_28 keepbig name 0     [索引28]   // 把当前目录下文件  图片比例与电脑尺寸相同(PC 宽>高)的保持正向 比例不同的(手机 宽<高) 旋转0度 并添加文件名 生成 PPTX文件   \n"
+				   		+ Cur_Bat_Name  + " #_28 keepbig name 90     [索引28]   // 把当前目录下文件  图片比例与电脑尺寸相同(PC 宽>高)的保持正向 比例不同的(手机 宽<高) 旋转90度 并添加文件名 生成 PPTX文件   \n"
+				   		+ Cur_Bat_Name  + " #_28 keepbig name 180     [索引28]   // 把当前目录下文件  图片比例与电脑尺寸相同(PC 宽>高)的保持正向 比例不同的(手机 宽<高) 旋转180度 并添加文件名 生成 PPTX文件   \n"
+						+ Cur_Bat_Name  + " #_28 keepbig name 270     [索引28]   // 把当前目录下文件  图片比例与电脑尺寸相同(PC 宽>高)的保持正向 比例不同的(手机 宽<高) 旋转270度 并添加文件名 生成 PPTX文件   \n"
 
 						;
 				
@@ -3694,6 +4571,8 @@ public class G2_ApplyRuleFor_TypeFile {
 			return curDirList;
 		}
 	}
+	
+
 
 	// // zrule_apply_G2.bat #_10_append 2001 往当前文件夹后缀增加 2001
 	// // zrule_apply_G2.bat #_10_prefix 2001 往当前文件夹前缀增加 2001
@@ -4461,6 +5340,8 @@ newRealFile=D:\BaiduNetdiskDownload\公式\bad_batch\good_batch\A.pdf
 		return originName.replace(type, "");
 	}
 
+
+	
 	public static String getFileTypeWithPoint_unknow(String fileName) {
 		String name = "";
 		if (fileName.contains(".")) {
@@ -5407,6 +6288,13 @@ newRealFile=D:\BaiduNetdiskDownload\公式\bad_batch\good_batch\A.pdf
 			return true;
 		}
 
+		@Override
+		boolean allowEmptyDirFileList() {
+			return false;
+		}
+		
+		
+		
 		String simpleDesc() {
 			return null;
 		}
@@ -5458,6 +6346,8 @@ newRealFile=D:\BaiduNetdiskDownload\公式\bad_batch\good_batch\A.pdf
 		ArrayList<String> curFilterFileTypeList; // 当前的文件过滤类型 多种文件过滤类型 例如把 多种格式 jpeg png 转为 jpg 时 使用到
 		ArrayList<File> curFixedFileList; // 当前修改操作成功的集合
 
+		abstract boolean allowEmptyDirFileList();  // 是否允许当前的目录下的文件为空 
+		
 		abstract String applyStringOperationRule1(String origin);
 
 		abstract File applyFileByteOperationRule2(File originFile);
@@ -6005,9 +6895,12 @@ newRealFile=D:\BaiduNetdiskDownload\公式\bad_batch\good_batch\A.pdf
 				typeFileList = getAllSubFile(mCurDirFile, null, curApplayRule.curFilterFileTypeList);
 			}
 
-			if (typeFileList.size() == 0) {
+			if (typeFileList.size() == 0 ) {
 				System.out.println("未能搜索到类型列表匹配的文件:  " + Rule_Identify_TypeIndexList.get(i));
-				continue;
+				if(!curApplayRule.allowEmptyDirFileList()) {  // 是否允许当前目录下的文件夹为空 
+					continue;
+				}
+		
 			}
 			initFileTypeMap(typeFileList);
 
@@ -6140,6 +7033,9 @@ newRealFile=D:\BaiduNetdiskDownload\公式\bad_batch\good_batch\A.pdf
 	}
 
 	static void initFileTypeMap(ArrayList<File> subFileList) {
+		if(subFileList == null) {
+			return;
+		}
 		for (File curFile : subFileList) {
 			String fileName = curFile.getName();
 			if (!fileName.contains(".")) {
@@ -6519,6 +7415,126 @@ newRealFile=D:\BaiduNetdiskDownload\公式\bad_batch\good_batch\A.pdf
         g2.drawImage(src, null, null);
         return res;
     }
+    
+	static void SortFileWithName(ArrayList<File> fileList) {
+	    Comparator<Object> CHINA_COMPARE = Collator.getInstance(java.util.Locale.CHINA);
+	    fileList.sort((o1_file, o2_file) -> {
+	        //比较的基本原则，拿最小长度的字符串进行比较，若全部相等，则长字符串往后排
+	    	String o1 = o1_file.getName();
+	    	String o2 = o2_file.getName();
+	        int len1 = o1.length();
+	        int len2 = o2.length();
+	        int len = (len1 - len2) <= 0 ? len1 : len2;
+	        StringBuilder sb1 = new StringBuilder();
+	        StringBuilder sb2 = new StringBuilder();
+	        for (int i = 0; i < len; i++) {
+	            String s1 = o1.substring(i, i + 1);
+	            String s2 = o2.substring(i, i + 1);
+	            if (isNumericFirstChar(s1) && isNumericFirstChar(s2)){
+	                //取出所有的数字
+	                sb1.append(s1);
+	                sb2.append(s2);
+	                //取数字时，不比较
+	                continue;
+	            }
+	            if (sb1.length() != 0 && sb2.length() != 0){
+	                if (!isNumericFirstChar(s1) && !isNumericFirstChar(s2)){
+	                    int value1 = Integer.valueOf(sb1.toString());
+	                    int value2 = Integer.valueOf(sb2.toString());
+	                    return value1 - value2;
+	                } else if (isNumericFirstChar(s1)) {
+	                    return 1;
+	                } else if (isNumericFirstChar(s2)) {
+	                    return -1;
+	                }
+	            }
+	            int result = CHINA_COMPARE.compare(s1, s2);
+	            if (result != 0) {
+	                return result;
+	            }
+	        }
+	        //这一步：是为了防止以下情况：第10  第20，正好以数字结尾，且字符串长度相等
+	        if (len1 == len2 && sb1.length() != 0 && sb2.length() != 0) {
+	            int value1 = Integer.valueOf(sb1.toString());
+	            int value2 = Integer.valueOf(sb2.toString());
+	            return value1 - value2;
+	        }
+	        //若前面都相等，则直接比较字符串的长度，长的排后面，短的排前面
+	        return Integer.compare(len1, len2);
+	    });
+		
+		
+	}
+	
+    //判断是否是数字
+ static boolean isNumericFirstChar(String s){
+        return Character.isDigit(s.charAt(0));
+    }
+ 
+	static ArrayList<File> getRealFileWithDirAndPointType(File dirFile,ArrayList<String> selectTypeList){
+		
+		ArrayList<File> targetFileList = new 	ArrayList<File> ();
+		if(dirFile ==null || !dirFile.exists() || dirFile.isFile()) {
+			return targetFileList;
+		}
+		
+        File[] dir_fileList = dirFile.listFiles();
+		
+        for (int i = 0; i < dir_fileList.length; i++) {
+			File itemFile = dir_fileList[i];
+			if(itemFile.isDirectory()) {
+				continue;
+			}
+
+			if(selectTypeList == null || selectTypeList.size() == 0) {
+				targetFileList.add(itemFile);
+				continue;
+			}
+			String fileName_lower = itemFile.getName().toLowerCase();
+			
+			for (int j = 0; j < selectTypeList.size(); j++) {
+				String typeStr = selectTypeList.get(j);
+				if(fileName_lower.endsWith(typeStr.trim().toLowerCase())) {
+					targetFileList.add(itemFile);
+				}
+
+			}
+		
+
+			
+		}
+		return targetFileList;
+	}
+	
+	static ArrayList<File> getRealFileWithDirAndPointType(File dirFile,String type){
+		
+		ArrayList<File> targetFileList = new 	ArrayList<File> ();
+		if(dirFile ==null || !dirFile.exists() || dirFile.isFile()) {
+			return targetFileList;
+		}
+		
+        File[] dir_fileList = dirFile.listFiles();
+		
+        for (int i = 0; i < dir_fileList.length; i++) {
+			File itemFile = dir_fileList[i];
+			if(itemFile.isDirectory()) {
+				continue;
+			}
+			if(type == null || "".equals(type.trim())) {
+				targetFileList.add(itemFile);
+				continue;
+			}
+			String fileName_lower = itemFile.getName().toLowerCase();
+			
+			
+			if(fileName_lower.endsWith(type.trim().toLowerCase())) {
+				targetFileList.add(itemFile);
+			}
+			
+		}
+		return targetFileList;
+	}
+ 
     
 	static void NotePadOpenTargetFile(String absPath){
 		String commandNotead = "";

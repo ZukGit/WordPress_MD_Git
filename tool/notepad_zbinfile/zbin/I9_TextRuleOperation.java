@@ -388,7 +388,7 @@ public class I9_TextRuleOperation {
         CUR_RULE_LIST.add( new Bat_Revert_MD_Rule29()); // 读取当前.bat 文件内容 进行 解析生成 MD文件的下半部分 并会解析新增的Method到模板文件  zzbattest_I9.bat
         CUR_RULE_LIST.add( new Show_Bat_Template_OnDir_Rule_30()); //  把当前模板文件 zzbattest_I9.bat 内容写进当前目录下 Test_xx.bat文档 并打开它
         CUR_RULE_LIST.add( new Bat_Format_Rule_31()); // 对当前 bat 文件进行 format 如果不是bat文件不操作 增项假如模板zbatrule_I9_Rule30.bat中
-//        CUR_RULE_LIST.add( new Image2Jpeg_Rule_3());
+        CUR_RULE_LIST.add( new Build_SH_BAT_WithJavaWithJar_Rule_32());
 //        CUR_RULE_LIST.add( new Image2Png_Rule_4());
 //        CUR_RULE_LIST.add( new AVI_Rule_5());
 //        CUR_RULE_LIST.add( new SubDirRename_Rule_6());
@@ -397,6 +397,163 @@ public class I9_TextRuleOperation {
 
     }
     
+    
+    
+    //依据当前目录 动态构建 java 运行命令  包括 sh  和 bat  // 当前目录只能有一个 .java 多个 .jar 包
+    class Build_SH_BAT_WithJavaWithJar_Rule_32 extends  Basic_Rule{
+
+    	Build_SH_BAT_WithJavaWithJar_Rule_32(){
+            super(32,false);
+        }
+
+        @Override
+        ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+            ArrayList<String>  realFileNameList = new  ArrayList<String>();
+
+            File dirFile =  curInputFileList.get(0).getParentFile();
+            File[] fileList =  dirFile.listFiles();
+            System.out.println("dirFile = "+ dirFile + "        fileList = "+ fileList.length );
+            ArrayList<File>  CurRealFileList = new  ArrayList<File>();
+
+            File javaFile = null;
+            String RuleIndexTag ="";
+            CurRealFileList.addAll(Arrays.asList(fileList));
+            ArrayList<String> jarFileNameList = new  ArrayList<String>();
+
+            int java_count = 0;
+            for (int i = 0; i < CurRealFileList.size(); i++) {
+                File fileItem = CurRealFileList.get(i);
+                String fileName = fileItem.getName();
+                if(fileName.endsWith(".java")) {
+                	javaFile = fileItem;
+                	if(fileName.contains("_")) {
+                		RuleIndexTag = fileName.split("_")[0].trim();
+                	}
+                	java_count++;
+                	if(java_count > 1) {
+                		System.out.println("当前目录下的 Java 文件大于1 无法动态生成 "+RuleIndexTag+BAT_OR_SH_Point);
+                	    return null;
+                	}
+                }
+                if(fileItem.isFile() && fileName.trim().toLowerCase().endsWith(".jar") && fileItem.exists()){
+                	jarFileNameList.add(fileName);
+                }
+            }
+            
+            if(javaFile == null) {
+            	System.out.println("当前目录 不存在 java 文件 无法生成 bat sh 运行命令! ");
+            	return null;
+            }
+            
+            ArrayList<String> allCommandList = new       ArrayList<String>();
+            ArrayList<String> batCommandList = new ArrayList<String>();
+            ArrayList<String> shCommandList = new ArrayList<String>();
+            buildBatCommand(batCommandList,javaFile,jarFileNameList,RuleIndexTag);
+            buildShCommand(shCommandList,javaFile,jarFileNameList,RuleIndexTag);
+         	allCommandList.add("════════════════════════ "+RuleIndexTag+".bat"+" ════════════════════════");
+         	allCommandList.addAll(batCommandList);
+         	allCommandList.add("");
+         	allCommandList.add("════════════════════════ "+RuleIndexTag+".sh"+" ════════════════════════");
+         	allCommandList.addAll(shCommandList);
+         	allCommandList.add("");
+            
+         	File batFile = new File(dirFile+File.separator+RuleIndexTag+".bat");
+            writeContentToFile(batFile,batCommandList);
+            
+         	File shFile = new File(dirFile+File.separator+RuleIndexTag+".sh");
+            writeContentToFile(shFile,shCommandList);
+            
+            
+            
+            writeContentToFile(I9_Temp_Text_File,allCommandList);
+            NotePadOpenTargetFile(I9_Temp_Text_File.getAbsolutePath());
+
+            return super.applyOperationRule(curFileList, subFileTypeMap, curDirList, curRealFileList);
+        }
+
+        void buildBatCommand( ArrayList<String>  batList , File javaFile ,  ArrayList<String>  jarNameList , String RuleTag) {
+//        	batList.add("════════════════════════ "+RuleTag+BAT_OR_SH_Point+" ════════════════════════");
+
+        	StringBuilder jarSB = new StringBuilder();
+        	for (int i = 0; i < jarNameList.size(); i++) {
+        		// %userprofile%\Desktop\zbin\G2_webp-imageio.jar;
+        		// G2_webp-imageio.jar;
+				String jarName = jarNameList.get(i);
+				if(!jarName.startsWith(RuleTag)) {
+					System.out.println("!!!!!!!!!!!!!!!!警告当前存在 Jar包不是规则命名: "+jarName);
+					batList.add("!!!!!!!!!!!!!!!!!!警告当前存在 Jar包不是规则命名: "+jarName);
+				}
+				jarSB.append("%userprofile%\\Desktop\\zbin\\"+jarName+";");
+				
+			}
+        	String javaNameNoPoint = getFileNameNoPointNoLowerCase(javaFile.getName());
+        	
+        	String classPathStr = jarSB.toString()+"%userprofile%\\Desktop\\zbin";
+//        	@echo off
+//        	Setlocal ENABLEDELAYEDEXPANSION
+//        	@javac -cp %userprofile%\Desktop\zbin\G2_webp-imageio.jar;%userprofile%\Desktop\zbin\G2_spire.presentation.free-3.9.0.jar;%userprofile%\Desktop\zbin\G2_fontbox.jar;%userprofile%\Desktop\zbin\G2_commons-logging-api.jar;%userprofile%\Desktop\zbin\G2_pdfbox.jar;%userprofile%\Desktop\zbin\G2_hutool.jar;%userprofile%\Desktop\zbin\G2_jshortcut_oberzalek.jar -Xlint:unchecked -encoding UTF-8 %userprofile%\Desktop\zbin\G2_ApplyRuleFor_TypeFile.java
+//        	@java -cp  %userprofile%\Desktop\zbin\G2_webp-imageio.jar;%userprofile%\Desktop\zbin\G2_spire.presentation.free-3.9.0.jar;%userprofile%\Desktop\zbin\G2_fontbox.jar;%userprofile%\Desktop\zbin\G2_commons-logging-api.jar;%userprofile%\Desktop\zbin\G2_pdfbox.jar;%userprofile%\Desktop\zbin\G2_hutool.jar;%userprofile%\Desktop\zbin\G2_jshortcut_oberzalek.jar;%userprofile%\Desktop\zbin    G2_ApplyRuleFor_TypeFile %1  %2  %3 %4  %5  %6  %7  %8  %9 
+    	
+        	batList.add("@echo off");
+        	batList.add("Setlocal ENABLEDELAYEDEXPANSION");
+        	batList.add("@javac -cp "+classPathStr+"  -Xlint:unchecked -encoding UTF-8 %userprofile%\\Desktop\\zbin\\"+javaFile.getName());
+        	batList.add("@java -cp "+classPathStr+"  "+javaNameNoPoint+"  %1  %2  %3 %4  %5  %6  %7  %8  %9 ");
+       
+        }
+        
+        void buildShCommand( ArrayList<String>  shList , File javaFile ,  ArrayList<String>  jarNameList , String RuleTag) {
+        	
+//        	shList.add("════════════════════════ "+RuleTag+BAT_OR_SH_Point+" ════════════════════════");
+
+        	StringBuilder jarSB = new StringBuilder();
+        	for (int i = 0; i < jarNameList.size(); i++) {
+        		// %userprofile%\Desktop\zbin\G2_webp-imageio.jar;
+        		// G2_webp-imageio.jar;
+				String jarName = jarNameList.get(i);
+				if(!jarName.startsWith(RuleTag)) {
+					System.out.println("!!!!!!!!!!!!!!!!警告当前存在 Jar包不是规则命名: "+jarName);
+					shList.add("!!!!!!!!!!!!!!!!!!警告当前存在 Jar包不是规则命名: "+jarName);
+				}
+				jarSB.append("$HOME/Desktop/zbin/"+jarName+":");
+				
+			}
+        	
+        	String classPathStr = "classpath=$classes:"+jarSB.toString()+"$HOME/Desktop/zbin/";
+//        	#!/bin/bash
+//        	CURPATH=$(pwd)
+//        	DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )" 
+//        	#cd $DIR
+//        	classes=$DIR
+//        	libs=$DIR
+//        	classpath=$classes:$HOME/Desktop/zbin/G2_jshortcut_oberzalek.jar:$HOME/Desktop/zbin/G2_webp-imageio.jar:$HOME/Desktop/zbin/
+//
+//        	javac -classpath $classpath -encoding UTF-8 $HOME/Desktop/zbin/G2_ApplyRuleFor_TypeFile.java
+//        	java  -classpath $classpath G2_ApplyRuleFor_TypeFile $1 $2 $3 $4 $5 $6 $7 $8 $9 
+
+        	String javaNameNoPoint = getFileNameNoPointNoLowerCase(javaFile.getName());
+        	
+        	shList.add("#!/bin/bash");
+        	shList.add("CURPATH=$(pwd)");
+        	shList.add("DIR=\"$( cd \"$( dirname \"${BASH_SOURCE[0]}\" )\" && pwd )\" ");
+        	shList.add("#cd $DIR");
+        	shList.add("classes=$DIR");
+        	shList.add(classPathStr);
+        	shList.add("");
+        	shList.add("javac -classpath $classpath -encoding UTF-8 $HOME/Desktop/zbin/"+javaFile.getName());
+        	shList.add("@javac -cp "+jarSB.toString()+"  -Xlint:unchecked -encoding UTF-8 %userprofile%\\Desktop\\zbin\\"+javaFile.getName());
+        	shList.add("java  -classpath $classpath "+javaNameNoPoint+ " $1 $2 $3 $4 $5 $6 $7 $8 $9 ");
+        	
+        }
+        
+        
+        
+        
+        @Override
+        String simpleDesc() {
+            return " ## A1.bat G1.bat G2.sh 本地依据Java名称生成 包括 xx.sh  和 xx.bat  // 当前目录只能有一个 .java 多个 .jar 包 !";
+        }
+
+    }
     
     class Bat_Format_Rule_31 extends  Basic_Rule{
 
@@ -5545,6 +5702,16 @@ public class I9_TextRuleOperation {
         return name.toLowerCase().trim();
     }
 
+    public  static String getFileNameNoPointNoLowerCase(String fileName){
+        String name = "";
+        if(fileName.contains(".")){
+            name = fileName.substring(0,fileName.lastIndexOf(".") ).trim();
+        }else{
+            name = new String(fileName);
+        }
+        return name.trim();
+    }
+    
     public  static String getFileTypeWithPoint(String fileName){
         String name = "";
         if(fileName.contains(".")){
