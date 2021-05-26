@@ -1861,7 +1861,7 @@ echo ______________Method_In rule5vscreen2end_func_1x0
 set rule5vscreen2end_dynamic_param1=
 if "%init_input_2%"=="" (
 set  rule5vscreen2end_dynamic_param1=1000000
-) else (  
+)
 echo allLoop=[!rule5vscreen2end_dynamic_param1!]        
 for /l %%i in (1, 1, !rule5vscreen2end_dynamic_param1!) do (
 rem echo i == %%i   _todown        
@@ -2418,6 +2418,43 @@ goto:eof
 
 
 
+:rule21vmultiscreen2end_func_1x0
+rem ======================================== rule21vmultiscreen2end_func_1x0
+rem rule_tip: %init_input_0% _21_  c2f5b32c        ##小米_有线USB_手机执行  adb -s c2f5b32c shell input swipe 340 1000 340 100 10 快速往下滑动 不打印Log了 默认执行百万次
+
+rem rule_tip: %init_input_0% _21_  721QECRM2ZMT4   ##魅蓝_有线USB_手机执行  adb -s 721QECRM2ZMT4 shell input swipe 340 1000 340 100 10 快速往下滑动 不打印Log了 默认执行百万次
+
+rem rule_tip: %init_input_0% _21_  HMKNW17531001873   ##荣耀_有线USB_手机执行 adb -s HMKNW17531001873 shell input swipe 340 1000 340 100 10 快速往下滑动 不打印Log了 默认执行百万次
+
+rem rule_tip: %init_input_0% _21_  192.168.31.89:5555   ##小米_无线USB_无线adb adb -s 192.168.31.89:5555 shell input swipe 340 1000 340 100 10 快速往下滑动 不打印Log了 默认执行百万次
+
+rem rule_tip: %init_input_0% _21_  192.168.31.40:5555   ##魅蓝_无线USB_无线adb adb -s 192.168.31.40:5555 shell input swipe 340 1000 340 100 10 快速往下滑动 不打印Log了 默认执行百万次
+
+rem rule_tip: %init_input_0% _21_  192.168.31.10:5555   ##荣耀_无线USB_无线adb adb -s 192.168.31.10:5555 shell input swipe 340 1000 340 100 10 快速往下滑动 不打印Log了 默认执行百万次
+rem desc: 
+rem sample: 
+rem sample_out: 
+::SETLOCAL
+echo ______________Method_In rule21vmultiscreen2end_func_1x0
+set rule21vmultiscreen2end_dynamic_param1=
+set rule5vscreen2end_dynamic_param1=
+if "%init_input_2%"=="" (
+set  rule5vscreen2end_dynamic_param1=c2f5b32c
+) 
+echo allLoop=[1000000]        
+for /l %%i in (1, 1, 1000000) do (
+rem echo i == %%i   _todown        
+echo adb -s %init_input_2% shell input swipe 340 1000 340 200  50 [i == %%i   _todown  ]
+adb -s %init_input_2% shell input swipe 340 1000 340 200  50
+)
+echo [rule21vmultiscreen2end_func_1x0 EndPrintCode]    output=[__empty__] dynamic_param1=[!rule21vmultiscreen2end_dynamic_param1!]   
+echo ______________Method_Out rule21vmultiscreen2end_func_1x0
+::ENDLOCAL
+goto:eof
+
+
+
+
 :ruletipprint_func_0x0
 rem ======================================== ruletipprint_func_0x0
 rem desc: Bussiness_Rule打印程序用于打印batrule规则序列
@@ -2464,6 +2501,18 @@ echo %init_input_0% _18_   100000   ##小米_无线USB_无线adb  adb -s 192.168
 echo %init_input_0% _19_   100000   ##魅蓝_无线USB_无线adb  adb -s 192.168.31.40:5555 shell input swipe 340 1200 340 400 命令向下滑动两下向上滑动一下 默认100000次
 
 echo %init_input_0% _20_   100000   ##荣耀_无线USB_无线adb  adb -s 192.168.31.10:5555 shell input swipe 340 1200 340 400 命令向下滑动两下向上滑动一下 默认100000次
+
+echo %init_input_0% _21_  c2f5b32c        ##小米_有线USB_手机执行  adb -s c2f5b32c shell input swipe 340 1000 340 100 10 快速往下滑动 不打印Log了 默认执行百万次
+
+echo %init_input_0% _21_  721QECRM2ZMT4   ##魅蓝_有线USB_手机执行  adb -s 721QECRM2ZMT4 shell input swipe 340 1000 340 100 10 快速往下滑动 不打印Log了 默认执行百万次
+
+echo %init_input_0% _21_  HMKNW17531001873   ##荣耀_有线USB_手机执行 adb -s HMKNW17531001873 shell input swipe 340 1000 340 100 10 快速往下滑动 不打印Log了 默认执行百万次
+
+echo %init_input_0% _21_  192.168.31.89:5555   ##小米_无线USB_无线adb adb -s 192.168.31.89:5555 shell input swipe 340 1000 340 100 10 快速往下滑动 不打印Log了 默认执行百万次
+
+echo %init_input_0% _21_  192.168.31.40:5555   ##魅蓝_无线USB_无线adb adb -s 192.168.31.40:5555 shell input swipe 340 1000 340 100 10 快速往下滑动 不打印Log了 默认执行百万次
+
+echo %init_input_0% _21_  192.168.31.10:5555   ##荣耀_无线USB_无线adb adb -s 192.168.31.10:5555 shell input swipe 340 1000 340 100 10 快速往下滑动 不打印Log了 默认执行百万次
 echo [ruletipprint_func_0x0 EndPrintCode]   output=[__empty__]  param1=[__empty__] 
 echo ______________Method_Out ruletipprint_func_0x0
 ::ENDLOCAL
