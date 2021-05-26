@@ -8,6 +8,12 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
+import com.mpatric.mp3agic.ID3v2;
+import com.mpatric.mp3agic.InvalidDataException;
+import com.mpatric.mp3agic.Mp3File;
+import com.mpatric.mp3agic.NotSupportedException;
+import com.mpatric.mp3agic.UnsupportedTagException;
+
 public class D6_FileNameSearch {
 
 
@@ -23,13 +29,13 @@ public class D6_FileNameSearch {
     static Set<File> allDirFileSet = new HashSet<>();  // 工程下所有的 文件夹文件
     static Set<File> allSimpleFileSet = new HashSet<>();   // 当前工程下所有非文件夹的 文件
     static int mSumDirNum = 0;
-
+    static  File curDirFile ;
 
     public static void main(String[] args) {
 
         String typeStr = null;
         String mShellPath = null;
-        File curDirFile = null;
+         curDirFile = null;
 //args[0] = D:\jira_download\0802\src
 //args[1] = .jpg.txt.mp4.png
 //args[2] = aaa
@@ -102,11 +108,92 @@ public class D6_FileNameSearch {
         sortMapData();
         showMapDetailData();
 
-        showMapSummaryData();
+        showMapSummaryData();   // 文件类型:.mp3    匹配文件个数:128 
+        if(mTypeList.size() == 1) {
+        	String type = mTypeList.get(0);
+            showOnlyOneTypeDetailInfo(type); //  对于只有一种选中类型的文件 进行 详细的解析
+        	
+        }
+
 
         System.out.println("程序正常结束!");
     }
+    
+    public static void showOnlyOneTypeDetailInfo(String type) {
 
+    	String type_lower_trim = type.toLowerCase().trim();
+    	System.out.println("打印 "+type+"文件类型的详细信息");
+    	ArrayList<File> mFileList = arrFileMap.get(type);
+    	switch(type_lower_trim) {
+    	case ".mp3":
+    		
+    		ShowMp3Info(mFileList,type);
+    	   break;
+    	   
+    	   
+    	      default:
+    	      	System.out.println(" "+type+"文件类型的详细信息  无具体逻辑请添加 到 D6_FileNameSearch!");
+    	}
+    	
+    	
+    }
+
+      static void ShowMp3Info(ArrayList<File> fileList,String type) {
+    	if(fileList == null || fileList.size() == 0) {
+    		System.out.println("当前目录: "+curDirFile.getAbsolutePath()+" 不存在 文件类型"+type+"的文件!!");
+    	   return;
+    	}
+    	
+    	for (int i = 0; i < fileList.size(); i++) {
+    		try {
+				Mp3File mp3Item = new Mp3File(fileList.get(i).getAbsolutePath());
+				MP3_D3V2_Info(mp3Item,i+1,fileList.size());
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				System.out.println("当前 MP3 文件解析错误! "+fileList.get(i).getAbsolutePath());
+			}
+    		
+		}
+    	
+    	
+    }
+    
+  	public static void MP3_D3V2_Info(Mp3File  mp3file , int index , int allSize) {
+
+		if (mp3file.hasId3v2Tag()) {
+			
+
+			  ID3v2 id3v2Tag = mp3file.getId3v2Tag();
+			  System.out.println("════════════════════════ mp3【"+index+"】【"+allSize+"】 "+mp3file.getFilename()+" ════════════════════════ ");
+			  System.out.println("Track___________:  "+id3v2Tag.getTrack());
+			  System.out.println("Artist__________:  "+id3v2Tag.getArtist());
+			  System.out.println("Title___________:  "+id3v2Tag.getTitle());
+			  System.out.println("Album___________:  "+id3v2Tag.getAlbum());
+			  System.out.println("Year____________:  "+id3v2Tag.getYear());
+			  System.out.println("Genre___________:  "+id3v2Tag.getGenre()+"("+id3v2Tag.getGenreDescription()+")");
+			  System.out.println("Comment_________:  "+id3v2Tag.getComment());
+			  System.out.println("Lyrics__________:  "+id3v2Tag.getLyrics());
+			  System.out.println("Composer________:  "+id3v2Tag.getComposer());
+			  System.out.println("Publisher_______:  "+id3v2Tag.getPublisher());
+			  System.out.println("Original_artist_:  "+id3v2Tag.getOriginalArtist());
+			  System.out.println("Album_artist____:  "+id3v2Tag.getAlbumArtist());
+			  System.out.println("Copyright_______:  "+id3v2Tag.getCopyright());
+			  System.out.println("URL_____________:  "+id3v2Tag.getUrl());
+			  System.out.println("Encoder_________:  "+id3v2Tag.getEncoder());
+			  byte[] albumImageData = id3v2Tag.getAlbumImage();
+			  if (albumImageData != null) {
+			    System.out.println("Have album image data, length: " + albumImageData.length + " bytes");
+			    System.out.println("Album image mime type: " + id3v2Tag.getAlbumImageMimeType());
+			  }
+
+	}else {
+		
+		System.out.println(mp3file.getFilename()+" 不存在 D3V2 Tag");
+	}
+	}
+  	
+    
     public static Comparator nameCompara = new Comparator<File>() {
         @Override
         public int compare(File o1, File o2) {

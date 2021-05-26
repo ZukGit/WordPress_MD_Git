@@ -1,6 +1,16 @@
 
 import cn.hutool.core.util.ImageUtil;
+import cn.hutool.json.JSONUtil;
+
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.pdf.PdfWriter;
 import com.luciad.imageio.webp.WebPReadParam;
+import com.mpatric.mp3agic.ID3v1;
+import com.mpatric.mp3agic.ID3v2;
+import com.mpatric.mp3agic.InvalidDataException;
+import com.mpatric.mp3agic.Mp3File;
+import com.mpatric.mp3agic.UnsupportedTagException;
 import com.spire.presentation.FileFormat;
 import com.spire.presentation.IAutoShape;
 import com.spire.presentation.IEmbedImage;
@@ -12,7 +22,13 @@ import com.spire.presentation.ShapeType;
 import com.spire.presentation.TextFont;
 import com.spire.presentation.drawing.FillFormatType;
 
+
 import net.jimmc.jshortcut.JShellLink;
+import net.sourceforge.pinyin4j.PinyinHelper;
+import net.sourceforge.pinyin4j.format.HanyuPinyinCaseType;
+import net.sourceforge.pinyin4j.format.HanyuPinyinOutputFormat;
+import net.sourceforge.pinyin4j.format.HanyuPinyinToneType;
+import net.sourceforge.pinyin4j.format.exception.BadHanyuPinyinOutputFormatCombination;
 
 import java.awt.*;
 import java.awt.font.FontRenderContext;
@@ -34,6 +50,9 @@ import java.util.*;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.crypto.Cipher;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
@@ -76,6 +95,8 @@ public class G2_ApplyRuleFor_TypeFile {
 	static String strZ7DefaultKey_PSW_Rule19 = "752025"; // 8-length
 	public static byte[] TEMP_Rule7 = new byte[BYTE_CONTENT_LENGTH_Rule7];
 
+	static G2_ApplyRuleFor_TypeFile mG2_Object;
+	
 	static {
 		try {
 			if (!G2_Properties_File.exists()) {
@@ -243,6 +264,17 @@ public class G2_ApplyRuleFor_TypeFile {
 		
 		// 创建文件 创建模板文件 
 		realTypeRuleList.add(new MakeFile_E5_Rule_31());
+		
+		// 把当前目录的 jpg png 文件转为 一个 pdf文件 
+		realTypeRuleList.add(new MakeJpg2PDF_Rule_32());
+		
+		
+		// 把当前目录mp3 文件进行 属性的更改 
+		realTypeRuleList.add(new MP3_Prop_Fixed_Rule_33());
+		
+		//  把当前的 MP3文件转为  JSON 格式数据 方便 布局 树形 结构
+		realTypeRuleList.add(new MP3_Revert2JSOn_Rule_34());
+		
 	}
 
 // 3038年 5 月 3 日
@@ -252,6 +284,917 @@ public class G2_ApplyRuleFor_TypeFile {
 	// 属性进行修改(文件名称)
 //     // 4.对当前子文件(包括子目录 子文件 --不包含孙目录 孙文件) 5. 从shell 中获取到的路径 去对某一个文件进行操作
 	
+	
+
+	
+    static final transient Rule34_MP3_NodeImpl Rule34_RootNodeImpl  = new G2_ApplyRuleFor_TypeFile().new Rule34_MP3_NodeImpl(0, "全部", 0,0,null);
+
+	class MP3_Revert2JSOn_Rule_34 extends Basic_Rule {
+
+		 int  Node_ID_Num = 0;
+		String[] Alphabet;
+		
+		int getNextNodeID(){
+			Node_ID_Num++;
+			return Node_ID_Num;
+		}
+		// 第一部分的 字母表 序列   level== 1 
+		ArrayList<Rule34_MP3_NodeImpl> alphabet_node_list;
+
+		@Override
+		boolean initParamsWithInputList(ArrayList<String> inputParamList) {
+			return super.initParamsWithInputList(inputParamList) ;
+		}
+
+		
+		MP3_Revert2JSOn_Rule_34() {
+			super("#", 34, 4);
+			Alphabet = new String []{"A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"};
+			alphabet_node_list = new ArrayList<Rule34_MP3_NodeImpl>();
+			Node_ID_Num = 0;
+		}
+
+		@Override
+		String simpleDesc() {
+
+			return Cur_Bat_Name + " #_34   ### 解析当前的MP3文件生成对应的 mp3_tree.json 文件  \n"
+					+ Cur_Bat_Name + " #_34    ### 解析当前的MP3文件生成对应的 mp3_tree.json 文件 \n"						
+                ;
+		}
+
+
+
+
+	
+		@Override
+		ArrayList<File> applySubFileListRule4(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
+			ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+		// TODO Auto-generated method stub
+			ArrayList<File> allMp3FileList = new 	ArrayList<File> ();
+			
+			ArrayList<File>  mp3List_1 = subFileTypeMap.get(".mp3");
+			ArrayList<File>  mp3List_2 = subFileTypeMap.get(".MP3");
+			if(mp3List_1 != null) {
+				
+				allMp3FileList.addAll(mp3List_1);
+			}
+			if(mp3List_2 != null) {
+				
+				allMp3FileList.addAll(mp3List_2);
+			}
+			
+			if(allMp3FileList.size() == 0) {
+				System.out.println("Rule34 当前的文件夹中 MP3文件的个数为0  请检查!!!");
+				return null;
+			}
+			
+			for (int i = 0; i < Alphabet.length; i++) {
+				String alphaItem = Alphabet[i];
+
+
+/*public Rule34_MP3_NodeImpl(long id, String name, int count,int level , String xmp3Path) {
+    this.id = id;
+    this.name = name;
+    this.count = count;
+    this.level = level;
+    this.mp3path = xmp3Path;
+    
+}
+*/
+				 Rule34_MP3_NodeImpl Rule34_RootNodeImpl  = mG2_Object.new Rule34_MP3_NodeImpl(getNextNodeID(), alphaItem, 0,1,null);
+				 alphabet_node_list.add(Rule34_RootNodeImpl);
+			}
+			Rule34_RootNodeImpl.children.addAll(alphabet_node_list);
+		
+			
+			
+	
+	
+			//  把 当前 目录下的 mp3  依据  作者分类 分好 
+		
+			HashMap<String,ArrayList<Rule34_MP3_NodeImpl>> mArtist_File_Map = new HashMap<String,ArrayList<Rule34_MP3_NodeImpl>>();   
+			
+			// 依据 备注 进行 分类 得到的 Item  粤语 英语 纯语  更多分类 留下扩展 
+			HashMap<String,ArrayList<Rule34_MP3_NodeImpl>> mComment_File_Map = new HashMap<String,ArrayList<Rule34_MP3_NodeImpl>>();   
+			   
+			
+			for (int i = 0; i < allMp3FileList.size(); i++) {
+	
+				try {
+					File File_realMP3 = allMp3FileList.get(i);
+					String mp3Name_nopoint = getFileNameNoPoint(allMp3FileList.get(i).getName());
+		
+		
+					String mp3File_Path = File_realMP3.getAbsolutePath();
+					Mp3File mp3file_item = new Mp3File(allMp3FileList.get(i).getAbsolutePath());
+					if (mp3file_item.hasId3v2Tag()) {
+						   ID3v2 id3v2Tag = mp3file_item.getId3v2Tag();
+						   
+						
+						   String titleName_tag =  id3v2Tag.getTitle().trim(); 
+						   String ArtistName_tag =  id3v2Tag.getArtist().trim();
+						   String CommentName_tag =  id3v2Tag.getComment().trim();
+						   
+						   if(mArtist_File_Map.containsKey(ArtistName_tag)) {
+							   ArrayList<Rule34_MP3_NodeImpl> curArr =    mArtist_File_Map.get(ArtistName_tag);
+							   curArr.add(mG2_Object.new Rule34_MP3_NodeImpl(getNextNodeID(), titleName_tag, 0,3,mp3File_Path));
+						   }else {
+							   ArrayList<Rule34_MP3_NodeImpl> targetArr = new  ArrayList<Rule34_MP3_NodeImpl>();
+							   targetArr.add(mG2_Object.new Rule34_MP3_NodeImpl(getNextNodeID(), titleName_tag, 0,3,mp3File_Path));
+							   mArtist_File_Map.put(ArtistName_tag, targetArr);
+						   }
+						   
+					}
+				}catch( Exception e) {
+					System.out.println("RuleIndex 34  解析MP3文件出现错误! ");
+
+				}
+			}
+			
+			Show_AddNode_MP3Map(mArtist_File_Map,alphabet_node_list);
+			
+			showRootNodeContent(Rule34_RootNodeImpl);
+			
+			
+
+			System.out.println("RuleIndex 34   MP3文件属性的操作 执行完成!");
+	
+			
+			
+		return super.applySubFileListRule4(curFileList, subFileTypeMap, curDirList, curRealFileList);
+		}
+
+		// 从 上 到下 依次 显示 当前的 Node 的 内容 
+		void showRootNodeContent(Rule34_MP3_NodeImpl rootNode) {
+			
+//			{
+//				  "id": -1,
+//				  "name": "全部",
+//				  "count": 21,
+//				  "children": [  ]
+//			}
+		
+			System.out.println("════════════════════════════════"+ " Root JSON"+"════════════════════════════════");
+	
+			String mp3Json = rootNode.json();
+			
+//			mp3Json = StringEscape.unescapeJava(mp3Json);
+			 
+			if(JSONUtil.isJson(mp3Json)) {
+				System.out.println("═════════════════ 是JSON  ═════════════════");
+
+				mp3Json = JSONUtil.formatJsonStr(mp3Json);
+				System.out.println(mp3Json);
+			}else {
+				System.out.println("═════════════════ 不是JSON  ═════════════════");
+
+				mp3Json = JSONUtil.formatJsonStr(mp3Json);
+//				System.out.println(mp3Json);
+				
+			}
+			
+			File Mp3_Json_File = new File(curDirFile.getAbsolutePath() + File.separator+"MP3_JSON.json");
+			writeContentToFile(Mp3_Json_File, mp3Json);
+			NotePadOpenTargetFile(Mp3_Json_File.getAbsolutePath());
+	
+	   
+		}
+		
+		
+		
+		Rule34_MP3_NodeImpl	getNodeImpl_With_Zimu(ArrayList<Rule34_MP3_NodeImpl> alphabet_node_list , String charAlhapbet){
+			Rule34_MP3_NodeImpl  selectedNode = null;
+			for (int i = 0; i < alphabet_node_list.size(); i++) {
+				Rule34_MP3_NodeImpl node = alphabet_node_list.get(i);
+				if(node.name.toUpperCase().equals(charAlhapbet.toUpperCase())) {
+					selectedNode = node;
+					break;
+				}
+				
+			}
+			
+			
+			return selectedNode;
+			
+		}
+		
+		@SuppressWarnings("unchecked")
+		boolean Show_AddNode_MP3Map(HashMap<String, ArrayList<Rule34_MP3_NodeImpl>>  xMP3FileMap ,  ArrayList<Rule34_MP3_NodeImpl> alphabet_node_list) {
+			boolean executeFlag = false;
+			Map.Entry<String, ArrayList<Rule34_MP3_NodeImpl>> entry;
+
+			if (xMP3FileMap != null) {
+				Iterator iterator = xMP3FileMap.entrySet().iterator();
+				while (iterator.hasNext()) {
+					entry = (Map.Entry<String, ArrayList<Rule34_MP3_NodeImpl>>) iterator.next();
+					
+					   //  获取 名称的 首字母 
+					String arrTag = entry.getKey(); // Map的Value  // 作者名称
+					String Alphabet_Word = getFirstZiMu(arrTag);
+					Rule34_MP3_NodeImpl  selectedNode_level_1 = 	getNodeImpl_With_Zimu(alphabet_node_list,Alphabet_Word);
+					ArrayList<Rule34_MP3_NodeImpl> fileArr_level_3 = entry.getValue(); // Map的Value  歌曲MP3
+
+					Rule34_MP3_NodeImpl artistNode_level_2 = mG2_Object.new Rule34_MP3_NodeImpl(getNextNodeID(), arrTag, fileArr_level_3.size(),2,null);
+					
+					selectedNode_level_1.addChildren(artistNode_level_2);
+					
+					System.out.println("═══════════════════════ arrTag["+arrTag+"]  alphabet=["+Alphabet_Word+"] all["+fileArr_level_3.size()+"] ═══════════════════════");
+
+					for (int i = 0; i < fileArr_level_3.size(); i++) {
+						Rule34_MP3_NodeImpl mp3FileNode_level_3 = fileArr_level_3.get(i);
+					
+						System.out.println("____________ arrTag["+arrTag+"] alphabet=["+Alphabet_Word+"] index["+(i+1)+"] all["+fileArr_level_3.size()+"] ____________");
+						System.out.println(mp3FileNode_level_3.toString());
+
+						artistNode_level_2.addChildren(mp3FileNode_level_3);
+					}
+
+				}
+			}
+
+			return executeFlag;
+		}
+		
+		
+		String getFirstZiMu(String srcStr) {
+			String firstZimu = "U";  //  默认为 Unknow;
+			if(srcStr == null || "".equals(srcStr.trim())) {
+				return firstZimu;
+			}
+			
+			if(!isContainChinese(srcStr)) {  // 如果 不包含中文  那么 取这个词的 第一个字符
+				String char_1 = srcStr.substring(0,1).toUpperCase();
+				firstZimu = char_1;
+				
+			}else {
+				String char_1 = srcStr.substring(0,1).toUpperCase();
+//				System.out.println("X2 char_1 = "+char_1 );
+				if(!isContainChinese(char_1)) {
+					firstZimu = char_1;
+				}else {  // 如果第一个字母为汉字  那么取到这个字的 拼音的 第一个词
+					String pinyinStr = ToPinyin(char_1);
+//					System.out.println("X2  pinyinStr = "+pinyinStr );
+					String char_1_fixed = pinyinStr.substring(0,1).toUpperCase();
+					firstZimu = char_1_fixed;
+				}
+				
+				
+			}
+			
+//			System.out.println("X3  firstZimu = "+firstZimu );
+			return firstZimu;
+			
+		}
+
+	}
+
+
+	
+
+	class Rule34_MP3_NodeImpl implements Rule34_MP3_Node, Serializable {
+
+	    private static final long serialVersionUID = 1L;
+
+	    public long id;
+	    public String name;
+	    public int count;
+	    public int level;
+	    public String mp3path;
+	    public List<Rule34_MP3_NodeImpl> children = new ArrayList<>();
+	    private transient long selectedChildId;
+
+//	    {
+//	    	  "id": -1,
+//	    	  "name": "全部",
+//	    	  "count": 21,
+//	    	  "children": []
+//	    }			  
+	    	               
+		@Override
+	    public String json() {
+			count = children.size();
+			System.out.println("___________【"+name+ "】 Node_Level_"+level+"节点情况 Begin ___________");
+	   		for (int i = 0; i < children.size(); i++) {
+				System.out.println(children.get(i).toString());
+			}
+			System.out.println("___________【"+name+ "】Node_Level_"+level+"节点情况 End ___________");
+System.out.println();
+			
+	    	StringBuilder sb_json = new StringBuilder();
+	    	sb_json.append("{\n");
+	    	sb_json.append("\"id\": "+id+",\n");
+	    	sb_json.append("\"name\": "+"\""+name+"\""+",\n");
+	    	sb_json.append("\"count\": "+count+",\n");
+	    	sb_json.append("\"level\": "+level+",\n");
+	  
+	    	if(mp3path != null) {
+	    	 	sb_json.append("\"mp3path\": "+"\""+(mp3path.replace("\\", "\\\\"))+"\""+",\n");
+	    	}else {
+	    	 	sb_json.append("\"mp3path\": \"null\""+",\n");	
+	    	}
+	    	
+	    	if(children == null || children.size() == 0) {
+	    		sb_json.append("\"children\": "+"[]\n");
+	    	}else {
+	    		sb_json.append("\"children\": "+"[\n");
+	    		for (int i = 0; i < children.size(); i++) {
+	    			Rule34_MP3_NodeImpl childNode = children.get(i);
+	    			if(childNode != null && childNode.children() != null && childNode.children().size() > 0) {
+	    				System.out.println("childNode.name = "+ childNode.name + "  childNode.level="+childNode.level+"  childNode.id="+childNode.id + "  childNode.count="+childNode.children().size());
+	    				
+	    				// 子节点 之间 使用 , 逗号 分隔
+	    				if(i == children.size()-1 ) {
+	    					sb_json.append(childNode.json()+"\n");
+	    				}else {
+	    					sb_json.append(childNode.json()+",\n");
+	    				}
+		    	
+		    			
+	    			}else {
+	    				System.out.println("结点 的 childNode 为空！！！ 为叶子节点");
+	    				if(childNode != null) {
+	    	  				if(i == children.size()-1 ) {
+		    					sb_json.append(childNode.json()+"\n");
+		    				}else {
+		    					sb_json.append(childNode.json()+",\n");
+		    				}
+	    	  				
+	    				}
+	    			
+	    			}
+
+				}
+	    		sb_json.append("]\n");
+	    	}
+	   
+	    	sb_json.append("}\n");
+	    	return sb_json.toString();
+	    }
+	    
+		@Override
+		public void setmp3path(String mp3Path) {
+			this.mp3path = mp3Path;
+			
+		}
+
+		@Override
+		public void setlevel(int level) {
+			// TODO Auto-generated method stub
+			this.level = level;
+		}
+
+		
+
+
+		@Override
+		public int level() {
+			// TODO Auto-generated method stub
+			return level;
+		}
+
+		@Override
+		public String mp3path() {
+			// TODO Auto-generated method stub
+			return mp3path;
+		}
+		
+
+
+	    public Rule34_MP3_NodeImpl(long id, String name, int count,int level , String xmp3Path) {
+	        this.id = id;
+	        this.name = name;
+	        this.count = count;
+	        this.level = level;
+	        this.mp3path = xmp3Path;
+	        children = new ArrayList<>();
+	        
+	    }
+
+	    @Override
+	    public long id() {
+	        return id;
+	    }
+
+	    @Nonnull
+	    @Override
+	    public String text() {
+	        return name + "(" + count + ")";
+	    }
+
+	    @Override
+	    public long selectedChild() {
+	        return selectedChildId;
+	    }
+
+	    @Override
+	    public void setSelectedChild(long id) {
+	        selectedChildId = id;
+	    }
+
+	    @Nullable
+	    @Override
+	    public List<? extends Rule34_MP3_Node> children() {
+	        return children;
+	    }
+
+	    public void setChildren(List<Rule34_MP3_NodeImpl> children) {
+	        this.children = children;
+	    }
+	    
+	    public void addChildren(Rule34_MP3_NodeImpl oneChildren) {
+	        this.children.add(oneChildren);
+	    }
+	    
+
+	    @Override
+	    public Rule34_MP3_Node getSelectedChild() {
+	        int i = getSelectedChildPosition();
+	        if (i == -1) return null;
+	        // in case of IndexOutOfBoundsException
+	        if (i >= 0 && i < children.size()) {
+	            return children.get(i);
+	        } else {
+	            return null;
+	        }
+	    }
+
+	    public String getName() {
+	        return name;
+	    }
+
+	    @Override
+	    public String toString() {
+	        return  "text=["+text()+"] " + "  id=[" + id + "] " + "  level=[" + level() + "]" + "  count=[" + children.size() + "]" + " mp3path=["+mp3path()+"]"  ;
+	    }
+
+	    private int getSelectedChildPosition() {
+	        if (children == null) return -1;
+	        for (int i = 0; i < children.size(); i++) {
+	        	Rule34_MP3_NodeImpl nodeImpl = children.get(i);
+	            if (nodeImpl == null) continue;
+	            if (nodeImpl.id == selectedChildId) {
+	                return i;
+	            }
+	        }
+	        return -1;
+	    }
+
+
+
+
+
+	}
+	
+	public interface Rule34_MP3_Node {
+
+		String json();
+	    /**
+	     * 标记唯一性
+	     *
+	     * @return -1 when it is root
+	     */
+	    long id();
+	    
+	    
+	    // 当前的层级
+	    int level();
+
+	    
+	    // 当前的对应的 MP3 文件的 全路径
+	    String mp3path();
+	    
+	    
+	    /**
+	     * 显示文案
+	     */
+	    @Nonnull
+	    String text();
+
+	    void setmp3path(String mp3Path);
+	    
+	    void setlevel(int level);
+	    
+	    /**
+	     * 被选中的Id
+	     *
+	     * @return -1 when {@link #children()} is null
+	     */
+	    long selectedChild();
+
+	    void setSelectedChild(long id);
+
+	    /**
+	     * 子树(为空表示是叶节点)
+	     *
+	     * @return null when it is a leaf
+	     */
+	    @Nullable
+	    List<? extends Rule34_MP3_Node> children();
+
+	    /**
+	     * 返回被选中的child
+	     */
+	    Rule34_MP3_Node getSelectedChild();
+
+	}
+	
+	
+	class MP3_Prop_Fixed_Rule_33 extends Basic_Rule {
+		String mTitle; // mp3文件的 标题 
+		String mArtist; // mp3文件的 作者
+		String mComment; // mp3文件的 备注
+		boolean isCommentAppend; //  是否是在Comment 进行追加 而不是替换
+		
+
+		@Override
+		boolean initParamsWithInputList(ArrayList<String> inputParamList) {
+			boolean Flag = true;
+
+			for (int i = 0; i < inputParamList.size(); i++) {
+				String paramItem = inputParamList.get(i);
+				String paramItem_lower_trim = paramItem.toLowerCase().trim();
+				if(paramItem_lower_trim.contains("title_")) {
+					String replaceTitle = paramItem.replace("title_", "").replace("Title_", "").trim();
+					mTitle = replaceTitle;
+				}
+				
+				if(paramItem_lower_trim.contains("artist_")) {
+					String replaceArtist = paramItem.replace("artist_", "").replace("Artist_", "").trim();
+					mArtist = replaceArtist;
+				}
+				
+				if(paramItem_lower_trim.contains("comment_")) {
+					String replaceComment = paramItem.replace("comment_", "").replace("Comment_", "").trim();
+					mComment = replaceComment;
+				}
+				if(paramItem_lower_trim.contains("commentappend_")) {
+					String replaceComment = paramItem.replace("commentappend_", "").replace("Commentappend_", "").trim();
+					mComment = replaceComment;
+					isCommentAppend = true;
+				}
+				
+				
+			}
+			System.out.println("用户输入的 三个替换参数 mTitle="+mTitle+"  mArtist="+mArtist+"   mComment="+mComment);
+             
+			if(mTitle == null && mArtist == null && mComment == null ) {
+				
+				Flag = false;
+				System.out.println("无法检测到用户输入的 需要修改的 MP3的三个属性 Title_xx  Artist_xxx Comment_xxx 程序执行失败!  请检查 ");
+			}
+			
+			
+			return super.initParamsWithInputList(inputParamList) && Flag;
+		}
+		
+		MP3_Prop_Fixed_Rule_33() {
+			super("#", 33, 4);
+			isCommentAppend = false;
+		}
+
+		@Override
+		String simpleDesc() {
+
+			return Cur_Bat_Name + " #_33   artist_周杰伦  comment_国语  title_稻香     ### 把当前的 mp3的属性进行批量的修改  \n"
+					+ Cur_Bat_Name + " #_33  artist_周杰伦  comment_国语   ### 把当前的 mp3的属性comment 和 artist 修改 \n"	
+					+ Cur_Bat_Name + " #_33  artist_周杰伦  title_稻香   ### 把当前的 mp3的属性comment 和 title 修改 \n"	
+					+ Cur_Bat_Name + " #_33  comment_国语  title_稻香   ### 把当前的 mp3的属性title 和 comment 修改 \n"	
+					+ Cur_Bat_Name + "  #_33 comment_国语   ### 把当前的 mp3的属性commont 改为国语  \n"
+					+ Cur_Bat_Name + "  #_33 comment_粤语   ### 把当前的 mp3的属性commont 改为粤语   \n"
+					+ Cur_Bat_Name + "  #_33 comment_英语   ### 把当前的 mp3的属性commont 改为英语   \n"
+					+ Cur_Bat_Name + "  #_33 comment_纯语   ### 把当前的 mp3的属性commont 改为纯语   \n"
+					+ Cur_Bat_Name + "  #_33 commentappend_收藏   ### 把当前的 mp3的属性commont 追加一个 原始Comment_收藏 为 Comment   \n"	
+					+ Cur_Bat_Name + "  #_33 commentappend_追赠   ### 把当前的 mp3的属性commont 追加一个 原始Comment_追赠 为 Comment   \n"	
+					+ Cur_Bat_Name + "  #_33 comment_纯语   ### 把当前的 mp3的属性commont 改为纯语   \n"	
+
+					+ Cur_Bat_Name + "  #_33 artist_周杰伦   ### 把当前的 mp3的属性artist 改为周杰伦 \n"	
+					+ Cur_Bat_Name + "  #_33 title_晴天   ### 把当前的 mp3的属性title 改为晴天 \n"							
+                ;
+		}
+
+
+
+
+	
+		@Override
+		ArrayList<File> applySubFileListRule4(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
+			ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+		// TODO Auto-generated method stub
+			ArrayList<File> allMp3FileList = new 	ArrayList<File> ();
+			
+			ArrayList<File>  mp3List_1 = subFileTypeMap.get(".mp3");
+			ArrayList<File>  mp3List_2 = subFileTypeMap.get(".MP3");
+			if(mp3List_1 != null) {
+				
+				allMp3FileList.addAll(mp3List_1);
+			}
+			if(mp3List_2 != null) {
+				
+				allMp3FileList.addAll(mp3List_2);
+			}
+			
+			if(allMp3FileList.size() == 0) {
+				System.out.println("当前的文件夹中 MP3文件的个数为0  请检查!!!");
+				return null;
+			}
+			
+			// 没有 tag的 mp3文件的集合  // 估计会改名 
+			ArrayList<File> unTagedMp3FileList = new ArrayList<File> ();
+			
+			   String TargetDirName = "MP3_Fixed_"+getTimeStamp();
+	
+			   
+			   String fixed_name = null;
+			for (int i = 0; i < allMp3FileList.size(); i++) {
+				
+				try {
+					String mp3Name_nopoint = getFileNameNoPoint(allMp3FileList.get(i).getName());
+		
+					File mp3File = allMp3FileList.get(i);
+					Mp3File mp3file = new Mp3File(allMp3FileList.get(i).getAbsolutePath());
+					String d3v1_title=null;
+					String d3v1_artist=null;
+					String d3v1_comment=null;
+					
+					if(mp3file.hasId3v1Tag()) {
+						
+						  ID3v1 id3v1Tag = mp3file.getId3v1Tag();
+//						  System.out.println("Track: " + id3v1Tag.getTrack());
+//						  System.out.println("Artist: " + id3v1Tag.getArtist());
+//						  System.out.println("Title: " + id3v1Tag.getTitle());
+//						  System.out.println("Album: " + id3v1Tag.getAlbum());
+//						  System.out.println("Year: " + id3v1Tag.getYear());
+//						  System.out.println("Genre: " + id3v1Tag.getGenre() + " (" + id3v1Tag.getGenreDescription() + ")");
+//						  System.out.println("Comment: " + id3v1Tag.getComment());
+						  d3v1_title = id3v1Tag.getTitle();
+						  d3v1_artist = id3v1Tag.getArtist();
+						  d3v1_comment = id3v1Tag.getComment();
+						  
+					}
+					
+					
+					if (mp3file.hasId3v2Tag()) {
+						  ID3v2 id3v2Tag = mp3file.getId3v2Tag();
+						   String titleName_old =  id3v2Tag.getTitle();
+						   String ArtistName_old =  id3v2Tag.getArtist();
+						   String CommentName_old =  id3v2Tag.getComment();
+						   
+						   boolean mTitleExist = false;
+						   boolean mCommentExist = false;
+						   boolean mArtistExist = false;
+//							String mTitle; // mp3文件的 标题 
+//							String mArtist; // mp3文件的 作者
+//							String mComment; // mp3文件的 备注
+						  if(mTitle != null && !"".equals(mTitle)) {
+							  id3v2Tag.setTitle(mTitle);
+							  titleName_old = mTitle;
+							  mTitleExist = true;
+						  }
+						
+						  if(mArtist != null && !"".equals(mArtist)) {
+							  id3v2Tag.setArtist(mArtist);
+							  mArtistExist = true;
+						  }
+						  
+						  if(mComment != null && !"".equals(mComment)) {
+							  if(isCommentAppend) {  //追加 而不是 替换 
+								  String mCommentAppendStr = CommentName_old+"_"+mComment;
+								  mCommentAppendStr = mCommentAppendStr.replace("__", "_").trim();
+								  if(mCommentAppendStr.startsWith("_")) {
+									  mCommentAppendStr =mCommentAppendStr.substring(1,mCommentAppendStr.length());
+								  }
+								  id3v2Tag.setComment(mCommentAppendStr);   
+							  }else {
+								  id3v2Tag.setComment(mComment); 
+							  }
+						
+							  mCommentExist = true;
+						  }
+						  
+						   mp3file.setId3v2Tag(id3v2Tag);
+						   
+						   fixed_name   = titleName_old;
+						   
+						   if(titleName_old == null || "".equals(titleName_old.trim())) {
+							   
+							   fixed_name = mp3Name_nopoint.replace("_", "");
+							   fixed_name = clearNumber(fixed_name).trim();
+							   if("".equals(fixed_name)) {
+								   fixed_name = "unknow";
+							   }
+							
+							 
+						   }
+						   
+						   String titleName_new =  id3v2Tag.getTitle();
+						   String ArtistName_new =  id3v2Tag.getArtist();
+						   String CommentName_new =  id3v2Tag.getComment();
+				
+						   fixed_name = fixed_name.replace(" ","_");
+						   fixed_name = fixed_name.replace("《","_");
+						   fixed_name = fixed_name.replace("》","_");
+						   fixed_name = fixed_name.replace("（","_");
+						   fixed_name = fixed_name.replace("）","_");
+						   fixed_name = fixed_name.replace("(","_");
+						   fixed_name = fixed_name.replace(")","_");
+						   fixed_name = fixed_name.replace("___","_");
+						   fixed_name = fixed_name.replace("__","_");
+						   fixed_name = fixed_name.replace("__","_");
+						   fixed_name = fixed_name+ "_"+getTimeStamp();
+						   fixed_name = fixed_name.replace("__","_");
+						   
+						   File mp3File_DirTarget_File = new File(allMp3FileList.get(i).getParentFile().getAbsolutePath()+File.separator+TargetDirName);
+						   
+						   if(!mp3File_DirTarget_File.exists()) {
+							   mp3File_DirTarget_File.mkdirs();
+						   }
+						   mp3file.save(allMp3FileList.get(i).getParentFile().getAbsolutePath()+File.separator+TargetDirName+File.separator +fixed_name+".mp3");
+				
+				
+						   StringBuilder SBLog = new StringBuilder();
+				
+						   SBLog.append(" 当前生成文件["+(i+1)+"]: "+ fixed_name+".mp3 ");
+						   
+//							  d3v1_title = id3v1Tag.getTitle();
+//							  d3v1_artist = id3v1Tag.getArtist();
+//							  d3v1_comment = id3v1Tag.getComment();
+							  
+						   if(mTitleExist) {
+							   SBLog.append(" Title["+titleName_old+"] -> Title["+titleName_new+"]  v2_titleName_old="+titleName_old+"  v2_ArtistName_old="+ArtistName_old+"  v2_CommentName_old="+CommentName_old +"  v1_titleName_old="+d3v1_title+"  v1_ArtistName_old="+d3v1_artist+"  v1_CommentName_old="+d3v1_comment );
+			            	}
+			
+						   if(mArtistExist) {
+							   SBLog.append(" Artist["+ArtistName_old+"] -> Artist["+ArtistName_new+"]  v2_titleName_old="+titleName_old+"  v2_ArtistName_old="+ArtistName_old+"  v2_CommentName_old="+CommentName_old +"  v1_titleName_old="+d3v1_title+"  v1_ArtistName_old="+d3v1_artist+"  v1_CommentName_old="+d3v1_comment );
+			            	}
+						   
+						   if(mCommentExist) {
+							   SBLog.append(" Comment["+CommentName_old+"] -> Comment["+CommentName_new+"]  v2_titleName_old="+titleName_old+"  v2_ArtistName_old="+ArtistName_old+"  v2_CommentName_old="+CommentName_old +"  v1_titleName_old="+d3v1_title+"  v1_ArtistName_old="+d3v1_artist+"  v1_CommentName_old="+d3v1_comment );
+			            	}
+					
+						   SBLog.append("  文件原名称["+mp3Name_nopoint+"]");
+						   System.out.println(SBLog.toString());
+						   
+						   
+					}else {
+						
+						unTagedMp3FileList.add(allMp3FileList.get(i));
+					}
+				}  catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+		
+					System.out.println("创建 Mp3File 文件失败!!! 失败文件"+(i+1)+ fixed_name+".mp3 ");
+				}
+				
+			}
+			
+			// 
+			if(unTagedMp3FileList.size() > 0) {
+				System.out.println("═════════════════════════ "+"失败!!! 遗憾存在 MP3转换失败文件 "+"═════════════════════════ ");
+				for (int j = 0; j < unTagedMp3FileList.size(); j++) {
+					System.out.println("没有D3V2-Tag    失败MP3文件["+(j+1)+"] = "+unTagedMp3FileList.get(j).getAbsolutePath() );
+				}
+			
+			}else {
+				System.out.println("═════════════════════════ "+"恭喜!!! 当前没有 不存在D3V2-Tag的文件 "+"═════════════════════════ ");
+	
+			}
+			System.out.println("RuleIndex 33 修改 MP3文件属性的操作 执行完成!");
+	
+			
+			
+		return super.applySubFileListRule4(curFileList, subFileTypeMap, curDirList, curRealFileList);
+		}
+
+
+	}
+
+
+	
+	
+	
+	class MakeJpg2PDF_Rule_32 extends Basic_Rule {
+
+		MakeJpg2PDF_Rule_32() {
+			super("#", 32, 4);
+		}
+		
+		
+		@Override
+		String simpleDesc() {
+
+			return Cur_Bat_Name + " #_32    // 把当前的 jpg 和 png 文件转为一个 PDF文件  (不操作 孙文件 孙文件夹 )  \n"
+					+ Cur_Bat_Name + "  #_32   ### 把当前的 jpg 和 png 文件转为一个 PDF文件  \n"
+
+                ;
+		}
+		
+		
+		@Override
+		boolean allowEmptyDirFileList() {
+		// TODO Auto-generated method stub
+		return true;
+		}
+		
+	
+		@Override
+		ArrayList<File> applySubFileListRule4(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
+			ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+			
+			ArrayList<File> pictureFileList = new 	ArrayList<File> ();
+			int picture_index = 1 ;
+			for (int i = 0; i < curRealFileList.size(); i++) {
+				File curFile = curRealFileList.get(i);
+				String currentFileName = curFile.getName().toLowerCase();
+				if (currentFileName.endsWith(".jpg") || currentFileName.endsWith(".png") ) {
+					pictureFileList.add(curFile);
+					System.out.println("picture_index["+picture_index+"] = "+ curFile.getAbsolutePath());
+					picture_index++;
+				}
+
+			}
+			
+			
+			if(pictureFileList.size() > 0) {
+				SortFileWithName(pictureFileList);
+				Document document = new Document();
+			    String result_pdf = curDirPath+File.separator+"Z_PDF_Merge"+pictureFileList.size()+"_"+getTimeStamp()+".pdf";
+
+				FileOutputStream os;
+				try {
+					os = new FileOutputStream(new File(result_pdf));
+					try {
+						PdfWriter.getInstance(document, os);
+					} catch (DocumentException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				} catch (FileNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+	
+				document.open();
+				for (int i = 0; i < pictureFileList.size(); i++) {
+					File imageFile = pictureFileList.get(i);
+					String imageFilename = imageFile.getName();
+					createPicInPDF(document, imageFile.getAbsolutePath(),i);
+					System.out.println("jpg["+i+"] all["+pictureFileList.size()+"] Name["+imageFilename+"] "+"图片转为 PDF完成");
+				}
+
+					document.close();
+				System.out.println("═════════"+pictureFileList.size()+"张图片转为 PDF完成"+"═════════");
+				
+			}else {
+				System.out.println("当前目录 没有 JPG PNG 文件 请检查! "+curDirPath);
+			}
+
+	
+		return super.applySubFileListRule4(curFileList, subFileTypeMap, curDirList, curRealFileList);
+		}
+		
+		 void createPicInPDF(Document document, String picturePath,int index) {
+				try {
+					com.itextpdf.text.Image image = com.itextpdf.text.Image.getInstance(picturePath);
+					float image_width = 	image.getWidth();
+					float image_hight = 	image.getHeight();
+					
+					    float imageHeight=image.getScaledHeight();
+			            float imageWidth=image.getScaledWidth();
+			            //设置页面宽高与图片一致
+			        com.itextpdf.text.Rectangle rectangle = new com.itextpdf.text.Rectangle(imageWidth, imageHeight);
+			    	document.setMargins(0, 0, 0, 0);
+			        document.setPageSize(rectangle);
+
+		            //图片居中
+		            image.setAlignment(com.itextpdf.text.Image.ALIGN_CENTER);
+		            
+//					float documentWidth = document.getPageSize().getWidth() - document.leftMargin() - document.rightMargin();
+//					float documentHeight = documentWidth / 580 * 320;// 重新设置宽高
+//					float documentWidth = document.getPageSize().getWidth();
+//					float documentHeight = document.getPageSize().getHeight();
+					System.out.println("════════════════════ "+index+" ("+picturePath+")"+" begin ════════════════════ ");
+//					System.out.println("index="+index+"  documentWidth = "+documentWidth+"  documentHeight="+documentHeight +" image_width="+image_width+"  image_hight="+image_hight);
+					System.out.println("index="+index+"   "+ " image_width="+image_width+"  image_hight="+image_hight);
+
+					image.scaleAbsolute(image_width, image_hight);
+					
+					   // 根据域的大小缩放图片
+//				    image.scaleToFit(documentWidth,documentHeight);
+				    // 添加图片
+//				    image.setAbsolutePosition(documentWidth,documentHeight);
+//					image.setAbsolutePosition(documentWidth, documentHeight);
+//					image.scaleAbsolute(documentWidth, documentHeight);// 重新设置宽高
+//					document.setMargins(0, 0, 0, 0);
+					System.out.println("document.topMargin()="+document.topMargin()+"  document.bottomMargin()"+document.bottomMargin()+"  document.leftMargin()"+document.leftMargin()+"  document.rightMargin()"+document.rightMargin());
+					 document.newPage();
+					document.add(image);
+				} catch (Exception ex) {
+				}
+			}
+		 
+		
+	}
 	class MakeFile_E5_Rule_31 extends Basic_Rule {
 		ArrayList<String> fliterTypeList ;
 		int fileCount ;   //创建文件的个数 
@@ -299,7 +1242,8 @@ public class G2_ApplyRuleFor_TypeFile {
 			isShowNumber = false;
 			
 		}
-		
+
+
 		@Override
 		boolean allowEmptyDirFileList() {
 			return true;
@@ -964,7 +1908,7 @@ public class G2_ApplyRuleFor_TypeFile {
 				    }
 				}
 				
-			    String result_pptx = curDirPath+File.separator+"Z_Merge"+pptxFileList.size()+"_"+getTimeStamp()+".pptx";
+			    String result_pptx = curDirPath+File.separator+"Z_PPTX_Merge"+pptxFileList.size()+"_"+getTimeStamp()+".pptx";
 			   File resultPPTX_File =  new File(result_pptx);
 			    // creating the file object
 			    FileOutputStream out = new FileOutputStream(resultPPTX_File);
@@ -6832,7 +7776,7 @@ newRealFile=D:\BaiduNetdiskDownload\公式\bad_batch\good_batch\A.pdf
 			}
 		}
 
-		G2_ApplyRuleFor_TypeFile mG2_Object = new G2_ApplyRuleFor_TypeFile();
+		mG2_Object = new G2_ApplyRuleFor_TypeFile();
 		mG2_Object.InitRule();
 
 		File mCurDirFile = new File(curDirPath);
@@ -7534,8 +8478,128 @@ newRealFile=D:\BaiduNetdiskDownload\公式\bad_batch\good_batch\A.pdf
 		}
 		return targetFileList;
 	}
- 
+
+    public static String clearNumber(String str){
+        String result = new String(str);
+        result = result.replaceAll("0","");
+        result = result.replaceAll("1","");
+        result = result.replaceAll("2","");
+        result = result.replaceAll("3","");
+        result = result.replaceAll("4","");
+        result = result.replaceAll("5","");
+        result = result.replaceAll("6","");
+        result = result.replaceAll("7","");
+        result = result.replaceAll("8","");
+        result = result.replaceAll("9","");
+        return result;
+    }
     
+    /**
+     * 汉字转为拼音 空间以下划线_分割
+     * 1.每个汉字前面添加_
+     * 2.每个汉字后面添加_
+     * 3.把所有的两个__ 下划线转为 一个下划线
+     *
+     * @param chinese
+     * @return
+     */
+    public static String ToPinyin(String chinese) {
+        if (chinese == null || chinese.trim().isEmpty()) {
+            return null;
+        }
+        String curItem = new String(chinese);
+        while (curItem.contains(" ")) {
+            curItem = curItem.replaceAll(" ", "");
+        }
+        String pinyinStr = "";
+        char[] newChar = curItem.toCharArray();
+        HanyuPinyinOutputFormat defaultFormat = new HanyuPinyinOutputFormat();
+        defaultFormat.setCaseType(HanyuPinyinCaseType.LOWERCASE);
+        defaultFormat.setToneType(HanyuPinyinToneType.WITHOUT_TONE);
+        for (int i = 0; i < newChar.length; i++) {
+            if (newChar[i] > 128) {
+                try {
+                    // 《》，：“￥。，？。，；【 】。、
+
+//                    System.out.println("xxxxxxxxxx");
+//                    System.out.println("newChar["+i+"] = "+ newChar[i]);
+                    String charStr = newChar[i]+"";
+                    if(charStr.equals("《")  ){
+                        pinyinStr += "<";
+                        continue;
+                    }else  if(charStr.equals("》")  ){
+                        pinyinStr += ">";
+                        continue;
+                    }else  if(charStr.equals("，")  ){
+                        pinyinStr += ",";
+                        continue;
+                    }else  if(charStr.equals("：")  ){
+                        pinyinStr += ":";
+                        continue;
+                    }else  if(charStr.equals("“")  ){
+                        pinyinStr += "\"";
+                        continue;
+                    }else  if(charStr.equals("￥")  ){
+                        pinyinStr += "$";
+                        continue;
+                    }else  if(charStr.equals("？")  ){
+                        pinyinStr += "?";
+                        continue;
+                    }else  if(charStr.equals("；")  ){
+                        pinyinStr += ";";
+                        continue;
+                    }else  if(charStr.equals("【")  ){
+                        pinyinStr += "[";
+                        continue;
+                    }else  if(charStr.equals("】")  ){
+                        pinyinStr += "]";
+                        continue;
+                    }else  if(charStr.equals("、")  ){
+                        pinyinStr += ",";
+                        continue;
+                    }
+
+
+
+
+                    String[] arrChar =   PinyinHelper.toHanyuPinyinStringArray(newChar[i], defaultFormat);
+                    if(arrChar == null){
+                        System.out.println("pinyinStr = "+ null);
+                        continue;
+                    }
+                    pinyinStr += "_" + arrChar[0] + "_"; // [0] 标识当前拼音 汉-> han
+//                    System.out.println("pinyinStr = "+ pinyinStr);
+//                    System.out.println("xxxxxxxxxx ");
+                } catch (BadHanyuPinyinOutputFormatCombination e) {
+                    e.printStackTrace();
+                }
+            } else {  // 汉字的编码是大于 128的 所以 小于 128编码的就直接认为是 ascii编码的
+                pinyinStr += newChar[i];
+            }
+        }
+        while (pinyinStr.contains("__")) {
+            pinyinStr = pinyinStr.replaceAll("__", "_");
+//            System.out.println("pinyinStr1 = " + pinyinStr);
+        }
+
+        while (pinyinStr.contains("u:")) {  // 女转为 nu:   绿 lu:   需要转为 nv  lv
+            pinyinStr = pinyinStr.replaceAll("u:", "v");
+//            System.out.println("pinyinStr1 = " + pinyinStr);
+        }
+
+        while (pinyinStr.startsWith("_")) {
+            pinyinStr = pinyinStr.substring(1, pinyinStr.length());
+//            System.out.println("pinyinStr2 = " + pinyinStr);
+        }
+        while (pinyinStr.endsWith("_")) {
+            pinyinStr = pinyinStr.substring(0, pinyinStr.length() - 1);
+//            System.out.println("pinyinStr3 = " + pinyinStr);
+        }
+        return pinyinStr;
+    }
+    
+
+
 	static void NotePadOpenTargetFile(String absPath){
 		String commandNotead = "";
 		if(CUR_OS_TYPE == OS_TYPE.Windows){

@@ -389,6 +389,10 @@ public class I9_TextRuleOperation {
         CUR_RULE_LIST.add( new Show_Bat_Template_OnDir_Rule_30()); //  把当前模板文件 zzbattest_I9.bat 内容写进当前目录下 Test_xx.bat文档 并打开它
         CUR_RULE_LIST.add( new Bat_Format_Rule_31()); // 对当前 bat 文件进行 format 如果不是bat文件不操作 增项假如模板zbatrule_I9_Rule30.bat中
         CUR_RULE_LIST.add( new Build_SH_BAT_WithJavaWithJar_Rule_32());
+        
+        
+        // 读取当前文件的每一个字符串 截取每一个字符作为单独的字符串然后复制120份
+        CUR_RULE_LIST.add( new MakeStringAsOneString_Copy120AsLine_Rule_33());
 //        CUR_RULE_LIST.add( new Image2Png_Rule_4());
 //        CUR_RULE_LIST.add( new AVI_Rule_5());
 //        CUR_RULE_LIST.add( new SubDirRename_Rule_6());
@@ -397,6 +401,79 @@ public class I9_TextRuleOperation {
 
     }
     
+    // 读取当前文件的每一个字符串 截取每一个字符作为单独的字符串然后复制120份
+    class MakeStringAsOneString_Copy120AsLine_Rule_33 extends  Basic_Rule{
+    	MakeStringAsOneString_Copy120AsLine_Rule_33(){
+            super(33,false);
+        }
+    	
+    	
+    	
+    	
+        @Override
+        ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+            for (int i = 0; i < curInputFileList.size(); i++) {
+                File fileItem = curInputFileList.get(i);
+                ArrayList<String> contentList = ReadFileContentAsList(fileItem);
+                
+				/*
+				 * if(true) { writeContentToFile(I9_Temp_Text_File,contentList);
+				 * NotePadOpenTargetFile(I9_Temp_Text_File.getAbsolutePath()); return null; }
+				 */
+                ArrayList<String> oneWordList = new          ArrayList<String>();
+                
+                for (int j = 0; j < contentList.size(); j++) {
+                	String wordStr = contentList.get(j).trim();
+                	
+                	int wordLength = wordStr.length();
+                	for (int k = 0; k < wordLength; k++) {
+                		String oneWord = wordStr.substring(k,k+1);
+                		if("".equals(oneWord.trim())) {
+                			continue;
+                		}
+                		oneWordList.add(oneWord);
+                		int currCount = oneWordList.size();
+                		System.out.println("Word_index["+currCount+"] value="+oneWord+"   lineStr="+wordStr);
+					}
+
+				}
+                
+                ArrayList<String> oneWordCopyList = new          ArrayList<String>();    
+   
+                for (int j = 0; j < oneWordList.size(); j++) {
+					
+                	String oneWord = oneWordList.get(j);
+                	System.out.println("oneWord["+j+"] = "+oneWord);
+                	String copyWord = copyWord(oneWord,130);
+                	oneWordCopyList.add(copyWord);
+				}
+
+                writeContentToFile(I9_Temp_Text_File,oneWordCopyList);
+                NotePadOpenTargetFile(I9_Temp_Text_File.getAbsolutePath());
+                System.out.println("rule_"+rule_index+" -> 完成 copy一个字符 作为 一行 一行120个重复字符的操作");
+
+        }
+
+
+            return super.applyOperationRule(curFileList, subFileTypeMap, curDirList, curRealFileList);
+        }
+        
+        String copyWord(String rawStr , int copyTime) {
+        	StringBuilder sb = new StringBuilder();
+        	for (int i = 0; i < copyTime; i++) {
+        		sb.append(rawStr);
+			}
+        	return sb.toString();
+        	
+        }
+
+    	
+        @Override
+        String simpleDesc() {
+            return " 读取当前文件的每一个字符串 截取每一个字符作为单独的字符串然后复制120份作为一行 notepad++ temp打开 ";
+        }
+    	
+    }
     
     
     //依据当前目录 动态构建 java 运行命令  包括 sh  和 bat  // 当前目录只能有一个 .java 多个 .jar 包
