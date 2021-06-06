@@ -393,6 +393,10 @@ public class I9_TextRuleOperation {
         
         // 读取当前文件的每一个字符串 截取每一个字符作为单独的字符串然后复制120份
         CUR_RULE_LIST.add( new MakeStringAsOneString_Copy120AsLine_Rule_33());
+        
+        // 读取当前页面的每一行 只留下 颜色的值  并 生成 android的 列表 
+        CUR_RULE_LIST.add( new Select16Color2Android_Rule_34());
+        
 //        CUR_RULE_LIST.add( new Image2Png_Rule_4());
 //        CUR_RULE_LIST.add( new AVI_Rule_5());
 //        CUR_RULE_LIST.add( new SubDirRename_Rule_6());
@@ -400,6 +404,186 @@ public class I9_TextRuleOperation {
 //        CUR_RULE_LIST.add( new ClearChineseType_8());
 
     }
+    
+
+
+    // 读取当前页面的每一行 只留下 颜色的值  并 生成 android的 列表 
+    class Select16Color2Android_Rule_34 extends  Basic_Rule{
+    	Select16Color2Android_Rule_34(){
+            super(34,false);
+        }
+    	
+    	
+    	
+    	
+        @Override
+        ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+            for (int i = 0; i < curInputFileList.size(); i++) {
+                File fileItem = curInputFileList.get(i);
+                ArrayList<String> contentList = ReadFileContentAsList(fileItem);
+                
+				/*
+				 * if(true) { writeContentToFile(I9_Temp_Text_File,contentList);
+				 * NotePadOpenTargetFile(I9_Temp_Text_File.getAbsolutePath()); return null; }
+				 */
+                ArrayList<String> oneWordList = new          ArrayList<String>();
+               	Map<String,String> name_color_map = new HashMap<String,String>();
+                for (int j = 0; j < contentList.size(); j++) {
+                	String wordStr = contentList.get(j).trim();
+                	
+                	String fixed_wordStr = wordStr.replace("###", "#");
+                	fixed_wordStr = fixed_wordStr.replace("	", " ");
+                	 fixed_wordStr = fixed_wordStr.replace("##", "#");
+                	 fixed_wordStr = fixed_wordStr.replace("##", "#");
+                	
+                	int jing_count = calculStrCount(fixed_wordStr,'#');
+                	
+                	System.out.println(" wordStr = "+ wordStr +" jing_count="+jing_count);
+                	
+                	String[] colorStrArr = fixed_wordStr.split(" ");
+                	if(jing_count == 0 || colorStrArr == null || colorStrArr.length < 2) {
+                		System.out.println("过滤A 点 ");
+                		continue;
+                	}
+                	
+                	
+             
+                	ArrayList<String> coloritemList = new ArrayList<String>();
+                	StringBuilder sb = new StringBuilder();
+                	
+                	for (int k = 0; k < colorStrArr.length; k++) {
+						String strItem = colorStrArr[k];
+						if(isNumeric(strItem)) {
+							System.out.println("过滤B 点  strItem ="+ strItem);
+							continue;
+						}else {
+							System.out.println("通过 B 点  strItem ="+ strItem);
+
+						}
+						System.out.println("通过 B 点  strItem ="+ strItem);
+
+						if(strItem.startsWith("#")) {
+							String clear_jing = strItem.replace("#", "");
+							
+							if(clear_jing.length() == 8 || clear_jing.length() == 6) {
+								if(is16jinzhi(clear_jing)) {
+									System.out.println("过滤C 点 ");
+							String colorName = 	coloritemList.get(coloritemList.size()-1);
+							String colorValue = 	strItem;
+							if(name_color_map.containsKey(colorName)) {
+								name_color_map.put(colorName+"_1", colorValue);	
+							}else {
+								name_color_map.put(colorName, colorValue);
+							}
+				
+									
+								}else {
+									System.out.println("过滤E 点 ");
+									System.out.println("长度不达标！！ strItem = "+ strItem);
+								}
+							}
+							
+									
+							continue;
+						}else {
+							System.out.println("FF 不是以 # 开头 strItem="+strItem);
+						}
+						coloritemList.add(strItem);  //  把名字 保存起来
+						
+					}
+                	
+                	
+                	
+  
+               
+              
+              
+
+				}
+               ArrayList<String> codeArr=  calculAndroidColorCode(name_color_map);
+       
+                
+
+
+                writeContentToFile(I9_Temp_Text_File,codeArr);
+                NotePadOpenTargetFile(I9_Temp_Text_File.getAbsolutePath());
+                System.out.println("rule_"+rule_index+" -> 完成读取当前文件的每一行 检测是否有颜色 如果有颜色 那么计算颜色 并输出安卓颜色列表");
+
+        }
+
+
+            return super.applyOperationRule(curFileList, subFileTypeMap, curDirList, curRealFileList);
+        }
+        
+        @SuppressWarnings("unchecked")
+        public  ArrayList<String> calculAndroidColorCode(Map<String,String> mMapParam ){
+        	ArrayList<String>  codeArr = new ArrayList<String>();
+        	
+        	//     <color name="rainbow_popul">#228B00FF</color>
+          	ArrayList<String>  xmlcodeArr = new ArrayList<String>();
+          	
+//            static int[] rainbow_colorList = {
+//                    R.color.rainbow_red     ,
+//                    R.color.rainbow_orange  ,
+//                    R.color.rainbow_yellow  ,
+//                    R.color.rainbow_green   ,
+//                    R.color.rainbow_blue    ,
+//                    R.color.rainbow_popul   };
+            
+          	ArrayList<String>  javacodeArr = new ArrayList<String>();
+          	javacodeArr.add("static int[] rainbow_colorList = {");
+          	
+          	
+            Map.Entry<String , String> entryItem;
+            
+    		 System.out.println("════════════════════ Map<String,String> 大小:" + mMapParam.size()+" " +"════════════════════ ");
+              int index = 0;
+            if(mMapParam != null){
+                Iterator iterator = mMapParam.entrySet().iterator();
+                while( iterator.hasNext() ){
+                    entryItem = (Map.Entry<String , String>) iterator.next();
+               
+                   String key =  entryItem.getKey();   //Map的Key
+                   String value =    entryItem.getValue();  //Map的Value
+                    System.out.println("Map_index["+index+"]  key=["+key+"]   value=["+value+"]");
+                    xmlcodeArr.add("<color name=\""+key+"\">"+value+"</color>");
+                    if(index == mMapParam.size() -1) {
+                        javacodeArr.add("R.color."+key);
+                    }else {
+                        javacodeArr.add("R.color."+key+",");
+                    }
+             
+                    index++;
+                }
+            }
+            javacodeArr.add("};");
+            
+            codeArr.addAll(javacodeArr);
+            codeArr.add("ZZZZZZZZZZZZZZZZZZZZZZZZZ");
+            codeArr.addAll(xmlcodeArr);
+            codeArr.add("ZZZZZZZZZZZZZZZZZZZZZZZZZ");
+            return codeArr;
+        }
+        
+        
+        String copyWord(String rawStr , int copyTime) {
+        	StringBuilder sb = new StringBuilder();
+        	for (int i = 0; i < copyTime; i++) {
+        		sb.append(rawStr);
+			}
+        	return sb.toString();
+        	
+        }
+
+    	
+        @Override
+        String simpleDesc() {
+            return " 读取当前文件的每一行 检测是否有颜色 如果有颜色 那么计算颜色 并输出安卓颜色列表 ";
+        }
+    	
+    }
+    
+    
     
     // 读取当前文件的每一个字符串 截取每一个字符作为单独的字符串然后复制120份
     class MakeStringAsOneString_Copy120AsLine_Rule_33 extends  Basic_Rule{
@@ -4771,14 +4955,6 @@ public class I9_TextRuleOperation {
 
 
 
-    public static boolean isNumeric(String str) {
-        for (int i = str.length(); --i >= 0; ) {
-            if (!Character.isDigit(str.charAt(i))) {
-                return false;
-            }
-        }
-        return true;
-    }
 
 
     static void writeContentToFile(File file, ArrayList<String> strList) {
@@ -10728,6 +10904,46 @@ public class I9_TextRuleOperation {
     }
 
 
+    @SuppressWarnings("unchecked")
+    public static void ShowMap_String_String(Map<String,String> mMapParam, String tag){
+        Map.Entry<String , String> entryItem;
+        
+		 System.out.println("════════════════════ Map<String,String> 大小:" + mMapParam.size()+" " +"════════════════════ ");
+          int index = 0;
+        if(mMapParam != null){
+            Iterator iterator = mMapParam.entrySet().iterator();
+            while( iterator.hasNext() ){
+                entryItem = (Map.Entry<String , String>) iterator.next();
+           
+               String key =  entryItem.getKey();   //Map的Key
+               String value =    entryItem.getValue();  //Map的Value
+                System.out.println("Map_index["+index+"]  key=["+key+"]   value=["+value+"]");
+                index++;
+            }
+        }
+    }
+
+
+    @SuppressWarnings("unchecked")
+    public static void ShowMap_Int_ArrInt(Map<Integer,ArrayList<Integer>> mMapParam){
+        Map.Entry<Integer , ArrayList<Integer>> entryItem;
+        int Firstindex = 0;
+        if(mMapParam != null){
+            Iterator iterator = mMapParam.entrySet().iterator();
+            while( iterator.hasNext() ){
+                entryItem = (Map.Entry<Integer , ArrayList<Integer>>) iterator.next();
+                Integer year =   entryItem.getKey();   //Map的Key
+                ArrayList<Integer> year_day =  entryItem.getValue();  //Map的Value
+                int SecondIndex = 0;
+                System.out.println("========== MapIndex["+Firstindex+"] "+year + "  =========");
+                for (int i = 0; i <year_day.size() ; i++) {
+                    System.out.println( "MapIndex["+Firstindex+"] ValueIndex=["+SecondIndex+"]"+" key=["  +year + "]  value=["+year_day.get(i)+"] "  );
+                    SecondIndex++;
+                }
+                Firstindex++;
+            }
+        }
+    }
     public static class MyJsonParser implements JsonParse {
 
         @SuppressWarnings("unchecked")
@@ -10828,6 +11044,39 @@ public class I9_TextRuleOperation {
          */
         String formatName(String name);
     }
+    
+static boolean is16jinzhi(String s) {
+boolean is16jinzhi = false;
+String regex="^[A-Fa-f0-9]+$";
+
+if(s.matches(regex)){
+
+System.out.println(s.toUpperCase()+"是16进制数");
+is16jinzhi = true;
+}else{
+
+System.out.println(s.toUpperCase()+"不是16进制数");
+is16jinzhi = false;
+   }
+
+return is16jinzhi;
+}
+    
+
+static int calculStrCount(String src, char charTarget) {
+    int count = 0;
+    String curFixStr = src.trim();
+
+    for (int i = 0; i < curFixStr.length(); i++) {
+        char charitem = curFixStr.charAt(i);
+
+        if (charitem == charTarget) {
+            count++;
+        }
+    }
+
+    return count;
+}
 
 	static boolean isStartWith_lower_trim_InArr(ArrayList<String> strList,String strValue) {
 		boolean isContain = false;
@@ -10850,6 +11099,17 @@ public class I9_TextRuleOperation {
 	}
 	
 
+    public static boolean isNumeric(String str) {
+    	if(str.contains("#")) {
+    		return false;
+    	}
+        for (int i = str.length(); --i >= 0; ) {
+            if (!Character.isDigit(str.charAt(i))) {
+                return false;
+            }
+        }
+        return true;
+    }
     //    List<A_B_C>  需要把这个 创建了三个 JavaBean
 // A , B  ,C  这三个 对象的 execute()方法 会执行  parseMap();  zzj
 //         而不会执行  parseMap()  的  generationBean.writeList(clz);  去 生成

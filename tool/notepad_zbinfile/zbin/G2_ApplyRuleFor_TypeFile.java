@@ -4,6 +4,9 @@ import cn.hutool.json.JSONUtil;
 
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.pdf.PdfCopy;
+import com.itextpdf.text.pdf.PdfImportedPage;
+import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.luciad.imageio.webp.WebPReadParam;
 import com.mpatric.mp3agic.ID3v1;
@@ -241,8 +244,9 @@ public class G2_ApplyRuleFor_TypeFile {
 		realTypeRuleList.add(new Land_Port_Classify_Rule_20());
 		realTypeRuleList.add(new Rename_Img_WithSize_Rule_21());
 		realTypeRuleList.add(new ReSize_Img_Rule_22());
-		realTypeRuleList.add(new Append_Pdf_Rule_23()); // 把 pdf 文件 追加 合并为 一个文件
 
+		//  23 
+		realTypeRuleList.add(new ZZ_Holder_ZZ_Rule_23());
 		realTypeRuleList.add(new add_Middle_Dir_Rule_24()); // 在当前的目录 与 子目录 之间 新增 一层文件夹 , 文件夹名称任意 用户输入
 
 		// 从上往下打印 年月 标示   接受来自 输入的参数  打开 临时文件
@@ -274,6 +278,8 @@ public class G2_ApplyRuleFor_TypeFile {
 		
 		//  把当前的 MP3文件转为  JSON 格式数据 方便 布局 树形 结构
 		realTypeRuleList.add(new MP3_Revert2JSOn_Rule_34());
+		realTypeRuleList.add(new Append_Pdf_Rule_35()); // 把 pdf 文件 追加 合并为 一个文件
+		realTypeRuleList.add(new Seperate_Pdf_Rule_36()); // 把 pdf中指定的页数 分隔出来作为一个新的pdf文件
 		
 	}
 
@@ -286,6 +292,339 @@ public class G2_ApplyRuleFor_TypeFile {
 	
 	
 
+	
+
+	 // 把 pdf中指定的页数 分隔出来作为一个新的pdf文件      #_36  A.pdf 31_341 
+	
+	class Seperate_Pdf_Rule_36 extends Basic_Rule {
+
+
+		// 参数的Key是 从参数输入的 文件的名称  参数的Value是对这个文件进行操作的 页面数值
+
+		File targetPDF_File = null ;    // 目标 pdf target
+		// 1. 有前  2.有后 3.有前后
+		ArrayList<String>  page_page_StrArr;   // 输入的分隔的字符串 _10 18_ 10_11 12_20  
+		Seperate_Pdf_Rule_36() {
+			super("#", 36, 3); //
+
+			page_page_StrArr = new ArrayList<String>();
+		}
+
+		@Override
+		boolean allowEmptyDirFileList() {
+		
+		return true;
+		}
+	
+		@Override
+		boolean initParamsWithInputList(ArrayList<String> inputParamList) {
+
+			for (int i = 0; i < inputParamList.size(); i++) {
+				String strInput = inputParamList.get(i);
+
+				File tempFile = new File(curDirPath + File.separator + strInput);
+				if (tempFile.exists() && !tempFile.isDirectory()) {
+					String inputFileName = tempFile.getName().toLowerCase();
+					if (inputFileName.endsWith(".pdf")) {
+						targetPDF_File =  tempFile;
+						continue;
+					}
+				}
+				
+				if(strInput.contains("_") && !strInput.contains("#") && strInput.contains("page_")) {
+					//去除掉_ 下划线后 全是数值
+					String verifyStr = strInput.replace("page_","");
+					String verifyStr_2 = verifyStr.replace("_","");
+					if(isNumeric(verifyStr_2)) {
+						page_page_StrArr.add(verifyStr);
+					}
+				}
+				
+		
+			}
+
+			if(targetPDF_File  == null || page_page_StrArr.size() == 0){
+				System.out.println("用户对于 规则 rule"+rule_index +"输入错误！  没有输入 指定的 pdf文件!");
+				return false;
+			}
+			return super.initParamsWithInputList(inputParamList);
+		}
+
+		@Override
+		ArrayList<File> applyFileListRule3(ArrayList<File> subFileList, HashMap<String, ArrayList<File>> fileTypeMap) {
+			// TODO Auto-generated method stub
+			if (targetPDF_File  == null  || page_page_StrArr.size() == 0) {
+				System.out.println("用户对于 规则 rule"+rule_index +"输入错误！  没有输入 指定的 pdf文件!");
+
+				return null;
+			}
+
+			try {
+				for (int i = 0; i < page_page_StrArr.size(); i++) {
+					
+					System.out.println("规则"+rule_index+" Param"+i+"["+page_page_StrArr.get(i)+"]");
+				}
+			
+				for (int i = 0; i < page_page_StrArr.size(); i++) {
+					String index_str_item = page_page_StrArr.get(i);
+					//  可能是 -1  , index_pre 为 -1   标示 从第一页 开始遍历 
+					int index_pre = calculPageString(index_str_item,true);
+					System.out.println("calculPageString_index_pre = "+index_pre);
+					if(index_pre == -1 || index_pre < 0) {  // 从第一页开始计数的
+						index_pre = 1 ;
+					}
+
+					// index_end 为 -1 标示 读取到 pdf的最后一页  这个页数需要读文件 才能拿取到 
+					int index_end = calculPageString(index_str_item,false);
+					System.out.println("calculPageString_index_end = "+index_end);
+					
+
+					
+				     PdfReader reader = new PdfReader(targetPDF_File.getAbsolutePath());
+
+				     int numberOfPages_Pdf = reader.getNumberOfPages();  // 读取文件大小
+				     reader.close();  //  关闭 
+				  
+						if(index_end == -1 || index_end < 0) {
+							index_end = numberOfPages_Pdf ;
+						}
+						
+						// 如果索引超过了 文件的页数  那么更正 
+						if(index_end > numberOfPages_Pdf) {
+							index_end = numberOfPages_Pdf;
+						}
+						
+						if(index_pre > index_end) {
+							int temp = index_pre;
+							index_pre = index_end;
+							index_end = temp;
+						}
+					
+						
+						System.out.println("当前Page_Page字符串【"+index_str_item+"】  当前解析索引 pre_index="+index_pre+"  end_index="+index_end +" PDF总页数="+numberOfPages_Pdf );	
+						String newPdfName = targetPDF_File.getParentFile().getAbsolutePath()+File.separator+(getFileNameNoPoint(targetPDF_File.getName()))+"_"+index_pre+"_"+index_end+".pdf";
+						
+						   reader = new PdfReader(targetPDF_File.getAbsolutePath());
+				            Document doc = new Document();
+				            String splitFileName = newPdfName;
+				            PdfCopy pdfCopy;
+				            try {
+				                pdfCopy = new PdfCopy(doc, new FileOutputStream(splitFileName));
+				            } catch (FileNotFoundException | DocumentException e) {
+								System.out.println("分隔失败---》 当前Page_Page字符串【"+index_str_item+"】  当前解析索引 pre_index="+index_pre+"  end_index="+index_end +" PDF总页数="+numberOfPages_Pdf );	
+
+				                throw new Exception("切割文件副本创建失败 AAAAA1111 ");
+				 
+				            }
+				            doc.open();
+				            // 将pdf按页复制到新建的PDF中
+				            System.out.println("PDF 循环起点 index_pre="+index_pre+"   终点index_end="+index_end);
+				            for (int j = index_pre; j <= index_end ; ++j) {
+//				                System.out.println("jAA  = "+ j);
+				                doc.newPage();
+//				                System.out.println("jBB  = "+ j);
+				                PdfImportedPage page = pdfCopy.getImportedPage(reader, j);
+				                pdfCopy.addPage(page);
+				            }
+				            doc.close();
+				  
+				            pdfCopy.close();
+				  
+
+					
+				}
+
+		
+
+			} catch (Exception e) {
+				System.out.println("当前 执行 pdf 分割操作报错！AAA " + e.getLocalizedMessage());
+
+			}
+
+			return super.applyFileListRule3(subFileList, fileTypeMap);
+		}
+		
+		int calculPageString(String pageStr , boolean isPre) {
+			int pageIndex = -1;
+			String fixed_str = pageStr.replace("__", "_").trim();
+			fixed_str = fixed_str.replace("___", "_");
+			fixed_str = fixed_str.replace("__", "_");
+			fixed_str = fixed_str.replace("__", "_");  // 只有一个 _ 下划线了
+			
+			String[] splitArr = fixed_str.split("_");
+			
+			
+			if(splitArr == null) {
+				return pageIndex;
+			}
+		
+			if(fixed_str.startsWith("_")) { // 如果以_ 开头说明 没有指定 起点   指定了终点 
+				if(isPre) {   
+					return pageIndex;
+				}else {   // 
+					String endIndex = fixed_str.replace("_", "");
+					if(isNumeric(endIndex)) {
+						return Integer.parseInt(endIndex);
+					}
+				}
+				
+			}else if(fixed_str.endsWith("_")) { // 没有指定末尾页数 那么返回 -1  指定了起始页 
+				if(isPre) {
+					String preIndex = fixed_str.replace("_", "");
+					if(isNumeric(preIndex)) {
+						return Integer.parseInt(preIndex);
+					}
+			
+				}else {   // 
+					return pageIndex;
+				}
+		
+			}  
+	
+			
+			if(splitArr.length  != 2) {
+				return pageIndex;
+			}
+			
+			String preStr = splitArr[0];
+			
+			String endStr = splitArr[1];
+			if(isPre && isNumeric(preStr)) {
+				return Integer.parseInt(preStr);
+				
+			}else if(!isPre && isNumeric(endStr)) {
+				return Integer.parseInt(endStr);
+			}
+			
+			return pageIndex;
+		}
+		
+
+		@Override
+		String simpleDesc() {
+
+			return Cur_Bat_Name + " #_"+rule_index+"  <指定Pdf文件>  page_1_10 page_11_20 page_30_40  ###  PDF从第一页开始 分隔当前的pdf文件中的1_10page 形成新的文件   \n"
+					+ Cur_Bat_Name + " #_"+rule_index+"  A.pdf  page_1_10  page_2_20  ### 解析当前的A.pdf 生成 下划线分隔 A_1_10.pdf 文件 分隔新page的pdf文件 \n"						
+              		+ Cur_Bat_Name + " #_"+rule_index+"  A.pdf  page_10_  page_50_  ### 解析当前的A.pdf 生成 从第10页开始解析到最后  从第50页开始解析到最后 \n"						
+
+					;
+		}
+
+	}
+
+	
+	
+	class Append_Pdf_Rule_35 extends Basic_Rule {
+
+		ArrayList<File> mPdfFileList; // 当前 cmd 参数给出的 pdf 文件列表 依次合并
+
+		Append_Pdf_Rule_35() {
+			super("#", 35, 3); //
+			mPdfFileList = new ArrayList<File>();
+		}
+
+		@Override
+		boolean initParamsWithInputList(ArrayList<String> inputParamList) {
+
+			for (int i = 0; i < inputParamList.size(); i++) {
+				String strInput = inputParamList.get(i);
+
+				File tempFile = new File(curDirPath + File.separator + strInput);
+				if (tempFile.exists() && !tempFile.isDirectory()) {
+					String inputFileName = tempFile.getName().toLowerCase();
+					if (inputFileName.endsWith(".pdf")) {
+						mPdfFileList.add(tempFile);
+					}
+				}
+			}
+
+			if (mPdfFileList.size() < 2) {
+				System.out.println("当前 命令行输入的 pdf 文件个数 小于2个无法 执行合并 操作!");
+				return false;
+			}
+			return super.initParamsWithInputList(inputParamList);
+		}
+
+		@Override
+		ArrayList<File> applyFileListRule3(ArrayList<File> subFileList, HashMap<String, ArrayList<File>> fileTypeMap) {
+			// TODO Auto-generated method stub
+			if (mPdfFileList.size() < 2) {
+				System.out.println("当前 命令行输入的 pdf 文件个数 小于2个无法 执行合并 操作!");
+				return null;
+			}
+
+			try {
+
+				String originName = mPdfFileList.get(0).getName();
+				String currentTimeStamp = "_" + getTimeStamp();
+				String newPdfFileName = getFileNameNoPoint(originName) + currentTimeStamp + ".pdf";
+
+				File newPdfFile = new File(curDirPath + File.separator + newPdfFileName);
+				File mergedFIle = mulFile2One(mPdfFileList, newPdfFile.getAbsolutePath());
+				System.out.println(" 新 合并文件大小:" + mergedFIle.length());
+
+				if (mergedFIle.length() > 0) {
+					for (int i = 0; i < mPdfFileList.size(); i++) {
+						File tempFile = mPdfFileList.get(i);
+						tempFile.delete();
+					}
+
+					tryReName(mergedFIle, originName);
+				}
+
+				System.out.println("OK!  PDF 文件 已经 生成 --> " + originName);
+
+			} catch (Exception e) {
+				System.out.println("当前 执行 pdf 合并操作报错！" + e.getLocalizedMessage());
+
+			}
+
+			return super.applyFileListRule3(subFileList, fileTypeMap);
+		}
+
+		/*
+		 * String ruleTip(String type, int index, String batName, OS_TYPE curType) {
+		 * String itemDesc = ""; String desc_true =
+		 * "  对给定的 pdf文件A   pdf文件B  pdf文件C 文件进行合并 合并的pdf文件名称为 pdfA文件名称,并删除原pdf文件 ";
+		 * 
+		 * if (curType == OS_TYPE.Windows) { itemDesc = batName.trim() + ".bat  " + type
+		 * + "_" + index + "      <指定Pdf文件A> <指定Pdf文件B>   <指定Pdf文件C>     ## [索引 " +
+		 * index + "]  描述: " + desc_true + "\n";
+		 * 
+		 * } else { itemDesc = batName.trim() + ".sh " + type + "_" + index +
+		 * "     <指定Pdf文件A>  <指定Pdf文件B>   <指定Pdf文件C>    ##   [索引 " + index + "]  描述:" +
+		 * desc_true; }
+		 * 
+		 * return itemDesc; }
+		 */
+		
+		@Override
+		String simpleDesc() {
+
+			return  Cur_Bat_Name + " #_"+rule_index+"  <指定A.Pdf文件> <指定B.Pdf文件>  ### 按顺序合并当前所有pdf到一个pdf文件中 原有pdf删除   \n"
+					+ Cur_Bat_Name + " #_"+rule_index+"  A.pdf B.pdf C.pdf   ### 按顺序合并当前所有pdf到一个pdf文件中 原有pdf删除    \n"						
+                ;
+		}
+		
+
+	}
+
+	public static File mulFile2One(List<File> files, String targetPath) throws IOException {
+		// pdf合并工具类
+		PDFMergerUtility mergePdf = new PDFMergerUtility();
+		for (File f : files) {
+			if (f.exists() && f.isFile()) {
+				// 循环添加要合并的pdf
+				mergePdf.addSource(f);
+			}
+		}
+		// 设置合并生成pdf文件名称
+		mergePdf.setDestinationFileName(targetPath);
+		// 合并pdf
+		mergePdf.mergeDocuments(MemoryUsageSetting.setupMainMemoryOnly());
+		return new File(targetPath);
+	}
+	
 	
     static final transient Rule34_MP3_NodeImpl Rule34_RootNodeImpl  = new G2_ApplyRuleFor_TypeFile().new Rule34_MP3_NodeImpl(0, "全部", 0,0,null);
 
@@ -747,7 +1086,7 @@ System.out.println();
 	
 	public interface Rule34_MP3_Node {
 
-		String json();
+
 	    /**
 	     * 标记唯一性
 	     *
@@ -755,13 +1094,17 @@ System.out.println();
 	     */
 	    long id();
 	    
-	    
+		String json();
 	    // 当前的层级
 	    int level();
 
 	    
 	    // 当前的对应的 MP3 文件的 全路径
 	    String mp3path();
+	  
+	    void setmp3path(String mp3Path);
+	    
+	    void setlevel(int level);
 	    
 	    
 	    /**
@@ -770,9 +1113,7 @@ System.out.println();
 	    @Nonnull
 	    String text();
 
-	    void setmp3path(String mp3Path);
-	    
-	    void setlevel(int level);
+
 	    
 	    /**
 	     * 被选中的Id
@@ -2951,106 +3292,12 @@ System.out.println();
 
 	}
 
-	class Append_Pdf_Rule_23 extends Basic_Rule {
-
-		ArrayList<File> mPdfFileList; // 当前 cmd 参数给出的 pdf 文件列表 依次合并
-
-		Append_Pdf_Rule_23() {
-			super("#", 23, 3); //
-			mPdfFileList = new ArrayList<File>();
+	
+	class ZZ_Holder_ZZ_Rule_23 extends Basic_Rule {
+		
+		ZZ_Holder_ZZ_Rule_23() {
+			super("#", 22, 4); //
 		}
-
-		@Override
-		boolean initParamsWithInputList(ArrayList<String> inputParamList) {
-
-			for (int i = 0; i < inputParamList.size(); i++) {
-				String strInput = inputParamList.get(i);
-
-				File tempFile = new File(curDirPath + File.separator + strInput);
-				if (tempFile.exists() && !tempFile.isDirectory()) {
-					String inputFileName = tempFile.getName().toLowerCase();
-					if (inputFileName.endsWith(".pdf")) {
-						mPdfFileList.add(tempFile);
-					}
-				}
-			}
-
-			if (mPdfFileList.size() < 2) {
-				System.out.println("当前 命令行输入的 pdf 文件个数 小于2个无法 执行合并 操作!");
-				return false;
-			}
-			return super.initParamsWithInputList(inputParamList);
-		}
-
-		@Override
-		ArrayList<File> applyFileListRule3(ArrayList<File> subFileList, HashMap<String, ArrayList<File>> fileTypeMap) {
-			// TODO Auto-generated method stub
-			if (mPdfFileList.size() < 2) {
-				System.out.println("当前 命令行输入的 pdf 文件个数 小于2个无法 执行合并 操作!");
-				return null;
-			}
-
-			try {
-
-				String originName = mPdfFileList.get(0).getName();
-				String currentTimeStamp = "_" + getTimeStamp();
-				String newPdfFileName = getFileNameNoPoint(originName) + currentTimeStamp + ".pdf";
-
-				File newPdfFile = new File(curDirPath + File.separator + newPdfFileName);
-				File mergedFIle = mulFile2One(mPdfFileList, newPdfFile.getAbsolutePath());
-				System.out.println(" 新 合并文件大小:" + mergedFIle.length());
-
-				if (mergedFIle.length() > 0) {
-					for (int i = 0; i < mPdfFileList.size(); i++) {
-						File tempFile = mPdfFileList.get(i);
-						tempFile.delete();
-					}
-
-					tryReName(mergedFIle, originName);
-				}
-
-				System.out.println("OK!  PDF 文件 已经 生成 --> " + originName);
-
-			} catch (Exception e) {
-				System.out.println("当前 执行 pdf 合并操作报错！" + e.getLocalizedMessage());
-
-			}
-
-			return super.applyFileListRule3(subFileList, fileTypeMap);
-		}
-
-		String ruleTip(String type, int index, String batName, OS_TYPE curType) {
-			String itemDesc = "";
-			String desc_true = "  对给定的 pdf文件A   pdf文件B  pdf文件C 文件进行合并 合并的pdf文件名称为 pdfA文件名称,并删除原pdf文件 ";
-
-			if (curType == OS_TYPE.Windows) {
-				itemDesc = batName.trim() + ".bat  " + type + "_" + index
-						+ "      <指定Pdf文件A> <指定Pdf文件B>   <指定Pdf文件C>     ## [索引 " + index + "]  描述: " + desc_true + "\n";
-
-			} else {
-				itemDesc = batName.trim() + ".sh " + type + "_" + index
-						+ "     <指定Pdf文件A>  <指定Pdf文件B>   <指定Pdf文件C>    ##   [索引 " + index + "]  描述:" + desc_true;
-			}
-
-			return itemDesc;
-		}
-
-	}
-
-	public static File mulFile2One(List<File> files, String targetPath) throws IOException {
-		// pdf合并工具类
-		PDFMergerUtility mergePdf = new PDFMergerUtility();
-		for (File f : files) {
-			if (f.exists() && f.isFile()) {
-				// 循环添加要合并的pdf
-				mergePdf.addSource(f);
-			}
-		}
-		// 设置合并生成pdf文件名称
-		mergePdf.setDestinationFileName(targetPath);
-		// 合并pdf
-		mergePdf.mergeDocuments(MemoryUsageSetting.setupMainMemoryOnly());
-		return new File(targetPath);
 	}
 
 	class ReSize_Img_Rule_22 extends Basic_Rule {

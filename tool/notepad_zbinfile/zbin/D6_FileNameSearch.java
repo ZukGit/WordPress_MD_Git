@@ -1,8 +1,5 @@
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -143,11 +140,20 @@ public class D6_FileNameSearch {
     		System.out.println("当前目录: "+curDirFile.getAbsolutePath()+" 不存在 文件类型"+type+"的文件!!");
     	   return;
     	}
-    	
+
+    	ArrayList<File> D3V2_LowerSongInfo_DifferentArr= new ArrayList<File>();
     	for (int i = 0; i < fileList.size(); i++) {
     		try {
-				Mp3File mp3Item = new Mp3File(fileList.get(i).getAbsolutePath());
-				MP3_D3V2_Info(mp3Item,i+1,fileList.size());
+
+                File MP3FileItem =     fileList.get(i);
+
+				Mp3File mp3TagItem = new Mp3File(MP3FileItem.getAbsolutePath());
+               boolean isSameInfo =   GetDifferent_D3V2Tag_ByteTag_MP3Info(mp3TagItem,MP3FileItem,i+1,fileList.size());
+
+               if(!isSameInfo){
+                   D3V2_LowerSongInfo_DifferentArr.add(MP3FileItem);
+               }
+
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -155,45 +161,307 @@ public class D6_FileNameSearch {
 			}
     		
 		}
-    	
-    	
+
+if(D3V2_LowerSongInfo_DifferentArr.size() > 0){
+    System.out.println("════════════ 存在【"+D3V2_LowerSongInfo_DifferentArr.size()+"】个 D3V2_Tag 和 Byte_Tag 不同的MP3文件 ══════════");
+
+    for (int i = 0; i < D3V2_LowerSongInfo_DifferentArr.size(); i++) {
+        File MP3FileItem =     fileList.get(i);
+
+        try {
+            Mp3File mp3TagItem_2 = new Mp3File(MP3FileItem.getAbsolutePath());
+
+            Show_D3V2Tag_ByteTag_MP3Info(mp3TagItem_2,MP3FileItem,i+1,D3V2_LowerSongInfo_DifferentArr.size());
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (UnsupportedTagException e) {
+            e.printStackTrace();
+        } catch (InvalidDataException e) {
+            e.printStackTrace();
+        }
+
     }
-    
-  	public static void MP3_D3V2_Info(Mp3File  mp3file , int index , int allSize) {
+    System.out.println("════════════ 存在【"+D3V2_LowerSongInfo_DifferentArr.size()+"】个 D3V2_Tag 和 Byte_Tag 不同的MP3文件 ══════════");
 
-		if (mp3file.hasId3v2Tag()) {
-			
+}
 
-			  ID3v2 id3v2Tag = mp3file.getId3v2Tag();
-			  System.out.println("════════════════════════ mp3【"+index+"】【"+allSize+"】 "+mp3file.getFilename()+" ════════════════════════ ");
-			  System.out.println("Track___________:  "+id3v2Tag.getTrack());
-			  System.out.println("Artist__________:  "+id3v2Tag.getArtist());
-			  System.out.println("Title___________:  "+id3v2Tag.getTitle());
-			  System.out.println("Album___________:  "+id3v2Tag.getAlbum());
-			  System.out.println("Year____________:  "+id3v2Tag.getYear());
-			  System.out.println("Genre___________:  "+id3v2Tag.getGenre()+"("+id3v2Tag.getGenreDescription()+")");
-			  System.out.println("Comment_________:  "+id3v2Tag.getComment());
-			  System.out.println("Lyrics__________:  "+id3v2Tag.getLyrics());
-			  System.out.println("Composer________:  "+id3v2Tag.getComposer());
-			  System.out.println("Publisher_______:  "+id3v2Tag.getPublisher());
-			  System.out.println("Original_artist_:  "+id3v2Tag.getOriginalArtist());
-			  System.out.println("Album_artist____:  "+id3v2Tag.getAlbumArtist());
-			  System.out.println("Copyright_______:  "+id3v2Tag.getCopyright());
-			  System.out.println("URL_____________:  "+id3v2Tag.getUrl());
-			  System.out.println("Encoder_________:  "+id3v2Tag.getEncoder());
+
+
+
+      }
+
+    static class MP3_Lower25_SDK_SongInfo {
+        private final String TAG = "TAG"; // 文件头1-3
+        private String songName; // 歌曲名4-33
+        private String artist; // 歌手名34-63
+        private String album; // 专辑名64-93
+        private String year; // 年94-97
+        private String comment; // 备注98-125
+        private byte r1, r2, r3; // 三个保留位126，127，128
+        private boolean valid; // 是否合法
+        public transient String fileName; // 此歌曲对应的文件名,没有封装
+
+
+        public MP3_Lower25_SDK_SongInfo(byte[] data) {
+            if (data.length != 128) {
+                throw new RuntimeException("数据长度不合法:" + data.length);
+            }
+            String tag = new String(data, 0, 3);
+// 只有前三个字节是TAG才处理后面的字节
+
+            System.out.println("Lower25_SDK_SongInfo tag  = "+ tag);
+            if (tag.equalsIgnoreCase("TAG")) {
+                valid = true;
+                try {
+                    songName = new String(data, 3, 30,"gbk").trim();
+                    artist = new String(data, 33, 30,"gbk").trim();
+                    album = new String(data, 63, 30,"gbk").trim();
+                    year = new String(data, 93, 4,"gbk").trim();
+                    comment = new String(data, 97, 28,"gbk").trim();
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
+
+                r1 = data[125];
+                r2 = data[126];
+                r3 = data[127];
+            } else {
+                valid = false;
+            }
+        }
+
+
+        /**
+         * 返回是否合法
+         *
+         * @return 是否
+         */
+        public boolean isValid() {
+            return valid;
+        }
+
+        /**
+         * 得到此对象的128个字节的表示形式
+         *
+         * @return
+         */
+        public byte[] getBytes() {
+            byte[] data = new byte[128];
+            System.arraycopy(TAG.getBytes(), 0, data, 0, 3);
+            byte[] temp = songName.getBytes();
+            System.arraycopy(temp, 0, data, 3, temp.length > 30 ? 30 : temp.length);
+            temp = artist.getBytes();
+            System.arraycopy(temp, 0, data, 33, temp.length > 30 ? 30 : temp.length);
+            temp = album.getBytes();
+            System.arraycopy(temp, 0, data, 63, temp.length > 30 ? 30 : temp.length);
+            temp = year.getBytes();
+            System.arraycopy(temp, 0, data, 93, temp.length > 4 ? 4 : temp.length);
+            temp = comment.getBytes();
+            System.arraycopy(temp, 0, data, 97, temp.length > 28 ? 28 : temp.length);
+            data[125] = r1;
+            data[126] = r2;
+            data[127] = r3;
+            return data;
+        }
+
+        public String getArtist() {
+            return artist;
+        }
+
+        public void setArtist(String authorName) {
+            this.artist = authorName;
+        }
+
+        public String getComment() {
+            return comment;
+        }
+
+        public void setComment(String comment) {
+            this.comment = comment;
+        }
+
+        public byte getR1() {
+            return r1;
+        }
+
+        public void setR1(byte r1) {
+            this.r1 = r1;
+        }
+
+        public byte getR2() {
+            return r2;
+        }
+
+        public void setR2(byte r2) {
+            this.r2 = r2;
+        }
+
+        public byte getR3() {
+            return r3;
+        }
+
+        public void setR3(byte r3) {
+            this.r3 = r3;
+        }
+
+        public String getSongName() {
+            return songName;
+        }
+
+        public void setSongName(String songName) {
+            if (songName == null) {
+                throw new NullPointerException("歌名不能是null!");
+            }
+            valid = true;
+            this.songName = songName;
+        }
+
+        public String getAlbum() {
+            return album;
+        }
+
+        public void setAlbum(String specialName) {
+            this.album = specialName;
+        }
+
+        public String getYear() {
+            return year;
+        }
+
+        public void setYear(String year) {
+            this.year = year;
+        }
+
+
+    }
+
+
+  	public static boolean GetDifferent_D3V2Tag_ByteTag_MP3Info(Mp3File  mp3Tag ,File mp3File, int index , int allSize) {
+
+        boolean isDifferent = false;
+		if (mp3Tag.hasId3v2Tag()) {
+            RandomAccessFile raFile = null;
+            byte[] buffer = new byte[128];
+            try {
+                raFile = new RandomAccessFile(mp3File, "r");
+
+              raFile.seek(raFile.length() - 128);
+              raFile.read(buffer);
+
+                MP3_Lower25_SDK_SongInfo mp3Info = new MP3_Lower25_SDK_SongInfo(buffer);
+
+
+                String mp3Info_artist = mp3Info.getArtist().trim();
+                String mp3Info_songname = mp3Info.getSongName().trim();
+                String mp3Info_comment = mp3Info.getComment().trim();
+
+
+                ID3v2 id3v2Tag = mp3Tag.getId3v2Tag();
+			  System.out.println("════════════════════════ MP3_D3V2_Info_mp3【"+index+"】【"+allSize+"】 "+mp3Tag.getFilename()+" ════════════════════════ ");
+
+                String id3v2Tag_artist = id3v2Tag.getArtist().trim();
+                String id3v2Tag_songname = id3v2Tag.getTitle().trim();
+                String id3v2Tag_comment = id3v2Tag.getComment().trim();
+
+			  System.out.println("D3V2_Artist=["+id3v2Tag.getArtist()+"]  "+"  Byte_Artist=["+mp3Info_artist+"]");
+			  System.out.println("D3V2_Title=["+id3v2Tag.getTitle()+"]       Byte_Title=["+mp3Info_songname+"]");
+                System.out.println("D3V2_Comment=["+id3v2Tag.getComment()+"]  Byte_Comment=["+mp3Info_comment+"]");
+			  System.out.println("TAG_Album___________:  "+id3v2Tag.getAlbum());
+			  System.out.println("TAG_Year____________:  "+id3v2Tag.getYear());
+			  System.out.println("TAG_Genre___________:  "+id3v2Tag.getGenre()+"("+id3v2Tag.getGenreDescription()+")");
+                System.out.println("TAG_Track___________:  "+id3v2Tag.getTrack()+"");
+			  System.out.println("TAG_Lyrics__________:  "+id3v2Tag.getLyrics());
+			  System.out.println("TAG_Composer________:  "+id3v2Tag.getComposer());
+			  System.out.println("TAG_Publisher_______:  "+id3v2Tag.getPublisher());
+			  System.out.println("TAG_Original_artist_:  "+id3v2Tag.getOriginalArtist());
+			  System.out.println("TAG_Album_artist____:  "+id3v2Tag.getAlbumArtist());
+			  System.out.println("TAG_Copyright_______:  "+id3v2Tag.getCopyright());
+			  System.out.println("TAG_URL_____________:  "+id3v2Tag.getUrl());
+			  System.out.println("TAG_Encoder_________:  "+id3v2Tag.getEncoder());
 			  byte[] albumImageData = id3v2Tag.getAlbumImage();
 			  if (albumImageData != null) {
 			    System.out.println("Have album image data, length: " + albumImageData.length + " bytes");
 			    System.out.println("Album image mime type: " + id3v2Tag.getAlbumImageMimeType());
 			  }
 
+			  // 只有 三个 项  都相等 才 是一致的
+			  if(id3v2Tag_artist.equals(mp3Info_artist) &&  id3v2Tag_songname.equals(mp3Info_songname)   &&  id3v2Tag_comment.equals(mp3Info_comment)  ){
+			      return true;
+             }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
 	}else {
 		
-		System.out.println(mp3file.getFilename()+" 不存在 D3V2 Tag");
+		System.out.println(mp3Tag.getFilename()+" 不存在 D3V2 Tag");
+		return isDifferent;
 	}
+        return isDifferent;
 	}
-  	
-    
+
+
+    public static void Show_D3V2Tag_ByteTag_MP3Info(Mp3File  mp3Tag ,File mp3File, int index , int allSize) {
+
+
+        if (mp3Tag.hasId3v2Tag()) {
+            RandomAccessFile raFile = null;
+            byte[] buffer = new byte[128];
+            try {
+                raFile = new RandomAccessFile(mp3File, "r");
+
+                raFile.seek(raFile.length() - 128);
+                raFile.read(buffer);
+
+                MP3_Lower25_SDK_SongInfo mp3Info = new MP3_Lower25_SDK_SongInfo(buffer);
+
+
+                String mp3Info_artist = mp3Info.getArtist().trim();
+                String mp3Info_songname = mp3Info.getSongName().trim();
+                String mp3Info_comment = mp3Info.getComment().trim();
+
+
+                ID3v2 id3v2Tag = mp3Tag.getId3v2Tag();
+                System.out.println("════════════ MP3_D3V2_Info_mp3【"+index+"】【"+allSize+"】 "+mp3Tag.getFilename()+" ════════════════════════ ");
+
+                String id3v2Tag_artist = id3v2Tag.getArtist().trim();
+                String id3v2Tag_songname = id3v2Tag.getTitle().trim();
+                String id3v2Tag_comment = id3v2Tag.getComment().trim();
+
+
+                System.out.println("D3V2_Artist=["+id3v2Tag.getArtist()+"]  "+"  Byte_Artist=["+mp3Info_artist+"]");
+                System.out.println("D3V2_Title=["+id3v2Tag.getTitle()+"]       Byte_Title=["+mp3Info_songname+"]");
+                System.out.println("D3V2_Comment=["+id3v2Tag.getComment()+"]  Byte_Comment=["+mp3Info_comment+"]");
+                System.out.println("TAG_Album___________:  "+id3v2Tag.getAlbum());
+                System.out.println("TAG_Year____________:  "+id3v2Tag.getYear());
+                System.out.println("TAG_Genre___________:  "+id3v2Tag.getGenre()+"("+id3v2Tag.getGenreDescription()+")");
+                System.out.println("TAG_Track___________:  "+id3v2Tag.getTrack()+"");
+                System.out.println("TAG_Lyrics__________:  "+id3v2Tag.getLyrics());
+                System.out.println("TAG_Composer________:  "+id3v2Tag.getComposer());
+                System.out.println("TAG_Publisher_______:  "+id3v2Tag.getPublisher());
+                System.out.println("TAG_Original_artist_:  "+id3v2Tag.getOriginalArtist());
+                System.out.println("TAG_Album_artist____:  "+id3v2Tag.getAlbumArtist());
+                System.out.println("TAG_Copyright_______:  "+id3v2Tag.getCopyright());
+                System.out.println("TAG_URL_____________:  "+id3v2Tag.getUrl());
+                System.out.println("TAG_Encoder_________:  "+id3v2Tag.getEncoder());
+                byte[] albumImageData = id3v2Tag.getAlbumImage();
+                if (albumImageData != null) {
+                    System.out.println("Have album image data, length: " + albumImageData.length + " bytes");
+                    System.out.println("Album image mime type: " + id3v2Tag.getAlbumImageMimeType());
+                }
+
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }else {
+
+            System.out.println(mp3Tag.getFilename()+" 不存在 D3V2 Tag");
+            System.out.println("════════════ MP3_Index["+index+"] All_Size【"+allSize+"】 不存在 ID3v2 TAG !!!!");
+        }
+
+    }
+
     public static Comparator nameCompara = new Comparator<File>() {
         @Override
         public int compare(File o1, File o2) {

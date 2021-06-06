@@ -1,9 +1,16 @@
 
+import java.awt.datatransfer.StringSelection;
+import java.awt.datatransfer.Transferable;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Comparator;
 
-public class K2_NotepadTip {
+
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.ClipboardOwner;
+import java.awt.datatransfer.DataFlavor;
+public class K2_NotepadTip  implements ClipboardOwner{
     static String OneLine_Pre = "\n════════════════════════════════════════════════";
     static String OneLine_End = "════════════════════════════════════════════════\n";
     static String OneLine = "════════";
@@ -40,10 +47,14 @@ public class K2_NotepadTip {
     // 固定3   当前操作系统的类型
     static OS_TYPE CUR_OS_TYPE = OS_TYPE.Windows;
 
-    public static void main(String[] args) {
+    private Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
 
+    public static void main(String[] args) {
         initSystemInfo();
-       	ShowNotepad_Search_Tip();
+       String  mSearchTip =  	ShowNotepad_Search_Tip();
+       Copy_To_System_ClipBoard(mSearchTip);
+
+       
         if(CUR_OS_TYPE == OS_TYPE.Windows){
  
 
@@ -57,6 +68,10 @@ public class K2_NotepadTip {
 
     }
 
+    static void  Copy_To_System_ClipBoard( String content ){
+        StringSelection stsel = new StringSelection(content);
+        Toolkit.getDefaultToolkit().getSystemClipboard().setContents(stsel, stsel);
+    }
 
     static void  PrintHead_End( String headStr ){
         System.out.println(OneLine_Pre + ""+headStr+""+ OneLine_End);
@@ -77,7 +92,7 @@ public class K2_NotepadTip {
     }
     
     
-    static void ShowNotepad_Search_Tip(){
+    static String ShowNotepad_Search_Tip(){
     	PrintHead_End("【Windos----NotePad++】搜索Tip");
         System.out.println(OneLine+" GPS 相关 正则表达式搜索Tip:");
         ArrayList<String> logKeyList = new   ArrayList<String> ();
@@ -95,7 +110,10 @@ public class K2_NotepadTip {
         logKeyList.add("GnssLocationProvider: SNR");
         logKeyList.add("Sending Location to com.baidu.BaiduMap, Provider: gps");
         logKeyList.add("Sending Location to com.autonavi.minimap, Provider: gps");
+        logKeyList.add("read  gps_open_ind");  //   agps Session 开始
         logKeyList.add("Location UpdateRecord for");
+        
+        
         
         StringBuilder printSB = new StringBuilder();
         
@@ -110,8 +128,17 @@ public class K2_NotepadTip {
 
         }
         
-        PrintRule(printTip);
+        // 把这个字符串 复制到 剪切板 
         
+//      // 存入剪贴板，并注册自己为所有者
+//      // 用以监控下一次剪贴板内容变化
+//      StringSelection tmp = new StringSelection(printTip);
+
+
+      
+        
+        PrintRule(printTip);
+
         PrintADB_Logcat(printTip);
         
         
@@ -134,7 +161,14 @@ public class K2_NotepadTip {
 //        		+ "Sending Location to com.baidu.BaiduMap, Provider: gps"
 //        		+ "Sending Location to com.autonavi.minimap, Provider: gps");
         System.out.println();
+        return printTip;
     }
+
+	@Override
+	public void lostOwnership(Clipboard clipboard, Transferable contents) {
+		// TODO Auto-generated method stub
+		
+	}
 
 
 }

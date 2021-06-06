@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -450,17 +451,7 @@ public class I9_TestJavaTemplate_Rule29 {
 		return contentList;
 
 	}
-	
-	 public static boolean isNumeric(String string) {
-		 String str = string.trim();
-	     for (int i = str.length(); --i >= 0; ) {
-	         if (!Character.isDigit(str.charAt(i))) {
-	             return false;
-	         }
-	     }
-	     return true;
-	 }
-    
+
 		boolean isStartWith_lower_trim_InArr(ArrayList<String> strList,String strValue) {
 			boolean isContain = false;
 			if(strList == null  || strList.size() == 0) {
@@ -497,6 +488,48 @@ public class I9_TestJavaTemplate_Rule29 {
 		 System.out.println();
 	 }
 	 
+	 
+	    @SuppressWarnings("unchecked")
+	    public static void ShowMap_String_String(Map<String,String> mMapParam, String tag){
+	        Map.Entry<String , String> entryItem;
+	        
+			 System.out.println("════════════════════ Map<String,String> 大小:" + mMapParam.size()+" " +"════════════════════ ");
+              int index = 0;
+	        if(mMapParam != null){
+	            Iterator iterator = mMapParam.entrySet().iterator();
+	            while( iterator.hasNext() ){
+	                entryItem = (Map.Entry<String , String>) iterator.next();
+	           
+	               String key =  entryItem.getKey();   //Map的Key
+	               String value =    entryItem.getValue();  //Map的Value
+	                System.out.println("Map_index["+index+"]  key=["+key+"]   value=["+value+"]");
+	                index++;
+	            }
+	        }
+	    }
+
+
+	    @SuppressWarnings("unchecked")
+	    public static void ShowMap_Int_ArrInt(Map<Integer,ArrayList<Integer>> mMapParam){
+	        Map.Entry<Integer , ArrayList<Integer>> entryItem;
+	        int Firstindex = 0;
+	        if(mMapParam != null){
+	            Iterator iterator = mMapParam.entrySet().iterator();
+	            while( iterator.hasNext() ){
+	                entryItem = (Map.Entry<Integer , ArrayList<Integer>>) iterator.next();
+	                Integer year =   entryItem.getKey();   //Map的Key
+	                ArrayList<Integer> year_day =  entryItem.getValue();  //Map的Value
+	                int SecondIndex = 0;
+	                System.out.println("========== MapIndex["+Firstindex+"] "+year + "  =========");
+	                for (int i = 0; i <year_day.size() ; i++) {
+	                    System.out.println( "MapIndex["+Firstindex+"] ValueIndex=["+SecondIndex+"]"+" key=["  +year + "]  value=["+year_day.get(i)+"] "  );
+	                    SecondIndex++;
+	                }
+	                Firstindex++;
+	            }
+	        }
+	    }
+	    
 		
 
 	 
@@ -568,12 +601,46 @@ public class I9_TestJavaTemplate_Rule29 {
 		
 	}
 	
-	
+    public static boolean isNumeric(String str) {
+    	if(str.contains("#")) {
+    		return false;
+    	}
+        for (int i = str.length(); --i >= 0; ) {
+            if (!Character.isDigit(str.charAt(i))) {
+                return false;
+            }
+        }
+        return true;
+    }
     //判断是否是数字
  static boolean isNumericFirstChar(String s){
         return Character.isDigit(s.charAt(0));
     }
  
+ 
+
+ public String getRandomColor(){
+     Random  rd = new Random();
+     int r =  rd.nextInt(256);
+     int g =  rd.nextInt(256);
+     int b =  rd.nextInt(256);
+     String r_str = Integer.toHexString(r);
+     String g_str = Integer.toHexString(g);
+     String b_str = Integer.toHexString(b);
+     if(r_str.length() == 1){
+         r_str = "0"+r_str;
+     }
+     if(g_str.length() == 1){
+         g_str = "0"+g_str;
+     }
+     if(b_str.length() == 1){
+         b_str = "0"+b_str;
+     }
+
+   return   "#"+r_str+g_str+b_str;
+
+ }
+
  
 	static void SortFileWithName(ArrayList<File> fileList) {
 	    Comparator<Object> CHINA_COMPARE = Collator.getInstance(java.util.Locale.CHINA);
@@ -668,6 +735,38 @@ public class I9_TestJavaTemplate_Rule29 {
     	
     }
  
+	static boolean is16jinzhi(String s) {
+		boolean is16jinzhi = false;
+		String regex="^[A-Fa-f0-9]+$";
+
+		if(s.matches(regex)){
+
+		System.out.println(s.toUpperCase()+"是16进制数");
+		is16jinzhi = true;
+		}else{
+
+		System.out.println(s.toUpperCase()+"不是16进制数");
+		is16jinzhi = false;
+		   }
+
+		return is16jinzhi;
+		}
+	
+    static int calculStrCount(String src, char charTarget) {
+        int count = 0;
+        String curFixStr = src.trim();
+
+        for (int i = 0; i < curFixStr.length(); i++) {
+            char charitem = curFixStr.charAt(i);
+
+            if (charitem == charTarget) {
+                count++;
+            }
+        }
+
+        return count;
+    }
+    
 	static ArrayList<File> getRealFileWithDirAndPointType(File dirFile,String type){
 		
 		ArrayList<File> targetFileList = new 	ArrayList<File> ();

@@ -1642,7 +1642,7 @@ rem ======================== BUSSINESS_OPERATION Begin========================
 
 :rule1vbankupapk_func_0x0
 rem ======================================== rule1vbankupapk_func_0x0
-rem rule_tip: %init_input_0% _1_   ## 备份bankup所有当前手机安装的apk本地PC本地目录
+rem rule_tip: %init_input_0% _1_   ## 备份bankup所有当前手机安装的三方 apk本地PC本地目录
 rem desc: 
 rem sample: 
 rem sample_out: 
@@ -1689,7 +1689,7 @@ goto:eof
 
 :rule2vgetapk_func_0x0
 rem ======================================== rule2vgetapk_func_0x0
-rem rule_tip: %init_input_0% _2_   ## 获取手机当前正在运行的APK到本地
+rem rule_tip: %init_input_0% _2_   ## 获取手机当前正在运行的APK_必须是三方的APK 到本地
 rem desc: 
 rem sample: 
 rem sample_out: 
@@ -1943,9 +1943,9 @@ goto:eof
 
 :rule8vtapxy_func_3x0
 rem ======================================== rule8vtapxy_func_3x0
-rem rule_tip: %init_input_0% _8_ 400 800 1000  ## 点击屏幕位置 x y repeat 重复 repeat次 默认1000次
+rem rule_tip: %init_input_0% _8_ 400 800 1000  ## 点击屏幕位置 x[400]  y[800] repeat[1000] 重复 repeat次 默认1000次
 
-rem desc: %init_input_0% _8_ 400 800 1000  点击屏幕位置 x y repeat 重复 repeat次 默认1000次
+rem desc: %init_input_0% _8_ 400 800 1000  点击屏幕位置 x[400]  y[800] repeat[1000] 重复 repeat次 默认1000次
 rem sample: 
 rem sample_out: 
 ::SETLOCAL
@@ -2166,280 +2166,87 @@ goto:eof
 
 
 
-:rule15vxmusbcreendown_func_1x0
-rem ======================================== rule15vxmusbcreendown_func_1x0
+:rule15vxmusbcreendown_func_2x0
+rem ======================================== rule15vxmusbcreendown_func_2x0
 rem rule_tip: %init_input_0% _15_   100000   ##小米_有线USB_手机执行 adb -s c2f5b32c shell input swipe 340 1200 340 400 命令向下滑动两下向上滑动一下 默认10000次
+
+rem rule_tip: %init_input_0% _15_  c2f5b32c  100000    ##小米_有线USB_手机执行  adb -s c2f5b32c shell input swipe 340 1200 340 400 命令向下滑动两下向上滑动一下 默认10000次
+
+rem rule_tip: %init_input_0% _15_  721QECRM2ZMT4  100000  ##魅蓝_有线USB_手机执行  adb -s 721QECRM2ZMT4 shell input swipe 340 1200 340 400 命令向下滑动两下向上滑动一下 默认10000次
+
+rem rule_tip: %init_input_0% _15_  HMKNW17531001873 100000  ##荣耀_有线USB_手机执行 adb -s HMKNW17531001873 shell input swipe 340 1200 340 400 命令向下滑动两下向上滑动一下 默认10000次
+
+rem rule_tip: %init_input_0% _15_  192.168.31.89:5555 100000  ##小米_无线USB_无线 adb -s 192.168.31.89:5555 shell input swipe 340 1200 340 400 命令向下滑动两下向上滑动一下 默认10000次
+
+rem rule_tip: %init_input_0% _15_  192.168.31.40:5555 100000  ##魅蓝_无线USB_无线 adb -s 192.168.31.40:5555 shell input swipe 340 1200 340 400 命令向下滑动两下向上滑动一下 默认10000次
+
+rem rule_tip: %init_input_0% _15_  192.168.31.10:5555 100000  ##荣耀_无线USB_无线 adb -s 192.168.31.10:5555 shell input swipe 340 1200 340 400 命令向下滑动两下向上滑动一下 默认10000次
 
 rem desc: 小米_有线USB_手机执行 adb -s c2f5b32c shell input swipe 340 1200 340 400 命令向下滑动两下向上滑动一下 默认10000次
 rem sample: 
 rem sample_out: 
 ::SETLOCAL
-echo ______________Method_In rule15vxmusbcreendown_func_1x0
+echo ______________Method_In rule15vxmusbcreendown_func_2x0
 set rule15vxmusbcreendown_dynamic_param1=
+set rule15vxmusbcreendown_dynamic_param2=
 if "%init_input_2%"=="" (
-set  rule15vxmusbcreendown_dynamic_param1=100000
+set  rule15vxmusbcreendown_dynamic_param1=c2f5b32c
 ) else (
 set rule15vxmusbcreendown_dynamic_param1=%init_input_2% 
 )
-echo [rule3vadbscreen_func_1x0 ]    output=[__empty__] dynamic_param1=[!rule15vxmusbcreendown_dynamic_param1!]   
-for /l %%i in (1, 1, !rule15vxmusbcreendown_dynamic_param1!) do (
-echo i == %%i   _todown   allLoop=[!rule15vxmusbcreendown_dynamic_param1!]     
-adb -s c2f5b32c shell input swipe 340 1200 340 400  
-ping -n 1 127.0.0.1>nul
-adb -s c2f5b32c shell input swipe 340 1200 340 400  
-ping -n 1 127.0.0.1>nul
-adb -s c2f5b32c shell input swipe 340 400 340 800
-ping -n 1 127.0.0.1>nul
-)
-for /l %%i in (1, 1, !rule15vxmusbcreendown_dynamic_param1!) do (
-echo i == %%i  _toup     allLoop=[!rule15vxmusbcreendown_dynamic_param1!]        
-adb -s c2f5b32c  shell input swipe  340 400  340 1200
-ping -n 1 127.0.0.1>nul
-adb -s c2f5b32c shell input swipe  340 400  340 1200
-ping -n 1 127.0.0.1>nul
-adb -s c2f5b32c  shell input swipe  340 800 340 400
-ping -n 1 127.0.0.1>nul
-)
-echo [rule15vxmusbcreendown_func_1x0 EndPrintCode]    output=[__empty__] dynamic_param1=[!rule15vxmusbcreendown_dynamic_param1!]   
-echo ______________Method_Out rule15vxmusbcreendown_func_1x0
-::ENDLOCAL
-goto:eof
-
-
-
-
-:rule16vmzusbcreendown_func_1x0
-rem ======================================== rule16vmzusbcreendown_func_1x0
-rem rule_tip: %init_input_0% _16_   100000   ##魅族_有线USB_手机执行 adb -s 721QECRM2ZMT4 shell input swipe 340 1200 340 400 命令向下滑动两下向上滑动一下 默认10000次
-
-rem desc: 魅族_有线USB_手机执行 adb -s 721QECRM2ZMT4 shell input swipe 340 1200 340 400 命令向下滑动两下向上滑动一下 默认100000次
-rem sample: 
-rem sample_out: 
-::SETLOCAL
-echo ______________Method_In rule16vmzusbcreendown_func_1x0
-set rule16vmzusbcreendown_dynamic_param1=
-if "%init_input_2%"=="" (
-set  rule16vmzusbcreendown_dynamic_param1=10000
+if "%init_input_3%"=="" (
+set  rule15vxmusbcreendown_dynamic_param2=10000
 ) else (
-set rule16vmzusbcreendown_dynamic_param1=%init_input_2% 
+set rule15vxmusbcreendown_dynamic_param2=%init_input_3% 
 )
-echo [rule3vadbscreen_func_1x0 ]    output=[__empty__] dynamic_param1=[!rule16vmzusbcreendown_dynamic_param1!]   
-for /l %%i in (1, 1, !rule16vmzusbcreendown_dynamic_param1!) do (
-echo i == %%i   _todown   allLoop=[!rule16vmzusbcreendown_dynamic_param1!]     
-adb -s 721QECRM2ZMT4 shell input swipe 340 1200 340 400  
+echo [rule3vadbscreen_func_1x0 ]    output=[__empty__] dynamic_param1=[!rule15vxmusbcreendown_dynamic_param1!]  dynamic_param2=[!rule15vxmusbcreendown_dynamic_param2!]    
+for /l %%i in (1, 1, !rule15vxmusbcreendown_dynamic_param2!) do (
+echo i == %%i   _todown   allLoop=[!rule15vxmusbcreendown_dynamic_param2!]     
+adb -s %init_input_2%  shell input swipe 340 1200 340 400  
 ping -n 1 127.0.0.1>nul
-adb -s 721QECRM2ZMT4 shell input swipe 340 1200 340 400  
+adb -s %init_input_2%  shell input swipe 340 1200 340 400  
 ping -n 1 127.0.0.1>nul
-adb -s 721QECRM2ZMT4 shell input swipe 340 400 340 800
-ping -n 1 127.0.0.1>nul
-)
-for /l %%i in (1, 1, !rule16vmzusbcreendown_dynamic_param1!) do (
-echo i == %%i  _toup     allLoop=[!rule16vmzusbcreendown_dynamic_param1!]        
-adb -s 721QECRM2ZMT4  shell input swipe  340 400  340 1200
-ping -n 1 127.0.0.1>nul
-adb -s 721QECRM2ZMT4 shell input swipe  340 400  340 1200
-ping -n 1 127.0.0.1>nul
-adb -s 721QECRM2ZMT4  shell input swipe  340 800 340 400
+adb -s %init_input_2%  shell input swipe 340 400 340 800
 ping -n 1 127.0.0.1>nul
 )
-echo [rule16vmzusbcreendown_func_1x0 EndPrintCode]    output=[__empty__] dynamic_param1=[!rule16vmzusbcreendown_dynamic_param1!]   
-echo ______________Method_Out rule16vmzusbcreendown_func_1x0
+for /l %%i in (1, 1, !rule15vxmusbcreendown_dynamic_param2!) do (
+echo i == %%i  _toup     allLoop=[!rule15vxmusbcreendown_dynamic_param2!]        
+adb -s %init_input_2%   shell input swipe  340 400  340 1200
+ping -n 1 127.0.0.1>nul
+adb -s %init_input_2%  shell input swipe  340 400  340 1200
+ping -n 1 127.0.0.1>nul
+adb -s %init_input_2%   shell input swipe  340 800 340 400
+ping -n 1 127.0.0.1>nul
+)
+echo [rule15vxmusbcreendown_func_2x0 EndPrintCode]    output=[__empty__] dynamic_param1=[!rule15vxmusbcreendown_dynamic_param1!]   dynamic_param2=[!rule15vxmusbcreendown_dynamic_param2!]   
+echo ______________Method_Out rule15vxmusbcreendown_func_2x0
 ::ENDLOCAL
 goto:eof
 
 
 
 
-:rule17vhnusbcreendown_func_1x0
-rem ======================================== rule17vhnusbcreendown_func_1x0
-rem rule_tip: %init_input_0% _17_   100000   ##荣耀_有线USB_手机执行 adb -s HMKNW17531001873 shell input swipe 340 1200 340 400 命令向下滑动两下向上滑动一下 默认10000次
+:rule16vmultiscreen2end_func_1x0
+rem ======================================== rule16vmultiscreen2end_func_1x0
+rem rule_tip: %init_input_0% _16_  c2f5b32c        ##小米_有线USB_手机执行  adb -s c2f5b32c shell input swipe 340 1000 340 100 10 快速往下滑动 不打印Log了 默认执行百万次
 
-rem desc: 荣耀_有线USB_手机执行 adb -s HMKNW17531001873 shell input swipe 340 1200 340 400 命令向下滑动两下向上滑动一下 默认10000次
-rem sample: 
-rem sample_out: 
-::SETLOCAL
-echo ______________Method_In rule17vhnusbcreendown_func_1x0
-set rule17vhnusbcreendown_dynamic_param1=
-if "%init_input_2%"=="" (
-set  rule17vhnusbcreendown_dynamic_param1=100000
-) else (
-set rule17vhnusbcreendown_dynamic_param1=%init_input_2% 
-)
-echo [rule3vadbscreen_func_1x0 ]    output=[__empty__] dynamic_param1=[!rule17vhnusbcreendown_dynamic_param1!]   
-for /l %%i in (1, 1, !rule17vhnusbcreendown_dynamic_param1!) do (
-echo i == %%i   _todown   allLoop=[!rule17vhnusbcreendown_dynamic_param1!]     
-adb -s HMKNW17531001873 shell input swipe 340 1200 340 400  
-ping -n 1 127.0.0.1>nul
-adb -s HMKNW17531001873 shell input swipe 340 1200 340 400  
-ping -n 1 127.0.0.1>nul
-adb -s HMKNW17531001873 shell input swipe 340 400 340 800
-ping -n 1 127.0.0.1>nul
-)
-for /l %%i in (1, 1, !rule17vhnusbcreendown_dynamic_param1!) do (
-echo i == %%i  _toup     allLoop=[!rule17vhnusbcreendown_dynamic_param1!]        
-adb -s HMKNW17531001873  shell input swipe  340 400  340 1200
-ping -n 1 127.0.0.1>nul
-adb -s HMKNW17531001873 shell input swipe  340 400  340 1200
-ping -n 1 127.0.0.1>nul
-adb -s HMKNW17531001873  shell input swipe  340 800 340 400
-ping -n 1 127.0.0.1>nul
-)
-echo [rule17vhnusbcreendown_func_1x0 EndPrintCode]    output=[__empty__] dynamic_param1=[!rule17vhnusbcreendown_dynamic_param1!]   
-echo ______________Method_Out rule17vhnusbcreendown_func_1x0
-::ENDLOCAL
-goto:eof
+rem rule_tip: %init_input_0% _16_  721QECRM2ZMT4   ##魅蓝_有线USB_手机执行  adb -s 721QECRM2ZMT4 shell input swipe 340 1000 340 100 10 快速往下滑动 不打印Log了 默认执行百万次
 
+rem rule_tip: %init_input_0% _16_  HMKNW17531001873   ##荣耀_有线USB_手机执行 adb -s HMKNW17531001873 shell input swipe 340 1000 340 100 10 快速往下滑动 不打印Log了 默认执行百万次
 
+rem rule_tip: %init_input_0% _16_  192.168.31.89:5555   ##小米_无线USB_无线adb adb -s 192.168.31.89:5555 shell input swipe 340 1000 340 100 10 快速往下滑动 不打印Log了 默认执行百万次
 
+rem rule_tip: %init_input_0% _16_  192.168.31.40:5555   ##魅蓝_无线USB_无线adb adb -s 192.168.31.40:5555 shell input swipe 340 1000 340 100 10 快速往下滑动 不打印Log了 默认执行百万次
 
-:rule18vxmwirelesscreendown_func_1x0
-rem ======================================== rule18vxmwirelesscreendown_func_1x0
-rem rule_tip: %init_input_0% _18_   100000   ##小米_无线USB_无线adb  adb -s 192.168.31.89:5555 shell input swipe 340 1200 340 400 命令向下滑动两下向上滑动一下 默认100000次
-
-rem desc: 小米_无线USB_无线adb adb -s 192.168.31.89:5555 shell input swipe 340 1200 340 400 命令向下滑动两下向上滑动一下 默认100000次
-rem sample: 
-rem sample_out: 
-::SETLOCAL
-echo ______________Method_In rule18vxmwirelesscreendown_func_1x0
-set rule18vxmwirelesscreendown_dynamic_param1=
-if "%init_input_2%"=="" (
-set  rule18vxmwirelesscreendown_dynamic_param1=100000
-) else (
-set rule18vxmwirelesscreendown_dynamic_param1=%init_input_2% 
-)
-echo [rule3vadbscreen_func_1x0 ]    output=[__empty__] dynamic_param1=[!rule18vxmwirelesscreendown_dynamic_param1!]   
-for /l %%i in (1, 1, !rule18vxmwirelesscreendown_dynamic_param1!) do (
-echo i == %%i   _todown   allLoop=[!rule18vxmwirelesscreendown_dynamic_param1!]     
-adb -s 192.168.31.89:5555 shell input swipe 340 1200 340 400  
-ping -n 1 127.0.0.1>nul
-adb -s 192.168.31.89:5555 shell input swipe 340 1200 340 400  
-ping -n 1 127.0.0.1>nul
-adb -s 192.168.31.89:5555 shell input swipe 340 400 340 800
-ping -n 1 127.0.0.1>nul
-)
-for /l %%i in (1, 1, !rule18vxmwirelesscreendown_dynamic_param1!) do (
-echo i == %%i  _toup     allLoop=[!rule18vxmwirelesscreendown_dynamic_param1!]        
-adb -s 192.168.31.89:5555  shell input swipe  340 400  340 1200
-ping -n 1 127.0.0.1>nul
-adb -s 192.168.31.89:5555 shell input swipe  340 400  340 1200
-ping -n 1 127.0.0.1>nul
-adb -s 192.168.31.89:5555  shell input swipe  340 800 340 400
-ping -n 1 127.0.0.1>nul
-)
-echo [rule18vxmwirelesscreendown_func_1x0 EndPrintCode]    output=[__empty__] dynamic_param1=[!rule18vxmwirelesscreendown_dynamic_param1!]   
-echo ______________Method_Out rule18vxmwirelesscreendown_func_1x0
-::ENDLOCAL
-goto:eof
-
-
-
-
-:rule19vmzwirelesscreendown_func_1x0
-rem ======================================== rule19vmzwirelesscreendown_func_1x0
-rem rule_tip: %init_input_0% _19_   100000   ##魅蓝_无线USB_无线adb  adb -s 192.168.31.40:5555 shell input swipe 340 1200 340 400 命令向下滑动两下向上滑动一下 默认100000次
-
-rem desc: 魅蓝_无线USB_无线adb adb -s 192.168.31.40:5555 shell input swipe 340 1200 340 400 命令向下滑动两下向上滑动一下 默认100000次
-rem sample: 
-rem sample_out: 
-::SETLOCAL
-echo ______________Method_In rule19vmzwirelesscreendown_func_1x0
-set rule19vmzwirelesscreendown_dynamic_param1=
-if "%init_input_2%"=="" (
-set  rule19vmzwirelesscreendown_dynamic_param1=100000
-) else (
-set rule19vmzwirelesscreendown_dynamic_param1=%init_input_2% 
-)
-echo [rule3vadbscreen_func_1x0 ]    output=[__empty__] dynamic_param1=[!rule19vmzwirelesscreendown_dynamic_param1!]   
-for /l %%i in (1, 1, !rule19vmzwirelesscreendown_dynamic_param1!) do (
-echo i == %%i   _todown   allLoop=[!rule19vmzwirelesscreendown_dynamic_param1!]     
-adb -s 192.168.31.40:5555 shell input swipe 340 1200 340 400  
-ping -n 1 127.0.0.1>nul
-adb -s 192.168.31.40:5555 shell input swipe 340 1200 340 400  
-ping -n 1 127.0.0.1>nul
-adb -s 192.168.31.40:5555 shell input swipe 340 400 340 800
-ping -n 1 127.0.0.1>nul
-)
-for /l %%i in (1, 1, !rule19vmzwirelesscreendown_dynamic_param1!) do (
-echo i == %%i  _toup     allLoop=[!rule19vmzwirelesscreendown_dynamic_param1!]        
-adb -s 192.168.31.40:5555  shell input swipe  340 400  340 1200
-ping -n 1 127.0.0.1>nul
-adb -s 192.168.31.40:5555 shell input swipe  340 400  340 1200
-ping -n 1 127.0.0.1>nul
-adb -s 192.168.31.40:5555  shell input swipe  340 800 340 400
-ping -n 1 127.0.0.1>nul
-)
-echo [rule19vmzwirelesscreendown_func_1x0 EndPrintCode]    output=[__empty__] dynamic_param1=[!rule19vmzwirelesscreendown_dynamic_param1!]   
-echo ______________Method_Out rule19vmzwirelesscreendown_func_1x0
-::ENDLOCAL
-goto:eof
-
-
-
-
-:rule20vhnwirelesscreendown_func_1x0
-rem ======================================== rule20vhnwirelesscreendown_func_1x0
-rem rule_tip: %init_input_0% _20_   100000   ##荣耀_无线USB_无线adb  adb -s 192.168.31.10:5555 shell input swipe 340 1200 340 400 命令向下滑动两下向上滑动一下 默认100000次
-
-rem desc: 荣耀_无线USB_无线adb adb -s 192.168.31.10:5555 shell input swipe 340 1200 340 400 命令向下滑动两下向上滑动一下 默认10000次
-rem sample: 
-rem sample_out: 
-::SETLOCAL
-echo ______________Method_In rule20vhnwirelesscreendown_func_1x0
-set rule20vhnwirelesscreendown_dynamic_param1=
-if "%init_input_2%"=="" (
-set  rule20vhnwirelesscreendown_dynamic_param1=100000
-) else (
-set rule20vhnwirelesscreendown_dynamic_param1=%init_input_2% 
-)
-echo [rule3vadbscreen_func_1x0 ]    output=[__empty__] dynamic_param1=[!rule20vhnwirelesscreendown_dynamic_param1!]   
-for /l %%i in (1, 1, !rule20vhnwirelesscreendown_dynamic_param1!) do (
-echo i == %%i   _todown   allLoop=[!rule20vhnwirelesscreendown_dynamic_param1!]     
-adb -s 192.168.31.10:5555 shell input swipe 340 1200 340 400  
-ping -n 1 127.0.0.1>nul
-adb -s 192.168.31.10:5555 shell input swipe 340 1200 340 400  
-ping -n 1 127.0.0.1>nul
-adb -s 192.168.31.10:5555 shell input swipe 340 400 340 800
-ping -n 1 127.0.0.1>nul
-)
-for /l %%i in (1, 1, !rule20vhnwirelesscreendown_dynamic_param1!) do (
-echo i == %%i  _toup     allLoop=[!rule20vhnwirelesscreendown_dynamic_param1!]        
-adb -s 192.168.31.10:5555  shell input swipe  340 400  340 1200
-ping -n 1 127.0.0.1>nul
-adb -s 192.168.31.10:5555 shell input swipe  340 400  340 1200
-ping -n 1 127.0.0.1>nul
-adb -s 192.168.31.10:5555  shell input swipe  340 800 340 400
-ping -n 1 127.0.0.1>nul
-)
-echo [rule20vhnwirelesscreendown_func_1x0 EndPrintCode]    output=[__empty__] dynamic_param1=[!rule20vhnwirelesscreendown_dynamic_param1!]   
-echo ______________Method_Out rule20vhnwirelesscreendown_func_1x0
-::ENDLOCAL
-goto:eof
-
-
-
-
-:rule21vmultiscreen2end_func_1x0
-rem ======================================== rule21vmultiscreen2end_func_1x0
-rem rule_tip: %init_input_0% _21_  c2f5b32c        ##小米_有线USB_手机执行  adb -s c2f5b32c shell input swipe 340 1000 340 100 10 快速往下滑动 不打印Log了 默认执行百万次
-
-rem rule_tip: %init_input_0% _21_  721QECRM2ZMT4   ##魅蓝_有线USB_手机执行  adb -s 721QECRM2ZMT4 shell input swipe 340 1000 340 100 10 快速往下滑动 不打印Log了 默认执行百万次
-
-rem rule_tip: %init_input_0% _21_  HMKNW17531001873   ##荣耀_有线USB_手机执行 adb -s HMKNW17531001873 shell input swipe 340 1000 340 100 10 快速往下滑动 不打印Log了 默认执行百万次
-
-rem rule_tip: %init_input_0% _21_  192.168.31.89:5555   ##小米_无线USB_无线adb adb -s 192.168.31.89:5555 shell input swipe 340 1000 340 100 10 快速往下滑动 不打印Log了 默认执行百万次
-
-rem rule_tip: %init_input_0% _21_  192.168.31.40:5555   ##魅蓝_无线USB_无线adb adb -s 192.168.31.40:5555 shell input swipe 340 1000 340 100 10 快速往下滑动 不打印Log了 默认执行百万次
-
-rem rule_tip: %init_input_0% _21_  192.168.31.10:5555   ##荣耀_无线USB_无线adb adb -s 192.168.31.10:5555 shell input swipe 340 1000 340 100 10 快速往下滑动 不打印Log了 默认执行百万次
+rem rule_tip: %init_input_0% _16_  192.168.31.10:5555   ##荣耀_无线USB_无线adb adb -s 192.168.31.10:5555 shell input swipe 340 1000 340 100 10 快速往下滑动 不打印Log了 默认执行百万次
 rem desc: 
 rem sample: 
 rem sample_out: 
 ::SETLOCAL
-echo ______________Method_In rule21vmultiscreen2end_func_1x0
-set rule21vmultiscreen2end_dynamic_param1=
-set rule5vscreen2end_dynamic_param1=
+echo ______________Method_In rule16vmultiscreen2end_func_1x0
+set rule16vmultiscreen2end_dynamic_param1=
 if "%init_input_2%"=="" (
-set  rule5vscreen2end_dynamic_param1=c2f5b32c
+set  rule16vmultiscreen2end_dynamic_param1=c2f5b32c
 ) 
 echo allLoop=[1000000]        
 for /l %%i in (1, 1, 1000000) do (
@@ -2447,8 +2254,98 @@ rem echo i == %%i   _todown
 echo adb -s %init_input_2% shell input swipe 340 1000 340 200  50 [i == %%i   _todown  ]
 adb -s %init_input_2% shell input swipe 340 1000 340 200  50
 )
-echo [rule21vmultiscreen2end_func_1x0 EndPrintCode]    output=[__empty__] dynamic_param1=[!rule21vmultiscreen2end_dynamic_param1!]   
-echo ______________Method_Out rule21vmultiscreen2end_func_1x0
+echo [rule16vmultiscreen2end_func_1x0 EndPrintCode]    output=[__empty__] dynamic_param1=[!rule16vmultiscreen2end_dynamic_param1!]   
+echo ______________Method_Out rule16vmultiscreen2end_func_1x0
+::ENDLOCAL
+goto:eof
+
+
+
+
+:rule17vadbdumpservice_func_0x0
+rem ======================================== rule17vadbdumpservice_func_0x0
+rem rule_tip: %init_input_0% _17_       ##把 连接adb的 手机 执行 adb dump service 抓取一些配置文件 命令 到 adb_dump_时间戳 文件夹
+rem desc: 
+rem sample: 
+rem sample_out: 
+::SETLOCAL
+echo ______________Method_In rule17vadbdumpservice_func_0x0
+cd !cd!
+ECHO init-ing
+ECHO waiting conenct with USB
+adb wait-for-device
+call :gettimehhmmsss_func_0x1
+set CURRENT_DATE_TIME_STAMP=!gettimehhmmsss_return_1!
+echo 创建文件夹  adb_dump_!CURRENT_DATE_TIME_STAMP!
+md  adb_dump_!CURRENT_DATE_TIME_STAMP!
+adb root 
+adb remount
+echo adb pull /data/system/users/0/settings_system.xml   adb_dump_!CURRENT_DATE_TIME_STAMP!\data_system_users_0_settings_system.xml
+adb pull /data/system/users/0/settings_system.xml   adb_dump_!CURRENT_DATE_TIME_STAMP!\data_system_users_0_settings_system.xml
+echo adb pull /data/system/users/0/settings_secure.xml   adb_dump_!CURRENT_DATE_TIME_STAMP!\data_system_users_0_settings_secure.xml
+adb pull /data/system/users/0/settings_secure.xml   adb_dump_!CURRENT_DATE_TIME_STAMP!\data_system_users_0_settings_secure.xml
+echo adb pull /data/system/users/0/settings_global.xml   adb_dump_!CURRENT_DATE_TIME_STAMP!\data_system_users_0_settings_global.xml
+adb pull /data/system/users/0/settings_global.xml   adb_dump_!CURRENT_DATE_TIME_STAMP!\data_system_users_0_settings_global.xml
+echo adb pull /vendor/etc/wifi/WCNSS_qcom_cfg.ini        adb_dump_!CURRENT_DATE_TIME_STAMP!\vendor_etc_wifi_WCNSS_qcom_cfg.ini
+adb pull /vendor/etc/wifi/WCNSS_qcom_cfg.ini        adb_dump_!CURRENT_DATE_TIME_STAMP!\vendor_etc_wifi_WCNSS_qcom_cfg.ini
+echo adb pull /vendor/etc/wifi/wpa_supplicant.conf     adb_dump_!CURRENT_DATE_TIME_STAMP!\vendor_etc_wifi_wpa_supplicant.conf
+adb pull /vendor/etc/wifi/wpa_supplicant.conf     adb_dump_!CURRENT_DATE_TIME_STAMP!\vendor_etc_wifi_wpa_supplicant.conf
+echo adb pull /system/etc/wifi/p2p_supplicant.conf    adb_dump_!CURRENT_DATE_TIME_STAMP!\vendor_etc_wifi_p2p_supplicant.conf
+adb pull /system/etc/wifi/p2p_supplicant.conf    adb_dump_!CURRENT_DATE_TIME_STAMP!\vendor_etc_wifi_p2p_supplicant.conf
+echo adb pull /data/misc/wifi/WifiConfigStore.xml    adb_dump_!CURRENT_DATE_TIME_STAMP!\data_misc_wifi_WifiConfigStore.xml
+adb pull /data/misc/wifi/WifiConfigStore.xml    adb_dump_!CURRENT_DATE_TIME_STAMP!\data_misc_wifi_WifiConfigStore.xml
+echo adb pull /data/misc/wifi/softap.conf     adb_dump_!CURRENT_DATE_TIME_STAMP!\data_misc_wifi_softap.conf
+adb pull /data/misc/wifi/softap.conf     adb_dump_!CURRENT_DATE_TIME_STAMP!\data_misc_wifi_softap.conf
+echo adb pull /system/build.prop               adb_dump_!CURRENT_DATE_TIME_STAMP!\system_build.prop
+adb pull /system/build.prop               adb_dump_!CURRENT_DATE_TIME_STAMP!\system_build.prop
+echo adb pull   /vendor/fireware_mnt/image/wlanmdsp.mbn    adb_dump_!CURRENT_DATE_TIME_STAMP!\vendor_fireware_mnt_image_wlanmdsp.mbn
+adb pull   /vendor/fireware_mnt/image/wlanmdsp.mbn    adb_dump_!CURRENT_DATE_TIME_STAMP!\vendor_fireware_mnt_image_wlanmdsp.mbn
+echo 
+adb pull  /vendor/fireware_mnt/image/Data.msc    adb_dump_!CURRENT_DATE_TIME_STAMP!\vendor_fireware_mnt_image_Data.mbn
+echo adb pull /vendor/rfs/msm/mpss/ramdumps    adb_dump_!CURRENT_DATE_TIME_STAMP!\vendor_rfs_msm_mpss_ramdumps\
+adb pull /vendor/rfs/msm/mpss/ramdumps    adb_dump_!CURRENT_DATE_TIME_STAMP!\vendor_rfs_msm_mpss_ramdumps\
+echo adb pull /storage/emulated/0/Pictures/Screenshots  adb_dump_!CURRENT_DATE_TIME_STAMP!\sdcard_Pictures_Screenshots\
+adb pull /storage/emulated/0/Pictures/Screenshots  adb_dump_!CURRENT_DATE_TIME_STAMP!\sdcard_Pictures_Screenshots\
+echo adb pull /system/etc/hostapd/hostapd.deny       adb_dump_!CURRENT_DATE_TIME_STAMP!\system_etc_hostapd.deny 
+adb pull /system/etc/hostapd/hostapd.deny       adb_dump_!CURRENT_DATE_TIME_STAMP!\system_etc_hostapd.deny 
+echo adb pull /system/etc/hostapd/hostapd.accept      adb_dump_!CURRENT_DATE_TIME_STAMP!\system_etc_hostapd.accept 
+adb pull /system/etc/hostapd/hostapd.accept      adb_dump_!CURRENT_DATE_TIME_STAMP!\system_etc_hostapd.accept 
+echo adb pull /data/vendor/wifi/hostapd/hostapd.conf    adb_dump_!CURRENT_DATE_TIME_STAMP!\data_vendor_wifi_hostapd_hostapd.conf
+adb pull /data/vendor/wifi/hostapd/hostapd.conf    adb_dump_!CURRENT_DATE_TIME_STAMP!\data_vendor_wifi_hostapd_hostapd.conf
+echo adb pull /data/vendor/wifi/hostapd/hostapd.accept   adb_dump_!CURRENT_DATE_TIME_STAMP!\data_vendor_wifi_hostapd_hostapd.accept
+adb pull /data/vendor/wifi/hostapd/hostapd.accept   adb_dump_!CURRENT_DATE_TIME_STAMP!\data_vendor_wifi_hostapd_hostapd.accept
+echo adb pull /data/vendor/wifi/hostapd/hostapd.deny  adb_dump_!CURRENT_DATE_TIME_STAMP!\data_vendor_wifi_hostapd_hostapd.deny
+adb pull /data/vendor/wifi/hostapd/hostapd.deny  adb_dump_!CURRENT_DATE_TIME_STAMP!\data_vendor_wifi_hostapd_hostapd.deny
+echo pull /data/vendor/bug2go       adb_dump_!CURRENT_DATE_TIME_STAMP!\data_vendor_bug2go\
+adb pull /data/vendor/bug2go       adb_dump_!CURRENT_DATE_TIME_STAMP!\data_vendor_bug2go\
+echo  adb pull  /data/vendor/diag_mdlog     adb_dump_!CURRENT_DATE_TIME_STAMP!\data_diag_mdlog\
+adb pull  /data/vendor/diag_mdlog     adb_dump_!CURRENT_DATE_TIME_STAMP!\data_diag_mdlog\
+echo adb pull  /data/debuglogger  adb_dump_!CURRENT_DATE_TIME_STAMP!\data_mtk_debuglogger\
+adb pull  /data/debuglogger  adb_dump_!CURRENT_DATE_TIME_STAMP!\data_mtk_debuglogger\
+adb pull   /data/vendor/mtklog/  adb_dump_!CURRENT_DATE_TIME_STAMP!\data_vendor_mtklog\
+adb shell service list  > adb_dump_!CURRENT_DATE_TIME_STAMP!\Adb_AllService.txt
+adb shell getprop > adb_dump_!CURRENT_DATE_TIME_STAMP!\Prop.txt
+adb shell pm list features > adb_dump_!CURRENT_DATE_TIME_STAMP!\pm_list_features.txt
+adb shell pm list packages  > adb_dump_!CURRENT_DATE_TIME_STAMP!\pm_list_packages.txt
+ping -n 2 127.0.0.1>nul
+if exist adb_dump_!CURRENT_DATE_TIME_STAMP!\Adb_AllService.txt (
+  for /f "tokens=1,2" %%i in (adb_dump_!CURRENT_DATE_TIME_STAMP!\Adb_AllService.txt) do (
+       set /a num+=1 
+	   set count=%%i
+       set service=%%j
+	   set realservice=!service:~0,-1!
+	   echo service_index=[!count!]     service_name=[!realservice!]                       dump_file=[!count!_!realservice!.txt]
+	   	if not "!realservice!"=="bugreport" (
+	   adb shell dumpsys !realservice! > adb_dump_!CURRENT_DATE_TIME_STAMP!\!count!_!realservice!.txt
+	   )
+rem   call adb uninstall !str1!
+  )
+ECHO all dumpsys service loaded at  adb_dump_!CURRENT_DATE_TIME_STAMP!\ !
+) else (
+ECHO adb_dump_!CURRENT_DATE_TIME_STAMP!\Adb_AllService.txt  not exist !
+)
+echo [rule17vadbdumpservice_func_0x0 EndPrintCode]   output=[__empty__]  param1=[__empty__] 
+echo ______________Method_Out rule17vadbdumpservice_func_0x0
 ::ENDLOCAL
 goto:eof
 
@@ -2462,9 +2359,9 @@ rem sample:
 rem sample_out: 
 ::SETLOCAL
 echo ______________Method_In ruletipprint_func_0x0
-echo %init_input_0% _1_   ## 备份bankup所有当前手机安装的apk本地PC本地目录
+echo %init_input_0% _1_   ## 备份bankup所有当前手机安装的三方 apk本地PC本地目录
 
-echo %init_input_0% _2_   ## 获取手机当前正在运行的APK到本地
+echo %init_input_0% _2_   ## 获取手机当前正在运行的APK_必须是三方的APK 到本地
 
 echo %init_input_0% _3_  ##安装当前目录的apk到手机
 
@@ -2476,7 +2373,7 @@ echo %init_input_0% _6_  ## 执行清空apk的操作
 
 echo %init_input_0% _7_  ## 蓝牙开启关闭 默认执行1000次
 
-echo %init_input_0% _8_ 400 800 1000  ## 点击屏幕位置 x y repeat 重复 repeat次 默认1000次
+echo %init_input_0% _8_ 400 800 1000  ## 点击屏幕位置 x[400]  y[800] repeat[1000] 重复 repeat次 默认1000次
 
 echo %init_input_0% _9_  ## wifi开启关闭  默认1000次
 
@@ -2492,27 +2389,31 @@ echo %init_input_0% _14_     ## 对当前手机屏幕录屏 然后拔出插入 �
 
 echo %init_input_0% _15_   100000   ##小米_有线USB_手机执行 adb -s c2f5b32c shell input swipe 340 1200 340 400 命令向下滑动两下向上滑动一下 默认10000次
 
-echo %init_input_0% _16_   100000   ##魅族_有线USB_手机执行 adb -s 721QECRM2ZMT4 shell input swipe 340 1200 340 400 命令向下滑动两下向上滑动一下 默认10000次
+echo %init_input_0% _15_  c2f5b32c  100000    ##小米_有线USB_手机执行  adb -s c2f5b32c shell input swipe 340 1200 340 400 命令向下滑动两下向上滑动一下 默认10000次
 
-echo %init_input_0% _17_   100000   ##荣耀_有线USB_手机执行 adb -s HMKNW17531001873 shell input swipe 340 1200 340 400 命令向下滑动两下向上滑动一下 默认10000次
+echo %init_input_0% _15_  721QECRM2ZMT4  100000  ##魅蓝_有线USB_手机执行  adb -s 721QECRM2ZMT4 shell input swipe 340 1200 340 400 命令向下滑动两下向上滑动一下 默认10000次
 
-echo %init_input_0% _18_   100000   ##小米_无线USB_无线adb  adb -s 192.168.31.89:5555 shell input swipe 340 1200 340 400 命令向下滑动两下向上滑动一下 默认100000次
+echo %init_input_0% _15_  HMKNW17531001873 100000  ##荣耀_有线USB_手机执行 adb -s HMKNW17531001873 shell input swipe 340 1200 340 400 命令向下滑动两下向上滑动一下 默认10000次
 
-echo %init_input_0% _19_   100000   ##魅蓝_无线USB_无线adb  adb -s 192.168.31.40:5555 shell input swipe 340 1200 340 400 命令向下滑动两下向上滑动一下 默认100000次
+echo %init_input_0% _15_  192.168.31.89:5555 100000  ##小米_无线USB_无线 adb -s 192.168.31.89:5555 shell input swipe 340 1200 340 400 命令向下滑动两下向上滑动一下 默认10000次
 
-echo %init_input_0% _20_   100000   ##荣耀_无线USB_无线adb  adb -s 192.168.31.10:5555 shell input swipe 340 1200 340 400 命令向下滑动两下向上滑动一下 默认100000次
+echo %init_input_0% _15_  192.168.31.40:5555 100000  ##魅蓝_无线USB_无线 adb -s 192.168.31.40:5555 shell input swipe 340 1200 340 400 命令向下滑动两下向上滑动一下 默认10000次
 
-echo %init_input_0% _21_  c2f5b32c        ##小米_有线USB_手机执行  adb -s c2f5b32c shell input swipe 340 1000 340 100 10 快速往下滑动 不打印Log了 默认执行百万次
+echo %init_input_0% _15_  192.168.31.10:5555 100000  ##荣耀_无线USB_无线 adb -s 192.168.31.10:5555 shell input swipe 340 1200 340 400 命令向下滑动两下向上滑动一下 默认10000次
 
-echo %init_input_0% _21_  721QECRM2ZMT4   ##魅蓝_有线USB_手机执行  adb -s 721QECRM2ZMT4 shell input swipe 340 1000 340 100 10 快速往下滑动 不打印Log了 默认执行百万次
+echo %init_input_0% _16_  c2f5b32c        ##小米_有线USB_手机执行  adb -s c2f5b32c shell input swipe 340 1000 340 100 10 快速往下滑动 不打印Log了 默认执行百万次
 
-echo %init_input_0% _21_  HMKNW17531001873   ##荣耀_有线USB_手机执行 adb -s HMKNW17531001873 shell input swipe 340 1000 340 100 10 快速往下滑动 不打印Log了 默认执行百万次
+echo %init_input_0% _16_  721QECRM2ZMT4   ##魅蓝_有线USB_手机执行  adb -s 721QECRM2ZMT4 shell input swipe 340 1000 340 100 10 快速往下滑动 不打印Log了 默认执行百万次
 
-echo %init_input_0% _21_  192.168.31.89:5555   ##小米_无线USB_无线adb adb -s 192.168.31.89:5555 shell input swipe 340 1000 340 100 10 快速往下滑动 不打印Log了 默认执行百万次
+echo %init_input_0% _16_  HMKNW17531001873   ##荣耀_有线USB_手机执行 adb -s HMKNW17531001873 shell input swipe 340 1000 340 100 10 快速往下滑动 不打印Log了 默认执行百万次
 
-echo %init_input_0% _21_  192.168.31.40:5555   ##魅蓝_无线USB_无线adb adb -s 192.168.31.40:5555 shell input swipe 340 1000 340 100 10 快速往下滑动 不打印Log了 默认执行百万次
+echo %init_input_0% _16_  192.168.31.89:5555   ##小米_无线USB_无线adb adb -s 192.168.31.89:5555 shell input swipe 340 1000 340 100 10 快速往下滑动 不打印Log了 默认执行百万次
 
-echo %init_input_0% _21_  192.168.31.10:5555   ##荣耀_无线USB_无线adb adb -s 192.168.31.10:5555 shell input swipe 340 1000 340 100 10 快速往下滑动 不打印Log了 默认执行百万次
+echo %init_input_0% _16_  192.168.31.40:5555   ##魅蓝_无线USB_无线adb adb -s 192.168.31.40:5555 shell input swipe 340 1000 340 100 10 快速往下滑动 不打印Log了 默认执行百万次
+
+echo %init_input_0% _16_  192.168.31.10:5555   ##荣耀_无线USB_无线adb adb -s 192.168.31.10:5555 shell input swipe 340 1000 340 100 10 快速往下滑动 不打印Log了 默认执行百万次
+
+echo %init_input_0% _17_       ##把 连接adb的 手机 执行 adb dump service 抓取一些配置文件 命令 到 adb_dump_时间戳 文件夹
 echo [ruletipprint_func_0x0 EndPrintCode]   output=[__empty__]  param1=[__empty__] 
 echo ______________Method_Out ruletipprint_func_0x0
 ::ENDLOCAL
