@@ -184,6 +184,8 @@ if(D3V2_LowerSongInfo_DifferentArr.size() > 0){
     }
     System.out.println("════════════ 存在【"+D3V2_LowerSongInfo_DifferentArr.size()+"】个 D3V2_Tag 和 Byte_Tag 不同的MP3文件 ══════════");
 
+}else {
+	System.out.println("════════════ 恭喜 Congratulations  当前读取到的所有MP3 D3V2_Tag 和 Byte_Tag 一致 ════════════");
 }
 
 
@@ -191,7 +193,47 @@ if(D3V2_LowerSongInfo_DifferentArr.size() > 0){
 
       }
 
-    static class MP3_Lower25_SDK_SongInfo {
+ // MP3的Comment 的 Tag 每次读取 都读取到
+//      D3V2_Comment=[?国语]_CharSet[UTF-8]_Byte[00111111 10111001 11111010 11010011 11101111 ]  Byte_Comment=[?国语]_ChatSet[GB2312]_Byte[00111111 10111001 11111010 11010011 111011
+//   问号  ?国语    为了把问号 去掉  所以创建这个方法                                                                                                                                      11 ]
+                                                                                                                                    		 
+      static String clearLuanMaForCommantTag(byte[] arr) {
+    	  String resultStr = null;
+    	  if(arr == null) {
+        	  return null;
+    	  }
+
+    	  
+    	  byte[] temp_byte_arr = new byte[arr.length-1];
+    	  
+    	  int temp_index = 0;
+    	  for (int i = 0; i < arr.length; i++) {
+			byte curByte = arr[i];
+			String byteStr = showByte(curByte);
+			if(byteStr != null && byteStr.trim().equals("00111111") && i ==0) {
+				continue;
+			}
+			if(temp_index <= temp_byte_arr.length -1) {
+				temp_byte_arr[temp_index] = curByte;
+				temp_index++;
+			}
+	
+
+		}
+
+ 
+    	  try {
+    		  resultStr =  new String(temp_byte_arr,"gbk");
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+      
+    	  return resultStr;
+      }
+      
+      
+      static class MP3_Lower25_SDK_SongInfo {
         private final String TAG = "TAG"; // 文件头1-3
         private String songName; // 歌曲名4-33
         private String artist; // 歌手名34-63
@@ -214,11 +256,13 @@ if(D3V2_LowerSongInfo_DifferentArr.size() > 0){
             if (tag.equalsIgnoreCase("TAG")) {
                 valid = true;
                 try {
+                	// utf-8    gbk
                     songName = new String(data, 3, 30,"gbk").trim();
                     artist = new String(data, 33, 30,"gbk").trim();
                     album = new String(data, 63, 30,"gbk").trim();
                     year = new String(data, 93, 4,"gbk").trim();
                     comment = new String(data, 97, 28,"gbk").trim();
+                    comment =   clearLuanMaForCommantTag(comment.getBytes());
                 } catch (UnsupportedEncodingException e) {
                     e.printStackTrace();
                 }
@@ -360,13 +404,30 @@ if(D3V2_LowerSongInfo_DifferentArr.size() > 0){
                 ID3v2 id3v2Tag = mp3Tag.getId3v2Tag();
 			  System.out.println("════════════════════════ MP3_D3V2_Info_mp3【"+index+"】【"+allSize+"】 "+mp3Tag.getFilename()+" ════════════════════════ ");
 
-                String id3v2Tag_artist = id3v2Tag.getArtist().trim();
-                String id3v2Tag_songname = id3v2Tag.getTitle().trim();
-                String id3v2Tag_comment = id3v2Tag.getComment().trim();
+              String id3v2Tag_artist =  id3v2Tag.getArtist() != null ? id3v2Tag.getArtist().trim():null;
+              String id3v2Tag_songname = id3v2Tag.getTitle() != null ? id3v2Tag.getTitle().trim():null;
+              String id3v2Tag_comment = id3v2Tag.getComment() != null ? id3v2Tag.getComment().trim():null;
+              if(id3v2Tag_comment != null) {
+            	  id3v2Tag_comment =   clearLuanMaForCommantTag(id3v2Tag_comment.getBytes());
+              }
+              
+         	 byte[] id3v3Comment_ByteArr = null;
+              if(id3v2Tag_comment != null) {
+            	 id3v3Comment_ByteArr =   id3v2Tag_comment.getBytes();
+              }
+              
+           	 byte[] mp3Info_comment_ByteArr = null;
+             if(mp3Info_comment != null) {
+            	 mp3Info_comment_ByteArr =   mp3Info_comment.getBytes();
+             }
+             
+
+              
+              
 
 			  System.out.println("D3V2_Artist=["+id3v2Tag.getArtist()+"]  "+"  Byte_Artist=["+mp3Info_artist+"]");
 			  System.out.println("D3V2_Title=["+id3v2Tag.getTitle()+"]       Byte_Title=["+mp3Info_songname+"]");
-                System.out.println("D3V2_Comment=["+id3v2Tag.getComment()+"]  Byte_Comment=["+mp3Info_comment+"]");
+                System.out.println("D3V2_Comment=["+id3v2Tag_comment+"]_CharSet["+getEncoding(id3v2Tag_comment)+"]_Byte["+showOneLineByteStr(id3v3Comment_ByteArr)+"]  Byte_Comment=["+mp3Info_comment+"]_ChatSet["+getEncoding(mp3Info_comment)+"]_Byte["+showOneLineByteStr(mp3Info_comment_ByteArr)+"]");
 			  System.out.println("TAG_Album___________:  "+id3v2Tag.getAlbum());
 			  System.out.println("TAG_Year____________:  "+id3v2Tag.getYear());
 			  System.out.println("TAG_Genre___________:  "+id3v2Tag.getGenre()+"("+id3v2Tag.getGenreDescription()+")");
@@ -401,6 +462,99 @@ if(D3V2_LowerSongInfo_DifferentArr.size() > 0){
 	}
 
 
+  	public static String getEncoding(String str) {
+  		if(str == null) {
+  			return "str_null";
+  			
+  		}
+  		
+  		String encode = "GB2312";
+  		try {
+  		if (str.equals(new String(str.getBytes(encode), encode))) {
+  		String s = encode;
+  		return s;
+  		}
+  		} catch (Exception exception) {
+  		}
+  		encode = "ISO-8859-1";
+  		try {
+  		if (str.equals(new String(str.getBytes(encode), encode))) {
+  		String s1 = encode;
+  		return s1;
+  		}
+  		} catch (Exception exception1) {
+  		}
+  		encode = "UTF-8";
+  		try {
+  		if (str.equals(new String(str.getBytes(encode), encode))) {
+  		String s2 = encode;
+  		return s2;
+  		}
+  		} catch (Exception exception2) {
+  		}
+  		
+  		encode = "GBK";
+  		try {
+  		if (str.equals(new String(str.getBytes(encode), encode))) {
+  		String s3 = encode;
+  		return s3;
+  		}
+  		} catch (Exception exception3) {
+  		}
+  		
+  		encode = "UTF-16";
+  		try {
+  		if (str.equals(new String(str.getBytes(encode), encode))) {
+  		String s3 = encode;
+  		return s3;
+  		}
+  		} catch (Exception exception3) {
+  		}
+  		
+  		return "";
+  		}
+  	
+
+    public static String showByte(byte byteData  ){
+        StringBuilder sb  = new StringBuilder();
+        String result = "";
+
+        for (int i = 7; i >= 0; i--) {
+
+            byte tempByte = byteData;
+            tempByte = (byte)(tempByte >> i);
+            int value = tempByte & 0x01;
+            if(value == 1){
+                sb.append("1");
+            }else{
+                sb.append("0");
+            }
+
+        }
+
+
+        return sb.toString()+ " ";
+
+    }
+    
+    public static String showOneLineByteStr(byte[] byteArr) {
+    	String resultByte = null;
+    	if(byteArr == null) {
+    		return null;
+    	}
+    	
+    	 StringBuilder mBinarySB = new StringBuilder();
+    	for (int i = 0; i < byteArr.length; i++) {
+    		byte byteStr  = byteArr[i];
+    		mBinarySB.append(showByte(byteStr));
+		}
+
+    	
+    	return mBinarySB.toString();
+    	
+    	
+    }
+
     public static void Show_D3V2Tag_ByteTag_MP3Info(Mp3File  mp3Tag ,File mp3File, int index , int allSize) {
 
 
@@ -424,14 +578,33 @@ if(D3V2_LowerSongInfo_DifferentArr.size() > 0){
                 ID3v2 id3v2Tag = mp3Tag.getId3v2Tag();
                 System.out.println("════════════ MP3_D3V2_Info_mp3【"+index+"】【"+allSize+"】 "+mp3Tag.getFilename()+" ════════════════════════ ");
 
-                String id3v2Tag_artist = id3v2Tag.getArtist().trim();
-                String id3v2Tag_songname = id3v2Tag.getTitle().trim();
-                String id3v2Tag_comment = id3v2Tag.getComment().trim();
+                String id3v2Tag_artist =  id3v2Tag.getArtist() != null ? id3v2Tag.getArtist().trim():null;
+                String id3v2Tag_songname = id3v2Tag.getTitle() != null ? id3v2Tag.getTitle().trim():null;
+                String id3v2Tag_comment = id3v2Tag.getComment() != null ? id3v2Tag.getComment().trim():null;
 
+                
+                if(id3v2Tag_comment != null) {
+              	  id3v2Tag_comment =   clearLuanMaForCommantTag(id3v2Tag_comment.getBytes());
+                }
+                
+            	 byte[] id3v3Comment_ByteArr = null;
+                 if(id3v2Tag_comment != null) {
+               	 id3v3Comment_ByteArr =   id3v2Tag_comment.getBytes();
+                 }
+                 
+              	 byte[] mp3Info_comment_ByteArr = null;
+                if(mp3Info_comment != null) {
+               	 mp3Info_comment_ByteArr =   mp3Info_comment.getBytes();
+                }
+                
+
+                 
+                 
+                
 
                 System.out.println("D3V2_Artist=["+id3v2Tag.getArtist()+"]  "+"  Byte_Artist=["+mp3Info_artist+"]");
                 System.out.println("D3V2_Title=["+id3v2Tag.getTitle()+"]       Byte_Title=["+mp3Info_songname+"]");
-                System.out.println("D3V2_Comment=["+id3v2Tag.getComment()+"]  Byte_Comment=["+mp3Info_comment+"]");
+                System.out.println("D3V2_Comment=["+id3v2Tag_comment+"]_CharSet["+getEncoding(id3v2Tag_comment)+"]_Byte["+showOneLineByteStr(id3v3Comment_ByteArr)+"]  Byte_Comment=["+mp3Info_comment+"]_ChatSet["+getEncoding(mp3Info_comment)+"]_Byte["+showOneLineByteStr(mp3Info_comment_ByteArr)+"]");
                 System.out.println("TAG_Album___________:  "+id3v2Tag.getAlbum());
                 System.out.println("TAG_Year____________:  "+id3v2Tag.getYear());
                 System.out.println("TAG_Genre___________:  "+id3v2Tag.getGenre()+"("+id3v2Tag.getGenreDescription()+")");
