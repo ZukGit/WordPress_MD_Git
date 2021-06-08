@@ -68,7 +68,9 @@ class F9_Byte {
             System.out.println("\n\n\n ══════════════════════  单独16进制(十六进制)形式 ══════════════════════ ");
             System.out.println(mHexSB.toString());
             System.out.println("\n\n\n ══════════════════════  单独二进制形式 ══════════════════════ ");
+            System.out.println("ZZZZZZZZZZZZZZZZZZZZZ");
             System.out.println(mBinarySB.toString());
+            System.out.println("ZZZZZZZZZZZZZZZZZZZZZ");
             mHexSB = new StringBuilder();
             mBinarySB = new StringBuilder();
         }

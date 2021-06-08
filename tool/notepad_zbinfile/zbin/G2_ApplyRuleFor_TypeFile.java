@@ -246,7 +246,7 @@ public class G2_ApplyRuleFor_TypeFile {
 		realTypeRuleList.add(new ReSize_Img_Rule_22());
 
 		//  23 
-		realTypeRuleList.add(new ZZ_Holder_ZZ_Rule_23());
+		realTypeRuleList.add(new CheckFileRealFormat_Rule_23());
 		realTypeRuleList.add(new add_Middle_Dir_Rule_24()); // 在当前的目录 与 子目录 之间 新增 一层文件夹 , 文件夹名称任意 用户输入
 
 		// 从上往下打印 年月 标示   接受来自 输入的参数  打开 临时文件
@@ -3293,11 +3293,229 @@ System.out.println();
 	}
 
 	
-	class ZZ_Holder_ZZ_Rule_23 extends Basic_Rule {
+	// 检查文件的真实类型 并对 那些 不符合真实类型的文件 进行提示
+	class CheckFileRealFormat_Rule_23 extends Basic_Rule {
 		
-		ZZ_Holder_ZZ_Rule_23() {
-			super("#", 22, 4); //
+	 final HashMap<String, String> mFileTypes;
+		  
+		CheckFileRealFormat_Rule_23() {
+			super("#", 23, 4); //
+			 mFileTypes = new HashMap<String, String>();
+			 initMoShuTypeMap();
 		}
+		
+		
+		@Override
+		String simpleDesc() {
+
+			return Cur_Bat_Name + " #_"+rule_index+"    ### 对当前目录的文件进行真实类型的检测[通过魔数字]并打印那些类型和魔数不一样文件的列表信息  \n"
+					+ Cur_Bat_Name + " #_"+rule_index+"    ### 对当前目录的文件进行真实类型的检测[通过魔数字]并打印那些类型和魔数不一样文件的列表信息 \n"						
+
+					;
+		}
+		
+		@Override
+			ArrayList<File> applySubFileListRule4(ArrayList<File> curFileList,
+					HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList,
+					ArrayList<File> curRealFileList) {
+				// TODO Auto-generated method stub
+			int different_type_file_index = 1;
+			for (int i = 0; i < curRealFileList.size(); i++) {
+			
+				File realFile = curRealFileList.get(i);
+				String fileNameWithoutPoint = getFileNameNoPoint(realFile.getName()).trim().toLowerCase();
+				  String fileType = getFileType(realFile.getAbsolutePath());
+				 
+		            if(fileType == null) {
+		            	fileType = "unknow";
+		            }
+		            
+				 if(!fileNameWithoutPoint.equals(fileType)) {
+					 
+					System.out.println("showtype_realtype_diffIndex["+different_type_file_index+"] =  showType="+ fileNameWithoutPoint+"   realType="+fileType+"   PATH="+realFile.getAbsolutePath());
+					different_type_file_index++;
+				 }
+				 
+				 
+			}
+			
+			
+				return super.applySubFileListRule4(curFileList, subFileTypeMap, curDirList, curRealFileList);
+			}
+		
+		
+		void initMoShuTypeMap() {
+		      // images
+	        mFileTypes.put("FFD8FF", "jpg");
+	        mFileTypes.put("89504E47", "png");
+	        mFileTypes.put("47494638", "gif");
+	        mFileTypes.put("49492A00", "tif");
+	        mFileTypes.put("424D", "bmp");
+	        mFileTypes.put("424D", "bmp");    
+	        mFileTypes.put("424D228C010000000000", "bmp");   //16色位图(bmp)        
+	        mFileTypes.put("424D8240090000000000", "bmp");   //24色位图(bmp)    
+	        mFileTypes.put("424D8E1B030000000000", "bmp");   //256色位图(bmp)    
+	        
+
+
+	        //
+	        mFileTypes.put("41433130", "dwg"); // CAD
+	        mFileTypes.put("38425053", "psd");
+	        mFileTypes.put("7B5C727466", "rtf"); // 日记本
+	        mFileTypes.put("3C3F786D6C", "xml");
+	        mFileTypes.put("68746D6C3E", "html");
+	        mFileTypes.put("44656C69766572792D646174653A", "eml"); // 邮件
+	        mFileTypes.put("D0CF11E0", "doc");
+	        
+	        mFileTypes.put("CFAD12FEC5FD746F", "dbx");       /** Outlook Express (dbx) */
+	        mFileTypes.put("2142444E", "pst");    //     /** Outlook (pst)*/
+	        mFileTypes.put("FF575043", "wpb");    /** Word Perfect (wpd)*/
+	        
+	        
+	        mFileTypes.put(      "252150532D41646F6265","esp" );
+	        mFileTypes.put(       "252150532D41646F6265","PS" );
+	        mFileTypes.put(       "255044462D312E", "PDF");
+	        mFileTypes.put(      "AC9EBD8F", "qdf" );
+	        mFileTypes.put(      "458600000600",  "qbb");
+	        mFileTypes.put(       "E3828596","PWL" );
+	        mFileTypes.put(     "504B0304", "zip"  );
+	        mFileTypes.put(      "52617221",  "RAR");
+	        mFileTypes.put(    "57415645",  "WAV"  );
+	        mFileTypes.put(      "41564920", "AVI" );
+	        mFileTypes.put(    "2E7261FD",   "RAM" );
+	        mFileTypes.put(   "2E524D46",    "RM" );
+	        mFileTypes.put(      "2E524D46000000120001",  "RMVB");  
+	        mFileTypes.put(     "000001BA", "MPG"  );
+	        mFileTypes.put(     "6D6F6F76",   "MOV");
+	        mFileTypes.put(       "3026B2758E66CF11","ASF");
+	        mFileTypes.put(    "60EA",   "ARJ" );
+	        mFileTypes.put(    "4D546864",   "MID" );
+	        mFileTypes.put(       "00000020667479706D70", "MP4"); 
+	        mFileTypes.put(     "49443303000000002176",  "MP3" );  
+	        mFileTypes.put(     "464C5601050000000900",  "FLV" ); 
+	        mFileTypes.put(     "1F8B08",  "GZ");
+	        mFileTypes.put(     "48544D4C207B0D0A0942", "CSS"  );
+	        mFileTypes.put(     "696B2E71623D696B2E71",  "JS" ); 
+	        mFileTypes.put(    "d0cf11e0a1b11ae10000",   "VSD" ); 
+	        mFileTypes.put(     "d0cf11e0a1b11ae10000",  "WPS");
+	        mFileTypes.put(      "6431303A637265617465", "TORRENT" ); 
+	        mFileTypes.put(      "3C2540207061676520","JSP" );    
+	        mFileTypes.put(      "7061636B61676520", "JAVA" ); 
+	        mFileTypes.put(     "CAFEBABE0000002E00",   "CLASS"); 
+	        mFileTypes.put(      "504B03040A000000", "JAR" ); 
+	        mFileTypes.put(     "4D616E69666573742D56",   "MF");
+	        mFileTypes.put(   "4D5A9000030000000400",    "EXE" ); 
+	        mFileTypes.put(    "7F454C4601010100",  "ELF"  ); 
+	        mFileTypes.put(      "2000604060", "WK1" );
+	        mFileTypes.put(     "00001A0000100400",  "WK3" );
+	        mFileTypes.put(     "00001A0002100400", "WK4"  ); 
+	        mFileTypes.put(   "576F726450726F",    "LWP" ); 
+	        mFileTypes.put(     "53520100",  "SLY" );    
+	        
+	        
+	        
+	        mFileTypes.put("D0CF11E0", "ppt");
+	        mFileTypes.put("D0CF11E0", "xls");//excel2003版本文件
+	        mFileTypes.put("5374616E64617264204A", "mdb");
+	        mFileTypes.put("252150532D41646F6265", "ps");
+	        mFileTypes.put("255044462D312E", "pdf");
+	        mFileTypes.put("504B0304", "pptx");
+	        mFileTypes.put("504B0304", "docx");
+	        mFileTypes.put("504B0304", "xlsx");//excel2007以上版本文件
+	        mFileTypes.put("52617221", "rar");
+	        mFileTypes.put("57415645", "wav");
+	        mFileTypes.put("41564920", "avi");
+	        mFileTypes.put("2E524D46", "rm");
+	        mFileTypes.put("000001BA", "mpg");
+	        mFileTypes.put("000001B3", "mpg");
+	        mFileTypes.put("6D6F6F76", "mov");
+	        mFileTypes.put("3026B2758E66CF11", "asf");
+	        mFileTypes.put("4D546864", "mid");
+	        mFileTypes.put("1F8B08", "gz");
+	
+
+	        
+			
+			
+		}
+		
+		
+	    /**
+	     * @param filePath 文件路径
+	     * @return 文件头信息
+	     * @author wlx
+	     * <p>
+	     * 方法描述：根据文件路径获取文件头信息
+	     */
+	    public  String getFileType(String filePath) {
+//	        System.out.println(getFileHeader(filePath));
+//	        System.out.println(mFileTypes.get(getFileHeader(filePath)));
+	        return mFileTypes.get(getFileHeader(filePath));
+	    }
+	    
+	    /**
+	     * @param filePath 文件路径
+	     * @return 文件头信息
+	     * @author wlx
+	     * <p>
+	     * 方法描述：根据文件路径获取文件头信息
+	     */
+	    public  String getFileHeader(String filePath) {
+	        FileInputStream is = null;
+	        String value = null;
+	        try {
+	            is = new FileInputStream(filePath);
+	            byte[] b = new byte[4];
+	            /*
+	             * int read() 从此输入流中读取一个数据字节。int read(byte[] b) 从此输入流中将最多 b.length
+	             * 个字节的数据读入一个 byte 数组中。 int read(byte[] b, int off, int len)
+	             * 从此输入流中将最多 len 个字节的数据读入一个 byte 数组中。
+	             */
+	            is.read(b, 0, b.length);
+	            value = bytesToHexString(b);
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	        } finally {
+	            if (null != is) {
+	                try {
+	                    is.close();
+	                } catch (IOException e) {
+	                    e.printStackTrace();
+	                }
+	            }
+	        }
+	        return value;
+	    }
+	    
+	    
+		
+	    /**
+	     * @param src 要读取文件头信息的文件的byte数组
+	     * @return 文件头信息
+	     * @author wlx
+	     * <p>
+	     * 方法描述：将要读取文件头信息的文件的byte数组转换成string类型表示
+	     */
+	      String bytesToHexString(byte[] src) {
+	        StringBuilder builder = new StringBuilder();
+	        if (src == null || src.length <= 0) {
+	            return null;
+	        }
+	        String hv;
+	        for (byte aSrc : src) {
+	            // 以十六进制（基数 16）无符号整数形式返回一个整数参数的字符串表示形式，并转换为大写
+	            hv = Integer.toHexString(aSrc & 0xFF).toUpperCase();
+	            if (hv.length() < 2) {
+	                builder.append(0);
+	            }
+	            builder.append(hv);
+	        }
+//	        System.out.println(builder.toString());
+	        return builder.toString();
+	    }
+	    
+		
+		
 	}
 
 	class ReSize_Img_Rule_22 extends Basic_Rule {
