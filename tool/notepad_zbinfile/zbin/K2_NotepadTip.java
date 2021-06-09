@@ -86,9 +86,14 @@ public class K2_NotepadTip  implements ClipboardOwner{
     
     static void  PrintADB_Logcat( String fliterStr ){
     	System.out.println();
-        System.out.println("══════════════════"+ " logcat 过滤执行 "+ "══════════════════" );
+        System.out.println("══════════════════"+ " grep_cmder_linux logcat 过滤执行 "+ "══════════════════" );
         System.out.println("adb logcat | grep -E  "+"\""+fliterStr+"\"");
+    
+        System.out.println("══════════════════"+ " findstr_cmd_windows  logcat 过滤执行 "+ "══════════════════" );
 
+        String findstrparam = fliterStr.replace("|", " ");
+        
+        System.out.println("adb logcat | findstr   "+"\""+fliterStr+"\"");
     }
     
     

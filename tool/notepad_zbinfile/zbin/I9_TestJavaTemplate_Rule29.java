@@ -867,7 +867,18 @@ System.out.println("--------------- index_byte["+i+"] char["+charItem+"]--------
         return array;
     }
 
-    private static int toByte(char c) {
+	public static String getFileNameNoPointNoLowerCase(String fileName) {
+		String name = "";
+		if (fileName.contains(".")) {
+			name = fileName.substring(0, fileName.lastIndexOf(".")).trim();
+		} else {
+			name = new String(fileName);
+		}
+		return name.trim();
+	}
+
+	
+	public static int toByte(char c) {
         if (c >= '0' && c <= '9') return (c - '0');
         if (c >= 'A' && c <= 'F') return (c - 'A' + 10);
         if (c >= 'a' && c <= 'f') return (c - 'a' + 10);

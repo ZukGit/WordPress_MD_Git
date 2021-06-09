@@ -409,7 +409,7 @@ public class I9_TextRuleOperation {
 			for (int i = 0; i < curInputFileList.size(); i++) {
 				ArrayList<String> allContentList = new ArrayList<String>();
 				File targetFile = curInputFileList.get(i);
-				String fileName = getFileNameNoPoint(targetFile.getName());
+				String fileName = getFileNameNoPointNoLowerCase(targetFile.getName());
 				ArrayList<String> allContent = ReadFileContentAsList(targetFile);
 
 				// 每一个 item 只包含 8位字符串 所组成的新的字符串集合 方便 转为 byte数组
@@ -436,7 +436,7 @@ public class I9_TextRuleOperation {
 				if (realType == null) {
 					realType = "unknow";
 				}
-				String realType_Name = fileName + "_Binary_Rule36_" + getTimeStamp() + "." + realType;
+				String realType_Name = fileName + "_BinRecovery_Rule36_" + getTimeStamp() + "." + realType;
 
 				File realFile = new File(targetFile.getParentFile().getAbsolutePath() + File.separator + realType_Name);
 				fileCopy(I9_Temp_Text_File, realFile);
@@ -574,6 +574,7 @@ public class I9_TextRuleOperation {
 				System.out.println(mBinarySB.toString());
 				System.out.println("ZZZZZZZZZZZZZZZZZZZZZ");
 
+				ArrayList<String> binary_str_List = new ArrayList<String> ();
 				if (mAsciiSB.length() > 0) {
 					System.out.println("\n\n\n\n");
 					System.out.println("ASCII长度: " + mAsciiSB.length());
@@ -587,20 +588,37 @@ public class I9_TextRuleOperation {
 					for (int j = 0; j < originSize; j++) {
 						sb.append(mAsciiSB.charAt(j));
 						if (j % 100 == 0) {
-							System.out.println(get12size(j) + "    " + sb.toString());
-							allContentList.add(get12size(j) + "    " + sb.toString());
+							String binaryItem = get12size(j) + "    " + sb.toString();
+							System.out.println(binaryItem);
+							allContentList.add(binaryItem);
+							binary_str_List.add(binaryItem);
 							sb = new StringBuilder();
 						}
 						if (j == originSize - 1) {
-							System.out.println(get12size(j) + "    " + sb);
-							allContentList.add(get12size(j) + "    " + sb.toString());
+							String binaryItem = get12size(j) + "    " + sb;
+							System.out.println(binaryItem);
+							allContentList.add(binaryItem);
+							binary_str_List.add(binaryItem);
 						}
 					}
 				}
 
 				writeContentToFile(I9_Temp_Text_File, allContentList);
 				NotePadOpenTargetFile(I9_Temp_Text_File.getAbsolutePath());
+				
+				// 在 文件 本地 创建一个 只有 二进制的 txt文件
+				
+				String origin_name = targetFile.getName();
+				String clearTypeName = getFileNameNoPointNoLowerCase(origin_name);
+				String binary_only_filename = clearTypeName+"_binary_"+getTimeStamp()+".txt";
+				File binaryFile = new File(targetFile.getParentFile().getAbsolutePath()+File.separator+binary_only_filename);
+				
+//				writeContentToFile(mBinarySB.toString(), binary_str_List);
+				writeContentToFile(binaryFile, mBinarySB.toString());
+//				NotePadOpenTargetFile(binaryFile.getAbsolutePath());
 				System.out.println("rule_" + rule_index + " -> 完成当前文件 " + targetFile.getAbsolutePath() + " 的 二进制打印!! ");
+
+				System.out.println("rule_" + rule_index + " -> 完成本地二进制文件 " + binaryFile.getAbsolutePath() + " 的 生成!! ");
 
 			}
 			return super.applyOperationRule(curFileList, subFileTypeMap, curDirList, curRealFileList);
@@ -11529,13 +11547,17 @@ public class I9_TextRuleOperation {
 		initMoshuTypeItem("464C5601", "FLV");
 		initMoshuTypeItem("1F8B0800", "GZ");
 		initMoshuTypeItem("48544D4C207B0D0A0942", "CSS");
+		initMoshuTypeItem("48544D4C", "CSS");
 		initMoshuTypeItem("696B2E71623D696B2E71", "JS");
+		initMoshuTypeItem("696B2E71", "JS");
 		initMoshuTypeItem("d0cf11e0a1b11ae10000", "VSD");
+		initMoshuTypeItem("d0cf11e0", "VSD");
 		initMoshuTypeItem("d0cf11e0a1b11ae10000", "WPS");
 		initMoshuTypeItem("d0cf11e0", "WPS");
 		initMoshuTypeItem("6431303A637265617465", "TORRENT");
 		initMoshuTypeItem("6431303A", "TORRENT");
 		initMoshuTypeItem("3C2540207061676520", "JSP");
+		initMoshuTypeItem("3C254020", "JSP");
 		initMoshuTypeItem("7061636B61676520", "JAVA");
 		initMoshuTypeItem("7061636B", "JAVA");
 		initMoshuTypeItem("CAFEBABE0000002E00", "CLASS");
@@ -11549,9 +11571,12 @@ public class I9_TextRuleOperation {
 		initMoshuTypeItem("7F454C4601010100", "ELF");
 		initMoshuTypeItem("7F454C46", "ELF");
 		initMoshuTypeItem("2000604060", "WK1");
+		initMoshuTypeItem("20006040", "WK1");
 		initMoshuTypeItem("00001A0000100400", "WK3");
+		initMoshuTypeItem("00001A00", "WK3");
 		initMoshuTypeItem("00001A0002100400", "WK4");
 		initMoshuTypeItem("576F726450726F", "LWP");
+		initMoshuTypeItem("576F7264", "LWP");
 		initMoshuTypeItem("53520100", "SLY");
 
 		initMoshuTypeItem("D0CF11E0", "ppt");

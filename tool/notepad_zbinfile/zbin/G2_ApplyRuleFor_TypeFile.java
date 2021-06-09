@@ -281,6 +281,9 @@ public class G2_ApplyRuleFor_TypeFile {
 		realTypeRuleList.add(new Append_Pdf_Rule_35()); // 把 pdf 文件 追加 合并为 一个文件
 		realTypeRuleList.add(new Seperate_Pdf_Rule_36()); // 把 pdf中指定的页数 分隔出来作为一个新的pdf文件
 		
+		realTypeRuleList.add(new Zapp_Zmain_dir_Create_Rule_37()); // 在本地目录创建 /sdcard/zapp  和 /sdcard/zmain 相关的 dir目录
+		
+		
 	}
 
 // 3038年 5 月 3 日
@@ -295,7 +298,163 @@ public class G2_ApplyRuleFor_TypeFile {
 	
 
 	 // 把 pdf中指定的页数 分隔出来作为一个新的pdf文件      #_36  A.pdf 31_341 
-	
+	// 在本地目录创建 /sdcard/zapp  和 /sdcard/zmain 相关的 dir目录
+	class Zapp_Zmain_dir_Create_Rule_37 extends Basic_Rule {
+		
+		boolean isZappFlag ;
+
+		boolean isZmainFlag ;
+		
+		boolean isZmainInputParamFlag ;
+		boolean isZappInputParamFlag ;
+		
+		Zapp_Zmain_dir_Create_Rule_37() {
+			super("#", 37, 3); //
+			isZappFlag = false;
+			
+			isZmainFlag = false;
+			isZmainInputParamFlag = false;
+			isZappInputParamFlag = false;
+		}
+		
+		@Override
+		boolean allowEmptyDirFileList() {
+		// TODO Auto-generated method stub
+		return true;
+		}
+		
+		@Override
+		boolean initParamsWithInputList(ArrayList<String> inputParamList) {
+			
+			for (int i = 0; i < inputParamList.size(); i++) {
+				
+			        String strParam = inputParamList.get(i);
+			        System.out.println("strParam["+i+"] = "+ strParam);
+			        if("zmain".equals(strParam)) {
+			            System.out.println("X2 strParam["+i+"] = "+ strParam);	
+			        	isZmainFlag = true;
+			        	isZmainInputParamFlag = true;
+			        	
+			        }
+			        
+			        if("zapp".equals(strParam)) {
+			            System.out.println("X3 strParam["+i+"] = "+ strParam);	
+
+			        	isZappFlag = true;
+			        	isZappInputParamFlag = true;
+			        }
+			        
+			}
+			
+			if(isZmainInputParamFlag == false && isZappInputParamFlag == false) {   // 说明用户没有输入任何指定的参数 那么设置 两个值都为 true 
+	            System.out.println("X4 strParam");	
+
+				isZmainFlag = true;
+				isZappFlag = true;
+			}
+		// TODO Auto-generated method stub
+		return super.initParamsWithInputList(inputParamList);
+		}
+		
+		
+		@Override
+		ArrayList<File> applyFileListRule3(ArrayList<File> subFileList, HashMap<String, ArrayList<File>> fileTypeMap) {
+		// TODO Auto-generated method stub
+			
+			String absShellPath = curDirFile.getAbsolutePath();
+			System.out.println(" 当前Shell的路径为: curDirFile =  "+ absShellPath);
+			
+			ArrayList<String> Zmain_createDirNameList = new 	ArrayList<String> ();
+			
+			ArrayList<String> Zapp_createDirNameList = new 	ArrayList<String> ();
+			
+			if(isZmainFlag) {
+				Zmain_createDirNameList.add("gif");
+				Zmain_createDirNameList.add("gif_land");
+				Zmain_createDirNameList.add("gif_port");
+				Zmain_createDirNameList.add("jpg");
+				Zmain_createDirNameList.add("jpg_land_home");
+				Zmain_createDirNameList.add("jpg_port_home");
+				Zmain_createDirNameList.add("jpg_port_wall");
+				Zmain_createDirNameList.add("jpg_land_wall");
+				Zmain_createDirNameList.add("mp3");
+				Zmain_createDirNameList.add("mp4");
+				Zmain_createDirNameList.add("mp4_home");
+				Zmain_createDirNameList.add("mp4_music");
+				Zmain_createDirNameList.add("mp4_scene");
+				
+			}
+			
+			if(isZappFlag) {
+				
+				Zapp_createDirNameList.add("gif");
+				Zapp_createDirNameList.add("gif_land");
+				Zapp_createDirNameList.add("gif_port");
+				Zapp_createDirNameList.add("jpg");
+				Zapp_createDirNameList.add("jpg_top_land");
+				Zapp_createDirNameList.add("jpg_top_port");
+				Zapp_createDirNameList.add("mp4");
+				Zapp_createDirNameList.add("mp4_raw");
+				Zapp_createDirNameList.add("mp4_hua");
+
+			}
+			
+			if(Zmain_createDirNameList.size() > 0 && isZmainFlag) {
+				System.out.println("══════════════════ zmain_begin ════════════════");
+
+				for (int i = 0; i < Zmain_createDirNameList.size(); i++) {
+					String dirName = Zmain_createDirNameList.get(i);
+					String zmain_dirName = "zmain"+File.separator+dirName;
+					String abs_path_dir = absShellPath + File.separator+ zmain_dirName;
+					File dirFile = new File(abs_path_dir);
+					dirFile.mkdirs();
+					System.out.println("创建_zmain_目录["+i+"]  = "+ abs_path_dir);
+
+				}
+				System.out.println("══════════════════ zmain_end ════════════════");
+			}
+			
+
+			
+			if(Zapp_createDirNameList.size() > 0  && isZappFlag ) {
+				System.out.println("══════════════════ zapp_begin ════════════════");
+
+				for (int i = 0; i < Zapp_createDirNameList.size(); i++) {
+					String dirName = Zapp_createDirNameList.get(i);
+					String zmain_dirName = "zapp"+File.separator+dirName;
+					String abs_path_dir = absShellPath + File.separator+ zmain_dirName;
+					File dirFile = new File(abs_path_dir);
+					dirFile.mkdirs();
+					System.out.println("创建_zapp_目录["+i+"]  = "+ abs_path_dir);
+				}
+				System.out.println("══════════════════ zapp_end ════════════════");
+
+			}
+			
+			System.out.println("当前 创建 zapp zmain 结构目录的方法 Rule_"+ rule_index +" 执行完毕!!  " );
+
+			
+			
+		return super.applyFileListRule3(subFileList, fileTypeMap);
+		}
+		
+		@Override
+		String simpleDesc() {
+		// TODO Auto-generated method stub
+			
+
+			return Cur_Bat_Name + " #_"+rule_index+"   ###  创建zapp 和 zmain的文件夹结构 /sdcard/zmain /sdcard/zapp   \n"
+					+ Cur_Bat_Name + " #_"+rule_index+"  zmain  zapp    ### 创建zapp 和 zmain的文件夹结构 /sdcard/zmain /sdcard/zapp \n"						
+              		+ Cur_Bat_Name + " #_"+rule_index+" zmain      ### 只在当前目录创建 zmain 的 /sdcard/zmain 目录结构 \n"						
+              		+ Cur_Bat_Name + " #_"+rule_index+" zapp      ### 只在当前目录创建 zapp 的 /sdcard/zapp 目录结构 \n"						
+
+					;
+
+		}
+		
+		
+		
+	}
 	class Seperate_Pdf_Rule_36 extends Basic_Rule {
 
 
@@ -3296,20 +3455,47 @@ System.out.println();
 	// 检查文件的真实类型 并对 那些 不符合真实类型的文件 进行提示
 	class CheckFileRealFormat_Rule_23 extends Basic_Rule {
 		
-	 final HashMap<String, String> mFileTypes;
+	 final HashMap<String, String> mFileTypes;   // 魔数 ----- 类型
+	 final HashMap<String, ArrayList<String>> mSameMoShu_ArrType_Map;  // 使用相同魔数 8位字符的文件
+	 ArrayList<String> NoMoShuTypeList ;  // 没有魔数的类型 比如 txt
+	 boolean isFixToRealType = false;
 		  
 		CheckFileRealFormat_Rule_23() {
 			super("#", 23, 4); //
 			 mFileTypes = new HashMap<String, String>();
+			 mSameMoShu_ArrType_Map  = new HashMap<String, ArrayList<String>>();
+			 NoMoShuTypeList = new ArrayList<String>();
+			 
+			 
+			 isFixToRealType = false;
 			 initMoShuTypeMap();
+			 InitInitSameMoShuMap_NoMoShuTypeList();
 		}
+		
+		@Override
+			boolean initParamsWithInputList(ArrayList<String> inputParamList) {
+				// TODO Auto-generated method stub
+			
+			for (int i = 0; i < inputParamList.size(); i++) {
+				String inputParam = inputParamList.get(i);
+				if(inputParam.trim().toLowerCase().startsWith("fix2real_true")) {
+					isFixToRealType = true;
+				} else {
+					isFixToRealType = false;
+				}
+
+			}
+				return super.initParamsWithInputList(inputParamList);
+			}
 		
 		
 		@Override
 		String simpleDesc() {
 
 			return Cur_Bat_Name + " #_"+rule_index+"    ### 对当前目录的文件进行真实类型的检测[通过魔数字]并打印那些类型和魔数不一样文件的列表信息  \n"
-					+ Cur_Bat_Name + " #_"+rule_index+"    ### 对当前目录的文件进行真实类型的检测[通过魔数字]并打印那些类型和魔数不一样文件的列表信息 \n"						
+					+ Cur_Bat_Name + " #_"+rule_index+"  fix2real_false    ### 对当前目录的文件进行真实类型的检测[通过魔数字]并打印那些类型和魔数不一样文件的列表信息 \n"						
+
+					+ Cur_Bat_Name + " #_"+rule_index+"  fix2real_true    ### 对当前目录的文件进行真实类型的检测[通过魔数字]并修正那些类型和魔数不一样文件的列表信息 \n"						
 
 					;
 		}
@@ -3320,125 +3506,272 @@ System.out.println();
 					ArrayList<File> curRealFileList) {
 				// TODO Auto-generated method stub
 			int different_type_file_index = 1;
+			ArrayList<File> differentRealTypeFileList = new ArrayList<File>();
+			System.out.println("════════════════════════"+" 当前目录文件的 魔数情况 Begin "+"════════════════════════");
+			curRealFileList.sort(new Comparator<File>() {
+
+				@Override
+				public int compare(File o1, File o2) {
+					// TODO Auto-generated method stub
+					String o1_type  = getFileTypeWithPoint(o1.getName());
+					String o2_type  = getFileTypeWithPoint(o2.getName());
+					return o1_type.compareTo(o2_type);
+				}
+			});
 			for (int i = 0; i < curRealFileList.size(); i++) {
 			
 				File realFile = curRealFileList.get(i);
-				String fileNameWithoutPoint = getFileNameNoPoint(realFile.getName()).trim().toLowerCase();
-				  String fileType = getFileType(realFile.getAbsolutePath());
-				 
-		            if(fileType == null) {
-		            	fileType = "unknow";
+				String originFileType = getFileTypeWithPoint(realFile.getName()).toLowerCase();
+				if("".equals(originFileType)) {
+					originFileType = "unknow";
+				}
+				String fileNameWithoutPoint = getFileTypeWithPoint(realFile.getName()).trim().toLowerCase();
+				  String realfileType = getFileType(realFile.getAbsolutePath());
+			
+		            if(realfileType == null ) {
+		    
+		            	realfileType = "unknow";
+//		            	if("".equals(originFileType)) {
+//		            		fileType = "";
+//		            	}else {
+//		            		fileType = originFileType;
+//		            	}
 		            }
+		   		 String moshu = getFileHeader(realFile.getAbsolutePath());
 		            
-				 if(!fileNameWithoutPoint.equals(fileType)) {
+					System.out.println("Index["+i+"]     showType=["+ originFileType+"]      realType=[."+realfileType+"]      MoShu=["+moshu+"]     PATH=["+realFile.getAbsolutePath()+"]");
+
+					
+					/*
+					 * final HashMap<String, String> mFileTypes; // 魔数 ----- 类型 final
+					 * HashMap<String, ArrayList<String>> mSameMoShu_ArrType_Map; // 使用相同魔数 8位字符的文件
+					 * ArrayList<String> NoMoShuTypeList ; // 没有魔数的类型 比如 txt
+					 */					 
+					
+				 if(!originFileType.equals(("."+realfileType).toLowerCase())) {
 					 
-					System.out.println("showtype_realtype_diffIndex["+different_type_file_index+"] =  showType="+ fileNameWithoutPoint+"   realType="+fileType+"   PATH="+realFile.getAbsolutePath());
+					 if("unknow".equals(realfileType) &&  NoMoShuTypeList.contains(originFileType.replace(".","").toLowerCase())) {
+						 continue;
+					 }
+					 // 如果当前的 文件类型 没有魔术 那么 不对比
+	
+					ArrayList<String> sameTypeList = 	 mSameMoShu_ArrType_Map.get(moshu);
+					
+					// 如果 两个 文件类型 使用 相同的  type  那么 也排除 这样的文件 
+					if(sameTypeList != null &&  sameTypeList.contains(originFileType.replace(".", "").toLowerCase())) {
+						
+						continue;
+					}
+					
+					
+						
+					differentRealTypeFileList.add(realFile);
 					different_type_file_index++;
+				
+				
+
 				 }
 				 
 				 
 			}
 			
+			System.out.println("════════════════════════"+" 当前目录文件的 魔数情况 End "+"════════════════════════");
+
+			
+			if(differentRealTypeFileList.size() > 0) {
+				System.out.println("════════════"+" 打印 【"+ differentRealTypeFileList.size() +"】 个 显示的类型 和 真实的类型不同的文件 Begin "+"════════════");
+
+				for (int i = 0; i < differentRealTypeFileList.size(); i++) {
+					File realType_showType_Diff_File = differentRealTypeFileList.get(i);
+					String oldName = realType_showType_Diff_File.getName();
+					String showTypeStr  = getFileTypeWithPoint(realType_showType_Diff_File.getName());
+					String realType = getFileType(realType_showType_Diff_File.getAbsolutePath());
+					if(realType == null) {
+						realType = "";
+					}
+					
+					String originFileType = getFileTypeWithPoint(realType_showType_Diff_File.getName());
+			   		 String moshu = getFileHeader(realType_showType_Diff_File.getAbsolutePath());
+					String fileNameNoPoint = getFileNameNoPointNoLowerCase(realType_showType_Diff_File.getName());
+					
+					  String realfileType = getFileType(realType_showType_Diff_File.getAbsolutePath());
+						
+			            if(realfileType == null ) {
+			            	realfileType = "unknow";
+			            }
+			            
+					System.out.println("Diff_Index["+i+"]     showType=["+ originFileType+"]      realType=[."+realfileType+"]      MoShu=["+moshu+"]     PATH=["+realType_showType_Diff_File.getAbsolutePath()+"]  initMoshuTypeItem(\""+moshu+"\", \""+(realfileType.equals("unknow")?showTypeStr.replace(".", ""):realfileType)+"\"); ");
+	
+					
+					
+					
+				}
+				System.out.println("════════════"+" 打印 【"+ differentRealTypeFileList.size() +"】 个 显示的类型 和 真实的类型不同的文件 End "+"════════════");
+
+			}else {
+				
+				System.out.println("════════════恭喜  当前所有文件 真实类型 和 显示类型 全都相同 "+"════════════");
+
+			}
+			
+			if(isFixToRealType && differentRealTypeFileList.size() > 0) {
+				System.out.println("═══════════════════  执行 ["+differentRealTypeFileList.size()+"]个文件 改为真实类型的 操作 Begin ══════════════════");
+				for (int i = 0; i < differentRealTypeFileList.size(); i++) {
+					File realType_showType_Diff_File = differentRealTypeFileList.get(i);
+					String oldName = realType_showType_Diff_File.getName();
+					String showTypeStr  = getFileTypeWithPoint(realType_showType_Diff_File.getName());
+					String realType = getFileType(realType_showType_Diff_File.getAbsolutePath());
+					if(realType == null) {
+						realType = "";
+					}
+			   		 String moshu = getFileHeader(realType_showType_Diff_File.getAbsolutePath());
+					String fileNameNoPoint = getFileNameNoPointNoLowerCase(realType_showType_Diff_File.getName());
+					
+					String newFileName = fileNameNoPoint +"."+realType;
+					tryReName(realType_showType_Diff_File, newFileName);
+					System.out.println("Index["+i+"]     showType=["+ showTypeStr+"]      realType=[."+realType+"]      MoShu=["+moshu+"]  OldName=["+oldName+"]    NewName["+newFileName+"]     isFixToRealType=["+isFixToRealType+"]    PATH=["+realType_showType_Diff_File.getAbsolutePath()+"]");
+	
+				}
+				System.out.println("═══════════════════  执行 ["+differentRealTypeFileList.size()+"]个文件 改为真实类型的 操作 End ══════════════════");
+
+			}
+
 			
 				return super.applySubFileListRule4(curFileList, subFileTypeMap, curDirList, curRealFileList);
 			}
 		
 		
-		void initMoShuTypeMap() {
-		      // images
-	        mFileTypes.put("FFD8FF", "jpg");
-	        mFileTypes.put("89504E47", "png");
-	        mFileTypes.put("47494638", "gif");
-	        mFileTypes.put("49492A00", "tif");
-	        mFileTypes.put("424D", "bmp");
-	        mFileTypes.put("424D", "bmp");    
-	        mFileTypes.put("424D228C010000000000", "bmp");   //16色位图(bmp)        
-	        mFileTypes.put("424D8240090000000000", "bmp");   //24色位图(bmp)    
-	        mFileTypes.put("424D8E1B030000000000", "bmp");   //256色位图(bmp)    
-	        
+	 void initMoShuTypeMap() {
 
+		// images
+		initMoshuTypeItem("FFD8FF", "jpg");
+		initMoshuTypeItem("89504E47", "png");
+		initMoshuTypeItem("47494638", "gif");
+		initMoshuTypeItem("49492A00", "tif");
+		initMoshuTypeItem("424D", "bmp");
+		initMoshuTypeItem("424D", "bmp");
+		initMoshuTypeItem("424D228C010000000000", "bmp"); // 16色位图(bmp)
+		initMoshuTypeItem("424D8240090000000000", "bmp"); // 24色位图(bmp)
+		initMoshuTypeItem("424D8E1B030000000000", "bmp"); // 256色位图(bmp)
 
-	        //
-	        mFileTypes.put("41433130", "dwg"); // CAD
-	        mFileTypes.put("38425053", "psd");
-	        mFileTypes.put("7B5C727466", "rtf"); // 日记本
-	        mFileTypes.put("3C3F786D6C", "xml");
-	        mFileTypes.put("68746D6C3E", "html");
-	        mFileTypes.put("44656C69766572792D646174653A", "eml"); // 邮件
-	        mFileTypes.put("D0CF11E0", "doc");
-	        
-	        mFileTypes.put("CFAD12FEC5FD746F", "dbx");       /** Outlook Express (dbx) */
-	        mFileTypes.put("2142444E", "pst");    //     /** Outlook (pst)*/
-	        mFileTypes.put("FF575043", "wpb");    /** Word Perfect (wpd)*/
-	        
-	        
-	        mFileTypes.put(      "252150532D41646F6265","esp" );
-	        mFileTypes.put(       "252150532D41646F6265","PS" );
-	        mFileTypes.put(       "255044462D312E", "PDF");
-	        mFileTypes.put(      "AC9EBD8F", "qdf" );
-	        mFileTypes.put(      "458600000600",  "qbb");
-	        mFileTypes.put(       "E3828596","PWL" );
-	        mFileTypes.put(     "504B0304", "zip"  );
-	        mFileTypes.put(      "52617221",  "RAR");
-	        mFileTypes.put(    "57415645",  "WAV"  );
-	        mFileTypes.put(      "41564920", "AVI" );
-	        mFileTypes.put(    "2E7261FD",   "RAM" );
-	        mFileTypes.put(   "2E524D46",    "RM" );
-	        mFileTypes.put(      "2E524D46000000120001",  "RMVB");  
-	        mFileTypes.put(     "000001BA", "MPG"  );
-	        mFileTypes.put(     "6D6F6F76",   "MOV");
-	        mFileTypes.put(       "3026B2758E66CF11","ASF");
-	        mFileTypes.put(    "60EA",   "ARJ" );
-	        mFileTypes.put(    "4D546864",   "MID" );
-	        mFileTypes.put(       "00000020667479706D70", "MP4"); 
-	        mFileTypes.put(     "49443303000000002176",  "MP3" );  
-	        mFileTypes.put(     "464C5601050000000900",  "FLV" ); 
-	        mFileTypes.put(     "1F8B08",  "GZ");
-	        mFileTypes.put(     "48544D4C207B0D0A0942", "CSS"  );
-	        mFileTypes.put(     "696B2E71623D696B2E71",  "JS" ); 
-	        mFileTypes.put(    "d0cf11e0a1b11ae10000",   "VSD" ); 
-	        mFileTypes.put(     "d0cf11e0a1b11ae10000",  "WPS");
-	        mFileTypes.put(      "6431303A637265617465", "TORRENT" ); 
-	        mFileTypes.put(      "3C2540207061676520","JSP" );    
-	        mFileTypes.put(      "7061636B61676520", "JAVA" ); 
-	        mFileTypes.put(     "CAFEBABE0000002E00",   "CLASS"); 
-	        mFileTypes.put(      "504B03040A000000", "JAR" ); 
-	        mFileTypes.put(     "4D616E69666573742D56",   "MF");
-	        mFileTypes.put(   "4D5A9000030000000400",    "EXE" ); 
-	        mFileTypes.put(    "7F454C4601010100",  "ELF"  ); 
-	        mFileTypes.put(      "2000604060", "WK1" );
-	        mFileTypes.put(     "00001A0000100400",  "WK3" );
-	        mFileTypes.put(     "00001A0002100400", "WK4"  ); 
-	        mFileTypes.put(   "576F726450726F",    "LWP" ); 
-	        mFileTypes.put(     "53520100",  "SLY" );    
-	        
-	        
-	        
-	        mFileTypes.put("D0CF11E0", "ppt");
-	        mFileTypes.put("D0CF11E0", "xls");//excel2003版本文件
-	        mFileTypes.put("5374616E64617264204A", "mdb");
-	        mFileTypes.put("252150532D41646F6265", "ps");
-	        mFileTypes.put("255044462D312E", "pdf");
-	        mFileTypes.put("504B0304", "pptx");
-	        mFileTypes.put("504B0304", "docx");
-	        mFileTypes.put("504B0304", "xlsx");//excel2007以上版本文件
-	        mFileTypes.put("52617221", "rar");
-	        mFileTypes.put("57415645", "wav");
-	        mFileTypes.put("41564920", "avi");
-	        mFileTypes.put("2E524D46", "rm");
-	        mFileTypes.put("000001BA", "mpg");
-	        mFileTypes.put("000001B3", "mpg");
-	        mFileTypes.put("6D6F6F76", "mov");
-	        mFileTypes.put("3026B2758E66CF11", "asf");
-	        mFileTypes.put("4D546864", "mid");
-	        mFileTypes.put("1F8B08", "gz");
-	
+		//
+		initMoshuTypeItem("41433130", "dwg"); // CAD
+		initMoshuTypeItem("38425053", "psd");
+		initMoshuTypeItem("7B5C727466", "rtf"); // 日记本
+		initMoshuTypeItem("7B5C7274", "rtf"); // 日记本
+		initMoshuTypeItem("504B0304", "zip"); // 日记本
+		initMoshuTypeItem("3C3F786D6C", "xml");
+		initMoshuTypeItem("3C3F786D", "xml");
 
-	        
-			
-			
-		}
+		initMoshuTypeItem("68746D6C3E", "html");
+		initMoshuTypeItem("68746D6C", "html");
+
+		initMoshuTypeItem("44656C69766572792D646174653A", "eml"); // 邮件
+		initMoshuTypeItem("44656C69", "eml"); // 邮件
+
+		initMoshuTypeItem("D0CF11E0", "doc");
+
+		initMoshuTypeItem("CFAD12FEC5FD746F", "dbx"); /** Outlook Express (dbx) */
+		initMoshuTypeItem("CFAD12FE", "dbx");
+
+		initMoshuTypeItem("2142444E", "pst"); // /** Outlook (pst)*/
+		initMoshuTypeItem("FF575043", "wpb"); /** Word Perfect (wpd) */
+
+		initMoshuTypeItem("252150532D41646F6265", "esp");
+		initMoshuTypeItem("25215053", "esp");
+		initMoshuTypeItem("252150532D41646F6265", "PS");
+		initMoshuTypeItem("25215053", "PS");
+		initMoshuTypeItem("255044462D312E", "PDF");
+		initMoshuTypeItem("25504446", "PDF");
+		initMoshuTypeItem("AC9EBD8F", "qdf");
+		initMoshuTypeItem("458600000600", "qbb");
+		initMoshuTypeItem("45860000", "qbb");
+		initMoshuTypeItem("E3828596", "PWL");
+		initMoshuTypeItem("504B0304", "zip");
+		initMoshuTypeItem("52617221", "RAR");
+		initMoshuTypeItem("57415645", "WAV");
+		initMoshuTypeItem("41564920", "AVI");
+		initMoshuTypeItem("2E7261FD", "RAM");
+		initMoshuTypeItem("2E524D46", "RM");
+		initMoshuTypeItem("2E524D46000000120001", "RMVB");
+		initMoshuTypeItem("2E524D46", "RMVB");
+		initMoshuTypeItem("000001BA", "MPG");
+		initMoshuTypeItem("6D6F6F76", "MOV");
+		initMoshuTypeItem("3026B2758E66CF11", "ASF");
+		initMoshuTypeItem("D7CDC69A", "wmf");
+		initMoshuTypeItem("3026B275", "ASF");
+		initMoshuTypeItem("000060EA", "ARJ");
+		initMoshuTypeItem("4D546864", "MID");
+		initMoshuTypeItem("00000020667479706D70", "MP4");
+		initMoshuTypeItem("00000020", "MP4");
+		initMoshuTypeItem("49443303000000002176", "MP3");
+		initMoshuTypeItem("49443303", "MP3");
+		initMoshuTypeItem("464C5601050000000900", "FLV");
+		initMoshuTypeItem("464C5601", "FLV");
+		initMoshuTypeItem("1F8B0800", "GZ");
+		initMoshuTypeItem("48544D4C207B0D0A0942", "CSS");
+		initMoshuTypeItem("48544D4C", "CSS");
+		initMoshuTypeItem("696B2E71623D696B2E71", "JS");
+		initMoshuTypeItem("696B2E71", "JS");
+		initMoshuTypeItem("d0cf11e0a1b11ae10000", "VSD");
+		initMoshuTypeItem("d0cf11e0", "VSD");
+		initMoshuTypeItem("d0cf11e0a1b11ae10000", "WPS");
+		initMoshuTypeItem("d0cf11e0", "WPS");
+		initMoshuTypeItem("6431303A637265617465", "TORRENT");
+		initMoshuTypeItem("6431303A", "TORRENT");
+		initMoshuTypeItem("3C2540207061676520", "JSP");
+		initMoshuTypeItem("3C254020", "JSP");
+		initMoshuTypeItem("7061636B61676520", "JAVA");
+		initMoshuTypeItem("7061636B", "JAVA");
+		initMoshuTypeItem("2F2A0A20", "JAVA");
 		
+		
+		initMoshuTypeItem("CAFEBABE0000002E00", "CLASS");
+		initMoshuTypeItem("CAFEBABE", "CLASS");
+		initMoshuTypeItem("504B03040A000000", "JAR");
+		initMoshuTypeItem("504B0304", "JAR");
+		initMoshuTypeItem("4D616E69666573742D56", "MF");
+		initMoshuTypeItem("4D616E69", "MF");
+		initMoshuTypeItem("4D5A9000030000000400", "EXE");
+		initMoshuTypeItem("4D5A9000", "EXE");
+		initMoshuTypeItem("7F454C4601010100", "ELF");
+		initMoshuTypeItem("7F454C46", "ELF");
+		initMoshuTypeItem("2000604060", "WK1");
+		initMoshuTypeItem("20006040", "WK1");
+		initMoshuTypeItem("00001A0000100400", "WK3");
+		initMoshuTypeItem("00001A00", "WK3");
+		initMoshuTypeItem("00001A0002100400", "WK4");
+		initMoshuTypeItem("576F726450726F", "LWP");
+		initMoshuTypeItem("576F7264", "LWP");
+		initMoshuTypeItem("53520100", "SLY");
+
+		initMoshuTypeItem("D0CF11E0", "ppt");
+		initMoshuTypeItem("D0CF11E0", "xls");// excel2003版本文件
+		initMoshuTypeItem("5374616E64617264204A", "mdb");
+		initMoshuTypeItem("5374616E", "mdb");
+		initMoshuTypeItem("252150532D41646F6265", "ps");
+		initMoshuTypeItem("25215053", "ps");
+		initMoshuTypeItem("255044462D312E", "pdf");
+		initMoshuTypeItem("25504446", "pdf");
+		initMoshuTypeItem("504B0304", "pptx");
+		initMoshuTypeItem("504B0304", "docx");
+		initMoshuTypeItem("504B0304", "xlsx");// excel2007以上版本文件
+		initMoshuTypeItem("52617221", "rar");
+		initMoshuTypeItem("57415645", "wav");
+		initMoshuTypeItem("41564920", "avi");
+		initMoshuTypeItem("2E524D46", "rm");
+		initMoshuTypeItem("000001BA", "mpg");
+		initMoshuTypeItem("000001B3", "mpg");
+		initMoshuTypeItem("6D6F6F76", "mov");
+		initMoshuTypeItem("3026B2758E66CF11", "asf");
+		initMoshuTypeItem("4D546864", "mid");
+		initMoshuTypeItem("1F8B08", "gz");
+		initMoshuTypeItem("3C21444F", "html");
+	}
+
+	void initMoshuTypeItem(String key , String value){
+		mFileTypes.put(key.toUpperCase(), value.toLowerCase());
+	}
 		
 	    /**
 	     * @param filePath 文件路径
@@ -3451,6 +3784,217 @@ System.out.println();
 //	        System.out.println(getFileHeader(filePath));
 //	        System.out.println(mFileTypes.get(getFileHeader(filePath)));
 	        return mFileTypes.get(getFileHeader(filePath));
+	    }
+	    
+	    public void InitInitSameMoShuMap_NoMoShuTypeList(){
+//	    	mSameMoShu_ArrType_Map
+// NoMoShuTypeList           abcdef
+	    	
+	    	//==============================================
+	    	NoMoShuTypeList.add("txt");
+	    	NoMoShuTypeList.add("tmp");
+	    	NoMoShuTypeList.add("vsdconfig");
+	    	NoMoShuTypeList.add("ver");
+	    	NoMoShuTypeList.add("tlog");
+	    	NoMoShuTypeList.add("tcl");
+	    	NoMoShuTypeList.add("swift");
+	    	NoMoShuTypeList.add("sql");
+	    	NoMoShuTypeList.add("sha512");
+	    	NoMoShuTypeList.add("sha1");
+	    	NoMoShuTypeList.add("s");
+	    	NoMoShuTypeList.add("h");
+	    	NoMoShuTypeList.add("rb");
+	    	NoMoShuTypeList.add("py");
+	    	NoMoShuTypeList.add("pm");
+	    	NoMoShuTypeList.add("pkgdef");
+	    	NoMoShuTypeList.add("md");
+	    	NoMoShuTypeList.add("lex");
+	    	NoMoShuTypeList.add("lzz");
+	    	NoMoShuTypeList.add("json");	
+	    	NoMoShuTypeList.add("ini");
+	    	NoMoShuTypeList.add("cpp");
+	    	NoMoShuTypeList.add("code");
+	    	NoMoShuTypeList.add("cer");
+	    	NoMoShuTypeList.add("c");
+	    	NoMoShuTypeList.add("admx");
+	    	NoMoShuTypeList.add("adml");
+	    	NoMoShuTypeList.add("vert");	
+	    	NoMoShuTypeList.add("tmlanguage");
+	    	NoMoShuTypeList.add("swift");
+	    	NoMoShuTypeList.add("sh");	
+	    	NoMoShuTypeList.add("js");	
+	    	NoMoShuTypeList.add("idl");	
+	    	NoMoShuTypeList.add("expected");	
+
+	       	NoMoShuTypeList.add("exp");	
+	       	NoMoShuTypeList.add("def");	
+	       	NoMoShuTypeList.add("db");	
+	       	NoMoShuTypeList.add("data");	
+	       	NoMoShuTypeList.add("dat");	
+	       	NoMoShuTypeList.add("bat");	
+	      	NoMoShuTypeList.add("at");	
+	      	NoMoShuTypeList.add("len");	
+	      	NoMoShuTypeList.add("prop");	
+	      	NoMoShuTypeList.add("snippet");	
+	      	NoMoShuTypeList.add("swift");	
+	      	NoMoShuTypeList.add("tmlanguage");	
+	      	NoMoShuTypeList.add("ts");	
+	    	//==============================================
+	    	String moshu_zip="504B0304";
+	    	ArrayList<String> same_zip_TypeList = new ArrayList<String>();
+	    	same_zip_TypeList.add("zip");
+	    	same_zip_TypeList.add("xlsx");
+	    	same_zip_TypeList.add("pptx");
+	    	same_zip_TypeList.add("nupkg");
+	    	same_zip_TypeList.add("jar");
+	    	same_zip_TypeList.add("dotm");
+	    	same_zip_TypeList.add("apk");
+	    	mSameMoShu_ArrType_Map.put(moshu_zip, same_zip_TypeList);
+	    	
+	    	
+	    	String moshu_exe="4D5A9000";
+	    	ArrayList<String> same_exe_TypeList = new ArrayList<String>();
+	    	same_exe_TypeList.add("exe");
+	    	same_exe_TypeList.add("toc");
+	    	same_exe_TypeList.add("node");
+	    	same_exe_TypeList.add("mun");
+	    	same_exe_TypeList.add("mui");
+	    	same_exe_TypeList.add("olb");
+	    	same_exe_TypeList.add("iltoc");
+	    	same_exe_TypeList.add("ildll");
+	    	same_exe_TypeList.add("dll");
+	    	same_exe_TypeList.add("sys");
+	    	mSameMoShu_ArrType_Map.put(moshu_exe, same_exe_TypeList);
+	    	
+	    	
+	    	
+	    	String moshu_so="7F454C46";
+	    	ArrayList<String> same_so_TypeList = new ArrayList<String>();
+	    	same_so_TypeList.add("so");
+	    	same_so_TypeList.add("elf");
+	    	mSameMoShu_ArrType_Map.put(moshu_so, same_so_TypeList);
+	    	
+	    	
+	    	String moshu_xls="D0CF11E0";
+	    	ArrayList<String> same_xls_TypeList = new ArrayList<String>();
+	    	same_xls_TypeList.add("xls");
+	    	same_xls_TypeList.add("doc");
+	    	same_xls_TypeList.add("ptt");
+	    	mSameMoShu_ArrType_Map.put(moshu_xls, same_xls_TypeList);
+	    	
+	    	
+	    	String moshu_xml="3C3F786D";
+	    	ArrayList<String> same_xml_TypeList = new ArrayList<String>();
+	    	same_xml_TypeList.add("xml");
+	    	same_xml_TypeList.add("pom");
+	    	same_xml_TypeList.add("manifest");		
+	    	same_xml_TypeList.add("iml");
+	    	same_xml_TypeList.add("filters");
+	    	same_xml_TypeList.add("config");
+	    	same_xml_TypeList.add("vcxproj");
+	   
+	    	
+	    	mSameMoShu_ArrType_Map.put(moshu_xml, same_xml_TypeList);
+	    	
+	    	
+	    	
+	    	String moshu_JAVA="2F2A0A20";
+	    	ArrayList<String> same_Java_TypeList = new ArrayList<String>();
+	    	same_Java_TypeList.add("java");
+	    	same_Java_TypeList.add("kt");
+	    	same_Java_TypeList.add("groovy");
+	    	same_Java_TypeList.add("pm");
+	    			
+	    	mSameMoShu_ArrType_Map.put(moshu_JAVA, same_Java_TypeList);
+	    	
+	    	String moshu_inf="FFFE5B00";
+	    	ArrayList<String> same_inf_TypeList = new ArrayList<String>();
+	    	same_inf_TypeList.add("inf");
+	    	same_inf_TypeList.add("inf_loc");
+	    	mSameMoShu_ArrType_Map.put(moshu_inf, same_inf_TypeList);
+	    	
+	    	
+	    	String moshu_pdb="4D696372";
+	    	ArrayList<String> same_pdb_TypeList = new ArrayList<String>();
+	    	same_pdb_TypeList.add("pdb");
+	    	same_pdb_TypeList.add("ilpdb");
+	    	same_pdb_TypeList.add("iltocpdb");
+	    	
+	    	
+	    	mSameMoShu_ArrType_Map.put(moshu_pdb, same_pdb_TypeList);
+	    	
+	    	
+	    	String moshu_admx="EFBBBF3C";
+	    	ArrayList<String> same_admx_TypeList = new ArrayList<String>();
+	    	same_admx_TypeList.add("nuspec");
+	    	same_admx_TypeList.add("admx");
+	    	mSameMoShu_ArrType_Map.put(moshu_admx, same_pdb_TypeList);
+	    	
+	    	
+	    	String moshu_swift="7F454C46";
+	    	ArrayList<String> same_swift_TypeList = new ArrayList<String>();
+	    	same_swift_TypeList.add("swift");
+	    	same_swift_TypeList.add("gyb");
+	    	same_swift_TypeList.add("sil");
+	    	mSameMoShu_ArrType_Map.put(moshu_swift, same_so_TypeList);
+	    	
+	    	
+	    	//==============================================
+	    	 initMoshuTypeItem("FFFE5B00", "inf_loc");
+	    	 initMoshuTypeItem("22205669", "vim");
+	    	 initMoshuTypeItem("6C657420", "vim");
+	    	 initMoshuTypeItem("00010000", "ttf");
+	    	 initMoshuTypeItem("3C737667", "svg");
+	    	 initMoshuTypeItem("6F2F636F", "bin");
+	    	 
+	    	 initMoshuTypeItem("D4C3B2A1", "cap");
+	    	 initMoshuTypeItem("2F2F3D3D", "mm");
+	    	  initMoshuTypeItem("2F2A2120", "ts");
+	    	  initMoshuTypeItem("4D5A9000", "exe");
+	    	  initMoshuTypeItem("23707261", "mof");
+	    	  initMoshuTypeItem("482E517F", "ipdb");
+	    	  initMoshuTypeItem("2F2F2052", "gyb");
+	    	  initMoshuTypeItem("D4C3B2A1", "pcap");
+	    	  initMoshuTypeItem("23232323", "properties");
+	    	  initMoshuTypeItem("7F454C46", "so");
+	    	  initMoshuTypeItem("64862300", "iobj");
+	    	  initMoshuTypeItem("FFD8FFE0", "jpeg");
+	    	  initMoshuTypeItem("2E636C61", "smali");
+	    	  initMoshuTypeItem("4F424A43", "rst");
+	    	  initMoshuTypeItem("4155544F", "rst");
+	    	  initMoshuTypeItem("420D0D0A", "pyc");
+	    	  initMoshuTypeItem("692F6A61", "bin");
+	    	  initMoshuTypeItem("D0CF11E0", "xls");
+	    	  initMoshuTypeItem("3C3F786D", "xml");
+	    	  initMoshuTypeItem("23202121", "pl");
+	    	  initMoshuTypeItem("4D696372", "pdb");
+	    	  initMoshuTypeItem("04000000", "pak");
+	    	  initMoshuTypeItem("626F6479", "out");
+	    	  initMoshuTypeItem("05000000", "aux");
+	    	  initMoshuTypeItem("4D534654", "olb");
+	    	  initMoshuTypeItem("EFBBBF3C", "nuspec");
+	    	  initMoshuTypeItem("24504D54", "nma");
+	    	  initMoshuTypeItem("6E006F00", "nlp");
+	    	  initMoshuTypeItem("23206372", "msg");
+	    	  initMoshuTypeItem("0000001C", "mp4");
+	    	  initMoshuTypeItem("00000018", "mp4");
+	    	  initMoshuTypeItem("213C6172", "lib");
+	    	  initMoshuTypeItem("7B7B2320", "jst");
+	    	  initMoshuTypeItem("2F2F203D", "js");
+	    	  initMoshuTypeItem("4D696372", "iltocpdb");
+	    	  initMoshuTypeItem("4D696372", "ilpdb");
+	    	  initMoshuTypeItem("00000100", "ico");
+	    	  initMoshuTypeItem("2320456E", "enc");
+	    }
+	    
+	    
+	    boolean isTypeUsedSameMoShu(String showType , String realType) {
+	    	boolean isSameMoShu = false;
+	    	
+	    	
+	    	
+	    	
+	    	return false;
 	    }
 	    
 	    /**
@@ -3473,6 +4017,7 @@ System.out.println();
 	             */
 	            is.read(b, 0, b.length);
 	            value = bytesToHexString(b);
+	            value = value.toUpperCase();
 	        } catch (Exception e) {
 	            e.printStackTrace();
 	        } finally {
@@ -3484,6 +4029,8 @@ System.out.println();
 	                }
 	            }
 	        }
+//			System.out.println("文件:" + filePath + "    魔数byte[4]_value_moshu = " + value);
+
 	        return value;
 	    }
 	    
@@ -9063,6 +9610,15 @@ newRealFile=D:\BaiduNetdiskDownload\公式\bad_batch\good_batch\A.pdf
         return pinyinStr;
     }
     
+	public static String getFileNameNoPointNoLowerCase(String fileName) {
+		String name = "";
+		if (fileName.contains(".")) {
+			name = fileName.substring(0, fileName.lastIndexOf(".")).trim();
+		} else {
+			name = new String(fileName);
+		}
+		return name.trim();
+	}
 
 
 	static void NotePadOpenTargetFile(String absPath){
