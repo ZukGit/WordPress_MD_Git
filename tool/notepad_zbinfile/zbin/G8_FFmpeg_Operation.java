@@ -133,6 +133,8 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
         videoTypeList.add(".rmvb");
         videoTypeList.add(".flv");
         videoTypeList.add(".mkv");
+        videoTypeList.add(".m4a");
+        videoTypeList.add(".mp3");
     }
 
 
@@ -146,6 +148,7 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
         mediaTypeList.add(".wav");
         mediaTypeList.add(".aac");
         mediaTypeList.add(".mkv");
+        mediaTypeList.add(".m4a");
 
     }
 
@@ -285,29 +288,128 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
     void InitRule(){
 
         //   加入类型一一对应的 那些 规则
-
+    	 //  提供一个 mp4 文件  输入该文件的两倍长度的文件
         CUR_RULE_LIST.add( new MergeMP4_Rule_1());
+        
+        //  提供一个 mp4 rmvb avi flv 文件  输入该文件音频mp3文件
         CUR_RULE_LIST.add( new GETMP3_Rule_2());
+        
+        // 传入视频文件  获取该视频文件的 所有 图片帧
         CUR_RULE_LIST.add( new GETJPGFrame4Video_Rule_3());
 
+//  把当前 mp4 avi flv rmvb 视频 旋转90度输出 sky.mp4
         CUR_RULE_LIST.add( new VideoRoast_Rule_4());
 
+//  对当前 给定的 Mp4文件进行切割为ts文件  文件结构为  当前目录 ./out 【输出文件夹 包含m3u8 文件】  ./out/TS_Dir 【TS文件的输出文件夹  包含 TS 文件】
         CUR_RULE_LIST.add( new MP4_To_TS_Rule_5());
 
+// UC 本地化  使 绝对路径转为 相对路径  方便查看  adb pull  /storage/emulated/0/UCDownloads/VideoData/ .  【   /storage/emulated/0/UCDownloads/VideoData/  转为 .  】
         CUR_RULE_LIST.add( new UC_OutPut_TS_Localized_6());
+        
+        
+        
+// ffmpeg -ss 00:00:00  -accurate_seek  -to 00:00:10  -i 1.mp4 -codec copy 1_output.mp4   //  截取视频
         CUR_RULE_LIST.add( new CutDown_Video_Rule_7());
 
 
-//        CUR_RULE_LIST.add( new File_Name_Rule_2());
-//        CUR_RULE_LIST.add( new Image2Jpeg_Rule_3());
-//        CUR_RULE_LIST.add( new Image2Png_Rule_4());
-//        CUR_RULE_LIST.add( new AVI_Rule_5());
-//        CUR_RULE_LIST.add( new SubDirRename_Rule_6());
-//        CUR_RULE_LIST.add( new Encropty_Rule_7());
-//        CUR_RULE_LIST.add( new ClearChineseType_8());
+        //  把当前的 mov文件转为 mp4文件 输出到本地文件夹
+        CUR_RULE_LIST.add( new MOV_Revert_MP4_Rule_8());
+        
+
 
     }
 
+    class MOV_Revert_MP4_Rule_8 extends  Basic_Rule{
+    	
+    	ArrayList<File> curDirMovFileList ;  // 当前目录的 mov文件 
+
+    	MOV_Revert_MP4_Rule_8(){
+            super(8);
+            curDirMovFileList = new  ArrayList<File>();
+
+        }
+    	
+    	
+    	
+        String ruleTip(String type, int index, String batName, OS_TYPE curType) {
+            return
+                    "\n"+Cur_Bat_Name+ " "+rule_index+ "     ##  把当前的 .mov 文件转为 mp4文件 生成在 目录 Mov_To_Mp4_时间戳 目录中   \n"+
+                    "\n"+Cur_Bat_Name+ "  "+rule_index+ "    ##  把当前的 .mov 文件转为 mp4文件 生成在 目录 Mov_To_Mp4_时间戳 目录中  \n"; }
+        
+    	
+    	
+        @Override
+        void operationRule(ArrayList<String> inputParamsList) {
+        	
+            String ffmpeg_path = getEnvironmentExePath("ffmpeg");
+            if(ffmpeg_path ==null){
+                errorMsg = "当前 ffmpeg 不在环境变量中 请下载该库 并添加到 环境变量中";
+                System.out.println(errorMsg);
+                return;
+            }
+            System.out.println("rule8 curDirMovFileList.size() = "+curDirMovFileList.size());
+            System.out.println("rule8 ffmpeg_path = "+ffmpeg_path);
+            
+            String Mov_2_Mp4_DirName = "Mov_To_Mp4_"+getTimeStamp();
+            File Mov_2_Mp4_Dir = new File(CUR_Dir_FILE+File.separator+Mov_2_Mp4_DirName);
+            
+            if(!Mov_2_Mp4_Dir.exists()) {
+            	Mov_2_Mp4_Dir.mkdirs();
+            }
+        	for (int i = 0; i < curDirMovFileList.size(); i++) {
+				File movFile = curDirMovFileList.get(i);
+				String movFileAbs = movFile.getAbsolutePath();
+				String fileName = movFile.getName();
+				String fileNameNoPointType = getFileNameNoPoint_NoCase(fileName);
+				String target_mp4_abs_path = (Mov_2_Mp4_Dir.getAbsolutePath()+File.separator+fileNameNoPointType+".mp4").replace(" ","");
+				
+				
+				
+
+	            //  ffmpeg -i movie.mov -vcodec copy -acodec copy out.mp4
+	            String command = ffmpeg_path +" -i "+movFileAbs  + "  -vcodec copy -acodec copy  " + target_mp4_abs_path;
+               System.out.println("--------ruleIndex["+rule_index+"] fileIndex["+i+"]  Path=["+movFile.getAbsolutePath().replace(" ","")+"] ");
+	            System.out.println(command);
+                execCMD(command);
+	            
+				
+			}
+        	
+        	
+        	
+        }
+    	@Override
+    	boolean checkParamsOK(File shellDir, String type2Param, ArrayList<String> otherParams) {
+    		// TODO Auto-generated method stub
+    		
+    		File[] listFile = shellDir.listFiles();
+    		
+    		if(listFile == null) {
+    			System.out.println("当前目录下的 Mov 文件为空_1  程序执行失败 ");
+    			return false;
+    		}
+    		
+    		for (int i = 0; i < listFile.length; i++) {
+				File itemFile = listFile[i];
+				
+				if(itemFile.isDirectory()) {
+					continue;
+				}
+				String fileName_tolower = itemFile.getName().toLowerCase();
+				if(fileName_tolower.endsWith(".mov")) {
+					curDirMovFileList.add(itemFile);
+				}
+			}
+    		
+    		if(curDirMovFileList.size() == 0) {
+    			
+    			System.out.println("当前目录下的 Mov 文件为空_2  程序执行失败 ");
+    			return false;
+    		}
+    		
+    		return super.checkParamsOK(shellDir, type2Param, otherParams);
+    	}
+    }
 
 
 
@@ -1305,7 +1407,7 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
 
         @Override
         String ruleTip(String type, int index, String batName, OS_TYPE curType) {
-            return  "\n"+Cur_Bat_Name+ "  2   <mp4,flv,avi.rmvb 路径>       ## 把当前 mp4 avi flv rmvb 视频文件 分离出它的 mp3音频文件 \n" ;
+            return  "\n"+Cur_Bat_Name+ "  2   <mp4,flv,avi,rmvb,m4a 路径>       ## 把当前 mp4 avi flv rmvb m4a 视频文件 分离出它的 mp3音频文件 \n" ;
         }
 
 
@@ -2040,6 +2142,17 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
         }
         return name.toLowerCase().trim();
     }
+    
+    public  static String getFileNameNoPoint_NoCase(String fileName){
+        String name = "";
+        if(fileName.contains(".")){
+            name = fileName.substring(0,fileName.lastIndexOf(".") ).trim();
+        }else{
+            name = new String(fileName);
+        }
+        return name.trim();
+    }
+    
 
     public  static String getFileTypeWithPoint(String fileName){
         String name = "";

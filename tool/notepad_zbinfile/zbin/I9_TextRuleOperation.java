@@ -1,9 +1,11 @@
 
+import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.RuntimeUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.qrcode.BufferedImageLuminanceSource;
 import cn.hutool.extra.qrcode.QrCodeUtil;
 import cn.hutool.extra.qrcode.QrConfig;
+import cn.hutool.http.HttpUtil;
 import cn.hutool.json.JSONUtil;
 import cn.hutool.system.JavaRuntimeInfo;
 import com.alibaba.fastjson.JSON;
@@ -23,6 +25,12 @@ import net.sourceforge.pinyin4j.format.exception.BadHanyuPinyinOutputFormatCombi
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+
+import org.jsoup.Connection;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.select.Elements;
+
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
@@ -37,6 +45,7 @@ import java.net.URLEncoder;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributeView;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.text.Collator;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.List;
@@ -381,6 +390,12 @@ public class I9_TextRuleOperation {
 		// 对于只包含 0 和 1 的字符串文件 转为一个 byte文件 在 txt中打开
 		CUR_RULE_LIST.add(new BinaryStrToFile_Rule_36());
 
+		// 检测 当前 txt文件中的 url 路径   并尝试下载这个 url 对应的文件到本地 
+		CUR_RULE_LIST.add(new Analysis_URI_IN_Txt_Download_DouYinMP4_Rule_37());
+		
+		// 检测当前的 txt文件  只 保留 url 内容 , 并 对这些 内容 进行 排序 在 temp 中 打印出来 
+
+		
 //        CUR_RULE_LIST.add( new Image2Png_Rule_4());
 //        CUR_RULE_LIST.add( new AVI_Rule_5());
 //        CUR_RULE_LIST.add( new SubDirRename_Rule_6());
@@ -388,6 +403,302 @@ public class I9_TextRuleOperation {
 //        CUR_RULE_LIST.add( new ClearChineseType_8());
 
 	}
+	
+	
+	
+	class Analysis_URI_IN_Txt_Download_DouYinMP4_Rule_37 extends Basic_Rule {
+
+		String error_string_item;
+		
+// String targetPath = "奇怪，刚刚和妈妈的衣架子交心攀谈后，怎么感觉头上有一圈星星呢～ https://v.kuaishou.com/6Rq0gB 复制此链接，打开【快手App】直接观看！";
+
+		ArrayList<String> videoUrlList ; 
+		ArrayList<String> urlList ;   // 在 url 中 检测到的 mp4 文件    比如 https://v.kuaishou.com/6Rq0gB 
+	    String videoSavePath=null;   //  默认为 txt 文件所在 目录下 新建 抖音 mp4 文件 
+
+	    String timeStamp_Str = null;
+	    int index_download;
+		Analysis_URI_IN_Txt_Download_DouYinMP4_Rule_37() {
+			super(37, false);
+			urlList = new ArrayList<String>();
+			timeStamp_Str = getTimeStamp();
+			index_download = 1;
+			videoUrlList =  new ArrayList<String>();
+		}
+
+	
+		@Override
+		boolean checkParamsOK(File shellDir, String type2Param, ArrayList<String> otherParams) {
+			// TODO Auto-generated method stub
+	
+			
+
+			return super.checkParamsOK(shellDir, type2Param, otherParams);
+		}
+		
+		@Override
+		void showWrongMessage() {
+			// TODO Auto-generated method stub
+			super.showWrongMessage();
+		}
+		
+		
+		
+		
+		@Override
+		String simpleDesc() {
+			return "  检测 当前 txt文件中的 url 路径(抖音 快手视频)   并尝试下载这个 url 对应的文件到本地 tile_时间戳.mp4 并在temp文件打印url列表";
+		}
+
+		@Override
+		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
+				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+			for (int i = 0; i < curInputFileList.size(); i++) {
+				ArrayList<String> allContentList = new ArrayList<String>();
+				File targetFile = curInputFileList.get(i);
+				String fileName = getFileNameNoPointNoLowerCase(targetFile.getName());
+				ArrayList<String> allContent = ReadFileContentAsList(targetFile);
+
+				if(targetFile.exists()) {
+					videoSavePath = targetFile.getParentFile().getAbsolutePath();
+				}
+				
+				if(videoSavePath == null) {
+					videoSavePath = targetFile.getParentFile().getAbsolutePath();
+				}
+				
+				if(allContent.size() > 0) {
+					for (int j = 0; j < allContent.size(); j++) {
+						String oneLine = allContent.get(j);
+						toGetUrlFromOneLine_And_InitUrlList(oneLine);
+						
+						
+					}
+					
+					
+					if(urlList.size() == 0) {
+						System.out.println("当前执行 "+rule_index +" 规则失败  读取文件中的 http-url数据失败!!");
+						return null;
+					}
+					
+					for (int j = 0; j < urlList.size(); j++) {
+						String urlItem = urlList.get(j);
+						
+						 parseUrl(urlItem);
+					}
+					
+	
+				}else {
+					System.out.println("当前执行 "+rule_index +" 规则失败  读取文件内容为空!!!");
+				}
+
+			}
+			
+//			urlList.sort(Chinese);
+			SortString(videoUrlList);
+			writeContentToFile(I9_Temp_Text_File, videoUrlList);
+			NotePadOpenTargetFile(I9_Temp_Text_File.getAbsolutePath());
+			System.out.println("VideoURL 列表打印在 PATH: "+ I9_Temp_Text_File.getAbsolutePath());
+			return super.applyOperationRule(curFileList, subFileTypeMap, curDirList, curRealFileList);
+
+		}
+
+
+		
+		
+	  public  void parseUrl(String url) {
+	        if(url.contains("v.kuaishou.com")){
+	            ksParseUrl(url);
+	            videoUrlList.add(url);
+	        }
+	        if (url.contains("v.douyin.com")     ){
+	            douYinParseUrl(url);
+	            videoUrlList.add(url);
+	        }else if(url.contains("douyin")) {
+	            downVideo(url,"douyin","抖音视频");
+	            videoUrlList.add(url);
+	        	
+	        }
+	    }
+	  
+	  
+	    /**
+	     * 方法描述: 抖音解析下载视频
+
+	     */
+		@SuppressWarnings("unchecked")
+	    public  void douYinParseUrl(String url) {
+	        try {
+	            final  String videoPath="https://www.iesdouyin.com/web/api/v2/aweme/iteminfo/?item_ids=";
+	            Connection con= Jsoup.connect(clearChinese(url));
+	            con.header("User-Agent", "Mozilla/5.0 (iPhone; CPU iPhone OS 12_1_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/16D57 Version/12.0 Safari/604.1");
+	            Connection.Response resp=con.method(Connection.Method.GET).execute();
+	            String videoUrl= videoPath+getItemId(resp.url().toString());
+	            String jsonStr = Jsoup.connect(videoUrl).ignoreContentType(true).execute().body();
+	            JSONObject json =JSONObject.parseObject(jsonStr);
+	            String videoAddress= json.getJSONArray("item_list").getJSONObject(0).getJSONObject("video").getJSONObject("play_addr").getJSONArray("url_list").get(0).toString();
+	            String title= json.getJSONArray("item_list").getJSONObject(0).getJSONObject("share_info").getString("share_title");
+	            videoAddress=videoAddress.replaceAll("playwm","play");
+	            HashMap headers = MapUtil.newHashMap();
+	            headers.put("User-Agent", "Mozilla/5.0 (iPhone; CPU iPhone OS 12_1_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/16D57 Version/12.0 Safari/604.1");
+	            String finalVideoAddress = HttpUtil.createGet(videoAddress).addHeaders(headers).execute().header("Location");
+	            //注:打印获取的链接
+	            System.out.println("-----抖音去水印链接-----\n"+finalVideoAddress);
+	            //下载无水印视频到本地
+	            downVideo(finalVideoAddress,title,"抖音视频");
+	        } catch (IOException e) {
+	            System.out.println(e.getMessage());
+	        }
+	    }
+	  
+		@SuppressWarnings("unchecked")
+	    public  void ksParseUrl(String url) {
+	        HashMap headers = MapUtil.newHashMap();
+	        headers.put("User-Agent", "Mozilla/5.0 (Linux; Android 5.0; SM-G900P Build/LRX21T) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Mobile Safari/537.36");
+	        String redirectUrl = HttpUtil.createGet(url).addHeaders(headers).execute().header("Location");
+	        String body= HttpUtil.createGet(redirectUrl).addHeaders(headers).execute().body();
+	        Document doc= Jsoup.parse(body);
+	        Elements videoElement = doc.select("video[id=video-player]");
+	        String videoUrl = videoElement.get(0).attr("src");
+	        String title = videoElement.get(0).attr("alt");
+	        System.out.println();
+	        System.out.println(videoUrl);
+	        System.out.println(title);
+	        downVideo(videoUrl,title,"快手视频");
+	    }
+		
+		@SuppressWarnings("unchecked")
+	    public  void downVideo(String httpUrl,String title,String source) {
+//	        String fileAddress = videoSavePath+"/"+source+"/"+title+".mp4";
+	        String fileAddress = videoSavePath+"/"+(title.replace(" ", ""))+"_"+index_download+"_"+timeStamp_Str+".mp4";
+	        index_download++;
+	        int byteRead;
+	        try {
+	            URL url = new URL(httpUrl);
+	            //获取链接
+	            URLConnection conn = url.openConnection();
+	            //输入流
+	            InputStream inStream = conn.getInputStream();
+	            //封装一个保存文件的路径对象
+	            File fileSavePath = new File(fileAddress);
+	            //注:如果保存文件夹不存在,那么则创建该文件夹
+	            File fileParent = fileSavePath.getParentFile();
+	            if(!fileParent.exists()){
+	                fileParent.mkdirs();
+	            }
+	            //写入文件
+	            FileOutputStream fs = new FileOutputStream(fileSavePath);
+	            byte[] buffer = new byte[1024];
+	            while ((byteRead = inStream.read(buffer)) != -1) {
+	                fs.write(buffer, 0, byteRead);
+	            }
+	            inStream.close();
+	            fs.close();
+	            System.out.println("\n-----视频保存路径-----\n"+fileSavePath.getAbsolutePath());
+	        } catch (FileNotFoundException e) {
+	            System.out.println(e.getMessage());
+	        } catch (IOException e) {
+	            System.out.println(e.getMessage());
+	        }
+	    }
+	    
+	    // 对每行的数据进行分析
+
+	    public  void toGetUrlFromOneLine_And_InitUrlList(String rowString) {
+	        String[] strArrRow = null;
+	        String fixStr = "";
+
+//	        if(str.trim().startsWith("http:") || str.trim().startsWith("https:") ||
+//	                str.trim().startsWith("thunder:") ||   str.trim().startsWith("magnet::") ){
+
+
+	        if (rowString != null) {
+	            fixStr = new String(rowString);
+	            // http://xxxxxx/sahttp://  避免出现 http://http: 连着的情况 起码也要使得间隔一个空格
+	            fixStr = fixStr.replace("http:", " http:");
+	            fixStr = fixStr.replace("https:", " https:");
+	            fixStr = fixStr.replace("thunder:", " thunder:");
+	            fixStr = fixStr.replace("magnet:", " magnet:");
+	            strArrRow = fixStr.split(" ");
+	        }
+
+	        if (strArrRow != null && strArrRow.length > 0) {
+
+	            for (int i = 0; i < strArrRow.length; i++) {
+	                String mCurContent = strArrRow[i];
+	                if (mCurContent == null || mCurContent.trim().equals("")) {
+	                    continue;
+	                }
+
+
+	                boolean isUrl = toJudgeUrl(mCurContent);
+	                if(isUrl){
+	                	urlList.add(clearChinese(mCurContent).trim());
+
+	                }
+
+	            }
+
+
+	        }
+
+
+	    }
+	    
+	    public  String clearChinese(String lineContent) {
+	        if (lineContent == null || lineContent.trim().isEmpty()) {
+	            return null;
+	        }
+	        Pattern pat = Pattern.compile(REGEX_CHINESE);
+	        Matcher mat = pat.matcher(lineContent);
+	        return mat.replaceAll(" ");
+	    }
+
+	    
+	    /**
+	     * 方法描述: 过滤分享链接的中文汉字
+
+	     */
+	    public  String filterUrl(String rowLine , String url) {
+	        String regex = "https?://(\\w|-)+(\\.(\\w|-)+)+(/(\\w+(\\?(\\w+=(\\w|%|-)*(\\&\\w+=(\\w|%|-)*)*)?)?)?)+";//匹配网址
+	        Pattern p = Pattern.compile(regex);
+	        Matcher m = p.matcher(rowLine);
+	        if(m.find()){
+	            return   rowLine.substring(m.start(),m.end());
+	        }
+	        return "";
+	    }
+
+	    /**
+	     * 方法描述: 获取分享视频id
+	     *
+
+	     */
+	    public  String getItemId(String url){
+	        int start = url.indexOf("/video/")+7;
+	        int end = url.lastIndexOf("/");
+	        String itemId = url.substring(start, end);
+	        return  itemId;
+	    }
+	    
+
+	    public  boolean toJudgeUrl(String str) {
+	        boolean isUrl = false;
+
+	        if (str.trim().toLowerCase().startsWith("http:") || str.toLowerCase().trim().startsWith("https:") ||
+	                str.toLowerCase().trim().startsWith("thunder:") || str.toLowerCase().trim().startsWith("magnet:")) {
+
+	            return true;
+	        }
+
+
+	        return isUrl;
+	    }
+	    
+	    
+
+	}
+	
 
 	class BinaryStrToFile_Rule_36 extends Basic_Rule {
 
@@ -6180,7 +6491,10 @@ public class I9_TextRuleOperation {
 		// 让各个规则自己去检测 自己需要的参数是否得到满足 并自己提示 给出 1.当前cmd路径下的文件 2.typeIndex 字符串 3.之后的输入参数
 		if (CUR_Selected_Rule == null
 				|| !CUR_Selected_Rule.checkParamsOK(CUR_Dir_FILE, CUR_TYPE_2_ParamsStr, CUR_INPUT_3_ParamStrList)) {
-			CUR_Selected_Rule.showWrongMessage(); // 提示当前规则的错误信息
+			if(CUR_Selected_Rule != null) {
+				CUR_Selected_Rule.showWrongMessage(); // 提示当前规则的错误信息
+			}
+			
 			System.out.println("当前输入参数可能 不能拼接成一个文件! 请检查输入参数!");
 			return;
 		}
@@ -11696,6 +12010,111 @@ static	void initMoshuTypeItem(String key , String value){
 			}
 		}
 		return true;
+	}
+	
+	
+	static void SortString(ArrayList<String> strList) {
+	    Comparator<Object> CHINA_COMPARE = Collator.getInstance(java.util.Locale.CHINA);
+	    strList.sort((o1, o2) -> {
+	        //比较的基本原则，拿最小长度的字符串进行比较，若全部相等，则长字符串往后排
+
+	        int len1 = o1.length();
+	        int len2 = o2.length();
+	        int len = (len1 - len2) <= 0 ? len1 : len2;
+	        StringBuilder sb1 = new StringBuilder();
+	        StringBuilder sb2 = new StringBuilder();
+	        for (int i = 0; i < len; i++) {
+	            String s1 = o1.substring(i, i + 1);
+	            String s2 = o2.substring(i, i + 1);
+	            if (isNumericFirstChar(s1) && isNumericFirstChar(s2)){
+	                //取出所有的数字
+	                sb1.append(s1);
+	                sb2.append(s2);
+	                //取数字时，不比较
+	                continue;
+	            }
+	            if (sb1.length() != 0 && sb2.length() != 0){
+	                if (!isNumericFirstChar(s1) && !isNumericFirstChar(s2)){
+	                    int value1 = Integer.valueOf(sb1.toString());
+	                    int value2 = Integer.valueOf(sb2.toString());
+	                    return value1 - value2;
+	                } else if (isNumericFirstChar(s1)) {
+	                    return 1;
+	                } else if (isNumericFirstChar(s2)) {
+	                    return -1;
+	                }
+	            }
+	            int result = CHINA_COMPARE.compare(s1, s2);
+	            if (result != 0) {
+	                return result;
+	            }
+	        }
+	        //这一步：是为了防止以下情况：第10  第20，正好以数字结尾，且字符串长度相等
+	        if (len1 == len2 && sb1.length() != 0 && sb2.length() != 0) {
+	            int value1 = Integer.valueOf(sb1.toString());
+	            int value2 = Integer.valueOf(sb2.toString());
+	            return value1 - value2;
+	        }
+	        //若前面都相等，则直接比较字符串的长度，长的排后面，短的排前面
+	        return Integer.compare(len1, len2);
+	    });
+		
+		
+	}
+	
+    //判断是否是数字
+ static boolean isNumericFirstChar(String s){
+        return Character.isDigit(s.charAt(0));
+    }
+    
+	static void SortFileWithName(ArrayList<File> fileList) {
+	    Comparator<Object> CHINA_COMPARE = Collator.getInstance(java.util.Locale.CHINA);
+	    fileList.sort((o1_file, o2_file) -> {
+	        //比较的基本原则，拿最小长度的字符串进行比较，若全部相等，则长字符串往后排
+	    	String o1 = o1_file.getName();
+	    	String o2 = o2_file.getName();
+	        int len1 = o1.length();
+	        int len2 = o2.length();
+	        int len = (len1 - len2) <= 0 ? len1 : len2;
+	        StringBuilder sb1 = new StringBuilder();
+	        StringBuilder sb2 = new StringBuilder();
+	        for (int i = 0; i < len; i++) {
+	            String s1 = o1.substring(i, i + 1);
+	            String s2 = o2.substring(i, i + 1);
+	            if (isNumericFirstChar(s1) && isNumericFirstChar(s2)){
+	                //取出所有的数字
+	                sb1.append(s1);
+	                sb2.append(s2);
+	                //取数字时，不比较
+	                continue;
+	            }
+	            if (sb1.length() != 0 && sb2.length() != 0){
+	                if (!isNumericFirstChar(s1) && !isNumericFirstChar(s2)){
+	                    int value1 = Integer.valueOf(sb1.toString());
+	                    int value2 = Integer.valueOf(sb2.toString());
+	                    return value1 - value2;
+	                } else if (isNumericFirstChar(s1)) {
+	                    return 1;
+	                } else if (isNumericFirstChar(s2)) {
+	                    return -1;
+	                }
+	            }
+	            int result = CHINA_COMPARE.compare(s1, s2);
+	            if (result != 0) {
+	                return result;
+	            }
+	        }
+	        //这一步：是为了防止以下情况：第10  第20，正好以数字结尾，且字符串长度相等
+	        if (len1 == len2 && sb1.length() != 0 && sb2.length() != 0) {
+	            int value1 = Integer.valueOf(sb1.toString());
+	            int value2 = Integer.valueOf(sb2.toString());
+	            return value1 - value2;
+	        }
+	        //若前面都相等，则直接比较字符串的长度，长的排后面，短的排前面
+	        return Integer.compare(len1, len2);
+	    });
+		
+		
 	}
 	// List<A_B_C> 需要把这个 创建了三个 JavaBean
 // A , B  ,C  这三个 对象的 execute()方法 会执行  parseMap();  zzj

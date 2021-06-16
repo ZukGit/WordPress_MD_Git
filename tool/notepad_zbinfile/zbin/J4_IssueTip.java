@@ -733,6 +733,63 @@ public class J4_IssueTip {
         System.out.println();
         System.out.println("【打印搜星Log】");
         System.out.println("adb logcat | grep \"Used In Fix:\"");
+        System.out.println();
+        System.out.println();
+        
+        System.out.println("═══════════════════════ MTK GNSS Measurement $PMTK485 $PMTK761 位置估测  ═══════════════════════");
+        System.out.println("(  there was NO GNSS measurement report as MTK commented in ALPS05083378, PMTK485 command was used to query the location and");
+        System.out.println("PMTK761 command was used to return estimated location while PMTK733 command indicated no GNSS measurement report )");
+        System.out.println();
+        System.out.println("$PMTK29   网络给的响应时间");
+        System.out.println("$PMTK293,【7.415000_响应时间s】,45,990,0,0,0,0,0,0*3E");
+        System.out.println("$PMTK293,【12.000000_响应时间s】,45,990,0,0,0,0,0,0*0A");
+        System.out.println();
+        System.out.println("$PMTK010  GPS系统启动消息 001--启动startup  000--unknow启动失败    与GPS_STATUS_SESSION_BEGIN出现的次数一致");
+        System.out.println("$PMTK010,001*2E");
+        System.out.println();
+        System.out.println("$PMTK485 为位置查询命令  ($PMTK733 GNSS Measurement 报告 一般出现在 该 $PMTK485 命令之后)");
+        System.out.println("$PMTK485,1,0,0,0*3A");
+        System.out.println();
+        System.out.println("$PMTK733 标识当前没有 GNSS Measurement 报告( 一般出现在 $PMTK485 为位置查询命令 后面  )");
+        System.out.println();
+        System.out.println("$PMTK761 返回估算的位置 为返回位置估测值 ( MSB 平台提供辅助数据 手机自身计算得到定位数据 )");
+        System.out.println("$PMTK761,0,14715,62043001,32768,1,19.377656,-99.149551,2197,32,16,85,62,90,0,0,215,90,90,83,0,99,182,182,154,85,68,154,68,2102,148443001,18.00*2F");
+        System.out.println();
+        System.out.println("$PMTK764");
+        System.out.println("$PMTK764,0,0,0,1,0,128,0*21");
+        System.out.println();
+        System.out.println("$PMTKAGC");
+        System.out.println("$PMTKAGC,235942.014,0,0,0,0,0,0,0,6,0,0*7D");
+        System.out.println();
+        System.out.println("$PMTKXML");
+        System.out.println("$PMTKXML,1,36,1,0,0,0,0,0,0,0,0.000,0.000,0.000,0.000,0,1826,2849,0.000,0.00000000,0.00000000,0.00000000,0.00000000,0,0.00000000,0.00000000,0.00000000,0,0,0,0,0,1,1,1,0.00000020,0.00000020,0.00000005,0.00000050*55");
+        System.out.println();
+        System.out.println("$PMTKTSX1");
+        System.out.println("$PMTKTSX1,14,-12033.637,0.345,39.091,58600000,-1.203285,-1.203364,7.744925,-0.223992,1.677364,-1.203,1.0*48");
+        System.out.println();
+        System.out.println("$PMTKMPE1");
+        System.out.println("$PMTKMPE1,0.0,0.000,0.0000000,0.0000000,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0,0,0,0*6B");
+        System.out.println();
+        System.out.println("$PMTKMPE2");
+        System.out.println("$PMTKMPE2,,*68");
+        System.out.println();
+        System.out.println("$PMTKLCPOS1");
+        System.out.println("$PMTKLCPOS1,19800105235942.014,24.519164,118.119804,150.0,1,0.000000,0.000000,0.0,0*78");
+        System.out.println();
+        System.out.println("$PMTKLCPOS2");
+        System.out.println("$PMTKLCPOS2,19800105235942.014,24.519164,118.119804,150.0,0,2161,550611.014,18*58");
+        System.out.println();
+        System.out.println();
+        System.out.println("04-20 12:13:38.882716   774   810 D agps    : [agps][n][CP] [MD_1] read  md_pmtk  pmtk=[$PMTK485,1,0,0,0*3A");
+        System.out.println("04-20 12:13:38.882841   774   810 D agps    : [agps][n][AGPS] [MNL] write  pmtk  [$PMTK485,1,0,0,0*3A");
+        System.out.println("04-20 12:13:38.884044   774   810 D agps    : XXLOGX [agps][n][AGPS] [MNL] read  pmtk=[$PMTK761,0,14715,62043001,32768,1,19.377656,-99.149551,2197,32,16,85,62,90,0,0,215,90,90,83,0,99,182,182,154,85,68,154,68,2102,148443001,18.00*2F");
+        System.out.println("04-20 12:13:38.884113   774   810 D agps    : XXLOGX [agps][n][CP] [MD_1] write  pmtk [$PMTK761,0,14715,62043001,32768,1,19.377656,-99.149551,2197,32,16,85,62,90,0,0,215,90,90,83,0,99,182,182,154,85,68,154,68,2102,148443001,18.00*2F");
+        System.out.println("04-20 12:13:38.887000   774   810 D agps    : [agps][n][CP] [MD_1] read  md_pmtk  pmtk=[$PMTK293,0.000000,0,0,0,0,0,0,0,0*08");
+        System.out.println("04-20 12:13:38.887061   774   810 D agps    : [agps][n][AGPS] [MNL] write  pmtk  [$PMTK293,0.000000,0,0,0,0,0,0,0,0*08");
+        System.out.println();
+        System.out.println();
+
+        
 
     }
 
