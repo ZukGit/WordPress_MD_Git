@@ -2,6 +2,8 @@
 import cn.hutool.core.util.ImageUtil;
 import cn.hutool.json.JSONUtil;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.pdf.PdfCopy;
@@ -65,8 +67,18 @@ import javax.swing.*;
 
 import org.apache.pdfbox.io.MemoryUsageSetting;
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.DateUtil;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.poi.xslf.usermodel.XMLSlideShow;
 import org.apache.poi.xslf.usermodel.XSLFSlide;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.ss.usermodel.CellType;
+
 import java.security.Key;
 import java.security.Security;
 
@@ -283,6 +295,9 @@ public class G2_ApplyRuleFor_TypeFile {
 		
 		realTypeRuleList.add(new Zapp_Zmain_dir_Create_Rule_37()); // 在本地目录创建 /sdcard/zapp  和 /sdcard/zmain 相关的 dir目录
 		
+		//  把 当前的 xlsx  xls 文件 转为 对应的 json 文件 
+		realTypeRuleList.add(new Revert_xlsx2json_Rule_38()); 
+		
 		
 	}
 
@@ -293,6 +308,205 @@ public class G2_ApplyRuleFor_TypeFile {
 	// 属性进行修改(文件名称)
 //     // 4.对当前子文件(包括子目录 子文件 --不包含孙目录 孙文件) 5. 从shell 中获取到的路径 去对某一个文件进行操作
 	
+	
+	class Revert_xlsx2json_Rule_38 extends Basic_Rule {
+		
+		ArrayList<File> xlsxFileList ;
+		Revert_xlsx2json_Rule_38() {
+			super("#", 38, 3); //
+			 xlsxFileList = new ArrayList<File>();
+		}
+
+		@Override
+		ArrayList<File> applyFileListRule3(ArrayList<File> subFileList, HashMap<String, ArrayList<File>> fileTypeMap) {
+			// TODO Auto-generated method stub
+
+
+			
+			for (int i = 0; i < xlsxFileList.size(); i++) {
+				File xlsxFile = xlsxFileList.get(i);
+				String xlsxFileName =  xlsxFile.getName();
+			    String resut_json_xlsx_name = xlsxFileName.replace(".", "_")+"_"+getTimeStamp();
+				File xlsxFile_resultDir = new File(xlsxFile.getParentFile().getAbsolutePath()+File.separator+resut_json_xlsx_name);
+				reverXlsxToJson(xlsxFile,xlsxFile_resultDir);
+			}
+
+			return super.applyFileListRule3(subFileList, fileTypeMap);
+		}
+
+		@Override
+		String simpleDesc() {
+
+			return  Cur_Bat_Name + " #_"+rule_index+"  <指定A.xlsx文件> <指定B.xls文件>  ### 按顺序解析当前的xlsx xls 为对应的json文件 生成在相同文件名_时间戳的文件夹中   \n"
+					+ Cur_Bat_Name + " #_"+rule_index+"  A.xlsx B.xls C.xlsx   ### 按顺序解析当前的xlsx xls 为对应的json文件 生成在相同文件名_时间戳的文件夹中    \n"						
+                ;
+		}
+		
+		@Override
+		boolean initParamsWithInputList(ArrayList<String> inputParamList) {
+			
+			for (int i = 0; i < inputParamList.size(); i++) {
+				String strInput = inputParamList.get(i);
+
+				File tempFile = new File(curDirPath + File.separator + strInput);
+				if (tempFile.exists() && !tempFile.isDirectory()) {
+					String inputFileName = tempFile.getName().toLowerCase();
+					if (inputFileName.endsWith(".xlsx") || inputFileName.endsWith(".xls") ) {
+						xlsxFileList.add(tempFile);
+					}
+				}
+			}
+
+			if (xlsxFileList.size() == 0) {
+				System.out.println("当前 输入的 xlsx 文件 为 空 无法获取 输入的 xlsx 请检查 输入!! ");
+				return false;
+			}
+			
+
+		// TODO Auto-generated method stub
+		return super.initParamsWithInputList(inputParamList);
+		}
+		
+		
+		
+		  public  void reverXlsxToJson(File xlsxFile , File jsonResultDirFile) {
+		        try {
+		            FileInputStream inp = new FileInputStream(xlsxFile.getAbsolutePath());
+		        
+		            Workbook workbook = null;
+//		            Workbook workbook = WorkbookFactory.create(inp);
+		            
+		            if (xlsxFile.getName().toLowerCase().trim().endsWith(".xls"))
+		            {
+		                workbook = new HSSFWorkbook(inp);
+		            }
+		            else
+		            {
+//			             workbook = WorkbookFactory.create(inp);
+		                workbook = new XSSFWorkbook(inp);
+		            }
+		            
+		 
+		            //获取sheet数
+		            int sheetNum = workbook.getNumberOfSheets();
+		            System.out.println("Shell_count = "+ sheetNum);
+		            JSONObject jsonObject = new JSONObject();
+		            for (int s = 0; s < sheetNum; s++) {
+		                // Get the Sheet of s.
+		                Sheet sheet = workbook.getSheetAt(s);
+		                //获取最大行数
+		               String shellName =  sheet.getSheetName();
+		     
+		                int rownum = sheet.getPhysicalNumberOfRows();
+		                if (rownum <= 1) {
+		                    continue;
+		                }
+		                
+		                //获取第一行
+		                Row row1 = sheet.getRow(0);
+		                //获取最大列数
+		                int colnum = row1.getPhysicalNumberOfCells();
+		                System.out.println("shellIndex["+s+"]  shellName["+ shellName+"]  rownum["+ rownum+"]   colnum["+colnum+ "]");
+
+		                JSONArray jsonArray = new JSONArray();
+		                for (int i = 1; i < rownum; i++) {
+		                    Row row = sheet.getRow(i);
+		                  	System.out.println("currentRow = "+ i );
+//		                    if(i > 10) {
+//		              
+//		                    	continue;
+//		                    }
+		                    if (row != null) {
+//		                    List<Object> list = new ArrayList<>();
+		                        JSONObject rowObj = new JSONObject();
+		                        //循环列
+		                        for (int j = 0; j < colnum; j++) {
+		                            Cell cellData = row.getCell(j);
+		                            if (cellData != null) {
+		                                //判断cell类型 
+                                    	System.out.println("colum="+j);
+                                    	
+		                                switch (cellData.getCellType()) {
+		                                    case NUMERIC: {
+		                                        rowObj.put(row1.getCell(j).getStringCellValue(), cellData.getNumericCellValue());
+		                                        break;
+		                                    }
+		                                    case FORMULA: {
+		                                        //判断cell是否为日期格式 
+		                                        if (DateUtil.isCellDateFormatted(cellData)) {
+		                                            //转换为日期格式YYYY-mm-dd 
+		                                            rowObj.put(row1.getCell(j).getStringCellValue(), cellData.getDateCellValue());
+		                                        } else {
+		                                            //数字 
+		                                            rowObj.put(row1.getCell(j).getStringCellValue(), cellData.getNumericCellValue());
+		                                        }
+		                                        break;
+		                                    }
+		                   
+		                                    
+		                                    case STRING: {
+		                                    
+
+		                                    	System.out.println("row1.getCell(j).toString() = "+ row1.getCell(j).toString());
+		                                    	System.out.println("row1.getCell(j).getCellStyle() = "+ row1.getCell(j).getCellStyle());
+		                                    	System.out.println("row1.getCell(j).getCellType() = "+ row1.getCell(j).getCellType());
+		                                 
+		                                    	String cellContent = null;
+		                                    	
+		                                    	try {
+			                                      cellContent = cellData.toString();
+
+		                                    	} catch(Error e) {
+		                                    		cellContent ="";
+		                                    		
+		                                    	}
+		                                    	
+		                                    	
+		                                    	rowObj.put(row1.getCell(j).toString(), cellContent);
+
+		                                    // 表头 是 富文本 的 时候 调用 	  getRichStringCellValue()  和 getStringCellValue() 报错!!! 
+		                                    	// Exception in thread "main" java.lang.NoSuchMethodError: org.openxmlformats.schemas.spreadsheetml.x2006.main.CTRst.xgetT()
+		                                    	 // Lorg/openxmlformats/schemas/officeDocument/x2006/sharedTypes/STXstring;
+		                                    	 
+	                                    	// rowObj.put(row1.getCell(j).getRichStringCellValue().toString(), cellData.getRichStringCellValue());
+			                                 // rowObj.put(row1.getCell(j).getStringCellValue().toString(), cellData.getStringCellValue());
+		      		                             
+		                                        break;
+		                                    }
+		                                    default:
+		                                        rowObj.put(row1.getCell(j).getStringCellValue(), "");
+		                                }
+		                            } else {
+		                                rowObj.put(row1.getCell(j).getStringCellValue(), "");
+
+		                            }
+		                        }
+		                        jsonArray.add(rowObj);
+		                    }
+		                }
+		                String jsonName = sheet.getSheetName()+".json";
+		                File jsonFile = new File(jsonResultDirFile.getAbsolutePath()+File.separator+jsonName);
+		                
+		                System.out.println(jsonArray.toJSONString());
+		                writeContentToFile(jsonFile, jsonArray.toJSONString());
+		                jsonObject.put(sheet.getSheetName(), jsonArray);
+		            }
+//		            System.out.println(jsonObject.toJSONString());
+		            System.out.println("长度"+jsonObject.toJSONString().length());
+		            String allSheetJsonFileName = "AllSheet_4_"+xlsxFile.getName().replace(".", "_")+".json";
+		            File allSheetJsonFile =  new File(jsonResultDirFile.getAbsolutePath()+File.separator+allSheetJsonFileName);
+	                writeContentToFile(allSheetJsonFile, jsonObject.toJSONString());
+
+	                System.out.println(" xlsxFile-->"+xlsxFile.getAbsolutePath()+" 解析成功!");
+		            
+		 
+		        } catch (Exception e) {
+		            e.printStackTrace();
+		        }
+		    }
+		
+		
+	}
 	
 
 	
@@ -741,6 +955,15 @@ public class G2_ApplyRuleFor_TypeFile {
 			return super.applyFileListRule3(subFileList, fileTypeMap);
 		}
 
+		@Override
+		String simpleDesc() {
+
+			return  Cur_Bat_Name + " #_"+rule_index+"  <指定A.Pdf文件> <指定B.Pdf文件>  ### 按顺序合并当前所有pdf到一个pdf文件中 原有pdf删除   \n"
+					+ Cur_Bat_Name + " #_"+rule_index+"  A.pdf B.pdf C.pdf   ### 按顺序合并当前所有pdf到一个pdf文件中 原有pdf删除    \n"						
+                ;
+		}
+		
+		
 		/*
 		 * String ruleTip(String type, int index, String batName, OS_TYPE curType) {
 		 * String itemDesc = ""; String desc_true =
@@ -757,14 +980,7 @@ public class G2_ApplyRuleFor_TypeFile {
 		 * return itemDesc; }
 		 */
 		
-		@Override
-		String simpleDesc() {
 
-			return  Cur_Bat_Name + " #_"+rule_index+"  <指定A.Pdf文件> <指定B.Pdf文件>  ### 按顺序合并当前所有pdf到一个pdf文件中 原有pdf删除   \n"
-					+ Cur_Bat_Name + " #_"+rule_index+"  A.pdf B.pdf C.pdf   ### 按顺序合并当前所有pdf到一个pdf文件中 原有pdf删除    \n"						
-                ;
-		}
-		
 
 	}
 
@@ -8333,7 +8549,13 @@ newRealFile=D:\BaiduNetdiskDownload\公式\bad_batch\good_batch\A.pdf
 
 		try {
 			if (file != null && !file.exists()) {
+				System.out.println("创建文件:  "+file.getAbsolutePath());
+				if(!file.getParentFile().exists()) {
+					file.getParentFile().mkdirs();
+				}
+		
 				file.createNewFile();
+
 			}
 
 			if (file != null && file.exists()) {

@@ -4229,8 +4229,10 @@ public class I9_TextRuleOperation {
 
 	// Rule_17 End 对 Json 格式的文件 或者 以json格式保存的文件 生成bean文件 以及 Graphviz 绘图显示结构
 
+	static ArrayList<File> rule17_resultFile_List = new  ArrayList<File> ();
 	class Make_Json_As_JavaFile_Graphviz2Jpg_Rule_17 extends Basic_Rule {
 
+		File targetFile_ResultDirFile;  // 在 目标 .json 文件中生成的 放置 目标 图片 目标 .java 文件的目录 
 		Make_Json_As_JavaFile_Graphviz2Jpg_Rule_17(boolean mIsInputDirAsSearchPoint) {
 			super(17);
 			isInputDirAsSearchPoint = mIsInputDirAsSearchPoint;
@@ -4245,8 +4247,12 @@ public class I9_TextRuleOperation {
 				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 			for (int i = 0; i < curInputFileList.size(); i++) {
 				File fileItem = curInputFileList.get(i);
+				File parentFile = fileItem.getParentFile();
+				String jsonFileName = fileItem.getName();
+				
+				targetFile_ResultDirFile = new File(parentFile.getAbsolutePath()+File.separator+jsonFileName.replace(".", "_")+"_"+getTimeStamp());
 				if (CUR_OS_TYPE == OS_TYPE.Windows) {
-					Make_Json_As_JavaFile_Rule_17(fileItem);
+					Make_Json_As_JavaFile_Rule_17(fileItem,targetFile_ResultDirFile);
 				} else if (CUR_OS_TYPE == OS_TYPE.MacOS) {
 					System.out.println("无法在 Linux下实现  没有notepad++ 啊! ");
 					System.out.println("无法实现对 Windows下 对 Json 格式的文件 或者 以json格式保存的文件 生成bean文件 以及 Graphviz 绘图显示结构 (B6)");
@@ -8683,8 +8689,10 @@ public class I9_TextRuleOperation {
 		}
 	}
 
-	public static void Make_Json_As_JavaFile_Rule_17(File srcFile) {
+	public static void Make_Json_As_JavaFile_Rule_17(File srcFile,File resultDirFile) {
 
+
+		
 		try {
 			Rule17_dirPath = I9_OUT_DIR_PATH;
 
@@ -8692,6 +8700,9 @@ public class I9_TextRuleOperation {
 
 			StringBuilder sb = new StringBuilder();
 			System.out.println("curFile = " + srcFile.getAbsolutePath());
+
+			
+			
 			tryReadJsonFromFile(sb, srcFile);
 
 			String firstArrChar = sb.toString().substring(0, 1);
@@ -8873,6 +8884,7 @@ public class I9_TextRuleOperation {
 
 			String netAddr = "https://dreampuf.github.io/GraphvizOnline/#" + encodeStr;
 			Rule17_tryWriteJsonToFile(Rule17_dotStringArr, Rule17_outFile, netAddr);
+			rule17_resultFile_List.add(Rule17_outFile);
 //  浏览器地址最多接受 4096个字符  所以 无法通过编译 .gv 文件来跳转到 对应的 graviz页面
 
 			JavaRuntimeInfo javaRuntimeInfo = new JavaRuntimeInfo();
@@ -8931,6 +8943,7 @@ public class I9_TextRuleOperation {
 				Thread.sleep(2000);
 				String procResult2 = Rule17_execCMD(command2); // 打开 acrord32 Adobe 阅读 PDF 文件
 				System.out.println("command2 = " + command2 + " procResult=" + procResult2);
+				rule17_resultFile_List.add(outputPdfFile);
 
 			}
 			String command3 = "cmd.exe /C start notepad++  " + Rule17_outFile.getAbsolutePath();
@@ -8978,13 +8991,31 @@ public class I9_TextRuleOperation {
 				// pngFile.getAbsolutePath());
 				String procResult7 = Rule17_execCMD(command7);
 				System.out.println("command7 = " + command7 + " procResult7=" + procResult7);
+				
+				rule17_resultFile_List.add(pngFile);
+				
 			}
+			
+			
+
 		} catch (Exception e) {
 
 		}
 
 		// System.out.println("Zukgit-----------End");
 
+		for (int i = 0; i < rule17_resultFile_List.size(); i++) {
+			File resultFile = rule17_resultFile_List.get(i);
+			if(!resultDirFile.exists()) {
+				resultDirFile.mkdirs();
+			}
+			String resultFileName = resultFile.getName();
+			File copyResultFile = new File(resultDirFile.getAbsolutePath()+File.separator+resultFileName);
+			fileCopy(resultFile, copyResultFile);
+			System.out.println("生成文件["+i+"] AllFile["+rule17_resultFile_List.size()+"] = "+ copyResultFile.getAbsolutePath());
+		}
+		System.out.println("在 目录 "+resultDirFile.getAbsolutePath()+" 生成了解析的文件!");
+		
 	}
 
 	public static String Rule17_execCMD(String command) {
@@ -9751,8 +9782,13 @@ public class I9_TextRuleOperation {
 			if (!file.exists() || file.exists() && file.isFile()) {
 				file.mkdirs();
 			}
-			System.out.println(" className2  = " + className);
-			BufferedWriter bw = new BufferedWriter(new FileWriter(new File(file, className + ".java")));
+	
+			System.out.println(" className2  =  rule17_resultFile_List.add(javaFile) " + className);
+			File javaFile = new File(file, className + ".java");
+			
+			rule17_resultFile_List.add(javaFile);
+			
+			BufferedWriter bw = new BufferedWriter(new FileWriter(javaFile));
 			bw.write("package ");
 			bw.write(packName);
 			bw.write(";\n");
@@ -9818,6 +9854,7 @@ public class I9_TextRuleOperation {
 			bw.write("}");
 
 			bw.close();
+		
 		}
 
 		public Map<String, Object> sortMapByKey(Map<String, Object> oriMap) {
@@ -11163,6 +11200,8 @@ public class I9_TextRuleOperation {
 
 			bw.close();
 			System.out.println("javaFIle Path = " + javaFile.getAbsolutePath());
+			
+			rule17_resultFile_List.add(javaFile);
 		}
 
 		private String capitalUpperCase(String s) {
