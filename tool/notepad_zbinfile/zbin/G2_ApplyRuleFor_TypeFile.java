@@ -4,6 +4,13 @@ import cn.hutool.json.JSONUtil;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.drew.imaging.jpeg.JpegMetadataReader;
+import com.drew.imaging.jpeg.JpegProcessingException;
+import com.drew.metadata.Directory;
+import com.drew.metadata.Metadata;
+import com.drew.metadata.MetadataException;
+import com.drew.metadata.Tag;
+import com.drew.metadata.exif.ExifIFD0Directory;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.pdf.PdfCopy;
@@ -4926,10 +4933,30 @@ public class G2_ApplyRuleFor_TypeFile {
 
 			for (int i = 0; i < mSrcFileImage.size(); i++) {
 				File imageFile = mSrcFileImage.get(i);
-				ImageIcon imageIcon = new ImageIcon(imageFile.getAbsolutePath());
-				int high = imageIcon.getIconHeight();
-				int width = imageIcon.getIconWidth();
 
+				int high = 0;
+				int width = 0;
+				ImageIcon imageIcon = new ImageIcon(imageFile.getAbsolutePath());
+				 high = imageIcon.getIconHeight();
+				 width = imageIcon.getIconWidth();
+				boolean isPort = getRotateAngleForPhoto(imageFile.getAbsolutePath());
+
+				if(!isPort){
+					int temp = high;
+					high = width ;
+					width = temp;
+				}
+/*				try {
+					BufferedImage sourceImg = ImageIO.read(new FileInputStream(imageFile.getAbsolutePath()));
+						 high = sourceImg.getHeight();
+                   		 width = sourceImg.getWidth();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}*/
+
+
+
+				System.out.println("1_Rule20_Land_Port Index["+i+"]  width["+width+"]" + " high["+high+"]   high >= width["+(high >= width)+"]  Path["+imageFile.getAbsolutePath()+"]");
 				if (high >= width) {
 					mPortImageFileList.add(imageFile);
 				} else {
@@ -4975,6 +5002,84 @@ public class G2_ApplyRuleFor_TypeFile {
 			}
 
 		}
+
+	/**
+		 * 图片翻转时，计算图片翻转到正常显示需旋转角度
+		 */
+		public boolean getRotateAngleForPhoto(String fileName){
+
+boolean isPort  = true;
+			File file = new File(fileName);
+
+			int angel = 0;
+			Metadata metadata;
+
+			try{
+				metadata = JpegMetadataReader.readMetadata(file);
+				metadata.getDirectories();
+
+				// zukgit_directory  [Exif IFD0] - Orientation = Right side, top (Rotate 90 CW)
+				for (Directory directory : metadata.getDirectories()) {
+					for (Tag tag : directory.getTags()) {
+						//格式化输出[directory.getName()] - tag.getTagName() = tag.getDescription()
+						System.out.format("zukgit_directory  [%s] - %s = %s\n", directory.getName(), tag.getTagName(), tag.getDescription());
+
+if("Exif IFD0".equals(directory.getName())){
+	String orientation = directory.getString(ExifIFD0Directory.TAG_ORIENTATION);
+	System.out.println("ZZOrientation = "+ orientation);
+
+	if("1".equals(orientation) ){   //  90度 和 270度  宽高对调了
+		angel = 0;
+
+	} else	if("6".equals(orientation) ){
+		//6旋转90
+		angel = 90;
+		isPort = false;
+	} else	if("3".equals(orientation) ){
+		//3旋转180
+		angel = 180;
+	} else	if("8".equals(orientation) ){
+		//8旋转90
+		angel = 270;
+		isPort = false;
+	}
+return isPort;
+}
+					}
+//					if (directory.hasErrors()) {
+//						for (String error : directory.getErrors()) {
+//							System.err.format("ERROR: %s", error);
+//						}
+//					}
+				}
+
+
+/*				if(directory.containsTag(ExifDirectory.TAG_ORIENTATION)){
+					// Exif信息中方向　　
+					int orientation = directory.getInt(ExifDirectory.TAG_ORIENTATION);
+					// 原图片的方向信息
+					if(6 == orientation ){
+						//6旋转90
+						angel = 90;
+					}else if( 3 == orientation){
+						//3旋转180
+						angel = 180;
+					}else if( 8 == orientation){
+						//8旋转90
+						angel = 270;
+					}
+				}*/
+
+			} catch(JpegProcessingException e){
+				e.printStackTrace();
+			} catch(IOException e){
+				e.printStackTrace();
+			}
+//			System.out.println("图片旋转角度：" + angel);
+			return isPort;
+		}
+
+
 
 		String ruleTip(String type, int index, String batName, OS_TYPE curType) {
 			String itemDesc = "";
