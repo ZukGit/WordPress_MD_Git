@@ -333,8 +333,8 @@ public class F3_BT {
         int allCount = 0 ;
         for (int i = 0; i < needDownList.size() ; i++) {
             BTFile btItem =  needDownList.get(i);
-            if(allSize < 20000000000L && allCount <= 15){
-                //  if(allSize < 10000000000L && allCount <= 10){ // 下一步的条件  大小大于20GB  并且最小数量大于15个   ，
+            if(allSize < 200000000000L && allCount <= 200){
+                //  if(allSize < 10000000000L && allCount <= 10){ // 下一步的条件  大小大于200GB  并且最小数量大于200个   ，
                 nextStepFile.add(btItem);
                 allSize += btItem.getBtSize();
                 allCount++;
