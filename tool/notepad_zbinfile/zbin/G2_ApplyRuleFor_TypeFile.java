@@ -7226,10 +7226,12 @@ return isPort;
 
 		boolean isBatchOperation = false; // 是否你是批量处理 会生成固定的 bad_batch good_batch 文件夹 而不是时间戳文件夹
 
+		boolean isZVIOperation = false;  // 是否是 1970ZVI 文件夹 操作
 		Encropty_Rule_7() {
 			super("#", 7, 4);
 			isAllFileOperation = false;
 			isBatchOperation = false;
+			isZVIOperation = false;
 		}
 
 		@Override
@@ -7251,6 +7253,13 @@ return isPort;
 			} else {
 				isAllFileOperation = false;
 			}
+			
+			if (inputParam.toLowerCase().contains("zvi") &&  inputParam.toLowerCase().contains("good") ) {
+				mEncroptyDirect = false;
+				isZVIOperation = true;
+				isBatchOperation = false;
+			} 
+			
 
 			return super.initParams4InputParam(inputParam);
 		}
@@ -7265,7 +7274,9 @@ return isPort;
 					+ " #_7_bad  [索引7]   // 把当前目录所有文件进行加密  加密文件在新的 时间戳文件夹中 \n" + Cur_Bat_Name
 					+ " #_7_good  [索引7]   // 把当前目录所有文件进行解密  解密文件在新的 时间戳文件夹中 \n" + Cur_Bat_Name
 					+ " #_7_bad_batch   [索引7]   // 把当前目录所有文件进行加密  加密文件在新的【 固定文件夹 bad_batch 】中 适合批量处理 \n" + Cur_Bat_Name
-					+ " #_7_good_batch   [索引7]   // 把当前目录所有文件进行解密 解密文件在新的【 固定文件夹 good_batch 】中 适合批量处理 " + "\n";
+					+ " #_7_good_batch   [索引7]   // 把当前目录所有文件进行解密 解密文件在新的【 固定文件夹 good_batch 】中 适合批量处理 "+ "\n" + Cur_Bat_Name
+					+ " #_7_good_zvi   [索引7]   // 把当前目录中的 1970ZVI  解密到新的文件夹在新的【 固定文件夹 1970ZVI_Good 】中 适合批量处理 \n" 
+					;
 
 		}
 
@@ -7290,11 +7301,11 @@ return isPort;
 				}
 			}
 
+
 			File curBadDirFile = new File(curDirFile.getAbsolutePath() + File.separator + CurBadDirName);
 			curBadDirFile.mkdirs();
 			String oldBasePath = curDirFile.getAbsolutePath();
 			String newBasePath = curBadDirFile.getAbsolutePath();
-			System.out.println("执行当前所有文件 加密操作  ");
 
 			if (!curDirList.contains(curDirFile)) {
 				curDirList.add(curDirFile);
@@ -7330,12 +7341,169 @@ return isPort;
 			 */
 
 		}
+		
+		File getContainDirName(File curShellDir , String name , boolean isDir) {
+			File targetFile = null;
+			String absShellPath = curShellDir.getAbsolutePath();
+			System.out.println(" 当前Shell的路径为: curDirFile =  "+ absShellPath);
+			File[] fileArr = curShellDir.listFiles();
+			if(fileArr != null) {
+				
+				for (int i = 0; i < fileArr.length; i++) {
+					File fileItem = fileArr[i];
+					String fileName = fileItem.getName();
+					if(isDir) {
+						if(fileItem.isDirectory() && fileItem.exists() ) {
+			                  if(fileName.equals(name)) {
+			                	  return fileItem;
+			                  }
+						}
+					}else {
+						if(fileItem.isFile() && fileItem.exists()) {
+			                  if(fileName.equals(name)) {
+			                	  return fileItem;
+			                  }
+						}
+						
+					}
+					
+				}
+			}
+			
+			
+			return targetFile;
+			
+		}
 
+		void jiemi1970ZVIDir(File m1970ZVI_DirFile , ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
+				 ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+			
+			SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd_HHmmss");// 设置日期格式
+			String date = df.format(new Date());
+			String CurBadDirName = "1970ZVI_Good" ;
+			
+			
+			// 1970ZVI_Good
+			File curBadDirFile = new File(curDirFile.getAbsolutePath() + File.separator + CurBadDirName);
+			
+			curBadDirFile.mkdirs();
+			                                                   // 1970ZVI路径  /C/1970ZVI
+			String oldBasePath = curDirFile.getAbsolutePath(); // 原有的路径 /C
+			String newBasePath = curBadDirFile.getAbsolutePath(); // 生成的 新路径 /C/1970ZVI_Good
+			
+			
+			for (int i = 0; i < curDirList.size(); i++) {
+				File oldDirFile = curDirList.get(i); // 原有的要解密文件
+				String oldDirPath = oldDirFile.getAbsolutePath();
+				if(!oldDirPath.contains("1970ZVI")) {   // 如果当前目录 不包含 1970ZVI   那么 不创建这个目录
+					continue;
+				}
+				
+				
+				// 把 原有的   1970ZVI 路径 变化为 1970ZVI_Good 路径
+				String newDirFilePath = oldDirFile.getAbsolutePath().replace(oldBasePath+File.separator+"1970ZVI", newBasePath);
+				System.out.println("AAAAAAAA  newBasePath="+newBasePath +"  newDirFilePath="+ newDirFilePath);
+
+
+				System.out.println("oldBasePath/1970ZVI --->  "+oldBasePath+File.separator+"1970ZVI   " + "oldDirFile["+i+"]  = " +oldDirFile.getAbsolutePath()+"  newDirFilePath["+i+"] = "+ newDirFilePath);
+				File newDirFile = new File(newDirFilePath);
+				newDirFile.mkdirs();
+
+
+				for (int j = 0; j < oldDirFile.listFiles().length; j++) {
+
+					File oldRealFile = oldDirFile.listFiles()[j];
+					String oldRealFile_Path = oldRealFile.getAbsolutePath();
+					if (oldRealFile.isDirectory()) {
+						continue;
+					}
+
+					if (isExpressType(oldRealFile)) {
+						continue;
+					}
+
+					// 如果原文件全路径 没有 1970ZVI     那么 不操作 这个文件 
+					if (!oldRealFile_Path.contains("1970ZVI")) {  
+						continue;
+					}
+					
+        	String newRealFilePath = oldRealFile.getAbsolutePath().replace("1970ZVI", "1970ZVI_Good");
+
+
+						String batch_fileName = oldRealFile.getName();
+//						File newRealFile = new File(newBasePath + File.separator + batch_fileName);   //  子文件夹取消 消失
+
+							File newRealFile = new File(newRealFilePath);  //  子文件夹存在
+							// 解密操作
+							System.out.println("执行当前 ZVI解密操作  batch_fileName = "+ batch_fileName +"     newBasePath="+newBasePath+"    newRealFile="+newRealFile.getAbsolutePath());
+		
+							createDecryFile(oldRealFile, newRealFile);
+			
+				}
+				
+				
+			}
+			
+			
+
+			
+			
+			/*
+			 * if(isZVIOperation) { // 如果是 zvi 操作 新的 地址要去掉 1970ZVI_Good/1970ZVI/xxx ->
+			 * 1970ZVI_Good/xxx if(newBasePath.contains(File.separator+"1970ZVI") &&
+			 * !newBasePath.endsWith(File.separator+"1970ZVI")) { newDirFilePath =
+			 * newDirFilePath.replace("1970ZVI", "").replace("_Good",
+			 * "1970ZVI_Good").replace(File.separator+File.separator, File.separator);
+			 * System.out.println("BBBBBBBB  newBasePath = "+ newBasePath
+			 * +"  newDirFilePath="+newDirFilePath); }else
+			 * if(newBasePath.endsWith(File.separator+"1970ZVI")) { newDirFilePath =
+			 * curBadDirFile.getAbsolutePath(); System.out.println("CCCCCC  newBasePath = "+
+			 * newBasePath);
+			 * 
+			 * }
+			 * 
+			 * }
+			 */
+			
+			
+			/*
+			 * if(isZVIOperation) { // 解密操作 System.out.println("ZVI newRealFilePath = "+
+			 * newRealFilePath); newRealFilePath =
+			 * oldRealFile.getAbsolutePath().replace(oldBasePath,
+			 * newBasePath).replace("1970ZVI", "").replace("_Good",
+			 * "1970ZVI_Good").replace(File.separator+File.separator, File.separator); File
+			 * newRealFile = new File(newRealFilePath); createDecryFile(oldRealFile,
+			 * newRealFile); System.out.println("执行当前 ZVI 解密操作  batch_fileName = "+
+			 * batch_fileName
+			 * +"     newBasePath="+newBasePath+"    newRealFile="+newRealFile.
+			 * getAbsolutePath());
+			 * 
+			 * }
+			 */
+
+			
+			
+			
+		}
 		void jiemiAllDir(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
 						 ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 
 			// 1.创建一个时间戳文件夹
 			// 2.在当前文件夹的基础上
+			System.out.println(" curDirFile ="+ curDirFile.getAbsolutePath());
+			
+			if(isZVIOperation) {
+			File zviFileDir	= getContainDirName(curDirFile,"1970ZVI" , true);
+				if( zviFileDir != null) {
+					
+					jiemi1970ZVIDir(zviFileDir ,curFileList , subFileTypeMap ,curDirList ,curRealFileList   );
+					
+				}else {
+					System.out.println(" 当前目录没有 1970ZVI 文件夹 无法执行   "+Cur_Bat_Name+" #_7_good_zvi   ## 批量解密操作！！！");
+				}
+				
+				return ;
+			}
 
 			SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd_HHmmss");// 设置日期格式
 			String date = df.format(new Date());
@@ -7349,6 +7517,7 @@ return isPort;
 				}
 			}
 
+
 			File curBadDirFile = new File(curDirFile.getAbsolutePath() + File.separator + CurBadDirName);
 			curBadDirFile.mkdirs();
 			String oldBasePath = curDirFile.getAbsolutePath(); // 原有的路径 /C
@@ -7356,6 +7525,13 @@ return isPort;
 			if (!curDirList.contains(curDirFile)) {
 				curDirList.add(curDirFile);
 			}
+			
+			System.out.println("执行当前所有文件 解密操作 newBasePath_Src =  " + newBasePath);
+
+	
+			System.out.println("执行当前所有文件  解密操作 newBasePath_Fixed =  " + newBasePath);
+
+			
 			System.out.println("执行当前所有文件 解密操作  curDirList.size() = "+ curDirList.size());
 
 			for (int i = 0; i < curDirList.size(); i++) {
@@ -7366,6 +7542,10 @@ return isPort;
 				if (!isBatchOperation) { // 如果 不是 batch 那么会创建文件夹
 					// 如果是当前目录下多 子文件夹 那么就把在* 的 情况下会 创建这个文件夹 事实上在 batch的情况下不需要这个文件夹
 					String newDirFilePath = oldDirFile.getAbsolutePath().replace(oldBasePath, newBasePath);
+					System.out.println("AAAAAAAA  newBasePath="+newBasePath +"  newDirFilePath="+ newDirFilePath);
+
+
+					System.out.println("oldDirFile["+i+"]  = " +oldDirFile.getAbsolutePath()+"  newDirFilePath["+i+"] = "+ newDirFilePath);
 					File newDirFile = new File(newDirFilePath);
 					newDirFile.mkdirs();
 				}
@@ -7387,6 +7567,8 @@ return isPort;
 						// 解密操作
 						createDecryFile(oldRealFile, newRealFile);
 					} else {
+						
+						
 						String newRealFilePath = oldRealFile.getAbsolutePath().replace(oldBasePath, newBasePath);
 
 /*
@@ -7402,11 +7584,14 @@ newRealFile=D:\BaiduNetdiskDownload\公式\bad_batch\good_batch\A.pdf
 
 						String batch_fileName = oldRealFile.getName();
 //						File newRealFile = new File(newBasePath + File.separator + batch_fileName);   //  子文件夹取消 消失
-						File newRealFile = new File(newRealFilePath);  //  子文件夹存在
-						// 解密操作
-						System.out.println("执行当前 解密操作  batch_fileName = "+ batch_fileName +"     newBasePath="+newBasePath+"    newRealFile="+newRealFile.getAbsolutePath());
-						System.out.println(" newRealFilePath = "+ newRealFilePath);
-						createDecryFile(oldRealFile, newRealFile);
+
+							File newRealFile = new File(newRealFilePath);  //  子文件夹存在
+							// 解密操作
+							System.out.println("执行当前 解密操作  batch_fileName = "+ batch_fileName +"     newBasePath="+newBasePath+"    newRealFile="+newRealFile.getAbsolutePath());
+							System.out.println(" newRealFilePath = "+ newRealFilePath);
+							createDecryFile(oldRealFile, newRealFile);
+			
+
 					}
 
 				}
@@ -7450,6 +7635,7 @@ newRealFile=D:\BaiduNetdiskDownload\公式\bad_batch\good_batch\A.pdf
 				curNewDirName += "_good";
 			}
 
+			
 			if (!containUserType) {
 				curNewDirName += "_" + curFilterFileTypeList.get(0); // 1.如果所有文件都加密 那么没有后缀 如果某一个文件类型解密 那么添加后缀
 			}

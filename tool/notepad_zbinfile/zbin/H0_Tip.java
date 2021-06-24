@@ -538,33 +538,6 @@ public class H0_Tip {
         System.out.println("cmd /K cd /d %userprofile%\\Desktop\\zbin & %userprofile%\\Desktop\\zbin\\A8.bat %userprofile%\\Desktop\\zbin  $(FULL_CURRENT_PATH)  ");
         System.out.println("可修改A8.bat 逻辑为: A8_WIFI_Log_Search.java  A8_GPS_Log_Search.java  F8_Dump_Analysis.java 先后运行 并输出到当前打开文件");
 
-        System.out.println();
-        System.out.println(" 用户设置 notepad运行【索引3】  运行当前bat文件 【 Run_Bat : alt+B 】");
-        System.out.println("Name: Run_Bat   Key:  alt+B");
-        System.out.println("cmd /K cd /d $(CURRENT_DIRECTORY) & cmd /K $(FULL_CURRENT_PATH)");
-        System.out.println("打开CMD窗口切换到当前目录 运行当前bat文件 ");
-        
-        System.out.println();
-        System.out.println(" 用户设置 notepad运行【索引4】  运行当前java文件 【 Run_Java : alt+J 】");
-        System.out.println("Name: Run_Java   Key:  alt+J");
-        System.out.println("cmd /K cd /d $(CURRENT_DIRECTORY) && javac  -encoding UTF-8 $(FULL_CURRENT_PATH) && java -cp .;$(CURRENT_DIRECTORY) $(NAME_PART)");
-        System.out.println("打开CMD窗口切换到当前目录 运行当前java文件 ");
-        
-        System.out.println();
-        System.out.println("notepad++本地环境变量情况");
-        System.out.println("当前txt文件全路径: D:\\Test\\123.txt");
-        System.out.println("$(FULL_CURRENT_PATH) === D:\\Test\\123.txt");
-        System.out.println("$(NAME_PART)         === 123");
-        System.out.println("$(CURRENT_DIRECTORY) === D:\\Test");
-        System.out.println("$(EXT_PART)          === .txt");
-        System.out.println("$(FILE_NAME)         === 123.txt");
-        System.out.println("$(NPP_DIRECTORY)     === D:\\ZWin_Software\\C1_GreenSoft_Zip_Dir\\npp.7.8.9.bin.x64 安装目录");
-        System.out.println("$(CURRENT_WORD)      === 鼠标选中的内容");
-        System.out.println("$(CURRENT_LINE)      === 当前鼠标所在的行(索引从0开始)");
-        System.out.println("$(CURRENT_COLUMN)    === 当前鼠标所在的列(索引从0开始)");
-        System.out.println();
-
-        
         PrintHead_End("  NotePad++ 设置  End  ");
     }
 
@@ -653,6 +626,13 @@ public class H0_Tip {
     static void Security_File_Tip(){
 
 
+        System.out.println("________________________ 【1970ZVI】【批量解密】【当前有子目录1970ZVI解析为1970ZVI_Good】 ________________________");
+        System.out.println("zrule_apply_G2"+BAT_OR_SH_Point+" " +"#_7_good_zvi  && cd ./1970ZVI_Good && cd ./ZVI_Individual  && zrule_apply_G2"+BAT_OR_SH_Point+" " +"#_9  _mp4 && zrule_apply_G2"+BAT_OR_SH_Point+" " +" #_26 mp4  && zrule_apply_G2"+BAT_OR_SH_Point+" " +" #_13_mp4 && zrule_apply_G2"+BAT_OR_SH_Point+" " +" #_12_mp4  && cd .. && cd ./ZVI_Position  && zrule_apply_G2"+BAT_OR_SH_Point+" " +"#_9  _mp4 && zrule_apply_G2"+BAT_OR_SH_Point+" " +" #_26 mp4   && zrule_apply_G2"+BAT_OR_SH_Point+" " +" #_13_mp4  && zrule_apply_G2"+BAT_OR_SH_Point+" " +" #_12_mp4  && cd .. && cd ./Z_SSS && zrule_apply_G2"+BAT_OR_SH_Point+" " +"#_9  _mp4 && cd .. && cd ./ZVI_mp4 && zrule_apply_G2"+BAT_OR_SH_Point+" " +"#_9  _mp4 && cd ..  &&  zrule_apply_G2"+BAT_OR_SH_Point+" " +" #_12_mp4 ./ZVI_mp4 &&  cd ./zapp    &&  zrule_apply_G2"+BAT_OR_SH_Point+" " +" #_27  _jpg  &&  zrule_apply_G2"+BAT_OR_SH_Point+" " +" #_27 _mp4  && zrule_apply_G2"+BAT_OR_SH_Point+" " +" #_27  _gif &&  zrule_apply_G2"+BAT_OR_SH_Point+" " +" #_12_jpg  &&  zrule_apply_G2"+BAT_OR_SH_Point+" " +" #_12_mp4 &&  zrule_apply_G2"+BAT_OR_SH_Point+" " +" #_12_gif");
+        System.out.println();
+        System.out.println();
+
+
+
         System.out.println();
         System.out.println("________________________ 【zapp】【解密】【Html】 ________________________");
         System.out.println("zrule_apply_G2"+BAT_OR_SH_Point+" " +"#_7_good_batch  ******原封不动解码");
@@ -667,17 +647,15 @@ public class H0_Tip {
         System.out.println();
 
 
-
-        System.out.println("________________________ ZVI_Position 【解压】【生成Html】 ________________________");
+        System.out.println("________________________ ZVI_Position 【解压】【生成Html】【当前有子目录ZVI_Position解析出 good_batch】 ________________________");
         System.out.println("zrule_apply_G2"+BAT_OR_SH_Point+" " +"#_7_good_batch  ******原封不动解码");
         System.out.println("cd ./good_batch                    ******进入解码文件夹");
         System.out.println("zrule_apply_G2"+BAT_OR_SH_Point+" " +"#_9  _mp4       ******把无类型转为mp4类型");
         System.out.println("cd ./ZVI_Position                  ******进入ZVI_Position文件夹");
-        System.out.println("zrule_apply_G2"+BAT_OR_SH_Point+" " +" #_24  mp4      ******在ZVI_Position执行在子目录与孙目录构建中间文件夹 mp4");
         System.out.println("zrule_apply_G2"+BAT_OR_SH_Point+" " +" #_26 mp4       ******依据文件夹把每个文件夹下的mp4 依次从1..n开始重命名");
         System.out.println("zrule_apply_G2"+BAT_OR_SH_Point+" " +" #_13_mp4       ******在当前ZVI_Position生成时间30秒间隔轮换 html文件");
         System.out.println("zrule_apply_G2"+BAT_OR_SH_Point+" " +" #_12_mp4       ******在当前ZVI_Position搜索mp4文件 生成对应html播放文件");
-        System.out.println("zrule_apply_G2"+BAT_OR_SH_Point+" " +"#_7_good_batch  && cd ./good_batch && zrule_apply_G2"+BAT_OR_SH_Point+" " +"#_9  _mp4  && cd ./ZVI_Position  && zrule_apply_G2"+BAT_OR_SH_Point+" " +" #_24  mp4  && zrule_apply_G2"+BAT_OR_SH_Point+" " +"#_26 mp4 && zrule_apply_G2"+BAT_OR_SH_Point+" " +" #_13_mp4 && zrule_apply_G2"+BAT_OR_SH_Point+" " +" #_12_mp4");
+        System.out.println("zrule_apply_G2"+BAT_OR_SH_Point+" " +"#_7_good_batch  && cd ./good_batch && zrule_apply_G2"+BAT_OR_SH_Point+" " +"#_9  _mp4  && cd ./ZVI_Position  && zrule_apply_G2"+BAT_OR_SH_Point+" " +"#_26 mp4 && zrule_apply_G2"+BAT_OR_SH_Point+" " +" #_13_mp4 && zrule_apply_G2"+BAT_OR_SH_Point+" " +" #_12_mp4");
         System.out.println();
         System.out.println();
         System.out.println();
