@@ -733,8 +733,8 @@ public class J4_IssueTip {
         System.out.println();
         System.out.println("【打印搜星Log】");
         System.out.println("adb logcat | grep \"Used In Fix:\"");
-        System.out.println();
-        System.out.println();
+        
+        
         
         System.out.println("═══════════════════════ MTK GNSS Measurement $PMTK485 $PMTK761 位置估测  ═══════════════════════");
         System.out.println("(  there was NO GNSS measurement report as MTK commented in ALPS05083378, PMTK485 command was used to query the location and");

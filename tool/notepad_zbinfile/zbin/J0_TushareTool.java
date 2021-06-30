@@ -3642,9 +3642,9 @@ boolean isOperationType4_Wtrade_date(ArrayList<String> fieldParamList){
             //  默认0  可选参数的所有组合形式
             //  1: 有一个 yts_code  通过 ts_code 多输入来查询  4000多个按x个为一组进行访问
             // 2:  有一个 ystart_date  10ystart_date 或者一个  yend_date   通过x 年份间隔 实现 按时间间隔查询
-          // 3. 以 (1mstart_date#1mend_date#1dtrade_date) rixianhangqing-time  以每个月为  【日线行情】
+          // 3. 以 (1mstart_date#1mend_date#1dtrade_date) rixianhangqingtime  以每个月为  【日线行情】
           // 3.1  以月份为分隔  201001  201012  202008 这样的时间分类   把当前日期 每月中包含每天的sheet  sheet的内容是当天的日志信息
-          // 4. 以(wtrade_date)   标识把当前的以 从 zhouxianhangqing-time_record_date=20101101 为起点 计算 每年 到现在的每个周五的集合
+          // 4. 以(wtrade_date)   标识把当前的以 从 zhouxianhangqingtime_record_date=20101101 为起点 计算 每年 到现在的每个周五的集合
             // 5. 月线行情 (mtrade_date)
             //6. 最新复现因子  (last_trade_date)
             // 7. 沪深股通十大成交股 (yeartonow_trade_date)
@@ -6129,12 +6129,12 @@ String[] arrStr = codePrams.split(",");
                 bodyPath = Python_BodyTemplate_8;
                 break;
 
-            case "yuexianhangqing-time":
+            case "yuexianhangqingtime":
                 bodyPath = Python_BodyTemplate_7;
                 break;
 
 
-            case "zhouxianhangqing-time":
+            case "zhouxianhangqingtime":
                 bodyPath = Python_BodyTemplate_6;
                 break;
 
@@ -6142,7 +6142,7 @@ String[] arrStr = codePrams.split(",");
 
             case "geguzijinliuxiang":
             case "meirizhibiao":
-            case "rixianhangqing-time":
+            case "rixianhangqingtime":
                 bodyPath = Python_BodyTemplate_5;
                 break;
 
@@ -6203,15 +6203,15 @@ String[] arrStr = codePrams.split(",");
 
         switch (leafNode.nodeName){
 
-            case "rixianhangqing-time":
+            case "rixianhangqingtime":
                 tableName="daily_YYYYMM (日线行情保存在年月份xlsx中)";
                 break;
 
-            case "zhouxianhangqing-time":
+            case "zhouxianhangqingtime":
                 tableName="weekly_YYYY (周线行情保存在 年份 xlsx中)";
                 break;
 
-            case "yuexianhangqing-time":
+            case "yuexianhangqingtime":
                 tableName="monthly_YYYY (月线行情保存在 年份 xlsx中)";
                 break;
 
@@ -6273,10 +6273,10 @@ String[] arrStr = codePrams.split(",");
     int  START_END_TIME_Call_ONCE_INPUT_ONE_TYPE = 0x0004 ;
 
 
-    //   0011每日行情【rixianhangqing-time】     0016每日指标【meirizhibiao】  0017个股资金流向【geguzijinliuxiang】
+    //   0011每日行情【rixianhangqingtime】     0016每日指标【meirizhibiao】  0017个股资金流向【geguzijinliuxiang】
     int  TRADE_DAY_ONE_INPUT_YYYYMM_OUTPUT_TYPE = 0x0008;
 
-    //   0012 周线行情【zhouxianhangqing-time】    0013月线行情【yuexianhangqing-time】    0021沪深股通十大成交股【hushengutongshidachengjiaogu】
+    //   0012 周线行情【zhouxianhangqingtime】    0013月线行情【yuexianhangqingtime】    0021沪深股通十大成交股【hushengutongshidachengjiaogu】
     //   0022沪深股通持股明细 【hushengutongchigumingxi】   0036港股通十大成交股【ganggutongshidachengjiaogu】  0037融资融券交易汇总【rongzirongquanjiaoyihuizong】
     // 0038 融资融券交易明细【rongzirongquanjiaoyimingxi】     0041龙虎榜每日明细【longhubangmeirimingxi】   0042龙虎榜机构明细【longhubangjigoumingxi】    0049大宗交易【dazongjiaoyi】
     int  TRADE_DAY_ONE_INPUT_YYYY_OUTPUT_TYPE = 0x0016;
@@ -6302,11 +6302,11 @@ String[] arrStr = codePrams.split(",");
        dailyQueryNodeNameList.add("gupiaohuigou");   //   0045股票回购【gupiaohuigou】
        dailyQueryNodeNameList.add("xianshougujiejin");  //   0048限售股解禁【xianshougujiejin】
        dailyQueryNodeNameList.add("gudongzengjianchi");  //   0051股东增减持【gudongzengjianchi】
-       dailyQueryNodeNameList.add("rixianhangqing-time");  // 0011每日行情【rixianhangqing-time】
+       dailyQueryNodeNameList.add("rixianhangqingtime");  // 0011每日行情【rixianhangqingtime】
        dailyQueryNodeNameList.add("meirizhibiao");  //   0016每日指标【meirizhibiao】
        dailyQueryNodeNameList.add("geguzijinliuxiang");  //  0017个股资金流向【geguzijinliuxiang】
-       dailyQueryNodeNameList.add("zhouxianhangqing-time");  // 0012 周线行情【zhouxianhangqing-time】
-       dailyQueryNodeNameList.add("yuexianhangqing-time");  //  0013月线行情【yuexianhangqing-time】
+       dailyQueryNodeNameList.add("zhouxianhangqingtime");  // 0012 周线行情【zhouxianhangqingtime】
+       dailyQueryNodeNameList.add("yuexianhangqingtime");  //  0013月线行情【yuexianhangqingtime】
        dailyQueryNodeNameList.add("hushengutongshidachengjiaogu");  //  0021沪深股通十大成交股【hushengutongshidachengjiaogu】
        dailyQueryNodeNameList.add("hushengutongchigumingxi");  //   //   0022沪深股通持股明细 【hushengutongchigumingxi】
        dailyQueryNodeNameList.add("ganggutongshidachengjiaogu");  // 0036港股通十大成交股【ganggutongshidachengjiaogu】
@@ -6463,18 +6463,18 @@ String[] arrStr = codePrams.split(",");
                 mDescSB.append("沪深通十大成交股");
                 break;
 
-            case "yuexianhangqing-time":
-                mDescSB.append("月线行情-时间");
+            case "yuexianhangqingtime":
+                mDescSB.append("月线行情v时间");
                 break;
 
 
 
-            case "zhouxianhangqing-time":
-                mDescSB.append("周线行情-时间");
+            case "zhouxianhangqingtime":
+                mDescSB.append("周线行情v时间");
                 break;
 
-            case "rixianhangqing-time":
-                mDescSB.append("日线行情-时间");
+            case "rixianhangqingtime":
+                mDescSB.append("日线行情v时间");
                 break;
 
             case "geguzijinliuxiang":

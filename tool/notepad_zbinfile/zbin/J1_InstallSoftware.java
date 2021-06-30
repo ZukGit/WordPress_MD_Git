@@ -89,7 +89,6 @@ public class J1_InstallSoftware {
         addPathExeFileNameList.add("adb.exe");
         addPathExeFileNameList.add("chrome.exe");
         addPathExeFileNameList.add("javac.exe");
-        addPathExeFileNameList.add("python.exe");
         addPathExeFileNameList.add("dot.exe");  // graphviz
         addPathExeFileNameList.add("tesseract.exe");  // tesseract OCR 图像文字识别
 
@@ -489,7 +488,7 @@ public class J1_InstallSoftware {
         ArrayList<File> allSubFileList;  //  当前如果是一个目录  那么这就是当前目录的所有子文件 孙文件
         // 需要添加到 环境变量的文件   添加的是它的父目录的路径
         ArrayList<File> addPathFileList;
-        ArrayList<File> exeAllFile;  //zukgit
+        ArrayList<File> exeAllFile;
 
         //   相对于  当前 shell 目录的 相对路径
         String target_relative_path;
@@ -538,10 +537,7 @@ public class J1_InstallSoftware {
                 addPathFileList = new ArrayList<File>();
                 subFileList.addAll(Arrays.asList(rootFile.listFiles()));
                 allSubFileList.addAll(getAllSubDirFile(rootFile));
-                exeAllFile.addAll(getTypeFileList(allSubFileList, ".exe"));    // zukgit
-                if(exeAllFile != null){
-                    software_allExeFileList.addAll(exeAllFile);
-                }
+                exeAllFile.addAll(getTypeFileList(allSubFileList, ".exe"));
                 addPathFileList.addAll(getPathFileList(exeAllFile, addPathExeFileNameList));
 
                 //  如果有 加入  环境变量的 exe 文件  那么 这个 exe 文件 就是执行文件
@@ -657,9 +653,9 @@ public class J1_InstallSoftware {
             for (int i = 0; i < allFile.size(); i++) {
                 File fileItem = allFile.get(i);
                 String fileName = fileItem.getName();
+                System.out.println("fileName = "+fileName.toLowerCase() +"     type ="+ type.toLowerCase() +"  fileItem.abspath = "+ fileItem.getAbsolutePath());
                 if (fileName.toLowerCase().endsWith(type.toLowerCase())) {
                     arrFile.add(fileItem);
-                    System.out.println("fileName = "+fileName.toLowerCase() +"     type ="+ type.toLowerCase() +"  fileItem.abspath = "+ fileItem.getAbsolutePath());
                 }
             }
             System.out.println("allFile.size = "+ allFile.size() + "     exeFileSize="+arrFile.size());
@@ -2106,7 +2102,6 @@ public class J1_InstallSoftware {
 
         File notepad_exe_File = searchExeFile("NotePad++.exe");
         if (notepad_exe_File != null) {
-            System.out.println("reg.reg  != null will create a  reg.reg");
             ArrayList<String> notepad_reg_List = new  ArrayList<String>();
             notepad_reg_List.add("Windows Registry Editor Version 5.00");
             notepad_reg_List.add("[HKEY_CLASSES_ROOT\\*\\Shell\\NotePad++]");
@@ -2115,8 +2110,6 @@ public class J1_InstallSoftware {
             notepad_reg_List.add("@=\"\\\""+notepad_path+"\\\" \\\"%1\\\"\"");
             File regFile = new File(CUR_Dir_FILE.getAbsolutePath()+File.separator+"reg.reg");
             writeContentToFile(regFile,notepad_reg_List);
-        }else{
-            System.out.println("reg.reg  is NULL");
         }
 
 
@@ -2169,7 +2162,6 @@ public class J1_InstallSoftware {
         for (int i = 0; i < software_allExeFileList.size() ; i++) {
             File exeFie = software_allExeFileList.get(i);
             String exeName_lower = exeFie.getName().toLowerCase().trim();
-            System.out.println("searchExeFile   fileName=["+fileName+"]  exeName_lower=["+exeName_lower+"]" );
             if(exeName_lower.endsWith(fileName)){
                 return exeFie;
             }
@@ -2321,6 +2313,13 @@ public class J1_InstallSoftware {
                     if (softFile.getName().endsWith(".exe") || softFile.getName().endsWith(".msi")) {
                         softwareList.add(softFile);
 
+                        if(softFile.getName().endsWith(".exe") && !software_allExeFileList.contains(softFile)){
+                            software_allExeFileList.add(softFile);
+                        }
+
+                        if(softFile.getName().endsWith(".msi")  && !software_allMsiFileList.contains(softFile) ){
+                            software_allMsiFileList.add(softFile);
+                        }
                         continue;
                     }
                     if (softFile.isDirectory()) {
@@ -2430,7 +2429,6 @@ public class J1_InstallSoftware {
     static int toDoIndex = 1;
 
     static void toDoInstall(String dirName, ArrayList<File> softwareList) {
-
         String key = calculFileOringinKey(dirName, zwin_soft_key_list);    // 是 哪一种目录下的文件   绿色当文件   绿色文件夹    可静默安装exe  添加到环境变量的文件
         if (key == null) {
             System.out.println("当前 dirName =" + dirName + " 没有在  zwin_soft_key_list  找到对应的Key");
@@ -2441,7 +2439,6 @@ public class J1_InstallSoftware {
 
         for (int i = 0; i < softwareList.size(); i++) {
             File itemFile = softwareList.get(i);
-            // zukgit
             ZWin_Software winSoftItem = J1_Object.new ZWin_Software(key, itemFile);
             allZWInSoftList.add(winSoftItem);
         }
@@ -2456,10 +2453,6 @@ public class J1_InstallSoftware {
             String switchKey = winSoftItem.category_key; // Pre_Install_Soft    // Slient1_OneExe_Local_Install   // Environment_Zip_Dir_Path 等类型
             File targetFile = winSoftItem.targetExeFile;
             File rootFile = winSoftItem.rootFile;
-
-            // 当前 winSoftItem.targetExeFile  =  M:\ZWin_Software\D0_Environment_Zip_Dir_Path\python-3.7.9-embed-amd64\Lib\site-packages\pip\_vendor\distlib\t32.exe
-            System.out.println("当前 winSoftItem.targetExeFile  =  " + targetFile.getAbsolutePath() );
-
             File single_install_Dir = winSoftItem.Single_install_Dir;
             File desktop_icon_file = winSoftItem.Desktop_Icon_File;
             String relativePath = winSoftItem.target_relative_path;         //   相对于  当前 shell 目录的 相对路径
@@ -2469,7 +2462,6 @@ public class J1_InstallSoftware {
             }
 
             String targetAbsPath = targetFile.getAbsolutePath();
-            String targetParentDirAbsPath = targetFile.getParentFile().getAbsolutePath();
             String clearChineseABsPath = clearChinese(targetAbsPath);
             ArrayList<String> OtherCommandList = new     ArrayList<String>();
             String curCommand = "";
@@ -2504,10 +2496,9 @@ public class J1_InstallSoftware {
 
                     break;
                 case "Environment_Zip_Dir_Path":
-                    curCommand = "rem  AddPath[" + i + "]  setx  PATH   " + targetParentDirAbsPath + ";%PATH%";
-                    OtherCommandList.add("setx  PATH   " + targetParentDirAbsPath + ";%PATH%");
-                    break;
+                    curCommand = "rem  AddPath[" + i + "]  setx  PATH   " + clearChineseABsPath + "%PATH%";
 
+                    break;
                 case "No_Slient_OneExe":
                     curCommand = "rem No_Slient_OneExe[" + i + "]  " + clearChineseABsPath;
                     break;

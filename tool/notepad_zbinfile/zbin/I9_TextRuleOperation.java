@@ -8006,6 +8006,50 @@ public class I9_TextRuleOperation {
 	}
 
 	/**
+	 * 汉字转为拼音
+	 *  汉字--->  HanZi
+	 * @param chinese
+	 * @return
+	 */
+	public static String Rule14_ToPinyin_WithFirstBig(String chinese) {
+		if (chinese == null || chinese.trim().isEmpty()) {
+			return null;
+		}
+		String curItem = new String(chinese);
+		while (curItem.contains(" ")) {
+			curItem = curItem.replaceAll(" ", "");
+		}
+		String pinyinStr = "";
+		char[] newChar = curItem.toCharArray();
+		HanyuPinyinOutputFormat defaultFormat = new HanyuPinyinOutputFormat();
+		defaultFormat.setCaseType(HanyuPinyinCaseType.LOWERCASE);
+		defaultFormat.setToneType(HanyuPinyinToneType.WITHOUT_TONE);
+		for (int i = 0; i < newChar.length; i++) {
+			if (newChar[i] > 128) {
+				try {
+					pinyinStr += toUpperFirstChar(PinyinHelper.toHanyuPinyinStringArray(newChar[i], defaultFormat)[0]); // [0] 标识当前拼音 汉->
+																										// han
+				} catch (BadHanyuPinyinOutputFormatCombination e) {
+					e.printStackTrace();
+				}
+			} else { // 汉字的编码是大于 128的 所以 小于 128编码的就直接认为是 ascii编码的
+				pinyinStr += (newChar[i]+"");
+			}
+		}
+		return pinyinStr;
+	}
+	
+	public static String toUpperFirstChar(String srcStr) {
+		if(srcStr == null) {
+			return "";
+		}
+		String secondStr = srcStr.substring(1).toLowerCase();
+		String firstChar = (srcStr.charAt(0)+"").toUpperCase();
+		
+		return firstChar+secondStr;
+		
+	}
+	/**
 	 * 汉字转为拼音 空间以下划线_分割 1.每个汉字前面添加_ 2.每个汉字后面添加_ 3.把所有的两个__ 下划线转为 一个下划线
 	 *
 	 * @param chinese
@@ -8757,7 +8801,23 @@ public class I9_TextRuleOperation {
 			// System.out.println(toujiaoJson);
 
 			I9_TextRuleOperation I9_Object = new I9_TextRuleOperation();
-			String result = new Json2Bean(sb.toString(), "RootBean", null, new MyNameGenerator(), new MyJsonParser(),
+			 JSONObject day_jsonobject =    JSONObject.parseObject(sb.toString());
+			 ArrayList<String> orikeyList = new  ArrayList<String>();
+			 ArrayList<String> fixed_clearChinese_keyList = new  ArrayList<String>();
+			 if(day_jsonobject != null && day_jsonobject.keySet().size() > 0) {
+				 orikeyList.addAll(day_jsonobject.keySet());
+			 }
+			 if(orikeyList.size() > 0) {
+				 for (int i = 0; i < orikeyList.size(); i++) {
+					 String keyname = orikeyList.get(i);
+					 String keyname_revert_pinyinStr = Rule14_ToPinyin_WithFirstBig(keyname);
+					 fixed_clearChinese_keyList.add(keyname_revert_pinyinStr);
+					
+				}
+				 
+			 }
+			 
+			String result = new Json2Bean(sb.toString(), "RootBean", null, new MyNameGenerator(fixed_clearChinese_keyList), new MyJsonParser(),
 					new MyBeanGenerator("com.zukgit")).execute();
 //            String result = new Json2Bean(sb.toString(), "RootBean", null, new MyNameGenerator(), new MyJsonParser(), new MyBeanGenerator("com.zukgit")).execute();
 
@@ -10424,6 +10484,7 @@ public class I9_TextRuleOperation {
 							return "List<Object>";
 						} else if (childJson.startsWith("{")) {
 							childName = nameGeneration.nextName();
+					
 
 							new Json2Bean(childJson, childName, name, nameGeneration, jsonParse, generationBean)
 									.execute();
@@ -11310,6 +11371,28 @@ public class I9_TextRuleOperation {
 				"LL", "MM", "NN" };
 		int posiiotn;
 
+		
+		
+MyNameGenerator(ArrayList<String> namekeyList){
+			
+String	names[] = { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R",
+					"S", "T", "U", "V", "W", "X", "Y", "Z", "AA", "BB", "CC", "DD", "EE", "FF", "GG", "HH", "JJ", "KK",
+					"LL", "MM", "NN" };
+			
+String[]	names_Arr = new String[namekeyList.size() + names.length];
+			
+for (int i = 0; i < namekeyList.size(); i++) {
+	names_Arr[i] = namekeyList.get(i);
+}
+
+for (int j = namekeyList.size(); j < names.length + namekeyList.size(); j++) {
+	names_Arr[j] = names[j-namekeyList.size()];
+}
+
+this.names = names_Arr;    // 初始化 名称
+
+			
+}
 		@Override
 		public String nextName() {
 

@@ -63,29 +63,29 @@ hushengupiao_jichushuju_IPOxingushangshi【120】[2000]├10┤<new_share>(10yst
 〓〓hangqingshuju
 hushengupiao_hangqingshuju_
 
-〖 日线行情-时间为序 https://tushare.pro/document/2?doc_id=27    
+〖 日线行情v时间为序 https://tushare.pro/document/2?doc_id=27    
 〖 *ts_code* 		股票代码
 〖 *trade_date*		交易日期(YYYYMMDD)
 〖 *start_date*		开始日期(YYYYMMDD)
 〖 *end_date*		结束日期(YYYYMMDD)
-hushengupiao_jichushuju_rixianhangqing-time  【120】[5000] <daily> (1mstart_date#1mend_date#trade_date) 《ts_code=trade_date=open=high=low=close=pre_close=change=pct_chg=vol=amount》
+hushengupiao_jichushuju_rixianhangqingtime  【120】[5000] <daily> (1mstart_date#1mend_date#trade_date) 《ts_code=trade_date=open=high=low=close=pre_close=change=pct_chg=vol=amount》
 
 
 
-〖 周线行情-时间为序  https://tushare.pro/document/2?doc_id=144   
+〖 周线行情v时间为序  https://tushare.pro/document/2?doc_id=144   
 〖*ts_code*	  TS代码（ts_code,trade_date两个参数任选一）
 〖*trade_date*  交易日期 （每周最后一个交易日期，YYYYMMDD格式）
 〖*start_date*  开始日期
 〖*end_date*	  结束日期
-hushengupiao_jichushuju_zhouxianhangqing-time  【300】[3700] <weekly> (wtrade_date) 《ts_code=trade_date=close=open=high=low=pre_close=change=pct_chg=vol=amount》
+hushengupiao_jichushuju_zhouxianhangqingtime  【300】[3700] <weekly> (wtrade_date) 《ts_code=trade_date=close=open=high=low=pre_close=change=pct_chg=vol=amount》
 
 
-〖月线行情-每个交易月的最后一日  https://tushare.pro/document/2?doc_id=145  
+〖月线行情v每个交易月的最后一日  https://tushare.pro/document/2?doc_id=145  
 〖 *ts_code* 		股票代码
 〖 *trade_date*		交易日期(YYYYMMDD)
 〖 *start_date*		开始日期(YYYYMMDD)
 〖 *end_date*		结束日期(YYYYMMDD)
-hushengupiao_jichushuju_yuexianhangqing-time  【120】[5000] <monthly> (mtrade_date) 《ts_code=trade_date=close=open=high=low=pre_close=change=pct_chg=vol=amount》
+hushengupiao_jichushuju_yuexianhangqingtime  【120】[5000] <monthly> (mtrade_date) 《ts_code=trade_date=close=open=high=low=pre_close=change=pct_chg=vol=amount》
 
 
 〖复权因子  https://tushare.pro/document/2?doc_id=28  

@@ -333,7 +333,10 @@ public class G2_ApplyRuleFor_TypeFile {
 			for (int i = 0; i < xlsxFileList.size(); i++) {
 				File xlsxFile = xlsxFileList.get(i);
 				String xlsxFileName =  xlsxFile.getName();
+				String getxlsxNameNoType = getFileNameNoPoint(xlsxFileName);
 				String resut_json_xlsx_name = xlsxFileName.replace(".", "_")+"_"+getTimeStamp();
+//				String resut_json_xlsx_name = getxlsxNameNoType+".json";
+
 				File xlsxFile_resultDir = new File(xlsxFile.getParentFile().getAbsolutePath()+File.separator+resut_json_xlsx_name);
 				reverXlsxToJson(xlsxFile,xlsxFile_resultDir);
 			}
@@ -345,7 +348,7 @@ public class G2_ApplyRuleFor_TypeFile {
 		String simpleDesc() {
 
 			return  Cur_Bat_Name + " #_"+rule_index+"  <指定A.xlsx文件> <指定B.xls文件>  ### 按顺序解析当前的xlsx xls 为对应的json文件 生成在相同文件名_时间戳的文件夹中   \n"
-					+ Cur_Bat_Name + " #_"+rule_index+"  A.xlsx B.xls C.xlsx   ### 按顺序解析当前的xlsx xls 为对应的json文件 生成在相同文件名_时间戳的文件夹中    \n"
+					+ Cur_Bat_Name + " #_"+rule_index+"  A.xlsx B.xls C.xlsx   ### 按顺序解析当前的xlsx day20200202.xls 为对应的day_20200202.json文件 生成在相同文件名_时间戳的文件夹中    \n"
 					;
 		}
 
@@ -413,12 +416,12 @@ public class G2_ApplyRuleFor_TypeFile {
 					Row row1 = sheet.getRow(0);
 					//获取最大列数
 					int colnum = row1.getPhysicalNumberOfCells();
-					System.out.println("shellIndex["+s+"]  shellName["+ shellName+"]  rownum["+ rownum+"]   colnum["+colnum+ "]");
+//					System.out.println("shellIndex["+s+"]  shellName["+ shellName+"]  rownum["+ rownum+"]   colnum["+colnum+ "]");
 
 					JSONArray jsonArray = new JSONArray();
 					for (int i = 1; i < rownum; i++) {
 						Row row = sheet.getRow(i);
-						System.out.println("currentRow = "+ i );
+//						System.out.println("currentRow = "+ i );
 //		                    if(i > 10) {
 //
 //		                    	continue;
@@ -431,7 +434,7 @@ public class G2_ApplyRuleFor_TypeFile {
 								Cell cellData = row.getCell(j);
 								if (cellData != null) {
 									//判断cell类型
-									System.out.println("colum="+j);
+//									System.out.println("colum="+j);
 
 									switch (cellData.getCellType()) {
 										case NUMERIC: {
@@ -454,9 +457,9 @@ public class G2_ApplyRuleFor_TypeFile {
 										case STRING: {
 
 
-											System.out.println("row1.getCell(j).toString() = "+ row1.getCell(j).toString());
-											System.out.println("row1.getCell(j).getCellStyle() = "+ row1.getCell(j).getCellStyle());
-											System.out.println("row1.getCell(j).getCellType() = "+ row1.getCell(j).getCellType());
+//											System.out.println("row1.getCell(j).toString() = "+ row1.getCell(j).toString());
+//											System.out.println("row1.getCell(j).getCellStyle() = "+ row1.getCell(j).getCellStyle());
+//											System.out.println("row1.getCell(j).getCellType() = "+ row1.getCell(j).getCellType());
 
 											String cellContent = null;
 
@@ -495,14 +498,30 @@ public class G2_ApplyRuleFor_TypeFile {
 					File jsonFile = new File(jsonResultDirFile.getAbsolutePath()+File.separator+jsonName);
 
 					System.out.println(jsonArray.toJSONString());
-					writeContentToFile(jsonFile, jsonArray.toJSONString());
+		
+					writeContentToFile(jsonFile, jsonArray.toJSONString()+"\n");
 					jsonObject.put(sheet.getSheetName(), jsonArray);
 				}
 //		            System.out.println(jsonObject.toJSONString());
-				System.out.println("长度"+jsonObject.toJSONString().length());
-				String allSheetJsonFileName = "AllSheet_4_"+xlsxFile.getName().replace(".", "_")+".json";
-				File allSheetJsonFile =  new File(jsonResultDirFile.getAbsolutePath()+File.separator+allSheetJsonFileName);
-				writeContentToFile(allSheetJsonFile, jsonObject.toJSONString());
+//				System.out.println("长度"+jsonObject.toJSONString().length());
+//				String allSheetJsonFileName = "AllSheet_"+xlsxFile.getName().replace(".", "_")+".json";
+			
+				String getxlsxNameNoType = getFileNameNoPoint(xlsxFile);
+				String resut_json_file_name = getxlsxNameNoType+".json";
+				ArrayList<String> jsonRowList = new ArrayList<String>();
+
+		
+				
+				
+				String JsonOneLine = jsonObject.toJSONString();  //  把它分隔多份  不要总是一行
+				
+				// 有都逗号 就换行 
+				JsonOneLine = JsonOneLine.replace(",", ",\n");
+				
+				File allSheetJsonFile =  new File(jsonResultDirFile.getAbsolutePath()+File.separator+resut_json_file_name);
+			
+				
+				writeContentToFile(allSheetJsonFile, JsonOneLine);
 
 				System.out.println(" xlsxFile-->"+xlsxFile.getAbsolutePath()+" 解析成功!");
 
