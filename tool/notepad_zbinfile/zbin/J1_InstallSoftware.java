@@ -84,11 +84,13 @@ public class J1_InstallSoftware {
 
     static {
 
-        addPathExeFileNameList.add("Cmder.exe");
-        addPathExeFileNameList.add("notepad++.exe");
-        addPathExeFileNameList.add("adb.exe");
+//        zbatrule_I9.bat  以及  加入到 PATH 中了
+//        addPathExeFileNameList.add("Cmder.exe");
+//        addPathExeFileNameList.add("notepad++.exe");
+//        addPathExeFileNameList.add("adb.exe");
+//        addPathExeFileNameList.add("javac.exe");
+    	
         addPathExeFileNameList.add("chrome.exe");
-        addPathExeFileNameList.add("javac.exe");
         addPathExeFileNameList.add("dot.exe");  // graphviz
         addPathExeFileNameList.add("tesseract.exe");  // tesseract OCR 图像文字识别
 
@@ -163,9 +165,9 @@ public class J1_InstallSoftware {
 
 
     // PATH 环境变量值进行当前的保存处理
-    static String EnvironmentValue = System.getProperties().getProperty("java.library.path");
-    static String PathSeparator = System.getProperties().getProperty("path.separator");
-    static String[] EnvironmentList = EnvironmentValue.split(PathSeparator);
+  public  static String EnvironmentValue = System.getProperties().getProperty("java.library.path");
+  public  static String PathSeparator = System.getProperties().getProperty("path.separator");
+  public  static String[] EnvironmentList = EnvironmentValue.split(PathSeparator);
 
 
     static boolean isContainEnvironment(String program) {
@@ -2061,8 +2063,8 @@ public class J1_InstallSoftware {
 
 
         if (CUR_Dir_FILE != null && !isZWinSoft(CUR_Dir_FILE)) {
-            System.out.println("当前目录不在 ZWin_Software 不是指定 软件保存安装 目录 ! ");
-            System.out.println("百度网盘 ZWin_SoftWared 地址:  \n" + "https://pan.baidu.com/disk/home#/all?vmode=list&path=%2F%E7%A7%BB%E5%8A%A8%E7%A1%AC%E7%9B%98%2Fsoftware%2FZWin_Software");
+            System.out.println("当前目录不在 zsoft 不是指定 软件保存安装 目录 ! ");
+            System.out.println("百度网盘 zsoft 地址:  \n" + "https://pan.baidu.com/disk/home#/all?vmode=list&path=%2F%E7%A7%BB%E5%8A%A8%E7%A1%AC%E7%9B%98%2Fsoftware%2FZWin_Software");
             return;
         }
         showWinSoftMap(zwin_soft_dir_Map);
@@ -2074,7 +2076,7 @@ public class J1_InstallSoftware {
                 System.out.println("unzip[" + (i + 1) + "] " + unzipFile.getAbsolutePath());
             }
             System.out.println();
-            System.out.println("【Tip】 请在 ZWin_Software 执行  ▲【   zzip_H5.bat  all   】▲ 来解压当前文件 !  之后再运行安装软件命令: " + Cur_Bat_Name);
+            System.out.println("【Tip】 请在 zsoft 执行  ▲【   zzip_H5.bat  all   】▲ 来解压当前文件 !  之后再运行安装软件命令: " + Cur_Bat_Name);
             return;
         } else {
             System.out.println(" >>>>> 当前 压缩文件 已全部解压缩  开始安装软件程序!!!");
@@ -2095,6 +2097,45 @@ public class J1_InstallSoftware {
             commandList.add(commandItem);
             System.out.println(commandItem);
         }
+        
+        // 往 commandList 检查 PATH的目录 并 检测 Item 是否存在  删除 那些 不存在的 item 
+        //   并去除掉重复项 
+        ArrayList<String> fixedPathList = new   ArrayList<String>();
+        if(EnvironmentValue != null && EnvironmentValue.length() > 10) {
+        	
+        	String[] pathItemArr = EnvironmentValue.split(";");
+        	if(pathItemArr != null) {
+        		for (int i = 0; i < pathItemArr.length; i++) {
+        			String pathStr = pathItemArr[i];
+        			File pathFile = new File(pathStr);
+        			if(pathFile.exists() && pathFile.isDirectory()) {
+        		
+        				if(!fixedPathList.contains(pathStr)) {
+        					fixedPathList.add(pathStr);
+        				}
+        			}
+				}
+        	}
+        }
+        
+        if(!fixedPathList.contains("C:\\Windows\\System32")) {
+        	fixedPathList.add("C:\\Windows\\System32");
+        }
+        if(fixedPathList.size() > 0) {
+        
+        	commandList.add("\n");
+        	commandList.add("rem ############################ END  Environment_ClearEmpty_ClearSame_Command ");     	
+        	
+        	StringBuilder pathSB = new StringBuilder();
+        	for (int i = 0; i < fixedPathList.size(); i++) {
+				String pathItem = fixedPathList.get(i);
+				pathSB.append(pathItem+";");
+			}
+        	commandList.add("echo setx  PATH   "+pathSB.toString());
+          	commandList.add("setx  PATH   "+pathSB.toString());
+        	commandList.add("echo=");
+
+        }
 
         File installBatFile = new File(CUR_Dir_FILE.getAbsolutePath()+File.separator+"J1_InstallSoft.bat");
         writeContentToFile(installBatFile,commandList);
@@ -2108,11 +2149,13 @@ public class J1_InstallSoftware {
             notepad_reg_List.add("[HKEY_CLASSES_ROOT\\*\\Shell\\NotePad++\\Command]");
             String notepad_path = notepad_exe_File.getAbsolutePath().replace("\\","\\\\");
             notepad_reg_List.add("@=\"\\\""+notepad_path+"\\\" \\\"%1\\\"\"");
-            File regFile = new File(CUR_Dir_FILE.getAbsolutePath()+File.separator+"reg.reg");
+            File regFile = new File(CUR_Dir_FILE.getAbsolutePath()+File.separator+"notepad.reg");
             writeContentToFile(regFile,notepad_reg_List);
         }
+        System.out.println("installBatFile ="+installBatFile.getAbsolutePath());
+        System.out.println("notepad_exe_File ="+notepad_exe_File.getAbsolutePath());
 
-
+        System.out.println("══════════════════════ J1_InstallSoftware.java  Run_OVer  J1_InstallSoft.bat(row="+commandList.size()+")");
 
 
 
@@ -2289,6 +2332,14 @@ public class J1_InstallSoftware {
     public static boolean isZWinSoft(File ShellDir) {
         boolean flag = false;
         File[] subFileList = ShellDir.listFiles();
+        if(!ShellDir.exists()){
+            System.out.println("当前 ShellDir="+ShellDir.getAbsolutePath()+" 不存在??? ");
+            return flag;
+        }
+        if(subFileList == null){
+            System.out.println("无法获取当前 ShellDir="+ShellDir.getAbsolutePath()+" 的子文件夹 File[]  listFiles()");
+            return flag;
+        }
 
 
         for (int i = 0; i < subFileList.length; i++) {
@@ -2323,7 +2374,7 @@ public class J1_InstallSoftware {
                         continue;
                     }
                     if (softFile.isDirectory()) {
-                        softwareList.add(softFile);
+                        softwareList.add(softFile);   // 加入文件夹 
                     }
                 }
 
@@ -2428,6 +2479,16 @@ public class J1_InstallSoftware {
 
     static int toDoIndex = 1;
 
+  //A0_Pre_Install_Soft/
+  //B0_Slient1_OneExe_Local_Install/
+  //B1_Silent1_OneExe_System_Install/
+  //B2_Slient2_OneMsi_System_Install/
+  //C0_Green_OneExe/
+  //C1_GreenSoft_Zip_Dir/
+  //D0_Environment_Zip_Dir_Path/
+  //F0_No_Slient_OneExe/
+  //F1_No_Slient_Zip_Dir_Path/
+    
     static void toDoInstall(String dirName, ArrayList<File> softwareList) {
         String key = calculFileOringinKey(dirName, zwin_soft_key_list);    // 是 哪一种目录下的文件   绿色当文件   绿色文件夹    可静默安装exe  添加到环境变量的文件
         if (key == null) {
@@ -2496,7 +2557,7 @@ public class J1_InstallSoftware {
 
                     break;
                 case "Environment_Zip_Dir_Path":
-                    curCommand = "rem  AddPath[" + i + "]  setx  PATH   " + clearChineseABsPath + "%PATH%";
+                    curCommand = " setx  PATH " + clearChineseABsPath + "%PATH%";
 
                     break;
                 case "No_Slient_OneExe":

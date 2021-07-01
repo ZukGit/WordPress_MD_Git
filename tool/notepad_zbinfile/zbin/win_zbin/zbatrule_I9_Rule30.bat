@@ -690,6 +690,7 @@ echo ========= please add command as environment settings in Cmder.exe =========
 echo;
 echo set PATH=%%ConEmuBaseDir%%\Scripts;%%PATH%%
 echo set PATH=%%USERPROFILE%%\Desktop\zbin\win_zbin;%%PATH%%
+echo set PATH= C:\Windows\System32;%%PATH%%
 echo alias cdd=cd /D %%USERPROFILE%%\Desktop
 echo alias cdz=cd /D %%USERPROFILE%%\Desktop\zbin
 echo set LANG=zh_CN.UTF-8
@@ -2684,8 +2685,8 @@ echo ____________________________ java 执行 %desktop%\zbin\J1_InstallSoftware.
 echo %javac_file_fullpath%  -cp %desktop%\zbin\J1_guava.jar;%desktop%\zbin\J1_jshortcut_oberzalek.jar -Xlint:unchecked  -encoding UTF-8   %desktop%\zbin\J1_InstallSoftware.java
 call %javac_file_fullpath%  -cp %desktop%\zbin\J1_guava.jar;%desktop%\zbin\J1_jshortcut_oberzalek.jar -Xlint:unchecked  -encoding UTF-8  %desktop%\zbin\J1_InstallSoftware.java
 echo;
-echo %java_file_fullpath% -cp %desktop%\zbin\J1_guava.jar;%desktop%\zbin\J1_jshortcut_oberzalek.jar;%desktop%\zbin  J1_InstallSoftware  %~dp0
-call %java_file_fullpath% -cp %desktop%\zbin\J1_guava.jar;%desktop%\zbin\J1_jshortcut_oberzalek.jar;%desktop%\zbin  J1_InstallSoftware  %~dp0
+echo %java_file_fullpath% -cp %desktop%\zbin\J1_guava.jar;%desktop%\zbin\J1_jshortcut_oberzalek.jar;%desktop%\zbin  J1_InstallSoftware  %init_cd%
+call %java_file_fullpath% -cp %desktop%\zbin\J1_guava.jar;%desktop%\zbin\J1_jshortcut_oberzalek.jar;%desktop%\zbin  J1_InstallSoftware  %init_cd%
 echo ____________________________ java 执行 %desktop%\zbin\J1_InstallSoftware.java Endxx  ____________________________
 
 echo ____________________________ python pip安装工具 Begin  ____________________________
