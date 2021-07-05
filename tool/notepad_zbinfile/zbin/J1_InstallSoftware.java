@@ -659,6 +659,12 @@ public class J1_InstallSoftware {
                 if (fileName.toLowerCase().endsWith(type.toLowerCase())) {
                     arrFile.add(fileItem);
                 }
+            
+                
+                if(type.toLowerCase().equals(".exe") && !software_allExeFileList.contains(fileItem)){
+                    software_allExeFileList.add(fileItem);
+                }
+                
             }
             System.out.println("allFile.size = "+ allFile.size() + "     exeFileSize="+arrFile.size());
             return arrFile;
@@ -2063,8 +2069,8 @@ public class J1_InstallSoftware {
 
 
         if (CUR_Dir_FILE != null && !isZWinSoft(CUR_Dir_FILE)) {
-            System.out.println("当前目录不在 zsoft 不是指定 软件保存安装 目录 ! ");
-            System.out.println("百度网盘 zsoft 地址:  \n" + "https://pan.baidu.com/disk/home#/all?vmode=list&path=%2F%E7%A7%BB%E5%8A%A8%E7%A1%AC%E7%9B%98%2Fsoftware%2FZWin_Software");
+            System.out.println("当前目录不在 zsoft_dest 不是指定 软件保存安装 目录 ! ");
+            System.out.println("百度网盘 zsoft_dest 地址:  \n" + "https://pan.baidu.com/disk/home#/all?vmode=list&path=%2F%E7%A7%BB%E5%8A%A8%E7%A1%AC%E7%9B%98%2Fsoftware%2FZWin_Software");
             return;
         }
         showWinSoftMap(zwin_soft_dir_Map);
@@ -2077,7 +2083,7 @@ public class J1_InstallSoftware {
             }
             System.out.println();
             System.out.println("【Tip】 请在 zsoft 执行  ▲【   zzip_H5.bat  all   】▲ 来解压当前文件 !  之后再运行安装软件命令: " + Cur_Bat_Name);
-            return;
+//            return;
         } else {
             System.out.println(" >>>>> 当前 压缩文件 已全部解压缩  开始安装软件程序!!!");
         }
@@ -2151,11 +2157,11 @@ public class J1_InstallSoftware {
             notepad_reg_List.add("@=\"\\\""+notepad_path+"\\\" \\\"%1\\\"\"");
             File regFile = new File(CUR_Dir_FILE.getAbsolutePath()+File.separator+"notepad.reg");
             writeContentToFile(regFile,notepad_reg_List);
+        }else {
+        	System.out.println("NotePad++.exe  搜索不到~~~~~~·");
         }
-        System.out.println("installBatFile ="+installBatFile.getAbsolutePath());
-        System.out.println("notepad_exe_File ="+notepad_exe_File.getAbsolutePath());
 
-        System.out.println("══════════════════════ J1_InstallSoftware.java  Run_OVer  J1_InstallSoft.bat(row="+commandList.size()+")");
+
 
 
 
@@ -2205,6 +2211,8 @@ public class J1_InstallSoftware {
         for (int i = 0; i < software_allExeFileList.size() ; i++) {
             File exeFie = software_allExeFileList.get(i);
             String exeName_lower = exeFie.getName().toLowerCase().trim();
+            System.out.println("exeFie["+i+"] fileName="+fileName+"   exeName_lower="+exeName_lower);
+  
             if(exeName_lower.endsWith(fileName)){
                 return exeFie;
             }
@@ -2332,14 +2340,6 @@ public class J1_InstallSoftware {
     public static boolean isZWinSoft(File ShellDir) {
         boolean flag = false;
         File[] subFileList = ShellDir.listFiles();
-        if(!ShellDir.exists()){
-            System.out.println("当前 ShellDir="+ShellDir.getAbsolutePath()+" 不存在??? ");
-            return flag;
-        }
-        if(subFileList == null){
-            System.out.println("无法获取当前 ShellDir="+ShellDir.getAbsolutePath()+" 的子文件夹 File[]  listFiles()");
-            return flag;
-        }
 
 
         for (int i = 0; i < subFileList.length; i++) {

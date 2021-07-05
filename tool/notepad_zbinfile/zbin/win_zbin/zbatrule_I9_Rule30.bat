@@ -133,6 +133,38 @@ goto:eof
 
 
 
+:getfilex_func_1x1
+rem ======================================== getfilex_func_1x1
+rem desc: 给一个文件 fileAbsPath=C:\Users\xxx\Desktop\zbin\A0.bat  取到x当前的文件名称  ~x=.bat
+rem sample: 
+rem sample_out: 
+::SETLOCAL
+echo ______________Method_In getfilex_func_1x1
+set getfilex_return_1=%~x1
+echo [getfilex_func_1x1 EndPrintCode]   getfilex_return_1=[!getfilex_return_1!]   param1=[%1]   
+echo ______________Method_Out getfilex_func_1x1
+::ENDLOCAL
+goto:eof
+
+
+
+
+:getfilenx_func_1x1
+rem ======================================== getfilenx_func_1x1
+rem desc: 给一个文件 fileAbsPath=C:\Users\xxx\Desktop\zbin\A0.bat  取到nx当前的文件名称  ~nx=A0.bat
+rem sample: 
+rem sample_out: 
+::SETLOCAL
+echo ______________Method_In getfilenx_func_1x1
+set getfilenx_return_1=%~nx1
+echo [getfilenx_func_1x1 EndPrintCode]   getfilenx_return_1=[!getfilenx_return_1!]   param1=[%1]   
+echo ______________Method_Out getfilenx_func_1x1
+::ENDLOCAL
+goto:eof
+
+
+
+
 :getfiledp_func_1x1
 rem ======================================== getfiledp_func_1x1
 rem desc: 给一个文件 fileAbsPath=C:\Users\xxx\Desktop\zbin\A0.bat  取到dp父目录路径  ~dp=C:\Users\xxx\Desktop\zbin\
@@ -149,6 +181,43 @@ goto:eof
 
 
 
+:copyfiledirovertodir_func_2x0
+rem ======================================== copyfiledirovertodir_func_2x0
+rem desc: 复制 [src文件或者目录] 到 目标目录 [dst目录] 如果dst目录存在那么强制覆盖 执行复制操作
+rem sample: 
+rem sample_out: 
+::SETLOCAL
+echo ______________Method_In copyfiledirovertodir_func_2x0
+set copy_src_file=%1
+set copy_dest_dirfile=%2
+call ::isfileexist_func_1x1  %copy_dest_dirfile%
+set copy_dest_dirfile_existflag=!isfileexist_return_1!
+echo copy_dest_dirfile_existflag=%copy_dest_dirfile_existflag%
+if "%copy_dest_dirfile_existflag%"=="true" (
+echo 当前src文件 To dst目标文件夹  src=[%1]   dst=[%2]  由于dst目标文件夹已经存在 强制覆盖!!
+) else (
+echo 当前src文件 To dst目标文件夹  src=[%1]   dst=[%2]  由于目标文件夹不存在 那么创建这样的文件夹
+rem mkdir %2
+)
+echo copy_src_file=[%copy_src_file%]  copy_dest_dirfile=[%copy_dest_dirfile%]
+echo 执行 xcopy 命令 复制文件(夹)[%copy_src_file%]   到目标文件夹[%copy_dest_dirfile%]   命令如下:
+call ::isrealfile_func_1x1 %copy_src_file%
+set copy_srcfile_isrealfile=!isrealfile_return_1!
+if "!copy_srcfile_isrealfile!"=="true" (
+echo xcopy  "%copy_src_file%" "%copy_dest_dirfile%\"      [复制文件]
+xcopy /y   "%copy_src_file%" "%copy_dest_dirfile%\"
+) else (
+echo xcopy /y /c  /e /h /r /s "%copy_src_file%\*.*" "%copy_dest_dirfile%\"      [复制文件夹]
+xcopy /y /c  /e /h /r /s "%copy_src_file%\*.*" "%copy_dest_dirfile%\"
+)
+echo [copyfiledirovertodir_func_2x0 EndPrintCode]    output=[__empty__] param1=[%1]   param2=[%2]   
+echo ______________Method_Out copyfiledirovertodir_func_2x0
+::ENDLOCAL
+goto:eof
+
+
+
+
 :copyfiledirtodir_func_2x0
 rem ======================================== copyfiledirtodir_func_2x0
 rem desc: 复制 [src文件或者目录] 到 目标目录 [dst目录] 如果dst目录存在那么不执行复制操作
@@ -158,7 +227,7 @@ rem sample_out:
 echo ______________Method_In copyfiledirtodir_func_2x0
 set copy_src_file=%1
 set copy_dest_dirfile=%2
-call :isfileexist_func_1x1  %copy_dest_dirfile%
+call ::isfileexist_func_1x1  %copy_dest_dirfile%
 set copy_dest_dirfile_existflag=!isfileexist_return_1!
 echo copy_dest_dirfile_existflag=%copy_dest_dirfile_existflag%
 if "%copy_dest_dirfile_existflag%"=="true" (
@@ -166,11 +235,21 @@ echo 当前src文件 To dst目标文件夹  src=[%1]   dst=[%2]  由于dst目标
 echo [copyfiledirtodir_func_2x0 EndPrintCode]    output=[__empty__] param1=[%1]   param2=[%2]   
 echo ______________Method_Out copyfiledirtodir_func_2x0
 GOTO:EOF
+) else (
+echo 当前src文件 To dst目标文件夹  src=[%1]   dst=[%2]  由于目标文件夹不存在 那么创建这样的文件夹
+rem mkdir %2
 )
 echo copy_src_file=[%copy_src_file%]  copy_dest_dirfile=[%copy_dest_dirfile%]
 echo 执行 xcopy 命令 复制文件(夹)[%copy_src_file%]   到目标文件夹[%copy_dest_dirfile%]   命令如下:
-echo xcopy /y /c  /e /h /r /s "%copy_src_file%\*.*" "%copy_dest_dirfile%\"
+call ::isrealfile_func_1x1 %copy_src_file%
+set copy_srcfile_isrealfile=!isrealfile_return_1!
+if "%copy_dest_dirfile_existflag%"=="true" (
+echo xcopy  "%copy_src_file%" "%copy_dest_dirfile%\"      [复制文件]
+xcopy  "%copy_src_file%" "%copy_dest_dirfile%\"
+) else (
+echo xcopy /y /c  /e /h /r /s "%copy_src_file%\*.*" "%copy_dest_dirfile%\"      [复制文件夹]
 xcopy /y /c  /e /h /r /s "%copy_src_file%\*.*" "%copy_dest_dirfile%\"
+)
 echo [copyfiledirtodir_func_2x0 EndPrintCode]    output=[__empty__] param1=[%1]   param2=[%2]   
 echo ______________Method_Out copyfiledirtodir_func_2x0
 ::ENDLOCAL
@@ -211,6 +290,42 @@ echo  7z.exe -y -p""  x "%1" -o!zip_express_dir!
 set expressfiletodir_return_1=!zip_notype_dir_path!
 echo [expressfiletodir_func_1x1 EndPrintCode]   expressfiletodir_return_1=[!expressfiletodir_return_1!]   param1=[%1]   
 echo ______________Method_Out expressfiletodir_func_1x1
+::ENDLOCAL
+goto:eof
+
+
+
+
+:expressfiletoinputdir_func_2x0
+rem ======================================== expressfiletoinputdir_func_2x0
+rem desc: 把当前的zip tar .gz .7z 解压到指定的文件夹 并不返回数值
+rem sample: 
+rem sample_out: 
+::SETLOCAL
+echo ______________Method_In expressfiletoinputdir_func_2x0
+set zip_full_path=%1
+echo zip_full_path=%zip_full_path%
+rem  [getfilenamenopointwithfullpath_func_1x1 ]   getfilenamenopointwithfullpath_return_1=[A0]   param1=[C:\Users\xxx\Desktop\zbin\A0.bat]
+call ::getfilenamenopointwithfullpath_func_1x1  %1
+set zip_notype_name=!getfilenamenopointwithfullpath_return_1!
+echo zip_notype_name=!zip_notype_name!
+echo zip_source_dir=%2\zip_notype_name
+call :isfileexist_func_1x1  %2\!zip_notype_name!
+set zip_targetdir_path_existflag=!isfileexist_return_1!
+if "%zip_targetdir_path_existflag%"=="true" (
+echo 当前压缩文件 %1 已经存在对应的解压缩文件夹  %2\!zip_notype_name!   跳过解压缩流程！  如果要测试请删除对应的文件夹
+echo [expressfiletoinputdir_func_2x0 EndPrintCode]    output=[__empty__] param1=[%1]   param2=[%2]   
+echo ______________Method_Out expressfiletoinputdir_func_2x0
+GOTO:EOF
+)
+set zip_express_dir=%2
+echo zip_express_dir=!zip_express_dir!
+echo 当前压缩文件 %1 将解压到文件夹  !zip_express_dir!  中！
+echo  7z.exe -y -p""  x "%1" -o!zip_express_dir!
+7z.exe -y -p""  x "%1" -o!zip_express_dir!
+set expressfiletodir_return_1=!zip_notype_dir_path!
+echo [expressfiletoinputdir_func_2x0 EndPrintCode]    output=[__empty__] param1=[%1]   param2=[%2]   
+echo ______________Method_Out expressfiletoinputdir_func_2x0
 ::ENDLOCAL
 goto:eof
 
@@ -642,6 +757,70 @@ goto:eof
 
 
 
+:isrealfile_func_1x1
+rem ======================================== isrealfile_func_1x1
+rem desc: 检测文件是否存在    不存在 返回false   存在那么 继续判断是否是文件 如果是 那么返回true   是文件夹返回false
+rem sample: call :isrealfile_func_1x1  %zbin%/A0.bat
+rem sample_out: [isrealfile_func_1x1 ]   isfileexist_return_1=[true]   param1=[C:\Users\xxx\Desktop\zbin/A0.bat]
+::SETLOCAL
+echo ______________Method_In isrealfile_func_1x1
+set isrealfile_exist=false
+if exist %1 (
+set isrealfile_exist=true
+) else (
+set isrealfile_exist=false
+set isrealfile_return_1=false
+echo [isrealfile_func_1x1 EndPrintCode]   isrealfile_return_1=[!isrealfile_return_1!]   param1=[%1]   
+echo ______________Method_Out isrealfile_func_1x1
+goto:eof
+)
+if "%isrealfile_exist%"=="true" (
+if exist test\. (
+set isrealfile_return_1=false
+) else (
+set isrealfile_return_1=true
+) 
+)
+echo [isrealfile_func_1x1 EndPrintCode]   isrealfile_return_1=[!isrealfile_return_1!]   param1=[%1]   
+echo ______________Method_Out isrealfile_func_1x1
+::ENDLOCAL
+goto:eof
+
+
+
+
+:isdirfile_func_1x1
+rem ======================================== isdirfile_func_1x1
+rem desc: 检测文件夹是否存在    不存在 返回false   存在那么 继续判断是否是文件夹 如果是 那么返回true   是文件返回false
+rem sample: call :isdirfile_func_1x1  %zbin%/A0.bat
+rem sample_out: [isdirfile_func_1x1 ]   isfileexist_return_1=[true]   param1=[C:\Users\xxx\Desktop\zbin/A0.bat]
+::SETLOCAL
+echo ______________Method_In isdirfile_func_1x1
+set isdirfile_exist=false
+if exist %1 (
+set isdirfile_exist=true
+) else (
+set isdirfile_exist=false
+set isdirfile_return_1=false
+echo [isdirfile_func_1x1 EndPrintCode]   isdirfile_return_1=[!isdirfile_return_1!]   param1=[%1]   
+echo ______________Method_Out isdirfile_func_1x1
+goto:eof
+)
+if "%isdirfile_exist%"=="true" (
+if exist test\. (
+set isdirfile_return_1=true
+) else (
+set isdirfile_return_1=false
+) 
+)
+echo [isdirfile_func_1x1 EndPrintCode]   isdirfile_return_1=[!isdirfile_return_1!]   param1=[%1]   
+echo ______________Method_Out isdirfile_func_1x1
+::ENDLOCAL
+goto:eof
+
+
+
+
 :readfile_func_1x0
 rem ======================================== readfile_func_1x0
 rem desc: 读取指定全路径文件的每行内容
@@ -672,25 +851,22 @@ rem ======================== FILE_OPERATION End========================
 rem ======================== SYSTEM_OPERATION Begin======================== 
 
 
-:showcmdercommand_func_0x0
-rem ======================================== showcmdercommand_func_0x0
+:showcmdercommand_func_1x0
+rem ======================================== showcmdercommand_func_1x0
 rem desc: 
 rem sample: 
 rem sample_out: 
 ::SETLOCAL
-echo ______________Method_In showcmdercommand_func_0x0
-for /f "delims=" %%j in ('dir /b /a-d /s "*Cmder.exe"') do (
-echo num=!exe_count! %%j 
-echo  %%j /REGISTER ALL  
-%%j /REGISTER ALL  
-start %%j
+echo ______________Method_In showcmdercommand_func_1x0
+echo  %1 /REGISTER ALL  
+%1 /REGISTER ALL  
+start %1
 echo;
 echo;
 echo ========= please add command as environment settings in Cmder.exe =========
 echo;
 echo set PATH=%%ConEmuBaseDir%%\Scripts;%%PATH%%
 echo set PATH=%%USERPROFILE%%\Desktop\zbin\win_zbin;%%PATH%%
-echo set PATH= C:\Windows\System32;%%PATH%%
 echo alias cdd=cd /D %%USERPROFILE%%\Desktop
 echo alias cdz=cd /D %%USERPROFILE%%\Desktop\zbin
 echo set LANG=zh_CN.UTF-8
@@ -698,9 +874,8 @@ echo;
 rem echo set PATH=%ConEmuBaseDir%\Scripts;%PATH%
 rem echo set PATH=E:\Temp_Install\jdk\bin;%PATH%
 rem echo set PATH=%USERPROFILE%\Desktop\zbin\win_zbin;%PATH%
-)
-echo [showcmdercommand_func_0x0 EndPrintCode]   output=[__empty__]  param1=[__empty__] 
-echo ______________Method_Out showcmdercommand_func_0x0
+echo [showcmdercommand_func_1x0 EndPrintCode]    output=[__empty__] param1=[%1]   
+echo ______________Method_Out showcmdercommand_func_1x0
 ::ENDLOCAL
 goto:eof
 
@@ -2570,7 +2745,7 @@ goto:eof
 
 :rule18vinstalllocalsoft_func_0x0
 rem ======================================== rule18vinstalllocalsoft_func_0x0
-rem rule_tip: %init_input_0% _18_  ## 安装本地zsoft的软件 1.解压 2.复制zbin 3.配置环境变量 4.静默安装 5.添加绿色软件桌面icon
+rem rule_tip: %init_input_0% _18_  ## 安装本地zsoft到zsoft_dest目录 1.解压 2.复制zbin 3.配置环境变量 4.静默安装 5.添加绿色软件桌面icon
 
 rem desc: 安装本地zsoft的软件 1.解压 2.复制zbin 3.配置环境变量 4.静默安装 5.添加绿色软件桌面icon
 rem sample: 
@@ -2578,6 +2753,11 @@ rem sample_out:
 ::SETLOCAL
 echo ______________Method_In rule18vinstalllocalsoft_func_0x0
 echo init_cd=!init_cd!
+call ::getfiledp_func_1x1 !init_cd!
+set zsoft_parent_dir=!getfiledp_return_1!
+set zsoft_dest_dir=!zsoft_parent_dir!zsoft_dest
+echo zsoft_parent_dir=!zsoft_parent_dir!
+echo zsoft_dest_dir=!zsoft_dest_dir!
 call ::getfilenamenopointwithfullpath_func_1x1  !init_cd!
 echo init_cd_dirname=!getfilenamenopointwithfullpath_return_1!
 if not "!getfilenamenopointwithfullpath_return_1!"=="zsoft"  (
@@ -2587,8 +2767,16 @@ echo ______________ rule18_1_Error Error Error Error Error End ______________
 echo [rule18vinstalllocalsoft_func_0x0 EndPrintCode]   output=[__empty__]  param1=[__empty__] 
 echo ______________Method_Out rule18vinstalllocalsoft_func_0x0
 goto:eof
-) 
-echo 1.解压当前所有 .zip .rar .7z 压缩文件   范围[1.当前目录内  2.当前目录子目录内 3.不包含孙目录 ]
+)
+call :isfileexist_func_1x1  !zsoft_dest_dir!
+set zsoft_dest_dir_existflag=!isfileexist_return_1!
+if "%zsoft_dest_dir_existflag%"=="true" (
+echo 当前zsoft目录[!init_cd!]  对应的使能目录[!zsoft_dest_dir!] 已存在了!!!
+) else (
+echo 当前zsoft目录[!init_cd!]  对应的使能目录[!zsoft_dest_dir!]   不存在 将创建这个目录!!!
+mkdir  !zsoft_dest_dir!
+)
+echo 1.解压zsoft所有 .zip .rar .7z 压缩文件   范围[1.当前目录内  2.当前目录子目录内 3.不包含孙目录 ]
 
 echo ____________________________ 显示当前 !init_cd! 目录 .zip 文件列表 Begin ____________________________
 call :showsubfile4dir4type_func_2x0 !init_cd!  *.zip
@@ -2600,8 +2788,9 @@ for /f "delims=\" %%a in ('dir /b /a-d /o-d "!init_cd!\*.zip"') do (
 set /a index_zip_file+=1
 rem %1\%%a    %%a是文件名字    %1 !init_cd! 是当前搜索目录   zip[0]  D:\Local_Soft_Test\zsoft\zbin.zip
 set zip_file_fullpath=!init_cd!/%%a
-echo zip[!index_zip_file!] == !zip_file_fullpath!  开始执行解压缩操作
-call ::expressfiletodir_func_1x1  !zip_file_fullpath!
+rem  zsoft/zbin.zip   express To  zsoft_dest/
+echo zip[!index_zip_file!] == !zsoft_dest_dir!  开始执行解压缩操作
+call ::expressfiletoinputdir_func_2x0 !zip_file_fullpath!  !zsoft_dest_dir!
 )
 echo ____________________________ 解压缩 !init_cd! 目录 .zip 文件列表 Endxx ____________________________
 
@@ -2620,16 +2809,55 @@ for /f "delims=\" %%b in ('dir /b /a-d /o-d "%%a\*.zip"') do (
 set /a index_zip_file+=1
 rem %1\%%a    %%a是文件名字    %1 !init_cd! 是当前搜索目录   zip[0]  D:\Local_Soft_Test\zsoft\zbin.zip
 set zip_file_fullpath=%%a/%%b
-echo zip[!index_zip_file!] == !zip_file_fullpath!  开始执行解压缩操作
-call ::expressfiletodir_func_1x1  !zip_file_fullpath!
+call ::getfilenx_func_1x1 %%a
+set local_sondir_name=!getfilenx_return_1!
+echo GG_A=%%a
+echo GG_B=%%b
+echo local_sondir_name=!local_sondir_name!
+set  zsoftdst_zipdir_fullpath=!zsoft_dest_dir!\!local_sondir_name!
+echo zsoft_sondir_name=[!zsoft_dest_dir!\!local_sondir_name!]  [!zsoftdst_zipdir_fullpath!]
+echo zip[!index_zip_file!] ==  !zsoft_dest_dir!!local_sondir_name! 开始执行解压缩操作
+call ::expressfiletoinputdir_func_2x0 !zip_file_fullpath!  !zsoftdst_zipdir_fullpath!
+rem zip[1] == D:\TEMP\ZZ\zsoft\Z1_Must_Manual_Zip/IDEA_IntelliJ_2018.3.3.zip  开始执行解压缩操作
+rem call ::expressfiletodir_func_1x1  !zip_file_fullpath!
 )
 echo ____________________________ 解压缩 %%a 目录下 .zip 文件列表 Endxx ____________________________
+
+echo ____________________________ 复制 %%a 目录下 .exe .mci 文件列表 Begin ____________________________
+set /a index_exe_file = 1
+for /f "delims=\" %%b in ('dir /b /a-d /o-d "%%a\*.*"') do (
+rem  需要 过滤 掉 zip 文件 
+set exe_file_fullpath=%%a\%%b
+call ::getfilex_func_1x1 !exe_file_fullpath!
+set cur_exefile_type=!getfilex_return_1!
+echo cur_exefile_type=!cur_exefile_type!    exe_file_fullpath=!exe_file_fullpath!
+if "!cur_exefile_type!"==".zip" (
+rem echo 当前选中文件 !exe_file_fullpath!  是 zip 文件 跳过复制 该文件的操作!
+) else (
+rem 当前选中文件 exe[1]=[D:\TEMP\ZZ\zsoft\B0_Slient1_OneExe_Local_Install/YoudaoDictSetup_8.9.6.0.exe]  非zip 文件   copyfiledirtodir_func_2x0  D:\TEMP\ZZ\zsoft\B0_Slient1_OneExe_Local_Install/YoudaoDictSetup_8.9.6.0.exe   D:\TEMP\ZZ\zsoft_dest
+echo=
+echo 当前选中文件 exe[!index_exe_file!]=[!exe_file_fullpath!]  非zip 文件   copyfiledirtodir_func_2x0  !exe_file_fullpath!   !zsoft_dest_dir!   将执行复制该文件的操作!
+rem copyfiledirtodir_func_2x0  D:\TEMP\ZZ\zsoft\B0_Slient1_OneExe_Local_Install/YoudaoDictSetup_8.9.6.0.exe   D:\TEMP\ZZ\zsoft_dest\B0_Slient1_OneExe_Local_Install
+echo GG_exeA=%%a
+echo GG_exeB=%%b
+call ::getfilenx_func_1x1 %%a
+set cur_exedir_name=!getfilenx_return_1!
+echo cur_exedir_name=!cur_exedir_name!
+rem GG_exeA=D:\TEMP\ZZ\zsoft\C0_Green_OneExe
+set zsoftdst_exedir_name=!zsoft_dest_dir!\!cur_exedir_name!
+echo zsoftdst_exedir_name=!zsoftdst_exedir_name!
+echo   copyfiledirovertodir_func_2x0  !exe_file_fullpath!   !zsoftdst_exedir_name!
+set /a index_exe_file+=1
+call ::copyfiledirovertodir_func_2x0  !exe_file_fullpath!   !zsoftdst_exedir_name!
+)
+)
+echo ____________________________ 复制 %%a 目录下 .exe .mci 文件列表 Endxx ____________________________
 )
 echo ____________________________ 开始解压 子目录 中的 zip 文件   End ____________________________
 
-echo ____________________________ 开始执行 复制当前 !init_cd!\zbin\ 目录 到 !desktop! 目录的操作 Begin ____________________________
-call ::copyfiledirtodir_func_2x0  !init_cd!\zbin\  !zbin!
-echo ____________________________ 开始执行 复制当前 !init_cd!\zbin\ 目录 到 !desktop! 目录的操作 Endxx ____________________________
+echo ____________________________ 开始执行 复制当前 !zsoft_dest_dir!\zbin\ 目录 到 !desktop! 目录的操作 Begin ____________________________
+call ::copyfiledirtodir_func_2x0  !zsoft_dest_dir!\zbin\  !zbin!
+echo ____________________________ 开始执行 复制当前 !zsoft_dest_dir!\zbin\ 目录 到 !desktop! 目录的操作 Endxx ____________________________
 
 echo ____________________________ java python win_zbin ffmpeg notepad++ 添加到环境变量 Begin  ____________________________
 rem  javac.exe
@@ -2638,32 +2866,32 @@ rem  python.exe
 rem  python.exe-dir/Scripts/
 rem  %zbin%/win_zbin/    %win_zbin%   [包含了 adb ]
 rem  ffmpeg.exe
-call ::searchonetargetfile4dir4type_func_2x1  !init_cd!  javac.exe
+call ::searchonetargetfile4dir4type_func_2x1  !zsoft_dest_dir!  javac.exe
 set javac_file_fullpath=!searchonetargetfile4dir4type_return_1!
-rem  javac_file_fullpath=D:\Local_Soft_Test\zsoft\D0_Environment_Zip_Dir_Path\JDK8_64\bin\javac.exe
+rem  javac_file_fullpath=D:\zsoft_dest\D0_Environment_Zip_Dir_Path\JDK8_64\bin\javac.exe
 echo javac_file_fullpath=!javac_file_fullpath!
 call ::getfiledp_func_1x1 !javac_file_fullpath!
 set javac_dir_fullpath=!getfiledp_return_1!
 echo javac_dir_fullpath=!javac_dir_fullpath!  javac_file_fullpath=!javac_file_fullpath!
-call ::searchonetargetfile4dir4type_func_2x1  !init_cd!  java.exe
+call ::searchonetargetfile4dir4type_func_2x1  !zsoft_dest_dir!  java.exe
 set java_file_fullpath=!searchonetargetfile4dir4type_return_1!
 echo java_file_fullpath=!java_file_fullpath!
 call ::getfiledp_func_1x1 !java_file_fullpath!
 set java_dir_fullpath=!getfiledp_return_1!
 echo java_dir_fullpath=!java_dir_fullpath!  java_file_fullpath=!java_file_fullpath!
-call ::searchonetargetfile4dir4type_func_2x1  !init_cd!  python.exe
+call ::searchonetargetfile4dir4type_func_2x1  !zsoft_dest_dir!  python.exe
 set python_file_fullpath=!searchonetargetfile4dir4type_return_1!
 echo python_file_fullpath=!python_file_fullpath!
 call ::getfiledp_func_1x1 !python_file_fullpath!
 set python_dir_fullpath=!getfiledp_return_1!
 echo python_dir_fullpath=!python_dir_fullpath!  python_file_fullpath=!python_file_fullpath!
-call ::searchonetargetfile4dir4type_func_2x1  !init_cd!  notepad++.exe
+call ::searchonetargetfile4dir4type_func_2x1  !zsoft_dest_dir!  notepad++.exe
 set notepad_file_fullpath=!searchonetargetfile4dir4type_return_1!
 echo notepad_file_fullpath=!notepad_file_fullpath!
 call ::getfiledp_func_1x1 !notepad_file_fullpath!
 set notepad_dir_fullpath=!getfiledp_return_1!
 echo notepad_dir_fullpath=!notepad_dir_fullpath!  notepad_file_fullpath=!notepad_file_fullpath!
-call ::searchonetargetfile4dir4type_func_2x1  !init_cd!  ffmpeg.exe
+call ::searchonetargetfile4dir4type_func_2x1  !zsoft_dest_dir!  ffmpeg.exe
 set ffmpeg_file_fullpath=!searchonetargetfile4dir4type_return_1!
 echo ffmpeg_file_fullpath=!ffmpeg_file_fullpath!
 call ::getfiledp_func_1x1 !ffmpeg_file_fullpath!
@@ -2685,21 +2913,26 @@ echo ____________________________ java 执行 %desktop%\zbin\J1_InstallSoftware.
 echo %javac_file_fullpath%  -cp %desktop%\zbin\J1_guava.jar;%desktop%\zbin\J1_jshortcut_oberzalek.jar -Xlint:unchecked  -encoding UTF-8   %desktop%\zbin\J1_InstallSoftware.java
 call %javac_file_fullpath%  -cp %desktop%\zbin\J1_guava.jar;%desktop%\zbin\J1_jshortcut_oberzalek.jar -Xlint:unchecked  -encoding UTF-8  %desktop%\zbin\J1_InstallSoftware.java
 echo;
-echo %java_file_fullpath% -cp %desktop%\zbin\J1_guava.jar;%desktop%\zbin\J1_jshortcut_oberzalek.jar;%desktop%\zbin  J1_InstallSoftware  %init_cd%
-call %java_file_fullpath% -cp %desktop%\zbin\J1_guava.jar;%desktop%\zbin\J1_jshortcut_oberzalek.jar;%desktop%\zbin  J1_InstallSoftware  %init_cd%
+echo %java_file_fullpath% -cp %desktop%\zbin\J1_guava.jar;%desktop%\zbin\J1_jshortcut_oberzalek.jar;%desktop%\zbin  J1_InstallSoftware  !zsoft_dest_dir!
+call %java_file_fullpath% -cp %desktop%\zbin\J1_guava.jar;%desktop%\zbin\J1_jshortcut_oberzalek.jar;%desktop%\zbin  J1_InstallSoftware  !zsoft_dest_dir!
 echo ____________________________ java 执行 %desktop%\zbin\J1_InstallSoftware.java Endxx  ____________________________
 
 echo ____________________________ python pip安装工具 Begin  ____________________________
 rem  python  get-pip.py 
 call %python_file_fullpath% !python_dir_fullpath!get-pip.py     
 echo ____________________________ python pip安装工具 Endxx  ____________________________
-call J1_InstallSoft.bat
+echo J1_InstallSoft.bat__PATH=!zsoft_dest_dir!\J1_InstallSoft.bat
+call !zsoft_dest_dir!\J1_InstallSoft.bat
 echo ____________________________ Cmder 注册 Setting Environment 提示 Begin  ____________________________
-call ::showcmdercommand_func_0x0
+call ::searchonetargetfile4dir4type_func_2x1  !zsoft_dest_dir!  Cmder.exe
+set cmder_file_fullpath=!searchonetargetfile4dir4type_return_1!
+echo cmder_file_fullpath=!cmder_file_fullpath!
+call ::showcmdercommand_func_1x0 !cmder_file_fullpath!
 echo ____________________________ Cmder 注册 Setting Environment 提示 Endxx  ____________________________
 
 echo ____________________________ 执行 notepad.reg 注册notepad到右键菜单 Begin  ____________________________
-call notepad.reg 
+echo notepad.reg__PATH=!zsoft_dest_dir!\notepad.reg 
+call !zsoft_dest_dir!\notepad.reg 
 echo ____________________________ 执行 notepad.reg 注册notepad到右键菜单 End  ____________________________
 echo [rule18vinstalllocalsoft_func_0x0 EndPrintCode]   output=[__empty__]  param1=[__empty__] 
 echo ______________Method_Out rule18vinstalllocalsoft_func_0x0
@@ -2772,7 +3005,7 @@ echo %init_input_0% _16_  192.168.31.10:5555   ##荣耀_无线USB_无线adb adb 
 
 echo %init_input_0% _17_       ##把 连接adb的 手机 执行 adb dump service 抓取一些配置文件 命令 到 adb_dump_时间戳 文件夹
 
-echo %init_input_0% _18_  ## 安装本地zsoft的软件 1.解压 2.复制zbin 3.配置环境变量 4.静默安装 5.添加绿色软件桌面icon
+echo %init_input_0% _18_  ## 安装本地zsoft到zsoft_dest目录 1.解压 2.复制zbin 3.配置环境变量 4.静默安装 5.添加绿色软件桌面icon
 echo [ruletipprint_func_0x0 EndPrintCode]   output=[__empty__]  param1=[__empty__] 
 echo ______________Method_Out ruletipprint_func_0x0
 ::ENDLOCAL
