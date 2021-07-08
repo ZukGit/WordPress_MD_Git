@@ -317,13 +317,23 @@ public class G2_ApplyRuleFor_TypeFile {
 
 
 	class Revert_xlsx2json_Rule_38 extends Basic_Rule {
+		boolean isDirOperation;  // 是否没有输入 xlsx 文件 而是 输入了一个 目录  默认shell 目录 已经 输入的目录 
 
+		File inputDirFile;
 		ArrayList<File> xlsxFileList ;
 		Revert_xlsx2json_Rule_38() {
 			super("#", 38, 3); //
 			xlsxFileList = new ArrayList<File>();
+			inputDirFile = null;
+			isDirOperation = false;
 		}
 
+		@Override
+		boolean allowEmptyDirFileList() {
+		// TODO Auto-generated method stub
+		return true;
+		}
+		
 		@Override
 		ArrayList<File> applyFileListRule3(ArrayList<File> subFileList, HashMap<String, ArrayList<File>> fileTypeMap) {
 			// TODO Auto-generated method stub
@@ -336,9 +346,23 @@ public class G2_ApplyRuleFor_TypeFile {
 				String getxlsxNameNoType = getFileNameNoPoint(xlsxFileName);
 				String resut_json_xlsx_name = xlsxFileName.replace(".", "_")+"_"+getTimeStamp();
 //				String resut_json_xlsx_name = getxlsxNameNoType+".json";
+				File xlsxFile_resultDir = null ;
 
-				File xlsxFile_resultDir = new File(xlsxFile.getParentFile().getAbsolutePath()+File.separator+resut_json_xlsx_name);
-				reverXlsxToJson(xlsxFile,xlsxFile_resultDir);
+				if(isDirOperation && inputDirFile != null) {
+					xlsxFile_resultDir = inputDirFile;
+					String resultJsonName = getxlsxNameNoType+".json";
+					File resultJsonFile = new File(inputDirFile.getAbsolutePath()+File.separator+resultJsonName);
+					if(resultJsonFile.exists()) {
+						// 如果当前 目录 已经 有 xxxx.xlsx 对应的 xxxxx.json 文件  那么 就不解析 这个 xlsx文件 
+						continue;
+					}
+					 reverXlsxToJson(xlsxFile,xlsxFile_resultDir,true);
+				}else {
+					// 如果 不是 输入 目录 的 话  那么就创建 xlsx 的 文件名称   如果是目录的话  那么就在当前目录生成 .json 
+					 xlsxFile_resultDir = new File(xlsxFile.getParentFile().getAbsolutePath()+File.separator+resut_json_xlsx_name);
+					 reverXlsxToJson(xlsxFile,xlsxFile_resultDir,false);
+				}
+				
 			}
 
 			return super.applyFileListRule3(subFileList, fileTypeMap);
@@ -349,6 +373,9 @@ public class G2_ApplyRuleFor_TypeFile {
 
 			return  Cur_Bat_Name + " #_"+rule_index+"  <指定A.xlsx文件> <指定B.xls文件>  ### 按顺序解析当前的xlsx xls 为对应的json文件 生成在相同文件名_时间戳的文件夹中   \n"
 					+ Cur_Bat_Name + " #_"+rule_index+"  A.xlsx B.xls C.xlsx   ### 按顺序解析当前的xlsx day20200202.xls 为对应的day_20200202.json文件 生成在相同文件名_时间戳的文件夹中    \n"
+					+ Cur_Bat_Name + " #_"+rule_index+"   ### 解析当前 shell-path 目录下的xlsx 文件 生成对应的.json 文件  没有直接返回    \n"
+					+ Cur_Bat_Name + " #_"+rule_index+"  C:\\Users\\xxx\\Desktop\\zbin\\J0_Data  ### 解析指定目录下的xlsx 文件 生成对应的.json 文件 没有直接返回    \n"
+
 					;
 		}
 
@@ -364,22 +391,101 @@ public class G2_ApplyRuleFor_TypeFile {
 					if (inputFileName.endsWith(".xlsx") || inputFileName.endsWith(".xls") ) {
 						xlsxFileList.add(tempFile);
 					}
+					
+	
 				}
+				
+				File inputDir = new File(strInput);
+				if(inputDir.exists() && inputDir.isDirectory()) {
+					isDirOperation = true;
+					inputDirFile = inputDir;
+				}
+				
+				System.out.println("initParamsWithInputList["+i+"] = "+strInput +"  inputDir.exists()="+inputDir.exists()+"  inputDir.isDirectory()="+inputDir.isDirectory());
+				
 			}
 
-			if (xlsxFileList.size() == 0) {
+			if (xlsxFileList.size() == 0 && inputDirFile == null) {
 				System.out.println("当前 输入的 xlsx 文件 为 空 无法获取 输入的 xlsx 请检查 输入!! ");
-				return false;
+				File shellDir = new File(curDirPath);
+				if(shellDir != null && shellDir.exists()) {
+					File[]  listArr = shellDir.listFiles();
+					
+					if(listArr == null || listArr.length ==0) {
+						System.out.println("当前 输入的目录  "+inputDirFile.getAbsolutePath()+"没有 任何文件操作!!");
+
+						return false;
+					}
+					for (int i = 0; i < listArr.length; i++) {
+						File fileItem = listArr[i];
+						
+						String inputFileName = fileItem.getName().toLowerCase();
+						if (inputFileName.endsWith(".xlsx") || inputFileName.endsWith(".xls") ) {
+							xlsxFileList.add(fileItem);
+							isDirOperation = true;
+							inputDirFile = shellDir;
+						}
+						
+					}
+					
+					
+					
+					
+				}else {
+					System.out.println("当前 输入的 xlsx 文件为空  shell目录为空 无法获取 输入的 xlsx 请检查 输入!! ");
+					return false;
+					
+				}
+				
+				
+		
+			}
+			
+			if(inputDirFile != null) {
+				File[]  listArr = inputDirFile.listFiles();
+				if(listArr == null || listArr.length ==0) {
+					System.out.println("当前 输入的目录  "+inputDirFile.getAbsolutePath()+"没有 任何文件操作!!");
+
+					return false;
+				}
+				for (int i = 0; i < listArr.length; i++) {
+					File fileItem = listArr[i];
+					
+					String inputFileName = fileItem.getName().toLowerCase();
+					if (inputFileName.endsWith(".xlsx") || inputFileName.endsWith(".xls") ) {
+						xlsxFileList.add(fileItem);
+					}
+					
+				}
+				
+
 			}
 
 
+			if(xlsxFileList.size() == 0  ) {
+				System.out.println("当前 输入的目录  inputDirFile ="+( inputDirFile == null ? "null":inputDirFile.getAbsolutePath() )+"没有 任何文件的 .xls .xlsx文件进行操作!!");
+
+				return false;
+			
+			}
+			if(inputDirFile == null) {
+				System.out.println("ZXX inputDirFile = null " +    " xlsxFileList.size()="+xlsxFileList.size()+"   isDirOperation="+isDirOperation);
+	
+			}else {
+				System.out.println("ZXX inputDirFile ="+inputDirFile.getAbsolutePath() +"    xlsxFileList.size()="+xlsxFileList.size()+"   isDirOperation="+isDirOperation);
+
+			}
+			
+			
+
+			
 			// TODO Auto-generated method stub
 			return super.initParamsWithInputList(inputParamList);
 		}
 
 
 
-		public  void reverXlsxToJson(File xlsxFile , File jsonResultDirFile) {
+		public  void reverXlsxToJson(File xlsxFile , File jsonResultDirFile,boolean isDirOperation) {
 			try {
 				FileInputStream inp = new FileInputStream(xlsxFile.getAbsolutePath());
 
@@ -495,11 +601,17 @@ public class G2_ApplyRuleFor_TypeFile {
 						}
 					}
 					String jsonName = sheet.getSheetName()+".json";
-					File jsonFile = new File(jsonResultDirFile.getAbsolutePath()+File.separator+jsonName);
+					
+					if(!isDirOperation) {   //  如果是 单一的 输入 xlsx 文件 那么才 输出 sheetname.json
+						File jsonFile = new File(jsonResultDirFile.getAbsolutePath()+File.separator+jsonName);
 
-					System.out.println(jsonArray.toJSONString());
-		
-					writeContentToFile(jsonFile, jsonArray.toJSONString()+"\n");
+						System.out.println(jsonArray.toJSONString());
+			
+						writeContentToFile(jsonFile, jsonArray.toJSONString()+"\n");
+					}
+	
+					
+					
 					jsonObject.put(sheet.getSheetName(), jsonArray);
 				}
 //		            System.out.println(jsonObject.toJSONString());

@@ -2918,6 +2918,14 @@ call %java_file_fullpath% -cp %desktop%\zbin\J1_guava.jar;%desktop%\zbin\J1_jsho
 echo ____________________________ java 执行 %desktop%\zbin\J1_InstallSoftware.java Endxx  ____________________________
 
 echo ____________________________ python pip安装工具 Begin  ____________________________
+
+rem   复制所有的 .whl 文件到 !python_dir_fullpath!wheel_tool_dir/文件夹中
+for /r %init_cd% %%j in  (*.whl*)do (
+set whl_file_fullpath=%%j
+echo  whl_file_fullpath=!whl_file_fullpath!
+echo  call ::copyfiledirovertodir_func_2x0  !whl_file_fullpath!   !python_dir_fullpath!wheel_tool_dir\
+call ::copyfiledirovertodir_func_2x0  !whl_file_fullpath!   !python_dir_fullpath!wheel_tool_dir\
+)
 rem  python  get-pip.py 
 call %python_file_fullpath% !python_dir_fullpath!get-pip.py     
 echo ____________________________ python pip安装工具 Endxx  ____________________________
@@ -3067,9 +3075,14 @@ rem Tip:  ruleXXvmethodName_func_xx  是定义 rule方法的固定格式
 rem ======================== 主函数main函数入口   
 :____Main____
 echo __________________ Main_Method Begin _______________________
-call :helloworld_func_0x0
+call ::helloworld_func_0x0
+for /r %init_cd% %%j in  (*.whl*)do (
+set whl_file_fullpath=%%j
+echo  whl_file_fullpath=!whl_file_fullpath!
 
-call :recordfilenametofile_func_1x1 %zbin%
+)
+
+call ::recordfilenametofile_func_1x1 %zbin%
 echo __________________ Main_Method End _______________________
 goto:eof
 rem ══════════════════════════════════════════ Main_Enter_Aera End══════════════════════════════════════════

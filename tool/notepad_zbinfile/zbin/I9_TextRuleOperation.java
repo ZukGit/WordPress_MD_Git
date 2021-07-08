@@ -395,12 +395,137 @@ public class I9_TextRuleOperation {
 		
 		// 检测当前的 txt文件  只 保留 url 内容 , 并 对这些 内容 进行 排序 在 temp 中 打印出来 
 
+		 // 去除在PC微信中多选复制文本出现的多余内容 只保留有用信息的规则
+		CUR_RULE_LIST.add(new Fixed_PCWeCharContent_KeepUsedInfo_Rule_38());
 		
 //        CUR_RULE_LIST.add( new Image2Png_Rule_4());
 //        CUR_RULE_LIST.add( new AVI_Rule_5());
 //        CUR_RULE_LIST.add( new SubDirRename_Rule_6());
 //        CUR_RULE_LIST.add( new Encropty_Rule_7());
 //        CUR_RULE_LIST.add( new ClearChineseType_8());
+
+	}
+	
+	
+	
+	class Fixed_PCWeCharContent_KeepUsedInfo_Rule_38 extends Basic_Rule {
+
+
+
+		Fixed_PCWeCharContent_KeepUsedInfo_Rule_38() {
+			super(38, false);
+		}
+
+		@Override
+		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
+				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+			for (int i = 0; i < curInputFileList.size(); i++) {
+				File fileItem = curInputFileList.get(i);
+
+//                ArrayList<String>  fixedStrArr =   clearChinese_Rule_13(fileItem);
+				ArrayList<String> fixedStrArr = clearPC_DuoYu_Content(fileItem);
+				System.out.println("════════════" + "输出文件 Begin " + "════════════");
+				for (int j = 0; j < fixedStrArr.size(); j++) {
+					System.out.println(fixedStrArr.get(j));
+				}
+				System.out.println("════════════" + "输出文件 End " + "════════════");
+				writeContentToFile(I9_Temp_Text_File, fixedStrArr);
+				NotePadOpenTargetFile(I9_Temp_Text_File.getAbsolutePath());
+				System.out.println("rule_" + rule_index + " ->  把当前文件的每一行 都 转为 System.out.println(xx) 的内容   File="
+						+ fileItem.getAbsolutePath());
+			}
+
+			return super.applyOperationRule(curFileList, subFileTypeMap, curDirList, curRealFileList);
+		}
+
+		@Override
+		String simpleDesc() {
+			return "  去除在PC微信中多选复制文本出现的多余内容 只保留有用信息的规则 ";
+		}
+
+		// 3. 如果当前 执行 错误 checkParams 返回 false 那么 将 打印这个函数 说明错误的可能原因
+		@Override
+		void showWrongMessage() {
+			System.out.println("当前 type 索引 " + rule_index + " 执行错误  可能是输入参数错误 请检查输入参数!");
+			System.out.println(" errorMsg = " + errorMsg);
+		}
+
+		// 4. 当前 rule的 说明 将会打印在 用户输入为空时的 提示语句！
+		@Override
+		String ruleTip(String type, int index, String batName, OS_TYPE curType) {
+			String itemDesc = "";
+			if (curType == OS_TYPE.Windows) {
+				itemDesc = batName.trim() + "  " + type + "_" + index + "    [索引 " + index + "]  描述:" + ""
+						+ simpleDesc();
+			} else {
+				itemDesc = batName.trim() + " " + type + "_" + index + "    [索引 " + index + "]  描述:" + ""
+						+ simpleDesc();
+			}
+
+			return itemDesc;
+		}
+		
+		
+		
+	
+		public  ArrayList<String>	clearPC_DuoYu_Content(File  srcFile){
+			ArrayList<String> newContent = new ArrayList<String>();
+
+			File curFile = srcFile;
+			ArrayList<String> clearTagList = new 	ArrayList<String>();
+			clearTagList.add("[图片]");
+			clearTagList.add("[语音聊天]");
+			clearTagList.add("[视频聊天]");
+			clearTagList.add("[文件]");
+			clearTagList.add("[视频]");
+			clearTagList.add("[语音]");
+			clearTagList.add("[地理位置]");
+	
+			
+
+			if (curFile != null) {
+
+				FileReader curReader;
+				try {
+
+					curReader = new FileReader(curFile);
+
+					BufferedReader curBR = new BufferedReader(new InputStreamReader(new FileInputStream(curFile), "utf-8"));
+					String oldOneLine = "";
+					String newOneLine = "";
+
+					while (oldOneLine != null) {
+
+						oldOneLine = curBR.readLine();
+						if (oldOneLine == null || oldOneLine.trim().isEmpty()) {
+							continue;
+						}
+						
+						// 去除 以 : 结尾的 字符串行
+						if(oldOneLine.endsWith(":")) {
+							continue;
+						}
+				
+
+						if(clearTagList.contains(oldOneLine)) { 
+							 // 如果包含 [图片] 类型字符串 那么也过滤
+							continue;
+						}
+						
+
+						newContent.add(oldOneLine.trim());
+					}
+					curBR.close();
+
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			} else {
+				System.out.println("Failed !");
+			}
+			return newContent;
+		}
+		
 
 	}
 	
@@ -3406,6 +3531,7 @@ public class I9_TextRuleOperation {
 
 			CurRealFileList.addAll(Arrays.asList(fileList));
 
+			realFileNameList.add("____________________ 实体文件 ____________________");
 			for (int i = 0; i < CurRealFileList.size(); i++) {
 				File fileItem = CurRealFileList.get(i);
 				String fileName = fileItem.getName();
@@ -3413,6 +3539,20 @@ public class I9_TextRuleOperation {
 					realFileNameList.add(fileName);
 				}
 			}
+			
+			realFileNameList.add("\n");
+			realFileNameList.add("____________________ 目录文件 ____________________");
+
+			for (int i = 0; i < CurRealFileList.size(); i++) {
+				File fileItem = CurRealFileList.get(i);
+				String fileName = fileItem.getName();
+				if (fileItem.isDirectory() && fileItem.exists()) {
+					realFileNameList.add(fileName);
+				}
+			}
+			
+			
+			
 			writeContentToFile(I9_Temp_Text_File, realFileNameList);
 			NotePadOpenTargetFile(I9_Temp_Text_File.getAbsolutePath());
 
@@ -3421,7 +3561,7 @@ public class I9_TextRuleOperation {
 
 		@Override
 		String simpleDesc() {
-			return " 把当前 目录下的实体文件 的 文件名称打印出来 !";
+			return " 把当前 目录下的实体文件 以及文件夹 文件名称打印出来 !";
 		}
 
 	}
@@ -3564,7 +3704,7 @@ public class I9_TextRuleOperation {
 			String curShellPath = dirFile.getAbsolutePath();
 			ArrayList<String> command_ContentList = new ArrayList<String>();
 
-			File rule23_template_bat_file = new File(zbinPath + File.separator + "I9_Template_Rule23.bat");
+			File rule23_template_bat_file = new File(zbinPath + File.separator + "I9_Template_Rule23.txt");
 			if (!rule23_template_bat_file.exists()) {
 				System.out.println("当前模板文件不存在! 请检查  执行失败!  rule23_template_bat_file = "
 						+ rule23_template_bat_file.getAbsolutePath());

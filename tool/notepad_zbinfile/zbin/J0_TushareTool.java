@@ -1155,7 +1155,10 @@ writeContentToFile(dailyPythonFile,allDailyCode);
 
 
             sb.append(LinePre+"指定单个索引节点 仅执行一个"+LineEnd);
-
+            StringBuilder sb_gupiaoliebiao = new StringBuilder();
+            StringBuilder sb_jiaoyirili = new StringBuilder();
+            
+            
 //            sb.append("描述: "+" 依据索引对该索引对应的python文件进行创建 并 执行该python文件    单个文件的更新执行!\n");
 //            sb.append(Cur_Bat_Name+"  all &&  " + " "+ J0_call_single_python_bat_File.getAbsolutePath() );
 
@@ -1165,9 +1168,33 @@ writeContentToFile(dailyPythonFile,allDailyCode);
                 String paddingIndexStr= single_node.paddingBlockIndexStr;    // 0001
                 String single_block= paddingIndexStr + "_single";
                 String desc = getNodeDescWithName(single_node,paddingIndexStr,true);
-                sb.append(desc+"\n");
-                sb.append(Cur_Bat_Name+ "  "+single_block+" &&  " + " "+ J0_call_single_python_bat_File.getAbsolutePath()  +"  "+ paddingIndexStr+"\n");
-                sb.append("\n");
+
+                if(desc.contains("股票列表") && desc.contains("gupiaoliebiao")) {
+             
+                	sb_gupiaoliebiao.append(Cur_Bat_Name+ "  "+single_block+" &&  " + " "+ J0_call_single_python_bat_File.getAbsolutePath()  +"  "+ paddingIndexStr+" && "+" copy  "+ J0_Dir_Path+"股票列表.xlsx  "+zbinPath+File.separator+"J0_股票列表.xlsx  /y ");
+
+                    
+                    sb.append(desc+"\n");
+                    sb.append(Cur_Bat_Name+ "  "+single_block+" &&  " + " "+ J0_call_single_python_bat_File.getAbsolutePath()  +"  "+ paddingIndexStr+" && "+" copy  "+ J0_Dir_Path+"股票列表.xlsx  "+zbinPath+File.separator+"J0_股票列表.xlsx /y "+"\n");
+                    sb.append("\n");
+                    
+                }else if(desc.contains("交易日历") && desc.contains("jiaoyirili")) {
+                	sb_jiaoyirili.append(Cur_Bat_Name+ "  "+single_block+" &&  " + " "+ J0_call_single_python_bat_File.getAbsolutePath()  +"  "+ paddingIndexStr +" && "+" copy  "+ J0_Dir_Path+"交易日历.xlsx  "+zbinPath+File.separator+"J0_交易日历.xlsx /y ");
+
+        
+                    sb.append(desc+"\n");
+                    sb.append(Cur_Bat_Name+ "  "+single_block+" &&  " + " "+ J0_call_single_python_bat_File.getAbsolutePath()  +"  "+ paddingIndexStr +" && "+" copy  "+ J0_Dir_Path+"交易日历.xlsx  "+zbinPath+File.separator+"J0_交易日历.xlsx  /y "+"\n");
+                    sb.append("\n");
+                	
+                }else {
+                    sb.append(desc+"\n");
+                    sb.append(Cur_Bat_Name+ "  "+single_block+" &&  " + " "+ J0_call_single_python_bat_File.getAbsolutePath()  +"  "+ paddingIndexStr+"\n");
+                    sb.append("\n");
+                	
+                }
+                
+                
+                
             }
 
 
@@ -1287,7 +1314,18 @@ writeContentToFile(dailyPythonFile,allDailyCode);
             sb.append(Cur_Bat_Name+"  day_"+nowInt+"   &&  " + " "+ J0_call_day_python_bat_File.getAbsolutePath() +"  "+ nowInt);
 
 
+            sb.append("\n【最新最近】交易日 day query  "+nowInt+ "查询并将生成的J0_Data目录文件导入手机命令如下: \n");
+            sb.append(Cur_Bat_Name+"  day_"+nowInt+"   &&  " + " "+ J0_call_day_python_bat_File.getAbsolutePath() +"  "+ nowInt +" && zrule_apply_G2.bat #_38 "+  J0_Dir_Path +"  && "+" adb push  "+J0_Dir_Path+".  /sdcard/zmain/stock/ "+ " \n && "+ " adb push "+zbinPath+File.separator+"J0_股票列表.xlsx  /sdcard/zmain/stock/J0_股票列表.xlsx ");
 
+         //  zrule_apply_G2.bat + J0_Dir_Path
+         int now_yyyy0101 =    getNow_YYYY0101();
+         if(now_yyyy0101 > nowInt) {
+        	 sb.append("\n【请执行以下命令完成 股票列表 交易日丽 的数据更新】 \n");
+        	 String refreshTip = sb_jiaoyirili.toString() +" && "+ sb_gupiaoliebiao.toString();
+        	 
+        	 sb.append(refreshTip.replace("&&", "&& \n "));
+         }
+//
 
             return     sb.toString();
 
@@ -2458,6 +2496,14 @@ writeContentToFile(dailyPythonFile,allDailyCode);
         return Integer.parseInt(beginDayDesc);
     }
 
+    
+    static int getNow_YYYY0101() {
+
+        SimpleDateFormat df = new SimpleDateFormat("yyyy");//设置日期格式
+        String date = df.format(new Date());
+        return Integer.parseInt(date+"0101");
+    }
+    
 
 
     static int getTimeStamp_YYYYMMDD_IntFlag() {

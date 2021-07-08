@@ -2,8 +2,9 @@
 Setlocal ENABLEDELAYEDEXPANSION
 set b=%~dp0
 set path0=%cd%
+echo path0=[%path0%]
 @REM    D5_SrcReplace.bat filez#"txt_md"srcz#"zhuzhengjie"dstz#"guohuixing"
 @REM    D5_SrcReplace.bat filez#"txt"srcz#"zhuzhengjie"dstz#"guohuixing"
 @REM    D5_SrcReplace.bat filez#"txt_md"srcz#"guohuixing"dstz#"zhuzhengjie"
 @REM    D5_SrcReplace.bat filez#"md"srcz#"guohuixing"dstz#"zhuzhengjie"
-%userprofile%\Desktop\zbin\D6.bat   %path0%  %1  %2  %3  %4  %5  %6  %7 %8  %9 
+%userprofile%\Desktop\zbin\D6.bat   "%path0%"  %1  %2  %3  %4  %5  %6  %7 %8  %9 
