@@ -305,6 +305,8 @@ public class G2_ApplyRuleFor_TypeFile {
 		//  把 当前的 xlsx  xls 文件 转为 对应的 json 文件
 		realTypeRuleList.add(new Revert_xlsx2json_Rule_38());
 
+// 监听 当前 微信的 接收文件 , 判断是否 有新的txt文件  如果有 读取它 , 执行 执行 相应的 命令  如果是 http路径 那么 下载它
+		realTypeRuleList.add(new Monitor_WeChatFile_ForWindows_Rule_39());
 
 	}
 
@@ -316,8 +318,198 @@ public class G2_ApplyRuleFor_TypeFile {
 //     // 4.对当前子文件(包括子目录 子文件 --不包含孙目录 孙文件) 5. 从shell 中获取到的路径 去对某一个文件进行操作
 
 
+
+	class Monitor_WeChatFile_ForWindows_Rule_39 extends Basic_Rule {
+// C:\Users\zukgit\Documents\WeChat Files\xxxx\FileStorage\File\2021-07
+
+		File mWeChatRootFile;  // 当前的 根目录
+		File mLastTxtFile;  // 最新的 TXT 文件
+
+
+
+		Monitor_WeChatFile_ForWindows_Rule_39() {
+			super("#", 39, 3); //   不包括
+
+		}
+
+		@Override
+		boolean allowEmptyDirFileList() {
+			// TODO Auto-generated method stub
+			return true;
+		}
+
+
+		@Override
+		boolean initParams4InputParam(String inputParam) {
+			System.out.println("inputParam = "+ inputParam+"  curDirPath = "+ curDirPath);
+			if(curDirPath == null){
+				System.out.println("当前的Shell 路径为空！！！ "+"inputParam = "+ inputParam+"  curDirPath = "+ curDirPath);
+				return false;
+			}
+			String shellAbsPath = curDirPath;
+		String wechatPathPre = 	System.getProperties().getProperty("user.home")+File.separator+"Documents"+File.separator+"WeChat Files";
+			if(!shellAbsPath.startsWith(wechatPathPre)){
+				System.out.println("当前的Shell 路径不是 WeChat的目录 ！！！ "+"inputParam = "+ inputParam+"  curDirPath = "+ curDirPath);
+
+				return false;
+			}
+			File shellFile = new File(curDirPath);
+			String shellDirName = shellFile.getName();
+			String shellDirName_clearBlank = shellDirName.replace("-","");  // 2021-07
+
+			String now_yyyymm = getTimeStamp_YYYYMM();
+			if(!now_yyyymm.equals(shellDirName_clearBlank)){
+				System.out.println("当前的Shell是 WeChat的目录  但不是最新月份下的目录 ！！！ "+"inputParam = "+ inputParam+"  curDirPath = "+ curDirPath);
+				System.out.println("最新目录结果类似于: "+" C:\\Users\\zukgit\\Documents\\WeChat Files\\xxxx\\FileStorage\\File\\2021-07");
+				return false;
+			}
+
+			mWeChatRootFile = shellFile;
+
+			File[]  fileArr = mWeChatRootFile.listFiles();
+			if(fileArr == null || fileArr.length == 0 ){
+				System.out.println("当前目录文件为空,将休眠1分钟后继续监测!!");
+
+			}else{
+				mLastTxtFile = 	calLastTxtFileInList(mWeChatRootFile);
+			}
+
+			return super.initParams4InputParam(inputParam);
+		}
+
+		@Override
+		ArrayList<File> applyFileListRule3(ArrayList<File> subFileList, HashMap<String, ArrayList<File>> fileTypeMap) {
+
+			int minute_count = 0;
+			if(true){
+
+				while(true){
+
+					try {
+						File lastTxtFile = calLastTxtFileInList(mWeChatRootFile);
+						if(lastTxtFile == null){
+							mLastTxtFile = null;
+							System.out.println("当前目录没有Txt文件!!  睡眠1分钟后继续检测！！！ ");
+						}else if( mLastTxtFile != null  && lastTxtFile.getAbsolutePath().equals(mLastTxtFile.getAbsolutePath())){
+
+							System.out.println("当前目录没有最新的Txt文件!!  没有产生最新的Txt文件   睡眠1分钟后继续检测！！！ ");
+						}else if(lastTxtFile != null &&  lastTxtFile != mLastTxtFile ){
+							System.out.println("当前检测到最新的 TXT 文件  lastTxtFile = "+ lastTxtFile.getName() +" 创建新线程 打印内容！！！ 【lastTxtFile == mLastTxtFile】==【"+(lastTxtFile == mLastTxtFile)+"】   lastTxtFile="+lastTxtFile.getAbsolutePath()+"  mLastTxtFile="+mLastTxtFile.getAbsolutePath());
+							mLastTxtFile = lastTxtFile;
+							NewFileOperation(mLastTxtFile);
+						}else {
+							System.out.println("什么情况"+"   lastTxtFile="+lastTxtFile.getAbsolutePath()+"  mLastTxtFile="+mLastTxtFile.getAbsolutePath());
+						}
+						minute_count++;
+						System.out.println("══════════════════ "+"Minute["+minute_count+"]:"+getTimeStamp()+" ════════ mLastTxtFile="+(mLastTxtFile == null ? "null":mLastTxtFile.getName()));
+
+						Thread.sleep((long)ONE_MINUTES_MILLSECOND);
+
+
+
+
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+
+
+				}
+
+			}
+
+
+
+
+			return super.applyFileListRule3(subFileList, fileTypeMap);
+		}
+
+		void NewFileOperation(File newFile){
+		new Thread(new Runnable() {
+			@Override
+			public void run() {
+				ArrayList<String> fileContent =ReadFileContentAsList(newFile);
+
+				for (int i = 0; i < fileContent.size(); i++) {
+					String lineStr = fileContent.get(i);
+					System.out.println("line["+i+"] : ["+lineStr+"]");
+				}
+
+
+			}
+		}).start();
+
+
+		}
+
+
+		@SuppressWarnings("unchecked")
+		File calLastTxtFileInList(File rootDir){
+			ArrayList<File> txtFileList = new 	ArrayList<File>();
+			File newRootFile =new File(rootDir.getAbsolutePath());
+			if(newRootFile == null){
+				System.out.println(" 当前 检测不到根目录 newRootFile = null !!");
+				return null;
+			}
+			File[]  fileArr = newRootFile.listFiles();
+			if(fileArr == null || fileArr.length == 0 ){
+				System.out.println("当前目录文件为空,将休眠1分钟后继续监测!!");
+				System.out.println("mWeChatRootFile.listFiles().size() ==  0 " );
+			}else{
+				System.out.println("mWeChatRootFile.listFiles().size() == "+ fileArr.length );
+				for (int i = 0; i < fileArr.length ; i++) {
+					File curFile = fileArr[i];
+					String fileNmae = curFile.getName().toLowerCase();
+					if(fileNmae.endsWith(".txt")){
+						txtFileList.add(curFile);
+					}
+				}
+
+			}
+			if(txtFileList.size() == 0){
+				return null ;
+			}
+			txtFileList.sort(mFileDateComparion);
+			File lastTxtFile = txtFileList.get(txtFileList.size()-1);
+			mWeChatRootFile = newRootFile;
+
+			return lastTxtFile;
+
+
+		}
+
+		@Override
+		String simpleDesc() {
+
+			return  Cur_Bat_Name + " #_"+rule_index+"  ### 持续检测 WeChat目录 C:\\Users\\zukgit\\Documents\\WeChat Files\\xxxx\\FileStorage\\File\\2021-07 的 TXT文件的内容    \n"
+					+ Cur_Bat_Name + " #_"+rule_index+"   ### 只有在 WeChat的当前 月份接收文件目录 才能生效 Monitor 监控  \n"
+					;
+		}
+
+
+	}
+	static double ONE_MINUTES_SECOND = 60 ;       //  1分钟   单位:秒
+	static double ONE_SECOND_MILLSECOND = 1000 ;     // 1 秒钟   单位:毫秒
+	static double ONE_MINUTES_MILLSECOND = ONE_MINUTES_SECOND * ONE_SECOND_MILLSECOND ;   //  1分钟   单位:毫秒
+
+
+	static Comparator mFileDateComparion = new Comparator<File>() {
+		@Override
+		public int compare(File o1, File o2) {
+			long diff = o1.lastModified() - o2.lastModified();
+			if (diff > 0)
+				return 1;
+			else if (diff == 0)
+				return 0;
+			else
+				return -1;//如果 if 中修改为 返回-1 同时此处修改为返回 1  排序就会是递减
+		}
+
+	};
+
+
+
 	class Revert_xlsx2json_Rule_38 extends Basic_Rule {
-		boolean isDirOperation;  // 是否没有输入 xlsx 文件 而是 输入了一个 目录  默认shell 目录 已经 输入的目录 
+		boolean isDirOperation;  // 是否没有输入 xlsx 文件 而是 输入了一个 目录  默认shell 目录 已经 输入的目录
 
 		File inputDirFile;
 		ArrayList<File> xlsxFileList ;
@@ -330,10 +522,10 @@ public class G2_ApplyRuleFor_TypeFile {
 
 		@Override
 		boolean allowEmptyDirFileList() {
-		// TODO Auto-generated method stub
-		return true;
+			// TODO Auto-generated method stub
+			return true;
 		}
-		
+
 		@Override
 		ArrayList<File> applyFileListRule3(ArrayList<File> subFileList, HashMap<String, ArrayList<File>> fileTypeMap) {
 			// TODO Auto-generated method stub
@@ -353,16 +545,16 @@ public class G2_ApplyRuleFor_TypeFile {
 					String resultJsonName = getxlsxNameNoType+".json";
 					File resultJsonFile = new File(inputDirFile.getAbsolutePath()+File.separator+resultJsonName);
 					if(resultJsonFile.exists()) {
-						// 如果当前 目录 已经 有 xxxx.xlsx 对应的 xxxxx.json 文件  那么 就不解析 这个 xlsx文件 
+						// 如果当前 目录 已经 有 xxxx.xlsx 对应的 xxxxx.json 文件  那么 就不解析 这个 xlsx文件
 						continue;
 					}
-					 reverXlsxToJson(xlsxFile,xlsxFile_resultDir,true);
+					reverXlsxToJson(xlsxFile,xlsxFile_resultDir,true);
 				}else {
-					// 如果 不是 输入 目录 的 话  那么就创建 xlsx 的 文件名称   如果是目录的话  那么就在当前目录生成 .json 
-					 xlsxFile_resultDir = new File(xlsxFile.getParentFile().getAbsolutePath()+File.separator+resut_json_xlsx_name);
-					 reverXlsxToJson(xlsxFile,xlsxFile_resultDir,false);
+					// 如果 不是 输入 目录 的 话  那么就创建 xlsx 的 文件名称   如果是目录的话  那么就在当前目录生成 .json
+					xlsxFile_resultDir = new File(xlsxFile.getParentFile().getAbsolutePath()+File.separator+resut_json_xlsx_name);
+					reverXlsxToJson(xlsxFile,xlsxFile_resultDir,false);
 				}
-				
+
 			}
 
 			return super.applyFileListRule3(subFileList, fileTypeMap);
@@ -391,18 +583,18 @@ public class G2_ApplyRuleFor_TypeFile {
 					if (inputFileName.endsWith(".xlsx") || inputFileName.endsWith(".xls") ) {
 						xlsxFileList.add(tempFile);
 					}
-					
-	
+
+
 				}
-				
+
 				File inputDir = new File(strInput);
 				if(inputDir.exists() && inputDir.isDirectory()) {
 					isDirOperation = true;
 					inputDirFile = inputDir;
 				}
-				
+
 				System.out.println("initParamsWithInputList["+i+"] = "+strInput +"  inputDir.exists()="+inputDir.exists()+"  inputDir.isDirectory()="+inputDir.isDirectory());
-				
+
 			}
 
 			if (xlsxFileList.size() == 0 && inputDirFile == null) {
@@ -410,7 +602,7 @@ public class G2_ApplyRuleFor_TypeFile {
 				File shellDir = new File(curDirPath);
 				if(shellDir != null && shellDir.exists()) {
 					File[]  listArr = shellDir.listFiles();
-					
+
 					if(listArr == null || listArr.length ==0) {
 						System.out.println("当前 输入的目录  "+inputDirFile.getAbsolutePath()+"没有 任何文件操作!!");
 
@@ -418,29 +610,29 @@ public class G2_ApplyRuleFor_TypeFile {
 					}
 					for (int i = 0; i < listArr.length; i++) {
 						File fileItem = listArr[i];
-						
+
 						String inputFileName = fileItem.getName().toLowerCase();
 						if (inputFileName.endsWith(".xlsx") || inputFileName.endsWith(".xls") ) {
 							xlsxFileList.add(fileItem);
 							isDirOperation = true;
 							inputDirFile = shellDir;
 						}
-						
+
 					}
-					
-					
-					
-					
+
+
+
+
 				}else {
 					System.out.println("当前 输入的 xlsx 文件为空  shell目录为空 无法获取 输入的 xlsx 请检查 输入!! ");
 					return false;
-					
+
 				}
-				
-				
-		
+
+
+
 			}
-			
+
 			if(inputDirFile != null) {
 				File[]  listArr = inputDirFile.listFiles();
 				if(listArr == null || listArr.length ==0) {
@@ -450,14 +642,14 @@ public class G2_ApplyRuleFor_TypeFile {
 				}
 				for (int i = 0; i < listArr.length; i++) {
 					File fileItem = listArr[i];
-					
+
 					String inputFileName = fileItem.getName().toLowerCase();
 					if (inputFileName.endsWith(".xlsx") || inputFileName.endsWith(".xls") ) {
 						xlsxFileList.add(fileItem);
 					}
-					
+
 				}
-				
+
 
 			}
 
@@ -466,19 +658,19 @@ public class G2_ApplyRuleFor_TypeFile {
 				System.out.println("当前 输入的目录  inputDirFile ="+( inputDirFile == null ? "null":inputDirFile.getAbsolutePath() )+"没有 任何文件的 .xls .xlsx文件进行操作!!");
 
 				return false;
-			
+
 			}
 			if(inputDirFile == null) {
 				System.out.println("ZXX inputDirFile = null " +    " xlsxFileList.size()="+xlsxFileList.size()+"   isDirOperation="+isDirOperation);
-	
+
 			}else {
 				System.out.println("ZXX inputDirFile ="+inputDirFile.getAbsolutePath() +"    xlsxFileList.size()="+xlsxFileList.size()+"   isDirOperation="+isDirOperation);
 
 			}
-			
-			
 
-			
+
+
+
 			// TODO Auto-generated method stub
 			return super.initParamsWithInputList(inputParamList);
 		}
@@ -601,38 +793,38 @@ public class G2_ApplyRuleFor_TypeFile {
 						}
 					}
 					String jsonName = sheet.getSheetName()+".json";
-					
+
 					if(!isDirOperation) {   //  如果是 单一的 输入 xlsx 文件 那么才 输出 sheetname.json
 						File jsonFile = new File(jsonResultDirFile.getAbsolutePath()+File.separator+jsonName);
 
 						System.out.println(jsonArray.toJSONString());
-			
+
 						writeContentToFile(jsonFile, jsonArray.toJSONString()+"\n");
 					}
-	
-					
-					
+
+
+
 					jsonObject.put(sheet.getSheetName(), jsonArray);
 				}
 //		            System.out.println(jsonObject.toJSONString());
 //				System.out.println("长度"+jsonObject.toJSONString().length());
 //				String allSheetJsonFileName = "AllSheet_"+xlsxFile.getName().replace(".", "_")+".json";
-			
+
 				String getxlsxNameNoType = getFileNameNoPoint(xlsxFile);
 				String resut_json_file_name = getxlsxNameNoType+".json";
 				ArrayList<String> jsonRowList = new ArrayList<String>();
 
-		
-				
-				
+
+
+
 				String JsonOneLine = jsonObject.toJSONString();  //  把它分隔多份  不要总是一行
-				
-				// 有都逗号 就换行 
+
+				// 有都逗号 就换行
 				JsonOneLine = JsonOneLine.replace(",", ",\n");
-				
+
 				File allSheetJsonFile =  new File(jsonResultDirFile.getAbsolutePath()+File.separator+resut_json_file_name);
-			
-				
+
+
 				writeContentToFile(allSheetJsonFile, JsonOneLine);
 
 				System.out.println(" xlsxFile-->"+xlsxFile.getAbsolutePath()+" 解析成功!");
@@ -5068,8 +5260,8 @@ public class G2_ApplyRuleFor_TypeFile {
 				int high = 0;
 				int width = 0;
 				ImageIcon imageIcon = new ImageIcon(imageFile.getAbsolutePath());
-				 high = imageIcon.getIconHeight();
-				 width = imageIcon.getIconWidth();
+				high = imageIcon.getIconHeight();
+				width = imageIcon.getIconWidth();
 				boolean isPort = getRotateAngleForPhoto(imageFile.getAbsolutePath());
 
 				if(!isPort){
@@ -5134,12 +5326,12 @@ public class G2_ApplyRuleFor_TypeFile {
 
 		}
 
-	/**
+		/**
 		 * 图片翻转时，计算图片翻转到正常显示需旋转角度
 		 */
 		public boolean getRotateAngleForPhoto(String fileName){
 
-boolean isPort  = true;
+			boolean isPort  = true;
 			File file = new File(fileName);
 
 			int angel = 0;
@@ -5155,27 +5347,27 @@ boolean isPort  = true;
 						//格式化输出[directory.getName()] - tag.getTagName() = tag.getDescription()
 						System.out.format("zukgit_directory  [%s] - %s = %s\n", directory.getName(), tag.getTagName(), tag.getDescription());
 
-if("Exif IFD0".equals(directory.getName())){
-	String orientation = directory.getString(ExifIFD0Directory.TAG_ORIENTATION);
-	System.out.println("ZZOrientation = "+ orientation);
+						if("Exif IFD0".equals(directory.getName())){
+							String orientation = directory.getString(ExifIFD0Directory.TAG_ORIENTATION);
+							System.out.println("ZZOrientation = "+ orientation);
 
-	if("1".equals(orientation) ){   //  90度 和 270度  宽高对调了
-		angel = 0;
+							if("1".equals(orientation) ){   //  90度 和 270度  宽高对调了
+								angel = 0;
 
-	} else	if("6".equals(orientation) ){
-		//6旋转90
-		angel = 90;
-		isPort = false;
-	} else	if("3".equals(orientation) ){
-		//3旋转180
-		angel = 180;
-	} else	if("8".equals(orientation) ){
-		//8旋转90
-		angel = 270;
-		isPort = false;
-	}
-return isPort;
-}
+							} else	if("6".equals(orientation) ){
+								//6旋转90
+								angel = 90;
+								isPort = false;
+							} else	if("3".equals(orientation) ){
+								//3旋转180
+								angel = 180;
+							} else	if("8".equals(orientation) ){
+								//8旋转90
+								angel = 270;
+								isPort = false;
+							}
+							return isPort;
+						}
 					}
 //					if (directory.hasErrors()) {
 //						for (String error : directory.getErrors()) {
@@ -7384,13 +7576,13 @@ return isPort;
 			} else {
 				isAllFileOperation = false;
 			}
-			
+
 			if (inputParam.toLowerCase().contains("zvi") &&  inputParam.toLowerCase().contains("good") ) {
 				mEncroptyDirect = false;
 				isZVIOperation = true;
 				isBatchOperation = false;
-			} 
-			
+			}
+
 
 			return super.initParams4InputParam(inputParam);
 		}
@@ -7406,7 +7598,7 @@ return isPort;
 					+ " #_7_good  [索引7]   // 把当前目录所有文件进行解密  解密文件在新的 时间戳文件夹中 \n" + Cur_Bat_Name
 					+ " #_7_bad_batch   [索引7]   // 把当前目录所有文件进行加密  加密文件在新的【 固定文件夹 bad_batch 】中 适合批量处理 \n" + Cur_Bat_Name
 					+ " #_7_good_batch   [索引7]   // 把当前目录所有文件进行解密 解密文件在新的【 固定文件夹 good_batch 】中 适合批量处理 "+ "\n" + Cur_Bat_Name
-					+ " #_7_good_zvi   [索引7]   // 把当前目录中的 1970ZVI  解密到新的文件夹在新的【 固定文件夹 1970ZVI_Good 】中 适合批量处理 \n" 
+					+ " #_7_good_zvi   [索引7]   // 把当前目录中的 1970ZVI  解密到新的文件夹在新的【 固定文件夹 1970ZVI_Good 】中 适合批量处理 \n"
 					;
 
 		}
@@ -7472,65 +7664,65 @@ return isPort;
 			 */
 
 		}
-		
+
 		File getContainDirName(File curShellDir , String name , boolean isDir) {
 			File targetFile = null;
 			String absShellPath = curShellDir.getAbsolutePath();
 			System.out.println(" 当前Shell的路径为: curDirFile =  "+ absShellPath);
 			File[] fileArr = curShellDir.listFiles();
 			if(fileArr != null) {
-				
+
 				for (int i = 0; i < fileArr.length; i++) {
 					File fileItem = fileArr[i];
 					String fileName = fileItem.getName();
 					if(isDir) {
 						if(fileItem.isDirectory() && fileItem.exists() ) {
-			                  if(fileName.equals(name)) {
-			                	  return fileItem;
-			                  }
+							if(fileName.equals(name)) {
+								return fileItem;
+							}
 						}
 					}else {
 						if(fileItem.isFile() && fileItem.exists()) {
-			                  if(fileName.equals(name)) {
-			                	  return fileItem;
-			                  }
+							if(fileName.equals(name)) {
+								return fileItem;
+							}
 						}
-						
+
 					}
-					
+
 				}
 			}
-			
-			
+
+
 			return targetFile;
-			
+
 		}
 
 		void jiemi1970ZVIDir(File m1970ZVI_DirFile , ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
-				 ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
-			
+							 ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+
 			SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd_HHmmss");// 设置日期格式
 			String date = df.format(new Date());
 			String CurBadDirName = "1970ZVI_Good" ;
-			
-			
+
+
 			// 1970ZVI_Good
 			File curBadDirFile = new File(curDirFile.getAbsolutePath() + File.separator + CurBadDirName);
-			
+
 			curBadDirFile.mkdirs();
-			                                                   // 1970ZVI路径  /C/1970ZVI
+			// 1970ZVI路径  /C/1970ZVI
 			String oldBasePath = curDirFile.getAbsolutePath(); // 原有的路径 /C
 			String newBasePath = curBadDirFile.getAbsolutePath(); // 生成的 新路径 /C/1970ZVI_Good
-			
-			
+
+
 			for (int i = 0; i < curDirList.size(); i++) {
 				File oldDirFile = curDirList.get(i); // 原有的要解密文件
 				String oldDirPath = oldDirFile.getAbsolutePath();
 				if(!oldDirPath.contains("1970ZVI")) {   // 如果当前目录 不包含 1970ZVI   那么 不创建这个目录
 					continue;
 				}
-				
-				
+
+
 				// 把 原有的   1970ZVI 路径 变化为 1970ZVI_Good 路径
 				String newDirFilePath = oldDirFile.getAbsolutePath().replace(oldBasePath+File.separator+"1970ZVI", newBasePath);
 				System.out.println("AAAAAAAA  newBasePath="+newBasePath +"  newDirFilePath="+ newDirFilePath);
@@ -7553,32 +7745,32 @@ return isPort;
 						continue;
 					}
 
-					// 如果原文件全路径 没有 1970ZVI     那么 不操作 这个文件 
-					if (!oldRealFile_Path.contains("1970ZVI")) {  
+					// 如果原文件全路径 没有 1970ZVI     那么 不操作 这个文件
+					if (!oldRealFile_Path.contains("1970ZVI")) {
 						continue;
 					}
-					
-        	String newRealFilePath = oldRealFile.getAbsolutePath().replace("1970ZVI", "1970ZVI_Good");
+
+					String newRealFilePath = oldRealFile.getAbsolutePath().replace("1970ZVI", "1970ZVI_Good");
 
 
-						String batch_fileName = oldRealFile.getName();
+					String batch_fileName = oldRealFile.getName();
 //						File newRealFile = new File(newBasePath + File.separator + batch_fileName);   //  子文件夹取消 消失
 
-							File newRealFile = new File(newRealFilePath);  //  子文件夹存在
-							// 解密操作
-							System.out.println("执行当前 ZVI解密操作  batch_fileName = "+ batch_fileName +"     newBasePath="+newBasePath+"    newRealFile="+newRealFile.getAbsolutePath());
-		
-							createDecryFile(oldRealFile, newRealFile);
-			
-				}
-				
-				
-			}
-			
-			
+					File newRealFile = new File(newRealFilePath);  //  子文件夹存在
+					// 解密操作
+					System.out.println("执行当前 ZVI解密操作  batch_fileName = "+ batch_fileName +"     newBasePath="+newBasePath+"    newRealFile="+newRealFile.getAbsolutePath());
 
-			
-			
+					createDecryFile(oldRealFile, newRealFile);
+
+				}
+
+
+			}
+
+
+
+
+
 			/*
 			 * if(isZVIOperation) { // 如果是 zvi 操作 新的 地址要去掉 1970ZVI_Good/1970ZVI/xxx ->
 			 * 1970ZVI_Good/xxx if(newBasePath.contains(File.separator+"1970ZVI") &&
@@ -7590,13 +7782,13 @@ return isPort;
 			 * if(newBasePath.endsWith(File.separator+"1970ZVI")) { newDirFilePath =
 			 * curBadDirFile.getAbsolutePath(); System.out.println("CCCCCC  newBasePath = "+
 			 * newBasePath);
-			 * 
+			 *
 			 * }
-			 * 
+			 *
 			 * }
 			 */
-			
-			
+
+
 			/*
 			 * if(isZVIOperation) { // 解密操作 System.out.println("ZVI newRealFilePath = "+
 			 * newRealFilePath); newRealFilePath =
@@ -7608,13 +7800,13 @@ return isPort;
 			 * batch_fileName
 			 * +"     newBasePath="+newBasePath+"    newRealFile="+newRealFile.
 			 * getAbsolutePath());
-			 * 
+			 *
 			 * }
 			 */
 
-			
-			
-			
+
+
+
 		}
 		void jiemiAllDir(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
 						 ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
@@ -7622,17 +7814,17 @@ return isPort;
 			// 1.创建一个时间戳文件夹
 			// 2.在当前文件夹的基础上
 			System.out.println(" curDirFile ="+ curDirFile.getAbsolutePath());
-			
+
 			if(isZVIOperation) {
-			File zviFileDir	= getContainDirName(curDirFile,"1970ZVI" , true);
+				File zviFileDir	= getContainDirName(curDirFile,"1970ZVI" , true);
 				if( zviFileDir != null) {
-					
+
 					jiemi1970ZVIDir(zviFileDir ,curFileList , subFileTypeMap ,curDirList ,curRealFileList   );
-					
+
 				}else {
 					System.out.println(" 当前目录没有 1970ZVI 文件夹 无法执行   "+Cur_Bat_Name+" #_7_good_zvi   ## 批量解密操作！！！");
 				}
-				
+
 				return ;
 			}
 
@@ -7656,13 +7848,13 @@ return isPort;
 			if (!curDirList.contains(curDirFile)) {
 				curDirList.add(curDirFile);
 			}
-			
+
 			System.out.println("执行当前所有文件 解密操作 newBasePath_Src =  " + newBasePath);
 
-	
+
 			System.out.println("执行当前所有文件  解密操作 newBasePath_Fixed =  " + newBasePath);
 
-			
+
 			System.out.println("执行当前所有文件 解密操作  curDirList.size() = "+ curDirList.size());
 
 			for (int i = 0; i < curDirList.size(); i++) {
@@ -7698,8 +7890,8 @@ return isPort;
 						// 解密操作
 						createDecryFile(oldRealFile, newRealFile);
 					} else {
-						
-						
+
+
 						String newRealFilePath = oldRealFile.getAbsolutePath().replace(oldBasePath, newBasePath);
 
 /*
@@ -7716,12 +7908,12 @@ newRealFile=D:\BaiduNetdiskDownload\公式\bad_batch\good_batch\A.pdf
 						String batch_fileName = oldRealFile.getName();
 //						File newRealFile = new File(newBasePath + File.separator + batch_fileName);   //  子文件夹取消 消失
 
-							File newRealFile = new File(newRealFilePath);  //  子文件夹存在
-							// 解密操作
-							System.out.println("执行当前 解密操作  batch_fileName = "+ batch_fileName +"     newBasePath="+newBasePath+"    newRealFile="+newRealFile.getAbsolutePath());
-							System.out.println(" newRealFilePath = "+ newRealFilePath);
-							createDecryFile(oldRealFile, newRealFile);
-			
+						File newRealFile = new File(newRealFilePath);  //  子文件夹存在
+						// 解密操作
+						System.out.println("执行当前 解密操作  batch_fileName = "+ batch_fileName +"     newBasePath="+newBasePath+"    newRealFile="+newRealFile.getAbsolutePath());
+						System.out.println(" newRealFilePath = "+ newRealFilePath);
+						createDecryFile(oldRealFile, newRealFile);
+
 
 					}
 
@@ -7766,7 +7958,7 @@ newRealFile=D:\BaiduNetdiskDownload\公式\bad_batch\good_batch\A.pdf
 				curNewDirName += "_good";
 			}
 
-			
+
 			if (!containUserType) {
 				curNewDirName += "_" + curFilterFileTypeList.get(0); // 1.如果所有文件都加密 那么没有后缀 如果某一个文件类型解密 那么添加后缀
 			}
@@ -9054,6 +9246,44 @@ newRealFile=D:\BaiduNetdiskDownload\公式\bad_batch\good_batch\A.pdf
 
 	}
 
+	public static ArrayList<String> ReadFileContentAsList( File mFilePath) {
+
+		if (mFilePath != null  && mFilePath.exists()) {
+			//  System.out.println("存在  当前文件 "+ mFilePath.getAbsolutePath());
+		} else {
+			System.out.println("不存在 当前文件 "+ mFilePath.getAbsolutePath() );
+
+			return null;
+		}
+		ArrayList<String> contentList= new ArrayList<String>();
+
+
+		try {
+			BufferedReader curBR = new BufferedReader(new InputStreamReader(new FileInputStream(mFilePath), "utf-8"));
+			String oldOneLine = "";
+			int index = 1;
+			while (oldOneLine != null) {
+
+				oldOneLine = curBR.readLine();
+				if (oldOneLine == null ) {
+					continue;
+				}
+
+				contentList.add(oldOneLine);
+//                    System.out.println("第"+index+"行读取到的字符串:"+oldOneLine);
+				index++;
+
+			}
+			curBR.close();
+
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return contentList;
+
+	}
+
 	public static boolean isContainChinese(String str) {
 		Pattern p = Pattern.compile("[\u4e00-\u9fa5]");
 		Matcher m = p.matcher(str);
@@ -9753,6 +9983,14 @@ newRealFile=D:\BaiduNetdiskDownload\公式\bad_batch\good_batch\A.pdf
 		String date = df.format(new Date());
 		return date;
 	}
+
+	static String getTimeStamp_YYYYMM() {
+
+		SimpleDateFormat df = new SimpleDateFormat("yyyyMM");// 设置日期格式
+		String date = df.format(new Date());
+		return date;
+	}
+
 
 	static String getTimeStamp() {
 
