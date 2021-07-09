@@ -3076,12 +3076,6 @@ rem ======================== 主函数main函数入口
 :____Main____
 echo __________________ Main_Method Begin _______________________
 call ::helloworld_func_0x0
-for /r %init_cd% %%j in  (*.whl*)do (
-set whl_file_fullpath=%%j
-echo  whl_file_fullpath=!whl_file_fullpath!
-
-)
-
 call ::recordfilenametofile_func_1x1 %zbin%
 echo __________________ Main_Method End _______________________
 goto:eof

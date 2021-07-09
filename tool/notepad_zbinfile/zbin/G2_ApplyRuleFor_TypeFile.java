@@ -1,5 +1,7 @@
 
+import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ImageUtil;
+import cn.hutool.http.HttpUtil;
 import cn.hutool.json.JSONUtil;
 
 import com.alibaba.fastjson.JSONArray;
@@ -51,6 +53,8 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 
 import java.math.BigInteger;
+import java.net.URL;
+import java.net.URLConnection;
 import java.nio.channels.FileChannel;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
@@ -84,6 +88,8 @@ import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.poi.xslf.usermodel.XMLSlideShow;
 import org.apache.poi.xslf.usermodel.XSLFSlide;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.jsoup.Connection;
+import org.jsoup.Jsoup;
 import org.apache.poi.ss.usermodel.CellType;
 
 import java.security.Key;
@@ -324,12 +330,15 @@ public class G2_ApplyRuleFor_TypeFile {
 
 		File mWeChatRootFile;  // 当前的 根目录
 		File mLastTxtFile;  // 最新的 TXT 文件
-
-
+ArrayList<String> urlStrList ;   // url  字符串列表
+File mDownloadedRootFile ;
+File mDownloadedMonthDir;  // 在 G2_Monitor_Download/YYYYMM/    年年年年月月的 目录文件  
 
 		Monitor_WeChatFile_ForWindows_Rule_39() {
 			super("#", 39, 3); //   不包括
-
+			urlStrList = new ArrayList<String>();
+			mDownloadedRootFile = new File(zbinPath+File.separator+"G2_Monitor_Download");
+			mDownloadedMonthDir = new File(mDownloadedRootFile.getAbsolutePath() +File.separator+getTimeStamp_YYYYMM());
 		}
 
 		@Override
@@ -364,6 +373,22 @@ public class G2_ApplyRuleFor_TypeFile {
 				return false;
 			}
 
+			if(!mDownloadedRootFile.exists()) {
+				mDownloadedRootFile.mkdirs();
+			}
+			
+			if(!mDownloadedMonthDir.exists()) {
+				mDownloadedMonthDir.mkdirs();
+			}
+			
+			
+			if(!mDownloadedMonthDir.exists()) {
+				System.out.println("当前文件下载保存路径不存在_请检查这个保存文件的目录 mDownloadedMonthDir = "+ mDownloadedMonthDir.getAbsolutePath());
+				return false;
+				
+			}
+			
+			
 			mWeChatRootFile = shellFile;
 
 			File[]  fileArr = mWeChatRootFile.listFiles();
@@ -422,18 +447,28 @@ public class G2_ApplyRuleFor_TypeFile {
 
 			return super.applyFileListRule3(subFileList, fileTypeMap);
 		}
-
+		
+         int curUrlIndex_InTxtFile ;   
+         
 		void NewFileOperation(File newFile){
 		new Thread(new Runnable() {
 			@Override
 			public void run() {
 				ArrayList<String> fileContent =ReadFileContentAsList(newFile);
 
+				String filename = newFile.getName();
+				String fileNameNoPoint = getFileNameNoPoint(filename) ;
+
+				curUrlIndex_InTxtFile = 0 ;
 				for (int i = 0; i < fileContent.size(); i++) {
 					String lineStr = fileContent.get(i);
-					System.out.println("line["+i+"] : ["+lineStr+"]");
-				}
+					ArrayList<String> oneLineUrlList = new ArrayList<String>();  // 一行 中 可能 多个 url  列表
+					String strLine_trim_clearChinese = clearChinese(lineStr.trim());
+					toGetUrlFromOneLine_And_InitUrlList(strLine_trim_clearChinese,oneLineUrlList);
+					System.out.println("line["+i+"] : str["+lineStr+"]  clearChinese["+strLine_trim_clearChinese+"] result["+OperationWithOneLine(i,oneLineUrlList,fileNameNoPoint)+"]");
 
+				}
+				System.out.println("════════════════ OVER ═════════════════");
 
 			}
 		}).start();
@@ -441,6 +476,146 @@ public class G2_ApplyRuleFor_TypeFile {
 
 		}
 
+		
+	    public  String clearChinese(String lineContent) {
+	        if (lineContent == null || lineContent.trim().isEmpty()) {
+	            return null;
+	        }
+	        Pattern pat = Pattern.compile(REGEX_CHINESE);
+	        Matcher mat = pat.matcher(lineContent);
+	        return mat.replaceAll(" ");
+	    }
+	    
+		String OperationWithOneLine(int index , ArrayList<String> strLineList , String fileNameNoPoint ) {
+			String tipMessage = null;
+			if(strLineList == null || strLineList.size() == 0){
+				tipMessage = " 当前行字符串为空 无逻辑执行";
+				return tipMessage;
+			}
+
+			for (int i = 0; i < strLineList.size(); i++) {
+				String strLine = strLineList.get(i);
+
+				String strLine_trim = strLine.trim();
+				String strLine_trim_clearChinese = clearChinese(strLine_trim);
+				boolean  isUrl = toJudgeUrl(strLine_trim_clearChinese);
+				if(isUrl && urlStrList.contains(strLine_trim_clearChinese)) {
+					tipMessage = " 当前url 已经执行过下载操作 跳过逻辑执行";
+					return tipMessage;
+
+				}
+				if(isUrl) {
+					curUrlIndex_InTxtFile++;
+
+					if(strLine_trim_clearChinese.contains("douyin")) {
+						douYinParseUrl(curUrlIndex_InTxtFile,strLine_trim_clearChinese,fileNameNoPoint);
+
+					}
+
+
+				}
+
+
+			}
+
+			
+			
+			
+	
+			
+			
+			
+			return tipMessage;
+			
+		}
+		
+		@SuppressWarnings("unchecked")
+	    public  void douYinParseUrl(int index , String url,String fileNameNoPoint) {
+	        try {
+	            final  String videoPath="https://www.iesdouyin.com/web/api/v2/aweme/iteminfo/?item_ids=";
+	            Connection con= Jsoup.connect(clearChinese(url));
+	            con.header("User-Agent", "Mozilla/5.0 (iPhone; CPU iPhone OS 12_1_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/16D57 Version/12.0 Safari/604.1");
+	            Connection.Response resp=con.method(Connection.Method.GET).execute();
+	            String videoUrl= videoPath+getDouYinItemId(resp.url().toString());
+	            String jsonStr = Jsoup.connect(videoUrl).ignoreContentType(true).execute().body();
+	            JSONObject json =JSONObject.parseObject(jsonStr);
+	            String videoAddress= json.getJSONArray("item_list").getJSONObject(0).getJSONObject("video").getJSONObject("play_addr").getJSONArray("url_list").get(0).toString();
+	            String title= json.getJSONArray("item_list").getJSONObject(0).getJSONObject("share_info").getString("share_title");
+	            videoAddress=videoAddress.replaceAll("playwm","play");
+	            HashMap headers = MapUtil.newHashMap();
+	            headers.put("User-Agent", "Mozilla/5.0 (iPhone; CPU iPhone OS 12_1_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/16D57 Version/12.0 Safari/604.1");
+	            String finalVideoAddress = HttpUtil.createGet(videoAddress).addHeaders(headers).execute().header("Location");
+	            //注:打印获取的链接
+	            System.out.println("-----抖音去水印链接-----\n"+finalVideoAddress);
+	            //下载无水印视频到本地
+	            downDouYinVideo( index ,finalVideoAddress,fileNameNoPoint,"抖音视频");
+	        } catch (IOException e) {
+	            System.out.println(e.getMessage());
+	        }
+	    }
+		
+		// 视频的保存 目录 不能是 当前文件 否则 就会执行 同步操作 影响网速
+		@SuppressWarnings("unchecked")
+	    public  void downDouYinVideo(int index , String httpUrl,String fileNameNoPoint,String source) {
+//	        String fileAddress = videoSavePath+"/"+source+"/"+title+".mp4";
+	        String fileAddress = mDownloadedMonthDir.getAbsolutePath()+File.separator+(fileNameNoPoint.replace(" ", ""))+"_"+index+"_"+getTimeStamp()+".mp4";
+	
+	        int byteRead;
+	        try {
+	            URL url = new URL(httpUrl);
+	            //获取链接
+	            URLConnection conn = url.openConnection();
+	            //输入流
+	            InputStream inStream = conn.getInputStream();
+	            //封装一个保存文件的路径对象
+	            File fileSavePath = new File(fileAddress);
+	            //注:如果保存文件夹不存在,那么则创建该文件夹
+	            File fileParent = fileSavePath.getParentFile();
+	            if(!fileParent.exists()){
+	                fileParent.mkdirs();
+	            }
+	            //写入文件
+	            FileOutputStream fs = new FileOutputStream(fileSavePath);
+	            byte[] buffer = new byte[1024];
+	            while ((byteRead = inStream.read(buffer)) != -1) {
+	                fs.write(buffer, 0, byteRead);
+	            }
+	            inStream.close();
+	            fs.close();
+	            System.out.println("\n-----视频保存路径-----\n"+fileSavePath.getAbsolutePath());
+				System.out.println("\nzzfile_3.bat "+ fileSavePath.getParentFile().getAbsolutePath());
+	            urlStrList.add(httpUrl);
+	        } catch (FileNotFoundException e) {
+	            System.out.println(e.getMessage());
+	        } catch (IOException e) {
+	            System.out.println(e.getMessage());
+	        }
+	    }
+		
+		
+		
+		
+	    public  String getDouYinItemId(String url){
+	        int start = url.indexOf("/video/")+7;
+	        int end = url.lastIndexOf("/");
+	        String itemId = url.substring(start, end);
+	        return  itemId;
+	    }
+	    
+		
+	    public  boolean toJudgeUrl(String str) {
+	        boolean isUrl = false;
+
+	        if (str.trim().toLowerCase().startsWith("http:") || str.toLowerCase().trim().startsWith("https:") ||
+	                str.toLowerCase().trim().startsWith("thunder:") || str.toLowerCase().trim().startsWith("magnet:")) {
+
+	            return true;
+	        }
+
+
+	        return isUrl;
+	    }
+	    
 
 		@SuppressWarnings("unchecked")
 		File calLastTxtFileInList(File rootDir){
@@ -477,11 +652,55 @@ public class G2_ApplyRuleFor_TypeFile {
 
 		}
 
+
+		// 对每行的数据进行分析
+
+		public  void toGetUrlFromOneLine_And_InitUrlList(String rowString,ArrayList<String> urlList) {
+			String[] strArrRow = null;
+			String fixStr = "";
+
+//	        if(str.trim().startsWith("http:") || str.trim().startsWith("https:") ||
+//	                str.trim().startsWith("thunder:") ||   str.trim().startsWith("magnet::") ){
+
+
+			if (rowString != null) {
+				fixStr = new String(rowString);
+				// http://xxxxxx/sahttp://  避免出现 http://http: 连着的情况 起码也要使得间隔一个空格
+				fixStr = fixStr.replace("http:", " http:");
+				fixStr = fixStr.replace("https:", " https:");
+				fixStr = fixStr.replace("thunder:", " thunder:");
+				fixStr = fixStr.replace("magnet:", " magnet:");
+				strArrRow = fixStr.split(" ");
+			}
+
+			if (strArrRow != null && strArrRow.length > 0) {
+
+				for (int i = 0; i < strArrRow.length; i++) {
+					String mCurContent = strArrRow[i];
+					if (mCurContent == null || mCurContent.trim().equals("")) {
+						continue;
+					}
+
+
+					boolean isUrl = toJudgeUrl(mCurContent);
+					if(isUrl){
+						urlList.add(clearChinese(mCurContent).trim());
+
+					}
+
+				}
+
+
+			}
+
+
+		}
+
 		@Override
 		String simpleDesc() {
 
 			return  Cur_Bat_Name + " #_"+rule_index+"  ### 持续检测 WeChat目录 C:\\Users\\zukgit\\Documents\\WeChat Files\\xxxx\\FileStorage\\File\\2021-07 的 TXT文件的内容    \n"
-					+ Cur_Bat_Name + " #_"+rule_index+"   ### 只有在 WeChat的当前 月份接收文件目录 才能生效 Monitor 监控  \n"
+					+ Cur_Bat_Name + " #_"+rule_index+"   ### 只有在 WeChat的当前 月份接收文件目录 才能生效 Monitor 监控 \n  explorer.exe  \"C:\\Users\\zukgit\\Documents\\WeChat Files\\zzj382581427\\FileStorage\\File\"   \n"
 					;
 		}
 
@@ -10239,7 +10458,7 @@ newRealFile=D:\BaiduNetdiskDownload\公式\bad_batch\good_batch\A.pdf
 		double sin = Math.abs(Math.sin(Math.toRadians(angel)));
 		int des_width = (int)(src.width *  cos) + (int)(src.height * sin);
 		int des_height =  (int)(src.height *  cos) + (int)(src.width * sin);
-		return new java.awt.Rectangle(new Dimension(des_width, des_height));
+		return new Rectangle(new Dimension(des_width, des_height));
 	}
 
 	/**
@@ -10279,7 +10498,7 @@ newRealFile=D:\BaiduNetdiskDownload\公式\bad_batch\good_batch\A.pdf
 	}
 
 	static void SortString(ArrayList<String> strList) {
-		Comparator<Object> CHINA_COMPARE = Collator.getInstance(java.util.Locale.CHINA);
+		Comparator<Object> CHINA_COMPARE = Collator.getInstance(Locale.CHINA);
 		strList.sort((o1, o2) -> {
 			//比较的基本原则，拿最小长度的字符串进行比较，若全部相等，则长字符串往后排
 
@@ -10330,7 +10549,7 @@ newRealFile=D:\BaiduNetdiskDownload\公式\bad_batch\good_batch\A.pdf
 
 
 	static void SortFileWithName(ArrayList<File> fileList) {
-		Comparator<Object> CHINA_COMPARE = Collator.getInstance(java.util.Locale.CHINA);
+		Comparator<Object> CHINA_COMPARE = Collator.getInstance(Locale.CHINA);
 		fileList.sort((o1_file, o2_file) -> {
 			//比较的基本原则，拿最小长度的字符串进行比较，若全部相等，则长字符串往后排
 			String o1 = o1_file.getName();
