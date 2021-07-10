@@ -2972,6 +2972,29 @@ adb shell input tap 450 450
 ping -n 1 127.0.0.1>nul
 adb shell input tap 450 450
 ping -n 1 127.0.0.1>nul
+
+adb shell input swipe   1050 1200 1050 400  200
+adb shell input swipe   1050 1200 1050 400  200
+adb shell input swipe   1050 1200 1050 400  200
+adb shell input swipe   1050 1200 1050 400  200
+adb shell input swipe   1050 1200 1050 400  200
+adb shell input swipe   1050 1200 1050 400  200
+adb shell input swipe   1050 1200 1050 400  200
+adb shell input swipe   1050 1200 1050 400  200
+adb shell input swipe   1050 1200 1050 400  200
+adb shell input swipe   1050 1200 1050 400  200
+adb shell input swipe   1050 1200 1050 400  200
+adb shell input swipe   1050 1200 1050 400  200
+adb shell input swipe   1050 1200 1050 400  200
+adb shell input swipe   1050 1200 1050 400  200
+adb shell input swipe   1050 1200 1050 400  200
+adb shell input swipe   1050 1200 1050 400  200
+adb shell input swipe   1050 1200 1050 400  200
+adb shell input swipe   1050 1200 1050 400  200
+adb shell input swipe   1050 1200 1050 400  200
+adb shell input swipe   1050 1200 1050 400  200
+adb shell input swipe   1050 1200 1050 400  200
+
 set rule19teldown_dynamic_param1=100000
 for /l %%i in (1, 1, !rule19teldown_dynamic_param1!) do (
 set loop_numnber=%%i
@@ -3018,6 +3041,27 @@ adb shell input tap 450 450
 ping -n 1 127.0.0.1>nul
 adb shell input tap 450 450
 ping -n 1 127.0.0.1>nul
+adb shell input swipe   1050 1200 1050 400  200
+adb shell input swipe   1050 1200 1050 400  200
+adb shell input swipe   1050 1200 1050 400  200
+adb shell input swipe   1050 1200 1050 400  200
+adb shell input swipe   1050 1200 1050 400  200
+adb shell input swipe   1050 1200 1050 400  200
+adb shell input swipe   1050 1200 1050 400  200
+adb shell input swipe   1050 1200 1050 400  200
+adb shell input swipe   1050 1200 1050 400  200
+adb shell input swipe   1050 1200 1050 400  200
+adb shell input swipe   1050 1200 1050 400  200
+adb shell input swipe   1050 1200 1050 400  200
+adb shell input swipe   1050 1200 1050 400  200
+adb shell input swipe   1050 1200 1050 400  200
+adb shell input swipe   1050 1200 1050 400  200
+adb shell input swipe   1050 1200 1050 400  200
+adb shell input swipe   1050 1200 1050 400  200
+adb shell input swipe   1050 1200 1050 400  200
+adb shell input swipe   1050 1200 1050 400  200
+adb shell input swipe   1050 1200 1050 400  200
+adb shell input swipe   1050 1200 1050 400  200
 )
 rem 往下拉
 adb shell input tap 1050 1600
