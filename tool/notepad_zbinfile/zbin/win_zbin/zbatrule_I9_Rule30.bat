@@ -2975,32 +2975,33 @@ ping -n 1 127.0.0.1>nul
 set rule19teldown_dynamic_param1=100000
 for /l %%i in (1, 1, !rule19teldown_dynamic_param1!) do (
 set loop_numnber=%%i
-set /a loop_numnber_yushu=!loop_numnber!%%20
+set /a loop_numnber_yushu=!loop_numnber!%%250
 echo __________________ Loop_Index[%%i] Begin  _______________________
 echo i == %%i      allLoop=[!rule19teldown_dynamic_param1!]  yushu=[!loop_numnber_yushu!]    adb shell input tap 190 1000
 adb shell input tap 190 1000
 ping -n 1 127.0.0.1>nul
-adb shell input swipe 190 1200 190 400  
+adb shell input swipe  1050 600 1050 1050  200
 ping -n 1 127.0.0.1>nul
 echo i == %%i      allLoop=[!rule19teldown_dynamic_param1!]  yushu=[!loop_numnber_yushu!]    adb shell input tap 190 1100
 adb shell input tap 190 1100
 ping -n 1 127.0.0.1>nul
-adb shell input swipe 190 1200 190 400  
+adb shell input swipe  1050 600 1050 1050  200
 ping -n 1 127.0.0.1>nul
 echo i == %%i      allLoop=[!rule19teldown_dynamic_param1!]  yushu=[!loop_numnber_yushu!]    adb shell input tap 190 1200
 adb shell input tap 190 1200
 ping -n 1 127.0.0.1>nul
-adb shell input swipe 190 1200 190 400  
+adb shell input swipe  1050 600 1050 1050  200
 ping -n 1 127.0.0.1>nul
 echo i == %%i      allLoop=[!rule19teldown_dynamic_param1!]  yushu=[!loop_numnber_yushu!]    adb shell input tap 190 1300
 adb shell input tap 190 1300
 ping -n 1 127.0.0.1>nul
-adb shell input swipe 190 1200 190 400  
+adb shell input swipe  1050 600 1050 1050  200
+ 
 ping -n 1 127.0.0.1>nul
 echo i == %%i      allLoop=[!rule19teldown_dynamic_param1!]  yushu=[!loop_numnber_yushu!]    adb shell input tap 190 1400
 adb shell input tap 190 1400
 ping -n 1 127.0.0.1>nul
-adb shell input swipe 190 1200 190 400  
+adb shell input swipe  1050 600 1050 1050  200
 ping -n 1 127.0.0.1>nul
 echo loop_numnber_yushu=!loop_numnber_yushu!
 if !loop_numnber_yushu! EQU 0 (
@@ -3018,6 +3019,12 @@ ping -n 1 127.0.0.1>nul
 adb shell input tap 450 450
 ping -n 1 127.0.0.1>nul
 )
+rem 往下拉
+adb shell input tap 1050 1600
+adb shell input swipe  1050 600 1050 900  200
+adb shell input swipe  1050 600 1050 900  200
+ping -n 1 127.0.0.1>nul
+
 echo __________________ Loop_Index[%%i] Endxx  _______________________
 )
 echo [rule19vdownloadshoucangjia_func_0x0 EndPrintCode]   output=[__empty__]  param1=[__empty__] 
