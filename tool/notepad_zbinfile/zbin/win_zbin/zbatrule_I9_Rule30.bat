@@ -2998,30 +2998,31 @@ adb shell input swipe   1050 1200 1050 400  200
 set rule19teldown_dynamic_param1=100000
 for /l %%i in (1, 1, !rule19teldown_dynamic_param1!) do (
 set loop_numnber=%%i
-set /a loop_numnber_yushu=!loop_numnber!%%250
+set yushu_number=250
+set /a loop_numnber_yushu=!loop_numnber!%%!yushu_number!
 echo __________________ Loop_Index[%%i] Begin  _______________________
-echo i == %%i      allLoop=[!rule19teldown_dynamic_param1!]  yushu=[!loop_numnber_yushu!]    adb shell input tap 190 1000
+echo i == %%i      allLoop=[!rule19teldown_dynamic_param1!]  yushu=[!loop_numnber_yushu!] yushu_number=[!yushu_number!]   adb shell input tap 190 1000
 adb shell input tap 190 1000
 ping -n 1 127.0.0.1>nul
 adb shell input swipe  1050 600 1050 1050  200
 ping -n 1 127.0.0.1>nul
-echo i == %%i      allLoop=[!rule19teldown_dynamic_param1!]  yushu=[!loop_numnber_yushu!]    adb shell input tap 190 1100
+echo i == %%i      allLoop=[!rule19teldown_dynamic_param1!]  yushu=[!loop_numnber_yushu!] yushu_number=[!yushu_number!]    adb shell input tap 190 1100
 adb shell input tap 190 1100
 ping -n 1 127.0.0.1>nul
 adb shell input swipe  1050 600 1050 1050  200
 ping -n 1 127.0.0.1>nul
-echo i == %%i      allLoop=[!rule19teldown_dynamic_param1!]  yushu=[!loop_numnber_yushu!]    adb shell input tap 190 1200
+echo i == %%i      allLoop=[!rule19teldown_dynamic_param1!]  yushu=[!loop_numnber_yushu!] yushu_number=[!yushu_number!]    adb shell input tap 190 1200
 adb shell input tap 190 1200
 ping -n 1 127.0.0.1>nul
 adb shell input swipe  1050 600 1050 1050  200
 ping -n 1 127.0.0.1>nul
-echo i == %%i      allLoop=[!rule19teldown_dynamic_param1!]  yushu=[!loop_numnber_yushu!]    adb shell input tap 190 1300
+echo i == %%i      allLoop=[!rule19teldown_dynamic_param1!]  yushu=[!loop_numnber_yushu!] yushu_number=[!yushu_number!]    adb shell input tap 190 1300
 adb shell input tap 190 1300
 ping -n 1 127.0.0.1>nul
 adb shell input swipe  1050 600 1050 1050  200
  
 ping -n 1 127.0.0.1>nul
-echo i == %%i      allLoop=[!rule19teldown_dynamic_param1!]  yushu=[!loop_numnber_yushu!]    adb shell input tap 190 1400
+echo i == %%i      allLoop=[!rule19teldown_dynamic_param1!]  yushu=[!loop_numnber_yushu!] yushu_number=[!yushu_number!]    adb shell input tap 190 1400
 adb shell input tap 190 1400
 ping -n 1 127.0.0.1>nul
 adb shell input swipe  1050 600 1050 1050  200
