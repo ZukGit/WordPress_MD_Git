@@ -2950,6 +2950,84 @@ goto:eof
 
 
 
+:rule19vdownloadshoucangjia_func_0x0
+rem ======================================== rule19vdownloadshoucangjia_func_0x0
+rem rule_tip: %init_input_0% _19_  ## ADB 命令 Tel自动加载目录
+rem desc: 
+rem sample: 
+rem sample_out: 
+::SETLOCAL
+echo ______________Method_In rule19vdownloadshoucangjia_func_0x0
+echo [rule3vadbscreen_func_1x0 ]    output=[__empty__] dynamic_param1=[!rule3vinstalldirapk_dynamic_param1!]   
+adb shell am force-stop org.telegram.messenger
+ping -n 1 127.0.0.1>nul
+rem 回到桌面
+adb shell input keyevent 3
+ping -n 1 127.0.0.1>nul
+rem 打开应用
+adb shell am start  org.telegram.messenger/org.telegram.ui.LaunchActivity
+ping -n 1 127.0.0.1>nul
+rem 模拟点击
+adb shell input tap 450 450
+ping -n 1 127.0.0.1>nul
+adb shell input tap 450 450
+ping -n 1 127.0.0.1>nul
+set rule19teldown_dynamic_param1=100000
+for /l %%i in (1, 1, !rule19teldown_dynamic_param1!) do (
+set loop_numnber=%%i
+set /a loop_numnber_yushu=!loop_numnber!%%20
+echo __________________ Loop_Index[%%i] Begin  _______________________
+echo i == %%i      allLoop=[!rule19teldown_dynamic_param1!]  yushu=[!loop_numnber_yushu!]    adb shell input tap 190 1000
+adb shell input tap 190 1000
+ping -n 1 127.0.0.1>nul
+adb shell input swipe 190 1200 190 400  
+ping -n 1 127.0.0.1>nul
+echo i == %%i      allLoop=[!rule19teldown_dynamic_param1!]  yushu=[!loop_numnber_yushu!]    adb shell input tap 190 1100
+adb shell input tap 190 1100
+ping -n 1 127.0.0.1>nul
+adb shell input swipe 190 1200 190 400  
+ping -n 1 127.0.0.1>nul
+echo i == %%i      allLoop=[!rule19teldown_dynamic_param1!]  yushu=[!loop_numnber_yushu!]    adb shell input tap 190 1200
+adb shell input tap 190 1200
+ping -n 1 127.0.0.1>nul
+adb shell input swipe 190 1200 190 400  
+ping -n 1 127.0.0.1>nul
+echo i == %%i      allLoop=[!rule19teldown_dynamic_param1!]  yushu=[!loop_numnber_yushu!]    adb shell input tap 190 1300
+adb shell input tap 190 1300
+ping -n 1 127.0.0.1>nul
+adb shell input swipe 190 1200 190 400  
+ping -n 1 127.0.0.1>nul
+echo i == %%i      allLoop=[!rule19teldown_dynamic_param1!]  yushu=[!loop_numnber_yushu!]    adb shell input tap 190 1400
+adb shell input tap 190 1400
+ping -n 1 127.0.0.1>nul
+adb shell input swipe 190 1200 190 400  
+ping -n 1 127.0.0.1>nul
+echo loop_numnber_yushu=!loop_numnber_yushu!
+if !loop_numnber_yushu! EQU 0 (
+adb shell am force-stop org.telegram.messenger
+ping -n 1 127.0.0.1>nul
+rem 回到桌面
+adb shell input keyevent 3
+ping -n 1 127.0.0.1>nul
+rem 打开应用
+adb shell am start  org.telegram.messenger/org.telegram.ui.LaunchActivity
+ping -n 1 127.0.0.1>nul
+rem 模拟点击
+adb shell input tap 450 450
+ping -n 1 127.0.0.1>nul
+adb shell input tap 450 450
+ping -n 1 127.0.0.1>nul
+)
+echo __________________ Loop_Index[%%i] Endxx  _______________________
+)
+echo [rule19vdownloadshoucangjia_func_0x0 EndPrintCode]   output=[__empty__]  param1=[__empty__] 
+echo ______________Method_Out rule19vdownloadshoucangjia_func_0x0
+::ENDLOCAL
+goto:eof
+
+
+
+
 :ruletipprint_func_0x0
 rem ======================================== ruletipprint_func_0x0
 rem desc: Bussiness_Rule打印程序用于打印batrule规则序列
@@ -3014,6 +3092,8 @@ echo %init_input_0% _16_  192.168.31.10:5555   ##荣耀_无线USB_无线adb adb 
 echo %init_input_0% _17_       ##把 连接adb的 手机 执行 adb dump service 抓取一些配置文件 命令 到 adb_dump_时间戳 文件夹
 
 echo %init_input_0% _18_  ## 安装本地zsoft到zsoft_dest目录 1.解压 2.复制zbin 3.配置环境变量 4.静默安装 5.添加绿色软件桌面icon
+
+echo %init_input_0% _19_  ## ADB 命令 Tel自动加载目录
 echo [ruletipprint_func_0x0 EndPrintCode]   output=[__empty__]  param1=[__empty__] 
 echo ______________Method_Out ruletipprint_func_0x0
 ::ENDLOCAL
@@ -3077,6 +3157,9 @@ rem ======================== 主函数main函数入口
 echo __________________ Main_Method Begin _______________________
 call ::helloworld_func_0x0
 call ::recordfilenametofile_func_1x1 %zbin%
+
+
+
 echo __________________ Main_Method End _______________________
 goto:eof
 rem ══════════════════════════════════════════ Main_Enter_Aera End══════════════════════════════════════════
