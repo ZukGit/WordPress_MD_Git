@@ -498,6 +498,7 @@ File mDownloadedMonthDir;  // 在 G2_Monitor_Download/YYYYMM/    年年年年月
 
 				String strLine_trim = strLine.trim();
 				String strLine_trim_clearChinese = clearChinese(strLine_trim);
+				System.out.println("strItem["+i+"]="+"["+strLine_trim_clearChinese+"]  On  One Line ");
 				boolean  isUrl = toJudgeUrl(strLine_trim_clearChinese);
 				if(isUrl && urlStrList.contains(strLine_trim_clearChinese)) {
 					tipMessage = " 当前url 已经执行过下载操作 跳过逻辑执行";
@@ -505,11 +506,12 @@ File mDownloadedMonthDir;  // 在 G2_Monitor_Download/YYYYMM/    年年年年月
 
 				}
 				if(isUrl) {
+					System.out.println("urlStrList.contain() == "+urlStrList.contains(strLine_trim_clearChinese) + "  url-size="+urlStrList.size());
 					curUrlIndex_InTxtFile++;
 
 					if(strLine_trim_clearChinese.contains("douyin")) {
 						douYinParseUrl(curUrlIndex_InTxtFile,strLine_trim_clearChinese,fileNameNoPoint);
-
+						urlStrList.add(strLine_trim_clearChinese);
 					}
 
 
@@ -518,13 +520,19 @@ File mDownloadedMonthDir;  // 在 G2_Monitor_Download/YYYYMM/    年年年年月
 
 			}
 
-			
-			
-			
-	
-			
-			
-			
+			System.out.println(" __________________ urlList Begin __________________");
+			for (int i = 0; i < urlStrList.size(); i++) {
+				String urlStr = urlStrList.get(i);
+				System.out.println("url["+(i+1)+"]  = "+ urlStr );
+			}
+
+			System.out.println(" __________________ urlList Endxx __________________");
+
+
+
+
+
+
 			return tipMessage;
 			
 		}
@@ -700,8 +708,13 @@ File mDownloadedMonthDir;  // 在 G2_Monitor_Download/YYYYMM/    年年年年月
 		String simpleDesc() {
 
 			return  Cur_Bat_Name + " #_"+rule_index+"  ### 持续检测 WeChat目录 C:\\Users\\zukgit\\Documents\\WeChat Files\\xxxx\\FileStorage\\File\\2021-07 的 TXT文件的内容    \n"
-					+ Cur_Bat_Name + " #_"+rule_index+"   ### 只有在 WeChat的当前 月份接收文件目录 才能生效 Monitor 监控 \n  explorer.exe  \"C:\\Users\\zukgit\\Documents\\WeChat Files\\zzj382581427\\FileStorage\\File\"   \n"
-					;
+					+ Cur_Bat_Name + " #_"+rule_index+"   ### 只有在 WeChat的当前 月份接收文件目录 才能生效 Monitor 监控 \n" +
+					"  explorer.exe  \""+System.getProperties().getProperty("user.home")+"\\Documents\\WeChat Files\\zzj382581427\\FileStorage\\File\"   \n"  +
+					"  explorer.exe  \""+mDownloadedMonthDir.getAbsolutePath()+"\"   \n"  +
+					"cd  "+ "\""+System.getProperties().getProperty("user.home")+"\\Documents\\WeChat Files\\zzj382581427\\FileStorage\\File"+File.separator+getTimeStamp_YYYY_MM()+"\"  &&   zrule_apply_G2.bat "+"_"+rule_index+"_" +
+					"\n"
+
+			;
 		}
 
 
@@ -10209,6 +10222,14 @@ newRealFile=D:\BaiduNetdiskDownload\公式\bad_batch\good_batch\A.pdf
 		String date = df.format(new Date());
 		return date;
 	}
+
+	static String getTimeStamp_YYYY_MM() {
+
+		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM");// 设置日期格式
+		String date = df.format(new Date());
+		return date;
+	}
+
 
 
 	static String getTimeStamp() {
