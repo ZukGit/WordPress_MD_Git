@@ -30,6 +30,10 @@ import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
+import org.openqa.selenium.Keys;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.interactions.Actions;
 
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
@@ -49,6 +53,7 @@ import java.text.Collator;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -533,6 +538,7 @@ public class I9_TextRuleOperation {
 	
 	class Analysis_URI_IN_Txt_Download_DouYinMP4_Rule_37 extends Basic_Rule {
 
+		File ChromeDriverFile ;
 		String error_string_item;
 		
 // String targetPath = "奇怪，刚刚和妈妈的衣架子交心攀谈后，怎么感觉头上有一圈星星呢～ https://v.kuaishou.com/6Rq0gB 复制此链接，打开【快手App】直接观看！";
@@ -549,6 +555,7 @@ public class I9_TextRuleOperation {
 			timeStamp_Str = getTimeStamp();
 			index_download = 1;
 			videoUrlList =  new ArrayList<String>();
+			ChromeDriverFile = new File(zbinPath+File.separator+"G2_chromedriver_v91.exe");
 		}
 
 	
@@ -572,7 +579,7 @@ public class I9_TextRuleOperation {
 		
 		@Override
 		String simpleDesc() {
-			return "  检测 当前 txt文件中的 url 路径(抖音 快手视频)   并尝试下载这个 url 对应的文件到本地 tile_时间戳.mp4 并在temp文件打印url列表";
+			return "  检测 当前 txt文件中的 url 路径(抖音 头条 快手视频)   并尝试下载这个 url 对应的文件到本地 tile_时间戳.mp4 并在temp文件打印url列表";
 		}
 
 		@Override
@@ -619,8 +626,14 @@ public class I9_TextRuleOperation {
 
 			}
 			
-//			urlList.sort(Chinese);
-			SortString(videoUrlList);
+			urlList.sort(new Comparator<String>() {
+				@Override
+				public int compare(String o1, String o2) {
+					return o1.compareTo(o2);
+				}
+			});
+//			SortString(videoUrlList);
+	
 			writeContentToFile(I9_Temp_Text_File, videoUrlList);
 			NotePadOpenTargetFile(I9_Temp_Text_File.getAbsolutePath());
 			System.out.println("VideoURL 列表打印在 PATH: "+ I9_Temp_Text_File.getAbsolutePath());
@@ -635,18 +648,256 @@ public class I9_TextRuleOperation {
 	        if(url.contains("v.kuaishou.com")){
 	            ksParseUrl(url);
 	            videoUrlList.add(url);
-	        }
-	        if (url.contains("v.douyin.com")     ){
+	        }else  if (url.contains("v.douyin.com")     ){
 	            douYinParseUrl(url);
 	            videoUrlList.add(url);
 	        }else if(url.contains("douyin")) {
-	            downVideo(url,"douyin","抖音视频");
+	            downVideo(url,"douyin","douyin");
+	            videoUrlList.add(url);
+	        	
+	        }else if(url.contains("m.toutiaoimg.cn") || url.contains("ixigua") ) {
+	            TouTiao_XiGua_Download(url);
 	            videoUrlList.add(url);
 	        	
 	        }
 	    }
 	  
+	  void TouTiao_XiGua_Download(String urlitem) {
+		  if(!ChromeDriverFile.exists()) {
+			  System.out.println("当前 ChroneDriver.exe 文件不存在 请检查当前 chrome版本 并去 http://npm.taobao.org/mirrors/chromedriver/ 下载对应版本的 chromedriver.exe 才能执行 头条西瓜视频的下载 ");
+			  return;
+		  }
+		  
+			if(urlitem.startsWith("https://www.ixigua.com/") || urlitem.startsWith("https://m.toutiaoimg.cn/") ) {
+				
+				XiGua_TouTiao_ParseUrl(urlitem);
+			}
+		  
+	  }
 	  
+	  
+	      void XiGua_TouTiao_ParseUrl(String url) {
+	    //  String url="https://m.toutiaoimg.cn/group/6966235416110301696/?app=news_article_lite&timestamp=1626072237&group_id=6966235416110301696&share_token=0f88ebb4-c474-4671-9d9b-4b7e76004e38";
+	       
+	    	  org.jsoup.nodes.Document mainHtml;
+	        	String jiemi_base64_url = null;
+	        	String base64_jiami_url = null;
+	        	
+	        	
+	        	// backup_url_1  有时 main_url  会 解析错误  所以 会导致 下载不了视频  此时 需要用 备用视频下载 
+	        	String jiemi_base64_bankurl = null; 
+	        	String base64_jiami_bankurl = null;
+	        	
+				String main_url_keyword="\"main_url\":\"";
+				String bankup_url_keyword="\"backup_url_1\":\"";
+				
+	    		try {
+	    			mainHtml = Jsoup.parse(getXiGua_MainPageSource(url));
+	    			if(mainHtml != null ) {
+	    				String MainHtmlStr = mainHtml.toString();
+
+	    				
+	    		      	// 把  "main_url":"  去除  那么 起点 就是 我们 要找的 url
+	    		       	//  "backup_url_1":" 
+	    				
+	    				base64_jiami_url = calculXiGuaMainUri(url,MainHtmlStr,main_url_keyword);
+	    				base64_jiami_bankurl = calculXiGuaMainUri(url,MainHtmlStr,bankup_url_keyword);
+	    				if(base64_jiami_url == null ) {
+	    					System.out.println("解析出的 base64_jiami_main_url 为空 无法下载视频到本地   base64_jiami_url="+base64_jiami_url);
+	    				}else {
+	    					System.out.println("解析出的 base64_jiami_url=["+base64_jiami_url+"]  尝试解密base64");
+
+	    					 jiemi_base64_url = jiemi_decryptBASE64(base64_jiami_url);
+	    					System.out.println();
+	    					
+	    					System.out.println("解析出的地址  jiemi_base64_url = ["+ jiemi_base64_url+"]");
+	    					
+	    					if(jiemi_base64_url.startsWith("http")) {
+	    						System.out.println("执行 main_url 下载操作!!!    jiemi_base64_url=["+jiemi_base64_url+"]");
+	    						downVideo(jiemi_base64_url,"","TouTiao");
+	    						
+	    						
+	    					}else {
+	    						System.out.println("解密出的地址不是以  http 开头  无法下载!!!");
+	    					}
+	    					
+	    				}
+	    				
+	    			}else {
+	    				System.out.println("当前读取到的 网页源码为空 ,   可能 G2_chromedriver版本 和 当前浏览器版本不一致!!   \n chromedriver.exe 下载地址: http://npm.taobao.org/mirrors/chromedriver/");
+	    			}
+	    			
+	    			
+	    		
+	    			
+	    		}catch (Exception e) {
+	    			// TODO: handle exception
+	    			System.out.println("解密Base64出意外Exception 尝试使用 bankup_url   \njiemi_base64_url=["+ jiemi_base64_url  +"]\nbase64_jiami_url=["+base64_jiami_url+"]    \n base64_jiami_bankurl=["+base64_jiami_bankurl+"]");
+	    			
+	    			try {
+		    			if(base64_jiami_bankurl != null) {
+		    				
+		    				jiemi_base64_bankurl = jiemi_decryptBASE64(base64_jiami_bankurl);
+		    			}
+		    			
+		    			if(jiemi_base64_bankurl != null && jiemi_base64_bankurl.startsWith("http")) {
+							System.out.println("执行 bankup_url_1 下载操作!!!    jiemi_base64_bankurl=["+jiemi_base64_bankurl+"]");
+							downVideo(jiemi_base64_bankurl,"","TouTiao");
+		    				
+		    			}
+		    		
+	    				
+	    				
+	    				
+	    			}catch (Exception e1) {
+	    				
+	    				System.out.println("尼玛 不干了  备用的 bankup_url 也解析失败!! 下载失败!! jiemi_base64_bankurl =["+jiemi_base64_bankurl+"]");
+						// TODO: handle exception
+					}
+	    			
+
+	    			
+	    			
+	    			
+	    		}
+	        	
+	        	
+	        	
+	        	
+	        	
+
+	        }
+	    
+      	// 把  "main_url":"  去除  那么 起点 就是 我们 要找的 url
+       	//  "backup_url_1":" 
+	      
+	      public   String calculXiGuaMainUri(String url , String mainHtmlStr , String beginKeyStr) {
+	    	   
+	      	String jiami_main_uri = null;
+	      	
+	      	if(mainHtmlStr == null ) {
+	      		System.out.println("当前 url="+url +"  获取到的网页源代码 htmlcode 为空!! ");
+	          	return jiami_main_uri;
+	      	}
+	      	
+	         	if( !mainHtmlStr.contains("\"vtype\":\"mp4\"")) {
+	       		System.out.println("当前 url="+url +"  获取到的网页源代码 htmlcode   不包含关键字 \"vtype\":\"mp4\" 无法解析视频!! ");
+	          	return jiami_main_uri;
+	      	}
+	         	
+	         	// "definition":"1080p","quality":"normal","vtype":"mp4"
+	         	// "definition":"720p","quality":"normal","vtype":"mp4" 
+	         	// "definition":"480p","quality":"normal","vtype":"mp4"
+	         	// "definition":"360p","quality":"normal","vtype":"mp4"
+
+	         	String mp4_1080p_keystr = "\"definition\":\"1080p\",\"quality\":\"normal\",\"vtype\":\"mp4\"";
+	         	String mp4_720p_keystr = "\"definition\":\"720p\",\"quality\":\"normal\",\"vtype\":\"mp4\"";
+	         	String mp4_480p_keystr = "\"definition\":\"480p\",\"quality\":\"normal\",\"vtype\":\"mp4\"";
+	         	String mp4_360p_keystr = "\"definition\":\"360p\",\"quality\":\"normal\",\"vtype\":\"mp4\"";
+	         	
+	         	String mKeyMp4Tag = null;  // 如果有 1080p 那么选择1080p  如果只有720p 那么就是720p 选分辨率最高那个
+	         	
+	         	if(mainHtmlStr.contains(mp4_1080p_keystr)) {
+	         		mKeyMp4Tag = mp4_1080p_keystr;
+	           }else if(mainHtmlStr.contains(mp4_720p_keystr)) {
+	          		mKeyMp4Tag = mp4_720p_keystr;
+	           }else if(mainHtmlStr.contains(mp4_480p_keystr)) {
+	          		mKeyMp4Tag = mp4_480p_keystr;
+	           }else if(mainHtmlStr.contains(mp4_360p_keystr)) {
+	          		mKeyMp4Tag = mp4_360p_keystr;
+	           }
+
+	         	if(mKeyMp4Tag == null) {
+	         		
+	       		System.out.println("当前 url="+url +"  获取到的网页源代码 htmlcode  查不到 1080p 720p 480p  360p 视频的任意一个  无法解析视频!! ");
+
+	         		return jiami_main_uri;
+	         	}
+	         	
+	         	
+	         	//  把 要 解析的 分辨率 搞到  第一行位置 
+	         	// "definition":"1080p","quality":"normal","vtype":"mp4","vwidth":1920,"vheight":1080,"bitrate":2629630,"fps":25,"codec_type":"h264","size":77367333,"main_url":"...,"backup_url_1":...
+	         	String mp4tag_begin_str = mainHtmlStr.substring(mainHtmlStr.indexOf(mKeyMp4Tag));
+	         	
+	         	
+	         	if(mp4tag_begin_str == null || !mp4tag_begin_str.contains("\"main_url\":\"") ) {
+	       		System.out.println("当前 url="+url +"  获取到的网页源代码 htmlcode  找到 1080p 720p 480p  360p   mKeyMp4Tag = "+ mKeyMp4Tag + "  但解析出 main_url 失败!!");
+
+	         		return jiami_main_uri;	
+	         	}
+	         	
+	         	
+	         	if(mp4tag_begin_str == null || !mp4tag_begin_str.contains("\"backup_url_1\":\"") ) {
+	       		System.out.println("当前 url="+url +"  获取到的网页源代码 htmlcode  找到 1080p 720p 480p  360p   mKeyMp4Tag = "+ mKeyMp4Tag + "  但解析出  backup_url_1;	 失败!!");
+
+	     		System.out.println();
+	       		System.out.println();
+	       		System.out.println("mp4tag_begin_str = ");
+	       		System.out.println(mp4tag_begin_str);
+	       		
+	     		System.out.println();
+	     		System.out.println();
+	     		
+	         	}
+	         	
+	         	
+	         	
+	         	//  "main_url":"...,"backup_url_1":...
+	         	String main_url_begin = mp4tag_begin_str.substring(mp4tag_begin_str.indexOf(beginKeyStr));
+	         	
+	         	// 把  "main_url":"  去除  那么 起点 就是 我们 要找的 url
+	         	//  "backup_url_1":" 
+	         	String main_url_raw = main_url_begin.replace(beginKeyStr, "");
+	         	
+	         	// 第一个引号的位置 就是 结束 标示    main_url_fixed 就是我们 要找的 url_raw
+	         	String main_url_fixed = main_url_raw.substring(0,main_url_raw.indexOf("\""));
+	         	
+	         	System.out.println("当前寻找到的 base64_url = "+ main_url_fixed);
+	         	
+	         	
+	      	
+	      	return main_url_fixed;
+	      	
+	      	
+	      }
+	      
+	      
+	      /**
+	       * 获取首页内容
+	       *
+	       * @return 首页内容
+	       * @throws InterruptedException 睡眠中断异常
+	       */
+	  String getXiGua_MainPageSource(String url) throws InterruptedException {
+	      	
+	              ChromeOptions CUR_CHROME_OPTIONS = new ChromeOptions();
+	              // 驱动位置
+	              System.setProperty("webdriver.chrome.driver", ChromeDriverFile.getAbsolutePath());
+	              // 避免被浏览器检测识别
+	              CUR_CHROME_OPTIONS.setExperimentalOption("excludeSwitches", Collections.singletonList("enable-automation"));
+	     
+	          
+	          ChromeDriver driver = new ChromeDriver(CUR_CHROME_OPTIONS);
+	          try {
+
+	              driver.get(url);
+	              long waitTime = Double.valueOf(Math.max(3, Math.random() * 5) * 1000).longValue();
+	              TimeUnit.MILLISECONDS.sleep(waitTime);
+	              long timeout = 30_000;
+	              // 循环下拉，直到全部加载完成或者超时
+	              do {
+	                  new Actions(driver).sendKeys(Keys.END).perform();
+	                  TimeUnit.MILLISECONDS.sleep(waitTime);
+	                  timeout -= waitTime;
+	              } while (!driver.getPageSource().contains("已经到底部，没有新的内容啦")
+	                      && timeout > 0);
+	              System.out.println("已经到底部，没有新的内容啦");
+	              return driver.getPageSource();
+	          } finally {
+	              driver.close();
+	          }
+	      }
+	      
 	    /**
 	     * 方法描述: 抖音解析下载视频
 
@@ -670,12 +921,17 @@ public class I9_TextRuleOperation {
 	            //注:打印获取的链接
 	            System.out.println("-----抖音去水印链接-----\n"+finalVideoAddress);
 	            //下载无水印视频到本地
-	            downVideo(finalVideoAddress,title,"抖音视频");
+	            downVideo(finalVideoAddress,title,"douyin");
 	        } catch (IOException e) {
 	            System.out.println(e.getMessage());
 	        }
 	    }
 	  
+
+		
+		
+		
+		
 		@SuppressWarnings("unchecked")
 	    public  void ksParseUrl(String url) {
 	        HashMap headers = MapUtil.newHashMap();
@@ -689,13 +945,13 @@ public class I9_TextRuleOperation {
 	        System.out.println();
 	        System.out.println(videoUrl);
 	        System.out.println(title);
-	        downVideo(videoUrl,title,"快手视频");
+	        downVideo(videoUrl,title,"kuaishou");
 	    }
 		
 		@SuppressWarnings("unchecked")
 	    public  void downVideo(String httpUrl,String title,String source) {
 //	        String fileAddress = videoSavePath+"/"+source+"/"+title+".mp4";
-	        String fileAddress = videoSavePath+"/"+(title.replace(" ", ""))+"_"+index_download+"_"+timeStamp_Str+".mp4";
+	        String fileAddress = videoSavePath+"/"+((source==null ||"".equals(source) ? "":source+"_")+title.replace(" ", ""))+"_"+index_download+"_"+timeStamp_Str+".mp4";
 	        index_download++;
 	        int byteRead;
 	        try {
@@ -12329,6 +12585,23 @@ static	void initMoshuTypeItem(String key , String value){
         return Character.isDigit(s.charAt(0));
     }
     
+ /**
+  * BASE64解密
+  * @throws Exception
+  */
+ public static String jiemi_decryptBASE64(String key) throws Exception {
+     return new String(Base64.getDecoder().decode(key));
+ }
+
+
+ /**
+  * BASE64加密
+  */
+ public static String jiami_encryptBASE64(byte[] key) throws Exception {
+ 	
+     return new String(Base64.getEncoder().encode(key));
+ }
+
 	static void SortFileWithName(ArrayList<File> fileList) {
 	    Comparator<Object> CHINA_COMPARE = Collator.getInstance(java.util.Locale.CHINA);
 	    fileList.sort((o1_file, o2_file) -> {

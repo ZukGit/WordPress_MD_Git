@@ -2999,7 +2999,10 @@ set rule19teldown_dynamic_param1=100000
 for /l %%i in (1, 1, !rule19teldown_dynamic_param1!) do (
 set loop_numnber=%%i
 set yushu_number=250
+set fanhuishu_number=10
 set /a loop_numnber_yushu=!loop_numnber!%%!yushu_number!
+set /a loop_numnber_fanhuishu=!loop_numnber!%%!fanhuishu_number!
+
 echo __________________ Loop_Index[%%i] Begin  _______________________
 echo i == %%i      allLoop=[!rule19teldown_dynamic_param1!]  yushu=[!loop_numnber_yushu!] yushu_number=[!yushu_number!]   adb shell input tap 190 1000
 adb shell input tap 190 1000
@@ -3028,6 +3031,53 @@ ping -n 1 127.0.0.1>nul
 adb shell input swipe  1050 600 1050 1050  200
 ping -n 1 127.0.0.1>nul
 echo loop_numnber_yushu=!loop_numnber_yushu!
+
+if !loop_numnber_fanhuishu! EQU 0 (
+rem  一直返回  返回到主界面 
+
+adb shell input keyevent 4
+adb shell input keyevent 4
+adb shell input keyevent 4
+adb shell input keyevent 4
+adb shell input keyevent 4
+adb shell input keyevent 4
+adb shell input keyevent 4
+adb shell input keyevent 4
+adb shell input keyevent 4
+adb shell input keyevent 4
+adb shell input keyevent 4
+adb shell input keyevent 4
+adb shell input keyevent 4
+adb shell input keyevent 4
+adb shell input keyevent 4
+adb shell input keyevent 4
+adb shell input keyevent 4
+adb shell input keyevent 4
+adb shell input keyevent 4
+adb shell input keyevent 4
+adb shell input keyevent 4
+adb shell input keyevent 4
+adb shell input keyevent 4
+ping -n 1 127.0.0.1>nul
+rem 打开应用
+adb shell am start  org.telegram.messenger/org.telegram.ui.LaunchActivity
+ping -n 1 127.0.0.1>nul
+rem 模拟点击
+adb shell input tap 450 450
+ping -n 1 127.0.0.1>nul
+adb shell input tap 450 450
+ping -n 1 127.0.0.1>nul
+adb shell input swipe    1050 400 1050 1000  200
+adb shell input swipe    1050 400 1050 1000  200
+adb shell input swipe    1050 400 1050 1000  200
+
+adb shell input swipe    1050 400 1050 1000  200
+
+)
+
+
+
+
 if !loop_numnber_yushu! EQU 0 (
 adb shell am force-stop org.telegram.messenger
 ping -n 1 127.0.0.1>nul
