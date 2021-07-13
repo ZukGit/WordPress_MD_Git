@@ -30,6 +30,7 @@ import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
+import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
@@ -377,9 +378,9 @@ public class I9_TextRuleOperation {
 		CUR_RULE_LIST.add(new Copy_Port_WithZ_Rule27()); // 把当前文件内容以 ZZZZZZZZZZZZZZZZZZZZZ 分割 专门生成剪切内容保存到零时txt文件
 		CUR_RULE_LIST.add(new Show_JavaTest_File_Rule_28()); // 读取 Java模板文件(包含初始化模块) 然后在notepad++打开它
 		CUR_RULE_LIST.add(new Bat_Revert_MD_Rule29()); // 读取当前.bat 文件内容 进行 解析生成 MD文件的下半部分 并会解析新增的Method到模板文件
-														// zzbattest_I9.bat
+		// zzbattest_I9.bat
 		CUR_RULE_LIST.add(new Show_Bat_Template_OnDir_Rule_30()); // 把当前模板文件 zzbattest_I9.bat 内容写进当前目录下 Test_xx.bat文档
-																	// 并打开它
+		// 并打开它
 		CUR_RULE_LIST.add(new Bat_Format_Rule_31()); // 对当前 bat 文件进行 format 如果不是bat文件不操作 增项假如模板zbatrule_I9_Rule30.bat中
 		CUR_RULE_LIST.add(new Build_SH_BAT_WithJavaWithJar_Rule_32());
 
@@ -395,14 +396,19 @@ public class I9_TextRuleOperation {
 		// 对于只包含 0 和 1 的字符串文件 转为一个 byte文件 在 txt中打开
 		CUR_RULE_LIST.add(new BinaryStrToFile_Rule_36());
 
-		// 检测 当前 txt文件中的 url 路径   并尝试下载这个 url 对应的文件到本地 
+		// 检测 当前 txt文件中的 url 路径   并尝试下载这个 url 对应的文件到本地
 		CUR_RULE_LIST.add(new Analysis_URI_IN_Txt_Download_DouYinMP4_Rule_37());
-		
-		// 检测当前的 txt文件  只 保留 url 内容 , 并 对这些 内容 进行 排序 在 temp 中 打印出来 
 
-		 // 去除在PC微信中多选复制文本出现的多余内容 只保留有用信息的规则
+		// 检测当前的 txt文件  只 保留 url 内容 , 并 对这些 内容 进行 排序 在 temp 中 打印出来
+
+		// 去除在PC微信中多选复制文本出现的多余内容 只保留有用信息的规则
 		CUR_RULE_LIST.add(new Fixed_PCWeCharContent_KeepUsedInfo_Rule_38());
-		
+
+
+
+		// 检测当前目录下  包括 所有 子目录 孙 目录下 的 txt 文件 把 内容集中到 一个文件中 按时间顺序排序 并过滤url出来
+		CUR_RULE_LIST.add(new MakeAllTxt_Content_To_OneFile_Rule_39());
+
 //        CUR_RULE_LIST.add( new Image2Png_Rule_4());
 //        CUR_RULE_LIST.add( new AVI_Rule_5());
 //        CUR_RULE_LIST.add( new SubDirRename_Rule_6());
@@ -410,9 +416,185 @@ public class I9_TextRuleOperation {
 //        CUR_RULE_LIST.add( new ClearChineseType_8());
 
 	}
-	
-	
-	
+
+
+	class MakeAllTxt_Content_To_OneFile_Rule_39 extends Basic_Rule {
+
+		ArrayList<File> allTxtFile ;
+
+		MakeAllTxt_Content_To_OneFile_Rule_39(boolean mIsInputDirAsSearchPoint) {
+			super(39);
+			isInputDirAsSearchPoint = mIsInputDirAsSearchPoint;
+			allTxtFile = new ArrayList<File>();
+
+		}
+
+		MakeAllTxt_Content_To_OneFile_Rule_39() {
+			super(39, false);
+			allTxtFile = new ArrayList<File>();
+		}
+
+		@SuppressWarnings("unchecked")
+		@Override
+		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+			ArrayList<String> realFileNameList = new ArrayList<String>();
+
+			File currentTxtFile = curInputFileList.get(0);
+			File dirFile = curInputFileList.get(0).getParentFile();
+			ArrayList<File> allTxtFileList = getAllSubFile(dirFile,".txt");
+
+			ArrayList<String> allTxtContentList = new ArrayList<String> ();
+			ArrayList<String> allUriContentList = new ArrayList<String> ();
+
+			int txtIndex = 1;
+			String url_tip  = "";
+			if(allTxtFileList != null) {
+
+				allTxtFileList.sort(mFileDateComparion_New_Old);
+
+
+				allTxtContentList.add("═══════════════════ txt_file_count["+(allTxtFileList.size()-1)+"] ═══════════════════");
+
+				System.out.println("allTxtFileList = "+ allTxtFileList.size());
+				for (int i = 0; i < allTxtFileList.size(); i++) {
+
+					File txtFile =  allTxtFileList.get(i);
+					if(txtFile.getAbsolutePath().equals(currentTxtFile.getAbsolutePath())) {
+						continue;
+					}
+
+					System.out.println("txt["+txtIndex+"]  txtFile=["+txtFile.getAbsolutePath()+"]");
+
+					String dateStr = getDateStrFromLongStamp(txtFile.lastModified());  // "yyyy-MM-dd_HH:mm:ss"
+
+					ArrayList<String> curTxtFileContentList = ReadFileContentAsList(txtFile);
+
+					String tip = "______ txt["+txtIndex+"] date["+dateStr+"] ______";
+
+					allTxtContentList.add(tip);
+					allTxtContentList.addAll(curTxtFileContentList);
+					allTxtContentList.add("");
+
+					//  检测当前文件的 每一行 是否 有 url
+					for (int j = 0; j < curTxtFileContentList.size(); j++) {
+						String lineStr = curTxtFileContentList.get(j);
+						ArrayList<String> oneLineUrlList = new ArrayList<String>(); // 一行 中 可能 多个 url 列表
+						String strLine_trim_clearChinese = clearChinese(lineStr.trim());
+						calculUrlInOneLine(strLine_trim_clearChinese, oneLineUrlList);
+
+
+						if(oneLineUrlList != null && oneLineUrlList.size() > 0) {
+
+							allUriContentList.addAll(oneLineUrlList);
+						}
+
+					}
+
+
+
+					txtIndex++;
+
+
+
+				}
+
+
+
+				url_tip = "═══════════════" + " url_count ["+ allUriContentList.size()+"] "+ "═══════════════";
+
+
+
+				allUriContentList.sort(new Comparator<String>() {
+					@Override
+					public int compare(String o1, String o2) {
+						return o1.compareTo(o2);
+					}
+				});
+
+
+				allTxtContentList.add(url_tip);
+				allTxtContentList.addAll(allUriContentList);
+				allTxtContentList.add(url_tip);
+
+
+
+			}
+
+			allTxtContentList.add(0, url_tip);
+
+
+			writeContentToFile(currentTxtFile, allTxtContentList);
+			NotePadOpenTargetFile(currentTxtFile.getAbsolutePath());
+
+			return super.applyOperationRule(curFileList, subFileTypeMap, curDirList, curRealFileList);
+		}
+
+
+		void calculUrlInOneLine(String rowString , ArrayList<String> urlList) {
+
+			String[] strArrRow = null;
+			String fixStr = "";
+
+//	        if(str.trim().startsWith("http:") || str.trim().startsWith("https:") ||
+//	                str.trim().startsWith("thunder:") ||   str.trim().startsWith("magnet::") ){
+
+			if (rowString != null) {
+				fixStr = new String(rowString);
+				// http://xxxxxx/sahttp:// 避免出现 http://http: 连着的情况 起码也要使得间隔一个空格
+				fixStr = fixStr.replace("http:", " http:");
+				fixStr = fixStr.replace("https:", " https:");
+				fixStr = fixStr.replace("thunder:", " thunder:");
+				fixStr = fixStr.replace("magnet:", " magnet:");
+				strArrRow = fixStr.split(" ");
+			}
+
+			if (strArrRow != null && strArrRow.length > 0) {
+
+				for (int i = 0; i < strArrRow.length; i++) {
+					String mCurContent = strArrRow[i];
+					if (mCurContent == null || mCurContent.trim().equals("")) {
+						continue;
+					}
+
+					boolean isUrl = toJudgeUrl(mCurContent);
+					if (isUrl) {
+						urlList.add(clearChinese(mCurContent).trim());
+
+					}
+
+				}
+
+			}
+
+
+		}
+
+		public boolean toJudgeUrl(String str) {
+			boolean isUrl = false;
+
+			if (str.trim().toLowerCase().startsWith("http:") || str.toLowerCase().trim().startsWith("https:")
+					|| str.toLowerCase().trim().startsWith("thunder:")
+					|| str.toLowerCase().trim().startsWith("magnet:")) {
+
+				return true;
+			}
+
+			return isUrl;
+		}
+
+
+
+
+		@Override
+		String simpleDesc() {
+			return " 把当前 目录下的 子目录 孙目录下 的 所有的 Txt文件 集合起来 以时间排序 打印到当前打开的文件 !";
+		}
+
+	}
+
+
+
 	class Fixed_PCWeCharContent_KeepUsedInfo_Rule_38 extends Basic_Rule {
 
 
@@ -423,7 +605,7 @@ public class I9_TextRuleOperation {
 
 		@Override
 		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
-				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 			for (int i = 0; i < curInputFileList.size(); i++) {
 				File fileItem = curInputFileList.get(i);
 
@@ -469,10 +651,10 @@ public class I9_TextRuleOperation {
 
 			return itemDesc;
 		}
-		
-		
-		
-	
+
+
+
+
 		public  ArrayList<String>	clearPC_DuoYu_Content(File  srcFile){
 			ArrayList<String> newContent = new ArrayList<String>();
 
@@ -485,8 +667,8 @@ public class I9_TextRuleOperation {
 			clearTagList.add("[视频]");
 			clearTagList.add("[语音]");
 			clearTagList.add("[地理位置]");
-	
-			
+
+
 
 			if (curFile != null) {
 
@@ -505,18 +687,18 @@ public class I9_TextRuleOperation {
 						if (oldOneLine == null || oldOneLine.trim().isEmpty()) {
 							continue;
 						}
-						
+
 						// 去除 以 : 结尾的 字符串行
 						if(oldOneLine.endsWith(":")) {
 							continue;
 						}
-				
 
-						if(clearTagList.contains(oldOneLine)) { 
-							 // 如果包含 [图片] 类型字符串 那么也过滤
+
+						if(clearTagList.contains(oldOneLine)) {
+							// 如果包含 [图片] 类型字符串 那么也过滤
 							continue;
 						}
-						
+
 
 						newContent.add(oldOneLine.trim());
 					}
@@ -530,53 +712,55 @@ public class I9_TextRuleOperation {
 			}
 			return newContent;
 		}
-		
+
 
 	}
-	
-	
-	
+
+
+
 	class Analysis_URI_IN_Txt_Download_DouYinMP4_Rule_37 extends Basic_Rule {
 
 		File ChromeDriverFile ;
 		String error_string_item;
-		
+
 // String targetPath = "奇怪，刚刚和妈妈的衣架子交心攀谈后，怎么感觉头上有一圈星星呢～ https://v.kuaishou.com/6Rq0gB 复制此链接，打开【快手App】直接观看！";
 
-		ArrayList<String> videoUrlList ; 
-		ArrayList<String> urlList ;   // 在 url 中 检测到的 mp4 文件    比如 https://v.kuaishou.com/6Rq0gB 
-	    String videoSavePath=null;   //  默认为 txt 文件所在 目录下 新建 抖音 mp4 文件 
+		ArrayList<String> videoUrlList ;
+		ArrayList<String> urlList ;   // 在 url 中 检测到的 mp4 文件    比如 https://v.kuaishou.com/6Rq0gB
+		String videoSavePath=null;   //  默认为 txt 文件所在 目录下 新建 抖音 mp4 文件
 
-	    String timeStamp_Str = null;
-	    int index_download;
+		String timeStamp_Str = null;
+		ArrayList<String> urlStrList; // url 字符串列表
+		int index_download;
 		Analysis_URI_IN_Txt_Download_DouYinMP4_Rule_37() {
 			super(37, false);
 			urlList = new ArrayList<String>();
 			timeStamp_Str = getTimeStamp();
 			index_download = 1;
 			videoUrlList =  new ArrayList<String>();
+			urlStrList =  new ArrayList<String>();
 			ChromeDriverFile = new File(zbinPath+File.separator+"G2_chromedriver_v91.exe");
 		}
 
-	
+
 		@Override
 		boolean checkParamsOK(File shellDir, String type2Param, ArrayList<String> otherParams) {
 			// TODO Auto-generated method stub
-	
-			
+
+
 
 			return super.checkParamsOK(shellDir, type2Param, otherParams);
 		}
-		
+
 		@Override
 		void showWrongMessage() {
 			// TODO Auto-generated method stub
 			super.showWrongMessage();
 		}
-		
-		
-		
-		
+
+
+
+
 		@Override
 		String simpleDesc() {
 			return "  检测 当前 txt文件中的 url 路径(抖音 头条 快手视频)   并尝试下载这个 url 对应的文件到本地 tile_时间戳.mp4 并在temp文件打印url列表";
@@ -584,48 +768,60 @@ public class I9_TextRuleOperation {
 
 		@Override
 		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
-				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 			for (int i = 0; i < curInputFileList.size(); i++) {
 				ArrayList<String> allContentList = new ArrayList<String>();
 				File targetFile = curInputFileList.get(i);
 				String fileName = getFileNameNoPointNoLowerCase(targetFile.getName());
 				ArrayList<String> allContent = ReadFileContentAsList(targetFile);
 
-				if(targetFile.exists()) {
+				if(targetFile.exists() && targetFile.isFile()) {
 					videoSavePath = targetFile.getParentFile().getAbsolutePath();
 				}
-				
+
 				if(videoSavePath == null) {
-					videoSavePath = targetFile.getParentFile().getAbsolutePath();
+					if(targetFile.exists() && targetFile.isFile()) {
+						videoSavePath = targetFile.getParentFile().getAbsolutePath();
+					}
 				}
-				
+
 				if(allContent.size() > 0) {
 					for (int j = 0; j < allContent.size(); j++) {
 						String oneLine = allContent.get(j);
 						toGetUrlFromOneLine_And_InitUrlList(oneLine);
-						
-						
+
+
 					}
-					
-					
+
+
 					if(urlList.size() == 0) {
 						System.out.println("当前执行 "+rule_index +" 规则失败  读取文件中的 http-url数据失败!!");
 						return null;
 					}
-					
+
+
 					for (int j = 0; j < urlList.size(); j++) {
 						String urlItem = urlList.get(j);
-						
-						 parseUrl(urlItem);
+
+						String strLine_trim = urlItem.trim();
+						String strLine_trim_clearChinese = clearChinese(strLine_trim);
+						System.out.println("strItem[" + j + "]=" + "[" + strLine_trim_clearChinese + "]  On  One Line ");
+						boolean isUrl = toJudgeUrl(strLine_trim_clearChinese);
+
+
+
+						System.out.println("开始解析 url urlItem="+ urlItem);
+
+						parseUrl(j,urlItem);
 					}
-					
-	
+
+
 				}else {
 					System.out.println("当前执行 "+rule_index +" 规则失败  读取文件内容为空!!!");
 				}
 
 			}
-			
+
 			urlList.sort(new Comparator<String>() {
 				@Override
 				public int compare(String o1, String o2) {
@@ -633,7 +829,7 @@ public class I9_TextRuleOperation {
 				}
 			});
 //			SortString(videoUrlList);
-	
+
 			writeContentToFile(I9_Temp_Text_File, videoUrlList);
 			NotePadOpenTargetFile(I9_Temp_Text_File.getAbsolutePath());
 			System.out.println("VideoURL 列表打印在 PATH: "+ I9_Temp_Text_File.getAbsolutePath());
@@ -642,444 +838,545 @@ public class I9_TextRuleOperation {
 		}
 
 
-		
-		
-	  public  void parseUrl(String url) {
-	        if(url.contains("v.kuaishou.com")){
-	            ksParseUrl(url);
-	            videoUrlList.add(url);
-	        }else  if (url.contains("v.douyin.com")     ){
-	            douYinParseUrl(url);
-	            videoUrlList.add(url);
-	        }else if(url.contains("douyin")) {
-	            downVideo(url,"douyin","douyin");
-	            videoUrlList.add(url);
-	        	
-	        }else if(url.contains("m.toutiaoimg.cn") || url.contains("ixigua") ) {
-	            TouTiao_XiGua_Download(url);
-	            videoUrlList.add(url);
-	        	
-	        }
-	    }
-	  
-	  void TouTiao_XiGua_Download(String urlitem) {
-		  if(!ChromeDriverFile.exists()) {
-			  System.out.println("当前 ChroneDriver.exe 文件不存在 请检查当前 chrome版本 并去 http://npm.taobao.org/mirrors/chromedriver/ 下载对应版本的 chromedriver.exe 才能执行 头条西瓜视频的下载 ");
-			  return;
-		  }
-		  
-			if(urlitem.startsWith("https://www.ixigua.com/") || urlitem.startsWith("https://m.toutiaoimg.cn/") ) {
-				
-				XiGua_TouTiao_ParseUrl(urlitem);
+
+
+		public  void parseUrl(int index , String url) {
+
+
+
+			if(url.contains("v.kuaishou.com")){
+				ksParseUrl(url);
+				videoUrlList.add(url);
+			}else  if (url.contains("v.douyin.com")     ){
+				douYinParseUrl(url);
+				videoUrlList.add(url);
+			}else if(url.contains("douyin")) {
+				downRawVideo_WithUrl(url,"douyin","douyin");
+				videoUrlList.add(url);
+
+			}else if(url.contains("m.toutiaoimg.cn") || url.contains("ixigua")  || url.contains("toutiao") ) {
+				TouTiao_XiGua_Download(index ,url);
+				videoUrlList.add(url);
+
 			}
-		  
-	  }
-	  
-	  
-	      void XiGua_TouTiao_ParseUrl(String url) {
-	    //  String url="https://m.toutiaoimg.cn/group/6966235416110301696/?app=news_article_lite&timestamp=1626072237&group_id=6966235416110301696&share_token=0f88ebb4-c474-4671-9d9b-4b7e76004e38";
-	       
-	    	  org.jsoup.nodes.Document mainHtml;
-	        	String jiemi_base64_url = null;
-	        	String base64_jiami_url = null;
-	        	
-	        	
-	        	// backup_url_1  有时 main_url  会 解析错误  所以 会导致 下载不了视频  此时 需要用 备用视频下载 
-	        	String jiemi_base64_bankurl = null; 
-	        	String base64_jiami_bankurl = null;
-	        	
-				String main_url_keyword="\"main_url\":\"";
-				String bankup_url_keyword="\"backup_url_1\":\"";
-				
-	    		try {
-	    			mainHtml = Jsoup.parse(getXiGua_MainPageSource(url));
-	    			if(mainHtml != null ) {
-	    				String MainHtmlStr = mainHtml.toString();
+		}
 
-	    				
-	    		      	// 把  "main_url":"  去除  那么 起点 就是 我们 要找的 url
-	    		       	//  "backup_url_1":" 
-	    				
-	    				base64_jiami_url = calculXiGuaMainUri(url,MainHtmlStr,main_url_keyword);
-	    				base64_jiami_bankurl = calculXiGuaMainUri(url,MainHtmlStr,bankup_url_keyword);
-	    				if(base64_jiami_url == null ) {
-	    					System.out.println("解析出的 base64_jiami_main_url 为空 无法下载视频到本地   base64_jiami_url="+base64_jiami_url);
-	    				}else {
-	    					System.out.println("解析出的 base64_jiami_url=["+base64_jiami_url+"]  尝试解密base64");
+		void TouTiao_XiGua_Download(int index , String urlitem) {
+			if(!ChromeDriverFile.exists()) {
+				System.out.println("当前 ChroneDriver.exe 文件不存在 请检查当前 chrome版本 并去 http://npm.taobao.org/mirrors/chromedriver/ 下载对应版本的 chromedriver.exe 才能执行 头条西瓜视频的下载 ");
+				return;
+			}
 
-	    					 jiemi_base64_url = jiemi_decryptBASE64(base64_jiami_url);
-	    					System.out.println();
-	    					
-	    					System.out.println("解析出的地址  jiemi_base64_url = ["+ jiemi_base64_url+"]");
-	    					
-	    					if(jiemi_base64_url.startsWith("http")) {
-	    						System.out.println("执行 main_url 下载操作!!!    jiemi_base64_url=["+jiemi_base64_url+"]");
-	    						downVideo(jiemi_base64_url,"","TouTiao");
-	    						
-	    						
-	    					}else {
-	    						System.out.println("解密出的地址不是以  http 开头  无法下载!!!");
-	    					}
-	    					
-	    				}
-	    				
-	    			}else {
-	    				System.out.println("当前读取到的 网页源码为空 ,   可能 G2_chromedriver版本 和 当前浏览器版本不一致!!   \n chromedriver.exe 下载地址: http://npm.taobao.org/mirrors/chromedriver/");
-	    			}
-	    			
-	    			
-	    		
-	    			
-	    		}catch (Exception e) {
-	    			// TODO: handle exception
-	    			System.out.println("解密Base64出意外Exception 尝试使用 bankup_url   \njiemi_base64_url=["+ jiemi_base64_url  +"]\nbase64_jiami_url=["+base64_jiami_url+"]    \n base64_jiami_bankurl=["+base64_jiami_bankurl+"]");
-	    			
-	    			try {
-		    			if(base64_jiami_bankurl != null) {
-		    				
-		    				jiemi_base64_bankurl = jiemi_decryptBASE64(base64_jiami_bankurl);
-		    			}
-		    			
-		    			if(jiemi_base64_bankurl != null && jiemi_base64_bankurl.startsWith("http")) {
-							System.out.println("执行 bankup_url_1 下载操作!!!    jiemi_base64_bankurl=["+jiemi_base64_bankurl+"]");
-							downVideo(jiemi_base64_bankurl,"","TouTiao");
-		    				
-		    			}
-		    		
-	    				
-	    				
-	    				
-	    			}catch (Exception e1) {
-	    				
-	    				System.out.println("尼玛 不干了  备用的 bankup_url 也解析失败!! 下载失败!! jiemi_base64_bankurl =["+jiemi_base64_bankurl+"]");
-						// TODO: handle exception
+//			if(urlitem.startsWith("https://www.ixigua.com/") || urlitem.startsWith("https://m.toutiaoimg.cn/") ) {
+
+			XiGua_TouTiao_ParseUrl(index,urlitem);
+//			}
+
+		}
+
+
+		void XiGua_TouTiao_ParseUrl(int index , String url) {
+			// String
+			// url="https://m.toutiaoimg.cn/group/6966235416110301696/?app=news_article_lite&timestamp=1626072237&group_id=6966235416110301696&share_token=0f88ebb4-c474-4671-9d9b-4b7e76004e38";
+
+			org.jsoup.nodes.Document mainHtml;
+			String jiemi_base64_url = null;
+			String base64_jiami_url = null;
+			String NoMainUrl_VideoTag_url = null ;  // 对于 没有 main_url 但 有 <video src="http" //这样的页面的处理
+
+			// backup_url_1 有时 main_url 会 解析错误 所以 会导致 下载不了视频 此时 需要用 备用视频下载
+			String jiemi_base64_bankurl = null;
+			String base64_jiami_bankurl = null;
+
+			String main_url_keyword = "\"main_url\":\"";
+			String bankup_url_keyword = "\"backup_url_1\":\"";
+
+
+
+			try {
+				mainHtml = Jsoup.parse(getXiGua_MainPageSource(url));
+
+				if(mainHtml != null && mainHtml.toString().contains("mediatype=\"video\"")
+						&& mainHtml.toString().contains("src=\"http")
+						&& mainHtml.toString().contains("<video") ) {
+					String  mainHtmlStr = mainHtml.toString();
+					// <video class="" tabindex="2" mediatype="video" src="http://v3-default.ixigua.com/c
+					String begin_video_tag = mainHtmlStr.substring(mainHtmlStr.indexOf("<video"));
+					String src_begin_tag = begin_video_tag.substring(begin_video_tag.indexOf("src=\"http"));
+					String http_begin_tag = src_begin_tag.replace("src=\"http", "");
+					String target_video_url = "http"+http_begin_tag.substring(0, http_begin_tag.indexOf("\""));
+					NoMainUrl_VideoTag_url = target_video_url;
+					System.out.println("当前页面源码有 Video Tag 标签 ");
+
+					System.out.println();
+					System.out.println("url = "+ url);
+					System.out.println("NoMainUrl_VideoTag_url = "+ NoMainUrl_VideoTag_url);
+					System.out.println("===============mainHtml Begin============ ");
+
+					System.out.println(mainHtml);
+
+					System.out.println("===============mainHtml Endxx============ ");
+
+					System.out.println();
+
+
+				}else {
+					System.out.println();
+					System.out.println("url = "+ url);
+					System.out.println("===============mainHtml Begin============ ");
+
+					System.out.println(mainHtml);
+
+					System.out.println("===============mainHtml Endxx============ ");
+
+					System.out.println();
+				}
+				if (mainHtml != null) {
+					String MainHtmlStr = mainHtml.toString();
+
+					// 把 "main_url":" 去除 那么 起点 就是 我们 要找的 url
+					// "backup_url_1":"
+
+					base64_jiami_url = calculXiGuaMainUri(url, MainHtmlStr, main_url_keyword);
+					base64_jiami_bankurl = calculXiGuaMainUri(url, MainHtmlStr, bankup_url_keyword);
+					if (base64_jiami_url == null) {
+
+						if(NoMainUrl_VideoTag_url != null) {
+							System.out.println("解析出的 base64_jiami_main_url 为空  但存在 video_tag_url = "+ NoMainUrl_VideoTag_url );
+							System.out.println(" 尝试下载  video_tag_url : "+ NoMainUrl_VideoTag_url);
+
+							downRawVideo_WithUrl(NoMainUrl_VideoTag_url, "", "TouTiao");
+						}else {
+
+							System.out.println("解析出的 base64_jiami_main_url 为空  NoMainUrl_VideoTag_url 为空 无法下载视频到本地   base64_jiami_url=" + base64_jiami_url);
+
+						}
+
+
+
+
+					} else {
+						System.out.println("解析出的 base64_jiami_url=[" + base64_jiami_url + "]  尝试解密base64");
+
+						jiemi_base64_url = jiemi_decryptBASE64(base64_jiami_url);
+						System.out.println();
+
+						System.out.println("解析出的地址  jiemi_base64_url = [" + jiemi_base64_url + "]");
+
+						if (jiemi_base64_url.startsWith("http")) {
+							System.out.println("执行 main_url 下载操作!!!    jiemi_base64_url=[" + jiemi_base64_url + "]");
+							downRawVideo_WithUrl(jiemi_base64_url, "", "TouTiao");
+
+						} else {
+							System.out.println("解密出的地址不是以  http 开头  无法下载!!!");
+						}
+
 					}
-	    			
 
-	    			
-	    			
-	    			
-	    		}
-	        	
-	        	
-	        	
-	        	
-	        	
+				} else {
+					System.out.println(
+							"当前读取到的 网页源码为空 ,   可能 G2_chromedriver版本 和 当前浏览器版本不一致!!   \n chromedriver.exe 下载地址: http://npm.taobao.org/mirrors/chromedriver/");
+				}
 
-	        }
-	    
-      	// 把  "main_url":"  去除  那么 起点 就是 我们 要找的 url
-       	//  "backup_url_1":" 
-	      
-	      public   String calculXiGuaMainUri(String url , String mainHtmlStr , String beginKeyStr) {
-	    	   
-	      	String jiami_main_uri = null;
-	      	
-	      	if(mainHtmlStr == null ) {
-	      		System.out.println("当前 url="+url +"  获取到的网页源代码 htmlcode 为空!! ");
-	          	return jiami_main_uri;
-	      	}
-	      	
-	         	if( !mainHtmlStr.contains("\"vtype\":\"mp4\"")) {
-	       		System.out.println("当前 url="+url +"  获取到的网页源代码 htmlcode   不包含关键字 \"vtype\":\"mp4\" 无法解析视频!! ");
-	          	return jiami_main_uri;
-	      	}
-	         	
-	         	// "definition":"1080p","quality":"normal","vtype":"mp4"
-	         	// "definition":"720p","quality":"normal","vtype":"mp4" 
-	         	// "definition":"480p","quality":"normal","vtype":"mp4"
-	         	// "definition":"360p","quality":"normal","vtype":"mp4"
+			} catch (Exception e) {
+				// TODO: handle exception
+				System.out.println("解密Base64出意外Exception 尝试使用 bankup_url   \njiemi_base64_url=[" + jiemi_base64_url
+						+ "]\nbase64_jiami_url=[" + base64_jiami_url + "]    \n base64_jiami_bankurl=["
+						+ base64_jiami_bankurl + "]");
 
-	         	String mp4_1080p_keystr = "\"definition\":\"1080p\",\"quality\":\"normal\",\"vtype\":\"mp4\"";
-	         	String mp4_720p_keystr = "\"definition\":\"720p\",\"quality\":\"normal\",\"vtype\":\"mp4\"";
-	         	String mp4_480p_keystr = "\"definition\":\"480p\",\"quality\":\"normal\",\"vtype\":\"mp4\"";
-	         	String mp4_360p_keystr = "\"definition\":\"360p\",\"quality\":\"normal\",\"vtype\":\"mp4\"";
-	         	
-	         	String mKeyMp4Tag = null;  // 如果有 1080p 那么选择1080p  如果只有720p 那么就是720p 选分辨率最高那个
-	         	
-	         	if(mainHtmlStr.contains(mp4_1080p_keystr)) {
-	         		mKeyMp4Tag = mp4_1080p_keystr;
-	           }else if(mainHtmlStr.contains(mp4_720p_keystr)) {
-	          		mKeyMp4Tag = mp4_720p_keystr;
-	           }else if(mainHtmlStr.contains(mp4_480p_keystr)) {
-	          		mKeyMp4Tag = mp4_480p_keystr;
-	           }else if(mainHtmlStr.contains(mp4_360p_keystr)) {
-	          		mKeyMp4Tag = mp4_360p_keystr;
-	           }
+				try {
+					if (base64_jiami_bankurl != null) {
 
-	         	if(mKeyMp4Tag == null) {
-	         		
-	       		System.out.println("当前 url="+url +"  获取到的网页源代码 htmlcode  查不到 1080p 720p 480p  360p 视频的任意一个  无法解析视频!! ");
+						jiemi_base64_bankurl = jiemi_decryptBASE64(base64_jiami_bankurl);
+					}
 
-	         		return jiami_main_uri;
-	         	}
-	         	
-	         	
-	         	//  把 要 解析的 分辨率 搞到  第一行位置 
-	         	// "definition":"1080p","quality":"normal","vtype":"mp4","vwidth":1920,"vheight":1080,"bitrate":2629630,"fps":25,"codec_type":"h264","size":77367333,"main_url":"...,"backup_url_1":...
-	         	String mp4tag_begin_str = mainHtmlStr.substring(mainHtmlStr.indexOf(mKeyMp4Tag));
-	         	
-	         	
-	         	if(mp4tag_begin_str == null || !mp4tag_begin_str.contains("\"main_url\":\"") ) {
-	       		System.out.println("当前 url="+url +"  获取到的网页源代码 htmlcode  找到 1080p 720p 480p  360p   mKeyMp4Tag = "+ mKeyMp4Tag + "  但解析出 main_url 失败!!");
+					if (jiemi_base64_bankurl != null && jiemi_base64_bankurl.startsWith("http")) {
+						System.out.println(
+								"执行 bankup_url_1 下载操作!!!    jiemi_base64_bankurl=[" + jiemi_base64_bankurl + "]");
+						downRawVideo_WithUrl(jiemi_base64_bankurl, "", "TouTiao");
 
-	         		return jiami_main_uri;	
-	         	}
-	         	
-	         	
-	         	if(mp4tag_begin_str == null || !mp4tag_begin_str.contains("\"backup_url_1\":\"") ) {
-	       		System.out.println("当前 url="+url +"  获取到的网页源代码 htmlcode  找到 1080p 720p 480p  360p   mKeyMp4Tag = "+ mKeyMp4Tag + "  但解析出  backup_url_1;	 失败!!");
+					}
 
-	     		System.out.println();
-	       		System.out.println();
-	       		System.out.println("mp4tag_begin_str = ");
-	       		System.out.println(mp4tag_begin_str);
-	       		
-	     		System.out.println();
-	     		System.out.println();
-	     		
-	         	}
-	         	
-	         	
-	         	
-	         	//  "main_url":"...,"backup_url_1":...
-	         	String main_url_begin = mp4tag_begin_str.substring(mp4tag_begin_str.indexOf(beginKeyStr));
-	         	
-	         	// 把  "main_url":"  去除  那么 起点 就是 我们 要找的 url
-	         	//  "backup_url_1":" 
-	         	String main_url_raw = main_url_begin.replace(beginKeyStr, "");
-	         	
-	         	// 第一个引号的位置 就是 结束 标示    main_url_fixed 就是我们 要找的 url_raw
-	         	String main_url_fixed = main_url_raw.substring(0,main_url_raw.indexOf("\""));
-	         	
-	         	System.out.println("当前寻找到的 base64_url = "+ main_url_fixed);
-	         	
-	         	
-	      	
-	      	return main_url_fixed;
-	      	
-	      	
-	      }
-	      
-	      
-	      /**
-	       * 获取首页内容
-	       *
-	       * @return 首页内容
-	       * @throws InterruptedException 睡眠中断异常
-	       */
-	  String getXiGua_MainPageSource(String url) throws InterruptedException {
-	      	
-	              ChromeOptions CUR_CHROME_OPTIONS = new ChromeOptions();
-	              // 驱动位置
-	              System.setProperty("webdriver.chrome.driver", ChromeDriverFile.getAbsolutePath());
-	              // 避免被浏览器检测识别
-	              CUR_CHROME_OPTIONS.setExperimentalOption("excludeSwitches", Collections.singletonList("enable-automation"));
-	     
-	          
-	          ChromeDriver driver = new ChromeDriver(CUR_CHROME_OPTIONS);
-	          try {
+				} catch (Exception e1) {
 
-	              driver.get(url);
-	              long waitTime = Double.valueOf(Math.max(3, Math.random() * 5) * 1000).longValue();
-	              TimeUnit.MILLISECONDS.sleep(waitTime);
-	              long timeout = 30_000;
-	              // 循环下拉，直到全部加载完成或者超时
-	              do {
-	                  new Actions(driver).sendKeys(Keys.END).perform();
-	                  TimeUnit.MILLISECONDS.sleep(waitTime);
-	                  timeout -= waitTime;
-	              } while (!driver.getPageSource().contains("已经到底部，没有新的内容啦")
-	                      && timeout > 0);
-	              System.out.println("已经到底部，没有新的内容啦");
-	              return driver.getPageSource();
-	          } finally {
-	              driver.close();
-	          }
-	      }
-	      
-	    /**
-	     * 方法描述: 抖音解析下载视频
+					System.out.println("尼玛 不干了  备用的 bankup_url 也解析失败!! 下载失败!! jiemi_base64_bankurl =["
+							+ jiemi_base64_bankurl + "]");
+					// TODO: handle exception
+				}
 
-	     */
+			}
+
+		}
+
+		// 把  "main_url":"  去除  那么 起点 就是 我们 要找的 url
+		//  "backup_url_1":"
+
+		public   String calculXiGuaMainUri(String url , String mainHtmlStr , String beginKeyStr) {
+
+			String jiami_main_uri = null;
+
+			if(mainHtmlStr == null ) {
+				System.out.println("当前 url="+url +"  获取到的网页源代码 htmlcode 为空!! ");
+				return jiami_main_uri;
+			}
+
+			if( !mainHtmlStr.contains("\"vtype\":\"mp4\"")) {
+				System.out.println("当前 url="+url +"  获取到的网页源代码 htmlcode   不包含关键字 \"vtype\":\"mp4\" 无法解析视频!! ");
+				return jiami_main_uri;
+			}
+
+			// "definition":"1080p","quality":"normal","vtype":"mp4"
+			// "definition":"720p","quality":"normal","vtype":"mp4"
+			// "definition":"480p","quality":"normal","vtype":"mp4"
+			// "definition":"360p","quality":"normal","vtype":"mp4"
+
+			String mp4_1080p_keystr = "\"definition\":\"1080p\",\"quality\":\"normal\",\"vtype\":\"mp4\"";
+			String mp4_720p_keystr = "\"definition\":\"720p\",\"quality\":\"normal\",\"vtype\":\"mp4\"";
+			String mp4_480p_keystr = "\"definition\":\"480p\",\"quality\":\"normal\",\"vtype\":\"mp4\"";
+			String mp4_360p_keystr = "\"definition\":\"360p\",\"quality\":\"normal\",\"vtype\":\"mp4\"";
+
+			String mKeyMp4Tag = null;  // 如果有 1080p 那么选择1080p  如果只有720p 那么就是720p 选分辨率最高那个
+
+			if(mainHtmlStr.contains(mp4_1080p_keystr)) {
+				mKeyMp4Tag = mp4_1080p_keystr;
+			}else if(mainHtmlStr.contains(mp4_720p_keystr)) {
+				mKeyMp4Tag = mp4_720p_keystr;
+			}else if(mainHtmlStr.contains(mp4_480p_keystr)) {
+				mKeyMp4Tag = mp4_480p_keystr;
+			}else if(mainHtmlStr.contains(mp4_360p_keystr)) {
+				mKeyMp4Tag = mp4_360p_keystr;
+			}
+
+			if(mKeyMp4Tag == null) {
+
+				System.out.println("当前 url="+url +"  获取到的网页源代码 htmlcode  查不到 1080p 720p 480p  360p 视频的任意一个  无法解析视频!! ");
+
+				return jiami_main_uri;
+			}
+
+
+			//  把 要 解析的 分辨率 搞到  第一行位置
+			// "definition":"1080p","quality":"normal","vtype":"mp4","vwidth":1920,"vheight":1080,"bitrate":2629630,"fps":25,"codec_type":"h264","size":77367333,"main_url":"...,"backup_url_1":...
+			String mp4tag_begin_str = mainHtmlStr.substring(mainHtmlStr.indexOf(mKeyMp4Tag));
+
+
+			if(mp4tag_begin_str == null || !mp4tag_begin_str.contains("\"main_url\":\"") ) {
+				System.out.println("当前 url="+url +"  获取到的网页源代码 htmlcode  找到 1080p 720p 480p  360p   mKeyMp4Tag = "+ mKeyMp4Tag + "  但解析出 main_url 失败!!");
+
+				return jiami_main_uri;
+			}
+
+
+			if(mp4tag_begin_str == null || !mp4tag_begin_str.contains("\"backup_url_1\":\"") ) {
+				System.out.println("当前 url="+url +"  获取到的网页源代码 htmlcode  找到 1080p 720p 480p  360p   mKeyMp4Tag = "+ mKeyMp4Tag + "  但解析出  backup_url_1;	 失败!!");
+
+				System.out.println();
+				System.out.println();
+				System.out.println("mp4tag_begin_str = ");
+				System.out.println(mp4tag_begin_str);
+
+				System.out.println();
+				System.out.println();
+
+			}
+
+
+
+			//  "main_url":"...,"backup_url_1":...
+			String main_url_begin = mp4tag_begin_str.substring(mp4tag_begin_str.indexOf(beginKeyStr));
+
+			// 把  "main_url":"  去除  那么 起点 就是 我们 要找的 url
+			//  "backup_url_1":"
+			String main_url_raw = main_url_begin.replace(beginKeyStr, "");
+
+			// 第一个引号的位置 就是 结束 标示    main_url_fixed 就是我们 要找的 url_raw
+			String main_url_fixed = main_url_raw.substring(0,main_url_raw.indexOf("\""));
+
+			System.out.println("当前寻找到的 base64_url = "+ main_url_fixed);
+
+
+
+			return main_url_fixed;
+
+
+		}
+
+
+		/**
+		 * 获取首页内容
+		 *
+		 * @return 首页内容
+		 * @throws InterruptedException 睡眠中断异常
+		 */
+		String getXiGua_MainPageSource(String url)  {
+
+			ChromeOptions CUR_CHROME_OPTIONS = new ChromeOptions();
+			// 驱动位置
+			CUR_CHROME_OPTIONS.addArguments("--start-fullscreen");
+
+//				CUR_CHROME_OPTIONS.addArguments("Accept=text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8");
+//				CUR_CHROME_OPTIONS.addArguments("Accept-Encoding=gzip, deflate, sdch");
+//				CUR_CHROME_OPTIONS.addArguments("Accept-Language=zh-CN,zh;q=0.8");
+//				CUR_CHROME_OPTIONS.addArguments("Connection=keep-alive");
+//				CUR_CHROME_OPTIONS.addArguments("Host=activityunion-marketing.meituan.com");
+//				CUR_CHROME_OPTIONS.addArguments("Upgrade-Insecure-Requests=1");
+//				CUR_CHROME_OPTIONS.addArguments("User-Agent=Mozilla/5.0 (iPhone; CPU iPhone OS 8_0 like Mac OS X) AppleWebKit/600.1.3 (KHTML, like Gecko) Version/8.0 Mobile/12A4345d Safari/600.1.4");
+
+
+			System.setProperty("webdriver.chrome.driver", ChromeDriverFile.getAbsolutePath());
+			// 避免被浏览器检测识别
+			CUR_CHROME_OPTIONS.setExperimentalOption("excludeSwitches", Collections.singletonList("enable-automation"));
+
+			ChromeDriver driver = new ChromeDriver(CUR_CHROME_OPTIONS);
+			int loop_index = 0;
+			try {
+
+				driver.get(url);
+				long waitTime = Double.valueOf(Math.max(3, Math.random() * 5) * 1000).longValue();
+				TimeUnit.MILLISECONDS.sleep(waitTime);
+				long timeout = 20_000;
+				// 循环下拉，直到全部加载完成或者超时
+				do {
+					new Actions(driver).sendKeys(Keys.END).perform();
+					TimeUnit.MILLISECONDS.sleep(waitTime);
+					if(loop_index == 1) {
+						System.out.println("!! 触发点击事件  起始 标识 AAA !!");
+						new Actions(driver).sendKeys(Keys.HOME).perform();
+						TimeUnit.MILLISECONDS.sleep(1500);
+						try {
+							driver.findElement(By.className("xgplayer-start")).click();
+							TimeUnit.MILLISECONDS.sleep(2000);
+						} catch (Exception e) {
+							System.out.println("尝试点击播放按钮失败!! ");
+
+							System.out.println("click异常:");
+							System.out.println(e.fillInStackTrace());
+
+						}
+
+
+					}
+
+					TimeUnit.MILLISECONDS.sleep(waitTime);
+					timeout -= waitTime;
+					loop_index++;
+				} while (!driver.getPageSource().contains("已经到底部，没有新的内容啦") && timeout > 0);
+				System.out.println("已经到底部，没有新的内容啦");
+				return driver.getPageSource();
+			}  catch (Exception e) {
+				// TODO: handle exception
+				System.out.println("获取网页源码的时候出错  url = "+ url);
+				e.printStackTrace();
+
+			}finally {
+				driver.close();
+
+			}
+			return null;
+		}
+
+		/**
+		 * 方法描述: 抖音解析下载视频
+
+		 */
 		@SuppressWarnings("unchecked")
-	    public  void douYinParseUrl(String url) {
-	        try {
-	            final  String videoPath="https://www.iesdouyin.com/web/api/v2/aweme/iteminfo/?item_ids=";
-	            Connection con= Jsoup.connect(clearChinese(url));
-	            con.header("User-Agent", "Mozilla/5.0 (iPhone; CPU iPhone OS 12_1_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/16D57 Version/12.0 Safari/604.1");
-	            Connection.Response resp=con.method(Connection.Method.GET).execute();
-	            String videoUrl= videoPath+getItemId(resp.url().toString());
-	            String jsonStr = Jsoup.connect(videoUrl).ignoreContentType(true).execute().body();
-	            JSONObject json =JSONObject.parseObject(jsonStr);
-	            String videoAddress= json.getJSONArray("item_list").getJSONObject(0).getJSONObject("video").getJSONObject("play_addr").getJSONArray("url_list").get(0).toString();
-	            String title= json.getJSONArray("item_list").getJSONObject(0).getJSONObject("share_info").getString("share_title");
-	            videoAddress=videoAddress.replaceAll("playwm","play");
-	            HashMap headers = MapUtil.newHashMap();
-	            headers.put("User-Agent", "Mozilla/5.0 (iPhone; CPU iPhone OS 12_1_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/16D57 Version/12.0 Safari/604.1");
-	            String finalVideoAddress = HttpUtil.createGet(videoAddress).addHeaders(headers).execute().header("Location");
-	            //注:打印获取的链接
-	            System.out.println("-----抖音去水印链接-----\n"+finalVideoAddress);
-	            //下载无水印视频到本地
-	            downVideo(finalVideoAddress,title,"douyin");
-	        } catch (IOException e) {
-	            System.out.println(e.getMessage());
-	        }
-	    }
-	  
+		public  void douYinParseUrl(String url) {
+			try {
+				final  String videoPath="https://www.iesdouyin.com/web/api/v2/aweme/iteminfo/?item_ids=";
+				Connection con= Jsoup.connect(clearChinese(url));
+				con.header("User-Agent", "Mozilla/5.0 (iPhone; CPU iPhone OS 12_1_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/16D57 Version/12.0 Safari/604.1");
+				Connection.Response resp=con.method(Connection.Method.GET).execute();
+				String videoUrl= videoPath+getItemId(resp.url().toString());
+				String jsonStr = Jsoup.connect(videoUrl).ignoreContentType(true).execute().body();
+				JSONObject json =JSONObject.parseObject(jsonStr);
+				String videoAddress= json.getJSONArray("item_list").getJSONObject(0).getJSONObject("video").getJSONObject("play_addr").getJSONArray("url_list").get(0).toString();
+				String title= json.getJSONArray("item_list").getJSONObject(0).getJSONObject("share_info").getString("share_title");
+				videoAddress=videoAddress.replaceAll("playwm","play");
+				HashMap headers = MapUtil.newHashMap();
+				headers.put("User-Agent", "Mozilla/5.0 (iPhone; CPU iPhone OS 12_1_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/16D57 Version/12.0 Safari/604.1");
+				String finalVideoAddress = HttpUtil.createGet(videoAddress).addHeaders(headers).execute().header("Location");
+				//注:打印获取的链接
+				System.out.println("-----抖音去水印链接-----\n"+finalVideoAddress);
+				//下载无水印视频到本地
+				downRawVideo_WithUrl(finalVideoAddress,title,"douyin");
+			} catch (IOException e) {
+				System.out.println(e.getMessage());
+			}
+		}
 
-		
-		
-		
-		
-		@SuppressWarnings("unchecked")
-	    public  void ksParseUrl(String url) {
-	        HashMap headers = MapUtil.newHashMap();
-	        headers.put("User-Agent", "Mozilla/5.0 (Linux; Android 5.0; SM-G900P Build/LRX21T) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Mobile Safari/537.36");
-	        String redirectUrl = HttpUtil.createGet(url).addHeaders(headers).execute().header("Location");
-	        String body= HttpUtil.createGet(redirectUrl).addHeaders(headers).execute().body();
-	        Document doc= Jsoup.parse(body);
-	        Elements videoElement = doc.select("video[id=video-player]");
-	        String videoUrl = videoElement.get(0).attr("src");
-	        String title = videoElement.get(0).attr("alt");
-	        System.out.println();
-	        System.out.println(videoUrl);
-	        System.out.println(title);
-	        downVideo(videoUrl,title,"kuaishou");
-	    }
-		
-		@SuppressWarnings("unchecked")
-	    public  void downVideo(String httpUrl,String title,String source) {
-//	        String fileAddress = videoSavePath+"/"+source+"/"+title+".mp4";
-	        String fileAddress = videoSavePath+"/"+((source==null ||"".equals(source) ? "":source+"_")+title.replace(" ", ""))+"_"+index_download+"_"+timeStamp_Str+".mp4";
-	        index_download++;
-	        int byteRead;
-	        try {
-	            URL url = new URL(httpUrl);
-	            //获取链接
-	            URLConnection conn = url.openConnection();
-	            //输入流
-	            InputStream inStream = conn.getInputStream();
-	            //封装一个保存文件的路径对象
-	            File fileSavePath = new File(fileAddress);
-	            //注:如果保存文件夹不存在,那么则创建该文件夹
-	            File fileParent = fileSavePath.getParentFile();
-	            if(!fileParent.exists()){
-	                fileParent.mkdirs();
-	            }
-	            //写入文件
-	            FileOutputStream fs = new FileOutputStream(fileSavePath);
-	            byte[] buffer = new byte[1024];
-	            while ((byteRead = inStream.read(buffer)) != -1) {
-	                fs.write(buffer, 0, byteRead);
-	            }
-	            inStream.close();
-	            fs.close();
-	            System.out.println("\n-----视频保存路径-----\n"+fileSavePath.getAbsolutePath());
-	        } catch (FileNotFoundException e) {
-	            System.out.println(e.getMessage());
-	        } catch (IOException e) {
-	            System.out.println(e.getMessage());
-	        }
-	    }
-	    
-	    // 对每行的数据进行分析
 
-	    public  void toGetUrlFromOneLine_And_InitUrlList(String rowString) {
-	        String[] strArrRow = null;
-	        String fixStr = "";
+
+
+
+
+		@SuppressWarnings("unchecked")
+		public  void ksParseUrl(String url) {
+			HashMap headers = MapUtil.newHashMap();
+			headers.put("User-Agent", "Mozilla/5.0 (Linux; Android 5.0; SM-G900P Build/LRX21T) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Mobile Safari/537.36");
+			String redirectUrl = HttpUtil.createGet(url).addHeaders(headers).execute().header("Location");
+			String body= HttpUtil.createGet(redirectUrl).addHeaders(headers).execute().body();
+			Document doc= Jsoup.parse(body);
+			Elements videoElement = doc.select("video[id=video-player]");
+			String videoUrl = videoElement.get(0).attr("src");
+			String title = videoElement.get(0).attr("alt");
+			System.out.println();
+			System.out.println(videoUrl);
+			System.out.println(title);
+			downRawVideo_WithUrl(videoUrl,title,"kuaishou");
+		}
+
+
+		// 视频的保存 目录 不能是 当前文件 否则 就会执行 同步操作 影响网速
+		@SuppressWarnings("unchecked")
+		public void downRawVideo_WithUrl( String httpUrl, String fileNameNoPoint, String source) {
+			if(urlStrList.contains(httpUrl)) {
+				System.out.println("当前url 路径已经下载过  跳过下载!!  url路径: "+ httpUrl +"");
+			}
+
+			//	        String fileAddress = videoSavePath+"/"+source+"/"+title+".mp4";
+			String fileAddress = videoSavePath+"/"+((source==null ||"".equals(source) ? "":source+"_")+fileNameNoPoint.replace(" ", ""))+"_"+index_download+"_"+timeStamp_Str+".mp4";
+			fileAddress = clearChinese(fileAddress);
+			fileAddress = fileAddress.replace(" ", "");
+			fileAddress = fileAddress.replace("	", "");
+			fileAddress = fileAddress.replace("！", "");
+			fileAddress = fileAddress.replace("!", "");
+			fileAddress = fileAddress.replace("，", "");
+			fileAddress = fileAddress.replace("：", "");
+			fileAddress = fileAddress.replace("《", "");
+			fileAddress = fileAddress.replace("？", "");
+			fileAddress = fileAddress.replace("。", "");
+			int byteRead;
+			try {
+				URL url = new URL(httpUrl);
+				// 获取链接
+				URLConnection conn = url.openConnection();
+				// 输入流
+				InputStream inStream = conn.getInputStream();
+				// 封装一个保存文件的路径对象
+				File fileSavePath = new File(fileAddress);
+				// 注:如果保存文件夹不存在,那么则创建该文件夹
+				File fileParent = fileSavePath.getParentFile();
+				if (!fileParent.exists()) {
+					fileParent.mkdirs();
+				}
+				// 写入文件
+				FileOutputStream fs = new FileOutputStream(fileSavePath);
+				byte[] buffer = new byte[1024];
+				while ((byteRead = inStream.read(buffer)) != -1) {
+					fs.write(buffer, 0, byteRead);
+				}
+				inStream.close();
+				fs.close();
+				System.out.println("\n-----视频保存路径-----\n" + fileSavePath.getAbsolutePath());
+				System.out.println("\nzzfile_3.bat " + fileSavePath.getParentFile().getAbsolutePath());
+				urlStrList.add(httpUrl);
+			} catch (FileNotFoundException e) {
+				System.out.println(e.getMessage());
+			} catch (IOException e) {
+				System.out.println(e.getMessage());
+			}
+		}
+
+		// 对每行的数据进行分析
+
+		public  void toGetUrlFromOneLine_And_InitUrlList(String rowString) {
+			String[] strArrRow = null;
+			String fixStr = "";
 
 //	        if(str.trim().startsWith("http:") || str.trim().startsWith("https:") ||
 //	                str.trim().startsWith("thunder:") ||   str.trim().startsWith("magnet::") ){
 
 
-	        if (rowString != null) {
-	            fixStr = new String(rowString);
-	            // http://xxxxxx/sahttp://  避免出现 http://http: 连着的情况 起码也要使得间隔一个空格
-	            fixStr = fixStr.replace("http:", " http:");
-	            fixStr = fixStr.replace("https:", " https:");
-	            fixStr = fixStr.replace("thunder:", " thunder:");
-	            fixStr = fixStr.replace("magnet:", " magnet:");
-	            strArrRow = fixStr.split(" ");
-	        }
+			if (rowString != null) {
+				fixStr = new String(rowString);
+				// http://xxxxxx/sahttp://  避免出现 http://http: 连着的情况 起码也要使得间隔一个空格
+				fixStr = fixStr.replace("http:", " http:");
+				fixStr = fixStr.replace("https:", " https:");
+				fixStr = fixStr.replace("thunder:", " thunder:");
+				fixStr = fixStr.replace("magnet:", " magnet:");
+				strArrRow = fixStr.split(" ");
+			}
 
-	        if (strArrRow != null && strArrRow.length > 0) {
+			if (strArrRow != null && strArrRow.length > 0) {
 
-	            for (int i = 0; i < strArrRow.length; i++) {
-	                String mCurContent = strArrRow[i];
-	                if (mCurContent == null || mCurContent.trim().equals("")) {
-	                    continue;
-	                }
-
-
-	                boolean isUrl = toJudgeUrl(mCurContent);
-	                if(isUrl){
-	                	urlList.add(clearChinese(mCurContent).trim());
-
-	                }
-
-	            }
+				for (int i = 0; i < strArrRow.length; i++) {
+					String mCurContent = strArrRow[i];
+					if (mCurContent == null || mCurContent.trim().equals("")) {
+						continue;
+					}
 
 
-	        }
+					boolean isUrl = toJudgeUrl(mCurContent);
+					if(isUrl){   // 当前 url  已经 包含  所以   不再添加重复的
+						if(!urlList.contains(clearChinese(mCurContent).trim())) {
+							urlList.add(clearChinese(mCurContent).trim());
+
+						}
+
+					}
+
+				}
 
 
-	    }
-	    
-	    public  String clearChinese(String lineContent) {
-	        if (lineContent == null || lineContent.trim().isEmpty()) {
-	            return null;
-	        }
-	        Pattern pat = Pattern.compile(REGEX_CHINESE);
-	        Matcher mat = pat.matcher(lineContent);
-	        return mat.replaceAll(" ");
-	    }
-
-	    
-	    /**
-	     * 方法描述: 过滤分享链接的中文汉字
-
-	     */
-	    public  String filterUrl(String rowLine , String url) {
-	        String regex = "https?://(\\w|-)+(\\.(\\w|-)+)+(/(\\w+(\\?(\\w+=(\\w|%|-)*(\\&\\w+=(\\w|%|-)*)*)?)?)?)+";//匹配网址
-	        Pattern p = Pattern.compile(regex);
-	        Matcher m = p.matcher(rowLine);
-	        if(m.find()){
-	            return   rowLine.substring(m.start(),m.end());
-	        }
-	        return "";
-	    }
-
-	    /**
-	     * 方法描述: 获取分享视频id
-	     *
-
-	     */
-	    public  String getItemId(String url){
-	        int start = url.indexOf("/video/")+7;
-	        int end = url.lastIndexOf("/");
-	        String itemId = url.substring(start, end);
-	        return  itemId;
-	    }
-	    
-
-	    public  boolean toJudgeUrl(String str) {
-	        boolean isUrl = false;
-
-	        if (str.trim().toLowerCase().startsWith("http:") || str.toLowerCase().trim().startsWith("https:") ||
-	                str.toLowerCase().trim().startsWith("thunder:") || str.toLowerCase().trim().startsWith("magnet:")) {
-
-	            return true;
-	        }
+			}
 
 
-	        return isUrl;
-	    }
-	    
-	    
+		}
+
+		public  String clearChinese(String lineContent) {
+			if (lineContent == null || lineContent.trim().isEmpty()) {
+				return null;
+			}
+			Pattern pat = Pattern.compile(REGEX_CHINESE);
+			Matcher mat = pat.matcher(lineContent);
+			return mat.replaceAll(" ");
+		}
+
+
+		/**
+		 * 方法描述: 过滤分享链接的中文汉字
+
+		 */
+		public  String filterUrl(String rowLine , String url) {
+			String regex = "https?://(\\w|-)+(\\.(\\w|-)+)+(/(\\w+(\\?(\\w+=(\\w|%|-)*(\\&\\w+=(\\w|%|-)*)*)?)?)?)+";//匹配网址
+			Pattern p = Pattern.compile(regex);
+			Matcher m = p.matcher(rowLine);
+			if(m.find()){
+				return   rowLine.substring(m.start(),m.end());
+			}
+			return "";
+		}
+
+		/**
+		 * 方法描述: 获取分享视频id
+		 *
+
+		 */
+		public  String getItemId(String url){
+			int start = url.indexOf("/video/")+7;
+			int end = url.lastIndexOf("/");
+			String itemId = url.substring(start, end);
+			return  itemId;
+		}
+
+
+		public  boolean toJudgeUrl(String str) {
+			boolean isUrl = false;
+
+			if (str.trim().toLowerCase().startsWith("http:") || str.toLowerCase().trim().startsWith("https:") ||
+					str.toLowerCase().trim().startsWith("thunder:") || str.toLowerCase().trim().startsWith("magnet:")) {
+
+				return true;
+			}
+
+
+			return isUrl;
+		}
+
+
 
 	}
-	
+
 
 	class BinaryStrToFile_Rule_36 extends Basic_Rule {
 
@@ -1097,7 +1394,7 @@ public class I9_TextRuleOperation {
 
 		@Override
 		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
-				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 			for (int i = 0; i < curInputFileList.size(); i++) {
 				ArrayList<String> allContentList = new ArrayList<String>();
 				File targetFile = curInputFileList.get(i);
@@ -1142,7 +1439,7 @@ public class I9_TextRuleOperation {
 		}
 
 		synchronized boolean Try8bitAsOneItem(ArrayList<String> contentList, ArrayList<String> item8bitArr,
-				ArrayList<Byte> resultByeArr) {
+											  ArrayList<Byte> resultByeArr) {
 			boolean isOnly_0_1_flag = true;
 
 			StringBuilder sb = new StringBuilder();
@@ -1207,7 +1504,7 @@ public class I9_TextRuleOperation {
 					targetByte = (byte) (targetByte | positionByte);
 				}
 //            System.out.println("positionByte_["+i+"] = "+showByte(positionByte));
-//            System.out.println("targetByte_["+i+"] = "+showByte(targetByte));  
+//            System.out.println("targetByte_["+i+"] = "+showByte(targetByte));
 			}
 			return targetByte;
 
@@ -1235,7 +1532,7 @@ public class I9_TextRuleOperation {
 
 		@Override
 		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
-				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 			for (int i = 0; i < curInputFileList.size(); i++) {
 				ArrayList<String> allContentList = new ArrayList<String>();
 				File targetFile = curInputFileList.get(i);
@@ -1297,14 +1594,14 @@ public class I9_TextRuleOperation {
 
 				writeContentToFile(I9_Temp_Text_File, allContentList);
 				NotePadOpenTargetFile(I9_Temp_Text_File.getAbsolutePath());
-				
+
 				// 在 文件 本地 创建一个 只有 二进制的 txt文件
-				
+
 				String origin_name = targetFile.getName();
 				String clearTypeName = getFileNameNoPointNoLowerCase(origin_name);
 				String binary_only_filename = clearTypeName+"_binary_"+getTimeStamp()+".txt";
 				File binaryFile = new File(targetFile.getParentFile().getAbsolutePath()+File.separator+binary_only_filename);
-				
+
 //				writeContentToFile(mBinarySB.toString(), binary_str_List);
 				writeContentToFile(binaryFile, mBinarySB.toString());
 //				NotePadOpenTargetFile(binaryFile.getAbsolutePath());
@@ -1327,7 +1624,7 @@ public class I9_TextRuleOperation {
 
 		@Override
 		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
-				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 			for (int i = 0; i < curInputFileList.size(); i++) {
 				File fileItem = curInputFileList.get(i);
 				ArrayList<String> contentList = ReadFileContentAsList(fileItem);
@@ -1484,7 +1781,7 @@ public class I9_TextRuleOperation {
 
 		@Override
 		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
-				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 			for (int i = 0; i < curInputFileList.size(); i++) {
 				File fileItem = curInputFileList.get(i);
 				ArrayList<String> contentList = ReadFileContentAsList(fileItem);
@@ -1555,7 +1852,7 @@ public class I9_TextRuleOperation {
 
 		@Override
 		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
-				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 			ArrayList<String> realFileNameList = new ArrayList<String>();
 
 			File dirFile = curInputFileList.get(0).getParentFile();
@@ -1638,7 +1935,7 @@ public class I9_TextRuleOperation {
 //        	@echo off
 //        	Setlocal ENABLEDELAYEDEXPANSION
 //        	@javac -cp %userprofile%\Desktop\zbin\G2_webp-imageio.jar;%userprofile%\Desktop\zbin\G2_spire.presentation.free-3.9.0.jar;%userprofile%\Desktop\zbin\G2_fontbox.jar;%userprofile%\Desktop\zbin\G2_commons-logging-api.jar;%userprofile%\Desktop\zbin\G2_pdfbox.jar;%userprofile%\Desktop\zbin\G2_hutool.jar;%userprofile%\Desktop\zbin\G2_jshortcut_oberzalek.jar -Xlint:unchecked -encoding UTF-8 %userprofile%\Desktop\zbin\G2_ApplyRuleFor_TypeFile.java
-//        	@java -cp  %userprofile%\Desktop\zbin\G2_webp-imageio.jar;%userprofile%\Desktop\zbin\G2_spire.presentation.free-3.9.0.jar;%userprofile%\Desktop\zbin\G2_fontbox.jar;%userprofile%\Desktop\zbin\G2_commons-logging-api.jar;%userprofile%\Desktop\zbin\G2_pdfbox.jar;%userprofile%\Desktop\zbin\G2_hutool.jar;%userprofile%\Desktop\zbin\G2_jshortcut_oberzalek.jar;%userprofile%\Desktop\zbin    G2_ApplyRuleFor_TypeFile %1  %2  %3 %4  %5  %6  %7  %8  %9 
+//        	@java -cp  %userprofile%\Desktop\zbin\G2_webp-imageio.jar;%userprofile%\Desktop\zbin\G2_spire.presentation.free-3.9.0.jar;%userprofile%\Desktop\zbin\G2_fontbox.jar;%userprofile%\Desktop\zbin\G2_commons-logging-api.jar;%userprofile%\Desktop\zbin\G2_pdfbox.jar;%userprofile%\Desktop\zbin\G2_hutool.jar;%userprofile%\Desktop\zbin\G2_jshortcut_oberzalek.jar;%userprofile%\Desktop\zbin    G2_ApplyRuleFor_TypeFile %1  %2  %3 %4  %5  %6  %7  %8  %9
 
 			batList.add("@echo off");
 			batList.add("Setlocal ENABLEDELAYEDEXPANSION");
@@ -1668,14 +1965,14 @@ public class I9_TextRuleOperation {
 			String classPathStr = "classpath=$classes:" + jarSB.toString() + "$HOME/Desktop/zbin/";
 //        	#!/bin/bash
 //        	CURPATH=$(pwd)
-//        	DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )" 
+//        	DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 //        	#cd $DIR
 //        	classes=$DIR
 //        	libs=$DIR
 //        	classpath=$classes:$HOME/Desktop/zbin/G2_jshortcut_oberzalek.jar:$HOME/Desktop/zbin/G2_webp-imageio.jar:$HOME/Desktop/zbin/
 //
 //        	javac -classpath $classpath -encoding UTF-8 $HOME/Desktop/zbin/G2_ApplyRuleFor_TypeFile.java
-//        	java  -classpath $classpath G2_ApplyRuleFor_TypeFile $1 $2 $3 $4 $5 $6 $7 $8 $9 
+//        	java  -classpath $classpath G2_ApplyRuleFor_TypeFile $1 $2 $3 $4 $5 $6 $7 $8 $9
 
 			String javaNameNoPoint = getFileNameNoPointNoLowerCase(javaFile.getName());
 
@@ -1727,7 +2024,7 @@ public class I9_TextRuleOperation {
 
 		@Override
 		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
-				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 
 			for (int i = 0; i < curInputFileList.size(); i++) {
 				File fileItem = curInputFileList.get(i);
@@ -1776,7 +2073,7 @@ public class I9_TextRuleOperation {
 //  如果 是 自己和 自己 比较  那么 更新  method 方法 文件 【 已经不需要 bat_ruleMethodName_file ， 这个文件了 】
 //                 if(fileItem.equals(bat_template_file)) {
 //         			writeContentToFile(bat_ruleMethodName_file,allRuleMethodNameList);
-//                	 
+//
 //                 }
 
 			}
@@ -2038,7 +2335,7 @@ public class I9_TextRuleOperation {
 			String operation_begin_tag;
 			String operation_end_tag;
 
-//          rem ========================   File_Operation_Begin ================================================
+			//          rem ========================   File_Operation_Begin ================================================
 //    		rem =========================  File_Operation_End ===================================
 			Bat_Operation(int index, String operationName) {
 				operation_index = index;
@@ -2348,7 +2645,7 @@ public class I9_TextRuleOperation {
 				if (isNumeric(preVStr)) {
 					isRuleMethod = true;
 					ruleIndex = Integer.parseInt(preVStr);
-//    		ruleIndex_Tag = Rule_Bat_File_Name +" _"+ruleIndex+"_ "; 
+//    		ruleIndex_Tag = Rule_Bat_File_Name +" _"+ruleIndex+"_ ";
 					ruleIndex_Tag = "%init_input_0%" + " _" + ruleIndex + "_ ";
 
 					System.out.println("bat_method_name_nofunc = " + bat_method_name_nofunc + " [isRuleMethod = "
@@ -2392,7 +2689,7 @@ public class I9_TextRuleOperation {
 							// 把 空格转为 null?
 							/*
 							 * if(addToFormat_ruleStr.contains(ruleIndex_Tag.replace(" ", ""))) {
-							 * 
+							 *
 							 * addToFormat_ruleStr = addToFormat_ruleStr.replace(ruleIndex_Tag.replace(" ",
 							 * ""), ""); }
 							 */
@@ -2533,7 +2830,7 @@ public class I9_TextRuleOperation {
 //    		tag=[helloworld_func_0x0raw方法] Line[3]   echo hello_world zukgit
 //    		tag=[helloworld_func_0x0raw方法] Line[4]   ::ENDLOCAL
 //    		tag=[helloworld_func_0x0raw方法] Line[5]   goto:eof
-//    		tag=[helloworld_func_0x0raw方法] Line[6]   
+//    		tag=[helloworld_func_0x0raw方法] Line[6]
 //    		tag=[helloworld_func_0x0raw方法] Line[7]   rem ================================  Test_Operation_End ============================
 
 			// 对当前的代码进行 format 格式化
@@ -2573,7 +2870,7 @@ public class I9_TextRuleOperation {
 					if (batCodeOneLine.startsWith("echo ")
 							&& batCodeOneLine.contains(method_In_PrintCode.toLowerCase().trim())) {
 						continue; // 去掉函数定义 echo echo
-									// ______________Method_In_searchOneTargetFile4Dir4Type_func_2x1 这样的字符串 进入函数字符串
+						// ______________Method_In_searchOneTargetFile4Dir4Type_func_2x1 这样的字符串 进入函数字符串
 					}
 
 					if (batCodeOneLine.startsWith("echo ")
@@ -2622,7 +2919,7 @@ public class I9_TextRuleOperation {
 					}
 
 					if (batCodeOneLine.startsWith("echo ") && isContainChinese(batCodeOneLine)) { // 如果当前包含中文的 echo 开头的
-//                       method_firstfixed_content.add(""); // 在中文前面 添加一个空格  空行 使得 输出不乱码	  
+//                       method_firstfixed_content.add(""); // 在中文前面 添加一个空格  空行 使得 输出不乱码
 						method_firstfixed_content.add(rawContent);
 					} else {
 						method_firstfixed_content.add(rawContent);
@@ -2631,11 +2928,11 @@ public class I9_TextRuleOperation {
 				}
 				showStringList(method_firstfixed_content, "清头清空清set的函数内容 bat_method_name=" + bat_method_name);
 
-//           echo recordFileNameToFile_return_1=[%recordFileNameToFile_return_1%]  param1=[%1]  
+//           echo recordFileNameToFile_return_1=[%recordFileNameToFile_return_1%]  param1=[%1]
 //    		 goto:eof
 //    		 rem ======================== searchLastFile_func_1x1
-//    		 rem 检测当前目录下 时间最新的那么文件 
-//    		 rem searchLastFile_func_1x1 接受一个路径参数  给出该路径下 最新的那个 实体文件名称   函数的返回值 一致 定义为 函数名_return 
+//    		 rem 检测当前目录下 时间最新的那么文件
+//    		 rem searchLastFile_func_1x1 接受一个路径参数  给出该路径下 最新的那个 实体文件名称   函数的返回值 一致 定义为 函数名_return
 //    		 rem searchLastFile_return=K3_MD_Rule.class
 
 				// 检测在 ArrayList 列表中是否有以 goto:eof 为内容的Item
@@ -2659,7 +2956,7 @@ public class I9_TextRuleOperation {
 					lastCodeStr = method_firstfixed_content.get(method_firstfixed_content.size() - 1).toLowerCase()
 							.trim();
 					while (lastCodeStr.startsWith("goto:eof") || "".equals(lastCodeStr)) { // 如果当前的最后一行 是 goto:eof
-																							// 那么删除该行
+						// 那么删除该行
 						method_firstfixed_content.remove(method_firstfixed_content.size() - 1);
 						if (method_firstfixed_content.size() == 0) {
 							break;
@@ -2958,7 +3255,7 @@ public class I9_TextRuleOperation {
 			// getFileNameNoPointWithFullPath_return_1=[Z_TEMP]
 			// param1=[C:\Users\zhuzj5\Desktop\zbin\Z_TEMP.txt]
 			void buildEndPrintCode(String methodName, String methodName_nofunc, int inputParamCount,
-					int outputParamCount, boolean isRuleMethod) {
+								   int outputParamCount, boolean isRuleMethod) {
 				endPrintCode = "";
 				String preCode = "echo [" + methodName + " EndPrintCode] ";
 				if (inputParamCount == 0 && outputParamCount == 0) {
@@ -3089,7 +3386,7 @@ public class I9_TextRuleOperation {
 			formatAllBatCodeList = buildAllBatFormatContent(mAreaList);
 
 			return formatAllBatCodeList;
-//    			
+//
 		}
 
 		void build_rulePrintMethod(Bat_Method rulePrintMethod, ArrayList<String> tipList) {
@@ -3276,7 +3573,7 @@ public class I9_TextRuleOperation {
 
 	}
 
-//  把当前模板文件 zbatrule_I9_Rule30.bat 内容写进当前目录下 Test_20200201_xxx(时间戳).bat 文档 并打开它
+	//  把当前模板文件 zbatrule_I9_Rule30.bat 内容写进当前目录下 Test_20200201_xxx(时间戳).bat 文档 并打开它
 	class Show_Bat_Template_OnDir_Rule_30 extends Basic_Rule {
 		File bat_template_file;
 
@@ -3288,7 +3585,7 @@ public class I9_TextRuleOperation {
 
 		@Override
 		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
-				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 			ArrayList<String> result_list = new ArrayList<String>();
 			if (!bat_template_file.exists()) {
 				result_list.add("当前 模板文件 " + bat_template_file.getAbsolutePath() + " 不存在 请检查该文件！");
@@ -3301,7 +3598,7 @@ public class I9_TextRuleOperation {
 					/*
 					 * // bat 文件 不需要在文件中的名字 没有名字
 					 * if(oneLine.contains("public class I9_TestJavaTemplate_Rule29")) {
-					 * 
+					 *
 					 * oneLine = oneLine.replace("public class I9_TestJavaTemplate_Rule29",
 					 * "public class Test_"+getTimeStampMMdd()); }
 					 */
@@ -3349,7 +3646,7 @@ public class I9_TextRuleOperation {
 
 		@Override
 		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
-				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 
 			ArrayList<String> MDAllContentList = new ArrayList<String>();
 
@@ -3499,7 +3796,7 @@ public class I9_TextRuleOperation {
 
 	}
 
-//  生成java Test模板文件 读取 Java模板文件(包含初始化模块)  然后在notepad++打开它 
+	//  生成java Test模板文件 读取 Java模板文件(包含初始化模块)  然后在notepad++打开它
 	class Show_JavaTest_File_Rule_28 extends Basic_Rule {
 		File java_template_file;
 
@@ -3511,7 +3808,7 @@ public class I9_TextRuleOperation {
 
 		@Override
 		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
-				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 			ArrayList<String> result_list = new ArrayList<String>();
 			String Test_Java_FileName = "Test_" + getTimeStampMMdd() + "_" + getTimeStampHHmmss();
 			String public_class_declare = "public class " + Test_Java_FileName;
@@ -3593,7 +3890,7 @@ public class I9_TextRuleOperation {
 
 		@Override
 		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
-				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 			for (int i = 0; i < curInputFileList.size(); i++) {
 				File fileItem = curInputFileList.get(i);
 				ArrayList<String> contentList = ReadFileContentAsList(fileItem);
@@ -3669,7 +3966,7 @@ public class I9_TextRuleOperation {
 
 		@Override
 		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
-				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 			ArrayList<File> realShellFileList = new ArrayList<File>();
 			ArrayList<String> logInfo = new ArrayList<String>();
 			for (int i = 0; i < curInputFileList.size(); i++) {
@@ -3777,7 +4074,7 @@ public class I9_TextRuleOperation {
 
 		@Override
 		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
-				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 			ArrayList<String> realFileNameList = new ArrayList<String>();
 
 			File dirFile = curInputFileList.get(0).getParentFile();
@@ -3795,7 +4092,7 @@ public class I9_TextRuleOperation {
 					realFileNameList.add(fileName);
 				}
 			}
-			
+
 			realFileNameList.add("\n");
 			realFileNameList.add("____________________ 目录文件 ____________________");
 
@@ -3806,9 +4103,9 @@ public class I9_TextRuleOperation {
 					realFileNameList.add(fileName);
 				}
 			}
-			
-			
-			
+
+
+
 			writeContentToFile(I9_Temp_Text_File, realFileNameList);
 			NotePadOpenTargetFile(I9_Temp_Text_File.getAbsolutePath());
 
@@ -3836,7 +4133,7 @@ public class I9_TextRuleOperation {
 
 		@Override
 		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
-				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 
 			ArrayList<String> AllQrStrList = new ArrayList<String>();
 			ArrayList<String> CommonQrStrList = new ArrayList<String>();
@@ -3926,7 +4223,7 @@ public class I9_TextRuleOperation {
 
 		@Override
 		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
-				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 			File dirFile = curInputFileList.get(0).getParentFile();
 			File[] fileList = dirFile.listFiles();
 			System.out.println("dirFile = " + dirFile + "        fileList = " + fileList.length);
@@ -4060,7 +4357,7 @@ public class I9_TextRuleOperation {
 
 		@Override
 		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
-				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 			for (int i = 0; i < curInputFileList.size(); i++) {
 				File fileItem = curInputFileList.get(i);
 
@@ -4139,11 +4436,11 @@ public class I9_TextRuleOperation {
 				}
 
 				/*
-				 * 
+				 *
 				 * System.out.println("════════════"+"输出文件 Begin " + "════════════"); for (int j
 				 * = 0; j < fixedStrArr.size(); j++) { System.out.println(fixedStrArr.get(j)); }
 				 * System.out.println("════════════"+"输出文件 End "+"════════════");
-				 * 
+				 *
 				 */
 				writeContentToFile(I9_Temp_Text_File, fixedStrArr);
 
@@ -4265,7 +4562,7 @@ public class I9_TextRuleOperation {
 
 		@Override
 		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
-				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 			for (int i = 0; i < curInputFileList.size(); i++) {
 				File fileItem = curInputFileList.get(i);
 
@@ -4340,7 +4637,7 @@ public class I9_TextRuleOperation {
 
 		@Override
 		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
-				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 			File dirFile = curInputFileList.get(0).getParentFile();
 			File[] fileList = dirFile.listFiles();
 			System.out.println("dirFile = " + dirFile + "        fileList = " + fileList.length);
@@ -4473,7 +4770,7 @@ public class I9_TextRuleOperation {
 
 		@Override
 		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
-				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 			for (int i = 0; i < curInputFileList.size(); i++) {
 				File fileItem = curInputFileList.get(i);
 				File curDirFile = fileItem.getParentFile();
@@ -4579,7 +4876,7 @@ public class I9_TextRuleOperation {
 
 		@Override
 		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
-				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 			for (int i = 0; i < curInputFileList.size(); i++) {
 				File fileItem = curInputFileList.get(i);
 				ArrayList<String> contentList = ReadFileContentAsList(fileItem);
@@ -4628,7 +4925,7 @@ public class I9_TextRuleOperation {
 	static ArrayList<File> rule17_resultFile_List = new  ArrayList<File> ();
 	class Make_Json_As_JavaFile_Graphviz2Jpg_Rule_17 extends Basic_Rule {
 
-		File targetFile_ResultDirFile;  // 在 目标 .json 文件中生成的 放置 目标 图片 目标 .java 文件的目录 
+		File targetFile_ResultDirFile;  // 在 目标 .json 文件中生成的 放置 目标 图片 目标 .java 文件的目录
 		Make_Json_As_JavaFile_Graphviz2Jpg_Rule_17(boolean mIsInputDirAsSearchPoint) {
 			super(17);
 			isInputDirAsSearchPoint = mIsInputDirAsSearchPoint;
@@ -4640,12 +4937,12 @@ public class I9_TextRuleOperation {
 
 		@Override
 		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
-				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 			for (int i = 0; i < curInputFileList.size(); i++) {
 				File fileItem = curInputFileList.get(i);
 				File parentFile = fileItem.getParentFile();
 				String jsonFileName = fileItem.getName();
-				
+
 				targetFile_ResultDirFile = new File(parentFile.getAbsolutePath()+File.separator+jsonFileName.replace(".", "_")+"_"+getTimeStamp());
 				if (CUR_OS_TYPE == OS_TYPE.Windows) {
 					Make_Json_As_JavaFile_Rule_17(fileItem,targetFile_ResultDirFile);
@@ -4682,7 +4979,7 @@ public class I9_TextRuleOperation {
 
 		@Override
 		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
-				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 			for (int i = 0; i < curInputFileList.size(); i++) {
 				File fileItem = curInputFileList.get(i);
 				if (CUR_OS_TYPE == OS_TYPE.Windows) {
@@ -4718,7 +5015,7 @@ public class I9_TextRuleOperation {
 
 		@Override
 		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
-				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 			for (int i = 0; i < curInputFileList.size(); i++) {
 				File fileItem = curInputFileList.get(i);
 				if (CUR_OS_TYPE == OS_TYPE.Windows) {
@@ -4758,7 +5055,7 @@ public class I9_TextRuleOperation {
 
 		@Override
 		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
-				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 			for (int i = 0; i < curInputFileList.size(); i++) {
 				File fileItem = curInputFileList.get(i);
 
@@ -4818,7 +5115,7 @@ public class I9_TextRuleOperation {
 
 		@Override
 		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
-				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 			for (int i = 0; i < curInputFileList.size(); i++) {
 				File fileItem = curInputFileList.get(i);
 
@@ -4878,7 +5175,7 @@ public class I9_TextRuleOperation {
 
 		@Override
 		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
-				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 			for (int i = 0; i < curInputFileList.size(); i++) {
 				File fileItem = curInputFileList.get(i);
 
@@ -4940,7 +5237,7 @@ public class I9_TextRuleOperation {
 
 		@Override
 		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
-				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 			for (int i = 0; i < curInputFileList.size(); i++) {
 				File fileItem = curInputFileList.get(i);
 
@@ -5008,7 +5305,7 @@ public class I9_TextRuleOperation {
 
 		@Override
 		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
-				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 			for (int i = 0; i < curInputFileList.size(); i++) {
 				File fileItem = curInputFileList.get(i);
 				ArrayList<String> contentList = ReadFileContentAsList(fileItem);
@@ -5100,7 +5397,7 @@ public class I9_TextRuleOperation {
 
 		@Override
 		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
-				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 			Rule6_num_row = rowSize;
 			for (int i = 0; i < curInputFileList.size(); i++) {
 				File fileItem = curInputFileList.get(i);
@@ -5163,7 +5460,7 @@ public class I9_TextRuleOperation {
 
 		@Override
 		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
-				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 			for (int i = 0; i < curInputFileList.size(); i++) {
 				File fileItem = curInputFileList.get(i);
 
@@ -5224,7 +5521,7 @@ public class I9_TextRuleOperation {
 
 		@Override
 		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
-				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 			for (int i = 0; i < curInputFileList.size(); i++) {
 				File fileItem = curInputFileList.get(i);
 				ArrayList<String> contentList = ReadFileContentAsList(fileItem);
@@ -5283,7 +5580,7 @@ public class I9_TextRuleOperation {
 
 		@Override
 		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
-				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 			for (int i = 0; i < curInputFileList.size(); i++) {
 				File fileItem = curInputFileList.get(i);
 				ArrayList<String> contentList = ReadFileContentAsList(fileItem);
@@ -5342,7 +5639,7 @@ public class I9_TextRuleOperation {
 
 		@Override
 		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
-				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 			for (int i = 0; i < curInputFileList.size(); i++) {
 				File fileItem = curInputFileList.get(i);
 				ArrayList<String> contentList = ReadFileContentAsList(fileItem);
@@ -5403,7 +5700,7 @@ public class I9_TextRuleOperation {
 
 		@Override
 		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
-				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 			for (int i = 0; i < curInputFileList.size(); i++) {
 				File fileItem = curInputFileList.get(i);
 				ArrayList<String> contentList = ReadFileContentAsList(fileItem);
@@ -5521,7 +5818,7 @@ public class I9_TextRuleOperation {
 
 		@Override
 		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
-				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 			return null;
 		}
 
@@ -5641,13 +5938,13 @@ public class I9_TextRuleOperation {
 //        abstract    ArrayList<File> applyFileListRule3(ArrayList<File> subFileList , HashMap<String, ArrayList<File>> fileTypeMap);
 		// applyFileListRule4
 		abstract ArrayList<File> applyOperationRule(ArrayList<File> curFileList,
-				HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList,
-				ArrayList<File> curRealFileList);
+													HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList,
+													ArrayList<File> curRealFileList);
 
 		// abstract void initParams4InputParam(String inputParam); // 初始化Rule的参数
 		// 依据输入的字符串
 		abstract String ruleTip(String type, int index, String batName, OS_TYPE curType); // 使用说明列表 如果覆盖 那么就不使用默认的说明 ,
-																							// 默认就一种情况
+		// 默认就一种情况
 
 		abstract String simpleDesc(); // 使用的简单描述 中文的该 rule的使用情况 默认会在 ruleTip 被调用
 
@@ -6314,10 +6611,10 @@ public class I9_TextRuleOperation {
 		for (int i = 0; i < oriStr.length(); i++) {
 			char itemChar = oriStr.charAt(i);
 			/*
-			 * 
+			 *
 			 * || (itemChar+"").equals("，") || (itemChar+"").equals("’") ||
 			 * (itemChar+"").equals("‘")
-			 * 
+			 *
 			 * || (itemChar+"").equals("；")
 			 */
 			if ((itemChar + "").equals("：") || (itemChar + "").equals("】") || (itemChar + "").equals("【")
@@ -6896,7 +7193,7 @@ public class I9_TextRuleOperation {
 			if(CUR_Selected_Rule != null) {
 				CUR_Selected_Rule.showWrongMessage(); // 提示当前规则的错误信息
 			}
-			
+
 			System.out.println("当前输入参数可能 不能拼接成一个文件! 请检查输入参数!");
 			return;
 		}
@@ -7093,7 +7390,7 @@ public class I9_TextRuleOperation {
 
 	public static int[] Rule5_item_Max_Length = new int[Rule5_NUM_ERERY_LINE_NEW]; // 在1.txt输入文件每个列中字符串的最大长度的数组 默认为0
 	public static int[] Rule5_item_Max_Length_new = new int[Rule5_NUM_ERERY_LINE_NEW]; // 在2.txt文件中每个列的字符串最大长度
-																						// 不足的补充padding
+	// 不足的补充padding
 
 	public static ArrayList<String> duiqi_Rule_5(File srcFile, File targetFile) {
 
@@ -7783,7 +8080,7 @@ public class I9_TextRuleOperation {
 
 	// 往 每行开头加入〖* 第一个字符串后加入* 其余不变(方便生成tushare的输入参数格式) ts_code -> 〖*ts_code* 描述
 	static ArrayList<String> addTushare_Params_Flag_18(ArrayList<String> originStrList, String beginStr,
-			String endStr) {
+													   String endStr) {
 		ArrayList<String> newContentList_Padding = new ArrayList<String>();
 		ArrayList<String> newContentList = new ArrayList<String>();
 		for (int i = 0; i < originStrList.size(); i++) {
@@ -8058,7 +8355,7 @@ public class I9_TextRuleOperation {
 	}
 
 	static ArrayList<String> Rule12_tryWriteNewContentToFile(ArrayList<String> clipList, ArrayList<String> oldList,
-			File file) {
+															 File file) {
 
 		ArrayList<String> newStrList = new ArrayList<String>();
 		if (file != null && file.exists()) {
@@ -8390,7 +8687,7 @@ public class I9_TextRuleOperation {
 			if (newChar[i] > 128) {
 				try {
 					pinyinStr += PinyinHelper.toHanyuPinyinStringArray(newChar[i], defaultFormat)[0]; // [0] 标识当前拼音 汉->
-																										// han
+					// han
 				} catch (BadHanyuPinyinOutputFormatCombination e) {
 					e.printStackTrace();
 				}
@@ -8424,7 +8721,7 @@ public class I9_TextRuleOperation {
 			if (newChar[i] > 128) {
 				try {
 					pinyinStr += toUpperFirstChar(PinyinHelper.toHanyuPinyinStringArray(newChar[i], defaultFormat)[0]); // [0] 标识当前拼音 汉->
-																										// han
+					// han
 				} catch (BadHanyuPinyinOutputFormatCombination e) {
 					e.printStackTrace();
 				}
@@ -8434,16 +8731,16 @@ public class I9_TextRuleOperation {
 		}
 		return pinyinStr;
 	}
-	
+
 	public static String toUpperFirstChar(String srcStr) {
 		if(srcStr == null) {
 			return "";
 		}
 		String secondStr = srcStr.substring(1).toLowerCase();
 		String firstChar = (srcStr.charAt(0)+"").toUpperCase();
-		
+
 		return firstChar+secondStr;
-		
+
 	}
 	/**
 	 * 汉字转为拼音 空间以下划线_分割 1.每个汉字前面添加_ 2.每个汉字后面添加_ 3.把所有的两个__ 下划线转为 一个下划线
@@ -8680,11 +8977,11 @@ public class I9_TextRuleOperation {
 
 				/*
 				 * QrConfig config = new QrConfig();
-				 * 
+				 *
 				 * File targetFile = QrCodeUtil.generate (qrCodeString, config, new
 				 * File(I9_OUT_DIR.getAbsolutePath() + File.separator +
 				 * getFileNameNoPoint(srcFile.getName())+"_"+getTimeStampLong()+".jpg"));
-				 * 
+				 *
 				 * RuntimeUtil.
 				 * exec("rundll32.exe C:\\\\Windows\\\\System32\\\\shimgvw.dll,ImageView_Fullscreen  "
 				 * + targetFile.getAbsolutePath());
@@ -8702,7 +8999,7 @@ public class I9_TextRuleOperation {
 
 	/**
 	 * 执行 mac(unix) 脚本命令~
-	 * 
+	 *
 	 * @param command
 	 * @return
 	 */
@@ -8753,7 +9050,7 @@ public class I9_TextRuleOperation {
 
 	/**
 	 * 读取控制命令的输出结果 原文链接：http://lavasoft.blog.51cto.com/62575/15599
-	 * 
+	 *
 	 * @param
 	 * @return 控制命令的输出结果
 	 * @throws IOException
@@ -8903,11 +9200,11 @@ public class I9_TextRuleOperation {
 
 				/*
 				 * QrConfig config = new QrConfig();
-				 * 
+				 *
 				 * File targetFile = QrCodeUtil.generate (qrCodeString, config, new
 				 * File(I9_OUT_DIR.getAbsolutePath() + File.separator +
 				 * getFileNameNoPoint(srcFile.getName())+"_"+getTimeStampLong()+".jpg"));
-				 * 
+				 *
 				 * RuntimeUtil.
 				 * exec("rundll32.exe C:\\\\Windows\\\\System32\\\\shimgvw.dll,ImageView_Fullscreen  "
 				 * + targetFile.getAbsolutePath());
@@ -9132,7 +9429,7 @@ public class I9_TextRuleOperation {
 	public static void Make_Json_As_JavaFile_Rule_17(File srcFile,File resultDirFile) {
 
 
-		
+
 		try {
 			Rule17_dirPath = I9_OUT_DIR_PATH;
 
@@ -9141,8 +9438,8 @@ public class I9_TextRuleOperation {
 			StringBuilder sb = new StringBuilder();
 			System.out.println("curFile = " + srcFile.getAbsolutePath());
 
-			
-			
+
+
 			tryReadJsonFromFile(sb, srcFile);
 
 			String firstArrChar = sb.toString().substring(0, 1);
@@ -9197,22 +9494,22 @@ public class I9_TextRuleOperation {
 			// System.out.println(toujiaoJson);
 
 			I9_TextRuleOperation I9_Object = new I9_TextRuleOperation();
-			 JSONObject day_jsonobject =    JSONObject.parseObject(sb.toString());
-			 ArrayList<String> orikeyList = new  ArrayList<String>();
-			 ArrayList<String> fixed_clearChinese_keyList = new  ArrayList<String>();
-			 if(day_jsonobject != null && day_jsonobject.keySet().size() > 0) {
-				 orikeyList.addAll(day_jsonobject.keySet());
-			 }
-			 if(orikeyList.size() > 0) {
-				 for (int i = 0; i < orikeyList.size(); i++) {
-					 String keyname = orikeyList.get(i);
-					 String keyname_revert_pinyinStr = Rule14_ToPinyin_WithFirstBig(keyname);
-					 fixed_clearChinese_keyList.add(keyname_revert_pinyinStr);
-					
+			JSONObject day_jsonobject =    JSONObject.parseObject(sb.toString());
+			ArrayList<String> orikeyList = new  ArrayList<String>();
+			ArrayList<String> fixed_clearChinese_keyList = new  ArrayList<String>();
+			if(day_jsonobject != null && day_jsonobject.keySet().size() > 0) {
+				orikeyList.addAll(day_jsonobject.keySet());
+			}
+			if(orikeyList.size() > 0) {
+				for (int i = 0; i < orikeyList.size(); i++) {
+					String keyname = orikeyList.get(i);
+					String keyname_revert_pinyinStr = Rule14_ToPinyin_WithFirstBig(keyname);
+					fixed_clearChinese_keyList.add(keyname_revert_pinyinStr);
+
 				}
-				 
-			 }
-			 
+
+			}
+
 			String result = new Json2Bean(sb.toString(), "RootBean", null, new MyNameGenerator(fixed_clearChinese_keyList), new MyJsonParser(),
 					new MyBeanGenerator("com.zukgit")).execute();
 //            String result = new Json2Bean(sb.toString(), "RootBean", null, new MyNameGenerator(), new MyJsonParser(), new MyBeanGenerator("com.zukgit")).execute();
@@ -9447,12 +9744,12 @@ public class I9_TextRuleOperation {
 				// pngFile.getAbsolutePath());
 				String procResult7 = Rule17_execCMD(command7);
 				System.out.println("command7 = " + command7 + " procResult7=" + procResult7);
-				
+
 				rule17_resultFile_List.add(pngFile);
-				
+
 			}
-			
-			
+
+
 
 		} catch (Exception e) {
 
@@ -9471,7 +9768,7 @@ public class I9_TextRuleOperation {
 			System.out.println("生成文件["+i+"] AllFile["+rule17_resultFile_List.size()+"] = "+ copyResultFile.getAbsolutePath());
 		}
 		System.out.println("在 目录 "+resultDirFile.getAbsolutePath()+" 生成了解析的文件!");
-		
+
 	}
 
 	public static String Rule17_execCMD(String command) {
@@ -9736,7 +10033,7 @@ public class I9_TextRuleOperation {
 			} else {
 
 				resultStr = listString.replaceAll(classTypeInListName, "【" + classTypeInListName + "】"); // List<【A】>
-																											// List<List<List<【A】>>>
+				// List<List<List<【A】>>>
 			}
 
 			// resultStr
@@ -10238,12 +10535,12 @@ public class I9_TextRuleOperation {
 			if (!file.exists() || file.exists() && file.isFile()) {
 				file.mkdirs();
 			}
-	
+
 			System.out.println(" className2  =  rule17_resultFile_List.add(javaFile) " + className);
 			File javaFile = new File(file, className + ".java");
-			
+
 			rule17_resultFile_List.add(javaFile);
-			
+
 			BufferedWriter bw = new BufferedWriter(new FileWriter(javaFile));
 			bw.write("package ");
 			bw.write(packName);
@@ -10310,7 +10607,7 @@ public class I9_TextRuleOperation {
 			bw.write("}");
 
 			bw.close();
-		
+
 		}
 
 		public Map<String, Object> sortMapByKey(Map<String, Object> oriMap) {
@@ -10449,7 +10746,7 @@ public class I9_TextRuleOperation {
 		}
 
 		public Json2Bean(String json, String name, String fatherName, NameGenerator nameGeneration, JsonParse jsonParse,
-				BeanGenerator generationBean) {
+						 BeanGenerator generationBean) {
 			this.json = json;
 			this.name = fixedName_Json2Bean(name);
 			this.nameGeneration = nameGeneration;
@@ -10880,7 +11177,7 @@ public class I9_TextRuleOperation {
 							return "List<Object>";
 						} else if (childJson.startsWith("{")) {
 							childName = nameGeneration.nextName();
-					
+
 
 							new Json2Bean(childJson, childName, name, nameGeneration, jsonParse, generationBean)
 									.execute();
@@ -11657,7 +11954,7 @@ public class I9_TextRuleOperation {
 
 			bw.close();
 			System.out.println("javaFIle Path = " + javaFile.getAbsolutePath());
-			
+
 			rule17_resultFile_List.add(javaFile);
 		}
 
@@ -11767,28 +12064,28 @@ public class I9_TextRuleOperation {
 				"LL", "MM", "NN" };
 		int posiiotn;
 
-		
-		
-MyNameGenerator(ArrayList<String> namekeyList){
-			
-String	names[] = { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R",
+
+
+		MyNameGenerator(ArrayList<String> namekeyList){
+
+			String	names[] = { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R",
 					"S", "T", "U", "V", "W", "X", "Y", "Z", "AA", "BB", "CC", "DD", "EE", "FF", "GG", "HH", "JJ", "KK",
 					"LL", "MM", "NN" };
-			
-String[]	names_Arr = new String[namekeyList.size() + names.length];
-			
-for (int i = 0; i < namekeyList.size(); i++) {
-	names_Arr[i] = namekeyList.get(i);
-}
 
-for (int j = namekeyList.size(); j < names.length + namekeyList.size(); j++) {
-	names_Arr[j] = names[j-namekeyList.size()];
-}
+			String[]	names_Arr = new String[namekeyList.size() + names.length];
 
-this.names = names_Arr;    // 初始化 名称
+			for (int i = 0; i < namekeyList.size(); i++) {
+				names_Arr[i] = namekeyList.get(i);
+			}
 
-			
-}
+			for (int j = namekeyList.size(); j < names.length + namekeyList.size(); j++) {
+				names_Arr[j] = names[j-namekeyList.size()];
+			}
+
+			this.names = names_Arr;    // 初始化 名称
+
+
+		}
 		@Override
 		public String nextName() {
 
@@ -11925,7 +12222,7 @@ this.names = names_Arr;    // 初始化 名称
 	}
 
 	public static String dumpHexString(byte[] array, StringBuilder xBinarySB, StringBuilder xAsciiSB,
-			StringBuilder xHexSB) {
+									   StringBuilder xHexSB) {
 		if (array == null)
 			return "(null)";
 		return dumpHexString(array, 0, array.length, xBinarySB, xAsciiSB, xHexSB);
@@ -11939,7 +12236,7 @@ this.names = names_Arr;    // 初始化 名称
 	static int byteIndex = 0;
 
 	public static String dumpHexString(byte[] array, int offset, int length, StringBuilder mBinarySB,
-			StringBuilder mAsciiSB, StringBuilder mHexSB) {
+									   StringBuilder mAsciiSB, StringBuilder mHexSB) {
 		if (array == null)
 			return "(null)";
 		StringBuilder result = new StringBuilder();
@@ -12435,10 +12732,10 @@ this.names = names_Arr;    // 初始化 名称
 
 	}
 
-static	void initMoshuTypeItem(String key , String value){
+	static	void initMoshuTypeItem(String key , String value){
 		mFileTypes.put(key.toLowerCase(), value.toLowerCase());
 	}
-	
+
 	/**
 	 * @param filePath 文件路径
 	 * @return 文件头信息
@@ -12529,127 +12826,171 @@ static	void initMoshuTypeItem(String key , String value){
 		}
 		return true;
 	}
-	
-	
+
+
 	static void SortString(ArrayList<String> strList) {
-	    Comparator<Object> CHINA_COMPARE = Collator.getInstance(java.util.Locale.CHINA);
-	    strList.sort((o1, o2) -> {
-	        //比较的基本原则，拿最小长度的字符串进行比较，若全部相等，则长字符串往后排
+		Comparator<Object> CHINA_COMPARE = Collator.getInstance(java.util.Locale.CHINA);
+		strList.sort((o1, o2) -> {
+			//比较的基本原则，拿最小长度的字符串进行比较，若全部相等，则长字符串往后排
 
-	        int len1 = o1.length();
-	        int len2 = o2.length();
-	        int len = (len1 - len2) <= 0 ? len1 : len2;
-	        StringBuilder sb1 = new StringBuilder();
-	        StringBuilder sb2 = new StringBuilder();
-	        for (int i = 0; i < len; i++) {
-	            String s1 = o1.substring(i, i + 1);
-	            String s2 = o2.substring(i, i + 1);
-	            if (isNumericFirstChar(s1) && isNumericFirstChar(s2)){
-	                //取出所有的数字
-	                sb1.append(s1);
-	                sb2.append(s2);
-	                //取数字时，不比较
-	                continue;
-	            }
-	            if (sb1.length() != 0 && sb2.length() != 0){
-	                if (!isNumericFirstChar(s1) && !isNumericFirstChar(s2)){
-	                    int value1 = Integer.valueOf(sb1.toString());
-	                    int value2 = Integer.valueOf(sb2.toString());
-	                    return value1 - value2;
-	                } else if (isNumericFirstChar(s1)) {
-	                    return 1;
-	                } else if (isNumericFirstChar(s2)) {
-	                    return -1;
-	                }
-	            }
-	            int result = CHINA_COMPARE.compare(s1, s2);
-	            if (result != 0) {
-	                return result;
-	            }
-	        }
-	        //这一步：是为了防止以下情况：第10  第20，正好以数字结尾，且字符串长度相等
-	        if (len1 == len2 && sb1.length() != 0 && sb2.length() != 0) {
-	            int value1 = Integer.valueOf(sb1.toString());
-	            int value2 = Integer.valueOf(sb2.toString());
-	            return value1 - value2;
-	        }
-	        //若前面都相等，则直接比较字符串的长度，长的排后面，短的排前面
-	        return Integer.compare(len1, len2);
-	    });
-		
-		
+			int len1 = o1.length();
+			int len2 = o2.length();
+			int len = (len1 - len2) <= 0 ? len1 : len2;
+			StringBuilder sb1 = new StringBuilder();
+			StringBuilder sb2 = new StringBuilder();
+			for (int i = 0; i < len; i++) {
+				String s1 = o1.substring(i, i + 1);
+				String s2 = o2.substring(i, i + 1);
+				if (isNumericFirstChar(s1) && isNumericFirstChar(s2)){
+					//取出所有的数字
+					sb1.append(s1);
+					sb2.append(s2);
+					//取数字时，不比较
+					continue;
+				}
+				if (sb1.length() != 0 && sb2.length() != 0){
+					if (!isNumericFirstChar(s1) && !isNumericFirstChar(s2)){
+						int value1 = Integer.valueOf(sb1.toString());
+						int value2 = Integer.valueOf(sb2.toString());
+						return value1 - value2;
+					} else if (isNumericFirstChar(s1)) {
+						return 1;
+					} else if (isNumericFirstChar(s2)) {
+						return -1;
+					}
+				}
+				int result = CHINA_COMPARE.compare(s1, s2);
+				if (result != 0) {
+					return result;
+				}
+			}
+			//这一步：是为了防止以下情况：第10  第20，正好以数字结尾，且字符串长度相等
+			if (len1 == len2 && sb1.length() != 0 && sb2.length() != 0) {
+				int value1 = Integer.valueOf(sb1.toString());
+				int value2 = Integer.valueOf(sb2.toString());
+				return value1 - value2;
+			}
+			//若前面都相等，则直接比较字符串的长度，长的排后面，短的排前面
+			return Integer.compare(len1, len2);
+		});
+
+
 	}
-	
-    //判断是否是数字
- static boolean isNumericFirstChar(String s){
-        return Character.isDigit(s.charAt(0));
-    }
-    
- /**
-  * BASE64解密
-  * @throws Exception
-  */
- public static String jiemi_decryptBASE64(String key) throws Exception {
-     return new String(Base64.getDecoder().decode(key));
- }
+
+	//判断是否是数字
+	static boolean isNumericFirstChar(String s){
+		return Character.isDigit(s.charAt(0));
+	}
+
+	/**
+	 * BASE64解密
+	 * @throws Exception
+	 */
+	public static String jiemi_decryptBASE64(String key) throws Exception {
+		return new String(Base64.getDecoder().decode(key));
+	}
 
 
- /**
-  * BASE64加密
-  */
- public static String jiami_encryptBASE64(byte[] key) throws Exception {
- 	
-     return new String(Base64.getEncoder().encode(key));
- }
+	/**
+	 * BASE64加密
+	 */
+	public static String jiami_encryptBASE64(byte[] key) throws Exception {
+
+		return new String(Base64.getEncoder().encode(key));
+	}
+
+	static ArrayList<File> getAllSubFile(File dirFile, String typeStr) {
+		ArrayList<String> typeList = new ArrayList<String>();
+		typeList.add(typeStr);
+
+		return getAllSubFile(dirFile.getAbsolutePath(), "", typeList);
+
+	}
+
+	static Comparator mFileDateComparion_New_Old = new Comparator<File>() {
+		@Override
+		public int compare(File o1, File o2) {
+			long diff = o1.lastModified() - o2.lastModified();
+			if (diff > 0)
+				return -1;
+			else if (diff == 0)
+				return 0;
+			else
+				return 1;// 如果 if 中修改为 返回-1 同时此处修改为返回 1 排序就会是递减
+		}
+
+	};
+
+	static Comparator mFileDateComparion_Old_New = new Comparator<File>() {
+		@Override
+		public int compare(File o1, File o2) {
+			long diff = o1.lastModified() - o2.lastModified();
+			if (diff > 0)
+				return 1;
+			else if (diff == 0)
+				return 0;
+			else
+				return -1;// 如果 if 中修改为 返回-1 同时此处修改为返回 1 排序就会是递减
+		}
+
+	};
+
+	public static String getDateStrFromLongStamp(long timeStamp){
+		Date             date = new Date(timeStamp);
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
+		String dateStr = simpleDateFormat.format(date);
+		return dateStr;
+	}
+
 
 	static void SortFileWithName(ArrayList<File> fileList) {
-	    Comparator<Object> CHINA_COMPARE = Collator.getInstance(java.util.Locale.CHINA);
-	    fileList.sort((o1_file, o2_file) -> {
-	        //比较的基本原则，拿最小长度的字符串进行比较，若全部相等，则长字符串往后排
-	    	String o1 = o1_file.getName();
-	    	String o2 = o2_file.getName();
-	        int len1 = o1.length();
-	        int len2 = o2.length();
-	        int len = (len1 - len2) <= 0 ? len1 : len2;
-	        StringBuilder sb1 = new StringBuilder();
-	        StringBuilder sb2 = new StringBuilder();
-	        for (int i = 0; i < len; i++) {
-	            String s1 = o1.substring(i, i + 1);
-	            String s2 = o2.substring(i, i + 1);
-	            if (isNumericFirstChar(s1) && isNumericFirstChar(s2)){
-	                //取出所有的数字
-	                sb1.append(s1);
-	                sb2.append(s2);
-	                //取数字时，不比较
-	                continue;
-	            }
-	            if (sb1.length() != 0 && sb2.length() != 0){
-	                if (!isNumericFirstChar(s1) && !isNumericFirstChar(s2)){
-	                    int value1 = Integer.valueOf(sb1.toString());
-	                    int value2 = Integer.valueOf(sb2.toString());
-	                    return value1 - value2;
-	                } else if (isNumericFirstChar(s1)) {
-	                    return 1;
-	                } else if (isNumericFirstChar(s2)) {
-	                    return -1;
-	                }
-	            }
-	            int result = CHINA_COMPARE.compare(s1, s2);
-	            if (result != 0) {
-	                return result;
-	            }
-	        }
-	        //这一步：是为了防止以下情况：第10  第20，正好以数字结尾，且字符串长度相等
-	        if (len1 == len2 && sb1.length() != 0 && sb2.length() != 0) {
-	            int value1 = Integer.valueOf(sb1.toString());
-	            int value2 = Integer.valueOf(sb2.toString());
-	            return value1 - value2;
-	        }
-	        //若前面都相等，则直接比较字符串的长度，长的排后面，短的排前面
-	        return Integer.compare(len1, len2);
-	    });
-		
-		
+		Comparator<Object> CHINA_COMPARE = Collator.getInstance(java.util.Locale.CHINA);
+		fileList.sort((o1_file, o2_file) -> {
+			//比较的基本原则，拿最小长度的字符串进行比较，若全部相等，则长字符串往后排
+			String o1 = o1_file.getName();
+			String o2 = o2_file.getName();
+			int len1 = o1.length();
+			int len2 = o2.length();
+			int len = (len1 - len2) <= 0 ? len1 : len2;
+			StringBuilder sb1 = new StringBuilder();
+			StringBuilder sb2 = new StringBuilder();
+			for (int i = 0; i < len; i++) {
+				String s1 = o1.substring(i, i + 1);
+				String s2 = o2.substring(i, i + 1);
+				if (isNumericFirstChar(s1) && isNumericFirstChar(s2)){
+					//取出所有的数字
+					sb1.append(s1);
+					sb2.append(s2);
+					//取数字时，不比较
+					continue;
+				}
+				if (sb1.length() != 0 && sb2.length() != 0){
+					if (!isNumericFirstChar(s1) && !isNumericFirstChar(s2)){
+						int value1 = Integer.valueOf(sb1.toString());
+						int value2 = Integer.valueOf(sb2.toString());
+						return value1 - value2;
+					} else if (isNumericFirstChar(s1)) {
+						return 1;
+					} else if (isNumericFirstChar(s2)) {
+						return -1;
+					}
+				}
+				int result = CHINA_COMPARE.compare(s1, s2);
+				if (result != 0) {
+					return result;
+				}
+			}
+			//这一步：是为了防止以下情况：第10  第20，正好以数字结尾，且字符串长度相等
+			if (len1 == len2 && sb1.length() != 0 && sb2.length() != 0) {
+				int value1 = Integer.valueOf(sb1.toString());
+				int value2 = Integer.valueOf(sb2.toString());
+				return value1 - value2;
+			}
+			//若前面都相等，则直接比较字符串的长度，长的排后面，短的排前面
+			return Integer.compare(len1, len2);
+		});
+
+
 	}
 	// List<A_B_C> 需要把这个 创建了三个 JavaBean
 // A , B  ,C  这三个 对象的 execute()方法 会执行  parseMap();  zzj

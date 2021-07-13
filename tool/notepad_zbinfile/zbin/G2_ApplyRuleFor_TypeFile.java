@@ -91,7 +91,9 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.select.Elements;
+import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.interactions.Actions;
@@ -335,6 +337,10 @@ public class G2_ApplyRuleFor_TypeFile {
 		File mDownloadedMonthDir; // 在 G2_Monitor_Download/YYYYMM/ 年年年年月月的 目录文件
 
 		File ChromeDriverFile; // G2_chromedriver_v91.exe 下载头条视频时会用到
+		
+		ArrayList<File> curAlredyDoTxtFileList;  //  当前已经执行了 检测处理的 txt文件 列表 持续增加
+		
+		
 
 		Monitor_WeChatFile_ForWindows_Rule_39() {
 			super("#", 39, 3); // 不包括
@@ -343,7 +349,7 @@ public class G2_ApplyRuleFor_TypeFile {
 			mDownloadedMonthDir = new File(
 					mDownloadedRootFile.getAbsolutePath() + File.separator + getTimeStamp_YYYYMM());
 			ChromeDriverFile = new File(zbinPath + File.separator + "G2_chromedriver_v91.exe");
-
+			curAlredyDoTxtFileList = new ArrayList<File>();
 		}
 
 		@Override
@@ -371,15 +377,32 @@ public class G2_ApplyRuleFor_TypeFile {
 			File shellFile = new File(curDirPath);
 			String shellDirName = shellFile.getName();
 			String shellDirName_clearBlank = shellDirName.replace("-", ""); // 2021-07
+			String shellFileAbsPath = shellFile.getAbsolutePath();
 
+	
+			String wechatRootPath = System.getProperties().getProperty("user.home") + File.separator + "Documents"+File.separator+"WeChat Files";
+			
+			
 			String now_yyyymm = getTimeStamp_YYYYMM();
-			if (!now_yyyymm.equals(shellDirName_clearBlank)) {
-				System.out.println("当前的Shell是 WeChat的目录  但不是最新月份下的目录 ！！！ " + "inputParam = " + inputParam
-						+ "  curDirPath = " + curDirPath);
+			// C:\Users\zhuzj5\Documents\WeChat Files
+			/*
+			 * if (!now_yyyymm.equals(shellDirName_clearBlank)) {
+			 * System.out.println("当前的Shell是 WeChat的目录  但不是最新月份下的目录 ！！！ " + "inputParam = "
+			 * + inputParam + "  curDirPath = " + curDirPath);
+			 * System.out.println("最新目录结果类似于: " +
+			 * " C:\\Users\\zukgit\\Documents\\WeChat Files\\xxxx\\FileStorage\\File\\2021-07"
+			 * ); return false; }
+			 */
+			
+			// 如果不是wechat的目录 那么提示 路径不对 
+			if (!shellFileAbsPath.startsWith(wechatRootPath)) {
+				System.out.println("当前的Shell是 WeChat的目录 下的目录 ！！！ " + "inputParam = " + inputParam
+						+ "  curDirPath = " + curDirPath +"   wechatRootPath = "+ wechatRootPath +"   shellFileAbsPath="+ shellFileAbsPath );
 				System.out.println("最新目录结果类似于: "
 						+ " C:\\Users\\zukgit\\Documents\\WeChat Files\\xxxx\\FileStorage\\File\\2021-07");
 				return false;
 			}
+			
 
 			if (!mDownloadedRootFile.exists()) {
 				mDownloadedRootFile.mkdirs();
@@ -404,6 +427,7 @@ public class G2_ApplyRuleFor_TypeFile {
 
 			} else {
 				mLastTxtFile = calLastTxtFileInList(mWeChatRootFile);
+				curAlredyDoTxtFileList = getAllSubFile(mWeChatRootFile,".txt");
 			}
 
 			return super.initParams4InputParam(inputParam);
@@ -456,30 +480,87 @@ public class G2_ApplyRuleFor_TypeFile {
 
 		int curUrlIndex_InTxtFile;
 
-		void NewFileOperation(File newFile) {
-			new Thread(new Runnable() {
-				@Override
-				public void run() {
-					ArrayList<String> fileContent = ReadFileContentAsList(newFile);
-
-					String filename = newFile.getName();
-					String fileNameNoPoint = getFileNameNoPoint(filename);
-
-					curUrlIndex_InTxtFile = 0;
-					for (int i = 0; i < fileContent.size(); i++) {
-						String lineStr = fileContent.get(i);
-						ArrayList<String> oneLineUrlList = new ArrayList<String>(); // 一行 中 可能 多个 url 列表
-						String strLine_trim_clearChinese = clearChinese(lineStr.trim());
-						toGetUrlFromOneLine_And_InitUrlList(strLine_trim_clearChinese, oneLineUrlList);
-						System.out.println(
-								"line[" + i + "] : str[" + lineStr + "]  clearChinese[" + strLine_trim_clearChinese
-										+ "] result[" + OperationWithOneLine(i, oneLineUrlList, fileNameNoPoint) + "]");
-
-					}
-					System.out.println("════════════════ OVER ═════════════════");
-
+		
+		
+		boolean isInAlreadyDoTxtFileList(ArrayList<File> mFileList , File singleFile ) {
+			boolean existFlag = false;
+			String singleAbs = singleFile.getAbsolutePath();
+			for (int i = 0; i < mFileList.size(); i++) {
+				
+				File fileItem =mFileList.get(i);
+				
+				String fileItemAbs = fileItem.getAbsolutePath();
+				
+				if(fileItemAbs.equals(singleAbs)) {
+		
+					existFlag = true;
+					return existFlag;
 				}
-			}).start();
+			}
+			
+			System.out.println("isInAlreadyDoTxtFileList = false "+"singleAbs = "+ singleAbs +" 不在已操作列表  将会执行它的 url 内容");
+			return existFlag;
+			
+		}
+		
+@SuppressWarnings("unchecked")
+void NewFileOperation(File newFile) {
+
+ArrayList<File>  curAllTxtFileList = getAllSubFile(mWeChatRootFile,".txt");
+curAllTxtFileList.sort(mFileDateComparion);
+
+ArrayList<File>  needOperationList = new  ArrayList<File> ();
+
+
+for (int i = 0; i < curAllTxtFileList.size(); i++) {
+	File curFile =curAllTxtFileList.get(i);
+	if(isInAlreadyDoTxtFileList(curAlredyDoTxtFileList,curFile)) {
+	     continue;   //  当前的 文件 已经 在 操作完成文件列表中 
+	}
+
+	needOperationList.add(curFile);
+
+}
+
+
+for (int i = 0; i < needOperationList.size(); i++) {
+	File operationFile =needOperationList.get(i);
+	curAlredyDoTxtFileList.add(operationFile);
+	System.out.println("______________ 新文件操作 lastNewFile["+newFile.getName()+"] operationFile["+operationFile.getName()+"]"+" index["+i+"] needOperationCount["+needOperationList.size()+"] "+"______________");
+	new Thread(new Runnable() {
+		@Override
+		public void run() {
+			ArrayList<String> fileContent = ReadFileContentAsList(operationFile);
+
+			String filename = operationFile.getName();
+			String fileNameNoPoint = getFileNameNoPoint(filename);
+
+			curUrlIndex_InTxtFile = 0;
+			for (int j = 0; j < fileContent.size(); j++) {
+				String lineStr = fileContent.get(j);
+				ArrayList<String> oneLineUrlList = new ArrayList<String>(); // 一行 中 可能 多个 url 列表
+				String strLine_trim_clearChinese = clearChinese(lineStr.trim());
+				synchronized (this) {
+					toGetUrlFromOneLine_And_InitUrlList(strLine_trim_clearChinese, oneLineUrlList);
+				}
+				System.out.println(
+						"line[" + j + "] : str[" + lineStr + "]  clearChinese[" + strLine_trim_clearChinese
+								+ "] result[" + OperationWithOneLine(j, oneLineUrlList, fileNameNoPoint) + "]");
+
+			}
+			System.out.println("════════════════ OVER ═════════════════");
+
+		}
+	}).start();
+	
+	
+}
+
+
+
+
+
+	
 
 		}
 
@@ -519,15 +600,19 @@ public class G2_ApplyRuleFor_TypeFile {
 					if (strLine_trim_clearChinese.contains("douyin")) {
 						douYinParseUrl(curUrlIndex_InTxtFile, strLine_trim_clearChinese, fileNameNoPoint);
 						urlStrList.add(strLine_trim_clearChinese);
-
+						tipMessage = "下载抖音视频";
 					} else if (strLine_trim_clearChinese.contains("v.kuaishou.com")) {
 						ksParseUrl(curUrlIndex_InTxtFile, strLine_trim_clearChinese, fileNameNoPoint);
 						urlStrList.add(strLine_trim_clearChinese);
-					} else if (strLine_trim_clearChinese.contains("m.toutiaoimg.cn")
+						tipMessage = "下载快手视频";
+					} else if (strLine_trim_clearChinese.contains("toutiao")  // m.toutiaoimg.cn  https://m.toutiaocdn.com/i6982548019329843742
 							|| strLine_trim_clearChinese.contains("ixigua")) {
 						TouTiao_XiGua_Download(curUrlIndex_InTxtFile, strLine_trim_clearChinese);
 						urlStrList.add(strLine_trim_clearChinese);
-
+						tipMessage = "下载头条西瓜视频";
+					}else {
+						tipMessage = "当前的URL不是抖音-快手-头条路径 暂不支持下载";
+						System.out.println("当前的URL不是抖音-快手-头条路径 暂不支持下载  URL = " +strLine_trim_clearChinese);
 					}
 
 				}
@@ -553,10 +638,10 @@ public class G2_ApplyRuleFor_TypeFile {
 				return;
 			}
 
-			if (urlitem.startsWith("https://www.ixigua.com/") || urlitem.startsWith("https://m.toutiaoimg.cn/")) {
+//			if (urlitem.startsWith("https://www.ixigua.com/") || urlitem.startsWith("https://m.toutiaoimg.cn/")) {
 
 				XiGua_TouTiao_ParseUrl(index, urlitem);
-			}
+//			}
 
 		}
 
@@ -567,6 +652,7 @@ public class G2_ApplyRuleFor_TypeFile {
 			org.jsoup.nodes.Document mainHtml;
 			String jiemi_base64_url = null;
 			String base64_jiami_url = null;
+			String NoMainUrl_VideoTag_url = null ;  // 对于 没有 main_url 但 有 <video src="http" //这样的页面的处理
 
 			// backup_url_1 有时 main_url 会 解析错误 所以 会导致 下载不了视频 此时 需要用 备用视频下载
 			String jiemi_base64_bankurl = null;
@@ -577,6 +663,42 @@ public class G2_ApplyRuleFor_TypeFile {
 
 			try {
 				mainHtml = Jsoup.parse(getXiGua_MainPageSource(url));
+				 
+				if(mainHtml != null && mainHtml.toString().contains("mediatype=\"video\"") 
+						&& mainHtml.toString().contains("src=\"http")
+						&& mainHtml.toString().contains("<video") ) {
+					String  mainHtmlStr = mainHtml.toString();
+					// <video class="" tabindex="2" mediatype="video" src="http://v3-default.ixigua.com/c
+					String begin_video_tag = mainHtmlStr.substring(mainHtmlStr.indexOf("<video"));  
+					String src_begin_tag = begin_video_tag.substring(begin_video_tag.indexOf("src=\"http"));
+					String http_begin_tag = src_begin_tag.replace("src=\"http", "");
+					String target_video_url = "http"+http_begin_tag.substring(0, http_begin_tag.indexOf("\""));
+					NoMainUrl_VideoTag_url = target_video_url;
+					System.out.println("当前页面源码有 Video Tag 标签 ");
+					
+					System.out.println();
+					System.out.println("url = "+ url);
+					System.out.println("NoMainUrl_VideoTag_url = "+ NoMainUrl_VideoTag_url);
+					System.out.println("===============mainHtml Begin============ ");
+					
+					System.out.println(mainHtml);
+					
+					System.out.println("===============mainHtml Endxx============ ");
+					
+					System.out.println();
+					
+					
+				}else {
+					System.out.println();
+					System.out.println("url = "+ url);
+					System.out.println("===============mainHtml Begin============ ");
+					
+					System.out.println(mainHtml);
+					
+					System.out.println("===============mainHtml Endxx============ ");
+					
+					System.out.println();
+				}
 				if (mainHtml != null) {
 					String MainHtmlStr = mainHtml.toString();
 
@@ -586,8 +708,21 @@ public class G2_ApplyRuleFor_TypeFile {
 					base64_jiami_url = calculXiGuaMainUri(url, MainHtmlStr, main_url_keyword);
 					base64_jiami_bankurl = calculXiGuaMainUri(url, MainHtmlStr, bankup_url_keyword);
 					if (base64_jiami_url == null) {
-						System.out.println(
-								"解析出的 base64_jiami_main_url 为空 无法下载视频到本地   base64_jiami_url=" + base64_jiami_url);
+					
+						if(NoMainUrl_VideoTag_url != null) {
+							System.out.println("解析出的 base64_jiami_main_url 为空  但存在 video_tag_url = "+ NoMainUrl_VideoTag_url );			
+						  System.out.println(" 尝试下载  video_tag_url : "+ NoMainUrl_VideoTag_url);
+						
+							downRawVideo_WithUrl(index,NoMainUrl_VideoTag_url, "", "TouTiao");
+						}else {
+							
+							System.out.println("解析出的 base64_jiami_main_url 为空  NoMainUrl_VideoTag_url 为空 无法下载视频到本地   base64_jiami_url=" + base64_jiami_url);
+
+						}
+						
+					
+					
+					
 					} else {
 						System.out.println("解析出的 base64_jiami_url=[" + base64_jiami_url + "]  尝试解密base64");
 
@@ -735,32 +870,104 @@ public class G2_ApplyRuleFor_TypeFile {
 		 * @return 首页内容
 		 * @throws InterruptedException 睡眠中断异常
 		 */
-		String getXiGua_MainPageSource(String url) throws InterruptedException {
+		String getXiGua_MainPageSource(String url)  {
 
 			ChromeOptions CUR_CHROME_OPTIONS = new ChromeOptions();
 			// 驱动位置
+			CUR_CHROME_OPTIONS.addArguments("--start-fullscreen"); 
+		
+//			CUR_CHROME_OPTIONS.addArguments("Accept=text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8");
+//			CUR_CHROME_OPTIONS.addArguments("Accept-Encoding=gzip, deflate, sdch");
+//			CUR_CHROME_OPTIONS.addArguments("Accept-Language=zh-CN,zh;q=0.8");
+//			CUR_CHROME_OPTIONS.addArguments("Connection=keep-alive");
+//			CUR_CHROME_OPTIONS.addArguments("Host=activityunion-marketing.meituan.com");
+//			CUR_CHROME_OPTIONS.addArguments("Upgrade-Insecure-Requests=1");
+//			CUR_CHROME_OPTIONS.addArguments("User-Agent=Mozilla/5.0 (iPhone; CPU iPhone OS 8_0 like Mac OS X) AppleWebKit/600.1.3 (KHTML, like Gecko) Version/8.0 Mobile/12A4345d Safari/600.1.4");
+
+
 			System.setProperty("webdriver.chrome.driver", ChromeDriverFile.getAbsolutePath());
 			// 避免被浏览器检测识别
 			CUR_CHROME_OPTIONS.setExperimentalOption("excludeSwitches", Collections.singletonList("enable-automation"));
 
 			ChromeDriver driver = new ChromeDriver(CUR_CHROME_OPTIONS);
+			int loop_index = 0;
 			try {
 
 				driver.get(url);
 				long waitTime = Double.valueOf(Math.max(3, Math.random() * 5) * 1000).longValue();
 				TimeUnit.MILLISECONDS.sleep(waitTime);
-				long timeout = 30_000;
+				long timeout = 20_000;
 				// 循环下拉，直到全部加载完成或者超时
 				do {
 					new Actions(driver).sendKeys(Keys.END).perform();
 					TimeUnit.MILLISECONDS.sleep(waitTime);
+					if(loop_index == 1) {
+						System.out.println("!! 触发点击事件  起始 标识 AAA !!");
+						new Actions(driver).sendKeys(Keys.HOME).perform();
+						TimeUnit.MILLISECONDS.sleep(1500);
+						try {
+					        driver.findElement(By.className("xgplayer-start")).click();
+							TimeUnit.MILLISECONDS.sleep(2000);
+						} catch (Exception e) {
+							System.out.println("尝试点击播放按钮失败!! ");
+						
+							System.out.println("click异常:");
+							System.out.println(e.fillInStackTrace());
+							
+						}
+		
+				
+//				        List<WebElement> element =  driver.findElements(xgplayer);
+//				        if(element != null && element.size() > 0) {
+//				        	WebElement endElement = element.get(element.size() -1 );
+//				    		System.out.println("!! 触发点击事件  起始 标识 BBB   element.size()="+element.size());
+//				        	endElement.click();
+//				        }
+					
+						
+						/*
+						 * System.out.println("!! 触发点击事件  起始 标识 BBB !!"); List<WebElement> playelements
+						 * = driver.findElementsByClassName("xgplayer-start");
+						 * System.out.println(" xgplayer-start  playelements.size() = " + (playelements
+						 * == null ? "null":playelements.size()+"")); if(playelements != null &&
+						 * playelements.size() > 0) { for (WebElement webElement : playelements) {
+						 * if(webElement != null) {
+						 * System.out.println("_______________ webelement begin _______________"); //
+						 * System.out.println(webElement.toString());
+						 * System.out.println("_______________ webelement endxx _______________");
+						 * 
+						 * }
+						 * 
+						 * }
+						 * 
+						 * 
+						 * 
+						 * System.out.println("存在播放按钮 xgplayer-start   触发点击 playelements="+(playelements
+						 * == null?"null":""+playelements.size())); }else {
+						 * 
+						 * System.out.println("没有播放按钮 xgplayer-start "); }
+						 */
+						
+//						TimeUnit.MILLISECONDS.sleep(2000);
+						
+					}
+
+					TimeUnit.MILLISECONDS.sleep(waitTime);
 					timeout -= waitTime;
+					loop_index++;
 				} while (!driver.getPageSource().contains("已经到底部，没有新的内容啦") && timeout > 0);
 				System.out.println("已经到底部，没有新的内容啦");
 				return driver.getPageSource();
-			} finally {
+			}  catch (Exception e) {
+				// TODO: handle exception
+				System.out.println("获取网页源码的时候出错  url = "+ url);
+				e.printStackTrace();
+		
+			}finally {
 				driver.close();
+
 			}
+			return null;
 		}
 
 		@SuppressWarnings("unchecked")
@@ -810,6 +1017,8 @@ public class G2_ApplyRuleFor_TypeFile {
 				System.out.println(e.getMessage());
 			}
 		}
+
+		// 	        String fileAddress = videoSavePath+"/"+((source==null ||"".equals(source) ? "":source+"_")+title.replace(" ", ""))+"_"+index_download+"_"+timeStamp_Str+".mp4";
 
 		// 视频的保存 目录 不能是 当前文件 否则 就会执行 同步操作 影响网速
 		@SuppressWarnings("unchecked")
@@ -872,34 +1081,36 @@ public class G2_ApplyRuleFor_TypeFile {
 		}
 
 		@SuppressWarnings("unchecked")
-		File calLastTxtFileInList(File rootDir) {
-			ArrayList<File> txtFileList = new ArrayList<File>();
-			File newRootFile = new File(rootDir.getAbsolutePath());
-			if (newRootFile == null) {
-				System.out.println(" 当前 检测不到根目录 newRootFile = null !!");
-				return null;
-			}
-			File[] fileArr = newRootFile.listFiles();
-			if (fileArr == null || fileArr.length == 0) {
-				System.out.println("当前目录文件为空,将休眠1分钟后继续监测!!");
-				System.out.println("mWeChatRootFile.listFiles().size() ==  0 ");
-			} else {
-				System.out.println("mWeChatRootFile.listFiles().size() == " + fileArr.length);
-				for (int i = 0; i < fileArr.length; i++) {
-					File curFile = fileArr[i];
-					String fileNmae = curFile.getName().toLowerCase();
-					if (fileNmae.endsWith(".txt")) {
-						txtFileList.add(curFile);
-					}
-				}
-
-			}
+		File calLastTxtFileInList(File rootDir) { 
+			
+			  // 全目录 搜索   TXT  文件  Begin 
+//			ArrayList<File> txtFileList = new ArrayList<File>();
+	
+			
+			ArrayList<File> txtFileList = 	getAllSubFile(rootDir,".txt");
+			
+			
+			/*
+			 * File newRootFile = new File(rootDir.getAbsolutePath()); if (newRootFile ==
+			 * null) { System.out.println(" 当前 检测不到根目录 newRootFile = null !!"); return null;
+			 * } File[] fileArr = newRootFile.listFiles(); if (fileArr == null ||
+			 * fileArr.length == 0) { System.out.println("当前目录文件为空,将休眠1分钟后继续监测!!");
+			 * System.out.println("mWeChatRootFile.listFiles().size() ==  0 "); } else {
+			 * System.out.println("mWeChatRootFile.listFiles().size() == " +
+			 * fileArr.length); for (int i = 0; i < fileArr.length; i++) { File curFile =
+			 * fileArr[i]; String fileNmae = curFile.getName().toLowerCase(); if
+			 * (fileNmae.endsWith(".txt")) { txtFileList.add(curFile); } }
+			 * 
+			 * }
+			 */
+			  // 全目录 搜索   TXT  文件  End 
+			
 			if (txtFileList.size() == 0) {
 				return null;
 			}
 			txtFileList.sort(mFileDateComparion);
 			File lastTxtFile = txtFileList.get(txtFileList.size() - 1);
-			mWeChatRootFile = newRootFile;
+//			mWeChatRootFile = newRootFile;
 
 			return lastTxtFile;
 
@@ -944,6 +1155,26 @@ public class G2_ApplyRuleFor_TypeFile {
 
 		}
 
+		/*
+		 * @Override String simpleDesc() {
+		 * 
+		 * return Cur_Bat_Name + " #_" + rule_index +
+		 * "  ### 持续检测 WeChat目录 C:\\Users\\zukgit\\Documents\\WeChat Files\\xxxx\\FileStorage\\File\\2021-07 的 TXT文件的内容    \n"
+		 * + Cur_Bat_Name + " #_" + rule_index +
+		 * "   ### 只有在 WeChat的当前 月份接收文件目录 才能生效 Monitor 监控 \n" + "  explorer.exe  \"" +
+		 * System.getProperties().getProperty("user.home") +
+		 * "\\Documents\\WeChat Files\\zzj382581427\\FileStorage\\File\"   \n" +
+		 * "  explorer.exe  \"" + mDownloadedMonthDir.getAbsolutePath() + "\"   \n" +
+		 * "cd  " + "\""+ System.getProperties().getProperty("user.home") +
+		 * "\\Documents\\WeChat Files\\zzj382581427\\FileStorage\\File" +
+		 * File.separator+ getTimeStamp_YYYY_MM() + "\"" +"  && "+ "  explorer.exe " +
+		 * " \""+ mDownloadedMonthDir.getAbsolutePath()+"\"" +
+		 * " \n &&   zrule_apply_G2.bat " + "_" + rule_index + "_" + "\n"
+		 * 
+		 * ; }
+		 */
+		
+		
 		@Override
 		String simpleDesc() {
 
@@ -951,9 +1182,9 @@ public class G2_ApplyRuleFor_TypeFile {
 					+ "  ### 持续检测 WeChat目录 C:\\Users\\zukgit\\Documents\\WeChat Files\\xxxx\\FileStorage\\File\\2021-07 的 TXT文件的内容    \n"
 					+ Cur_Bat_Name + " #_" + rule_index + "   ### 只有在 WeChat的当前 月份接收文件目录 才能生效 Monitor 监控 \n"
 					+ "  explorer.exe  \"" + System.getProperties().getProperty("user.home")
-					+ "\\Documents\\WeChat Files\\zzj382581427\\FileStorage\\File\"   \n" + "  explorer.exe  \""
+					+ "\\Documents\\WeChat Files\"   \n" + "  explorer.exe  \""
 					+ mDownloadedMonthDir.getAbsolutePath() + "\"   \n"
-				    + "cd  " + "\""+ System.getProperties().getProperty("user.home") + "\\Documents\\WeChat Files\\zzj382581427\\FileStorage\\File" + File.separator+ getTimeStamp_YYYY_MM() + "\""
+				    + "cd  " + "\""+ System.getProperties().getProperty("user.home") + "\\Documents\\WeChat Files" + "\""
 					+"  && "+ "  explorer.exe " + " \""+  mDownloadedMonthDir.getAbsolutePath()+"\"" + 
 				      " \n &&   zrule_apply_G2.bat " + "_" + rule_index + "_" + "\n"
 
@@ -9769,6 +10000,14 @@ public class G2_ApplyRuleFor_TypeFile {
 		return getAllSubFile(dirFile, null, typeList);
 	}
 
+	static ArrayList<File> getAllSubFile(File dirFile, String typeStr) {
+		ArrayList<String> typeList = new ArrayList<String>();
+		typeList.add(typeStr);
+
+		return getAllSubFile(dirFile.getAbsolutePath(), "", typeList);
+
+	}
+	
 	static ArrayList<File> getAllSubFile(File dirFile, String aospPath, ArrayList<String> typeList) {
 		if (aospPath == null || "".equals(aospPath)) {
 			return getAllSubFile(dirFile.getAbsolutePath(), "", typeList);
