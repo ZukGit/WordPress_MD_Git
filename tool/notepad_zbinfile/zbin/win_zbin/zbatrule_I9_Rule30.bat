@@ -1154,6 +1154,40 @@ goto:eof
 
 
 
+:getrandomintwithmaxmin_func_2x1
+rem ======================================== getrandomintwithmaxmin_func_2x1
+rem desc: 获得一个指定 max 与 min 之间的一个随机数
+rem sample: call :getrandomintwithmaxmin_func_2x1  0 100
+rem sample: call :getrandomintwithmaxmin_func_2x1  1000 10000
+rem sample_out: getrandomintwithmaxmin_return_1=[21]   param1=[0]   param2=[100]
+rem sample_out: getrandomintwithmaxmin_return_1=[5437]   param1=[1000]   param2=[10000]
+::SETLOCAL
+echo ______________Method_In getrandomintwithmaxmin_func_2x1
+set getrandomintwithmaxmin_return_1=%1
+set random_min=%1
+set random_max=%2
+if "%random_min%"=="" (
+set /a random_min=0
+) 
+if "%random_max%"=="" (
+set /a random_min=100
+)
+set /a random_mod=!random_max!-!random_min!+1 
+echo random_mod=!random_mod!
+rem 产生[min,max]之间的随机数 
+for /l %%i in (1,1,1) do (
+rem echo random=!random!
+set /a getrandomintwithmaxmin_return_1=!random!%%!random_mod!+!random_min! 
+)
+rem  去除掉所有的空格 路径字符串 有用  
+echo [getrandomintwithmaxmin_func_2x1 EndPrintCode]   getrandomintwithmaxmin_return_1=[!getrandomintwithmaxmin_return_1!]   param1=[%1]   param2=[%2]   
+echo ______________Method_Out getrandomintwithmaxmin_func_2x1
+::ENDLOCAL
+goto:eof
+
+
+
+
 :stringtrim_func_1x1
 rem ======================================== stringtrim_func_1x1
 rem desc: 去字符串中的所有的空格  不去除引号
@@ -2768,6 +2802,27 @@ echo [rule18vinstalllocalsoft_func_0x0 EndPrintCode]   output=[__empty__]  param
 echo ______________Method_Out rule18vinstalllocalsoft_func_0x0
 goto:eof
 )
+echo 10请确保当前是运行在管理员权限下,否则系统环境变量可能无法设置.
+ping -n 5 127.0.0.1>nul
+echo 9请确保当前是运行在管理员权限下,否则系统环境变量可能无法设置.
+ping -n 2 127.0.0.1>nul
+echo 8请确保当前是运行在管理员权限下,否则系统环境变量可能无法设置.
+ping -n 2 127.0.0.1>nul
+echo 7请确保当前是运行在管理员权限下,否则系统环境变量可能无法设置.
+ping -n 2 127.0.0.1>nul
+echo 6请确保当前是运行在管理员权限下,否则系统环境变量可能无法设置.
+ping -n 2 127.0.0.1>nul
+echo 5请确保当前是运行在管理员权限下,否则系统环境变量可能无法设置.
+ping -n 2 127.0.0.1>nul
+echo 4请确保当前是运行在管理员权限下,否则系统环境变量可能无法设置.
+ping -n 2 127.0.0.1>nul
+echo 3请确保当前是运行在管理员权限下,否则系统环境变量可能无法设置.
+ping -n 2 127.0.0.1>nul
+echo 2请确保当前是运行在管理员权限下,否则系统环境变量可能无法设置.
+ping -n 2 127.0.0.1>nul
+echo 1请确保当前是运行在管理员权限下,否则系统环境变量可能无法设置.
+ping -n 2 127.0.0.1>nul
+echo 0开始执行zsoft_dest目录生成操作!!
 call :isfileexist_func_1x1  !zsoft_dest_dir!
 set zsoft_dest_dir_existflag=!isfileexist_return_1!
 if "%zsoft_dest_dir_existflag%"=="true" (
@@ -2972,7 +3027,6 @@ adb shell input tap 450 450
 ping -n 1 127.0.0.1>nul
 adb shell input tap 450 450
 ping -n 1 127.0.0.1>nul
-
 adb shell input swipe   1050 1200 1050 400  200
 adb shell input swipe   1050 1200 1050 400  200
 adb shell input swipe   1050 1200 1050 400  200
@@ -2994,7 +3048,6 @@ adb shell input swipe   1050 1200 1050 400  200
 adb shell input swipe   1050 1200 1050 400  200
 adb shell input swipe   1050 1200 1050 400  200
 adb shell input swipe   1050 1200 1050 400  200
-
 set rule19teldown_dynamic_param1=100000
 for /l %%i in (1, 1, !rule19teldown_dynamic_param1!) do (
 set loop_numnber=%%i
@@ -3002,7 +3055,6 @@ set yushu_number=250
 set fanhuishu_number=10
 set /a loop_numnber_yushu=!loop_numnber!%%!yushu_number!
 set /a loop_numnber_fanhuishu=!loop_numnber!%%!fanhuishu_number!
-
 echo __________________ Loop_Index[%%i] Begin  _______________________
 echo i == %%i      allLoop=[!rule19teldown_dynamic_param1!]  yushu=[!loop_numnber_yushu!] yushu_number=[!yushu_number!]   adb shell input tap 190 1000
 adb shell input tap 190 1000
@@ -3023,7 +3075,6 @@ echo i == %%i      allLoop=[!rule19teldown_dynamic_param1!]  yushu=[!loop_numnbe
 adb shell input tap 190 1300
 ping -n 1 127.0.0.1>nul
 adb shell input swipe  1050 600 1050 1050  200
- 
 ping -n 1 127.0.0.1>nul
 echo i == %%i      allLoop=[!rule19teldown_dynamic_param1!]  yushu=[!loop_numnber_yushu!] yushu_number=[!yushu_number!]    adb shell input tap 190 1400
 adb shell input tap 190 1400
@@ -3031,10 +3082,8 @@ ping -n 1 127.0.0.1>nul
 adb shell input swipe  1050 600 1050 1050  200
 ping -n 1 127.0.0.1>nul
 echo loop_numnber_yushu=!loop_numnber_yushu!
-
 if !loop_numnber_fanhuishu! EQU 0 (
 rem  一直返回  返回到主界面 
-
 adb shell input keyevent 4
 adb shell input keyevent 4
 adb shell input keyevent 4
@@ -3070,14 +3119,8 @@ ping -n 1 127.0.0.1>nul
 adb shell input swipe    1050 400 1050 1000  200
 adb shell input swipe    1050 400 1050 1000  200
 adb shell input swipe    1050 400 1050 1000  200
-
 adb shell input swipe    1050 400 1050 1000  200
-
 )
-
-
-
-
 if !loop_numnber_yushu! EQU 0 (
 adb shell am force-stop org.telegram.messenger
 ping -n 1 127.0.0.1>nul
@@ -3119,7 +3162,6 @@ adb shell input tap 1050 1600
 adb shell input swipe  1050 600 1050 900  200
 adb shell input swipe  1050 600 1050 900  200
 ping -n 1 127.0.0.1>nul
-
 echo __________________ Loop_Index[%%i] Endxx  _______________________
 )
 echo [rule19vdownloadshoucangjia_func_0x0 EndPrintCode]   output=[__empty__]  param1=[__empty__] 
@@ -3259,8 +3301,8 @@ rem ======================== 主函数main函数入口
 echo __________________ Main_Method Begin _______________________
 call ::helloworld_func_0x0
 call ::recordfilenametofile_func_1x1 %zbin%
-
-
+call ::getrandomintwithmaxmin_func_2x1 1000 10000
+echo getrandomintwithmaxmin_return_1=[!getrandomintwithmaxmin_return_1!]
 
 echo __________________ Main_Method End _______________________
 goto:eof
