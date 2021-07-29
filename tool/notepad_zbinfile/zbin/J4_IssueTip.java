@@ -194,6 +194,13 @@ public class J4_IssueTip {
 
     }
 
+    static void  GPS_Log_isLoggable(){
+    	  System.out.println("__________________ 【GPS】 Log.isLoggable(TAG,Log.VERBOSE) ____________________");
+    	System.out.println("adb shell setprop log.tag.AltitudeReceiver D &&   adb shell setprop log.tag.DataPerPackageAndUser D &&  adb shell setprop log.tag.DebugReportService D &&  adb shell setprop log.tag.EsStatusReceiver D &&  adb shell setprop log.tag.FlpServiceProvider D &&  adb shell setprop log.tag.FusedLocationService D &&  adb shell setprop log.tag.GeofenceServiceProvider D &&  adb shell setprop log.tag.GnssConfigService D &&  adb shell setprop log.tag.GpsNetInitiatedHandler D &&  adb shell setprop log.tag.GTPClientHelper D &&  adb shell setprop log.tag.IzatConfig D &&  adb shell setprop log.tag.IzatProvider D &&  adb shell setprop log.tag.IzatService D &&  adb shell setprop log.tag.IZatServiceContext D &&  adb shell setprop log.tag.LocationService D &&  adb shell setprop log.tag.LocationServiceReceiver D &&  adb shell setprop log.tag.NetInitiatedActivity D &&  adb shell setprop log.tag.NetworkLocationService D &&  adb shell setprop log.tag.NpProxy D &&  adb shell setprop log.tag.OsAgent D &&  adb shell setprop log.tag.RilInfoMonitor D &&  adb shell setprop log.tag.WiFiDBProvider D &&  adb shell setprop log.tag.WiFiDBReceiver D &&  adb shell setprop log.tag.WWANDBProvider D &&  adb shell setprop log.tag.WWANDBReceiver D");
+    	System.out.println();
+
+    	
+    }
 
     static void  Other_Tip(){
 
@@ -215,7 +222,8 @@ public class J4_IssueTip {
         System.out.println("【 wifi-service.jar  push命令】");
         System.out.println("adb root && adb remount && adb shell settings put global wifi_verbose_logging_enabled 1 && adb push .\\wifi-service.jar /system/framework/   ##### 连续重启两遍?");
         System.out.println();
-
+        GPS_Log_isLoggable();
+      
     }
 
     static void  ADB_Input_Tip(){
@@ -733,8 +741,8 @@ public class J4_IssueTip {
         System.out.println();
         System.out.println("【打印搜星Log】");
         System.out.println("adb logcat | grep \"Used In Fix:\"");
-        
-        
+        System.out.println();
+        System.out.println();
         
         System.out.println("═══════════════════════ MTK GNSS Measurement $PMTK485 $PMTK761 位置估测  ═══════════════════════");
         System.out.println("(  there was NO GNSS measurement report as MTK commented in ALPS05083378, PMTK485 command was used to query the location and");

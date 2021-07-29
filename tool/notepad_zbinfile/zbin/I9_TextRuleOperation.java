@@ -409,6 +409,13 @@ public class I9_TextRuleOperation {
 		// 检测当前目录下  包括 所有 子目录 孙 目录下 的 txt 文件 把 内容集中到 一个文件中 按时间顺序排序 并过滤url出来
 		CUR_RULE_LIST.add(new MakeAllTxt_Content_To_OneFile_Rule_39());
 
+		
+		//  把 当前的 每一行 转为  md 格式的 ```  oneline ``` 格式  方便放入 网站 之后 安卓 ios 都能快捷复制
+		CUR_RULE_LIST.add(new MakeOneLine_As_BlockWith_MD_Format_Rule_40());
+		
+		//  把 当前的 所有 内容 都 转为 1 行的 内容 
+		CUR_RULE_LIST.add(new MakeContent_As_OneLine_Rule_41());
+		
 //        CUR_RULE_LIST.add( new Image2Png_Rule_4());
 //        CUR_RULE_LIST.add( new AVI_Rule_5());
 //        CUR_RULE_LIST.add( new SubDirRename_Rule_6());
@@ -416,8 +423,128 @@ public class I9_TextRuleOperation {
 //        CUR_RULE_LIST.add( new ClearChineseType_8());
 
 	}
+	
 
 
+	class MakeContent_As_OneLine_Rule_41 extends Basic_Rule {
+
+
+
+		MakeContent_As_OneLine_Rule_41() {
+			super(41, false);
+		}
+
+		@Override
+		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+			for (int i = 0; i < curInputFileList.size(); i++) {
+				File fileItem = curInputFileList.get(i);
+
+//                ArrayList<String>  fixedStrArr =   clearChinese_Rule_13(fileItem);
+				String fixedStrArr = MakeContent_As_OneStrLine_Rule_41(fileItem);
+				System.out.println("════════════" + "输出文件 转为一行 Begin " + "════════════");
+//				for (int j = 0; j < fixedStrArr.size(); j++) {
+//					System.out.println(fixedStrArr.get(j));
+//				}
+				System.out.println(fixedStrArr);
+				System.out.println("════════════" + "输出文件 转为一行 End " + "════════════");
+				writeContentToFile(I9_Temp_Text_File, fixedStrArr);
+				NotePadOpenTargetFile(I9_Temp_Text_File.getAbsolutePath());
+				System.out.println("rule_" + rule_index + " ->  把当前文件所有的内容转为一行    File="
+						+ fileItem.getAbsolutePath());
+			}
+
+			return super.applyOperationRule(curFileList, subFileTypeMap, curDirList, curRealFileList);
+		}
+
+		@Override
+		String simpleDesc() {
+			return " 把 当前的 所有 内容 都 转为 1 一行的 内容 的字符串 (多用于输入命令)  ";
+		}
+
+		// 3. 如果当前 执行 错误 checkParams 返回 false 那么 将 打印这个函数 说明错误的可能原因
+		@Override
+		void showWrongMessage() {
+			System.out.println("当前 type 索引 " + rule_index + " 执行错误  可能是输入参数错误 请检查输入参数!");
+			System.out.println(" errorMsg = " + errorMsg);
+		}
+
+		// 4. 当前 rule的 说明 将会打印在 用户输入为空时的 提示语句！
+		@Override
+		String ruleTip(String type, int index, String batName, OS_TYPE curType) {
+			String itemDesc = "";
+			if (curType == OS_TYPE.Windows) {
+				itemDesc = batName.trim() + "  " + type + "_" + index + "    [索引 " + index + "]  描述:" + ""
+						+ simpleDesc();
+			} else {
+				itemDesc = batName.trim() + " " + type + "_" + index + "    [索引 " + index + "]  描述:" + ""
+						+ simpleDesc();
+			}
+
+			return itemDesc;
+		}
+	}
+	
+
+	class MakeOneLine_As_BlockWith_MD_Format_Rule_40 extends Basic_Rule {
+		
+		MakeOneLine_As_BlockWith_MD_Format_Rule_40() {
+			super(40, false);
+
+		}
+		
+
+		@Override
+		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+			for (int i = 0; i < curInputFileList.size(); i++) {
+				File fileItem = curInputFileList.get(i);
+
+//                ArrayList<String>  fixedStrArr =   clearChinese_Rule_13(fileItem);
+				ArrayList<String> fixedStrArr = add_md_code_block_format_Rule_40(fileItem);
+				System.out.println("════════════" + "输出文件 Begin " + "════════════");
+				for (int j = 0; j < fixedStrArr.size(); j++) {
+					System.out.println(fixedStrArr.get(j));
+				}
+				System.out.println("════════════" + "输出文件 End " + "════════════");
+				writeContentToFile(I9_Temp_Text_File, fixedStrArr);
+				NotePadOpenTargetFile(I9_Temp_Text_File.getAbsolutePath());
+				System.out.println("rule_" + rule_index + " ->  把当前文件的每一行 都 转为 System.out.println(xx) 的内容   File="
+						+ fileItem.getAbsolutePath());
+			}
+
+			return super.applyOperationRule(curFileList, subFileTypeMap, curDirList, curRealFileList);
+		}
+
+		@Override
+		String simpleDesc() {
+			return "  把当前文件的每一行 都 转为 ``` md code-block ``` 格式字样的内容 ";
+		}
+
+		// 3. 如果当前 执行 错误 checkParams 返回 false 那么 将 打印这个函数 说明错误的可能原因
+		@Override
+		void showWrongMessage() {
+			System.out.println("当前 type 索引 " + rule_index + " 执行错误  可能是输入参数错误 请检查输入参数!");
+			System.out.println(" errorMsg = " + errorMsg);
+		}
+
+		// 4. 当前 rule的 说明 将会打印在 用户输入为空时的 提示语句！
+		@Override
+		String ruleTip(String type, int index, String batName, OS_TYPE curType) {
+			String itemDesc = "";
+			if (curType == OS_TYPE.Windows) {
+				itemDesc = batName.trim() + "  " + type + "_" + index + "    [索引 " + index + "]  描述:" + ""
+						+ simpleDesc();
+			} else {
+				itemDesc = batName.trim() + " " + type + "_" + index + "    [索引 " + index + "]  描述:" + ""
+						+ simpleDesc();
+			}
+
+			return itemDesc;
+		}
+		
+		
+	}
 	class MakeAllTxt_Content_To_OneFile_Rule_39 extends Basic_Rule {
 
 		ArrayList<File> allTxtFile ;
@@ -8481,6 +8608,134 @@ public class I9_TextRuleOperation {
 
 	private static String Rule13_REGEX_CHINESE = "[\u4e00-\u9fa5]";
 
+	
+	public static ArrayList<String> add_md_code_block_format_Rule_40(File srcFile) {
+		ArrayList<String> newContent = new ArrayList<String>();
+		
+
+		
+
+		newContent.add("---                                       ");
+		newContent.add("layout: post                              ");
+		newContent.add("title: 粘贴墙板               ");
+		newContent.add("category: 工具                            ");
+		newContent.add("tags: Tool                                ");
+		newContent.add("keywords: 粘贴                        ");
+		newContent.add("typora-root-url: ..\\..\\                   ");
+		newContent.add("typora-copy-images-to: ..\\..\\public\\zimage");
+		newContent.add("---                                       ");
+		newContent.add("");
+		newContent.add("## 简介                                   ");
+		newContent.add(" * TOC                                    ");
+		newContent.add(" {:toc}                                   ");
+		newContent.add("");
+		newContent.add("## 粘贴墙板                       ");
+		newContent.add("");
+		newContent.add("### 汉语");
+		newContent.add("");
+		newContent.add("### Code");
+		newContent.add("");
+		newContent.add("### 英语");
+		File curFile = srcFile;
+
+		if (curFile != null) {
+
+			FileReader curReader;
+			try {
+
+				curReader = new FileReader(curFile);
+
+				BufferedReader curBR = new BufferedReader(new InputStreamReader(new FileInputStream(curFile), "utf-8"));
+				String oldOneLine = "";
+				String newOneLine = "";
+
+				while (oldOneLine != null) {
+
+					oldOneLine = curBR.readLine();
+					if (oldOneLine == null || oldOneLine.trim().isEmpty()) {
+						String lastItemStr = null ;
+						if(newContent.size() > 0) {
+							 lastItemStr  = newContent.get(newContent.size()-1);
+						}
+						
+						if(oldOneLine != null && "```".equals(oldOneLine.trim())) {  //  如果当前 只包含 ``` 那么 直接跳过 
+							continue;
+						}
+                    
+                         if(lastItemStr != null && !"".equals(lastItemStr) ) {
+//                        		newContent.add("");
+                         }
+					
+						continue;
+					}
+					
+					if("```".equals(oldOneLine.trim())){
+						continue;
+					}
+					
+					// 把 所有的 ` 去掉
+					newOneLine = oldOneLine.replace("`", "").trim();
+					
+					String append_oneLine = "\n```\n"+newOneLine+"\n```\n";
+
+
+					if(!newContent.contains(append_oneLine)) {  // 去除 重复
+						newContent.add(append_oneLine);
+					}
+				
+				}
+				curBR.close();
+
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		} else {
+			System.out.println("Failed !");
+		}
+		
+
+		return newContent;
+	}
+	
+	
+	public static String MakeContent_As_OneStrLine_Rule_41(File srcFile) {
+
+		
+		StringBuilder newContent = new StringBuilder();
+
+		File curFile = srcFile;
+
+		if (curFile != null) {
+
+			FileReader curReader;
+			try {
+
+				curReader = new FileReader(curFile);
+
+				BufferedReader curBR = new BufferedReader(new InputStreamReader(new FileInputStream(curFile), "utf-8"));
+				String oldOneLine = "";
+				String newOneLine = "";
+
+				while (oldOneLine != null) {
+
+					oldOneLine = curBR.readLine();
+					if (oldOneLine == null || oldOneLine.trim().isEmpty()) {
+						continue;
+					}
+
+					newContent.append(oldOneLine+" ");
+				}
+				curBR.close();
+
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		} else {
+			System.out.println("Failed !");
+		}
+		return newContent.toString();
+	}
+	
 	public static ArrayList<String> add_system_out_Rule_21(File srcFile) {
 		ArrayList<String> newContent = new ArrayList<String>();
 
@@ -12920,6 +13175,9 @@ public class I9_TextRuleOperation {
 		}
 
 	};
+	
+	
+	
 
 	static Comparator mFileDateComparion_Old_New = new Comparator<File>() {
 		@Override
