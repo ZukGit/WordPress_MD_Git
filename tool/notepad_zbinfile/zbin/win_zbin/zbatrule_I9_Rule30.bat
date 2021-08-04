@@ -2745,6 +2745,14 @@ echo pull /data/vendor/bug2go       adb_dump_!CURRENT_DATE_TIME_STAMP!\data_vend
 adb pull /data/vendor/bug2go       adb_dump_!CURRENT_DATE_TIME_STAMP!\data_vendor_bug2go\
 echo  adb pull  /data/vendor/diag_mdlog     adb_dump_!CURRENT_DATE_TIME_STAMP!\data_diag_mdlog\
 adb pull  /data/vendor/diag_mdlog     adb_dump_!CURRENT_DATE_TIME_STAMP!\data_diag_mdlog\
+echo  pull /data/vendor/aplogd/     adb_dump_!CURRENT_DATE_TIME_STAMP!\data_vendor_aplogd\
+adb pull /data/vendor/aplogd/     adb_dump_!CURRENT_DATE_TIME_STAMP!\data_vendor_aplogd\
+echo adb pull  /system/etc/     adb_dump_!CURRENT_DATE_TIME_STAMP!\system_etc\
+adb pull  /system/etc/     adb_dump_!CURRENT_DATE_TIME_STAMP!\system_etc\
+echo adb pull  /data/user/     adb_dump_!CURRENT_DATE_TIME_STAMP!\data_user\
+adb pull  /data/user/     adb_dump_!CURRENT_DATE_TIME_STAMP!\data_user\
+echo adb pull  /data/user_de/     adb_dump_!CURRENT_DATE_TIME_STAMP!\data_user_de\
+adb pull  /data/user_de/     adb_dump_!CURRENT_DATE_TIME_STAMP!\data_user_de\
 echo adb pull  /data/debuglogger  adb_dump_!CURRENT_DATE_TIME_STAMP!\data_mtk_debuglogger\
 adb pull  /data/debuglogger  adb_dump_!CURRENT_DATE_TIME_STAMP!\data_mtk_debuglogger\
 adb pull   /data/vendor/mtklog/  adb_dump_!CURRENT_DATE_TIME_STAMP!\data_vendor_mtklog\
@@ -2769,6 +2777,12 @@ ECHO all dumpsys service loaded at  adb_dump_!CURRENT_DATE_TIME_STAMP!\ !
 ) else (
 ECHO adb_dump_!CURRENT_DATE_TIME_STAMP!\Adb_AllService.txt  not exist !
 )
+adb shell dumpres        > adb_dump_!CURRENT_DATE_TIME_STAMP!\dumpres.txt
+adb shell dumpsys wifi               > adb_dump_!CURRENT_DATE_TIME_STAMP!\dumpsys_wifi.txt
+adb shell dumpsys wifiscanner        > adb_dump_!CURRENT_DATE_TIME_STAMP!\dumpsys_wifiscanner.txt
+adb shell iw phy0 reg get            > adb_dump_!CURRENT_DATE_TIME_STAMP!\iw_reg_get.txt  
+adb shell pm list features           > adb_dump_!CURRENT_DATE_TIME_STAMP!\pm_list_features.txt  
+adb shell dumpsys telephony.registry > adb_dump_!CURRENT_DATE_TIME_STAMP!\dumpsys_telephony.txt  
 echo [rule17vadbdumpservice_func_0x0 EndPrintCode]   output=[__empty__]  param1=[__empty__] 
 echo ______________Method_Out rule17vadbdumpservice_func_0x0
 ::ENDLOCAL
@@ -3301,9 +3315,8 @@ rem ======================== 主函数main函数入口
 echo __________________ Main_Method Begin _______________________
 call ::helloworld_func_0x0
 call ::recordfilenametofile_func_1x1 %zbin%
-call ::getrandomintwithmaxmin_func_2x1 1000 10000
-echo getrandomintwithmaxmin_return_1=[!getrandomintwithmaxmin_return_1!]
-
+call :getrandomintwithmaxmin_func_2x1  1000 10000
+echo getrandomintwithmaxmin_return_1=!getrandomintwithmaxmin_return_1!
 echo __________________ Main_Method End _______________________
 goto:eof
 rem ══════════════════════════════════════════ Main_Enter_Aera End══════════════════════════════════════════

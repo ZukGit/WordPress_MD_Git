@@ -322,11 +322,300 @@ public class G2_ApplyRuleFor_TypeFile {
 		
 		realTypeRuleList.add(new Monitor_Browser_ForWindows_Rule_40());
 		
+// 	// 读取当前文件夹下的jpg文件(仅仅时当前目录) 然后 读取当前的jpg的 artist  Desc  Make  Mode  Copyright UserComment 信息 来生成 .md文件
+
+		realTypeRuleList.add(new Read_Jpg_Exif_Info_Create_MDContent_Rule_41());
 
 		
 	}
 
 // 3038年 5 月 3 日
+	
+	
+	// operation_type 操作类型 1--读取文件内容字符串 进行修改 2--对文件对文件内容(字节)--进行修改 3.对全体子文件进行的随性的操作
+	// 属性进行修改(文件名称)
+//     // 4.对当前子文件(包括子目录 子文件 --不包含孙目录 孙文件) 5. 从shell 中获取到的路径 去对某一个文件进行操作
+
+	
+	
+	// 读取当前文件夹下的jpg文件(仅仅时当前目录) 然后 读取当前的jpg的 artist  Desc  Make  Mode  Copyright UserComment 信息 来生成 .md文件
+// 规则:   
+//1.jpg 的 Copyright 放入对应的 video文件的 md值 
+//2. jpg  和 video  命名都是 以 md5 文件命名
+//3. 所有的 artist  Desc  Make  Mode  Copyright UserComment  信息都以 _ 下划线 结束防止可能的乱码
+//4. jpg 的 Artist 放入涉及的知识内容 作为分类的依据 以下划线_分开
+//5. Desc  放入自己的对video 的个人见解 理解
+// 6. Make  Mode  UserComment 这三项  还没想好放什么
+// 7. 涉及初衷 是为了 把 学习过的video 作为 子项 在各个知识点类目下 显示 为了保存自己学习的过程 而设计的这个规则
+//  zfilesearch_D6.bat .jpg    能查看到具体的填充项 
+//	_______ type=[.jpg] index=[1] name=[2021-08-04_144330.jpg]  Exif Begin  _______
+//			JpgIndex[1] == Artist[隔热_] Desc[个问题_] Make[疯玩五天_] Mode[废物废物_] Copyright[如果我问过我_] UserComment[问他我问过_]
+				
+	class Read_Jpg_Exif_Info_Create_MDContent_Rule_41 extends Basic_Rule {
+		ArrayList<File> jpgFileList ;  //  当前目录下的 jpg 文件 
+		ArrayList<Jpg_Exif> jpgExifList ;  //  当前从 jpg读取信息后生成的原始数据
+		String video_url_prefix;   // video   md文件中 video标签的前缀
+		String image_url_prefix;  //  jpg   md文件中 jpg标签的前缀
+
+
+		Read_Jpg_Exif_Info_Create_MDContent_Rule_41() {
+			super("#", 41, 4); //
+			jpgFileList = new ArrayList<File> ();
+			jpgExifList = new  ArrayList<Jpg_Exif> ();
+			video_url_prefix = "https:github/mp4/xxxxxxxxx/";
+			image_url_prefix = "https:github/jpg/xxxxxxxxx/";
+		}
+		
+		
+		 class Jpg_Exif {
+			 
+				String mImageArtist_CategoryStr= null;
+				String mImageCopyright_VideoMD = null;
+			    String mImageDescription_SelfDesc = null;
+			     
+			     
+			String mImageMake_Utf8 = null;     // 待定
+			String mImageModel_Utf8 = null;     // 待定
+			String mPhotoUserComment_Utf8 = null;   // 待定
+			
+			File imageFile;    // 从该 jpg 文件读取到的 exif 信息 原文件
+			String videoName;    //  从 jpg 读取到 Copyright 是对应的 video 的文件名称
+			String videoUrl;  //    video 对应的 url   这个 .mp4 结尾  前缀 待定 可能需要从外部读取
+			String imageUrl;   // jpg 显示的 url 
+			
+			
+			@Override
+			public String toString() {
+
+			return "ImageName["+imageFile.getName()+"] category["+mImageArtist_CategoryStr+"]  video["+mImageCopyright_VideoMD+"] desc["+mImageDescription_SelfDesc+"] Make["+mImageMake_Utf8+"] Model["+mImageModel_Utf8+"] usercomment["+mPhotoUserComment_Utf8+"]  videoUrl["+videoUrl+"] imageUrl["+imageUrl+"]";
+			}
+			
+			
+			
+			Jpg_Exif(File curImageFile){
+				imageFile = 	curImageFile ;
+				imageUrl = image_url_prefix + File.separator+imageFile.getName();
+				initExifInfo(curImageFile);
+				
+			}
+			
+			
+			void initExifInfo(File file){
+			
+				String mImageDescription_Utf8 = null;
+				String mImageMake_Utf8 = null;
+				String mImageModel_Utf8 = null;
+				String mImageArtist_Utf8= null;
+				String mImageCopyright_Utf8 = null;
+				String mPhotoUserComment_Utf8 = null;
+				int angel = 0;
+				Metadata metadata;
+
+				try {
+					metadata = JpegMetadataReader.readMetadata(file);
+					metadata.getDirectories();
+
+					// zukgit_directory [Exif IFD0] - Orientation = Right side, top (Rotate 90 CW)
+					for (Directory directory : metadata.getDirectories()) {
+						for (Tag tag : directory.getTags()) {
+							// 格式化输出[directory.getName()] - tag.getTagName() = tag.getDescription()
+//							System.out.format("zukgit_directory  [%s] - %s = %s\n", directory.getName(), tag.getTagName(),tag.getDescription());
+
+							if ("Exif IFD0".equals(directory.getName())) {
+				
+
+								String mImageDescription = directory.getString(ExifIFD0Directory.TAG_IMAGE_DESCRIPTION);
+								
+								 mImageDescription_Utf8 = new String(mImageDescription.getBytes(),"UTF-8");
+
+								
+								String mImageMake = directory.getString(ExifIFD0Directory.TAG_MAKE);
+								 mImageMake_Utf8 = new String(mImageMake.getBytes(),"UTF-8");
+								
+								
+								String mImageModel = directory.getString(ExifIFD0Directory.TAG_MODEL);
+								 mImageModel_Utf8 = new String(mImageModel.getBytes(),"UTF-8");
+								
+								
+								String mImageArtist = directory.getString(ExifIFD0Directory.TAG_ARTIST);
+								 mImageArtist_Utf8 = new String(mImageArtist.getBytes(),"UTF-8");
+								
+								
+								
+								String mImageCopyright = directory.getString(ExifIFD0Directory.TAG_COPYRIGHT);
+								 mImageCopyright_Utf8 = new String(mImageCopyright.getBytes(),"UTF-8");
+								
+								
+								
+//								System.out.println("XXmImageDescription=["+mImageDescription+"]  Utf8["+mImageDescription_Utf8+"]");
+//								System.out.println("XXmImageMake=["+mImageMake+"]  Utf8["+mImageMake_Utf8+"]");
+//								System.out.println("XXmImageModel=["+mImageModel+"]  Utf8["+mImageModel_Utf8+"]");
+//								System.out.println("XXmImageArtist=["+mImageArtist+"]  Utf8["+mImageArtist_Utf8+"]");
+//								System.out.println("XXmImageCopyright=["+mImageCopyright+"]  Utf8["+mImageCopyright_Utf8+"]");
+
+						
+							}
+							
+							if ("Exif SubIFD".equals(directory.getName())) {
+
+						if("User Comment".equals(tag.getTagName())) {	
+							String mPhotoUserComment =  tag.getDescription();
+//							System.out.println("AZ_User_Comment=["+tag.getDescription()+"]");	
+							 mPhotoUserComment_Utf8 = new String(mPhotoUserComment.getBytes(),"utf-8");
+//							System.out.println("AZXXmPhotoUserComment=["+mPhotoUserComment+"]   mPhotoUserComment_Utf8=["+mPhotoUserComment_Utf8+"]" );	
+
+								}
+						
+							}
+						}
+
+					}
+
+
+
+				} catch (JpegProcessingException e) {
+					e.printStackTrace();
+					System.out.println("JpegProcessingException  异常事件发生 ");
+				} catch (IOException e) {
+					System.out.println("IOException  异常事件发生 ");
+					e.printStackTrace();
+				}
+				
+//				String mImageArtist_CategoryStr= null;
+//				String mImageCopyright_VideoMD = null;
+//			    String mImageDescription_SelfDesc = null;
+//			     
+//			     
+//			String mImageMake_Utf8 = null;     // 待定
+//			String mImageModel_Utf8 = null;     // 待定
+//			String mPhotoUserComment_Utf8 = null;   // 待定
+				
+	
+		        if(mImageArtist_Utf8 != null) {
+		        	mImageArtist_CategoryStr = clear_end_xiahua_xian(mImageArtist_Utf8);
+					
+				}else {
+					System.out.println("当前文件 ["+file.getName()+"] 没有读取到 mImageArtist_CategoryStr !! ");
+				}
+				
+				if(mImageDescription_Utf8 != null) {
+					mImageDescription_SelfDesc = clear_end_xiahua_xian(mImageDescription_Utf8);
+					
+				}else {
+					System.out.println("当前文件 ["+file.getName()+"] 没有读取到 mImageDescription_SelfDesc !! ");
+				}
+				
+				
+			if(mImageCopyright_Utf8 != null) {
+					
+				mImageCopyright_VideoMD = clear_end_xiahua_xian(mImageCopyright_Utf8);
+				videoName = mImageCopyright_VideoMD;
+				videoUrl = video_url_prefix+videoName+".mp4";
+				}else {
+					System.out.println("当前文件 ["+file.getName()+"] 没有读取到 mImageCopyright_VideoMD !! ");
+				}
+				
+				
+			
+				
+				if(mImageMake_Utf8 != null) {
+			this.mImageMake_Utf8 = clear_end_xiahua_xian(mImageMake_Utf8);
+				}else {
+					System.out.println("当前文件 ["+file.getName()+"] 没有读取到 mImageMake_Utf8 !! ");
+				}
+				
+				
+				
+				if(mImageModel_Utf8 != null) {
+					this.mImageModel_Utf8 = clear_end_xiahua_xian(mImageModel_Utf8);
+				}else {
+					System.out.println("当前文件 ["+file.getName()+"] 没有读取到 mImageModel_Utf8 !! ");
+				}
+		
+				if(mPhotoUserComment_Utf8 != null) {
+					this.mPhotoUserComment_Utf8 = clear_end_xiahua_xian(mPhotoUserComment_Utf8);
+				}else {
+					System.out.println("当前文件 ["+file.getName()+"] 没有读取到 mPhotoUserComment_Utf8 !! ");
+				}
+
+			}
+			
+			
+			
+		}
+		 
+		 String clear_end_xiahua_xian(String rawStr) {
+		
+			 String tempStr = rawStr;
+			 while(tempStr.endsWith("_")) {
+				 tempStr = tempStr.substring(0,tempStr.length() -1);
+			 }
+			 
+			 return tempStr;
+			 
+			 
+		 }
+		
+@Override
+ArrayList<File> applySubFileListRule4(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
+	ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+// TODO Auto-generated method stub
+	jpgFileList = 	getAllSubFile(curDirFile, ".jpg");
+	
+	if(jpgFileList.size() == 0 ) {
+		System.out.println(" 当前目录 curDirFile=["+curDirFile.getAbsolutePath()+"] 内没有 jpg文件!!  请检查后再次执行!! ");
+		return null;
+	}
+	
+	
+	for (int i = 0; i < jpgFileList.size(); i++) {
+//		Jpg_Exif
+		File jpgFile = jpgFileList.get(i);
+		Jpg_Exif  jpg_exif_item = new Jpg_Exif(jpgFile);
+		
+		jpgExifList.add(jpg_exif_item);
+		
+	}
+	
+	
+	if(jpgExifList.size() == 0) {
+		
+		System.out.println(" 当前目录 curDirFile=["+curDirFile.getAbsolutePath()+"]  存在["+jpgFileList.size()+"]个jpg "+" 但无法正常读取到 exif 信息  请检查后再次执行!! ");
+
+		return null;
+	}
+	
+	
+	for (int i = 0; i < jpgExifList.size(); i++) {
+		Jpg_Exif jpgExifitem = jpgExifList.get(i);
+		System.out.println("jpg_exif["+i+"] = "+ jpgExifitem.toString() );
+		
+	}
+	
+	
+	
+return super.applySubFileListRule4(curFileList, subFileTypeMap, curDirList, curRealFileList);
+}
+		
+		@Override
+		boolean allowEmptyDirFileList() {
+			// TODO Auto-generated method stub
+			return true;
+		}
+
+		@Override
+		String simpleDesc() {
+
+			return "\n"+Cur_Bat_Name + " #_" + rule_index+ "  ###  读取当前文件夹下的jpg文件的exif信息 artist  Desc  Make  Mode  Copyright UserComment 并以此生成 .md文件  " +
+		           "\n"+Cur_Bat_Name + " #_" + rule_index+ "  ###  读取当前文件夹下的jpg文件的exif信息 artist  Desc  Make  Mode  Copyright UserComment 并以此生成 .md文件 \n";
+
+		}
+
+		
+		
+	}
+	
+	
 
 	class Monitor_Browser_ForWindows_Rule_40 extends Basic_Rule {
 //		 1-----详细 下载路径        2----详细下载路径      3-----详细下载路径

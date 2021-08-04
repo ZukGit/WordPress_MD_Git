@@ -88,7 +88,9 @@ public class K2_NotepadTip  implements ClipboardOwner{
     	System.out.println();
         System.out.println("══════════════════"+ " grep_cmder_linux logcat 过滤执行 "+ "══════════════════" );
         System.out.println("adb logcat | grep -E  "+"\""+fliterStr+"\"");
-    
+    System.out.println();
+    System.out.println();
+    System.out.println();
         System.out.println("══════════════════"+ " findstr_cmd_windows  logcat 过滤执行 "+ "══════════════════" );
 
         String findstrparam = fliterStr.replace("|", " ");
@@ -115,9 +117,24 @@ public class K2_NotepadTip  implements ClipboardOwner{
         logKeyList.add("GnssLocationProvider: SNR");
         logKeyList.add("Sending Location to com.baidu.BaiduMap, Provider: gps");
         logKeyList.add("Sending Location to com.autonavi.minimap, Provider: gps");
-        logKeyList.add("read  gps_open_ind");  //   agps Session 开始
+//        logKeyList.add("read  gps_open_ind");  //   agps Session 开始
         logKeyList.add("Location UpdateRecord for");
+        logKeyList.add("u0 com.autonavi.minimap/com.autonavi.map.activity.NewMapActivity");
+        logKeyList.add("Sending Location to com.motorola.duogpstest"); 
         
+        logKeyList.add("Sending Location to com.baidu.map.location.test");
+        logKeyList.add("reportLocation: Location");
+        
+        logKeyList.add("------initLocationSDK()");
+
+        logKeyList.add("BaiduNetworkLocation onBind receive action");
+        
+        logKeyList.add("targetClass: com.baidu.map.location.BaiduNetworkLocationService");
+        
+        
+        
+
+        //  persist.vendor.log.aplogd.enable     // GPS 的 GnssLocationProvider.java 的 Log 开关
         
         
         StringBuilder printSB = new StringBuilder();
