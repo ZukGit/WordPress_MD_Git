@@ -357,6 +357,11 @@ public class G2_ApplyRuleFor_TypeFile {
 		String video_url_prefix;   // video   md文件中 video标签的前缀
 		String image_url_prefix;  //  jpg   md文件中 jpg标签的前缀
 
+		ArrayList<String> English_CharList ;
+		
+		// key 对应的 categoryitemStr  ,   Value 为 符合这个 Category的 Jpg_Exif   // 未完待续 zukgit 
+
+		Map<String,ArrayList<Jpg_Exif>>  mOneWord_JpgExifArr_Map;
 
 		Read_Jpg_Exif_Info_Create_MDContent_Rule_41() {
 			super("#", 41, 4); //
@@ -364,19 +369,53 @@ public class G2_ApplyRuleFor_TypeFile {
 			jpgExifList = new  ArrayList<Jpg_Exif> ();
 			video_url_prefix = "https:github/mp4/xxxxxxxxx/";
 			image_url_prefix = "https:github/jpg/xxxxxxxxx/";
+			initEnglishChar();
+		}
+		
+		void initEnglishChar(){
+			English_CharList =  new ArrayList<String>();
+			English_CharList.add("A");
+			English_CharList.add("B");
+			English_CharList.add("C");
+			English_CharList.add("D");
+			English_CharList.add("E");
+			English_CharList.add("F");
+			English_CharList.add("G");
+			English_CharList.add("H");
+			English_CharList.add("I");
+			English_CharList.add("J");
+			English_CharList.add("K");
+			English_CharList.add("L");
+			English_CharList.add("M");
+			English_CharList.add("N");
+			English_CharList.add("O");
+			English_CharList.add("P");
+			English_CharList.add("Q");
+			English_CharList.add("R");
+			English_CharList.add("S");
+			English_CharList.add("T");
+			English_CharList.add("U");
+			English_CharList.add("V");
+			English_CharList.add("W");
+			English_CharList.add("X");
+			English_CharList.add("Y");
+			English_CharList.add("Z");
 		}
 		
 		
 		 class Jpg_Exif {
-			 
+ // key 是  对应的首字母的 英文 大写字母 , List 是这个 Jpg_Exif 对应的属于这个索引下的 当前的Category
+	
+			 Map<String,ArrayList<String>> mEnglishChar_CategoryList_Map;
+			 ArrayList<String> mCategoryList;    // 在 artist_category 中以_分隔的 各个项
 				String mImageArtist_CategoryStr= null;
 				String mImageCopyright_VideoMD = null;
 			    String mImageDescription_SelfDesc = null;
-			     
-			     
-			String mImageMake_Utf8 = null;     // 待定
+				String mImageMake_OriginSrc = null;     //  图片的问题的出处 来源问题
+				String mPhotoUserComment_KnowledgePoint = null;   //知识点 待定  KnowLedge 知识点
+		
 			String mImageModel_Utf8 = null;     // 待定
-			String mPhotoUserComment_Utf8 = null;   // 待定
+
 			
 			File imageFile;    // 从该 jpg 文件读取到的 exif 信息 原文件
 			String videoName;    //  从 jpg 读取到 Copyright 是对应的 video 的文件名称
@@ -384,18 +423,99 @@ public class G2_ApplyRuleFor_TypeFile {
 			String imageUrl;   // jpg 显示的 url 
 			
 			
+			@SuppressWarnings("unchecked")
 			@Override
 			public String toString() {
+				StringBuilder sb = new StringBuilder();
+				
+				
+				Map.Entry<String, ArrayList<String>> entry;
 
-			return "ImageName["+imageFile.getName()+"] category["+mImageArtist_CategoryStr+"]  video["+mImageCopyright_VideoMD+"] desc["+mImageDescription_SelfDesc+"] Make["+mImageMake_Utf8+"] Model["+mImageModel_Utf8+"] usercomment["+mPhotoUserComment_Utf8+"]  videoUrl["+videoUrl+"] imageUrl["+imageUrl+"]";
+				if (mEnglishChar_CategoryList_Map != null) {
+					Iterator iterator = mEnglishChar_CategoryList_Map.entrySet().iterator();
+					while (iterator.hasNext()) {
+						entry = (Map.Entry<String, ArrayList<String>>) iterator.next();
+
+						// 获取 名称的 首字母
+						String oneWordStr = entry.getKey(); // Map的Value // 作者名称
+						ArrayList<String> categoryNameList = entry.getValue();
+						sb.append("mapKey("+oneWordStr+"_"+categoryNameList.size()+")【");
+						for (int i = 0; i < categoryNameList.size(); i++) {
+							String categoryItem = categoryNameList.get(i);
+							sb.append(categoryItem+",");
+						}
+						sb.append("】");
+						
+					}
+					}
+		
+
+			return "ImageName["+imageFile.getName()+"] category["+mImageArtist_CategoryStr+"]  video["+mImageCopyright_VideoMD+"] desc["+mImageDescription_SelfDesc+"] Make["+mImageMake_OriginSrc+"] Model["+mImageModel_Utf8+"] usercomment["+mPhotoUserComment_KnowledgePoint+"]  videoUrl["+videoUrl+"] imageUrl["+imageUrl+"]  mCategoryList.size=["+mCategoryList.size()+"] Map="+sb.toString();
 			}
 			
+			
+			void init_Artist_Category() {
+				mEnglishChar_CategoryList_Map =  new HashMap<String,ArrayList<String>>();
+				mCategoryList =  new ArrayList<String>();
+	
+				if(mImageArtist_CategoryStr != null && !mImageArtist_CategoryStr.contains("_")) {
+					
+					mCategoryList.add(mImageArtist_CategoryStr);
+					String itemStr = mImageArtist_CategoryStr.replace("_", "").replace(" ", "").trim();
+					
+					String Alphabet_Word = getFirstZiMu(itemStr);
+					
+					if(mEnglishChar_CategoryList_Map.get(Alphabet_Word) == null) {
+						ArrayList<String> category_word_list =  new ArrayList<String>();
+						category_word_list.add(itemStr);
+						mEnglishChar_CategoryList_Map.put(Alphabet_Word, category_word_list);
+					}else {
+						
+						ArrayList<String> category_word_list = mEnglishChar_CategoryList_Map.get(Alphabet_Word) ;
+						category_word_list.add(itemStr);
+					}
+					
+					return;
+				}
+				
+				if(mImageArtist_CategoryStr != null && mImageArtist_CategoryStr.contains("_")) {
+					
+				String[] categoryItem = 	mImageArtist_CategoryStr.trim().split("_");
+				
+				
+				for (int i = 0; i < categoryItem.length; i++) {
+					String itemStr = categoryItem[i];
+					itemStr = itemStr.replace("_", "").replace(" ", "").trim();
+					mCategoryList.add(itemStr);
+					
+					String Alphabet_Word = getFirstZiMu(itemStr);
+					
+					if(mEnglishChar_CategoryList_Map.get(Alphabet_Word) == null) {
+						ArrayList<String> category_word_list =  new ArrayList<String>();
+						category_word_list.add(itemStr);
+						mEnglishChar_CategoryList_Map.put(Alphabet_Word, category_word_list);
+					}else {
+						
+						ArrayList<String> category_word_list = mEnglishChar_CategoryList_Map.get(Alphabet_Word) ;
+						category_word_list.add(itemStr);
+					}
+
+				}
+					
+					
+				}
+				
+				
+			}
+
 			
 			
 			Jpg_Exif(File curImageFile){
 				imageFile = 	curImageFile ;
 				imageUrl = image_url_prefix + File.separator+imageFile.getName();
 				initExifInfo(curImageFile);
+				init_Artist_Category();
+				
 				
 			}
 			
@@ -425,25 +545,29 @@ public class G2_ApplyRuleFor_TypeFile {
 				
 
 								String mImageDescription = directory.getString(ExifIFD0Directory.TAG_IMAGE_DESCRIPTION);
-								
+								if(mImageDescription != null)
 								 mImageDescription_Utf8 = new String(mImageDescription.getBytes(),"UTF-8");
 
 								
 								String mImageMake = directory.getString(ExifIFD0Directory.TAG_MAKE);
-								 mImageMake_Utf8 = new String(mImageMake.getBytes(),"UTF-8");
+								if(mImageMake != null)
+								mImageMake_Utf8 = new String(mImageMake.getBytes(),"UTF-8");
 								
 								
 								String mImageModel = directory.getString(ExifIFD0Directory.TAG_MODEL);
-								 mImageModel_Utf8 = new String(mImageModel.getBytes(),"UTF-8");
+								if(mImageModel != null)
+								mImageModel_Utf8 = new String(mImageModel.getBytes(),"UTF-8");
 								
 								
 								String mImageArtist = directory.getString(ExifIFD0Directory.TAG_ARTIST);
-								 mImageArtist_Utf8 = new String(mImageArtist.getBytes(),"UTF-8");
+								if(mImageArtist != null)
+								mImageArtist_Utf8 = new String(mImageArtist.getBytes(),"UTF-8");
 								
 								
 								
 								String mImageCopyright = directory.getString(ExifIFD0Directory.TAG_COPYRIGHT);
-								 mImageCopyright_Utf8 = new String(mImageCopyright.getBytes(),"UTF-8");
+								if(mImageCopyright != null)
+								mImageCopyright_Utf8 = new String(mImageCopyright.getBytes(),"UTF-8");
 								
 								
 								
@@ -461,7 +585,8 @@ public class G2_ApplyRuleFor_TypeFile {
 						if("User Comment".equals(tag.getTagName())) {	
 							String mPhotoUserComment =  tag.getDescription();
 //							System.out.println("AZ_User_Comment=["+tag.getDescription()+"]");	
-							 mPhotoUserComment_Utf8 = new String(mPhotoUserComment.getBytes(),"utf-8");
+							if(mPhotoUserComment != null)
+							mPhotoUserComment_Utf8 = new String(mPhotoUserComment.getBytes(),"utf-8");
 //							System.out.println("AZXXmPhotoUserComment=["+mPhotoUserComment+"]   mPhotoUserComment_Utf8=["+mPhotoUserComment_Utf8+"]" );	
 
 								}
@@ -519,7 +644,7 @@ public class G2_ApplyRuleFor_TypeFile {
 			
 				
 				if(mImageMake_Utf8 != null) {
-			this.mImageMake_Utf8 = clear_end_xiahua_xian(mImageMake_Utf8);
+			this.mImageMake_OriginSrc = clear_end_xiahua_xian(mImageMake_Utf8);
 				}else {
 					System.out.println("当前文件 ["+file.getName()+"] 没有读取到 mImageMake_Utf8 !! ");
 				}
@@ -533,7 +658,7 @@ public class G2_ApplyRuleFor_TypeFile {
 				}
 		
 				if(mPhotoUserComment_Utf8 != null) {
-					this.mPhotoUserComment_Utf8 = clear_end_xiahua_xian(mPhotoUserComment_Utf8);
+					this.mPhotoUserComment_KnowledgePoint = clear_end_xiahua_xian(mPhotoUserComment_Utf8);
 				}else {
 					System.out.println("当前文件 ["+file.getName()+"] 没有读取到 mPhotoUserComment_Utf8 !! ");
 				}
@@ -12696,6 +12821,33 @@ File ChromeDriverFile = new File(zbinPath + File.separator + "G2_chromedriver_v9
 	}
 
 
+	static String getFirstZiMu(String srcStr) {
+		String firstZimu = "U"; // 默认为 Unknow;
+		if (srcStr == null || "".equals(srcStr.trim())) {
+			return firstZimu;
+		}
 
+		if (!isContainChinese(srcStr)) { // 如果 不包含中文 那么 取这个词的 第一个字符
+			String char_1 = srcStr.substring(0, 1).toUpperCase();
+			firstZimu = char_1;
+
+		} else {
+			String char_1 = srcStr.substring(0, 1).toUpperCase();
+//			System.out.println("X2 char_1 = "+char_1 );
+			if (!isContainChinese(char_1)) {
+				firstZimu = char_1;
+			} else { // 如果第一个字母为汉字 那么取到这个字的 拼音的 第一个词
+				String pinyinStr = ToPinyin(char_1);
+//				System.out.println("X2  pinyinStr = "+pinyinStr );
+				String char_1_fixed = pinyinStr.substring(0, 1).toUpperCase();
+				firstZimu = char_1_fixed;
+			}
+
+		}
+
+//		System.out.println("X3  firstZimu = "+firstZimu );
+		return firstZimu;
+
+	}
 
 }

@@ -43,6 +43,7 @@ import java.awt.datatransfer.Transferable;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLDecoder;
@@ -50,6 +51,8 @@ import java.net.URLEncoder;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributeView;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.text.Collator;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -1396,6 +1399,14 @@ public class I9_TextRuleOperation {
 				fs.close();
 				System.out.println("\n-----视频保存路径-----\n" + fileSavePath.getAbsolutePath());
 				System.out.println("\nzzfile_3.bat " + fileSavePath.getParentFile().getAbsolutePath());
+				
+				
+				//  获取文件的 md值   并重命名为 mdxxxx.mp4  
+				String mdName = getMD5Three(fileSavePath.getAbsolutePath());
+				String new_Md_Name = mdName+".mp4";
+				tryReName(fileSavePath, new_Md_Name);
+				//  把下载的 mp4 文件 名称 转为 md值
+				
 				urlStrList.add(httpUrl);
 			} catch (FileNotFoundException e) {
 				System.out.println(e.getMessage());
@@ -2068,7 +2079,7 @@ public class I9_TextRuleOperation {
 			batList.add("Setlocal ENABLEDELAYEDEXPANSION");
 			batList.add("@javac -cp " + classPathStr
 					+ "  -Xlint:unchecked -encoding UTF-8 %userprofile%\\Desktop\\zbin\\" + javaFile.getName());
-			batList.add("@java -cp " + classPathStr + "  " + javaNameNoPoint + "  %1  %2  %3 %4  %5  %6  %7  %8  %9 ");
+			batList.add("@java -cp " + classPathStr + "  -Dfile.encoding=UTF-8   " + javaNameNoPoint + "  %1  %2  %3 %4  %5  %6  %7  %8  %9 ");
 
 		}
 
@@ -2113,7 +2124,7 @@ public class I9_TextRuleOperation {
 			shList.add("javac -classpath $classpath -encoding UTF-8 $HOME/Desktop/zbin/" + javaFile.getName());
 			shList.add("@javac -cp " + jarSB.toString()
 					+ "  -Xlint:unchecked -encoding UTF-8 %userprofile%\\Desktop\\zbin\\" + javaFile.getName());
-			shList.add("java  -classpath $classpath " + "  -Xmx10240m -Xms10240m -Xmn5120m " + javaNameNoPoint + " "
+			shList.add("java  -classpath $classpath " + "  -Xmx10240m -Xms10240m -Xmn5120m   -Dfile.encoding=UTF-8   " + javaNameNoPoint + " "
 					+ " $1 $2 $3 $4 $5 $6 $7 $8 $9 ");
 
 		}
@@ -6245,6 +6256,7 @@ public class I9_TextRuleOperation {
 
 			if (file != null && file.exists()) {
 				BufferedWriter curBW = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "utf-8"));
+		
 				curBW.write(sb.toString());
 				curBW.flush();
 				curBW.close();
@@ -13192,6 +13204,29 @@ public class I9_TextRuleOperation {
 		}
 
 	};
+	
+	
+	public static String getMD5Three(String path) {
+		BigInteger bi = null;
+		try {
+			byte[] buffer = new byte[8192];
+			int len = 0;
+			MessageDigest md = MessageDigest.getInstance("MD5");
+			File f = new File(path);
+			FileInputStream fis = new FileInputStream(f);
+			while ((len = fis.read(buffer)) != -1) {
+				md.update(buffer, 0, len);
+			}
+			fis.close();
+			byte[] b = md.digest();
+			bi = new BigInteger(1, b);
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return bi.toString(16);
+	}
 
 	public static String getDateStrFromLongStamp(long timeStamp){
 		Date             date = new Date(timeStamp);

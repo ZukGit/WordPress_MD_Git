@@ -1,6 +1,8 @@
 
 import java.io.*;
 import java.math.BigInteger;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
@@ -49,6 +51,15 @@ public class D6_FileNameSearch {
 //args[6] = daada
 //args[7] = dacfada
 //args[8] = daada
+		
+
+System.out.println("系统默认编码"+Charset.defaultCharset());
+        
+System.getProperties().put("file.encoding", "UTF-8");
+System.getProperties().list(System.out);
+        
+System.out.println("defaultCharSet: "+Charset.defaultCharset());
+
 
 		if (args != null) {
 			for (int i = 0; i < args.length; i++) {
@@ -694,6 +705,25 @@ public class D6_FileNameSearch {
 		}
 	}
 
+	
+	static String bytesToHexString(byte[] src) {
+		StringBuilder builder = new StringBuilder();
+		if (src == null || src.length <= 0) {
+			return null;
+		}
+		String hv;
+		for (byte aSrc : src) {
+			// 以十六进制（基数 16）无符号整数形式返回一个整数参数的字符串表示形式，并转换为大写
+			hv = Integer.toHexString(aSrc & 0xFF).toUpperCase();
+			if (hv.length() < 2) {
+				builder.append(0);
+			}
+			builder.append(hv);
+		}
+//        System.out.println(builder.toString());
+		return builder.toString();
+	}
+	
 	public static String getMD5Three(String path) {
 		BigInteger bi = null;
 		try {
@@ -1075,8 +1105,16 @@ public class D6_FileNameSearch {
 		Metadata metadata;
 
 		try {
+	
+			
 			metadata = JpegMetadataReader.readMetadata(file);
-			metadata.getDirectories();
+			if(metadata == null) {
+				return false; 
+			}
+		
+			
+
+
 
 			// zukgit_directory [Exif IFD0] - Orientation = Right side, top (Rotate 90 CW)
 			for (Directory directory : metadata.getDirectories()) {
@@ -1089,24 +1127,34 @@ public class D6_FileNameSearch {
 
 						String mImageDescription = directory.getString(ExifIFD0Directory.TAG_IMAGE_DESCRIPTION);
 						
-						 mImageDescription_Utf8 = new String(mImageDescription.getBytes(),"utf-8");
+						if(mImageDescription != null ) {
+
+
+				            mImageDescription_Utf8 = new String(mImageDescription.getBytes(),StandardCharsets.UTF_8);
+							
+	
+						}
 
 						
 						String mImageMake = directory.getString(ExifIFD0Directory.TAG_MAKE);
+						if(mImageMake != null )
 						 mImageMake_Utf8 = new String(mImageMake.getBytes(),"utf-8");
 						
 						
 						String mImageModel = directory.getString(ExifIFD0Directory.TAG_MODEL);
-						 mImageModel_Utf8 = new String(mImageModel.getBytes(),"utf-8");
+						if(mImageModel != null )
+						mImageModel_Utf8 = new String(mImageModel.getBytes(),"utf-8");
 						
 						
 						String mImageArtist = directory.getString(ExifIFD0Directory.TAG_ARTIST);
-						 mImageArtist_Utf8 = new String(mImageArtist.getBytes(),"utf-8");
+						if(mImageArtist != null )
+						mImageArtist_Utf8 = new String(mImageArtist.getBytes(),"utf-8");
 						
 						
 						
 						String mImageCopyright = directory.getString(ExifIFD0Directory.TAG_COPYRIGHT);
-						 mImageCopyright_Utf8 = new String(mImageCopyright.getBytes(),"utf-8");
+						if(mImageCopyright != null )
+						mImageCopyright_Utf8 = new String(mImageCopyright.getBytes(),"utf-8");
 						
 						
 						
@@ -1124,7 +1172,8 @@ public class D6_FileNameSearch {
 				if("User Comment".equals(tag.getTagName())) {	
 					String mPhotoUserComment =  tag.getDescription();
 //					System.out.println("AZ_User_Comment=["+tag.getDescription()+"]");	
-					 mPhotoUserComment_Utf8 = new String(mPhotoUserComment.getBytes(),"utf-8");
+					if(mPhotoUserComment != null )
+					mPhotoUserComment_Utf8 = new String(mPhotoUserComment.getBytes(),"utf-8");
 //					System.out.println("AZXXmPhotoUserComment=["+mPhotoUserComment+"]   mPhotoUserComment_Utf8=["+mPhotoUserComment_Utf8+"]" );	
 
 						}
@@ -1153,4 +1202,34 @@ public class D6_FileNameSearch {
 //		System.out.println("图片旋转角度：" + angel);
 		return isPort;
 	}
+	
+	
+
+	static String byteArrToString(byte[] byteArr) {
+		InputStream inputStream = null;
+		byte[] result = byteArr;
+		StringBuilder sb = new StringBuilder();
+		inputStream = new ByteArrayInputStream(result);
+		InputStreamReader input;
+		try {
+//			input = new InputStreamReader(inputStream,"utf-8");
+			input = new InputStreamReader(inputStream);
+		BufferedReader bf = new BufferedReader(input);
+		String line = null;
+
+	
+			while((line=bf.readLine()) != null){
+				sb.append(line);
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return  sb.toString();
+	}
+	
+	
+
+    
 }
