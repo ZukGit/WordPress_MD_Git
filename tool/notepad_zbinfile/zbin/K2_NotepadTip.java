@@ -125,11 +125,13 @@ public class K2_NotepadTip  implements ClipboardOwner{
         logKeyList.add("Sending Location to com.baidu.map.location.test");
         logKeyList.add("reportLocation: Location");
         
+        logKeyList.add("Sending Location to ");
         logKeyList.add("------initLocationSDK()");
 
         logKeyList.add("BaiduNetworkLocation onBind receive action");
         
         logKeyList.add("targetClass: com.baidu.map.location.BaiduNetworkLocationService");
+
         
         
         

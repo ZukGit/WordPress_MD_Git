@@ -356,24 +356,74 @@ public class G2_ApplyRuleFor_TypeFile {
 		ArrayList<Jpg_Exif> jpgExifList ;  //  当前从 jpg读取信息后生成的原始数据
 		String video_url_prefix;   // video   md文件中 video标签的前缀
 		String image_url_prefix;  //  jpg   md文件中 jpg标签的前缀
+		
+		boolean is_kaoyan;   // 考研 类型
+		boolean is_gaokao;   // 高考 类型
 
 		ArrayList<String> English_CharList ;
+		ArrayList<String> mCategoryItemList_In_Jpg;  // 所有 分类 的 类型 二级分类的类型 
 		
-		// key 对应的 categoryitemStr  ,   Value 为 符合这个 Category的 Jpg_Exif   // 未完待续 zukgit 
+		// key 为 jpg 中的 Category , List 为 符合 这个 category 的 Jpg_Exif 
+		Map<String,ArrayList<Jpg_Exif>>  mCategory_JpgExifList_Map;
+		
+		// key 英语Englist OneWord , value 为  符合 这个 Key的 Category的集合 
 
-		Map<String,ArrayList<Jpg_Exif>>  mOneWord_JpgExifArr_Map;
+		Map<String,ArrayList<String>>  mOneWord_CategoryArr_Map;
 
+		@Override
+		boolean initParamsWithInputList(ArrayList<String> inputParamList) {
+			// mdname_true    // kaoyan_true    gaokao_true
+			
+			
+
+			for (int i = 0; i < inputParamList.size(); i++) {
+				String paramItem = inputParamList.get(i);
+				String paramItem_lower_trim = paramItem.toLowerCase().trim();
+
+				if ("kaoyan_true".equals(paramItem_lower_trim)) {
+					is_kaoyan = true;
+				}
+
+				if ("gaokao_true".equals(paramItem_lower_trim)) {
+					is_gaokao = true;
+				}
+				
+			}
+			
+			
+			if(is_gaokao) {
+				video_url_prefix = "D:/Git_Dir/Z_School/zschool_media/gaokao_mp4/";
+				image_url_prefix = "/public/zimage/zschool_media/gaokao_jpg/";
+			}else {
+				video_url_prefix = "D:/Git_Dir/Z_School/zschool_media/kaoyan_mp4/";
+				image_url_prefix = "/public/zimage/zschool_media/kaoyan_jpg/";
+			}
+			
+			
+			
+			
+		// TODO Auto-generated method stub
+		return super.initParamsWithInputList(inputParamList);
+		}
+		
+		
+		
+		
 		Read_Jpg_Exif_Info_Create_MDContent_Rule_41() {
 			super("#", 41, 4); //
 			jpgFileList = new ArrayList<File> ();
 			jpgExifList = new  ArrayList<Jpg_Exif> ();
-			video_url_prefix = "https:github/mp4/xxxxxxxxx/";
-			image_url_prefix = "https:github/jpg/xxxxxxxxx/";
+
+	
 			initEnglishChar();
 		}
 		
 		void initEnglishChar(){
 			English_CharList =  new ArrayList<String>();
+			mCategoryItemList_In_Jpg  =new  ArrayList<String>();
+			mOneWord_CategoryArr_Map = new HashMap<String,ArrayList<String>>();
+			mCategory_JpgExifList_Map = new  HashMap<String,ArrayList<Jpg_Exif>>();
+			
 			English_CharList.add("A");
 			English_CharList.add("B");
 			English_CharList.add("C");
@@ -512,7 +562,7 @@ public class G2_ApplyRuleFor_TypeFile {
 			
 			Jpg_Exif(File curImageFile){
 				imageFile = 	curImageFile ;
-				imageUrl = image_url_prefix + File.separator+imageFile.getName();
+				imageUrl = image_url_prefix + curImageFile.getName();
 				initExifInfo(curImageFile);
 				init_Artist_Category();
 				
@@ -624,7 +674,7 @@ public class G2_ApplyRuleFor_TypeFile {
 				}
 				
 				if(mImageDescription_Utf8 != null) {
-					mImageDescription_SelfDesc = clear_end_xiahua_xian(mImageDescription_Utf8);
+					mImageDescription_SelfDesc = fixed_number_point(clear_end_xiahua_xian(mImageDescription_Utf8));
 					
 				}else {
 					System.out.println("当前文件 ["+file.getName()+"] 没有读取到 mImageDescription_SelfDesc !! ");
@@ -658,7 +708,7 @@ public class G2_ApplyRuleFor_TypeFile {
 				}
 		
 				if(mPhotoUserComment_Utf8 != null) {
-					this.mPhotoUserComment_KnowledgePoint = clear_end_xiahua_xian(mPhotoUserComment_Utf8);
+					this.mPhotoUserComment_KnowledgePoint = fixed_number_point(clear_end_xiahua_xian(mPhotoUserComment_Utf8));
 				}else {
 					System.out.println("当前文件 ["+file.getName()+"] 没有读取到 mPhotoUserComment_Utf8 !! ");
 				}
@@ -669,6 +719,29 @@ public class G2_ApplyRuleFor_TypeFile {
 			
 		}
 		 
+		 
+		 // 
+		 String fixed_number_point(String rawStr) {
+			 
+			 String tempStr = rawStr;
+			 tempStr =  tempStr.replace("1.", "\n1.");
+			 tempStr =  tempStr.replace("2.", "\n2.");
+			 tempStr =  tempStr.replace("3.", "\n3.");
+			 tempStr =  tempStr.replace("4.", "\n4.");
+			 tempStr =  tempStr.replace("5.", "\n5.");
+			 tempStr =  tempStr.replace("6.", "\n6.");
+			 tempStr =  tempStr.replace("7.", "\n7.");
+			 tempStr =  tempStr.replace("8.", "\n8.");
+			 tempStr =  tempStr.replace("9.", "\n9.");
+			 tempStr =  tempStr.replace("10.", "\n10.");
+
+			 tempStr = tempStr.trim();
+			 if(tempStr.startsWith("\n")) {
+				 tempStr = tempStr.substring(1);
+			 }
+			 return tempStr;
+ 
+		 }
 		 String clear_end_xiahua_xian(String rawStr) {
 		
 			 String tempStr = rawStr;
@@ -714,14 +787,230 @@ ArrayList<File> applySubFileListRule4(ArrayList<File> curFileList, HashMap<Strin
 	for (int i = 0; i < jpgExifList.size(); i++) {
 		Jpg_Exif jpgExifitem = jpgExifList.get(i);
 		System.out.println("jpg_exif["+i+"] = "+ jpgExifitem.toString() );
+
 		
+	if(jpgExifitem.mCategoryList.size() > 0) {
+		
+		for (int j = 0; j < jpgExifitem.mCategoryList.size(); j++) {
+			String exif_category_in_jpg = jpgExifitem.mCategoryList.get(j);
+			
+			if(!mCategoryItemList_In_Jpg.contains(exif_category_in_jpg)) {
+				
+				mCategoryItemList_In_Jpg.add(exif_category_in_jpg);
+			}
+			
+		ArrayList<Jpg_Exif>	 matchJpgExifArr = mCategory_JpgExifList_Map.get(exif_category_in_jpg);
+		if(matchJpgExifArr == null) {
+			matchJpgExifArr = new 		ArrayList<Jpg_Exif>	 ();
+			matchJpgExifArr.add(jpgExifitem);
+			mCategory_JpgExifList_Map.put(exif_category_in_jpg, matchJpgExifArr);
+			
+		}else {
+			if(!matchJpgExifArr.contains(jpgExifitem)) {
+				matchJpgExifArr.add(jpgExifitem);
+			}
+		}
+		
+		}
 	}
+
+	}
+	
+	for (int i = 0; i < mCategoryItemList_In_Jpg.size(); i++) {
+		String categoryItem = mCategoryItemList_In_Jpg.get(i);
+		String firstCharName = getFirstZiMu(categoryItem);
+	ArrayList<String> matchCategoryList = 	mOneWord_CategoryArr_Map.get(firstCharName);
+	if(matchCategoryList == null) {
+		matchCategoryList = new 	ArrayList<String> ();
+		matchCategoryList.add(categoryItem);
+		mOneWord_CategoryArr_Map.put(firstCharName, matchCategoryList);
+		
+	}else {
+		if(!matchCategoryList.contains(categoryItem)) {	
+			matchCategoryList.add(categoryItem);
+		}
+
+	}
+		System.out.println("category["+(i+1)+"] == "+ firstCharName+"   "+ categoryItem);
+	}
+	
+	
+ArrayList<String> mMdContentList = 	BuildMDContent(English_CharList,mOneWord_CategoryArr_Map,mCategory_JpgExifList_Map);
+	
+
+// 对 MD文件 进行分隔处理
+ArrayList<String> segerate_MdContentList = new ArrayList<String> ();
+
+
+
+segerate_MdContentList.add("---");
+if(is_gaokao) {
+	segerate_MdContentList.add("title: 高考数学学习");
+	segerate_MdContentList.add("category: 学习");
+	segerate_MdContentList.add("tags: Math");
+	segerate_MdContentList.add("keywords: 数学 高考");
+	segerate_MdContentList.add("typora-root-url: ..\\..\\");
+	segerate_MdContentList.add("typora-copy-images-to: ..\\..\\public\\zimage\\zschool_media\\gaokao_jpg");
+
+}else {
+	segerate_MdContentList.add("title: 研究考试学习");
+	segerate_MdContentList.add("category: 学习");
+	segerate_MdContentList.add("tags: Math");
+	segerate_MdContentList.add("keywords: 数学 考研");
+	segerate_MdContentList.add("typora-root-url: ..\\..\\");
+	segerate_MdContentList.add("typora-copy-images-to: ..\\..\\public\\zimage\\zschool_media\\kaoyan_jpg");
+
+}
+segerate_MdContentList.add("---");
+segerate_MdContentList.add("\n");
+
+
+segerate_MdContentList.add("## 简介");
+segerate_MdContentList.add(" * TOC");
+segerate_MdContentList.add(" {:toc}");
+segerate_MdContentList.add("\n");
+
+
+
+
+
+for (int i = 0; i < mMdContentList.size(); i++) {
+	String contentLine = mMdContentList.get(i);
+	segerate_MdContentList.add("\n"+contentLine)	;
+
+}
+
+writeContentToFile(G2_Temp_Text_File, segerate_MdContentList);
+NotePadOpenTargetFile(G2_Temp_Text_File.getAbsolutePath());
+
+	
+
+
 	
 	
 	
 return super.applySubFileListRule4(curFileList, subFileTypeMap, curDirList, curRealFileList);
 }
 		
+ArrayList<String> BuildMDContent(ArrayList<String> mEnglishCharList , 
+		Map<String,ArrayList<String>>  xOneWord_CategoryArr_Map ,
+		Map<String,ArrayList<Jpg_Exif>>  mCategory_JpgExifList_Map ) {
+	
+	
+//	StringBuilder mMDContentSB = new StringBuilder();
+	
+	ArrayList<String> mMDContentStrList = new ArrayList<String>();
+	for (int i = 0; i < mEnglishCharList.size(); i++) {
+		String charWord = mEnglishCharList.get(i);
+		mMDContentStrList.add("## "+charWord);
+		
+	ArrayList<String> matchCategoryList =	xOneWord_CategoryArr_Map.get(charWord);
+	
+	if(matchCategoryList != null) {
+
+		matchCategoryList.sort(new Comparator<String>() {
+		@Override
+		public int compare(String o1, String o2) {
+			return o1.compareTo(o2);
+		}
+
+	});
+		
+		for (int j = 0; j < matchCategoryList.size(); j++) {
+			String categoryStrItem = matchCategoryList.get(j);
+			
+			mMDContentStrList.add("### "+(j+1)+"_"+ categoryStrItem);
+	
+			
+			ArrayList<Jpg_Exif>	 matchExifJpgArr =	mCategory_JpgExifList_Map.get(categoryStrItem);
+			
+			if(matchExifJpgArr != null) {
+				
+				for (int k = 0; k < matchExifJpgArr.size(); k++) {
+					Jpg_Exif  jpgExif = matchExifJpgArr.get(k);
+					
+			
+					
+					String imageurl = jpgExif.imageUrl;
+					String  videourl = jpgExif.videoUrl;
+					String videoName = jpgExif.videoName;
+					String knowledgeComment = jpgExif.mPhotoUserComment_KnowledgePoint;
+					String imageDescString = jpgExif.mImageDescription_SelfDesc;
+					String originBirthPlaceInfo =  jpgExif.mImageMake_OriginSrc == null ? "网络":jpgExif.mImageMake_OriginSrc;
+					
+				
+					//  <img src="/public/zimage/tool/graphviz/digraph16.jpg">
+					// /public/zimage/zschool/kaoyan/
+					mMDContentStrList.add("<img src=\""+imageurl+"\">");
+					
+					
+					mMDContentStrList.add("**涉及知识点:**  ");
+					mMDContentStrList.add("```\n"+knowledgeComment+"\n````");
+					
+					
+					mMDContentStrList.add("**个人解题想法思路:**  ");
+					mMDContentStrList.add("```\n"+imageDescString+"\n````");
+					
+					mMDContentStrList.add("**视频链接:**  "+"["+videoName+"]("+videourl+"){:target=\"_blank\"}");
+					mMDContentStrList.add("**视频链接文件MD值:**  ");
+					mMDContentStrList.add("```\n"+videoName+"\n````");
+					mMDContentStrList.add("**图片名称:**  ");
+					mMDContentStrList.add("```\n"+jpgExif.imageFile.getName()+"\n````");
+					
+					
+					mMDContentStrList.add("**题目源信息:**  ");
+					mMDContentStrList.add("```\n"+originBirthPlaceInfo +"\n````");
+					
+					
+					//  <video  controls="controls"> <source src="mp4/1.mp4" type="video/mp4" /> </video>
+					
+					/*   //  报错  Not allowed to load local resource: <URL>
+					 * if(is_gaokao) {
+					 * mMDContentStrList.add("\n<video  controls=\"controls\"> <source src=\""
+					 * +videourl+"\" type=\"video/mp4\" /> </video>\n");
+					 * 
+					 * 
+					 * }else {
+					 * mMDContentStrList.add("\n<video  controls=\"controls\"> <source src=\""
+					 * +videourl+"\" type=\"video/mp4\" /> </video>\n");
+					 * 
+					 * 
+					 * }
+					 */
+					
+					
+					
+					
+					
+					// [ifa](fafafafa)
+					
+					
+//					mMDContentStrList.add(jpgExif.toString());
+				}
+				
+				
+			}
+			
+			
+		}
+		
+		
+		
+		
+		
+	}
+	}
+	
+	
+	
+	System.out.println(" ============== 打印 MD 内容  Begin ============== ");
+	for (int i = 0; i < mMDContentStrList.size(); i++) {
+		String oneLine = mMDContentStrList.get(i);
+		System.out.println(oneLine);
+	}
+	
+	return mMDContentStrList;
+}
 		@Override
 		boolean allowEmptyDirFileList() {
 			// TODO Auto-generated method stub
@@ -731,8 +1020,9 @@ return super.applySubFileListRule4(curFileList, subFileTypeMap, curDirList, curR
 		@Override
 		String simpleDesc() {
 
-			return "\n"+Cur_Bat_Name + " #_" + rule_index+ "  ###  读取当前文件夹下的jpg文件的exif信息 artist  Desc  Make  Mode  Copyright UserComment 并以此生成 .md文件  " +
-		           "\n"+Cur_Bat_Name + " #_" + rule_index+ "  ###  读取当前文件夹下的jpg文件的exif信息 artist  Desc  Make  Mode  Copyright UserComment 并以此生成 .md文件 \n";
+			return "\n"+Cur_Bat_Name + " #_" + rule_index+ "  ###  默认生成 考研类型的.md 读取当前文件夹下的jpg文件的exif信息 artist  Desc  Make  Mode  Copyright UserComment 并以此生成 .md文件  " +
+		           "\n"+Cur_Bat_Name + " #_" + rule_index+ " kaoyan_true  ###  生成考研类型的md  读取当前文件夹下的jpg文件的exif信息 artist  Desc  Make  Mode  Copyright UserComment 并以此生成 .md文件 \n" +
+	           "\n"+Cur_Bat_Name + " #_" + rule_index+ " gaokao_true   ###  生成高考类型的md  读取当前文件夹下的jpg文件的exif信息 artist  Desc  Make  Mode  Copyright UserComment 并以此生成 .md文件 \n";
 
 		}
 
@@ -1884,6 +2174,8 @@ File ChromeDriverFile = new File(zbinPath + File.separator + "G2_chromedriver_v9
 
 		ArrayList<File> curAlredyDoTxtFileList;  //  当前已经执行了 检测处理的 txt文件 列表 持续增加
 
+		// 下载的视频 是否 以 MD5 进行命名
+		boolean isMDName = false;
 
 
 		Monitor_WeChatFile_ForWindows_Rule_39() {
@@ -1903,6 +2195,23 @@ File ChromeDriverFile = new File(zbinPath + File.separator + "G2_chromedriver_v9
 			return true;
 		}
 
+		@Override
+		boolean initParamsWithInputList(ArrayList<String> inputParamList) {
+			boolean Flag = true;
+
+			for (int i = 0; i < inputParamList.size(); i++) {
+				String paramItem = inputParamList.get(i);
+				String paramItem_lower_trim = paramItem.toLowerCase().trim();
+
+				if ("mdname_true".equals(paramItem_lower_trim)) {
+					isMDName = true;
+				}
+
+			}
+	
+			return super.initParamsWithInputList(inputParamList) && Flag;
+		}
+		
 		@Override
 		boolean initParams4InputParam(String inputParam) {
 			System.out.println("inputParam = " + inputParam + "  curDirPath = " + curDirPath);
@@ -2648,6 +2957,18 @@ File ChromeDriverFile = new File(zbinPath + File.separator + "G2_chromedriver_v9
 				fs.close();
 				System.out.println("\n-----视频保存路径-----\n" + fileSavePath.getAbsolutePath());
 				System.out.println("\nzzfile_3.bat " + fileSavePath.getParentFile().getAbsolutePath());
+			
+				
+				if(isMDName) {
+					System.out.println("由于 isMDName=true  视频文件将以 MD5 属性文件名称进行命名!!! ");
+			
+					//  获取文件的 md值   并重命名为 mdxxxx.mp4  
+					String mdName = getMD5Three(fileSavePath.getAbsolutePath());
+					String new_Md_Name = mdName+".mp4";
+					tryReName(fileSavePath, new_Md_Name);
+					//  把下载的 mp4 文件 名称 转为 md值
+				}
+				
 				urlStrList.add(httpUrl);
 			} catch (FileNotFoundException e) {
 				System.out.println(e.getMessage());
@@ -2810,8 +3131,9 @@ File ChromeDriverFile = new File(zbinPath + File.separator + "G2_chromedriver_v9
 		@Override
 		String simpleDesc() {
 
-			return Cur_Bat_Name + " #_" + rule_index
-					+ "  ### 持续检测 WeChat目录 C:\\Users\\zukgit\\Documents\\WeChat Files\\xxxx\\FileStorage\\File\\2021-07 的 TXT文件的内容    \n"
+			return Cur_Bat_Name + " #_" + rule_index	+ "  ### 持续检测 WeChat目录 C:\\Users\\zukgit\\Documents\\WeChat Files\\xxxx\\FileStorage\\File\\2021-07 的 TXT文件的内容    \n" + 
+					Cur_Bat_Name + " #_" + rule_index +"  mdname_true "	+ "  ### 以MD5字符串保存下载视频文件 持续检测 WeChat目录 C:\\Users\\zukgit\\Documents\\WeChat Files\\xxxx\\FileStorage\\File\\2021-07 的 TXT文件的内容    \n"
+					
 					+ Cur_Bat_Name + " #_" + rule_index + "   ### 只有在 WeChat的当前 月份接收文件目录 才能生效 Monitor 监控 \n"
 					+ "  explorer.exe  \"" + System.getProperties().getProperty("user.home")+ "\\Documents\\WeChat Files\"  \n"
 					+ "  explorer.exe  \"" + System.getProperties().getProperty("user.home")+ "\\Documents\\Tencent Files\"  \n"
@@ -2820,7 +3142,7 @@ File ChromeDriverFile = new File(zbinPath + File.separator + "G2_chromedriver_v9
 					+ "\"   \n" + "cd  " + "\""+ System.getProperties().getProperty("user.home") + "\\Documents\\" + "\""+"  && "
 
 					+ "  explorer.exe " + " \""+  mDownloadedMonthDir.getAbsolutePath()+"\"" +
-					" \n &&   zrule_apply_G2.bat " + "_" + rule_index + "_" + "\n"
+					" \n &&   zrule_apply_G2.bat " + "_" + rule_index + "_" +"  mdname_true"+ "\n"
 
 					;
 		}
