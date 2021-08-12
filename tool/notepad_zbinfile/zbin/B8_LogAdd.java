@@ -138,15 +138,19 @@ static {
     }
 
     static OS_TYPE curOS_TYPE = OS_TYPE.Windows;
+    static String CUR_OS_BATCH_ENDTYPE=".bat";
 
     static void initSystemInfo() {
         String osName = System.getProperties().getProperty("os.name").toLowerCase();
         if (osName.contains("window")) {
             curOS_TYPE = OS_TYPE.Windows;
+            CUR_OS_BATCH_ENDTYPE = ".bat";
         } else if (osName.contains("linux")) {
             curOS_TYPE = OS_TYPE.Linux;
+            CUR_OS_BATCH_ENDTYPE = ".sh";
         } else if (osName.contains("mac")) {
             curOS_TYPE = OS_TYPE.MacOS;
+            CUR_OS_BATCH_ENDTYPE = ".sh";
         }
     }
 
@@ -196,13 +200,156 @@ static {
         return indexFlag;
     }
 
+    
+    static String LogTypeStr = "syso"; 
+    static ArrayList<File> inputJavaFileList;  // 输入的 Java 文件 数量
+    static String CUR_BAT_PATH;   // 传递过来的第一个参数  程序执行的路径
+    static File CUR_SHELL_DIRFILE;   // 传递过来的第一个参数  程序执行的路径
+    static boolean isAospOperation = false;   //  是否执行一些 AOSP 操作 为了 兼容性 添加 
+
+//    logtype_slog        android.util.SLog.i(TAG,XX);
+//    logtype_syso   system.out.print(XXX);
+//    logtype_log          android.util.Log.i(TAG,XX); 
+    
+    
+  static  boolean initParamsWithInputList(ArrayList<String> inputParamList) {
+	  inputJavaFileList = new ArrayList<File>();
+	  
+    	
+    	String logTypeItem;
+    	String logTypeStr = null;
+		for (int i = 0; i < inputParamList.size(); i++) {
+			String paramItem = inputParamList.get(i);
+			System.out.println("param["+i+"] = "+paramItem);
+			if(paramItem.contains("logtype_")) {  // logtype_syso
+				logTypeItem = paramItem;
+				logTypeStr = logTypeItem.replace("logtype_", "");
+				System.out.println("logTypeStr  = "+ logTypeStr);
+			}
+			
+			if(paramItem.contains("aospmethod_true")) {  // logtype_syso
+                isAospOperation = true;
+				logTypeStr = "log";
+
+			}
+			
+			
+			
+			
+			
+			
+			File inputFile = new File(CUR_BAT_PATH+File.separator+paramItem);
+			if(inputFile.exists() && inputFile.isFile() && inputFile.getName().endsWith(".java")) {
+				inputJavaFileList.add(inputFile);
+				
+			}
+			
+
+		}
+		
+		if(inputParamList.size() == 0) {
+			System.out.println("当前用户输入的参数为0 , 请必须输入一个参数使得程序允许");
+			return false;
+		}
+		
+		if(logTypeStr == null ) {
+			System.out.println("当前用户输入的打印参数类型为空  请输入一个 logtype_slog  logtype_log  logtype_syso 之一");
+	
+			return false;
+		}
+		
+		if(!logTypeStr.equals("slog") && 
+				!logTypeStr.equals("syso") &&
+				!logTypeStr.equals("log")
+				) {
+			
+			System.out.println("当前用户输入的打印参数类型为【"+logTypeStr+"】 不是指定输入  请输入一个 logtype_slog  logtype_log  logtype_syso 之一");
+			
+			
+			return false;
+			
+		}
+		
+		
+		LogTypeStr = logTypeStr;
+		
+		if(inputJavaFileList.size() > 0) {
+			System.out.println("用户手动输入的 .java 文件 将【只该输入的Java文件】进行 添加Log 操作!! ");
+		}else {
+			System.out.println("用户没有输入 .java 文件 将【搜索当前目录下的Java 文件】 并进行 添加 Log操作 ");
+
+		}
+		System.out.println("isAospOperation【"+isAospOperation+"】");
+
+		
+		System.out.println("当前打印的程序选择为  【"+LogTypeStr+"】");
+    	
+    	
+	  
+	  return true ;
+    	
+    	
+    }
+  
+  
+ static  void showTip() {
+	 System.out.println("═══════════ 程序执行Tip"+"═══════════");
+	 
+	  System.out.println("zlog_add_B8"+CUR_OS_BATCH_ENDTYPE+"  logtype_syso   TestA.java                      ###  对指定的  TestA.java  使用 system.out.print(TAG,XX) 进行打印 ");
+
+	  System.out.println("zlog_add_B8"+CUR_OS_BATCH_ENDTYPE+"  logtype_log  TestA.java TestB.java             ### 对指定的 TestA.java TestB.java 两文件使用 android.util.Log.i(TAG,XX) 进行打印 ");
+
+	  System.out.println("zlog_add_B8"+CUR_OS_BATCH_ENDTYPE+"  logtype_slog  TestA.java TestB.java TestC.java  ### 对指定的三个java文件 使用 android.util.SLog.i(TAG,XX) 进行打印 ");
+
+	  
+	  System.out.println("zlog_add_B8"+CUR_OS_BATCH_ENDTYPE+"  logtype_syso      ### 在本地目录搜索Java文件 然后 使用 system.out.print(TAG,XX) 进行打印 ");
+
+	  System.out.println("zlog_add_B8"+CUR_OS_BATCH_ENDTYPE+"  logtype_log       ### 在本地目录搜索Java文件 然后 使用 android.util.Log.i(TAG,XX) 进行打印 ");
+
+	  System.out.println("zlog_add_B8"+CUR_OS_BATCH_ENDTYPE+"  logtype_slog      ### 在本地目录搜索Java文件 然后 使用 android.util.SLog.i(TAG,XX) 进行打印 ");
+
+	  
+	  System.out.println("zlog_add_B8"+CUR_OS_BATCH_ENDTYPE+"  aospmethod_true      ### 在AOSP目录中执行 对应的添加 zmethod Log的逻辑操作(为了兼容性添加)");
+
+	  
+	  
+	  
+		 System.out.println("═══════════════════════════════");  
+//    logtype_slog        android.util.SLog.i(TAG,XX);
+//    logtype_syso   system.out.print(XXX);
+//    logtype_log          android.util.Log.i(TAG,XX); 
+
+	  
+	  
+  }
+ 
+ 
+ 
+ 
     public static void main(String[] args) throws IOException {
         initSystemInfo();
 
         if (args != null) {
             for (int i = 0; i < args.length; i++) {
                 System.out.println("args[" + i + "] = " + args[i]);
+                
+                if(i == 0) {
+                	File tempPathFile = new File(args[0]);
+                
+                	if(tempPathFile.exists() && tempPathFile.isDirectory()) {
+                		CUR_BAT_PATH = args[0];
+                		CUR_SHELL_DIRFILE = tempPathFile;
+                	}
+                
+                }
+                // args[0] = D:\Eclipse_WorkPlace\ZCode_Test\src\T\A
+                
             }
+        }
+        
+        if(CUR_SHELL_DIRFILE == null) {
+        	System.out.println("当前程序执行 Shell 路径为空  请检查输入!! CUR_SHELL_DIRFILE="+CUR_SHELL_DIRFILE);
+        	return;
         }
 
 
@@ -212,9 +359,15 @@ static {
                 mKeyWordName.add(itemArgStr);
             }
         }
+        
+        if(!initParamsWithInputList(mKeyWordName)) {
+        	System.out.println("当前用户输入参数不符合程序执行条件!!  请重新查看 提示 tip 后再输入!");
+        	showTip();
+        	return;
+        }
 
         //  如果当前的路径没有获得参数 那么 默认对ZClassList 执行操作
-        if (mKeyWordName.size() == 0) {  //   static ArrayList<ZClass> ZClassList = new  ArrayList<ZClass>();
+        if (isAospOperation) {  //   static ArrayList<ZClass> ZClassList = new  ArrayList<ZClass>();
             //  判断当前的 路径是否是AOSP 路径
             // curProjectPath
             if (isAOSPPath(curProjectPath)) {
@@ -336,7 +489,25 @@ static {
                 tryAddLogFlag();
 
 
-            } else {   // 当前的路径似乎一个 普通的 Java 文件
+            } else if(inputJavaFileList.size() > 0){
+            	
+            	for (int i = 0; i < inputJavaFileList.size(); i++) {
+					
+                    // 尝试添加 开始操作 .java 文件
+                    File javaFile = inputJavaFileList.get(i);
+                    ZIDEClass mZIDEClass = new ZIDEClass(javaFile.getAbsolutePath());
+                    mZIDEClass.InitZmethodFromJavaFile(javaFile, mZIDEClass);
+                    ZParamClassList.add(mZIDEClass);
+                    try {
+                        Thread.sleep(50);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+				}
+                tryAddLogFlag();
+            	
+            	
+            } else {   // 当前的路径似乎一个  目录 进行 搜索
                 ArrayList<File> javaFilePathParamList = new ArrayList<>();
                 ArrayList<File> javaDirPathParamList = new ArrayList<>();
                 javaFilePathParamList.addAll(initJavaFileFromParam(mKeyWordName));
@@ -1355,15 +1526,27 @@ if(newClassCode == null || "".equals(newClassCode)){
             String methodPrint = new String(COMMON_PRINT_METHOD);
             String holdStr = "ZukgitHoldPlace";
             String MethodStr = "";
-            if (isIDEClass) {
+//            if (isIDEClass) {
+//                MethodStr = "System.out.println(";
+//            } else if (isAPP) {
+//                MethodStr = "android.util.Log.i(\"" + TAG + "_" + className + "\",";
+//            } else if (isFramework) {
+//                MethodStr = "android.util.SLog.i(\"" + TAG + "_" + className + "\",";
+//            } else {
+//                MethodStr = "System.out.println(";
+//            }
+            
+            
+            if (LogTypeStr.equals("syso")) {
                 MethodStr = "System.out.println(";
-            } else if (isAPP) {
+            } else if (LogTypeStr.equals("log")) {
                 MethodStr = "android.util.Log.i(\"" + TAG + "_" + className + "\",";
-            } else if (isFramework) {
+            } else if (LogTypeStr.equals("slog")) {
                 MethodStr = "android.util.SLog.i(\"" + TAG + "_" + className + "\",";
             } else {
                 MethodStr = "System.out.println(";
             }
+            
 
             String returnStr = methodPrint.replaceAll(holdStr, MethodStr);
 
@@ -2514,15 +2697,46 @@ if(newClassCode == null || "".equals(newClassCode)){
             String realPrintCode = "";
             //  String tagMethod = TAG+"_"+this.methodName;
             String tagMethod = TAG + "_" + this.belongClass.className + "_" + this.methodName;
-            if (this.belongClass.isIDEClass) {
+        
+//            if (this.belongClass.isIDEClass) {
+//                realPrintCode = "\nSystem.out.println( " + "\" " + tagMethod + "   \" + " + paramString + ");\n";
+//            } else if (this.belongClass.isAndroidClass && this.belongClass.isAPP) {
+//                // android.util.Log.i
+//                realPrintCode = "\nandroid.util.Log.i(\"" + tagMethod + "\"," + paramString + ");\n";
+//            } else if (this.belongClass.isAndroidClass && this.belongClass.isFramework) {
+//                realPrintCode = "\nandroid.util.Slog.i(\"" + tagMethod + "\"," + paramString + ");\n";
+//            }
+            
+            
+            
+            if (LogTypeStr.equals("syso")) {
                 realPrintCode = "\nSystem.out.println( " + "\" " + tagMethod + "   \" + " + paramString + ");\n";
-            } else if (this.belongClass.isAndroidClass && this.belongClass.isAPP) {
-                // android.util.Log.i
+
+            }else if(LogTypeStr.equals("log")) {
                 realPrintCode = "\nandroid.util.Log.i(\"" + tagMethod + "\"," + paramString + ");\n";
-            } else if (this.belongClass.isAndroidClass && this.belongClass.isFramework) {
+
+            }else if(LogTypeStr.equals("slog")) {
                 realPrintCode = "\nandroid.util.Slog.i(\"" + tagMethod + "\"," + paramString + ");\n";
+
+            }else {
+                realPrintCode = "\nSystem.out.println( " + "\" " + tagMethod + "   \" + " + paramString + ");\n";
+
             }
 
+            
+            
+            
+//            if (LogTypeStr.equals("syso")) {
+//            	
+//            }else if(LogTypeStr.equals("log")) {
+//            	
+//            }else if(LogTypeStr.equals("slog")) {
+//            	
+//            }else {
+//        
+//            }
+            
+            
             return realPrintCode;
         }
 
@@ -2548,26 +2762,74 @@ if(newClassCode == null || "".equals(newClassCode)){
             String strCode3 = "";
 
             String tagMethod = TAG + "_" + this.belongClass.className + "_" + this.methodName;
-            if (this.belongClass.isIDEClass) {
-                String re_Name = "re" + System.currentTimeMillis();
-                strCode1 = "\nRuntimeException " + re_Name + " = new RuntimeException();";
-                strCode2 = "\n" + re_Name + ".fillInStackTrace();";
-                String tag = "\nSystem.out.println( " + "\" " + tagMethod + "   RuntimeException.fillInStackTrace() \" );";
-                strCode3 = tag + "\n" + re_Name + ".printStackTrace();\n";
+      
+//            if (this.belongClass.isIDEClass) {
+//                String re_Name = "re" + System.currentTimeMillis();
+//                strCode1 = "\nRuntimeException " + re_Name + " = new RuntimeException();";
+//                strCode2 = "\n" + re_Name + ".fillInStackTrace();";
+//                String tag = "\nSystem.out.println( " + "\" " + tagMethod + "   RuntimeException.fillInStackTrace() \" );";
+//                strCode3 = tag + "\n" + re_Name + ".printStackTrace();\n";
+//
+//            } else if (this.belongClass.isAndroidClass && this.belongClass.isAPP) {
+//                // android.util.Log.i
+//                String re_Name = "re" + System.currentTimeMillis();
+//                strCode1 = "\nRuntimeException " + re_Name + " = new RuntimeException();";
+//                strCode2 = "\n" + re_Name + ".fillInStackTrace();";
+//                strCode3 = "\nandroid.util.Log.i(\"" + tagMethod + "\", \"RuntimeException\", " + re_Name + " );\n";
+//            } else if (this.belongClass.isAndroidClass && this.belongClass.isFramework) {
+//                String re_Name = "re" + System.currentTimeMillis();
+//                strCode1 = "\nRuntimeException " + re_Name + " = new RuntimeException();";
+//                strCode2 = "\n" + re_Name + ".fillInStackTrace();";
+//                strCode3 = "\nandroid.util.SLog.i(\"" + tagMethod + "\", \"RuntimeException\", " + re_Name + " );\n";
+//            }
 
-            } else if (this.belongClass.isAndroidClass && this.belongClass.isAPP) {
-                // android.util.Log.i
-                String re_Name = "re" + System.currentTimeMillis();
-                strCode1 = "\nRuntimeException " + re_Name + " = new RuntimeException();";
-                strCode2 = "\n" + re_Name + ".fillInStackTrace();";
-                strCode3 = "\nandroid.util.Log.i(\"" + tagMethod + "\", \"RuntimeException\", " + re_Name + " );\n";
-            } else if (this.belongClass.isAndroidClass && this.belongClass.isFramework) {
-                String re_Name = "re" + System.currentTimeMillis();
-                strCode1 = "\nRuntimeException " + re_Name + " = new RuntimeException();";
-                strCode2 = "\n" + re_Name + ".fillInStackTrace();";
-                strCode3 = "\nandroid.util.SLog.i(\"" + tagMethod + "\", \"RuntimeException\", " + re_Name + " );\n";
-            }
+            
+       if (LogTypeStr.equals("syso")) {
+              String re_Name = "re" + System.currentTimeMillis();
+              strCode1 = "\nRuntimeException " + re_Name + " = new RuntimeException();";
+              strCode2 = "\n" + re_Name + ".fillInStackTrace();";
+              String tag = "\nSystem.out.println( " + "\" " + tagMethod + "   RuntimeException.fillInStackTrace() \" );";
+              strCode3 = tag + "\n" + re_Name + ".printStackTrace();\n";
 
+        }else if(LogTypeStr.equals("log")) {
+        	
+            // android.util.Log.i
+            String re_Name = "re" + System.currentTimeMillis();
+            strCode1 = "\nRuntimeException " + re_Name + " = new RuntimeException();";
+            strCode2 = "\n" + re_Name + ".fillInStackTrace();";
+            strCode3 = "\nandroid.util.Log.i(\"" + tagMethod + "\", \"RuntimeException\", " + re_Name + " );\n";
+      
+            
+        }else if(LogTypeStr.equals("slog")) {
+        	
+            String re_Name = "re" + System.currentTimeMillis();
+            strCode1 = "\nRuntimeException " + re_Name + " = new RuntimeException();";
+            strCode2 = "\n" + re_Name + ".fillInStackTrace();";
+            strCode3 = "\nandroid.util.SLog.i(\"" + tagMethod + "\", \"RuntimeException\", " + re_Name + " );\n";
+  
+            
+        }else {
+    
+            String re_Name = "re" + System.currentTimeMillis();
+            strCode1 = "\nRuntimeException " + re_Name + " = new RuntimeException();";
+            strCode2 = "\n" + re_Name + ".fillInStackTrace();";
+            String tag = "\nSystem.out.println( " + "\" " + tagMethod + "   RuntimeException.fillInStackTrace() \" );";
+            strCode3 = tag + "\n" + re_Name + ".printStackTrace();\n";
+
+     
+        }
+            
+            
+//       if (LogTypeStr.equals("syso")) {
+//        	
+//        }else if(LogTypeStr.equals("log")) {
+//        	
+//        }else if(LogTypeStr.equals("slog")) {
+//        	
+//        }else {
+//    
+//        }
+            
             return strCode1 + strCode2 + strCode3;
         }
 
@@ -2602,37 +2864,96 @@ if(newClassCode == null || "".equals(newClassCode)){
 //                    System.out.println("════════════ 线程名称threadName: 【" + key.getName() + "】 end ════════════\n");
 //                }
 
+            
+            
 
-            if (this.belongClass.isIDEClass) {
-                String runtimeMXBean_Name = "runtimeMXBean" + System.currentTimeMillis();
-                getProcessStr = "\njava.lang.management.RuntimeMXBean  " + runtimeMXBean_Name + " = java.lang.management.ManagementFactory.getRuntimeMXBean();";
-                String mProcessId_Name = "mProcessId" + System.currentTimeMillis();
-                String pCodeStr1 = "\nint " + mProcessId_Name + "  =  Integer.valueOf(" + runtimeMXBean_Name + ".getName().split(\"@\")[0]).intValue();";
-                getProcessStr = getProcessStr + pCodeStr1;
-                // System.out.println("\n════════════ 线程名称threadName:【 " + key.getName() + "】  进程ID-ProcessID:【"+mProcessId + "】  线程ID-ThreadId:【"+key.getId()+ "】  线程序号-indexId: 【"+ (threadNum++)+ "】 start ══════════");
-                //    双引号包住愿有的引号
-                strCode6_fix = "\nSystem.out.println( " + "\" " + tagMethod + " \" +" + "\" \\n  线程索引序号下标 【 \"" + " + (" + threadNum_Name + ") +" + "\" 】════════════ 线程名称threadName:【\"" + " + key.getName() + " + " \"  】  进程ID-ProcessID:【 \"" + "+ " + mProcessId_Name + " +  " + " \" 】  线程ID-ThreadId:【 \" " + "+key.getId()+ " + " \" 】 \" );";
-                strCode7_fix = "\nSystem.out.println( st.toString() );";
-                strCode8_fix = "\nSystem.out.println( " + "\" " + tagMethod + " \" + " + "\" \\n  线程索引序号下标 【 \"" + " + (" + threadNum_Name + "++)+ " + "\"  】════════════\" );";
-            } else if (this.belongClass.isAndroidClass && this.belongClass.isAPP) {
-                // android.util.Log.i  int mProcessId = android.os.Process.myPid();
-                String mProcessId_Name = "mProcessId" + System.currentTimeMillis();
-                getProcessStr = "\n int " + mProcessId_Name + " = android.os.Process.myPid();";
-                String strCode6_fix_1 = "\" " + tagMethod + " \" +" + "\" \\n  线程索引序号下标 【 \"" + " +(" + threadNum_Name + ") +" + "\" 】════════════ 线程名称threadName:【\"" + " + key.getName() + " + " \"  】  进程ID-ProcessID:【 \"" + "+ " + mProcessId_Name + " +  " + " \" 】  线程ID-ThreadId:【 \" " + "+key.getId()+ " + " \" 】 \" ";
-                strCode6_fix = "\nandroid.util.Log.i(\"" + tagMethod + "\"," + strCode6_fix_1 + ");\n";
-                strCode7_fix = "\nandroid.util.Log.i(\"" + tagMethod + "\"," + " \"StackTraceElement:\"  + " + strCode6_fix_1 + ");\n";
-                String strCode8_fix_1 = "\" " + tagMethod + " \" +" + "\" \\n  线程索引序号下标 【 \"" + "+ (" + threadNum_Name + "++) +" + "\" 】════════════打印结束\" ";
-                strCode8_fix = "\nandroid.util.Log.i(\"" + tagMethod + "\"," + " \"StackTraceElement:\"  + " + strCode8_fix_1 + ");\n";
-            } else if (this.belongClass.isAndroidClass && this.belongClass.isFramework) {
-                // android.util.SLog.i
-                String mProcessId_Name = "mProcessId" + System.currentTimeMillis();
-                getProcessStr = "\n int " + mProcessId_Name + " = android.os.Process.myPid();";
-                String strCode6_fix_1 = "\" " + tagMethod + " \" + " + "\" \\n  线程索引序号下标 【 \"" + " +(" + threadNum_Name + ")+ " + "\" 】════════════ 线程名称threadName:【\"" + " + key.getName() + " + " \"  】  进程ID-ProcessID:【 \"" + "+ " + mProcessId_Name + " +  " + " \" 】  线程ID-ThreadId:【 \" " + "+key.getId()+ " + " \" 】 \" ";
-                strCode6_fix = "\nandroid.util.SLog.i(\"" + tagMethod + "\"," + strCode6_fix_1 + ");\n";
-                strCode7_fix = "\nandroid.util.Sog.i(\"" + tagMethod + "\"," + " \"StackTraceElement:\"  + " + strCode6_fix_1 + ");\n";
-                String strCode8_fix_1 = "\" " + tagMethod + " \" + " + "\" + \\n  线程索引序号下标 【 \"" + " +(" + threadNum_Name + "++)+ " + "\" 】════════════打印结束\" ";
-                strCode8_fix = "\nandroid.util.Sog.i(\"" + tagMethod + "\"," + " \"StackTraceElement:\"  + " + strCode8_fix_1 + ");\n";
-            }
+//            if (this.belongClass.isIDEClass) {
+//                String runtimeMXBean_Name = "runtimeMXBean" + System.currentTimeMillis();
+//                getProcessStr = "\njava.lang.management.RuntimeMXBean  " + runtimeMXBean_Name + " = java.lang.management.ManagementFactory.getRuntimeMXBean();";
+//                String mProcessId_Name = "mProcessId" + System.currentTimeMillis();
+//                String pCodeStr1 = "\nint " + mProcessId_Name + "  =  Integer.valueOf(" + runtimeMXBean_Name + ".getName().split(\"@\")[0]).intValue();";
+//                getProcessStr = getProcessStr + pCodeStr1;
+//                // System.out.println("\n════════════ 线程名称threadName:【 " + key.getName() + "】  进程ID-ProcessID:【"+mProcessId + "】  线程ID-ThreadId:【"+key.getId()+ "】  线程序号-indexId: 【"+ (threadNum++)+ "】 start ══════════");
+//                //    双引号包住愿有的引号
+//                strCode6_fix = "\nSystem.out.println( " + "\" " + tagMethod + " \" +" + "\" \\n  线程索引序号下标 【 \"" + " + (" + threadNum_Name + ") +" + "\" 】════════════ 线程名称threadName:【\"" + " + key.getName() + " + " \"  】  进程ID-ProcessID:【 \"" + "+ " + mProcessId_Name + " +  " + " \" 】  线程ID-ThreadId:【 \" " + "+key.getId()+ " + " \" 】 \" );";
+//                strCode7_fix = "\nSystem.out.println( st.toString() );";
+//                strCode8_fix = "\nSystem.out.println( " + "\" " + tagMethod + " \" + " + "\" \\n  线程索引序号下标 【 \"" + " + (" + threadNum_Name + "++)+ " + "\"  】════════════\" );";
+//            } else if (this.belongClass.isAndroidClass && this.belongClass.isAPP) {
+//                // android.util.Log.i  int mProcessId = android.os.Process.myPid();
+//                String mProcessId_Name = "mProcessId" + System.currentTimeMillis();
+//                getProcessStr = "\n int " + mProcessId_Name + " = android.os.Process.myPid();";
+//                String strCode6_fix_1 = "\" " + tagMethod + " \" +" + "\" \\n  线程索引序号下标 【 \"" + " +(" + threadNum_Name + ") +" + "\" 】════════════ 线程名称threadName:【\"" + " + key.getName() + " + " \"  】  进程ID-ProcessID:【 \"" + "+ " + mProcessId_Name + " +  " + " \" 】  线程ID-ThreadId:【 \" " + "+key.getId()+ " + " \" 】 \" ";
+//                strCode6_fix = "\nandroid.util.Log.i(\"" + tagMethod + "\"," + strCode6_fix_1 + ");\n";
+//                strCode7_fix = "\nandroid.util.Log.i(\"" + tagMethod + "\"," + " \"StackTraceElement:\"  + " + strCode6_fix_1 + ");\n";
+//                String strCode8_fix_1 = "\" " + tagMethod + " \" +" + "\" \\n  线程索引序号下标 【 \"" + "+ (" + threadNum_Name + "++) +" + "\" 】════════════打印结束\" ";
+//                strCode8_fix = "\nandroid.util.Log.i(\"" + tagMethod + "\"," + " \"StackTraceElement:\"  + " + strCode8_fix_1 + ");\n";
+//            } else if (this.belongClass.isAndroidClass && this.belongClass.isFramework) {
+//                // android.util.SLog.i
+//                String mProcessId_Name = "mProcessId" + System.currentTimeMillis();
+//                getProcessStr = "\n int " + mProcessId_Name + " = android.os.Process.myPid();";
+//                String strCode6_fix_1 = "\" " + tagMethod + " \" + " + "\" \\n  线程索引序号下标 【 \"" + " +(" + threadNum_Name + ")+ " + "\" 】════════════ 线程名称threadName:【\"" + " + key.getName() + " + " \"  】  进程ID-ProcessID:【 \"" + "+ " + mProcessId_Name + " +  " + " \" 】  线程ID-ThreadId:【 \" " + "+key.getId()+ " + " \" 】 \" ";
+//                strCode6_fix = "\nandroid.util.SLog.i(\"" + tagMethod + "\"," + strCode6_fix_1 + ");\n";
+//                strCode7_fix = "\nandroid.util.Sog.i(\"" + tagMethod + "\"," + " \"StackTraceElement:\"  + " + strCode6_fix_1 + ");\n";
+//                String strCode8_fix_1 = "\" " + tagMethod + " \" + " + "\" + \\n  线程索引序号下标 【 \"" + " +(" + threadNum_Name + "++)+ " + "\" 】════════════打印结束\" ";
+//                strCode8_fix = "\nandroid.util.Sog.i(\"" + tagMethod + "\"," + " \"StackTraceElement:\"  + " + strCode8_fix_1 + ");\n";
+//            }
+//            
+            
+            
+            
+       if (LogTypeStr.equals("syso")) {
+           String runtimeMXBean_Name = "runtimeMXBean" + System.currentTimeMillis();
+           getProcessStr = "\njava.lang.management.RuntimeMXBean  " + runtimeMXBean_Name + " = java.lang.management.ManagementFactory.getRuntimeMXBean();";
+           String mProcessId_Name = "mProcessId" + System.currentTimeMillis();
+           String pCodeStr1 = "\nint " + mProcessId_Name + "  =  Integer.valueOf(" + runtimeMXBean_Name + ".getName().split(\"@\")[0]).intValue();";
+           getProcessStr = getProcessStr + pCodeStr1;
+           // System.out.println("\n════════════ 线程名称threadName:【 " + key.getName() + "】  进程ID-ProcessID:【"+mProcessId + "】  线程ID-ThreadId:【"+key.getId()+ "】  线程序号-indexId: 【"+ (threadNum++)+ "】 start ══════════");
+           //    双引号包住愿有的引号
+           strCode6_fix = "\nSystem.out.println( " + "\" " + tagMethod + " \" +" + "\" \\n  线程索引序号下标 【 \"" + " + (" + threadNum_Name + ") +" + "\" 】════════════ 线程名称threadName:【\"" + " + key.getName() + " + " \"  】  进程ID-ProcessID:【 \"" + "+ " + mProcessId_Name + " +  " + " \" 】  线程ID-ThreadId:【 \" " + "+key.getId()+ " + " \" 】 \" );";
+           strCode7_fix = "\nSystem.out.println( st.toString() );";
+           strCode8_fix = "\nSystem.out.println( " + "\" " + tagMethod + " \" + " + "\" \\n  线程索引序号下标 【 \"" + " + (" + threadNum_Name + "++)+ " + "\"  】════════════\" );";
+  
+    	   
+        	
+        }else if(LogTypeStr.equals("log")) {
+        	
+            // android.util.Log.i  int mProcessId = android.os.Process.myPid();
+            String mProcessId_Name = "mProcessId" + System.currentTimeMillis();
+            getProcessStr = "\n int " + mProcessId_Name + " = android.os.Process.myPid();";
+            String strCode6_fix_1 = "\" " + tagMethod + " \" +" + "\" \\n  线程索引序号下标 【 \"" + " +(" + threadNum_Name + ") +" + "\" 】════════════ 线程名称threadName:【\"" + " + key.getName() + " + " \"  】  进程ID-ProcessID:【 \"" + "+ " + mProcessId_Name + " +  " + " \" 】  线程ID-ThreadId:【 \" " + "+key.getId()+ " + " \" 】 \" ";
+            strCode6_fix = "\nandroid.util.Log.i(\"" + tagMethod + "\"," + strCode6_fix_1 + ");\n";
+            strCode7_fix = "\nandroid.util.Log.i(\"" + tagMethod + "\"," + " \"StackTraceElement:\"  + " + strCode6_fix_1 + ");\n";
+            String strCode8_fix_1 = "\" " + tagMethod + " \" +" + "\" \\n  线程索引序号下标 【 \"" + "+ (" + threadNum_Name + "++) +" + "\" 】════════════打印结束\" ";
+            strCode8_fix = "\nandroid.util.Log.i(\"" + tagMethod + "\"," + " \"StackTraceElement:\"  + " + strCode8_fix_1 + ");\n";
+        
+            
+        }else if(LogTypeStr.equals("slog")) {
+        	
+            // android.util.SLog.i
+            String mProcessId_Name = "mProcessId" + System.currentTimeMillis();
+            getProcessStr = "\n int " + mProcessId_Name + " = android.os.Process.myPid();";
+            String strCode6_fix_1 = "\" " + tagMethod + " \" + " + "\" \\n  线程索引序号下标 【 \"" + " +(" + threadNum_Name + ")+ " + "\" 】════════════ 线程名称threadName:【\"" + " + key.getName() + " + " \"  】  进程ID-ProcessID:【 \"" + "+ " + mProcessId_Name + " +  " + " \" 】  线程ID-ThreadId:【 \" " + "+key.getId()+ " + " \" 】 \" ";
+            strCode6_fix = "\nandroid.util.SLog.i(\"" + tagMethod + "\"," + strCode6_fix_1 + ");\n";
+            strCode7_fix = "\nandroid.util.Sog.i(\"" + tagMethod + "\"," + " \"StackTraceElement:\"  + " + strCode6_fix_1 + ");\n";
+            String strCode8_fix_1 = "\" " + tagMethod + " \" + " + "\" + \\n  线程索引序号下标 【 \"" + " +(" + threadNum_Name + "++)+ " + "\" 】════════════打印结束\" ";
+            strCode8_fix = "\nandroid.util.Sog.i(\"" + tagMethod + "\"," + " \"StackTraceElement:\"  + " + strCode8_fix_1 + ");\n";
+    
+        }else {
+    
+            String runtimeMXBean_Name = "runtimeMXBean" + System.currentTimeMillis();
+            getProcessStr = "\njava.lang.management.RuntimeMXBean  " + runtimeMXBean_Name + " = java.lang.management.ManagementFactory.getRuntimeMXBean();";
+            String mProcessId_Name = "mProcessId" + System.currentTimeMillis();
+            String pCodeStr1 = "\nint " + mProcessId_Name + "  =  Integer.valueOf(" + runtimeMXBean_Name + ".getName().split(\"@\")[0]).intValue();";
+            getProcessStr = getProcessStr + pCodeStr1;
+            // System.out.println("\n════════════ 线程名称threadName:【 " + key.getName() + "】  进程ID-ProcessID:【"+mProcessId + "】  线程ID-ThreadId:【"+key.getId()+ "】  线程序号-indexId: 【"+ (threadNum++)+ "】 start ══════════");
+            //    双引号包住愿有的引号
+            strCode6_fix = "\nSystem.out.println( " + "\" " + tagMethod + " \" +" + "\" \\n  线程索引序号下标 【 \"" + " + (" + threadNum_Name + ") +" + "\" 】════════════ 线程名称threadName:【\"" + " + key.getName() + " + " \"  】  进程ID-ProcessID:【 \"" + "+ " + mProcessId_Name + " +  " + " \" 】  线程ID-ThreadId:【 \" " + "+key.getId()+ " + " \" 】 \" );";
+            strCode7_fix = "\nSystem.out.println( st.toString() );";
+            strCode8_fix = "\nSystem.out.println( " + "\" " + tagMethod + " \" + " + "\" \\n  线程索引序号下标 【 \"" + " + (" + threadNum_Name + "++)+ " + "\"  】════════════\" );";
+   
+        }
+            
+            
             return strCode1 + strCode2 + strCode3 + getProcessStr + strCode4 + strCode5 + strCode6 + strCode6_fix + strCode7 + strCode7_fix + strCode8 + strCode8_fix + strCode9;
         }
 

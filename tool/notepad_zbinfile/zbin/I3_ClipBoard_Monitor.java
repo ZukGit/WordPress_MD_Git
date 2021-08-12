@@ -101,7 +101,7 @@ public class I3_ClipBoard_Monitor implements ClipboardOwner{
 
 
     static void Operation(String clipText){
-        System.out.println("════════"+clipText+"Begin════════");
+        System.out.println("════════"+clipText+"  Begin════════");
         System.out.println("time = ");
 //        System.out.println("clip_text = "+ clipText);
 

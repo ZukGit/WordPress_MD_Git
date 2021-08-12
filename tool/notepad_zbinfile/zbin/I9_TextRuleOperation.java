@@ -419,6 +419,10 @@ public class I9_TextRuleOperation {
 		//  把 当前的 所有 内容 都 转为 1 行的 内容 
 		CUR_RULE_LIST.add(new MakeContent_As_OneLine_Rule_41());
 		
+		
+		// 去除当前空白的一行  使得文本紧凑
+		CUR_RULE_LIST.add(new Clear_Blank_Line_Rule_42());
+		
 //        CUR_RULE_LIST.add( new Image2Png_Rule_4());
 //        CUR_RULE_LIST.add( new AVI_Rule_5());
 //        CUR_RULE_LIST.add( new SubDirRename_Rule_6());
@@ -426,6 +430,57 @@ public class I9_TextRuleOperation {
 //        CUR_RULE_LIST.add( new ClearChineseType_8());
 
 	}
+	
+	
+
+	class Clear_Blank_Line_Rule_42 extends Basic_Rule {
+
+
+
+		Clear_Blank_Line_Rule_42() {
+			super(42, false);
+		}
+		
+		
+		
+		@Override
+		String simpleDesc() {
+			return " 把当前的所有内容都中的空行都去除掉,使得显示紧凑 ";
+		}
+		
+		@Override
+		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+			for (int i = 0; i < curInputFileList.size(); i++) {
+				File fileItem = curInputFileList.get(i);
+
+				ArrayList<String> fixed_blank_List = new ArrayList<String> ();
+			ArrayList<String> rawContent = 	ReadFileContentAsList(fileItem);
+			
+			
+			for (int j = 0; j < rawContent.size(); j++) {
+				String lineStr = rawContent.get(j);
+				String clearBlankStr = lineStr.replace(" ", "").replace(" ", "").replace("	", "");
+				if(!clearBlankStr.equals("")) {
+					fixed_blank_List.add(lineStr.trim());
+					
+				}
+			}
+			
+			writeContentToFile(I9_Temp_Text_File, fixed_blank_List);
+			NotePadOpenTargetFile(I9_Temp_Text_File.getAbsolutePath());
+			
+			
+				
+			}
+
+			return super.applyOperationRule(curFileList, subFileTypeMap, curDirList, curRealFileList);
+		}
+		
+		
+
+	}
+	
 	
 
 
@@ -856,6 +911,7 @@ public class I9_TextRuleOperation {
 // String targetPath = "奇怪，刚刚和妈妈的衣架子交心攀谈后，怎么感觉头上有一圈星星呢～ https://v.kuaishou.com/6Rq0gB 复制此链接，打开【快手App】直接观看！";
 
 		ArrayList<String> videoUrlList ;
+		ArrayList<String> url_name_LogList;   // 用于保存url 和 名称的Log条目
 		ArrayList<String> urlList ;   // 在 url 中 检测到的 mp4 文件    比如 https://v.kuaishou.com/6Rq0gB
 		String videoSavePath=null;   //  默认为 txt 文件所在 目录下 新建 抖音 mp4 文件
 
@@ -869,6 +925,7 @@ public class I9_TextRuleOperation {
 			index_download = 1;
 			videoUrlList =  new ArrayList<String>();
 			urlStrList =  new ArrayList<String>();
+			url_name_LogList =  new ArrayList<String>();
 			ChromeDriverFile = new File(zbinPath+File.separator+"G2_chromedriver_v91.exe");
 		}
 
@@ -960,7 +1017,10 @@ public class I9_TextRuleOperation {
 			});
 //			SortString(videoUrlList);
 
-			writeContentToFile(I9_Temp_Text_File, videoUrlList);
+//			writeContentToFile(I9_Temp_Text_File, videoUrlList);
+			writeContentToFile(I9_Temp_Text_File, url_name_LogList);	
+			
+			
 			NotePadOpenTargetFile(I9_Temp_Text_File.getAbsolutePath());
 			System.out.println("VideoURL 列表打印在 PATH: "+ I9_Temp_Text_File.getAbsolutePath());
 			return super.applyOperationRule(curFileList, subFileTypeMap, curDirList, curRealFileList);
@@ -981,7 +1041,7 @@ public class I9_TextRuleOperation {
 				douYinParseUrl(url);
 				videoUrlList.add(url);
 			}else if(url.contains("douyin")) {
-				downRawVideo_WithUrl(url,"douyin","douyin");
+				downRawVideo_WithUrl(url,url,"douyin","douyin");
 				videoUrlList.add(url);
 
 			}else if(url.contains("m.toutiaoimg.cn") || url.contains("ixigua")  || url.contains("toutiao") ) {
@@ -1075,7 +1135,7 @@ public class I9_TextRuleOperation {
 							System.out.println("解析出的 base64_jiami_main_url 为空  但存在 video_tag_url = "+ NoMainUrl_VideoTag_url );
 							System.out.println(" 尝试下载  video_tag_url : "+ NoMainUrl_VideoTag_url);
 
-							downRawVideo_WithUrl(NoMainUrl_VideoTag_url, "", "TouTiao");
+							downRawVideo_WithUrl(url,NoMainUrl_VideoTag_url, "", "TouTiao");
 						}else {
 
 							System.out.println("解析出的 base64_jiami_main_url 为空  NoMainUrl_VideoTag_url 为空 无法下载视频到本地   base64_jiami_url=" + base64_jiami_url);
@@ -1095,7 +1155,7 @@ public class I9_TextRuleOperation {
 
 						if (jiemi_base64_url.startsWith("http")) {
 							System.out.println("执行 main_url 下载操作!!!    jiemi_base64_url=[" + jiemi_base64_url + "]");
-							downRawVideo_WithUrl(jiemi_base64_url, "", "TouTiao");
+							downRawVideo_WithUrl(url,jiemi_base64_url, "", "TouTiao");
 
 						} else {
 							System.out.println("解密出的地址不是以  http 开头  无法下载!!!");
@@ -1123,7 +1183,7 @@ public class I9_TextRuleOperation {
 					if (jiemi_base64_bankurl != null && jiemi_base64_bankurl.startsWith("http")) {
 						System.out.println(
 								"执行 bankup_url_1 下载操作!!!    jiemi_base64_bankurl=[" + jiemi_base64_bankurl + "]");
-						downRawVideo_WithUrl(jiemi_base64_bankurl, "", "TouTiao");
+						downRawVideo_WithUrl(url,jiemi_base64_bankurl, "", "TouTiao");
 
 					}
 
@@ -1328,7 +1388,7 @@ public class I9_TextRuleOperation {
 				//注:打印获取的链接
 				System.out.println("-----抖音去水印链接-----\n"+finalVideoAddress);
 				//下载无水印视频到本地
-				downRawVideo_WithUrl(finalVideoAddress,title,"douyin");
+				downRawVideo_WithUrl(url,finalVideoAddress,title,"douyin");
 			} catch (IOException e) {
 				System.out.println(e.getMessage());
 			}
@@ -1352,13 +1412,14 @@ public class I9_TextRuleOperation {
 			System.out.println();
 			System.out.println(videoUrl);
 			System.out.println(title);
-			downRawVideo_WithUrl(videoUrl,title,"kuaishou");
+			downRawVideo_WithUrl(url,videoUrl,title,"kuaishou");
 		}
 
 
 		// 视频的保存 目录 不能是 当前文件 否则 就会执行 同步操作 影响网速
+		// pageUrl 是页面的url   httpUrl 是视频文件的url 
 		@SuppressWarnings("unchecked")
-		public void downRawVideo_WithUrl( String httpUrl, String fileNameNoPoint, String source) {
+		public void downRawVideo_WithUrl(String pageUrl , String httpUrl, String fileNameNoPoint, String source) {
 			if(urlStrList.contains(httpUrl)) {
 				System.out.println("当前url 路径已经下载过  跳过下载!!  url路径: "+ httpUrl +"");
 			}
@@ -1406,7 +1467,7 @@ public class I9_TextRuleOperation {
 				String new_Md_Name = mdName+".mp4";
 				tryReName(fileSavePath, new_Md_Name);
 				//  把下载的 mp4 文件 名称 转为 md值
-				
+				url_name_LogList.add(pageUrl+"          "+mdName);
 				urlStrList.add(httpUrl);
 			} catch (FileNotFoundException e) {
 				System.out.println(e.getMessage());

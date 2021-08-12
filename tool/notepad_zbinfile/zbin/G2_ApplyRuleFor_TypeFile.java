@@ -319,26 +319,317 @@ public class G2_ApplyRuleFor_TypeFile {
 
 // 监听 当前 微信的 接收文件 , 判断是否 有新的txt文件  如果有 读取它 , 执行 执行 相应的 命令  如果是 http路径 那么 下载它
 		realTypeRuleList.add(new Monitor_WeChatFile_ForWindows_Rule_39());
-		
+
+		// 对网站进行抓取资源到本地
 		realTypeRuleList.add(new Monitor_Browser_ForWindows_Rule_40());
-		
+
 // 	// 读取当前文件夹下的jpg文件(仅仅时当前目录) 然后 读取当前的jpg的 artist  Desc  Make  Mode  Copyright UserComment 信息 来生成 .md文件
 
 		realTypeRuleList.add(new Read_Jpg_Exif_Info_Create_MDContent_Rule_41());
-
+		
+		
+		// 传递一个地址  然后返回这个地址的所有的网页的代码  打印在 Temp.txt 中 , 循环到底 持续五分钟  并执行一直写入txt的操作
+		//  必须以 http 开头
+		realTypeRuleList.add(new GetHttpCode_Rule_42());
+		
+		
+// 传递一个 txt文本文件 以及一个 splitstr_XXXX 到程序中,将会去把当前所有的字符串进行split分隔，并输入split分隔后的第一个空格前的字符串
+		
+		realTypeRuleList.add(new SqlitTxt_Return_FirstBlankStr_Rule_43());
 		
 	}
 
+	
+	
 // 3038年 5 月 3 日
-	
-	
+
 	// operation_type 操作类型 1--读取文件内容字符串 进行修改 2--对文件对文件内容(字节)--进行修改 3.对全体子文件进行的随性的操作
 	// 属性进行修改(文件名称)
 //     // 4.对当前子文件(包括子目录 子文件 --不包含孙目录 孙文件) 5. 从shell 中获取到的路径 去对某一个文件进行操作
 
 	
 	
-	// 读取当前文件夹下的jpg文件(仅仅时当前目录) 然后 读取当前的jpg的 artist  Desc  Make  Mode  Copyright UserComment 信息 来生成 .md文件
+	class SqlitTxt_Return_FirstBlankStr_Rule_43 extends Basic_Rule {
+		
+		File operationFile ;   //  不能为空 
+		String sqlitstr_tag;   // 从外输入的 对txt文件进行切割的 标示 不能为空
+		
+		SqlitTxt_Return_FirstBlankStr_Rule_43() {
+			super("#", 43, 4); //
+
+		}
+		
+		
+		@Override
+		ArrayList<File> applySubFileListRule4(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
+			ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+		// TODO Auto-generated method stub
+		
+			
+
+			
+			String Tag= ReadFileContent(operationFile);
+			String[]  tagArr = Tag.split(sqlitstr_tag);
+			
+			ArrayList<String> matchStrList = new ArrayList<String> ();
+			matchStrList.add("════════════════════"+"切割Tag="+sqlitstr_tag+" ════════════════════");
+			for (int i = 0; i < tagArr.length; i++) {
+				String stritem = tagArr[i];
+
+				// 为了 获取 分隔后的每行, 每行包含一些空格，所以 这里取到每行空格之前的字符串
+			  String[] blankArr = 	stritem.split(" ");
+				if(blankArr != null) {
+					String oneBlankStr = blankArr[0];
+					oneBlankStr = oneBlankStr.replace("\"", "");  // 去除引号
+					if(oneBlankStr.equals("")) {
+						continue;
+					}
+			
+//					System.out.println("index["+i+"]:oneBlank【"+oneBlankStr+"】");
+					matchStrList.add(oneBlankStr);
+//					System.out.println("index["+i+"]:oneBlank【"+oneBlankStr+"】:["+tagArr[i]+"]");
+					
+				}
+				
+			
+			}
+			
+			matchStrList.sort(new Comparator<String>() {
+				@Override
+				public int compare(String o1, String o2) {
+					return o1.compareTo(o2);
+				}
+
+			});
+			
+			ArrayList<String> resultStrList = new ArrayList<String> ();
+			resultStrList.add("输入参数已经结果:  sqlitstr["+sqlitstr_tag+"]"+"  operationFile["+operationFile.getAbsolutePath()+"]");
+
+			resultStrList.addAll(matchStrList);
+			
+			
+			
+            writeContentToFile(G2_Temp_Text_File, resultStrList);
+            NotePadOpenTargetFile(G2_Temp_Text_File.getAbsolutePath());
+            
+			
+			
+			return super.applySubFileListRule4(curFileList, subFileTypeMap, curDirList, curRealFileList);
+		}
+		
+		@Override
+		boolean initParamsWithInputList(ArrayList<String> inputParamList) {
+		// TODO Auto-generated method stub
+			
+			for (int i = 0; i < inputParamList.size(); i++) {
+				String paramItem = inputParamList.get(i);
+				
+				if(paramItem.contains("sqlitstr_")) {
+					sqlitstr_tag = paramItem.replace("sqlitstr_", "");
+					continue;
+					
+				}
+				
+				File targetFile = new File(curDirPath+File.separator+paramItem);
+				
+				if(targetFile.exists()) {
+					
+					operationFile = targetFile;
+				}
+
+			}
+			
+			if(operationFile == null || !operationFile.exists()) {
+				
+				System.out.println("当前 规则:"+rule_index+" 需要输入的文件为空, 请检查输入！！");
+			   return false;
+			}
+			
+			
+			
+			if(sqlitstr_tag == null || sqlitstr_tag.equals("")) {
+				
+				System.out.println("当前 规则:"+rule_index+" 需要输入切割字符串 sqlitstr_XXX 为空！！, 请检查输入！！");
+			   return false;
+			}
+
+		return super.initParamsWithInputList(inputParamList);
+		}
+		
+		
+		
+		@Override
+		String simpleDesc() {
+
+			return "\n" + Cur_Bat_Name + " #_" + rule_index+"  2.txt sqlitstr_href     ### 一个本地操作文件以及一个切割符,返回切割后的每行的第一个空格前的字符串 ";
+		}
+		
+		
+	}
+
+	
+	class GetHttpCode_Rule_42 extends Basic_Rule {
+		//  必须以 http 开头
+		String searchHttpUrl ;   // 从输入传入的 需要得到 的 http 源码的 网页的地址
+		ChromeDriver mChromeDriver ; 
+		String curPositionHtmlCodeStr;   // 每次得到的 html代码的值 用于突然用户终止程序时 使用
+		GetHttpCode_Rule_42() {
+			super("#", 42, 4); //
+
+		}
+		
+		@Override
+		boolean initParamsWithInputList(ArrayList<String> inputParamList) {
+		// TODO Auto-generated method stub
+			
+			for (int i = 0; i < inputParamList.size(); i++) {
+				String paramItem = inputParamList.get(i);
+				String paramItem_lower_trim = paramItem.toLowerCase().trim();
+System.out.println("paramItem["+i+"] = "+paramItem_lower_trim);
+				if (paramItem_lower_trim.startsWith("http")) {
+					searchHttpUrl = paramItem_lower_trim;
+				}
+
+			}
+			
+			if(searchHttpUrl == null) {
+				System.out.println("当前输入的网页为空  请检查输入!!!");
+				return false;
+			}
+			
+			
+			File ChromeDriverFile = new File(zbinPath + File.separator + "G2_chromedriver_v91.exe");
+
+			System.setProperty("webdriver.chrome.driver", ChromeDriverFile.getAbsolutePath());
+
+			ChromeOptions CUR_CHROME_OPTIONS = new ChromeOptions();
+			// 驱动位置
+			CUR_CHROME_OPTIONS.addArguments("--start-fullscreen");
+
+			CUR_CHROME_OPTIONS.setExperimentalOption("excludeSwitches", Collections.singletonList("enable-automation"));
+
+			mChromeDriver = new ChromeDriver(CUR_CHROME_OPTIONS);
+			
+			
+		return super.initParamsWithInputList(inputParamList);
+		}
+		
+		
+	     void registerShutDownLister(){
+		        Runtime.getRuntime().addShutdownHook(new Thread() {
+		            public void run() {
+		                try {
+		                    Thread.sleep(200);
+		                    System.out.println("════════ 监听到 Ctr+Z stop进程操作 将执行保存当前页面位置代码的操作 ════════");
+
+		                    writeContentToFile(G2_Temp_Text_File, curPositionHtmlCodeStr);
+		                    NotePadOpenTargetFile(G2_Temp_Text_File.getAbsolutePath());
+		                
+		                    System.out.println("获得【"+searchHttpUrl+"】 MainPage HtmlCode 突然终止 部分成功 !! ");
+		                    System.out.println("════════"+"════════");
+		                    //some cleaning up code...
+
+		                } catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+		            }
+		        });
+
+		    }
+	     
+		@Override
+		ArrayList<File> applySubFileListRule4(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
+			ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+		// TODO Auto-generated method stub
+		
+			registerShutDownLister();
+			
+			String httpPageCode = BrowserOperation_WithRootUrl(searchHttpUrl);
+			
+			
+			if(httpPageCode != null) {
+				
+                writeContentToFile(G2_Temp_Text_File, httpPageCode);
+                NotePadOpenTargetFile(G2_Temp_Text_File.getAbsolutePath());
+            System.out.println("获得【"+searchHttpUrl+"】 MainPage HtmlCode 成功!! ");
+			}else {
+			      System.out.println("获得【"+searchHttpUrl+"】 MainPage HtmlCode 失败!! ");
+
+			}
+			
+
+			
+			return super.applySubFileListRule4(curFileList, subFileTypeMap, curDirList, curRealFileList);
+		}
+		
+		
+		@Override
+		String simpleDesc() {
+
+			return "\n" + Cur_Bat_Name + " #_" + rule_index+" https://www.baidu.com   ### 传递一个http路径打开它的html源码(tip:有些页面浏览器另存为的html由于某些html页面) ";
+		}
+		
+		String BrowserOperation_WithRootUrl(String mMainUrl) {
+
+	
+			String mainPageHtmlStr = null;
+			File ChromeDriverFile = new File(zbinPath + File.separator + "G2_chromedriver_v91.exe");
+
+			System.setProperty("webdriver.chrome.driver", ChromeDriverFile.getAbsolutePath());
+
+			ChromeDriver driver = mChromeDriver;
+			int loop_index = 0;
+			try {
+				long waitTime = 1000;
+				long timeout = 60_000;   // 15 秒 // 给他 1分钟
+
+				driver.get(mMainUrl);
+				String title = driver.getTitle();
+				System.out.printf("loop_index[" + loop_index + "] = " + title);
+
+				System.out.printf("A now accesss %s \n", driver.getCurrentUrl());
+
+//				 long waitTime = Double.valueOf(Math.max(3, Math.random() * 5) * 1000).longValue();
+				TimeUnit.MILLISECONDS.sleep(waitTime);
+
+				// 循环下拉，直到全部加载完成或者超时
+				do {
+					new Actions(driver).sendKeys(Keys.END).perform();
+					TimeUnit.MILLISECONDS.sleep(waitTime);
+
+					timeout -= waitTime;
+					loop_index++;
+					curPositionHtmlCodeStr = driver.getPageSource();
+				} while (!driver.getPageSource().contains("已经到底部，没有新的内容啦") && timeout > 0);
+				System.out.println("BrowserOperation_WithRootUrl 已经到底部，没有新的内容啦");
+				mainPageHtmlStr = driver.getPageSource();
+				curPositionHtmlCodeStr = driver.getPageSource();
+			} catch (Exception e) {
+				// TODO: handle exception
+				System.out.println("获取网页源码的时候出错  mMainUrl = " + mMainUrl);
+				e.printStackTrace();
+
+			}
+
+
+
+			if (mainPageHtmlStr != null) {
+
+				System.out.println("当前已经得到网页Html代码如下:\n"+mainPageHtmlStr);
+
+			} else {
+				System.out.println("rootUrl.mHtmlStr  ==== null ");
+			}
+
+			return mainPageHtmlStr;
+		}
+
+		
+		
+		
+		
+	}
 // 规则:   
 //1.jpg 的 Copyright 放入对应的 video文件的 md值 
 //2. jpg  和 video  命名都是 以 md5 文件命名
@@ -348,33 +639,38 @@ public class G2_ApplyRuleFor_TypeFile {
 // 6. Make  Mode  UserComment 这三项  还没想好放什么
 // 7. 涉及初衷 是为了 把 学习过的video 作为 子项 在各个知识点类目下 显示 为了保存自己学习的过程 而设计的这个规则
 //  zfilesearch_D6.bat .jpg    能查看到具体的填充项 
+	
+	// 读取当前文件夹下的jpg文件(仅仅时当前目录) 然后 读取当前的jpg的 artist Desc Make Mode Copyright
+	// UserComment 信息 来生成 .md文件
+	
+	
 //	_______ type=[.jpg] index=[1] name=[2021-08-04_144330.jpg]  Exif Begin  _______
 //			JpgIndex[1] == Artist[隔热_] Desc[个问题_] Make[疯玩五天_] Mode[废物废物_] Copyright[如果我问过我_] UserComment[问他我问过_]
-				
+
+	volatile  int   mCategory_JpgExif_Count_Rule_41 = 0;
+	
 	class Read_Jpg_Exif_Info_Create_MDContent_Rule_41 extends Basic_Rule {
-		ArrayList<File> jpgFileList ;  //  当前目录下的 jpg 文件 
-		ArrayList<Jpg_Exif> jpgExifList ;  //  当前从 jpg读取信息后生成的原始数据
-		String video_url_prefix;   // video   md文件中 video标签的前缀
-		String image_url_prefix;  //  jpg   md文件中 jpg标签的前缀
-		
-		boolean is_kaoyan;   // 考研 类型
-		boolean is_gaokao;   // 高考 类型
+		ArrayList<File> jpgFileList; // 当前目录下的 jpg 文件
+		ArrayList<Jpg_Exif> jpgExifList; // 当前从 jpg读取信息后生成的原始数据
+		String video_url_prefix; // video md文件中 video标签的前缀
+		String image_url_prefix; // jpg md文件中 jpg标签的前缀
 
-		ArrayList<String> English_CharList ;
-		ArrayList<String> mCategoryItemList_In_Jpg;  // 所有 分类 的 类型 二级分类的类型 
-		
-		// key 为 jpg 中的 Category , List 为 符合 这个 category 的 Jpg_Exif 
-		Map<String,ArrayList<Jpg_Exif>>  mCategory_JpgExifList_Map;
-		
-		// key 英语Englist OneWord , value 为  符合 这个 Key的 Category的集合 
+		boolean is_kaoyan; // 考研 类型
+		boolean is_gaokao; // 高考 类型
 
-		Map<String,ArrayList<String>>  mOneWord_CategoryArr_Map;
+		ArrayList<String> English_CharList;
+		ArrayList<String> mCategoryItemList_In_Jpg; // 所有 分类 的 类型 二级分类的类型
+
+		// key 为 jpg 中的 Category , List 为 符合 这个 category 的 Jpg_Exif
+		Map<String, ArrayList<Jpg_Exif>> mCategory_JpgExifList_Map;
+
+		// key 英语Englist OneWord , value 为 符合 这个 Key的 Category的集合
+
+		Map<String, ArrayList<String>> mOneWord_CategoryArr_Map;
 
 		@Override
 		boolean initParamsWithInputList(ArrayList<String> inputParamList) {
-			// mdname_true    // kaoyan_true    gaokao_true
-			
-			
+			// mdname_true // kaoyan_true gaokao_true
 
 			for (int i = 0; i < inputParamList.size(); i++) {
 				String paramItem = inputParamList.get(i);
@@ -387,43 +683,35 @@ public class G2_ApplyRuleFor_TypeFile {
 				if ("gaokao_true".equals(paramItem_lower_trim)) {
 					is_gaokao = true;
 				}
-				
+
 			}
-			
-			
-			if(is_gaokao) {
-				video_url_prefix = "D:/Git_Dir/Z_School/zschool_media/gaokao_mp4/";
+
+			if (is_gaokao) {
+				video_url_prefix = "D:/Git_Dir/zschool/zschool_media/gaokao_mp4/";
 				image_url_prefix = "/public/zimage/zschool_media/gaokao_jpg/";
-			}else {
-				video_url_prefix = "D:/Git_Dir/Z_School/zschool_media/kaoyan_mp4/";
+			} else {
+				video_url_prefix = "D:/Git_Dir/zschool/zschool_media/kaoyan_mp4/";
 				image_url_prefix = "/public/zimage/zschool_media/kaoyan_jpg/";
 			}
-			
-			
-			
-			
-		// TODO Auto-generated method stub
-		return super.initParamsWithInputList(inputParamList);
+
+			// TODO Auto-generated method stub
+			return super.initParamsWithInputList(inputParamList);
 		}
-		
-		
-		
-		
+
 		Read_Jpg_Exif_Info_Create_MDContent_Rule_41() {
 			super("#", 41, 4); //
-			jpgFileList = new ArrayList<File> ();
-			jpgExifList = new  ArrayList<Jpg_Exif> ();
+			jpgFileList = new ArrayList<File>();
+			jpgExifList = new ArrayList<Jpg_Exif>();
 
-	
 			initEnglishChar();
 		}
-		
-		void initEnglishChar(){
-			English_CharList =  new ArrayList<String>();
-			mCategoryItemList_In_Jpg  =new  ArrayList<String>();
-			mOneWord_CategoryArr_Map = new HashMap<String,ArrayList<String>>();
-			mCategory_JpgExifList_Map = new  HashMap<String,ArrayList<Jpg_Exif>>();
-			
+
+		void initEnglishChar() {
+			English_CharList = new ArrayList<String>();
+			mCategoryItemList_In_Jpg = new ArrayList<String>();
+			mOneWord_CategoryArr_Map = new HashMap<String, ArrayList<String>>();
+			mCategory_JpgExifList_Map = new HashMap<String, ArrayList<Jpg_Exif>>();
+
 			English_CharList.add("A");
 			English_CharList.add("B");
 			English_CharList.add("C");
@@ -451,34 +739,30 @@ public class G2_ApplyRuleFor_TypeFile {
 			English_CharList.add("Y");
 			English_CharList.add("Z");
 		}
-		
-		
-		 class Jpg_Exif {
- // key 是  对应的首字母的 英文 大写字母 , List 是这个 Jpg_Exif 对应的属于这个索引下的 当前的Category
-	
-			 Map<String,ArrayList<String>> mEnglishChar_CategoryList_Map;
-			 ArrayList<String> mCategoryList;    // 在 artist_category 中以_分隔的 各个项
-				String mImageArtist_CategoryStr= null;
-				String mImageCopyright_VideoMD = null;
-			    String mImageDescription_SelfDesc = null;
-				String mImageMake_OriginSrc = null;     //  图片的问题的出处 来源问题
-				String mPhotoUserComment_KnowledgePoint = null;   //知识点 待定  KnowLedge 知识点
-		
-			String mImageModel_Utf8 = null;     // 待定
 
-			
-			File imageFile;    // 从该 jpg 文件读取到的 exif 信息 原文件
-			String videoName;    //  从 jpg 读取到 Copyright 是对应的 video 的文件名称
-			String videoUrl;  //    video 对应的 url   这个 .mp4 结尾  前缀 待定 可能需要从外部读取
-			String imageUrl;   // jpg 显示的 url 
-			
-			
+		class Jpg_Exif {
+			// key 是 对应的首字母的 英文 大写字母 , List 是这个 Jpg_Exif 对应的属于这个索引下的 当前的Category
+
+			Map<String, ArrayList<String>> mEnglishChar_CategoryList_Map;
+			ArrayList<String> mCategoryList; // 在 artist_category 中以_分隔的 各个项
+			String mImageArtist_CategoryStr = null;
+			String mImageCopyright_VideoMD = null;
+			String mImageDescription_SelfDesc = null;
+			String mImageMake_OriginSrc = null; // 图片的问题的出处 来源问题
+			String mPhotoUserComment_KnowledgePoint = null; // 知识点 待定 KnowLedge 知识点
+
+			String mImageModel_HttpUrl = null; // 待定 // 图片截图的网络地址
+
+			File imageFile; // 从该 jpg 文件读取到的 exif 信息 原文件
+			String videoName; // 从 jpg 读取到 Copyright 是对应的 video 的文件名称
+			String videoUrl; // video 对应的 url 这个 .mp4 结尾 前缀 待定 可能需要从外部读取
+			String imageUrl; // jpg 显示的 url
+
 			@SuppressWarnings("unchecked")
 			@Override
 			public String toString() {
 				StringBuilder sb = new StringBuilder();
-				
-				
+
 				Map.Entry<String, ArrayList<String>> entry;
 
 				if (mEnglishChar_CategoryList_Map != null) {
@@ -489,93 +773,88 @@ public class G2_ApplyRuleFor_TypeFile {
 						// 获取 名称的 首字母
 						String oneWordStr = entry.getKey(); // Map的Value // 作者名称
 						ArrayList<String> categoryNameList = entry.getValue();
-						sb.append("mapKey("+oneWordStr+"_"+categoryNameList.size()+")【");
+						sb.append("mapKey(" + oneWordStr + "_" + categoryNameList.size() + ")【");
 						for (int i = 0; i < categoryNameList.size(); i++) {
 							String categoryItem = categoryNameList.get(i);
-							sb.append(categoryItem+",");
+							sb.append(categoryItem + ",");
 						}
 						sb.append("】");
-						
-					}
-					}
-		
 
-			return "ImageName["+imageFile.getName()+"] category["+mImageArtist_CategoryStr+"]  video["+mImageCopyright_VideoMD+"] desc["+mImageDescription_SelfDesc+"] Make["+mImageMake_OriginSrc+"] Model["+mImageModel_Utf8+"] usercomment["+mPhotoUserComment_KnowledgePoint+"]  videoUrl["+videoUrl+"] imageUrl["+imageUrl+"]  mCategoryList.size=["+mCategoryList.size()+"] Map="+sb.toString();
+					}
+				}
+
+				return "ImageName[" + imageFile.getName() + "] category[" + mImageArtist_CategoryStr + "]  video["
+						+ mImageCopyright_VideoMD + "] desc[" + mImageDescription_SelfDesc + "] Make["
+						+ mImageMake_OriginSrc + "] Model[" + mImageModel_HttpUrl + "] usercomment["
+						+ mPhotoUserComment_KnowledgePoint + "]  videoUrl[" + videoUrl + "] imageUrl[" + imageUrl
+						+ "]  mCategoryList.size=[" + mCategoryList.size() + "] Map=" + sb.toString();
 			}
-			
-			
+
 			void init_Artist_Category() {
-				mEnglishChar_CategoryList_Map =  new HashMap<String,ArrayList<String>>();
-				mCategoryList =  new ArrayList<String>();
-	
-				if(mImageArtist_CategoryStr != null && !mImageArtist_CategoryStr.contains("_")) {
-					
+				mEnglishChar_CategoryList_Map = new HashMap<String, ArrayList<String>>();
+				mCategoryList = new ArrayList<String>();
+
+				if (mImageArtist_CategoryStr != null && !mImageArtist_CategoryStr.contains("_")) {
+
 					mCategoryList.add(mImageArtist_CategoryStr);
 					String itemStr = mImageArtist_CategoryStr.replace("_", "").replace(" ", "").trim();
-					
+
 					String Alphabet_Word = getFirstZiMu(itemStr);
-					
-					if(mEnglishChar_CategoryList_Map.get(Alphabet_Word) == null) {
-						ArrayList<String> category_word_list =  new ArrayList<String>();
+
+					if (mEnglishChar_CategoryList_Map.get(Alphabet_Word) == null) {
+						ArrayList<String> category_word_list = new ArrayList<String>();
 						category_word_list.add(itemStr);
 						mEnglishChar_CategoryList_Map.put(Alphabet_Word, category_word_list);
-					}else {
-						
-						ArrayList<String> category_word_list = mEnglishChar_CategoryList_Map.get(Alphabet_Word) ;
+					} else {
+
+						ArrayList<String> category_word_list = mEnglishChar_CategoryList_Map.get(Alphabet_Word);
 						category_word_list.add(itemStr);
 					}
-					
+
 					return;
 				}
-				
-				if(mImageArtist_CategoryStr != null && mImageArtist_CategoryStr.contains("_")) {
-					
-				String[] categoryItem = 	mImageArtist_CategoryStr.trim().split("_");
-				
-				
-				for (int i = 0; i < categoryItem.length; i++) {
-					String itemStr = categoryItem[i];
-					itemStr = itemStr.replace("_", "").replace(" ", "").trim();
-					mCategoryList.add(itemStr);
-					
-					String Alphabet_Word = getFirstZiMu(itemStr);
-					
-					if(mEnglishChar_CategoryList_Map.get(Alphabet_Word) == null) {
-						ArrayList<String> category_word_list =  new ArrayList<String>();
-						category_word_list.add(itemStr);
-						mEnglishChar_CategoryList_Map.put(Alphabet_Word, category_word_list);
-					}else {
-						
-						ArrayList<String> category_word_list = mEnglishChar_CategoryList_Map.get(Alphabet_Word) ;
-						category_word_list.add(itemStr);
+
+				if (mImageArtist_CategoryStr != null && mImageArtist_CategoryStr.contains("_")) {
+
+					String[] categoryItem = mImageArtist_CategoryStr.trim().split("_");
+
+					for (int i = 0; i < categoryItem.length; i++) {
+						String itemStr = categoryItem[i];
+						itemStr = itemStr.replace("_", "").replace(" ", "").trim();
+						mCategoryList.add(itemStr);
+
+						String Alphabet_Word = getFirstZiMu(itemStr);
+
+						if (mEnglishChar_CategoryList_Map.get(Alphabet_Word) == null) {
+							ArrayList<String> category_word_list = new ArrayList<String>();
+							category_word_list.add(itemStr);
+							mEnglishChar_CategoryList_Map.put(Alphabet_Word, category_word_list);
+						} else {
+
+							ArrayList<String> category_word_list = mEnglishChar_CategoryList_Map.get(Alphabet_Word);
+							category_word_list.add(itemStr);
+						}
+
 					}
 
 				}
-					
-					
-				}
-				
-				
+
 			}
 
-			
-			
-			Jpg_Exif(File curImageFile){
-				imageFile = 	curImageFile ;
+			Jpg_Exif(File curImageFile) {
+				imageFile = curImageFile;
 				imageUrl = image_url_prefix + curImageFile.getName();
 				initExifInfo(curImageFile);
 				init_Artist_Category();
-				
-				
+
 			}
-			
-			
-			void initExifInfo(File file){
-			
+
+			void initExifInfo(File file) {
+
 				String mImageDescription_Utf8 = null;
 				String mImageMake_Utf8 = null;
 				String mImageModel_Utf8 = null;
-				String mImageArtist_Utf8= null;
+				String mImageArtist_Utf8 = null;
 				String mImageCopyright_Utf8 = null;
 				String mPhotoUserComment_Utf8 = null;
 				int angel = 0;
@@ -592,61 +871,50 @@ public class G2_ApplyRuleFor_TypeFile {
 //							System.out.format("zukgit_directory  [%s] - %s = %s\n", directory.getName(), tag.getTagName(),tag.getDescription());
 
 							if ("Exif IFD0".equals(directory.getName())) {
-				
 
 								String mImageDescription = directory.getString(ExifIFD0Directory.TAG_IMAGE_DESCRIPTION);
-								if(mImageDescription != null)
-								 mImageDescription_Utf8 = new String(mImageDescription.getBytes(),"UTF-8");
+								if (mImageDescription != null)
+									mImageDescription_Utf8 = new String(mImageDescription.getBytes(), "UTF-8");
 
-								
 								String mImageMake = directory.getString(ExifIFD0Directory.TAG_MAKE);
-								if(mImageMake != null)
-								mImageMake_Utf8 = new String(mImageMake.getBytes(),"UTF-8");
-								
-								
+								if (mImageMake != null)
+									mImageMake_Utf8 = new String(mImageMake.getBytes(), "UTF-8");
+
 								String mImageModel = directory.getString(ExifIFD0Directory.TAG_MODEL);
-								if(mImageModel != null)
-								mImageModel_Utf8 = new String(mImageModel.getBytes(),"UTF-8");
-								
-								
+								if (mImageModel != null)
+									mImageModel_Utf8 = new String(mImageModel.getBytes(), "UTF-8");
+
 								String mImageArtist = directory.getString(ExifIFD0Directory.TAG_ARTIST);
-								if(mImageArtist != null)
-								mImageArtist_Utf8 = new String(mImageArtist.getBytes(),"UTF-8");
-								
-								
-								
+								if (mImageArtist != null)
+									mImageArtist_Utf8 = new String(mImageArtist.getBytes(), "UTF-8");
+
 								String mImageCopyright = directory.getString(ExifIFD0Directory.TAG_COPYRIGHT);
-								if(mImageCopyright != null)
-								mImageCopyright_Utf8 = new String(mImageCopyright.getBytes(),"UTF-8");
-								
-								
-								
+								if (mImageCopyright != null)
+									mImageCopyright_Utf8 = new String(mImageCopyright.getBytes(), "UTF-8");
+
 //								System.out.println("XXmImageDescription=["+mImageDescription+"]  Utf8["+mImageDescription_Utf8+"]");
 //								System.out.println("XXmImageMake=["+mImageMake+"]  Utf8["+mImageMake_Utf8+"]");
 //								System.out.println("XXmImageModel=["+mImageModel+"]  Utf8["+mImageModel_Utf8+"]");
 //								System.out.println("XXmImageArtist=["+mImageArtist+"]  Utf8["+mImageArtist_Utf8+"]");
 //								System.out.println("XXmImageCopyright=["+mImageCopyright+"]  Utf8["+mImageCopyright_Utf8+"]");
 
-						
 							}
-							
+
 							if ("Exif SubIFD".equals(directory.getName())) {
 
-						if("User Comment".equals(tag.getTagName())) {	
-							String mPhotoUserComment =  tag.getDescription();
+								if ("User Comment".equals(tag.getTagName())) {
+									String mPhotoUserComment = tag.getDescription();
 //							System.out.println("AZ_User_Comment=["+tag.getDescription()+"]");	
-							if(mPhotoUserComment != null)
-							mPhotoUserComment_Utf8 = new String(mPhotoUserComment.getBytes(),"utf-8");
+									if (mPhotoUserComment != null)
+										mPhotoUserComment_Utf8 = new String(mPhotoUserComment.getBytes(), "utf-8");
 //							System.out.println("AZXXmPhotoUserComment=["+mPhotoUserComment+"]   mPhotoUserComment_Utf8=["+mPhotoUserComment_Utf8+"]" );	
 
 								}
-						
+
 							}
 						}
 
 					}
-
-
 
 				} catch (JpegProcessingException e) {
 					e.printStackTrace();
@@ -655,7 +923,7 @@ public class G2_ApplyRuleFor_TypeFile {
 					System.out.println("IOException  异常事件发生 ");
 					e.printStackTrace();
 				}
-				
+
 //				String mImageArtist_CategoryStr= null;
 //				String mImageCopyright_VideoMD = null;
 //			    String mImageDescription_SelfDesc = null;
@@ -664,353 +932,319 @@ public class G2_ApplyRuleFor_TypeFile {
 //			String mImageMake_Utf8 = null;     // 待定
 //			String mImageModel_Utf8 = null;     // 待定
 //			String mPhotoUserComment_Utf8 = null;   // 待定
-				
-	
-		        if(mImageArtist_Utf8 != null) {
-		        	mImageArtist_CategoryStr = clear_end_xiahua_xian(mImageArtist_Utf8);
-					
-				}else {
-					System.out.println("当前文件 ["+file.getName()+"] 没有读取到 mImageArtist_CategoryStr !! ");
+
+				if (mImageArtist_Utf8 != null) {
+					mImageArtist_CategoryStr = clear_end_xiahua_xian(mImageArtist_Utf8);
+
+				} else {
+					System.out.println("当前文件 [" + file.getName() + "] 没有读取到 mImageArtist_CategoryStr !! ");
 				}
-				
-				if(mImageDescription_Utf8 != null) {
+
+				if (mImageDescription_Utf8 != null) {
 					mImageDescription_SelfDesc = fixed_number_point(clear_end_xiahua_xian(mImageDescription_Utf8));
-					
-				}else {
-					System.out.println("当前文件 ["+file.getName()+"] 没有读取到 mImageDescription_SelfDesc !! ");
+
+				} else {
+					System.out.println("当前文件 [" + file.getName() + "] 没有读取到 mImageDescription_SelfDesc !! ");
 				}
-				
-				
-			if(mImageCopyright_Utf8 != null) {
-					
-				mImageCopyright_VideoMD = clear_end_xiahua_xian(mImageCopyright_Utf8);
-				videoName = mImageCopyright_VideoMD;
-				videoUrl = video_url_prefix+videoName+".mp4";
-				}else {
-					System.out.println("当前文件 ["+file.getName()+"] 没有读取到 mImageCopyright_VideoMD !! ");
+
+				if (mImageCopyright_Utf8 != null) {
+
+					mImageCopyright_VideoMD = clear_end_xiahua_xian(mImageCopyright_Utf8);
+					videoName = mImageCopyright_VideoMD;
+					videoUrl = video_url_prefix + videoName + ".mp4";
+				} else {
+					System.out.println("当前文件 [" + file.getName() + "] 没有读取到 mImageCopyright_VideoMD !! ");
 				}
-				
-				
-			
-				
-				if(mImageMake_Utf8 != null) {
-			this.mImageMake_OriginSrc = clear_end_xiahua_xian(mImageMake_Utf8);
-				}else {
-					System.out.println("当前文件 ["+file.getName()+"] 没有读取到 mImageMake_Utf8 !! ");
+
+				if (mImageMake_Utf8 != null) {
+					this.mImageMake_OriginSrc = clear_end_xiahua_xian(mImageMake_Utf8);
+				} else {
+					System.out.println("当前文件 [" + file.getName() + "] 没有读取到 mImageMake_Utf8 !! ");
 				}
-				
-				
-				
-				if(mImageModel_Utf8 != null) {
-					this.mImageModel_Utf8 = clear_end_xiahua_xian(mImageModel_Utf8);
-				}else {
-					System.out.println("当前文件 ["+file.getName()+"] 没有读取到 mImageModel_Utf8 !! ");
+
+				if (mImageModel_Utf8 != null) {
+					this.mImageModel_HttpUrl = clear_end_xiahua_xian(mImageModel_Utf8);
+				} else {
+					System.out.println("当前文件 [" + file.getName() + "] 没有读取到 mImageModel_Utf8 !! ");
 				}
-		
-				if(mPhotoUserComment_Utf8 != null) {
-					this.mPhotoUserComment_KnowledgePoint = fixed_number_point(clear_end_xiahua_xian(mPhotoUserComment_Utf8));
-				}else {
-					System.out.println("当前文件 ["+file.getName()+"] 没有读取到 mPhotoUserComment_Utf8 !! ");
+
+				if (mPhotoUserComment_Utf8 != null) {
+					this.mPhotoUserComment_KnowledgePoint = fixed_number_point(
+							clear_end_xiahua_xian(mPhotoUserComment_Utf8));
+				} else {
+					System.out.println("当前文件 [" + file.getName() + "] 没有读取到 mPhotoUserComment_Utf8 !! ");
 				}
 
 			}
-			
-			
-			
-		}
-		 
-		 
-		 // 
-		 String fixed_number_point(String rawStr) {
-			 
-			 String tempStr = rawStr;
-			 tempStr =  tempStr.replace("1.", "\n1.");
-			 tempStr =  tempStr.replace("2.", "\n2.");
-			 tempStr =  tempStr.replace("3.", "\n3.");
-			 tempStr =  tempStr.replace("4.", "\n4.");
-			 tempStr =  tempStr.replace("5.", "\n5.");
-			 tempStr =  tempStr.replace("6.", "\n6.");
-			 tempStr =  tempStr.replace("7.", "\n7.");
-			 tempStr =  tempStr.replace("8.", "\n8.");
-			 tempStr =  tempStr.replace("9.", "\n9.");
-			 tempStr =  tempStr.replace("10.", "\n10.");
 
-			 tempStr = tempStr.trim();
-			 if(tempStr.startsWith("\n")) {
-				 tempStr = tempStr.substring(1);
-			 }
-			 return tempStr;
- 
-		 }
-		 String clear_end_xiahua_xian(String rawStr) {
-		
-			 String tempStr = rawStr;
-			 while(tempStr.endsWith("_")) {
-				 tempStr = tempStr.substring(0,tempStr.length() -1);
-			 }
-			 
-			 return tempStr;
-			 
-			 
-		 }
-		
-@Override
-ArrayList<File> applySubFileListRule4(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
-	ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+		}
+
+		//
+		String fixed_number_point(String rawStr) {
+
+			String tempStr = rawStr;
+			tempStr = tempStr.replace("1.", "\n1.");
+			tempStr = tempStr.replace("2.", "\n2.");
+			tempStr = tempStr.replace("3.", "\n3.");
+			tempStr = tempStr.replace("4.", "\n4.");
+			tempStr = tempStr.replace("5.", "\n5.");
+			tempStr = tempStr.replace("6.", "\n6.");
+			tempStr = tempStr.replace("7.", "\n7.");
+			tempStr = tempStr.replace("8.", "\n8.");
+			tempStr = tempStr.replace("9.", "\n9.");
+			tempStr = tempStr.replace("10.", "\n10.");
+
+			tempStr = tempStr.trim();
+			if (tempStr.startsWith("\n")) {
+				tempStr = tempStr.substring(1);
+			}
+			return tempStr;
+
+		}
+
+		String clear_end_xiahua_xian(String rawStr) {
+
+			String tempStr = rawStr;
+			while (tempStr.endsWith("_")) {
+				tempStr = tempStr.substring(0, tempStr.length() - 1);
+			}
+
+			return tempStr;
+
+		}
+
+		@Override
+		ArrayList<File> applySubFileListRule4(ArrayList<File> curFileList,
+				HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList,
+				ArrayList<File> curRealFileList) {
 // TODO Auto-generated method stub
-	jpgFileList = 	getAllSubFile(curDirFile, ".jpg");
-	
-	if(jpgFileList.size() == 0 ) {
-		System.out.println(" 当前目录 curDirFile=["+curDirFile.getAbsolutePath()+"] 内没有 jpg文件!!  请检查后再次执行!! ");
-		return null;
-	}
-	
-	
-	for (int i = 0; i < jpgFileList.size(); i++) {
+			jpgFileList = getAllSubFile(curDirFile, ".jpg");
+
+			if (jpgFileList.size() == 0) {
+				System.out.println(" 当前目录 curDirFile=[" + curDirFile.getAbsolutePath() + "] 内没有 jpg文件!!  请检查后再次执行!! ");
+				return null;
+			}
+
+			for (int i = 0; i < jpgFileList.size(); i++) {
 //		Jpg_Exif
-		File jpgFile = jpgFileList.get(i);
-		Jpg_Exif  jpg_exif_item = new Jpg_Exif(jpgFile);
-		
-		jpgExifList.add(jpg_exif_item);
-		
-	}
-	
-	
-	if(jpgExifList.size() == 0) {
-		
-		System.out.println(" 当前目录 curDirFile=["+curDirFile.getAbsolutePath()+"]  存在["+jpgFileList.size()+"]个jpg "+" 但无法正常读取到 exif 信息  请检查后再次执行!! ");
+				File jpgFile = jpgFileList.get(i);
+				Jpg_Exif jpg_exif_item = new Jpg_Exif(jpgFile);
 
-		return null;
-	}
-	
-	
-	for (int i = 0; i < jpgExifList.size(); i++) {
-		Jpg_Exif jpgExifitem = jpgExifList.get(i);
-		System.out.println("jpg_exif["+i+"] = "+ jpgExifitem.toString() );
+				jpgExifList.add(jpg_exif_item);
 
-		
-	if(jpgExifitem.mCategoryList.size() > 0) {
-		
-		for (int j = 0; j < jpgExifitem.mCategoryList.size(); j++) {
-			String exif_category_in_jpg = jpgExifitem.mCategoryList.get(j);
-			
-			if(!mCategoryItemList_In_Jpg.contains(exif_category_in_jpg)) {
-				
-				mCategoryItemList_In_Jpg.add(exif_category_in_jpg);
 			}
-			
-		ArrayList<Jpg_Exif>	 matchJpgExifArr = mCategory_JpgExifList_Map.get(exif_category_in_jpg);
-		if(matchJpgExifArr == null) {
-			matchJpgExifArr = new 		ArrayList<Jpg_Exif>	 ();
-			matchJpgExifArr.add(jpgExifitem);
-			mCategory_JpgExifList_Map.put(exif_category_in_jpg, matchJpgExifArr);
-			
-		}else {
-			if(!matchJpgExifArr.contains(jpgExifitem)) {
-				matchJpgExifArr.add(jpgExifitem);
+
+			if (jpgExifList.size() == 0) {
+
+				System.out.println(" 当前目录 curDirFile=[" + curDirFile.getAbsolutePath() + "]  存在[" + jpgFileList.size()
+						+ "]个jpg " + " 但无法正常读取到 exif 信息  请检查后再次执行!! ");
+
+				return null;
 			}
-		}
-		
-		}
-	}
 
-	}
-	
-	for (int i = 0; i < mCategoryItemList_In_Jpg.size(); i++) {
-		String categoryItem = mCategoryItemList_In_Jpg.get(i);
-		String firstCharName = getFirstZiMu(categoryItem);
-	ArrayList<String> matchCategoryList = 	mOneWord_CategoryArr_Map.get(firstCharName);
-	if(matchCategoryList == null) {
-		matchCategoryList = new 	ArrayList<String> ();
-		matchCategoryList.add(categoryItem);
-		mOneWord_CategoryArr_Map.put(firstCharName, matchCategoryList);
-		
-	}else {
-		if(!matchCategoryList.contains(categoryItem)) {	
-			matchCategoryList.add(categoryItem);
-		}
+			for (int i = 0; i < jpgExifList.size(); i++) {
+				Jpg_Exif jpgExifitem = jpgExifList.get(i);
+				System.out.println("jpg_exif[" + i + "] = " + jpgExifitem.toString());
 
-	}
-		System.out.println("category["+(i+1)+"] == "+ firstCharName+"   "+ categoryItem);
-	}
-	
-	
-ArrayList<String> mMdContentList = 	BuildMDContent(English_CharList,mOneWord_CategoryArr_Map,mCategory_JpgExifList_Map);
-	
+				if (jpgExifitem.mCategoryList.size() > 0) {
+
+					for (int j = 0; j < jpgExifitem.mCategoryList.size(); j++) {
+						String exif_category_in_jpg = jpgExifitem.mCategoryList.get(j);
+
+						if (!mCategoryItemList_In_Jpg.contains(exif_category_in_jpg)) {
+
+							mCategoryItemList_In_Jpg.add(exif_category_in_jpg);
+						}
+
+						ArrayList<Jpg_Exif> matchJpgExifArr = mCategory_JpgExifList_Map.get(exif_category_in_jpg);
+						if (matchJpgExifArr == null) {
+							matchJpgExifArr = new ArrayList<Jpg_Exif>();
+							matchJpgExifArr.add(jpgExifitem);
+							mCategory_JpgExifList_Map.put(exif_category_in_jpg, matchJpgExifArr);
+
+						} else {
+							if (!matchJpgExifArr.contains(jpgExifitem)) {
+								matchJpgExifArr.add(jpgExifitem);
+							}
+						}
+
+					}
+				}
+
+			}
+
+			for (int i = 0; i < mCategoryItemList_In_Jpg.size(); i++) {
+				String categoryItem = mCategoryItemList_In_Jpg.get(i);
+				String firstCharName = getFirstZiMu(categoryItem);
+				ArrayList<String> matchCategoryList = mOneWord_CategoryArr_Map.get(firstCharName);
+				if (matchCategoryList == null) {
+					matchCategoryList = new ArrayList<String>();
+					matchCategoryList.add(categoryItem);
+					mOneWord_CategoryArr_Map.put(firstCharName, matchCategoryList);
+
+				} else {
+					if (!matchCategoryList.contains(categoryItem)) {
+						matchCategoryList.add(categoryItem);
+					}
+
+				}
+				System.out.println("category[" + (i + 1) + "] == " + firstCharName + "   " + categoryItem);
+			}
+
+			ArrayList<String> mMdContentList = BuildMDContent(English_CharList, mOneWord_CategoryArr_Map,
+					mCategory_JpgExifList_Map);
 
 // 对 MD文件 进行分隔处理
-ArrayList<String> segerate_MdContentList = new ArrayList<String> ();
+			ArrayList<String> segerate_MdContentList = new ArrayList<String>();
 
+			segerate_MdContentList.add("---");
+			if (is_gaokao) {
+				segerate_MdContentList.add("title: 高考数学学习");
+				segerate_MdContentList.add("category: 学习");
+				segerate_MdContentList.add("tags: Math");
+				segerate_MdContentList.add("keywords: 数学 高考");
+				segerate_MdContentList.add("typora-root-url: ..\\..\\");
+				segerate_MdContentList.add("typora-copy-images-to: ..\\..\\public\\zimage\\zschool_media\\gaokao_jpg");
 
+			} else {
+				segerate_MdContentList.add("title: 研究考试学习");
+				segerate_MdContentList.add("category: 学习");
+				segerate_MdContentList.add("tags: Math");
+				segerate_MdContentList.add("keywords: 数学 考研");
+				segerate_MdContentList.add("typora-root-url: ..\\..\\");
+				segerate_MdContentList.add("typora-copy-images-to: ..\\..\\public\\zimage\\zschool_media\\kaoyan_jpg");
 
-segerate_MdContentList.add("---");
-if(is_gaokao) {
-	segerate_MdContentList.add("title: 高考数学学习");
-	segerate_MdContentList.add("category: 学习");
-	segerate_MdContentList.add("tags: Math");
-	segerate_MdContentList.add("keywords: 数学 高考");
-	segerate_MdContentList.add("typora-root-url: ..\\..\\");
-	segerate_MdContentList.add("typora-copy-images-to: ..\\..\\public\\zimage\\zschool_media\\gaokao_jpg");
-
-}else {
-	segerate_MdContentList.add("title: 研究考试学习");
-	segerate_MdContentList.add("category: 学习");
-	segerate_MdContentList.add("tags: Math");
-	segerate_MdContentList.add("keywords: 数学 考研");
-	segerate_MdContentList.add("typora-root-url: ..\\..\\");
-	segerate_MdContentList.add("typora-copy-images-to: ..\\..\\public\\zimage\\zschool_media\\kaoyan_jpg");
-
-}
-segerate_MdContentList.add("---");
-segerate_MdContentList.add("\n");
-
-
-segerate_MdContentList.add("## 简介");
-segerate_MdContentList.add(" * TOC");
-segerate_MdContentList.add(" {:toc}");
-segerate_MdContentList.add("\n");
-
-
-
-
-
-for (int i = 0; i < mMdContentList.size(); i++) {
-	String contentLine = mMdContentList.get(i);
-	segerate_MdContentList.add("\n"+contentLine)	;
-
-}
-
-writeContentToFile(G2_Temp_Text_File, segerate_MdContentList);
-NotePadOpenTargetFile(G2_Temp_Text_File.getAbsolutePath());
-
-	
-
-
-	
-	
-	
-return super.applySubFileListRule4(curFileList, subFileTypeMap, curDirList, curRealFileList);
-}
-		
-ArrayList<String> BuildMDContent(ArrayList<String> mEnglishCharList , 
-		Map<String,ArrayList<String>>  xOneWord_CategoryArr_Map ,
-		Map<String,ArrayList<Jpg_Exif>>  mCategory_JpgExifList_Map ) {
-	
-	
-//	StringBuilder mMDContentSB = new StringBuilder();
-	
-	ArrayList<String> mMDContentStrList = new ArrayList<String>();
-	for (int i = 0; i < mEnglishCharList.size(); i++) {
-		String charWord = mEnglishCharList.get(i);
-		mMDContentStrList.add("## "+charWord);
-		
-	ArrayList<String> matchCategoryList =	xOneWord_CategoryArr_Map.get(charWord);
-	
-	if(matchCategoryList != null) {
-
-		matchCategoryList.sort(new Comparator<String>() {
-		@Override
-		public int compare(String o1, String o2) {
-			return o1.compareTo(o2);
-		}
-
-	});
-		
-		for (int j = 0; j < matchCategoryList.size(); j++) {
-			String categoryStrItem = matchCategoryList.get(j);
-			
-			mMDContentStrList.add("### "+(j+1)+"_"+ categoryStrItem);
-	
-			
-			ArrayList<Jpg_Exif>	 matchExifJpgArr =	mCategory_JpgExifList_Map.get(categoryStrItem);
-			
-			if(matchExifJpgArr != null) {
-				
-				for (int k = 0; k < matchExifJpgArr.size(); k++) {
-					Jpg_Exif  jpgExif = matchExifJpgArr.get(k);
-					
-			
-					
-					String imageurl = jpgExif.imageUrl;
-					String  videourl = jpgExif.videoUrl;
-					String videoName = jpgExif.videoName;
-					String knowledgeComment = jpgExif.mPhotoUserComment_KnowledgePoint;
-					String imageDescString = jpgExif.mImageDescription_SelfDesc;
-					String originBirthPlaceInfo =  jpgExif.mImageMake_OriginSrc == null ? "网络":jpgExif.mImageMake_OriginSrc;
-					
-				
-					//  <img src="/public/zimage/tool/graphviz/digraph16.jpg">
-					// /public/zimage/zschool/kaoyan/
-					mMDContentStrList.add("<img src=\""+imageurl+"\">");
-					
-					
-					mMDContentStrList.add("**涉及知识点:**  ");
-					mMDContentStrList.add("```\n"+knowledgeComment+"\n````");
-					
-					
-					mMDContentStrList.add("**个人解题想法思路:**  ");
-					mMDContentStrList.add("```\n"+imageDescString+"\n````");
-					
-					mMDContentStrList.add("**视频链接:**  "+"["+videoName+"]("+videourl+"){:target=\"_blank\"}");
-					mMDContentStrList.add("**视频链接文件MD值:**  ");
-					mMDContentStrList.add("```\n"+videoName+"\n````");
-					mMDContentStrList.add("**图片名称:**  ");
-					mMDContentStrList.add("```\n"+jpgExif.imageFile.getName()+"\n````");
-					
-					
-					mMDContentStrList.add("**题目源信息:**  ");
-					mMDContentStrList.add("```\n"+originBirthPlaceInfo +"\n````");
-					
-					
-					//  <video  controls="controls"> <source src="mp4/1.mp4" type="video/mp4" /> </video>
-					
-					/*   //  报错  Not allowed to load local resource: <URL>
-					 * if(is_gaokao) {
-					 * mMDContentStrList.add("\n<video  controls=\"controls\"> <source src=\""
-					 * +videourl+"\" type=\"video/mp4\" /> </video>\n");
-					 * 
-					 * 
-					 * }else {
-					 * mMDContentStrList.add("\n<video  controls=\"controls\"> <source src=\""
-					 * +videourl+"\" type=\"video/mp4\" /> </video>\n");
-					 * 
-					 * 
-					 * }
-					 */
-					
-					
-					
-					
-					
-					// [ifa](fafafafa)
-					
-					
-//					mMDContentStrList.add(jpgExif.toString());
-				}
-				
-				
 			}
-			
-			
+			segerate_MdContentList.add("---");
+			segerate_MdContentList.add("\n");
+
+			segerate_MdContentList.add("## 简介_项式量("+mCategory_JpgExif_Count_Rule_41+")");
+			segerate_MdContentList.add(" * TOC");
+			segerate_MdContentList.add(" {:toc}");
+			segerate_MdContentList.add("\n");
+
+			for (int i = 0; i < mMdContentList.size(); i++) {
+				String contentLine = mMdContentList.get(i);
+				segerate_MdContentList.add("\n" + contentLine);
+
+			}
+
+			writeContentToFile(G2_Temp_Text_File, segerate_MdContentList);
+			NotePadOpenTargetFile(G2_Temp_Text_File.getAbsolutePath());
+
+			return super.applySubFileListRule4(curFileList, subFileTypeMap, curDirList, curRealFileList);
 		}
-		
-		
-		
-		
-		
-	}
-	}
+
 	
-	
-	
-	System.out.println(" ============== 打印 MD 内容  Begin ============== ");
-	for (int i = 0; i < mMDContentStrList.size(); i++) {
-		String oneLine = mMDContentStrList.get(i);
-		System.out.println(oneLine);
-	}
-	
-	return mMDContentStrList;
-}
+		
+		ArrayList<String> BuildMDContent(ArrayList<String> mEnglishCharList,
+				Map<String, ArrayList<String>> xOneWord_CategoryArr_Map,
+				Map<String, ArrayList<Jpg_Exif>> mCategory_JpgExifList_Map) {
+
+//	StringBuilder mMDContentSB = new StringBuilder();
+
+			ArrayList<String> mMDContentStrList = new ArrayList<String>();
+			for (int i = 0; i < mEnglishCharList.size(); i++) {
+				String charWord = mEnglishCharList.get(i);
+				mMDContentStrList.add("## " + charWord);
+
+				ArrayList<String> matchCategoryList = xOneWord_CategoryArr_Map.get(charWord);
+
+				if (matchCategoryList != null) {
+
+					matchCategoryList.sort(new Comparator<String>() {
+						@Override
+						public int compare(String o1, String o2) {
+							return o1.compareTo(o2);
+						}
+
+					});
+
+					for (int j = 0; j < matchCategoryList.size(); j++) {
+						String categoryStrItem = matchCategoryList.get(j);
+
+						mMDContentStrList.add("### " + (j + 1) + "_" + categoryStrItem);
+						mCategory_JpgExif_Count_Rule_41++;
+						ArrayList<Jpg_Exif> matchExifJpgArr = mCategory_JpgExifList_Map.get(categoryStrItem);
+
+						if (matchExifJpgArr != null) {
+
+							for (int k = 0; k < matchExifJpgArr.size(); k++) {
+								Jpg_Exif jpgExif = matchExifJpgArr.get(k);
+							
+								String httpUrl = jpgExif.mImageModel_HttpUrl;
+								String imageurl = jpgExif.imageUrl;
+								String videourl = jpgExif.videoUrl;
+								String videoName = jpgExif.videoName;
+								String knowledgeComment = jpgExif.mPhotoUserComment_KnowledgePoint;
+								String imageDescString = jpgExif.mImageDescription_SelfDesc;
+								String originBirthPlaceInfo = jpgExif.mImageMake_OriginSrc == null ? "网络"
+										: jpgExif.mImageMake_OriginSrc;
+
+								// <img src="/public/zimage/tool/graphviz/digraph16.jpg">
+								// /public/zimage/zschool/kaoyan/
+								mMDContentStrList.add("<img src=\"" + imageurl + "\">");
+
+								mMDContentStrList.add("**涉及知识点:**  ");
+								mMDContentStrList.add("```\n" + knowledgeComment + "\n````");
+
+								mMDContentStrList.add("**个人解题想法思路:**  ");
+								mMDContentStrList.add("```\n" + imageDescString + "\n````");
+
+								mMDContentStrList.add(
+										"**视频网络链接:**  " + "[" + httpUrl + "](" + httpUrl + "){:target=\"_blank\"}");
+
+								mMDContentStrList.add(
+										"**视频本地链接:**  " + "[" + videoName + "](" + videourl + "){:target=\"_blank\"}");
+
+								mMDContentStrList.add("**视频链接文件MD值:**  ");
+								mMDContentStrList.add("```\n" + videoName + "\n````");
+								mMDContentStrList.add("**图片名称:**  ");
+								mMDContentStrList.add("```\n" + jpgExif.imageFile.getName() + "\n````");
+
+								mMDContentStrList.add("**题目源信息:**  ");
+								mMDContentStrList.add("```\n" + originBirthPlaceInfo + "\n````");
+
+						
+								
+								// <video controls="controls"> <source src="mp4/1.mp4" type="video/mp4" />
+								// </video>
+
+								/*
+								 * // 报错 Not allowed to load local resource: <URL> if(is_gaokao) {
+								 * mMDContentStrList.add("\n<video  controls=\"controls\"> <source src=\""
+								 * +videourl+"\" type=\"video/mp4\" /> </video>\n");
+								 * 
+								 * 
+								 * }else {
+								 * mMDContentStrList.add("\n<video  controls=\"controls\"> <source src=\""
+								 * +videourl+"\" type=\"video/mp4\" /> </video>\n");
+								 * 
+								 * 
+								 * }
+								 */
+
+								// [ifa](fafafafa)
+
+//					mMDContentStrList.add(jpgExif.toString());
+							}
+
+						}
+
+					}
+
+				}
+			}
+
+			System.out.println(" ============== 打印 MD 内容  Begin ============== ");
+			for (int i = 0; i < mMDContentStrList.size(); i++) {
+				String oneLine = mMDContentStrList.get(i);
+				System.out.println(oneLine);
+			}
+
+			return mMDContentStrList;
+		}
+
 		@Override
 		boolean allowEmptyDirFileList() {
 			// TODO Auto-generated method stub
@@ -1020,268 +1254,248 @@ ArrayList<String> BuildMDContent(ArrayList<String> mEnglishCharList ,
 		@Override
 		String simpleDesc() {
 
-			return "\n"+Cur_Bat_Name + " #_" + rule_index+ "  ###  默认生成 考研类型的.md 读取当前文件夹下的jpg文件的exif信息 artist  Desc  Make  Mode  Copyright UserComment 并以此生成 .md文件  " +
-		           "\n"+Cur_Bat_Name + " #_" + rule_index+ " kaoyan_true  ###  生成考研类型的md  读取当前文件夹下的jpg文件的exif信息 artist  Desc  Make  Mode  Copyright UserComment 并以此生成 .md文件 \n" +
-	           "\n"+Cur_Bat_Name + " #_" + rule_index+ " gaokao_true   ###  生成高考类型的md  读取当前文件夹下的jpg文件的exif信息 artist  Desc  Make  Mode  Copyright UserComment 并以此生成 .md文件 \n";
+			return "\n" + Cur_Bat_Name + " #_" + rule_index
+					+ "  ###  默认生成 考研类型的.md 读取当前文件夹下的jpg文件的exif信息 artist  Desc  Make  Mode  Copyright UserComment 并以此生成 .md文件  "
+					+ "\n" + Cur_Bat_Name + " #_" + rule_index
+					+ " kaoyan_true  ###  生成考研类型的md  读取当前文件夹下的jpg文件的exif信息 artist  Desc  Make  Mode  Copyright UserComment 并以此生成 .md文件 \n"
+					+ "\n" + Cur_Bat_Name + " #_" + rule_index
+					+ " gaokao_true   ###  生成高考类型的md  读取当前文件夹下的jpg文件的exif信息 artist  Desc  Make  Mode  Copyright UserComment 并以此生成 .md文件 \n";
 
 		}
 
-		
-		
 	}
-	
-	
 
 	class Monitor_Browser_ForWindows_Rule_40 extends Basic_Rule {
 //		 1-----详细 下载路径        2----详细下载路径      3-----详细下载路径
-	     Map<String,Integer> mDisplayUrl_Index_Map; 
+		Map<String, Integer> mDisplayUrl_Index_Map;
 
-	     File ImageDownloadDir;
-	     //  详细下载路径-----路径中要下载的内容 
-		HashMap<String,ArrayList<String>> mDisplayUrl_ImageUrlList_Map;
-	
-		// 所有的下载路径   用于避免重复下载 
-		ArrayList<String> allDownloadedUrlList ;
-		
-		ChromeDriver  mChromeDriver;
-		
-		
-		//------------- 输入类型A -------------
-		String mainurl_InputValue;   //  查询的主页面
-		ArrayList<String> mCategoryNameList_InputValue;  // 查询的分类名称
-		
-		//------------- 输入类型B -------------
-		int mPageSize_InputValue;   // 查询页数
-		String beginurl_InputValue;   // 查询页数
-		ArrayList<String>  keynameList_InputValue;  // category页面关键词
-		
-		
+		File ImageDownloadDir;
+		// 详细下载路径-----路径中要下载的内容
+		HashMap<String, ArrayList<String>> mDisplayUrl_ImageUrlList_Map;
+
+		// 所有的下载路径 用于避免重复下载
+		ArrayList<String> allDownloadedUrlList;
+
+		ChromeDriver mChromeDriver;
+
+		// ------------- 输入类型A -------------
+		String mainurl_InputValue; // 查询的主页面
+		ArrayList<String> mCategoryNameList_InputValue; // 查询的分类名称
+
+		// ------------- 输入类型B -------------
+		int mPageSize_InputValue; // 查询页数
+		String beginurl_InputValue; // 查询页数
+		ArrayList<String> keynameList_InputValue; // category页面关键词
+
 		@Override
 		boolean allowEmptyDirFileList() {
 			// TODO Auto-generated method stub
 			return true;
 		}
-		
+
 		Monitor_Browser_ForWindows_Rule_40() {
 			super("#", 40, 3); // 不包括
-			allDownloadedUrlList = new ArrayList<String> ();
-			mDisplayUrl_ImageUrlList_Map = new 	HashMap<String,ArrayList<String>> (5000);
+			allDownloadedUrlList = new ArrayList<String>();
+			mDisplayUrl_ImageUrlList_Map = new HashMap<String, ArrayList<String>>(5000);
 			mDisplayUrl_Index_Map = Maps.newLinkedHashMap();
-			mCategoryNameList_InputValue = new  ArrayList<String> ();
-			keynameList_InputValue = new  ArrayList<String> ();
+			mCategoryNameList_InputValue = new ArrayList<String>();
+			keynameList_InputValue = new ArrayList<String>();
 			mPageSize_InputValue = 10; // 默认是10 页
 		}
-		
-		
+
 		// mainurl_https://www.52pojie.cn
 		// categoryname_还洗论坛AAAB_CategoryABB
-		
+
 		// pagesize_100
 		// beginurl_https://www.52pojie.cn/forum-2-1.html
 		// keyname_你好我好_大家好_都不好
 
 		@Override
-			boolean initParamsWithInputList(ArrayList<String> inputParamList) {
-				// TODO Auto-generated method stub
-			ImageDownloadDir = new File(curDirPath+File.separator+"Rule"+rule_index+"_Download_"+getTimeStamp());
-			
+		boolean initParamsWithInputList(ArrayList<String> inputParamList) {
+			// TODO Auto-generated method stub
+			ImageDownloadDir = new File(
+					curDirPath + File.separator + "Rule" + rule_index + "_Download_" + getTimeStamp());
+
 			ImageDownloadDir.mkdirs();
 			ImageDownloadDir.mkdirs();
-			
+
 			for (int i = 0; i < inputParamList.size(); i++) {
 				String inputStrItem = inputParamList.get(i);
-				if(inputStrItem.startsWith("mainurl_")) {
+				if (inputStrItem.startsWith("mainurl_")) {
 					String mainUrl = inputStrItem.replace("mainurl_", "").trim();
 					mainurl_InputValue = mainUrl;
-					
-				} else if(inputStrItem.startsWith("categoryname_")) {
-					
+
+				} else if (inputStrItem.startsWith("categoryname_")) {
+
 					String categoryListStr = inputStrItem.replace("categoryname_", "").trim();
-					
+
 					String[] categoryNameArr = categoryListStr.split("_");
-					if(categoryNameArr == null) {
+					if (categoryNameArr == null) {
 						continue;
-						
+
 					}
 					for (int j = 0; j < categoryNameArr.length; j++) {
 						mCategoryNameList_InputValue.add(categoryNameArr[j].trim());
 					}
-				} else if(inputStrItem.startsWith("beginurl_")) {
+				} else if (inputStrItem.startsWith("beginurl_")) {
 					String beginurl = inputStrItem.replace("beginurl_", "").trim();
 					beginurl_InputValue = beginurl;
-					
-				} else if(inputStrItem.startsWith("pagesize_")) {
+
+				} else if (inputStrItem.startsWith("pagesize_")) {
 					String pagesizeStr = inputStrItem.replace("pagesize_", "").trim();
-					if(isNumeric(pagesizeStr)) {
+					if (isNumeric(pagesizeStr)) {
 						mPageSize_InputValue = Integer.parseInt(pagesizeStr);
 					}
-				
-					
-				}else if(inputStrItem.startsWith("keyname_")) {
-					
+
+				} else if (inputStrItem.startsWith("keyname_")) {
+
 					String keynameListStr = inputStrItem.replace("keyname_", "").trim();
-					
+
 					String[] keyNameArr = keynameListStr.split("_");
-					if(keyNameArr == null) {
+					if (keyNameArr == null) {
 						continue;
-						
+
 					}
 					for (int j = 0; j < keyNameArr.length; j++) {
 						keynameList_InputValue.add(keyNameArr[j].trim());
 					}
 				}
-				
-				
+
 			}
 			System.out.println("输入参数详情如下:\n");
 			System.out.println("输入类型A:");
-			System.out.println("mainurl_InputValue=["+mainurl_InputValue+"]");
-			if(mCategoryNameList_InputValue.size()  > 0) {
+			System.out.println("mainurl_InputValue=[" + mainurl_InputValue + "]");
+			if (mCategoryNameList_InputValue.size() > 0) {
 				for (int i = 0; i < mCategoryNameList_InputValue.size(); i++) {
-					System.out.println("mCategoryNameList_InputValue["+i+"] = "+ mCategoryNameList_InputValue.get(i));
+					System.out.println(
+							"mCategoryNameList_InputValue[" + i + "] = " + mCategoryNameList_InputValue.get(i));
 				}
-			}else {
+			} else {
 				System.out.println("mCategoryNameList_InputValue=[ null ]");
 			}
-			if(keynameList_InputValue.size()  > 0) {
+			if (keynameList_InputValue.size() > 0) {
 				for (int i = 0; i < keynameList_InputValue.size(); i++) {
-					System.out.println("keynameList_InputValue["+i+"] = "+ keynameList_InputValue.get(i));
+					System.out.println("keynameList_InputValue[" + i + "] = " + keynameList_InputValue.get(i));
 				}
-			}else {
+			} else {
 				System.out.println("keynameList_InputValue=[ null ]");
 			}
-			
-			System.out.println("pagesize=["+mPageSize_InputValue+"]");
-			
-			
+
+			System.out.println("pagesize=[" + mPageSize_InputValue + "]");
 
 			System.out.println("输入类型B:");
 
-			
-			System.out.println("pagesize=["+mPageSize_InputValue+"]");
-			System.out.println("beginurl=["+beginurl_InputValue+"]");
-			
-			if(keynameList_InputValue.size()  > 0) {
+			System.out.println("pagesize=[" + mPageSize_InputValue + "]");
+			System.out.println("beginurl=[" + beginurl_InputValue + "]");
+
+			if (keynameList_InputValue.size() > 0) {
 				for (int i = 0; i < keynameList_InputValue.size(); i++) {
-					System.out.println("keynameList_InputValue["+i+"] = "+ keynameList_InputValue.get(i));
+					System.out.println("keynameList_InputValue[" + i + "] = " + keynameList_InputValue.get(i));
 				}
-			}else {
+			} else {
 				System.out.println("keynameList_InputValue=[ null ]");
 			}
-			
-			if(mainurl_InputValue == null && keynameList_InputValue.size() == 0 &&  beginurl_InputValue == null ) {
-				
+
+			if (mainurl_InputValue == null && keynameList_InputValue.size() == 0 && beginurl_InputValue == null) {
+
 				System.out.println("当前输入的 mainurl  beginurl keynameList_InputValue 为 空! 请检查输入参数!!");
 				return false;
-				
+
 			}
-			
-			
-			
-			if(!ImageDownloadDir.exists()) {
-				System.out.println("当前下载文件的保存目录 不存在 程序无法执行下去:  ImageDownloadDir = "+ ImageDownloadDir.getAbsolutePath());
+
+			if (!ImageDownloadDir.exists()) {
+				System.out
+						.println("当前下载文件的保存目录 不存在 程序无法执行下去:  ImageDownloadDir = " + ImageDownloadDir.getAbsolutePath());
 				return false;
 			}
-			
+
 			File ChromeDriverFile = new File(zbinPath + File.separator + "G2_chromedriver_v91.exe");
-			
+
 			System.setProperty("webdriver.chrome.driver", ChromeDriverFile.getAbsolutePath());
 
 			ChromeOptions CUR_CHROME_OPTIONS = new ChromeOptions();
 			// 驱动位置
-			CUR_CHROME_OPTIONS.addArguments("--start-fullscreen"); 
-			
-			
+			CUR_CHROME_OPTIONS.addArguments("--start-fullscreen");
+
 			CUR_CHROME_OPTIONS.setExperimentalOption("excludeSwitches", Collections.singletonList("enable-automation"));
 
-			
 			mChromeDriver = new ChromeDriver(CUR_CHROME_OPTIONS);
-			
-			
-				return super.initParamsWithInputList(inputParamList);
-			}
-		
+
+			return super.initParamsWithInputList(inputParamList);
+		}
+
 		@Override
 		String simpleDesc() {
 
-			return "\n"+Cur_Bat_Name + " #_" + rule_index+ "  mainurl_https://www.52pojie.cn/  categoryname_『原创发布区』 keyname_小工具  pagesize_5  ### 对网站进行抓取资源到本地  " +
-		           "\n"+Cur_Bat_Name + " #_" + rule_index+ "  beginurl_https://www.douban.com/group/explore/culture    keyname_水  pagesize_3  ### 对网站进行抓取资源到本地   \n";
+			return "\n" + Cur_Bat_Name + " #_" + rule_index
+					+ "  mainurl_https://www.52pojie.cn/  categoryname_『原创发布区』 keyname_小工具  pagesize_5  ### 对网站进行抓取资源到本地  "
+					+ "\n" + Cur_Bat_Name + " #_" + rule_index
+					+ "  beginurl_https://www.douban.com/group/explore/culture    keyname_水  pagesize_3  ### 对网站进行抓取资源到本地   \n";
 
 		}
 
-		
 		void TestOperationBrowser() {
-			
-			ArrayList<RootUrl_A> mSearchWebList = new ArrayList<RootUrl_A> ();
-			RootUrl_A    pojie_52_A = new RootUrl_A(mainurl_InputValue);
 
-			if(mCategoryNameList_InputValue.size() != 0 ) {
+			ArrayList<RootUrl_A> mSearchWebList = new ArrayList<RootUrl_A>();
+			RootUrl_A pojie_52_A = new RootUrl_A(mainurl_InputValue);
+
+			if (mCategoryNameList_InputValue.size() != 0) {
 				for (int i = 0; i < mCategoryNameList_InputValue.size(); i++) {
 					String catetegoryName = mCategoryNameList_InputValue.get(i);
-					if("".equals(catetegoryName)) {
+					if ("".equals(catetegoryName)) {
 						continue;
 					}
 					CategoryUrl_B category_B = new CategoryUrl_B(catetegoryName);
 					pojie_52_A.addCategory(category_B);
 					category_B.searchPageSize = mPageSize_InputValue;
-					category_B.beginCategoryUrl=beginurl_InputValue;
-					
+					category_B.beginCategoryUrl = beginurl_InputValue;
+
 					for (int j = 0; j < keynameList_InputValue.size(); j++) {
 						String keyname = keynameList_InputValue.get(j);
-						if("".equals(keyname)) {
+						if ("".equals(keyname)) {
 							continue;
 						}
-						
+
 						category_B.addKeyWord(keyname);
 					}
 				}
-				
-			}else {   // 没有输入 mCategoryNameList_InputValue  
-				if(mainurl_InputValue == null) {
-					pojie_52_A.mRootUrl=beginurl_InputValue;
+
+			} else { // 没有输入 mCategoryNameList_InputValue
+				if (mainurl_InputValue == null) {
+					pojie_52_A.mRootUrl = beginurl_InputValue;
 				}
-				
-				CategoryUrl_B category_B = new CategoryUrl_B(beginurl_InputValue,mPageSize_InputValue);		
+
+				CategoryUrl_B category_B = new CategoryUrl_B(beginurl_InputValue, mPageSize_InputValue);
 				pojie_52_A.addCategory(category_B);
 				for (int j = 0; j < keynameList_InputValue.size(); j++) {
 					String keyname = keynameList_InputValue.get(j);
-					if("".equals(keyname)) {
+					if ("".equals(keyname)) {
 						continue;
 					}
-					
+
 					category_B.addKeyWord(keyname);
 				}
-		
+
 			}
-	
-			
-		
-			
-			System.out.println("pojie_52_A.mCategoryUrlList.size() = "+pojie_52_A.mCategoryUrlList.size());
-	
+
+			System.out.println("pojie_52_A.mCategoryUrlList.size() = " + pojie_52_A.mCategoryUrlList.size());
+
 			mSearchWebList.add(pojie_52_A);
-			
-			
-			
-			
+
 			for (int i = 0; i < mSearchWebList.size(); i++) {
-				RootUrl_A  rootItem = mSearchWebList.get(i);
+				RootUrl_A rootItem = mSearchWebList.get(i);
 				BrowserOperation_WithRootUrl(rootItem);
 			}
-			
 
-			
 //	System.out.println("mainPageHtmlStr = \n"+ mainPageHtmlStr);
-			
-			
+
 		}
-		
-		
+
 		@SuppressWarnings("unchecked")
 		void ShowDisplayUrl() {
-	
-			ArrayList<String> urlLog = new ArrayList<String> ();
-			
+
+			ArrayList<String> urlLog = new ArrayList<String>();
+
 			Map.Entry<String, Integer> entry;
 
 			if (mDisplayUrl_Index_Map != null) {
@@ -1292,15 +1506,15 @@ ArrayList<String> BuildMDContent(ArrayList<String> mEnglishCharList ,
 					// 获取 名称的 首字母
 					String url = entry.getKey(); // Map的Value // 作者名称
 					Integer index = entry.getValue();
-					urlLog.add("index["+index+"]  url=[ "+url+" ]");
+					urlLog.add("index[" + index + "]  url=[ " + url + " ]");
 				}
-				}
-			
-			if(urlLog.size() > 0) {
-				
-				String txtLogFileAbsPath = ImageDownloadDir.getAbsolutePath()+File.separator+ "0_url.txt";
+			}
+
+			if (urlLog.size() > 0) {
+
+				String txtLogFileAbsPath = ImageDownloadDir.getAbsolutePath() + File.separator + "0_url.txt";
 				File txtLogFile = new File(txtLogFileAbsPath);
-				
+
 				System.out.println("____________ DisplayUrlList Begin ____________ ");
 				for (int i = 0; i < urlLog.size(); i++) {
 					String oneLine = urlLog.get(i);
@@ -1308,599 +1522,543 @@ ArrayList<String> BuildMDContent(ArrayList<String> mEnglishCharList ,
 				}
 				System.out.println("____________ DisplayUrlList End ____________ ");
 				urlLog.sort(mStringComparion);
-		
+
 				writeContentToFile(txtLogFile, urlLog);
-				System.out.println("写入Log信息到文件:  txtLogFile="+txtLogFile.getAbsolutePath());
-			}else {
+				System.out.println("写入Log信息到文件:  txtLogFile=" + txtLogFile.getAbsolutePath());
+			} else {
 				System.out.println("当前没有打开过 DisplayUrl ");
 			}
 
-			
-
-			
-		
 		}
-		void BrowserOperation_WithRootUrl(RootUrl_A  rootUrl) {
 
-			
+		void BrowserOperation_WithRootUrl(RootUrl_A rootUrl) {
+
 			String mMainUrl = rootUrl.mRootUrl;
 			String mainPageHtmlStr = null;
 			File ChromeDriverFile = new File(zbinPath + File.separator + "G2_chromedriver_v91.exe");
-			
-			
+
 			System.setProperty("webdriver.chrome.driver", ChromeDriverFile.getAbsolutePath());
-			
-			
+
 //			ChromeOptions CUR_CHROME_OPTIONS = new ChromeOptions();
 //			// 驱动位置
 //			CUR_CHROME_OPTIONS.addArguments("--start-fullscreen"); 
 //			CUR_CHROME_OPTIONS.setExperimentalOption("excludeSwitches", Collections.singletonList("enable-automation"));
 
 //			ChromeDriver driver = new ChromeDriver(CUR_CHROME_OPTIONS);
-			
+
 			ChromeDriver driver = mChromeDriver;
 			int loop_index = 0;
 			try {
-			     long waitTime = 2000;
-				 long timeout = 15_000;
-					
-				driver.get(mMainUrl);
-				 String title = driver.getTitle();
-			     System.out.printf("loop_index["+loop_index+"] = "+ title);
+				long waitTime = 2000;
+				long timeout = 15_000;
 
-			     System.out.printf("A now accesss %s \n", driver.getCurrentUrl());
-			        
-			     
+				driver.get(mMainUrl);
+				String title = driver.getTitle();
+				System.out.printf("loop_index[" + loop_index + "] = " + title);
+
+				System.out.printf("A now accesss %s \n", driver.getCurrentUrl());
+
 //				 long waitTime = Double.valueOf(Math.max(3, Math.random() * 5) * 1000).longValue();
-			     TimeUnit.MILLISECONDS.sleep(waitTime);
-	
+				TimeUnit.MILLISECONDS.sleep(waitTime);
+
 				// 循环下拉，直到全部加载完成或者超时
 				do {
 					new Actions(driver).sendKeys(Keys.END).perform();
 					TimeUnit.MILLISECONDS.sleep(waitTime);
-			
+
 					timeout -= waitTime;
 					loop_index++;
 				} while (!driver.getPageSource().contains("已经到底部，没有新的内容啦") && timeout > 0);
 				System.out.println("BrowserOperation_WithRootUrl 已经到底部，没有新的内容啦");
-				rootUrl.mHtmlStr =  driver.getPageSource();
-			}  catch (Exception e) {
+				rootUrl.mHtmlStr = driver.getPageSource();
+			} catch (Exception e) {
 				// TODO: handle exception
-				System.out.println("获取网页源码的时候出错  mMainUrl = " + mMainUrl );
+				System.out.println("获取网页源码的时候出错  mMainUrl = " + mMainUrl);
 				e.printStackTrace();
-		
+
 			}
-			
+
 			int next_index = 1;
-			
-			if(rootUrl.mHtmlStr != null) {
-				System.out.println("rootUrl.mCategoryUrlList.size() = "+ rootUrl.mCategoryUrlList.size());
-		
+
+			if (rootUrl.mHtmlStr != null) {
+				System.out.println("rootUrl.mCategoryUrlList.size() = " + rootUrl.mCategoryUrlList.size());
+
 				for (int i = 0; i < rootUrl.mCategoryUrlList.size(); i++) {
-					CategoryUrl_B categoryValueB =  rootUrl.mCategoryUrlList.get(i);
+					CategoryUrl_B categoryValueB = rootUrl.mCategoryUrlList.get(i);
 //					String keyName =  categoryValueB.mCategoryKeyName;
-					ArrayList<String> keyNameList = categoryValueB.mKeyWordList; 
-				
-					String mCategoryKeyName  = 	rootUrl.mCategoryUrlList.get(i).mCategoryKeyName;
+					ArrayList<String> keyNameList = categoryValueB.mKeyWordList;
+
+					String mCategoryKeyName = rootUrl.mCategoryUrlList.get(i).mCategoryKeyName;
 					String begin_categury_url = null;
- 	
-						
-						// <a href="forum-2-1.html" style="color: #F30012;">『原创发布区』</a>
-						//  从 mHtmlStr  代码的 所有的 <a> 标签的 text 中找到 包含 keyName 的 那个 a 连接的 href属性
-					if(mCategoryKeyName != null && !"".equals(mCategoryKeyName)) {
-						begin_categury_url =calcul_categoryurl_from_html_RoouUrlA(rootUrl,mCategoryKeyName);
-						System.out.println("getCategotyUrl   begin_categury_url="+ begin_categury_url +"   mCategoryKeyName="+mCategoryKeyName);
-					}else {
+
+					// <a href="forum-2-1.html" style="color: #F30012;">『原创发布区』</a>
+					// 从 mHtmlStr 代码的 所有的 <a> 标签的 text 中找到 包含 keyName 的 那个 a 连接的 href属性
+					if (mCategoryKeyName != null && !"".equals(mCategoryKeyName)) {
+						begin_categury_url = calcul_categoryurl_from_html_RoouUrlA(rootUrl, mCategoryKeyName);
+						System.out.println("getCategotyUrl   begin_categury_url=" + begin_categury_url
+								+ "   mCategoryKeyName=" + mCategoryKeyName);
+					} else {
 						begin_categury_url = rootUrl.getCategoryList().get(i).beginCategoryUrl;
-						System.out.println("DefineCategotyUrl  begin_categury_url = "+ begin_categury_url +"  mCategoryKeyName="+mCategoryKeyName);
+						System.out.println("DefineCategotyUrl  begin_categury_url = " + begin_categury_url
+								+ "  mCategoryKeyName=" + mCategoryKeyName);
 					}
 
-						String a_href = begin_categury_url;
-						
-						System.out.println("keyName["+mCategoryKeyName+"]  a_href["+a_href+"]");
-						
-						if(a_href != null) {
-//							categoryValueB.mCategoryUrl = a_href;
-							// a_href 分类的主页面的 url 
-							categoryValueB.beginCategoryUrl = a_href;   // 搜索到的 url 作为 默认的 起始 url
-							
-							if(!categoryValueB.mCategoryPageUrlList.contains(a_href)) {
-								
-								categoryValueB.mCategoryPageUrlList.add(a_href);
-								BrowserOperation_WithCategoryUrl(rootUrl , categoryValueB , a_href);
-							
-							}
-			        	}
-						
-						while(categoryValueB.nextPageUrl != null 
-								&& 
-								categoryValueB.nextPageUrl.equals(categoryValueB.mCategoryPageUrlList.get(categoryValueB.mCategoryPageUrlList.size()-1)) 
-								&&
-								categoryValueB.mCategoryPageUrlList.size() <= categoryValueB.searchPageSize) {
-							System.out.println("nextPageUrl["+categoryValueB.nextPageUrl+"]  next_index["+next_index+"]   categoryValueB.mCategoryPageUrlList.size()["+categoryValueB.mCategoryPageUrlList.size()+"]"  );
-							BrowserOperation_WithCategoryUrl(rootUrl , categoryValueB , categoryValueB.nextPageUrl );
-							next_index++;
-						}
-						
-						
-				
+					String a_href = begin_categury_url;
 
-					
+					System.out.println("keyName[" + mCategoryKeyName + "]  a_href[" + a_href + "]");
+
+					if (a_href != null) {
+//							categoryValueB.mCategoryUrl = a_href;
+						// a_href 分类的主页面的 url
+						categoryValueB.beginCategoryUrl = a_href; // 搜索到的 url 作为 默认的 起始 url
+
+						if (!categoryValueB.mCategoryPageUrlList.contains(a_href)) {
+
+							categoryValueB.mCategoryPageUrlList.add(a_href);
+							BrowserOperation_WithCategoryUrl(rootUrl, categoryValueB, a_href);
+
+						}
+					}
+
+					while (categoryValueB.nextPageUrl != null
+							&& categoryValueB.nextPageUrl.equals(categoryValueB.mCategoryPageUrlList
+									.get(categoryValueB.mCategoryPageUrlList.size() - 1))
+							&& categoryValueB.mCategoryPageUrlList.size() <= categoryValueB.searchPageSize) {
+						System.out.println("nextPageUrl[" + categoryValueB.nextPageUrl + "]  next_index[" + next_index
+								+ "]   categoryValueB.mCategoryPageUrlList.size()["
+								+ categoryValueB.mCategoryPageUrlList.size() + "]");
+						BrowserOperation_WithCategoryUrl(rootUrl, categoryValueB, categoryValueB.nextPageUrl);
+						next_index++;
+					}
+
 				}
-				
-				
-			}else {
+
+			} else {
 				System.out.println("rootUrl.mHtmlStr  ==== null ");
 			}
 
 		}
-		
-		
+
 		@Override
 		ArrayList<File> applyFileListRule3(ArrayList<File> subFileList, HashMap<String, ArrayList<File>> fileTypeMap) {
-		// TODO Auto-generated method stub
-			
-			
-			
+			// TODO Auto-generated method stub
+
 			TestOperationBrowser();
 			ShowDisplayUrl();
-			
-		
-			if(mChromeDriver != null) {
+
+			if (mChromeDriver != null) {
 				mChromeDriver.close();
 			}
-			System.out.println("════════════════════ Rule_"+rule_index+"  Game Over!! ════════════════════");
-			
-			
-		return super.applyFileListRule3(subFileList, fileTypeMap);
+			System.out.println("════════════════════ Rule_" + rule_index + "  Game Over!! ════════════════════");
+
+			return super.applyFileListRule3(subFileList, fileTypeMap);
 		}
-		
-		
-		class RootUrl_A{
-			String mRootUrl;  // 主目录地址
-			String mHtmlStr;   // 主目录的页面代码
-			ArrayList<CategoryUrl_B> mCategoryUrlList;  // 分类目录
-			
-			RootUrl_A(String rootUrl){
+
+		class RootUrl_A {
+			String mRootUrl; // 主目录地址
+			String mHtmlStr; // 主目录的页面代码
+			ArrayList<CategoryUrl_B> mCategoryUrlList; // 分类目录
+
+			RootUrl_A(String rootUrl) {
 				mRootUrl = rootUrl;
-				mCategoryUrlList = new ArrayList<CategoryUrl_B> ();
-				
+				mCategoryUrlList = new ArrayList<CategoryUrl_B>();
+
 			}
 
-			
-			ArrayList<CategoryUrl_B> getCategoryList(){
-					return mCategoryUrlList;
-					}
-			   
-		
-		   void addCategory(CategoryUrl_B categort){
-			mCategoryUrlList.add(categort);
+			ArrayList<CategoryUrl_B> getCategoryList() {
+				return mCategoryUrlList;
 			}
-		
-		   
+
+			void addCategory(CategoryUrl_B categort) {
+				mCategoryUrlList.add(categort);
+			}
+
 		}
-		
-		class CategoryUrl_B{
-			String mCategoryKeyName; // 分类url的名称 
-			boolean isPageUrlInit;    //  PageUrl 是否已经完成 搜索 页面 对应的 url 
-			ArrayList<String> mCategoryPageUrlList;   //  category源码的url的路径的集合 
-			String nextPageUrl ;   // 下一页的地址 
-			int searchPageSize;  // 需要搜索的页面的数量
-			String beginCategoryUrl ;   // 起始的搜索页面
-			
-			
+
+		class CategoryUrl_B {
+			String mCategoryKeyName; // 分类url的名称
+			boolean isPageUrlInit; // PageUrl 是否已经完成 搜索 页面 对应的 url
+			ArrayList<String> mCategoryPageUrlList; // category源码的url的路径的集合
+			String nextPageUrl; // 下一页的地址
+			int searchPageSize; // 需要搜索的页面的数量
+			String beginCategoryUrl; // 起始的搜索页面
+
 //			String mCategoryUrl_FirstPage; // 分类url的地址  分类首页地址
 //			ArrayList<DisplayUrl_C> mDisplayUrlList_FirstPage;  // 展示的详细的地址 
 //			String mHtmlStr_FirstPage;
-			
-			
-			ArrayList<String> mKeyWordList ;   // 要搜索的 关键词 列表
-			
-	
-			Map<String,ArrayList<DisplayUrl_C>> mPageUrl_DisplayUrlList_Map ;  // 页面url--该页详情的url列表对应的map
-			Map<String,String> mPageUrl_HtmlStr_Map;  // 对应category 第一页的源码 第二页的源码 第三页的源码.....
-			
 
-			CategoryUrl_B(String beginUrl ,  int pageSize){
+			ArrayList<String> mKeyWordList; // 要搜索的 关键词 列表
+
+			Map<String, ArrayList<DisplayUrl_C>> mPageUrl_DisplayUrlList_Map; // 页面url--该页详情的url列表对应的map
+			Map<String, String> mPageUrl_HtmlStr_Map; // 对应category 第一页的源码 第二页的源码 第三页的源码.....
+
+			CategoryUrl_B(String beginUrl, int pageSize) {
 				mCategoryKeyName = "";
 				mPageUrl_DisplayUrlList_Map = Maps.newConcurrentMap();
 				mPageUrl_HtmlStr_Map = Maps.newConcurrentMap();
-				mCategoryPageUrlList = new 	ArrayList<String>();
-				mKeyWordList = new ArrayList<String> ();
+				mCategoryPageUrlList = new ArrayList<String>();
+				mKeyWordList = new ArrayList<String>();
 				searchPageSize = pageSize;
 				beginCategoryUrl = beginUrl;
-				
+
 			}
-			
-			
-			
-			CategoryUrl_B(String keyName){
+
+			CategoryUrl_B(String keyName) {
 				mCategoryKeyName = keyName;
 				mPageUrl_DisplayUrlList_Map = Maps.newConcurrentMap();
 				mPageUrl_HtmlStr_Map = Maps.newConcurrentMap();
-				mCategoryPageUrlList = new 	ArrayList<String>();
-				mKeyWordList = new ArrayList<String> ();
+				mCategoryPageUrlList = new ArrayList<String>();
+				mKeyWordList = new ArrayList<String>();
 				searchPageSize = 10;
-				
+
 			}
-			
-			
-			void addKeyWord(String keyWord){
-				if(!mKeyWordList.contains(keyWord)) {
-					mKeyWordList.add(keyWord);	
+
+			void addKeyWord(String keyWord) {
+				if (!mKeyWordList.contains(keyWord)) {
+					mKeyWordList.add(keyWord);
 				}
 
 			}
-			
-			   void addDisPlayUrl(String pageurl , DisplayUrl_C displayUrl){
-				   if(mPageUrl_DisplayUrlList_Map.get(pageurl) == null) {
-					   ArrayList<DisplayUrl_C> displayUrl_C_item = new    ArrayList<DisplayUrl_C>();
-					   displayUrl_C_item.add(displayUrl);
-					   mPageUrl_DisplayUrlList_Map.put(pageurl, displayUrl_C_item);
-				   }else {
-					   
-					   ArrayList<DisplayUrl_C> displayUrl_C_item =    mPageUrl_DisplayUrlList_Map.get(pageurl) ;
-					   displayUrl_C_item.add(displayUrl);
-				   }
 
+			void addDisPlayUrl(String pageurl, DisplayUrl_C displayUrl) {
+				if (mPageUrl_DisplayUrlList_Map.get(pageurl) == null) {
+					ArrayList<DisplayUrl_C> displayUrl_C_item = new ArrayList<DisplayUrl_C>();
+					displayUrl_C_item.add(displayUrl);
+					mPageUrl_DisplayUrlList_Map.put(pageurl, displayUrl_C_item);
+				} else {
+
+					ArrayList<DisplayUrl_C> displayUrl_C_item = mPageUrl_DisplayUrlList_Map.get(pageurl);
+					displayUrl_C_item.add(displayUrl);
 				}
-			   
+
+			}
+
 		}
-		
-		
-		class DisplayUrl_C{
+
+		class DisplayUrl_C {
 			String mHtmlStr;
 			String mDisplayName; // 需要在 Category 中 过滤显示的 关键字
 			ArrayList<String> mDownloadUrlList;
-			
-			DisplayUrl_C(String keyName){
+
+			DisplayUrl_C(String keyName) {
 				mDisplayName = keyName;
-				mDownloadUrlList = new ArrayList<String> ();
+				mDownloadUrlList = new ArrayList<String>();
 			}
-			
+
 		}
-		
-		
-		void BrowserOperation_WithCategoryUrl(RootUrl_A  rootUrl_A , CategoryUrl_B categoryUrl_B ,  String href_categoryUrl) {
-		
-			String firstPageHtml_InCategory = null ;
+
+		void BrowserOperation_WithCategoryUrl(RootUrl_A rootUrl_A, CategoryUrl_B categoryUrl_B,
+				String href_categoryUrl) {
+
+			String firstPageHtml_InCategory = null;
 //			for (int i = 0; i < categoryUrl_B.mKeyWordList.size(); i++) {
 //				String keyword_InPage = categoryUrl_B.mKeyWordList.get(i);
-				
-				String mCategoryPageHtmlStr = null;
-				File ChromeDriverFile = new File(zbinPath + File.separator + "G2_chromedriver_v91.exe");
-				
-				
+
+			String mCategoryPageHtmlStr = null;
+			File ChromeDriverFile = new File(zbinPath + File.separator + "G2_chromedriver_v91.exe");
+
 //				System.setProperty("webdriver.chrome.driver", ChromeDriverFile.getAbsolutePath());
 //				
 //				
 //				ChromeOptions CUR_CHROME_OPTIONS = new ChromeOptions();
 //				// 驱动位置
 //				ChromeDriver driver = new ChromeDriver(CUR_CHROME_OPTIONS);
-				
-				
-				ChromeDriver driver = mChromeDriver;
-				
-				int loop_index = 0;
-				try {
-				     long waitTime = 2000;
-					 long timeout = 15_000;
-						
-					driver.get(href_categoryUrl);
-					 String title = driver.getTitle();
-				     System.out.printf("loop_index["+loop_index+"] = "+ title);
 
-				     System.out.printf("A now accesss %s \n", driver.getCurrentUrl());
-				        
-				     
+			ChromeDriver driver = mChromeDriver;
+
+			int loop_index = 0;
+			try {
+				long waitTime = 2000;
+				long timeout = 15_000;
+
+				driver.get(href_categoryUrl);
+				String title = driver.getTitle();
+				System.out.printf("loop_index[" + loop_index + "] = " + title);
+
+				System.out.printf("A now accesss %s \n", driver.getCurrentUrl());
+
 //					 long waitTime = Double.valueOf(Math.max(3, Math.random() * 5) * 1000).longValue();
-				     TimeUnit.MILLISECONDS.sleep(waitTime);
-		
-					// 循环下拉，直到全部加载完成或者超时
-					do {
-						new Actions(driver).sendKeys(Keys.END).perform();
-						TimeUnit.MILLISECONDS.sleep(waitTime);
-				
-						timeout -= waitTime;
-						loop_index++;
-					} while (!driver.getPageSource().contains("已经到底部，没有新的内容啦") && timeout > 0);
-					System.out.println("BrowserOperation_WithCategoryUrl 已经到底部，没有新的内容啦");
-					String pageHtmlStr =  driver.getPageSource();
-					categoryUrl_B.mPageUrl_HtmlStr_Map.put(href_categoryUrl, pageHtmlStr);
-					firstPageHtml_InCategory = pageHtmlStr;   //  保存该页的内容  推到出第二页的 url 
-				}  catch (Exception e) {
-					// TODO: handle exception
-					System.out.println("获取网页源码的时候出错  href_categoryUrl = " + href_categoryUrl );
-					e.printStackTrace();
-			
-				}finally {
+				TimeUnit.MILLISECONDS.sleep(waitTime);
+
+				// 循环下拉，直到全部加载完成或者超时
+				do {
+					new Actions(driver).sendKeys(Keys.END).perform();
+					TimeUnit.MILLISECONDS.sleep(waitTime);
+
+					timeout -= waitTime;
+					loop_index++;
+				} while (!driver.getPageSource().contains("已经到底部，没有新的内容啦") && timeout > 0);
+				System.out.println("BrowserOperation_WithCategoryUrl 已经到底部，没有新的内容啦");
+				String pageHtmlStr = driver.getPageSource();
+				categoryUrl_B.mPageUrl_HtmlStr_Map.put(href_categoryUrl, pageHtmlStr);
+				firstPageHtml_InCategory = pageHtmlStr; // 保存该页的内容 推到出第二页的 url
+			} catch (Exception e) {
+				// TODO: handle exception
+				System.out.println("获取网页源码的时候出错  href_categoryUrl = " + href_categoryUrl);
+				e.printStackTrace();
+
+			} finally {
 //					driver.close();
 
-				}
-				
-				if(!categoryUrl_B.isPageUrlInit) {
-					
-					initCategoryPageUrl(rootUrl_A,categoryUrl_B,firstPageHtml_InCategory);
-				}
-				
-				
-				if(categoryUrl_B.mPageUrl_HtmlStr_Map.get(href_categoryUrl) != null) {
+			}
 
-					System.out.println("categoryUrl_B.mKeyWordList.size() = "+ categoryUrl_B.mKeyWordList.size());
-					for (int i = 0; i < categoryUrl_B.mKeyWordList.size(); i++) {
-						
-						String displayKeyName  = categoryUrl_B.mKeyWordList.get(i);
-						DisplayUrl_C  displayUrl_C = new DisplayUrl_C(displayKeyName);
+			if (!categoryUrl_B.isPageUrlInit) {
+
+				initCategoryPageUrl(rootUrl_A, categoryUrl_B, firstPageHtml_InCategory);
+			}
+
+			if (categoryUrl_B.mPageUrl_HtmlStr_Map.get(href_categoryUrl) != null) {
+
+				System.out.println("categoryUrl_B.mKeyWordList.size() = " + categoryUrl_B.mKeyWordList.size());
+				for (int i = 0; i < categoryUrl_B.mKeyWordList.size(); i++) {
+
+					String displayKeyName = categoryUrl_B.mKeyWordList.get(i);
+					DisplayUrl_C displayUrl_C = new DisplayUrl_C(displayKeyName);
 //						String displayKeyName = displayUrl.mDisplayName;
-						System.out.println("displayKeyName-A = "+ displayKeyName);
-						ArrayList<String> a_href_Display_UrlList=calcul_categoryurl_from_html_CategoryB(rootUrl_A,categoryUrl_B,displayKeyName,firstPageHtml_InCategory);
-						System.out.println("displayKeyName-B = "+ displayKeyName +"  a_href_Display_UrlList=="+a_href_Display_UrlList);
+					System.out.println("displayKeyName-A = " + displayKeyName);
+					ArrayList<String> a_href_Display_UrlList = calcul_categoryurl_from_html_CategoryB(rootUrl_A,
+							categoryUrl_B, displayKeyName, firstPageHtml_InCategory);
+					System.out.println("displayKeyName-B = " + displayKeyName + "  a_href_Display_UrlList=="
+							+ a_href_Display_UrlList);
 
-						if(a_href_Display_UrlList == null) {
-							continue;
-						}
-						System.out.println("displayKeyName-C = "+ displayKeyName);
-						displayUrl_C.mDownloadUrlList.addAll(a_href_Display_UrlList);
-						System.out.println("displayKeyName-D = "+ displayKeyName+"  displayUrl_C.mDownloadUrlList.size()="+displayUrl_C.mDownloadUrlList.size());
-
-						for (int j = 0; j < a_href_Display_UrlList.size(); j++) {
-							String href_url = a_href_Display_UrlList.get(j);
-							System.out.println("Catagery["+categoryUrl_B.mCategoryKeyName+"]  DisplayUrlIndex["+i+"] DisplyUrlCount["+categoryUrl_B.mKeyWordList.size()+"]  A["+j+"]  ACount["+a_href_Display_UrlList.size()+"] href="+href_url);
-
-							
-					//  分析 详细 download show  内容url中的  href=https://www.52pojie.cn/thread-1467500-1-1.html 对应的页面
-							
-							TryAnalysisHrefForDisplayUrl(rootUrl_A,categoryUrl_B,displayUrl_C,href_url);
-						}
-						
-						
+					if (a_href_Display_UrlList == null) {
+						continue;
 					}
-					
-					
+					System.out.println("displayKeyName-C = " + displayKeyName);
+					displayUrl_C.mDownloadUrlList.addAll(a_href_Display_UrlList);
+					System.out.println("displayKeyName-D = " + displayKeyName
+							+ "  displayUrl_C.mDownloadUrlList.size()=" + displayUrl_C.mDownloadUrlList.size());
 
-					
-				}else {
-					System.out.println("categoryUrl_B.mPageUrl_HtmlStr_Map.get(href_categoryUrl)  === null   没有解析到html源码?");
-					
-					
+					for (int j = 0; j < a_href_Display_UrlList.size(); j++) {
+						String href_url = a_href_Display_UrlList.get(j);
+						System.out.println("Catagery[" + categoryUrl_B.mCategoryKeyName + "]  DisplayUrlIndex[" + i
+								+ "] DisplyUrlCount[" + categoryUrl_B.mKeyWordList.size() + "]  A[" + j + "]  ACount["
+								+ a_href_Display_UrlList.size() + "] href=" + href_url);
+
+						// 分析 详细 download show 内容url中的
+						// href=https://www.52pojie.cn/thread-1467500-1-1.html 对应的页面
+
+						TryAnalysisHrefForDisplayUrl(rootUrl_A, categoryUrl_B, displayUrl_C, href_url);
+					}
+
 				}
+
+			} else {
+				System.out.println("categoryUrl_B.mPageUrl_HtmlStr_Map.get(href_categoryUrl)  === null   没有解析到html源码?");
+
+			}
 //			}
-			
 
-
-			
-			
-			
-			
-			
 		}
-		
-		boolean isInnerHtmlContainNextTip(String innerHtml , ArrayList<String> nextUrlTipList) {
+
+		boolean isInnerHtmlContainNextTip(String innerHtml, ArrayList<String> nextUrlTipList) {
 			boolean containFlag = false;
 			for (int i = 0; i < nextUrlTipList.size(); i++) {
-				String tipitem =  nextUrlTipList.get(i);
-				
-				if(innerHtml.contains(tipitem)) {
+				String tipitem = nextUrlTipList.get(i);
+
+				if (innerHtml.contains(tipitem)) {
 					return true;
 				}
-				
+
 			}
-			
-			
+
 			return containFlag;
-			
-			
+
 		}
-		// 从首页中   推导 出  第二页  第三页的 地址 
-		void initCategoryPageUrl(RootUrl_A  rootUrl_A ,CategoryUrl_B categoryUrl_B,String firstPageHtml) {
-			
-			org.jsoup.nodes.Document  curDocument =  Jsoup.parse(firstPageHtml);
-			
+
+		// 从首页中 推导 出 第二页 第三页的 地址
+		void initCategoryPageUrl(RootUrl_A rootUrl_A, CategoryUrl_B categoryUrl_B, String firstPageHtml) {
+
+			org.jsoup.nodes.Document curDocument = Jsoup.parse(firstPageHtml);
+
 			String rawHtmlStr = curDocument.html();
 			ArrayList<String> nextUrlTipList = new ArrayList<String>();
 			nextUrlTipList.add("下一页");
 			nextUrlTipList.add("后页");
 			nextUrlTipList.add("下页");
-			Elements  mElements = 	curDocument.getElementsByTag("a");
-			
-			if(isInnerHtmlContainNextTip(rawHtmlStr,nextUrlTipList) ) {
+			Elements mElements = curDocument.getElementsByTag("a");
 
+			if (isInnerHtmlContainNextTip(rawHtmlStr, nextUrlTipList)) {
 
 //			Elements  mElements =  curDocument.select("a[href]");
 // a class="bm_h" href="javascript:;" rel="forum.php?mod=forumdisplay&fid=2&page=3" curpage="2" id="autopbn" totalpage="204" picstyle="0" forumdefstyle="">下一页 &raquo;</a>
 // <a href="forum-2-3.html" class="nxt">下一页</a>
-			
-			if(mElements != null && mElements.size() > 0) {
-				
-				System.out.println("a[href] mElements.size()  = "+ mElements.size() );
-				Iterator<org.jsoup.nodes.Element> nextpage_element_iterator = 	mElements.iterator();
-				while(nextpage_element_iterator.hasNext()) {
-					org.jsoup.nodes.Element curElement = 	nextpage_element_iterator.next();
-					String innerHtml = curElement.html();
-					String href=curElement.attr("href");
-					System.out.println("nexttip_innerHtml = "+ innerHtml  +"   href["+href+"]");
-					if(isInnerHtmlContainNextTip(innerHtml,nextUrlTipList) ) {
-				
-						if(href == null || "".equals(href.trim()) || href.contains("javascript")) {
-							continue;
-						}
-						
-						if(!href.startsWith("http")) {
-							String fixed_href = rootUrl_A.mRootUrl+"/"+href;
-							fixed_href = fixed_href.replace("//", "/");
-							if(!categoryUrl_B.mCategoryPageUrlList.contains(fixed_href)) {
-								categoryUrl_B.nextPageUrl =  fixed_href;
-								categoryUrl_B.mCategoryPageUrlList.add(fixed_href);
-								System.out.println("a[href]_Next_Tip  nextPageUrl=["+fixed_href+"]  innerHtml = "+ innerHtml  +"   href["+href+"]");
 
-								return;
-							}
-							
-						}
-						
-					}
-		
-				}
-				
-				
-			}
-			
-			
-			}else {  // 当前 页面 并不包括  下一页 下页 等  标签
-				
-				//   <a>  数字 <a> 的 标签的 url的 集合  
-				ArrayList<String> digital_inner_linkA_hrefList = new 	ArrayList<String>();
-				
-				// 当前已经保存了的 url 列表的 集合  如果不再里面  那么就 加入 
-				ArrayList<String> curPageUrlList = categoryUrl_B.mCategoryPageUrlList;
-				if(mElements != null && mElements.size() > 0) {
-					System.out.println("a[href]_No_Next_Tip mElements.size()  = "+ mElements.size() );
-					Iterator<org.jsoup.nodes.Element> nextpage_element_iterator = 	mElements.iterator();
-					while(nextpage_element_iterator.hasNext()) {
-						org.jsoup.nodes.Element curElement = 	nextpage_element_iterator.next();
+				if (mElements != null && mElements.size() > 0) {
+
+					System.out.println("a[href] mElements.size()  = " + mElements.size());
+					Iterator<org.jsoup.nodes.Element> nextpage_element_iterator = mElements.iterator();
+					while (nextpage_element_iterator.hasNext()) {
+						org.jsoup.nodes.Element curElement = nextpage_element_iterator.next();
 						String innerHtml = curElement.html();
-						String href=curElement.attr("href");
-						System.out.println("a[href]_No_Next_Tip  innerHtml = "+ innerHtml  +"   href["+href+"]");
-						if(isNumeric(innerHtml)) {
+						String href = curElement.attr("href");
+						System.out.println("nexttip_innerHtml = " + innerHtml + "   href[" + href + "]");
+						if (isInnerHtmlContainNextTip(innerHtml, nextUrlTipList)) {
 
-							if(href == null || "".equals(href.trim()) || href.contains("javascript")) {
+							if (href == null || "".equals(href.trim()) || href.contains("javascript")) {
 								continue;
 							}
-							
-							if(!href.startsWith("http")) {
-								String fixed_href = rootUrl_A.mRootUrl+"/"+href;
+
+							if (!href.startsWith("http")) {
+								String fixed_href = rootUrl_A.mRootUrl + "/" + href;
 								fixed_href = fixed_href.replace("//", "/");
-								if(!categoryUrl_B.mCategoryPageUrlList.contains(fixed_href)) {
-									categoryUrl_B.nextPageUrl =  fixed_href;
+								if (!categoryUrl_B.mCategoryPageUrlList.contains(fixed_href)) {
+									categoryUrl_B.nextPageUrl = fixed_href;
 									categoryUrl_B.mCategoryPageUrlList.add(fixed_href);
-									System.out.println("a[href]_No_Next_Tip  nextPageUrl=["+fixed_href+"]  innerHtml = "+ innerHtml  +"   href["+href+"]");
+									System.out.println("a[href]_Next_Tip  nextPageUrl=[" + fixed_href
+											+ "]  innerHtml = " + innerHtml + "   href[" + href + "]");
 
 									return;
 								}
-								
+
 							}
-							
-							
+
 						}
-						
-				
-						
+
 					}
-					
-					
-				}		
-				
-				
+
+				}
+
+			} else { // 当前 页面 并不包括 下一页 下页 等 标签
+
+				// <a> 数字 <a> 的 标签的 url的 集合
+				ArrayList<String> digital_inner_linkA_hrefList = new ArrayList<String>();
+
+				// 当前已经保存了的 url 列表的 集合 如果不再里面 那么就 加入
+				ArrayList<String> curPageUrlList = categoryUrl_B.mCategoryPageUrlList;
+				if (mElements != null && mElements.size() > 0) {
+					System.out.println("a[href]_No_Next_Tip mElements.size()  = " + mElements.size());
+					Iterator<org.jsoup.nodes.Element> nextpage_element_iterator = mElements.iterator();
+					while (nextpage_element_iterator.hasNext()) {
+						org.jsoup.nodes.Element curElement = nextpage_element_iterator.next();
+						String innerHtml = curElement.html();
+						String href = curElement.attr("href");
+						System.out.println("a[href]_No_Next_Tip  innerHtml = " + innerHtml + "   href[" + href + "]");
+						if (isNumeric(innerHtml)) {
+
+							if (href == null || "".equals(href.trim()) || href.contains("javascript")) {
+								continue;
+							}
+
+							if (!href.startsWith("http")) {
+								String fixed_href = rootUrl_A.mRootUrl + "/" + href;
+								fixed_href = fixed_href.replace("//", "/");
+								if (!categoryUrl_B.mCategoryPageUrlList.contains(fixed_href)) {
+									categoryUrl_B.nextPageUrl = fixed_href;
+									categoryUrl_B.mCategoryPageUrlList.add(fixed_href);
+									System.out.println("a[href]_No_Next_Tip  nextPageUrl=[" + fixed_href
+											+ "]  innerHtml = " + innerHtml + "   href[" + href + "]");
+
+									return;
+								}
+
+							}
+
+						}
+
+					}
+
+				}
+
 			}
-			
-			
+
 		}
-		
-		void TryAnalysisHrefForDisplayUrl(RootUrl_A  rootUrl_A , CategoryUrl_B categpryUrl_B , DisplayUrl_C displayUrl_C , String hrefUrl) {
-			
-			// 1_1_kcafalm.jpg    第一个详情页面的第1个照片    第一个1 一定对应了一个详情的地址 
-			// 1_2_xafafma.jpg 
-			// 打开 对应的  a  href    获取 源码
-		String detailContentHtmlCode = 	getHtmlSource(hrefUrl);
-		if(detailContentHtmlCode == null) {
-			System.out.println("当前内容详情页面 中的 hrefUrl= "+hrefUrl+" 解析出来的源文件为空!! ");
-			return;
-		}
-		org.jsoup.nodes.Document  curDocument =  Jsoup.parse(detailContentHtmlCode);
-		
+
+		void TryAnalysisHrefForDisplayUrl(RootUrl_A rootUrl_A, CategoryUrl_B categpryUrl_B, DisplayUrl_C displayUrl_C,
+				String hrefUrl) {
+
+			// 1_1_kcafalm.jpg 第一个详情页面的第1个照片 第一个1 一定对应了一个详情的地址
+			// 1_2_xafafma.jpg
+			// 打开 对应的 a href 获取 源码
+			String detailContentHtmlCode = getHtmlSource(hrefUrl);
+			if (detailContentHtmlCode == null) {
+				System.out.println("当前内容详情页面 中的 hrefUrl= " + hrefUrl + " 解析出来的源文件为空!! ");
+				return;
+			}
+			org.jsoup.nodes.Document curDocument = Jsoup.parse(detailContentHtmlCode);
+
 //		Elements  mElements = 	curDocument.getElementsByTag("img");
-		Elements  mElements =  curDocument.select("img[src]");
-		 
+			Elements mElements = curDocument.select("img[src]");
 
-		if(mElements != null && mElements.size() > 0) {
+			if (mElements != null && mElements.size() > 0) {
 
-			System.out.println("img[src] mElements.size()  = "+ mElements.size());
-Iterator<org.jsoup.nodes.Element> element_iterator = 	mElements.iterator();
-		int index_image_In_Detailurl = 1;
-		while(element_iterator.hasNext()) {
-			org.jsoup.nodes.Element curElement = 	element_iterator.next();
-			 String src=curElement.attr("abs:src");
-			 System.out.println("img["+index_image_In_Detailurl+"] all["+mElements.size()+"] src=[ "+src+" ] href=[ "+hrefUrl+" ]");
-			
-			 if(!allDownloadedUrlList.contains(src)) {  //  避免 重复下载 url 
-				 
-				 allDownloadedUrlList.add(src);   // 怎么实现  url 和 它的 下载的页面 对应?
-				 addImgSrcToDetailMap(hrefUrl,src);
-				index_image_In_Detailurl++;
-			 }
+				System.out.println("img[src] mElements.size()  = " + mElements.size());
+				Iterator<org.jsoup.nodes.Element> element_iterator = mElements.iterator();
+				int index_image_In_Detailurl = 1;
+				while (element_iterator.hasNext()) {
+					org.jsoup.nodes.Element curElement = element_iterator.next();
+					String src = curElement.attr("abs:src");
+					System.out.println("img[" + index_image_In_Detailurl + "] all[" + mElements.size() + "] src=[ "
+							+ src + " ] href=[ " + hrefUrl + " ]");
+
+					if (!allDownloadedUrlList.contains(src)) { // 避免 重复下载 url
+
+						allDownloadedUrlList.add(src); // 怎么实现 url 和 它的 下载的页面 对应?
+						addImgSrcToDetailMap(hrefUrl, src);
+						index_image_In_Detailurl++;
+					}
+
+				}
+
+				// 开始执行下载操作
+				TryDownloadImageOperation(hrefUrl);
+			}
 
 		}
-		
-		
-		
-		// 开始执行下载操作 
-		TryDownloadImageOperation(hrefUrl);
-		}
-		
-		
-			
-		
-			
-			
-		}
-		 int mDisplayUrl_ID = 0;
-		
-		int  getNextDisplayUrl_ID() {
+
+		int mDisplayUrl_ID = 0;
+
+		int getNextDisplayUrl_ID() {
 			mDisplayUrl_ID++;
 			return mDisplayUrl_ID;
-			
+
 		}
-		
-		// 开始执行下载操作 
-		void	TryDownloadImageOperation(String hrefUrl){
-			ArrayList<String> mImageUrlList = 	mDisplayUrl_ImageUrlList_Map.get(hrefUrl);
-			if(mImageUrlList == null || mImageUrlList.size() == 0) {
-				System.out.println("当前 详情页面 url="+hrefUrl+"   解析到的图片资源数量 为0 !!! ");
-			  return;
+
+		// 开始执行下载操作
+		void TryDownloadImageOperation(String hrefUrl) {
+			ArrayList<String> mImageUrlList = mDisplayUrl_ImageUrlList_Map.get(hrefUrl);
+			if (mImageUrlList == null || mImageUrlList.size() == 0) {
+				System.out.println("当前 详情页面 url=" + hrefUrl + "   解析到的图片资源数量 为0 !!! ");
+				return;
 			}
-			
+
 			int urlIndex = -1;
-			if(mDisplayUrl_Index_Map.containsValue(hrefUrl)) {
-				urlIndex = (Integer)mDisplayUrl_Index_Map.get(hrefUrl);
-			}else {
-				int DisplayID =  getNextDisplayUrl_ID();
-				mDisplayUrl_Index_Map.put( hrefUrl,DisplayID);
+			if (mDisplayUrl_Index_Map.containsValue(hrefUrl)) {
+				urlIndex = (Integer) mDisplayUrl_Index_Map.get(hrefUrl);
+			} else {
+				int DisplayID = getNextDisplayUrl_ID();
+				mDisplayUrl_Index_Map.put(hrefUrl, DisplayID);
 				urlIndex = DisplayID;
 			}
-			System.out.println("hrefUrl["+hrefUrl+"]  mImageUrlList.size()="+mImageUrlList.size());
-			
+			System.out.println("hrefUrl[" + hrefUrl + "]  mImageUrlList.size()=" + mImageUrlList.size());
+
 			for (int i = 0; i < mImageUrlList.size(); i++) {
 				String urlItem = mImageUrlList.get(i);
 				int imageIndex_InDetail = i;
 				int Detail_Index = urlIndex;
-				String imageName_Pre =  Detail_Index+"_"+imageIndex_InDetail+"_";
-				String urlType =urlItem.substring(urlItem.lastIndexOf("."));
-				if(urlType == null) {
-					urlType = ".jpg";  //  默认为 .jpg
+				String imageName_Pre = Detail_Index + "_" + imageIndex_InDetail + "_";
+				String urlType = urlItem.substring(urlItem.lastIndexOf("."));
+				if (urlType == null) {
+					urlType = ".jpg"; // 默认为 .jpg
 				}
-				String fileName_NoType_ABS = ImageDownloadDir.getAbsolutePath()+File.separator+ imageName_Pre+getTimeStamp()+urlType;
+				String fileName_NoType_ABS = ImageDownloadDir.getAbsolutePath() + File.separator + imageName_Pre
+						+ getTimeStamp() + urlType;
 				File imageFile = new File(fileName_NoType_ABS);
-				downloadOperation(urlItem,imageFile,1);
-				
-				
-				
+				downloadOperation(urlItem, imageFile, 1);
+
 			}
-			
-			
-			
-			
-			
+
 		}
-		
-		// 视频的保存 目录 不能是 当前文件 否则 就会执行 同步操作 影响网速  repeatTimes 下载失败重复的次数
+
+		// 视频的保存 目录 不能是 当前文件 否则 就会执行 同步操作 影响网速 repeatTimes 下载失败重复的次数
 		@SuppressWarnings("unchecked")
-		public void downloadOperation( String httpUrl, File localFile , int repeatTimes) {
-       String fileAddress = localFile.getAbsolutePath();
+		public void downloadOperation(String httpUrl, File localFile, int repeatTimes) {
+			String fileAddress = localFile.getAbsolutePath();
 //			String fileAddress = mDownloadedMonthDir.getAbsolutePath() + File.separator
 //					+ (source == null || "".equals(source) ? "" : source + "_") + (fileNameNoPoint.replace(" ", ""))
 //					+ "_" + index + "_" + getTimeStamp() + ".mp4";
 
-       System.out.println("下载操作:[ "+httpUrl+" ]   \n fileAddress:"+ fileAddress);
+			System.out.println("下载操作:[ " + httpUrl + " ]   \n fileAddress:" + fileAddress);
 			int byteRead;
 			try {
 				URL url = new URL(httpUrl);
@@ -1923,248 +2081,208 @@ Iterator<org.jsoup.nodes.Element> element_iterator = 	mElements.iterator();
 				}
 				inStream.close();
 				fs.close();
-				System.out.println("\n-----url[ "+httpUrl+" ]下载完成-----\n" + fileSavePath.getAbsolutePath());
+				System.out.println("\n-----url[ " + httpUrl + " ]下载完成-----\n" + fileSavePath.getAbsolutePath());
 
 			} catch (FileNotFoundException e) {
-				System.out.println("ZFileNotFoundException=="+e.getMessage());
+				System.out.println("ZFileNotFoundException==" + e.getMessage());
 			} catch (IOException e) {
-				System.out.println("ZIOException:"+e.getMessage());
-				if(repeatTimes <= 3) {
-					downloadOperation(  httpUrl,  localFile , repeatTimes + 1);    // 再次执行 下载操作 
+				System.out.println("ZIOException:" + e.getMessage());
+				if (repeatTimes <= 3) {
+					downloadOperation(httpUrl, localFile, repeatTimes + 1); // 再次执行 下载操作
 
 				}
 			}
 		}
-		
-		
-		
-		
-	void	addImgSrcToDetailMap(String keyurl , String valueUrl){
-		ArrayList<String> mImageUrlList = 	mDisplayUrl_ImageUrlList_Map.get(keyurl);
-		if(mImageUrlList == null) {
-			ArrayList<String> mImageUrlList_filled = new ArrayList<String>();
-			mImageUrlList_filled.add(valueUrl);
-			mDisplayUrl_ImageUrlList_Map.put(keyurl, mImageUrlList_filled);
-		}else {
-			if(!mImageUrlList.contains(valueUrl)) {
-				mImageUrlList.add(valueUrl);
+
+		void addImgSrcToDetailMap(String keyurl, String valueUrl) {
+			ArrayList<String> mImageUrlList = mDisplayUrl_ImageUrlList_Map.get(keyurl);
+			if (mImageUrlList == null) {
+				ArrayList<String> mImageUrlList_filled = new ArrayList<String>();
+				mImageUrlList_filled.add(valueUrl);
+				mDisplayUrl_ImageUrlList_Map.put(keyurl, mImageUrlList_filled);
+			} else {
+				if (!mImageUrlList.contains(valueUrl)) {
+					mImageUrlList.add(valueUrl);
+				}
+
 			}
 
 		}
-	
-		}
-		
-		
+
 		String getHtmlSource(String url) {
 			String htmlSource = null;
-			if(url == null || "".equals(url)) {
+			if (url == null || "".equals(url)) {
 				return null;
 			}
-			
-File ChromeDriverFile = new File(zbinPath + File.separator + "G2_chromedriver_v91.exe");
-			
-			
+
+			File ChromeDriverFile = new File(zbinPath + File.separator + "G2_chromedriver_v91.exe");
+
 			System.setProperty("webdriver.chrome.driver", ChromeDriverFile.getAbsolutePath());
-			
-			
+
 //			ChromeOptions CUR_CHROME_OPTIONS = new ChromeOptions();
 //			// 驱动位置
 //			CUR_CHROME_OPTIONS.addArguments("--start-fullscreen"); 
 //			CUR_CHROME_OPTIONS.setExperimentalOption("excludeSwitches", Collections.singletonList("enable-automation"));
 //			ChromeDriver driver = new ChromeDriver(CUR_CHROME_OPTIONS);
-			
-			
+
 			ChromeDriver driver = mChromeDriver;
-			
+
 			int loop_index = 0;
 			try {
-			     long waitTime = 2000;
-				 long timeout = 12_000;
-					
+				long waitTime = 2000;
+				long timeout = 12_000;
+
 				driver.get(url);
-	
-			     
+
 //				 long waitTime = Double.valueOf(Math.max(3, Math.random() * 5) * 1000).longValue();
-			     TimeUnit.MILLISECONDS.sleep(waitTime);
-	
+				TimeUnit.MILLISECONDS.sleep(waitTime);
+
 				// 循环下拉，直到全部加载完成或者超时
 				do {
 					new Actions(driver).sendKeys(Keys.END).perform();
 					TimeUnit.MILLISECONDS.sleep(waitTime);
-			
+
 					timeout -= waitTime;
 					loop_index++;
 				} while (!driver.getPageSource().contains("已经到底部，没有新的内容啦") && timeout > 0);
 				System.out.println("getHtmlSource 已经到底部，没有新的内容啦");
-				htmlSource =  driver.getPageSource();
-			}  catch (Exception e) {
+				htmlSource = driver.getPageSource();
+			} catch (Exception e) {
 				// TODO: handle exception
-				System.out.println("getHtmlSource 获取网页源码的时候出错  url = " + url );
+				System.out.println("getHtmlSource 获取网页源码的时候出错  url = " + url);
 				e.printStackTrace();
-		
-			}finally {
+
+			} finally {
 //				driver.close();
 
 			}
-			
+
 			return htmlSource;
-			
-			
-			
-			
+
 		}
 
-		
-		
-		
-		
-		ArrayList<String> calcul_categoryurl_from_html_CategoryB(RootUrl_A mRootUrl_A , CategoryUrl_B mCategoryUrl_B, String linkA_text ,String categoryFirstPageHtmlCode) {
+		ArrayList<String> calcul_categoryurl_from_html_CategoryB(RootUrl_A mRootUrl_A, CategoryUrl_B mCategoryUrl_B,
+				String linkA_text, String categoryFirstPageHtmlCode) {
 			ArrayList<String> result_href_List = null;
-			
-			ArrayList<String> fixed_href_List = new ArrayList<String>();
-			  //6.Jsoup解析html
-			org.jsoup.nodes.Document document = Jsoup.parse(categoryFirstPageHtmlCode);
-			
-			Elements  mElements = 	document.getElementsByTag("a");
-			if(mElements != null && mElements.size() > 0) {
 
-				System.out.println("a_link mElements.size()  = "+ mElements.size());
-	Iterator<org.jsoup.nodes.Element> element_iterator = 	mElements.iterator();
-			int index_a_link = 1;
-			while(element_iterator.hasNext()) {
-				org.jsoup.nodes.Element curElement = 	element_iterator.next();
-				String mHtml = curElement.outerHtml();
-				// 当前的 a 的标签 应该 包含 关键词 a   以及  href
-				
-				System.out.println("_____CategoryUrlB_____a["+index_a_link+"] all["+mElements.size()+"]   mHtml="+mHtml);
-				
-				
-				index_a_link++;
-				
-				if(mHtml.contains(linkA_text) && mHtml.contains("href")) {
-					String hrefValue_RawStr = mHtml.substring(mHtml.indexOf("href=\""));
-					hrefValue_RawStr = hrefValue_RawStr.replace("href=\"", "");
-					hrefValue_RawStr = hrefValue_RawStr.replace("href=", "");
-					String  hrefValue_Fixed =  hrefValue_RawStr.substring(0,hrefValue_RawStr.indexOf("\""));
-					 // 把 amp; 转为 空 
-					hrefValue_Fixed = hrefValue_Fixed.replace("amp;", "");
-					
-					if(!hrefValue_Fixed.startsWith("http")) {
-						hrefValue_Fixed = mRootUrl_A.mRootUrl+"/"+hrefValue_Fixed;	
+			ArrayList<String> fixed_href_List = new ArrayList<String>();
+			// 6.Jsoup解析html
+			org.jsoup.nodes.Document document = Jsoup.parse(categoryFirstPageHtmlCode);
+
+			Elements mElements = document.getElementsByTag("a");
+			if (mElements != null && mElements.size() > 0) {
+
+				System.out.println("a_link mElements.size()  = " + mElements.size());
+				Iterator<org.jsoup.nodes.Element> element_iterator = mElements.iterator();
+				int index_a_link = 1;
+				while (element_iterator.hasNext()) {
+					org.jsoup.nodes.Element curElement = element_iterator.next();
+					String mHtml = curElement.outerHtml();
+					// 当前的 a 的标签 应该 包含 关键词 a 以及 href
+
+					System.out.println("_____CategoryUrlB_____a[" + index_a_link + "] all[" + mElements.size()
+							+ "]   mHtml=" + mHtml);
+
+					index_a_link++;
+
+					if (mHtml.contains(linkA_text) && mHtml.contains("href")) {
+						String hrefValue_RawStr = mHtml.substring(mHtml.indexOf("href=\""));
+						hrefValue_RawStr = hrefValue_RawStr.replace("href=\"", "");
+						hrefValue_RawStr = hrefValue_RawStr.replace("href=", "");
+						String hrefValue_Fixed = hrefValue_RawStr.substring(0, hrefValue_RawStr.indexOf("\""));
+						// 把 amp; 转为 空
+						hrefValue_Fixed = hrefValue_Fixed.replace("amp;", "");
+
+						if (!hrefValue_Fixed.startsWith("http")) {
+							hrefValue_Fixed = mRootUrl_A.mRootUrl + "/" + hrefValue_Fixed;
+						}
+						fixed_href_List.add(hrefValue_Fixed);
+
 					}
-					fixed_href_List.add(hrefValue_Fixed);
-				
+
 				}
 
-				
-			}
-				
-			
-		
-				
-				
-				
-			}else {
-				System.out.println("当前的 url "+ mRootUrl_A.mRootUrl+" 的源码中 没有找到 标签<a> 的 内容");
+			} else {
+				System.out.println("当前的 url " + mRootUrl_A.mRootUrl + " 的源码中 没有找到 标签<a> 的 内容");
 				System.out.println("源码htmlCode Begin _________________________________");
 				System.out.println(mCategoryUrl_B.mPageUrl_HtmlStr_Map.size());
 				System.out.println("源码htmlCode Endxx _________________________________");
 			}
-			
-			
-			
-			
-            
-			if(fixed_href_List.size() > 0) {
-				System.out.println("fixed_href_List  = "+fixed_href_List.size());
+
+			if (fixed_href_List.size() > 0) {
+				System.out.println("fixed_href_List  = " + fixed_href_List.size());
 				return fixed_href_List;
-			}else {
+			} else {
 				System.out.println("fixed_href_List  = 0");
 				return result_href_List;
 			}
 
 		}
-		
-		
-		String calcul_categoryurl_from_html_RoouUrlA(RootUrl_A mRootUrl_A  , String linkA_text) {
-			String result_href = null;
-			
-			  //6.Jsoup解析html
-			org.jsoup.nodes.Document document = Jsoup.parse(mRootUrl_A.mHtmlStr);
-			
-			Elements  mElements = 	document.getElementsByTag("a");
-			if(mElements != null && mElements.size() > 0) {
 
-				System.out.println("getElementsByTag[a]   mElements.size()  = "+ mElements.size() +" linkA_text["+linkA_text+"]");
-	Iterator<org.jsoup.nodes.Element> element_iterator = 	mElements.iterator();
-			int index_a_link = 1;
-			while(element_iterator.hasNext()) {
-				org.jsoup.nodes.Element curElement = 	element_iterator.next();
-				String mHtml = curElement.outerHtml();
-				// 当前的 a 的标签 应该 包含 关键词 a   以及  href
-				
-				System.out.println("___RootUrlA___a["+index_a_link+"] all["+mElements.size()+"]   mHtml="+mHtml);
-				
-				
-				index_a_link++;
-				
-				if(mHtml.contains(linkA_text) && mHtml.contains("href")) {
-					String hrefValue_RawStr = mHtml.substring(mHtml.indexOf("href=\""));
-					hrefValue_RawStr = hrefValue_RawStr.replace("href=\"", "");
-					String  hrefValue_Fixed =  hrefValue_RawStr.substring(0,hrefValue_RawStr.indexOf("\""));
-					 // 把 amp; 转为 空 
-					hrefValue_Fixed = hrefValue_Fixed.replace("amp;", "");
-					
-					if(!hrefValue_Fixed.startsWith("http")) {
-						hrefValue_Fixed = mRootUrl_A.mRootUrl+"/"+hrefValue_Fixed;	
-					}
-					
-					// 最后一个匹配的  符合条件 
-					result_href  = hrefValue_Fixed;
+		String calcul_categoryurl_from_html_RoouUrlA(RootUrl_A mRootUrl_A, String linkA_text) {
+			String result_href = null;
+
+			// 6.Jsoup解析html
+			org.jsoup.nodes.Document document = Jsoup.parse(mRootUrl_A.mHtmlStr);
+
+			Elements mElements = document.getElementsByTag("a");
+			if (mElements != null && mElements.size() > 0) {
+
+				System.out.println("getElementsByTag[a]   mElements.size()  = " + mElements.size() + " linkA_text["
+						+ linkA_text + "]");
+				Iterator<org.jsoup.nodes.Element> element_iterator = mElements.iterator();
+				int index_a_link = 1;
+				while (element_iterator.hasNext()) {
+					org.jsoup.nodes.Element curElement = element_iterator.next();
+					String mHtml = curElement.outerHtml();
+					// 当前的 a 的标签 应该 包含 关键词 a 以及 href
+
+					System.out.println(
+							"___RootUrlA___a[" + index_a_link + "] all[" + mElements.size() + "]   mHtml=" + mHtml);
+
+					index_a_link++;
+
+					if (mHtml.contains(linkA_text) && mHtml.contains("href")) {
+						String hrefValue_RawStr = mHtml.substring(mHtml.indexOf("href=\""));
+						hrefValue_RawStr = hrefValue_RawStr.replace("href=\"", "");
+						String hrefValue_Fixed = hrefValue_RawStr.substring(0, hrefValue_RawStr.indexOf("\""));
+						// 把 amp; 转为 空
+						hrefValue_Fixed = hrefValue_Fixed.replace("amp;", "");
+
+						if (!hrefValue_Fixed.startsWith("http")) {
+							hrefValue_Fixed = mRootUrl_A.mRootUrl + "/" + hrefValue_Fixed;
+						}
+
+						// 最后一个匹配的 符合条件
+						result_href = hrefValue_Fixed;
 //					return hrefValue_Fixed;
+					}
+
 				}
 
-				
-			}
-				
-			
-		
-				
-				
-				
-			}else {
-				System.out.println("当前的 url "+ mRootUrl_A.mRootUrl+" 的源码中 没有找到 标签<a> 的 内容");
+			} else {
+				System.out.println("当前的 url " + mRootUrl_A.mRootUrl + " 的源码中 没有找到 标签<a> 的 内容");
 				System.out.println("源码htmlCode Begin _________________________________");
 				System.out.println(mRootUrl_A.mHtmlStr);
 				System.out.println("源码htmlCode Endxx _________________________________");
 			}
-			
-            
-			
-			return result_href;
-			
-			
-		}
-		
-		
 
-		
-		
-		
+			return result_href;
+
+		}
+
 	}
-	
-	
+
 	// operation_type 操作类型 1--读取文件内容字符串 进行修改 2--对文件对文件内容(字节)--进行修改 3.对全体子文件进行的随性的操作
 	// 属性进行修改(文件名称)
 //     // 4.对当前子文件(包括子目录 子文件 --不包含孙目录 孙文件) 5. 从shell 中获取到的路径 去对某一个文件进行操作
 
-
 	class Monitor_WeChatFile_ForWindows_Rule_39 extends Basic_Rule {
 // C:\Users\zukgit\Documents\WeChat Files\xxxx\FileStorage\File\2021-07
 
-		ArrayList<File> searchRootFileList ;  // 存放要搜索的 txt文件的 根目录  目前只有 \WeChat Files\和\Tencent Files\
-		File mWeChatRootFile; //  C:\Users\xx\Documents\WeChat Files\ 目录 微信使用
-		File mTencentRootFile; //  C:\Users\xx\Documents\Tencent Files\  目录 QQ使用
+		ArrayList<File> searchRootFileList; // 存放要搜索的 txt文件的 根目录 目前只有 \WeChat Files\和\Tencent Files\
+		File mWeChatRootFile; // C:\Users\xx\Documents\WeChat Files\ 目录 微信使用
+		File mTencentRootFile; // C:\Users\xx\Documents\Tencent Files\ 目录 QQ使用
 		File mLastTxtFile; // 最新的 TXT 文件
 		ArrayList<String> urlStrList; // url 字符串列表
 		File mDownloadedRootFile;
@@ -2172,11 +2290,10 @@ File ChromeDriverFile = new File(zbinPath + File.separator + "G2_chromedriver_v9
 
 		File ChromeDriverFile; // G2_chromedriver_v91.exe 下载头条视频时会用到
 
-		ArrayList<File> curAlredyDoTxtFileList;  //  当前已经执行了 检测处理的 txt文件 列表 持续增加
+		ArrayList<File> curAlredyDoTxtFileList; // 当前已经执行了 检测处理的 txt文件 列表 持续增加
 
 		// 下载的视频 是否 以 MD5 进行命名
 		boolean isMDName = false;
-
 
 		Monitor_WeChatFile_ForWindows_Rule_39() {
 			super("#", 39, 3); // 不包括
@@ -2208,10 +2325,10 @@ File ChromeDriverFile = new File(zbinPath + File.separator + "G2_chromedriver_v9
 				}
 
 			}
-	
+
 			return super.initParamsWithInputList(inputParamList) && Flag;
 		}
-		
+
 		@Override
 		boolean initParams4InputParam(String inputParam) {
 			System.out.println("inputParam = " + inputParam + "  curDirPath = " + curDirPath);
@@ -2231,25 +2348,21 @@ File ChromeDriverFile = new File(zbinPath + File.separator + "G2_chromedriver_v9
 			File wechatDocumentDirFile = new File(wechatPathPre);
 			File tecentDocumentDirFile = new File(tecentAbsFile);
 
-
-
-
-	/*		if (!shellAbsPath.startsWith(doucumentPath)) {
-				System.out.println(
-						"当前的Shell 路径不是 Document["+doucumentPath+"] 下的路径 的目录 ！！！ " + "inputParam = " + inputParam + "  curDirPath = " + curDirPath);
-
-				return false;
-			}*/
-
+			/*
+			 * if (!shellAbsPath.startsWith(doucumentPath)) { System.out.println(
+			 * "当前的Shell 路径不是 Document["+doucumentPath+"] 下的路径 的目录 ！！！ " + "inputParam = " +
+			 * inputParam + "  curDirPath = " + curDirPath);
+			 * 
+			 * return false; }
+			 */
 
 			File shellFile = new File(curDirPath);
 			String shellDirName = shellFile.getName();
 			String shellDirName_clearBlank = shellDirName.replace("-", ""); // 2021-07
 			String shellFileAbsPath = shellFile.getAbsolutePath();
 
-
-			String wechatRootPath = System.getProperties().getProperty("user.home") + File.separator + "Documents"+File.separator+"WeChat Files";
-
+			String wechatRootPath = System.getProperties().getProperty("user.home") + File.separator + "Documents"
+					+ File.separator + "WeChat Files";
 
 			String now_yyyymm = getTimeStamp_YYYYMM();
 			// C:\Users\zhuzj5\Documents\WeChat Files
@@ -2271,9 +2384,9 @@ File ChromeDriverFile = new File(zbinPath + File.separator + "G2_chromedriver_v9
 //				return false;
 //			}
 //
-			if(!wechatDocumentDirFile.exists() && !tecentDocumentDirFile.exists() ) {
+			if (!wechatDocumentDirFile.exists() && !tecentDocumentDirFile.exists()) {
 
-				System.out.println("当前 Document目录["+doucumentPath+"] ");
+				System.out.println("当前 Document目录[" + doucumentPath + "] ");
 				return false;
 			}
 
@@ -2295,25 +2408,23 @@ File ChromeDriverFile = new File(zbinPath + File.separator + "G2_chromedriver_v9
 			mWeChatRootFile = wechatDocumentDirFile;
 			mTencentRootFile = tecentDocumentDirFile;
 
-			if(mWeChatRootFile.exists()) {
+			if (mWeChatRootFile.exists()) {
 				searchRootFileList.add(mWeChatRootFile);
 				System.out.println("当前 WeChat目录存在 将持续为您监听");
-			}else{
-				System.out.println("当前 WeChat目录不存在   !!! File Not Exist ="+mWeChatRootFile.getAbsolutePath());
+			} else {
+				System.out.println("当前 WeChat目录不存在   !!! File Not Exist =" + mWeChatRootFile.getAbsolutePath());
 			}
 
-			if(mTencentRootFile.exists()) {
+			if (mTencentRootFile.exists()) {
 				searchRootFileList.add(mTencentRootFile);
 				System.out.println("当前 Tecent[QQ] 目录存在 将持续为您监听");
-			}else{
-				System.out.println("当前 Tecent[QQ]目录不存在   !!! File Not Exist ="+mTencentRootFile.getAbsolutePath());
+			} else {
+				System.out.println("当前 Tecent[QQ]目录不存在   !!! File Not Exist =" + mTencentRootFile.getAbsolutePath());
 
 			}
 
-
 			mLastTxtFile = calLastTxtFileInFileList(searchRootFileList);
-			curAlredyDoTxtFileList = getAllSubFileInFileList(searchRootFileList,".txt");
-
+			curAlredyDoTxtFileList = getAllSubFileInFileList(searchRootFileList, ".txt");
 
 //			File[] fileArr = mWeChatRootFile.listFiles();
 //			if (fileArr == null || fileArr.length == 0) {
@@ -2332,11 +2443,12 @@ File ChromeDriverFile = new File(zbinPath + File.separator + "G2_chromedriver_v9
 
 			for (int i = 0; i < searchFileList.size(); i++) {
 				File searchFile = searchFileList.get(i);
-				sb.append(searchFile.getAbsolutePath()+"_____");
+				sb.append(searchFile.getAbsolutePath() + "_____");
 			}
 			return sb.toString();
 
 		}
+
 		@Override
 		ArrayList<File> applyFileListRule3(ArrayList<File> subFileList, HashMap<String, ArrayList<File>> fileTypeMap) {
 
@@ -2350,11 +2462,12 @@ File ChromeDriverFile = new File(zbinPath + File.separator + "G2_chromedriver_v9
 						File lastTxtFile = calLastTxtFileInFileList(searchRootFileList);
 						if (lastTxtFile == null) {
 							mLastTxtFile = null;
-							System.out.println("当前搜索目录["+searchFileTip+"]没有Txt文件!!  睡眠1分钟后继续检测！！！ ");
+							System.out.println("当前搜索目录[" + searchFileTip + "]没有Txt文件!!  睡眠1分钟后继续检测！！！ ");
 						} else if (mLastTxtFile != null
 								&& lastTxtFile.getAbsolutePath().equals(mLastTxtFile.getAbsolutePath())) {
 
-							System.out.println("当前搜索目录["+searchFileTip+"]没有Txt文件!!!!  没有产生最新的Txt文件   睡眠1分钟后继续检测！！！ ");
+							System.out
+									.println("当前搜索目录[" + searchFileTip + "]没有Txt文件!!!!  没有产生最新的Txt文件   睡眠1分钟后继续检测！！！ ");
 						} else if (lastTxtFile != null && lastTxtFile != mLastTxtFile) {
 							System.out.println("当前检测到最新的 TXT 文件  lastTxtFile = " + lastTxtFile.getName()
 									+ " 创建新线程 打印内容！！！ 【lastTxtFile == mLastTxtFile】==【" + (lastTxtFile == mLastTxtFile)
@@ -2385,25 +2498,24 @@ File ChromeDriverFile = new File(zbinPath + File.separator + "G2_chromedriver_v9
 
 		int curUrlIndex_InTxtFile;
 
-
-
-		boolean isInAlreadyDoTxtFileList(ArrayList<File> mFileList , File singleFile ) {
+		boolean isInAlreadyDoTxtFileList(ArrayList<File> mFileList, File singleFile) {
 			boolean existFlag = false;
 			String singleAbs = singleFile.getAbsolutePath();
 			for (int i = 0; i < mFileList.size(); i++) {
 
-				File fileItem =mFileList.get(i);
+				File fileItem = mFileList.get(i);
 
 				String fileItemAbs = fileItem.getAbsolutePath();
 
-				if(fileItemAbs.equals(singleAbs)) {
+				if (fileItemAbs.equals(singleAbs)) {
 
 					existFlag = true;
 					return existFlag;
 				}
 			}
 
-			System.out.println("isInAlreadyDoTxtFileList = false "+"singleAbs = "+ singleAbs +" 不在已操作列表  将会执行它的 url 内容");
+			System.out.println(
+					"isInAlreadyDoTxtFileList = false " + "singleAbs = " + singleAbs + " 不在已操作列表  将会执行它的 url 内容");
 			return existFlag;
 
 		}
@@ -2411,27 +2523,27 @@ File ChromeDriverFile = new File(zbinPath + File.separator + "G2_chromedriver_v9
 		@SuppressWarnings("unchecked")
 		void NewFileOperation(File newFile) {
 
-			ArrayList<File>  curAllTxtFileList = getAllSubFileInFileList(searchRootFileList,".txt");
+			ArrayList<File> curAllTxtFileList = getAllSubFileInFileList(searchRootFileList, ".txt");
 			curAllTxtFileList.sort(mFileDateComparion);
 
-			ArrayList<File>  needOperationList = new  ArrayList<File> ();
-
+			ArrayList<File> needOperationList = new ArrayList<File>();
 
 			for (int i = 0; i < curAllTxtFileList.size(); i++) {
-				File curFile =curAllTxtFileList.get(i);
-				if(isInAlreadyDoTxtFileList(curAlredyDoTxtFileList,curFile)) {
-					continue;   //  当前的 文件 已经 在 操作完成文件列表中
+				File curFile = curAllTxtFileList.get(i);
+				if (isInAlreadyDoTxtFileList(curAlredyDoTxtFileList, curFile)) {
+					continue; // 当前的 文件 已经 在 操作完成文件列表中
 				}
 
 				needOperationList.add(curFile);
 
 			}
 
-
 			for (int i = 0; i < needOperationList.size(); i++) {
-				File operationFile =needOperationList.get(i);
+				File operationFile = needOperationList.get(i);
 				curAlredyDoTxtFileList.add(operationFile);
-				System.out.println("______________ 新文件操作 lastNewFile["+newFile.getName()+"] operationFile["+operationFile.getName()+"]"+" index["+i+"] needOperationCount["+needOperationList.size()+"] "+"______________");
+				System.out.println("______________ 新文件操作 lastNewFile[" + newFile.getName() + "] operationFile["
+						+ operationFile.getName() + "]" + " index[" + i + "] needOperationCount["
+						+ needOperationList.size() + "] " + "______________");
 				new Thread(new Runnable() {
 					@Override
 					public void run() {
@@ -2448,9 +2560,9 @@ File ChromeDriverFile = new File(zbinPath + File.separator + "G2_chromedriver_v9
 							synchronized (this) {
 								toGetUrlFromOneLine_And_InitUrlList(strLine_trim_clearChinese, oneLineUrlList);
 							}
-							System.out.println(
-									"line[" + j + "] : str[" + lineStr + "]  clearChinese[" + strLine_trim_clearChinese
-											+ "] result[" + OperationWithOneLine(j, oneLineUrlList, fileNameNoPoint) + "]");
+							System.out.println("line[" + j + "] : str[" + lineStr + "]  clearChinese["
+									+ strLine_trim_clearChinese + "] result["
+									+ OperationWithOneLine(j, oneLineUrlList, fileNameNoPoint) + "]");
 
 						}
 						System.out.println("════════════════ OVER ═════════════════");
@@ -2458,14 +2570,7 @@ File ChromeDriverFile = new File(zbinPath + File.separator + "G2_chromedriver_v9
 					}
 				}).start();
 
-
 			}
-
-
-
-
-
-
 
 		}
 
@@ -2510,14 +2615,15 @@ File ChromeDriverFile = new File(zbinPath + File.separator + "G2_chromedriver_v9
 						ksParseUrl(curUrlIndex_InTxtFile, strLine_trim_clearChinese, fileNameNoPoint);
 						urlStrList.add(strLine_trim_clearChinese);
 						tipMessage = "下载快手视频";
-					} else if (strLine_trim_clearChinese.contains("toutiao")  // m.toutiaoimg.cn  https://m.toutiaocdn.com/i6982548019329843742
+					} else if (strLine_trim_clearChinese.contains("toutiao") // m.toutiaoimg.cn
+																				// https://m.toutiaocdn.com/i6982548019329843742
 							|| strLine_trim_clearChinese.contains("ixigua")) {
 						TouTiao_XiGua_Download(curUrlIndex_InTxtFile, strLine_trim_clearChinese);
 						urlStrList.add(strLine_trim_clearChinese);
 						tipMessage = "下载头条西瓜视频";
-					}else {
+					} else {
 						tipMessage = "当前的URL不是抖音-快手-头条路径 暂不支持下载";
-						System.out.println("当前的URL不是抖音-快手-头条路径 暂不支持下载  URL = " +strLine_trim_clearChinese);
+						System.out.println("当前的URL不是抖音-快手-头条路径 暂不支持下载  URL = " + strLine_trim_clearChinese);
 					}
 
 				}
@@ -2550,14 +2656,14 @@ File ChromeDriverFile = new File(zbinPath + File.separator + "G2_chromedriver_v9
 
 		}
 
-		void XiGua_TouTiao_ParseUrl(int index , String url) {
+		void XiGua_TouTiao_ParseUrl(int index, String url) {
 			// String
 			// url="https://m.toutiaoimg.cn/group/6966235416110301696/?app=news_article_lite&timestamp=1626072237&group_id=6966235416110301696&share_token=0f88ebb4-c474-4671-9d9b-4b7e76004e38";
 
 			org.jsoup.nodes.Document mainHtml;
 			String jiemi_base64_url = null;
 			String base64_jiami_url = null;
-			String NoMainUrl_VideoTag_url = null ;  // 对于 没有 main_url 但 有 <video src="http" //这样的页面的处理
+			String NoMainUrl_VideoTag_url = null; // 对于 没有 main_url 但 有 <video src="http" //这样的页面的处理
 
 			// backup_url_1 有时 main_url 会 解析错误 所以 会导致 下载不了视频 此时 需要用 备用视频下载
 			String jiemi_base64_bankurl = null;
@@ -2569,21 +2675,21 @@ File ChromeDriverFile = new File(zbinPath + File.separator + "G2_chromedriver_v9
 			try {
 				mainHtml = Jsoup.parse(getXiGua_MainPageSource(url));
 
-				if(mainHtml != null && mainHtml.toString().contains("mediatype=\"video\"")
-						&& mainHtml.toString().contains("src=\"http")
-						&& mainHtml.toString().contains("<video") ) {
-					String  mainHtmlStr = mainHtml.toString();
-					// <video class="" tabindex="2" mediatype="video" src="http://v3-default.ixigua.com/c
+				if (mainHtml != null && mainHtml.toString().contains("mediatype=\"video\"")
+						&& mainHtml.toString().contains("src=\"http") && mainHtml.toString().contains("<video")) {
+					String mainHtmlStr = mainHtml.toString();
+					// <video class="" tabindex="2" mediatype="video"
+					// src="http://v3-default.ixigua.com/c
 					String begin_video_tag = mainHtmlStr.substring(mainHtmlStr.indexOf("<video"));
 					String src_begin_tag = begin_video_tag.substring(begin_video_tag.indexOf("src=\"http"));
 					String http_begin_tag = src_begin_tag.replace("src=\"http", "");
-					String target_video_url = "http"+http_begin_tag.substring(0, http_begin_tag.indexOf("\""));
+					String target_video_url = "http" + http_begin_tag.substring(0, http_begin_tag.indexOf("\""));
 					NoMainUrl_VideoTag_url = target_video_url;
 					System.out.println("当前页面源码有 Video Tag 标签 ");
 
 					System.out.println();
-					System.out.println("url = "+ url);
-					System.out.println("NoMainUrl_VideoTag_url = "+ NoMainUrl_VideoTag_url);
+					System.out.println("url = " + url);
+					System.out.println("NoMainUrl_VideoTag_url = " + NoMainUrl_VideoTag_url);
 					System.out.println("===============mainHtml Begin============ ");
 
 					System.out.println(mainHtml);
@@ -2592,10 +2698,9 @@ File ChromeDriverFile = new File(zbinPath + File.separator + "G2_chromedriver_v9
 
 					System.out.println();
 
-
-				}else {
+				} else {
 					System.out.println();
-					System.out.println("url = "+ url);
+					System.out.println("url = " + url);
 					System.out.println("===============mainHtml Begin============ ");
 
 					System.out.println(mainHtml);
@@ -2614,19 +2719,19 @@ File ChromeDriverFile = new File(zbinPath + File.separator + "G2_chromedriver_v9
 					base64_jiami_bankurl = calculXiGuaMainUri(url, MainHtmlStr, bankup_url_keyword);
 					if (base64_jiami_url == null) {
 
-						if(NoMainUrl_VideoTag_url != null) {
-							System.out.println("解析出的 base64_jiami_main_url 为空  但存在 video_tag_url = "+ NoMainUrl_VideoTag_url );
-							System.out.println(" 尝试下载  video_tag_url : "+ NoMainUrl_VideoTag_url);
+						if (NoMainUrl_VideoTag_url != null) {
+							System.out.println(
+									"解析出的 base64_jiami_main_url 为空  但存在 video_tag_url = " + NoMainUrl_VideoTag_url);
+							System.out.println(" 尝试下载  video_tag_url : " + NoMainUrl_VideoTag_url);
 
-							downRawVideo_WithUrl(index,NoMainUrl_VideoTag_url, "", "TouTiao");
-						}else {
+							downRawVideo_WithUrl(index, NoMainUrl_VideoTag_url, "", "TouTiao");
+						} else {
 
-							System.out.println("解析出的 base64_jiami_main_url 为空  NoMainUrl_VideoTag_url 为空 无法下载视频到本地   base64_jiami_url=" + base64_jiami_url);
+							System.out.println(
+									"解析出的 base64_jiami_main_url 为空  NoMainUrl_VideoTag_url 为空 无法下载视频到本地   base64_jiami_url="
+											+ base64_jiami_url);
 
 						}
-
-
-
 
 					} else {
 						System.out.println("解析出的 base64_jiami_url=[" + base64_jiami_url + "]  尝试解密base64");
@@ -2638,7 +2743,7 @@ File ChromeDriverFile = new File(zbinPath + File.separator + "G2_chromedriver_v9
 
 						if (jiemi_base64_url.startsWith("http")) {
 							System.out.println("执行 main_url 下载操作!!!    jiemi_base64_url=[" + jiemi_base64_url + "]");
-							downRawVideo_WithUrl(index,jiemi_base64_url, "", "TouTiao");
+							downRawVideo_WithUrl(index, jiemi_base64_url, "", "TouTiao");
 
 						} else {
 							System.out.println("解密出的地址不是以  http 开头  无法下载!!!");
@@ -2666,7 +2771,7 @@ File ChromeDriverFile = new File(zbinPath + File.separator + "G2_chromedriver_v9
 					if (jiemi_base64_bankurl != null && jiemi_base64_bankurl.startsWith("http")) {
 						System.out.println(
 								"执行 bankup_url_1 下载操作!!!    jiemi_base64_bankurl=[" + jiemi_base64_bankurl + "]");
-						downRawVideo_WithUrl(index,jiemi_base64_bankurl, "", "TouTiao");
+						downRawVideo_WithUrl(index, jiemi_base64_bankurl, "", "TouTiao");
 
 					}
 
@@ -2775,7 +2880,7 @@ File ChromeDriverFile = new File(zbinPath + File.separator + "G2_chromedriver_v9
 		 * @return 首页内容
 		 * @throws InterruptedException 睡眠中断异常
 		 */
-		String getXiGua_MainPageSource(String url)  {
+		String getXiGua_MainPageSource(String url) {
 
 			ChromeOptions CUR_CHROME_OPTIONS = new ChromeOptions();
 			// 驱动位置
@@ -2788,7 +2893,6 @@ File ChromeDriverFile = new File(zbinPath + File.separator + "G2_chromedriver_v9
 //			CUR_CHROME_OPTIONS.addArguments("Host=activityunion-marketing.meituan.com");
 //			CUR_CHROME_OPTIONS.addArguments("Upgrade-Insecure-Requests=1");
 //			CUR_CHROME_OPTIONS.addArguments("User-Agent=Mozilla/5.0 (iPhone; CPU iPhone OS 8_0 like Mac OS X) AppleWebKit/600.1.3 (KHTML, like Gecko) Version/8.0 Mobile/12A4345d Safari/600.1.4");
-
 
 			System.setProperty("webdriver.chrome.driver", ChromeDriverFile.getAbsolutePath());
 			// 避免被浏览器检测识别
@@ -2806,7 +2910,7 @@ File ChromeDriverFile = new File(zbinPath + File.separator + "G2_chromedriver_v9
 				do {
 					new Actions(driver).sendKeys(Keys.END).perform();
 					TimeUnit.MILLISECONDS.sleep(waitTime);
-					if(loop_index == 1) {
+					if (loop_index == 1) {
 						System.out.println("!! 触发点击事件  起始 标识 AAA !!");
 						new Actions(driver).sendKeys(Keys.HOME).perform();
 						TimeUnit.MILLISECONDS.sleep(1500);
@@ -2821,14 +2925,12 @@ File ChromeDriverFile = new File(zbinPath + File.separator + "G2_chromedriver_v9
 
 						}
 
-
 //				        List<WebElement> element =  driver.findElements(xgplayer);
 //				        if(element != null && element.size() > 0) {
 //				        	WebElement endElement = element.get(element.size() -1 );
 //				    		System.out.println("!! 触发点击事件  起始 标识 BBB   element.size()="+element.size());
 //				        	endElement.click();
 //				        }
-
 
 						/*
 						 * System.out.println("!! 触发点击事件  起始 标识 BBB !!"); List<WebElement> playelements
@@ -2863,12 +2965,12 @@ File ChromeDriverFile = new File(zbinPath + File.separator + "G2_chromedriver_v9
 				} while (!driver.getPageSource().contains("已经到底部，没有新的内容啦") && timeout > 0);
 				System.out.println("已经到底部，没有新的内容啦");
 				return driver.getPageSource();
-			}  catch (Exception e) {
+			} catch (Exception e) {
 				// TODO: handle exception
-				System.out.println("获取网页源码的时候出错  url = "+ url);
+				System.out.println("获取网页源码的时候出错  url = " + url);
 				e.printStackTrace();
 
-			}finally {
+			} finally {
 				driver.close();
 
 			}
@@ -2923,7 +3025,9 @@ File ChromeDriverFile = new File(zbinPath + File.separator + "G2_chromedriver_v9
 			}
 		}
 
-		// 	        String fileAddress = videoSavePath+"/"+((source==null ||"".equals(source) ? "":source+"_")+title.replace(" ", ""))+"_"+index_download+"_"+timeStamp_Str+".mp4";
+		// String fileAddress = videoSavePath+"/"+((source==null ||"".equals(source) ?
+		// "":source+"_")+title.replace(" ",
+		// ""))+"_"+index_download+"_"+timeStamp_Str+".mp4";
 
 		// 视频的保存 目录 不能是 当前文件 否则 就会执行 同步操作 影响网速
 		@SuppressWarnings("unchecked")
@@ -2957,18 +3061,17 @@ File ChromeDriverFile = new File(zbinPath + File.separator + "G2_chromedriver_v9
 				fs.close();
 				System.out.println("\n-----视频保存路径-----\n" + fileSavePath.getAbsolutePath());
 				System.out.println("\nzzfile_3.bat " + fileSavePath.getParentFile().getAbsolutePath());
-			
-				
-				if(isMDName) {
+
+				if (isMDName) {
 					System.out.println("由于 isMDName=true  视频文件将以 MD5 属性文件名称进行命名!!! ");
-			
-					//  获取文件的 md值   并重命名为 mdxxxx.mp4  
+
+					// 获取文件的 md值 并重命名为 mdxxxx.mp4
 					String mdName = getMD5Three(fileSavePath.getAbsolutePath());
-					String new_Md_Name = mdName+".mp4";
+					String new_Md_Name = mdName + ".mp4";
 					tryReName(fileSavePath, new_Md_Name);
-					//  把下载的 mp4 文件 名称 转为 md值
+					// 把下载的 mp4 文件 名称 转为 md值
 				}
-				
+
 				urlStrList.add(httpUrl);
 			} catch (FileNotFoundException e) {
 				System.out.println(e.getMessage());
@@ -2997,21 +3100,20 @@ File ChromeDriverFile = new File(zbinPath + File.separator + "G2_chromedriver_v9
 			return isUrl;
 		}
 
-
 		@SuppressWarnings("unchecked")
 		File calLastTxtFileInFileList(ArrayList<File> rootFileList) {
 
-			if(rootFileList == null || rootFileList.size() == 0) {
+			if (rootFileList == null || rootFileList.size() == 0) {
 				System.out.println(" AA   calLastTxtFileInFileList == null ");
 				return null;
 			}
-			// 全目录 搜索   TXT  文件  Begin
-			ArrayList<File> allTxtFileList = 	new 	ArrayList<File>();
+			// 全目录 搜索 TXT 文件 Begin
+			ArrayList<File> allTxtFileList = new ArrayList<File>();
 //			ArrayList<File> txtFileList = new ArrayList<File>();
 			for (int i = 0; i < rootFileList.size(); i++) {
 				File rootDir = rootFileList.get(i);
-				ArrayList<File> txtFileList = 	getAllSubFile(rootDir,".txt");
-				if (txtFileList == null  || txtFileList.size() == 0) {
+				ArrayList<File> txtFileList = getAllSubFile(rootDir, ".txt");
+				if (txtFileList == null || txtFileList.size() == 0) {
 					continue;
 				}
 
@@ -3019,7 +3121,7 @@ File ChromeDriverFile = new File(zbinPath + File.separator + "G2_chromedriver_v9
 
 			}
 
-			if(allTxtFileList.size() == 0) {
+			if (allTxtFileList.size() == 0) {
 				System.out.println(" BB   calLastTxtFileInFileList.size() == 0 ");
 				return null;
 			}
@@ -3032,16 +3134,13 @@ File ChromeDriverFile = new File(zbinPath + File.separator + "G2_chromedriver_v9
 
 		}
 
-
 		@SuppressWarnings("unchecked")
 		File calLastTxtFileInList(File rootDir) {
 
-			// 全目录 搜索   TXT  文件  Begin
+			// 全目录 搜索 TXT 文件 Begin
 //			ArrayList<File> txtFileList = new ArrayList<File>();
 
-
-			ArrayList<File> txtFileList = 	getAllSubFile(rootDir,".txt");
-
+			ArrayList<File> txtFileList = getAllSubFile(rootDir, ".txt");
 
 			/*
 			 * File newRootFile = new File(rootDir.getAbsolutePath()); if (newRootFile ==
@@ -3056,7 +3155,7 @@ File ChromeDriverFile = new File(zbinPath + File.separator + "G2_chromedriver_v9
 			 *
 			 * }
 			 */
-			// 全目录 搜索   TXT  文件  End
+			// 全目录 搜索 TXT 文件 End
 
 			if (txtFileList.size() == 0) {
 				return null;
@@ -3127,24 +3226,26 @@ File ChromeDriverFile = new File(zbinPath + File.separator + "G2_chromedriver_v9
 		 * ; }
 		 */
 
-
 		@Override
 		String simpleDesc() {
 
-			return Cur_Bat_Name + " #_" + rule_index	+ "  ### 持续检测 WeChat目录 C:\\Users\\zukgit\\Documents\\WeChat Files\\xxxx\\FileStorage\\File\\2021-07 的 TXT文件的内容    \n" + 
-					Cur_Bat_Name + " #_" + rule_index +"  mdname_true "	+ "  ### 以MD5字符串保存下载视频文件 持续检测 WeChat目录 C:\\Users\\zukgit\\Documents\\WeChat Files\\xxxx\\FileStorage\\File\\2021-07 的 TXT文件的内容    \n"
-					
+			return Cur_Bat_Name + " #_" + rule_index
+					+ "  ### 持续检测 WeChat目录 C:\\Users\\zukgit\\Documents\\WeChat Files\\xxxx\\FileStorage\\File\\2021-07 的 TXT文件的内容    \n"
+					+ Cur_Bat_Name + " #_" + rule_index + "  mdname_true "
+					+ "  ### 以MD5字符串保存下载视频文件 持续检测 WeChat目录 C:\\Users\\zukgit\\Documents\\WeChat Files\\xxxx\\FileStorage\\File\\2021-07 的 TXT文件的内容    \n"
+
 					+ Cur_Bat_Name + " #_" + rule_index + "   ### 只有在 WeChat的当前 月份接收文件目录 才能生效 Monitor 监控 \n"
-					+ "  explorer.exe  \"" + System.getProperties().getProperty("user.home")+ "\\Documents\\WeChat Files\"  \n"
-					+ "  explorer.exe  \"" + System.getProperties().getProperty("user.home")+ "\\Documents\\Tencent Files\"  \n"
+					+ "  explorer.exe  \"" + System.getProperties().getProperty("user.home")
+					+ "\\Documents\\WeChat Files\"  \n" + "  explorer.exe  \""
+					+ System.getProperties().getProperty("user.home") + "\\Documents\\Tencent Files\"  \n"
 
-					+ "  explorer.exe  \""+ mDownloadedMonthDir.getAbsolutePath()
-					+ "\"   \n" + "cd  " + "\""+ System.getProperties().getProperty("user.home") + "\\Documents\\" + "\""+"  && "
+					+ "  explorer.exe  \"" + mDownloadedMonthDir.getAbsolutePath() + "\"   \n" + "cd  " + "\""
+					+ System.getProperties().getProperty("user.home") + "\\Documents\\" + "\"" + "  && "
 
-					+ "  explorer.exe " + " \""+  mDownloadedMonthDir.getAbsolutePath()+"\"" +
-					" \n &&   zrule_apply_G2.bat " + "_" + rule_index + "_" +"  mdname_true"+ "\n"
+					+ "  explorer.exe " + " \"" + mDownloadedMonthDir.getAbsolutePath() + "\""
+					+ " \n &&   zrule_apply_G2.bat " + "_" + rule_index + "_" + "  mdname_true" + "\n"
 
-					;
+			;
 		}
 
 	}
@@ -3167,18 +3268,16 @@ File ChromeDriverFile = new File(zbinPath + File.separator + "G2_chromedriver_v9
 
 	};
 
-
-
 	static Comparator mStringComparion = new Comparator<String>() {
 		@Override
 		public int compare(String o1, String o2) {
 			int o1_length = o1.length();
 			int o2_length = o2.length();
-			if(o1_length < o2_length) {
+			if (o1_length < o2_length) {
 				return -1;
-			}else if(o1_length == o2_length) {
-				return  o1.compareTo(o2);
-			}else if(o1_length > o2_length) {
+			} else if (o1_length == o2_length) {
+				return o1.compareTo(o2);
+			} else if (o1_length > o2_length) {
 				return 1;
 			}
 
@@ -3186,7 +3285,7 @@ File ChromeDriverFile = new File(zbinPath + File.separator + "G2_chromedriver_v9
 		}
 
 	};
-	
+
 	class Revert_xlsx2json_Rule_38 extends Basic_Rule {
 		boolean isDirOperation; // 是否没有输入 xlsx 文件 而是 输入了一个 目录 默认shell 目录 已经 输入的目录
 
@@ -11983,7 +12082,7 @@ File ChromeDriverFile = new File(zbinPath + File.separator + "G2_chromedriver_v9
 		return getAllSubFile(dirFile.getAbsolutePath(), "", typeList);
 
 	}
-	
+
 	static ArrayList<File> getAllSubFile(File dirFile, String aospPath, ArrayList<String> typeList) {
 		if (aospPath == null || "".equals(aospPath)) {
 			return getAllSubFile(dirFile.getAbsolutePath(), "", typeList);
@@ -13113,18 +13212,12 @@ File ChromeDriverFile = new File(zbinPath + File.separator + "G2_chromedriver_v9
 			execute_Mac(commandNotead);
 		}
 	}
-	
-	
-	
-
-
-
 
 	static ArrayList<File> getAllSubFileInFileList(ArrayList<File> rootFileList, String typeStr) {
-		if(rootFileList == null || rootFileList.size() == 0) {
+		if (rootFileList == null || rootFileList.size() == 0) {
 			return null;
 		}
-		ArrayList<File>  ResultFileList = new 	ArrayList<File>();
+		ArrayList<File> ResultFileList = new ArrayList<File>();
 
 		ArrayList<String> typeList = new ArrayList<String>();
 		typeList.add(typeStr);
@@ -13132,7 +13225,7 @@ File ChromeDriverFile = new File(zbinPath + File.separator + "G2_chromedriver_v9
 		for (int i = 0; i < rootFileList.size(); i++) {
 			File dirFile = rootFileList.get(i);
 			ArrayList<File> flitterFileList = getAllSubFile(dirFile.getAbsolutePath(), "", typeList);
-			if(flitterFileList == null || flitterFileList.size() == 0) {
+			if (flitterFileList == null || flitterFileList.size() == 0) {
 				continue;
 			}
 			ResultFileList.addAll(flitterFileList);
@@ -13141,7 +13234,6 @@ File ChromeDriverFile = new File(zbinPath + File.separator + "G2_chromedriver_v9
 		return ResultFileList;
 
 	}
-
 
 	static String getFirstZiMu(String srcStr) {
 		String firstZimu = "U"; // 默认为 Unknow;
