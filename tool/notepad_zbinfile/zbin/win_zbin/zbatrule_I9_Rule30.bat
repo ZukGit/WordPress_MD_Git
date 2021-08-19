@@ -3381,6 +3381,99 @@ goto:eof
 
 
 
+:rule22vfastopenexe_func_1x0
+rem ======================================== rule22vfastopenexe_func_1x0
+rem rule_tip: %init_input_0% _22_  control      ##  start control.exe  快速打开控制面板
+
+rem rule_tip: %init_input_0% _22_  regedit      ##  start regedit.exe  快速打开注册表
+
+rem rule_tip: %init_input_0% _22_  dxdiag       ##  start  dxdiag.exe  快速打开 DirectX信息面板
+
+rem rule_tip: %init_input_0% _22_  mstsc        ##  start  mstsc.exe  快速打开 远程桌面连接窗口
+
+rem rule_tip: %init_input_0% _22_  ncpa.cpl     ##  start control ncpa.cpl   快速打开本地连接页面
+
+rem rule_tip: %init_input_0% _22_  gpedit.msc   ##  start gpedit.msc  快速打开组策略
+
+rem rule_tip: %init_input_0% _22_  compmgmt.msc   ##  start  compmgmt.msc  快速打开计算机管理
+
+rem rule_tip: %init_input_0% _22_  secpol.msc   ##  start  secpol.msc  快速打开本地安全策略
+
+rem rule_tip: %init_input_0% _22_  cmd   ##    管理员权限打开CMD_初始路径D盘 【Win+X+Shift+A】 打开管理员CMD的命快键_依次点击
+
+rem rule_tip: %init_input_0% _22_   showfiletype  ##   显示文件的扩展名
+
+rem rule_tip: %init_input_0% _22_   showhiddenfile  ##   显示隐藏文件夹 文件
+
+rem rule_tip: %init_input_0% _22_   wifi  ##   显示wifi信息
+
+
+rem desc: 
+rem sample: 
+rem sample_out: 
+::SETLOCAL
+echo ______________Method_In rule22vfastopenexe_func_1x0
+set rule22vfastopenexe_dynamic_param1=
+if "%init_input_2%"=="control" (
+start control.exe
+)
+if "%init_input_2%"=="dxdiag" (
+start dxdiag.exe
+)
+if "%init_input_2%"=="mstsc" (
+start mstsc.exe
+)
+if "%init_input_2%"=="ncpa.cpl" (
+start control ncpa.cpl
+)
+if "%init_input_2%"=="gpedit.msc" (
+start gpedit.msc
+)
+if "%init_input_2%"=="compmgmt.msc" (
+start compmgmt.msc
+)
+if "%init_input_2%"=="cmd" (
+del zcmd_admin_I9.bat
+echo @ECHO off >> zcmd_admin_I9.bat  
+echo setlocal enabledelayedexpansion  >> zcmd_admin_I9.bat  
+rem set local_str=^%1 mshta vbscript^:CreateObject^(^"Shell^.Application^"^)^.ShellExecute^(^"cmd^.exe^",^"/c ^%^~s0 ::^",^"^",^"runas^",1^)^(window^.close^)^&^&exit
+echo ^%%^1 mshta vbscript^:CreateObject^(^"Shell^.Application^"^)^.ShellExecute^(^"cmd^.exe^",^"/c %%^~s0 ::^",^"^",^"runas^",1^)^(window^.close^)^&^&exit  >> zcmd_admin_I9.bat 
+echo start cmd /K D: >> zcmd_admin_I9.bat  
+echo start cmd /K "cd /d D:/zsoft/"  >> zcmd_admin_I9.bat  
+start zcmd_admin_I9.bat  
+rem start %win_zbin%/zcmd_admin_I9.bat  
+rem del  zcmd_admin_I9.bat  
+)
+if "%init_input_2%"=="regedit" (
+start regedit.exe
+)
+if "%init_input_2%"=="showfiletype" (
+echo 显示文件的扩展名
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v HideFileExt /t reg_dword /d 00000000 /f
+)
+if "%init_input_2%"=="showhiddenfile" (
+echo 显示隐藏文件
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v Hidden /t reg_dword /d 1 /f
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v HideFileExt /t reg_dword /d 0 /f
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v ShowSuperHidden /t reg_dword /d 1 /f
+)
+if "%init_input_2%"=="wifi" (
+echo 显示WIFI
+del showwifi.txt
+for /f "skip=9 tokens=1,2 delims=:" %%i in ('netsh wlan show profiles') do  @echo %%j | findstr -i -v echo | netsh wlan show profiles %%j key=clear >> "showwifi.txt"
+echo ___________________ WIFI Info Begin ___________________
+cat showwifi.txt  | findstr  "SSID.name Key"
+echo ___________________ WIFI Info End ___________________
+rem del  showwifi.txt
+)
+echo [rule22vfastopenexe_func_1x0 EndPrintCode]    output=[__empty__] dynamic_param1=[!rule22vfastopenexe_dynamic_param1!]   
+echo ______________Method_Out rule22vfastopenexe_func_1x0
+::ENDLOCAL
+goto:eof
+
+
+
+
 :rule999vmethodholdplace_func_0x0
 rem ======================================== rule999vmethodholdplace_func_0x0
 rem rule_tip: %init_input_0% _999_   ## 打印当前 rule规则的method模板
@@ -3498,6 +3591,31 @@ echo %init_input_0% _21_ mp4  ## 查看当前目录下所有 mp4文件的MD属�
 echo %init_input_0% _21_ jpg   ## 查看当前目录下所有 jpg文件的MD属性
 
 echo %init_input_0% _21_ gif  ## 查看当前目录下所有 gif文件的MD属性
+
+echo %init_input_0% _22_  control      ##  start control.exe  快速打开控制面板
+
+echo %init_input_0% _22_  regedit      ##  start regedit.exe  快速打开注册表
+
+echo %init_input_0% _22_  dxdiag       ##  start  dxdiag.exe  快速打开 DirectX信息面板
+
+echo %init_input_0% _22_  mstsc        ##  start  mstsc.exe  快速打开 远程桌面连接窗口
+
+echo %init_input_0% _22_  ncpa.cpl     ##  start control ncpa.cpl   快速打开本地连接页面
+
+echo %init_input_0% _22_  gpedit.msc   ##  start gpedit.msc  快速打开组策略
+
+echo %init_input_0% _22_  compmgmt.msc   ##  start  compmgmt.msc  快速打开计算机管理
+
+echo %init_input_0% _22_  secpol.msc   ##  start  secpol.msc  快速打开本地安全策略
+
+echo %init_input_0% _22_  cmd   ##    管理员权限打开CMD_初始路径D盘 【Win+X+Shift+A】 打开管理员CMD的命快键_依次点击
+
+echo %init_input_0% _22_   showfiletype  ##   显示文件的扩展名
+
+echo %init_input_0% _22_   showhiddenfile  ##   显示隐藏文件夹 文件
+
+echo %init_input_0% _22_   wifi  ##   显示wifi密码信息
+
 
 echo %init_input_0% _999_   ## 打印当前 rule规则的method模板
 echo [ruletipprint_func_0x0 EndPrintCode]   output=[__empty__]  param1=[__empty__] 
