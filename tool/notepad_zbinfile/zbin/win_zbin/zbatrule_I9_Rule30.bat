@@ -851,6 +851,31 @@ rem ======================== FILE_OPERATION End========================
 rem ======================== SYSTEM_OPERATION Begin======================== 
 
 
+:isadminuser_func_0x1
+rem ======================================== isadminuser_func_0x1
+rem desc: 检测当前运行环境是否是Admin 管理员权限   如果是管理员返回true    如果只是普通的用户返回false  通过net session 的返回值判断
+rem sample: call :isadminuser_func_0x1  
+rem sample_out: [isadminuser_func_0x1 ]   isadminuser_return_1=[false]   
+::SETLOCAL
+echo ______________Method_In isadminuser_func_0x1
+
+net session
+echo errorlevel=%ERRORLEVEL%
+if %ERRORLEVEL% LEQ 1 (
+echo 当前Admin用户权限
+set isadminuser_return_1=true
+) else (
+echo 当前普通用户权限
+set isadminuser_return_1=false
+)
+
+echo [isadminuser_func_0x1 EndPrintCode]   isadminuser_return_1=[!isadminuser_return_1!]    
+echo ______________Method_Out isadminuser_func_0x1
+::ENDLOCAL
+goto:eof
+
+
+
 :showcmdercommand_func_1x0
 rem ======================================== showcmdercommand_func_1x0
 rem desc: 
@@ -2841,26 +2866,22 @@ echo [rule18vinstalllocalsoft_func_0x0 EndPrintCode]   output=[__empty__]  param
 echo ______________Method_Out rule18vinstalllocalsoft_func_0x0
 goto:eof
 )
-echo 10请确保当前是运行在管理员权限下,否则系统环境变量可能无法设置.
-ping -n 5 127.0.0.1>nul
-echo 9请确保当前是运行在管理员权限下,否则系统环境变量可能无法设置.
+
+call :isadminuser_func_0x1
+echo  isadminuser_return_1=!isadminuser_return_1!
+if "!isadminuser_return_1!"=="false" (
+echo 请确保当前是运行在管理员权限下,否则系统环境变量可能无法设置.
 ping -n 2 127.0.0.1>nul
-echo 8请确保当前是运行在管理员权限下,否则系统环境变量可能无法设置.
+
+echo 当前不是 Admin 的 运行环境 无法执行安装程序操作  程序停止！
+goto:eof
+)
+echo 当前CMD环境是 Admin环境 将往下执行 3
 ping -n 2 127.0.0.1>nul
-echo 7请确保当前是运行在管理员权限下,否则系统环境变量可能无法设置.
+echo 当前CMD环境是 Admin环境 将往下执行 2
 ping -n 2 127.0.0.1>nul
-echo 6请确保当前是运行在管理员权限下,否则系统环境变量可能无法设置.
-ping -n 2 127.0.0.1>nul
-echo 5请确保当前是运行在管理员权限下,否则系统环境变量可能无法设置.
-ping -n 2 127.0.0.1>nul
-echo 4请确保当前是运行在管理员权限下,否则系统环境变量可能无法设置.
-ping -n 2 127.0.0.1>nul
-echo 3请确保当前是运行在管理员权限下,否则系统环境变量可能无法设置.
-ping -n 2 127.0.0.1>nul
-echo 2请确保当前是运行在管理员权限下,否则系统环境变量可能无法设置.
-ping -n 2 127.0.0.1>nul
-echo 1请确保当前是运行在管理员权限下,否则系统环境变量可能无法设置.
-ping -n 2 127.0.0.1>nul
+echo 当前CMD环境是 Admin环境 将往下执行 1
+
 echo 0开始执行zsoft_dest目录生成操作!!
 call :isfileexist_func_1x1  !zsoft_dest_dir!
 set zsoft_dest_dir_existflag=!isfileexist_return_1!
@@ -3683,6 +3704,8 @@ call ::helloworld_func_0x0
 call ::recordfilenametofile_func_1x1 %zbin%
 call :getrandomintwithmaxmin_func_2x1  1000 10000
 echo getrandomintwithmaxmin_return_1=!getrandomintwithmaxmin_return_1!
+call :isadminuser_func_0x1
+echo  isadminuser_return_1=!isadminuser_return_1!
 echo __________________ Main_Method End _______________________
 goto:eof
 rem ══════════════════════════════════════════ Main_Enter_Aera End══════════════════════════════════════════
