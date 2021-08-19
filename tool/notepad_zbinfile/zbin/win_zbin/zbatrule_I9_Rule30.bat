@@ -2065,6 +2065,31 @@ rem ======================== TEST_OPERATION End========================
 rem ======================== BUSSINESS_OPERATION Begin======================== 
 
 
+:rule0vmethodtemplate_func_0x0
+rem ======================================== rule0vmethodtemplate_func_0x0
+rem rule_tip: %init_input_0% _0_   ## 打印当前 rule规则的method模板
+rem desc: 
+rem sample: 
+rem sample_out: 
+::SETLOCAL
+echo ______________Method_In rule0vmethodtemplate_func_0x0
+echo ======================================================================== Rule_Method_模板 Begin ========================================================================
+echo :rule0vmethodtemplate_func_0x0
+echo rem ======================================== rule0vmethodtemplate_func_0x0
+echo rem desc:
+echo rem sample_out:
+echo ::SETLOCAL
+echo ::ENDLOCAL
+echo goto:eof
+echo ======================================================================== Rule_Method_模板 End ========================================================================
+echo [rule0vmethodtemplate_func_0x0 EndPrintCode]   output=[__empty__]  param1=[__empty__] 
+echo ______________Method_Out rule0vmethodtemplate_func_0x0
+::ENDLOCAL
+goto:eof
+
+
+
+
 :rule1vbankupapk_func_0x0
 rem ======================================== rule1vbankupapk_func_0x0
 rem rule_tip: %init_input_0% _1_   ## 备份bankup所有当前手机安装的三方 apk本地PC本地目录
@@ -3021,7 +3046,7 @@ goto:eof
 
 :rule19vdownloadshoucangjia_func_0x0
 rem ======================================== rule19vdownloadshoucangjia_func_0x0
-rem rule_tip: %init_input_0% _19_  ## ADB 命令 Tel自动加载目录
+rem rule_tip: %init_input_0% _19_  ## ADB 命令 Tel自动加载命令
 rem desc: 
 rem sample: 
 rem sample_out: 
@@ -3186,6 +3211,195 @@ goto:eof
 
 
 
+:rule20vrenamewithtype_func_2x0
+rem ======================================== rule20vrenamewithtype_func_2x0
+rem rule_tip: %init_input_0% _20_      ## 把当前目录的 media媒体文件 jpg_jpeg_webp_mp4_avi_gif 改成 数字.类型 形式
+
+rem rule_tip: %init_input_0% _20_   jpg   ## 已经当前输入的类型去对匹配的文件改名 改为  数字.类型 形式
+
+rem rule_tip: %init_input_0% _20_   png   ## 已经当前输入的类型去对匹配的文件改名 改为  数字_.类型 形式
+
+rem rule_tip: %init_input_0% _20_   gif    ## 已经当前输入的类型去对匹配的文件改名 改为  数字.类型 形式
+
+rem rule_tip: %init_input_0% _20_   mp4   ## 已经当前输入的类型去对匹配的文件改名 改为  数字.类型 形式
+
+rem rule_tip: %init_input_0% _20_   webp   ## 已经当前输入的类型去对匹配的文件改名 改为  数字.类型 形式
+
+rem rule_tip: %init_input_0% _20_   jpg timestamp  ## 已经当前输入的类型去对匹配的文件改名 改为  数字_时间戳.类型 形式
+
+rem rule_tip: %init_input_0% _20_   png timestamp  ## 已经当前输入的类型去对匹配的文件改名 改为  数字_时间戳.类型 形式
+
+rem rule_tip: %init_input_0% _20_   gif timestamp  ## 已经当前输入的类型去对匹配的文件改名 改为  数字_时间戳.类型 形式
+
+rem rule_tip: %init_input_0% _20_   mp4 timestamp  ## 已经当前输入的类型去对匹配的文件改名 改为  数字_时间戳.类型 形式
+
+rem rule_tip: %init_input_0% _20_   webp timestamp  ## 已经当前输入的类型去对匹配的文件改名 改为  数字_时间戳.类型 形式
+rem desc: 
+rem sample: 
+rem sample_out: 
+::SETLOCAL
+echo ______________Method_In rule20vrenamewithtype_func_2x0
+set rule20vrenamewithtype_dynamic_param1=
+set rule20vrenamewithtype_dynamic_param2=
+if "%init_input_2%"=="" (
+echo init_input_2=null 
+) else (
+rem set rule4vscreendown_dynamic_param1=%init_input_2% 
+echo init_input_2=%rule4vscreendown_dynamic_param1% 
+)
+rem   !init_cd! 
+set /a n=0
+set  fileName_timestamp_pre=
+if "%init_input_3%"=="timestamp" (
+call :gettimehhmmsss_func_0x1
+set CURRENT_DATE_TIME_STAMP=!gettimehhmmsss_return_1!
+set  fileName_timestamp_pre=_!CURRENT_DATE_TIME_STAMP!
+echo CURRENT_DATE_TIME_STAMP=!CURRENT_DATE_TIME_STAMP!
+echo fileName_timestamp_pre=!fileName_timestamp_pre!
+) 
+if "%init_input_2%"=="" (
+for /f "delims=\" %%i in ('dir /b /a-d /o-d "!init_cd!\*.jpg"') do (
+    set /a n+=1
+    set number=!n!
+    set newfileName=!n!!fileName_timestamp_pre!%%~xi
+    echo 完全匹配[jpg]源文件:%%i 重命名为:!newfileName!
+    ren "%%i" "!newfileName!"
+)
+set /a n=0
+for /f "delims=\" %%i in ('dir /b /a-d /o-d "!init_cd!\*.png"') do (
+    set /a n+=1
+    set number=!n!
+    set newfileName=!n!!fileName_timestamp_pre!%%~xi
+    echo 完全匹配[png]源文件:%%i 重命名为:!newfileName!
+    ren "%%i" "!newfileName!"
+)
+set /a n=0
+for /f "delims=\" %%i in ('dir /b /a-d /o-d "!init_cd!\*.gif"') do (
+    set /a n+=1
+    set number=!n!
+    set newfileName=!n!!fileName_timestamp_pre!%%~xi
+    echo 完全匹配[gif]源文件:%%i 重命名为:!newfileName!
+    ren "%%i" "!newfileName!"
+)
+set /a n=0
+for /f "delims=\" %%i in ('dir /b /a-d /o-d "!init_cd!\*.jpeg"') do (
+    set /a n+=1
+    set number=!n!
+    set newfileName=!n!!fileName_timestamp_pre!%%~xi
+    echo 完全匹配[jpeg]源文件:%%i 重命名为:!newfileName!
+    ren "%%i" "!newfileName!"
+)
+set /a n=0
+for /f "delims=\" %%i in ('dir /b /a-d /o-d "!init_cd!\*.bmp"') do (
+    set /a n+=1
+    set number=!n!
+    set newfileName=!n!!fileName_timestamp_pre!%%~xi
+    echo 完全匹配[bmp]源文件:%%i 重命名为:!newfileName!
+    ren "%%i" "!newfileName!"
+)
+set /a n=0
+for /f "delims=\" %%i in ('dir /b /a-d /o-d "!init_cd!\*.webp"') do (
+    set /a n+=1
+    set number=!n!
+    set newfileName=!n!!fileName_timestamp_pre!%%~xi
+    echo 完全匹配[webp]源文件:%%i 重命名为:!newfileName!
+    ren "%%i" "!newfileName!"
+)
+set /a n=0
+for /f "delims=\" %%i in ('dir /b /a-d /o-d "!init_cd!\*.mp4"') do (
+    set /a n+=1
+    set number=!n!
+    set newfileName=!n!!fileName_timestamp_pre!%%~xi
+    echo 完全匹配[webp]源文件:%%i 重命名为:!newfileName!
+    ren "%%i" "!newfileName!"
+)
+set /a n=0
+for /f "delims=\" %%i in ('dir /b /a-d /o-d "!init_cd!\*.avi"') do (
+    set /a n+=1
+    set number=!n!
+    set newfileName=!n!!fileName_timestamp_pre!%%~xi
+    echo 完全匹配[webp]源文件:%%i 重命名为:!newfileName!
+    ren "%%i" "!newfileName!"
+)
+) else (
+call :clearStringPadding_func_1x1  %init_input_2%
+set rule4vscreendown_dynamic_param1=!clearStringPadding_return_1!
+echo rule4vscreendown_dynamic_param1=[!rule4vscreendown_dynamic_param1!] [!clearStringPadding_return_1!]
+for /f "delims=\" %%i in ('dir /b /a-d /o-d "!init_cd!\*.!rule4vscreendown_dynamic_param1!"') do (
+    set /a n+=1
+    set number=!n!
+    set newfileName=!n!%fileName_timestamp_pre%.!rule4vscreendown_dynamic_param1!
+    echo 输入类型[!rule4vscreendown_dynamic_param1!]匹配源文件:[%%i] 重命名为:[!newfileName!]
+    ren "%%i" "!newfileName!"
+)
+)
+echo [rule20vrenamewithtype_func_2x0 EndPrintCode]    output=[__empty__] dynamic_param1=[!rule20vrenamewithtype_dynamic_param1!]   dynamic_param2=[!rule20vrenamewithtype_dynamic_param2!]   
+echo ______________Method_Out rule20vrenamewithtype_func_2x0
+::ENDLOCAL
+goto:eof
+
+
+
+
+:rule21vshowfilemd_func_1x0
+rem ======================================== rule21vshowfilemd_func_1x0
+rem rule_tip: %init_input_0% _21_   ## 查看当前目录下所有文件的 MD属性
+
+rem rule_tip: %init_input_0% _21_ mp4  ## 查看当前目录下所有 mp4文件的MD属性
+
+rem rule_tip: %init_input_0% _21_ jpg   ## 查看当前目录下所有 jpg文件的MD属性
+
+rem rule_tip: %init_input_0% _21_ gif  ## 查看当前目录下所有 gif文件的MD属性
+rem desc: 
+rem sample: 
+rem sample_out: 
+::SETLOCAL
+echo ______________Method_In rule21vshowfilemd_func_1x0
+set rule21vshowfilemd_dynamic_param1=
+set /a n=0
+if "%init_input_2%"=="" (
+echo init_input_2=null 
+for /f "delims=\" %%i in ('dir /b /a-d /o-d "!init_cd!\*.*"') do (
+    set /a n+=1
+    echo 全类型源文件[!n!][%%i] MD属性信息如下:
+    certutil -hashfile "%%i"  MD5
+)
+) else (
+echo init_input_2=%init_input_2%
+set rule21vshowfilemd_dynamic_param1=%init_input_2%
+for /f "delims=\" %%i in ('dir /b /a-d /o-d "!init_cd!\*.!rule21vshowfilemd_dynamic_param1!"') do (
+    set /a n+=1
+    echo !rule21vshowfilemd_dynamic_param1!]类型源文件[!n!][%%i] MD属性信息如下:
+    certutil -hashfile "%%i"  MD5
+)
+)
+echo [rule21vshowfilemd_func_1x0 EndPrintCode]    output=[__empty__] dynamic_param1=[!rule21vshowfilemd_dynamic_param1!]   
+echo ______________Method_Out rule21vshowfilemd_func_1x0
+::ENDLOCAL
+goto:eof
+
+
+
+
+:rule999vmethodholdplace_func_0x0
+rem ======================================== rule999vmethodholdplace_func_0x0
+rem rule_tip: %init_input_0% _999_   ## 打印当前 rule规则的method模板
+rem desc: 
+rem sample: 
+rem sample_out: 
+::SETLOCAL
+echo ______________Method_In rule999vmethodholdplace_func_0x0
+echo ========================================== Rule_Method_HoldPlace_占位模板 Begin ===============================
+echo :rule999vmethodholdplace_func_0x0
+echo ========================================== Rule_Method_HoldPlace_占位模板 End ===============================
+echo [rule999vmethodholdplace_func_0x0 EndPrintCode]   output=[__empty__]  param1=[__empty__] 
+echo ______________Method_Out rule999vmethodholdplace_func_0x0
+::ENDLOCAL
+goto:eof
+
+
+
+
 :ruletipprint_func_0x0
 rem ======================================== ruletipprint_func_0x0
 rem desc: Bussiness_Rule打印程序用于打印batrule规则序列
@@ -3193,6 +3407,8 @@ rem sample:
 rem sample_out: 
 ::SETLOCAL
 echo ______________Method_In ruletipprint_func_0x0
+echo %init_input_0% _0_   ## 打印当前 rule规则的method模板
+
 echo %init_input_0% _1_   ## 备份bankup所有当前手机安装的三方 apk本地PC本地目录
 
 echo %init_input_0% _2_   ## 获取手机当前正在运行的APK_必须是三方的APK 到本地
@@ -3251,7 +3467,39 @@ echo %init_input_0% _17_       ##把 连接adb的 手机 执行 adb dump service
 
 echo %init_input_0% _18_  ## 安装本地zsoft到zsoft_dest目录 1.解压 2.复制zbin 3.配置环境变量 4.静默安装 5.添加绿色软件桌面icon
 
-echo %init_input_0% _19_  ## ADB 命令 Tel自动加载目录
+echo %init_input_0% _19_  ## ADB 命令 Tel自动加载命令
+
+echo %init_input_0% _20_      ## 把当前目录的 media媒体文件 jpg_jpeg_webp_mp4_avi_gif 改成 数字.类型 形式
+
+echo %init_input_0% _20_   jpg   ## 已经当前输入的类型去对匹配的文件改名 改为  数字.类型 形式
+
+echo %init_input_0% _20_   png   ## 已经当前输入的类型去对匹配的文件改名 改为  数字_.类型 形式
+
+echo %init_input_0% _20_   gif    ## 已经当前输入的类型去对匹配的文件改名 改为  数字.类型 形式
+
+echo %init_input_0% _20_   mp4   ## 已经当前输入的类型去对匹配的文件改名 改为  数字.类型 形式
+
+echo %init_input_0% _20_   webp   ## 已经当前输入的类型去对匹配的文件改名 改为  数字.类型 形式
+
+echo %init_input_0% _20_   jpg timestamp  ## 已经当前输入的类型去对匹配的文件改名 改为  数字_时间戳.类型 形式
+
+echo %init_input_0% _20_   png timestamp  ## 已经当前输入的类型去对匹配的文件改名 改为  数字_时间戳.类型 形式
+
+echo %init_input_0% _20_   gif timestamp  ## 已经当前输入的类型去对匹配的文件改名 改为  数字_时间戳.类型 形式
+
+echo %init_input_0% _20_   mp4 timestamp  ## 已经当前输入的类型去对匹配的文件改名 改为  数字_时间戳.类型 形式
+
+echo %init_input_0% _20_   webp timestamp  ## 已经当前输入的类型去对匹配的文件改名 改为  数字_时间戳.类型 形式
+
+echo %init_input_0% _21_   ## 查看当前目录下所有文件的 MD属性
+
+echo %init_input_0% _21_ mp4  ## 查看当前目录下所有 mp4文件的MD属性
+
+echo %init_input_0% _21_ jpg   ## 查看当前目录下所有 jpg文件的MD属性
+
+echo %init_input_0% _21_ gif  ## 查看当前目录下所有 gif文件的MD属性
+
+echo %init_input_0% _999_   ## 打印当前 rule规则的method模板
 echo [ruletipprint_func_0x0 EndPrintCode]   output=[__empty__]  param1=[__empty__] 
 echo ______________Method_Out ruletipprint_func_0x0
 ::ENDLOCAL

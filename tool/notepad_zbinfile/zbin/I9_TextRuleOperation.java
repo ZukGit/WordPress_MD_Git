@@ -17,6 +17,7 @@ import com.google.zxing.MultiFormatReader;
 import com.google.zxing.Result;
 import com.google.zxing.common.HybridBinarizer;
 
+
 import net.sourceforge.pinyin4j.PinyinHelper;
 import net.sourceforge.pinyin4j.format.HanyuPinyinCaseType;
 import net.sourceforge.pinyin4j.format.HanyuPinyinOutputFormat;
@@ -26,6 +27,9 @@ import net.sourceforge.pinyin4j.format.exception.BadHanyuPinyinOutputFormatCombi
 import javax.imageio.ImageIO;
 import javax.swing.*;
 
+import org.apache.commons.io.FileUtils;
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -44,10 +48,8 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.net.URL;
-import java.net.URLConnection;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
+import java.net.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributeView;
 import java.nio.file.attribute.BasicFileAttributes;
@@ -60,6 +62,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.zip.GZIPInputStream;
 
 //
 public class I9_TextRuleOperation {
@@ -412,17 +415,17 @@ public class I9_TextRuleOperation {
 		// 检测当前目录下  包括 所有 子目录 孙 目录下 的 txt 文件 把 内容集中到 一个文件中 按时间顺序排序 并过滤url出来
 		CUR_RULE_LIST.add(new MakeAllTxt_Content_To_OneFile_Rule_39());
 
-		
+
 		//  把 当前的 每一行 转为  md 格式的 ```  oneline ``` 格式  方便放入 网站 之后 安卓 ios 都能快捷复制
 		CUR_RULE_LIST.add(new MakeOneLine_As_BlockWith_MD_Format_Rule_40());
-		
-		//  把 当前的 所有 内容 都 转为 1 行的 内容 
+
+		//  把 当前的 所有 内容 都 转为 1 行的 内容
 		CUR_RULE_LIST.add(new MakeContent_As_OneLine_Rule_41());
-		
-		
+
+
 		// 去除当前空白的一行  使得文本紧凑
 		CUR_RULE_LIST.add(new Clear_Blank_Line_Rule_42());
-		
+
 //        CUR_RULE_LIST.add( new Image2Png_Rule_4());
 //        CUR_RULE_LIST.add( new AVI_Rule_5());
 //        CUR_RULE_LIST.add( new SubDirRename_Rule_6());
@@ -430,8 +433,8 @@ public class I9_TextRuleOperation {
 //        CUR_RULE_LIST.add( new ClearChineseType_8());
 
 	}
-	
-	
+
+
 
 	class Clear_Blank_Line_Rule_42 extends Basic_Rule {
 
@@ -440,14 +443,14 @@ public class I9_TextRuleOperation {
 		Clear_Blank_Line_Rule_42() {
 			super(42, false);
 		}
-		
-		
-		
+
+
+
 		@Override
 		String simpleDesc() {
 			return " 把当前的所有内容都中的空行都去除掉,使得显示紧凑 ";
 		}
-		
+
 		@Override
 		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
 										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
@@ -455,33 +458,33 @@ public class I9_TextRuleOperation {
 				File fileItem = curInputFileList.get(i);
 
 				ArrayList<String> fixed_blank_List = new ArrayList<String> ();
-			ArrayList<String> rawContent = 	ReadFileContentAsList(fileItem);
-			
-			
-			for (int j = 0; j < rawContent.size(); j++) {
-				String lineStr = rawContent.get(j);
-				String clearBlankStr = lineStr.replace(" ", "").replace(" ", "").replace("	", "");
-				if(!clearBlankStr.equals("")) {
-					fixed_blank_List.add(lineStr.trim());
-					
+				ArrayList<String> rawContent = 	ReadFileContentAsList(fileItem);
+
+
+				for (int j = 0; j < rawContent.size(); j++) {
+					String lineStr = rawContent.get(j);
+					String clearBlankStr = lineStr.replace(" ", "").replace(" ", "").replace("	", "");
+					if(!clearBlankStr.equals("")) {
+						fixed_blank_List.add(lineStr.trim());
+
+					}
 				}
-			}
-			
-			writeContentToFile(I9_Temp_Text_File, fixed_blank_List);
-			NotePadOpenTargetFile(I9_Temp_Text_File.getAbsolutePath());
-			
-			
-				
+
+				writeContentToFile(I9_Temp_Text_File, fixed_blank_List);
+				NotePadOpenTargetFile(I9_Temp_Text_File.getAbsolutePath());
+
+
+
 			}
 
 			return super.applyOperationRule(curFileList, subFileTypeMap, curDirList, curRealFileList);
 		}
-		
-		
+
+
 
 	}
-	
-	
+
+
 
 
 	class MakeContent_As_OneLine_Rule_41 extends Basic_Rule {
@@ -542,15 +545,15 @@ public class I9_TextRuleOperation {
 			return itemDesc;
 		}
 	}
-	
+
 
 	class MakeOneLine_As_BlockWith_MD_Format_Rule_40 extends Basic_Rule {
-		
+
 		MakeOneLine_As_BlockWith_MD_Format_Rule_40() {
 			super(40, false);
 
 		}
-		
+
 
 		@Override
 		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
@@ -600,8 +603,8 @@ public class I9_TextRuleOperation {
 
 			return itemDesc;
 		}
-		
-		
+
+
 	}
 	class MakeAllTxt_Content_To_OneFile_Rule_39 extends Basic_Rule {
 
@@ -903,6 +906,20 @@ public class I9_TextRuleOperation {
 
 
 
+	public static class TwitterVideo {
+		public long duration;
+		public long size;
+		public String url;
+
+		@Override
+		public String toString() {
+			// TODO Auto-generated method stub
+			return "[url]=[ "+url+" ]"+ "  [size]=["+size+"]" + "  [duration]=["+duration+"]";
+		}
+	}
+
+	static int download_failed_time = 0;
+
 	class Analysis_URI_IN_Txt_Download_DouYinMP4_Rule_37 extends Basic_Rule {
 
 		File ChromeDriverFile ;
@@ -950,7 +967,7 @@ public class I9_TextRuleOperation {
 
 		@Override
 		String simpleDesc() {
-			return "  检测 当前 txt文件中的 url 路径(抖音 头条 快手视频)   并尝试下载这个 url 对应的文件到本地 tile_时间戳.mp4 并在temp文件打印url列表";
+			return "  检测 当前 txt文件中的 url 路径(抖音 头条 快手 tw fb 视频)   并尝试下载这个 url 对应的文件到本地 tile_时间戳.mp4 并在temp文件打印url列表";
 		}
 
 		@Override
@@ -1018,9 +1035,9 @@ public class I9_TextRuleOperation {
 //			SortString(videoUrlList);
 
 //			writeContentToFile(I9_Temp_Text_File, videoUrlList);
-			writeContentToFile(I9_Temp_Text_File, url_name_LogList);	
-			
-			
+			writeContentToFile(I9_Temp_Text_File, url_name_LogList);
+
+
 			NotePadOpenTargetFile(I9_Temp_Text_File.getAbsolutePath());
 			System.out.println("VideoURL 列表打印在 PATH: "+ I9_Temp_Text_File.getAbsolutePath());
 			return super.applyOperationRule(curFileList, subFileTypeMap, curDirList, curRealFileList);
@@ -1048,7 +1065,13 @@ public class I9_TextRuleOperation {
 				TouTiao_XiGua_Download(index ,url);
 				videoUrlList.add(url);
 
+			}else if(url.contains("https://twitter.com")) {
+				// 	// https://twitter.com/PDChinese/status/1427649465826033672?s=19
+				TW_Download(index ,url);
+				videoUrlList.add(url);
+
 			}
+
 		}
 
 		void TouTiao_XiGua_Download(int index , String urlitem) {
@@ -1365,6 +1388,228 @@ public class I9_TextRuleOperation {
 			return null;
 		}
 
+
+		public  String getPostDataString(HashMap<String, String> params) throws UnsupportedEncodingException {
+			StringBuilder result = new StringBuilder();
+			boolean first = true;
+			for (Map.Entry<String, String> entry : params.entrySet()) {
+				if (first)
+					first = false;
+				else
+					result.append("&");
+				result.append(URLEncoder.encode(entry.getKey(), "UTF-8"));
+				result.append("=");
+				result.append(URLEncoder.encode(entry.getValue(), "UTF-8"));
+			}
+			return result.toString();
+		}
+
+
+		public  List<TwitterVideo> extractTwitterVideo(String id) {
+	        /* URL url = new URL(String.format("https://api.twitter.com/1.1/videos/tweet/config/%s.json", id));
+	         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+	         connection.setRequestMethod("GET");
+	         connection.addRequestProperty("Authorization", "Bearer AAAAAAAAAAAAAAAAAAAAAIK1zgAAAAAA2tUWuhGZ2JceoId5GwYWU5GspY4%3DUq7gzFoCZs1QfwGoVdvSac3IniczZEYXIcDyumCauIXpcAPorE");
+	         connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Linux; Android 5.0; SM-G900P Build/LRX21T) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.56 Mobile Safari/537.36");
+	 */
+
+			List<TwitterVideo> curTwitterListInfo = null;
+
+	        try{
+
+				InetSocketAddress address = new InetSocketAddress("127.0.0.1", 7078);
+				Proxy proxy = new Proxy(Proxy.Type.HTTP, address); // http代理协议类型
+
+				URL url = new URL("https://twittervideodownloaderpro.com/twittervideodownloadv2/index.php");
+//				HttpURLConnection connection = (HttpURLConnection) url.openConnection(proxy);   // 代理  有点慢
+				HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+				connection.setRequestMethod("POST");
+				connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Linux; Android 5.0; SM-G900P Build/LRX21T) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.56 Mobile Safari/537.36");
+
+				connection.setDoOutput(true);
+				connection.setDoInput(true);
+
+
+				HashMap<String, String> postDataParams = new HashMap<>();
+				postDataParams.put("id", id);
+				long  beginTimeStamp = System.currentTimeMillis();
+				System.out.println("connection.getOutputStream  Begin  获取 id="+id+"  对应的  ( TwitterInfo_耗时A 得很)" );
+
+
+
+				OutputStream os = connection.getOutputStream();
+				long  endTimeStamp = System.currentTimeMillis();
+				long distance_second = (endTimeStamp -beginTimeStamp)/1000;
+				System.out.println("connection.getOutputStream  Begin  获取 id="+id+"  成功 TwitterInfo_耗时A :【"+distance_second+"秒】" );
+
+				System.out.println("connection.getOutputStream  End " );
+
+				BufferedWriter writer = new BufferedWriter(
+						new OutputStreamWriter(os, "UTF-8"));
+				System.out.println("getPostDataString Begin " );
+				writer.write(getPostDataString(postDataParams));
+				System.out.println("getPostDataString  End " );
+				writer.flush();
+				writer.close();
+				os.close();
+				System.out.println("Debug: extractTwitterVideo  Begin  statusCode (耗时B)" );
+				System.out.println("connection.getOutputStream  Begin  获取 id="+id+"  对应的  ( TwitterInfo_耗时B  _得很)" );
+				  beginTimeStamp = System.currentTimeMillis();
+				int statusCode = connection.getResponseCode();
+				endTimeStamp = System.currentTimeMillis();
+				 distance_second = (endTimeStamp -beginTimeStamp)/1000;
+
+
+				System.out.println("Debug: extractTwitterVideo  End  statusCode = " + statusCode+"  TwitterInfo_耗时B 【"+distance_second+" 秒】");
+
+				if (statusCode == 200) {
+					StringBuilder sb = new StringBuilder();
+					InputStream in;
+					String contentEncoding = connection.getHeaderField("Content-Encoding");
+					if (contentEncoding != null && contentEncoding.equals("gzip")) {
+						in = new GZIPInputStream(connection.getInputStream());
+					} else {
+						in = connection.getInputStream();
+					}
+					BufferedReader reader = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
+					String line;
+					while ((line = reader.readLine()) != null) {
+						sb.append(line).append("\r\n");
+					}
+					reader.close();
+					org.json.JSONObject object = new org.json.JSONObject(sb.toString());
+					if (object.has("state") && object.getString("state").equals("success")) {
+						if (object.has("videos")) {
+							JSONArray videos = object.getJSONArray("videos");
+							List<TwitterVideo> twitterVideos = new ArrayList<>();
+							for (int i = 0; i < videos.length(); i++) {
+								org.json.JSONObject video = videos.getJSONObject(i);
+								TwitterVideo twitterVideo = new TwitterVideo();
+								if (video.has("duration")) {
+									twitterVideo.duration = video.getLong("duration");
+								}
+								if (video.has("size")) {
+									twitterVideo.size = video.getLong("size");
+								}
+								if (video.has("url")) {
+									twitterVideo.url = video.getString("url");
+								}
+								twitterVideos.add(twitterVideo);
+							}
+							System.out.println("依据 PageUrl 获取 到  ID 成功！！ ");
+							download_failed_time=0;
+							return twitterVideos;
+						}
+					}
+				}
+
+			}catch ( Exception e){
+				download_failed_time++;
+				if(download_failed_time%5==0){
+					System.out.println("解析 pageUrl【"+id+"】 Retry 5 次 都失败!!  放弃这个 ID对应的资源!! ");
+
+				}else{
+					curTwitterListInfo = 	extractTwitterVideo( id);
+
+					if(curTwitterListInfo != null && curTwitterListInfo.size() >0){
+						download_failed_time=0;
+						return curTwitterListInfo;
+					}
+
+
+				}
+
+
+			}
+
+			return null;
+		}
+
+
+
+		public  void	TW_Download( int index  ,String httppage) {
+
+			// 1. 获取 tw 的  id
+			System.out.println("TW_Download  Method Begin ");
+			String id_str = getIdFromTWUrl(httppage);
+
+			System.out.println("TW_Download  Method    id_str ="+ id_str);
+
+			if(id_str == null || "".equals(id_str.trim()) || !isNumeric(id_str.trim())){
+				System.out.println("当前 TW-Url: "+httppage+" 识别出的ID出错请检查!! id_str="+id_str);
+				return;
+			}
+
+
+			try {
+
+				System.out.println("extractTwitterVideo  Method Begin ");
+				List<TwitterVideo> list = 	extractTwitterVideo(id_str);
+				System.out.println("extractTwitterVideo  Method End ");
+				if(list == null || list.size() == 0) {
+					System.out.println("返回为空 ");
+				}else {
+
+					System.out.println("返回 list.size() == "+list.size());
+					TwitterVideo high_url_TwitterVideo = 		showTwitterInfo_ReturnBigOne(list);
+
+					if(high_url_TwitterVideo != null) {
+ 						downRawVideo_WithUrl_Proxy(httppage, high_url_TwitterVideo.url, id_str, null);
+				//		downloadByCommonIO(httppage, high_url_TwitterVideo.url, id_str, null);
+						System.out.println("下载操作完成!");
+
+					}else {
+						System.out.println(" url 为空 无法执行下载操作!! ");
+					}
+				}
+
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				System.out.println("出现异常!! ");
+			}
+
+
+		}
+
+
+
+
+		TwitterVideo   showTwitterInfo_ReturnBigOne(List<TwitterVideo> list){
+			TwitterVideo curBigItem = null;
+			long currentBigSize = 0l;
+			for (int i = 0; i < list.size(); i++) {
+				TwitterVideo  item = list.get(i);
+
+				if(currentBigSize < item.size) {
+					currentBigSize = item.size;
+					curBigItem = item;
+				}
+				System.out.println("twitter["+i+"]:"+item.toString());
+			}
+			if(curBigItem != null) {
+				System.out.println("最大分辨率-url:"+curBigItem.toString()+"");
+			}else {
+				System.out.println("没有选中最大分辨率的 url!!  请检查");
+			}
+
+			return curBigItem;
+		}
+
+		String getIdFromTWUrl(String httpPageUrl) {
+			// // https://twitter.com/PDChinese/status/1427649465826033672?s=19
+
+
+			String  status_end = httpPageUrl.substring(httpPageUrl.indexOf("status/")+"status/".length());
+
+			String clear_doubt_id = status_end.substring(0,status_end.indexOf("?"));
+
+			return clear_doubt_id;
+
+		}
+
+
+
 		/**
 		 * 方法描述: 抖音解析下载视频
 
@@ -1416,12 +1661,72 @@ public class I9_TextRuleOperation {
 		}
 
 
+		public  void downloadByCommonIO(String pageUrl , String httpUrl, String fileNameNoPoint, String source) {
+//			int index_download = 1;
+//			String timeStamp_Str  = getTimeStamp();
+//			String videoSavePath = ztemp_dir;
+
+
+			//	        String fileAddress = videoSavePath+"/"+source+"/"+title+".mp4";
+			String fileAddress = videoSavePath+"/"+((source==null ||"".equals(source) ? "":source+"_")+fileNameNoPoint.replace(" ", ""))+"_"+index_download+"_"+timeStamp_Str+".mp4";
+			fileAddress = clearChinese(fileAddress);
+			fileAddress = fileAddress.replace(" ", "");
+			fileAddress = fileAddress.replace("	", "");
+			fileAddress = fileAddress.replace("！", "");
+			fileAddress = fileAddress.replace("!", "");
+			fileAddress = fileAddress.replace("，", "");
+			fileAddress = fileAddress.replace("：", "");
+			fileAddress = fileAddress.replace("《", "");
+			fileAddress = fileAddress.replace("？", "");
+			fileAddress = fileAddress.replace("。", "");
+
+			try {
+				System.out.println();
+				System.out.println("downloadByCommonIO_Retry下载["+download_failed_time+"] Begin fileAddress= "+fileAddress);
+				System.out.println("downloadByCommonIO_Retry下载["+download_failed_time+"] Begin HttpUrl= "+httpUrl);
+				System.out.println("downloadByCommonIO_Retry下载["+download_failed_time+"] Begin PageUrl= "+pageUrl);
+
+
+
+				File fileSavePath = new File(fileAddress);
+				FileUtils.copyURLToFile(new URL(httpUrl), fileSavePath,30000,30000);
+				download_failed_time = 0;
+				System.out.println("downloadByCommonIO_下载["+download_failed_time+"] End  fileAddress="+fileAddress);
+
+				System.out.println("\n-----视频保存路径-----\n" + fileSavePath.getAbsolutePath());
+				System.out.println("\nzzfile_3.bat " + fileSavePath.getParentFile().getAbsolutePath());
+
+
+				//  获取文件的 md值   并重命名为 mdxxxx.mp4
+				String mdName = getMD5Three(fileSavePath.getAbsolutePath());
+				String new_Md_Name = mdName+".mp4";
+				tryReName(fileSavePath, new_Md_Name);
+				System.out.println("\n-----视频保存路径(MD名称)-----\n" + fileSavePath.getAbsolutePath());
+				//  把下载的 mp4 文件 名称 转为 md值
+				url_name_LogList.add(pageUrl+"          "+mdName);
+				urlStrList.add(httpUrl);
+
+			} catch (IOException e) {
+				download_failed_time++;
+				if(download_failed_time%10 == 0) {
+					System.out.println("程序下载 retry "+download_failed_time+" 次 仍然 下载 失败----放弃");
+				}else {
+					downloadByCommonIO( pageUrl ,  httpUrl,  fileNameNoPoint,  source);
+				}
+				// e.printStackTrace();
+			}
+
+
+		}
+
+
 		// 视频的保存 目录 不能是 当前文件 否则 就会执行 同步操作 影响网速
-		// pageUrl 是页面的url   httpUrl 是视频文件的url 
+		// pageUrl 是页面的url   httpUrl 是视频文件的url
 		@SuppressWarnings("unchecked")
-		public void downRawVideo_WithUrl(String pageUrl , String httpUrl, String fileNameNoPoint, String source) {
+		public void downRawVideo_WithUrl_Proxy(String pageUrl , String httpUrl, String fileNameNoPoint, String source) {
 			if(urlStrList.contains(httpUrl)) {
 				System.out.println("当前url 路径已经下载过  跳过下载!!  url路径: "+ httpUrl +"");
+				return;
 			}
 
 			//	        String fileAddress = videoSavePath+"/"+source+"/"+title+".mp4";
@@ -1437,12 +1742,33 @@ public class I9_TextRuleOperation {
 			fileAddress = fileAddress.replace("？", "");
 			fileAddress = fileAddress.replace("。", "");
 			int byteRead;
+
+
 			try {
-				URL url = new URL(httpUrl);
+
 				// 获取链接
-				URLConnection conn = url.openConnection();
+
+				System.out.println("downloadByCommonIO_Retry下载["+download_failed_time+"] Begin fileAddress= "+fileAddress);
+				System.out.println("downloadByCommonIO_Retry下载["+download_failed_time+"] Begin HttpUrl= "+httpUrl);
+				System.out.println("downloadByCommonIO_Retry下载["+download_failed_time+"] Begin PageUrl= "+pageUrl);
+
+
+				InetSocketAddress address = new InetSocketAddress("127.0.0.1", 7078);
+				Proxy proxy = new Proxy(Proxy.Type.HTTP, address); // http代理协议类型
+				URL url = new URL(httpUrl);
+				URLConnection conn = url.openConnection(proxy);    // 代理
+//				URLConnection conn = url.openConnection();
 				// 输入流
+				long  beginTimeStamp = System.currentTimeMillis();
+				System.out.println("conn.getInputStream 获得 输入流  Begin ( downRawVideo耗时_A 得很) ");
 				InputStream inStream = conn.getInputStream();
+				long  endTimeStamp = System.currentTimeMillis();
+				long distance_second = (endTimeStamp -beginTimeStamp)/1000;
+
+
+				System.out.println("conn.getInputStream 获得 输入流  End ( downRawVideo耗时_A【"+distance_second+" 秒】 得很)");
+
+
 				// 封装一个保存文件的路径对象
 				File fileSavePath = new File(fileAddress);
 				// 注:如果保存文件夹不存在,那么则创建该文件夹
@@ -1453,26 +1779,140 @@ public class I9_TextRuleOperation {
 				// 写入文件
 				FileOutputStream fs = new FileOutputStream(fileSavePath);
 				byte[] buffer = new byte[1024];
+				beginTimeStamp = System.currentTimeMillis();
+				System.out.println("FileOutputStream.write  写入本地文件  Begin   比较 downRawVideo_耗时_B ");
 				while ((byteRead = inStream.read(buffer)) != -1) {
 					fs.write(buffer, 0, byteRead);
 				}
+				endTimeStamp = System.currentTimeMillis();
+				distance_second = (endTimeStamp -beginTimeStamp)/1000;
+
+				System.out.println("FileOutputStream.write  写入本地文件  End ( downRawVideo_耗时_B【"+distance_second+" 秒】 得很)");
+
 				inStream.close();
 				fs.close();
 				System.out.println("\n-----视频保存路径-----\n" + fileSavePath.getAbsolutePath());
 				System.out.println("\nzzfile_3.bat " + fileSavePath.getParentFile().getAbsolutePath());
-				
-				
-				//  获取文件的 md值   并重命名为 mdxxxx.mp4  
+
+
+				//  获取文件的 md值   并重命名为 mdxxxx.mp4
 				String mdName = getMD5Three(fileSavePath.getAbsolutePath());
 				String new_Md_Name = mdName+".mp4";
 				tryReName(fileSavePath, new_Md_Name);
 				//  把下载的 mp4 文件 名称 转为 md值
 				url_name_LogList.add(pageUrl+"          "+mdName);
 				urlStrList.add(httpUrl);
-			} catch (FileNotFoundException e) {
-				System.out.println(e.getMessage());
-			} catch (IOException e) {
-				System.out.println(e.getMessage());
+				download_failed_time = 0;
+				System.out.println("downloadByCommonIO_下载["+download_failed_time+"] End  fileAddress="+fileAddress);
+			} catch (Exception e) {
+
+				download_failed_time++;
+				if(download_failed_time%10 == 0) {
+					System.out.println("程序下载 retry "+download_failed_time+" 次 仍然 下载 失败----放弃");
+				}else {
+					downRawVideo_WithUrl_Proxy( pageUrl ,  httpUrl,  fileNameNoPoint,  source);
+				}
+				// e.printStackTrace();
+
+				// 	System.out.println(e.getMessage());
+			}
+		}
+
+		// 视频的保存 目录 不能是 当前文件 否则 就会执行 同步操作 影响网速
+		// pageUrl 是页面的url   httpUrl 是视频文件的url
+		@SuppressWarnings("unchecked")
+		public void downRawVideo_WithUrl(String pageUrl , String httpUrl, String fileNameNoPoint, String source) {
+			if(urlStrList.contains(httpUrl)) {
+				System.out.println("当前url 路径已经下载过  跳过下载!!  url路径: "+ httpUrl +"");
+				return;
+			}
+
+			//	        String fileAddress = videoSavePath+"/"+source+"/"+title+".mp4";
+			String fileAddress = videoSavePath+"/"+((source==null ||"".equals(source) ? "":source+"_")+fileNameNoPoint.replace(" ", ""))+"_"+index_download+"_"+timeStamp_Str+".mp4";
+			fileAddress = clearChinese(fileAddress);
+			fileAddress = fileAddress.replace(" ", "");
+			fileAddress = fileAddress.replace("	", "");
+			fileAddress = fileAddress.replace("！", "");
+			fileAddress = fileAddress.replace("!", "");
+			fileAddress = fileAddress.replace("，", "");
+			fileAddress = fileAddress.replace("：", "");
+			fileAddress = fileAddress.replace("《", "");
+			fileAddress = fileAddress.replace("？", "");
+			fileAddress = fileAddress.replace("。", "");
+			int byteRead;
+
+
+			try {
+
+				// 获取链接
+
+				System.out.println("downloadByCommonIO_Retry下载["+download_failed_time+"] Begin fileAddress= "+fileAddress);
+				System.out.println("downloadByCommonIO_Retry下载["+download_failed_time+"] Begin HttpUrl= "+httpUrl);
+				System.out.println("downloadByCommonIO_Retry下载["+download_failed_time+"] Begin PageUrl= "+pageUrl);
+
+
+				InetSocketAddress address = new InetSocketAddress("127.0.0.1", 7078);
+				Proxy proxy = new Proxy(Proxy.Type.HTTP, address); // http代理协议类型
+				URL url = new URL(httpUrl);
+//				URLConnection conn = url.openConnection(proxy);    // 代理
+				URLConnection conn = url.openConnection();
+				// 输入流
+				long  beginTimeStamp = System.currentTimeMillis();
+				System.out.println("conn.getInputStream 获得 输入流  Begin ( downRawVideo耗时_A 得很) ");
+				InputStream inStream = conn.getInputStream();
+				long  endTimeStamp = System.currentTimeMillis();
+				long distance_second = (endTimeStamp -beginTimeStamp)/1000;
+
+
+				System.out.println("conn.getInputStream 获得 输入流  End ( downRawVideo耗时_A【"+distance_second+" 秒】 得很)");
+
+
+				// 封装一个保存文件的路径对象
+				File fileSavePath = new File(fileAddress);
+				// 注:如果保存文件夹不存在,那么则创建该文件夹
+				File fileParent = fileSavePath.getParentFile();
+				if (!fileParent.exists()) {
+					fileParent.mkdirs();
+				}
+				// 写入文件
+				FileOutputStream fs = new FileOutputStream(fileSavePath);
+				byte[] buffer = new byte[1024];
+				beginTimeStamp = System.currentTimeMillis();
+				System.out.println("FileOutputStream.write  写入本地文件  Begin   比较 downRawVideo_耗时_B ");
+				while ((byteRead = inStream.read(buffer)) != -1) {
+					fs.write(buffer, 0, byteRead);
+				}
+				endTimeStamp = System.currentTimeMillis();
+				distance_second = (endTimeStamp -beginTimeStamp)/1000;
+
+				System.out.println("FileOutputStream.write  写入本地文件  End ( downRawVideo_耗时_B【"+distance_second+" 秒】 得很)");
+
+				inStream.close();
+				fs.close();
+				System.out.println("\n-----视频保存路径-----\n" + fileSavePath.getAbsolutePath());
+				System.out.println("\nzzfile_3.bat " + fileSavePath.getParentFile().getAbsolutePath());
+
+
+				//  获取文件的 md值   并重命名为 mdxxxx.mp4
+				String mdName = getMD5Three(fileSavePath.getAbsolutePath());
+				String new_Md_Name = mdName+".mp4";
+				tryReName(fileSavePath, new_Md_Name);
+				//  把下载的 mp4 文件 名称 转为 md值
+				url_name_LogList.add(pageUrl+"          "+mdName);
+				urlStrList.add(httpUrl);
+				download_failed_time = 0;
+				System.out.println("downloadByCommonIO_下载["+download_failed_time+"] End  fileAddress="+fileAddress);
+			} catch (Exception e) {
+
+				download_failed_time++;
+				if(download_failed_time%10 == 0) {
+					System.out.println("程序下载 retry "+download_failed_time+" 次 仍然 下载 失败----放弃");
+				}else {
+					downRawVideo_WithUrl( pageUrl ,  httpUrl,  fileNameNoPoint,  source);
+				}
+				// e.printStackTrace();
+
+			// 	System.out.println(e.getMessage());
 			}
 		}
 
@@ -6317,7 +6757,7 @@ public class I9_TextRuleOperation {
 
 			if (file != null && file.exists()) {
 				BufferedWriter curBW = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "utf-8"));
-		
+
 				curBW.write(sb.toString());
 				curBW.flush();
 				curBW.close();
@@ -8681,12 +9121,12 @@ public class I9_TextRuleOperation {
 
 	private static String Rule13_REGEX_CHINESE = "[\u4e00-\u9fa5]";
 
-	
+
 	public static ArrayList<String> add_md_code_block_format_Rule_40(File srcFile) {
 		ArrayList<String> newContent = new ArrayList<String>();
-		
 
-		
+
+
 
 		newContent.add("---                                       ");
 		newContent.add("layout: post                              ");
@@ -8728,34 +9168,34 @@ public class I9_TextRuleOperation {
 					if (oldOneLine == null || oldOneLine.trim().isEmpty()) {
 						String lastItemStr = null ;
 						if(newContent.size() > 0) {
-							 lastItemStr  = newContent.get(newContent.size()-1);
+							lastItemStr  = newContent.get(newContent.size()-1);
 						}
-						
-						if(oldOneLine != null && "```".equals(oldOneLine.trim())) {  //  如果当前 只包含 ``` 那么 直接跳过 
+
+						if(oldOneLine != null && "```".equals(oldOneLine.trim())) {  //  如果当前 只包含 ``` 那么 直接跳过
 							continue;
 						}
-                    
-                         if(lastItemStr != null && !"".equals(lastItemStr) ) {
+
+						if(lastItemStr != null && !"".equals(lastItemStr) ) {
 //                        		newContent.add("");
-                         }
-					
+						}
+
 						continue;
 					}
-					
+
 					if("```".equals(oldOneLine.trim())){
 						continue;
 					}
-					
+
 					// 把 所有的 ` 去掉
 					newOneLine = oldOneLine.replace("`", "").trim();
-					
+
 					String append_oneLine = "\n```\n"+newOneLine+"\n```\n";
 
 
 					if(!newContent.contains(append_oneLine)) {  // 去除 重复
 						newContent.add(append_oneLine);
 					}
-				
+
 				}
 				curBR.close();
 
@@ -8765,15 +9205,15 @@ public class I9_TextRuleOperation {
 		} else {
 			System.out.println("Failed !");
 		}
-		
+
 
 		return newContent;
 	}
-	
-	
+
+
 	public static String MakeContent_As_OneStrLine_Rule_41(File srcFile) {
 
-		
+
 		StringBuilder newContent = new StringBuilder();
 
 		File curFile = srcFile;
@@ -8808,7 +9248,7 @@ public class I9_TextRuleOperation {
 		}
 		return newContent.toString();
 	}
-	
+
 	public static ArrayList<String> add_system_out_Rule_21(File srcFile) {
 		ArrayList<String> newContent = new ArrayList<String>();
 
@@ -13248,9 +13688,9 @@ public class I9_TextRuleOperation {
 		}
 
 	};
-	
-	
-	
+
+
+
 
 	static Comparator mFileDateComparion_Old_New = new Comparator<File>() {
 		@Override
@@ -13265,8 +13705,8 @@ public class I9_TextRuleOperation {
 		}
 
 	};
-	
-	
+
+
 	public static String getMD5Three(String path) {
 		BigInteger bi = null;
 		try {

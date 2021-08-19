@@ -37,6 +37,7 @@ import com.spire.presentation.ShapeType;
 import com.spire.presentation.TextFont;
 import com.spire.presentation.drawing.FillFormatType;
 
+
 import net.jimmc.jshortcut.JShellLink;
 import net.sourceforge.pinyin4j.PinyinHelper;
 import net.sourceforge.pinyin4j.format.HanyuPinyinCaseType;
@@ -53,9 +54,9 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 
 import java.math.BigInteger;
-import java.net.URL;
-import java.net.URLConnection;
+import java.net.*;
 import java.nio.channels.FileChannel;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.security.MessageDigest;
@@ -67,6 +68,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.zip.GZIPInputStream;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -77,6 +79,7 @@ import javax.imageio.stream.FileImageInputStream;
 import javax.imageio.stream.ImageOutputStream;
 import javax.swing.*;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.pdfbox.io.MemoryUsageSetting;
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -89,6 +92,7 @@ import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.poi.xslf.usermodel.XMLSlideShow;
 import org.apache.poi.xslf.usermodel.XSLFSlide;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.json.JSONException;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.select.Elements;
@@ -2277,6 +2281,22 @@ System.out.println("paramItem["+i+"] = "+paramItem_lower_trim);
 	// 属性进行修改(文件名称)
 //     // 4.对当前子文件(包括子目录 子文件 --不包含孙目录 孙文件) 5. 从shell 中获取到的路径 去对某一个文件进行操作
 
+	
+    public static class TwitterVideo {
+        public long duration;
+        public long size;
+        public String url;
+
+        @Override
+        public String toString() {
+        	// TODO Auto-generated method stub
+        	return "[url]=[ "+url+" ]"+ "  [size]=["+size+"]" + "  [duration]=["+duration+"]";
+        }
+    }
+    
+    public static  int  download_failed_time = 0;
+    
+    
 	class Monitor_WeChatFile_ForWindows_Rule_39 extends Basic_Rule {
 // C:\Users\zukgit\Documents\WeChat Files\xxxx\FileStorage\File\2021-07
 
@@ -2595,7 +2615,7 @@ System.out.println("paramItem["+i+"] = "+paramItem_lower_trim);
 
 				String strLine_trim = strLine.trim();
 				String strLine_trim_clearChinese = clearChinese(strLine_trim);
-				System.out.println("strItem[" + i + "]=" + "[" + strLine_trim_clearChinese + "]  On  One Line ");
+				System.out.println("strItem[" + i + "]["+strLineList.size()+"]=" + "[" + strLine_trim_clearChinese + "]  On  One Line ");
 				boolean isUrl = toJudgeUrl(strLine_trim_clearChinese);
 				if (isUrl && urlStrList.contains(strLine_trim_clearChinese)) {
 					tipMessage = " 当前url 已经执行过下载操作 跳过逻辑执行";
@@ -2621,6 +2641,12 @@ System.out.println("paramItem["+i+"] = "+paramItem_lower_trim);
 						TouTiao_XiGua_Download(curUrlIndex_InTxtFile, strLine_trim_clearChinese);
 						urlStrList.add(strLine_trim_clearChinese);
 						tipMessage = "下载头条西瓜视频";
+					} else if(strLine_trim_clearChinese.contains("https://twitter.com")) {
+						// 	// https://twitter.com/PDChinese/status/1427649465826033672?s=19
+						TW_Download(curUrlIndex_InTxtFile ,strLine_trim_clearChinese);
+				
+						tipMessage = "下载TW视频";
+
 					} else {
 						tipMessage = "当前的URL不是抖音-快手-头条路径 暂不支持下载";
 						System.out.println("当前的URL不是抖音-快手-头条路径 暂不支持下载  URL = " + strLine_trim_clearChinese);
@@ -2641,7 +2667,276 @@ System.out.println("paramItem["+i+"] = "+paramItem_lower_trim);
 			return tipMessage;
 
 		}
+		
+		public  String getPostDataString(HashMap<String, String> params) throws UnsupportedEncodingException {
+	        StringBuilder result = new StringBuilder();
+	        boolean first = true;
+	        for (Map.Entry<String, String> entry : params.entrySet()) {
+	            if (first)
+	                first = false;
+	            else
+	                result.append("&");
+	            result.append(URLEncoder.encode(entry.getKey(), "UTF-8"));
+	            result.append("=");
+	            result.append(URLEncoder.encode(entry.getValue(), "UTF-8"));
+	        }
+	        return result.toString();
+	    }
 
+
+		public  List<TwitterVideo> extractTwitterVideo(String id) {
+	        /* URL url = new URL(String.format("https://api.twitter.com/1.1/videos/tweet/config/%s.json", id));
+	         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+	         connection.setRequestMethod("GET");
+	         connection.addRequestProperty("Authorization", "Bearer AAAAAAAAAAAAAAAAAAAAAIK1zgAAAAAA2tUWuhGZ2JceoId5GwYWU5GspY4%3DUq7gzFoCZs1QfwGoVdvSac3IniczZEYXIcDyumCauIXpcAPorE");
+	         connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Linux; Android 5.0; SM-G900P Build/LRX21T) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.56 Mobile Safari/537.36");
+	 */
+
+			List<TwitterVideo> curTwitterListInfo = null;
+
+			try{
+
+				InetSocketAddress address = new InetSocketAddress("127.0.0.1", 7078);
+				Proxy proxy = new Proxy(Proxy.Type.HTTP, address); // http代理协议类型
+
+				URL url = new URL("https://twittervideodownloaderpro.com/twittervideodownloadv2/index.php");
+//				HttpURLConnection connection = (HttpURLConnection) url.openConnection(proxy);   // 代理  有点慢
+				HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+				connection.setRequestMethod("POST");
+				connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Linux; Android 5.0; SM-G900P Build/LRX21T) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.56 Mobile Safari/537.36");
+
+				connection.setDoOutput(true);
+				connection.setDoInput(true);
+
+
+				HashMap<String, String> postDataParams = new HashMap<>();
+				postDataParams.put("id", id);
+				long  beginTimeStamp = System.currentTimeMillis();
+				System.out.println("connection.getOutputStream  Begin  获取 id="+id+"  对应的  TwitterInfo_耗时_A  得很)" );
+
+
+
+				OutputStream os = connection.getOutputStream();
+				long  endTimeStamp = System.currentTimeMillis();
+				long distance_second = (endTimeStamp -beginTimeStamp)/1000;
+				System.out.println("connection.getOutputStream  Begin  获取 id="+id+"  成功 TwitterInfo_耗时_A:【"+distance_second+"秒】" );
+
+				System.out.println("connection.getOutputStream  End " );
+
+				BufferedWriter writer = new BufferedWriter(
+						new OutputStreamWriter(os, "UTF-8"));
+				System.out.println("getPostDataString Begin " );
+				writer.write(getPostDataString(postDataParams));
+				System.out.println("getPostDataString  End " );
+				writer.flush();
+				writer.close();
+				os.close();
+				System.out.println("Debug: extractTwitterVideo  Begin  statusCode (耗时B)" );
+				System.out.println("connection.getOutputStream  Begin  获取 id="+id+"  对应的  ( TwitterInfo_耗时B  _得很)" );
+				beginTimeStamp = System.currentTimeMillis();
+				int statusCode = connection.getResponseCode();
+				endTimeStamp = System.currentTimeMillis();
+				distance_second = (endTimeStamp -beginTimeStamp)/1000;
+
+
+				System.out.println("Debug: extractTwitterVideo  End  statusCode = " + statusCode+"  TwitterInfo_耗时B【"+distance_second+" 秒】");
+
+				if (statusCode == 200) {
+					StringBuilder sb = new StringBuilder();
+					InputStream in;
+					String contentEncoding = connection.getHeaderField("Content-Encoding");
+					if (contentEncoding != null && contentEncoding.equals("gzip")) {
+						in = new GZIPInputStream(connection.getInputStream());
+					} else {
+						in = connection.getInputStream();
+					}
+					BufferedReader reader = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
+					String line;
+					while ((line = reader.readLine()) != null) {
+						sb.append(line).append("\r\n");
+					}
+					reader.close();
+					org.json.JSONObject object = new org.json.JSONObject(sb.toString());
+					if (object.has("state") && object.getString("state").equals("success")) {
+						if (object.has("videos")) {
+							org.json.JSONArray videos = object.getJSONArray("videos");
+							List<TwitterVideo> twitterVideos = new ArrayList<>();
+							for (int i = 0; i < videos.length(); i++) {
+								org.json.JSONObject video = videos.getJSONObject(i);
+								TwitterVideo twitterVideo = new TwitterVideo();
+								if (video.has("duration")) {
+									twitterVideo.duration = video.getLong("duration");
+								}
+								if (video.has("size")) {
+									twitterVideo.size = video.getLong("size");
+								}
+								if (video.has("url")) {
+									twitterVideo.url = video.getString("url");
+								}
+								twitterVideos.add(twitterVideo);
+							}
+							System.out.println("依据 PageUrl 获取 到  ID 成功！！ ");
+							download_failed_time=0;
+							return twitterVideos;
+						}
+					}
+				}
+
+			}catch ( Exception e){
+				download_failed_time++;
+				if(download_failed_time%5==0){
+					System.out.println("解析 pageUrl【"+id+"】 Retry 5 次 都失败!!  放弃这个 ID对应的资源!! ");
+
+				}else{
+					curTwitterListInfo = 	extractTwitterVideo( id);
+
+					if(curTwitterListInfo != null && curTwitterListInfo.size() >0){
+						download_failed_time=0;
+						return curTwitterListInfo;
+					}
+
+
+				}
+
+
+			}
+
+			return null;
+		}
+			String getIdFromTWUrl(String httpPageUrl) {
+				// // https://twitter.com/PDChinese/status/1427649465826033672?s=19
+				
+
+				String  status_end = httpPageUrl.substring(httpPageUrl.indexOf("status/")+"status/".length());
+				
+				String clear_doubt_id = status_end.substring(0,status_end.indexOf("?"));
+				
+				return clear_doubt_id;
+				
+			}
+			
+			
+			 TwitterVideo   showTwitterInfo_ReturnBigOne(List<TwitterVideo> list , String httpPageUrl){
+			    	TwitterVideo curBigItem = null;
+			    	long currentBigSize = 0l;
+				  for (int i = 0; i < list.size(); i++) {
+					  TwitterVideo  item = list.get(i);
+				
+					  if(currentBigSize < item.size) {
+						  currentBigSize = item.size;
+						  curBigItem = item;
+					  }
+					  System.out.println("twitter["+i+"]:"+item.toString());
+				}
+				  if(curBigItem != null) {
+					  System.out.println("最大分辨率-url:"+curBigItem.toString()+"  httpPageUrl:"+httpPageUrl);
+				  }else {
+					  System.out.println("没有选中最大分辨率的 url!!  请检查");
+				  }
+			    	
+				  return curBigItem;
+			    }
+			// downRawVideo_WithUrl(index, finalVideoAddress, fileNameNoPoint, "douyin");
+				public  void downloadByCommonIO(int index,String pageurl ,  String httpUrl, String fileNameNoPoint, String source) {
+
+					
+					String fileAddress = mDownloadedMonthDir.getAbsolutePath() + File.separator
+							+ (source == null || "".equals(source) ? "" : source + "_") + (fileNameNoPoint.replace(" ", ""))
+							+ "_" + index + "_" + getTimeStamp() + ".mp4";
+					
+			        try {
+			        	System.out.println();
+			        	System.out.println("downloadByCommonIO_Retry下载["+download_failed_time+"] Begin FileAddress="+fileAddress);
+			        	System.out.println("downloadByCommonIO_Retry下载["+download_failed_time+"] Begin PageUrl="+pageurl);
+			        	System.out.println("downloadByCommonIO_Retry下载["+download_failed_time+"] Begin HttpUrl="+httpUrl);
+
+			        	
+			        	File fileSavePath = new File(fileAddress);
+			            FileUtils.copyURLToFile(new URL(httpUrl), fileSavePath,30000,30000);
+			            download_failed_time = 0;  
+			            
+			        	System.out.println("downloadByCommonIO_下载["+download_failed_time+"] End  fileAddress="+fileAddress);
+
+						System.out.println("\n-----视频保存路径-----\n" + fileSavePath.getAbsolutePath());
+						System.out.println("\nzzfile_3.bat " + fileSavePath.getParentFile().getAbsolutePath());
+						
+						
+						
+						if (isMDName) {
+							System.out.println("由于 isMDName=true  视频文件将以 MD5 属性文件名称进行命名!!! ");
+
+							// 获取文件的 md值 并重命名为 mdxxxx.mp4
+							String mdName = getMD5Three(fileSavePath.getAbsolutePath());
+							String new_Md_Name = mdName + ".mp4";
+							tryReName(fileSavePath, new_Md_Name);
+							System.out.println("\n-----视频保存路径(MD名称)-----\n" + fileSavePath.getAbsolutePath());
+
+							// 把下载的 mp4 文件 名称 转为 md值
+						}
+						
+					
+						//  把下载的 mp4 文件 名称 转为 md值
+//						url_name_LogList.add(pageUrl+"          "+mdName);
+						urlStrList.add(httpUrl);
+						
+			        } catch (IOException e) {
+			        	download_failed_time++;
+			        	if(download_failed_time%10 == 0) {
+			        		System.out.println("程序下载 retry "+download_failed_time+" 次 仍然 下载 失败----放弃");
+			        	}else {
+			        		
+
+			        		downloadByCommonIO( index ,  pageurl , httpUrl,  fileNameNoPoint,  source);
+			        	}
+//			            e.printStackTrace();
+			        }
+
+			        
+				}
+				
+		public  void	TW_Download( int index  ,String httppage) {
+			
+			// 1. 获取 tw 的  id  
+			String id_str = getIdFromTWUrl(httppage);
+			if(id_str == null || "".equals(id_str.trim()) || !isNumeric(id_str.trim())){
+				System.out.println("当前 TW-Url: "+httppage+" 识别出的ID出错请检查!! id_str="+id_str);
+			    return;
+			}
+			
+			
+			try {
+				List<TwitterVideo> list = 	extractTwitterVideo(id_str);
+				
+				if(list == null || list.size() == 0) {
+					System.out.println("返回为空 ");
+				}else {
+					
+					System.out.println("返回 list.size() == "+list.size());
+					TwitterVideo high_url_TwitterVideo = 		showTwitterInfo_ReturnBigOne(list,httppage);
+					
+					if(high_url_TwitterVideo != null) {
+//						downRawVideo_WithUrl(httppage, high_url_TwitterVideo.url, id_str, null);
+			            // downRawVideo_WithUrl(index, finalVideoAddress, fileNameNoPoint, "douyin");
+
+//						downRawVideo_WithUrl(index, high_url_TwitterVideo.url, id_str, null);
+						downRawVideo_WithUrl_WithProxy(index, high_url_TwitterVideo.url, id_str, null,httppage);
+
+//						downloadByCommonIO(index,httppage, high_url_TwitterVideo.url, id_str, "tw");
+						System.out.println("下载操作完成!");
+						
+					}else {
+						System.out.println(" url 为空 无法执行下载操作!! ");
+					}
+				}
+		 
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				System.out.println("出现异常!! ");
+			}
+			
+			
+		}
 		void TouTiao_XiGua_Download(int index, String urlitem) {
 			if (!ChromeDriverFile.exists()) {
 				System.out.println(
@@ -3028,6 +3323,113 @@ System.out.println("paramItem["+i+"] = "+paramItem_lower_trim);
 		// String fileAddress = videoSavePath+"/"+((source==null ||"".equals(source) ?
 		// "":source+"_")+title.replace(" ",
 		// ""))+"_"+index_download+"_"+timeStamp_Str+".mp4";
+
+
+
+
+		// 视频的保存 目录 不能是 当前文件 否则 就会执行 同步操作 影响网速
+		// pageUrl 是页面的url   httpUrl 是视频文件的url
+		@SuppressWarnings("unchecked")
+		public void downRawVideo_WithUrl_WithProxy(int index, String httpUrl, String fileNameNoPoint, String source ,String pageUrl) {
+			if(urlStrList.contains(httpUrl)) {
+				System.out.println("当前url 路径已经下载过  跳过下载!!  url路径: "+ httpUrl +"");
+				return;
+			}
+
+			String fileAddress = mDownloadedMonthDir.getAbsolutePath() + File.separator
+					+ (source == null || "".equals(source) ? "" : source + "_") + (fileNameNoPoint.replace(" ", ""))
+					+ "_" + index + "_" + getTimeStamp() + ".mp4";
+
+			int byteRead;
+
+
+			try {
+
+				// 获取链接
+
+				System.out.println("downloadByCommonIO_Retry下载["+download_failed_time+"] Begin fileAddress= "+fileAddress);
+				System.out.println("downloadByCommonIO_Retry下载["+download_failed_time+"] Begin HttpUrl= "+httpUrl);
+				System.out.println("downloadByCommonIO_Retry下载["+download_failed_time+"] Begin PageUrl= "+pageUrl);
+
+
+				InetSocketAddress address = new InetSocketAddress("127.0.0.1", 7078);
+				Proxy proxy = new Proxy(Proxy.Type.HTTP, address); // http代理协议类型
+				URL url = new URL(httpUrl);
+				URLConnection conn = url.openConnection(proxy);
+				// 输入流
+
+				long  beginTimeStamp = System.currentTimeMillis();
+
+
+
+
+
+
+				System.out.println("conn.getInputStream 获得 输入流  Begin ( downRawVideo耗时_A 得很) ");
+				InputStream inStream = conn.getInputStream();
+				long  endTimeStamp = System.currentTimeMillis();
+				long distance_second = (endTimeStamp -beginTimeStamp)/1000;
+
+
+				System.out.println("conn.getInputStream 获得 输入流  End ( downRawVideo耗时_A【"+distance_second+" 秒】 得很)");
+
+				// 封装一个保存文件的路径对象
+				File fileSavePath = new File(fileAddress);
+				// 注:如果保存文件夹不存在,那么则创建该文件夹
+				File fileParent = fileSavePath.getParentFile();
+				if (!fileParent.exists()) {
+					fileParent.mkdirs();
+				}
+				// 写入文件
+				FileOutputStream fs = new FileOutputStream(fileSavePath);
+				byte[] buffer = new byte[1024];
+				  beginTimeStamp = System.currentTimeMillis();
+				System.out.println("FileOutputStream.write  写入本地文件  Begin   比较 downRawVideo_耗时_B ");
+
+				while ((byteRead = inStream.read(buffer)) != -1) {
+					fs.write(buffer, 0, byteRead);
+				}
+				  endTimeStamp = System.currentTimeMillis();
+				 distance_second = (endTimeStamp -beginTimeStamp)/1000;
+
+				System.out.println("FileOutputStream.write  写入本地文件  End ( downRawVideo_耗时_B【"+distance_second+" 秒】 得很)");
+
+				inStream.close();
+				fs.close();
+				System.out.println("\n-----视频保存路径-----\n" + fileSavePath.getAbsolutePath());
+				System.out.println("\nzzfile_3.bat " + fileSavePath.getParentFile().getAbsolutePath());
+
+
+
+				if (isMDName) {
+					System.out.println("由于 isMDName=true  视频文件将以 MD5 属性文件名称进行命名!!! ");
+
+					// 获取文件的 md值 并重命名为 mdxxxx.mp4
+					String mdName = getMD5Three(fileSavePath.getAbsolutePath());
+					String new_Md_Name = mdName + ".mp4";
+					tryReName(fileSavePath, new_Md_Name);
+					// 把下载的 mp4 文件 名称 转为 md值
+				}
+
+
+
+				urlStrList.add(httpUrl);
+				download_failed_time = 0;
+				System.out.println("downloadByCommonIO_下载["+download_failed_time+"] End  fileAddress="+fileAddress);
+			} catch (Exception e) {
+
+				download_failed_time++;
+				if(download_failed_time%10 == 0) {
+					System.out.println("程序下载 retry "+download_failed_time+" 次 仍然 下载 失败----放弃");
+				}else {
+					downRawVideo_WithUrl_WithProxy(  index,  httpUrl,  fileNameNoPoint,  source ,pageUrl);
+				}
+				// e.printStackTrace();
+
+				// 	System.out.println(e.getMessage());
+			}
+		}
+
 
 		// 视频的保存 目录 不能是 当前文件 否则 就会执行 同步操作 影响网速
 		@SuppressWarnings("unchecked")
