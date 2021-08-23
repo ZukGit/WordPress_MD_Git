@@ -854,11 +854,10 @@ rem ======================== SYSTEM_OPERATION Begin========================
 :isadminuser_func_0x1
 rem ======================================== isadminuser_func_0x1
 rem desc: 检测当前运行环境是否是Admin 管理员权限   如果是管理员返回true    如果只是普通的用户返回false  通过net session 的返回值判断
-rem sample: call :isadminuser_func_0x1  
-rem sample_out: [isadminuser_func_0x1 ]   isadminuser_return_1=[false]   
+rem sample: call :isadminuser_func_0x1
+rem sample_out: [isadminuser_func_0x1 ]   isadminuser_return_1=[false]
 ::SETLOCAL
 echo ______________Method_In isadminuser_func_0x1
-
 net session
 echo errorlevel=%ERRORLEVEL%
 if %ERRORLEVEL% LEQ 1 (
@@ -868,11 +867,11 @@ set isadminuser_return_1=true
 echo 当前普通用户权限
 set isadminuser_return_1=false
 )
-
-echo [isadminuser_func_0x1 EndPrintCode]   isadminuser_return_1=[!isadminuser_return_1!]    
+echo [isadminuser_func_0x1 EndPrintCode] isadminuser_return_1=[!isadminuser_return_1!]   param1=[__empty__] 
 echo ______________Method_Out isadminuser_func_0x1
 ::ENDLOCAL
 goto:eof
+
 
 
 
@@ -2866,14 +2865,14 @@ echo [rule18vinstalllocalsoft_func_0x0 EndPrintCode]   output=[__empty__]  param
 echo ______________Method_Out rule18vinstalllocalsoft_func_0x0
 goto:eof
 )
-
 call :isadminuser_func_0x1
 echo  isadminuser_return_1=!isadminuser_return_1!
 if "!isadminuser_return_1!"=="false" (
 echo 请确保当前是运行在管理员权限下,否则系统环境变量可能无法设置.
 ping -n 2 127.0.0.1>nul
-
 echo 当前不是 Admin 的 运行环境 无法执行安装程序操作  程序停止！
+echo [rule18vinstalllocalsoft_func_0x0 EndPrintCode]   output=[__empty__]  param1=[__empty__] 
+echo ______________Method_Out rule18vinstalllocalsoft_func_0x0
 goto:eof
 )
 echo 当前CMD环境是 Admin环境 将往下执行 3
@@ -3362,8 +3361,8 @@ goto:eof
 
 
 
-:rule21vshowfilemd_func_1x0
-rem ======================================== rule21vshowfilemd_func_1x0
+:rule21vshowfilemd_func_2x0
+rem ======================================== rule21vshowfilemd_func_2x0
 rem rule_tip: %init_input_0% _21_   ## 查看当前目录下所有文件的 MD属性
 
 rem rule_tip: %init_input_0% _21_ mp4  ## 查看当前目录下所有 mp4文件的MD属性
@@ -3371,31 +3370,93 @@ rem rule_tip: %init_input_0% _21_ mp4  ## 查看当前目录下所有 mp4文件�
 rem rule_tip: %init_input_0% _21_ jpg   ## 查看当前目录下所有 jpg文件的MD属性
 
 rem rule_tip: %init_input_0% _21_ gif  ## 查看当前目录下所有 gif文件的MD属性
+
+rem rule_tip: %init_input_0% _21_ mdname_true    ## 查看当前目录下所有文件的 MD属性  并把当前名字改为md值
+
+rem rule_tip: %init_input_0% _21_ mp4 mdname_true ## 查看当前目录下所有 mp4文件的MD属性  并把当前名字改为md值
+
+rem rule_tip: %init_input_0% _21_ jpg mdname_true ## 查看当前目录下所有 gif文件的MD属性 并把当前名字改为md值
+
+rem rule_tip: %init_input_0% _21_ gif mdname_true ## 查看当前目录下所有 gif文件的MD属性 并把当前名字改为md值
 rem desc: 
 rem sample: 
 rem sample_out: 
 ::SETLOCAL
-echo ______________Method_In rule21vshowfilemd_func_1x0
+echo ______________Method_In rule21vshowfilemd_func_2x0
 set rule21vshowfilemd_dynamic_param1=
+set rule21vshowfilemd_dynamic_param2=
+set rule21vshowfilemd_dynamic_param1=%init_input_2%
+set rule21vshowfilemd_dynamic_param2=%init_input_3%
 set /a n=0
 if "%init_input_2%"=="" (
 echo init_input_2=null 
 for /f "delims=\" %%i in ('dir /b /a-d /o-d "!init_cd!\*.*"') do (
     set /a n+=1
-    echo 全类型源文件[!n!][%%i] MD属性信息如下:
-    certutil -hashfile "%%i"  MD5
+    echo 全类型源文件[!n!][%%i] MD属性信息如下: command [ certutil -hashfile "%%i"  MD5 ]
+	certutil -hashfile  "%%i"  MD5  | findstr /V "CertUtil MD5 "
+	echo=
 )
-) else (
+echo [rule21vshowfilemd_func_2x0 EndPrintCode]    output=[__empty__] dynamic_param1=[!rule21vshowfilemd_dynamic_param1!]   dynamic_param2=[!rule21vshowfilemd_dynamic_param2!]   
+echo ______________Method_Out rule21vshowfilemd_func_2x0
+goto:eof
+) else if not "%init_input_2%"=="mdname_true" (
+if "%init_input_3%"=="" (
 echo init_input_2=%init_input_2%
 set rule21vshowfilemd_dynamic_param1=%init_input_2%
 for /f "delims=\" %%i in ('dir /b /a-d /o-d "!init_cd!\*.!rule21vshowfilemd_dynamic_param1!"') do (
     set /a n+=1
-    echo !rule21vshowfilemd_dynamic_param1!]类型源文件[!n!][%%i] MD属性信息如下:
-    certutil -hashfile "%%i"  MD5
+    echo !rule21vshowfilemd_dynamic_param1!]类型源文件[!n!][%%i] MD属性信息如下: command [ certutil -hashfile "%%i"  MD5 ]
+	certutil -hashfile  "%%i"  MD5  | findstr /V "CertUtil MD5 "
+	echo=
+)
+echo [rule21vshowfilemd_func_2x0 EndPrintCode]    output=[__empty__] dynamic_param1=[!rule21vshowfilemd_dynamic_param1!]   dynamic_param2=[!rule21vshowfilemd_dynamic_param2!]   
+echo ______________Method_Out rule21vshowfilemd_func_2x0
+goto:eof
 )
 )
-echo [rule21vshowfilemd_func_1x0 EndPrintCode]    output=[__empty__] dynamic_param1=[!rule21vshowfilemd_dynamic_param1!]   
-echo ______________Method_Out rule21vshowfilemd_func_1x0
+if not "%init_input_2%"=="" (
+if "%init_input_2%"=="mdname_true" (
+del zbatrule_21.txt
+for /f "delims=\" %%i in ('dir /b /a-d /o-d "!init_cd!\*.*"') do (
+    set /a n+=1
+	call ::getfilex_func_1x1  !init_cd!\%%i
+    set cur_file_type=!getfilex_return_1!
+	echo ____全类型源文件[!n!][%%i] MD属性信息如下: command [ certutil -hashfile "%%i"  MD5 ]
+	certutil -hashfile  "%%i"  MD5  | findstr /V "CertUtil MD5 " > zbatrule_21.txt
+	set /p md5str=<zbatrule_21.txt
+	echo md5str=!md5str!
+	echo type=!cur_file_type!
+	ren "%%i" "!md5str!!cur_file_type!"
+	echo ____全类型源文件[!n!][%%i]改为MD5名称命名文件[!md5str!!cur_file_type!] 成功
+)
+del zbatrule_21.txt
+echo [rule21vshowfilemd_func_2x0 EndPrintCode]    output=[__empty__] dynamic_param1=[!rule21vshowfilemd_dynamic_param1!]   dynamic_param2=[!rule21vshowfilemd_dynamic_param2!]   
+echo ______________Method_Out rule21vshowfilemd_func_2x0
+goto:eof
+) else if "%init_input_3%"=="mdname_true" (
+del zbatrule_21.txt
+echo init_input_2=%init_input_2%
+set rule21vshowfilemd_dynamic_param1=%init_input_2%
+for /f "delims=\" %%i in ('dir /b /a-d /o-d "!init_cd!\*.!rule21vshowfilemd_dynamic_param1!"') do (
+    set /a n+=1
+	call ::getfilex_func_1x1  !init_cd!\%%i
+    set cur_file_type=!getfilex_return_1!
+    echo !rule21vshowfilemd_dynamic_param1! ]类型源文件[!n!][%%i] MD属性信息如下: command [ certutil -hashfile "%%i"  MD5 ]
+	certutil -hashfile  "%%i"  MD5  | findstr /V "CertUtil MD5 "  > zbatrule_21.txt
+	set /p md5str=<zbatrule_21.txt
+	echo md5str=!md5str!
+	echo type=!cur_file_type!
+	ren "%%i" "!md5str!!cur_file_type!"
+	echo !rule21vshowfilemd_dynamic_param1! 类型源文件[!n!][%%i]改为MD5名称命名文件[!md5str!!cur_file_type!] 成功
+)
+del zbatrule_21.txt
+echo [rule21vshowfilemd_func_2x0 EndPrintCode]    output=[__empty__] dynamic_param1=[!rule21vshowfilemd_dynamic_param1!]   dynamic_param2=[!rule21vshowfilemd_dynamic_param2!]   
+echo ______________Method_Out rule21vshowfilemd_func_2x0
+goto:eof
+)
+)   
+echo [rule21vshowfilemd_func_2x0 EndPrintCode]    output=[__empty__] dynamic_param1=[!rule21vshowfilemd_dynamic_param1!]   dynamic_param2=[!rule21vshowfilemd_dynamic_param2!]   
+echo ______________Method_Out rule21vshowfilemd_func_2x0
 ::ENDLOCAL
 goto:eof
 
@@ -3426,9 +3487,7 @@ rem rule_tip: %init_input_0% _22_   showfiletype  ##   显示文件的扩展名
 
 rem rule_tip: %init_input_0% _22_   showhiddenfile  ##   显示隐藏文件夹 文件
 
-rem rule_tip: %init_input_0% _22_   wifi  ##   显示wifi信息
-
-
+rem rule_tip: %init_input_0% _22_   wifi        ##  显示wifi信息
 rem desc: 
 rem sample: 
 rem sample_out: 
@@ -3483,7 +3542,7 @@ echo 显示WIFI
 del showwifi.txt
 for /f "skip=9 tokens=1,2 delims=:" %%i in ('netsh wlan show profiles') do  @echo %%j | findstr -i -v echo | netsh wlan show profiles %%j key=clear >> "showwifi.txt"
 echo ___________________ WIFI Info Begin ___________________
-cat showwifi.txt  | findstr  "SSID.name Key"
+type showwifi.txt  | findstr  "SSID.name Key"
 echo ___________________ WIFI Info End ___________________
 rem del  showwifi.txt
 )
@@ -3495,19 +3554,212 @@ goto:eof
 
 
 
-:rule999vmethodholdplace_func_0x0
-rem ======================================== rule999vmethodholdplace_func_0x0
-rem rule_tip: %init_input_0% _999_   ## 打印当前 rule规则的method模板
+:rule23vfiletypechange_func_0x0
+rem ======================================== rule23vfiletypechange_func_0x0
+rem rule_tip: %init_input_0% _23_  png_jpg  ##  更改当前文件的类型  原类型_目标类型  png_jpg
+
+rem rule_tip: %init_input_0% _23_  _jpg  ##  更改当前文件的类型  原类型_目标类型  无类型 转为 jpg 类型
+
+rem rule_tip: %init_input_0% _23_  jpg_  ##  更改当前文件的类型  原类型_目标类型    jpg 类型 转为  无类型
+
+rem rule_tip: %init_input_0% _23_  _png  ##  更改当前文件的类型  原类型_目标类型  无类型 转为 png 类型
+
+rem rule_tip: %init_input_0% _23_  png_  ##  更改当前文件的类型  原类型_目标类型    png 类型 转为  无类型
+
+rem rule_tip: %init_input_0% _23_  _webp  ##  更改当前文件的类型  原类型_目标类型   无类型 转为 webp 类型
+
+rem rule_tip: %init_input_0% _23_  webp_  ##  更改当前文件的类型  原类型_目标类型    webp 类型 转为  无类型
+
+rem rule_tip: %init_input_0% _23_  _gif  ##  更改当前文件的类型  原类型_目标类型   无类型 转为 gif 类型
+
+rem rule_tip: %init_input_0% _23_  gif_  ##  更改当前文件的类型  原类型_目标类型    gif 类型 转为  无类型
+
+rem rule_tip: %init_input_0% _23_  _mp4  ##  更改当前文件的类型  原类型_目标类型  无类型 转为 mp4 类型
+
+rem rule_tip: %init_input_0% _23_  mp4_  ##  更改当前文件的类型  原类型_目标类型  无类型 转为 mp4 类型
+
+rem desc: 把当前目录中的原类型 转为 目标类型
+rem sample: 
+rem sample_out: 
+::SETLOCAL
+echo ______________Method_In rule23vfiletypechange_func_0x0
+set /a n=0
+if "%init_input_2%"=="" (
+echo 当前用户输入为空 无法执行规则 _23_ 去更改当前文件的类型  原类型_目标类型 例: png_jpg
+echo [rule23vfiletypechange_func_0x0 EndPrintCode]   output=[__empty__]  param1=[__empty__] 
+echo ______________Method_Out rule23vfiletypechange_func_0x0
+goto:eof
+) else (
+set rule23vfiletypechange_dynamic_param1=%init_input_2% 
+echo rule23vfiletypechange_dynamic_param1=!rule23vfiletypechange_dynamic_param1!
+set isContainString_return_1=
+call :isContainString_func_2x1  !rule23vfiletypechange_dynamic_param1!  _
+echo isContainString_return_1=!isContainString_return_1!
+if "!isContainString_return_1!"=="false" (
+echo 当前输入参数[ %init_input_2%  ]  没有包含 类型分隔符 [ _ ]   执行程序失败  示例:  png_jpg    mp4_  _mp4  jpg_   _jpg  
+echo [rule23vfiletypechange_func_0x0 EndPrintCode]   output=[__empty__]  param1=[__empty__] 
+echo ______________Method_Out rule23vfiletypechange_func_0x0
+GOTO:EOF
+)
+)
+echo 用户输入有效类型参数  [ !rule23vfiletypechange_dynamic_param1! ]
+set src_type_str=
+set dst_type_str=
+set getSubStringWithPre_return_1=
+call :getSubStringWithPre_func_2x1 !rule23vfiletypechange_dynamic_param1!  _
+echo getSubStringWithPre_return_1=!getSubStringWithPre_return_1!
+set getSubStringWithEnd_return_1=
+call :getSubStringWithEnd_func_2x1 !rule23vfiletypechange_dynamic_param1!  _
+echo getSubStringWithEnd_return_1=!getSubStringWithEnd_return_1!
+set src_type_str=!getSubStringWithEnd_return_1!
+set dst_type_str=!getSubStringWithPre_return_1!
+echo src_type_str=[ !src_type_str! ]   dst_type_str=[ !dst_type_str! ]
+if "!src_type_str!"=="" (
+echo 过滤没有类型的文件  转为 [ !dst_type_str! ] 的文件
+set dest_file_type=
+if "!dst_type_str!"=="" (
+set dest_file_type=
+) else (
+set dest_file_type=.!dst_type_str!
+)
+for /f "delims=\" %%i in ('dir /b /a-d /o-d "!init_cd!\*.*"') do (
+    set /a n+=1
+	rem call ::showfile_func_1x0  !init_cd!\%%i
+	rem  ~x= 
+	call ::getfilex_func_1x1  !init_cd!\%%i
+	set cur_file_type=!getfilex_return_1!
+	if "!cur_file_type!"=="" (
+	echo ____无类型源文件[!n!][%%i] 文件信息如下:  ~x=!cur_file_type!
+		call :getfilenamenopointwithfullpath_func_1x1 %%i
+set filename_no_type=!getfilenamenopointwithfullpath_return_1!
+set filename_with_type=!getfilenamenopointwithfullpath_return_1!!dest_file_type!
+		 ren "!init_cd!\%%i" "!filename_with_type!"
+	echo=
+	)
+)
+echo [rule23vfiletypechange_func_0x0 EndPrintCode]   output=[__empty__]  param1=[__empty__] 
+echo ______________Method_Out rule23vfiletypechange_func_0x0
+goto:eof
+)
+set dest_file_type=
+if "!dst_type_str!"=="" (
+set dest_file_type=
+) else (
+set dest_file_type=.!dst_type_str!
+)
+echo 过滤 [ !src_type_str! ] 类型的文件 转为 [ !dst_type_str! ] 追尾[ !dest_file_type! ]的文件
+for /f "delims=\" %%i in ('dir /b /a-d /o-d "!init_cd!\*.!src_type_str!"') do (
+    set /a n+=1
+	call :getfilenamenopointwithfullpath_func_1x1 %%i
+set filename_no_type=!getfilenamenopointwithfullpath_return_1!
+set filename_with_type=!getfilenamenopointwithfullpath_return_1!!dest_file_type!
+    echo 匹配[ !src_type_str! ]类型源文件[!n!][%%i] 转为 [ !filename_with_type! ]
+	echo command [  ren "!init_cd!\%%i" "!filename_with_type!"  ]
+	 ren "!init_cd!\%%i" "!filename_with_type!"
+    echo=
+)
+echo rule23vfiletypechange_dynamic_param1=%init_input_2%
+echo [rule23vfiletypechange_func_0x0 EndPrintCode]   output=[__empty__]  param1=[__empty__] 
+echo ______________Method_Out rule23vfiletypechange_func_0x0
+::ENDLOCAL
+goto:eof
+
+
+
+
+:rule996vwindowsbomb_func_0x0
+rem ======================================== rule996vwindowsbomb_func_0x0
+rem rule_tip: %init_input_0% _996_     ## 不断循环打开关闭 CMD页面  感觉像 轰炸屏幕 寓意轰炸996  无奈下周修好电脑继续
 rem desc: 
 rem sample: 
 rem sample_out: 
 ::SETLOCAL
-echo ______________Method_In rule999vmethodholdplace_func_0x0
+echo ______________Method_In rule996vwindowsbomb_func_0x0
+del zcmd_winbomb_I9_996.bat
+echo @ECHO off >> zcmd_winbomb_I9_996.bat  
+echo setlocal enabledelayedexpansion  >> zcmd_winbomb_I9_996.bat  
+rem set local_str=^%1 mshta vbscript^:CreateObject^(^"Shell^.Application^"^)^.ShellExecute^(^"cmd^.exe^",^"/c ^%^~s0 ::^",^"^",^"runas^",1^)^(window^.close^)^&^&exit
+echo call mshta vbscript^:CreateObject^(^"Shell^.Application^"^)^.ShellExecute^(^"cmd^.exe^",^"/c %%^~s0 ::^",^"^",^"runas^",1^)^(window^.close^)^&^&exit  >> zcmd_winbomb_I9_996.bat 
+rem echo start cmd /K D: >> zcmd_winbomb_I9_996.bat  
+rem echo start cmd /K "cd /d D:/zsoft/"  >> zcmd_winbomb_I9_996.bat  
+start zcmd_winbomb_I9_996.bat
+ping -n 100 127.0.0.1>nul
+del zcmd_winbomb_I9_996.bat
+echo [rule996vwindowsbomb_func_0x0 EndPrintCode]   output=[__empty__]  param1=[__empty__] 
+echo ______________Method_Out rule996vwindowsbomb_func_0x0
+::ENDLOCAL
+goto:eof
+
+
+
+
+:rule997vmethodholdplace3_func_2x0
+rem ======================================== rule997vmethodholdplace3_func_2x0
+rem rule_tip: %init_input_0% _997_   ## 打印当前 rule规则的method模板 2x0模板
+rem desc: 
+rem sample: 
+rem sample_out: 
+::SETLOCAL
+echo ______________Method_In rule997vmethodholdplace3_func_2x0
+set rule997vmethodholdplace3_dynamic_param1=
+set rule997vmethodholdplace3_dynamic_param2=
 echo ========================================== Rule_Method_HoldPlace_占位模板 Begin ===============================
-echo :rule999vmethodholdplace_func_0x0
+if "%init_input_2%"=="HolderOn" (
+set rule997vmethodholdplace3_dynamic_param1=%init_input_2%
+) else (
+)
+echo rule997vmethodholdplace3_dynamic_param1=%init_input_2%
+if "%init_input_3%"=="HolderOn" (
+set rule997vmethodholdplace3_dynamic_param2=%init_input_3%
+) else (
+)
+echo rule997vmethodholdplace3_dynamic_param2=%init_input_3%
 echo ========================================== Rule_Method_HoldPlace_占位模板 End ===============================
-echo [rule999vmethodholdplace_func_0x0 EndPrintCode]   output=[__empty__]  param1=[__empty__] 
-echo ______________Method_Out rule999vmethodholdplace_func_0x0
+echo [rule997vmethodholdplace3_func_2x0 EndPrintCode]    output=[__empty__] dynamic_param1=[!rule997vmethodholdplace3_dynamic_param1!]   dynamic_param2=[!rule997vmethodholdplace3_dynamic_param2!]   
+echo ______________Method_Out rule997vmethodholdplace3_func_2x0
+::ENDLOCAL
+goto:eof
+
+
+
+
+:rule998vmethodholdplace1_func_1x0
+rem ======================================== rule998vmethodholdplace1_func_1x0
+rem rule_tip: %init_input_0% _998_   ## 打印当前 rule规则的method模板 1x0模板
+rem desc: 
+rem sample: 
+rem sample_out: 
+::SETLOCAL
+echo ______________Method_In rule998vmethodholdplace1_func_1x0
+set rule998vmethodholdplace1_dynamic_param1=
+echo ========================================== Rule_Method_HoldPlace_占位模板 Begin ===============================
+if "%init_input_2%"=="HolderOn" (
+set rule998vmethodholdplace1_dynamic_param1=%init_input_2%
+) else (
+)
+echo rule998vmethodholdplace1_dynamic_param1=%init_input_2%
+echo ========================================== Rule_Method_HoldPlace_占位模板 End ===============================
+echo [rule998vmethodholdplace1_func_1x0 EndPrintCode]    output=[__empty__] dynamic_param1=[!rule998vmethodholdplace1_dynamic_param1!]   
+echo ______________Method_Out rule998vmethodholdplace1_func_1x0
+::ENDLOCAL
+goto:eof
+
+
+
+
+:rule999vmethodholdplace0_func_0x0
+rem ======================================== rule999vmethodholdplace0_func_0x0
+rem rule_tip: %init_input_0% _999_   ## 打印当前 rule规则的method模板 0x0模板
+rem desc: 
+rem sample: 
+rem sample_out: 
+::SETLOCAL
+echo ______________Method_In rule999vmethodholdplace0_func_0x0
+echo ========================================== Rule_Method_HoldPlace_占位模板 Begin ===============================
+echo :rule999vmethodholdplace0_func_0x0
+echo ========================================== Rule_Method_HoldPlace_占位模板 End ===============================
+echo [rule999vmethodholdplace0_func_0x0 EndPrintCode]   output=[__empty__]  param1=[__empty__] 
+echo ______________Method_Out rule999vmethodholdplace0_func_0x0
 ::ENDLOCAL
 goto:eof
 
@@ -3613,6 +3865,14 @@ echo %init_input_0% _21_ jpg   ## 查看当前目录下所有 jpg文件的MD属�
 
 echo %init_input_0% _21_ gif  ## 查看当前目录下所有 gif文件的MD属性
 
+echo %init_input_0% _21_ mdname_true    ## 查看当前目录下所有文件的 MD属性  并把当前名字改为md值
+
+echo %init_input_0% _21_ mp4 mdname_true ## 查看当前目录下所有 mp4文件的MD属性  并把当前名字改为md值
+
+echo %init_input_0% _21_ jpg mdname_true ## 查看当前目录下所有 gif文件的MD属性 并把当前名字改为md值
+
+echo %init_input_0% _21_ gif mdname_true ## 查看当前目录下所有 gif文件的MD属性 并把当前名字改为md值
+
 echo %init_input_0% _22_  control      ##  start control.exe  快速打开控制面板
 
 echo %init_input_0% _22_  regedit      ##  start regedit.exe  快速打开注册表
@@ -3635,10 +3895,37 @@ echo %init_input_0% _22_   showfiletype  ##   显示文件的扩展名
 
 echo %init_input_0% _22_   showhiddenfile  ##   显示隐藏文件夹 文件
 
-echo %init_input_0% _22_   wifi  ##   显示wifi密码信息
+echo %init_input_0% _22_   wifi        ##  显示wifi信息
 
+echo %init_input_0% _23_  png_jpg  ##  更改当前文件的类型  原类型_目标类型  png_jpg
 
-echo %init_input_0% _999_   ## 打印当前 rule规则的method模板
+echo %init_input_0% _23_  _jpg  ##  更改当前文件的类型  原类型_目标类型  无类型 转为 jpg 类型
+
+echo %init_input_0% _23_  jpg_  ##  更改当前文件的类型  原类型_目标类型    jpg 类型 转为  无类型
+
+echo %init_input_0% _23_  _png  ##  更改当前文件的类型  原类型_目标类型  无类型 转为 png 类型
+
+echo %init_input_0% _23_  png_  ##  更改当前文件的类型  原类型_目标类型    png 类型 转为  无类型
+
+echo %init_input_0% _23_  _webp  ##  更改当前文件的类型  原类型_目标类型   无类型 转为 webp 类型
+
+echo %init_input_0% _23_  webp_  ##  更改当前文件的类型  原类型_目标类型    webp 类型 转为  无类型
+
+echo %init_input_0% _23_  _gif  ##  更改当前文件的类型  原类型_目标类型   无类型 转为 gif 类型
+
+echo %init_input_0% _23_  gif_  ##  更改当前文件的类型  原类型_目标类型    gif 类型 转为  无类型
+
+echo %init_input_0% _23_  _mp4  ##  更改当前文件的类型  原类型_目标类型  无类型 转为 mp4 类型
+
+echo %init_input_0% _23_  mp4_  ##  更改当前文件的类型  原类型_目标类型  无类型 转为 mp4 类型
+
+echo %init_input_0% _996_     ## 不断循环打开关闭 CMD页面  感觉像 轰炸屏幕 寓意轰炸996  无奈下周修好电脑继续
+
+echo %init_input_0% _997_   ## 打印当前 rule规则的method模板 2x0模板
+
+echo %init_input_0% _998_   ## 打印当前 rule规则的method模板 1x0模板
+
+echo %init_input_0% _999_   ## 打印当前 rule规则的method模板 0x0模板
 echo [ruletipprint_func_0x0 EndPrintCode]   output=[__empty__]  param1=[__empty__] 
 echo ______________Method_Out ruletipprint_func_0x0
 ::ENDLOCAL
