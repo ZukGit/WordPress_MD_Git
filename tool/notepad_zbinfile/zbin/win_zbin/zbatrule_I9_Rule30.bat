@@ -1469,6 +1469,58 @@ goto:eof
 
 
 
+:stringreplace_func_3x1
+rem ======================================== stringreplace_func_3x1
+rem desc: 把字符串进行替换 实现replace方法
+
+rem desc: 返回在参数一字符串的夹在中间的字符串 没有找到对应字符串返回空
+rem sample: call :stringreplace_func_3x1 "123456789"  "123"  "789"
+rem sample: call :stringreplace_func_3x1 "123456789"  "23"  "56"
+rem sample: call :stringreplace_func_3x1 "123456789"  ""  "45"
+rem sample: call :stringreplace_func_3x1 "111222111"  "11"  "AA"
+rem sample_out: [stringreplace_func_3x1 ]   stringreplace_return_1=[789456789]   param1=["123456789"]   param2=["123"]   param3=["789"]
+rem sample_out: [stringreplace_func_3x1 ]   stringreplace_return_1=[156456789]   param1=["123456789"]   param2=["23"]   param3=["56"]
+rem sample_out: [stringreplace_func_3x1 ]   stringreplace_return_1=[123456789]   param1=["123456789"]   param2=[""]     param3=["45"]
+rem sample_out: [stringreplace_func_3x1 ]   stringreplace_return_1=[AA1222AA1]   param1=["111222111"]   param2=["11"]   param3=["AA"]
+::SETLOCAL
+echo ______________Method_In stringreplace_func_3x1
+echo  stringreplace_func_3x1 input_1_param ==[%1]
+echo  stringreplace_func_3x1 input_2_param ==[%2]
+echo  stringreplace_func_3x1 input_3_param ==[%3]
+set   stringreplace_return_1=
+set param_str_1=%1
+set param_str_trim1=%param_str_1: =%
+set param_str_2=%2
+set param_str_trim2=%param_str_2: =%
+set param_str_2_existflag=false
+set param_str_3=%3
+set param_str_trim3=%param_str_3: =%
+set param_str_3_existflag=false
+echo  stringreplace_func_3x1--param_str_trim1  ==[%param_str_trim1%]
+echo  stringreplace_func_3x1--param_str_trim2  ==[%param_str_trim2%]
+echo  stringreplace_func_3x1--param_str_trim3  ==[%param_str_trim3%]
+call :clearStringPadding_func_1x1  %param_str_1%
+set param_str_trim1_nopadding=!clearStringPadding_return_1!
+call :clearStringPadding_func_1x1  %param_str_2%
+set param_str_trim2_nopadding=!clearStringPadding_return_1!
+call :clearStringPadding_func_1x1  %param_str_3%
+set param_str_trim3_nopadding=!clearStringPadding_return_1!
+echo  stringreplace_func_3x1--param_str_trim1_nopadding  ==[%param_str_trim1_nopadding%]
+echo  stringreplace_func_3x1--param_str_trim2_nopadding  ==[%param_str_trim2_nopadding%]
+echo  stringreplace_func_3x1--param_str_trim3_nopadding  ==[%param_str_trim3_nopadding%]
+set temp_str=%1
+echo temp_str=%temp_str%
+echo command [ set stringreplace_return_1=%temp_str:!param_str_trim2_nopadding!=!param_str_trim3_nopadding!% ]
+call set "stringreplace_return_1=%%temp_str:!param_str_trim2_nopadding!=!param_str_trim3_nopadding!%%"
+echo stringreplace_return_1__[ !stringreplace_return_1! ] 
+echo [stringreplace_func_3x1 EndPrintCode]   stringreplace_return_1=[!stringreplace_return_1!]   param1=[%1]   param2=[%2]   param3=[%3]   
+echo ______________Method_Out stringreplace_func_3x1
+::ENDLOCAL
+goto:eof
+
+
+
+
 :getsubstringwithpreendtag_func_3x1
 rem ======================================== getsubstringwithpreendtag_func_3x1
 rem desc: 忽略两边引号  以参数二为起始头字符串(不包含)  以参数三为结尾字符串(不包含)
@@ -3233,7 +3285,7 @@ goto:eof
 
 :rule20vrenamewithtype_func_2x0
 rem ======================================== rule20vrenamewithtype_func_2x0
-rem rule_tip: %init_input_0% _20_      ## 把当前目录的 media媒体文件 jpg_jpeg_webp_mp4_avi_gif 改成 数字.类型 形式
+rem rule_tip: %init_input_0% _20_      ## 把当前目录的 media媒体文件 jpg_jpeg_webp_mp4_avi_gif_mp3_txt 改成 数字.类型 形式
 
 rem rule_tip: %init_input_0% _20_   jpg   ## 已经当前输入的类型去对匹配的文件改名 改为  数字.类型 形式
 
@@ -3327,6 +3379,15 @@ for /f "delims=\" %%i in ('dir /b /a-d /o-d "!init_cd!\*.webp"') do (
 )
 set /a n=0
 for /f "delims=\" %%i in ('dir /b /a-d /o-d "!init_cd!\*.mp4"') do (
+    set /a n+=1
+    set number=!n!
+    set newfileName=!n!!fileName_timestamp_pre!%%~xi
+    echo 完全匹配[webp]源文件:%%i 重命名为:!newfileName!
+    ren "%%i" "!newfileName!"
+)
+
+set /a n=0
+for /f "delims=\" %%i in ('dir /b /a-d /o-d "!init_cd!\*.mp3"') do (
     set /a n+=1
     set number=!n!
     set newfileName=!n!!fileName_timestamp_pre!%%~xi
@@ -3554,8 +3615,8 @@ goto:eof
 
 
 
-:rule23vfiletypechange_func_0x0
-rem ======================================== rule23vfiletypechange_func_0x0
+:rule23vfiletypechange_func_1x0
+rem ======================================== rule23vfiletypechange_func_1x0
 rem rule_tip: %init_input_0% _23_  png_jpg  ##  更改当前文件的类型  原类型_目标类型  png_jpg
 
 rem rule_tip: %init_input_0% _23_  _jpg  ##  更改当前文件的类型  原类型_目标类型  无类型 转为 jpg 类型
@@ -3582,12 +3643,13 @@ rem desc: 把当前目录中的原类型 转为 目标类型
 rem sample: 
 rem sample_out: 
 ::SETLOCAL
-echo ______________Method_In rule23vfiletypechange_func_0x0
+echo ______________Method_In rule23vfiletypechange_func_1x0
+set rule23vfiletypechange_dynamic_param1=
 set /a n=0
 if "%init_input_2%"=="" (
 echo 当前用户输入为空 无法执行规则 _23_ 去更改当前文件的类型  原类型_目标类型 例: png_jpg
-echo [rule23vfiletypechange_func_0x0 EndPrintCode]   output=[__empty__]  param1=[__empty__] 
-echo ______________Method_Out rule23vfiletypechange_func_0x0
+echo [rule23vfiletypechange_func_1x0 EndPrintCode]    output=[__empty__] dynamic_param1=[!rule23vfiletypechange_dynamic_param1!]   
+echo ______________Method_Out rule23vfiletypechange_func_1x0
 goto:eof
 ) else (
 set rule23vfiletypechange_dynamic_param1=%init_input_2% 
@@ -3597,8 +3659,8 @@ call :isContainString_func_2x1  !rule23vfiletypechange_dynamic_param1!  _
 echo isContainString_return_1=!isContainString_return_1!
 if "!isContainString_return_1!"=="false" (
 echo 当前输入参数[ %init_input_2%  ]  没有包含 类型分隔符 [ _ ]   执行程序失败  示例:  png_jpg    mp4_  _mp4  jpg_   _jpg  
-echo [rule23vfiletypechange_func_0x0 EndPrintCode]   output=[__empty__]  param1=[__empty__] 
-echo ______________Method_Out rule23vfiletypechange_func_0x0
+echo [rule23vfiletypechange_func_1x0 EndPrintCode]    output=[__empty__] dynamic_param1=[!rule23vfiletypechange_dynamic_param1!]   
+echo ______________Method_Out rule23vfiletypechange_func_1x0
 GOTO:EOF
 )
 )
@@ -3637,8 +3699,8 @@ set filename_with_type=!getfilenamenopointwithfullpath_return_1!!dest_file_type!
 	echo=
 	)
 )
-echo [rule23vfiletypechange_func_0x0 EndPrintCode]   output=[__empty__]  param1=[__empty__] 
-echo ______________Method_Out rule23vfiletypechange_func_0x0
+echo [rule23vfiletypechange_func_1x0 EndPrintCode]    output=[__empty__] dynamic_param1=[!rule23vfiletypechange_dynamic_param1!]   
+echo ______________Method_Out rule23vfiletypechange_func_1x0
 goto:eof
 )
 set dest_file_type=
@@ -3659,8 +3721,170 @@ set filename_with_type=!getfilenamenopointwithfullpath_return_1!!dest_file_type!
     echo=
 )
 echo rule23vfiletypechange_dynamic_param1=%init_input_2%
-echo [rule23vfiletypechange_func_0x0 EndPrintCode]   output=[__empty__]  param1=[__empty__] 
-echo ______________Method_Out rule23vfiletypechange_func_0x0
+echo [rule23vfiletypechange_func_1x0 EndPrintCode]    output=[__empty__] dynamic_param1=[!rule23vfiletypechange_dynamic_param1!]   
+echo ______________Method_Out rule23vfiletypechange_func_1x0
+::ENDLOCAL
+goto:eof
+
+
+
+
+:rule24vfilenamewithpreend_func_3x0
+rem ======================================== rule24vfilenamewithpreend_func_3x0
+rem rule_tip: %init_input_0% _24_ pre_temp_  end__end    ##  对当前目录的所有实体文件名称 加上前缀 temp_ 后缀加上 _end
+
+rem rule_tip: %init_input_0% _24_ pre_temp_  end_2020  jpg  ##  对当前目录的jpg文件名称 加上前缀 temp_ 后缀加上 2020
+
+rem rule_tip: %init_input_0% _24_ pre_2021  end_base  mp4  ##  对当前目录的mp4文件名称 加上前缀 2021 后缀加上 base
+
+rem desc: %init_input_0% _24_  pre_2021  end_base  mp4  对当前目录的mp4文件名称 加上前缀 2021 后缀加上 base
+rem sample: 
+rem sample_out: 
+::SETLOCAL
+echo ______________Method_In rule24vfilenamewithpreend_func_3x0
+set rule24vfilenamewithpreend_dynamic_param1=
+set rule24vfilenamewithpreend_dynamic_param2=
+set rule24vfilenamewithpreend_dynamic_param3=
+set prestr=
+set endstr=
+set filetypestr=*
+if "%init_input_2%"=="" (
+echo pre_ 前缀没有输入
+) else (
+set rule24vfilenamewithpreend_dynamic_param1=%init_input_2%
+call :isstartwith_func_2x1 %init_input_2%  pre_ 
+set local_isstartwith_return_1=!isstartwith_return_1!
+if "!local_isstartwith_return_1!"=="true" (
+call :stringreplace_func_3x1 %init_input_2%  pre_  ""
+echo stringreplace_return_1=!stringreplace_return_1!
+set prestr=!stringreplace_return_1!
+echo  输入的第一个参数是 pre_开头   值为  prestr=!prestr!
+) else (
+echo  输入的第一个参数不是 pre_开头   将默认pre_为空  prestr=
+set prestr=
+)
+)
+if "%init_input_3%"=="" (
+echo end_ 后缀没有输入
+) else (
+set rule24vfilenamewithpreend_dynamic_param2=%init_input_3%
+call :isstartwith_func_2x1 %init_input_3%  end_ 
+set local_isstartwith_return_1=!isstartwith_return_1!
+if "!local_isstartwith_return_1!"=="true" (
+call :stringreplace_func_3x1 %init_input_3%  end_  ""
+echo stringreplace_return_1=!stringreplace_return_1!
+set endstr=!stringreplace_return_1!
+echo  输入的第一个参数是 end_ 开头   值为  endstr=!endstr!
+) else (
+echo  输入的第一个参数不是 end_ 开头  将默认 end_为空  endstr=
+set endstr=
+)
+)
+if "%init_input_4%"=="" (
+echo 第三个参数 类型输入为空  默认类型为 filetypestr=*
+) else (
+set rule24vfilenamewithpreend_dynamic_param2=%init_input_4%
+set filetypestr=%init_input_4%
+)
+echo prestr[ !prestr! ]_________endstr[ !endstr! ]_________filetype[ !filetypestr! ]   
+for /f "delims=\" %%i in ('dir /b /a-d /o-d "!init_cd!\*.!filetypestr!"') do (
+    set /a n+=1
+	call ::getfilex_func_1x1  !init_cd!\%%i
+    set cur_file_type=!getfilex_return_1!
+	echo init_cd/i = !init_cd!\%%i
+	call ::getFileNameNoPointWithFullPath_func_1x1 !init_cd!\%%i
+	set cur_file_name=!getFileNameNoPointWithFullPath_return_1!
+	set cur_file_new_name=!prestr!!getFileNameNoPointWithFullPath_return_1!!endstr!!getfilex_return_1!
+	echo cur_file_new_name=[ !cur_file_new_name! ]
+	echo ____类型[ !filetypestr! ]源文件[!n!][%%i] 新名字[ !cur_file_new_name! ]
+	echo command[  ren "%%i" "!cur_file_new_name!"  ] 
+	ren "%%i" "!cur_file_new_name!"
+)
+echo [rule24vfilenamewithpreend_func_3x0 EndPrintCode]    output=[__empty__] dynamic_param1=[!rule24vfilenamewithpreend_dynamic_param1!]   dynamic_param2=[!rule24vfilenamewithpreend_dynamic_param2!]   dynamic_param3=[!rule24vfilenamewithpreend_dynamic_param3!]   
+echo ______________Method_Out rule24vfilenamewithpreend_func_3x0
+::ENDLOCAL
+goto:eof
+
+
+
+
+:rule25vfilenamereplace_func_2x0
+rem ======================================== rule25vfilenamereplace_func_2x0
+rem rule_tip: %init_input_0% _25_  123_AAA  ##  更改当前文件名称 把 123 替换为 AAA
+
+rem rule_tip: %init_input_0% _25_  123_AAA  jpg ##  更改当前目录的 jpg 文件名称中 把 123 替换为 AAA
+
+rem desc: 把当前目录中的原文件名称 替换字符串 转为新的文件名称
+rem sample: 
+rem sample_out: 
+::SETLOCAL
+echo ______________Method_In rule25vfilenamereplace_func_2x0
+set rule25vfilenamereplace_dynamic_param1=
+set rule25vfilenamereplace_dynamic_param2=
+set /a n=0
+if "%init_input_2%"=="" (
+echo 当前用户输入为空 无法执行规则 _25_ 去更改当前文件的类型  原名称_目标名称 例: 123_AAA
+echo [rule25vfilenamereplace_func_2x0 EndPrintCode]    output=[__empty__] dynamic_param1=[!rule25vfilenamereplace_dynamic_param1!]   dynamic_param2=[!rule25vfilenamereplace_dynamic_param2!]   
+echo ______________Method_Out rule25vfilenamereplace_func_2x0
+goto:eof
+) else (
+set rule25vfilenamereplace_dynamic_param1=%init_input_2% 
+echo rule25vfilenamereplace_dynamic_param1=!rule25vfilenamereplace_dynamic_param1!
+set isContainString_return_1=
+call :isContainString_func_2x1  !rule25vfilenamereplace_dynamic_param1!  _
+echo isContainString_return_1=!isContainString_return_1!
+if "!isContainString_return_1!"=="false" (
+echo 当前输入参数[ %init_input_2%  ]  没有包含 类型分隔符 [ _ ]   执行程序失败  示例:  123_AAA  456_BBB  原始名称_替换名称 
+echo [rule25vfilenamereplace_func_2x0 EndPrintCode]    output=[__empty__] dynamic_param1=[!rule25vfilenamereplace_dynamic_param1!]   dynamic_param2=[!rule25vfilenamereplace_dynamic_param2!]   
+echo ______________Method_Out rule25vfilenamereplace_func_2x0
+GOTO:EOF
+)
+)
+echo 用户输入有效类型参数  [ !rule25vfilenamereplace_dynamic_param1! ]
+set src_name_str=
+set dst_name_str=
+set getSubStringWithPre_return_1=
+call :getSubStringWithPre_func_2x1 !rule25vfilenamereplace_dynamic_param1!  _
+echo getSubStringWithPre_return_1=!getSubStringWithPre_return_1!
+set getSubStringWithEnd_return_1=
+call :getSubStringWithEnd_func_2x1 !rule25vfilenamereplace_dynamic_param1!  _
+echo getSubStringWithEnd_return_1=!getSubStringWithEnd_return_1!
+set src_name_str=!getSubStringWithEnd_return_1!
+set dst_name_str=!getSubStringWithPre_return_1!
+echo src_name_str[ !src_name_str! ]__________dst_name_str[ !dst_name_str! ]
+if "!src_name_str!"=="" (
+echo 用户输入类似  _!dst_name_str!  的字符串, 没有输入 需要替换的字符串  请检查输入参数 重新执行
+echo [rule25vfilenamereplace_func_2x0 EndPrintCode]    output=[__empty__] dynamic_param1=[!rule25vfilenamereplace_dynamic_param1!]   dynamic_param2=[!rule25vfilenamereplace_dynamic_param2!]   
+echo ______________Method_Out rule25vfilenamereplace_func_2x0
+GOTO:EOF
+)
+set filetypestr=* 
+if "%init_input_3%"=="" (
+echo 第二个参数 类型输入为空  默认类型为当前目录下全部实体文件 filetypestr=*
+) else (
+set rule24vfilenamewithpreend_dynamic_param2=%init_input_3%
+set filetypestr=%init_input_3%
+)
+echo  src_name_str[ !src_name_str! ]________dst_name_str[ !dst_name_str! ]_______filetypestr[ !filetypestr! ]
+for /f "delims=\" %%i in ('dir /b /a-d /o-d "!init_cd!\*.!filetypestr!"') do (
+    set /a n+=1
+	rem call ::showfile_func_1x0  !init_cd!\%%i
+	rem  ~x= 
+	call ::getfilex_func_1x1  !init_cd!\%%i
+	set cur_file_type=!getfilex_return_1!
+	call ::getfilenamenopointwithfullpath_func_1x1 %%i
+    set filename_no_type=!getfilenamenopointwithfullpath_return_1!
+    set old_name_str=!getfilenamenopointwithfullpath_return_1!!cur_file_type!
+	call ::stringreplace_func_3x1 !filename_no_type!  "!src_name_str!"  "!dst_name_str!"
+	set new_name_str=!stringreplace_return_1!!cur_file_type!
+	echo oldname[ !old_name_str! ]________newname[ !new_name_str! ]
+	if not "!old_name_str!"=="!new_name_str!" (
+		echo ____类型[ !cur_file_type! ]源文件[!n!][%%i] 新名字[ !new_name_str! ] 执行改名操作
+		ren "!init_cd!\%%i" "!new_name_str!"
+	)
+)
+echo [rule25vfilenamereplace_func_2x0 EndPrintCode]    output=[__empty__] dynamic_param1=[!rule25vfilenamereplace_dynamic_param1!]   dynamic_param2=[!rule25vfilenamereplace_dynamic_param2!]   
+echo ______________Method_Out rule25vfilenamereplace_func_2x0
 ::ENDLOCAL
 goto:eof
 
@@ -3835,7 +4059,7 @@ echo %init_input_0% _18_  ## 安装本地zsoft到zsoft_dest目录 1.解压 2.复
 
 echo %init_input_0% _19_  ## ADB 命令 Tel自动加载命令
 
-echo %init_input_0% _20_      ## 把当前目录的 media媒体文件 jpg_jpeg_webp_mp4_avi_gif 改成 数字.类型 形式
+echo %init_input_0% _20_      ## 把当前目录的 media媒体文件 jpg_jpeg_webp_mp4_avi_gif_mp3_txt 改成 数字.类型 形式
 
 echo %init_input_0% _20_   jpg   ## 已经当前输入的类型去对匹配的文件改名 改为  数字.类型 形式
 
@@ -3919,6 +4143,16 @@ echo %init_input_0% _23_  _mp4  ##  更改当前文件的类型  原类型_目�
 
 echo %init_input_0% _23_  mp4_  ##  更改当前文件的类型  原类型_目标类型  无类型 转为 mp4 类型
 
+echo %init_input_0% _24_ pre_temp_  end__end    ##  对当前目录的所有实体文件名称 加上前缀 temp_ 后缀加上 _end
+
+echo %init_input_0% _24_ pre_temp_  end_2020  jpg  ##  对当前目录的jpg文件名称 加上前缀 temp_ 后缀加上 2020
+
+echo %init_input_0% _24_ pre_2021  end_base  mp4  ##  对当前目录的mp4文件名称 加上前缀 2021 后缀加上 base
+
+echo %init_input_0% _25_  123_AAA  ##  更改当前文件名称 把 123 替换为 AAA
+
+echo %init_input_0% _25_  123_AAA  jpg ##  更改当前目录的 jpg 文件名称中 把 123 替换为 AAA
+
 echo %init_input_0% _996_     ## 不断循环打开关闭 CMD页面  感觉像 轰炸屏幕 寓意轰炸996  无奈下周修好电脑继续
 
 echo %init_input_0% _997_   ## 打印当前 rule规则的method模板 2x0模板
@@ -3993,6 +4227,10 @@ call :getrandomintwithmaxmin_func_2x1  1000 10000
 echo getrandomintwithmaxmin_return_1=!getrandomintwithmaxmin_return_1!
 call :isadminuser_func_0x1
 echo  isadminuser_return_1=!isadminuser_return_1!
+
+rem call :stringreplace_func_3x1 123456789  123  ""
+rem echo stringreplace_return_1=!stringreplace_return_1!
+
 echo __________________ Main_Method End _______________________
 goto:eof
 rem ══════════════════════════════════════════ Main_Enter_Aera End══════════════════════════════════════════

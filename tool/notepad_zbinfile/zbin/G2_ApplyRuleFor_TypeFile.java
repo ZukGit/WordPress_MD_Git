@@ -3,6 +3,9 @@ import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ImageUtil;
 import cn.hutool.http.HttpUtil;
 import cn.hutool.json.JSONUtil;
+import it.sauronsoftware.jave.Encoder;
+import it.sauronsoftware.jave.MultimediaInfo;
+import it.sauronsoftware.jave.VideoSize;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -96,6 +99,9 @@ import org.json.JSONException;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.select.Elements;
+import org.mp4parser.IsoFile;
+import org.mp4parser.boxes.iso14496.part12.MovieBox;
+import org.mp4parser.boxes.iso14496.part12.TrackBox;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
@@ -341,6 +347,9 @@ public class G2_ApplyRuleFor_TypeFile {
 		
 		realTypeRuleList.add(new SqlitTxt_Return_FirstBlankStr_Rule_43());
 		
+		realTypeRuleList.add(new Land_Port_Mp4Rename_Rule_44());
+		
+		
 	}
 
 	
@@ -352,6 +361,269 @@ public class G2_ApplyRuleFor_TypeFile {
 //     // 4.对当前子文件(包括子目录 子文件 --不包含孙目录 孙文件) 5. 从shell 中获取到的路径 去对某一个文件进行操作
 
 	
+	
+	class Land_Port_Mp4Rename_Rule_44 extends Basic_Rule {
+		
+		
+		Land_Port_Mp4Rename_Rule_44() {
+			super("#", 44, 4); //
+
+		
+			mSrcMP4FileList = new ArrayList<File>();
+			
+			mLandMP4FileList = new ArrayList<File>();
+			
+			mPortMP4FileList = new ArrayList<File>();
+
+		
+		}
+		
+		
+		File mSouTuDir ;   //  当前视频的缩略图文件夹
+
+		ArrayList<File> mSrcMP4FileList; // Shell 目录下原始文件目录
+		ArrayList<File> mLandMP4FileList; // Shell/Land_Port_TimeStamp/Land/ 文件夹下的文件
+		ArrayList<File> mPortMP4FileList; // Shell/Land_Port_TimeStamp/Land/ 文件夹下的文件
+
+		// 在缩图中的名称对应的 是否是 isport的属性
+		Map<String,Boolean> notypeFileName_IsPort_Map_InSuotu;
+		
+		@Override
+		boolean initParamsWithInputList(ArrayList<String> inputParamList) {
+		// TODO Auto-generated method stub
+			
+			
+			File[] listFile = 	curDirFile.listFiles();
+			if(listFile == null || listFile.length == 0) {
+				System.out.println("当前执行目录文件为空 无法执行程序 请检查!!  ");
+				return false;
+			}
+			
+			for (int i = 0; i < listFile.length; i++) {
+				File curFile = listFile[i];
+				String fileName = curFile.getName();
+				if(curFile.isDirectory() && fileName.startsWith("SuoTu_MP4_")) {
+					mSouTuDir = curFile;
+					
+				}
+			}
+
+			if(mSouTuDir == null || !mSouTuDir.exists() 
+					||  mSouTuDir.listFiles() == null || mSouTuDir.listFiles().length == 0) {
+				
+				System.out.println("当前缩略图文件夹为空 请检查:  mSouTuDir = "+ mSouTuDir );
+			    System.out.println("Tip: ");
+				System.out.println("当前程序需要先执行zmpeg_ffmpeg_G8.bat 9     ## 把当前目录下的 Mp4 生成缩略图");
+				System.out.println(" 当前程序依赖 软件  ffmpeg.exe ");
+				return false;
+				
+			}
+			
+			initMapWithSuoTuDir(mSouTuDir);
+
+		return super.initParamsWithInputList(inputParamList);
+		}
+		
+		
+	void	initMapWithSuoTuDir(File suotuDir){
+		notypeFileName_IsPort_Map_InSuotu = new HashMap<String,Boolean>();
+		File[] fileList = suotuDir.listFiles();
+		
+		for (int i = 0; i < fileList.length; i++) {
+			File curFile = fileList[i];
+			String type = getFileTypeWithPoint(curFile.getName());
+			String fileNameNoPoint = getFileNameNoPoint(curFile.getName());
+			if(".jpg".equals(type)) {
+				ImageIcon imageIcon = new ImageIcon(curFile.getAbsolutePath());
+				int high = imageIcon.getIconHeight();
+				int width = imageIcon.getIconWidth();
+				boolean isPort = true;
+				if(width > high) {
+					isPort = false;
+				} else {
+					isPort = true;
+				}
+				
+				notypeFileName_IsPort_Map_InSuotu.put(fileNameNoPoint, isPort);
+	
+			}
+		
+		}
+		
+		
+
+		deleteDirectory(suotuDir.getAbsolutePath());
+				
+		
+		
+		System.out.println("notypeFileName_IsPort_Map Size["+notypeFileName_IsPort_Map_InSuotu.size()+"]");
+			
+		}
+		
+		
+		 boolean  isVideoPort_MP4Parser(File videoFile){
+		    	boolean isport = true;
+try {
+IsoFile isoFile = new IsoFile(new FileInputStream(videoFile).getChannel());
+
+ 
+MovieBox movieBox = org.mp4parser.tools.Path.getPath(isoFile, "moov");
+// 可以打印这个 movieBox  toString 看看里面有啥
+List<org.mp4parser.Box> boxes = movieBox.getBoxes();
+// 宽高时长获取
+long duration = movieBox.getMovieHeaderBox().getDuration();
+int width = 0;
+int height = 0;
+for (org.mp4parser.Box box : boxes) {
+    if (box instanceof TrackBox) {
+        TrackBox tBbx = (TrackBox) box;
+        width = (int) tBbx.getTrackHeaderBox().getWidth();
+        height = (int) tBbx.getTrackHeaderBox().getHeight();
+
+        if(width > height) {
+        	
+        	isport = false;
+        }
+        
+        System.out.println("filename["+videoFile.getName()+"]"+"   width["+width+"]"+"  hight["+height+"]"+"   isport["+isport+"]" +"  duration["+duration+"]");
+
+        
+        break;
+    }
+}
+
+	isoFile.close();
+} catch (IOException e) {
+	// TODO Auto-generated catch block
+	e.printStackTrace();
+	System.out.println("异常发生 e="+e);
+}
+
+		    	return isport;
+		 
+		    }
+		 
+		 
+		 boolean  isVideoPort_MultimediaInfo(File mp4File){
+		    	boolean isport = true;
+		    	
+		        Encoder encoder = new Encoder();
+
+		        try {
+		            MultimediaInfo m = encoder.getInfo(mp4File);
+		            
+		   
+		          VideoSize size =   m.getVideo().getSize();
+
+		        long duration =   m.getDuration();
+		        
+		        
+		        int lastsecond = (int)duration/1000 -1;
+		      
+		          int height = size.getHeight();
+		          int width =   size.getWidth();
+		          if(height < width) {
+		        	  isport = false;
+		          }
+		          System.out.println("filename["+mp4File.getName()+"]"+"   width["+width+"]"+"    hight["+height+"]"+"   isport["+isport+"]   duration["+duration+"]  lastsecond["+lastsecond+"]");
+
+		        } catch (Exception e) {
+		            e.printStackTrace();
+		        }
+
+		    	return isport;
+		 
+		    }
+		 
+		 
+		 
+		@Override
+		ArrayList<File> applySubFileListRule4(ArrayList<File> curFileList,
+				HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList,
+				ArrayList<File> curRealFileList) {
+
+			for (int i = 0; i < curRealFileList.size(); i++) {
+				File fileItem = curRealFileList.get(i);
+				String fileName = fileItem.getName();
+				String fileName_lower = fileName.toLowerCase();
+
+					if (fileName_lower.endsWith(".mp4") || fileName_lower.endsWith(".MP4")) {
+						mSrcMP4FileList.add(fileItem);
+					}
+		
+			}
+
+
+			
+			for (int i = 0; i < mSrcMP4FileList.size(); i++) {
+				File mp4File = mSrcMP4FileList.get(i);
+				String mp4NameNoType = getFileNameNoPoint(mp4File.getName());
+				
+				if(notypeFileName_IsPort_Map_InSuotu.containsKey(mp4NameNoType)) {
+					Boolean isPort = notypeFileName_IsPort_Map_InSuotu.get(mp4NameNoType);
+	            	if (isPort) {
+	              		mPortMP4FileList.add(mp4File);
+					} else {
+						mLandMP4FileList.add(mp4File);
+					}
+	            	
+					
+				}else {
+					
+					System.out.println("当前文件 mp4File="+mp4File.getName()+" 无法在缩略图文件夹 "+mSouTuDir+" 找到对应的缩略图!! 无法判断");
+					
+				}
+				
+
+  
+			}
+			
+			int allOperationFileCount = mSrcMP4FileList.size()+mPortMP4FileList.size();
+
+			for (int i = 0; i < mPortMP4FileList.size(); i++) {
+				File mp4File = mPortMP4FileList.get(i);
+				String fileName = mp4File.getName();
+				if(fileName.startsWith("Port_")) {  // 已经有分类   cintinue
+					continue;
+				}
+				String new_name = "Port_"+fileName;
+				
+				System.out.println("Port["+i+"] AllPort["+mPortMP4FileList.size()+"]  AllMP4["+allOperationFileCount+"]  OldName["+fileName+"]  newName["+new_name+"]");
+				tryReName(mp4File, new_name);
+				
+			}
+			
+			for (int i = 0; i < mLandMP4FileList.size(); i++) {
+				File mp4File = mLandMP4FileList.get(i);
+				String fileName = mp4File.getName();
+				if(fileName.startsWith("Land_")) {  // 已经有分类   cintinue
+					continue;
+				}
+				String new_name = "Land_"+fileName;
+				System.out.println();
+				System.out.println("Land["+i+"] AllLand["+mLandMP4FileList.size()+"]  AllMP4["+allOperationFileCount+"]  OldName["+fileName+"]  newName["+new_name+"]");
+
+				tryReName(mp4File, new_name);
+
+			}
+			
+
+			
+			System.out.println(""+rule_index +" 对Video 进行 Port_ 和 Land_ 的重命名完成!");
+
+			return super.applySubFileListRule4(curFileList, subFileTypeMap, curDirList, curRealFileList);
+		}
+		
+		
+		
+		@Override
+		String simpleDesc() {
+
+			return "\n" + "zmpeg_ffmpeg_G8.bat 9 && "+  Cur_Bat_Name + " #_" + rule_index+"   ###  对当前的目录中的MP4文件 先生成动态 缩略图文件夹 获取正确宽高后 以 Port_ 和 Land_前缀来重命名MP4文件名称   ";
+		}
+		
+		
+	}
 	
 	class SqlitTxt_Return_FirstBlankStr_Rule_43 extends Basic_Rule {
 		
@@ -13665,5 +13937,101 @@ System.out.println("paramItem["+i+"] = "+paramItem_lower_trim);
 		return firstZimu;
 
 	}
+	
+	
+	/**
+	* 删除文件，可以是文件或文件夹
+	*
+	* @param fileName
+	* 要删除的文件名
+	* @return 删除成功返回true，否则返回false
+	*/
+	public static boolean delete(String fileName) {
+	File file = new File(fileName);
+	if (!file.exists()) {
+	System.out.println("删除文件失败:" + fileName + "不存在！");
+	return false;
+	} else {
+	if (file.isFile())
+	return deleteFile(fileName);
+	else
+	return deleteDirectory(fileName);
+	}
+	}
+
+	/**
+	* 删除单个文件
+	*
+	* @param fileName
+	* 要删除的文件的文件名
+	* @return 单个文件删除成功返回true，否则返回false
+	*/
+	public static boolean deleteFile(String fileName) {
+	File file = new File(fileName);
+	// 如果文件路径所对应的文件存在，并且是一个文件，则直接删除
+	if (file.exists() && file.isFile()) {
+	if (file.delete()) {
+	System.out.println("删除单个文件" + fileName + "成功！");
+	return true;
+	} else {
+	System.out.println("删除单个文件" + fileName + "失败！");
+	return false;
+	}
+	} else {
+	System.out.println("删除单个文件失败：" + fileName + "不存在！");
+	return false;
+	}
+	}
+
+	/**
+	* 删除目录及目录下的文件
+	*
+	* @param dir
+	* 要删除的目录的文件路径
+	* @return 目录删除成功返回true，否则返回false
+	*/
+	public static boolean deleteDirectory(String dir) {
+	// 如果dir不以文件分隔符结尾，自动添加文件分隔符
+	if (!dir.endsWith(File.separator))
+	dir = dir + File.separator;
+	File dirFile = new File(dir);
+	// 如果dir对应的文件不存在，或者不是一个目录，则退出
+	if ((!dirFile.exists()) || (!dirFile.isDirectory())) {
+	System.out.println("删除目录失败：" + dir + "不存在！");
+	return false;
+	}
+	boolean flag = true;
+	// 删除文件夹中的所有文件包括子目录
+	File[] files = dirFile.listFiles();
+	for (int i = 0; i < files.length; i++) {
+	// 删除子文件
+	if (files[i].isFile()) {
+	flag = deleteFile(files[i].getAbsolutePath());
+	if (!flag)
+	break;
+	}
+	// 删除子目录
+	else if (files[i].isDirectory()) {
+	flag = deleteDirectory(files[i]
+	.getAbsolutePath());
+	if (!flag)
+	break;
+	}
+	}
+	if (!flag) {
+	System.out.println("删除目录失败！");
+	return false;
+	}
+	// 删除当前目录
+	if (dirFile.delete()) {
+	System.out.println("删除目录" + dir + "成功！");
+	return true;
+	} else {
+	return false;
+	}
+	}
+	
+
+	
 
 }

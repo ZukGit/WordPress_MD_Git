@@ -1,6 +1,7 @@
 import cn.hutool.system.JavaRuntimeInfo;
 import it.sauronsoftware.jave.Encoder;
 import it.sauronsoftware.jave.MultimediaInfo;
+import it.sauronsoftware.jave.VideoSize;
 
 import java.io.*;
 import java.nio.file.*;
@@ -315,8 +316,108 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
         //  把当前的 mov文件转为 mp4文件 输出到本地文件夹
         CUR_RULE_LIST.add( new MOV_Revert_MP4_Rule_8());
         
+        // 把当前目录下的 Mp4 生成缩略图  保存到  本地  生成在 目录 SuoTu_Mp4_时间戳 目录中
+        CUR_RULE_LIST.add( new CaptureSuoLueTu_From_MP4_Rule_9());
+        
 
+    }
+    
+    
+    // 把当前目录下的 Mp4 生成缩略图  保存到  本地  生成在 目录 SuoTu_Mp4_时间戳 目录中
+    class CaptureSuoLueTu_From_MP4_Rule_9 extends  Basic_Rule{
+    	
+    	ArrayList<File> curDirMP4FileList ;  // 当前目录的 mov文件 
 
+    	CaptureSuoLueTu_From_MP4_Rule_9(){
+            super(9);
+            curDirMP4FileList = new  ArrayList<File>();
+
+        }
+    	
+    	
+    	
+        String ruleTip(String type, int index, String batName, OS_TYPE curType) {
+            return
+                    "\n"+Cur_Bat_Name+ " "+rule_index+ "     ## 把当前目录下的 Mp4 生成缩略图  保存到  本地  生成在 目录 SuoTu_Mp4_时间戳 目录中   \n"+
+                    "\n"+Cur_Bat_Name+ "  "+rule_index+ "    ##  把当前目录下的 Mp4 生成缩略图  保存到  本地  生成在 目录 SuoTu_Mp4_时间戳 目录中  \n"; }
+        
+    	
+    	
+        @Override
+        void operationRule(ArrayList<String> inputParamsList) {
+        	
+            String ffmpeg_path = getEnvironmentExePath("ffmpeg");
+            if(ffmpeg_path ==null){
+                errorMsg = "当前 ffmpeg 不在环境变量中 请下载该库 并添加到 环境变量中";
+                System.out.println(errorMsg);
+                return;
+            }
+            System.out.println("rule8 curDirMP4FileList.size() = "+curDirMP4FileList.size());
+            System.out.println("rule8 ffmpeg_path = "+ffmpeg_path);
+            
+            String SuoTu_Mp4_DirName = "SuoTu_MP4_"+getTimeStamp();
+            File SuoTu_Mp4_Dir = new File(CUR_Dir_FILE+File.separator+SuoTu_Mp4_DirName);
+            
+            if(!SuoTu_Mp4_Dir.exists()) {
+            	SuoTu_Mp4_Dir.mkdirs();
+            }
+        	for (int i = 0; i < curDirMP4FileList.size(); i++) {
+				File mp4File = curDirMP4FileList.get(i);
+				String mp4FileAbs = mp4File.getAbsolutePath();
+				String fileName = mp4File.getName();
+				String fileNameNoPointType = getFileNameNoPoint_NoCase(fileName);
+				String target_jpg_abs_path = (SuoTu_Mp4_Dir.getAbsolutePath()+File.separator+fileNameNoPointType+".jpg").replace(" ","");
+				
+				
+				
+
+				// D:\software\ffmpeg\bin\ffmpeg.exe -i D:\TEMP\ZZ\mp4_home\temp\mp4_home_land\Land_5.mp4 -r 0.001  D:\TEMP\ZZ\mp4_home\temp\mp4_home_land\land_5.jpg
+	   
+				String command = ffmpeg_path +" -i "+mp4FileAbs  + "  -r 0.001  " + target_jpg_abs_path;
+               System.out.println("--------ruleIndex["+rule_index+"] fileIndex["+i+"]  Path=["+target_jpg_abs_path.replace(" ","")+"] ");
+	            System.out.println(command);
+                execCMD(command);
+	            
+				
+			}
+        	
+        	
+        	
+        }
+        
+    	@Override
+    	boolean checkParamsOK(File shellDir, String type2Param, ArrayList<String> otherParams) {
+    		// TODO Auto-generated method stub
+    		
+    		File[] listFile = shellDir.listFiles();
+    		
+    		if(listFile == null) {
+    			System.out.println("当前目录下的 文件为空   程序执行失败 ");
+    			return false;
+    		}
+    		
+    		for (int i = 0; i < listFile.length; i++) {
+				File itemFile = listFile[i];
+				
+				if(itemFile.isDirectory()) {
+					continue;
+				}
+				String fileName_tolower = itemFile.getName().toLowerCase();
+				if(fileName_tolower.endsWith(".mp4")) {
+					curDirMP4FileList.add(itemFile);
+				}
+			}
+    		
+    		if(curDirMP4FileList.size() == 0) {
+    			
+    			System.out.println("当前目录下的 MP4 文件为空   程序不能执行   程序执行失败 ");
+    			return false;
+    		}
+    		
+    		return super.checkParamsOK(shellDir, type2Param, otherParams);
+    	}
+    	
+    	
     }
 
     class MOV_Revert_MP4_Rule_8 extends  Basic_Rule{
@@ -616,6 +717,31 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
     }
 
 
+   static boolean  isVideoPort(File mp4File){
+    	boolean isport = true;
+    	
+        Encoder encoder = new Encoder();
+
+        try {
+            MultimediaInfo m = encoder.getInfo(mp4File);
+            
+          VideoSize size =   m.getVideo().getSize();
+
+          int height = size.getHeight();
+          int width =   size.getWidth();
+          if(height < width) {
+        	  isport = false;
+          }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    	return isport;
+ 
+    }
+    
+    
     static String ReadVideoTime(File source) {
         Encoder encoder = new Encoder();
         String length = "";
