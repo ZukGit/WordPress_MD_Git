@@ -328,9 +328,15 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
     	
     	ArrayList<File> curDirMP4FileList ;  // 当前目录的 mov文件 
 
+    	ArrayList<String> curMp4NameNoTypeList;   // 当前需要产生
+    	
+        File SuoTu_Mp4_Dir ;
+        String ffmpeg_path ;
+        
     	CaptureSuoLueTu_From_MP4_Rule_9(){
             super(9);
             curDirMP4FileList = new  ArrayList<File>();
+            curMp4NameNoTypeList = new  ArrayList<String>();
 
         }
     	
@@ -346,7 +352,7 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
         @Override
         void operationRule(ArrayList<String> inputParamsList) {
         	
-            String ffmpeg_path = getEnvironmentExePath("ffmpeg");
+           ffmpeg_path = getEnvironmentExePath("ffmpeg");
             if(ffmpeg_path ==null){
                 errorMsg = "当前 ffmpeg 不在环境变量中 请下载该库 并添加到 环境变量中";
                 System.out.println(errorMsg);
@@ -356,7 +362,7 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
             System.out.println("rule8 ffmpeg_path = "+ffmpeg_path);
             
             String SuoTu_Mp4_DirName = "SuoTu_MP4_"+getTimeStamp();
-            File SuoTu_Mp4_Dir = new File(CUR_Dir_FILE+File.separator+SuoTu_Mp4_DirName);
+             SuoTu_Mp4_Dir = new File(CUR_Dir_FILE+File.separator+SuoTu_Mp4_DirName);
             
             if(!SuoTu_Mp4_Dir.exists()) {
             	SuoTu_Mp4_Dir.mkdirs();
@@ -366,6 +372,7 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
 				String mp4FileAbs = mp4File.getAbsolutePath();
 				String fileName = mp4File.getName();
 				String fileNameNoPointType = getFileNameNoPoint_NoCase(fileName);
+				curMp4NameNoTypeList.add(fileNameNoPointType);
 				String target_jpg_abs_path = (SuoTu_Mp4_Dir.getAbsolutePath()+File.separator+fileNameNoPointType+".jpg").replace(" ","");
 				
 				
@@ -380,12 +387,144 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
 	            
 				
 			}
+
+            System.out.println("等待程序执行1.5秒");
+            try {
+                Thread.sleep(1500);
+            }catch (Exception e){
+
+            }
+            
         	
+        	//  检测哪些文件是 执行失败的 没有 创建 文件
+        	int curMP4Count = curDirMP4FileList.size();
+        	int jpgCount = 0;
+        	if(SuoTu_Mp4_Dir.listFiles() != null) {
+        		jpgCount = 	SuoTu_Mp4_Dir.listFiles().length;
+        		
+        	}
+        		
+        	if(curMP4Count != jpgCount) {
+        		
+        		System.out.println("当前MP4数量["+curMP4Count+"]  JPG数量["+jpgCount+"] 不一致  存在缩略图失败的文件 Failed");
+        
+                ArrayList<File> failedMP4FileList = calculFailedMP4(SuoTu_Mp4_Dir,curMp4NameNoTypeList);
+
+                System.out.println("failedMP4FileList.size()  = "+ failedMP4FileList.size());
+                 int whilecount = 1;
+                while(failedMP4FileList.size() > 0) {
+                	System.out.println("执行第 [ "+whilecount+" ] 次循环排除失败项 failedMP4FileList.size()="+failedMP4FileList.size());
+                	  generalSuoTu(failedMP4FileList);
+                	  failedMP4FileList = calculFailedMP4(SuoTu_Mp4_Dir,curMp4NameNoTypeList);
+                	  whilecount++;
+                }
+        	 
+        	
+        	
+        	}else {
+        		System.out.println("当前MP4数量["+curMP4Count+"]  JPG数量["+jpgCount+"] 一致  缩略图执行PASS ");
+	
+        		
+        	}
+        	
+        	//  检测哪些文件是 执行失败的 没有 创建 文件
+        	int curMP4Count_end = curDirMP4FileList.size();
+        	int jpgCount_end = 0;
+        	if(SuoTu_Mp4_Dir.listFiles() != null) {
+        		jpgCount_end = 	SuoTu_Mp4_Dir.listFiles().length;
+        		
+        	}
+        	
+        	if(curMP4Count_end != jpgCount_end) {
+             	System.out.println("程序执行结束!!   尼玛 还是有失败_Failed!!  curMP4Count_end["+curMP4Count_end+"]"+"  jpgCount_end["+jpgCount_end +"] ");
+        	}else {
+        		
+             	System.out.println("程序执行结束!!  程序执行成功_OK!!  curMP4Count_end["+curMP4Count_end+"]"+"  jpgCount_end["+jpgCount_end +"] ");
+
+        	}
+   
         	
         	
         }
         
-    	@Override
+        
+        
+        ArrayList<File>  calculFailedMP4(File SuotuDir , ArrayList<String> allMp4NameNoTypeList){
+        	 ArrayList<File>  failedMp4List = new  ArrayList<File> ();
+        	 
+        	File[] allFile =  SuotuDir.listFiles();
+        	ArrayList<String> allMp4NameNoType_TempList = new  ArrayList<String>();
+            allMp4NameNoType_TempList.addAll(allMp4NameNoTypeList);
+
+        	
+        	for (int i = 0; i < allFile.length; i++) {
+				File jpgFile = allFile[i];
+				String fileName = jpgFile.getName();
+				String fileNameNoPointType = getFileNameNoPoint_NoCase(fileName);
+
+                allMp4NameNoType_TempList.remove(fileNameNoPointType);
+
+                System.out.println();
+			}
+
+        	if(allMp4NameNoType_TempList.size() == 0){
+
+        	    return failedMp4List;
+            }
+
+
+            for (int i = 0; i < allMp4NameNoType_TempList.size() ; i++) {
+                String fileNameNoPointType =allMp4NameNoType_TempList.get(i);
+                File failedFile = 	new File(CUR_Dir_FILE.getAbsolutePath()+File.separator+fileNameNoPointType+".mp4");
+                if(failedFile.exists()) {
+
+                    failedMp4List.add(failedFile);
+                }
+            }
+
+
+
+
+        	return failedMp4List;
+        	
+        	
+        }
+        
+       void  generalSuoTu(ArrayList<File> mp4FileList ){
+
+           System.out.println("等待程序执行1秒");
+           try {
+               Thread.sleep(1000);
+           }catch (Exception e){
+
+           }
+
+       	for (int i = 0; i < mp4FileList.size(); i++) {
+				File mp4File = mp4FileList.get(i);
+				String mp4FileAbs = mp4File.getAbsolutePath();
+				String fileName = mp4File.getName();
+				String fileNameNoPointType = getFileNameNoPoint_NoCase(fileName);
+
+				String target_jpg_abs_path = (SuoTu_Mp4_Dir.getAbsolutePath()+File.separator+fileNameNoPointType+".jpg").replace(" ","");
+				
+				
+				
+
+				// D:\software\ffmpeg\bin\ffmpeg.exe -y -i D:\TEMP\ZZ\mp4_home\temp\mp4_home_land\Land_5.mp4 -r 0.001  D:\TEMP\ZZ\mp4_home\temp\mp4_home_land\land_5.jpg
+	   
+				String command = ffmpeg_path +" -y -i "+mp4FileAbs  + "  -r 0.001  " + target_jpg_abs_path;
+              System.out.println("--------ruleIndex["+rule_index+"] fileIndex["+i+"]  Path=["+target_jpg_abs_path.replace(" ","")+"] ");
+	            System.out.println(command);
+               execCMD(command);
+	            
+				
+			}
+       	
+        	
+        }
+    	
+       
+       @Override
     	boolean checkParamsOK(File shellDir, String type2Param, ArrayList<String> otherParams) {
     		// TODO Auto-generated method stub
     		

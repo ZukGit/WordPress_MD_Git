@@ -3382,16 +3382,24 @@ for /f "delims=\" %%i in ('dir /b /a-d /o-d "!init_cd!\*.mp4"') do (
     set /a n+=1
     set number=!n!
     set newfileName=!n!!fileName_timestamp_pre!%%~xi
-    echo 完全匹配[webp]源文件:%%i 重命名为:!newfileName!
+    echo 完全匹配[mp4]源文件:%%i 重命名为:!newfileName!
     ren "%%i" "!newfileName!"
 )
-
+set /a n=0
+del zzZZzz.txt
+for /f "delims=\" %%i in ('dir /b /a-d /o-d "!init_cd!\*.txt"') do (
+    set /a n+=1
+    set number=!n!
+    set newfileName=!n!!fileName_timestamp_pre!%%~xi
+    echo 完全匹配[txt]源文件:%%i 重命名为:!newfileName!
+    ren "%%i" "!newfileName!"
+)
 set /a n=0
 for /f "delims=\" %%i in ('dir /b /a-d /o-d "!init_cd!\*.mp3"') do (
     set /a n+=1
     set number=!n!
     set newfileName=!n!!fileName_timestamp_pre!%%~xi
-    echo 完全匹配[webp]源文件:%%i 重命名为:!newfileName!
+    echo 完全匹配[mp3]源文件:%%i 重命名为:!newfileName!
     ren "%%i" "!newfileName!"
 )
 set /a n=0
@@ -3399,7 +3407,7 @@ for /f "delims=\" %%i in ('dir /b /a-d /o-d "!init_cd!\*.avi"') do (
     set /a n+=1
     set number=!n!
     set newfileName=!n!!fileName_timestamp_pre!%%~xi
-    echo 完全匹配[webp]源文件:%%i 重命名为:!newfileName!
+    echo 完全匹配[avi]源文件:%%i 重命名为:!newfileName!
     ren "%%i" "!newfileName!"
 )
 ) else (
