@@ -934,7 +934,9 @@ System.out.println("paramItem["+i+"] = "+paramItem_lower_trim);
 		boolean is_kaoyan; // 考研 类型
 		boolean is_gaokao; // 高考 类型
 
-		ArrayList<String> English_CharList;
+		ArrayList<String> English_CharList;   // A-Z 的 集合 
+		ArrayList<String> Chinese_CharList;   // 中文的集合  "公式集合"   "导式集合"  "结尾叹"
+		
 		ArrayList<String> mCategoryItemList_In_Jpg; // 所有 分类 的 类型 二级分类的类型
 
 		// key 为 jpg 中的 Category , List 为 符合 这个 category 的 Jpg_Exif
@@ -954,10 +956,12 @@ System.out.println("paramItem["+i+"] = "+paramItem_lower_trim);
 
 				if ("kaoyan_true".equals(paramItem_lower_trim)) {
 					is_kaoyan = true;
+
 				}
 
 				if ("gaokao_true".equals(paramItem_lower_trim)) {
 					is_gaokao = true;
+
 				}
 
 			}
@@ -980,8 +984,16 @@ System.out.println("paramItem["+i+"] = "+paramItem_lower_trim);
 			jpgExifList = new ArrayList<Jpg_Exif>();
 
 			initEnglishChar();
+			initChineseChar();
 		}
 
+		void initChineseChar() {
+			Chinese_CharList = new ArrayList<String>();
+				Chinese_CharList.add("公式集合");
+				Chinese_CharList.add("导式集合");
+				Chinese_CharList.add("结尾叹");
+	
+		}
 		void initEnglishChar() {
 			English_CharList = new ArrayList<String>();
 			mCategoryItemList_In_Jpg = new ArrayList<String>();
@@ -1099,6 +1111,7 @@ System.out.println("paramItem["+i+"] = "+paramItem_lower_trim);
 						itemStr = itemStr.replace("_", "").replace(" ", "").trim();
 						mCategoryList.add(itemStr);
 
+						//zukgit 
 						String Alphabet_Word = getFirstZiMu(itemStr);
 
 						if (mEnglishChar_CategoryList_Map.get(Alphabet_Word) == null) {
@@ -1289,6 +1302,20 @@ System.out.println("paramItem["+i+"] = "+paramItem_lower_trim);
 
 		}
 
+		
+		boolean isContainInChineseCategory(ArrayList<String> mChineseCategoryList , String matchStr ) {
+			
+			for (int i = 0; i < mChineseCategoryList.size(); i++) {
+				String chineseStr =  mChineseCategoryList.get(i);
+				if(matchStr.contains(chineseStr)) {
+					return true;
+				}
+			}
+			return false;
+			
+			
+			
+		}
 		@Override
 		ArrayList<File> applySubFileListRule4(ArrayList<File> curFileList,
 				HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList,
@@ -1349,8 +1376,13 @@ System.out.println("paramItem["+i+"] = "+paramItem_lower_trim);
 
 			}
 
+			//  初始化英语字母 A-B-C-D-E....-Z 的 Category 
 			for (int i = 0; i < mCategoryItemList_In_Jpg.size(); i++) {
 				String categoryItem = mCategoryItemList_In_Jpg.get(i);
+				boolean isContainInChineseCategory =  isContainInChineseCategory(Chinese_CharList ,categoryItem);
+				if(isContainInChineseCategory) {
+					continue;
+				}
 				String firstCharName = getFirstZiMu(categoryItem);
 				ArrayList<String> matchCategoryList = mOneWord_CategoryArr_Map.get(firstCharName);
 				if (matchCategoryList == null) {
@@ -1367,7 +1399,37 @@ System.out.println("paramItem["+i+"] = "+paramItem_lower_trim);
 				System.out.println("category[" + (i + 1) + "] == " + firstCharName + "   " + categoryItem);
 			}
 
-			ArrayList<String> mMdContentList = BuildMDContent(English_CharList, mOneWord_CategoryArr_Map,
+			// 初始化 中文的  "结尾叹" "公式集合" "导式集合" category 的
+			for (int i = 0; i < mCategoryItemList_In_Jpg.size(); i++) {
+				//   排查出符合逻辑的  categoryItem xx zukgit 
+				String categoryItem = mCategoryItemList_In_Jpg.get(i);
+				for (int j = 0; j < Chinese_CharList.size(); j++) {
+					String chineseCategory = Chinese_CharList.get(j);
+					if(categoryItem.contains(chineseCategory)) {
+						
+						ArrayList<String> matchCategoryList = mOneWord_CategoryArr_Map.get(chineseCategory);
+					
+						if (matchCategoryList == null) {
+							matchCategoryList = new ArrayList<String>();
+							matchCategoryList.add(categoryItem);
+							mOneWord_CategoryArr_Map.put(chineseCategory, matchCategoryList);
+
+						} else {
+							if (!matchCategoryList.contains(categoryItem)) {
+								matchCategoryList.add(categoryItem);
+							}
+
+						}
+						
+					}
+					
+				}
+				
+				
+			}
+			
+			
+			ArrayList<String> mMdContentList = BuildMDContent(English_CharList, Chinese_CharList , mOneWord_CategoryArr_Map,
 					mCategory_JpgExifList_Map);
 
 // 对 MD文件 进行分隔处理
@@ -1382,7 +1444,8 @@ System.out.println("paramItem["+i+"] = "+paramItem_lower_trim);
 				segerate_MdContentList.add("typora-root-url: ..\\..\\");
 				segerate_MdContentList.add("typora-copy-images-to: ..\\..\\public\\zimage\\zschool_media\\gaokao_jpg");
 
-			} else {
+
+			} else if(is_kaoyan) {
 				segerate_MdContentList.add("title: 研究考试学习");
 				segerate_MdContentList.add("category: 学习");
 				segerate_MdContentList.add("tags: Math");
@@ -1390,6 +1453,12 @@ System.out.println("paramItem["+i+"] = "+paramItem_lower_trim);
 				segerate_MdContentList.add("typora-root-url: ..\\..\\");
 				segerate_MdContentList.add("typora-copy-images-to: ..\\..\\public\\zimage\\zschool_media\\kaoyan_jpg");
 
+				
+				//   追加   到mMdContentList  后面的 一些信息
+				ArrayList<String> appendForKaoYanList = new 	ArrayList<String>();
+				
+				
+				
 			}
 			segerate_MdContentList.add("---");
 			segerate_MdContentList.add("\n");
@@ -1399,6 +1468,8 @@ System.out.println("paramItem["+i+"] = "+paramItem_lower_trim);
 			segerate_MdContentList.add(" {:toc}");
 			segerate_MdContentList.add("\n");
 
+
+			
 			for (int i = 0; i < mMdContentList.size(); i++) {
 				String contentLine = mMdContentList.get(i);
 				segerate_MdContentList.add("\n" + contentLine);
@@ -1413,16 +1484,20 @@ System.out.println("paramItem["+i+"] = "+paramItem_lower_trim);
 
 	
 		
-		ArrayList<String> BuildMDContent(ArrayList<String> mEnglishCharList,
+		ArrayList<String> BuildMDContent(ArrayList<String> mEnglishCharList, ArrayList<String> mChineseCharList,
 				Map<String, ArrayList<String>> xOneWord_CategoryArr_Map,
 				Map<String, ArrayList<Jpg_Exif>> mCategory_JpgExifList_Map) {
 
 //	StringBuilder mMDContentSB = new StringBuilder();
 
 			ArrayList<String> mMDContentStrList = new ArrayList<String>();
+			
+			//    添加 英语 Category 
 			for (int i = 0; i < mEnglishCharList.size(); i++) {
 				String charWord = mEnglishCharList.get(i);
 				mMDContentStrList.add("## " + charWord);
+		
+	
 
 				ArrayList<String> matchCategoryList = xOneWord_CategoryArr_Map.get(charWord);
 
@@ -1481,28 +1556,7 @@ System.out.println("paramItem["+i+"] = "+paramItem_lower_trim);
 								mMDContentStrList.add("**题目源信息:**  ");
 								mMDContentStrList.add("```\n" + originBirthPlaceInfo + "\n````");
 
-						
-								
-								// <video controls="controls"> <source src="mp4/1.mp4" type="video/mp4" />
-								// </video>
-
-								/*
-								 * // 报错 Not allowed to load local resource: <URL> if(is_gaokao) {
-								 * mMDContentStrList.add("\n<video  controls=\"controls\"> <source src=\""
-								 * +videourl+"\" type=\"video/mp4\" /> </video>\n");
-								 * 
-								 * 
-								 * }else {
-								 * mMDContentStrList.add("\n<video  controls=\"controls\"> <source src=\""
-								 * +videourl+"\" type=\"video/mp4\" /> </video>\n");
-								 * 
-								 * 
-								 * }
-								 */
-
-								// [ifa](fafafafa)
-
-//					mMDContentStrList.add(jpgExif.toString());
+	
 							}
 
 						}
@@ -1511,6 +1565,89 @@ System.out.println("paramItem["+i+"] = "+paramItem_lower_trim);
 
 				}
 			}
+			
+			
+			
+			//    添加 中文  Category 
+			for (int i = 0; i < mChineseCharList.size(); i++) {
+				
+				String ChineseCategoryWord = mChineseCharList.get(i);
+				mMDContentStrList.add("## " + ChineseCategoryWord);
+		
+				if(ChineseCategoryWord.equals("结尾叹")) {
+					
+					mMDContentStrList.add("**涉及知识点**  ");
+					mMDContentStrList.add("```\n" +"为后辈们做些能遗留的东西,莫望无前吾辈自强......" + "\n````");
+					
+					continue;
+				}
+
+				ArrayList<String> matchCategoryList = xOneWord_CategoryArr_Map.get(ChineseCategoryWord);
+
+				if (matchCategoryList != null) {
+
+					matchCategoryList.sort(new Comparator<String>() {
+						@Override
+						public int compare(String o1, String o2) {
+							return o1.compareTo(o2);
+						}
+
+					});
+
+					for (int j = 0; j < matchCategoryList.size(); j++) {
+						String categoryStrItem = matchCategoryList.get(j);
+
+						mMDContentStrList.add("### " + (j + 1) + "_" + categoryStrItem);
+						mCategory_JpgExif_Count_Rule_41++;
+						ArrayList<Jpg_Exif> matchExifJpgArr = mCategory_JpgExifList_Map.get(categoryStrItem);
+
+						if (matchExifJpgArr != null) {
+
+							for (int k = 0; k < matchExifJpgArr.size(); k++) {
+								Jpg_Exif jpgExif = matchExifJpgArr.get(k);
+							
+								String httpUrl = jpgExif.mImageModel_HttpUrl;
+								String imageurl = jpgExif.imageUrl;
+								String videourl = jpgExif.videoUrl;
+								String videoName = jpgExif.videoName;
+								String knowledgeComment = jpgExif.mPhotoUserComment_KnowledgePoint;
+								String imageDescString = jpgExif.mImageDescription_SelfDesc;
+								String originBirthPlaceInfo = jpgExif.mImageMake_OriginSrc == null ? "网络"
+										: jpgExif.mImageMake_OriginSrc;
+
+								// <img src="/public/zimage/tool/graphviz/digraph16.jpg">
+								// /public/zimage/zschool/kaoyan/
+								mMDContentStrList.add("<img src=\"" + imageurl + "\">");
+								/*
+								 * mMDContentStrList.add("**涉及知识点:**  "); mMDContentStrList.add("```\n" +
+								 * knowledgeComment + "\n````");
+								 * 
+								 * mMDContentStrList.add("**个人解题想法思路:**  "); mMDContentStrList.add("```\n" +
+								 * imageDescString + "\n````");
+								 * 
+								 * mMDContentStrList.add( "**视频网络链接:**  " + "[" + httpUrl + "](" + httpUrl +
+								 * "){:target=\"_blank\"}");
+								 * 
+								 * mMDContentStrList.add( "**视频本地链接:**  " + "[" + videoName + "](" + videourl +
+								 * "){:target=\"_blank\"}");
+								 * 
+								 * mMDContentStrList.add("**视频链接文件MD值:**  "); mMDContentStrList.add("```\n" +
+								 * videoName + "\n````"); mMDContentStrList.add("**图片名称:**  ");
+								 * mMDContentStrList.add("```\n" + jpgExif.imageFile.getName() + "\n````");
+								 * 
+								 * mMDContentStrList.add("**题目源信息:**  "); mMDContentStrList.add("```\n" +
+								 * originBirthPlaceInfo + "\n````");
+								 */
+	
+							}
+
+						}
+
+					}
+
+				}
+			}
+			
 
 			System.out.println(" ============== 打印 MD 内容  Begin ============== ");
 			for (int i = 0; i < mMDContentStrList.size(); i++) {
@@ -8332,52 +8469,93 @@ System.out.println("paramItem["+i+"] = "+paramItem_lower_trim);
 
 		ArrayList<String> fliterTypeList;
 		ArrayList<File> mSrcFileImage; // 符合 过滤 条件的 当前目录的文件夹的集合
+		boolean isPortLandNamed;   //  是否 以  port 和 Name 添加前缀 
 
 		Rename_Img_WithSize_Rule_21() {
 			super("#", 21, 4); //
 			fliterTypeList = new ArrayList<String>();
 			mSrcFileImage = new ArrayList<File>();
+			isPortLandNamed = false;
 		}
 
+		
 		@Override
-		boolean initParams4InputParam(String inputParam) {
+		boolean initParamsWithInputList(ArrayList<String> inputParamList) {
+			// TODO Auto-generated method stub
 			boolean isEmptyTypeInput = false;
+			for (int i = 0; i < inputParamList.size(); i++) {
+				String inputParam = inputParamList.get(i);
+				
+				if(inputParam.contains("portland_true")) {
+					isPortLandNamed = true;
+					
+				}
+				
+				
+				boolean isGifInput = false;
+				if (inputParam.contains("gif")) {
+					fliterTypeList.add(".gif");
+					isGifInput = true;
+				}
 
-			boolean isGifInput = false;
-			if (inputParam.contains("gif")) {
-				fliterTypeList.add(".gif");
-				isGifInput = true;
+				boolean isJpgInput = false;
+				if (inputParam.contains("jpg")) {
+					fliterTypeList.add(".jpg");
+					isJpgInput = true;
+				}
+
+				boolean isPngInput = false;
+				if (inputParam.contains("png")) {
+					fliterTypeList.add(".png");
+					isPngInput = true;
+				}
+
+				boolean isWebpInput = false;
+				if (inputParam.contains("webp")) {
+					fliterTypeList.add(".webp");
+					isWebpInput = true;
+				}
+
+				isEmptyTypeInput = isEmptyTypeInput || !(isGifInput || isWebpInput || isPngInput || isJpgInput);
+				if (isEmptyTypeInput) {
+					fliterTypeList.add(".webp");
+					fliterTypeList.add(".jpg");
+					fliterTypeList.add(".png");
+					fliterTypeList.add(".gif");
+				}
+				
+				
+				
 			}
-
-			boolean isJpgInput = false;
-			if (inputParam.contains("jpg")) {
-				fliterTypeList.add(".jpg");
-				isJpgInput = true;
-			}
-
-			boolean isPngInput = false;
-			if (inputParam.contains("png")) {
-				fliterTypeList.add(".png");
-				isPngInput = true;
-			}
-
-			boolean isWebpInput = false;
-			if (inputParam.contains("webp")) {
-				fliterTypeList.add(".webp");
-				isWebpInput = true;
-			}
-
-			isEmptyTypeInput = !(isGifInput || isWebpInput || isPngInput || isJpgInput);
-			if (isEmptyTypeInput) {
-				fliterTypeList.add(".webp");
-				fliterTypeList.add(".jpg");
-				fliterTypeList.add(".png");
-				fliterTypeList.add(".gif");
-			}
-
-			return super.initParams4InputParam(inputParam);
+			
+			System.out.println("isPortLandNamed = "+ isPortLandNamed +"  isEmptyTypeInput="+isEmptyTypeInput);
+			
+			return super.initParamsWithInputList(inputParamList);
 		}
-
+		
+		/*
+		 * @Override boolean initParams4InputParam(String inputParam) { boolean
+		 * isEmptyTypeInput = false;
+		 * 
+		 * boolean isGifInput = false; if (inputParam.contains("gif")) {
+		 * fliterTypeList.add(".gif"); isGifInput = true; }
+		 * 
+		 * boolean isJpgInput = false; if (inputParam.contains("jpg")) {
+		 * fliterTypeList.add(".jpg"); isJpgInput = true; }
+		 * 
+		 * boolean isPngInput = false; if (inputParam.contains("png")) {
+		 * fliterTypeList.add(".png"); isPngInput = true; }
+		 * 
+		 * boolean isWebpInput = false; if (inputParam.contains("webp")) {
+		 * fliterTypeList.add(".webp"); isWebpInput = true; }
+		 * 
+		 * isEmptyTypeInput = !(isGifInput || isWebpInput || isPngInput || isJpgInput);
+		 * if (isEmptyTypeInput) { fliterTypeList.add(".webp");
+		 * fliterTypeList.add(".jpg"); fliterTypeList.add(".png");
+		 * fliterTypeList.add(".gif"); }
+		 * 
+		 * return super.initParams4InputParam(inputParam); }
+		 */
 		boolean checkInFlitterList(String fileName) {
 			boolean result = false;
 
@@ -8418,9 +8596,25 @@ System.out.println("paramItem["+i+"] = "+paramItem_lower_trim);
 				int high = imageIcon.getIconHeight();
 				int width = imageIcon.getIconWidth();
 
+				boolean isPort = getRotateAngleForPhoto(imageFile.getAbsolutePath());
+
+				if (!isPort) {
+					int temp = high;
+					high = width;
+					width = temp;
+				}
+				
 				// 当前文件的 宽高
 				String str_width_x_high = calculateSizeStr(width, high);
 				String newName = str_width_x_high + "_" + fileName;
+				if(isPortLandNamed) {
+					if(width > high) {
+						newName = "Land_"+newName;
+					}else {
+						newName = "Port_"+newName;
+						
+					}
+				}
 				tryReName(imageFile, newName);
 				System.out.println("File[" + i + "] =  SrcName【" + fileName + "】  TargetName【" + newName + "】");
 
@@ -8475,6 +8669,7 @@ System.out.println("paramItem["+i+"] = "+paramItem_lower_trim);
 		String ruleTip(String type, int index, String batName, OS_TYPE curType) {
 			String itemDesc = "";
 			String desc_A = " 对当前目录下的图片文件 指定类型图片(参数输入)(png)(jpg)(webp)(gif)进行 进行以 宽x高 类似 1960x1280_原名 的操作";
+			String desc_B = " 对当前目录下的图片文件 指定类型图片(参数输入)(png)(jpg)(webp)(gif)进行 进行以 宽x高 类似 Land_1960x1280_原名  Port_600x900 的操作";
 
 			if (curType == OS_TYPE.Windows) {
 				itemDesc = batName.trim() + Cur_Batch_End + "  " + type + "_" + index + "" + "    #### [索引 " + index
@@ -8492,6 +8687,9 @@ System.out.println("paramItem["+i+"] = "+paramItem_lower_trim);
 				itemDesc += batName.trim() + Cur_Batch_End + "  " + type + "_" + index + "_jpg_png_gif_webp"
 						+ "    #### [索引 " + index + "]  描述: " + desc_A + "\n";
 
+				itemDesc += batName.trim() + Cur_Batch_End + "  " + type + "_" + index + "_jpg_png_gif_webp" + "  portland_true "
+						+ "    #### [索引 " + index + "]  描述: " + desc_B + "\n";
+				
 			} else {
 				itemDesc = batName.trim() + Cur_Batch_End + "  " + type + "_" + index + "" + "    #### [索引 " + index
 						+ "]  描述: " + desc_A + "\n";
@@ -8507,6 +8705,8 @@ System.out.println("paramItem["+i+"] = "+paramItem_lower_trim);
 						+ index + "]  描述: " + desc_A + "\n";
 				itemDesc += batName.trim() + Cur_Batch_End + "  " + type + "_" + index + "_jpg_png_gif_webp"
 						+ "    #### [索引 " + index + "]  描述: " + desc_A + "\n";
+				itemDesc += batName.trim() + Cur_Batch_End + "  " + type + "_" + index + "_jpg_png_gif_webp"
+						+ "    #### [索引 " + index + "]  描述: " + desc_B + "\n";
 			}
 			return itemDesc;
 
@@ -8645,72 +8845,7 @@ System.out.println("paramItem["+i+"] = "+paramItem_lower_trim);
 
 		}
 
-		/**
-		 * 图片翻转时，计算图片翻转到正常显示需旋转角度
-		 */
-		public boolean getRotateAngleForPhoto(String fileName) {
 
-			boolean isPort = true;
-			File file = new File(fileName);
-
-			int angel = 0;
-			Metadata metadata;
-
-			try {
-				metadata = JpegMetadataReader.readMetadata(file);
-				metadata.getDirectories();
-
-				// zukgit_directory [Exif IFD0] - Orientation = Right side, top (Rotate 90 CW)
-				for (Directory directory : metadata.getDirectories()) {
-					for (Tag tag : directory.getTags()) {
-						// 格式化输出[directory.getName()] - tag.getTagName() = tag.getDescription()
-						System.out.format("zukgit_directory  [%s] - %s = %s\n", directory.getName(), tag.getTagName(),
-								tag.getDescription());
-
-						if ("Exif IFD0".equals(directory.getName())) {
-							String orientation = directory.getString(ExifIFD0Directory.TAG_ORIENTATION);
-							System.out.println("ZZOrientation = " + orientation);
-
-							if ("1".equals(orientation)) { // 90度 和 270度 宽高对调了
-								angel = 0;
-
-							} else if ("6".equals(orientation)) {
-								// 6旋转90
-								angel = 90;
-								isPort = false;
-							} else if ("3".equals(orientation)) {
-								// 3旋转180
-								angel = 180;
-							} else if ("8".equals(orientation)) {
-								// 8旋转90
-								angel = 270;
-								isPort = false;
-							}
-							return isPort;
-						}
-					}
-//					if (directory.hasErrors()) {
-//						for (String error : directory.getErrors()) {
-//							System.err.format("ERROR: %s", error);
-//						}
-//					}
-				}
-
-				/*
-				 * if(directory.containsTag(ExifDirectory.TAG_ORIENTATION)){ // Exif信息中方向 int
-				 * orientation = directory.getInt(ExifDirectory.TAG_ORIENTATION); // 原图片的方向信息
-				 * if(6 == orientation ){ //6旋转90 angel = 90; }else if( 3 == orientation){
-				 * //3旋转180 angel = 180; }else if( 8 == orientation){ //8旋转90 angel = 270; } }
-				 */
-
-			} catch (JpegProcessingException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-//			System.out.println("图片旋转角度：" + angel);
-			return isPort;
-		}
 
 		String ruleTip(String type, int index, String batName, OS_TYPE curType) {
 			String itemDesc = "";
@@ -14031,7 +14166,72 @@ System.out.println("paramItem["+i+"] = "+paramItem_lower_trim);
 	}
 	}
 	
+	/**
+	 * 图片翻转时，计算图片翻转到正常显示需旋转角度
+	 */
+	public static boolean getRotateAngleForPhoto(String fileName) {
 
+		boolean isPort = true;
+		File file = new File(fileName);
+
+		int angel = 0;
+		Metadata metadata;
+
+		try {
+			metadata = JpegMetadataReader.readMetadata(file);
+			metadata.getDirectories();
+
+			// zukgit_directory [Exif IFD0] - Orientation = Right side, top (Rotate 90 CW)
+			for (Directory directory : metadata.getDirectories()) {
+				for (Tag tag : directory.getTags()) {
+					// 格式化输出[directory.getName()] - tag.getTagName() = tag.getDescription()
+					System.out.format("zukgit_directory  [%s] - %s = %s\n", directory.getName(), tag.getTagName(),
+							tag.getDescription());
+
+					if ("Exif IFD0".equals(directory.getName())) {
+						String orientation = directory.getString(ExifIFD0Directory.TAG_ORIENTATION);
+						System.out.println("ZZOrientation = " + orientation);
+
+						if ("1".equals(orientation)) { // 90度 和 270度 宽高对调了
+							angel = 0;
+
+						} else if ("6".equals(orientation)) {
+							// 6旋转90
+							angel = 90;
+							isPort = false;
+						} else if ("3".equals(orientation)) {
+							// 3旋转180
+							angel = 180;
+						} else if ("8".equals(orientation)) {
+							// 8旋转90
+							angel = 270;
+							isPort = false;
+						}
+						return isPort;
+					}
+				}
+//				if (directory.hasErrors()) {
+//					for (String error : directory.getErrors()) {
+//						System.err.format("ERROR: %s", error);
+//					}
+//				}
+			}
+
+			/*
+			 * if(directory.containsTag(ExifDirectory.TAG_ORIENTATION)){ // Exif信息中方向 int
+			 * orientation = directory.getInt(ExifDirectory.TAG_ORIENTATION); // 原图片的方向信息
+			 * if(6 == orientation ){ //6旋转90 angel = 90; }else if( 3 == orientation){
+			 * //3旋转180 angel = 180; }else if( 8 == orientation){ //8旋转90 angel = 270; } }
+			 */
+
+		} catch (JpegProcessingException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+//		System.out.println("图片旋转角度：" + angel);
+		return isPort;
+	}
 	
 
 }
