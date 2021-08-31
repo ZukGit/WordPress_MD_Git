@@ -543,13 +543,13 @@ public class H0_Tip {
         System.out.println("Name: Run_Bat   Key:  alt+B");
         System.out.println("cmd /K cd /d $(CURRENT_DIRECTORY) & cmd /K $(FULL_CURRENT_PATH)");
         System.out.println("打开CMD窗口切换到当前目录 运行当前bat文件 ");
-        
+
         System.out.println();
         System.out.println(" 用户设置 notepad运行【索引4】  运行当前java文件 【 Run_Java : alt+J 】");
         System.out.println("Name: Run_Java   Key:  alt+J");
         System.out.println("cmd /K cd /d $(CURRENT_DIRECTORY) && javac  -encoding UTF-8 $(FULL_CURRENT_PATH) && java -cp .;$(CURRENT_DIRECTORY) $(NAME_PART)");
         System.out.println("打开CMD窗口切换到当前目录 运行当前java文件 ");
-        
+
         System.out.println();
         System.out.println("notepad++本地环境变量情况");
         System.out.println("当前txt文件全路径: D:\\Test\\123.txt");
@@ -564,7 +564,7 @@ public class H0_Tip {
         System.out.println("$(CURRENT_COLUMN)    === 当前鼠标所在的列(索引从0开始)");
         System.out.println();
 
-        
+
         PrintHead_End("  NotePad++ 设置  End  ");
     }
 
@@ -653,6 +653,13 @@ public class H0_Tip {
     static void Security_File_Tip(){
 
 
+
+        System.out.println("________________________ 【1970ZVI】【批量解密】【当前有子目录1970ZVI解析为1970ZVI_Good】 ________________________");
+        System.out.println("zrule_apply_G2"+BAT_OR_SH_Point+" " +"#_7_good_zvi  && cd ./1970ZVI_Good && cd ./ZVI_Individual  && zrule_apply_G2"+BAT_OR_SH_Point+" " +"#_9  _mp4 && zrule_apply_G2"+BAT_OR_SH_Point+" " +" #_26 mp4  && zrule_apply_G2"+BAT_OR_SH_Point+" " +" #_13_mp4 && zrule_apply_G2"+BAT_OR_SH_Point+" " +" #_12_mp4  && cd .. && cd ./ZVI_Position  && zrule_apply_G2"+BAT_OR_SH_Point+" " +"#_9  _mp4 && zrule_apply_G2"+BAT_OR_SH_Point+" " +" #_26 mp4   && zrule_apply_G2"+BAT_OR_SH_Point+" " +" #_13_mp4  && zrule_apply_G2"+BAT_OR_SH_Point+" " +" #_12_mp4  && cd .. && cd ./Z_SSS && zrule_apply_G2"+BAT_OR_SH_Point+" " +"#_9  _mp4 && cd .. && cd ./ZVI_mp4 && zrule_apply_G2"+BAT_OR_SH_Point+" " +"#_9  _mp4 && cd ..  &&  zrule_apply_G2"+BAT_OR_SH_Point+" " +" #_12_mp4 ./ZVI_mp4 &&  cd ./zapp    &&  zrule_apply_G2"+BAT_OR_SH_Point+" " +" #_27  _jpg  &&  zrule_apply_G2"+BAT_OR_SH_Point+" " +" #_27 _mp4  && zrule_apply_G2"+BAT_OR_SH_Point+" " +" #_27  _gif &&  zrule_apply_G2"+BAT_OR_SH_Point+" " +" #_12_jpg  &&  zrule_apply_G2"+BAT_OR_SH_Point+" " +" #_12_mp4 &&  zrule_apply_G2"+BAT_OR_SH_Point+" " +" #_12_gif");
+        System.out.println();
+        System.out.println();
+
+
         System.out.println();
         System.out.println("________________________ 【zapp】【解密】【Html】 ________________________");
         System.out.println("zrule_apply_G2"+BAT_OR_SH_Point+" " +"#_7_good_batch  ******原封不动解码");
@@ -734,9 +741,9 @@ public class H0_Tip {
 
 
         PrintHead_End(" 文件加密解密操作 End    ");
-        
-        
-        
+
+
+
         System.out.println("⁰¹²³⁴⁵⁶⁷⁸⁹❤❥웃유♋☮✌☏☢☠✔☑♚▲♪✈✞÷↑↓◆◇⊙■□△▽¿─│♥❣♂♀☿Ⓐ✍✉☣☤✘☒♛▼♫⌘☪≈←→◈◎☉★☆⊿※¡━┃♡ღツ☼☁❅♒✎©®™Σ✪✯☭➳卐√↖↗●◐Θ◤◥︻〖〗┄┆℃℉°✿ϟ☃☂✄¢€£∞✫★½✡×↙↘○◑⊕◣◢︼【】┅┇☽☾✚〓▂▃▄▅▆▇█▉▊▋▌▍▎▏↔↕☽☾の·▸◂▴▾┈┊①②③④⑤⑥⑦⑧⑨⑩ⅠⅡⅢⅣⅤⅥⅦⅧⅨⅩ㍿▓♨♛❖♓☪✙┉┋☹☺☻تヅツッシÜϡﭢ™℠℗©®♥❤❥❣❦❧♡۵웃유ღ♋♂♀☿☼☀☁☂☄☾☽❄☃☈⊙☉℃℉❅✺ϟ☇♤♧♡♢♠♣♥♦☜☞☝✍☚☛☟✌✽✾✿❁❃❋❀⚘☑✓✔√☐☒✗✘ㄨ✕✖✖⋆✢✣✤✥❋✦✧✩✰✪✫✬✭✮✯❂✡★✱✲✳✴✵✶✷✸✹✺✻✼❄❅❆❇❈❉❊†☨✞✝☥☦☓☩☯☧☬☸✡♁✙♆。，、＇：∶；?'’“”〝〞ˆˇ﹕︰﹔﹖﹑·¨….¸;！´？！～—ˉ｜‖＂〃｀@﹫¡¿﹏﹋﹌︴々﹟#﹩$﹠&﹪%*﹡﹢﹦﹤‐￣¯―﹨ˆ˜﹍﹎+=<＿_-\\ˇ~﹉﹊（）〈〉‹›﹛﹜『』〖〗［］《》〔〕{}「」【】︵︷︿︹︽_﹁﹃︻︶︸﹀︺︾ˉ﹂﹄︼☩☨☦✞✛✜✝✙✠✚†‡◉○◌◍◎●◐◑◒◓◔◕◖◗❂☢⊗⊙◘◙◍⅟½⅓⅕⅙⅛⅔⅖⅚⅜¾⅗⅝⅞⅘≂≃≄≅≆≇≈≉≊≋≌≍≎≏≐≑≒≓≔≕≖≗≘≙≚≛≜≝≞≟≠≡≢≣≤≥≦≧≨≩⊰⊱⋛⋚∫∬∭∮∯∰∱∲∳%℅‰‱㊣㊎㊍㊌㊋㊏㊐㊊㊚㊛㊤㊥㊦㊧㊨㊒㊞㊑㊒㊓㊔㊕㊖㊗㊘㊜㊝㊟㊠㊡㊢㊩㊪㊫㊬㊭㊮㊯㊰㊙㉿囍♔♕♖♗♘♙♚♛♜♝♞♟ℂℍℕℙℚℝℤℬℰℯℱℊℋℎℐℒℓℳℴ℘ℛℭ℮ℌℑℜℨ♪♫♩♬♭♮♯°øⒶ☮✌☪✡☭✯卐✐✎✏✑✒✍✉✁✂✃✄✆✉☎☏➟➡➢➣➤➥➦➧➨➚➘➙➛➜➝➞➸♐➲➳⏎➴➵➶➷➸➹➺➻➼➽←↑→↓↔↕↖↗↘↙↚↛↜↝↞↟↠↡↢↣↤↥↦↧↨➫➬➩➪➭➮➯➱↩↪↫↬↭↮↯↰↱↲↳↴↵↶↷↸↹↺↻↼↽↾↿⇀⇁⇂⇃⇄⇅⇆⇇⇈⇉⇊⇋⇌⇍⇎⇏⇐⇑⇒⇓⇔⇕⇖⇗⇘⇙⇚⇛⇜⇝⇞⇟⇠⇡⇢⇣⇤⇥⇦⇧⇨⇩⇪➃➄➅➆➇➈➉➊➋➌➍➎➏➐➑➒➓㊀㊁㊂㊃㊄㊅㊆㊇㊈㊉ⒶⒷⒸⒹⒺⒻⒼⒽⒾⒿⓀⓁⓂⓃⓄⓅⓆⓇⓈⓉⓊⓋⓌⓍⓎⓏⓐⓑⓒⓓⓔⓕⓖⓗⓘⓙⓚⓛⓜⓝⓞⓟⓠⓡⓢⓣⓤⓥⓦⓧⓨⓩ⒜⒝⒞⒟⒠⒡⒢⒣⒤⒥⒦⒧⒨⒩⒪⒫⒬⒭⒮⒯⒰⒱⒲⒳⒴⒵ⅠⅡⅢⅣⅤⅥⅦⅧⅨⅩⅪⅫⅬⅭⅮⅯⅰⅱⅲⅳⅴⅵⅶⅷⅸⅹⅺⅻⅼⅽⅾⅿ┌┍┎┏┐┑┒┓└┕┖┗┘┙┚┛├┝┞┟┠┡┢┣┤┥┦┧┨┩┪┫┬┭┮┯┰┱┲┳┴┵┶┷┸┹┺┻┼┽┾┿╀╁╂╃╄╅╆╇╈╉╊╋╌╍╎╏═║╒╓╔╕╖╗╘╙╚╛╜╝╞╟╠╡╢╣╤╥╦╧╨╩╪╫╬◤◥◄►▶◀◣◢▲▼◥▸◂▴▾△▽▷◁⊿▻◅▵▿▹◃❏❐❑❒▀▁▂▃▄▅▆▇▉▊▋█▌▍▎▏▐░▒▓▔▕■□▢▣▤▥▦▧▨▩▪▫▬▭▮▯㋀㋁㋂㋃㋄㋅㋆㋇㋈㋉㋊㋋㏠㏡㏢㏣㏤㏥㏦㏧㏨㏩㏪㏫㏬㏭㏮㏯㏰㏱㏲㏳㏴㏵㏶㏷㏸㏹㏺㏻㏼㏽㏾㍙㍚㍛㍜㍝㍞㍟㍠㍡㍢㍣㍤㍥㍦㍧㍨㍩㍪㍫㍬㍭㍮㍯㍰㍘☰☲☱☴☵☶☳☷☯");
         System.out.println("♠♣♧♡♥❤❥❣♂♀✲☀☼☾☽◐◑☺☻☎☏✿❀№↑↓←→√×÷★℃℉°◆◇⊙■□△▽¿½☯✡㍿卍卐♂♀✚〓㎡♪♫♩♬㊚㊛囍㊒㊖Φ♀♂‖$@*&#※卍卐Ψ♫♬♭♩♪♯♮⌒¶∮‖€￡¥$");
         System.out.println("①②③④⑤⑥⑦⑧⑨⑩⑪⑫⑬⑭⑮⑯⑰⑱⑲⑳⓪❶❷❸❹❺❻❼❽❾❿⓫⓬⓭⓮⓯⓰⓱⓲⓳⓴㊀㊁㊂㊃㊄㊅㊆㊇㊈㊉㈠㈡㈢㈣㈤㈥㈦㈧㈨㈩⑴⑵⑶⑷⑸⑹⑺⑻⑼⑽⑾⑿⒀⒁⒂⒃⒄⒅⒆⒇⒈⒉⒊⒋⒌⒍⒎⒏⒐⒑⒒⒓⒔⒕⒖⒗⒘⒙⒚⒛ⅠⅡⅢⅣⅤⅥⅦⅧⅨⅩⅪⅫⅰⅱⅲⅳⅴⅵⅶⅷⅸⅹⒶⒷⒸⒹⒺⒻⒼⒽⒾⒿⓀⓁⓂⓃⓄⓅⓆⓇⓈⓉⓊⓋⓌⓍⓎⓏⓐⓑⓒⓓⓔⓕⓖⓗⓘⓙⓚⓛⓜⓝⓞⓟⓠⓡⓢⓣⓤⓥⓦⓧⓨⓩ⒜⒝⒞⒟⒠⒡⒢⒣⒤⒥⒦⒧⒨⒩⒪⒫⒬⒭⒮⒯⒰⒱⒲⒳⒴⒵");
