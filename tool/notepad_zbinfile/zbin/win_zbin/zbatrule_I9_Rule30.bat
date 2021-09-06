@@ -3899,6 +3899,74 @@ goto:eof
 
 
 
+:rule26vmakedirwithtemplate_func_1x0
+rem ======================================== rule26vmakedirwithtemplate_func_1x0
+rem rule_tip: %init_input_0% _26_  mkdir_zapp  ##  在当前目录创建 zapp 对应的 目录
+
+rem rule_tip: %init_input_0% _26_  mkdir_zmain  ##  在当前目录创建 zmain 对应的 目录
+
+rem desc: 给定一个 标识符 如-mkdir_zapp 创建符合这个标识符的文件夹列表
+rem sample: 
+rem sample_out: 
+::SETLOCAL
+echo ______________Method_In rule26vmakedirwithtemplate_func_1x0
+set rule26vmakedirwithtemplate_dynamic_param1=
+if "%init_input_2%"=="mkdir_zapp" (
+set rule26vmakedirwithtemplate_dynamic_param1=%init_input_2%
+mkdir jpg_common_port
+mkdir jpg_common_land
+mkdir jpg_top_land
+mkdir jpg_top_port
+mkdir jpg_girl_port
+mkdir jpg_girl_land
+mkdir jpg_lin_port
+mkdir jpg_lin_land
+mkdir gif_common_land
+mkdir gif_common_port
+mkdir gif_top_port
+mkdir gif_top_land
+mkdir mp4_common_land
+mkdir mp4_common_port
+mkdir mp4_top_port
+mkdir mp4_top_land
+mkdir mp4_single_port
+mkdir mp4_single_land
+mkdir mp4_raw_port
+mkdir mp4_raw_land
+mkdir mp4_hua_port
+mkdir mp4_hua_land
+
+)
+if "%init_input_2%"=="mkdir_zmain" (
+set rule26vmakedirwithtemplate_dynamic_param1=%init_input_2%
+mkdir jpg_common_port
+mkdir jpg_common_land
+mkdir jpg_scene_port
+mkdir jpg_scene_land
+mkdir jpg_home_port
+mkdir jpg_home_land
+mkdir gif_common_land
+mkdir gif_common_port
+mkdir gif
+mkdir mp4_common_land
+mkdir mp4_common_port
+mkdir mp4_home_port
+mkdir mp4_home_land
+mkdir mp4_scene_port
+mkdir mp4_scene_land
+mkdir mp4_music_port
+mkdir mp4_music_land
+mkdir mp3
+)
+echo rule26vmakedirwithtemplate_dynamic_param1=%init_input_2%
+echo [rule26vmakedirwithtemplate_func_1x0 EndPrintCode]    output=[__empty__] dynamic_param1=[!rule26vmakedirwithtemplate_dynamic_param1!]   
+echo ______________Method_Out rule26vmakedirwithtemplate_func_1x0
+::ENDLOCAL
+goto:eof
+
+
+
+
 :rule996vwindowsbomb_func_0x0
 rem ======================================== rule996vwindowsbomb_func_0x0
 rem rule_tip: %init_input_0% _996_     ## 不断循环打开关闭 CMD页面  感觉像 轰炸屏幕 寓意轰炸996  无奈下周修好电脑继续
@@ -4160,6 +4228,10 @@ echo %init_input_0% _24_ pre_2021  end_base  mp4  ##  对当前目录的mp4文�
 echo %init_input_0% _25_  123_AAA  ##  更改当前文件名称 把 123 替换为 AAA
 
 echo %init_input_0% _25_  123_AAA  jpg ##  更改当前目录的 jpg 文件名称中 把 123 替换为 AAA
+
+echo %init_input_0% _26_  mkdir_zapp  ##  在当前目录创建 zapp 对应的 目录
+
+echo %init_input_0% _26_  mkdir_zmain  ##  在当前目录创建 zmain 对应的 目录
 
 echo %init_input_0% _996_     ## 不断循环打开关闭 CMD页面  感觉像 轰炸屏幕 寓意轰炸996  无奈下周修好电脑继续
 

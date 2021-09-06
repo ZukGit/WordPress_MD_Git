@@ -63,6 +63,10 @@ public class K3_MD_Rule {
     static  String strZ7DefaultKey_PSW_Rule19 = "752025";  // 8-length
     public static byte[] TEMP_Rule7 = new byte[BYTE_CONTENT_LENGTH_Rule7];
 
+	static File K3_Temp_Text_File = new File(
+			System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin"
+					+ File.separator + get_Bat_Sh_FlagNumber(Cur_Bat_Name) + "_Temp_Text.txt");
+	
 
     static {
         try {
@@ -106,7 +110,7 @@ public class K3_MD_Rule {
     // JDK 的路径
     static String JDK_BIN_PATH = "";
 
-    static OS_TYPE curOS_TYPE = OS_TYPE.Windows;
+    static OS_TYPE CUR_OS_TYPE = OS_TYPE.Windows;
     static String curOS_ExeTYPE = "";
     static ArrayList<String> mKeyWordName = new ArrayList<>();
 
@@ -117,7 +121,7 @@ public class K3_MD_Rule {
         String osName = System.getProperties().getProperty("os.name").toLowerCase();
         String curLibraryPath =  System.getProperties().getProperty("java.library.path");
         if (osName.contains("window")) {
-            curOS_TYPE = OS_TYPE.Windows;
+            CUR_OS_TYPE = OS_TYPE.Windows;
             Cur_Bat_Name = Cur_Bat_Name+".bat";
             Cur_Batch_End = ".bat";
             curOS_ExeTYPE = ".exe";
@@ -125,7 +129,7 @@ public class K3_MD_Rule {
             Win_Lin_Mac_ZbinPath = zbinPath+File.separator+"win_zbin";
 
         } else if (osName.contains("linux")) {
-            curOS_TYPE = OS_TYPE.Linux;
+            CUR_OS_TYPE = OS_TYPE.Linux;
             Cur_Bat_Name = Cur_Bat_Name+".sh";
             curOS_ExeTYPE = "";
             Cur_Batch_End = ".sh";
@@ -133,7 +137,7 @@ public class K3_MD_Rule {
             Win_Lin_Mac_ZbinPath = zbinPath+File.separator+"lin_zbin";
 
         } else if (osName.contains("mac")) {
-            curOS_TYPE = OS_TYPE.MacOS;
+            CUR_OS_TYPE = OS_TYPE.MacOS;
             Cur_Bat_Name = Cur_Bat_Name+".sh";
             curOS_ExeTYPE = "";
             Cur_Batch_End = ".sh";
@@ -195,7 +199,11 @@ public class K3_MD_Rule {
     	 
     	 realTypeRuleList.add( new Fixed_Table_Rule_4());
     	 
-    	 
+     	 realTypeRuleList.add( new Time_Head_Rule_5());
+     	 
+     	 realTypeRuleList.add( new Sort_ABCDZ_Rule_6());
+     	 
+     	 
 //    	 1. 为每个代码块 起始  添加  code 字样 
 //    	 2. 为 每个代码块开头 去除 字样
     	 
@@ -237,7 +245,178 @@ public class K3_MD_Rule {
     // operation_type  操作类型     1--读取文件内容字符串 进行修改      2--对文件对文件内容(字节)--进行修改    3.对全体子文件进行的随性的操作 属性进行修改(文件名称)
 //     // 4.对当前子文件(包括子目录 子文件 --不包含孙目录 孙文件)   5. 所有文件 目录进行操作
 
+    
+	class Sort_ABCDZ_Rule_6 extends Basic_Rule {
+		
+		Sort_ABCDZ_Rule_6() {
+			super("#", 6, 4);
 
+		}
+		
+		@Override
+		String simpleDesc() {
+			return "\n"
+     	+ Cur_Bat_Name + "  #_"+rule_index+"    ##打开notepad输出 #A #B  #C   #D  #E 的顺序列表 \n" 
+		+ Cur_Bat_Name + "  #_"+rule_index+"    ##打开notepad输出 #A #B  #C   #D  #E 的顺序列表 \n" ;
+			}
+		
+		@Override
+		ArrayList<File> applySubFileListRule4(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
+			ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+		// TODO Auto-generated method stub
+			
+			StringBuilder sb  = new StringBuilder();
+			sb.append("# A\n\n\n");
+			sb.append("# B\n\n\n");
+			sb.append("# C\n\n\n");
+			sb.append("# D\n\n\n");
+			sb.append("# E\n\n\n");
+			sb.append("# F\n\n\n");
+			sb.append("# G\n\n\n");
+			sb.append("# H\n\n\n");
+			sb.append("# I\n\n\n");
+			sb.append("# J\n\n\n");
+			sb.append("# K\n\n\n");
+			sb.append("# L\n\n\n");
+			sb.append("# M\n\n\n");
+			sb.append("# N\n\n\n");
+			sb.append("# O\n\n\n");
+			sb.append("# P\n\n\n");
+			sb.append("# Q\n\n\n");
+			sb.append("# R\n\n\n");
+			sb.append("# S\n\n\n");
+			sb.append("# T\n\n\n");
+			sb.append("# U\n\n\n");
+			sb.append("# V\n\n\n");
+			sb.append("# W\n\n\n");
+			sb.append("# X\n\n\n");
+			sb.append("# Y\n\n\n");
+			sb.append("# Z\n\n\n");
+
+			writeContentToFile(K3_Temp_Text_File, sb.toString());
+			NotePadOpenTargetFile(K3_Temp_Text_File.getAbsolutePath());
+			
+		
+			return super.applySubFileListRule4(curFileList, subFileTypeMap, curDirList, curRealFileList);
+		}
+		
+	}
+
+
+
+		class Time_Head_Rule_5 extends Basic_Rule {
+			int originType;
+			int targetType;
+
+			Time_Head_Rule_5() {
+				super("#", 5, 5);
+				originType = -1;
+				targetType = -1;
+			}
+
+			@Override
+			String simpleDesc() {
+				return "\n"
+	     	+ Cur_Bat_Name + "  #_5  1992_"+getCurrentYear()+"   ##打开notepad输出当前1992年至今年"+getCurrentYear()+"年 年月历   MD格式类型(年月里) \n" 
+			+ Cur_Bat_Name + "  #_5  1992_2020   ##打开notepad输出当前1992年至2020年 年月历   MD格式类型(年月里) \n" 
+			+ Cur_Bat_Name + "  #_5  1990_   ##打开notepad输出当前1990年至今年" + getCurrentYear() + " 年月历 MD格式类型(年月里) \n" 
+			+ Cur_Bat_Name + " #_5  _2010   ##打开notepad输出 1992(默认)至2010年年月历 MD格式类型(年月里) \n ";
+			}
+
+			@Override
+			boolean initParamsWithInputList(ArrayList<String> inputParamList) {
+				boolean Flag = true;
+
+				// 获取到装换的类型
+				String inputFileTypeParams = inputParamList.get(inputParamList.size() - 1);
+
+				if (!inputFileTypeParams.contains("_")) {
+					Flag = false;
+					System.out.println("无法检测到当前 第5 Rule   起始年份_截止年份   请检查后重新执行");
+				} else {
+
+					if (inputFileTypeParams.endsWith("_")) {
+						String target = "";
+						String[] parmas = inputFileTypeParams.split("_");
+						String origin = parmas[0];
+						System.out.println("item=" + inputFileTypeParams + "   origin=" + origin + "     target=" + target);
+						if (isNumeric(origin) && !"".equals(origin)) {
+							originType = Integer.parseInt(origin);
+						}
+
+						if (isNumeric(target) && !"".equals(target)) {
+							targetType = Integer.parseInt(target);
+						}
+					} else {
+						String[] parmas = inputFileTypeParams.split("_");
+						System.out.println(
+								"item=" + inputFileTypeParams + "   origin=" + parmas[0] + "     target=" + parmas[1]);
+						if (parmas.length >= 2) {
+
+							if (isNumeric(parmas[0])) {
+								originType = Integer.parseInt(parmas[0]);
+							}
+
+							if (isNumeric(parmas[1])) {
+								targetType = Integer.parseInt(parmas[1]);
+							}
+
+						}
+
+					}
+
+					Flag = true;
+
+				}
+
+				return super.initParamsWithInputList(inputParamList) && Flag;
+			}
+
+			@Override
+			ArrayList<File> applyDir_SubFileListRule5(ArrayList<File> allSubDirFileList,
+					ArrayList<File> allSubRealFileList) {
+				// TODO Auto-generated method stub
+				// TODO Auto-generated method stub
+				if (originType == -1) { // 没有获取到 初始化值 那么 默认就是 1992
+					originType = 1992;
+				}
+
+				if (targetType == -1) { // 没有获取到 初始化值 那么 默认就是 1992
+					targetType = getCurrentYear();
+				}
+
+				// 确保 origin 是 小于 targetType 的
+				if (originType > targetType) {
+					targetType = originType + targetType;
+					originType = targetType - originType;
+					targetType = targetType - originType;
+				}
+				StringBuilder sb = new StringBuilder();
+	System.out.println("targetType = "+targetType +"    originType="+ originType);
+				for (int i = targetType; i >= originType; i--) {
+					sb.append("   \n");
+					sb.append("   \n");
+					sb.append("   \n");
+
+					for (int j = 12; j >= 1; j--) {
+						sb.append("### " + i + "." + (j > 9 ? "" + j : "0" + j));
+
+						sb.append("   \n");
+						sb.append("   \n");
+					}
+
+					sb.append("## " + i);
+					sb.append("   \n");
+					sb.append("   \n");
+
+				}
+				writeContentToFile(K3_Temp_Text_File, sb.toString());
+				NotePadOpenTargetFile(K3_Temp_Text_File.getAbsolutePath());
+				return super.applyDir_SubFileListRule5(allSubDirFileList, allSubRealFileList);
+			}
+
+		}
+	
     
     
     
@@ -344,6 +523,7 @@ public class K3_MD_Rule {
 	   	
 	   	
 	   	//  把 修复  写进 md 文件中
+	   	@SuppressWarnings("unchecked")
 	   	ArrayList<String> getFixedList(ArrayList<Map<Integer , String>> table_Map_List ,ArrayList<String> rawMdList  ){
 	   		
 	   		
@@ -402,7 +582,7 @@ public class K3_MD_Rule {
 	   		
 	   	}
 	   	
-	   	
+	   	@SuppressWarnings("unchecked")	
 	   	void ShowTableMap(ArrayList<Map<Integer , String>> table_Map_List ){
 	   		
 	   		
@@ -428,6 +608,7 @@ public class K3_MD_Rule {
 	   	}
 	   }
     	
+	   	@SuppressWarnings("unchecked")	
 	   	ArrayList<Map<Integer , String>> FixedTableMap(ArrayList<Map<Integer , String>> table_Map_List ){
 	   		ArrayList<Map<Integer , String>> fixed_table_Map_List = new 	ArrayList<Map<Integer , String>>();
 	   	      //  把	修改后的 元素 保存在 这里 
@@ -944,7 +1125,7 @@ public class K3_MD_Rule {
     	
     	   
 
-    		
+   @SuppressWarnings("unchecked")	
     String fixMarkDownImageTagSrc(String imageLine) {
     			String strResult = imageLine;
     			if(!imageLine.contains("](") || !imageLine.contains("zimage") || !imageLine.contains("![")) {
@@ -999,7 +1180,7 @@ public class K3_MD_Rule {
     		}
     		
     		
-    		
+    @SuppressWarnings("unchecked")
    String fixImageTagSrc(String imageLine) {
     			String strResult = imageLine;
     			if(!imageLine.contains("<img")) {
@@ -1253,14 +1434,22 @@ public class K3_MD_Rule {
 
 
 
-    public static boolean isNumeric(String str) {
-        for (int i = str.length(); --i >= 0; ) {
-            if (!Character.isDigit(str.charAt(i))) {
-                return false;
-            }
-        }
-        return true;
-    }
+	public static boolean isNumeric(String str) {
+
+		if (str == null) {
+			return false;
+		}
+
+		for (int i = str.length(); --i >= 0;) {
+			if (!Character.isDigit(str.charAt(i))) {
+				return false;
+			}
+		}
+		if (str.equals("")) {
+			return false;
+		}
+		return true;
+	}
 
 
     static void writeContentToFile(File file, ArrayList<String> strList) {
@@ -1858,7 +2047,7 @@ public class K3_MD_Rule {
             Rule itemRule = realTypeRuleList.get(i);
             String type =  itemRule.file_type;
             int index =  itemRule.rule_index;
-            String desc =  itemRule.ruleTip(type , index ,Cur_Bat_Name,curOS_TYPE);
+            String desc =  itemRule.ruleTip(type , index ,Cur_Bat_Name,CUR_OS_TYPE);
 
 /*
             String itemDesc = "";
@@ -2455,12 +2644,107 @@ public class K3_MD_Rule {
    }
    
     
+	// A1 ..... A2.
+	static String get_Bat_Sh_FlagNumber(String mCur_Bat_Name) {
+		String mCharNumber = "error";
+		String curBat = mCur_Bat_Name;
+		if (mCur_Bat_Name.contains(".sh")) {
+			curBat = curBat.replace(".sh", "");
+		}
+
+		if (mCur_Bat_Name.contains(".bat")) {
+			curBat = curBat.replace(".bat", "");
+		}
+		if (curBat.contains("_")) {
+			String[] arrNameList = curBat.split("_");
+			mCharNumber = arrNameList[arrNameList.length - 1];
+		} else {
+			mCharNumber = curBat;
+		}
+
+		return mCharNumber;
+	}
+	static int getCurrentYear() {
+
+		SimpleDateFormat df = new SimpleDateFormat("YYYY");
+
+		return Integer.parseInt(df.format(new Date()));
+
+	}
+	
+	static void NotePadOpenTargetFile(String absPath) {
+		String commandNotead = "";
+		if (CUR_OS_TYPE == OS_TYPE.Windows) {
+			commandNotead = "cmd.exe /c start   Notepad++.exe " + absPath;
+			execCMD(commandNotead);
+
+		} else if (CUR_OS_TYPE == OS_TYPE.Linux) {
+			commandNotead = " gedit " + absPath;
+		} else if (CUR_OS_TYPE == OS_TYPE.MacOS) {
+			commandNotead = "/Applications/UltraEdit  " + absPath;
+			execute_Mac(commandNotead);
+		}
+	}
+	
+	
+	/**
+	 * 执行 mac(unix) 脚本命令~
+	 * 
+	 * @param command
+	 * @return
+	 */
+	public static int execute_Mac(String command) {
+		String[] cmd = { "/bin/bash", "-c", command };
+		Runtime rt = Runtime.getRuntime();
+		Process proc = null;
+		try {
+			proc = rt.exec(cmd);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		// 打开流
+//        OutputStream os = proc.getOutputStream();
+//        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(os));
+
+		try {
+//            String newCommand = "/bin/bash -c "+"\""+command+"\"";
+//            System.out.println("newCommand = " + newCommand);
+
+//            bw.write(newCommand);
+
+//
+//            bw.flush();
+//            bw.close();
+
+			/** 真奇怪，把控制台的输出打印一遍之后竟然能正常终止了~ */
+//            readConsole(proc);
+
+			/** waitFor() 的作用在于 java 程序是否等待 Terminal 执行脚本完毕~ */
+			proc.waitFor();
+			Thread.sleep(100000);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+//        int retCode = proc.exitValue();
+//        if (retCode != 0) {
+//            System.out.println("unix script retCode = " + retCode);
+//
+//            System.out.println(readConsole(proc));
+//            System.out.println("UnixScriptUil.execute 出错了!!");
+//        }
+
+		return 0;
+	}
+
+	
     public static String execCMD(String command) {
 
         String result = "";
-        if(curOS_TYPE == OS_TYPE.Windows){
+        if(CUR_OS_TYPE == OS_TYPE.Windows){
             return execCMD_Windows(command);
-        }else if(curOS_TYPE == OS_TYPE.MacOS){
+        }else if(CUR_OS_TYPE == OS_TYPE.MacOS){
 
             return execCMD_Mac(command);
         }else{

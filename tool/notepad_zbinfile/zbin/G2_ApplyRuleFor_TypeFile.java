@@ -7273,9 +7273,11 @@ System.out.println("paramItem["+i+"] = "+paramItem_lower_trim);
 
 		@Override
 		String simpleDesc() {
-			return "\n" + Cur_Bat_Name + "  #_25  1992_2020   ##打开notepad输出当前1992年至2020年 年月历  \n" + Cur_Bat_Name
-					+ "  #_25  1990_   ##打开notepad输出当前1990年至今年" + getCurrentYear() + " 年月历 \n" + Cur_Bat_Name
-					+ " #_25  _2010   ##打开notepad输出 1992(默认)至2010年年月历 \n ";
+			return "\n"
+     	+ Cur_Bat_Name + "  #_25  1992_"+getCurrentYear()+"   ##打开notepad输出当前1992年至今年"+getCurrentYear()+"年 年月历   MD格式类型(年月里) \n" 
+		+ Cur_Bat_Name + "  #_25  1992_2020   ##打开notepad输出当前1992年至2020年 年月历   MD格式类型(年月里) \n" 
+		+ Cur_Bat_Name + "  #_25  1990_   ##打开notepad输出当前1990年至今年" + getCurrentYear() + " 年月历 MD格式类型(年月里) \n" 
+		+ Cur_Bat_Name + " #_25  _2010   ##打开notepad输出 1992(默认)至2010年年月历 MD格式类型(年月里) \n ";
 		}
 
 		@Override
@@ -7347,13 +7349,13 @@ System.out.println("paramItem["+i+"] = "+paramItem_lower_trim);
 				targetType = targetType - originType;
 			}
 			StringBuilder sb = new StringBuilder();
-
+System.out.println("targetType = "+targetType +"    originType="+ originType);
 			for (int i = targetType; i >= originType; i--) {
 				sb.append("   \n");
 				sb.append("   \n");
 				sb.append("   \n");
 
-				for (int j = 12; j <= 1; j--) {
+				for (int j = 12; j >= 1; j--) {
 					sb.append("### " + i + "." + (j > 9 ? "" + j : "0" + j));
 
 					sb.append("   \n");
@@ -9514,7 +9516,7 @@ System.out.println("paramItem["+i+"] = "+paramItem_lower_trim);
 			// webp 动态图 会报错 Decode returned code VP8_STATUS_UNSUPPORTED_FEATURE
 			// Obtain a WebP ImageReader instance
 			ImageReader reader = ImageIO.getImageReadersByMIMEType("image/webp").next();
-
+System.out.println("如果报错,将 webp-imageio.dll 等三个文件放入 win_zbin 中继续执行 !! ");
 			// Configure decoding parameters
 			WebPReadParam readParam = new WebPReadParam();
 			readParam.setBypassFiltering(true);
@@ -14232,6 +14234,8 @@ System.out.println("paramItem["+i+"] = "+paramItem_lower_trim);
 //		System.out.println("图片旋转角度：" + angel);
 		return isPort;
 	}
+	
+
 	
 
 }
