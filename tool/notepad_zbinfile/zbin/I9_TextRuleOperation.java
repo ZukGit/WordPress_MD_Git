@@ -5006,6 +5006,9 @@ public class I9_TextRuleOperation {
 				ArrayList<String> fixedStrArr = new ArrayList<String>();
 				String fileContent = ReadFileContent(fileItem);
 				fileContent = fileContent.replace("\n", " ");
+				fileContent = fileContent.replace(IP_Addpress_Pre_1, " ");
+				fileContent = fileContent.replace(IP_Addpress_Pre_2, " ");
+
 				fixedStrArr.add("提示1: 手机和电脑 必须在 同一个 网络下才能完成 wireless adb 连接操作! ");
 				pair_code_6tr = getDefineLengthDigital(fileContent, 6);
 				if (pair_code_6tr == null) { // 一：if
@@ -5032,9 +5035,10 @@ public class I9_TextRuleOperation {
 						} else {
 							fixedStrArr.add("[3]-> 5位 连接端口码: " + adb_wireless_port_5str.replace("\n", ""));
 
-							String fixed_3_content = fixed_2_content.replace(adb_wireless_port_5str, "");
-							System.out.println("fixed_3_content = " + fixed_3_content);
+							String fixed_3_content = fixed_2_content.replace(adb_wireless_port_5str, "").trim();
+				
 							ipaddress_last_3str = getDefineLengthDigital_Range(fixed_3_content, 3);
+							System.out.println("fixed_3_content = " + fixed_3_content +"    ipaddress_last_3str="+ipaddress_last_3str);
 							if (ipaddress_last_3str == null) {
 								fixedStrArr.add("[4]-> 无法搜索到 IP地址最后值(最多三位)");
 							} else {
@@ -5051,7 +5055,7 @@ public class I9_TextRuleOperation {
 				if (isAllSuccess) {
 					String IP_Address_1 = IP_Addpress_Pre_1 + ipaddress_last_3str;
 					fixedStrArr.add("\n");
-					fixedStrArr.add("═════════════════════IP前缀:" + IP_Addpress_Pre_1 + "═════════════════════");
+					fixedStrArr.add("═════════════════════IP前缀:" + IP_Addpress_Pre_1 + "【"+IP_Address_1+"】"+"═════════════════════");
 					String adbCommand_1_1 = calcul_Wireless_ADB_Command(IP_Address_1, adb_wireless_port_5str,
 							pair_code_6tr, pair_port_5str);
 					String adbCommand_1_2 = calcul_Wireless_ADB_Command(IP_Address_1, pair_port_5str, pair_code_6tr,
@@ -5063,7 +5067,7 @@ public class I9_TextRuleOperation {
 
 					String IP_Address_2 = IP_Addpress_Pre_2 + ipaddress_last_3str;
 					fixedStrArr.add("\n");
-					fixedStrArr.add("═════════════════════ IP前缀:" + IP_Addpress_Pre_2 + "═════════════════════");
+					fixedStrArr.add("═════════════════════ IP前缀:" + IP_Addpress_Pre_2 + "【"+IP_Address_2+"】"+"═════════════════════");
 					String adbCommand_2_1 = calcul_Wireless_ADB_Command(IP_Address_2, adb_wireless_port_5str,
 							pair_code_6tr, pair_port_5str);
 					String adbCommand_2_2 = calcul_Wireless_ADB_Command(IP_Address_2, pair_port_5str, pair_code_6tr,
@@ -5102,7 +5106,12 @@ public class I9_TextRuleOperation {
 		String getDefineLengthDigital_Range(String content, int digitalLength) {
 			String resultStr = null;
 			if (content == null || content.trim().length() < digitalLength) {
+				System.out.println(" getDefineLengthDigital_Range  content=["+content+"]  digitalLength="+digitalLength +"  return null");
 				return resultStr;
+			}
+			
+			if(content.length() == digitalLength) {
+				return content;
 			}
 			if (content.contains(" ")) {
 				String[] strArr = content.split(" ");
@@ -5162,7 +5171,7 @@ public class I9_TextRuleOperation {
 
 		@Override
 		String simpleDesc() {
-			return "  把 输入的四个参数 转为 无线 adb 连接的命令 1.IP地址 2.IP端口 3.6位配对码 4.配对端口";
+			return " WireLess_Debug 把 输入的四个参数 转为 无线 adb 连接的命令 1.IP地址 2.IP端口 3.6位配对码 4.配对端口";
 		}
 
 		// 3. 如果当前 执行 错误 checkParams 返回 false 那么 将 打印这个函数 说明错误的可能原因

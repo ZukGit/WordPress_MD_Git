@@ -3935,7 +3935,8 @@ mkdir mp4_raw_port
 mkdir mp4_raw_land
 mkdir mp4_hua_port
 mkdir mp4_hua_land
-
+mkdir mp4_dan_port
+mkdir mp4_dan_land
 )
 if "%init_input_2%"=="mkdir_zmain" (
 set rule26vmakedirwithtemplate_dynamic_param1=%init_input_2%
@@ -3961,6 +3962,85 @@ mkdir mp3
 echo rule26vmakedirwithtemplate_dynamic_param1=%init_input_2%
 echo [rule26vmakedirwithtemplate_func_1x0 EndPrintCode]    output=[__empty__] dynamic_param1=[!rule26vmakedirwithtemplate_dynamic_param1!]   
 echo ______________Method_Out rule26vmakedirwithtemplate_func_1x0
+::ENDLOCAL
+goto:eof
+
+
+
+
+:rule27vwirelessadbconnect_func_4x0
+rem ======================================== rule27vwirelessadbconnect_func_4x0
+rem rule_tip: %init_input_0% _27_   192ipend3_115  ipport_44971  paircode_300827 pairport_43173     ## 对当前输入的 192ipend3(IP地址最后三位) 192.168.0.115 的 安卓设置进行无线连接
+
+rem rule_tip: %init_input_0% _27_   10ipend3_115  ipport_44971  paircode_300827 pairport_43173     ## 对当前输入的 10ipend3(IP地址最后三位) 10.106.20.115 的 安卓设置进行无线连接
+
+rem rule_tip: %init_input_0% _27_   192ipend3_  ipport_  paircode_ pairport_     ## 对当前输入的 192ipend3(IP地址最后三位) 192.168.0.115 的 安卓设置进行无线连接
+
+rem rule_tip: %init_input_0% _27_   10ipend3_  ipport_  paircode_ pairport_     ## 对当前输入的 10ipend3(IP地址最后三位) 10.106.20.115 的 安卓设置进行无线连接
+
+rem desc: 对无线安卓调试设备进行无线连接adb操作
+rem sample: 
+rem sample_out: 
+::SETLOCAL
+echo ______________Method_In rule27vwirelessadbconnect_func_4x0
+set rule27vwirelessadbconnect_dynamic_param1=
+set rule27vwirelessadbconnect_dynamic_param2=
+set rule27vwirelessadbconnect_dynamic_param3=
+set rule27vwirelessadbconnect_dynamic_param4=
+set rule27vwirelessadbconnect_dynamic_param1=%init_input_2% 
+set rule27vwirelessadbconnect_dynamic_param2=%init_input_3% 
+set rule27vwirelessadbconnect_dynamic_param3=%init_input_4% 
+set rule27vwirelessadbconnect_dynamic_param4=%init_input_5% 
+rem Param1______192ipend3_115        Param1______10ipend3_115
+set ipaddress=
+set ipaddress_pre=192.168.0.
+set ipaddress_end3_number=
+call :isstartwith_func_2x1 %init_input_2%  192ipend3_ 
+set is192ipaddress=!isstartwith_return_1!
+if "!is192ipaddress!"=="true" (
+set ipaddress_pre=192.168.0.
+call :stringreplace_func_3x1 %init_input_2%  192ipend3_  ""
+set ipaddress_end3_number=!stringreplace_return_1!
+) else (
+call :isstartwith_func_2x1 %init_input_2%  10ipend3_ 
+set is10ipaddress=!isstartwith_return_1!
+if "!is10ipaddress!"=="true" (
+set ipaddress_pre=10.106.20.
+call :stringreplace_func_3x1 %init_input_2%  10ipend3_  ""
+set ipaddress_end3_number=!stringreplace_return_1!
+)
+)
+echo ipaddress_pre=!ipaddress_pre!
+echo ipaddress_end3_number=!ipaddress_end3_number!
+set ipaddress=!ipaddress_pre!!ipaddress_end3_number!
+echo ipaddress=!ipaddress!
+rem Param2______ipport_44971      
+set ipport=
+call :stringreplace_func_3x1 %init_input_3%  ipport_  ""
+set ipport=!stringreplace_return_1!
+echo ipaddress=!ipaddress!  ipport=!ipport!
+rem Param3______paircode_300827
+set paircode=
+call :stringreplace_func_3x1 %init_input_4%  paircode_  ""
+set paircode=!stringreplace_return_1!
+echo ipaddress=!ipaddress!  ipport=!ipport!  paircode=!paircode!
+rem Param4______pairport_43173
+set pairport=
+call :stringreplace_func_3x1 %init_input_5%  pairport_  ""
+set pairport=!stringreplace_return_1!
+echo ipaddress=!ipaddress!  ipport=!ipport!  paircode=!paircode!  pairport=!pairport!
+echo=
+echo _____________connect command Begin_____________
+rem echo adb kill-server ^&^& adb pair !ipaddress!^:!pairport!  !paircode!  ^&^&  adb connect !ipaddress!^:!ipport! ^&^&  adb -s !ipaddress!^:!ipport! shell 
+echo adb pair !ipaddress!^:!pairport!  !paircode!  ^&^&  adb connect !ipaddress!^:!ipport! ^&^&  adb -s !ipaddress!^:!ipport! shell 
+echo _____________connect command End_____________
+rem adb kill-server && adb pair !ipaddress!:!pairport!  !paircode!  &&  adb connect !ipaddress!:!ipport! &&  adb -s !ipaddress!:!ipport! shell 
+adb pair !ipaddress!:!pairport!  !paircode!  &&  adb connect !ipaddress!:!ipport! &&  adb -s !ipaddress!:!ipport! shell 
+echo=
+echo rule997vmethodholdplace3_dynamic_param2=%init_input_3%
+echo ========================================== Rule_Method_HoldPlace_占位模板 End ===============================
+echo [rule27vwirelessadbconnect_func_4x0 EndPrintCode]    output=[__empty__] dynamic_param1=[!rule27vwirelessadbconnect_dynamic_param1!]   dynamic_param2=[!rule27vwirelessadbconnect_dynamic_param2!]   dynamic_param3=[!rule27vwirelessadbconnect_dynamic_param3!]   dynamic_param4=[!rule27vwirelessadbconnect_dynamic_param4!]   
+echo ______________Method_Out rule27vwirelessadbconnect_func_4x0
 ::ENDLOCAL
 goto:eof
 
@@ -4232,6 +4312,14 @@ echo %init_input_0% _25_  123_AAA  jpg ##  更改当前目录的 jpg 文件名�
 echo %init_input_0% _26_  mkdir_zapp  ##  在当前目录创建 zapp 对应的 目录
 
 echo %init_input_0% _26_  mkdir_zmain  ##  在当前目录创建 zmain 对应的 目录
+
+echo %init_input_0% _27_   192ipend3_115  ipport_44971  paircode_300827 pairport_43173     ## 对当前输入的 192ipend3(IP地址最后三位) 192.168.0.115 的 安卓设置进行无线连接
+
+echo %init_input_0% _27_   10ipend3_115  ipport_44971  paircode_300827 pairport_43173     ## 对当前输入的 10ipend3(IP地址最后三位) 10.106.20.115 的 安卓设置进行无线连接
+
+echo %init_input_0% _27_   192ipend3_  ipport_  paircode_ pairport_     ## 对当前输入的 192ipend3(IP地址最后三位) 192.168.0.115 的 安卓设置进行无线连接
+
+echo %init_input_0% _27_   10ipend3_  ipport_  paircode_ pairport_     ## 对当前输入的 10ipend3(IP地址最后三位) 10.106.20.115 的 安卓设置进行无线连接
 
 echo %init_input_0% _996_     ## 不断循环打开关闭 CMD页面  感觉像 轰炸屏幕 寓意轰炸996  无奈下周修好电脑继续
 
