@@ -789,6 +789,32 @@ goto:eof
 
 
 
+:isemptydirfile_func_1x1
+rem ======================================== isemptydirfile_func_1x1
+rem desc: 检测当前目录是否是空目录(没有子文件 没有子文件夹)
+rem sample: call :isemptydirfile_func_1x1  %zbin%
+rem sample_out: [isemptydirfile_func_1x1 ]   isfileexist_return_1=[true]   param1=[C:\Users\xxx\Desktop\zbin/A0.bat]
+::SETLOCAL
+echo ______________Method_In isemptydirfile_func_1x1
+echo readFile_func_1x0 input_1_param == %1
+set isemptydirfile_return_1=false
+dir /b /a-d /o-d /s   %1
+echo errorlevel=%ERRORLEVEL%
+if %ERRORLEVEL% LEQ 0 (
+echo 当前目录有文件
+set isemptydirfile_return_1=false
+) else (
+echo 当前目录没有有文件
+set isemptydirfile_return_1=true
+)
+echo [isemptydirfile_func_1x1 EndPrintCode]   isemptydirfile_return_1=[!isemptydirfile_return_1!]   param1=[%1]   
+echo ______________Method_Out isemptydirfile_func_1x1
+::ENDLOCAL
+goto:eof
+
+
+
+
 :isdirfile_func_1x1
 rem ======================================== isdirfile_func_1x1
 rem desc: 检测文件夹是否存在    不存在 返回false   存在那么 继续判断是否是文件夹 如果是 那么返回true   是文件返回false
@@ -3118,7 +3144,7 @@ goto:eof
 
 :rule19vdownloadshoucangjia_func_0x0
 rem ======================================== rule19vdownloadshoucangjia_func_0x0
-rem rule_tip: %init_input_0% _19_  ## ADB 命令 Tel自动加载命令
+rem rule_tip: %init_input_0% _19_        ## ADB 命令 Tel自动加载命令 第19规则
 rem desc: 
 rem sample: 
 rem sample_out: 
@@ -3974,9 +4000,9 @@ rem rule_tip: %init_input_0% _27_   192ipend3_115  ipport_44971  paircode_300827
 
 rem rule_tip: %init_input_0% _27_   10ipend3_115  ipport_44971  paircode_300827 pairport_43173     ## 对当前输入的 10ipend3(IP地址最后三位) 10.106.20.115 的 安卓设置进行无线连接
 
-rem rule_tip: %init_input_0% _27_   192ipend3_  ipport_  paircode_ pairport_     ## 对当前输入的 192ipend3(IP地址最后三位) 192.168.0.115 的 安卓设置进行无线连接
-
 rem rule_tip: %init_input_0% _27_   10ipend3_  ipport_  paircode_ pairport_     ## 对当前输入的 10ipend3(IP地址最后三位) 10.106.20.115 的 安卓设置进行无线连接
+
+rem rule_tip: %init_input_0% _27_   192ipend3_  ipport_  paircode_ pairport_     ## 对当前输入的 192ipend3(IP地址最后三位) 192.168.0.115 的 安卓设置进行无线连接
 
 rem desc: 对无线安卓调试设备进行无线连接adb操作
 rem sample: 
@@ -4041,6 +4067,266 @@ echo rule997vmethodholdplace3_dynamic_param2=%init_input_3%
 echo ========================================== Rule_Method_HoldPlace_占位模板 End ===============================
 echo [rule27vwirelessadbconnect_func_4x0 EndPrintCode]    output=[__empty__] dynamic_param1=[!rule27vwirelessadbconnect_dynamic_param1!]   dynamic_param2=[!rule27vwirelessadbconnect_dynamic_param2!]   dynamic_param3=[!rule27vwirelessadbconnect_dynamic_param3!]   dynamic_param4=[!rule27vwirelessadbconnect_dynamic_param4!]   
 echo ______________Method_Out rule27vwirelessadbconnect_func_4x0
+::ENDLOCAL
+goto:eof
+
+
+
+
+:rule28vfiltermediatodir_func_1x0
+rem ======================================== rule28vfiltermediatodir_func_1x0
+rem rule_tip: %init_input_0% _28_   mediafilter_true  ## 搜索当前目录下的所有多媒体文件 把它们 统一归类到 一个文件类型的文件夹Z_jpg Z_mp4 Z_gif Z_avi Z_webp 中
+
+rem rule_tip: %init_input_0% _28_   typefilter_xlsx  ## 搜索当前目录下指定的输入类例如[xlsx] 把它们 统一归类到 一个文件类型的文件夹Z_xlsx  文件目录中
+
+rem rule_tip: %init_input_0% _28_   typefilter_txt  ## 搜索当前目录下指定的输入类例如[txt] 把它们 统一归类到 一个文件类型的文件夹Z_txt  文件目录中
+
+rem rule_tip: %init_input_0% _28_   typefilter_java  ## 搜索当前目录下指定的输入类例如[java] 把它们 统一归类到 一个文件类型的文件夹Z_java  文件目录中
+rem desc: 
+rem sample: 
+rem sample_out: 
+::SETLOCAL
+echo ______________Method_In rule28vfiltermediatodir_func_1x0
+set rule28vfiltermediatodir_dynamic_param1=
+set rule28vfiltermediatodir_dynamic_param1=%init_input_2% 
+echo  init_input_2=%init_input_2% 
+set searchdir=!init_cd!
+if "%init_input_2%"=="mediafilter_true" (
+set rule28vfiltermediatodir_dynamic_param1=%init_input_2%
+set Z_jpg_dirname=Z_jpg
+echo  mkdir !Z_jpg_dirname!
+mkdir !Z_jpg_dirname!
+echo searchdir=%searchdir%   init_cd=!init_cd!
+dir /b /a-d /o-d /s "%searchdir%\*.jpg"  > rule28_jpg.txt
+dir /b /a-d /o-d /s "%searchdir%\*.png"  > rule28_png.txt
+set /a index_jpg = 0
+for /f %%x in (rule28_jpg.txt) do (
+echo ___________[!index_jpg!_jpg]______________
+set jpg_file_fullpath=%%x
+set /a index_jpg+=1
+set oldname=%%~nx
+echo [!index_jpg!_jpg] i=%%x  jpg_file_fullpath=!jpg_file_fullpath! index_jpg=!index_jpg! oldname=!oldname! newfileName_raw=!newfileName_raw! newfileName=!newfileName! xi=%%~xx  ni=%%~nx
+set newfileName_raw=!index_jpg!_!oldname!%%~xx
+set newfileName=!newfileName_raw: =!
+set itemfullpath=%%~sx
+rem  ren "%%i" "!newfileName!"
+rem echo f | xcopy /y D:\TEMP\0915\1.jpg  D:\TEMP\0915\A\1_1.jpg && del D:\TEMP\0915\1.jpg 
+echo echo f ^| xcopy /y "!itemfullpath!"  !init_cd!\!Z_jpg_dirname!\!newfileName!  ^&^& del  "!itemfullpath!"
+echo=
+echo f | xcopy /y "!itemfullpath!"  !init_cd!\!Z_jpg_dirname!\!newfileName!  && del  "!itemfullpath!"
+)
+for /f %%z in (rule28_png.txt) do (
+echo ___________[!index_jpg!_png]______________
+set png_file_fullpath=%%z
+set /a index_jpg+=1
+set oldname=%%~nz
+set newfileName_jpg_raw=!index_jpg!_!oldname!.jpg
+set newfileName_jpg=!newfileName_jpg_raw: =!
+echo [!index_jpg!_png]  i=%%z png_file_fullpath=!png_file_fullpath! index_jpg=!index_jpg! oldname=!oldname!   newfileName_jpg_raw=%newfileName_jpg_raw%   newfileName_jpg=!newfileName_jpg! xi=%%~xz  ni=%%~nz
+set itemfullpath=%%~sz
+rem  ren "%%i" "!newfileName!"
+rem echo f | xcopy /y D:\TEMP\0915\1.png  D:\TEMP\0915\A\1_1.png && del D:\TEMP\0915\1.png 
+echo echo f ^| xcopy /y "!itemfullpath!"  !init_cd!\!Z_jpg_dirname!\!newfileName!  ^&^& del  "!itemfullpath!"
+echo=
+echo f | xcopy /y "!itemfullpath!"  !init_cd!\!Z_jpg_dirname!\!newfileName!  && del  "!itemfullpath!"
+)
+echo del "!Z_jpg_dirname!_!index_jpg!" Begin 
+rd /s/q  "!Z_jpg_dirname!_!index_jpg!"
+echo del "!Z_jpg_dirname!_!index_jpg!" End
+ren "!Z_jpg_dirname!" "!Z_jpg_dirname!_!index_jpg!"
+del rule28_jpg.txt
+del rule28_png.txt
+dir /b /a-d /o-d /s "%searchdir%\*.mp4"  > rule28_mp4.txt
+set /a index_mp4 = 0
+set Z_mp4_dirname=Z_mp4
+echo  mkdir !Z_mp4_dirname!
+for /f %%x in (rule28_mp4.txt) do (
+echo ___________[!index_mp4!_mp4]______________
+set mp4_file_fullpath=%%x
+set /a index_mp4+=1
+set oldname=%%~nx
+set newfileName_mp4_raw=!index_mp4!_!oldname!%%~xx
+set newfileName_mp4=!newfileName_mp4_raw: =!
+echo [!index_mp4!_mp4] i=%%x  mp4_file_fullpath=!mp4_file_fullpath! index_mp4=!index_mp4! oldname=!oldname! newfileName_mp4_raw=!newfileName_mp4_raw! newfileName_mp4=!newfileName_mp4! xi=%%~xx  ni=%%~nx
+set itemfullpath=%%~sx
+rem  ren "%%i" "!newfileName!"
+rem echo f | xcopy /y D:\TEMP\0915\1.mp4  D:\TEMP\0915\A\1_1.mp4 && del D:\TEMP\0915\1.mp4 
+echo echo f ^| xcopy /y "!itemfullpath!"  !init_cd!\!Z_mp4_dirname!\!newfileName_mp4!  ^&^& del  "!itemfullpath!"
+echo=
+echo f | xcopy /y "!itemfullpath!"  !init_cd!\!Z_mp4_dirname!\!newfileName_mp4!  && del  "!itemfullpath!"
+)
+rd /s/q  "!Z_mp4_dirname!_!index_mp4!"
+ren "!Z_mp4_dirname!" "!Z_mp4_dirname!_!index_mp4!"
+del rule28_mp4.txt
+dir /b /a-d /o-d /s "%searchdir%\*.avi"  > rule28_avi.txt
+set /a index_avi = 0
+set Z_avi_dirname=Z_avi
+echo  mkdir !Z_avi_dirname!
+for /f %%x in (rule28_avi.txt) do (
+echo ___________[!index_avi!_avi]______________
+set avi_file_fullpath=%%x
+set /a index_avi+=1
+set oldname=%%~nx
+set newfileName_avi_raw=!index_avi!_!oldname!%%~xx
+set newfileName_avi=!newfileName_avi_raw: =!
+echo [!index_avi!_avi] i=%%x  avi_file_fullpath=!avi_file_fullpath! index_avi=!index_avi! oldname=!oldname! newfileName_avi_raw=!newfileName_avi_raw! newfileName_avi=!newfileName_avi! xi=%%~xx  ni=%%~nx
+set itemfullpath=%%~sx
+rem  ren "%%i" "!newfileName!"
+rem echo f | xcopy /y D:\TEMP\0915\1.avi  D:\TEMP\0915\A\1_1.avi && del D:\TEMP\0915\1.avi 
+echo echo f ^| xcopy /y "!itemfullpath!"  !init_cd!\!Z_avi_dirname!\!newfileName_avi!  ^&^& del  "!itemfullpath!"
+echo=
+echo f | xcopy /y "!itemfullpath!"  !init_cd!\!Z_avi_dirname!\!newfileName_avi!  && del  "!itemfullpath!"
+)
+rd /s/q  "!Z_avi_dirname!_!index_avi!"
+ren "!Z_avi_dirname!" "!Z_avi_dirname!_!index_avi!"
+del rule28_avi.txt
+dir /b /a-d /o-d /s "%searchdir%\*.gif"  > rule28_gif.txt
+set /a index_gif = 0
+set Z_gif_dirname=Z_gif
+echo  mkdir !Z_gif_dirname!
+for /f %%x in (rule28_gif.txt) do (
+echo ___________[!index_gif!_gif]______________
+set gif_file_fullpath=%%x
+set /a index_gif+=1
+set oldname=%%~nx
+set newfileName_gif_raw=!index_gif!_!oldname!%%~xx
+set newfileName_gif=!newfileName_gif_raw: =!
+echo [!index_gif!_gif] i=%%x  gif_file_fullpath=!gif_file_fullpath! index_gif=!index_gif! oldname=!oldname! newfileName_gif_raw=!newfileName_gif_raw! newfileName_gif=!newfileName_gif! xi=%%~xx  ni=%%~nx
+set itemfullpath=%%~sx
+rem  ren "%%i" "!newfileName!"
+rem echo f | xcopy /y D:\TEMP\0915\1.gif  D:\TEMP\0915\A\1_1.gif && del D:\TEMP\0915\1.gif 
+echo echo f ^| xcopy /y "!itemfullpath!"  !init_cd!\!Z_gif_dirname!\!newfileName_gif!  ^&^& del  "!itemfullpath!"
+echo=
+echo f | xcopy /y "!itemfullpath!"  !init_cd!\!Z_gif_dirname!\!newfileName_gif!  && del  "!itemfullpath!"
+)
+rd /s/q  "!Z_gif_dirname!_!index_gif!"
+ren "!Z_gif_dirname!" "!Z_gif_dirname!_!index_gif!"
+del rule28_gif.txt
+dir /b /a-d /o-d /s "%searchdir%\*.webp"  > rule28_webp.txt
+set /a index_webp = 0
+set Z_webp_dirname=Z_webp
+echo  mkdir !Z_webp_dirname!
+for /f %%x in (rule28_webp.txt) do (
+echo ___________[!index_webp!_webp]______________
+set webp_file_fullpath=%%x
+set /a index_webp+=1
+set oldname=%%~nx
+set newfileName_webp_raw=!index_webp!_!oldname!%%~xx
+set newfileName_webp=!newfileName_webp_raw: =!
+echo [!index_webp!_webp] i=%%x  webp_file_fullpath=!webp_file_fullpath! index_webp=!index_webp! oldname=!oldname! newfileName_webp_raw=!newfileName_webp_raw! newfileName_webp=!newfileName_webp! xi=%%~xx  ni=%%~nx
+set itemfullpath=%%~sx
+rem  ren "%%i" "!newfileName!"
+rem echo f | xcopy /y D:\TEMP\0915\1.webp  D:\TEMP\0915\A\1_1.webp && del D:\TEMP\0915\1.webp 
+echo echo f ^| xcopy /y "!itemfullpath!"  !init_cd!\!Z_webp_dirname!\!newfileName_webp!  ^&^& del  "!itemfullpath!"
+echo=
+echo f | xcopy /y "!itemfullpath!"  !init_cd!\!Z_webp_dirname!\!newfileName_webp!  && del  "!itemfullpath!"
+)
+rd /s/q  "!Z_webp_dirname!_!index_webp!"
+ren "!Z_webp_dirname!" "!Z_webp_dirname!_!index_webp!"
+del rule28_webp.txt
+dir /b /a-d /o-d /s "%searchdir%\*.flv"  > rule28_flv.txt
+set /a index_flv = 0
+set Z_flv_dirname=Z_flv
+echo  mkdir !Z_flv_dirname!
+for /f %%x in (rule28_flv.txt) do (
+echo ___________[!index_flv!_flv]______________
+set flv_file_fullpath=%%x
+set /a index_flv+=1
+set oldname=%%~nx
+set newfileName_flv_raw=!index_flv!_!oldname!%%~xx
+set newfileName_flv=!newfileName_flv_raw: =!
+echo [!index_flv!_flv] i=%%x  flv_file_fullpath=!flv_file_fullpath! index_flv=!index_flv! oldname=!oldname! newfileName_flv_raw=!newfileName_flv_raw! newfileName_flv=!newfileName_flv! xi=%%~xx  ni=%%~nx
+set itemfullpath=%%~sx
+rem  ren "%%i" "!newfileName!"
+rem echo f | xcopy /y D:\TEMP\0915\1.flv  D:\TEMP\0915\A\1_1.flv && del D:\TEMP\0915\1.flv 
+echo echo f ^| xcopy /y "!itemfullpath!"  !init_cd!\!Z_flv_dirname!\!newfileName_flv!  ^&^& del  "!itemfullpath!"
+echo=
+echo f | xcopy /y "!itemfullpath!"  !init_cd!\!Z_flv_dirname!\!newfileName_flv!  && del  "!itemfullpath!"
+)
+rd /s/q  "!Z_flv_dirname!_!index_flv!"
+ren "!Z_flv_dirname!" "!Z_flv_dirname!_!index_flv!"
+del rule28_flv.txt
+dir /b /a-d /o-d /s "%searchdir%\*.wmv"  > rule28_wmv.txt
+set /a index_wmv = 0
+set Z_wmv_dirname=Z_wmv
+echo  mkdir !Z_wmv_dirname!
+for /f %%x in (rule28_wmv.txt) do (
+echo ___________[!index_wmv!_wmv]______________
+set wmv_file_fullpath=%%x
+set /a index_wmv+=1
+set oldname=%%~nx
+set newfileName_wmv_raw=!index_wmv!_!oldname!%%~xx
+set newfileName_wmv=!newfileName_wmv_raw: =!
+echo [!index_wmv!_wmv] i=%%x  wmv_file_fullpath=!wmv_file_fullpath! index_wmv=!index_wmv! oldname=!oldname! newfileName_wmv_raw=!newfileName_wmv_raw! newfileName_wmv=!newfileName_wmv! xi=%%~xx  ni=%%~nx
+set itemfullpath=%%~sx
+rem  ren "%%i" "!newfileName!"
+rem echo f | xcopy /y D:\TEMP\0915\1.wmv  D:\TEMP\0915\A\1_1.wmv && del D:\TEMP\0915\1.wmv 
+echo echo f ^| xcopy /y "!itemfullpath!"  !init_cd!\!Z_wmv_dirname!\!newfileName_wmv!  ^&^& del  "!itemfullpath!"
+echo=
+echo f | xcopy /y "!itemfullpath!"  !init_cd!\!Z_wmv_dirname!\!newfileName_wmv!  && del  "!itemfullpath!"
+)
+rd /s/q  "!Z_wmv_dirname!_!index_wmv!"
+ren "!Z_wmv_dirname!" "!Z_wmv_dirname!_!index_wmv!"
+del rule28_wmv.txt
+rem 遍历Z_开头的目录  检测是否是空文件夹  是 空文件夹 删除它
+set /a Index_R_D = 0
+for /d  /r %searchdir% %%j in  (*Z_*)do (
+set /a Index_R_D+=1 
+call :isemptydirfile_func_1x1 %%j
+set emptydir_flag=!isemptydirfile_return_1!
+echo r_d_index[!Index_R_D!] =  %%j  isemptydirfile_return_1=!isemptydirfile_return_1! emptydir_flag=!emptydir_flag!
+if "!emptydir_flag!"=="true" (
+echo 删除空文件夹 %%j
+rd /s/q  "%%j"
+)
+)
+) else (
+call :isstartwith_func_2x1 %init_input_2%  typefilter_ 
+set isstart_typefillter=!isstartwith_return_1!
+echo isstart_typefillter = !isstart_typefillter!
+if "!isstart_typefillter!"=="true" (
+call :stringreplace_func_3x1 %init_input_2%  typefilter_  ""
+set target_file_type=!stringreplace_return_1!
+set zzztype=!stringreplace_return_1!
+echo target_file_type=!target_file_type!  zzztype=!zzztype!
+rem 开始执行过滤 指定类型文件 如 xlsx 的 目录 
+dir /b /a-d /o-d /s "%searchdir%\*.!zzztype!"  > rule28_!zzztype!.txt
+set /a index_zzz = 0
+set Z_zzz_dirname=Z_!zzztype!
+echo  mkdir !Z_zzz_dirname!
+for /f %%x in (rule28_!zzztype!.txt) do (
+echo ___________[!index_zzz!_!zzztype!]______________
+set zzz_file_fullpath=%%x
+set /a index_zzz+=1
+set oldname=%%~nx
+set newfileName_zzz_raw=!index_zzz!_!oldname!%%~xx
+set newfileName_zzz=!newfileName_zzz_raw: =!
+echo [!index_zzz!_!zzztype!] i=%%x  zzz_file_fullpath=!zzz_file_fullpath! index_zzz=!index_zzz! oldname=!oldname! newfileName_zzz_raw=!newfileName_zzz_raw! newfileName_zzz=!newfileName_zzz! xi=%%~xx  ni=%%~nx
+set itemfullpath=%%~sx
+echo echo f ^| xcopy /y "!itemfullpath!"  !init_cd!\!Z_zzz_dirname!\!newfileName_zzz!  ^&^& del  "!itemfullpath!"
+echo=
+echo f | xcopy /y "!itemfullpath!"  !init_cd!\!Z_zzz_dirname!\!newfileName_zzz!  && del  "!itemfullpath!"
+)
+rd /s/q  "!Z_zzz_dirname!_!index_zzz!"
+ren "!Z_zzz_dirname!" "!Z_zzz_dirname!_!index_zzz!"
+del rule28_!zzztype!.txt
+rem 遍历Z_!zzztype!开头的目录  检测是否是空文件夹  是 空文件夹 删除它
+set /a Index_R_D = 0
+for /d  /r %searchdir% %%j in  (*Z_!zzztype!*)do (
+set /a Index_R_D+=1 
+call :isemptydirfile_func_1x1 %%j
+set emptydir_flag=!isemptydirfile_return_1!
+echo r_d_index[!Index_R_D!] =  %%j  isemptydirfile_return_1=!isemptydirfile_return_1! emptydir_flag=!emptydir_flag!
+if "!emptydir_flag!"=="true" (
+echo 删除空文件夹 %%j
+rd /s/q  "%%j"
+)
+)
+)
+)
+echo rule28vfiltermediatodir_dynamic_param1=%init_input_2%
+echo [rule28vfiltermediatodir_func_1x0 EndPrintCode]    output=[__empty__] dynamic_param1=[!rule28vfiltermediatodir_dynamic_param1!]   
+echo ______________Method_Out rule28vfiltermediatodir_func_1x0
 ::ENDLOCAL
 goto:eof
 
@@ -4213,7 +4499,7 @@ echo %init_input_0% _17_       ##把 连接adb的 手机 执行 adb dump service
 
 echo %init_input_0% _18_  ## 安装本地zsoft到zsoft_dest目录 1.解压 2.复制zbin 3.配置环境变量 4.静默安装 5.添加绿色软件桌面icon
 
-echo %init_input_0% _19_  ## ADB 命令 Tel自动加载命令
+echo %init_input_0% _19_        ## ADB 命令 Tel自动加载命令 第19规则
 
 echo %init_input_0% _20_      ## 把当前目录的 media媒体文件 jpg_jpeg_webp_mp4_avi_gif_mp3_txt 改成 数字.类型 形式
 
@@ -4317,9 +4603,17 @@ echo %init_input_0% _27_   192ipend3_115  ipport_44971  paircode_300827 pairport
 
 echo %init_input_0% _27_   10ipend3_115  ipport_44971  paircode_300827 pairport_43173     ## 对当前输入的 10ipend3(IP地址最后三位) 10.106.20.115 的 安卓设置进行无线连接
 
+echo %init_input_0% _27_   10ipend3_  ipport_  paircode_ pairport_     ## 对当前输入的 10ipend3(IP地址最后三位) 10.106.20.115 的 安卓设置进行无线连接
+
 echo %init_input_0% _27_   192ipend3_  ipport_  paircode_ pairport_     ## 对当前输入的 192ipend3(IP地址最后三位) 192.168.0.115 的 安卓设置进行无线连接
 
-echo %init_input_0% _27_   10ipend3_  ipport_  paircode_ pairport_     ## 对当前输入的 10ipend3(IP地址最后三位) 10.106.20.115 的 安卓设置进行无线连接
+echo %init_input_0% _28_   mediafilter_true  ## 搜索当前目录下的所有多媒体文件 把它们 统一归类到 一个文件类型的文件夹Z_jpg Z_mp4 Z_gif Z_avi Z_webp 中
+
+echo %init_input_0% _28_   typefilter_xlsx  ## 搜索当前目录下指定的输入类例如[xlsx] 把它们 统一归类到 一个文件类型的文件夹Z_xlsx  文件目录中
+
+echo %init_input_0% _28_   typefilter_txt  ## 搜索当前目录下指定的输入类例如[txt] 把它们 统一归类到 一个文件类型的文件夹Z_txt  文件目录中
+
+echo %init_input_0% _28_   typefilter_java  ## 搜索当前目录下指定的输入类例如[java] 把它们 统一归类到 一个文件类型的文件夹Z_java  文件目录中
 
 echo %init_input_0% _996_     ## 不断循环打开关闭 CMD页面  感觉像 轰炸屏幕 寓意轰炸996  无奈下周修好电脑继续
 
@@ -4396,6 +4690,8 @@ echo getrandomintwithmaxmin_return_1=!getrandomintwithmaxmin_return_1!
 call :isadminuser_func_0x1
 echo  isadminuser_return_1=!isadminuser_return_1!
 
+rem call :isemptydirfile_func_1x1 !init_cd!
+rem echo isemptydirfile_return_1=!isemptydirfile_return_1!
 rem call :stringreplace_func_3x1 123456789  123  ""
 rem echo stringreplace_return_1=!stringreplace_return_1!
 
