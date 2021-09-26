@@ -1066,6 +1066,23 @@ goto:eof
 
 
 
+:gettimeddhhmm_func_0x1
+rem ======================================== gettimeddhhmm_func_0x1
+rem desc: 获取当前日时分数据
+rem sample: [gettimeddhhmm_func_0x1 ] gettimeddhhmm_return_1=[21-05-18_18_57_36_51]   param1=[__empty__]
+rem sample_out: [gettimeddhhmm_func_0x1 ] gettimeddhhmm_return_1=[21-05-18_18_57_36_52]   param1=[__empty__]
+::SETLOCAL
+echo ______________Method_In gettimeddhhmm_func_0x1
+set gettimeddhhmm_return_1=%DATE:~11,2%%TIME:~0,2%%TIME:~3,2%
+echo gettimeddhhmm_return_1=%getTimeNona_return_1%
+echo [gettimeddhhmm_func_0x1 EndPrintCode] gettimeddhhmm_return_1=[!gettimeddhhmm_return_1!]   param1=[__empty__] 
+echo ______________Method_Out gettimeddhhmm_func_0x1
+::ENDLOCAL
+goto:eof
+
+
+
+
 :gettimenona_func_0x1
 rem ======================================== gettimenona_func_0x1
 rem desc: 获取当前的时间戳信息 包含周几 用于打印
@@ -2720,7 +2737,7 @@ goto:eof
 
 :rule15vxmusbcreendown_func_2x0
 rem ======================================== rule15vxmusbcreendown_func_2x0
-rem rule_tip: %init_input_0% _15_   100000   ##小米_有线USB_手机执行 adb -s c2f5b32c shell input swipe 340 1200 340 400 命令向下滑动两下向上滑动一下 默认10000次
+rem rule_tip: %init_input_0% _15_   100000   ## 有线USB_手机执行 adb  shell input swipe 340 1200 340 400 命令向下滑动两下向上滑动一下 默认10000次
 
 rem rule_tip: %init_input_0% _15_  c2f5b32c  100000    ##小米_有线USB_手机执行  adb -s c2f5b32c shell input swipe 340 1200 340 400 命令向下滑动两下向上滑动一下 默认10000次
 
@@ -2747,7 +2764,27 @@ set  rule15vxmusbcreendown_dynamic_param1=c2f5b32c
 set rule15vxmusbcreendown_dynamic_param1=%init_input_2% 
 )
 if "%init_input_3%"=="" (
-set  rule15vxmusbcreendown_dynamic_param2=10000
+for /l %%i in (1, 1, !rule15vxmusbcreendown_dynamic_param1!) do (
+echo i == %%i   _todown   allLoop=[!rule15vxmusbcreendown_dynamic_param1!]     
+adb  shell input swipe 340 1200 340 400  
+ping -n 1 127.0.0.1>nul
+adb  shell input swipe 340 1200 340 400  
+ping -n 1 127.0.0.1>nul
+adb  shell input swipe 340 400 340 800
+ping -n 1 127.0.0.1>nul
+)
+for /l %%i in (1, 1, !rule15vxmusbcreendown_dynamic_param1!) do (
+echo i == %%i  _toup     allLoop=[!rule15vxmusbcreendown_dynamic_param1!]        
+adb   shell input swipe  340 400  340 1200
+ping -n 1 127.0.0.1>nul
+adb  shell input swipe  340 400  340 1200
+ping -n 1 127.0.0.1>nul
+adb   shell input swipe  340 800 340 400
+ping -n 1 127.0.0.1>nul
+)
+echo [rule15vxmusbcreendown_func_2x0 EndPrintCode]    output=[__empty__] dynamic_param1=[!rule15vxmusbcreendown_dynamic_param1!]   dynamic_param2=[!rule15vxmusbcreendown_dynamic_param2!]   
+echo ______________Method_Out rule15vxmusbcreendown_func_2x0
+goto:eof
 ) else (
 set rule15vxmusbcreendown_dynamic_param2=%init_input_3% 
 )
@@ -4075,13 +4112,13 @@ goto:eof
 
 :rule28vfiltermediatodir_func_1x0
 rem ======================================== rule28vfiltermediatodir_func_1x0
-rem rule_tip: %init_input_0% _28_   mediafilter_true  ## 搜索当前目录下的所有多媒体文件 把它们 统一归类到 一个文件类型的文件夹Z_jpg Z_mp4 Z_gif Z_avi Z_webp 中
+rem rule_tip: %init_input_0% _28_   mediafilter_true  ## 搜索所有(包含孙文件)当前目录下的所有多媒体文件 把它们 统一归类到 一个文件类型的文件夹Z_jpg Z_mp4 Z_gif Z_avi Z_webp 中
 
-rem rule_tip: %init_input_0% _28_   typefilter_xlsx  ## 搜索当前目录下指定的输入类例如[xlsx] 把它们 统一归类到 一个文件类型的文件夹Z_xlsx  文件目录中
+rem rule_tip: %init_input_0% _28_   typefilter_xlsx  ## 搜索所有(包含孙文件)当前目录下指定的输入类例如[xlsx] 把它们 统一归类到 一个文件类型的文件夹Z_xlsx  文件目录中
 
-rem rule_tip: %init_input_0% _28_   typefilter_txt  ## 搜索当前目录下指定的输入类例如[txt] 把它们 统一归类到 一个文件类型的文件夹Z_txt  文件目录中
+rem rule_tip: %init_input_0% _28_   typefilter_txt  ## 搜索所有(包含孙文件)当前目录下指定的输入类例如[txt] 把它们 统一归类到 一个文件类型的文件夹Z_txt  文件目录中
 
-rem rule_tip: %init_input_0% _28_   typefilter_java  ## 搜索当前目录下指定的输入类例如[java] 把它们 统一归类到 一个文件类型的文件夹Z_java  文件目录中
+rem rule_tip: %init_input_0% _28_   typefilter_java  ## 搜索所有(包含孙文件)当前目录下指定的输入类例如[java] 把它们 统一归类到 一个文件类型的文件夹Z_java  文件目录中
 rem desc: 
 rem sample: 
 rem sample_out: 
@@ -4333,6 +4370,177 @@ goto:eof
 
 
 
+:rule29vflitermediatozappdir_func_0x0
+rem ======================================== rule29vflitermediatozappdir_func_0x0
+rem rule_tip: %init_input_0% _29_  %init_input_0%  _29_    ## 过滤当前路径(不包括孙文件)下Port_Land命名的的jpg gif mp4到新建的zapp分类目录 jpg_common_land
+
+rem rule_tip: %init_input_0% _29_  %init_input_0%  _29_    ## 过滤当前路径(不包括孙文件)下Port_Land命名的的jpg gif mp4到新建的zapp分类目录 jpg_common_port
+rem desc: 
+rem sample: 
+rem sample_out: 
+::SETLOCAL
+echo ______________Method_In rule29vflitermediatozappdir_func_0x0
+mkdir jpg_common_port
+mkdir jpg_common_land
+mkdir jpg_top_land
+mkdir jpg_top_port
+mkdir jpg_girl_port
+mkdir jpg_girl_land
+mkdir jpg_lin_port
+mkdir jpg_lin_land
+mkdir gif_common_land
+mkdir gif_common_port
+mkdir gif_top_port
+mkdir gif_top_land
+mkdir mp4_common_land
+mkdir mp4_common_port
+mkdir mp4_top_port
+mkdir mp4_top_land
+mkdir mp4_single_port
+mkdir mp4_single_land
+mkdir mp4_raw_port
+mkdir mp4_raw_land
+mkdir mp4_hua_port
+mkdir mp4_hua_land
+mkdir mp4_dan_port
+mkdir mp4_dan_land
+call ::gettimeddhhmm_func_0x1
+set ddhhmmstr=!gettimeddhhmm_return_1!
+echo ddhhmmstr=!ddhhmmstr!
+dir /b /a-d /o-d /s "%init_cd%\Port_*.jpg"  > jpg_common_port.txt
+set /a index_jpg = 0
+set Z_jpg_port_dirname=jpg_common_port
+echo  mkdir !Z_jpg_port_dirname!
+for /f %%x in (jpg_common_port.txt) do (
+echo ___________[!index_jpg!_jpg]______________
+set jpg_file_fullpath=%%x
+set /a index_jpg+=1
+set oldname=%%~nx
+set newfileName_jpg_raw=!ddhhmmstr!_!index_jpg!_!oldname!%%~xx
+set newfileName_jpg=!newfileName_jpg_raw: =!
+echo [!index_jpg!_jpg] i=%%x  jpg_file_fullpath=!jpg_file_fullpath! index_jpg=!index_jpg! oldname=!oldname! newfileName_jpg_raw=!newfileName_jpg_raw! newfileName_jpg=!newfileName_jpg! xi=%%~xx  ni=%%~nx
+set itemfullpath=%%~sx
+rem  ren "%%i" "!newfileName!"
+rem echo f | xcopy /y D:\TEMP\0915\1.jpg  D:\TEMP\0915\A\1_1.jpg && del D:\TEMP\0915\1.jpg 
+echo echo f ^| xcopy /y "!itemfullpath!"  !init_cd!\!Z_jpg_port_dirname!\!newfileName_jpg!  ^&^& del  "!itemfullpath!"
+echo=
+echo f | xcopy /y "!itemfullpath!"  !init_cd!\!Z_jpg_port_dirname!\!newfileName_jpg!  && del  "!itemfullpath!"
+)
+rd /s/q  "!Z_jpg_port_dirname!_!index_jpg!"
+del jpg_common_port.txt
+dir /b /a-d /o-d /s "%init_cd%\Land_*.jpg"  > jpg_common_land.txt
+set /a index_jpg = 0
+set Z_jpg_land_dirname=jpg_common_land
+echo  mkdir !Z_jpg_land_dirname!
+for /f %%x in (jpg_common_land.txt) do (
+echo ___________[!index_jpg!_jpg]______________
+set jpg_file_fullpath=%%x
+set /a index_jpg+=1
+set oldname=%%~nx
+set newfileName_jpg_raw=!ddhhmmstr!_!index_jpg!_!oldname!%%~xx
+set newfileName_jpg=!newfileName_jpg_raw: =!
+echo [!index_jpg!_jpg] i=%%x  jpg_file_fullpath=!jpg_file_fullpath! index_jpg=!index_jpg! oldname=!oldname! newfileName_jpg_raw=!newfileName_jpg_raw! newfileName_jpg=!newfileName_jpg! xi=%%~xx  ni=%%~nx
+set itemfullpath=%%~sx
+rem  ren "%%i" "!newfileName!"
+rem echo f | xcopy /y D:\TEMP\0915\1.jpg  D:\TEMP\0915\A\1_1.jpg && del D:\TEMP\0915\1.jpg 
+echo echo f ^| xcopy /y "!itemfullpath!"  !init_cd!\!Z_jpg_land_dirname!\!newfileName_jpg!  ^&^& del  "!itemfullpath!"
+echo=
+echo f | xcopy /y "!itemfullpath!"  !init_cd!\!Z_jpg_land_dirname!\!newfileName_jpg!  && del  "!itemfullpath!"
+)
+rd /s/q  "!Z_jpg_land_dirname!_!index_jpg!"
+del jpg_common_land.txt
+dir /b /a-d /o-d /s "%init_cd%\Port_*.gif"  > gif_common_port.txt
+set /a index_gif = 0
+set Z_gif_port_dirname=gif_common_port
+echo  mkdir !Z_gif_port_dirname!
+for /f %%x in (gif_common_port.txt) do (
+echo ___________[!index_gif!_gif]______________
+set gif_file_fullpath=%%x
+set /a index_gif+=1
+set oldname=%%~nx
+set newfileName_gif_raw=!ddhhmmstr!_!index_gif!_!oldname!%%~xx
+set newfileName_gif=!newfileName_gif_raw: =!
+echo [!index_gif!_gif] i=%%x  gif_file_fullpath=!gif_file_fullpath! index_gif=!index_gif! oldname=!oldname! newfileName_gif_raw=!newfileName_gif_raw! newfileName_gif=!newfileName_gif! xi=%%~xx  ni=%%~nx
+set itemfullpath=%%~sx
+rem  ren "%%i" "!newfileName!"
+rem echo f | xcopy /y D:\TEMP\0915\1.gif  D:\TEMP\0915\A\1_1.gif && del D:\TEMP\0915\1.gif 
+echo echo f ^| xcopy /y "!itemfullpath!"  !init_cd!\!Z_gif_port_dirname!\!newfileName_gif!  ^&^& del  "!itemfullpath!"
+echo=
+echo f | xcopy /y "!itemfullpath!"  !init_cd!\!Z_gif_port_dirname!\!newfileName_gif!  && del  "!itemfullpath!"
+)
+rd /s/q  "!Z_gif_port_dirname!_!index_gif!"
+del gif_common_port.txt
+dir /b /a-d /o-d /s "%init_cd%\Land_*.gif"  > gif_common_land.txt
+set /a index_gif = 0
+set Z_gif_land_dirname=gif_common_land
+echo  mkdir !Z_gif_land_dirname!
+for /f %%x in (gif_common_land.txt) do (
+echo ___________[!index_gif!_gif]______________
+set gif_file_fullpath=%%x
+set /a index_gif+=1
+set oldname=%%~nx
+set newfileName_gif_raw=!ddhhmmstr!_!index_gif!_!oldname!%%~xx
+set newfileName_gif=!newfileName_gif_raw: =!
+echo [!index_gif!_gif] i=%%x  gif_file_fullpath=!gif_file_fullpath! index_gif=!index_gif! oldname=!oldname! newfileName_gif_raw=!newfileName_gif_raw! newfileName_gif=!newfileName_gif! xi=%%~xx  ni=%%~nx
+set itemfullpath=%%~sx
+rem  ren "%%i" "!newfileName!"
+rem echo f | xcopy /y D:\TEMP\0915\1.gif  D:\TEMP\0915\A\1_1.gif && del D:\TEMP\0915\1.gif 
+echo echo f ^| xcopy /y "!itemfullpath!"  !init_cd!\!Z_gif_land_dirname!\!newfileName_gif!  ^&^& del  "!itemfullpath!"
+echo=
+echo f | xcopy /y "!itemfullpath!"  !init_cd!\!Z_gif_land_dirname!\!newfileName_gif!  && del  "!itemfullpath!"
+)
+rd /s/q  "!Z_gif_land_dirname!_!index_gif!"
+del gif_common_land.txt
+dir /b /a-d /o-d /s "%init_cd%\Port_*.mp4"  > mp4_common_port.txt
+set /a index_mp4 = 0
+set Z_mp4_port_dirname=mp4_common_port
+echo  mkdir !Z_mp4_port_dirname!
+for /f %%x in (mp4_common_port.txt) do (
+echo ___________[!index_mp4!_mp4]______________
+set mp4_file_fullpath=%%x
+set /a index_mp4+=1
+set oldname=%%~nx
+set newfileName_mp4_raw=!ddhhmmstr!_!index_mp4!_!oldname!%%~xx
+set newfileName_mp4=!newfileName_mp4_raw: =!
+echo [!index_mp4!_mp4] i=%%x  mp4_file_fullpath=!mp4_file_fullpath! index_mp4=!index_mp4! oldname=!oldname! newfileName_mp4_raw=!newfileName_mp4_raw! newfileName_mp4=!newfileName_mp4! xi=%%~xx  ni=%%~nx
+set itemfullpath=%%~sx
+rem  ren "%%i" "!newfileName!"
+rem echo f | xcopy /y D:\TEMP\0915\1.mp4  D:\TEMP\0915\A\1_1.mp4 && del D:\TEMP\0915\1.mp4 
+echo echo f ^| xcopy /y "!itemfullpath!"  !init_cd!\!Z_mp4_port_dirname!\!newfileName_mp4!  ^&^& del  "!itemfullpath!"
+echo=
+echo f | xcopy /y "!itemfullpath!"  !init_cd!\!Z_mp4_port_dirname!\!newfileName_mp4!  && del  "!itemfullpath!"
+)
+rd /s/q  "!Z_mp4_port_dirname!_!index_mp4!"
+del mp4_common_port.txt
+dir /b /a-d /o-d /s "%init_cd%\Land_*.mp4"  > mp4_common_land.txt
+set /a index_mp4 = 0
+set Z_mp4_land_dirname=mp4_common_land
+echo  mkdir !Z_mp4_land_dirname!
+for /f %%x in (mp4_common_land.txt) do (
+echo ___________[!index_mp4!_mp4]______________
+set mp4_file_fullpath=%%x
+set /a index_mp4+=1
+set oldname=%%~nx
+set newfileName_mp4_raw=!ddhhmmstr!_!index_mp4!_!oldname!%%~xx
+set newfileName_mp4=!newfileName_mp4_raw: =!
+echo [!index_mp4!_mp4] i=%%x  mp4_file_fullpath=!mp4_file_fullpath! index_mp4=!index_mp4! oldname=!oldname! newfileName_mp4_raw=!newfileName_mp4_raw! newfileName_mp4=!newfileName_mp4! xi=%%~xx  ni=%%~nx
+set itemfullpath=%%~sx
+rem  ren "%%i" "!newfileName!"
+rem echo f | xcopy /y D:\TEMP\0915\1.mp4  D:\TEMP\0915\A\1_1.mp4 && del D:\TEMP\0915\1.mp4 
+echo echo f ^| xcopy /y "!itemfullpath!"  !init_cd!\!Z_mp4_land_dirname!\!newfileName_mp4!  ^&^& del  "!itemfullpath!"
+echo=
+echo f | xcopy /y "!itemfullpath!"  !init_cd!\!Z_mp4_land_dirname!\!newfileName_mp4!  && del  "!itemfullpath!"
+)
+rd /s/q  "!Z_mp4_land_dirname!_!index_mp4!"
+del mp4_common_land.txt
+echo [rule29vflitermediatozappdir_func_0x0 EndPrintCode]   output=[__empty__]  param1=[__empty__] 
+echo ______________Method_Out rule29vflitermediatozappdir_func_0x0
+::ENDLOCAL
+goto:eof
+
+
+
+
 :rule996vwindowsbomb_func_0x0
 rem ======================================== rule996vwindowsbomb_func_0x0
 rem rule_tip: %init_input_0% _996_     ## 不断循环打开关闭 CMD页面  感觉像 轰炸屏幕 寓意轰炸996  无奈下周修好电脑继续
@@ -4469,7 +4677,7 @@ echo %init_input_0% _13_   ## 对当前手机屏幕截屏并拉取到手机本�
 
 echo %init_input_0% _14_     ## 对当前手机屏幕录屏 然后拔出插入 使得mp4文件拉取到手机本地
 
-echo %init_input_0% _15_   100000   ##小米_有线USB_手机执行 adb -s c2f5b32c shell input swipe 340 1200 340 400 命令向下滑动两下向上滑动一下 默认10000次
+echo %init_input_0% _15_   100000   ## 有线USB_手机执行 adb  shell input swipe 340 1200 340 400 命令向下滑动两下向上滑动一下 默认10000次
 
 echo %init_input_0% _15_  c2f5b32c  100000    ##小米_有线USB_手机执行  adb -s c2f5b32c shell input swipe 340 1200 340 400 命令向下滑动两下向上滑动一下 默认10000次
 
@@ -4607,13 +4815,17 @@ echo %init_input_0% _27_   10ipend3_  ipport_  paircode_ pairport_     ## 对当
 
 echo %init_input_0% _27_   192ipend3_  ipport_  paircode_ pairport_     ## 对当前输入的 192ipend3(IP地址最后三位) 192.168.0.115 的 安卓设置进行无线连接
 
-echo %init_input_0% _28_   mediafilter_true  ## 搜索当前目录下的所有多媒体文件 把它们 统一归类到 一个文件类型的文件夹Z_jpg Z_mp4 Z_gif Z_avi Z_webp 中
+echo %init_input_0% _28_   mediafilter_true  ## 搜索所有(包含孙文件)当前目录下的所有多媒体文件 把它们 统一归类到 一个文件类型的文件夹Z_jpg Z_mp4 Z_gif Z_avi Z_webp 中
 
-echo %init_input_0% _28_   typefilter_xlsx  ## 搜索当前目录下指定的输入类例如[xlsx] 把它们 统一归类到 一个文件类型的文件夹Z_xlsx  文件目录中
+echo %init_input_0% _28_   typefilter_xlsx  ## 搜索所有(包含孙文件)当前目录下指定的输入类例如[xlsx] 把它们 统一归类到 一个文件类型的文件夹Z_xlsx  文件目录中
 
-echo %init_input_0% _28_   typefilter_txt  ## 搜索当前目录下指定的输入类例如[txt] 把它们 统一归类到 一个文件类型的文件夹Z_txt  文件目录中
+echo %init_input_0% _28_   typefilter_txt  ## 搜索所有(包含孙文件)当前目录下指定的输入类例如[txt] 把它们 统一归类到 一个文件类型的文件夹Z_txt  文件目录中
 
-echo %init_input_0% _28_   typefilter_java  ## 搜索当前目录下指定的输入类例如[java] 把它们 统一归类到 一个文件类型的文件夹Z_java  文件目录中
+echo %init_input_0% _28_   typefilter_java  ## 搜索所有(包含孙文件)当前目录下指定的输入类例如[java] 把它们 统一归类到 一个文件类型的文件夹Z_java  文件目录中
+
+echo %init_input_0% _29_  %init_input_0%  _29_    ## 过滤当前路径(不包括孙文件)下Port_Land命名的的jpg gif mp4到新建的zapp分类目录 jpg_common_land
+
+echo %init_input_0% _29_  %init_input_0%  _29_    ## 过滤当前路径(不包括孙文件)下Port_Land命名的的jpg gif mp4到新建的zapp分类目录 jpg_common_port
 
 echo %init_input_0% _996_     ## 不断循环打开关闭 CMD页面  感觉像 轰炸屏幕 寓意轰炸996  无奈下周修好电脑继续
 

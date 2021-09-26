@@ -738,6 +738,10 @@ public class H0_Tip {
         System.out.println();
 
 
+        System.out.println("________________ gif jpg png mp4 资源归统到 jpg_common_port[land]  gif_common_port[land]  mp4_common_port[land]____________ ");
+        System.out.println("zmpeg_ffmpeg_G8.bat 9 && zrule_apply_G2.bat #_44 &&  zrule_apply_G2.bat  && zrule_apply_G2.bat #_9  png_jpg  && zrule_apply_G2.bat   #_21_jpg_png_gif_webp  portland_true  &&  zbatrule_I9_Rule30.bat  _29_ \r\n"+ "");
+        System.out.println();
+        
 
         PrintHead_End(" 文件加密解密操作 End    ");
         
@@ -854,3 +858,8 @@ System.out.println();
 
 
 }
+
+
+//  zmpeg_ffmpeg_G8.bat 9 && zrule_apply_G2.bat #_44 &&  zrule_apply_G2.bat  && zrule_apply_G2.bat #_9  png_jpg  && zrule_apply_G2.bat   #_21_jpg_png_gif_webp  portland_true  &&  zbatrule_I9_Rule30.bat  _29_ 
+
+

@@ -395,7 +395,7 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
 
             }
             
-        	
+            int whilecount = 1;
         	//  检测哪些文件是 执行失败的 没有 创建 文件
         	int curMP4Count = curDirMP4FileList.size();
         	int jpgCount = 0;
@@ -411,12 +411,17 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
                 ArrayList<File> failedMP4FileList = calculFailedMP4(SuoTu_Mp4_Dir,curMp4NameNoTypeList);
 
                 System.out.println("failedMP4FileList.size()  = "+ failedMP4FileList.size());
-                 int whilecount = 1;
-                while(failedMP4FileList.size() > 0) {
+    
+                while(failedMP4FileList.size() > 0 && whilecount <= 10  ) {
                 	System.out.println("执行第 [ "+whilecount+" ] 次循环排除失败项 failedMP4FileList.size()="+failedMP4FileList.size());
                 	  generalSuoTu(failedMP4FileList);
                 	  failedMP4FileList = calculFailedMP4(SuoTu_Mp4_Dir,curMp4NameNoTypeList);
                 	  whilecount++;
+                }
+                
+                if(whilecount > 10) {
+                	System.out.println("尝试对Failed 文件进行 【"+whilecount+"】 次 创建缩略图操作仍然失败..... 程序执行OVER:");
+                	
                 }
         	 
         	
@@ -436,10 +441,10 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
         	}
         	
         	if(curMP4Count_end != jpgCount_end) {
-             	System.out.println("程序执行结束!!   尼玛 还是有失败_Failed!!  curMP4Count_end["+curMP4Count_end+"]"+"  jpgCount_end["+jpgCount_end +"] ");
+             	System.out.println("程序执行结束!!   尼玛 还是有失败_Failed!!  curMP4Count_end["+curMP4Count_end+"]"+"  jpgCount_end["+jpgCount_end +"]  whilecount=["+whilecount+"]");
         	}else {
         		
-             	System.out.println("程序执行结束!!  程序执行成功_OK!!  curMP4Count_end["+curMP4Count_end+"]"+"  jpgCount_end["+jpgCount_end +"] ");
+             	System.out.println("程序执行结束!!  程序执行成功_OK!!  curMP4Count_end["+curMP4Count_end+"]"+"  jpgCount_end["+jpgCount_end +"]  whilecount=["+whilecount+"]");
 
         	}
    

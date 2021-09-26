@@ -12558,7 +12558,17 @@ System.out.println("如果报错,将 webp-imageio.dll 等三个文件放入 win_
 				System.out.println(oldName + " 转为 " + newFilePath + " 成功！");
 				curFixedFileList.add(curFile);
 			} else {
-				System.out.println(oldName + " 转为 " + newFilePath + " 失败！");
+				String fileNameNoPoint = getFileNameNoPoint(newName);
+				String secondNewName = newName.replace(fileNameNoPoint, fileNameNoPoint+"_"+getTimeStampLong());
+				System.out.println(oldName + " 转为 " + newFilePath + " 失败1次！ 尝试使用新名称 secondNewName=["+secondNewName+"]");
+				String newSecondPath = curFile.getParent() + File.separator + secondNewName;
+				File secondFile = new File(newSecondPath);
+				flag = curFile.renameTo(secondFile);
+				if(flag) {
+					System.out.println(oldName + " 第二次转为 " + newFilePath + " 成功！");
+				}else {
+					System.out.println(oldName + " 第二次转为 " + newFilePath + " 仍然失败！");
+				}
 			}
 			return flag;
 		}

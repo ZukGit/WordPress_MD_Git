@@ -51,8 +51,12 @@ public class K2_NotepadTip  implements ClipboardOwner{
 
     public static void main(String[] args) {
         initSystemInfo();
-       String  mSearchTip =  	ShowNotepad_Search_Tip();
-       Copy_To_System_ClipBoard(mSearchTip);
+       String  mGPSSearchTip =  	Show_GPS_Notepad_Search_Tip();
+       Copy_To_System_ClipBoard(mGPSSearchTip);
+       
+       
+       String  mWIFISearchTip =  	Show_WIFI_Notepad_Search_Tip();
+       
 
        
         if(CUR_OS_TYPE == OS_TYPE.Windows){
@@ -99,8 +103,53 @@ public class K2_NotepadTip  implements ClipboardOwner{
     }
     
     
-    static String ShowNotepad_Search_Tip(){
-    	PrintHead_End("【Windos----NotePad++】搜索Tip");
+    static String Show_WIFI_Notepad_Search_Tip(){
+    	PrintHead_End("【Windos----NotePad++】搜索 Wifi_Tip");
+        System.out.println(OneLine+" Wifi 相关 正则表达式搜索Tip:");
+        ArrayList<String> logKeyList = new   ArrayList<String> ();
+        logKeyList.add("LOST_PROVISIONING");
+        logKeyList.add("wlan0: CTRL-EVENT");
+        logKeyList.add("no-internet access");
+        logKeyList.add("set country code");
+        logKeyList.add("AUTH failure");
+        logKeyList.add("Trying to associate");
+        
+        logKeyList.add("Bug2Go-BugReportService:");
+        logKeyList.add("Association Rejection event");
+        
+        logKeyList.add("com.android.settings.wifi.WifiSettings");
+        logKeyList.add("connection failed with");
+        logKeyList.add("vdev-0: Connecting to");
+        
+
+        //  persist.vendor.log.aplogd.enable     // GPS 的 GnssLocationProvider.java 的 Log 开关
+        
+        
+        StringBuilder printSB = new StringBuilder();
+        
+        for (int i = 0; i < logKeyList.size(); i++) {
+        	String logItem = logKeyList.get(i);
+        	printSB.append(logItem.trim()+"|");
+		}
+        
+        String printTip = printSB.toString();
+        while(printTip.endsWith("|")) {
+        	printTip = printTip.substring(0, printTip.length()-1);
+
+        }
+
+
+        PrintRule(printTip);
+
+        PrintADB_Logcat(printTip);
+
+        System.out.println();
+        return printTip;	
+    	
+    }
+    
+    static String Show_GPS_Notepad_Search_Tip(){
+    	PrintHead_End("【Windos----NotePad++】搜索 GPS_Tip");
         System.out.println(OneLine+" GPS 相关 正则表达式搜索Tip:");
         ArrayList<String> logKeyList = new   ArrayList<String> ();
         logKeyList.add("GPS_STATUS_SESSION_BEGIN");
