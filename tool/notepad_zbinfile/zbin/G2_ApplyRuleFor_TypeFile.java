@@ -2714,6 +2714,8 @@ System.out.println("paramItem["+i+"] = "+paramItem_lower_trim);
 		File mTencentRootFile; // C:\Users\xx\Documents\Tencent Files\ 目录 QQ使用
 		File mLastTxtFile; // 最新的 TXT 文件
 		ArrayList<String> urlStrList; // url 字符串列表
+		
+
 		File mDownloadedRootFile;
 		File mDownloadedMonthDir; // 在 G2_Monitor_Download/YYYYMM/ 年年年年月月的 目录文件
 
@@ -2724,6 +2726,12 @@ System.out.println("paramItem["+i+"] = "+paramItem_lower_trim);
 		// 下载的视频 是否 以 MD5 进行命名
 		boolean isMDName = false;
 
+		
+		// zcmd_run_[]//  
+		ArrayList<String> zcmdRunCommandList;  // 在 文件中 识别出的 zcmd_run_的命令的集合
+		
+		
+		
 		Monitor_WeChatFile_ForWindows_Rule_39() {
 			super("#", 39, 3); // 不包括
 			urlStrList = new ArrayList<String>();
@@ -2984,15 +2992,30 @@ System.out.println("paramItem["+i+"] = "+paramItem_lower_trim);
 						curUrlIndex_InTxtFile = 0;
 						for (int j = 0; j < fileContent.size(); j++) {
 							String lineStr = fileContent.get(j);
-							ArrayList<String> oneLineUrlList = new ArrayList<String>(); // 一行 中 可能 多个 url 列表
 							String strLine_trim_clearChinese = clearChinese(lineStr.trim());
+							
+							 // 一行 中 可能 多个 url 列表
+							ArrayList<String> oneLineUrlList = new ArrayList<String>();
+						
+							// 一行 中 可能 多个 zcmd_run_ 列表
+							ArrayList<String> oneLineZCmdRunCommandList = new ArrayList<String>(); 
+							
+							
+		
 							synchronized (this) {
 								toGetUrlFromOneLine_And_InitUrlList(strLine_trim_clearChinese, oneLineUrlList);
+								zcmd_run_toGetZCmdRunFromOneLine_And_InitZCmdList(lineStr, oneLineZCmdRunCommandList);
 							}
 							System.out.println("line[" + j + "] : str[" + lineStr + "]  clearChinese["
 									+ strLine_trim_clearChinese + "] result["
 									+ OperationWithOneLine(j, oneLineUrlList, fileNameNoPoint) + "]");
 
+							if(oneLineZCmdRunCommandList.size() >0 ) {
+								System.out.println("___________ zcmd_run_xxx Begin["+oneLineZCmdRunCommandList.size()+"] line["+j+"] ___________ ");	
+							     String comResult = 	zcmd_run_OperationWithOneLine(j, oneLineZCmdRunCommandList, fileNameNoPoint);
+								System.out.println("zcomResult: "+comResult);
+							     System.out.println("___________ zcmd_run_xxx End["+oneLineZCmdRunCommandList.size()+"] line["+j+"] ___________ ");	
+							}
 						}
 						System.out.println("════════════════ OVER ═════════════════");
 
@@ -3012,6 +3035,30 @@ System.out.println("paramItem["+i+"] = "+paramItem_lower_trim);
 			return mat.replaceAll(" ");
 		}
 
+		
+		// 执行 zcmd_run_ 的程序
+		String zcmd_run_OperationWithOneLine(int index, ArrayList<String> zcmdRunStrList, String fileNameNoPoint) {
+			String tipMessage = null;
+			if (zcmdRunStrList == null || zcmdRunStrList.size() == 0) {
+				tipMessage = " 当前zcmd_run_xxx  运行命令为空 无逻辑执行";
+				return tipMessage;
+			}
+			
+			StringBuilder tipSb = new StringBuilder();
+			for (int i = 0; i < zcmdRunStrList.size(); i++) {
+				String strLine = zcmdRunStrList.get(i);
+				System.out.println("_______________zmd_run_["+i+"]  commond["+strLine+"] Begin ____");
+				tipSb.append("["+i+"]"+"["+strLine+"]");
+				execCMD(strLine);
+				System.out.println("_______________zmd_run_["+i+"]  commond["+strLine+"] End ____");
+
+			}
+			
+
+			return "zcmd_run_执行【"+tipSb.toString()+"】";
+		}
+		
+		
 		String OperationWithOneLine(int index, ArrayList<String> strLineList, String fileNameNoPoint) {
 			String tipMessage = null;
 			if (strLineList == null || strLineList.size() == 0) {
@@ -4017,6 +4064,54 @@ System.out.println("paramItem["+i+"] = "+paramItem_lower_trim);
 			}
 
 		}
+		
+		
+		
+		// 对每行的数据检查是否有 zcmd_run_ 之类的 运行命令
+
+		
+		public  void zcmd_run_toGetZCmdRunFromOneLine_And_InitZCmdList(String rowString, ArrayList<String> zcmdrunStrList) {
+			String[] strArrRow = null;
+			String fixStr = "";
+
+//	        if(str.trim().startsWith("http:") || str.trim().startsWith("https:") ||
+//	                str.trim().startsWith("thunder:") ||   str.trim().startsWith("magnet::") ){
+
+			if(!rowString.contains("zcmd_run_")) {
+				System.out.println("当前行 rowString="+rowString+" 不包含标识符 【zcmd_run_】 命令执行失败!");
+				return;
+			}
+		
+			
+			if (rowString != null) {
+				fixStr = new String(rowString);
+				// http://xxxxxx/sahttp:// 避免出现 http://http: 连着的情况 起码也要使得间隔一个空格
+				fixStr = fixStr.replace("zcmd_run_", " zcmd_run_");
+
+				strArrRow = fixStr.split("zcmd_run_");
+			}
+
+			if (strArrRow != null && strArrRow.length > 0) {
+
+				for (int i = 0; i < strArrRow.length; i++) {
+					String mCommandItem = strArrRow[i];
+					System.out.println("strArrRow["+i+"] = "+ mCommandItem);
+					if (mCommandItem == null || mCommandItem.trim().equals("") ) {
+						continue;
+					}
+
+					mCommandItem =  mCommandItem.replace("zcmd_run_", "");
+					System.out.println("zcmd_run_xxx rowString["+rowString+"]"+"  mCommandItem = ["+ mCommandItem+"] " );
+					zcmdrunStrList.add(mCommandItem.trim());
+					
+
+
+				}
+
+			}
+
+		}
+		
 
 		/*
 		 * @Override String simpleDesc() {

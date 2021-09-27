@@ -1002,9 +1002,13 @@ GOTO:EOF
 echo cur_path_item_existflag=false__[!cur_path_item_existflag!]
 echo 当前添加到 系统环境变量PATH中的Dir项 %cur_path_item% 不存在  将执行%cur_path_item% 加入到PATH的操作
 )
+
 echo 执行添加 %1 到系统环境变量的命令如下:
-echo  setx "Path" "%1;%path%" /m
-setx "Path" "%1;%path%" /m
+call ::clearstringpadding_func_1x1 %1
+set path_no_padding=!clearstringpadding_return_1!
+echo clear padding result str ___ path_no_padding[!path_no_padding!]   path_no_paddingA[%path_no_padding%]  clearstringpadding_return_1=[!clearstringpadding_return_1!] param1=[%1]   
+echo  setx "Path" "!path_no_padding!;%path%" /m
+setx "Path" "!path_no_padding!;%path%" /m
 echo [addpathenvironment_func_1x0 EndPrintCode]    output=[__empty__] param1=[%1]   
 echo ______________Method_Out addpathenvironment_func_1x0
 ::ENDLOCAL
@@ -3129,13 +3133,15 @@ echo ffmpeg_dir_fullpath=!ffmpeg_dir_fullpath!  ffmpeg_file_fullpath=!ffmpeg_fil
 echo  win_zbin_dir_fullpath=%win_zbin%
 echo pythonscript_dir_fullpath=!python_dir_fullpath!Scripts
 rem  addpathenvironment_func_1x0  添加到环境变量  检查环境变量是否有这个值 如果有 跳过   没有 就加入 
-call ::addpathenvironment_func_1x0 %win_zbin%
-call ::addpathenvironment_func_1x0 !python_dir_fullpath!Scripts
-call ::addpathenvironment_func_1x0 !ffmpeg_dir_fullpath!
-call ::addpathenvironment_func_1x0 !notepad_dir_fullpath!
-call ::addpathenvironment_func_1x0 !python_dir_fullpath!
-call ::addpathenvironment_func_1x0 !java_dir_fullpath!
-call ::addpathenvironment_func_1x0 !javac_dir_fullpath!
+rem  call ::addpathenvironment_func_1x0 %win_zbin%
+rem  call ::addpathenvironment_func_1x0 !python_dir_fullpath!Scripts
+rem  call ::addpathenvironment_func_1x0 !ffmpeg_dir_fullpath!
+rem  call ::addpathenvironment_func_1x0 !notepad_dir_fullpath!
+rem  call ::addpathenvironment_func_1x0 !python_dir_fullpath!
+rem  call ::addpathenvironment_func_1x0 !java_dir_fullpath!
+rem  call ::addpathenvironment_func_1x0 !javac_dir_fullpath!
+set all_environment_var="!win_zbin!;!python_dir_fullpath!Scripts;!ffmpeg_dir_fullpath!;!notepad_dir_fullpath!;!python_dir_fullpath!;!java_dir_fullpath!;!javac_dir_fullpath!"
+call ::addpathenvironment_func_1x0  !all_environment_var!
 echo ____________________________ java python win_zbin ffmpeg notepad++ 添加到环境变量 End  ____________________________
 
 echo ____________________________ java 执行 %desktop%\zbin\J1_InstallSoftware.java Begin  ____________________________
@@ -4000,6 +4006,11 @@ mkdir mp4_hua_port
 mkdir mp4_hua_land
 mkdir mp4_dan_port
 mkdir mp4_dan_land
+mkdir mp4_sss_port
+mkdir mp4_sss_land
+mkdir mp4_anim_port
+mkdir mp4_anim_land
+
 )
 if "%init_input_2%"=="mkdir_zmain" (
 set rule26vmakedirwithtemplate_dynamic_param1=%init_input_2%
@@ -4404,6 +4415,11 @@ mkdir mp4_hua_port
 mkdir mp4_hua_land
 mkdir mp4_dan_port
 mkdir mp4_dan_land
+mkdir mp4_sss_port
+mkdir mp4_sss_land
+mkdir mp4_anim_port
+mkdir mp4_anim_land
+mkdir Z_SSS
 call ::gettimeddhhmm_func_0x1
 set ddhhmmstr=!gettimeddhhmm_return_1!
 echo ddhhmmstr=!ddhhmmstr!
@@ -4901,6 +4917,13 @@ call :getrandomintwithmaxmin_func_2x1  1000 10000
 echo getrandomintwithmaxmin_return_1=!getrandomintwithmaxmin_return_1!
 call :isadminuser_func_0x1
 echo  isadminuser_return_1=!isadminuser_return_1!
+
+
+
+
+
+rem set all_environment_var="!win_zbin!;!desktop!;!init_cd!;!zbin!;!init_userprofile!"
+rem call ::addpathenvironment_func_1x0  !all_environment_var!
 
 rem call :isemptydirfile_func_1x1 !init_cd!
 rem echo isemptydirfile_return_1=!isemptydirfile_return_1!
