@@ -756,6 +756,32 @@ goto:eof
 
 
 
+:getfilerownum_func_1x1
+rem ======================================== getfilerownum_func_1x1
+rem desc: 动态计算当前给定文件的行数并返回
+rem sample: call :getfilerownum_func_1x1  %zbin%/A0.bat
+rem sample_out: [getfilerownum_func_1x1 ]   getfilerownum_return_1=[10]   param1=[C:\Users\xxx\Desktop\zbin\A0.bat]
+::SETLOCAL
+echo ______________Method_In getfilerownum_func_1x1
+set getfilerownum_return_1=0
+if exist %1 (
+for /f %%a in (' find /c /v "" ^<"%1" ') do set rownum=%%a
+
+set getfilerownum_return_1=!rownum!
+echo rownum[!rownum!]  getfilerownum_return_1[!getfilerownum_return_1!]
+echo %1 Zukgit  File Exist
+) else (
+echo %1 Zukgit  File Do Not Exist
+)
+echo [getfilerownum_func_1x1 EndPrintCode]   getfilerownum_return_1=[!getfilerownum_return_1!]   param1=[%1]   
+echo ______________Method_Out getfilerownum_func_1x1
+::ENDLOCAL
+goto:eof
+
+
+
+
+
 
 :isrealfile_func_1x1
 rem ======================================== isrealfile_func_1x1
@@ -4419,11 +4445,16 @@ mkdir mp4_sss_port
 mkdir mp4_sss_land
 mkdir mp4_anim_port
 mkdir mp4_anim_land
-mkdir Z_SSS
+mkdir z_sss
+mkdir z_webp
 call ::gettimeddhhmm_func_0x1
 set ddhhmmstr=!gettimeddhhmm_return_1!
 echo ddhhmmstr=!ddhhmmstr!
 dir /b /a-d /o-d /s "%init_cd%\Port_*.jpg"  > jpg_common_port.txt
+ping -n 1 127.0.0.1>nul 
+call ::getfilerownum_func_1x1  %init_cd%\jpg_common_port.txt
+set jpg_common_port_rownum=!getfilerownum_return_1!
+echo getfilerownum_return_1[!getfilerownum_return_1!]  jpg_common_port_rownum[!jpg_common_port_rownum!]
 set /a index_jpg = 0
 set Z_jpg_port_dirname=jpg_common_port
 echo  mkdir !Z_jpg_port_dirname!
@@ -4432,7 +4463,7 @@ echo ___________[!index_jpg!_jpg]______________
 set jpg_file_fullpath=%%x
 set /a index_jpg+=1
 set oldname=%%~nx
-set newfileName_jpg_raw=!ddhhmmstr!_!index_jpg!_!oldname!%%~xx
+set newfileName_jpg_raw=!ddhhmmstr!_!index_jpg!_!jpg_common_port_rownum!_!oldname!%%~xx
 set newfileName_jpg=!newfileName_jpg_raw: =!
 echo [!index_jpg!_jpg] i=%%x  jpg_file_fullpath=!jpg_file_fullpath! index_jpg=!index_jpg! oldname=!oldname! newfileName_jpg_raw=!newfileName_jpg_raw! newfileName_jpg=!newfileName_jpg! xi=%%~xx  ni=%%~nx
 set itemfullpath=%%~sx
@@ -4445,6 +4476,11 @@ echo f | xcopy /y "!itemfullpath!"  !init_cd!\!Z_jpg_port_dirname!\!newfileName_
 rd /s/q  "!Z_jpg_port_dirname!_!index_jpg!"
 del jpg_common_port.txt
 dir /b /a-d /o-d /s "%init_cd%\Land_*.jpg"  > jpg_common_land.txt
+ping -n 1 127.0.0.1>nul 
+call ::getfilerownum_func_1x1  %init_cd%\jpg_common_land.txt
+set jpg_common_land_rownum=!getfilerownum_return_1!
+echo getfilerownum_return_1[!getfilerownum_return_1!]  jpg_common_land_rownum[!jpg_common_land_rownum!]
+
 set /a index_jpg = 0
 set Z_jpg_land_dirname=jpg_common_land
 echo  mkdir !Z_jpg_land_dirname!
@@ -4453,7 +4489,7 @@ echo ___________[!index_jpg!_jpg]______________
 set jpg_file_fullpath=%%x
 set /a index_jpg+=1
 set oldname=%%~nx
-set newfileName_jpg_raw=!ddhhmmstr!_!index_jpg!_!oldname!%%~xx
+set newfileName_jpg_raw=!ddhhmmstr!_!index_jpg!_!jpg_common_land_rownum!_!oldname!%%~xx
 set newfileName_jpg=!newfileName_jpg_raw: =!
 echo [!index_jpg!_jpg] i=%%x  jpg_file_fullpath=!jpg_file_fullpath! index_jpg=!index_jpg! oldname=!oldname! newfileName_jpg_raw=!newfileName_jpg_raw! newfileName_jpg=!newfileName_jpg! xi=%%~xx  ni=%%~nx
 set itemfullpath=%%~sx
@@ -4466,6 +4502,11 @@ echo f | xcopy /y "!itemfullpath!"  !init_cd!\!Z_jpg_land_dirname!\!newfileName_
 rd /s/q  "!Z_jpg_land_dirname!_!index_jpg!"
 del jpg_common_land.txt
 dir /b /a-d /o-d /s "%init_cd%\Port_*.gif"  > gif_common_port.txt
+ping -n 1 127.0.0.1>nul 
+call ::getfilerownum_func_1x1  %init_cd%\gif_common_port.txt
+set gif_common_port_rownum=!getfilerownum_return_1!
+echo getfilerownum_return_1[!getfilerownum_return_1!]  gif_common_port_rownum[!gif_common_port_rownum!]
+
 set /a index_gif = 0
 set Z_gif_port_dirname=gif_common_port
 echo  mkdir !Z_gif_port_dirname!
@@ -4474,7 +4515,7 @@ echo ___________[!index_gif!_gif]______________
 set gif_file_fullpath=%%x
 set /a index_gif+=1
 set oldname=%%~nx
-set newfileName_gif_raw=!ddhhmmstr!_!index_gif!_!oldname!%%~xx
+set newfileName_gif_raw=!ddhhmmstr!_!index_gif!_!gif_common_port_rownum!_!oldname!%%~xx
 set newfileName_gif=!newfileName_gif_raw: =!
 echo [!index_gif!_gif] i=%%x  gif_file_fullpath=!gif_file_fullpath! index_gif=!index_gif! oldname=!oldname! newfileName_gif_raw=!newfileName_gif_raw! newfileName_gif=!newfileName_gif! xi=%%~xx  ni=%%~nx
 set itemfullpath=%%~sx
@@ -4487,6 +4528,12 @@ echo f | xcopy /y "!itemfullpath!"  !init_cd!\!Z_gif_port_dirname!\!newfileName_
 rd /s/q  "!Z_gif_port_dirname!_!index_gif!"
 del gif_common_port.txt
 dir /b /a-d /o-d /s "%init_cd%\Land_*.gif"  > gif_common_land.txt
+ping -n 1 127.0.0.1>nul 
+call ::getfilerownum_func_1x1  %init_cd%\gif_common_land.txt
+set gif_common_land_rownum=!getfilerownum_return_1!
+echo getfilerownum_return_1[!getfilerownum_return_1!]  gif_common_land_rownum[!gif_common_land_rownum!]
+
+
 set /a index_gif = 0
 set Z_gif_land_dirname=gif_common_land
 echo  mkdir !Z_gif_land_dirname!
@@ -4495,7 +4542,7 @@ echo ___________[!index_gif!_gif]______________
 set gif_file_fullpath=%%x
 set /a index_gif+=1
 set oldname=%%~nx
-set newfileName_gif_raw=!ddhhmmstr!_!index_gif!_!oldname!%%~xx
+set newfileName_gif_raw=!ddhhmmstr!_!index_gif!_!gif_common_land_rownum!_!oldname!%%~xx
 set newfileName_gif=!newfileName_gif_raw: =!
 echo [!index_gif!_gif] i=%%x  gif_file_fullpath=!gif_file_fullpath! index_gif=!index_gif! oldname=!oldname! newfileName_gif_raw=!newfileName_gif_raw! newfileName_gif=!newfileName_gif! xi=%%~xx  ni=%%~nx
 set itemfullpath=%%~sx
@@ -4508,6 +4555,11 @@ echo f | xcopy /y "!itemfullpath!"  !init_cd!\!Z_gif_land_dirname!\!newfileName_
 rd /s/q  "!Z_gif_land_dirname!_!index_gif!"
 del gif_common_land.txt
 dir /b /a-d /o-d /s "%init_cd%\Port_*.mp4"  > mp4_common_port.txt
+ping -n 1 127.0.0.1>nul 
+call ::getfilerownum_func_1x1  %init_cd%\mp4_common_port.txt
+set mp4_common_port_rownum=!getfilerownum_return_1!
+echo getfilerownum_return_1[!getfilerownum_return_1!]  mp4_common_port_rownum[!mp4_common_port_rownum!]
+
 set /a index_mp4 = 0
 set Z_mp4_port_dirname=mp4_common_port
 echo  mkdir !Z_mp4_port_dirname!
@@ -4516,7 +4568,7 @@ echo ___________[!index_mp4!_mp4]______________
 set mp4_file_fullpath=%%x
 set /a index_mp4+=1
 set oldname=%%~nx
-set newfileName_mp4_raw=!ddhhmmstr!_!index_mp4!_!oldname!%%~xx
+set newfileName_mp4_raw=!ddhhmmstr!_!index_mp4!_!mp4_common_port_rownum!_!oldname!%%~xx
 set newfileName_mp4=!newfileName_mp4_raw: =!
 echo [!index_mp4!_mp4] i=%%x  mp4_file_fullpath=!mp4_file_fullpath! index_mp4=!index_mp4! oldname=!oldname! newfileName_mp4_raw=!newfileName_mp4_raw! newfileName_mp4=!newfileName_mp4! xi=%%~xx  ni=%%~nx
 set itemfullpath=%%~sx
@@ -4529,6 +4581,11 @@ echo f | xcopy /y "!itemfullpath!"  !init_cd!\!Z_mp4_port_dirname!\!newfileName_
 rd /s/q  "!Z_mp4_port_dirname!_!index_mp4!"
 del mp4_common_port.txt
 dir /b /a-d /o-d /s "%init_cd%\Land_*.mp4"  > mp4_common_land.txt
+ping -n 1 127.0.0.1>nul 
+call ::getfilerownum_func_1x1  %init_cd%\mp4_common_land.txt
+set mp4_common_land_rownum=!getfilerownum_return_1!
+echo getfilerownum_return_1[!getfilerownum_return_1!]  mp4_common_land_rownum[!mp4_common_land_rownum!]
+
 set /a index_mp4 = 0
 set Z_mp4_land_dirname=mp4_common_land
 echo  mkdir !Z_mp4_land_dirname!
@@ -4537,7 +4594,7 @@ echo ___________[!index_mp4!_mp4]______________
 set mp4_file_fullpath=%%x
 set /a index_mp4+=1
 set oldname=%%~nx
-set newfileName_mp4_raw=!ddhhmmstr!_!index_mp4!_!oldname!%%~xx
+set newfileName_mp4_raw=!ddhhmmstr!_!index_mp4!_!mp4_common_land_rownum!_!oldname!%%~xx
 set newfileName_mp4=!newfileName_mp4_raw: =!
 echo [!index_mp4!_mp4] i=%%x  mp4_file_fullpath=!mp4_file_fullpath! index_mp4=!index_mp4! oldname=!oldname! newfileName_mp4_raw=!newfileName_mp4_raw! newfileName_mp4=!newfileName_mp4! xi=%%~xx  ni=%%~nx
 set itemfullpath=%%~sx
@@ -4839,9 +4896,9 @@ echo %init_input_0% _28_   typefilter_txt  ## 搜索所有(包含孙文件)当�
 
 echo %init_input_0% _28_   typefilter_java  ## 搜索所有(包含孙文件)当前目录下指定的输入类例如[java] 把它们 统一归类到 一个文件类型的文件夹Z_java  文件目录中
 
-echo %init_input_0% _29_  %init_input_0%  _29_    ## 过滤当前路径(不包括孙文件)下Port_Land命名的的jpg gif mp4到新建的zapp分类目录 jpg_common_land
+echo %init_input_0% _29_      ## 过滤当前路径(不包括孙文件)下Port_Land命名的的jpg gif mp4到新建的zapp分类目录 jpg_common_land
 
-echo %init_input_0% _29_  %init_input_0%  _29_    ## 过滤当前路径(不包括孙文件)下Port_Land命名的的jpg gif mp4到新建的zapp分类目录 jpg_common_port
+echo %init_input_0% _29_     ## 过滤当前路径(不包括孙文件)下Port_Land命名的的jpg gif mp4到新建的zapp分类目录 jpg_common_port
 
 echo %init_input_0% _996_     ## 不断循环打开关闭 CMD页面  感觉像 轰炸屏幕 寓意轰炸996  无奈下周修好电脑继续
 
@@ -4913,14 +4970,15 @@ rem ======================== 主函数main函数入口
 echo __________________ Main_Method Begin _______________________
 call ::helloworld_func_0x0
 call ::recordfilenametofile_func_1x1 %zbin%
-call :getrandomintwithmaxmin_func_2x1  1000 10000
+call ::getrandomintwithmaxmin_func_2x1  1000 10000
 echo getrandomintwithmaxmin_return_1=!getrandomintwithmaxmin_return_1!
-call :isadminuser_func_0x1
+call ::isadminuser_func_0x1
 echo  isadminuser_return_1=!isadminuser_return_1!
 
 
 
-
+rem call ::getfilerownum_func_1x1  D:/TEMP/0415/K3_MD_Rule.java
+rem echo getfilerownum_return_1[!getfilerownum_return_1!]
 
 rem set all_environment_var="!win_zbin!;!desktop!;!init_cd!;!zbin!;!init_userprofile!"
 rem call ::addpathenvironment_func_1x0  !all_environment_var!

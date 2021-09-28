@@ -8567,12 +8567,16 @@ System.out.println("targetType = "+targetType +"    originType="+ originType);
 		ArrayList<String> fliterTypeList;
 		ArrayList<File> mSrcFileImage; // 符合 过滤 条件的 当前目录的文件夹的集合
 		boolean isPortLandNamed;   //  是否 以  port 和 Name 添加前缀 
+		
+		boolean isClearBlank;    // 是否是把当前目录的文件中包含的空格去除  另外的操作逻辑
 
 		Rename_Img_WithSize_Rule_21() {
 			super("#", 21, 4); //
 			fliterTypeList = new ArrayList<String>();
 			mSrcFileImage = new ArrayList<File>();
 			isPortLandNamed = false;
+			isClearBlank = false;
+			
 		}
 
 		
@@ -8588,6 +8592,11 @@ System.out.println("targetType = "+targetType +"    originType="+ originType);
 					
 				}
 				
+				
+				if(inputParam.contains("clearblank_true")) {
+					isClearBlank = true;
+					
+				}
 				
 				boolean isGifInput = false;
 				if (inputParam.contains("gif")) {
@@ -8622,7 +8631,13 @@ System.out.println("targetType = "+targetType +"    originType="+ originType);
 				}
 				
 				
+		
 				
+			}
+			
+			if(isClearBlank) {
+				fliterTypeList.clear();
+				fliterTypeList.add("*");
 			}
 			
 			System.out.println("isPortLandNamed = "+ isPortLandNamed +"  isEmptyTypeInput="+isEmptyTypeInput);
@@ -8669,6 +8684,39 @@ System.out.println("targetType = "+targetType +"    originType="+ originType);
 		ArrayList<File> applySubFileListRule4(ArrayList<File> curFileList,
 				HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList,
 				ArrayList<File> curRealFileList) {
+			
+			if(isClearBlank) {
+				int blankIndex = 0 ;
+				
+				for (int i = 0; i < curRealFileList.size(); i++) {
+					File fileItem = curRealFileList.get(i);
+					String fileName = fileItem.getName();
+					String fileName_lower = fileName.toLowerCase();
+					if(fileItem.isDirectory()) {
+						continue;
+					}
+					
+					
+					if(fileName.contains(" ")) {
+						// 去除 名称 中的 空格 
+						String newName = fileName.replace(" ", "");
+						tryReName(fileItem, newName);
+						System.out.println("去除空格文件["+blankIndex+"] oldname["+fileName+"]  newname["+newName+"]");
+						blankIndex++;
+					}
+					
+					
+
+				}
+				
+				
+				
+				System.out.println("RealFile Clear Blank  实体文件 清除空格 执行完成! ");
+
+				return super.applySubFileListRule4(curFileList, subFileTypeMap, curDirList, curRealFileList);
+		
+				
+			}
 
 			for (int i = 0; i < curRealFileList.size(); i++) {
 				File fileItem = curRealFileList.get(i);
@@ -8787,6 +8835,9 @@ System.out.println("targetType = "+targetType +"    originType="+ originType);
 				itemDesc += batName.trim() + Cur_Batch_End + "  " + type + "_" + index + "_jpg_png_gif_webp" + "  portland_true "
 						+ "    #### [索引 " + index + "]  描述: " + desc_B + "\n";
 				
+				itemDesc += batName.trim() + Cur_Batch_End + "  " + type + "_" + index + "" + "  clearblank_true "
+						+ "    #### [索引 " + index + "]  描述: " + "## 清除当前目录下的包含有空格的文件名称 去除空格" + "\n";
+				
 			} else {
 				itemDesc = batName.trim() + Cur_Batch_End + "  " + type + "_" + index + "" + "    #### [索引 " + index
 						+ "]  描述: " + desc_A + "\n";
@@ -8804,6 +8855,10 @@ System.out.println("targetType = "+targetType +"    originType="+ originType);
 						+ "    #### [索引 " + index + "]  描述: " + desc_A + "\n";
 				itemDesc += batName.trim() + Cur_Batch_End + "  " + type + "_" + index + "_jpg_png_gif_webp"
 						+ "    #### [索引 " + index + "]  描述: " + desc_B + "\n";
+		
+				itemDesc += batName.trim() + Cur_Batch_End + "  " + type + "_" + index + "" + "  clearblank_true "
+						+ "    #### [索引 " + index + "]  描述: " + "## 清除当前目录下的包含有空格的文件名称 去除空格" + "\n";
+				
 			}
 			return itemDesc;
 
