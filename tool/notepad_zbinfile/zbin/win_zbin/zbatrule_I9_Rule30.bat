@@ -4446,7 +4446,19 @@ mkdir mp4_sss_land
 mkdir mp4_anim_port
 mkdir mp4_anim_land
 mkdir z_sss
+mkdir z_sss\zz_unknow_land\ 
+mkdir z_sss\zz_unknow_port\
+mkdir z_sss\korean_land\  
+mkdir z_sss\other\        
+mkdir z_sss\tandan_port\  
+mkdir z_sss\tanhua_port\
+mkdir z_sss\korean_port\  
+mkdir z_sss\tandan_land\  
+mkdir z_sss\tanhua_land\
 mkdir z_webp
+mkdir z_temp_land
+mkdir z_temp_port
+
 call ::gettimeddhhmm_func_0x1
 set ddhhmmstr=!gettimeddhhmm_return_1!
 echo ddhhmmstr=!ddhhmmstr!
