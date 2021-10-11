@@ -756,6 +756,7 @@ goto:eof
 
 
 
+
 :getfilerownum_func_1x1
 rem ======================================== getfilerownum_func_1x1
 rem desc: 动态计算当前给定文件的行数并返回
@@ -766,7 +767,6 @@ echo ______________Method_In getfilerownum_func_1x1
 set getfilerownum_return_1=0
 if exist %1 (
 for /f %%a in (' find /c /v "" ^<"%1" ') do set rownum=%%a
-
 set getfilerownum_return_1=!rownum!
 echo rownum[!rownum!]  getfilerownum_return_1[!getfilerownum_return_1!]
 echo %1 Zukgit  File Exist
@@ -777,8 +777,6 @@ echo [getfilerownum_func_1x1 EndPrintCode]   getfilerownum_return_1=[!getfilerow
 echo ______________Method_Out getfilerownum_func_1x1
 ::ENDLOCAL
 goto:eof
-
-
 
 
 
@@ -1028,7 +1026,6 @@ GOTO:EOF
 echo cur_path_item_existflag=false__[!cur_path_item_existflag!]
 echo 当前添加到 系统环境变量PATH中的Dir项 %cur_path_item% 不存在  将执行%cur_path_item% 加入到PATH的操作
 )
-
 echo 执行添加 %1 到系统环境变量的命令如下:
 call ::clearstringpadding_func_1x1 %1
 set path_no_padding=!clearstringpadding_return_1!
@@ -2206,6 +2203,81 @@ echo [helloworld_func_0x0 EndPrintCode]   output=[__empty__]  param1=[__empty__]
 echo ______________Method_Out helloworld_func_0x0
 ::ENDLOCAL
 goto:eof
+
+
+
+
+:showlove_func_0x0
+rem ======================================== showlove_func_0x0
+rem desc: showlove测试程序
+rem sample: 
+rem sample_out: 
+::SETLOCAL
+echo ______________Method_In showlove_func_0x0
+mode con cols=75 lines=28
+echo.
+echo                    *********               *********
+ping -n 1 127.0.0.1>nul
+echo                ****************           *****************
+ping -n 1 127.0.0.1>nul
+echo           **********************       ************************
+ping -n 1 127.0.0.1>nul
+echo        ***********************************************************
+ping -n 1 127.0.0.1>nul
+echo      ***************************************************************
+ping -n 1 127.0.0.1>nul
+echo     *****************************************************************
+ping -n 1 127.0.0.1>nul
+echo    -------------------------------------------------------------------
+ping -n 1 127.0.0.1>nul
+echo                                亲爱的XXX
+ping -n 1 127.0.0.1>nul
+echo     -----------------------------------------------------------------
+ping -n 1 127.0.0.1>nul
+echo      ******** 我 ***************************************************
+ping -n 1 127.0.0.1>nul
+echo        *************** 爱 ****************************************
+ping -n 1 127.0.0.1>nul
+echo          ********************* 你 ******************************
+ping -n 1 127.0.0.1>nul
+echo            *****************，********************************
+ping -n 1 127.0.0.1>nul
+echo              ***********************************************
+ping -n 1 127.0.0.1>nul
+echo                ********* 一 ******************************
+ping -n 1 127.0.0.1>nul
+echo                  ********** 生 *************************
+ping -n 1 127.0.0.1>nul
+echo                    *********** 一 ********************
+ping -n 1 127.0.0.1>nul
+echo                      ************ 世 ***************
+ping -n 1 127.0.0.1>nul
+echo                        **************！***********
+ping -n 1 127.0.0.1>nul
+echo                          ***********************
+ping -n 1 127.0.0.1>nul
+echo                            *******************
+ping -n 1 127.0.0.1>nul
+echo                              ***************
+ping -n 1 127.0.0.1>nul
+echo                                ***********
+ping -n 1 127.0.0.1>nul
+echo                                  *******
+ping -n 1 127.0.0.1>nul
+echo                                    ***
+ping -n 1 127.0.0.1>nul
+echo                                     * 
+ping -n 1 127.0.0.1>nul
+for /l %%i in (1, 1, 1000) do (
+set /a dj=!random!%%9
+color !dj!f
+ping -n 1.7 127.0.0.1>nul
+)
+echo [showlove_func_0x0 EndPrintCode]   output=[__empty__]  param1=[__empty__] 
+echo ______________Method_Out showlove_func_0x0
+::ENDLOCAL
+goto:eof
+
 
 
 
@@ -4036,12 +4108,15 @@ mkdir mp4_sss_port
 mkdir mp4_sss_land
 mkdir mp4_anim_port
 mkdir mp4_anim_land
-
+mkdir mp4_toto_port
+mkdir mp4_toto_land
 )
 if "%init_input_2%"=="mkdir_zmain" (
 set rule26vmakedirwithtemplate_dynamic_param1=%init_input_2%
 mkdir jpg_common_port
 mkdir jpg_common_land
+mkdir jpg_gaokao_land
+mkdir jpg_kaoyan_land
 mkdir jpg_scene_port
 mkdir jpg_scene_land
 mkdir jpg_home_port
@@ -4057,6 +4132,8 @@ mkdir mp4_scene_port
 mkdir mp4_scene_land
 mkdir mp4_music_port
 mkdir mp4_music_land
+mkdir mp4_kaoyan_land
+mkdir mp4_gaokao_land
 mkdir mp3
 )
 echo rule26vmakedirwithtemplate_dynamic_param1=%init_input_2%
@@ -4409,9 +4486,9 @@ goto:eof
 
 :rule29vflitermediatozappdir_func_0x0
 rem ======================================== rule29vflitermediatozappdir_func_0x0
-rem rule_tip: %init_input_0% _29_  %init_input_0%  _29_    ## 过滤当前路径(不包括孙文件)下Port_Land命名的的jpg gif mp4到新建的zapp分类目录 jpg_common_land
+rem rule_tip: %init_input_0% _29_       ## 过滤当前路径(不包括孙文件)下Port_Land命名的的jpg gif mp4到新建的zapp分类目录 jpg_common_land
 
-rem rule_tip: %init_input_0% _29_  %init_input_0%  _29_    ## 过滤当前路径(不包括孙文件)下Port_Land命名的的jpg gif mp4到新建的zapp分类目录 jpg_common_port
+rem rule_tip: %init_input_0% _29_      ## 过滤当前路径(不包括孙文件)下Port_Land命名的的jpg gif mp4到新建的zapp分类目录 jpg_common_port
 rem desc: 
 rem sample: 
 rem sample_out: 
@@ -4445,6 +4522,10 @@ mkdir mp4_sss_port
 mkdir mp4_sss_land
 mkdir mp4_anim_port
 mkdir mp4_anim_land
+mkdir mp4_toto_land
+mkdir mp4_toto_port
+mkdir mp4_fake_port
+mkdir mp4_fake_land
 mkdir z_sss
 mkdir z_sss\zz_unknow_land\ 
 mkdir z_sss\zz_unknow_port\
@@ -4466,10 +4547,10 @@ mkdir z_sss\yzzzz\
 mkdir z_sss\xcny\
 mkdir z_sss\stym\
 mkdir z_sss\thy\
+mkdir z_sss\dyf\
 mkdir z_webp
-mkdir z_mp4_temp_land
-mkdir z_mp4_temp_port
-
+mkdir zzmp4_temp_land
+mkdir zzmp4_temp_port
 call ::gettimeddhhmm_func_0x1
 set ddhhmmstr=!gettimeddhhmm_return_1!
 echo ddhhmmstr=!ddhhmmstr!
@@ -4503,7 +4584,6 @@ ping -n 1 127.0.0.1>nul
 call ::getfilerownum_func_1x1  %init_cd%\jpg_common_land.txt
 set jpg_common_land_rownum=!getfilerownum_return_1!
 echo getfilerownum_return_1[!getfilerownum_return_1!]  jpg_common_land_rownum[!jpg_common_land_rownum!]
-
 set /a index_jpg = 0
 set Z_jpg_land_dirname=jpg_common_land
 echo  mkdir !Z_jpg_land_dirname!
@@ -4529,7 +4609,6 @@ ping -n 1 127.0.0.1>nul
 call ::getfilerownum_func_1x1  %init_cd%\gif_common_port.txt
 set gif_common_port_rownum=!getfilerownum_return_1!
 echo getfilerownum_return_1[!getfilerownum_return_1!]  gif_common_port_rownum[!gif_common_port_rownum!]
-
 set /a index_gif = 0
 set Z_gif_port_dirname=gif_common_port
 echo  mkdir !Z_gif_port_dirname!
@@ -4555,8 +4634,6 @@ ping -n 1 127.0.0.1>nul
 call ::getfilerownum_func_1x1  %init_cd%\gif_common_land.txt
 set gif_common_land_rownum=!getfilerownum_return_1!
 echo getfilerownum_return_1[!getfilerownum_return_1!]  gif_common_land_rownum[!gif_common_land_rownum!]
-
-
 set /a index_gif = 0
 set Z_gif_land_dirname=gif_common_land
 echo  mkdir !Z_gif_land_dirname!
@@ -4582,7 +4659,6 @@ ping -n 1 127.0.0.1>nul
 call ::getfilerownum_func_1x1  %init_cd%\mp4_common_port.txt
 set mp4_common_port_rownum=!getfilerownum_return_1!
 echo getfilerownum_return_1[!getfilerownum_return_1!]  mp4_common_port_rownum[!mp4_common_port_rownum!]
-
 set /a index_mp4 = 0
 set Z_mp4_port_dirname=mp4_common_port
 echo  mkdir !Z_mp4_port_dirname!
@@ -4608,7 +4684,6 @@ ping -n 1 127.0.0.1>nul
 call ::getfilerownum_func_1x1  %init_cd%\mp4_common_land.txt
 set mp4_common_land_rownum=!getfilerownum_return_1!
 echo getfilerownum_return_1[!getfilerownum_return_1!]  mp4_common_land_rownum[!mp4_common_land_rownum!]
-
 set /a index_mp4 = 0
 set Z_mp4_land_dirname=mp4_common_land
 echo  mkdir !Z_mp4_land_dirname!
@@ -4634,6 +4709,23 @@ echo ______________Method_Out rule29vflitermediatozappdir_func_0x0
 ::ENDLOCAL
 goto:eof
 
+
+
+
+
+:rule30vshowlove_func_0x0
+rem ======================================== rule30vshowlove_func_0x0
+rem rule_tip: %init_input_0% _30_   ##  打印爱心并闪屏
+rem desc: 
+rem sample: 
+rem sample_out: 
+::SETLOCAL
+echo ______________Method_In rule30vshowlove_func_0x0
+call ::showlove_func_0x0
+echo [rule30vshowlove_func_0x0 EndPrintCode]   output=[__empty__]  param1=[__empty__] 
+echo ______________Method_Out rule30vshowlove_func_0x0
+::ENDLOCAL
+goto:eof
 
 
 
@@ -4919,9 +5011,11 @@ echo %init_input_0% _28_   typefilter_txt  ## 搜索所有(包含孙文件)当�
 
 echo %init_input_0% _28_   typefilter_java  ## 搜索所有(包含孙文件)当前目录下指定的输入类例如[java] 把它们 统一归类到 一个文件类型的文件夹Z_java  文件目录中
 
-echo %init_input_0% _29_      ## 过滤当前路径(不包括孙文件)下Port_Land命名的的jpg gif mp4到新建的zapp分类目录 jpg_common_land
+echo %init_input_0% _29_       ## 过滤当前路径(不包括孙文件)下Port_Land命名的的jpg gif mp4到新建的zapp分类目录 jpg_common_land
 
-echo %init_input_0% _29_     ## 过滤当前路径(不包括孙文件)下Port_Land命名的的jpg gif mp4到新建的zapp分类目录 jpg_common_port
+echo %init_input_0% _29_      ## 过滤当前路径(不包括孙文件)下Port_Land命名的的jpg gif mp4到新建的zapp分类目录 jpg_common_port
+
+echo %init_input_0% _30_      ##  打印爱心并闪屏
 
 echo %init_input_0% _996_     ## 不断循环打开关闭 CMD页面  感觉像 轰炸屏幕 寓意轰炸996  无奈下周修好电脑继续
 
@@ -4999,6 +5093,9 @@ call ::isadminuser_func_0x1
 echo  isadminuser_return_1=!isadminuser_return_1!
 
 
+echo startup_dir=%USERPROFILE%\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup  
+
+rem call ::showlove_func_0x0
 
 rem call ::getfilerownum_func_1x1  D:/TEMP/0415/K3_MD_Rule.java
 rem echo getfilerownum_return_1[!getfilerownum_return_1!]

@@ -120,6 +120,14 @@ public class K2_NotepadTip  implements ClipboardOwner{
         logKeyList.add("com.android.settings.wifi.WifiSettings");
         logKeyList.add("connection failed with");
         logKeyList.add("vdev-0: Connecting to");
+        logKeyList.add("WifiService: setWifiEnabled"); 
+        logKeyList.add("WifiNative: Could not get Iface"); 
+
+        logKeyList.add("Failed to load WiFi driver"); 
+
+        
+        
+        
         
 
         //  persist.vendor.log.aplogd.enable     // GPS 的 GnssLocationProvider.java 的 Log 开关

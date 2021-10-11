@@ -967,11 +967,11 @@ System.out.println("paramItem["+i+"] = "+paramItem_lower_trim);
 			}
 
 			if (is_gaokao) {
-				video_url_prefix = "D:/Git_Dir/zschool/zschool_media/gaokao_mp4/";
-				image_url_prefix = "/public/zimage/zschool_media/gaokao_jpg/";
+				video_url_prefix = "D:/Git_Dir/zschool/zschool_media/mp4_gaokao_land/";
+				image_url_prefix = "/public/zimage/zschool_media/jpg_gaokao_land/";
 			} else {
-				video_url_prefix = "D:/Git_Dir/zschool/zschool_media/kaoyan_mp4/";
-				image_url_prefix = "/public/zimage/zschool_media/kaoyan_jpg/";
+				video_url_prefix = "D:/Git_Dir/zschool/zschool_media/mp4_kaoyan_land/";
+				image_url_prefix = "/public/zimage/zschool_media/jpg_kaoyan_land/";
 			}
 
 			// TODO Auto-generated method stub
@@ -1442,7 +1442,7 @@ System.out.println("paramItem["+i+"] = "+paramItem_lower_trim);
 				segerate_MdContentList.add("tags: Math");
 				segerate_MdContentList.add("keywords: 数学 高考");
 				segerate_MdContentList.add("typora-root-url: ..\\..\\");
-				segerate_MdContentList.add("typora-copy-images-to: ..\\..\\public\\zimage\\zschool_media\\gaokao_jpg");
+				segerate_MdContentList.add("typora-copy-images-to: ..\\..\\public\\zimage\\zschool_media\\jpg_gaokao_land");
 
 
 			} else if(is_kaoyan) {
@@ -1451,7 +1451,7 @@ System.out.println("paramItem["+i+"] = "+paramItem_lower_trim);
 				segerate_MdContentList.add("tags: Math");
 				segerate_MdContentList.add("keywords: 数学 考研");
 				segerate_MdContentList.add("typora-root-url: ..\\..\\");
-				segerate_MdContentList.add("typora-copy-images-to: ..\\..\\public\\zimage\\zschool_media\\kaoyan_jpg");
+				segerate_MdContentList.add("typora-copy-images-to: ..\\..\\public\\zimage\\zschool_media\\jpg_kaoyan_land");
 
 				
 				//   追加   到mMdContentList  后面的 一些信息
