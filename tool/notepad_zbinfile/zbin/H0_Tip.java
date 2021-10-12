@@ -628,7 +628,7 @@ public class H0_Tip {
         System.out.println("设置环境变量  Setting -> StartUp -> Environment  输入如下的配置信息: ");
         System.out.println();
         System.out.println("set PATH=%ConEmuBaseDir%\\Scripts;%PATH%\n" +
-                "set PATH=%USERPROFILE%\\Desktop\\zbin\\win_zbin;%USERPROFILE%\\Desktop\\zbin\\python;%PATH%\n" +
+                "set PATH=%USERPROFILE%\\Desktop\\zbin\\win_zbin;%USERPROFILE%\\Desktop\\zbin\\win_pbin;%USERPROFILE%\\Desktop\\zbin\\python;%PATH%\n" +
                 "set PATH=%USERPROFILE%\\Desktop\\zbin\\lin_zbin;%USERPROFILE%\\Desktop\\zbin\\mac_zbin;%PATH%\n" +
                 "\n" +
                 "alias gits=git status\n" +
@@ -655,7 +655,7 @@ public class H0_Tip {
 
     	
         System.out.println("________________________ 【1970ZVI】【批量解密】【当前有子目录1970ZVI解析为1970ZVI_Good】 ________________________");
-        System.out.println("zrule_apply_G2"+BAT_OR_SH_Point+" " +"#_7_good_zvi  && cd ./1970ZVI_Good && cd ./ZVI_Individual  && zrule_apply_G2"+BAT_OR_SH_Point+" " +"#_9  _mp4 && zrule_apply_G2"+BAT_OR_SH_Point+" " +" #_26 mp4  && zrule_apply_G2"+BAT_OR_SH_Point+" " +" #_13_mp4 && zrule_apply_G2"+BAT_OR_SH_Point+" " +" #_12_mp4  && cd .. && cd ./ZVI_Position  && zrule_apply_G2"+BAT_OR_SH_Point+" " +"#_9  _mp4 && zrule_apply_G2"+BAT_OR_SH_Point+" " +" #_26 mp4   && zrule_apply_G2"+BAT_OR_SH_Point+" " +" #_13_mp4  && zrule_apply_G2"+BAT_OR_SH_Point+" " +" #_12_mp4  && cd .. && cd ./Z_SSS && zrule_apply_G2"+BAT_OR_SH_Point+" " +"#_9  _mp4 && cd .. && cd ./ZVI_mp4 && zrule_apply_G2"+BAT_OR_SH_Point+" " +"#_9  _mp4 && cd ..  &&  zrule_apply_G2"+BAT_OR_SH_Point+" " +" #_12_mp4 ./ZVI_mp4 &&  cd ./zapp    &&  zrule_apply_G2"+BAT_OR_SH_Point+" " +" #_27  _jpg  &&  zrule_apply_G2"+BAT_OR_SH_Point+" " +" #_27 _mp4  && zrule_apply_G2"+BAT_OR_SH_Point+" " +" #_27  _gif &&  zrule_apply_G2"+BAT_OR_SH_Point+" " +" #_12_jpg  &&  zrule_apply_G2"+BAT_OR_SH_Point+" " +" #_12_mp4 &&  zrule_apply_G2"+BAT_OR_SH_Point+" " +" #_12_gif");
+        System.out.println("zrule_apply_G2"+BAT_OR_SH_Point+" " +"#_7_good_zvi  && cd ./1970ZVI_Good && cd ./ZVI_Individual  && zrule_apply_G2"+BAT_OR_SH_Point+" " +"#_9  _mp4 && zrule_apply_G2"+BAT_OR_SH_Point+" " +" #_26 mp4  && zrule_apply_G2"+BAT_OR_SH_Point+" " +" #_13_mp4 && zrule_apply_G2"+BAT_OR_SH_Point+" " +" #_12_mp4  && cd .. && cd ./ZVI_Position  && zrule_apply_G2"+BAT_OR_SH_Point+" " +"#_9  _mp4 && zrule_apply_G2"+BAT_OR_SH_Point+" " +" #_26 mp4   && zrule_apply_G2"+BAT_OR_SH_Point+" " +" #_13_mp4  && zrule_apply_G2"+BAT_OR_SH_Point+" " +" #_12_mp4  && cd .. && cd ./z_sss && zrule_apply_G2"+BAT_OR_SH_Point+" " +"#_9  _mp4 && cd .. && cd ./ZVI_mp4 && zrule_apply_G2"+BAT_OR_SH_Point+" " +"#_9  _mp4 && cd ..  &&  zrule_apply_G2"+BAT_OR_SH_Point+" " +" #_12_mp4 ./ZVI_mp4 &&  cd ./zapp    &&  zrule_apply_G2"+BAT_OR_SH_Point+" " +" #_27  _jpg  &&  zrule_apply_G2"+BAT_OR_SH_Point+" " +" #_27 _mp4  && zrule_apply_G2"+BAT_OR_SH_Point+" " +" #_27  _gif &&  zrule_apply_G2"+BAT_OR_SH_Point+" " +" #_12_jpg  &&  zrule_apply_G2"+BAT_OR_SH_Point+" " +" #_12_mp4 &&  zrule_apply_G2"+BAT_OR_SH_Point+" " +" #_12_gif");
         System.out.println();
         System.out.println();
         

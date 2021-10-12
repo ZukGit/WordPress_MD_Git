@@ -5,6 +5,8 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.qrcode.BufferedImageLuminanceSource;
 import cn.hutool.extra.qrcode.QrCodeUtil;
 import cn.hutool.extra.qrcode.QrConfig;
+import cn.hutool.http.HttpRequest;
+import cn.hutool.http.HttpResponse;
 import cn.hutool.http.HttpUtil;
 import cn.hutool.json.JSONUtil;
 import cn.hutool.system.JavaRuntimeInfo;
@@ -33,6 +35,7 @@ import org.json.JSONException;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
@@ -426,6 +429,10 @@ public class I9_TextRuleOperation {
 		// 去除当前空白的一行  使得文本紧凑
 		CUR_RULE_LIST.add(new Clear_Blank_Line_Rule_42());
 
+		
+		// 对python代码的 格式进行格式化使得符合编译要求进格为4 8 12 16,不能有 tab 制表符
+		CUR_RULE_LIST.add(new Format_PythonCode_Rule_43());
+		
 //        CUR_RULE_LIST.add( new Image2Png_Rule_4());
 //        CUR_RULE_LIST.add( new AVI_Rule_5());
 //        CUR_RULE_LIST.add( new SubDirRename_Rule_6());
@@ -433,7 +440,223 @@ public class I9_TextRuleOperation {
 //        CUR_RULE_LIST.add( new ClearChineseType_8());
 
 	}
+	
+	
+	
+	
 
+	class Format_PythonCode_Rule_43 extends Basic_Rule {
+
+		ArrayList<String> needAddBlankTagList ; // 需要新起一行并需要后撤4步的 关键字的集合
+		
+		 //  每行行数作为 key   每行的起始的空格作为 value 组成的 Map
+		HashMap<Integer,Integer> linenumBlankCountMap;
+		
+		//  每行行数作为 key   每行的起始字符串作为 value 组成的 Map
+		HashMap<Integer,String>  linenumFirstCharMap; 
+		
+		// 匹配到的 以 关键字作为key  起始的 行数的集合 作为 value 组成的 Map 
+		HashMap<String,ArrayList<Integer>> backTagMatchRownumMap;
+		
+		Format_PythonCode_Rule_43() {
+			super(43, false);
+			needAddBlankTagList  = new ArrayList<String> ();
+			linenumBlankCountMap = new HashMap<Integer,Integer>();
+			linenumFirstCharMap = new HashMap<Integer,String>();
+			backTagMatchRownumMap = new HashMap<String,ArrayList<Integer>>();
+			
+			initBack4StepTag();
+		}
+		
+		void addBack4StepTag(String tag) {
+			needAddBlankTagList.add(tag+" ");
+		}
+		
+		// tab 键  需要 转为 4 个 空格键
+		// 需要 回退 4步   并 是以: 为 结尾字符的 Tag 关键字集合 
+		void initBack4StepTag() {
+			//  #  井号 可以 不处理  直接放在 首字母位置 
+
+			addBack4StepTag("def");
+			addBack4StepTag("class");
+			addBack4StepTag("if");
+			addBack4StepTag("else");
+			addBack4StepTag("elif");
+			addBack4StepTag("try");
+			addBack4StepTag("except");
+			addBack4StepTag("for");
+			
+		}
+		
+		@Override
+		String simpleDesc() {
+			return " 对python代码的 格式进行格式化使得符合编译要求进格为4 8 12 16,不能有 tab 制表符 ";
+		}
+
+		
+
+		@Override
+		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+			for (int i = 0; i < curInputFileList.size(); i++) {
+				File fileItem = curInputFileList.get(i);
+
+				ArrayList<String> fixed_blank_List = new ArrayList<String> ();
+				ArrayList<String> rawContent = 	ReadFileContentAsList(fileItem);
+				
+				ArrayList<String> fixedPythonCode = new ArrayList<String>();
+
+
+				for (int j = 0; j < rawContent.size(); j++) {
+					int rownum = j+1;   // 当前的行数
+					String lineStr = rawContent.get(j);
+					String line_clearTab = lineStr.replace("	", "");
+					
+					if("".equals(line_clearTab.trim())) {
+						// 当前行是一个空格 加入 空行到新组成的集合中
+						fixedPythonCode.add("");
+						linenumBlankCountMap.put(rownum, 0);
+						linenumFirstCharMap.put(rownum, "");
+						continue;
+					}
+					//   获取当前行的空格的个数
+							
+					int backstepCount = calBlankStepCount(line_clearTab);
+					String firstWord = calFirstWord(line_clearTab);
+					linenumBlankCountMap.put(rownum, backstepCount);
+					linenumFirstCharMap.put(rownum, firstWord);
+					if(needAddBlankTagList.contains(firstWord)) {
+						
+					ArrayList<Integer> matchRowNumList = 	backTagMatchRownumMap.get(firstWord);
+					if(matchRowNumList == null) {
+						matchRowNumList = new ArrayList<Integer>();
+					}
+		
+					matchRowNumList.add(rownum);
+				
+					backTagMatchRownumMap.put(firstWord, matchRowNumList);
+						
+					}
+					
+					if(backstepCount%4 != 0) {
+						int neareastNum = calculNearNum(backstepCount);
+						System.out.println("第【"+rownum+"】行代码 缩进值有问题 该缩进值为【"+backstepCount+"】 neareastNum=【"+neareastNum+"】");
+						// 修复这个缩进值
+						String line_clearTab_trim = line_clearTab.trim();
+		
+						String line_clearTab_fixed = getRepeatStr(" ", neareastNum)+line_clearTab_trim;
+						fixedPythonCode.add(line_clearTab_fixed);
+						continue;
+					}
+					
+					fixedPythonCode.add(line_clearTab);
+				}
+
+				//  把  数据 写入 原 有的 代码中去 
+				writeContentToFile(fileItem, fixedPythonCode);
+				NotePadOpenTargetFile(fileItem.getAbsolutePath());
+
+
+
+			}
+
+			return super.applyOperationRule(curFileList, subFileTypeMap, curDirList, curRealFileList);
+		}
+		
+		
+	    public  int calculNearNum(int stepNum) {
+	    	if(stepNum % 4 == 0) {
+	    		return stepNum;
+	    	}
+	    	int resultInt  =  stepNum;
+	    	
+	    	int step_add_1 = stepNum+1;
+	    	int step_del_1 = stepNum-1;
+	    	
+	    	if(step_add_1 % 4 == 0) {
+	    		return step_add_1;
+	    	}
+	    	
+	    	if(step_del_1 % 4 == 0) {
+	    		return step_del_1;
+	    	}
+	    	
+	    	
+	    	int step_add_2 = stepNum+2;
+	    	int step_del_2 = stepNum-2;
+	    	
+	    	if(step_del_2 % 4 == 0) {
+	    		return step_del_2;
+	    	}
+	    	
+	    	
+	    	if(step_add_2 % 4 == 0) {
+	    		return step_add_2;
+	    	}
+	    	
+
+	    	
+	   		return stepNum;
+	    	
+	    	
+	    }
+	    
+		
+	    public  String getRepeatStr(String rawStr  , int count) {
+	    	StringBuilder sb = new StringBuilder();
+	    	for (int i = 0; i < count; i++) {
+	    		sb.append(rawStr);
+			}
+	    	
+	    	return sb.toString();
+	    	
+	    }
+		
+	    public  String calFirstWord(String lineStr) {
+	    	int blankStepCount = 0;
+	    	String line_rime = lineStr.trim();
+	    	int line_trim_Size = line_rime.length();
+	    	StringBuilder sb = new StringBuilder();
+	    	
+	    	for (int i = 0; i < line_trim_Size; i++) {
+	    		
+	    		String oneWord  = line_rime.charAt(i)+"";
+	    		if(" ".equals(oneWord)) {
+	    			break;
+	    		}
+	    		sb.append(oneWord);
+			}
+	 
+	    	
+	    	 
+	    	return  sb.toString();
+	    	
+	    	
+	    } 
+	    public  int calBlankStepCount(String lineStr) {
+	    	int blankStepCount = 0;
+	    	
+	    	int lineSize = lineStr.length();
+	    	
+	    	for (int i = 0; i < lineSize; i++) {
+	    		
+	    		String oneWord  = lineStr.charAt(i)+"";
+	    		if(" ".equals(oneWord)) {
+	    			continue;
+	    		}
+	    		return i;
+			}
+	 
+	    	
+	    	 
+	    	return  blankStepCount;
+	    	
+	    	
+	    } 
+
+		
+	}
+	
 
 
 	class Clear_Blank_Line_Rule_42 extends Basic_Rule {
@@ -906,6 +1129,24 @@ public class I9_TextRuleOperation {
 
 
 
+	   static class BliBliVideoInfo {  // 真实项目中不推荐直接使用`public`哦😯
+
+	        public String videoName;
+	        public JSONObject videoInfo;
+	        public String videoBaseUrl;
+	        public String audioBaseUrl;
+	        public String videoBaseRange;
+	        public String audioBaseRange;
+	        public String videoSize;
+	        public String audioSize;
+	        
+	   @Override
+		public String toString() {
+			// TODO Auto-generated method stub
+			return "\n videoName[ "+videoName+" ] \n videoBaseUrl[ "+videoBaseUrl+" ]  \naudioBaseUrl[ "+audioBaseUrl+" ]  \nvideoSize[ "+videoSize+" ]   \naudioSize[ "+audioSize+" ]";
+		}
+	    }
+	   
 	public static class TwitterVideo {
 		public long duration;
 		public long size;
@@ -967,7 +1208,7 @@ public class I9_TextRuleOperation {
 
 		@Override
 		String simpleDesc() {
-			return "  检测 当前 txt文件中的 url 路径(抖音 头条 快手 tw fb 视频)   并尝试下载这个 url 对应的文件到本地 tile_时间戳.mp4 并在temp文件打印url列表";
+			return "  检测 当前 txt文件中的 url 路径(抖音 头条 快手 tw bli 视频)   并尝试下载这个 url 对应的文件到本地 tile_时间戳.mp4 并在temp文件打印url列表";
 		}
 
 		@Override
@@ -1065,6 +1306,11 @@ public class I9_TextRuleOperation {
 				TouTiao_XiGua_Download(index ,url);
 				videoUrlList.add(url);
 
+			}else if(url.contains("https://www.bilibili.com/video")) {
+				// https://www.bilibili.com/video/BV1xb4y1Z741?from=search&seid=15286481463758585446&spm_id_from=333.337.0.0
+				BliBli_Download(index ,url);
+				videoUrlList.add(url);
+
 			}else if(url.contains("https://twitter.com")) {
 				// 	// https://twitter.com/PDChinese/status/1427649465826033672?s=19
 				TW_Download(index ,url);
@@ -1073,10 +1319,26 @@ public class I9_TextRuleOperation {
 			}
 
 		}
+		
+		
+		
+		void BliBli_Download(int index , String urlitem) {
+			if(!ChromeDriverFile.exists()) {
+				System.out.println("当前 ChroneDriver.exe["+ChromeDriverFile.getAbsolutePath()+"] 文件不存在 请检查当前 chrome版本 并去 http://npm.taobao.org/mirrors/chromedriver/ 下载对应版本的 chromedriver.exe 才能执行 头条西瓜视频的下载 ");
+				return;
+			}
+
+//			if(urlitem.startsWith("https://www.ixigua.com/") || urlitem.startsWith("https://m.toutiaoimg.cn/") ) {
+			BliBli_ParseUrl(index,urlitem);
+//			XiGua_TouTiao_ParseUrl(index,urlitem);
+//			}
+
+		}
+		
 
 		void TouTiao_XiGua_Download(int index , String urlitem) {
 			if(!ChromeDriverFile.exists()) {
-				System.out.println("当前 ChroneDriver.exe 文件不存在 请检查当前 chrome版本 并去 http://npm.taobao.org/mirrors/chromedriver/ 下载对应版本的 chromedriver.exe 才能执行 头条西瓜视频的下载 ");
+				System.out.println("当前 ChroneDriver.exe["+ChromeDriverFile.getAbsolutePath()+"] 文件不存在 请检查当前 chrome版本 并去 http://npm.taobao.org/mirrors/chromedriver/ 下载对应版本的 chromedriver.exe 才能执行 头条西瓜视频的下载 ");
 				return;
 			}
 
@@ -1087,7 +1349,228 @@ public class I9_TextRuleOperation {
 
 		}
 
+		
+		
+		
+		void BliBli_ParseUrl(int index , String url) {
+			// String
+			// url="https://www.bilibili.com/video/BV1xb4y1Z741?from=search&seid=15286481463758585446&spm_id_from=333.337.0.0";
 
+			org.jsoup.nodes.Document document;
+			String jiemi_base64_url = null;
+			String base64_jiami_url = null;
+			String NoMainUrl_VideoTag_url = null ;  // 对于 没有 main_url 但 有 <video src="http" //这样的页面的处理
+			BliBliVideoInfo   mBliBli_VIDEO_INFO = new BliBliVideoInfo();
+
+			try {
+			String mainHtml = 	getXiGua_BliBli_MainPageSource(url);
+				document = Jsoup.parse(mainHtml);
+				
+	
+		        Element title = document.getElementsByTag("title").first();
+		        // 视频名称
+		        mBliBli_VIDEO_INFO.videoName = title.text();
+		        // 截取视频信息<script>window.__playinfo__=
+		        Pattern pattern = Pattern.compile("(?<=<script>window.__playinfo__=).*?(?=</script>)");
+		        Matcher matcher = pattern.matcher(mainHtml);
+		        if (matcher.find()) {
+		            String group = matcher.group();
+//		            System.out.println("group = " + group);
+		            mBliBli_VIDEO_INFO.videoInfo = JSONObject.parseObject(group);
+		        } else {
+		            System.err.println("未匹配到视频信息，退出程序！");
+		            return;
+		        }
+		        getBliBliVideoInfo(url,mBliBli_VIDEO_INFO);
+				
+				
+				
+				
+
+			}catch (Exception e) {
+				System.out.println("XiGua_TouTiao_ParseUrl  Exception e =" + e);
+			}
+		}
+		
+
+		
+
+	    /**
+	     * 解析视频和音频的具体信息
+	     */
+	    public  void getBliBliVideoInfo(String videoUrl , BliBliVideoInfo mBliBli_VIDEO_INFO) {
+	        // 获取视频的基本信息
+	    	com.alibaba.fastjson.JSONObject videoInfo = mBliBli_VIDEO_INFO.videoInfo;
+	        System.out.println("videoInfo = "+ videoInfo);
+	        com.alibaba.fastjson.JSONArray videoInfoArr = videoInfo.getJSONObject("data").getJSONObject("dash").getJSONArray("video");
+	        mBliBli_VIDEO_INFO.videoBaseUrl = videoInfoArr.getJSONObject(0).getString("baseUrl");
+	        mBliBli_VIDEO_INFO.videoBaseRange = videoInfoArr.getJSONObject(0).getJSONObject("SegmentBase")
+	            .getString("Initialization");
+	    
+	        String USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.163 Safari/537.36";
+
+	        HttpResponse videoRes = HttpRequest.get(mBliBli_VIDEO_INFO.videoBaseUrl)
+	            .header("Referer", videoUrl)
+	            .header("Range", "bytes=" + mBliBli_VIDEO_INFO.videoBaseRange)
+	            .header("User-Agent", USER_AGENT)
+	            .timeout(2000)
+	            .execute();
+	        mBliBli_VIDEO_INFO.videoSize = videoRes.header("Content-Range").split("/")[1];
+
+	        // 获取音频基本信息
+	        com.alibaba.fastjson.JSONArray audioInfoArr = videoInfo.getJSONObject("data").getJSONObject("dash")
+	            .getJSONArray("audio");
+	        mBliBli_VIDEO_INFO.audioBaseUrl = audioInfoArr.getJSONObject(0).getString("baseUrl");
+	        mBliBli_VIDEO_INFO.audioBaseRange = audioInfoArr.getJSONObject(0).getJSONObject("SegmentBase")
+	            .getString("Initialization");
+	        HttpResponse audioRes = HttpRequest.get(mBliBli_VIDEO_INFO.audioBaseUrl)
+	            .header("Referer", videoUrl)
+	            .header("Range", "bytes=" + mBliBli_VIDEO_INFO.audioBaseRange)
+	            .header("User-Agent", USER_AGENT)
+	            .timeout(2000)
+	            .execute();
+	        mBliBli_VIDEO_INFO.audioSize = audioRes.header("Content-Range").split("/")[1];
+
+	        System.out.println("VIDEO_INFO = 【"+mBliBli_VIDEO_INFO+"】");
+	        download_BliBli_File(videoUrl,mBliBli_VIDEO_INFO);
+	    }
+
+	    /**
+	     * 下载音视频
+	     */
+	    public  void download_BliBli_File(String videoUrl, BliBliVideoInfo mBliBli_VIDEO_INFO) {
+	        // 保存音视频的位置
+	    
+
+	        
+			String fileAddress_notype_str = videoSavePath+"/"+"blibli"+"_"+index_download+"_"+timeStamp_Str;
+			fileAddress_notype_str = clearChinese(fileAddress_notype_str);
+			fileAddress_notype_str = fileAddress_notype_str.replace(" ", "");
+			fileAddress_notype_str = fileAddress_notype_str.replace("	", "");
+			fileAddress_notype_str = fileAddress_notype_str.replace("！", "");
+			fileAddress_notype_str = fileAddress_notype_str.replace("!", "");
+			fileAddress_notype_str = fileAddress_notype_str.replace("，", "");
+			fileAddress_notype_str = fileAddress_notype_str.replace("：", "");
+			fileAddress_notype_str = fileAddress_notype_str.replace("《", "");
+			fileAddress_notype_str = fileAddress_notype_str.replace("？", "");
+			fileAddress_notype_str = fileAddress_notype_str.replace("。", "");
+			
+
+	        // 下载视频
+	        File videoFile = new File(fileAddress_notype_str + "_video.mp4");
+	        String USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.163 Safari/537.36";
+
+	        
+	        if (!videoFile.exists()) {
+	            System.out.println("--------------开始下载视频文件-------------- VIDEO_INFO.videoBaseUrl[ "+mBliBli_VIDEO_INFO.videoBaseUrl+" ]  VIDEO_INFO.videoSize["+mBliBli_VIDEO_INFO.videoSize+"]");
+	            HttpResponse videoRes = HttpRequest.get(mBliBli_VIDEO_INFO.videoBaseUrl)
+	                .header("Referer", videoUrl)
+	                .header("Range", "bytes=0-" + mBliBli_VIDEO_INFO.videoSize)
+	                .header("User-Agent", USER_AGENT)
+	                .execute();
+	            videoRes.writeBody(videoFile);
+	            System.out.println("--------------视频文件下载完成--------------");
+	        }
+
+	        // 下载音频
+	        File audioFile = new File(fileAddress_notype_str + "_audio.mp4");
+	        if (!audioFile.exists()) {
+	            System.out.println("--------------开始下载音频文件--------------VIDEO_INFO.audioBaseUrl[ "+mBliBli_VIDEO_INFO.audioBaseUrl+"]  VIDEO_INFO.audioSize["+mBliBli_VIDEO_INFO.audioSize+"]");
+	            HttpResponse audioRes = HttpRequest.get(mBliBli_VIDEO_INFO.audioBaseUrl)
+	                .header("Referer", videoUrl)
+	                .header("Range", "bytes=0-" + mBliBli_VIDEO_INFO.audioSize)
+	                .header("User-Agent", USER_AGENT)
+	                .execute();
+	            audioRes.writeBody(audioFile);
+	            System.out.println("--------------音频文件下载完成--------------");
+	        }
+	    	
+	    	
+			/*
+			 * Map<String, String> htmlParsers = new HashMap<>(); htmlParsers.put("Referer",
+			 * videoUrl); htmlParsers.put("Range", "bytes=" + VIDEO_INFO.audioSize);
+			 * htmlParsers.put("User-Agent", USER_AGENT);
+			 * OkHttpUtils.get().url(VIDEO_INFO.audioBaseUrl).headers(htmlParsers).build().
+			 * execute( new FileCallBack("D:/", VIDEO_INFO.videoName + ".mp3") {
+			 * 
+			 * @Override public void onError(Call call, Exception e, int i) {
+			 * e.printStackTrace(); }
+			 * 
+			 * @Override public void onResponse(File file, int i) {
+			 * System.out.println("获取到的数据:" + file.getAbsolutePath()); } });
+			 */
+	        
+	        
+	//  合并视频 音频 文件   
+	//  ffmpeg -i video.mp4 -i audio.mp4 -c:v copy -c:a aac -strict experimental output.mp4 
+	 File outputFile =        mergeBliBli_Video_Audio_Files(videoFile, audioFile , mBliBli_VIDEO_INFO,fileAddress_notype_str+".mp4");
+
+	 if(outputFile != null && outputFile.exists() && outputFile.length() > 200) {
+		 System.out.println("当前 BliBli 视频文件下载成功 !!   把没有声音的mp4 以及 只有声音的mp4 文件删除");
+		 
+		 videoFile.delete();
+		 audioFile.delete();
+			//  获取文件的 md值   并重命名为 mdxxxx.mp4
+			String mdName = getMD5Three(outputFile.getAbsolutePath());
+			String new_Md_Name = mdName+".mp4";
+			tryReName(outputFile, new_Md_Name);
+			System.out.println("\n-----视频BliBli视频保存路径(MD名称)-----\n" + outputFile.getAbsolutePath());
+			//  把下载的 mp4 文件 名称 转为 md值
+			url_name_LogList.add(videoUrl+"          "+mdName);
+			urlStrList.add(videoUrl);
+		 
+	 }else {
+		 
+		 System.out.println("当前 BliBli视频(声音和视频是两个单独文件)  把x_video.mp4 和 x_audio.mp4 文件合成失败 请手动合并 命令如下:");
+		 
+		 System.out.println("合并视频【" + videoFile.getAbsolutePath()+" 】  声音【"+audioFile.getAbsolutePath()+"】"+" 命令如下:");
+		 System.out.println("________________________________________________");
+		 System.out.println(" ffmpeg -i "+videoFile.getAbsolutePath()+" -i "+audioFile.getAbsolutePath()+" -c:v copy -c:a aac -strict experimental  "+fileAddress_notype_str+".mp4");
+		 System.out.println("________________________________________________");
+	 }
+}
+
+
+	 public File  mergeBliBli_Video_Audio_Files(File videoFile, File audioFile ,  BliBliVideoInfo mBliBli_VIDEO_INFO , String outputFilePath) {
+	    	File outPutFile = null;
+	        System.out.println("--------------开始合并音视频--------------");
+	        String outFilePath = outputFilePath;
+	        
+	        List<String> commend = new ArrayList<>();
+	        
+	        String ffmpeg_path = getEnvironmentExePath("ffmpeg");
+	            if(ffmpeg_path ==null){
+	                errorMsg = "当前 ffmpeg 不在环境变量中 请下载该库 并添加到 环境变量中  下载的视频文件和音频文件需要合并才能正常 否则 mp4 文件无声音!!";
+	                System.out.println(errorMsg);
+	                 return null;
+	            }
+	        commend.add(ffmpeg_path);
+	        commend.add("-i");
+	        commend.add(videoFile.getAbsolutePath());
+	        commend.add("-i");
+	        commend.add(audioFile.getAbsolutePath());
+	        commend.add("-vcodec");
+	        commend.add("copy");
+	        commend.add("-acodec");
+	        commend.add("copy");
+	        commend.add(outFilePath);
+
+	        ProcessBuilder builder = new ProcessBuilder();
+	        builder.command(commend);
+	        try {
+	            builder.inheritIO().start().waitFor();
+	            System.out.println("--------------音视频合并完成--------------");
+	        } catch (InterruptedException | IOException e) {
+	            System.err.println("音视频合并失败！");
+	            e.printStackTrace();
+	        }
+	        
+	        outPutFile = new File(outFilePath);
+	        
+	        return outPutFile;
+
+	    }
+	    
 		void XiGua_TouTiao_ParseUrl(int index , String url) {
 			// String
 			// url="https://m.toutiaoimg.cn/group/6966235416110301696/?app=news_article_lite&timestamp=1626072237&group_id=6966235416110301696&share_token=0f88ebb4-c474-4671-9d9b-4b7e76004e38";
@@ -1107,7 +1590,7 @@ public class I9_TextRuleOperation {
 
 
 			try {
-				mainHtml = Jsoup.parse(getXiGua_MainPageSource(url));
+				mainHtml = Jsoup.parse(getXiGua_BliBli_MainPageSource(url));
 
 				if(mainHtml != null && mainHtml.toString().contains("mediatype=\"video\"")
 						&& mainHtml.toString().contains("src=\"http")
@@ -1321,7 +1804,7 @@ public class I9_TextRuleOperation {
 		 * @return 首页内容
 		 * @throws InterruptedException 睡眠中断异常
 		 */
-		String getXiGua_MainPageSource(String url)  {
+		String getXiGua_BliBli_MainPageSource(String url)  {
 
 			ChromeOptions CUR_CHROME_OPTIONS = new ChromeOptions();
 			// 驱动位置
