@@ -3305,6 +3305,7 @@ adb shell input tap 450 450
 ping -n 1 127.0.0.1>nul
 adb shell input tap 450 450
 ping -n 1 127.0.0.1>nul
+rem 往下滑动 到最底层
 adb shell input swipe   1050 1200 1050 400  200
 adb shell input swipe   1050 1200 1050 400  200
 adb shell input swipe   1050 1200 1050 400  200
@@ -3330,13 +3331,14 @@ set rule19teldown_dynamic_param1=100000
 for /l %%i in (1, 1, !rule19teldown_dynamic_param1!) do (
 set loop_numnber=%%i
 set yushu_number=250
-set fanhuishu_number=10
+set fanhuishu_number=30
 set /a loop_numnber_yushu=!loop_numnber!%%!yushu_number!
 set /a loop_numnber_fanhuishu=!loop_numnber!%%!fanhuishu_number!
 echo __________________ Loop_Index[%%i] Begin  _______________________
 echo i == %%i      allLoop=[!rule19teldown_dynamic_param1!]  yushu=[!loop_numnber_yushu!] yushu_number=[!yushu_number!]   adb shell input tap 190 1000
 adb shell input tap 190 1000
 ping -n 1 127.0.0.1>nul
+rem 往上滑动 到最底层
 adb shell input swipe  1050 600 1050 1050  200
 ping -n 1 127.0.0.1>nul
 echo i == %%i      allLoop=[!rule19teldown_dynamic_param1!]  yushu=[!loop_numnber_yushu!] yushu_number=[!yushu_number!]    adb shell input tap 190 1100
@@ -3394,12 +3396,21 @@ adb shell input tap 450 450
 ping -n 1 127.0.0.1>nul
 adb shell input tap 450 450
 ping -n 1 127.0.0.1>nul
+rem 随机往下拉 往上拉
+call :getrandomintwithmaxmin_func_2x1  0 100
+set randomInt_A=!getrandomintwithmaxmin_return_1!
+if !loop_numnber_yushu! GEQ 50 (
 adb shell input swipe    1050 400 1050 1000  200
 adb shell input swipe    1050 400 1050 1000  200
-adb shell input swipe    1050 400 1050 1000  200
-adb shell input swipe    1050 400 1050 1000  200
+) else (
+adb shell input swipe     1050 1000 1050 400 200
+adb shell input swipe     1050 1000 1050 400 200
+)
+
+
 )
 if !loop_numnber_yushu! EQU 0 (
+rem 强制关闭应用
 adb shell am force-stop org.telegram.messenger
 ping -n 1 127.0.0.1>nul
 rem 回到桌面
@@ -3413,30 +3424,23 @@ adb shell input tap 450 450
 ping -n 1 127.0.0.1>nul
 adb shell input tap 450 450
 ping -n 1 127.0.0.1>nul
-adb shell input swipe   1050 1200 1050 400  200
-adb shell input swipe   1050 1200 1050 400  200
-adb shell input swipe   1050 1200 1050 400  200
-adb shell input swipe   1050 1200 1050 400  200
-adb shell input swipe   1050 1200 1050 400  200
-adb shell input swipe   1050 1200 1050 400  200
-adb shell input swipe   1050 1200 1050 400  200
-adb shell input swipe   1050 1200 1050 400  200
-adb shell input swipe   1050 1200 1050 400  200
-adb shell input swipe   1050 1200 1050 400  200
-adb shell input swipe   1050 1200 1050 400  200
-adb shell input swipe   1050 1200 1050 400  200
-adb shell input swipe   1050 1200 1050 400  200
-adb shell input swipe   1050 1200 1050 400  200
-adb shell input swipe   1050 1200 1050 400  200
-adb shell input swipe   1050 1200 1050 400  200
-adb shell input swipe   1050 1200 1050 400  200
-adb shell input swipe   1050 1200 1050 400  200
-adb shell input swipe   1050 1200 1050 400  200
-adb shell input swipe   1050 1200 1050 400  200
-adb shell input swipe   1050 1200 1050 400  200
+
+rem 随机往下拉 往上拉
+call :getrandomintwithmaxmin_func_2x1  0 100
+set randomInt_A=!getrandomintwithmaxmin_return_1!
+if !loop_numnber_yushu! GEQ 50 (
+adb shell input swipe    1050 400 1050 1000  200
+adb shell input swipe    1050 400 1050 1000  200
+
+) else (
+adb shell input swipe     1050 1000 1050 400 200
+adb shell input swipe     1050 1000 1050 400 200
+
 )
-rem 往下拉
+)
+
 adb shell input tap 1050 1600
+rem 往上拉
 adb shell input swipe  1050 600 1050 900  200
 adb shell input swipe  1050 600 1050 900  200
 ping -n 1 127.0.0.1>nul
