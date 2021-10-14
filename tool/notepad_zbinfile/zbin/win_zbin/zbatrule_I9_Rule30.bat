@@ -4114,6 +4114,8 @@ mkdir mp4_anim_port
 mkdir mp4_anim_land
 mkdir mp4_toto_port
 mkdir mp4_toto_land
+mkdir mp4_fake_port
+mkdir mp4_fake_land
 )
 if "%init_input_2%"=="mkdir_zmain" (
 set rule26vmakedirwithtemplate_dynamic_param1=%init_input_2%
