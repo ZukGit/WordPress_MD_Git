@@ -1178,9 +1178,9 @@ class SnakeConf(object):
     # 蛇运动的场地长宽
     global Device_Height
     global Device_Width
-    WIDTH , HEIGHT= 27, 27     ##  一个方块的宽高像素
-    LINE_WIDTH = 27
-    LINE_MARGIN = 0
+    WIDTH , HEIGHT= 28, 28     ##  一个方块的宽高像素
+    LINE_WIDTH = 28
+    LINE_MARGIN = 2
     LINE_TRUEWIDTH = LINE_WIDTH - 2 * LINE_MARGIN
     # SCREEN_X, SCREEN_Y = LINE_WIDTH * HEIGHT, LINE_WIDTH * WIDTH
     # SCREEN_X, SCREEN_Y =  int((Device_Width/25)-LINE_MARGIN) * HEIGHT   ,int((Device_Height/25)-LINE_MARGIN) * HEIGHT
@@ -1203,7 +1203,7 @@ class SnakeConf(object):
     WHITE_COLOR = (255, 255, 255)
     SNAKE_COLOR = (136, 0, 21)
     FOOD_COLOR = (20, 220, 39)
-
+    RED_COLOR = (255, 0, 0)
 
 class Snake(object):
 
@@ -1440,7 +1440,7 @@ class Snake(object):
         left = (self.snake[0] // SnakeConf.WIDTH) * SnakeConf.LINE_WIDTH + 2 + int(Device_Width // 4) # margin 2
         top = (self.snake[0] % SnakeConf.WIDTH) * SnakeConf.LINE_WIDTH + 2
         rect = pygame.Rect(left, top, SnakeConf.LINE_TRUEWIDTH, SnakeConf.LINE_TRUEWIDTH)
-        pygame.draw.rect(screen, SnakeConf.SNAKE_COLOR, rect, 0)
+        pygame.draw.rect(screen, SnakeConf.RED_COLOR, rect, 0)
         for i in range(1, self.snake_size):
             left_pre = (self.snake[i - 1] // SnakeConf.WIDTH) * SnakeConf.LINE_WIDTH + 2  + int(Device_Width // 4) # margin 2
             top_pre = (self.snake[i - 1] % SnakeConf.WIDTH) * SnakeConf.LINE_WIDTH + 2
@@ -1450,8 +1450,10 @@ class Snake(object):
                 rect = pygame.Rect(min(left, left_pre), top, SnakeConf.LINE_TRUEWIDTH + SnakeConf.LINE_WIDTH, SnakeConf.LINE_TRUEWIDTH)
             else:
                 rect = pygame.Rect(left, min(top, top_pre), SnakeConf.LINE_TRUEWIDTH, SnakeConf.LINE_TRUEWIDTH + SnakeConf.LINE_WIDTH)
-            pygame.draw.rect(screen, SnakeConf.SNAKE_COLOR, rect, 0)
-
+            if (i == 1):
+                pygame.draw.rect(screen, SnakeConf.BLACK_COLOR , rect, 0)
+            else:
+                pygame.draw.rect(screen, SnakeConf.SNAKE_COLOR, rect, 0)
     def handle_key_event(self, event):
         if event.type == KEYDOWN:
             if event.key == K_ESCAPE:
@@ -1494,7 +1496,7 @@ class Snake(object):
 
             screen.fill(SnakeConf.BLACK_COLOR)
 
-            boardrect = pygame.Rect(SnakeConf.LINE_WIDTH+ int(Device_Width // 4),SnakeConf.LINE_WIDTH,SnakeConf.SCREEN_X - SnakeConf.LINE_WIDTH*2 , SnakeConf.SCREEN_Y-SnakeConf.LINE_WIDTH*2 )
+            boardrect = pygame.Rect(SnakeConf.LINE_WIDTH+ int(Device_Width // 4),SnakeConf.LINE_WIDTH,SnakeConf.SCREEN_X - SnakeConf.LINE_WIDTH*2 , SnakeConf.SCREEN_Y-SnakeConf.LINE_WIDTH*2  )
             pygame.draw.rect(screen,SnakeConf.WHITE_COLOR,boardrect,0)
             
             self.draw_snake(screen)
@@ -1531,7 +1533,9 @@ class Snake(object):
             if isdead:
                 self.show_text(screen,(100,200),'YOU DEAD!',(227,29,18), False, 100)
                 self.show_text(screen,(150,260),'press space to try again...',(0,0,22), False, 30)
-
+                time.sleep(10)
+                snake1 = Snake()
+                snake1.snake_main()
             # 显示分数文字
             self.show_text(screen,(50,500),'Scores: '+str(self.snake_size),(223,223,223))
 
