@@ -35,7 +35,8 @@ prulePath = ""
 params_list=list()
 realTypeRuleList=list()
 now_yyyymmdd=str(time.strftime('%Y%m%d', time.localtime(time.time())))
-
+Device_Height = 1080
+Device_Width = 720
 
 
 def GetDesktopPath():
@@ -58,6 +59,13 @@ def initSystemInfo():
     global CUR_OS_TYPE
     global CUR_OS_ExeTYPE
     global params_list
+    global Device_Height
+    global Device_Width  
+    
+    pygame.init()
+    screenInfo = pygame.display.Info()
+    Device_Width = screenInfo.current_w
+    Device_Height = screenInfo.current_h
     desktopPath = GetDesktopPath()
     zbinPath=str(desktopPath)+os.sep+"zbin"
     pbinPath=zbinPath+os.sep+"win_pbin"
@@ -74,10 +82,13 @@ def initSystemInfo():
     if len(sys.argv) >= 4:
         params_list=sys.argv[3:]
 
+
     print("CUR_OS_TYPE:"+str(CUR_OS_TYPE))
     print("输入参数个数:"+str(len(sys.argv)))
     print("参数列表:"+str(sys.argv))
     print("操作系统:"+str(sys.platform))
+    print("屏幕宽度_Width :"+str(Device_Width))
+    print("屏幕宽度_Height:"+str(Device_Height))
     print("批处理后缀:"+CUR_Batch_End)
     print("批处理文件名称:"+CUR_Bat_Name)
     print("desktopPath:"+str(desktopPath))
@@ -198,6 +209,9 @@ class CodeRain_Rule_1(Basic_Rule):
         PANEL_highly = screenInfo.current_h
         FONT_PX = 15
         winSur = pygame.display.set_mode((PANEL_width, PANEL_highly))  # 全屏模式
+        # global Device_Width
+        # global Device_Height
+        # winSur = pygame.display.set_mode((Device_Width, Device_Height))  # 全屏模式
         font = pygame.font.SysFont("arial", 20)
         bg_suface = pygame.Surface((PANEL_width, PANEL_highly), flags=pygame.SRCALPHA)
         pygame.Surface.convert(bg_suface)
@@ -1162,24 +1176,31 @@ seed(1)
 
 class SnakeConf(object):
     # 蛇运动的场地长宽
-    HEIGHT, WIDTH = 20, 20
-    LINE_WIDTH = 25
-    LINE_MARGIN = 4
+    global Device_Height
+    global Device_Width
+    WIDTH , HEIGHT= 27, 27     ##  一个方块的宽高像素
+    LINE_WIDTH = 27
+    LINE_MARGIN = 0
     LINE_TRUEWIDTH = LINE_WIDTH - 2 * LINE_MARGIN
-    SCREEN_X, SCREEN_Y = LINE_WIDTH * HEIGHT, LINE_WIDTH * WIDTH
+    # SCREEN_X, SCREEN_Y = LINE_WIDTH * HEIGHT, LINE_WIDTH * WIDTH
+    # SCREEN_X, SCREEN_Y =  int((Device_Width/25)-LINE_MARGIN) * HEIGHT   ,int((Device_Height/25)-LINE_MARGIN) * HEIGHT
+    SCREEN_X, SCREEN_Y =  LINE_WIDTH * WIDTH    , LINE_WIDTH * HEIGHT 
+    #FIELD_SIZE = HEIGHT * WIDTH
     FIELD_SIZE = HEIGHT * WIDTH
-
     # 用来代表不同东西的数字，由于矩阵上每个格子会处理成到达食物的路径长度，
     # 因此这三个变量间需要有足够大的间隔(>HEIGHT*WIDTH)
-    FOOD, UNDEFINED = 0, (HEIGHT + 1) * (WIDTH + 1)
+    random.seed(time.clock())
+    # FOOD, UNDEFINED = 0, (HEIGHT + 1) * (WIDTH + 1)
+    FOOD, UNDEFINED = 0, random.randint(0,HEIGHT + 1) * (WIDTH + 1)
+
     SNAKE = 2 * UNDEFINED
 
     LEFT, RIGHT, UP, DOWN = -1, 1, -WIDTH, WIDTH
 
     # 错误码
     ERR = SNAKE
-
-    BG_COLOR = (255, 255, 255)
+    BLACK_COLOR = (0, 0, 0)
+    WHITE_COLOR = (255, 255, 255)
     SNAKE_COLOR = (136, 0, 21)
     FOOD_COLOR = (20, 220, 39)
 
@@ -1415,14 +1436,15 @@ class Snake(object):
                 self.tmpboard[self.tmpsnake[self.tmpsnake_size]] = SnakeConf.UNDEFINED
 
     def draw_snake(self, screen):
-        left = (self.snake[0] // SnakeConf.WIDTH) * SnakeConf.LINE_WIDTH + 2 # margin 2
+        global Device_Width; 
+        left = (self.snake[0] // SnakeConf.WIDTH) * SnakeConf.LINE_WIDTH + 2 + int(Device_Width // 4) # margin 2
         top = (self.snake[0] % SnakeConf.WIDTH) * SnakeConf.LINE_WIDTH + 2
         rect = pygame.Rect(left, top, SnakeConf.LINE_TRUEWIDTH, SnakeConf.LINE_TRUEWIDTH)
         pygame.draw.rect(screen, SnakeConf.SNAKE_COLOR, rect, 0)
         for i in range(1, self.snake_size):
-            left_pre = (self.snake[i - 1] // SnakeConf.WIDTH) * SnakeConf.LINE_WIDTH + 2 # margin 2
+            left_pre = (self.snake[i - 1] // SnakeConf.WIDTH) * SnakeConf.LINE_WIDTH + 2  + int(Device_Width // 4) # margin 2
             top_pre = (self.snake[i - 1] % SnakeConf.WIDTH) * SnakeConf.LINE_WIDTH + 2
-            left = (self.snake[i] // SnakeConf.WIDTH) * SnakeConf.LINE_WIDTH + 2 # margin 2
+            left = (self.snake[i] // SnakeConf.WIDTH) * SnakeConf.LINE_WIDTH + 2   + int(Device_Width // 4) # margin 2
             top = (self.snake[i] % SnakeConf.WIDTH) * SnakeConf.LINE_WIDTH + 2
             if (top_pre == top):
                 rect = pygame.Rect(min(left, left_pre), top, SnakeConf.LINE_TRUEWIDTH + SnakeConf.LINE_WIDTH, SnakeConf.LINE_TRUEWIDTH)
@@ -1430,10 +1452,20 @@ class Snake(object):
                 rect = pygame.Rect(left, min(top, top_pre), SnakeConf.LINE_TRUEWIDTH, SnakeConf.LINE_TRUEWIDTH + SnakeConf.LINE_WIDTH)
             pygame.draw.rect(screen, SnakeConf.SNAKE_COLOR, rect, 0)
 
+    def handle_key_event(self, event):
+        if event.type == KEYDOWN:
+            if event.key == K_ESCAPE:
+                sys.exit()
+                
     def snake_main(self):
         pygame.init()
-        screen = pygame.display.set_mode((SnakeConf.SCREEN_X, SnakeConf.SCREEN_Y))
-        pygame.display.set_caption('Snake')
+        
+        global Device_Width
+        global Device_Height
+
+        # screen = pygame.display.set_mode((SnakeConf.SCREEN_X, SnakeConf.SCREEN_Y))
+        screen = pygame.display.set_mode((Device_Width, Device_Height))
+        pygame.display.set_caption('AI_Snake')
         clock = pygame.time.Clock()
 
         isdead = False
@@ -1445,6 +1477,9 @@ class Snake(object):
         onestep = False
         while True:
             for event in pygame.event.get():
+
+                if event.type == KEYDOWN and event.key == pygame.K_ESCAPE:
+                    sys.exit()
                 if event.type == pygame.QUIT:
                     sys.exit()
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
@@ -1457,13 +1492,18 @@ class Snake(object):
 
             onestep = False
 
-            screen.fill(SnakeConf.BG_COLOR)
+            screen.fill(SnakeConf.BLACK_COLOR)
 
+            boardrect = pygame.Rect(SnakeConf.LINE_WIDTH+ int(Device_Width // 4),SnakeConf.LINE_WIDTH,SnakeConf.SCREEN_X - SnakeConf.LINE_WIDTH*2 , SnakeConf.SCREEN_Y-SnakeConf.LINE_WIDTH*2 )
+            pygame.draw.rect(screen,SnakeConf.WHITE_COLOR,boardrect,0)
+            
             self.draw_snake(screen)
 
-            rect = pygame.Rect((self.food//SnakeConf.WIDTH)*SnakeConf.LINE_WIDTH + 2,(self.food%SnakeConf.WIDTH)*SnakeConf.LINE_WIDTH +2 ,SnakeConf.LINE_TRUEWIDTH, SnakeConf.LINE_TRUEWIDTH)
+            rect = pygame.Rect((self.food//SnakeConf.WIDTH)*SnakeConf.LINE_WIDTH + 2+ int(Device_Width // 4),(self.food%SnakeConf.WIDTH)*SnakeConf.LINE_WIDTH +2 ,SnakeConf.LINE_TRUEWIDTH, SnakeConf.LINE_TRUEWIDTH)
             pygame.draw.rect(screen,SnakeConf.FOOD_COLOR,rect,0)
 
+
+  
             # 重置矩阵
             self.board_reset(self.snake, self.snake_size, self.board)
 

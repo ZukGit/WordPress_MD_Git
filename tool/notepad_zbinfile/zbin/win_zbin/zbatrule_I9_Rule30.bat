@@ -1091,6 +1091,20 @@ echo ______________Method_Out gettimehhmmsss_func_0x1
 goto:eof
 
 
+:gettimemmddhhmm_func_0x1
+rem ======================================== gettimemmddhhmm_func_0x1
+rem desc: 获取当前年份时间戳记录全数字
+rem sample: [gettimemmddhhmm_func_0x1 ] gettimemmddhhmm_return_1=[21-05-18_18_57_36_51]   param1=[__empty__]
+rem sample_out: [gettimemmddhhmm_func_0x1 ] gettimemmddhhmm_return_1=[21-05-18_18_57_36_52]   param1=[__empty__]
+::SETLOCAL
+echo ______________Method_In gettimemmddhhmm_func_0x1
+set gettimemmddhhmm_return_1=%DATE:~8,2%%DATE:~11,2%_%TIME:~0,2%%TIME:~3,2%
+echo gettimemmddhhmm_return_1=%gettimemmddhhmm_return_1%
+echo [gettimemmddhhmm_func_0x1 EndPrintCode] gettimemmddhhmm_return_1=[!gettimemmddhhmm_return_1!]   param1=[__empty__] 
+echo ______________Method_Out gettimemmddhhmm_func_0x1
+::ENDLOCAL
+goto:eof
+
 
 
 :gettimeddhhmm_func_0x1
@@ -1101,7 +1115,7 @@ rem sample_out: [gettimeddhhmm_func_0x1 ] gettimeddhhmm_return_1=[21-05-18_18_57
 ::SETLOCAL
 echo ______________Method_In gettimeddhhmm_func_0x1
 set gettimeddhhmm_return_1=%DATE:~11,2%%TIME:~0,2%%TIME:~3,2%
-echo gettimeddhhmm_return_1=%getTimeNona_return_1%
+echo gettimeddhhmm_return_1=%gettimeddhhmm_return_1%
 echo [gettimeddhhmm_func_0x1 EndPrintCode] gettimeddhhmm_return_1=[!gettimeddhhmm_return_1!]   param1=[__empty__] 
 echo ______________Method_Out gettimeddhhmm_func_0x1
 ::ENDLOCAL
@@ -4076,6 +4090,8 @@ rem rule_tip: %init_input_0% _26_  mkdir_zapp  ##  在当前目录创建 zapp �
 
 rem rule_tip: %init_input_0% _26_  mkdir_zmain  ##  在当前目录创建 zmain 对应的 目录
 
+rem rule_tip: %init_input_0% _26_  mkdir_yymmdd_1970zvi  ##  在当前目录创建 temp_media 对应日期的 1970zvi 目录
+
 rem desc: 给定一个 标识符 如-mkdir_zapp 创建符合这个标识符的文件夹列表
 rem sample: 
 rem sample_out: 
@@ -4142,6 +4158,80 @@ mkdir mp4_kaoyan_land
 mkdir mp4_gaokao_land
 mkdir mp3
 )
+
+
+if "%init_input_2%"=="mkdir_yymmdd_1970zvi" (
+set rule26vmakedirwithtemplate_dynamic_param1=%init_input_2%
+call :gettimemmddhhmm_func_0x1
+set mmdd_hhmm_timestr=!gettimemmddhhmm_return_1!
+echo mmdd_hhmm_timestr=!mmdd_hhmm_timestr!  gettimemmddhhmm_return_1=!gettimemmddhhmm_return_1!
+echo mkdir .\!mmdd_hhmm_timestr!\zapp\jpg_common_port
+mkdir .\!mmdd_hhmm_timestr!\zapp\jpg_common_port
+mkdir .\!mmdd_hhmm_timestr!\zapp\jpg_common_land
+mkdir .\!mmdd_hhmm_timestr!\zapp\jpg_top_land
+mkdir .\!mmdd_hhmm_timestr!\zapp\jpg_top_port
+mkdir .\!mmdd_hhmm_timestr!\zapp\jpg_girl_port
+mkdir .\!mmdd_hhmm_timestr!\zapp\jpg_girl_land
+mkdir .\!mmdd_hhmm_timestr!\zapp\jpg_lin_port
+mkdir .\!mmdd_hhmm_timestr!\zapp\jpg_lin_land
+mkdir .\!mmdd_hhmm_timestr!\zapp\gif_common_land
+mkdir .\!mmdd_hhmm_timestr!\zapp\gif_common_port
+mkdir .\!mmdd_hhmm_timestr!\zapp\gif_top_port
+mkdir .\!mmdd_hhmm_timestr!\zapp\gif_top_land
+mkdir .\!mmdd_hhmm_timestr!\zapp\mp4_common_land
+mkdir .\!mmdd_hhmm_timestr!\zapp\mp4_common_port
+mkdir .\!mmdd_hhmm_timestr!\zapp\mp4_top_port
+mkdir .\!mmdd_hhmm_timestr!\zapp\mp4_top_land
+mkdir .\!mmdd_hhmm_timestr!\zapp\mp4_single_port
+mkdir .\!mmdd_hhmm_timestr!\zapp\mp4_single_land
+mkdir .\!mmdd_hhmm_timestr!\zapp\mp4_raw_port
+mkdir .\!mmdd_hhmm_timestr!\zapp\mp4_raw_land
+mkdir .\!mmdd_hhmm_timestr!\zapp\mp4_hua_port
+mkdir .\!mmdd_hhmm_timestr!\zapp\mp4_hua_land
+mkdir .\!mmdd_hhmm_timestr!\zapp\mp4_dan_port
+mkdir .\!mmdd_hhmm_timestr!\zapp\mp4_dan_land
+mkdir .\!mmdd_hhmm_timestr!\zapp\mp4_sss_port
+mkdir .\!mmdd_hhmm_timestr!\zapp\mp4_sss_land
+mkdir .\!mmdd_hhmm_timestr!\zapp\mp4_anim_port
+mkdir .\!mmdd_hhmm_timestr!\zapp\mp4_anim_land
+mkdir .\!mmdd_hhmm_timestr!\zapp\mp4_toto_port
+mkdir .\!mmdd_hhmm_timestr!\zapp\mp4_toto_land
+mkdir .\!mmdd_hhmm_timestr!\zapp\mp4_fake_port
+mkdir .\!mmdd_hhmm_timestr!\zapp\mp4_fake_land
+
+
+mkdir .\!mmdd_hhmm_timestr!\z_sss\animation
+mkdir .\!mmdd_hhmm_timestr!\z_sss\bcxs
+mkdir .\!mmdd_hhmm_timestr!\z_sss\bdyjy
+mkdir .\!mmdd_hhmm_timestr!\z_sss\bsllx
+mkdir .\!mmdd_hhmm_timestr!\z_sss\cjmy
+mkdir .\!mmdd_hhmm_timestr!\z_sss\fakeface
+mkdir .\!mmdd_hhmm_timestr!\z_sss\foreign
+mkdir .\!mmdd_hhmm_timestr!\z_sss\gcyz
+mkdir .\!mmdd_hhmm_timestr!\z_sss\hmh
+mkdir .\!mmdd_hhmm_timestr!\z_sss\korean_land
+mkdir .\!mmdd_hhmm_timestr!\z_sss\korean_port
+mkdir .\!mmdd_hhmm_timestr!\z_sss\mly
+mkdir .\!mmdd_hhmm_timestr!\z_sss\other
+mkdir .\!mmdd_hhmm_timestr!\z_sss\qglxc
+mkdir .\!mmdd_hhmm_timestr!\z_sss\qlln
+mkdir .\!mmdd_hhmm_timestr!\z_sss\qsll
+mkdir .\!mmdd_hhmm_timestr!\z_sss\ssyy
+mkdir .\!mmdd_hhmm_timestr!\z_sss\stym
+mkdir .\!mmdd_hhmm_timestr!\z_sss\tandan_land
+mkdir .\!mmdd_hhmm_timestr!\z_sss\tandan_port
+mkdir .\!mmdd_hhmm_timestr!\z_sss\tanhua_land
+mkdir .\!mmdd_hhmm_timestr!\z_sss\tanhua_port
+mkdir .\!mmdd_hhmm_timestr!\z_sss\thy
+mkdir .\!mmdd_hhmm_timestr!\z_sss\xnnm
+mkdir .\!mmdd_hhmm_timestr!\z_sss\xqkjx
+mkdir .\!mmdd_hhmm_timestr!\z_sss\yml
+mkdir .\!mmdd_hhmm_timestr!\z_sss\yyzzz
+mkdir .\!mmdd_hhmm_timestr!\z_sss\zyw
+mkdir .\!mmdd_hhmm_timestr!\z_sss\zz_unknow_land
+mkdir .\!mmdd_hhmm_timestr!\z_sss\zz_unknow_port
+)
+
 echo rule26vmakedirwithtemplate_dynamic_param1=%init_input_2%
 echo [rule26vmakedirwithtemplate_func_1x0 EndPrintCode]    output=[__empty__] dynamic_param1=[!rule26vmakedirwithtemplate_dynamic_param1!]   
 echo ______________Method_Out rule26vmakedirwithtemplate_func_1x0
@@ -4536,7 +4626,7 @@ mkdir z_sss
 mkdir z_sss\zz_unknow_land\ 
 mkdir z_sss\zz_unknow_port\
 mkdir z_sss\other\     
-mkdir z_sss\foreigin\     
+mkdir z_sss\foreign\     
 mkdir z_sss\tandan_port\  
 mkdir z_sss\tanhua_port\
 mkdir z_sss\korean_port\  
@@ -5001,6 +5091,8 @@ echo %init_input_0% _26_  mkdir_zapp  ##  在当前目录创建 zapp 对应的 �
 
 echo %init_input_0% _26_  mkdir_zmain  ##  在当前目录创建 zmain 对应的 目录
 
+echo %init_input_0% _26_  mkdir_yymmdd_1970zvi   ##  在当前目录创建 1970zvi temp 临时对应的 目录
+
 echo %init_input_0% _27_   192ipend3_115  ipport_44971  paircode_300827 pairport_43173     ## 对当前输入的 192ipend3(IP地址最后三位) 192.168.0.115 的 安卓设置进行无线连接
 
 echo %init_input_0% _27_   10ipend3_115  ipport_44971  paircode_300827 pairport_43173     ## 对当前输入的 10ipend3(IP地址最后三位) 10.106.20.115 的 安卓设置进行无线连接
@@ -5113,6 +5205,9 @@ rem call :isemptydirfile_func_1x1 !init_cd!
 rem echo isemptydirfile_return_1=!isemptydirfile_return_1!
 rem call :stringreplace_func_3x1 123456789  123  ""
 rem echo stringreplace_return_1=!stringreplace_return_1!
+
+rem call :gettimemmddhhmm_func_0x1
+rem echo gettimemmddhhmm_func_0x1=!gettimemmddhhmm_func_0x1!
 
 echo __________________ Main_Method End _______________________
 goto:eof

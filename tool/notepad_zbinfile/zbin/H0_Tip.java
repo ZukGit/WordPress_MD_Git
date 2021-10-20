@@ -64,6 +64,7 @@ public class H0_Tip {
         }
 
         Chrome_Tip();
+        ADB_Push_Command_Tip();
         Security_File_Tip();
 
     }
@@ -645,11 +646,127 @@ public class H0_Tip {
     }
 
 
+    //=================================================
+//    adb push ./gif_common_land/   /sdcard/zmain/ &&
+//    adb push ./gif_common_port/   /sdcard/zmain/ &&
+//    adb push ./gif_top_land/      /sdcard/zmain/ &&
+//    adb push ./gif_top_port/      /sdcard/zmain/ &&
+//    adb push ./jpg_common_land/   /sdcard/zmain/ &&
+//    adb push ./jpg_common_port/   /sdcard/zmain/ &&
+//    adb push ./jpg_girl_land/     /sdcard/zmain/ &&
+//    adb push ./jpg_girl_port/     /sdcard/zmain/ &&
+//    adb push ./jpg_lin_land/      /sdcard/zmain/ &&
+//    adb push ./jpg_lin_port/      /sdcard/zmain/ &&
+//    adb push ./jpg_top_land/      /sdcard/zmain/ &&
+//    adb push ./jpg_top_port/      /sdcard/zmain/ &&
+//    adb push ./mp4_anim_land/     /sdcard/zmain/ &&
+//    adb push ./mp4_anim_port/     /sdcard/zmain/ &&
+//    adb push ./mp4_common_land/   /sdcard/zmain/ &&
+//    adb push ./mp4_common_port/   /sdcard/zmain/ &&
+//    adb push ./mp4_dan_land/      /sdcard/zmain/ &&
+//    adb push ./mp4_dan_port/      /sdcard/zmain/ &&
+//    adb push ./mp4_fake_land/     /sdcard/zmain/ &&
+//    adb push ./mp4_fake_port/     /sdcard/zmain/ &&
+//    adb push ./mp4_hua_land/      /sdcard/zmain/ &&
+//    adb push ./mp4_hua_port/      /sdcard/zmain/ &&
+//    adb push ./mp4_raw_land/      /sdcard/zmain/ &&
+//    adb push ./mp4_raw_port/      /sdcard/zmain/ &&
+//    adb push ./mp4_single_land/   /sdcard/zmain/ &&
+//    adb push ./mp4_single_port/   /sdcard/zmain/ &&
+//    adb push ./mp4_sss_land/      /sdcard/zmain/ &&
+//    adb push ./mp4_sss_port/      /sdcard/zmain/ &&
+//    adb push ./mp4_top_land/      /sdcard/zmain/ &&
+//    adb push ./mp4_top_port/      /sdcard/zmain/ &&
+//    adb push ./mp4_toto_land/     /sdcard/zmain/ &&
+//    adb push ./mp4_toto_port/     /sdcard/zmain/ 
+//    
+    
+    static void ADB_Push_Command_Tip(){
+    	PrintHead_End("【ADB_Push_Command】【zapp】");
+    	System.out.println("________________________ 【ADB_Push_Command】【zapp 部分 push( 128G 存储不够 ... ) 】 Begin ________________________");
+
+        StringBuilder  m128G_PushCommand = new StringBuilder();
+        m128G_PushCommand.append("adb push ./gif_top_land/.      /sdcard/zapp/gif_top_land/ && "); 
+        m128G_PushCommand.append("adb push ./gif_top_port/      /sdcard/zapp/ && "); 
+        m128G_PushCommand.append("adb push ./jpg_common_land/   /sdcard/zapp/ && "); 
+        m128G_PushCommand.append("adb push ./jpg_common_port/   /sdcard/zapp/ && "); 
+        m128G_PushCommand.append("adb push ./jpg_girl_land/     /sdcard/zapp/ && "); 
+        m128G_PushCommand.append("adb push ./jpg_girl_port/     /sdcard/zapp/ && "); 
+        m128G_PushCommand.append("adb push ./jpg_lin_land/      /sdcard/zapp/ && "); 
+        m128G_PushCommand.append("adb push ./jpg_lin_port/      /sdcard/zapp/ && "); 
+        m128G_PushCommand.append("adb push ./jpg_top_land/      /sdcard/zapp/ && "); 
+        m128G_PushCommand.append("adb push ./jpg_top_port/      /sdcard/zapp/ && "); 
+        m128G_PushCommand.append("adb push ./mp4_anim_land/     /sdcard/zapp/ && "); 
+        m128G_PushCommand.append("adb push ./mp4_anim_port/     /sdcard/zapp/ && "); 
+        m128G_PushCommand.append("adb push ./mp4_dan_land/      /sdcard/zapp/ && "); 
+        m128G_PushCommand.append("adb push ./mp4_dan_port/      /sdcard/zapp/ && "); 
+        m128G_PushCommand.append("adb push ./mp4_fake_land/     /sdcard/zapp/ && "); 
+        m128G_PushCommand.append("adb push ./mp4_fake_port/     /sdcard/zapp/ && "); 
+        m128G_PushCommand.append("adb push ./mp4_single_land/   /sdcard/zapp/ && "); 
+        m128G_PushCommand.append("adb push ./mp4_single_port/   /sdcard/zapp/ && "); 
+        m128G_PushCommand.append("adb push ./mp4_sss_land/      /sdcard/zapp/ && "); 
+        m128G_PushCommand.append("adb push ./mp4_sss_port/      /sdcard/zapp/ && "); 
+        m128G_PushCommand.append("adb push ./mp4_top_land/      /sdcard/zapp/ && "); 
+        m128G_PushCommand.append("adb push ./mp4_top_port/      /sdcard/zapp/ && "); 
+        m128G_PushCommand.append("adb push ./mp4_toto_land/     /sdcard/zapp/ && "); 
+        m128G_PushCommand.append("adb push ./mp4_toto_port/     /sdcard/zapp/ && "); 
+        //  avoid big file big dir  使用小文件夹替换	     
+        m128G_PushCommand.append("adb push ./gif_top_port/.  /sdcard/zapp/gif_common_port/ && "); 
+        m128G_PushCommand.append("adb push ./gif_top_land/.  /sdcard/zapp/gif_common_land/ && "); 
+        m128G_PushCommand.append("adb push ./mp4_sss_land/.  /sdcard/zapp/mp4_common_land/  && "); 
+        m128G_PushCommand.append("adb push ./mp4_sss_port/.  /sdcard/zapp/mp4_common_port/  && "); 
+        m128G_PushCommand.append("adb push ./mp4_sss_land/.  /sdcard/zapp/mp4_hua_land/  &&    "); 
+        m128G_PushCommand.append("adb push ./mp4_sss_port/.  /sdcard/zapp/mp4_hua_port/  &&    "); 
+        m128G_PushCommand.append("adb push ./mp4_sss_land/.  /sdcard/zapp/mp4_raw_land/  &&    "); 
+        m128G_PushCommand.append("adb push ./mp4_sss_port/.  /sdcard/zapp/mp4_raw_port/        "); 
+        
+        
+        
+        System.out.println(m128G_PushCommand.toString());
+        
+        
+    	
+        
+        System.out.println("________________________ 【ADB_Push_Command】【zapp 部分 push( 128G 存储不够 ... ) 】 End ________________________");
+    	PrintHead_End("【ADB_Push_Command】【zapp】");
+    }
 
 
+//    去除这八项									     
+//    adb push ./mp4_common_land/   /sdcard/zmain/ &&     5.11
+//    adb push ./mp4_common_port/   /sdcard/zmain/ &&     1.94
+//    adb push ./mp4_hua_land/      /sdcard/zmain/ &&     32.44
+//    adb push ./mp4_hua_port/      /sdcard/zmain/ &&     8.41
+//    adb push ./mp4_raw_land/      /sdcard/zmain/ &&     33.55
+//    adb push ./mp4_raw_port/      /sdcard/zmain/ &&    8.44  
+//    adb push ./gif_common_land  3.63
+//    adb push ./gif_common_port  1.6
 
+//    jpg_common_land  1.67
+//    jpg_common_port  5.46
+//    gif_common_land  3.63
+//    gif_common_port  1.6
+//    gif_top_land     0.376
+//    gif_top_port     0.077
+//    mp4_anim_land    1
+//    mp4_anim_port    0.5
+//    mp4_dan_land     8.41
+//    mp4_dan_port     0.779
+//    mp4_fake_land    2.93
+//    mp4_fake_port    0.148
+//    mp4_single_land  4.9
+//    mp4_single_port  4.13
+//    mp4_sss_land     0.62
+//    mp4_sss_port     0.358
+//    mp4_top_land     7.9
+//    mp4_top_port     1.33
+//    mp4_toto_land    0.3
+//    mp4_toto_port    0.3
 
+    
+    //=================================================
 
+    
     static void Security_File_Tip(){
 
 
