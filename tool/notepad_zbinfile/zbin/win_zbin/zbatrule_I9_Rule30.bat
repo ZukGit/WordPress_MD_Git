@@ -3036,6 +3036,7 @@ adb pull  /data/user_de/     adb_dump_!CURRENT_DATE_TIME_STAMP!\data_user_de\
 echo adb pull  /data/debuglogger  adb_dump_!CURRENT_DATE_TIME_STAMP!\data_mtk_debuglogger\
 adb pull  /data/debuglogger  adb_dump_!CURRENT_DATE_TIME_STAMP!\data_mtk_debuglogger\
 adb pull   /data/vendor/mtklog/  adb_dump_!CURRENT_DATE_TIME_STAMP!\data_vendor_mtklog\
+adb shell ls -l  /dev/  > adb_dump_!CURRENT_DATE_TIME_STAMP!\dev.txt
 adb shell service list  > adb_dump_!CURRENT_DATE_TIME_STAMP!\Adb_AllService.txt
 adb shell getprop > adb_dump_!CURRENT_DATE_TIME_STAMP!\Prop.txt
 adb shell pm list features > adb_dump_!CURRENT_DATE_TIME_STAMP!\pm_list_features.txt
@@ -3296,7 +3297,6 @@ goto:eof
 
 
 
-
 :rule19vdownloadshoucangjia_func_0x0
 rem ======================================== rule19vdownloadshoucangjia_func_0x0
 rem rule_tip: %init_input_0% _19_        ## ADB 命令 Tel自动加载命令 第19规则
@@ -3314,12 +3314,20 @@ ping -n 1 127.0.0.1>nul
 rem 打开应用
 adb shell am start  org.telegram.messenger/org.telegram.ui.LaunchActivity
 ping -n 1 127.0.0.1>nul
-rem 模拟点击
+echo _____ 模拟点击进入 favourite 目录 Begin  _____
 adb shell input tap 450 450
 ping -n 1 127.0.0.1>nul
 adb shell input tap 450 450
 ping -n 1 127.0.0.1>nul
+adb shell input tap 450 450
+ping -n 1 127.0.0.1>nul
+adb shell input tap 450 450
+ping -n 1 127.0.0.1>nul
+adb shell input tap 450 450
+ping -n 1 127.0.0.1>nul
+echo _____ 模拟点击进入 favourite 目录 End  _____
 rem 往下滑动 到最底层
+echo ____ 往下滑动 到最底层 Begin ____
 adb shell input swipe   1050 1200 1050 400  200
 adb shell input swipe   1050 1200 1050 400  200
 adb shell input swipe   1050 1200 1050 400  200
@@ -3342,6 +3350,7 @@ adb shell input swipe   1050 1200 1050 400  200
 adb shell input swipe   1050 1200 1050 400  200
 adb shell input swipe   1050 1200 1050 400  200
 set rule19teldown_dynamic_param1=100000
+echo ____ 往下滑动 到最底层 End ____
 for /l %%i in (1, 1, !rule19teldown_dynamic_param1!) do (
 set loop_numnber=%%i
 set yushu_number=250
@@ -3349,121 +3358,166 @@ set fanhuishu_number=30
 set /a loop_numnber_yushu=!loop_numnber!%%!yushu_number!
 set /a loop_numnber_fanhuishu=!loop_numnber!%%!fanhuishu_number!
 echo __________________ Loop_Index[%%i] Begin  _______________________
-echo i == %%i      allLoop=[!rule19teldown_dynamic_param1!]  yushu=[!loop_numnber_yushu!] yushu_number=[!yushu_number!]   adb shell input tap 190 1000
+echo i == %%i      allLoop=[!rule19teldown_dynamic_param1!]  yushu=[!loop_numnber_yushu!]    强制返回桌面循环数[!fanhuishu_number!] 强制重启循环数=[!yushu_number!]   adb shell input tap 190 1000
+echo 屏幕点击 _A1  x_190 y_1000
 adb shell input tap 190 1000
 ping -n 1 127.0.0.1>nul
-rem 往上滑动 到最底层
+echo 往上滑动 _A1
 adb shell input swipe  1050 600 1050 1050  200
 ping -n 1 127.0.0.1>nul
-echo i == %%i      allLoop=[!rule19teldown_dynamic_param1!]  yushu=[!loop_numnber_yushu!] yushu_number=[!yushu_number!]    adb shell input tap 190 1100
+echo i == %%i      allLoop=[!rule19teldown_dynamic_param1!]  yushu=[!loop_numnber_yushu!]    强制返回桌面循环数[!fanhuishu_number!] 强制重启循环数=[!yushu_number!]    adb shell input tap 190 1100
+echo 屏幕点击 _A2  x_190 y_1100
 adb shell input tap 190 1100
 ping -n 1 127.0.0.1>nul
+echo 往上滑动 _A2
 adb shell input swipe  1050 600 1050 1050  200
 ping -n 1 127.0.0.1>nul
-echo i == %%i      allLoop=[!rule19teldown_dynamic_param1!]  yushu=[!loop_numnber_yushu!] yushu_number=[!yushu_number!]    adb shell input tap 190 1200
+echo i == %%i      allLoop=[!rule19teldown_dynamic_param1!]  yushu=[!loop_numnber_yushu!]    强制返回桌面循环数[!fanhuishu_number!] 强制重启循环数=[!yushu_number!]    adb shell input tap 190 1200
+echo 屏幕点击 _A3  x_190 y_1200
 adb shell input tap 190 1200
 ping -n 1 127.0.0.1>nul
+echo 往上滑动 _A3
 adb shell input swipe  1050 600 1050 1050  200
 ping -n 1 127.0.0.1>nul
-echo i == %%i      allLoop=[!rule19teldown_dynamic_param1!]  yushu=[!loop_numnber_yushu!] yushu_number=[!yushu_number!]    adb shell input tap 190 1300
+echo i == %%i      allLoop=[!rule19teldown_dynamic_param1!]  yushu=[!loop_numnber_yushu!]    强制返回桌面循环数[!fanhuishu_number!] 强制重启循环数=[!yushu_number!]    adb shell input tap 190 1300
+echo 屏幕点击 _A4  x_190 y_1300
 adb shell input tap 190 1300
 ping -n 1 127.0.0.1>nul
+echo 往上滑动 _A4
 adb shell input swipe  1050 600 1050 1050  200
 ping -n 1 127.0.0.1>nul
-echo i == %%i      allLoop=[!rule19teldown_dynamic_param1!]  yushu=[!loop_numnber_yushu!] yushu_number=[!yushu_number!]    adb shell input tap 190 1400
+echo i == %%i      allLoop=[!rule19teldown_dynamic_param1!]  yushu=[!loop_numnber_yushu!]    强制返回桌面循环数[!fanhuishu_number!] 强制重启循环数=[!yushu_number!]    adb shell input tap 190 1400
+echo 屏幕点击 _A5  x_190 y_1400
 adb shell input tap 190 1400
 ping -n 1 127.0.0.1>nul
+echo 往上滑动 _A5
 adb shell input swipe  1050 600 1050 1050  200
 ping -n 1 127.0.0.1>nul
 echo loop_numnber_yushu=!loop_numnber_yushu!
 if !loop_numnber_fanhuishu! EQU 0 (
-rem  一直返回  返回到主界面 
-adb shell input keyevent 4
-adb shell input keyevent 4
-adb shell input keyevent 4
-adb shell input keyevent 4
-adb shell input keyevent 4
-adb shell input keyevent 4
-adb shell input keyevent 4
-adb shell input keyevent 4
-adb shell input keyevent 4
-adb shell input keyevent 4
-adb shell input keyevent 4
-adb shell input keyevent 4
-adb shell input keyevent 4
-adb shell input keyevent 4
-adb shell input keyevent 4
-adb shell input keyevent 4
-adb shell input keyevent 4
-adb shell input keyevent 4
-adb shell input keyevent 4
-adb shell input keyevent 4
-adb shell input keyevent 4
-adb shell input keyevent 4
+echo  loop_numnber_fanhuishu=[!loop_numnber_fanhuishu!]____________一直返回  返回到主界面 Begin ____________ 
 adb shell input keyevent 4
 ping -n 1 127.0.0.1>nul
-rem 打开应用
 adb shell am start  org.telegram.messenger/org.telegram.ui.LaunchActivity
 ping -n 1 127.0.0.1>nul
-rem 模拟点击
+adb shell input keyevent 4
+ping -n 1 127.0.0.1>nul
+adb shell am start  org.telegram.messenger/org.telegram.ui.LaunchActivity
+ping -n 1 127.0.0.1>nul
+adb shell input keyevent 4
+ping -n 1 127.0.0.1>nul
+adb shell am start  org.telegram.messenger/org.telegram.ui.LaunchActivity
+ping -n 1 127.0.0.1>nul
+adb shell input keyevent 4
+ping -n 1 127.0.0.1>nul
+adb shell am start  org.telegram.messenger/org.telegram.ui.LaunchActivity
+
+ping -n 1 127.0.0.1>nul
+rem 打开应用
+echo  loop_numnber_fanhuishu=[!loop_numnber_fanhuishu!]____________一直返回  返回到主界面 End ____________ 
+
+adb shell am start  org.telegram.messenger/org.telegram.ui.LaunchActivity
+ping -n 1 127.0.0.1>nul
+echo ......等待5秒......
+ping -n 5 127.0.0.1>nul
+echo 屏幕点击 _B1  x_450 y_450
 adb shell input tap 450 450
 ping -n 1 127.0.0.1>nul
+echo 屏幕点击 _B2  x_450 y_450
 adb shell input tap 450 450
 ping -n 1 127.0.0.1>nul
-rem 随机往下拉 往上拉
-call :getrandomintwithmaxmin_func_2x1  0 100
-set randomInt_A=!getrandomintwithmaxmin_return_1!
-if !loop_numnber_yushu! GEQ 50 (
-adb shell input swipe    1050 400 1050 1000  200
-adb shell input swipe    1050 400 1050 1000  200
-) else (
-adb shell input swipe     1050 1000 1050 400 200
-adb shell input swipe     1050 1000 1050 400 200
-)
 
+rem call :getrandomintwithmaxmin_func_2x1  0 100
+rem set randomInt_A=!getrandomintwithmaxmin_return_1!
+rem echo 随机往上下拉  randomInt_A=[!randomInt_A!] 
+rem if !randomInt_A! GEQ 50 (
+rem echo 随机结果[!randomInt_A! 大于等于50 ]: _________往上滑______
+rem echo 往上滑动 _B1
+rem adb shell input swipe    1050 400 1050 1000  200
+rem echo 往上滑动 _B2
+rem adb shell input swipe    1050 400 1050 1000  200
+rem ) else (
+rem echo 随机结果[!randomInt_A! 小于 50    ]: _________往下滑______
+rem adb shell input swipe     1050 1000 1050 400 200
+rem echo 往下滑动 _B1
+rem adb shell input swipe     1050 1000 1050 400 200
+rem echo 往下滑动 _B1
+rem )
 
 )
+echo _______________________  依次循环结束 _______________________
 if !loop_numnber_yushu! EQU 0 (
-rem 强制关闭应用
+echo  尝试强制关闭应用   !yushu_number! 
 adb shell am force-stop org.telegram.messenger
 ping -n 1 127.0.0.1>nul
-rem 回到桌面
+echo 尝试强制关闭应用 回到桌面
 adb shell input keyevent 3
 ping -n 1 127.0.0.1>nul
-rem 打开应用
+echo 尝试强制关闭应用 打开应用
 adb shell am start  org.telegram.messenger/org.telegram.ui.LaunchActivity
 ping -n 1 127.0.0.1>nul
-rem 模拟点击
+echo  模拟点击 _C1 450 450  进入 favourite 目录
 adb shell input tap 450 450
 ping -n 1 127.0.0.1>nul
+echo  模拟点击 _C2 450 450 进入 favourite 目录
 adb shell input tap 450 450
 ping -n 1 127.0.0.1>nul
+
+echo  模拟点击 _C3 450 450 进入 favourite 目录
+adb shell input tap 450 450
+ping -n 1 127.0.0.1>nul
+
+echo  模拟点击 _C4 450 450 进入 favourite 目录
+adb shell input tap 450 450
+ping -n 1 127.0.0.1>nul
+
 
 rem 随机往下拉 往上拉
 call :getrandomintwithmaxmin_func_2x1  0 100
 set randomInt_A=!getrandomintwithmaxmin_return_1!
-if !loop_numnber_yushu! GEQ 50 (
+echo 尝试强制关闭应用 随机往上下拉  randomInt_A=[!randomInt_A!] 
+if !randomInt_A! GEQ 50 (
+echo 尝试强制关闭应用 随机结果[!randomInt_A! 大于等于50 ]: _________往上滑______
+echo=
+echo 往上滑动 _C1
 adb shell input swipe    1050 400 1050 1000  200
+echo 往上滑动 _C2
 adb shell input swipe    1050 400 1050 1000  200
+
 
 ) else (
+echo 尝试强制关闭应用 随机结果[!randomInt_A! 小于 50    ]: _________往下滑______
+echo=
+echo 往下滑动 _C1
 adb shell input swipe     1050 1000 1050 400 200
+echo 往下滑动 _C2
 adb shell input swipe     1050 1000 1050 400 200
+
 
 )
 )
 
-adb shell input tap 1050 1600
-rem 往上拉
+rem echo  模拟点击 _D1 1050 1600
+rem adb shell input tap 1050 1600
+set /a move_base_step=!loop_numnber!/!yushu_number! + 1
+echo move_base_step=!move_base_step!
+
+for /l %%k in (1, 1, !move_base_step!) do (
+echo 往上滑动  D1  move_base_step=!move_base_step!
 adb shell input swipe  1050 600 1050 900  200
+)
+echo 往上滑动  D2  move_base_step=!move_base_step!
 adb shell input swipe  1050 600 1050 900  200
 ping -n 1 127.0.0.1>nul
+
+
 echo __________________ Loop_Index[%%i] Endxx  _______________________
 )
 echo [rule19vdownloadshoucangjia_func_0x0 EndPrintCode]   output=[__empty__]  param1=[__empty__] 
 echo ______________Method_Out rule19vdownloadshoucangjia_func_0x0
 ::ENDLOCAL
 goto:eof
+
 
 
 
