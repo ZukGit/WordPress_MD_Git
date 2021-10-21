@@ -3361,38 +3361,38 @@ echo __________________ Loop_Index[%%i] Begin  _______________________
 echo i == %%i      allLoop=[!rule19teldown_dynamic_param1!]  yushu=[!loop_numnber_yushu!]    强制返回桌面循环数[!fanhuishu_number!] 强制重启循环数=[!yushu_number!]   adb shell input tap 190 1000
 echo 屏幕点击 _A1  x_190 y_1000
 adb shell input tap 190 1000
-ping -n 10 127.0.0.1>nul
+ping -n 3 127.0.0.1>nul
 echo 往上滑动 _A1
 adb shell input swipe  1050 600 1050 1050  200
-ping -n 10 127.0.0.1>nul
+ping -n 3 127.0.0.1>nul
 echo i == %%i      allLoop=[!rule19teldown_dynamic_param1!]  yushu=[!loop_numnber_yushu!]    强制返回桌面循环数[!fanhuishu_number!] 强制重启循环数=[!yushu_number!]    adb shell input tap 190 1100
 echo 屏幕点击 _A2  x_190 y_1100
 adb shell input tap 190 1100
-ping -n 10 127.0.0.1>nul
+ping -n 3 127.0.0.1>nul
 echo 往上滑动 _A2
 adb shell input swipe  1050 600 1050 1050  200
-ping -n 10 127.0.0.1>nul
+ping -n 3 127.0.0.1>nul
 echo i == %%i      allLoop=[!rule19teldown_dynamic_param1!]  yushu=[!loop_numnber_yushu!]    强制返回桌面循环数[!fanhuishu_number!] 强制重启循环数=[!yushu_number!]    adb shell input tap 190 1200
 echo 屏幕点击 _A3  x_190 y_1200
 adb shell input tap 190 1200
-ping -n 10 127.0.0.1>nul
+ping -n 3 127.0.0.1>nul
 echo 往上滑动 _A3
 adb shell input swipe  1050 600 1050 1050  200
 ping -n 1 127.0.0.1>nul
 echo i == %%i      allLoop=[!rule19teldown_dynamic_param1!]  yushu=[!loop_numnber_yushu!]    强制返回桌面循环数[!fanhuishu_number!] 强制重启循环数=[!yushu_number!]    adb shell input tap 190 1300
 echo 屏幕点击 _A4  x_190 y_1300
 adb shell input tap 190 1300
-ping -n 10 127.0.0.1>nul
+ping -n 3 127.0.0.1>nul
 echo 往上滑动 _A4
 adb shell input swipe  1050 600 1050 1050  200
-ping -n 10 127.0.0.1>nul
+ping -n 3 127.0.0.1>nul
 echo i == %%i      allLoop=[!rule19teldown_dynamic_param1!]  yushu=[!loop_numnber_yushu!]    强制返回桌面循环数[!fanhuishu_number!] 强制重启循环数=[!yushu_number!]    adb shell input tap 190 1400
 echo 屏幕点击 _A5  x_190 y_1400
 adb shell input tap 190 1400
-ping -n 10 127.0.0.1>nul
+ping -n 3 127.0.0.1>nul
 echo 往上滑动 _A5
 adb shell input swipe  1050 600 1050 1050  200
-ping -n 10 127.0.0.1>nul
+ping -n 3 127.0.0.1>nul
 echo loop_numnber_yushu=!loop_numnber_yushu!
 if !loop_numnber_fanhuishu! EQU 0 (
 echo  loop_numnber_fanhuishu=[!loop_numnber_fanhuishu!]____________一直返回  返回到主界面 Begin ____________ 
