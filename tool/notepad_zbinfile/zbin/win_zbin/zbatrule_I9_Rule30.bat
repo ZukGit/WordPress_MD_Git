@@ -901,6 +901,132 @@ rem ======================== FILE_OPERATION End========================
 rem ======================== SYSTEM_OPERATION Begin======================== 
 
 
+:getandroidreceivembwithin5s_func_0x1
+rem ======================================== isadminuser_func_0x1
+rem desc: 检测当前USB adb 连接的安卓设备整体的对应的 当前5秒钟 接收流量 接受到的数据量 单位为 MB 不区分应用
+rem sample: call :getandroidreceivembwithin5s_func_0x1
+rem sample_out: [getandroidreceivembwithin5s_func_0x1 ]   getandroidreceivembwithin5s_return_1=[0] getandroidreceivembwithin5s_return_1=[1]
+::SETLOCAL
+echo ______________Method_In getandroidreceivembwithin5s_func_0x1
+echo getandroidreceivembwithin5s_func_0x1  input_1_param == %1
+set input_1_param=%1
+set /a getandroidreceivembwithin5s_return_1=0
+adb shell cat /proc/net/dev | findstr wlan0 | awk '{print $2}' > dev_recv_1.txt
+ping -n 1 127.0.0.1>nul
+cat dev_recv_1.txt
+set /p dev_recv_num1=<dev_recv_1.txt
+
+rem 0开头会有错误 所以再添加一个1 
+set dev_recv_num1_end9=1!dev_recv_num1:~2!
+echo dev_recv_num1_end9=!dev_recv_num1_end9!  dev_recv_num1=!dev_recv_num1!
+
+ping -n 5 127.0.0.1>nul
+adb shell cat /proc/net/dev | findstr wlan0 | awk '{print $2}' > dev_recv_2.txt
+ping -n 1 127.0.0.1>nul
+
+cat dev_recv_2.txt
+set /p dev_recv_num2=<dev_recv_2.txt
+rem 0开头会有错误 所以再添加一个1 
+set dev_recv_num2_end9=1!dev_recv_num2:~2!
+
+set /a dev_recv_num1_end9_10bit=!dev_recv_num1_end9!
+set /a dev_recv_num2_end9_10bit=!dev_recv_num2_end9!
+
+echo dev_recv_num2_end9=!dev_recv_num2_end9!  dev_recv_num2=!dev_recv_num2!   dev_recv_num1_end9_10bit=!dev_recv_num1_end9_10bit!   dev_recv_num2_end9_10bit=!dev_recv_num2_end9_10bit!
+set /a dev_receive_distance_byte=!dev_recv_num2_end9_10bit!-!dev_recv_num1_end9_10bit!
+set /a dev_receive_MB=!dev_receive_distance_byte!/(1024*1024)
+echo  dev_recv_num1=!dev_recv_num1!  dev_recv_num2=!dev_recv_num2!_______ dev_recv_num1_end9=!dev_recv_num1_end9! dev_recv_num2_end9=!dev_recv_num2_end9!  dev_receive_distance_byte=!dev_receive_distance_byte! dev_receive_MB=!dev_receive_MB!
+
+if !dev_receive_MB! GEQ 1  (
+echo 当前有流量A  dev_receive_MB=!dev_receive_MB!
+set /a getandroidreceivembwithin5s_return_1=!dev_receive_MB!
+) else if !dev_receive_MB! LSS 0  (
+echo 当前有流量B   dev_receive_MB=!dev_receive_MB!
+echo=
+echo=
+rem 差距是负数 仍然说明 有流量 那么返回为1  意思意思 
+set /a getandroidreceivembwithin5s_return_1=1
+) else (
+echo 当前 没流量 没流量   dev_receive_MB=!dev_receive_MB!
+
+)
+del dev_recv_1.txt
+del dev_recv_2.txt
+
+echo [getandroidreceivembwithin5s_func_0x1 EndPrintCode] getandroidreceivembwithin5s_return_1=[!getandroidreceivembwithin5s_return_1!]   param1=[__empty__] 
+echo ______________Method_Out getandroidreceivembwithin5s_func_0x1
+::ENDLOCAL
+goto:eof
+
+
+
+
+
+:getandroidreceivembwithappname_func_1x1
+rem ======================================== getandroidreceivembwithappname_func_1x1
+rem desc: 检测当前USB adb 连接的安卓设备对应提供的app名称在 5秒钟 接受到的数据量 单位为 MB
+rem sample: call :getandroidreceivembwithappname_func_1x1
+rem sample_out: [getandroidreceivembwithappname_func_1x1 ]   getandroidreceivembwith5s_return_1=[0] getandroidreceivembwith5s_return_1=[5]
+::SETLOCAL
+echo ______________Method_In getandroidreceivembwithappname_func_1x1
+echo getandroidreceivembwithappname_func_1x1  input_1_param == %1
+set input_1_param=%1
+set /a getandroidreceivembwithappname_return_1=0
+adb shell ps | findstr !input_1_param! | awk '{print $2}' > tel_pid.txt
+ping -n 1 127.0.0.1>nul
+cat tel_pid.txt
+set /p tel_pid_num=<tel_pid.txt
+
+adb shell cat /proc/!tel_pid_num!/net/dev | findstr wlan0 | awk '{print $2}' > tel_recv_1.txt
+ping -n 1 127.0.0.1>nul
+cat tel_recv_1.txt
+set /p tel_recv_num1=<tel_recv_1.txt
+rem 0开头会有错误 所以再添加一个1 
+set tel_recv_num1_end9=1!tel_recv_num1:~2!
+echo tel_recv_num1_end9=!tel_recv_num1_end9!  tel_recv_num1=!tel_recv_num1!
+echo  tel_pid_num=!tel_pid_num!  tel_recv_num1=!tel_recv_num1!
+
+ping -n 5 127.0.0.1>nul
+adb shell cat /proc/!tel_pid_num!/net/dev | findstr wlan0 | awk '{print $2}' > tel_recv_2.txt
+ping -n 1 127.0.0.1>nul
+cat tel_recv_2.txt
+set /p tel_recv_num2=<tel_recv_2.txt
+rem 0开头会有错误 所以再添加一个1 
+set tel_recv_num2_end9=1!tel_recv_num2:~2!
+
+set /a tel_recv_num1_end9_10bit=!tel_recv_num1_end9!
+set /a tel_recv_num2_end9_10bit=!tel_recv_num2_end9!
+
+echo tel_recv_num2_end9=!tel_recv_num2_end9!  tel_recv_num2=!tel_recv_num2!   tel_recv_num1_end9_10bit=!tel_recv_num1_end9_10bit!   tel_recv_num2_end9_10bit=!tel_recv_num2_end9_10bit!
+set /a receive_distance_byte=!tel_recv_num2_end9_10bit!-!tel_recv_num1_end9_10bit!
+set /a receive_MB=!receive_distance_byte!/(1024*1024)
+echo  ____ tel_pid_num=!tel_pid_num! tel_recv_num1=!tel_recv_num1!  tel_recv_num2=!tel_recv_num2!_______ tel_recv_num1_end9=!tel_recv_num1_end9! tel_recv_num2_end9=!tel_recv_num2_end9!  receive_distance_byte=!receive_distance_byte! receive_MB=!receive_MB!
+
+if !receive_MB! GEQ 1  (
+echo 当前有流量A  receive_MB=!receive_MB!
+set /a getandroidreceivembwithappname_return_1=!receive_MB!
+) else if !receive_MB! LSS 0  (
+echo 当前有流量B   receive_MB=!receive_MB!
+echo=
+echo=
+rem 差距是负数 仍然说明 有流量 那么返回为1  意思意思 
+set /a getandroidreceivembwithappname_return_1=1
+) else (
+echo 当前 没流量 没流量   receive_MB=!receive_MB!
+
+)
+del tel_recv_1.txt
+del tel_recv_2.txt
+echo [getandroidreceivembwithappname_func_1x1 EndPrintCode] getandroidreceivembwithappname_return_1=[!getandroidreceivembwithappname_return_1!]   param1=[!input_1_param!] 
+echo ______________Method_Out getandroidreceivembwithappname_func_1x1
+::ENDLOCAL
+goto:eof
+
+
+
+
+
+
 :isadminuser_func_0x1
 rem ======================================== isadminuser_func_0x1
 rem desc: 检测当前运行环境是否是Admin 管理员权限   如果是管理员返回true    如果只是普通的用户返回false  通过net session 的返回值判断
@@ -3329,71 +3455,79 @@ echo _____ 模拟点击进入 favourite 目录 End  _____
 rem 往下滑动 到最底层
 echo ____ 往下滑动 到最底层 Begin ____
 adb shell input swipe   1050 1200 1050 400  200
-adb shell input swipe   1050 1200 1050 400  200
-adb shell input swipe   1050 1200 1050 400  200
-adb shell input swipe   1050 1200 1050 400  200
-adb shell input swipe   1050 1200 1050 400  200
-adb shell input swipe   1050 1200 1050 400  200
-adb shell input swipe   1050 1200 1050 400  200
-adb shell input swipe   1050 1200 1050 400  200
-adb shell input swipe   1050 1200 1050 400  200
-adb shell input swipe   1050 1200 1050 400  200
-adb shell input swipe   1050 1200 1050 400  200
-adb shell input swipe   1050 1200 1050 400  200
-adb shell input swipe   1050 1200 1050 400  200
-adb shell input swipe   1050 1200 1050 400  200
-adb shell input swipe   1050 1200 1050 400  200
-adb shell input swipe   1050 1200 1050 400  200
-adb shell input swipe   1050 1200 1050 400  200
-adb shell input swipe   1050 1200 1050 400  200
-adb shell input swipe   1050 1200 1050 400  200
-adb shell input swipe   1050 1200 1050 400  200
-adb shell input swipe   1050 1200 1050 400  200
+rem adb shell input swipe   1050 1200 1050 400  200
+rem adb shell input swipe   1050 1200 1050 400  200
+rem adb shell input swipe   1050 1200 1050 400  200
+rem adb shell input swipe   1050 1200 1050 400  200
+rem adb shell input swipe   1050 1200 1050 400  200
+rem adb shell input swipe   1050 1200 1050 400  200
+rem adb shell input swipe   1050 1200 1050 400  200
+rem adb shell input swipe   1050 1200 1050 400  200
+rem adb shell input swipe   1050 1200 1050 400  200
+rem adb shell input swipe   1050 1200 1050 400  200
+rem adb shell input swipe   1050 1200 1050 400  200
+rem adb shell input swipe   1050 1200 1050 400  200
+rem adb shell input swipe   1050 1200 1050 400  200
+rem adb shell input swipe   1050 1200 1050 400  200
+rem adb shell input swipe   1050 1200 1050 400  200
+rem adb shell input swipe   1050 1200 1050 400  200
+rem adb shell input swipe   1050 1200 1050 400  200
+rem adb shell input swipe   1050 1200 1050 400  200
+rem adb shell input swipe   1050 1200 1050 400  200
+rem adb shell input swipe   1050 1200 1050 400  200
 set rule19teldown_dynamic_param1=100000
 echo ____ 往下滑动 到最底层 End ____
 for /l %%i in (1, 1, !rule19teldown_dynamic_param1!) do (
 set loop_numnber=%%i
-set yushu_number=150
+set reset_yushu_number=150
 set fanhuishu_number=30
-set /a loop_numnber_yushu=!loop_numnber!%%!yushu_number!
+set move_begin_number=1000
+set /a loop_numnber_resetyushu=!loop_numnber!%%!reset_yushu_number!
 set /a loop_numnber_fanhuishu=!loop_numnber!%%!fanhuishu_number!
+set /a loop_numnber_movebeginshu=!loop_numnber!%%!move_begin_number!
+
+adb shell ps | findstr telegram | awk '{print $2}' > tel_pid.txt
+set /a tel_pid_num =< tel_pid.txt
+adb shell cat /proc/!tel_pid_num!/net/dev | findstr wlan0 | awk '{print $2}' > tel_recv.txt
+set /a tel_recv_num =< tel_recv.txt
+echo  loop_begin__________ tel_pid_num=!tel_pid_num!  tel_recv_num=!tel_recv_num!_______
 echo __________________ Loop_Index[%%i] Begin  _______________________
-echo i == %%i      allLoop=[!rule19teldown_dynamic_param1!]  yushu=[!loop_numnber_yushu!]    强制返回桌面循环数[!fanhuishu_number!] 强制重启循环数=[!yushu_number!]   adb shell input tap 190 1000
+echo i == %%i      allLoop=[!rule19teldown_dynamic_param1!]  yushu=[!loop_numnber_resetyushu!]    强制返回桌面循环数[!fanhuishu_number!] 强制重启循环数=[!reset_yushu_number!]   adb shell input tap 190 1000
 echo 屏幕点击 _A1  x_190 y_1000
 adb shell input tap 190 1000
 ping -n 3 127.0.0.1>nul
 echo 往上滑动 _A1
 adb shell input swipe  1050 600 1050 1050  200
 ping -n 3 127.0.0.1>nul
-echo i == %%i      allLoop=[!rule19teldown_dynamic_param1!]  yushu=[!loop_numnber_yushu!]    强制返回桌面循环数[!fanhuishu_number!] 强制重启循环数=[!yushu_number!]    adb shell input tap 190 1100
+echo i == %%i      allLoop=[!rule19teldown_dynamic_param1!]  yushu=[!loop_numnber_resetyushu!]    强制返回桌面循环数[!fanhuishu_number!] 强制重启循环数=[!reset_yushu_number!]    adb shell input tap 190 1100
 echo 屏幕点击 _A2  x_190 y_1100
 adb shell input tap 190 1100
 ping -n 3 127.0.0.1>nul
 echo 往上滑动 _A2
 adb shell input swipe  1050 600 1050 1050  200
 ping -n 3 127.0.0.1>nul
-echo i == %%i      allLoop=[!rule19teldown_dynamic_param1!]  yushu=[!loop_numnber_yushu!]    强制返回桌面循环数[!fanhuishu_number!] 强制重启循环数=[!yushu_number!]    adb shell input tap 190 1200
+echo i == %%i      allLoop=[!rule19teldown_dynamic_param1!]  yushu=[!loop_numnber_resetyushu!]    强制返回桌面循环数[!fanhuishu_number!] 强制重启循环数=[!reset_yushu_number!]    adb shell input tap 190 1200
 echo 屏幕点击 _A3  x_190 y_1200
 adb shell input tap 190 1200
 ping -n 3 127.0.0.1>nul
 echo 往上滑动 _A3
 adb shell input swipe  1050 600 1050 1050  200
 ping -n 1 127.0.0.1>nul
-echo i == %%i      allLoop=[!rule19teldown_dynamic_param1!]  yushu=[!loop_numnber_yushu!]    强制返回桌面循环数[!fanhuishu_number!] 强制重启循环数=[!yushu_number!]    adb shell input tap 190 1300
+echo i == %%i      allLoop=[!rule19teldown_dynamic_param1!]  yushu=[!loop_numnber_resetyushu!]    强制返回桌面循环数[!fanhuishu_number!] 强制重启循环数=[!reset_yushu_number!]    adb shell input tap 190 1300
 echo 屏幕点击 _A4  x_190 y_1300
 adb shell input tap 190 1300
 ping -n 3 127.0.0.1>nul
 echo 往上滑动 _A4
 adb shell input swipe  1050 600 1050 1050  200
 ping -n 3 127.0.0.1>nul
-echo i == %%i      allLoop=[!rule19teldown_dynamic_param1!]  yushu=[!loop_numnber_yushu!]    强制返回桌面循环数[!fanhuishu_number!] 强制重启循环数=[!yushu_number!]    adb shell input tap 190 1400
+echo i == %%i      allLoop=[!rule19teldown_dynamic_param1!]  yushu=[!loop_numnber_resetyushu!]    强制返回桌面循环数[!fanhuishu_number!] 强制重启循环数=[!reset_yushu_number!]    adb shell input tap 190 1400
 echo 屏幕点击 _A5  x_190 y_1400
 adb shell input tap 190 1400
 ping -n 3 127.0.0.1>nul
 echo 往上滑动 _A5
 adb shell input swipe  1050 600 1050 1050  200
 ping -n 3 127.0.0.1>nul
-echo loop_numnber_yushu=!loop_numnber_yushu!
+echo loop_numnber_resetyushu=!loop_numnber_resetyushu!
 if !loop_numnber_fanhuishu! EQU 0 (
 echo  loop_numnber_fanhuishu=[!loop_numnber_fanhuishu!]____________一直返回  返回到主界面 Begin ____________ 
 adb shell input keyevent 4
@@ -3446,8 +3580,8 @@ rem )
 
 )
 echo _______________________  依次循环结束 _______________________
-if !loop_numnber_yushu! EQU 0 (
-echo  尝试强制关闭应用   !yushu_number! 
+if !loop_numnber_resetyushu! EQU 0 (
+echo  尝试强制关闭应用   !reset_yushu_number! 
 adb shell am force-stop org.telegram.messenger
 ping -n 1 127.0.0.1>nul
 echo 尝试强制关闭应用 回到桌面
@@ -3498,17 +3632,40 @@ adb shell input swipe     1050 1000 1050 400 200
 )
 
 rem echo  模拟点击 _D1 1050 1600
-rem adb shell input tap 1050 1600
-set /a move_base_step=!loop_numnber!/!yushu_number! + 1
+if !loop_numnber_movebeginshu! EQU 0 (
+echo  模拟点击回到地步按键 _D1 1050 1600
+adb shell input tap 1050 1600
+)
+
+
+call :getandroidreceivembwithin5s_func_0x1
+set currentdev_receive_MD=!getandroidreceivembwithin5s_return_1!
+echo currentdev_receive_MD=!currentdev_receive_MD!  getandroidreceivembwithin5s_return_1=!getandroidreceivembwithin5s_return_1!
+rem 有流量 时  不移动   无流量 MD=0 才移动  
+if !currentdev_receive_MD! EQU 0 (
+set /a move_base_step=!loop_numnber!/!reset_yushu_number! + 1
 echo move_base_step=!move_base_step!
 
-for /l %%k in (1, 1, !move_base_step!) do (
-echo 往上滑动  D1  move_base_step=!move_base_step!
+rem for /l %%k in (1, 1, !move_base_step!) do (
+echo 无流量 往上滑动  D1  move_base_step=!move_base_step!
 adb shell input swipe  1050 600 1050 900  200
-)
-echo 往上滑动  D2  move_base_step=!move_base_step!
+rem )
+echo 无流量 往上滑动  D2  move_base_step=!move_base_step!
 adb shell input swipe  1050 600 1050 900  200
 ping -n 1 127.0.0.1>nul
+
+
+call :getrandomintwithmaxmin_func_2x1  0 100
+set randomInt_A=!getrandomintwithmaxmin_return_1!
+echo 无流量 往上滑动  D3   randomInt_A=[!randomInt_A!] 
+if !randomInt_A! GEQ 50 (
+adb shell input swipe  1050 600 1050 900  200
+ping -n 1 127.0.0.1>nul
+)
+
+)
+
+
 
 
 echo __________________ Loop_Index[%%i] Endxx  _______________________
@@ -5262,6 +5419,12 @@ rem echo stringreplace_return_1=!stringreplace_return_1!
 
 rem call :gettimemmddhhmm_func_0x1
 rem echo gettimemmddhhmm_func_0x1=!gettimemmddhhmm_func_0x1!
+
+
+
+rem call :getandroidreceivembwithin5s_func_0x1
+rem set currentdev_receive_MD=!getandroidreceivembwithin5s_return_1!
+rem echo currentdev_receive_MD=!currentdev_receive_MD!  getandroidreceivembwithin5s_return_1=!getandroidreceivembwithin5s_return_1!
 
 echo __________________ Main_Method End _______________________
 goto:eof
