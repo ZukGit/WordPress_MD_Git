@@ -5011,6 +5011,36 @@ echo f | xcopy /y "!itemfullpath!"  !init_cd!\!Z_mp4_land_dirname!\!newfileName_
 )
 rd /s/q  "!Z_mp4_land_dirname!_!index_mp4!"
 del mp4_common_land.txt
+
+
+dir /b /a-d /o-d /s "%init_cd%\*.webp"  > z_webp.txt
+ping -n 1 127.0.0.1>nul 
+call ::getfilerownum_func_1x1  %init_cd%\z_webp.txt
+set webp_common_port_rownum=!getfilerownum_return_1!
+echo getfilerownum_return_1[!getfilerownum_return_1!]  webp_common_port_rownum[!webp_common_port_rownum!]
+set /a index_webp = 0
+set Z_webp_port_dirname=z_webp
+echo  mkdir !Z_webp_port_dirname!
+for /f %%x in (z_webp.txt) do (
+echo ___________[!index_webp!_webp]______________
+set webp_file_fullpath=%%x
+set /a index_webp+=1
+set oldname=%%~nx
+set newfileName_webp_raw=!ddhhmmstr!_!index_webp!_!webp_common_port_rownum!_!oldname!%%~xx
+set newfileName_webp=!newfileName_webp_raw: =!
+echo [!index_webp!_webp] i=%%x  webp_file_fullpath=!webp_file_fullpath! index_webp=!index_webp! oldname=!oldname! newfileName_webp_raw=!newfileName_webp_raw! newfileName_webp=!newfileName_webp! xi=%%~xx  ni=%%~nx
+set itemfullpath=%%~sx
+rem  ren "%%i" "!newfileName!"
+rem echo f | xcopy /y D:\TEMP\0915\1.webp  D:\TEMP\0915\A\1_1.webp && del D:\TEMP\0915\1.webp 
+echo echo f ^| xcopy /y "!itemfullpath!"  !init_cd!\!Z_webp_port_dirname!\!newfileName_webp!  ^&^& del  "!itemfullpath!"
+echo=
+echo f | xcopy /y "!itemfullpath!"  !init_cd!\!Z_webp_port_dirname!\!newfileName_webp!  && del  "!itemfullpath!"
+)
+rd /s/q  "!Z_webp_port_dirname!_!index_webp!"
+del z_webp.txt
+
+
+
 echo [rule29vflitermediatozappdir_func_0x0 EndPrintCode]   output=[__empty__]  param1=[__empty__] 
 echo ______________Method_Out rule29vflitermediatozappdir_func_0x0
 ::ENDLOCAL
