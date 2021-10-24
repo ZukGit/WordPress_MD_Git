@@ -3479,7 +3479,7 @@ set rule19teldown_dynamic_param1=100000
 echo ____ 往下滑动 到最底层 End ____
 for /l %%i in (1, 1, !rule19teldown_dynamic_param1!) do (
 set loop_numnber=%%i
-set reset_yushu_number=150
+set reset_yushu_number=500
 set fanhuishu_number=30
 set move_begin_number=1000
 set /a loop_numnber_resetyushu=!loop_numnber!%%!reset_yushu_number!
