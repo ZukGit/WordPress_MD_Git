@@ -90,7 +90,7 @@ public class F0_RepoCommand {
             String inputParam = params.trim();
             String[] results = inputParam.split(" ");
             if (results.length != 4) {
-                System.out.println("initWith4Params 方法解析错误!  params =" + params);
+                System.out.println("initWith4Params 方法解析错误!  params =" + params+"  results.length="+results.length);
                 return;
             }
             this.gitRepoName = results[0];
@@ -237,7 +237,7 @@ public class F0_RepoCommand {
                 F0_Properties.setProperty(buildKey, buildValue);
             }
             setProperity();
-            System.out.println("已保存当前解析的 ReleaseNote.html  详情调用如下:");
+            System.out.println("已保存当前解析的 ReleaseNote.html produce_name【"+metaData.productName+"】  详情调用如下:");
             showtip();
             return;
         } else if (mKeyWordName.size() != DEFAULT_INPUT_NUM) {
@@ -351,6 +351,7 @@ public class F0_RepoCommand {
         for (int i = 0; i < nameObjs.length; i++) {
             Repo_Meta_Data repoData = new Repo_Meta_Data();
             repoData.productName = nameObjs[i] + "";
+//            System.out.println("XXXX repoData.productName="+ repoData.productName);
             repoData.initWith4Params(propkeyValueMap.get(nameObjs[i]));
             repoData.initBuildingCommandWithMap(propkeyValueMap);
             propRepoMetaList.add(repoData);
@@ -439,7 +440,9 @@ public class F0_RepoCommand {
 
                     if (product_name_begin && !product_name_over) {
                         PRODUCT_NAME_RAW = oldOneLine;
-                        if(PRODUCT_NAME_RAW.contains("retail") ){
+                        if("<th>FILE NAME</th>".equals(oldOneLine.trim())) {
+                        //   过滤 
+                        }else if(PRODUCT_NAME_RAW.contains("retail")  || PRODUCT_NAME_RAW.contains("_g") ){
                             product_name_over = true;
                         }
 
@@ -509,7 +512,9 @@ public class F0_RepoCommand {
         PRODUCT_NAME_RAW = PRODUCT_NAME_RAW.trim().replace("<td>", "");
         PRODUCT_NAME_RAW = PRODUCT_NAME_RAW.replace("</td>", "");
         PRODUCT_NAME_RAW = PRODUCT_NAME_RAW.replace("_retail", "").trim();
+        PRODUCT_NAME_RAW = PRODUCT_NAME_RAW.replace("_g", "").trim();
         mProductName = PRODUCT_NAME_RAW;
+        System.out.println("XXX mProductName = "+ mProductName);
 
         String mXml = "";
         XML_RAW = XML_RAW.trim().replace("<td>", "");
@@ -517,18 +522,19 @@ public class F0_RepoCommand {
         String xml1 = XML_RAW.substring(0, XML_RAW.indexOf("_test-keys")).trim();
         String xml2 = xml1.substring(xml1.lastIndexOf("_") + 1, xml1.length());
         mXml = xml2.trim() + ".xml";
-
+        System.out.println("XXX mXml = "+ mXml);
+        
         String mManifest = "";
         Manifest_RAW = Manifest_RAW.trim().replace("<td>", "");
         Manifest_RAW = Manifest_RAW.replace("</td>", "").trim();
         mManifest = Manifest_RAW.trim();
-
+        System.out.println("XXX mManifest = "+ mManifest);
 
         String mGit = "";
         String git1 = GIT_RAW.substring(0, GIT_RAW.trim().indexOf(".git")).trim();
         String git2 = git1.substring(git1.lastIndexOf("/") + 1).trim();
         mGit = git2 + ".git";
-
+        System.out.println("XXX mGit = "+ mGit);
 
 //        System.out.println("mProductName = "+ mProductName);
 //        System.out.println("mXml = "+ mXml);
@@ -566,8 +572,12 @@ public class F0_RepoCommand {
         printSchema("【 提交commit命令 提示】");
         System.out.println("git push origin TEMP:refs/for/【当前分支| 通过 git gui ，gitk 查看提交分支】");
         System.out.println("示例1:  git push origin TEMP:refs/for/bp ");
-        System.out.println("示例2:  git push origin TEMP:refs/for/bq ");
-        System.out.println("示例3:  git push origin TEMP:refs/for/bp-mtk ");
+        System.out.println("示例2:  git push origin TEMP:refs/for/bp-mtk ");
+        System.out.println("示例3:  git push origin TEMP:refs/for/bq ");
+        System.out.println("示例4:  git push origin TEMP:refs/for/br ");
+        System.out.println("示例5:  git push origin TEMP:refs/for/br-mtk ");
+        System.out.println("示例6:  git push origin TEMP:refs/for/bs ");
+        System.out.println("示例7:  git push origin TEMP:refs/for/bs-mtk ");
         printLine();
         printSchema("");
     }
@@ -1220,7 +1230,7 @@ public class F0_RepoCommand {
     }
 
     static void showtip() {
-        System.out.println("当前需要 userdebug_retail 类型的 ReleaseNote文件! ");
+        System.out.println("当前需要 retail_userdebug  或者 g_userdebug 类型的 ReleaseNote文件! ");
         System.out.println("当前示例的格式为【四个参数】: zrepo_command_F0  q.git  bp  test.xml  sky   【打印对应命令】");
         System.out.println("当前示例的格式为【一个参数】: zrepo_command_F0  xxxxReleaseNotes.html   【解析对应html文件并保存在 properties 中】");
         System.out.println("q.git   【git仓库(.git结尾) (ReleaseNote.html 搜索 .git )】    ");
@@ -1232,6 +1242,14 @@ public class F0_RepoCommand {
 
     }
 
+
+	static String getTimeStamp() {
+
+		SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd_HHmmss");// 设置日期格式
+		String date = df.format(new Date());
+		return date;
+	}
+	
     @SuppressWarnings("unchecked")
     static void showProperiesMap(Map<String,String> productName) {
         System.out.println("════════════════════" + "Properities数据表" + "════════════════════");
@@ -1277,7 +1295,13 @@ public class F0_RepoCommand {
                 entry = (Map.Entry<String, String>) iterator.next();
                 String key = entry.getKey();  //Map的Value
                 String value = entry.getValue();  //Map的Value
-                System.out.println(pre + value);
+                String[] mStrArr =  value.split(" ");
+                String lastname = null;
+                if(mStrArr.length > 1) {
+                     lastname = mStrArr[mStrArr.length-1];
+                }
+        
+                System.out.println(pre + value +" > "+" "+ (lastname!=null?lastname:getTimeStamp())+".txt");
             }
         }
         System.out.println("══════════Tip══════════");
