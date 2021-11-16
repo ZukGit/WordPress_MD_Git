@@ -2927,6 +2927,9 @@ echo CURRENT_DATE_TIME_STAMP=!CURRENT_DATE_TIME_STAMP!
 adb shell screencap -p /sdcard/Pictures/B7_zscreenshot_%CURRENT_DATE_TIME_STAMP%.png
 ECHO Picture_Name: /sdcard/Pictures/B7_zscreenshot_%CURRENT_DATE_TIME_STAMP%.png 
 adb pull /sdcard/Pictures/B7_zscreenshot_%CURRENT_DATE_TIME_STAMP%.png  ./B7_zscreenshot_%CURRENT_DATE_TIME_STAMP%.png
+%win_zbin%/nconvert  -out jpeg -truecolors   B7_zscreenshot_%CURRENT_DATE_TIME_STAMP%.png
+ping -n 1 127.0.0.1>nul 
+del B7_zscreenshot_%CURRENT_DATE_TIME_STAMP%.png
 echo  对当前文件截屏成功 请继续截屏 否则 ctrl+c 停止软件运行 
 PAUSE
 goto rule13vtakepicture_loop
@@ -3155,6 +3158,8 @@ echo  pull /data/vendor/aplogd/     adb_dump_!CURRENT_DATE_TIME_STAMP!\data_vend
 adb pull /data/vendor/aplogd/     adb_dump_!CURRENT_DATE_TIME_STAMP!\data_vendor_aplogd\
 echo adb pull  /system/etc/     adb_dump_!CURRENT_DATE_TIME_STAMP!\system_etc\
 adb pull  /system/etc/     adb_dump_!CURRENT_DATE_TIME_STAMP!\system_etc\
+echo adb pull /etc/      adb_dump_!CURRENT_DATE_TIME_STAMP!\etc\
+adb pull /etc/      adb_dump_!CURRENT_DATE_TIME_STAMP!\etc\
 echo adb pull  /data/user/     adb_dump_!CURRENT_DATE_TIME_STAMP!\data_user\
 adb pull  /data/user/     adb_dump_!CURRENT_DATE_TIME_STAMP!\data_user\
 echo adb pull  /data/user_de/     adb_dump_!CURRENT_DATE_TIME_STAMP!\data_user_de\
