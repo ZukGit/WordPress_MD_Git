@@ -4452,8 +4452,11 @@ System.out.println("paramItem["+i+"] = "+paramItem_lower_trim);
 				String finalVideoAddress = HttpUtil.createGet(videoAddress).addHeaders(headers).execute()
 						.header("Location");
 				// 注:打印获取的链接
-				System.out.println("-----抖音去水印链接-----\n" + finalVideoAddress);
+				System.out.println("-----抖音去水印链接-----\n" + "finalVideoAddress="+finalVideoAddress+"  \nvideoAddress="+videoAddress);
 				// 下载无水印视频到本地
+				if(finalVideoAddress == null) {
+					finalVideoAddress = videoAddress ;
+				}
 				downRawVideo_WithUrl(index, finalVideoAddress, fileNameNoPoint, "douyin");
 			} catch (IOException e) {
 				System.out.println(e.getMessage());

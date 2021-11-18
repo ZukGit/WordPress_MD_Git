@@ -29,6 +29,18 @@ public class J0_GuPiao_Analysis {
 	
     static ArrayList<String> TScode_List = new ArrayList<String>();    // 读取  J0_股票列表 里的股票名称的集合
     
+    // tscode 与 名称 一一对应起来
+    static Map<String,String> TScode_StockName_Map = new HashMap<String,String>(); 
+    
+    //  key 是 今年的 年份     value 是 今年的 交易的日期的集合
+    static Map<Integer,ArrayList<Integer>> mYear_TradeDayList_Map = new HashMap<Integer,ArrayList<Integer>>();  
+    
+	static String[] MainStock_SheetChineseNameArr = {"收盘价","涨跌幅","涨跌值","成交额"};
+	static String[] MainStock_SheetEnglishNameArr = {"close","pct_chg","change","amount"};
+	
+	static String[] SheetHead_Part_1 = {"cname","ts_code"};
+	
+    
 	// 类型_索引 ，对当前类型的文件执行索引执行的操作 html1---对html类型的子文件执行 索引为1 的逻辑操作 String
 	// apply(String)
 	static ArrayList<String> Rule_Identify_TypeIndexList = new ArrayList<String>();
@@ -70,6 +82,11 @@ public class J0_GuPiao_Analysis {
     static String J0_JiaoYiRiQi_Path = zbinPath+File.separator+"J0_交易日历.xlsx";
     
 
+    // 当前保存   2021_main_stock.xlsx  2020_main_stock.xlsx 文件的集合  放置于 
+	static ArrayList<File> mYearMainStockFileList = new ArrayList<File>(); // 规则的集合
+	
+
+	
 
 	static void setProperity() {
 		try {
@@ -227,15 +244,134 @@ public class J0_GuPiao_Analysis {
     }
     
     
+    static void  initTradeDayList(){
+        File tradeDayFile = new File(J0_JiaoYiRiQi_Path);
+        if(!tradeDayFile.exists()){
+            System.out.println("当前 没有 基础数据文件【交易日历.xlsx】( 请添置该文件 ) J0_JiaoYiRiQi_Path ="+ J0_JiaoYiRiQi_Path);
+            return;
+        }
+
+        Workbook wb =null;
+        Sheet sheet = null;
+        Row row = null;
+        List<Map<String,String>> list = null;
+        String cellData = null;
+        String filePath = tradeDayFile.getAbsolutePath();
+//        System.out.println("J0_JiaoYiRiQi_Path xlsx Path = "+ filePath);
+        String columns[] = {"exchange","cal_date","is_open","pretrade_date"};
+        wb = readExcel(filePath);
+
+        if(wb != null){
+            //用来存放表中数据
+            list = new ArrayList<Map<String,String>>();
+            //获取第一个sheet
+//            sheet = wb.getSheet("股票列表");
+//            sheet = wb.getSheetAt(0);
+            sheet = wb.getSheet("交易日历");
+            //获取最大行数
+            int rownum = sheet.getPhysicalNumberOfRows();
+            //获取第一行
+            row = sheet.getRow(0);
+            //获取最大列数
+            int colnum = row.getPhysicalNumberOfCells();
+            for (int i = 1; i<rownum; i++) {
+                Map<String,String> map = new LinkedHashMap<String,String>();
+                row = sheet.getRow(i);
+                if(row !=null){
+                    for (int j=0;j<colnum;j++){
+                        cellData = (String) getCellFormatValue(row.getCell(j));
+                        map.put(columns[j], cellData);
+                    }
+                }else{
+                    break;
+                }
+                list.add(map);
+            }
+        }
+
+        String SH_TAG = "SSE";
+        String HK_TAG = "XHKG";
+        //遍历解析出来的list
+      first:  for (Map<String,String> map : list) {
+        second:     for (Map.Entry<String,String> entry : map.entrySet()) {
+//                System.out.print(entry.getKey()+":"+entry.getValue()+",");
+
+                if("exchange".equals(entry.getKey()) && SH_TAG.equals(entry.getValue()) ){
+                    addSHTradeDay(map);
+                     break ;
+                }
+                //    System.out.println(" entry.getKey() = "+entry.getKey() + "   entry.getValue() = "+ entry.getValue()+"【Over】");
+            }
+//            System.out.println();
+        }
+
+        //    HK_TradeDayList =
+//    SH_TradeDayList =
+//    HK_No_TradeDayList
+//    SH_No_TradeDayList
+
+//        showTradeDayList(SH_TradeDayList,"上证交易日");
+//        showTradeDayList(SH_No_TradeDayList,"上证非交易日");
+//        showTradeDayList(HK_TradeDayList,"港市交易日");
+//        showTradeDayList(HK_No_TradeDayList,"港市非交易日");
+
+
+     int nowYeayTradeDaySize =  mYear_TradeDayList_Map.get(getCurrentYear()).size();
+     
+//     System.out.println("今年【"+getCurrentYear()+"】 总共有 【"+ nowYeayTradeDaySize+"】 个交易日! ");
+      
+    }
+    
+    static void   addSHTradeDay(Map<String,String> map ){
+        // addSHTradeDay  isopen = 1.0     cal_date = 19910418
+        // 1.0 转为 int  报错
+        String isopen = map.get("is_open").trim();
+        float isOpenInt = Float.parseFloat(isopen);
+        String cal_date =  map.get("cal_date").trim();
+     //   System.out.println("addSHTradeDay  isopen = "+isopen + "   isOpenInt ="+isOpenInt+  "     cal_date = "+ cal_date);
+
+        if(isOpenInt == 1 && cal_date != null && cal_date.trim().length() == 8 ) {  // 20200101
+        	
+            int dayIntFlag = Integer.parseInt(cal_date);
+            String yearStr =cal_date.trim().substring(0,4);
+            int yearInt = Integer.parseInt(yearStr); 
+            
+            
+           Add_SH_Now_TradeDayList_FromNow(yearInt,dayIntFlag);    //  添加 日期   分分 应该.
+
+          
+        	
+        } 
+        	
+        	
+ 
+
+    }
+    
+    // 从年初 到 今天的 日期的集合
+    static void Add_SH_Now_TradeDayList_FromNow(int yearInt , int dayIntFlag){
+    ArrayList<Integer> matchTradeDayList = 	mYear_TradeDayList_Map.get(yearInt);
+    	if(matchTradeDayList == null) {
+    		matchTradeDayList = new ArrayList<Integer>();
+    		mYear_TradeDayList_Map.put(yearInt, matchTradeDayList);
+    	}
+    	if(!matchTradeDayList.contains(dayIntFlag)) {
+    		matchTradeDayList.add(dayIntFlag);
+    	}
+    	
+    }
+    
+    
     static void  initTsCodeList(){
 // TScode_List
+
         File ts_code_File = new File(J0_GuPiaoLieBiao_Path);
         if(!ts_code_File.exists()){
             System.out.println("当前 没有 基础数据文件【股票列表.xlsx】( 请添置该文件 ) J0_GuPiaoLieBiao_Path ="+ J0_GuPiaoLieBiao_Path);
             return;
         }
 
-
+    	System.out.println("开始读取 "+J0_GuPiaoLieBiao_Path+" 文件股票数据");
         Workbook wb =null;
         Sheet sheet = null;
         Row row = null;
@@ -277,15 +413,27 @@ public class J0_GuPiao_Analysis {
 
 
         for (Map<String,String> map : list) {
+        	String ts_code = null;
+        	String stockName = null;
             for (Map.Entry<String,String> entry : map.entrySet()) {
 //                System.out.print(entry.getKey()+":"+entry.getValue()+",");
 
                 if("ts_code".equals(entry.getKey())){
                     TScode_List.add(entry.getValue());
+                    ts_code = entry.getValue();
                 }
 
+                if("name".equals(entry.getKey())){
+                	stockName = entry.getValue();
+                }
+                
 
                 //    System.out.println(" entry.getKey() = "+entry.getKey() + "   entry.getValue() = "+ entry.getValue()+"【Over】");
+            }
+            if(ts_code != null && stockName != null  ) {
+            	TScode_StockName_Map.put(ts_code, stockName);
+            	
+            	
             }
 //            System.out.println();
         }
@@ -298,19 +446,49 @@ public class J0_GuPiao_Analysis {
             }
         });
 
-   	 System.out.println("TScode_List.size = 【 "+ TScode_List.size()+"】   保存于" +J0_GuPiaoLieBiao_Path+"股票列表! ");
+   	 System.out.println("TScode_List.size = 【 "+ TScode_List.size()+"】 TScode_StockName_Map.size=【"+TScode_StockName_Map.size()+"】  保存于" +J0_GuPiaoLieBiao_Path+"股票列表! ");
 
     }
     
 
-	void InitRule() {
+	void initrule() {
+//	
+//	 realTypeRuleList.add(new  Daily_basic_YYYYMM_XLSX_Rule_0());
 
-	 realTypeRuleList.add(new Daily_basic_YYYYMM_XLSX_Rule_1());
-
+		addRuleToList(new  Make_Year_Stock_Xlsx_Rule_1(),true);	
+		addRuleToList(new  Make_Year_Stock_Xlsx_Rule_1(),true);	
+		addRuleToList(new  Make_Year_Stock_Xlsx_Rule_1(),true);	
+		addRuleToList(new  Make_Year_Stock_Xlsx_Rule_1(),true);	
+		addRuleToList(new  Make_Year_Stock_Xlsx_Rule_1(),true);	
+		addRuleToList(new  Make_Year_Stock_Xlsx_Rule_1(),true);	
+		addRuleToList(new  Make_Year_Stock_Xlsx_Rule_1(),true);	
+		addRuleToList(new  Make_Year_Stock_Xlsx_Rule_1(),true);	
+		addRuleToList(new  Make_Year_Stock_Xlsx_Rule_1(),true);	
+		addRuleToList(new  Make_Year_Stock_Xlsx_Rule_1(),true);	
+		addRuleToList(new  Make_Year_Stock_Xlsx_Rule_1(),true);	
+		addRuleToList(new  Make_Year_Stock_Xlsx_Rule_1(),true);	
+		addRuleToList(new  Make_Year_Stock_Xlsx_Rule_1(),true);	
+		addRuleToList(new  Make_Year_Stock_Xlsx_Rule_1(),true);	
+		addRuleToList(new  Make_Year_Stock_Xlsx_Rule_1(),true);	
+		addRuleToList(new  Make_Year_Stock_Xlsx_Rule_1(),true);	
+		addRuleToList(new  Make_Year_Stock_Xlsx_Rule_1(),true);	
+		addRuleToList(new  Make_Year_Stock_Xlsx_Rule_1(),true);	
+		addRuleToList(new  Make_Year_Stock_Xlsx_Rule_1(),true);	
+	}
+	
+	
+	
+	
+void 	addRuleToList(Rule rule , boolean isShowInXlsxHead){
+	  realTypeRuleList.add(rule);	
+	  rule.isShowHeaderInXlsx = isShowInXlsxHead;
+	  rule.dynamicIndexInList = realTypeRuleList.size();
+	
 		
 		
 	}
 
+	
 	
 	
 	
@@ -323,21 +501,76 @@ public class J0_GuPiao_Analysis {
 
 
 	
+	//  创建一个 xlsx 把 一年的 数据都包含进去  收盘股价 涨跌幅度   涨跌值  成交量  四个指标
+	// 放入的文件名称是  2021_main_stock.xlsx    包含 close pct_chg  change  amount  四个指标
+	//  每个xlsx 分为三部分  第一部分 是 股票名称    第二部分是 动态计算的 最近结果  第三部分是 当前属性的指标
+	
+	class Make_Year_Stock_Xlsx_Rule_1 extends  Basic_Rule{
+		
+		// 默认为今年   如果是 从外部获取 那么 就是指定的 年份  最终会 匹配到  2021_main_stock.xlsx 这样的文件
+		String mYearStr;
+		
+		Make_Year_Stock_Xlsx_Rule_1() {
+			super("#", 1, 4); //
+			// TODO Auto-generated constructor stub
+			mYearStr = getCurrentYear()+"";
+		
+		}
+		
+		
+		@Override
+		boolean initParamsWithInputList(ArrayList<String> inputParamList) {
+		// TODO Auto-generated method stub
+		
+			File J0_Data_Dir_File = new File(J0_Data_Dir_Path);
+			
+			if(!J0_Data_Dir_File.exists()) {
+				System.out.println(" J0_Data 路径 "+ J0_Data_Dir_Path +" 文件不存在 程序停止执行 请检查!! 该路径");
+			   return false;
+			}
+			
+			return super.initParamsWithInputList(inputParamList);
+		}
+		
+		
+		
+		
+		
+		@Override
+		ArrayList<File> applySubFileListRule4(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
+			ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+		// TODO Auto-generated method stub
+		return super.applySubFileListRule4(curFileList, subFileTypeMap, curDirList, curRealFileList);
+		}
+		
+		
+		@Override
+		String simpleDesc() {
+
+			return "\n"  +  Cur_Bat_Name + " #_" + rule_index+"  "+" year_"+mYearStr+"   ###  对当前"+mYearStr+"_main_stock.xlsx 文件进行数据添加     ";
+		}
+		
+		
+		
+		
+	}
+	
+	
+	
 	
 	// 分析在  J0_Data_Dir_Path   zbin/J0_Data/中的  daily_basic_*.xlsx  输出一个XLSX结果  daily_basic_202108 
-	class Daily_basic_YYYYMM_XLSX_Rule_1 extends  Basic_Rule{
+	class  Daily_basic_YYYYMM_XLSX_Rule_0 extends  Basic_Rule{
 
 		ArrayList<File>  mAllDailyBasicXlsxFileList ;   // 所有在  /zbin/J0_Data/中的 daily_basic_*.xlsx 文件
 		ArrayList<Stock_NodeImpl> allStockDailyBasicList;  // 所有的股票列表 以及 这个股票的 daily_basic.xlsx 信息
 		
 		
-		Daily_basic_YYYYMM_XLSX_Rule_1() {
-			super("#", 1, 4); //
+		 Daily_basic_YYYYMM_XLSX_Rule_0() {
+			super("#", 0, 4); //
 			// TODO Auto-generated constructor stub
 			mAllDailyBasicXlsxFileList = new ArrayList<File>();
 			allStockDailyBasicList =  new ArrayList<Stock_NodeImpl>();
-			initTsCodeList();  
-			
+		
 		}
 		
 	 void 	showFileArrayList(ArrayList<File> fileList){
@@ -350,6 +583,8 @@ public class J0_GuPiao_Analysis {
 		 System.out.println("fileList.size() = "+ fileList.size());
 			
 		}
+	 
+	 
 		@Override
 		boolean initParamsWithInputList(ArrayList<String> inputParamList) {
 		// TODO Auto-generated method stub
@@ -407,7 +642,12 @@ public class J0_GuPiao_Analysis {
 				        Workbook wb =null;
 				
 				        Row row = null;
-				        List<Map<String,String>> list = null;
+				        
+				     // 一个Xlsx 多个 Sheet页的内容  nima  
+				        List<List<Map<String,String>>> mXlsxDataList = null; 
+				        
+				        List<Map<String,String>> mSheetDataList = null;   // 一个Sheet页的内容
+				        
 				        String cellData = null;
 				        String filePath = mDailyBasicFile.getAbsolutePath();
 				        System.out.println("xlsx Path = "+ filePath);
@@ -419,8 +659,9 @@ public class J0_GuPiao_Analysis {
 				        wb = readExcel(filePath);
 
 				        if(wb != null){
-				            //用来存放表中数据
-				            list = new ArrayList<Map<String,String>>();
+				        	// 仅仅 初始化
+				            mSheetDataList = new ArrayList<Map<String,String>>();
+				            mXlsxDataList = new  ArrayList<List<Map<String,String>>>();
 				            //获取第一个sheet
 //				            sheet = wb.getSheet("股票列表");
 //				            sheet = wb.getSheetAt(0);
@@ -440,9 +681,9 @@ public class J0_GuPiao_Analysis {
 					        	  sheetIndex++;
 					        	  
 					        	  
-					        	  
+						            //用来存放表中数据  ArrayItem【Map<String,String>】 是一个sheet页的一行的数据
 					              //用来存放表中数据
-					              list = new ArrayList<Map<String,String>>();
+					              mSheetDataList = new ArrayList<Map<String,String>>();
 					              //获取第一个sheet
 //					              sheet = wb.getSheet("股票列表");
 //					       
@@ -466,18 +707,21 @@ public class J0_GuPiao_Analysis {
 					                  }else{
 					                      break;
 					                  }
-					                  list.add(map);
+					                  mSheetDataList.add(map);  // 增加一行
 					              }
 					              
 					              
+					              mXlsxDataList.add(mSheetDataList);  //   添加一个sheet 
 					              
-					              
-							
+						           System.out.println("mXlsxDataList.size()="+mXlsxDataList.size()+"    mSheetDataList.size() = "+ mSheetDataList.size()+"  ");
 						}
-				           System.out.println();
+			
 
 				        }   //   if(wb != null)  End 
 				        //遍历解析出来的list
+				        //  解析当前的 mXlsxDataList 解析出的全部数据   
+				        // 由于程序数据太大 耗时太大 所以继续写下去该 Rule1 意义不大 需要换思维处理
+				       
 						
 				          System.out.println("Thread_Runnable_OVER!! "+"fileIndex["+fileIndex+"]  filePath["+ filePath+"]");
 
@@ -504,7 +748,7 @@ public class J0_GuPiao_Analysis {
 		@Override
 		String simpleDesc() {
 
-			return "\n"  +  Cur_Bat_Name + " #_" + rule_index+"   ###  针对 Desktop/zbin/J0_Data/ 目录下的   daily_basic_YYYYMM.xlsx  进行客制分析输出 一个 .xlsx的说明文件    ";
+			return "\n"  +  Cur_Bat_Name + " #_" + rule_index+"   ###  【太耗时_可行性失败_废弃】针对 Desktop/zbin/J0_Data/ 目录下的   daily_basic_YYYYMM.xlsx  进行客制分析输出 一个 .xlsx的说明文件    ";
 		}
 		
 		
@@ -608,6 +852,13 @@ public class J0_GuPiao_Analysis {
 			return null;
 		}
 
+		String getXlsxDynamicHeader() {
+			return "动态"+dynamicIndexInList;
+		}
+
+		
+		
+		
 		String ruleTip(String type, int index, String batName, OS_TYPE curType) {
 			String itemDesc = "";
 			if (curType == OS_TYPE.Windows) {
@@ -655,6 +906,9 @@ public class J0_GuPiao_Analysis {
 		ArrayList<String> curFilterFileTypeList; // 当前的文件过滤类型 多种文件过滤类型 例如把 多种格式 jpeg png 转为 jpg 时 使用到
 		ArrayList<File> curFixedFileList; // 当前修改操作成功的集合
 
+		boolean isShowHeaderInXlsx ;  //  Rule的规则是否在  main_stock.xlsx 中显示
+		int dynamicIndexInList ;    // 在 List 中的位置
+		
 		abstract boolean allowEmptyDirFileList(); // 是否允许当前的目录下的文件为空
 
 		abstract String applyStringOperationRule1(String origin);
@@ -680,6 +934,10 @@ public class J0_GuPiao_Analysis {
 
 		abstract String simpleDesc(); // 使用的简单描述 中文的该 rule的使用情况 默认会在 ruleTip 被调用
 
+		
+		abstract String getXlsxDynamicHeader(); //  在 xlsx中的动态计算的 head 描述
+
+		
 	}
 
 	static void writeContentToFile(File file, String strParam) {
@@ -953,8 +1211,34 @@ public class J0_GuPiao_Analysis {
 
 	}
 
+	
+	static void initYYYYMainStockXlsx() {
+		
+	
+	    File J0_Data_File = new File(J0_Data_Dir_Path);
+	    if(!J0_Data_File.exists() || J0_Data_File.listFiles() == null ) {
+	    	
+	    	
+	    	System.out.println("当前 "+J0_Data_Dir_Path+"路径中 不存在数据文件!");
+	    	return;
+	    	
+	    }
+	    File[] J0DataFileArr = J0_Data_File.listFiles();
+	    
+	    
+		for (int i = 0; i < J0DataFileArr.length; i++) {
+			File curFile = J0DataFileArr[i];
+			String fileName = curFile.getName().toLowerCase();
+			//   把 J0_Data 中 以  main_stock.xlsx 结尾的文件集合起来 
+			if(fileName.endsWith("main_stock.xlsx") && !fileName.contains("~$") ) {
+				mYearMainStockFileList.add(curFile);
+			}
+		}
 
-	static void showTip() {
+	}
+	
+	static void showRuleMethod() {
+		
 		System.out.println("对Type文件内容 进行 Index 规则的处理  identy=【 Type_Index 】【 文件后缀_当前操作逻辑索引】\n");
 		System.out.println("当前已实现的替换逻辑如下:\n");
 
@@ -977,6 +1261,422 @@ public class J0_GuPiao_Analysis {
 		}
 		System.out.println("═══════════════════" + "使用方法列表 End " + "═══════════════════" + "\n");
 
+		
+	}
+	
+
+	static boolean isContainNowYearMainStockFile( ArrayList<File> mMainStockFileList ) {
+		boolean isContainFla = false;
+		
+		for (int i = 0; i < mMainStockFileList.size(); i++) {
+			File mainStockFile = mMainStockFileList.get(i);
+			String mMainStockName = mainStockFile.getName();
+//			System.out.println("mMainStockName="+mMainStockName+"    Cur=" + getCurrentYear()+"_main_stock.xlsx");
+			if(mMainStockName.equals(getCurrentYear()+"_main_stock.xlsx")) {
+				return true;
+			}
+		}
+
+		return isContainFla;
+
+	}
+	static void showMainFileStatus() {
+	
+		// 打印当前文件的   main_stock.xlsx 文件情况
+		System.out.println("═══════════════════" + " xxxx_main_stock.xlsx  情况 Begin" + "═══════════════════" + "\n");
+
+		
+		// 当前目录 没有任何一个 main_stock.xlsx 活着当前
+	
+		if(mYearMainStockFileList.size() == 0 || !isContainNowYearMainStockFile(mYearMainStockFileList) ) {
+	
+			System.out.println("当前目录没有任何 xxxx_main_stock.xslx 将初始化  以及今年的 main_stock.xlsx 文件【"+getCurrentYear()+"_main_stock.xlsx】"+ "\n");
+			
+			initYearMainStockXlsxForYear(getCurrentYear() );
+			
+		}else {
+		
+			//  分析 当前 xlsx 文件的 记录 项数据
+			 initTradeDayList();
+//			 【年总项:244】【至今项:155】【记账项:44】【遗落项:67】【今日账:false】
+			for (int i = 0; i < mYearMainStockFileList.size(); i++) {
+				File mainStockFileItem = mYearMainStockFileList.get(i);
+				String fileName = mainStockFileItem.getName();
+				String yearFromFileName = fileName.substring(0,4);
+				int fileYearInt = Integer.parseInt(yearFromFileName);
+				
+				StringBuilder mTipSb = new StringBuilder();
+		    	ArrayList<Integer> yearTradeDayList = 	mYear_TradeDayList_Map.get(fileYearInt);
+				String mYearTip = "【年总项:"+yearTradeDayList.size()+"】";
+				ArrayList<Integer> fromNowTradeDayList = calculFromNowTradeDayList(getCurrentYYYYMMDD(),yearTradeDayList);
+				String mFromNowTip = "【至今项:"+fromNowTradeDayList.size()+"】";
+				// 检测当前 目前为止  没有记录的 交易日的集合
+				ArrayList<Integer> mRecordDayList = calculRecordTradeDayList(fileYearInt,getCurrentYYYYMMDD(),fromNowTradeDayList,mainStockFileItem , SheetHead_Part_1 , realTypeRuleList , yearTradeDayList);
+				
+				String mRecordTip = "【记账项:"+mRecordDayList.size()+"】";
+				int needRecordCount = fromNowTradeDayList.size() - mRecordDayList.size();
+				String mNeedRecordTip = "【遗落项:"+needRecordCount+"】";
+				boolean isContainToady = isContainDayInList(getCurrentYYYYMMDD() , mRecordDayList);
+				String mRecordToday = "【今日账:"+isContainToady+"】";
+				mTipSb.append(mYearTip+" "+mFromNowTip+" "+mRecordTip+" "+mNeedRecordTip+" "+mRecordToday );
+				
+				mTipSb.append("\n");
+				System.out.println("MainStock["+(i+1)+"_"+(mYearMainStockFileList.size())+"]:"+fileName+" "+ mTipSb.toString());
+				
+			}
+		}
+		
+		
+		System.out.println("═══════════════════" + " xxxx_main_stock.xlsx  情况 End" + "═══════════════════" + "\n");
+
+		
+
+	}
+	
+	static boolean isContainDayInList(int curDayInt , ArrayList<Integer> intList) {
+		boolean flag = false;
+		if(intList == null || intList.size() == 0) {
+			return false;
+		}
+		
+		for (int i = 0; i < intList.size(); i++) {
+			int itemInt = intList.get(i);
+			if(curDayInt == itemInt) {
+				return true;
+			}
+		}
+		
+		
+		return flag;
+		
+	}
+	
+	// 读取文件 去 检测 当前目前 为止 还没有记录的 日期的集合 
+	static ArrayList<Integer> 	calculRecordTradeDayList( int nowYear , int nowYYYYMMDD ,
+			ArrayList<Integer> mFromNowOnTradeDayList , File mMainStockXlsxFile , 
+			String [] SheetHead_Part_1_tscodeName  ,  ArrayList<Rule>  SheetHead_Part_B_RuleList , 
+			ArrayList<Integer> SheetHead_Part_C  ){
+		
+		
+		
+		 ArrayList<Integer> fromNowDayList = new  ArrayList<Integer> ();
+		
+ // SheetHead_Part_1
+ // ShhetHead_Part_2
+		 
+ArrayList<String> columnHeadArr = new ArrayList<String>();
+
+for (int i = 0; i < SheetHead_Part_1_tscodeName.length; i++) {
+	columnHeadArr.add(SheetHead_Part_1_tscodeName[i]);
+}
+
+for (int i = 0; i < SheetHead_Part_B_RuleList.size(); i++) {
+	if(SheetHead_Part_B_RuleList.get(i).isShowHeaderInXlsx) {
+		columnHeadArr.add(SheetHead_Part_B_RuleList.get(i).getXlsxDynamicHeader());
+	}
+
+}
+
+
+
+for (int i = SheetHead_Part_C.size() -1 ; i >= 0 ; i--) {
+	columnHeadArr.add((SheetHead_Part_C.get(i)+"").substring(4));
+}
+
+
+
+
+String[] columns =  new String[columnHeadArr.size()];
+
+for (int i = 0; i < columnHeadArr.size(); i++) {
+	columns[i] = columnHeadArr.get(i);
+//	System.out.println("columns["+i+"]  = " + columns[i]);
+}
+
+
+
+
+
+		   Workbook mainStockWorkBook  =null;
+	        Sheet mainStockSheet = null;
+	        Row mainStockRow = null;
+	        List<Map<String,String>> mainStockList = null;
+	        String mainStockCellData = null;
+
+	        mainStockWorkBook = readExcel(mMainStockXlsxFile.getAbsolutePath());
+          
+	        
+	        if(mainStockWorkBook != null){
+	            //用来存放表中数据
+	        	// 行数据集合
+	        	// 每个行都是一个Map     Map的Key 是 Colum的名称  Value 是单元格的值
+	        	mainStockList = new ArrayList<Map<String,String>>();
+	            //获取第一个sheet
+//	            sheet = wb.getSheet("股票列表");
+//	            sheet = wb.getSheetAt(0);
+	            mainStockSheet = mainStockWorkBook.getSheet(MainStock_SheetChineseNameArr[0]);
+	            //获取最大行数
+	            int rownum = mainStockSheet.getPhysicalNumberOfRows();
+	            //获取第一行
+	            mainStockRow = mainStockSheet.getRow(0);
+	            //获取最大列数
+	            int colnum = mainStockRow.getPhysicalNumberOfCells();
+	            for (int i = 1; i<rownum; i++) {
+	                Map<String,String> map = new LinkedHashMap<String,String>();
+	                mainStockRow = mainStockSheet.getRow(i);
+	                if(mainStockRow !=null){
+	                    for (int j=0;j<colnum;j++){
+	                    	mainStockCellData = (String) getCellFormatValue(mainStockRow.getCell(j));
+	                        map.put(columns[j], mainStockCellData);
+	                    }
+	                }else{
+	                    break;
+	                }
+	                mainStockList.add(map);
+	            }
+	            
+	            
+	            //遍历解析出来的list
+	            
+	            
+	        }
+	        
+	        if(mainStockList == null || mainStockList.size() == 0 ) {
+	        	
+	        	System.out.println(" 读取 " + mMainStockXlsxFile.getAbsolutePath() +" 文件失败! ");
+	       	 return fromNowDayList;
+	        
+	        }
+	        
+//	 System.out.println(" 读取 " + mMainStockXlsxFile.getAbsolutePath() +" 文件 共 " + mainStockList.size() +" 行 !" +"  至今交易日数量:  "+mFromNowOnTradeDayList.size());
+   	
+	        	
+	      
+	        for (int i = 0; i < mFromNowOnTradeDayList.size(); i++) {
+	        	Random rd = new Random();
+	        	int nowOnDayInt = mFromNowOnTradeDayList.get(i);
+	        	String mMMDD = (""+nowOnDayInt).substring(4).trim();
+//	        	System.out.println("MMDD = "+ mMMDD);
+	        	if(mMMDD.length() != 4) {
+	        		continue;
+	        	}
+	        	
+	        	int randomIndexA = rd.nextInt(mainStockList.size()-1) +1;
+	        	int randomIndexB = rd.nextInt(mainStockList.size()-1) +1;
+	        	int randomIndexC = rd.nextInt(mainStockList.size()-1) +1;
+	        	
+	        	   Map<String,String> mRowMapA=  	mainStockList.get(randomIndexA);
+	          	   Map<String,String> mRowMapB=  	mainStockList.get(randomIndexB);
+	          	   Map<String,String> mRowMapC=  	mainStockList.get(randomIndexC);
+	          	   
+	             	String CellA =  mRowMapA.get(mMMDD);
+	            	String CellB =  mRowMapB.get(mMMDD);
+	            	String CellC =  mRowMapC.get(mMMDD);
+	            	
+	            
+	            	// 如果三个 都不等于 null  那么说明 这个 项 就没有 初始化了   是 
+	            	if(CellA != null && !"".equals(CellA)
+	            		&&	CellB != null && !"".equals(CellB)
+	               		&&	CellC != null && !"".equals(CellC)		) {
+	            		fromNowDayList.add(nowOnDayInt);
+//	    	        	System.out.println("MMDD = "+ mMMDD+"  nowOnDayInt="+nowOnDayInt+" RA["+randomIndexA+"]【CellA="+CellA+"】"+"  RB["+randomIndexB+"]【CellB="+CellB+"】"+"  RC["+randomIndexC+"]【CellC="+CellC+"】");
+
+	            	}
+	            	
+//    	        	System.out.println("MMDD = "+ mMMDD+"  nowOnDayInt="+nowOnDayInt+" RA["+randomIndexA+"]【CellA="+CellA+"】"+"  RB["+randomIndexB+"]【CellB="+CellB+"】"+"  RC["+randomIndexC+"]【CellC="+CellC+"】");
+
+    	        	
+	          	   
+			}
+	        
+	        
+//	        System.out.println("当前 记录的 日期 数量为: "+ fromNowDayList.size() );
+	        
+	        for (int i = 0; i < fromNowDayList.size(); i++) {
+//				System.out.println("recordIndex["+i+"_"+fromNowDayList.size()+"] = "+fromNowDayList.get(i));
+			}
+	        
+	        
+	        
+       
+		 return fromNowDayList;
+	}
+	
+	
+	static ArrayList<Integer>  calculFromNowTradeDayList( int nowDay ,  ArrayList<Integer> curYearTradeDayList ){
+		 ArrayList<Integer> fromNowDayList = new  ArrayList<Integer> ();
+		 
+		 
+		 for (int i = 0; i < curYearTradeDayList.size(); i++) {
+		int curDay = 	 curYearTradeDayList.get(i);
+
+		if(nowDay >= curDay ) {
+			
+			fromNowDayList.add(curDay);
+			
+//			System.out.println("add index["+i+ "]   nowDay="+nowDay+"   curDay="+curDay);
+			
+		}else {
+			
+//			System.out.println("noadd index["+i+ "]   nowDay="+nowDay+"   curDay="+curDay);
+		}
+			 
+			
+		}
+		
+		
+		 return fromNowDayList;
+		 
+		
+	}
+	
+
+	static void initYearMainStockXlsxForYear(int curYear){
+		
+		String curYearMainStockXlsxName = curYear+"_main_stock.xlsx";
+		File targetFile = new File(J0_Data_Dir_Path+File.separator+curYearMainStockXlsxName);
+		
+		
+		// 创建 这个 xlsx 文件 
+		//  1.从 交易日历 读取到 今年的交易日期的集合  
+		//  2.从 股票列表 读取到 今年的 股票列表
+		//  3. 动态计算的列表 需要预留 留他个 20 个动态列表  组成一个新的xlsx 文件 
+		
+		 initTsCodeList();
+		 
+		 ArrayList<Rule> dynamicColumn = realTypeRuleList ;   // 动态计算column逻辑的项
+		 initTradeDayList();
+		
+		 // 
+		ArrayList<Integer> matchTradeDayList =  mYear_TradeDayList_Map.get(curYear);
+//		TScode_StockName_Map    
+//		TScode_List
+		
+		
+		initYearMainStockXlsxWithData_createxlsx(curYear,targetFile,TScode_List,TScode_StockName_Map,realTypeRuleList,matchTradeDayList);
+		
+		
+	}
+	
+
+	
+	static void initYearMainStockXlsxWithData_createxlsx(int curYear , File tmpFile ,
+			ArrayList<String> tscodeList , Map<String, String> tScode_StockName_Map ,
+			ArrayList<Rule> ruleList , ArrayList<Integer> tradeDayList ) {
+
+		
+	    OutputStream outputStreamExcel = null;
+        if (!tmpFile.getParentFile().exists()) {
+            tmpFile.getParentFile().mkdirs();//创建目录
+        }
+        if(!tmpFile.exists()) {
+            try {
+				tmpFile.createNewFile();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				System.out.println("创建文件 mainStock【"+tmpFile.getAbsolutePath()+"】失败A !");
+				e.printStackTrace();
+			}//创建文件
+        }
+        
+        
+        Workbook workbook = null;
+        workbook = new XSSFWorkbook();//创建Workbook对象(excel的文档对象)
+        
+        for (int i = 0; i < MainStock_SheetChineseNameArr.length; i++) {
+        	String curShhetName = MainStock_SheetChineseNameArr[i];
+        	
+
+            Sheet mSheet = workbook.createSheet(curShhetName);// 建建sheet对象（excel的表单）
+            
+            // 设置单元格字体
+            Font headerFont = workbook.createFont(); // 字体
+            headerFont.setFontHeightInPoints((short)14);
+            headerFont.setFontName("黑体");
+            
+     
+            Row row = mSheet.createRow(0);
+            
+            
+            int rowIndex = 0 ;
+            
+        
+//            SheetHead_Part_1
+            
+            for (int j = 0; j < SheetHead_Part_1.length; j++) {
+                row.createCell(rowIndex++).setCellValue(SheetHead_Part_1[j]);
+			}
+            
+ 
+            
+            for (int j = 0; j < ruleList.size(); j++) {
+				String columnName =  ruleList.get(j).getXlsxDynamicHeader();
+				// 有些 规则 是  不显示 在 head  中的  有些规则 则作用在 header 中 
+				if(ruleList.get(j).isShowHeaderInXlsx) {
+				    row.createCell(rowIndex++).setCellValue(columnName);
+				}
+	
+			}
+            
+            for (int j = tradeDayList.size() -1 ; j >= 0 ; j--) {
+				int dayFalg = tradeDayList.get(j);
+				String monthday = (""+dayFalg).substring(4);
+	            row.createCell(rowIndex++).setCellValue(monthday);
+            
+			}
+            int columnIndex = 1 ;
+   
+            //  SheetHead_Part_1    与   两行 强关联 
+            for (int j = 0; j < tscodeList.size(); j++) {
+				String tscode = tscodeList.get(j);
+				String cname = tScode_StockName_Map.get(tscode);
+	
+		            Row rowNext = mSheet.createRow(columnIndex++);
+		            rowNext.createCell(0).setCellValue(cname);
+		            rowNext.createCell(1).setCellValue(tscode);
+			}
+    
+		}
+        try {
+			outputStreamExcel = new FileOutputStream(tmpFile);
+	        workbook.write(outputStreamExcel);
+	        outputStreamExcel.flush();
+	        outputStreamExcel.close();
+	        
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			System.out.println("创建文件 mainStock【"+tmpFile.getAbsolutePath()+"】失败B !");
+
+			e.printStackTrace();
+		}
+
+        
+        
+
+
+        if(tmpFile.exists() && tmpFile.length() > 10) {
+            System.out.println(" 创建 "+ tmpFile.getAbsolutePath()+" 文件 Success 成功! ");
+        }else {
+        	
+            System.out.println(" 创建 "+ tmpFile.getAbsolutePath()+" 文件 Failed 失败! ");
+
+        }
+
+        
+        
+		
+		//  1. 创建 sheet 页面
+		//  2. 在 sheet 页面填充 初始化的数据
+		
+		
+		
+	}
+	
+	static void showTip() {
+	
+		showRuleMethod();
+		showMainFileStatus();
+		
 	}
 
 	static boolean checkInputParamsOK() {
@@ -1030,11 +1730,16 @@ public class J0_GuPiao_Analysis {
 		}
 
 		mJ0_Object = new J0_GuPiao_Analysis();
-		mJ0_Object.InitRule();
+		mJ0_Object.initrule();
+		
 
 		File mCurDirFile = new File(curDirPath);
 		curDirFile = new File(curDirPath);
 
+		// 初始化  mYY
+		initYYYYMainStockXlsx();
+		
+		
 		if (mKeyWordName.size() == 0) {
 			showTip();
 			return;
@@ -1050,10 +1755,13 @@ public class J0_GuPiao_Analysis {
 			return;
 		}
 
+
+		
 		// 通过 shell中输入参数来进行操作
 		// Rule_Identify_TypeIndexList.add("html_1"); // 1.添加处理的类型文件 类型_该类型的处理逻辑索引
 		// 索引从1开始
-
+		initTsCodeList();   //  开始 初始化  TS_Code
+		initTradeDayList();
 		for (int i = 0; i < Rule_Identify_TypeIndexList.size(); i++) { // 依据文件类型 去找到文件
 			// html_1
 			String applyRuleString = Rule_Identify_TypeIndexList.get(i);
@@ -1480,6 +2188,16 @@ public class J0_GuPiao_Analysis {
 		}
 		return retCode + "";
 	}
+	
+	
+	static int getCurrentYYYYMMDD() {
+
+		SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd");
+
+		return Integer.parseInt(df.format(new Date()));
+
+	}
+	
 
 	static int getCurrentYear() {
 
