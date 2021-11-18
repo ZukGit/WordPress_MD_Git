@@ -1469,7 +1469,12 @@ writeContentToFile(dailyPythonFile,allDailyCode);
             sb.append("\n【十二月】"+"  day_"+month12_begin+"-"+month12_end+" 查询如下: \n");
             sb.append(Cur_Bat_Name+"  day_"+month12_begin+"-"+month12_end+"   &&  " + " "+ J0_call_rangeday_python_bat_File.getAbsolutePath() + " "+ month12_begin+"-"+month12_end);
 
-            
+
+            sb.append("\n【今年年初("+curYearBeginDay+")到今日("+nowMonth_End+")】"+"  day_"+curYearBeginDay+"-"+nowMonth_End+" 查询如下: \n");
+            sb.append(Cur_Bat_Name+"  day_"+curYearBeginDay+"-"+nowMonth_End+"   &&  " + " "+ J0_call_rangeday_python_bat_File.getAbsolutePath() + " "+ curYearBeginDay+"-"+nowMonth_End);
+
+
+
             sb.append("\n【今月月初("+nowMonth_Begin+")到今日("+nowMonth_End+")】"+"  day_"+nowMonth_Begin+"-"+nowMonth_End+" 查询如下: \n");
             sb.append(Cur_Bat_Name+"  day_"+nowMonth_Begin+"-"+nowMonth_End+"   &&  " + " "+ J0_call_rangeday_python_bat_File.getAbsolutePath() + " "+ nowMonth_Begin+"-"+nowMonth_End);
 
