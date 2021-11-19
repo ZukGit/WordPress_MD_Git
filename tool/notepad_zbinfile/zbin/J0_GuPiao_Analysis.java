@@ -2,6 +2,11 @@
 
 import com.google.common.collect.Maps;
 
+import net.sourceforge.pinyin4j.PinyinHelper;
+import net.sourceforge.pinyin4j.format.HanyuPinyinCaseType;
+import net.sourceforge.pinyin4j.format.HanyuPinyinOutputFormat;
+import net.sourceforge.pinyin4j.format.HanyuPinyinToneType;
+import net.sourceforge.pinyin4j.format.exception.BadHanyuPinyinOutputFormatCombination;
 
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
@@ -455,25 +460,25 @@ public class J0_GuPiao_Analysis {
 //	
 //	 realTypeRuleList.add(new  Daily_basic_YYYYMM_XLSX_Rule_0());
 
-		addRuleToList(new  Make_Year_Stock_Xlsx_Rule_1(),true);	
-		addRuleToList(new  Make_Year_Stock_Xlsx_Rule_1(),true);	
-		addRuleToList(new  Make_Year_Stock_Xlsx_Rule_1(),true);	
-		addRuleToList(new  Make_Year_Stock_Xlsx_Rule_1(),true);	
-		addRuleToList(new  Make_Year_Stock_Xlsx_Rule_1(),true);	
-		addRuleToList(new  Make_Year_Stock_Xlsx_Rule_1(),true);	
-		addRuleToList(new  Make_Year_Stock_Xlsx_Rule_1(),true);	
-		addRuleToList(new  Make_Year_Stock_Xlsx_Rule_1(),true);	
-		addRuleToList(new  Make_Year_Stock_Xlsx_Rule_1(),true);	
-		addRuleToList(new  Make_Year_Stock_Xlsx_Rule_1(),true);	
-		addRuleToList(new  Make_Year_Stock_Xlsx_Rule_1(),true);	
-		addRuleToList(new  Make_Year_Stock_Xlsx_Rule_1(),true);	
-		addRuleToList(new  Make_Year_Stock_Xlsx_Rule_1(),true);	
-		addRuleToList(new  Make_Year_Stock_Xlsx_Rule_1(),true);	
-		addRuleToList(new  Make_Year_Stock_Xlsx_Rule_1(),true);	
-		addRuleToList(new  Make_Year_Stock_Xlsx_Rule_1(),true);	
-		addRuleToList(new  Make_Year_Stock_Xlsx_Rule_1(),true);	
-		addRuleToList(new  Make_Year_Stock_Xlsx_Rule_1(),true);	
-		addRuleToList(new  Make_Year_Stock_Xlsx_Rule_1(),true);	
+		addRuleToList(new  AddData_To_Year_Main_Stock_Xlsx_Rule_1(),true);	
+	addRuleToList(new  AddData_To_Year_Main_Stock_Xlsx_Rule_1(),true);	
+	addRuleToList(new  AddData_To_Year_Main_Stock_Xlsx_Rule_1(),true);	
+	addRuleToList(new  AddData_To_Year_Main_Stock_Xlsx_Rule_1(),true);	
+	addRuleToList(new  AddData_To_Year_Main_Stock_Xlsx_Rule_1(),true);	
+	addRuleToList(new  AddData_To_Year_Main_Stock_Xlsx_Rule_1(),true);	
+	addRuleToList(new  AddData_To_Year_Main_Stock_Xlsx_Rule_1(),true);	
+	addRuleToList(new  AddData_To_Year_Main_Stock_Xlsx_Rule_1(),true);	
+	addRuleToList(new  AddData_To_Year_Main_Stock_Xlsx_Rule_1(),true);	
+	addRuleToList(new  AddData_To_Year_Main_Stock_Xlsx_Rule_1(),true);	
+	addRuleToList(new  AddData_To_Year_Main_Stock_Xlsx_Rule_1(),true);	
+	addRuleToList(new  AddData_To_Year_Main_Stock_Xlsx_Rule_1(),true);	
+	addRuleToList(new  AddData_To_Year_Main_Stock_Xlsx_Rule_1(),true);	
+	addRuleToList(new  AddData_To_Year_Main_Stock_Xlsx_Rule_1(),true);	
+	addRuleToList(new  AddData_To_Year_Main_Stock_Xlsx_Rule_1(),true);	
+	addRuleToList(new  AddData_To_Year_Main_Stock_Xlsx_Rule_1(),true);	
+	addRuleToList(new  AddData_To_Year_Main_Stock_Xlsx_Rule_1(),true);	
+	addRuleToList(new  AddData_To_Year_Main_Stock_Xlsx_Rule_1(),true);	
+	addRuleToList(new  AddData_To_Year_Main_Stock_Xlsx_Rule_1(),true);	
 	}
 	
 	
@@ -505,16 +510,43 @@ void 	addRuleToList(Rule rule , boolean isShowInXlsxHead){
 	// 放入的文件名称是  2021_main_stock.xlsx    包含 close pct_chg  change  amount  四个指标
 	//  每个xlsx 分为三部分  第一部分 是 股票名称    第二部分是 动态计算的 最近结果  第三部分是 当前属性的指标
 	
-	class Make_Year_Stock_Xlsx_Rule_1 extends  Basic_Rule{
+	class AddData_To_Year_Main_Stock_Xlsx_Rule_1 extends  Basic_Rule{
 		
 		// 默认为今年   如果是 从外部获取 那么 就是指定的 年份  最终会 匹配到  2021_main_stock.xlsx 这样的文件
-		String mYearStr;
+		int mYearInt;   // 默认为 今年  从 输入得到 
+		File mMatchYearMainStockFile;  // 匹配到的 xxxx_main_stock.xlsx
+		ArrayList<File> mDayXlsxFileList ;   // 在 J0_Data 中的 day_2021_1105.xlsx 文件的集合
+		ArrayList<File> mDayJsonFileList ; // 在 J0_Data 中的 day_2021_1105.json 文件的集合
+		ArrayList<Integer> mNeedAddTradeDayList;//  读取 yyyy_main_stock.xlsx 后需要加载数据的日期列表
+	
+		ArrayList<Integer> mYearTradeDayList;//    今年总共需要写入的 交易日期 列表
 		
-		Make_Year_Stock_Xlsx_Rule_1() {
+		ArrayList<Integer> mdAddFaiedTradeDayList;  //  添加数据失败的 日期的 天数  可能由于 没有文件导致
+		
+		// key【000001(ts_code)】---> value【 key【0811】,value【RiXianXingQingvShiJianWeiXu(四个属性)】 】
+	    // 拿到了 对应的 数据 
+ 		Map<String,Map<String,RiXianXingQingvShiJianWeiXu>>  mStockPropMap;
+		
+
+ 		boolean isShowLog;
+		
+		File mJ0_Data_Dir_File;
+	
+		
+		
+		
+		AddData_To_Year_Main_Stock_Xlsx_Rule_1() {
 			super("#", 1, 4); //
 			// TODO Auto-generated constructor stub
-			mYearStr = getCurrentYear()+"";
-		
+			mYearInt = getCurrentYear();
+			mDayXlsxFileList = new ArrayList<File>();
+			mDayJsonFileList = new ArrayList<File>();
+			mNeedAddTradeDayList = new  ArrayList<Integer>();
+			mdAddFaiedTradeDayList = new  ArrayList<Integer>();
+			mYearTradeDayList =  new  ArrayList<Integer>();
+			mStockPropMap = new  HashMap<String,Map<String,RiXianXingQingvShiJianWeiXu>>();
+			
+			isShowLog = false;
 		}
 		
 		
@@ -522,40 +554,858 @@ void 	addRuleToList(Rule rule , boolean isShowInXlsxHead){
 		boolean initParamsWithInputList(ArrayList<String> inputParamList) {
 		// TODO Auto-generated method stub
 		
-			File J0_Data_Dir_File = new File(J0_Data_Dir_Path);
+			mJ0_Data_Dir_File = new File(J0_Data_Dir_Path);
 			
-			if(!J0_Data_Dir_File.exists()) {
+			if(!mJ0_Data_Dir_File.exists()) {
 				System.out.println(" J0_Data 路径 "+ J0_Data_Dir_Path +" 文件不存在 程序停止执行 请检查!! 该路径");
 			   return false;
 			}
 			
+			for (int i = 0; i < inputParamList.size(); i++) {
+				String paramItem = inputParamList.get(i).toLowerCase();
+				
+				
+				if (paramItem.startsWith("year_")) {
+					String mYearStr =  paramItem.replace("year_", "").trim();
+					
+					if(isNumeric(mYearStr) && mYearStr.length() == 4) {
+						mYearInt = Integer.parseInt(mYearStr);
+						
+					}
+				}
+				
+				if (paramItem.equals("showlog_true")) {
+					isShowLog = true;
+			
+				}
+				
+				
+				
+				
+			}
+	
+			mMatchYearMainStockFile = new File(mJ0_Data_Dir_File.getAbsolutePath()+File.separator+mYearInt+"_main_stock.xlsx");
+			
+			if(!mMatchYearMainStockFile.exists()) {
+				System.out.println("当前目录有没对应的 xxxx_main_stock.xlsx 文件 将创建这样的文件!");
+				initYearMainStockXlsxForYear(mYearInt);
+			}
+			
+			if(!initJ0DataDay_Xlsx_Json_File()) {
+				System.out.println("当前 "+mJ0_Data_Dir_File.getAbsolutePath()+" 目录没有对应的 day_"+mYearInt+"_xxxx.xlsx 文件请执行  zstock_tushare_tool_J0.bat 创建这样的文件" );
+			   return false;
+			}
+
+			
+			System.out.println("mYearInt【"+mYearInt+"】  isShowLog 【"+isShowLog+"】");
+			
+			
 			return super.initParamsWithInputList(inputParamList);
+		}
+		
+		@Override
+		boolean allowEmptyDirFileList() {
+		// TODO Auto-generated method stub
+		return true;
 		}
 		
 		
 		
+		
+		//  【 000001.SH  】   【Map<MMDD,close>>】
 		
 		
 		@Override
 		ArrayList<File> applySubFileListRule4(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
 			ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 		// TODO Auto-generated method stub
+			// 对当前 的 xlsx 文件 进行 填充数据的操作 
+
+			System.out.println("mYearInt_B 【"+mYearInt+"】");	
+
+	
+			File mainStockFileItem = mMatchYearMainStockFile;
+
+			int fileYearInt = mYearInt;
+			mYearTradeDayList = 	mYear_TradeDayList_Map.get(fileYearInt);
+			ArrayList<Integer> fromNowTradeDayList = calculFromNowTradeDayList(getCurrentYYYYMMDD(),mYearTradeDayList);
+			// 检测当前 目前为止  没有记录的 交易日的集合
+			ArrayList<Integer> mRecordDayList = calculRecordTradeDayList(fileYearInt,getCurrentYYYYMMDD(),fromNowTradeDayList,mainStockFileItem , SheetHead_Part_1 , realTypeRuleList , mYearTradeDayList);
+			int needRecordCount = fromNowTradeDayList.size() - mRecordDayList.size();
+			boolean isContainToady = isContainDayInList(getCurrentYYYYMMDD() , mRecordDayList);
+			
+		
+			mNeedAddTradeDayList.addAll(fromNowTradeDayList);
+			
+//			for (int i = 0; i < mRecordDayList.size(); i++) {
+//				int recordDayInt = mRecordDayList.get(i);
+//				mNeedAddTradeDayList.remove(Integer.valueOf(recordDayInt));  // 去除对应的Object 
+//		      System.out.println("去除已经有数据的日期 "+recordDayInt);
+//			}
+			
+			
+			for (int i = 0; i < mNeedAddTradeDayList.size(); i++) {
+				int needAddTradeDayInt = mNeedAddTradeDayList.get(i);
+				if(mRecordDayList.contains(Integer.valueOf(needAddTradeDayInt))) {
+					
+					System.out.println("已经有数据的交易日期 "+needAddTradeDayInt+" !  无需检查 json文件  continue ");
+					continue;
+				}
+				
+			File matchDayJsonFile = 	getMatchTradeDayJsonFile(needAddTradeDayInt,mDayJsonFileList);
+				if(matchDayJsonFile == null) {
+					mdAddFaiedTradeDayList.add(needAddTradeDayInt);
+					System.out.println("没有匹配到的交易日期 "+needAddTradeDayInt+" 的Json文件为空! ");
+					continue;
+				}else {
+					
+					System.out.println("匹配到的交易日期 "+needAddTradeDayInt+" 的Json文件! matchDayJsonFile="+matchDayJsonFile.getAbsolutePath());
+
+				}
+				
+				
+			      StringBuilder mDayjsonSB = new StringBuilder();
+                  tryReadJsonFromFile(mDayjsonSB,matchDayJsonFile);
+                  
+                  
+                  com.alibaba.fastjson.JSONObject day_jsonobject =    com.alibaba.fastjson.JSONObject.parseObject(mDayjsonSB.toString());
+                  
+                  
+                  ArrayList<String> keyList =new ArrayList<String>();
+                  keyList.addAll( day_jsonobject.keySet());
+                  // json 中 应该包含 每日行情 这样的 key 
+                  
+//                  if(!isContainRiXianHangQing("RiXianXingQingvShiJianWeiXu",keyList)) {
+//  					mdAddFaiedTradeDayList.add(needAddTradeDayInt);
+//                	  continue;
+//                  }
+
+//                  匹配到的交易日期 20211104
+                  
+                  for (int j = 0; j < keyList.size(); j++) {
+					String keyStr = keyList.get(j);
+					System.out.println(needAddTradeDayInt+" Key["+j+"]="+keyStr);
+				}
+                  
+                if(!keyList.contains("日线行情v时间为序")) {
+                	System.out.println("匹配到的交易日期 "+needAddTradeDayInt+" 的Json文件  不包含 每日行情v时间为序 needAddTradeDayInt【"+needAddTradeDayInt+"】  matchDayJsonFile="+matchDayJsonFile.getAbsolutePath());
+					mdAddFaiedTradeDayList.add(needAddTradeDayInt);
+              	  continue;
+                }
+
+                
+                  
+                  
+                com.alibaba.fastjson.JSONArray mMeiRiHangQingJSONArray = (com.alibaba.fastjson.JSONArray)day_jsonobject.getJSONArray("日线行情v时间为序");
+                  
+              
+                if(mMeiRiHangQingJSONArray == null) {
+                	System.out.println("尼玛  从 "+matchDayJsonFile.getName()+" 获取 日线行情v时间为序 数据失败!");
+					mdAddFaiedTradeDayList.add(needAddTradeDayInt);
+	              	  continue;
+                }
+                  
+  	      		// key【000001(ts_code)】---> value【 key【0811】,value【RiXianXingQingvShiJianWeiXu(四个属性)】 】
+
+                  
+	              List<RiXianXingQingvShiJianWeiXu> mRiXianXingQingvShiJianWeiXuList =  mMeiRiHangQingJSONArray.toJavaList(RiXianXingQingvShiJianWeiXu.class);
+
+	              for (int j = 0; j < mRiXianXingQingvShiJianWeiXuList.size(); j++) {
+	            	  RiXianXingQingvShiJianWeiXu mMeiRiHangQing = 	  mRiXianXingQingvShiJianWeiXuList.get(j);
+	            
+	            	
+	            	  
+	            	  String tsCode = mMeiRiHangQing.getTs_code();
+	            	  String matchDayInt = needAddTradeDayInt+"";
+	            	  
+	            
+	        
+	            
+	            	  
+	            	  Map<String,RiXianXingQingvShiJianWeiXu> matchDateMap = 	  mStockPropMap.get(tsCode);
+	            	  
+	            	  if(matchDateMap == null) {
+	            		  
+	            		  matchDateMap = new HashMap<String,RiXianXingQingvShiJianWeiXu>();
+	            	  }
+	            	  
+	            	  if(!matchDateMap.containsKey(matchDayInt)) {
+	            		  matchDateMap.put(matchDayInt, mMeiRiHangQing);
+	            	  }
+	            		
+	            	  mStockPropMap.put(tsCode, matchDateMap);
+	           
+	          		// key【000001(ts_code)】---> value【 key【0811】,value【RiXianXingQingvShiJianWeiXu(四个属性)】 】
+//	          		Map<String,Map<String,RiXianXingQingvShiJianWeiXu>>  
+	          		
+	          		
+	          		
+	            	  
+	            	
+				}
+	      
+//                  Map mDay_MeiRiHangQing_Map = new HashMap<String,List<RiXianXingQingvShiJianWeiXu>>();
+//	              mDay_MeiRiHangQing_Map.put(needAddTradeDayInt+"", RiXianXingQingvShiJianWeiXu);
+	              
+	              
+	           
+                  
+                  
+                  
+				// 开始 转换 json 为 Object  
+				
+				
+//				JSONObject day_jsonobject =    JSONObject.parseObject(jsonSB.toString());
+			}
+			
+			
+			// 1. 判断 当前 MainStock 缺少的 数据 往里面填充    
+			
+			// 2. 依据 本地搜索到的 .xlsx 以及 对应的 json ( 优先使用json 查询数据)
+	
+			// 显示对应的 数据
+			if(isShowLog) {
+				  ShowStockPropMap();
+			}
+			
+			
+			// 感觉 还不如 创建 新的  20xx_main_stock.xlsx 文件  这样 还更快点
+			createMainXlsxWithData(mainStockFileItem,mYearTradeDayList,mStockPropMap);
+			
+			
+			
+			
+			// 填充对应的数据
+			
+			
 		return super.applySubFileListRule4(curFileList, subFileTypeMap, curDirList, curRealFileList);
 		}
 		
 		
-		@Override
-		String simpleDesc() {
+		@SuppressWarnings("unchecked")
+		void createMainXlsxWithData(File tmpFile, ArrayList<Integer> mYearAllTradeDayList , Map<String,Map<String,RiXianXingQingvShiJianWeiXu>>  mTsCode_Data_Map ) {
 
-			return "\n"  +  Cur_Bat_Name + " #_" + rule_index+"  "+" year_"+mYearStr+"   ###  对当前"+mYearStr+"_main_stock.xlsx 文件进行数据添加     ";
+			
+		    OutputStream outputStreamExcel = null;
+		    tmpFile.delete();   // 删除 原有的文件    从新创建 新文件
+	        if (!tmpFile.getParentFile().exists()) {
+	            tmpFile.getParentFile().mkdirs();//创建目录
+	        }
+	        if(!tmpFile.exists()) {
+	            try {
+					tmpFile.createNewFile();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					System.out.println("创建文件 mainStock【"+tmpFile.getAbsolutePath()+"】失败A !");
+					e.printStackTrace();
+				}//创建文件
+	        }
+	        
+	        
+	        Workbook workbook = null;
+	        workbook = new XSSFWorkbook();//创建Workbook对象(excel的文档对象)
+	        
+	   
+	        
+	        for (int i = 0; i < MainStock_SheetChineseNameArr.length; i++) {
+	        	
+	            Map<String,Integer> headName_ColumnNum_Map = new     HashMap<String,Integer>();
+	            
+	        	// 收盘价    涨跌幅   涨跌值  成交额
+	        	String curShhetName = MainStock_SheetChineseNameArr[i];
+	           // 	{"close","pct_chg","change","amount"};
+	        	String curSheetName_English = MainStock_SheetEnglishNameArr[i];
+
+	            Sheet mSheet = workbook.createSheet(curShhetName);// 建建sheet对象（excel的表单）
+	            
+	            // 设置单元格字体
+	            Font headerFont = workbook.createFont(); // 字体
+	            headerFont.setFontHeightInPoints((short)14);
+	            headerFont.setFontName("黑体");
+	            
+	     
+	            Row row = mSheet.createRow(0);
+	            
+	            
+	            int rowIndex = 0 ;
+	            
+	        
+//	            SheetHead_Part_1
+	            
+	            for (int j = 0; j < SheetHead_Part_1.length; j++) {
+	            	// cname【0】  ts_code【1】 
+	            	headName_ColumnNum_Map.put(SheetHead_Part_1[j], rowIndex);
+	                row.createCell(rowIndex++).setCellValue(SheetHead_Part_1[j]);
+				}
+	            
+	 
+	            
+	            for (int j = 0; j < realTypeRuleList.size(); j++) {
+					String columnName =  realTypeRuleList.get(j).getXlsxDynamicHeader();
+					// 有些 规则 是  不显示 在 head  中的  有些规则 则作用在 header 中 
+					if(realTypeRuleList.get(j).isShowHeaderInXlsx) {
+			        	// dynamicProp【3】   ......  dynamicProp【8】
+					 	headName_ColumnNum_Map.put(columnName, rowIndex);
+					    row.createCell(rowIndex++).setCellValue(columnName);
+					}
+		
+				}
+	            
+	            for (int j = mYearAllTradeDayList.size() -1 ; j >= 0 ; j--) {
+					int dayFalg = mYearAllTradeDayList.get(j);
+					String monthday = (""+dayFalg).substring(4);
+					
+				   	// 1231【19】   ......  0101【42】
+				 	headName_ColumnNum_Map.put(monthday, rowIndex);
+		            row.createCell(rowIndex++).setCellValue(monthday);
+	            
+				}
+	            int columnIndex = 1 ;
+	   
+	            
+	            
+	            
+	        	
+				Map.Entry<String,Map<String,RiXianXingQingvShiJianWeiXu>> mOutEntry;
+
+				if (mStockPropMap != null) {
+					Iterator mOutIterator = mStockPropMap.entrySet().iterator();
+					while (mOutIterator.hasNext()) {
+						// ts_code --- XXX【0201  prop】
+						mOutEntry = (Map.Entry<String,Map<String,RiXianXingQingvShiJianWeiXu>> ) mOutIterator.next();
+
+						// 获取 名称的 首字母
+						String ts_code_key = mOutEntry.getKey(); // Map的Value // 作者名称
+						Map<String,RiXianXingQingvShiJianWeiXu>  mData_RiXianHangQing_Map = mOutEntry.getValue();
+					
+						if(mData_RiXianHangQing_Map == null) {
+							continue;
+						}
+//						logsb.append("ts_code_key(___" + ts_code_key + "___" + mData_RiXianHangQing_Map.size() + "___");
+//						System.out.println("ts_code_key(___" + ts_code_key + "___" + mData_RiXianHangQing_Map.size() + "___");
+						Map.Entry<String,RiXianXingQingvShiJianWeiXu>  mInnerEntry;
+						
+						Iterator InnerIterator = mData_RiXianHangQing_Map.entrySet().iterator();
+						
+					
+						boolean isRowInit = false;
+						Row rowNext = null ; 
+						while (InnerIterator.hasNext()) {
+							
+							mInnerEntry = (Map.Entry<String,RiXianXingQingvShiJianWeiXu> ) InnerIterator.next();
+		
+							String tradeDayStr = mInnerEntry.getKey(); // Map的Value // 作者名称
+							RiXianXingQingvShiJianWeiXu mRiXianHangQing = mInnerEntry.getValue();
+							
+							String mMMDD = tradeDayStr.trim().substring(4);
+							
+							
+							String tscode = mRiXianHangQing.ts_code;
+							String cname = mRiXianHangQing.cname;
+		
+			
+							
+							// amount 的单位是 千元 在 这里 改为 单位为 元 
+				
+							
+							if( rowNext == null) {
+								 rowNext = mSheet.createRow(columnIndex++);
+							}
+							
+							rowNext.createCell(0).setCellValue(cname);
+							rowNext.createCell(1).setCellValue(tscode);
+							
+							if(curSheetName_English.equals("close")) {
+								double close = mRiXianHangQing.close;
+								
+								rowNext.createCell(headName_ColumnNum_Map.get(mMMDD)).setCellValue(close);
+								
+							}	else	if(curSheetName_English.equals("change")) {
+								double change = mRiXianHangQing.change;
+								
+								rowNext.createCell(headName_ColumnNum_Map.get(mMMDD)).setCellValue(change);
+								
+							}	else	if(curSheetName_English.equals("pct_chg")) {
+								double pct_chg = mRiXianHangQing.pct_chg;
+								
+								rowNext.createCell(headName_ColumnNum_Map.get(mMMDD)).setCellValue(pct_chg);
+								
+							}	else if(curSheetName_English.equals("amount")) {
+								//  由于成交量的 单位是 千元  直观看 不方便   此处把 double 的小数点去掉 并且 小数点后保持三位
+//								String keep3PointFixed = clearPointAndKeepBackNum(amount,3);
+								Long amountLongNoPoint = mRiXianHangQing.getAmountAsLongNoPoint();
+								if(amountLongNoPoint != null) {
+									rowNext.createCell(headName_ColumnNum_Map.get(mMMDD)).setCellValue(amountLongNoPoint);
+
+								}
+							}
+							
+							
+							
+//							headName_ColumnNum_Map
+						
+//							logsb.append(ts_code_key+"_"+dayIndex+" = "+ mRiXianHangQing.toString());
+//							System.out.println(ts_code_key+"_"+dayIndex+" = "+ mRiXianHangQing.toString());
+					
+					
+						}
+						
+						
+
+					}
+				}
+				
+	            
+	            
+	            
+	            //  这里 写入 数据  遍历Map 
+	            //  SheetHead_Part_1    与   两行 强关联 
+//	            for (int j = 0; j < tscodeList.size(); j++) {
+//					String tscode = tscodeList.get(j);
+//					String cname = tScode_StockName_Map.get(tscode);
+//		
+//			            Row rowNext = mSheet.createRow(columnIndex++);
+//			            rowNext.createCell(0).setCellValue(cname);
+//			            rowNext.createCell(1).setCellValue(tscode);
+//				}
+	    
+	            
+	            
+	            
+	            
+			}
+	        try {
+				outputStreamExcel = new FileOutputStream(tmpFile);
+		        workbook.write(outputStreamExcel);
+		        outputStreamExcel.flush();
+		        outputStreamExcel.close();
+		        
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				System.out.println("创建文件 createMainXlsxWithData  mainStock【"+tmpFile.getAbsolutePath()+"】失败B !");
+
+				e.printStackTrace();
+			}
+
+	        
+	        
+
+
+	        if(tmpFile.exists() && tmpFile.length() > 10) {
+	            System.out.println(" Rule1 创建 createMainXlsxWithData  "+ tmpFile.getAbsolutePath()+" 文件 Success 成功! ");
+	        }else {
+	        	
+	            System.out.println(" Rule1 创建 createMainXlsxWithData  "+ tmpFile.getAbsolutePath()+" 文件 Failed 失败! ");
+
+	        }
+
+			//  1. 创建 sheet 页面
+			//  2. 在 sheet 页面填充 初始化的数据
+
+		}
+		
+	
+			
+	
+		String clearPointAndKeepBackNum(double amountValue , int pointBackNum){
+			String amountResultStr = ""+amountValue;
+
+			if("".equals(amountResultStr)) {
+				return "";
+			}
+			
+			// 如果当前 value 包含 点号  那么 计算 点号 后面有所少个值
+			if(amountResultStr.contains(".")) {
+				String endPointStr = amountResultStr.substring(amountResultStr.lastIndexOf(".")).trim();
+				String end3NumStr = "000";
+				amountResultStr = 	amountResultStr.replace(endPointStr, end3NumStr);   // .3134 变为  000  把最后三位都变为 0 
+
+			}else {  // 如果当前 没有点号  那么 再 末尾 添加 三个0 
+				
+				
+				amountResultStr = amountResultStr+"000";
+			}
+			
+			
+			return amountResultStr;
+			
+			
+			
+		}
+		
+		@SuppressWarnings("unchecked")
+		void ShowStockPropMap() {
+			
+
+			StringBuilder logsb = new StringBuilder();
+			
+			Map.Entry<String,Map<String,RiXianXingQingvShiJianWeiXu>> mOutEntry;
+
+			if (mStockPropMap != null) {
+				Iterator mOutIterator = mStockPropMap.entrySet().iterator();
+				while (mOutIterator.hasNext()) {
+					mOutEntry = (Map.Entry<String,Map<String,RiXianXingQingvShiJianWeiXu>> ) mOutIterator.next();
+
+					// 获取 名称的 首字母
+					String ts_code_key = mOutEntry.getKey(); // Map的Value // 作者名称
+					Map<String,RiXianXingQingvShiJianWeiXu>  mData_RiXianHangQing_Map = mOutEntry.getValue();
+				
+					if(mData_RiXianHangQing_Map == null) {
+						continue;
+					}
+//					logsb.append("ts_code_key(___" + ts_code_key + "___" + mData_RiXianHangQing_Map.size() + "___");
+					System.out.println("ts_code_key(___" + ts_code_key + "___" + mData_RiXianHangQing_Map.size() + "___");
+					Map.Entry<String,RiXianXingQingvShiJianWeiXu>  mInnerEntry;
+					
+					Iterator InnerIterator = mData_RiXianHangQing_Map.entrySet().iterator();
+					
+					int dayIndex = 0;
+					while (InnerIterator.hasNext()) {
+						
+						mInnerEntry = (Map.Entry<String,RiXianXingQingvShiJianWeiXu> ) InnerIterator.next();
+	
+						String tradeDayStr = mInnerEntry.getKey(); // Map的Value // 作者名称
+						RiXianXingQingvShiJianWeiXu mRiXianHangQing = mInnerEntry.getValue();
+						
+					
+//						logsb.append(ts_code_key+"_"+dayIndex+" = "+ mRiXianHangQing.toString());
+						System.out.println(ts_code_key+"_"+tradeDayStr+"_"+dayIndex+" = "+ mRiXianHangQing.toString());
+						dayIndex++;
+				
+					}
+					
+					
+
+				}
+			}
+			
+			System.out.println("从 day_xxx.json 文件的个数"+ mDayJsonFileList.size()+"    股票列表数 mStockPropMap.size() = "+ mStockPropMap.size() );
+
 		}
 		
 		
+		
+		boolean isContainRiXianHangQing(String keyStr , ArrayList<String> keyList) {
+			boolean containFlag = false;
+			
+			for (int i = 0; i < keyList.size(); i++) {
+				String chineseKeyStr = keyList.get(i);
+				
+		        String stcKeyStr_clearChinese_FirstCharUP_Str = ToPinyin_WithFirstBig(chineseKeyStr);
+		        
+		        if(keyStr.equals(stcKeyStr_clearChinese_FirstCharUP_Str)) {
+		        	return true;
+		        }
+			}
+			
+			
+			
+			return containFlag;
+			
+			
+		}
+		
+	    public  String toUpperFirstChar(String srcStr) {
+	        if(srcStr == null) {
+	            return "";
+	        }
+	        String secondStr = srcStr.substring(1).toLowerCase();
+	        String firstChar = (srcStr.charAt(0)+"").toUpperCase();
+
+	        return firstChar+secondStr;
+
+	    }
+	    
+	    public  String  ToPinyin_WithFirstBig(String chinese) {
+	        if (chinese == null || chinese.trim().isEmpty()) {
+	            return null;
+	        }
+	        String curItem = new String(chinese);
+	        while (curItem.contains(" ")) {
+	            curItem = curItem.replaceAll(" ", "");
+	        }
+	        String pinyinStr = "";
+	        char[] newChar = curItem.toCharArray();
+	        HanyuPinyinOutputFormat defaultFormat = new HanyuPinyinOutputFormat();
+	        defaultFormat.setCaseType(HanyuPinyinCaseType.LOWERCASE);
+	        defaultFormat.setToneType(HanyuPinyinToneType.WITHOUT_TONE);
+	        for (int i = 0; i < newChar.length; i++) {
+	            if (newChar[i] > 128) {
+	                try {
+	                    pinyinStr += toUpperFirstChar(PinyinHelper.toHanyuPinyinStringArray(newChar[i], defaultFormat)[0]); // [0] 标识当前拼音 汉->
+	                    // han
+	                } catch (BadHanyuPinyinOutputFormatCombination e) {
+	                    e.printStackTrace();
+	                }
+	            } else { // 汉字的编码是大于 128的 所以 小于 128编码的就直接认为是 ascii编码的
+	                pinyinStr += (newChar[i]+"");
+	            }
+	        }
+	        return pinyinStr;
+	    }
+	    
+	     void tryReadJsonFromFile(StringBuilder sb, File file) {
+
+	        if (file != null && file.exists()) {
+
+	            try {
+	                BufferedReader curBR = new BufferedReader(new InputStreamReader(new FileInputStream(file), "utf-8"));
+	                String lineStr = "";
+
+	                while (lineStr != null) {
+	                    lineStr = curBR.readLine();
+	                    if (lineStr == null || lineStr.trim().isEmpty()) {
+	                        continue;
+	                    }
+
+	                    sb.append(lineStr.trim());
+	                }
+	                curBR.close();
+
+//	                System.out.println("read json File OK !");
+	            } catch (IOException e) {
+	                e.printStackTrace();
+	            }
+	        } else {
+	            System.out.println("Failed !");
+	        }
+	    }
+		
+	    
+		
+		File getMatchTradeDayJsonFile(int tradeDayInt , ArrayList<File> jsonFileList) {
+			File matchJsonFile = null;
+			
+			for (int i = 0; i < jsonFileList.size(); i++) {
+				File jsonFile = jsonFileList.get(i);
+				String fileName = jsonFile.getName().toLowerCase();
+				
+				String onlyDigitalFileName = fileName.replace(".json", "").replace(".", "").replace("_", "").replace("day", "").trim();
+				
+				if((tradeDayInt+"").equals(onlyDigitalFileName)) {
+					return jsonFile;
+				}
+			}
+			
+			return matchJsonFile;
+			
+			
+		}
+		
+		boolean initJ0DataDay_Xlsx_Json_File() {
+
+			
+		File[] mFileArr = 	mJ0_Data_Dir_File.listFiles();
+			if(mFileArr == null || mFileArr.length == 0) {
+				return false;
+			}
+			
+			for (int i = 0; i < mFileArr.length; i++) {
+				File item = mFileArr[i];
+				String fileName = item.getName().toLowerCase();
+				if(fileName.startsWith("day_"+mYearInt+"_") && fileName.endsWith(".xlsx")) {
+					
+					mDayXlsxFileList.add(item);
+				}else if(fileName.startsWith("day_"+mYearInt+"_") && fileName.endsWith(".json")) {
+					mDayJsonFileList.add(item);
+				}
+
+			}
+			
+			if(mDayXlsxFileList.size() == 0) {
+				return false;
+			}
+		
+				return true;
+			
+		}
+		
+		
+		
+	
+		
+		@Override
+		String simpleDesc() {
+
+			return "\n"  +  Cur_Bat_Name + " #_" + rule_index+"  "+" year_"+mYearInt+"   ###  对当前"+mYearInt+"_main_stock.xlsx 文件进行数据添加  不打印Log    " +
+					"\n"  +  Cur_Bat_Name + " #_" + rule_index+"  "+" year_"+mYearInt+"  showlog_true  ###  对当前"+mYearInt+"_main_stock.xlsx 文件进行数据添加 会打印Log    ";
+			
+		}
+		
+		
+		
+
 		
 		
 	}
 	
 	
+	
+	static class RiXianXingQingvShiJianWeiXu{
+	    @Override
+		public String toString() {
+			return " RiXian [ close="+close+" amount=" + amount + ", change=" + change + ", cname=" + cname
+					+ ", trade_date=" + trade_date + ", ts_code=" + ts_code + "]";
+		}
+
+		Double amount;
+	    Double change;
+	    Double close;
+	    String cname;
+	    Double high;
+	    Double low;
+	    Double open;
+	    Double pct_chg;
+	    Double pre_close;
+	    String trade_date;
+	    String ts_code;
+	    Double vol;
+
+	    
+		Long getAmountAsLongNoPoint(){
+			
+			String amountResultStr = ""+amount;
+
+			if("".equals(amountResultStr)) {
+				return null;
+			}
+			
+			 Long longValue =   (long) (amount * 1000);
+			 
+			//	System.out.println("tscode["+ts_code+"] name["+cname+"] trade_date["+trade_date+"]  amountResultStr["+amountResultStr+"]  amount["+amount+"] +  longValue["+longValue+"]");
+
+				
+			 return longValue;
+	
+		}
+		
+		Long getAmountAsLongNoPointA(){
+			String amountResultStr = ""+amount;
+
+			if("".equals(amountResultStr)) {
+				return null;
+			}
+			
+			// 如果当前 value 包含 点号  那么 计算 点号 后面有所少个值
+			if(amountResultStr.contains(".")) {
+				String endPointStr = amountResultStr.substring(amountResultStr.lastIndexOf(".")).trim();
+		
+				String end3NumStr = "000";
+				amountResultStr = 	amountResultStr.replace(endPointStr, end3NumStr);   // .3134 变为  000  把最后三位都变为 0 
+
+			}else {  // 如果当前 没有点号  那么 再 末尾 添加 三个0 
+				
+				
+				amountResultStr = amountResultStr+"000";
+			}
+			
+			Long longValue = Long.parseLong(amountResultStr);
+			
+			System.out.println("tscode["+ts_code+"] name["+cname+"] trade_date["+trade_date+"]  amountResultStr["+amountResultStr+"]  amount["+amount+"] +  longValue["+longValue+"]");
+
+			
+			return longValue;
+			
+			
+		}
+		
+	    public Double getAmount(){
+	        return amount;
+	    }
+
+	    public void setAmount(Double amount){
+	        this.amount=amount;
+	    }
+
+	    public Double getChange(){
+	        return change;
+	    }
+
+	    public void setChange(Double change){
+	        this.change=change;
+	    }
+
+	    public Double getClose(){
+	        return close;
+	    }
+
+	    public void setClose(Double close){
+	        this.close=close;
+	    }
+
+	    public String getCname(){
+	        return cname;
+	    }
+
+	    public void setCname(String cname){
+	        this.cname=cname;
+	    }
+
+	    public Double getHigh(){
+	        return high;
+	    }
+
+	    public void setHigh(Double high){
+	        this.high=high;
+	    }
+
+	    public Double getLow(){
+	        return low;
+	    }
+
+	    public void setLow(Double low){
+	        this.low=low;
+	    }
+
+	    public Double getOpen(){
+	        return open;
+	    }
+
+	    public void setOpen(Double open){
+	        this.open=open;
+	    }
+
+	    public Double getPct_chg(){
+	        return pct_chg;
+	    }
+
+	    public void setPct_chg(Double pct_chg){
+	        this.pct_chg=pct_chg;
+	    }
+
+	    public Double getPre_close(){
+	        return pre_close;
+	    }
+
+	    public void setPre_close(Double pre_close){
+	        this.pre_close=pre_close;
+	    }
+
+	    public String getTrade_date(){
+	        return trade_date;
+	    }
+
+	    public void setTrade_date(String trade_date){
+	        this.trade_date=trade_date;
+	    }
+
+	    public String getTs_code(){
+	        return ts_code;
+	    }
+
+	    public void setTs_code(String ts_code){
+	        this.ts_code=ts_code;
+	    }
+
+	    public Double getVol(){
+	        return vol;
+	    }
+
+	    public void setVol(Double vol){
+	        this.vol=vol;
+	    }
+
+	}
 	
 	
 	// 分析在  J0_Data_Dir_Path   zbin/J0_Data/中的  daily_basic_*.xlsx  输出一个XLSX结果  daily_basic_202108 
@@ -1475,9 +2325,10 @@ for (int i = 0; i < columnHeadArr.size(); i++) {
 	            	
 	            
 	            	// 如果三个 都不等于 null  那么说明 这个 项 就没有 初始化了   是 
-	            	if(CellA != null && !"".equals(CellA)
-	            		&&	CellB != null && !"".equals(CellB)
-	               		&&	CellC != null && !"".equals(CellC)		) {
+	            	// 只要三个 项  其中 一个项 不是空  那么说明  这天的 数据填充过
+	            	if( (CellA != null && !"".equals(CellA))
+	            		||	(CellB != null && !"".equals(CellB))
+	               		||	(CellC != null && !"".equals(CellC))		) {
 	            		fromNowDayList.add(nowOnDayInt);
 //	    	        	System.out.println("MMDD = "+ mMMDD+"  nowOnDayInt="+nowOnDayInt+" RA["+randomIndexA+"]【CellA="+CellA+"】"+"  RB["+randomIndexB+"]【CellB="+CellB+"】"+"  RC["+randomIndexC+"]【CellC="+CellC+"】");
 
@@ -1746,7 +2597,7 @@ for (int i = 0; i < columnHeadArr.size(); i++) {
 		}
 
 		if (!checkInputParamsOK()) {
-			System.out.println("当前用户输入的格式错误   input=【类型_索引】  例如    html_1   html_2    html_3  ");
+			System.out.println("当前用户输入的格式错误  或者 输入参数不符合 规则要求  请检查  ");
 			return;
 		}
 
