@@ -2510,9 +2510,9 @@ echo ______________Method_In rule2vgetapk_func_0x0
 rem del rule2.txt
 rem del rule2_3app.txt
 echo  获取当前正在运行的APK 
-rem adb shell dumpsys window | findstr "mCurrentFocus"
+rem adb shell dumpsys window | findstr "mCurrentFocus=Window"
 rem mCurrentFocus=Window{52b526e u0 com.autonavi.minimap/com.autonavi.map.activity.NewMapActivity}
-adb shell dumpsys window | findstr "mCurrentFocus" > rule2.txt 
+adb shell dumpsys window | findstr "mCurrentFocus=Window" > rule2.txt 
 set isscreenon=false
 set /a Index_F_1 = 0
 for  /f "delims=" %%l in (rule2.txt) do (
