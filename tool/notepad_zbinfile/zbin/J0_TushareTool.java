@@ -61,13 +61,16 @@ public class J0_TushareTool {
 
     static String J0_call_rangeday_python_bat = System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin"+File.separator+"J0_0000_call_rangeday_python.bat";
 
+    static String J0_call_fileday_python_bat = System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin"+File.separator+"J0_0000_call_fileday_python.bat";
+
+    
     
     static File J0_call_all_python_bat_File ;
     static File J0_call_rest_python_bat_File ;
     static File J0_call_single_python_bat_File ;
     static File J0_call_day_python_bat_File ;
     static File J0_call_rangeday_python_bat_File ;
-    
+    static File J0_call_fileday_python_bat_File ;
 
     static String J0_GuPiaoLieBiao_Path = zbinPath+File.separator+"J0_股票列表.xlsx";
     static String J0_JiaoYiRiQi_Path = zbinPath+File.separator+"J0_交易日历.xlsx";
@@ -344,7 +347,14 @@ public class J0_TushareTool {
             fileCopy(python_call_rangeday_bat,python_call_rangeday_windows);  // J0_DayPython 中放入 文件  J0_0000_call_day_python.bat
             J0_call_rangeday_python_bat_File = python_call_rangeday_windows;
 
+           
             
+            		
+          File python_call_fileday_bat  = new File( J0_call_fileday_python_bat);
+           File python_call_fileday_windows  = new File( J0_DailyPython_File + File.separator + python_call_fileday_bat.getName());
+          fileCopy(python_call_fileday_bat,python_call_fileday_windows);  // J0_DayPython 中放入 文件  J0_0000_call_day_python.bat
+           J0_call_fileday_python_bat_File = python_call_fileday_windows;
+                    
 
             if (J0_GuPiaoLieBiao_Path_File.exists() ) {
                 File python_GuPiaoLieBiao_Path_File  = new File( J0_Python_Dir_Path_File + File.separator + J0_GuPiaoLieBiao_Path_File.getName());
@@ -484,7 +494,9 @@ public class J0_TushareTool {
 
 
     class QueryItem{
-        int mItemPythonType_Input ;  // 输入的 int 区分类型  default-0  all-1  rest-2  single-3    day-4  ts_code-5
+    	
+    	 // 输入的 int 区分类型  default-0  all-1  rest-2  single-3    day-4    ts_code-5 
+        int mItemPythonType_Input ; 
         String TsCode_Input;  // 输入的 ts_code
 
         // 外部 给了 一个 区间  例如 day_20200715-20210812   那么 这里就会放入 这个区间内 交易 时间的集合  
@@ -495,6 +507,7 @@ public class J0_TushareTool {
         String end_day = getTimeStamp_YYYYMMDD();
         String trade_day = getTimeStamp_YYYYMMDD();
 
+        File logFile ;   //  输入的 以 file_xxx开头的文件  里面包含有  日期数据 
 
 
 
@@ -554,40 +567,94 @@ System.out.println("__________day区间查询 【"+begin_data+"_____"+end_data+"
                 }
                 return true;
     }
+      
+      
+      ArrayList<Integer> readTradeDataLogFile(File logFile){
+    	    ArrayList<Integer> tradeDateInLogFile_List = new      ArrayList<Integer> ();
+    	    
+    	ArrayList<String> rawLogList =     ReadFileContentAsList(logFile);
+    	
+    	if(rawLogList != null) {
+    		
+    		for (int i = 0; i < rawLogList.size(); i++) {
+				String tradeDayStr = rawLogList.get(i).trim();
+				if(isNumeric(tradeDayStr) && tradeDayStr.length() == 8) {
+					
+					tradeDateInLogFile_List.add(Integer.parseInt(tradeDayStr));
+				}
+			}
+    		
+    		
+    	}
+    	    
+    	    
+    	    return tradeDateInLogFile_List;
+    	  
+    	  
+      }
+      
+       //  mPythonType_Input = 4 , mInputParamsStr = file_C:\Users\zhuzj5\Desktop\zbin\J0_Data\2021_main_stock.log
 
         QueryItem(int mPythonType_Input,String mInputParamsStr){
             mItemPythonType_Input = mPythonType_Input;
             inputPramsStr =  mInputParamsStr;
 
+            System.out.println("XXmPythonType_Input = "+ mPythonType_Input+"   XXmInputParamsStr="+ mInputParamsStr);
             if(mPythonType_Input == 4){  //   包含 day
                 System.out.println("mPythonType_Input == 4  mInputParamsStr = "+ mInputParamsStr);
-                if(mInputParamsStr.contains("-")){
-                    String dayNum = inputPramsStr.substring(inputPramsStr.indexOf("-")+1);
-                 //   zzzzzzzzzzzzzzzz
-                    System.out.println("mPythonType_Input == 4  dayNum = "+ dayNum);
-                    System.out.println("mPythonType_Input == 4  A  SH_Last_Trade_Day_Int = "+ SH_Last_Trade_Day_Int);
+            	if(mInputParamsStr.startsWith("file_")) {
+            		String logFilePath = mInputParamsStr.substring("file_".length());
+            		
+            		logFile = new File(logFilePath);
+            		if(logFile.exists()) {
+            			System.out.println("当前 logFile 存在 = "+ logFile.getAbsolutePath());
+            			day4TimeQueryTradeDayIntList = readTradeDataLogFile(logFile);
+            			
+            			if(day4TimeQueryTradeDayIntList != null && day4TimeQueryTradeDayIntList.size() > 0 ) {
+            				System.out.println("当前 从 "+logFile.getAbsolutePath()+" 读取到tradeday数量为【"+day4TimeQueryTradeDayIntList.size()+"】");
+            			}else {
+            				System.out.println("当前 从 "+logFile.getAbsolutePath()+" 无法读取到tradeday 日期数据!");
+	
+            			}
+            			
+            		}else {
+             			System.out.println("当前 logFile 不存在   logFilePath="+ logFilePath);	
+            		}
+            		
+            	}else {
+            		
+                    if(mInputParamsStr.contains("-")){
+                        String dayNum = inputPramsStr.substring(inputPramsStr.indexOf("-")+1);
+                     //   zzzzzzzzzzzzzzzz
+                        System.out.println("mPythonType_Input == 4  dayNum = "+ dayNum);
+                        System.out.println("mPythonType_Input == 4  A  SH_Last_Trade_Day_Int = "+ SH_Last_Trade_Day_Int);
 
-                    if(isNumeric(dayNum) && dayNum.length() != 8){  // 当天的日子减去多少天
-                        int dayNumInt = Integer.parseInt(dayNum);
-                        SH_Last_Trade_Day_Int = getFutureDayFlag(SH_Last_Trade_Day_Int,-(dayNumInt));
-                    }else if(dayNum.length()== 8 && isYYYYMMDDStr(dayNum)){  //  day_20211201-21211231 如果当前的是日期   那么就是给了一段时间值
-                      
-                    	String time1 = mInputParamsStr.replace("day_", "").replace("-", "").replace(dayNum, "");
-                    	System.out.println("ZZTime1:"+time1+"  Time2:"+dayNum);
-                    	initDay4TimeQueryList(time1,dayNum);
-                    	
+                        if(isNumeric(dayNum) && dayNum.length() != 8){  // 当天的日子减去多少天
+                            int dayNumInt = Integer.parseInt(dayNum);
+                            SH_Last_Trade_Day_Int = getFutureDayFlag(SH_Last_Trade_Day_Int,-(dayNumInt));
+                        }else if(dayNum.length()== 8 && isYYYYMMDDStr(dayNum)){  //  day_20211201-21211231 如果当前的是日期   那么就是给了一段时间值
+                          
+                        	String time1 = mInputParamsStr.replace("day_", "").replace("-", "").replace(dayNum, "");
+                        	System.out.println("ZZTime1:"+time1+"  Time2:"+dayNum);
+                        	initDay4TimeQueryList(time1,dayNum);
+                        	
+                        }
+                        System.out.println("mPythonType_Input == 4  B  SH_Last_Trade_Day_Int = "+ SH_Last_Trade_Day_Int);
+
+                    }else if(mInputParamsStr.contains("_")){
+                        String timeStamp = inputPramsStr.substring(inputPramsStr.indexOf("_")+1);
+                        // 20100101   这样的字符串
+                        System.out.println("mPythonType_Input == 4  timeStamp = "+ timeStamp);
+                        if(isNumeric(timeStamp)){
+                            SH_Last_Trade_Day_Int = Integer.parseInt(timeStamp);
+                        }
+
                     }
-                    System.out.println("mPythonType_Input == 4  B  SH_Last_Trade_Day_Int = "+ SH_Last_Trade_Day_Int);
+            		
+            		
+            	}
+         
 
-                }else if(mInputParamsStr.contains("_")){
-                    String timeStamp = inputPramsStr.substring(inputPramsStr.indexOf("_")+1);
-                    // 20100101   这样的字符串
-                    System.out.println("mPythonType_Input == 4  timeStamp = "+ timeStamp);
-                    if(isNumeric(timeStamp)){
-                        SH_Last_Trade_Day_Int = Integer.parseInt(timeStamp);
-                    }
-
-                }
 
                  start_day = SH_Last_Trade_Day_Int+"";
                  end_day = SH_Last_Trade_Day_Int+"";
@@ -1190,6 +1257,8 @@ writeContentToFile(dailyPythonFile,allDailyCode);
 
     class Operation_tip_Rule_1 extends Basic_Rule {
         ArrayList<File> curInputFileList;
+        
+
 
         Operation_tip_Rule_1(boolean mIsInputDirAsSearchPoint) {
             super(1);
@@ -1423,9 +1492,7 @@ writeContentToFile(dailyPythonFile,allDailyCode);
 
 
             sb.append(LinePre+"day_日期1-日期2 输入1日期范围的命令集合"+LineEnd);
-            sb.append("\n【一整年】"+"  day_"+curYearBeginDay+"-"+curYearBeginEnd+" 查询如下: \n");
-            sb.append(Cur_Bat_Name+"  day_"+curYearBeginDay+"-"+curYearBeginEnd+"   &&  " + " "+ J0_call_rangeday_python_bat_File.getAbsolutePath() + " "+ curYearBeginDay+"-"+curYearBeginEnd);
-
+ 
             sb.append("\n【一月】"+"  day_"+month01_begin+"-"+month01_end+" 查询如下: \n");
             sb.append(Cur_Bat_Name+"  day_"+month01_begin+"-"+month01_end+"   &&  " + " "+ J0_call_rangeday_python_bat_File.getAbsolutePath() + " "+ month01_begin+"-"+month01_end);
 
@@ -1469,14 +1536,20 @@ writeContentToFile(dailyPythonFile,allDailyCode);
             sb.append("\n【十二月】"+"  day_"+month12_begin+"-"+month12_end+" 查询如下: \n");
             sb.append(Cur_Bat_Name+"  day_"+month12_begin+"-"+month12_end+"   &&  " + " "+ J0_call_rangeday_python_bat_File.getAbsolutePath() + " "+ month12_begin+"-"+month12_end);
 
+            sb.append("\n【一整年】"+"  day_"+curYearBeginDay+"-"+curYearBeginEnd+" 查询如下: \n");
+            sb.append(Cur_Bat_Name+"  day_"+curYearBeginDay+"-"+curYearBeginEnd+"   &&  " + " "+ J0_call_rangeday_python_bat_File.getAbsolutePath() + " "+ curYearBeginDay+"-"+curYearBeginEnd);
 
+            
             sb.append("\n【今年年初("+curYearBeginDay+")到今日("+nowMonth_End+")】"+"  day_"+curYearBeginDay+"-"+nowMonth_End+" 查询如下: \n");
             sb.append(Cur_Bat_Name+"  day_"+curYearBeginDay+"-"+nowMonth_End+"   &&  " + " "+ J0_call_rangeday_python_bat_File.getAbsolutePath() + " "+ curYearBeginDay+"-"+nowMonth_End);
 
-
-
+            
             sb.append("\n【今月月初("+nowMonth_Begin+")到今日("+nowMonth_End+")】"+"  day_"+nowMonth_Begin+"-"+nowMonth_End+" 查询如下: \n");
             sb.append(Cur_Bat_Name+"  day_"+nowMonth_Begin+"-"+nowMonth_End+"   &&  " + " "+ J0_call_rangeday_python_bat_File.getAbsolutePath() + " "+ nowMonth_Begin+"-"+nowMonth_End);
+
+            
+            sb.append("\n【日期文件查询 执行指定文件内标记的 tradeday 的执行条目 】"+" 查询如下: \n");
+            sb.append(Cur_Bat_Name+"  file_"+J0_Dir_Path+getCurrentYear()+"_main_stock.log"+"   &&  " + " "+ J0_call_fileday_python_bat_File.getAbsolutePath() +" "+ J0_Dir_Path+""+getCurrentYear()+"_main_stock.log");
 
             
             sb.append(LinePre+LineEnd);
@@ -1987,14 +2060,15 @@ writeContentToFile(dailyPythonFile,allDailyCode);
         if (inputParams == null) {
             return 0;
         }
-
+//  XXinputParams = file_C:\Users\zhuzj5\Desktop\zbin\J0_Data\2021_main_stock.log
+        System.out.println(" XXinputParams = "+ inputParams);
         if(inputParams.contains("all")){
             return 1;
         }else if(inputParams.contains("rest")){
             return 2;
         }else if(inputParams.contains("single")){
             return 3;
-        }else if(inputParams.contains("day")){
+        }else if(inputParams.contains("day") || inputParams.startsWith("file_") ){
             return 4;
         }
 
@@ -2995,7 +3069,7 @@ writeContentToFile(dailyPythonFile,allDailyCode);
     // 1 == all    // 标识当前 执行 所有的 数据操作
     // 2 == rest   //  标识当前 执行指定 索引 及其 后的 数据操作
     // 3== single 标识当前只是单一的索引操作
-
+    //  4== day  或者  file_开头  记载有 日期数据的文件
 
    static int PythonType_Input = 0 ;
 
@@ -3024,8 +3098,8 @@ writeContentToFile(dailyPythonFile,allDailyCode);
 
         initTreeData();
 
-        System.out.println("PythonItem_Index = "+ PythonItem_Index);
-        System.out.println("PythonType_Input = "+ PythonType_Input);
+        System.out.println("Main_PythonItem_Index = "+ PythonItem_Index);
+        System.out.println("Main_PythonType_Input = "+ PythonType_Input);
 
 
 
@@ -3129,6 +3203,7 @@ if(mRootqueryItem.day4TimeQueryTradeDayIntList == null   ) {
 
         RestoreProp_TreeNode();
         setProperity();
+        System.out.println("Main函数执行结束! ");
     }
 
     public static int getImageHigh(File picture) {
@@ -6933,7 +7008,21 @@ String[] arrStr = codePrams.split(",");
     static int  x_tscode_num_default = 50;   // xcode ts_code 的默认的个数
     static int default_space_year = 10;   // 11ystart_date  11yend_date  时间间隔的长度 单位年 y  10ystart_date
 
+    
+    
+    
+    static int getCurrentYear() {
+
+    	SimpleDateFormat df = new SimpleDateFormat("YYYY");
+
+    	return Integer.parseInt(df.format(new Date()));
+
+    }
+    
 }
+
+
+
 
 
 // 管理层薪酬和持股 异常   J0_0008_guanlicengxinchouhechigu   Python_BodyTemplate_3     长度超过100w条 那么 另起别的sheet保存

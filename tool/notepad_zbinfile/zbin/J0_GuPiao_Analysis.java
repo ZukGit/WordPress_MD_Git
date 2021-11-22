@@ -53,6 +53,13 @@ public class J0_GuPiao_Analysis {
 	static String Cur_Batch_End = ".bat";
 	static String J0_Bat_Name = "zgupiao_analysis_J0";
 	static String Cur_Bat_Name = "zgupiao_analysis_J0";
+	
+	static String J0_Stock_Bat_Name = "zstock_tushare_tool_J0";
+	static String  G2_Rule_Bat_Name =  "zrule_apply_G2";
+    static String J0_call_fileday_python_bat_In_J0DayPython = System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin"+File.separator+"J0_DayPython"+File.separator+"J0_0000_call_fileday_python";
+
+	
+	
 	static String zbinPath = System.getProperties().getProperty("user.home") + File.separator + "Desktop"
 			+ File.separator + "zbin";
 	static String J0_File_Path = zbinPath + File.separator + "J0";
@@ -128,6 +135,7 @@ public class J0_GuPiao_Analysis {
 		if (osName.contains("window")) {
 			CUR_OS_TYPE = OS_TYPE.Windows;
 			Cur_Bat_Name = Cur_Bat_Name + ".bat";
+	
 			Cur_Batch_End = ".bat";
 			curOS_ExeTYPE = ".exe";
 			initJDKPath_Windows(curLibraryPath);
@@ -150,7 +158,10 @@ public class J0_GuPiao_Analysis {
 			Win_Lin_Mac_ZbinPath = zbinPath + File.separator + "mac_zbin";
 
 		}
-
+		
+		G2_Rule_Bat_Name = G2_Rule_Bat_Name+ Cur_Batch_End;
+		J0_Stock_Bat_Name = J0_Stock_Bat_Name + Cur_Batch_End;
+		J0_call_fileday_python_bat_In_J0DayPython   = J0_call_fileday_python_bat_In_J0DayPython + Cur_Batch_End;
 	}
 
 	static void initJDKPath_Linux_MacOS(String environmentPath) {
@@ -254,6 +265,12 @@ public class J0_GuPiao_Analysis {
         if(!tradeDayFile.exists()){
             System.out.println("当前 没有 基础数据文件【交易日历.xlsx】( 请添置该文件 ) J0_JiaoYiRiQi_Path ="+ J0_JiaoYiRiQi_Path);
             return;
+        }
+        
+        if(mYear_TradeDayList_Map != null && mYear_TradeDayList_Map.size() > 100) {
+            System.out.println("股票交易日期 已经 初始化完成 不需要再次初始化 mYear_TradeDayList_Map.size()=【"+mYear_TradeDayList_Map.size()+"】");
+        	return ;
+        	
         }
 
         Workbook wb =null;
@@ -514,6 +531,7 @@ void 	addRuleToList(Rule rule , boolean isShowInXlsxHead){
 		
 		// 默认为今年   如果是 从外部获取 那么 就是指定的 年份  最终会 匹配到  2021_main_stock.xlsx 这样的文件
 		int mYearInt;   // 默认为 今年  从 输入得到 
+		int mYYYMMdd ;   //  默认是今天的日期  可从参数得到
 		File mMatchYearMainStockFile;  // 匹配到的 xxxx_main_stock.xlsx
 		ArrayList<File> mDayXlsxFileList ;   // 在 J0_Data 中的 day_2021_1105.xlsx 文件的集合
 		ArrayList<File> mDayJsonFileList ; // 在 J0_Data 中的 day_2021_1105.json 文件的集合
@@ -533,12 +551,29 @@ void 	addRuleToList(Rule rule , boolean isShowInXlsxHead){
 		File mJ0_Data_Dir_File;
 	
 		
+		// 用于 保存 匹配 到  mYYYYMMdd 的 那天的那年的交易日期集合
+		File mMatchTradeDay_LogFile;
+	
+		
+		@Override
+		String simpleDesc() {
+
+			return "\n"  +  Cur_Bat_Name + " #_" + rule_index+"  "+" year_"+mYearInt+"   ###  对当前"+mYearInt+"_main_stock.xlsx 文件进行数据添加  不打印Log    " +
+					"\n"  +  Cur_Bat_Name + " #_" + rule_index+"  "+" year_"+mYearInt+" showlog_true   ###  对当前"+mYearInt+"_main_stock.xlsx 文件进行数据添加  打印Log    " +
+					"\n"  +  Cur_Bat_Name + " #_" + rule_index+"  "+" yyyymmdd_"+getCurrentYYYYMMDD()+"  showlog_true  ###  对当前"+mYearInt+"_main_stock.xlsx  指定截至日期 文件进行数据添加 会打印Log    ";
+			
+		}
+		
+		
+		
 		
 		
 		AddData_To_Year_Main_Stock_Xlsx_Rule_1() {
 			super("#", 1, 4); //
 			// TODO Auto-generated constructor stub
 			mYearInt = getCurrentYear();
+			mYYYMMdd = getCurrentYYYYMMDD();
+			
 			mDayXlsxFileList = new ArrayList<File>();
 			mDayJsonFileList = new ArrayList<File>();
 			mNeedAddTradeDayList = new  ArrayList<Integer>();
@@ -570,9 +605,22 @@ void 	addRuleToList(Rule rule , boolean isShowInXlsxHead){
 					
 					if(isNumeric(mYearStr) && mYearStr.length() == 4) {
 						mYearInt = Integer.parseInt(mYearStr);
+			
+						mYYYMMdd = mYearInt*10000+ mYYYMMdd%10000;
+					}
+				}
+				
+				if (paramItem.startsWith("yyyymmdd_")) {
+					String mYYYYMMddStr =  paramItem.replace("yyyymmdd_", "").trim();
+					
+					if(isNumeric(mYYYYMMddStr) && mYYYYMMddStr.length() == 8) {
+						mYYYMMdd = Integer.parseInt(mYYYYMMddStr);
+						mYearInt = mYYYMMdd / 10000;
 						
 					}
 				}
+				
+				
 				
 				if (paramItem.equals("showlog_true")) {
 					isShowLog = true;
@@ -583,6 +631,13 @@ void 	addRuleToList(Rule rule , boolean isShowInXlsxHead){
 				
 				
 			}
+			
+			initTradeDayList();
+		
+			System.out.println("mYearInt【"+mYearInt+"】  mYYYMMdd【"+mYYYMMdd+"】 isShowLog 【"+isShowLog+"】");
+			isJ0DataDir_Have_Day_Json_File(mYYYMMdd);
+			mMatchTradeDay_LogFile = new File(J0_Data_Dir_Path+File.separator+mYearInt+"_main_stock.log");
+			
 	
 			mMatchYearMainStockFile = new File(mJ0_Data_Dir_File.getAbsolutePath()+File.separator+mYearInt+"_main_stock.xlsx");
 			
@@ -591,16 +646,151 @@ void 	addRuleToList(Rule rule , boolean isShowInXlsxHead){
 				initYearMainStockXlsxForYear(mYearInt);
 			}
 			
-			if(!initJ0DataDay_Xlsx_Json_File()) {
+			ArrayList<Integer> mTradeDayFromYYYYList = 	createTradeDayFromNow(mYearInt ,  mYYYMMdd);
+			if(mTradeDayFromYYYYList == null) {
+				System.out.println("当前 没有匹配到 "+mYYYMMdd+" 对应的交易日历!");
+				return false;
+			}
+			ArrayList<Integer> missDayList = MatchMissJsonFileTradeDay(mYearInt ,  mYYYMMdd, mMatchTradeDay_LogFile,mTradeDayFromYYYYList);
+			
+			
+			if(missDayList != null && missDayList.size() > 0) {
+				System.out.println("当前缺失 【"+missDayList.size()+"】"+" 个 Json 数据文件! 请执行如下 命令完成初始化 Json 数据!");
+			    
+			
+			}else {
+				
+				System.out.println("当前 没有缺失  Json 数据文件! 将执行 解析json 生产 main_stock.xlsx 的操作! ");
+
+			}
+				
+			
+			
+			
+			if(missDayList != null && missDayList.size() > 0) {
+				initTradeDayList();   // 初始化交易日期  确保 有数据
 				System.out.println("当前 "+mJ0_Data_Dir_File.getAbsolutePath()+" 目录没有对应的 day_"+mYearInt+"_xxxx.xlsx 文件请执行  zstock_tushare_tool_J0.bat 创建这样的文件" );
-			   return false;
+			
+	
+			System.out.println(" 写入 日期数据到 mMatchTradeDay_LogFile="+mMatchTradeDay_LogFile.getAbsolutePath()+" 文件");
+
+			showInitJsonAndExeCuteCommand(mYearInt,mYYYMMdd,mMatchTradeDay_LogFile);
+			
+	
+				return false;
 			}
 
 			
-			System.out.println("mYearInt【"+mYearInt+"】  isShowLog 【"+isShowLog+"】");
-			
+
 			
 			return super.initParamsWithInputList(inputParamList);
+		}
+		
+		
+		
+		// 显示 需要完成 给定的 参数 初始化命令 并 再次 执行 本程序的命令
+		void showInitJsonAndExeCuteCommand(int cYear  , int mTradeDay , File logFile) {
+			StringBuilder commandSB =new StringBuilder();
+			
+			
+			String callJ0JavaCommand = J0_Stock_Bat_Name+" file_"+logFile.getAbsolutePath();
+			
+			String callJ0DayFileCommand = J0_call_fileday_python_bat_In_J0DayPython+" "+logFile.getAbsolutePath();
+			
+	
+//			zstock_tushare_tool_J0.bat  file_C:\Users\zhuzj5\Desktop\zbin\J0_Data\2021_main_stock.log  
+//			&&   C:\Users\zhuzj5\Desktop\zbin\J0_DayPython\J0_0000_call_fileday_python.bat C:\Users\zhuzj5\Desktop\zbin\J0_Data\2021_main_stock.log
+	
+			String makeXlsxToJsonCommand = G2_Rule_Bat_Name + " #_38 "+ J0_Data_Dir_Path;
+			
+			String callSelfCommand = Cur_Bat_Name+"  #_"+rule_index +"  "+"yyyymmdd_"+mTradeDay;
+			
+			commandSB.append(callJ0JavaCommand+"  &&  "+ callJ0DayFileCommand+" && "+makeXlsxToJsonCommand+" && "+ callSelfCommand);
+			
+
+			
+			System.out.println("请执行如下命令 完成初始化["+mTradeDay+"] json 数据的操作 并再次调用自身 :\n"+commandSB.toString());
+//			zgupiao_analysis_J0.bat #_1   yyyymmdd_20211122
+			
+		}
+		
+		
+		
+		ArrayList<Integer> MatchMissJsonFileTradeDay(int cYear  , int mTradeDay , File logFile , ArrayList<Integer> fromNowTradeDayList) {
+			
+			if(!logFile.exists()) {
+				try {
+					logFile.createNewFile();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			
+			
+			ArrayList<Integer>  matchMissJsonFileList  = new 	ArrayList<Integer>();
+			
+			StringBuilder daySB = new StringBuilder();
+			
+			for (int i = 0; i < fromNowTradeDayList.size(); i++) {
+				 int matchDayInt  = 	fromNowTradeDayList.get(i);
+				 //  判断 日期 对应的 json 是否存在 
+				File  matchTradeDayExistJsonFile  = matchTradeDayExistJson(matchDayInt);
+				 if(matchTradeDayExistJsonFile == null || !matchTradeDayExistJsonFile.exists()) {
+						daySB.append(matchDayInt+"\n");
+						matchMissJsonFileList.add(matchDayInt);
+				 }
+			
+				}
+				writeContentToFile(logFile, daySB.toString());
+				
+			return matchMissJsonFileList;
+			
+			
+		}
+		
+		
+		ArrayList<Integer> createTradeDayFromNow(int cYear  , int mTradeDay ) {
+	
+			
+
+		
+    	ArrayList<Integer> yearTradeDayList = 	mYear_TradeDayList_Map.get(cYear);
+    	if(yearTradeDayList == null) {
+    		System.out.println(" 没有找到 "+cYear+" 年 对应的 股市交易数据! " );
+    		return null;
+    	}
+	
+    	
+		ArrayList<Integer> fromNowTradeDayList = calculFromNowTradeDayList(mTradeDay,yearTradeDayList);
+		
+		// 从 Json 文件中查询 哪些 是 需要 补充的  哪些 是 有的  哪些 是 没有的 
+		
+
+			
+			return fromNowTradeDayList;
+			
+		}
+		
+		
+		File matchTradeDayExistJson(int tradeDay) {
+			 int mMatchYear = tradeDay / 10000;
+			
+			 String mMatchMMDD = (""+tradeDay).replace(""+mMatchYear, "");
+			 String matchJsonName = "day_"+mMatchYear+"_"+mMatchMMDD+".json";
+			 
+			 File matchJsonFile = new File(J0_Data_Dir_Path+matchJsonName);
+			 
+			 System.out.println("matchJsonFile = "+ matchJsonFile.getAbsolutePath());
+			 if(!matchJsonFile.exists()) {
+				 return null;
+			 }
+		
+			 // 判断 文件 里面是否 含有 时间v 这里算了  影响性能
+			 
+			 return matchJsonFile;
+			 
+			 
 		}
 		
 		@Override
@@ -628,11 +818,11 @@ void 	addRuleToList(Rule rule , boolean isShowInXlsxHead){
 
 			int fileYearInt = mYearInt;
 			mYearTradeDayList = 	mYear_TradeDayList_Map.get(fileYearInt);
-			ArrayList<Integer> fromNowTradeDayList = calculFromNowTradeDayList(getCurrentYYYYMMDD(),mYearTradeDayList);
+			ArrayList<Integer> fromNowTradeDayList = calculFromNowTradeDayList(mYYYMMdd,mYearTradeDayList);
 			// 检测当前 目前为止  没有记录的 交易日的集合
-			ArrayList<Integer> mRecordDayList = calculRecordTradeDayList(fileYearInt,getCurrentYYYYMMDD(),fromNowTradeDayList,mainStockFileItem , SheetHead_Part_1 , realTypeRuleList , mYearTradeDayList);
+			ArrayList<Integer> mRecordDayList = calculRecordTradeDayList(fileYearInt,mYYYMMdd,fromNowTradeDayList,mainStockFileItem , SheetHead_Part_1 , realTypeRuleList , mYearTradeDayList);
 			int needRecordCount = fromNowTradeDayList.size() - mRecordDayList.size();
-			boolean isContainToady = isContainDayInList(getCurrentYYYYMMDD() , mRecordDayList);
+			boolean isContainToady = isContainDayInList(mYYYMMdd , mRecordDayList);
 			
 		
 			mNeedAddTradeDayList.addAll(fromNowTradeDayList);
@@ -1176,12 +1366,14 @@ void 	addRuleToList(Rule rule , boolean isShowInXlsxHead){
 		File getMatchTradeDayJsonFile(int tradeDayInt , ArrayList<File> jsonFileList) {
 			File matchJsonFile = null;
 			
+			System.out.println("tradeDayInt = "+ tradeDayInt +"  jsonFileList= "+ jsonFileList);
 			for (int i = 0; i < jsonFileList.size(); i++) {
 				File jsonFile = jsonFileList.get(i);
 				String fileName = jsonFile.getName().toLowerCase();
 				
 				String onlyDigitalFileName = fileName.replace(".json", "").replace(".", "").replace("_", "").replace("day", "").trim();
 				
+				System.out.println("onlyDigitalFileName = "+onlyDigitalFileName+"   onlyDigitalFileName="+onlyDigitalFileName);
 				if((tradeDayInt+"").equals(onlyDigitalFileName)) {
 					return jsonFile;
 				}
@@ -1192,13 +1384,17 @@ void 	addRuleToList(Rule rule , boolean isShowInXlsxHead){
 			
 		}
 		
-		boolean initJ0DataDay_Xlsx_Json_File() {
+		
+		// 判断是否 满足 Data的数据要求
+		boolean isJ0DataDir_Have_Day_Json_File(int yyyymmdd) {
 
 			
 		File[] mFileArr = 	mJ0_Data_Dir_File.listFiles();
 			if(mFileArr == null || mFileArr.length == 0) {
 				return false;
 			}
+			
+			
 			
 			for (int i = 0; i < mFileArr.length; i++) {
 				File item = mFileArr[i];
@@ -1221,18 +1417,7 @@ void 	addRuleToList(Rule rule , boolean isShowInXlsxHead){
 		}
 		
 		
-		
-	
-		
-		@Override
-		String simpleDesc() {
 
-			return "\n"  +  Cur_Bat_Name + " #_" + rule_index+"  "+" year_"+mYearInt+"   ###  对当前"+mYearInt+"_main_stock.xlsx 文件进行数据添加  不打印Log    " +
-					"\n"  +  Cur_Bat_Name + " #_" + rule_index+"  "+" year_"+mYearInt+"  showlog_true  ###  对当前"+mYearInt+"_main_stock.xlsx 文件进行数据添加 会打印Log    ";
-			
-		}
-		
-		
 		
 
 		
@@ -3039,6 +3224,9 @@ for (int i = 0; i < columnHeadArr.size(); i++) {
 		}
 		return retCode + "";
 	}
+	
+	
+
 	
 	
 	static int getCurrentYYYYMMDD() {
