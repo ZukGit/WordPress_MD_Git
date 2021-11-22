@@ -836,11 +836,11 @@ void 	addRuleToList(Rule rule , boolean isShowInXlsxHead){
 			
 			for (int i = 0; i < mNeedAddTradeDayList.size(); i++) {
 				int needAddTradeDayInt = mNeedAddTradeDayList.get(i);
-				if(mRecordDayList.contains(Integer.valueOf(needAddTradeDayInt))) {
-					
-					System.out.println("已经有数据的交易日期 "+needAddTradeDayInt+" !  无需检查 json文件  continue ");
-					continue;
-				}
+//				if(mRecordDayList.contains(Integer.valueOf(needAddTradeDayInt))) {
+//
+//					System.out.println("已经有数据的交易日期 "+needAddTradeDayInt+" !  无需检查 json文件  continue ");
+//					continue;
+//				}
 				
 			File matchDayJsonFile = 	getMatchTradeDayJsonFile(needAddTradeDayInt,mDayJsonFileList);
 				if(matchDayJsonFile == null) {
