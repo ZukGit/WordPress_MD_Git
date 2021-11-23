@@ -11,4 +11,4 @@ Setlocal ENABLEDELAYEDEXPANSION
 @rem echo 9=%9
 
 @javac  -Xlint:unchecked  -encoding UTF-8 %userprofile%\Desktop\zbin\K1_ShowQcomInfo.java
-@java -cp %userprofile%\Desktop\zbin  K1_ShowQcomInfo  %1  %2  %3 %4  %5  %6  %7  %8  %9 
+@java  -Dfile.encoding=UTF-8  -cp %userprofile%\Desktop\zbin  K1_ShowQcomInfo  %1  %2  %3 %4  %5  %6  %7  %8  %9 
