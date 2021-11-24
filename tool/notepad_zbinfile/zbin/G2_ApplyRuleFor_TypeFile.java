@@ -5151,7 +5151,18 @@ System.out.println("paramItem["+i+"] = "+paramItem_lower_trim);
 										rowObj.put(row1.getCell(j).getStringCellValue(), "");
 									}
 								} else {
-									rowObj.put(row1.getCell(j).getStringCellValue(), "");
+									
+									
+									try {
+										rowObj.put(row1.getCell(j).getStringCellValue(), "");
+
+									} catch (Error e) {
+										System.out.println("发生异常 e="+ e);
+										continue;
+
+									}
+									
+						
 
 								}
 							}

@@ -15,12 +15,15 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import javax.swing.*;
 import java.io.*;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributeView;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.text.Collator;
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -40,7 +43,10 @@ public class J0_GuPiao_Analysis {
     //  key 是 今年的 年份     value 是 今年的 交易的日期的集合
     static Map<Integer,ArrayList<Integer>> mYear_TradeDayList_Map = new HashMap<Integer,ArrayList<Integer>>();  
     
-	static String[] MainStock_SheetChineseNameArr = {"收盘价","涨跌幅","涨跌值","成交额"};
+    static ArrayList<Integer> allTradeDayList  = new ArrayList<Integer>();  
+    
+    
+	static String[] MainStock_SheetChineseNameArr = {"收盘价","涨跌比","涨跌值","成交额"};
 	static String[] MainStock_SheetEnglishNameArr = {"close","pct_chg","change","amount"};
 	
 	static String[] SheetHead_Part_1 = {"cname","ts_code"};
@@ -380,6 +386,7 @@ public class J0_GuPiao_Analysis {
     	if(!matchTradeDayList.contains(dayIntFlag)) {
     		matchTradeDayList.add(dayIntFlag);
     	}
+    	allTradeDayList.add(dayIntFlag);
     	
     }
     
@@ -504,10 +511,66 @@ void 	addRuleToList(Rule rule , boolean isShowInXlsxHead){
 
 
 	
-	//  创建一个 xlsx 把 一年的 数据都包含进去  收盘股价 涨跌幅度   涨跌值  成交量  四个指标
+	//  创建一个 xlsx 把 一年的 数据都包含进去  收盘股价 涨跌比度   涨跌值  成交量  四个指标
 	// 放入的文件名称是  2021_main_stock.xlsx    包含 close pct_chg  change  amount  四个指标
 	//  每个xlsx 分为三部分  第一部分 是 股票名称    第二部分是 动态计算的 最近结果  第三部分是 当前属性的指标
 	
+static public	Map<String,Map<String,RiXianXingQingvShiJianWeiXu>>  mStockPropMap;
+
+static public Map<String,ArrayList<RiXianXingQingvShiJianWeiXu>>  mTsCode_RiXianArr_Map;
+
+@SuppressWarnings("unchecked")
+static void sortTsCode_RiXianArr_Map(boolean isShowLog) {
+
+	
+	Map.Entry<String,ArrayList<RiXianXingQingvShiJianWeiXu>> mOutEntry;
+
+	if (mTsCode_RiXianArr_Map != null) {
+		Iterator mOutIterator = mTsCode_RiXianArr_Map.entrySet().iterator();
+		
+		
+		while (mOutIterator.hasNext()) {
+			// ts_code --- XXX【0201  prop】
+			mOutEntry = (Map.Entry<String,ArrayList<RiXianXingQingvShiJianWeiXu>> ) mOutIterator.next();
+
+			// 获取 名称的 首字母
+			String ts_code_key = mOutEntry.getKey(); // Map的Value // 作者名称
+			ArrayList<RiXianXingQingvShiJianWeiXu>  mRiXianArr = mOutEntry.getValue(); // 今年 日线行情 
+		
+			if(mRiXianArr == null) {
+				continue;
+			}
+			
+			// 对  匹配的到的 年Arr 进行 排除 以 tradeday 为索引标识 
+			mRiXianArr.sort((new Comparator<RiXianXingQingvShiJianWeiXu>() {
+	            @Override
+	            public int compare(RiXianXingQingvShiJianWeiXu o1, RiXianXingQingvShiJianWeiXu o2) {
+	                return o1.trade_date.compareTo(o2.trade_date);
+	            }
+	        }));
+			
+			if(isShowLog) {
+				
+				for (int i = 0; i < mRiXianArr.size(); i++) {
+					RiXianXingQingvShiJianWeiXu rixianItem = mRiXianArr.get(i);
+					System.out.println("Arr["+i+"]"+"tscode="+ts_code_key+"  rixianItem.tradeday="+rixianItem.trade_date);
+				}
+		
+			}
+		
+		}
+		
+		
+	}
+	
+	
+}
+
+
+static DecimalFormat priceFormat  ;
+// = new DecimalFormat("##,##0.00");
+
+
 	class AddData_To_Year_Main_Stock_Xlsx_Rule_1 extends  Basic_Rule{
 		
 		// 默认为今年   如果是 从外部获取 那么 就是指定的 年份  最终会 匹配到  2021_main_stock.xlsx 这样的文件
@@ -522,10 +585,13 @@ void 	addRuleToList(Rule rule , boolean isShowInXlsxHead){
 		
 		ArrayList<Integer> mdAddFaiedTradeDayList;  //  添加数据失败的 日期的 天数  可能由于 没有文件导致
 		
-		// key【000001(ts_code)】---> value【 key【0811】,value【RiXianXingQingvShiJianWeiXu(四个属性)】 】
+		// key【000001(ts_code)】---> value【 key【0811r日期】,value【RiXianXingQingvShiJianWeiXu(四个属性)】 】
 	    // 拿到了 对应的 数据 
- 		Map<String,Map<String,RiXianXingQingvShiJianWeiXu>>  mStockPropMap;
+ 	
 		
+ 		// key 为 ts_code  ,  value  为 对应的 所有的 交易信息数据 
+ 
+ 		
 
  		boolean isShowLog;
 		
@@ -541,28 +607,174 @@ void 	addRuleToList(Rule rule , boolean isShowInXlsxHead){
 
 			return "\n"  +  Cur_Bat_Name + " #_" + rule_index+"  "+" year_"+mYearInt+"   ###  对当前"+mYearInt+"_main_stock.xlsx 文件进行数据添加  不打印Log    " +
 					"\n"  +  Cur_Bat_Name + " #_" + rule_index+"  "+" year_"+mYearInt+" showlog_true   ###  对当前"+mYearInt+"_main_stock.xlsx 文件进行数据添加  打印Log    " +
-					"\n"  +  Cur_Bat_Name + " #_" + rule_index+"  "+" yyyymmdd_"+getCurrentYYYYMMDD()+"  showlog_true  ###  对当前"+mYearInt+"_main_stock.xlsx  指定截至日期 文件进行数据添加 会打印Log    ";
+					"\n"  +  Cur_Bat_Name + " #_" + rule_index+"  "+" yyyymmdd_"+getCurrentYYYYMMDDWith17Point()+"  showlog_true  ###  对当前"+mYearInt+"_main_stock.xlsx  指定截至日期 文件进行数据添加 会打印Log    ";
 			
 		}
 		
 		
 		
+//		abstract	String getXlsxDynamicCell(String sheetName , ArrayList<RiXianXingQingvShiJianWeiXu> mRiXianList ) ;	
+//		abstract	String  ShouPanJia_SheetCell_Operation( ArrayList<RiXianXingQingvShiJianWeiXu> mRiXianList);
+//		abstract	String  ZhangDieFu_SheetCell_Operation( ArrayList<RiXianXingQingvShiJianWeiXu> mRiXianList);
+//		abstract	String  ZhangDieZhi_SheetCell_Operation( ArrayList<RiXianXingQingvShiJianWeiXu> mRiXianList);
+//		abstract	String  ChengJiaoEr_SheetCell_Operation( ArrayList<RiXianXingQingvShiJianWeiXu> mRiXianList);
+
+		
+		String  ChengJiaoEr_SheetCell_Operation( ArrayList<RiXianXingQingvShiJianWeiXu> mRiXianList) {
+			String resultStr = "";
+			
+			// 直接使用 double  进行 加减 会有 精度的 丢失 
+			BigDecimal currentPriceSum =   new BigDecimal(0);
+			int hasValueCount = 0 ;
+
+			for (int i = 0; i < mRiXianList.size(); i++) {
+				RiXianXingQingvShiJianWeiXu  rixianItem = mRiXianList.get(i);
+				
+				double itemZhangDieValue = rixianItem.amount;
+	
+		
+				  BigDecimal itemPrice_big = new BigDecimal(itemZhangDieValue);
+	
+				 currentPriceSum =   currentPriceSum.add(itemPrice_big);
+				 hasValueCount++;
+	
+			}
+			if(hasValueCount == 0) {
+				return "";
+			}
+		
+			BigDecimal hasZhangDieValueCount_big =   new BigDecimal(hasValueCount);
+			//amount  单位 从 千元  回归到  元
+			currentPriceSum = 	currentPriceSum.multiply(new BigDecimal(1000));
+			
+		
+			double priceAvarage = currentPriceSum.divide(hasZhangDieValueCount_big, RoundingMode.HALF_UP).doubleValue();
+//			return	priceFormat.format(priceAvarage);
+			return	((long)priceAvarage)+"";
+			
+		}
+		
+		
+		String  ZhangDieZhi_SheetCell_Operation( ArrayList<RiXianXingQingvShiJianWeiXu> mRiXianList) {
+			String resultStr = "";
+			
+			// 直接使用 double  进行 加减 会有 精度的 丢失 
+			BigDecimal currentPriceSum =   new BigDecimal(0);
+			int hasValueCount = 0 ;
+
+			for (int i = 0; i < mRiXianList.size(); i++) {
+				RiXianXingQingvShiJianWeiXu  rixianItem = mRiXianList.get(i);
+				
+				double itemZhangDieValue = rixianItem.change;
+	
+		
+				  BigDecimal itemPrice_big = new BigDecimal(itemZhangDieValue);
+	
+				 currentPriceSum =   currentPriceSum.add(itemPrice_big);
+				 hasValueCount++;
+	
+			}
+			if(hasValueCount == 0) {
+				return "";
+			}
+		
+			BigDecimal hasZhangDieValueCount_big =   new BigDecimal(hasValueCount);
+		
+			double priceAvarage = currentPriceSum.divide(hasZhangDieValueCount_big, RoundingMode.HALF_UP).doubleValue();
+			return	priceFormat.format(priceAvarage);
+			
+		}
+		
+		
+		String  ZhangDieFu_SheetCell_Operation( ArrayList<RiXianXingQingvShiJianWeiXu> mRiXianList) {
+			String resultStr = "";
+			
+			// 直接使用 double  进行 加减 会有 精度的 丢失 
+			BigDecimal currentPriceSum =   new BigDecimal(0);
+			int hasValueCount = 0 ;
+
+			for (int i = 0; i < mRiXianList.size(); i++) {
+				RiXianXingQingvShiJianWeiXu  rixianItem = mRiXianList.get(i);
+				
+				double itemZhangDieValue = rixianItem.pct_chg;
+	
+		
+				  BigDecimal itemPrice_big = new BigDecimal(itemZhangDieValue);
+	
+				 currentPriceSum =   currentPriceSum.add(itemPrice_big);
+				 hasValueCount++;
+	
+			}
+			if(hasValueCount == 0) {
+				return "";
+			}
+		
+			BigDecimal hasZhangDieValueCount_big =   new BigDecimal(hasValueCount);
+		
+			double priceAvarage = currentPriceSum.divide(hasZhangDieValueCount_big, RoundingMode.HALF_UP).doubleValue();
+			return	priceFormat.format(priceAvarage);
+		}
+		
+		
+		
+		String ShouPanJia_SheetCell_Operation(ArrayList<RiXianXingQingvShiJianWeiXu> mRiXianList ) {
+			String resultStr = "";
+			
+			// 直接使用 double  进行 加减 会有 精度的 丢失 
+			BigDecimal currentPriceSum =   new BigDecimal(0);
+			int hasPriceCount = 0 ;
+
+			for (int i = 0; i < mRiXianList.size(); i++) {
+				RiXianXingQingvShiJianWeiXu  rixianItem = mRiXianList.get(i);
+				
+				double itemPrice = rixianItem.close;
+				if(itemPrice == 0) {
+					continue;
+				}
+		
+				  BigDecimal itemPrice_big = new BigDecimal(itemPrice);
+	
+				 currentPriceSum =   currentPriceSum.add(itemPrice_big);
+				hasPriceCount++;
+	
+			}
+			if(hasPriceCount == 0) {
+				return "";
+			}
+		
+			BigDecimal hasPriceCount_big =   new BigDecimal(hasPriceCount);
+		
+			double priceAvarage = currentPriceSum.divide(hasPriceCount_big, RoundingMode.HALF_UP).doubleValue();
+			return	priceFormat.format(priceAvarage);
+			
+		}
+
+		
+		
+		@Override
+		String getXlsxDynamicHeader(String sheetName) {
+			// TODO Auto-generated method stub
+			return "平均值_"+rule_index;
+		}
 		
 		
 		AddData_To_Year_Main_Stock_Xlsx_Rule_1() {
 			super("#", 1, 4); //
 			// TODO Auto-generated constructor stub
 			mYearInt = getCurrentYear();
-			mYYYMMdd = getCurrentYYYYMMDD();
-			
+//			mYYYMMdd = getCurrentYYYYMMDD();
+			mYYYMMdd =  	getCurrentYYYYMMDDWith17Point();
 			mDayXlsxFileList = new ArrayList<File>();
 			mDayJsonFileList = new ArrayList<File>();
 			mNeedAddTradeDayList = new  ArrayList<Integer>();
 			mdAddFaiedTradeDayList = new  ArrayList<Integer>();
 			mYearTradeDayList =  new  ArrayList<Integer>();
 			mStockPropMap = new  HashMap<String,Map<String,RiXianXingQingvShiJianWeiXu>>();
-			
+			mTsCode_RiXianArr_Map = new HashMap<String,ArrayList<RiXianXingQingvShiJianWeiXu>>();
 			isShowLog = false;
+			
+			priceFormat  = new DecimalFormat("##,##0.00");
+			
 		}
 		
 		
@@ -608,12 +820,17 @@ void 	addRuleToList(Rule rule , boolean isShowInXlsxHead){
 			
 				}
 				
+	
+				
 				
 				
 				
 			}
 			
 			initTradeDayList();
+			
+			// 需要确保 当前 mYYYMMdd 是一个交易日的日期
+			
 		
 			System.out.println("mYearInt【"+mYearInt+"】  mYYYMMdd【"+mYYYMMdd+"】 isShowLog 【"+isShowLog+"】");
 			isJ0DataDir_Have_Day_Json_File(mYYYMMdd);
@@ -727,7 +944,8 @@ void 	addRuleToList(Rule rule , boolean isShowInXlsxHead){
 			mYearTradeDayList = 	mYear_TradeDayList_Map.get(fileYearInt);
 			ArrayList<Integer> fromNowTradeDayList = calculFromNowTradeDayList(mYYYMMdd,mYearTradeDayList);
 			// 检测当前 目前为止  没有记录的 交易日的集合
-			ArrayList<Integer> mRecordDayList = calculRecordTradeDayList(fileYearInt,mYYYMMdd,fromNowTradeDayList,mainStockFileItem , SheetHead_Part_1 , realTypeRuleList , mYearTradeDayList);
+			String sheetName_1 = MainStock_SheetChineseNameArr[0];
+			ArrayList<Integer> mRecordDayList = calculRecordTradeDayList(fileYearInt,mYYYMMdd,sheetName_1,mainStockFileItem ,fromNowTradeDayList ,  SheetHead_Part_1 , realTypeRuleList , mYearTradeDayList);
 			int needRecordCount = fromNowTradeDayList.size() - mRecordDayList.size();
 			boolean isContainToady = isContainDayInList(mYYYMMdd , mRecordDayList);
 			
@@ -814,13 +1032,19 @@ void 	addRuleToList(Rule rule , boolean isShowInXlsxHead){
 	            	  
 	            	  String tsCode = mMeiRiHangQing.getTs_code();
 	            	  String matchDayInt = needAddTradeDayInt+"";
-	            	  
+	            	  String mRiXianTradeDay = mMeiRiHangQing.trade_date;
 	            
 	        
 	            
 	            	  
 	            	  Map<String,RiXianXingQingvShiJianWeiXu> matchDateMap = 	  mStockPropMap.get(tsCode);
 	            	  
+	            	  ArrayList<RiXianXingQingvShiJianWeiXu> mMatchRiXianArr =    mTsCode_RiXianArr_Map.get(tsCode);
+	            	  
+	            	  if(mMatchRiXianArr == null) {
+	            		  mMatchRiXianArr = new ArrayList<RiXianXingQingvShiJianWeiXu>();
+	            		  
+	            	  }
 	            	  if(matchDateMap == null) {
 	            		  
 	            		  matchDateMap = new HashMap<String,RiXianXingQingvShiJianWeiXu>();
@@ -828,9 +1052,11 @@ void 	addRuleToList(Rule rule , boolean isShowInXlsxHead){
 	            	  
 	            	  if(!matchDateMap.containsKey(matchDayInt)) {
 	            		  matchDateMap.put(matchDayInt, mMeiRiHangQing);
+	             		  mMatchRiXianArr.add(mMeiRiHangQing);
 	            	  }
-	            		
+	            	  
 	            	  mStockPropMap.put(tsCode, matchDateMap);
+	            	  mTsCode_RiXianArr_Map.put(tsCode, mMatchRiXianArr);
 	           
 	          		// key【000001(ts_code)】---> value【 key【0811】,value【RiXianXingQingvShiJianWeiXu(四个属性)】 】
 //	          		Map<String,Map<String,RiXianXingQingvShiJianWeiXu>>  
@@ -865,9 +1091,17 @@ void 	addRuleToList(Rule rule , boolean isShowInXlsxHead){
 				  ShowStockPropMap();
 			}
 			
+			System.out.println("mStockPropMap.size() = "+ mStockPropMap.size());
 			
+			System.out.println("mTsCode_RiXianArr_Map.size() = "+ mTsCode_RiXianArr_Map.size());
+			
+			//  参数用于控制 是否 在 排序完成后显示 Log
+		     sortTsCode_RiXianArr_Map(false);
+			
+			// 记录点  Zukgit 
+			// 应该还要提供一个最新提供的 日期
 			// 感觉 还不如 创建 新的  20xx_main_stock.xlsx 文件  这样 还更快点
-			createMainXlsxWithData(mainStockFileItem,mYearTradeDayList,mStockPropMap);
+			createMainXlsxWithData(mYYYMMdd,mainStockFileItem,mYearTradeDayList,mStockPropMap,mTsCode_RiXianArr_Map);
 			
 			
 			
@@ -880,7 +1114,10 @@ void 	addRuleToList(Rule rule , boolean isShowInXlsxHead){
 		
 		
 		@SuppressWarnings("unchecked")
-		void createMainXlsxWithData(File tmpFile, ArrayList<Integer> mYearAllTradeDayList , Map<String,Map<String,RiXianXingQingvShiJianWeiXu>>  mTsCode_Data_Map ) {
+		void createMainXlsxWithData(int endTradeDay , File tmpFile, 
+				ArrayList<Integer> mYearAllTradeDayList ,
+				Map<String,Map<String,RiXianXingQingvShiJianWeiXu>>  mTsCode_Data_Map ,
+				 Map<String,ArrayList<RiXianXingQingvShiJianWeiXu>> mTsCode_ArrRiXian_Map) {
 
 			
 		    OutputStream outputStreamExcel = null;
@@ -899,6 +1136,8 @@ void 	addRuleToList(Rule rule , boolean isShowInXlsxHead){
 	        }
 	        
 	        
+	       	String endTradeMMDD = (endTradeDay+"").substring(4);
+	       	
 	        Workbook workbook = null;
 	        workbook = new XSSFWorkbook();//创建Workbook对象(excel的文档对象)
 	        
@@ -908,7 +1147,7 @@ void 	addRuleToList(Rule rule , boolean isShowInXlsxHead){
 	        	
 	            Map<String,Integer> headName_ColumnNum_Map = new     HashMap<String,Integer>();
 	            
-	        	// 收盘价    涨跌幅   涨跌值  成交额
+	        	// 收盘价    涨跌比   涨跌值  成交额
 	        	String curShhetName = MainStock_SheetChineseNameArr[i];
 	           // 	{"close","pct_chg","change","amount"};
 	        	String curSheetName_English = MainStock_SheetEnglishNameArr[i];
@@ -923,11 +1162,12 @@ void 	addRuleToList(Rule rule , boolean isShowInXlsxHead){
 	     
 	            Row row = mSheet.createRow(0);
 	            
-	            
+	      
+	            //--------------------------head_row_Begin--------------------------
 	            int rowIndex = 0 ;
 	            
 	        
-//	            SheetHead_Part_1
+//	            SheetHead_Part_1  	// cname【0】  ts_code【1】 
 	            
 	            for (int j = 0; j < SheetHead_Part_1.length; j++) {
 	            	// cname【0】  ts_code【1】 
@@ -936,10 +1176,24 @@ void 	addRuleToList(Rule rule , boolean isShowInXlsxHead){
 				}
 	            
 	 
+	        	//  当前股价
+	            // {"1122收盘价","1122涨跌比","1122涨跌值","1122成交额"}; 
+	            
+	            for (int j = 0; j < MainStock_SheetChineseNameArr.length; j++) {
+	            	String headItem = MainStock_SheetChineseNameArr[j];
+	            	String endTradeDayHeadStr = endTradeMMDD + headItem;
+	            	headName_ColumnNum_Map.put(endTradeDayHeadStr, rowIndex);
+	                row.createCell(rowIndex++).setCellValue(endTradeDayHeadStr);
+	            }
+	            
+	            
 	            
 	            for (int j = 0; j < realTypeRuleList.size(); j++) {
-					String columnName =  realTypeRuleList.get(j).getXlsxDynamicHeader();
+	            	// 参数是 sheetName
+					String columnName =  realTypeRuleList.get(j).getXlsxDynamicHeader(curShhetName);
 					// 有些 规则 是  不显示 在 head  中的  有些规则 则作用在 header 中 
+					// isShowHeaderInXlsx Zukgit 控制当前 Rule 是否显示表头的 
+					//  用于控制 显示的 表头的 
 					if(realTypeRuleList.get(j).isShowHeaderInXlsx) {
 			        	// dynamicProp【3】   ......  dynamicProp【8】
 					 	headName_ColumnNum_Map.put(columnName, rowIndex);
@@ -952,11 +1206,17 @@ void 	addRuleToList(Rule rule , boolean isShowInXlsxHead){
 					int dayFalg = mYearAllTradeDayList.get(j);
 					String monthday = (""+dayFalg).substring(4);
 					
+			
+					
 				   	// 1231【19】   ......  0101【42】
 				 	headName_ColumnNum_Map.put(monthday, rowIndex);
-		            row.createCell(rowIndex++).setCellValue(monthday);
+				 	Cell matchCell =    row.createCell(rowIndex++);
+				 	matchCell.setCellValue(monthday);
+		            
 	            
 				}
+	            
+	            //--------------------------head_row_END--------------------------
 	            int columnIndex = 1 ;
 	   
 	            
@@ -975,6 +1235,10 @@ void 	addRuleToList(Rule rule , boolean isShowInXlsxHead){
 						String ts_code_key = mOutEntry.getKey(); // Map的Value // 作者名称
 						Map<String,RiXianXingQingvShiJianWeiXu>  mData_RiXianHangQing_Map = mOutEntry.getValue();
 					
+						// 该股票 所有的数据
+						ArrayList<RiXianXingQingvShiJianWeiXu>   tsMatchRiXianArr = 	mTsCode_ArrRiXian_Map.get(ts_code_key);
+						
+						                                          
 						if(mData_RiXianHangQing_Map == null) {
 							continue;
 						}
@@ -984,14 +1248,60 @@ void 	addRuleToList(Rule rule , boolean isShowInXlsxHead){
 						
 						Iterator InnerIterator = mData_RiXianHangQing_Map.entrySet().iterator();
 						
-					
-						boolean isRowInit = false;
+
+
+						
+
+			            
+
+
 						Row rowNext = null ; 
-						while (InnerIterator.hasNext()) {
+						
+						if( rowNext == null) {
+							 rowNext = mSheet.createRow(columnIndex++);
+						}
+						
+						
+						//  动态 计算 Begin  
+			            for (int j = 0; j < realTypeRuleList.size(); j++) {
+			            	// 参数是 sheetName
+							String columnName =  realTypeRuleList.get(j).getXlsxDynamicHeader(curShhetName);
+							// 有些 规则 是  不显示 在 head  中的  有些规则 则作用在 header 中 
+							// isShowHeaderInXlsx Zukgit 控制当前 Rule 是否显示表头的 
+							Integer mDynamicPosition = 	headName_ColumnNum_Map.get(columnName);
+							//  用于控制 显示的 表头的 
+							if(mDynamicPosition != null) {
 							
+								String cellValue = realTypeRuleList.get(j).getXlsxDynamicCell(curShhetName, tsMatchRiXianArr);
+							
+								if(isDoubleNumeric(cellValue)) {
+									rowNext.createCell(mDynamicPosition).setCellValue(Double.parseDouble(cellValue));
+								}else if(isNumeric(cellValue)){
+									rowNext.createCell(mDynamicPosition).setCellValue(Long.parseLong(cellValue));
+
+								}else {
+									rowNext.createCell(mDynamicPosition).setCellValue(cellValue);
+								}
+								
+						
+							    
+							}
+							
+						}
+			    		//  动态 计算 End  
+			            
+		
+						
+			
+			
+						
+				
+						
+						while (InnerIterator.hasNext()) {
+							 //  key=0201,  value=RiXianXingQingvShiJianWeiXu
 							mInnerEntry = (Map.Entry<String,RiXianXingQingvShiJianWeiXu> ) InnerIterator.next();
 		
-							String tradeDayStr = mInnerEntry.getKey(); // Map的Value // 作者名称
+							String tradeDayStr = mInnerEntry.getKey(); // Map的Value 
 							RiXianXingQingvShiJianWeiXu mRiXianHangQing = mInnerEntry.getValue();
 							
 							String mMMDD = tradeDayStr.trim().substring(4);
@@ -999,18 +1309,56 @@ void 	addRuleToList(Rule rule , boolean isShowInXlsxHead){
 							
 							String tscode = mRiXianHangQing.ts_code;
 							String cname = mRiXianHangQing.cname;
+							String tradeDay = mRiXianHangQing.trade_date;
 		
-			
 							
-							// amount 的单位是 千元 在 这里 改为 单位为 元 
-				
+
 							
-							if( rowNext == null) {
-								 rowNext = mSheet.createRow(columnIndex++);
-							}
-							
-							rowNext.createCell(0).setCellValue(cname);
+							// 填充 cell单元内容
+							rowNext.createCell(0).setCellValue(cname);  
 							rowNext.createCell(1).setCellValue(tscode);
+							
+							if((mYYYMMdd+"").equals(tradeDay)) {
+					
+					            for (int j = 0; j < MainStock_SheetChineseNameArr.length; j++) {
+					            	String headEnglishItem = MainStock_SheetEnglishNameArr[j];
+					            	String headChineseItem = MainStock_SheetChineseNameArr[j];
+					            	String endTradeDayHeadStr = endTradeMMDD + headChineseItem;
+			
+									if(headEnglishItem.equals("close")) {
+										double close = mRiXianHangQing.close;
+										
+										rowNext.createCell(headName_ColumnNum_Map.get(endTradeDayHeadStr)).setCellValue(close);
+										
+									}	else	if(headEnglishItem.equals("change")) {
+										double change = mRiXianHangQing.change;
+										
+										rowNext.createCell(headName_ColumnNum_Map.get(endTradeDayHeadStr)).setCellValue(change);
+										
+									}	else	if(headEnglishItem.equals("pct_chg")) {
+										double pct_chg = mRiXianHangQing.pct_chg;
+										
+										rowNext.createCell(headName_ColumnNum_Map.get(endTradeDayHeadStr)).setCellValue(pct_chg);
+										
+									}	else if(headEnglishItem.equals("amount")) {
+										//  由于成交量的 单位是 千元  直观看 不方便   此处把 double 的小数点去掉 并且 小数点后保持三位
+//										String keep3PointFixed = clearPointAndKeepBackNum(amount,3);
+									
+										// amount 的单位是 千元 在 这里 改为 单位为 元 
+										Long amountLongNoPoint = mRiXianHangQing.getAmountAsLongNoPoint();
+										if(amountLongNoPoint != null) {
+											rowNext.createCell(headName_ColumnNum_Map.get(endTradeDayHeadStr)).setCellValue(amountLongNoPoint);
+
+										}
+									}
+									
+					            }
+					            
+					            
+							}
+						
+							
+							
 							
 							if(curSheetName_English.equals("close")) {
 								double close = mRiXianHangQing.close;
@@ -1030,6 +1378,8 @@ void 	addRuleToList(Rule rule , boolean isShowInXlsxHead){
 							}	else if(curSheetName_English.equals("amount")) {
 								//  由于成交量的 单位是 千元  直观看 不方便   此处把 double 的小数点去掉 并且 小数点后保持三位
 //								String keep3PointFixed = clearPointAndKeepBackNum(amount,3);
+							
+								// amount 的单位是 千元 在 这里 改为 单位为 元 
 								Long amountLongNoPoint = mRiXianHangQing.getAmountAsLongNoPoint();
 								if(amountLongNoPoint != null) {
 									rowNext.createCell(headName_ColumnNum_Map.get(mMMDD)).setCellValue(amountLongNoPoint);
@@ -1796,12 +2146,70 @@ void 	addRuleToList(Rule rule , boolean isShowInXlsxHead){
 			return null;
 		}
 
-		String getXlsxDynamicHeader() {
+		String getXlsxDynamicHeader(String sheetName) {
 			return "动态"+dynamicIndexInList;
 		}
 
 		
 		
+		
+		String getXlsxDynamicCell(String sheetName , ArrayList<RiXianXingQingvShiJianWeiXu> mRiXianList ) {
+			String cellStr = "";
+			
+			// MainStock_SheetChineseNameArr
+			
+//			 MainStock_SheetChineseNameArr = {"收盘价","涨跌比","涨跌值","成交额"};
+			
+			switch (sheetName) {
+			case "收盘价":
+				cellStr = ShouPanJia_SheetCell_Operation(mRiXianList);
+				break;
+
+			case "涨跌比":
+				  cellStr = ZhangDieFu_SheetCell_Operation(mRiXianList);
+				break;
+			case "涨跌值":
+				  cellStr = ZhangDieZhi_SheetCell_Operation(mRiXianList);
+				break;
+			case "成交额":
+				  cellStr = ChengJiaoEr_SheetCell_Operation(mRiXianList);
+				break;
+				
+			default:
+				break;
+			}
+			
+			return cellStr;
+		}
+		
+		
+			String  ZhangDieFu_SheetCell_Operation( ArrayList<RiXianXingQingvShiJianWeiXu> mRiXianList){
+				
+				return "";
+				
+			}
+
+
+			String  ZhangDieZhi_SheetCell_Operation( ArrayList<RiXianXingQingvShiJianWeiXu> mRiXianList){
+				
+				return "";
+				
+			}
+			
+			
+			String  ChengJiaoEr_SheetCell_Operation( ArrayList<RiXianXingQingvShiJianWeiXu> mRiXianList){
+				
+				return "";
+				
+			}
+
+		
+		
+		String ShouPanJia_SheetCell_Operation(ArrayList<RiXianXingQingvShiJianWeiXu> mRiXianList ) {
+			
+			return "";
+			
+		}
 		
 		String ruleTip(String type, int index, String batName, OS_TYPE curType) {
 			String itemDesc = "";
@@ -1879,9 +2287,23 @@ void 	addRuleToList(Rule rule , boolean isShowInXlsxHead){
 		abstract String simpleDesc(); // 使用的简单描述 中文的该 rule的使用情况 默认会在 ruleTip 被调用
 
 		
-		abstract String getXlsxDynamicHeader(); //  在 xlsx中的动态计算的 head 描述
+		abstract String getXlsxDynamicHeader(String sheetName); //  在 xlsx中的动态计算的 head 描述
 
 		
+		abstract	String getXlsxDynamicCell(String sheetName , ArrayList<RiXianXingQingvShiJianWeiXu> mRiXianList ) ;
+		
+		
+		abstract	String  ShouPanJia_SheetCell_Operation( ArrayList<RiXianXingQingvShiJianWeiXu> mRiXianList);
+
+
+		abstract	String  ZhangDieFu_SheetCell_Operation( ArrayList<RiXianXingQingvShiJianWeiXu> mRiXianList);
+
+
+		abstract	String  ZhangDieZhi_SheetCell_Operation( ArrayList<RiXianXingQingvShiJianWeiXu> mRiXianList);
+			
+			
+		abstract	String  ChengJiaoEr_SheetCell_Operation( ArrayList<RiXianXingQingvShiJianWeiXu> mRiXianList);
+
 	}
 
 	static void writeContentToFile(File file, String strParam) {
@@ -1991,7 +2413,28 @@ void 	addRuleToList(Rule rule , boolean isShowInXlsxHead){
 		}
 		return false;
 	}
+	
+	
+	public	static Pattern Double_Pattern = Pattern.compile("-?[0-9]+[.]{0,1}[0-9]*[dD]{0,1}");
+	
+	public static boolean isDoubleNumeric(String str){
 
+
+		Matcher isNum = Double_Pattern.matcher(str);
+
+		if( !isNum.matches() ){
+		return false;
+
+		}
+
+		return true;
+
+		}
+	
+
+
+	
+	
 	public static boolean isNumeric(String str) {
 
 		if (str == null) {
@@ -2255,7 +2698,7 @@ void 	addRuleToList(Rule rule , boolean isShowInXlsxHead){
 				ArrayList<Integer> fromNowTradeDayList = calculFromNowTradeDayList(getCurrentYYYYMMDD(),yearTradeDayList);
 				String mFromNowTip = "【至今项:"+fromNowTradeDayList.size()+"】";
 				// 检测当前 目前为止  没有记录的 交易日的集合
-				ArrayList<Integer> mRecordDayList = calculRecordTradeDayList(fileYearInt,getCurrentYYYYMMDD(),fromNowTradeDayList,mainStockFileItem , SheetHead_Part_1 , realTypeRuleList , yearTradeDayList);
+				ArrayList<Integer> mRecordDayList = calculRecordTradeDayList(fileYearInt,getCurrentYYYYMMDD(),MainStock_SheetChineseNameArr[0],mainStockFileItem , fromNowTradeDayList , SheetHead_Part_1 , realTypeRuleList , yearTradeDayList);
 				
 			
 				
@@ -2266,7 +2709,22 @@ void 	addRuleToList(Rule rule , boolean isShowInXlsxHead){
 				String mNeedRecordTip = "【遗落项:"+needRecordCount+"】";
 				boolean isContainToady = isContainDayInList(getCurrentYYYYMMDD() , mRecordDayList);
 				String mRecordToday = "【今日账:"+isContainToady+"】";
-				mTipSb.append(mYearTip+" "+mFromNowTip+" "+mRecordTip+" "+mNeedRecordTip+" "+mRecordToday );
+				
+
+				
+				if(fileYearInt == getCurrentYear()) {
+					boolean isRreshToday = (getCurrentYYYYMMDDWith17Point()  == getCurrentYYYYMMDD());
+					String isRreshTodayStr = "【今日是否能更新(17点):"+isRreshToday+"】";
+					
+					mTipSb.append(mYearTip+" "+mFromNowTip+" "+mRecordTip+" "+mNeedRecordTip+" "+mRecordToday+" "+ isRreshTodayStr );
+
+				}else {
+					mTipSb.append(mYearTip+" "+mFromNowTip+" "+mRecordTip+" "+mNeedRecordTip+" "+mRecordToday );
+
+					
+				}
+
+				
 				
 				mTipSb.append("\n");
 				   // 插入更新命令 fileYearInt
@@ -2278,7 +2736,7 @@ void 	addRuleToList(Rule rule , boolean isShowInXlsxHead){
 				
 				File logFile = new File(J0_Data_Dir_Path+fileYearInt+"_main_stock.log");
 				
-				int lastDay = getCurrentYYYYMMDD();
+				int lastDay = getCurrentYYYYMMDDWith17Point();
 				if(fileYearInt < getCurrentYear()) {
 					lastDay = fileYearInt*10000+1231;
 				}
@@ -2313,8 +2771,10 @@ void 	addRuleToList(Rule rule , boolean isShowInXlsxHead){
 	}
 	
 	// 读取文件 去 检测 当前目前 为止 还没有记录的 日期的集合 
-	static ArrayList<Integer> 	calculRecordTradeDayList( int nowYear , int nowYYYYMMDD ,
-			ArrayList<Integer> mFromNowOnTradeDayList , File mMainStockXlsxFile , 
+	static public  ArrayList<Integer> 	calculRecordTradeDayList(
+			int nowYear , int nowYYYYMMDD ,
+			String sheetName ,  File mMainStockXlsxFile , 
+			ArrayList<Integer> mFromNowOnTradeDayList ,
 			String [] SheetHead_Part_1_tscodeName  ,  ArrayList<Rule>  SheetHead_Part_B_RuleList , 
 			ArrayList<Integer> SheetHead_Part_C  ){
 		
@@ -2331,12 +2791,18 @@ for (int i = 0; i < SheetHead_Part_1_tscodeName.length; i++) {
 	columnHeadArr.add(SheetHead_Part_1_tscodeName[i]);
 }
 
+// 最新的那天的 close chg pct_chg amount 的 数据
+for (int i = 0; i < MainStock_SheetChineseNameArr.length; i++) {
+	columnHeadArr.add(MainStock_SheetChineseNameArr[i]);
+}
+
 for (int i = 0; i < SheetHead_Part_B_RuleList.size(); i++) {
 	if(SheetHead_Part_B_RuleList.get(i).isShowHeaderInXlsx) {
-		columnHeadArr.add(SheetHead_Part_B_RuleList.get(i).getXlsxDynamicHeader());
+		columnHeadArr.add(SheetHead_Part_B_RuleList.get(i).getXlsxDynamicHeader(sheetName));
 	}
 
 }
+
 
 
 
@@ -2375,7 +2841,7 @@ for (int i = 0; i < columnHeadArr.size(); i++) {
 	            //获取第一个sheet
 //	            sheet = wb.getSheet("股票列表");
 //	            sheet = wb.getSheetAt(0);
-	            mainStockSheet = mainStockWorkBook.getSheet(MainStock_SheetChineseNameArr[0]);
+	            mainStockSheet = mainStockWorkBook.getSheet(sheetName);
 	            //获取最大行数
 	            int rownum = mainStockSheet.getPhysicalNumberOfRows();
 	            //获取第一行
@@ -2572,7 +3038,7 @@ for (int i = 0; i < columnHeadArr.size(); i++) {
  
             
             for (int j = 0; j < ruleList.size(); j++) {
-				String columnName =  ruleList.get(j).getXlsxDynamicHeader();
+				String columnName =  ruleList.get(j).getXlsxDynamicHeader(curShhetName);
 				// 有些 规则 是  不显示 在 head  中的  有些规则 则作用在 header 中 
 				if(ruleList.get(j).isShowHeaderInXlsx) {
 				    row.createCell(rowIndex++).setCellValue(columnName);
@@ -3153,6 +3619,30 @@ for (int i = 0; i < columnHeadArr.size(); i++) {
 	
 	
 
+
+	
+	// 只有过了 17 点 才会有 今天的 交易数据  所以 这里 判断 如果 过了 17点 那么返回今天的日期  不到17点 那么返回昨天的日期
+	static int getCurrentYYYYMMDDWith17Point() {
+
+		SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd");
+		int refrashDay  = getCurrentYYYYMMDD() ;
+
+
+	    long today17Long =   getToday17PointTimeLong();
+	    
+	    long nowLong  = Calendar.getInstance().getTimeInMillis();
+	    if(nowLong > today17Long) {    // 晚上过来17点了  可以得到今天数据
+	    	refrashDay = getCurrentYYYYMMDD() ;
+	    }else {
+	    	 // 还没到今天17点  只可以得到昨天数据
+	    	refrashDay  = 	getYesterTradeDayIntFlag(getCurrentYYYYMMDD());
+
+	    }
+	    
+		return refrashDay;
+
+	}
+	
 	
 	
 	static int getCurrentYYYYMMDD() {
@@ -3698,6 +4188,67 @@ public static void showInitJsonAndExeCuteCommand(int ruleIndex , int cYear  , in
 	System.out.println("—————————————————————————————————————————————————————————————");
 	System.out.println("_____________________________________________________________\n\n");
 
+}
+
+
+
+static int  getYesterTradeDayIntFlag(int dayFlagInt ){
+    int step = -1;
+    int tomorrow = getFutureDayFlag(dayFlagInt,step);
+if(allTradeDayList.size() == 0) {
+	initTradeDayList();
+}
+	
+while(!allTradeDayList.contains(tomorrow)) {  //  如果 不包含今日  那么 往后 计算 
+		
+	 tomorrow = getFutureDayFlag(tomorrow,step);
+	}
+
+    return tomorrow;
+}
+
+
+
+static int getFutureDayFlag(int dayFlagInt , int DaySpace){
+     int curDay =  dayFlagInt;
+     int futureDay = dayFlagInt;
+     String daysDesc = dayFlagInt+"";
+     SimpleDateFormat simple = new SimpleDateFormat("yyyyMMdd");
+     try {
+         Date nowDate =    simple.parse(daysDesc);
+         Calendar    curCalendar =Calendar.getInstance();
+         curCalendar.setTime(nowDate);
+         int curDayYear =   curCalendar.get(Calendar.DAY_OF_YEAR);
+         int newDay2Year = curDayYear + DaySpace;
+         curCalendar.set(Calendar.DAY_OF_YEAR,newDay2Year);
+
+         int year = curCalendar.get(Calendar.YEAR);
+         int month = curCalendar.get(Calendar.MONTH)+1;
+         int day2month = curCalendar.get(Calendar.DAY_OF_MONTH);
+         String monthDesc = month>=10?month+"":"0"+month;
+         String dayDesc = day2month>=10?day2month+"":"0"+day2month;
+
+         String dayIntFalg = year+""+monthDesc+dayDesc;
+         futureDay = Integer.parseInt(dayIntFalg);
+     } catch (ParseException e) {
+         e.printStackTrace();
+     }
+
+     return futureDay;
+ }
+
+
+public static Long getToday17PointTimeLong(){
+    Calendar c1 = Calendar.getInstance();
+//    c1.add(Calendar.DATE,-1);
+    c1.set(Calendar.HOUR_OF_DAY,17);
+    c1.set(Calendar.MINUTE,0);
+    c1.set(Calendar.SECOND,0);
+    c1.set(Calendar.MILLISECOND,0);
+    //下面两句可以省略
+    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//    System.out.print("getToday17PointTimeLong:"+simpleDateFormat.format(c1.getTime()));
+    return c1.getTimeInMillis();
 }
 
 
