@@ -105,6 +105,12 @@ public class J0_GuPiao_Analysis {
 	
 
 	
+	
+	// 专门 放置 头部数据的 数据结构
+	static Map<String,StockHeadData>  stockHeadDataMap = new HashMap<String,StockHeadData> ();
+	
+	
+	
 
 	static void setProperity() {
 		try {
@@ -459,7 +465,7 @@ public class J0_GuPiao_Analysis {
 
                 //    System.out.println(" entry.getKey() = "+entry.getKey() + "   entry.getValue() = "+ entry.getValue()+"【Over】");
             }
-            if(ts_code != null && stockName != null  ) {
+            if(ts_code != null && stockName != null   ) {
             	TScode_StockName_Map.put(ts_code, stockName);
             	
             	
@@ -484,10 +490,2541 @@ public class J0_GuPiao_Analysis {
 //	// 是否显示在 Head 的 头部 
 //	 realTypeRuleList.add(new  Daily_basic_YYYYMM_XLSX_Rule_0());
 
+		
+	
+		// 添加 数据  并  并产生 得到的 数据类型
 		addRuleToList(new  AddData_To_Year_Main_Stock_Xlsx_Rule_1(),true);	
 
+		//  今天的数据 和 平均数据的对比
+		addRuleToList(new  Dynamic_0Today_BeiShu_Rule_2(),true);	
+		
+		addRuleToList(new  Dynamic_Preday2_BeiShu_Rule_3(),true);	
+		
+		
+		addRuleToList(new  Dynamic_Preday3_BeiShu_Rule_4(),true);	
+		
+		addRuleToList(new  Dynamic_Preday4_BeiShu_Rule_5(),true);	
+		
+		
+		addRuleToList(new  Dynamic_Preday5_BeiShu_Rule_6(),true);	
+
+		addRuleToList(new  Dynamic_Preday6_BeiShu_Rule_7(),true);	
+		
+		
+		addRuleToList(new  Dynamic_Preday7_BeiShu_Rule_8(),true);	
+		
+		
+		addRuleToList(new  Dynamic_Preday10_BeiShu_Rule_9(),true);	
+		
+		addRuleToList(new  Dynamic_Preday15_BeiShu_Rule_10(),true);	
+		
+		
+		addRuleToList(new  Dynamic_Preday20_BeiShu_Rule_11(),true);	
+		
+		addRuleToList(new  Dynamic_Preday30_BeiShu_Rule_12(),true);	
+		
+		
+		// 最近两天涨跌的数值的和   以及涨跌幅度的和
+		addRuleToList(new  Last2DaySum_ZhangDieZhi_ZhangDieBi_Rule_13(),true);	
+		
+		addRuleToList(new  Last3DaySum_ZhangDieZhi_ZhangDieBi_Rule_14(),true);	
+		
+		
+		addRuleToList(new  Last4DaySum_ZhangDieZhi_ZhangDieBi_Rule_15(),true);	
+		
+		
+		addRuleToList(new  Last5DaySum_ZhangDieZhi_ZhangDieBi_Rule_16(),true);	
+
+		
+		
+		addRuleToList(new  Last6DaySum_ZhangDieZhi_ZhangDieBi_Rule_17(),true);	
+		
+		addRuleToList(new  Last7DaySum_ZhangDieZhi_ZhangDieBi_Rule_18(),true);	
+		
+		addRuleToList(new  Last8DaySum_ZhangDieZhi_ZhangDieBi_Rule_19(),true);	
+		
+		addRuleToList(new  Last9DaySum_ZhangDieZhi_ZhangDieBi_Rule_20(),true);	
+		
+		addRuleToList(new  Last10DaySum_ZhangDieZhi_ZhangDieBi_Rule_21(),true);	
+		
+		addRuleToList(new  Last15DaySum_ZhangDieZhi_ZhangDieBi_Rule_22(),true);	
+		
+		
+		addRuleToList(new  Last20DaySum_ZhangDieZhi_ZhangDieBi_Rule_23(),true);	
+		
+		addRuleToList(new  Last30DaySum_ZhangDieZhi_ZhangDieBi_Rule_24(),true);	
+		
+		// rule_25开始 
+
+		
+		// 计算近10天的涨跌数据
 	}
 	
+
+
+	
+	class Dynamic_Preday30_BeiShu_Rule_12 extends  Basic_Rule{
+		
+		
+		// 当前记录的交易日 数量
+		int preday_count = 30;
+		
+		Dynamic_Preday30_BeiShu_Rule_12(){
+			super("#", 12, 4); //
+			preday_count = 30;   //
+		}
+		
+
+		
+		@Override
+		String getXlsxDynamicHeader(String sheetName) {
+			// TODO Auto-generated method stub
+			switch (sheetName) {
+			case "收盘价":
+				   return "近"+preday_count+"天收盘价"+"均比"+"_"+rule_index;
+			
+			case "涨跌值":
+				   return "近"+preday_count+"天涨跌值"+"均比"+"_"+rule_index;
+			case "涨跌比":
+				   return "近"+preday_count+"天涨跌幅"+"均比"+"_"+rule_index;
+			case "成交额":
+				   return "近"+preday_count+"天成交额"+"均比"+"_"+rule_index;
+				
+			default:
+				break;
+			}
+			return "近"+preday_count+"天"+"均比"+"_"+rule_index;
+		}
+		
+		@Override
+		String simpleDesc() {
+			return "\n"  +  Cur_Bat_Name + " #_" + rule_index+"    ###   计算当前最新最近"+preday_count+" 天 记录与平均值的比值   " ;
+			
+		}
+		
+		
+		
+		
+		@Override
+		String ShouPanJia_SheetCell_Operation(String tscode, J0_GuPiao_Analysis.StockHeadData headData,
+				ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> mRiXianList) {
+			// TODO Auto-generated method stub
+			
+			if(mRiXianList == null || mRiXianList.size() == 0) {
+				
+				//  没有对比数据 那么 对币值就是 0 
+				headData.pre30day_close = 0;
+				headData.pre30day_close_comparison = 0;
+				return super.ChengJiaoEr_SheetCell_Operation(tscode, headData ,  mRiXianList);
+				
+			}
+			
+			
+			
+			// 从列表中指定返回指定数目的列表  包含2个 1个 0 个的情况
+			ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
+		
+			
+			//
+			double preXDayClose =  	calLastRiXianListValue("close",preday_count,lastDaysList);
+			
+			headData.pre30day_close = preXDayClose;
+			headData.pre30day_close_comparison =  preXDayClose  / headData.pingjun_close ;
+
+			return	priceRateFormat.format(headData.pre30day_close_comparison);
+		}
+		
+		
+		
+		@Override
+		String ZhangDieZhi_SheetCell_Operation(String tscode, J0_GuPiao_Analysis.StockHeadData headData,
+				ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> mRiXianList) {
+			// TODO Auto-generated method stub
+		
+			if(mRiXianList == null || mRiXianList.size() == 0) {
+				
+				//  没有对比数据 那么 对币值就是 0 
+				headData.pre30day_change = 0;
+				headData.pre30day_change_comparison = 0;
+				return super.ChengJiaoEr_SheetCell_Operation(tscode, headData ,  mRiXianList);
+				
+			}
+			
+			
+			
+			// 从列表中指定返回指定数目的列表  包含2个 1个 0 个的情况
+			ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
+		
+			
+			//
+			double preXDayClose =  	calLastRiXianListValue("change",preday_count,lastDaysList);
+			
+			headData.pre30day_change = preXDayClose;
+			headData.pre30day_change_comparison =  preXDayClose  / headData.pingjun_change ;
+			return	priceRateFormat.format(headData.pre30day_change_comparison);
+		}
+		
+		
+
+		
+		@Override
+		String ZhangDieFu_SheetCell_Operation(String tscode, J0_GuPiao_Analysis.StockHeadData headData,
+				ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> mRiXianList) {
+			// TODO Auto-generated method stub
+			
+			
+			if(mRiXianList == null || mRiXianList.size() == 0) {
+				
+				//  没有对比数据 那么 对币值就是 0 
+				headData.pre30day_pct_change = 0;
+				headData.pre30day_pct_change_comparison = 0;
+				return super.ChengJiaoEr_SheetCell_Operation(tscode, headData ,  mRiXianList);
+				
+			}
+			
+			
+			
+			// 从列表中指定返回指定数目的列表  包含2个 1个 0 个的情况
+			ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
+		
+			
+			//
+			double preXDayPctChg =  	calLastRiXianListValue("pct_chg",preday_count,lastDaysList);
+			
+			headData.pre30day_pct_change = preXDayPctChg;
+			headData.pre30day_pct_change_comparison =  preXDayPctChg  / headData.pingjun_pct_change ;
+//			return	priceFormat.format(headData.day1_close_comparison);
+			return	priceRateFormat.format(headData.pre30day_pct_change_comparison);
+
+		}
+		
+		@Override
+		String ChengJiaoEr_SheetCell_Operation(String tscode, StockHeadData headData,
+				ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> mRiXianList) {
+			// TODO Auto-generated method stub
+			
+			
+			if(mRiXianList == null || mRiXianList.size() == 0) {
+				
+				//  没有对比数据 那么 对币值就是 0 
+				headData.pre30day_amount = 0;
+				headData.pre30day_amount_comparison = 0;
+				return super.ChengJiaoEr_SheetCell_Operation(tscode, headData ,  mRiXianList);
+				
+			}
+			
+			
+			
+			// 从列表中指定返回指定数目的列表  包含2个 1个 0 个的情况
+			ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
+		
+			
+			//
+			double preXDayPctChg =  	calLastRiXianListValue("amount",preday_count,lastDaysList) * 1000;
+			
+			headData.pre30day_amount = preXDayPctChg;
+			headData.pre30day_amount_comparison =  preXDayPctChg  / headData.pingjun_amount ;
+//			return	priceFormat.format(headData.day1_close_comparison);
+			return	priceRateFormat.format(headData.pre30day_amount_comparison);
+
+		}
+		
+		
+	}
+	
+	class Dynamic_Preday20_BeiShu_Rule_11 extends  Basic_Rule{
+		
+		
+		// 当前记录的交易日 数量
+		int preday_count = 20;
+		
+		Dynamic_Preday20_BeiShu_Rule_11(){
+			super("#", 11, 4); //
+			preday_count = 20;   //
+		}
+		
+
+		
+		@Override
+		String getXlsxDynamicHeader(String sheetName) {
+			// TODO Auto-generated method stub
+			switch (sheetName) {
+			case "收盘价":
+				   return "近"+preday_count+"天收盘价"+"均比"+"_"+rule_index;
+			
+			case "涨跌值":
+				   return "近"+preday_count+"天涨跌值"+"均比"+"_"+rule_index;
+			case "涨跌比":
+				   return "近"+preday_count+"天涨跌幅"+"均比"+"_"+rule_index;
+			case "成交额":
+				   return "近"+preday_count+"天成交额"+"均比"+"_"+rule_index;
+				
+			default:
+				break;
+			}
+			return "近"+preday_count+"天"+"均比"+"_"+rule_index;
+		}
+		
+		@Override
+		String simpleDesc() {
+			return "\n"  +  Cur_Bat_Name + " #_" + rule_index+"    ###   计算当前最新最近"+preday_count+" 天 记录与平均值的比值   " ;
+			
+		}
+		
+		
+		
+		
+		@Override
+		String ShouPanJia_SheetCell_Operation(String tscode, J0_GuPiao_Analysis.StockHeadData headData,
+				ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> mRiXianList) {
+			// TODO Auto-generated method stub
+			
+			if(mRiXianList == null || mRiXianList.size() == 0) {
+				
+				//  没有对比数据 那么 对币值就是 0 
+				headData.pre20day_close = 0;
+				headData.pre20day_close_comparison = 0;
+				return super.ChengJiaoEr_SheetCell_Operation(tscode, headData ,  mRiXianList);
+				
+			}
+			
+			
+			
+			// 从列表中指定返回指定数目的列表  包含2个 1个 0 个的情况
+			ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
+		
+			
+			//
+			double preXDayClose =  	calLastRiXianListValue("close",preday_count,lastDaysList);
+			
+			headData.pre20day_close = preXDayClose;
+			headData.pre20day_close_comparison =  preXDayClose  / headData.pingjun_close ;
+
+			return	priceRateFormat.format(headData.pre20day_close_comparison);
+		}
+		
+		
+		
+		@Override
+		String ZhangDieZhi_SheetCell_Operation(String tscode, J0_GuPiao_Analysis.StockHeadData headData,
+				ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> mRiXianList) {
+			// TODO Auto-generated method stub
+		
+			if(mRiXianList == null || mRiXianList.size() == 0) {
+				
+				//  没有对比数据 那么 对币值就是 0 
+				headData.pre20day_change = 0;
+				headData.pre20day_change_comparison = 0;
+				return super.ChengJiaoEr_SheetCell_Operation(tscode, headData ,  mRiXianList);
+				
+			}
+			
+			
+			
+			// 从列表中指定返回指定数目的列表  包含2个 1个 0 个的情况
+			ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
+		
+			
+			//
+			double preXDayClose =  	calLastRiXianListValue("change",preday_count,lastDaysList);
+			
+			headData.pre20day_change = preXDayClose;
+			headData.pre20day_change_comparison =  preXDayClose  / headData.pingjun_change ;
+			return	priceRateFormat.format(headData.pre20day_change_comparison);
+		}
+		
+		
+
+		
+		@Override
+		String ZhangDieFu_SheetCell_Operation(String tscode, J0_GuPiao_Analysis.StockHeadData headData,
+				ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> mRiXianList) {
+			// TODO Auto-generated method stub
+			
+			
+			if(mRiXianList == null || mRiXianList.size() == 0) {
+				
+				//  没有对比数据 那么 对币值就是 0 
+				headData.pre20day_pct_change = 0;
+				headData.pre20day_pct_change_comparison = 0;
+				return super.ChengJiaoEr_SheetCell_Operation(tscode, headData ,  mRiXianList);
+				
+			}
+			
+			
+			
+			// 从列表中指定返回指定数目的列表  包含2个 1个 0 个的情况
+			ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
+		
+			
+			//
+			double preXDayPctChg =  	calLastRiXianListValue("pct_chg",preday_count,lastDaysList);
+			
+			headData.pre20day_pct_change = preXDayPctChg;
+			headData.pre20day_pct_change_comparison =  preXDayPctChg  / headData.pingjun_pct_change ;
+//			return	priceFormat.format(headData.day1_close_comparison);
+			return	priceRateFormat.format(headData.pre20day_pct_change_comparison);
+
+		}
+		
+		@Override
+		String ChengJiaoEr_SheetCell_Operation(String tscode, StockHeadData headData,
+				ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> mRiXianList) {
+			// TODO Auto-generated method stub
+			
+			
+			if(mRiXianList == null || mRiXianList.size() == 0) {
+				
+				//  没有对比数据 那么 对币值就是 0 
+				headData.pre20day_amount = 0;
+				headData.pre20day_amount_comparison = 0;
+				return super.ChengJiaoEr_SheetCell_Operation(tscode, headData ,  mRiXianList);
+				
+			}
+			
+			
+			
+			// 从列表中指定返回指定数目的列表  包含2个 1个 0 个的情况
+			ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
+		
+			
+			//
+			double preXDayPctChg =  	calLastRiXianListValue("amount",preday_count,lastDaysList) * 1000;
+			
+			headData.pre20day_amount = preXDayPctChg;
+			headData.pre20day_amount_comparison =  preXDayPctChg  / headData.pingjun_amount ;
+//			return	priceFormat.format(headData.day1_close_comparison);
+			return	priceRateFormat.format(headData.pre20day_amount_comparison);
+
+		}
+		
+		
+	}
+	
+	class Last30DaySum_ZhangDieZhi_ZhangDieBi_Rule_24 extends  Last2DaySum_ZhangDieZhi_ZhangDieBi_Rule_13{
+		
+		Last30DaySum_ZhangDieZhi_ZhangDieBi_Rule_24(){
+			super("#", 24, 4 , 30); //
+		}
+		
+	}
+	
+	
+	class Last20DaySum_ZhangDieZhi_ZhangDieBi_Rule_23 extends  Last2DaySum_ZhangDieZhi_ZhangDieBi_Rule_13{
+		
+		Last20DaySum_ZhangDieZhi_ZhangDieBi_Rule_23(){
+			super("#", 23, 4 , 20); //
+		}
+		
+	}
+	
+	
+	
+	class Last15DaySum_ZhangDieZhi_ZhangDieBi_Rule_22 extends  Last2DaySum_ZhangDieZhi_ZhangDieBi_Rule_13{
+		
+		Last15DaySum_ZhangDieZhi_ZhangDieBi_Rule_22(){
+			super("#", 22, 4 , 15); //
+		}
+		
+	}
+	
+	
+	class Last10DaySum_ZhangDieZhi_ZhangDieBi_Rule_21 extends  Last2DaySum_ZhangDieZhi_ZhangDieBi_Rule_13{
+		
+		Last10DaySum_ZhangDieZhi_ZhangDieBi_Rule_21(){
+			super("#", 21, 4 , 10); //
+		}
+		
+	}
+	
+	
+	class Last9DaySum_ZhangDieZhi_ZhangDieBi_Rule_20 extends  Last2DaySum_ZhangDieZhi_ZhangDieBi_Rule_13{
+		
+		Last9DaySum_ZhangDieZhi_ZhangDieBi_Rule_20(){
+			super("#", 20, 4 , 9); //
+		}
+		
+	}
+	
+	
+	
+	class Last8DaySum_ZhangDieZhi_ZhangDieBi_Rule_19 extends  Last2DaySum_ZhangDieZhi_ZhangDieBi_Rule_13{
+		
+		Last8DaySum_ZhangDieZhi_ZhangDieBi_Rule_19(){
+			super("#", 19, 4 , 8); //
+		}
+		
+	}
+	
+	
+	class Last7DaySum_ZhangDieZhi_ZhangDieBi_Rule_18 extends  Last2DaySum_ZhangDieZhi_ZhangDieBi_Rule_13{
+		
+		Last7DaySum_ZhangDieZhi_ZhangDieBi_Rule_18(){
+			super("#", 18, 4 , 7); //
+		}
+		
+	}
+	
+	
+	class Last6DaySum_ZhangDieZhi_ZhangDieBi_Rule_17 extends  Last2DaySum_ZhangDieZhi_ZhangDieBi_Rule_13{
+		
+		Last6DaySum_ZhangDieZhi_ZhangDieBi_Rule_17(){
+			super("#", 17, 4 , 6); //
+		}
+		
+	}
+	
+	
+	
+	class Last5DaySum_ZhangDieZhi_ZhangDieBi_Rule_16 extends  Last2DaySum_ZhangDieZhi_ZhangDieBi_Rule_13{
+		
+		Last5DaySum_ZhangDieZhi_ZhangDieBi_Rule_16(){
+			super("#", 16, 4 , 5); //
+		}
+		
+	}
+	
+	
+	
+	class Last4DaySum_ZhangDieZhi_ZhangDieBi_Rule_15 extends  Last2DaySum_ZhangDieZhi_ZhangDieBi_Rule_13{
+		
+		Last4DaySum_ZhangDieZhi_ZhangDieBi_Rule_15(){
+			super("#", 15, 4 , 4); //
+		}
+		
+	}
+	
+	
+	
+	class Last3DaySum_ZhangDieZhi_ZhangDieBi_Rule_14 extends  Last2DaySum_ZhangDieZhi_ZhangDieBi_Rule_13{
+		
+		Last3DaySum_ZhangDieZhi_ZhangDieBi_Rule_14(){
+			super("#", 14, 4 , 3); //
+		}
+		
+	}
+	
+
+	class Last2DaySum_ZhangDieZhi_ZhangDieBi_Rule_13 extends  Basic_Rule{
+		
+		
+		
+		// 当前记录的交易日 数量
+	public	int preday_count = 2;
+		
+	Last2DaySum_ZhangDieZhi_ZhangDieBi_Rule_13(String tag, int ruleIndex , int typeIndex , int dayNum){
+		super(tag, ruleIndex, typeIndex); //
+		preday_count = dayNum;
+	}
+	
+	
+	Last2DaySum_ZhangDieZhi_ZhangDieBi_Rule_13(){
+			super("#", 13, 4); //
+			preday_count = 2;   //
+		}
+		
+		@Override
+		String getXlsxDynamicHeader(String sheetName) {
+			// TODO Auto-generated method stub
+			switch (sheetName) {
+//			case "收盘价":
+//				   return "近"+preday_count+"天收盘价"+"均比"+"_"+rule_index;
+			
+			case "涨跌值":
+				   return "近"+preday_count+"天涨跌值"+"和"+"_"+rule_index;
+			case "涨跌比":
+				   return "近"+preday_count+"天涨跌幅"+"和"+"_"+rule_index;
+				   
+//			case "成交额":
+//				   return "近"+preday_count+"天成交额"+"均比"+"_"+rule_index;
+				
+			default:
+				break;
+			}
+			return null;
+		}
+		
+		
+		
+		@Override
+		String ZhangDieZhi_SheetCell_Operation(String tscode, J0_GuPiao_Analysis.StockHeadData headData,
+				ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> mRiXianList) {
+			// TODO Auto-generated method stub
+		
+			if(mRiXianList == null || mRiXianList.size() == 0) {
+				
+				//  没有对比数据 那么 对币值就是 0 
+
+				return super.ChengJiaoEr_SheetCell_Operation(tscode, headData ,  mRiXianList);
+				
+			}
+			
+			
+			
+			// 从列表中指定返回指定数目的列表  包含2个 1个 0 个的情况
+			ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
+		
+			
+			//
+			
+			double preXDayClose_Sum =  	calLastRiXianListValueSum("change",preday_count,lastDaysList);
+
+			return	priceRateFormat.format(preXDayClose_Sum);
+		}
+		
+		
+
+		
+		@Override
+		String ZhangDieFu_SheetCell_Operation(String tscode, J0_GuPiao_Analysis.StockHeadData headData,
+				ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> mRiXianList) {
+			// TODO Auto-generated method stub
+			
+			
+			if(mRiXianList == null || mRiXianList.size() == 0) {
+				
+				//  没有对比数据 那么 对币值就是 0 
+
+				return super.ChengJiaoEr_SheetCell_Operation(tscode, headData ,  mRiXianList);
+				
+			}
+			
+			
+			
+			// 从列表中指定返回指定数目的列表  包含2个 1个 0 个的情况
+			ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
+		
+			
+			//
+			
+			double preXDayClose_Sum =  	calLastRiXianListValueSum("pct_chg",preday_count,lastDaysList);
+
+			return	priceRateFormat.format(preXDayClose_Sum);
+
+		}
+		
+		@Override
+		String simpleDesc() {
+			return "\n"  +  Cur_Bat_Name + " #_" + rule_index+"    ###   计算当前最新最近"+preday_count+" 天 涨跌值 和 涨跌幅 的总和 Sum  " ;
+			
+		}
+		
+		
+		
+	}
+	
+	
+	
+	//  计算 最新的 那个工作日的与平均值的比值  计算这两天的对比的数据
+	// 最近两天的平均值 与  年度平均值对比
+	class Dynamic_Preday15_BeiShu_Rule_10 extends  Basic_Rule{
+		
+		
+		
+		
+		
+		
+		
+		// 当前记录的交易日 数量
+		int preday_count = 15;
+		
+		Dynamic_Preday15_BeiShu_Rule_10(){
+			super("#", 10, 4); //
+			preday_count = 15;   //
+		}
+		
+		
+		@Override
+		String getXlsxDynamicHeader(String sheetName) {
+			// TODO Auto-generated method stub
+			switch (sheetName) {
+			case "收盘价":
+				   return "近"+preday_count+"天收盘价"+"均比"+"_"+rule_index;
+			
+			case "涨跌值":
+				   return "近"+preday_count+"天涨跌值"+"均比"+"_"+rule_index;
+			case "涨跌比":
+				   return "近"+preday_count+"天涨跌幅"+"均比"+"_"+rule_index;
+			case "成交额":
+				   return "近"+preday_count+"天成交额"+"均比"+"_"+rule_index;
+				
+			default:
+				break;
+			}
+			return "近"+preday_count+"天"+"均比"+"_"+rule_index;
+		}
+		
+		@Override
+		String simpleDesc() {
+			return "\n"  +  Cur_Bat_Name + " #_" + rule_index+"    ###   计算当前最新最近"+preday_count+" 天 记录与平均值的比值   " ;
+			
+		}
+		
+		
+		
+		
+		@Override
+		String ShouPanJia_SheetCell_Operation(String tscode, J0_GuPiao_Analysis.StockHeadData headData,
+				ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> mRiXianList) {
+			// TODO Auto-generated method stub
+			
+			if(mRiXianList == null || mRiXianList.size() == 0) {
+				
+				//  没有对比数据 那么 对币值就是 0 
+				headData.pre15day_close = 0;
+				headData.pre15day_close_comparison = 0;
+				return super.ChengJiaoEr_SheetCell_Operation(tscode, headData ,  mRiXianList);
+				
+			}
+			
+			
+			
+			// 从列表中指定返回指定数目的列表  包含2个 1个 0 个的情况
+			ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
+		
+			
+			//
+			double preXDayClose =  	calLastRiXianListValue("close",preday_count,lastDaysList);
+			
+			headData.pre15day_close = preXDayClose;
+			headData.pre15day_close_comparison =  preXDayClose  / headData.pingjun_close ;
+
+			return	priceRateFormat.format(headData.pre15day_close_comparison);
+		}
+		
+		
+		
+		@Override
+		String ZhangDieZhi_SheetCell_Operation(String tscode, J0_GuPiao_Analysis.StockHeadData headData,
+				ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> mRiXianList) {
+			// TODO Auto-generated method stub
+		
+			if(mRiXianList == null || mRiXianList.size() == 0) {
+				
+				//  没有对比数据 那么 对币值就是 0 
+				headData.pre15day_change = 0;
+				headData.pre15day_change_comparison = 0;
+				return super.ChengJiaoEr_SheetCell_Operation(tscode, headData ,  mRiXianList);
+				
+			}
+			
+			
+			
+			// 从列表中指定返回指定数目的列表  包含2个 1个 0 个的情况
+			ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
+		
+			
+			//
+			double preXDayClose =  	calLastRiXianListValue("change",preday_count,lastDaysList);
+			
+			headData.pre15day_change = preXDayClose;
+			headData.pre15day_change_comparison =  preXDayClose  / headData.pingjun_change ;
+			return	priceRateFormat.format(headData.pre15day_change_comparison);
+		}
+		
+		
+
+		
+		@Override
+		String ZhangDieFu_SheetCell_Operation(String tscode, J0_GuPiao_Analysis.StockHeadData headData,
+				ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> mRiXianList) {
+			// TODO Auto-generated method stub
+			
+			
+			if(mRiXianList == null || mRiXianList.size() == 0) {
+				
+				//  没有对比数据 那么 对币值就是 0 
+				headData.pre15day_pct_change = 0;
+				headData.pre15day_pct_change_comparison = 0;
+				return super.ChengJiaoEr_SheetCell_Operation(tscode, headData ,  mRiXianList);
+				
+			}
+			
+			
+			
+			// 从列表中指定返回指定数目的列表  包含2个 1个 0 个的情况
+			ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
+		
+			
+			//
+			double preXDayPctChg =  	calLastRiXianListValue("pct_chg",preday_count,lastDaysList);
+			
+			headData.pre15day_pct_change = preXDayPctChg;
+			headData.pre15day_pct_change_comparison =  preXDayPctChg  / headData.pingjun_pct_change ;
+//			return	priceFormat.format(headData.day1_close_comparison);
+			return	priceRateFormat.format(headData.pre15day_pct_change_comparison);
+
+		}
+		
+		@Override
+		String ChengJiaoEr_SheetCell_Operation(String tscode, StockHeadData headData,
+				ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> mRiXianList) {
+			// TODO Auto-generated method stub
+			
+			
+			if(mRiXianList == null || mRiXianList.size() == 0) {
+				
+				//  没有对比数据 那么 对币值就是 0 
+				headData.pre15day_amount = 0;
+				headData.pre15day_amount_comparison = 0;
+				return super.ChengJiaoEr_SheetCell_Operation(tscode, headData ,  mRiXianList);
+				
+			}
+			
+			
+			
+			// 从列表中指定返回指定数目的列表  包含2个 1个 0 个的情况
+			ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
+		
+			
+			//
+			double preXDayPctChg =  	calLastRiXianListValue("amount",preday_count,lastDaysList) * 1000;
+			
+			headData.pre15day_amount = preXDayPctChg;
+			headData.pre15day_amount_comparison =  preXDayPctChg  / headData.pingjun_amount ;
+//			return	priceFormat.format(headData.day1_close_comparison);
+			return	priceRateFormat.format(headData.pre15day_amount_comparison);
+
+		}
+		
+		
+	}
+	
+	
+	
+	
+
+	//  计算 最新的 那个工作日的与平均值的比值  计算这两天的对比的数据
+	// 最近两天的平均值 与  年度平均值对比
+	class Dynamic_Preday10_BeiShu_Rule_9 extends  Basic_Rule{
+		
+		
+		
+		
+		
+		
+		
+		// 当前记录的交易日 数量
+		int preday_count = 10;
+		
+		Dynamic_Preday10_BeiShu_Rule_9(){
+			super("#", 9, 4); //
+			preday_count = 10;   //
+		}
+		
+		
+		@Override
+		String getXlsxDynamicHeader(String sheetName) {
+			// TODO Auto-generated method stub
+			switch (sheetName) {
+			case "收盘价":
+				   return "近"+preday_count+"天收盘价"+"均比"+"_"+rule_index;
+			
+			case "涨跌值":
+				   return "近"+preday_count+"天涨跌值"+"均比"+"_"+rule_index;
+			case "涨跌比":
+				   return "近"+preday_count+"天涨跌幅"+"均比"+"_"+rule_index;
+			case "成交额":
+				   return "近"+preday_count+"天成交额"+"均比"+"_"+rule_index;
+				
+			default:
+				break;
+			}
+			return "近"+preday_count+"天"+"均比";
+		}
+		
+		@Override
+		String simpleDesc() {
+			return "\n"  +  Cur_Bat_Name + " #_" + rule_index+"    ###   计算当前最新最近"+preday_count+" 天 记录与平均值的比值   " ;
+			
+		}
+		
+		
+		
+		
+		@Override
+		String ShouPanJia_SheetCell_Operation(String tscode, J0_GuPiao_Analysis.StockHeadData headData,
+				ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> mRiXianList) {
+			// TODO Auto-generated method stub
+			
+			if(mRiXianList == null || mRiXianList.size() == 0) {
+				
+				//  没有对比数据 那么 对币值就是 0 
+				headData.pre10day_close = 0;
+				headData.pre10day_close_comparison = 0;
+				return super.ChengJiaoEr_SheetCell_Operation(tscode, headData ,  mRiXianList);
+				
+			}
+			
+			
+			
+			// 从列表中指定返回指定数目的列表  包含2个 1个 0 个的情况
+			ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
+		
+			
+			//
+			double preXDayClose =  	calLastRiXianListValue("close",preday_count,lastDaysList);
+			
+			headData.pre10day_close = preXDayClose;
+			headData.pre10day_close_comparison =  preXDayClose  / headData.pingjun_close ;
+
+			return	priceRateFormat.format(headData.pre10day_close_comparison);
+		}
+		
+		
+		
+		@Override
+		String ZhangDieZhi_SheetCell_Operation(String tscode, J0_GuPiao_Analysis.StockHeadData headData,
+				ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> mRiXianList) {
+			// TODO Auto-generated method stub
+		
+			if(mRiXianList == null || mRiXianList.size() == 0) {
+				
+				//  没有对比数据 那么 对币值就是 0 
+				headData.pre10day_change = 0;
+				headData.pre10day_change_comparison = 0;
+				return super.ChengJiaoEr_SheetCell_Operation(tscode, headData ,  mRiXianList);
+				
+			}
+			
+			
+			
+			// 从列表中指定返回指定数目的列表  包含2个 1个 0 个的情况
+			ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
+		
+			
+			//
+			double preXDayClose =  	calLastRiXianListValue("change",preday_count,lastDaysList);
+			
+			headData.pre10day_change = preXDayClose;
+			headData.pre10day_change_comparison =  preXDayClose  / headData.pingjun_change ;
+			return	priceRateFormat.format(headData.pre10day_change_comparison);
+		}
+		
+		
+
+		
+		@Override
+		String ZhangDieFu_SheetCell_Operation(String tscode, J0_GuPiao_Analysis.StockHeadData headData,
+				ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> mRiXianList) {
+			// TODO Auto-generated method stub
+			
+			
+			if(mRiXianList == null || mRiXianList.size() == 0) {
+				
+				//  没有对比数据 那么 对币值就是 0 
+				headData.pre10day_pct_change = 0;
+				headData.pre10day_pct_change_comparison = 0;
+				return super.ChengJiaoEr_SheetCell_Operation(tscode, headData ,  mRiXianList);
+				
+			}
+			
+			
+			
+			// 从列表中指定返回指定数目的列表  包含2个 1个 0 个的情况
+			ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
+		
+			
+			//
+			double preXDayPctChg =  	calLastRiXianListValue("pct_chg",preday_count,lastDaysList);
+			
+			headData.pre10day_pct_change = preXDayPctChg;
+			headData.pre10day_pct_change_comparison =  preXDayPctChg  / headData.pingjun_pct_change ;
+//			return	priceFormat.format(headData.day1_close_comparison);
+			return	priceRateFormat.format(headData.pre10day_pct_change_comparison);
+
+		}
+		
+		@Override
+		String ChengJiaoEr_SheetCell_Operation(String tscode, StockHeadData headData,
+				ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> mRiXianList) {
+			// TODO Auto-generated method stub
+			
+			
+			if(mRiXianList == null || mRiXianList.size() == 0) {
+				
+				//  没有对比数据 那么 对币值就是 0 
+				headData.pre10day_amount = 0;
+				headData.pre10day_amount_comparison = 0;
+				return super.ChengJiaoEr_SheetCell_Operation(tscode, headData ,  mRiXianList);
+				
+			}
+			
+			
+			
+			// 从列表中指定返回指定数目的列表  包含2个 1个 0 个的情况
+			ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
+		
+			
+			//
+			double preXDayPctChg =  	calLastRiXianListValue("amount",preday_count,lastDaysList) * 1000;
+			
+			headData.pre10day_amount = preXDayPctChg;
+			headData.pre10day_amount_comparison =  preXDayPctChg  / headData.pingjun_amount ;
+//			return	priceFormat.format(headData.day1_close_comparison);
+			return	priceRateFormat.format(headData.pre10day_amount_comparison);
+
+		}
+		
+		
+	}
+	
+	
+	
+	
+
+	//  计算 最新的 那个工作日的与平均值的比值  计算这两天的对比的数据
+	// 最近两天的平均值 与  年度平均值对比
+	class Dynamic_Preday7_BeiShu_Rule_8 extends  Basic_Rule{
+		
+		
+		
+		
+		
+		
+		
+		// 当前记录的交易日 数量
+		int preday_count = 7;
+		
+		Dynamic_Preday7_BeiShu_Rule_8(){
+			super("#", 8, 4); //
+			preday_count = 7;   //
+		}
+		
+		
+		@Override
+		String getXlsxDynamicHeader(String sheetName) {
+			// TODO Auto-generated method stub
+			switch (sheetName) {
+			case "收盘价":
+				   return "近"+preday_count+"天收盘价"+"均比"+"_"+rule_index;
+			
+			case "涨跌值":
+				   return "近"+preday_count+"天涨跌值"+"均比"+"_"+rule_index;
+			case "涨跌比":
+				   return "近"+preday_count+"天涨跌幅"+"均比"+"_"+rule_index;
+			case "成交额":
+				   return "近"+preday_count+"天成交额"+"均比"+"_"+rule_index;
+				
+			default:
+				break;
+			}
+			return "近"+preday_count+"天"+"均比"+"_"+rule_index;
+		}
+		
+		@Override
+		String simpleDesc() {
+			return "\n"  +  Cur_Bat_Name + " #_" + rule_index+"    ###   计算当前最新最近"+preday_count+" 天 记录与平均值的比值   " ;
+			
+		}
+		
+		
+		
+		
+		@Override
+		String ShouPanJia_SheetCell_Operation(String tscode, J0_GuPiao_Analysis.StockHeadData headData,
+				ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> mRiXianList) {
+			// TODO Auto-generated method stub
+			
+			if(mRiXianList == null || mRiXianList.size() == 0) {
+				
+				//  没有对比数据 那么 对币值就是 0 
+				headData.pre7day_close = 0;
+				headData.pre7day_close_comparison = 0;
+				return super.ChengJiaoEr_SheetCell_Operation(tscode, headData ,  mRiXianList);
+				
+			}
+			
+			
+			
+			// 从列表中指定返回指定数目的列表  包含2个 1个 0 个的情况
+			ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
+		
+			
+			//
+			double preXDayClose =  	calLastRiXianListValue("close",preday_count,lastDaysList);
+			
+			headData.pre7day_close = preXDayClose;
+			headData.pre7day_close_comparison =  preXDayClose  / headData.pingjun_close ;
+
+			return	priceRateFormat.format(headData.pre7day_close_comparison);
+		}
+		
+		
+		
+		@Override
+		String ZhangDieZhi_SheetCell_Operation(String tscode, J0_GuPiao_Analysis.StockHeadData headData,
+				ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> mRiXianList) {
+			// TODO Auto-generated method stub
+		
+			if(mRiXianList == null || mRiXianList.size() == 0) {
+				
+				//  没有对比数据 那么 对币值就是 0 
+				headData.pre7day_change = 0;
+				headData.pre7day_change_comparison = 0;
+				return super.ChengJiaoEr_SheetCell_Operation(tscode, headData ,  mRiXianList);
+				
+			}
+			
+			
+			
+			// 从列表中指定返回指定数目的列表  包含2个 1个 0 个的情况
+			ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
+		
+			
+			//
+			double preXDayClose =  	calLastRiXianListValue("change",preday_count,lastDaysList);
+			
+			headData.pre7day_change = preXDayClose;
+			headData.pre7day_change_comparison =  preXDayClose  / headData.pingjun_change ;
+			return	priceRateFormat.format(headData.pre7day_change_comparison);
+		}
+		
+		
+
+		
+		@Override
+		String ZhangDieFu_SheetCell_Operation(String tscode, J0_GuPiao_Analysis.StockHeadData headData,
+				ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> mRiXianList) {
+			// TODO Auto-generated method stub
+			
+			
+			if(mRiXianList == null || mRiXianList.size() == 0) {
+				
+				//  没有对比数据 那么 对币值就是 0 
+				headData.pre7day_pct_change = 0;
+				headData.pre7day_pct_change_comparison = 0;
+				return super.ChengJiaoEr_SheetCell_Operation(tscode, headData ,  mRiXianList);
+				
+			}
+			
+			
+			
+			// 从列表中指定返回指定数目的列表  包含2个 1个 0 个的情况
+			ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
+		
+			
+			//
+			double preXDayPctChg =  	calLastRiXianListValue("pct_chg",preday_count,lastDaysList);
+			
+			headData.pre7day_pct_change = preXDayPctChg;
+			headData.pre7day_pct_change_comparison =  preXDayPctChg  / headData.pingjun_pct_change ;
+//			return	priceFormat.format(headData.day1_close_comparison);
+			return	priceRateFormat.format(headData.pre7day_pct_change_comparison);
+
+		}
+		
+		@Override
+		String ChengJiaoEr_SheetCell_Operation(String tscode, StockHeadData headData,
+				ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> mRiXianList) {
+			// TODO Auto-generated method stub
+			
+			
+			if(mRiXianList == null || mRiXianList.size() == 0) {
+				
+				//  没有对比数据 那么 对币值就是 0 
+				headData.pre7day_amount = 0;
+				headData.pre7day_amount_comparison = 0;
+				return super.ChengJiaoEr_SheetCell_Operation(tscode, headData ,  mRiXianList);
+				
+			}
+			
+			
+			
+			// 从列表中指定返回指定数目的列表  包含2个 1个 0 个的情况
+			ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
+		
+			
+			//
+			double preXDayPctChg =  	calLastRiXianListValue("amount",preday_count,lastDaysList) * 1000;
+			
+			headData.pre7day_amount = preXDayPctChg;
+			headData.pre7day_amount_comparison =  preXDayPctChg  / headData.pingjun_amount ;
+//			return	priceFormat.format(headData.day1_close_comparison);
+			return	priceRateFormat.format(headData.pre7day_amount_comparison);
+
+		}
+		
+		
+	}
+	
+	
+	
+	
+
+	//  计算 最新的 那个工作日的与平均值的比值  计算这两天的对比的数据
+	// 最近两天的平均值 与  年度平均值对比
+	class Dynamic_Preday6_BeiShu_Rule_7 extends  Basic_Rule{
+		
+		
+		
+		
+		
+		
+		
+		// 当前记录的交易日 数量
+		int preday_count = 6;
+		
+		Dynamic_Preday6_BeiShu_Rule_7(){
+			super("#", 7, 4); //
+			preday_count = 6;   //
+		}
+		
+		
+		@Override
+		String getXlsxDynamicHeader(String sheetName) {
+			// TODO Auto-generated method stub
+			switch (sheetName) {
+			case "收盘价":
+				   return "近"+preday_count+"天收盘价"+"均比"+"_"+rule_index;
+			
+			case "涨跌值":
+				   return "近"+preday_count+"天涨跌值"+"均比"+"_"+rule_index;
+			case "涨跌比":
+				   return "近"+preday_count+"天涨跌幅"+"均比"+"_"+rule_index;
+			case "成交额":
+				   return "近"+preday_count+"天成交额"+"均比"+"_"+rule_index;
+				
+			default:
+				break;
+			}
+			return "近"+preday_count+"天"+"均比";
+		}
+		
+		@Override
+		String simpleDesc() {
+			return "\n"  +  Cur_Bat_Name + " #_" + rule_index+"    ###   计算当前最新最近"+preday_count+" 天 记录与平均值的比值   " ;
+			
+		}
+		
+		
+		
+		
+		@Override
+		String ShouPanJia_SheetCell_Operation(String tscode, J0_GuPiao_Analysis.StockHeadData headData,
+				ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> mRiXianList) {
+			// TODO Auto-generated method stub
+			
+			if(mRiXianList == null || mRiXianList.size() == 0) {
+				
+				//  没有对比数据 那么 对币值就是 0 
+				headData.pre6day_close = 0;
+				headData.pre6day_close_comparison = 0;
+				return super.ChengJiaoEr_SheetCell_Operation(tscode, headData ,  mRiXianList);
+				
+			}
+			
+			
+			
+			// 从列表中指定返回指定数目的列表  包含2个 1个 0 个的情况
+			ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
+		
+			
+			//
+			double preXDayClose =  	calLastRiXianListValue("close",preday_count,lastDaysList);
+			
+			headData.pre6day_close = preXDayClose;
+			headData.pre6day_close_comparison =  preXDayClose  / headData.pingjun_close ;
+
+			return	priceRateFormat.format(headData.pre6day_close_comparison);
+		}
+		
+		
+		
+		@Override
+		String ZhangDieZhi_SheetCell_Operation(String tscode, J0_GuPiao_Analysis.StockHeadData headData,
+				ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> mRiXianList) {
+			// TODO Auto-generated method stub
+		
+			if(mRiXianList == null || mRiXianList.size() == 0) {
+				
+				//  没有对比数据 那么 对币值就是 0 
+				headData.pre6day_change = 0;
+				headData.pre6day_change_comparison = 0;
+				return super.ChengJiaoEr_SheetCell_Operation(tscode, headData ,  mRiXianList);
+				
+			}
+			
+			
+			
+			// 从列表中指定返回指定数目的列表  包含2个 1个 0 个的情况
+			ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
+		
+			
+			//
+			double preXDayClose =  	calLastRiXianListValue("change",preday_count,lastDaysList);
+			
+			headData.pre6day_change = preXDayClose;
+			headData.pre6day_change_comparison =  preXDayClose  / headData.pingjun_change ;
+			return	priceRateFormat.format(headData.pre6day_change_comparison);
+		}
+		
+		
+
+		
+		@Override
+		String ZhangDieFu_SheetCell_Operation(String tscode, J0_GuPiao_Analysis.StockHeadData headData,
+				ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> mRiXianList) {
+			// TODO Auto-generated method stub
+			
+			
+			if(mRiXianList == null || mRiXianList.size() == 0) {
+				
+				//  没有对比数据 那么 对币值就是 0 
+				headData.pre6day_pct_change = 0;
+				headData.pre6day_pct_change_comparison = 0;
+				return super.ChengJiaoEr_SheetCell_Operation(tscode, headData ,  mRiXianList);
+				
+			}
+			
+			
+			
+			// 从列表中指定返回指定数目的列表  包含2个 1个 0 个的情况
+			ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
+		
+			
+			//
+			double preXDayPctChg =  	calLastRiXianListValue("pct_chg",preday_count,lastDaysList);
+			
+			headData.pre6day_pct_change = preXDayPctChg;
+			headData.pre6day_pct_change_comparison =  preXDayPctChg  / headData.pingjun_pct_change ;
+//			return	priceFormat.format(headData.day1_close_comparison);
+			return	priceRateFormat.format(headData.pre6day_pct_change_comparison);
+
+		}
+		
+		@Override
+		String ChengJiaoEr_SheetCell_Operation(String tscode, StockHeadData headData,
+				ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> mRiXianList) {
+			// TODO Auto-generated method stub
+			
+			
+			if(mRiXianList == null || mRiXianList.size() == 0) {
+				
+				//  没有对比数据 那么 对币值就是 0 
+				headData.pre6day_amount = 0;
+				headData.pre6day_amount_comparison = 0;
+				return super.ChengJiaoEr_SheetCell_Operation(tscode, headData ,  mRiXianList);
+				
+			}
+			
+			
+			
+			// 从列表中指定返回指定数目的列表  包含2个 1个 0 个的情况
+			ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
+		
+			
+			//
+			double preXDayPctChg =  	calLastRiXianListValue("amount",preday_count,lastDaysList) * 1000;
+			
+			headData.pre6day_amount = preXDayPctChg;
+			headData.pre6day_amount_comparison =  preXDayPctChg  / headData.pingjun_amount ;
+//			return	priceFormat.format(headData.day1_close_comparison);
+			return	priceRateFormat.format(headData.pre6day_amount_comparison);
+
+		}
+		
+		
+	}
+	
+	
+	
+	//  计算 最新的 那个工作日的与平均值的比值  计算这两天的对比的数据
+	// 最近两天的平均值 与  年度平均值对比
+	class Dynamic_Preday5_BeiShu_Rule_6 extends  Basic_Rule{
+		
+		
+		
+		
+		
+		
+		
+		// 当前记录的交易日 数量
+		int preday_count = 5;
+		
+		Dynamic_Preday5_BeiShu_Rule_6(){
+			super("#", 6, 4); //
+			preday_count = 5;   //
+		}
+		
+		
+		@Override
+		String getXlsxDynamicHeader(String sheetName) {
+			// TODO Auto-generated method stub
+			switch (sheetName) {
+			case "收盘价":
+				   return "近"+preday_count+"天收盘价"+"均比"+"_"+rule_index;
+			
+			case "涨跌值":
+				   return "近"+preday_count+"天涨跌值"+"均比"+"_"+rule_index;
+			case "涨跌比":
+				   return "近"+preday_count+"天涨跌幅"+"均比"+"_"+rule_index;
+			case "成交额":
+				   return "近"+preday_count+"天成交额"+"均比"+"_"+rule_index;
+				
+			default:
+				break;
+			}
+			return "近"+preday_count+"天"+"均比";
+		}
+		
+		@Override
+		String simpleDesc() {
+			return "\n"  +  Cur_Bat_Name + " #_" + rule_index+"    ###   计算当前最新最近"+preday_count+" 天 记录与平均值的比值   " ;
+			
+		}
+		
+		
+		
+		
+		@Override
+		String ShouPanJia_SheetCell_Operation(String tscode, J0_GuPiao_Analysis.StockHeadData headData,
+				ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> mRiXianList) {
+			// TODO Auto-generated method stub
+			
+			if(mRiXianList == null || mRiXianList.size() == 0) {
+				
+				//  没有对比数据 那么 对币值就是 0 
+				headData.pre5day_close = 0;
+				headData.pre5day_close_comparison = 0;
+				return super.ChengJiaoEr_SheetCell_Operation(tscode, headData ,  mRiXianList);
+				
+			}
+			
+			
+			
+			// 从列表中指定返回指定数目的列表  包含2个 1个 0 个的情况
+			ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
+		
+			
+			//
+			double preXDayClose =  	calLastRiXianListValue("close",preday_count,lastDaysList);
+			
+			headData.pre5day_close = preXDayClose;
+			headData.pre5day_close_comparison =  preXDayClose  / headData.pingjun_close ;
+
+			return	priceRateFormat.format(headData.pre5day_close_comparison);
+		}
+		
+		
+		
+		@Override
+		String ZhangDieZhi_SheetCell_Operation(String tscode, J0_GuPiao_Analysis.StockHeadData headData,
+				ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> mRiXianList) {
+			// TODO Auto-generated method stub
+		
+			if(mRiXianList == null || mRiXianList.size() == 0) {
+				
+				//  没有对比数据 那么 对币值就是 0 
+				headData.pre5day_change = 0;
+				headData.pre5day_change_comparison = 0;
+				return super.ChengJiaoEr_SheetCell_Operation(tscode, headData ,  mRiXianList);
+				
+			}
+			
+			
+			
+			// 从列表中指定返回指定数目的列表  包含2个 1个 0 个的情况
+			ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
+		
+			
+			//
+			double preXDayClose =  	calLastRiXianListValue("change",preday_count,lastDaysList);
+			
+			headData.pre5day_change = preXDayClose;
+			headData.pre5day_change_comparison =  preXDayClose  / headData.pingjun_change ;
+			return	priceRateFormat.format(headData.pre5day_change_comparison);
+		}
+		
+		
+
+		
+		@Override
+		String ZhangDieFu_SheetCell_Operation(String tscode, J0_GuPiao_Analysis.StockHeadData headData,
+				ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> mRiXianList) {
+			// TODO Auto-generated method stub
+			
+			
+			if(mRiXianList == null || mRiXianList.size() == 0) {
+				
+				//  没有对比数据 那么 对币值就是 0 
+				headData.pre5day_pct_change = 0;
+				headData.pre5day_pct_change_comparison = 0;
+				return super.ChengJiaoEr_SheetCell_Operation(tscode, headData ,  mRiXianList);
+				
+			}
+			
+			
+			
+			// 从列表中指定返回指定数目的列表  包含2个 1个 0 个的情况
+			ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
+		
+			
+			//
+			double preXDayPctChg =  	calLastRiXianListValue("pct_chg",preday_count,lastDaysList);
+			
+			headData.pre5day_pct_change = preXDayPctChg;
+			headData.pre5day_pct_change_comparison =  preXDayPctChg  / headData.pingjun_pct_change ;
+//			return	priceFormat.format(headData.day1_close_comparison);
+			return	priceRateFormat.format(headData.pre5day_pct_change_comparison);
+
+		}
+		
+		@Override
+		String ChengJiaoEr_SheetCell_Operation(String tscode, StockHeadData headData,
+				ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> mRiXianList) {
+			// TODO Auto-generated method stub
+			
+			
+			if(mRiXianList == null || mRiXianList.size() == 0) {
+				
+				//  没有对比数据 那么 对币值就是 0 
+				headData.pre5day_amount = 0;
+				headData.pre5day_amount_comparison = 0;
+				return super.ChengJiaoEr_SheetCell_Operation(tscode, headData ,  mRiXianList);
+				
+			}
+			
+			
+			
+			// 从列表中指定返回指定数目的列表  包含2个 1个 0 个的情况
+			ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
+		
+			
+			//
+			double preXDayPctChg =  	calLastRiXianListValue("amount",preday_count,lastDaysList) * 1000;
+			
+			headData.pre5day_amount = preXDayPctChg;
+			headData.pre5day_amount_comparison =  preXDayPctChg  / headData.pingjun_amount ;
+//			return	priceFormat.format(headData.day1_close_comparison);
+			return	priceRateFormat.format(headData.pre5day_amount_comparison);
+
+		}
+		
+		
+	}
+	
+	
+	
+	
+	
+
+	//  计算 最新的 那个工作日的与平均值的比值  计算这两天的对比的数据
+	// 最近两天的平均值 与  年度平均值对比
+	class Dynamic_Preday4_BeiShu_Rule_5 extends  Basic_Rule{
+		
+		
+		
+		
+		
+		
+		
+		// 当前记录的交易日 数量
+		int preday_count = 4;
+		
+		Dynamic_Preday4_BeiShu_Rule_5(){
+			super("#", 5, 4); //
+			preday_count = 4;   //
+		}
+		
+		
+		@Override
+		String getXlsxDynamicHeader(String sheetName) {
+			// TODO Auto-generated method stub
+			switch (sheetName) {
+			case "收盘价":
+				   return "近"+preday_count+"天收盘价"+"均比"+"_"+rule_index;
+			
+			case "涨跌值":
+				   return "近"+preday_count+"天涨跌值"+"均比"+"_"+rule_index;
+			case "涨跌比":
+				   return "近"+preday_count+"天涨跌幅"+"均比"+"_"+rule_index;
+			case "成交额":
+				   return "近"+preday_count+"天成交额"+"均比"+"_"+rule_index;
+				
+			default:
+				break;
+			}
+			return "近"+preday_count+"天"+"均比";
+		}
+		
+		@Override
+		String simpleDesc() {
+			return "\n"  +  Cur_Bat_Name + " #_" + rule_index+"    ###   计算当前最新最近"+preday_count+" 天 记录与平均值的比值   " ;
+			
+		}
+		
+		
+		
+		
+		@Override
+		String ShouPanJia_SheetCell_Operation(String tscode, J0_GuPiao_Analysis.StockHeadData headData,
+				ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> mRiXianList) {
+			// TODO Auto-generated method stub
+			
+			if(mRiXianList == null || mRiXianList.size() == 0) {
+				
+				//  没有对比数据 那么 对币值就是 0 
+				headData.pre4day_close = 0;
+				headData.pre4day_close_comparison = 0;
+				return super.ChengJiaoEr_SheetCell_Operation(tscode, headData ,  mRiXianList);
+				
+			}
+			
+			
+			
+			// 从列表中指定返回指定数目的列表  包含2个 1个 0 个的情况
+			ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
+		
+			
+			//
+			double preXDayClose =  	calLastRiXianListValue("close",preday_count,lastDaysList);
+			
+			headData.pre4day_close = preXDayClose;
+			headData.pre4day_close_comparison =  preXDayClose  / headData.pingjun_close ;
+
+			return	priceRateFormat.format(headData.pre4day_close_comparison);
+		}
+		
+		
+		
+		@Override
+		String ZhangDieZhi_SheetCell_Operation(String tscode, J0_GuPiao_Analysis.StockHeadData headData,
+				ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> mRiXianList) {
+			// TODO Auto-generated method stub
+		
+			if(mRiXianList == null || mRiXianList.size() == 0) {
+				
+				//  没有对比数据 那么 对币值就是 0 
+				headData.pre4day_change = 0;
+				headData.pre4day_change_comparison = 0;
+				return super.ChengJiaoEr_SheetCell_Operation(tscode, headData ,  mRiXianList);
+				
+			}
+			
+			
+			
+			// 从列表中指定返回指定数目的列表  包含2个 1个 0 个的情况
+			ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
+		
+			
+			//
+			double preXDayClose =  	calLastRiXianListValue("change",preday_count,lastDaysList);
+			
+			headData.pre4day_change = preXDayClose;
+			headData.pre4day_change_comparison =  preXDayClose  / headData.pingjun_change ;
+			return	priceRateFormat.format(headData.pre4day_change_comparison);
+		}
+		
+		
+
+		
+		@Override
+		String ZhangDieFu_SheetCell_Operation(String tscode, J0_GuPiao_Analysis.StockHeadData headData,
+				ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> mRiXianList) {
+			// TODO Auto-generated method stub
+			
+			
+			if(mRiXianList == null || mRiXianList.size() == 0) {
+				
+				//  没有对比数据 那么 对币值就是 0 
+				headData.pre4day_pct_change = 0;
+				headData.pre4day_pct_change_comparison = 0;
+				return super.ChengJiaoEr_SheetCell_Operation(tscode, headData ,  mRiXianList);
+				
+			}
+			
+			
+			
+			// 从列表中指定返回指定数目的列表  包含2个 1个 0 个的情况
+			ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
+		
+			
+			//
+			double preXDayPctChg =  	calLastRiXianListValue("pct_chg",preday_count,lastDaysList);
+			
+			headData.pre4day_pct_change = preXDayPctChg;
+			headData.pre4day_pct_change_comparison =  preXDayPctChg  / headData.pingjun_pct_change ;
+//			return	priceFormat.format(headData.day1_close_comparison);
+			return	priceRateFormat.format(headData.pre4day_pct_change_comparison);
+
+		}
+		
+		@Override
+		String ChengJiaoEr_SheetCell_Operation(String tscode, StockHeadData headData,
+				ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> mRiXianList) {
+			// TODO Auto-generated method stub
+			
+			
+			if(mRiXianList == null || mRiXianList.size() == 0) {
+				
+				//  没有对比数据 那么 对币值就是 0 
+				headData.pre4day_amount = 0;
+				headData.pre4day_amount_comparison = 0;
+				return super.ChengJiaoEr_SheetCell_Operation(tscode, headData ,  mRiXianList);
+				
+			}
+			
+			
+			
+			// 从列表中指定返回指定数目的列表  包含2个 1个 0 个的情况
+			ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
+		
+			
+			//
+			double preXDayPctChg =  	calLastRiXianListValue("amount",preday_count,lastDaysList) * 1000;
+			
+			headData.pre4day_amount = preXDayPctChg;
+			headData.pre4day_amount_comparison =  preXDayPctChg  / headData.pingjun_amount ;
+//			return	priceFormat.format(headData.day1_close_comparison);
+			return	priceRateFormat.format(headData.pre4day_amount_comparison);
+
+		}
+		
+		
+	}
+	
+	
+
+	
+	//  计算 最新的 那个工作日的与平均值的比值  计算这两天的对比的数据
+	// 最近两天的平均值 与  年度平均值对比
+	class Dynamic_Preday3_BeiShu_Rule_4 extends  Basic_Rule{
+		
+		
+		
+		
+		
+		
+		
+		// 当前记录的交易日 数量
+		int preday_count = 3;
+		
+		Dynamic_Preday3_BeiShu_Rule_4(){
+			super("#", 4, 4); //
+			preday_count = 3;   //
+		}
+		
+		
+		@Override
+		String getXlsxDynamicHeader(String sheetName) {
+			// TODO Auto-generated method stub
+			switch (sheetName) {
+			case "收盘价":
+				   return "近"+preday_count+"天收盘价"+"均比"+"_"+rule_index;
+			
+			case "涨跌值":
+				   return "近"+preday_count+"天涨跌值"+"均比"+"_"+rule_index;
+			case "涨跌比":
+				   return "近"+preday_count+"天涨跌幅"+"均比"+"_"+rule_index;
+			case "成交额":
+				   return "近"+preday_count+"天成交额"+"均比"+"_"+rule_index;
+				
+			default:
+				break;
+			}
+			return "近"+preday_count+"天"+"均比";
+		}
+		
+		@Override
+		String simpleDesc() {
+			return "\n"  +  Cur_Bat_Name + " #_" + rule_index+"    ###   计算当前最新最近"+preday_count+" 天 记录与平均值的比值   " ;
+			
+		}
+		
+		
+		
+		
+		@Override
+		String ShouPanJia_SheetCell_Operation(String tscode, J0_GuPiao_Analysis.StockHeadData headData,
+				ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> mRiXianList) {
+			// TODO Auto-generated method stub
+			
+			if(mRiXianList == null || mRiXianList.size() == 0) {
+				
+				//  没有对比数据 那么 对币值就是 0 
+				headData.pre3day_close = 0;
+				headData.pre3day_close_comparison = 0;
+				return super.ChengJiaoEr_SheetCell_Operation(tscode, headData ,  mRiXianList);
+				
+			}
+			
+			
+			
+			// 从列表中指定返回指定数目的列表  包含2个 1个 0 个的情况
+			ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
+		
+			
+			//
+			double preXDayClose =  	calLastRiXianListValue("close",preday_count,lastDaysList);
+			
+			headData.pre3day_close = preXDayClose;
+			headData.pre3day_close_comparison =  preXDayClose  / headData.pingjun_close ;
+
+			return	priceRateFormat.format(headData.pre3day_close_comparison);
+		}
+		
+		
+		
+		@Override
+		String ZhangDieZhi_SheetCell_Operation(String tscode, J0_GuPiao_Analysis.StockHeadData headData,
+				ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> mRiXianList) {
+			// TODO Auto-generated method stub
+		
+			if(mRiXianList == null || mRiXianList.size() == 0) {
+				
+				//  没有对比数据 那么 对币值就是 0 
+				headData.pre3day_change = 0;
+				headData.pre3day_change_comparison = 0;
+				return super.ChengJiaoEr_SheetCell_Operation(tscode, headData ,  mRiXianList);
+				
+			}
+			
+			
+			
+			// 从列表中指定返回指定数目的列表  包含2个 1个 0 个的情况
+			ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
+		
+			
+			//
+			double preXDayClose =  	calLastRiXianListValue("change",preday_count,lastDaysList);
+			
+			headData.pre3day_change = preXDayClose;
+			headData.pre3day_change_comparison =  preXDayClose  / headData.pingjun_change ;
+			return	priceRateFormat.format(headData.pre3day_change_comparison);
+		}
+		
+		
+
+		
+		@Override
+		String ZhangDieFu_SheetCell_Operation(String tscode, J0_GuPiao_Analysis.StockHeadData headData,
+				ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> mRiXianList) {
+			// TODO Auto-generated method stub
+			
+			
+			if(mRiXianList == null || mRiXianList.size() == 0) {
+				
+				//  没有对比数据 那么 对币值就是 0 
+				headData.pre3day_pct_change = 0;
+				headData.pre3day_pct_change_comparison = 0;
+				return super.ChengJiaoEr_SheetCell_Operation(tscode, headData ,  mRiXianList);
+				
+			}
+			
+			
+			
+			// 从列表中指定返回指定数目的列表  包含2个 1个 0 个的情况
+			ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
+		
+			
+			//
+			double preXDayPctChg =  	calLastRiXianListValue("pct_chg",preday_count,lastDaysList);
+			
+			headData.pre3day_pct_change = preXDayPctChg;
+			headData.pre3day_pct_change_comparison =  preXDayPctChg  / headData.pingjun_pct_change ;
+//			return	priceFormat.format(headData.day1_close_comparison);
+			return	priceRateFormat.format(headData.pre3day_pct_change_comparison);
+
+		}
+		
+		@Override
+		String ChengJiaoEr_SheetCell_Operation(String tscode, StockHeadData headData,
+				ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> mRiXianList) {
+			// TODO Auto-generated method stub
+			
+			
+			if(mRiXianList == null || mRiXianList.size() == 0) {
+				
+				//  没有对比数据 那么 对币值就是 0 
+				headData.pre3day_amount = 0;
+				headData.pre3day_amount_comparison = 0;
+				return super.ChengJiaoEr_SheetCell_Operation(tscode, headData ,  mRiXianList);
+				
+			}
+			
+			
+			
+			// 从列表中指定返回指定数目的列表  包含2个 1个 0 个的情况
+			ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
+		
+			
+			//
+			double preXDayPctChg =  	calLastRiXianListValue("amount",preday_count,lastDaysList) * 1000;
+			
+			headData.pre3day_amount = preXDayPctChg;
+			headData.pre3day_amount_comparison =  preXDayPctChg  / headData.pingjun_amount ;
+//			return	priceFormat.format(headData.day1_close_comparison);
+			return	priceRateFormat.format(headData.pre3day_amount_comparison);
+
+		}
+		
+		
+	}
+	
+	
+	
+	// calLastRiXianListValue("close",lastDaysList,preday_count) 
+	
+	
+	
+	public static 	double calLastRiXianListValueSum(String prop,int predayCount , 
+			ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> rawRiXianList) {
+		double mDoubleValue = 0 ;
+		double mDoubleSumValue = 0 ;
+		int listSize = rawRiXianList.size();
+		
+//		System.out.println("ZXXZ_A_prop="+prop+"    mDoubleSumValue="+mDoubleSumValue+"  listSize="+listSize);
+
+		
+		if(listSize == 0) {
+			return 0;
+		}
+		
+		switch (prop) {
+		case "close":
+			
+			for (int i = 0; i < rawRiXianList.size(); i++) {
+				mDoubleSumValue += rawRiXianList.get(i).close;
+			}
+			
+			break;
+
+		case "change":
+			
+			for (int i = 0; i < rawRiXianList.size(); i++) {
+				mDoubleSumValue += rawRiXianList.get(i).change;
+			}
+			
+			break;
+			
+		case "pct_chg":
+			
+			for (int i = 0; i < rawRiXianList.size(); i++) {
+				mDoubleSumValue += rawRiXianList.get(i).pct_chg;
+			}
+			
+			
+			break;
+			
+		case "amount":
+			for (int i = 0; i < rawRiXianList.size(); i++) {
+				mDoubleSumValue += rawRiXianList.get(i).amount;
+			}
+			
+			
+			break;
+			
+		default:
+			mDoubleSumValue = 0 ;
+			break;
+		}
+		
+		
+//		System.out.println("ZXXZ_B_prop="+prop+"    mDoubleSumValue="+mDoubleSumValue+"  listSize="+listSize);
+		
+		
+		return mDoubleSumValue;
+	
+	}
+	
+	public static 	double calLastRiXianListValue(String prop,int predayCount , 
+			ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> rawRiXianList) {
+		double mDoubleValue = 0 ;
+		double mDoubleSumValue = 0 ;
+		int listSize = rawRiXianList.size();
+		
+//		System.out.println("ZXXZ_A_prop="+prop+"    mDoubleSumValue="+mDoubleSumValue+"  listSize="+listSize);
+
+		
+		if(listSize == 0) {
+			return 0;
+		}
+		
+		switch (prop) {
+		case "close":
+			
+			for (int i = 0; i < rawRiXianList.size(); i++) {
+				mDoubleSumValue += rawRiXianList.get(i).close;
+			}
+			
+			break;
+
+		case "change":
+			
+			for (int i = 0; i < rawRiXianList.size(); i++) {
+				mDoubleSumValue += rawRiXianList.get(i).change;
+			}
+			
+			break;
+			
+		case "pct_chg":
+			
+			for (int i = 0; i < rawRiXianList.size(); i++) {
+				mDoubleSumValue += rawRiXianList.get(i).pct_chg;
+			}
+			
+			
+			break;
+			
+		case "amount":
+			for (int i = 0; i < rawRiXianList.size(); i++) {
+				mDoubleSumValue += rawRiXianList.get(i).amount;
+			}
+			
+			
+			break;
+			
+		default:
+			mDoubleSumValue = 0 ;
+			break;
+		}
+		
+		
+//		System.out.println("ZXXZ_B_prop="+prop+"    mDoubleSumValue="+mDoubleSumValue+"  listSize="+listSize);
+		
+		
+		return mDoubleSumValue/listSize;
+	
+	}
+	
+static	ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> 	getLastRiXianListWithCount( 
+			ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> rawRiXianList , int dayCount){
+	ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu>  resultList = new 	ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu>();
+	
+	
+	int listSize = rawRiXianList.size();
+	
+	
+	if(listSize == 0) {
+		return resultList;
+	}
+	
+	int distanceCount = listSize - dayCount;
+	
+//	System.out.println("ZXXZ_A   distanceCount="+distanceCount+"   rawRiXianListSize="+ listSize);
+// ZXXZ_A   distanceCount=217   rawRiXianListSize=219
+	if(distanceCount <= 0) {  // 当前的数据 都 不够 dayCount 满足的 那么 直接返回 全部的数据
+		
+		return resultList;
+	}
+	
+	// 从 最后 往前 数 dayCount 个 数据值 返回 回去 
+	for (int i = rawRiXianList.size()-1; i > rawRiXianList.size()-1-dayCount; i--) {
+		resultList.add(rawRiXianList.get(i));
+	
+	}
+	
+//	System.out.println("ZXXZ_A   distanceCount="+distanceCount+"   listSize="+ listSize+"  resultList.size()="+resultList.size());
+
+	return resultList;
+	
+		
+		
+		
+		
+	}
+	
+	
+	//  计算 最新的 那个工作日的与平均值的比值  计算这两天的对比的数据
+	// 最近两天的平均值 与  年度平均值对比
+	class Dynamic_Preday2_BeiShu_Rule_3 extends  Basic_Rule{
+		
+		
+		
+		
+		
+		
+		
+		// 当前记录的交易日 数量
+		int preday_count = 2;
+		
+		Dynamic_Preday2_BeiShu_Rule_3(){
+			super("#", 3, 4); //
+			preday_count = 2;   //
+		}
+		
+		
+		@Override
+		String getXlsxDynamicHeader(String sheetName) {
+			// TODO Auto-generated method stub
+			switch (sheetName) {
+			case "收盘价":
+				   return "近"+preday_count+"天收盘价"+"均比"+"_"+rule_index;
+			
+			case "涨跌值":
+				   return "近"+preday_count+"天涨跌值"+"均比"+"_"+rule_index;
+			case "涨跌比":
+				   return "近"+preday_count+"天涨跌幅"+"均比"+"_"+rule_index;
+			case "成交额":
+				   return "近"+preday_count+"天成交额"+"均比"+"_"+rule_index;
+				
+			default:
+				break;
+			}
+			return "近"+preday_count+"天"+"均比"+"_"+rule_index;
+		}
+		
+		@Override
+		String simpleDesc() {
+			return "\n"  +  Cur_Bat_Name + " #_" + rule_index+"    ###   计算当前最新最近"+preday_count+" 天 记录与平均值的比值   " ;
+			
+		}
+		
+		
+		
+		
+		@Override
+		String ShouPanJia_SheetCell_Operation(String tscode, J0_GuPiao_Analysis.StockHeadData headData,
+				ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> mRiXianList) {
+			// TODO Auto-generated method stub
+			
+			if(mRiXianList == null || mRiXianList.size() == 0) {
+				
+				//  没有对比数据 那么 对币值就是 0 
+				headData.pre2day_close = 0;
+				headData.pre2day_close_comparison = 0;
+				return super.ChengJiaoEr_SheetCell_Operation(tscode, headData ,  mRiXianList);
+				
+			}
+			
+			
+			
+			// 从列表中指定返回指定数目的列表  包含2个 1个 0 个的情况
+			ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
+		
+			
+			//
+			double preXDayClose =  	calLastRiXianListValue("close",preday_count,lastDaysList);
+			
+			headData.pre2day_close = preXDayClose;
+			headData.pre2day_close_comparison =  preXDayClose  / headData.pingjun_close ;
+//			return	priceFormat.format(headData.day1_close_comparison);
+			return	priceRateFormat.format(headData.pre2day_close_comparison);
+		}
+		
+		
+		
+		@Override
+		String ZhangDieZhi_SheetCell_Operation(String tscode, J0_GuPiao_Analysis.StockHeadData headData,
+				ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> mRiXianList) {
+			// TODO Auto-generated method stub
+		
+			if(mRiXianList == null || mRiXianList.size() == 0) {
+				
+				//  没有对比数据 那么 对币值就是 0 
+				headData.pre2day_change = 0;
+				headData.pre2day_change_comparison = 0;
+				return super.ChengJiaoEr_SheetCell_Operation(tscode, headData ,  mRiXianList);
+				
+			}
+			
+			
+			
+			// 从列表中指定返回指定数目的列表  包含2个 1个 0 个的情况
+			ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
+		
+			
+			//
+			double preXDayClose =  	calLastRiXianListValue("change",preday_count,lastDaysList);
+			
+			headData.pre2day_change = preXDayClose;
+			headData.pre2day_change_comparison =  preXDayClose  / headData.pingjun_change ;
+//			return	priceFormat.format(headData.day1_close_comparison);
+			return	priceRateFormat.format(headData.pre2day_change_comparison);
+		}
+		
+		
+
+		
+		@Override
+		String ZhangDieFu_SheetCell_Operation(String tscode, J0_GuPiao_Analysis.StockHeadData headData,
+				ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> mRiXianList) {
+			// TODO Auto-generated method stub
+			
+			
+			if(mRiXianList == null || mRiXianList.size() == 0) {
+				
+				//  没有对比数据 那么 对币值就是 0 
+				headData.pre2day_pct_change = 0;
+				headData.pre2day_pct_change_comparison = 0;
+				return super.ChengJiaoEr_SheetCell_Operation(tscode, headData ,  mRiXianList);
+				
+			}
+			
+			
+			
+			// 从列表中指定返回指定数目的列表  包含2个 1个 0 个的情况
+			ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
+		
+			
+			//
+			double preXDayPctChg =  	calLastRiXianListValue("pct_chg",preday_count,lastDaysList);
+			
+			headData.pre2day_pct_change = preXDayPctChg;
+			headData.pre2day_pct_change_comparison =  preXDayPctChg  / headData.pingjun_pct_change ;
+//			return	priceFormat.format(headData.day1_close_comparison);
+			return	priceRateFormat.format(headData.pre2day_pct_change_comparison);
+
+		}
+		
+		@Override
+		String ChengJiaoEr_SheetCell_Operation(String tscode, StockHeadData headData,
+				ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> mRiXianList) {
+			// TODO Auto-generated method stub
+			
+			
+			if(mRiXianList == null || mRiXianList.size() == 0) {
+				
+				//  没有对比数据 那么 对币值就是 0 
+				headData.pre2day_amount = 0;
+				headData.pre2day_amount_comparison = 0;
+				return super.ChengJiaoEr_SheetCell_Operation(tscode, headData ,  mRiXianList);
+				
+			}
+			
+			
+			
+			// 从列表中指定返回指定数目的列表  包含2个 1个 0 个的情况
+			ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
+		
+			
+			//
+			double preXDayPctChg =  	calLastRiXianListValue("amount",preday_count,lastDaysList) * 1000;
+			
+			headData.pre2day_amount = preXDayPctChg;
+			headData.pre2day_amount_comparison =  preXDayPctChg  / headData.pingjun_amount ;
+//			return	priceFormat.format(headData.day1_close_comparison);
+			return	priceRateFormat.format(headData.pre2day_amount_comparison);
+
+		}
+		
+		
+	}
+	
+
+	//  计算 最新的 那个工作日的与平均值的比值 
+	class Dynamic_0Today_BeiShu_Rule_2 extends  Basic_Rule{
+		
+		
+		
+		@Override
+		String ShouPanJia_SheetCell_Operation(String tscode, J0_GuPiao_Analysis.StockHeadData headData,
+				ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> mRiXianList) {
+			// TODO Auto-generated method stub
+			
+			if(mRiXianList == null || mRiXianList.size() == 0) {
+				
+				//  没有对比数据 那么 对币值就是 0 
+				headData.day1_close = 0;
+				headData.day1_close_comparison = 0;
+				return super.ChengJiaoEr_SheetCell_Operation(tscode, headData ,  mRiXianList);
+				
+			}
+			
+			RiXianXingQingvShiJianWeiXu lastdayRiXian = mRiXianList.get(mRiXianList.size()-1);
+			double lastClose = lastdayRiXian.close;
+			
+			headData.day1_close = lastClose;
+			headData.day1_close_comparison =  lastClose  / headData.pingjun_close ;
+		   	
+//			return	priceFormat.format(headData.day1_close_comparison);
+			return	priceRateFormat.format(headData.day1_close_comparison);
+		}
+		
+		@Override
+		String ZhangDieZhi_SheetCell_Operation(String tscode, J0_GuPiao_Analysis.StockHeadData headData,
+				ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> mRiXianList) {
+			// TODO Auto-generated method stub
+		
+			if(mRiXianList == null || mRiXianList.size() == 0) {
+				
+				//  没有对比数据 那么 对币值就是 0 
+				headData.day1_change = 0;
+				headData.day1_change_comparison = 0;
+				return super.ChengJiaoEr_SheetCell_Operation(tscode, headData ,  mRiXianList);
+				
+			}
+			
+			RiXianXingQingvShiJianWeiXu lastdayRiXian = mRiXianList.get(mRiXianList.size()-1);
+			double lastChange = lastdayRiXian.change;
+			
+			headData.day1_change = lastChange;
+			headData.day1_change_comparison =  lastChange  / headData.pingjun_change ;
+		   	
+//			return	priceFormat.format(headData.day1_pct_change_comparison);
+			return	priceRateFormat.format(headData.day1_change_comparison);
+		}
+		
+		
+
+		
+		@Override
+		String ZhangDieFu_SheetCell_Operation(String tscode, J0_GuPiao_Analysis.StockHeadData headData,
+				ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> mRiXianList) {
+			// TODO Auto-generated method stub
+			
+			
+			if(mRiXianList == null || mRiXianList.size() == 0) {
+				
+				//  没有对比数据 那么 对币值就是 0 
+				headData.day1_pct_change = 0;
+				headData.day1_pct_change_comparison = 0;
+				return super.ChengJiaoEr_SheetCell_Operation(tscode, headData ,  mRiXianList);
+				
+			}
+			
+			RiXianXingQingvShiJianWeiXu lastdayRiXian = mRiXianList.get(mRiXianList.size()-1);
+			double lastpct_chg = lastdayRiXian.pct_chg;
+			
+			headData.day1_pct_change = lastpct_chg;
+			headData.day1_pct_change_comparison =  lastpct_chg  / headData.pingjun_pct_change ;
+		   	
+		
+			return	priceRateFormat.format(headData.day1_pct_change_comparison);
+//			return	priceFormat.format(headData.day1_pct_change_comparison);
+
+		}
+		
+		@Override
+		String ChengJiaoEr_SheetCell_Operation(String tscode, StockHeadData headData,
+				ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> mRiXianList) {
+			// TODO Auto-generated method stub
+			
+			if(mRiXianList == null || mRiXianList.size() == 0) {
+				
+				//  没有对比数据 那么 对币值就是 0 
+				headData.day1_amount = 0;
+				headData.day1_amount_comparison = 0;
+				return super.ChengJiaoEr_SheetCell_Operation(tscode, headData ,  mRiXianList);
+				
+			}
+			
+			RiXianXingQingvShiJianWeiXu lastdayRiXian = mRiXianList.get(mRiXianList.size()-1);
+			double lastAmount = lastdayRiXian.amount * 1000;  // 单位是1千  转为 单位为 元
+			
+			headData.day1_amount = lastAmount ;
+			headData.day1_amount_comparison =  lastAmount / headData.pingjun_amount ;
+		   	
+			return	priceRateFormat.format(headData.day1_amount_comparison);
+		}
+		
+		
+		// 当前记录的交易日 数量
+		int preday_count = 0;
+		
+		Dynamic_0Today_BeiShu_Rule_2(){
+			super("#", 2, 4); //
+			preday_count = 1;   //
+		}
+		
+
+		
+		@Override
+		String getXlsxDynamicHeader(String sheetName) {
+			// TODO Auto-generated method stub
+			switch (sheetName) {
+			case "收盘价":
+				   return "近"+preday_count+"天收盘价"+"均比"+"_"+rule_index;
+			
+			case "涨跌值":
+				   return "近"+preday_count+"天涨跌值"+"均比"+"_"+rule_index;
+			case "涨跌比":
+				   return "近"+preday_count+"天涨跌幅"+"均比"+"_"+rule_index;
+			case "成交额":
+				   return "近"+preday_count+"天成交额"+"均比"+"_"+rule_index;
+				
+			default:
+				break;
+			}
+			return "近"+preday_count+"天"+"均比"+"_"+rule_index;
+		}
+		
+		@Override
+		String simpleDesc() {
+			return "\n"  +  Cur_Bat_Name + " #_" + rule_index+"    ###   计算当前最新最近"+preday_count+" 天 记录与平均值的比值   " ;
+			
+		}
+		
+		
+	}
+	
+
+	
+	static class StockHeadData {
+		
+		 String tsname;
+		 String tscode;
+		 
+		 // 计算得到的平均值
+		 double pingjun_close;
+		 double pingjun_pct_change;
+		 double pingjun_change;
+		 double pingjun_amount;
+		 
+		 
+		 // ________  最新值和 平均值的比较  ________
+		 double day1_close;
+		 double day1_pct_change;
+		 double day1_change;
+		 double day1_amount;
+		 
+		 //   最天的值和平均值的比较的倍数  
+		 double day1_close_comparison;
+		 double day1_pct_change_comparison;
+		 double day1_change_comparison;
+		 double day1_amount_comparison;
+		 // ________  最新值和 平均值的比较  ________ 
+		 
+		 
+		 //  最近两天的平均值 和 年平均值的比较
+		 double pre2day_close;
+		 double pre2day_pct_change;
+		 double pre2day_change;
+		 double pre2day_amount;
+		 
+		 double pre2day_close_comparison;
+		 double pre2day_pct_change_comparison;
+		 double pre2day_change_comparison;
+		 double pre2day_amount_comparison;
+		 
+		 
+		 //  最近X天的平均值 和 年平均值的比较
+		 double pre3day_close;
+		 double pre3day_pct_change;
+		 double pre3day_change;
+		 double pre3day_amount;
+		 
+		 double pre3day_close_comparison;
+		 double pre3day_pct_change_comparison;
+		 double pre3day_change_comparison;
+		 double pre3day_amount_comparison;
+		
+		 
+		 //  最近X天的平均值 和 年平均值的比较
+		 double pre4day_close;
+		 double pre4day_pct_change;
+		 double pre4day_change;
+		 double pre4day_amount;
+		 
+		 double pre4day_close_comparison;
+		 double pre4day_pct_change_comparison;
+		 double pre4day_change_comparison;
+		 double pre4day_amount_comparison;
+		 
+		 
+		 //  最近X天的平均值 和 年平均值的比较
+		 double pre5day_close;
+		 double pre5day_pct_change;
+		 double pre5day_change;
+		 double pre5day_amount;
+		 
+		 double pre5day_close_comparison;
+		 double pre5day_pct_change_comparison;
+		 double pre5day_change_comparison;
+		 double pre5day_amount_comparison;
+		 
+		 
+		 //  最近X天的平均值 和 年平均值的比较
+		 double pre6day_close;
+		 double pre6day_pct_change;
+		 double pre6day_change;
+		 double pre6day_amount;
+		 
+		 double pre6day_close_comparison;
+		 double pre6day_pct_change_comparison;
+		 double pre6day_change_comparison;
+		 double pre6day_amount_comparison;
+		
+		 
+		 //  最近X天的平均值 和 年平均值的比较
+		 double pre7day_close;
+		 double pre7day_pct_change;
+		 double pre7day_change;
+		 double pre7day_amount;
+		 
+		 double pre7day_close_comparison;
+		 double pre7day_pct_change_comparison;
+		 double pre7day_change_comparison;
+		 double pre7day_amount_comparison;
+		 
+		 
+		 
+		 //  最近X天的平均值 和 年平均值的比较
+		 double pre8day_close;
+		 double pre8day_pct_change;
+		 double pre8day_change;
+		 double pre8day_amount;
+		 
+		 double pre8day_close_comparison;
+		 double pre8day_pct_change_comparison;
+		 double pre8day_change_comparison;
+		 double pre8day_amount_comparison;
+		 
+		 
+		 //  最近X天的平均值 和 年平均值的比较
+		 double pre9day_close;
+		 double pre9day_pct_change;
+		 double pre9day_change;
+		 double pre9day_amount;
+		 
+		 double pre9day_close_comparison;
+		 double pre9day_pct_change_comparison;
+		 double pre9day_change_comparison;
+		 double pre9day_amount_comparison;
+		 
+		 
+		 //  最近X天的平均值 和 年平均值的比较
+		 double pre10day_close;
+		 double pre10day_pct_change;
+		 double pre10day_change;
+		 double pre10day_amount;
+		 
+		 double pre10day_close_comparison;
+		 double pre10day_pct_change_comparison;
+		 double pre10day_change_comparison;
+		 double pre10day_amount_comparison;
+		 
+		 
+		 
+		 //  最近X天的平均值 和 年平均值的比较
+		 double pre15day_close;
+		 double pre15day_pct_change;
+		 double pre15day_change;
+		 double pre15day_amount;
+		 
+		 double pre15day_close_comparison;
+		 double pre15day_pct_change_comparison;
+		 double pre15day_change_comparison;
+		 double pre15day_amount_comparison;
+		 
+		 
+		 //  最近X天的平均值 和 年平均值的比较
+		 double pre20day_close;
+		 double pre20day_pct_change;
+		 double pre20day_change;
+		 double pre20day_amount;
+		 
+		 double pre20day_close_comparison;
+		 double pre20day_pct_change_comparison;
+		 double pre20day_change_comparison;
+		 double pre20day_amount_comparison;
+		 
+		 
+		 //  最近X天的平均值 和 年平均值的比较
+		 double pre30day_close;
+		 double pre30day_pct_change;
+		 double pre30day_change;
+		 double pre30day_amount;
+		 
+		 double pre30day_close_comparison;
+		 double pre30day_pct_change_comparison;
+		 double pre30day_change_comparison;
+		 double pre30day_amount_comparison;
+		 
+		 
+		 
+	}
 	
 	
 	
@@ -495,6 +3032,7 @@ void 	addRuleToList(Rule rule , boolean isShowInXlsxHead){
 	  realTypeRuleList.add(rule);	
 	  rule.isShowHeaderInXlsx = isShowInXlsxHead;
 	  rule.dynamicIndexInList = realTypeRuleList.size();
+
 	
 	}
 
@@ -568,7 +3106,11 @@ static void sortTsCode_RiXianArr_Map(boolean isShowLog) {
 
 
 static DecimalFormat priceFormat  ;
-// = new DecimalFormat("##,##0.00");
+static DecimalFormat priceRateFormat  ;
+
+// priceFormat  = new DecimalFormat("##,##0.00");
+
+
 
 
 	class AddData_To_Year_Main_Stock_Xlsx_Rule_1 extends  Basic_Rule{
@@ -620,17 +3162,20 @@ static DecimalFormat priceFormat  ;
 //		abstract	String  ChengJiaoEr_SheetCell_Operation( ArrayList<RiXianXingQingvShiJianWeiXu> mRiXianList);
 
 		
-		String  ChengJiaoEr_SheetCell_Operation( ArrayList<RiXianXingQingvShiJianWeiXu> mRiXianList) {
+		String  ChengJiaoEr_SheetCell_Operation( String ts_code_key , StockHeadData headData,  ArrayList<RiXianXingQingvShiJianWeiXu> mRiXianList) {
 			String resultStr = "";
 			
 			// 直接使用 double  进行 加减 会有 精度的 丢失 
 			BigDecimal currentPriceSum =   new BigDecimal(0);
 			int hasValueCount = 0 ;
+			String matchTsCode = null;
 
 			for (int i = 0; i < mRiXianList.size(); i++) {
 				RiXianXingQingvShiJianWeiXu  rixianItem = mRiXianList.get(i);
 				
 				double itemZhangDieValue = rixianItem.amount;
+		
+			
 	
 		
 				  BigDecimal itemPrice_big = new BigDecimal(itemZhangDieValue);
@@ -650,12 +3195,23 @@ static DecimalFormat priceFormat  ;
 		
 			double priceAvarage = currentPriceSum.divide(hasZhangDieValueCount_big, RoundingMode.HALF_UP).doubleValue();
 //			return	priceFormat.format(priceAvarage);
+		
+			
+			
+			StockHeadData  matchHeadData =  stockHeadDataMap.get(ts_code_key);
+			if(matchHeadData == null) {
+				matchHeadData = new StockHeadData();
+			}
+			matchHeadData.pingjun_amount = priceAvarage;
+			stockHeadDataMap.put(ts_code_key, matchHeadData);
+			
+			
 			return	((long)priceAvarage)+"";
 			
 		}
 		
 		
-		String  ZhangDieZhi_SheetCell_Operation( ArrayList<RiXianXingQingvShiJianWeiXu> mRiXianList) {
+		String  ZhangDieZhi_SheetCell_Operation(String ts_code_key , StockHeadData headData, ArrayList<RiXianXingQingvShiJianWeiXu> mRiXianList) {
 			String resultStr = "";
 			
 			// 直接使用 double  进行 加减 会有 精度的 丢失 
@@ -681,12 +3237,21 @@ static DecimalFormat priceFormat  ;
 			BigDecimal hasZhangDieValueCount_big =   new BigDecimal(hasValueCount);
 		
 			double priceAvarage = currentPriceSum.divide(hasZhangDieValueCount_big, RoundingMode.HALF_UP).doubleValue();
+			
+			
+			StockHeadData  matchHeadData =  stockHeadDataMap.get(ts_code_key);
+			if(matchHeadData == null) {
+				matchHeadData = new StockHeadData();
+			}
+			matchHeadData.pingjun_change = priceAvarage;
+			stockHeadDataMap.put(ts_code_key, matchHeadData);
+			
 			return	priceFormat.format(priceAvarage);
 			
 		}
 		
 		
-		String  ZhangDieFu_SheetCell_Operation( ArrayList<RiXianXingQingvShiJianWeiXu> mRiXianList) {
+		String  ZhangDieFu_SheetCell_Operation(String ts_code_key ,  StockHeadData headData, ArrayList<RiXianXingQingvShiJianWeiXu> mRiXianList) {
 			String resultStr = "";
 			
 			// 直接使用 double  进行 加减 会有 精度的 丢失 
@@ -712,12 +3277,21 @@ static DecimalFormat priceFormat  ;
 			BigDecimal hasZhangDieValueCount_big =   new BigDecimal(hasValueCount);
 		
 			double priceAvarage = currentPriceSum.divide(hasZhangDieValueCount_big, RoundingMode.HALF_UP).doubleValue();
+		
+			
+			StockHeadData  matchHeadData =  stockHeadDataMap.get(ts_code_key);
+			if(matchHeadData == null) {
+				matchHeadData = new StockHeadData();
+			}
+			matchHeadData.pingjun_pct_change = priceAvarage;
+			stockHeadDataMap.put(ts_code_key, matchHeadData);
+			
 			return	priceFormat.format(priceAvarage);
 		}
 		
 		
 		
-		String ShouPanJia_SheetCell_Operation(ArrayList<RiXianXingQingvShiJianWeiXu> mRiXianList ) {
+		String ShouPanJia_SheetCell_Operation(String ts_code_key , StockHeadData headData,  ArrayList<RiXianXingQingvShiJianWeiXu> mRiXianList ) {
 			String resultStr = "";
 			
 			// 直接使用 double  进行 加减 会有 精度的 丢失 
@@ -745,17 +3319,49 @@ static DecimalFormat priceFormat  ;
 			BigDecimal hasPriceCount_big =   new BigDecimal(hasPriceCount);
 		
 			double priceAvarage = currentPriceSum.divide(hasPriceCount_big, RoundingMode.HALF_UP).doubleValue();
+		
+			
+			StockHeadData  matchHeadData =  stockHeadDataMap.get(ts_code_key);
+			if(matchHeadData == null) {
+				matchHeadData = new StockHeadData();
+			}
+			matchHeadData.pingjun_close = priceAvarage;
+			stockHeadDataMap.put(ts_code_key, matchHeadData);
+			
 			return	priceFormat.format(priceAvarage);
 			
 		}
 
 		
 		
+//		@Override
+//		String getXlsxDynamicHeader(String sheetName) {
+//			// TODO Auto-generated method stub
+//			return "平均值_"+rule_index;
+//		}
+		
+		
 		@Override
 		String getXlsxDynamicHeader(String sheetName) {
 			// TODO Auto-generated method stub
+			switch (sheetName) {
+			case "收盘价":
+				return "收盘价年平均值_"+rule_index;
+			
+			case "涨跌值":
+				return "涨跌值年平均值_"+rule_index;
+			case "涨跌比":
+				return "涨跌比年平均值_"+rule_index;
+			case "成交额":
+				return "成交额年平均值"+"_"+rule_index;
+				
+			default:
+				break;
+			}
 			return "平均值_"+rule_index;
 		}
+		
+		
 		
 		
 		AddData_To_Year_Main_Stock_Xlsx_Rule_1() {
@@ -774,7 +3380,7 @@ static DecimalFormat priceFormat  ;
 			isShowLog = false;
 			
 			priceFormat  = new DecimalFormat("##,##0.00");
-			
+			priceRateFormat  = new DecimalFormat("0.00");
 		}
 		
 		
@@ -1194,7 +3800,7 @@ static DecimalFormat priceFormat  ;
 					// 有些 规则 是  不显示 在 head  中的  有些规则 则作用在 header 中 
 					// isShowHeaderInXlsx Zukgit 控制当前 Rule 是否显示表头的 
 					//  用于控制 显示的 表头的 
-					if(realTypeRuleList.get(j).isShowHeaderInXlsx) {
+					if(realTypeRuleList.get(j).isShowHeaderInXlsx && columnName != null && !"".equals(columnName)) {
 			        	// dynamicProp【3】   ......  dynamicProp【8】
 					 	headName_ColumnNum_Map.put(columnName, rowIndex);
 					    row.createCell(rowIndex++).setCellValue(columnName);
@@ -1265,14 +3871,19 @@ static DecimalFormat priceFormat  ;
 						//  动态 计算 Begin  
 			            for (int j = 0; j < realTypeRuleList.size(); j++) {
 			            	// 参数是 sheetName
+			            
 							String columnName =  realTypeRuleList.get(j).getXlsxDynamicHeader(curShhetName);
+				
 							// 有些 规则 是  不显示 在 head  中的  有些规则 则作用在 header 中 
 							// isShowHeaderInXlsx Zukgit 控制当前 Rule 是否显示表头的 
 							Integer mDynamicPosition = 	headName_ColumnNum_Map.get(columnName);
-							//  用于控制 显示的 表头的 
-							if(mDynamicPosition != null) {
 							
-								String cellValue = realTypeRuleList.get(j).getXlsxDynamicCell(curShhetName, tsMatchRiXianArr);
+							
+							//  用于控制 显示的 表头的 
+							if(mDynamicPosition != null && columnName != null && !"".equals(columnName)) {
+							
+					
+								String cellValue = realTypeRuleList.get(j).getXlsxDynamicCell(curShhetName, ts_code_key, tsMatchRiXianArr);
 							
 								if(isDoubleNumeric(cellValue)) {
 									rowNext.createCell(mDynamicPosition).setCellValue(Double.parseDouble(cellValue));
@@ -1311,6 +3922,14 @@ static DecimalFormat priceFormat  ;
 							String cname = mRiXianHangQing.cname;
 							String tradeDay = mRiXianHangQing.trade_date;
 		
+							if(cname == null || "null".equals(cname) || "".equals(cname.trim())) {
+								
+								cname = 	TScode_StockName_Map.get(tscode);
+								if(cname == null || "".equals(cname)) {
+									cname = "null";
+								}
+								
+							}
 							
 
 							
@@ -2147,32 +4766,41 @@ static DecimalFormat priceFormat  ;
 		}
 
 		String getXlsxDynamicHeader(String sheetName) {
-			return "动态"+dynamicIndexInList;
+//			return "动态"+dynamicIndexInList;
+			return  null;
 		}
 
 		
 		
 		
-		String getXlsxDynamicCell(String sheetName , ArrayList<RiXianXingQingvShiJianWeiXu> mRiXianList ) {
+		String getXlsxDynamicCell(String sheetName , String tscode, ArrayList<RiXianXingQingvShiJianWeiXu> mRiXianList ) {
 			String cellStr = "";
 			
 			// MainStock_SheetChineseNameArr
 			
 //			 MainStock_SheetChineseNameArr = {"收盘价","涨跌比","涨跌值","成交额"};
 			
+			// 初始化 headData 数据 
+			StockHeadData headData = 	stockHeadDataMap.get(tscode);
+			if(headData == null) {
+				headData = new StockHeadData();
+				stockHeadDataMap.put(tscode, headData);
+			}
+
+			
 			switch (sheetName) {
 			case "收盘价":
-				cellStr = ShouPanJia_SheetCell_Operation(mRiXianList);
+				cellStr = ShouPanJia_SheetCell_Operation( tscode ,  headData ,mRiXianList);
 				break;
 
 			case "涨跌比":
-				  cellStr = ZhangDieFu_SheetCell_Operation(mRiXianList);
+				  cellStr = ZhangDieFu_SheetCell_Operation( tscode , headData ,mRiXianList);
 				break;
 			case "涨跌值":
-				  cellStr = ZhangDieZhi_SheetCell_Operation(mRiXianList);
+				  cellStr = ZhangDieZhi_SheetCell_Operation( tscode , headData ,mRiXianList);
 				break;
 			case "成交额":
-				  cellStr = ChengJiaoEr_SheetCell_Operation(mRiXianList);
+				  cellStr = ChengJiaoEr_SheetCell_Operation( tscode , headData  ,mRiXianList);
 				break;
 				
 			default:
@@ -2183,21 +4811,21 @@ static DecimalFormat priceFormat  ;
 		}
 		
 		
-			String  ZhangDieFu_SheetCell_Operation( ArrayList<RiXianXingQingvShiJianWeiXu> mRiXianList){
+			String  ZhangDieFu_SheetCell_Operation( String tscode,StockHeadData headData , ArrayList<RiXianXingQingvShiJianWeiXu> mRiXianList){
 				
 				return "";
 				
 			}
 
 
-			String  ZhangDieZhi_SheetCell_Operation( ArrayList<RiXianXingQingvShiJianWeiXu> mRiXianList){
+			String  ZhangDieZhi_SheetCell_Operation(String tscode, StockHeadData headData , ArrayList<RiXianXingQingvShiJianWeiXu> mRiXianList){
 				
 				return "";
 				
 			}
 			
 			
-			String  ChengJiaoEr_SheetCell_Operation( ArrayList<RiXianXingQingvShiJianWeiXu> mRiXianList){
+			String  ChengJiaoEr_SheetCell_Operation( String tscode,StockHeadData headData , ArrayList<RiXianXingQingvShiJianWeiXu> mRiXianList){
 				
 				return "";
 				
@@ -2205,7 +4833,7 @@ static DecimalFormat priceFormat  ;
 
 		
 		
-		String ShouPanJia_SheetCell_Operation(ArrayList<RiXianXingQingvShiJianWeiXu> mRiXianList ) {
+		String ShouPanJia_SheetCell_Operation(String tscode,StockHeadData headData ,ArrayList<RiXianXingQingvShiJianWeiXu> mRiXianList ) {
 			
 			return "";
 			
@@ -2290,19 +4918,19 @@ static DecimalFormat priceFormat  ;
 		abstract String getXlsxDynamicHeader(String sheetName); //  在 xlsx中的动态计算的 head 描述
 
 		
-		abstract	String getXlsxDynamicCell(String sheetName , ArrayList<RiXianXingQingvShiJianWeiXu> mRiXianList ) ;
+		abstract	String getXlsxDynamicCell(String sheetName , String tscode, ArrayList<RiXianXingQingvShiJianWeiXu> mRiXianList ) ;
 		
 		
-		abstract	String  ShouPanJia_SheetCell_Operation( ArrayList<RiXianXingQingvShiJianWeiXu> mRiXianList);
+		abstract	String  ShouPanJia_SheetCell_Operation(String tscode,StockHeadData headData ,  ArrayList<RiXianXingQingvShiJianWeiXu> mRiXianList);
 
 
-		abstract	String  ZhangDieFu_SheetCell_Operation( ArrayList<RiXianXingQingvShiJianWeiXu> mRiXianList);
+		abstract	String  ZhangDieFu_SheetCell_Operation(String tscode, StockHeadData headData , ArrayList<RiXianXingQingvShiJianWeiXu> mRiXianList);
 
 
-		abstract	String  ZhangDieZhi_SheetCell_Operation( ArrayList<RiXianXingQingvShiJianWeiXu> mRiXianList);
+		abstract	String  ZhangDieZhi_SheetCell_Operation(String tscode, StockHeadData headData , ArrayList<RiXianXingQingvShiJianWeiXu> mRiXianList);
 			
 			
-		abstract	String  ChengJiaoEr_SheetCell_Operation( ArrayList<RiXianXingQingvShiJianWeiXu> mRiXianList);
+		abstract	String  ChengJiaoEr_SheetCell_Operation( String tscode, StockHeadData headData , ArrayList<RiXianXingQingvShiJianWeiXu> mRiXianList);
 
 	}
 
