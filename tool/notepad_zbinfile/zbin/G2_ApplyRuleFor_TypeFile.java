@@ -4828,9 +4828,15 @@ System.out.println("paramItem["+i+"] = "+paramItem_lower_trim);
 					+ "  ### 以MD5字符串保存下载视频文件 持续检测 WeChat目录 C:\\Users\\zukgit\\Documents\\WeChat Files\\xxxx\\FileStorage\\File\\2021-07 的 TXT文件的内容    \n"
 
 					+ Cur_Bat_Name + " #_" + rule_index + "   ### 只有在 WeChat的当前 月份接收文件目录 才能生效 Monitor 监控 \n"
-					+ "  explorer.exe  \"" + System.getProperties().getProperty("user.home")
-					+ "\\Documents\\WeChat Files\"  \n" + "  explorer.exe  \""
-					+ System.getProperties().getProperty("user.home") + "\\Documents\\Tencent Files\"  \n"
+				
+					// copy System.getProperties().getProperty("user.home")\Desktop\zbin\win_zbin\zrule_apply_G2_39rule_startup.vbs   C:\ProgramData\Microsoft\Windows\Start Menu\Programs\StartUp\ 
+					// copy %userprofile%\Desktop\zbin\win_zbin\zrule_apply_G2_39rule_startup.vbs   C:\ProgramData\Microsoft\Windows\Start Menu\Programs\StartUp\ 
+                    // zbatrule_I9_Rule30.bat _31_  file_C:\Users\zhuzj5\Desktop\ScreenShot\D\T.txt
+					+ " 【配置检测开机启动】 \"\n" + "zbatrule_I9_Rule30.bat _31_  file_"+Win_Lin_Mac_ZbinPath+File.separator+"zrule_apply_G2_39rule_startup.vbs"+"  "+ "\n" 
+					+ "  explorer.exe  \"" + "C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\StartUp\\\"  \n" 
+
+					+ "  explorer.exe  \"" + System.getProperties().getProperty("user.home")+ "\\Documents\\WeChat Files\"  \n" 
+					+ "  explorer.exe  \""+ System.getProperties().getProperty("user.home") + "\\Documents\\Tencent Files\"  \n"
 
 					+ "  explorer.exe  \"" + mDownloadedMonthDir.getAbsolutePath() + "\"   \n" + "cd  " + "\""
 					+ System.getProperties().getProperty("user.home") + "\\Documents\\" + "\"" + "  && "

@@ -5054,20 +5054,55 @@ goto:eof
 
 
 
-
-:rule30vshowlove_func_0x0
-rem ======================================== rule30vshowlove_func_0x0
-rem rule_tip: %init_input_0% _30_   ##  打印爱心并闪屏
+:rule31vcopyfiletostartupwithadmin_func_1x0
+rem ======================================== rule31vcopyfiletostartup_func_1x0
+rem rule_tip: %init_input_0% _31_  file_xxxx.bat  ##   admin权限复制到 Windows启动路径  explorer.exe  "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\StartUp"
 rem desc: 
 rem sample: 
 rem sample_out: 
 ::SETLOCAL
-echo ______________Method_In rule30vshowlove_func_0x0
-call ::showlove_func_0x0
-echo [rule30vshowlove_func_0x0 EndPrintCode]   output=[__empty__]  param1=[__empty__] 
-echo ______________Method_Out rule30vshowlove_func_0x0
+echo ______________Method_In rule31vcopyfiletostartup_func_1x0
+set rule31vcopyfiletostartup_dynamic_param1=%init_input_2%
+call :isstartwith_func_2x1 %init_input_2%  file_ 
+set isstart_file=!isstartwith_return_1!
+echo isstart_file = !isstart_file!
+if "!isstart_file!"=="true" (
+call :stringreplace_func_3x1 %init_input_2%  file_  ""
+set target_file_path=!stringreplace_return_1!
+echo "当前输入文件路径为" target_file_path=!target_file_path!  
+
+call ::isfileexist_func_1x1 !target_file_path!  
+set paramfile_existflag=!isfileexist_return_1!
+echo paramfile_existflag=!paramfile_existflag!
+if "!paramfile_existflag!"=="true" (
+echo "当前输入文件路径为" target_file_path=!target_file_path!  并且 文件 存在
+
+del  %win_zbin%/zcmd_admin_I9.bat    
+echo @ECHO off > %win_zbin%/zcmd_admin_I9.bat  
+echo setlocal enabledelayedexpansion  >> %win_zbin%/zcmd_admin_I9.bat  
+rem set local_str=^%1 mshta vbscript^:CreateObject^(^"Shell^.Application^"^)^.ShellExecute^(^"cmd^.exe^",^"/c ^%^~s0 ::^",^"^",^"runas^",1^)^(window^.close^)^&^&exit
+echo ^%%^1 mshta vbscript^:CreateObject^(^"Shell^.Application^"^)^.ShellExecute^(^"cmd^.exe^",^"/c %%^~s0 ::^",^"^",^"runas^",1^)^(window^.close^)^&^&exit  >> %win_zbin%/zcmd_admin_I9.bat  
+echo  cmd /K xcopy /y "!target_file_path!"   "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\StartUp"  >> %win_zbin%/zcmd_admin_I9.bat
+start %win_zbin%/zcmd_admin_I9.bat
+
+rem start %win_zbin%/zcmd_admin_I9.bat  
+rem del  zcmd_admin_I9.bat  
+
+
+) else (
+echo "当前输入文件路径为 target_file_path=!target_file_path!  但文件经检测 文件 不存在  程序执行失败!"
+
+)
+
+
+) else (
+echo "当前输入参数 %init_input_2% 不是以 file_开头! 程序执行失败! "
+)
+echo [rule31vcopyfiletostartup_func_1x0 EndPrintCode]    output=[__empty__] dynamic_param1=[!rule31vcopyfiletostartup_dynamic_param1!]   
+echo ______________Method_Out rule31vcopyfiletostartup_func_1x0
 ::ENDLOCAL
 goto:eof
+
 
 
 
@@ -5360,6 +5395,8 @@ echo %init_input_0% _29_       ## 过滤当前路径(不包括孙文件)下Port_
 echo %init_input_0% _29_      ## 过滤当前路径(不包括孙文件)下Port_Land命名的的jpg gif mp4到新建的zapp分类目录 jpg_common_port
 
 echo %init_input_0% _30_      ##  打印爱心并闪屏
+
+echo %init_input_0% _31_  file_xxxx.bat  ## admin权限复制到 Windows启动路径  explorer.exe  "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\StartUp"
 
 echo %init_input_0% _996_     ## 不断循环打开关闭 CMD页面  感觉像 轰炸屏幕 寓意轰炸996  无奈下周修好电脑继续
 
