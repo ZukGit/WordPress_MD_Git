@@ -1,6 +1,6 @@
 win_zbinPath = "%userprofile%"+"\Desktop\zbin\win_zbin"
 zbinPath = "%userprofile%"+"\Desktop\zbin\"
-docpath = "C:\Users\zhuzj5\Documents\"
+docpath = "%userprofile%"+"\Documents\"
 
 command =  "cmd /c "+ zbinpath +"\G2.bat  "+docpath+"  _39_   mdname_true  "
 DIM objShell
