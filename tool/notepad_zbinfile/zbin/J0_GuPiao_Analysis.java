@@ -8,9 +8,11 @@ import net.sourceforge.pinyin4j.format.HanyuPinyinOutputFormat;
 import net.sourceforge.pinyin4j.format.HanyuPinyinToneType;
 import net.sourceforge.pinyin4j.format.exception.BadHanyuPinyinOutputFormatCombination;
 
+import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
-
+import org.apache.poi.xssf.usermodel.XSSFCellStyle;
+import org.apache.poi.xssf.usermodel.XSSFColor;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import javax.swing.*;
@@ -51,6 +53,27 @@ public class J0_GuPiao_Analysis {
 	
 	static String[] SheetHead_Part_1 = {"cname","ts_code"};
 	
+	
+	// 为了匹配 最后的 close 项 方便对比 
+	static String[]  calculChineseNameArr(String mEnglishSheet) {
+		String[] dynmicNameArr= new String[MainStock_SheetChineseNameArr.length];
+		String lastMatch = null;
+		int nameIndex = 0;
+		for (int i = 0; i < MainStock_SheetEnglishNameArr.length; i++) {
+			String englishSheetName = MainStock_SheetEnglishNameArr[i];
+			String chineseSheetName = MainStock_SheetChineseNameArr[i];
+			
+			if(!englishSheetName.equals(mEnglishSheet)) {
+				dynmicNameArr[nameIndex++] = chineseSheetName;
+			}else {
+				lastMatch = chineseSheetName;
+			}
+			
+		}
+		dynmicNameArr[dynmicNameArr.length-1] = lastMatch;
+		
+		return dynmicNameArr;
+	}
     
 	// 类型_索引 ，对当前类型的文件执行索引执行的操作 html1---对html类型的子文件执行 索引为1 的逻辑操作 String
 	// apply(String)
@@ -492,88 +515,117 @@ public class J0_GuPiao_Analysis {
 
 		
 	
-		// 添加 数据  并  并产生 得到的 数据类型
+		//1. 添加 数据  并  并产生 得到的 数据类型
 		addRuleToList(new  AddData_To_Year_Main_Stock_Xlsx_Rule_1(),true);	
 
-		//  今天的数据 和 平均数据的对比
+		//2.  今天的数据 和 平均数据的对比
 		addRuleToList(new  Dynamic_0Today_BeiShu_Rule_2(),true);	
 		
+		//3.
 		addRuleToList(new  Dynamic_Preday2_BeiShu_Rule_3(),true);	
 		
-		
+		//4.
 		addRuleToList(new  Dynamic_Preday3_BeiShu_Rule_4(),true);	
 		
+		//5.
 		addRuleToList(new  Dynamic_Preday4_BeiShu_Rule_5(),true);	
 		
-		
+		//6.
 		addRuleToList(new  Dynamic_Preday5_BeiShu_Rule_6(),true);	
 
+		//7.
 		addRuleToList(new  Dynamic_Preday6_BeiShu_Rule_7(),true);	
 		
-		
+		//8.
 		addRuleToList(new  Dynamic_Preday7_BeiShu_Rule_8(),true);	
 		
-		
+		//9.
 		addRuleToList(new  Dynamic_Preday10_BeiShu_Rule_9(),true);	
 		
+		//10.
 		addRuleToList(new  Dynamic_Preday15_BeiShu_Rule_10(),true);	
 		
-		
+		//11.
 		addRuleToList(new  Dynamic_Preday20_BeiShu_Rule_11(),true);	
 		
+		//12.
 		addRuleToList(new  Dynamic_Preday30_BeiShu_Rule_12(),true);	
 		
-		
+		//13.
 		// 最近两天涨跌的数值的和   以及涨跌幅度的和
 		addRuleToList(new  Last2DaySum_ZhangDieZhi_ZhangDieBi_Rule_13(),true);	
 		
+		//14.
 		addRuleToList(new  Last3DaySum_ZhangDieZhi_ZhangDieBi_Rule_14(),true);	
 		
-		
+		//15.
 		addRuleToList(new  Last4DaySum_ZhangDieZhi_ZhangDieBi_Rule_15(),true);	
 		
-		
+		//16.
 		addRuleToList(new  Last5DaySum_ZhangDieZhi_ZhangDieBi_Rule_16(),true);	
 
 		
-		
+		//17.
 		addRuleToList(new  Last6DaySum_ZhangDieZhi_ZhangDieBi_Rule_17(),true);	
 		
+		//18.
 		addRuleToList(new  Last7DaySum_ZhangDieZhi_ZhangDieBi_Rule_18(),true);	
 		
+		//19.
 		addRuleToList(new  Last8DaySum_ZhangDieZhi_ZhangDieBi_Rule_19(),true);	
 		
+		//20.
 		addRuleToList(new  Last9DaySum_ZhangDieZhi_ZhangDieBi_Rule_20(),true);	
 		
+		//21.
 		addRuleToList(new  Last10DaySum_ZhangDieZhi_ZhangDieBi_Rule_21(),true);	
 		
+		//22.
 		addRuleToList(new  Last15DaySum_ZhangDieZhi_ZhangDieBi_Rule_22(),true);	
 		
-		
+		//23.
 		addRuleToList(new  Last20DaySum_ZhangDieZhi_ZhangDieBi_Rule_23(),true);	
 		
+		//24.
 		addRuleToList(new  Last30DaySum_ZhangDieZhi_ZhangDieBi_Rule_24(),true);	
-		
-		// rule_25开始 
 
+		//25.
 		// 记录 年内 最低的 那天 
 		addRuleToList(new  MinPrice_ForYear_DateStr_Rule_25(),true);	
 		
-		
+		//26.
 		// 记录 年内 最高的 那天 
 		addRuleToList(new  MaxPrice_ForYear_DateStr_Rule_26(),true);	
 		
-		
+		//27.
 		addRuleToList(new  MinPrice_ForYear_Price_Rule_27(),true);
 		
 		
+		//28.
 		addRuleToList(new  MaxPrice_ForYear_Price_Rule_28(),true);
 		
+		//29.
 		// 年内 最低 和  年内最高的 比值  按 时间顺序 比值
 		addRuleToList(new  MaxPrice_MinPrice_Rate_Rule_29(),true);
 		
+		//30.
 		// 最高价与最低价之间的差值
 		addRuleToList(new  MaxPrice_MinPrice_Distance_Rule_30(),true);
+		
+		
+		//31.
+		// 最低价格与最高价格的间隔天数 
+		addRuleToList(new  MinMaxPriceDateStr_ForYear_Distance_Rule_31(),true);	
+		
+		//32.
+		// 最低价格与现在日期的间隔天数
+		addRuleToList(new  MinPriceDateStr_NowDate_ForYear_Distance_Rule_32(),true);	
+
+		//33.
+		// 最高价格与现在日期的间隔天数
+		addRuleToList(new  MaxPriceDateStr_NowDate_ForYear_Distance_Rule_33(),true);	
+		
+		
 		
 		
 		/*
@@ -589,6 +641,243 @@ public class J0_GuPiao_Analysis {
 	}
 	
 	
+	
+	// 最高价格与现在日期的间隔天数
+	class MaxPriceDateStr_NowDate_ForYear_Distance_Rule_33 extends  Basic_Rule{
+		
+
+
+		MaxPriceDateStr_NowDate_ForYear_Distance_Rule_33(){
+			super("#", 33, 4); //
+		}
+		
+		
+		@Override
+		String ShouPanJia_SheetCell_Operation(String tscode, J0_GuPiao_Analysis.StockHeadData headData,
+				ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> mRiXianList) {
+			// TODO Auto-generated method stub
+	
+			String maxDayStr = headData.max_price_datestr;
+            String todayStr = getTimeStamp_yyyyMMdd();
+			
+			if(maxDayStr == null || todayStr == null) {
+				return null;
+			}
+			
+			// 
+			if(maxDayStr.trim().length() != 8 || todayStr.trim().length() != 8) {
+				return null;
+			}
+			String timeA = maxDayStr.trim();
+			String timeB = todayStr.trim();
+			
+			long dayDistance = getTimeDistanceLong(timeA, timeB);
+			
+			// 时间上先的比值 比上 时间上 后的比值
+			return dayDistance+"";
+		}
+		
+		
+
+		@Override
+		String getXlsxDynamicHeader(String sheetName) {
+			// TODO Auto-generated method stub
+			switch (sheetName) {
+			case "收盘价":
+
+					   return "最高价与今日("+getTimeStamp_MMdd()+")间隔"+"_"+rule_index;	
+		
+	
+			
+//			case "涨跌值":
+//				   return "近"+preday_count+"天涨跌值"+"均比"+"_"+rule_index;
+//			case "涨跌比":
+//				   return "近"+preday_count+"天涨跌幅"+"均比"+"_"+rule_index;
+//			case "成交额":
+//				   return "近"+preday_count+"天成交额"+"均比"+"_"+rule_index;
+				
+			default:
+				break;
+			}
+			return null;
+		}
+		
+		@Override
+		String simpleDesc() {
+
+			return "\n"  +  Cur_Bat_Name + " #_" + rule_index+"    ###   今年最高价与今日("+getTimeStamp_MMdd()+")间隔" ;
+			
+		}
+		
+		
+	}
+	
+	
+	
+	
+	// 最低价格与现在日期的间隔天数
+	class MinPriceDateStr_NowDate_ForYear_Distance_Rule_32 extends  Basic_Rule{
+		
+
+
+		MinPriceDateStr_NowDate_ForYear_Distance_Rule_32(){
+			super("#", 32, 4); //
+		}
+		
+		
+		@Override
+		String ShouPanJia_SheetCell_Operation(String tscode, J0_GuPiao_Analysis.StockHeadData headData,
+				ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> mRiXianList) {
+			// TODO Auto-generated method stub
+	
+			String minDayStr = headData.min_price_datestr;
+            String todayStr = getTimeStamp_yyyyMMdd();
+			
+			if(minDayStr == null || todayStr == null) {
+				return null;
+			}
+			
+			// 
+			if(minDayStr.trim().length() != 8 || todayStr.trim().length() != 8) {
+				return null;
+			}
+			String timeA = minDayStr.trim();
+			String timeB = todayStr.trim();
+			
+			long dayDistance = getTimeDistanceLong(timeA, timeB);
+			
+			// 时间上先的比值 比上 时间上 后的比值
+			return dayDistance+"";
+		}
+		
+		
+
+		@Override
+		String getXlsxDynamicHeader(String sheetName) {
+			// TODO Auto-generated method stub
+			switch (sheetName) {
+			case "收盘价":
+
+					   return "最低价与今日("+getTimeStamp_MMdd()+")间隔"+"_"+rule_index;	
+		
+	
+			
+//			case "涨跌值":
+//				   return "近"+preday_count+"天涨跌值"+"均比"+"_"+rule_index;
+//			case "涨跌比":
+//				   return "近"+preday_count+"天涨跌幅"+"均比"+"_"+rule_index;
+//			case "成交额":
+//				   return "近"+preday_count+"天成交额"+"均比"+"_"+rule_index;
+				
+			default:
+				break;
+			}
+			return null;
+		}
+		
+		@Override
+		String simpleDesc() {
+
+			return "\n"  +  Cur_Bat_Name + " #_" + rule_index+"    ###   今年最低价与今日("+getTimeStamp_MMdd()+")间隔" ;
+			
+		}
+		
+		
+	}
+	
+	// 最高价与最低价之间的差值
+	class MinMaxPriceDateStr_ForYear_Distance_Rule_31 extends  Basic_Rule{
+		
+		
+
+		MinMaxPriceDateStr_ForYear_Distance_Rule_31(){
+			super("#", 31, 4); //
+		}
+		
+		
+		@Override
+		String ShouPanJia_SheetCell_Operation(String tscode, J0_GuPiao_Analysis.StockHeadData headData,
+				ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> mRiXianList) {
+			// TODO Auto-generated method stub
+	
+			String minDayStr = headData.min_price_datestr;
+			String maxDayStr = headData.max_price_datestr;
+			
+			if(minDayStr == null || maxDayStr == null) {
+				return null;
+			}
+			
+			// 
+			if(minDayStr.trim().length() != 8 || maxDayStr.trim().length() != 8) {
+				return null;
+			}
+			String timeA = minDayStr.trim();
+			String timeB = maxDayStr.trim();
+			
+			long dayDistance = getTimeDistanceLong(timeA, timeB);
+			
+			// 时间上先的比值 比上 时间上 后的比值
+			return dayDistance+"";
+		}
+		
+		
+
+		@Override
+		String getXlsxDynamicHeader(String sheetName) {
+			// TODO Auto-generated method stub
+			switch (sheetName) {
+			case "收盘价":
+
+					   return "最高低价天数间隔"+"_"+rule_index;	
+		
+	
+			
+//			case "涨跌值":
+//				   return "近"+preday_count+"天涨跌值"+"均比"+"_"+rule_index;
+//			case "涨跌比":
+//				   return "近"+preday_count+"天涨跌幅"+"均比"+"_"+rule_index;
+//			case "成交额":
+//				   return "近"+preday_count+"天成交额"+"均比"+"_"+rule_index;
+				
+			default:
+				break;
+			}
+			return null;
+		}
+		
+		@Override
+		String simpleDesc() {
+			
+			return "\n"  +  Cur_Bat_Name + " #_" + rule_index+"    ###   今年最高价与最低价相隔的天数" ;
+			
+		}
+		
+		
+	}
+	
+	
+    public static long getTimeDistanceLong(String srcTime,String dstTime)  {
+   	 
+        SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd");
+        long NTime  = 0 ;
+        long OTime = 0 ;
+        long diff = 0 ;
+		try {
+			NTime = df.parse(srcTime).getTime();
+	        //从对象中拿到时间
+	         OTime = df.parse(dstTime).getTime();
+	         diff=(NTime-OTime);
+//				System.out.println("  NTime="+NTime+"   OTime="+OTime +"  diff="+ diff);
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			System.out.println("Exception  NTime="+NTime+"   OTime="+OTime);
+			e.printStackTrace();
+		}
+	 long days = diff / (1000 * 60 * 60 * 24); 
+
+        return   Math.abs(days);
+    }
+    
 	
 	// 最高价与最低价之间的差值
 	class MaxPrice_MinPrice_Distance_Rule_30 extends  Basic_Rule{
@@ -974,8 +1263,8 @@ public class J0_GuPiao_Analysis {
 					}
 				}
 				
-				System.out.println("B_headData.max_price_datestr = "+ headData.max_price_datestr +" isMax="+isMax+"  ruleIndex="+rule_index+" tscode="+ tscode);
-				System.out.println("B_headData.max_price_inyear = "+ headData.max_price_inyear +" isMax="+isMax+"  ruleIndex="+rule_index+" tscode="+ tscode);
+//				System.out.println("B_headData.max_price_datestr = "+ headData.max_price_datestr +" isMax="+isMax+"  ruleIndex="+rule_index+" tscode="+ tscode);
+//				System.out.println("B_headData.max_price_inyear = "+ headData.max_price_inyear +" isMax="+isMax+"  ruleIndex="+rule_index+" tscode="+ tscode);
 
 				if(curValue != 0) {
 					
@@ -985,8 +1274,8 @@ public class J0_GuPiao_Analysis {
 					
 				
 					
-					System.out.println("A headData.max_price_datestr = "+ headData.max_price_datestr +" isMax="+isMax+"  ruleIndex="+rule_index+" tscode="+ tscode);
-					System.out.println("A headData.max_price_inyear = "+ headData.max_price_inyear +" isMax="+isMax+"  ruleIndex="+rule_index+" tscode="+ tscode);
+//					System.out.println("A headData.max_price_datestr = "+ headData.max_price_datestr +" isMax="+isMax+"  ruleIndex="+rule_index+" tscode="+ tscode);
+//					System.out.println("A headData.max_price_inyear = "+ headData.max_price_inyear +" isMax="+isMax+"  ruleIndex="+rule_index+" tscode="+ tscode);
 
 					return dateStr;
 				}
@@ -1008,8 +1297,8 @@ public class J0_GuPiao_Analysis {
 				}
 				
 				
-				System.out.println("C_headData.min_price_datestr = "+ headData.min_price_datestr +" isMax="+isMax+"  ruleIndex="+rule_index+" tscode="+ tscode);
-				System.out.println("C_headData.min_price_inyear = "+ headData.min_price_inyear +" isMax="+isMax+"  ruleIndex="+rule_index+" tscode="+ tscode);
+//				System.out.println("C_headData.min_price_datestr = "+ headData.min_price_datestr +" isMax="+isMax+"  ruleIndex="+rule_index+" tscode="+ tscode);
+//				System.out.println("C_headData.min_price_inyear = "+ headData.min_price_inyear +" isMax="+isMax+"  ruleIndex="+rule_index+" tscode="+ tscode);
 
 				
 				if(curValue != 0) {
@@ -1019,8 +1308,8 @@ public class J0_GuPiao_Analysis {
 					headData.min_price_datestr = dateStr;
 					headData.min_price_inyear = curValue;
 					
-					System.out.println("D_headData.min_price_datestr = "+ headData.min_price_datestr +" isMax="+isMax+"  ruleIndex="+rule_index+" tscode="+ tscode);
-					System.out.println("D_headData.min_price_inyear = "+ headData.min_price_inyear +" isMax="+isMax+"  ruleIndex="+rule_index+" tscode="+ tscode);
+//					System.out.println("D_headData.min_price_datestr = "+ headData.min_price_datestr +" isMax="+isMax+"  ruleIndex="+rule_index+" tscode="+ tscode);
+//					System.out.println("D_headData.min_price_inyear = "+ headData.min_price_inyear +" isMax="+isMax+"  ruleIndex="+rule_index+" tscode="+ tscode);
 
 					
 					
@@ -3541,6 +3830,8 @@ void 	addRuleToList(Rule rule , boolean isShowInXlsxHead){
 	  realTypeRuleList.add(rule);	
 	  rule.isShowHeaderInXlsx = isShowInXlsxHead;
 	  rule.dynamicIndexInList = realTypeRuleList.size();
+	  // 动态 修改 rule_index 
+	  rule.rule_index = realTypeRuleList.size(); 
 
 	
 	}
@@ -4269,15 +4560,56 @@ static DecimalFormat priceRateFormat  ;
 
 	            Sheet mSheet = workbook.createSheet(curShhetName);// 建建sheet对象（excel的表单）
 	            
+	            // 冻结 前 6列  前1行  
+	            mSheet.createFreezePane(6, 1, 6, 1);
+	            
 	            // 设置单元格字体
 	            Font headerFont = workbook.createFont(); // 字体
 	            headerFont.setFontHeightInPoints((short)14);
 	            headerFont.setFontName("黑体");
 	            
 	     
-	            Row row = mSheet.createRow(0);
+	            Row mHeadRow = mSheet.createRow(0);
+	        
 	            
+	   
 	      
+	             // 尼玛   这样操作  报错 都可以?   fuck 
+	            CellStyle headRowStyle_tscode_1=workbook.createCellStyle();
+	            headRowStyle_tscode_1.setFillForegroundColor(IndexedColors.BRIGHT_GREEN.getIndex());
+	            headRowStyle_tscode_1.setFillPattern(CellStyle.SOLID_FOREGROUND);
+	            headRowStyle_tscode_1.setAlignment(CellStyle.ALIGN_CENTER); // 水平布局：居中
+                headRowStyle_tscode_1.setVerticalAlignment(CellStyle.VERTICAL_CENTER);
+	            
+	       
+	            CellStyle headRowStyle_todaydata_2=workbook.createCellStyle();
+	            headRowStyle_todaydata_2.setFillForegroundColor(IndexedColors.BRIGHT_GREEN.getIndex());
+	            headRowStyle_todaydata_2.setFillPattern(CellStyle.SOLID_FOREGROUND);
+	            headRowStyle_todaydata_2.setAlignment(CellStyle.ALIGN_CENTER); // 水平布局：居中
+                headRowStyle_todaydata_2.setVerticalAlignment(CellStyle.VERTICAL_CENTER);
+	  
+	            
+	            CellStyle headRowStyle_dynamicRule_3=workbook.createCellStyle();
+	            headRowStyle_dynamicRule_3.setFillForegroundColor(IndexedColors.LIGHT_TURQUOISE.getIndex());
+	            headRowStyle_dynamicRule_3.setFillPattern(CellStyle.SOLID_FOREGROUND);
+	            headRowStyle_dynamicRule_3.setAlignment(CellStyle.ALIGN_CENTER); // 水平布局：居中
+                headRowStyle_dynamicRule_3.setVerticalAlignment(CellStyle.VERTICAL_CENTER);
+	  
+	  
+	            CellStyle headRowStyle_monthday_4=workbook.createCellStyle();
+	            headRowStyle_monthday_4.setFillForegroundColor(IndexedColors.BRIGHT_GREEN.getIndex());
+	            headRowStyle_monthday_4.setFillPattern(CellStyle.SOLID_FOREGROUND);
+	            headRowStyle_monthday_4.setAlignment(CellStyle.ALIGN_CENTER); // 水平布局：居中
+                headRowStyle_monthday_4.setVerticalAlignment(CellStyle.VERTICAL_CENTER); 
+	            
+//	            隐藏行
+//	            CellReference cellReference = new CellReference(name.getRefersToFormula());
+//	            int rowNo = cellReference.getRow();
+//	            org.apache.poi.ss.usermodel.Row row = sheet.getRow(rowNo);
+//	            row.setZeroHeight(true);
+//
+//	            隐藏列可直接调用sheet.setColumnHidden
+	            
 	            //--------------------------head_row_Begin--------------------------
 	            int rowIndex = 0 ;
 	            
@@ -4287,18 +4619,39 @@ static DecimalFormat priceRateFormat  ;
 	            for (int j = 0; j < SheetHead_Part_1.length; j++) {
 	            	// cname【0】  ts_code【1】 
 	            	headName_ColumnNum_Map.put(SheetHead_Part_1[j], rowIndex);
-	                row.createCell(rowIndex++).setCellValue(SheetHead_Part_1[j]);
+	                mSheet.autoSizeColumn(rowIndex); 
+					int width_column = mSheet.getColumnWidth(rowIndex) * 7/5;
+                    mSheet.setColumnWidth(rowIndex,width_column);
+	             	Cell tscodeNameHeadCell =  mHeadRow.createCell(rowIndex++);
+	             	tscodeNameHeadCell.setCellStyle(headRowStyle_tscode_1);
+	             	tscodeNameHeadCell.setCellValue(SheetHead_Part_1[j]);
+
+	
+	            	
 				}
 	            
 	 
 	        	//  当前股价
 	            // {"1122收盘价","1122涨跌比","1122涨跌值","1122成交额"}; 
+	            //  把 匹配到的 sheetName 对应的列放到最后 使得好匹配
+
+                 // curSheetName_English  	{"close","pct_chg","change","amount"};
+	            //   如果 close 是匹配到的 那么   MainStock_SheetChineseNameArr 需要最后是 close
+	            String[] MainStock_SheetChineseNameArr_FixEnd = calculChineseNameArr(curSheetName_English);
 	            
-	            for (int j = 0; j < MainStock_SheetChineseNameArr.length; j++) {
-	            	String headItem = MainStock_SheetChineseNameArr[j];
+	            for (int j = 0; j < MainStock_SheetChineseNameArr_FixEnd.length; j++) {
+	            	String headItem = MainStock_SheetChineseNameArr_FixEnd[j];
 	            	String endTradeDayHeadStr = endTradeMMDD + headItem;
+	            	
 	            	headName_ColumnNum_Map.put(endTradeDayHeadStr, rowIndex);
-	                row.createCell(rowIndex++).setCellValue(endTradeDayHeadStr);
+					mSheet.autoSizeColumn(rowIndex); 
+					int width_column = mSheet.getColumnWidth(rowIndex) * 7/5;
+                    mSheet.setColumnWidth(rowIndex,width_column);
+						
+	             	Cell mTodayDateCell =   mHeadRow.createCell(rowIndex++);
+	             	mTodayDateCell.setCellStyle(headRowStyle_todaydata_2);
+	             	mTodayDateCell.setCellValue(endTradeDayHeadStr);
+	
 	            }
 	            
 	            
@@ -4312,7 +4665,13 @@ static DecimalFormat priceRateFormat  ;
 					if(realTypeRuleList.get(j).isShowHeaderInXlsx && columnName != null && !"".equals(columnName)) {
 			        	// dynamicProp【3】   ......  dynamicProp【8】
 					 	headName_ColumnNum_Map.put(columnName, rowIndex);
-					    row.createCell(rowIndex++).setCellValue(columnName);
+						mSheet.autoSizeColumn(rowIndex); 
+						int width_column = mSheet.getColumnWidth(rowIndex) * 7/3;
+                        mSheet.setColumnWidth(rowIndex,width_column);
+		  
+					   	Cell mRuleCell = 	mHeadRow.createCell(rowIndex++);
+					   	mRuleCell.setCellValue(columnName);
+					   	mRuleCell.setCellStyle(headRowStyle_dynamicRule_3);
 					}
 		
 				}
@@ -4322,15 +4681,30 @@ static DecimalFormat priceRateFormat  ;
 					String monthday = (""+dayFalg).substring(4);
 					
 			
+					//          mSheet.setColumnHidden(i, );
+					
 					
 				   	// 1231【19】   ......  0101【42】
 				 	headName_ColumnNum_Map.put(monthday, rowIndex);
-				 	Cell matchCell =    row.createCell(rowIndex++);
+				 	// 判断 是否大于 今天  如果大于今天 那么隐藏该行
+				 	String matchDayFalg = dayFalg+"";
+				 	int todayFlagInt = Integer.parseInt(getTimeStamp_yyyyMMdd());
+				 	if(dayFalg > todayFlagInt ) {   // 大于今天的 那些 日期列表 把它 隐藏掉 
+				 		  mSheet.setColumnHidden(rowIndex, true );
+				 	}
+				 	
+					mSheet.autoSizeColumn(rowIndex); 
+					int width_column = mSheet.getColumnWidth(rowIndex) * 7/4;
+                    mSheet.setColumnWidth(rowIndex,width_column);
+					
+				 	Cell matchCell =    mHeadRow.createCell(rowIndex++);
 				 	matchCell.setCellValue(monthday);
-		            
-	            
+				 	matchCell.setCellStyle(null);
+				 	matchCell.setCellStyle(headRowStyle_monthday_4);
 				}
-	            
+
+	   
+	      
 	            //--------------------------head_row_END--------------------------
 	            int columnIndex = 1 ;
 	   
@@ -4457,7 +4831,7 @@ static DecimalFormat priceRateFormat  ;
 			
 									if(headEnglishItem.equals("close")) {
 										double close = mRiXianHangQing.close;
-										
+//										System.out.println("endTradeDayHeadStr = "+ endTradeDayHeadStr +"   headName_ColumnNum_Map.get(endTradeDayHeadStr)="+ headName_ColumnNum_Map.get(endTradeDayHeadStr) );
 										rowNext.createCell(headName_ColumnNum_Map.get(endTradeDayHeadStr)).setCellValue(close);
 										
 									}	else	if(headEnglishItem.equals("change")) {
@@ -6614,6 +6988,24 @@ for (int i = 0; i < columnHeadArr.size(); i++) {
 		return date;
 	}
 
+	
+	static String getTimeStamp_MMdd() {
+
+		SimpleDateFormat df = new SimpleDateFormat("MMdd");// 设置日期格式
+		String date = df.format(new Date());
+		return date;
+	}
+
+	
+	static String getTimeStamp_yyyyMMdd() {
+
+		SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd");// 设置日期格式
+		String date = df.format(new Date());
+		return date;
+	}
+
+	
+	
 	static String getTimeStamp_YYYY_MM() {
 
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM");// 设置日期格式
