@@ -351,12 +351,481 @@ public class G2_ApplyRuleFor_TypeFile {
 		
 		realTypeRuleList.add(new Jpg_Stock_Port_To_MD_Rule_45());
 		
+		// 在 jpg 图片 本身 标记 一些 这个图片本身的一些属性
+		realTypeRuleList.add(new ShowJpgTagContent_To_Image_Rule_46());
+
 	}
 
-	
+
 	
 // 3038年 5 月 3 日
 
+	class ShowJpgTagContent_To_Image_Rule_46 extends Basic_Rule {
+		
+	
+		File outJpgFile ; //   当前目录的产出目录
+		boolean is_jpgharddir ;   // 目录是否 固定
+
+boolean is_model_show         ;
+boolean is_manufacturer_show  ;
+boolean is_artist_show        ;
+boolean is_copyright_show     ;
+boolean is_description_show   ;
+boolean is_comment_show       ;
+
+		
+		ShowJpgTagContent_To_Image_Rule_46() {
+			super("#", 46, 4);
+			 is_model_show         = false ;
+			 is_manufacturer_show  = false ;
+			 is_artist_show        = false ;
+			 is_copyright_show     = false ;
+			 is_description_show   = false ;
+			 is_comment_show       = false ; 
+			 is_jpgharddir =  false;
+		}
+
+		
+		@Override
+		boolean initParamsWithInputList(ArrayList<String> inputParamList) {
+			// mdname_true // kaoyan_true gaokao_true
+
+			for (int i = 0; i < inputParamList.size(); i++) {
+				String paramItem = inputParamList.get(i);
+				String paramItem_lower_trim = paramItem.toLowerCase().trim();
+
+				if ("model_show".equals(paramItem_lower_trim)) {
+					is_model_show = true;
+				}
+
+				if ("manufacturer_show".equals(paramItem_lower_trim)) {
+					is_manufacturer_show = true;
+				}
+				
+				if ("artist_show".equals(paramItem_lower_trim)) {
+					is_artist_show = true;
+				}
+				
+				if ("copyright_show".equals(paramItem_lower_trim)) {
+					is_copyright_show = true;
+				}
+				
+				
+				if ("description_show".equals(paramItem_lower_trim)) {
+					is_description_show = true;
+				}
+				
+				if ("comment_show".equals(paramItem_lower_trim)) {
+					is_comment_show = true;
+				}
+				
+				
+				if ("harddir_true".equals(paramItem_lower_trim)) {
+					is_jpgharddir = true;
+				}
+				
+				
+				
+
+			}
+			
+	
+			System.out.println("is_model_show="+is_model_show+"  is_manufacturer_show="+is_manufacturer_show
+					+" is_artist_show ="+ is_artist_show +"  is_copyright_show="+is_copyright_show+" is_description_show="+is_description_show
+					+" is_comment_show="+is_comment_show);
+	
+			
+			// 只要有一个是 true 才能执行
+if(is_comment_show  || is_manufacturer_show || is_artist_show || is_copyright_show 
+		|| is_description_show || is_comment_show  ) {
+	
+	System.out.println("将执行程序生成 携带JPG属性显示在图片中的图片集合  ");
+	
+	
+}else {
+	
+	System.out.println(" 输入参数列表必须要有一个参数才能执行 否则没有意义 ");
+	return false;
+	
+}
+
+
+if(is_jpgharddir) {
+	outJpgFile =  new File(curDirFile.getAbsolutePath()+File.separator+"jpg_tag_dir");
+	
+}else {
+	outJpgFile =  new File(curDirFile.getAbsolutePath()+File.separator+"jpg_tag_"+getTimeStamp());
+
+	
+}
+
+
+
+
+			
+			// TODO Auto-generated method stub
+			return super.initParamsWithInputList(inputParamList);
+		}
+		
+		
+		@Override
+		String simpleDesc() {
+
+			return Cur_Bat_Name + " #_"+rule_index+"    // 把当前的 jpg 和 png 文件转为一个 PDF文件  (不操作 孙文件 孙文件夹 )  \n" 
+			+ Cur_Bat_Name + "  #_"+rule_index+"  model_show  ### 把当前的 jpg 和 png  并在图片显示 model属性  放到 jpg_tag_timestamp目录   \n"
+			+ Cur_Bat_Name + 	 "  #_"+rule_index+"  manufacturer_show  ### 把当前的 jpg 和 png   放到 jpg_tag_timestamp目录   \n"
+			+ Cur_Bat_Name + 	 "  #_"+rule_index+"  artist_show  ### 把当前的 jpg 和 png  放到 jpg_tag_timestamp目录   \n"
+			+ Cur_Bat_Name + 	 "  #_"+rule_index+"  copyright_show  ### 把当前的 jpg 和 png   放到 jpg_tag_timestamp目录   \n"
+			+ Cur_Bat_Name + 	 "  #_"+rule_index+"  description_show  ### 把当前的 jpg 和 png  放到 jpg_tag_timestamp目录  \n"
+			+ Cur_Bat_Name + 	 "  #_"+rule_index+"  comment_show  ### 把当前的 jpg 和 png   放到 jpg_tag_timestamp目录   \n"
+			+ Cur_Bat_Name + 	 "  #_"+rule_index+"  copyright_show  harddir_true  ### 把当前的 jpg 和 png   放到 固定的 jpg_tag_dir目录 方便批处理   \n"
+             + Cur_Bat_Name + 	 "  #_"+rule_index+"  copyright_show  harddir_true && cd ./jpg_tag_dir && "+ Cur_Bat_Name+" #_32 " +"  #### 对 jpg_yan_land 把 md写入图片并生成 pdf文件"
+             		+ ""
+//			zrule_apply_G2.bat  #_46  copyright_show  harddir_true 
+					;
+		}
+
+		
+		
+		@Override
+		ArrayList<File> applySubFileListRule4(ArrayList<File> curFileList,
+				HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList,
+				ArrayList<File> curRealFileList) {
+// TODO Auto-generated method stub
+		ArrayList<File> 	jpgFileList = getAllSubFile(curDirFile, ".jpg");
+
+			if (jpgFileList.size() == 0) {
+				System.out.println(" 当前目录 curDirFile=[" + curDirFile.getAbsolutePath() + "] 内没有 jpg文件!!  请检查后再次执行!! ");
+				return null;
+			}
+
+			for (int i = 0; i < jpgFileList.size(); i++) {
+//		Jpg_Exif
+				File jpgFile = jpgFileList.get(i);
+				String jpgName = jpgFile.getName();
+				JPGExifInfo mStockExifJpg = new JPGExifInfo(jpgFile);
+				StringBuilder rawLineSB = new StringBuilder();
+				if(is_model_show) {
+					if(mStockExifJpg.mImageModel_Utf8 != null) {
+						rawLineSB.append("model:"+mStockExifJpg.mImageModel_Utf8+"\n");
+					}
+				
+				}
+				
+				
+				if(is_manufacturer_show) {
+					if(mStockExifJpg.mImageMake_Utf8 != null) {
+						rawLineSB.append("manufacturer:"+mStockExifJpg.mImageMake_Utf8+"\n");
+					}
+				
+				}
+				
+				
+				
+				if(is_artist_show) {
+					if(mStockExifJpg.mImageArtist_Utf8 != null) {
+						rawLineSB.append("artist:"+mStockExifJpg.mImageArtist_Utf8+"\n");
+					}
+				
+				}
+				
+				
+				if(is_copyright_show) {
+					if(mStockExifJpg.mImageCopyright_Utf8 != null) {
+						rawLineSB.append("copyright:"+mStockExifJpg.mImageCopyright_Utf8+"\n");
+					}
+				
+				}
+				
+				if(is_description_show) {
+					if(mStockExifJpg.mImageDescription_Utf8 != null) {
+						rawLineSB.append("description:"+mStockExifJpg.mImageDescription_Utf8+"\n");
+					}
+				
+				}
+				
+				
+				if(is_comment_show) {
+					if(mStockExifJpg.mPhotoUserComment_Utf8 != null) {
+						rawLineSB.append("comment:"+mStockExifJpg.mPhotoUserComment_Utf8+"\n");
+					}
+				
+				}
+				
+			
+				File srcJpgFile = jpgFile;
+				File targetJpg = new File(outJpgFile.getAbsolutePath()+File.separator+jpgName);
+				String drawLine = rawLineSB.toString();
+				
+				System.out.println("File["+i+"] srcJpgFile="+srcJpgFile.getAbsolutePath()+"  targetJpg="+targetJpg.getAbsolutePath()+" drawLine="+drawLine);
+				drawTagJpg(srcJpgFile,targetJpg,drawLine);
+		
+			}
+			
+			return super.applySubFileListRule4(curFileList, subFileTypeMap, curDirList, curRealFileList);
+			
+		}
+		
+		
+		
+ 		void drawTagJpg(File srcJpgFile , File dstJpgFile , String drawText) {
+
+ 			
+ 			if(!dstJpgFile.getParentFile().exists()) {
+ 				dstJpgFile.getParentFile().mkdirs();
+ 			}
+ 			
+ 			fileCopy(srcJpgFile, dstJpgFile);
+			File mCurFile = srcJpgFile ;
+	
+			ImageIcon imageIcon = new ImageIcon(dstJpgFile.getAbsolutePath());
+
+			BufferedImage bi = getBufferedImage(dstJpgFile);
+			int heigh = bi.getHeight();
+			int width = bi.getWidth();
+			int jpg_width =  width;
+			int jpg_hight =  heigh;
+			
+
+//				BufferedImage bi = new BufferedImage(width, heigh, BufferedImage.TYPE_INT_RGB);// INT精确度达到一定,RGB三原色，高度70,宽度150
+				// 得到它的绘制环境(这张图片的笔)
+				Graphics2D g2 = (Graphics2D) bi.getGraphics();
+//				g2.fillRect(0, 0, jpg_width, jpg_width);// 填充一个矩形 左上角坐标(0,0),宽500,高500;填充整张图片
+				g2.setColor(new Color(0, 0, 0));// 设置颜色
+//				g2.fillRect(0, 0, width, heigh);// 填充整张图片(其实就是设置背景颜色)
+				int frontSize = 16;
+				int centerx = jpg_width / 2;
+				int centery = jpg_hight / 2;
+				
+				
+				int centery_20 = jpg_hight / 20;
+				int centerx_20 = (jpg_width / 20) * 19;
+				
+
+				Font f = new Font("宋体", Font.BOLD, frontSize);
+				g2.setFont(f); // 设置字体:字体、字号、大小
+				FontRenderContext context = g2.getFontRenderContext();
+				Rectangle2D bounds = f.getStringBounds(drawText + "", context);
+				
+				g2.drawString(drawText + "", (float) (jpg_width-2*bounds.getCenterX() - 30 ),	(float) ( jpg_hight - 2*bounds.getCenterY() - 30)); // 向图片上写字符串
+		
+				
+//				g2.drawString(drawText + "", (float) (centerx - bounds.getCenterX()),	(float) (centery - bounds.getCenterY())); // 向图片上写字符串
+				
+				try {
+//					dstJpgFile.createNewFile();
+					ImageIO.write(bi, "jpg", new FileOutputStream(dstJpgFile));// 保存图片 JPEG表示保存格式
+					System.out.println("创建文件[" + dstJpgFile.getName() + "]  = " + dstJpgFile.getAbsolutePath() + "成功");
+				} catch (Exception e) {
+					System.out.println("复制图片格式出现异常！");
+				}
+
+	
+		
+
+		}
+ 		
+		public BufferedImage getBufferedImage(File file) {
+			Image img = null;
+			try {
+				img = ImageIO.read(file); // 构造Image对象
+			} catch (Exception e) {
+				System.out.println(e);
+				return null;
+			}
+
+			int width = img.getWidth(null); // 得到源图宽
+			int height = img.getHeight(null); // 得到源图长
+
+//    return resizeFix(400, 492);
+			return resize(img, width, height);
+		}
+ 		
+		
+		public BufferedImage resize(Image mImage, int w, int h) {
+			// SCALE_SMOOTH 的缩略算法 生成缩略图片的平滑度的 优先级比速度高 生成的图片质量比较好 但速度慢
+			BufferedImage image = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
+			Graphics g = image.getGraphics();
+			try {
+				g.drawImage(mImage, 0, 0, w, h, null); // 绘制缩小后的图
+			} finally {
+				if (g != null) {
+					g.dispose();
+				}
+			}
+			return image;
+			// File destFile = new File("C:\\temp\\456.jpg");
+			// FileOutputStream out = new FileOutputStream(destFile); // 输出到文件流
+			// // 可以正常实现bmp、png、gif转jpg
+			// JPEGImageEncoder encoder = JPEGCodec.createJPEGEncoder(out);
+			// encoder.encode(image); // JPEG编码
+			// out.close();
+		}
+
+	}
+	
+	
+	class JPGExifInfo{
+		File rawFile ; 
+		
+		public	String mImageModel_Utf8;  // 股票名称
+		public	String mImageMake_Utf8;  // ts代码
+		public	String mImageArtist_Utf8;  // 股票名称
+		public	String mImageCopyright_Utf8;  // ts代码
+		public	String mImageDescription_Utf8;  // 股票名称
+		public	String mPhotoUserComment_Utf8;  // ts代码
+		
+		
+		JPGExifInfo(File mFile){
+			rawFile = mFile;
+			initTagProp(rawFile);
+		}
+		
+		void initTagProp(File jpgFile) {
+			String fileName = jpgFile.getAbsolutePath().toLowerCase().trim();
+			if(!fileName.endsWith(".jpg")) {
+				return;
+			}
+			initExifInfo(jpgFile);
+			
+			System.out.println("mImageModel_Utf8="+mImageModel_Utf8+"  mImageMake_Utf8="+mImageMake_Utf8+"  mImageArtist_Utf8="+mImageArtist_Utf8
+					+"  mImageCopyright_Utf8="+mImageCopyright_Utf8+"  mImageDescription_Utf8="+mImageDescription_Utf8+" mPhotoUserComment_Utf8="+mPhotoUserComment_Utf8);
+		
+			
+		}
+		
+		
+		
+		void initExifInfo(File file) {
+
+			 mImageDescription_Utf8 = null;
+			 mImageMake_Utf8 = null;
+			 mImageModel_Utf8 = null;
+			 mImageArtist_Utf8 = null;
+			 mImageCopyright_Utf8 = null;
+			 mPhotoUserComment_Utf8 = null;
+			 
+			int angel = 0;
+			Metadata metadata;
+
+			try {
+				metadata = JpegMetadataReader.readMetadata(file);
+				metadata.getDirectories();
+
+				// zukgit_directory [Exif IFD0] - Orientation = Right side, top (Rotate 90 CW)
+				for (Directory directory : metadata.getDirectories()) {
+					for (Tag tag : directory.getTags()) {
+						// 格式化输出[directory.getName()] - tag.getTagName() = tag.getDescription()
+//						System.out.format("zukgit_directory  [%s] - %s = %s\n", directory.getName(), tag.getTagName(),tag.getDescription());
+
+						if ("Exif IFD0".equals(directory.getName())) {
+
+							String mImageDescription = directory.getString(ExifIFD0Directory.TAG_IMAGE_DESCRIPTION);
+							if (mImageDescription != null)
+								mImageDescription_Utf8 = new String(mImageDescription.getBytes(), "UTF-8");
+
+							String mImageMake = directory.getString(ExifIFD0Directory.TAG_MAKE);
+							if (mImageMake != null)
+								mImageMake_Utf8 = new String(mImageMake.getBytes(), "UTF-8");
+
+							String mImageModel = directory.getString(ExifIFD0Directory.TAG_MODEL);
+							if (mImageModel != null)
+								mImageModel_Utf8 = new String(mImageModel.getBytes(), "UTF-8");
+
+							String mImageArtist = directory.getString(ExifIFD0Directory.TAG_ARTIST);
+							if (mImageArtist != null)
+								mImageArtist_Utf8 = new String(mImageArtist.getBytes(), "UTF-8");
+
+							String mImageCopyright = directory.getString(ExifIFD0Directory.TAG_COPYRIGHT);
+							if (mImageCopyright != null)
+								mImageCopyright_Utf8 = new String(mImageCopyright.getBytes(), "UTF-8");
+
+//							System.out.println("XXmImageDescription=["+mImageDescription+"]  Utf8["+mImageDescription_Utf8+"]");
+//							System.out.println("XXmImageMake=["+mImageMake+"]  Utf8["+mImageMake_Utf8+"]");
+//							System.out.println("XXmImageModel=["+mImageModel+"]  Utf8["+mImageModel_Utf8+"]");
+//							System.out.println("XXmImageArtist=["+mImageArtist+"]  Utf8["+mImageArtist_Utf8+"]");
+//							System.out.println("XXmImageCopyright=["+mImageCopyright+"]  Utf8["+mImageCopyright_Utf8+"]");
+
+						}
+
+						if ("Exif SubIFD".equals(directory.getName())) {
+
+							if ("User Comment".equals(tag.getTagName())) {
+								String mPhotoUserComment = tag.getDescription();
+//						System.out.println("AZ_User_Comment=["+tag.getDescription()+"]");	
+								if (mPhotoUserComment != null)
+									mPhotoUserComment_Utf8 = new String(mPhotoUserComment.getBytes(), "utf-8");
+//						System.out.println("AZXXmPhotoUserComment=["+mPhotoUserComment+"]   mPhotoUserComment_Utf8=["+mPhotoUserComment_Utf8+"]" );	
+
+							}
+
+						}
+					}
+
+				}
+
+			} catch (JpegProcessingException e) {
+				e.printStackTrace();
+				System.out.println("JpegProcessingException  异常事件发生 ");
+			} catch (IOException e) {
+				System.out.println("IOException  异常事件发生 ");
+				e.printStackTrace();
+			}
+
+//			String mImageArtist_CategoryStr= null;
+//			String mImageCopyright_VideoMD = null;
+//		    String mImageDescription_SelfDesc = null;
+//		     
+//		     
+//		String mImageMake_Utf8 = null;     // 待定
+//		String mImageModel_Utf8 = null;     // 待定
+//		String mPhotoUserComment_Utf8 = null;   // 待定
+
+			if (mImageArtist_Utf8 != null) {
+			System.out.println(" mImageArtist_Utf8 = "+ mImageArtist_Utf8);
+
+			} else {
+				System.out.println("当前文件 [" + file.getName() + "] 没有读取到 mImageArtist_CategoryStr !! ");
+			}
+
+			if (mImageDescription_Utf8 != null) {
+				System.out.println(" mImageDescription_Utf8 = "+ mImageArtist_Utf8);
+
+			} else {
+				System.out.println("当前文件 [" + file.getName() + "] 没有读取到 mImageDescription_SelfDesc !! ");
+			}
+
+			if (mImageCopyright_Utf8 != null) {
+
+				System.out.println(" mImageCopyright_Utf8 = "+ mImageCopyright_Utf8);
+
+			} else {
+				System.out.println("当前文件 [" + file.getName() + "] 没有读取到 mImageCopyright_VideoMD !! ");
+			}
+
+			if (mImageMake_Utf8 != null) {
+				System.out.println(" mImageMake_Utf8 = "+ mImageMake_Utf8);
+			} else {
+				System.out.println("当前文件 [" + file.getName() + "] 没有读取到 mImageMake_Utf8 !! ");
+			}
+
+			if (mImageModel_Utf8 != null) {
+				System.out.println(" mImageModel_Utf8 = "+ mImageModel_Utf8);
+			} else {
+				System.out.println("当前文件 [" + file.getName() + "] 没有读取到 mImageModel_Utf8 !! ");
+			}
+
+			if (mPhotoUserComment_Utf8 != null) {
+				System.out.println(" mPhotoUserComment_Utf8 = "+ mPhotoUserComment_Utf8);
+			} else {
+				System.out.println("当前文件 [" + file.getName() + "] 没有读取到 mPhotoUserComment_Utf8 !! ");
+			}
+
+		}
+
+	
+	}
+	
 	
 	
 	class Jpg_Stock_Port_To_MD_Rule_45 extends Basic_Rule {
@@ -6447,17 +6916,21 @@ System.out.println("paramItem["+i+"] = "+paramItem_lower_trim);
 
 	class MakeJpg2PDF_Rule_32 extends Basic_Rule {
 
+
+
+		
 		MakeJpg2PDF_Rule_32() {
 			super("#", 32, 4);
+
 		}
 
 		@Override
 		String simpleDesc() {
 
-			return Cur_Bat_Name + " #_32    // 把当前的 jpg 和 png 文件转为一个 PDF文件  (不操作 孙文件 孙文件夹 )  \n" + Cur_Bat_Name
-					+ "  #_32   ### 把当前的 jpg 和 png 文件转为一个 PDF文件  \n"
+			return Cur_Bat_Name + " #_32    // 把当前的 jpg 和 png 文件转为一个 PDF文件  (不操作 孙文件 孙文件夹 )  \n"
+			+ Cur_Bat_Name + "  #_32   ### 把当前的 jpg 和 png 文件转为一个 PDF文件  \n"
 
-			;
+					;
 		}
 
 		@Override
@@ -6887,7 +7360,7 @@ System.out.println("paramItem["+i+"] = "+paramItem_lower_trim);
 				}
 				try {
 					mCurFile.createNewFile();
-					ImageIO.write(bi, type, new FileOutputStream(mCurFile));// 保存图片 JPEG表示保存格式
+					ImageIO.write(bi, "jpg", new FileOutputStream(mCurFile));// 保存图片 JPEG表示保存格式
 					System.out.println("创建文件[" + i + "]  = " + mCurFile.getAbsolutePath() + "成功");
 				} catch (Exception e) {
 					System.out.println("复制图片格式出现异常！");

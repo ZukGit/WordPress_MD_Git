@@ -902,7 +902,7 @@ rem ======================== SYSTEM_OPERATION Begin========================
 
 
 :getandroidreceivembwithin5s_func_0x1
-rem ======================================== isadminuser_func_0x1
+rem ======================================== getandroidreceivembwithin5s_func_0x1
 rem desc: 检测当前USB adb 连接的安卓设备整体的对应的 当前5秒钟 接收流量 接受到的数据量 单位为 MB 不区分应用
 rem sample: call :getandroidreceivembwithin5s_func_0x1
 rem sample_out: [getandroidreceivembwithin5s_func_0x1 ]   getandroidreceivembwithin5s_return_1=[0] getandroidreceivembwithin5s_return_1=[1]
@@ -915,28 +915,22 @@ adb shell cat /proc/net/dev | findstr wlan0 | awk '{print $2}' > dev_recv_1.txt
 ping -n 1 127.0.0.1>nul
 cat dev_recv_1.txt
 set /p dev_recv_num1=<dev_recv_1.txt
-
 rem 0开头会有错误 所以再添加一个1 
 set dev_recv_num1_end9=1!dev_recv_num1:~2!
 echo dev_recv_num1_end9=!dev_recv_num1_end9!  dev_recv_num1=!dev_recv_num1!
-
 ping -n 5 127.0.0.1>nul
 adb shell cat /proc/net/dev | findstr wlan0 | awk '{print $2}' > dev_recv_2.txt
 ping -n 1 127.0.0.1>nul
-
 cat dev_recv_2.txt
 set /p dev_recv_num2=<dev_recv_2.txt
 rem 0开头会有错误 所以再添加一个1 
 set dev_recv_num2_end9=1!dev_recv_num2:~2!
-
 set /a dev_recv_num1_end9_10bit=!dev_recv_num1_end9!
 set /a dev_recv_num2_end9_10bit=!dev_recv_num2_end9!
-
 echo dev_recv_num2_end9=!dev_recv_num2_end9!  dev_recv_num2=!dev_recv_num2!   dev_recv_num1_end9_10bit=!dev_recv_num1_end9_10bit!   dev_recv_num2_end9_10bit=!dev_recv_num2_end9_10bit!
 set /a dev_receive_distance_byte=!dev_recv_num2_end9_10bit!-!dev_recv_num1_end9_10bit!
 set /a dev_receive_MB=!dev_receive_distance_byte!/(1024*1024)
 echo  dev_recv_num1=!dev_recv_num1!  dev_recv_num2=!dev_recv_num2!_______ dev_recv_num1_end9=!dev_recv_num1_end9! dev_recv_num2_end9=!dev_recv_num2_end9!  dev_receive_distance_byte=!dev_receive_distance_byte! dev_receive_MB=!dev_receive_MB!
-
 if !dev_receive_MB! GEQ 1  (
 echo 当前有流量A  dev_receive_MB=!dev_receive_MB!
 set /a getandroidreceivembwithin5s_return_1=!dev_receive_MB!
@@ -948,16 +942,13 @@ rem 差距是负数 仍然说明 有流量 那么返回为1  意思意思
 set /a getandroidreceivembwithin5s_return_1=1
 ) else (
 echo 当前 没流量 没流量   dev_receive_MB=!dev_receive_MB!
-
 )
 del dev_recv_1.txt
 del dev_recv_2.txt
-
 echo [getandroidreceivembwithin5s_func_0x1 EndPrintCode] getandroidreceivembwithin5s_return_1=[!getandroidreceivembwithin5s_return_1!]   param1=[__empty__] 
 echo ______________Method_Out getandroidreceivembwithin5s_func_0x1
 ::ENDLOCAL
 goto:eof
-
 
 
 
@@ -976,7 +967,6 @@ adb shell ps | findstr !input_1_param! | awk '{print $2}' > tel_pid.txt
 ping -n 1 127.0.0.1>nul
 cat tel_pid.txt
 set /p tel_pid_num=<tel_pid.txt
-
 adb shell cat /proc/!tel_pid_num!/net/dev | findstr wlan0 | awk '{print $2}' > tel_recv_1.txt
 ping -n 1 127.0.0.1>nul
 cat tel_recv_1.txt
@@ -985,7 +975,6 @@ rem 0开头会有错误 所以再添加一个1
 set tel_recv_num1_end9=1!tel_recv_num1:~2!
 echo tel_recv_num1_end9=!tel_recv_num1_end9!  tel_recv_num1=!tel_recv_num1!
 echo  tel_pid_num=!tel_pid_num!  tel_recv_num1=!tel_recv_num1!
-
 ping -n 5 127.0.0.1>nul
 adb shell cat /proc/!tel_pid_num!/net/dev | findstr wlan0 | awk '{print $2}' > tel_recv_2.txt
 ping -n 1 127.0.0.1>nul
@@ -993,15 +982,12 @@ cat tel_recv_2.txt
 set /p tel_recv_num2=<tel_recv_2.txt
 rem 0开头会有错误 所以再添加一个1 
 set tel_recv_num2_end9=1!tel_recv_num2:~2!
-
 set /a tel_recv_num1_end9_10bit=!tel_recv_num1_end9!
 set /a tel_recv_num2_end9_10bit=!tel_recv_num2_end9!
-
 echo tel_recv_num2_end9=!tel_recv_num2_end9!  tel_recv_num2=!tel_recv_num2!   tel_recv_num1_end9_10bit=!tel_recv_num1_end9_10bit!   tel_recv_num2_end9_10bit=!tel_recv_num2_end9_10bit!
 set /a receive_distance_byte=!tel_recv_num2_end9_10bit!-!tel_recv_num1_end9_10bit!
 set /a receive_MB=!receive_distance_byte!/(1024*1024)
 echo  ____ tel_pid_num=!tel_pid_num! tel_recv_num1=!tel_recv_num1!  tel_recv_num2=!tel_recv_num2!_______ tel_recv_num1_end9=!tel_recv_num1_end9! tel_recv_num2_end9=!tel_recv_num2_end9!  receive_distance_byte=!receive_distance_byte! receive_MB=!receive_MB!
-
 if !receive_MB! GEQ 1  (
 echo 当前有流量A  receive_MB=!receive_MB!
 set /a getandroidreceivembwithappname_return_1=!receive_MB!
@@ -1013,16 +999,13 @@ rem 差距是负数 仍然说明 有流量 那么返回为1  意思意思
 set /a getandroidreceivembwithappname_return_1=1
 ) else (
 echo 当前 没流量 没流量   receive_MB=!receive_MB!
-
 )
 del tel_recv_1.txt
 del tel_recv_2.txt
-echo [getandroidreceivembwithappname_func_1x1 EndPrintCode] getandroidreceivembwithappname_return_1=[!getandroidreceivembwithappname_return_1!]   param1=[!input_1_param!] 
+echo [getandroidreceivembwithappname_func_1x1 EndPrintCode]   getandroidreceivembwithappname_return_1=[!getandroidreceivembwithappname_return_1!]   param1=[%1]   
 echo ______________Method_Out getandroidreceivembwithappname_func_1x1
 ::ENDLOCAL
 goto:eof
-
-
 
 
 
@@ -1217,6 +1200,8 @@ echo ______________Method_Out gettimehhmmsss_func_0x1
 goto:eof
 
 
+
+
 :gettimemmddhhmm_func_0x1
 rem ======================================== gettimemmddhhmm_func_0x1
 rem desc: 获取当前年份时间戳记录全数字
@@ -1230,6 +1215,7 @@ echo [gettimemmddhhmm_func_0x1 EndPrintCode] gettimemmddhhmm_return_1=[!gettimem
 echo ______________Method_Out gettimemmddhhmm_func_0x1
 ::ENDLOCAL
 goto:eof
+
 
 
 
@@ -2421,7 +2407,6 @@ goto:eof
 
 
 
-
 rem ======================== TEST_OPERATION End======================== 
 rem ======================== BUSSINESS_OPERATION Begin======================== 
 
@@ -3428,6 +3413,7 @@ goto:eof
 
 
 
+
 :rule19vdownloadshoucangjia_func_0x0
 rem ======================================== rule19vdownloadshoucangjia_func_0x0
 rem rule_tip: %init_input_0% _19_        ## ADB 命令 Tel自动加载命令 第19规则
@@ -3457,7 +3443,9 @@ ping -n 1 127.0.0.1>nul
 adb shell input tap 450 450
 ping -n 1 127.0.0.1>nul
 echo _____ 模拟点击进入 favourite 目录 End  _____
+
 rem 往下滑动 到最底层
+
 echo ____ 往下滑动 到最底层 Begin ____
 adb shell input swipe   1050 1200 1050 400  200
 rem adb shell input swipe   1050 1200 1050 400  200
@@ -3490,7 +3478,6 @@ set move_begin_number=1000
 set /a loop_numnber_resetyushu=!loop_numnber!%%!reset_yushu_number!
 set /a loop_numnber_fanhuishu=!loop_numnber!%%!fanhuishu_number!
 set /a loop_numnber_movebeginshu=!loop_numnber!%%!move_begin_number!
-
 adb shell ps | findstr telegram | awk '{print $2}' > tel_pid.txt
 set /a tel_pid_num =< tel_pid.txt
 adb shell cat /proc/!tel_pid_num!/net/dev | findstr wlan0 | awk '{print $2}' > tel_recv.txt
@@ -3498,6 +3485,7 @@ set /a tel_recv_num =< tel_recv.txt
 echo  loop_begin__________ tel_pid_num=!tel_pid_num!  tel_recv_num=!tel_recv_num!_______
 echo __________________ Loop_Index[%%i] Begin  _______________________
 echo i == %%i      allLoop=[!rule19teldown_dynamic_param1!]  yushu=[!loop_numnber_resetyushu!]    强制返回桌面循环数[!fanhuishu_number!] 强制重启循环数=[!reset_yushu_number!]   adb shell input tap 190 1000
+
 echo 屏幕点击 _A1  x_190 y_1000
 adb shell input tap 190 1000
 ping -n 3 127.0.0.1>nul
@@ -3505,6 +3493,7 @@ echo 往上滑动 _A1
 adb shell input swipe  1050 600 1050 1050  200
 ping -n 3 127.0.0.1>nul
 echo i == %%i      allLoop=[!rule19teldown_dynamic_param1!]  yushu=[!loop_numnber_resetyushu!]    强制返回桌面循环数[!fanhuishu_number!] 强制重启循环数=[!reset_yushu_number!]    adb shell input tap 190 1100
+
 echo 屏幕点击 _A2  x_190 y_1100
 adb shell input tap 190 1100
 ping -n 3 127.0.0.1>nul
@@ -3512,6 +3501,7 @@ echo 往上滑动 _A2
 adb shell input swipe  1050 600 1050 1050  200
 ping -n 3 127.0.0.1>nul
 echo i == %%i      allLoop=[!rule19teldown_dynamic_param1!]  yushu=[!loop_numnber_resetyushu!]    强制返回桌面循环数[!fanhuishu_number!] 强制重启循环数=[!reset_yushu_number!]    adb shell input tap 190 1200
+
 echo 屏幕点击 _A3  x_190 y_1200
 adb shell input tap 190 1200
 ping -n 3 127.0.0.1>nul
@@ -3519,6 +3509,7 @@ echo 往上滑动 _A3
 adb shell input swipe  1050 600 1050 1050  200
 ping -n 1 127.0.0.1>nul
 echo i == %%i      allLoop=[!rule19teldown_dynamic_param1!]  yushu=[!loop_numnber_resetyushu!]    强制返回桌面循环数[!fanhuishu_number!] 强制重启循环数=[!reset_yushu_number!]    adb shell input tap 190 1300
+
 echo 屏幕点击 _A4  x_190 y_1300
 adb shell input tap 190 1300
 ping -n 3 127.0.0.1>nul
@@ -3526,6 +3517,7 @@ echo 往上滑动 _A4
 adb shell input swipe  1050 600 1050 1050  200
 ping -n 3 127.0.0.1>nul
 echo i == %%i      allLoop=[!rule19teldown_dynamic_param1!]  yushu=[!loop_numnber_resetyushu!]    强制返回桌面循环数[!fanhuishu_number!] 强制重启循环数=[!reset_yushu_number!]    adb shell input tap 190 1400
+
 echo 屏幕点击 _A5  x_190 y_1400
 adb shell input tap 190 1400
 ping -n 3 127.0.0.1>nul
@@ -3550,11 +3542,10 @@ ping -n 1 127.0.0.1>nul
 adb shell input keyevent 4
 ping -n 1 127.0.0.1>nul
 adb shell am start  org.telegram.messenger/org.telegram.ui.LaunchActivity
-
 ping -n 1 127.0.0.1>nul
 rem 打开应用
-echo  loop_numnber_fanhuishu=[!loop_numnber_fanhuishu!]____________一直返回  返回到主界面 End ____________ 
 
+echo  loop_numnber_fanhuishu=[!loop_numnber_fanhuishu!]____________一直返回  返回到主界面 End ____________ 
 adb shell am start  org.telegram.messenger/org.telegram.ui.LaunchActivity
 ping -n 1 127.0.0.1>nul
 echo ......等待5秒......
@@ -3565,12 +3556,12 @@ ping -n 1 127.0.0.1>nul
 echo 屏幕点击 _B2  x_450 y_450
 adb shell input tap 450 450
 ping -n 1 127.0.0.1>nul
-
 rem call :getrandomintwithmaxmin_func_2x1  0 100
 rem set randomInt_A=!getrandomintwithmaxmin_return_1!
 rem echo 随机往上下拉  randomInt_A=[!randomInt_A!] 
 rem if !randomInt_A! GEQ 50 (
 rem echo 随机结果[!randomInt_A! 大于等于50 ]: _________往上滑______
+
 rem echo 往上滑动 _B1
 rem adb shell input swipe    1050 400 1050 1000  200
 rem echo 往上滑动 _B2
@@ -3582,7 +3573,6 @@ rem echo 往下滑动 _B1
 rem adb shell input swipe     1050 1000 1050 400 200
 rem echo 往下滑动 _B1
 rem )
-
 )
 echo _______________________  依次循环结束 _______________________
 if !loop_numnber_resetyushu! EQU 0 (
@@ -3601,16 +3591,12 @@ ping -n 1 127.0.0.1>nul
 echo  模拟点击 _C2 450 450 进入 favourite 目录
 adb shell input tap 450 450
 ping -n 1 127.0.0.1>nul
-
 echo  模拟点击 _C3 450 450 进入 favourite 目录
 adb shell input tap 450 450
 ping -n 1 127.0.0.1>nul
-
 echo  模拟点击 _C4 450 450 进入 favourite 目录
 adb shell input tap 450 450
 ping -n 1 127.0.0.1>nul
-
-
 rem 随机往下拉 往上拉
 call :getrandomintwithmaxmin_func_2x1  0 100
 set randomInt_A=!getrandomintwithmaxmin_return_1!
@@ -3622,8 +3608,6 @@ echo 往上滑动 _C1
 adb shell input swipe    1050 400 1050 1000  200
 echo 往上滑动 _C2
 adb shell input swipe    1050 400 1050 1000  200
-
-
 ) else (
 echo 尝试强制关闭应用 随机结果[!randomInt_A! 小于 50    ]: _________往下滑______
 echo=
@@ -3631,18 +3615,13 @@ echo 往下滑动 _C1
 adb shell input swipe     1050 1000 1050 400 200
 echo 往下滑动 _C2
 adb shell input swipe     1050 1000 1050 400 200
-
-
 )
 )
-
 rem echo  模拟点击 _D1 1050 1600
 if !loop_numnber_movebeginshu! EQU 0 (
 echo  模拟点击回到地步按键 _D1 1050 1600
 adb shell input tap 1050 1600
 )
-
-
 call :getandroidreceivembwithin5s_func_0x1
 set currentdev_receive_MD=!getandroidreceivembwithin5s_return_1!
 echo currentdev_receive_MD=!currentdev_receive_MD!  getandroidreceivembwithin5s_return_1=!getandroidreceivembwithin5s_return_1!
@@ -3650,7 +3629,6 @@ rem 有流量 时  不移动   无流量 MD=0 才移动
 if !currentdev_receive_MD! EQU 0 (
 set /a move_base_step=!loop_numnber!/!reset_yushu_number! + 1
 echo move_base_step=!move_base_step!
-
 rem for /l %%k in (1, 1, !move_base_step!) do (
 echo 无流量 往上滑动  D1  move_base_step=!move_base_step!
 adb shell input swipe  1050 600 1050 900  200
@@ -3658,8 +3636,6 @@ rem )
 echo 无流量 往上滑动  D2  move_base_step=!move_base_step!
 adb shell input swipe  1050 600 1050 900  200
 ping -n 1 127.0.0.1>nul
-
-
 call :getrandomintwithmaxmin_func_2x1  0 100
 set randomInt_A=!getrandomintwithmaxmin_return_1!
 echo 无流量 往上滑动  D3   randomInt_A=[!randomInt_A!] 
@@ -3667,19 +3643,13 @@ if !randomInt_A! GEQ 50 (
 adb shell input swipe  1050 600 1050 900  200
 ping -n 1 127.0.0.1>nul
 )
-
 )
-
-
-
-
 echo __________________ Loop_Index[%%i] Endxx  _______________________
 )
 echo [rule19vdownloadshoucangjia_func_0x0 EndPrintCode]   output=[__empty__]  param1=[__empty__] 
 echo ______________Method_Out rule19vdownloadshoucangjia_func_0x0
 ::ENDLOCAL
 goto:eof
-
 
 
 
@@ -4374,8 +4344,6 @@ mkdir mp4_kaoyan_land
 mkdir mp4_gaokao_land
 mkdir mp3
 )
-
-
 if "%init_input_2%"=="mkdir_yymmdd_1970zvi" (
 set rule26vmakedirwithtemplate_dynamic_param1=%init_input_2%
 call :gettimemmddhhmm_func_0x1
@@ -4414,8 +4382,6 @@ mkdir .\!mmdd_hhmm_timestr!\zapp\mp4_toto_port
 mkdir .\!mmdd_hhmm_timestr!\zapp\mp4_toto_land
 mkdir .\!mmdd_hhmm_timestr!\zapp\mp4_fake_port
 mkdir .\!mmdd_hhmm_timestr!\zapp\mp4_fake_land
-
-
 mkdir .\!mmdd_hhmm_timestr!\z_sss\animation
 mkdir .\!mmdd_hhmm_timestr!\z_sss\bcxs
 mkdir .\!mmdd_hhmm_timestr!\z_sss\bdyjy
@@ -4447,7 +4413,6 @@ mkdir .\!mmdd_hhmm_timestr!\z_sss\zyw
 mkdir .\!mmdd_hhmm_timestr!\z_sss\zz_unknow_land
 mkdir .\!mmdd_hhmm_timestr!\z_sss\zz_unknow_port
 )
-
 echo rule26vmakedirwithtemplate_dynamic_param1=%init_input_2%
 echo [rule26vmakedirwithtemplate_func_1x0 EndPrintCode]    output=[__empty__] dynamic_param1=[!rule26vmakedirwithtemplate_dynamic_param1!]   
 echo ______________Method_Out rule26vmakedirwithtemplate_func_1x0
@@ -4798,9 +4763,9 @@ goto:eof
 
 :rule29vflitermediatozappdir_func_0x0
 rem ======================================== rule29vflitermediatozappdir_func_0x0
-rem rule_tip: %init_input_0% _29_       ## 过滤当前路径(不包括孙文件)下Port_Land命名的的jpg gif mp4到新建的zapp分类目录 jpg_common_land
+rem rule_tip: %init_input_0% _29_       ## zapp 过滤当前路径(不包括孙文件)下Port_Land命名的的jpg gif mp4到新建的zapp分类目录 jpg_common_land
 
-rem rule_tip: %init_input_0% _29_      ## 过滤当前路径(不包括孙文件)下Port_Land命名的的jpg gif mp4到新建的zapp分类目录 jpg_common_port
+rem rule_tip: %init_input_0% _29_      ## zapp 过滤当前路径(不包括孙文件)下Port_Land命名的的jpg gif mp4到新建的zapp分类目录 jpg_common_port
 rem desc: 
 rem sample: 
 rem sample_out: 
@@ -5016,8 +4981,6 @@ echo f | xcopy /y "!itemfullpath!"  !init_cd!\!Z_mp4_land_dirname!\!newfileName_
 )
 rd /s/q  "!Z_mp4_land_dirname!_!index_mp4!"
 del mp4_common_land.txt
-
-
 dir /b /a-d /o-d /s "%init_cd%\*.webp"  > z_webp.txt
 ping -n 1 127.0.0.1>nul 
 call ::getfilerownum_func_1x1  %init_cd%\z_webp.txt
@@ -5043,9 +5006,6 @@ echo f | xcopy /y "!itemfullpath!"  !init_cd!\!Z_webp_port_dirname!\!newfileName
 )
 rd /s/q  "!Z_webp_port_dirname!_!index_webp!"
 del z_webp.txt
-
-
-
 echo [rule29vflitermediatozappdir_func_0x0 EndPrintCode]   output=[__empty__]  param1=[__empty__] 
 echo ______________Method_Out rule29vflitermediatozappdir_func_0x0
 ::ENDLOCAL
@@ -5055,13 +5015,14 @@ goto:eof
 
 
 :rule31vcopyfiletostartupwithadmin_func_1x0
-rem ======================================== rule31vcopyfiletostartup_func_1x0
+rem ======================================== rule31vcopyfiletostartupwithadmin_func_1x0
 rem rule_tip: %init_input_0% _31_  file_xxxx.bat  ##   admin权限复制到 Windows启动路径  explorer.exe  "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\StartUp"
 rem desc: 
 rem sample: 
 rem sample_out: 
 ::SETLOCAL
-echo ______________Method_In rule31vcopyfiletostartup_func_1x0
+echo ______________Method_In rule31vcopyfiletostartupwithadmin_func_1x0
+set rule31vcopyfiletostartupwithadmin_dynamic_param1=
 set rule31vcopyfiletostartup_dynamic_param1=%init_input_2%
 call :isstartwith_func_2x1 %init_input_2%  file_ 
 set isstart_file=!isstartwith_return_1!
@@ -5070,13 +5031,11 @@ if "!isstart_file!"=="true" (
 call :stringreplace_func_3x1 %init_input_2%  file_  ""
 set target_file_path=!stringreplace_return_1!
 echo "当前输入文件路径为" target_file_path=!target_file_path!  
-
 call ::isfileexist_func_1x1 !target_file_path!  
 set paramfile_existflag=!isfileexist_return_1!
 echo paramfile_existflag=!paramfile_existflag!
 if "!paramfile_existflag!"=="true" (
 echo "当前输入文件路径为" target_file_path=!target_file_path!  并且 文件 存在
-
 del  %win_zbin%/zcmd_admin_I9.bat    
 echo @ECHO off > %win_zbin%/zcmd_admin_I9.bat  
 echo setlocal enabledelayedexpansion  >> %win_zbin%/zcmd_admin_I9.bat  
@@ -5084,22 +5043,236 @@ rem set local_str=^%1 mshta vbscript^:CreateObject^(^"Shell^.Application^"^)^.Sh
 echo ^%%^1 mshta vbscript^:CreateObject^(^"Shell^.Application^"^)^.ShellExecute^(^"cmd^.exe^",^"/c %%^~s0 ::^",^"^",^"runas^",1^)^(window^.close^)^&^&exit  >> %win_zbin%/zcmd_admin_I9.bat  
 echo  cmd /K xcopy /y "!target_file_path!"   "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\StartUp"  >> %win_zbin%/zcmd_admin_I9.bat
 start %win_zbin%/zcmd_admin_I9.bat
-
 rem start %win_zbin%/zcmd_admin_I9.bat  
 rem del  zcmd_admin_I9.bat  
-
-
 ) else (
 echo "当前输入文件路径为 target_file_path=!target_file_path!  但文件经检测 文件 不存在  程序执行失败!"
-
 )
-
-
 ) else (
 echo "当前输入参数 %init_input_2% 不是以 file_开头! 程序执行失败! "
 )
-echo [rule31vcopyfiletostartup_func_1x0 EndPrintCode]    output=[__empty__] dynamic_param1=[!rule31vcopyfiletostartup_dynamic_param1!]   
-echo ______________Method_Out rule31vcopyfiletostartup_func_1x0
+echo [rule31vcopyfiletostartupwithadmin_func_1x0 EndPrintCode]    output=[__empty__] dynamic_param1=[!rule31vcopyfiletostartupwithadmin_dynamic_param1!]   
+echo ______________Method_Out rule31vcopyfiletostartupwithadmin_func_1x0
+::ENDLOCAL
+goto:eof
+
+
+
+
+:rule32vflitermediatozmaindir_func_0x0
+rem ======================================== rule32vflitermediatozmaindir_func_0x0
+rem rule_tip: %init_input_0% _32_       ## main 过滤当前路径(不包括孙文件)下Port_Land命名的的jpg gif mp4到新建的zmain分类目录 jpg_common_land
+
+rem rule_tip: %init_input_0% _32_      ## main 过滤当前路径(不包括孙文件)下Port_Land命名的的jpg gif mp4到新建的zmain分类目录 jpg_common_port
+rem desc: 
+rem sample: 
+rem sample_out: 
+::SETLOCAL
+echo ______________Method_In rule32vflitermediatozmaindir_func_0x0
+mkdir jpg_common_port
+mkdir jpg_common_land
+mkdir jpg_gaokao_land
+mkdir jpg_kaoyan_port
+mkdir jpg_home_port
+mkdir jpg_home_land
+mkdir jpg_scene_port
+mkdir jpg_scene_land
+mkdir gif_common_land
+mkdir gif_common_port
+mkdir gif 
+mkdir stock
+mkdir jpg_stock_port
+mkdir mp3
+mkdir mp4_common_land
+mkdir mp4_common_port
+mkdir mp4_gaokao_land
+mkdir mp4_kaoyan_land
+mkdir mp4_home_port
+mkdir mp4_home_land
+mkdir mp4_music_port
+mkdir mp4_music_land
+mkdir mp4_scene_port
+mkdir mp4_scene_land
+call ::gettimeddhhmm_func_0x1
+set ddhhmmstr=!gettimeddhhmm_return_1!
+echo ddhhmmstr=!ddhhmmstr!
+dir /b /a-d /o-d /s "%init_cd%\Port_*.jpg"  > jpg_home_port.txt
+ping -n 1 127.0.0.1>nul 
+call ::getfilerownum_func_1x1  %init_cd%\jpg_home_port.txt
+set jpg_common_port_rownum=!getfilerownum_return_1!
+echo getfilerownum_return_1[!getfilerownum_return_1!]  jpg_common_port_rownum[!jpg_common_port_rownum!]
+set /a index_jpg = 0
+set Z_jpg_port_dirname=jpg_home_port
+echo  mkdir !Z_jpg_port_dirname!
+for /f %%x in (jpg_home_port.txt) do (
+echo ___________[!index_jpg!_jpg]______________
+set jpg_file_fullpath=%%x
+set /a index_jpg+=1
+set oldname=%%~nx
+set newfileName_jpg_raw=!ddhhmmstr!_!index_jpg!_!jpg_common_port_rownum!_!oldname!%%~xx
+set newfileName_jpg=!newfileName_jpg_raw: =!
+echo [!index_jpg!_jpg] i=%%x  jpg_file_fullpath=!jpg_file_fullpath! index_jpg=!index_jpg! oldname=!oldname! newfileName_jpg_raw=!newfileName_jpg_raw! newfileName_jpg=!newfileName_jpg! xi=%%~xx  ni=%%~nx
+set itemfullpath=%%~sx
+rem  ren "%%i" "!newfileName!"
+rem echo f | xcopy /y D:\TEMP\0915\1.jpg  D:\TEMP\0915\A\1_1.jpg && del D:\TEMP\0915\1.jpg 
+echo echo f ^| xcopy /y "!itemfullpath!"  !init_cd!\!Z_jpg_port_dirname!\!newfileName_jpg!  ^&^& del  "!itemfullpath!"
+echo=
+echo f | xcopy /y "!itemfullpath!"  !init_cd!\!Z_jpg_port_dirname!\!newfileName_jpg!  && del  "!itemfullpath!"
+)
+rd /s/q  "!Z_jpg_port_dirname!_!index_jpg!"
+del jpg_home_port.txt
+dir /b /a-d /o-d /s "%init_cd%\Land_*.jpg"  > jpg_home_land.txt
+ping -n 1 127.0.0.1>nul 
+call ::getfilerownum_func_1x1  %init_cd%\jpg_home_land.txt
+set jpg_common_land_rownum=!getfilerownum_return_1!
+echo getfilerownum_return_1[!getfilerownum_return_1!]  jpg_common_land_rownum[!jpg_common_land_rownum!]
+set /a index_jpg = 0
+set Z_jpg_land_dirname=jpg_home_land
+echo  mkdir !Z_jpg_land_dirname!
+for /f %%x in (jpg_home_land.txt) do (
+echo ___________[!index_jpg!_jpg]______________
+set jpg_file_fullpath=%%x
+set /a index_jpg+=1
+set oldname=%%~nx
+set newfileName_jpg_raw=!ddhhmmstr!_!index_jpg!_!jpg_common_land_rownum!_!oldname!%%~xx
+set newfileName_jpg=!newfileName_jpg_raw: =!
+echo [!index_jpg!_jpg] i=%%x  jpg_file_fullpath=!jpg_file_fullpath! index_jpg=!index_jpg! oldname=!oldname! newfileName_jpg_raw=!newfileName_jpg_raw! newfileName_jpg=!newfileName_jpg! xi=%%~xx  ni=%%~nx
+set itemfullpath=%%~sx
+rem  ren "%%i" "!newfileName!"
+rem echo f | xcopy /y D:\TEMP\0915\1.jpg  D:\TEMP\0915\A\1_1.jpg && del D:\TEMP\0915\1.jpg 
+echo echo f ^| xcopy /y "!itemfullpath!"  !init_cd!\!Z_jpg_land_dirname!\!newfileName_jpg!  ^&^& del  "!itemfullpath!"
+echo=
+echo f | xcopy /y "!itemfullpath!"  !init_cd!\!Z_jpg_land_dirname!\!newfileName_jpg!  && del  "!itemfullpath!"
+)
+rd /s/q  "!Z_jpg_land_dirname!_!index_jpg!"
+del jpg_home_land.txt
+dir /b /a-d /o-d /s "%init_cd%\Port_*.gif"  > gif_common_port.txt
+ping -n 1 127.0.0.1>nul 
+call ::getfilerownum_func_1x1  %init_cd%\gif_common_port.txt
+set gif_common_port_rownum=!getfilerownum_return_1!
+echo getfilerownum_return_1[!getfilerownum_return_1!]  gif_common_port_rownum[!gif_common_port_rownum!]
+set /a index_gif = 0
+set Z_gif_port_dirname=gif_common_port
+echo  mkdir !Z_gif_port_dirname!
+for /f %%x in (gif_common_port.txt) do (
+echo ___________[!index_gif!_gif]______________
+set gif_file_fullpath=%%x
+set /a index_gif+=1
+set oldname=%%~nx
+set newfileName_gif_raw=!ddhhmmstr!_!index_gif!_!gif_common_port_rownum!_!oldname!%%~xx
+set newfileName_gif=!newfileName_gif_raw: =!
+echo [!index_gif!_gif] i=%%x  gif_file_fullpath=!gif_file_fullpath! index_gif=!index_gif! oldname=!oldname! newfileName_gif_raw=!newfileName_gif_raw! newfileName_gif=!newfileName_gif! xi=%%~xx  ni=%%~nx
+set itemfullpath=%%~sx
+rem  ren "%%i" "!newfileName!"
+rem echo f | xcopy /y D:\TEMP\0915\1.gif  D:\TEMP\0915\A\1_1.gif && del D:\TEMP\0915\1.gif 
+echo echo f ^| xcopy /y "!itemfullpath!"  !init_cd!\!Z_gif_port_dirname!\!newfileName_gif!  ^&^& del  "!itemfullpath!"
+echo=
+echo f | xcopy /y "!itemfullpath!"  !init_cd!\!Z_gif_port_dirname!\!newfileName_gif!  && del  "!itemfullpath!"
+)
+rd /s/q  "!Z_gif_port_dirname!_!index_gif!"
+del gif_common_port.txt
+dir /b /a-d /o-d /s "%init_cd%\Land_*.gif"  > gif_common_land.txt
+ping -n 1 127.0.0.1>nul 
+call ::getfilerownum_func_1x1  %init_cd%\gif_common_land.txt
+set gif_common_land_rownum=!getfilerownum_return_1!
+echo getfilerownum_return_1[!getfilerownum_return_1!]  gif_common_land_rownum[!gif_common_land_rownum!]
+set /a index_gif = 0
+set Z_gif_land_dirname=gif_common_land
+echo  mkdir !Z_gif_land_dirname!
+for /f %%x in (gif_common_land.txt) do (
+echo ___________[!index_gif!_gif]______________
+set gif_file_fullpath=%%x
+set /a index_gif+=1
+set oldname=%%~nx
+set newfileName_gif_raw=!ddhhmmstr!_!index_gif!_!gif_common_land_rownum!_!oldname!%%~xx
+set newfileName_gif=!newfileName_gif_raw: =!
+echo [!index_gif!_gif] i=%%x  gif_file_fullpath=!gif_file_fullpath! index_gif=!index_gif! oldname=!oldname! newfileName_gif_raw=!newfileName_gif_raw! newfileName_gif=!newfileName_gif! xi=%%~xx  ni=%%~nx
+set itemfullpath=%%~sx
+rem  ren "%%i" "!newfileName!"
+rem echo f | xcopy /y D:\TEMP\0915\1.gif  D:\TEMP\0915\A\1_1.gif && del D:\TEMP\0915\1.gif 
+echo echo f ^| xcopy /y "!itemfullpath!"  !init_cd!\!Z_gif_land_dirname!\!newfileName_gif!  ^&^& del  "!itemfullpath!"
+echo=
+echo f | xcopy /y "!itemfullpath!"  !init_cd!\!Z_gif_land_dirname!\!newfileName_gif!  && del  "!itemfullpath!"
+)
+rd /s/q  "!Z_gif_land_dirname!_!index_gif!"
+del gif_common_land.txt
+dir /b /a-d /o-d /s "%init_cd%\Port_*.mp4"  > mp4_home_port.txt
+ping -n 1 127.0.0.1>nul 
+call ::getfilerownum_func_1x1  %init_cd%\mp4_home_port.txt
+set mp4_common_port_rownum=!getfilerownum_return_1!
+echo getfilerownum_return_1[!getfilerownum_return_1!]  mp4_common_port_rownum[!mp4_common_port_rownum!]
+set /a index_mp4 = 0
+set Z_mp4_port_dirname=mp4_home_port
+echo  mkdir !Z_mp4_port_dirname!
+for /f %%x in (mp4_home_port.txt) do (
+echo ___________[!index_mp4!_mp4]______________
+set mp4_file_fullpath=%%x
+set /a index_mp4+=1
+set oldname=%%~nx
+set newfileName_mp4_raw=!ddhhmmstr!_!index_mp4!_!mp4_common_port_rownum!_!oldname!%%~xx
+set newfileName_mp4=!newfileName_mp4_raw: =!
+echo [!index_mp4!_mp4] i=%%x  mp4_file_fullpath=!mp4_file_fullpath! index_mp4=!index_mp4! oldname=!oldname! newfileName_mp4_raw=!newfileName_mp4_raw! newfileName_mp4=!newfileName_mp4! xi=%%~xx  ni=%%~nx
+set itemfullpath=%%~sx
+rem  ren "%%i" "!newfileName!"
+rem echo f | xcopy /y D:\TEMP\0915\1.mp4  D:\TEMP\0915\A\1_1.mp4 && del D:\TEMP\0915\1.mp4 
+echo echo f ^| xcopy /y "!itemfullpath!"  !init_cd!\!Z_mp4_port_dirname!\!newfileName_mp4!  ^&^& del  "!itemfullpath!"
+echo=
+echo f | xcopy /y "!itemfullpath!"  !init_cd!\!Z_mp4_port_dirname!\!newfileName_mp4!  && del  "!itemfullpath!"
+)
+rd /s/q  "!Z_mp4_port_dirname!_!index_mp4!"
+del mp4_home_port.txt
+dir /b /a-d /o-d /s "%init_cd%\Land_*.mp4"  > mp4_home_land.txt
+ping -n 1 127.0.0.1>nul 
+call ::getfilerownum_func_1x1  %init_cd%\mp4_home_land.txt
+set mp4_common_land_rownum=!getfilerownum_return_1!
+echo getfilerownum_return_1[!getfilerownum_return_1!]  mp4_common_land_rownum[!mp4_common_land_rownum!]
+set /a index_mp4 = 0
+set Z_mp4_land_dirname=mp4_home_land
+echo  mkdir !Z_mp4_land_dirname!
+for /f %%x in (mp4_home_land.txt) do (
+echo ___________[!index_mp4!_mp4]______________
+set mp4_file_fullpath=%%x
+set /a index_mp4+=1
+set oldname=%%~nx
+set newfileName_mp4_raw=!ddhhmmstr!_!index_mp4!_!mp4_common_land_rownum!_!oldname!%%~xx
+set newfileName_mp4=!newfileName_mp4_raw: =!
+echo [!index_mp4!_mp4] i=%%x  mp4_file_fullpath=!mp4_file_fullpath! index_mp4=!index_mp4! oldname=!oldname! newfileName_mp4_raw=!newfileName_mp4_raw! newfileName_mp4=!newfileName_mp4! xi=%%~xx  ni=%%~nx
+set itemfullpath=%%~sx
+rem  ren "%%i" "!newfileName!"
+rem echo f | xcopy /y D:\TEMP\0915\1.mp4  D:\TEMP\0915\A\1_1.mp4 && del D:\TEMP\0915\1.mp4 
+echo echo f ^| xcopy /y "!itemfullpath!"  !init_cd!\!Z_mp4_land_dirname!\!newfileName_mp4!  ^&^& del  "!itemfullpath!"
+echo=
+echo f | xcopy /y "!itemfullpath!"  !init_cd!\!Z_mp4_land_dirname!\!newfileName_mp4!  && del  "!itemfullpath!"
+)
+rd /s/q  "!Z_mp4_land_dirname!_!index_mp4!"
+del mp4_home_land.txt
+dir /b /a-d /o-d /s "%init_cd%\*.mp3"  > mp3.txt
+ping -n 1 127.0.0.1>nul 
+call ::getfilerownum_func_1x1  %init_cd%\mp3.txt
+set webp_common_port_rownum=!getfilerownum_return_1!
+echo getfilerownum_return_1[!getfilerownum_return_1!]  webp_common_port_rownum[!webp_common_port_rownum!]
+set /a index_webp = 0
+set Z_webp_port_dirname=mp3
+echo  mkdir !Z_webp_port_dirname!
+for /f %%x in (mp3.txt) do (
+echo ___________[!index_webp!_webp]______________
+set webp_file_fullpath=%%x
+set /a index_webp+=1
+set oldname=%%~nx
+set newfileName_webp_raw=!ddhhmmstr!_!index_webp!_!webp_common_port_rownum!_!oldname!%%~xx
+set newfileName_webp=!newfileName_webp_raw: =!
+echo [!index_webp!_webp] i=%%x  webp_file_fullpath=!webp_file_fullpath! index_webp=!index_webp! oldname=!oldname! newfileName_webp_raw=!newfileName_webp_raw! newfileName_webp=!newfileName_webp! xi=%%~xx  ni=%%~nx
+set itemfullpath=%%~sx
+rem  ren "%%i" "!newfileName!"
+rem echo f | xcopy /y D:\TEMP\0915\1.webp  D:\TEMP\0915\A\1_1.webp && del D:\TEMP\0915\1.webp 
+echo echo f ^| xcopy /y "!itemfullpath!"  !init_cd!\!Z_webp_port_dirname!\!newfileName_webp!  ^&^& del  "!itemfullpath!"
+echo=
+echo f | xcopy /y "!itemfullpath!"  !init_cd!\!Z_webp_port_dirname!\!newfileName_webp!  && del  "!itemfullpath!"
+)
+rd /s/q  "!Z_webp_port_dirname!_!index_webp!"
+del mp3.txt
+echo [rule32vflitermediatozmaindir_func_0x0 EndPrintCode]   output=[__empty__]  param1=[__empty__] 
+echo ______________Method_Out rule32vflitermediatozmaindir_func_0x0
 ::ENDLOCAL
 goto:eof
 
@@ -5372,7 +5545,7 @@ echo %init_input_0% _26_  mkdir_zapp  ##  在当前目录创建 zapp 对应的 �
 
 echo %init_input_0% _26_  mkdir_zmain  ##  在当前目录创建 zmain 对应的 目录
 
-echo %init_input_0% _26_  mkdir_yymmdd_1970zvi   ##  在当前目录创建 1970zvi temp 临时对应的 目录
+echo %init_input_0% _26_  mkdir_yymmdd_1970zvi  ##  在当前目录创建 temp_media 对应日期的 1970zvi 目录
 
 echo %init_input_0% _27_   192ipend3_115  ipport_44971  paircode_300827 pairport_43173     ## 对当前输入的 192ipend3(IP地址最后三位) 192.168.0.115 的 安卓设置进行无线连接
 
@@ -5394,9 +5567,11 @@ echo %init_input_0% _29_       ## 过滤当前路径(不包括孙文件)下Port_
 
 echo %init_input_0% _29_      ## 过滤当前路径(不包括孙文件)下Port_Land命名的的jpg gif mp4到新建的zapp分类目录 jpg_common_port
 
-echo %init_input_0% _30_      ##  打印爱心并闪屏
+echo %init_input_0% _31_  file_xxxx.bat  ##   admin权限复制到 Windows启动路径  explorer.exe  "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\StartUp"
 
-echo %init_input_0% _31_  file_xxxx.bat  ## admin权限复制到 Windows启动路径  explorer.exe  "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\StartUp"
+echo %init_input_0% _32_       ## main 过滤当前路径(不包括孙文件)下Port_Land命名的的jpg gif mp4到新建的zmain分类目录 jpg_common_land
+
+echo %init_input_0% _32_      ## main 过滤当前路径(不包括孙文件)下Port_Land命名的的jpg gif mp4到新建的zmain分类目录 jpg_common_port
 
 echo %init_input_0% _996_     ## 不断循环打开关闭 CMD页面  感觉像 轰炸屏幕 寓意轰炸996  无奈下周修好电脑继续
 

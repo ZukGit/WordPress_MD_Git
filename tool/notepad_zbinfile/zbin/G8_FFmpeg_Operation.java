@@ -4,17 +4,16 @@ import it.sauronsoftware.jave.MultimediaInfo;
 import it.sauronsoftware.jave.VideoSize;
 
 import java.io.*;
+import java.math.BigInteger;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-
-
-
 
 //
 public class G8_FFmpeg_Operation {
@@ -320,13 +319,194 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
         CUR_RULE_LIST.add( new CaptureSuoLueTu_From_MP4_Rule_9());
 
 
+        // 批量旋转当前目录下的 mp4 文件
+        CUR_RULE_LIST.add( new Batch_VideoRoast_Rule_10());
+        
     }
 
 
+    
+    // 批量旋转当前目录下的 mp4 文件
+    class Batch_VideoRoast_Rule_10 extends  Basic_Rule{
+    	
+        ArrayList<File> curDirMP4FileList ;  // 当前目录的 mp4文件    如果 MDName
+        ArrayList<File> needChangeToMDFileList  ;  // 当前如果包含中文那么需要转为 MD5名称 的 文件 的 列表
+        int batchRotate = 90;
+        String batchDirName = "";
+        String ffmpeg_path = "";
+        File batchDirFile = null;
+    	
+    	Batch_VideoRoast_Rule_10(){
+            super(10);
+            curDirMP4FileList = new  ArrayList<File>();
+            needChangeToMDFileList =  new  ArrayList<File>();
+            batchRotate = 90;
+        }
+    	
+
+        String ruleTip(String type, int index, String batName, OS_TYPE curType) {
+            return
+   "\n"+Cur_Bat_Name+ " "+rule_index+ "  batch_90    ## 把当前目录下的 Mp4文件 批量旋转90度  保存到90_rotate_时间戳 目录中   \n"+
+   "\n"+Cur_Bat_Name+ "  "+rule_index+ " batch_180    ## 把当前目录下的 Mp4文件 批量旋转180度  保存到180_rotate_时间戳 目录中 中  \n" +
+   "\n"+Cur_Bat_Name+ " "+rule_index+ "  batch_270    ## 把当前目录下的 Mp4文件 批量旋转270度  保存到270_rotate_时间戳 目录中 中   \n"
+
+   ; }
+
+
+        
+
+        @Override
+        boolean checkParamsOK(File shellDir, String type2Param, ArrayList<String> otherParams) {
+            System.out.println("rule"+rule_index+" shellDir = "+ shellDir);
+            System.out.println("rule"+rule_index+"  otherParams = "+ otherParams.size());
+
+
+            if(otherParams == null || otherParams.size() ==0){
+                errorMsg = "用户输入的文件参数为空";
+                System.out.println(errorMsg);
+                return false;
+            }
+
+      
+
+            System.out.println("rule4 otherParams.size() = "+ otherParams.size());
+            for (int i = 0; i <otherParams.size() ; i++) {
+            	String paramsItem = otherParams.get(i);
+            	if(paramsItem.startsWith("batch_")) {
+            		
+            		String mRotateStr = paramsItem.replace("batch_", "").trim();
+            		if(isNumeric(mRotateStr)) {
+            			
+            			batchRotate =  Integer.parseInt(mRotateStr);
+            		}
+            		
+            		
+            		
+            	}
+            	
+            }
+            
+             ffmpeg_path = getEnvironmentExePath("ffmpeg");
+            if(ffmpeg_path ==null || "".equals(ffmpeg_path)){
+                errorMsg = "当前 ffmpeg 不在环境变量中 请下载该库 并添加到 环境变量中";
+                System.out.println(errorMsg);
+                return false;
+            }
+            
+            // 检查 中文 mp4文件, 可能会引起 执行失败  needChangeToMDFileList
+            for (File fileItem:shellDir.listFiles()) {
+		       String fileItemName = fileItem.getName().toLowerCase().trim();
+		       if(isContainChinese(fileItemName) && fileItemName.endsWith(".mp4")) {
+		    	   needChangeToMDFileList.add(fileItem);
+		       }
+			}
+            
+            //  把 中文的文件 改为 md 命名的文件
+            for (int i = 0; i < needChangeToMDFileList.size(); i++) {
+            	File chineseNameFileItem =  needChangeToMDFileList.get(i);
+            	String fileName = chineseNameFileItem.getName();
+            	
+            	String mdName = getMD5Three(chineseNameFileItem.getAbsolutePath())+".mp4";
+            	
+            	System.out.println("file["+i+"] fileName="+fileName+" 改为 "+mdName);
+            	tryReName(chineseNameFileItem, mdName);
+            	
+			}
+            
+            
+            
+            // 检查 mp4  文件
+            
+            for (File fileItem:shellDir.listFiles()) {
+		       String fileItemName = fileItem.getName().toLowerCase().trim();
+		       if(fileItemName.endsWith(".mp4")) {
+		    	   curDirMP4FileList.add(fileItem);
+		       }
+				
+			}
+            
+            if(curDirMP4FileList.size() == 0) {
+                errorMsg = "当前 shell 目录下 mp4 文件的个数为 0  shellDir="+shellDir.getAbsolutePath();
+                System.out.println(errorMsg);
+                return false;
+            	
+            }
+         
+  
+            // 180_rotate_
+            batchDirName = batchRotate+"_"+"roast"+rule_index+"_"+getTimeStamp();
+
+            
+            batchDirFile =  new File(shellDir.getAbsolutePath()+File.separator+""+batchDirName);
+            if(!batchDirFile.exists()) {
+            	batchDirFile.mkdirs();
+            }
+            
+            
+            
+            System.out.println("rule"+rule_index+"  batchRotate="+batchRotate+"   batchDirName="+ batchDirName+"   ffmpeg_path="+ ffmpeg_path);
+            return  super.checkParamsOK(shellDir,type2Param,otherParams);
+        }
+        
+        
+    	
+    	
+
+
+        @Override
+        void operationRule(ArrayList<String> inputParamsList) {
+
+
+
+            //     ffmpeg -i sky1.mp4  image%d.jpg    抠图
+
+ 
+            System.out.println("rule4 ffmpeg_path = "+ffmpeg_path);
+            // 把 当前的 mp4 文件写入 G8_1_MergedRule.txt
+            for (int i = 0; i < curDirMP4FileList.size(); i++) {
+
+                File mp4File = curDirMP4FileList.get(i);
+                StringBuilder sb =new StringBuilder();
+
+                String originName = mp4File.getName();
+                String noPointFileName = getFileNameNoPoint(originName);
+                String type = getFileTypeWithPoint(mp4File.getName());
+//                File jpgDirFile = new File(CUR_Dir_1_PATH+File.separator+noPointFileName+"_"+DateFormat.format(new Date())+File.separator);
+//                jpgDirFile.mkdirs();
+//                String newFileName = originName+"_mp3_"+DateFormat.format(new Date())+".mp3";
+                
+                String newFileName =  originName;
+//                String newFileName = mp4File.getName().replace(".mp4","_x"+bigNum+"_"+DateFormat.format(new Date())+".mp4");     //  新的文件的名称  2.mp4 2_mergedxxxxxxxxxx.mp4
+//                String imageStr = noPointFileName+"_%d.jpg";
+//                String absImagePath = jpgDirFile.getAbsolutePath()+File.separator+imageStr;
+                String newFileAbsPath = batchDirFile.getAbsolutePath()+File.separator + newFileName;
+
+/*                ffmpeg -i 1.mp4 -vf "rotate=90*PI/180" 2.mp4        // 顺时针旋转90度
+                ffmpeg -i 1.mp4 -vf "rotate=PI"      3.mp4          // 顺时针旋转180度
+                ffmpeg -i 1.mp4 -vf "rotate=270*PI/180"  4.mp4      // 顺时针旋转270度*/
+
+                String command = "";
+                if(batchRotate == 90 || batchRotate == 270){
+                    command = ffmpeg_path +" -i "+ mp4File.getAbsolutePath() + " -vf \"rotate="+batchRotate+"*PI/180:ow=ih:oh=iw\"  " + newFileAbsPath;
+
+                }else{
+                    command = ffmpeg_path +" -i "+ mp4File.getAbsolutePath() + " -vf \"rotate="+batchRotate+"*PI/180\" " + newFileAbsPath;
+                }
+
+                System.out.println(command);
+                execCMD(command);
+            }
+            
+        }
+
+        
+
+        
+    }
     // 把当前目录下的 Mp4 生成缩略图  保存到  本地  生成在 目录 SuoTu_Mp4_时间戳 目录中
     class CaptureSuoLueTu_From_MP4_Rule_9 extends  Basic_Rule{
 
-        ArrayList<File> curDirMP4FileList ;  // 当前目录的 mov文件
+        ArrayList<File> curDirMP4FileList ;  // 当前目录的 mp4文件
 
         ArrayList<String> curMp4NameNoTypeList;   // 当前需要产生
 
@@ -1438,6 +1618,8 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
         return date;
     }
 
+
+    
     class VideoRoast_Rule_4 extends  Basic_Rule{
         ArrayList<File> mInputMediaFileList ;  // 输入的 视频文件
         int rotate = 90;
@@ -2420,6 +2602,23 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
         return null;
     }
 
+    
+    public static String execCMDNoStart(String command) {
+        StringBuilder sb =new StringBuilder();
+        try {
+            Process process=Runtime.getRuntime().exec("cmd /c  "+command);
+            BufferedReader bufferedReader=new BufferedReader(new InputStreamReader(process.getInputStream()));
+            String line;
+            while((line=bufferedReader.readLine())!=null)
+            {
+                sb.append(line+"\n");
+            }
+        } catch (Exception e) {
+            return e.toString();
+        }
+        return sb.toString();
+    }
+    
 
     public static String execCMD(String command) {
         StringBuilder sb =new StringBuilder();
@@ -2477,5 +2676,28 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
         }
         return name.toLowerCase().trim();
     }
+    
+	public static String getMD5Three(String path) {
+		BigInteger bi = null;
+		try {
+			byte[] buffer = new byte[8192];
+			int len = 0;
+			MessageDigest md = MessageDigest.getInstance("MD5");
+			File f = new File(path);
+			FileInputStream fis = new FileInputStream(f);
+			while ((len = fis.read(buffer)) != -1) {
+				md.update(buffer, 0, len);
+			}
+			fis.close();
+			byte[] b = md.digest();
+			bi = new BigInteger(1, b);
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return bi.toString(16);
+	}
+	
 
 }
