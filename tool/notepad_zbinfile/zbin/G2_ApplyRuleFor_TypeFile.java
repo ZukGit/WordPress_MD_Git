@@ -354,6 +354,671 @@ public class G2_ApplyRuleFor_TypeFile {
 		// 在 jpg 图片 本身 标记 一些 这个图片本身的一些属性
 		realTypeRuleList.add(new ShowJpgTagContent_To_Image_Rule_46());
 
+		
+		//  给定一个 西瓜视频 主页 下载 该页面内的所有视频文件 
+		realTypeRuleList.add(new Download_XiGua_HomeVideo_Rule_47());
+	}
+	
+	
+//  给定一个 西瓜视频 主页 下载 该页面内的所有视频文件 
+	class Download_XiGua_HomeVideo_Rule_47 extends Basic_Rule {
+		ArrayList<String> allHrefList ;  // 所有引用的链接
+		ArrayList<String> allNumberHrefList ;  // 所有只有数字的引用链接( 西瓜视频 里 特有的 )
+		ArrayList<String> allNumberHttpLinkList ;  //  https://www.ixigua.com/+数值href的集合
+		File mDownloadedMonthDir ; 
+		File ChromeDriverFile ; 
+	//  必须以 http 开头
+			String searchHttpUrl ;   // 从输入传入的 需要得到 的 http 源码的 网页的地址
+			ChromeDriver mChromeDriver ; 
+			String curPositionHtmlCodeStr;   // 每次得到的 html代码的值 用于突然用户终止程序时 使用
+			
+		Download_XiGua_HomeVideo_Rule_47() {
+			super("#", 47, 4);
+			allHrefList = new 	ArrayList<String>();
+			allNumberHrefList = new 	ArrayList<String>();
+			allNumberHttpLinkList =  new 	ArrayList<String>();
+			mDownloadedMonthDir = curDirFile;
+			if(mDownloadedMonthDir == null) {
+				mDownloadedMonthDir = new File(curDirPath);
+			}
+		}
+
+		
+		
+		String tryDownLoadXiGuaVideo(ArrayList<String> linkList) {
+			StringBuilder  downloadLogSB = new  StringBuilder();
+			
+			if(linkList == null || linkList.size() == 0) {
+				
+				downloadLogSB.append("  当前 下载链接 集合 为 空 ");
+				return downloadLogSB.toString();
+				
+			}
+			
+			for (int i = 0; i < linkList.size(); i++) {
+				String linkItem = linkList.get(i);
+			
+				// zukgit  下载 方式
+				XiGua_TouTiao_ParseUrl(i, linkItem);
+				downloadLogSB.append("下载 link["+i+"] "+linkItem+"  执行Over!");
+				
+			}
+			
+
+			
+			
+			return downloadLogSB.toString();
+			
+			
+		}
+		
+		void XiGua_TouTiao_ParseUrl(int index, String url) {
+			// String
+			// url="https://m.toutiaoimg.cn/group/6966235416110301696/?app=news_article_lite&timestamp=1626072237&group_id=6966235416110301696&share_token=0f88ebb4-c474-4671-9d9b-4b7e76004e38";
+
+			org.jsoup.nodes.Document mainHtml;
+			String jiemi_base64_url = null;
+			String base64_jiami_url = null;
+			String NoMainUrl_VideoTag_url = null; // 对于 没有 main_url 但 有 <video src="http" //这样的页面的处理
+
+			// backup_url_1 有时 main_url 会 解析错误 所以 会导致 下载不了视频 此时 需要用 备用视频下载
+			String jiemi_base64_bankurl = null;
+			String base64_jiami_bankurl = null;
+
+			String main_url_keyword = "\"main_url\":\"";
+			String bankup_url_keyword = "\"backup_url_1\":\"";
+
+			try {
+				mainHtml = Jsoup.parse(getXiGua_MainPageSource(url));
+
+				if (mainHtml != null && mainHtml.toString().contains("mediatype=\"video\"")
+						&& mainHtml.toString().contains("src=\"http") && mainHtml.toString().contains("<video")) {
+					String mainHtmlStr = mainHtml.toString();
+					// <video class="" tabindex="2" mediatype="video"
+					// src="http://v3-default.ixigua.com/c
+					String begin_video_tag = mainHtmlStr.substring(mainHtmlStr.indexOf("<video"));
+					String src_begin_tag = begin_video_tag.substring(begin_video_tag.indexOf("src=\"http"));
+					String http_begin_tag = src_begin_tag.replace("src=\"http", "");
+					String target_video_url = "http" + http_begin_tag.substring(0, http_begin_tag.indexOf("\""));
+					NoMainUrl_VideoTag_url = target_video_url;
+					System.out.println("当前页面源码有 Video Tag 标签 ");
+
+					System.out.println();
+					System.out.println("url = " + url);
+					System.out.println("NoMainUrl_VideoTag_url = " + NoMainUrl_VideoTag_url);
+					System.out.println("===============mainHtml Begin============ ");
+
+					System.out.println(mainHtml);
+
+					System.out.println("===============mainHtml Endxx============ ");
+
+					System.out.println();
+
+				} else {
+					System.out.println();
+					System.out.println("url = " + url);
+					System.out.println("===============mainHtml Begin============ ");
+
+					System.out.println(mainHtml);
+
+					System.out.println("===============mainHtml Endxx============ ");
+
+					System.out.println();
+				}
+				if (mainHtml != null) {
+					String MainHtmlStr = mainHtml.toString();
+
+					// 把 "main_url":" 去除 那么 起点 就是 我们 要找的 url
+					// "backup_url_1":"
+
+					base64_jiami_url = calculXiGuaMainUri(url, MainHtmlStr, main_url_keyword);
+					base64_jiami_bankurl = calculXiGuaMainUri(url, MainHtmlStr, bankup_url_keyword);
+					if (base64_jiami_url == null) {
+
+						if (NoMainUrl_VideoTag_url != null) {
+							System.out.println(
+									"解析出的 base64_jiami_main_url 为空  但存在 video_tag_url = " + NoMainUrl_VideoTag_url);
+							System.out.println(" 尝试下载  video_tag_url : " + NoMainUrl_VideoTag_url);
+
+							downRawVideo_WithUrl(index, NoMainUrl_VideoTag_url, "", "TouTiao");
+						} else {
+
+							System.out.println(
+									"解析出的 base64_jiami_main_url 为空  NoMainUrl_VideoTag_url 为空 无法下载视频到本地   base64_jiami_url="
+											+ base64_jiami_url);
+
+						}
+
+					} else {
+						System.out.println("解析出的 base64_jiami_url=[" + base64_jiami_url + "]  尝试解密base64");
+
+						jiemi_base64_url = jiemi_decryptBASE64(base64_jiami_url);
+						System.out.println();
+
+						System.out.println("解析出的地址  jiemi_base64_url = [" + jiemi_base64_url + "]");
+
+						if (jiemi_base64_url.startsWith("http")) {
+							System.out.println("执行 main_url 下载操作!!!    jiemi_base64_url=[" + jiemi_base64_url + "]");
+							System.out.println("XXAAA");
+							downRawVideo_WithUrl(index, jiemi_base64_url, "", "TouTiao");
+
+							System.out.println("XXBB");
+						} else {
+							System.out.println("解密出的地址不是以  http 开头  无法下载!!!");
+						}
+
+					}
+
+				} else {
+					System.out.println(
+							"当前读取到的 网页源码为空 ,   可能 G2_chromedriver版本 和 当前浏览器版本不一致!!   \n chromedriver.exe 下载地址: http://npm.taobao.org/mirrors/chromedriver/");
+				}
+
+			} catch (Exception e) {
+				e.fillInStackTrace();
+				// TODO: handle exception
+				System.out.println("异常 Exception.getMessage = "+ e.getMessage() );
+
+				System.out.println("异常 Exception = "+ e );
+
+				System.out.println("解密Base64出意外Exception 尝试使用 bankup_url   \njiemi_base64_url=[" + jiemi_base64_url
+						+ "]\nbase64_jiami_url=[" + base64_jiami_url + "]    \n base64_jiami_bankurl=["
+						+ base64_jiami_bankurl + "]");
+
+				try {
+					if (base64_jiami_bankurl != null) {
+
+						jiemi_base64_bankurl = jiemi_decryptBASE64(base64_jiami_bankurl);
+					}
+
+					if (jiemi_base64_bankurl != null && jiemi_base64_bankurl.startsWith("http")) {
+						System.out.println(
+								"执行 bankup_url_1 下载操作!!!    jiemi_base64_bankurl=[" + jiemi_base64_bankurl + "]");
+						downRawVideo_WithUrl(index, jiemi_base64_bankurl, "", "TouTiao");
+
+					}
+
+				} catch (Exception e1) {
+
+					System.out.println("尼玛 不干了  备用的 bankup_url 也解析失败!! 下载失败!! jiemi_base64_bankurl =["
+							+ jiemi_base64_bankurl + "]");
+					// TODO: handle exception
+				}
+
+			}
+
+		}
+		
+		
+		/**
+		 * 获取首页内容
+		 *
+		 * @return 首页内容
+		 * @throws InterruptedException 睡眠中断异常
+		 */
+		String getXiGua_MainPageSource(String url) {
+
+			ChromeOptions CUR_CHROME_OPTIONS = new ChromeOptions();
+			// 驱动位置
+			CUR_CHROME_OPTIONS.addArguments("--start-fullscreen");
+
+//			CUR_CHROME_OPTIONS.addArguments("Accept=text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8");
+//			CUR_CHROME_OPTIONS.addArguments("Accept-Encoding=gzip, deflate, sdch");
+//			CUR_CHROME_OPTIONS.addArguments("Accept-Language=zh-CN,zh;q=0.8");
+//			CUR_CHROME_OPTIONS.addArguments("Connection=keep-alive");
+//			CUR_CHROME_OPTIONS.addArguments("Host=activityunion-marketing.meituan.com");
+//			CUR_CHROME_OPTIONS.addArguments("Upgrade-Insecure-Requests=1");
+//			CUR_CHROME_OPTIONS.addArguments("User-Agent=Mozilla/5.0 (iPhone; CPU iPhone OS 8_0 like Mac OS X) AppleWebKit/600.1.3 (KHTML, like Gecko) Version/8.0 Mobile/12A4345d Safari/600.1.4");
+
+			System.setProperty("webdriver.chrome.driver", ChromeDriverFile.getAbsolutePath());
+			// 避免被浏览器检测识别
+			CUR_CHROME_OPTIONS.setExperimentalOption("excludeSwitches", Collections.singletonList("enable-automation"));
+
+			ChromeDriver driver = new ChromeDriver(CUR_CHROME_OPTIONS);
+			int loop_index = 0;
+			try {
+
+				driver.get(url);
+				long waitTime = Double.valueOf(Math.max(3, Math.random() * 5) * 1000).longValue();
+				TimeUnit.MILLISECONDS.sleep(waitTime);
+				long timeout = 20_000;
+				// 循环下拉，直到全部加载完成或者超时
+				do {
+					new Actions(driver).sendKeys(Keys.END).perform();
+					TimeUnit.MILLISECONDS.sleep(waitTime);
+					if (loop_index == 1) {
+						System.out.println("!! 触发点击事件  起始 标识 AAA !!");
+						new Actions(driver).sendKeys(Keys.HOME).perform();
+						TimeUnit.MILLISECONDS.sleep(1500);
+						try {
+							driver.findElement(By.className("xgplayer-start")).click();
+							TimeUnit.MILLISECONDS.sleep(2000);
+						} catch (Exception e) {
+							System.out.println("尝试点击播放按钮失败!! ");
+
+							System.out.println("click异常:");
+							System.out.println(e.fillInStackTrace());
+
+						}
+
+
+
+					}
+
+					TimeUnit.MILLISECONDS.sleep(waitTime);
+					timeout -= waitTime;
+					loop_index++;
+				} while (!driver.getPageSource().contains("已经到底部，没有新的内容啦") && timeout > 0);
+				System.out.println("已经到底部，没有新的内容啦");
+				return driver.getPageSource();
+			} catch (Exception e) {
+				// TODO: handle exception
+				System.out.println("获取网页源码的时候出错  url = " + url);
+				e.printStackTrace();
+
+			} finally {
+				driver.close();
+
+			}
+			return null;
+		}
+		
+		
+		
+
+		// 视频的保存 目录 不能是 当前文件 否则 就会执行 同步操作 影响网速
+		@SuppressWarnings("unchecked")
+		public void downRawVideo_WithUrl(int index, String httpUrl, String fileNameNoPoint, String source) {
+//	        String fileAddress = videoSavePath+"/"+source+"/"+title+".mp4";
+			if(mDownloadedMonthDir == null) {
+				mDownloadedMonthDir = new File(curDirPath);
+			}
+			String fileAddress = mDownloadedMonthDir.getAbsolutePath() + File.separator
+					+ (source == null || "".equals(source) ? "" : source + "_") + (fileNameNoPoint.replace(" ", ""))
+					+ "_" + index + "_" + getTimeStamp() + ".mp4";
+
+			System.out.println("index = "+ index);
+			System.out.println("fileAddress = "+ fileAddress);
+			
+			System.out.println("httpUrl = "+ httpUrl);
+			System.out.println("fileNameNoPoint = "+ fileNameNoPoint);
+			System.out.println("source = "+ source);
+
+			int byteRead;
+			try {
+				URL url = new URL(httpUrl);
+				// 获取链接
+				URLConnection conn = url.openConnection();
+				// 输入流
+				InputStream inStream = conn.getInputStream();
+				// 封装一个保存文件的路径对象
+				File fileSavePath = new File(fileAddress);
+				// 注:如果保存文件夹不存在,那么则创建该文件夹
+				File fileParent = fileSavePath.getParentFile();
+				if (!fileParent.exists()) {
+					fileParent.mkdirs();
+				}
+				// 写入文件
+				FileOutputStream fs = new FileOutputStream(fileSavePath);
+				byte[] buffer = new byte[1024];
+				while ((byteRead = inStream.read(buffer)) != -1) {
+					fs.write(buffer, 0, byteRead);
+				}
+				inStream.close();
+				fs.close();
+				System.out.println("\n-----视频保存路径-----\n" + fileSavePath.getAbsolutePath());
+				System.out.println("\nzzfile_3.bat " + fileSavePath.getParentFile().getAbsolutePath());
+
+
+					System.out.println("由于 isMDName=true  视频文件将以 MD5 属性文件名称进行命名!!! ");
+
+					// 获取文件的 md值 并重命名为 mdxxxx.mp4
+					String mdName = getMD5Three(fileSavePath.getAbsolutePath());
+					String new_Md_Name = mdName + ".mp4";
+					tryReName(fileSavePath, new_Md_Name);
+					// 把下载的 mp4 文件 名称 转为 md值
+			
+			} catch (FileNotFoundException e) {
+				System.out.println(e.getMessage());
+			} catch (IOException e) {
+				System.out.println(e.getMessage());
+			}
+		}
+
+		
+		// 把 "main_url":" 去除 那么 起点 就是 我们 要找的 url
+		// "backup_url_1":"
+
+		public String calculXiGuaMainUri(String url, String mainHtmlStr, String beginKeyStr) {
+
+			String jiami_main_uri = null;
+
+			if (mainHtmlStr == null) {
+				System.out.println("当前 url=" + url + "  获取到的网页源代码 htmlcode 为空!! ");
+				return jiami_main_uri;
+			}
+
+			if (!mainHtmlStr.contains("\"vtype\":\"mp4\"")) {
+				System.out.println("当前 url=" + url + "  获取到的网页源代码 htmlcode   不包含关键字 \"vtype\":\"mp4\" 无法解析视频!! ");
+				return jiami_main_uri;
+			}
+
+			// "definition":"1080p","quality":"normal","vtype":"mp4"
+			// "definition":"720p","quality":"normal","vtype":"mp4"
+			// "definition":"480p","quality":"normal","vtype":"mp4"
+			// "definition":"360p","quality":"normal","vtype":"mp4"
+
+			String mp4_1080p_keystr = "\"definition\":\"1080p\",\"quality\":\"normal\",\"vtype\":\"mp4\"";
+			String mp4_720p_keystr = "\"definition\":\"720p\",\"quality\":\"normal\",\"vtype\":\"mp4\"";
+			String mp4_480p_keystr = "\"definition\":\"480p\",\"quality\":\"normal\",\"vtype\":\"mp4\"";
+			String mp4_360p_keystr = "\"definition\":\"360p\",\"quality\":\"normal\",\"vtype\":\"mp4\"";
+
+			String mKeyMp4Tag = null; // 如果有 1080p 那么选择1080p 如果只有720p 那么就是720p 选分辨率最高那个
+
+			if (mainHtmlStr.contains(mp4_1080p_keystr)) {
+				mKeyMp4Tag = mp4_1080p_keystr;
+			} else if (mainHtmlStr.contains(mp4_720p_keystr)) {
+				mKeyMp4Tag = mp4_720p_keystr;
+			} else if (mainHtmlStr.contains(mp4_480p_keystr)) {
+				mKeyMp4Tag = mp4_480p_keystr;
+			} else if (mainHtmlStr.contains(mp4_360p_keystr)) {
+				mKeyMp4Tag = mp4_360p_keystr;
+			}
+
+			if (mKeyMp4Tag == null) {
+
+				System.out.println(
+						"当前 url=" + url + "  获取到的网页源代码 htmlcode  查不到 1080p 720p 480p  360p 视频的任意一个  无法解析视频!! ");
+
+				return jiami_main_uri;
+			}
+
+			// 把 要 解析的 分辨率 搞到 第一行位置
+			// "definition":"1080p","quality":"normal","vtype":"mp4","vwidth":1920,"vheight":1080,"bitrate":2629630,"fps":25,"codec_type":"h264","size":77367333,"main_url":"...,"backup_url_1":...
+			String mp4tag_begin_str = mainHtmlStr.substring(mainHtmlStr.indexOf(mKeyMp4Tag));
+
+			if (mp4tag_begin_str == null || !mp4tag_begin_str.contains("\"main_url\":\"")) {
+				System.out.println("当前 url=" + url + "  获取到的网页源代码 htmlcode  找到 1080p 720p 480p  360p   mKeyMp4Tag = "
+						+ mKeyMp4Tag + "  但解析出 main_url 失败!!");
+
+				return jiami_main_uri;
+			}
+
+			if (mp4tag_begin_str == null || !mp4tag_begin_str.contains("\"backup_url_1\":\"")) {
+				System.out.println("当前 url=" + url + "  获取到的网页源代码 htmlcode  找到 1080p 720p 480p  360p   mKeyMp4Tag = "
+						+ mKeyMp4Tag + "  但解析出  backup_url_1;	 失败!!");
+
+				System.out.println();
+				System.out.println();
+				System.out.println("mp4tag_begin_str = ");
+				System.out.println(mp4tag_begin_str);
+
+				System.out.println();
+				System.out.println();
+
+			}
+
+			// "main_url":"...,"backup_url_1":...
+			String main_url_begin = mp4tag_begin_str.substring(mp4tag_begin_str.indexOf(beginKeyStr));
+
+			// 把 "main_url":" 去除 那么 起点 就是 我们 要找的 url
+			// "backup_url_1":"
+			String main_url_raw = main_url_begin.replace(beginKeyStr, "");
+
+			// 第一个引号的位置 就是 结束 标示 main_url_fixed 就是我们 要找的 url_raw
+			String main_url_fixed = main_url_raw.substring(0, main_url_raw.indexOf("\""));
+
+			System.out.println("当前寻找到的 base64_url = " + main_url_fixed);
+
+			return main_url_fixed;
+
+		}
+		
+		@Override
+		boolean initParamsWithInputList(ArrayList<String> inputParamList) {
+		// TODO Auto-generated method stub
+			
+			for (int i = 0; i < inputParamList.size(); i++) {
+				String paramItem = inputParamList.get(i);
+				String paramItem_lower_trim = paramItem.toLowerCase().trim();
+System.out.println("paramItem["+i+"] = "+paramItem_lower_trim);
+				if (paramItem_lower_trim.startsWith("http")) {
+					searchHttpUrl = paramItem_lower_trim;
+				}
+
+			}
+			
+			if(searchHttpUrl == null) {
+				System.out.println("当前输入的网页为空  请检查输入!!!");
+				return false;
+			}
+			
+			
+			 ChromeDriverFile = new File(zbinPath + File.separator + "G2_chromedriver_v91.exe");
+
+	
+			System.setProperty("webdriver.chrome.driver", ChromeDriverFile.getAbsolutePath());
+
+			ChromeOptions CUR_CHROME_OPTIONS = new ChromeOptions();
+			// 驱动位置
+			CUR_CHROME_OPTIONS.addArguments("--start-fullscreen");
+
+			CUR_CHROME_OPTIONS.setExperimentalOption("excludeSwitches", Collections.singletonList("enable-automation"));
+
+			mChromeDriver = new ChromeDriver(CUR_CHROME_OPTIONS);
+			
+			
+		return super.initParamsWithInputList(inputParamList);
+		}
+		
+		
+	     void registerShutDownLister(){
+		        Runtime.getRuntime().addShutdownHook(new Thread() {
+		            public void run() {
+		                try {
+		                    Thread.sleep(200);
+		                    System.out.println("════════ 监听到 Ctr+Z stop进程操作 将执行保存当前页面位置代码的操作 ════════");
+
+		                    writeContentToFile(G2_Temp_Text_File, curPositionHtmlCodeStr);
+		                    NotePadOpenTargetFile(G2_Temp_Text_File.getAbsolutePath());
+		                
+		                    System.out.println("获得【"+searchHttpUrl+"】 MainPage HtmlCode 突然终止 部分成功 !! ");
+		                    System.out.println("════════"+"════════");
+		                    //some cleaning up code...
+
+		                } catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+		            }
+		        });
+
+		    }
+	     
+		@Override
+		ArrayList<File> applySubFileListRule4(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
+			ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+		// TODO Auto-generated method stub
+		
+			registerShutDownLister();
+			if(searchHttpUrl.startsWith("https://profile.zjurl.cn/rogue/ugc/profile") && searchHttpUrl.contains("user_id")	) {
+				String user_id_raw = searchHttpUrl.substring(searchHttpUrl.indexOf("user_id="));
+				String user_id = user_id_raw.substring(0,user_id_raw.indexOf("&")).replace("&", "").replace("user_id=", "");
+				// https://www.ixigua.com/home/3346556174218692
+				System.out.println(" profile searchHttpUrl="+searchHttpUrl);
+				System.out.println(" profile  user_id_raw="+user_id_raw);
+				System.out.println(" profile  user_id="+user_id);
+				searchHttpUrl = "https://www.ixigua.com/home/"+user_id.trim();
+			}
+			
+			String httpPageCode = BrowserOperation_WithRootUrl(searchHttpUrl);
+			
+	
+			
+			
+			//  对页面的链接 href 进行分析
+		String mHrefLog = 	TryHrefAnalysis(httpPageCode);
+			
+
+			
+			if(httpPageCode != null) {
+				
+				curPositionHtmlCodeStr = httpPageCode+"\n"+"════════════════════ Href-Log ════════════════════\n"+mHrefLog;
+				
+                writeContentToFile(G2_Temp_Text_File, httpPageCode+"\n"+"════════════════════ Href-Log ════════════════════\n"+mHrefLog);
+                NotePadOpenTargetFile(G2_Temp_Text_File.getAbsolutePath());
+            System.out.println("获得【"+searchHttpUrl+"】 MainPage HtmlCode 成功!! ");
+			}else {
+			      System.out.println("获得【"+searchHttpUrl+"】 MainPage HtmlCode 失败!! ");
+
+			}
+			
+			
+			return super.applySubFileListRule4(curFileList, subFileTypeMap, curDirList, curRealFileList);
+		}
+		
+		
+		String  TryHrefAnalysis( String mPageHtmlCode ){
+			StringBuilder  mLogSB  = new StringBuilder();
+			
+			if(mPageHtmlCode == null || "".equals(mPageHtmlCode)) {
+				
+				System.out.println("当前获取到的 页面 代码 为 空  执行失败!  ");
+				return "当前获取到的 页面 代码 为 空  执行失败!";
+			}
+			
+			
+			// 以 href=" 
+		 String[] rawHrefArr = 	mPageHtmlCode.split("href=\"");
+		
+		 if(rawHrefArr == null) {
+				System.out.println("当前获取到的 页面 代码  不包含关键字  rawHrefArr");
+				return "当前获取到的 页面 代码  不包含关键字  rawHrefArr"; 
+			 
+		 }
+		 
+		 for (int i = 0; i < rawHrefArr.length; i++) {
+			 String rawHrefItem = rawHrefArr[i];
+			System.out.println("rawHref["+i+"] = "+rawHrefItem);
+			mLogSB.append("rawHref["+i+"] = "+rawHrefItem+"\n");
+			if(rawHrefItem.contains("\"")) {
+				String realHref = rawHrefItem.substring(0,rawHrefItem.indexOf("\""));
+				allHrefList.add(realHref);
+				
+			}
+		}
+		 
+		 for (int i = 0; i < allHrefList.size(); i++) {
+			 String realHref = allHrefList.get(i);
+			 
+				System.out.println("realHref["+i+"] = "+realHref);
+				mLogSB.append("realHref["+i+"] = "+realHref+"\n");
+				String clearTagHref = realHref.replace("/", "").replace("?logTag=","").trim();
+				
+				if(isNumeric(clearTagHref) && !allNumberHrefList.contains(clearTagHref)) {
+					
+					allNumberHrefList.add(clearTagHref);
+				}
+				
+				
+		}
+		 
+		 
+		 for (int i = 0; i < allNumberHrefList.size(); i++) {
+			 
+			 String realNumHref = allNumberHrefList.get(i);
+			 
+				System.out.println("realNumHref["+i+"] = "+realNumHref);
+				mLogSB.append("realNumHref["+i+"] = "+realNumHref+"\n"); 
+				allNumberHttpLinkList.add("https://www.ixigua.com/"+realNumHref.trim());
+		 }
+		 
+		 
+		 String downlodLog =  tryDownLoadXiGuaVideo(allNumberHttpLinkList);
+				 mLogSB.append(downlodLog);
+		 
+		 return mLogSB.toString();
+			
+			
+			
+		}
+		
+
+		
+		@Override
+		String simpleDesc() {
+
+			//  输入参数有空格 导致 无法直接传递从 shell 传递到 java执行代码  所以这里 注释掉  直接使用 textrule就不存在这样的情况
+//			return "\n" + Cur_Bat_Name + " #_" + rule_index+"  https://www.ixigua.com/home/3346556174218692   ###  给定一个 西瓜视频 主页 下载 该页面内的所有视频文件   " +
+//		"\n"+	 Cur_Bat_Name + " #_" + rule_index+"  https://profile.zjurl.cn/rogue/ugc/profile/?version_code=851&version_name=80501&user_id=100443303952   ###  给定一个 头条新闻用户主页 下载该页面内的所有视频文件   ";
+	
+			return "\n" + Cur_Bat_Name + " #_" + rule_index+"  https://www.ixigua.com/home/3346556174218692   ###  给定一个 西瓜视频 主页 下载 该页面内的所有视频文件   " ;
+			
+			
+			
+//			https://profile.zjurl.cn/rogue/ugc/profile/?version_code=851&version_name=80501&user_id=100443303952
+		}
+		
+		String BrowserOperation_WithRootUrl(String mMainUrl) {
+
+	
+			String mainPageHtmlStr = null;
+			File ChromeDriverFile = new File(zbinPath + File.separator + "G2_chromedriver_v91.exe");
+
+			System.setProperty("webdriver.chrome.driver", ChromeDriverFile.getAbsolutePath());
+
+			ChromeDriver driver = mChromeDriver;
+			int loop_index = 0;
+			try {
+				long waitTime = 1000;
+				long timeout = 60_000;   // 15 秒 // 给他 1分钟
+
+				driver.get(mMainUrl);
+				String title = driver.getTitle();
+				System.out.printf("loop_index[" + loop_index + "] = " + title);
+
+				System.out.printf("A now accesss %s \n", driver.getCurrentUrl());
+
+//				 long waitTime = Double.valueOf(Math.max(3, Math.random() * 5) * 1000).longValue();
+				TimeUnit.MILLISECONDS.sleep(waitTime);
+
+				// 循环下拉，直到全部加载完成或者超时
+				do {
+					new Actions(driver).sendKeys(Keys.END).perform();
+					TimeUnit.MILLISECONDS.sleep(waitTime);
+
+					timeout -= waitTime;
+					loop_index++;
+					curPositionHtmlCodeStr = driver.getPageSource();
+				} while (!driver.getPageSource().contains("已经到底部，没有新的内容啦") && timeout > 0);
+				System.out.println("BrowserOperation_WithRootUrl 已经到底部，没有新的内容啦");
+				mainPageHtmlStr = driver.getPageSource();
+				curPositionHtmlCodeStr = driver.getPageSource();
+			} catch (Exception e) {
+				// TODO: handle exception
+				System.out.println("获取网页源码的时候出错  mMainUrl = " + mMainUrl);
+				e.printStackTrace();
+
+			}
+
+
+
+			if (mainPageHtmlStr != null) {
+
+				System.out.println("当前已经得到网页Html代码如下:\n"+mainPageHtmlStr);
+
+			} else {
+				System.out.println("rootUrl.mHtmlStr  ==== null ");
+			}
+
+			return mainPageHtmlStr;
+		}
+
+		
+		
+		
+		
+		
 	}
 
 
@@ -4231,6 +4896,7 @@ System.out.println("paramItem["+i+"] = "+paramItem_lower_trim);
 					return tipMessage;
 
 				}
+				//   如果是 url 那么 执行下载 
 				if (isUrl) {
 					System.out.println("urlStrList.contain() == " + urlStrList.contains(strLine_trim_clearChinese)
 							+ "  url-size=" + urlStrList.size());
@@ -4244,6 +4910,14 @@ System.out.println("paramItem["+i+"] = "+paramItem_lower_trim);
 						ksParseUrl(curUrlIndex_InTxtFile, strLine_trim_clearChinese, fileNameNoPoint);
 						urlStrList.add(strLine_trim_clearChinese);
 						tipMessage = "下载快手视频";
+					} else if(strLine_trim_clearChinese.startsWith("https://profile.zjurl.cn/rogue/ugc/profile") && strLine_trim_clearChinese.contains("user_id")){
+						// https://profile.zjurl.cn/rogue/ugc/profile/?version_code=851&version_name=80501&user_id=3346556174218692&media_id=1632586053830670&request_source=1&active_tab=dongtai&device_id=65&app_name=news_article&share_token=4c7776c5-9a34-443f-b7df-9e6e69c08f17&tt_from=copy_link&utm_source=copy_link&utm_medium=toutiao_android&utm_campaign=client_share?=推荐《Emath》的主页  - 今日头条
+                        //   获取 用户的id 去它的主页 拿取 所有的 该用户的视频 然后下载
+						DownloadUserTouTiaoHomeVideo(strLine_trim_clearChinese.trim());
+					}  else if(strLine_trim_clearChinese.startsWith("https://www.ixigua.com/home/")) {
+						DownloadUserTouTiaoHomeVideo_IXiGuaHome(strLine_trim_clearChinese);
+
+						
 					} else if (strLine_trim_clearChinese.contains("toutiao") // m.toutiaoimg.cn
 																				// https://m.toutiaocdn.com/i6982548019329843742
 							|| strLine_trim_clearChinese.contains("ixigua")) {
@@ -4256,7 +4930,7 @@ System.out.println("paramItem["+i+"] = "+paramItem_lower_trim);
 				
 						tipMessage = "下载TW视频";
 
-					} else {
+					}  else {
 						tipMessage = "当前的URL不是抖音-快手-头条路径 暂不支持下载";
 						System.out.println("当前的URL不是抖音-快手-头条路径 暂不支持下载  URL = " + strLine_trim_clearChinese);
 					}
@@ -4276,6 +4950,166 @@ System.out.println("paramItem["+i+"] = "+paramItem_lower_trim);
 			return tipMessage;
 
 		}
+		
+		
+		// 		https://www.ixigua.com/home/3346556174218692
+		public void DownloadUserTouTiaoHomeVideo_IXiGuaHome(String mIxiguaHomeUrl ) {
+			if(!mIxiguaHomeUrl.startsWith("https://www.ixigua.com/home/")) {
+				
+				System.out.println("当前 路径 "+mIxiguaHomeUrl+"  不是 https://www.ixigua.com/home/ 类型的主页路径 无法批量下载");
+				
+				return;
+			}
+			
+
+			String homePageCode = getXiGua_MainPageSource(mIxiguaHomeUrl);
+			
+			// 检测 这个 主页下的  href 文件 
+			if(homePageCode == null || "".equals(homePageCode)) {
+				System.out.println("当前 获取到的 主页路径 "+homePageCode+" 得到的 html代码为空!  退出执行");
+				return ;
+			}
+			
+			System.out.println("当前 获取到的 主页路径 "+homePageCode+" 得到的 html代码!  开始执行检测 href 视频操作!");
+			TryHrefAnalysis(homePageCode);
+			
+			
+		}
+		
+		// https://profile.zjurl.cn/rogue/ugc/profile/?version_code=851&version_name=80501&user_id=3346556174218692&media_id=1632586053830670&request_source=1&active_tab=dongtai&device_id=65&app_name=news_article&share_token=4c7776c5-9a34-443f-b7df-9e6e69c08f17&tt_from=copy_link&utm_source=copy_link&utm_medium=toutiao_android&utm_campaign=client_share?=推荐《Emath》的主页  - 今日头条
+
+		public void DownloadUserTouTiaoHomeVideo(String mTouTiaoProfieUrl) {
+			String user_id_raw = mTouTiaoProfieUrl.substring(mTouTiaoProfieUrl.indexOf("user_id="));
+			
+			String user_id = user_id_raw.substring(0,user_id_raw.indexOf("&")).replace("&", "").replace("user_id=", "");
+			
+			// https://www.ixigua.com/home/3346556174218692
+			System.out.println(" DownloadUserTouTiaoHomeVideo  mTouTiaoProfieUrl="+mTouTiaoProfieUrl);
+			System.out.println(" DownloadUserTouTiaoHomeVideo  user_id_raw="+user_id_raw);
+
+			System.out.println(" DownloadUserTouTiaoHomeVideo  user_id="+user_id);
+
+			String touTiaoHomePage = "https://www.ixigua.com/home/"+user_id.trim();
+			
+			//xxzukgit
+			
+			String homePageCode = getXiGua_MainPageSource(touTiaoHomePage);
+			
+			// 检测 这个 主页下的  href 文件 
+			if(homePageCode == null || "".equals(homePageCode)) {
+				System.out.println("当前 获取到的 主页路径 "+homePageCode+" 得到的 html代码为空!  退出执行");
+				return ;
+			}
+			
+			System.out.println("当前 获取到的 主页路径 "+homePageCode+" 得到的 html代码!  开始执行检测 href 视频操作!");
+			TryHrefAnalysis(homePageCode);
+			
+		}
+		
+		
+		
+		
+
+		String  TryHrefAnalysis( String mPageHtmlCode ){
+			StringBuilder  mLogSB  = new StringBuilder();
+			ArrayList<String> allHrefList = new ArrayList<String>();
+			ArrayList<String> allNumberHrefList = new ArrayList<String>();
+			ArrayList<String> allNumberHttpLinkList = new ArrayList<String>();
+			
+			
+			
+			if(mPageHtmlCode == null || "".equals(mPageHtmlCode)) {
+				
+				System.out.println("当前获取到的 页面 代码 为 空  执行失败!  ");
+				return "当前获取到的 页面 代码 为 空  执行失败!";
+			}
+			
+			
+			// 以 href=" 
+		 String[] rawHrefArr = 	mPageHtmlCode.split("href=\"");
+		
+		 if(rawHrefArr == null) {
+				System.out.println("当前获取到的 页面 代码  不包含关键字  rawHrefArr");
+				return "当前获取到的 页面 代码  不包含关键字  rawHrefArr"; 
+			 
+		 }
+		 
+		 for (int i = 0; i < rawHrefArr.length; i++) {
+			 String rawHrefItem = rawHrefArr[i];
+			System.out.println("rawHref["+i+"] = "+rawHrefItem);
+			mLogSB.append("rawHref["+i+"] = "+rawHrefItem+"\n");
+			if(rawHrefItem.contains("\"")) {
+				String realHref = rawHrefItem.substring(0,rawHrefItem.indexOf("\""));
+				allHrefList.add(realHref);
+				
+			}
+		}
+		 
+		 for (int i = 0; i < allHrefList.size(); i++) {
+			 String realHref = allHrefList.get(i);
+			 
+				System.out.println("realHref["+i+"] = "+realHref);
+				mLogSB.append("realHref["+i+"] = "+realHref+"\n");
+				String clearTagHref = realHref.replace("/", "").replace("?logTag=","").trim();
+				
+				if(isNumeric(clearTagHref) && !allNumberHrefList.contains(clearTagHref)) {
+					
+					allNumberHrefList.add(clearTagHref);
+				}
+				
+				
+		}
+		 
+		 
+		 for (int i = 0; i < allNumberHrefList.size(); i++) {
+			 
+			 String realNumHref = allNumberHrefList.get(i);
+			 
+				System.out.println("realNumHref["+i+"] = "+realNumHref);
+				mLogSB.append("realNumHref["+i+"] = "+realNumHref+"\n"); 
+				allNumberHttpLinkList.add("https://www.ixigua.com/"+realNumHref.trim());
+		 }
+		 
+		 
+		 String downlodLog =  tryDownLoadXiGuaVideo(allNumberHttpLinkList);
+				 mLogSB.append(downlodLog);
+		 
+		 return mLogSB.toString();
+			
+			
+			
+		}
+		
+		
+		
+		String tryDownLoadXiGuaVideo(ArrayList<String> linkList) {
+			StringBuilder  downloadLogSB = new  StringBuilder();
+			
+			if(linkList == null || linkList.size() == 0) {
+				
+				downloadLogSB.append("  当前 下载链接 集合 为 空 ");
+				return downloadLogSB.toString();
+				
+			}
+			
+			for (int i = 0; i < linkList.size(); i++) {
+				String linkItem = linkList.get(i);
+			
+				// zukgit  下载 方式
+				XiGua_TouTiao_ParseUrl(i, linkItem);
+				downloadLogSB.append("下载 link["+i+"] "+linkItem+"  执行Over!");
+				
+			}
+			
+
+			
+			
+			return downloadLogSB.toString();
+			
+			
+		}
+		
+		
 		
 		public  String getPostDataString(HashMap<String, String> params) throws UnsupportedEncodingException {
 	        StringBuilder result = new StringBuilder();
@@ -5047,6 +5881,9 @@ System.out.println("paramItem["+i+"] = "+paramItem_lower_trim);
 		@SuppressWarnings("unchecked")
 		public void downRawVideo_WithUrl(int index, String httpUrl, String fileNameNoPoint, String source) {
 //	        String fileAddress = videoSavePath+"/"+source+"/"+title+".mp4";
+			if(mDownloadedMonthDir == null) {
+				mDownloadedMonthDir = new File(curDirPath);
+			}
 			String fileAddress = mDownloadedMonthDir.getAbsolutePath() + File.separator
 					+ (source == null || "".equals(source) ? "" : source + "_") + (fileNameNoPoint.replace(" ", ""))
 					+ "_" + index + "_" + getTimeStamp() + ".mp4";
@@ -14059,7 +14896,7 @@ System.out.println("如果报错,将 webp-imageio.dll 等三个文件放入 win_
 				return false;
 			}
 		}
-		if (str.equals("")) {
+		if (str.trim().equals("")) {
 			return false;
 		}
 		return true;

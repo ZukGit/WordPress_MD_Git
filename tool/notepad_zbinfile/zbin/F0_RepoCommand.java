@@ -531,10 +531,17 @@ public class F0_RepoCommand {
         System.out.println("XXX mManifest = "+ mManifest);
 
         String mGit = "";
+        GIT_RAW = GIT_RAW.trim();
         String git1 = GIT_RAW.substring(0, GIT_RAW.trim().indexOf(".git")).trim();
         String git2 = git1.substring(git1.lastIndexOf("/") + 1).trim();
         mGit = git2 + ".git";
-        System.out.println("XXX mGit = "+ mGit);
+        // XXX mGit = mani.git
+        System.out.println("GIT_RAW="+ GIT_RAW);
+        System.out.println("git1="+ git1);
+        System.out.println("git2="+ git2);
+        System.out.println("mGit="+ mGit);
+        System.out.println("XXX mGit = "+ mGit+"    GIT_RAW="+ GIT_RAW);
+
 
 //        System.out.println("mProductName = "+ mProductName);
 //        System.out.println("mXml = "+ mXml);

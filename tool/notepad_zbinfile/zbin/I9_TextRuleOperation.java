@@ -1302,6 +1302,12 @@ public class I9_TextRuleOperation {
 				downRawVideo_WithUrl(url,url,"douyin","douyin");
 				videoUrlList.add(url);
 
+			}else if(url.startsWith("https://profile.zjurl.cn/rogue/ugc/profile") && url.contains("user_id")){
+				// https://profile.zjurl.cn/rogue/ugc/profile/?version_code=851&version_name=80501&user_id=3346556174218692&media_id=1632586053830670&request_source=1&active_tab=dongtai&device_id=65&app_name=news_article&share_token=4c7776c5-9a34-443f-b7df-9e6e69c08f17&tt_from=copy_link&utm_source=copy_link&utm_medium=toutiao_android&utm_campaign=client_share?=推荐《Emath》的主页  - 今日头条
+                //   获取 用户的id 去它的主页 拿取 所有的 该用户的视频 然后下载
+				DownloadUserTouTiaoHomeVideo(url.trim());
+			} else if(url.startsWith("https://www.ixigua.com/home/")) {
+				DownloadUserTouTiaoHomeVideo_IXiGuaHome(url);
 			}else if(url.contains("m.toutiaoimg.cn") || url.contains("ixigua")  || url.contains("toutiao") ) {
 				TouTiao_XiGua_Download(index ,url);
 				videoUrlList.add(url);
@@ -1321,6 +1327,162 @@ public class I9_TextRuleOperation {
 		}
 
 
+		// 		https://www.ixigua.com/home/3346556174218692
+		public void DownloadUserTouTiaoHomeVideo_IXiGuaHome(String mIxiguaHomeUrl ) {
+			if(!mIxiguaHomeUrl.startsWith("https://www.ixigua.com/home/")) {
+				
+				System.out.println("当前 路径 "+mIxiguaHomeUrl+"  不是 https://www.ixigua.com/home/ 类型的主页路径 无法批量下载");
+				
+				return;
+			}
+			
+
+			String homePageCode = getXiGua_BliBli_MainPageSource(mIxiguaHomeUrl);
+			
+			// 检测 这个 主页下的  href 文件 
+			if(homePageCode == null || "".equals(homePageCode)) {
+				System.out.println("当前 获取到的 主页路径 "+homePageCode+" 得到的 html代码为空!  退出执行");
+				return ;
+			}
+			
+			System.out.println("当前 获取到的 主页路径 "+homePageCode+" 得到的 html代码!  开始执行检测 href 视频操作!");
+			TryHrefAnalysis(homePageCode);
+			
+			
+		}
+		// https://profile.zjurl.cn/rogue/ugc/profile/?version_code=851&version_name=80501&user_id=3346556174218692&media_id=1632586053830670&request_source=1&active_tab=dongtai&device_id=65&app_name=news_article&share_token=4c7776c5-9a34-443f-b7df-9e6e69c08f17&tt_from=copy_link&utm_source=copy_link&utm_medium=toutiao_android&utm_campaign=client_share?=推荐《Emath》的主页  - 今日头条
+
+		public void DownloadUserTouTiaoHomeVideo(String mTouTiaoProfieUrl) {
+			String user_id_raw = mTouTiaoProfieUrl.substring(mTouTiaoProfieUrl.indexOf("user_id="));
+			
+			String user_id = user_id_raw.substring(0,user_id_raw.indexOf("&")).replace("&", "").replace("user_id=", "");
+			
+			// https://www.ixigua.com/home/3346556174218692
+			System.out.println(" DownloadUserTouTiaoHomeVideo  mTouTiaoProfieUrl="+mTouTiaoProfieUrl);
+			System.out.println(" DownloadUserTouTiaoHomeVideo  user_id_raw="+user_id_raw);
+
+			System.out.println(" DownloadUserTouTiaoHomeVideo  user_id="+user_id);
+
+			String touTiaoHomePage = "https://www.ixigua.com/home/"+user_id.trim();
+			
+			//xxzukgit
+			
+			String homePageCode = getXiGua_BliBli_MainPageSource(touTiaoHomePage);
+			
+			// 检测 这个 主页下的  href 文件 
+			if(homePageCode == null || "".equals(homePageCode)) {
+				System.out.println("当前 获取到的 主页路径 "+homePageCode+" 得到的 html代码为空!  退出执行");
+				return ;
+			}
+			
+			System.out.println("当前 获取到的 主页路径 "+homePageCode+" 得到的 html代码!  开始执行检测 href 视频操作!");
+			TryHrefAnalysis(homePageCode);
+			
+		}
+		
+		
+		
+		
+
+		String  TryHrefAnalysis( String mPageHtmlCode ){
+			StringBuilder  mLogSB  = new StringBuilder();
+			ArrayList<String> allHrefList = new ArrayList<String>();
+			ArrayList<String> allNumberHrefList = new ArrayList<String>();
+			ArrayList<String> allNumberHttpLinkList = new ArrayList<String>();
+			
+			
+			
+			if(mPageHtmlCode == null || "".equals(mPageHtmlCode)) {
+				
+				System.out.println("当前获取到的 页面 代码 为 空  执行失败!  ");
+				return "当前获取到的 页面 代码 为 空  执行失败!";
+			}
+			
+			
+			// 以 href=" 
+		 String[] rawHrefArr = 	mPageHtmlCode.split("href=\"");
+		
+		 if(rawHrefArr == null) {
+				System.out.println("当前获取到的 页面 代码  不包含关键字  rawHrefArr");
+				return "当前获取到的 页面 代码  不包含关键字  rawHrefArr"; 
+			 
+		 }
+		 
+		 for (int i = 0; i < rawHrefArr.length; i++) {
+			 String rawHrefItem = rawHrefArr[i];
+			System.out.println("rawHref["+i+"] = "+rawHrefItem);
+			mLogSB.append("rawHref["+i+"] = "+rawHrefItem+"\n");
+			if(rawHrefItem.contains("\"")) {
+				String realHref = rawHrefItem.substring(0,rawHrefItem.indexOf("\""));
+				allHrefList.add(realHref);
+				
+			}
+		}
+		 
+		 for (int i = 0; i < allHrefList.size(); i++) {
+			 String realHref = allHrefList.get(i);
+			 
+				System.out.println("realHref["+i+"] = "+realHref);
+				mLogSB.append("realHref["+i+"] = "+realHref+"\n");
+				String clearTagHref = realHref.replace("/", "").replace("?logTag=","").trim();
+				
+				if(isNumeric(clearTagHref) && !allNumberHrefList.contains(clearTagHref)) {
+					
+					allNumberHrefList.add(clearTagHref);
+				}
+				
+				
+		}
+		 
+		 
+		 for (int i = 0; i < allNumberHrefList.size(); i++) {
+			 
+			 String realNumHref = allNumberHrefList.get(i);
+			 
+				System.out.println("realNumHref["+i+"] = "+realNumHref);
+				mLogSB.append("realNumHref["+i+"] = "+realNumHref+"\n"); 
+				allNumberHttpLinkList.add("https://www.ixigua.com/"+realNumHref.trim());
+		 }
+		 
+		 
+		 String downlodLog =  tryDownLoadXiGuaVideo(allNumberHttpLinkList);
+				 mLogSB.append(downlodLog);
+		 
+		 return mLogSB.toString();
+			
+			
+			
+		}
+		
+		
+		
+		String tryDownLoadXiGuaVideo(ArrayList<String> linkList) {
+			StringBuilder  downloadLogSB = new  StringBuilder();
+			
+			if(linkList == null || linkList.size() == 0) {
+				
+				downloadLogSB.append("  当前 下载链接 集合 为 空 ");
+				return downloadLogSB.toString();
+				
+			}
+			
+			for (int i = 0; i < linkList.size(); i++) {
+				String linkItem = linkList.get(i);
+			
+				// zukgit  下载 方式
+				XiGua_TouTiao_ParseUrl(i, linkItem);
+				downloadLogSB.append("下载 link["+i+"] "+linkItem+"  执行Over!");
+				
+			}
+			
+
+			
+			
+			return downloadLogSB.toString();
+			
+			
+		}
+		
 
 		void BliBli_Download(int index , String urlitem) {
 			if(!ChromeDriverFile.exists()) {
