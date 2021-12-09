@@ -4544,10 +4544,16 @@ System.out.println("paramItem["+i+"] = "+paramItem_lower_trim);
 		// 下载的视频 是否 以 MD5 进行命名
 		boolean isMDName = false;
 
+		boolean isLogFile = false;
+		StringBuilder mLogSB ;
+		File mLogFile ;
 		
 		// zcmd_run_[]//  
 		ArrayList<String> zcmdRunCommandList;  // 在 文件中 识别出的 zcmd_run_的命令的集合
 		
+		File cmderExePath  ;  // cmder.exe 文件的绝对路径  使得程序 能再 cmder.exe上执行程序 有环境变量的优势
+		// 写入的 需要 cmder.exe 需要执行的 命令的 集合    使用 && 来串连
+		File cmder_prexe_bat_file ; // C:\Users\zhuzj5\Desktop\zbin\win_zbin\zcmder_prexe_G2.bat
 		
 		
 		Monitor_WeChatFile_ForWindows_Rule_39() {
@@ -4559,7 +4565,12 @@ System.out.println("paramItem["+i+"] = "+paramItem_lower_trim);
 			ChromeDriverFile = new File(zbinPath + File.separator + "G2_chromedriver_v91.exe");
 			curAlredyDoTxtFileList = new ArrayList<File>();
 			searchRootFileList = new ArrayList<File>();
-		}
+			isLogFile = false;
+			mLogSB = new StringBuilder();
+			mLogFile =  new File(zbinPath + File.separator +"win_zbin"+File.separator+"zrule_apply_G2_39rule.log");
+			
+			// cmderExePath 是写死的
+	}
 
 		@Override
 		boolean allowEmptyDirFileList() {
@@ -4579,6 +4590,11 @@ System.out.println("paramItem["+i+"] = "+paramItem_lower_trim);
 					isMDName = true;
 				}
 
+				if ("logfile_true".equals(paramItem_lower_trim)) {
+					isLogFile = false;
+				}
+
+				
 			}
 
 			return super.initParamsWithInputList(inputParamList) && Flag;
@@ -4867,7 +4883,8 @@ System.out.println("paramItem["+i+"] = "+paramItem_lower_trim);
 				String strLine = zcmdRunStrList.get(i);
 				System.out.println("_______________zmd_run_["+i+"]  commond["+strLine+"] Begin ____");
 				tipSb.append("["+i+"]"+"["+strLine+"]");
-				execCMD(strLine);
+				run_cmder(strLine);
+				// cmder 需要写道这里 执行 
 				System.out.println("_______________zmd_run_["+i+"]  commond["+strLine+"] End ____");
 
 			}
@@ -4875,6 +4892,134 @@ System.out.println("paramItem["+i+"] = "+paramItem_lower_trim);
 
 			return "zcmd_run_执行【"+tipSb.toString()+"】";
 		}
+		
+		
+		
+		public  void run_cmder(String command) {
+
+			if (CUR_OS_TYPE == OS_TYPE.Windows) {
+				 run_cmder_win_bat(command);
+			} else if (CUR_OS_TYPE == OS_TYPE.MacOS) {
+
+//				return execCMD_Mac(command);
+			} else {
+
+//				execCMD_Mac(command);
+			}
+//			return result;
+		}
+		
+		
+		public  void run_cmder_win_bat(String command) {
+			System.out.println("  run_cmder_win_bat  command="+command);
+			
+			String batHeadStr = "@echo off\r\n"
+					+ "Setlocal ENABLEDELAYEDEXPANSION\r\n"
+					+ "echo  _____________ cmder_pre_exe _____________\r\n"
+					+ "@ECHO off\r\n"
+					+ "setlocal enabledelayedexpansion\r\n"
+					+ "chcp 65001\r\n"
+					+ "rem ══════════════════════════════════════════ System_Init_Aera Begin  ══════════════════════════════════════════\r\n"
+					+ "\r\n"
+					+ "rem 函数定义之前的提示必须以英文结尾 否则 可能 报出一些 找不到之类的 错误 ----  \r\n"
+					+ "rem ________________ 系统路径初始化   \r\n"
+					+ "set init_cd=%cd%\r\n"
+					+ "set init_dp0=%~dp0\r\n"
+					+ "set init_f0=%~f0\r\n"
+					+ "set init_path=%path%\r\n"
+					+ "set init_input_0=%0\r\n"
+					+ "echo init_cd=%init_cd%               rem %cd% === 当前执行命令的当前路径  C:\\Users\\zhuxx  \r\n"
+					+ "echo init_f0=%init_f0%               rem %~f0 === 当前执行文件的全路径       C:\\Users\\xxx\\Desktop\\zbin\\win_zbin\\init_input_0.bat   \r\n"
+					+ "echo init_input_0=%init_input_0%     rem %0 ===当前执行文件的名称 init_input_0=[zbatrule_I9_Rule30.bat]     init_input_0=[zbatrule_I9_Rule30.bat]\r\n"
+					+ "echo init_dp0=%init_dp0%             rem %~dp0 ===  当前执行文件的文件夹名称  init_dp0 = C:\\Users\\zhuxx\\Desktop\\zbin\\win_zbin\\  \r\n"
+					+ "echo init_path=%init_path%           rem %path% === 当前的系统坏境变量PATH\r\n"
+					+ "rem init_path=D:\\ZWin_Software\\C1_GreenSoft_Zip_Dir\\cmder\\bin;C:\\Users\\xxx\\Desktop\\zbin\\win_soft\\Redis;C:\\Program Files\\Tesseract-OCR;D:\\software\\ffmpeg\\bin;C:\\Users\\xxx\\Desktop\\zbin\\lin_zbin;C:\\Swift\\bin\\;C:\\Users\\xxx\\Desktop\\zbin\\mac_zbin;C:\\Users\\xxx\\Desktop\\zbin\\win_zbin;C:\\Users\\xxx\\Desktop\\zbin\\python;\r\n"
+					+ "rem D:\\ZWin_Software\\C1_GreenSoft_Zip_Dir\\cmder\\vendor\\conemu-maximus5\\ConEmu\\Scripts;D:\\ZWin_Software\\C1_GreenSoft_Zip_Dir\\cmder\\vendor\\conemu-maximus5;D:\\ZWin_Software\\C1_GreenSoft_Zip_Dir\\cmder\\vendor\\conemu-maximus5\\ConEmu;C:\\Windows\\System32;C:\\Users\\xxx\\Desktop\\zbin\\win_zbin;D:\\ZWin_Software\\D0_Environment_Zip_Dir_Path\\JDK8_64\\jre\\bin;D:\\ZWin_Software\\D0_Environment_Zip_Dir_Path\\JDK8_64\\bin;D:\\ZWin_Software\\C1_GreenSoft_Zip_Dir\\npp.7.8.9.bin.x64;\r\n"
+					+ "rem D:\\ZWin_Software\\D0_Environment_Zip_Dir_Path\\python-3.7.9-embed-amd64;D:\\ZWin_Software\\D0_Environment_Zip_Dir_Path\\python-3.7.9-embed-amd64/Scripts;C:\\Program Files (x86)\\Qualcomm\\QUTS\\bin;C:\\Program Files (x86)\\Qualcomm\\QXDM5;C:\\Program Files (x86)\\Qualcomm\\PCAT\\bin;\r\n"
+					+ "rem C:\\Program Files (x86)\\Qualcomm\\EUD;C:\\Program Files (x86)\\Qualcomm\\QIKTool\\1.0.109.1;C:\\Windows;C:\\Windows\\System32;D:\\ZWin_Software\\D0_Environment_Zip_Dir_Path\\ADB;D:\\ZWin_Software\\C1_GreenSoft_Zip_Dir\\cmder;D:\\ZWin_Software\\C1_GreenSoft_Zip_Dir\\npp.7.8.9.bin.x64;C:\\Users\\xxx\\Desktop\\zbin\\win_zbin;C:\\Program Files (x86)\\Graphviz2.38\\bin;\r\n"
+					+ "rem D:\\ZWin_Software\\D0_Environment_Zip_Dir_Path\\JDK8_64\\bin;C:\\Program Files\\Tesseract-OCR;C:\\Users\\xxx\\AppData\\Local\\Google\\Chrome\\Application;D:\\ZWin_Software\\D0_Environment_Zip_Dir_Path\\JDK8_64\\jre\\bin;C:\\Users\\xxx\\AppData\\Local\\Android\\Sdk\\platform-tools;D:\\ZWin_Software\\C1_GreenSoft_Zip_Dir\\cmder\\bin;D:\\ZWin_Software\\C1_GreenSoft_Zip_Dir\\cmder\\vendor\\git-for-windows\\cmd;C:\\Program Files\\Tesseract-OCR;C:\\Users\\xxx\\Desktop\\zbin\\lin_zbin;C:\\Users\\xxx\\Desktop\\zbin\\mac_zbin;\r\n"
+					+ "rem C:\\Users\\xxx\\Desktop\\zbin\\win_zbin;C:\\Users\\xxx\\AppData\\Local\\Programs\\Microsoft VS Code\\bin;D:\\ZWin_Software\\C1_GreenSoft_Zip_Dir\\cmder\\vendor\\git-for-windows\\usr\\bin;D:\\ZWin_Software\\C1_GreenSoft_Zip_Dir\\cmder\\vendor\\git-for-windows\\usr\\share\\vim\\vim74;D:\\ZWin_Software\\C1_GreenSoft_Zip_Dir\\cmder\\\r\n"
+					+ "echo=\r\n"
+					+ "echo=\r\n"
+					+ "echo=\r\n"
+					+ "echo=\r\n"
+					+ "\r\n"
+					+ " \r\n"
+					+ "rem ________________ 相对路径初始化   \r\n"
+					+ "set init_userprofile=%userprofile%\r\n"
+					+ "set init_desktop=%userprofile%\\Desktop\r\n"
+					+ "set desktop=%userprofile%\\Desktop\r\n"
+					+ "set init_zbin=%userprofile%\\Desktop\\zbin\r\n"
+					+ "set zbin=%userprofile%\\Desktop\\zbin\r\n"
+					+ "set win_zbin=%userprofile%\\Desktop\\zbin\\win_zbin\r\n"
+					+ "set init_win_zbin=%userprofile%\\Desktop\\zbin\\win_zbin\r\n"
+					+ "echo init_userprofile=%init_userprofile%     rem %userprofile% 标示为 用户主目录 init_userprofile=C:\\Users\\xxx  \r\n"
+					+ "echo desktop=%desktop%                       rem init_desktop 和 desktop 标示 桌面路径 C:\\Users\\xxx\\Desktop\r\n"
+					+ "echo init_desktop=%init_desktop%             rem init_desktop 和 desktop 标示 桌面路径 C:\\Users\\xxx\\Desktop\r\n"
+					+ "echo zbin=%zbin%                             rem zbin 和 init_zbin 标示 桌面zbin路径 C:\\Users\\xxx\\Desktop\\zbin\r\n"
+					+ "echo init_zbin=%init_zbin%                   rem zbin 和 init_zbin 标示 桌面zbin路径 C:\\Users\\xxx\\Desktop\\zbin\r\n"
+					+ "echo win_zbin=%win_zbin%                     rem win_zbin 和 init_win_zbin 标示 桌面zbin路径里的win_zbin C:\\Users\\xxx\\Desktop\\zbin\\win_zbin\r\n"
+					+ "echo init_win_zbin=%init_win_zbin%           rem win_zbin 和 init_win_zbin 标示 桌面zbin路径里的win_zbin C:\\Users\\xxx\\Desktop\\zbin\\win_zbin\r\n"
+					+ "\n";
+			
+			// 写入 zcmder_prexe_G2.bat 的内容
+			String cmderPrexe_bat_Content = batHeadStr+command;
+			
+			// cmder.exe 定义地址
+//			 cmderExePath = new File("D:\\zsoft_dest\\C1_GreenSoft_Zip_Dir\\cmder\\Cmder.exe");
+
+//			cmder_prexe_bat_file = new File(zbinPath + File.separator + "win_zbin"+File.separator+"zcmder_prexe_G2"+Cur_Batch_End);
+		
+			
+			 cmderExePath = new File("D:\\zsoft_dest\\C1_GreenSoft_Zip_Dir\\cmder\\Cmder.exe");
+
+			 cmder_prexe_bat_file = new File(zbinPath + File.separator + "win_zbin"+File.separator+"zcmder_prexe_G2.bat");
+			
+			writeContentToFile(cmder_prexe_bat_file, cmderPrexe_bat_Content);
+			  String  fixedCommand = null;
+
+			  
+
+				if(!cmderExePath.exists()) {
+					System.out.println("\n"+"command="+command+" cmderExePath 文件不存在  cmderExePath="+cmderExePath.getAbsolutePath());
+			
+					mLogSB.append("\n"+"command="+command+" cmderExePath 文件不存在  cmderExePath="+cmderExePath.getAbsolutePath());
+					
+					fixedCommand =  command;
+				}else if(!cmder_prexe_bat_file.exists()) {
+					System.out.println(" cmder_prexe_bat_file 文件不存在  cmder_prexe_bat_file="+cmder_prexe_bat_file.getAbsolutePath());
+			  
+					mLogSB.append("\n"+"command="+command+" cmder_prexe_bat_file 文件不存在  cmder_prexe_bat_file="+cmder_prexe_bat_file.getAbsolutePath());
+
+			
+					
+					fixedCommand =  command;
+				}
+				
+				if(cmderExePath.exists() && cmder_prexe_bat_file.exists()) {
+					// D:\ZWin_Software\C1_GreenSoft_Zip_Dir\cmder\Cmder.exe  /TASK zcmder_prexe_G2.bat
+					fixedCommand = cmderExePath.getAbsolutePath()+" /TASK "+ cmder_prexe_bat_file.getName();
+					
+					System.out.println(" cmder.exe 存在 将在 cmder 下执行逻辑! ");
+					
+					mLogSB.append("\n"+" cmder.exe 存在 将在 cmder 下执行逻辑!   cmderExePath="+cmderExePath.getAbsolutePath()+"  cmder_prexe_bat_file="+cmder_prexe_bat_file.getAbsolutePath());
+
+					
+					
+				}
+				
+				if(isLogFile) {
+					writeContentToFile(mLogFile, mLogSB.toString());
+				}
+				
+
+			
+			execCMD(fixedCommand);
+			
+
+		}
+		
+		
 		
 		
 		String OperationWithOneLine(int index, ArrayList<String> strLineList, String fileNameNoPoint) {
@@ -6095,6 +6240,22 @@ System.out.println("paramItem["+i+"] = "+paramItem_lower_trim);
 
 					mCommandItem =  mCommandItem.replace("zcmd_run_", "");
 					System.out.println("zcmd_run_xxx rowString["+rowString+"]"+"  mCommandItem = ["+ mCommandItem+"] " );
+					
+					
+					
+	                if(mCommandItem.contains("【") && mCommandItem.contains("】")  &&
+	                		mCommandItem.indexOf("【") < mCommandItem.indexOf("】")
+	                ){
+
+
+	                    String tipNum  =     mCommandItem.substring(mCommandItem.indexOf("【"),mCommandItem.lastIndexOf("】")+1);
+
+	                    System.out.println("tipNum = "+ tipNum);
+	                    mCommandItem = mCommandItem.replace(tipNum,"");
+
+	                }
+	                
+					
 					zcmdrunStrList.add(mCommandItem.trim());
 					
 
@@ -6130,7 +6291,7 @@ System.out.println("paramItem["+i+"] = "+paramItem_lower_trim);
 
 			return Cur_Bat_Name + " #_" + rule_index
 					+ "  ### 持续检测 WeChat目录 C:\\Users\\zukgit\\Documents\\WeChat Files\\xxxx\\FileStorage\\File\\2021-07 的 TXT文件的内容    \n"
-					+ Cur_Bat_Name + " #_" + rule_index + "  mdname_true "
+					+ Cur_Bat_Name + " #_" + rule_index + "  mdname_true   logfile_true "
 					+ "  ### 以MD5字符串保存下载视频文件 持续检测 WeChat目录 C:\\Users\\zukgit\\Documents\\WeChat Files\\xxxx\\FileStorage\\File\\2021-07 的 TXT文件的内容    \n"
 
 					+ Cur_Bat_Name + " #_" + rule_index + "   ### 只有在 WeChat的当前 月份接收文件目录 才能生效 Monitor 监控 \n"

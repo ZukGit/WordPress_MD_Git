@@ -626,7 +626,7 @@ public class H0_Tip {
         System.out.println("Cmder.exe /REGISTER ALL       // 鼠标目录右击出现cmder选项   ");
         System.out.println("Cmder.exe /UNREGISTER ALL       // 鼠标目录右击删除cmder选项   ");
         System.out.println("Cmder 下载地址:"+"  https://pan.baidu.com/disk/home#/all?vmode=list&path=%2F%E7%A7%BB%E5%8A%A8%E7%A1%AC%E7%9B%98%2Fsoftware%2Fwin");
-        System.out.println("设置环境变量  Setting -> StartUp -> Environment  输入如下的配置信息: ");
+        System.out.println("_____________"+"设置环境变量  Setting -> StartUp -> Environment  输入如下的配置信息: "+"_____________");
         System.out.println();
         System.out.println("set PATH=%ConEmuBaseDir%\\Scripts;%PATH%\n" +
                 "set PATH=%USERPROFILE%\\Desktop\\zbin\\win_zbin;%USERPROFILE%\\Desktop\\zbin\\win_pbin;%USERPROFILE%\\Desktop\\zbin\\python;%PATH%\n" +
@@ -641,6 +641,18 @@ public class H0_Tip {
                 "set PATH=C:\\Program Files\\Tesseract-OCR;%PATH%\n" +
                 "set PATH=%USERPROFILE%\\Desktop\\zbin\\win_soft\\Redis;%PATH%");
         System.out.println("set LANG=zh_CN.UTF-8");
+        System.out.println();
+        System.out.println();
+        System.out.println("_____________"+"预置Task设置  Setting -> StartUp -> Tasks > (+)添加Task  > zcmder_prexe_G2.bat > 保存 输入如下的配置信息: "+"_____________");
+        System.out.println("【1.TaskName】(实现cmd下打开cmder并执行 预先写入zcmder_prexe_G2.bat的命令(cmder有cmd没有的环境变量如 python):");
+        System.out.println("zcmder_prexe_G2.bat");
+        System.out.println();
+        System.out.println("【1.TaskContent-最底部大方框】:");
+        System.out.println("%USERPROFILE%\\Desktop\\zbin\\win_zbin\\zcmder_prexe_G2.bat");
+        System.out.println();
+        System.out.println("【1.cmd实现逻辑方式 示例】  ");
+        System.out.println("D:\\zsoft_dst\\C1_GreenSoft_Zip_Dir\\cmder\\Cmder.exe  /TASK zcmder_prexe_G2.bat ");
+        System.out.println("D:\\ZWin_Software\\C1_GreenSoft_Zip_Dir\\cmder\\Cmder.exe  /TASK zcmder_prexe_G2.bat ");
         System.out.println();
         PrintHead_End(" Winddows下Cmder设置 End   ");
     }
