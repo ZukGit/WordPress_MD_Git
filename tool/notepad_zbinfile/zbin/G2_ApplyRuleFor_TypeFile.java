@@ -1,6 +1,7 @@
 
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ImageUtil;
+import cn.hutool.core.util.RuntimeUtil;
 import cn.hutool.http.HttpUtil;
 import cn.hutool.json.JSONUtil;
 import it.sauronsoftware.jave.Encoder;
@@ -357,8 +358,314 @@ public class G2_ApplyRuleFor_TypeFile {
 		
 		//  给定一个 西瓜视频 主页 下载 该页面内的所有视频文件 
 		realTypeRuleList.add(new Download_XiGua_HomeVideo_Rule_47());
+		
+		
+		// voice_fafaefafea 读取 voice 的 内容
+		realTypeRuleList.add(new Read_Speak_Word_Rule_48());
+		
+		
+		// 给定一个 类型的 模板  起始页(默认1)  最终页(默认100) 
+		// 是否代理(默认false)  itemtag(页面内的标记用于过滤)  imagetag(详细内容也的照片的标示)
+		// CategoryModel_HttpPage_Download_Rule_49
+		realTypeRuleList.add(new CategoryModel_HttpPage_Download_Rule_49());
+		
+		// initrule
 	}
 	
+	class CategoryModel_HttpPage_Download_Rule_49 extends Basic_Rule {
+		String mCategoryModel ;  //  Page 主页的模板  使用 {page} 来对 页面进行替换 默认为 {page}
+		int beginPageIndex;
+		int mNextPageStep = 1;
+		int endPageIndex;
+		
+		ArrayList<String> mDynamicPageUrlList ;
+		boolean isProxy ;  // 是否代理
+		
+		String mHrefTag = "";   // category  页面下的 每 个项的 标示
+		String mImageTag = "";   // 需要下载的图片的特殊标示    如果为空 那么 就下载 全部  不过滤 
+		int  mSleepInterval ;    // 每个 页面 完成下载的 睡眠 时间  默认 10秒
+		
+		
+		
+		// 有些参数从 bat 传递不过来  比如 & ? 等等 需要做转义
+		HashMap<String,String> needReplaceWordMap ;
+		ArrayList<String> needReplaceWordKeyList ; 
+		ArrayList<String> needRealExistWordValueList ; 
+		
+		
+		// https://tieba.baidu.com/f?kw=%E6%9D%8E%E6%AF%85&ie=utf-8&pn=350
+		
+		// 有些网页 不是按照 页面内容来的  是按照 多少个item数值 来的  所以有这个参数 每页的步长  默认为1 
+
+		
+		CategoryModel_HttpPage_Download_Rule_49() {
+		super("#", 49, 4);
+
+		mCategoryModel = "{page}";
+		beginPageIndex = 1;
+		endPageIndex = 100;
+		mDynamicPageUrlList = new ArrayList<String>();
+		
+		isProxy = false;
+		 mHrefTag = "";   // category  页面下的 每 个项的 标示
+		 mImageTag = "";   // 需要下载的图片的特殊标示
+		 mSleepInterval = 10;
+		 mNextPageStep = 1;
+		 
+		 needReplaceWordKeyList = new ArrayList<String>(); 
+		 needRealExistWordValueList  = new ArrayList<String>(); 
+		 needReplaceWordMap = new HashMap<String,String>();
+		 initReplaceWord();
+		 
+	}
+		
+		void initReplaceWord() {
+			addReplaceWord("#","=");
+			addReplaceWord("@","&");
+		}
+		
+		void addReplaceWord(String mSrcWord, String mDstWord ) {
+			
+			needReplaceWordKeyList.add(mSrcWord);
+			needRealExistWordValueList.add(mDstWord);
+			needReplaceWordMap.put(mSrcWord, mDstWord);
+			
+		}
+		
+		
+		String replaceWordToExist(String  mSrcStr) {
+			String result = mSrcStr;
+			
+			for (int i = 0; i < needReplaceWordKeyList.size(); i++) {
+				String holdstr = needReplaceWordKeyList.get(i);
+				String realValue = needReplaceWordMap.get(holdstr);
+				result = result.replaceAll(holdstr, realValue);
+				
+			}
+			
+			return result;
+			
+		}
+		
+		
+		@Override
+		boolean initParamsWithInputList(ArrayList<String> inputParamList) {
+			boolean Flag = true;
+
+			for (int i = 0; i < inputParamList.size(); i++) {
+				String paramItem = inputParamList.get(i);
+				String paramItem_lower_trim = paramItem.toLowerCase().trim();
+
+				
+				if (paramItem_lower_trim.startsWith("model_")) {
+				  String mModelRaw =  paramItem_lower_trim.replace("model_", "").trim();
+				  mCategoryModel =  replaceWordToExist(mModelRaw);
+				}
+				
+				if (paramItem_lower_trim.startsWith("proxy_true")) {
+					
+					isProxy = true;
+					}
+				
+				
+				if (paramItem_lower_trim.startsWith("pagestep_")) {
+					  String mPageStepStr =  paramItem_lower_trim.replace("pagestep_", "").trim();
+					  if(isNumeric(mPageStepStr)) {
+						  mNextPageStep = Integer.parseInt(mPageStepStr);
+					  }
+			       }
+				
+				
+				if (paramItem_lower_trim.startsWith("beginpage_")) {
+					  String mBeginPageStr =  paramItem_lower_trim.replace("beginpage_", "").trim();
+					  if(isNumeric(mBeginPageStr)) {
+						  beginPageIndex = Integer.parseInt(mBeginPageStr);
+					  }
+			       }
+				
+
+				if (paramItem_lower_trim.startsWith("endpage_")) {
+					  String mEndPageStr =  paramItem_lower_trim.replace("endpage_", "").trim();
+					  if(isNumeric(mEndPageStr)) {
+						  endPageIndex = Integer.parseInt(mEndPageStr);
+					  }
+			       }
+				
+
+				if (paramItem_lower_trim.startsWith("sleeptime_")) {
+					  String mSleepTimeStr =  paramItem_lower_trim.replace("sleeptime_", "").trim();
+					  if(isNumeric(mSleepTimeStr)) {
+						  mSleepInterval = Integer.parseInt(mSleepTimeStr);
+					  }
+			       }
+				
+				if (paramItem_lower_trim.startsWith("hreftag_")) {
+					  String mHrefRaw =  paramItem_lower_trim.replace("hreftag_", "").trim();
+					  mHrefTag =  replaceWordToExist(mHrefRaw);
+					}
+				
+				
+				if (paramItem_lower_trim.startsWith("imagetag_")) {
+					  String mImageTagRaw =  paramItem_lower_trim.replace("imagetag_", "").trim();
+					  mImageTag =  replaceWordToExist(mImageTagRaw);
+					}
+				
+				
+				
+
+			}
+			
+//			mCategoryModel = mCategoryModel.replace("{page}", beginPageIndex+"");
+			
+			System.out.println(" beginPageIndex = "+ beginPageIndex);
+			System.out.println(" mHrefTag = "+ mHrefTag);
+
+			System.out.println(" mImageTag = "+ mImageTag);
+
+
+			
+			System.out.println(" beginPageIndex = "+ beginPageIndex);
+			
+			System.out.println(" mNextPageStep = "+ mNextPageStep);
+
+			System.out.println(" endPageIndex = "+ endPageIndex);
+		
+			System.out.println(" mSleepInterval = "+ mSleepInterval);
+			System.out.println(" isProxy = "+ isProxy);
+			
+			initModelCategoryPageList(mCategoryModel,beginPageIndex,mNextPageStep,endPageIndex);
+
+			return super.initParamsWithInputList(inputParamList) && Flag;
+		}
+
+		
+		// model_https://tieba.baidu.com/f?kw#%E6%9D%8E%E6%AF%85@ie#utf-8&pn#{page}  beginpage_1  endpage_1000 pagestep_50  hreftag_https://tieba.baidu.com/p/  imagetag_  proxy_true sleeptime_10
+
+
+		
+		@Override
+		String simpleDesc() {
+
+			return Cur_Bat_Name + " #_"+rule_index+"   //   给定一个页面{page}模板 =转为# &转为@  传递到代码进行图片的自动搜索下载功能  \n"
+
+                  + Cur_Bat_Name + " #_"+rule_index+"  model_https://www.52pojie.cn/forum-4-{page}.html  beginpage_1  endpage_94 pagestep_1  hreftag_https://www.52pojie.cn/thread  imagetag_attach.52pojie sleeptime_10  proxy_true    ###// 爬取{page}网页-52破解  \n"
+
+                      + Cur_Bat_Name + " #_"+rule_index+"  model_https://tieba.baidu.com/f?kw#%E6%9D%8E%E6%AF%85@ie#utf-8@pn#{page}   beginpage_0  endpage_1000 pagestep_50  hreftag_hreftag_https://tieba.baidu.com/p/   imagetag_    proxy_true  sleeptime_10   ###// 爬取{page}网页-百度贴吧  \n"
+
+                      
+					;
+		}
+
+		
+		
+	 void	initModelCategoryPageList(String modelUrl , int beginIndex , int pageStep , int engIndex){
+			
+		 String rawModelUrl = new String(modelUrl);
+		
+		   int curStep = beginIndex ;
+			for (int i = beginIndex; i <= engIndex; i++) {
+				 String mModelPageStr = new String(modelUrl);
+				
+				 String realPage = 	 mModelPageStr.replace("{page}", curStep+"");
+				 curStep += pageStep;
+				 
+				 mDynamicPageUrlList.add(realPage);
+			}
+			
+		
+			
+			for (int i = 0; i < mDynamicPageUrlList.size(); i++) {
+				String pageTip = mDynamicPageUrlList.get(i);
+				System.out.println("realPage["+(i+1)+"] = "+ pageTip );
+			}
+			
+			
+		}
+		
+		
+	}
+	
+	// voice_fafaefafea 读取 voice 的 内容
+	class Read_Speak_Word_Rule_48 extends Basic_Rule {
+		String mVoice_Utf8 ;
+		
+		
+		Read_Speak_Word_Rule_48() {
+		super("#", 48, 4);
+		mVoice_Utf8 = "HelloWorld_Zukgit";
+	}
+		
+		
+		@Override
+		ArrayList<File> applySubFileListRule4(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
+			ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+			
+			
+			
+			
+		       String mVbsFilePath = zbinPath + File.separator + "B3_voice.vbs";
+		        String commadStr = "CreateObject(\"SAPI.SpVoice\").Speak \"" + mVoice_Utf8 + "\"";
+
+
+               try {
+				String mANSIStr =   new String(commadStr.getBytes("UTF-8"), "GB2312");
+			} catch (UnsupportedEncodingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+		        
+		        File voice_file = new File(mVbsFilePath);
+		        
+		        ANSI_writeContentToFile(voice_file, commadStr);
+//		        UTF8File_To_ANSIFile(voice_file);
+		        
+//		        RuntimeUtil.exec("Wscript.exe  /x " + voice_file.getAbsolutePath());
+			  execCMD(voice_file.getAbsolutePath());
+			return super.applySubFileListRule4(curFileList, subFileTypeMap, curDirList, curRealFileList);
+			}
+
+		
+		
+		
+		
+		@Override
+		boolean initParamsWithInputList(ArrayList<String> inputParamList) {
+			boolean Flag = true;
+
+			for (int i = 0; i < inputParamList.size(); i++) {
+				String paramItem = inputParamList.get(i);
+				String paramItem_lower_trim = paramItem.toLowerCase().trim();
+
+				
+				if (paramItem_lower_trim.startsWith("voice_")) {
+					mVoice_Utf8 = paramItem_lower_trim.replace("voice_", "").trim();
+				}
+
+			}
+
+			return super.initParamsWithInputList(inputParamList) && Flag;
+		}
+
+		
+		
+
+		
+		@Override
+		String simpleDesc() {
+
+			return Cur_Bat_Name + " #_"+rule_index+"   // 读取给定的voice 发出声音  \n"
+
+                  + Cur_Bat_Name + " #_"+rule_index+"  voice_12345ABCDE   // 读取给定的voice 发出声音  \n"
+
+					;
+		}
+
+		
+		
+		
+	
+	}
 	
 //  给定一个 西瓜视频 主页 下载 该页面内的所有视频文件 
 	class Download_XiGua_HomeVideo_Rule_47 extends Basic_Rule {
@@ -4835,22 +5142,51 @@ System.out.println("paramItem["+i+"] = "+paramItem_lower_trim);
 							ArrayList<String> oneLineZCmdRunCommandList = new ArrayList<String>(); 
 							
 							
+							//  zcmder_run_ 列表 区别于 zcmd_run  一个运行在cmd 一个运行在cmder
+							ArrayList<String> oneLineZCmderRunCommandList = new ArrayList<String>(); 
+							
+							
 		
 							synchronized (this) {
 								toGetUrlFromOneLine_And_InitUrlList(strLine_trim_clearChinese, oneLineUrlList);
-								zcmd_run_toGetZCmdRunFromOneLine_And_InitZCmdList(lineStr, oneLineZCmdRunCommandList);
+								zcmd_run_toGetZCmdRunFromOneLine_And_InitZCmdList(lineStr, oneLineZCmdRunCommandList,oneLineZCmderRunCommandList);
 							}
 							System.out.println("line[" + j + "] : str[" + lineStr + "]  clearChinese["
 									+ strLine_trim_clearChinese + "] result["
 									+ OperationWithOneLine(j, oneLineUrlList, fileNameNoPoint) + "]");
 
 							if(oneLineZCmdRunCommandList.size() >0 ) {
-								System.out.println("___________ zcmd_run_xxx Begin["+oneLineZCmdRunCommandList.size()+"] line["+j+"] ___________ ");	
+								mLogSB.append("___________ zcmd_run_xxx Begin["+oneLineZCmdRunCommandList.size()+"] line["+j+"] ___________ "+lineStr+"\n");		
+
+								System.out.println("___________ zcmd_run_xxx Begin["+oneLineZCmdRunCommandList.size()+"] line["+j+"] ___________ "+lineStr+"\n");		
 							     String comResult = 	zcmd_run_OperationWithOneLine(j, oneLineZCmdRunCommandList, fileNameNoPoint);
 								System.out.println("zcomResult: "+comResult);
-							     System.out.println("___________ zcmd_run_xxx End["+oneLineZCmdRunCommandList.size()+"] line["+j+"] ___________ ");	
+							     System.out.println("___________ zcmd_run_xxx End["+oneLineZCmdRunCommandList.size()+"] line["+j+"] ___________ "+lineStr+"\n");	
+							     mLogSB.append("___________ zcmd_run_xxx End["+oneLineZCmdRunCommandList.size()+"] line["+j+"] ___________ "+lineStr+"\n");	
+							     
 							}
+							
+							if(oneLineZCmderRunCommandList.size() >0 ) {
+				
+								mLogSB.append("___________ zcmder_run_xxx Begin["+oneLineZCmderRunCommandList.size()+"] line["+j+"] ___________ "+lineStr+"\n");	
+
+								System.out.println("___________ zcmder_run_xxx Begin["+oneLineZCmderRunCommandList.size()+"] line["+j+"] ___________ "+lineStr+"\n");		
+							     String comResult = 	zcmder_run_OperationWithOneLine(j, oneLineZCmderRunCommandList, fileNameNoPoint);
+								System.out.println("zcomResult: "+comResult);
+								mLogSB.append("zcomResult: "+comResult);
+
+
+ System.out.println("___________ zcmder_run_xxx End["+oneLineZCmderRunCommandList.size()+"] line["+j+"] ___________ lineStr="+lineStr+"\n");	
+   mLogSB.append("___________ zcmder_run_xxx End["+oneLineZCmderRunCommandList.size()+"] line["+j+"] ___________ "+lineStr+"\n");	
+
+							}
+							
 						}
+						
+						if(isLogFile) {
+							writeContentToFile(mLogFile, mLogSB.toString());
+						}
+						
 						System.out.println("════════════════ OVER ═════════════════");
 
 					}
@@ -4870,7 +5206,7 @@ System.out.println("paramItem["+i+"] = "+paramItem_lower_trim);
 		}
 
 		
-		// 执行 zcmd_run_ 的程序
+		// 执行 zcmder_run_ 的程序
 		String zcmd_run_OperationWithOneLine(int index, ArrayList<String> zcmdRunStrList, String fileNameNoPoint) {
 			String tipMessage = null;
 			if (zcmdRunStrList == null || zcmdRunStrList.size() == 0) {
@@ -4878,17 +5214,56 @@ System.out.println("paramItem["+i+"] = "+paramItem_lower_trim);
 				return tipMessage;
 			}
 			
+			
 			StringBuilder tipSb = new StringBuilder();
 			for (int i = 0; i < zcmdRunStrList.size(); i++) {
 				String strLine = zcmdRunStrList.get(i);
+				
+				strLine = strLine.replace("%win_zbin%", Win_Lin_Mac_ZbinPath);
+				strLine = strLine.replace("%zbin%", zbinPath);
+
+	                
 				System.out.println("_______________zmd_run_["+i+"]  commond["+strLine+"] Begin ____");
 				tipSb.append("["+i+"]"+"["+strLine+"]");
-				run_cmder(strLine);
-				// cmder 需要写道这里 执行 
+				execCMD(strLine);   //  cmd 运行
+		
 				System.out.println("_______________zmd_run_["+i+"]  commond["+strLine+"] End ____");
 
 			}
 			
+
+			return "zcmd_run_执行【"+tipSb.toString()+"】";
+		}
+		
+		// 执行 zcmder_run_ 的程序
+		String zcmder_run_OperationWithOneLine(int index, ArrayList<String> zcmderRunStrList, String fileNameNoPoint) {
+			String tipMessage = null;
+			if (zcmderRunStrList == null || zcmderRunStrList.size() == 0) {
+				tipMessage = " 当前zcmd_run_xxx  运行命令为空 无逻辑执行";
+				return tipMessage;
+			}
+			
+			StringBuilder tipSb = new StringBuilder();
+			for (int i = 0; i < zcmderRunStrList.size(); i++) {
+				String strLine = zcmderRunStrList.get(i);
+				System.out.println("_______________zmder_run_["+i+"]  commond["+strLine+"] Begin ____");
+				mLogSB.append("_______________zmder_run_["+i+"]  commond["+strLine+"] Begin ____");
+
+	
+				
+				tipSb.append("["+i+"]"+"["+strLine+"]");
+				run_cmder(strLine);
+				// cmder 需要写道这里 执行 
+				
+				System.out.println("_______________zmder_run_["+i+"]  commond["+strLine+"] End ____");
+
+				mLogSB.append("_______________zmder_run_["+i+"]  commond["+strLine+"] End ____");
+
+				
+				
+			}
+			
+			mLogSB.append("zcmd_run_执行【"+tipSb.toString()+"】");
 
 			return "zcmd_run_执行【"+tipSb.toString()+"】";
 		}
@@ -5008,10 +5383,7 @@ System.out.println("paramItem["+i+"] = "+paramItem_lower_trim);
 					
 				}
 				
-				if(isLogFile) {
-					writeContentToFile(mLogFile, mLogSB.toString());
-				}
-				
+			
 
 			
 			execCMD(fixedCommand);
@@ -6208,61 +6580,120 @@ System.out.println("paramItem["+i+"] = "+paramItem_lower_trim);
 		// 对每行的数据检查是否有 zcmd_run_ 之类的 运行命令
 
 		
-		public  void zcmd_run_toGetZCmdRunFromOneLine_And_InitZCmdList(String rowString, ArrayList<String> zcmdrunStrList) {
+		public  void zcmd_run_toGetZCmdRunFromOneLine_And_InitZCmdList(String rowString, ArrayList<String> zcmdrunStrList , ArrayList<String> zrunStrList_cmderList) {
 			String[] strArrRow = null;
 			String fixStr = "";
 
 //	        if(str.trim().startsWith("http:") || str.trim().startsWith("https:") ||
 //	                str.trim().startsWith("thunder:") ||   str.trim().startsWith("magnet::") ){
+			
+			
 
-			if(!rowString.contains("zcmd_run_")) {
-				System.out.println("当前行 rowString="+rowString+" 不包含标识符 【zcmd_run_】 命令执行失败!");
+			if(!rowString.contains("zcmd_run_") && !rowString.contains("zcmder_run_") ) {
+				System.out.println("当前行 rowString="+rowString+" 不包含标识符 【zcmd_run_】   【zcmder_run_】命令执行失败!");
 				return;
 			}
 		
-			
-			if (rowString != null) {
-				fixStr = new String(rowString);
-				// http://xxxxxx/sahttp:// 避免出现 http://http: 连着的情况 起码也要使得间隔一个空格
-				fixStr = fixStr.replace("zcmd_run_", " zcmd_run_");
+			if(rowString.contains("zcmd_run_")) {
+				
+				if (rowString != null) {
+					fixStr = new String(rowString);
+					// http://xxxxxx/sahttp:// 避免出现 http://http: 连着的情况 起码也要使得间隔一个空格
+					fixStr = fixStr.replace("zcmd_run_", " zcmd_run_");
 
-				strArrRow = fixStr.split("zcmd_run_");
-			}
-
-			if (strArrRow != null && strArrRow.length > 0) {
-
-				for (int i = 0; i < strArrRow.length; i++) {
-					String mCommandItem = strArrRow[i];
-					System.out.println("strArrRow["+i+"] = "+ mCommandItem);
-					if (mCommandItem == null || mCommandItem.trim().equals("") ) {
-						continue;
-					}
-
-					mCommandItem =  mCommandItem.replace("zcmd_run_", "");
-					System.out.println("zcmd_run_xxx rowString["+rowString+"]"+"  mCommandItem = ["+ mCommandItem+"] " );
-					
-					
-					
-	                if(mCommandItem.contains("【") && mCommandItem.contains("】")  &&
-	                		mCommandItem.indexOf("【") < mCommandItem.indexOf("】")
-	                ){
-
-
-	                    String tipNum  =     mCommandItem.substring(mCommandItem.indexOf("【"),mCommandItem.lastIndexOf("】")+1);
-
-	                    System.out.println("tipNum = "+ tipNum);
-	                    mCommandItem = mCommandItem.replace(tipNum,"");
-
-	                }
-	                
-					
-					zcmdrunStrList.add(mCommandItem.trim());
-					
-
-
+					strArrRow = fixStr.split("zcmd_run_");
 				}
 
+				if (strArrRow != null && strArrRow.length > 0) {
+
+					for (int i = 0; i < strArrRow.length; i++) {
+						String mCommandItem = strArrRow[i];
+						System.out.println("strArrRow["+i+"] = "+ mCommandItem);
+						if (mCommandItem == null || mCommandItem.trim().equals("") ) {
+							continue;
+						}
+
+						mCommandItem =  mCommandItem.replace("zcmd_run_", "");
+						System.out.println("zcmd_run_xxx rowString["+rowString+"]"+"  mCommandItem = ["+ mCommandItem+"] " );
+						
+						
+						
+		                if(mCommandItem.contains("【") && mCommandItem.contains("】")  &&
+		                		mCommandItem.indexOf("【") < mCommandItem.indexOf("】")
+		                ){
+
+
+		                    String tipNum  =     mCommandItem.substring(mCommandItem.indexOf("【"),mCommandItem.lastIndexOf("】")+1);
+
+		                    System.out.println("tipNum = "+ tipNum);
+		                    mCommandItem = mCommandItem.replace(tipNum,"");
+
+		                }
+		                
+		             
+						
+		             
+		              
+		                
+						zcmdrunStrList.add(mCommandItem.trim());
+						
+
+
+					}
+
+				}
+				
+			} else if(rowString.contains("zcmder_run_")) {
+				
+				
+				if (rowString != null) {
+					fixStr = new String(rowString);
+					// http://xxxxxx/sahttp:// 避免出现 http://http: 连着的情况 起码也要使得间隔一个空格
+					fixStr = fixStr.replace("zcmder_run_", " zcmder_run_");
+
+					strArrRow = fixStr.split("zcmder_run_");
+				}
+
+				if (strArrRow != null && strArrRow.length > 0) {
+
+					for (int i = 0; i < strArrRow.length; i++) {
+						String mCommandItem = strArrRow[i];
+						System.out.println("strArrRow["+i+"] = "+ mCommandItem);
+						if (mCommandItem == null || mCommandItem.trim().equals("") ) {
+							continue;
+						}
+
+						mCommandItem =  mCommandItem.replace("zcmder_run_", "");
+						System.out.println("zcmd_run_xxx rowString["+rowString+"]"+"  mCommandItem = ["+ mCommandItem+"] " );
+						
+						
+						
+		                if(mCommandItem.contains("【") && mCommandItem.contains("】")  &&
+		                		mCommandItem.indexOf("【") < mCommandItem.indexOf("】")
+		                ){
+
+
+		                    String tipNum  =     mCommandItem.substring(mCommandItem.indexOf("【"),mCommandItem.lastIndexOf("】")+1);
+
+		                    System.out.println("tipNum = "+ tipNum);
+		                    mCommandItem = mCommandItem.replace(tipNum,"");
+
+		                }
+		                
+						
+		              
+		                
+		                zrunStrList_cmderList.add(mCommandItem.trim());
+						
+
+
+					}
+
+				}
+				
+				
 			}
+
 
 		}
 		
@@ -14937,6 +15368,73 @@ System.out.println("如果报错,将 webp-imageio.dll 等三个文件放入 win_
 		abstract String simpleDesc(); // 使用的简单描述 中文的该 rule的使用情况 默认会在 ruleTip 被调用
 
 	}
+	
+	
+	
+
+	
+	static void ANSI_writeContentToFile(File file, String strParam) {
+
+		try {
+			if (file != null && !file.exists()) {
+				System.out.println("创建文件:  " + file.getAbsolutePath());
+				if (!file.getParentFile().exists()) {
+					file.getParentFile().mkdirs();
+				}
+
+				file.createNewFile();
+
+			}
+
+			if (file != null && file.exists()) {
+				BufferedWriter curBW = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file),"GBK"));
+				curBW.write(strParam);
+				curBW.flush();
+				curBW.close();
+				// System.out.println("write out File OK ! File = " + file.getAbsolutePath());
+			} else {
+				System.out.println("write out File  Failed !    File = " + file.getAbsolutePath());
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	
+	
+
+	public   void UTF8File_To_ANSIFile(File file) {
+		 StringBuffer buffer=new StringBuffer();
+		 try {
+		 FileInputStream fis=new FileInputStream(file.getAbsolutePath());
+		 InputStreamReader isr=new InputStreamReader(fis,"UTF-8");
+		 BufferedReader br=new BufferedReader(isr);
+		 String line=null;
+		 br.skip(1);
+		while ((line=br.readLine())!=null) {
+		buffer.append(line);
+		buffer.append("\r\n");
+		 }
+		 buffer.delete(buffer.length()-2,buffer.length());
+		 br.close();
+		 } catch (Exception e) {
+		 e.printStackTrace();
+		 }
+		 System.out.println(buffer);
+		 try {
+		 FileOutputStream fos=new FileOutputStream(file.getAbsoluteFile());
+		 OutputStreamWriter osw=new OutputStreamWriter(fos);
+		 osw.write(buffer.toString());
+		 osw.flush();
+		 osw.close();
+		 } catch (Exception e) {
+		 e.printStackTrace();
+		 }
+		 
+		 
+		}
+	
+	
 
 	static void writeContentToFile(File file, String strParam) {
 
