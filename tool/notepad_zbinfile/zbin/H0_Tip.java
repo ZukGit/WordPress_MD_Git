@@ -630,7 +630,7 @@ public class H0_Tip {
         System.out.println();
         System.out.println("set PATH=%ConEmuBaseDir%\\Scripts;%PATH%\n" +
                 "set PATH=%USERPROFILE%\\Desktop\\zbin\\win_zbin;%USERPROFILE%\\Desktop\\zbin\\win_pbin;%USERPROFILE%\\Desktop\\zbin\\python;%PATH%\n" +
-                "set PATH=%USERPROFILE%\\Desktop\\zbin\\lin_zbin;%USERPROFILE%\\Desktop\\zbin\\mac_zbin;%PATH%\n" +
+                "set PATH=%USERPROFILE%\\Desktop\\zbin\\lin_zbin;%USERPROFILE%\\Desktop\\zbin\\win_zbin\\bin;%USERPROFILE%\\Desktop\\zbin\\mac_zbin;%PATH%\n" +
                 "\n" +
                 "alias gits=git status\n" +
                 "alias cdd=cd /D %USERPROFILE%\\Desktop\n" +
@@ -651,7 +651,7 @@ public class H0_Tip {
         System.out.println("%USERPROFILE%\\Desktop\\zbin\\win_zbin\\zcmder_prexe_G2.bat");
         System.out.println();
         System.out.println("【1.cmd实现逻辑方式 示例】  ");
-        System.out.println("D:\\zsoft_dst\\C1_GreenSoft_Zip_Dir\\cmder\\Cmder.exe  /TASK zcmder_prexe_G2.bat ");
+        System.out.println("D:\\zsoft_dest\\C1_GreenSoft_Zip_Dir\\cmder\\Cmder.exe  /TASK zcmder_prexe_G2.bat ");
         System.out.println("D:\\ZWin_Software\\C1_GreenSoft_Zip_Dir\\cmder\\Cmder.exe  /TASK zcmder_prexe_G2.bat ");
         System.out.println();
         PrintHead_End(" Winddows下Cmder设置 End   ");
@@ -873,13 +873,13 @@ public class H0_Tip {
         System.out.println("________________________ 【zapp】【加密】 ________________________");
         System.out.println("zrule_apply_G2.bat #_18  .jpg .png .gif .webp .mp4   && zrule_apply_G2.bat #_7_bad_batch &&  cd ./bad_batch  &&  zrule_apply_G2.bat #_9  jpg_ && zrule_apply_G2.bat #_9  webp_ &&  zrule_apply_G2.bat #_9 png_  &&  zrule_apply_G2.bat #_9 gif_ &&  zrule_apply_G2.bat #_9 mp4_");
         System.out.println();
-        
+
         System.out.println();
         System.out.println("________________ gif jpg png mp4 资源归统【zmain】到 jpg_home_port[land]  gif_common_port[land]  mp4_home_port[land]____________ ");
         System.out.println("adb pull /sdcard/1/.  &  zmpeg_ffmpeg_G8.bat  8 samedir_true && zrule_apply_G2.bat  #_21  clearblank_true &&   zrule_apply_G2.bat #_9  png_jpg && zrule_apply_G2.bat #_9  MP4_mp4 && zrule_apply_G2.bat #_9 jpeg_jpg  && zrule_apply_G2.bat #_9 JPG_jpg &&  zmpeg_ffmpeg_G8.bat 9 && zrule_apply_G2.bat #_44   && zrule_apply_G2.bat   #_21_jpg_png_gif_webp  portland_true  &&  zbatrule_I9_Rule30.bat  _32_\r\n"
                 + " \r\n"+ "");
         System.out.println();
-        
+
         System.out.println();
         System.out.println("________________ gif jpg png mp4 资源归统【zapp】到 jpg_common_port[land]  gif_common_port[land]  mp4_common_port[land]____________ ");
         System.out.println("adb pull /sdcard/1/.  &  zmpeg_ffmpeg_G8.bat  8 samedir_true && zrule_apply_G2.bat  #_21  clearblank_true &&   zrule_apply_G2.bat #_9  png_jpg && zrule_apply_G2.bat #_9  MP4_mp4 && zrule_apply_G2.bat #_9 jpeg_jpg  && zrule_apply_G2.bat #_9 JPG_jpg &&  zmpeg_ffmpeg_G8.bat 9 && zrule_apply_G2.bat #_44   && zrule_apply_G2.bat   #_21_jpg_png_gif_webp  portland_true  &&  zbatrule_I9_Rule30.bat  _29_\r\n"
