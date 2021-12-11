@@ -3423,13 +3423,13 @@ rem sample_out:
 ::SETLOCAL
 echo ______________Method_In rule19vdownloadshoucangjia_func_0x0
 echo [rule3vadbscreen_func_1x0 ]    output=[__empty__] dynamic_param1=[!rule3vinstalldirapk_dynamic_param1!]   
-adb shell am force-stop org.telegram.messenger
+adb shell am force-stop org.telegram.messenger.web
 ping -n 1 127.0.0.1>nul
 rem 回到桌面
 adb shell input keyevent 3
 ping -n 1 127.0.0.1>nul
 rem 打开应用
-adb shell am start  org.telegram.messenger/org.telegram.ui.LaunchActivity
+adb shell am start  org.telegram.messenger.web/org.telegram.ui.LaunchActivity
 ping -n 1 127.0.0.1>nul
 echo _____ 模拟点击进入 favourite 目录 Begin  _____
 adb shell input tap 450 450
@@ -3529,24 +3529,24 @@ if !loop_numnber_fanhuishu! EQU 0 (
 echo  loop_numnber_fanhuishu=[!loop_numnber_fanhuishu!]____________一直返回  返回到主界面 Begin ____________ 
 adb shell input keyevent 4
 ping -n 1 127.0.0.1>nul
-adb shell am start  org.telegram.messenger/org.telegram.ui.LaunchActivity
+adb shell am start  org.telegram.messenger.web/org.telegram.ui.LaunchActivity
 ping -n 1 127.0.0.1>nul
 adb shell input keyevent 4
 ping -n 1 127.0.0.1>nul
-adb shell am start  org.telegram.messenger/org.telegram.ui.LaunchActivity
+adb shell am start  org.telegram.messenger.web/org.telegram.ui.LaunchActivity
 ping -n 1 127.0.0.1>nul
 adb shell input keyevent 4
 ping -n 1 127.0.0.1>nul
-adb shell am start  org.telegram.messenger/org.telegram.ui.LaunchActivity
+adb shell am start  org.telegram.messenger.web/org.telegram.ui.LaunchActivity
 ping -n 1 127.0.0.1>nul
 adb shell input keyevent 4
 ping -n 1 127.0.0.1>nul
-adb shell am start  org.telegram.messenger/org.telegram.ui.LaunchActivity
+adb shell am start  org.telegram.messenger.web/org.telegram.ui.LaunchActivity
 ping -n 1 127.0.0.1>nul
 rem 打开应用
 
 echo  loop_numnber_fanhuishu=[!loop_numnber_fanhuishu!]____________一直返回  返回到主界面 End ____________ 
-adb shell am start  org.telegram.messenger/org.telegram.ui.LaunchActivity
+adb shell am start  org.telegram.messenger.web/org.telegram.ui.LaunchActivity
 ping -n 1 127.0.0.1>nul
 echo ......等待5秒......
 ping -n 5 127.0.0.1>nul
@@ -3577,13 +3577,13 @@ rem )
 echo _______________________  依次循环结束 _______________________
 if !loop_numnber_resetyushu! EQU 0 (
 echo  尝试强制关闭应用   !reset_yushu_number! 
-adb shell am force-stop org.telegram.messenger
+adb shell am force-stop org.telegram.messenger.web
 ping -n 1 127.0.0.1>nul
 echo 尝试强制关闭应用 回到桌面
 adb shell input keyevent 3
 ping -n 1 127.0.0.1>nul
 echo 尝试强制关闭应用 打开应用
-adb shell am start  org.telegram.messenger/org.telegram.ui.LaunchActivity
+adb shell am start  org.telegram.messenger.web/org.telegram.ui.LaunchActivity
 ping -n 1 127.0.0.1>nul
 echo  模拟点击 _C1 450 450  进入 favourite 目录
 adb shell input tap 450 450
