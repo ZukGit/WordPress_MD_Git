@@ -433,6 +433,16 @@ public class I9_TextRuleOperation {
 		// 对python代码的 格式进行格式化使得符合编译要求进格为4 8 12 16,不能有 tab 制表符
 		CUR_RULE_LIST.add(new Format_PythonCode_Rule_43());
 
+		
+		// 对当前文件过来    去掉 行开头是空格的 那些行  保留 行开头就是描述的那些行 adb dumpsys 中查看主项
+		CUR_RULE_LIST.add(new NoBlankBeginRow_Flitter_Rule44());
+		
+		CUR_RULE_LIST.add(new TwoBlankBeginRow_Flitter_Rule45());
+		
+		
+		
+		
+		
 //        CUR_RULE_LIST.add( new Image2Png_Rule_4());
 //        CUR_RULE_LIST.add( new AVI_Rule_5());
 //        CUR_RULE_LIST.add( new SubDirRename_Rule_6());
@@ -441,7 +451,138 @@ public class I9_TextRuleOperation {
 
 	}
 
+	
+	// 开头两行是空格第三个不是空格的 行
+	class TwoBlankBeginRow_Flitter_Rule45 extends Basic_Rule {
 
+
+		TwoBlankBeginRow_Flitter_Rule45() {
+			super(45, false);
+	
+		}
+
+		
+
+		
+		@Override
+		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+			for (int i = 0; i < curInputFileList.size(); i++) {
+	
+				File fileItem = curInputFileList.get(i);
+				System.out.println("file["+i+"]["+curInputFileList.size()+"] "+ fileItem.getAbsolutePath() );
+				ArrayList<String> contentList = ReadFileContentAsList(fileItem);
+
+				// 找到 起始为ZZZZZ 开头的 行数
+				ArrayList<String> matchRuleRowList = new ArrayList<String> ();
+
+				for (int j = 0; j < contentList.size(); j++) {
+					String lineContent = contentList.get(j);
+					if(lineContent == null || "".equals(lineContent) ) {
+						continue;
+					}
+					
+					
+					// 开头 有 三个 空格的 过来掉
+					if(lineContent.startsWith("   ")) { //  以 空格 开头 那么 过滤 掉 它
+						continue;
+					}
+				
+					if(!matchRuleRowList.contains(lineContent)) {
+						System.out.println("line["+(j+1)+"]["+contentList.size()+"] file["+i+"]["+curInputFileList.size()+"] write to file: "+ lineContent );
+						if(!lineContent.startsWith(" ")) {
+							matchRuleRowList.add(lineContent+"  【HeadOneTag】");
+						}else {
+							matchRuleRowList.add(lineContent);
+						}
+				
+					}
+	
+				
+				}
+
+
+				writeContentToFile(I9_Temp_Text_File, matchRuleRowList);
+				NotePadOpenTargetFile(I9_Temp_Text_File.getAbsolutePath());
+				System.out.println("rule_" + rule_index + " ->去掉 行开头是空格的 保留内容到 TEMP TXT 文件");
+				
+
+			}
+
+			return super.applyOperationRule(curFileList, subFileTypeMap, curDirList, curRealFileList);
+		}
+
+		@Override
+		String simpleDesc() {
+			return " 对当前文件过来  保留开头不是空格 以及 开头两行是空格第三个不是空格的 行 adb shell dumpsys 使用到 ";
+		}
+
+	}
+	
+	
+
+	class NoBlankBeginRow_Flitter_Rule44 extends Basic_Rule {
+
+
+		int row_blank_count = 0;
+
+		NoBlankBeginRow_Flitter_Rule44() {
+			super(44, false);
+			row_blank_count = 0 ;
+		}
+
+		
+
+		
+		@Override
+		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+			for (int i = 0; i < curInputFileList.size(); i++) {
+	
+				File fileItem = curInputFileList.get(i);
+				System.out.println("file["+i+"]["+curInputFileList.size()+"] "+ fileItem.getAbsolutePath() );
+				ArrayList<String> contentList = ReadFileContentAsList(fileItem);
+
+				// 找到 起始为ZZZZZ 开头的 行数
+				ArrayList<String> matchRuleRowList = new ArrayList<String> ();
+
+				for (int j = 0; j < contentList.size(); j++) {
+					String lineContent = contentList.get(j);
+					if(lineContent == null || "".equals(lineContent) ) {
+						continue;
+					}
+					
+					
+					if(lineContent.startsWith(" ")) { //  以 空格 开头 那么 过滤 掉 它
+						continue;
+					}
+				
+					if(!matchRuleRowList.contains(lineContent)) {
+						System.out.println("line["+(j+1)+"]["+contentList.size()+"] file["+i+"]["+curInputFileList.size()+"] write to file: "+ lineContent );
+						matchRuleRowList.add(lineContent);
+					}
+	
+				
+				}
+
+
+				writeContentToFile(I9_Temp_Text_File, matchRuleRowList);
+				NotePadOpenTargetFile(I9_Temp_Text_File.getAbsolutePath());
+				System.out.println("rule_" + rule_index + " ->去掉 行开头是空格的 保留内容到 TEMP TXT 文件");
+				
+
+			}
+
+			return super.applyOperationRule(curFileList, subFileTypeMap, curDirList, curRealFileList);
+		}
+
+		@Override
+		String simpleDesc() {
+			return " 对当前文件过来    去掉 行开头是空格的 那些行  保留 行开头就是描述的那些行 adb shell dumpsys 使用到 ";
+		}
+
+	}
+	
 
 
 

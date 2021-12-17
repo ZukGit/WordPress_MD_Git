@@ -29,6 +29,11 @@ public class K2_NotepadTip  implements ClipboardOwner{
 
     static String BAT_OR_SH_Point ;
 
+    
+    
+
+    
+    
     static void initSystemInfo() {
         String osName = System.getProperties().getProperty("os.name").toLowerCase();
         if (osName.contains("window")) {
@@ -49,13 +54,79 @@ public class K2_NotepadTip  implements ClipboardOwner{
 
     private Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
 
+    static String selectedMode = "gps" ;   // 默认显示的模块
+    
+    static void initParams(String[] argsParam) {
+    	if(argsParam == null || argsParam.length == 0) {
+    		System.out.println("输入参数为空,默认剪切模块为:"+selectedMode);
+    	}
+    	
+    	
+    	for (int i = 0; i < argsParam.length; i++) {
+    		String paramItem = argsParam[i].toLowerCase().trim();
+    		
+    		if("bt".equals(paramItem)) {
+    			selectedMode = "bt";
+    		}
+			
+    		if("wifi".equals(paramItem)) {
+    			selectedMode = "wifi";
+    		}
+    		
+			
+    		if("nfc".equals(paramItem)) {
+    			selectedMode = "nfc";
+    		}
+    		
+			
+    		if("gps".equals(paramItem)) {
+    			selectedMode = "gps";
+    		}
+    		
+    		
+		}
+
+    }
+
+
+    
+    
     public static void main(String[] args) {
+    	initParams(args);
+    	
         initSystemInfo();
+        
+        String  mNFCSearchTip =  	Show_NFC_Notepad_Search_Tip();
+        
+      String  mBTSearchTip =  	Show_BT_Notepad_Search_Tip();
+        
        String  mGPSSearchTip =  	Show_GPS_Notepad_Search_Tip();
-       Copy_To_System_ClipBoard(mGPSSearchTip);
-       
-       
+  
        String  mWIFISearchTip =  	Show_WIFI_Notepad_Search_Tip();
+       
+       switch (selectedMode) {
+	case "gps":
+	       Copy_To_System_ClipBoard(mGPSSearchTip);
+		break;
+
+	case "wifi":
+	       Copy_To_System_ClipBoard(mWIFISearchTip);
+		break;
+		
+	case "bt":
+	       Copy_To_System_ClipBoard(mBTSearchTip);
+		break;
+		
+	case "nfc":
+	       Copy_To_System_ClipBoard(mNFCSearchTip);
+		break;
+
+	default:
+	       Copy_To_System_ClipBoard(mGPSSearchTip);
+		break;
+	}
+       
+
        
 
        
@@ -68,6 +139,7 @@ public class K2_NotepadTip  implements ClipboardOwner{
 
         }
 
+        System.out.println("SelectedMode【"+ selectedMode+"】");
 
 
     }
@@ -124,9 +196,12 @@ public class K2_NotepadTip  implements ClipboardOwner{
         logKeyList.add("WifiNative: Could not get Iface"); 
 
         logKeyList.add("Failed to load WiFi driver"); 
-
+        logKeyList.add("UploadAsyncTask:"); 
         
         
+        logKeyList.add("BUG2GO-Util: TYPE_"); 
+        
+        logKeyList.add("MMApiWebService"); 
         
         
 
@@ -155,6 +230,40 @@ public class K2_NotepadTip  implements ClipboardOwner{
         return printTip;	
     	
     }
+    
+    
+    
+    // 蓝牙 关键字搜索  目前为 空
+    static String Show_BT_Notepad_Search_Tip(){
+    	PrintHead_End("【Windos----NotePad++】搜索 BT_Tip");
+        ArrayList<String> logKeyList = new   ArrayList<String> ();
+        
+        StringBuilder printSB = new StringBuilder();
+        
+
+        
+        String printTip = printSB.toString();
+        
+        return printTip;
+        
+    }
+    
+    
+    
+    static String Show_NFC_Notepad_Search_Tip(){
+    	PrintHead_End("【Windos----NotePad++】搜索 NFC_Tip");
+        ArrayList<String> logKeyList = new   ArrayList<String> ();
+        
+        StringBuilder printSB = new StringBuilder();
+        
+
+        
+        String printTip = printSB.toString();
+        
+        return printTip;
+        
+    }
+    
     
     static String Show_GPS_Notepad_Search_Tip(){
     	PrintHead_End("【Windos----NotePad++】搜索 GPS_Tip");
