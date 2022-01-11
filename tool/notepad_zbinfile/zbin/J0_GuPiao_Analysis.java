@@ -4816,7 +4816,10 @@ static DecimalFormat priceRateFormat  ;
 								
 							}
 							
-
+							cname = 	TScode_StockName_Map.get(tscode);
+							if(cname == null || "".equals(cname)) {
+								cname = "null";
+							}
 							
 							// 填充 cell单元内容
 							rowNext.createCell(0).setCellValue(cname);  
