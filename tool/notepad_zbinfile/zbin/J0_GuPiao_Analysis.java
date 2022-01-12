@@ -96,6 +96,8 @@ public class J0_GuPiao_Analysis {
 
 	static File J0_Properties_File = new File(System.getProperties().getProperty("user.home") + File.separator
 			+ "Desktop" + File.separator + "zbin" + File.separator + "J0.properties");
+	
+
 	static InputStream J0_Properties_InputStream;
 	static OutputStream J0_Properties_OutputStream;
 	static Properties J0_Properties = new Properties();
@@ -122,7 +124,16 @@ public class J0_GuPiao_Analysis {
     static String J0_GuPiaoLieBiao_Path = zbinPath+File.separator+"J0_股票列表.xlsx";
     static String J0_JiaoYiRiQi_Path = zbinPath+File.separator+"J0_交易日历.xlsx";
     
-
+	// 九安医疗_002432 收藏的关注的 喜爱的 stock_item 
+	// 贵州茅台_600519
+	static File J0_Favorite_File = new File(System.getProperties().getProperty("user.home") + File.separator
+			+ "Desktop" + File.separator + "zbin" + File.separator + "J0_Stock_Favorite.txt");
+	
+	static Map<String,String> mFavoriteStock_Tscode_Cname_Map = new HashMap<String,String>();
+	
+	static ArrayList<String> mFravoriteSrock_Raw_List ;  // 原始读取到的列表()
+	static ArrayList<String> mFravoriteSrock_Fixed_List ; // 经过对其排序之后的列表()
+	
     // 当前保存   2021_main_stock.xlsx  2020_main_stock.xlsx 文件的集合  放置于 
 	static ArrayList<File> mYearMainStockFileList = new ArrayList<File>(); // 规则的集合
 	
@@ -294,6 +305,75 @@ public class J0_GuPiao_Analysis {
         return cellValue;
     }
     
+    
+    static void initFavoriteStockItem() {
+        File mFavoriteStockFile = J0_Favorite_File ;
+        
+        if(!mFavoriteStockFile.exists()) {
+        	try {
+        		System.out.println(mFavoriteStockFile.getAbsolutePath()+" 收藏股票列表不存在 创建该文件!!");
+				mFavoriteStockFile.createNewFile();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+        	return ;
+        }
+        
+        mFravoriteSrock_Raw_List = ReadFileContentAsList(mFavoriteStockFile);
+        mFravoriteSrock_Fixed_List = new ArrayList<String>();
+    
+    
+        if(mFravoriteSrock_Raw_List != null) {
+        	for (int i = 0; i < mFravoriteSrock_Raw_List.size(); i++) {
+        		// 九安医疗_002432
+				String oneStock_RawLine = mFravoriteSrock_Raw_List.get(i).trim();
+		
+			
+				oneStock_RawLine = oneStock_RawLine.replace(".SZ", "").replace(".BJ", "").replace(".SH", "").replace(".HK", "");
+				String oneStock_RawLine_Temp =  new String(oneStock_RawLine).replace(" ","").replace("	","").replace("	","").trim();
+				
+				oneStock_RawLine = oneStock_RawLine.replace("ST", "").replace("*", "");
+				
+
+			String clearChineseStr = 	clearChinese(oneStock_RawLine).replace(" ","").replace("	","").replace("	","").trim();
+			System.out.println("isNumeric(clearChineseStr) = "+isNumeric(clearChineseStr)+"   clearChineseStr.length="+clearChineseStr.length());
+			if(isNumeric(clearChineseStr) && clearChineseStr.length() == 6 && !mFavoriteStock_Tscode_Cname_Map.containsKey(clearChineseStr)) {
+				String tsCode = clearChineseStr;
+				String stockName = oneStock_RawLine_Temp.replace(tsCode, "").trim();
+				if(stockName.length() ==5) {
+					if(stockName.contains("*ST")) {
+						mFravoriteSrock_Fixed_List.add(tsCode+" "+stockName+" ");	
+					}
+
+				}	else if(stockName.length() ==4) {
+					if(stockName.contains("ST")) {
+						mFravoriteSrock_Fixed_List.add(tsCode+" "+stockName+"  ");	
+					}else {
+						mFravoriteSrock_Fixed_List.add(tsCode+" "+stockName);
+					}
+	
+				}else 	if(stockName.length() ==3) {
+					mFravoriteSrock_Fixed_List.add(tsCode+" "+stockName+"  ");
+				}else 	if(stockName.length() ==2) {
+					mFravoriteSrock_Fixed_List.add(tsCode+" "+stockName+"    ");
+				}else {
+					mFravoriteSrock_Fixed_List.add(tsCode+" "+stockName);
+				} 
+
+				mFavoriteStock_Tscode_Cname_Map.put(tsCode, stockName);
+			}
+		
+		
+			}
+      	
+        }
+        
+        
+    	
+    	
+    	
+    }
     
     static void  initTradeDayList(){
         File tradeDayFile = new File(J0_JiaoYiRiQi_Path);
@@ -653,8 +733,8 @@ public class J0_GuPiao_Analysis {
 		
 		
 		@Override
-		String ShouPanJia_SheetCell_Operation(String tscode, J0_GuPiao_Analysis.StockHeadData headData,
-				ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> mRiXianList) {
+		String ShouPanJia_SheetCell_Operation(String tscode, StockHeadData headData,
+				ArrayList<RiXianXingQingvShiJianWeiXu> mRiXianList) {
 			// TODO Auto-generated method stub
 	
 			String maxDayStr = headData.max_price_datestr;
@@ -726,8 +806,8 @@ public class J0_GuPiao_Analysis {
 		
 		
 		@Override
-		String ShouPanJia_SheetCell_Operation(String tscode, J0_GuPiao_Analysis.StockHeadData headData,
-				ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> mRiXianList) {
+		String ShouPanJia_SheetCell_Operation(String tscode, StockHeadData headData,
+				ArrayList<RiXianXingQingvShiJianWeiXu> mRiXianList) {
 			// TODO Auto-generated method stub
 	
 			String minDayStr = headData.min_price_datestr;
@@ -796,8 +876,8 @@ public class J0_GuPiao_Analysis {
 		
 		
 		@Override
-		String ShouPanJia_SheetCell_Operation(String tscode, J0_GuPiao_Analysis.StockHeadData headData,
-				ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> mRiXianList) {
+		String ShouPanJia_SheetCell_Operation(String tscode, StockHeadData headData,
+				ArrayList<RiXianXingQingvShiJianWeiXu> mRiXianList) {
 			// TODO Auto-generated method stub
 	
 			String minDayStr = headData.min_price_datestr;
@@ -890,8 +970,8 @@ public class J0_GuPiao_Analysis {
 		
 
 		@Override
-		String ShouPanJia_SheetCell_Operation(String tscode, J0_GuPiao_Analysis.StockHeadData headData,
-				ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> mRiXianList) {
+		String ShouPanJia_SheetCell_Operation(String tscode, StockHeadData headData,
+				ArrayList<RiXianXingQingvShiJianWeiXu> mRiXianList) {
 			// TODO Auto-generated method stub
 			
 			double prePrice = 0 ;  // 时间先的价格
@@ -1003,8 +1083,8 @@ public class J0_GuPiao_Analysis {
 		
 
 		@Override
-		String ShouPanJia_SheetCell_Operation(String tscode, J0_GuPiao_Analysis.StockHeadData headData,
-				ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> mRiXianList) {
+		String ShouPanJia_SheetCell_Operation(String tscode, StockHeadData headData,
+				ArrayList<RiXianXingQingvShiJianWeiXu> mRiXianList) {
 			// TODO Auto-generated method stub
 			
 			double prePrice = 0 ;  // 时间先的价格
@@ -1126,8 +1206,8 @@ public class J0_GuPiao_Analysis {
 		
 		
 		@Override
-		String ShouPanJia_SheetCell_Operation(String tscode, J0_GuPiao_Analysis.StockHeadData headData,
-				ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> mRiXianList) {
+		String ShouPanJia_SheetCell_Operation(String tscode, StockHeadData headData,
+				ArrayList<RiXianXingQingvShiJianWeiXu> mRiXianList) {
 			// TODO Auto-generated method stub
 
 			if(isMaxPrice) {   // 先 都要初始值  最高价格
@@ -1241,8 +1321,8 @@ public class J0_GuPiao_Analysis {
 		
 		
 		@Override
-		String ShouPanJia_SheetCell_Operation(String tscode, J0_GuPiao_Analysis.StockHeadData headData,
-				ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> mRiXianList) {
+		String ShouPanJia_SheetCell_Operation(String tscode, StockHeadData headData,
+				ArrayList<RiXianXingQingvShiJianWeiXu> mRiXianList) {
 			// TODO Auto-generated method stub
 			double curValue = 0 ; 
 			String dateStr = "";
@@ -1392,8 +1472,8 @@ public class J0_GuPiao_Analysis {
 		
 		
 		@Override
-		String ShouPanJia_SheetCell_Operation(String tscode, J0_GuPiao_Analysis.StockHeadData headData,
-				ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> mRiXianList) {
+		String ShouPanJia_SheetCell_Operation(String tscode, StockHeadData headData,
+				ArrayList<RiXianXingQingvShiJianWeiXu> mRiXianList) {
 			// TODO Auto-generated method stub
 			
 			if(mRiXianList == null || mRiXianList.size() == 0) {
@@ -1408,7 +1488,7 @@ public class J0_GuPiao_Analysis {
 			
 			
 			// 从列表中指定返回指定数目的列表  包含2个 1个 0 个的情况
-			ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
+			ArrayList<RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
 		
 			
 			//
@@ -1423,8 +1503,8 @@ public class J0_GuPiao_Analysis {
 		
 		
 		@Override
-		String ZhangDieZhi_SheetCell_Operation(String tscode, J0_GuPiao_Analysis.StockHeadData headData,
-				ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> mRiXianList) {
+		String ZhangDieZhi_SheetCell_Operation(String tscode, StockHeadData headData,
+				ArrayList<RiXianXingQingvShiJianWeiXu> mRiXianList) {
 			// TODO Auto-generated method stub
 		
 			if(mRiXianList == null || mRiXianList.size() == 0) {
@@ -1439,7 +1519,7 @@ public class J0_GuPiao_Analysis {
 			
 			
 			// 从列表中指定返回指定数目的列表  包含2个 1个 0 个的情况
-			ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
+			ArrayList<RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
 		
 			
 			//
@@ -1454,8 +1534,8 @@ public class J0_GuPiao_Analysis {
 
 		
 		@Override
-		String ZhangDieFu_SheetCell_Operation(String tscode, J0_GuPiao_Analysis.StockHeadData headData,
-				ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> mRiXianList) {
+		String ZhangDieFu_SheetCell_Operation(String tscode, StockHeadData headData,
+				ArrayList<RiXianXingQingvShiJianWeiXu> mRiXianList) {
 			// TODO Auto-generated method stub
 			
 			
@@ -1471,7 +1551,7 @@ public class J0_GuPiao_Analysis {
 			
 			
 			// 从列表中指定返回指定数目的列表  包含2个 1个 0 个的情况
-			ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
+			ArrayList<RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
 		
 			
 			//
@@ -1486,7 +1566,7 @@ public class J0_GuPiao_Analysis {
 		
 		@Override
 		String ChengJiaoEr_SheetCell_Operation(String tscode, StockHeadData headData,
-				ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> mRiXianList) {
+				ArrayList<RiXianXingQingvShiJianWeiXu> mRiXianList) {
 			// TODO Auto-generated method stub
 			
 			
@@ -1502,7 +1582,7 @@ public class J0_GuPiao_Analysis {
 			
 			
 			// 从列表中指定返回指定数目的列表  包含2个 1个 0 个的情况
-			ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
+			ArrayList<RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
 		
 			
 			//
@@ -1561,8 +1641,8 @@ public class J0_GuPiao_Analysis {
 		
 		
 		@Override
-		String ShouPanJia_SheetCell_Operation(String tscode, J0_GuPiao_Analysis.StockHeadData headData,
-				ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> mRiXianList) {
+		String ShouPanJia_SheetCell_Operation(String tscode, StockHeadData headData,
+				ArrayList<RiXianXingQingvShiJianWeiXu> mRiXianList) {
 			// TODO Auto-generated method stub
 			
 			if(mRiXianList == null || mRiXianList.size() == 0) {
@@ -1577,7 +1657,7 @@ public class J0_GuPiao_Analysis {
 			
 			
 			// 从列表中指定返回指定数目的列表  包含2个 1个 0 个的情况
-			ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
+			ArrayList<RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
 		
 			
 			//
@@ -1592,8 +1672,8 @@ public class J0_GuPiao_Analysis {
 		
 		
 		@Override
-		String ZhangDieZhi_SheetCell_Operation(String tscode, J0_GuPiao_Analysis.StockHeadData headData,
-				ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> mRiXianList) {
+		String ZhangDieZhi_SheetCell_Operation(String tscode, StockHeadData headData,
+				ArrayList<RiXianXingQingvShiJianWeiXu> mRiXianList) {
 			// TODO Auto-generated method stub
 		
 			if(mRiXianList == null || mRiXianList.size() == 0) {
@@ -1608,7 +1688,7 @@ public class J0_GuPiao_Analysis {
 			
 			
 			// 从列表中指定返回指定数目的列表  包含2个 1个 0 个的情况
-			ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
+			ArrayList<RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
 		
 			
 			//
@@ -1623,8 +1703,8 @@ public class J0_GuPiao_Analysis {
 
 		
 		@Override
-		String ZhangDieFu_SheetCell_Operation(String tscode, J0_GuPiao_Analysis.StockHeadData headData,
-				ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> mRiXianList) {
+		String ZhangDieFu_SheetCell_Operation(String tscode, StockHeadData headData,
+				ArrayList<RiXianXingQingvShiJianWeiXu> mRiXianList) {
 			// TODO Auto-generated method stub
 			
 			
@@ -1640,7 +1720,7 @@ public class J0_GuPiao_Analysis {
 			
 			
 			// 从列表中指定返回指定数目的列表  包含2个 1个 0 个的情况
-			ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
+			ArrayList<RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
 		
 			
 			//
@@ -1655,7 +1735,7 @@ public class J0_GuPiao_Analysis {
 		
 		@Override
 		String ChengJiaoEr_SheetCell_Operation(String tscode, StockHeadData headData,
-				ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> mRiXianList) {
+				ArrayList<RiXianXingQingvShiJianWeiXu> mRiXianList) {
 			// TODO Auto-generated method stub
 			
 			
@@ -1671,7 +1751,7 @@ public class J0_GuPiao_Analysis {
 			
 			
 			// 从列表中指定返回指定数目的列表  包含2个 1个 0 个的情况
-			ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
+			ArrayList<RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
 		
 			
 			//
@@ -1833,8 +1913,8 @@ public class J0_GuPiao_Analysis {
 		
 		
 		@Override
-		String ZhangDieZhi_SheetCell_Operation(String tscode, J0_GuPiao_Analysis.StockHeadData headData,
-				ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> mRiXianList) {
+		String ZhangDieZhi_SheetCell_Operation(String tscode, StockHeadData headData,
+				ArrayList<RiXianXingQingvShiJianWeiXu> mRiXianList) {
 			// TODO Auto-generated method stub
 		
 			if(mRiXianList == null || mRiXianList.size() == 0) {
@@ -1848,7 +1928,7 @@ public class J0_GuPiao_Analysis {
 			
 			
 			// 从列表中指定返回指定数目的列表  包含2个 1个 0 个的情况
-			ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
+			ArrayList<RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
 		
 			
 			//
@@ -1862,8 +1942,8 @@ public class J0_GuPiao_Analysis {
 
 		
 		@Override
-		String ZhangDieFu_SheetCell_Operation(String tscode, J0_GuPiao_Analysis.StockHeadData headData,
-				ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> mRiXianList) {
+		String ZhangDieFu_SheetCell_Operation(String tscode, StockHeadData headData,
+				ArrayList<RiXianXingQingvShiJianWeiXu> mRiXianList) {
 			// TODO Auto-generated method stub
 			
 			
@@ -1878,7 +1958,7 @@ public class J0_GuPiao_Analysis {
 			
 			
 			// 从列表中指定返回指定数目的列表  包含2个 1个 0 个的情况
-			ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
+			ArrayList<RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
 		
 			
 			//
@@ -1950,8 +2030,8 @@ public class J0_GuPiao_Analysis {
 		
 		
 		@Override
-		String ShouPanJia_SheetCell_Operation(String tscode, J0_GuPiao_Analysis.StockHeadData headData,
-				ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> mRiXianList) {
+		String ShouPanJia_SheetCell_Operation(String tscode, StockHeadData headData,
+				ArrayList<RiXianXingQingvShiJianWeiXu> mRiXianList) {
 			// TODO Auto-generated method stub
 			
 			if(mRiXianList == null || mRiXianList.size() == 0) {
@@ -1966,7 +2046,7 @@ public class J0_GuPiao_Analysis {
 			
 			
 			// 从列表中指定返回指定数目的列表  包含2个 1个 0 个的情况
-			ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
+			ArrayList<RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
 		
 			
 			//
@@ -1981,8 +2061,8 @@ public class J0_GuPiao_Analysis {
 		
 		
 		@Override
-		String ZhangDieZhi_SheetCell_Operation(String tscode, J0_GuPiao_Analysis.StockHeadData headData,
-				ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> mRiXianList) {
+		String ZhangDieZhi_SheetCell_Operation(String tscode, StockHeadData headData,
+				ArrayList<RiXianXingQingvShiJianWeiXu> mRiXianList) {
 			// TODO Auto-generated method stub
 		
 			if(mRiXianList == null || mRiXianList.size() == 0) {
@@ -1997,7 +2077,7 @@ public class J0_GuPiao_Analysis {
 			
 			
 			// 从列表中指定返回指定数目的列表  包含2个 1个 0 个的情况
-			ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
+			ArrayList<RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
 		
 			
 			//
@@ -2012,8 +2092,8 @@ public class J0_GuPiao_Analysis {
 
 		
 		@Override
-		String ZhangDieFu_SheetCell_Operation(String tscode, J0_GuPiao_Analysis.StockHeadData headData,
-				ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> mRiXianList) {
+		String ZhangDieFu_SheetCell_Operation(String tscode, StockHeadData headData,
+				ArrayList<RiXianXingQingvShiJianWeiXu> mRiXianList) {
 			// TODO Auto-generated method stub
 			
 			
@@ -2029,7 +2109,7 @@ public class J0_GuPiao_Analysis {
 			
 			
 			// 从列表中指定返回指定数目的列表  包含2个 1个 0 个的情况
-			ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
+			ArrayList<RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
 		
 			
 			//
@@ -2044,7 +2124,7 @@ public class J0_GuPiao_Analysis {
 		
 		@Override
 		String ChengJiaoEr_SheetCell_Operation(String tscode, StockHeadData headData,
-				ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> mRiXianList) {
+				ArrayList<RiXianXingQingvShiJianWeiXu> mRiXianList) {
 			// TODO Auto-generated method stub
 			
 			
@@ -2060,7 +2140,7 @@ public class J0_GuPiao_Analysis {
 			
 			
 			// 从列表中指定返回指定数目的列表  包含2个 1个 0 个的情况
-			ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
+			ArrayList<RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
 		
 			
 			//
@@ -2129,8 +2209,8 @@ public class J0_GuPiao_Analysis {
 		
 		
 		@Override
-		String ShouPanJia_SheetCell_Operation(String tscode, J0_GuPiao_Analysis.StockHeadData headData,
-				ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> mRiXianList) {
+		String ShouPanJia_SheetCell_Operation(String tscode, StockHeadData headData,
+				ArrayList<RiXianXingQingvShiJianWeiXu> mRiXianList) {
 			// TODO Auto-generated method stub
 			
 			if(mRiXianList == null || mRiXianList.size() == 0) {
@@ -2145,7 +2225,7 @@ public class J0_GuPiao_Analysis {
 			
 			
 			// 从列表中指定返回指定数目的列表  包含2个 1个 0 个的情况
-			ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
+			ArrayList<RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
 		
 			
 			//
@@ -2160,8 +2240,8 @@ public class J0_GuPiao_Analysis {
 		
 		
 		@Override
-		String ZhangDieZhi_SheetCell_Operation(String tscode, J0_GuPiao_Analysis.StockHeadData headData,
-				ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> mRiXianList) {
+		String ZhangDieZhi_SheetCell_Operation(String tscode, StockHeadData headData,
+				ArrayList<RiXianXingQingvShiJianWeiXu> mRiXianList) {
 			// TODO Auto-generated method stub
 		
 			if(mRiXianList == null || mRiXianList.size() == 0) {
@@ -2176,7 +2256,7 @@ public class J0_GuPiao_Analysis {
 			
 			
 			// 从列表中指定返回指定数目的列表  包含2个 1个 0 个的情况
-			ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
+			ArrayList<RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
 		
 			
 			//
@@ -2191,8 +2271,8 @@ public class J0_GuPiao_Analysis {
 
 		
 		@Override
-		String ZhangDieFu_SheetCell_Operation(String tscode, J0_GuPiao_Analysis.StockHeadData headData,
-				ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> mRiXianList) {
+		String ZhangDieFu_SheetCell_Operation(String tscode, StockHeadData headData,
+				ArrayList<RiXianXingQingvShiJianWeiXu> mRiXianList) {
 			// TODO Auto-generated method stub
 			
 			
@@ -2208,7 +2288,7 @@ public class J0_GuPiao_Analysis {
 			
 			
 			// 从列表中指定返回指定数目的列表  包含2个 1个 0 个的情况
-			ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
+			ArrayList<RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
 		
 			
 			//
@@ -2223,7 +2303,7 @@ public class J0_GuPiao_Analysis {
 		
 		@Override
 		String ChengJiaoEr_SheetCell_Operation(String tscode, StockHeadData headData,
-				ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> mRiXianList) {
+				ArrayList<RiXianXingQingvShiJianWeiXu> mRiXianList) {
 			// TODO Auto-generated method stub
 			
 			
@@ -2239,7 +2319,7 @@ public class J0_GuPiao_Analysis {
 			
 			
 			// 从列表中指定返回指定数目的列表  包含2个 1个 0 个的情况
-			ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
+			ArrayList<RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
 		
 			
 			//
@@ -2308,8 +2388,8 @@ public class J0_GuPiao_Analysis {
 		
 		
 		@Override
-		String ShouPanJia_SheetCell_Operation(String tscode, J0_GuPiao_Analysis.StockHeadData headData,
-				ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> mRiXianList) {
+		String ShouPanJia_SheetCell_Operation(String tscode, StockHeadData headData,
+				ArrayList<RiXianXingQingvShiJianWeiXu> mRiXianList) {
 			// TODO Auto-generated method stub
 			
 			if(mRiXianList == null || mRiXianList.size() == 0) {
@@ -2324,7 +2404,7 @@ public class J0_GuPiao_Analysis {
 			
 			
 			// 从列表中指定返回指定数目的列表  包含2个 1个 0 个的情况
-			ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
+			ArrayList<RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
 		
 			
 			//
@@ -2339,8 +2419,8 @@ public class J0_GuPiao_Analysis {
 		
 		
 		@Override
-		String ZhangDieZhi_SheetCell_Operation(String tscode, J0_GuPiao_Analysis.StockHeadData headData,
-				ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> mRiXianList) {
+		String ZhangDieZhi_SheetCell_Operation(String tscode, StockHeadData headData,
+				ArrayList<RiXianXingQingvShiJianWeiXu> mRiXianList) {
 			// TODO Auto-generated method stub
 		
 			if(mRiXianList == null || mRiXianList.size() == 0) {
@@ -2355,7 +2435,7 @@ public class J0_GuPiao_Analysis {
 			
 			
 			// 从列表中指定返回指定数目的列表  包含2个 1个 0 个的情况
-			ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
+			ArrayList<RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
 		
 			
 			//
@@ -2370,8 +2450,8 @@ public class J0_GuPiao_Analysis {
 
 		
 		@Override
-		String ZhangDieFu_SheetCell_Operation(String tscode, J0_GuPiao_Analysis.StockHeadData headData,
-				ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> mRiXianList) {
+		String ZhangDieFu_SheetCell_Operation(String tscode, StockHeadData headData,
+				ArrayList<RiXianXingQingvShiJianWeiXu> mRiXianList) {
 			// TODO Auto-generated method stub
 			
 			
@@ -2387,7 +2467,7 @@ public class J0_GuPiao_Analysis {
 			
 			
 			// 从列表中指定返回指定数目的列表  包含2个 1个 0 个的情况
-			ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
+			ArrayList<RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
 		
 			
 			//
@@ -2402,7 +2482,7 @@ public class J0_GuPiao_Analysis {
 		
 		@Override
 		String ChengJiaoEr_SheetCell_Operation(String tscode, StockHeadData headData,
-				ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> mRiXianList) {
+				ArrayList<RiXianXingQingvShiJianWeiXu> mRiXianList) {
 			// TODO Auto-generated method stub
 			
 			
@@ -2418,7 +2498,7 @@ public class J0_GuPiao_Analysis {
 			
 			
 			// 从列表中指定返回指定数目的列表  包含2个 1个 0 个的情况
-			ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
+			ArrayList<RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
 		
 			
 			//
@@ -2487,8 +2567,8 @@ public class J0_GuPiao_Analysis {
 		
 		
 		@Override
-		String ShouPanJia_SheetCell_Operation(String tscode, J0_GuPiao_Analysis.StockHeadData headData,
-				ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> mRiXianList) {
+		String ShouPanJia_SheetCell_Operation(String tscode, StockHeadData headData,
+				ArrayList<RiXianXingQingvShiJianWeiXu> mRiXianList) {
 			// TODO Auto-generated method stub
 			
 			if(mRiXianList == null || mRiXianList.size() == 0) {
@@ -2503,7 +2583,7 @@ public class J0_GuPiao_Analysis {
 			
 			
 			// 从列表中指定返回指定数目的列表  包含2个 1个 0 个的情况
-			ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
+			ArrayList<RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
 		
 			
 			//
@@ -2518,8 +2598,8 @@ public class J0_GuPiao_Analysis {
 		
 		
 		@Override
-		String ZhangDieZhi_SheetCell_Operation(String tscode, J0_GuPiao_Analysis.StockHeadData headData,
-				ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> mRiXianList) {
+		String ZhangDieZhi_SheetCell_Operation(String tscode, StockHeadData headData,
+				ArrayList<RiXianXingQingvShiJianWeiXu> mRiXianList) {
 			// TODO Auto-generated method stub
 		
 			if(mRiXianList == null || mRiXianList.size() == 0) {
@@ -2534,7 +2614,7 @@ public class J0_GuPiao_Analysis {
 			
 			
 			// 从列表中指定返回指定数目的列表  包含2个 1个 0 个的情况
-			ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
+			ArrayList<RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
 		
 			
 			//
@@ -2549,8 +2629,8 @@ public class J0_GuPiao_Analysis {
 
 		
 		@Override
-		String ZhangDieFu_SheetCell_Operation(String tscode, J0_GuPiao_Analysis.StockHeadData headData,
-				ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> mRiXianList) {
+		String ZhangDieFu_SheetCell_Operation(String tscode, StockHeadData headData,
+				ArrayList<RiXianXingQingvShiJianWeiXu> mRiXianList) {
 			// TODO Auto-generated method stub
 			
 			
@@ -2566,7 +2646,7 @@ public class J0_GuPiao_Analysis {
 			
 			
 			// 从列表中指定返回指定数目的列表  包含2个 1个 0 个的情况
-			ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
+			ArrayList<RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
 		
 			
 			//
@@ -2581,7 +2661,7 @@ public class J0_GuPiao_Analysis {
 		
 		@Override
 		String ChengJiaoEr_SheetCell_Operation(String tscode, StockHeadData headData,
-				ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> mRiXianList) {
+				ArrayList<RiXianXingQingvShiJianWeiXu> mRiXianList) {
 			// TODO Auto-generated method stub
 			
 			
@@ -2597,7 +2677,7 @@ public class J0_GuPiao_Analysis {
 			
 			
 			// 从列表中指定返回指定数目的列表  包含2个 1个 0 个的情况
-			ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
+			ArrayList<RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
 		
 			
 			//
@@ -2664,8 +2744,8 @@ public class J0_GuPiao_Analysis {
 		
 		
 		@Override
-		String ShouPanJia_SheetCell_Operation(String tscode, J0_GuPiao_Analysis.StockHeadData headData,
-				ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> mRiXianList) {
+		String ShouPanJia_SheetCell_Operation(String tscode, StockHeadData headData,
+				ArrayList<RiXianXingQingvShiJianWeiXu> mRiXianList) {
 			// TODO Auto-generated method stub
 			
 			if(mRiXianList == null || mRiXianList.size() == 0) {
@@ -2680,7 +2760,7 @@ public class J0_GuPiao_Analysis {
 			
 			
 			// 从列表中指定返回指定数目的列表  包含2个 1个 0 个的情况
-			ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
+			ArrayList<RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
 		
 			
 			//
@@ -2695,8 +2775,8 @@ public class J0_GuPiao_Analysis {
 		
 		
 		@Override
-		String ZhangDieZhi_SheetCell_Operation(String tscode, J0_GuPiao_Analysis.StockHeadData headData,
-				ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> mRiXianList) {
+		String ZhangDieZhi_SheetCell_Operation(String tscode, StockHeadData headData,
+				ArrayList<RiXianXingQingvShiJianWeiXu> mRiXianList) {
 			// TODO Auto-generated method stub
 		
 			if(mRiXianList == null || mRiXianList.size() == 0) {
@@ -2711,7 +2791,7 @@ public class J0_GuPiao_Analysis {
 			
 			
 			// 从列表中指定返回指定数目的列表  包含2个 1个 0 个的情况
-			ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
+			ArrayList<RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
 		
 			
 			//
@@ -2726,8 +2806,8 @@ public class J0_GuPiao_Analysis {
 
 		
 		@Override
-		String ZhangDieFu_SheetCell_Operation(String tscode, J0_GuPiao_Analysis.StockHeadData headData,
-				ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> mRiXianList) {
+		String ZhangDieFu_SheetCell_Operation(String tscode, StockHeadData headData,
+				ArrayList<RiXianXingQingvShiJianWeiXu> mRiXianList) {
 			// TODO Auto-generated method stub
 			
 			
@@ -2743,7 +2823,7 @@ public class J0_GuPiao_Analysis {
 			
 			
 			// 从列表中指定返回指定数目的列表  包含2个 1个 0 个的情况
-			ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
+			ArrayList<RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
 		
 			
 			//
@@ -2758,7 +2838,7 @@ public class J0_GuPiao_Analysis {
 		
 		@Override
 		String ChengJiaoEr_SheetCell_Operation(String tscode, StockHeadData headData,
-				ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> mRiXianList) {
+				ArrayList<RiXianXingQingvShiJianWeiXu> mRiXianList) {
 			// TODO Auto-generated method stub
 			
 			
@@ -2774,7 +2854,7 @@ public class J0_GuPiao_Analysis {
 			
 			
 			// 从列表中指定返回指定数目的列表  包含2个 1个 0 个的情况
-			ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
+			ArrayList<RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
 		
 			
 			//
@@ -2844,8 +2924,8 @@ public class J0_GuPiao_Analysis {
 		
 		
 		@Override
-		String ShouPanJia_SheetCell_Operation(String tscode, J0_GuPiao_Analysis.StockHeadData headData,
-				ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> mRiXianList) {
+		String ShouPanJia_SheetCell_Operation(String tscode, StockHeadData headData,
+				ArrayList<RiXianXingQingvShiJianWeiXu> mRiXianList) {
 			// TODO Auto-generated method stub
 			
 			if(mRiXianList == null || mRiXianList.size() == 0) {
@@ -2860,7 +2940,7 @@ public class J0_GuPiao_Analysis {
 			
 			
 			// 从列表中指定返回指定数目的列表  包含2个 1个 0 个的情况
-			ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
+			ArrayList<RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
 		
 			
 			//
@@ -2875,8 +2955,8 @@ public class J0_GuPiao_Analysis {
 		
 		
 		@Override
-		String ZhangDieZhi_SheetCell_Operation(String tscode, J0_GuPiao_Analysis.StockHeadData headData,
-				ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> mRiXianList) {
+		String ZhangDieZhi_SheetCell_Operation(String tscode, StockHeadData headData,
+				ArrayList<RiXianXingQingvShiJianWeiXu> mRiXianList) {
 			// TODO Auto-generated method stub
 		
 			if(mRiXianList == null || mRiXianList.size() == 0) {
@@ -2891,7 +2971,7 @@ public class J0_GuPiao_Analysis {
 			
 			
 			// 从列表中指定返回指定数目的列表  包含2个 1个 0 个的情况
-			ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
+			ArrayList<RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
 		
 			
 			//
@@ -2906,8 +2986,8 @@ public class J0_GuPiao_Analysis {
 
 		
 		@Override
-		String ZhangDieFu_SheetCell_Operation(String tscode, J0_GuPiao_Analysis.StockHeadData headData,
-				ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> mRiXianList) {
+		String ZhangDieFu_SheetCell_Operation(String tscode, StockHeadData headData,
+				ArrayList<RiXianXingQingvShiJianWeiXu> mRiXianList) {
 			// TODO Auto-generated method stub
 			
 			
@@ -2923,7 +3003,7 @@ public class J0_GuPiao_Analysis {
 			
 			
 			// 从列表中指定返回指定数目的列表  包含2个 1个 0 个的情况
-			ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
+			ArrayList<RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
 		
 			
 			//
@@ -2938,7 +3018,7 @@ public class J0_GuPiao_Analysis {
 		
 		@Override
 		String ChengJiaoEr_SheetCell_Operation(String tscode, StockHeadData headData,
-				ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> mRiXianList) {
+				ArrayList<RiXianXingQingvShiJianWeiXu> mRiXianList) {
 			// TODO Auto-generated method stub
 			
 			
@@ -2954,7 +3034,7 @@ public class J0_GuPiao_Analysis {
 			
 			
 			// 从列表中指定返回指定数目的列表  包含2个 1个 0 个的情况
-			ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
+			ArrayList<RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
 		
 			
 			//
@@ -3022,8 +3102,8 @@ public class J0_GuPiao_Analysis {
 		
 		
 		@Override
-		String ShouPanJia_SheetCell_Operation(String tscode, J0_GuPiao_Analysis.StockHeadData headData,
-				ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> mRiXianList) {
+		String ShouPanJia_SheetCell_Operation(String tscode, StockHeadData headData,
+				ArrayList<RiXianXingQingvShiJianWeiXu> mRiXianList) {
 			// TODO Auto-generated method stub
 			
 			if(mRiXianList == null || mRiXianList.size() == 0) {
@@ -3038,7 +3118,7 @@ public class J0_GuPiao_Analysis {
 			
 			
 			// 从列表中指定返回指定数目的列表  包含2个 1个 0 个的情况
-			ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
+			ArrayList<RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
 		
 			
 			//
@@ -3053,8 +3133,8 @@ public class J0_GuPiao_Analysis {
 		
 		
 		@Override
-		String ZhangDieZhi_SheetCell_Operation(String tscode, J0_GuPiao_Analysis.StockHeadData headData,
-				ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> mRiXianList) {
+		String ZhangDieZhi_SheetCell_Operation(String tscode, StockHeadData headData,
+				ArrayList<RiXianXingQingvShiJianWeiXu> mRiXianList) {
 			// TODO Auto-generated method stub
 		
 			if(mRiXianList == null || mRiXianList.size() == 0) {
@@ -3069,7 +3149,7 @@ public class J0_GuPiao_Analysis {
 			
 			
 			// 从列表中指定返回指定数目的列表  包含2个 1个 0 个的情况
-			ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
+			ArrayList<RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
 		
 			
 			//
@@ -3084,8 +3164,8 @@ public class J0_GuPiao_Analysis {
 
 		
 		@Override
-		String ZhangDieFu_SheetCell_Operation(String tscode, J0_GuPiao_Analysis.StockHeadData headData,
-				ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> mRiXianList) {
+		String ZhangDieFu_SheetCell_Operation(String tscode, StockHeadData headData,
+				ArrayList<RiXianXingQingvShiJianWeiXu> mRiXianList) {
 			// TODO Auto-generated method stub
 			
 			
@@ -3101,7 +3181,7 @@ public class J0_GuPiao_Analysis {
 			
 			
 			// 从列表中指定返回指定数目的列表  包含2个 1个 0 个的情况
-			ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
+			ArrayList<RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
 		
 			
 			//
@@ -3116,7 +3196,7 @@ public class J0_GuPiao_Analysis {
 		
 		@Override
 		String ChengJiaoEr_SheetCell_Operation(String tscode, StockHeadData headData,
-				ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> mRiXianList) {
+				ArrayList<RiXianXingQingvShiJianWeiXu> mRiXianList) {
 			// TODO Auto-generated method stub
 			
 			
@@ -3132,7 +3212,7 @@ public class J0_GuPiao_Analysis {
 			
 			
 			// 从列表中指定返回指定数目的列表  包含2个 1个 0 个的情况
-			ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
+			ArrayList<RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
 		
 			
 			//
@@ -3155,7 +3235,7 @@ public class J0_GuPiao_Analysis {
 	
 	
 	public static 	double calLastRiXianListValueSum(String prop,int predayCount , 
-			ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> rawRiXianList) {
+			ArrayList<RiXianXingQingvShiJianWeiXu> rawRiXianList) {
 		double mDoubleValue = 0 ;
 		double mDoubleSumValue = 0 ;
 		int listSize = rawRiXianList.size();
@@ -3215,7 +3295,7 @@ public class J0_GuPiao_Analysis {
 	}
 	
 	public static 	double calLastRiXianListValue(String prop,int predayCount , 
-			ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> rawRiXianList) {
+			ArrayList<RiXianXingQingvShiJianWeiXu> rawRiXianList) {
 		double mDoubleValue = 0 ;
 		double mDoubleSumValue = 0 ;
 		int listSize = rawRiXianList.size();
@@ -3274,9 +3354,9 @@ public class J0_GuPiao_Analysis {
 	
 	}
 	
-static	ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> 	getLastRiXianListWithCount( 
-			ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> rawRiXianList , int dayCount){
-	ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu>  resultList = new 	ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu>();
+static	ArrayList<RiXianXingQingvShiJianWeiXu> 	getLastRiXianListWithCount(
+        ArrayList<RiXianXingQingvShiJianWeiXu> rawRiXianList , int dayCount){
+	ArrayList<RiXianXingQingvShiJianWeiXu>  resultList = new 	ArrayList<RiXianXingQingvShiJianWeiXu>();
 	
 	
 	int listSize = rawRiXianList.size();
@@ -3361,8 +3441,8 @@ static	ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> 	getLastRiXianL
 		
 		
 		@Override
-		String ShouPanJia_SheetCell_Operation(String tscode, J0_GuPiao_Analysis.StockHeadData headData,
-				ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> mRiXianList) {
+		String ShouPanJia_SheetCell_Operation(String tscode, StockHeadData headData,
+				ArrayList<RiXianXingQingvShiJianWeiXu> mRiXianList) {
 			// TODO Auto-generated method stub
 			
 			if(mRiXianList == null || mRiXianList.size() == 0) {
@@ -3377,7 +3457,7 @@ static	ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> 	getLastRiXianL
 			
 			
 			// 从列表中指定返回指定数目的列表  包含2个 1个 0 个的情况
-			ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
+			ArrayList<RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
 		
 			
 			//
@@ -3392,8 +3472,8 @@ static	ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> 	getLastRiXianL
 		
 		
 		@Override
-		String ZhangDieZhi_SheetCell_Operation(String tscode, J0_GuPiao_Analysis.StockHeadData headData,
-				ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> mRiXianList) {
+		String ZhangDieZhi_SheetCell_Operation(String tscode, StockHeadData headData,
+				ArrayList<RiXianXingQingvShiJianWeiXu> mRiXianList) {
 			// TODO Auto-generated method stub
 		
 			if(mRiXianList == null || mRiXianList.size() == 0) {
@@ -3408,7 +3488,7 @@ static	ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> 	getLastRiXianL
 			
 			
 			// 从列表中指定返回指定数目的列表  包含2个 1个 0 个的情况
-			ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
+			ArrayList<RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
 		
 			
 			//
@@ -3424,8 +3504,8 @@ static	ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> 	getLastRiXianL
 
 		
 		@Override
-		String ZhangDieFu_SheetCell_Operation(String tscode, J0_GuPiao_Analysis.StockHeadData headData,
-				ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> mRiXianList) {
+		String ZhangDieFu_SheetCell_Operation(String tscode, StockHeadData headData,
+				ArrayList<RiXianXingQingvShiJianWeiXu> mRiXianList) {
 			// TODO Auto-generated method stub
 			
 			
@@ -3441,7 +3521,7 @@ static	ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> 	getLastRiXianL
 			
 			
 			// 从列表中指定返回指定数目的列表  包含2个 1个 0 个的情况
-			ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
+			ArrayList<RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
 		
 			
 			//
@@ -3456,7 +3536,7 @@ static	ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> 	getLastRiXianL
 		
 		@Override
 		String ChengJiaoEr_SheetCell_Operation(String tscode, StockHeadData headData,
-				ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> mRiXianList) {
+				ArrayList<RiXianXingQingvShiJianWeiXu> mRiXianList) {
 			// TODO Auto-generated method stub
 			
 			
@@ -3472,7 +3552,7 @@ static	ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> 	getLastRiXianL
 			
 			
 			// 从列表中指定返回指定数目的列表  包含2个 1个 0 个的情况
-			ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
+			ArrayList<RiXianXingQingvShiJianWeiXu> lastDaysList = getLastRiXianListWithCount(mRiXianList,preday_count);
 		
 			
 			//
@@ -3495,8 +3575,8 @@ static	ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> 	getLastRiXianL
 		
 		
 		@Override
-		String ShouPanJia_SheetCell_Operation(String tscode, J0_GuPiao_Analysis.StockHeadData headData,
-				ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> mRiXianList) {
+		String ShouPanJia_SheetCell_Operation(String tscode, StockHeadData headData,
+				ArrayList<RiXianXingQingvShiJianWeiXu> mRiXianList) {
 			// TODO Auto-generated method stub
 			
 			if(mRiXianList == null || mRiXianList.size() == 0) {
@@ -3519,8 +3599,8 @@ static	ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> 	getLastRiXianL
 		}
 		
 		@Override
-		String ZhangDieZhi_SheetCell_Operation(String tscode, J0_GuPiao_Analysis.StockHeadData headData,
-				ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> mRiXianList) {
+		String ZhangDieZhi_SheetCell_Operation(String tscode, StockHeadData headData,
+				ArrayList<RiXianXingQingvShiJianWeiXu> mRiXianList) {
 			// TODO Auto-generated method stub
 		
 			if(mRiXianList == null || mRiXianList.size() == 0) {
@@ -3546,8 +3626,8 @@ static	ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> 	getLastRiXianL
 
 		
 		@Override
-		String ZhangDieFu_SheetCell_Operation(String tscode, J0_GuPiao_Analysis.StockHeadData headData,
-				ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> mRiXianList) {
+		String ZhangDieFu_SheetCell_Operation(String tscode, StockHeadData headData,
+				ArrayList<RiXianXingQingvShiJianWeiXu> mRiXianList) {
 			// TODO Auto-generated method stub
 			
 			
@@ -3574,7 +3654,7 @@ static	ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> 	getLastRiXianL
 		
 		@Override
 		String ChengJiaoEr_SheetCell_Operation(String tscode, StockHeadData headData,
-				ArrayList<J0_GuPiao_Analysis.RiXianXingQingvShiJianWeiXu> mRiXianList) {
+				ArrayList<RiXianXingQingvShiJianWeiXu> mRiXianList) {
 			// TODO Auto-generated method stub
 			
 			if(mRiXianList == null || mRiXianList.size() == 0) {
@@ -4234,12 +4314,15 @@ static DecimalFormat priceRateFormat  ;
 			}
 			
 			initTradeDayList();
-			
+			isJ0DataDir_Have_Day_Json_File(mYYYMMdd);  //初始话 json 文件列表
 			// 需要确保 当前 mYYYMMdd 是一个交易日的日期
-			
+			// 例如 一年最后一天  20171231 不是交易日的情况
+			while(!allTradeDayList.contains(mYYYMMdd)){
+				mYYYMMdd = getYesterTradeDayIntFlag(mYYYMMdd);
+			};
 		
 			System.out.println("mYearInt【"+mYearInt+"】  mYYYMMdd【"+mYYYMMdd+"】 isShowLog 【"+isShowLog+"】");
-			isJ0DataDir_Have_Day_Json_File(mYYYMMdd);
+
 			mMatchTradeDay_LogFile = new File(J0_Data_Dir_Path+File.separator+mYearInt+"_main_stock.log");
 			
 	
@@ -4376,7 +4459,7 @@ static DecimalFormat priceRateFormat  ;
 			File matchDayJsonFile = 	getMatchTradeDayJsonFile(needAddTradeDayInt,mDayJsonFileList);
 				if(matchDayJsonFile == null) {
 					mdAddFaiedTradeDayList.add(needAddTradeDayInt);
-					System.out.println("没有匹配到的交易日期 "+needAddTradeDayInt+" 的Json文件为空! ");
+					System.out.println("没有匹配到的交易日期 "+needAddTradeDayInt+" 的Json文件为空!  mDayJsonFileList.size()="+mDayJsonFileList.size());
 					continue;
 				}else {
 					
@@ -4822,8 +4905,31 @@ static DecimalFormat priceRateFormat  ;
 							}
 							
 							// 填充 cell单元内容
-							rowNext.createCell(0).setCellValue(cname);  
-							rowNext.createCell(1).setCellValue(tscode);
+							// 判断是否是 收藏的 J0_Stock_Favorite.txt 里的列表  如果是 那么把名称调整为 黄色
+							
+			
+							String clearAreaTscode = tscode.replace(".SH", "").replace(".SZ", "").replace(".HK", "").replace(".BJ", "").trim();
+							if(mFavoriteStock_Tscode_Cname_Map.containsKey(clearAreaTscode)) {
+								// 是与收藏列表匹配的 stockItem 
+								
+					            CellStyle FavoriteStockStyle=workbook.createCellStyle();
+					            FavoriteStockStyle.setFillForegroundColor(IndexedColors.LIGHT_YELLOW.getIndex());
+					            FavoriteStockStyle.setFillPattern(CellStyle.SOLID_FOREGROUND);
+
+					            // 为关注的 股票 添加 黄色的北京颜色
+					    	 	Cell mFravoriteStockCell =    rowNext.createCell(0);
+					    	 	mFravoriteStockCell.setCellValue(cname);
+					    	 	mFravoriteStockCell.setCellStyle(null);
+					    	 	mFravoriteStockCell.setCellStyle(FavoriteStockStyle);
+						
+								rowNext.createCell(1).setCellValue(tscode);
+							}else {
+								rowNext.createCell(0).setCellValue(cname);  
+								rowNext.createCell(1).setCellValue(tscode);	
+							}
+							
+				
+							
 							
 							if((mYYYMMdd+"").equals(tradeDay)) {
 					
@@ -6140,6 +6246,50 @@ static DecimalFormat priceRateFormat  ;
 
 	}
 	
+	
+	
+	static void showFavoriteStock() {
+		
+	
+		System.out.println("═══════════════════" + "Favorite_Stock 收藏关注股票列表 Begin" + "═══════════════════" + "\n");
+		if(mFravoriteSrock_Fixed_List == null || mFravoriteSrock_Fixed_List.size() == 0) {
+			System.out.println("当前收藏股票列表为空!");
+			
+		}else {
+			int count = 1;
+			StringBuilder sb = new StringBuilder();
+			mFravoriteSrock_Fixed_List.sort(new Comparator<String>() {
+	            @Override
+	            public int compare(String o1, String o2) {
+	                return o1.compareTo(o2);
+	            }
+	        });
+			for (int i = 0; i < mFravoriteSrock_Fixed_List.size(); i++) {
+				String mFaveriteStockTip = mFravoriteSrock_Fixed_List.get(i);  // "688029 际华集团"
+	
+				if(count%5 == 0) {
+					sb.append("【"+getPaddingIntString(count, 4, "0", true)+":"+mFaveriteStockTip+"】\n");	
+				}else {
+					sb.append("【"+getPaddingIntString(count, 4, "0", true)+":"+mFaveriteStockTip+"】");	
+				}
+		
+				
+				count++;
+			
+			}
+			
+			writeContentToFile(J0_Favorite_File, mFravoriteSrock_Fixed_List);
+			System.out.println(sb + "\n");
+			
+		}
+		System.out.println("_______打开 "+J0_Favorite_File.getName()+"添加数据");
+		System.out.println("notepad++ "+J0_Favorite_File.getAbsolutePath());
+
+		System.out.println("═══════════════════" + "Favorite_Stock 收藏关注股票列表 End " + "═══════════════════" + "\n");
+
+		
+		
+	}
 	static void showRuleMethod() {
 		
 		System.out.println("对Type文件内容 进行 Index 规则的处理  identy=【 Type_Index 】【 文件后缀_当前操作逻辑索引】\n");
@@ -6622,8 +6772,9 @@ for (int i = 0; i < columnHeadArr.size(); i++) {
 	}
 	
 	static void showTip() {
-	
+		initFavoriteStockItem();  // 初始化 关注的喜爱的 股票列表
 		showRuleMethod();
+		showFavoriteStock();
 		showMainFileStatus();
 		
 	}
@@ -6711,6 +6862,8 @@ for (int i = 0; i < columnHeadArr.size(); i++) {
 		// 索引从1开始
 		initTsCodeList();   //  开始 初始化  TS_Code
 		initTradeDayList();
+		initFavoriteStockItem();
+		
 		for (int i = 0; i < Rule_Identify_TypeIndexList.size(); i++) { // 依据文件类型 去找到文件
 			// html_1
 			String applyRuleString = Rule_Identify_TypeIndexList.get(i);
