@@ -12914,9 +12914,9 @@ File  curFileImag = new File(ImageDownloadDir.getAbsolutePath()+File.separator+g
 
 		@Override
 		String simpleDesc() {
-			return "\n" + Cur_Bat_Name + "  #_13_mp4    ### 动态计算当前文件夹中所有子文件中的mp4文件夹中的 mp4文件个数  并在当前目录生成html文件 \n"
-					+ Cur_Bat_Name + "  #_13_jpg    ### 动态计算当前文件夹中所有子文件中的jpg文件夹中的 jpg文件个数 并在当前目录生成html文件\n"
-					+ Cur_Bat_Name + "  #_13_gif    ### 动态计算当前文件夹中所有子文件中的gif文件夹中的 gif文件个数 并在当前目录生成html文件\n"
+			return "\n" + Cur_Bat_Name + "  #_13_mp4    ### 动态计算当前文件夹中所有子文件中的mp4文件夹中的 mp4文件个数(孙文件夹名称必须是mp4)  并在当前shell目录生成html文件 \n"
+					+ Cur_Bat_Name + "  #_13_jpg    ### 动态计算当前文件夹中所有子文件中的jpg文件夹中的 jpg文件个数(孙文件夹名称必须是jpg) 并在当前目录生成html文件\n"
+					+ Cur_Bat_Name + "  #_13_gif    ### 动态计算当前文件夹中所有子文件中的gif文件夹中的 gif文件个数(孙文件夹名称必须是gif) 并在当前目录生成html文件\n"
 					+ Cur_Bat_Name
 					+ "  #_13_mp4  <单个子件夹参数>  ### 同没有参数(但shell路径不同) 动态计算当前文件夹中所有子文件中的mp4文件夹中的 mp4文件个数 并在当前目录生成html文件\n"
 					+ Cur_Bat_Name
@@ -13108,12 +13108,22 @@ File  curFileImag = new File(ImageDownloadDir.getAbsolutePath()+File.separator+g
 	class CalCulMediaHtml_Rule_12 extends Basic_Rule {
 
 		ArrayList<File> operaDirFileList; // 当前从参数获得的目录文件集合
-		int operaType; // 0-unknow 1--mp4 2--jpg 3--gif
+		int operaType; // 0-unknow  1--mp4 2--jpg 3--gif     // 4--allmp4    把当前所有的mp4文件转为一个数组  放入到html页面
 
+		
+		ArrayList<File> allMp4FileList; //  当前目录的所有的mp4文件的列表   operaType=4--allmp4 适用
+		
+		
+		
+		ArrayList<File> mp4AllHtmlTemplate_FileList;
+		
 		ArrayList<File> mp4HtmlTemplate_FileList;
 		ArrayList<File> jpgHtmlTemplate_FileList;
 		ArrayList<File> gifHtmlTemplate_FileList;
 
+		File Mp4_All_3x3_Html_TemplateFile;
+		
+		
 		File Mp4_2x2_Html_TemplateFile;
 		File Mp4_3x3_Html_TemplateFile;
 		File Mp4_3x5_Html_TemplateFile;
@@ -13175,10 +13185,16 @@ File  curFileImag = new File(ImageDownloadDir.getAbsolutePath()+File.separator+g
 			super("#", 12, 5);
 			operaType = 0;
 			operaDirFileList = new ArrayList<File>();
+			mp4AllHtmlTemplate_FileList = new ArrayList<File>();
 			mp4HtmlTemplate_FileList = new ArrayList<File>();
 			jpgHtmlTemplate_FileList = new ArrayList<File>();
 			gifHtmlTemplate_FileList = new ArrayList<File>();
 
+			
+			Mp4_All_3x3_Html_TemplateFile = new File(zbinPath + File.separator + "G2_Rule12_mp4_all_3x3.html");
+			mp4AllHtmlTemplate_FileList.add(Mp4_All_3x3_Html_TemplateFile);
+			
+			
 			Mp4_2x2_Html_TemplateFile = new File(zbinPath + File.separator + "G2_Rule12_mp4_2x2.html");
 			Mp4_3x3_Html_TemplateFile = new File(zbinPath + File.separator + "G2_Rule12_mp4_3x3.html");
 			Mp4_3x5_Html_TemplateFile = new File(zbinPath + File.separator + "G2_Rule12_mp4_3x5.html");
@@ -13306,7 +13322,10 @@ File  curFileImag = new File(ImageDownloadDir.getAbsolutePath()+File.separator+g
 				operaType = 2;
 			} else if (inputParam.contains("_gif")) {
 				operaType = 3;
+			} else if (inputParam.contains("_allmp4")) {
+				operaType = 4;
 			}
+
 
 			return super.initParams4InputParam(inputParam);
 		}
@@ -13354,20 +13373,36 @@ File  curFileImag = new File(ImageDownloadDir.getAbsolutePath()+File.separator+g
 						operaDirFileList.add(dirFile);
 					} else if (operaType == 3 && dirName.contains("gif")) {
 						operaDirFileList.add(dirFile);
-					}
+					} 
 
 				}
 
 			}
-			if (operaDirFileList.size() == 0) {
-				System.out.println("当前用户没有输入执行的目录名称,请重新输入C!");
-				return null;
+
+			
+			
+			if(operaType == 4 ) {   //  对当前目录的所有的
+
+				
+				
+				OperationHtmlMedia(curDirFile);
+				
+			} else {
+				
+				if (operaDirFileList.size() == 0) {
+					System.out.println("当前用户没有输入执行的目录名称,请重新输入C!");
+					return null;
+				}
+				
+				for (int i = 0; i < operaDirFileList.size(); i++) {
+					File operaDirFile = operaDirFileList.get(i);
+					OperationHtmlMedia(operaDirFile);
+				}
+				
+				
 			}
 
-			for (int i = 0; i < operaDirFileList.size(); i++) {
-				File operaDirFile = operaDirFileList.get(i);
-				OperationHtmlMedia(operaDirFile);
-			}
+	
 
 			return super.applyDir_SubFileListRule5(allSubDirFileList, allSubRealFileList);
 		}
@@ -13380,9 +13415,17 @@ File  curFileImag = new File(ImageDownloadDir.getAbsolutePath()+File.separator+g
 				System.out.println("当前用户没有输入执行的目录名称,请重新输入C!");
 				return null;
 			}
-			for (int i = 0; i < operaDirFileList.size(); i++) {
-				File operaDirFile = operaDirFileList.get(i);
-				OperationHtmlMedia(operaDirFile);
+		     if(operaType == 4 ) {   //  mp4all 的 逻辑与 别的逻辑 有点区别
+
+				OperationHtmlMedia(curDirFile);
+				
+			}else {
+				for (int i = 0; i < operaDirFileList.size(); i++) {
+					File operaDirFile = operaDirFileList.get(i);
+					OperationHtmlMedia(operaDirFile);
+				}
+
+				
 			}
 
 			return super.applySubFileListRule4(curFileList, subFileTypeMap, curDirList, curRealFileList);
@@ -13405,6 +13448,56 @@ File  curFileImag = new File(ImageDownloadDir.getAbsolutePath()+File.separator+g
 					tryMediaFileRenameOperation(gif_mediaFileList, ".gif");
 					tryGIFHtmlOperation(xdirFile, gif_mediaFileList.size());
 					break;
+					
+				case 4: // allmp4
+					
+						allMp4FileList = getAllSubFile(curDirFile, ".mp4");
+						if(allMp4FileList == null || allMp4FileList.size() == 0) {
+							System.out.println("  当前目录 curDirFile="+curDirFile.getAbsolutePath()+" 没有寻找到 .mp4文件 执行生成 allmp4-html文件失败!");
+					           return;
+						}
+							System.out.println("  当前目录 curDirFile="+curDirFile.getAbsolutePath()+" allMp4FileList.size()="+allMp4FileList.size());
+		
+						StringBuilder  htmlCodeSB_head1 = new StringBuilder();
+						StringBuilder  htmlCodeSB_head2 = new StringBuilder();
+						
+						
+						htmlCodeSB_head1.append("var videoCount =  "+allMp4FileList.size()+";\n");
+						htmlCodeSB_head2.append("var videolist = [");
+						for (int i = 0; i <  allMp4FileList.size(); i++) {
+							File mp4File = allMp4FileList.get(i);
+							String mp4FilePath = allMp4FileList.get(i).getAbsolutePath();
+							String mp4FilePath_fixed  = mp4FilePath.replace(File.separator, "/");
+							String varName = "videofile_"+i;
+							htmlCodeSB_head1.append(varName+" ={  index:"+i+" , filepath:\""+mp4FilePath_fixed+"\" };"+"\n");
+							if(i == allMp4FileList.size() -1) {
+								htmlCodeSB_head2.append(varName+"");
+							}else {
+								htmlCodeSB_head2.append(varName+",");
+							}
+						
+						}
+						htmlCodeSB_head2.append("];\n");
+						
+		
+
+						String htmlCode = htmlCodeSB_head1+"\n"+htmlCodeSB_head2.toString();
+						
+						System.out.println("  htmlCode=\n "+htmlCode.toString());
+						
+							// hoderplace -begin
+//							videofile_0 = { index:0 , path:"./mp4_1/mp4/",length:11,};
+//							video1 = { index:1 , path:"./mp4_2/mp4/",length:11,};
+//							var objectArr = [ person0,person1, ];
+							// hoderplace -end
+							
+							
+						tryAllMp4HtmlOperation(htmlCode);
+					
+
+					break;
+					
+					
 				default:
 			}
 
@@ -13505,14 +13598,48 @@ File  curFileImag = new File(ImageDownloadDir.getAbsolutePath()+File.separator+g
 
 		}
 
+		
+		// allMp4 的 操作逻辑
+		void tryAllMp4HtmlOperation(String commonHtmlCode) {
+			String curDirName = curDirFile.getName();
+			String curParentDirName = curDirFile.getParentFile().getName();
+			System.out.println("curDirFile = " + curDirFile.getAbsolutePath());
+			System.out.println("ParentFile = " + curDirFile.getParentFile().getAbsolutePath());
+
+			for (int i = 0; i < mp4AllHtmlTemplate_FileList.size(); i++) {
+				File HtmlFile = mp4AllHtmlTemplate_FileList.get(i);
+				if (!HtmlFile.exists()) {
+					System.out.println("注意当前Html文件不存在!  PATH:  " + HtmlFile.getAbsolutePath());
+					continue;
+				}
+				String htmlname = HtmlFile.getName();
+				htmlname = htmlname.replace("G2_Rule12", curDirName);
+
+				String htmlContent = ReadFileContent(HtmlFile);
+				htmlContent = htmlContent.replace("zukgitPlaceHolderindex", commonHtmlCode);
+
+				File curShellHtmlFile = new File(
+						curDirFile.getAbsolutePath() + File.separator + "" + htmlname);
+				writeContentToFile(curShellHtmlFile, htmlContent);
+				System.out.println("htmlContent:"+ htmlContent);
+				System.out.println("生成Html文件:"+ curShellHtmlFile.getAbsolutePath());
+			}
+
+		}
+		
+		
 		@Override
 		String simpleDesc() {
-			return "\n" + Cur_Bat_Name + "  #_12_mp4      ### 把当前可能的目录mp4文件生成 html 播放文件  \n" + Cur_Bat_Name
-					+ "  #_12_gif      ### 把当前可能的目录gif文件生成 html 播放文件  \n" + Cur_Bat_Name
-					+ "  #_12_jpg      ### 把当前可能的目录jpg文件生成 html 播放文件  \n" + Cur_Bat_Name
-					+ "  #_12_mp4   <目标文件夹目录>   ### 把当前目录mp4文件生成 html 播放文件  \n" + Cur_Bat_Name
-					+ "  #_12_gif   <目标文件夹目录>   ### 把当前目录gif文件生成 html 播放文件  \n" + Cur_Bat_Name
-					+ "  #_12_jpg   <目标文件夹目录>   ### 把当前目录jpg文件生成 html 播放文件  \n";
+			return "\n" + Cur_Bat_Name
+					+ "  #_12_mp4      ### 把目录中包含mp4的文件夹进行检索 生成 [mp4目录名称-html文件][mp4改名1.2.3][单一文件夹] 播放文件  \n" + Cur_Bat_Name
+					+ "  #_12_allmp4    ### 把目录中所有的mp4文件 生成 Arr数组 放入 [allmp4_timestamp_html][mp4不改名][多文件夹] 播放文件  \n" + Cur_Bat_Name
+					+ "  #_12_gif      ### 把目录中包含gif的文件夹进行检索 生成 gif-html 播放文件  \n" + Cur_Bat_Name
+					+ "  #_12_jpg      ### 把目录中包含jpg的文件夹进行检索 生成 jpg-html 播放文件  \n" + Cur_Bat_Name
+					+ "  #_12_mp4   <目标文件夹目录>   ### 把当前输入目录包含mp4文件夹 生成 mp4-html 播放文件  \n" + Cur_Bat_Name
+					+ "  #_12_gif   <目标文件夹目录>   ### 把当前输入目录包含gif文件夹 生成 gif-html 播放文件  \n" + Cur_Bat_Name
+					+ "  #_12_jpg   <目标文件夹目录>   ### 把当前输入目录包含jpg文件夹 生成 jpg-html 播放文件  \n";
+		
+		
 		}
 
 	}
