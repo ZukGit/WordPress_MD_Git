@@ -397,7 +397,7 @@ public class G2_ApplyRuleFor_TypeFile {
 
 		// https://tieba.baidu.com/f?kw=%E6%9D%8E%E6%AF%85&ie=utf-8&pn=350
 		String mCategoryMainUrl ;  // item 页面是使用相对的路径  没有出现 绝对路径  所以得 保存 这个 主路径
-        String httpXpre ;  //  http://     或者  https://(默认)
+		String httpXpre ;  //  http://     或者  https://(默认)
 
 
 		// 有些网页 不是按照 页面内容来的  是按照 多少个item数值 来的  所以有这个参数 每页的步长  默认为1
@@ -655,26 +655,26 @@ public class G2_ApplyRuleFor_TypeFile {
 // a class="bm_h" href="javascript:;" rel="forum.php?mod=forumdisplay&fid=2&page=3" curpage="2" id="autopbn" totalpage="204" picstyle="0" forumdefstyle="">下一页 &raquo;</a>
 // <a href="forum-2-3.html" class="nxt">下一页</a>
 
-				if (mElements != null && mElements.size() > 0) {
+			if (mElements != null && mElements.size() > 0) {
 
-					System.out.println("a[href] mElements.size()  = " + mElements.size());
-					Iterator<org.jsoup.nodes.Element> nextpage_element_iterator = mElements.iterator();
-					while (nextpage_element_iterator.hasNext()) {
-						org.jsoup.nodes.Element curElement = nextpage_element_iterator.next();
-						String innerHtml = curElement.html();
-						String href = curElement.attr("href");
-						System.out.println("nexttip_innerHtml = " + innerHtml + "   href[" + href + "]");
-						mAllHrefInPageList.add(href);
+				System.out.println("a[href] mElements.size()  = " + mElements.size());
+				Iterator<org.jsoup.nodes.Element> nextpage_element_iterator = mElements.iterator();
+				while (nextpage_element_iterator.hasNext()) {
+					org.jsoup.nodes.Element curElement = nextpage_element_iterator.next();
+					String innerHtml = curElement.html();
+					String href = curElement.attr("href");
+					System.out.println("nexttip_innerHtml = " + innerHtml + "   href[" + href + "]");
+					mAllHrefInPageList.add(href);
 
-						// 判断这个 Href 是否符合 hreftag
-						if(href.startsWith(mHrefTag)){
+					// 判断这个 Href 是否符合 hreftag
+					if(href.startsWith(mHrefTag)){
 
-							if(!mMatchHrefTagInPageList.contains(httpXpre+mainUrl+"/"+href)){
-								mMatchHrefTagInPageList.add(httpXpre+mainUrl+"/"+href);
-							}
-
-
+						if(!mMatchHrefTagInPageList.contains(httpXpre+mainUrl+"/"+href)){
+							mMatchHrefTagInPageList.add(httpXpre+mainUrl+"/"+href);
 						}
+
+
+					}
 
 
 
@@ -701,9 +701,9 @@ public class G2_ApplyRuleFor_TypeFile {
 
 						}*/
 
-					}
-
 				}
+
+			}
 
 
 
@@ -739,8 +739,8 @@ public class G2_ApplyRuleFor_TypeFile {
 					// 判断这个 Href 是否符合 hreftag
 					if(mImageTag == null || "".equals(mImageTag)){
 						if(src.startsWith("http") &&(
-					src.toLowerCase().endsWith(".gif")  || 	src.toLowerCase().endsWith(".webp") ||
-							 src.toLowerCase().endsWith(".jpg")  || 	src.toLowerCase().endsWith(".png")
+								src.toLowerCase().endsWith(".gif")  || 	src.toLowerCase().endsWith(".webp") ||
+										src.toLowerCase().endsWith(".jpg")  || 	src.toLowerCase().endsWith(".png")
 
 						)){
 
@@ -793,7 +793,7 @@ public class G2_ApplyRuleFor_TypeFile {
 
 				// 获取到 这个网页的 源码
 
-			      String pageHtmlCode = 	getMainPageHtmlCode(pageItemUrl);
+				String pageHtmlCode = 	getMainPageHtmlCode(pageItemUrl);
 
 				if(pageHtmlCode == null || pageHtmlCode.length() < 10){
 
@@ -823,7 +823,7 @@ public class G2_ApplyRuleFor_TypeFile {
 						if(mHrefHtmlCode == null || mHrefHtmlCode.length() < 10){
 
 							System.out.println(" 获取 HrefHtmlCode 失败 --> "+"pageItemUrl["+(i+1)+"] = "+ pageItemUrl +"  hrefItemUrl["+(j+1)+"]["+j+"] = "+ hrefUrl );
-                           continue;
+							continue;
 						}
 
 
@@ -841,9 +841,9 @@ public class G2_ApplyRuleFor_TypeFile {
 								System.out.println("pageItemUrl["+(i+1)+"]["+mDynamicPageUrlList.size()+"] = "+ pageItemUrl +"  hrefItemUrl["+(j+1)+"]["+mPageItemHrefList.size()+"] = "+ hrefUrl+" ImgSrc["+k+"]["+mImageSrcInHrefPageList.size()+"]="+ imgSrc);
 
 
-File  curFileImag = new File(ImageDownloadDir.getAbsolutePath()+File.separator+getTimeStampLong()+srcType);
+								File  curFileImag = new File(ImageDownloadDir.getAbsolutePath()+File.separator+getTimeStampLong()+srcType);
 
-                                   TryDownLoadImage(imgSrc ,curFileImag , 3);
+								TryDownLoadImage(imgSrc ,curFileImag , 3);
 
 							}
 
@@ -887,9 +887,9 @@ File  curFileImag = new File(ImageDownloadDir.getAbsolutePath()+File.separator+g
 				if(isProxy){
 					InetSocketAddress address = new InetSocketAddress("127.0.0.1", 7078);
 					Proxy proxy = new Proxy(Proxy.Type.HTTP, address); // http代理协议类型
-					 conn = url.openConnection(proxy);
+					conn = url.openConnection(proxy);
 				}else{
-					 conn = url.openConnection();
+					conn = url.openConnection();
 				}
 
 
@@ -13110,20 +13110,26 @@ File  curFileImag = new File(ImageDownloadDir.getAbsolutePath()+File.separator+g
 		ArrayList<File> operaDirFileList; // 当前从参数获得的目录文件集合
 		int operaType; // 0-unknow  1--mp4 2--jpg 3--gif     // 4--allmp4    把当前所有的mp4文件转为一个数组  放入到html页面
 
-		
+
 		ArrayList<File> allMp4FileList; //  当前目录的所有的mp4文件的列表   operaType=4--allmp4 适用
-		
-		
-		
+
+
+
 		ArrayList<File> mp4AllHtmlTemplate_FileList;
-		
+
 		ArrayList<File> mp4HtmlTemplate_FileList;
 		ArrayList<File> jpgHtmlTemplate_FileList;
 		ArrayList<File> gifHtmlTemplate_FileList;
 
+		File Mp4_All_2x2_Html_TemplateFile;
 		File Mp4_All_3x3_Html_TemplateFile;
-		
-		
+		File Mp4_All_3x5_Html_TemplateFile;
+		File Mp4_All_3x4_Html_TemplateFile;
+		File Mp4_All_4x4_Html_TemplateFile;
+		File Mp4_All_5x5_Html_TemplateFile;
+
+
+
 		File Mp4_2x2_Html_TemplateFile;
 		File Mp4_3x3_Html_TemplateFile;
 		File Mp4_3x5_Html_TemplateFile;
@@ -13190,11 +13196,29 @@ File  curFileImag = new File(ImageDownloadDir.getAbsolutePath()+File.separator+g
 			jpgHtmlTemplate_FileList = new ArrayList<File>();
 			gifHtmlTemplate_FileList = new ArrayList<File>();
 
-			
+
+			Mp4_All_2x2_Html_TemplateFile = new File(zbinPath + File.separator + "G2_Rule12_mp4_all_2x2.html");
+
 			Mp4_All_3x3_Html_TemplateFile = new File(zbinPath + File.separator + "G2_Rule12_mp4_all_3x3.html");
+			Mp4_All_3x5_Html_TemplateFile = new File(zbinPath + File.separator + "G2_Rule12_mp4_all_3x5.html");
+			Mp4_All_4x4_Html_TemplateFile = new File(zbinPath + File.separator + "G2_Rule12_mp4_all_4x4.html");
+			Mp4_All_3x4_Html_TemplateFile = new File(zbinPath + File.separator + "G2_Rule12_mp4_all_3x4.html");
+			Mp4_All_5x5_Html_TemplateFile = new File(zbinPath + File.separator + "G2_Rule12_mp4_all_5x5.html");
+
+
+
+			mp4AllHtmlTemplate_FileList.add(Mp4_All_2x2_Html_TemplateFile);
+
 			mp4AllHtmlTemplate_FileList.add(Mp4_All_3x3_Html_TemplateFile);
-			
-			
+			mp4AllHtmlTemplate_FileList.add(Mp4_All_4x4_Html_TemplateFile);
+			mp4AllHtmlTemplate_FileList.add(Mp4_All_3x5_Html_TemplateFile);
+			mp4AllHtmlTemplate_FileList.add(Mp4_All_3x4_Html_TemplateFile);
+
+			mp4AllHtmlTemplate_FileList.add(Mp4_All_5x5_Html_TemplateFile);
+
+
+
+
 			Mp4_2x2_Html_TemplateFile = new File(zbinPath + File.separator + "G2_Rule12_mp4_2x2.html");
 			Mp4_3x3_Html_TemplateFile = new File(zbinPath + File.separator + "G2_Rule12_mp4_3x3.html");
 			Mp4_3x5_Html_TemplateFile = new File(zbinPath + File.separator + "G2_Rule12_mp4_3x5.html");
@@ -13373,36 +13397,36 @@ File  curFileImag = new File(ImageDownloadDir.getAbsolutePath()+File.separator+g
 						operaDirFileList.add(dirFile);
 					} else if (operaType == 3 && dirName.contains("gif")) {
 						operaDirFileList.add(dirFile);
-					} 
+					}
 
 				}
 
 			}
 
-			
-			
+
+
 			if(operaType == 4 ) {   //  对当前目录的所有的
 
-				
-				
+
+
 				OperationHtmlMedia(curDirFile);
-				
+
 			} else {
-				
+
 				if (operaDirFileList.size() == 0) {
 					System.out.println("当前用户没有输入执行的目录名称,请重新输入C!");
 					return null;
 				}
-				
+
 				for (int i = 0; i < operaDirFileList.size(); i++) {
 					File operaDirFile = operaDirFileList.get(i);
 					OperationHtmlMedia(operaDirFile);
 				}
-				
-				
+
+
 			}
 
-	
+
 
 			return super.applyDir_SubFileListRule5(allSubDirFileList, allSubRealFileList);
 		}
@@ -13415,17 +13439,17 @@ File  curFileImag = new File(ImageDownloadDir.getAbsolutePath()+File.separator+g
 				System.out.println("当前用户没有输入执行的目录名称,请重新输入C!");
 				return null;
 			}
-		     if(operaType == 4 ) {   //  mp4all 的 逻辑与 别的逻辑 有点区别
+			if(operaType == 4 ) {   //  mp4all 的 逻辑与 别的逻辑 有点区别
 
 				OperationHtmlMedia(curDirFile);
-				
+
 			}else {
 				for (int i = 0; i < operaDirFileList.size(); i++) {
 					File operaDirFile = operaDirFileList.get(i);
 					OperationHtmlMedia(operaDirFile);
 				}
 
-				
+
 			}
 
 			return super.applySubFileListRule4(curFileList, subFileTypeMap, curDirList, curRealFileList);
@@ -13448,56 +13472,56 @@ File  curFileImag = new File(ImageDownloadDir.getAbsolutePath()+File.separator+g
 					tryMediaFileRenameOperation(gif_mediaFileList, ".gif");
 					tryGIFHtmlOperation(xdirFile, gif_mediaFileList.size());
 					break;
-					
-				case 4: // allmp4
-					
-						allMp4FileList = getAllSubFile(curDirFile, ".mp4");
-						if(allMp4FileList == null || allMp4FileList.size() == 0) {
-							System.out.println("  当前目录 curDirFile="+curDirFile.getAbsolutePath()+" 没有寻找到 .mp4文件 执行生成 allmp4-html文件失败!");
-					           return;
-						}
-							System.out.println("  当前目录 curDirFile="+curDirFile.getAbsolutePath()+" allMp4FileList.size()="+allMp4FileList.size());
-		
-						StringBuilder  htmlCodeSB_head1 = new StringBuilder();
-						StringBuilder  htmlCodeSB_head2 = new StringBuilder();
-						
-						
-						htmlCodeSB_head1.append("var videoCount =  "+allMp4FileList.size()+";\n");
-						htmlCodeSB_head2.append("var videolist = [");
-						for (int i = 0; i <  allMp4FileList.size(); i++) {
-							File mp4File = allMp4FileList.get(i);
-							String mp4FilePath = allMp4FileList.get(i).getAbsolutePath();
-							String mp4FilePath_fixed  = mp4FilePath.replace(File.separator, "/");
-							String varName = "videofile_"+i;
-							htmlCodeSB_head1.append(varName+" ={  index:"+i+" , filepath:\""+mp4FilePath_fixed+"\" };"+"\n");
-							if(i == allMp4FileList.size() -1) {
-								htmlCodeSB_head2.append(varName+"");
-							}else {
-								htmlCodeSB_head2.append(varName+",");
-							}
-						
-						}
-						htmlCodeSB_head2.append("];\n");
-						
-		
 
-						String htmlCode = htmlCodeSB_head1+"\n"+htmlCodeSB_head2.toString();
-						
-						System.out.println("  htmlCode=\n "+htmlCode.toString());
-						
-							// hoderplace -begin
+				case 4: // allmp4
+
+					allMp4FileList = getAllSubFile(curDirFile, ".mp4");
+					if(allMp4FileList == null || allMp4FileList.size() == 0) {
+						System.out.println("  当前目录 curDirFile="+curDirFile.getAbsolutePath()+" 没有寻找到 .mp4文件 执行生成 allmp4-html文件失败!");
+						return;
+					}
+					System.out.println("  当前目录 curDirFile="+curDirFile.getAbsolutePath()+" allMp4FileList.size()="+allMp4FileList.size());
+
+					StringBuilder  htmlCodeSB_head1 = new StringBuilder();
+					StringBuilder  htmlCodeSB_head2 = new StringBuilder();
+
+
+					htmlCodeSB_head1.append("var videoCount =  "+allMp4FileList.size()+";\n");
+					htmlCodeSB_head2.append("var videolist = [");
+					for (int i = 0; i <  allMp4FileList.size(); i++) {
+						File mp4File = allMp4FileList.get(i);
+						String mp4FilePath = allMp4FileList.get(i).getAbsolutePath();
+						String mp4FilePath_fixed  = mp4FilePath.replace(File.separator, "/");
+						String varName = "videofile_"+i;
+						htmlCodeSB_head1.append(varName+" ={  index:"+i+" , filepath:\""+mp4FilePath_fixed+"\" };"+"\n");
+						if(i == allMp4FileList.size() -1) {
+							htmlCodeSB_head2.append(varName+"");
+						}else {
+							htmlCodeSB_head2.append(varName+",");
+						}
+
+					}
+					htmlCodeSB_head2.append("];\n");
+
+
+
+					String htmlCode = htmlCodeSB_head1+"\n"+htmlCodeSB_head2.toString();
+
+					System.out.println("  htmlCode=\n "+htmlCode.toString());
+
+					// hoderplace -begin
 //							videofile_0 = { index:0 , path:"./mp4_1/mp4/",length:11,};
 //							video1 = { index:1 , path:"./mp4_2/mp4/",length:11,};
 //							var objectArr = [ person0,person1, ];
-							// hoderplace -end
-							
-							
-						tryAllMp4HtmlOperation(htmlCode);
-					
+					// hoderplace -end
+
+
+					tryAllMp4HtmlOperation(htmlCode);
+
 
 					break;
-					
-					
+
+
 				default:
 			}
 
@@ -13598,7 +13622,7 @@ File  curFileImag = new File(ImageDownloadDir.getAbsolutePath()+File.separator+g
 
 		}
 
-		
+
 		// allMp4 的 操作逻辑
 		void tryAllMp4HtmlOperation(String commonHtmlCode) {
 			String curDirName = curDirFile.getName();
@@ -13626,8 +13650,8 @@ File  curFileImag = new File(ImageDownloadDir.getAbsolutePath()+File.separator+g
 			}
 
 		}
-		
-		
+
+
 		@Override
 		String simpleDesc() {
 			return "\n" + Cur_Bat_Name
@@ -13638,8 +13662,8 @@ File  curFileImag = new File(ImageDownloadDir.getAbsolutePath()+File.separator+g
 					+ "  #_12_mp4   <目标文件夹目录>   ### 把当前输入目录包含mp4文件夹 生成 mp4-html 播放文件  \n" + Cur_Bat_Name
 					+ "  #_12_gif   <目标文件夹目录>   ### 把当前输入目录包含gif文件夹 生成 gif-html 播放文件  \n" + Cur_Bat_Name
 					+ "  #_12_jpg   <目标文件夹目录>   ### 把当前输入目录包含jpg文件夹 生成 jpg-html 播放文件  \n";
-		
-		
+
+
 		}
 
 	}
