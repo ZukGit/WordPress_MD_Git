@@ -5,8 +5,8 @@
 <title>xx</title>
 <style>
 .video_local {
-    width:19.7% ;
-    height:33.2% ;
+    width:33.3% ;
+    height:19.9% ;
    object-fit:fill;
    float:left;
 }
@@ -14,19 +14,19 @@
 </head>
 <body style="background-color:#101010; margin:0px">
 <script>
-
 // ================= Head Begin =================
 zukgitPlaceHolderindex
 // ================= Head End =================
 var countnum = 11 // 总数
 var VideoArr =  document.getElementsByTagName("video");
 var VideoNum = VideoArr.length;
-var curRowNum = 5;
-var curColumNum = 3;
+var NowRowNum = 5;
+var NowColumnNum = 3;
+
 var windowWidth = document.documentElement.clientWidth; 
 var windowHeight = document.documentElement.clientHeight; 
-var curWindowWidth = ((windowWidth - curRowNum)/1) / curRowNum   ;
-var curWindowHeight = ((windowHeight -curColumNum )/1) / curColumNum  ;
+var curWindowWidth = ((windowWidth - NowColumnNum)/1) / NowColumnNum   ;
+var curWindowHeight = ((windowHeight -NowRowNum )/1) / NowRowNum  ;
 window.onload=function(){
 for (var i = 0; i < VideoArr.length; i++) {
 resetVideosize(i);
@@ -38,8 +38,8 @@ randomPlayInit();
 window.onresize = function(){
 var windowWidthNew = window.screen.width - 100; 
 var windowHeightNew = window.screen.height - 100; 
-var curWindowWidthNew = windowWidthNew / curRowNum - 2;
-var curWindowHeightNew = windowHeightNew / curColumNum -2;
+var curWindowWidthNew = windowWidthNew / NowColumnNum - 2;
+var curWindowHeightNew = windowHeightNew / NowRowNum -2;
 for (var i = 0; i < VideoArr.length; i++) {
 resetVideoSizeParam(i,curWindowWidthNew,curWindowHeightNew);
 }
@@ -90,7 +90,6 @@ function randomPlay(obj) {
 var num = Math.floor(Math.random()*(videoCount - 1 ) + 1);
 var srcStr = videolist[num].filepath;
 console.log("randomPlay num="+num+"   srcStr="+videolist[num].filepath);
-
 obj.src=srcStr;
 obj.play();
 }
@@ -112,20 +111,13 @@ function changeVideoDiff() {
 <video   class="video_local"   autoplay="true"   onended="randomPlay(this)">
 <source src="./0017ssyyx/mp4/2.mp4" type="video/mp4" />
 </video>
+
 <video   class="video_local"   autoplay="true"   onended="randomPlay(this)">
-<source src="./0017ssyyx/mp4/3.mp4" type="video/mp4" />
-</video>
-<video   class="video_local"   autoplay="true"   onended="randomPlay(this)">
-<source src="./0017ssyyx/mp4/4.mp4" type="video/mp4" />
-</video>
-<video   class="video_local"   autoplay="true"   onended="randomPlay(this)">
-<source src="./0017ssyyx/mp4/5.mp4" type="video/mp4" />
+<source src="./0017ssyyx/mp4/2.mp4" type="video/mp4" />
 </video>
 </div>
 <div width="100%" height="250px">
-<video   class="video_local"   autoplay="true"   onended="randomPlay(this)">
-<source src="./0017ssyyx/mp4/6.mp4" type="video/mp4" />
-</video>
+
 <video   class="video_local"   autoplay="true"   onended="randomPlay(this)">
 <source src="./0017ssyyx/mp4/7.mp4" type="video/mp4" />
 </video>
@@ -133,28 +125,46 @@ function changeVideoDiff() {
 <source src="./0017ssyyx/mp4/8.mp4" type="video/mp4" />
 </video>
 <video   class="video_local"   autoplay="true"   onended="randomPlay(this)">
-<source src="./0017ssyyx/mp4/9.mp4" type="video/mp4" />
-</video>
-<video   class="video_local"   autoplay="true"   onended="randomPlay(this)">
-<source src="./0017ssyyx/mp4/10.mp4" type="video/mp4" />
+<source src="./0017ssyyx/mp4/2.mp4" type="video/mp4" />
 </video>
 </div>
+
 <div width="100%" height="250px">
 <video   class="video_local"   autoplay="true"   onended="randomPlay(this)">
-<source src="./0017ssyyx/mp4/11.mp4" type="video/mp4" />
+<source src="./0017ssyyx/mp4/1.mp4" type="video/mp4" />
 </video>
 <video   class="video_local"   autoplay="true"   onended="randomPlay(this)">
-<source src="./0017ssyyx/mp4/12.mp4" type="video/mp4" />
+<source src="./0017ssyyx/mp4/2.mp4" type="video/mp4" />
 </video>
 <video   class="video_local"   autoplay="true"   onended="randomPlay(this)">
-<source src="./0017ssyyx/mp4/13.mp4" type="video/mp4" />
-</video>
-<video   class="video_local"   autoplay="true"   onended="randomPlay(this)">
-<source src="./0017ssyyx/mp4/14.mp4" type="video/mp4" />
-</video>
-<video   class="video_local"   autoplay="true"   onended="randomPlay(this)">
-<source src="./0017ssyyx/mp4/15.mp4" type="video/mp4" />
+<source src="./0017ssyyx/mp4/2.mp4" type="video/mp4" />
 </video>
 </div>
+
+<div width="100%" height="250px">
+<video   class="video_local"   autoplay="true"   onended="randomPlay(this)">
+<source src="./0017ssyyx/mp4/1.mp4" type="video/mp4" />
+</video>
+<video   class="video_local"   autoplay="true"   onended="randomPlay(this)">
+<source src="./0017ssyyx/mp4/2.mp4" type="video/mp4" />
+</video>
+<video   class="video_local"   autoplay="true"   onended="randomPlay(this)">
+<source src="./0017ssyyx/mp4/2.mp4" type="video/mp4" />
+</video>
+</div>
+
+
+<div width="100%" height="250px">
+<video   class="video_local"   autoplay="true"   onended="randomPlay(this)">
+<source src="./0017ssyyx/mp4/1.mp4" type="video/mp4" />
+</video>
+<video   class="video_local"   autoplay="true"   onended="randomPlay(this)">
+<source src="./0017ssyyx/mp4/2.mp4" type="video/mp4" />
+</video>
+<video   class="video_local"   autoplay="true"   onended="randomPlay(this)">
+<source src="./0017ssyyx/mp4/2.mp4" type="video/mp4" />
+</video>
+</div>
+
 </body>
 </html>

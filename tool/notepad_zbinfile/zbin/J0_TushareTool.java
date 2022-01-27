@@ -1611,8 +1611,9 @@ writeContentToFile(dailyPythonFile,allDailyCode);
             sb.append(Cur_Bat_Name+"  day_"+nowInt+"   &&  " + " "+ J0_call_day_python_bat_File.getAbsolutePath() +"  "+ nowInt);
 
 
-            sb.append("\n【最新最近】交易日 day query  "+nowInt+ "查询并将生成的J0_Data目录文件导入手机命令如下: \n");
-            sb.append(Cur_Bat_Name+"  day_"+nowInt+"   &&  " + " "+ J0_call_day_python_bat_File.getAbsolutePath() +"  "+ nowInt +" && zrule_apply_G2.bat #_38 "+  J0_Dir_Path +"  && "+" adb push  "+J0_Dir_Path+".  /sdcard/zmain/stock/ "+ " \n && "+ " adb push "+zbinPath+File.separator+"J0_股票列表.xlsx  /sdcard/zmain/stock/J0_股票列表.xlsx ");
+            int lastTradeDay = getCurrentYYYYMMDDWith17Point();
+            sb.append("\n【最新最近有数据交易日_当日数据当日下午5点更新】交易日 day query  "+lastTradeDay+ "查询并将生成的J0_Data目录文件导入手机命令如下: \n");
+            sb.append(Cur_Bat_Name+"  day_"+lastTradeDay+"   &&  " + " "+ J0_call_day_python_bat_File.getAbsolutePath() +"  "+ lastTradeDay +" && zrule_apply_G2.bat #_38 "+  J0_Dir_Path +"  && "+" adb push  "+J0_Dir_Path+".  /sdcard/zmain/stock/ "+ " \n && "+ " adb push "+zbinPath+File.separator+"J0_股票列表.xlsx  /sdcard/zmain/stock/J0_股票列表.xlsx ");
 
          //  zrule_apply_G2.bat + J0_Dir_Path
          int now_yyyy0101 =    getNow_YYYY0101();
@@ -7010,6 +7011,67 @@ String[] arrStr = codePrams.split(",");
 
     
     
+    
+	// 只有过了 17 点 才会有 今天的 交易数据  所以 这里 判断 如果 过了 17点 那么返回今天的日期  不到17点 那么返回昨天的日期
+	static int getCurrentYYYYMMDDWith17Point() {
+
+		SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd");
+		int refrashDay  = getCurrentYYYYMMDD() ;
+
+
+	    long today17Long =   getToday17PointTimeLong();
+	    
+	    long nowLong  = Calendar.getInstance().getTimeInMillis();
+	    if(nowLong > today17Long) {    // 晚上过来17点了  可以得到今天数据
+	    	refrashDay = getCurrentYYYYMMDD() ;
+	    }else {
+	    	 // 还没到今天17点  只可以得到昨天数据
+	    	refrashDay  = 	getYesterTradeDayIntFlag(getCurrentYYYYMMDD());
+
+	    }
+	    
+		return refrashDay;
+
+	}
+	
+	
+	static int  getYesterTradeDayIntFlag(int dayFlagInt ){
+	    int step = -1;
+	    int tomorrow = getFutureDayFlag(dayFlagInt,step);
+	if(SH_TradeDayList.size() == 0) {
+		initTradeDayList();
+	}
+		
+	while(!SH_TradeDayList.contains(tomorrow)) {  //  如果 不包含今日  那么 往后 计算 
+			
+		 tomorrow = getFutureDayFlag(tomorrow,step);
+		}
+
+	    return tomorrow;
+	}
+	
+	
+	public static Long getToday17PointTimeLong(){
+	    Calendar c1 = Calendar.getInstance();
+//	    c1.add(Calendar.DATE,-1);
+	    c1.set(Calendar.HOUR_OF_DAY,17);
+	    c1.set(Calendar.MINUTE,0);
+	    c1.set(Calendar.SECOND,0);
+	    c1.set(Calendar.MILLISECOND,0);
+	    //下面两句可以省略
+	    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//	    System.out.print("getToday17PointTimeLong:"+simpleDateFormat.format(c1.getTime()));
+	    return c1.getTimeInMillis();
+	}
+	
+	static int getCurrentYYYYMMDD() {
+
+		SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd");
+
+		return Integer.parseInt(df.format(new Date()));
+
+	}
+	
     
     static int getCurrentYear() {
 

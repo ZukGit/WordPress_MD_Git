@@ -13122,11 +13122,36 @@ public class G2_ApplyRuleFor_TypeFile {
 		ArrayList<File> gifHtmlTemplate_FileList;
 
 		File Mp4_All_2x2_Html_TemplateFile;
+		File Mp4_All_2x3_Html_TemplateFile;
+		File Mp4_All_2x4_Html_TemplateFile;
+		File Mp4_All_2x5_Html_TemplateFile;
+		
+		
+		File Mp4_All_3x2_Html_TemplateFile;
 		File Mp4_All_3x3_Html_TemplateFile;
-		File Mp4_All_3x5_Html_TemplateFile;
 		File Mp4_All_3x4_Html_TemplateFile;
+		File Mp4_All_3x5_Html_TemplateFile;
+		
+		
+		File Mp4_All_4x2_Html_TemplateFile;
+		File Mp4_All_4x3_Html_TemplateFile;
 		File Mp4_All_4x4_Html_TemplateFile;
+		File Mp4_All_4x5_Html_TemplateFile;
+		
+		File Mp4_All_5x2_Html_TemplateFile;
+		File Mp4_All_5x3_Html_TemplateFile;
+		File Mp4_All_5x4_Html_TemplateFile;
 		File Mp4_All_5x5_Html_TemplateFile;
+
+
+		
+		
+
+		
+
+
+
+
 
 
 
@@ -13198,22 +13223,54 @@ public class G2_ApplyRuleFor_TypeFile {
 
 
 			Mp4_All_2x2_Html_TemplateFile = new File(zbinPath + File.separator + "G2_Rule12_mp4_all_2x2.html");
-
+			Mp4_All_2x3_Html_TemplateFile = new File(zbinPath + File.separator + "G2_Rule12_mp4_all_2x3.html");
+			Mp4_All_2x4_Html_TemplateFile = new File(zbinPath + File.separator + "G2_Rule12_mp4_all_2x4.html");
+			Mp4_All_2x5_Html_TemplateFile = new File(zbinPath + File.separator + "G2_Rule12_mp4_all_2x5.html");
+			
+			
+			
+			Mp4_All_3x2_Html_TemplateFile = new File(zbinPath + File.separator + "G2_Rule12_mp4_all_3x2.html");
 			Mp4_All_3x3_Html_TemplateFile = new File(zbinPath + File.separator + "G2_Rule12_mp4_all_3x3.html");
-			Mp4_All_3x5_Html_TemplateFile = new File(zbinPath + File.separator + "G2_Rule12_mp4_all_3x5.html");
-			Mp4_All_4x4_Html_TemplateFile = new File(zbinPath + File.separator + "G2_Rule12_mp4_all_4x4.html");
 			Mp4_All_3x4_Html_TemplateFile = new File(zbinPath + File.separator + "G2_Rule12_mp4_all_3x4.html");
+			Mp4_All_3x5_Html_TemplateFile = new File(zbinPath + File.separator + "G2_Rule12_mp4_all_3x5.html");
+			
+			
+			Mp4_All_4x2_Html_TemplateFile = new File(zbinPath + File.separator + "G2_Rule12_mp4_all_4x2.html");
+		 	Mp4_All_4x3_Html_TemplateFile = new File(zbinPath + File.separator + "G2_Rule12_mp4_all_4x3.html");
+		 	Mp4_All_4x4_Html_TemplateFile = new File(zbinPath + File.separator + "G2_Rule12_mp4_all_4x4.html");
+		 	Mp4_All_4x5_Html_TemplateFile = new File(zbinPath + File.separator + "G2_Rule12_mp4_all_4x5.html");
+
+		 	
+			Mp4_All_5x2_Html_TemplateFile = new File(zbinPath + File.separator + "G2_Rule12_mp4_all_5x2.html");
+			Mp4_All_5x3_Html_TemplateFile = new File(zbinPath + File.separator + "G2_Rule12_mp4_all_5x3.html");
+			Mp4_All_5x4_Html_TemplateFile = new File(zbinPath + File.separator + "G2_Rule12_mp4_all_5x4.html");
 			Mp4_All_5x5_Html_TemplateFile = new File(zbinPath + File.separator + "G2_Rule12_mp4_all_5x5.html");
 
-
+		
+			
+			
 
 			mp4AllHtmlTemplate_FileList.add(Mp4_All_2x2_Html_TemplateFile);
+			mp4AllHtmlTemplate_FileList.add(Mp4_All_2x3_Html_TemplateFile);
+			mp4AllHtmlTemplate_FileList.add(Mp4_All_2x4_Html_TemplateFile);
+			mp4AllHtmlTemplate_FileList.add(Mp4_All_2x5_Html_TemplateFile);
+			
 
+
+			mp4AllHtmlTemplate_FileList.add(Mp4_All_3x2_Html_TemplateFile);
 			mp4AllHtmlTemplate_FileList.add(Mp4_All_3x3_Html_TemplateFile);
-			mp4AllHtmlTemplate_FileList.add(Mp4_All_4x4_Html_TemplateFile);
-			mp4AllHtmlTemplate_FileList.add(Mp4_All_3x5_Html_TemplateFile);
 			mp4AllHtmlTemplate_FileList.add(Mp4_All_3x4_Html_TemplateFile);
-
+			mp4AllHtmlTemplate_FileList.add(Mp4_All_3x5_Html_TemplateFile);
+			
+			mp4AllHtmlTemplate_FileList.add(Mp4_All_4x2_Html_TemplateFile);
+			mp4AllHtmlTemplate_FileList.add(Mp4_All_4x3_Html_TemplateFile);
+			mp4AllHtmlTemplate_FileList.add(Mp4_All_4x4_Html_TemplateFile);
+			mp4AllHtmlTemplate_FileList.add(Mp4_All_4x5_Html_TemplateFile);
+			
+			
+			mp4AllHtmlTemplate_FileList.add(Mp4_All_5x2_Html_TemplateFile);
+			mp4AllHtmlTemplate_FileList.add(Mp4_All_5x3_Html_TemplateFile);
+			mp4AllHtmlTemplate_FileList.add(Mp4_All_5x4_Html_TemplateFile);
 			mp4AllHtmlTemplate_FileList.add(Mp4_All_5x5_Html_TemplateFile);
 
 
