@@ -50,6 +50,11 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
         ---------------------------------------------------------------
 */
 
+	
+// 【Mp4截取 Gif 】 -ss  视频截取gif的起点  -t gif持续的时长  -i 输入  -r 帧率   -y 强制覆盖
+// ffmpeg -ss 00:00:04 -t 3 -i 1.mp4 -r 15  1.gif -y
+
+	
 
     //  把 mp4 文件转为 .ts 文件  并生成  .m3u8 播放列表   然后对文件内容 进行操作
 
@@ -322,9 +327,214 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
         // 批量旋转当前目录下的 mp4 文件
         CUR_RULE_LIST.add( new Batch_VideoRoast_Rule_10());
         
+        
+        // 转换 mp4 指定时刻 为 gif 指定持续的长度的时间
+        CUR_RULE_LIST.add( new Revert_MP4_To_Gif_Rule_11());
+        
+        
     }
 
 
+    class Revert_MP4_To_Gif_Rule_11 extends  Basic_Rule{
+        ArrayList<File> mInputMediaFileList ;  // 输入的 视频文件
+
+        File targetInputMP4File ;  // 输入的 Mp4文件
+        String beginTimeStr;
+        String endTimeStr;
+        int timeDistance ;   //  时间的间距  秒 .. 
+        String outputFileName;  // 输出文件的名称  Gif 的输出的文件名称
+
+
+        Revert_MP4_To_Gif_Rule_11(){
+            super(11);
+            mInputMediaFileList = new  ArrayList<File>();
+
+        }
+
+
+        @Override
+        String ruleTip(String type, int index, String batName, OS_TYPE curType) {
+            return          "\n"+Cur_Bat_Name+ "  11   <mp4,flv,avi.rmvb 路径>    ## 把所有的MP4转Gif   \n"+
+                            "\n"+Cur_Bat_Name+ "  11   10-              <mp4,flv,avi.rmvb 路径>       ## 秒数MP4转Gif   \n"+
+                            "\n"+Cur_Bat_Name+ "  11   -100              <mp4,flv,avi.rmvb 路径>    ## 秒数MP4转Gif   \n"+
+                            "\n"+Cur_Bat_Name+ "  11  10-50              <mp4,flv,avi.rmvb 路径>    ## 秒数MP4转Gif   \n"+
+                            "\n"+Cur_Bat_Name+ "  11  01:10-             <mp4,flv,avi.rmvb 路径>    ## 分钟数MP4转Gif \n"+
+                            "\n"+Cur_Bat_Name+ "  11  -01:10             <mp4,flv,avi.rmvb 路径>    ## 分钟数MP4转Gif \n"+
+                            "\n"+Cur_Bat_Name+ "  11  01:10-02:50        <mp4,flv,avi.rmvb 路径>    ## 分钟数MP4转Gif \n"+
+                            "\n"+Cur_Bat_Name+ "  11  00:00:10-          <mp4,flv,avi.rmvb 路径>    ## 时分秒MP4转Gif \n"+
+                            "\n"+Cur_Bat_Name+ "  11  -00:00:10          <mp4,flv,avi.rmvb 路径>    ## 时分秒MP4转Gif \n"+
+                            "\n"+Cur_Bat_Name+ "  11  00:00:00-00:00:10  <mp4,flv,avi.rmvb 路径>    ## 时分秒MP4转Gif \n" +
+                            "\n"+Cur_Bat_Name+ "  11   <mp4,flv,avi.rmvb 路径>    ## 把所有的MP4转Gif   \n"; }
+
+
+
+    	
+     // 【Mp4截取 Gif 】 -ss  视频截取gif的起点  -t gif持续的时长  -i 输入  -r 帧率   -y 强制覆盖
+     // ffmpeg -ss 00:00:04 -t 3 -i 1.mp4 -r 15  1.gif -y
+        
+        @Override
+        boolean checkParamsOK(File shellDir, String type2Param, ArrayList<String> otherParams) {
+            System.out.println("rule11 shellDir = "+ shellDir);
+            System.out.println("rule11  otherParams = "+ otherParams.size());
+
+
+            if(otherParams == null || otherParams.size() ==0){
+                errorMsg = "用户输入的文件参数为空";
+                System.out.println(errorMsg);
+                return false;
+            }
+
+
+
+            System.out.println("rule11 otherParams.size() = "+ otherParams.size());
+
+            for (int i = 0; i <otherParams.size() ; i++) {
+                String pre = "."+File.separator;
+                String curStringItem = otherParams.get(i).toString();
+                String curAbsPath = "";
+                if(curStringItem.startsWith(pre)){
+                    curStringItem = curStringItem.substring(2);
+                }
+                curAbsPath = shellDir.getAbsolutePath() + File.separator + curStringItem;
+                File curFIle = new File(curAbsPath) ;
+                System.out.println("curAbsPath  = "+ curAbsPath);
+                if(curFIle.exists() && videoTypeList.contains(getFileTypeWithPoint(curFIle.getName())) ){  // 判断
+                    mInputMediaFileList.add(curFIle);
+                }
+            }
+            if(mInputMediaFileList.size() == 0){
+                errorMsg = "当前从参数找不到对应的输入源 .mp4  .flv .rmvb .avi 文件 ";
+                System.out.println(errorMsg);
+                return false;
+            }
+            System.out.println("rule7 checkParamsOK mInputMediaFileList.size() = "+ mInputMediaFileList.size());
+            targetInputMP4File = mInputMediaFileList.get(mInputMediaFileList.size()-1);
+            String tagFlag = otherParams.get(0);
+            System.out.println("targetInputMP4File = "+ targetInputMP4File.getAbsolutePath());
+            System.out.println("tagFlag = "+ tagFlag);
+
+            
+            
+
+        
+            if(tagFlag.startsWith("-")){
+                tagFlag = "00:00:00"+tagFlag;
+            }
+
+            if(tagFlag.endsWith("-")){
+                tagFlag = tagFlag+ReadVideoTime(targetInputMP4File);
+            }
+
+            String[] tagArr = tagFlag.split("-");
+            if(tagArr == null || tagArr.length != 2){
+                System.out.println("tagFlag = "+ tagFlag +"   tagArr.length = " + tagArr.length);
+                beginTimeStr = null;    // 不输入  时间参数时
+                endTimeStr = null;
+                
+                
+                String originName = targetInputMP4File.getName();
+              String fileNameOnly = getFileNameNoPoint(originName);
+              
+                outputFileName = fileNameOnly+"_"+System.currentTimeMillis()/1000+".gif";
+
+                return true;
+            }
+
+            
+
+            String pre_Str = tagArr[0];
+            if(!"".equals(pre_Str.trim())){
+                beginTimeStr =   fixedTimeStr(pre_Str);
+            }else{
+                beginTimeStr =  "00:00:00";
+            }
+
+
+
+            String end_Str = tagArr[1];
+            if(!"".equals(end_Str.trim())){
+                endTimeStr =   fixedTimeStr(end_Str);
+            }else{
+                endTimeStr =  ReadVideoTime(targetInputMP4File);
+            }
+
+            
+            String originName = targetInputMP4File.getName();
+//          String typeStr = getFileTypeWithPoint(originName);
+          String typeStr =".gif";
+          String fileNameOnly = getFileNameNoPoint(originName);
+
+          outputFileName = fileNameOnly+"_"+beginTimeStr.replace(":","")+"_"+endTimeStr.replace(":","")+"_"+System.currentTimeMillis()/1000+typeStr;
+          outputFileName = outputFileName.replace(" ","");
+         
+          
+
+
+
+            String beginTemp1 = beginTimeStr.replace(":","");
+            String endTemp1 = endTimeStr.replace(":","");
+            int beginTemp1_int = Integer.parseInt(beginTemp1);
+            int endTemp1_int = Integer.parseInt(endTemp1);
+
+            System.out.println("beginTimeStr = "+ beginTimeStr +"   endTimeStr = "+ endTimeStr  +"   outputFileName =  "+ outputFileName  + "targetInputMP4File = "+ targetInputMP4File.getName());
+
+            if(beginTemp1_int > endTemp1_int){
+                System.out.println("开始时间大于结束时间! 请检查参数!   beginTimeStr = "+ beginTimeStr  +"       endTimeStr = "+ endTimeStr);
+            }
+
+            return  super.checkParamsOK(shellDir,type2Param,otherParams);
+        }
+
+
+
+        @Override
+        void operationRule(ArrayList<String> inputParamsList) {
+
+
+            System.out.println("beginTimeStr = "+ beginTimeStr +"   endTimeStr = "+ endTimeStr  +"   outputFileName =  "+ outputFileName  + "targetInputMP4File = "+ targetInputMP4File.getName());
+
+
+
+            //     ffmpeg -i sky1.mp4  image%d.jpg    抠图
+
+            String ffmpeg_path = getEnvironmentExePath("ffmpeg");
+            if(ffmpeg_path ==null){
+                errorMsg = "当前 ffmpeg 不在环境变量中 请下载该库 并添加到 环境变量中";
+                System.out.println(errorMsg);
+                return;
+            }
+            System.out.println("rule7 curInputFileList.size() = "+mInputMediaFileList.size());
+            System.out.println("rule7 ffmpeg_path = "+ffmpeg_path);
+            // 把 当前的 mp4 文件写入 G8_1_MergedRule.txt
+
+            // ffmpeg -ss 00:00:04 -t 3 -i 1.mp4 -r 15  1.gif -y
+            
+            // ffmpeg -ss 00:00:04 -to  00:00:10 -i 1.mp4 -r 15  1.gif -y
+            // ffmpeg -i 1.mp4 -r 15  1.gif -y
+            
+            String command =  null;
+            if(beginTimeStr != null && endTimeStr != null) {
+            	 command = ffmpeg_path +" -ss "+beginTimeStr  + "  -to " + endTimeStr +"  -i " + "\""+targetInputMP4File.getName()+ "\"" +" "+ "   -r 15  "+ outputFileName +" -y ";
+            }else {
+             	 command = ffmpeg_path +" -i " + "\""+targetInputMP4File.getName()+ "\"" +" "+ "   -r 15  "+ outputFileName +" -y ";
+            }
+     
+
+
+            System.out.println(command);
+            execCMD(command);
+            System.out.println("裁剪输出文件完成 -》 " + outputFileName);
+
+
+
+        }
+
+
+
+    }
+
+
+    
     
     // 批量旋转当前目录下的 mp4 文件
     class Batch_VideoRoast_Rule_10 extends  Basic_Rule{
