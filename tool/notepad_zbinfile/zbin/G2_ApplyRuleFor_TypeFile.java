@@ -369,9 +369,310 @@ public class G2_ApplyRuleFor_TypeFile {
 		// CategoryModel_HttpPage_Download_Rule_49
 		realTypeRuleList.add(new CategoryModel_HttpPage_Download_Rule_49());
 
+		
+		
+		
+		// 把 当前的 输入的 jpg 或者 当前目录下的 jpg文件 动态计算成 320 宽度的 字符串 并 在打开的文件中打印
+		realTypeRuleList.add(new JPG_To_TextChar_Rule_50());
+		
 		// initrule
 	}
+	
+	
 
+	// 把 当前的 输入的 jpg 或者 当前目录下的 jpg文件 动态计算成 320 宽度的 字符串 并 在打开的文件中打印
+	class JPG_To_TextChar_Rule_50 extends Basic_Rule {
+		// true  那么就对当前目录下的所有 jpg文件进行 打印字符串画像操作    false--说明有输入对输入进行操作
+		boolean isDirOperation; // 是否没有输入 jpg 文件 而是 输入了一个 目录 默认shell 目录 已经 输入的目录
+
+		StringBuilder allSB;
+		File inputDirFile;
+		ArrayList<File> jpgFileList;
+
+		JPG_To_TextChar_Rule_50() {
+			super("#", 50, 3); //
+			jpgFileList = new ArrayList<File>();
+			inputDirFile = null;
+			allSB = new StringBuilder();
+			isDirOperation = false;
+		}
+
+		@Override
+		boolean allowEmptyDirFileList() {
+			// TODO Auto-generated method stub
+			return true;
+		}
+
+		@Override
+		ArrayList<File> applyFileListRule3(ArrayList<File> subFileList, HashMap<String, ArrayList<File>> fileTypeMap) {
+			// TODO Auto-generated method stub
+
+			for (int i = 0; i < jpgFileList.size(); i++) {
+				File jpgFile = jpgFileList.get(i);
+				String jpgFileName = jpgFile.getName();
+				String getjpgNameNoType = getFileNameNoPoint(jpgFileName);
+
+
+				File jpgFile_resultDir = null;
+
+				if (isDirOperation && inputDirFile != null) {
+					jpgFile_resultDir = inputDirFile;
+		
+			
+			
+					// 打印的 宽度 默认设置为  320 
+			        BufferedImage jpgImage;
+					try {
+						jpgImage = resizeImage(jpgFile.getAbsolutePath(),320);
+				        allSB.append(printImage(jpgImage));
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+			        
+//			        System.out.println(" Width:"+image.getWidth()+"  High:"+image.getHeight());
+			        
+		
+			    
+				} else {
+					// 如果 不是 输入 目录 的 话 那么就创建 jpg 的 文件名称 如果是目录的话 那么就在当前目录生成 .json
+				
+					
+			        BufferedImage jpgImage;
+					try {
+						jpgImage = resizeImage(jpgFile.getAbsolutePath(),320);
+					     allSB.append(printImage(jpgImage));
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+			        
+//			        System.out.println(" Width:"+image.getWidth()+"  High:"+image.getHeight());
+			        
+			   
+		
+				}
+
+			}
+			
+			// 打开 notepad++
+			
+			writeContentToFile(G2_Temp_Text_File, allSB.toString());
+			NotePadOpenTargetFile(G2_Temp_Text_File.getAbsolutePath());
+			
+
+			return super.applyFileListRule3(subFileList, fileTypeMap);
+		}
+
+		
+
+
+		@Override
+		String simpleDesc() {
+
+			return Cur_Bat_Name + " #_" + rule_index
+					+ "  <指定A.jpg文件> <指定B.jpg文件>  ### 对给定的jpg 打印它的 字符串画像   \n"
+					+ Cur_Bat_Name + " #_" + rule_index+ "   ### 解析当前目录jpg 打印出所有的画像    \n"
+					;
+		}
+
+		@Override
+		boolean initParamsWithInputList(ArrayList<String> inputParamList) {
+
+			for (int i = 0; i < inputParamList.size(); i++) {
+				String strInput = inputParamList.get(i);
+
+				File tempFile = new File(curDirPath + File.separator + strInput);
+				if (tempFile.exists() && !tempFile.isDirectory()) {
+					String inputFileName = tempFile.getName().toLowerCase();
+					if (inputFileName.endsWith(".jpg") || inputFileName.endsWith(".JPG")) {
+						jpgFileList.add(tempFile);
+					}
+
+				}
+
+				File inputDir = new File(strInput);
+				if (inputDir.exists() && inputDir.isDirectory()) {
+					isDirOperation = true;
+					inputDirFile = inputDir;
+				}
+
+				System.out.println("initParamsWithInputList[" + i + "] = " + strInput + "  inputDir.exists()="
+						+ inputDir.exists() + "  inputDir.isDirectory()=" + inputDir.isDirectory());
+
+			}
+
+			if (jpgFileList.size() == 0 && inputDirFile == null) {
+				System.out.println("当前 输入的 jpg 文件 为 空 无法获取 输入的 jpg 请检查 输入!! ");
+				File shellDir = new File(curDirPath);
+				if (shellDir != null && shellDir.exists()) {
+					File[] listArr = shellDir.listFiles();
+
+					if (listArr == null || listArr.length == 0) {
+						System.out.println("当前 输入的目录  " + inputDirFile.getAbsolutePath() + "没有 任何文件操作!!");
+
+						return false;
+					}
+					for (int i = 0; i < listArr.length; i++) {
+						File fileItem = listArr[i];
+
+						String inputFileName = fileItem.getName().toLowerCase();
+						if (inputFileName.endsWith(".jpg") || inputFileName.endsWith(".jpg")) {
+							jpgFileList.add(fileItem);
+							isDirOperation = true;
+							inputDirFile = shellDir;
+						}
+
+					}
+
+				} else {
+					System.out.println("当前 输入的 jpg 文件为空  shell目录为空 无法获取 输入的 xlsx 请检查 输入!! ");
+					return false;
+
+				}
+
+			}
+
+			/*
+			 * if (inputDirFile != null) { File[] listArr = inputDirFile.listFiles(); if
+			 * (listArr == null || listArr.length == 0) { System.out.println("当前 输入的目录  " +
+			 * inputDirFile.getAbsolutePath() + "没有 任何文件操作!!");
+			 * 
+			 * return false; } for (int i = 0; i < listArr.length; i++) { File fileItem =
+			 * listArr[i];
+			 * 
+			 * String inputFileName = fileItem.getName().toLowerCase(); if
+			 * (inputFileName.endsWith(".jpg") || !jpgFileList.contains(fileItem)) {
+			 * jpgFileList.add(fileItem); }
+			 * 
+			 * }
+			 * 
+			 * }
+			 */
+
+			if (jpgFileList.size() == 0) {
+				System.out.println(
+						"当前 输入的目录  inputDirFile =" + (inputDirFile == null ? "null" : inputDirFile.getAbsolutePath())
+								+ "没有 任何文件的 .jpg .JPG文件进行操作!!");
+
+				return false;
+
+			}
+			if (inputDirFile == null) {
+				System.out.println("ZXX inputDirFile = null " + " jpgFileList.size()=" + jpgFileList.size()
+						+ "   isDirOperation=" + isDirOperation);
+
+			} else {
+				System.out.println("ZXX inputDirFile =" + inputDirFile.getAbsolutePath() + "    jpgFileList.size()="
+						+ jpgFileList.size() + "   isDirOperation=" + isDirOperation);
+
+			}
+
+			// TODO Auto-generated method stub
+			return super.initParamsWithInputList(inputParamList);
+		}
+
+		
+	    /**
+	     * 图片缩放
+	     *
+	     * @param srcImagePath  图片路径
+	     * @param targetWidth   目标宽度
+	     * @return
+	     * @throws IOException
+	     */
+	    public  BufferedImage resizeImage(String srcImagePath, int targetWidth) throws IOException {
+	        Image srcImage = ImageIO.read(new File(srcImagePath));
+	        // 这里除以2  原始高度除以2 notepad++ 打开宽高宽度不一致 这里使得高度减少一半 看起来对称  
+	        int targetHeight = (int)(getTargetHeight(targetWidth, srcImage)/2); 
+	        BufferedImage resizedImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_RGB);
+	        Graphics2D graphics2D = resizedImage.createGraphics();
+	        graphics2D.drawImage(srcImage, 0, 0, targetWidth, targetHeight, null);
+	        graphics2D.dispose();
+	        return resizedImage;
+	    }
+
+	    /**
+	     * 图片缩放
+	     *
+	     * @param srcImagePath  图片路径
+	     * @param targetWidth   目标宽度
+	     * @return
+	     * @throws IOException
+	     */
+	    public  BufferedImage resizeImage2(String srcImagePath, int targetWidth) throws IOException {
+	        Image srcImage = ImageIO.read(new File(srcImagePath));
+	        int targetHeight = getTargetHeight(targetWidth, srcImage);
+	        Image image = srcImage.getScaledInstance(targetWidth, targetHeight, Image.SCALE_DEFAULT);
+	        BufferedImage bufferedImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_RGB);
+	        bufferedImage.getGraphics().drawImage(image, 0, 0, null);
+	        return bufferedImage;
+	    }
+
+	    /**
+	     * 根据指定宽度，计算等比例高度
+	     *
+	     * @param targetWidth   目标宽度
+	     * @param srcImage      图片信息
+	     * @return
+	     */
+	    private  int getTargetHeight(int targetWidth, Image srcImage) {
+	        int targetHeight = srcImage.getHeight(null);
+	        if (targetWidth < srcImage.getWidth(null)) {
+	            targetHeight = Math.round((float)targetHeight / ((float)srcImage.getWidth(null) / (float)targetWidth));
+	        }
+	        return targetHeight;
+	    }
+
+	    /**
+	     * 图片打印
+	     *
+	     * @param image
+	     * @throws IOException
+	     */
+	    public  String printImage(BufferedImage image) throws IOException {
+	        final char[] PIXEL_CHAR_ARRAY = {'W', '@', '#', '8', '&', '*', 'o', ':', '.', ' '};
+	        int width = image.getWidth();
+	        int height = image.getHeight();
+	        StringBuilder imageSB = new StringBuilder();
+	        for (int i = 0; i < height; i++) {
+	            for (int j = 0; j < width; j++) {
+	                int rgb = image.getRGB(j, i);
+	                Color color = new Color(rgb);
+	                int red = color.getRed();
+	                int green = color.getGreen();
+	                int blue = color.getBlue();
+	                // 一个用于计算RGB像素点灰度的公式
+	                Double grayscale = 0.2126 * red + 0.7152 * green + 0.0722 * blue;
+	                double index = grayscale / (Math.ceil(255 / PIXEL_CHAR_ARRAY.length) + 0.5);
+	                System.out.print(PIXEL_CHAR_ARRAY[(int)(Math.floor(index))]);
+	                imageSB.append(PIXEL_CHAR_ARRAY[(int)(Math.floor(index))]);
+	            }
+
+	            System.out.println();
+	            imageSB.append("\n");
+	        }
+	        
+	        imageSB.append("\n");
+	        imageSB.append("\n");
+	        imageSB.append("\n");
+	        imageSB.append("\n");
+//	        imageSB.append("\n");
+//	        imageSB.append("\n");
+	        return imageSB.toString();
+	    }
+
+		
+		
+
+	}
+
+	
+	
+	// 给定一个 类型的 模板  起始页(默认1)  最终页(默认100)
+	// 是否代理(默认false)  itemtag(页面内的标记用于过滤)  imagetag(详细内容也的照片的标示)
+	// CategoryModel_HttpPage_Download_Rule_49
+	
 	class CategoryModel_HttpPage_Download_Rule_49 extends Basic_Rule {
 
 		String mCategoryModel ;  //  Page 主页的模板  使用 {page} 来对 页面进行替换 默认为 {page}
