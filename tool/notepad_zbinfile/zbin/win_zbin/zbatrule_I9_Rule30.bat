@@ -5279,6 +5279,35 @@ goto:eof
 
 
 
+:rule33vgitcommit_func_0x0
+rem ======================================== rule33vgitcommit_func_0x0
+rem rule_tip: %init_input_0% _33_    ##  在当前目录自动提交代码默认main分支
+rem desc: 
+rem sample: call :rule33vgitcommit_func_0x0
+rem sample_out: 
+::SETLOCAL
+echo ______________Method_In rule33vgitcommit_func_0x0
+echo :rule33vgitcommit_func_0x0
+del zzZZzz.txt
+set hh=%time:~0,2%
+if /i %hh% LSS 10 (set hh=0%time:~1,1%)
+set CURRENT_DATE_TIME_STAMP=%date:~0,4%年%date:~5,2%月%date:~8,2%日-%hh%时%time:~3,2%分%time:~6,2%秒
+git branch -a
+git branch -r
+git status
+dir
+git add ./
+git commit -m "Zukgit_Commit"
+git push
+git log
+echo [rule33vgitcommit_func_0x0 EndPrintCode]   output=[__empty__]  param1=[__empty__] 
+echo ______________Method_Out rule33vgitcommit_func_0x0
+::ENDLOCAL
+goto:eof
+
+
+
+
 :rule996vwindowsbomb_func_0x0
 rem ======================================== rule996vwindowsbomb_func_0x0
 rem rule_tip: %init_input_0% _996_     ## 不断循环打开关闭 CMD页面  感觉像 轰炸屏幕 寓意轰炸996  无奈下周修好电脑继续
@@ -5563,15 +5592,17 @@ echo %init_input_0% _28_   typefilter_txt  ## 搜索所有(包含孙文件)当�
 
 echo %init_input_0% _28_   typefilter_java  ## 搜索所有(包含孙文件)当前目录下指定的输入类例如[java] 把它们 统一归类到 一个文件类型的文件夹Z_java  文件目录中
 
-echo %init_input_0% _29_       ## 过滤当前路径(不包括孙文件)下Port_Land命名的的jpg gif mp4到新建的zapp分类目录 jpg_common_land
+echo %init_input_0% _29_       ## zapp 过滤当前路径(不包括孙文件)下Port_Land命名的的jpg gif mp4到新建的zapp分类目录 jpg_common_land
 
-echo %init_input_0% _29_      ## 过滤当前路径(不包括孙文件)下Port_Land命名的的jpg gif mp4到新建的zapp分类目录 jpg_common_port
+echo %init_input_0% _29_      ## zapp 过滤当前路径(不包括孙文件)下Port_Land命名的的jpg gif mp4到新建的zapp分类目录 jpg_common_port
 
 echo %init_input_0% _31_  file_xxxx.bat  ##   admin权限复制到 Windows启动路径  explorer.exe  "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\StartUp"
 
 echo %init_input_0% _32_       ## main 过滤当前路径(不包括孙文件)下Port_Land命名的的jpg gif mp4到新建的zmain分类目录 jpg_common_land
 
 echo %init_input_0% _32_      ## main 过滤当前路径(不包括孙文件)下Port_Land命名的的jpg gif mp4到新建的zmain分类目录 jpg_common_port
+
+echo %init_input_0% _33_    ##  在当前目录自动提交代码默认main分支
 
 echo %init_input_0% _996_     ## 不断循环打开关闭 CMD页面  感觉像 轰炸屏幕 寓意轰炸996  无奈下周修好电脑继续
 
