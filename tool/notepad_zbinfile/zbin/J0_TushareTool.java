@@ -82,7 +82,7 @@ public class J0_TushareTool {
     static String mac_zbinPath = System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin" + File.separator + "mac_zbin";
 
 
-    //1. nodename_last_record_day=""  ;   // 当前记录的数据最大的时间
+//1. nodename_last_record_day=""  ;   // 当前记录的数据最大的时间
 //2. nodename_begin_record_day="";  // 当前查询记录的起始的时间
 //3. nodename_xxxxxx; // 记录当前node的 prop项  在 nodelist中自选中
     // 固定2 当前执行文件的编号 A1  A2  A3   ... G1   J0   G3 ... Z9
@@ -93,6 +93,14 @@ public class J0_TushareTool {
     static Map<String, String> propKey2ValueList = new HashMap<String, String>();
 
 
+    
+    // zukgitA
+    // zstock_tushare_tool_J0.bat  make_dynamic_batsh     
+    static boolean is_Make_Dynamic_Bat_SH = false ;  // 输入的参数是否有 make_dynamic_bat  这个参数 如果 有 那么需要执行额外的逻辑
+    //  J0_Dynamic_Bat.bat  J0_Dynamic_Bat.sh
+    static File dynamic_Bat_SH_File = new File(System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin" + File.separator + "J0_Dynamic_Bat.bat");   // 动态 写入 执行命令的  bat 文件     J0_Dynamic_Bat.bat  J0_Dynamic_Bat.sh
+    static ArrayList<String> dynamicBatShContentList = new ArrayList<>(); //  用于存放 动态执行内容的 数组
+    
     // 当前Shell目录下的 文件类型列表  抽取出来  通用
     static HashMap<String, ArrayList<File>> CurDirFileTypeMap = new HashMap<String, ArrayList<File>>();
     ;
@@ -453,6 +461,13 @@ public class J0_TushareTool {
         if (args != null) {
             for (int i = 0; i < args.length; i++) {
                 System.out.println("args[" + i + "] = " + args[i]);
+                
+                if("make_dynamic_batsh".equals(args[i])) {
+                	
+                	is_Make_Dynamic_Bat_SH = true;   // 检测当前是否输入了 make_dynamic_batsh 来动态输出一个 bat sh 文件 动态执行
+                	continue;
+                }
+                
                 if (i == 0) {   // 第一个参数永远是  当前 shell的目录
                     CUR_Dir_1_PATH = args[i];
                 } else if (i == 1) {  // 第二个参数是用来 对 当前功能进行分类使用的
@@ -1207,21 +1222,32 @@ writeContentToFile(dailyPythonFile,allDailyCode);
 
     static void initSystemInfo() {
         String osName = System.getProperties().getProperty("os.name").toLowerCase();
+        
+        TimeZone timeZone = TimeZone.getTimeZone("GMT+8");
+
+        TimeZone.setDefault(timeZone);
+        
         if (osName.contains("window")) {
             CUR_OS_TYPE = OS_TYPE.Windows;
             Cur_Bat_Name = Cur_Bat_Name + ".bat";
             BAT_OR_SH_Point = ".bat";
             cur_os_zbinPath = win_zbinPath;
+             dynamic_Bat_SH_File = new File(System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin" + File.separator + "J0_Dynamic_Bat.bat");   // 动态 写入 执行命令的  bat 文件     J0_Dynamic_Bat.bat  J0_Dynamic_Bat.sh
+            
         } else if (osName.contains("linux")) {
             CUR_OS_TYPE = OS_TYPE.Linux;
             Cur_Bat_Name = Cur_Bat_Name + ".sh";
             BAT_OR_SH_Point = ".sh";
             cur_os_zbinPath = lin_zbinPath;
+            dynamic_Bat_SH_File = new File(System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin" + File.separator + "J0_Dynamic_Bat.sh");   // 动态 写入 执行命令的  bat 文件     J0_Dynamic_Bat.bat  J0_Dynamic_Bat.sh
+
         } else if (osName.contains("mac")) {
             CUR_OS_TYPE = OS_TYPE.MacOS;
             Cur_Bat_Name = Cur_Bat_Name + ".sh";
             BAT_OR_SH_Point = ".sh";
             cur_os_zbinPath = mac_zbinPath;
+            dynamic_Bat_SH_File = new File(System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin" + File.separator + "J0_Dynamic_Bat.sh");   // 动态 写入 执行命令的  bat 文件     J0_Dynamic_Bat.bat  J0_Dynamic_Bat.sh
+
         }
     }
 
@@ -1615,6 +1641,15 @@ writeContentToFile(dailyPythonFile,allDailyCode);
             sb.append("\n【最新最近有数据交易日_当日数据当日下午5点更新】交易日 day query  "+lastTradeDay+ "查询并将生成的J0_Data目录文件导入手机命令如下: \n");
             sb.append(Cur_Bat_Name+"  day_"+lastTradeDay+"   &&  " + " "+ J0_call_day_python_bat_File.getAbsolutePath() +"  "+ lastTradeDay +" && zrule_apply_G2.bat #_38 "+  J0_Dir_Path +"  && "+" adb push  "+J0_Dir_Path+".  /sdcard/zmain/stock/ "+ " \n && "+ " adb push "+zbinPath+File.separator+"J0_股票列表.xlsx  /sdcard/zmain/stock/J0_股票列表.xlsx ");
 
+            
+            // 输入的参数有 make_dynamic_batsh 时  需要 动态生成 执行代码 到 目录
+            if(is_Make_Dynamic_Bat_SH) {
+            	
+            	Try_Dynamic_BatSH_Operation( lastTradeDay);
+            	
+            }
+            
+            
          //  zrule_apply_G2.bat + J0_Dir_Path
          int now_yyyy0101 =    getNow_YYYY0101();
          if(now_yyyy0101 > nowInt) {
@@ -1630,6 +1665,69 @@ writeContentToFile(dailyPythonFile,allDailyCode);
 
 
         }
+        
+        void Try_Dynamic_BatSH_Operation(int lastTradeDay) {
+//        	dynamicBatShContentList
+        	if(CUR_OS_TYPE == OS_TYPE.Windows) {
+        		// Bat 的动态写入   等待填充	
+        		dynamicBatShContentList.add("@echo off");
+        		dynamicBatShContentList.add("Setlocal ENABLEDELAYEDEXPANSION");    		
+        		StringBuilder tempSB = new StringBuilder();
+        		
+        		
+        		// 下载当天的 xlsx 文件 并 转为 json  
+        		// C:\Users\zhuzj5\Desktop\zbin\win_zbin\zstock_tushare_tool_J0.bat  day_20220224 && 
+        		// C:\Users\zhuzj5\Desktop\zbin\J0_DayPython\J0_0000_call_day_python.bat  20220224 && 
+        		// C:\Users\zhuzj5\Desktop\zbin\win_zbin\zrule_apply_G2.bat _38  C:\Users\zhuzj5\Desktop\zbin\J0_Data\  
+
+        		tempSB.append(win_zbinPath+File.separator+Cur_Bat_Name+"  day_"+lastTradeDay+" && ");
+        		tempSB.append(J0_call_day_python_bat_File.getAbsolutePath()+ "  "+ lastTradeDay +" && ");
+        		tempSB.append(win_zbinPath+File.separator+"zrule_apply_G2.bat"+ " _38  "+ J0_Dir_Path +"  && ");
+       
+        		
+        		// zrule_apply_G2.bat #_38 "+  J0_Dir_Path
+        		
+        		
+        		// sb.append(Cur_Bat_Name+"  day_"+lastTradeDay+"   &&  " + " "+ J0_call_day_python_bat_File.getAbsolutePath() +"  "+ lastTradeDay +" && zrule_apply_G2.bat #_38 "+  J0_Dir_Path +"  && "+" adb push  "+J0_Dir_Path+".  /sdcard/zmain/stock/ "+ " \n && "+ " adb push "+zbinPath+File.separator+"J0_股票列表.xlsx  /sdcard/zmain/stock/J0_股票列表.xlsx ");
+// zstock_tushare_tool_J0.bat  day_20220224   &&   C:\Users\zhuzj5\Desktop\zbin\J0_DayPython\J0_0000_call_day_python.bat  20220224 && zrule_apply_G2.bat #_38 C:\Users\zhuzj5\Desktop\zbin\J0_Data\  &&  adb push  C:\Users\zhuzj5\Desktop\zbin\J0_Data\.  /sdcard/zmain/stock/  
+//  &&  adb push C:\Users\zhuzj5\Desktop\zbin\J0_股票列表.xlsx  /sdcard/zmain/stock/J0_股票列表.xlsx 
+      		  // C:\Users\zhuzj5\Desktop\zbin\win_zbin\zgupiao_analysis_J0.bat  #_1  yyyymmdd_20220224
+	 
+        		
+        		
+        		
+
+
+        		 // 需要去掉 命令中的 #  井号   可能有歧义
+        		//    依据当前的 json 文件 创建 对应的  2022_main_stock.xlsx  2023_main_stock.xlsx 文件
+//         		StringBuilder createYearMainCommandSB = new StringBuilder();
+                String Cur_J0_GuPiao_Analysis_Bat_Name = "zgupiao_analysis_J0"+BAT_OR_SH_Point;
+                
+         		// zgupiao_analysis_J0.bat  #_1  yyyymmdd_20220303
+                tempSB.append(win_zbinPath+File.separator+Cur_J0_GuPiao_Analysis_Bat_Name+"  _1  yyyymmdd_"+lastTradeDay+" ");
+
+           		
+         		dynamicBatShContentList.add(tempSB.toString());
+         		
+           		
+           		
+        	}else {
+        		// SH 的动态写入   等待填充
+        		
+        		
+        	}
+        	
+        	System.out.println("写入 dynamic_Bat_SH_File "+dynamic_Bat_SH_File.getAbsolutePath() +"  dynamicBatShContentList.size()="+dynamicBatShContentList.size());
+        	for (int i = 0; i < dynamicBatShContentList.size(); i++) {
+				String lineItem = dynamicBatShContentList.get(i);
+				System.out.println("Dynamic_Line["+i+"] = "+ lineItem);
+			}
+        	writeContentToFile(dynamic_Bat_SH_File, dynamicBatShContentList);
+        	
+        	//    sb.append(Cur_Bat_Name+"  day_"+lastTradeDay+"   &&  " + " "+ J0_call_day_python_bat_File.getAbsolutePath() +"  "+ lastTradeDay +" && zrule_apply_G2.bat #_38 "+  J0_Dir_Path +"  && "+" adb push  "+J0_Dir_Path+".  /sdcard/zmain/stock/ "+ " \n && "+ " adb push "+zbinPath+File.separator+"J0_股票列表.xlsx  /sdcard/zmain/stock/J0_股票列表.xlsx ");
+
+        }
+        
     }
 
 
@@ -3075,6 +3173,10 @@ writeContentToFile(dailyPythonFile,allDailyCode);
    static int PythonType_Input = 0 ;
 
 
+
+   
+   
+   
     // 当前 用户选择的 当前的 指定的 索引  默认为 0
     static int PythonItem_Index = 0;
 
@@ -3117,10 +3219,12 @@ writeContentToFile(dailyPythonFile,allDailyCode);
         J0_TushareTool.InitRule();
 
         // 用户没有输入参数
-        if (CUR_INPUT_3_ParamStrList.size() == 0 && !allowEmptyInputParam && PythonType_Input == 0) {
+        System.out.println(" CUR_INPUT_3_ParamStrList.size() = "+ CUR_INPUT_3_ParamStrList.size()+"  PythonType_Input="+PythonType_Input);
+        if (CUR_INPUT_3_ParamStrList.size() == 0 && PythonType_Input == 0) {
             showTip();
             return;
         }
+   
 
  //   默认的索引同时也被修改  没有获得 当前 适配的规则索引
 //        if (CUR_TYPE_INDEX <= 0 || CUR_TYPE_INDEX > CUR_RULE_LIST.size()) {

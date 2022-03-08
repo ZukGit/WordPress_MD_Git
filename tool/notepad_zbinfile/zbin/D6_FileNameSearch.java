@@ -698,13 +698,33 @@ System.out.println("defaultCharSet: "+Charset.defaultCharset());
 					boolean isPaddingEmpty = md5_Length == 31 ? true : false;
 					String fixedIndex = getFixedIndex(index2);
 					System.out.println(" 【index : " + fixedIndex + "】   【 MD5(" + md5_Length + "):  "
-							+ (isPaddingEmpty ? " " : "") + mdHex + " 】 " + Path);
+							+ (isPaddingEmpty ? " " : "") + mdHex + " 】 "+"Size["+getPaddingIntString((int)curFile.length(),12," ",true)+"] " + Path);
 				}
 				System.out.println("================" + fixedType + "End================");
 			}
 		}
 	}
 
+	static String getPaddingIntString(int index, int padinglength, String oneStr, boolean dirPre) {
+		String result = "" + index;
+		int length = ("" + index).length();
+
+		if (length < padinglength) {
+			int distance = padinglength - length;
+			for (int i = 0; i < distance; i++) {
+				if (dirPre) {
+					result = oneStr + result;
+				} else {
+					result = result + oneStr;
+				}
+
+			}
+
+		}
+		return result;
+
+	}
+	
 	
 	static String bytesToHexString(byte[] src) {
 		StringBuilder builder = new StringBuilder();
@@ -954,7 +974,7 @@ System.out.println("defaultCharSet: "+Charset.defaultCharset());
 		System.out.println();
 		for (File curFile : allSimpleFileSet) {
 			String fileName = curFile.getName();
-			System.out.println("文件索引[ " + index + "]  路径: " + curFile.getAbsolutePath());
+			System.out.println("文件索引[ " + getPaddingIntString(index,6," ",true) + "]"+" Size["+getPaddingIntString((int)curFile.length(),12," ",true)+"]"+"  路径: " + curFile.getAbsolutePath() );
 			if (!fileName.contains(".")) {
 				addFileMapItemWithKey("unknow", curFile);
 			} else {

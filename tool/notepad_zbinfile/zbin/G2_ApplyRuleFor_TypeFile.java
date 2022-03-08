@@ -87,6 +87,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.pdfbox.io.MemoryUsageSetting;
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.openxml4j.util.ZipSecureFile;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.ss.usermodel.Row;
@@ -96,6 +97,7 @@ import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.poi.xslf.usermodel.XMLSlideShow;
 import org.apache.poi.xslf.usermodel.XSLFSlide;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.xmlbeans.impl.xb.xsdschema.impl.FormChoiceImpl;
 import org.json.JSONException;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
@@ -375,9 +377,204 @@ public class G2_ApplyRuleFor_TypeFile {
 		// 把 当前的 输入的 jpg 或者 当前目录下的 jpg文件 动态计算成 320 宽度的 字符串 并 在打开的文件中打印
 		realTypeRuleList.add(new JPG_To_TextChar_Rule_50());
 		
+		
+		// 把 当前的 原目录中的所有文件 复制到 对应目录的文件， 如果文件大小一直 那么就跳过复制的过程
+		// tip: git action 操作过程中 文件大小不变 但是 它的MD5值 变化了  导致每次都 更新相同的文件
+		realTypeRuleList.add(new SrcDir_Copy2_DstDir_WithFileLength_Rule_51());
+		
+		
 		// initrule
 	}
 	
+	class SrcDir_Copy2_DstDir_WithFileLength_Rule_51 extends Basic_Rule {
+		File src_Dir ; //    源目录
+		File dst_Dir ;   //   目的目录
+	
+		//  需要执行 从 src 复制到 dst 的 实体文件的 对应关系 
+		HashMap<File,File> srcFile_dstFile_Map;
+		 ArrayList<File> needCopyFileList = new ArrayList<File>();  //  需要 进行 复制操作的文件(文件大小不一样)
+		SrcDir_Copy2_DstDir_WithFileLength_Rule_51() {
+			super("#", 51, 4); //
+	
+			needCopyFileList = new ArrayList<File>();
+			srcFile_dstFile_Map = new HashMap<File,File>();
+		}
+		
+		
+
+		@Override
+		boolean initParamsWithInputList(ArrayList<String> inputParamList) {
+			// mdname_true // kaoyan_true gaokao_true
+
+			
+//			src_xxxxxx
+//			dst_xxxxx
+			
+			for (int i = 0; i < inputParamList.size(); i++) {
+				String paramItem_lower_trim = inputParamList.get(i);
+//				String paramItem_lower_trim = paramItem.toLowerCase().trim();
+
+				if (paramItem_lower_trim.startsWith("src_")) {
+					
+					String srcDirPath = (" "+paramItem_lower_trim).replace(" src_", "");
+					srcDirPath = srcDirPath.replace(" ", "");
+					
+					File srcDirFile = new File(srcDirPath);
+					if(!srcDirFile.exists()) {
+						System.out.println("当前 SRC目录["+ srcDirPath+"] 不存在 请检查输入参数!");
+						return false;
+					}
+					
+					
+					if(!srcDirFile.isDirectory()) {
+						System.out.println("当前 SRC目录["+ srcDirPath+"] 不是文件夹  请检查输入参数!");
+	
+						return false;
+					}
+					
+					src_Dir = srcDirFile;
+				}
+
+			if (paramItem_lower_trim.startsWith("dst_")) {
+					
+					String dstDirPath = (" "+paramItem_lower_trim).replace(" dst_", "");
+					dstDirPath = dstDirPath.replace(" ", "");
+					
+					File dstDirFile = new File(dstDirPath);
+					if(!dstDirFile.exists()) {
+						System.out.println("当前 DST目录["+ dstDirPath+"] 不存在 请检查输入参数!");
+						return false;
+					}
+					
+					
+					if(!dstDirFile.isDirectory()) {
+						System.out.println("当前 DST目录["+ dstDirPath+"] 不是文件夹  请检查输入参数!");
+	
+						return false;
+					}
+					
+					dst_Dir = dstDirFile;
+				}
+
+			}
+			
+			
+			if(src_Dir == null) {
+				System.out.println("当前 SRC 目录["+ src_Dir+"] 为空   请检查输入参数!");
+				
+				return false;
+		
+			}
+			
+			if(dst_Dir == null) {
+				System.out.println("当前 DST目录["+ dst_Dir+"] 为空   请检查输入参数!");
+				
+				return false;
+		
+			}
+
+
+			System.out.println(" 当前输入 SRC[ "+ src_Dir.getAbsolutePath()+"]  Dst[ "+dst_Dir.getAbsolutePath()+"]"+" ] 存在  将执行代码逻辑");
+	
+
+			// TODO Auto-generated method stub
+			return super.initParamsWithInputList(inputParamList);
+		}
+
+
+		@Override
+		String simpleDesc() {
+
+			return "\n"+Cur_Bat_Name + " #_"+rule_index+"  src_xxxxxx  dst_xxxxx    //  把 当前的 原目录中的所有文件 复制到 对应目录的文件， 如果文件大小一直 那么就跳过复制的过程  \n"
+					+ Cur_Bat_Name + "  #_"+rule_index+   " src_  dst_  ###  把 当前的 原目录中的所有文件 复制到 对应目录的文件， 如果文件大小一直 那么就跳过复制的过程   \n"
+                   	+ ""
+//			zrule_apply_G2.bat  #_46  copyright_show  harddir_true
+					;
+		}
+
+
+
+		@Override
+		ArrayList<File> applySubFileListRule4(ArrayList<File> curFileList,
+											  HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList,
+											  ArrayList<File> curRealFileList) {
+// TODO Auto-generated method stub
+			
+			File[] srcFileArr = src_Dir.listFiles();
+			File[] dstFileArr = dst_Dir.listFiles();
+			
+			if(srcFileArr == null || srcFileArr.length == 0 ) {
+				System.out.println("  当前 原目录 Src目录["+src_Dir.getAbsolutePath()+"] 中文件为空  ");
+	
+				return super.applySubFileListRule4(curFileList, subFileTypeMap, curDirList, curRealFileList);
+
+			}
+			
+			// needCopyFileList
+			
+			for (int i = 0; i < srcFileArr.length; i++) {
+				File fileItem = srcFileArr[i];
+				if(fileItem.isDirectory()) {  //  不对  文件夹进行复制
+					continue; 
+				}
+				
+				String name = fileItem.getName();
+				String dstMatchFilePath = dst_Dir.getAbsolutePath()+File.separator+name;
+				File dstMatchFile = new File(dstMatchFilePath);
+				
+				if(dstMatchFile.exists()) {
+					if(dstMatchFile.length() != fileItem.length()) {
+						
+						// 原目录 有这个文件 但是和 dst 目录不一致 那么也加入 copy 列表
+						needCopyFileList.add(fileItem); 
+						srcFile_dstFile_Map.put(fileItem, dstMatchFile);
+					}
+				}else {
+					// 原目录 没有这个文件 那么加入copy列表
+					needCopyFileList.add(fileItem);  
+					srcFile_dstFile_Map.put(fileItem, dstMatchFile);
+				}
+			
+				
+			}
+			
+			
+			System.out.println("当前 需要执行 Copy 操作的 文件 的 总数 : "+ needCopyFileList.size());
+			System.out.println("开始执行 ———————— Copy-Operation begin —————");
+
+			if(needCopyFileList.size() > 0 ) {
+				for (int i = 0; i < needCopyFileList.size(); i++) {
+	
+					File srcItem = needCopyFileList.get(i);
+					
+					File dstFile = srcFile_dstFile_Map.get(srcItem);
+					System.out.println("开始第["+i+"] 个文件复制 src["+srcItem+"]  dst["+dstFile+"]");	
+					if(dstFile == null) {
+						continue;
+					}
+					
+					
+					if(dstFile.exists()) {
+						dstFile.delete();
+					}
+					
+					fileCopy(srcItem, dstFile);
+					
+				}
+				
+				
+				
+			}
+			System.out.println("开始执行 ———————— Copy-Operation end —————");
+
+			return super.applySubFileListRule4(curFileList, subFileTypeMap, curDirList, curRealFileList);
+
+		}
+		
+		
+		
+		
+	}
 	
 
 	// 把 当前的 输入的 jpg 或者 当前目录下的 jpg文件 动态计算成 320 宽度的 字符串 并 在打开的文件中打印
@@ -7517,6 +7714,8 @@ public class G2_ApplyRuleFor_TypeFile {
 					isDirOperation = true;
 					inputDirFile = inputDir;
 				}
+				
+		
 
 				System.out.println("initParamsWithInputList[" + i + "] = " + strInput + "  inputDir.exists()="
 						+ inputDir.exists() + "  inputDir.isDirectory()=" + inputDir.isDirectory());
@@ -7568,6 +7767,8 @@ public class G2_ApplyRuleFor_TypeFile {
 					if (inputFileName.endsWith(".xlsx") || inputFileName.endsWith(".xls")) {
 						xlsxFileList.add(fileItem);
 					}
+					
+					System.out.println("inputDir_xlsx["+i+"] = "+ fileItem.getAbsolutePath()+"  Size="+fileItem.length() );
 
 				}
 
@@ -7599,6 +7800,7 @@ public class G2_ApplyRuleFor_TypeFile {
 			try {
 				FileInputStream inp = new FileInputStream(xlsxFile.getAbsolutePath());
 
+				ZipSecureFile.setMinInflateRatio(-1.0d);
 				Workbook workbook = null;
 //		            Workbook workbook = WorkbookFactory.create(inp);
 
