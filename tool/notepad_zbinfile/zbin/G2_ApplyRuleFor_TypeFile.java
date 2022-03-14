@@ -523,7 +523,14 @@ public class G2_ApplyRuleFor_TypeFile {
 				File dstMatchFile = new File(dstMatchFilePath);
 				
 				if(dstMatchFile.exists()) {
-					if(dstMatchFile.length() != fileItem.length()) {
+					// 源文件大小要大于 10 
+					long srcFileSize = fileItem.length();
+					long dstFileSize = fileItem.length();
+					long diffSize = Math.abs(dstFileSize - srcFileSize);
+					
+					if(dstMatchFile.length() != fileItem.length()   // 两个文件的大小不一样才执行 copy
+							&& fileItem.length() > 10   // 源文件的大小要大于10 才执行 copy 
+							&& diffSize > 10) {   // 两个文件的差异要大于10 才 执行 copy 文件
 						
 						// 原目录 有这个文件 但是和 dst 目录不一致 那么也加入 copy 列表
 						needCopyFileList.add(fileItem); 
@@ -548,7 +555,9 @@ public class G2_ApplyRuleFor_TypeFile {
 					File srcItem = needCopyFileList.get(i);
 					
 					File dstFile = srcFile_dstFile_Map.get(srcItem);
-					System.out.println("开始第["+i+"] 个文件复制 src["+srcItem+"]  dst["+dstFile+"]");	
+					System.out.println("开始第["+i+"] 个_SRC_文件复制 src["+srcItem+"][Size:"+srcItem.length()+"][MD5:"+getMD5Three(srcItem.getAbsolutePath())+"]");	
+					System.out.println(""); 
+					
 					if(dstFile == null) {
 						continue;
 					}
@@ -560,6 +569,8 @@ public class G2_ApplyRuleFor_TypeFile {
 					
 					fileCopy(srcItem, dstFile);
 					
+					System.out.println("完成第["+i+"] 个_DST_文件复制 dst["+dstFile+"][Size:"+dstFile.length()+"][MD5:"+getMD5Three(dstFile.getAbsolutePath())+"]");	
+
 				}
 				
 				
@@ -12848,6 +12859,11 @@ public class G2_ApplyRuleFor_TypeFile {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
+		} catch (Exception e) {
+			 e.printStackTrace();
+			}
+		if(bi == null) {
+			return "MD5_Null";
 		}
 		return bi.toString(16);
 	}

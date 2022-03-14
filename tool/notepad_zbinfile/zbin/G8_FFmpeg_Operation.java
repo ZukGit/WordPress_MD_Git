@@ -342,19 +342,21 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
         String beginTimeStr;
         String endTimeStr;
         int timeDistance ;   //  时间的间距  秒 .. 
+        boolean isAllMp4_Operation_Tag ; //   是否 包含  allmp4 标识  如果有 那么对当前所有的mp4转为 gif
         String outputFileName;  // 输出文件的名称  Gif 的输出的文件名称
 
 
         Revert_MP4_To_Gif_Rule_11(){
             super(11);
             mInputMediaFileList = new  ArrayList<File>();
+            isAllMp4_Operation_Tag = false;
 
         }
 
 
         @Override
         String ruleTip(String type, int index, String batName, OS_TYPE curType) {
-            return          "\n"+Cur_Bat_Name+ "  11   <mp4,flv,avi.rmvb 路径>    ## 把所有的MP4转Gif   \n"+
+            return          "\n"+Cur_Bat_Name+ "  11   <mp4,flv,avi.rmvb 路径>    ## 输入单个MP4路径 把单个MP4转Gif   \n"+
                             "\n"+Cur_Bat_Name+ "  11   10-              <mp4,flv,avi.rmvb 路径>       ## 秒数MP4转Gif   \n"+
                             "\n"+Cur_Bat_Name+ "  11   -100              <mp4,flv,avi.rmvb 路径>    ## 秒数MP4转Gif   \n"+
                             "\n"+Cur_Bat_Name+ "  11  10-50              <mp4,flv,avi.rmvb 路径>    ## 秒数MP4转Gif   \n"+
@@ -364,7 +366,7 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
                             "\n"+Cur_Bat_Name+ "  11  00:00:10-          <mp4,flv,avi.rmvb 路径>    ## 时分秒MP4转Gif \n"+
                             "\n"+Cur_Bat_Name+ "  11  -00:00:10          <mp4,flv,avi.rmvb 路径>    ## 时分秒MP4转Gif \n"+
                             "\n"+Cur_Bat_Name+ "  11  00:00:00-00:00:10  <mp4,flv,avi.rmvb 路径>    ## 时分秒MP4转Gif \n" +
-                            "\n"+Cur_Bat_Name+ "  11   <mp4,flv,avi.rmvb 路径>    ## 把所有的MP4转Gif   \n"; }
+                            "\n"+Cur_Bat_Name+ "  11  allmp4      ### <mp4,flv,avi.rmvb 路径>   把本地的所有的MP4转Gif   \n"; }
 
 
 
@@ -380,8 +382,21 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
 
             if(otherParams == null || otherParams.size() ==0){
                 errorMsg = "用户输入的文件参数为空";
+                // 检测当前目录下的 mp4 文件 
                 System.out.println(errorMsg);
                 return false;
+            }
+            
+            if(otherParams.size() == 1) {
+            	String firstParam = otherParams.get(0).toLowerCase();
+            	if("allmp4".equals(firstParam)) {
+            		
+            		isAllMp4_Operation_Tag = true;
+                    System.out.println("当前 对 本地目录所有mp4  进行 gif的 格式转换! ");
+            		return true ; 
+            	}
+            	
+            	
             }
 
 
@@ -486,12 +501,70 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
         }
 
 
+        void TryAllMp42GifOperation(File[] allLocalFileArr , String mpegPath) {
+        	if(allLocalFileArr == null || allLocalFileArr.length == 0) {
+        		
+        		System.out.println("当前目录 CUR_Dir_FILE="+CUR_Dir_FILE.getAbsolutePath()+" 子文件为空!");
+        	}
+        	
+        	ArrayList<File> allMp4File = new ArrayList<File> ();
+        	
+        	
+        	for (int i = 0; i < allLocalFileArr.length; i++) {
+        		File fileItem = allLocalFileArr[i];
+        		
+        		if(fileItem.isFile()) {
+        			String fileName_lower =  fileItem.getName().toLowerCase();
+        			
+        			if(fileName_lower.endsWith(".mp4")) {
+        				allMp4File.add(fileItem);
+        				
+        			}
+        			
+        		}
+				
+			}
+        	
+        	
+        	if(allMp4File.size()  == 0 ) {
+        		
+       System.out.println("当前目录 CUR_Dir_FILE="+CUR_Dir_FILE.getAbsolutePath()+"  不包含 mp4文件 !");
+
+       System.out.println("请检查当前目录是否包含 mp4 文件 然后再试 ! ");
+       
+       return ;
+        	}
+        	
+        	for (int i = 0; i < allMp4File.size(); i++) {
+				File mp4FileItem = allMp4File.get(i);
+				String mp4AbsPath = mp4FileItem.getAbsolutePath();
+				
+                String originName = mp4FileItem.getName();
+              String fileNameOnly = getFileNameNoPoint(originName);
+              
+                outputFileName = fileNameOnly+"_"+System.currentTimeMillis()/1000+".gif";
+                
+				
+            	String  command = mpegPath +" -i " + "\""+mp4AbsPath+ "\"" +" "+ "   -r 15  "+ outputFileName +" -y ";
+
+            	System.out.println("allmp4["+(i+1)+"]["+allMp4File.size()+"] outputFileName[ "+outputFileName+" ]command【 "+command+" 】");
+            	execCMDNoStart(command);
+
+                
+            	 
+			}
+        	
+            System.out.println("当前本地 CUR_Dir_FILE="+CUR_Dir_FILE.getAbsolutePath()+" MP4 文件 转为 gif 文件完成! ");
+
+            
+        	
+        }
 
         @Override
         void operationRule(ArrayList<String> inputParamsList) {
 
 
-            System.out.println("beginTimeStr = "+ beginTimeStr +"   endTimeStr = "+ endTimeStr  +"   outputFileName =  "+ outputFileName  + "targetInputMP4File = "+ targetInputMP4File.getName());
+            System.out.println("beginTimeStr = "+ beginTimeStr +"   endTimeStr = "+ endTimeStr  +"   outputFileName =  "+ outputFileName  + "targetInputMP4File = "+ targetInputMP4File);
 
 
 
@@ -507,6 +580,17 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
             System.out.println("rule7 ffmpeg_path = "+ffmpeg_path);
             // 把 当前的 mp4 文件写入 G8_1_MergedRule.txt
 
+            System.out.println("isAllMp4_Operation_Tag = "+isAllMp4_Operation_Tag);
+            
+            if(isAllMp4_Operation_Tag) {
+            	
+            File[]  mFileArr = 	CUR_Dir_FILE.listFiles();
+            TryAllMp42GifOperation(mFileArr,ffmpeg_path);
+            	
+            	return;
+            }
+            
+            
             // ffmpeg -ss 00:00:04 -t 3 -i 1.mp4 -r 15  1.gif -y
             
             // ffmpeg -ss 00:00:04 -to  00:00:10 -i 1.mp4 -r 15  1.gif -y
