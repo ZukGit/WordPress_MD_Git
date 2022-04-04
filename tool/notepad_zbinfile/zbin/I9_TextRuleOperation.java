@@ -433,16 +433,17 @@ public class I9_TextRuleOperation {
 		// 对python代码的 格式进行格式化使得符合编译要求进格为4 8 12 16,不能有 tab 制表符
 		CUR_RULE_LIST.add(new Format_PythonCode_Rule_43());
 
-		
+
 		// 对当前文件过来    去掉 行开头是空格的 那些行  保留 行开头就是描述的那些行 adb dumpsys 中查看主项
 		CUR_RULE_LIST.add(new NoBlankBeginRow_Flitter_Rule44());
-		
+		// 开头两行是空格第三个不是空格的 行
 		CUR_RULE_LIST.add(new TwoBlankBeginRow_Flitter_Rule45());
-		
-		
-		
-		
-		
+
+		// 对当前的文字符串进行 Base 64 的 加密输出
+		CUR_RULE_LIST.add(new String_To_Base64__Rule46());
+
+
+
 //        CUR_RULE_LIST.add( new Image2Png_Rule_4());
 //        CUR_RULE_LIST.add( new AVI_Rule_5());
 //        CUR_RULE_LIST.add( new SubDirRename_Rule_6());
@@ -451,24 +452,123 @@ public class I9_TextRuleOperation {
 
 	}
 
-	
+
+	// 关键词          ---> 直接加密                            关键词的Base64     //# 关键词
+	//  HashMap<String,String> EnglishKey_Base64Value_Map =  new HashMap<String,String>();
+	// key=关键词   ---> EnglishKey_Base64Value_Map.put("key","关键词的Base64");   //# 关键词
+	class String_To_Base64__Rule46 extends Basic_Rule {
+
+		String_To_Base64__Rule46() {
+			super(46, false);
+
+		}
+
+
+		@Override
+		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+			for (int i = 0; i < curInputFileList.size(); i++) {
+
+				File fileItem = curInputFileList.get(i);
+				System.out.println("file["+i+"]["+curInputFileList.size()+"] "+ fileItem.getAbsolutePath() );
+				ArrayList<String> contentList = ReadFileContentAsList(fileItem);
+
+				// 找到 起始为ZZZZZ 开头的 行数
+				ArrayList<String> matchRuleRowList = new ArrayList<String> ();
+				matchRuleRowList.add("HashMap<String,String> mEnglishKey_Base64JiaMiValue_Map =  new HashMap<String,String>();");
+
+				for (int j = 0; j < contentList.size(); j++) {
+					String lineContent = contentList.get(j);
+					if(lineContent == null || "".equals(lineContent) ) {
+						continue;
+					}
+					String rawLineStr = new String(lineContent);
+					String mBase64Str = null;
+					String fixedLine = null;
+					if(lineContent.contains("=")){
+						String mKeyStr = lineContent.substring(0,lineContent.indexOf("=")).trim();
+						String mValueStr =  lineContent.substring(lineContent.indexOf("=")+1).trim();
+						try {
+							mBase64Str = jiami_encryptBASE64(mValueStr.getBytes());
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+
+
+						fixedLine = "mEnglishKey_Base64JiaMiValue_Map.put(\""+mKeyStr+"\",\""+mBase64Str+"\");"+"   "+"//# "+mValueStr;   //# 关键词
+
+
+					}else{
+
+						try {
+							mBase64Str = jiami_encryptBASE64(lineContent.getBytes());
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+						fixedLine = mBase64Str+"  "+"//# "+rawLineStr;
+
+					}
+
+					matchRuleRowList.add(fixedLine);
+
+					// 一行  如果 有 空格  =  那么 就 加密  空格后的字符串
+
+				}
+
+				writeContentToFile(I9_Temp_Text_File, matchRuleRowList);
+				NotePadOpenTargetFile(I9_Temp_Text_File.getAbsolutePath());
+				System.out.println("rule_" + rule_index + " ->去掉 行开头是空格的 保留内容到 TEMP TXT 文件");
+
+			}
+
+			return super.applyOperationRule(curFileList, subFileTypeMap, curDirList, curRealFileList);
+		}
+
+		@Override
+		String simpleDesc() {
+			return " 对当前的文字符串进行 Base 64 的 加密输出 , 也可以 key=value 输出对应 key-加密base64 来隐藏明文 ";
+		}
+
+
+
+	}
+
+/*	*//**
+	 * BASE64解密
+	 * @throws Exception
+	 *//*
+	public static String jiemi_decryptBASE64(String key) throws Exception {
+		return new String(Base64.getDecoder().decode(key));
+	}
+
+
+	*//**
+	 * BASE64加密
+	 *//*
+	public static String jiami_encryptBASE64(byte[] key) throws Exception {
+
+		return new String(Base64.getEncoder().encode(key));
+	}*/
+
+
+// 对当前文件过来  保留开头不是空格 以及 开头两行是空格第三个不是空格的 行 adb shell dumpsys 使用到
 	// 开头两行是空格第三个不是空格的 行
 	class TwoBlankBeginRow_Flitter_Rule45 extends Basic_Rule {
 
 
 		TwoBlankBeginRow_Flitter_Rule45() {
 			super(45, false);
-	
+
 		}
 
-		
 
-		
+
+
 		@Override
 		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
 										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 			for (int i = 0; i < curInputFileList.size(); i++) {
-	
+
 				File fileItem = curInputFileList.get(i);
 				System.out.println("file["+i+"]["+curInputFileList.size()+"] "+ fileItem.getAbsolutePath() );
 				ArrayList<String> contentList = ReadFileContentAsList(fileItem);
@@ -481,13 +581,13 @@ public class I9_TextRuleOperation {
 					if(lineContent == null || "".equals(lineContent) ) {
 						continue;
 					}
-					
-					
+
+
 					// 开头 有 三个 空格的 过来掉
 					if(lineContent.startsWith("   ")) { //  以 空格 开头 那么 过滤 掉 它
 						continue;
 					}
-				
+
 					if(!matchRuleRowList.contains(lineContent)) {
 						System.out.println("line["+(j+1)+"]["+contentList.size()+"] file["+i+"]["+curInputFileList.size()+"] write to file: "+ lineContent );
 						if(!lineContent.startsWith(" ")) {
@@ -495,17 +595,17 @@ public class I9_TextRuleOperation {
 						}else {
 							matchRuleRowList.add(lineContent);
 						}
-				
+
 					}
-	
-				
+
+
 				}
 
 
 				writeContentToFile(I9_Temp_Text_File, matchRuleRowList);
 				NotePadOpenTargetFile(I9_Temp_Text_File.getAbsolutePath());
 				System.out.println("rule_" + rule_index + " ->去掉 行开头是空格的 保留内容到 TEMP TXT 文件");
-				
+
 
 			}
 
@@ -518,8 +618,8 @@ public class I9_TextRuleOperation {
 		}
 
 	}
-	
-	
+
+
 
 	class NoBlankBeginRow_Flitter_Rule44 extends Basic_Rule {
 
@@ -531,14 +631,14 @@ public class I9_TextRuleOperation {
 			row_blank_count = 0 ;
 		}
 
-		
 
-		
+
+
 		@Override
 		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
 										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 			for (int i = 0; i < curInputFileList.size(); i++) {
-	
+
 				File fileItem = curInputFileList.get(i);
 				System.out.println("file["+i+"]["+curInputFileList.size()+"] "+ fileItem.getAbsolutePath() );
 				ArrayList<String> contentList = ReadFileContentAsList(fileItem);
@@ -551,25 +651,25 @@ public class I9_TextRuleOperation {
 					if(lineContent == null || "".equals(lineContent) ) {
 						continue;
 					}
-					
-					
+
+
 					if(lineContent.startsWith(" ")) { //  以 空格 开头 那么 过滤 掉 它
 						continue;
 					}
-				
+
 					if(!matchRuleRowList.contains(lineContent)) {
 						System.out.println("line["+(j+1)+"]["+contentList.size()+"] file["+i+"]["+curInputFileList.size()+"] write to file: "+ lineContent );
 						matchRuleRowList.add(lineContent);
 					}
-	
-				
+
+
 				}
 
 
 				writeContentToFile(I9_Temp_Text_File, matchRuleRowList);
 				NotePadOpenTargetFile(I9_Temp_Text_File.getAbsolutePath());
 				System.out.println("rule_" + rule_index + " ->去掉 行开头是空格的 保留内容到 TEMP TXT 文件");
-				
+
 
 			}
 
@@ -582,7 +682,7 @@ public class I9_TextRuleOperation {
 		}
 
 	}
-	
+
 
 
 
@@ -1445,7 +1545,7 @@ public class I9_TextRuleOperation {
 
 			}else if(url.startsWith("https://profile.zjurl.cn/rogue/ugc/profile") && url.contains("user_id")){
 				// https://profile.zjurl.cn/rogue/ugc/profile/?version_code=851&version_name=80501&user_id=3346556174218692&media_id=1632586053830670&request_source=1&active_tab=dongtai&device_id=65&app_name=news_article&share_token=4c7776c5-9a34-443f-b7df-9e6e69c08f17&tt_from=copy_link&utm_source=copy_link&utm_medium=toutiao_android&utm_campaign=client_share?=推荐《Emath》的主页  - 今日头条
-                //   获取 用户的id 去它的主页 拿取 所有的 该用户的视频 然后下载
+				//   获取 用户的id 去它的主页 拿取 所有的 该用户的视频 然后下载
 				DownloadUserTouTiaoHomeVideo(url.trim());
 			} else if(url.startsWith("https://www.ixigua.com/home/")) {
 				DownloadUserTouTiaoHomeVideo_IXiGuaHome(url);
@@ -1471,33 +1571,33 @@ public class I9_TextRuleOperation {
 		// 		https://www.ixigua.com/home/3346556174218692
 		public void DownloadUserTouTiaoHomeVideo_IXiGuaHome(String mIxiguaHomeUrl ) {
 			if(!mIxiguaHomeUrl.startsWith("https://www.ixigua.com/home/")) {
-				
+
 				System.out.println("当前 路径 "+mIxiguaHomeUrl+"  不是 https://www.ixigua.com/home/ 类型的主页路径 无法批量下载");
-				
+
 				return;
 			}
-			
+
 
 			String homePageCode = getXiGua_BliBli_MainPageSource(mIxiguaHomeUrl);
-			
-			// 检测 这个 主页下的  href 文件 
+
+			// 检测 这个 主页下的  href 文件
 			if(homePageCode == null || "".equals(homePageCode)) {
 				System.out.println("当前 获取到的 主页路径 "+homePageCode+" 得到的 html代码为空!  退出执行");
 				return ;
 			}
-			
+
 			System.out.println("当前 获取到的 主页路径 "+homePageCode+" 得到的 html代码!  开始执行检测 href 视频操作!");
 			TryHrefAnalysis(homePageCode);
-			
-			
+
+
 		}
 		// https://profile.zjurl.cn/rogue/ugc/profile/?version_code=851&version_name=80501&user_id=3346556174218692&media_id=1632586053830670&request_source=1&active_tab=dongtai&device_id=65&app_name=news_article&share_token=4c7776c5-9a34-443f-b7df-9e6e69c08f17&tt_from=copy_link&utm_source=copy_link&utm_medium=toutiao_android&utm_campaign=client_share?=推荐《Emath》的主页  - 今日头条
 
 		public void DownloadUserTouTiaoHomeVideo(String mTouTiaoProfieUrl) {
 			String user_id_raw = mTouTiaoProfieUrl.substring(mTouTiaoProfieUrl.indexOf("user_id="));
-			
+
 			String user_id = user_id_raw.substring(0,user_id_raw.indexOf("&")).replace("&", "").replace("user_id=", "");
-			
+
 			// https://www.ixigua.com/home/3346556174218692
 			System.out.println(" DownloadUserTouTiaoHomeVideo  mTouTiaoProfieUrl="+mTouTiaoProfieUrl);
 			System.out.println(" DownloadUserTouTiaoHomeVideo  user_id_raw="+user_id_raw);
@@ -1505,125 +1605,125 @@ public class I9_TextRuleOperation {
 			System.out.println(" DownloadUserTouTiaoHomeVideo  user_id="+user_id);
 
 			String touTiaoHomePage = "https://www.ixigua.com/home/"+user_id.trim();
-			
+
 			//xxzukgit
-			
+
 			String homePageCode = getXiGua_BliBli_MainPageSource(touTiaoHomePage);
-			
-			// 检测 这个 主页下的  href 文件 
+
+			// 检测 这个 主页下的  href 文件
 			if(homePageCode == null || "".equals(homePageCode)) {
 				System.out.println("当前 获取到的 主页路径 "+homePageCode+" 得到的 html代码为空!  退出执行");
 				return ;
 			}
-			
+
 			System.out.println("当前 获取到的 主页路径 "+homePageCode+" 得到的 html代码!  开始执行检测 href 视频操作!");
 			TryHrefAnalysis(homePageCode);
-			
+
 		}
-		
-		
-		
-		
+
+
+
+
 
 		String  TryHrefAnalysis( String mPageHtmlCode ){
 			StringBuilder  mLogSB  = new StringBuilder();
 			ArrayList<String> allHrefList = new ArrayList<String>();
 			ArrayList<String> allNumberHrefList = new ArrayList<String>();
 			ArrayList<String> allNumberHttpLinkList = new ArrayList<String>();
-			
-			
-			
+
+
+
 			if(mPageHtmlCode == null || "".equals(mPageHtmlCode)) {
-				
+
 				System.out.println("当前获取到的 页面 代码 为 空  执行失败!  ");
 				return "当前获取到的 页面 代码 为 空  执行失败!";
 			}
-			
-			
-			// 以 href=" 
-		 String[] rawHrefArr = 	mPageHtmlCode.split("href=\"");
-		
-		 if(rawHrefArr == null) {
+
+
+			// 以 href="
+			String[] rawHrefArr = 	mPageHtmlCode.split("href=\"");
+
+			if(rawHrefArr == null) {
 				System.out.println("当前获取到的 页面 代码  不包含关键字  rawHrefArr");
-				return "当前获取到的 页面 代码  不包含关键字  rawHrefArr"; 
-			 
-		 }
-		 
-		 for (int i = 0; i < rawHrefArr.length; i++) {
-			 String rawHrefItem = rawHrefArr[i];
-			System.out.println("rawHref["+i+"] = "+rawHrefItem);
-			mLogSB.append("rawHref["+i+"] = "+rawHrefItem+"\n");
-			if(rawHrefItem.contains("\"")) {
-				String realHref = rawHrefItem.substring(0,rawHrefItem.indexOf("\""));
-				allHrefList.add(realHref);
-				
+				return "当前获取到的 页面 代码  不包含关键字  rawHrefArr";
+
 			}
-		}
-		 
-		 for (int i = 0; i < allHrefList.size(); i++) {
-			 String realHref = allHrefList.get(i);
-			 
+
+			for (int i = 0; i < rawHrefArr.length; i++) {
+				String rawHrefItem = rawHrefArr[i];
+				System.out.println("rawHref["+i+"] = "+rawHrefItem);
+				mLogSB.append("rawHref["+i+"] = "+rawHrefItem+"\n");
+				if(rawHrefItem.contains("\"")) {
+					String realHref = rawHrefItem.substring(0,rawHrefItem.indexOf("\""));
+					allHrefList.add(realHref);
+
+				}
+			}
+
+			for (int i = 0; i < allHrefList.size(); i++) {
+				String realHref = allHrefList.get(i);
+
 				System.out.println("realHref["+i+"] = "+realHref);
 				mLogSB.append("realHref["+i+"] = "+realHref+"\n");
 				String clearTagHref = realHref.replace("/", "").replace("?logTag=","").trim();
-				
+
 				if(isNumeric(clearTagHref) && !allNumberHrefList.contains(clearTagHref)) {
-					
+
 					allNumberHrefList.add(clearTagHref);
 				}
-				
-				
-		}
-		 
-		 
-		 for (int i = 0; i < allNumberHrefList.size(); i++) {
-			 
-			 String realNumHref = allNumberHrefList.get(i);
-			 
+
+
+			}
+
+
+			for (int i = 0; i < allNumberHrefList.size(); i++) {
+
+				String realNumHref = allNumberHrefList.get(i);
+
 				System.out.println("realNumHref["+i+"] = "+realNumHref);
-				mLogSB.append("realNumHref["+i+"] = "+realNumHref+"\n"); 
+				mLogSB.append("realNumHref["+i+"] = "+realNumHref+"\n");
 				allNumberHttpLinkList.add("https://www.ixigua.com/"+realNumHref.trim());
-		 }
-		 
-		 
-		 String downlodLog =  tryDownLoadXiGuaVideo(allNumberHttpLinkList);
-				 mLogSB.append(downlodLog);
-		 
-		 return mLogSB.toString();
-			
-			
-			
+			}
+
+
+			String downlodLog =  tryDownLoadXiGuaVideo(allNumberHttpLinkList);
+			mLogSB.append(downlodLog);
+
+			return mLogSB.toString();
+
+
+
 		}
-		
-		
-		
+
+
+
 		String tryDownLoadXiGuaVideo(ArrayList<String> linkList) {
 			StringBuilder  downloadLogSB = new  StringBuilder();
-			
+
 			if(linkList == null || linkList.size() == 0) {
-				
+
 				downloadLogSB.append("  当前 下载链接 集合 为 空 ");
 				return downloadLogSB.toString();
-				
+
 			}
-			
+
 			for (int i = 0; i < linkList.size(); i++) {
 				String linkItem = linkList.get(i);
-			
+
 				// zukgit  下载 方式
 				XiGua_TouTiao_ParseUrl(i, linkItem);
 				downloadLogSB.append("下载 link["+i+"] "+linkItem+"  执行Over!");
-				
-			}
-			
 
-			
-			
+			}
+
+
+
+
 			return downloadLogSB.toString();
-			
-			
+
+
 		}
-		
+
 
 		void BliBli_Download(int index , String urlitem) {
 			if(!ChromeDriverFile.exists()) {
