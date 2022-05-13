@@ -371,111 +371,111 @@ public class G2_ApplyRuleFor_TypeFile {
 		// CategoryModel_HttpPage_Download_Rule_49
 		realTypeRuleList.add(new CategoryModel_HttpPage_Download_Rule_49());
 
-		
-		
-		
+
+
+
 		// 把 当前的 输入的 jpg 或者 当前目录下的 jpg文件 动态计算成 320 宽度的 字符串 并 在打开的文件中打印
 		realTypeRuleList.add(new JPG_To_TextChar_Rule_50());
-		
-		
+
+
 		// 把 当前的 原目录中的所有文件 复制到 对应目录的文件， 如果文件大小一直 那么就跳过复制的过程
 		// tip: git action 操作过程中 文件大小不变 但是 它的MD5值 变化了  导致每次都 更新相同的文件
 		realTypeRuleList.add(new SrcDir_Copy2_DstDir_WithFileLength_Rule_51());
-		
-		
+
+
 		// initrule
 	}
-	
+
 	class SrcDir_Copy2_DstDir_WithFileLength_Rule_51 extends Basic_Rule {
 		File src_Dir ; //    源目录
 		File dst_Dir ;   //   目的目录
-	
-		//  需要执行 从 src 复制到 dst 的 实体文件的 对应关系 
+
+		//  需要执行 从 src 复制到 dst 的 实体文件的 对应关系
 		HashMap<File,File> srcFile_dstFile_Map;
-		 ArrayList<File> needCopyFileList = new ArrayList<File>();  //  需要 进行 复制操作的文件(文件大小不一样)
+		ArrayList<File> needCopyFileList = new ArrayList<File>();  //  需要 进行 复制操作的文件(文件大小不一样)
 		SrcDir_Copy2_DstDir_WithFileLength_Rule_51() {
 			super("#", 51, 4); //
-	
+
 			needCopyFileList = new ArrayList<File>();
 			srcFile_dstFile_Map = new HashMap<File,File>();
 		}
-		
-		
+
+
 
 		@Override
 		boolean initParamsWithInputList(ArrayList<String> inputParamList) {
 			// mdname_true // kaoyan_true gaokao_true
 
-			
+
 //			src_xxxxxx
 //			dst_xxxxx
-			
+
 			for (int i = 0; i < inputParamList.size(); i++) {
 				String paramItem_lower_trim = inputParamList.get(i);
 //				String paramItem_lower_trim = paramItem.toLowerCase().trim();
 
 				if (paramItem_lower_trim.startsWith("src_")) {
-					
+
 					String srcDirPath = (" "+paramItem_lower_trim).replace(" src_", "");
 					srcDirPath = srcDirPath.replace(" ", "");
-					
+
 					File srcDirFile = new File(srcDirPath);
 					if(!srcDirFile.exists()) {
 						System.out.println("当前 SRC目录["+ srcDirPath+"] 不存在 请检查输入参数!");
 						return false;
 					}
-					
-					
+
+
 					if(!srcDirFile.isDirectory()) {
 						System.out.println("当前 SRC目录["+ srcDirPath+"] 不是文件夹  请检查输入参数!");
-	
+
 						return false;
 					}
-					
+
 					src_Dir = srcDirFile;
 				}
 
-			if (paramItem_lower_trim.startsWith("dst_")) {
-					
+				if (paramItem_lower_trim.startsWith("dst_")) {
+
 					String dstDirPath = (" "+paramItem_lower_trim).replace(" dst_", "");
 					dstDirPath = dstDirPath.replace(" ", "");
-					
+
 					File dstDirFile = new File(dstDirPath);
 					if(!dstDirFile.exists()) {
 						System.out.println("当前 DST目录["+ dstDirPath+"] 不存在 请检查输入参数!");
 						return false;
 					}
-					
-					
+
+
 					if(!dstDirFile.isDirectory()) {
 						System.out.println("当前 DST目录["+ dstDirPath+"] 不是文件夹  请检查输入参数!");
-	
+
 						return false;
 					}
-					
+
 					dst_Dir = dstDirFile;
 				}
 
 			}
-			
-			
+
+
 			if(src_Dir == null) {
 				System.out.println("当前 SRC 目录["+ src_Dir+"] 为空   请检查输入参数!");
-				
+
 				return false;
-		
+
 			}
-			
+
 			if(dst_Dir == null) {
 				System.out.println("当前 DST目录["+ dst_Dir+"] 为空   请检查输入参数!");
-				
+
 				return false;
-		
+
 			}
 
 
 			System.out.println(" 当前输入 SRC[ "+ src_Dir.getAbsolutePath()+"]  Dst[ "+dst_Dir.getAbsolutePath()+"]"+" ] 存在  将执行代码逻辑");
-	
+
 
 			// TODO Auto-generated method stub
 			return super.initParamsWithInputList(inputParamList);
@@ -487,7 +487,7 @@ public class G2_ApplyRuleFor_TypeFile {
 
 			return "\n"+Cur_Bat_Name + " #_"+rule_index+"  src_xxxxxx  dst_xxxxx    //  把 当前的 原目录中的所有文件 复制到 对应目录的文件， 如果文件大小一直 那么就跳过复制的过程  \n"
 					+ Cur_Bat_Name + "  #_"+rule_index+   " src_  dst_  ###  把 当前的 原目录中的所有文件 复制到 对应目录的文件， 如果文件大小一直 那么就跳过复制的过程   \n"
-                   	+ ""
+					+ ""
 //			zrule_apply_G2.bat  #_46  copyright_show  harddir_true
 					;
 		}
@@ -499,94 +499,94 @@ public class G2_ApplyRuleFor_TypeFile {
 											  HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList,
 											  ArrayList<File> curRealFileList) {
 // TODO Auto-generated method stub
-			
+
 			File[] srcFileArr = src_Dir.listFiles();
 			File[] dstFileArr = dst_Dir.listFiles();
-			
+
 			if(srcFileArr == null || srcFileArr.length == 0 ) {
 				System.out.println("  当前 原目录 Src目录["+src_Dir.getAbsolutePath()+"] 中文件为空  ");
-	
+
 				return super.applySubFileListRule4(curFileList, subFileTypeMap, curDirList, curRealFileList);
 
 			}
-			
+
 			// needCopyFileList
-			
+
 			for (int i = 0; i < srcFileArr.length; i++) {
 				File fileItem = srcFileArr[i];
 				if(fileItem.isDirectory()) {  //  不对  文件夹进行复制
-					continue; 
+					continue;
 				}
-				
+
 				String name = fileItem.getName();
 				String dstMatchFilePath = dst_Dir.getAbsolutePath()+File.separator+name;
 				File dstMatchFile = new File(dstMatchFilePath);
-				
+
 				if(dstMatchFile.exists()) {
-					// 源文件大小要大于 10 
+					// 源文件大小要大于 10
 					long srcFileSize = fileItem.length();
 					long dstFileSize = fileItem.length();
 					long diffSize = Math.abs(dstFileSize - srcFileSize);
-					
+
 					if(dstMatchFile.length() != fileItem.length()   // 两个文件的大小不一样才执行 copy
-							&& fileItem.length() > 10   // 源文件的大小要大于10 才执行 copy 
+							&& fileItem.length() > 10   // 源文件的大小要大于10 才执行 copy
 							&& diffSize > 10) {   // 两个文件的差异要大于10 才 执行 copy 文件
-						
+
 						// 原目录 有这个文件 但是和 dst 目录不一致 那么也加入 copy 列表
-						needCopyFileList.add(fileItem); 
+						needCopyFileList.add(fileItem);
 						srcFile_dstFile_Map.put(fileItem, dstMatchFile);
 					}
 				}else {
 					// 原目录 没有这个文件 那么加入copy列表
-					needCopyFileList.add(fileItem);  
+					needCopyFileList.add(fileItem);
 					srcFile_dstFile_Map.put(fileItem, dstMatchFile);
 				}
-			
-				
+
+
 			}
-			
-			
+
+
 			System.out.println("当前 需要执行 Copy 操作的 文件 的 总数 : "+ needCopyFileList.size());
 			System.out.println("开始执行 ———————— Copy-Operation begin —————");
 
 			if(needCopyFileList.size() > 0 ) {
 				for (int i = 0; i < needCopyFileList.size(); i++) {
-	
+
 					File srcItem = needCopyFileList.get(i);
-					
+
 					File dstFile = srcFile_dstFile_Map.get(srcItem);
-					System.out.println("开始第["+i+"] 个_SRC_文件复制 src["+srcItem+"][Size:"+srcItem.length()+"][MD5:"+getMD5Three(srcItem.getAbsolutePath())+"]");	
-					System.out.println(""); 
-					
+					System.out.println("开始第["+i+"] 个_SRC_文件复制 src["+srcItem+"][Size:"+srcItem.length()+"][MD5:"+getMD5Three(srcItem.getAbsolutePath())+"]");
+					System.out.println("");
+
 					if(dstFile == null) {
 						continue;
 					}
-					
-					
+
+
 					if(dstFile.exists()) {
 						dstFile.delete();
 					}
-					
+
 					fileCopy(srcItem, dstFile);
-					
-					System.out.println("完成第["+i+"] 个_DST_文件复制 dst["+dstFile+"][Size:"+dstFile.length()+"][MD5:"+getMD5Three(dstFile.getAbsolutePath())+"]");	
+
+					System.out.println("完成第["+i+"] 个_DST_文件复制 dst["+dstFile+"][Size:"+dstFile.length()+"][MD5:"+getMD5Three(dstFile.getAbsolutePath())+"]");
 
 				}
-				
-				
-				
+
+
+
 			}
 			System.out.println("开始执行 ———————— Copy-Operation end —————");
 
 			return super.applySubFileListRule4(curFileList, subFileTypeMap, curDirList, curRealFileList);
 
 		}
-		
-		
-		
-		
+
+
+
+
 	}
-	
+
 
 	// 把 当前的 输入的 jpg 或者 当前目录下的 jpg文件 动态计算成 320 宽度的 字符串 并 在打开的文件中打印
 	class JPG_To_TextChar_Rule_50 extends Basic_Rule {
@@ -625,54 +625,54 @@ public class G2_ApplyRuleFor_TypeFile {
 
 				if (isDirOperation && inputDirFile != null) {
 					jpgFile_resultDir = inputDirFile;
-		
-			
-			
-					// 打印的 宽度 默认设置为  320 
-			        BufferedImage jpgImage;
+
+
+
+					// 打印的 宽度 默认设置为  320
+					BufferedImage jpgImage;
 					try {
 						jpgImage = resizeImage(jpgFile.getAbsolutePath(),320);
-				        allSB.append(printImage(jpgImage));
+						allSB.append(printImage(jpgImage));
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-			        
+
 //			        System.out.println(" Width:"+image.getWidth()+"  High:"+image.getHeight());
-			        
-		
-			    
+
+
+
 				} else {
 					// 如果 不是 输入 目录 的 话 那么就创建 jpg 的 文件名称 如果是目录的话 那么就在当前目录生成 .json
-				
-					
-			        BufferedImage jpgImage;
+
+
+					BufferedImage jpgImage;
 					try {
 						jpgImage = resizeImage(jpgFile.getAbsolutePath(),320);
-					     allSB.append(printImage(jpgImage));
+						allSB.append(printImage(jpgImage));
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-			        
+
 //			        System.out.println(" Width:"+image.getWidth()+"  High:"+image.getHeight());
-			        
-			   
-		
+
+
+
 				}
 
 			}
-			
+
 			// 打开 notepad++
-			
+
 			writeContentToFile(G2_Temp_Text_File, allSB.toString());
 			NotePadOpenTargetFile(G2_Temp_Text_File.getAbsolutePath());
-			
+
 
 			return super.applyFileListRule3(subFileList, fileTypeMap);
 		}
 
-		
+
 
 
 		@Override
@@ -745,16 +745,16 @@ public class G2_ApplyRuleFor_TypeFile {
 			 * if (inputDirFile != null) { File[] listArr = inputDirFile.listFiles(); if
 			 * (listArr == null || listArr.length == 0) { System.out.println("当前 输入的目录  " +
 			 * inputDirFile.getAbsolutePath() + "没有 任何文件操作!!");
-			 * 
+			 *
 			 * return false; } for (int i = 0; i < listArr.length; i++) { File fileItem =
 			 * listArr[i];
-			 * 
+			 *
 			 * String inputFileName = fileItem.getName().toLowerCase(); if
 			 * (inputFileName.endsWith(".jpg") || !jpgFileList.contains(fileItem)) {
 			 * jpgFileList.add(fileItem); }
-			 * 
+			 *
 			 * }
-			 * 
+			 *
 			 * }
 			 */
 
@@ -780,107 +780,107 @@ public class G2_ApplyRuleFor_TypeFile {
 			return super.initParamsWithInputList(inputParamList);
 		}
 
-		
-	    /**
-	     * 图片缩放
-	     *
-	     * @param srcImagePath  图片路径
-	     * @param targetWidth   目标宽度
-	     * @return
-	     * @throws IOException
-	     */
-	    public  BufferedImage resizeImage(String srcImagePath, int targetWidth) throws IOException {
-	        Image srcImage = ImageIO.read(new File(srcImagePath));
-	        // 这里除以2  原始高度除以2 notepad++ 打开宽高宽度不一致 这里使得高度减少一半 看起来对称  
-	        int targetHeight = (int)(getTargetHeight(targetWidth, srcImage)/2); 
-	        BufferedImage resizedImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_RGB);
-	        Graphics2D graphics2D = resizedImage.createGraphics();
-	        graphics2D.drawImage(srcImage, 0, 0, targetWidth, targetHeight, null);
-	        graphics2D.dispose();
-	        return resizedImage;
-	    }
 
-	    /**
-	     * 图片缩放
-	     *
-	     * @param srcImagePath  图片路径
-	     * @param targetWidth   目标宽度
-	     * @return
-	     * @throws IOException
-	     */
-	    public  BufferedImage resizeImage2(String srcImagePath, int targetWidth) throws IOException {
-	        Image srcImage = ImageIO.read(new File(srcImagePath));
-	        int targetHeight = getTargetHeight(targetWidth, srcImage);
-	        Image image = srcImage.getScaledInstance(targetWidth, targetHeight, Image.SCALE_DEFAULT);
-	        BufferedImage bufferedImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_RGB);
-	        bufferedImage.getGraphics().drawImage(image, 0, 0, null);
-	        return bufferedImage;
-	    }
+		/**
+		 * 图片缩放
+		 *
+		 * @param srcImagePath  图片路径
+		 * @param targetWidth   目标宽度
+		 * @return
+		 * @throws IOException
+		 */
+		public  BufferedImage resizeImage(String srcImagePath, int targetWidth) throws IOException {
+			Image srcImage = ImageIO.read(new File(srcImagePath));
+			// 这里除以2  原始高度除以2 notepad++ 打开宽高宽度不一致 这里使得高度减少一半 看起来对称
+			int targetHeight = (int)(getTargetHeight(targetWidth, srcImage)/2);
+			BufferedImage resizedImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_RGB);
+			Graphics2D graphics2D = resizedImage.createGraphics();
+			graphics2D.drawImage(srcImage, 0, 0, targetWidth, targetHeight, null);
+			graphics2D.dispose();
+			return resizedImage;
+		}
 
-	    /**
-	     * 根据指定宽度，计算等比例高度
-	     *
-	     * @param targetWidth   目标宽度
-	     * @param srcImage      图片信息
-	     * @return
-	     */
-	    private  int getTargetHeight(int targetWidth, Image srcImage) {
-	        int targetHeight = srcImage.getHeight(null);
-	        if (targetWidth < srcImage.getWidth(null)) {
-	            targetHeight = Math.round((float)targetHeight / ((float)srcImage.getWidth(null) / (float)targetWidth));
-	        }
-	        return targetHeight;
-	    }
+		/**
+		 * 图片缩放
+		 *
+		 * @param srcImagePath  图片路径
+		 * @param targetWidth   目标宽度
+		 * @return
+		 * @throws IOException
+		 */
+		public  BufferedImage resizeImage2(String srcImagePath, int targetWidth) throws IOException {
+			Image srcImage = ImageIO.read(new File(srcImagePath));
+			int targetHeight = getTargetHeight(targetWidth, srcImage);
+			Image image = srcImage.getScaledInstance(targetWidth, targetHeight, Image.SCALE_DEFAULT);
+			BufferedImage bufferedImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_RGB);
+			bufferedImage.getGraphics().drawImage(image, 0, 0, null);
+			return bufferedImage;
+		}
 
-	    /**
-	     * 图片打印
-	     *
-	     * @param image
-	     * @throws IOException
-	     */
-	    public  String printImage(BufferedImage image) throws IOException {
-	        final char[] PIXEL_CHAR_ARRAY = {'W', '@', '#', '8', '&', '*', 'o', ':', '.', ' '};
-	        int width = image.getWidth();
-	        int height = image.getHeight();
-	        StringBuilder imageSB = new StringBuilder();
-	        for (int i = 0; i < height; i++) {
-	            for (int j = 0; j < width; j++) {
-	                int rgb = image.getRGB(j, i);
-	                Color color = new Color(rgb);
-	                int red = color.getRed();
-	                int green = color.getGreen();
-	                int blue = color.getBlue();
-	                // 一个用于计算RGB像素点灰度的公式
-	                Double grayscale = 0.2126 * red + 0.7152 * green + 0.0722 * blue;
-	                double index = grayscale / (Math.ceil(255 / PIXEL_CHAR_ARRAY.length) + 0.5);
-	                System.out.print(PIXEL_CHAR_ARRAY[(int)(Math.floor(index))]);
-	                imageSB.append(PIXEL_CHAR_ARRAY[(int)(Math.floor(index))]);
-	            }
+		/**
+		 * 根据指定宽度，计算等比例高度
+		 *
+		 * @param targetWidth   目标宽度
+		 * @param srcImage      图片信息
+		 * @return
+		 */
+		private  int getTargetHeight(int targetWidth, Image srcImage) {
+			int targetHeight = srcImage.getHeight(null);
+			if (targetWidth < srcImage.getWidth(null)) {
+				targetHeight = Math.round((float)targetHeight / ((float)srcImage.getWidth(null) / (float)targetWidth));
+			}
+			return targetHeight;
+		}
 
-	            System.out.println();
-	            imageSB.append("\n");
-	        }
-	        
-	        imageSB.append("\n");
-	        imageSB.append("\n");
-	        imageSB.append("\n");
-	        imageSB.append("\n");
+		/**
+		 * 图片打印
+		 *
+		 * @param image
+		 * @throws IOException
+		 */
+		public  String printImage(BufferedImage image) throws IOException {
+			final char[] PIXEL_CHAR_ARRAY = {'W', '@', '#', '8', '&', '*', 'o', ':', '.', ' '};
+			int width = image.getWidth();
+			int height = image.getHeight();
+			StringBuilder imageSB = new StringBuilder();
+			for (int i = 0; i < height; i++) {
+				for (int j = 0; j < width; j++) {
+					int rgb = image.getRGB(j, i);
+					Color color = new Color(rgb);
+					int red = color.getRed();
+					int green = color.getGreen();
+					int blue = color.getBlue();
+					// 一个用于计算RGB像素点灰度的公式
+					Double grayscale = 0.2126 * red + 0.7152 * green + 0.0722 * blue;
+					double index = grayscale / (Math.ceil(255 / PIXEL_CHAR_ARRAY.length) + 0.5);
+					System.out.print(PIXEL_CHAR_ARRAY[(int)(Math.floor(index))]);
+					imageSB.append(PIXEL_CHAR_ARRAY[(int)(Math.floor(index))]);
+				}
+
+				System.out.println();
+				imageSB.append("\n");
+			}
+
+			imageSB.append("\n");
+			imageSB.append("\n");
+			imageSB.append("\n");
+			imageSB.append("\n");
 //	        imageSB.append("\n");
 //	        imageSB.append("\n");
-	        return imageSB.toString();
-	    }
+			return imageSB.toString();
+		}
 
-		
-		
+
+
 
 	}
 
-	
-	
+
+
 	// 给定一个 类型的 模板  起始页(默认1)  最终页(默认100)
 	// 是否代理(默认false)  itemtag(页面内的标记用于过滤)  imagetag(详细内容也的照片的标示)
 	// CategoryModel_HttpPage_Download_Rule_49
-	
+
 	class CategoryModel_HttpPage_Download_Rule_49 extends Basic_Rule {
 
 		String mCategoryModel ;  //  Page 主页的模板  使用 {page} 来对 页面进行替换 默认为 {page}
@@ -7725,8 +7725,8 @@ public class G2_ApplyRuleFor_TypeFile {
 					isDirOperation = true;
 					inputDirFile = inputDir;
 				}
-				
-		
+
+
 
 				System.out.println("initParamsWithInputList[" + i + "] = " + strInput + "  inputDir.exists()="
 						+ inputDir.exists() + "  inputDir.isDirectory()=" + inputDir.isDirectory());
@@ -7778,7 +7778,7 @@ public class G2_ApplyRuleFor_TypeFile {
 					if (inputFileName.endsWith(".xlsx") || inputFileName.endsWith(".xls")) {
 						xlsxFileList.add(fileItem);
 					}
-					
+
 					System.out.println("inputDir_xlsx["+i+"] = "+ fileItem.getAbsolutePath()+"  Size="+fileItem.length() );
 
 				}
@@ -10498,24 +10498,29 @@ public class G2_ApplyRuleFor_TypeFile {
 			for (int i = 0; i < allSubDirFileList.size(); i++) {
 				File curDirFile = allSubDirFileList.get(i);
 				String curDirName = curDirFile.getName();
-
+				String curDirAbsPath = curDirFile.getAbsolutePath();
 				// 如果当前文件夹 包含 过滤类型的名称 如 mp4 gif jpg 那么才往下走
-				if (!curDirName.contains(targetType)) {
+//				System.out.println("A i["+i+"] curDirName=" + curDirName );
+				if (!curDirName.contains(targetType) && !curDirAbsPath.toLowerCase().contains(targetType)) {
 					continue;
 				}
 
 				File[] listFile = curDirFile.listFiles();
-
+//				System.out.println("B i["+i+"] curDirName=" + curDirName );
 				if (listFile == null || listFile.length <= 0) {
 
 					continue;
 				}
 
+				// jpg_xxx_port/AI/aaaaaaaaaaaa.jpg
+				// 1.当遍历 jpg_xxx_port 时发现 里面只有文件夹
+				// 2. 当遍历 AI时发现 它又不是 包含jpg 的文件夹名名称 (完全路径 需要 包含 jpg)
 				for (int j = 0; j < listFile.length; j++) {
 					File mRealFile = listFile[j];
 					if (mRealFile.isFile() && !mRealFile.isDirectory()) {
 						String realFileNmae = mRealFile.getName();
 						String type = getFileTypeWithPoint(realFileNmae);
+						System.out.println("j["+j+"] realFileNmae=" + realFileNmae + "   type=" +type);
 						if ("".equals(type)) {
 							String newName = realFileNmae + "." + targetType;
 							tryReName(mRealFile, newName);
@@ -12860,8 +12865,8 @@ public class G2_ApplyRuleFor_TypeFile {
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (Exception e) {
-			 e.printStackTrace();
-			}
+			e.printStackTrace();
+		}
 		if(bi == null) {
 			return "MD5_Null";
 		}
@@ -13644,29 +13649,29 @@ public class G2_ApplyRuleFor_TypeFile {
 		File Mp4_All_2x3_Html_TemplateFile;
 		File Mp4_All_2x4_Html_TemplateFile;
 		File Mp4_All_2x5_Html_TemplateFile;
-		
-		
+
+
 		File Mp4_All_3x2_Html_TemplateFile;
 		File Mp4_All_3x3_Html_TemplateFile;
 		File Mp4_All_3x4_Html_TemplateFile;
 		File Mp4_All_3x5_Html_TemplateFile;
-		
-		
+
+
 		File Mp4_All_4x2_Html_TemplateFile;
 		File Mp4_All_4x3_Html_TemplateFile;
 		File Mp4_All_4x4_Html_TemplateFile;
 		File Mp4_All_4x5_Html_TemplateFile;
-		
+
 		File Mp4_All_5x2_Html_TemplateFile;
 		File Mp4_All_5x3_Html_TemplateFile;
 		File Mp4_All_5x4_Html_TemplateFile;
 		File Mp4_All_5x5_Html_TemplateFile;
 
 
-		
-		
 
-		
+
+
+
 
 
 
@@ -13745,48 +13750,48 @@ public class G2_ApplyRuleFor_TypeFile {
 			Mp4_All_2x3_Html_TemplateFile = new File(zbinPath + File.separator + "G2_Rule12_mp4_all_2x3.html");
 			Mp4_All_2x4_Html_TemplateFile = new File(zbinPath + File.separator + "G2_Rule12_mp4_all_2x4.html");
 			Mp4_All_2x5_Html_TemplateFile = new File(zbinPath + File.separator + "G2_Rule12_mp4_all_2x5.html");
-			
-			
-			
+
+
+
 			Mp4_All_3x2_Html_TemplateFile = new File(zbinPath + File.separator + "G2_Rule12_mp4_all_3x2.html");
 			Mp4_All_3x3_Html_TemplateFile = new File(zbinPath + File.separator + "G2_Rule12_mp4_all_3x3.html");
 			Mp4_All_3x4_Html_TemplateFile = new File(zbinPath + File.separator + "G2_Rule12_mp4_all_3x4.html");
 			Mp4_All_3x5_Html_TemplateFile = new File(zbinPath + File.separator + "G2_Rule12_mp4_all_3x5.html");
-			
-			
-			Mp4_All_4x2_Html_TemplateFile = new File(zbinPath + File.separator + "G2_Rule12_mp4_all_4x2.html");
-		 	Mp4_All_4x3_Html_TemplateFile = new File(zbinPath + File.separator + "G2_Rule12_mp4_all_4x3.html");
-		 	Mp4_All_4x4_Html_TemplateFile = new File(zbinPath + File.separator + "G2_Rule12_mp4_all_4x4.html");
-		 	Mp4_All_4x5_Html_TemplateFile = new File(zbinPath + File.separator + "G2_Rule12_mp4_all_4x5.html");
 
-		 	
+
+			Mp4_All_4x2_Html_TemplateFile = new File(zbinPath + File.separator + "G2_Rule12_mp4_all_4x2.html");
+			Mp4_All_4x3_Html_TemplateFile = new File(zbinPath + File.separator + "G2_Rule12_mp4_all_4x3.html");
+			Mp4_All_4x4_Html_TemplateFile = new File(zbinPath + File.separator + "G2_Rule12_mp4_all_4x4.html");
+			Mp4_All_4x5_Html_TemplateFile = new File(zbinPath + File.separator + "G2_Rule12_mp4_all_4x5.html");
+
+
 			Mp4_All_5x2_Html_TemplateFile = new File(zbinPath + File.separator + "G2_Rule12_mp4_all_5x2.html");
 			Mp4_All_5x3_Html_TemplateFile = new File(zbinPath + File.separator + "G2_Rule12_mp4_all_5x3.html");
 			Mp4_All_5x4_Html_TemplateFile = new File(zbinPath + File.separator + "G2_Rule12_mp4_all_5x4.html");
 			Mp4_All_5x5_Html_TemplateFile = new File(zbinPath + File.separator + "G2_Rule12_mp4_all_5x5.html");
 
-		
-			
-			
+
+
+
 
 			mp4AllHtmlTemplate_FileList.add(Mp4_All_2x2_Html_TemplateFile);
 			mp4AllHtmlTemplate_FileList.add(Mp4_All_2x3_Html_TemplateFile);
 			mp4AllHtmlTemplate_FileList.add(Mp4_All_2x4_Html_TemplateFile);
 			mp4AllHtmlTemplate_FileList.add(Mp4_All_2x5_Html_TemplateFile);
-			
+
 
 
 			mp4AllHtmlTemplate_FileList.add(Mp4_All_3x2_Html_TemplateFile);
 			mp4AllHtmlTemplate_FileList.add(Mp4_All_3x3_Html_TemplateFile);
 			mp4AllHtmlTemplate_FileList.add(Mp4_All_3x4_Html_TemplateFile);
 			mp4AllHtmlTemplate_FileList.add(Mp4_All_3x5_Html_TemplateFile);
-			
+
 			mp4AllHtmlTemplate_FileList.add(Mp4_All_4x2_Html_TemplateFile);
 			mp4AllHtmlTemplate_FileList.add(Mp4_All_4x3_Html_TemplateFile);
 			mp4AllHtmlTemplate_FileList.add(Mp4_All_4x4_Html_TemplateFile);
 			mp4AllHtmlTemplate_FileList.add(Mp4_All_4x5_Html_TemplateFile);
-			
-			
+
+
 			mp4AllHtmlTemplate_FileList.add(Mp4_All_5x2_Html_TemplateFile);
 			mp4AllHtmlTemplate_FileList.add(Mp4_All_5x3_Html_TemplateFile);
 			mp4AllHtmlTemplate_FileList.add(Mp4_All_5x4_Html_TemplateFile);
