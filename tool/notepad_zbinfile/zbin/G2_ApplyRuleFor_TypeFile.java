@@ -382,8 +382,142 @@ public class G2_ApplyRuleFor_TypeFile {
 		// tip: git action 操作过程中 文件大小不变 但是 它的MD5值 变化了  导致每次都 更新相同的文件
 		realTypeRuleList.add(new SrcDir_Copy2_DstDir_WithFileLength_Rule_51());
 
-
+		// 去除在 一个文件夹中 多余的相同的 MD5 文件   只保留 一个MD5  去重操作
+		realTypeRuleList.add(new Delete_SameMD5File_OnlyExistOneInDir_Rule_52());
 		// initrule
+	}
+
+
+	class Delete_SameMD5File_OnlyExistOneInDir_Rule_52 extends Basic_Rule {
+
+		boolean showmd5 = false;
+		boolean force_delete = false;
+		ArrayList<File> needDeleteFileList  ;  // 需要删除的文件
+
+		ArrayList<String> allMD5List  ;  // 所有文件的MD5的值
+
+		Delete_SameMD5File_OnlyExistOneInDir_Rule_52() {
+			super("#", 52, 5); //
+			force_delete = false;
+			showmd5= false;
+			needDeleteFileList = new ArrayList<File>();
+			allMD5List =  new ArrayList<String>();
+		}
+
+		@Override
+		boolean initParamsWithInputList(ArrayList<String> inputParamList) {
+			// mdname_true // kaoyan_true gaokao_true
+
+
+//			src_xxxxxx
+//			dst_xxxxx
+
+			for (int i = 0; i < inputParamList.size(); i++) {
+				String paramItem_lower_trim = inputParamList.get(i);
+//				String paramItem_lower_trim = paramItem.toLowerCase().trim();
+
+				if (paramItem_lower_trim.startsWith("delete_true")) {
+					force_delete = true;
+				}
+
+				if (paramItem_lower_trim.startsWith("showmd5_true")) {
+					showmd5 = true;
+				}
+
+			}
+
+
+			System.out.println(" 当前输入 delete_true="+force_delete);
+
+
+			// TODO Auto-generated method stub
+			return super.initParamsWithInputList(inputParamList);
+		}
+
+
+		@Override
+		ArrayList<File> applyDir_SubFileListRule5(ArrayList<File> allSubDirFileList, ArrayList<File> allSubRealFileList) {
+			ArrayList<File>  allOperationDirList = new 	ArrayList<File>();
+			if(allSubDirFileList != null){
+				allOperationDirList.addAll(allSubDirFileList);
+			}
+			allSubDirFileList.add(curDirFile);
+
+
+			for (int i = 0; i < allOperationDirList.size(); i++) {
+				File subDir = allOperationDirList.get(i);
+				File[] subFileArr = subDir.listFiles();
+				if(subFileArr == null || subFileArr.length == 0){
+					continue;
+				}
+				ArrayList<String> md5ValueList = new ArrayList<String> ();
+
+				for (int j = 0; j <  subFileArr.length ; j++) {
+					File fileItem = subFileArr[j];
+					if(fileItem.isDirectory()){
+						continue;
+					}
+					String md5Value = getMD5Three(fileItem.getAbsolutePath());
+
+
+					if(!allMD5List.contains(md5Value)){
+						allMD5List.add(md5Value);
+					}
+
+
+					if(!md5ValueList.contains(md5Value)){
+						md5ValueList.add(md5Value);
+					}else{   // 如果 已经 包含 这个 MD5 说明 已经 包含 这个文件了  那么加入 需要被删除的列表
+						needDeleteFileList.add(fileItem);
+					}
+
+				}
+
+			}
+
+			for (int i = 0; i < needDeleteFileList.size(); i++) {
+				File needDeleteFile = needDeleteFileList.get(i);
+				System.out.println("need_delete_重复["+i+"] = " + needDeleteFile.getAbsolutePath());
+
+				if(force_delete){
+					needDeleteFile.delete();
+				}
+			}
+
+			String delete_tip = force_delete?"强制删除Flag:OK":"强制删除Flag:False";
+			System.out.println("相同文件夹下重复文件数量:"+needDeleteFileList.size()+"   "+delete_tip);
+
+
+			if(showmd5){
+
+				StringBuilder sbLog = new StringBuilder();
+				for (int i = 0; i < allMD5List.size() ; i++) {
+					String md5Item = allMD5List.get(i);
+					sbLog.append(md5Item+"\n");
+
+
+				}
+				writeContentToFile(G2_Temp_Text_File, sbLog.toString());
+				NotePadOpenTargetFile(G2_Temp_Text_File.getAbsolutePath());	// 打开 notepad++
+			}
+
+			return super.applyDir_SubFileListRule5(allSubDirFileList, allSubRealFileList);
+		}
+
+		@Override
+		String simpleDesc() {
+
+			return "\n"+Cur_Bat_Name + " #_"+rule_index+"  delete_true      //  去除在 一个文件夹中 多余的相同的 MD5 文件   只保留 一个MD5  去重操作  \n"
+					+ Cur_Bat_Name + "  #_"+rule_index+   " showmd5_true    ###  把 当前的目录中的文件的MD5 输出到文本中   \n"
+					+ Cur_Bat_Name + "  #_"+rule_index+   " showmd5_true delete_true    ###  把 当前的目录中的文件的MD5 输出到文本中 并删除重复文件  \n"
+					+ Cur_Bat_Name + "  #_"+rule_index+  "    ### 打印当前目录的重复文件  \n"
+					+ ""
+//			zrule_apply_G2.bat  #_46  copyright_show  harddir_true
+					;
+		}
+
+
+
 	}
 
 	class SrcDir_Copy2_DstDir_WithFileLength_Rule_51 extends Basic_Rule {

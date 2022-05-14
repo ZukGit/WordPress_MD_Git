@@ -443,7 +443,8 @@ public class I9_TextRuleOperation {
 		CUR_RULE_LIST.add(new String_To_Base64__Rule46());
 
 
-
+		// 依据当前每行的字符串 羽 每个文件的md5去判断  如果文件的md5包含在输入字符串行中 那么删除这个文件
+		CUR_RULE_LIST.add(new Delete_File_WithMD5_Rule_47());
 //        CUR_RULE_LIST.add( new Image2Png_Rule_4());
 //        CUR_RULE_LIST.add( new AVI_Rule_5());
 //        CUR_RULE_LIST.add( new SubDirRename_Rule_6());
@@ -452,6 +453,83 @@ public class I9_TextRuleOperation {
 
 	}
 
+	// 依据当前每行的MD5字符串 与 每个文件的md5去判断  如果文件的md5包含在输入字符串行中 那么删除这个文件
+	class Delete_File_WithMD5_Rule_47 extends Basic_Rule {
+
+		Delete_File_WithMD5_Rule_47() {
+			super(47, true);
+
+		}
+
+		@Override
+		boolean checkParamsOK(File shellDir, String type2Param, ArrayList<String> otherParams) {
+			return true;
+		}
+
+		@Override
+		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+
+			ArrayList<File> needDeleteFileList = new 	ArrayList<File>();
+
+			ArrayList<String> inputMD5List = null;
+
+			File inputDir = null;
+			for (int i = 0; i < curInputFileList.size(); i++) {
+
+				File fileItem = curInputFileList.get(i);
+				inputDir = 	fileItem.getParentFile();
+				System.out.println("file["+i+"]["+curInputFileList.size()+"] "+ fileItem.getAbsolutePath() );
+				inputMD5List = ReadFileContentAsList(fileItem);
+
+			}
+			if(inputDir == null){
+				System.out.println("当前输入的 文件夹路径 inputDir 为空! 请检查!! " );
+				return null;
+			}
+
+		ArrayList<File>  allMatchFileList = 	getAllSubFile(inputDir,null);
+			System.out.println("inputDir = "+ inputDir.getAbsolutePath() );
+			if(inputMD5List == null || inputMD5List.size() == 0){
+				System.out.println("当前输入的 MD5 列表为空!  请检查!!" );
+				return  null;  //
+			}
+			System.out.println("allMatchFileList.size() = "+ allMatchFileList.size() );
+			for (int i = 0; i < allMatchFileList.size(); i++) {
+
+				File realfileItem = allMatchFileList.get(i);
+//				System.out.println("file["+i+"]["+curRealFileList.size()+"] "+ realfileItem.getAbsolutePath() );
+
+				String filemd5 = getMD5Three(realfileItem.getAbsolutePath());
+				if(inputMD5List.contains(filemd5)){
+					needDeleteFileList.add(realfileItem);
+
+				}
+			}
+
+			if(needDeleteFileList.size() == 0 ){
+				System.out.println("当前输入的 MD5 列表 与 文件 没有相匹配的  没有任何删除操作!" );
+			}else{
+
+				for (int i = 0; i < needDeleteFileList.size(); i++) {
+					File deleteFile = needDeleteFileList.get(i);
+					System.out.println("delete_file["+i+"] = "+ deleteFile.getAbsolutePath());
+					deleteFile.delete();
+				}
+				System.out.println("删除MD5指定文件操作成功!" );
+			}
+
+			return super.applyOperationRule(curFileList, subFileTypeMap, curDirList, curRealFileList);
+		}
+
+
+
+		@Override
+		String simpleDesc() {
+			return " 依据当前每行的MD5字符串 与 每个文件的md5去判断  如果文件的md5包含在输入字符串行中 那么删除这个文件 ";
+		}
+
+	}
 
 	// 关键词          ---> 直接加密                            关键词的Base64     //# 关键词
 	//  HashMap<String,String> EnglishKey_Base64Value_Map =  new HashMap<String,String>();
@@ -8733,7 +8811,7 @@ public class I9_TextRuleOperation {
 				CUR_Selected_Rule.showWrongMessage(); // 提示当前规则的错误信息
 			}
 
-			System.out.println("当前输入参数可能 不能拼接成一个文件! 请检查输入参数!");
+			System.out.println("当前输入参数可能 不能拼接成一个文件! 请检查输入参数! CUR_Selected_Rule="+CUR_TYPE_INDEX +"  CUR_Selected_Rule="+CUR_Selected_Rule);
 			return;
 		}
 
@@ -14568,7 +14646,12 @@ public class I9_TextRuleOperation {
 
 	static ArrayList<File> getAllSubFile(File dirFile, String typeStr) {
 		ArrayList<String> typeList = new ArrayList<String>();
-		typeList.add(typeStr);
+		if(typeStr == null){
+			typeList.add("*");
+		}else{
+			typeList.add(typeStr);
+		}
+
 
 		return getAllSubFile(dirFile.getAbsolutePath(), "", typeList);
 
