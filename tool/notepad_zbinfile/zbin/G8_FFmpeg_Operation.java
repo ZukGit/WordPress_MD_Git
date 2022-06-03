@@ -1053,9 +1053,9 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
 
         String ruleTip(String type, int index, String batName, OS_TYPE curType) {
             return
-                    "\n"+Cur_Bat_Name+ " "+rule_index+ "     ##  把当前的 .ts .mov  .m4v  文件转为 mp4文件 生成在 目录 Mov_To_Mp4_时间戳 目录中   \n"+
-                            "\n"+Cur_Bat_Name+ "  "+rule_index+ "    ##  把当前的 .ts .mov .m4v  文件转为 mp4文件 生成在 目录 Mov_To_Mp4_时间戳 目录中  \n"+
-                            "\n"+Cur_Bat_Name+ "  "+rule_index+ " samedir_true   ##  把当前的 .ts .mov .m4v  文件转为 mp4文件 生成在 当前相同目录中  并删除原始文件  \n" ; }
+                    "\n"+Cur_Bat_Name+ " "+rule_index+ "     ##  把当前的 .wmv  .mkv .ts .mov .avi .m4v  文件转为 mp4文件 生成在 目录 Mov_To_Mp4_时间戳 目录中   \n"+
+                            "\n"+Cur_Bat_Name+ "  "+rule_index+ "    ##  把当前的.wmv .mkv .avi .ts .mov .m4v  文件转为 mp4文件 生成在 目录 Mov_To_Mp4_时间戳 目录中  \n"+
+                            "\n"+Cur_Bat_Name+ "  "+rule_index+ " samedir_true   ##  把当前的 .wmv .mkv .avi .ts .mov .m4v  文件转为 mp4文件 生成在 当前相同目录中  并删除原始文件  \n" ; }
 
 
 
@@ -1095,14 +1095,20 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
                 //  ffmpeg -i movie.mov -vcodec copy -acodec copy out.mp4
 
                 String command = ffmpeg_path +" -i "+movFileAbs  + "  -vcodec copy -acodec copy  " + target_mp4_abs_path;
-                if(type.endsWith("ts")){
+
+                if(type.endsWith("wmv")){   // ffmpeg -i sample.wmv -vcodec libx264 -acodec aac out.mp4
+                    command = ffmpeg_path +" -i "+movFileAbs  + " -vcodec libx264 -acodec aac  " + target_mp4_abs_path;
+                } else if(type.endsWith("mkv")){   // ffmpeg -i 1.mkv  -c:v copy -c:a aac 1.mp4
+                    command = ffmpeg_path +" -i "+movFileAbs  + "  -c:v copy -c:a aac   " + target_mp4_abs_path;
+                } else  if(type.endsWith("avi")){   // ffmpeg -i input_filename.avi -c:v copy -c:a copy -y output_filename.mp4
+                    command = ffmpeg_path +" -i "+movFileAbs  + "   -c:v copy -c:a copy -y   " + target_mp4_abs_path;
+                } else if(type.endsWith("ts")){
                      command = ffmpeg_path +" -i "+movFileAbs  + "  -vcodec copy -absf aac_adtstoasc   " + target_mp4_abs_path;
                 }else{
                      command = ffmpeg_path +" -i "+movFileAbs  + "  -vcodec copy -acodec copy  " + target_mp4_abs_path;
                 }
 
                 System.out.println("--------ruleIndex["+rule_index+"] fileIndex["+i+"]  Path=["+movFile.getAbsolutePath().replace(" ","")+"] ");
-
 
                 System.out.println(command);
                 execCMD(command);
@@ -1168,7 +1174,9 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
                     continue;
                 }
                 String fileName_tolower = itemFile.getName().toLowerCase();
-                if(fileName_tolower.endsWith(".mov") || fileName_tolower.endsWith(".m4v") || fileName_tolower.endsWith(".ts")) {
+                if(fileName_tolower.endsWith(".mov") || fileName_tolower.endsWith(".m4v")
+                        || fileName_tolower.endsWith(".ts")   || fileName_tolower.endsWith(".avi")
+                        || fileName_tolower.endsWith(".mkv")  || fileName_tolower.endsWith("wmv")){
                     curDirMovFileList.add(itemFile);
                 }
             }
