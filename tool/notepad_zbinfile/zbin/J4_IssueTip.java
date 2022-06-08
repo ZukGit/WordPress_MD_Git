@@ -1,4 +1,4 @@
-
+import java.io.File;
 
 public class J4_IssueTip {
     static String OneLine_Pre = "\n════════";
@@ -7,6 +7,10 @@ public class J4_IssueTip {
 
     static String User_Home = System.getProperties().getProperty("user.home");
 
+    static String Desktop_Path = System.getProperties().getProperty("user.home")+File.separator+"Desktop";
+    
+    static String Zbin_Path = Desktop_Path+File.separator+"zbin";
+    
     enum OS_TYPE {
         Windows,
         Linux,
@@ -55,6 +59,7 @@ public class J4_IssueTip {
         Other_Tip();
   
         Pass_Tip();
+        zwisl_log_search_J9();
     }
     
 
@@ -63,6 +68,13 @@ public class J4_IssueTip {
 
         System.out.println("TAIWAN: \n7487900017");
     }
+    
+    static void  zwisl_log_search_J9(){
+        System.out.println("════════════════════════ zwisl_log_search_J9.bat J9_Log.xlsx  ════════════════════════════════════════════════");
+
+        System.out.println(Zbin_Path+File.separator+"J9_Log.xlsx");
+    }
+    
     static void  AOSP_PATH_Tip(){
         System.out.println("════════════════════════ AOSP 模块路径 ════════════════════════════════════════════════");
         System.out.println();
