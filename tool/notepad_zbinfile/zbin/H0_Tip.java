@@ -856,6 +856,7 @@ public class H0_Tip {
         System.out.println("zrule_apply_G2"+BAT_OR_SH_Point+" " +"#_7_good_batch && cd ./good_batch && zrule_apply_G2"+BAT_OR_SH_Point+" " +"#_9  _gif");
         System.out.println();
 
+        zapp_pull_shoucang_tip();
 
         System.out.println("________________________ 【zapp】【解密】【Html】 ________________________");
         System.out.println("zrule_apply_G2"+BAT_OR_SH_Point+" " +"#_7_good_batch  ******原封不动解码");
@@ -1015,6 +1016,65 @@ public class H0_Tip {
         }
 
     }
+
+    // adb pull /sdcard/zapp/jpg_lin_land/zzz_shoucang ./zapp/jpg_lin_land/
+    // adb pull /sdcard/zapp/jpg_lin_land/zzz_shoucang  ./zapp/jpg_lin_land/zzz_shoucang/ &&
+    static void zapp_pull_shoucang_tip(){
+        String shoucang_dir = "zzz_shoucang";
+        String zapp_dir = "/sdcard/zapp/";
+        ArrayList<String> dirName = new ArrayList<String>();
+
+        dirName.add("jpg_top_land");
+        dirName.add("jpg_top_port");
+        dirName.add("jpg_lin_land");
+        dirName.add("jpg_lin_port");
+        dirName.add("jpg_common_land");
+        dirName.add("jpg_common_port");
+        dirName.add("gif_common_land");
+        dirName.add("gif_common_port");
+        dirName.add("gif_top_land");
+        dirName.add("gif_top_port");
+        dirName.add("mp4_common_land");
+        dirName.add("mp4_common_port");
+        dirName.add("mp4_anim_land");
+        dirName.add("mp4_anim_port");
+        dirName.add("mp4_dan_land");
+        dirName.add("mp4_dan_port");
+        dirName.add("mp4_hua_land");
+        dirName.add("mp4_hua_port");
+        dirName.add("mp4_raw_land");
+        dirName.add("mp4_raw_port");
+        dirName.add("mp4_fake_land");
+        dirName.add("mp4_fake_port");
+        dirName.add("mp4_single_land");
+        dirName.add("mp4_single_port");
+        dirName.add("mp4_sss_land");
+        dirName.add("mp4_sss_port");
+        dirName.add("mp4_top_land");
+        dirName.add("mp4_top_port");
+        dirName.add("mp4_toto_land");
+        dirName.add("mp4_toto_port");
+
+        StringBuilder shoucang_tip = new StringBuilder();
+        //     //  mkdir .\zapp\mp4_toto_port\zzz_shoucang\ &&  adb pull /sdcard/zapp/jpg_lin_land/zzz_shoucang  ./zapp/jpg_lin_land/zzz_shoucang/ &&
+        for (int i = 0; i < dirName.size(); i++) {
+            String categoryDirName = dirName.get(i);
+            String mkdir_command = " mkdir "+"."+File.separator+"zapp"+File.separator+categoryDirName+File.separator+shoucang_dir+File.separator +" & ";
+            String commandItem = mkdir_command+" adb pull "+zapp_dir+categoryDirName+"/"+shoucang_dir+" ./zapp/"+categoryDirName+"/"+shoucang_dir+"/"+" & ";
+            if(i == dirName.size() -1 ){
+                 commandItem = mkdir_command+" adb pull "+zapp_dir+categoryDirName+"/"+shoucang_dir+" ./zapp/"+categoryDirName+"/"+shoucang_dir+"/"+" ";
+            }
+            shoucang_tip.append(commandItem);
+
+        }
+
+        String jiemi_command= " && cd ./zapp/ && zrule_apply_G2.bat #_7_good_batch && cd ./good_batch  &&  zrule_apply_G2.bat  #_27  _jpg  &&  zrule_apply_G2.bat  #_27  _mp4  &&  zrule_apply_G2.bat  #_27  _gif &&  zrule_apply_G2.bat  #_12_jpg  &&  zrule_apply_G2.bat  #_12_mp4 &&  zrule_apply_G2.bat  #_12_gif";
+
+        System.out.println("________________________ 【zapp】【pull shoucang 并解密 】 ________________________");
+        System.out.println(shoucang_tip.toString()+" "+jiemi_command);
+        System.out.println();
+    }
+
 
 
 
