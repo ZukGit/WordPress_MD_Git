@@ -1060,9 +1060,11 @@ public class H0_Tip {
         for (int i = 0; i < dirName.size(); i++) {
             String categoryDirName = dirName.get(i);
             String mkdir_command = " mkdir "+"."+File.separator+"zapp"+File.separator+categoryDirName+File.separator+shoucang_dir+File.separator +" & ";
-            String commandItem = mkdir_command+" adb pull "+zapp_dir+categoryDirName+"/"+shoucang_dir+" ./zapp/"+categoryDirName+"/"+shoucang_dir+"/"+" & ";
+            String commandItem = mkdir_command+" adb pull "+zapp_dir+categoryDirName+"/"+shoucang_dir+" ./zapp/"+categoryDirName+"/"+" & ";
             if(i == dirName.size() -1 ){
-                 commandItem = mkdir_command+" adb pull "+zapp_dir+categoryDirName+"/"+shoucang_dir+" ./zapp/"+categoryDirName+"/"+shoucang_dir+"/"+" ";
+//                 commandItem = mkdir_command+" adb pull "+zapp_dir+categoryDirName+"/"+shoucang_dir+" ./zapp/"+categoryDirName+"/"+shoucang_dir+"/"+" ";
+                commandItem = mkdir_command+" adb pull "+zapp_dir+categoryDirName+"/"+shoucang_dir+" ./zapp/"+categoryDirName+"/"+" ";
+
             }
             shoucang_tip.append(commandItem);
 
