@@ -1,0 +1,195 @@
+APP崩溃
+Bug2Go 启动上报Log时间点
+ACS信道选中列表
+开始亮屏
+程序发送广播[  可能是重发广播rebroadcast 有些广播会在屏幕解锁后再次发送一次广播 这类广播 包含  EXTRA_REBROADCAST_ON_UNLOCK 等 ]
+【 发送广播,并且会在设备解锁之后 重新再发送一次广播  重发广播包含 EXTRA_REBROADCAST_ON_UNLOCK 】
+【 设备 开始进入睡眠 】
+【 设备灭屏 】
+【 设备亮屏 】
+【ABSENT[SIM卡缺失],NOT_READY[SIM卡已加载未准备就绪],READY[准备就就绪],LOADED[加载完成],UNKNOWN[未知错误] phoneId[对应卡槽]】
+【 发生ARN 程序无响应！ 】
+设备重启完成
+【提示通知-通知notification数据】
+【 安卓异常记录 栈调用情况  】
+【 安卓致命运行时异常 奔溃  】
+开始灭屏
+启动应用
+后台启动应用
+丢弃后台启动应用【无权限等】
+截屏操作
+【Code路径:   】
+上传Bug2GO
+不清楚具体
+热点状态变化
+设备MAC地址
+当前WIFI固件版本
+认证请求超时
+[ 发送给设备通知当前热点的信道已经变更 ]
+当前最终ACS选择的信道列表编号
+[ ACS 自动信道选择中 PCL 选择的信道列表 ]
+[ ACS 时 PCL 列表项  信道选项值 ]
+[ ACS 可选信道的长度  1.2.3.4..12 ..36..40.149..153..157 具体值到对应文件 ACS channel list: len: 查找 ]
+设置wifi中的countryCode [可能影响频谱 DFS等] http://host810096584.s248.pppf.com.cn/tool/182/
+当前硬件没有可支持的信道 无法工作 查看国家码信道
+设置国家码  https://wenku.baidu.com/view/88021e4cc850ad02de8041ac.html
+手机设置的国家码 可能没有可用5G信道 造成无法打开
+手机热点 停止工作
+手机热点 开始工作
+手机热点连接的客户端数量
+手机热点由于10分钟没有客户端连接 自动关闭
+WIFI连接事件
+WIFI断开事件
+[ 从谷歌得到回馈 证明有网络能力 ]
+设备无法访问google网站
+【当前没有网络能力】
+【更新当前热点最多连接设备的个数】
+引起WIFI_CLASS_D_DIAGNOSTICS异常(reasonCode 不为0,3 断开时rssi较好情况)
+尝试连接该网络
+[ 上面的passpoint网络可用 ]
+【 WifiStateMachine  选取评估的目标网络 】
+[ 注入 wifi 配置信息  搜素 【空格servingAccessPoint】  ]
+【 匹配到Passpoint网络 】
+【 WifiConfigManager 选取评估的候选网络 】
+【 移除所有 passpoint网络  】
+【 移除所有 passpoint网络 和 临时网络 】
+发现 passpoint 为 yes的热点  passpoint: yes
+【 添加或更新passpoint配置到 WifiConfigStore.xml 配置文件中 】
+【 设置国家对应的国家信道范围 DFS信道 等 】
+[ 国家允许使用的信道范围  DFS  ]
+【 手机接收到 断开关联帧  将断开与别的设备的热点连接 】
+[接收到SIM变化广播 SIM卡被拔去[与Sim卡相关的passpoint网络将无法连接]
+接收到SIM变化广播 SIM卡已插入卡槽[与Sim卡相关的可用passpoint网络将进行ANPQ查询后自动候选 Set network candidate 
+热点的工作信道变更
+【 配置的信道channel不可用 】
+【 DFS 信道检测开始  】
+【 DFS 信道检测结束  】
+【 ACS 自动信道选择完成工作 】
+【 Auto Channel Select 自动信道选择结果 】
+【 当前信道并不能被热点AP使用 】
+【 ACS自动信道选择 选中了一个不可用的信道 】
+【 ACS自动信道选择 执行失败 】
+【 热点接口初始化失败  热点不可用  】
+【 热点不可用事件  】
+【  可选的ACS 信道 不可用  】
+热点信道变更【0--2.4Ghz   1--5GHz】
+[ WifiSateMechine状态栈 处理事件命令 CMD_REMOVE_NETWORK  移除网络]
+[ WifiSateMechine状态栈 处理事件命令 CMD_GET_CONFIGURED_NETWORKS ]
+[ WifiSateMechine状态栈 处理事件命令 CMD_GET_SUPPORTED_FEATURES ]
+[ WifiSateMechine状态栈 处理事件命令 CMD_GET_LINK_LAYER_STATS ]
+[ WifiSateMechine状态栈 处理事件命令 CMD_GET_MATCHING_CONFIG ]
+[ WifiSateMechine状态栈 处理事件命令 更新passpoint配置 CMD_ADD_OR_UPDATE_PASSPOINT_CONFIG ]
+[ WifiSateMechine状态栈 处理事件命令 CMD_GET_PASSPOINT_CONFIGS ]
+[ WifiSateMechine状态栈 处理事件命令 CMD_INITIALIZE  初始化 ]
+connected[是否连接wifi],enabled=[wifi是否打开],level=[信号格数],inetCondition=[0当前网络无联网,1正常],ssid=[热点名]
+设备接收到来自热点的 断开 Deauth帧
+设备连接到当前手机热点
+设备离开到当前手机热点
+更新添加网络
+向该SSID热点进行ANQP 网络查询
+WIFI_button打开
+WIFI_button关闭
+设备 Mac地址
+【 WIFI状态机 离开连接状态】
+【 暂时屏蔽热点事件 】
+【 没有从热点AP得到 Probe回馈帧   】
+【 手机检测心跳帧Probe失败  】
+【 EAP 认证成功 】
+【 热点名称长度过长导致打开热点失败 】
+【 热点开启失败 】
+【 四次握手失败 可能是错误密码  】
+【 认证失败  】
+【 认证成功  】
+【  802.11ax 的 WPA3 的认证方式 Protocols  】
+【 被AP-kickout 踢出 悲剧  】
+[ ini配置 srd_ch_support=0 关闭在低功耗5G channel -14dm ,  srd_ch_support=1 开启在低功耗5G channel]
+【 执行解认证请求 断开请求  】
+【 热点关闭  】
+【 手机作为热点的连接情况 】
+【 手机连接的WIFI无网络能力  显示wifi感叹号】
+【 手机接收到关联请求( 手机作为热点AP ) 】
+【 热点拒绝关联事件发生 】
+【 关闭热点  由该应用关闭 】
+IPR 丢失邻居事件发生(可能导致断线)
+设备 主动发送 断开帧 断开当前网络！
+ 手机认证超时 不能连接网络！
+WIFI 断开事件发生
+WIFI 连接成功事件发生
+用户进入WIFI设置界面
+用户进入热点设置界面
+关闭热点成功 10(正在关闭) 11(关闭成功) 12(正在打开) 13(打开成功) 14(打开失败)
+热点状态变化 10(正在关闭) 11(关闭成功) 12(正在打开) 13(打开成功) 14(打开失败)
+打开热点成功 10(正在关闭) 11(关闭成功) 12(正在打开) 13(打开成功) 14(打开失败)
+热点名称
+【 加载 WIFI 驱动失败 】
+【 Wifi HAL 启动失败 】
+打开 WIFI 开关
+关闭 WIFI 开关
+[verbose]打开热点状态成功 10(正在关闭) 11(关闭成功) 12(正在打开) 13(打开成功) 14(打开失败)
+[verbose]热点正在打开中 10(正在关闭) 11(关闭成功) 12(正在打开) 13(打开成功) 14(打开失败)
+[verbose]热点打开成功 10(正在关闭) 11(关闭成功) 12(正在打开) 13(打开成功) 14(打开失败)
+应用开启热点
+接口被销毁
+wlan0接口物理链路层信号无效True if the physical link-layer connection signal is valid.
+加载驱动失败
+连接失败
+拒绝关联事件
+停止导航
+检测到 亮屏 事件
+检测到 灭屏 事件
+// /hardware/qcom/sdmxxx/gps/sdmxxx/gnss/ libgnss.so上报 , GnssLocationProvider.java 中  方法 void handleReportSvStatus(SvStatusInfo info) 中的 int SvStatusInfo.mSvCount【SV count:卫星个数 】 || 【 卫星可用个数 】 usedInFixCount  是int[] mSvidWithFlags 数组中 比特位 0x4 第2位 不为0 的个数 (【 int[] 】info.mSvidWithFlags[i] & GnssStatus.GNSS_SV_FLAGS_USED_IN_FIX【0x4 2^2 第2个比特位】) != 0
+"GnssLocationProvider.java 中  方法 void handleReportSvStatus(SvStatusInfo info) 【PRN-是伪随机噪声码（pseudo random noise code）的缩写，不是卫星卫星的编号】 【 SvStatusInfo.int[] mSvidWithFlags】;  mSvidWithFlags[i] >> GnssStatus.SVID_SHIFT_WIDTH【8,往右移动八位的值】的集合 ||【 GPS卫星所发送的信号包括载波信号、P码、C/A码和数据码(或称D码)等多种信号分量  每一卫星有一个特殊的PRN码《可用来作为卫星的 identify 》 码，所以用户接收机可以通过生成并匹配相同的码样解调一个特别的卫星信号】
+GnssLocationProvider.java 中  方法 void handleReportSvStatus(SvStatusInfo info) 【 SNR 信噪比  大于20一般认为信号有效 】 【 SvStatusInfo.float[] mCn0s 】
+【 ELE是仰角 Elevation , 人与卫星 连接 与 水平面之间的夹角 仰角就是这颗卫星相对地平线的夹角  卫星在头顶是仰角 90度  仰角将从0°增加到90°，然后再减小到0° 】 【 SvStatusInfo.float[] mSvElevations; 】
+【 Azm是方位角，Azimuth  表示这颗卫星在哪个方向，东北，西北。。。具体多少度 ，俯视图 大地平面 人为圆心  正北为0度 卫星垂直映射到水平面 与原点之间的夹角  】 【 SvStatusInfo.float[] mSvAzimuths;; 】
+GnssLocationProvider.java 中  方法 void handleReportSvStatus(SvStatusInfo info) 【 FRQ 频率?  】 【 SvStatusInfo.float[] mSvCarrierFreqs;;; 】
+【 A=第1位=含有历书数据    E=0位=含有星历数据   U=第2位=卫星是否可用 F=第3位=是否含有频率信息】 【 SvStatusInfo.int[] mSvidWithFlags 中最低四位bit位的lag  】 【 SvStatusInfo.float[] mSvCarrierFreqs;;; 】
+ GPS 获取卫星数据引擎 打开 
+GPS 获取卫星数据引擎 关闭
+GPS 获取卫星数据Session 会话 开始
+GPS 获取卫星数据Session 会话结束 一般已经得到了一些位置卫星数据
+冷启动完成时间  (毫秒 )// ttff的意思是Time to First Fix，就是到了一个完全陌生的地方，GPS里面没有存任何信息// 时间也不对的情况下，从开机到得到坐标信息和时间信息的时间。(也叫冷启动时间）// 这个理想值是18秒。一般现代的GPS都可以在30秒定位。  冷启动完成时间 
+接收到的位置数据信息,type【 network  gps fuse 】
+用户的GPS 开关打开的
+用户的GPS 关闭打开的
+GPS 的 固件信息
+插入有效的 sim卡 读取到了 mcc/mnc
+发送位置请求
+开始处理位置导航 获取位置信息
+GPS导航状态 [ 1=会话开始  2=会话结束  3=GPS定位引擎打开  4=GPS定位引擎关闭 ]
+给对应的 应用 发送 Location 数据
+应用开始位置请求
+应用 停止了 位置请求
+CTS测试失败
+TTFF测试失败
+定位信息 xtra等
+CTS项开始测试
+请求位置更新
+位置provider提供 不存在
+无法请求位置
+注入xtra数据成功
+可用搜星数量
+GNSS状态
+发送数据给百度网络定位测试app
+发送Cell消息
+报告位置
+百度网络定位服务加载binder成功
+电话进行定位操作 Start_Stop
+发送位置给电话应用
+发送位置给waze
+发送位置给谷歌地图
+发送位置给百度地图
+发送地图给高德地图
+发送地址给duotest
+AGPS消息
+Supl连接
+SUPL的TCP网络错误
+A2DP蓝牙的音频传输协议开始
+A2DP状态机变化
+当前蓝牙音频控制app
+SNK设备状态
+当前语音焦点app
+蓝牙协议状态变化
+蓝牙音频连接正在断开
+蓝牙音频连接正在建立
+Sco蓝牙同步语音电话连接设备信息

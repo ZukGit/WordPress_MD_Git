@@ -1,0 +1,9 @@
+ON A2DP STARTED
+A2dpStateMachine: state:
+Avrcp_ext: updateCurrentMediaState: mMediaController
+Avrcp_ext: Play Status for :
+MediaFocusControl: requestAudioFocus() from
+BluetoothPhonePolicy: processProfileStateChanged
+HeadsetStateMachine: AudioDisconnecting: 
+HeadsetStateMachine: AudioConnecting
+AS.BtHelper: setBtScoActiveDevice:

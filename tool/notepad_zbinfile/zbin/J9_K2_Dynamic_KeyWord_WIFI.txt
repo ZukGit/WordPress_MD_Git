@@ -1,0 +1,111 @@
+SND notifyWifiApStateChange
+wpa_supplicant: wlan0: Own MAC address:
+WifiVendorHal: Driver:
+wlan0: Authentication with
+lim_send_extended_chan_switch_action_frame
+wlansap_pre_start_bss_acs_scan_callback
+__wlan_hdd_cfg80211_do_acs
+Succeeded to set country code to:
+IEEE 802.11 Hardware does not support configured channel
+Updated:country_code=
+interface state COUNTRY_UPDATE->DISABLED
+SoftApManager: Soft AP is stopped
+Soft AP is started
+sap_num_connected_sta=
+SoftApManager: Timeout message received. Stopping soft AP
+hdd_send_association_event:
+PROBE_DNS www.google.com
+generate_204 Probe failed
+no-internet access
+Updated:max_num_sta=
+Added Drop box entry - WIFI_CLASS_D_DIAGNOSTICS
+wpa_supplicant: wlan0: Trying to associate with SSID
+servingAccessPoint
+setTargetBssid set to
+injectWifiApInfo
+PasspointManager: Matched
+Set network candidate scan result
+Removing passpoint network config
+Removing all passpoint or ephemeral configured networks
+passpoint: yes
+PasspointManager: Added/updated Passpoint configuration:
+Regulatory information - country
+wpa_supplicant: nl80211:
+Received Disassoc frame for Addr
+IntentBroadcaster: Broadcasting intent
+WifiService: resetting networks because SIM was removed
+WifiService: resetting networks because SIM was loaded
+SoftApManager: Channel switched. Frequency:
+Possibly channel configuration is invalid
+wlan0: DFS-CAC-START
+wlan0: DFS-CAC-COMPLETED
+wlan0: ACS-COMPLETED
+nl80211: ACS Results:
+not allowed for AP mode
+ACS picked unusable channels
+wlan0: ACS-FAILED
+hostapd : Interface initialization failed
+hostapd : wlan0: AP-DISABLED
+ACS: Possibly channel configuration is invalid
+WifiTetherApBandPref: Updating band index to
+WifiAsyncChannel.WifiService: sendMessageSynchronously sendMessageSynchronously.send message=131125
+WifiAsyncChannel.WifiService: sendMessageSynchronously sendMessageSynchronously.send message=131131
+WifiAsyncChannel.WifiService: sendMessageSynchronously sendMessageSynchronously.send message=131133
+WifiAsyncChannel.WifiService: sendMessageSynchronously sendMessageSynchronously.send message=131135
+WifiAsyncChannel.WifiService: sendMessageSynchronously sendMessageSynchronously.send message=131171
+WifiAsyncChannel.WifiService: sendMessageSynchronously sendMessageSynchronously.send message=131178
+WifiAsyncChannel.WifiService: sendMessageSynchronously sendMessageSynchronously.send message=131180
+WifiAsyncChannel.WifiService: sendMessageSynchronously sendMessageSynchronously.send message=131207
+NetworkController.WifiSignalController:  to:
+received Deauth frame
+wlan0: AP-STA-CONNECTED
+wlan0: AP-STA-DISCONNECTED
+WifiConfigManager: Adding/Updating network
+ANQP initiated on
+set wifi switch state to 1
+set wifi switch state to 0
+WifiStateMachine: Leaving Connected state
+wlan0: CTRL-EVENT-SSID-TEMP-DISABLED
+No ProbeRsp from AP
+Received Heart Beat Failure
+wlan0: CTRL-EVENT-EAP-SUCCESS
+hostapd : Invalid SSID size
+SoftAP start failed
+4-Way Handshake failed
+NetworkEvent(NETWORK_VALIDATION_FAILED 
+NetworkEvent(NETWORK_REVALIDATION_SUCCESS
+validation passed 
+validation failed 
+KeyMgmt: OWE Protocols
+wma_peer_sta_kickout_event_handler
+sme_set_etsi13_srd_ch_in_master_mode
+Process Deauth Req on
+__wlan_hdd_cfg80211_stop_ap
+onStaConnected Macaddr:
+statusLabel=No internet
+Received Assoc Req
+wlan0: CTRL-EVENT-ASSOC-REJECT
+stopTethering caller:
+IpReachabilityMonitor: FAILURE: LOST_PROVISIONING, NeighborEvent
+WifiStateMachine: FAILURE: LOST_PROVISIONING, NeighborEvent
+wlan0: Request to deauthenticate
+AUTH failure
+wlan0: CTRL-EVENT-DISCONNECTED
+wlan0: CTRL-EVENT-CONNECTED
+com.android.settings.wifi.WifiSettings
+com.android.settings.wifi.tether.WifiTetherSettings
+SoftApCallbackProxy: onStateChanged: state=11
+SoftApCallbackProxy: onStateChanged: state=13
+WifiTetherSsidPref: Updating SSID
+Failed to load WiFi driver
+Wifi HAL start failed
+setWifiEnabled: true
+setWifiEnabled: false
+WifiService: handleWifiApStateChange: currentState=13
+WifiService: handleWifiApStateChange: currentState=12 previousState=11
+WifiService: handleWifiApStateChange: currentState=13 previousState=12
+startTethering caller
+STA iface wlan0 was destroyed
+interfaceLinkStateChanged, iface: wlan0, up: false
+connection failed with
+Association Rejection event

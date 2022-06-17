@@ -1,0 +1,24 @@
+Shutting down VM
+Bug2Go-BugReportService: onStartCommand - action: motorola.intent.action.BUG2GO.BUGREPORT.START
+__wlan_hdd_cfg80211_do_acs
+Value:IS_SCREEN_ON: true
+IntentBroadcaster: Broadcasting intent
+IntentBroadcaster: Broadcasting and adding intent for rebroadcast
+KeyguardViewMediator: handleNotifyStartedGoingToSleep
+KeyguardViewMediator: handleNotifyScreenTurnedOff
+KeyguardViewMediator: handleNotifyScreenTurnedOn
+PhoneGlobals: ACTION_SIM_STATE_CHANGED state
+ActivityManager: ANR in
+android.intent.action.REBOOT
+MD.NotificationData
+E AndroidRuntime:
+AndroidRuntime: FATAL EXCEPTION: main
+AndroidRuntime: *** FATAL EXCEPTION IN SYSTEM PROCESS
+Value:IS_SCREEN_ON: false
+ActivityTaskManager: START
+Background activity start
+Abort background activity starts from
+MediaProvider: Open with lower FS for /storage/emulated/0/Pictures/Screenshots
+去除【Code路径:   】
+BUG2GO-Util: TYPE_
+MMApiWebService

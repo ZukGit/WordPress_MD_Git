@@ -445,14 +445,106 @@ public class I9_TextRuleOperation {
 
 		// 依据当前每行的字符串 羽 每个文件的md5去判断  如果文件的md5包含在输入字符串行中 那么删除这个文件
 		CUR_RULE_LIST.add(new Delete_File_WithMD5_Rule_47());
+		
+		
+		//  去除当前分析Log文件中的提示中信息,读取 J9_I9_Dynamic_ClearDesc.txt   并过滤当前每一行
+		// jira comment 中  有要求  尽量不写中文
+		CUR_RULE_LIST.add(new Clear_Wisl_Chinese_Tip_Rule_48());
+		
+		
+		
 //        CUR_RULE_LIST.add( new Image2Png_Rule_4());
 //        CUR_RULE_LIST.add( new AVI_Rule_5());
 //        CUR_RULE_LIST.add( new SubDirRename_Rule_6());
 //        CUR_RULE_LIST.add( new Encropty_Rule_7());
 //        CUR_RULE_LIST.add( new ClearChineseType_8());
 
+		
+		
 	}
 
+	
+	//  去除当前分析Log文件中的提示中信息,读取 J9_I9_Dynamic_ClearDesc.txt   并过滤当前每一行
+	// jira comment 中  有要求  尽量不写中文
+	class Clear_Wisl_Chinese_Tip_Rule_48 extends Basic_Rule {
+
+		File J9_I9_Dynamic_ClearDesc_File ;  // 读取需要 清楚的 文件
+		ArrayList<String> clearDescList ;   // 从 需要清除的文件读取到的内容
+		ArrayList<String> clearDescConentList ; // 执行完清除逻辑之后的 内容 
+		Clear_Wisl_Chinese_Tip_Rule_48() {
+			super(48, false);
+		
+			J9_I9_Dynamic_ClearDesc_File = new File(zbinPath+File.separator+"J9_I9_Dynamic_ClearDesc.txt");
+		}
+		
+		
+		@Override
+		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+			
+			if(!J9_I9_Dynamic_ClearDesc_File.exists()) {
+				System.out.println("当前 J9_I9_Dynamic_ClearDesc_File="+J9_I9_Dynamic_ClearDesc_File.getAbsolutePath()+" 为空 请检查!");
+			    return null;
+			}
+			
+			
+			clearDescList = ReadFileContentAsList(J9_I9_Dynamic_ClearDesc_File);
+			
+			if(clearDescList == null || clearDescList.size() == 0) {
+				System.out.println("当前 Clear_Wisl_Chinese_Tip_Rule_48 中读取"+J9_I9_Dynamic_ClearDesc_File.getAbsolutePath()+" 得到的数据为空 请检查!");
+			    return null;
+			
+			}
+			
+			clearDescConentList = new ArrayList<String>();
+			
+			
+			for (int i = 0; i < curInputFileList.size(); i++) {
+
+				File fileItem = curInputFileList.get(i);
+				System.out.println("file["+i+"]["+curInputFileList.size()+"] "+ fileItem.getAbsolutePath() );
+				ArrayList<String> contentList = ReadFileContentAsList(fileItem);
+
+		
+				for (int j = 0; j < contentList.size(); j++) {
+					String lineContent = contentList.get(j);
+					if(lineContent == null || "".equals(lineContent) ) {
+						clearDescConentList.add("");
+						continue;
+					}
+					
+					String clearLineContent = lineContent;
+					
+					for (int k = 0; k < clearDescList.size(); k++) {
+						String fixedItem = clearDescList.get(k);
+						clearLineContent = clearLineContent.replace(fixedItem,"");
+		
+					}
+					clearDescConentList.add(clearLineContent);
+				
+
+				}
+
+				writeContentToFile(I9_Temp_Text_File, clearDescConentList);
+				NotePadOpenTargetFile(I9_Temp_Text_File.getAbsolutePath());
+				System.out.println("rule_" + rule_index + " ->去掉 行开头是空格的 保留内容到 TEMP TXT 文件");
+
+			}
+
+			return super.applyOperationRule(curFileList, subFileTypeMap, curDirList, curRealFileList);
+		}
+
+		
+	
+		@Override
+		String simpleDesc() {
+			return " 去除当前分析Log文件中的提示中信息,读取 J9_I9_Dynamic_ClearDesc.txt得到要清除的中文字符串 并过滤当前每一行 jira comment 中  有要求  尽量不写中文";
+		}
+
+		
+	}
+	
+	
 	// 依据当前每行的MD5字符串 与 每个文件的md5去判断  如果文件的md5包含在输入字符串行中 那么删除这个文件
 	class Delete_File_WithMD5_Rule_47 extends Basic_Rule {
 

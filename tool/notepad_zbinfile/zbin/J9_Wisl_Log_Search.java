@@ -55,6 +55,10 @@ public class J9_Wisl_Log_Search {
     static Map<String, String> propKey2ValueList = new HashMap<String, String>();
 
 
+
+    
+    
+    
     // 当前Shell目录下的 文件类型列表  抽取出来  通用
     static HashMap<String, ArrayList<File>> CurDirFileTypeMap = new HashMap<String, ArrayList<File>>();
     ;
@@ -234,6 +238,8 @@ public class J9_Wisl_Log_Search {
                 Log_Operation_Type = 2;
                 notepad_command_dir = curFile;
                 notepad_command_File = new File(notepad_command_dir.getAbsolutePath() + File.separator + "Z_" + getTimeStamp() + ".txt");
+//                notepad_command_File = new File(notepad_command_dir.getAbsolutePath() + File.separator + "Z_" + "analysis" + ".txt");
+
             }
 
         } else {
@@ -1779,7 +1785,7 @@ public class J9_Wisl_Log_Search {
                 Map<String, String> rowContentMap = sheetValueList.get(i);
                 getKeyAndValue_Title_Row(rowContentMap, sheetName, i + 1);
             }
-//            System.out.println("══════════ Sheet【"+sheetName+"】End══════════ ");
+ //            System.out.println("══════════ Sheet【"+sheetName+"】End══════════ ");
 
         }
 
@@ -1791,13 +1797,28 @@ public class J9_Wisl_Log_Search {
 
         Map.Entry<String, List<Map<String, String>>> entryItem;
 
+        //  GPS BT WIFI NFC 的 desc 都写在 同一个 txt 文件中
+        // J9_I9_Dynamic_ClearDesc.txt   // 实现在 ztextrule_operation_I9.bat 中每次都要手动去除描述的烦恼
+        ArrayList<String> matchhDynamicDescStrList = new  ArrayList<String>();
+        
+        
         Iterator iterator = sheetMap.entrySet().iterator();
         while (iterator.hasNext()) {
             entryItem = (Map.Entry<String, List<Map<String, String>>>) iterator.next();
-            String sheetName = entryItem.getKey();   //Map的Key    Sheet名称 String name
+            
+          //Map的Key    Sheet名称 String name COMMON   WIFI GPS BT NFC
+            String sheetName = entryItem.getKey();   
             ArrayList<AbstractKeyEntry> curKeyEntryList = new ArrayList<AbstractKeyEntry>();  // 值
 
-
+            // J9_K2_Dynamic_KeyWord_Common.txt     // 动态创建 这样的 Txt 文件写入每行关键字
+            // J9_K2_Dynamic_KeyWord_GPS.txt
+            // J9_K2_Dynamic_KeyWord_WIFI.txt
+            // J9_K2_Dynamic_KeyWord_BT.txt
+            // J9_K2_Dynamic_KeyWord_NFC.txt    // 实现 改动 xlsx 文件 后 J9 和 znotepad_tip_K2.bat 同时改变
+            ArrayList<String> matchDynamicKeyList = new  ArrayList<String>();
+            
+            
+      
             List<Map<String, String>> sheetValueList = entryItem.getValue();  //Map的Value   Sheet 内容
 
 
@@ -1853,14 +1874,42 @@ public class J9_Wisl_Log_Search {
                             System.out.println("当前没有匹配到 Head--》" + key);
                     }
                 }
+                
+                if (isStrEmpty(descStr_2)) {
+                    System.out.println("当前 sheetName【" + sheetName + "】 KeyWord【" + keyWord_1 + "】 说明为空!  请补充! ");
+                }else {
+                	
+                	if(!matchhDynamicDescStrList.contains(descStr_2)) {
+                		  matchhDynamicDescStrList.add(descStr_2);
+                	}
+                  
+                }
 
                 if (isStrEmpty(keyWord_1)) {   //  关键词为 空  那么  无法创建  识别对象
                     continue;
                 }
-                if (isStrEmpty(descStr_2)) {
-                    System.out.println("当前 sheetName【" + sheetName + "】 KeyWord【" + keyWord_1 + "】 说明为空!  请补充! ");
-                }
+
+                
+              
+          
+                
                 boolean isMultiKeyWord = keyWord_1.contains("\n");
+                
+                if(isMultiKeyWord) {
+                	String oneLineWord = getPre_N(keyWord_1);
+                	
+                	if(!matchDynamicKeyList.contains(oneLineWord)) {
+              		  matchDynamicKeyList.add(oneLineWord);
+              	}
+                	
+                }else {
+                	if(!matchDynamicKeyList.contains(keyWord_1)) {
+                		  matchDynamicKeyList.add(keyWord_1);
+                	}
+                
+                }
+              
+                
                 boolean isTop_Flag = !isBooleanEmpty(isTopStr_3);
                 boolean isPrintOnce_Flag = !isBooleanEmpty(isPrintOnceStr_4);
                 boolean isIgnoreRepeat_Flag = !isBooleanEmpty(isIgnoreRepeatStr_5);
@@ -1892,14 +1941,92 @@ public class J9_Wisl_Log_Search {
             }
             EntryList_Map.put(sheetName, curKeyEntryList);
 
+            Dynamic_Make_Wisl_K2_TxtKey(sheetName,matchDynamicKeyList);
 
         }
 
 //        System.out.println("EntryList_Map.size = "+ EntryList_Map.size());
 
+        Dynamic_Make_Wisl_I9_DescTxtList(matchhDynamicDescStrList);
 
     }
 
+    
+    
+	// 获取字符串 \n 前的字符串
+	public static String getPre_N(String mStr) {
+		if(!mStr.contains("\n")) {
+			return  mStr;
+		}
+		
+		int N_index = mStr.indexOf("\n");
+		String preN_Str =mStr.substring(0,N_index).trim();
+		
+		return preN_Str;
+		
+		
+	}
+	
+    //  GPS BT WIFI NFC 的 desc 都写在 同一个 txt 文件中
+    // J9_I9_Dynamic_ClearDesc.txt   // 实现在 ztextrule_operation_I9.bat 中每次都要手动去除描述的烦恼
+    static void Dynamic_Make_Wisl_I9_DescTxtList(ArrayList<String> mDescList) {
+    	if(mDescList == null || mDescList.size() == 0 ) {
+    		System.out.println("Dynamic_Make_Wisl_I9_DescTxtList 当前 mDescList="+mDescList+"  为空!");
+    		return;
+    	}
+    	
+    	for (int i = 0; i < mDescList.size(); i++) {
+    		String DescItem = mDescList.get(i);
+    		System.out.println(" Dynamic_Make_Wisl_I9_DescTxtList  DescItem["+i+"] = "+DescItem);
+			
+		}
+    	
+    	File J9_I9_Dynamic_DescTxt_File = new File(zbinPath+File.separator+"J9_I9_Dynamic_ClearDesc.txt");
+    	writeContentToFile(J9_I9_Dynamic_DescTxt_File, mDescList);
+    	System.out.println("写入 "+J9_I9_Dynamic_DescTxt_File.getAbsolutePath()+"文件成功!");
+   
+    }
+    
+    // J9_K2_Dynamic_KeyWord_Common.txt     // 动态创建 这样的 Txt 文件写入每行关键字
+    // J9_K2_Dynamic_KeyWord_GPS.txt
+    // J9_K2_Dynamic_KeyWord_WIFI.txt
+    // J9_K2_Dynamic_KeyWord_BT.txt
+    // J9_K2_Dynamic_KeyWord_NFC.txt  
+    // 动态 创建 提供给  znotepad_tip_K2.bat 使用的 关键字 副产品
+    static void Dynamic_Make_Wisl_K2_TxtKey(String sheetName,ArrayList<String> mKeyList) {
+    	if(isStrEmpty(sheetName) ) {
+    		System.out.println("Dynamic_Make_Wisl_K2_TxtKey 当前 sheetName="+sheetName+"  为空!");
+    		return;
+    	}
+    	
+    	// COMMON_LOG  WIFI_Log 这样的sheet名称 没有包含关键字 只是对 Log 的说明 过滤
+    	if(sheetName.toLowerCase().endsWith("_log")) {
+    		System.out.println("Dynamic_Make_Wisl_K2_TxtKey 当前 sheetName="+sheetName+"  为空!");
+    		return;
+    	}
+    	
+    	
+    	
+    	if(mKeyList == null || mKeyList.size() == 0 ) {
+    		System.out.println("Dynamic_Make_Wisl_K2_TxtKey 当前 mKeyList="+mKeyList+"  为空!");
+    		return;
+    	}
+    	
+    	for (int i = 0; i < mKeyList.size(); i++) {
+    		String keyItem = mKeyList.get(i);
+    		System.out.println("sheetName["+sheetName+"]key["+i+"] = "+keyItem);
+			
+		}
+    	
+    	File J9_K2_Dynamic_Txt_File = new File(zbinPath+File.separator+"J9_K2_Dynamic_KeyWord_"+sheetName+".txt");
+    	writeContentToFile(J9_K2_Dynamic_Txt_File, mKeyList);
+    	System.out.println("写入 "+J9_K2_Dynamic_Txt_File.getAbsolutePath()+"文件成功!");
+    	
+    }
+
+    
+    
+    
     static boolean isStrEmpty(String tableStr) {
         if (tableStr == null || "".equals(tableStr.trim())) {
             return true;
@@ -2144,6 +2271,7 @@ public class J9_Wisl_Log_Search {
 
     public static final ArrayList<AbstractKeyEntry> keyEntryList = new ArrayList<AbstractKeyEntry>();
 
+    // 从 xlsx 中 读取的 关键字的 组成的 AbstractKeyEntry 的 集合
     public static final Map<String, ArrayList<AbstractKeyEntry>> EntryList_Map = Maps.newLinkedHashMap();
     public static ArrayList<String> EntryKey_List = new ArrayList<String>();
 

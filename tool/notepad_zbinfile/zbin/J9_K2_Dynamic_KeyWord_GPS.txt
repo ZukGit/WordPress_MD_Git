@@ -1,0 +1,50 @@
+GnssLocationProvider: stopNavigating
+GnssLocationProvider: receive broadcast intent, action: android.intent.action.SCREEN_ON
+GnssLocationProvider: receive broadcast intent, action: android.intent.action.SCREEN_OFF
+GnssLocationProvider: SV
+GnssLocationProvider: PRN
+GnssLocationProvider: SNR
+GnssLocationProvider: ELE
+GnssLocationProvider: AZM
+GnssLocationProvider: FRQ
+GnssLocationProvider: FLG
+GnssLocationProvider: GPS_STATUS_ENGINE_ON
+GnssLocationProvider: GPS_STATUS_ENGINE_OFF
+GnssLocationProvider: GPS_STATUS_SESSION_BEGIN
+GnssLocationProvider: GPS_STATUS_SESSION_END
+GnssLocationProvider: TTFF
+LocationManagerService: incoming location: Location
+Location mode: true
+Location mode: false
+GnssLocationProvider: gnssNameCb:
+GnssLocationProvider: SIM MCC/MNC is available:
+GnssLocationProvider: setRequest ProviderRequest[ON
+GnssLocationProvider: startNavigating
+GnssLocationProvider: reportStatus status:
+LocationManagerService: Sending Location to
+LocationManagerService: Started, Location UpdateRecord for
+LocationManagerService: Stopped, Location UpdateRecord for
+E TestRunner: failed:
+GnssTtffTests: (Test: FAIL)
+LocSvc_
+CtsTestRunListener: Now executing :
+GNSS HAL Requesting location updates from
+provider doesn't exist:
+Unable to request location
+injectXtraData success
+Used In Fix:
+GnssManager: GNSS_
+Sending Location to com.baidu.map.location.test
+new cell broadcast message
+reportLocation: Location
+BaiduNetworkLocation onBind receive action
+UpdateRecord for com.android.phone
+Sending Location to com.android.phone
+Sending Location to com.waze
+Sending Location to com.google.android.apps.maps
+Sending Location to com.baidu.BaiduMap
+Sending Location to com.autonavi.minimap
+Sending Location to com.motorola.duogpstest
+AgpsApn :
+SUPL network connection
+SUPL: got TCP Error
