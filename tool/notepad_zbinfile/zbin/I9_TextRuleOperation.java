@@ -445,83 +445,86 @@ public class I9_TextRuleOperation {
 
 		// 依据当前每行的字符串 羽 每个文件的md5去判断  如果文件的md5包含在输入字符串行中 那么删除这个文件
 		CUR_RULE_LIST.add(new Delete_File_WithMD5_Rule_47());
-		
-		
+
+		// 读取当前所有的子目录 子文件夹下的文件生成 md5 字符串到 txt 中
+		CUR_RULE_LIST.add(new Read_File_ToMD5_Rule_48());
+
+
 		//  去除当前分析Log文件中的提示中信息,读取 J9_I9_Dynamic_ClearDesc.txt   并过滤当前每一行
 		// jira comment 中  有要求  尽量不写中文
-		CUR_RULE_LIST.add(new Clear_Wisl_Chinese_Tip_Rule_48());
-		
-		
-		
+		CUR_RULE_LIST.add(new Clear_Wisl_Chinese_Tip_Rule_49());
+
+
+
 //        CUR_RULE_LIST.add( new Image2Png_Rule_4());
 //        CUR_RULE_LIST.add( new AVI_Rule_5());
 //        CUR_RULE_LIST.add( new SubDirRename_Rule_6());
 //        CUR_RULE_LIST.add( new Encropty_Rule_7());
 //        CUR_RULE_LIST.add( new ClearChineseType_8());
 
-		
-		
+
+
 	}
 
-	
+
 	//  去除当前分析Log文件中的提示中信息,读取 J9_I9_Dynamic_ClearDesc.txt   并过滤当前每一行
 	// jira comment 中  有要求  尽量不写中文
-	class Clear_Wisl_Chinese_Tip_Rule_48 extends Basic_Rule {
+	class Clear_Wisl_Chinese_Tip_Rule_49 extends Basic_Rule {
 
 		File J9_I9_Dynamic_ClearDesc_File ;  // 读取需要 清楚的 文件
 		ArrayList<String> clearDescList ;   // 从 需要清除的文件读取到的内容
-		ArrayList<String> clearDescConentList ; // 执行完清除逻辑之后的 内容 
-		Clear_Wisl_Chinese_Tip_Rule_48() {
-			super(48, false);
-		
+		ArrayList<String> clearDescConentList ; // 执行完清除逻辑之后的 内容
+		Clear_Wisl_Chinese_Tip_Rule_49() {
+			super(49, false);
+
 			J9_I9_Dynamic_ClearDesc_File = new File(zbinPath+File.separator+"J9_I9_Dynamic_ClearDesc.txt");
 		}
-		
-		
+
+
 		@Override
 		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
 										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
-			
+
 			if(!J9_I9_Dynamic_ClearDesc_File.exists()) {
 				System.out.println("当前 J9_I9_Dynamic_ClearDesc_File="+J9_I9_Dynamic_ClearDesc_File.getAbsolutePath()+" 为空 请检查!");
-			    return null;
+				return null;
 			}
-			
-			
+
+
 			clearDescList = ReadFileContentAsList(J9_I9_Dynamic_ClearDesc_File);
-			
+
 			if(clearDescList == null || clearDescList.size() == 0) {
 				System.out.println("当前 Clear_Wisl_Chinese_Tip_Rule_48 中读取"+J9_I9_Dynamic_ClearDesc_File.getAbsolutePath()+" 得到的数据为空 请检查!");
-			    return null;
-			
+				return null;
+
 			}
-			
+
 			clearDescConentList = new ArrayList<String>();
-			
-			
+
+
 			for (int i = 0; i < curInputFileList.size(); i++) {
 
 				File fileItem = curInputFileList.get(i);
 				System.out.println("file["+i+"]["+curInputFileList.size()+"] "+ fileItem.getAbsolutePath() );
 				ArrayList<String> contentList = ReadFileContentAsList(fileItem);
 
-		
+
 				for (int j = 0; j < contentList.size(); j++) {
 					String lineContent = contentList.get(j);
 					if(lineContent == null || "".equals(lineContent) ) {
 						clearDescConentList.add("");
 						continue;
 					}
-					
+
 					String clearLineContent = lineContent;
-					
+
 					for (int k = 0; k < clearDescList.size(); k++) {
 						String fixedItem = clearDescList.get(k);
 						clearLineContent = clearLineContent.replace(fixedItem,"");
-		
+
 					}
 					clearDescConentList.add(clearLineContent);
-				
+
 
 				}
 
@@ -534,17 +537,99 @@ public class I9_TextRuleOperation {
 			return super.applyOperationRule(curFileList, subFileTypeMap, curDirList, curRealFileList);
 		}
 
-		
-	
+
+
 		@Override
 		String simpleDesc() {
 			return " 去除当前分析Log文件中的提示中信息,读取 J9_I9_Dynamic_ClearDesc.txt得到要清除的中文字符串 并过滤当前每一行 jira comment 中  有要求  尽量不写中文";
 		}
 
-		
+
 	}
-	
-	
+
+
+	// 读取当前所有的子目录 子文件夹下的文件生成 md5 字符串到 txt 中
+	class Read_File_ToMD5_Rule_48 extends Basic_Rule {
+
+		Read_File_ToMD5_Rule_48() {
+			super(48, true);
+
+		}
+
+		@Override
+		boolean checkParamsOK(File shellDir, String type2Param, ArrayList<String> otherParams) {
+			return true;
+		}
+
+		@Override
+		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+
+
+			ArrayList<String> readMD5List = new ArrayList<String> ();
+
+			File inputDir = null;
+			for (int i = 0; i < curInputFileList.size(); i++) {
+
+				File fileItem = curInputFileList.get(i);
+				inputDir = 	fileItem.getParentFile();
+				System.out.println("file["+i+"]["+curInputFileList.size()+"] "+ fileItem.getAbsolutePath() );
+
+
+			}
+			if(inputDir == null){
+				System.out.println("当前输入的 文件夹路径 inputDir 为空! 请检查!! " );
+				return null;
+			}
+
+			ArrayList<File>  allMatchFileList = 	getAllSubFile(inputDir,null);
+			System.out.println("inputDir = "+ inputDir.getAbsolutePath() );
+			if(allMatchFileList == null || allMatchFileList.size() == 0){
+				System.out.println("当前文件夹 列表为空! 没有文件 请检查!!" );
+				return  null;  //
+			}
+			System.out.println("allMatchFileList.size() = "+ allMatchFileList.size() );
+			for (int i = 0; i < allMatchFileList.size(); i++) {
+
+				File realfileItem = allMatchFileList.get(i);
+//				System.out.println("file["+i+"]["+curRealFileList.size()+"] "+ realfileItem.getAbsolutePath() );
+
+				String filemd5 = getMD5Three(realfileItem.getAbsolutePath());
+				if(!readMD5List.contains(filemd5)){
+					readMD5List.add(filemd5);
+
+				}
+			}
+
+			if(readMD5List.size() == 0 ){
+				System.out.println("当前输入的 文件 为空 无法输出 MD5 列表 !!" );
+			}else{
+
+				for (int i = 0; i < readMD5List.size(); i++) {
+					String fileMd5Str = readMD5List.get(i);
+					System.out.println("File["+i+"] = "+ fileMd5Str);
+				}
+
+				writeContentToFile(I9_Temp_Text_File, readMD5List);
+				NotePadOpenTargetFile(I9_Temp_Text_File.getAbsolutePath());
+				System.out.println("rule_" + rule_index + " ->打印当前目录下的所有文件的 MD5字符串 保留内容到 TEMP TXT 文件");
+
+				System.out.println("打印当前目录下的所有文件的 MD5字符串 操作成功!" );
+			}
+
+			return super.applyOperationRule(curFileList, subFileTypeMap, curDirList, curRealFileList);
+		}
+
+
+
+		@Override
+		String simpleDesc() {
+			return "读取当前所有的子目录 子文件夹下的文件生成 md5 字符串到 txt 中 ";
+		}
+
+	}
+
+	// 依据当前每行的MD5字符串 与 每个文件的md5去判断  如果文件的md5包含在输入字符串行中 那么删除这个文件
 	// 依据当前每行的MD5字符串 与 每个文件的md5去判断  如果文件的md5包含在输入字符串行中 那么删除这个文件
 	class Delete_File_WithMD5_Rule_47 extends Basic_Rule {
 
@@ -580,7 +665,7 @@ public class I9_TextRuleOperation {
 				return null;
 			}
 
-		ArrayList<File>  allMatchFileList = 	getAllSubFile(inputDir,null);
+			ArrayList<File>  allMatchFileList = 	getAllSubFile(inputDir,null);
 			System.out.println("inputDir = "+ inputDir.getAbsolutePath() );
 			if(inputMD5List == null || inputMD5List.size() == 0){
 				System.out.println("当前输入的 MD5 列表为空!  请检查!!" );
@@ -703,7 +788,7 @@ public class I9_TextRuleOperation {
 
 	}
 
-/*	*//**
+	/*	*//**
 	 * BASE64解密
 	 * @throws Exception
 	 *//*
