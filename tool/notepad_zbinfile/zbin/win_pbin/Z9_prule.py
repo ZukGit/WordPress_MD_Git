@@ -11,7 +11,7 @@ import traceback
 from pygame.locals import *
 from random import randint
 from random import seed
-
+import  math
 #  全局变量  与系统 息息相关的 项 
 class OS_TYPE(Enum):
     Windows = "windows"
@@ -1178,8 +1178,8 @@ class SnakeConf(object):
     # 蛇运动的场地长宽
     global Device_Height
     global Device_Width
-    WIDTH , HEIGHT= 28, 28     ##  一个方块的宽高像素
-    LINE_WIDTH = 28
+    WIDTH , HEIGHT= 27, 27     ##  一个方块的宽高像素
+    LINE_WIDTH = 27
     LINE_MARGIN = 2
     LINE_TRUEWIDTH = LINE_WIDTH - 2 * LINE_MARGIN
     # SCREEN_X, SCREEN_Y = LINE_WIDTH * HEIGHT, LINE_WIDTH * WIDTH
@@ -3035,12 +3035,163 @@ class TankWar_Rule_5(Basic_Rule):
         return "坦克大战(双人玩)_TankWar"
 ###################### Rule_5 End  ###################### 
 
+###################### Rule_6 Begin  ######################
+
+
+one_time_rule6 = 0.5 #时间流速
+show_n_rule6 = 0
+show_frequency_rule6 = 0.0015 #烟花绽放频率，数值越大频率越高
+yanhua_count_rule6 = 30 # 烟花数量
+
+class Yanhua():
+    is_show = False
+    x, y = 0, 0
+    vy = 0
+    p_list = []
+    color = [0, 0, 0]
+    v = 0
+
+    def __init__(self, x, y, vy, n=300, color=[0, 255, 0], v=10):
+        self.x = x
+        self.y = y
+        self.vy = vy
+        self.color = color
+        self.v = v
+        # self.is_show = True
+        for i in range(n):
+            self.p_list.append([random.random() * 2 * math.pi, 0, v * math.pow(random.random(), 1 / 3)])
+
+    def chongzhi(self,WINDOW_W,WINDOW_H):
+        self.is_show = True
+        self.x = random.randint(WINDOW_W // 2 - 350, WINDOW_W // 2 + 350)
+        self.y = random.randint(int(WINDOW_H / 2), int(WINDOW_H * 3 / 5))
+        self.vy = -40 * (random.random() * 0.4 + 0.8) - self.vy * 0.2
+        color_r_rule5 = random.randint(0, 255)
+        color_g_rule5 = random.randint(0, 255)
+        color_b_rule5 = random.randint(0, 255)
+        self.color = [color_r_rule5,color_g_rule5,color_b_rule5]
+        n = len(self.p_list)
+        self.p_list = []
+        for i in range(n):
+            self.p_list.append([random.random() * 2 * math.pi, 0, self.v * math.pow(random.random(), 1 / 3)])
+
+    def run(self,WINDOW_H,one_time_rule6):
+        global show_n_rule6
+        for p in self.p_list:
+            p[1] = p[1] + (random.random() * 0.6 + 0.7) * p[2]
+            p[2] = p[2] * 0.97
+            if p[2] < 1.2:
+                self.color[0] *= 0.9999
+                self.color[1] *= 0.9999
+                self.color[2] *= 0.9999
+
+            if max(self.color) < 10 or self.y>WINDOW_H+p[1]:
+                show_n_rule6 -= 1
+                self.is_show = False
+                break
+        self.vy += 10 * one_time_rule6
+        self.y += self.vy * one_time_rule6
+
+
+
+def rule6_main(yanhua_count):
+    pygame.init()
+    screenInfo = pygame.display.Info()
+    PANEL_width = screenInfo.current_w
+    PANEL_highly = screenInfo.current_h
+    FONT_PX = 15
+    global show_n_rule6
+    screen = pygame.display.set_mode((PANEL_width, PANEL_highly))  # 全屏模式
+    # global Device_Width
+    # global Device_Height
+    # screen = pygame.display.set_mode((Device_Width, Device_Height))  # 全屏模式
+    font = pygame.font.SysFont("arial", 20)
+    bg_suface = pygame.Surface((PANEL_width, PANEL_highly), flags=pygame.SRCALPHA)
+    pygame.Surface.convert(bg_suface)
+    bg_suface.fill(pygame.Color(0, 0, 0, 28))
+
+    sound_wav_rule6 = pygame.mixer.music.load(pbinPath+"\\Z9\\rule6_file\\yanhua.mp3")  
+    #  pygame.mixer.music.load('res/bg.mp3')
+    pygame.mixer.music.set_volume(0.2)
+    pygame.mixer.music.play()
+    pygame.display.set_caption("烟花")
+    print("rule6_main.yanhua_count:"+str(yanhua_count))
+    # 加载图片,音乐,音效.
+    background_image     = pygame.image.load(pbinPath+"\\Z9\\rule6_file\\background.jpg")
+    screen.fill((0, 0, 0))
+    screen.blit(background_image, (0, 0))
+    yanhua_list = []
+    for i in range(yanhua_count):
+        color_r_rule6 = random.randint(0, 255)
+        color_g_rule6 = random.randint(0, 255)
+        color_b_rule6 = random.randint(0, 255)
+        speed_rule6 =  random.randint(10, 30)
+        yanhua_list.append(Yanhua(300, 300, -20, n=100, color=[color_r_rule6, color_g_rule6, color_b_rule6], v=speed_rule6))
+
+    clock = pygame.time.Clock()
+    # 游戏主循环
+    while True:
+        if not pygame.mixer.music.get_busy():
+            pygame.mixer.music.play()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                # 接收到退出时间后退出程序
+                exit()
+    
+        # 将背景图画上去
+        screen.fill((0, 0, 0))
+        #screen.blit(background_image, (0, 0))
+        # 放烟花
+        for i, yh in enumerate(yanhua_list):
+            if not yh.is_show:
+                yh.is_show = False
+                if random.random() < show_frequency_rule6 * (len(yanhua_list) - show_n_rule6):
+                    show_n_rule6 += 1
+                    yh.chongzhi(PANEL_width,PANEL_highly)
+                continue
+            yh.run(PANEL_highly,one_time_rule6)
+            for p in yh.p_list:
+                x, y = yh.x + p[1] * math.cos(p[0]), yh.y + p[1] * math.sin(p[0])
+                if random.random() < 0.055:
+                    screen.set_at((int(x), int(y)),(255,255,255))
+                else:
+                    screen.set_at((int(x), int(y)), (int(yh.color[0]), int(yh.color[1]), int(yh.color[2])))
+    
+        # 刷新画面
+        pygame.display.update()
+        # 返回上一个调用的时间（ms）
+        time_passed = clock.tick(25)
+
+
+
+class YanHua_Rule_6(Basic_Rule):
+
+    def __init__(self, rule_index, operation_type):
+        self.rule_index = rule_index
+        self.operation_type = operation_type
+
+#    def __init__(self, rule_index, operation_type,file_type):
+#        self.rule_index = rule_index
+#        self.operation_type = operation_type
+#        self.file_type = file_type
+
+
+    def applyNoParamOperationRule0(self):
+        global yanhua_count_rule6
+        rule6_main(yanhua_count_rule6);# 烟花的数量
+
+    def simpleDesc(self):
+        return "屏幕打印烟花"
+
+###################### Rule_6 End  ######################
+
 def initRule():
     realTypeRuleList.append(CodeRain_Rule_1(1,0));
     realTypeRuleList.append(PlaneWars_Rule_2(2,0));
     realTypeRuleList.append(AI_SnakeEatFood_Rule_3(3,0));
     realTypeRuleList.append(SnakeEatFood_Rule_4(4,0));
     realTypeRuleList.append(TankWar_Rule_5(5,0));
+    realTypeRuleList.append(YanHua_Rule_6(6,0));
     
     print("当前规则数量:"+str(len(realTypeRuleList)))
 
