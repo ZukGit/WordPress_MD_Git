@@ -698,6 +698,7 @@ public class G2_ApplyRuleFor_TypeFile {
 						continue;
 					}
 
+					System.out.println("完成第["+i+"] 个_DST_文件复制 dst["+dstFile+"][Size:"+dstFile.length()+"][MD5:"+getMD5Three(dstFile.getAbsolutePath())+"]");
 
 					if(dstFile.exists()) {
 						dstFile.delete();
@@ -705,7 +706,6 @@ public class G2_ApplyRuleFor_TypeFile {
 
 					fileCopy(srcItem, dstFile);
 
-					System.out.println("完成第["+i+"] 个_DST_文件复制 dst["+dstFile+"][Size:"+dstFile.length()+"][MD5:"+getMD5Three(dstFile.getAbsolutePath())+"]");
 
 				}
 
