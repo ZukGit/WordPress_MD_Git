@@ -97,6 +97,9 @@ public class J0_TushareTool {
     // zukgitA
     // zstock_tushare_tool_J0.bat  make_dynamic_batsh     
     static boolean is_Make_Dynamic_Bat_SH = false ;  // 输入的参数是否有 make_dynamic_bat  这个参数 如果 有 那么需要执行额外的逻辑
+    
+    // 
+    
     //  J0_Dynamic_Bat.bat  J0_Dynamic_Bat.sh
     static File dynamic_Bat_SH_File = new File(System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin" + File.separator + "J0_Dynamic_Bat.bat");   // 动态 写入 执行命令的  bat 文件     J0_Dynamic_Bat.bat  J0_Dynamic_Bat.sh
     static ArrayList<String> dynamicBatShContentList = new ArrayList<>(); //  用于存放 动态执行内容的 数组
@@ -1704,9 +1707,16 @@ writeContentToFile(dailyPythonFile,allDailyCode);
                 String Cur_J0_GuPiao_Analysis_Bat_Name = "zgupiao_analysis_J0"+BAT_OR_SH_Point;
                 
          		// zgupiao_analysis_J0.bat  #_1  yyyymmdd_20220303
-                tempSB.append(win_zbinPath+File.separator+Cur_J0_GuPiao_Analysis_Bat_Name+"  _1  yyyymmdd_"+lastTradeDay+" ");
+                tempSB.append(win_zbinPath+File.separator+Cur_J0_GuPiao_Analysis_Bat_Name+"  _1  yyyymmdd_"+lastTradeDay+" && ");
 
            		
+                // 对生成的 day_2022_0630  之类的 文件  进行动态计算  往 json 中 添加 day3 day5  day10 day15 之类的数据 
+                //  zdaily_stock_json_operation_J0.bat #_1 day_20220630
+                String Cur_J0_Daily_Json_Operation_Bat_Name = "zdaily_stock_json_operation_J0"+BAT_OR_SH_Point;
+                tempSB.append(win_zbinPath+File.separator+Cur_J0_Daily_Json_Operation_Bat_Name+"  _1  day_"+lastTradeDay+" ");
+
+                
+                
          		dynamicBatShContentList.add(tempSB.toString());
          		
            		
