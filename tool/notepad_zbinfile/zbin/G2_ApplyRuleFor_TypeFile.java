@@ -656,10 +656,12 @@ public class G2_ApplyRuleFor_TypeFile {
 				String dstMatchFilePath = dst_Dir.getAbsolutePath()+File.separator+name;
 				File dstMatchFile = new File(dstMatchFilePath);
 
+
+
 				if(dstMatchFile.exists()) {
 					// 源文件大小要大于 10
 					long srcFileSize = fileItem.length();
-					long dstFileSize = fileItem.length();
+					long dstFileSize = dstMatchFile.length();
 					long diffSize = Math.abs(dstFileSize - srcFileSize);
 
 					if(dstMatchFile.length() != fileItem.length()   // 两个文件的大小不一样才执行 copy
