@@ -4,7 +4,10 @@
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-
+import com.alibaba.fastjson.parser.ParserConfig;
+import com.alibaba.fastjson.serializer.SerializeConfig;
+import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.alibaba.fastjson.serializer.ValueFilter;
 
 import net.sourceforge.pinyin4j.PinyinHelper;
 import net.sourceforge.pinyin4j.format.HanyuPinyinCaseType;
@@ -19,7 +22,7 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.io.*;
-
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.*;
 import java.nio.channels.FileChannel;
@@ -376,6 +379,12 @@ public class J0_Dynamic_AppendData_JsonTool {
 	}
 
 	
+	
+	
+	
+
+
+
 	// 动态的对当前指定日期 的 json 文件进行 填充数据的操作
 	// 输入一个指定的日期参数 找到这个参数对应的 json文件 然后 依次读取 
 	 // 前3 天 的 json文件(含自身文件)   动态计算 这3天的 涨幅的和 填充到 参数文件
@@ -550,6 +559,10 @@ public class J0_Dynamic_AppendData_JsonTool {
         			continue;
         		}
         		
+        		
+        		
+        		// "day3_pct_chg":0.2802000000000001,
+        		
         		ArrayList<RiXianXingQingvShiJianWeiXu> day3_rixianList = getSubList_RiXian(3, match_rixianList);
         		
            		ArrayList<RiXianXingQingvShiJianWeiXu> day5_rixianList = getSubList_RiXian(5, match_rixianList);
@@ -569,10 +582,25 @@ public class J0_Dynamic_AppendData_JsonTool {
 			}
         	
         }
+       
         
+        ValueFilter filter = new ValueFilter() {
+            @Override
+            public Object process(Object object, String name, Object value) {
+                if(value instanceof BigDecimal || value instanceof Double || value instanceof Float){
+                    return new BigDecimal(value.toString());
+                }
+                return value;
+            }
+        };
         
-        JSONArray  rixian_jsonarr =   JSONArray.parseArray(JSON.toJSONString(mTargetDay_RiXianList));
+//        ParserConfig
+//        SerializeConfig 
+        // 	// "day3_pct_chg":0.2802000000000001,   解决  double 显示精度的问题 
+        JSONArray  rixian_jsonarr =   JSONArray.parseArray(JSON.toJSONString(mTargetDay_RiXianList,filter, new SerializerFeature[0]));
         
+
+
         
         mTargetDay_JsonObject.remove(mAppendFixedJsonKey);  // 去除原先的 key 以及对应的数据
         mTargetDay_JsonObject.put(mAppendFixedJsonKey, rixian_jsonarr);  // 添加新的 day3 day5 xx 的 key 

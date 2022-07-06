@@ -666,7 +666,7 @@ public class G2_ApplyRuleFor_TypeFile {
 
 					if(dstMatchFile.length() != fileItem.length()   // 两个文件的大小不一样才执行 copy
 							&& fileItem.length() > 10   // 源文件的大小要大于10 才执行 copy
-							&& diffSize > 10) {   // 两个文件的差异要大于10 才 执行 copy 文件
+							&& diffSize > 100) {   // 两个文件的差异要大于100 才 执行 copy 文件
 
 						// 原目录 有这个文件 但是和 dst 目录不一致 那么也加入 copy 列表
 						needCopyFileList.add(fileItem);
