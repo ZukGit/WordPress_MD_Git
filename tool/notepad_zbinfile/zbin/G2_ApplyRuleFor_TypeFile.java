@@ -527,6 +527,7 @@ public class G2_ApplyRuleFor_TypeFile {
 		//  需要执行 从 src 复制到 dst 的 实体文件的 对应关系
 		HashMap<File,File> srcFile_dstFile_Map;
 		ArrayList<File> needCopyFileList = new ArrayList<File>();  //  需要 进行 复制操作的文件(文件大小不一样)
+		private File copyFileItem;
 		SrcDir_Copy2_DstDir_WithFileLength_Rule_51() {
 			super("#", 51, 4); //
 
@@ -616,11 +617,14 @@ public class G2_ApplyRuleFor_TypeFile {
 		}
 
 
+		 //  如果当前的需要 提交的 文件中 不包含 json 文件  那么  不提交这次文件 以达到 省空间的 目的 
+		 //  xlsx 每次更新都是全替换  而不是 部分替换 导致 更新文件大小过大 
+		
 		@Override
 		String simpleDesc() {
 
-			return "\n"+Cur_Bat_Name + " #_"+rule_index+"  src_xxxxxx  dst_xxxxx    //  把 当前的 原目录中的所有文件 复制到 对应目录的文件， 如果文件大小一直 那么就跳过复制的过程  \n"
-					+ Cur_Bat_Name + "  #_"+rule_index+   " src_  dst_  ###  把 当前的 原目录中的所有文件 复制到 对应目录的文件， 如果文件大小一直 那么就跳过复制的过程   \n"
+			return "\n"+Cur_Bat_Name + " #_"+rule_index+"  src_xxxxxx  dst_xxxxx    //  把 当前的 原目录中的所有文件 复制到 对应目录的文件， 额外必须包含json文件   更新stock-xlsx时使用 如果文件大小一致 那么就跳过复制的过程  \n"
+					+ Cur_Bat_Name + "  #_"+rule_index+   " src_  dst_  ###  把 当前的 原目录中的所有文件 复制到 对应目录的文件，xlsx 每次更新都是全替换 而不是 部分替换 导致 更新文件大小过大 特用更新ActionDemo 一天只更新一次   \n"
 					+ ""
 //			zrule_apply_G2.bat  #_46  copyright_show  harddir_true
 					;
@@ -685,7 +689,8 @@ public class G2_ApplyRuleFor_TypeFile {
 			System.out.println("当前 需要执行 Copy 操作的 文件 的 总数 : "+ needCopyFileList.size());
 			System.out.println("开始执行 ———————— Copy-Operation begin —————");
 
-			if(needCopyFileList.size() > 0 ) {
+	
+			if(needCopyFileList.size() > 0 && isContainJsonFile(needCopyFileList)) {
 				for (int i = 0; i < needCopyFileList.size(); i++) {
 
 					File srcItem = needCopyFileList.get(i);
@@ -719,6 +724,21 @@ public class G2_ApplyRuleFor_TypeFile {
 		}
 
 
+		boolean isContainJsonFile(ArrayList<File> mCopyFileList) {
+			for (int i = 0; i < mCopyFileList.size(); i++) {
+				File copyFileItem = mCopyFileList.get(i);
+				String fileName_lower = copyFileItem.getName().toLowerCase().trim();
+				System.out.println("copyFileItem["+i+"]"+ copyFileItem.getAbsolutePath());
+
+				if(fileName_lower != null && fileName_lower.endsWith(".json")) {
+					System.out.println("当前 复制 目录 包含 json 文件:"+ copyFileItem.getAbsolutePath()+" 将执行复制操作!");
+					return true;
+				}
+			}
+			System.out.println("当前 复制文件列表 目录 不包含 json 文件      将不执行复制操作!");
+
+			return false;
+		}
 
 
 	}
