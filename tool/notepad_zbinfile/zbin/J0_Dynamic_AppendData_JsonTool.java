@@ -535,7 +535,7 @@ public class J0_Dynamic_AppendData_JsonTool {
                 
                 for (int j = 0; j < sheetValueJSONArray.size(); j++) {
                 	Object obj = sheetValueJSONArray.get(j);
-                	System.out.println(obj);
+//                	System.out.println(obj);
                 	
 				}
                 
@@ -586,7 +586,7 @@ public class J0_Dynamic_AppendData_JsonTool {
 
 			if(mTargetDay_RiXianList != null && mTargetDay_RiXianList.size() > 0 ) {
 
-		int oneYearJsonCount =	getCurrentYearJsonFileCount(oneYear_FileList);
+		int oneYearJsonCount =	getMatchYearJsonFileCount(oneYear_FileList,inputDayInt);
         	for (int i = 0; i < mTargetDay_RiXianList.size(); i++) {
         		
         		RiXianXingQingvShiJianWeiXu rixianItem = mTargetDay_RiXianList.get(i);
@@ -687,14 +687,16 @@ public class J0_Dynamic_AppendData_JsonTool {
 		}
 
 
-		int getCurrentYearJsonFileCount( ArrayList<File> oneYear_FileList ){
+		int getMatchYearJsonFileCount( ArrayList<File> oneYear_FileList ,int dayFlag ){  // // 从输入获得 年份
 			int curYearFileCount = 0 ;
 			if(oneYear_FileList == null || oneYear_FileList.size() == 0){
 				return curYearFileCount;
 			}
 
 
-			int yearBeginInt = getCurrentYYYY()*10000+101;
+			// 从输入获得 年份  (inputDayInt/10000)
+//			int yearBeginInt = getCurrentYYYY()*10000+101;   // 获得现在的年份
+			int yearBeginInt = (dayFlag/10000)*10000+101;  // 从输入获得 年份
 			for (int i = 0; i < oneYear_FileList.size() ; i++) {
 				File jsonFileItem = oneYear_FileList.get(i);
 				String mDailyJsonName = jsonFileItem.getName().toLowerCase();
