@@ -391,6 +391,12 @@ public class J0_Dynamic_AppendData_JsonTool {
 	 // 前5 天 的 json文件(含自身文件)   动态计算 这5天的 涨幅的和 填充到 参数文件
 	 // 前10 天 的 json文件(含自身文件)   动态计算 这10天的 涨幅的和 填充到 参数文件
 	 // 前15 天 的 json文件(含自身文件)   动态计算 这15天的 涨幅的和 填充到 参数文件
+
+	// 前30 天 的 json文件(含自身文件)   动态计算 这5天的 涨幅的和 填充到 参数文件
+	// 前60 天 的 json文件(含自身文件)   动态计算 这10天的 涨幅的和 填充到 参数文件
+	// 前90 天 的 json文件(含自身文件)   动态计算 这15天的 涨幅的和 填充到 参数文件
+	// 前一年 的 json文件(含自身文件)   动态计算 这15天的 涨幅的和 填充到 参数文件
+
 	class Append_Day_3_5_10_15_FlowRate_Rule_1 extends  Basic_Rule{
 		
 		String inputDayStr ;  // 用户的输入的 参数  day_20220630   指定需要执行的日期 
@@ -403,7 +409,7 @@ public class J0_Dynamic_AppendData_JsonTool {
 	    JSONObject mTargetDay_JsonObject ; // 读取到的 目标 daily json 文件的 JSONObject
 	    
 	     // 从 mTargetDay_JsonObject 读取到的 日线行情数据  需要动态改里面的内容 
-	     List<J0_Dynamic_AppendData_JsonTool.RiXianXingQingvShiJianWeiXu> mTargetDay_RiXianList= null ;
+	     List<RiXianXingQingvShiJianWeiXu> mTargetDay_RiXianList= null ;
 	      String mAppendFixedJsonKey = "日线行情v时间为序";
 	     
 		Append_Day_3_5_10_15_FlowRate_Rule_1(){
@@ -463,7 +469,38 @@ public class J0_Dynamic_AppendData_JsonTool {
 		}
 		System.out.println("当前 依据匹配到的文件 "+matchJsonDayFile+" 计算得到的 json数据文件列表大小="+matchTargetFileList.size()  );
 
-			
+
+			matchTargetFileList.sort(new Comparator<File>() {
+				@Override
+				public int compare(File o1, File o2) {
+
+
+					String mDailyNumberStr_o1 = o1.getName().toLowerCase().replace("day","").replace("_","")
+							.replace(" ","").replace("json","")
+							.replace(".","").trim();
+
+					String mDailyNumberStr_o2 = o2.getName().toLowerCase().replace("day","").replace("_","")
+							.replace(" ","").replace("json","")
+							.replace(".","").trim();
+
+					if(isNumeric(mDailyNumberStr_o1) && isNumeric(mDailyNumberStr_o2) ){
+
+						int curDayInt_o1 = 	Integer.parseInt(mDailyNumberStr_o1);
+						int curDayInt_o2 = 	Integer.parseInt(mDailyNumberStr_o2);
+						if(curDayInt_o1 > curDayInt_o2){
+							return -1;
+						} else if(curDayInt_o1 == curDayInt_o2){
+							return 0;
+						}else{
+
+							return 1;
+						}
+
+					}
+
+					return o1.getName().compareTo(o2.getName());
+				}
+			});
 		
 		for (int i = 0; i < matchTargetFileList.size(); i++) {
 			File fileItem  = matchTargetFileList.get(i);
@@ -502,7 +539,7 @@ public class J0_Dynamic_AppendData_JsonTool {
                 	
 				}
                 
-                mTargetDay_RiXianList = JSONObject.parseArray(sheetValueJSONArray.toString(),J0_Dynamic_AppendData_JsonTool.RiXianXingQingvShiJianWeiXu.class);
+                mTargetDay_RiXianList = JSONObject.parseArray(sheetValueJSONArray.toString(), RiXianXingQingvShiJianWeiXu.class);
             
                 if(mTargetDay_RiXianList == null) {
                 	System.out.println("把 jsonArr 的字符串 转为 List<Stock_Daily_Basic> 数组的过程失败! ");
@@ -530,11 +567,12 @@ public class J0_Dynamic_AppendData_JsonTool {
         //  把 所有的  需要 读取的文件集合 又 作为 一个集合
         // 最多 读取到  15  json 文件  需要 解析这些 json  转为 
         // HashMap<String,ArrayList<RiXianXingQingvShiJianWeiXu>> matchJsonArrMap; 的 一项数据
-		ArrayList<File> day15_FileList = getSubList(15, matchTargetFileList);
-		initRiXianXingQingMap(mAppendFixedJsonKey ,day15_FileList);
-		// 
+//		ArrayList<File> day15_FileList = getSubList(15, matchTargetFileList);
+//		initRiXianXingQingMap(mAppendFixedJsonKey ,day15_FileList);
 
-
+		//
+		ArrayList<File> oneYear_FileList = getSubList(365, matchTargetFileList);   //  最多一年的数据
+		initRiXianXingQingMap(mAppendFixedJsonKey ,oneYear_FileList);
 	
 		
 		
@@ -544,10 +582,11 @@ public class J0_Dynamic_AppendData_JsonTool {
 		
 		
         // 试一试把  rootRiXianList 的 每个item 的 day3 
-        
-        if(mTargetDay_RiXianList != null && mTargetDay_RiXianList.size() > 0 ) {
-        	
-        	
+			System.out.println( "  size="+(mTargetDay_RiXianList == null ? 0:mTargetDay_RiXianList.size()) + " mTargetDay_RiXianList =  "+mTargetDay_RiXianList);
+
+			if(mTargetDay_RiXianList != null && mTargetDay_RiXianList.size() > 0 ) {
+
+		int oneYearJsonCount =	getCurrentYearJsonFileCount(oneYear_FileList);
         	for (int i = 0; i < mTargetDay_RiXianList.size(); i++) {
         		
         		RiXianXingQingvShiJianWeiXu rixianItem = mTargetDay_RiXianList.get(i);
@@ -570,19 +609,34 @@ public class J0_Dynamic_AppendData_JsonTool {
            		ArrayList<RiXianXingQingvShiJianWeiXu> day10_rixianList = getSubList_RiXian(10, match_rixianList);
         		
            		ArrayList<RiXianXingQingvShiJianWeiXu> day15_rixianList = getSubList_RiXian(15, match_rixianList);
-        		
-           		
+
+
+				ArrayList<RiXianXingQingvShiJianWeiXu> day30_rixianList = getSubList_RiXian(30, match_rixianList);
+
+				ArrayList<RiXianXingQingvShiJianWeiXu> day60_rixianList = getSubList_RiXian(60, match_rixianList);
+
+				ArrayList<RiXianXingQingvShiJianWeiXu> day90_rixianList = getSubList_RiXian(90, match_rixianList);
+
+				ArrayList<RiXianXingQingvShiJianWeiXu> one_year_rixianList = getSubList_RiXian(oneYearJsonCount, match_rixianList);
+
         		// 每次 都 要读 json   应该只读 一次
         	
         		rixianItem.setDay3_pct_chg(cal_sum_pct_chg(day3_rixianList));
         		rixianItem.setDay5_pct_chg(cal_sum_pct_chg(day5_rixianList));
         		rixianItem.setDay10_pct_chg(cal_sum_pct_chg(day10_rixianList));
         		rixianItem.setDay15_pct_chg(cal_sum_pct_chg(day15_rixianList));
-				
+				rixianItem.setDay30_pct_chg(cal_sum_pct_chg(day30_rixianList));
+				rixianItem.setDay60_pct_chg(cal_sum_pct_chg(day60_rixianList));
+				rixianItem.setDay90_pct_chg(cal_sum_pct_chg(day90_rixianList));
+
+				double cal_year_sum_pct_chg = cal_sum_pct_chg(one_year_rixianList);
+				System.out.println(match_tscode+"  oneYearJsonCount="+oneYearJsonCount+"  cal_year_sum_pct_chg = "+cal_year_sum_pct_chg+"   one_year_rixianList.size()="+one_year_rixianList.size() +"  match_rixianList.size()="+match_rixianList.size());
+				rixianItem.setYear_pct_chg(cal_year_sum_pct_chg);
 			}
         	
         }
-       
+
+
         
         ValueFilter filter = new ValueFilter() {
             @Override
@@ -613,7 +667,7 @@ public class J0_Dynamic_AppendData_JsonTool {
         // 写回 匹配到的  json 日期文件 使得 目录多出 day3 day5 day 10 day 15 数据
         writeContentToFile(matchJsonDayFile, mTargetDay_JsonObject.toJSONString());
         System.out.println(matchJsonDayFile.getAbsolutePath());
-       System.out.println(" 动态写入 day3 day5 day 10 day 15 数据 数据完成! ");
+       System.out.println(" 动态写入 day3 day5 day 10 day 15   day30 day60  day90  dayyear  数据 数据完成! ");
 		
 		// 1.开始读取 匹配到的 matchJsonDayFile json 文件  作为  母数据源
 		// 2.开始读取前三个 json 文件 动态算出 day3_flowrate   然后赋值给  母数据源
@@ -631,8 +685,47 @@ public class J0_Dynamic_AppendData_JsonTool {
 			return "\n"  +  Cur_Bat_Name + " #_" + rule_index+" day_"+getTimeStamp_yyyyMMdd()+" "+"    ###   动态的对当前指定日期("+getTimeStamp_yyyyMMdd()+")的json文件进行动态的数据填充" ;
 			
 		}
-		
-		
+
+
+		int getCurrentYearJsonFileCount( ArrayList<File> oneYear_FileList ){
+			int curYearFileCount = 0 ;
+			if(oneYear_FileList == null || oneYear_FileList.size() == 0){
+				return curYearFileCount;
+			}
+
+
+			int yearBeginInt = getCurrentYYYY()*10000+101;
+			for (int i = 0; i < oneYear_FileList.size() ; i++) {
+				File jsonFileItem = oneYear_FileList.get(i);
+				String mDailyJsonName = jsonFileItem.getName().toLowerCase();
+				String mDailyNumberStr = mDailyJsonName.replace("day","").replace("_","")
+						.replace(" ","").replace("json","")
+						.replace(".","").trim();
+
+				System.out.println(" getCurrentYearJsonFileCount  mDailyNumberStr["+i+"]="+mDailyNumberStr);
+				if(isNumeric(mDailyNumberStr)){
+
+				int curFileDayInt = 	Integer.parseInt(mDailyNumberStr);
+
+				if(curFileDayInt >= yearBeginInt ){
+					curYearFileCount++;
+				}
+
+				}
+
+				// day_2022_0104.json
+
+
+			}
+
+
+			System.out.println(" getCurrentYearJsonFileCount  curYearFileCount="+curYearFileCount);
+			return curYearFileCount;
+
+
+		}
+
+
 
 		// 每次 都 要读 json   应该只读 一次
 //	
@@ -678,8 +771,8 @@ public class J0_Dynamic_AppendData_JsonTool {
 
 		void  initRiXianXingQingMap(String mJsonKey , ArrayList<File> mJsonFileList){
 // matchJsonArrMap = new HashMap<String,ArrayList<RiXianXingQingvShiJianWeiXu>>();
-			
-			
+
+			System.out.println("initRiXianXingQingMap    mJsonKey="+mJsonKey+"    mJsonFileList.size()="+mJsonFileList.size());
 			for (int i = 0; i < mJsonFileList.size(); i++) {
 				File jsonFileitem = mJsonFileList.get(i);
 				
@@ -695,13 +788,13 @@ public class J0_Dynamic_AppendData_JsonTool {
 		        
 		        if(jsonArr == null) {
 		        	System.out.println("json 文件 "+ jsonFileitem.getAbsolutePath()+" 转为 JSONObject 对象成功! 但获取"+mJsonKey+"  jsonKey 列表失败!   请检查! ");
-		            return;
+		            continue;
 		        }
 		      
 		        // jsonarr ---> list 
 		        
-                  List<J0_Dynamic_AppendData_JsonTool.RiXianXingQingvShiJianWeiXu>     mMatchRiXianList =
-		        		JSONObject.parseArray(jsonArr.toString(),J0_Dynamic_AppendData_JsonTool.RiXianXingQingvShiJianWeiXu.class);
+                  List<RiXianXingQingvShiJianWeiXu>     mMatchRiXianList =
+		        		JSONObject.parseArray(jsonArr.toString(), RiXianXingQingvShiJianWeiXu.class);
 	                 
   
                   if(mMatchRiXianList == null || mMatchRiXianList.size() == 0) {
@@ -737,7 +830,7 @@ public class J0_Dynamic_AppendData_JsonTool {
   
 				
 			}
-			// ShowMap_RiXianXingQing( matchJsonArrMap);
+		//	ShowMap_RiXianXingQing( matchJsonArrMap);
 			System.out.println("matchJsonArrMap.size() = "+ matchJsonArrMap.size());
 	
 		 }
@@ -797,18 +890,74 @@ public class J0_Dynamic_AppendData_JsonTool {
 		   public Double day5_pct_chg;
 		   public Double day10_pct_chg;
 		   public Double day15_pct_chg;
-			 
-		   
-		    @Override
-			public String toString() {
-				return "RiXianXingQingvShiJianWeiXu [amount=" + amount + ", change=" + change + ", close=" + close
-						+ ", cname=" + cname + ", high=" + high + ", low=" + low + ", open=" + open + ", pct_chg=" + pct_chg
-						+ ", pre_close=" + pre_close + ", trade_date=" + trade_date + ", ts_code=" + ts_code + ", vol="
-						+ vol + ", day3_pct_chg=" + day3_pct_chg + ", day5_pct_chg=" + day5_pct_chg + ", day10_pct_chg="
-						+ day10_pct_chg + ", day15_pct_chg=" + day15_pct_chg + "]";
-			}
-		   
-			public Double getDay3_pct_chg() {
+
+		//  动态增加的数据  动态增加的属性
+		public Double day30_pct_chg;
+		public Double day60_pct_chg;
+		public Double day90_pct_chg;
+		public Double year_pct_chg;
+
+
+
+		@Override
+		public String toString() {
+			return "RiXianXingQingvShiJianWeiXu{" +
+					"amount=" + amount +
+					", change=" + change +
+					", close=" + close +
+					", cname='" + cname + '\'' +
+					", high=" + high +
+					", low=" + low +
+					", open=" + open +
+					", pct_chg=" + pct_chg +
+					", pre_close=" + pre_close +
+					", trade_date='" + trade_date + '\'' +
+					", ts_code='" + ts_code + '\'' +
+					", vol=" + vol +
+					", day3_pct_chg=" + day3_pct_chg +
+					", day5_pct_chg=" + day5_pct_chg +
+					", day10_pct_chg=" + day10_pct_chg +
+					", day15_pct_chg=" + day15_pct_chg +
+					", day30_pct_chg=" + day30_pct_chg +
+					", day60_pct_chg=" + day60_pct_chg +
+					", day90_pct_chg=" + day90_pct_chg +
+					", year_pct_chg=" + year_pct_chg +
+					'}';
+		}
+
+		public Double getDay30_pct_chg() {
+			return day30_pct_chg;
+		}
+
+		public void setDay30_pct_chg(Double day30_pct_chg) {
+			this.day30_pct_chg = day30_pct_chg;
+		}
+
+		public Double getDay60_pct_chg() {
+			return day60_pct_chg;
+		}
+
+		public void setDay60_pct_chg(Double day60_pct_chg) {
+			this.day60_pct_chg = day60_pct_chg;
+		}
+
+		public Double getDay90_pct_chg() {
+			return day90_pct_chg;
+		}
+
+		public void setDay90_pct_chg(Double day90_pct_chg) {
+			this.day90_pct_chg = day90_pct_chg;
+		}
+
+		public Double getYear_pct_chg() {
+			return year_pct_chg;
+		}
+
+		public void setYear_pct_chg(Double year_pct_chg) {
+			this.year_pct_chg = year_pct_chg;
+		}
+
+		public Double getDay3_pct_chg() {
 				return day3_pct_chg;
 			}
 
@@ -2061,10 +2210,17 @@ public class J0_Dynamic_AppendData_JsonTool {
 	//  给定需要返回的 数组的个数  然后 过滤返回
 	public static ArrayList<File> getSubList(int limitSize , ArrayList<File> fileList ){
 		ArrayList<File>  subList = new 	ArrayList<File> ();
-		if(fileList == null || fileList.size() < limitSize) {
+		if(fileList == null ) {
 			
 			return subList;
 		}
+
+		// 如果大于 自身大小 那么返回自身
+		if(limitSize >= fileList.size()){
+
+			return fileList;
+		}
+
 		
 		for (int i = 0; i < limitSize; i++) {
 			File item = fileList.get(i);
@@ -2081,11 +2237,15 @@ public class J0_Dynamic_AppendData_JsonTool {
 	//  给定需要返回的 数组的个数  然后 过滤返回
 	public static ArrayList<RiXianXingQingvShiJianWeiXu> getSubList_RiXian(int limitSize , ArrayList<RiXianXingQingvShiJianWeiXu> mList ){
 		ArrayList<RiXianXingQingvShiJianWeiXu>  subList = new 	ArrayList<RiXianXingQingvShiJianWeiXu> ();
-		if(mList == null || mList.size() < limitSize) {
+		if(mList == null ) {
 			
 			return subList;
 		}
-		
+
+		if( mList.size() < limitSize){  // 有些股票新 上市 所以达不到 limitSize的大小 ， 如 一年的 limit  , 那么 全部返回 自身的数据
+
+			return mList;
+		}
 		for (int i = 0; i < limitSize; i++) {
 			RiXianXingQingvShiJianWeiXu item = mList.get(i);
 			subList.add(item);
@@ -2151,6 +2311,12 @@ public class J0_Dynamic_AppendData_JsonTool {
         }
     }
 
-    
+	static int getCurrentYYYY() {
+
+		SimpleDateFormat df = new SimpleDateFormat("yyyy");
+
+		return Integer.parseInt(df.format(new Date()));
+
+	}
 
 }
