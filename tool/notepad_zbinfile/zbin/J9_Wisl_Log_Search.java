@@ -1841,7 +1841,7 @@ public class J9_Wisl_Log_Search {
                 String isPrintOnceStr_4 = null; //4. 是否只打印一次
                 String isIgnoreRepeatStr_5 = null; //5. 是否过滤上下重复
                 String AospPathStr = null;    // AOSP 提示 路径
-
+                String isClipBoard_6 = null; //6. 剪切板  // 默认是true , 只有N 时才是false
 
                 for (int j = 0; j < keyList.size(); j++) {
                     String key = keyList.get(j).trim();
@@ -1870,6 +1870,10 @@ public class J9_Wisl_Log_Search {
                             AospPathStr = rowContentMap.get(key);
                             break;
 
+                        case "剪切板":
+                        	isClipBoard_6 = rowContentMap.get(key);
+                            break;
+                            
                         default:
                             System.out.println("当前没有匹配到 Head--》" + key);
                     }
@@ -1894,16 +1898,25 @@ public class J9_Wisl_Log_Search {
           
                 
                 boolean isMultiKeyWord = keyWord_1.contains("\n");
-                
+                boolean isCopyToDynamicText =  true;
+                if(isClipBoard_6 == null) {
+                	isCopyToDynamicText =  true;
+                }else {
+                    if(  "N".equals(isClipBoard_6) || "n".equals(isClipBoard_6)) {
+                    	isCopyToDynamicText = false;
+                    }
+                	
+                }
+
                 if(isMultiKeyWord) {
                 	String oneLineWord = getPre_N(keyWord_1);
                 	
-                	if(!matchDynamicKeyList.contains(oneLineWord)) {
+                	if(!matchDynamicKeyList.contains(oneLineWord) && isCopyToDynamicText) {
               		  matchDynamicKeyList.add(oneLineWord);
               	}
                 	
                 }else {
-                	if(!matchDynamicKeyList.contains(keyWord_1)) {
+                	if(!matchDynamicKeyList.contains(keyWord_1)  && isCopyToDynamicText) {
                 		  matchDynamicKeyList.add(keyWord_1);
                 	}
                 
