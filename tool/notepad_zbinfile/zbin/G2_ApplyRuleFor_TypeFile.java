@@ -385,8 +385,621 @@ public class G2_ApplyRuleFor_TypeFile {
 		// 去除在 一个文件夹中 多余的相同的 MD5 文件   只保留 一个MD5  去重操作
 		realTypeRuleList.add(new Delete_SameMD5File_OnlyExistOneInDir_Rule_52());
 		// initrule
+
+		// 在 一个 android-studio apk 目录执行的 用于 克隆一个工程到同目录 但工程名称可选
+		realTypeRuleList.add(new Copy_APK_Product_ChangeProductName_Rule_53());
 	}
 
+
+
+	/*
+	 * 1.AndroidManifest.xml 改变 package 包的名称 <manifest
+	 * xmlns:android="http://schemas.android.com/apk/res/android"
+	 * xmlns:tools="http://schemas.android.com/tools"
+	 * package="com.and.zvideo_and_dy_clone1"> 【】
+	 *
+	 * 2. 所有的 import com.and.zvideo_and_dy.*; 都改为 import
+	 * com.and.改为zvideo_and_dy_clone1.*;
+	 *
+	 * 然后再把 对应的 package="com.and.zvideo_and_dy_clone1 的文件夹名称从zvideo_and_dy
+	 * 改为zvideo_and_dy_clone1
+	 *
+	 *
+	 *
+	 * 3.build.gradle
+	 *
+	 * defaultConfig { applicationId "com.and.zvideo_and_dy_clone1"【】 minSdkVersion
+	 * 21 targetSdkVersion 30 versionCode 1 versionName "1.0"
+	 *
+	 * testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner" }
+	 *
+	 * 4.settings.gradle rootProject.name = "zvideo_and_dy_clone1"
+	 *
+	 *
+	 * 5.所有的 Java 文件中的 【2.已实现】
+	 *
+	 * import com.and.zvideo_and_dy.R; 替换为 import com.and.zvideo_and_dy_clone1.R;
+	 *
+	 * 6. app 名称需要变更为_1 AndroidManifest.xml <application android:allowBackup="true"
+	 * android:icon="@mipmap/launch_icon" android:label="@string/app_name"
+	 * android:roundIcon="@mipmap/launch_icon" android:theme="@style/AppTheme"
+	 * android:largeHeap="true" android:requestLegacyExternalStorage="true"
+	 * android:supportsRtl="true">
+	 *
+	 * strings.xml <string name="app_name">VLC</string> 改为 <string
+	 * name="app_name">VLC_1</string>
+	 */
+	class Copy_APK_Product_ChangeProductName_Rule_53 extends Basic_Rule {
+		File src_apk_Dir; // APK源目录 D:\apk_dir/A_product
+		File dst_apk_Dir; // APK目的目录 // D:\apk_dir/A_product_20220815_154034_clone
+
+		File src_AndroidManifest_xml_File;
+		File src_build_gradle_File;
+		File src_settings_gradle_File;
+		File src_strings_xml_File;
+		ArrayList<File> src_fixed_FileList;   // 需要重新写入数据的文件列表
+		HashMap<File,ArrayList<String>> srcFile_fixedContent_Map;  // 原文件作为key 修复后的内容作为value的 Map
+
+		File dst_AndroidManifest_xml_File;
+		File dst_build_gradle_File;
+		File dst_settings_gradle_File;
+		File dst_strings_xml_File;
+
+		String old_product_name; // 就得工程名称 com.and.app1
+		String new_productappend_name; // 新的追加的工程名称 appendname
+
+		String old_product_endfixname;  // 原来的工程名称的最后小数点后的字符串 app1
+		File   old_product_endfixname_DirFile;  // 对应的工程目录
+		String new_product_endfixname;  // 原来的工程名称的最后小数点后的字符串 app1_4qrqr
+
+//		后缀名称   app1  改为 app1_4qrqr
+
+
+		String new_product_name; // 新的工程名称 com.and.app1_appendname
+
+		String old_app_show_name; // 旧的 app显示的名字 <string name="app_name">VLC</string>
+		String new_app_show_name; // 新的 app 显示的名字
+		ArrayList<File> src_all_Java_FileList; // 所有的 原目录 java 文件
+		ArrayList<File> dst_all_Java_FileList; // 所有的 目的目录 java 文件
+
+		// 有些 xml 中 有自定义view   制订了 
+		ArrayList<File> src_all_Layout_XmlFileList; // 所有的 原目录 java 文件
+		ArrayList<File> dst_all_Layout_XmlFileList; // 所有的 目的目录 java 文件
+
+
+		// 需要 进行 复制操作的文件 所有 文件夹 所有文件
+		ArrayList<File> src_needCopyFileList = new ArrayList<File>();
+		String HHmmss_timestr; // 时分秒时间戳
+		String YYMMdd_timestr; // 年月日 时间戳
+
+		// 经过 修改 后的 Androidmanifest.xml 的 所有内容
+		ArrayList<String> dst_AndroidManifest_xml_File_StrList;
+		// 经过 修改 后的 strings.xml 的 所有内容
+		ArrayList<String> dst_strings_xml_File_StrList;
+
+		// 经过 修改 后的 build.gradle 的 所有内容
+		ArrayList<String> dst_build_gradle_File_StrList;
+
+		// 经过 修改 后的 settings.gradle 的 所有内容
+		ArrayList<String> dst_settings_gradle_File_StrList;
+
+		// appname_xxxxxx // apk显示的名称 默认为 a
+		// productappend_xxxx // 工程名称后缀增加 什么 已达到简单克隆目的
+
+		Copy_APK_Product_ChangeProductName_Rule_53() {
+			super("#", 53, 5); //
+
+			src_needCopyFileList = new ArrayList<File>();
+
+
+			dst_AndroidManifest_xml_File_StrList = new ArrayList<String>();
+			dst_strings_xml_File_StrList = new ArrayList<String>();
+			dst_build_gradle_File_StrList = new ArrayList<String>();
+			dst_settings_gradle_File_StrList = new ArrayList<String>();
+
+			src_all_Java_FileList = new ArrayList<File>();
+			dst_all_Java_FileList = new ArrayList<File>();
+
+			src_all_Layout_XmlFileList = new ArrayList<File>();
+			dst_all_Layout_XmlFileList = new ArrayList<File>();
+
+
+			src_fixed_FileList = new ArrayList<File>();
+			srcFile_fixedContent_Map = new HashMap<File,ArrayList<String>>();
+		}
+
+		@Override
+		boolean initParamsWithInputList(ArrayList<String> inputParamList) {
+			// mdname_true // kaoyan_true gaokao_true
+
+			// 判断当前的输入的路径 是否是一个apk工程的根目录
+			// 1. 包含 AndroidManifest.xml 包含 gradle文件
+
+			if (!isShellInAndroidAPKDir()) {
+				System.out.println("不是APK目录  src_settings_gradle_File=" + src_settings_gradle_File
+						+ "  src_build_gradle_File=" + src_build_gradle_File + "  src_AndroidManifest_xml_File="
+						+ src_AndroidManifest_xml_File + "  src_strings_xml_File=" + src_strings_xml_File);
+
+				return false;
+			}
+
+			System.out.println("APK目录 src_settings_gradle_File=" + src_settings_gradle_File + "  src_build_gradle_File="
+					+ src_build_gradle_File + "  src_AndroidManifest_xml_File=" + src_AndroidManifest_xml_File
+					+ "  src_strings_xml_File=" + src_strings_xml_File);
+
+			// appname_xxxxxx // apk显示的名称 默认为 z
+			// productappend_xxxx // 工程名称后缀增加 什么 已达到简单克隆目的 默认为原有dir+时间戳 dy-->dy_081512
+			new_app_show_name = "z";
+			HHmmss_timestr = getTimeStamp_HHmmss();
+			YYMMdd_timestr = getTimeStamp_YYYYMMdd();
+			new_productappend_name = HHmmss_timestr;
+
+			for (int i = 0; i < inputParamList.size(); i++) {
+				String paramItem_lower_trim = inputParamList.get(i);
+//				String paramItem_lower_trim = paramItem.toLowerCase().trim();
+
+				if (paramItem_lower_trim.startsWith("appname_")) {
+
+					String input_appname_str = (" " + paramItem_lower_trim).replace(" appname_", "");
+					input_appname_str = input_appname_str.replace(" ", "");
+
+					new_app_show_name = input_appname_str;
+
+				}
+
+				if (paramItem_lower_trim.startsWith("productappend_")) {
+
+					String input_productname_str = (" " + paramItem_lower_trim).replace(" productappend_", "");
+					input_productname_str = input_productname_str.replace(" ", "");
+
+					new_productappend_name = input_productname_str;
+
+				}
+
+			}
+			System.out.println(
+					"new_app_show_name =" + new_app_show_name + "   new_productappend_name=" + new_productappend_name);
+
+			src_apk_Dir = new File(curDirPath);
+
+			if (!src_apk_Dir.exists()) {
+				System.out.println("当前Shell 目录 不存在 请检查  src_apk_Dir=" + src_apk_Dir);
+				return false;
+			}
+
+			String src_dir_name = src_apk_Dir.getName();
+			String dst_dir_name = src_dir_name + "_" + new_productappend_name;
+			String dst_dir_path = src_apk_Dir.getAbsolutePath().replace(src_dir_name, dst_dir_name);
+
+			dst_apk_Dir = new File(dst_dir_path);
+
+//					dst_apk_Dir = new File(src_apk_Dir.getAbsolutePath()+File.separator+HHmmss_timestr);
+
+			// 读取旧的工程名称 以及 旧的 app的显示的名称
+			// String old_product_name; // 就得工程名称 com.and.app1
+			// String old_app_show_name; // 旧的 app显示的名字 <string name="app_name">VLC</string>
+
+			old_product_name = readAndroidManifext_ProductName(src_AndroidManifest_xml_File, new_productappend_name);
+
+			if (old_product_name == null) {
+				System.out.println(
+						"当前工程文件 src_AndroidManifest_xml_File=" + src_AndroidManifest_xml_File + " 无法读取到工程名称!!  请检查!! ");
+				return false;
+			}
+			if(old_product_name.contains(".")) {
+				old_product_endfixname = old_product_name.substring(old_product_name.lastIndexOf(".")+1);
+				new_product_endfixname = old_product_endfixname+"_"+new_productappend_name;
+			}else {
+
+				old_product_endfixname = old_product_name;
+				new_product_endfixname = old_product_endfixname+"_"+new_productappend_name;
+			}
+
+			new_product_name = old_product_name + "_" + new_productappend_name;
+
+			System.out.println(" 当前输入 old_product_name[ " + old_product_name + "]   new_product_name[ "
+					+ new_product_name + "]" + "old_product_endfixname["+old_product_endfixname+"]  "+" new_product_endfixname="+new_product_endfixname);
+
+			if (src_strings_xml_File.exists()) {
+				old_app_show_name = readStringsXml_AppName(src_strings_xml_File, new_app_show_name);
+
+			}
+			System.out.println(" 当前输入 old_app_show_name[ " + old_app_show_name + "]   new_app_show_name[ "
+					+ new_app_show_name + "]" + "  ");
+
+			// settings.gradle 和 build.gradle 的 applicationId "com.and.zvideo_and_dy" 改为 新的
+
+			initSettings_Gradle(src_settings_gradle_File, old_product_name, new_product_name);
+			initBuild_Gradle(src_build_gradle_File, old_product_name, new_product_name);
+
+			System.out.println(" 当前输入 SRC[ " + src_apk_Dir.getAbsolutePath() + "]  Dst[ "
+					+ dst_apk_Dir.getAbsolutePath() + "]" + " ] 存在  将执行 克隆 apk代码逻辑");
+
+			// TODO Auto-generated method stub
+			return super.initParamsWithInputList(inputParamList);
+		}
+
+		void initSettings_Gradle(File settingsGradleFile, String oldPackageName, String newPackageName) {
+
+			ArrayList<String> settingsStrList = ReadFileContentAsList(settingsGradleFile);
+
+			if (settingsStrList == null) {
+				System.out.println("从 settingsGradleFile=" + settingsGradleFile + "读取到的数据为空! ");
+				return;
+			}
+			System.out.println("settingsGradleFile = "+settingsGradleFile+"   oldPackageName="+oldPackageName+"   newPackageName="+newPackageName);
+			for (int i = 0; i < settingsStrList.size(); i++) {
+				String lineStr = settingsStrList.get(i);
+				// rootProject.name =
+				if(lineStr.contains("rootProject.name")) {
+					dst_settings_gradle_File_StrList.add("rootProject.name = \""+new_product_endfixname+"\"");
+					continue;
+				}
+
+				String lineStr_Replace_Str = lineStr.replace(oldPackageName, newPackageName);
+				dst_settings_gradle_File_StrList.add(lineStr_Replace_Str);
+			}
+
+			src_fixed_FileList.add(settingsGradleFile);
+			srcFile_fixedContent_Map.put(settingsGradleFile, dst_settings_gradle_File_StrList);
+
+			System.out.println("dst_settings_gradle_File_StrList.size() = " + dst_settings_gradle_File_StrList.size());
+
+		}
+
+		void initBuild_Gradle(File BuildGradleFile, String oldPackageName, String newPackageName) {
+
+			ArrayList<String> BuildStrList = ReadFileContentAsList(BuildGradleFile);
+
+			if (BuildStrList == null) {
+				System.out.println("从 BuildGradleFile=" + BuildGradleFile + "读取到的数据为空! ");
+				return;
+			}
+
+			for (int i = 0; i < BuildStrList.size(); i++) {
+				String lineStr = BuildStrList.get(i);
+				String lineStr_Replace_Str = lineStr.replace(oldPackageName, newPackageName);
+				dst_build_gradle_File_StrList.add(lineStr_Replace_Str);
+			}
+
+			src_fixed_FileList.add(BuildGradleFile);
+			srcFile_fixedContent_Map.put(BuildGradleFile, dst_build_gradle_File_StrList);
+
+			System.out.println("dst_build_gradle_File_StrList.size() = " + dst_build_gradle_File_StrList.size());
+
+		}
+
+		String readStringsXml_AppName(File stringsXmlFile, String newAppName) {
+
+			String local_appName = null;
+
+			if (stringsXmlFile == null || !stringsXmlFile.exists()) {
+				return local_appName;
+			}
+
+			ArrayList<String> rawStringXml_StrList = ReadFileContentAsList(stringsXmlFile);
+
+			if (rawStringXml_StrList == null) {
+				return local_appName;
+			}
+
+			for (int i = 0; i < rawStringXml_StrList.size(); i++) {
+				String oneLineStr = rawStringXml_StrList.get(i);
+				// <string name="app_name">VLC</string>
+				if (oneLineStr.contains("name=\"app_name\"")) {
+					String appNameBeginStr = oneLineStr.substring(oneLineStr.indexOf("name=\"app_name\"")).trim();
+
+					local_appName = appNameBeginStr.replace("name=\"app_name\"", "").trim();
+					local_appName = local_appName.replace(" ", "");
+					local_appName = local_appName.replace("</string>", "");
+					local_appName = local_appName.replace("<string", "");
+					local_appName = local_appName.replace("\"", "");
+					local_appName = local_appName.replace(">", "");
+					local_appName = local_appName.replace("<", "");
+					String fixed_product_linestr = "<string name=\"app_name\">" + newAppName + "</string>";
+					dst_strings_xml_File_StrList.add(fixed_product_linestr);
+					continue;
+				}
+				dst_strings_xml_File_StrList.add(oneLineStr);
+
+			}
+
+
+			src_fixed_FileList.add(stringsXmlFile);
+			srcFile_fixedContent_Map.put(stringsXmlFile, dst_strings_xml_File_StrList);
+
+			return local_appName;
+
+		}
+
+		String readAndroidManifext_ProductName(File manifestFile, String productappendStr) {
+			String local_prductName = null;
+
+			if (manifestFile == null || !manifestFile.exists()) {
+				return local_prductName;
+			}
+
+			ArrayList<String> rawAndroidManifest_StrList = ReadFileContentAsList(manifestFile);
+
+			if (rawAndroidManifest_StrList == null) {
+				return local_prductName;
+			}
+
+			for (int i = 0; i < rawAndroidManifest_StrList.size(); i++) {
+				String oneLineStr = rawAndroidManifest_StrList.get(i);
+
+				if (oneLineStr.contains("package=")) {
+					String packageBeginStr = oneLineStr.substring(oneLineStr.indexOf("package=")).trim();
+
+					local_prductName = packageBeginStr.replace("package=", "").trim();
+					local_prductName = local_prductName.replace(" ", "");
+					local_prductName = local_prductName.replace("\"", "");
+					local_prductName = local_prductName.replace(">", "");
+					local_prductName = local_prductName.replace("<", "");
+					local_prductName = local_prductName.replace("\"", "");
+					String new_product_Name = local_prductName + "_" + productappendStr;
+					String fixed_product_linestr = oneLineStr.replace(local_prductName, new_product_Name);
+					System.out.println("fixed_product_linestr = "+fixed_product_linestr +"  new_product_Name="+new_product_Name);
+					dst_AndroidManifest_xml_File_StrList.add(fixed_product_linestr);
+					continue;
+				}
+				dst_AndroidManifest_xml_File_StrList.add(oneLineStr);
+
+			}
+
+			src_fixed_FileList.add(manifestFile);
+			srcFile_fixedContent_Map.put(manifestFile, dst_AndroidManifest_xml_File_StrList);
+
+			return local_prductName;
+		}
+		// 1. 根目录下有 settings.gradle
+		// 2. 根目录下有 build.gradle
+		// 3. 根目录\app\src\main\AndroidManifest.xml 文件存在
+
+		boolean isShellInAndroidAPKDir() {
+			boolean isApkDirFlag = false;
+			File shellDir = new File(curDirPath);
+			if (!shellDir.exists()) {
+				System.out.println("当前 输入的路径错误: 不存在:  curDirPath = " + curDirPath);
+				return isApkDirFlag;
+			}
+
+			src_settings_gradle_File = new File(shellDir.getAbsolutePath() + File.separator + "settings.gradle");
+			if (!src_settings_gradle_File.exists()) {
+				System.out.println("当前 app工程目录下不包含 settings.gradle 文件 请检查!  curDirPath=" + curDirPath);
+				return isApkDirFlag;
+			}
+
+			src_build_gradle_File = new File(
+					shellDir.getAbsolutePath() + File.separator + "app" + File.separator + "build.gradle");
+			if (!src_build_gradle_File.exists()) {
+				System.out.println("当前 app工程目录下不包含 apk目录/app/settings.gradle 文件 请检查!  curDirPath=" + curDirPath);
+				return isApkDirFlag;
+			}
+
+			src_AndroidManifest_xml_File = new File(shellDir.getAbsolutePath() + File.separator + "app" + File.separator
+					+ "src" + File.separator + "main" + File.separator + "AndroidManifest.xml");
+			if (!src_AndroidManifest_xml_File.exists()) {
+				System.out.println(
+						"当前 app工程目录下不包含 apk目录/app/src/main/AndroidManifest.xml 文件 请检查!  curDirPath=" + curDirPath);
+				return isApkDirFlag;
+			}
+
+			src_strings_xml_File = new File(shellDir.getAbsolutePath() + File.separator + "app" + File.separator + "src"
+					+ File.separator + "main" + File.separator + "res" + File.separator + "values" + File.separator
+					+ "strings.xml");
+
+			if (!src_strings_xml_File.exists()) {
+				System.out.println("当前 apk目录/app/src/main/res/values/strings.xml  文件不存在   注意:显示的APK名称可能无法修改!");
+			}
+
+			return true;
+
+		}
+
+		@Override
+		String simpleDesc() {
+
+			return "\n" + Cur_Bat_Name + " #_" + rule_index
+					+ "  appname_xxxxxx  productappend_xxxxx    // 如果 当前 shell 目录是app代码根目录 那么在clone一个apk到父文件夹 appname指定显示的apk名称 productappend用于在原有工程名添加后缀使得app相互独立  \n"
+					+ Cur_Bat_Name + "  #_" + rule_index
+					+ " appname_z      ### 如果 当前 shell 目录是app代码根目录 那么在clone一个apk到父文件夹 appname指定显示的apk名称为z  productappend用于在原有工程名添加后缀使得app相互独立   \n"
+					+ ""
+//			zrule_apply_G2.bat  #_53  appname_z  productappend_xxx
+					;
+		}
+
+		@Override
+		ArrayList<File> applyDir_SubFileListRule5(ArrayList<File> allSubDirFileList,
+												  ArrayList<File> allSubRealFileList){
+
+
+
+			// 创建 clone 的 目录文件
+			try {
+				dst_apk_Dir.mkdirs();
+			}
+			catch (Exception e) { //
+
+				System.out.println("创建 dst_apk_Dir="+dst_apk_Dir+" 失败!"); }
+
+			if(!dst_apk_Dir.exists()) {
+				System.out.println("当前 Clone 目录 不存在 请检查  dst_apk_Dir="+dst_apk_Dir);
+				return null;
+			}
+			dst_apk_Dir.mkdirs();
+			if(!dst_apk_Dir.exists()) {
+
+				System.out.println("当前 Clone 目录 不存在 请检查  dst_apk_Dir="+dst_apk_Dir);
+				return null;
+			}
+
+			// old_product_endfixname_DirFile
+			int matchFileCount = 0 ;
+			for (int i = 0; i < allSubDirFileList.size(); i++) {
+				File dirFile =  allSubDirFileList.get(i);
+
+				String dirName = dirFile.getName();
+				String dirFile_AbsPath = dirFile.getAbsolutePath();
+
+
+				if(dirName.equals(old_product_endfixname) &&
+						!dirFile_AbsPath.contains("ap_generated_sources") &&
+						!dirFile_AbsPath.contains("out") &&
+						!dirFile_AbsPath.contains("generated")   &&
+						!dirFile_AbsPath.contains("androidTest")   &&
+						!dirFile_AbsPath.contains((File.separator+"test"+File.separator))   &&
+						!dirFile_AbsPath.contains("intermediates")
+				) {
+					old_product_endfixname_DirFile = dirFile;
+					System.out.println("match_old_product_endfixname["+matchFileCount+"] = "+dirFile_AbsPath);
+					matchFileCount++;
+				}
+			}
+
+			if(old_product_endfixname_DirFile == null) {
+				System.out.println("当前没有找到 "+old_product_name+"对应的工程目录地址:"+old_product_endfixname_DirFile+"  执行失败请检查!");
+				return null;
+			}
+			System.out.println("old_product_endfixname_DirFile = "+old_product_endfixname_DirFile);
+
+// old_product_endfixname;
+// zmain-Life-main_203136\app\src\main\java\com\and\zmain_life  变为
+// zmain-Life-main_203136\app\src\main\java\com\and\zmain_life_203136
+
+			String old_product_endfixname_Path = old_product_endfixname_DirFile.getAbsolutePath();
+			String new_product_endfixname_Path = old_product_endfixname_Path.replace(old_product_endfixname,new_product_endfixname);
+
+
+			for (int i = 0; i < allSubRealFileList.size(); i++) {
+				File copyItem = allSubRealFileList.get(i);
+				String copyItem_AbsPath = copyItem.getAbsolutePath();
+				// zmain-Life-main    和  zmain-Life-main_202111
+				String endfixname_path_AbsPath = copyItem_AbsPath.replace(old_product_endfixname_Path, new_product_endfixname_Path);
+				if(copyItem_AbsPath.contains(old_product_endfixname_Path)) {
+					System.out.println("匹配到 old_product_endfixname_Path="+old_product_endfixname_Path+" match文件 = "+copyItem_AbsPath);
+				}
+				String targetItem_AbsPath = endfixname_path_AbsPath.replace(src_apk_Dir.getAbsolutePath(), dst_apk_Dir.getAbsolutePath());
+				File targetItem = new File(targetItem_AbsPath);
+				if(copyItem.getName().toLowerCase().endsWith(".java")) {
+					src_all_Java_FileList.add(copyItem);
+					dst_all_Java_FileList.add(targetItem);
+				}
+
+				if(copyItem.getName().toLowerCase().endsWith(".xml") && copyItem.getAbsolutePath().toLowerCase().contains((File.separator+"layout"+File.separator))) {
+					src_all_Layout_XmlFileList.add(copyItem);
+					dst_all_Layout_XmlFileList.add(targetItem);
+				}
+
+				System.out.println("copyItem["+(i+1)+"]["+allSubRealFileList.size()+"] = "+ copyItem+ "  targetItem="+targetItem_AbsPath+"  old_product_endfixname_Path="+old_product_endfixname_Path+"   new_product_endfixname_Path="+new_product_endfixname_Path +"   src_apk_Dir="+src_apk_Dir+"  dst_apk_Dir="+dst_apk_Dir);
+
+				fileCopy(copyItem,targetItem );
+			}
+
+			System.out.println("src_fixed_FileList.size() = "+ src_fixed_FileList.size());
+			System.out.println("dst_all_Layout_XmlFileList.size() = "+dst_all_Layout_XmlFileList.size());
+
+			// 开始对 目标文件 进行 修改
+			for (int i = 0; i < src_fixed_FileList.size(); i++) {
+				File product_fixed_file = src_fixed_FileList.get(i);
+				String product_fixed_file_AbsPath = product_fixed_file.getAbsolutePath();
+				String target_fixed_file_path = product_fixed_file_AbsPath.replace(src_apk_Dir.getAbsolutePath(), dst_apk_Dir.getAbsolutePath());
+				File target_fixed_file = new File(target_fixed_file_path);
+				if(target_fixed_file.exists()) {
+					ArrayList<String> matchFixedArr = srcFile_fixedContent_Map.get(product_fixed_file);
+					if(matchFixedArr != null && matchFixedArr.size() > 0 ) {
+						System.out.println("Product_writeItem["+(i+1)+"]["+src_fixed_FileList.size()+"]  --> linenum="+matchFixedArr.size());
+						writeContentToFile(target_fixed_file, matchFixedArr);
+					}
+
+					for (int j = 0; j < matchFixedArr.size(); j++) {
+						System.out.println(matchFixedArr.get(j));
+					}
+
+				}
+
+			}
+
+
+			System.out.println("dst_all_Java_FileList.size() = "+ dst_all_Java_FileList.size());
+			for (int i = 0; i < dst_all_Java_FileList.size(); i++) {
+
+				File javaFileItem = dst_all_Java_FileList.get(i);
+				System.out.println("Java_writeItem["+(i+1)+"]["+dst_all_Java_FileList.size()+"]  ");
+
+				ArrayList<String> rawContent = ReadFileContentAsList(javaFileItem);
+
+				if(rawContent == null || rawContent.size() == 0 ) {
+					continue;
+				}
+
+
+				ArrayList<String> fixed_rawContent = new ArrayList<String> ();
+				for (int j = 0; j < rawContent.size(); j++) {
+					String lineStr = rawContent.get(j);
+
+					if(lineStr.contains(old_product_name)) {
+						String fixedStr =  lineStr.replace(old_product_name, new_product_name);
+						fixed_rawContent.add(fixedStr);
+						continue;
+					}
+
+					fixed_rawContent.add(lineStr);
+
+				}
+				writeContentToFile(javaFileItem, fixed_rawContent);
+
+			}
+
+
+			System.out.println("dst_all_Layout_XmlFileList.size() = "+dst_all_Layout_XmlFileList.size());
+			for (int i = 0; i < dst_all_Layout_XmlFileList.size(); i++) {
+
+				File xmlFileItem = dst_all_Layout_XmlFileList.get(i);
+				System.out.println("Xml_writeItem["+(i+1)+"]["+dst_all_Layout_XmlFileList.size()+"]  ");
+
+				ArrayList<String> rawContent = ReadFileContentAsList(xmlFileItem);
+
+				if(rawContent == null || rawContent.size() == 0 ) {
+					continue;
+				}
+
+
+				ArrayList<String> fixed_rawContent = new ArrayList<String> ();
+				for (int j = 0; j < rawContent.size(); j++) {
+					String lineStr = rawContent.get(j);
+
+					if(lineStr.contains(old_product_name)) {
+						String fixedStr =  lineStr.replace(old_product_name, new_product_name);
+						fixed_rawContent.add(fixedStr);
+						continue;
+					}
+
+					fixed_rawContent.add(lineStr);
+
+				}
+				writeContentToFile(xmlFileItem, fixed_rawContent);
+
+			}
+
+			System.out.println("Clone APK 的操作已完成   目标目录="+dst_apk_Dir);
+
+			return super.applyDir_SubFileListRule5(allSubDirFileList, allSubRealFileList);
+
+
+		}
+
+
+
+		@Override
+		ArrayList<File> applySubFileListRule4(ArrayList<File> curFileList,
+											  HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList,
+											  ArrayList<File> curRealFileList) {
+			return super.applySubFileListRule4(curFileList, subFileTypeMap, curDirList, curRealFileList);
+
+		}
+
+	}
 
 	class Delete_SameMD5File_OnlyExistOneInDir_Rule_52 extends Basic_Rule {
 
@@ -617,9 +1230,9 @@ public class G2_ApplyRuleFor_TypeFile {
 		}
 
 
-		 //  如果当前的需要 提交的 文件中 不包含 json 文件  那么  不提交这次文件 以达到 省空间的 目的 
-		 //  xlsx 每次更新都是全替换  而不是 部分替换 导致 更新文件大小过大 
-		
+		//  如果当前的需要 提交的 文件中 不包含 json 文件  那么  不提交这次文件 以达到 省空间的 目的
+		//  xlsx 每次更新都是全替换  而不是 部分替换 导致 更新文件大小过大
+
 		@Override
 		String simpleDesc() {
 
@@ -689,7 +1302,7 @@ public class G2_ApplyRuleFor_TypeFile {
 			System.out.println("当前 需要执行 Copy 操作的 文件 的 总数 : "+ needCopyFileList.size());
 			System.out.println("开始执行 ———————— Copy-Operation begin —————");
 
-	
+
 			if(needCopyFileList.size() > 0 && isContainJsonFile(needCopyFileList)) {
 				for (int i = 0; i < needCopyFileList.size(); i++) {
 
@@ -17498,6 +18111,25 @@ public class G2_ApplyRuleFor_TypeFile {
 		return date;
 	}
 
+
+	static String getTimeStamp_HHmmss() {
+
+		SimpleDateFormat df = new SimpleDateFormat("HHmmss");// 设置日期格式
+		String date = df.format(new Date());
+		return date;
+	}
+
+
+
+	static String getTimeStamp_YYYYMMdd() {
+
+		SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd");// 设置日期格式
+		String date = df.format(new Date());
+		return date;
+	}
+
+
+
 	static Rule getRuleByIdentify(String identify) {
 		for (int i = 0; i < realTypeRuleList.size(); i++) {
 			if (realTypeRuleList.get(i).identify.equals(identify)) {
@@ -17512,7 +18144,11 @@ public class G2_ApplyRuleFor_TypeFile {
 		OutputStream output = null;
 		int lengthSize;
 		// 创建输入输出流对象
+		File targetDirParentFile = target.getParentFile();
 		try {
+			if(targetDirParentFile != null && !targetDirParentFile.exists()) {
+				targetDirParentFile.mkdirs();
+			}
 			input = new FileInputStream(origin);
 			output = new FileOutputStream(target);
 			// 获取文件长度
