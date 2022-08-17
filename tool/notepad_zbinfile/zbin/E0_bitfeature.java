@@ -317,6 +317,31 @@ public class E0_bitfeature {
         toCheck64BitFeature(-1);
         toCheck64BitFeature(192);
         toCheck64BitFeature(168);
+        
+        ShowUseTip();
+       
+   
+    }
+    // 0b111100011 这样的数据
+    static void ShowUseTip() {
+    
+    	System.out.println(" zbitfeature_E0   111111                ## 十进制 转为64位long值输出");
+     	System.out.println(" zbitfeature_E0   101010                ## 十进制 转为64位long值输出");
+     	System.out.println(" zbitfeature_E0   -22222                ## 十进制 转为64位long值输出");
+
+    	System.out.println(" zbitfeature_E0   0xACDE12AEC           ## 十六进制 转为64位long值输出");
+     	System.out.println(" zbitfeature_E0   0xFEDCBA74ABC         ## 十六进制 转为64位long值输出");
+     	
+    	System.out.println(" zbitfeature_E0   0b111111              ## 二进制 转为64位long值输出");
+     	System.out.println(" zbitfeature_E0   0b10101010101010101   ## 二进制 转为64位long值输出");
+     	
+     	
+    	System.out.println(" zbitfeature_E0   0b111111              ## 二进制 转为64位long值输出");
+     	System.out.println(" zbitfeature_E0   0b10101010101010101   ## 二进制 转为64位long值输出");
+     	
+       	System.out.println(" zbitfeature_E0   byte98000000          ## 字节数组 制转为64位long值输出");
+     	System.out.println(" zbitfeature_E0   byteA0000000          ## 字节数组 转为64位long值输出");
+     	
     }
 
 
@@ -333,6 +358,7 @@ public class E0_bitfeature {
 //args[0] =  0x1231f
 //args[1] =  12314
 //args[2] = 0xsa     //
+//args[2] = 0b111111110000011111000011110000111100001111    // 输入是二进制时 也把他转为 16进制 10进制输出
 // zbitfeature   0xaff  21313  // 对给出的参数进行bit位分析然后打印
 
         if (args != null) {
@@ -358,7 +384,7 @@ public class E0_bitfeature {
         }
         for (int i = 0; i < mKeyWordName.size(); i++) {
             String paramItem = mKeyWordName.get(i);
-            if (paramItem.startsWith("0x")) {
+            if (paramItem.startsWith("0x") || paramItem.startsWith("ox")) {  // 0xfffff
                 String longValue = paramItem.substring(2);
                 if(longValue == null || longValue.length() > 16){
                     System.out.println("用户输入的参数太大 已经大于8字节 64 bit数据 请检查输入！ ");
@@ -368,7 +394,52 @@ public class E0_bitfeature {
                 toCheck64BitFeature(longItem);
 
 
-            } else {
+            }else if(paramItem.startsWith("0b") || paramItem.startsWith("ob") ) {  // 0b101010101
+            	String binary_num = paramItem.substring(2);
+            	
+               if( binary_num == null){
+                 System.out.println("用户输入的二进制参数太长 无法获取 请检查!");
+                    return;
+                 }
+                           
+            	
+                if( binary_num.length() > 64){
+                    System.out.println("用户输入的二进制参数太长 已经大于8字节 64 bit数据 请检查输入！ binary_num.length()="+binary_num.length());
+                    return;
+                }
+                
+                String empty_check_str = binary_num.replace("0", "").replace("1", "").trim();
+                
+                if(!"".equals(empty_check_str)) {
+                	System.out.println("用户输入的 ob开头的二进制参数 不仅仅包含0和1 还包含"+empty_check_str+" 请检查!");
+                	return;
+                }
+                
+                // 二进制转为 16进制
+                Long longItem = Long.parseUnsignedLong(binary_num.trim(), 2);
+                toCheck64BitFeature(longItem);    
+            	
+            }  else if(paramItem.toLowerCase().startsWith("byte")){      // byte98000000
+               	String byteArr_Str = paramItem.toLowerCase().replace("byte", "");  // 98000000
+               	
+               	if(byteArr_Str.length() > 16) {
+               		// 
+               		System.out.println("当前输入的 byte数组 转为 long 最多为 64位bit 16个十六进制字符!  byteArr_Str="+byteArr_Str);
+               		return; 
+               	}
+               	
+               	
+               	// 16进制 字符串  转为 byte 数组
+              byte[] longByteArr = 	hexStringToByteArray(byteArr_Str);
+               	
+              int byteInt = bytesToInt(longByteArr);
+              long byteLong = (long)(byteInt);
+              
+              toCheck64BitFeature(readUnsignedLong(byteLong).longValue());
+            	
+            	
+            	
+            }else {
 
                 if(paramItem == null || paramItem.length() > 20 ){
                     System.out.println("用户输入的参数太大 已经大于8字节 64 bit数据 请检查输入！ ");
@@ -390,6 +461,8 @@ public class E0_bitfeature {
                         System.out.println("用户输入的参数太大 已经大于8字节 64 bit数据 请检查输入！ ");
                         return;
                     }
+                    
+                    
 
                 }
 
@@ -415,6 +488,134 @@ public class E0_bitfeature {
         }
 
     }
+    
+    
+    public static  int bytesToInt(byte[] a){
+        int ans=0;
+        for(int i=0;i<4;i++){
+            ans<<=8;
+            ans|=(a[3-i]&0xff);
+            /* 这种写法会看起来更加清楚一些：
+            int tmp=a[3-i];
+            tmp=tmp&0x000000ff;
+            ans|=tmp;*/
+           // intPrint(ans);
+        }
+        return ans;
+    }
+    
+    
+    
+	public static String toHexString(int i) {
+		StringBuilder sb = new StringBuilder();
+		sb.append(toHexString(toByteArray(i)));
+		sb.append(toTenString(i));
+
+		return sb.toString();
+	}
+
+	public static String toHexStringNoTen(int i) {
+		StringBuilder sb = new StringBuilder();
+		sb.append(toHexString(toByteArray(i)));
+		return "0x" + sb.toString().trim();
+	}
+
+	public static String toHexString(byte b) {
+		return toHexString(toByteArray(b));
+	}
+
+	public static String toHexString(byte[] array) {
+		return toHexString(array, 0, array.length, true);
+	}
+
+	public static String toHexString(byte[] array, boolean upperCase) {
+		return toHexString(array, 0, array.length, upperCase);
+	}
+
+	public static String toHexString(byte[] array, int offset, int length) {
+		return toHexString(array, offset, length, true);
+	}
+
+	public static String toHexString(byte[] array, int offset, int length, boolean upperCase) {
+		char[] digits = upperCase ? HEX_DIGITS : HEX_LOWER_CASE_DIGITS;
+		char[] buf = new char[length * 2];
+
+		int bufIndex = 0;
+		for (int i = offset; i < offset + length; i++) {
+			byte b = array[i];
+			buf[bufIndex++] = digits[(b >>> 4) & 0x0F];
+			buf[bufIndex++] = digits[b & 0x0F];
+		}
+
+		return new String(buf);
+	}
+
+	public static byte[] toByteArray(byte b) {
+		byte[] array = new byte[1];
+		array[0] = b;
+		return array;
+	}
+
+	public static byte[] toByteArray(int i) {
+		byte[] array = new byte[4];
+
+		array[3] = (byte) (i & 0xFF);
+		array[2] = (byte) ((i >> 8) & 0xFF);
+		array[1] = (byte) ((i >> 16) & 0xFF);
+		array[0] = (byte) ((i >> 24) & 0xFF);
+
+		return array;
+	}
+
+	private static int toByte(char c) {
+		if (c >= '0' && c <= '9')
+			return (c - '0');
+		if (c >= 'A' && c <= 'F')
+			return (c - 'A' + 10);
+		if (c >= 'a' && c <= 'f')
+			return (c - 'a' + 10);
+
+		throw new RuntimeException("Invalid hex char '" + c + "'");
+	}
+
+	public static byte[] hexStringToByteArray(String hexString) {
+		int length = hexString.length();
+		byte[] buffer = new byte[length / 2];
+
+		for (int i = 0; i < length; i += 2) {
+			buffer[i / 2] = (byte) ((toByte(hexString.charAt(i)) << 4) | toByte(hexString.charAt(i + 1)));
+		}
+
+		return buffer;
+	}
+
+	 final static char[] HEX_DIGITS = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D',
+			'E', 'F' };
+	 final static char[] HEX_LOWER_CASE_DIGITS = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b',
+			'c', 'd', 'e', 'f' };
+	
+	public static StringBuilder appendByteAsHex(StringBuilder sb, byte b, boolean upperCase) {
+		char[] digits = upperCase ? HEX_DIGITS : HEX_LOWER_CASE_DIGITS;
+		sb.append(digits[(b >> 4) & 0xf]);
+		sb.append(digits[b & 0xf]);
+		return sb;
+	}
+
+	public static String toTenString(int i) {
+		String str = i + "";
+		int length = str.length();
+		if (length < 10) {
+			int paddingSize = 10 - length;
+
+			for (int j = 0; j < paddingSize; j++) {
+				str = "0" + str;
+			}
+		}
+		str = " " + str;
+		// System.out.println(" 10进制 = "+ str);
+		return str;
+	}
+
 
 
     public static final BigDecimal readUnsignedLong(long value)  {

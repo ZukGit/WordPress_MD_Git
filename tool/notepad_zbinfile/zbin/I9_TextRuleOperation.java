@@ -1,7 +1,9 @@
 
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.RuntimeUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.util.ByteUtil;
 import cn.hutool.extra.qrcode.BufferedImageLuminanceSource;
 import cn.hutool.extra.qrcode.QrCodeUtil;
 import cn.hutool.extra.qrcode.QrConfig;
@@ -10,6 +12,7 @@ import cn.hutool.http.HttpResponse;
 import cn.hutool.http.HttpUtil;
 import cn.hutool.json.JSONUtil;
 import cn.hutool.system.JavaRuntimeInfo;
+
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.primitives.Bytes;
@@ -27,12 +30,16 @@ import net.sourceforge.pinyin4j.format.exception.BadHanyuPinyinOutputFormatCombi
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import java.io.*;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
 import org.apache.commons.io.FileUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
+import org.jsoup.helper.Validate;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -460,8 +467,468 @@ public class I9_TextRuleOperation {
 //        CUR_RULE_LIST.add( new Encropty_Rule_7());
 //        CUR_RULE_LIST.add( new ClearChineseType_8());
 
+		
+		// .pcapng  wifi 包 文件解析  对wifi包的分析
+		CUR_RULE_LIST.add(new PcaPng_Frame_Analysis_Rule_51());
+		
 	}
 
+	
+	
+	
+	// 对 .pcapng  wifi 包 文件解析  对wifi包的分析
+	class PcaPng_Frame_Analysis_Rule_51 extends Basic_Rule {
+
+	     static final int GLOBAL_HEADER_LENGTH = 24;
+	     static final int PACKET_HEADER_LENGTH = 16;
+	      long fileSize;
+	      InputStream input;
+	     ByteOrder bo = ByteOrder.BIG_ENDIAN;
+	     volatile  ByteReader reader;
+	     volatile  int offset;
+	  
+	    
+		PcaPng_Frame_Analysis_Rule_51() {
+			super(51, false);
+		}
+
+		
+		@Override
+		String simpleDesc() {
+			return " 对 .pcapng  wifi 包 文件解析  对wifi包的分析  ";
+		}
+		
+		@Override
+		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
+				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+			// TODO Auto-generated method stub
+		
+			for (int i = 0; i < curInputFileList.size(); i++) {
+				File fileItem = curInputFileList.get(i);
+				String fileName = fileItem.getName().toLowerCase();
+				if(!fileName.endsWith(".pcap")) {
+					System.out.println("当前文件不是 .pcapng Wifi帧交互类型 无法解析  请检查!!");
+					return null;
+				}
+				
+				try {
+					PcapFileParser(fileItem);
+					parse();
+
+				} catch (Exception e) {
+	                System.out.println("解析 pcapng 文件["+fileItem.getAbsolutePath()+"] 出现异常  异常结束!! ");
+				}
+				
+		
+                System.out.println("═════════ pcapng 文件["+fileItem.getAbsolutePath()+"] 解析结束"+"═════════");
+			}
+			
+			
+			return super.applyOperationRule(curFileList, subFileTypeMap, curDirList, curRealFileList);
+		}
+		
+		  public boolean hasMoreData() {
+		        return offset < fileSize;
+		    }
+		  
+		   public void parse() throws IOException {
+		
+			   int step_index = 1;
+			        while (hasMoreData()) {
+			     	   synchronized (this) {
+			            byte[] packetHeaderBuffer = new byte[16];
+			            int preOffSet = offset;
+			            System.out.println("step["+step_index+"]_0  preOffSet="+preOffSet +"   offset="+offset);
+
+			            ByteBuffer buffer = reader.read(PACKET_HEADER_LENGTH);
+			      
+			            System.out.println("step["+step_index+"]_1  preOffSet="+preOffSet +"   offset="+offset);
+			            PacketHeader packetHeader = parsePacketHeader(buffer.array(),step_index,preOffSet);
+
+			            System.out.println("step["+step_index+"]_3  preOffSet="+preOffSet +"   offset="+offset);
+
+			            input.skip(packetHeader.getCapLen());
+			            offset += (packetHeader.getCapLen());
+			            System.out.println("step["+step_index+"]_4  preOffSet="+preOffSet +"   offset="+offset);
+
+			            				
+			            System.out.println("step["+step_index+"]_5  "+"preOffSet="+preOffSet+"   offset = "+ offset +"   CapLen="+packetHeader.getCapLen()+"  fileSize="+fileSize );
+ 			            System.out.println("step["+step_index+"]_6"+ packetHeader);
+			            step_index++;
+			     	   }
+			}
+
+		    }
+		   
+
+		// offset 还没 读取到 9232 的值 就被 加了 一个 16个 HeadData_Length 的长度
+		//preOffSet=4836   offset = 9232   CapLen=4396  fileSize=232773
+		//0000 0000 0000 0000 0000 0000 1010 0100
+		//0000 0000 0000 0000 1010 0100 1110 1010
+		//0000 0000 1010 0100 1110 1010 1110 0011
+		//1010 0100 1110 1010 1110 0011 0101 1101
+		//ApreOffset=9248  Aoffset=9248   capLen=-1528110243   capA=-1528110243   len=343119073     capLenBuffer=5DE3EAA4     dataHeaderBuffer=FA6A373C9C71AB445DE3EAA4E1947314
+			    		
+			    		
+			    public PacketHeader parsePacketHeader(byte[] dataHeaderBuffer ,int step_index , int preOffset){
+			        byte[] timeSBuffer = Arrays.copyOfRange(dataHeaderBuffer, 0, 4);
+			        byte[] timeMsBuffer = Arrays.copyOfRange(dataHeaderBuffer, 4, 8);
+			        byte[] capLenBuffer = Arrays.copyOfRange(dataHeaderBuffer, 8, 12);
+			        byte[] lenBuffer = Arrays.copyOfRange(dataHeaderBuffer, 12, 16);
+
+			        PacketHeader packetHeader = new PacketHeader();
+
+			        String timeS = DateUtil.dateToString(ByteUtil.bytesToInt(timeSBuffer,bo) * 1000L);
+			        int timeMs = ByteUtil.bytesToInt(timeMsBuffer,bo);
+			        int capLen = ByteUtil.bytesToInt(capLenBuffer,bo);
+			        int len = ByteUtil.bytesToInt(lenBuffer,bo);
+
+			        int  capA = bytesToInt(capLenBuffer);
+			        
+			     // CapLength 读错		            
+			      //offsetA=9248   capLen=-1528110243   capA=-1528110243     capLenBuffer=5DE3EAA4   len=343119073
+			      //PacketHeader{timeS=2002-01-06 05:07:06, timeMs=1152086428, capLen=-1528110243, len=343119073}
+			      //offset = -1528100995   CapLen=-1528110243  fileSize=232773
+			        
+			        System.out.println("step["+step_index+"]_2_parsePacketHeader  ApreOffset="+preOffset+"  Aoffset="+offset+"   capLen="+capLen+"   capA="+capA+"   len="+len+"     capLenBuffer="+toHexString(capLenBuffer)+"     dataHeaderBuffer="+toHexString(dataHeaderBuffer));
+			        
+			        packetHeader.setTimeS(timeS);
+			        packetHeader.setTimeMs(timeMs);
+			        packetHeader.setCapLen(capLen);
+			        packetHeader.setLen(len);
+
+			        return packetHeader;
+			    }
+			    
+			    
+	    public void PcapFileParser(File pcapFile) throws Exception {
+	        fileSize = pcapFile.length();
+	        System.out.println("文件长度:"+fileSize);
+	        input = new BufferedInputStream(new FileInputStream(pcapFile));
+
+	        byte[] globalHeaderBuffer = new byte[GLOBAL_HEADER_LENGTH];
+	        if(input.read(globalHeaderBuffer) != GLOBAL_HEADER_LENGTH) {
+	            System.out.println("The Pcap file is broken!");
+	            return;
+	        }
+
+	        byte[] magicNum = Arrays.copyOfRange(globalHeaderBuffer, 0, 4);
+
+	        if(!DigitalTransUtils.byte2hex(magicNum).equalsIgnoreCase("A1B2C3D4")){
+	            bo = ByteOrder.LITTLE_ENDIAN;
+	        }
+	        reader = new ByteReader(bo);
+	        offset = 24;
+
+	        // 解析 Global Header
+	        GlobalHeader globalHeader = parseGlobalHeader(globalHeaderBuffer);
+	        System.out.println(globalHeader);
+	    }
+
+	    
+	    /**
+	     *  解析Global Header
+	     */
+	    private GlobalHeader parseGlobalHeader(byte[] globalHeaderBuffer) {
+	        GlobalHeader globalHeader = new GlobalHeader();
+
+	        byte[] magicBuffer = Arrays.copyOfRange(globalHeaderBuffer, 0, 4);
+	        byte[] linkTypeBuffer = Arrays.copyOfRange(globalHeaderBuffer, 20, 24);
+
+	        globalHeader.setMagicNum(DigitalTransUtils.byte2hex(magicBuffer));
+	        globalHeader.setLinkType(ByteUtil.bytesToInt(linkTypeBuffer,bo));
+
+	        return globalHeader;
+	    }
+	    
+
+	    public  int bytesToInt(byte[] a){
+	        int ans=0;
+	        for(int i=0;i<4;i++){
+	            ans<<=8;
+	            ans|=(a[3-i]&0xff);
+	            /* 这种写法会看起来更加清楚一些：
+	            int tmp=a[3-i];
+	            tmp=tmp&0x000000ff;
+	            ans|=tmp;*/
+//	            intPrint(ans);
+	        }
+	        return ans;
+	    }
+	    
+	    
+	    public  void intPrint(int a){//将 int 按位从左到右打印
+	        int count=0;
+	        for(int i=31;i>=0;i--){
+	            System.out.print((a>>i)&1);
+	            count++;
+	            if(count==4){//每四位为一组，用空格分开
+	                System.out.print(" ");
+	                count=0;
+	            }
+	        }
+	        System.out.println();
+	    }
+   
+	    
+	    public class ByteReader {
+	        ByteOrder bo = ByteOrder.BIG_ENDIAN;
+	        public ByteReader(ByteOrder bo){
+	            this.bo = bo;
+	        }
+	        /**
+	         * Reads {@code length} bytes from the file at the input stream's current
+	         * position.
+	         *
+	         * @param length the amount of bytes to read
+	         * @return a {@link ByteBuffer} that holds the underlying byte array of the data
+	         * that was read.
+	         * @throws IOException if there was an error while reading from the file
+	         */
+	        public ByteBuffer read(int length) throws IOException {
+	            return read(length, bo);
+	        }
+
+	        /**
+	         * Reads {@code length} bytes from the file at the input stream's current
+	         * position.
+	         *
+	         * @param length the amount of bytes to read
+	         * @param order  the endianness of the resulting {@link ByteBuffer}
+	         * @return a {@link ByteBuffer} that holds the underlying byte array of the data
+	         * that was read.
+	         * @throws IOException if there was an error while reading from the file
+	         */
+	        public ByteBuffer read(int length, ByteOrder order)  {
+	        	
+	            ByteBuffer buffer = null;
+	            
+	            byte[] data = new byte[length];
+	            try {
+	            	
+//		            byte[] data =    new byte[] { (byte)0x00, 0x00, (byte)0x00, (byte)0x00, 
+//		            		(byte)0x00, 0x00, (byte)0x00, (byte)0x00, 
+//		            		(byte)0x00, 0x00, (byte)0x00, (byte)0x00,
+//		            		(byte)0x00, 0x00, (byte)0x00, (byte)0x00, 
+//		             };
+		            
+		            int avaliableNum =  input.available();
+		            int curPosition = (int) (fileSize - avaliableNum);
+		            int curPosition_offset_diff = offset - curPosition;
+		            System.out.println("avaliableNum = "+ avaliableNum +"  curPosition="+ curPosition+"  curPosition_offset_diff="+curPosition_offset_diff);
+		            
+//step[7]_0  preOffSet=9232   offset=9232
+//avaliableNum = 224581  curPosition=8192  curPosition_offset_diff=1040
+//step[7]_1  preOffSet=9232   offset=9248
+//step[7]_2_parsePacketHeader  ApreOffset=9232  Aoffset=9248   capLen=1508   capA=1508   len=1508     capLenBuffer=E4050000     dataHeaderBuffer=3B4984607FA40200E4050000E4050000
+//step[7]_3  preOffSet=9232   offset=9248
+//step[7]_4  preOffSet=9232   offset=10756
+//step[7]_5  preOffSet=9232   offset = 10756   CapLen=1508  fileSize=232773
+		
+		            //  offset为 9232  读取到  但curPosition 却是8192  意味着当前读取 只能从8192开始 需要继续跳过 diff=1040个字节才能从  9232 开始
+		            if(curPosition_offset_diff > 0 ) {
+		                input.skip(curPosition_offset_diff);
+		            }
+		  
+		            input.read(data, 0, length);
+
+		            offset += length;
+		             buffer = ByteBuffer.wrap(data);
+		            buffer.order(order);
+	            	
+	            } catch(Exception e ) {
+	            	System.out.println("读取read 方法 发生异常! e="+e);
+	            }
+
+	            return buffer;
+	        }
+			
+			}
+  
+
+        
+	    
+	    
+	}
+
+	// zukgit 
+	public static class DateUtil {
+		
+		
+		// yyyy-MM-dd HH:mm:ss
+	    public static String dateToString(long timeStamp) {
+	    	SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	        String now = f.format(timeStamp);
+	        return now;
+
+	    }
+		
+	    static String getTimeStampStr_YYYYMMDDHHMMSS_FORMAT(Long time) {
+	    	SimpleDateFormat f = new SimpleDateFormat("yyyyMMddHHmmss");
+	        String now = f.format(time);
+	        return now;
+	    }
+
+	}
+
+	public static class DigitalTransUtils {
+		/**
+	     * 字节数组转换为十六进制字符串
+	     *
+	     * @param b byte[] 需要转换的字节数组
+	     * @return String 十六进制字符串
+	     */
+	    public static final String byte2hex(byte[] b) {
+	        if (b == null) {
+	            throw new IllegalArgumentException(
+	                    "Argument b ( byte array ) is null! ");
+	        }
+	        String hs = "";
+	        String stmp = "";
+	        for (int n = 0; n < b.length; n++) {
+	            stmp = Integer.toHexString(b[n] & 0xff);
+	            if (stmp.length() == 1) {
+	                hs = hs + "0" + stmp;
+	            } else {
+	                hs = hs + stmp;
+	            }
+	        }
+	        return hs.toUpperCase();
+	    }
+
+	 	/**
+	     * 字节数组转为普通字符串（ASCII对应的字符）
+	     *
+	     * @param bytearray byte[]
+	     * @return String
+	     */
+	    public static String bytetoString(byte[] bytearray) {
+	        String result = "";
+	        char temp;
+
+	        int length = bytearray.length;
+	        for (int i = 0; i < length; i++) {
+	            temp = (char) bytearray[i];
+	            result += temp;
+	        }
+	        return result;
+	    }
+	}
+
+    
+	public static  class GlobalHeader {
+
+	    public static final int LINK_TYPE_ETHERNET = 1;
+
+	    /**
+	     * 十六制的magicNum,通常是 A1B2C3D4
+	     */
+	    public String magicNum;
+	    /**
+	     * 链路层报头类型,通常是1，表示以太网
+	     */
+	    public int linkType;
+
+	    public GlobalHeader() {
+	    }
+
+	    public String getMagicNum() {
+	        return magicNum;
+	    }
+
+	    public void setMagicNum(String magicNum) {
+	        this.magicNum = magicNum;
+	    }
+
+	    public int getLinkType() {
+	        return linkType;
+	    }
+
+	    public void setLinkType(int linkType) {
+	        this.linkType = linkType;
+	    }
+
+	    @Override
+	    public String toString() {
+	        return "GlobalHeader{" +
+	                "magicNum=" + magicNum +
+	                ", linkType=" + linkType +
+	                '}';
+	    }
+	}
+	
+	
+	
+	public static class PacketHeader {
+
+	    /**
+	     *
+	     * 时间戳 高位（秒）：记录数据包抓获的时间, 转化为 yyyy-MM-dd HH:mm:ss格式的日期时间
+	     * 记录方式是从格林尼治时间的1970年1月1日 00:00:00 到抓包时经过的秒数（4个字节）
+	     *
+	     */
+		public String timeS;
+	    /**
+	     * 时间戳 低位（微秒）：抓取数据包时的微秒值（4个字节）
+	     */
+		public int timeMs;
+	    /**
+	     * 数据包长度：标识所抓获的数据包保存在 pcap 文件中的实际长度，以字节为单位（4个字节）
+	     */
+		public int capLen;
+	    /**
+	     * 数据包实际长度： 所抓获的数据包的真实长度（4个字节）
+	     */
+		public int len;
+
+	    public PacketHeader() {
+	    }
+
+	    @Override
+	    public String toString() {
+	        return "PacketHeader{" +
+	                "timeS=" + timeS +
+	                ", timeMs=" + timeMs +
+	                ", capLen=" + capLen +
+	                ", len=" + len +
+	                '}';
+	    }
+
+	    public int getTimeMs() {
+	        return timeMs;
+	    }
+
+	    public void setTimeMs(int timeMs) {
+	        this.timeMs = timeMs;
+	    }
+
+	    public int getCapLen() {
+	        return capLen;
+	    }
+
+	    public void setCapLen(int capLen) {
+	        this.capLen = capLen;
+	    }
+
+	    public int getLen() {
+	        return len;
+	    }
+
+	    public void setLen(int len) {
+	        this.len = len;
+	    }
+
+	    public String getTimeS() {
+
+	        return timeS;
+	    }
+
+	    public void setTimeS(String timeS) {
+	        this.timeS = timeS;
+	    }
+
+	}
+	
 	
 	//SELinux : avc:  denied  { find } for pid=27266 uid=10108 name=motorola.hardware.sarwifi.IMtkWifi/default scontext=u:r:platform_app:s0:c512,c768 tcontext=u:object_r:default_android_service:s0 tclass=service_manager permissive=0
 	//SELinux : avc:  denied  { find } for pid=6433 uid=90008 name=content_capture scontext=u:r:isolated_app:s0:c512,c768 tcontext=u:object_r:content_capture_service:s0 tclass=service_manager permissive=0
@@ -3842,7 +4309,7 @@ public class I9_TextRuleOperation {
 
 		@Override
 		String simpleDesc() {
-			return " ## A1.bat G1.bat G2.sh 本地依据Java名称生成 包括 xx.sh  和 xx.bat  // 当前目录只能有一个 .java 多个 .jar 包 !";
+			return " ## A1.bat G1.bat G2.sh 本地依据Java名称生成 读取jar包 包括 xx.sh  和 xx.bat  // 当前目录只能有一个 .java 多个 .jar 包 !";
 		}
 
 	}
