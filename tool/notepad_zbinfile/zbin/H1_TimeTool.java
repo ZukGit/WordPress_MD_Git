@@ -486,6 +486,10 @@ public class H1_TimeTool {
         System.out.println("提示7:  " + Cur_Bat_Name + "  clearday0812            ## 清除指定日期 08月 12 日的数据");
 
 
+        System.out.println("提示8:  " + Cur_Bat_Name + "  stamp_1560950936            ## 记录时间戳  打印 对应的日期   ");
+        System.out.println("提示8:  " + Cur_Bat_Name + "  stamp_1661227529           ## 记录时间戳  打印 对应的日期");
+
+        
 //        ztime_H1.bat  every_month[31] every_week[5]  every_year[0607]
 
 
@@ -1575,8 +1579,8 @@ public class H1_TimeTool {
         }
 
         // 设置对应的 calendoar 日历
-        ztimeStamp.targetCalendar.set((int) ztimeStamp.year, (int) ztimeStamp.month, (int) ztimeStamp.day);
-        ztimeStamp.targetCalendar.set((int) ztimeStamp.year, (int) ztimeStamp.month, (int) ztimeStamp.day, (int) ztimeStamp.hour, (int) ztimeStamp.mintus, (int) ztimeStamp.second);
+        ztimeStamp.targetCalendar.set((int) ztimeStamp.year, (int) ztimeStamp.month-1, (int) ztimeStamp.day);
+        ztimeStamp.targetCalendar.set((int) ztimeStamp.year, (int) ztimeStamp.month-1, (int) ztimeStamp.day, (int) ztimeStamp.hour, (int) ztimeStamp.mintus, (int) ztimeStamp.second);
         ztimeStamp.targetCalendar.set(Calendar.MILLISECOND, (int) ztimeStamp.microSecond);
 
         return ztimeStamp;
@@ -1945,8 +1949,31 @@ public class H1_TimeTool {
 //            提示7:  ztime_H1.bat  everyweek[7]_DDDDDD            ## 记录一个循环每周日志  该日志的时间为每周周天
 //            提示7:  ztime_H1.bat  everyweek[11-7]_GGGGGG            ## 记录一个指定月份的循环每周日志  该日志的时间为11月的每周周天
 //            提示7:  ztime_H1.bat  everyyear[0207]_EEEEE            ## 记录一个每年的日志 该日志的时间0207    效果
+//            提示8:  ztime_H1.bat  stamp_32424242            ##  记录时间戳  打印 对应的日期
 //
 
+        
+        boolean checkType8(String param) {
+            boolean endflag = false;
+
+            // 1. 以  时间 参数为结尾
+            endflag = param.startsWith("stamp_") || param.startsWith("timestamp_");
+            System.out.println("param = "+ param +"  endflag="+endflag);
+            if(!endflag) {
+            	return	false;
+            }
+            
+            String clearTimeStamp = param.replace("timestamp_", "").replace("stamp_", "").trim();
+            
+            if(!isNumeric(clearTimeStamp)) {
+            	return	false;
+            }
+
+
+            return true;
+        }
+        
+        
         boolean checkType6(String param) {
             boolean endflag = false;
 
@@ -2108,8 +2135,8 @@ public class H1_TimeTool {
                     long distanceMonth = distanceValueMillion / (1000L * 60L * 60 * 24 * 30);
                     long distanceYear = distanceValueMillion / (1000L * 60 * 60 * 24 * 365);
 
-                    System.out.println("\n时间点A -> " + time1);
-                    System.out.println("时间点B -> " + time2);
+                    System.out.println("\n时间点A -> " + time1+"     时间戳ms:"+millionSecondsA);
+                    System.out.println("时间点B -> " + time2+"     时间戳ms:"+millionSecondsB);
                     System.out.println("\n相差时间距离:\n");
                     System.out.println("毫秒      : " + distanceValueMillion + "ms");
                     System.out.println("秒        : " + (distanceValueMillion / 1000) + "s");
@@ -2149,13 +2176,14 @@ public class H1_TimeTool {
                     long CdistanceDay = CdistanceValueMillion / (1000 * 60 * 60 * 24);
 
 
-                    System.out.println("\n时间点A           -> " + showCalendar(zTimeStampForType3.targetCalendar));
-                    System.out.println("时间点B(今日凌晨) -> " + showCalendar(todayCalendar));
-                    System.out.println("\n该时间点今日时长:\n");
+                    System.out.println("\n时间点A           -> " + showCalendar(zTimeStampForType3.targetCalendar)+"   时间戳S:"+(millSecondForType3/1000)+"   时间戳ms:"+millSecondForType3);
+                    System.out.println("时间点B(今日凌晨) -> " + showCalendar(todayCalendar)+"   时间戳S:"+(todayMillSecond/1000)+"   时间戳ms:"+todayMillSecond);
+                    System.out.println("\n该时间点距离今日时长:\n");
                     System.out.println("毫秒      : " + CdistanceValueMillion + "ms");
                     System.out.println("秒        : " + (CdistanceValueMillion / 1000) + "s");
                     System.out.println("分钟      : " + (CdistanceValueMillion / (1000 * 60) + "分钟" + (CdistanceSecond % 60) + "秒"));
                     System.out.println("小时      : " + (CdistanceValueMillion / (1000 * 60 * 60) + "小时" + (CdistanceMintus % 60) + "分钟") + (CdistanceSecond % 60) + "秒");
+                    System.out.println("天        : " + (CdistanceValueMillion /  (1000 * 60 * 60 * 24)) + "天");
 
 
                     break;
@@ -2231,10 +2259,79 @@ public class H1_TimeTool {
 
 
                     break;
+                    
                 case 6:   //  ztime  day_ day[] month[]  month_ everyweek everymonth everyyear_
                     showNoTypeTip(timeTool);
                     // nothing
                     break;
+                    
+                case 8:   //  ztime  stamp_1560950936
+                   
+                    String params_8 = inputParamList.get(0);
+                    
+                    String timestamp_num = params_8.replace("timestamp_", "").replace("stamp_", "").trim();
+                    String timestamp_raw = timestamp_num;
+                    if(timestamp_num.length() == 10) { // 如果是 10位  那么可能输入是 秒  转为 毫秒
+                    	timestamp_num = timestamp_num+"000";
+                    }
+                    Long timeStamp_long = Long.parseLong(timestamp_num);
+                    
+
+                       Calendar stampCalendar=Calendar.getInstance();
+                       stampCalendar.setTimeInMillis(timeStamp_long);
+
+                       int year_8 =stampCalendar.get(Calendar.YEAR);
+                      	String year_8_str 	= year_8+"";
+                       
+                       int month_8 = (stampCalendar.get(Calendar.MONTH) == 0 ? 12 : (stampCalendar.get(Calendar.MONTH)+1));
+                    
+                    	String month_8_str 	= (month_8>9?month_8+"":"0"+month_8);
+                    		   
+                       int day_8 = stampCalendar.get(Calendar.DAY_OF_MONTH);
+                       String day_8_str 	=day_8+"";
+                       if(day_8 < 10) {
+                    	   day_8_str = "0"+day_8;
+                       } 
+                   	
+                       
+                       int hour_8 = stampCalendar.get(Calendar.HOUR_OF_DAY);
+                       String hour_8_str 	=hour_8+"";
+                       if(hour_8 < 10) {
+                    	   hour_8_str = "0"+hour_8;
+                       } 
+                       
+                       int minute_8 = stampCalendar.get(Calendar.MINUTE);
+                       
+                       String minute_8_str 	=minute_8+"";
+                       if(minute_8 < 10) {
+                    	   minute_8_str = "0"+minute_8;
+                       } 
+                       
+                       int second_8 = stampCalendar.get(Calendar.SECOND);
+                       
+                       String second_8_str 	=second_8+"";
+                       if(second_8 < 10) {
+                    	   second_8_str = "0"+second_8;
+                       } 
+                       
+                       
+    
+                    
+//                       ztime_H1.bat  2020-04-26_16:16:00
+                      String commandTip = Cur_Bat_Name+" "+year_8_str+"-"+month_8_str+"-"+day_8_str+"_"+hour_8_str+":"+minute_8_str+":"+second_8_str;
+             
+                
+                      System.out.println("\n"+params_8+" 计算出的时间点:   "+commandTip+"\n" + year_8_str + "年" +
+                   		   month_8_str + "月" +
+                   		   day_8_str + "日" +
+                   		   hour_8_str + "时" +
+                   		   minute_8_str + "分" +
+                   		   second_8_str + "秒"+"       【 "+timestamp_raw+" 】   " +commandTip);
+                      
+                      break;
+                    
+                    
+    
                 default:
                     initFlag = false;
             }
@@ -2291,6 +2388,9 @@ public class H1_TimeTool {
                     flag = true;
                 } else if (checkType6(onlyOneParam)) {
                     inputType = 6;
+                    flag = true;
+                }else if (checkType8(onlyOneParam)) {
+                    inputType = 8;
                     flag = true;
                 } else {    // 其余的情况  输入类型为 0 标识无法识别
                     inputType = 0;
@@ -3094,14 +3194,9 @@ public class H1_TimeTool {
 
             StringBuilder lineOne = new StringBuilder();
             StringBuilder lineTwo = new StringBuilder();
-          //zz  System.out.println("weekKeyList.size() = "+ weekKeyList.size());
-      
             for (int i = 0; i < weekKeyList.size(); i++) {
                 ArrayList<Integer> weekDays = weekKeyList.get(i);
                 int days = weekDays.size();
-                if(days == 0) {
-                	continue;
-                }
                 int weekNum = i + 1;
                 String descItem = weekNum + "w(" + days + "d)" + nowSelectTip(month, weekDays);
                 descItem = getPaddingString(descItem, 14 + descItem.length(), " ", true);
@@ -3111,7 +3206,6 @@ public class H1_TimeTool {
 //                System.out.println(descItem);
                 lineOne.append(descItem);
 
-//                System.out.println("weekKeyList.size() = "+ weekKeyList.size()+"  "+"weekDays.size() days = "+ days);
                 int beginDay = weekDays.get(0);
                 int endDay = weekDays.get(weekDays.size() - 1);
 

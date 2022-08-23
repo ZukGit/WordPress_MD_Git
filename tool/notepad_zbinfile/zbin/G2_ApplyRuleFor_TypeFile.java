@@ -2750,6 +2750,7 @@ public class G2_ApplyRuleFor_TypeFile {
 						Thread.sleep(200);
 						System.out.println("════════ 监听到 Ctr+Z stop进程操作 将执行保存当前页面位置代码的操作 ════════");
 
+				
 						writeContentToFile(G2_Temp_Text_File, curPositionHtmlCodeStr);
 						NotePadOpenTargetFile(G2_Temp_Text_File.getAbsolutePath());
 
@@ -4484,13 +4485,18 @@ public class G2_ApplyRuleFor_TypeFile {
 
 
 	class GetHttpCode_Rule_42 extends Basic_Rule {
+		
+		
+		boolean html2md_flag ; //  html2md_true  //    把当前的 html 转为 md的操作 
+		
+		
 		//  必须以 http 开头
 		String searchHttpUrl ;   // 从输入传入的 需要得到 的 http 源码的 网页的地址
 		ChromeDriver mChromeDriver ;
 		String curPositionHtmlCodeStr;   // 每次得到的 html代码的值 用于突然用户终止程序时 使用
 		GetHttpCode_Rule_42() {
 			super("#", 42, 4); //
-
+			html2md_flag = false;
 		}
 
 		@Override
@@ -4502,9 +4508,13 @@ public class G2_ApplyRuleFor_TypeFile {
 				String paramItem_lower_trim = paramItem.toLowerCase().trim();
 				System.out.println("paramItem["+i+"] = "+paramItem_lower_trim);
 				if (paramItem_lower_trim.startsWith("http")) {
-					searchHttpUrl = paramItem_lower_trim;
+					searchHttpUrl = paramItem;
 				}
 
+				if (paramItem_lower_trim.startsWith("html2md_true")) {
+					html2md_flag = true;
+				}
+				
 			}
 
 			if(searchHttpUrl == null) {
@@ -4525,6 +4535,7 @@ public class G2_ApplyRuleFor_TypeFile {
 
 			mChromeDriver = new ChromeDriver(CUR_CHROME_OPTIONS);
 
+			System.out.println("searchHttpUrl=【"+searchHttpUrl+"】  html2md_flag=【"+html2md_flag+"】");
 
 			return super.initParamsWithInputList(inputParamList);
 		}
@@ -4558,16 +4569,31 @@ public class G2_ApplyRuleFor_TypeFile {
 											  ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 			// TODO Auto-generated method stub
 
-			registerShutDownLister();
+			if(!html2md_flag) {   // 确保 html2md 时 不打开 G2_Temp
+				registerShutDownLister();
+			}
+
 
 			String httpPageCode = BrowserOperation_WithRootUrl(searchHttpUrl);
 
 
 			if(httpPageCode != null) {
 
-				writeContentToFile(G2_Temp_Text_File, httpPageCode);
-				NotePadOpenTargetFile(G2_Temp_Text_File.getAbsolutePath());
-				System.out.println("获得【"+searchHttpUrl+"】 MainPage HtmlCode 成功!! ");
+
+				
+				if(html2md_flag) {
+					System.out.println("开始 进行 Html 转 MD 的文件的操作! ");
+					
+					Html_2_MD_Operation(G2_Temp_Text_File);
+					System.out.println("执行  Html 转 MD 的文件的操作 成功! ! ");
+					return null;
+				}else {
+					
+					writeContentToFile(G2_Temp_Text_File, httpPageCode);
+					NotePadOpenTargetFile(G2_Temp_Text_File.getAbsolutePath());
+					System.out.println("获得【"+searchHttpUrl+"】 MainPage HtmlCode 成功!! ");
+		
+				}
 			}else {
 				System.out.println("获得【"+searchHttpUrl+"】 MainPage HtmlCode 失败!! ");
 
@@ -4581,10 +4607,763 @@ public class G2_ApplyRuleFor_TypeFile {
 
 		@Override
 		String simpleDesc() {
+			return "\n" + Cur_Bat_Name + " #_" + rule_index+" https://www.baidu.com   ### 传递一个http路径打开它的html源码(tip:有些页面浏览器另存为的html由于某些html页面) "
 
-			return "\n" + Cur_Bat_Name + " #_" + rule_index+" https://www.baidu.com   ### 传递一个http路径打开它的html源码(tip:有些页面浏览器另存为的html由于某些html页面) ";
+			+  "\n" + Cur_Bat_Name + " #_" + rule_index+" https://zhou-yuxin.github.io/articles/2016/%E6%97%A0%E7%BA%BF%E7%BD%91%E7%BB%9CWPA2%E5%8A%A0%E5%AF%86%E7%9A%84%E7%A0%B4%E8%A7%A3/index.html  html2md_true   ### 传递一个http路径打开它的html源码 并解析到 MD文件(以github.io工程的文件夹格式) ";
 		}
 
+		// html2md ====================begin==========================
+		
+		// 模拟主页
+//		String rootUrl = "https://zhou-yuxin.github.io/articles/2016/%E6%97%A0%E7%BA%BF%E7%BD%91%E7%BB%9CWPA2%E5%8A%A0%E5%AF%86%E7%9A%84%E7%A0%B4%E8%A7%A3/";
+
+		String rootUrl = "https://qiankunli.github.io";
+		String rootUrl_possible_url1  = "https://qiankunli.github.io";
+                // https://qiankunli.github.io/2022/03/20/xxxx资源 
+		
+		// 当前的主页  https://qiankunli.github.io/2022/03/20/flink.html  
+		//
+		
+		// <p><img src="/public/upload/compute/flink_design.png" alt="" /></p>
+		// https://qiankunli.github.io/  public/upload/compute/flink_design.png
+        // https://qiankunli.github.io/ 	  资源的主页	
+		// <img src="x.jpg"> 中的 x.jpg 对应的 src的 绝对的路径
+
+		HashMap<String, String> srcImageUrl_ZimageUrl_Map; // <img src="x.jpg">【key】 <img src="x.jpg"> 【value】<img
+		// src="//../zimage/architect/01_sorttable.jpg">
+		HashMap<String, String> srcImageUrl_AbsUrl_Map; // <img src="x.jpg">【key】 https://www.baidu.com/x.jpg【value】
+		HashMap<String, String> srcImageUrl_AbsUrl_Possibale1_Map; // <img src="x.jpg">【key】 https://www.baidu.com/x.jpg【value】
+
+		
+		HashMap<String, File> srcImageUrl_LocalFile_Map; // 1.jpg 对应的 本地的 public/zimage/html2md/1.jpg
+
+		ArrayList<String> srcImageUrl_List; // <img src="x.jpg"> 的原始 内容为了最终方便 替换
+		ArrayList<String> innderHtmlTag; // 需要去除的 tag
+
+		File curMDShellDir; // 本地的shell执行的路径
+		// html_2_md_timestemp
+		File html_md_timestamp_dir; // html_2_md_20220818_192012/ 当前目录下 生成的 html_2_md_timestamp
+		String html_md_timestamp_dirname; // html_2_md_20220818_192012
+
+		File html_zimage_dir; // html_2_md_20220818_192012/zukgit.github.io/public/zimage/html2md/
+		File html_2_mdfile_dir; // html_2_md_20220818_192012/zukgit.github.io/_posts/Technology/html2md/
+		// html_2_md_20220818_192012/zukgit.github.io
+		// html_2_md_20220818_192012/zukgit.github.io/public/zimage/html2md/
+		// 【html_zimage_dir】
+		// html_2_md_20220818_192012/zukgit.github.io/public/zimage/html2md/xxxx.jpg
+		// html_2_md_20220818_192012/zukgit.github.io/_posts/Technology/html2md/
+		// html_2_md_20220818_192012/zukgit.github.io/_posts/Technology/html2md/{title}.md
+
+		String md_title; // 当前html的 title 属性 当做 md 文件的名称
+		File md_file; // 目标的 md 文件
+
+		String time_stamp_str; // 日期格式
+
+		// md 文件的头部
+		ArrayList<String> mdHeadList;
+		
+	void init_http_url() {
+		String inputUrl = searchHttpUrl;
+		
+		rootUrl = searchHttpUrl;
+		rootUrl_possible_url1 = searchHttpUrl;
+		if(inputUrl.endsWith(".html")) {
+			// /
+			rootUrl = 	inputUrl.substring(0,inputUrl.lastIndexOf("/"));
+			
+		}
+		
+		//  https://qiankunli.github.io
+		if(searchHttpUrl.contains("github.io")) {
+			rootUrl_possible_url1 = searchHttpUrl.substring(0,searchHttpUrl.indexOf("github.io")+"github.io".length());
+			
+		}
+		
+		System.out.println("searchHttpUrl=【"+searchHttpUrl+"】   rootUrl=【"+rootUrl+"】   rootUrl_possible_url1="+rootUrl_possible_url1);
+	
+		
+	}
+		
+		void Html_2_MD_Operation(File httpCodeFile) {
+			init_html2md_value();
+			init_http_url();
+			String httpCodeFileName = time_stamp_str+"_"+httpCodeFile.getName();
+			File curShell_TxtFile = new File(curDirFile.getAbsolutePath()+File.separator+httpCodeFileName);
+			fileCopy(httpCodeFile, curShell_TxtFile);
+	
+			Html_2_MD(curShell_TxtFile);
+			
+			
+		}
+		
+		
+		void  Html_2_MD(File fileItem ) {
+	
+				curMDShellDir = fileItem.getParentFile();
+				System.out.println("curShellDir = " + curMDShellDir);
+
+				initHtml2MD_Dir(curMDShellDir); // 初始化 那些 需要用到的目录
+
+				ArrayList<String> allMD_StrList = new ArrayList<String>();
+				ArrayList<String> fixedMD_StrList = new ArrayList<String>();
+				ArrayList<String> rawHtml_StrList = ReadFileContentAsList(fileItem);
+
+				// 0. <h1> 转为 # <h6> 转为 ######
+
+				// 1. <p> 转为 空 去除掉
+				// 1.1 <img src="1.png"> 转为 相对路径 需要计算 src的绝对路径 所以需要依据参数得到 这里假设有 保留
+// 下载到本地 并命名为 	20220818_3142.png
+//				<img src="//../zimage/html2md/20220818_3142.png">
+				// 1.2 <a> </a> 可保留
+
+				// 2. <pre> 转为 "\n```\n" <pre> 转为 "\n```\n"
+
+				// 3. 最后处理
+				// 去除 <body class="p" > 给定参数 body 去除 <body 开头 以及 在它之后的 > 的这段内容
+				// <div id="main"> <article id=" <article id= <\ 开头的 以及之后的> 去除
+
+				for (int j = 0; j < rawHtml_StrList.size(); j++) {
+					String oneLineStr = rawHtml_StrList.get(j);
+					String fixedLineStr = new String(oneLineStr);
+					;
+
+					// 0. <h1> 转为 # <h6> 转为 ######
+					fixedLineStr = title_to_jing(oneLineStr);
+					// 1. <p> operation
+					fixedLineStr = clear_p_br_tag(fixedLineStr);
+
+				
+					// 2. <pre> operation
+					fixedLineStr = clear_pre_tag(fixedLineStr);
+
+					// 3. 去除 <body class="p" >
+					fixedLineStr = clear_inner_tag(fixedLineStr);
+
+					
+					// &lt;==<    &gt;==> 的转换
+					fixedLineStr = clear_lt_gt_tag(fixedLineStr);
+					
+					fixedMD_StrList.add(fixedLineStr);
+				}
+
+				md_file = new File(html_2_mdfile_dir + File.separator + md_title + ".md");
+
+				initHeadList(md_title); // 初始化 mdHeadList
+
+				// allMD_StrList = mdHeadList + fixedMD_StrList
+
+				System.out.println("srcImageUrl_List.size() = " + srcImageUrl_List.size());
+
+//					HashMap<String,String> srcImageUrl_ZimageUrl_Map;  //<img src="x.jpg">【key】 <img src="x.jpg">    【value】<img src="//../zimage/architect/01_sorttable.jpg">
+//					HashMap<String,String> srcImageUrl_AbsUrl_Map;  //<img src="x.jpg">【key】   https://www.baidu.com/x.jpg【value】
+//					HashMap<String,File> srcImageUrl_LocalFile_Map;
+
+				for (int j = 0; j < srcImageUrl_List.size(); j++) {
+					String imageUrlItem = srcImageUrl_List.get(j);
+					String networkAbsUrl = srcImageUrl_AbsUrl_Map.get(imageUrlItem);
+					String networkAbsUrl_Possible1 = srcImageUrl_AbsUrl_Map.get(imageUrlItem);
+					String publicImage_Src_Url = srcImageUrl_ZimageUrl_Map.get(imageUrlItem);
+					File localImgFile = srcImageUrl_LocalFile_Map.get(imageUrlItem);
+
+					System.out.println("image[" + j + "][" + srcImageUrl_List.size() + "]  MD_File="+md_file.getAbsolutePath()+"   showUrl=" + imageUrlItem
+							+ "  networkUrl:" + networkAbsUrl + " publicSrc:" + publicImage_Src_Url + "  localFile:"
+							+ localImgFile.getAbsolutePath()+" possible_url1=【"+networkAbsUrl_Possible1+"】");
+
+				if(!downloadImage(localImgFile, networkAbsUrl)) {
+					System.out.println("mainUrl:"+networkAbsUrl+"  没有下载成功 尝试使用备用路径 networkAbsUrl_Possible1="+networkAbsUrl_Possible1);
+					
+					
+					if(!downloadImage(localImgFile, networkAbsUrl_Possible1)){
+						System.out.println(" FUCK 主路径和配用路径都下载失败!! "+"mainUrl:"+networkAbsUrl+"  没有下载成功 尝试使用备用路径 networkAbsUrl_Possible1="+networkAbsUrl_Possible1);
+						
+						
+					}
+					
+					
+				  }	
+				}
+			
+
+				allMD_StrList.addAll(mdHeadList);
+				
+				// 去除 占用多行的 注释  <!-- -->    和 <script> 以及 </script>
+				ArrayList<String>  clearScriptMDList = clearMultiZhuShi_clearMultiScript(fixedMD_StrList);
+				
+				// 多行空格转为 一行 空格   使得 整体 看起来紧凑
+				ArrayList<String> clear_MultiBlankMDList = clearMultiBlank(clearScriptMDList);
+				allMD_StrList.addAll(clear_MultiBlankMDList);
+
+//				writeContentToFile(I9_Temp_Text_File, fixedMD_StrList);
+//				NotePadOpenTargetFile(I9_Temp_Text_File.getAbsolutePath());
+
+				writeContentToFile(md_file, allMD_StrList);
+				NotePadOpenTargetFile(md_file.getAbsolutePath());
+
+
+		}
+		
+		
+		void init_html2md_value() {
+			srcImageUrl_ZimageUrl_Map = new HashMap<String, String>();
+			srcImageUrl_AbsUrl_Map = new HashMap<String, String>();
+			srcImageUrl_AbsUrl_Possibale1_Map =  new HashMap<String, String>();
+			srcImageUrl_List = new ArrayList<String>();
+			srcImageUrl_LocalFile_Map = new HashMap<String, File>();
+			mdHeadList = new ArrayList<String>();
+			time_stamp_str = getTimeStampyyyyMMdd_HHmmss();
+			init_innerTag_List();
+
+		}
+		
+		
+		void init_innerTag_List() {
+			innderHtmlTag = new ArrayList<String>();
+			innderHtmlTag.add("html");
+			innderHtmlTag.add("head");
+//			innderHtmlTag.add("title");
+			innderHtmlTag.add("link");
+			innderHtmlTag.add("body");
+			innderHtmlTag.add("header");
+			innderHtmlTag.add("meta");
+			innderHtmlTag.add("div");
+			innderHtmlTag.add("article");
+
+
+
+			innderHtmlTag.add("i");
+			innderHtmlTag.add("!doctype html");
+			innderHtmlTag.add("br");
+			innderHtmlTag.add("li");
+			innderHtmlTag.add("ul");
+			innderHtmlTag.add("table");
+
+			innderHtmlTag.add("tr");
+
+			innderHtmlTag.add("td");
+			innderHtmlTag.add("button");
+			innderHtmlTag.add("ol");
+
+			innderHtmlTag.add("hr");
+			innderHtmlTag.add("thead");
+
+			innderHtmlTag.add("th");
+			
+			innderHtmlTag.add("footer");
+			innderHtmlTag.add("tbody");
+			innderHtmlTag.add("code");
+			innderHtmlTag.add("span");
+//			innderHtmlTag.add("!--");
+//			innderHtmlTag.add("script");
+			
+	
+			
+		}
+		
+		
+//		---
+//		layout: post
+//		title: {title}
+//		category: html2md
+//		tags: html2md
+//		keywords:
+//		typora-root-url:..\..\..\
+//		typora-copy-images-to:..\..\..\public\zimage\html2md
+//		---
+
+		void initHeadList(String title) {
+
+			mdHeadList.add("---");
+			if (title.startsWith("unknow")) {
+				mdHeadList.add("title: " + "unknow");
+
+			} else {
+				mdHeadList.add("title: " + title);
+			}
+			mdHeadList.add("category: html2md");
+			mdHeadList.add("tags: html2md");
+			mdHeadList.add("keywords: ");
+			mdHeadList.add("typora-root-url:..\\..\\..\\");
+			mdHeadList.add("typora-copy-images-to:..\\..\\..\\public\\zimage\\html2md");
+			mdHeadList.add("---");
+
+			mdHeadList.add("\n");
+
+			mdHeadList.add("## 简介");
+			mdHeadList.add(" * TOC");
+			mdHeadList.add(" {:toc}");
+
+			mdHeadList.add("\n");
+			mdHeadList.add("\n");
+
+		}
+
+		void initHtml2MD_Dir(File shellDirFile) {
+			String shellPath = shellDirFile.getAbsolutePath();
+
+			html_md_timestamp_dirname = "html_2_md" + "_" + time_stamp_str;
+			md_title = "unknow_" + time_stamp_str;
+
+			html_md_timestamp_dir = new File(shellPath + File.separator + html_md_timestamp_dirname);
+			html_zimage_dir = new File(
+					html_md_timestamp_dir.getAbsolutePath() + File.separator + "zukgit.github.io" + File.separator
+							+ "public" + File.separator + "zimage" + File.separator + "html2md" + File.separator);
+			html_2_mdfile_dir = new File(
+					html_md_timestamp_dir.getAbsolutePath() + File.separator + "zukgit.github.io" + File.separator
+							+ "_posts" + File.separator + "Technology" + File.separator + "html2md" + File.separator);
+
+		}
+		
+		
+		
+
+		ArrayList<String> clearMultiBlank(ArrayList<String> rawMDList){
+			ArrayList<String> clearMultiBlankList = new 	ArrayList<String>();
+			
+			
+			boolean is_preline_blank = false;
+			for (int i = 0; i < rawMDList.size(); i++) {
+				String oneLine = rawMDList.get(i);
+				String clear_blank_str = oneLine.replace("    ", "").replace(" ", "").trim();
+				
+				if("".equals(clear_blank_str)) {
+					if(!is_preline_blank) {
+						clearMultiBlankList.add("");
+					}
+					is_preline_blank = true;
+			
+					continue;
+				}else {
+					is_preline_blank = false;
+					// 缩进  必须是  2 6 之间  不能是 4 否则会影响后面的 空格
+					if(oneLine.startsWith("    ") && !oneLine.startsWith("     ")) {
+						oneLine = oneLine.replace("    ", "  ");
+						
+					}
+					clearMultiBlankList.add(oneLine);
+				}
+	
+			}
+			
+			return clearMultiBlankList;
+		}
+		
+		
+		ArrayList<String> clearMultiZhuShi_clearMultiScript(ArrayList<String> rawMDList){
+			ArrayList<String> fixedMDList = new ArrayList<String>();
+			
+			boolean isEmptyLine_ZhuShi = false;    // 是否包含在多行注释内  是否包含在 多行 script 内
+			
+			boolean isEmptyLine_Script = false;    // 是否包含在多行注释内  是否包含在 多行 script 内
+
+			int isInCodeCount = 0;   // 在 code 中的 代码是 不需要 去除的
+			for (int i = 0; i < rawMDList.size(); i++) {
+				String rawLine = rawMDList.get(i);
+				String fixedLine = new String(rawLine);
+				
+				
+
+				
+				// <script  和 </script> 在同一行  那么 去除 这些
+				if(rawLine.contains("<script") && rawLine.contains("</script>")) {
+					String  matchStr = getSubString_WithPre_WithEnd(rawLine, "<script", "</script>");
+					if(matchStr != null) {
+						fixedLine = rawLine.replace(matchStr, "");
+						fixedLine = fixedLine.replace("<script", "");
+						fixedLine = fixedLine.replace("</script>", "");
+						fixedMDList.add(fixedLine);
+						continue;
+					}
+					
+				}
+				
+
+				if(rawLine.contains("<!--") && rawLine.contains("-->")) {
+					String  matchStr = getSubString_WithPre_WithEnd(rawLine, "<!--", "-->");
+					if(matchStr != null) {
+						fixedLine = rawLine.replace(matchStr, "");
+						fixedLine = fixedLine.replace("<!--", "");
+						fixedLine = fixedLine.replace("-->", "");
+						fixedMDList.add(fixedLine);
+						continue;
+					}
+					
+				}
+				
+				// 多行 script
+				if(rawLine.contains("<script") && !rawLine.contains("</script>")) {
+					isEmptyLine_Script = true;
+				}
+				
+				if(!rawLine.contains("<script") && rawLine.contains("</script>")) {
+					isEmptyLine_Script = false;
+					continue;   // 这一行 也不要了
+				}
+				
+				
+				// 多行 script
+				if(rawLine.contains("<!--") && !rawLine.contains("-->")) {
+					isEmptyLine_ZhuShi = true;
+				}
+				
+				if(!rawLine.contains("<!--") && rawLine.contains("-->")) {
+					isEmptyLine_ZhuShi = false;
+					continue;   // 这一行 也不要了
+				}
+				
+				if(rawLine.startsWith("```")) {
+					isInCodeCount++;
+				}
+	
+				//isInCodeCount%2 != 1  &&说明是在 code 中
+				if(!isEmptyLine_Script && !isEmptyLine_ZhuShi && (isInCodeCount%2 != 1)) {
+					fixedMDList.add(fixedLine);
+				}
+	
+			}
+			
+			
+			return fixedMDList;
+			
+		}
+		// &lt;==<    &gt;==> 的转换
+//		fixedLineStr = clear_lt_gt_tag(fixedLineStr);
+		
+		// 特殊字符串的处理
+		String clear_lt_gt_tag(String rawLine) {
+			String fixedLineStr = new String(rawLine);
+			fixedLineStr = fixedLineStr.replace("&lt;", "<");
+			fixedLineStr = fixedLineStr.replace("&gt;", ">");
+			
+			
+			if(fixedLineStr.contains("[") && !fixedLineStr.contains("]") && isContainChinese(fixedLineStr)) {
+				fixedLineStr = fixedLineStr.replace("[", "【");
+				
+			}
+
+			return fixedLineStr;
+		}
+		
+
+		boolean downloadImage(File targetImgFile, String networkUrl) {
+			boolean downFlag = false;
+			int byteRead;
+
+			try {
+				// 写入文件
+				File fileSavePath = new File(targetImgFile.getAbsolutePath());
+				// 注:如果保存文件夹不存在,那么则创建该文件夹
+				File fileParent = fileSavePath.getParentFile();
+				if (!fileParent.exists()) {
+					fileParent.mkdirs();
+				}
+
+				URL url = new URL(networkUrl);
+				URLConnection conn = url.openConnection();
+
+				InputStream inStream = conn.getInputStream();
+
+				FileOutputStream fs = new FileOutputStream(fileSavePath);
+				byte[] buffer = new byte[1024];
+				long beginTimeStamp = System.currentTimeMillis();
+				System.out.println("FileOutputStream.write  写入本地文件  Begin   比较 downRawVideo_耗时_B ");
+				while ((byteRead = inStream.read(buffer)) != -1) {
+					fs.write(buffer, 0, byteRead);
+				}
+				long endTimeStamp = System.currentTimeMillis();
+				long distance_second = (endTimeStamp - beginTimeStamp) / 1000;
+
+				System.out.println(
+						"FileOutputStream.write  写入本地文件  End ( downRawVideo_耗时_B【" + distance_second + " 秒】 耗时得很)");
+
+				inStream.close();
+				fs.close();
+
+			} catch (Exception e) {
+				// TODO: handle exception
+				System.out.println("下载 " + networkUrl + " 图片失败: e=" + e);
+			}
+
+			if (targetImgFile.exists() && targetImgFile.length() > 10) {
+				downFlag = true;
+			}
+
+			return downFlag;
+
+		}
+
+		String clear_inner_tag(String rawLine) {
+			String fixed_LineStr = new String(rawLine);
+			for (int i = 0; i < innderHtmlTag.size(); i++) {
+				String tag = innderHtmlTag.get(i);
+				String beginTag = "<" + tag + ">";
+				String beginTag_Innder = "<" + tag + " ";
+				String EndTag = "</" + tag + ">";
+
+				// <head> </head> 同在一行
+				if (fixed_LineStr.contains(beginTag) && fixed_LineStr.contains(EndTag)) {
+					fixed_LineStr = fixed_LineStr.replace(beginTag, "");
+					fixed_LineStr = fixed_LineStr.replace(EndTag, "");
+				} else if (fixed_LineStr.contains(beginTag) && !fixed_LineStr.contains(EndTag)) {
+					// 只包含 <head> 没有 </head> 的 字样
+					fixed_LineStr = fixed_LineStr.replace(beginTag, "");
+				} else if (!fixed_LineStr.contains(beginTag) && fixed_LineStr.contains(EndTag)) {
+					// 只包含 </head> 没有 <head> 的 字样
+					fixed_LineStr = fixed_LineStr.replace(EndTag, "");
+				}
+
+				// da <link rel="stylesheet" type="text/css" media="all"
+				// href="../../../style.css"> dada      // <div class="highlight">
+				if (fixed_LineStr.contains(beginTag_Innder)) {
+					String indderStr = getSubString_WithPre_WithEnd(fixed_LineStr, beginTag_Innder, ">");
+
+					if (indderStr != null) {
+
+						fixed_LineStr = fixed_LineStr.replace(indderStr, "");
+					
+					
+						while(fixed_LineStr.contains(beginTag_Innder)) {
+							String step_place_str = getSubString_WithPre_WithEnd(fixed_LineStr, beginTag_Innder, ">");
+							if (step_place_str != null) {
+								fixed_LineStr = fixed_LineStr.replace(step_place_str, "");
+							}
+							
+						}
+					
+					}
+
+				}
+
+			}
+
+			if (fixed_LineStr.contains("<title>") && fixed_LineStr.contains("</title>")) {
+
+				md_title = fixed_LineStr.replace("<title>", "").replace("</title>", "").replace("	", "")
+								.replace("=", "").replace(" ", "").replace("!", "").replace("&", "").replace("#", "").replace("@", "")
+						.replace("|", "").replace("%", "").replace("&", "").trim();
+			}
+
+			return fixed_LineStr;
+
+		}
+
+		String clear_strong_tag(String rawLine) {
+			String fixedLineStr = new String(rawLine);
+			fixedLineStr = fixedLineStr.replace("<strong>", "!");
+			fixedLineStr = fixedLineStr.replace("</strong>", "!");
+			return fixedLineStr;
+		}
+
+		String clear_pre_tag(String rawLine) {
+			String fixedLineStr = new String(rawLine);
+			
+			
+			fixedLineStr = fixedLineStr.replace("<pre>", "\n```\n");
+			fixedLineStr = fixedLineStr.replace("</pre>", "\n```\n");
+			
+			// <pre class="highlight">   也要 改成 ``` 
+			if(fixedLineStr.contains("<pre ")) {  // 
+				String match_Inner_Pre_Tag = getSubString_WithPre_WithEnd(fixedLineStr,"<pre ",">");
+				
+				if(match_Inner_Pre_Tag != null) {
+					fixedLineStr = fixedLineStr.replace(match_Inner_Pre_Tag, "\n```\n");
+					
+				}
+				
+			}
+			return fixedLineStr;
+		}
+
+		// 获得 第一个匹配到的 前缀 和 后缀的 字符串
+		String getSubString_WithPre_WithEnd(String oldExp, String pre, String end) {
+			String result = oldExp;
+			int matchIndex = 0 ;
+			int end_FirstIndex = result.indexOf(end,matchIndex);
+
+			int begin_ExpIndex = calculNearPairIndex(result, end_FirstIndex, pre); //
+
+			while(begin_ExpIndex == -1){
+				matchIndex++;
+				 end_FirstIndex = result.indexOf(end,matchIndex);
+
+
+				 begin_ExpIndex = calculNearPairIndex(result, end_FirstIndex, pre); //
+
+				if(matchIndex  > 100){
+					System.out.println("无法匹配到A "+" begin_ExpIndex = " + begin_ExpIndex + " end_FirstIndex=" + end_FirstIndex+"  oldExp=【"+oldExp+"】     pre=【"+pre+"】  end=【"+end+"】");
+
+					return null;
+				}
+			}
+// begin_ExpIndex = -1 end_FirstIndex=34  oldExp=【      <a class="pjaxlink" href="/"><img src="/public/upload/gavatar/gavatar.jpg" class="img-rounded avatar"></a>】     pre=【<img】  end=【>】
+			if(end_FirstIndex == -1){
+				System.out.println("无法匹配到B "+" begin_ExpIndex = " + begin_ExpIndex + " end_FirstIndex=" + end_FirstIndex+"  oldExp=【"+oldExp+"】     pre=【"+pre+"】  end=【"+end+"】");
+
+				return  null;
+			}
+
+
+			String targetExpNoOut = result.substring(begin_ExpIndex + 1, end_FirstIndex); // 包前 不包后
+			String targetExpWithOut = result.substring(begin_ExpIndex, end_FirstIndex + end.length()); // 包前 包后  加上 后缀的长度
+			// System.out.println(" oldExp = " + oldExp);
+			// System.out.println(" targetExpWithOut = " + targetExpWithOut);
+			// System.out.println(" targetExpNoOut = " + targetExpNoOut);
+			// System.out.println(" begin_ExpIndex = " + begin_ExpIndex + " end_FirstIndex
+			// =" + end_FirstIndex);
+			System.out.println(" begin_ExpIndex = " + begin_ExpIndex + " end_FirstIndex=" + end_FirstIndex+"  oldExp=【"+oldExp+"】     pre=【"+pre+"】  end=【"+end+"】"+" targetExpWithOut=【"+targetExpWithOut+"】");
+
+			return targetExpWithOut;
+		}
+
+		// 计算 在 字符串 originStr 中 在位置 endIndex 之前 最近的那个 匹配上的 matchStr的 索引
+		int calculNearPairIndex(String originStr, int endIndex, String matchStr) {
+			int beginIndex = 0;
+			String subStr = originStr.substring(0, endIndex);
+			beginIndex = subStr.lastIndexOf(matchStr);
+			return beginIndex;
+
+		}
+
+		String clear_p_br_tag(String rawLine) {
+			String fixedLineStr = new String(rawLine);
+			fixedLineStr = fixedLineStr.replace("<p>", "");
+			fixedLineStr = fixedLineStr.replace("</p>", "");
+			fixedLineStr = fixedLineStr.replace("<br>", "");
+			
+			// <img src="2.jpeg">
+			if (fixedLineStr.contains("<img") && fixedLineStr.contains(">")) {
+				// 类似从 <p> faa <img src="2.jpeg"> fafa</p> 计算得到 <img src="2.jpeg">
+				String imageNamePre = time_stamp_str;
+
+				// <img src="1.png">
+				// 转为 <img src="/public/zimage/html2md/"+time"1.png">
+				System.out.println("当前的 <p> 中包含 链接<img >   fixedLineStr=" + fixedLineStr);
+
+				String fixedmatchImgCode = getSubString_WithPre_WithEnd(fixedLineStr, "<img", ">");
+
+//				int whileCount = 0 ;
+//				while(fixedmatchImgCode == null) {
+//					String fixed_ImageCode_temp = getSubString_WithPre_WithEnd(fixedLineStr,"<img",">");
+//					if(fixed_ImageCode_temp != null) {
+//						fixedmatchImgCode = fixed_ImageCode_temp;
+//					}else {
+//						if(whileCount > 10) {
+//							break;
+//						}
+//
+//					}
+//					whileCount++;
+//				}
+
+				String matchImgCode = fixedmatchImgCode;
+
+				matchImgCode = matchImgCode.replace("<img", "").replace("/>", "").replace(">", "").replace("src=", "")
+						.replace("\"", "").replace(" ", "");
+//				srcImageUrl_ZimageUrl_Map= new HashMap<String,String>();
+//				srcImageUrl_AbsUrl_Map= new HashMap<String,String>();
+//				srcImageUrl_List = new ArrayList<String> ();
+				System.out.println("matchImgCode = " + matchImgCode);
+				if (!srcImageUrl_List.contains(matchImgCode)) {
+
+					// 动态计算 绝对路径的 url
+					String match_abs_imgsrc = rootUrl + "/" + matchImgCode;
+					String match_abs_imgsrc_possible1 = rootUrl_possible_url1 + "/" + matchImgCode;
+					
+					String oneName_NoSep_FileName = matchImgCode.replace("/", "_");
+					String match_relative_imgsrc = "/public/zimage/html2md/" + time_stamp_str + "_" + oneName_NoSep_FileName;
+
+//
+					File match_relative_img_file = new File(
+							html_zimage_dir.getAbsolutePath() + File.separator + time_stamp_str + "_" + oneName_NoSep_FileName);
+
+					srcImageUrl_List.add(matchImgCode);
+					srcImageUrl_LocalFile_Map.put(matchImgCode, match_relative_img_file);
+					srcImageUrl_AbsUrl_Map.put(matchImgCode, match_abs_imgsrc);
+					srcImageUrl_AbsUrl_Possibale1_Map.put(matchImgCode, match_abs_imgsrc_possible1);
+					srcImageUrl_ZimageUrl_Map.put(matchImgCode, match_relative_imgsrc);
+
+//				    String match_relative_imagecode = "<img src=\""+match_relative_imgsrc+"\">";
+
+					// <img src="1.png">
+					// 转为 <img src="/public/zimage/html2md/"+time"1.png">
+					fixedLineStr = fixedLineStr.replace(matchImgCode, match_relative_imgsrc);
+
+					// zimage/html_to_md/timestamp.jpg
+				}
+
+			}
+
+			if (fixedLineStr.contains("<a") && fixedLineStr.contains(">")) {
+
+				System.out.println("当前的 <p> 中包含 链接<a> 保留  fixedLineStr=" + fixedLineStr);
+
+			}
+
+			return fixedLineStr;
+		}
+
+		String title_to_jing(String rawLine) {
+			String fixedLineStr = new String(rawLine);
+			// 0. <h1> 转为 # <h6> 转为 ######
+			// <h1 class="entry-title">无线网络WPA2加密的破解</h1>
+
+			fixedLineStr = fixedLineStr.replace("	", "");
+			if (fixedLineStr.contains("<h1") && fixedLineStr.contains("</h1>")) {
+				String h_tag_innder = getSubString_WithPre_WithEnd(fixedLineStr, "<h1", ">");
+
+				fixedLineStr = fixedLineStr.replace(h_tag_innder, "");
+				fixedLineStr = fixedLineStr.replace("</h1>", "");
+				fixedLineStr = "# " + fixedLineStr;
+			}
+
+			if (fixedLineStr.contains("<h2") && fixedLineStr.contains("</h2>")) {
+				String h_tag_innder = getSubString_WithPre_WithEnd(fixedLineStr, "<h2", ">");
+
+				fixedLineStr = fixedLineStr.replace(h_tag_innder, "");
+				fixedLineStr = fixedLineStr.replace("</h2>", "");
+				fixedLineStr = "## " + fixedLineStr;
+			}
+
+			if (fixedLineStr.contains("<h3") && fixedLineStr.contains("</h3>")) {
+				String h_tag_innder = getSubString_WithPre_WithEnd(fixedLineStr, "<h3", ">");
+
+				fixedLineStr = fixedLineStr.replace(h_tag_innder, "");
+				fixedLineStr = fixedLineStr.replace("</h3>", "");
+				fixedLineStr = "### " + fixedLineStr;
+			}
+
+			if (fixedLineStr.contains("<h4") && fixedLineStr.contains("</h4>")) {
+				String h_tag_innder = getSubString_WithPre_WithEnd(fixedLineStr, "<h4", ">");
+
+				fixedLineStr = fixedLineStr.replace(h_tag_innder, "");
+				fixedLineStr = fixedLineStr.replace("</h4>", "");
+				fixedLineStr = "#### " + fixedLineStr;
+			}
+
+			if (fixedLineStr.contains("<h5") && fixedLineStr.contains("</h5>")) {
+				String h_tag_innder = getSubString_WithPre_WithEnd(fixedLineStr, "<h5", ">");
+
+				fixedLineStr = fixedLineStr.replace(h_tag_innder, "");
+				fixedLineStr = fixedLineStr.replace("</h5>", "");
+				fixedLineStr = "##### " + fixedLineStr;
+			}
+
+			if (fixedLineStr.contains("<h6") && fixedLineStr.contains("</h6>")) {
+				String h_tag_innder = getSubString_WithPre_WithEnd(fixedLineStr, "<h6", ">");
+
+				fixedLineStr = fixedLineStr.replace(h_tag_innder, "");
+				fixedLineStr = fixedLineStr.replace("</h6>", "");
+				fixedLineStr = "##### " + fixedLineStr;
+			}
+
+			return fixedLineStr;
+		}
+
+		
+		
+		// html2md ==================== end ==========================
+		
+		
+		
 		String BrowserOperation_WithRootUrl(String mMainUrl) {
 
 
@@ -17416,6 +18195,12 @@ public class G2_ApplyRuleFor_TypeFile {
 		}
 		try {
 			if (file != null && !file.exists()) {
+				System.out.println("新建文件夹: file="+file.getAbsolutePath());
+				
+				if (!file.getParentFile().exists()) {
+					file.getParentFile().mkdirs();
+				}
+		
 				file.createNewFile();
 			}
 
@@ -19009,6 +19794,14 @@ public class G2_ApplyRuleFor_TypeFile {
 		}
 		return null;
 	}
+	
+	static String getTimeStampyyyyMMdd_HHmmss() {
+
+		SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd_HHmmss");// 设置日期格式
+		String date = df.format(new Date());
+		return date;
+	}
+
 
 
 

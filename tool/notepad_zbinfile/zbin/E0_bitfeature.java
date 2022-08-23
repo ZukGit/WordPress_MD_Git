@@ -1,7 +1,11 @@
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 public class E0_bitfeature {
 
@@ -342,6 +346,10 @@ public class E0_bitfeature {
        	System.out.println(" zbitfeature_E0   byte98000000          ## 字节数组 制转为64位long值输出");
      	System.out.println(" zbitfeature_E0   byteA0000000          ## 字节数组 转为64位long值输出");
      	
+       	System.out.println(" zbitfeature_E0   timebyte9800000098000000          ## 字节数组 把字节转为时间输出");
+
+     	
+     	
     }
 
 
@@ -439,6 +447,149 @@ public class E0_bitfeature {
             	
             	
             	
+            }else if(paramItem.toLowerCase().startsWith("timebyte")){
+               	String timebyteArr_Str = paramItem.toLowerCase().replace("timebyte", "");  // 98000000
+               	
+               	if(timebyteArr_Str.length() > 16) {
+               		// 
+               		System.out.println("当前输入的 timebyte数组 转为 long 最多为 64位bit 16个十六进制字符!  timebyteArr_Str="+timebyteArr_Str);
+               		return; 
+               	}
+            	
+                ByteOrder bo = ByteOrder.BIG_ENDIAN;
+  
+                byte[] longByteArr =  	hexStringToByteArray(timebyteArr_Str);
+                
+                if(longByteArr == null) {
+                	
+                	System.out.println(" longByteArr 字节数组 为空 ");
+                	return;
+                }
+                
+                if(longByteArr.length != 8) {
+                	
+                	System.out.println("byte[] longByteArr 字节数组长度不等于 8 longByteArr.length="+longByteArr.length);
+                	return;
+                }
+                
+                byte[] time_S = {longByteArr[0],longByteArr[1],longByteArr[2],longByteArr[3]};
+
+                byte[] time_Ms = {longByteArr[4],longByteArr[5],longByteArr[6],longByteArr[7]};
+                
+                System.out.println("输入字节数组: "+"0x"+timebyteArr_Str);
+                String up4Byte_str = timebyteArr_Str.substring(0,8);
+                String down4Byte_str = timebyteArr_Str.substring(8);
+
+                String up4byte_style_1_str = toHexString(longByteArr[0])+" "+toHexString(longByteArr[1])+" "+toHexString(longByteArr[2])+" "+toHexString(longByteArr[3])+" ";
+           
+                String down4byte_style_1_str = toHexString(longByteArr[4])+" "+toHexString(longByteArr[5])+" "+toHexString(longByteArr[6])+" "+toHexString(longByteArr[7])+" ";
+                
+
+                String timeS = dateToString((long)(bytesToInt(time_S) * 1000L));
+         		int timeMs = bytesToInt(time_Ms);
+                System.out.println("方式1_高4字节: "+"0x"+up4Byte_str +"    "+"字节情况:"+up4byte_style_1_str+" ");
+                System.out.println("方式1_低4字节: "+"0x"+down4Byte_str+"    "+"字节情况:"+down4byte_style_1_str+" ");
+                
+         		System.out.println("解析方式1_(pcap方式): "+"高字节32位timeS ="+timeS+"   低字节32位timeMs="+timeMs);
+         				
+         		System.out.println();
+          		System.out.println();
+                //  4C F6 04 00【Timestamp (High) 4个字节】
+                //  F5 CB A4 E4 【Timestamp (Lower) 4个字节】
+                //  输入的字节是 0x4CF60400【4->1】F5CBA4E4
+                // 组成的字节应该是 0x0004F64CE4A4CBF5 =1396710020795381毫秒=1396710020秒
+                
+//         		toUnsignedString
+         		byte[] long_time_ms = {longByteArr[3],longByteArr[2],longByteArr[1],longByteArr[0],longByteArr[7],longByteArr[6],longByteArr[5],longByteArr[4]};	        
+         		
+         		
+                String up4byte_style_2_str = toHexString(longByteArr[3])+" "+toHexString(longByteArr[2])+" "+toHexString(longByteArr[1])+" "+toHexString(longByteArr[0])+" ";
+                
+                String down4byte_style_2_str = toHexString(longByteArr[7])+" "+toHexString(longByteArr[6])+" "+toHexString(longByteArr[5])+" "+toHexString(longByteArr[4])+" ";
+                
+
+                String style2_byte_arr_str = "0x"+(up4byte_style_2_str+down4byte_style_2_str).replace(" ", "");
+
+                
+             
+                System.out.println("方式2 原始的字节: "+"0x"+timebyteArr_Str.toUpperCase());
+                System.out.println("方式2 重组的字节: "+style2_byte_arr_str);
+                System.out.println("方式2_高4字节: "+"0x"+up4byte_style_2_str +"    "+"字节情况:"+up4byte_style_2_str+" ");
+                System.out.println("方式2_低4字节: "+"0x"+down4byte_style_2_str+"    "+"字节情况:"+down4byte_style_2_str+" ");
+                
+                //  long=1396710020795381  微妙
+                //  long=1560950936695086634
+                //  以 10(-6)次方  微妙 为单位 
+         		long long_time_stamp =   bytesToLong(long_time_ms,0,false);
+         		String long_time_stamp_test = ""+long_time_stamp;
+         		
+         		long long_time_stamp_ws = 0;
+         		long long_time_stamp_ms = 0 ;
+         		String tip ="微秒10[-6]为单位";
+         		
+         		if(long_time_stamp_test.length() >= "1560950936695086634".length() ) {
+         			//  以  纳秒为单位
+         			 tip ="纳秒10[-9]为单位";
+         	    	 long_time_stamp_ws =(long) (long_time_stamp % 1000000000L);
+         	   	  long_time_stamp_ms = ( long_time_stamp - long_time_stamp_ws ) / 1000000;
+         			
+         		}else {  //  以 微秒为单位
+         			
+         			
+                	 long_time_stamp_ws =(long) (long_time_stamp % 1000000L);
+                    
+                	//  long=1396710020795381   ws=795381    转为 毫秒 需要再 除以 1000
+                	 long_time_stamp_ms = ( long_time_stamp - long_time_stamp_ws ) / 1000;
+         		}
+
+            
+
+           
+
+                Calendar stampCalendar=Calendar.getInstance();
+                stampCalendar.setTimeInMillis(long_time_stamp_ms);
+
+                int year_8 =stampCalendar.get(Calendar.YEAR);
+               	String year_8_str 	= year_8+"";
+                
+                int month_8 = (stampCalendar.get(Calendar.MONTH) == 0 ? 12 : (stampCalendar.get(Calendar.MONTH)+1));
+             
+             	String month_8_str 	= (month_8>9?month_8+"":"0"+month_8);
+             		   
+                int day_8 = stampCalendar.get(Calendar.DAY_OF_MONTH);
+                String day_8_str 	=day_8+"";
+                if(day_8 < 10) {
+             	   day_8_str = "0"+day_8;
+                } 
+            	
+                
+                int hour_8 = stampCalendar.get(Calendar.HOUR_OF_DAY);
+                String hour_8_str 	=hour_8+"";
+                if(hour_8 < 10) {
+             	   hour_8_str = "0"+hour_8;
+                } 
+                
+                int minute_8 = stampCalendar.get(Calendar.MINUTE);
+                
+                String minute_8_str 	=minute_8+"";
+                if(minute_8 < 10) {
+             	   minute_8_str = "0"+minute_8;
+                } 
+                
+                int second_8 = stampCalendar.get(Calendar.SECOND);
+                
+                String second_8_str 	=second_8+"";
+                if(second_8 < 10) {
+             	   second_8_str = "0"+second_8;
+                } 
+                
+                String time_stamp_style2_str =" "+year_8_str+"-"+month_8_str+"-"+day_8_str+"_"+hour_8_str+":"+minute_8_str+":"+second_8_str;
+                
+         
+                
+         		System.out.println("解析方式2_(pcapng方式): "+"时间戳:"+time_stamp_style2_str+"  秒="+(long_time_stamp/1000000L)+"   毫秒="+long_time_stamp_ws+"  long="+long_time_stamp+" "+tip);
+
+            	
             }else {
 
                 if(paramItem == null || paramItem.length() > 20 ){
@@ -490,6 +641,25 @@ public class E0_bitfeature {
     }
     
     
+    /**
+     * 利用 {@link java.nio.ByteBuffer}实现byte[]转long
+     * @param input
+     * @param offset 
+     * @param littleEndian 输入数组是否小端模式
+     * @return
+     */
+    public static long bytesToLong(byte[] input, int offset, boolean littleEndian) { 
+        if(offset <0 || offset+8>input.length)
+            throw new IllegalArgumentException(String.format("less than 8 bytes from index %d  is insufficient for long",offset));
+        ByteBuffer buffer = ByteBuffer.wrap(input,offset,8);
+        if(littleEndian){
+            // ByteBuffer.order(ByteOrder) 方法指定字节序,即大小端模式(BIG_ENDIAN/LITTLE_ENDIAN)
+            // ByteBuffer 默认为大端(BIG_ENDIAN)模式 
+            buffer.order(ByteOrder.LITTLE_ENDIAN);
+        }
+        return buffer.getLong();  
+    } 
+    
     public static  int bytesToInt(byte[] a){
         int ans=0;
         for(int i=0;i<4;i++){
@@ -505,6 +675,19 @@ public class E0_bitfeature {
     }
     
     
+    public static  long bytesToLong(byte[] a){
+        long ans=0;
+        for(int i=0;i<8;i++){
+            ans<<=8;
+            ans|=(a[7-i]&0xff);
+            /* 这种写法会看起来更加清楚一些：
+            int tmp=a[3-i];
+            tmp=tmp&0x000000ff;
+            ans|=tmp;*/
+           // intPrint(ans);
+        }
+        return ans;
+    }
     
 	public static String toHexString(int i) {
 		StringBuilder sb = new StringBuilder();
@@ -625,4 +808,14 @@ public class E0_bitfeature {
         return BigDecimal.valueOf(lowValue).add(BigDecimal.valueOf(Long.MAX_VALUE)).add(BigDecimal.valueOf(1));
     }
 
+	// yyyy-MM-dd HH:mm:ss
+    public static String dateToString(long timeStamp) {
+    	SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String now = f.format(timeStamp);
+        return now;
+
+    }
+    
+
+    
 }
