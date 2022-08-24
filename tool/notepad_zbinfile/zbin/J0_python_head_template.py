@@ -179,8 +179,9 @@ print("now_yyyymmdd = "+ str(now_yyyymmdd))
 
 
 
+#pro = ts.pro_api('43acb9a5ddc2cf73c6c4ea54796748f965457ed57daaa736bb778ea2')   ## 自身过期了
+pro = ts.pro_api('c8811a29e9b51d03b2b3f6be3937f331d6187999563900664056c438')    ## 百度查pro_api 得到的 https://www.pythonheidong.com/blog/article/524786/a1fa3d379c91be81a4de/ 
 
-pro = ts.pro_api('43acb9a5ddc2cf73c6c4ea54796748f965457ed57daaa736bb778ea2')
 # print(J0_PROPS.get(tree_node_name+"record_date"))           #根据key读取value
 # J0_PROPS.put(tree_node_name+"record_date", now_yyyymmdd)       ###  覆盖原有的 key 和 value
 #  zukgit
