@@ -9,7 +9,7 @@ import time,datetime  # https://www.jb51.net/article/66019.htm
 import re
 import os
 import tempfile
-
+sys.stdout = io.TextIOWrapper(sys.stdout.buffer,encoding='utf8')
 ############################## 全局数据初始化块 数据初始化函数  End ##############################
 
 ##############  properities 函数 Begin ##############
