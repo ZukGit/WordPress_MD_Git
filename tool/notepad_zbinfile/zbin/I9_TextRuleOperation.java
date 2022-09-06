@@ -461,23 +461,207 @@ public class I9_TextRuleOperation {
 		// permissive=0
 		CUR_RULE_LIST.add(new Avc_Deny_ShowFix_Rule_50());
 
-//        CUR_RULE_LIST.add( new Image2Png_Rule_4());
-//        CUR_RULE_LIST.add( new AVI_Rule_5());
-//        CUR_RULE_LIST.add( new SubDirRename_Rule_6());
-//        CUR_RULE_LIST.add( new Encropty_Rule_7());
-//        CUR_RULE_LIST.add( new ClearChineseType_8());
+		// .pcap   tcpdump 包 帧的分析
+		CUR_RULE_LIST.add(new PcaP_TcpDump_Frame_Analysis_Rule_51());
+		
+		
+		// 打开 研究 WIFI EAPOL  交互帧研究的 txt 文件 和 pcapng 文件 
+		CUR_RULE_LIST.add(new PcaPng_TXT_WifiFrame_ByteShow_Rule_52());
+		
+		// .pcapng  wifi 包 文件解析  对wifi包的分析   待开发
+		CUR_RULE_LIST.add(new PcaPng_Wifi_Frame_Analysis_Rule_53());
+		
 
 		
-		// .pcapng  wifi 包 文件解析  对wifi包的分析
-		CUR_RULE_LIST.add(new PcaPng_Frame_Analysis_Rule_51());
+		// 当前 txt 文件内容的 twitter的  id 进行集合
+		CUR_RULE_LIST.add(new Twitter_ID_Search_Rule_54());
+	}
+	
+	
+	class PcaPng_TXT_WifiFrame_ByteShow_Rule_52 extends Basic_Rule {
+		
+		File  pcapng_txt_analysis_file ; 
+		File  pcapng_wififrame_file ; 
+		
+		PcaPng_TXT_WifiFrame_ByteShow_Rule_52() {
+			super(52, false);
+			
+			pcapng_txt_analysis_file = new File(zbinPath + File.separator + "I9_wpa2_eapol_analysis.txt");
+
+			pcapng_wififrame_file = new File(zbinPath + File.separator + "I9_wpa2_eapol_analysis.pcapng");
+
+		}
+		
+		@Override
+		String simpleDesc() {
+			return "打开 研究 WIFI EAPOL 交互帧研究的 txt 文件 和 pcapng 文件 ";
+		}
+
+		
+		@Override
+		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
+				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+			for (int i = 0; i < curInputFileList.size(); i++) {
+				File fileItem = curInputFileList.get(i);
+		
+				System.out.println("打开  wifi pcapng eapol 帧 研究 txt文件:");
+				System.out.println(pcapng_txt_analysis_file.getAbsolutePath());
+				System.out.println();
+				System.out.println("打开  wifi pcapng eapol 帧 研究 pcapng文件:");
+				System.out.println(pcapng_wififrame_file.getAbsolutePath());
+				
+				if(pcapng_txt_analysis_file.exists()) {
+					NotePadOpenTargetFile(pcapng_txt_analysis_file.getAbsolutePath());
+				}
+				
+				if(pcapng_wififrame_file.exists()) {
+					execCMD(pcapng_wififrame_file.getAbsolutePath());
+				}
+	
+			}
+
+			return super.applyOperationRule(curFileList, subFileTypeMap, curDirList, curRealFileList);
+		}
+		
+		
+		
 		
 	}
+	// 当前 txt 文件内容的 twitter的  id 进行集合
+	class Twitter_ID_Search_Rule_54 extends Basic_Rule {
 
+		ArrayList<String> tw_id_list ;
+		
+		Twitter_ID_Search_Rule_54() {
+			super(54, false);
+			tw_id_list = new ArrayList<String>();
+			
+		}
+	     
+
+		@Override
+		String simpleDesc() {
+			return "当前 txt 文件内容 以及同目录的txt文件 的 twitter的  id 进行集合整理成 ```md```格式输出 ";
+		}
+
+		@Override
+		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
+				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+			for (int i = 0; i < curInputFileList.size(); i++) {
+				File fileItem = curInputFileList.get(i);
+				
+				File cur_txt_dir_file = fileItem.getParentFile();
+				
+				if(cur_txt_dir_file == null || !cur_txt_dir_file.exists()) {
+					System.out.println("当前的 txt文件的父目录不存在 请检查! txt_fileItem="+fileItem+"    cur_txt_dir_file="+ cur_txt_dir_file);
+					
+					return null;
+				}
+				
+				File[] all_sub_file_arr = cur_txt_dir_file.listFiles();
+				
+				if(all_sub_file_arr == null) {
+					System.out.println("当前的 txt文件的父目录为空  请检查! txt_fileItem="+fileItem+"    cur_txt_dir_file="+ cur_txt_dir_file+"   all_sub_file_arr="+all_sub_file_arr);
+					
+					return null;
+				}
+				
+				for (int j = 0; j < all_sub_file_arr.length; j++) {
+					File mDir_SubFile = all_sub_file_arr[j];
+					
+					if(mDir_SubFile== null || mDir_SubFile.isDirectory()) {
+						continue;
+					}
+					
+					if(!mDir_SubFile.getName().toLowerCase().endsWith(".txt")) {
+						continue;
+					}
+					
+					
+			
+					ArrayList<String> txtFileList = ReadFileContentAsList(mDir_SubFile);
+					
+					
+					twitter_id_search(txtFileList);
+			
+					
+				}
+
+				
+				//``` 
+				//id
+				//```   包裹 起来的 id 
+				ArrayList<String> md5_id_code_list = new ArrayList<String>();
+				System.out.println("tw_id_list.size() = "+ tw_id_list.size());
+				for (int j = 0; j < tw_id_list.size(); j++) {
+					String tw_id = tw_id_list.get(j);
+					System.out.println("id["+(j+1)+"] = "+ tw_id);
+					
+					md5_id_code_list.add("```");
+					md5_id_code_list.add(tw_id);
+					md5_id_code_list.add("```");
+					md5_id_code_list.add("");
+				}
+
+
+				writeContentToFile(I9_Temp_Text_File, md5_id_code_list);
+				NotePadOpenTargetFile(I9_Temp_Text_File.getAbsolutePath());
+
+			}
+
+			return super.applyOperationRule(curFileList, subFileTypeMap, curDirList, curRealFileList);
+		}
+		
+		// https://twitter.com/JulianRoepcke/status/
+		void twitter_id_search(ArrayList<String> lineList ) {
+			
+			for (int i = 0; i < lineList.size(); i++) {
+				String mOneLineStr = lineList.get(i).trim();
+				
+				if(mOneLineStr.contains("https://twitter.com") && mOneLineStr.contains("status")) {
+					
+					String match_id = getSubString_WithPre_WithEnd(mOneLineStr,"https://twitter.com","status");
+					
+					match_id = match_id.replace("https://twitter.com", "");
+					match_id = match_id.replace("/status", "");
+					match_id = match_id.replace("/", "");
+					if(match_id != null && !tw_id_list.contains(match_id)) {
+						
+						tw_id_list.add(match_id);
+					}
+					
+					
+				}
+				
+			}
+			
+			
+		}
+		
+	}
 	
 	
 	
-	// 对 .pcapng  wifi 包 文件解析  对wifi包的分析
-	class PcaPng_Frame_Analysis_Rule_51 extends Basic_Rule {
+
+	// .pcapng  wifi 包 文件解析  对wifi包的分析   待开发
+	class PcaPng_Wifi_Frame_Analysis_Rule_53 extends Basic_Rule {
+
+		PcaPng_Wifi_Frame_Analysis_Rule_53() {
+			super(53, false);
+		}
+	     
+		
+		@Override
+		String simpleDesc() {
+			return ".pcapng  wifi 包 文件解析  对wifi包的分析   待开发 ";
+		}
+		
+		
+	}
+	
+	
+	// 对 .pcap文件解析  对 tcpdump 包的分析
+	class PcaP_TcpDump_Frame_Analysis_Rule_51 extends Basic_Rule {
 
 	     static final int GLOBAL_HEADER_LENGTH = 24;
 	     static final int PACKET_HEADER_LENGTH = 16;
@@ -488,14 +672,14 @@ public class I9_TextRuleOperation {
 	     volatile  int offset;
 	  
 	    
-		PcaPng_Frame_Analysis_Rule_51() {
+	     PcaP_TcpDump_Frame_Analysis_Rule_51() {
 			super(51, false);
 		}
 
 		
 		@Override
 		String simpleDesc() {
-			return " 对 .pcapng  wifi 包 文件解析  对wifi包的分析  ";
+			return " 对 .pcap  tcpdump抓取的 wifi帧包 文件解析  对wifi包的分析  ";
 		}
 		
 		@Override
@@ -15463,6 +15647,59 @@ public class I9_TextRuleOperation {
 		});
 
 	}
+	
+	
+	// 计算 在 字符串 originStr 中 在位置 endIndex 之前 最近的那个 匹配上的 matchStr的 索引
+	int calculNearPairIndex(String originStr, int endIndex, String matchStr) {
+		int beginIndex = 0;
+		String subStr = originStr.substring(0, endIndex);
+		beginIndex = subStr.lastIndexOf(matchStr);
+		return beginIndex;
+
+	}
+	
+	// 获得 第一个匹配到的 前缀 和 后缀的 字符串
+	String getSubString_WithPre_WithEnd(String oldExp, String pre, String end) {
+		String result = oldExp;
+		int matchIndex = 0 ;
+		int end_FirstIndex = result.indexOf(end,matchIndex);
+
+		int begin_ExpIndex = calculNearPairIndex(result, end_FirstIndex, pre); //
+
+		while(begin_ExpIndex == -1){
+			matchIndex++;
+			 end_FirstIndex = result.indexOf(end,matchIndex);
+
+
+			 begin_ExpIndex = calculNearPairIndex(result, end_FirstIndex, pre); //
+
+			if(matchIndex  > 100){
+				System.out.println("无法匹配到A "+" begin_ExpIndex = " + begin_ExpIndex + " end_FirstIndex=" + end_FirstIndex+"  oldExp=【"+oldExp+"】     pre=【"+pre+"】  end=【"+end+"】");
+
+				return null;
+			}
+		}
+//begin_ExpIndex = -1 end_FirstIndex=34  oldExp=【      <a class="pjaxlink" href="/"><img src="/public/upload/gavatar/gavatar.jpg" class="img-rounded avatar"></a>】     pre=【<img】  end=【>】
+		if(end_FirstIndex == -1){
+			System.out.println("无法匹配到B "+" begin_ExpIndex = " + begin_ExpIndex + " end_FirstIndex=" + end_FirstIndex+"  oldExp=【"+oldExp+"】     pre=【"+pre+"】  end=【"+end+"】");
+
+			return  null;
+		}
+
+
+		String targetExpNoOut = result.substring(begin_ExpIndex + 1, end_FirstIndex); // 包前 不包后
+		String targetExpWithOut = result.substring(begin_ExpIndex, end_FirstIndex + end.length()); // 包前 包后  加上 后缀的长度
+		// System.out.println(" oldExp = " + oldExp);
+		// System.out.println(" targetExpWithOut = " + targetExpWithOut);
+		// System.out.println(" targetExpNoOut = " + targetExpNoOut);
+		// System.out.println(" begin_ExpIndex = " + begin_ExpIndex + " end_FirstIndex
+		// =" + end_FirstIndex);
+		System.out.println(" begin_ExpIndex = " + begin_ExpIndex + " end_FirstIndex=" + end_FirstIndex+"  oldExp=【"+oldExp+"】     pre=【"+pre+"】  end=【"+end+"】"+" targetExpWithOut=【"+targetExpWithOut+"】");
+
+		return targetExpWithOut;
+	}
+
+	
 	// List<A_B_C> 需要把这个 创建了三个 JavaBean
 // A , B  ,C  这三个 对象的 execute()方法 会执行  parseMap();  zzj
 //         而不会执行  parseMap()  的  generationBean.writeList(clz);  去 生成
