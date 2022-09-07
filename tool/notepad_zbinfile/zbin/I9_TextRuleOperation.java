@@ -646,19 +646,600 @@ public class I9_TextRuleOperation {
 	// .pcapng  wifi 包 文件解析  对wifi包的分析   待开发
 	class PcaPng_Wifi_Frame_Analysis_Rule_53 extends Basic_Rule {
 
-		PcaPng_Wifi_Frame_Analysis_Rule_53() {
-			super(53, false);
-		}
+		File pacapng_file;
+	    BufferedInputStream pcapng_bis;
+	   volatile  int mFile_CurSor_Position = 0 ; // 当前  索引的位置 
 	     
-		
+	     
+	     static final int Block_Type_Length = 4;
+	     static final int Block_Head_Total_Length = 4;
+	     // 每次都要读 8 个字节 包含 type 和 block total length
+	     static final int Block_Type_And_Head_Total_Length = Block_Type_Length + Block_Head_Total_Length ;
+
+	     static final int Block_Tail_Total_Length = 4;
+	     
+	     ArrayList<Wifi_Frame_AbsCommon_Struct> wifiFrameStructList;   // 帧解析的集合
+	     
+
+
+PcaPng_Wifi_Frame_Analysis_Rule_53() {
+	super(53, false);
+	wifiFrameStructList = new ArrayList<Wifi_Frame_AbsCommon_Struct>();
+}
+ 
+
+@Override
+String simpleDesc() {
+	return ".pcapng  wifi 包 文件解析  对wifi包的分析   待开发 ";
+}
+
+
 		@Override
-		String simpleDesc() {
-			return ".pcapng  wifi 包 文件解析  对wifi包的分析   待开发 ";
+		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
+				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+			for (int i = 0; i < curInputFileList.size(); i++) {
+				File fileItem = curInputFileList.get(i);
+				
+				File cur_txt_dir_file = fileItem.getParentFile();
+				
+				if(cur_txt_dir_file == null || !cur_txt_dir_file.exists()) {
+					System.out.println("当前的 txt文件的父目录不存在 请检查! txt_fileItem="+fileItem+"    cur_txt_dir_file="+ cur_txt_dir_file);
+					
+					return null;
+				}
+				
+				if(!fileItem.getName().toLowerCase().endsWith(".pcapng")) {
+					
+				System.out.println("当前的 输入文件 不是  .pcapng 文件 请检查! fileItem="+fileItem+"    fileItem="+ fileItem);
+					
+					return null;
+				}
+				
+				pacapng_file = fileItem;
+				
+				try {
+					Pcapng_File_Parser(pacapng_file);
+				} catch (Exception e) {
+					// TODO: handle exception
+				System.out.println("Pcapng_File_Parser Exception  =  "+ e);
+				}
+		
+				
+
+			}
+
+			return super.applyOperationRule(curFileList, subFileTypeMap, curDirList, curRealFileList);
 		}
 		
+	
+
+		// throws IOException 
+		public Wifi_Frame_AbsCommon_Struct getMatch_Wifi_Frame_Struct  ( Wifi_Frame_Base_Struct  frame_base_struct ) {
+		
+		    byte[] type_and_length = new byte[Block_Type_And_Head_Total_Length];
+		    try {
+		    	
+			    if(pcapng_bis.read(type_and_length) != Block_Type_And_Head_Total_Length) {
+			        System.out.println("The Pcap file is broken!");
+			        return null;
+			    }
+			    
+		    }catch (Exception e) {
+				// TODO: handle exception
+		    	System.out.println("pcapng_bis.read(type_and_length)  发生异常 "+  e);
+			}
+
+
+		    int begin_byte_index = mFile_CurSor_Position;
+		    int end_byte_index = mFile_CurSor_Position;
+
+		    mFile_CurSor_Position += Block_Type_And_Head_Total_Length;
+		    
+		    byte[] block_type = Arrays.copyOfRange(type_and_length, 0, 4);
+		    String block_type_bytes_hexstr = DigitalTransUtils.byte2hex(block_type,true);
+		    
+
+		    byte[] block_head_length_bytes = Arrays.copyOfRange(type_and_length, 4, 8);
+		    String block_head_length_bytes_hexstr = DigitalTransUtils.byte2hex(block_head_length_bytes,true);
+		  
+		    
+		    // 将16进制字符串转为10进制的int（注意字符串不要以f开头，如有要先处理为0）
+		    int  block_head_length = Integer.parseInt(clearZero_for_NumberStr(block_head_length_bytes_hexstr),16);
+//		    if(!DigitalTransUtils.byte2hex(block_type).equalsIgnoreCase("A1B2C3D4")){
+//		        bo = ByteOrder.LITTLE_ENDIAN;
+//		    }
+//		    reader = new ByteReader(bo);
+//		    offset = 24;
+
+		    // 解析 Global Header
+//		    GlobalHeader globalHeader = parseGlobalHeader(globalHeaderBuffer);
+		    
+		    // 【block_type_bytes_hexstr = 0A0D0D0A】   block_head_length_bytes_hexstr=【6C000000】 ByteOrder.BIG_ENDIAN 大端对齐了  实际 要小端对齐
+		   // 【block_type_bytes_hexstr = 0A0D0D0A】   block_head_length_bytes_hexstr=【0000006C】 block_head_length【108】
+		    System.out.println("【block_type_bytes_hexstr = "+block_type_bytes_hexstr+"】   block_head_length_bytes_hexstr=【"+block_head_length_bytes_hexstr+"】 block_head_length【"+block_head_length+"】");
+
+
+		    // 去除了  headLength=4 和 BlockTYpe=4 总 8个 字节的 剩余的字节数组
+		    int   rest_frame_length = block_head_length-Block_Type_And_Head_Total_Length;
+		    byte[] all_frame_byte_withoutBlockType_withoutHeadTotalLength = new byte[rest_frame_length]; 
+
+		    byte[] all_frame_bytes = null;
+		    String all_frame_hexstr = null;
+		    int readRestByteCount = 0 ;
+		    
+		    
+		    try {
+		    	readRestByteCount =  pcapng_bis.read(all_frame_byte_withoutBlockType_withoutHeadTotalLength, 0, rest_frame_length);
+		    }catch (Exception e) {
+				 System.out.println(" pcapng_bis.read(all_frame_byte_withoutBlockType_withoutHeadTotalLength, 0, rest_frame_length) 异常 e="+e);
+			}
+		    
+		    mFile_CurSor_Position += rest_frame_length;
+		    
+		   String all_rest_frame_byte_hexstr = DigitalTransUtils.byte2hex(all_frame_byte_withoutBlockType_withoutHeadTotalLength,false);
+		   if(all_rest_frame_byte_hexstr == null) {
+			   System.out.println("all_rest_frame_byte_hexstr  读取为空 ! block_type_bytes_hexstr="+block_type_bytes_hexstr);
+			   return null;
+		   }else {
+			   System.out.println("all_rest_frame_byte_hexstr.length = "+ all_frame_byte_withoutBlockType_withoutHeadTotalLength.length +"   readByteCount="+readRestByteCount);
+			   
+			   System.out.println("all_rest_frame_byte_hexstr=\n"+all_rest_frame_byte_hexstr);
+
+			   
+			   
+			   all_frame_bytes =  byteMerger(block_type,block_head_length_bytes,all_frame_byte_withoutBlockType_withoutHeadTotalLength);
+		 
+			    all_frame_hexstr = DigitalTransUtils.byte2hex(all_frame_bytes,false);
+			   
+			   System.out.println("all_frame_hexstr=\n"+all_frame_hexstr);
+			   
+			   
+		   }
+		   
+		   if(all_frame_bytes.length < 4) {
+			   
+			   System.out.println(" 当前读取 WIFI 帧 失败! 请检查!");
+			   return null;
+		   }
+		   byte[]  block_tail_length_bytes = {all_frame_bytes[all_frame_bytes.length-4],all_frame_bytes[all_frame_bytes.length-3],all_frame_bytes[all_frame_bytes.length-2],all_frame_bytes[all_frame_bytes.length-1]};
+		   
+		    String block_tail_length_bytes_hexstr = DigitalTransUtils.byte2hex(block_tail_length_bytes,true);
+		    int  block_tail_length = Integer.parseInt(clearZero_for_NumberStr(block_tail_length_bytes_hexstr),16);
+		    
+		    if(block_tail_length != block_head_length ) {
+		    	System.out.println("block_tail_length_bytes_hexstr = "+ block_tail_length_bytes_hexstr);
+				   System.out.println(" 当前读取 到的帧  block_head_length="+block_head_length+"    block_tail_length="+block_tail_length+"  请检查!");
+				   return null;
+	    }
+
+		   end_byte_index = mFile_CurSor_Position;
+		   
+		   Wifi_Frame_AbsCommon_Struct  matchFrame =    frame_base_struct.getMatch_Wifi_Frame(block_type_bytes_hexstr);
+		   matchFrame.frame_bytes = all_frame_bytes;
+		   matchFrame.frame_bytes_hexstr = all_frame_hexstr;
+		   
+		   matchFrame.frame_length = all_frame_bytes.length;
+		   matchFrame.block_type_4bytes = block_type;
+		   matchFrame.block_type_str = block_type_bytes_hexstr;
+		   
+		   
+		   
+		   matchFrame.head_block_total_length_4bytes = block_head_length_bytes;
+		   matchFrame.head_block_total_length = block_head_length;
+		   matchFrame.head_block_total_length_4bytes_hexstr = block_head_length_bytes_hexstr;
+		   
+		   
+		   matchFrame.tail_block_total_length_4bytes = block_tail_length_bytes;
+		   matchFrame.tail_block_total_length = block_tail_length;
+		   matchFrame.tail_block_total_length_4bytes_hexstr = block_tail_length_bytes_hexstr;
+		   
+		   
+		   matchFrame.frame_begin_index = begin_byte_index;
+		   matchFrame.frame_end_index = end_byte_index;
+		   
+		   matchFrame.package_number = wifiFrameStructList.size();
+		   
+		   
+
+		   return matchFrame;
+		}
+	    
+public void Pcapng_File_Parser(File pcapFile) throws Exception {
+   long fileSize = pcapFile.length();
+    System.out.println("文件长度:"+fileSize);
+    pcapng_bis = new BufferedInputStream(new FileInputStream(pcapFile));
+    Wifi_Frame_Base_Struct  frame_base_struct = new Wifi_Frame_Base_Struct();
+
+
+    while( mFile_CurSor_Position < fileSize) {
+    	   
+    	   Wifi_Frame_AbsCommon_Struct matchWiFiFrame =  getMatch_Wifi_Frame_Struct(frame_base_struct);
+    	   
+    	   if(matchWiFiFrame != null) {
+    		   wifiFrameStructList.add(matchWiFiFrame);
+    	   }else {
+    		   
+    		   System.out.println("遇到 解析 到的 matchWiFiFrame == null 的 情况 请检查  mFile_CurSor_Position="+mFile_CurSor_Position);
+    	   }
+    	   
+    	
+    }
+ 
+    pcapng_bis.close();
+    
+    
+    for (int i = 0; i < wifiFrameStructList.size(); i++) {
+		
+    	Wifi_Frame_AbsCommon_Struct wif_frame_struct = wifiFrameStructList.get(i);
+    	System.out.println();
+    	System.out.println("═════════════["+i+"]"+"["+wif_frame_struct.block_type_str+"]"+"═══════════");
+    	wif_frame_struct.parse_wifi_frame(wif_frame_struct.frame_bytes);
+    	System.out.println();
+    	System.out.println(wif_frame_struct);
+    	System.out.println();
+	}
+    
+    System.out.println("总共解析的帧数量如下: wifiFrameStructList.size() = "+ wifiFrameStructList.size() +"  mFile_CurSor_Position="+ mFile_CurSor_Position);
+
+    
+    
+
+   
+}
+
+
+
+	}
+	
+	
+	class Wifi_Frame_Struct_00000001 extends Wifi_Frame_Base_Struct{
+
+		Wifi_Frame_Struct_00000001(byte[] block_type_bytes, byte[] block_head_length_bytes, byte[] all_frame_bytes,
+				int beginInFile, int endInFile) {
+			super(block_type_bytes, block_head_length_bytes, all_frame_bytes, beginInFile, endInFile);
+			// TODO Auto-generated constructor stub
+		}
+
+		Wifi_Frame_Struct_00000001(){
+			
+		}
 		
 	}
 	
+	
+	class Wifi_Frame_Struct_00000005 extends Wifi_Frame_Base_Struct{
+
+		Wifi_Frame_Struct_00000005(byte[] block_type_bytes, byte[] block_head_length_bytes, byte[] all_frame_bytes,
+				int beginInFile, int endInFile) {
+			super(block_type_bytes, block_head_length_bytes, all_frame_bytes, beginInFile, endInFile);
+			// TODO Auto-generated constructor stub
+		}
+
+		Wifi_Frame_Struct_00000005(){
+			
+		}
+		
+		 void parse_wifi_frame(byte[] all_frame) {
+				
+			 
+		 }
+		 
+		
+	}
+	
+	
+	
+//    1                   2                   3
+//0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+//+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+//0 |                    Block Type = 0x00000006                    |
+//+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+//4 |                      Block Total Length                       |
+//+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+//8 |                         Interface ID                          |
+//+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+//12 |                        Timestamp (High)                       |
+//+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+//16 |                        Timestamp (Low)                        |
+//+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+//20 |                    Captured Packet Length                     |
+//+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+//24 |                    Original Packet Length                     |
+//+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+//28 /                                                               /
+///                          Packet Data                          /
+///              variable length, padded to 32 bits               /
+///                                                               /
+//+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+///                                                               /
+///                      Options (variable)                       /
+///                                                               /
+//+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+//|                      Block Total Length                       |
+//+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+	
+	class Wifi_Frame_Struct_00000006 extends Wifi_Frame_Base_Struct{
+	
+		byte[] Interface_ID_4bytes;
+		byte[] Timestamp_High_4bytes;
+		byte[] Timestamp_Low_4bytes;
+		byte[] Captured_Packet_Length_4bytes;
+		byte[] Original_Packet_Length_4bytes;
+		int  Captured_Packet_Avaliable_Length;  // 有效字节占用
+		int  Original_Packet_Avaliable_Length;  // 有效字节占用
+		int  Captured_Packet_Real_Length;  // 有效字节占用 32位对齐 后的实际占用
+		int  Original_Packet_Real_Length; 	
+		byte[] Packet_Data_bytes ;  // 内部协议的解析 包数据 
+		
+
+		
+		 @Override
+		public String toString() {
+			return "Wifi_Frame_Struct_00000006 【Interface_ID_4bytes=" + Arrays.toString(Interface_ID_4bytes)
+					+ ", Timestamp_High_4bytes=" + Arrays.toString(Timestamp_High_4bytes) + ", Timestamp_Low_4bytes="
+					+ Arrays.toString(Timestamp_Low_4bytes) + ", Captured_Packet_Length_4bytes="
+					+ Arrays.toString(Captured_Packet_Length_4bytes) + ", Original_Packet_Length_4bytes="
+					+ Arrays.toString(Original_Packet_Length_4bytes) + ", Captured_Packet_Avaliable_Length="
+					+ Captured_Packet_Avaliable_Length + ", Original_Packet_Avaliable_Length="
+					+ Original_Packet_Avaliable_Length + ", Captured_Packet_Real_Length=" + Captured_Packet_Real_Length
+					+ ", Original_Packet_Real_Length=" + Original_Packet_Real_Length + ", Packet_Data_bytes="
+					+ Arrays.toString(Packet_Data_bytes) + "】 "+super.toString();
+		}
+
+
+
+		void parse_wifi_frame(byte[] all_frame) {
+			 Interface_ID_4bytes =  beginIndex_endIndex_byteArr(8,11);
+			 Timestamp_High_4bytes =  beginIndex_endIndex_byteArr(12,15);
+			 Timestamp_High_4bytes =  beginIndex_endIndex_byteArr(16,19);
+			 Captured_Packet_Length_4bytes  =  beginIndex_endIndex_byteArr(20,23);
+			 Original_Packet_Length_4bytes  =  beginIndex_endIndex_byteArr(24,27);
+			 Packet_Data_bytes  =  beginIndex_endIndex_byteArr(28,(frame_length - 4 -1));
+			 
+			    String Captured_Packet_Length_4bytes_hexstr = DigitalTransUtils.byte2hex(Captured_Packet_Length_4bytes,true);
+			    // 将16进制字符串转为10进制的int（注意字符串不要以f开头，如有要先处理为0）
+			    
+			    System.out.println("Captured_Packet_Length_4bytes_hexstr = "+ Captured_Packet_Length_4bytes_hexstr +" Captured_Packet_Length_4bytes ="+Arrays.toString(Captured_Packet_Length_4bytes) );
+			    Captured_Packet_Avaliable_Length = Integer.parseInt(clearZero_for_NumberStr(Captured_Packet_Length_4bytes_hexstr),16);
+			    
+			    Captured_Packet_Real_Length =  getRealLength_From_AvaliableLength(Captured_Packet_Avaliable_Length);
+			    
+			    
+			    
+			    String Original_Packet_Length_4bytes_hexstr = DigitalTransUtils.byte2hex(Original_Packet_Length_4bytes,true);
+			    System.out.println("Original_Packet_Length_4bytes_hexstr = "+ Original_Packet_Length_4bytes_hexstr+" Original_Packet_Length_4bytes ="+Arrays.toString(Original_Packet_Length_4bytes) );
+			    // 将16进制字符串转为10进制的int（注意字符串不要以f开头，如有要先处理为0）
+			    Original_Packet_Avaliable_Length = Integer.parseInt(clearZero_for_NumberStr(Original_Packet_Length_4bytes_hexstr),16);
+			    
+			    Original_Packet_Real_Length =  getRealLength_From_AvaliableLength(Captured_Packet_Avaliable_Length);
+			    
+			    
+		 }
+		 
+		 
+
+		Wifi_Frame_Struct_00000006(byte[] block_type_bytes, byte[] block_head_length_bytes, byte[] all_frame_bytes,
+				int beginInFile, int endInFile) {
+			super(block_type_bytes, block_head_length_bytes, all_frame_bytes, beginInFile, endInFile);
+			// TODO Auto-generated constructor stub
+		}
+
+		Wifi_Frame_Struct_00000006(){
+			
+		}
+		
+
+		
+	}
+	
+	
+	
+	
+	
+	class Wifi_Frame_Struct_0A0D0D0A extends Wifi_Frame_Base_Struct{
+
+		Wifi_Frame_Struct_0A0D0D0A(byte[] block_type_bytes, byte[] block_head_length_bytes, byte[] all_frame_bytes,
+				int beginInFile, int endInFile) {
+			super(block_type_bytes, block_head_length_bytes, all_frame_bytes, beginInFile, endInFile);
+			// TODO Auto-generated constructor stub
+		}
+
+		Wifi_Frame_Struct_0A0D0D0A(){
+			
+		}
+		
+		 void parse_wifi_frame(byte[] all_frame) {
+		
+			 
+		 }
+		 
+		
+	}
+	
+	class Wifi_Frame_Base_Struct extends Wifi_Frame_AbsCommon_Struct{
+		
+		Wifi_Frame_Base_Struct(byte[] block_type_bytes ,byte[] block_head_length_bytes ,byte[] all_frame_bytes   , int beginInFile , int endInFile  ){
+			super(block_type_bytes,block_head_length_bytes,all_frame_bytes,beginInFile,endInFile);
+		}
+		
+		Wifi_Frame_Base_Struct(){
+			super();
+		}
+		
+		Wifi_Frame_AbsCommon_Struct getMatch_Wifi_Frame(String block_type_str) {
+			switch (block_type_str) {
+
+			case "00000001":
+
+				return new Wifi_Frame_Struct_00000001();
+		
+				
+			case "00000005":
+
+				return new Wifi_Frame_Struct_00000005();
+
+				
+			case "00000006":
+
+				return new Wifi_Frame_Struct_00000006();
+	
+				
+			case "0A0D0D0A":
+
+				return new Wifi_Frame_Struct_0A0D0D0A();
+			
+				
+			default:
+				break;
+			}
+			
+			
+			System.out.println("没有选中 block_type_str = "+block_type_str +"的解析类!  ");
+			return null;
+			
+			
+		}
+		
+		 void parse_wifi_frame(byte[] all_frame) {
+			 System.out.println("method parse_wifi_frame call in "+ getClass().getSimpleName());
+  
+		 }
+		 
+		 
+		     // 两头 都包含
+			byte[] beginIndex_endIndex_byteArr(int beginIndex , int endIndex) {
+				int cur_byte_length = endIndex - beginIndex +1 ; 
+				if(cur_byte_length <= 0) {
+					System.out.println("当前查询 子byte数组 	beginIndex="+beginIndex+"  endIndex="+endIndex+"  cur_byte_length="+cur_byte_length +"异常  请检查!");
+				    return null;
+				}
+				
+				byte[] matchByte = new byte[cur_byte_length];
+				
+				if(frame_bytes == null || frame_bytes.length < cur_byte_length) {
+					
+					System.out.println("当前查询 子byte数组 	beginIndex="+beginIndex+"  endIndex="+endIndex+"  cur_byte_length="+cur_byte_length +"frame_bytes 为 空  请检查!");
+				    return null;
+				}
+				
+				if(endIndex >=  frame_bytes.length || beginIndex < 0) {
+					
+					System.out.println("当前查询A 子byte数组 	beginIndex="+beginIndex+"  endIndex="+endIndex+"  cur_byte_length="+cur_byte_length +"异常  请检查!");
+				    return null;
+				}
+				
+				for (int i = beginIndex; i <= endIndex; i++) {
+					int matchIndex = i - beginIndex;
+					matchByte[matchIndex] = frame_bytes[i];
+				}
+				
+				return matchByte;
+				
+				
+			}
+		 
+//			  Options-Length=19   那么对齐长度 【(19%4 == 0) ? 19:(Math.flow(19/4)*4)】=20个字节
+//			  Options-Length=45   那么对齐长度 【(45%4 == 0) ? 45:(Math.flow(45/4)*4)】=48个字节
+			 int getRealLength_From_AvaliableLength(int avaliableLength) {
+				 
+				 int realLength = avaliableLength;
+				 while(realLength%4 != 0) {
+					 realLength++;
+				 }
+				 
+				 return realLength;
+				 
+			 }
+		
+	}
+	
+	 abstract class Wifi_Frame_AbsCommon_Struct {
+		byte[] frame_bytes;  // 当前帧的所有的字节 
+        String frame_bytes_hexstr; 
+		
+		byte[] block_type_4bytes ; // Block Type = 0x0A0D0D0A  Block Type=0x00000001  Block Type=0x0000060   Block Type=0x000005 
+		String block_type_str;
+
+		
+		
+		byte[] head_block_total_length_4bytes ;   // 头部的 长度
+		int head_block_total_length;
+		String head_block_total_length_4bytes_hexstr;
+
+		
+		byte[] tail_block_total_length_4bytes ;   // 尾部的 长度
+		int tail_block_total_length;
+		String tail_block_total_length_4bytes_hexstr;
+		
+		
+		int frame_length ; 
+		
+		int frame_begin_index;
+		
+		int frame_end_index;
+		
+		int package_number;  //  包序列  第一个 包    第二个包
+		
+		Wifi_Frame_AbsCommon_Struct(){
+			
+		}
+		
+		Wifi_Frame_AbsCommon_Struct(byte[] block_type_bytes ,byte[] block_head_length_bytes ,byte[] all_frame_bytes , int beginInFile , int endInFile  ){
+			
+			
+			block_type_4bytes = block_type_bytes;
+			
+			
+			head_block_total_length_4bytes = block_head_length_bytes;
+			
+			
+			frame_bytes = all_frame_bytes;
+			frame_length = all_frame_bytes.length; 
+			frame_begin_index = beginInFile;
+			frame_end_index = endInFile;
+			block_type_str = DigitalTransUtils.byte2hex(block_type_4bytes);
+			frame_bytes_hexstr = DigitalTransUtils.byte2hex(frame_bytes);
+		}
+		
+		
+		
+		
+		@Override
+		public String toString() {
+			return getClass().getSimpleName()+" "+package_number+"[frame_bytes=" + Arrays.toString(frame_bytes) + ", frame_bytes_hexstr="
+					+ frame_bytes_hexstr + ", block_type_4bytes=" + Arrays.toString(block_type_4bytes)
+					+ ", block_type_str=" + block_type_str + ", head_block_total_length_4bytes="
+					+ Arrays.toString(head_block_total_length_4bytes) + ", head_block_total_length="
+					+ head_block_total_length + ", head_block_total_length_4bytes_hexstr="
+					+ head_block_total_length_4bytes_hexstr + ", tail_block_total_length_4bytes="
+					+ Arrays.toString(tail_block_total_length_4bytes) + ", tail_block_total_length="
+					+ tail_block_total_length + ", tail_block_total_length_4bytes_hexstr="
+					+ tail_block_total_length_4bytes_hexstr + ", frame_length=" + frame_length + ", frame_begin_index="
+					+ frame_begin_index + ", frame_end_index=" + frame_end_index + ", package_number=" + package_number
+					+ "]";
+		}
+
+		public String getBlock_type_str() {
+			return block_type_str;
+		}
+
+
+
+		public void setBlock_type_str(String block_type_str) {
+			this.block_type_str = block_type_str;
+		}
+
+		
+		abstract int getRealLength_From_AvaliableLength(int avaliableLength);
+		
+		abstract byte[] beginIndex_endIndex_byteArr(int beginIndex , int endIndex);
+		
+		abstract Wifi_Frame_AbsCommon_Struct getMatch_Wifi_Frame(String block_type_str);
+		
+		abstract void parse_wifi_frame(byte[] all_frame);
+		
+		
+	}
 	
 	// 对 .pcap文件解析  对 tcpdump 包的分析
 	class PcaP_TcpDump_Frame_Analysis_Rule_51 extends Basic_Rule {
@@ -798,7 +1379,7 @@ public class I9_TextRuleOperation {
 
 	        byte[] magicNum = Arrays.copyOfRange(globalHeaderBuffer, 0, 4);
 
-	        if(!DigitalTransUtils.byte2hex(magicNum).equalsIgnoreCase("A1B2C3D4")){
+	        if(!DigitalTransUtils.byte2hex(magicNum,false).equalsIgnoreCase("A1B2C3D4")){
 	            bo = ByteOrder.LITTLE_ENDIAN;
 	        }
 	        reader = new ByteReader(bo);
@@ -819,7 +1400,7 @@ public class I9_TextRuleOperation {
 	        byte[] magicBuffer = Arrays.copyOfRange(globalHeaderBuffer, 0, 4);
 	        byte[] linkTypeBuffer = Arrays.copyOfRange(globalHeaderBuffer, 20, 24);
 
-	        globalHeader.setMagicNum(DigitalTransUtils.byte2hex(magicBuffer));
+	        globalHeader.setMagicNum(DigitalTransUtils.byte2hex(magicBuffer,false));
 	        globalHeader.setLinkType(ByteUtil.bytesToInt(linkTypeBuffer,bo));
 
 	        return globalHeader;
@@ -962,24 +1543,66 @@ public class I9_TextRuleOperation {
 	     * @param b byte[] 需要转换的字节数组
 	     * @return String 十六进制字符串
 	     */
-	    public static final String byte2hex(byte[] b) {
+		
+		 // 【block_type_bytes_hexstr = 0A0D0D0A】   block_head_length_bytes_hexstr=【6C000000】 ByteOrder.BIG_ENDIAN 大端对齐了  实际 要小端对齐
+		// 【block_type_bytes_hexstr = A0D0D0A0】   block_head_length_bytes_hexstr=【000000C6】  尼马  还是 错 要  6C才对   // new StringBuffer(s).reverse().toString(); 不行
+		
+		// 【block_type_bytes_hexstr = 0A0D0D0A】   block_head_length_bytes_hexstr=【0000006C】   终于 好了 
+	    public static final String byte2hex(byte[] b , boolean isLittle_end) {  // 小端对齐-true   大端对齐-false
 	        if (b == null) {
 	            throw new IllegalArgumentException(
 	                    "Argument b ( byte array ) is null! ");
 	        }
 	        String hs = "";
 	        String stmp = "";
-	        for (int n = 0; n < b.length; n++) {
-	            stmp = Integer.toHexString(b[n] & 0xff);
-	            if (stmp.length() == 1) {
-	                hs = hs + "0" + stmp;
-	            } else {
-	                hs = hs + stmp;
-	            }
+	        if(isLittle_end) {
+		        for (int n = b.length -1 ; n >= 0 ; n--) {
+		            stmp = Integer.toHexString(b[n] & 0xff);
+		            if (stmp.length() == 1) {
+		                hs = hs + "0" + stmp;
+		            } else {
+		                hs = hs + stmp;
+		            }
+		        }
+	        	
+	        } else {
+		        for (int n = 0; n < b.length; n++) {
+		            stmp = Integer.toHexString(b[n] & 0xff);
+		            if (stmp.length() == 1) {
+		                hs = hs + "0" + stmp;
+		            } else {
+		                hs = hs + stmp;
+		            }
+		        }
+	        	
 	        }
+
+
 	        return hs.toUpperCase();
 	    }
 
+	    
+	    public static final String byte2hex(byte[] b ) {  // 小端对齐-true   大端对齐-false
+	        if (b == null) {
+	            throw new IllegalArgumentException(
+	                    "Argument b ( byte array ) is null! ");
+	        }
+	        String hs = "";
+	        String stmp = "";
+
+		        for (int n = 0; n < b.length; n++) {
+		            stmp = Integer.toHexString(b[n] & 0xff);
+		            if (stmp.length() == 1) {
+		                hs = hs + "0" + stmp;
+		            } else {
+		                hs = hs + stmp;
+		            }
+		        }
+	      
+
+	        return hs.toUpperCase();
+	    }
+	    
 	 	/**
 	     * 字节数组转为普通字符串（ASCII对应的字符）
 	     *
@@ -4038,6 +4661,21 @@ public class I9_TextRuleOperation {
 						.add("\n\n\n\n══════════════════════Index" + i + "   PATH : " + targetFile.getAbsolutePath());
 
 				byte[] byteArr = tryFile2Byte(targetFile);
+				
+//result.length=1207959002
+//result.length=1207959533                     // 读取的文件太大造成 byte[]数组太大  进而使得 StringBuilder.append()的大小 大于12亿 length了 导致无法打印
+//Exception in thread "main" java.lang.OutOfMemoryError: Requested array size exceeds VM limit
+//at java.util.Arrays.copyOf(Arrays.java:3332)
+//at java.lang.AbstractStringBuilder.expandCapacity(AbstractStringBuilder.java:137)
+//at java.lang.AbstractStringBuilder.ensureCapacityInternal(AbstractStringBuilder.java:121)
+//at java.lang.AbstractStringBuilder.append(AbstractStringBuilder.java:421)
+//at java.lang.StringBuilder.append(StringBuilder.java:136)
+//at I9_TextRuleOperation.dumpHexString(I9_TextRuleOperation.java:15450)
+//at I9_TextRuleOperation.dumpHexString(I9_TextRuleOperation.java:15350)
+//at I9_TextRuleOperation$FileToByte_F9_Rule_35.applyOperationRule(I9_TextRuleOperation.java:4530)
+//at I9_TextRuleOperation$Basic_Rule.operationRule(I9_TextRuleOperation.java:8819)
+//at I9_TextRuleOperation.main(I9_TextRuleOperation.java:10218)
+						
 				String dumpHex_result_str = dumpHexString(byteArr, mBinarySB, mAsciiSB, mHexSB);
 				allContentList
 						.add("\n\n\n\n══════════════════════Index" + i + "   PATH : " + targetFile.getAbsolutePath());
@@ -14868,51 +15506,190 @@ public class I9_TextRuleOperation {
 
 	static int byteIndex = 0;
 
+
+
 	public static String dumpHexString(byte[] array, int offset, int length, StringBuilder mBinarySB,
 			StringBuilder mAsciiSB, StringBuilder mHexSB) {
-		if (array == null)
-			return "(null)";
 		StringBuilder result = new StringBuilder();
+		boolean isTooBig_Flag = false;
+		                   
+		if( array.length > 80000000) {  // 在 这里 大于 12亿 导致 报错  大于 12亿 那么把result舍弃掉
+			isTooBig_Flag = true;
+		}
+		
+		System.out.println("mBinarySB.init.size = "+mBinarySB.length() +"   mAsciiSB.init.size="+mAsciiSB.length()+"     mHexSB.init.size="+mHexSB.length()+""); 
+		// 24826448 
+		System.out.println("bytes.length = "+array.length +"   offset="+offset+"     length="+length+""); 
+		// bytes.length = 87241784  = 83M
+		try {
+			
 
-		byte[] line = new byte[16];
-		int lineIndex = 0;
+			if (array == null)
+				return "(null)";
 
-		result.append("\n0x");
-		result.append(toHexString(offset));
 
-		// 把 int offset 转为 10 进制 10位数值
+			byte[] line = new byte[16];
+			int lineIndex = 0;
 
-		for (int i = offset; i < offset + length; i++) {
-			if (lineIndex == 16) {
-				result.append(" ");
-				ArrayList<Byte> byteList = new ArrayList<Byte>();
-				for (int j = 0; j < 16; j++) {
-					byteList.add(line[j]);
-					if (line[j] >= ' ' && line[j] <= '~') {
-						result.append(new String(line, j, 1));
-					} else {
+			dumpHexString_result_append(isTooBig_Flag,result,"\n0x");
+			dumpHexString_result_append(isTooBig_Flag,result,toHexString(offset));
 
-						if (line[j] == 0x00) { // 0x00 NUL(null) 空字符 ●
+			// 把 int offset 转为 10 进制 10位数值
 
-							result.append("●");
-						} else if (line[j] == 0x0A) { // 0x0A 换行符 ▲
-							result.append("▲");
-						} else if (line[j] == 0x0D) { // 0D-■ 回车
-							result.append("■");
-						} else if (line[j] == 0x09) { // 09 - ◆水平制表符 相当于 Tab
-							result.append("◆");
-						} else if (line[j] == 0x0B) { // 0x0B -┓ VT (vertical tab) 垂直制表符
-							result.append("┓");
-						} else if (line[j] == 0x1F) { // █ 0x1F 单元分隔符
-							result.append("█");
-						} else if (line[j] == 0x0C) { // 0x0C ▼ FF (NP form feed, new page) 换页键
-							result.append("▼");
+			for (int i = offset; i < offset + length; i++) {
+				if (lineIndex == 16) {
+					dumpHexString_result_append(isTooBig_Flag,result," ");
+					ArrayList<Byte> byteList = new ArrayList<Byte>();
+					for (int j = 0; j < 16; j++) {
+						byteList.add(line[j]);
+						if (line[j] >= ' ' && line[j] <= '~') {
+							dumpHexString_result_append(isTooBig_Flag,result,new String(line, j, 1));
 						} else {
-							result.append(".");
+
+							if (line[j] == 0x00) { // 0x00 NUL(null) 空字符 ●
+
+								dumpHexString_result_append(isTooBig_Flag,result,"●");
+							} else if (line[j] == 0x0A) { // 0x0A 换行符 ▲
+								dumpHexString_result_append(isTooBig_Flag,result,"▲");
+							} else if (line[j] == 0x0D) { // 0D-■ 回车
+								dumpHexString_result_append(isTooBig_Flag,result,"■");
+							} else if (line[j] == 0x09) { // 09 - ◆水平制表符 相当于 Tab
+								dumpHexString_result_append(isTooBig_Flag,result,"◆");
+							} else if (line[j] == 0x0B) { // 0x0B -┓ VT (vertical tab) 垂直制表符
+								dumpHexString_result_append(isTooBig_Flag,result,"┓");
+							} else if (line[j] == 0x1F) { // █ 0x1F 单元分隔符
+								dumpHexString_result_append(isTooBig_Flag,result,"█");
+							} else if (line[j] == 0x0C) { // 0x0C ▼ FF (NP form feed, new page) 换页键
+								dumpHexString_result_append(isTooBig_Flag,result,"▼");
+							} else {
+								dumpHexString_result_append(isTooBig_Flag,result,".");
+							}
+						}
+						if (j == 15) { // 最后字符显示一个分割线
+							dumpHexString_result_append(isTooBig_Flag,result,"  ║ "); // 这里显示的是 字节信息
+							for (int k = 0; k < byteList.size(); k++) {
+								byte curByte = byteList.get(k);
+
+								String targetChar = "";
+								if (curByte >= ' ' && curByte <= '~') {
+									targetChar = new String(line, k, 1);
+								} else {
+//	                                targetChar = ".";
+
+									if (curByte == 0x00) {
+//	                                    dumpHexString_result_append(isTooBig_Flag,result,"●");
+										targetChar = "●";
+									} else if (curByte == 0x0A) { // 0x0A 换行符 ▲
+//	                                    dumpHexString_result_append(isTooBig_Flag,result,"♂");
+										targetChar = "▲";
+									} else if (curByte == 0x0D) { // 0D-■ 回车
+//	                                    dumpHexString_result_append(isTooBig_Flag,result,"∠");
+										targetChar = "■";
+									} else if (curByte == 0x09) { // 09 - ◆水平制表符 相当于 Tab
+										targetChar = "◆";
+									} else if (curByte == 0x0B) { // 0x0B -┓ VT (vertical tab) 垂直制表符
+										targetChar = "┓";
+									} else if (curByte == 0x1F) { // █ 0x1F 单元分隔符
+										targetChar = "█";
+									} else if (curByte == 0x0C) { // 0x0C ▼ FF (NP form feed, new page) 换页键
+										targetChar = "▼";
+									} else {
+//	                                    dumpHexString_result_append(isTooBig_Flag,result,".");
+										targetChar = ".";
+									}
+
+								}
+
+								String byreStr = toHexString(curByte);
+								if(!isTooBig_Flag) {
+								mAsciiSB.append(targetChar);
+								}
+							
+								if (k < 9) {
+									dumpHexString_result_append(isTooBig_Flag,result,"【 0" + k + "-" + toHexStringNoTen(byteIndex) + "-"
+											+ toTenString(byteIndex).trim() + "-" + byreStr + "-" + targetChar + " 】 ");
+
+								} else {
+//									System.out.println("result.length="+result.length());   在 这里 大于 12亿 导致 报错
+									
+									if(result.length() >1207959000  ) {  // 在 这里 大于 12亿 导致 报错  大于 12亿 那么把result舍弃掉
+										isTooBig_Flag = true;
+										result = new StringBuilder();
+									}
+									
+									dumpHexString_result_append(isTooBig_Flag,result,"【 " + k + "-" + toHexStringNoTen(byteIndex) + "-"
+											+ toTenString(byteIndex).trim() + "-" + byreStr + "-" + targetChar + " 】 ");
+								}
+								
+
+//								
+								byteIndex++;
+								dumpHexString_result_append(isTooBig_Flag,result,showByte(curByte, mBinarySB));
+							}
+
 						}
 					}
-					if (j == 15) { // 最后字符显示一个分割线
-						result.append("  ║ "); // 这里显示的是 字节信息
+
+					dumpHexString_result_append(isTooBig_Flag,result,"\n0x");
+					mHexSB.append("\n");
+					mBinarySB.append("\n");
+					dumpHexString_result_append(isTooBig_Flag,result,toHexString(i));
+					lineIndex = 0;
+				}
+
+				byte b = array[i];
+				dumpHexString_result_append(isTooBig_Flag,result," ");
+				dumpHexString_result_append(isTooBig_Flag,result,(HEX_DIGITS[(b >>> 4) & 0x0F]+""));
+				dumpHexString_result_append(isTooBig_Flag,result,HEX_DIGITS[b & 0x0F]+"");
+
+				mHexSB.append(" ");
+				mHexSB.append(HEX_DIGITS[(b >>> 4) & 0x0F]);
+				mHexSB.append(HEX_DIGITS[b & 0x0F]);
+
+				line[lineIndex++] = b;
+			}
+
+			if (lineIndex != 0) { // if (lineIndex != 16) AOSP 中存在错误 无法打印 最后是 16个字节的情况
+				int count = (16 - lineIndex) * 3;
+				count++;
+				for (int i = 0; i < count; i++) {
+					dumpHexString_result_append(isTooBig_Flag,result," ");
+				}
+				ArrayList<Byte> byteList = new ArrayList<Byte>();
+				for (int i = 0; i < lineIndex; i++) {
+					byteList.add(line[i]);
+					if (line[i] >= ' ' && line[i] <= '~') {
+						dumpHexString_result_append(isTooBig_Flag,result,new String(line, i, 1));
+					} else {
+//	                    dumpHexString_result_append(isTooBig_Flag,result,".");
+
+						if (line[i] == 0x00) {
+							dumpHexString_result_append(isTooBig_Flag,result,"●");
+						} else if (line[i] == 0x0A) { // 0x0A 换行符 ▲
+							dumpHexString_result_append(isTooBig_Flag,result,"▲");
+						} else if (line[i] == 0x0D) { // 0D-■回车
+							dumpHexString_result_append(isTooBig_Flag,result,"■");
+						} else if (line[i] == 0x09) { // 09 - ◆水平制表符 相当于 Tab
+							dumpHexString_result_append(isTooBig_Flag,result,"◆");
+						} else if (line[i] == 0x0B) { // 0x0B -┓ VT (vertical tab) 垂直制表符
+							dumpHexString_result_append(isTooBig_Flag,result,"┓");
+						} else if (line[i] == 0x1F) { // █ 0x1F 单元分隔符
+							dumpHexString_result_append(isTooBig_Flag,result,"█");
+						} else if (line[i] == 0x0C) { // 0x0C ▼ FF (NP form feed, new page) 换页键
+							dumpHexString_result_append(isTooBig_Flag,result,"▼");
+						} else {
+							dumpHexString_result_append(isTooBig_Flag,result,".");
+						}
+
+					}
+
+					if (i == lineIndex - 1) { // 最后字符显示一个分割线
+						int paddingSize = 16 - lineIndex;
+						for (int j = 0; j < paddingSize; j++) {
+							dumpHexString_result_append(isTooBig_Flag,result," ");
+						}
+						dumpHexString_result_append(isTooBig_Flag,result,"  ║ "); // 这里显示的是 字节信息
+
 						for (int k = 0; k < byteList.size(); k++) {
 							byte curByte = byteList.get(k);
 
@@ -14920,16 +15697,13 @@ public class I9_TextRuleOperation {
 							if (curByte >= ' ' && curByte <= '~') {
 								targetChar = new String(line, k, 1);
 							} else {
-//                                targetChar = ".";
+//	                            targetChar = ".";
 
 								if (curByte == 0x00) {
-//                                    result.append("●");
-									targetChar = "●";
+									dumpHexString_result_append(isTooBig_Flag,result,"●");
 								} else if (curByte == 0x0A) { // 0x0A 换行符 ▲
-//                                    result.append("♂");
 									targetChar = "▲";
 								} else if (curByte == 0x0D) { // 0D-■ 回车
-//                                    result.append("∠");
 									targetChar = "■";
 								} else if (curByte == 0x09) { // 09 - ◆水平制表符 相当于 Tab
 									targetChar = "◆";
@@ -14940,136 +15714,69 @@ public class I9_TextRuleOperation {
 								} else if (curByte == 0x0C) { // 0x0C ▼ FF (NP form feed, new page) 换页键
 									targetChar = "▼";
 								} else {
-//                                    result.append(".");
 									targetChar = ".";
 								}
-
 							}
 
 							String byreStr = toHexString(curByte);
-							mAsciiSB.append(targetChar);
+							if(!isTooBig_Flag) {
+								mAsciiSB.append(targetChar);
+							}
+					
 							if (k < 9) {
-								result.append("【 0" + k + "-" + toHexStringNoTen(byteIndex) + "-"
+								dumpHexString_result_append(isTooBig_Flag,result,"【 0" + k + "-" + toHexStringNoTen(byteIndex) + "-"
 										+ toTenString(byteIndex).trim() + "-" + byreStr + "-" + targetChar + " 】 ");
-
 							} else {
-								result.append("【 " + k + "-" + toHexStringNoTen(byteIndex) + "-"
+								dumpHexString_result_append(isTooBig_Flag,result,"【 " + k + "-" + toHexStringNoTen(byteIndex) + "-"
 										+ toTenString(byteIndex).trim() + "-" + byreStr + "-" + targetChar + " 】 ");
 							}
 							byteIndex++;
-							result.append(showByte(curByte, mBinarySB));
+							dumpHexString_result_append(isTooBig_Flag,result,showByte(curByte, mBinarySB));
 						}
-
 					}
 				}
-
-				result.append("\n0x");
-				mHexSB.append("\n");
-				mBinarySB.append("\n");
-				result.append(toHexString(i));
-				lineIndex = 0;
 			}
+			
+			System.out.println("result.end.size="+result.length()+" "+"mBinarySB.end.size = "+mBinarySB.length() +"   mAsciiSB.end.size="+mAsciiSB.length()+"     mHexSB.init.end="+mHexSB.length()+""); 
 
-			byte b = array[i];
-			result.append(" ");
-			result.append(HEX_DIGITS[(b >>> 4) & 0x0F]);
-			result.append(HEX_DIGITS[b & 0x0F]);
-
-			mHexSB.append(" ");
-			mHexSB.append(HEX_DIGITS[(b >>> 4) & 0x0F]);
-			mHexSB.append(HEX_DIGITS[b & 0x0F]);
-
-			line[lineIndex++] = b;
+			System.out.println("bytes.length = "+array.length +"   offset="+offset+"     length="+length+""); 
+		}catch (Exception e) {
+			// TODO: handle exception
+			
+			System.out.println("发生 异常 result.length = "+ result.length());
 		}
+		
+		
+//		result.end.size=222218811 mBinarySB.end.size = 36103552   mAsciiSB.end.size=4477953     mHexSB.init.end=13713752
+//		bytes.length = 4477960   offset=0     length=4477960
+// 	    222218811/4477960=49.6      result.length=1207959533会报错   那么 判断 大于这个值 就舍弃 result 
+		System.out.println("result.end.size="+result.length()+" "+"mBinarySB.end.size = "+mBinarySB.length() +"   mAsciiSB.end.size="+mAsciiSB.length()+"     mHexSB.init.end="+mHexSB.length()+""); 
 
-		if (lineIndex != 0) { // if (lineIndex != 16) AOSP 中存在错误 无法打印 最后是 16个字节的情况
-			int count = (16 - lineIndex) * 3;
-			count++;
-			for (int i = 0; i < count; i++) {
-				result.append(" ");
-			}
-			ArrayList<Byte> byteList = new ArrayList<Byte>();
-			for (int i = 0; i < lineIndex; i++) {
-				byteList.add(line[i]);
-				if (line[i] >= ' ' && line[i] <= '~') {
-					result.append(new String(line, i, 1));
-				} else {
-//                    result.append(".");
+		System.out.println("bytes.length = "+array.length +"   offset="+offset+"     length="+length+""); 
+		
 
-					if (line[i] == 0x00) {
-						result.append("●");
-					} else if (line[i] == 0x0A) { // 0x0A 换行符 ▲
-						result.append("▲");
-					} else if (line[i] == 0x0D) { // 0D-■回车
-						result.append("■");
-					} else if (line[i] == 0x09) { // 09 - ◆水平制表符 相当于 Tab
-						result.append("◆");
-					} else if (line[i] == 0x0B) { // 0x0B -┓ VT (vertical tab) 垂直制表符
-						result.append("┓");
-					} else if (line[i] == 0x1F) { // █ 0x1F 单元分隔符
-						result.append("█");
-					} else if (line[i] == 0x0C) { // 0x0C ▼ FF (NP form feed, new page) 换页键
-						result.append("▼");
-					} else {
-						result.append(".");
-					}
-
-				}
-
-				if (i == lineIndex - 1) { // 最后字符显示一个分割线
-					int paddingSize = 16 - lineIndex;
-					for (int j = 0; j < paddingSize; j++) {
-						result.append(" ");
-					}
-					result.append("  ║ "); // 这里显示的是 字节信息
-
-					for (int k = 0; k < byteList.size(); k++) {
-						byte curByte = byteList.get(k);
-
-						String targetChar = "";
-						if (curByte >= ' ' && curByte <= '~') {
-							targetChar = new String(line, k, 1);
-						} else {
-//                            targetChar = ".";
-
-							if (curByte == 0x00) {
-								result.append("●");
-							} else if (curByte == 0x0A) { // 0x0A 换行符 ▲
-								targetChar = "▲";
-							} else if (curByte == 0x0D) { // 0D-■ 回车
-								targetChar = "■";
-							} else if (curByte == 0x09) { // 09 - ◆水平制表符 相当于 Tab
-								targetChar = "◆";
-							} else if (curByte == 0x0B) { // 0x0B -┓ VT (vertical tab) 垂直制表符
-								targetChar = "┓";
-							} else if (curByte == 0x1F) { // █ 0x1F 单元分隔符
-								targetChar = "█";
-							} else if (curByte == 0x0C) { // 0x0C ▼ FF (NP form feed, new page) 换页键
-								targetChar = "▼";
-							} else {
-								targetChar = ".";
-							}
-						}
-
-						String byreStr = toHexString(curByte);
-						mAsciiSB.append(targetChar);
-						if (k < 9) {
-							result.append("【 0" + k + "-" + toHexStringNoTen(byteIndex) + "-"
-									+ toTenString(byteIndex).trim() + "-" + byreStr + "-" + targetChar + " 】 ");
-						} else {
-							result.append("【 " + k + "-" + toHexStringNoTen(byteIndex) + "-"
-									+ toTenString(byteIndex).trim() + "-" + byreStr + "-" + targetChar + " 】 ");
-						}
-						byteIndex++;
-						result.append(showByte(curByte, mBinarySB));
-					}
-				}
-			}
+		if(isTooBig_Flag) {
+			result = new StringBuilder();
+			dumpHexString_result_append(isTooBig_Flag,result,"该显示区块 字符串Length大于12亿 会上报 java.lang.OutOfMemoryError: Requested array size exceeds VM limit 决定不显示! ");
 		}
+		
+		if(isTooBig_Flag) {
+			
+		mAsciiSB.append("该显示区块 字符串Length大于12亿 会上报 java.lang.OutOfMemoryError: Requested array size exceeds VM limit 决定不显示! ");
+		}
+		
+		
 
 		return result.toString();
 	}
+static void  dumpHexString_result_append(boolean isBig ,StringBuilder sb , String str){
+if(isBig){
+return;
+}
 
+sb.append(str);
+
+}
 	public static String showByte(byte byteData, StringBuilder mBinarySB) {
 		StringBuilder sb = new StringBuilder();
 		String result = "";
@@ -15459,6 +16166,16 @@ public class I9_TextRuleOperation {
 		}
 		return true;
 	}
+	
+	// 000000ccc  转为 ccc  , 00c0c000 转为 c0c000
+	public static String clearZero_for_NumberStr(String str) {
+		String fixed_str = str.trim();
+		while (fixed_str.startsWith("0") && fixed_str.length() != 0 ) {
+			fixed_str = fixed_str.substring(1);
+		}
+		return fixed_str;
+	}
+	
 
 	static void SortString(ArrayList<String> strList) {
 		Comparator<Object> CHINA_COMPARE = Collator.getInstance(java.util.Locale.CHINA);
@@ -15699,6 +16416,30 @@ public class I9_TextRuleOperation {
 		return targetExpWithOut;
 	}
 
+	
+
+	// 使用两个 for 语句
+	//java 合并两个byte数组 
+	public static byte[] byteMerger(byte[] bt1, byte[] bt2 , byte[] bt3){ 
+	    byte[] bt4 = new byte[bt1.length+bt2.length+bt3.length]; 
+	int i=0;
+	    for(byte bt: bt1){
+	    	bt4[i]=bt;
+	 i++;
+	}
+	     
+	for(byte bt: bt2){
+		bt4[i]=bt;
+	  i++;
+	}
+	
+
+		for(byte bt: bt3){
+			bt4[i]=bt;
+		  i++;
+		}
+	    return bt4; 
+	}
 	
 	// List<A_B_C> 需要把这个 创建了三个 JavaBean
 // A , B  ,C  这三个 对象的 execute()方法 会执行  parseMap();  zzj
