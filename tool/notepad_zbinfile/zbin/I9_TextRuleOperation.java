@@ -701,7 +701,9 @@ String simpleDesc() {
 					Pcapng_File_Parser(pacapng_file);
 				} catch (Exception e) {
 					// TODO: handle exception
-				System.out.println("Pcapng_File_Parser Exception  =  "+ e);
+					 e.printStackTrace();
+					 
+				System.out.println("Pcapng_File_Parser Exception  =  "+e.getMessage()+"  e.toString()"+e.toString());
 				}
 		
 				
@@ -960,6 +962,7 @@ public void Pcapng_File_Parser(File pcapFile) throws Exception {
 	
 	class Wifi_Frame_Struct_00000006 extends Wifi_Frame_Base_Struct{
 	
+		// ════════════════  Block Format Begin ════════════════
 		byte[] Interface_ID_4bytes;
 		byte[] Timestamp_High_4bytes;
 		byte[] Timestamp_Low_4bytes;
@@ -971,11 +974,19 @@ public void Pcapng_File_Parser(File pcapFile) throws Exception {
 		int  Original_Packet_Real_Length; 	
 		byte[] Packet_Data_bytes ;  // 内部协议的解析 包数据 
 		
-
+		String timestamp_str ;   //  时间戳代表的内容 
+		// ════════════════  Block Format End ════════════════
 		
-		 @Override
-		public String toString() {
-			return "Wifi_Frame_Struct_00000006 【Interface_ID_4bytes=" + Arrays.toString(Interface_ID_4bytes)
+	
+		
+		// ════════════════  IEEE802.11  Format Begin ════════════════
+		
+		
+		
+		// ════════════════  IEEE802.11 Format End ════════════════
+		
+		public String toString1() {
+			return "Wifi_Frame_Struct_00000006 【timestamp_str="+timestamp_str+"   Interface_ID_4bytes=" + Arrays.toString(Interface_ID_4bytes)
 					+ ", Timestamp_High_4bytes=" + Arrays.toString(Timestamp_High_4bytes) + ", Timestamp_Low_4bytes="
 					+ Arrays.toString(Timestamp_Low_4bytes) + ", Captured_Packet_Length_4bytes="
 					+ Arrays.toString(Captured_Packet_Length_4bytes) + ", Original_Packet_Length_4bytes="
@@ -986,37 +997,881 @@ public void Pcapng_File_Parser(File pcapFile) throws Exception {
 					+ Arrays.toString(Packet_Data_bytes) + "】 "+super.toString();
 		}
 
+		 
+
+
+
+
+	//════════════════ Radiotap Format Begin ════════════════
+		ArrayList<ArrayList<Integer>>  MultiPresent_IntList_List;
+
+		ArrayList<Integer> All_RadiotapPresent_IntList ; 
+
+		// 对  bit 位 的 描述 
+		Map<Integer,String> All_RadiotapPresent_Bit_Desc_Map; ;
+
+		 // 位置 与对应的字节数组 的Map    有些 没有 Present 那么就 不保存 
+		// 0 , 1 ,2  对应的 多个 byte[] 数组
+		Map<Integer,ArrayList<Byte>>  Option_RadiotapPresent_Bit_ByteArr_Map;
+
+		// 各个 bit位 存在 那么 对应的 存在的数据区块的长度 
+		Map<Integer,Integer>  Option_RadiotapPresent_Bit_ByteLength_Map;
+
+		 // 32 位 bit位 
+ int radiotap_present_tsft_1bit                  = 0x00000001 ;
+ int radiotap_present_flags_2bit                 = 0x00000002 ;
+ int radiotap_present_rate_3bit                  = 0x00000004 ;
+ int radiotap_present_channel_4bit               = 0x00000008 ;
+ int radiotap_present_fhss_5bit                  = 0x00000010 ;
+ int radiotap_present_dbm_antsignal_6bit         = 0x00000020 ;
+ int radiotap_present_db_antnoise_7bit           = 0x00000040 ;
+ int radiotap_present_lock_quality_8bit          = 0x00000080 ;
+ int radiotap_present_tx_attenuation_9bit        = 0x00000100 ;
+ int radiotap_present_db_tx_attenuation_10bit    = 0x00000200 ;
+ int radiotap_present_dbm_tx_power_11bit         = 0x00000400 ;
+ int radiotap_present_antenna_12bit              = 0x00000800 ;
+ int radiotap_present_db_antsignal_13bit         = 0x00001000 ;
+ int radiotap_present_db_antnoise_14bit          = 0x00002000 ;
+ int radiotap_present_rxflags_15bit              = 0x00004000 ;
+ int radiotap_present_txflags_16bit              = 0x00008000 ;
+                                                  // 第 17  第18 个 bit位 是 空的  为啥呢?  
+ int radiotap_present_xchannel_19bit             = 0x00040000 ;
+ int radiotap_present_mcs_20bit                  = 0x00080000 ;
+ int radiotap_present_ampdu_21bit                = 0x00100000 ;
+ int radiotap_present_vht_22bit                  = 0x00200000 ;
+ int radiotap_present_timestamp_23bit            = 0x00400000 ;
+ int radiotap_present_he_24bit                   = 0x00800000 ;
+ int radiotap_present_he_mu_25bit                = 0x01000000 ;
+                                                  // 第26  bit位 是 空的  为啥呢?  
+ int radiotap_present_0_length_psdu_27bit        = 0x04000000 ;
+ int radiotap_present_l_sig_28bit                = 0x08000000 ;
+ int radiotap_present_tlv_29bit                  = 0x10000000 ;
+ int radiotap_present_rtap_ns_30bit              = 0x20000000 ;
+ int radiotap_present_vendor_ns_31bit            = 0x40000000 ;
+ int radiotap_present_ext_32bit                  = 0x80000000 ;
+		 
+		 
+		 
+		 
+		 byte Header_revision_1byte;
+		 byte Header_pad_1byte;
+		 byte[]  Header_length_2bytes;   // 决定了 Radiotap_Header_bytes 的长度
+		 int Header_length_Int; 
+		 
+		 byte[]  Present_flags_First_32bits_4bytes;
+		 int Present_BitMsk_First; //  字节转为的 int值 第一个 present_mask  可能会有多个  所以要解析出多个来
+		 ArrayList<Integer> All_Present_BitMsk;   // 所有的 bitmap的数据
+		 
+		 byte[] Radiotap_Header_bytes ; 
+		 
+	
+		 byte[] option_1bit_radiotap_mactime_8bytes;
+		 
+//	════════════════ Radiotap Format End ════════════════
+		
+		 void init_prop(){
+
+			 
+			 init_radiotap_format();
+
+		}
+		 
+		 
+		 void init_radiotap_format() {
+			 
+			  All_RadiotapPresent_IntList  = new 	  ArrayList<Integer>();
+
+			  All_RadiotapPresent_Bit_Desc_Map  =  new   HashMap<Integer,String>();
+			   MultiPresent_IntList_List = new ArrayList<ArrayList<Integer>>();
+				Option_RadiotapPresent_Bit_ByteLength_Map  =  new   HashMap<Integer,Integer>();
+			  Option_RadiotapPresent_Bit_ByteArr_Map =  new   HashMap<Integer,ArrayList<Byte>>();
+			  All_Present_BitMsk   = new 	  ArrayList<Integer>();
+	
+
+			  
+			  All_RadiotapPresent_Bit_Desc_Map.put(radiotap_present_tsft_1bit                 , "radiotap_present_tsft_1bit              ");
+			  All_RadiotapPresent_Bit_Desc_Map.put(radiotap_present_flags_2bit                , "radiotap_present_flags_2bit             ");
+			  All_RadiotapPresent_Bit_Desc_Map.put(radiotap_present_rate_3bit                 , "radiotap_present_rate_3bit              ");
+			  All_RadiotapPresent_Bit_Desc_Map.put(radiotap_present_channel_4bit              , "radiotap_present_channel_4bit           ");
+			  All_RadiotapPresent_Bit_Desc_Map.put(radiotap_present_fhss_5bit                 , "radiotap_present_fhss_5bit              ");
+			  All_RadiotapPresent_Bit_Desc_Map.put(radiotap_present_dbm_antsignal_6bit        , "radiotap_present_dbm_antsignal_6bit     ");
+			  All_RadiotapPresent_Bit_Desc_Map.put(radiotap_present_db_antnoise_7bit          , "radiotap_present_db_antnoise_7bit       ");
+			  All_RadiotapPresent_Bit_Desc_Map.put(radiotap_present_lock_quality_8bit         , "radiotap_present_lock_quality_8bit      ");
+			  All_RadiotapPresent_Bit_Desc_Map.put(radiotap_present_tx_attenuation_9bit       , "radiotap_present_tx_attenuation_9bit    ");
+			  All_RadiotapPresent_Bit_Desc_Map.put(radiotap_present_db_tx_attenuation_10bit   , "radiotap_present_db_tx_attenuation_10bi ");
+			  All_RadiotapPresent_Bit_Desc_Map.put(radiotap_present_dbm_tx_power_11bit        , "radiotap_present_dbm_tx_power_11bit     ");
+			  All_RadiotapPresent_Bit_Desc_Map.put(radiotap_present_antenna_12bit             , "radiotap_present_antenna_12bit          ");
+			  All_RadiotapPresent_Bit_Desc_Map.put(radiotap_present_db_antsignal_13bit        , "radiotap_present_db_antsignal_13bit     ");
+			  All_RadiotapPresent_Bit_Desc_Map.put(radiotap_present_db_antnoise_14bit         , "radiotap_present_db_antnoise_14bit      ");
+			  All_RadiotapPresent_Bit_Desc_Map.put(radiotap_present_rxflags_15bit             , "radiotap_present_rxflags_15bit          ");
+			  All_RadiotapPresent_Bit_Desc_Map.put(radiotap_present_txflags_16bit             , "radiotap_present_txflags_16bit          ");
+			  All_RadiotapPresent_Bit_Desc_Map.put(radiotap_present_xchannel_19bit            , "radiotap_present_xchannel_19bit         ");
+			  All_RadiotapPresent_Bit_Desc_Map.put(radiotap_present_mcs_20bit                 , "radiotap_present_mcs_20bit              ");
+			  All_RadiotapPresent_Bit_Desc_Map.put(radiotap_present_ampdu_21bit               , "radiotap_present_ampdu_21bit            ");
+			  All_RadiotapPresent_Bit_Desc_Map.put(radiotap_present_vht_22bit                 , "radiotap_present_vht_22bit              ");
+			  All_RadiotapPresent_Bit_Desc_Map.put(radiotap_present_timestamp_23bit           , "radiotap_present_timestamp_23bit        ");
+			  All_RadiotapPresent_Bit_Desc_Map.put(radiotap_present_he_24bit                  , "radiotap_present_he_24bit               ");
+			  All_RadiotapPresent_Bit_Desc_Map.put(radiotap_present_he_mu_25bit               , "radiotap_present_he_mu_25bit            ");
+			  All_RadiotapPresent_Bit_Desc_Map.put(radiotap_present_0_length_psdu_27bit       , "radiotap_present_0_length_psdu_27bit    ");
+			  All_RadiotapPresent_Bit_Desc_Map.put(radiotap_present_l_sig_28bit               , "radiotap_present_l_sig_28bit            ");
+			  All_RadiotapPresent_Bit_Desc_Map.put(radiotap_present_tlv_29bit                 , "radiotap_present_tlv_29bit              ");
+			  All_RadiotapPresent_Bit_Desc_Map.put(radiotap_present_rtap_ns_30bit             , "radiotap_present_rtap_ns_30bit          ");
+			  All_RadiotapPresent_Bit_Desc_Map.put(radiotap_present_vendor_ns_31bit           , "radiotap_present_vendor_ns_31bit        ");
+			  All_RadiotapPresent_Bit_Desc_Map.put(radiotap_present_ext_32bit                 , "radiotap_present_ext_32bit              ");
+			  				  
+			  
+			  All_RadiotapPresent_IntList.add(radiotap_present_tsft_1bit               );
+			  All_RadiotapPresent_IntList.add(radiotap_present_flags_2bit              );
+			  All_RadiotapPresent_IntList.add(radiotap_present_rate_3bit               );
+			  All_RadiotapPresent_IntList.add(radiotap_present_channel_4bit            );
+			  All_RadiotapPresent_IntList.add(radiotap_present_fhss_5bit               );
+			  All_RadiotapPresent_IntList.add(radiotap_present_dbm_antsignal_6bit      );
+			  All_RadiotapPresent_IntList.add(radiotap_present_db_antnoise_7bit        );
+			  All_RadiotapPresent_IntList.add(radiotap_present_lock_quality_8bit       );
+			  All_RadiotapPresent_IntList.add(radiotap_present_tx_attenuation_9bit     );
+			  All_RadiotapPresent_IntList.add(radiotap_present_db_tx_attenuation_10bit );
+			  All_RadiotapPresent_IntList.add(radiotap_present_dbm_tx_power_11bit      );
+			  All_RadiotapPresent_IntList.add(radiotap_present_antenna_12bit           );
+			  All_RadiotapPresent_IntList.add(radiotap_present_db_antsignal_13bit      );
+			  All_RadiotapPresent_IntList.add(radiotap_present_db_antnoise_14bit       );
+			  All_RadiotapPresent_IntList.add(radiotap_present_rxflags_15bit           );
+			  All_RadiotapPresent_IntList.add(radiotap_present_txflags_16bit           );                               
+			  All_RadiotapPresent_IntList.add(radiotap_present_xchannel_19bit          );
+			  All_RadiotapPresent_IntList.add(radiotap_present_mcs_20bit               );
+			  All_RadiotapPresent_IntList.add(radiotap_present_ampdu_21bit             );
+			  All_RadiotapPresent_IntList.add(radiotap_present_vht_22bit               );
+			  All_RadiotapPresent_IntList.add(radiotap_present_timestamp_23bit         );
+			  All_RadiotapPresent_IntList.add(radiotap_present_he_24bit                );
+			  All_RadiotapPresent_IntList.add(radiotap_present_he_mu_25bit             );                             
+			  All_RadiotapPresent_IntList.add(radiotap_present_0_length_psdu_27bit     );
+			  All_RadiotapPresent_IntList.add(radiotap_present_l_sig_28bit             );
+			  All_RadiotapPresent_IntList.add(radiotap_present_tlv_29bit               );
+			  All_RadiotapPresent_IntList.add(radiotap_present_rtap_ns_30bit           );
+			  All_RadiotapPresent_IntList.add(radiotap_present_vendor_ns_31bit         );
+			  All_RadiotapPresent_IntList.add(radiotap_present_ext_32bit               );	 
+			  
+			  
+			  
+			  // length=0 的 意味着  这个值标识的是 boolean 
+			  // https://oomake.com/question/3948105 
+			  // https://www.radiotap.org/fields/XChannel.html
+			  // https://www.radiotap.org/fields/MCS.html
+			  Option_RadiotapPresent_Bit_ByteLength_Map.put(radiotap_present_tsft_1bit               , 8   ) ;// .... .... .... .... .... .... .... ...1 = TSFT: radiotap.present.tsft == 1        【包含字段 radiotap.mactime 08字节 】   #接收到数据包的时间戳单位毫秒
+			  Option_RadiotapPresent_Bit_ByteLength_Map.put(radiotap_present_flags_2bit              , 1   ) ;// .... .... .... .... .... .... .... ..1. = Flags: radiotap.present.flags == 1      【包含字段 radiotap.flags 01字节-8比特位】     #标记
+			  Option_RadiotapPresent_Bit_ByteLength_Map.put(radiotap_present_rate_3bit               , 1   ) ;// .... .... .... .... .... .... .... .1.. = Rate: radiotap.present.rate == 1        【包含字段 radiotap.datarate 01字节】    #速度
+			  Option_RadiotapPresent_Bit_ByteLength_Map.put(radiotap_present_channel_4bit            , 4   ) ;// .... .... .... .... .... .... .... 1... = Channel: radiotap.present.channel == 1  【包含字段 radiotap.channel.freq 2字节  radiotap.channel.flags 2字节 共4字节】#信道
+			  Option_RadiotapPresent_Bit_ByteLength_Map.put(radiotap_present_fhss_5bit               , 2   ) ;// .... .... .... .... .... .... ...0 .... = FHSS: radiotap.present.fhss == 1       布尔值    #跳频技术   【radiotap.fhss.hopset 1字节 radiotap.fhss.pattern 1字节 共2字节】
+			  Option_RadiotapPresent_Bit_ByteLength_Map.put(radiotap_present_dbm_antsignal_6bit      , 1   ) ;// .... .... .... .... .... .... ..1. .... = dBm Antenna Signal: radiotap.present.dbm_antsignal == 1 【包含字段 radiotap.dbm_antsignal 1字节】 #天线信号
+			  Option_RadiotapPresent_Bit_ByteLength_Map.put(radiotap_present_db_antnoise_7bit        , 1   ) ;// .... .... .... .... .... .... .0.. .... = dBm Antenna Noise: Boolean  radiotap.present.db_antnoise == 1 【1字节】  #天线噪声
+			  Option_RadiotapPresent_Bit_ByteLength_Map.put(radiotap_present_lock_quality_8bit       , 2   ) ;// .... .... .... .... .... .... 0... .... = Lock Quality: Boolean radiotap.present.lock_quality == 1   【2字节】  Barker Lock的质量. 单调不降低, 锁定强度更高. 数据表中称为“信号质量”
+			  Option_RadiotapPresent_Bit_ByteLength_Map.put(radiotap_present_tx_attenuation_9bit     , 2   ) ;// .... .... .... .... .... ...0 .... .... = TX Attenuation: Boolean无数据 radiotap.present.tx_attenuation == 1   【2字节】 u16
+			  Option_RadiotapPresent_Bit_ByteLength_Map.put(radiotap_present_db_tx_attenuation_10bit , 2   ) ;// .... .... .... .... .... ..0. .... .... = dB TX Attenuation: Boolean无数据    【2字节】 u16  radiotap.present.db_tx_attenuation == 1
+			  Option_RadiotapPresent_Bit_ByteLength_Map.put(radiotap_present_dbm_tx_power_11bit      , 1   ) ;// .... .... .... .... .... .0.. .... .... = dBm TX Power: radiotap.present.dbm_tx_power == 1   【包含字段 radiotap.不知道 01字节】 发射功率以dBm(1毫瓦参考分贝)表示. 这是在天线端口测量的绝对功率电平
+			  Option_RadiotapPresent_Bit_ByteLength_Map.put(radiotap_present_antenna_12bit           , 1   ) ;// .... .... .... .... .... 1... .... .... = Antenna: radiotap.present.antenna == 1  【包含字段 radiotap.antenna 01字节】     #天线
+			  Option_RadiotapPresent_Bit_ByteLength_Map.put(radiotap_present_db_antsignal_13bit      , 1   ) ;// .... .... .... .... ...0 .... .... .... = dB Antenna Signal: radiotap.present.db_antsignal == 1   【1字节】 天线处的RF信号功率, 与任意固定参考之间的分贝差
+			  Option_RadiotapPresent_Bit_ByteLength_Map.put(radiotap_present_db_antnoise_14bit       , 1   ) ;// .... .... .... .... ..0. .... .... .... = dB Antenna Noise: radiotap.present.db_antnoise == 1  【1字节】  天线的RF噪声功率, 与任意固定参考之间的分贝差. 该字段包含单个无符号的8位值
+			  Option_RadiotapPresent_Bit_ByteLength_Map.put(radiotap_present_rxflags_15bit           , 2   ) ;// .... .... .... .... .1.. .... .... .... = RX flags: radiotap.present.rxflags == 1 【包含字段 radiotap.rxflags 02字节】     #接收标识
+			  Option_RadiotapPresent_Bit_ByteLength_Map.put(radiotap_present_txflags_16bit           , 3   ) ;// .... .... .... .... 0... .... .... .... = TX flags: radiotap.present.txflags == 1 【包含字段 radiotap.txflags 02字节】#发送标识  暂时 默认后面会带有一个1个字节的 奇怪点 2或3 unknown TLV data: 00
+			  Option_RadiotapPresent_Bit_ByteLength_Map.put(radiotap_present_xchannel_19bit          , 8   ) ;// .... .... .... .0.. .... .... .... .... = Channel+: radiotap.present.xchannel == 1    【8字节】     u32 flags, u16 freq, u8 channel, u8 maxpower  https://www.radiotap.org/fields/XChannel.html
+			  Option_RadiotapPresent_Bit_ByteLength_Map.put(radiotap_present_mcs_20bit               , 3   ) ;// .... .... .... 0... .... .... .... .... = MCS information: radiotap.present.mcs == 1  【包含字段 radiotap.mcs  03字节】
+			  Option_RadiotapPresent_Bit_ByteLength_Map.put(radiotap_present_ampdu_21bit             , 8   ) ;// .... .... ...0 .... .... .... .... .... = A-MPDU Status: radiotap.present.ampdu == 1  【8字节】  u32 reference number, u16 flags, u8 delimiter CRC value, u8 reserved  ##  Aggregate MPDU, MPDU 帧聚合 进一步提高效率和可靠性,增加了MPDU帧的大小和A-MPDU帧的大小
+			  Option_RadiotapPresent_Bit_ByteLength_Map.put(radiotap_present_vht_22bit               , 8   ) ;// .... .... ..0. .... .... .... .... .... = VHT information: radiotap.present.vht == 1  【8字节】   u16 known, u8 flags, u8 bandwidth, u8 mcs_nss[4], u8 coding, u8 group_id, u16 partial_aid ## very high traslation
+			  Option_RadiotapPresent_Bit_ByteLength_Map.put(radiotap_present_timestamp_23bit         , 12   ) ;// .... .... .0.. .... .... .... .... .... = frame timestamp: radiotap.present.timestamp == 1  u64 timestamp, u16 accuracy, u8 unit/position, u8 flags 【包含字段 radiotap.timestamp  timestampinfo-12字节( timestamp8+ accuracy2 +unit2)】
+			  Option_RadiotapPresent_Bit_ByteLength_Map.put(radiotap_present_he_24bit                , 12   ) ;// .... .... 0... .... .... .... .... .... = HE information:   radiotap.present.he == 1   【12字节】u16 data1, data2, data3, data4, data5, data6 多选
+			  Option_RadiotapPresent_Bit_ByteLength_Map.put(radiotap_present_he_mu_25bit             , 6   ) ;// .... ...0 .... .... .... .... .... .... = HE-MU information: radiotap.present.he_mu == 1 【6字节】   u16 flags1  u16 flags2  u8 RU_channel1[4] u8 RU_channel2[4]
+			  Option_RadiotapPresent_Bit_ByteLength_Map.put(radiotap_present_0_length_psdu_27bit     , 1   ) ;// .... .0.. .... .... .... .... .... .... = 0 Length PSDU: radiotap.present.0_length.psdu == 1   【1字节】u8 type
+			  Option_RadiotapPresent_Bit_ByteLength_Map.put(radiotap_present_l_sig_28bit             , 4   ) ;// .... 0... .... .... .... .... .... .... = L-SIG:  radiotap.present.l_sig ==  1 【4字节】  u16 data1, data2 
+			  Option_RadiotapPresent_Bit_ByteLength_Map.put(radiotap_present_tlv_29bit               , 0   ) ;// ...0 .... .... .... .... .... .... .... = TLVs: radiotap.present.tlv == 1  类型-长度-值  的结构动态解析
+			  Option_RadiotapPresent_Bit_ByteLength_Map.put(radiotap_present_rtap_ns_30bit           , 0   ) ;// ..0. .... .... .... .... .... .... .... = Radiotap NS next: Boolean无数据  radiotap.present.rtap_ns == 1【未包含显示字段 标记属性为True False 】
+			  Option_RadiotapPresent_Bit_ByteLength_Map.put(radiotap_present_vendor_ns_31bit         , 0   ) ;// .0.. .... .... .... .... .... .... .... = Vendor NS next:  Boolean无数据 radiotap.present.vendor_ns == 1【未包含显示字段 标记属性为True False 】
+			  Option_RadiotapPresent_Bit_ByteLength_Map.put(radiotap_present_ext_32bit               , 0   ) ;// 0... .... .... .... .... .... .... .... = Ext:  Boolean无数据 标识是否还有present存在了 多个present_flag   radiotap.present.ext == 1   【present中的Ext代表着还有另外的present字段存在】
+
+			 
+			 
+		 }
+
+	
+			  
+			 ArrayList<Byte> byteArr2List(byte[] bytearr){
+				 ArrayList<Byte>  ByteList = new ArrayList<Byte>();
+			     for (int i = 0; i < bytearr.length; i++) {
+				  ByteList.add(bytearr[i]);
+			   }	 
+			     return ByteList;
+			 }
+			 
+			 byte[] byteList2Arr(ArrayList<Byte> byteList) {
+				 byte[] byteArr = new byte[byteList.size()];
+				 for (int i = 0; i < byteList.size(); i++) {
+					 byteArr[i] = byteList.get(i);
+				}
+				 return byteArr;
+			 }
+			 
+			 
+			 void Block_Format_Parser(byte[] all_frame) {
+				 
+				 Interface_ID_4bytes =  beginIndex_endIndex_byteArr(all_frame,8,11);
+
+				 Captured_Packet_Length_4bytes  =  beginIndex_endIndex_byteArr(all_frame,20,23);
+				 Original_Packet_Length_4bytes  =  beginIndex_endIndex_byteArr(all_frame,24,27);
+				 Packet_Data_bytes  =  beginIndex_endIndex_byteArr(all_frame,28,(frame_length - 4 -1));
+				 
+				    String Captured_Packet_Length_4bytes_hexstr = DigitalTransUtils.byte2hex(Captured_Packet_Length_4bytes,true);
+				    // 将16进制字符串转为10进制的int（注意字符串不要以f开头，如有要先处理为0）
+				    
+				    System.out.println("Captured_Packet_Length_4bytes_hexstr = "+ Captured_Packet_Length_4bytes_hexstr +" Captured_Packet_Length_4bytes ="+Arrays.toString(Captured_Packet_Length_4bytes) );
+				    Captured_Packet_Avaliable_Length = Integer.parseInt(clearZero_for_NumberStr(Captured_Packet_Length_4bytes_hexstr),16);
+				    
+				    Captured_Packet_Real_Length =  getRealLength_From_AvaliableLength(Captured_Packet_Avaliable_Length);
+				    
+				    
+				    
+				    String Original_Packet_Length_4bytes_hexstr = DigitalTransUtils.byte2hex(Original_Packet_Length_4bytes,true);
+				    System.out.println("Original_Packet_Length_4bytes_hexstr = "+ Original_Packet_Length_4bytes_hexstr+" Original_Packet_Length_4bytes ="+Arrays.toString(Original_Packet_Length_4bytes) );
+				    // 将16进制字符串转为10进制的int（注意字符串不要以f开头，如有要先处理为0）
+				    Original_Packet_Avaliable_Length = Integer.parseInt(clearZero_for_NumberStr(Original_Packet_Length_4bytes_hexstr),16);
+				    
+				    Original_Packet_Real_Length =  getRealLength_From_AvaliableLength(Captured_Packet_Avaliable_Length);
+				    
+				    
+					 Timestamp_High_4bytes =  beginIndex_endIndex_byteArr(all_frame,12,15);
+					 Timestamp_Low_4bytes =  beginIndex_endIndex_byteArr(all_frame,16,19);
+				
+					 
+					 
+					 // TimeStamp 时间戳 Begin  ════════════════════════════════════
+//		         		toUnsignedString
+		         		byte[] long_time_ms = {Timestamp_High_4bytes[3],Timestamp_High_4bytes[2],Timestamp_High_4bytes[1],Timestamp_High_4bytes[0],Timestamp_Low_4bytes[3],Timestamp_Low_4bytes[2],Timestamp_Low_4bytes[1],Timestamp_Low_4bytes[0]};	        
+		         		
+		         		
+		                //  long=1396710020795381  微妙
+		                //  long=1560950936695086634  纳秒
+		                //  以 10(-6)次方  微妙 为单位 
+		         		long long_time_stamp =   bytesToLong(long_time_ms,0,false);
+		         		String long_time_stamp_test = ""+long_time_stamp;
+		         		long long_time_stamp_ws = 0;   // 微妙
+		         		long long_time_stamp_ms = 0 ;  // 毫秒
+		         		
+		         		if(long_time_stamp_test.length() >= "1560950936695086634".length() ) {
+		         			//  以  纳秒为单位
+		         	    	 long_time_stamp_ws =(long) (long_time_stamp % 1000000000L);
+		         	   	  long_time_stamp_ms = ( long_time_stamp - long_time_stamp_ws ) / 1000000;
+		         			
+		         		}else {  //  以 微秒为单位
+
+		                	 long_time_stamp_ws =(long) (long_time_stamp % 1000000L);
+		                	//  long=1396710020795381   ws=795381    转为 毫秒 需要再 除以 1000
+		                	 long_time_stamp_ms = ( long_time_stamp - long_time_stamp_ws ) / 1000;
+		         		}
+		         		
+		                Calendar stampCalendar=Calendar.getInstance();
+		                stampCalendar.setTimeInMillis(long_time_stamp_ms);
+
+		                int year_8 =stampCalendar.get(Calendar.YEAR);
+		               	String year_8_str 	= year_8+"";
+		                
+		                int month_8 = (stampCalendar.get(Calendar.MONTH) == 0 ? 12 : (stampCalendar.get(Calendar.MONTH)+1));
+		             
+		             	String month_8_str 	= (month_8>9?month_8+"":"0"+month_8);
+		             		   
+		                int day_8 = stampCalendar.get(Calendar.DAY_OF_MONTH);
+		                String day_8_str 	=day_8+"";
+		                if(day_8 < 10) {
+		             	   day_8_str = "0"+day_8;
+		                } 
+		            	
+		                
+		                int hour_8 = stampCalendar.get(Calendar.HOUR_OF_DAY);
+		                String hour_8_str 	=hour_8+"";
+		                if(hour_8 < 10) {
+		             	   hour_8_str = "0"+hour_8;
+		                } 
+		                
+		                int minute_8 = stampCalendar.get(Calendar.MINUTE);
+		                
+		                String minute_8_str 	=minute_8+"";
+		                if(minute_8 < 10) {
+		             	   minute_8_str = "0"+minute_8;
+		                } 
+		                
+		                int second_8 = stampCalendar.get(Calendar.SECOND);
+		                
+		                String second_8_str 	=second_8+"";
+		                if(second_8 < 10) {
+		             	   second_8_str = "0"+second_8;
+		                } 
+		                
+//		                long_time_stamp_test=1396710020801071 long_time_stamp_test.length=16 
+//		                                     1560950936695086634
+		                String time_stamp_style2_str =" "+year_8_str+"-"+month_8_str+"-"+day_8_str+"_"+hour_8_str+":"+minute_8_str+":"+second_8_str+"."+long_time_stamp_ws +" long_time_stamp_test="+long_time_stamp_test+" long_time_stamp_test.length="+long_time_stamp_test.length()+"  long_time_stamp_ms="+long_time_stamp_ms+"  long_time_stamp_ws="+long_time_stamp_ws;                
+		                
+		                System.out.println(time_stamp_style2_str);
+			
+		                timestamp_str = year_8_str+"-"+month_8_str+"-"+day_8_str+"_"+hour_8_str+":"+minute_8_str+":"+second_8_str+"."+long_time_stamp_ws;
+						 // TimeStamp 时间戳 End  ════════════════════════════════════
+
+				 
+			 }
+			 
+		 void 	 Radiotap_Header_Parser() {
+			 Header_revision_1byte = Packet_Data_bytes[0];
+			 Header_pad_1byte = Packet_Data_bytes[0];
+			 Header_length_2bytes  =  beginIndex_endIndex_byteArr(Packet_Data_bytes,2,3); 
+			 Present_flags_First_32bits_4bytes  =  beginIndex_endIndex_byteArr(Packet_Data_bytes,4,7); 
+			 
+			 
+			 
+			    String Header_length_2bytes_hexstr = DigitalTransUtils.byte2hex(Header_length_2bytes,true);
+			    
+			    Header_length_Int = Integer.parseInt(clearZero_for_NumberStr(Header_length_2bytes_hexstr),16);
+			    
+			    
+			    Radiotap_Header_bytes =   beginIndex_endIndex_byteArr(Packet_Data_bytes,0,Header_length_Int-1); 
+			    
+			    String Present_flags_32bits_4bytes_hexstr = DigitalTransUtils.byte2hex(Present_flags_First_32bits_4bytes,true);
+			    Present_BitMsk_First = Integer.parseInt(clearZero_for_NumberStr(Present_flags_32bits_4bytes_hexstr),16);
+			    
+			    
+
+			    All_Present_BitMsk.add(Present_BitMsk_First);
+			    
+			    int temp_mask = Present_BitMsk_First;
+			    
+			    int mask_step = 4;
+			    // 有 下一个 present_mask 的 标识 
+			    //  要在 这里  检查 是否 有 下一个 Present_BitMsk
+			    // All_Present_BitMsk
+			    int Present_BitMsk_Count = 0 ; 
+			    Option_RadiotapPresent_Bit_ByteArr_Map.put(Present_BitMsk_Count, byteArr2List(Present_flags_First_32bits_4bytes));
+			    
+			    while((temp_mask & radiotap_present_ext_32bit) != 0) {
+			    	
+			    
+			   	 byte[] next_present_4bytes  =  beginIndex_endIndex_byteArr(Packet_Data_bytes,4+mask_step,7+mask_step); 
+
+				 
+				    String next_present_4bytes_hexstr = DigitalTransUtils.byte2hex(next_present_4bytes,true);
+				    temp_mask = Integer.parseInt(clearZero_for_NumberStr(next_present_4bytes_hexstr),16);
+				    
+				    All_Present_BitMsk.add(temp_mask);
+				    mask_step+=4;
+				    Present_BitMsk_Count++;
+				    Option_RadiotapPresent_Bit_ByteArr_Map.put(Present_BitMsk_Count, byteArr2List(next_present_4bytes));
+
+				    
+			    }
+			    
+			    //  去检测 多个 present_falg  获得的 flag 放入 ArrayList<ArrayList<Integer>> 中
+			    for (int i = 0; i < All_Present_BitMsk.size(); i++) {
+			    
+			    	
+				    for (int j = 0; j < All_RadiotapPresent_IntList.size(); j++) {
+				    	ArrayList<Integer> matchPresentBitMsk_Int_List = new 	ArrayList<Integer> ();
+				    	int bitFeature = All_RadiotapPresent_IntList.get(j);
+				    	
+				    	if((bitFeature & Present_BitMsk_First) != 0) {
+				    		System.out.println("Present_BitMsk["+(j+1)+"] = 表现 ! ");
+				    		matchPresentBitMsk_Int_List.add(bitFeature);
+				    	}
+				    	MultiPresent_IntList_List.add(matchPresentBitMsk_Int_List);
+					}
+
+				}
+			    
+			    
+			
+			    // 解析出 总共多少个  precent , 这部分 不解析
+			    int dynamic_present_bytes_length = 0 ;
+			    int  present_count = MultiPresent_IntList_List.size();
+			    int  present_bitMsk_size = All_Present_BitMsk.size();
+			    for (int i = 0; i < MultiPresent_IntList_List.size(); i++) {
+			    	
+			    	
+			    	ArrayList<Integer> one_item_present_List = 	MultiPresent_IntList_List.get(i);
+			
+			    
+			    for (int j = 0; j < one_item_present_List.size(); j++) {
+			    	
+			    	int matchBit = one_item_present_List.get(j);
+			    	
+			    	String present_desc = All_RadiotapPresent_Bit_Desc_Map.get(matchBit);
+			    	
+			    	int matchBit_Length = Option_RadiotapPresent_Bit_ByteLength_Map.get(matchBit);
+			    	dynamic_present_bytes_length += matchBit_Length;
+			    	
+			    	
+			    	
+			    	System.out.println("present_size["+present_count+"] present_bitMsk_size["+present_bitMsk_size+"]  present["+(i+1)+"]  matchBit="+matchBit+"   bit_desc:"+present_desc+"  bit_length="+matchBit_Length +" dynamic_present_bytes_length="+dynamic_present_bytes_length);
+					
+				}
+			    }
+	
+			    System.out.println(getClass().getSimpleName()+ "  dynamic_present_bytes_length = "+ dynamic_present_bytes_length);
+			    
+
+			    
+		 }
 
 
 		void parse_wifi_frame(byte[] all_frame) {
-			 Interface_ID_4bytes =  beginIndex_endIndex_byteArr(8,11);
-			 Timestamp_High_4bytes =  beginIndex_endIndex_byteArr(12,15);
-			 Timestamp_High_4bytes =  beginIndex_endIndex_byteArr(16,19);
-			 Captured_Packet_Length_4bytes  =  beginIndex_endIndex_byteArr(20,23);
-			 Original_Packet_Length_4bytes  =  beginIndex_endIndex_byteArr(24,27);
-			 Packet_Data_bytes  =  beginIndex_endIndex_byteArr(28,(frame_length - 4 -1));
-			 
-			    String Captured_Packet_Length_4bytes_hexstr = DigitalTransUtils.byte2hex(Captured_Packet_Length_4bytes,true);
-			    // 将16进制字符串转为10进制的int（注意字符串不要以f开头，如有要先处理为0）
-			    
-			    System.out.println("Captured_Packet_Length_4bytes_hexstr = "+ Captured_Packet_Length_4bytes_hexstr +" Captured_Packet_Length_4bytes ="+Arrays.toString(Captured_Packet_Length_4bytes) );
-			    Captured_Packet_Avaliable_Length = Integer.parseInt(clearZero_for_NumberStr(Captured_Packet_Length_4bytes_hexstr),16);
-			    
-			    Captured_Packet_Real_Length =  getRealLength_From_AvaliableLength(Captured_Packet_Avaliable_Length);
-			    
-			    
-			    
-			    String Original_Packet_Length_4bytes_hexstr = DigitalTransUtils.byte2hex(Original_Packet_Length_4bytes,true);
-			    System.out.println("Original_Packet_Length_4bytes_hexstr = "+ Original_Packet_Length_4bytes_hexstr+" Original_Packet_Length_4bytes ="+Arrays.toString(Original_Packet_Length_4bytes) );
-			    // 将16进制字符串转为10进制的int（注意字符串不要以f开头，如有要先处理为0）
-			    Original_Packet_Avaliable_Length = Integer.parseInt(clearZero_for_NumberStr(Original_Packet_Length_4bytes_hexstr),16);
-			    
-			    Original_Packet_Real_Length =  getRealLength_From_AvaliableLength(Captured_Packet_Avaliable_Length);
-			    
-			    
+
+				 
+
+
+			
+				 Block_Format_Parser(all_frame);
+				 
+				 Radiotap_Header_Parser();
+				 
+				 IE80211_Format_Parser();
+				 
+
 		 }
 		 
-		 
+		
+		// ════════════════  IE80211_Format   Begin ════════════════
+
+        byte wifi_type_subtype_1byte;  // wifi 帧的 type 管理帧 数据帧 控制帧   和  subtype  各种类型
+        int wifi_type_int;  // 主类型 
+        int wifi_subtype_int;   // 子类型 
+
+        
+        byte wifi_control_flag_1byte; //
+        
+        boolean wifi_is_receive_farme;  // 是否是接收帧 
+        boolean wifi_is_protected;  // 是否是加密的 wifi_control_flag_1byte的 0x40 为 是否为 1 决定
+        
+        byte[] wifi_during_2bytes; 
+        
+        // 只有三个是 表现在  字节中  剩下的那个 默认 为
+        byte[] wifi_ra_6bytes;  // 接收地址 
+        byte[] wifi_ta_6bytes;  // 传输地址 
+        byte[] wifi_da_6bytes;  // 目的 地址 
+        byte[] wifi_sa_6bytes;  // 原 地址 
+        
+        byte[] wifi_bssid_6bytes;  // 原 地址 
+        
+        byte[] wifi_high12bit_SequenceNumber_low4bit_FragmentNumber_2bytes;
+        byte[] wifi_qos_data_2bytes;
+        byte[] wifi_ccmp_paramters_8bytes;
+    
+        
+//   8 比特位 的 Flag   
+//      .... ..10 = DS status: Frame from DS to a STA via AP(To DS: 0 From DS: 1) (0x2)    对于STA  0:发送帧   1:接收帧
+//    	.... .0.. = More Fragments: This is the last fragment     该帧是否还有分包数据
+//    	.... 0... = Retry: Frame is not being retransmitted       重传
+//    	...0 .... = PWR MGT: STA will stay up                     省电管理
+//    	..0. .... = More Data: No data buffered                   有数据缓存吗
+//    	.0.. .... = Protected flag: Data is not protected         是否是加密数据
+//    	0... .... = +HTC/Order flag: Not strictly ordered
+		// ════════════════  IE80211_Format Format End ════════════════
+		
+// STA 接受帧(DS=2)     RA    TA   DA    SA    八个 地址 
+// .... ..10 = DS status: Frame from DS to a STA via AP(To DS: 0 From DS: 1) (0x2)        
+//        E0 B9 A5 1F E7 94 【六个字节 wlan.ra == E0:B9:A5:1F:E7:94 接收Mac地址】
+//        20 DC E6 4F 6C 90【六字节 传输Mac地址 wlan.ta == 20:DC:E6:4F:6C:90 】	
+//        20 DC E6 4F 6C 90【六字节 原Mac地址 wlan.sa ==20:DC:E6:4F:6C:90 】
+//     没有 目的 DA , 目的地址 就是 RA 接收地址 
+   
+// STA 发送帧(DS=1)
+//.... ..01 = DS status: Frame from STA to DS via an AP (To DS: 1 From DS: 0) (0x1)        
+//     20 DC E6 4F 6C 90【六个字节 wlan.ra == 20 DC:E6:4F:6C:90 接收Mac地址】
+//     E0 B9 A5 1F E7 94 【六字节  wlan.ta == E0:B9:A5:1F:E7:94 】 
+//     20 DC  E6 4F 6C 90 【六字节 目的Mac地址 wlan.da ==20:DC:E6:4F:6C:90 】   
+//        
+        
+		void IE80211_Format_Parser() {
+//    radiotrap 帧的  Header_length_Int 规定了 头的大小  那么 依据 此   就 可以得到  IE80211 格式的开头  
+			
+			
+			
+			int wifi_type_begin_position_length1 = Header_length_Int;
+			int wifi_type_end_position_length1 = Header_length_Int+ 1 -1 ;
+			byte[]  wifi_type_subtype_1bytes  =  beginIndex_endIndex_byteArr(Packet_Data_bytes,wifi_type_begin_position_length1,wifi_type_end_position_length1); 
+			if(wifi_type_subtype_1bytes != null && wifi_type_subtype_1bytes.length == 1) {
+				
+				wifi_type_subtype_1byte = wifi_type_subtype_1bytes[0];
+				
+				wifi_type_int  = (wifi_type_subtype_1byte & 0x0C) >> 2; // 1100=C
+				
+			    wifi_subtype_int  =  (wifi_type_subtype_1byte & 0xf0) >> 4;
+			}
+			
+			
+			int wifi_controlflag_begin_position_1bytes = wifi_type_end_position_length1+1;
+			int wifi_controlflag_end_position_1bytes = wifi_controlflag_begin_position_1bytes + 1 -1 ;
+			
+			
+			byte[]  wifi_control_flag_1bytes  =  beginIndex_endIndex_byteArr(Packet_Data_bytes,wifi_controlflag_begin_position_1bytes,wifi_controlflag_begin_position_1bytes); 
+			if(wifi_control_flag_1bytes != null && wifi_control_flag_1bytes.length == 1) {
+				
+				wifi_control_flag_1byte = wifi_control_flag_1bytes[0];
+			
+			
+				wifi_is_receive_farme = ((wifi_control_flag_1byte & 0x02) == 0x02);
+				
+				wifi_is_protected = ((wifi_control_flag_1byte & 0x40) == 0x40);
+				
+			}
+			
+			
+			int wifi_during_begin_position_2bytes  =  wifi_controlflag_end_position_1bytes + 1;
+			int wifi_during_end_position_2bytes  =  wifi_during_begin_position_2bytes + 2 -1 ;
+			
+			wifi_during_2bytes  =  beginIndex_endIndex_byteArr(Packet_Data_bytes,wifi_during_begin_position_2bytes,wifi_during_end_position_2bytes); 
+			
+			
+			
+			// 解析完 common的 部分 
+			parser_WifiFrame_with_type_subtype(wifi_during_end_position_2bytes);
+			
+			
+		
+		//  依据  type-subtype   可能 还有  其余的 有的有 Qos两个字节   有的没有Qos字节    依据 type-subtype  结构还不一样   有的只有两个地址 address 
+		}
+		
+		void type2_sub8_qosdata_parser(int wifi_during_end_position_2bytes) {
+			
+			
+
+			int wifi_ra_begin_position_6bytes  = 0 ;
+			int wifi_ra_end_position_6bytes  =  0 ;
+			int wifi_ta_begin_position_6bytes  =  0 ;
+			int wifi_ta_end_position_6bytes  = 0 ;
+			int wifi_da_begin_position_6bytes  = 0;
+			int wifi_da_end_position_6bytes  =  0 ;
+			int wifi_sa_begin_position_6bytes  = 0 ;
+			int wifi_sa_end_position_6bytes  = 0 ;
+			
+			if(wifi_is_receive_farme) {  // 接收帧
+				
+				 wifi_ra_begin_position_6bytes  =  wifi_during_end_position_2bytes + 1;
+				 wifi_ra_end_position_6bytes  =  wifi_ra_begin_position_6bytes + 6 -1;
+				wifi_ra_6bytes =  beginIndex_endIndex_byteArr(Packet_Data_bytes,wifi_ra_begin_position_6bytes,wifi_ra_end_position_6bytes); 
+				
+				 wifi_ta_begin_position_6bytes  =  wifi_ra_end_position_6bytes + 1;
+				 wifi_ta_end_position_6bytes  =  wifi_ta_begin_position_6bytes + 6 -1;
+				wifi_ta_6bytes =  beginIndex_endIndex_byteArr(Packet_Data_bytes,wifi_ta_begin_position_6bytes,wifi_ta_end_position_6bytes); 
+				
+				//  STA 接受帧  da 就是 ra    没有记录 DA   没有 DA
+				wifi_da_6bytes = wifi_ra_6bytes;
+				
+				
+				
+				
+				 wifi_sa_begin_position_6bytes  =  wifi_ta_end_position_6bytes + 1;
+				 wifi_sa_end_position_6bytes  =  wifi_sa_begin_position_6bytes + 6 -1;
+				wifi_sa_6bytes =  beginIndex_endIndex_byteArr(Packet_Data_bytes,wifi_sa_begin_position_6bytes,wifi_sa_end_position_6bytes); 
+
+				
+				wifi_bssid_6bytes = wifi_ta_6bytes;
+
+			} else {   // 发送帧
+				
+				 wifi_ra_begin_position_6bytes  =  wifi_during_end_position_2bytes + 1;
+				 wifi_ra_end_position_6bytes  =  wifi_ra_begin_position_6bytes + 6 -1;
+				wifi_ra_6bytes =  beginIndex_endIndex_byteArr(Packet_Data_bytes,wifi_ra_begin_position_6bytes,wifi_ra_end_position_6bytes); 
+
+				 wifi_ta_begin_position_6bytes  =  wifi_ra_end_position_6bytes + 1;
+				 wifi_ta_end_position_6bytes  =  wifi_ta_begin_position_6bytes + 6 -1;
+				 wifi_ta_6bytes =  beginIndex_endIndex_byteArr(Packet_Data_bytes,wifi_ta_begin_position_6bytes,wifi_ta_end_position_6bytes); 
+				
+				
+				 wifi_da_begin_position_6bytes  =  wifi_ta_end_position_6bytes + 1;
+				 wifi_da_end_position_6bytes  =  wifi_da_begin_position_6bytes + 6 -1;
+				 
+				 wifi_sa_begin_position_6bytes = wifi_da_begin_position_6bytes;
+				 wifi_sa_end_position_6bytes = wifi_da_end_position_6bytes;
+				 
+				 wifi_da_6bytes =  beginIndex_endIndex_byteArr(Packet_Data_bytes,wifi_da_begin_position_6bytes,wifi_da_end_position_6bytes); 
+
+				//  STA 发送帧   sa 就是 ta  ,  没有 加载
+				wifi_sa_6bytes = wifi_ta_6bytes;
+			
+				
+				wifi_bssid_6bytes = wifi_ra_6bytes;
+				
+			}
+
+		
+
+					
+		int wifi_sequence_frame_number_begin_position_2bytes  =  wifi_sa_end_position_6bytes + 1;
+		int wifi_sequence_frame_number_end_position_2bytes  =  wifi_sequence_frame_number_begin_position_2bytes + 2 -1 ;
+					
+			
+		wifi_high12bit_SequenceNumber_low4bit_FragmentNumber_2bytes =  beginIndex_endIndex_byteArr(Packet_Data_bytes,wifi_sequence_frame_number_begin_position_2bytes,wifi_sequence_frame_number_end_position_2bytes); 
+
+		
+		int wifi_qos_data_begin_position_2bytes   =  wifi_sequence_frame_number_end_position_2bytes + 1;
+		int wifi_qos_data_end_position_2bytes  =  wifi_qos_data_begin_position_2bytes + 2 -1 ;
+		
+		wifi_qos_data_2bytes =  beginIndex_endIndex_byteArr(Packet_Data_bytes,wifi_qos_data_begin_position_2bytes,wifi_qos_data_end_position_2bytes); 
+
+		if(wifi_is_protected) {
+			
+			int wifi_ccmp_paramters_begin_position_8bytes   =  wifi_qos_data_end_position_2bytes + 1;
+			int wifi_ccmp_paramters_end_position_8bytes  =  wifi_ccmp_paramters_begin_position_8bytes + 2 -1 ;
+			
+			wifi_ccmp_paramters_8bytes =  beginIndex_endIndex_byteArr(Packet_Data_bytes,wifi_ccmp_paramters_begin_position_8bytes,wifi_ccmp_paramters_end_position_8bytes); 
+
+			
+		}
+		
+	  
+		}
+
+		
+		void parser_WifiFrame_with_type_subtype(int wifi_during_end_position_2bytes ) {
+			
+			if(wifi_type_int == 0 ) {   //   管理帧
+				
+				switch(wifi_subtype_int) {
+				
+				case 0:   
+// Association Request 关联请求帧	管理帧 wlan.fc.type == 0	wlan.fc.subtype == 0x00
+				
+			      break;
+				
+			      
+				case 1:   
+// Association Response 关联响应帧	管理帧 wlan.fc.type == 0	wlan.fc.subtype == 0x01
+				
+			      break;
+			      
+			      
+				case 2:   
+// 		
+			      break;
+			      
+				case 3:   
+//			 		
+					 break;
+						      
+				case 4:   
+//			 		
+					 break;
+			      
+				case 5:   
+//			 		
+					 break;
+					 
+				case 8:   
+//			 		
+					 break;
+					 
+				case 10:   
+//			 		
+					 break;
+					 
+				case 11:   
+//			 		
+					 break;				 
+					 
+				case 12:   
+//			 		
+					 break;					 
+
+				case 13:   
+//			 		
+					 break;		
+				default: 
+	                  System.out.println("没有找到合适的 对应的解析类型 wifi_type_int="+wifi_type_int+"  wifi_subtype_int="+wifi_subtype_int);
+				
+				
+				}
+				
+			} else if(wifi_type_int == 1) {  // 控制帧 
+				
+			
+				switch(wifi_subtype_int) {
+				
+				case 0:   
+				
+			      break;
+				
+			      
+				case 1:   
+				
+			      break;
+			      
+			      
+				case 2:   
+// 		
+			      break;
+			      
+				case 3:   
+//			 		
+					 break;
+						      
+				case 4:   
+//			 		
+					 break;
+			      
+				case 5:   
+//			 		
+					 break;
+					 
+				case 8:   
+//			 		
+					 break;
+					 
+				case 10:   
+//			 		
+					 break;
+					 
+				case 11:   
+//			 		
+					 break;				 
+					 
+				case 12:   
+//			 		
+					 break;					 
+
+				case 13:   
+//			 		
+					 break;		
+				default: 
+	                  System.out.println("没有找到合适的 对应的解析类型 wifi_type_int="+wifi_type_int+"  wifi_subtype_int="+wifi_subtype_int);
+				
+				
+				}
+				
+				
+				
+				
+			} else if(wifi_type_int == 2)  {   // 数据帧
+			
+				
+				switch(wifi_subtype_int) {
+				
+				case 0:   
+				
+			      break;
+				
+			      
+				case 1:   
+				
+			      break;
+			      
+			      
+				case 2:   
+// 		
+			      break;
+			      
+				case 3:   
+//			 		
+					 break;
+						      
+				case 4:   
+//			 		
+					 break;
+			      
+				case 5:   
+//			 		
+					 break;
+					 
+				case 8:     // type2_sub8_qosdata_parser();
+//			 		
+					type2_sub8_qosdata_parser(wifi_during_end_position_2bytes);
+					
+					
+					 break;
+					 
+				case 10:   
+//			 		
+					 break;
+					 
+				case 11:   
+//			 		
+					 break;				 
+					 
+				case 12:   
+//			 		
+					 break;					 
+
+				case 13:   
+//			 		
+					 break;		
+				default: 
+	                  System.out.println("没有找到合适的 对应的解析类型 wifi_type_int="+wifi_type_int+"  wifi_subtype_int="+wifi_subtype_int);
+				
+				
+				}
+				
+		
+				
+			}
+			
+
+			
+		}
+
+
+
+
+
+		@Override
+		public String toString() {
+			return "Wifi_Frame_Struct_00000006 "+ ", wifi_qos_data_2bytes=" + Arrays.toString(wifi_qos_data_2bytes)+" [Interface_ID_4bytes=" + Arrays.toString(Interface_ID_4bytes)
+					+ ", Timestamp_High_4bytes=" + Arrays.toString(Timestamp_High_4bytes) + ", Timestamp_Low_4bytes="
+					+ Arrays.toString(Timestamp_Low_4bytes) + ", Captured_Packet_Length_4bytes="
+					+ Arrays.toString(Captured_Packet_Length_4bytes) + ", Original_Packet_Length_4bytes="
+					+ Arrays.toString(Original_Packet_Length_4bytes) + ", Captured_Packet_Avaliable_Length="
+					+ Captured_Packet_Avaliable_Length + ", Original_Packet_Avaliable_Length="
+					+ Original_Packet_Avaliable_Length + ", Captured_Packet_Real_Length=" + Captured_Packet_Real_Length
+					+ ", Original_Packet_Real_Length=" + Original_Packet_Real_Length + ", Packet_Data_bytes="
+					+ Arrays.toString(Packet_Data_bytes) + ", timestamp_str=" + timestamp_str
+					+ ", MultiPresent_IntList_List=" + MultiPresent_IntList_List + ", All_RadiotapPresent_IntList="
+					+ All_RadiotapPresent_IntList + ", All_RadiotapPresent_Bit_Desc_Map="
+					+ All_RadiotapPresent_Bit_Desc_Map + ", Option_RadiotapPresent_Bit_ByteArr_Map="
+					+ Option_RadiotapPresent_Bit_ByteArr_Map + ", Option_RadiotapPresent_Bit_ByteLength_Map="
+					+ Option_RadiotapPresent_Bit_ByteLength_Map + ", radiotap_present_tsft_1bit="
+					+ radiotap_present_tsft_1bit + ", radiotap_present_flags_2bit=" + radiotap_present_flags_2bit
+					+ ", radiotap_present_rate_3bit=" + radiotap_present_rate_3bit + ", radiotap_present_channel_4bit="
+					+ radiotap_present_channel_4bit + ", radiotap_present_fhss_5bit=" + radiotap_present_fhss_5bit
+					+ ", radiotap_present_dbm_antsignal_6bit=" + radiotap_present_dbm_antsignal_6bit
+					+ ", radiotap_present_db_antnoise_7bit=" + radiotap_present_db_antnoise_7bit
+					+ ", radiotap_present_lock_quality_8bit=" + radiotap_present_lock_quality_8bit
+					+ ", radiotap_present_tx_attenuation_9bit=" + radiotap_present_tx_attenuation_9bit
+					+ ", radiotap_present_db_tx_attenuation_10bit=" + radiotap_present_db_tx_attenuation_10bit
+					+ ", radiotap_present_dbm_tx_power_11bit=" + radiotap_present_dbm_tx_power_11bit
+					+ ", radiotap_present_antenna_12bit=" + radiotap_present_antenna_12bit
+					+ ", radiotap_present_db_antsignal_13bit=" + radiotap_present_db_antsignal_13bit
+					+ ", radiotap_present_db_antnoise_14bit=" + radiotap_present_db_antnoise_14bit
+					+ ", radiotap_present_rxflags_15bit=" + radiotap_present_rxflags_15bit
+					+ ", radiotap_present_txflags_16bit=" + radiotap_present_txflags_16bit
+					+ ", radiotap_present_xchannel_19bit=" + radiotap_present_xchannel_19bit
+					+ ", radiotap_present_mcs_20bit=" + radiotap_present_mcs_20bit + ", radiotap_present_ampdu_21bit="
+					+ radiotap_present_ampdu_21bit + ", radiotap_present_vht_22bit=" + radiotap_present_vht_22bit
+					+ ", radiotap_present_timestamp_23bit=" + radiotap_present_timestamp_23bit
+					+ ", radiotap_present_he_24bit=" + radiotap_present_he_24bit + ", radiotap_present_he_mu_25bit="
+					+ radiotap_present_he_mu_25bit + ", radiotap_present_0_length_psdu_27bit="
+					+ radiotap_present_0_length_psdu_27bit + ", radiotap_present_l_sig_28bit="
+					+ radiotap_present_l_sig_28bit + ", radiotap_present_tlv_29bit=" + radiotap_present_tlv_29bit
+					+ ", radiotap_present_rtap_ns_30bit=" + radiotap_present_rtap_ns_30bit
+					+ ", radiotap_present_vendor_ns_31bit=" + radiotap_present_vendor_ns_31bit
+					+ ", radiotap_present_ext_32bit=" + radiotap_present_ext_32bit + ", Header_revision_1byte="
+					+ Header_revision_1byte + ", Header_pad_1byte=" + Header_pad_1byte + ", Header_length_2bytes="
+					+ Arrays.toString(Header_length_2bytes) + ", Header_length_Int=" + Header_length_Int
+					+ ", Present_flags_First_32bits_4bytes=" + Arrays.toString(Present_flags_First_32bits_4bytes)
+					+ ", Present_BitMsk_First=" + Present_BitMsk_First + ", All_Present_BitMsk=" + All_Present_BitMsk
+					+ ", Radiotap_Header_bytes=" + Arrays.toString(Radiotap_Header_bytes)
+					+ ", option_1bit_radiotap_mactime_8bytes=" + Arrays.toString(option_1bit_radiotap_mactime_8bytes)
+					+ ", wifi_type_subtype_1byte=" + wifi_type_subtype_1byte + ", wifi_type_int=" + wifi_type_int
+					+ ", wifi_subtype_int=" + wifi_subtype_int + ", wifi_control_flag_1byte=" + wifi_control_flag_1byte
+					+ ", wifi_is_receive_farme=" + wifi_is_receive_farme + ", wifi_is_protected=" + wifi_is_protected
+					+ ", wifi_during_2bytes=" + Arrays.toString(wifi_during_2bytes) + ", wifi_ra_6bytes="
+					+ Arrays.toString(wifi_ra_6bytes) + ", wifi_ta_6bytes=" + Arrays.toString(wifi_ta_6bytes)
+					+ ", wifi_da_6bytes=" + Arrays.toString(wifi_da_6bytes) + ", wifi_sa_6bytes="
+					+ Arrays.toString(wifi_sa_6bytes) + ", wifi_bssid_6bytes=" + Arrays.toString(wifi_bssid_6bytes)
+					+ ", wifi_high12bit_SequenceNumber_low4bit_FragmentNumber_2bytes="
+					+ Arrays.toString(wifi_high12bit_SequenceNumber_low4bit_FragmentNumber_2bytes)
+					+ ", wifi_qos_data_2bytes=" + Arrays.toString(wifi_qos_data_2bytes)
+					+ ", wifi_ccmp_paramters_8bytes=" + Arrays.toString(wifi_ccmp_paramters_8bytes) + "]";
+		}
+
 
 		Wifi_Frame_Struct_00000006(byte[] block_type_bytes, byte[] block_head_length_bytes, byte[] all_frame_bytes,
 				int beginInFile, int endInFile) {
@@ -1025,7 +1880,7 @@ public void Pcapng_File_Parser(File pcapFile) throws Exception {
 		}
 
 		Wifi_Frame_Struct_00000006(){
-			
+			init_prop();
 		}
 		
 
@@ -1107,7 +1962,7 @@ public void Pcapng_File_Parser(File pcapFile) throws Exception {
 		 
 		 
 		     // 两头 都包含
-			byte[] beginIndex_endIndex_byteArr(int beginIndex , int endIndex) {
+			byte[] beginIndex_endIndex_byteArr(byte[] all_frame_byte , int beginIndex , int endIndex) {
 				int cur_byte_length = endIndex - beginIndex +1 ; 
 				if(cur_byte_length <= 0) {
 					System.out.println("当前查询 子byte数组 	beginIndex="+beginIndex+"  endIndex="+endIndex+"  cur_byte_length="+cur_byte_length +"异常  请检查!");
@@ -1116,13 +1971,13 @@ public void Pcapng_File_Parser(File pcapFile) throws Exception {
 				
 				byte[] matchByte = new byte[cur_byte_length];
 				
-				if(frame_bytes == null || frame_bytes.length < cur_byte_length) {
+				if(all_frame_byte == null || all_frame_byte.length < cur_byte_length) {
 					
 					System.out.println("当前查询 子byte数组 	beginIndex="+beginIndex+"  endIndex="+endIndex+"  cur_byte_length="+cur_byte_length +"frame_bytes 为 空  请检查!");
 				    return null;
 				}
 				
-				if(endIndex >=  frame_bytes.length || beginIndex < 0) {
+				if(endIndex >=  all_frame_byte.length || beginIndex < 0) {
 					
 					System.out.println("当前查询A 子byte数组 	beginIndex="+beginIndex+"  endIndex="+endIndex+"  cur_byte_length="+cur_byte_length +"异常  请检查!");
 				    return null;
@@ -1130,7 +1985,7 @@ public void Pcapng_File_Parser(File pcapFile) throws Exception {
 				
 				for (int i = beginIndex; i <= endIndex; i++) {
 					int matchIndex = i - beginIndex;
-					matchByte[matchIndex] = frame_bytes[i];
+					matchByte[matchIndex] = all_frame_byte[i];
 				}
 				
 				return matchByte;
@@ -1232,7 +2087,7 @@ public void Pcapng_File_Parser(File pcapFile) throws Exception {
 		
 		abstract int getRealLength_From_AvaliableLength(int avaliableLength);
 		
-		abstract byte[] beginIndex_endIndex_byteArr(int beginIndex , int endIndex);
+		abstract byte[] beginIndex_endIndex_byteArr(byte[] all_frame_byte , int beginIndex , int endIndex);
 		
 		abstract Wifi_Frame_AbsCommon_Struct getMatch_Wifi_Frame(String block_type_str);
 		
@@ -16417,6 +17272,26 @@ sb.append(str);
 	}
 
 	
+    
+    /**
+     * 利用 {@link java.nio.ByteBuffer}实现byte[]转long
+     * @param input
+     * @param offset 
+     * @param littleEndian 输入数组是否小端模式
+     * @return
+     */
+    public static long bytesToLong(byte[] input, int offset, boolean littleEndian) { 
+        if(offset <0 || offset+8>input.length)
+            throw new IllegalArgumentException(String.format("less than 8 bytes from index %d  is insufficient for long",offset));
+        ByteBuffer buffer = ByteBuffer.wrap(input,offset,8);
+        if(littleEndian){
+            // ByteBuffer.order(ByteOrder) 方法指定字节序,即大小端模式(BIG_ENDIAN/LITTLE_ENDIAN)
+            // ByteBuffer 默认为大端(BIG_ENDIAN)模式 
+            buffer.order(ByteOrder.LITTLE_ENDIAN);
+        }
+        return buffer.getLong();  
+    } 
+    
 
 	// 使用两个 for 语句
 	//java 合并两个byte数组 
