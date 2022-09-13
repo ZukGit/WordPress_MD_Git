@@ -13,8 +13,10 @@ import cn.hutool.http.HttpUtil;
 import cn.hutool.json.JSONUtil;
 import cn.hutool.system.JavaRuntimeInfo;
 
+
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.google.common.base.Ascii;
 import com.google.common.primitives.Bytes;
 import com.google.zxing.BinaryBitmap;
 import com.google.zxing.EncodeHintType;
@@ -33,6 +35,7 @@ import javax.swing.*;
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.CharBuffer;
 
 import org.apache.commons.io.FileUtils;
 import org.json.JSONArray;
@@ -58,6 +61,7 @@ import java.io.*;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.*;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributeView;
@@ -660,11 +664,19 @@ public class I9_TextRuleOperation {
 	     
 	     ArrayList<Wifi_Frame_AbsCommon_Struct> wifiFrameStructList;   // 帧解析的集合
 	     
+	     ArrayList<Wifi_Frame_AbsCommon_Struct> wifiEapolFrameStructList; //  EAPOL 帧的集合
+	     
+	     // beacon 唯一标识   ssid-chanelhz-bssid   唯一标识
+	     ArrayList<Wifi_Frame_AbsCommon_Struct> wifiBeaconFrameStructList; //  EAPOL 帧的集合
+	     ArrayList<String> wifiBeaconIdetifyList;  // beacon 唯一标识   ssid-chanelhz-bssid
 
 
 PcaPng_Wifi_Frame_Analysis_Rule_53() {
 	super(53, false);
 	wifiFrameStructList = new ArrayList<Wifi_Frame_AbsCommon_Struct>();
+	wifiEapolFrameStructList = new ArrayList<Wifi_Frame_AbsCommon_Struct>();
+	wifiBeaconFrameStructList = new ArrayList<Wifi_Frame_AbsCommon_Struct>();
+	wifiBeaconIdetifyList = new ArrayList<String>();
 }
  
 
@@ -758,7 +770,7 @@ String simpleDesc() {
 		    
 		    // 【block_type_bytes_hexstr = 0A0D0D0A】   block_head_length_bytes_hexstr=【6C000000】 ByteOrder.BIG_ENDIAN 大端对齐了  实际 要小端对齐
 		   // 【block_type_bytes_hexstr = 0A0D0D0A】   block_head_length_bytes_hexstr=【0000006C】 block_head_length【108】
-		    System.out.println("【block_type_bytes_hexstr = "+block_type_bytes_hexstr+"】   block_head_length_bytes_hexstr=【"+block_head_length_bytes_hexstr+"】 block_head_length【"+block_head_length+"】");
+//		    System.out.println("【block_type_bytes_hexstr = "+block_type_bytes_hexstr+"】   block_head_length_bytes_hexstr=【"+block_head_length_bytes_hexstr+"】 block_head_length【"+block_head_length+"】");
 
 
 		    // 去除了  headLength=4 和 BlockTYpe=4 总 8个 字节的 剩余的字节数组
@@ -783,9 +795,9 @@ String simpleDesc() {
 			   System.out.println("all_rest_frame_byte_hexstr  读取为空 ! block_type_bytes_hexstr="+block_type_bytes_hexstr);
 			   return null;
 		   }else {
-			   System.out.println("all_rest_frame_byte_hexstr.length = "+ all_frame_byte_withoutBlockType_withoutHeadTotalLength.length +"   readByteCount="+readRestByteCount);
+//			   System.out.println("all_rest_frame_byte_hexstr.length = "+ all_frame_byte_withoutBlockType_withoutHeadTotalLength.length +"   readByteCount="+readRestByteCount);
 			   
-			   System.out.println("all_rest_frame_byte_hexstr=\n"+all_rest_frame_byte_hexstr);
+//			   System.out.println("all_rest_frame_byte_hexstr=\n"+all_rest_frame_byte_hexstr);
 
 			   
 			   
@@ -793,7 +805,7 @@ String simpleDesc() {
 		 
 			    all_frame_hexstr = DigitalTransUtils.byte2hex(all_frame_bytes,false);
 			   
-			   System.out.println("all_frame_hexstr=\n"+all_frame_hexstr);
+//			   System.out.println("all_frame_hexstr=\n"+all_frame_hexstr);
 			   
 			   
 		   }
@@ -839,7 +851,7 @@ String simpleDesc() {
 		   matchFrame.frame_begin_index = begin_byte_index;
 		   matchFrame.frame_end_index = end_byte_index;
 		   
-		   matchFrame.package_number = wifiFrameStructList.size();
+		   matchFrame.package_number = wifiFrameStructList.size() -1 ; //  为了与 wireshark 对齐 这里 -1 
 		   
 		   
 
@@ -848,7 +860,7 @@ String simpleDesc() {
 	    
 public void Pcapng_File_Parser(File pcapFile) throws Exception {
    long fileSize = pcapFile.length();
-    System.out.println("文件长度:"+fileSize);
+//    System.out.println("文件长度:"+fileSize);
     pcapng_bis = new BufferedInputStream(new FileInputStream(pcapFile));
     Wifi_Frame_Base_Struct  frame_base_struct = new Wifi_Frame_Base_Struct();
 
@@ -874,14 +886,70 @@ public void Pcapng_File_Parser(File pcapFile) throws Exception {
 		
     	Wifi_Frame_AbsCommon_Struct wif_frame_struct = wifiFrameStructList.get(i);
     	System.out.println();
-    	System.out.println("═════════════["+i+"]"+"["+wif_frame_struct.block_type_str+"]"+"═══════════");
+    	System.out.println("═════════════["+i+"]"+"["+wifiFrameStructList.size()+"]"+"____["+wif_frame_struct.block_type_str+"]"+"═══════════");
     	wif_frame_struct.parse_wifi_frame(wif_frame_struct.frame_bytes);
     	System.out.println();
-    	System.out.println(wif_frame_struct);
+//    	System.out.println(wif_frame_struct);
+    	
+    	if(wif_frame_struct.getEAPOL_Handshake_Message_Number() > 0 ) {
+    		wifiEapolFrameStructList.add(wif_frame_struct);
+    	}
+//    	
+    	if(wif_frame_struct.is_beacon_frame()) {
+    		String ssid_identify = wif_frame_struct.getBeacon_Identify();
+    		if(!wifiBeaconIdetifyList.contains(ssid_identify)) {
+    			
+    			wifiBeaconIdetifyList.add(ssid_identify);
+    	    	wifiBeaconFrameStructList.add(wif_frame_struct);
+    		}
+    		
+    	}
+    
+
     	System.out.println();
 	}
     
+    
+    for (int j = 0; j < wifiBeaconFrameStructList.size(); j++) {
+    	Wifi_Frame_AbsCommon_Struct wif_beacon_frame_struct = wifiBeaconFrameStructList.get(j);
+    	System.out.println("══════No."+wif_beacon_frame_struct.package_number+"═══════Beacon["+(j+1)+"]"+"["+wifiBeaconFrameStructList.size()+"]"+" "+wif_beacon_frame_struct.getBeacon_Identify()+"  "+wif_beacon_frame_struct.getFrame_TimeStamp_Desc()+"══════════");
+
+     }
+    
+    
+    for (int i = 0; i < wifiEapolFrameStructList.size(); i++) {
+    	Wifi_Frame_AbsCommon_Struct wif_eapol_frame_struct = wifiEapolFrameStructList.get(i);
+    	System.out.println("══════No."+wif_eapol_frame_struct.package_number+"═══════EAPOL["+(i+1)+"]"+"["+wifiEapolFrameStructList.size()+"]"+" "+wif_eapol_frame_struct.getEAPOL_Handshake_Message_Number()+" message "+wif_eapol_frame_struct.getFrame_TimeStamp_Desc()+"══════════");
+	    System.out.println("WPA Key Nonce:" + Arrays.toString(wif_eapol_frame_struct.getEAPOL_WPA_Key_Nonce_Bytes()));
+	    System.out.println("WPA Key MIC:" + Arrays.toString(wif_eapol_frame_struct.getEAPOL_WPA_MIC_Bytes()));
+	    if(wif_eapol_frame_struct.getEAPOL_Handshake_Message_Number() == 2) {  // 获取 step2_data
+	    	
+	    	if(wif_eapol_frame_struct.getEAPOL_8021X_Authentication_Bytes() == null) {
+			    System.out.println("Step_2 EAPOL 802.1X Authentication Data Length: 0 ,  没有获取到所有的 802.1X Auth数据 " );
+ 
+			    continue;
+	    	}
+		    System.out.println("Step_2 EAPOL 802.1X Authentication Data Length:" + wif_eapol_frame_struct.getEAPOL_8021X_Authentication_Bytes().length);
+		    System.out.println("Step_2 EAPOL 802.1X Authentication Data :" + Arrays.toString(wif_eapol_frame_struct.getEAPOL_8021X_Authentication_Bytes()));			   
+
+		    System.out.println("Step_2 EAPOL Receiver_Address( AP_MAC )" + Arrays.toString(wif_eapol_frame_struct.getFrame_Receiver_Address()));			    
+			System.out.println("Step_2 EAPOL Transmitter_Address( STA_MAC )" + Arrays.toString(wif_eapol_frame_struct.getFrame_Transmitter_Address()));		    
+
+		    
+	    	
+		    
+	    }
+	    
+	    if(wif_eapol_frame_struct.getEAPOL_Handshake_Message_Number() == 1) {
+	    	
+		    System.out.println("Step_1 WPA Key Nonce( AP_Nonce ):" + Arrays.toString(wif_eapol_frame_struct.getEAPOL_WPA_Key_Nonce_Bytes()));
+
+	    }
+	    
+    }
+    
     System.out.println("总共解析的帧数量如下: wifiFrameStructList.size() = "+ wifiFrameStructList.size() +"  mFile_CurSor_Position="+ mFile_CurSor_Position);
+    System.out.println("EAPOL帧数量如下: wifiEapolFrameStructList.size() = "+ wifiEapolFrameStructList.size() );
 
     
     
@@ -892,6 +960,8 @@ public void Pcapng_File_Parser(File pcapFile) throws Exception {
 
 
 	}
+	
+
 	
 	
 	class Wifi_Frame_Struct_00000001 extends Wifi_Frame_Base_Struct{
@@ -972,21 +1042,133 @@ public void Pcapng_File_Parser(File pcapFile) throws Exception {
 		int  Original_Packet_Avaliable_Length;  // 有效字节占用
 		int  Captured_Packet_Real_Length;  // 有效字节占用 32位对齐 后的实际占用
 		int  Original_Packet_Real_Length; 	
-		byte[] Packet_Data_bytes ;  // 内部协议的解析 包数据 
-		
+		byte[] Packet_Data_bytes ;  // 内部协议的解析 包数据   看得见的数据包的部分
+//		int Packet_Data_Visibal_Length ;   // wireshark 打开 可见帧数据长度 等于 Packet_Data_bytes 的长度
 		String timestamp_str ;   //  时间戳代表的内容 
 		// ════════════════  Block Format End ════════════════
 		
 	
 		
-		// ════════════════  IEEE802.11  Format Begin ════════════════
+		
+		// ════════════════  IE80211_Format   Begin ════════════════
+
+        byte wifi_type_subtype_1byte;  // wifi 帧的 type 管理帧 数据帧 控制帧   和  subtype  各种类型
+        int wifi_type_int;  // 主类型 
+        int wifi_subtype_int;   // 子类型 
+
+        
+        byte wifi_control_flag_1byte; //
+        
+        boolean wifi_is_receive_farme;  // 是否是接收帧 
+        boolean wifi_is_protected;  // 是否是加密的 wifi_control_flag_1byte的 0x40 为 是否为 1 决定
+        
+        byte[] wifi_during_2bytes; 
+        
+        // 只有三个是 表现在  字节中  剩下的那个 默认 为
+        byte[] wifi_ra_6bytes;  // 接收地址 
+        byte[] wifi_ta_6bytes;  // 传输地址 
+        byte[] wifi_da_6bytes;  // 目的 地址 
+        byte[] wifi_sa_6bytes;  // 原 地址 
+        
+        byte[] wifi_bssid_6bytes;  // 原 地址 
+        
+        byte[] wifi_high12bit_SequenceNumber_low4bit_FragmentNumber_2bytes;
+        byte[] wifi_qos_control_2bytes;
+        byte[] wifi_ccmp_paramters_8bytes;
+    
+        byte[] wifi_logical_link_conteolflag_8bytes;
+        byte[]   wifi_logical_link_type_2bytes;
+        String wifi_logical_link_type_2bytes_hexstr;
+        
+        byte[] wifi_qos_data_bytes; // Qos-Data 携带的数据类型 
+        
+        // eapol-接受的帧有   发送的帧 没有 frame_check_sequeue   【路由器发送的帧 都有 frame_check_sequeue ？ 】
+        byte[] wifi_qosdata_frame_check_sequeue_4bytes; //  Qos-data 数据的最后四个 校验码  注意  EAP-类型 没有该字段
+        
+        
+        
+//   8 比特位 的 Flag   
+//      .... ..10 = DS status: Frame from DS to a STA via AP(To DS: 0 From DS: 1) (0x2)    对于STA  0:发送帧   1:接收帧
+//    	.... .0.. = More Fragments: This is the last fragment     该帧是否还有分包数据
+//    	.... 0... = Retry: Frame is not being retransmitted       重传
+//    	...0 .... = PWR MGT: STA will stay up                     省电管理
+//    	..0. .... = More Data: No data buffered                   有数据缓存吗
+//    	.0.. .... = Protected flag: Data is not protected         是否是加密数据
+//    	0... .... = +HTC/Order flag: Not strictly ordered
+		// ════════════════  IE80211_Format Format End ════════════════
+		
+        
+        byte[] wifi_8021x_auth_version_1byte;  // Version: 802.1X-2001 (1)
+        int wifi_8021x_auth_version_int;
+        byte[] wifi_8021x_auth_type_1byte;  // eapol==3   eap=0 
+        int wifi_8021x_auth_type_int;
+        byte[] wifi_8021x_auth_length_2byte; 
+        int wifi_8021x_auth_length_int;
+        byte[] wifi_eapol_auth_data_bytes;   // eapol 的 认证的数据 集合
+
+        byte[] wifi_eapol_all_data_bytes;   // eapol 的 认证的数据 集合
+        
+		byte[] eap_key_desc_1bytes; 
+		byte[] eap_key_info_2bytes; 
+		byte[] eap_key_length_2bytes;   //  区别于  eap_key_data_length_2bytes
+		
+		byte[] eap_replay_counter_8bytes;
+		
+		byte[] eap_wpa_key_nonce_32bytes;
+		
+		byte[] eap_key_iv_16bytes; 
 		
 		
+		byte[] eap_key_rsc_8bytes; 
+		byte[] eap_key_id_8bytes; 
 		
-		// ════════════════  IEEE802.11 Format End ════════════════
+		byte[] eap_key_mic_16bytes; 
 		
-		public String toString1() {
-			return "Wifi_Frame_Struct_00000006 【timestamp_str="+timestamp_str+"   Interface_ID_4bytes=" + Arrays.toString(Interface_ID_4bytes)
+		byte[] eap_key_data_length_2bytes; 
+		int eap_key_data_length_int;
+		
+		byte[] eap_key_data_bytes; 
+		
+		
+        
+        
+//        eap_key_desc_1bytes
+        
+
+		
+		
+		//══════════ beacon_frame_begin ═══════════════
+		
+		byte[] wifi_80211_wireless_management_beacon_bytes;    // 802.11 byte 管理帧数据
+		byte[] wifi_80211_wireless_management_beacon_ssid_bytes;   //  ssid 的 热点名称的 字节数组
+		String ssid_hexstr;  //    热点名称对应的字符串的十六进制形式
+		String ssid_name;   // 人类可读的热点 
+		
+		byte[] wifi_80211_wireless_management_beacon_channel_bytes; // 当前热点频道的 字节数组
+		int wifi_80211_wireless_management_beacon_channel_id; //  频道id
+		int wifi_80211_wireless_management_beacon_channel_hz;  // id 对应的 赫兹频道
+		
+		//══════════ beacon_frame_end ═══════════════
+		
+
+		//════════════════ Radiotap Format Begin ════════════════
+		ArrayList<ArrayList<Integer>>  MultiPresent_IntList_List;
+
+
+
+		@Override
+		public String toString() {
+			return "Wifi_Frame_Struct_00000006 EAP_HankShark_Numer= "+getEAPOL_Handshake_Message_Number()+" eap_key_data_length_int="+eap_key_data_length_int+" "
+		         + ", eap_key_length_2bytes="   + Arrays.toString(eap_key_length_2bytes) 
+					+ Arrays.toString(eap_key_length_2bytes) + ", eap_replay_counter_8bytes="
+					+ Arrays.toString(eap_replay_counter_8bytes) + ", eap_wpa_key_nonce_32bytes="
+					+ Arrays.toString(eap_wpa_key_nonce_32bytes) + ", eap_key_iv_16bytes="
+					+ Arrays.toString(eap_key_iv_16bytes) + ", eap_key_rsc_8bytes="
+					+ Arrays.toString(eap_key_rsc_8bytes) + ", eap_key_id_8bytes="
+					+ Arrays.toString(eap_key_id_8bytes) + ", eap_key_mic_16bytes="
+					+ Arrays.toString(eap_key_mic_16bytes) + ", eap_key_data_length_2bytes="
+					+ Arrays.toString(eap_key_data_length_2bytes) + ", eap_key_data_length_int="
+					+ eap_key_data_length_int + ", eap_key_data_bytes=" + Arrays.toString(eap_key_data_bytes) +"[Interface_ID_4bytes=" + Arrays.toString(Interface_ID_4bytes)
 					+ ", Timestamp_High_4bytes=" + Arrays.toString(Timestamp_High_4bytes) + ", Timestamp_Low_4bytes="
 					+ Arrays.toString(Timestamp_Low_4bytes) + ", Captured_Packet_Length_4bytes="
 					+ Arrays.toString(Captured_Packet_Length_4bytes) + ", Original_Packet_Length_4bytes="
@@ -994,16 +1176,70 @@ public void Pcapng_File_Parser(File pcapFile) throws Exception {
 					+ Captured_Packet_Avaliable_Length + ", Original_Packet_Avaliable_Length="
 					+ Original_Packet_Avaliable_Length + ", Captured_Packet_Real_Length=" + Captured_Packet_Real_Length
 					+ ", Original_Packet_Real_Length=" + Original_Packet_Real_Length + ", Packet_Data_bytes="
-					+ Arrays.toString(Packet_Data_bytes) + "】 "+super.toString();
+					+ Arrays.toString(Packet_Data_bytes) + ", timestamp_str=" + timestamp_str
+					+ ", wifi_type_subtype_1byte=" + wifi_type_subtype_1byte + ", wifi_type_int=" + wifi_type_int
+					+ ", wifi_subtype_int=" + wifi_subtype_int + ", wifi_control_flag_1byte=" + wifi_control_flag_1byte
+					+ ", wifi_is_receive_farme=" + wifi_is_receive_farme + ", wifi_is_protected=" + wifi_is_protected
+					+ ", wifi_during_2bytes=" + Arrays.toString(wifi_during_2bytes) + ", wifi_ra_6bytes="
+					+ Arrays.toString(wifi_ra_6bytes) + ", wifi_ta_6bytes=" + Arrays.toString(wifi_ta_6bytes)
+					+ ", wifi_da_6bytes=" + Arrays.toString(wifi_da_6bytes) + ", wifi_sa_6bytes="
+					+ Arrays.toString(wifi_sa_6bytes) + ", wifi_bssid_6bytes=" + Arrays.toString(wifi_bssid_6bytes)
+					+ ", wifi_high12bit_SequenceNumber_low4bit_FragmentNumber_2bytes="
+					+ Arrays.toString(wifi_high12bit_SequenceNumber_low4bit_FragmentNumber_2bytes)
+					+ ", wifi_qos_control_2bytes=" + Arrays.toString(wifi_qos_control_2bytes)
+					+ ", wifi_ccmp_paramters_8bytes=" + Arrays.toString(wifi_ccmp_paramters_8bytes)
+					+ ", wifi_logical_link_conteolflag_8bytes=" + Arrays.toString(wifi_logical_link_conteolflag_8bytes)
+					+ ", wifi_logical_link_type_2bytes=" + Arrays.toString(wifi_logical_link_type_2bytes)
+					+ ", wifi_logical_link_type_2bytes_hexstr=" + wifi_logical_link_type_2bytes_hexstr
+					+ ", wifi_qos_data_bytes=" + Arrays.toString(wifi_qos_data_bytes)
+					+ ", wifi_qosdata_frame_check_sequeue_4bytes="
+					+ Arrays.toString(wifi_qosdata_frame_check_sequeue_4bytes) + ", wifi_8021x_auth_version_1byte="
+					+ Arrays.toString(wifi_8021x_auth_version_1byte) + ", wifi_8021x_auth_version_int="
+					+ wifi_8021x_auth_version_int + ", wifi_8021x_auth_type_1byte="
+					+ Arrays.toString(wifi_8021x_auth_type_1byte) + ", wifi_8021x_auth_type_int="
+					+ wifi_8021x_auth_type_int + ", wifi_8021x_auth_length_2byte="
+					+ Arrays.toString(wifi_8021x_auth_length_2byte) + ", wifi_8021x_auth_length_int="
+					+ wifi_8021x_auth_length_int + ", wifi_eapol_auth_data_bytes="
+					+ Arrays.toString(wifi_eapol_auth_data_bytes) + ", MultiPresent_IntList_List="
+					+ MultiPresent_IntList_List + ", All_RadiotapPresent_IntList=" + All_RadiotapPresent_IntList
+					+ ", All_RadiotapPresent_Bit_Desc_Map=" + All_RadiotapPresent_Bit_Desc_Map
+					+ ", Option_RadiotapPresent_Bit_ByteArr_Map=" + Option_RadiotapPresent_Bit_ByteArr_Map
+					+ ", Option_RadiotapPresent_Bit_ByteLength_Map=" + Option_RadiotapPresent_Bit_ByteLength_Map
+					+ ", radiotap_present_tsft_1bit=" + radiotap_present_tsft_1bit + ", radiotap_present_flags_2bit="
+					+ radiotap_present_flags_2bit + ", radiotap_present_rate_3bit=" + radiotap_present_rate_3bit
+					+ ", radiotap_present_channel_4bit=" + radiotap_present_channel_4bit
+					+ ", radiotap_present_fhss_5bit=" + radiotap_present_fhss_5bit
+					+ ", radiotap_present_dbm_antsignal_6bit=" + radiotap_present_dbm_antsignal_6bit
+					+ ", radiotap_present_db_antnoise_7bit=" + radiotap_present_db_antnoise_7bit
+					+ ", radiotap_present_lock_quality_8bit=" + radiotap_present_lock_quality_8bit
+					+ ", radiotap_present_tx_attenuation_9bit=" + radiotap_present_tx_attenuation_9bit
+					+ ", radiotap_present_db_tx_attenuation_10bit=" + radiotap_present_db_tx_attenuation_10bit
+					+ ", radiotap_present_dbm_tx_power_11bit=" + radiotap_present_dbm_tx_power_11bit
+					+ ", radiotap_present_antenna_12bit=" + radiotap_present_antenna_12bit
+					+ ", radiotap_present_db_antsignal_13bit=" + radiotap_present_db_antsignal_13bit
+					+ ", radiotap_present_db_antnoise_14bit=" + radiotap_present_db_antnoise_14bit
+					+ ", radiotap_present_rxflags_15bit=" + radiotap_present_rxflags_15bit
+					+ ", radiotap_present_txflags_16bit=" + radiotap_present_txflags_16bit
+					+ ", radiotap_present_xchannel_19bit=" + radiotap_present_xchannel_19bit
+					+ ", radiotap_present_mcs_20bit=" + radiotap_present_mcs_20bit + ", radiotap_present_ampdu_21bit="
+					+ radiotap_present_ampdu_21bit + ", radiotap_present_vht_22bit=" + radiotap_present_vht_22bit
+					+ ", radiotap_present_timestamp_23bit=" + radiotap_present_timestamp_23bit
+					+ ", radiotap_present_he_24bit=" + radiotap_present_he_24bit + ", radiotap_present_he_mu_25bit="
+					+ radiotap_present_he_mu_25bit + ", radiotap_present_0_length_psdu_27bit="
+					+ radiotap_present_0_length_psdu_27bit + ", radiotap_present_l_sig_28bit="
+					+ radiotap_present_l_sig_28bit + ", radiotap_present_tlv_29bit=" + radiotap_present_tlv_29bit
+					+ ", radiotap_present_rtap_ns_30bit=" + radiotap_present_rtap_ns_30bit
+					+ ", radiotap_present_vendor_ns_31bit=" + radiotap_present_vendor_ns_31bit
+					+ ", radiotap_present_ext_32bit=" + radiotap_present_ext_32bit + ", Header_revision_1byte="
+					+ Header_revision_1byte + ", Header_pad_1byte=" + Header_pad_1byte + ", Header_length_2bytes="
+					+ Arrays.toString(Header_length_2bytes) + ", Header_length_Int=" + Header_length_Int
+					+ ", Present_flags_First_32bits_4bytes=" + Arrays.toString(Present_flags_First_32bits_4bytes)
+					+ ", Present_BitMsk_First=" + Present_BitMsk_First_Int + ", All_Present_BitMsk=" + All_Present_BitMsk
+					+ ", Radiotap_Header_bytes=" + Arrays.toString(Radiotap_Header_bytes)
+					+ ", option_1bit_radiotap_mactime_8bytes=" + Arrays.toString(option_1bit_radiotap_mactime_8bytes)
+					+ ", eap_key_desc_1bytes=" + Arrays.toString(eap_key_desc_1bytes) + ", eap_key_info_2bytes="  + Arrays.toString(eap_key_info_2bytes)+ 
+ "]";
 		}
-
-		 
-
-
-
-
-	//════════════════ Radiotap Format Begin ════════════════
-		ArrayList<ArrayList<Integer>>  MultiPresent_IntList_List;
 
 		ArrayList<Integer> All_RadiotapPresent_IntList ; 
 
@@ -1059,7 +1295,7 @@ public void Pcapng_File_Parser(File pcapFile) throws Exception {
 		 int Header_length_Int; 
 		 
 		 byte[]  Present_flags_First_32bits_4bytes;
-		 int Present_BitMsk_First; //  字节转为的 int值 第一个 present_mask  可能会有多个  所以要解析出多个来
+		 int Present_BitMsk_First_Int; //  字节转为的 int值 第一个 present_mask  可能会有多个  所以要解析出多个来
 		 ArrayList<Integer> All_Present_BitMsk;   // 所有的 bitmap的数据
 		 
 		 byte[] Radiotap_Header_bytes ; 
@@ -1069,6 +1305,24 @@ public void Pcapng_File_Parser(File pcapFile) throws Exception {
 		 
 //	════════════════ Radiotap Format End ════════════════
 		
+		 @Override
+		 String getBeacon_Identify() {
+			 if(is_beacon_frame()) {
+				 return ssid_name+"-"+wifi_80211_wireless_management_beacon_channel_hz+"-"+Arrays.toString(wifi_bssid_6bytes);
+			 }
+			 return null;
+		 }
+		
+		 @Override
+		 boolean is_beacon_frame() {
+			 if(wifi_subtype_int == 8 && wifi_type_int == 0) {
+				 return true;
+			 }
+		
+			
+			return false;
+		}
+		 
 		 void init_prop(){
 
 			 
@@ -1217,10 +1471,10 @@ public void Pcapng_File_Parser(File pcapFile) throws Exception {
 				 Original_Packet_Length_4bytes  =  beginIndex_endIndex_byteArr(all_frame,24,27);
 				 Packet_Data_bytes  =  beginIndex_endIndex_byteArr(all_frame,28,(frame_length - 4 -1));
 				 
-				    String Captured_Packet_Length_4bytes_hexstr = DigitalTransUtils.byte2hex(Captured_Packet_Length_4bytes,true);
+          	    String Captured_Packet_Length_4bytes_hexstr = DigitalTransUtils.byte2hex(Captured_Packet_Length_4bytes,true);
 				    // 将16进制字符串转为10进制的int（注意字符串不要以f开头，如有要先处理为0）
 				    
-				    System.out.println("Captured_Packet_Length_4bytes_hexstr = "+ Captured_Packet_Length_4bytes_hexstr +" Captured_Packet_Length_4bytes ="+Arrays.toString(Captured_Packet_Length_4bytes) );
+//				    System.out.println("Captured_Packet_Length_4bytes_hexstr = "+ Captured_Packet_Length_4bytes_hexstr +" Captured_Packet_Length_4bytes ="+Arrays.toString(Captured_Packet_Length_4bytes) );
 				    Captured_Packet_Avaliable_Length = Integer.parseInt(clearZero_for_NumberStr(Captured_Packet_Length_4bytes_hexstr),16);
 				    
 				    Captured_Packet_Real_Length =  getRealLength_From_AvaliableLength(Captured_Packet_Avaliable_Length);
@@ -1306,7 +1560,7 @@ public void Pcapng_File_Parser(File pcapFile) throws Exception {
 //		                                     1560950936695086634
 		                String time_stamp_style2_str =" "+year_8_str+"-"+month_8_str+"-"+day_8_str+"_"+hour_8_str+":"+minute_8_str+":"+second_8_str+"."+long_time_stamp_ws +" long_time_stamp_test="+long_time_stamp_test+" long_time_stamp_test.length="+long_time_stamp_test.length()+"  long_time_stamp_ms="+long_time_stamp_ms+"  long_time_stamp_ws="+long_time_stamp_ws;                
 		                
-		                System.out.println(time_stamp_style2_str);
+//		                System.out.println(time_stamp_style2_str);
 			
 		                timestamp_str = year_8_str+"-"+month_8_str+"-"+day_8_str+"_"+hour_8_str+":"+minute_8_str+":"+second_8_str+"."+long_time_stamp_ws;
 						 // TimeStamp 时间戳 End  ════════════════════════════════════
@@ -1330,13 +1584,23 @@ public void Pcapng_File_Parser(File pcapFile) throws Exception {
 			    Radiotap_Header_bytes =   beginIndex_endIndex_byteArr(Packet_Data_bytes,0,Header_length_Int-1); 
 			    
 			    String Present_flags_32bits_4bytes_hexstr = DigitalTransUtils.byte2hex(Present_flags_First_32bits_4bytes,true);
-			    Present_BitMsk_First = Integer.parseInt(clearZero_for_NumberStr(Present_flags_32bits_4bytes_hexstr),16);
+			    
+			    // A040402F
+			    if(isNumeric(Present_flags_32bits_4bytes_hexstr)) {
+				    Present_BitMsk_First_Int = Integer.parseInt(clearZero_for_NumberStr(Present_flags_32bits_4bytes_hexstr),16);
+			    	
+			    }else {
+			    	
+			    	Present_BitMsk_First_Int = bytesToInt(Present_flags_First_32bits_4bytes,0);
+			    	
+			    }
+		
 			    
 			    
 
-			    All_Present_BitMsk.add(Present_BitMsk_First);
+			    All_Present_BitMsk.add(Present_BitMsk_First_Int);
 			    
-			    int temp_mask = Present_BitMsk_First;
+			    int temp_mask = Present_BitMsk_First_Int;
 			    
 			    int mask_step = 4;
 			    // 有 下一个 present_mask 的 标识 
@@ -1370,8 +1634,8 @@ public void Pcapng_File_Parser(File pcapFile) throws Exception {
 				    	ArrayList<Integer> matchPresentBitMsk_Int_List = new 	ArrayList<Integer> ();
 				    	int bitFeature = All_RadiotapPresent_IntList.get(j);
 				    	
-				    	if((bitFeature & Present_BitMsk_First) != 0) {
-				    		System.out.println("Present_BitMsk["+(j+1)+"] = 表现 ! ");
+				    	if((bitFeature & Present_BitMsk_First_Int) != 0) {
+//				    		System.out.println("Present_BitMsk["+(j+1)+"] = 表现 ! ");
 				    		matchPresentBitMsk_Int_List.add(bitFeature);
 				    	}
 				    	MultiPresent_IntList_List.add(matchPresentBitMsk_Int_List);
@@ -1402,12 +1666,12 @@ public void Pcapng_File_Parser(File pcapFile) throws Exception {
 			    	
 			    	
 			    	
-			    	System.out.println("present_size["+present_count+"] present_bitMsk_size["+present_bitMsk_size+"]  present["+(i+1)+"]  matchBit="+matchBit+"   bit_desc:"+present_desc+"  bit_length="+matchBit_Length +" dynamic_present_bytes_length="+dynamic_present_bytes_length);
+//			    	System.out.println("present_size["+present_count+"] present_bitMsk_size["+present_bitMsk_size+"]  present["+(i+1)+"]  matchBit="+matchBit+"   bit_desc:"+present_desc+"  bit_length="+matchBit_Length +" dynamic_present_bytes_length="+dynamic_present_bytes_length);
 					
 				}
 			    }
 	
-			    System.out.println(getClass().getSimpleName()+ "  dynamic_present_bytes_length = "+ dynamic_present_bytes_length);
+//			    System.out.println(getClass().getSimpleName()+ "  dynamic_present_bytes_length = "+ dynamic_present_bytes_length);
 			    
 
 			    
@@ -1429,44 +1693,7 @@ public void Pcapng_File_Parser(File pcapFile) throws Exception {
 
 		 }
 		 
-		
-		// ════════════════  IE80211_Format   Begin ════════════════
 
-        byte wifi_type_subtype_1byte;  // wifi 帧的 type 管理帧 数据帧 控制帧   和  subtype  各种类型
-        int wifi_type_int;  // 主类型 
-        int wifi_subtype_int;   // 子类型 
-
-        
-        byte wifi_control_flag_1byte; //
-        
-        boolean wifi_is_receive_farme;  // 是否是接收帧 
-        boolean wifi_is_protected;  // 是否是加密的 wifi_control_flag_1byte的 0x40 为 是否为 1 决定
-        
-        byte[] wifi_during_2bytes; 
-        
-        // 只有三个是 表现在  字节中  剩下的那个 默认 为
-        byte[] wifi_ra_6bytes;  // 接收地址 
-        byte[] wifi_ta_6bytes;  // 传输地址 
-        byte[] wifi_da_6bytes;  // 目的 地址 
-        byte[] wifi_sa_6bytes;  // 原 地址 
-        
-        byte[] wifi_bssid_6bytes;  // 原 地址 
-        
-        byte[] wifi_high12bit_SequenceNumber_low4bit_FragmentNumber_2bytes;
-        byte[] wifi_qos_data_2bytes;
-        byte[] wifi_ccmp_paramters_8bytes;
-    
-        
-//   8 比特位 的 Flag   
-//      .... ..10 = DS status: Frame from DS to a STA via AP(To DS: 0 From DS: 1) (0x2)    对于STA  0:发送帧   1:接收帧
-//    	.... .0.. = More Fragments: This is the last fragment     该帧是否还有分包数据
-//    	.... 0... = Retry: Frame is not being retransmitted       重传
-//    	...0 .... = PWR MGT: STA will stay up                     省电管理
-//    	..0. .... = More Data: No data buffered                   有数据缓存吗
-//    	.0.. .... = Protected flag: Data is not protected         是否是加密数据
-//    	0... .... = +HTC/Order flag: Not strictly ordered
-		// ════════════════  IE80211_Format Format End ════════════════
-		
 // STA 接受帧(DS=2)     RA    TA   DA    SA    八个 地址 
 // .... ..10 = DS status: Frame from DS to a STA via AP(To DS: 0 From DS: 1) (0x2)        
 //        E0 B9 A5 1F E7 94 【六个字节 wlan.ra == E0:B9:A5:1F:E7:94 接收Mac地址】
@@ -1531,7 +1758,8 @@ public void Pcapng_File_Parser(File pcapFile) throws Exception {
 		//  依据  type-subtype   可能 还有  其余的 有的有 Qos两个字节   有的没有Qos字节    依据 type-subtype  结构还不一样   有的只有两个地址 address 
 		}
 		
-		void type2_sub8_qosdata_parser(int wifi_during_end_position_2bytes) {
+		
+		void type2_sub8_80211_qosdata_parser(int wifi_during_end_position_2bytes) {
 			
 			
 
@@ -1544,7 +1772,7 @@ public void Pcapng_File_Parser(File pcapFile) throws Exception {
 			int wifi_sa_begin_position_6bytes  = 0 ;
 			int wifi_sa_end_position_6bytes  = 0 ;
 			
-			if(wifi_is_receive_farme) {  // 接收帧
+			if(wifi_is_receive_farme) {  // eap 接收帧   DS=10
 				
 				 wifi_ra_begin_position_6bytes  =  wifi_during_end_position_2bytes + 1;
 				 wifi_ra_end_position_6bytes  =  wifi_ra_begin_position_6bytes + 6 -1;
@@ -1567,7 +1795,291 @@ public void Pcapng_File_Parser(File pcapFile) throws Exception {
 				
 				wifi_bssid_6bytes = wifi_ta_6bytes;
 
-			} else {   // 发送帧
+			} else {   // eap 发送帧     DS=01
+				
+				 wifi_ra_begin_position_6bytes  =  wifi_during_end_position_2bytes + 1;
+				 wifi_ra_end_position_6bytes  =  wifi_ra_begin_position_6bytes + 6 -1;
+				wifi_ra_6bytes =  beginIndex_endIndex_byteArr(Packet_Data_bytes,wifi_ra_begin_position_6bytes,wifi_ra_end_position_6bytes); 
+
+				 wifi_ta_begin_position_6bytes  =  wifi_ra_end_position_6bytes + 1;
+				 wifi_ta_end_position_6bytes  =  wifi_ta_begin_position_6bytes + 6 -1;
+				 wifi_ta_6bytes =  beginIndex_endIndex_byteArr(Packet_Data_bytes,wifi_ta_begin_position_6bytes,wifi_ta_end_position_6bytes); 
+				
+				
+				 wifi_da_begin_position_6bytes  =  wifi_ta_end_position_6bytes + 1;
+				 wifi_da_end_position_6bytes  =  wifi_da_begin_position_6bytes + 6 -1;
+				 
+				 wifi_sa_begin_position_6bytes = wifi_da_begin_position_6bytes;
+				 wifi_sa_end_position_6bytes = wifi_da_end_position_6bytes;
+				 
+				 wifi_da_6bytes =  beginIndex_endIndex_byteArr(Packet_Data_bytes,wifi_da_begin_position_6bytes,wifi_da_end_position_6bytes); 
+
+				//  STA 发送帧   sa 就是 ta  ,  没有 加载
+				wifi_sa_6bytes = wifi_ta_6bytes;
+			
+				
+				wifi_bssid_6bytes = wifi_ra_6bytes;
+				
+			}
+
+		
+
+					
+		int wifi_sequence_frame_number_begin_position_2bytes  =  wifi_sa_end_position_6bytes + 1;
+		int wifi_sequence_frame_number_end_position_2bytes  =  wifi_sequence_frame_number_begin_position_2bytes + 2 -1 ;
+					
+			
+		wifi_high12bit_SequenceNumber_low4bit_FragmentNumber_2bytes =  beginIndex_endIndex_byteArr(Packet_Data_bytes,wifi_sequence_frame_number_begin_position_2bytes,wifi_sequence_frame_number_end_position_2bytes); 
+
+		
+		int wifi_qos_control_begin_position_2bytes   =  wifi_sequence_frame_number_end_position_2bytes + 1;
+		int wifi_qos_control_end_position_2bytes  =  wifi_qos_control_begin_position_2bytes + 2 -1 ;
+		
+		wifi_qos_control_2bytes =  beginIndex_endIndex_byteArr(Packet_Data_bytes,wifi_qos_control_begin_position_2bytes,wifi_qos_control_end_position_2bytes); 
+
+		int wifi_ccmp_paramters_begin_position_8bytes   =  wifi_qos_control_end_position_2bytes + 1;
+		int wifi_ccmp_paramters_end_position_8bytes  =  wifi_ccmp_paramters_begin_position_8bytes + 2 -1 ;
+		
+		if(wifi_is_protected) {  // 是  Qos-data 携带数据类型
+			
+			 wifi_ccmp_paramters_begin_position_8bytes   =  wifi_qos_control_end_position_2bytes + 1;
+			 wifi_ccmp_paramters_end_position_8bytes  =  wifi_ccmp_paramters_begin_position_8bytes + 2 -1 ;
+			
+			wifi_ccmp_paramters_8bytes =  beginIndex_endIndex_byteArr(Packet_Data_bytes,wifi_ccmp_paramters_begin_position_8bytes,wifi_ccmp_paramters_end_position_8bytes); 
+
+			
+			// 结尾是 总长度 - 4 - 1 
+			
+//			
+//			int  Original_Packet_Real_Length; 	
+//			byte[] Packet_Data_bytes ;  // 内部协议的解析 包数据 
+			
+			int wifi_qos_data_begin_position_8bytes   =  wifi_ccmp_paramters_end_position_8bytes + 1;
+			int wifi_qos_data_end_position_8bytes   =  Original_Packet_Real_Length -4 -1;
+			
+			wifi_qos_data_bytes =  beginIndex_endIndex_byteArr(Packet_Data_bytes,wifi_qos_data_begin_position_8bytes,wifi_qos_data_end_position_8bytes); 
+
+			
+			 // frame_check_sequeue 是 数据包内最后的那四个字节
+			 wifi_qosdata_frame_check_sequeue_4bytes =  beginIndex_endIndex_byteArr(Packet_Data_bytes,Packet_Data_bytes.length-8,Packet_Data_bytes.length-4-1);
+		
+			 
+			
+			
+			
+		}
+		
+		
+		
+	  
+		}
+		
+		
+		// // beacon帧     DS=00
+		void type0_sub8_80211_beacon_parser(int wifi_during_end_position_2bytes) {
+			int wifi_ra_begin_position_6bytes  = 0 ;
+			int wifi_ra_end_position_6bytes  =  0 ;
+			int wifi_ta_begin_position_6bytes  =  0 ;
+			int wifi_ta_end_position_6bytes  = 0 ;
+			int wifi_da_begin_position_6bytes  = 0;
+			int wifi_da_end_position_6bytes  =  0 ;
+			int wifi_sa_begin_position_6bytes  = 0 ;
+			int wifi_sa_end_position_6bytes  = 0 ;
+			int wifi_bssid_begin_position_6bytes  = 0 ;
+			int wifi_bssid_end_position_6bytes  = 0 ;
+			
+			
+			
+			
+			 wifi_ra_begin_position_6bytes  =  wifi_during_end_position_2bytes + 1;
+			 wifi_ra_end_position_6bytes  =  wifi_ra_begin_position_6bytes + 6 -1;
+		     wifi_ra_6bytes =  beginIndex_endIndex_byteArr(Packet_Data_bytes,wifi_ra_begin_position_6bytes,wifi_ra_end_position_6bytes); 
+			
+			// beacon 帧  da==sa
+			wifi_da_6bytes = wifi_ra_6bytes;
+				
+			
+			 wifi_ta_begin_position_6bytes  =  wifi_ra_end_position_6bytes + 1;
+			 wifi_ta_end_position_6bytes  =  wifi_ta_begin_position_6bytes + 6 -1;
+			wifi_ta_6bytes =  beginIndex_endIndex_byteArr(Packet_Data_bytes,wifi_ta_begin_position_6bytes,wifi_ta_end_position_6bytes); 
+			
+			wifi_sa_6bytes = wifi_ta_6bytes;
+			
+			
+			wifi_bssid_begin_position_6bytes = wifi_ta_end_position_6bytes + 1;
+			wifi_bssid_end_position_6bytes = wifi_bssid_begin_position_6bytes + 6 -1;
+			 
+			wifi_bssid_6bytes =  beginIndex_endIndex_byteArr(Packet_Data_bytes,wifi_bssid_begin_position_6bytes,wifi_bssid_end_position_6bytes); 
+
+			 
+			int wifi_sequence_frame_number_begin_position_2bytes  =  wifi_bssid_end_position_6bytes + 1;
+			int wifi_sequence_frame_number_end_position_2bytes  =  wifi_sequence_frame_number_begin_position_2bytes + 2 -1 ;
+						
+				
+			wifi_high12bit_SequenceNumber_low4bit_FragmentNumber_2bytes =  beginIndex_endIndex_byteArr(Packet_Data_bytes,wifi_sequence_frame_number_begin_position_2bytes,wifi_sequence_frame_number_end_position_2bytes); 
+
+			
+			
+			wifi_80211_wireless_management_beacon_bytes =   beginIndex_endIndex_byteArr(Packet_Data_bytes,wifi_sequence_frame_number_end_position_2bytes + 1,Packet_Data_bytes.length - 4 -1); //  最后有四个  Frame Check Squeue
+
+			
+			
+			System.out.println("wifi_80211_wireless_management_beacon_bytes.length = "+ wifi_80211_wireless_management_beacon_bytes.length);
+
+			
+			type0_sub8_beacon_80211_wireless_management_parser(wifi_80211_wireless_management_beacon_bytes);
+			
+			
+		}
+		
+		void  type0_sub8_beacon_80211_wireless_management_parser(byte[] beacon_management_bytes) {
+			
+ 
+			int beacon_management_fixed_paramter_timestamp_begin_position_8bytes  = 0;
+			int beacon_management_fixed_paramter_timestamp_end_position_8bytes  =  beacon_management_fixed_paramter_timestamp_begin_position_8bytes + 8 -1 ;
+			
+			// 8字节的 Timestamp
+			byte[] beacon_management_fixed_paramter_timestamp_8bytes =   beginIndex_endIndex_byteArr(beacon_management_bytes,beacon_management_fixed_paramter_timestamp_begin_position_8bytes ,beacon_management_fixed_paramter_timestamp_end_position_8bytes);
+
+			int beacon_management_fixed_paramter_beaconinternval_begin_position_2bytes  = beacon_management_fixed_paramter_timestamp_end_position_8bytes + 1;
+			int beacon_management_fixed_paramter_beaconinternval_end_position_2bytes  =  beacon_management_fixed_paramter_beaconinternval_begin_position_2bytes + 2 -1 ;
+
+			byte[] beacon_management_fixed_paramter_beaconinternval_2bytes =   beginIndex_endIndex_byteArr(beacon_management_bytes,beacon_management_fixed_paramter_beaconinternval_begin_position_2bytes ,beacon_management_fixed_paramter_beaconinternval_end_position_2bytes);
+
+		
+			int beacon_management_fixed_paramter_capainfo_begin_position_2bytes  = beacon_management_fixed_paramter_beaconinternval_end_position_2bytes + 1;
+			int beacon_management_fixed_paramter_capainfo_end_position_2bytes  =  beacon_management_fixed_paramter_capainfo_begin_position_2bytes + 2 -1 ;
+			byte[] beacon_management_fixed_paramter_capainfo_2bytes =   beginIndex_endIndex_byteArr(beacon_management_bytes,beacon_management_fixed_paramter_capainfo_begin_position_2bytes ,beacon_management_fixed_paramter_capainfo_end_position_2bytes);
+
+			
+			
+			// Type-Length-Field
+			// 0--【ssid-length】---ssid
+			// 1--【channel-length】---channel
+			
+			int beacon_management_tagged_paramter_begin_position_optionbytes = beacon_management_fixed_paramter_capainfo_end_position_2bytes + 1;
+			
+			int cur_tagged_position = beacon_management_tagged_paramter_begin_position_optionbytes;
+			byte[]  tagged_paramter_type_bytes;
+			byte[]  tagged_paramter_length_bytes;
+			byte[]  tagged_paramter_fields_bytes;
+			
+			while(cur_tagged_position < beacon_management_bytes.length -2 ) {
+				
+				int tagged_paramter_type_begin_position_1bytes = cur_tagged_position;
+				int tagged_paramter_type_end_position_1bytes = cur_tagged_position;
+
+				tagged_paramter_type_bytes =    beginIndex_endIndex_byteArr(beacon_management_bytes,tagged_paramter_type_begin_position_1bytes ,tagged_paramter_type_end_position_1bytes);
+				
+				
+				int tagged_paramter_length_begin_position_1bytes = tagged_paramter_type_end_position_1bytes + 1;
+				int tagged_paramter_length_end_position_1bytes = tagged_paramter_length_begin_position_1bytes +1 -1;
+				tagged_paramter_length_bytes =    beginIndex_endIndex_byteArr(beacon_management_bytes,tagged_paramter_length_begin_position_1bytes ,tagged_paramter_length_end_position_1bytes);
+				
+				
+				int tagged_type_index = (int)(tagged_paramter_type_bytes[0]);
+				int tagged_type_length = ( int)(tagged_paramter_length_bytes[0]  & 0x0FF);
+				
+				
+
+				int tagged_paramter_field_begin_position_bytes = tagged_paramter_length_end_position_1bytes + 1;
+				int tagged_paramter_field_end_position_bytes = tagged_paramter_field_begin_position_bytes +tagged_type_length -1;
+			
+				tagged_paramter_fields_bytes =    beginIndex_endIndex_byteArr(beacon_management_bytes,tagged_paramter_field_begin_position_bytes ,tagged_paramter_field_end_position_bytes);
+				
+				
+				// 下一个 tagged_position 的  位置
+				cur_tagged_position = tagged_paramter_field_end_position_bytes + 1;
+				
+				
+				if(tagged_paramter_fields_bytes == null) {
+//					System.out.println("package_number = "+package_number+" cur_tagged_position="+(cur_tagged_position)+" (beacon_management_bytes.length-2)="+(beacon_management_bytes.length -2)+"  tagged_paramter_field_begin_position_bytes="+tagged_paramter_field_begin_position_bytes+"  tagged_paramter_field_end_position_bytes="+tagged_paramter_field_end_position_bytes+"    tagged_type_index="+tagged_type_index+" tagged_type_length="+tagged_type_length+"   filed.length="+tagged_paramter_fields_bytes+"  == null");	
+                       continue;
+				}else {
+					
+//					System.out.println("package_number = "+package_number+" cur_tagged_position="+(cur_tagged_position)+" (beacon_management_bytes.length-2)="+(beacon_management_bytes.length -2)+"  tagged_paramter_field_begin_position_bytes="+tagged_paramter_field_begin_position_bytes+"  tagged_paramter_field_end_position_bytes="+tagged_paramter_field_end_position_bytes+"    tagged_type_index="+tagged_type_index+" tagged_type_length="+tagged_type_length+"   filed.length="+tagged_paramter_fields_bytes.length);	
+
+				}
+				
+				
+				if(tagged_type_index == 0) {  // ssid的typeid==0
+					
+					wifi_80211_wireless_management_beacon_ssid_bytes = tagged_paramter_fields_bytes;
+					ssid_hexstr = bytesToHexString(wifi_80211_wireless_management_beacon_ssid_bytes);
+				
+					if(wifi_80211_wireless_management_beacon_ssid_bytes == null) {
+						continue;
+					}
+					
+					char[] ssid_char_arr = getChars(wifi_80211_wireless_management_beacon_ssid_bytes);
+					String ssid_name_temp = new String(ssid_char_arr,  0 ,wifi_80211_wireless_management_beacon_ssid_bytes.length);
+					
+					ssid_name = ssid_name_temp;
+//					System.out.println("ssid_hexstr="+ssid_hexstr +"   ssid_name="+ssid_name  );	
+
+				
+
+				} else if(tagged_type_index == 3) { // typeid=3 就是 channel
+					
+//					byte[] wifi_80211_wireless_management_beacon_channel_bytes; // 当前热点频道的 字节数组
+//					int wifi_80211_wireless_management_beacon_channel_id; //  频道id
+//					int wifi_80211_wireless_management_beacon_channel_hz;  // id 对应的 赫兹频道
+					
+					byte[] wifi_80211_wireless_management_beacon_channel_bytes = tagged_paramter_fields_bytes;
+					
+					
+					wifi_80211_wireless_management_beacon_channel_id = ( int)(wifi_80211_wireless_management_beacon_channel_bytes[0]  & 0x0FF);
+
+//					System.out.println("wifi_80211_wireless_management_beacon_channel_id="+wifi_80211_wireless_management_beacon_channel_id   );	
+
+					wifi_80211_wireless_management_beacon_channel_hz = 	getChannelId_2_ChanneHz(wifi_80211_wireless_management_beacon_channel_id);
+				
+//					System.out.println("wifi_80211_wireless_management_beacon_channel_id="+wifi_80211_wireless_management_beacon_channel_id  +"    wifi_80211_wireless_management_beacon_channel_hz="+wifi_80211_wireless_management_beacon_channel_hz );	
+
+				}
+				
+			}
+			
+			
+			
+		}
+		void type2_sub8_eapol_eap_tlvs_tcp_key_parser(int wifi_during_end_position_2bytes) {
+			
+			
+
+			int wifi_ra_begin_position_6bytes  = 0 ;
+			int wifi_ra_end_position_6bytes  =  0 ;
+			int wifi_ta_begin_position_6bytes  =  0 ;
+			int wifi_ta_end_position_6bytes  = 0 ;
+			int wifi_da_begin_position_6bytes  = 0;
+			int wifi_da_end_position_6bytes  =  0 ;
+			int wifi_sa_begin_position_6bytes  = 0 ;
+			int wifi_sa_end_position_6bytes  = 0 ;
+			
+			if(wifi_is_receive_farme) {  // eap接收帧        DS=10
+				
+				 wifi_ra_begin_position_6bytes  =  wifi_during_end_position_2bytes + 1;
+				 wifi_ra_end_position_6bytes  =  wifi_ra_begin_position_6bytes + 6 -1;
+				wifi_ra_6bytes =  beginIndex_endIndex_byteArr(Packet_Data_bytes,wifi_ra_begin_position_6bytes,wifi_ra_end_position_6bytes); 
+				
+				 wifi_ta_begin_position_6bytes  =  wifi_ra_end_position_6bytes + 1;
+				 wifi_ta_end_position_6bytes  =  wifi_ta_begin_position_6bytes + 6 -1;
+				wifi_ta_6bytes =  beginIndex_endIndex_byteArr(Packet_Data_bytes,wifi_ta_begin_position_6bytes,wifi_ta_end_position_6bytes); 
+				
+				//  STA 接受帧  da 就是 ra    没有记录 DA   没有 DA
+				wifi_da_6bytes = wifi_ra_6bytes;
+				
+				
+				
+				
+				 wifi_sa_begin_position_6bytes  =  wifi_ta_end_position_6bytes + 1;
+				 wifi_sa_end_position_6bytes  =  wifi_sa_begin_position_6bytes + 6 -1;
+				wifi_sa_6bytes =  beginIndex_endIndex_byteArr(Packet_Data_bytes,wifi_sa_begin_position_6bytes,wifi_sa_end_position_6bytes); 
+
+				
+				wifi_bssid_6bytes = wifi_ta_6bytes;
+
+			} else {    // eap 发送帧     DS=01
 				
 				 wifi_ra_begin_position_6bytes  =  wifi_during_end_position_2bytes + 1;
 				 wifi_ra_end_position_6bytes  =  wifi_ra_begin_position_6bytes + 6 -1;
@@ -1607,19 +2119,283 @@ public void Pcapng_File_Parser(File pcapFile) throws Exception {
 		int wifi_qos_data_begin_position_2bytes   =  wifi_sequence_frame_number_end_position_2bytes + 1;
 		int wifi_qos_data_end_position_2bytes  =  wifi_qos_data_begin_position_2bytes + 2 -1 ;
 		
-		wifi_qos_data_2bytes =  beginIndex_endIndex_byteArr(Packet_Data_bytes,wifi_qos_data_begin_position_2bytes,wifi_qos_data_end_position_2bytes); 
+		wifi_qos_control_2bytes =  beginIndex_endIndex_byteArr(Packet_Data_bytes,wifi_qos_data_begin_position_2bytes,wifi_qos_data_end_position_2bytes); 
 
-		if(wifi_is_protected) {
-			
-			int wifi_ccmp_paramters_begin_position_8bytes   =  wifi_qos_data_end_position_2bytes + 1;
-			int wifi_ccmp_paramters_end_position_8bytes  =  wifi_ccmp_paramters_begin_position_8bytes + 2 -1 ;
-			
-			wifi_ccmp_paramters_8bytes =  beginIndex_endIndex_byteArr(Packet_Data_bytes,wifi_ccmp_paramters_begin_position_8bytes,wifi_ccmp_paramters_end_position_8bytes); 
+		
+		int wifi_logical_link_conteolflag_begin_position_8bytes   =  wifi_qos_data_end_position_2bytes + 1;
+		int wifi_logical_link_conteolflag_end_position_8bytes  =  wifi_logical_link_conteolflag_begin_position_8bytes + 8 -1 ;
+		
 
+		wifi_logical_link_conteolflag_8bytes  =  beginIndex_endIndex_byteArr(Packet_Data_bytes,wifi_logical_link_conteolflag_begin_position_8bytes,wifi_logical_link_conteolflag_end_position_8bytes); 
+	
+	    byte[] wifi_logical_link_type_2bytes_temp =  { wifi_logical_link_conteolflag_8bytes[wifi_logical_link_conteolflag_8bytes.length-1],wifi_logical_link_conteolflag_8bytes[wifi_logical_link_conteolflag_8bytes.length-2]};
+
+		wifi_logical_link_type_2bytes = wifi_logical_link_type_2bytes_temp;
+		
+		wifi_logical_link_type_2bytes_hexstr = bytesToHexString(wifi_logical_link_type_2bytes,true);  //小端显示
+		
+		if(wifi_logical_link_type_2bytes_hexstr != null) {
+			wifi_logical_link_type_2bytes_hexstr = wifi_logical_link_type_2bytes_hexstr.toLowerCase().trim();
+		}
+		//  要 依据 wifi_logical_link_type_2bytes 的 不同进一步 判断
+		
+		if(wifi_logical_link_type_2bytes_hexstr == null ) {
+			
+			System.out.println("当前 读取 wifi_logical_link_type_2bytes 解析出的 wifi_logical_link_type_2bytes_hexstr 为空 请检查 !  wifi_logical_link_type_2bytes="+wifi_logical_link_type_2bytes);
+			return;
+		}
+		
+		
+        // 当前  读取到的 位置   int wifi_logical_link_conteolflag_end_position_8bytes
+		switch(wifi_logical_link_type_2bytes_hexstr) {
+		
+		case "888e":  // eapol--888e   eap-888e
+			
+//	        byte[] wifi_8021x_auth_version_1byte;  // Version: 802.1X-2001 (1)
+//	        byte[] wifi_8021x_auth_type_1byte;  // eapol==3   eap=0 
+//	        byte[] wifi_8021x_auth_length_2byte; 
+	        
+			int wifi_8021x_auth_version_begin_position_1byte = wifi_logical_link_conteolflag_end_position_8bytes + 1;
+			int wifi_8021x_auth_version_end_position_1byte = wifi_8021x_auth_version_begin_position_1byte + 1 -1 ;
+			wifi_8021x_auth_version_1byte  =  beginIndex_endIndex_byteArr(Packet_Data_bytes,wifi_8021x_auth_version_begin_position_1byte,wifi_8021x_auth_version_end_position_1byte); 
+
+			int wifi_8021x_auth_type_begin_position_1byte = wifi_8021x_auth_version_end_position_1byte + 1;
+			int wifi_8021x_auth_type_end_position_1byte = wifi_8021x_auth_type_begin_position_1byte + 1 -1 ;
+			wifi_8021x_auth_type_1byte  =  beginIndex_endIndex_byteArr(Packet_Data_bytes,wifi_8021x_auth_type_begin_position_1byte,wifi_8021x_auth_type_end_position_1byte); 
+
+			
+			int wifi_8021x_auth_length_begin_position_2byte = wifi_8021x_auth_type_end_position_1byte + 1;
+			int wifi_8021x_auth_length_end_position_2byte = wifi_8021x_auth_length_begin_position_2byte + 2 -1 ;
+			wifi_8021x_auth_length_2byte  =  beginIndex_endIndex_byteArr(Packet_Data_bytes,wifi_8021x_auth_length_begin_position_2byte,wifi_8021x_auth_length_end_position_2byte); 
+
+			wifi_8021x_auth_version_int = wifi_8021x_auth_version_1byte[0];
+			wifi_8021x_auth_type_int = wifi_8021x_auth_type_1byte[0];
+	
+			wifi_8021x_auth_length_int =  merge2ByteToInt(wifi_8021x_auth_length_2byte[0],wifi_8021x_auth_length_2byte[1]);
+			
+			if(wifi_8021x_auth_type_int == 3) {   // eapol帧
+				
+				
+				int wifi_8021x_auth_data_begin_position_bytes = wifi_8021x_auth_length_end_position_2byte + 1;
+				int wifi_8021x_auth_data_end_position_bytes = wifi_8021x_auth_data_begin_position_bytes +wifi_8021x_auth_length_int - 1;
+				wifi_eapol_auth_data_bytes = beginIndex_endIndex_byteArr(Packet_Data_bytes,wifi_8021x_auth_data_begin_position_bytes,wifi_8021x_auth_data_end_position_bytes); 
+				
+				// 所有的 auth data  包含 length 
+				wifi_eapol_all_data_bytes = beginIndex_endIndex_byteArr(Packet_Data_bytes,wifi_8021x_auth_version_begin_position_1byte,wifi_8021x_auth_data_end_position_bytes); 
+
+				
+				parser_80211_eap_frame(wifi_eapol_auth_data_bytes);  // 开始解析 eapol-data 的 数据 
+				
+			}else if(wifi_8021x_auth_type_int == 0 ){  // eap tlsv1.2 等 其他帧 
+				
+				
+			}
+			
+			
+			
+			
+			break;
+		
+			
+		case "0806":  // arp--0806 
+			
+			break;
+			
+		case "0800":  // dns--0800    tlsv1.2  
+			
+			break;
+			
+			default:
+			   System.out.println(" wifi_logical_link_type_2bytes_hexstr="+wifi_logical_link_type_2bytes_hexstr+" 不清楚什么类型");	
+			 
+		
+		
+		
+		}
+		
+		
+		
+		}
+		
+
+		
+		void  parser_80211_eap_frame(byte[] eapolDataBytes) {
+			int eap_key_desc_begin_position_1byte = 0;
+			int eap_key_desc_end_position_1byte = eap_key_desc_begin_position_1byte + 1 -1 ;
+			
+			eap_key_desc_1bytes = beginIndex_endIndex_byteArr(eapolDataBytes,eap_key_desc_begin_position_1byte,eap_key_desc_end_position_1byte); 
+			
+			
+			int eap_key_info_begin_position_2byte = eap_key_desc_end_position_1byte + 1;
+			int eap_key_info_end_position_2byte = eap_key_info_begin_position_2byte + 2 -1 ;
+			eap_key_info_2bytes = beginIndex_endIndex_byteArr(eapolDataBytes,eap_key_info_begin_position_2byte,eap_key_info_end_position_2byte); 
+			
+			
+			int eap_key_length_begin_position_2byte = eap_key_info_end_position_2byte + 1;
+			int eap_key_length_end_position_2byte = eap_key_length_begin_position_2byte + 2 -1 ;
+			eap_key_length_2bytes = beginIndex_endIndex_byteArr(eapolDataBytes,eap_key_length_begin_position_2byte,eap_key_length_end_position_2byte); 
+			
+			
+			
+			
+			int eap_replay_counter_begin_position_8byte = eap_key_length_end_position_2byte + 1;
+			int eap_replay_counter_end_position_8byte = eap_replay_counter_begin_position_8byte + 8 -1 ;
+			eap_replay_counter_8bytes = beginIndex_endIndex_byteArr(eapolDataBytes,eap_replay_counter_begin_position_8byte,eap_replay_counter_end_position_8byte); 
+			
+			
+			int eap_wpa_key_nonce_begin_position_32byte = eap_replay_counter_end_position_8byte + 1;
+			int eap_wpa_key_nonce_end_position_32byte = eap_wpa_key_nonce_begin_position_32byte + 32 -1 ;
+			eap_wpa_key_nonce_32bytes = beginIndex_endIndex_byteArr(eapolDataBytes,eap_wpa_key_nonce_begin_position_32byte,eap_wpa_key_nonce_end_position_32byte); 
+			
+			
+			int eap_key_iv_begin_position_16byte = eap_wpa_key_nonce_end_position_32byte + 1;
+			int eap_key_iv_end_position_16byte = eap_key_iv_begin_position_16byte + 16 -1 ;
+			eap_key_iv_16bytes = beginIndex_endIndex_byteArr(eapolDataBytes,eap_key_iv_begin_position_16byte,eap_key_iv_end_position_16byte); 
+			
+			
+			
+			
+			int eap_key_rsc_begin_position_8byte = eap_key_iv_end_position_16byte + 1;
+			int eap_key_rsc_end_position_8byte = eap_key_rsc_begin_position_8byte + 8 -1 ;
+			eap_key_rsc_8bytes = beginIndex_endIndex_byteArr(eapolDataBytes,eap_key_rsc_begin_position_8byte,eap_key_rsc_end_position_8byte); 
+			
+			
+			int eap_key_id_begin_position_8byte = eap_key_rsc_end_position_8byte + 1;
+			int eap_key_id_end_position_8byte = eap_key_id_begin_position_8byte + 8 -1 ;
+			eap_key_id_8bytes = beginIndex_endIndex_byteArr(eapolDataBytes,eap_key_id_begin_position_8byte,eap_key_id_end_position_8byte); 
+			
+			int eap_key_mic_begin_position_16byte = eap_key_id_end_position_8byte + 1;
+			int eap_key_mic_end_position_16byte = eap_key_mic_begin_position_16byte + 16 -1 ;
+			eap_key_mic_16bytes = beginIndex_endIndex_byteArr(eapolDataBytes,eap_key_mic_begin_position_16byte,eap_key_mic_end_position_16byte); 
+			
+			
+			int eap_key_data_length_begin_position_2byte = eap_key_mic_end_position_16byte + 1;
+			int eap_key_data_length_end_position_2byte = eap_key_data_length_begin_position_2byte + 2 -1 ;
+			eap_key_data_length_2bytes = beginIndex_endIndex_byteArr(eapolDataBytes,eap_key_data_length_begin_position_2byte,eap_key_data_length_end_position_2byte); 
+			
+			
+			eap_key_data_length_int = merge2ByteToInt(eap_key_data_length_2bytes[0], eap_key_data_length_2bytes[1]);
+			
+			if(eap_key_data_length_int > 0) {
+				
+				
+				int eap_key_data_begin_position_bytes = eap_key_data_length_end_position_2byte + 1;
+				int eap_key_data_end_position_bytes = eap_key_data_begin_position_bytes + eap_key_data_length_int -1 ;
+				eap_key_data_bytes   = beginIndex_endIndex_byteArr(eapolDataBytes,eap_key_data_begin_position_bytes,eap_key_data_end_position_bytes); 
+				
+
+			}
+			
+			
+			//  可以 通过  Key-MIC=0  Secure=0 来判断
+			// 第一个  Key-MIC=0  Secure=0
+			// 第二个  Key-MIC=1  Secure=0
+			// 第三个  Key-MIC=0  Secure=1
+			// 第四个  Key-MIC=1  Secure=1
+			//
+			// AP  --->  STA 第一个   isWifiReceive=true            Key-Type-Pairwise=1   Key-ACK=1   Key-MIC=0  Install-Set=0  Secure=0
+			//  STA  --->  AP   第二个   isWifiReceive=false        Key-Type-Pairwise=1   Key-ACK=0   Key-MIC=1  Install-Set=0  Secure=0
+			// AP  --->  STA 第三个   isWifiReceive=true            Key-Type-Pairwise=1   Key-ACK=1   Key-MIC=0  Install-Set=1  Secure=1
+			//  STA  --->  AP   第二个   isWifiReceive=false        Key-Type-Pairwise=1   Key-ACK=0   Key-MIC=1  Install-Set=0  Secure=1
+			
 			
 		}
 		
-	  
+		
+		@Override
+		 byte[] getEAPOL_WPA_Key_Nonce_Bytes() {
+			 return eap_wpa_key_nonce_32bytes;
+		 }
+		
+		@Override
+		 byte[] getEAPOL_WPA_MIC_Bytes() {
+			 return eap_key_mic_16bytes;
+		 }
+		 
+
+			@Override
+		 byte[] getEAPOL_8021X_Authentication_Bytes() {
+			 return wifi_eapol_all_data_bytes;
+		 }
+		 
+			
+			@Override
+			 byte[] getFrame_Receiver_Address() {
+				 return wifi_ra_6bytes;
+			 }
+			
+			@Override
+			 byte[] getFrame_Transmitter_Address() {
+				 return wifi_ta_6bytes;
+			 }
+			
+
+	        
+	        
+			@Override
+			 // 是否是 STA 接受到的 帧 (即 AP 发送的帧数据)
+			 boolean is_receive_for_sta() {
+				 return wifi_is_receive_farme;
+			 } 
+			 
+		
+		@Override
+		 String getFrame_TimeStamp_Desc() {
+			 return timestamp_str;
+		 }
+		
+		
+		
+		//  可以 通过  Key-MIC=0  Secure=0 来判断
+		// 第一个  Key-MIC=0  Secure=0
+		// 第二个  Key-MIC=1  Secure=0
+		// 第三个  Key-MIC=1  Secure=1    Encrypted_Data=1
+		// 第四个  Key-MIC=1  Secure=1    Encrypted_Data=0
+		@Override
+		int getEAPOL_Handshake_Message_Number() {
+			if(!isEAPOL()) {  // 非 EAPOL 的 返回 0 
+//				System.out.println("非 EAPOL 帧   第几次握手返回 0  ");
+				return 0 ; 
+			}
+//			...1 .... .... .... = Encrypted Key Data: Set
+			if(eap_key_info_2bytes == null || eap_key_info_2bytes.length != 2) {
+//				System.out.println(" EAPOL 帧  但 eap_info_2bytes 字节数组为空   第几次握手返回 0  ");
+				return 0;
+			}
+			
+			boolean Bit_Key_MIC_Flag = (( eap_key_info_2bytes[0] & 0x01 ) == 0x01);
+			
+			boolean Bit_Key_Secure_Flag = (( eap_key_info_2bytes[0] & 0x02 ) == 0x02);
+			
+			boolean Bit_Encrypted_Data_Flag = (( eap_key_info_2bytes[0] & 0x10 ) == 0x10);
+			
+			
+			if(!Bit_Key_MIC_Flag && !Bit_Key_Secure_Flag) {
+				return  1 ;
+			}
+	
+			if(Bit_Key_MIC_Flag && !Bit_Key_Secure_Flag) {
+				return  2 ;
+			}
+			
+			if(Bit_Key_MIC_Flag && Bit_Key_Secure_Flag && Bit_Encrypted_Data_Flag) {
+				return  3 ;
+			}
+			
+			if(Bit_Key_MIC_Flag && Bit_Key_Secure_Flag && !Bit_Encrypted_Data_Flag) {
+				return  4 ;
+			}
+			
+			
+			return 0 ; 
+		}
+		
+		boolean isEAPOL() {
+			if("888e".equals(wifi_logical_link_type_2bytes_hexstr) && wifi_8021x_auth_type_int == 3) {
+				
+				return true;
+			}
+			return false;
 		}
 
 		
@@ -1657,8 +2433,10 @@ public void Pcapng_File_Parser(File pcapFile) throws Exception {
 //			 		
 					 break;
 					 
-				case 8:   
+				case 8:    //  wlan.fc.type == 0 && wlan.fc.subtype == 0x08     beacon 帧
 //			 		
+					type0_sub8_80211_beacon_parser(wifi_during_end_position_2bytes);  // beacon 帧 解析	
+					
 					 break;
 					 
 				case 10:   
@@ -1773,8 +2551,25 @@ public void Pcapng_File_Parser(File pcapFile) throws Exception {
 					 break;
 					 
 				case 8:     // type2_sub8_qosdata_parser();
-//			 		
-					type2_sub8_qosdata_parser(wifi_during_end_position_2bytes);
+					//  wlan.fc.subtype == 0x08 &&  wlan.fc.type == 2   
+//  1.有 Protected-Data-Flag=1 的 Qos Data 帧
+					
+//  Protected-Data-Flag=0       Logic-Link-Control-8字节 
+//  2.有  的 EAPOL帧   802.1X Authentication type = 3  【802.1X Authentication  verison=2 auth-type=3 】
+//  3.有  EAP 帧 【802.1X Authentication  verison=1 auth-type=0 】 Logic-Link-Control 的 Type-是 0x888e【 802.1X Authentication 】 
+//	4.有 TLSv1.2 帧 	Logic-Link-Control 的 Type-是 0x0800【 TCP 】	  没有 	802.1X Authentication 区块 		
+//  5. 有 Qos-Data 类型的 TCP帧? 	Logic-Link-Control 的 Type-是 0x0800【 TCP 】		
+
+// arp  dns  也都是 可能是 qos_data  
+					
+					if(wifi_is_protected) {  // 带有数据的  Qos Data 类型
+						
+						type2_sub8_80211_qosdata_parser(wifi_during_end_position_2bytes);	
+					}else {
+						
+						type2_sub8_eapol_eap_tlvs_tcp_key_parser(wifi_during_end_position_2bytes);
+					}
+				
 					
 					
 					 break;
@@ -1812,65 +2607,6 @@ public void Pcapng_File_Parser(File pcapFile) throws Exception {
 
 
 
-		@Override
-		public String toString() {
-			return "Wifi_Frame_Struct_00000006 "+ ", wifi_qos_data_2bytes=" + Arrays.toString(wifi_qos_data_2bytes)+" [Interface_ID_4bytes=" + Arrays.toString(Interface_ID_4bytes)
-					+ ", Timestamp_High_4bytes=" + Arrays.toString(Timestamp_High_4bytes) + ", Timestamp_Low_4bytes="
-					+ Arrays.toString(Timestamp_Low_4bytes) + ", Captured_Packet_Length_4bytes="
-					+ Arrays.toString(Captured_Packet_Length_4bytes) + ", Original_Packet_Length_4bytes="
-					+ Arrays.toString(Original_Packet_Length_4bytes) + ", Captured_Packet_Avaliable_Length="
-					+ Captured_Packet_Avaliable_Length + ", Original_Packet_Avaliable_Length="
-					+ Original_Packet_Avaliable_Length + ", Captured_Packet_Real_Length=" + Captured_Packet_Real_Length
-					+ ", Original_Packet_Real_Length=" + Original_Packet_Real_Length + ", Packet_Data_bytes="
-					+ Arrays.toString(Packet_Data_bytes) + ", timestamp_str=" + timestamp_str
-					+ ", MultiPresent_IntList_List=" + MultiPresent_IntList_List + ", All_RadiotapPresent_IntList="
-					+ All_RadiotapPresent_IntList + ", All_RadiotapPresent_Bit_Desc_Map="
-					+ All_RadiotapPresent_Bit_Desc_Map + ", Option_RadiotapPresent_Bit_ByteArr_Map="
-					+ Option_RadiotapPresent_Bit_ByteArr_Map + ", Option_RadiotapPresent_Bit_ByteLength_Map="
-					+ Option_RadiotapPresent_Bit_ByteLength_Map + ", radiotap_present_tsft_1bit="
-					+ radiotap_present_tsft_1bit + ", radiotap_present_flags_2bit=" + radiotap_present_flags_2bit
-					+ ", radiotap_present_rate_3bit=" + radiotap_present_rate_3bit + ", radiotap_present_channel_4bit="
-					+ radiotap_present_channel_4bit + ", radiotap_present_fhss_5bit=" + radiotap_present_fhss_5bit
-					+ ", radiotap_present_dbm_antsignal_6bit=" + radiotap_present_dbm_antsignal_6bit
-					+ ", radiotap_present_db_antnoise_7bit=" + radiotap_present_db_antnoise_7bit
-					+ ", radiotap_present_lock_quality_8bit=" + radiotap_present_lock_quality_8bit
-					+ ", radiotap_present_tx_attenuation_9bit=" + radiotap_present_tx_attenuation_9bit
-					+ ", radiotap_present_db_tx_attenuation_10bit=" + radiotap_present_db_tx_attenuation_10bit
-					+ ", radiotap_present_dbm_tx_power_11bit=" + radiotap_present_dbm_tx_power_11bit
-					+ ", radiotap_present_antenna_12bit=" + radiotap_present_antenna_12bit
-					+ ", radiotap_present_db_antsignal_13bit=" + radiotap_present_db_antsignal_13bit
-					+ ", radiotap_present_db_antnoise_14bit=" + radiotap_present_db_antnoise_14bit
-					+ ", radiotap_present_rxflags_15bit=" + radiotap_present_rxflags_15bit
-					+ ", radiotap_present_txflags_16bit=" + radiotap_present_txflags_16bit
-					+ ", radiotap_present_xchannel_19bit=" + radiotap_present_xchannel_19bit
-					+ ", radiotap_present_mcs_20bit=" + radiotap_present_mcs_20bit + ", radiotap_present_ampdu_21bit="
-					+ radiotap_present_ampdu_21bit + ", radiotap_present_vht_22bit=" + radiotap_present_vht_22bit
-					+ ", radiotap_present_timestamp_23bit=" + radiotap_present_timestamp_23bit
-					+ ", radiotap_present_he_24bit=" + radiotap_present_he_24bit + ", radiotap_present_he_mu_25bit="
-					+ radiotap_present_he_mu_25bit + ", radiotap_present_0_length_psdu_27bit="
-					+ radiotap_present_0_length_psdu_27bit + ", radiotap_present_l_sig_28bit="
-					+ radiotap_present_l_sig_28bit + ", radiotap_present_tlv_29bit=" + radiotap_present_tlv_29bit
-					+ ", radiotap_present_rtap_ns_30bit=" + radiotap_present_rtap_ns_30bit
-					+ ", radiotap_present_vendor_ns_31bit=" + radiotap_present_vendor_ns_31bit
-					+ ", radiotap_present_ext_32bit=" + radiotap_present_ext_32bit + ", Header_revision_1byte="
-					+ Header_revision_1byte + ", Header_pad_1byte=" + Header_pad_1byte + ", Header_length_2bytes="
-					+ Arrays.toString(Header_length_2bytes) + ", Header_length_Int=" + Header_length_Int
-					+ ", Present_flags_First_32bits_4bytes=" + Arrays.toString(Present_flags_First_32bits_4bytes)
-					+ ", Present_BitMsk_First=" + Present_BitMsk_First + ", All_Present_BitMsk=" + All_Present_BitMsk
-					+ ", Radiotap_Header_bytes=" + Arrays.toString(Radiotap_Header_bytes)
-					+ ", option_1bit_radiotap_mactime_8bytes=" + Arrays.toString(option_1bit_radiotap_mactime_8bytes)
-					+ ", wifi_type_subtype_1byte=" + wifi_type_subtype_1byte + ", wifi_type_int=" + wifi_type_int
-					+ ", wifi_subtype_int=" + wifi_subtype_int + ", wifi_control_flag_1byte=" + wifi_control_flag_1byte
-					+ ", wifi_is_receive_farme=" + wifi_is_receive_farme + ", wifi_is_protected=" + wifi_is_protected
-					+ ", wifi_during_2bytes=" + Arrays.toString(wifi_during_2bytes) + ", wifi_ra_6bytes="
-					+ Arrays.toString(wifi_ra_6bytes) + ", wifi_ta_6bytes=" + Arrays.toString(wifi_ta_6bytes)
-					+ ", wifi_da_6bytes=" + Arrays.toString(wifi_da_6bytes) + ", wifi_sa_6bytes="
-					+ Arrays.toString(wifi_sa_6bytes) + ", wifi_bssid_6bytes=" + Arrays.toString(wifi_bssid_6bytes)
-					+ ", wifi_high12bit_SequenceNumber_low4bit_FragmentNumber_2bytes="
-					+ Arrays.toString(wifi_high12bit_SequenceNumber_low4bit_FragmentNumber_2bytes)
-					+ ", wifi_qos_data_2bytes=" + Arrays.toString(wifi_qos_data_2bytes)
-					+ ", wifi_ccmp_paramters_8bytes=" + Arrays.toString(wifi_ccmp_paramters_8bytes) + "]";
-		}
 
 
 		Wifi_Frame_Struct_00000006(byte[] block_type_bytes, byte[] block_head_length_bytes, byte[] all_frame_bytes,
@@ -1884,6 +2620,9 @@ public void Pcapng_File_Parser(File pcapFile) throws Exception {
 		}
 		
 
+		
+
+		 
 		
 	}
 	
@@ -1979,7 +2718,7 @@ public void Pcapng_File_Parser(File pcapFile) throws Exception {
 				
 				if(endIndex >=  all_frame_byte.length || beginIndex < 0) {
 					
-					System.out.println("当前查询A 子byte数组 	beginIndex="+beginIndex+"  endIndex="+endIndex+"  cur_byte_length="+cur_byte_length +"异常  请检查!");
+					System.out.println("当前查询A 子byte数组 	beginIndex="+beginIndex+"  endIndex="+endIndex+"  cur_byte_length="+cur_byte_length +"   all_frame_byte.length="+ all_frame_byte.length +" 异常  请检查!");
 				    return null;
 				}
 				
@@ -2005,7 +2744,57 @@ public void Pcapng_File_Parser(File pcapFile) throws Exception {
 				 return realLength;
 				 
 			 }
+			 
+			 
+			 int getEAPOL_Handshake_Message_Number() {
+				 return 0;
+			 }
 		
+			 
+			 
+				
+			 String getFrame_TimeStamp_Desc() {
+				 return "";
+			 }
+			 
+				 byte[] getEAPOL_WPA_Key_Nonce_Bytes() {
+					 return null;
+				 }
+				
+				 byte[] getEAPOL_WPA_MIC_Bytes() {
+					 return null;
+				 }
+				
+				 byte[] getEAPOL_8021X_Authentication_Bytes() {
+					 return null;
+				 }
+				 
+				 
+				 
+					 byte[] getFrame_Receiver_Address() {
+						 return null;
+					 }
+					
+					 byte[] getFrame_Transmitter_Address() {
+						 return null;
+					 }
+					
+					 // 是否是 STA 接受到的 帧 (即 AP 发送的帧数据)
+					 boolean is_receive_for_sta() {
+						 return false;
+					 }  
+					
+						 String getBeacon_Identify() {
+							 
+							 return null;
+						 }
+						
+	
+						 boolean is_beacon_frame() {
+							
+							return false;
+						}
+						
 	}
 	
 	 abstract class Wifi_Frame_AbsCommon_Struct {
@@ -2093,6 +2882,28 @@ public void Pcapng_File_Parser(File pcapFile) throws Exception {
 		
 		abstract void parse_wifi_frame(byte[] all_frame);
 		
+		abstract int getEAPOL_Handshake_Message_Number();
+		
+		abstract String  getFrame_TimeStamp_Desc();
+		
+		
+		abstract byte[] getEAPOL_WPA_Key_Nonce_Bytes();
+		
+		abstract byte[] getEAPOL_WPA_MIC_Bytes();
+		
+		abstract byte[] getEAPOL_8021X_Authentication_Bytes();
+		
+		
+		abstract byte[] getFrame_Receiver_Address();
+		
+		abstract byte[] getFrame_Transmitter_Address();
+		
+		abstract String getBeacon_Identify(); 
+		
+		// 是否是 beacon 帧
+		abstract boolean is_beacon_frame(); 
+		
+		abstract boolean is_receive_for_sta();   // 是否是 STA 接受到的 帧 (即 AP 发送的帧数据)
 		
 	}
 	
@@ -17009,6 +17820,41 @@ sb.append(str);
 //	        System.out.println(builder.toString());
 		return builder.toString();
 	}
+	
+	
+	
+	static String bytesToHexString(byte[] src , boolean isLittleEnd) {
+		StringBuilder builder = new StringBuilder();
+		if (src == null || src.length <= 0) {
+			return null;
+		}
+		String hv;
+		if(isLittleEnd) {  // 小端
+			
+			for (int i =  src.length -1 ;i >= 0  ; i--) {
+				hv = Integer.toHexString(src[i] & 0xFF).toUpperCase();
+				if (hv.length() < 2) {
+					builder.append(0);
+				}
+				builder.append(hv);
+			}
+			
+		}else {  // 大端
+			
+			for (byte aSrc : src) {
+				// 以十六进制（基数 16）无符号整数形式返回一个整数参数的字符串表示形式，并转换为大写
+				hv = Integer.toHexString(aSrc & 0xFF).toUpperCase();
+				if (hv.length() < 2) {
+					builder.append(0);
+				}
+				builder.append(hv);
+			}
+		}
+
+//	        System.out.println(builder.toString());
+		return builder.toString();
+	}
+	
 
 	public static boolean isNumeric(String str) {
 		if (str.contains("#")) {
@@ -17293,6 +18139,69 @@ sb.append(str);
     } 
     
 
+    /**
+     * 将两个byte 合并转化为一个 hex 数据
+     *
+     * @param high 高位数据
+     * @param low  低位数据
+     * @return 返回的数据 高位在前，低位在后。
+     */
+    public static int merge2ByteToInt(byte high, byte low) {
+        return (int) ((high & 0xff) << 8 | (low & 0xff));
+    }
+    
+    public static int bytesToInt(byte[] src, int offset) {  
+        int value;    
+        value = (int) ( ((src[offset] & 0xFF)<<24)  
+                |((src[offset+1] & 0xFF)<<16)  
+                |((src[offset+2] & 0xFF)<<8)  
+                |(src[offset+3] & 0xFF));  
+        return value;  
+    }  
+    
+
+    /**
+     * 将一个 int 型数据转化为两个byte 数据
+     * @param value int 数值
+     * @return  两个字节的byte 数组
+     */
+    public static byte[] intToByteArray(int value) {
+        byte[] mValue = new byte[2];
+        mValue[0] = (byte) ((value >> 8) & 0xFF);
+        mValue[1] = (byte) (value & 0xFF);
+        return mValue;
+    }
+    
+    public static byte[] getBytes(char[] chars) {
+        Charset cs = Charset.forName("UTF-8");
+        CharBuffer cb = CharBuffer.allocate(chars.length);
+        cb.put(chars);
+        cb.flip();
+        ByteBuffer bb = cs.encode(cb);
+        return bb.array();
+    }
+ 
+    public static char[] getChars(byte[] bytes) {
+        Charset cs = Charset.forName("UTF-8");
+        ByteBuffer bb = ByteBuffer.allocate(bytes.length);
+        bb.put(bytes).flip();
+        CharBuffer cb = cs.decode(bb);
+        return cb.array();
+    }
+ 
+    public static byte[] charToByte(char c) {
+        byte[] b = new byte[2];
+        b[0] = (byte) ((c & 0xFF00) >> 8);
+        b[1] = (byte) (c & 0xFF);
+        return b;
+    }
+ 
+    public static char byteToChar(byte[] b) {
+        int hi = (b[0] & 0xFF) << 8;
+        int lo = b[1] & 0xFF;
+        return (char) (hi | lo);
+    }
+    
 	// 使用两个 for 语句
 	//java 合并两个byte数组 
 	public static byte[] byteMerger(byte[] bt1, byte[] bt2 , byte[] bt3){ 
@@ -17314,6 +18223,249 @@ sb.append(str);
 		  i++;
 		}
 	    return bt4; 
+	}
+	
+	int getChannelId_2_ChanneHz(int channel_id){
+		int mHz = channel_id;
+		switch(channel_id) {
+		
+		case 1:
+			mHz = 2412;
+			break;
+		
+		case 2:
+			mHz = 2417;
+			break;
+			
+		case 3:
+			mHz = 2422;
+			break;
+			
+		case 4:
+			mHz = 2427;
+			break;
+			
+		case 5:
+			mHz = 2432;
+			break;
+			
+		case 6:
+			mHz = 2437;
+			break;
+			
+		case 7:
+			mHz = 2442;
+			break;
+			
+		case 8:
+			mHz = 2447;
+			break;
+			
+		case 9:
+			mHz = 2452;
+			break;
+			
+		case 10:
+			mHz = 2457;
+			break;
+			
+		case 11:
+			mHz = 2462;
+			break;
+			
+		case 12:
+			mHz = 2467;
+			break;
+			
+		case 13:
+			mHz = 2472;
+			break;
+			
+		case 16:
+			mHz = 5080;
+			break;
+			
+		case 34:
+			mHz = 5170;
+			break;
+			
+		case 36:
+			mHz = 5180;
+			break;
+			
+		case 38:
+			mHz = 5190;
+			break;
+			
+		case 40:
+			mHz = 5200;
+			break;
+		case 42:
+			mHz = 5210;
+			break;
+			
+		case 44:
+			mHz = 5220;
+			break;
+			
+		case 46:
+			mHz = 5230;
+			break;
+			
+		case 48:
+			mHz = 5240;
+			break;
+			
+		case 50:
+			mHz = 5250;
+			break;
+			
+		case 52:
+			mHz = 5260;
+			break;
+			
+			
+		case 56:
+			mHz = 5280;
+			break;
+			
+		case 60:
+			mHz = 5300;
+			break;
+			
+		case 64:
+			mHz = 5320;
+			break;
+			
+		case 70:
+			mHz = 5350;
+			break;
+			
+		case 94:
+			mHz = 5470;
+			break;
+
+			
+		case 100:
+			mHz = 5500;
+			break;
+			
+		case 104:
+			mHz = 5520;
+			break;
+			
+		case 108:
+			mHz = 5540;
+			break;
+			
+			
+		case 112:
+			mHz = 5560;
+			break;
+			
+		case 116:
+			mHz = 5580;
+			break;
+			
+		case 120:
+			mHz = 5600;
+			break;
+			
+		case 124:
+			mHz = 5620;
+			break;
+			
+		case 128:
+			mHz = 5640;
+			break;
+			
+			
+		case 132:
+			mHz = 5660;
+			break;
+			
+			
+		case 136:
+			mHz = 5680;
+			break;
+			
+			
+		case 140:
+			mHz = 5700;
+			break;
+			
+			
+		case 145:
+			mHz = 5725;
+			break;
+			
+			
+		case 149:
+			mHz = 5745;
+			break;
+			
+			
+		case 153:
+			mHz = 5765;
+			break;
+			
+			
+		case 157:
+			mHz = 5785;
+			break;
+			
+		case 161:
+			mHz = 5805;
+			break;
+			
+			
+		case 165:
+			mHz = 5825;
+			break;
+			
+		case 183:
+			mHz = 4915;
+			break;
+			
+		case 184:
+			mHz = 4920;
+			break;
+			
+			
+		case 185:
+			mHz = 4925;
+			break;
+			
+			
+			
+		case 187:
+			mHz = 4935;
+			break;
+			
+			
+			
+		case 188:
+			mHz = 4940;
+			break;
+			
+			
+		case 189:
+			mHz = 4945;
+			break;
+			
+			
+		case 192:
+			mHz = 4960;
+			break;
+		case 196:
+			mHz = 4980;
+			break;
+			
+			
+			default:
+				
+		}
+		return mHz;
 	}
 	
 	// List<A_B_C> 需要把这个 创建了三个 JavaBean
