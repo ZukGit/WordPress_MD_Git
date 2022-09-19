@@ -4743,10 +4743,15 @@ public class G2_ApplyRuleFor_TypeFile {
 					// &lt;==<    &gt;==> 的转换
 					fixedLineStr = clear_lt_gt_tag(fixedLineStr);
 					
+					// amp; 转为 空格
+					fixedLineStr = clear_amp_tag(fixedLineStr);
+				
+					
 					fixedMD_StrList.add(fixedLineStr);
 				}
 
-				md_file = new File(html_2_mdfile_dir + File.separator + md_title + ".md");
+				// 2022-09-13-
+				md_file = new File(html_2_mdfile_dir + File.separator +getYear_Month_Day()+"-"+ md_title + ".md");
 
 				initHeadList(md_title); // 初始化 mdHeadList
 
@@ -4873,7 +4878,8 @@ public class G2_ApplyRuleFor_TypeFile {
 		void initHeadList(String title) {
 
 			mdHeadList.add("---");
-			if (title.startsWith("unknow")) {
+			mdHeadList.add("layout: post");
+			if (title == null || title.startsWith("unknow")  ) {
 				mdHeadList.add("title: " + "unknow");
 
 			} else {
@@ -4882,8 +4888,8 @@ public class G2_ApplyRuleFor_TypeFile {
 			mdHeadList.add("category: html2md");
 			mdHeadList.add("tags: html2md");
 			mdHeadList.add("keywords: ");
-			mdHeadList.add("typora-root-url:..\\..\\..\\");
-			mdHeadList.add("typora-copy-images-to:..\\..\\..\\public\\zimage\\html2md");
+			mdHeadList.add("typora-root-url: ..\\..\\..\\");
+			mdHeadList.add("typora-copy-images-to: ..\\..\\..\\public\\zimage\\html2md");
 			mdHeadList.add("---");
 
 			mdHeadList.add("\n");
@@ -4901,7 +4907,7 @@ public class G2_ApplyRuleFor_TypeFile {
 			String shellPath = shellDirFile.getAbsolutePath();
 
 			html_md_timestamp_dirname = "html_2_md" + "_" + time_stamp_str;
-			md_title = "unknow_" + time_stamp_str;
+			md_title = "unknow" + time_stamp_str;
 
 			html_md_timestamp_dir = new File(shellPath + File.separator + html_md_timestamp_dirname);
 			html_zimage_dir = new File(
@@ -5027,6 +5033,17 @@ public class G2_ApplyRuleFor_TypeFile {
 		}
 		// &lt;==<    &gt;==> 的转换
 //		fixedLineStr = clear_lt_gt_tag(fixedLineStr);
+		
+
+		
+		// 特殊字符串的处理
+		String clear_amp_tag(String rawLine) {
+			String fixedLineStr = new String(rawLine);
+			fixedLineStr = fixedLineStr.replace("amp;", "");
+
+
+			return fixedLineStr;
+		}
 		
 		// 特殊字符串的处理
 		String clear_lt_gt_tag(String rawLine) {
@@ -5312,7 +5329,7 @@ public class G2_ApplyRuleFor_TypeFile {
 
 				fixedLineStr = fixedLineStr.replace(h_tag_innder, "");
 				fixedLineStr = fixedLineStr.replace("</h1>", "");
-				fixedLineStr = "# " + fixedLineStr;
+				fixedLineStr = "## " + fixedLineStr;
 			}
 
 			if (fixedLineStr.contains("<h2") && fixedLineStr.contains("</h2>")) {
@@ -5320,7 +5337,7 @@ public class G2_ApplyRuleFor_TypeFile {
 
 				fixedLineStr = fixedLineStr.replace(h_tag_innder, "");
 				fixedLineStr = fixedLineStr.replace("</h2>", "");
-				fixedLineStr = "## " + fixedLineStr;
+				fixedLineStr = "### " + fixedLineStr;
 			}
 
 			if (fixedLineStr.contains("<h3") && fixedLineStr.contains("</h3>")) {
@@ -5328,7 +5345,7 @@ public class G2_ApplyRuleFor_TypeFile {
 
 				fixedLineStr = fixedLineStr.replace(h_tag_innder, "");
 				fixedLineStr = fixedLineStr.replace("</h3>", "");
-				fixedLineStr = "### " + fixedLineStr;
+				fixedLineStr = "#### " + fixedLineStr;
 			}
 
 			if (fixedLineStr.contains("<h4") && fixedLineStr.contains("</h4>")) {
@@ -5336,7 +5353,7 @@ public class G2_ApplyRuleFor_TypeFile {
 
 				fixedLineStr = fixedLineStr.replace(h_tag_innder, "");
 				fixedLineStr = fixedLineStr.replace("</h4>", "");
-				fixedLineStr = "#### " + fixedLineStr;
+				fixedLineStr = "##### " + fixedLineStr;
 			}
 
 			if (fixedLineStr.contains("<h5") && fixedLineStr.contains("</h5>")) {
@@ -5344,7 +5361,7 @@ public class G2_ApplyRuleFor_TypeFile {
 
 				fixedLineStr = fixedLineStr.replace(h_tag_innder, "");
 				fixedLineStr = fixedLineStr.replace("</h5>", "");
-				fixedLineStr = "##### " + fixedLineStr;
+				fixedLineStr = "###### " + fixedLineStr;
 			}
 
 			if (fixedLineStr.contains("<h6") && fixedLineStr.contains("</h6>")) {
@@ -5352,7 +5369,7 @@ public class G2_ApplyRuleFor_TypeFile {
 
 				fixedLineStr = fixedLineStr.replace(h_tag_innder, "");
 				fixedLineStr = fixedLineStr.replace("</h6>", "");
-				fixedLineStr = "##### " + fixedLineStr;
+				fixedLineStr = "###### " + fixedLineStr;
 			}
 
 			return fixedLineStr;
@@ -19802,7 +19819,16 @@ public class G2_ApplyRuleFor_TypeFile {
 		return date;
 	}
 
+	static String getYear_Month_Day() {
+
+		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");// 设置日期格式
+		String date = df.format(new Date());
+		return date;
+	}
+	
 
 
+	
+	
 
 }
