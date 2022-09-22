@@ -1667,7 +1667,7 @@ public class I9_TextRuleOperation {
 					" 明文索引["+i+"]_sub["+pwdList.size()+"]_all["+wp2_password_dictionary_alllist.size()+"]="+password_temp_item 
 							+"  明文来自于"+Rule_53_wp2_password_dictionary_file.getAbsolutePath()+" "+ 
 							print_inteval_time+ "次密码尝试花销:" + (time_distance_long / 1000) + "秒 " + 
-							i+ "位密码破解以花销:" + (time_distance_long / 1000) + "秒 " + 
+							i+ "位密码破解以花销:" + (time_alltake_long / 1000) + "秒 " + 
 
 							
 							"");
@@ -3293,10 +3293,11 @@ public class I9_TextRuleOperation {
 
 			wifi_80211_wireless_management_beacon_bytes = beginIndex_endIndex_byteArr(Packet_Data_bytes,
 					wifi_sequence_frame_number_end_position_2bytes + 1, Packet_Data_bytes.length - 4 - 1); // 最后有四个
-																											// Frame
-																											// Check
-																											// Squeue
-
+																										// Squeue
+// 当前查询 子byte数组     beginIndex=42  endIndex=39  cur_byte_length=-2异常  请检查!  java.lang.NullPointerException
+			if(wifi_80211_wireless_management_beacon_bytes == null) {
+				return ;   // 
+			}
 			System.out.println("wifi_80211_wireless_management_beacon_bytes.length = "
 					+ wifi_80211_wireless_management_beacon_bytes.length);
 
@@ -3501,6 +3502,10 @@ public class I9_TextRuleOperation {
 					wifi_logical_link_conteolflag_begin_position_8bytes,
 					wifi_logical_link_conteolflag_end_position_8bytes);
 
+			if(wifi_logical_link_conteolflag_8bytes == null) {
+				
+				return;
+			}
 			byte[] wifi_logical_link_type_2bytes_temp = {
 					wifi_logical_link_conteolflag_8bytes[wifi_logical_link_conteolflag_8bytes.length - 1],
 					wifi_logical_link_conteolflag_8bytes[wifi_logical_link_conteolflag_8bytes.length - 2] };
@@ -4020,7 +4025,7 @@ public class I9_TextRuleOperation {
 		byte[] beginIndex_endIndex_byteArr(byte[] all_frame_byte, int beginIndex, int endIndex) {
 			int cur_byte_length = endIndex - beginIndex + 1;
 			if (cur_byte_length <= 0) {
-				System.out.println("当前查询 子byte数组 	beginIndex=" + beginIndex + "  endIndex=" + endIndex
+				System.out.println("package_number="+package_number+"  当前查询 子byte数组 	beginIndex=" + beginIndex + "  endIndex=" + endIndex
 						+ "  cur_byte_length=" + cur_byte_length + "异常  请检查!");
 				return null;
 			}
