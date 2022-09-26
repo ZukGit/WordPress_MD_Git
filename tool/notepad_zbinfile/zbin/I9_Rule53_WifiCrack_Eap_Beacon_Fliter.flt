@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<filters>
+	<filterobj clsid="{22353029-A733-4FCC-8AC0-782DA33FA464}">
+		<filter id="279" name="EAP" comment="EAP" color="0" group="">
+			<rootnode clsid="{F4342DAD-4A56-4ABA-9436-6E3C30DAB1C8}">
+				<filternode inverted="0" comment="">
+					<protocol class="1" type="9" data="40380000" slicetoheader="0"/>
+				</filternode>
+			</rootnode>
+		</filter>
+	</filterobj>
+	<filterobj clsid="{22353029-A733-4FCC-8AC0-782DA33FA464}">
+		<filter id="281" name="Beacon" comment="" color="0" group="">
+			<rootnode clsid="{F4342DAD-4A56-4ABA-9436-6E3C30DAB1C8}">
+				<filternode inverted="0" comment="">
+					<protocol class="1" type="9" data="E2000000" slicetoheader="0"/>
+				</filternode>
+			</rootnode>
+		</filter>
+	</filterobj>
+</filters>
+

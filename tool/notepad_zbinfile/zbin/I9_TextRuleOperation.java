@@ -366,8 +366,13 @@ public class I9_TextRuleOperation {
 	 
 		System.out.println();
 		if (args != null) {
+			
 			for (int i = 0; i < args.length; i++) {
 				System.out.println("args[" + i + "] = " + args[i]);
+			}
+			
+			for (int i = 0; i < args.length; i++) {
+				System.out.println("exe_args[" + i + "] = " + args[i]);
 				if (i == 0) { // 第一个参数永远是 当前 shell的目录
 					CUR_Dir_1_PATH = args[i];
 				} else if (i == 1) { // 第二个参数是用来 对 当前功能进行分类使用的
@@ -739,6 +744,9 @@ public class I9_TextRuleOperation {
 
 	
 	// 破解 程序 执行的 order 顺序
+	public  static String Rule_53_Input_SSID_Str = "12345";
+	public  static String Rule_53_Input_BSSID_Str = "12345";
+	
 	public  static String Rule_53_Crack_Order_Default = "12345";
 	public  static int  namechar_2_3_areacode6_order1 = 1; // 名字+6位areacode   一千万数据
 	public  static int  digital_8_number_order2 = 2;  // 纯8位数字  一亿数据
@@ -768,6 +776,7 @@ public class I9_TextRuleOperation {
 		static final int Block_Tail_Total_Length = 4;
 
 		ArrayList<Wifi_Crack_Info_Struct> wifiCrackInfoList; // 可以进行 破解密码的 配对帧信息集合
+		ArrayList<String> wifiCrack_BSSID_InfoList;  // 用于 确保 wifiCrackInfoList 唯一 标识的集合 
 
 		ArrayList<Wifi_Frame_AbsCommon_Struct> wifiFrameStructList; // 帧解析的集合
 
@@ -785,7 +794,11 @@ public class I9_TextRuleOperation {
 
 		ArrayList<String> tel_number_begin_3num_list; // 电话号码开头的三位
 		ArrayList<String> tel_number_pre_5num_list; // 电话号码前面的七位
-
+		
+		String input_ssid_str ;   // 外部输入的 ssid 
+		byte[] input_ssid_str_bytearr;
+		String input_bssid_str ;   // 外部输入的 bssid 
+		byte[] input_bssid_str_bytearr;
 		PcaPng_Wifi_Frame_Analysis_Rule_53() {
 			super(53, false);
 			wifiFrameStructList = new ArrayList<Wifi_Frame_AbsCommon_Struct>();
@@ -793,6 +806,9 @@ public class I9_TextRuleOperation {
 			wifiBeaconFrameStructList = new ArrayList<Wifi_Frame_AbsCommon_Struct>();
 			wifiBeaconIdetifyList = new ArrayList<String>();
 			wifiCrackInfoList = new ArrayList<Wifi_Crack_Info_Struct>();
+			
+			wifiCrack_BSSID_InfoList  = new ArrayList<String>();
+			
 
 		}
 		
@@ -809,6 +825,12 @@ public class I9_TextRuleOperation {
 			
 			String threadcount_prefix = rule_index+"_"+"threadcount_" ;
 			
+			
+			String ssid_prefix = rule_index+"_"+"ssid_" ;
+			
+			
+			String bssid_prefix = rule_index+"_"+"bssid_" ;
+			
 			for (int i = 0; i < preParamList.size(); i++) {
 				String pre_param = preParamList.get(i);
 				
@@ -818,6 +840,48 @@ public class I9_TextRuleOperation {
 					System.out.println("Crack 的执行规则 序列为: "+ crackorder_preparam);
 					
 				}
+				
+				if(pre_param.startsWith(ssid_prefix)) {
+					String ssid_input = pre_param.replace(ssid_prefix, "").trim();
+					
+					ssid_input = ssid_input.replace("_z_", " ").trim();
+					
+					// 由于 输入的 ssid 可能 包含空格  , 传入空格会使得程序 当做另外的参数  使用 _z_ 来代替 空格
+					Rule_53_Input_SSID_Str = ssid_input;
+					System.out.println("Crack 外部输入的 SSID为 : "+ Rule_53_Input_SSID_Str);
+					input_ssid_str = Rule_53_Input_SSID_Str;
+					try {
+						input_ssid_str_bytearr = input_ssid_str.getBytes("UTF-8");
+					} catch (UnsupportedEncodingException e) {
+
+					    // TODO Auto-generated catch block
+
+					    e.printStackTrace();
+
+					    }
+			
+				}
+				
+				
+				if(pre_param.startsWith(bssid_prefix)) {
+					String bssid_input = pre_param.replace(bssid_prefix, "").trim();
+					Rule_53_Input_BSSID_Str = bssid_input;
+					if(Rule_53_Input_BSSID_Str.length() == 12) {
+		
+						System.out.println("Crack 外部输入的 BSSID为 : "+ Rule_53_Input_BSSID_Str);
+						input_bssid_str = Rule_53_Input_BSSID_Str;
+						
+						
+						input_bssid_str_bytearr = HexStrToBytes(input_bssid_str);
+						
+					}else {
+						System.out.println("Crack 外部输入的 BSSID为 : "+ bssid_input+"=["+bssid_input.length()+"]   长度不足12 无法组成6字节Mac地址 请检查!");
+					}
+					
+				}
+				
+				
+				
 				
 				
 				if(pre_param.startsWith(threadcount_prefix)) {
@@ -906,17 +970,21 @@ public class I9_TextRuleOperation {
 
 		@Override
 		String simpleDesc() {
-			String preparam_thread = " "+rule_index+"_"+"threadcount_100";
+			String preparam_thread = " "+rule_index+"_"+"threadcount_10";
 			String preparam_crackorder = " "+rule_index+"_"+"crackorder_2";
+			String preparam_ssid_input = " "+rule_index+"_"+"ssid_TP-LINK_4F6C90";
+			String preparam_bssid_input = " "+rule_index+"_"+"bssid_20dce64f6c90";
+			
+			
 			String preparam_selected = " "+rule_index+"_"+"frameno_2";
 			String preparam_ssidmod = " "+rule_index+"_"+"ssidmod_CMCC";
 			String preparam_bssidmod = " "+rule_index+"_"+"bssidmod_ffffffff";
 			StringBuilder preParamSB = new StringBuilder();
-			preParamSB.append(preparam_thread).append(preparam_crackorder).append(preparam_selected).append(preparam_ssidmod).append(preparam_bssidmod).append(preParamSB);
+			preParamSB.append(preparam_thread).append(preparam_crackorder).append(preparam_ssid_input).append(preparam_bssid_input).append(preparam_ssidmod).append(preparam_bssidmod).append(preParamSB);
 			String preparam_thread_tip = "thread【设置破解线程个数】";
 			String preparam_crackorder_tip = "crackorder【设置破解密码类型 1.名字+6位areacode 2.8位数字 3.姓氏+ 生日 4.9位数字 5.11位号码】";
-			String preparam_ssidmod_tip = "ssidmod【修改ssid为指定字符串】";
-			String preparam_selected_tip = "frameno【选中No序号帧】";
+			String preparam_ssidmod_tip = "ssid【ssid为指定字符串 _z_代替空格】";
+			String preparam_selected_tip = "bssid【热点的mac地址】";
 			
 			StringBuilder preParamSB_tip = new StringBuilder();
 			preParamSB_tip.append("                  ## "+preparam_thread_tip+preparam_crackorder_tip+preparam_selected_tip+preparam_ssidmod_tip);
@@ -1166,6 +1234,16 @@ public class I9_TextRuleOperation {
 
 			}
 
+			if (tel_number_pre_5num_list == null || tel_number_pre_5num_list.size() == 0) {
+				System.out.println("初始化 前5 位 电话号码数据 开始");
+				init_tel_number(); // 初始化 电话 号码
+				System.out.println("初始化 前5 位 电话号码数据 结束");
+			}
+			
+			
+			Wifi_Frame_AbsCommon_Struct temp_eap_frame_message1 = null;
+			Wifi_Frame_AbsCommon_Struct temp_eap_frame_message2 = null;
+			
 			for (int i = 0; i < wifiEapolFrameStructList.size(); i++) {
 				Wifi_Frame_AbsCommon_Struct wif_eapol_frame_struct = wifiEapolFrameStructList.get(i);
 				System.out.println("══════No." + wif_eapol_frame_struct.package_number + "═══════EAPOL[" + (i + 1) + "]"
@@ -1193,6 +1271,7 @@ public class I9_TextRuleOperation {
 					System.out.println("Step_2 EAPOL Transmitter_Address( STA_MAC )"
 							+ Arrays.toString(wif_eapol_frame_struct.getFrame_Transmitter_Address()));
 
+					temp_eap_frame_message2 = wif_eapol_frame_struct;
 				}
 
 				if (wif_eapol_frame_struct.getEAPOL_Handshake_Message_Number() == 1) {
@@ -1200,18 +1279,51 @@ public class I9_TextRuleOperation {
 					System.out.println("Step_1 WPA Key Nonce( AP_Nonce ):"
 							+ Arrays.toString(wif_eapol_frame_struct.getEAPOL_WPA_Key_Nonce_Bytes()));
 
+					temp_eap_frame_message1 = wif_eapol_frame_struct;
 				}
+				
+				
+				
+				if(input_ssid_str_bytearr != null && input_bssid_str_bytearr != null &&
+						temp_eap_frame_message2 !=  null && temp_eap_frame_message1 != null ) {
+					
+		
+					
+					if (Arrays.equals(input_bssid_str_bytearr, temp_eap_frame_message1.get_wifi_bssid_Bytes()) && 
+							Arrays.equals(input_bssid_str_bytearr, temp_eap_frame_message2.get_wifi_bssid_Bytes())){
+						
+						add_used_wpa2_password(wp2_password_dictionary_list);
+						Wifi_Crack_Info_Struct matchCrackInfo = new Wifi_Crack_Info_Struct(input_ssid_str_bytearr,
+								temp_eap_frame_message1, temp_eap_frame_message2, area_policy_code_list, wp2_password_dictionary_list,
+								tel_number_pre_5num_list);
+
+						if(!wifiCrack_BSSID_InfoList.contains(input_bssid_str)) {
+							wifiCrack_BSSID_InfoList.add(input_bssid_str);
+							wifiCrackInfoList.add(matchCrackInfo);
+						}
+			
+						
+						
+					}
+
+					
+				}
+				
+				
 
 			}
 			
+
+	
+			System.out.println("input_ssid_str_bytearr = "+Arrays.toString(input_ssid_str_bytearr));
+			System.out.println("input_bssid_str_bytearr = "+Arrays.toString(input_bssid_str_bytearr));
+			
+			System.out.println("temp_eap_frame_message1 = "+Arrays.toString(temp_eap_frame_message1.get_wifi_bssid_Bytes()));
+			System.out.println("temp_eap_frame_message2 = "+Arrays.toString(temp_eap_frame_message2.get_wifi_bssid_Bytes()));
+			
 			
 
-			if (tel_number_pre_5num_list == null || tel_number_pre_5num_list.size() == 0) {
-				System.out.println("初始化 前5 位 电话号码数据 开始");
-				init_tel_number(); // 初始化 电话 号码
-				System.out.println("初始化 前5 位 电话号码数据 结束");
-			}
-			
+		
 			
 			System.out.println(" WIFI Beacon 帧数量:"+ wifiBeaconFrameStructList.size());
 			for (int i = 0; i < wifiBeaconFrameStructList.size(); i++) {
@@ -1242,6 +1354,8 @@ public class I9_TextRuleOperation {
 						}
 
 					}
+					
+			
 
 				}
 
@@ -1253,11 +1367,21 @@ public class I9_TextRuleOperation {
 					Wifi_Crack_Info_Struct matchCrackInfo = new Wifi_Crack_Info_Struct(wif_beacon_frame_struct,
 							eap_frame_message1, eap_frame_message2, area_policy_code_list, wp2_password_dictionary_list,
 							tel_number_pre_5num_list);
+					
+					
+					if(!wifiCrack_BSSID_InfoList.contains(wif_beacon_frame_struct.get_wifi_ssid())) {
+						wifiCrack_BSSID_InfoList.add(wif_beacon_frame_struct.get_wifi_ssid());
+						wifiCrackInfoList.add(matchCrackInfo);
+					}
+					
 
-					wifiCrackInfoList.add(matchCrackInfo);
 				}
 
 			}
+			
+			
+			
+		
 
 			System.out.println("总共解析的帧数量如下: wifiFrameStructList.size() = " + wifiFrameStructList.size()
 					+ "  mFile_CurSor_Position=" + mFile_CurSor_Position);
@@ -1271,7 +1395,26 @@ public class I9_TextRuleOperation {
 			System.out.println("恭喜 当前搜索到的 可以暴力穷举破解的wifi 列表信息如下:");
 			for (int i = 0; i < wifiCrackInfoList.size(); i++) {
 				Wifi_Crack_Info_Struct crackWifiInfo = wifiCrackInfoList.get(i);
-				System.out.println("wifi_" + (i + 1) + "【" + crackWifiInfo.beacon_frame.get_wifi_ssid() + "】");
+				if(crackWifiInfo.beacon_frame != null) {
+					System.out.println("wifi_" + (i + 1) + "【" + crackWifiInfo.beacon_frame.get_wifi_ssid() + "】");
+				}else {
+					 String ssid_name_temp = "";
+
+					 try {
+						  ssid_name_temp = new String(crackWifiInfo.target_ssid_byte_arr,"UTF-8");
+					 }catch (UnsupportedEncodingException e) {
+
+						    // TODO Auto-generated catch block
+
+						    e.printStackTrace();
+
+						    }
+				
+					System.out.println("wifi_" + (i + 1) + "【" + ssid_name_temp +"】__【target_ssid_byte_arr("+ByteAsHexString(crackWifiInfo.target_ssid_byte_arr)+")"+ "(手动输入 SSID["+input_ssid_str+"]["+ByteAsHexString(input_ssid_str_bytearr)+"]  BSSID["+input_bssid_str+"]["+ByteAsHexString(input_bssid_str_bytearr)+"]) 】");
+
+					
+				}
+	
 
 			}
 
@@ -1280,8 +1423,13 @@ public class I9_TextRuleOperation {
 			System.out.println(success_crack_tip);		
 			for (int i = 0; i < wifiCrackInfoList.size(); i++) {
 				Wifi_Crack_Info_Struct crackWifiInfo = wifiCrackInfoList.get(i);
+				
+				
 				System.out.println("开始破解 当前搜索到的 可以暴力穷举破解wifi " + "wifi_" + (i + 1) + "【"
-						+ crackWifiInfo.beacon_frame.get_wifi_ssid() + "】");
+						+ new String(crackWifiInfo.target_ssid_byte_arr) + "】");
+				
+				
+				
 //    	crackWifiInfo.begin_wifi_crack();   // 10个线程 去搞 ? 
 				int all_thread_count = Rule_53_Thread_Count; // 当前用于运算的线程数量
 				
@@ -1336,6 +1484,7 @@ public class I9_TextRuleOperation {
 		Wifi_Frame_AbsCommon_Struct eap_frame_1; // 第一个 交互帧 含有 bssid(热点的mac地址)
 		Wifi_Frame_AbsCommon_Struct eap_frame_2; // 第一个 交互帧 含有 bssid(热点的mac地址)
 		Wifi_Frame_AbsCommon_Struct beacon_frame; // 热点beacon 帧 含有 bssid(热点的mac地址) 和 ssid
+		byte[] target_ssid_byte_arr ; //  外部输入的 ssid 的名称  字节数组
 
 		int thread_id;
 		int thread_count;
@@ -1456,9 +1605,19 @@ public class I9_TextRuleOperation {
 		}
 
 		Wifi_Crack_Info_Struct deep_clone(Wifi_Crack_Info_Struct crackInfo) {
-			Wifi_Crack_Info_Struct crack_clone = new Wifi_Crack_Info_Struct(crackInfo.beacon_frame,
-					crackInfo.eap_frame_1, crackInfo.eap_frame_2, crackInfo.area_policy_code_alllist,
-					crackInfo.wp2_password_dictionary_alllist, crackInfo.tel_code_pre5_alllist);
+			Wifi_Crack_Info_Struct crack_clone =  null ;
+			if(crackInfo.beacon_frame == null) {
+				
+				 crack_clone = new Wifi_Crack_Info_Struct(crackInfo.target_ssid_byte_arr,
+							crackInfo.eap_frame_1, crackInfo.eap_frame_2, crackInfo.area_policy_code_alllist,
+							crackInfo.wp2_password_dictionary_alllist, crackInfo.tel_code_pre5_alllist);
+			} else {
+				
+				 crack_clone = new Wifi_Crack_Info_Struct(crackInfo.beacon_frame,
+						crackInfo.eap_frame_1, crackInfo.eap_frame_2, crackInfo.area_policy_code_alllist,
+						crackInfo.wp2_password_dictionary_alllist, crackInfo.tel_code_pre5_alllist);
+			}
+
 			return crack_clone;
 
 		}
@@ -1540,12 +1699,46 @@ public class I9_TextRuleOperation {
 			all_char_list.add("\"");
 
 		}
+		
+		
+		Wifi_Crack_Info_Struct(byte[] ssid_byte, Wifi_Frame_AbsCommon_Struct eap1,
+				Wifi_Frame_AbsCommon_Struct eap2,
+
+				ArrayList<String> area_code_list, ArrayList<String> wpa2_pwd_list, ArrayList<String> tel_list) {
+			target_ssid_byte_arr = ssid_byte;
+	
+			eap_frame_1 = eap1;
+			eap_frame_2 = eap2;
+			wp2_password_dictionary_alllist = wpa2_pwd_list;
+			area_policy_code_alllist = area_code_list;
+			tel_code_pre5_alllist = tel_list;
+			pwd_8_begin_long = 0;
+			pwd_8_end_long = 99999999L;
+
+			pwd_9_begin_long = 0;
+			pwd_9_end_long = 999999999L;
+
+			pwd_10_begin_long = 0;
+			pwd_10_end_long = 9999999999L;
+
+			pwd_11_begin_long = 0;
+			pwd_11_end_long = 99999999999L;
+
+			YEAR_BEGIN_SEARCH_DEFAULT = 1949;
+			year_search_end = Integer.parseInt(getTimeStamp_YYYY());
+			year_search_begin = YEAR_BEGIN_SEARCH_DEFAULT;
+
+			init_all_char_list();
+
+		}
+		
 
 		Wifi_Crack_Info_Struct(Wifi_Frame_AbsCommon_Struct beacon, Wifi_Frame_AbsCommon_Struct eap1,
 				Wifi_Frame_AbsCommon_Struct eap2,
 
 				ArrayList<String> area_code_list, ArrayList<String> wpa2_pwd_list, ArrayList<String> tel_list) {
 			beacon_frame = beacon;
+			target_ssid_byte_arr = beacon_frame.get_wifi_ssid_Bytes();
 			eap_frame_1 = eap1;
 			eap_frame_2 = eap2;
 			wp2_password_dictionary_alllist = wpa2_pwd_list;
@@ -1573,7 +1766,8 @@ public class I9_TextRuleOperation {
 
 		void begin_wifi_crack() {
 
-			byte[] ssid_bytes_1 = beacon_frame.get_wifi_ssid_Bytes();
+//			byte[] ssid_bytes_1 = beacon_frame.get_wifi_ssid_Bytes();
+			byte[] ssid_bytes_1 = target_ssid_byte_arr;
 			byte[] ap_mac_bytes_2 = eap_frame_2.getFrame_Receiver_Address();
 			byte[] sta_mac_bytes_3 = eap_frame_2.getFrame_Transmitter_Address();
 
@@ -2169,8 +2363,8 @@ public class I9_TextRuleOperation {
 				byte[] mic_data_bytes = hmac_sha1(step2_data_bytes_fixed, ptk_data_16bytes, 16);
 
 				if (Arrays.equals(mic_data_bytes, mic_bytes)) {
-					success_crack_tip = "thread[" + thread_id + "][" + thread_count + "]  使用明文密码 " + password_temp_item
-							+ " 暴力破解 Wifi网络(" + String.valueOf(getChars((ssid_bytes))) + ") 匹配成功!"+"\n"
+					success_crack_tip = "\n恭喜成功破解\nthread[" + thread_id + "][" + thread_count + "]  使用明文密码 _______" + password_temp_item
+							+ "_______ 暴力破解 Wifi网络(_______" + String.valueOf(getChars((ssid_bytes))) + "_______) 匹配成功!"+"\n"
 							+zbinPath+File.separator+"I9_wpa2_crack_rule53_pwd_dictionary.txt    该文件包含用户自定义明文密码";
 
 					System.out.println("thread[" + thread_id + "][" + thread_count + "]  使用明文密码 " + password_temp_item
@@ -6656,6 +6850,29 @@ public class I9_TextRuleOperation {
 					} else {
 						System.out.println("解析出的 base64_jiami_url=[" + base64_jiami_url + "]  尝试解密base64");
 
+						
+						
+// 当前寻找到的 base64_url = 
+// aHR0cDovL3YzLXhnLXdlYi1wYy5peGlndWEuY29tLzc4ZGUwNTEzOTI4MWE4NjAwNGI4NDA0Njc5ZGI4ZWRmLzYzMzEyMDJmL3ZpZGVvL3Rvcy9jbi90b3MtY24tdmUtNC8wNmEyMGNhZGZmN2I0YzE4YmU2NmIwMmU2Y2RiM2M2Yi8
+// \u002FYT0xNzY4JmNoPTAmY3I9MCZkcj0wJmVyPTAmY2Q9MCU3QzAlN0MwJTdDMCZjdj0xJmJyPTMwMDQmYnQ9MzAwNCZjcz0wJmRzPTQmZnQ9ZUluSjcyMkhqd2s5S3lCTXlxc1ExLUM1cVNZSGF+UHVEdEc3WHZsVlJxOCZtaW1lX3R5cGU9dmlkZW9fbXA0JnFzPTAmcmM9TlRnMk9EcGtPenRrTkdZOE9HYzRNMEJwTTNrNU5XcDFjSE40TlRNek5EY3pNMEJlWUdNME1qTmZOalF4TW1Jd05HTTFZU05tWDJCalkyTTBhREpnTFMxa0xTOXpjdyUzRCUzRCZsPTIwMjIwOTI2MTA0MDUxMDEwMjEyMTM4MDUxMDQyNjhEMTY=
+// 需要 判断 当前的 解析的 url 是否 包含 u001  u002   如果包含  那么  需要 截取 
+						
+						
+						if(base64_jiami_url.contains("\\u002")) {
+							System.out.println("当前 base-url 包含 \\u002 间隔字符");
+							
+							base64_jiami_url = base64_jiami_url.substring(0,base64_jiami_url.indexOf("\\u002"));
+							
+						}
+						
+						if(base64_jiami_url.contains("\\u001")) {
+							System.out.println("当前 base-url 包含 \\u001 间隔字符");
+							
+							base64_jiami_url = base64_jiami_url.substring(0,base64_jiami_url.indexOf("\\u001"));
+							
+						}
+						System.out.println(" base64_jiami_url=[" + base64_jiami_url + "]  开始尝试解密base64");
+						
 						jiemi_base64_url = jiemi_decryptBASE64(base64_jiami_url);
 						System.out.println();
 
@@ -12673,7 +12890,7 @@ public class I9_TextRuleOperation {
 							
 						   String[]	 preparam = preparam_item.split("_");
 						   boolean is3segment = false;
-						   if(preparam != null && preparam.length == 3) {
+						   if(preparam != null && preparam.length >= 3) {  // 我擦   53_ssid_TP-LINK_4F6C90  有 四个  后面的词组包含下划线
 							   is3segment = true;
 						   }
 						   
@@ -13704,7 +13921,7 @@ public class I9_TextRuleOperation {
 			
 			   String[]	 preparamArr = pre_param_item.split("_");
 			   boolean is3segment = false;
-			   if(preparamArr != null && preparamArr.length == 3) {
+			   if(preparamArr != null && preparamArr.length >= 3) {
 				   is3segment = true;
 			   }
 			   
@@ -20324,6 +20541,22 @@ public class I9_TextRuleOperation {
 		return paddingStr + numStr;
 	}
 
+
+	public static  String  ByteAsHexString(byte [] byteArray) {        
+		StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < byteArray.length; i++) {
+            String hex = Integer.toHexString(byteArray[i] & 0xFF);
+            if (hex.length() == 1) {
+                hex = '0' + hex;
+            }
+
+            sb.append(hex.toLowerCase()+" ");
+        }
+        return sb.toString();
+    
+    }
+	
+	
 	// List<A_B_C> 需要把这个 创建了三个 JavaBean
 // A , B  ,C  这三个 对象的 execute()方法 会执行  parseMap();  zzj
 //         而不会执行  parseMap()  的  generationBean.writeList(clz);  去 生成
