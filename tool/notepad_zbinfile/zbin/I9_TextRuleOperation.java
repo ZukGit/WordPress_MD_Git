@@ -8529,7 +8529,7 @@ public class I9_TextRuleOperation {
 			batList.add("@echo off");
 			batList.add("Setlocal ENABLEDELAYEDEXPANSION");
 			batList.add("@javac -cp " + classPathStr
-					+ "  -Xlint:unchecked -encoding UTF-8 %userprofile%\\Desktop\\zbin\\" + javaFile.getName());
+					+ "  -Xlint:unchecked -encoding UTF-8 -d %userprofile%\\Desktop\\zbin  %userprofile%\\Desktop\\zbin\\" + javaFile.getName());
 			batList.add("@java -cp " + classPathStr + "  -Dfile.encoding=UTF-8   " + javaNameNoPoint
 					+ "  %1  %2  %3 %4  %5  %6  %7  %8  %9 ");
 
@@ -8573,9 +8573,9 @@ public class I9_TextRuleOperation {
 			shList.add("classes=$DIR");
 			shList.add(classPathStr);
 			shList.add("");
-			shList.add("javac -classpath $classpath -encoding UTF-8 $HOME/Desktop/zbin/" + javaFile.getName());
+			shList.add("javac -classpath $classpath -encoding UTF-8  -d $HOME\\Desktop\\zbin   $HOME/Desktop/zbin/" + javaFile.getName());
 			shList.add("@javac -cp " + jarSB.toString()
-					+ "  -Xlint:unchecked -encoding UTF-8 %userprofile%\\Desktop\\zbin\\" + javaFile.getName());
+					+ "  -Xlint:unchecked -encoding UTF-8  -d $HOME\\Desktop\\zbin  %userprofile%\\Desktop\\zbin\\" + javaFile.getName());
 			shList.add("java  -classpath $classpath " + "  -Xmx10240m -Xms10240m -Xmn5120m   -Dfile.encoding=UTF-8   "
 					+ javaNameNoPoint + " " + " $1 $2 $3 $4 $5 $6 $7 $8 $9 ");
 
