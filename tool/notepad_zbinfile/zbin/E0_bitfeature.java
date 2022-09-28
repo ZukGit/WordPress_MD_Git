@@ -5,6 +5,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 
 public class E0_bitfeature {
@@ -162,9 +163,22 @@ public class E0_bitfeature {
     static void toCheck64BitFeature(long flag) {
         System.out.println();
         System.out.println();
+        String OxHexString = getOxHexString(flag);
+        byte[] flagByteArr = null ;
+        if(OxHexString.startsWith("0x") && OxHexString.length() <= 4) {
+        	String hexString = OxHexString.replace("0x", "");
+            flagByteArr =	hexStringToByteArray(hexString);
+        }
+        String byte2Int_Tip = "";
         System.out.println("#######=============解析   flag=" + getOxHexString(flag) + "   Begin ===========####");
+        if( flagByteArr != null ) {
+//        System.out.println("(byte["+OxHexString+"] 转 int 10进制):" + Arrays.toString(flagByteArr));   	
+        byte2Int_Tip = "(byte["+OxHexString+"]_转_int_10进制):" + Arrays.toString(flagByteArr);
+        }
         System.out.println("当前解析能力标记位Long(       16进制):" + getOxHexString(flag));
-        System.out.println("当前解析能力标记位Long( 有符号10进制):" + flag   +"                 (无符号10进制):"+Long.toUnsignedString(flag) )  ;
+        
+        
+        System.out.println("当前解析能力标记位Long( 有符号10进制):" + flag   +"                 (无符号10进制):"+Long.toUnsignedString(flag) + "          "+ byte2Int_Tip)  ;
         System.out.println("当前解析能力标记位Long( 未补位 2进制):" + Long.toBinaryString(flag));
         System.out.println("当前解析能力标记位Long( 补位   2进制):" + get64bitString(flag));
         System.out.println("=============解析能力如下===========");
@@ -587,7 +601,7 @@ public class E0_bitfeature {
                 
          
                 
-         		System.out.println("解析方式2_(pcapng方式): "+"时间戳:"+time_stamp_style2_str+"  秒="+(long_time_stamp/1000000L)+"   毫秒="+long_time_stamp_ws+"  long="+long_time_stamp+" "+tip);
+         		System.out.println("解析方式2_(pcapng方式): "+"时间戳:"+time_stamp_style2_str+"  秒="+(long_time_stamp/1000000L)+"   微妙"+long_time_stamp_ws+"  long="+long_time_stamp+" "+tip);
 
             	
             }else {
@@ -762,6 +776,9 @@ public class E0_bitfeature {
 	}
 
 	public static byte[] hexStringToByteArray(String hexString) {
+		if(hexString.length()% 2 != 0 ) {
+			hexString = "0"+hexString;
+		}
 		int length = hexString.length();
 		byte[] buffer = new byte[length / 2];
 

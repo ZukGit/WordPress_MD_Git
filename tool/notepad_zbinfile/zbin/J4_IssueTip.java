@@ -1,4 +1,5 @@
 import java.io.File;
+import java.util.Arrays;
 
 public class J4_IssueTip {
     static String OneLine_Pre = "\n════════";
@@ -56,6 +57,8 @@ public class J4_IssueTip {
         GPS_NMEA_Tip();
         ADB_pull_Tip();
         ADB_Input_Tip();
+        WIFI_SAR_Tip();
+        
         Other_Tip();
   
         Pass_Tip();
@@ -237,6 +240,21 @@ public class J4_IssueTip {
         GPS_Log_isLoggable();
       
     }
+    
+    
+    
+    
+    static void  WIFI_SAR_Tip(){
+        System.out.println("════════════════════════ WIFI_SAR 相关命令  ════════════════════════════════════════════════");
+        System.out.println("___打开_WIFI_SAR的Log开关");
+        System.out.println("adb root && adb remount && adb shell setprop ro.debuggable 1 && adb shell setprop persist.radio.ctbk_log 5 && adb shell setprop persist.vendor.radio.ctbk_log 5 && adb shell setprop persist.radio.adb_log_on 1 ​ &&  adb reboot");
+        System.out.println();
+        System.out.println("___打印_WIFI_SAR的Log");
+        System.out.println("adb logcat | grep -E \"SARCTRL|MDMCTBK\"");
+    }
+
+    
+    
 
     static void  ADB_Input_Tip(){
         System.out.println("════════════════════════ adb 命令 输入字符 ════════════════════════════════════════════════");
