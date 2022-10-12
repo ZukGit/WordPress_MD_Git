@@ -563,7 +563,143 @@ public class I9_TextRuleOperation {
 		// 检测当前的 txt文件 只 保留 url 内容 , 并 对这些 内容 进行 排序 在 temp 中 打印出来
 		CUR_RULE_LIST.add(new Analysis_URI_IN_Txt_Download_DouYinMP4_Rule_55());
 
+		
+		// 在当前的 md 文件中 把 # 号 里面 转为 # 1.   ## --> ## 2.   ###### --> ###### 6.
+		CUR_RULE_LIST.add(new MD_File_Head_JingHao_AddIndex_Rule_56());
+		
 	}
+	
+	
+	class MD_File_Head_JingHao_AddIndex_Rule_56 extends Basic_Rule {
+
+
+		MD_File_Head_JingHao_AddIndex_Rule_56() {
+			super(56, false);
+
+		}
+
+		// 1. 完成参数的 自我客制化 实现 checkParamsOK 方法
+
+		// 2. 对应的逻辑方法 实现方法 applyOperationRule
+
+		@Override
+		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
+				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+			for (int i = 0; i < curInputFileList.size(); i++) {
+				File fileItem = curInputFileList.get(i);
+				if(!fileItem.getName().toLowerCase().endsWith(".md")) {   // 只对  md 文件操作
+					continue;
+				}
+				ArrayList<String> contentList = ReadFileContentAsList(fileItem);
+				ArrayList<String> fixedStrArr = Make_JingHao_Add_Index(contentList);
+				writeContentToFile(I9_Temp_Text_File, fixedStrArr);
+				NotePadOpenTargetFile(I9_Temp_Text_File.getAbsolutePath());
+				System.out.println("rule_"+rule_index+" -> 把当前文件加入 Head# 井号 添加索引   File=" + fileItem.getAbsolutePath());
+			}
+			System.out.println("rule_"+rule_index+" -> 把当前文件加入 Head# 井号 添加索引  执行完成" );
+			return super.applyOperationRule(curFileList, subFileTypeMap, curDirList, curRealFileList);
+		}
+		
+		ArrayList<String> Make_JingHao_Add_Index(ArrayList<String>  contentList){
+			ArrayList<String> addJingHaoList  = new ArrayList<String>();
+			
+			for (int i = 0; i < contentList.size(); i++) {
+				String one_line_str = contentList.get(i);
+				if(one_line_str.startsWith("#")) {
+					
+					String new_line_str = operation_add_JingHao_Index(one_line_str);
+					addJingHaoList.add(new_line_str);
+					continue;
+				}
+				
+				addJingHaoList.add(one_line_str);
+				
+			}
+			
+			
+			return addJingHaoList;
+			
+			
+		}
+		
+		
+		String operation_add_JingHao_Index(String rawHeadStr) {
+			String headLine =  rawHeadStr;
+			String clear_jing_str = headLine.replace("#", "").trim();
+			
+			System.out.println("rawLine = "+rawHeadStr);
+			if(clear_jing_str.startsWith("1_")) {
+				clear_jing_str = clear_jing_str.replace("1_","");
+			} else		if(clear_jing_str.startsWith("2_")) {
+				clear_jing_str = clear_jing_str.replace("2_","");
+			} else		if(clear_jing_str.startsWith("3_")) {
+				clear_jing_str = clear_jing_str.replace("3_","");
+			} else		if(clear_jing_str.startsWith("4_")) {
+				clear_jing_str = clear_jing_str.replace("4_","");
+			} else		if(clear_jing_str.startsWith("5_")) {
+				clear_jing_str = clear_jing_str.replace("5_","");
+			} else		if(clear_jing_str.startsWith("6_")) {
+				clear_jing_str = clear_jing_str.replace("6_","");
+			}
+			
+			System.out.println("A1_clear_jing_str = "+clear_jing_str);
+			
+			  // 需要 处理 原始存在在  1.  2.  3.  4.  5.  6. 这样的情况
+
+			if(headLine.startsWith("######")) { // 6 
+				
+				headLine = "###### "+"6_"+clear_jing_str;
+				
+			} else 			if(headLine.startsWith("#####")) { // 5
+				headLine = "##### "+"5_"+clear_jing_str;
+				
+			}else 			if(headLine.startsWith("####")) { // 4
+				
+				headLine = "#### "+"4_"+clear_jing_str;
+			}else 			if(headLine.startsWith("###")) { // 3
+				
+				headLine = "### "+"3_"+clear_jing_str;
+			}else 			if(headLine.startsWith("##")) { // 2
+				headLine = "## "+"2_"+clear_jing_str;
+				
+			}else 			if(headLine.startsWith("#")) { // 1
+				headLine = "# "+"1_"+clear_jing_str;
+				
+			}
+			System.out.println("A2_headLine = "+headLine);
+
+			return headLine;
+			
+		}
+
+		@Override
+		String simpleDesc() {
+			return " 在当前的 md 文件中 把 # 号 里面 转为 # 1.  ##转为 ## 2. 添加顺序索引";
+		}
+
+		// 3. 如果当前 执行 错误 checkParams 返回 false 那么 将 打印这个函数 说明错误的可能原因
+		@Override
+		void showWrongMessage() {
+			System.out.println("当前 type 索引 " + rule_index + " 执行错误  可能是输入参数错误 请检查输入参数!");
+			System.out.println(" errorMsg = " + errorMsg);
+		}
+
+		// 4. 当前 rule的 说明 将会打印在 用户输入为空时的 提示语句！
+		@Override
+		String ruleTip(String type, int index, String batName, OS_TYPE curType) {
+			String itemDesc = "";
+			if (curType == OS_TYPE.Windows) {
+				itemDesc = batName.trim() + "  " + type + "_" + index + "    [索引 " + index + "]  描述:" + ""
+						+ simpleDesc();
+			} else {
+				itemDesc = batName.trim() + " " + type + "_" + index + "    [索引 " + index + "]  描述:" + ""
+						+ simpleDesc();
+			}
+
+			return itemDesc;
+		}
+	}
+	
 
 	class PcaPng_TXT_WifiFrame_ByteShow_Rule_52 extends Basic_Rule {
 
@@ -12929,7 +13065,8 @@ public class I9_TextRuleOperation {
 
 		
 		}
-
+		System.out.println();
+		System.out.println();
 		System.out.println("当前默认选中的 default_index_" + CUR_TYPE_INDEX);
 
 		String defaultSelectedStr = "【* 默认】";
@@ -12943,7 +13080,7 @@ public class I9_TextRuleOperation {
 			}
 			System.out.println(Cur_Bat_Name + curInfoitem);
 		}
-		
+		System.out.println();
 		System.out.println("当前默认选中的 default_index_" + CUR_TYPE_INDEX);
 		if(I9_PreParam_PropValue_List.size() == 0) {
 			System.out.println("当前预置参数列表为空! ");
