@@ -40,7 +40,7 @@ import com.spire.presentation.Presentation;
 import com.spire.presentation.ShapeType;
 import com.spire.presentation.TextFont;
 import com.spire.presentation.drawing.FillFormatType;
-
+import com.sun.mail.util.MailSSLSocketFactory;
 
 import net.jimmc.jshortcut.JShellLink;
 import net.sourceforge.pinyin4j.PinyinHelper;
@@ -81,7 +81,16 @@ import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.stream.FileImageInputStream;
 import javax.imageio.stream.ImageOutputStream;
+import javax.mail.internet.MimeBodyPart;
+import javax.mail.internet.MimeMessage;
 import javax.swing.*;
+
+import javax.mail.Authenticator;
+import javax.mail.PasswordAuthentication;
+import javax.mail.internet.MimeBodyPart;
+import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
+import com.sun.mail.util.MailSSLSocketFactory;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.pdfbox.io.MemoryUsageSetting;
@@ -388,7 +397,1074 @@ public class G2_ApplyRuleFor_TypeFile {
 
 		// 在 一个 android-studio apk 目录执行的 用于 克隆一个工程到同目录 但工程名称可选
 		realTypeRuleList.add(new Copy_APK_Product_ChangeProductName_Rule_53());
+		
+
+		
+		
+		realTypeRuleList.add(new Send_Email_TO_Dst_Rule_54());
+		
 	}
+
+	
+	class Send_Email_TO_Dst_Rule_54 extends Basic_Rule {
+
+		
+
+		
+		ArrayList<String> message_tip_list ;
+		
+	    // 0 只发送文字内容--本机信息等    
+		// 1--搭配 query_dir 发送本地对应目录的所有文件的字符串  
+		// 2--发送屏幕截图      
+		// 3--发送指定文件到附件  //  可以一起实现啊   0123  , 111 那么就只执行一个1  type_0123
+		String sendType = "0";   
+		String quChong_Type = "0";
+		
+		ArrayList<File> queryDirList ;   // 用户输入的多个需要查询所有文件的文件夹的目录
+		ArrayList<File> attatchFileList ;  //  可能包含 文件夹 以及 文件的路径 upfile_
+		ArrayList<WifiItem> wifiItemList = new ArrayList<WifiItem>();  // Wifi 相关的信息
+		
+		String dstemail = "";
+		String content_text = "";  // 邮件的内容
+
+		String subject_text = "";  // 主题
+
+		// 是否重复 一直发
+		boolean isLoop = false;
+		
+		int repeatcount = 1;   //  默认的发送次数 
+		
+		int interval = 1;   //  默认发送的间隔 秒为单位  默认1 秒
+		
+		
+		String mCurrentUserName = "null";
+		
+		
+		Send_Email_TO_Dst_Rule_54() {
+			super("#", 54, 4); //
+			attatchFileList = new ArrayList<File>();
+			queryDirList =  new ArrayList<File>();	
+			message_tip_list =  new ArrayList<String>();	
+		}
+
+		@Override
+		boolean initParamsWithInputList(ArrayList<String> inputParamList) {
+			// mdname_true // kaoyan_true gaokao_true
+
+			for (int i = 0; i < inputParamList.size(); i++) {
+				String paramItem_lower_trim = inputParamList.get(i);
+//				String paramItem_lower_trim = paramItem.toLowerCase().trim();
+
+				if (paramItem_lower_trim.startsWith("dst_")) {
+					dstemail = paramItem_lower_trim.replace("dst_","");
+				}
+
+				if (paramItem_lower_trim.startsWith("type_")) {  // type_012341 
+					String mSendtype =  paramItem_lower_trim.replace("type_","");  // 0 只发送文字内容   1--发送屏幕截图
+					
+					sendType = mSendtype;
+					
+//					if(isNumeric(mSendtype)) {  // .contain("0") .contain("1")   .contain("2")    .contain("3")  来判断是否有 
+//						sendType = mSendtype;
+//					}else {
+//						System.out.println("当前发送的 type_ 后缀 不是数字: 请检查! " + paramItem_lower_trim);
+//					}
+					
+				}
+
+
+				if (paramItem_lower_trim.startsWith("content_")) {
+					content_text =  paramItem_lower_trim.replace("content_","");  // 0 只发送文字内容   1--发送屏幕截图
+				}
+				
+				if (paramItem_lower_trim.startsWith("subject_")) {
+					subject_text =  paramItem_lower_trim.replace("subject_","");  // 0 只发送文字内容   1--发送屏幕截图
+				}
+				
+				if (paramItem_lower_trim.startsWith("loop_true")) {
+					isLoop = true;  // 0 只发送文字内容   1--发送屏幕截图
+				}
+	
+				if (paramItem_lower_trim.startsWith("repeatcount_")) {
+				String 	count_str =  paramItem_lower_trim.replace("repeatcount_",""); 
+				if(isNumeric(count_str)) {
+					repeatcount = Integer.parseInt(count_str);
+				}
+				
+				}
+				
+				if (paramItem_lower_trim.startsWith("interval_")) {
+				String 	interval_str =  paramItem_lower_trim.replace("interval_",""); 
+				if(isNumeric(interval_str)) {
+					interval = Integer.parseInt(interval_str);
+				}
+				
+				}
+				
+				
+				
+				
+				
+				if (paramItem_lower_trim.startsWith("query_")) {
+				String 	query_dir_path =  paramItem_lower_trim.replace("query_",""); 
+				File queryFile = new File(query_dir_path);
+				if(queryFile.exists() && queryFile.isDirectory()) {
+					queryDirList.add(queryFile);
+				}else {
+					System.out.println("paramItem_lower_trim 对应的 queryFile 不存在 ! -->"+paramItem_lower_trim);
+					
+					if(!queryFile.exists()) {
+						System.out.println("paramItem_lower_trim 对应的 queryFile 不存在 ! -->"+paramItem_lower_trim);
+						message_tip_list.add("参数["+paramItem_lower_trim+"]" +"对应的 queryFile 不存在 ! -->"+paramItem_lower_trim);
+					}else if(queryFile.isFile()) {
+						System.out.println("paramItem_lower_trim 对应的 upload_file  是文件夹 ! -->"+paramItem_lower_trim+" 无法上传 请检查");
+						message_tip_list.add("参数["+paramItem_lower_trim+"]" +"对应的 是文件  无法查询所有子文件 ! -->"+paramItem_lower_trim);
+						
+					}
+
+				}
+			  }
+				
+				
+				
+				if (paramItem_lower_trim.startsWith("upfile_")) {
+				String 	up_file_path =  paramItem_lower_trim.replace("upfile_",""); 
+				File upFile = new File(up_file_path);
+				if(upFile.exists() && upFile.isFile()) {
+					attatchFileList.add(upFile);
+				}else {
+					if(!upFile.exists()) {
+						System.out.println("paramItem_lower_trim 对应的 upload_file 不存在 ! -->"+paramItem_lower_trim);
+						message_tip_list.add("参数["+paramItem_lower_trim+"]" +"对应的 upload_file 不存在 ! -->"+paramItem_lower_trim);
+					}else if(upFile.isDirectory()) {
+						System.out.println("paramItem_lower_trim 对应的 upload_file  是文件夹 ! -->"+paramItem_lower_trim+" 无法上传 请检查");
+						message_tip_list.add("参数["+paramItem_lower_trim+"]" +"对应的 是文件夹  无法添加到附件 ! -->"+paramItem_lower_trim);
+						
+					}
+		
+				}
+			
+				}
+			
+			}
+			System.out.println("═══════════════════输入参数展示 Begin ══════════════════");
+
+			quChong_Type = calcul_QuChong_Type(sendType);
+			if(quChong_Type ==  null || "".equals(quChong_Type)) {
+				quChong_Type = "0";   // 默认 执行0 的操作
+			}
+			
+			ArrayList<String> infoList = getParamsInfoList();
+			for (int i = 0; i < infoList.size(); i++) {
+				System.out.println(infoList.get(i));
+			}
+			
+	
+			
+			System.out.println("═══════════════════输入参数展示 End ══════════════════");
+			
+		
+			// TODO Auto-generated method stub
+			return super.initParamsWithInputList(inputParamList);
+		}
+
+
+	    // 0 只发送文字内容--本机信息等    
+		// 1--搭配 query_dir 发送本地对应目录的所有文件的字符串  
+		// 2--发送屏幕截图      
+		// 3--发送指定文件到附件  //  可以一起实现啊   0123  , 111 那么就只执行一个1  type_0123
+		@Override
+		String simpleDesc() {
+
+			return "\n"+Cur_Bat_Name + " #_"+rule_index+"  dst_zukgit@foxmail.com  type_0  subject_Cmder测试  content_HelloWorld         //  给dst目的邮箱发送邮件 type=0 【0=打印简单信息 1=查询目录(query_)  2=发送截屏 3=发送附件(upload_)】   \n"
+					+ Cur_Bat_Name + "  #_"+rule_index+   " type_1  query_D/1A/221013    query_D/1A/221012     ###  把对应文件夹下的文件列表发送邮件  dst目的邮箱默认 foxmail  \n"
+					+ Cur_Bat_Name + "  #_"+rule_index+   " type_2      ###   截取当前电脑屏幕发送到邮箱   \n"
+					+ Cur_Bat_Name + "  #_"+rule_index+   " type_3  upfile_D/1A/221013/G2.bat  upfile_D/1A/123.txt     ###  把对应多个文件当作有邮箱附件发送  type=3   \n"
+					+ Cur_Bat_Name + "  #_"+rule_index+   " type_2   loop_true   ###   不断循环发送当前电脑屏幕截屏发送到邮箱   \n"
+					+ Cur_Bat_Name + "  #_"+rule_index+   " type_2   repeatcount_10 interval_30  ###   发送10个电脑屏幕截屏间隔为30秒发送到邮箱   \n"
+					+Cur_Bat_Name + " #_"+rule_index+"  dst_zukgit@foxmail.com  type_0123  subject_Cmder测试  content_HelloWorld         //   操作 0 1 2 3 一起执行   \n"
+					
+					+ ""
+					;
+		}
+		
+		
+
+		
+		@Override
+		ArrayList<File> applySubFileListRule4(ArrayList<File> curFileList,
+											  HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList,
+											  ArrayList<File> curRealFileList){
+		 
+			
+			char[] send_type_arr = quChong_Type.toCharArray();
+			
+			ArrayList<String> extraInfoList = new ArrayList<String>();
+			HashMap<File,String> imageFile_Desc_Map = new HashMap<File,String> ();
+			ArrayList<File> mParamAttatchFileList = new ArrayList<File>();
+			ArrayList<String> queryDirInfoList = new ArrayList<String>() ;  // 查询 列表的数据
+			
+
+			
+			
+			if(isLoop) {
+				repeatcount = 1000000 ;  // 重复 10000万次 已达到  无限 循环的目的
+			}
+			
+			for (int i = 0; i < repeatcount; i++) {
+				
+				extraInfoList.clear();
+				imageFile_Desc_Map.clear();
+ 				mParamAttatchFileList.clear();   //  要 上传 的 文件 本来 就不会重复 
+				
+			    // 0 只发送文字内容--本机信息等  时间戳 等简单的数据   
+				// 1--搭配 query_dir 发送本地对应目录的所有文件的字符串  
+				// 2--发送屏幕截图      
+				// 3--发送指定文件到附件  //  可以一起实现啊   0123  , 111 那么就只执行一个1  type_0123
+				for (int j = 0; j < send_type_arr.length; j++) {
+					String oneCharType = send_type_arr[j]+"";
+				
+					switch(oneCharType) {
+					case "0":
+						ArrayList<String> simple_info_List =  getSimpleInfoList();
+						if(simple_info_List != null) {
+							extraInfoList.addAll(simple_info_List);
+						}
+
+						break;
+
+					case "1":
+						
+						if(queryDirInfoList.size() == 0) {
+							
+							queryDirInfoList.add("═════════"+"QueryDir["+queryDirList.size()+"]"+" Begin ═════════");
+
+							  for (int k = 0; k < queryDirList.size(); k++) {
+								  File queryDir = queryDirList.get(k);
+									queryDirInfoList.add("═════════"+"QueryDir["+k+"]["+queryDirList.size()+"]"+"═════════");
+								  if(queryDir.exists() && queryDir.isDirectory()) {
+									  ArrayList<File> allSubFile = getAllSubFile(queryDir, "*");
+									  addQueryFileInfo(queryDir,queryDirInfoList,allSubFile,k,queryDirList.size());
+									  System.out.println("AA_ queryDir="+queryDir+"  queryDir.exists()="+queryDir.exists()+"    queryDir.isDirectory()="+ queryDir.isDirectory()+"  allSubFile.size()="+allSubFile.size());
+
+								  }else {
+									  
+									  System.out.println("BB_ queryDir="+queryDir+"  queryDir.exists()="+queryDir.exists()+"    queryDir.isDirectory()="+ queryDir.isDirectory());
+								  }
+								
+							}
+								queryDirInfoList.add("═════════"+"QueryDir["+queryDirList.size()+"]"+" End ═════════");
+						}
+						
+						
+						if(queryDirInfoList.size() != 0) {
+							
+						System.out.println("queryDirInfoList.size() = "+ queryDirInfoList.size());
+						
+						for (int k = 0; k < queryDirInfoList.size(); k++) {
+							System.out.println("query_file = " + queryDirInfoList.get(k));
+							
+						}
+							extraInfoList.addAll(queryDirInfoList);
+							
+						}
+				
+
+						break;
+						
+						
+					case "2":
+	                             
+					File screenShotFile = 	getPCScreenFile();
+					if(screenShotFile.exists()) {
+						imageFile_Desc_Map.put(screenShotFile, getTimeStampyyyyMMdd_HHmmss()+"_"+mCurrentUserName+"屏幕截图");
+					}else {
+						System.out.println("当前屏幕截图失败 screenShotFile="+ screenShotFile);
+					}
+
+						break;
+						
+					case "3":
+						mParamAttatchFileList.addAll(attatchFileList);
+
+						break;
+						
+						
+						default:
+							System.out.println("oneCharType = "+ oneCharType +"  没有执行规则!");
+					}
+
+				
+				}
+				
+				try {
+					System.out.println("═════════════["+i+"]["+repeatcount+"] 次发送邮件  interval="+interval+"秒");
+					send_email(dstemail, subject_text+"_repeat["+i+"]["+repeatcount+"]", content_text, extraInfoList, imageFile_Desc_Map, mParamAttatchFileList);
+					Thread.sleep(interval * 1000);
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+			}
+			System.out.println(" 次发送邮件 程序 执行 结束 ! ");
+			
+			return super.applySubFileListRule4(curFileList, subFileTypeMap, curDirList, curRealFileList);
+		}
+
+
+		
+		void addQueryFileInfo(File queryFile ,  ArrayList<String> fileInfoList  , ArrayList<File> allSubFile , int index , int count) {
+			if(allSubFile == null || allSubFile.size() == 0) {
+				
+				return ;
+			}
+			
+			fileInfoList.add("═════════QueryDir["+index+"]["+count+"]_"+queryFile.getAbsolutePath());
+			
+			for (int i = 0; i < allSubFile.size(); i++) {
+				File fileItem = allSubFile.get(i);
+				fileInfoList.add("file["+i+"]["+allSubFile.size()+"]__"+fileItem.getAbsolutePath());
+			}
+			fileInfoList.add("");
+		}
+		
+		ArrayList<String> getSimpleInfoList() {
+			ArrayList<String>  mSimpleInfoList = new 	ArrayList<String>();
+			
+			
+	        ArrayList<String> wifiInfoList =  getWifiInfoList();
+	        if(wifiInfoList != null && wifiInfoList.size() > 0) {
+		        mSimpleInfoList.add("________"+"Wifi_Info"+"________");
+		        mSimpleInfoList.addAll(wifiInfoList);
+		        mSimpleInfoList.add("");
+		        mSimpleInfoList.add("");
+	        }
+
+	        
+	        
+		        String osName = System.getProperties().getProperty("os.name").toLowerCase();
+
+		     
+		        Runtime r = Runtime.getRuntime();
+		        Properties props = System.getProperties();
+		
+		    
+		        Map<String, String> map = System.getenv();  // System.getenv().get("USERNAME")
+
+		        String userName = map.get("USERNAME");// 获取用户名
+		        mCurrentUserName = userName;
+		        String computerName = map.get("COMPUTERNAME");// 获取计算机名
+		        String userDomain = map.get("USERDOMAIN");// 获取计算机域名
+		        
+		    	ArrayList<String>  SystemInfoList = new 	ArrayList<String>();
+		    	
+		    	
+		
+		        SystemInfoList.add("操作系统OS:"+osName);
+		    	SystemInfoList.add("用户名:" + "【System.getenv().get(\"USERNAME\")" + "】" + userName);
+		    	SystemInfoList.add("计算机名:【System.getenv().get(\"COMPUTERNAME\")】" + computerName);
+		    	SystemInfoList.add("计算机域名:【System.getenv().get(\"USERDOMAIN\")\"】" + userDomain);
+		    	SystemInfoList.add("JVM可以使用的总内存:" + "【Runtime.getRuntime().totalMemory()】 " + r.totalMemory());  // 【Runtime.getRuntime().totalMemory()】
+		    	SystemInfoList.add("JVM可以使用的剩余内存:" + "【Runtime.getRuntime().freeMemory()】 " + r.freeMemory());
+		    	SystemInfoList.add("JVM可以使用的处理器个数:" + "【Runtime.getRuntime().availableProcessors()】 " + r.availableProcessors());
+		    	SystemInfoList.add("Java的运行环境版本:" + "【java.version】" + props.getProperty("java.version"));
+		    	SystemInfoList.add("Java的运行环境供应商:" + "【java.vendor】" + props.getProperty("java.vendor"));
+		    	SystemInfoList.add("Java供应商的URL:" + "【java.vendor.url】" + props.getProperty("java.vendor.url"));
+		    	SystemInfoList.add("Java的安装路径:" + "【java.home】" + props.getProperty("java.home"));
+		    	SystemInfoList.add("Java的虚拟机规范版本:" + "【java.vm.specification.version】" + props.getProperty("java.vm.specification.version"));
+		    	SystemInfoList.add("Java的虚拟机规范供应商:" + "【java.vm.specification.vendor】" + props.getProperty("java.vm.specification.vendor"));
+		    	SystemInfoList.add("Java的虚拟机规范名称:" + "【java.vm.specification.name】" + props.getProperty("java.vm.specification.name"));
+		    	SystemInfoList.add("Java的虚拟机实现版本:" + "【java.vm.version】" + props.getProperty("java.vm.version"));
+		    	SystemInfoList.add("Java的虚拟机实现供应商:" + "【java.vm.vendor】" + props.getProperty("java.vm.vendor"));
+		    	SystemInfoList.add("Java的虚拟机实现名称:" + "【java.vm.name】" + props.getProperty("java.vm.name"));
+		    	SystemInfoList.add("Java运行时环境规范版本:" + "【java.specification.version】" + props.getProperty("java.specification.version"));
+		    	SystemInfoList.add("Java运行时环境规范供应商:" + "【java.specification.vender】" + props.getProperty("java.specification.vender"));
+		    	SystemInfoList.add("Java运行时环境规范名称:" + "【java.specification.name】" + props.getProperty("java.specification.name"));
+		    	SystemInfoList.add("Java的类格式版本号:" + "【java.class.version】" + props.getProperty("java.class.version"));
+		    	SystemInfoList.add("Java的类路径:" + "【java.class.path】" + props.getProperty("java.class.path"));
+		    	SystemInfoList.add("加载库时搜索的路径列表:" + "【java.library.path】" + props.getProperty("java.library.path"));
+		    	SystemInfoList.add("默认的临时文件路径:" + "【java.io.tmpdir】" + props.getProperty("java.io.tmpdir"));
+		    	SystemInfoList.add("一个或多个扩展目录的路径:" + "【java.ext.dirs】" + props.getProperty("java.ext.dirs"));
+		    	SystemInfoList.add("操作系统的名称:" + "【os.name】" + props.getProperty("os.name"));
+		    	SystemInfoList.add("操作系统的构架:" + "【os.arch】" + props.getProperty("os.arch"));
+		    	SystemInfoList.add("操作系统的版本:" + "【os.version】" + props.getProperty("os.version"));
+		    	SystemInfoList.add("当前系统文件分隔符:" + "【file.separator】" + props.getProperty("file.separator"));
+		    	SystemInfoList.add("当前系统路径分隔符:" + "【path.separator】" + props.getProperty("path.separator"));
+		    	SystemInfoList.add("行分隔符:" + "【line.separator】" + props.getProperty("line.separator"));
+		    	SystemInfoList.add("用户的账户名称:" + "【user.name】" + props.getProperty("user.name"));
+		    	SystemInfoList.add("用户的主目录:" + "【user.home】" + props.getProperty("user.home"));
+		    	SystemInfoList.add("用户的Desktop目录:" + "【user.desktop】" + props.getProperty("user.desktop"));
+		    	SystemInfoList.add("用户的当前工作目录:" + "【user.dir】" + props.getProperty("user.dir"));
+		    	
+		    	
+		        mSimpleInfoList.add("________"+"System_Prop_Info"+"________");
+		    	for (int i = 0; i < SystemInfoList.size(); i++) {
+			        mSimpleInfoList.add("system["+i+"]["+SystemInfoList.size()+"]__"+SystemInfoList.get(i));
+				}
+		   
+		        mSimpleInfoList.add("");
+		        mSimpleInfoList.add("________"+"Java_Prop_Info"+"________");
+		
+		        Properties system_props = System.getProperties();
+		        Object[] keyObjs = System.getProperties().stringPropertyNames().toArray();
+
+		        for (int i = 0; i < keyObjs.length; i++) {
+		            String key = keyObjs[i] + "";
+		            String value = system_props.getProperty(key);
+		            mSimpleInfoList.add("Java_Property["+i+"]["+keyObjs.length+"]"+"【 " + key + "____" + value+"】");
+		        }
+		        
+		        mSimpleInfoList.add("________"+"Screen_Info"+"________");
+		        int width = getZScreenWeight();
+		        int high = getZScreenHeight();
+		        mSimpleInfoList.add("屏幕分辨率:" + width + "x" + high);
+		        mSimpleInfoList.add("屏幕宽:" + width);
+		        mSimpleInfoList.add("屏幕高:" + high);
+		        
+
+		        
+		
+		        
+		     
+			return mSimpleInfoList;
+		
+		}
+
+		ArrayList<String> getWifiInfoList(){
+			ArrayList<String>  wifiInfoList = new ArrayList<String>  ();
+			String osName = System.getProperties().getProperty("os.name").toLowerCase();
+		     File wifiLogFile = new File(System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin" + File.separator + "E2_WifiDetail.txt");
+
+	
+            	
+	        if(osName != null && osName.toLowerCase().contains("win")) {  // windows 系统
+	            String word1 = "上的配置文件";   // 接口 WLAN 上的配置文件 debugtheworld:
+	            String word2 = "关键内容";    // 关键内容            : 12345678
+	            
+	            String curMatchContent = "";
+	            String tip = "";
+	            if(wifiLogFile.exists()) {
+		            String UTF8_Conent = ReadFileContent_No_UTF8(wifiLogFile);
+		            String Default_Conent = ReadFileContent_No_UTF8(wifiLogFile);
+		            String GBK_Conent = ReadFileContent_GBK(wifiLogFile);
+		          
+		            
+		            if(UTF8_Conent.contains(word2)) {
+		            	curMatchContent = UTF8_Conent;
+		            	tip = "UTF8_Conent";
+		            }     else      if(Default_Conent.contains(word2)) {
+		            	curMatchContent = Default_Conent;
+		            	tip = "Default_Conent";
+		            }    else       if(GBK_Conent.contains(word2)) {
+		            	curMatchContent = GBK_Conent;
+		               	tip = "GBK_Conent";
+		            }
+
+	            }
+
+	            System.out.println("tipA["+tip+"]  curMatchContent="+curMatchContent);
+	            
+	         
+            	
+	          
+	            if (wifiLogFile.exists() && curMatchContent.contains(word2)) {
+	                //  System.out.println("wifiLogFile 文件存在");
+	            	readWifiObjectFromString(curMatchContent);
+	                ArrayList<String> wifiList = transactWifiList(wifiItemList);
+	           
+	                System.out.println(" Read-Wifi_Success   wifiList.size()="+wifiList.size());
+	                
+	                return wifiList;
+
+	            } else {   //   如果 不存在 那么 执行 相关命令得到 对应的文件    执行 E2_WifiDetail_Exit.bat 文件 
+	    	    	File E2_WifiDetail_Bat_File = new File(System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin" + File.separator + "E2_WifiDetail_Exit.bat");
+
+	    	    	System.out.println("执行 Bat 文件 "+ E2_WifiDetail_Bat_File.getAbsolutePath() +" Begin");
+	            	execCMD(E2_WifiDetail_Bat_File.getAbsolutePath());
+	    	    	System.out.println("执行 Bat 文件 "+ E2_WifiDetail_Bat_File.getAbsolutePath() +" End");
+
+	    	    	try {
+						Thread.sleep(1500); // 睡 1.5 秒
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}   
+	    	    	
+	    	    	boolean wifiLogExist =  wifiLogFile.exists();
+	    	    	boolean isContainWord= false;
+	    	    	String wifiLog_Content ="";
+	    	    	
+	    	    	if(wifiLogExist) {
+		            String UTF8_Conent = ReadFileContent_No_UTF8(wifiLogFile);
+		            String Default_Conent = ReadFileContent_No_UTF8(wifiLogFile);
+		            String GBK_Conent = ReadFileContent_GBK(wifiLogFile);
+		          
+		            
+		            if(UTF8_Conent.contains(word2)) {
+		            	curMatchContent = UTF8_Conent;
+		            	tip = "UTF8_Conent";
+		            }     else      if(Default_Conent.contains(word2)) {
+		            	curMatchContent = Default_Conent;
+		            	tip = "Default_Conent";
+		            }    else       if(GBK_Conent.contains(word2)) {
+		            	curMatchContent = GBK_Conent;
+		               	tip = "GBK_Conent";
+		            }
+		            
+	    	    
+
+	    	    		
+	    	    		wifiLog_Content = ReadFileContent(wifiLogFile);
+	    	    		isContainWord = curMatchContent.contains(word2);
+	    	    	}
+	    	    	
+	    	    	boolean conainWord =  curMatchContent.contains(word2);
+		            System.out.println("tipB["+tip+"]  conainWord="+conainWord+"   curMatchContent="+curMatchContent);
+
+		            
+	                if (wifiLogFile.exists() && curMatchContent.contains(word2)) {
+		                //  System.out.println("wifiLogFile 文件存在");
+	                	readWifiObjectFromString(curMatchContent);
+		                ArrayList<String> wifiList = transactWifiList(wifiItemList);
+		              	System.out.println("getWifiInfoList() __A__  wifiList.size= "+wifiList.size() +"wifiLogExist = "+ wifiLogExist + "isContainWord="+isContainWord+"  curMatchContent="+curMatchContent);
+		                return wifiList;
+
+		            }
+	              	System.out.println("getWifiInfoList() __B__  getWifiInfoList().size= "+wifiInfoList.size() +"   wifiLogExist = "+ wifiLogExist + "  isContainWord="+isContainWord+"  wifiLog_Content="+wifiLog_Content);
+	     	
+	            }
+	        	
+	        }else if(osName != null && osName.toLowerCase().contains("mac")){  //  mac 的
+	        	
+	            ArrayList<String> wifiListMac = new    ArrayList<String>();
+	            wifiListMac.add("MAC系统访问WIFI密码: 请打开LaunchPad 》 其他 》 钥匙串访问 》 系统(right) 》 airport网络密码");
+	        	return wifiListMac;
+	        	
+	        } else {  // linx 
+	        	
+	        	
+	            String wifiPath = "/etc/NetworkManager/system-connections";
+	            File wifiDir = new File(wifiPath);
+	            if (!wifiDir.exists()) {
+	                System.out.println("WiFi-Path: " + wifiPath + "  不存在!");
+	                return null;
+	            }
+
+	            File[] wifiList = wifiDir.listFiles();
+	            ArrayList<String> wifiLogList = new ArrayList<String>();
+	            for (int i = 0; i < wifiList.length; i++) {
+	                int index = i + 1;
+	                String str0 = "WIFI索引:" + index;
+	                wifiLogList.add(str0);
+	                ArrayList<String> curWifiItemLog = translateLinuxWifi(wifiList[i],i,wifiList.length);
+	                wifiLogList.addAll(curWifiItemLog);
+	            }
+	            wifiInfoList.addAll(wifiLogList);
+	        	
+	        }
+         	System.out.println("getWifiInfoList() __C__  getWifiInfoList().size= "+wifiInfoList.size());
+			
+			return wifiInfoList;
+			
+		}
+		
+		
+		 ArrayList<String> translateLinuxWifi(File wifiFile, int index , int count ) {
+		        ArrayList<String> strArr = new ArrayList<String>();
+		        String wifiName = wifiFile.getName();
+		        String wifiPsk = "";
+		        String fileContent = readStringFromFile(wifiFile);
+
+		        if (!fileContent.contains("psk=") || "".equals(fileContent)) {
+		            wifiPsk = "无权限访问wifi文件:" + wifiFile.getAbsolutePath();
+		        } else {
+		            String mWifiPassword = fileContent.substring(fileContent.indexOf("psk=")).trim();
+		            mWifiPassword = mWifiPassword.substring(0, mWifiPassword.indexOf("[")).trim();
+		            mWifiPassword = mWifiPassword.replace("psk=", "").trim();
+		            wifiPsk = mWifiPassword;
+
+		        }
+//		        psk=zhuminghe
+// [ipv4]
+
+		        if(null == wifiPsk || "".equals(wifiPsk)){
+		            wifiPsk = "[无密码]";
+		        }
+		        String str1 = "WIFI名称:" + wifiName;
+		        String str2 = "WIFI密码:" + wifiPsk;
+		        String str3 = "==================";
+	
+		        strArr.add("wifi["+index+"]["+count+"] wifi名称["+ wifiName+"] wifi密码["+wifiPsk+"]");
+		        
+		        return strArr;
+		    }
+		 
+		ArrayList<String> transactWifiList(ArrayList<WifiItem> wifiList) {
+	        ArrayList<String> strArr = new ArrayList<String>();
+
+	        for (int i = 0; i < wifiList.size(); i++) {
+	            WifiItem item = wifiList.get(i);
+	            int index = i + 1;
+	            String str0 = "WIFI索引:" + index;
+	            String str1 = "WIFI名称:" + item.getName();
+	            String str2 = "WIFI密码:" + item.getKey();
+	            strArr.add("wifi["+i+"]["+wifiList.size()+"] wifi名称["+ item.getName()+"] wifi密码["+item.getKey()+"]");
+	
+	        }
+	        return strArr;
+
+	    }
+		synchronized void readWifiObjectFromString(String fileContent) {
+	        StringBuilder sb = new StringBuilder();
+	        String word1 = "上的配置文件";   // 接口 WLAN 上的配置文件 debugtheworld:
+	        String word2 = "关键内容";    // 关键内容            : 12345678
+
+	        try {
+	            //   BufferedReader curBR = new BufferedReader(new InputStreamReader(new FileInputStream(fileItem), "utf-8"));
+	        
+	            String lineContent = "";
+
+	            String wifiName = "";
+	            String wifiKey = "";
+	            boolean wifiNameReadyFlag = false;
+	            boolean wifiKeyReadyFlag = false;
+	            
+	            String[] lineArr =    fileContent.split("\n");
+	            
+	            for (int i = 0; i < lineArr.length; i++) {
+	            	lineContent = lineArr[i].trim();
+		
+	                if (lineContent.contains(word1)) {
+	                    wifiName = lineContent.substring(lineContent.indexOf(word1) + word1.length(), lineContent.length() - 1).trim();
+	                    wifiNameReadyFlag = true;
+	                    wifiKeyReadyFlag = false;
+	                    wifiKey = "";
+	                }
+
+	                if (lineContent.contains(word2)) {
+	                    wifiKey = lineContent.substring(lineContent.indexOf(word2) + word2.length()).trim();
+	                    wifiKey = wifiKey.substring(1).trim();
+	                    if (wifiNameReadyFlag) {
+	                        wifiKeyReadyFlag = true;
+	                    }
+	                    if (wifiNameReadyFlag && wifiNameReadyFlag) {
+	                        WifiItem wifiItem = new WifiItem(wifiName, wifiKey);
+	                        wifiItemList.add(wifiItem);
+	                        wifiNameReadyFlag = false;
+	                        wifiKeyReadyFlag = false;
+	                    }
+
+
+	                }
+
+
+	            }
+	     
+	        } catch (Exception e) {
+	        	System.out.println("readWifiObjectFromString Exception e="+e);
+	        }
+
+
+	    }
+		
+		 String readStringFromFile(File fileItem) {
+		        StringBuilder sb = new StringBuilder();
+		        try {
+		            //   BufferedReader curBR = new BufferedReader(new InputStreamReader(new FileInputStream(fileItem), "utf-8"));
+		            BufferedReader curBR = new BufferedReader(new InputStreamReader(new FileInputStream(fileItem)));
+		            String lineContent = "";
+		            while (lineContent != null) {
+		                lineContent = curBR.readLine();
+		                if (lineContent == null || lineContent.trim().isEmpty()) {
+		                    continue;
+		                }
+		                sb.append(lineContent + "\n");
+		            }
+		            curBR.close();
+		        } catch (Exception e) {
+		        }
+		        return sb.toString();
+		    }
+		 
+		 String readStringFromFile_UTF8(File fileItem) {
+		        StringBuilder sb = new StringBuilder();
+		        try {
+		               BufferedReader curBR = new BufferedReader(new InputStreamReader(new FileInputStream(fileItem), "utf-8"));
+//		            BufferedReader curBR = new BufferedReader(new InputStreamReader(new FileInputStream(fileItem)));
+		            String lineContent = "";
+		            while (lineContent != null) {
+		                lineContent = curBR.readLine();
+		                if (lineContent == null || lineContent.trim().isEmpty()) {
+		                    continue;
+		                }
+		                sb.append(lineContent + "\n");
+		            }
+		            curBR.close();
+		        } catch (Exception e) {
+		        }
+		        return sb.toString();
+		    }
+		 
+		 
+		 
+	     int getZScreenHeight() {
+	        // CMD 和 IDE下 宽高一致  1920x1080
+	        GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+	        int height = gd.getDisplayMode().getHeight();
+	        return height;
+
+	    }
+
+
+	     
+	     int getZScreenWeight() {
+
+	        // CMD 和 IDE下 宽高一致  1920x1080
+
+	        GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+	        int width = gd.getDisplayMode().getWidth();
+	        return width;
+
+
+	    }
+		ArrayList<String> getParamsInfoList() {
+			
+			ArrayList<String>  infoList = new 	ArrayList<String> ();
+//			infoList.add("dst["+dstemail+"]" +"  "+"sendType["+sendType+"]"+"  quChong_Type["+quChong_Type+"] "+"isLoop["+isLoop+"]" +"  interval["+interval+"]  "+"repeatcount["+repeatcount+"]" +"  "+"subject["+subject_text+"]"+" "+"content_text["+content_text+"]");
+			infoList.add("dst["+dstemail+"]");
+			infoList.add("sendType["+sendType+"]");
+			infoList.add("quChong_Type["+quChong_Type+"]");
+			infoList.add("isLoop["+isLoop+"]");
+			infoList.add("interval["+interval+"]");
+			infoList.add("repeatcount["+repeatcount+"]");
+			infoList.add("subject["+subject_text+"]");
+			infoList.add("content_text["+content_text+"]");
+
+			
+			for (int i = 0; i < queryDirList.size(); i++) {
+				File queryFile = queryDirList.get(i);
+				infoList.add("_____query_file["+i+"]["+queryDirList.size()+"]"+"__"+queryFile.getAbsolutePath());
+			}
+			
+			for (int i = 0; i < attatchFileList.size(); i++) {
+				File attatchFile = attatchFileList.get(i);
+				infoList.add("_____upfile["+i+"]["+attatchFileList.size()+"]__"+attatchFile.getAbsolutePath());
+			}
+			
+			for (int i = 0; i < message_tip_list.size(); i++) {
+				String tip_item = message_tip_list.get(i);
+				infoList.add("_____tip["+i+"]["+message_tip_list.size()+"]__"+tip_item);
+			}
+			
+			
+			
+			
+		
+			return infoList;
+
+		}
+		
+		
+
+
+		// 11111 转为1   01231 转为 0123     321 转为 123   2314转为 1234 
+	    // 0 只发送文字内容--本机信息等    
+		// 1--搭配 query_dir 发送本地对应目录的所有文件的字符串  
+		// 2--发送屏幕截图      
+		// 3--发送指定文件到附件  //  可以一起实现啊   0123  , 111 那么就只执行一个1  type_0123 
+		String calcul_QuChong_Type(String inputType ) {  // 去重 去重复
+			String quchong_type_str = "";
+			StringBuilder inputType_SB  = new StringBuilder();
+			
+			if(inputType == null || "".equals(inputType.trim())) {
+				return "0";
+			} 
+			
+			if(inputType.contains("0")) {
+				inputType_SB.append("0");
+			}
+			
+			if(inputType.contains("1")) {
+				inputType_SB.append("1");
+			}
+			
+			if(inputType.contains("2")) {
+				inputType_SB.append("2");
+			}
+			
+			if(inputType.contains("3")) {
+				inputType_SB.append("3");
+			}
+			
+			if(inputType.contains("4")) {
+				inputType_SB.append("4");
+			}
+			
+			if(inputType.contains("5")) {
+				inputType_SB.append("5");
+			}
+			
+			if(inputType.contains("6")) {
+				inputType_SB.append("6");
+			}
+	
+			if(inputType.contains("7")) {
+				inputType_SB.append("7");
+			}
+			
+			if(inputType.contains("8")) {
+				inputType_SB.append("8");
+			}
+			
+			if(inputType.contains("9")) {
+				inputType_SB.append("9");
+			}
+			if(inputType.contains("a")) {  // 往后继续了 
+				inputType_SB.append("a");
+			}
+
+			return inputType_SB.toString();
+
+		}
+		
+		class WifiItem {
+	        String name;
+	        String key;
+
+	        WifiItem() {
+
+	        }
+
+	        WifiItem(String name, String key) {
+	            this.name = name;
+	            this.key = key;
+	        }
+
+
+	        public void setName(String name) {
+	            this.name = name;
+	        }
+
+	        public void setKey(String key) {
+	            this.key = key;
+	        }
+
+	        public String getKey() {
+	            return key;
+	        }
+
+	        public String getName() {
+	            return name;
+	        }
+	    }
+		
+		@SuppressWarnings("unchecked")
+	     public void send_email(String targetEMail , String mTitle ,  String inputContent , ArrayList<String> extraTextList ,  HashMap<File,String> imageFile_Desc_Map , ArrayList<File> attatchFileList) throws Exception {
+	        // 给用户发送邮件的邮箱
+	         String from = "382581427@qq.com";
+	        // 邮箱的用户名
+	         String username = "382581427@qq.com";
+	        // 邮箱授权码   // kyioxkexvqdtbjhd【新】   pwkvngnpfkvpbgcd【旧】
+
+	         String password = "kyioxkexvqdtbjhd";
+	        // 发送邮件的服务器地址，QQ服务器
+	         String host = "smtp.qq.com";
+	        // 接收人邮箱
+	         String to = targetEMail ;
+	         if(to == null || "".equals(to.trim())) { 
+	        	 to = "zukgit@foxmail.com";
+	         }
+
+	        // 邮件主题
+//	         String title = "邮件主题[测试混合邮件]";
+	         String title = mTitle;
+	         if(title == null || "".equals(title.trim())) { 
+	        	 title = "YYYYHHDD";
+	         }
+
+	        // 使用QQ邮箱时配置
+	        Properties prop = new Properties();
+	        prop.setProperty("mail.host", "smtp.qq.com");    // 设置QQ邮件服务器
+	        prop.setProperty("mail.transport.protocol", "smtp");      // 邮件发送协议
+	        prop.setProperty("mail.smtp.auth", "true");      // 需要验证用户名和密码
+
+	        // 关于QQ邮箱，还要设置SSL加密，其他邮箱不需要
+	        MailSSLSocketFactory sf = new MailSSLSocketFactory();
+	        sf.setTrustAllHosts(true);
+	        prop.put("mail.smtp.ssl.enable", "true");
+	        prop.put("mail.smtp.ssl.socketFactory", sf);
+
+	        // 创建定义整个邮件程序所需的环境信息的 Session 对象，QQ才有，其他邮箱就不用了
+	        javax.mail.Session session = javax.mail.Session.getDefaultInstance(prop, new Authenticator() {
+	            @Override
+	            protected PasswordAuthentication getPasswordAuthentication() {
+	                // 发件人邮箱用户名，授权码
+	                return new PasswordAuthentication(username, password);
+	            }
+	        });
+
+	        // 开启 Session 的 debug 模式，这样就可以查看程序发送 Email 的运行状态
+	        session.setDebug(true);
+
+	        // 通过 session 得到 transport 对象
+	        javax.mail.Transport  ts = session.getTransport();
+
+	        // 使用邮箱的用户名和授权码连上邮箱服务器
+	        ts.connect(host, username, password);
+
+	        // 创建邮件，写邮件
+	        // 需要传递 session
+	        MimeMessage message = new MimeMessage(session);
+	        message.setFrom(new javax.mail.internet.InternetAddress(from)); // 指明邮件的发件人
+	        message.setRecipient(javax.mail.Message.RecipientType.TO, new javax.mail.internet.InternetAddress(to));   // 指明邮件的收件人
+	        message.setSubject(mTitle);     // 邮件主题
+	        
+	        
+	        
+	        
+
+	        // ===========================================  配置开始  ==============================
+	        // 遍历  imageFile_Desc_Map
+	        
+	        StringBuilder extraSB = new StringBuilder();
+	        if(extraTextList != null && extraTextList.size() > 0) {   // 一些 额外的信息 
+	        	extraSB.append("<br><br>═══════ 副文开始 ═══════<br><br>");
+	        	for (int i = 0; i < extraTextList.size(); i++) {
+	        		extraSB.append(extraTextList.get(i)+"<br>");
+				}
+	        	extraSB.append("<br><br>═══════ 副文结束 ═══════<br><br>");
+	        }
+	        
+	        StringBuilder paramSB = new StringBuilder();
+	       ArrayList<String> infoList =  getParamsInfoList();
+	        if(infoList != null && infoList.size() > 0) {   // 一些 额外的信息 
+	 
+	        	for (int i = 0; i < infoList.size(); i++) {
+	        		paramSB.append(infoList.get(i)+"<br>");
+				}
+	
+	        }
+	        
+	        
+	        
+	        ArrayList<MimeBodyPart> image_desc_MimeBodyPartList = new  ArrayList<MimeBodyPart>();
+	        
+	        MimeBodyPart body_content = new MimeBodyPart();    // 文字内容 
+	        body_content.setContent(inputContent+"<br><br>"+mCurrentUserName+" "+getTimeStampyyyyMMdd_HHmmss()+"<br>═══════ 正文结束 ═══════<br>"+""+"<br>"+paramSB.toString()+"<br>═══════ 参数结束 ═══════<br><br>"+extraSB.toString(), "text/html;charset=utf-8");
+	        image_desc_MimeBodyPartList.add(body_content);
+
+	        
+	        if(imageFile_Desc_Map != null) {
+		
+	    		Map.Entry<File, String> entryItem;
+	    		int item_index = 0;
+	    		int map_size = 0;
+	    			map_size = imageFile_Desc_Map.size();
+	    			Iterator iterator = imageFile_Desc_Map.entrySet().iterator();
+	    			while (iterator.hasNext()) {
+	    				entryItem = (Map.Entry<File, String>) iterator.next();
+	    				File key_file = entryItem.getKey(); // Map的Key
+	    				String value_desc = entryItem.getValue(); // Map的Value
+	    				if(key_file == null ) {
+	    					System.out.println("map[" + item_index + "][" + map_size + "]____" + "key[" + key_file + "]-value[" + value_desc + "]"+" 为空! "); 
+	    					continue;
+	    				}
+	    				
+	    				if(!key_file.exists()) {
+	    					System.out.println("map[" + item_index + "][" + map_size + "]____" + "key[" + key_file + "]-value[" + value_desc + "]"+" 不存在! "); 
+	    					continue;
+	    				}
+	    				System.out.println("map[" + item_index + "][" + map_size + "]____" + "key[" + key_file + "]-value[" + value_desc + "]");
+	    				
+
+	    				
+	    		        MimeBodyPart body_image = new MimeBodyPart();
+	    		        body_image.setDataHandler(new javax.activation.DataHandler(new javax.activation.FileDataSource(key_file.getAbsolutePath())));
+	    		        body_image.setContentID(key_file.getName());
+	    		        
+	    		        
+	    		        // 文本
+	    				// " 图片描述:fafa <img src='cid:1.png'>", "text/html;charset=utf-8"
+//	    		        body2.setContent("我不是广告，<img src='cid:1.png'>", "text/html;charset=utf-8");
+	    				String image_item_desc = value_desc +" <img src='cid:"+key_file.getName()+"'>";
+	    		        MimeBodyPart body_text = new MimeBodyPart();
+	    		        body_text.setContent(image_item_desc, "text/html;charset=utf-8");
+	    		        
+	    		        image_desc_MimeBodyPartList.add(body_image);
+	    		        image_desc_MimeBodyPartList.add(body_text);
+
+	    				item_index++;
+	    			}
+	        }
+	        
+	        
+	        MimeMultipart image_desc_MimeMultipart = null;
+	        if(image_desc_MimeBodyPartList.size() > 0 ) {
+	        	 image_desc_MimeMultipart = new MimeMultipart();
+	        	
+	        	 for (int i = 0; i < image_desc_MimeBodyPartList.size(); i++) {
+	        		 image_desc_MimeMultipart.addBodyPart(image_desc_MimeBodyPartList.get(i));
+				}
+	        	 image_desc_MimeMultipart.setSubType("related");   // 文本和图片内嵌成功
+	        }
+
+	      
+	        ArrayList<MimeBodyPart> attatch_MimeBodyPartList = new  ArrayList<MimeBodyPart>();
+	        
+	        if(attatchFileList.size() > 0 ) {
+	        	
+	        	for (int i = 0; i < attatchFileList.size(); i++) {
+	        		File attatchFile = attatchFileList.get(i);
+
+	                MimeBodyPart body_attatch = new MimeBodyPart();
+	                body_attatch.setDataHandler(new javax.activation.DataHandler(new javax.activation.FileDataSource(attatchFile.getAbsolutePath())));
+	                body_attatch.setFileName(attatchFile.getName());
+	                attatch_MimeBodyPartList.add(body_attatch);
+				}
+	        	
+	        	
+	        }
+	        
+	        
+	        // 将拼装好的正文内容设置为主体
+	        MimeBodyPart contentText = new MimeBodyPart();
+	        if(image_desc_MimeMultipart != null) {
+	            contentText.setContent(image_desc_MimeMultipart);
+	        }
+	   
+	        
+	        
+	        // 拼接附件与正文内容
+	        MimeMultipart all_MimeMultipart = new MimeMultipart();
+	        all_MimeMultipart.addBodyPart(contentText);
+	        for (int i = 0; i < attatch_MimeBodyPartList.size(); i++) {
+	        	all_MimeMultipart.addBodyPart(attatch_MimeBodyPartList.get(i));   //   添加附件
+			}
+	        all_MimeMultipart.setSubType("mixed");  
+	        
+	        
+	        // ===========================================  配置结束  ==============================
+	        // 设置到消息中，保存修改
+	        message.setContent(all_MimeMultipart);  // 把最后编辑好的邮件放到消息当中
+	        message.saveChanges();   // 保存修改
+
+	        // 发送邮件
+	        ts.sendMessage(message, message.getAllRecipients());
+
+	        // 释放资源
+	        ts.close();
+	    	
+	    	
+	    }
+	    
+
+
+		
+	}
+	
+	
+
 
 
 
@@ -18106,6 +19182,116 @@ public class G2_ApplyRuleFor_TypeFile {
 		}
 	}
 
+	
+	public static String ReadFileContent_No_UTF8(File mFilePath) {
+
+		if (mFilePath != null && mFilePath.exists()) {
+			// System.out.println("存在 当前文件 "+ mFilePath.getAbsolutePath());
+		} else {
+			System.out.println("不存在 当前文件 " + mFilePath.getAbsolutePath());
+
+			return null;
+		}
+		StringBuilder sb = new StringBuilder();
+
+		try {
+			BufferedReader curBR = new BufferedReader(new InputStreamReader(new FileInputStream(mFilePath)));
+			String oldOneLine = "";
+			int index = 1;
+			while (oldOneLine != null) {
+
+				oldOneLine = curBR.readLine();
+				if (oldOneLine == null || oldOneLine.trim().isEmpty()) {
+					continue;
+				}
+
+				sb.append(oldOneLine + "\n");
+//                    System.out.println("第"+index+"行读取到的字符串:"+oldOneLine);
+				index++;
+
+			}
+			curBR.close();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return sb.toString();
+
+	}
+	
+	public static String ReadFileContent_GBK(File mFilePath) {
+
+		if (mFilePath != null && mFilePath.exists()) {
+			// System.out.println("存在 当前文件 "+ mFilePath.getAbsolutePath());
+		} else {
+			System.out.println("不存在 当前文件 " + mFilePath.getAbsolutePath());
+
+			return null;
+		}
+		StringBuilder sb = new StringBuilder();
+
+		try {
+			BufferedReader curBR = new BufferedReader(new InputStreamReader(new FileInputStream(mFilePath), "GBK"));
+			String oldOneLine = "";
+			int index = 1;
+			while (oldOneLine != null) {
+
+				oldOneLine = curBR.readLine();
+				if (oldOneLine == null || oldOneLine.trim().isEmpty()) {
+					continue;
+				}
+
+				sb.append(oldOneLine + "\n");
+//                    System.out.println("第"+index+"行读取到的字符串:"+oldOneLine);
+				index++;
+
+			}
+			curBR.close();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return sb.toString();
+
+	}
+	
+	public static String ReadFileContent_UTF8(File mFilePath) {
+
+		if (mFilePath != null && mFilePath.exists()) {
+			// System.out.println("存在 当前文件 "+ mFilePath.getAbsolutePath());
+		} else {
+			System.out.println("不存在 当前文件 " + mFilePath.getAbsolutePath());
+
+			return null;
+		}
+		StringBuilder sb = new StringBuilder();
+
+		try {
+			BufferedReader curBR = new BufferedReader(new InputStreamReader(new FileInputStream(mFilePath), "utf-8"));
+			String oldOneLine = "";
+			int index = 1;
+			while (oldOneLine != null) {
+
+				oldOneLine = curBR.readLine();
+				if (oldOneLine == null || oldOneLine.trim().isEmpty()) {
+					continue;
+				}
+
+				sb.append(oldOneLine + "\n");
+//                    System.out.println("第"+index+"行读取到的字符串:"+oldOneLine);
+				index++;
+
+			}
+			curBR.close();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return sb.toString();
+
+	}
+	
+	
 	public static String ReadFileContent(File mFilePath) {
 
 		if (mFilePath != null && mFilePath.exists()) {
@@ -18398,7 +19584,7 @@ public class G2_ApplyRuleFor_TypeFile {
 
 					for (int i = 0; i < typeList.size(); i++) {
 						String type = typeList.get(i);
-						if ("#".equals(type)) { // 如果 类型是 * 那么就把 所有的 非目录文件加入列表中
+						if ("*".equals(type) || "#".equals(type)) { // 如果 类型是 * 那么就把 所有的 非目录文件加入列表中
 							File curFile = new File(fileString);
 							if (!curFile.isDirectory()) {
 								allFile.add(curFile);
@@ -19827,8 +21013,139 @@ public class G2_ApplyRuleFor_TypeFile {
 	}
 	
 
+  static  File getPCScreenFile() {
 
+        // H7_Email_WorkPlace
+        //   把截图放到 C:\Users\zhuzj5\Desktop\zbin\H7_Email_WorkPlace\yyMMdd_hhmmss 文件夹中
+
+	    String timestamp =getTimeStamp_YYYYMMdd();
+        String H7_WorkPlace_TaskDir = zbinPath + File.separator + "G2_Monitor_Download"+File.separator+getTimeStamp_YYYYMM();
+
+        File taskDirFile = new File(H7_WorkPlace_TaskDir);
+        if (!taskDirFile.exists()) {
+            taskDirFile.mkdirs();
+        }
+
+        File imageFIle = null;
+        String imageName = "pc_screen_" + timestamp + ".png";
+        String imageAbsPath = H7_WorkPlace_TaskDir + File.separator + imageName;
+
+        imageFIle = new File(imageAbsPath);
+
+        if (!imageFIle.exists()) {
+            try {
+                imageFIle.createNewFile();
+            } catch (Exception e) {
+
+            }
+        }
+
+        //----------------Image Begin---------
+        GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+        int height = gd.getDisplayMode().getHeight();
+        int width = gd.getDisplayMode().getWidth();
+        Rectangle screenRect = new Rectangle(0,0,width,height);
+         cn.hutool.core.swing.ScreenUtil.captureScreen(screenRect,imageFIle);
+//----------------Image End---------
+
+        System.out.println("PC截图路径: " + imageAbsPath);
+        if (!imageFIle.exists() || imageFIle.length() < 100) {
+            return null;
+        }
+        
+        return imageFIle;
+//        File newImage_XY_File =   paintXYFromImageFile(imageFIle);
+//        return newImage_XY_File;
+    }
 	
+
+  static boolean isImageFile(File imageFIle){
+      boolean  flag = false;
+      if(imageFIle.getName().endsWith(".jpg") ||
+              imageFIle.getName().endsWith(".Jpg") ||
+              imageFIle.getName().endsWith(".JPG") ||
+              imageFIle.getName().endsWith(".png") ||
+              imageFIle.getName().endsWith(".Png") ||
+              imageFIle.getName().endsWith(".PNG")
+      ){
+          flag = true;
+      }
+      return flag;
+  }
+  
+  public  static String getFileTypeNoPoint(String fileName){
+      String name = "";
+      if(fileName.contains(".")){
+          name = fileName.substring(fileName.lastIndexOf(".") + 1 ).trim().toLowerCase();
+      }else{
+          name = "";
+      }
+      return name.toLowerCase().trim();
+  }
+  
+  static File paintXYFromImageFile(File imageFile){
+      if(!imageFile.exists() || imageFile.length() < 10 || !isImageFile(imageFile)){
+          return null ;
+      }
+
+      String originName = getFileNameNoPoint(imageFile.getName());
+      String imageType = getFileTypeNoPoint(imageFile.getName());
+      String newImageFileNameStr = originName+"_xy"+"."+imageType;
+      File newImageFile = new File(imageFile.getParentFile().getAbsolutePath()+File.separator+newImageFileNameStr);
+
+
+
+      try {
+          if(!newImageFile.exists()){
+              newImageFile.createNewFile();
+          }
+          BufferedImage bi =    ImageIO.read(imageFile);
+          int height = bi.getHeight();
+          int width = bi.getWidth();
+
+          int up_line_num = width/10; // 竖线的数量
+          int down_line_num = height/10;  // 横线的数量
+
+          Graphics2D g2 = (Graphics2D) bi.getGraphics();
+          g2.setColor(Color.RED);//设置颜色
+          g2.setStroke(new BasicStroke(1.5f));  // 直线粗细
+          Font f =  new Font("宋体",Font.BOLD,20);
+          g2.setFont(f); //设置字体:字体、字号、大小
+          for (int i = 0; i <down_line_num ; i++) { // 横线的数量
+              int down_origin_x_item = 0;
+              int down_origin_y_item =  100 * i + 100;
+              int down_new_x_item = width;
+              int down_new_y_item = down_origin_y_item;
+
+              int text_X = down_origin_x_item + 10;  //
+              int text_y = down_origin_y_item - 10;  //
+              g2.drawString(down_origin_y_item+"",text_X,text_y);
+              g2.drawLine(down_origin_x_item,down_origin_y_item,down_new_x_item,down_new_y_item);
+          }
+
+
+          for (int i = 0; i <up_line_num ; i++) { // 竖线的数量
+
+              int down_origin_x_item = 100 * i + 100;
+              int down_origin_y_item =  0;
+              int down_new_x_item = down_origin_x_item;
+              int down_new_y_item = height;
+              int text_X = down_origin_x_item - 50;  //
+              int text_y = down_origin_y_item + 20;
+              g2.drawString(down_origin_x_item+"",text_X,text_y);
+              g2.drawLine(down_origin_x_item,down_origin_y_item,down_new_x_item,down_new_y_item);
+          }
+          ImageIO.write(bi,imageType,new FileOutputStream(newImageFile));
+          System.out.println("程序执行结束!");
+      } catch (IOException e) {
+
+          e.printStackTrace();
+          System.out.println("异常="+e);
+          return imageFile;  //  出现异常 那么就不操作 x y 坐标了
+      }
+      return newImageFile;
+  }
+
 	
 
 }

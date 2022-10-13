@@ -18,3 +18,5 @@ rem @echo name=!name!
 rem @echo  'netsh wlan show profiles !prestr! key=clear  >> E2_WifiDetail.txt '
 netsh wlan show profiles !prestr! key=clear >> %userprofile%\Desktop\zbin\E2_WifiDetail.txt
 )
+dos2unix %userprofile%\Desktop\zbin\E2_WifiDetail.txt
+exit
