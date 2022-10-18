@@ -7603,8 +7603,8 @@ public class G2_ApplyRuleFor_TypeFile {
 
 		
 		//
-		int mMailFirstMinute = 1;
-		int mMailInteval = 2;
+		int mMailFirstMinute = 3;
+		int mMailInteval = 30;
 		int last_email_count = 0; // 最新的 email的数量
 		HashMap<Integer, ArrayList<EmailInfo>> minute_mailListMap; // key 是当前的分钟的值 value 是当前接收到 cmdermail cmdmail 邮件的集合
 
@@ -7622,6 +7622,8 @@ public class G2_ApplyRuleFor_TypeFile {
 
 		boolean isLogFile = false;
 		StringBuilder mLogSB;
+		
+		int sendMailCount = 1 ;   // 发送  mail的 数量 
 
 		ArrayList<String> mOneTimeLogList; // 一次运行的Log
 
@@ -7656,6 +7658,7 @@ public class G2_ApplyRuleFor_TypeFile {
 			minute_mailListMap = new HashMap<Integer, ArrayList<EmailInfo>>();
 			last_email_count = 0;
 			zAlreadRunMailCommandList = new ArrayList<EmailInfo>();
+			sendMailCount = 1;
 		}
 
 		@Override
@@ -7974,6 +7977,9 @@ public class G2_ApplyRuleFor_TypeFile {
 				System.out.println(
 						"minutes_count=" + minutes_count + "   userName_fix=" + userName_fix + "   cmdercommand=" + command);
 
+				command = command.replace("%win_zbin%", Win_Lin_Mac_ZbinPath);
+				String command_fixed = command.replace("%zbin%", zbinPath);
+				
 		
 				String result = "";
 				new Thread(new Runnable() {   // 让 子线程  去执行  否则 卡住 主线程
@@ -7982,9 +7988,9 @@ public class G2_ApplyRuleFor_TypeFile {
 					public void run() {
 						// TODO Auto-generated method stub
 					
-						zMailCmdRunCommandList.add(command);
-						String result = execCMD(command);
-						System.out.println("execCMD command【"+command+"】 result="+result);
+						zMailCmdRunCommandList.add(command_fixed);
+						String result = execCMD(command_fixed);
+						System.out.println("execCMD command【"+command_fixed+"】 result="+result);
 
 					}
 				}).start();
@@ -8007,6 +8013,9 @@ public class G2_ApplyRuleFor_TypeFile {
 				System.out.println("minutes_count=" + minutes_count + "   userName_fix=" + userName_fix
 						+ "   cmd_command=" + command);
 			
+				command = command.replace("%win_zbin%", Win_Lin_Mac_ZbinPath);
+				String command_fixed = command.replace("%zbin%", zbinPath);
+				
 				String result = "";
 				new Thread(new Runnable() { // 让 子线程  去执行  否则 卡住 主线程
 		
@@ -8014,9 +8023,9 @@ public class G2_ApplyRuleFor_TypeFile {
 					public void run() {
 						// TODO Auto-generated method stub
 					
-						zMailCmdRunCommandList.add(command);
-						String result = run_cmder(command); // cmd 运行
-						System.out.println("run_cmder  command【"+command+"】 result="+result);
+						zMailCmdRunCommandList.add(command_fixed);
+						String result = run_cmder(command_fixed); // cmd 运行
+						System.out.println("run_cmder  command【"+command_fixed+"】 result="+result);
 					}
 				}).start();
 				
@@ -8453,7 +8462,7 @@ public class G2_ApplyRuleFor_TypeFile {
 
 			String pc_userName = System.getenv().get("USERNAME");// 获取用户名
 
-			String mSubjectStr = "uptip" + "_" + pc_userName + "_[minute:" + minute_count + "][first:"
+			String mSubjectStr = "uptip" + "_" + pc_userName + "_"+sendMailCount+"[minute:" + minute_count + "][first:"
 					+ first_send_minute + "][inteval:" + minute_inteval + "][lastTxt:" + (lastTxtFile != null?lastTxtFile.getName():"null") + "]"
 					+ "_" + getTimeStamp_HHmmss();
 
@@ -8596,6 +8605,7 @@ public class G2_ApplyRuleFor_TypeFile {
 
 			try {
 				sendemail(minute_count == first_send_minute , pc_userName, null, mSubjectStr, "Hello Monitor!", paramStrList, extraInfoList, file_desc_map,attatchFile);
+				sendMailCount++;
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
