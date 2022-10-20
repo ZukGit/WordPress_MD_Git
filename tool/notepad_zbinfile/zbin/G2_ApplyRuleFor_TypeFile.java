@@ -400,8 +400,192 @@ public class G2_ApplyRuleFor_TypeFile {
 
 		realTypeRuleList.add(new Send_Email_TO_Dst_Rule_54());
 
+		
+		//读取到当前 所有 目录的 .rs 文件  对于 【pub fn】___ 【pub const fn】 pub unsafe   字样的 字符串 并且不是// 开头的字符串打印出一份详情清单
+		realTypeRuleList.add(new Read_RS_File_Print_Pub_Fn_Method_To_MD_Rule_55());
+		
+		
 	}
 
+	//1.  不是以 //开头
+	//2.  包含  fn
+	//3.  包含 pub 
+	 // 4. 包含 (     ,  最后一个 { 转为 【】
+	//  5.添加上 序号 
+	 // 转成 md  保存 然后 打印  ###### xxxxxx.rs
+	
+	//读取到当前 所有 目录的 .rs 文件  对于 【pub fn】___ 【pub const fn】 pub unsafe   字样的 字符串 转为 md 文件 并且不是// 开头的字符串打印出一份详情MD文件清单
+	class Read_RS_File_Print_Pub_Fn_Method_To_MD_Rule_55 extends Basic_Rule {
+
+		 ArrayList<File> allRustFile ;  // 
+		 ArrayList<File> allAvaliableRustFile ;  // 
+		 HashMap<File,ArrayList<String>>   mRustFile_MethodMDList_Map;
+		 
+
+		 Read_RS_File_Print_Pub_Fn_Method_To_MD_Rule_55() {
+			super("#", 55, 5); //
+
+			allRustFile = new ArrayList<File>();    //   依据 搜索到 的文件 拍显示  上下才能有关系
+			mRustFile_MethodMDList_Map = new HashMap<File,ArrayList<String>> ();
+			
+			allAvaliableRustFile = new ArrayList<File>();   //  有效的 rust 文件
+	
+		}
+
+		@Override
+		boolean initParamsWithInputList(ArrayList<String> inputParamList) {
+			// mdname_true // kaoyan_true gaokao_true
+
+
+
+			// TODO Auto-generated method stub
+			return super.initParamsWithInputList(inputParamList);
+		}
+
+
+
+
+		@Override
+		String simpleDesc() {
+
+			return "\n" + Cur_Bat_Name + " #_" + rule_index
+					+ "     //   读取到当前 所有 目录的 .rs 文件  对于 【pub fn】___ 【pub const fn】 pub unsafe   字样的 字符串 转为 md 文件 并且不是// 开头的字符串打印出一份详情MD文件清单 \n"
+					+ Cur_Bat_Name + "  #_" + rule_index
+					+ "       ### 读取到当前 所有 目录的 .rs 文件  对于 【pub fn】___ 【pub const fn】 pub unsafe   字样的 字符串 转为 md 文件 并且不是// 开头的字符串打印出一份详情MD文件清单   \n"
+					+ ""
+//			zrule_apply_G2.bat  #_53  appname_z  productappend_xxx
+			;
+		}
+
+		@Override
+		ArrayList<File> applyDir_SubFileListRule5(ArrayList<File> allSubDirFileList,
+				ArrayList<File> allSubRealFileList) {
+
+
+
+			for (int i = 0; i < allSubRealFileList.size(); i++) {
+		
+	
+				File targetItem = allSubRealFileList.get(i);
+				
+				System.out.println("realdile["+i+"]["+allSubRealFileList.size()+"]__"+targetItem.getAbsolutePath());
+				if (targetItem.getName().toLowerCase().endsWith(".rs")) {
+					allRustFile.add(targetItem);
+					
+					
+				ArrayList<String> rawRsContentList = 	ReadFileContentAsList(targetItem);
+				
+				if(rawRsContentList != null && rawRsContentList.size() > 0) {
+					
+				
+					ArrayList<String> pub_fn_list =  read_pub_fn_FromList(rawRsContentList);
+					System.out.println("targetItem="+targetItem.getAbsolutePath()+"  pub_fn_list="+pub_fn_list.size() +" rawRsContentList="+rawRsContentList.size());
+					if(pub_fn_list != null && pub_fn_list.size() > 0 ) {
+						
+						ArrayList<String> mdRSMethodContentList = new ArrayList<String> ();
+						
+						String codePreBlock = "```";
+						String rust_str = File.separator+"rust";
+						String abs_path = targetItem.getAbsolutePath();
+						if(targetItem.getAbsolutePath().contains(rust_str)) {
+							abs_path = abs_path.substring(abs_path.indexOf(rust_str),abs_path.length());
+							
+						}
+						String  file_head = "## "+ abs_path+"\n\n"+codePreBlock+"\n";
+						String codeEndBlock = "\n```\n";
+						
+						mdRSMethodContentList.add(file_head);
+						mdRSMethodContentList.addAll(pub_fn_list);
+						
+						mdRSMethodContentList.add(codeEndBlock);
+				
+						allAvaliableRustFile.add(targetItem);
+						mRustFile_MethodMDList_Map.put(targetItem, mdRSMethodContentList);
+						
+						
+					}
+					
+				}
+					
+				}
+
+
+			}
+			
+			if(mRustFile_MethodMDList_Map.size() == 0) {
+				System.out.println("当前 目录 "+curDirPath+" 没有 含有有效 pub fn 的 .rs 文件!!   无法生成 md  文件内容  请检查! ");
+				return super.applyDir_SubFileListRule5(allSubDirFileList, allSubRealFileList); 
+			}
+			
+			
+			
+			
+			
+			
+			ArrayList<String>  allContentList = new ArrayList<String>();
+			for (int i = 0; i < allAvaliableRustFile.size(); i++) {
+				
+				File rs_pub_fn_file = allAvaliableRustFile.get(i);
+				System.out.println("avaliable_rs["+i+"]["+allAvaliableRustFile.size()+"] = "+ rs_pub_fn_file.getAbsolutePath());
+				ArrayList<String> fnList  = mRustFile_MethodMDList_Map.get(rs_pub_fn_file);
+				if(fnList != null) {
+					allContentList.addAll(fnList);
+					allContentList.add("");
+				}
+		
+				
+			}
+			
+			if(allContentList.size() > 0 ) {
+				
+				writeContentToFile(G2_Temp_Text_File, allContentList);
+				NotePadOpenTargetFile(G2_Temp_Text_File.getAbsolutePath());
+				System.out.println("成功执行 读取到当前 所有 目录的 .rs 文件 记录 pub fn 方法的操作!  将打开 \n "+G2_Temp_Text_File.getAbsolutePath()+"\n 显示MD内容!");
+			}
+			
+
+
+	
+
+			return super.applyDir_SubFileListRule5(allSubDirFileList, allSubRealFileList);
+
+		}
+
+		
+		ArrayList<String> 	read_pub_fn_FromList(ArrayList<String>  mRawRustContentList){
+			ArrayList<String>   pub_method_name_list = new 	ArrayList<String> ();
+			
+			int method_index = 1;
+			
+			for (int i = 0; i < mRawRustContentList.size(); i++) {
+				String oneLine  = mRawRustContentList.get(i).trim();
+				//1.  不是以 //开头
+				//2.  包含  fn
+				//3.  包含 pub 
+				 // 4. 包含 (     ,  最后一个 { 转为 【】
+				//  5.添加上 序号 
+				 // 转成 md  保存 然后 打印  ###### xxxxxx.rs
+				
+				if(oneLine.startsWith("//")) {
+					continue;
+				}
+				if(oneLine.contains("pub") && oneLine.contains(" fn ")  && oneLine.contains("(") ) {
+					
+					oneLine = oneLine.replace("{", "【】");
+					pub_method_name_list.add(method_index+"  "+oneLine);
+					method_index++;
+	
+				}
+		
+			}
+			
+			return pub_method_name_list;
+			
+		}
+
+	}
+
+	
 	class Send_Email_TO_Dst_Rule_54 extends Basic_Rule {
 
 		ArrayList<String> message_tip_list;
