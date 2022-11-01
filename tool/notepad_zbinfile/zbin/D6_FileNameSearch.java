@@ -839,7 +839,7 @@ System.out.println("defaultCharSet: "+Charset.defaultCharset());
 		for (String infoItem : formatStringList) {
 			System.out.println(infoItem);
 		}
-		System.out.println("文件夹总数:" + allSimpleFileSet.size());
+		System.out.println("文件夹总数:" + allSimpleFileSet.size() +"           匹配文件类型总数:"+formatStringList.size());
 		System.out.println("文件总数:" + fileSum);
 	}
 
@@ -1241,7 +1241,7 @@ System.out.println("defaultCharSet: "+Charset.defaultCharset());
 			while((line=bf.readLine()) != null){
 				sb.append(line);
 			}
-		} catch (IOException e) {
+		} catch (IOException e) {                                                                                    
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
