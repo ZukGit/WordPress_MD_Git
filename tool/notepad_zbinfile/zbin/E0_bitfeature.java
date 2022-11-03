@@ -406,6 +406,15 @@ public class E0_bitfeature {
         }
         for (int i = 0; i < mKeyWordName.size(); i++) {
             String paramItem = mKeyWordName.get(i);
+            
+            
+            print_byte(paramItem);
+            System.out.println(" ");
+            System.out.println(" ");
+            System.out.println(" ");
+            System.out.println("——————————————————————————————————————"+" 数值字节处理开始 "+"——————————————————————————————————————");
+            
+            
             if (paramItem.startsWith("0x") || paramItem.startsWith("ox")) {  // 0xfffff
                 String longValue = paramItem.substring(2);
                 if(longValue == null || longValue.length() > 16){
@@ -632,7 +641,7 @@ public class E0_bitfeature {
                 }
 
 
-                if(paramItem.trim().startsWith("-")){  //  以负号开头的数字
+                if(paramItem.trim().startsWith("-") && isNumericChar(paramItem.trim())){  //  以负号开头的数字
 
                     long curValue = Long.parseLong(paramItem);
                     long unsignedValue = curValue & Long.MAX_VALUE ;
@@ -643,18 +652,234 @@ public class E0_bitfeature {
 
 
                     toCheck64BitFeature(readUnsignedLong(curValue).longValue());
-                }else{
+                }else if(isNumericChar(paramItem.trim())) {
 
                     toCheck64BitFeature(Long.parseUnsignedLong(paramItem));
+                } else {
+                	// 打印 这个字符串 字面值的  字节数组
+                	
+//                	String rawInputStr = paramItem.trim();
+//                	byte[] str_bytes = rawInputStr.getBytes();
+//                	
+//                	String byte_tipstr = bytesToHexString(str_bytes);
+//                	String byte_char_tipstr = bytesToHexCharString(str_bytes,rawInputStr);
+//                	
+//                	
+//                  	String byte_10int_str = bytesToIntString(str_bytes);
+//                  	
+//                	String byte_10int_tipstr = bytesToIntCharString(str_bytes,rawInputStr);
+//                	
+//                	
+//                	
+//                	
+//                 	System.out.println("");
+//                	System.out.println("————————————————————————"+"输入字符串字面量值:【"+rawInputStr+"】"+"————————————————————————");
+//                	System.out.println("字符串十十进制字节:【 [ "+ byte_10int_str+"] 】");
+//                	System.out.println("字符串十十进制字节:【 [ "+ byte_10int_tipstr+"] 】");
+//                	
+//                	System.out.println("字符串十六进制字节:【 [ "+ byte_tipstr+" ] 】");
+//                  	System.out.println("字符串十六进制字节:【 [ "+ byte_char_tipstr+"] 】");
                 }
 
 
             }
+            
+
+          	
         }
+        
+
 
     }
     
     
+	static void print_byte(String  paramItem ) {
+		
+        //    每个  输入的  字符 都打印 出 字节
+        
+    	String rawInputStr = paramItem.trim();
+    	byte[] str_bytes = rawInputStr.getBytes();
+    	
+    	String byte_tipstr = bytesToHexString(str_bytes);
+    	String byte_char_tipstr = bytesToHexCharString(str_bytes,rawInputStr);
+    	
+    	
+      	String byte_10int_str = bytesToIntString(str_bytes);
+      	
+    	String byte_10int_tipstr = bytesToIntCharString(str_bytes,rawInputStr);
+    	
+    	
+    	
+    	
+     	System.out.println("");
+    	System.out.println("————————————————————————"+"输入字符串字面量值:【"+rawInputStr+"】"+"————————————————————————");
+    	System.out.println("字符串十十进制字节:【 [ "+ byte_10int_str+"] 】");
+    	System.out.println("字符串十十进制字节:【 [ "+ byte_10int_tipstr+"] 】");
+    	
+    	System.out.println("字符串十六进制字节:【 [ "+ byte_tipstr+" ] 】");
+      	System.out.println("字符串十六进制字节:【 [ "+ byte_char_tipstr+"] 】");
+		
+	}
+    
+    
+    
+	static String bytesToIntString(byte[] src ) {
+		StringBuilder builder = new StringBuilder();
+		if (src == null || src.length <= 0) {
+			return null;
+		}
+		String hv;
+
+		int byteIndex = 0 ;
+		for (byte aSrc : src) {
+			// 以十六进制（基数 16）无符号整数形式返回一个整数参数的字符串表示形式，并转换为大写
+			hv = Integer.toString(aSrc & 0xFF).toUpperCase();
+			int value = Integer.parseInt(hv);
+			
+			int padding_blank = 2;
+			String blank_pandding_str = "  ";
+			if( value >= 100) {
+				padding_blank = 1;
+				blank_pandding_str = " ";
+			}
+			if (hv.length() < 2) {
+				builder.append(0);
+			}
+			
+			
+			if(byteIndex == src.length -1) {
+				builder.append(blank_pandding_str+hv+"  ");
+			}else {
+				builder.append(blank_pandding_str+hv+"   "+","+" ");
+			}
+		
+			byteIndex++;
+			
+		}
+
+//        System.out.println(builder.toString());
+		return builder.toString();
+	}
+	
+	
+    
+	static String bytesToIntCharString(byte[] src,String rawstr) {
+		StringBuilder builder = new StringBuilder();
+		if (src == null || src.length <= 0) {
+			return null;
+		}
+		String hv;
+
+		int byteIndex = 0 ;
+		for (byte aSrc : src) {
+			// 以十六进制（基数 16）无符号整数形式返回一个整数参数的字符串表示形式，并转换为大写
+			hv = Integer.toString(aSrc & 0xFF).toUpperCase();
+			int value = Integer.parseInt(hv);
+			
+			int padding_blank = 2;
+			String blank_pandding_str = "  ";
+			if( value >= 100) {
+				padding_blank = 1;
+				blank_pandding_str = " ";
+			}
+			if (hv.length() < 2) {
+				builder.append(0);
+			}
+			
+			
+			if(byteIndex == src.length -1) {
+				builder.append(blank_pandding_str+hv+"_"+rawstr.charAt(byteIndex)+"");
+			}else {
+				builder.append(blank_pandding_str+hv+"_"+rawstr.charAt(byteIndex)+" "+","+" ");
+			}
+		
+			byteIndex++;
+			
+		}
+
+//        System.out.println(builder.toString());
+		return builder.toString();
+	}
+	
+	
+	
+    
+    // 【0x31,0x32,0x33,0x34,0x35,0x36,0x37,0x38,0x74】
+    // 【0x31_x,0x32,0x33,0x34,0x35,0x36,0x37,0x38,0x74】
+	static String bytesToHexCharString(byte[] src,String rawstr) {
+		StringBuilder builder = new StringBuilder();
+		if (src == null || src.length <= 0) {
+			return null;
+		}
+		String hv;
+
+		int byteIndex = 0 ;
+		for (byte aSrc : src) {
+			// 以十六进制（基数 16）无符号整数形式返回一个整数参数的字符串表示形式，并转换为大写
+			hv = Integer.toHexString(aSrc & 0xFF).toUpperCase();
+			if (hv.length() < 2) {
+				builder.append(0);
+			}
+			if(byteIndex == src.length -1) {
+				builder.append("0x"+hv+"_"+rawstr.charAt(byteIndex)+"");
+			}else {
+				builder.append("0x"+hv+"_"+rawstr.charAt(byteIndex)+" "+","+" ");
+			}
+		
+			byteIndex++;
+			
+		}
+
+//        System.out.println(builder.toString());
+		return builder.toString();
+	}
+	
+	
+	static String bytesToHexString(byte[] src) {
+		StringBuilder builder = new StringBuilder();
+		if (src == null || src.length <= 0) {
+			return null;
+		}
+		String hv;
+
+		int byteIndex = 0 ;
+		for (byte aSrc : src) {
+			// 以十六进制（基数 16）无符号整数形式返回一个整数参数的字符串表示形式，并转换为大写
+			hv = Integer.toHexString(aSrc & 0xFF).toUpperCase();
+			if (hv.length() < 2) {
+				builder.append(0);
+			}
+			if(byteIndex == src.length -1) {
+				builder.append("0x"+hv+" ");
+			}else {
+				builder.append("0x"+hv+"   "+","+" ");
+			}
+		
+			byteIndex++;
+			
+		}
+
+//        System.out.println(builder.toString());
+		return builder.toString();
+	}
+	
+    
+	// 判断是否是数字
+	static boolean isNumericChar(String str) {
+		
+		for (int i = 0; i <str.length(); i++) {
+			char charItem = str.charAt(i);
+			if ((i== 0) && (charItem  == '-' || charItem  == '+')){
+				continue;
+			}
+			
+			if(!Character.isDigit(charItem)) {
+				   return false;
+			}
+		}
+	   return true;
+	}
+	
     /**
      * 利用 {@link java.nio.ByteBuffer}实现byte[]转long
      * @param input
