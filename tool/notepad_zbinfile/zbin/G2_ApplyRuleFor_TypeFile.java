@@ -19988,15 +19988,17 @@ public class G2_ApplyRuleFor_TypeFile {
 			}
 
 			// 对读取到的TEMP字节数组 BYTE_CONTENT_LENGTH 个字节进行 ECB模式加密 明文大小与密文大小一致
-
-			byte[] real_byte =   new byte[(int) generalFile_length];
-			for (int i = 0; i < generalFile_length; i++) {
-				real_byte[i] = TEMP_Rule7[i];
-			}
+          
+		
 			
 			byte[] encrypt_bytes = encrypt(TEMP_Rule7);
 
 			
+			/*
+			byte[] real_byte =   new byte[(int) generalFile_length];
+			for (int i = 0; i < generalFile_length; i++) {
+				real_byte[i] = TEMP_Rule7[i];
+			}
 			
 			byte[] encrypt_real_bytes = encrypt(real_byte);
 			String raw_bytes_str  = bytesToHexString(real_byte);
@@ -20012,7 +20014,7 @@ public class G2_ApplyRuleFor_TypeFile {
 			 
 			  System.out.println("原始字符串:"+raw_str+   "   "+ "原始Hex字符串:" + raw_bytes_str );
 			  System.out.println("加密字符串:"+encrypt_str+   "   "+"加密Hex字符串:" + encrypt_raw_bytes_str );
-	
+	        */
 
 			// 加密后的密文 填充 encryptFile文件的头首部
 			encryptBufferedOutputStream.write(encrypt_bytes, 0, encrypt_bytes.length);
