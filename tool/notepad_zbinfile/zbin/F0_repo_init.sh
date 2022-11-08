@@ -122,62 +122,6 @@ cd $CurPath_Begin/device/qcom/common
 CUR_GIT_PATH=$(pwd)
 echo "CUR_GIT_PATH="$CUR_GIT_PATH
 cd $CurPath_Begin
-##################### /device/mediatek/vendor/common  Begin #####################
-cd $CurPath_Begin/device/mediatek/vendor/common
-#TODO-LIST-Begin  
-# git cherry-pick 
-# git reset --hard 
-
-
-
-# TODO-LIST-END
-CUR_GIT_PATH=$(pwd)
-echo "CUR_GIT_PATH="$CUR_GIT_PATH
-cd $CurPath_Begin
-##################### /vendor/mediatek/proprietary/packages/services/LPPeService  Begin #####################
-cd $CurPath_Begin/vendor/mediatek/proprietary/packages/services/LPPeService
-#TODO-LIST-Begin  
-# git cherry-pick 
-# git reset --hard 
-
-
-# TODO-LIST-END
-CUR_GIT_PATH=$(pwd)
-echo "CUR_GIT_PATH="$CUR_GIT_PATH
-cd $CurPath_Begin
-##################### /vendor/mediatek/proprietary/packages/apps/LocationEM2  Begin #####################
-cd $CurPath_Begin/vendor/mediatek/proprietary/packages/apps/LocationEM2
-#TODO-LIST-Begin  
-# git cherry-pick 
-# git reset --hard 
-
-
-# TODO-LIST-END
-CUR_GIT_PATH=$(pwd)
-echo "CUR_GIT_PATH="$CUR_GIT_PATH
-cd $CurPath_Begin
-##################### /device/mediatek/common  Begin #####################
-cd $CurPath_Begin/device/mediatek/common
-#TODO-LIST-Begin  
-# git cherry-pick 
-# git reset --hard 
-
-
-# TODO-LIST-END
-CUR_GIT_PATH=$(pwd)
-echo "CUR_GIT_PATH="$CUR_GIT_PATH
-cd $CurPath_Begin
-##################### /vendor/mediatek/proprietary/hardware/connectivity/gps  Begin #####################
-cd $CurPath_Begin/vendor/mediatek/proprietary/hardware/connectivity/gps
-#TODO-LIST-Begin  
-# git cherry-pick 
-# git reset --hard 
-
-
-# TODO-LIST-END
-CUR_GIT_PATH=$(pwd)
-echo "CUR_GIT_PATH="$CUR_GIT_PATH
-cd $CurPath_Begin
 ##################### /motorola/security/sepolicy  Begin #####################
 cd $CurPath_Begin/motorola/security/sepolicy/
 #TODO-LIST-Begin  
@@ -190,16 +134,6 @@ cd $CurPath_Begin/motorola/security/sepolicy/
 CUR_GIT_PATH=$(pwd)
 echo "CUR_GIT_PATH="$CUR_GIT_PATH
 cd $CurPath_Begin
-##################### /device/moto/xxxx  Begin #####################
-cd $CurPath_Begin/device/moto/xxxx
-#TODO-LIST-Begin  
-# git cherry-pick 
-# git reset --hard 
-
-# TODO-LIST-END
-CUR_GIT_PATH=$(pwd)
-echo "CUR_GIT_PATH="$CUR_GIT_PATH
-cd $CurPath_Begin
 ##################### /vendor/qcom/opensource/wlan/qcacld-3.0  Begin #####################
 cd $CurPath_Begin/vendor/qcom/opensource/wlan/qcacld-3.0
 #TODO-LIST-Begin  
@@ -207,11 +141,29 @@ cd $CurPath_Begin/vendor/qcom/opensource/wlan/qcacld-3.0
 # git reset --hard 
 
 
+
 # TODO-LIST-END
 CUR_GIT_PATH=$(pwd)
 echo "CUR_GIT_PATH="$CUR_GIT_PATH
 cd $CurPath_Begin
-##############################################################################################################################
+
+################       Out-Dir Delete Operation Begin ####################  
+
+date_time=`date +%Y%m%d_%H%M%S`
+echo "date_time=$date_time"
+## mv ./out  ./out_"$date_time"
+## mv ./kernel_platform/out ./kernel_platform/out_"$date_time"
+
+################       Out-Dir Delete Operation End   ####################  
+
+
+##################### Absolution Path   Custom Operation Begin ########################################
+
+
+
+
+#####################  Absolution Path  Custom Operation End ##########################################
+
 cd $CurPath_Begin
 CurPath_End=$(pwd)
 echo "PATH_End="$CurPath_End
