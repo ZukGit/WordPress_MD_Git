@@ -12,6 +12,7 @@ echo "cur_F0_repo_init=$cur_F0_repo_init"
 
     if [ ! -f "$raw_F0_repo_init" ]; then
            echo " Raw  File $raw_F0_repo_init Not Exist!!!! "
+    
        else   
            echo " Raw  File $raw_F0_repo_init  Exist! "
 
@@ -26,6 +27,7 @@ echo "cur_F0_repo_init=$cur_F0_repo_init"
             
     fi
 
+
 echo "CUR_REPO_PATH="$CUR_REPO_PATH
 echo "cur_shell_path="$cur_shell_path
 echo "try execute  [ repo forall -c pwd ] please waitting! "
@@ -37,37 +39,51 @@ all_number=`grep -n  ""   ./repo_pwd.txt | wc -l`
 for line in `cat ./repo_pwd.txt`
 do
  cd $line
-git checkout TEMP
-git clean -dxf
+ 
+
 git_status=`git status | grep "commits"`
 git_release=`git status | grep "release"`
 git_untracked=`git status | grep "Untracked files"`
 
- echo "index=["$line_number"]["$all_number"]"  "pwd="$line "git_status="$git_status
-if [ -n "$git_status" ]; then
+echo -e "\n index=["$line_number"]["$all_number"]"  "pwd="$line "git_status="$git_status 
+git_desc=`git status`
+echo "git_desc="$git_desc
+git checkout TEMP
+git clean -dxf
 
-       if [ -n "$git_untracked" ]; then
+if [ -n "$git_status" ]; then
+ echo "________ go git_status block 1_"
+    if [ -n "$git_untracked" ]; then
+             echo "________ go git_untracked block 2_"
              echo "cur_path="$line " try to remove the untracked and git checkout .   "
              echo "cd "$line " && " "rm -fr ./ &&  git checkout . "
-			 git clean -dxf
+             git clean -dxf
              rm -fr ./
              git checkout .
-			 git clean -dxf
-       fi
-	
+    fi
+
+
     if [ -z "$git_release" ]; then
-        echo "════════════════════════════════════════""index=["$line_number"]["$all_number"]"  "pwd="$line "git_status="$git_status"════════════════════════"
-        echo "cur_path="$line " try to execute  <git reset --hard HEAD~5>  <repo sync .> "
-        git clean -dxf
-		git reset --hard HEAD~5
-        repo sync .
-        echo "cd "$line " && " "git status "
-        echo "══════════End["$line_number"]["$all_number"]════════════"  "pwd="$line    "git_status="$git_status
+            echo "________ go git_release block 3_"
+            echo "════════════════════════════════════════""index=["$line_number"]["$all_number"]"  "pwd="$line "git_status="$git_status"════════════════════════"
+
+
+            echo "cur_path="$line " try to execute  <git reset --hard HEAD~5>  <repo sync .> "
+            git clean -dxf
+            git reset --hard HEAD~5
+            repo sync .
+            echo "cd "$line " && " "git status "
+            echo "══════════End["$line_number"]["$all_number"]════════════"  "pwd="$line    "git_status="$git_status
+
+        else
+          echo "________ go git_release_else  block 4_"
+          echo "cd "$line " && " "git status "
+          echo "═#═#══#═#══#══End["$line_number"]["$all_number"]═#═#══#═#══#══"  "pwd="$line    "git_status="$git_status
     fi
   else
+      echo "________ go git_status_else  block 5_ "
       echo "cd "$line " && " "git status "
-      echo "__________End["$line_number"]["$all_number"]____________"  "pwd="$line    "git_status="$git_status
-
+      echo "═════════End["$line_number"]["$all_number"]═════════"  "pwd="$line    "git_status="$git_status
 fi
 
  let line_number=line_number+1
@@ -75,30 +91,29 @@ done
 
 cd $CUR_REPO_PATH
 
+
 echo "════════════════════════════════════════""["$all_number"]"" Git Repo Reset Finish ════════════════════════════════════════"
 echo "════════════════════════════ 1.   mv out out_1 "
 date_time=`date +%Y%m%d_%H%M%S`
 echo "date_time=$date_time"
-# mv ./out  ./out_"$date_time" 
-# mv ./kernel_platform/out ./kernel_platform/out_"$date_time"
+## mv ./out  ./out_"$date_time"
+## mv ./kernel_platform/out ./kernel_platform/out_"$date_time"
+## mv ./release  ./release_"$date_time"
 echo "════════════════════════════ 2.   repo sync -j2  "
 repo sync -j2
 echo "════════════════════════════  repo sync -j2 finish  ════════════════════════════  "
 
 
-
-echo "════════════════════════════ 3.  F0_repo_init  Cherry-Pick Operation Begin  ════════════════════════════  "
+echo "════════════════════════════3.  F0_repo_init  Cherry-Pick Operation Begin  ════════════════════════════  "
 raw_zrepo_reset="$HOME/Desktop/zbin/lin_zbin/zrepo_rest.sh"
 $cur_F0_repo_init
 if [ $? -eq 0 ]; then
-    echo "______build success_______ $cur_F0_repo_init  build success _____cur_F0_repo_init=$cur_F0_repo_init "
-    echo "______build success_______ $cur_F0_repo_init  build success _____raw_zrepo_reset=$raw_zrepo_reset "
+    echo "_____ $cur_F0_repo_init  build success _____raw_zrepo_reset=$raw_zrepo_reset "
 else
-    echo "__build failed___ $cur_F0_repo_init  __build failed ______rereset_____cur_zrepo_reset=$cur_F0_repo_init ___ "
-	echo "__build failed___ $cur_F0_repo_init  __build failed ______rereset_____raw_zrepo_reset=$raw_zrepo_reset ___ "
-    $raw_zrepo_reset
+    echo "_____ $cur_F0_repo_init build failed ____rereset_____raw_zrepo_reset=$raw_zrepo_reset ___ "
+$raw_zrepo_reset
 fi
 
 
 
-
+ 

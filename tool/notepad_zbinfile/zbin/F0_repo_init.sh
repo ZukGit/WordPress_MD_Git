@@ -147,22 +147,49 @@ CUR_GIT_PATH=$(pwd)
 echo "CUR_GIT_PATH="$CUR_GIT_PATH
 cd $CurPath_Begin
 
-################       Out-Dir Delete Operation Begin ####################  
+#################################################### Custom Operation Begin ##########################################################################
 
-date_time=`date +%Y%m%d_%H%M%S`
-echo "date_time=$date_time"
+############################ MSI Delete Operation 
+cd $CurPath_Begin
+## date_time=`date +%Y%m%d_%H%M%S`
 ## mv ./out  ./out_"$date_time"
 ## mv ./kernel_platform/out ./kernel_platform/out_"$date_time"
-
-################       Out-Dir Delete Operation End   ####################  
-
-
-##################### Absolution Path   Custom Operation Begin ########################################
+## mv ./release  ./release_"$date_time"
 
 
 
+############################ MSI Init Operation
+cd $CurPath_Begin
+##  repo --trace sync -cdf -j2     ## repo sync failed check 
 
-#####################  Absolution Path  Custom Operation End ##########################################
+
+
+############################ MSI  Build Operation 
+cd $CurPath_Begin
+
+
+#===========================================================================
+
+
+#=============================  Vendor Delete Operation 
+cd $CurPath_Begin
+## date_time=`date +%Y%m%d_%H%M%S`
+## mv ./out  ./out_"$date_time"
+## mv ./kernel_platform/out ./kernel_platform/out_"$date_time"
+## mv ./release  ./release_"$date_time"
+
+
+#============================= Vendor Init Operation
+cd $CurPath_Begin
+##  repo --trace sync -cdf -j2     ## repo sync failed check 
+
+#=============================  Vendor  Build Operation 
+cd $CurPath_Begin
+
+
+
+#################################################### Custom Operation End   #########################################################################
+
 
 cd $CurPath_Begin
 CurPath_End=$(pwd)
