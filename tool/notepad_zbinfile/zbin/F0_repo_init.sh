@@ -160,13 +160,13 @@ cd $CurPath_Begin
 
 ############################ MSI Init Operation
 cd $CurPath_Begin
-##  repo --trace sync -cdf -j2     ## repo sync failed check 
+## repo init custom &&  repo --trace sync -cdf -j2     ## repo sync failed check 
 
 
 
 ############################ MSI  Build Operation 
 cd $CurPath_Begin
-
+## source /opt/conf/moto.conf  
 
 #===========================================================================
 
@@ -181,11 +181,11 @@ cd $CurPath_Begin
 
 #============================= Vendor Init Operation
 cd $CurPath_Begin
-##  repo --trace sync -cdf -j2     ## repo sync failed check 
+##  repo init custom  &&  repo --trace sync -cdf -j2     ## repo sync failed check 
 
 #=============================  Vendor  Build Operation 
 cd $CurPath_Begin
-
+## source /opt/conf/moto.conf
 
 
 #################################################### Custom Operation End   #########################################################################

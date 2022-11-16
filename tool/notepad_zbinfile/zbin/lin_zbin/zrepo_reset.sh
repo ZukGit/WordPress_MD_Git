@@ -100,7 +100,7 @@ echo "date_time=$date_time"
 ## mv ./kernel_platform/out ./kernel_platform/out_"$date_time"
 ## mv ./release  ./release_"$date_time"
 echo "════════════════════════════ 2.   repo sync -j2  "
-repo sync -j2
+## repo sync -j2    ##  sync at F0_repo_init.sh
 echo "════════════════════════════  repo sync -j2 finish  ════════════════════════════  "
 
 
