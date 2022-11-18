@@ -567,6 +567,189 @@ public class I9_TextRuleOperation {
 		// 在当前的 md 文件中 把 # 号 里面 转为 # 1.   ## --> ## 2.   ###### --> ###### 6.
 		CUR_RULE_LIST.add(new MD_File_Head_JingHao_AddIndex_Rule_56());
 		
+		
+		// 在当前的中的文件 .c .cpp .java  .txt 等转为 一个 codeblock 写入 MD 文件 
+		CUR_RULE_LIST.add(new RealFile_To_MD_CodeBlock_Rule_57());
+		
+	}
+	
+	class RealFile_To_MD_CodeBlock_Rule_57 extends Basic_Rule {
+		ArrayList<String> allMD_Content;
+
+		RealFile_To_MD_CodeBlock_Rule_57() {
+			super(57, false);
+			allMD_Content = new ArrayList<String>();
+
+		}
+		
+		boolean  isFile_In_MD(File realFile) {
+			
+			
+			boolean flag = false ;
+			
+			
+			File mDir_SubFile = realFile;
+
+			if (mDir_SubFile == null || mDir_SubFile.isDirectory()) {
+				return flag ;
+			}
+
+			String filename_lowwer = mDir_SubFile.getName().toLowerCase();
+			
+			if (filename_lowwer.endsWith(".txt") 
+					||	filename_lowwer.endsWith(".h") 	
+					||	filename_lowwer.endsWith(".c") 	
+					||	filename_lowwer.endsWith(".sh") 	
+					||	filename_lowwer.endsWith(".mk") 	
+					||	filename_lowwer.endsWith(".cpp") 	
+					||	filename_lowwer.endsWith(".java") 	
+
+					) {
+				return true ;
+			}
+			
+			
+			return flag ;
+			
+		}
+
+		@Override
+		String simpleDesc() {
+			return "读取当前目录 txt .cpp .c .java  文件内容进行集合整理成 MD 文件类型 ## 行数 ```code```格式输出 ";
+		}
+
+		@Override
+		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
+				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+			
+			System.out.println("执行 规则:"+rule_index+" 的 applyOperationRule 方法!  curInputFileList.size()="+curInputFileList.size());
+			for (int i = 0; i < curInputFileList.size(); i++) {
+				File fileItem = curInputFileList.get(i);
+
+				File cur_txt_dir_file = fileItem.getParentFile();
+
+				if (cur_txt_dir_file == null || !cur_txt_dir_file.exists()) {
+					System.out.println("当前的 txt文件的父目录不存在 请检查! txt_fileItem=" + fileItem + "    cur_txt_dir_file="
+							+ cur_txt_dir_file);
+
+					return null;
+				}
+
+				System.out.println("当前的  txt_fileItem=" + fileItem + "    cur_txt_dir_file="
+						+ cur_txt_dir_file);
+				
+				File[] all_sub_file_arr = cur_txt_dir_file.listFiles();
+
+				if (all_sub_file_arr == null) {
+					System.out.println("当前的 txt文件的父目录为空  请检查! txt_fileItem=" + fileItem + "    cur_txt_dir_file="
+							+ cur_txt_dir_file + "   all_sub_file_arr=" + all_sub_file_arr);
+
+					return null;
+				}
+				
+				ArrayList<File> avaliable_file_list = new ArrayList<File>();
+				
+				
+				for (int j = 0; j < all_sub_file_arr.length; j++) {
+					File fileItem_temp = all_sub_file_arr[j];
+					
+					if(fileItem_temp.isFile() ) {
+						
+						avaliable_file_list.add(fileItem_temp);
+					}
+				}
+				
+				avaliable_file_list.sort(new Comparator<File>() {
+					@Override
+					public int compare(File o1, File o2) {
+						if(o1.length() > o2.length()) {
+							
+							return -1;
+						}
+						
+				        if(o1.length() < o2.length()) {
+							
+							return 1;
+						}
+				        
+				        if(o1.length() == o2.length()) {
+							
+							return -1;
+						}
+				
+						return 1;
+					}
+				});
+				
+		
+				
+
+				System.out.println("当前的  avaliable_file_list  =" + avaliable_file_list );
+				
+				for (int j = 0; j < avaliable_file_list.size(); j++) {
+					File mDir_SubFile = avaliable_file_list.get(j);
+
+					if (mDir_SubFile == null || mDir_SubFile.isDirectory()) {
+						continue;
+					}
+					boolean is_need_write_md =  isFile_In_MD(mDir_SubFile);
+					System.out.println("当前的  mDir_SubFile["+j+"]  =" + mDir_SubFile +"  is_need_write_md="+is_need_write_md );
+					if (!is_need_write_md) {
+						continue;
+					}
+
+					ArrayList<String> txtFileList = ReadFileContentAsList(mDir_SubFile);
+					System.out.println("当前的  mDir_SubFile["+j+"]  =" + mDir_SubFile +"  txtFileList="+txtFileList );
+
+					
+					ArrayList<String> mdContentList = 	addCodeBlock_To_MD(mDir_SubFile,txtFileList);
+					
+					if(mdContentList != null ) {
+						allMD_Content.addAll(mdContentList);
+					}
+					
+					System.out.println("当前的  mDir_SubFile["+j+"]  =" + mDir_SubFile +"  txtFileList="+txtFileList );
+					
+
+				}
+
+	
+
+				for (int j = 0; j < allMD_Content.size(); j++) {
+					String line_str = allMD_Content.get(j);
+					System.out.println("line[" + (j + 1) + "] = " + line_str);
+
+				}
+
+				writeContentToFile(I9_Temp_Text_File, allMD_Content);
+				NotePadOpenTargetFile(I9_Temp_Text_File.getAbsolutePath());
+
+			}
+
+			return super.applyOperationRule(curFileList, subFileTypeMap, curDirList, curRealFileList);
+		}
+
+
+		ArrayList<String>  addCodeBlock_To_MD(File realFile , ArrayList<String> lineList) {
+
+			ArrayList<String> codeBlockList =  new ArrayList<String>();
+			
+			int fileRow_Count  = lineList.size();
+			String file_name = realFile.getName();
+			
+			
+			String HeadTip = "###  "+ realFile.getName()+"("+fileRow_Count+")";
+
+			codeBlockList.add(HeadTip);
+			codeBlockList.add("");
+			codeBlockList.add("```");
+			codeBlockList.addAll(lineList);
+			codeBlockList.add("```");
+			codeBlockList.add("");
+
+			return codeBlockList ;
+		}
+
 	}
 	
 	

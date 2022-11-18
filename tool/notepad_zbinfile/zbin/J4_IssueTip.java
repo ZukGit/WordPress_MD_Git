@@ -755,11 +755,11 @@ public class J4_IssueTip {
         System.out.println("0xB0ED (LTE NAS EMM Plain OTA outgoing Message)");
         System.out.println("0xB0EC (LTE NAS EMM Plain OTA incoming Message)  进行过滤");
         System.out.println();
-        System.out.println("【Bug2go GNSS_V9.cfg 抓取Modem LOG 提示】");
+        System.out.println("【Bug2go GNSS_LT20_General.cfg 抓取Modem LOG 提示】");
         System.out.println("modem log was collected using QC_default.cfg as log mask, so there is very few GNSS msg in QXDM log and we can not further check it from modem perspective");
         System.out.println("( whether there is any interferance, whether HW performance is good, whether any error from modem or GNSS engine... )");
-        System.out.println("can you please help to use GNSS_V9.cfg as log mask");
-        System.out.println("( Bug2Go -> System Debug Settings -> diag_mdlog v2 -> Config file -> GNSS_V9.cfg ) to collect one more B2G log?");
+        System.out.println("can you please help to use GNSS_LT20_General.cfg as log mask");
+        System.out.println("( Bug2Go -> System Debug Settings -> diag_mdlog v2 -> Config file -> GNSS_LT20_General.cfg ) to collect one more B2G log?");
         System.out.println("and if possible, please help to side by side test it on REF device and collect pass log for comparison");
         System.out.println("much appreciated");
         System.out.println();
