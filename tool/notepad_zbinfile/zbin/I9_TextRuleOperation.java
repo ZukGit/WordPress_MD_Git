@@ -571,7 +571,394 @@ public class I9_TextRuleOperation {
 		// 在当前的中的文件 .c .cpp .java  .txt 等转为 一个 codeblock 写入 MD 文件 
 		CUR_RULE_LIST.add(new RealFile_To_MD_CodeBlock_Rule_57());
 		
+		
+		//  把当前的 变量表达式  等号前的 值 转为  echo 类型的输出
+		// gen_fact_package=0
+		//echo "$ {gen_fact_package}=${gen_fact_package}"
+		CUR_RULE_LIST.add(new Bash_Var_To_Echo_Rule_58());
+		
+		
+		//  把当前 bash  文件 和 sh 文件  空格插入echo  追踪 打印数据  然后 查看 执行 调用过程 
+		// gen_fact_package=0
+		//echo "$ {gen_fact_package}=${gen_fact_package}"
+		CUR_RULE_LIST.add(new Add_Echo_Log_To_SH_BASH_Rule_59());
+		
+		
 	}
+	
+	class Add_Echo_Log_To_SH_BASH_Rule_59 extends Basic_Rule {
+
+
+		@Override
+		String simpleDesc() {
+			return "  把当前 bash  文件 和 sh 文件  空格插入echo  追踪 打印数据  然后 查看 执行 调用过程  ";
+		}
+
+		Add_Echo_Log_To_SH_BASH_Rule_59() {
+			super(59, false);
+		}
+
+		
+		@Override
+		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
+				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+			for (int i = 0; i < curInputFileList.size(); i++) {
+				File fileItem = curInputFileList.get(i);
+				
+				String file_name = fileItem.getName();
+				
+				if(!file_name.toLowerCase().endsWith(".sh") && !file_name.toLowerCase().endsWith(".bash") ) {
+					
+					System.out.println("当前文件 不是  sh 文件 或者 bash  文件 无法执行  添加 echo 打印变量的操作  请检查!");
+					
+					return null;
+				}
+
+//                ArrayList<String>  fixedStrArr =   clearChinese_Rule_13(fileItem);
+				ArrayList<String> fixedStrArr = Bash_Sh_File_Add_Echo(fileItem);
+				System.out.println("════════════" + "输出文件 Begin " + "════════════");
+				for (int j = 0; j < fixedStrArr.size(); j++) {
+					System.out.println(fixedStrArr.get(j));
+				}
+				System.out.println("════════════" + "输出文件 End " + "════════════");
+				writeContentToFile(I9_Temp_Text_File, fixedStrArr);
+				NotePadOpenTargetFile(I9_Temp_Text_File.getAbsolutePath());
+				System.out.println("rule_" + rule_index + " ->  把当前文件的 等号表达式=  都 转为 echo ${ var } = ${var} 的内容   File="
+						+ fileItem.getAbsolutePath());
+			}
+
+			return super.applyOperationRule(curFileList, subFileTypeMap, curDirList, curRealFileList);
+		}
+
+		
+
+		
+		public  ArrayList<String> Bash_Sh_File_Add_Echo(File srcFile) {
+			ArrayList<String> newListContent = new ArrayList<String>();
+
+			File curFile = srcFile;
+
+			String file_name = curFile.getName();
+			
+			int echo_count = 1;
+			if (curFile != null) {
+
+				FileReader curReader;
+				try {
+
+					curReader = new FileReader(curFile);
+
+					BufferedReader curBR = new BufferedReader(new InputStreamReader(new FileInputStream(curFile), "utf-8"));
+					String oldOneLine = "";
+					String newOneLine = "";
+
+					while (oldOneLine != null) {
+
+						oldOneLine = curBR.readLine();
+						if (oldOneLine == null || oldOneLine.trim().isEmpty()) {
+							newListContent.add("");
+							continue;
+						}
+
+//	                    System.out.println(" \"this is test string\" ");
+//	                    System.out.println("adb shell am broadcast -a com.Android.test --es<string> test_string \"this is test string\" —ei<int> test_int 100 —ez<boolean> test_boolean true");
+						newOneLine = new String(oldOneLine).trim();
+
+						
+						
+						// 最后是以 " 或者 \ 结尾的  不操作
+						//echo zukgit_build_device_old.bash_479  "$ {build_int_files}=${build_int_files}"
+						// ramdisk-recovery.img \
+						
+						//1. 不包含 等号 而且是以 \ 和  为 结尾 说明 可能是 多行操作   不执行 打印操作 
+						// fuck 这里 " 为结尾 不能 这样写 
+						if( (newOneLine.endsWith("\\") ))   {  // 以 \   为 结尾 开头 是多行  直接 跳过 
+							
+							newListContent.add(newOneLine);
+							continue;
+						}
+				
+						// 当前 只有 一个 引号  那么 也 跳过
+						if( (newOneLine.endsWith("\"")) && ( newOneLine.indexOf("\"") == newOneLine.lastIndexOf("\"") ))   {  // 以 \   为 结尾 开头 是多行  直接 跳过 
+							
+							newListContent.add(newOneLine);
+							continue;
+						}
+	
+						
+						//1.注释
+						if(newOneLine.startsWith("#")) {  // 以 # 开头 是注释  直接 跳过 
+							
+							newListContent.add(newOneLine);
+							continue;
+						}
+ 
+						
+						
+						// 只对 包含 = 等号的 变量进行输出 
+						//  script_name=$(basename ${script_path})   不以 if 开头  只有 一个 等号
+						//2. 只有一个等号的 赋值 的 表达式的处理
+						if(!newOneLine.startsWith("if") 
+								&& !newOneLine.contains("!=") 
+								&& newOneLine.contains("=")
+								&& newOneLine.indexOf("=") == newOneLine.lastIndexOf("=") ) {
+							String equal_var_str = newOneLine.substring(0,newOneLine.indexOf("=")).trim();
+							
+							if(equal_var_str.contains(" ")) {  //  // 如果 变量名称中 含有 空格那么 就不打印它了 
+								newListContent.add(newOneLine);
+								continue;
+							}
+							
+							String echo_var_command = "echo zukgit_"+file_name+"_"+echo_count+"  "+"\"$ {"+equal_var_str+"}=${"+equal_var_str+"}\"";
+							echo_count++;
+							newListContent.add(newOneLine);
+							newListContent.add(echo_var_command);
+							continue;
+						}
+						
+						
+						//3. 方法的内部  那么打印调用的方法 
+						//function release_build_info {
+						if(newOneLine.startsWith("function ")) {
+				
+							String function_name = newOneLine.replace("{", "").replace("}", "").replace("(", "").replace(")", "").trim();
+							String method_echo_command =  "echo zukgit_"+file_name+"_"+echo_count+" ______func_begin___________ "+function_name+" ___________";
+							echo_count++;
+							newListContent.add(newOneLine);
+							newListContent.add(method_echo_command);
+							continue;
+						}
+						
+						
+						// 如果当前语句中有变量  那么 获取 所有的变量的名字  并打印
+						//          cp ${RBE_log_dir}/rbe_metrics.* ${build_info_dir}/ || true
+						//4. 
+						if(newOneLine.contains("${")) {
+							String[] var_arr = newOneLine.split("\\$\\{");
+							if(var_arr == null) {
+								newListContent.add(newOneLine);
+								continue;
+							}
+							
+							for (int i = 0; i < var_arr.length; i++) {
+								String varItem = var_arr[i]+" ";;
+								
+								if(i == 0) {   // 第一个分隔项 是 没有匹配的
+									continue;
+								}
+								
+								if(varItem.contains("}")) {
+									String var_name = varItem.trim().substring(0,varItem.indexOf("}"));
+									
+									if(var_name.contains(" ")) {  // 如果 变量名称中 含有 空格那么 就不打印它了 
+										continue;
+									}
+									
+									String echo_var_command =  "echo zukgit_"+file_name+"_"+echo_count+"  "+"\"$ {"+var_name+"}=${"+var_name+"}\"";
+									echo_count++;
+									newListContent.add(echo_var_command);
+									
+								}
+							}
+							newListContent.add(newOneLine);
+							continue;
+						}
+						
+						//5. 
+						// generate_product_graph $NINJA_BUILD_FILE $MSI_TARGET  没有 括号 扩起的 变量 
+						if(newOneLine.contains("$") && !newOneLine.contains("${") && !newOneLine.contains(")")   ) {
+							String[] var_arr = newOneLine.split("\\$");
+							if(var_arr == null) {
+								newListContent.add(newOneLine);
+								continue;
+							}
+							
+							
+							
+							for (int i = 0; i < var_arr.length; i++) {
+								String varItem = var_arr[i]+" ";
+								
+								if(i == 0) {   // 第一个分隔项 是 没有匹配的
+									continue;
+								}
+								
+								String var_name = "";
+								if(varItem.contains(" ")) {
+									var_name = varItem.trim().substring(0,varItem.indexOf(" "));
+									
+									
+									if(var_name.contains(" ") || var_name.contains("/") || var_name.contains(".") ) {  // 如果 变量名称中 含有 空格那么 就不打印它了 
+										continue;
+									}
+									var_name = var_name.replace("\\", "").replace("/", "").replace("\"", "").replace(",", "").replace(" ", "");
+									String echo_var_command =  "echo zukgit_"+file_name+"_"+echo_count+"  "+"\"$ {"+var_name+"}=${"+var_name+"}\"";
+									echo_count++;
+									newListContent.add(echo_var_command);
+									
+								}
+							}
+							newListContent.add(newOneLine);
+							continue;
+							
+							
+						}
+						
+						
+						
+						newListContent.add(newOneLine.trim());
+					}
+					curBR.close();
+
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			} else {
+				System.out.println("Failed !");
+			}
+			return newListContent;
+		}
+		
+
+		// 3. 如果当前 执行 错误 checkParams 返回 false 那么 将 打印这个函数 说明错误的可能原因
+		@Override
+		void showWrongMessage() {
+			System.out.println("当前 type 索引 " + rule_index + " 执行错误  可能是输入参数错误 请检查输入参数!");
+			System.out.println(" errorMsg = " + errorMsg);
+		}
+
+		// 4. 当前 rule的 说明 将会打印在 用户输入为空时的 提示语句！
+		@Override
+		String ruleTip(String type, int index, String batName, OS_TYPE curType) {
+			String itemDesc = "";
+			if (curType == OS_TYPE.Windows) {
+				itemDesc = batName.trim() + "  " + type + "_" + index + "    [索引 " + index + "]  描述:" + ""
+						+ simpleDesc();
+			} else {
+				itemDesc = batName.trim() + " " + type + "_" + index + "    [索引 " + index + "]  描述:" + ""
+						+ simpleDesc();
+			}
+
+			return itemDesc;
+		}
+	}
+
+	
+	
+	class Bash_Var_To_Echo_Rule_58 extends Basic_Rule {
+
+
+		@Override
+		String simpleDesc() {
+			return "  把当前文件的每一行 等号前的变量 gen_fact_package=0 都 转为 Linux-bash的输出 echo \"$ {gen_fact_package}=${gen_fact_package}\"  ";
+		}
+
+		Bash_Var_To_Echo_Rule_58() {
+			super(58, false);
+		}
+
+		@Override
+		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
+				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+			for (int i = 0; i < curInputFileList.size(); i++) {
+				File fileItem = curInputFileList.get(i);
+
+//                ArrayList<String>  fixedStrArr =   clearChinese_Rule_13(fileItem);
+				ArrayList<String> fixedStrArr = Linxu_Var_Echo_Method(fileItem);
+				System.out.println("════════════" + "输出文件 Begin " + "════════════");
+				for (int j = 0; j < fixedStrArr.size(); j++) {
+					System.out.println(fixedStrArr.get(j));
+				}
+				System.out.println("════════════" + "输出文件 End " + "════════════");
+				writeContentToFile(I9_Temp_Text_File, fixedStrArr);
+				NotePadOpenTargetFile(I9_Temp_Text_File.getAbsolutePath());
+				System.out.println("rule_" + rule_index + " ->  把当前文件的 等号表达式=  都 转为 echo ${ var } = ${var} 的内容   File="
+						+ fileItem.getAbsolutePath());
+			}
+
+			return super.applyOperationRule(curFileList, subFileTypeMap, curDirList, curRealFileList);
+		}
+
+		
+
+		
+		public  ArrayList<String> Linxu_Var_Echo_Method(File srcFile) {
+			ArrayList<String> newContent = new ArrayList<String>();
+
+			File curFile = srcFile;
+
+			if (curFile != null) {
+
+				FileReader curReader;
+				try {
+
+					curReader = new FileReader(curFile);
+
+					BufferedReader curBR = new BufferedReader(new InputStreamReader(new FileInputStream(curFile), "utf-8"));
+					String oldOneLine = "";
+					String newOneLine = "";
+
+					while (oldOneLine != null) {
+
+						oldOneLine = curBR.readLine();
+						if (oldOneLine == null || oldOneLine.trim().isEmpty()) {
+						//	newContent.add("System.out.println();");
+							continue;
+						}
+
+//	                    System.out.println(" \"this is test string\" ");
+//	                    System.out.println("adb shell am broadcast -a com.Android.test --es<string> test_string \"this is test string\" —ei<int> test_int 100 —ez<boolean> test_boolean true");
+						newOneLine = new String(oldOneLine).trim();
+
+						
+						// 只对 包含 = 等号的 变量进行输出 
+						if(!newOneLine.contains("=")) {
+							continue;
+						}
+						
+						String equal_var_str = newOneLine.substring(0,newOneLine.indexOf("=")).trim();
+						
+						// echo "$ {gen_fact_package}=${gen_fact_package}"
+						
+						String echo_command = "echo \"$ {"+equal_var_str+"}=${"+equal_var_str+"}\"";
+						
+
+						newContent.add(echo_command.trim());
+					}
+					curBR.close();
+
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			} else {
+				System.out.println("Failed !");
+			}
+			return newContent;
+		}
+		
+
+		// 3. 如果当前 执行 错误 checkParams 返回 false 那么 将 打印这个函数 说明错误的可能原因
+		@Override
+		void showWrongMessage() {
+			System.out.println("当前 type 索引 " + rule_index + " 执行错误  可能是输入参数错误 请检查输入参数!");
+			System.out.println(" errorMsg = " + errorMsg);
+		}
+
+		// 4. 当前 rule的 说明 将会打印在 用户输入为空时的 提示语句！
+		@Override
+		String ruleTip(String type, int index, String batName, OS_TYPE curType) {
+			String itemDesc = "";
+			if (curType == OS_TYPE.Windows) {
+				itemDesc = batName.trim() + "  " + type + "_" + index + "    [索引 " + index + "]  描述:" + ""
+						+ simpleDesc();
+			} else {
+				itemDesc = batName.trim() + " " + type + "_" + index + "    [索引 " + index + "]  描述:" + ""
+						+ simpleDesc();
+			}
+
+			return itemDesc;
+		}
+	}
+
 	
 	class RealFile_To_MD_CodeBlock_Rule_57 extends Basic_Rule {
 		ArrayList<String> allMD_Content;
