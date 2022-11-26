@@ -102,6 +102,7 @@ public class F0_RepoCommand {
         String buildsummary_build_target ; // 产品名称
 
         String BuildInstruction_Content;  //  
+        String BuildInstruction_MoveHtml_Content;  // 
         ArrayList<String> BuildInstructionList;  //  
         
         String BuildInstruction_VendorOnly_Content;  // 
@@ -129,6 +130,8 @@ public class F0_RepoCommand {
         
         
         String ManifestInfo_Content;  // 
+        String ManifestInfo_MoveHtml_Content;  // 
+        
         ArrayList<String> ManifestInfoList; 
         String manifestinfo_branch ;   // MANIFEST BRANCH	ms  // manifest的分支
         String manifestinfo_xmlfile ;     // MANIFEST FILE	r-q8450.xml   // .xml输入
@@ -867,57 +870,118 @@ public class F0_RepoCommand {
         product_txt_List.add("16_manifest_url      =  " +metaData.manifestinfo_url); 
         product_txt_List.add("17_manifest_git      =  " +metaData.manifestinfo_url_gitname); 
         
-        // -------------------------------   【 编译 apk jar so bin 命令】-----------------------------		
-        product_txt_List.add("");
-        product_txt_List.add("");
-        product_txt_List.add(getSchema("【"+productName+" MSI Init 】 MSI Repo Init 初始化 MSI 命令"));
-        product_txt_List.add("");
-        product_txt_List.add("source /opt/conf/moto.conf "+" && "+ metaData.buildinstruction_msionly_repo_fixed_init+" && "+ " repo sync -j2 " +" && "+" repo start --all TEMP " +" && "+metaData.buildinstruction_msionly_compile_command+ " 2>&1 | tee "+getTimeStamp()+"_"+metaData.buildsummary_build_target+".log");
-      //  product_txt_List.add("source build/envsetup.sh && source /opt/conf/moto.conf "+" && "+ metaData.buildinstruction_msionly_repo_fixed_init+" && "+ " repo sync -j2 " +" && "+" repo start --all TEMP " +" && "+metaData.buildinstruction_msionly_compile_command+ " 2>&1 | tee "+getTimeStamp()+"_"+metaData.buildsummary_build_target+".log");
-
-        product_txt_List.add("");
-        product_txt_List.add(getSchema("【"+productName+" MSI-Track Init 】  MSI Repo Trace Init 初始化 MSI 命令"));
-        product_txt_List.add("");
-//        product_txt_List.add("source build/envsetup.sh && source /opt/conf/moto.conf "+" && "+ metaData.buildinstruction_msionly_repo_fixed_init+" && "+ " repo --trace sync  -cdf  -j2 " +" && "+" repo start --all TEMP " +" && "+metaData.buildinstruction_msionly_compile_command+ " 2>&1 | tee "+getTimeStamp()+"_"+metaData.buildsummary_build_target+".log");
-        product_txt_List.add("source /opt/conf/moto.conf "+" && "+ metaData.buildinstruction_msionly_repo_fixed_init+" && "+ " repo --trace sync  -cdf  -j2 " +" && "+" repo start --all TEMP " +" && "+metaData.buildinstruction_msionly_compile_command+ " 2>&1 | tee "+getTimeStamp()+"_"+metaData.buildsummary_build_target+".log");
-        product_txt_List.add("");
         
-        product_txt_List.add(getSchema("【"+productName+" MSI Rebuild 】 "));
-        product_txt_List.add("");
-//        product_txt_List.add("source build/envsetup.sh && source /opt/conf/moto.conf "+" && "+metaData.buildinstruction_msionly_compile_command+ " 2>&1 | tee "+getTimeStamp()+"_"+metaData.buildsummary_build_target+".log");
-        product_txt_List.add("source /opt/conf/moto.conf "+" && "+metaData.buildinstruction_msionly_compile_command+ " 2>&1 | tee "+getTimeStamp()+"_"+metaData.buildsummary_build_target+".log");
-
-        
-        
-        product_txt_List.add("");
-        product_txt_List.add("");
-        product_txt_List.add("");
-        product_txt_List.add("");
-        product_txt_List.add(getSchema("【"+productName+" Vendor Init 】  Vendor Repo Init 初始化 Vendor 命令"));
-        product_txt_List.add("");
-//        product_txt_List.add("source build/envsetup.sh && source /opt/conf/moto.conf "+" && "+ metaData.buildinstruction_vendoronly_repo_fixed_init+" && " +" repo sync -j2 " +" && "+" repo start --all TEMP " +" && "+metaData.buildinstruction_vendoronly_compile_command+ " 2>&1 | tee "+getTimeStamp()+"_"+metaData.buildsummary_build_target+".log");
-        product_txt_List.add("source /opt/conf/moto.conf "+" && "+ metaData.buildinstruction_vendoronly_repo_fixed_init+" && " +" repo sync -j2 " +" && "+" repo start --all TEMP " +" && "+metaData.buildinstruction_vendoronly_compile_command+ " 2>&1 | tee "+getTimeStamp()+"_"+metaData.buildsummary_build_target+".log");
-
-        product_txt_List.add("");
-        product_txt_List.add(getSchema("【"+productName+" Vendor Track Init 】 Vendor Repo Trace Init  初始化 Vendor 命令"));
-        product_txt_List.add("");
-//        product_txt_List.add("source build/envsetup.sh && source /opt/conf/moto.conf "+" && "+ metaData.buildinstruction_vendoronly_repo_fixed_init+" && " +" repo --trace sync  -cdf  -j2 " +" && "+" repo start --all TEMP " +" && "+metaData.buildinstruction_vendoronly_compile_command+ " 2>&1 | tee "+getTimeStamp()+"_"+metaData.buildsummary_build_target+".log");
-        product_txt_List.add("source /opt/conf/moto.conf "+" && "+ metaData.buildinstruction_vendoronly_repo_fixed_init+" && " +" repo --trace sync  -cdf  -j2 " +" && "+" repo start --all TEMP " +" && "+metaData.buildinstruction_vendoronly_compile_command+ " 2>&1 | tee "+getTimeStamp()+"_"+metaData.buildsummary_build_target+".log");
-
-        product_txt_List.add("");
-        
-        product_txt_List.add(getSchema("【"+productName+" Vendor Rebuild 】 "));
-        product_txt_List.add("");
-//        product_txt_List.add("source build/envsetup.sh && source /opt/conf/moto.conf "+"  && "+metaData.buildinstruction_vendoronly_compile_command+ " 2>&1 | tee "+getTimeStamp()+"_"+metaData.buildsummary_build_target+".log");
-        product_txt_List.add("source /opt/conf/moto.conf "+"  && "+metaData.buildinstruction_vendoronly_compile_command+ " 2>&1 | tee "+getTimeStamp()+"_"+metaData.buildsummary_build_target+".log");
-
-        product_txt_List.add("");
         // -------------------------------   【 Modem Release Info 信息】-----------------------------
         product_txt_List.add("");
         
         product_txt_List.add(getSchema("【"+productName+"】  Modem Release Info 信息"));
         product_txt_List.add(metaData.ModemRelease_MoveHtml_Content );
         product_txt_List.add(""); 
+        
+        
+        // -------------------------------   【 Manifest    Info 信息】-----------------------------
+        product_txt_List.add("");
+        
+        product_txt_List.add(getSchema("【"+productName+"】  Manifest  Info 信息"));
+        product_txt_List.add(metaData.ManifestInfo_MoveHtml_Content  );
+        product_txt_List.add(""); 
+        
+        
+
+        // -------------------------------   【 BUILD INSTRUCTIONS  Info 信息】-----------------------------
+        product_txt_List.add("");
+        
+        product_txt_List.add(getSchema("【"+productName+"】  Build Instructions Info 信息"));
+        product_txt_List.add(metaData.BuildInstruction_MoveHtml_Content  );
+        product_txt_List.add(""); 
+        
+        
+        
+        
+        // -------------------------------   【  MSI Init Info 信息】-----------------------------
+
+        product_txt_List.add("");
+        product_txt_List.add("");
+        
+        product_txt_List.add(getSchema("【"+productName+" MSI Init 】 MSI Repo Init 初始化 MSI 命令"));
+        product_txt_List.add("");
+        product_txt_List.add(metaData.buildinstruction_msionly_repo_fixed_init+" && "+ " repo sync -j2 " +" && "+" repo start --all TEMP " +" && "+" "+" && "+"source /opt/conf/moto.conf "+" && "+metaData.buildinstruction_msionly_compile_command+ " 2>&1 | tee "+getTimeStamp()+"_"+metaData.buildsummary_build_target+".log");
+        product_txt_List.add("");
+        
+        product_txt_List.add(getSchema("【"+productName+" MSI Init && Zrule 】 MSI Repo Init 初始化 MSI 命令  && Zrule修改命令 "));
+        product_txt_List.add("");
+        product_txt_List.add(metaData.buildinstruction_msionly_repo_fixed_init+" && "+ " repo sync -j2 " +" && "+" repo start --all TEMP " +" && "+"zrule_apply_G2"+Cur_Batch_End+" #_57 1  2  tip_qcom_mtk"+" && "+"source /opt/conf/moto.conf "+" && "+metaData.buildinstruction_msionly_compile_command+ " 2>&1 | tee "+getTimeStamp()+"_"+metaData.buildsummary_build_target+".log");
+
+        
+        
+        product_txt_List.add("");
+        product_txt_List.add(getSchema("【"+productName+" MSI-Track Init 】  MSI Repo Trace Init 初始化 MSI 命令"));
+        product_txt_List.add("");
+        product_txt_List.add("source /opt/conf/moto.conf "+" && "+ metaData.buildinstruction_msionly_repo_fixed_init+" && "+ " repo --trace sync  -cdf  -j2 " +" && "+" repo start --all TEMP " +" && "+metaData.buildinstruction_msionly_compile_command+ " 2>&1 | tee "+getTimeStamp()+"_"+metaData.buildsummary_build_target+".log");
+        product_txt_List.add("");
+
+        product_txt_List.add(getSchema("【"+productName+" MSI-Track Init && Zrule  】  MSI Repo Trace Init 初始化 MSI 命令  && Zrule修改命令 "));
+        product_txt_List.add("");
+        product_txt_List.add(metaData.buildinstruction_msionly_repo_fixed_init+" && "+ " repo --trace sync  -cdf  -j2  " +" && "+" repo start --all TEMP " +" && "+"zrule_apply_G2"+Cur_Batch_End+" #_57 1  2  tip_qcom_mtk"+" && "+"source /opt/conf/moto.conf "+" && "+metaData.buildinstruction_msionly_compile_command+ " 2>&1 | tee "+getTimeStamp()+"_"+metaData.buildsummary_build_target+".log");
+
+        product_txt_List.add("");
+        
+        
+        product_txt_List.add(getSchema("【"+productName+" MSI Rebuild 】 "));
+        product_txt_List.add("");
+        product_txt_List.add("source /opt/conf/moto.conf "+" && "+metaData.buildinstruction_msionly_compile_command+ " 2>&1 | tee "+getTimeStamp()+"_"+metaData.buildsummary_build_target+".log");
+
+        product_txt_List.add("");
+        product_txt_List.add(getSchema("【"+productName+" MSI Rebuild && Zrule  】 &&  Zrule修改命令 "));
+        product_txt_List.add("");
+        product_txt_List.add("zrule_apply_G2"+Cur_Batch_End+" #_57 1  2  tip_qcom_mtk"+" && "+"source /opt/conf/moto.conf "+" && "+metaData.buildinstruction_msionly_compile_command+ " 2>&1 | tee "+getTimeStamp()+"_"+metaData.buildsummary_build_target+".log");
+
+        
+        
+        product_txt_List.add("");
+        product_txt_List.add("");
+        product_txt_List.add("");
+        product_txt_List.add("");
+        // -------------------------------   【  Vendor Init Info 信息】-----------------------------
+        
+        product_txt_List.add(getSchema("【"+productName+" Vendor Init 】  Vendor Repo Init 初始化 Vendor 命令"));
+        product_txt_List.add("");
+        product_txt_List.add("source /opt/conf/moto.conf "+" && "+ metaData.buildinstruction_vendoronly_repo_fixed_init+" && " +" repo sync -j2 " +" && "+" repo start --all TEMP " +" && "+metaData.buildinstruction_vendoronly_compile_command+ " 2>&1 | tee "+getTimeStamp()+"_"+metaData.buildsummary_build_target+".log");
+
+        product_txt_List.add("");
+        product_txt_List.add(getSchema("【"+productName+" Vendor Init && Zrule  】  Vendor Repo Init 初始化 Vendor 命令 && zrule修改命令"));
+        product_txt_List.add("");
+        product_txt_List.add( metaData.buildinstruction_vendoronly_repo_fixed_init+" && " +" repo sync -j2 " +" && "+" repo start --all TEMP "+" && "+"zrule_apply_G2"+Cur_Batch_End+" #_57 1  2  tip_qcom_mtk"  +" && "+"source /opt/conf/moto.conf "+" && "+metaData.buildinstruction_vendoronly_compile_command+ " 2>&1 | tee "+getTimeStamp()+"_"+metaData.buildsummary_build_target+".log");
+
+        
+        
+        product_txt_List.add("");
+        product_txt_List.add(getSchema("【"+productName+" Vendor Track Init 】 Vendor Repo Trace Init  初始化 Vendor 命令"));
+        product_txt_List.add("");
+        product_txt_List.add("source /opt/conf/moto.conf "+" && "+ metaData.buildinstruction_vendoronly_repo_fixed_init+" && " +" repo --trace sync  -cdf  -j2 " +" && "+" repo start --all TEMP " +" && "+metaData.buildinstruction_vendoronly_compile_command+ " 2>&1 | tee "+getTimeStamp()+"_"+metaData.buildsummary_build_target+".log");
+
+        
+        product_txt_List.add("");
+        product_txt_List.add(getSchema("【"+productName+" Vendor Track Init && Zrule  】 Vendor Repo Trace Init  初始化 Vendor 命令 && Zrule修改命令 "));
+        product_txt_List.add("");
+        product_txt_List.add( metaData.buildinstruction_vendoronly_repo_fixed_init+" && " +" repo --trace sync  -cdf  -j2 " +" && "+" repo start --all TEMP "+" && "+"zrule_apply_G2"+Cur_Batch_End+" #_57 1  2  tip_qcom_mtk"  +" && "+"source /opt/conf/moto.conf "+" && "+metaData.buildinstruction_vendoronly_compile_command+ " 2>&1 | tee "+getTimeStamp()+"_"+metaData.buildsummary_build_target+".log");
+
+        
+        product_txt_List.add("");
+        
+        product_txt_List.add(getSchema("【"+productName+" Vendor Rebuild 】 "));
+        product_txt_List.add("");
+        product_txt_List.add("source /opt/conf/moto.conf "+"  && "+metaData.buildinstruction_vendoronly_compile_command+ " 2>&1 | tee "+getTimeStamp()+"_"+metaData.buildsummary_build_target+".log");
+
+        product_txt_List.add("");
+        
+        
+        product_txt_List.add(getSchema("【"+productName+" Vendor Rebuild  && Zrule 】  && Zrule修改命令"));
+        product_txt_List.add("");
+        product_txt_List.add("zrule_apply_G2"+Cur_Batch_End+" #_57 1  2  tip_qcom_mtk"+" && "+"source /opt/conf/moto.conf "+"  && "+metaData.buildinstruction_vendoronly_compile_command+ " 2>&1 | tee "+getTimeStamp()+"_"+metaData.buildsummary_build_target+".log");
+
+        product_txt_List.add("");
+
         // -------------------------------   【 编译 apk jar so bin 命令】-----------------------------
         product_txt_List.add("");
         product_txt_List.add(getSchema("【"+productName+"】 【 编译 apk jar so bin 命令】"));
@@ -936,23 +1000,24 @@ public class F0_RepoCommand {
         product_txt_List.add("");
         product_txt_List.add("【 bin/wpa_supplicant " + productName + "-userdebug" + "】");
         product_txt_List.add(buildWpaSupplicant(input_gitRepoName, input_manifestBranchName, input_xml_manifestFileName, productName, ""));
+        product_txt_List.add("push命令:  adb root && adb remount && adb push ./wpa_supplicant  /vendor/bin/hw/ && adb reboot ");
         product_txt_List.add("");
         product_txt_List.add("【 mtk/SarControlService " + productName + "-userdebug" + "】");
         product_txt_List.add("");
-        product_txt_List.add("source /opt/conf/moto.conf  && lunch "+productName+"-userdebug  && cd ./motorola/modem/mtk/SarControl/SarControlService &&  mm ");
+        product_txt_List.add(" export PATH=/apps/android/python-2.7.6-x64/bin:$PATH  && export PATH=/apps/android/perl-5.1aclmsx8.4-x64/bin:$PATH &&  source build/envsetup.sh &&  source /opt/conf/moto.conf  && lunch "+productName+"-userdebug  && cd ./motorola/modem/mtk/SarControl/SarControlService &&  mm ");
         product_txt_List.add("");
         product_txt_List.add("zzfile_3.sh   ./out/target/product/tesla/system/priv-app/MtkSarControlService.apk");   
         
         
         product_txt_List.add("");
         product_txt_List.add("【 matk/sarwifi " + productName + "-userdebug" + "】");   
-        product_txt_List.add("source /opt/conf/moto.conf  && lunch "+productName+"-userdebug  &&   cd ./vendor/mediatek/proprietary/hardware/connectivity/wlan/sarwifi/service &&  mm   ");
+        product_txt_List.add(" export PATH=/apps/android/python-2.7.6-x64/bin:$PATH  && export PATH=/apps/android/perl-5.1aclmsx8.4-x64/bin:$PATH &&  source build/envsetup.sh &&  source /opt/conf/moto.conf  && lunch "+productName+"-userdebug  &&   cd ./vendor/mediatek/proprietary/hardware/connectivity/wlan/sarwifi/service &&  mm   ");
         
         
         
         product_txt_List.add("");
         product_txt_List.add("【 qcom/libmdmcutback " + productName + "-userdebug" + "】");   
-        product_txt_List.add("source /opt/conf/moto.conf  && lunch "+productName+"-userdebug  &&   make libmdmcutback | tee build_libmdmcutback.log     ");
+        product_txt_List.add(" export PATH=/apps/android/python-2.7.6-x64/bin:$PATH  && export PATH=/apps/android/perl-5.1aclmsx8.4-x64/bin:$PATH &&  source build/envsetup.sh &&  source /opt/conf/moto.conf  && lunch "+productName+"-userdebug  &&   make libmdmcutback | tee build_libmdmcutback.log     ");
         
 
         
@@ -968,7 +1033,9 @@ public class F0_RepoCommand {
         product_txt_List.add("git fetch origin mr-2021-q3/br:TEMP_A    【拉取远程分支到本地 TEMP_A分支】");
         product_txt_List.add("git pull --rebase origin mq-2020-q4/bq   【拉取远程分支 rebase 】");
         product_txt_List.add("repo forall -c  git reset --hard HEAD~3  【所有git 回退到上三个版本】");
-        product_txt_List.add("repo forall -c git clean -fdx            【清理项目】 ");
+        product_txt_List.add("repo forall -c git clean -nfdx           【清理项目 删除 untracked files&dir 以及gitignore标记的文件目录】  ");
+        product_txt_List.add("repo forall -c git clean -nfd            【清理项目 删除 untracked files&dir 】  ");
+
         product_txt_List.add("mkdir msi && cd msi                      【创建目录并进入】 ");
         product_txt_List.add("cp -fr ../zukgit.txt  ./                 【复制上一目录的文件到当前文件夹】 ");
         product_txt_List.add("chmod 777 -R ./F0_repo_init.sh           【对当前 sh 文件赋权】 ");
@@ -978,6 +1045,24 @@ public class F0_RepoCommand {
         product_txt_List.add("cd /home && ls -l                        【查看当前工作站用户】");
         
         product_txt_List.add("");
+        
+        
+        product_txt_List.add(getSchema("【"+productName+"】  Git Sync Error  命令提示"));
+        product_txt_List.add("一.unable to read sha1 file of xx 问题的处理");
+        product_txt_List.add("  1.【  repo --trace sync  -cdf  -j2  】  ___ 查看repo的动作 看哪一个 git 分支报错");
+        product_txt_List.add("   如:cd /Code1/Vendor2/kernel/prebuilts/5.4/arm64 : git read-tree --reset -u -v HEAD 1>| 2>|  报错"); 
+        product_txt_List.add("   说明 路径/kernel/prebuilts/5.4/arm64 报错");
+        product_txt_List.add("  2.【  rm -fr .repo/projects/kernel/prebuilts/5.4/arm64.git   】  ___ 删除.repo 下文件");
+        product_txt_List.add("  3.【  rm -fr .repo/project-objects/home/repo/dev/platform/android/kernel/prebuilts/5.4/arm64.git   】  ___ 删除.repo 下文件");
+        product_txt_List.add("  4.【  repo init xxx  &&  repo --trace sync  -cdf  -j2   】 重新更新代码  ");
+        product_txt_List.add("");
+        product_txt_List.add("二. error: Exited sync due to fetch errors && would clobber existing tag 拉取失败问题处理 ");
+        product_txt_List.add("  1.【   repo forall -c git fetch --tags -f  && repo --trace sync  -cdf  -j2  】  ___ 更新远程代码");
+        product_txt_List.add("");
+        product_txt_List.add("三. 拉取远程分支到本地 到本地新分支的操作 ");
+        product_txt_List.add("  1.【 git branch -a > a.txt   】  【查看当前的远程分支】");
+        product_txt_List.add("  1.【 git fetch origin mr-2021-q3/br:TEMP_A  】  【拉取远程分支到本地 TEMP_A分支】");
+        
         
         metaData.repo_info_store_file = new File(Zbin+"F0_"+productName+".txt");
         writeContentToFile(metaData.repo_info_store_file,product_txt_List);
@@ -1027,6 +1112,30 @@ public class F0_RepoCommand {
 	}
 
 	
+    public  static  String   Clear_Empty_Line_For_String(String rawContent) {
+    	StringBuilder sb = new  StringBuilder();
+    	
+    	if(!rawContent.contains("\n")) {
+    		return rawContent;
+    	}
+
+    	String[] arr_raws = rawContent.split("\n");
+    	
+    	if(arr_raws == null) {
+    		return rawContent;
+    	}
+    	
+    	for (int i = 0; i < arr_raws.length; i++) {
+			String str_item = arr_raws[i]; 
+			if("".equals(str_item.trim())) {
+				continue;
+			}
+			sb.append(str_item+"\n");
+		}
+    	
+    	return sb.toString();
+    	
+    }
     
     public  static  void   Operation_5_Params_Delete(String productName) {
     
@@ -1122,10 +1231,10 @@ public class F0_RepoCommand {
 //            showBuildingAppCommand();
            
             System.out.println();
-            showCommitTip();
+    
             showPathTip(input_productName,input_VersionChar);
             showProperiesMap(productKey2ValueList);
-
+            showCommitTip();
         }
         
     	
@@ -1474,6 +1583,8 @@ public class F0_RepoCommand {
 			} else if(headBlock.contains("Manifest Info</h3>")) {
 				metaData.ManifestInfo_Content  = headBlock;
 				metaData.ManifestInfoList = Str2StrList(headBlock);
+				metaData.ManifestInfo_MoveHtml_Content  =  ModemRelease_MoveHtml(metaData.ManifestInfo_Content);;
+				
 			}else if(headBlock.contains("Build Instructions</h3>")) {
 				metaData.BuildInstruction_Content = headBlock;
 				metaData.BuildInstructionList = Str2StrList(headBlock);
@@ -1489,6 +1600,8 @@ public class F0_RepoCommand {
 					
 					
 				}
+				
+				metaData.BuildInstruction_MoveHtml_Content  = ModemRelease_MoveHtml(metaData.BuildInstruction_Content);
 				
 				
 				
@@ -1532,6 +1645,12 @@ public class F0_RepoCommand {
     	
     	modem_release_content = 	modem_release_content.replace("\"close\">", "").replace("</h3>", "").replace("<div>", "")
     	.replace("<pre>", "").replace("</pre>", "").replace("</div>", "").replace("<br />", "").replace("<hr />", "")
+    	.replace("</h4>", "").replace("<table>", "").replace("<tbody>", "").replace("<tr>", "").replace("<th>", "")
+    	.replace("</th>", "").replace("</tr>", "").replace("</td>", "").replace("</tbody>", "").replace("</table>", "")
+     	.replace("<td>", "").replace("<h4>", "")
+     	.replace("&lt;", "【").replace("&gt;", "】")
+     	
+    	
     	.replace("<div class=\"content\" data-collapse>", "").trim();
     	;
     	
@@ -1745,6 +1864,8 @@ public class F0_RepoCommand {
 
 
     static void showCommitTip() {
+        System.out.println(" ");
+        System.out.println(" ");
         printSchema("【 提交commit命令 提示】");
         System.out.println("git push origin TEMP:refs/for/【当前分支| 通过 git gui ，gitk 查看提交分支】");
         System.out.println("示例1:  git push origin TEMP:refs/for/bp ");
@@ -1757,6 +1878,8 @@ public class F0_RepoCommand {
         System.out.println("示例8:  git push origin TEMP:refs/for/prods-mtk ");
         System.out.println("示例9:  git push origin TEMP:refs/for/bt ");
         System.out.println("示例10:  git push origin TEMP:refs/for/bt-mtk ");
+
+      
         printLine();
         printSchema("");
     }

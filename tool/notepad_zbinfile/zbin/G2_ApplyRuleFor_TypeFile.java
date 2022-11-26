@@ -17,6 +17,13 @@ import com.drew.metadata.Metadata;
 import com.drew.metadata.MetadataException;
 import com.drew.metadata.Tag;
 import com.drew.metadata.exif.ExifIFD0Directory;
+import com.github.javaparser.JavaParser;
+import com.github.javaparser.ast.*;
+import com.github.javaparser.ast.body.*;
+import com.github.javaparser.ast.stmt.ExpressionStmt;
+import com.github.javaparser.ast.stmt.IfStmt;
+import com.github.javaparser.ast.type.ClassOrInterfaceType;
+import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 import com.google.common.collect.Maps;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
@@ -41,7 +48,6 @@ import com.spire.presentation.ShapeType;
 import com.spire.presentation.TextFont;
 import com.spire.presentation.drawing.FillFormatType;
 import com.sun.mail.util.MailSSLSocketFactory;
-
 
 import net.jimmc.jshortcut.JShellLink;
 import net.sourceforge.pinyin4j.PinyinHelper;
@@ -212,7 +218,7 @@ public class G2_ApplyRuleFor_TypeFile {
 
 	static OS_TYPE CUR_OS_TYPE = OS_TYPE.Windows;
 	static String curOS_ExeTYPE = "";
-	static ArrayList<String> mKeyWordName = new ArrayList<>();
+	static ArrayList<String> mKeyWordName = new ArrayList<String>();
 
 	// 当前Shell目录下的 文件类型列表 抽取出来 通用
 	static HashMap<String, ArrayList<File>> CurDirFileTypeMap = new HashMap<String, ArrayList<File>>();;
@@ -409,147 +415,2861 @@ public class G2_ApplyRuleFor_TypeFile {
 		// 对 输入的字符串   进行 加密  并打印 前后数据 对比
 		realTypeRuleList.add(new Encry_StringByte_To_Print_Rule_56());
 		
+		// 对 build_device.bash  和 build_msi_device.sh  两个 编译文件 添加 修改 埋点 
+		// bash   sh    java   等等  需要   添加Log 的 操作
+		realTypeRuleList.add(new AddLog_CompileCheck_For_File_Rule_57());
+		
+		
 	}
 	
+    static String Rule_57_TAG = "zukgit_"+getTimeStampyyyyMMdd_HHmmss();
+    static String Rule_57_LogTypeStr = "log";   // log   slog   syso  三种类型的打印
+    static ArrayList<ZClass> Rule_57_ZClassList = new ArrayList<ZClass>();
+    static String curProjectPath = System.getProperty("user.dir");
+    
+	class AddLog_CompileCheck_For_File_Rule_57 extends Basic_Rule {
+
+
+
+
+		
+		File aosp_wpa_supplicant_c_file;
+		File aosp_settings_wifienabler_file;
+		File aosp_build_device_bash_file ;
+		File aosp_build_msi_device_sh_file ;
+		File aosp_vendor_qcom_build_nonhlos_sh_file ;
+		
+		File aosp_kernel_platform_build_kernel_sh_file ;		
+		File aosp_vendor_qcom_nonhlos_dir;    //  当前AOSP的 Qcom 的 编译目录 需要查找它下面的 文件夹 是否存在 common/build.sh  文件  , 有就添加 echo 
+		// 如果 没有操作逻辑  以及类型处理  是java的话  添加Log  默认android.util.Log  可以通过 java_systemout_style 改为 system.out 输出
+		ArrayList<File> inputFileList ;   // 输入文件的集合 
+		
+		
+		// 判断当前路径是否是 AOSP 路径   直接检测 WifiEnable 是否存在
+		boolean isCurPath_AOSP = false;  // 当前的目录是否是
+		
+		String timestamp_yyyymmdd_hhmmss;  // 时间戳   统一 使用 
+		
+		//  addlog_aosp_wifienable_java 检测是否是AOSP 如果是就把对应的 WifiEnable 文件 添加echo
+		boolean isAddLog_AOSP_WifiEnable_Operation; //  addlog_aosp_wifienable_java
+		String AOSP_WifiEnable_Version_Tip ;   // 当前的版本的 描述
+		
+		boolean isAddLog_SystemOut_Style; //  java_systemout_style
+		
+		//  addecho_aosp_devicebuild_bash   检测是否是AOSP 如果是就把对应的 devicebuild_bash 添加echo
+		boolean isAddLog_AOSP_Bash_Operation;       //  addecho_aosp_devicebuild_bash     .bash  .sh  添加 埋点 
+		
+		 // 【 compile_check_java    xxxx.java 对指定文件检测编译错误】
+        //  【compile_check_java      对当前的目录下的 java 文件进行 检测测试】
+		boolean isJava_Compile_Check_Operation;    
+		
+		boolean isBashEchoBatch;  // sh_echo_batch         // 搜局搜索 当前目录下的 bash sh 生成全局的   sh_echo_batch_时间戳 文件夹
+		
+		
+		AddLog_CompileCheck_For_File_Rule_57() {
+			super("#", 57, 4);
+
+			inputFileList = new ArrayList<File>();
+			AOSP_WifiEnable_Version_Tip ="";
+			
+			timestamp_yyyymmdd_hhmmss = getTimeStamp_yyyyMMdd_HHmmss();
+		}
+
+		
+		boolean isCurPathAOSP () {
+			 
+			String shellpath = curDirPath ;
+			
+			File shellFile = new File(shellpath);
+			
+			aosp_settings_wifienabler_file = new File(shellFile.getAbsolutePath()+File.separator+"packages/apps/Settings/src/com/android/settings/wifi/WifiEnabler.java");
+			
+			aosp_build_device_bash_file = new File(shellFile.getAbsolutePath()+File.separator+"motorola/build/bin/build_device.bash");
+			
+			aosp_build_msi_device_sh_file = new File(shellFile.getAbsolutePath()+File.separator+"device/moto/msi/build_msi_device.sh");
+
+			aosp_vendor_qcom_build_nonhlos_sh_file = new File(shellFile.getAbsolutePath()+File.separator+"vendor/qcom/nonhlos/build_support/bin/build_nonhlos.sh");
+
+			aosp_vendor_qcom_nonhlos_dir = new File(shellFile.getAbsolutePath()+File.separator+"vendor/qcom/nonhlos/");
+
+			aosp_kernel_platform_build_kernel_sh_file = new File(shellFile.getAbsolutePath()+File.separator+"kernel_platform/build/build_kernel.sh");
+
+			aosp_wpa_supplicant_c_file = new File(shellFile.getAbsolutePath()+File.separator+"external/wpa_supplicant_8/wpa_supplicant/wpa_supplicant.c");
+
+			
+			
+			
+		
+			
+			
+			
+			return  aosp_settings_wifienabler_file.exists() && aosp_settings_wifienabler_file.length() > 100;
+		}
 	
-	static String bytesToIntString(byte[] src ) {
-		StringBuilder builder = new StringBuilder();
-		if (src == null || src.length <= 0) {
+		@Override
+		boolean initParamsWithInputList(ArrayList<String> inputParamList) {
+			boolean Flag = true;
+			isCurPath_AOSP = isCurPathAOSP();
+			for (int i = 0; i < inputParamList.size(); i++) {
+
+
+				String strInput = inputParamList.get(i);
+
+				File tempFile = new File(curDirPath + File.separator + strInput);
+				if (tempFile.exists() && !tempFile.isDirectory()) {
+					String inputFileName = tempFile.getName().toLowerCase();
+					inputFileList.add(tempFile);
+					continue;
+				}
+
+				File inputDir = new File(strInput);
+				if (inputDir.exists() && !inputDir.isDirectory()) {
+					inputFileList.add(inputDir);
+					continue;
+				}
+				
+				
+				String paramItem = inputParamList.get(i);
+				String paramItem_lower_trim = paramItem.toLowerCase().trim();
+				
+				
+				if (paramItem_lower_trim.startsWith("java_systemout_style")) {
+					isAddLog_SystemOut_Style = true;
+					continue;
+				}
+				
+				
+				if (paramItem_lower_trim.startsWith("sh_echo_batch")) {
+					isBashEchoBatch = true;
+					continue;
+				}
+				
+				if (paramItem_lower_trim.startsWith("wifitip_")) {
+					AOSP_WifiEnable_Version_Tip = paramItem_lower_trim.replace("wifitip_", "");
+					Rule_57_TAG = Rule_57_TAG +"_"+AOSP_WifiEnable_Version_Tip;
+					continue;
+				}
+				
+
+				// ----------------------  简洁的 执行命令 Begin --------------------
+				if (paramItem_lower_trim.startsWith("tip_")) {   //  简洁的 执行 命令参数
+					AOSP_WifiEnable_Version_Tip = paramItem_lower_trim.replace("tip_", "");
+					Rule_57_TAG = Rule_57_TAG +"_"+AOSP_WifiEnable_Version_Tip;
+					continue;
+				}
+				
+				if (paramItem_lower_trim.equals("1")) {
+					isAddLog_AOSP_Bash_Operation = true;
+					continue;
+				}
+				if (paramItem_lower_trim.startsWith("2")) {
+					isAddLog_AOSP_WifiEnable_Operation = true;
+					continue;
+				}
+				// ----------------------  简洁的 执行命令 End --------------------
+				
+				
+				
+
+				if (paramItem_lower_trim.startsWith("compile_check_java")) {
+					isJava_Compile_Check_Operation = true;
+					continue;
+				}
+
+				if (paramItem_lower_trim.startsWith("addecho_aosp_devicebuild_bash")) {
+					isAddLog_AOSP_Bash_Operation = true;
+					continue;
+				}
+				
+		
+				if (paramItem_lower_trim.startsWith("addlog_aosp_wifienable_java")) {
+					isAddLog_AOSP_WifiEnable_Operation = true;
+					continue;
+				}
+				
+			
+		
+			}
+			System.out.println("");
+			System.out.println("非非非 Operation_Type 操作");
+			System.out.println("isCurPath_AOSP___________: "+ isCurPath_AOSP + "  【true: 当前根目录是AOSP目录】 【fasle: 当前不是AOSP 工程的根目录】 ");
+			System.out.println("WifiEnabler______________:"+aosp_settings_wifienabler_file);
+			System.out.println("build_device.bash________:"+aosp_build_device_bash_file);
+			System.out.println("build_msi_device.sh______:"+aosp_build_msi_device_sh_file);
+			System.out.println("isAddLog_SystemOut_Style_: "+ isAddLog_SystemOut_Style+"  【true: Java 使用 System.out.println()打印】  【false : 标识 Java 文件使用 android.util.Log 】");
+			System.out.println("WifiEnable_Version_Tip___: "+AOSP_WifiEnable_Version_Tip+"  【true: WifiEnable的提示信息 一般用来说明版本的目的】  【false :】");
+
+
+			
+			
+			System.out.println("");
+			System.out.println("Operation_Type 操作");
+			System.out.println("1.isBashEchoBatch____________________:"+ isBashEchoBatch                +"  【true: 当前操作是批量生成对bash sh的修改操作 输出文件夹 sh_echo_batch_"+getTimeStampyyyyMMdd_HHmmss()+"文件夹】 【false:不操作类型】");
+			System.out.println("2.compile_check_java_________________:"+ isJava_Compile_Check_Operation +"  【true:  对当前输入的文件 或者 当前子目录(非递归)所有的java文件查看是否有 编译错误(无法检查运行错误)】 【false: 无Opeartion_Type时 进行 添加Log的操作】");
+			System.out.println("3.addecho_aosp_devicebuild_bash______:"+ isAddLog_AOSP_Bash_Operation   +"  【true:  指定AOSP目录的 build_msi_device.sh 和 build_device.bash 添加埋点 】 【false:不操作类型】");
+			System.out.println("4.addlog_aosp_wifienable_java________:"+ isAddLog_AOSP_WifiEnable_Operation +"  【true:  指定AOSP目录的 WifiEnabler.java 添加Log 埋点 】 【false:不操作类型】");
+			System.out.println("5.没有指定操作类型 那么将按照 文件类型 进行 处理 sh_bash(默认添加埋点) Java(默认添加Log)");
+			
+			System.out.println("");
+			for (int i = 0; i < inputFileList.size(); i++) {
+				System.out.println("输入文件["+i+"]____"+inputFileList.get(i).getAbsolutePath());
+			}
+			
+			
+			if(isAddLog_AOSP_WifiEnable_Operation || isAddLog_AOSP_Bash_Operation) {
+				if(!isCurPath_AOSP) {
+					System.out.println("当前目录 不是 AOSP 根 目录 无法进行 AOSP的 先关 固定路径  如 WifiEnaabler 的 操作!  请在 AOSP目录执行 aosp操作!");
+					return false;
+				}
+				
+			}
+			
+			if(isAddLog_SystemOut_Style) {
+				Rule_57_LogTypeStr = "syso";
+			}
+			
+			if(inputFileList.size() == 0 &&
+					isBashEchoBatch == false && 
+					isJava_Compile_Check_Operation == false && 
+					isAddLog_AOSP_Bash_Operation == false && 
+					isAddLog_AOSP_WifiEnable_Operation == false 
+					) {
+				
+				System.out.println("当前 输入的操作类型为空 并且 也没有输入参数文件  执行规则未知 无法执行 请检查!");
+				return false;
+			}
+
+			return super.initParamsWithInputList(inputParamList) && Flag;
+		}
+		@Override
+		String simpleDesc() {
+			return "  \n"
+					+ Cur_Bat_Name  + " #_"+rule_index+"  addecho_aosp_devicebuild_bash  ### 在AOSP工程根目录的 build_device.bash  和 build_msi_device.sh  两个 编译文件 添加 修改 埋点 \n"
+					+ Cur_Bat_Name  + " #_"+rule_index+"  1    (同 addecho_aosp_devicebuild_bash)  ### 在AOSP工程根目录的 build_device.bash  和 build_msi_device.sh  两个 编译文件 添加 修改 埋点 \n"
+
+					+ Cur_Bat_Name + " #_"+rule_index+ " addlog_aosp_wifienable_java ### AOSP目录的 WifiEnabler.java 添加Log 埋点 \n"
+				   	+ Cur_Bat_Name  + " #_"+rule_index+"  2    (同 addlog_aosp_wifienable_java)  ### 在AOSP工程根目录的 build_device.bash  和 build_msi_device.sh  两个 编译文件 添加 修改 埋点 \n"
+
+				   	+ Cur_Bat_Name  + " #_"+rule_index+"  2  tip_message  (同 addlog_aosp_wifienable_javawifitip_ xx)  ### 在AOSP工程根目录的 build_device.bash  和 build_msi_device.sh  两个 编译文件 添加 修改 埋点 \n"
+
+				   	+ Cur_Bat_Name  + " #_"+rule_index+" 1  2  tip_message  (同时执行 sh 修改 wifienable 以及标记操作 )  ### 在AOSP工程根目录的 build_device.bash  和 build_msi_device.sh  两个 编译文件 添加 修改 埋点 \n"
+
+					+ Cur_Bat_Name + " #_"+rule_index+ " addlog_aosp_wifienable_java  wifitip_qcom_mtk_version_tip   ### AOSP目录的 WifiEnabler.java 添加Log 埋点 并加入 wifienable_【提示信息(qcom_mtk_version_tip)】 \n"
+
+					+ Cur_Bat_Name + " #_"+rule_index+ " compile_check_java    ### 把当前目录下的 java 文件进行 编译错误的检测 \n"
+				    + Cur_Bat_Name + " #_"+rule_index+ " compile_check_java   <xxx.java>  ### 把当前输入 java 文件进行 编译错误的检测 \n"
+					+ Cur_Bat_Name + " #_"+rule_index+ " sh_echo_batch   ### 当前操作是批量生成对bash sh的add echo 修改操作 输出文件夹 sh_echo_batch_"+getTimeStampyyyyMMdd_HHmmss()+"文件夹  \n"
+					+ Cur_Bat_Name + " #_"+rule_index+ " <xxxx.java>     ###  对输入java 文件 输出 android.util.Log.i(); 的 埋点打印  \n"
+					+ Cur_Bat_Name + " #_"+rule_index+ " java_systemout_style  <xxxx.java>     ###  对输入java 文件 输出 system.out.println(); 的 埋点打印  \n"
+					+ Cur_Bat_Name + " #_"+rule_index+ " <xxxx.sh>   <xxxx.bash>   ###  对输入bash 文件本身进行修改 输出 echo 的 埋点打印  \n"
+
+					;
+		}
+
+
+	
+		@Override
+		ArrayList<File> applySubFileListRule4(ArrayList<File> curFileList,
+				HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList,
+				ArrayList<File> curRealFileList) {
+			
+			
+			if(isAddLog_AOSP_Bash_Operation) {
+				aosp_devicebuild_bash_add_echo();
+	
+			}
+			
+			if(isAddLog_AOSP_WifiEnable_Operation) {	
+				aosp_wifi_enable_add_log();
+				aosp_wpasupplicant_add_log();
+			}
+			
+			
+
+
 			return null;
 		}
-		String hv;
+		
+		
+		void aosp_wpa_supplicant_cha_zhuang() {
+			
+			ArrayList<String> wpasupplicant_file_contentlist = ReadFileContentAsList(aosp_wpa_supplicant_c_file);
+			
+			
+			ArrayList<String> newCodeList = new ArrayList<String> ();
+			
+			for (int i = 0; i < wpasupplicant_file_contentlist.size(); i++) {
+				
+				String oneLine = wpasupplicant_file_contentlist.get(i);
+				
+				if(oneLine.contains("zukgit")) {
+					continue;
+				}
+				
+				// I wpa_supplicant: wlan0: CTRL-EVENT-CONNECTED - Connection to 78:e9:cf:23:b5:ee completed
+		
+//				wpa_msg(wpa_s, MSG_INFO, WPA_EVENT_CONNECTED "- Connection to "
+//						MACSTR " completed [id=%d id_str=%s%s]",
+//						MAC2STR(wpa_s->bssid),
+//						ssid ? ssid->id : -1,
+//						ssid && ssid->id_str ? ssid->id_str : "",
+//						fils_hlp_sent ? " FILS_HLP_SENT" : "");
+				
+				if(oneLine.contains("- Connection to") && oneLine.contains("wpa_msg") ) {
+					
+				//	wpa_msg(wpa_s, MSG_INFO, "Authentication with timed out.MAC2STR(bssid)");
+					newCodeList.add("wpa_msg(wpa_s, MSG_INFO, \"wpa_zukgit_"+aosp_wpa_supplicant_c_file.getAbsolutePath()+"_"+timestamp_yyyymmdd_hhmmss+"_【"+AOSP_WifiEnable_Version_Tip+"】 【- Connection to 】" +"\");");		
+					newCodeList.add(oneLine);
+					
+					continue;
+				}
+				
+				// wpa_supplicant: wlan0: Own MAC address: c8:58:95:d8:9a:4b
+				// wpa_dbg(wpa_s, MSG_DEBUG, "Own MAC address: " MACSTR,MAC2STR(wpa_s->own_addr));
+				if(oneLine.contains("Own MAC address:")  ) {
+					
+				//	wpa_msg(wpa_s, MSG_INFO, "Authentication with timed out.MAC2STR(bssid)");
+					newCodeList.add("wpa_msg(wpa_s, MSG_INFO, \"wpa_zukgit_"+aosp_wpa_supplicant_c_file.getAbsolutePath()+"_"+timestamp_yyyymmdd_hhmmss+"_【"+AOSP_WifiEnable_Version_Tip+"】 【 Own MAC address: 】"+"\");");		
+					newCodeList.add(oneLine);
+					
+					continue;
+				}
+				
 
-		int byteIndex = 0 ;
-		for (byte aSrc : src) {
-			// 以十六进制（基数 16）无符号整数形式返回一个整数参数的字符串表示形式，并转换为大写
-			hv = Integer.toString(aSrc & 0xFF).toUpperCase();
-			int value = Integer.parseInt(hv);
-			
-			int padding_blank = 2;
-			String blank_pandding_str = "  ";
-			if( value >= 100) {
-				padding_blank = 1;
-				blank_pandding_str = " ";
-			}
-			if (hv.length() < 2) {
-				builder.append(0);
+				
+				
+				newCodeList.add(oneLine);
+				
 			}
 			
+			writeContentToFile(aosp_wpa_supplicant_c_file, newCodeList);
+			System.out.println(""+aosp_wpa_supplicant_c_file.getAbsolutePath()+" 插桩成功!");
+		}
+		
+		void aosp_wifi_enable_cha_zhuang() {
 			
-			if(byteIndex == src.length -1) {
-				builder.append(blank_pandding_str+hv+"  ");
+			ArrayList<String> wpasupplicant_file_contentlist = ReadFileContentAsList(aosp_settings_wifienabler_file);
+			
+			
+			ArrayList<String> newCodeList = new ArrayList<String> ();
+			
+			for (int i = 0; i < wpasupplicant_file_contentlist.size(); i++) {
+				
+				String oneLine = wpasupplicant_file_contentlist.get(i);
+				
+				if(oneLine.contains("zukgit")) {
+					continue;
+				}
+				
+
+				
+				if(oneLine.contains("onSwitchToggled(boolean isChecked)") ) {
+//					 android.util.Log.i("zoggled", "this_i2");
+			
+					
+					newCodeList.add(oneLine);
+					newCodeList.add("android.util.Log.i(\"wifienabler_zukgit\", \""+aosp_settings_wifienabler_file.getAbsolutePath()+"_"+timestamp_yyyymmdd_hhmmss+"_【"+AOSP_WifiEnable_Version_Tip+"】【 WifiEnabler_onSwitchToggled isChecked=\"+isChecked+\"】\");");		
+
+					
+					continue;
+				}
+
+				newCodeList.add(oneLine);
+				
+			}
+			
+			writeContentToFile(aosp_settings_wifienabler_file, newCodeList);
+			System.out.println(""+aosp_settings_wifienabler_file.getAbsolutePath()+" 插桩成功!");
+		}
+		
+		
+		
+		void aosp_wpasupplicant_add_log(){
+			
+			if(aosp_wpa_supplicant_c_file.exists()) {
+	
+				aosp_wpa_supplicant_cha_zhuang();
+				
 			}else {
-				builder.append(blank_pandding_str+hv+"   "+","+" ");
+				
+				System.out.println(" aosp_wpa_supplicant_c_file 文件不存在: "+ aosp_wpa_supplicant_c_file.getAbsolutePath());
 			}
-		
-			byteIndex++;
-			
-		}
 
-//        System.out.println(builder.toString());
-		return builder.toString();
-	}
-	static String bytesToIntCharString(byte[] src,String rawstr) {
-		StringBuilder builder = new StringBuilder();
-		if (src == null || src.length <= 0) {
-			return null;
 		}
-		String hv;
 		
-		int rawStr_size = rawstr.length();
+		void aosp_wifi_enable_add_log(){
+			aosp_wifi_enable_cha_zhuang();
+			
+		// 对 Java 文件 进行 添加注释用   不适合 插装
+//        ZAndroidAPPClass mZAndroidAPPClass = new ZAndroidAPPClass(aosp_settings_wifienabler_file.getAbsolutePath());
+//        ArrayList<ZMethod> methodList = new ArrayList<ZMethod>();
+//        //boolean  onSwitchToggled(boolean isChecked)
+//        methodList.add(new ZMethod(mZAndroidAPPClass, "boolean", "onSwitchToggled", "boolean isChecked "));
+//        mZAndroidAPPClass.addZMethod(methodList);
+//        //   Rule_57_LogTypeStr = "log";   // slog  //syso 三种打印方式
+//        Rule_57_ZClassList.add(mZAndroidAPPClass);
+//        Begin_Java_Parser();
+        
+        
+		}
+		
+	    public  void Begin_Java_Parser()  {
 
-		int byteIndex = 0 ;
-		for (byte aSrc : src) {
-			// 以十六进制（基数 16）无符号整数形式返回一个整数参数的字符串表示形式，并转换为大写
-			hv = Integer.toString(aSrc & 0xFF).toUpperCase();
-			int value = Integer.parseInt(hv);
-			
-			int padding_blank = 2;
-			String blank_pandding_str = "  ";
-			if( value >= 100) {
-				padding_blank = 1;
-				blank_pandding_str = " ";
-			} 
-			if ( value < 10) {
-				 padding_blank = 3;
-				 blank_pandding_str = "   ";
+
+	        //  如果当前的路径没有获得参数 那么 默认对ZClassList 执行操作
+	        if (isCurPath_AOSP) {  //   static ArrayList<ZClass> ZClassList = new  ArrayList<ZClass>();
+	            //  判断当前的 路径是否是AOSP 路径
+	            // curProjectPath
+	            if (isCurPath_AOSP) {
+	       
+	                int classSize = Rule_57_ZClassList.size();
+	                System.out.println(" 总共需要解析文件的个数  classSize = " + classSize);
+
+	                String newClassCode = "";  //
+	                String originClassCode = "";
+	                String formatNewClassCode = "";
+	                for (int i = 0; i < classSize; i++) {
+	                    System.out.println(" 开始解析第  " + i + "个文件    文件名为: " + Rule_57_ZClassList.get(i).path);
+	                    newClassCode = Rule_57_ZClassList.get(i).toNewClassCode();
+
+	                    if(newClassCode == null || "".equals(newClassCode)){
+	                        continue;
+	                    }
+	                    // 构建新的方法的内容  zukgitlog_2
+	                    System.out.println("═══════ 新构建的类文件的内容 如下: newClassCode :  \n" + newClassCode);
+
+	                    //  在newClassCode中加入新的Log方法   找到最后一个 { 的位置
+	                    int lastBlock = newClassCode.lastIndexOf("}");
+	                    //     System.out.println(" 最后{ 的位置 " +lastBlock );
+	                    String newClassCodeFix = "";
+
+	                    if (!Rule_57_ZClassList.get(i).alreadyAddPrintMethod) {
+	                        if (Rule_57_ZClassList.get(i).isIDEClass) {
+	                            //  newClassCodeFix = newClassCode.substring(0,lastBlock)+ "    " +IDEA_PRINT_METHOD + "}";
+	                            newClassCodeFix = newClassCode.substring(0, lastBlock) + "    " + Rule_57_ZClassList.get(i).GetRealPrintMethod() + "}";
+	                        } else if (Rule_57_ZClassList.get(i).isAPP) {
+	                            //      newClassCodeFix = newClassCode.substring(0,lastBlock) + "    " +APP_PRINT_METHOD + "}";
+	                            newClassCodeFix = newClassCode.substring(0, lastBlock) + "    " + Rule_57_ZClassList.get(i).GetRealPrintMethod() + "}";
+	                        } else if (Rule_57_ZClassList.get(i).isFramework) {
+	                            //  newClassCodeFix = newClassCode.substring(0,lastBlock) + "    " +Framework_PRINT_METHOD + "}";
+	                            newClassCodeFix = newClassCode.substring(0, lastBlock) + "    " + Rule_57_ZClassList.get(i).GetRealPrintMethod() + "}";
+	                        }
+
+	                    } else {  // 已经 添加过 MethodPrint的 类
+	                        newClassCodeFix = newClassCode;
+	                    }
+
+
+	                    // System.out.println("  添加 打印Log 的 字符串 newClassCodeFix  \n " +newClassCodeFix );
+	                    formatNewClassCode = JavaParser.parse(newClassCodeFix).toString();
+	                    //  System.out.println("═══════ 格式化文件 如下: formatNewClassCode :" + formatNewClassCode);
+	                    // 把当前的新构建的文件重新写入 .java 文件
+	                    writeContentToFile(Rule_57_ZClassList.get(i).classFile, formatNewClassCode);
+	                }
+
+
+	            } else {
+	                //  当前并不是AOSP是主页
+	                System.out.println("当前并不是AOSP主页，必须提供 【Java文件路径】 或者 【文件夹路径】！");
+	                return;
+	            }
+
+
+	        } 
+	    }
+	    
+		void aosp_devicebuild_bash_add_echo(){
+
+			if(aosp_build_device_bash_file.exists()) {
+				
+				 ArrayList<String> add_echo_list = 	Bash_Sh_File_Add_Echo(aosp_build_device_bash_file);
+				
+					writeContentToFile(aosp_build_device_bash_file, add_echo_list);
+					
+					  System.out.println("当前已经把 AOSP_bash文件:"+aosp_build_device_bash_file.getAbsolutePath()+"  添加完成 echo 埋点! ");
+					  
+			} else {
+				
+				  System.out.println("当前已经把 AOSP_bash文件:"+aosp_build_device_bash_file.getAbsolutePath()+"不存在   echo 埋点操作失败! ");
+
 			}
-			if (hv.length() < 2) {
-				builder.append(0);
-			}
 			
 			
-			if(byteIndex == src.length -1) {
-				builder.append(blank_pandding_str+hv+"_"+(byteIndex >= rawStr_size ?"?": rawstr.substring(byteIndex,byteIndex+1))+"");
+			
+			
+			
+			
+			if(aosp_build_msi_device_sh_file.exists()) {
+				 ArrayList<String> add_echo_list = 	Bash_Sh_File_Add_Echo(aosp_build_msi_device_sh_file);
+				
+					writeContentToFile(aosp_build_msi_device_sh_file, add_echo_list);
+
+		  System.out.println("当前已经把 AOSP_sh文件:"+aosp_build_msi_device_sh_file.getAbsolutePath()+"  添加完成 echo 埋点! ");
+					
 			}else {
-				builder.append(blank_pandding_str+hv+"_"+(byteIndex >= rawStr_size ?"?": rawstr.substring(byteIndex,byteIndex+1))+" "+","+" ");
+				
+				  System.out.println("当前已经把 AOSP_sh文件:"+aosp_build_msi_device_sh_file.getAbsolutePath()+"不存在   echo 埋点操作失败! ");
+
 			}
-		
-			byteIndex++;
+			
+			
+			if(aosp_kernel_platform_build_kernel_sh_file.exists()) {
+				 ArrayList<String> add_echo_list = 	Bash_Sh_File_Add_Echo(aosp_kernel_platform_build_kernel_sh_file);
+				
+			writeContentToFile(aosp_kernel_platform_build_kernel_sh_file, add_echo_list);
+
+		  System.out.println("当前已经把 AOSP_sh文件:"+aosp_kernel_platform_build_kernel_sh_file.getAbsolutePath()+"  添加完成 echo 埋点! ");		
+			}else {
+				  System.out.println("当前已经把 AOSP_sh文件:"+aosp_kernel_platform_build_kernel_sh_file.getAbsolutePath()+"不存在   echo 埋点操作失败! ");
+
+			}
+			
+			
+			if(aosp_vendor_qcom_build_nonhlos_sh_file.exists()) {
+				
+				 ArrayList<String> add_echo_list = 	Bash_Sh_File_Add_Echo(aosp_vendor_qcom_build_nonhlos_sh_file);
+				
+					writeContentToFile(aosp_vendor_qcom_build_nonhlos_sh_file, add_echo_list);
+					
+					  System.out.println("当前已经把 AOSP_bash文件:"+aosp_vendor_qcom_build_nonhlos_sh_file.getAbsolutePath()+"  添加完成 echo 埋点! ");
+					  
+			} else {
+				
+				  System.out.println("当前已经把 AOSP_bash文件:"+aosp_vendor_qcom_build_nonhlos_sh_file.getAbsolutePath()+"不存在   echo 埋点操作失败! ");
+
+			}
+			
+			
+			if(aosp_vendor_qcom_nonhlos_dir.exists() && aosp_vendor_qcom_nonhlos_dir.isDirectory()) {
+				
+			File[] nonhlos_file_arr = 	aosp_vendor_qcom_nonhlos_dir.listFiles();
+			
+			if(nonhlos_file_arr != null) {
+				for (int i = 0; i < nonhlos_file_arr.length; i++) {
+					File nonhlos_item_file = nonhlos_file_arr[i];
+					
+					if(nonhlos_item_file.isDirectory()) {
+						
+						File nonhlos_common_build_sh_file = new File(nonhlos_item_file.getAbsolutePath()+File.separator+"common/build.sh");
+						
+						if(nonhlos_common_build_sh_file.exists()) {
+							ArrayList<String> add_echo_list = 	Bash_Sh_File_Add_Echo(nonhlos_common_build_sh_file,true);
+							writeContentToFile(nonhlos_common_build_sh_file, add_echo_list);
+							System.out.println("当前已经把 AOSP_bash文件:"+nonhlos_common_build_sh_file.getAbsolutePath()+"  添加完成 echo 埋点! ");
+						}
+						
+						File nonhlos_boot_images_build_sh_file = new File(nonhlos_item_file.getAbsolutePath()+File.separator+"boot_images/build.sh");
+						
+						if(nonhlos_boot_images_build_sh_file.exists()) {
+							ArrayList<String> add_echo_list = 	Bash_Sh_File_Add_Echo(nonhlos_boot_images_build_sh_file,true);
+							writeContentToFile(nonhlos_boot_images_build_sh_file, add_echo_list);
+							System.out.println("当前已经把 AOSP_bash文件:"+nonhlos_boot_images_build_sh_file.getAbsolutePath()+"  添加完成 echo 埋点! ");
+						}
+				
+						
+					}
+				}
+				
+				
+			}
+				
+				
+		}
+			  
 			
 		}
+		
+		public  ArrayList<String> Bash_Sh_File_Add_Echo(File srcFile ) {
+			
+			return Bash_Sh_File_Add_Echo(srcFile,true); //  默认 所有的显示 全局的路径  会更清晰
+			
+		}
+		
+		
+		public  ArrayList<String> Bash_Sh_File_Add_Echo(File srcFile , boolean isFullname) {
+			ArrayList<String> newListContent = new ArrayList<String>();
 
-//        System.out.println(builder.toString());
-		return builder.toString();
+			File curFile = srcFile;
+
+			String file_name = curFile.getName();
+			if(isFullname) {
+				file_name =  curFile.getAbsolutePath();
+			}
+			String operation_timestamp =timestamp_yyyymmdd_hhmmss;
+			
+			int echo_count = 1;
+			if (curFile != null) {
+
+				FileReader curReader;
+				try {
+
+					curReader = new FileReader(curFile);
+
+					BufferedReader curBR = new BufferedReader(new InputStreamReader(new FileInputStream(curFile), "utf-8"));
+					String oldOneLine = "";
+					String newOneLine = "";
+					String pre_one_line = "";
+					
+
+					while (oldOneLine != null) {
+
+						oldOneLine = curBR.readLine();
+						
+						if(!newOneLine.contains("zukgit")) {  // 修改 老的 上一句  会被 echo代替 
+							pre_one_line = newOneLine;
+						}
+						
+						if (oldOneLine == null || oldOneLine.trim().isEmpty()) {
+							newListContent.add("");
+							continue;
+						}
+
+//	                    System.out.println(" \"this is test string\" ");
+//	                    System.out.println("adb shell am broadcast -a com.Android.test --es<string> test_string \"this is test string\" —ei<int> test_int 100 —ez<boolean> test_boolean true");
+						newOneLine = new String(oldOneLine).trim();
+
+						//1.注释
+						if(newOneLine.contains("zukgit")) {  //  如果当前行 包含 zukgit  那么是旧的 打印  不理它 直接跳过  继续检测下一行
+							continue;
+						}
+				
+						//1.注释
+						if(newOneLine.startsWith("#")) {  // 以 # 开头 是注释  直接 跳过 
+							
+							newListContent.add(newOneLine);
+							continue;
+						}
+						
+						
+						// 最后是以 " 或者 \ 结尾的  不操作
+						//echo zukgit_build_device_old.bash_479  "$ {build_int_files}=${build_int_files}"
+						// ramdisk-recovery.img \
+						
+						//1. 不包含 等号 而且是以 \ 和  为 结尾 说明 可能是 多行操作   不执行 打印操作 
+						// fuck 这里 " 为结尾 不能 这样写 
+						if( (newOneLine.endsWith("\\") ))   {  // 以 \   为 结尾 开头 是多行  直接 跳过 
+							
+							newListContent.add(newOneLine);
+							continue;
+						}
+				
+						// 当前 只有 一个 引号  那么 也 跳过
+						if( (newOneLine.endsWith("\"")) && ( newOneLine.indexOf("\"") == newOneLine.lastIndexOf("\"") ))   {  // 以 \   为 结尾 开头 是多行  直接 跳过 
+							
+							newListContent.add(newOneLine);
+							continue;
+						}
+	
+		
+				
+ 
+						
+						
+						// 只对 包含 = 等号的 变量进行输出 
+						//  script_name=$(basename ${script_path})   不以 if 开头  只有 一个 等号
+						//2. 只有一个等号的 赋值 的 表达式的处理
+						if(!newOneLine.startsWith("if") 
+								&& !newOneLine.contains("!=") 
+								&& newOneLine.contains("=")
+								&& newOneLine.indexOf("=") == newOneLine.lastIndexOf("=") ) {
+							String equal_var_str = newOneLine.substring(0,newOneLine.indexOf("=")).trim();
+							
+							if(equal_var_str.contains(" ")) {  //  // 如果 变量名称中 含有 空格那么 就不打印它了 
+								newListContent.add(newOneLine);
+								continue;
+							}
+							
+							String echo_var_command = "echo zukgit_"+file_name+"_"+echo_count+"_"+operation_timestamp+"  "+"\"$ {"+equal_var_str+"}=${"+equal_var_str+"}\"";
+							echo_count++;
+							newListContent.add(newOneLine);
+							newListContent.add(echo_var_command);
+							continue;
+						}
+						
+						
+						//3. 方法的内部  那么打印调用的方法 
+						//function release_build_info {    并且是 以 { 为结尾的 方法  否则 报错 
+						if(newOneLine.startsWith("function ") && newOneLine.endsWith("{")) {
+				
+							String function_name = newOneLine.replace("{", "").replace("}", "").replace("(", "").replace(")", "").replace("function", "zfunc").trim();
+							String method_echo_command =  "echo zukgit_"+file_name+"_"+echo_count+"_"+operation_timestamp+"  "+" ______func_begin___________ "+function_name+" ___________";
+							echo_count++;
+							newListContent.add(newOneLine);
+							newListContent.add(method_echo_command);
+							continue;
+						}
+						
+						
+						// 如果当前语句中有变量  那么 获取 所有的变量的名字  并打印
+						//          cp ${RBE_log_dir}/rbe_metrics.* ${build_info_dir}/ || true
+						//4. 
+					// 4.1 如果当前 不是以 \ 为 结尾  但 包含${   , 那么 要
+					// 	cp -f ${BUILD_SCRIPT_DIR}/boot/QcomPkg/SocPkg/Palima/Common/uefipil_oneli.cfg \
+					//	${BUILD_SCRIPT_DIR}/boot/QcomPkg/SocPkg/Palima/Common/uefipil.cfg
+						
+						if(newOneLine.contains("${")) {
+							String[] var_arr = newOneLine.split("\\$\\{");
+							if(var_arr == null) {
+								newListContent.add(newOneLine);
+								continue;
+							}
+							
+							ArrayList<String> var_list = new ArrayList<String>();
+							for (int i = 0; i < var_arr.length; i++) {
+								String varItem = var_arr[i]+" ";;
+								
+								if(i == 0) {   // 第一个分隔项 是 没有匹配的
+									continue;
+								}
+								
+								if(varItem.contains("}")) {
+									String var_name = varItem.trim().substring(0,varItem.indexOf("}"));
+									
+									if(var_name.contains(" ")) {  // 如果 变量名称中 含有 空格那么 就不打印它了 
+										continue;
+									}
+									
+									String echo_var_command =  "echo zukgit_"+file_name+"_"+echo_count+"_"+operation_timestamp+"  "+"  "+"\"$ {"+var_name+"}=${"+var_name+"}\"";
+									echo_count++;
+//									newListContent.add(echo_var_command);
+									var_list.add(echo_var_command);
+									
+									
+								}
+							}
+							
+							if(pre_one_line != null && pre_one_line.endsWith("\\")) {
+								 // 如果 当前行的上一行 是 \ 结尾的话  当前行 说明是多行的最后一行 那么先输出当前行 再 打印
+//								System.out.println("______");
+//								System.out.println("newOneLine_A = "+ newOneLine );
+//								System.out.println("pre_one_line_A = "+ pre_one_line );
+//								System.out.println("end_with__\\_A  =  " + pre_one_line.endsWith("\\"));
+//								System.out.println("______");
+								
+								newListContent.add(newOneLine);  
+								newListContent.addAll(var_list);
+							
+								
+							}else {
+								
+//								System.out.println("______");
+//								System.out.println("newOneLine_B = "+ newOneLine );
+//								System.out.println("pre_one_line_B = "+ pre_one_line );
+//								System.out.println("end_with__\\_B  =  " + pre_one_line.endsWith("\\"));
+//								System.out.println("______");
+								// 先打印  再 输出
+								newListContent.addAll(var_list);
+								newListContent.add(newOneLine);
+							}
+							
+							continue;
+						}
+						
+						//5. 
+						// generate_product_graph $NINJA_BUILD_FILE $MSI_TARGET  没有 括号 扩起的 变量 
+						if(newOneLine.contains("$") && !newOneLine.contains("${") && !newOneLine.contains(")")   ) {
+							String[] var_arr = newOneLine.split("\\$");
+							if(var_arr == null) {
+								newListContent.add(newOneLine);
+								continue;
+							}
+							
+							
+							
+							for (int i = 0; i < var_arr.length; i++) {
+								String varItem = var_arr[i]+" ";
+								
+								if(i == 0) {   // 第一个分隔项 是 没有匹配的
+									continue;
+								}
+								
+								String var_name = "";
+								if(varItem.contains(" ")) {
+									var_name = varItem.trim().substring(0,varItem.indexOf(" "));
+									
+									
+									if(var_name.contains(" ") || var_name.contains("/") || var_name.contains(".") ) {  // 如果 变量名称中 含有 空格那么 就不打印它了 
+										continue;
+									}
+									var_name = var_name.replace("\\", "").replace("/", "").replace("\"", "").replace(",", "").replace(" ", "");
+									String echo_var_command =  "echo zukgit_"+file_name+"_"+echo_count+"_"+operation_timestamp+"  "+"  "+"\"$ {"+var_name+"}=${"+var_name+"}\"";
+									echo_count++;
+									newListContent.add(echo_var_command);
+									
+								}
+							}
+							newListContent.add(newOneLine);
+							continue;
+							
+							
+						}
+						
+						
+						
+						newListContent.add(newOneLine.trim());
+					}
+					curBR.close();
+
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			} else {
+				System.out.println("Failed !");
+			}
+			return newListContent;
+		}
+		
+
+
+		
 	}
 	
-	static String bytesToHexString_Padding(byte[] src) {
-		StringBuilder builder = new StringBuilder();
-		if (src == null || src.length <= 0) {
-			return null;
-		}
-		String hv;
-
-		int byteIndex = 0 ;
-		for (byte aSrc : src) {
-			// 以十六进制（基数 16）无符号整数形式返回一个整数参数的字符串表示形式，并转换为大写
-			hv = Integer.toHexString(aSrc & 0xFF).toUpperCase();
-			if (hv.length() < 2) {
-				builder.append(0);
-			}
-			if(byteIndex == src.length -1) {
-				builder.append("0x"+hv+" ");
-			}else {
-				builder.append("0x"+hv+"   "+","+" ");
-			}
-		
-			byteIndex++;
-			
-		}
-
-//        System.out.println(builder.toString());
-		return builder.toString();
-	}
 	
+    static String calculIndexFlag(Node curNode) {
+        String indexFlag = "";
+        if (curNode != null && curNode.getMetaModel().getType() == com.github.javaparser.ast.body.MethodDeclaration.class) {
+            return "[0]";
+        } else {  // 把自己在
+            List<Node> curChildList = curNode.getParentNode().get().getChildNodes();
+            for (int i = 0; i < curChildList.size(); i++) {
+                if (curNode == curChildList.get(i)) {
+                    indexFlag = "[" + i + "]";
+                    break;
+                }
+            }
+        }
+        indexFlag = calculIndexFlag(curNode.getParentNode().get()) + indexFlag;
+        return indexFlag;
+    }
 	
-	static String bytesToHexCharString(byte[] src,String rawstr) {
-		StringBuilder builder = new StringBuilder();
-		if (src == null || src.length <= 0) {
-			return null;
-		}
-		String hv;
-		int rawStr_size = rawstr.length();
+    static void NodeMapPrint(Map<String, ArrayList<Node>> sameNodeMap) {
+        Map.Entry<String, ArrayList<Node>> entry;
+        if (sameNodeMap != null) {
+            Iterator iterator = sameNodeMap.entrySet().iterator();
+            while (iterator.hasNext()) {
+                entry = (Map.Entry<String, ArrayList<Node>>) iterator.next();
+                String key = entry.getKey();  //Map的Value
+                ArrayList<Node> sameNodeList = entry.getValue();  //Map的Value
+                System.out.println("════════Same Node Begin════════");
+                for (int i = 0; i < sameNodeList.size(); i++) {
 
-		int byteIndex = 0 ;
-		for (byte aSrc : src) {
-			// 以十六进制（基数 16）无符号整数形式返回一个整数参数的字符串表示形式，并转换为大写
-			hv = Integer.toHexString(aSrc & 0xFF).toUpperCase();
-			if (hv.length() < 2) {
-				builder.append(0);
-			}
-			if(byteIndex == src.length -1) {
-				builder.append("0x"+hv+"_"+(byteIndex >= rawStr_size ?"?": rawstr.substring(byteIndex,byteIndex+1))+"");
-			}else {
-				builder.append("0x"+hv+"_"+(byteIndex >= rawStr_size ?"?": rawstr.substring(byteIndex,byteIndex+1))+" "+","+" ");
-			}
-		
-			byteIndex++;
-			
-		}
+                    Node sameNodeitem = sameNodeList.get(i);
+                    String indexIdentify = calculIndexFlag(sameNodeitem);
+                    System.out.println(" 相同Node 索引:" + i + " Content = " + sameNodeitem + "indexIdentify = " + indexIdentify + "   FatherType = " + sameNodeitem.getParentNode().get().getMetaModel().getType());
 
-//        System.out.println(builder.toString());
-		return builder.toString();
-	}
+                }
+                System.out.println("════════Same Node End════════");
+            }
+        }
+
+
+    }
+	
+    static class ZAndroidAPPClass extends ZAndroidClass {
+        ZAndroidAPPClass(String path, ArrayList<ZMethod> methodList) {
+            super(path, methodList);
+            isAPP = true;
+        }
+
+        ZAndroidAPPClass(String path) {
+            super(path);
+            isAPP = true;
+        }
+
+
+    }
+    
+    static class ZAndroidClass extends ZCommonClass {
+        ZAndroidClass(String path, ArrayList<ZMethod> methodList) {
+            super(path, methodList);
+            isIDEClass = false;
+            isAndroidClass = true;
+        }
+
+        ZAndroidClass(String path) {
+            super(path);
+            isIDEClass = false;
+            isAndroidClass = true;
+        }
+
+
+    }
+    
+    static class ZCommonClass extends ZClass {
+        ZCommonClass(String path, ArrayList<ZMethod> methodList) {
+            super(path, methodList);
+        }
+
+        ZCommonClass(String path) {
+            super(path);
+        }
+
+    }
+    
+    
+    static abstract class ZClass {
+        CompilationUnit zCompilationUnit;
+        ClassOrInterfaceDeclaration zClassOrInterfaceDeclaration;
+        ArrayList<ZMethod> zmethodList;
+        String originClassContent;  // 类的完整代码
+        String newClassContent;    // 经过修改后的代码
+        String className;
+        String path;    // 类的路径
+        File classFile;   // 类对应的文件
+        boolean alreadyAddPrintMethod;
+        boolean isAPP;
+        boolean isFramework;
+        boolean isAndroidClass;     //  是否是安卓项目的类
+        boolean isIDEClass;       // 是否是IDE 项目的 类
+        boolean isInterfaceFile;   // 当前的文件是一个java 接口文件
+
+        ZClass() {
+
+        }
+
+        ZClass(String path) {
+            this.path = path;
+            if (this.path == null || this.path.equals("") || this.path.equals(".java")) {
+                System.out.println(" 解析文件出错！ 文件为空 或者不是Java文件   文件 = " + this.path);
+                return;
+            }
+            String javaName = this.path.substring(this.path.lastIndexOf(File.separator) + 1, this.path.lastIndexOf(".java"));
+            if (javaName == null) {
+                System.out.println(" 文件名解析出错！");
+                return;
+            }
+            this.className = javaName;
+            this.classFile = new File(path);
+            alreadyAddPrintMethod = false;
+            // zukgitlog_3
+            //   System.out.println("ZClass(String path) = "+ classFile.getAbsolutePath() +"   className="+className);  //  接口 public interface
+
+            if (this.classFile.exists()) {
+                try {
+                    zCompilationUnit = JavaParser.parse(this.classFile);
+                    this.originClassContent = zCompilationUnit.toString();
+
+                    Optional<ClassOrInterfaceDeclaration> classOrInterfaceDeclaration_OPT = zCompilationUnit.getClassByName(this.className);
+
+//                    System.out.println(" this.className = "+ this.className);  // C:\Users\zhuzj5\IdeaProjects\JavaParser\src\Main
+                    if (classOrInterfaceDeclaration_OPT != null && classOrInterfaceDeclaration_OPT.isPresent()) {
+                        zClassOrInterfaceDeclaration = classOrInterfaceDeclaration_OPT.get();
+                    } else {
+//                        System.out.println(" 解析 ClassOrInterfaceDeclaration 出错 ！");
+                        System.out.println("══════════════════════════");
+                        System.out.println("PATH接口Interface文件:" + "    无法通过 javaparser解析 ！");
+                        System.out.println("Name=" + this.className + "   Path:" + path);
+                        System.out.println("══════════════════════════");
+                        this.isInterfaceFile = true;
+                        return;
+                    }
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    System.out.println(" 解析文件出错！ 可能是Lambda表达式  文件 = " + this.path);
+                    this.isInterfaceFile = true;  // 标记为interface文件  不解析
+
+                }
+            } else {
+                System.out.println(" 文件  " + this.path + " 不存在无法解析！ ");
+            }
+        }
+
+
+        void InitZmethodFromJavaFile(File javaFIle, ZClass zCurZClass) {
+            this.zmethodList = new ArrayList<ZMethod>();
+            if(this.isInterfaceFile){
+                return;
+            }
+            ArrayList<ZMethod> curMethod = ParserJavaMethod(javaFIle, zCurZClass);
+            this.zmethodList.addAll(curMethod);
+
+        }
+
+        ArrayList<ZMethod> ParserJavaMethod(File javaFile, ZClass zCurZClass) {
+            ArrayList<ZMethod> zMethodList = new ArrayList<ZMethod>();
+
+            String javaName = javaFile.getName();
+            if (javaName.endsWith(".java")) {
+                javaName = javaName.substring(0, javaName.length() - ".java".length());
+            }
+
+
+            try {
+                CompilationUnit mCompilationUnit = JavaParser.parse(javaFile);
+                Optional<ClassOrInterfaceDeclaration> class_opt = mCompilationUnit.getClassByName(javaName);
+                ClassOrInterfaceDeclaration mClassDeclaration = null;
+                if (class_opt.isPresent()) {
+                    mClassDeclaration = class_opt.get();
+                }
+
+                if (mClassDeclaration != null) {
+
+
+                    List<MethodDeclaration> CurMethodList = mClassDeclaration.getMethods();
+
+                    ArrayList<MethodDeclaration> methodDecList_arr = new ArrayList<MethodDeclaration>();
+                    for (MethodDeclaration mMethodDec : CurMethodList) {
+                        methodDecList_arr.add(mMethodDec);
+                    }
+
+//                    methodDecList_arr.sort(FieldMethod_Compare);
+
+                    int index = 0;
+                    for (MethodDeclaration methodDec : methodDecList_arr) {
+
+
+                        boolean isStaticMethod = methodDec.isStatic();
+                        boolean isNativeMethod = methodDec.isNative();
+                        boolean isSyncMethod = methodDec.isSynchronized();
+                        boolean isAbstractMethod = methodDec.isAbstract();
+                        boolean isFinalMethod = methodDec.isFinal();
+                        String modifyWord = "";
+                        if (isNativeMethod || isAbstractMethod) {   // 过滤 native方法 和  abstract 抽象方法
+                            continue;
+                        }
+                        modifyWord = modifyWord.trim();
+
+//                        methodDec.isThrown("Exception");
+
+
+                        String methodName = methodDec.getNameAsString(); // 函数名称
+                        NodeList<Parameter> methodParamList = methodDec.getParameters();
+                        String paramStr = "";    // 函数的参数
+
+
+                        String methodDecStr = methodDec.getDeclarationAsString(false, false, false);
+                        int returnIndex = methodDecStr.indexOf(methodName);
+                        String returnString = "";
+                        if (returnIndex > 0) {
+                            returnString = methodDecStr.substring(0, returnIndex);
+                        }
+                        //  System.out.println("Signature =  "+  methodDec.getSignature().asString());
+                        //        System.out.println("getDeclarationAsString =  "+  methodDec.getDeclarationAsString());
+                        //       System.out.println("getDeclarationAsString2 =  "+  methodDec.getDeclarationAsString(false,false,false));
+                        for (Parameter param : methodParamList) {
+                            //  System.out.println("param = "+ param.toString());
+                            paramStr = paramStr + "," + param.toString();
+                        }
+                        paramStr = paramStr.trim();
+                        while (paramStr.startsWith(",")) {
+
+                            paramStr = paramStr.substring(1);
+                        }
+
+                        while (paramStr.endsWith(",")) {
+                            paramStr = paramStr.substring(1, paramStr.length());
+                        }
+
+                        //  System.out.println("returnString = " + returnString + "         methodName = " + methodName + "  paramStr = " + paramStr);
+                        //  methodDec.g
+                        // 继续点
+                        String resultStr = "方法索引" + index + ": " + returnString + " " + methodName + "(" + paramStr + ")";
+
+//                        arrMethodList.add(resultStr);
+                        ZMethod curZMtthod = new ZMethod(zCurZClass, returnString.trim(), methodName.trim(), paramStr.trim());
+//                        new ZMethod(mZAndroidAPPClass,"boolean","onSwitchToggled","boolean isChecked ")
+                        zMethodList.add(curZMtthod);
+                        index++;
+
+                    }
+
+
+                }
+
+            } catch (Exception e) {
+                   System.out.println("X Exception ");
+                System.out.println("解析文件失败! 可能是接口 可能是 lamdaba表达式");
+                e.printStackTrace();
+            }
+
+            return zMethodList;
+        }
+
+        ZClass(String path, ArrayList<ZMethod> methodList) {
+            this.path = path;
+            this.zmethodList = methodList;
+            this.classFile = new File(path);
+            if (this.classFile.exists()) {
+                try {
+                    zCompilationUnit = JavaParser.parse(this.classFile);
+                    this.originClassContent = zCompilationUnit.toString();
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                    System.out.println(" 解析文件出错！  文件 = " + this.path);
+                }
+            } else {
+                System.out.println(" 文件  " + this.path + " 不存在无法解析！ ");
+            }
+
+        }
+
+
+        //计算字符串在给定字符串出现的次数
+        public static int calculSrcCount(String src, String des) {
+            int index = 0;
+            int count = 0;
+            while ((index = src.indexOf(des, index)) != -1) {
+                count++;
+                index = index + des.length();
+            }
+            System.out.println(des + "出现了 " + count + " 次");
+            return count;
+        }
+
+
+        public static int getCharacterPosition(String originStr, String src, int orderIndex) {
+//这里是获取"/"符号的位置
+            int resultValue = -1;
+            try {
+                Matcher slashMatcher = Pattern.compile(src).matcher(originStr);
+                int mIdx = 0;
+                while (slashMatcher.find()) {
+                    mIdx++;
+                    if (mIdx == orderIndex) {
+                        break;
+                    }
+                }
+                resultValue =  slashMatcher.start();
+
+                return resultValue;
+            } catch (Exception e){
+                System.out.println("getCharacterPosition 检索 "+ src +"第"+orderIndex+"次出现位置失败!");
+            }finally {
+                return resultValue;
+            }
+
+        }
+
+
+        static String replaceWithIndex(String oriStr, String src, String dest, int index) {
+            String curResultStr = oriStr;
+            if (!curResultStr.contains(src)) {   //  如果没有包含src  那么 原样返回
+                System.out.println("原样返回1  不包含！src");
+                return oriStr;
+            }
+            int order = index + 1;
+
+            int srcCount = calculSrcCount(oriStr, src);
+            if (order <= 0 || order > srcCount) {  //  如果给出的索引为负数 或者 索引+1 > 大于 字符串个数 那么返回原样
+                System.out.println("原样返回2   order=" + order + "  srcCount= " + srcCount);
+                return oriStr;
+            }
+
+            int curPlaceIndex = getCharacterPosition(oriStr, src, order);
+            if (curPlaceIndex < 0) {
+                System.out.println("原样返回3   curPlaceIndex=" + curPlaceIndex);
+
+                return oriStr;
+            }
+
+            int beginIndex = oriStr.indexOf(src, curPlaceIndex);
+            int length = src.length();
+            int endIndex = beginIndex + length;
+            if (beginIndex < 0) {
+                System.out.println("原样返回4   beginIndex=" + beginIndex);
+
+                return oriStr;
+            }
+
+            if (endIndex > oriStr.length()) {
+                System.out.println("原样返回5   endIndex=" + endIndex + "  oriStr.length()=" + oriStr.length());
+
+                return oriStr;
+            }
+            curResultStr = oriStr.substring(0, beginIndex) + dest + oriStr.substring(endIndex);
+
+//            curResultStr.indexOf()
+
+
+            return curResultStr;
+        }
+
+        // 把原有的Class代码转为新替换的Class的代码
+        String toNewClassCode() {
+            String originClassCode = "";
+            String newClassCode = "";
+            String originMethodCode = "";
+            String newMethodCode = "";
+
+            if (this.originClassContent == null || this.originClassContent.equals("")) {
+                System.out.println("解析文件出现错误: originClassContent 为空");
+                return null;
+            }
+            // zukgitlog_4  原始类的内容
+            //  System.out.println("═══════ originClassContent ═══════\n"+this.originClassContent);
+            originClassCode = new String(this.originClassContent);
+
+            if (originClassCode.contains("zukgit")) {
+                System.out.println(" 该类已经添加了Log 不再添加Log的打印方法 MetodPrint!");
+                this.alreadyAddPrintMethod = true;
+            }
+
+            newClassCode = new String(originClassCode);
+            int mMethodIndex = 1;
+            for (ZMethod zmethod : this.zmethodList) {
+                //System.out.println("  当前解析Method: = "+ zmethod.methodName);
+                //  curClassCode.replaceAll(zmethod.originCodeString,)
+                int allNodeSize = zmethod.checkAllNode(zmethod.methodDeclaration);   //  获取总共Method 中多少个结点
+                if (allNodeSize == 0) {
+                    continue;
+                }
+
+                if (zmethod.originCodeString.contains("@Test")) {
+                    continue;
+                }
+
+                // 去掉方法的注释   //  //  //
+                zmethod.logOnlyParam_originCodeString = tryToClearHeadCommandB(zmethod.originCodeString);
+
+                // 如果方法中包含 @Test   那么也不解析 zukgit_log zukgit1_log zukgitlog_1
+                //  System.out.println("zmethod.originCodeString 去除方法头部注释后 = \n"+ zmethod.logOnlyParam_originCodeString);
+
+                int expressNodeSize = zmethod.expressNodeList.size();    //  每个表达式 前面 添加一些 log 以此 来观察 程序 运行
+                // zukgitlog_5
+                //      System.out.println(" allNodeSize = "+ allNodeSize +"       表达式结点 expressNodeSize = "+ expressNodeSize);
+                originMethodCode = zmethod.originCodeString;
+                //       System.out.println("第" + mMethodIndex+" 个方法开始解析 methodName =:" +zmethod.methodName);
+                mMethodIndex++;
+                
+                //   去掉 zukgit 
+//                if (zmethod.originCodeString.contains("zukgit")) {  // 对已经添加过Log的方法不再处理
+//                    //  System.out.println(" 该方法已经添加了Log 不再添加Log 添加log!"+zmethod.methodName);
+//                    //  System.out.println(" 该方法已经添加了Log  需要进行修正 Log 打印的时间点);
+//                    zmethod.belongClass.alreadyAddPrintMethod = true;
+//                    continue;
+//                }
+                
+                
+                
+                newMethodCode = new String(zmethod.logOnlyParam_originCodeString);
+
+                NodeMapPrint(zmethod.sameExpressNodeMap);
+                Object[] sameSetKey = zmethod.sameExpressNodeMap.keySet().toArray();
+                for (int i = 0; i < sameSetKey.length; i++) {
+                    ArrayList<Node> sameNodeList = zmethod.sameExpressNodeMap.get(sameSetKey[i]);
+                    for (int j = 0; j < sameNodeList.size(); j++) {
+                        int nodeIndex = j;
+                        Node curNode = sameNodeList.get(j);
+                        boolean needBlock = curNode.getParentNode().get().getMetaModel().getType() == com.github.javaparser.ast.stmt.IfStmt.class;
+
+                        String code1 = zmethod.fixExpressNodeString(curNode.toString());  //  需要对这里进行fix  去除空格与注释
+                        String[] analysysCode = zmethod.tryAnalysisExpressNodeString(curNode.toString());
+
+                        //  如果父类不为空  并且父类是 com.github.javaparser.ast.stmt.IfStmt   并且父类的子项只有两个
+                        String log = zmethod.buildIndexLog();
+                        String codePre1 = "";
+                        String codeBack1 = "";
+                        if (analysysCode != null && analysysCode.length == 2) {
+                            codePre1 = analysysCode[0];
+                            codeBack1 = analysysCode[1];
+                        }
+
+                        if (checkExceptionFlag(codePre1)) {
+                            codePre1 = "";
+                        }
+                        if (checkExceptionFlag(codeBack1)) {
+                            codeBack1 = "";
+                        }
+                        String code2 = log + codePre1 + "  " + code1 + codeBack1;
+
+                        Node fatherNode = curNode.getParentNode().get();
+
+                        if (needBlock) {
+                            code2 = "{" + code2 + "}";
+                        }
+                        System.out.println("═══════════map-same-code-begin══════════");
+                        System.out.println("index: " + j + "  sameCode oldMethodCode = " + newMethodCode);
+                        String oldMethodCode = new String(newMethodCode);
+                        // 原始的已经变化了  之前的替换已经被 "  test1 = 11;" 已经被替换为 "test1 = 11;" 所以 需要减1
+                        newMethodCode = replaceWithIndex(oldMethodCode, "  " + code1, code2, nodeIndex);
+                        System.out.println("index:" + j + "  sameCode code1 = " + "  " + code1);
+                        System.out.println("index:" + j + "  sameCode code2 = " + code2);
+                        System.out.println("index: " + j + "  sameCode newMethodCode = " + newMethodCode);
+                        System.out.println("old == new  " + oldMethodCode.equals(newMethodCode));
+                        System.out.println("═══════════map-same-code-end══════════");
+                        System.out.println();
+                    }
+
+
+                }
+
+                for (int j = 0; j < expressNodeSize; j++) {
+                    //  Node node =  zmethod.expressNodeList.get(j);
+                    Node node = (Node) zmethod.expressNodeList.toArray()[j];
+                    String code1 = zmethod.fixExpressNodeString(node.toString());  //  需要对这里进行fix  去除空格与注释
+                    String[] analysysCode = zmethod.tryAnalysisExpressNodeString(node.toString());  // 对参数进行分析  String[2]  === type和typename
+//Line 695: ══════=== fixStr = Toast.makeText(mContext, R.string.wifi_in_airplane_mode, Toast.LENGTH_SHORT).show();
+//Line 700: ══════=== fixStr = mSwitchWidget.setChecked(false);
+//Line 705: ══════=== fixStr = mMetricsFeatureProvider.action(mContext, MetricsEvent.ACTION_WIFI_ON);
+//Line 710: ══════=== fixStr = mMetricsFeatureProvider.action(mContext, MetricsEvent.ACTION_WIFI_OFF, mConnected.get());
+//Line 715: ══════=== fixStr = mSwitchWidget.setEnabled(true);
+//Line 720: ══════=== fixStr = Toast.makeText(mContext, R.string.wifi_error, Toast.LENGTH_SHORT).show();
+
+                    //  如果父类不为空  并且父类是 com.github.javaparser.ast.stmt.IfStmt   并且父类的子项只有两个
+                    String log = zmethod.buildIndexLog();
+                    String codePre1 = "";
+                    String codeBack1 = "";
+                    if (analysysCode != null && analysysCode.length == 2) {
+                        codePre1 = analysysCode[0];
+                        codeBack1 = analysysCode[1];
+                    }
+//                    codeBackXXX =   报错的
+//                            zPrintLog(>);
+                    //   System.out.println(" codePreXXX   = "+ codePre1);
+                    //   System.out.println(" codeBackXXX = "+ codeBack1);
+
+//                    expected one of "!=" "%" "%=" "&" "&&" "&=" "(" ")" "*" "*=" "+" "+=" "," "-" "-=" "->"
+//                    "/" "/=" "::" "<" "<<=" "<=" "=" "==" ">" ">=" ">>=" ">>>=" "?" "^" "^="
+//                    "instanceof" "|" "|=" "||"
+
+                    if (checkExceptionFlag(codePre1)) {
+                        codePre1 = "";
+                    }
+
+
+                    if (checkExceptionFlag(codeBack1)) {
+                        codeBack1 = "";
+                    }
+                    //  System.out.println(" codePreXXX_B   = "+ codePre1);
+                    // System.out.println(" codeBackXXX_B = "+ codeBack1);
+
+
+                    String code2 = log + codePre1 + code1 + codeBack1;
+
+                    Node fatherNode = node.getParentNode().get();
+
+                    if (fatherNode != null && fatherNode.getMetaModel().getType() == com.github.javaparser.ast.stmt.IfStmt.class) {
+                        code2 = "{" + code2 + "}";   //  对于  if()   int = aa  ;    // 这样的表达式处理
+                        //System.out.println(" fatherNode.getChildNodes().size = "+ fatherNode.getChildNodes().size());
+                    }
+/*                    else if(fatherNode != null && fatherNode.getMetaModel().getType() == com.github.javaparser.ast.stmt.BlockStmt.class && fatherNode.getChildNodes().size() == 1){
+                        code2 = "{" + code2 + "}" ;   //  对于  if()   int = aa  ;    // 这样的表达式处理
+
+                    }*/
+
+
+                    System.out.println();
+                    System.out.println();
+//                    System.out.println("═════════════════════════Begin════════════════════");
+                    Node grandFatherNode = fatherNode.getParentNode().get();
+                    System.out.println("code2 = " + code2);
+
+
+//                    System.out.println("node.getMetaModel().getType() = "+ node.getMetaModel().getType());
+//                         System.out.println("node.tostring = "+node.toString());
+//                         for (int i = 0; i < node.getChildNodes().size(); i++) {
+//                            System.out.println("curNode-child["+i+"] = "+ node.getChildNodes().get(i).getMetaModel().getType() );
+//                         }
+//                    System.out.println("fatherNode.tostring = "+fatherNode.toString());
+//                        System.out.println("fatherNode.getMetaModel().getType() = "+ fatherNode.getMetaModel().getType());
+//                    System.out.println("father-child-size="+fatherNode.getChildNodes().size());
+//                    for (int i = 0; i < fatherNode.getChildNodes().size(); i++) {
+//                        System.out.println("child["+i+"] = "+ fatherNode.getChildNodes().get(i).getMetaModel().getType() );
+//                    }
+//
+//                        if(grandFatherNode != null){
+//                            System.out.println("grandFatherNode.getMetaModel().getType() = "+ grandFatherNode.getMetaModel().getType());
+//                            System.out.println("grandFatherNode = "+ grandFatherNode.toString());
+//                        }
+//                    System.out.println("═════════════════════════End════════════════════");
+
+
+                    System.out.println();
+                    System.out.println();
+
+                    //System.out.println("############## index="+j+"     原有的Log node.toString() = "+code1);
+                    //System.out.println("############## index="+j+"     现有的Log code2 = "+code2);
+
+                    //  当前的 code1 是否是  某个 expressNode 的 子集
+                    //  判断 当前的 code1 是否含有多个子项
+                    newMethodCode = newMethodCode.replace("  " + code1, code2);     //  继续点  这里因为空格的原因无法匹配到
+// ############## index=0     原有的Log node.toString() = Toast.makeText(mContext, R.string.wifi_in_airplane_mode, Toast.LENGTH_SHORT).show();
+//############## index=0     现有的Log code2 =
+// android.util.Log.i("zukgit_onSwitchToggled","this is indexLog index= 0");
+// Toast.makeText(mContext, R.string.wifi_in_airplane_mode, Toast.LENGTH_SHORT).show();
+                    //System.out.println("############## index="+j+"     现有的  newMethodCode  = "+newMethodCode);
+
+                }
+
+                //System.out.println("！！！！！！！！！！新构建的方法 Method的方法 如下: 原始方法 :" + zmethod.originCodeString);  // 构建新的方法的内容
+                //System.out.println("！！！！！！！！！！新构建的方法 Method的方法 如下: newMethodCode :" + newMethodCode);  // 构建新的方法的内容
+                String addBlankOriginCodeString = "";
+                if (zmethod.originCodeString.startsWith("/*")) {
+                    String originCodeStringWithOutZhuShi = zmethod.originCodeString.substring(zmethod.originCodeString.indexOf("*/") + 2).trim();
+                    addBlankOriginCodeString = originCodeStringWithOutZhuShi.replaceAll("\n", "\n    ");
+                    //System.out.println("Method 开头包含注释 /***/ ！！");
+                } else {
+                    addBlankOriginCodeString = zmethod.originCodeString.replaceAll("\n", "\n    ");
+                    //System.out.println("Method 开头不包含注释 /***/ ！！");
+                }
+
+
+                if (addBlankOriginCodeString.startsWith("@Override")) {
+                    addBlankOriginCodeString = "    " + addBlankOriginCodeString;
+                }
+                addBlankOriginCodeString = addBlankOriginCodeString.replace("    * ", "* ");
+                addBlankOriginCodeString = addBlankOriginCodeString.replace("    */", "*/");
+
+                if (zmethod.buildIndexLogList != null) {
+
+                    for (int i = 0; i < zmethod.buildIndexLogList.size(); i++) {
+                        String index = zmethod.buildIndexLogList.get(i);
+                        //System.out.println("序号 : "+ i  + "   出现的序号: +" + (index) );
+                    }
+
+                }
+
+                newMethodCode = zmethod.fixnewMethodCode(newMethodCode); // 把  this_is_indexLog_index=0  依次设置序号
+                // System.out.println("═════════=   newMethodCode  Begin═════════==");
+                //  System.out.println(newMethodCode);
+                //  System.out.println("═════════=   newMethodCode  End═════════==");
+                //  System.out.println("═════════=   newClassCode  Begin═════════==");
+
+                newClassCode = newClassCode.replace(addBlankOriginCodeString, newMethodCode); // 构建新类文件内容
+
+                if (!newClassCode.contains(newMethodCode)) {
+                    //System.out.println("第一次匹配失败 在 addBlankOriginCodeString 和 newClassCode中的方法 格式问题不对称");
+                    //System.out.println("1.newClassCode 中的格式无法查询  需要查看Log ");
+                    //System.out.println("2.当前去匹配去适应的method字符串是:\n"+ addBlankOriginCodeString);
+
+                    String classCodeTemplate = "class ZTemplate {" + addBlankOriginCodeString + " }";
+
+                    CompilationUnit compileUtil = JavaParser.parse(classCodeTemplate);
+
+                    String strCode1 = compileUtil.toString();
+                    //System.out.println(strCode1);
+                    String sreCode2 = strCode1.substring("class ZTemplate {".length());
+                    String strCode3 = sreCode2.substring(0, sreCode2.lastIndexOf("}"));
+                    String firstCode = "";
+                    firstCode = strCode3.substring(0, 1);
+                    //    System.out.println("firstCode1 = "+ firstCode);
+                    while (!strCode3.startsWith(" ")) {
+                        firstCode = strCode3.substring(0, 1);
+                        //System.out.println("firstCode2 = "+ firstCode);
+                        strCode3 = strCode3.substring(1);
+                    }
+                    if (newClassCode.contains(strCode3)) {
+                        // System.out.println("第二次匹配成功 在 strCode3 和 newClassCode中的方法 格式问题对称");
+                        newClassCode = newClassCode.replace(strCode3, newMethodCode);
+
+                    } else {
+                        // System.out.println("第二次匹配失败 在 strCode3 和 newClassCode中的方法 格式问题不对称");
+                    }
+                } else {
+                    //System.out.println("第一次匹配成功 在 addBlankOriginCodeString 和 newClassCode中的方法 格式对称");
+
+                }
+                // System.out.println(newClassCode);
+                //  System.out.println("═════════=   newClassCode  End═════════==");
+                //   System.out.println("═════════=   addBlankOriginCodeString  Begin═════════==");
+                //  System.out.println(addBlankOriginCodeString);
+                //  System.out.println("═════════=   addBlankOriginCodeString  End═════════==");
+                newMethodCode = null;
+            }
+            // System.out.println("！！！！！！！！！！  原始类的内容 :" + originClassCode);  // 构建新的方法的内容
+            //  System.out.println("！！！！！！！！！！新类的内容 :" + newClassCode);  // 构建新的方法的内容
+            return newClassCode;
+        }
+
+        void addZMethod(ArrayList<ZMethod> zmethodList) {
+            this.zmethodList = zmethodList;
+        }
+        /*fafa*/
+
+
+        static String tryToClearHeadCommandB(String originMethodContent) {
+            String methodOnly = originMethodContent.trim();
+            String resultCode = originMethodContent;
+            if (!methodOnly.startsWith("//")) {
+                return originMethodContent;
+            } else {
+                String[] codeArr = originMethodContent.split("\n");
+                StringBuilder sb = new StringBuilder();
+                int beginIndex = 0;
+                for (int i = 0; i < codeArr.length; i++) {
+                    if (!codeArr[i].trim().startsWith("//")) {
+                        beginIndex = i;
+//                        System.out.println("头部注释:  i"+i+"    " + codeArr[i]);
+                        break;
+                    }
+                    
+                    if (codeArr[i].trim().contains("zukgit")) {   // 包含 zukgit 的 去掉
+                        beginIndex = i;
+//                        System.out.println("头部注释:  i"+i+"    " + codeArr[i]);
+                        break;
+                    }
+                    
+                }
+
+                for (int i = 0; i < codeArr.length; i++) {
+//                    System.out.println("所有分割情况 i="+i+ "  value = "+codeArr[i]);
+                }
+                for (int j = beginIndex; j < codeArr.length; j++) {
+                    sb.append(codeArr[j] + "\n");
+
+                }
+
+                resultCode = sb.toString();
+//                System.out.println("去除Head注释的方法字符:"+ resultCode );
+            }
+
+
+            return resultCode;
+
+        }
+
+        static ArrayList<File> initJavaFileFromParam(ArrayList<String> keyList) {
+            ArrayList<File> curJavaFileList = new ArrayList<File>();
+
+            //  如果当前的文件是以./ 文件开头的话 那么说明 传入的参数是 相对路径  需要转为绝对路径
+            for (int i = 0; i < keyList.size(); i++) {
+                String itemStr = keyList.get(i);
+                String absItemStr = "";
+                if (itemStr.startsWith("./") || itemStr.startsWith(".\\")) {
+                    itemStr = itemStr.replace("./", "");
+                    itemStr = itemStr.replace(".\\", "");
+                    absItemStr = curProjectPath + File.separator + itemStr;
+                } else {
+                    absItemStr = itemStr;    // 传递过来的就是绝对路径
+                }
+
+
+                File cuAabsItemStrFile = new File(absItemStr);
+                if (cuAabsItemStrFile.exists() && cuAabsItemStrFile.getName().endsWith(".java")) {
+                    // 文件存在 并且是以  .java 文件为结尾的 文件
+                    curJavaFileList.add(cuAabsItemStrFile);
+                }
+            }
+
+
+            return curJavaFileList;
+
+        }
+
+
+
+        String GetRealPrintMethod() {
+            String methodPrint = new String(COMMON_PRINT_METHOD);
+            String holdStr = "ZukgitHoldPlace";
+            String MethodStr = "";
+//            if (isIDEClass) {
+//                MethodStr = "System.out.println(";
+//            } else if (isAPP) {
+//                MethodStr = "android.util.Log.i(\"" + TAG + "_" + className + "\",";
+//            } else if (isFramework) {
+//                MethodStr = "android.util.SLog.i(\"" + TAG + "_" + className + "\",";
+//            } else {
+//                MethodStr = "System.out.println(";
+//            }
+            
+            
+            if (Rule_57_LogTypeStr.equals("syso")) {
+                MethodStr = "System.out.println(";
+            } else if (Rule_57_LogTypeStr.equals("log")) {
+                MethodStr = "android.util.Log.i(\"" + Rule_57_TAG + "_" + className + "\",";
+            } else if (Rule_57_LogTypeStr.equals("slog")) {
+                MethodStr = "android.util.SLog.i(\"" + Rule_57_TAG + "_" + className + "\",";
+            } else {
+                MethodStr = "System.out.println(";
+            }
+            
+
+            String returnStr = methodPrint.replaceAll(holdStr, MethodStr);
+
+
+//            boolean isAPP;
+//            boolean isFramework;
+//            boolean isAndroidClass;     //  是否是安卓项目的类
+//            boolean isIDEClass;       // 是否是IDE 项目的 类
+
+
+            return returnStr;
+        }
+    }
+
+    
+    static class ZMethod {
+        MethodDeclaration methodDeclaration;
+        NodeList<Parameter> methodParamList;
+        String paramLogString;   //  参数的打印字符串
+        ZClass belongClass;
+        Set<Node> expressNodeList;   //  表达式结点的集合( 不重复 )
+        Map<String, ArrayList<Node>> sameExpressNodeMap; // 表达式 相同的结点 但是父节点不同  比如 { int a =3  ; a=2; if(xxx) a=2;}
+        String methodIdentify;   // 方法的唯一标识
+        String returnString;   // 方法返回值
+        String methodName;  // 方法名称
+        String paramString;  // 方法参数字符串
+        String ownerClassName;   // 方法拥有类名称
+        String originCodeString;  // 方法的字符串集合
+        String logOnlyParam_originCodeString;  //
+        int methodLogIndex;
+        String newCodeString;    // 已替换方法的集合
+        ArrayList<String> buildIndexLogList;
+
+
+        String fixnewMethodCode(String newMethodContent) {
+            String flagStr = "this_is_indexLog_index=0";
+            if (!newMethodContent.contains(flagStr)) {
+                return newMethodContent;
+            }
+            String curMethodContent = newMethodContent;
+            int addIntValue = 1;
+            int flagIndex = newMethodContent.indexOf(flagStr);
+            while (flagIndex > 0) {
+
+                String currentLog = "this_is_indexLog_index=" + addIntValue;
+                curMethodContent = curMethodContent.substring(0, flagIndex) + currentLog + curMethodContent.substring(flagIndex + flagStr.length());
+                flagIndex = curMethodContent.indexOf(flagStr);
+                addIntValue++;
+                //System.out.println(" addIntValue = "+ addIntValue +  "   flagIndex = "+ flagIndex);
+
+//                addIntValue = 905   flagIndex = 1398
+//                addIntValue = 906   flagIndex = 1398
+//                addIntValue = 907   flagIndex = 1398
+
+            }
+
+
+            return curMethodContent;
+        }
+
+
+        String[] tryAnalysisExpressNodeString(String nodeString) {
+            String checkCode = "";
+//            System.out.println(" 表达式分析 返回分析代码 " );
+//            System.out.println(" 表达式:  "+  nodeString);
+            // 表达式 以 // 开头 那么 就不解析
+            if (nodeString.trim().startsWith("//")) {
+                return null;
+            }
+
+
+            //   System.out.println('=');
+            //   intValue = -10;  (处理)
+            //   int xxx = 10;
+            //  System.out.println("method1   intValue =  ge" + intValue);
+            // 对于那些事赋值语句的句子 进行 代码的分析
+            // 有些表达式 内的 字符串 里面 包含 等号 这些表达式 不处理
+            // 1.判断是否包含等号  2.以等号分割的长度 必须等于2
+            // 3. 等号前面的数值不能包含空格 不能包含双引号  单引号“ ‘
+//  Map<String, String> map = new HashMap<String, String>();
+            if (nodeString.contains("=")) {
+                String strArr[] = nodeString.split("=");
+                if (strArr.length != 2) {
+                    return null;
+                }  // 确保只分出两个 子subString
+                //   wifiConfig = Method.xxxxx();      type = 1
+                //  WifiGraturation wifiConfig = Method.xxxxx();    typ2 = 2
+                // final int wifiApState = mWifiManager.getWifiApState();  type3 =3
+                String variableName = "";
+
+                String str1 = strArr[0].trim();
+                String str2 = strArr[1].trim();
+                variableName = str1;
+                // 继续点
+                if (str1.contains("\"") || str1.contains("\'")) {
+                    //  不能包含双引号  单引号“ ‘
+                    return null;
+                }  // intValue = -10;
+                int type = 1;
+
+                if (str1.contains(" ")) {
+                    String[] arrStrTest = str1.split(" ");
+                    if (arrStrTest != null && arrStrTest.length == 2) {
+                        type = 2;
+                        variableName = arrStrTest[1].trim();
+                    } else if (arrStrTest != null && arrStrTest.length == 3 && str1.contains(",") && !arrStrTest[2].contains("<") && !arrStrTest[2].contains(">")) {
+// 第二种类型   //  Map<String, String> map
+                        // final int wifiApState
+                        type = 2;
+                        variableName = arrStrTest[2].trim();
+
+                    } else if (arrStrTest != null && arrStrTest.length == 3 && arrStrTest[0].trim().equals("final")) {
+                        //   // final int wifiApState = mWifiManager.getWifiApState();
+                        type = 2;
+                        variableName = arrStrTest[2].trim();
+                    } else {
+
+                        return null;
+                    }
+
+                }
+                //  泛华的打印Log的方法
+                // variableName  指向变量名称   type标识当前的表达形式 1 2
+
+                //  0 是打印前的Log
+                // 1  是 执行后的Log
+                String strShuZu[] = new String[2];
+
+                if (type == 1) {  //  wifiConfig = Method.xxxxx();      type = 1
+                    String code1 = "\nzPrintLog(" + variableName + ");\n";
+                    String code2 = "\nzPrintLog(" + variableName + ");\n";
+                    strShuZu[0] = code1;
+                    strShuZu[1] = code2;
+                    // 是否有对称的() 的 括号
+                    if (!hasDoubleBlock(code1.trim()) || !hasDoubleBlock(code2.trim()) ||
+                            !hasDoubleMiddleBlock(code1.trim()) || !hasDoubleMiddleBlock(code2.trim())) {
+                        return null;
+                    }
+
+                } else if (type == 2) {   //  WifiGraturation wifiConfig = Method.xxxxx();    typ2 = 2
+                    strShuZu[0] = "\n";
+                    String code1 = "\nzPrintLog(" + variableName + ");\n";
+                    strShuZu[1] = code1;
+
+                    // 是否有对称的() 的 括号
+                    if (!hasDoubleBlock(code1.trim()) || !hasDoubleMiddleBlock(code1.trim())) {
+                        return null;
+                    }
+                }
+
+                return strShuZu;
+
+
+            } else {
+                return null;
+            }
+
+
+        }
+
+        static boolean hasDoubleMiddleBlock(String express) {
+            boolean flag = false;
+            int getStrCharNumA = calculStrCount(express, '[');
+            int getStrCharNumB = calculStrCount(express, ']');
+
+            if (getStrCharNumA == getStrCharNumB) {
+                flag = true;
+            }
+
+            return flag;
+
+        }
+
+        static boolean hasDoubleBlock(String express) {
+            boolean flag = false;
+            int getStrCharNumA = calculStrCount(express, '(');
+            int getStrCharNumB = calculStrCount(express, ')');
+
+            if (getStrCharNumA == getStrCharNumB) {
+                flag = true;
+            }
+
+            return flag;
+
+        }
+
+        static int calculStrCount(String src, char charTarget) {
+            int count = 0;
+            String curFixStr = src.trim();
+
+            for (int i = 0; i < curFixStr.length(); i++) {
+                char charitem = curFixStr.charAt(i);
+
+                if (charitem == charTarget) {
+                    count++;
+                }
+            }
+
+            return count;
+        }
+
+        String fixExpressNodeString(String nodeString) {
+            String fixStr = "";
+            if (nodeString.contains("\n")) {
+
+                String[] strArr = nodeString.split("\n");
+                for (int i = 0; i < strArr.length; i++) {
+                    if (!strArr[i].trim().startsWith("//")) {
+                        fixStr = fixStr + strArr[i].trim();
+                    }
+                }
+
+            } else {
+                fixStr = nodeString;
+            }
+
+// Log if user was connected at the time of switching off.
+//mMetricsFeatureProvider.action(mContext, MetricsEvent.ACTION_WIFI_OFF, mConnected.get());
+
+
+            // Log if user was connected at the time of switching off.
+            // mMetricsFeatureProvider.action(mContext, MetricsEvent.ACTION_WIFI_OFF, mConnected.get());
+            // System.out.println("══════=== fixStr = "+ fixStr);
+            return fixStr;
+        }
+
+        int getNodeLength(Node node) {
+            int nodelength = 0;
+            if (node.getChildNodes().size() == 0) {
+//                System.out.println(" 叶子结点的类型: "+  node.getMetaModel().getType() + " 内容为: "+ node.toString());
+
+                return 0;
+            } else {
+//                System.out.println(" 非叶子结点的类型: "+  node.getMetaModel().getType() + " 内容为: "+ node.toString()  );
+                if (node.getMetaModel().getType() == com.github.javaparser.ast.stmt.ExpressionStmt.class) {
+//                    System.out.println("═════════=表达式类型 ExpressionStmt :"+  node.getMetaModel().getType() + " 内容为: "+ node.toString()+"═════════=");
+
+                    Node fatherNode = node.getParentNode().get();
+                    int fatherNodeChildSize = 0;
+                    String fatherType = "";
+                    Node yeyeNode;
+                    String yeyeType = "";
+                    System.out.println("═══════════════════开始═════════════════════");
+                    if (fatherNode != null) {
+
+
+                        System.out.println("当前表达式:" + node.toString() + "   type = " + node.getMetaModel().getType());
+                        System.out.println("当前表达式的子表达式大小:" + node.getChildNodes().size());
+                        fatherType = fatherNode.getMetaModel().getType().toString();
+                        fatherNodeChildSize = fatherNode.getChildNodes() != null ? fatherNode.getChildNodes().size() : 0;
+                        System.out.println("父类的表达式: " + fatherNode.toString() + " type = " + fatherNode.getMetaModel().getType());
+                        System.out.println("父类的Child-Size = " + fatherNode.getChildNodes().size());
+                        for (int i = 0; i < fatherNode.getChildNodes().size(); i++) {
+                            System.out.println("child[" + i + "]  str = " + fatherNode.getChildNodes().get(i).toString());
+                            System.out.println("child[" + i + "]  type = " + fatherNode.getChildNodes().get(i).getMetaModel().getType());
+                        }
+                        yeyeNode = fatherNode.getParentNode().get();
+                        if (yeyeNode != null) {
+                            yeyeType = yeyeNode.getMetaModel().getType().toString();
+                            System.out.println("爷爷类的表达式: " + yeyeNode.toString() + "   type = " + yeyeType);
+                        }
+
+                    }
+
+                    System.out.println("═══════════════════结束═════════════════════");
+                    int index = expressNodeList.size();
+                    //   System.out.println("索引:"+index+"   *************表达式的父类表达式类型为 FatherExpressionStmt : fatherType="+fatherType+"     yeyeType="+yeyeType   + "  fatherNodeChildSize = "+ fatherNodeChildSize  );
+
+                    // 表达式的node相同   字符串也相同的情况的处理
+                    // 表达式相同  但是上下文件不同   如果在   if  表达式 ; else  表达的情况下 那么可能会造成 语法错误
+
+                    // 对于表达式相同的node 通过ArrayList<Node> 来进行保存  通过判断父节点的类型来 得到是否添加{}
+                    // 由于添加Log 是字符串匹配   对于node相同的表达式  字符串都会去匹配 replace
+                    // 对于 不需要{}的 表达式  添加了 {} 导致上下文语法不通过
+                    // 对于 需要{} 的 表达式  只有添加了 {} 才能使得语法通过
+
+                    //  如果当前的表达式  不包含 这个 node  并且这个Node也包含在 相同Map 的Key中 那么 添加这个node
+                    // 如果这个表达式也是 IF 下的单独表达式 那么 也需要替换
+                    if (!expressNodeList.contains(node) && !sameExpressNodeMap.keySet().contains(node.toString()) &&
+                            node.getParentNode().get().getMetaModel().getType() != com.github.javaparser.ast.stmt.IfStmt.class) {   // 如果有两个相同的sameExpress 那么它们仍然保存在 ArrayList<Node>无法区分
+                        expressNodeList.add(node);
+                    } else {
+
+                        // 检测当前ArrayList是否为空 为空话 就创建这样的Map
+                        ArrayList<Node> nodeList = sameExpressNodeMap.get(node.toString());
+                        if (nodeList == null) {
+                            nodeList = new ArrayList<Node>();
+                        }
+
+                        Node preSameNode = null;
+                        if (expressNodeList.contains(node)) {   //  如果是第一次检测到相同  那么需要拿到之前的保存在Set的Node
+                            Iterator<Node> it = expressNodeList.iterator();
+                            while (it.hasNext()) {   // 拿到之前  SET 中保存的那个 表达式Node
+                                Node setNode = it.next();
+                                if (setNode != null && node.toString().equals(setNode.toString())) {
+                                    preSameNode = setNode;
+                                    break;
+                                }
+
+                            }//判断是否有下一个
+                            expressNodeList.remove(node);  // 拿到之前的Node  再从Set中删除它
+                        }
+
+                        if (preSameNode != null) {   //  如果之前的Node 不为空 那么 把它取出来 放到List
+                            nodeList.add(preSameNode);
+                        }
+
+                        nodeList.add(node);   //  填充当前的Node
+                        sameExpressNodeMap.put(node.toString(), nodeList);
+
+                        //  如果已经包含了这个node  那么 检查这个node是否是 if xxx ; else  xxx ; 的 情况
+                        //  如果这个 node 满足 if  ; else 的 情况 需要给它 过滤 去除
+                    }
+                }
+                List<Node> listNode = node.getChildNodes();
+                nodelength = listNode.size();
+                for (Node itemNode : listNode) {
+                    nodelength = nodelength + getNodeLength(itemNode);
+
+                }
+
+            }
+            return nodelength;
+
+        }
+
+        int checkAllNode(MethodDeclaration method) {
+            if (method == null) {
+                return 0;
+            }
+            int num = 0;
+            List<Node> curList = method.getChildNodes();
+            if (curList == null) {
+                return 0;
+            }
+            num = curList.size();
+            if (num == 0) {
+                return 0;
+            }
+
+            for (Node itemNode : curList) {
+                num = num + getNodeLength(itemNode);
+
+            }
+            return num;
+        }
+
+
+        synchronized String buildIndexLog() {
+            String codeStr =
+                    "";
+            if (buildIndexLogList == null) {
+                buildIndexLogList = new ArrayList<String>();
+            }
+
+            codeStr = CommonCodePrint("\"this_is_indexLog_index=" + 0 + "\"");
+            // codeStr = CommonCodePrint("this_is_indexLog_index=0");
+            methodLogIndex++;
+
+            buildIndexLogList.add("this is indexLog index=" + 0);
+            return codeStr;
+        }
+
+
+        ZMethod(ZClass parentClass, String returnString, String methodName, String paramString) {
+            this.belongClass = parentClass;
+            this.returnString = returnString;
+            this.methodName = methodName;
+            this.paramString = paramString;
+            if (paramString.trim().endsWith(")") && paramString.trim().startsWith("(")) {
+                this.paramString = paramString;
+            } else {
+                this.paramString = "(" + paramString.trim() + ")";
+            }
+            methodLogIndex = 0;
+            this.paramString = tryFixParamFormat(this.paramString);
+            this.methodIdentify = (this.returnString + " " + this.methodName + this.paramString).trim();
+            this.ownerClassName = this.belongClass.className;
+
+            this.methodDeclaration = getMethodDeclarationFromCompilationUnit(this.belongClass.zClassOrInterfaceDeclaration, methodIdentify);
+            if (this.methodDeclaration == null) {
+                System.out.println("解析Method为空! 程序退出");
+                return;
+            }
+            this.methodParamList = this.methodDeclaration.getParameters();
+            this.originCodeString = this.methodDeclaration.toString();
+            if (this.methodParamList != null) {
+                paramLogString = makeMethodParamLog(this.methodParamList);
+//                System.out.println("依据参数生成的打印Log的代码如下:\n"+ paramLogString);
+                // @Override public boolean onSwitchToggled(boolean isChecked, int int1, String str1, ArrayList<String> strArr, String[] strArr1, int[] arrInt)
+
+
+//  @Override public boolean onSwitchToggled()  获取到这样的字符串  没有考虑到 方法头包含 /**/的情况
+                String preCode = "";
+                if (originCodeString.trim().startsWith("/*") && originCodeString.trim().contains("*/")) {  // 如果包含注释的话
+                    String fixOriginCodeString = originCodeString.substring(originCodeString.indexOf("*/") + 2);
+                    preCode = fixOriginCodeString.substring(0, fixOriginCodeString.indexOf("{") + 1).trim();
+//                    System.out.println("包含 包头部含注释 preCode  :\n"+ preCode);
+                } else {
+
+                    preCode = originCodeString.substring(0, originCodeString.indexOf("{") + 1);
+//                    System.out.println("不包头部含注释 preCode  :\n"+ preCode);
+                }
+                //  public void enableVerboseLogging(int verbose) {
+                //  包含注释
+                logOnlyParam_originCodeString = originCodeString.replace(preCode, preCode + "\n" + paramLogString);  //  添加了对 参数的打印的代码
+
+                //  把包含的 注释 /***/  去掉
+                if (logOnlyParam_originCodeString.trim().startsWith("/*") && logOnlyParam_originCodeString.trim().contains("*/")) {
+                    logOnlyParam_originCodeString = logOnlyParam_originCodeString.substring(logOnlyParam_originCodeString.indexOf("*/") + 2);
+                }
+
+            }
+//            System.out.println("方法的原始字符串:\n"+ originCodeString);
+//            System.out.println("加入参数Log的字符串:\n"+ logOnlyParam_originCodeString);
+
+            expressNodeList = new HashSet<Node>();
+            //  开始处理表达式的打印
+            sameExpressNodeMap = new HashMap<String, ArrayList<Node>>();
+        }
+
+        static String tryFixParamFormat(String param) {
+            if (!param.contains(",")) {
+                while (param.contains("  ")) {
+                    param = param.replace("  ", " ");
+                }
+                return param.trim();
+            }
+            String fixParam = "";
+            String[] strArr = param.split(",");
+            int size = strArr.length;
+
+            for (int i = 0; i < size; i++) {
+                String curStr = strArr[i].trim();
+                while (curStr.contains("  ")) {
+                    curStr = curStr.replace("  ", " ");
+                }
+                fixParam = fixParam + curStr + ", ";
+            }
+            fixParam = fixParam.trim();
+            while (fixParam.endsWith(",")) {
+                fixParam = fixParam.substring(0, fixParam.length() - 1);
+
+            }
+
+
+//            System.out.println("fixParam = "+ fixParam);
+            return fixParam;
+
+        }
+
+
+        // 1 判断基本的数据类型    基本的数据类型不用盘空  直接打印
+// 2. 判断是否是基本类型的数组(该数组有多少层级)
+// 3 判断如果为 对象类型  那么  需要判空  并打印
+// 4.判断是否为对象的集合 (该集合内部是否还包含有集合  集合的层级) 并打印
+
+
+        String makeMethodParamLog(NodeList<Parameter> paramList) {
+            // 决定选择哪一种打印Log的代码
+            String paramLogCode = "";
+            String itemCode = "";
+            for (Parameter paramItem : paramList) {
+                //paramItem = boolean isChecked
+                //paramItem = int int1
+
+                if (isBasicType(paramItem.toString())) {  // 基本的 boolean  byte char  short int  long float double  8种类型
+
+                    String Code1 = BaseTypeCode(paramItem.toString());
+                    itemCode = Code1;
+                    //      System.out.println(" 当前的参数是基本数据类型 boolean  byte char  short int  long float double      paramItem = "+ paramItem.toString() +"代码："+ Code1);
+                } else if (isBasicShuZu(paramItem.toString())) {
+
+                    String Code2 = BaseTypeListCode(paramItem.toString());
+                    itemCode = Code2;
+                    //       System.out.println(" 当前的参数是基本数据类型数组[]    paramItem = "+ paramItem.toString() +"代码："+ Code2);
+                } else if (isSingleObject(paramItem.toString())) {  //  String xx  Object XX  Integer XXX
+                    String Code3 = SingleObjectPrintCode(paramItem.toString());
+                    itemCode = Code3;
+                    // System.out.println(" 当前的参数是单个类Object类型   paramItem ="+ paramItem.toString() +"代码："+ Code3);
+                } else if (isObjectArr(paramItem.toString())) {    //  String[]
+                    String Code4 = ArrObjectPrintCode(paramItem.toString());
+                    itemCode = Code4;
+                    //     System.out.println(" 当前的参数是类的集合 类似于ArrayList<Object> Object[]   paramItem ="+ paramItem.toString()+"代码："+ Code4);
+                }
+
+                paramLogCode = paramLogCode + itemCode;
+
+            }
+            while (paramLogCode.contains("\n ")) {
+                paramLogCode = paramLogCode.replaceAll("\n ", "\n");
+            }
+            return CommonRuntimeExceptionCodePrint() + CommonProcessAndThreadCodePrint() + paramLogCode;  // 添加所有Log的地方
+        }
+
+
+        static Set<String> ListTypeList = new HashSet<String>();
+
+        {
+
+            ListTypeList.add("Collection");
+            ListTypeList.add("List");
+            ListTypeList.add("Vector");
+            ListTypeList.add("Stack");
+            ListTypeList.add("Deque");
+            ListTypeList.add("LinkedBlockingDeque");
+            ListTypeList.add("Queue");
+            ListTypeList.add("ArrayDeque");
+            ListTypeList.add("BlockingQueue");
+            ListTypeList.add("LinkedTransferQueue");
+            ListTypeList.add("LinkedBlockingQueue");
+            ListTypeList.add("PriorityQueue");
+            ListTypeList.add("ArrayList");
+            ListTypeList.add("LinkedList");
+            ListTypeList.add("SortedList");
+            ListTypeList.add("Map");
+            ListTypeList.add("HashMap");
+            ListTypeList.add("TreeMap");
+            ListTypeList.add("LinkedHashMap");
+            ListTypeList.add("SortedMap");
+            ListTypeList.add("WeakHashMap");
+            ListTypeList.add("ConcurrentHashMap");
+            ListTypeList.add("Set");
+            ListTypeList.add("EnumSet");
+            ListTypeList.add("SortedSet");
+            ListTypeList.add("HashSet");
+            ListTypeList.add("TreeSet");
+            ListTypeList.add("LinkedHashSet");
+            ListTypeList.add("CopyOnWriteArraySet");
+            ListTypeList.add("Hashtable");
+            ListTypeList.add("Iterator");
+            ListTypeList.add("Iterable");
+
+
+            //  Iterable<String>  itable;
+            //   Iterator<String> itStr;
+            //     ConcurrentHashMap cMap;
+            //  BlockingQueue blockque;
+            //      CopyOnWriteArraySet arrayset;
+//            LinkedHashMap<String,String>  linkMap;
+//            LinkedBlockingDeque<String> lk;
+//            LinkedTransferQueue<String> lt;
+            // Hashtable<String,String> strtable;
+            // WeakHashMap<String,String> weekMap;
+            //   SortedMap<String,String> sortedMap ;
+            //  SortedSet<String> sortedSet ;
+            // EnumSet<String> enumSet;
+            //    Queue<String> q ;
+            //    Vector<String> vec;
+            //   Stack<String> stack;
+            //   Deque<String> deque;
+            //  ArrayDeque<String> arrDeq;
+            //  PriorityQueue<String> queue;
+        }
+
+
+        static boolean isObjectArr(String params) {
+            boolean isObjectArr = false;
+            if (!params.contains(" ")) { // 并不包含空格说明这个参数的格式错误
+                //  System.out.println(" 当前参数字符串不符合   参数类型_空格_参数名  的格式 !  解析错误！ params="+ params);
+                return false;
+
+            }
+            String[] paramArr = params.split(" ");
+            if (paramArr.length == 2 && !params.contains(",")) {  // ArrList<Object> arr   ArrayList<List<XX>> map;
+                isObjectArr = isArrObjectTypeString(paramArr[0]);           //   paramItem =Map<String, Object> mapValue
+            } else if (params.contains(",") && params.contains("<") && params.contains(">")) { // param = Map<String, Object> mapValue
+
+                isObjectArr = isArrObjectTypeString(params.substring(0, params.lastIndexOf(">") + 1).replace(" ", ""));
+            } else {
+
+                //   System.out.println(" ═══==当前参数字符串 !  解析错误！══════==");
+            }
+
+
+            return isObjectArr;
+
+        }
+
+
+        static boolean isArrObjectTypeString(String type) {  //     String xx  Object XX  Integer XXX
+            boolean isArrObjectTypeString = false;
+            if (!basicTypeList.contains(type.trim()) || type.contains("[]")) {   // ArrayList
+                isArrObjectTypeString = true;
+                return isArrObjectTypeString;
+            }
+
+            for (String curListType : ListTypeList) {
+                if (type.contains(curListType)) {
+                    isArrObjectTypeString = true;
+                    break;
+                }
+            }
+            return isArrObjectTypeString;
+        }
+
+
+        static boolean isSingleObject(String params) {
+            boolean isSingleObject = false;
+            if (!params.contains(" ")) { // 并不包含空格说明这个参数的格式错误
+                System.out.println(" 当前参数字符串不符合   参数类型_空格_参数名  的格式 !  解析错误！");
+                return false;
+
+            }
+            String[] paramArr = params.split(" ");
+            if (paramArr.length != 2) {
+                //  System.out.println(" 当前参数字符串不符合   参数类型_空格_参数名  的格式  解析的长度不为2 !  解析错误！");
+                return false;
+            }
+
+            isSingleObject = isSingleObjectTypeString(paramArr[0]);
+
+            return isSingleObject;
+
+        }
+
+        static boolean isSingleObjectTypeString(String type) {  //     String xx  Object XX  Integer XXX
+            boolean isSingleObjectTypeString = true;
+            if (!basicTypeList.contains(type.trim()) && !type.contains("[]")) {   // ArrayList
+                for (String curListType : ListTypeList) {
+                    if (type.contains(curListType)) {
+                        isSingleObjectTypeString = false;
+                        break;
+                    }
+                }
+            } else if (type.contains("[]")) {
+                isSingleObjectTypeString = false;  // 对象数组   不是单独的对象
+            }
+            return isSingleObjectTypeString;
+        }
+
+
+        static boolean isBasicShuZu(String params) {
+            boolean isBasic = false;
+            if (!params.contains(" ")) { // 并不包含空格说明这个参数的格式错误
+                System.out.println(" 当前参数字符串不符合   参数类型_空格_参数名  的格式 !  解析错误！");
+                return false;
+
+            }
+            String[] paramArr = params.split(" ");
+            if (paramArr.length != 2) {
+                //    System.out.println(" 当前参数字符串不符合   参数类型_空格_参数名  的格式  解析的长度不为2 !  解析错误！");
+                return false;
+            }
+
+            isBasic = isBasicShuzuTypeString(paramArr[0]);
+
+            return isBasic;
+
+        }
+
+        static boolean isBasicShuzuTypeString(String type) {  // byte[] int[]  long[]
+            boolean isBasicShuZu = false;
+            String curType = new String(type);
+            curType = curType.replace("[]", "").trim();  // byte[] ->  byte
+            if (basicTypeList.contains(curType.trim()) && type.contains("[]")) {
+                isBasicShuZu = true;
+            }
+            return isBasicShuZu;
+        }
+
+
+        static boolean isBasicType(String params) {
+            boolean isBasic = false;
+            if (!params.contains(" ")) { // 并不包含空格说明这个参数的格式错误
+                System.out.println(" 当前参数字符串不符合   参数类型_空格_参数名  的格式 !  解析错误！");
+                return false;
+
+            }
+            String[] paramArr = params.split(" ");
+            if (paramArr.length != 2) {
+                //   System.out.println(" 当前参数字符串不符合   参数类型_空格_参数名  的格式  解析的长度不为2 !  解析错误！");
+                return false;
+            }
+
+            isBasic = isBasicTypeString(paramArr[0]);
+
+            return isBasic;
+        }
+
+        static Set<String> basicTypeList = new HashSet<String>();
+
+        {
+            basicTypeList.add("boolean");
+            basicTypeList.add("byte");
+            basicTypeList.add("char");
+            basicTypeList.add("short");
+            basicTypeList.add("int");
+            basicTypeList.add("long");
+            basicTypeList.add("float");
+            basicTypeList.add("double");
+        }
+
+        static boolean isBasicTypeString(String type) {
+            boolean isBasic = false;
+            if (basicTypeList.contains(type.trim())) {
+                isBasic = true;
+            }
+            return isBasic;
+        }
+
+
+        String ArrObjectPrintCode(String paramString) {
+            String[] param = paramString.split(" ");
+            String baseType = param[0];
+            String bsseTypeName = param[1];
+//            String[] strArr = {"A","B"};
+//            int zBaseListSize = strArr.length;
+//            for (int zindex = 0 ; zindex < zBaseListSize ; zindex++ ){
+//                System.out.println("zindex "+zindex +" : " + strArr[zindex].toString());
+//            }
+
+            if (baseType.contains("[]")) {  // String[]  Object[]
+
+                //String code1 = "\nint zBaseListSize = " + bsseTypeName+".length;";
+                // String code2 = "\nfor (int zindex = 0 ; zindex < zBaseListSize ; zindex++ ){";
+                String code1 = "\n  if( " + bsseTypeName + " != null ){";
+                String code2 = "\nfor (int zindex = 0 ; zindex < " + bsseTypeName + ".length" + " ; zindex++ ){";
+                String code3 = "\"" + paramString + "  zindex = \" + zindex +\"   :  value= \" + " + bsseTypeName + "[zindex].toString()";      //  " zindex "+zindex +" : " + intArr[zindex]
+                String code3_code = CommonCodePrint(code3);
+                String code4 = "}  \n";
+                String code5 = "}  \nelse { ";
+                String code6 = CommonCodePrint("\"" + bsseTypeName + " is null !\"");
+                String code7 = "} \n";
+
+                return code1 + code2 + code3_code + code4 + code5 + code6 + code7;
+            }
+            String codeStr = "";
+            if (paramString.contains("<") && paramString.contains(">") && !paramString.contains(",") &&
+                    !paramString.contains("map") && !paramString.contains("Map")) {    // List 类型
+                codeStr = getCodePrintForCollect(baseType, bsseTypeName);
+            } else if (paramString.contains("<") && paramString.contains(">") && paramString.contains(",")) {
+                //  map的类型
+                // paramString  MAP类型 = Map<String, Object> mapValue
+                //   System.out.println("paramString  MAP类型 = "+ paramString );
+                String type = paramString.substring(0, paramString.lastIndexOf(">") + 1).replace(" ", "");
+                String typeName = paramString.substring(paramString.lastIndexOf(">") + 1);
+                codeStr = getCodePrintForCollect(type, typeName);
+            }
+
+
+            //  String codeStr = CommonCodePrint(bsseTypeName+".toString()");
+            return codeStr;
+        }
+
+        String getCodePrintForCollect(String param1, String param2) {
+            String paramName = param1.trim() + " " + param2.trim();
+            String baseType = param1;
+            String baseTypeName = param2;
+//            System.out.println(" baseType ="+ baseType + "    bsseTypeName="+ baseTypeName );
+
+// HashMap 例子
+//HashMap map =new HashMap<>();
+//map.entrySet().iterator();
+
+// TreeMap 例子
+//TreeMap map =new TreeMap<>();
+//map.entrySet().iterator();
+
+// LinkedHashMap 例子
+//LinkedHashMap map =new LinkedHashMap<>();
+//map.entrySet().iterator();
+
+// SortedMap 例子  SortedMap 是抽象类
+//SortedMap map  = null;
+//map.entrySet().iterator();
+
+
+// WeakHashMap 例子
+//WeakHashMap map =new WeakHashMap<>();
+//map.entrySet().iterator();
+
+
+// ConcurrentHashMap 例子
+//ConcurrentHashMap map =new ConcurrentHashMap<>();
+//map.entrySet().iterator();
+
+
+// Hashtable 例子
+//Hashtable linkQueue = null ;
+//Iterator iterator =    linkQueue.entrySet().iterator();
+//iterator.hasNext();
+//Map.Entry<String , String> entrya = (Map.Entry<String , String>) iterator.next();
+//entrya.getKey();
+//entrya.getValue();
+            String paramType = "";
+            String keyStringType = "";
+            String valueStringType = "";
+            if (param1.contains("<") && param1.contains(">") && param1.contains(",")) {  //  Map 包含 <String, String>
+                paramType = param1.substring(0, param1.indexOf("<"));
+                if (param1.contains("Map") || param1.contains("map")) {
+                    keyStringType = param1.substring(param1.indexOf("<") + 1, param1.indexOf(","));
+                    valueStringType = param1.substring(param1.indexOf(",") + 1, param1.lastIndexOf(">"));
+                } else {
+                    // 是List的 情况
+                    valueStringType = param1.substring(param1.indexOf("<") + 1, param1.indexOf(">"));
+                }
+
+            } else if (param1.contains("<") && param1.contains(">") && !param1.contains(",")) {  //   paramItem =ArrayList<String> strArr   param1=ArrayList<String>
+                paramType = param1.substring(0, param1.indexOf("<"));
+                keyStringType = "";
+                valueStringType = param1.substring(param1.indexOf("<") + 1, param1.indexOf(">"));
+            } else {
+                paramType = param1.trim();
+                valueStringType = baseTypeName;
+            }
+
+            String code0 = "\n  if( " + baseTypeName + " != null ){";
+            if (paramType.endsWith("Map") || "Hashtable".equals(paramType)) {   // 当前 类型是 Map的类型
+                String code1 = "";
+                if (!keyStringType.isEmpty() && !valueStringType.isEmpty()) {
+                    code1 = "\nMap.Entry<" + keyStringType + " , " + valueStringType + "> entry = null;";
+                } else {
+                    System.out.println("获取到的Map中的key 和 value 为空  出现错误 将退出！  param1 = " + param1);
+                    return null;
+                }
+                //   String code2 = "\n if("+bsseTypeName+" != null){";
+                String code3 = "\n java.util.Iterator iterator = " + baseTypeName + ".entrySet().iterator();";
+                String code3_1 = "\n int mZindex = 0 ;";
+                String code4 = "\n while( iterator.hasNext() ){";
+
+                String code5 = "\n entry = (Map.Entry<" + keyStringType + "," + valueStringType + ">) iterator.next();";
+                String code6 = "\"" + baseTypeName + "    index =" + "\"+ mZindex + \"   " + "  entry.Key= \"" + "+ entry.getKey() +" + " \" entry.Value=\"" + "+ entry.getValue()";  // 继续点
+                String code6_fix = CommonCodePrint(code6);
+                String code6_1 = " mZindex ++ ;";
+                String code7 = " }";
+                // String code8 = "\n }";
+
+                String code9 = "}  \nelse { ";
+                String code10 = CommonCodePrint("\"" + baseTypeName + " is null !\"");
+                String code11 = "} \n";
+
+//  Map.Entry<String , ArrayList<String> > entry;
+// Map 的 例子
+//            Map<String,String> map = null;
+//            Map.Entry<String , String> entry;
+//            if(map != null){
+//                Iterator iterator = map.entrySet().iterator();
+//                while( iterator.hasNext() ){
+//                    entry = (Map.Entry<String , String>) iterator.next();
+//                    entry.getKey();  //Map的Value
+//                    entry.getValue();  //Map的Value
+//                    System.out.println("zukgit0725"+"entry.getKey()= "+entry.getKey() +" ----entry.getValue()="+entry.getValue());
+//                }
+//            }
+
+                return code0 + code1 + code3 + code3_1 + code4 + code5 + code6_fix + code6_1 + code7 + code9 + code10 + code11;
+
+            } else if (paramType.endsWith("Set") || paramType.endsWith("List") || paramType.endsWith("Queue") || paramType.endsWith("Deque") ||
+                    paramType.endsWith("Stack") || paramType.endsWith("Vector") || paramType.endsWith("Collection")) {
+// 当前的是一个List<>   valueStringType 代表当前《》 中的内容
+// CopyOnWriteArraySet linkQueue = null ;
+//Object[] objectList  = linkQueue.toArray();
+//for(int zindex =0 ; zindex < linkQueue.size(); zindex ++){
+//System.out.println("zindex "+zindex +" : " + objectList[zindex].toString());
+//}
+                String code0_list = "\n  if( " + baseTypeName + " != null ){";
+                String code1 = "\n Object[] objectList  =" + baseTypeName + ".toArray();";
+                String code2 = "\n  for(int zindex =0 ; zindex < " + baseTypeName + ".size(); zindex ++){";
+                String code3 = " \"" + paramName + "  index =\"+zindex +" + "\" value :\" + " + "objectList[zindex].toString()";
+                String code3_fix = CommonCodePrint(code3);
+                String code4 = " }";
+                String code5 = "\n}  \nelse { ";
+                String code6 = CommonCodePrint("\"" + paramName + " is null !\"");
+                String code7 = "} \n";
+
+
+                return code0_list + code1 + code2 + code3_fix + code4 + code5 + code6 + code7;  // 继续点
+            } else {
+                // 其余以外的数组关键字  直接  toString 了
+                // paramType=Map<String,  valueStringType =Object>
+                //    System.out.println("无法判断集合的类型  paramType="+paramType.toString() +"  valueStringType ="+ valueStringType);
+
+                if (checkValueStringType(valueStringType.trim())) {
+                    //  包含 .>
+                    return CommonCodePrint("\"" + baseTypeName + "=\"+" + baseTypeName + ".toString()");
+                }
+                // PemessionState>
+                return CommonCodePrint(valueStringType.trim() + ".toString()");
+            }
+
+            //  Map 需要获取 Key 和 Value的 类型  否则无法转换
+            // ═══════════════=   通用 ════════════===
+
+            //    return "";
+        }
+
+        static boolean checkValueStringType(String typeStr) {
+            boolean flag = true;
+
+            if (typeStr.contains(".>") || typeStr.contains(">.")) {
+
+                flag = false;
+            }
+
+            return flag;
+
+        }
+
+
+
+
+        String SingleObjectPrintCode(String paramString) {
+            String[] param = paramString.split(" ");
+            String baseType = param[0];
+            String bsseTypeName = param[1];
+            String code1 = "\n if(" + bsseTypeName + " != null ) {";
+            String code2 = CommonCodePrint("\"" + paramString + " = \" + " + bsseTypeName + ".toString()");
+            String code3 = " } \nelse { ";
+            String code4 = CommonCodePrint("\"" + paramString + " ==  null\"  ");
+            String code5 = "}\n";
+            return code1 + code2 + code3 + code4 + code5;
+        }
+
+
+        public static void getKeyAndValue(Map<String, String> map) {
+            Map.Entry<String, String> entry;
+            if (map != null) {
+                Iterator iterator = map.entrySet().iterator();
+                while (iterator.hasNext()) {
+                    entry = (Map.Entry<String, String>) iterator.next();
+                    entry.getKey();  //Map的Value
+                    entry.getValue();  //Map的Value
+                    //  System.out.println("zukgit0725"+"entry.getKey()= "+entry.getKey() +" ----entry.getValue()="+entry.getValue());
+                }
+            }
+        }
+
+        String BaseTypeListCode(String paramString) {
+//            int[] intArr = {1,2,4};
+//            int zBaseListSize = intArr.length;
+//            for (int zindex = 0 ; zindex < zBaseListSize ; zindex++ ){
+//                System.out.println("zindex "+zindex +" : " + intArr[zindex]);
+//            }
+
+
+            String[] param = paramString.split(" ");
+            String baseType = param[0];
+            String bsseTypeName = param[1];
+            //  String code1 = "\nint zBaseListSize = " + bsseTypeName+".length;";
+            String code1 = "";
+            String code2 = "\nfor (int zindex = 0 ; zindex < " + bsseTypeName + ".length" + " ; zindex++ ){";
+            String code3 = "\"" + paramString + "----index = \" + zindex +\" : \" +  \"  value = \" + " + bsseTypeName + "[zindex]";      //  " zindex "+zindex +" : " + intArr[zindex]
+            String code3_code = CommonCodePrint(code3);
+            String code4 = "}\n";
+
+            return code1 + code2 + code3_code + code4;
+        }
+
+
+        String BaseTypeCode(String paramString) {
+            String[] param = paramString.split(" ");
+            String baseType = param[0];
+            String bsseTypeName = param[1];
+            String code = "\"" + paramString + " = \" + " + bsseTypeName;
+            return CommonCodePrint(code);
+        }
+
+
+        String getRuntimeExceptionCode() {
+            String excepCode = "";
+            return excepCode;
+
+        }
+
+        String CommonCodePrint(String paramString) {    //  boolean  falg |  String like  | ArrayList List  | XXX xClass
+            String realPrintCode = "";
+            //  String tagMethod = TAG+"_"+this.methodName;
+            String tagMethod = Rule_57_TAG + "_" + this.belongClass.className + "_" + this.methodName;
+        
+//            if (this.belongClass.isIDEClass) {
+//                realPrintCode = "\nSystem.out.println( " + "\" " + tagMethod + "   \" + " + paramString + ");\n";
+//            } else if (this.belongClass.isAndroidClass && this.belongClass.isAPP) {
+//                // android.util.Log.i
+//                realPrintCode = "\nandroid.util.Log.i(\"" + tagMethod + "\"," + paramString + ");\n";
+//            } else if (this.belongClass.isAndroidClass && this.belongClass.isFramework) {
+//                realPrintCode = "\nandroid.util.Slog.i(\"" + tagMethod + "\"," + paramString + ");\n";
+//            }
+            
+            
+            
+            if (Rule_57_LogTypeStr.equals("syso")) {
+                realPrintCode = "\nSystem.out.println( " + "\" " + tagMethod + "   \" + " + paramString + ");\n";
+
+            }else if(Rule_57_LogTypeStr.equals("log")) {
+                realPrintCode = "\nandroid.util.Log.i(\"" + tagMethod + "\"," + paramString + ");\n";
+
+            }else if(Rule_57_LogTypeStr.equals("slog")) {
+                realPrintCode = "\nandroid.util.Slog.i(\"" + tagMethod + "\"," + paramString + ");\n";
+
+            }else {
+                realPrintCode = "\nSystem.out.println( " + "\" " + tagMethod + "   \" + " + paramString + ");\n";
+
+            }
+
+            
+            
+            
+//            if (LogTypeStr.equals("syso")) {
+//            	
+//            }else if(LogTypeStr.equals("log")) {
+//            	
+//            }else if(LogTypeStr.equals("slog")) {
+//            	
+//            }else {
+//        
+//            }
+            
+            
+            return realPrintCode;
+        }
+
+
+        // IDEA 打印
+//        RuntimeException re = new RuntimeException();
+//        re.fillInStackTrace();
+//        re.printStackTrace();
+
+        //  APP层面 安卓打印
+//        RuntimeException re = new RuntimeException();
+//        re.fillInStackTrace();
+//        android.util.Log.v("zukgit", "RuntimeException", re);
+
+        //  Framework层面 安卓打印
+//        RuntimeException re = new RuntimeException();
+//        re.fillInStackTrace();
+//        android.util.SLog.v("zukgit", "RuntimeException", re);
+
+        String CommonProcessAndThreadCodePrint() {
+            String strCode1 = "";
+            String strCode2 = "";
+            String strCode3 = "";
+
+            String tagMethod = Rule_57_TAG + "_" + this.belongClass.className + "_" + this.methodName;
+      
+//            if (this.belongClass.isIDEClass) {
+//                String re_Name = "re" + System.currentTimeMillis();
+//                strCode1 = "\nRuntimeException " + re_Name + " = new RuntimeException();";
+//                strCode2 = "\n" + re_Name + ".fillInStackTrace();";
+//                String tag = "\nSystem.out.println( " + "\" " + tagMethod + "   RuntimeException.fillInStackTrace() \" );";
+//                strCode3 = tag + "\n" + re_Name + ".printStackTrace();\n";
+//
+//            } else if (this.belongClass.isAndroidClass && this.belongClass.isAPP) {
+//                // android.util.Log.i
+//                String re_Name = "re" + System.currentTimeMillis();
+//                strCode1 = "\nRuntimeException " + re_Name + " = new RuntimeException();";
+//                strCode2 = "\n" + re_Name + ".fillInStackTrace();";
+//                strCode3 = "\nandroid.util.Log.i(\"" + tagMethod + "\", \"RuntimeException\", " + re_Name + " );\n";
+//            } else if (this.belongClass.isAndroidClass && this.belongClass.isFramework) {
+//                String re_Name = "re" + System.currentTimeMillis();
+//                strCode1 = "\nRuntimeException " + re_Name + " = new RuntimeException();";
+//                strCode2 = "\n" + re_Name + ".fillInStackTrace();";
+//                strCode3 = "\nandroid.util.SLog.i(\"" + tagMethod + "\", \"RuntimeException\", " + re_Name + " );\n";
+//            }
+
+            
+       if (Rule_57_LogTypeStr.equals("syso")) {
+              String re_Name = "re" + System.currentTimeMillis();
+              strCode1 = "\nRuntimeException " + re_Name + " = new RuntimeException();";
+              strCode2 = "\n" + re_Name + ".fillInStackTrace();";
+              String tag = "\nSystem.out.println( " + "\" " + tagMethod + "   RuntimeException.fillInStackTrace() \" );";
+              strCode3 = tag + "\n" + re_Name + ".printStackTrace();\n";
+
+        }else if(Rule_57_LogTypeStr.equals("log")) {
+        	
+            // android.util.Log.i
+            String re_Name = "re" + System.currentTimeMillis();
+            strCode1 = "\nRuntimeException " + re_Name + " = new RuntimeException();";
+            strCode2 = "\n" + re_Name + ".fillInStackTrace();";
+            strCode3 = "\nandroid.util.Log.i(\"" + tagMethod + "\", \"RuntimeException\", " + re_Name + " );\n";
+      
+            
+        }else if(Rule_57_LogTypeStr.equals("slog")) {
+        	
+            String re_Name = "re" + System.currentTimeMillis();
+            strCode1 = "\nRuntimeException " + re_Name + " = new RuntimeException();";
+            strCode2 = "\n" + re_Name + ".fillInStackTrace();";
+            strCode3 = "\nandroid.util.SLog.i(\"" + tagMethod + "\", \"RuntimeException\", " + re_Name + " );\n";
+  
+            
+        }else {
+    
+            String re_Name = "re" + System.currentTimeMillis();
+            strCode1 = "\nRuntimeException " + re_Name + " = new RuntimeException();";
+            strCode2 = "\n" + re_Name + ".fillInStackTrace();";
+            String tag = "\nSystem.out.println( " + "\" " + tagMethod + "   RuntimeException.fillInStackTrace() \" );";
+            strCode3 = tag + "\n" + re_Name + ".printStackTrace();\n";
+
+     
+        }
+            
+            
+//       if (LogTypeStr.equals("syso")) {
+//        	
+//        }else if(LogTypeStr.equals("log")) {
+//        	
+//        }else if(LogTypeStr.equals("slog")) {
+//        	
+//        }else {
+//    
+//        }
+            
+            return strCode1 + strCode2 + strCode3;
+        }
+
+
+        String CommonRuntimeExceptionCodePrint() {    //  boolean  falg |  String like  | ArrayList List  | XXX xClass
+            String tagMethod = Rule_57_TAG + "_" + this.belongClass.className + "_" + this.methodName;
+            String stackName = "stacks" + System.currentTimeMillis();
+            String strCode1 = "\njava.util.Map<Thread, StackTraceElement[]> " + stackName + " = Thread.getAllStackTraces();";
+            String threadSet_Name = "threadSet" + System.currentTimeMillis();
+            String strCode2 = "\njava.util.Set<Thread> " + threadSet_Name + " = " + stackName + ".keySet();";
+            String strCode3 = "";
+            String getProcessStr = "";
+            String threadNum_Name = "threadNum" + System.currentTimeMillis();
+            String strCode4 = "\nint " + threadNum_Name + " = 1;";
+            String strCode5 = "\nfor (Thread key : " + threadSet_Name + ") {";
+
+            String strCode6 = "\nStackTraceElement[] stackTraceElements = " + stackName + ".get(key);";
+            String strCode6_fix = "";
+            String strCode7 = "\nfor (StackTraceElement st : stackTraceElements) {";
+            String strCode7_fix = "";
+            String strCode8 = "\n}";
+            String strCode8_fix = "";
+            String strCode9 = "\n}";
+
+
+//                for (Thread key : threadSet) {
+//                    StackTraceElement[] stackTraceElements = stacks.get(key);
+//                    System.out.println("\n════════════ 线程名称threadName:【 " + key.getName() + "】  进程ID-ProcessID:【"+mProcessId + "】  线程ID-ThreadId:【"+key.getId()+ "】  线程序号-indexId: 【"+ (threadNum++)+ "】 start ══════════");
+//                    for (StackTraceElement st : stackTraceElements) {
+//                        System.out.println( "StackTraceElement: " + st.toString());
+//                    }
+//                    System.out.println("════════════ 线程名称threadName: 【" + key.getName() + "】 end ════════════\n");
+//                }
+
+            
+            
+
+//            if (this.belongClass.isIDEClass) {
+//                String runtimeMXBean_Name = "runtimeMXBean" + System.currentTimeMillis();
+//                getProcessStr = "\njava.lang.management.RuntimeMXBean  " + runtimeMXBean_Name + " = java.lang.management.ManagementFactory.getRuntimeMXBean();";
+//                String mProcessId_Name = "mProcessId" + System.currentTimeMillis();
+//                String pCodeStr1 = "\nint " + mProcessId_Name + "  =  Integer.valueOf(" + runtimeMXBean_Name + ".getName().split(\"@\")[0]).intValue();";
+//                getProcessStr = getProcessStr + pCodeStr1;
+//                // System.out.println("\n════════════ 线程名称threadName:【 " + key.getName() + "】  进程ID-ProcessID:【"+mProcessId + "】  线程ID-ThreadId:【"+key.getId()+ "】  线程序号-indexId: 【"+ (threadNum++)+ "】 start ══════════");
+//                //    双引号包住愿有的引号
+//                strCode6_fix = "\nSystem.out.println( " + "\" " + tagMethod + " \" +" + "\" \\n  线程索引序号下标 【 \"" + " + (" + threadNum_Name + ") +" + "\" 】════════════ 线程名称threadName:【\"" + " + key.getName() + " + " \"  】  进程ID-ProcessID:【 \"" + "+ " + mProcessId_Name + " +  " + " \" 】  线程ID-ThreadId:【 \" " + "+key.getId()+ " + " \" 】 \" );";
+//                strCode7_fix = "\nSystem.out.println( st.toString() );";
+//                strCode8_fix = "\nSystem.out.println( " + "\" " + tagMethod + " \" + " + "\" \\n  线程索引序号下标 【 \"" + " + (" + threadNum_Name + "++)+ " + "\"  】════════════\" );";
+//            } else if (this.belongClass.isAndroidClass && this.belongClass.isAPP) {
+//                // android.util.Log.i  int mProcessId = android.os.Process.myPid();
+//                String mProcessId_Name = "mProcessId" + System.currentTimeMillis();
+//                getProcessStr = "\n int " + mProcessId_Name + " = android.os.Process.myPid();";
+//                String strCode6_fix_1 = "\" " + tagMethod + " \" +" + "\" \\n  线程索引序号下标 【 \"" + " +(" + threadNum_Name + ") +" + "\" 】════════════ 线程名称threadName:【\"" + " + key.getName() + " + " \"  】  进程ID-ProcessID:【 \"" + "+ " + mProcessId_Name + " +  " + " \" 】  线程ID-ThreadId:【 \" " + "+key.getId()+ " + " \" 】 \" ";
+//                strCode6_fix = "\nandroid.util.Log.i(\"" + tagMethod + "\"," + strCode6_fix_1 + ");\n";
+//                strCode7_fix = "\nandroid.util.Log.i(\"" + tagMethod + "\"," + " \"StackTraceElement:\"  + " + strCode6_fix_1 + ");\n";
+//                String strCode8_fix_1 = "\" " + tagMethod + " \" +" + "\" \\n  线程索引序号下标 【 \"" + "+ (" + threadNum_Name + "++) +" + "\" 】════════════打印结束\" ";
+//                strCode8_fix = "\nandroid.util.Log.i(\"" + tagMethod + "\"," + " \"StackTraceElement:\"  + " + strCode8_fix_1 + ");\n";
+//            } else if (this.belongClass.isAndroidClass && this.belongClass.isFramework) {
+//                // android.util.SLog.i
+//                String mProcessId_Name = "mProcessId" + System.currentTimeMillis();
+//                getProcessStr = "\n int " + mProcessId_Name + " = android.os.Process.myPid();";
+//                String strCode6_fix_1 = "\" " + tagMethod + " \" + " + "\" \\n  线程索引序号下标 【 \"" + " +(" + threadNum_Name + ")+ " + "\" 】════════════ 线程名称threadName:【\"" + " + key.getName() + " + " \"  】  进程ID-ProcessID:【 \"" + "+ " + mProcessId_Name + " +  " + " \" 】  线程ID-ThreadId:【 \" " + "+key.getId()+ " + " \" 】 \" ";
+//                strCode6_fix = "\nandroid.util.SLog.i(\"" + tagMethod + "\"," + strCode6_fix_1 + ");\n";
+//                strCode7_fix = "\nandroid.util.Sog.i(\"" + tagMethod + "\"," + " \"StackTraceElement:\"  + " + strCode6_fix_1 + ");\n";
+//                String strCode8_fix_1 = "\" " + tagMethod + " \" + " + "\" + \\n  线程索引序号下标 【 \"" + " +(" + threadNum_Name + "++)+ " + "\" 】════════════打印结束\" ";
+//                strCode8_fix = "\nandroid.util.Sog.i(\"" + tagMethod + "\"," + " \"StackTraceElement:\"  + " + strCode8_fix_1 + ");\n";
+//            }
+//            
+            
+            
+            
+       if (Rule_57_LogTypeStr.equals("syso")) {
+           String runtimeMXBean_Name = "runtimeMXBean" + System.currentTimeMillis();
+           getProcessStr = "\njava.lang.management.RuntimeMXBean  " + runtimeMXBean_Name + " = java.lang.management.ManagementFactory.getRuntimeMXBean();";
+           String mProcessId_Name = "mProcessId" + System.currentTimeMillis();
+           String pCodeStr1 = "\nint " + mProcessId_Name + "  =  Integer.valueOf(" + runtimeMXBean_Name + ".getName().split(\"@\")[0]).intValue();";
+           getProcessStr = getProcessStr + pCodeStr1;
+           // System.out.println("\n════════════ 线程名称threadName:【 " + key.getName() + "】  进程ID-ProcessID:【"+mProcessId + "】  线程ID-ThreadId:【"+key.getId()+ "】  线程序号-indexId: 【"+ (threadNum++)+ "】 start ══════════");
+           //    双引号包住愿有的引号
+           strCode6_fix = "\nSystem.out.println( " + "\" " + tagMethod + " \" +" + "\" \\n  线程索引序号下标 【 \"" + " + (" + threadNum_Name + ") +" + "\" 】════════════ 线程名称threadName:【\"" + " + key.getName() + " + " \"  】  进程ID-ProcessID:【 \"" + "+ " + mProcessId_Name + " +  " + " \" 】  线程ID-ThreadId:【 \" " + "+key.getId()+ " + " \" 】 \" );";
+           strCode7_fix = "\nSystem.out.println( st.toString() );";
+           strCode8_fix = "\nSystem.out.println( " + "\" " + tagMethod + " \" + " + "\" \\n  线程索引序号下标 【 \"" + " + (" + threadNum_Name + "++)+ " + "\"  】════════════\" );";
+  
+    	   
+        	
+        }else if(Rule_57_LogTypeStr.equals("log")) {
+        	
+            // android.util.Log.i  int mProcessId = android.os.Process.myPid();
+            String mProcessId_Name = "mProcessId" + System.currentTimeMillis();
+            getProcessStr = "\n int " + mProcessId_Name + " = android.os.Process.myPid();";
+            String strCode6_fix_1 = "\" " + tagMethod + " \" +" + "\" \\n  线程索引序号下标 【 \"" + " +(" + threadNum_Name + ") +" + "\" 】════════════ 线程名称threadName:【\"" + " + key.getName() + " + " \"  】  进程ID-ProcessID:【 \"" + "+ " + mProcessId_Name + " +  " + " \" 】  线程ID-ThreadId:【 \" " + "+key.getId()+ " + " \" 】 \" ";
+            strCode6_fix = "\nandroid.util.Log.i(\"" + tagMethod + "\"," + strCode6_fix_1 + ");\n";
+            strCode7_fix = "\nandroid.util.Log.i(\"" + tagMethod + "\"," + " \"StackTraceElement:\"  + " + strCode6_fix_1 + ");\n";
+            String strCode8_fix_1 = "\" " + tagMethod + " \" +" + "\" \\n  线程索引序号下标 【 \"" + "+ (" + threadNum_Name + "++) +" + "\" 】════════════打印结束\" ";
+            strCode8_fix = "\nandroid.util.Log.i(\"" + tagMethod + "\"," + " \"StackTraceElement:\"  + " + strCode8_fix_1 + ");\n";
+        
+            
+        }else if(Rule_57_LogTypeStr.equals("slog")) {
+        	
+            // android.util.SLog.i
+            String mProcessId_Name = "mProcessId" + System.currentTimeMillis();
+            getProcessStr = "\n int " + mProcessId_Name + " = android.os.Process.myPid();";
+            String strCode6_fix_1 = "\" " + tagMethod + " \" + " + "\" \\n  线程索引序号下标 【 \"" + " +(" + threadNum_Name + ")+ " + "\" 】════════════ 线程名称threadName:【\"" + " + key.getName() + " + " \"  】  进程ID-ProcessID:【 \"" + "+ " + mProcessId_Name + " +  " + " \" 】  线程ID-ThreadId:【 \" " + "+key.getId()+ " + " \" 】 \" ";
+            strCode6_fix = "\nandroid.util.SLog.i(\"" + tagMethod + "\"," + strCode6_fix_1 + ");\n";
+            strCode7_fix = "\nandroid.util.Sog.i(\"" + tagMethod + "\"," + " \"StackTraceElement:\"  + " + strCode6_fix_1 + ");\n";
+            String strCode8_fix_1 = "\" " + tagMethod + " \" + " + "\" + \\n  线程索引序号下标 【 \"" + " +(" + threadNum_Name + "++)+ " + "\" 】════════════打印结束\" ";
+            strCode8_fix = "\nandroid.util.Sog.i(\"" + tagMethod + "\"," + " \"StackTraceElement:\"  + " + strCode8_fix_1 + ");\n";
+    
+        }else {
+    
+            String runtimeMXBean_Name = "runtimeMXBean" + System.currentTimeMillis();
+            getProcessStr = "\njava.lang.management.RuntimeMXBean  " + runtimeMXBean_Name + " = java.lang.management.ManagementFactory.getRuntimeMXBean();";
+            String mProcessId_Name = "mProcessId" + System.currentTimeMillis();
+            String pCodeStr1 = "\nint " + mProcessId_Name + "  =  Integer.valueOf(" + runtimeMXBean_Name + ".getName().split(\"@\")[0]).intValue();";
+            getProcessStr = getProcessStr + pCodeStr1;
+            // System.out.println("\n════════════ 线程名称threadName:【 " + key.getName() + "】  进程ID-ProcessID:【"+mProcessId + "】  线程ID-ThreadId:【"+key.getId()+ "】  线程序号-indexId: 【"+ (threadNum++)+ "】 start ══════════");
+            //    双引号包住愿有的引号
+            strCode6_fix = "\nSystem.out.println( " + "\" " + tagMethod + " \" +" + "\" \\n  线程索引序号下标 【 \"" + " + (" + threadNum_Name + ") +" + "\" 】════════════ 线程名称threadName:【\"" + " + key.getName() + " + " \"  】  进程ID-ProcessID:【 \"" + "+ " + mProcessId_Name + " +  " + " \" 】  线程ID-ThreadId:【 \" " + "+key.getId()+ " + " \" 】 \" );";
+            strCode7_fix = "\nSystem.out.println( st.toString() );";
+            strCode8_fix = "\nSystem.out.println( " + "\" " + tagMethod + " \" + " + "\" \\n  线程索引序号下标 【 \"" + " + (" + threadNum_Name + "++)+ " + "\"  】════════════\" );";
+   
+        }
+            
+            
+            return strCode1 + strCode2 + strCode3 + getProcessStr + strCode4 + strCode5 + strCode6 + strCode6_fix + strCode7 + strCode7_fix + strCode8 + strCode8_fix + strCode9;
+        }
+
+
+        static MethodDeclaration getMethodDeclarationFromCompilationUnit(ClassOrInterfaceDeclaration mClassOrInterfaceDeclaration, String methodIdentify) {
+            MethodDeclaration returnMethod = null;
+            List<MethodDeclaration> methodList = mClassOrInterfaceDeclaration.getMethods();
+            int methodSize = methodList.size();
+            String getDeclarationAsString = "";
+            for (int i = 0; i < methodSize; i++) {
+//                System.out.println("═════════第 "+ i +"个Method方法开始解析═══════════════");
+                MethodDeclaration curMethodDeclaration = methodList.get(i);
+
+
+//                String getName = curMethodDeclaration.getName().toString();
+//                System.out.println("MethodDeclaration.getName().toString() = "+ getName);
+//
+//                String getNameAsString = curMethodDeclaration.getNameAsString();
+//                System.out.println("MethodDeclaration.getNameAsString() = "+ getNameAsString);
+//
+//                String getIdentifier =  curMethodDeclaration.getName().getIdentifier();
+//                System.out.println("MethodDeclaration.getName().getIdentifier() = "+ getIdentifier);
+//
+//                String getDeclarationAsString2=     curMethodDeclaration.getDeclarationAsString();
+//                System.out.println("MethodDeclaration.getDeclarationAsString() = "+ getDeclarationAsString2);
+
+                // String MethodDeclaration_toString =  curMethodDeclaration.toString();
+                // System.out.println("MethodDeclaration_toString = "+ MethodDeclaration_toString);
+
+                getDeclarationAsString = curMethodDeclaration.getDeclarationAsString(false, false, true);
+//                System.out.println("MethodDeclaration.getDeclarationAsString(false,false,true) = "+ getDeclarationAsString);
+//                System.out.println("methodIdentify = "+ methodIdentify);
+
+                // 匹配方法   检索当前的方法与解析的方法是否相同   Zukgit1
+//                System.out.println("索引:"+i+"    methodIdentify 返回 MethodDeclaration  methodIdentify= " +methodIdentify);
+//                System.out.println("索引:"+i+"    methodIdentify 返回 MethodDeclaration  getDeclarationAsString= " + getDeclarationAsString );
+//                System.out.println("--------------------------------------------");
+
+                if (methodIdentify.trim().toLowerCase().equals(getDeclarationAsString.trim().toLowerCase())) {
+                    NodeList<Parameter> methodParamList = curMethodDeclaration.getParameters();
+//                    System.out.println("═════════参数列表Begin═══════════════");
+                    for (Parameter param : methodParamList) {
+//                        System.out.println("param = "+ param.toString());
+                    }
+//                    System.out.println("═════════参数列表End═══════════════");
+
+                    returnMethod = curMethodDeclaration;
+                    //  System.out.println("索引:"+i+"相等 将返回!  methodIdentify "+ methodIdentify + " getDeclarationAsString ="+ getDeclarationAsString);
+                    return returnMethod;
+                }
+//                System.out.println("══════════════第 "+ i +"个Method方法解析结束══════════════");
+            }
+
+
+            System.out.println(" 没匹配到 methodIdentify 返回null");
+
+            System.out.println("methodIdentify         =: " + methodIdentify + "   methodSize=" + methodSize);
+            System.out.println("getDeclarationAsString =: " + getDeclarationAsString + "   methodSize=" + methodSize);
+            System.out.println("══════════════");
+
+            return returnMethod;
+        }
+    }
+
+
+    static String COMMON_PRINT_METHOD = "    public final static <T> boolean isListType(T t) {        if (t == null) {            return false;        }        String typeInfo = t.getClass().getName();        ZukgitHoldPlace\"isListType  typeInfo =  \" + typeInfo);        String[] zListTypeArr = {\"java.util.Set\",                \"java.util.ArrayList\",                \"java.util.Collection\",                \"java.util.List\",                \"java.util.Vector\",                \"java.util.Stack\",                \"java.util.LinkedList\",                \"javafx.collections.transformation.SortedList\"        };        for (String curStr : zListTypeArr) {                        if (curStr.equals(typeInfo)) {                return true;            }        }        return false;    }    public final static <T> boolean isSetType(T t) {        if (t == null) {            return false;        }        String typeInfo = t.getClass().getName();        ZukgitHoldPlace\"isMapType  typeInfo =  \" + typeInfo);        String[] zSetTypeArr = {\"java.util.EnumSet\",                \"java.util.SortedSet\",                \"java.util.concurrent.CopyOnWriteArraySet\",                \"java.util.LinkedHashSet\",                \"java.util.HashSet\",                \"java.util.TreeSet\",                \"android.util.SparseArray\",                \"android.util.ArraySet\"        };        for (String curStr : zSetTypeArr) {            if (curStr.equals(typeInfo)) {                return true;            }        }        return false;    }    public final static <T> boolean iQueueType(T t) {        if (t == null) {            return false;        }        String typeInfo = t.getClass().getName();        ZukgitHoldPlace\"isMapType  typeInfo =  \" + typeInfo);        String[] zQueueTypeArr = {                \"java.util.concurrent.LinkedBlockingDeque\",                \"java.util.Queue\",                \"java.util.ArrayDeque\",                \"java.util.concurrent.BlockingQueue\",                \"java.util.concurrent.LinkedTransferQueue\",                \"java.util.PriorityQueue\",                \"java.util.concurrent.LinkedBlockingQueue\",        };        for (String curStr : zQueueTypeArr) {            if (curStr.equals(typeInfo)) {                return true;            }        }        return false;    }    public final static <T> boolean isShuZuType(T t) {        if (t == null) {            return false;        }        String typeInfo = t.getClass().getName();        ZukgitHoldPlace\"isMapType  typeInfo =  \" + typeInfo);        String[] zMapTypeArr = {\"[Ljava.lang.String;\",                  \"[Ljava/lang/Object;\",                  \"[I\",                 \"[B\",                  \"[C\",                 \"[S\",                 \"[J\",                 \"[F\",                \"[D\"            };        if(typeInfo.startsWith(\"[L\")){            return true;        }        for (String curStr : zMapTypeArr) {            if (curStr.equals(typeInfo)) {                return true;            }        }        return false;    }    public final static <T> boolean isMapType(T t) {        if (t == null) {            return false;        }        String typeInfo = t.getClass().getName();        ZukgitHoldPlace\"isMapType  typeInfo =  \" + typeInfo);        String[] zMapTypeArr = {\"java.util.HashMap\",                \"java.util.TreeMap\",                \"java.util.LinkedHashMap\",                \"java.util.WeakHashMap\",                \"java.util.concurrent.ConcurrentHashMap\",                \"java.util.Hashtable\",                \"android.util.ArrayMap\"};        for (String curStr : zMapTypeArr) {            if (curStr.equals(typeInfo)) {                return true;            }        }        return false;    }    public final static <T> void zPrintLog(T t) {      if( t ==null){return ;}        ZukgitHoldPlace\" 当前类型:   \" + t.getClass().getName());        if (isListType(t)) {            ZukgitHoldPlace\"List数据类型类型   \");            if (t != null) {                Object[] objectList = ((java.util.List) t).toArray();                for (int zindex = 0; zindex < objectList.length; zindex++) {                    ZukgitHoldPlace\" List   \" + \"ArrayList<Date> dateList  index =\" + zindex + \" value :\" + objectList[zindex].toString());                }            } else {                ZukgitHoldPlace\" List   \" + \"ArrayList<Date> dateList is null !\");            }        } else if (isSetType(t)) {            ZukgitHoldPlace\"Set数据类型类型   \");            if (t != null) {                Object[] objectList = ((java.util.Set) t).toArray();                for (int zindex = 0; zindex < objectList.length; zindex++) {                    ZukgitHoldPlace\" Set   \" + \"ArrayList<Date> dateList  index =\" + zindex + \" value :\" + objectList[zindex].toString());                }            } else {                ZukgitHoldPlace\" Set   \" + \"ArrayList<Date> dateList is null !\");            }        } else if (iQueueType(t)) {            if (t != null) {                Object[] objectList = ((java.util.Queue) t).toArray();                for (int zindex = 0; zindex < objectList.length; zindex++) {                    ZukgitHoldPlace\" Queue :   \" + \"ArrayList<Date> dateList  index =\" + zindex + \" value :\" + objectList[zindex].toString());                }            } else {                ZukgitHoldPlace\" Queue   \" + \"ArrayList<Date> dateList is null !\");            }        } else if (isMapType(t)) {            ZukgitHoldPlace\"Map数据类型类型  \");            if (t != null) {                java.util.Map.Entry<String, String> entry = null;                java.util.Iterator iterator = ((java.util.Map) t).entrySet().iterator();                int mZindex = 0;                while (iterator.hasNext()) {                    entry = ( java.util.Map.Entry<String, String>) iterator.next();                    ZukgitHoldPlace\" Map   \" + \" stringMap    index =\" + mZindex + \"     entry.Key= \" + entry.getKey() + \" entry.Value=\" + entry.getValue());                    mZindex++;                }            } else {                ZukgitHoldPlace\" Map   \" + \" t is null !\");            }        } else if(isShuZuType(t)){            ZukgitHoldPlace\"[] 数组类型格式  \");            if (t != null) {                String Arrtype = t.getClass().getName();                java.util.ArrayList<Object>  valueList= new  java.util.ArrayList();                int[] intArr=null;                byte[] byteArr=null;                char[] charArr=null;                short[] shortArr=null;                long[] longArr=null;                float[] floatArr=null;                double[] doubleArr= null;                boolean[] booleanArr = null;                Object[]  ObjectArr =null;                if(Arrtype.equals(\"[I\")){                       intArr = (int[])t ;                    valueList.add( java.util.Arrays.toString(intArr));                } else if(Arrtype.equals(\"[J\")){                      longArr = (long[])t ;                    valueList.add( java.util.Arrays.toString(longArr));                }else if(Arrtype.equals(\"[F\")){                    floatArr = (float[])t ;                    valueList.add( java.util.Arrays.toString(floatArr));                }else if(Arrtype.equals(\"[D\")){                    doubleArr = (double[])t ;                    valueList.add( java.util.Arrays.toString(doubleArr));                }else if(Arrtype.equals(\"[S\")){                    shortArr = (short[])t ;                    valueList.add( java.util.Arrays.toString(shortArr));                }else if(Arrtype.equals(\"[C\")){                    charArr = (char[])t ;                    valueList.add( java.util.Arrays.toString(charArr));                }else if(Arrtype.equals(\"[B\")){                    byteArr = (byte[])t ;                    valueList.add( java.util.Arrays.toString(byteArr));                }else if(Arrtype.equals(\"[Z\")){                    booleanArr = (boolean[])t ;                    valueList.add( java.util.Arrays.toString(booleanArr));                }else{                    ObjectArr = (Object[]) t ;                    for (Object curObject:ObjectArr ) {                        valueList.add(curObject);                    }                }                for (int zindex = 0; zindex < valueList.size(); zindex++) {                    ZukgitHoldPlace\" shuzu[]   \" + \"XXXX[]   zindex = \" + zindex + \"   :  value= \" + valueList.get(zindex).toString());                }            } else {                ZukgitHoldPlace\" zukgit_B8_Test_method3   \" + \"strArr is null !\");            }        }else {            ZukgitHoldPlace\"    baseObject = true   基本Object对象类型   toString()=\" + t);        }    }";
+
+    
+    
+	
 	class Encry_StringByte_To_Print_Rule_56 extends Basic_Rule {
 		
 		String  key_str = "zukgit12";
@@ -19519,7 +22239,10 @@ public class G2_ApplyRuleFor_TypeFile {
 				itemDesc = batName.trim() + ".bat  " + type + "_" + index + "    [索引 " + index + "]  描述:"
 						+ simpleDesc();
 			} else {
-				itemDesc = batName.trim() + ".sh " + type + "_" + index + "    [索引 " + index + "]  描述:" + simpleDesc();
+			//  在 Linux 下  #_42 会被当成注释  无法 被识别  所以  必须 把 第一个 # 号改为 下划线
+				String  simple_desc = simpleDesc();
+				String fixed_simple_desc  = simple_desc.replace("#_","@_");
+				itemDesc = batName.trim() + ".sh " + type + "_" + index + "    [索引 " + index + "]  描述:" + fixed_simple_desc;
 			}
 
 			return itemDesc;
@@ -20420,9 +23143,9 @@ public class G2_ApplyRuleFor_TypeFile {
 				ArrayList<File> resultFileList = curApplayRule.applySubFileListRule4(typeFileList, CurDirFileTypeMap,
 						subDirList, realFileList);
 				if (resultFileList != typeFileList) {
-					System.out.println("应用规则:  " + applyRuleString + " 成功!");
+					System.out.println("应用规则: curApplayRule.operation_type ="+curApplayRule.operation_type+" " + applyRuleString + " 成功!");
 				} else {
-					System.out.println("应用规则:  " + applyRuleString + " 失败!");
+					System.out.println("应用规则: curApplayRule.operation_type ="+curApplayRule.operation_type+" " + applyRuleString + " 失败!");
 				}
 
 			} else if (curApplayRule.operation_type == 3) { // 对所有文件进行的 统一处理的 类型
@@ -20430,9 +23153,9 @@ public class G2_ApplyRuleFor_TypeFile {
 				ArrayList<File> resultFileList = curApplayRule.applyFileListRule3(typeFileList, CurDirFileTypeMap);
 				if (resultFileList != typeFileList) {
 
-					System.out.println("应用规则:  " + applyRuleString + " 成功!");
+					System.out.println("应用规则: curApplayRule.operation_type ="+curApplayRule.operation_type+" " + applyRuleString + " 成功!");
 				} else {
-					System.out.println("应用规则:  " + applyRuleString + " 失败!");
+					System.out.println("应用规则: curApplayRule.operation_type ="+curApplayRule.operation_type+" " + applyRuleString + " 失败!");
 				}
 
 			} else if (curApplayRule.operation_type == 5) { // 对所有文件夹 所有子文件 孙文件 所有 子文件夹 孙文件夹
@@ -22190,6 +24913,202 @@ public class G2_ApplyRuleFor_TypeFile {
 			return name;
 		}
 	}
+	
+
+	static String bytesToIntString(byte[] src ) {
+		StringBuilder builder = new StringBuilder();
+		if (src == null || src.length <= 0) {
+			return null;
+		}
+		String hv;
+
+		int byteIndex = 0 ;
+		for (byte aSrc : src) {
+			// 以十六进制（基数 16）无符号整数形式返回一个整数参数的字符串表示形式，并转换为大写
+			hv = Integer.toString(aSrc & 0xFF).toUpperCase();
+			int value = Integer.parseInt(hv);
+			
+			int padding_blank = 2;
+			String blank_pandding_str = "  ";
+			if( value >= 100) {
+				padding_blank = 1;
+				blank_pandding_str = " ";
+			}
+			if (hv.length() < 2) {
+				builder.append(0);
+			}
+			
+			
+			if(byteIndex == src.length -1) {
+				builder.append(blank_pandding_str+hv+"  ");
+			}else {
+				builder.append(blank_pandding_str+hv+"   "+","+" ");
+			}
+		
+			byteIndex++;
+			
+		}
+
+//        System.out.println(builder.toString());
+		return builder.toString();
+	}
+	static String bytesToIntCharString(byte[] src,String rawstr) {
+		StringBuilder builder = new StringBuilder();
+		if (src == null || src.length <= 0) {
+			return null;
+		}
+		String hv;
+		
+		int rawStr_size = rawstr.length();
+
+		int byteIndex = 0 ;
+		for (byte aSrc : src) {
+			// 以十六进制（基数 16）无符号整数形式返回一个整数参数的字符串表示形式，并转换为大写
+			hv = Integer.toString(aSrc & 0xFF).toUpperCase();
+			int value = Integer.parseInt(hv);
+			
+			int padding_blank = 2;
+			String blank_pandding_str = "  ";
+			if( value >= 100) {
+				padding_blank = 1;
+				blank_pandding_str = " ";
+			} 
+			if ( value < 10) {
+				 padding_blank = 3;
+				 blank_pandding_str = "   ";
+			}
+			if (hv.length() < 2) {
+				builder.append(0);
+			}
+			
+			
+			if(byteIndex == src.length -1) {
+				builder.append(blank_pandding_str+hv+"_"+(byteIndex >= rawStr_size ?"?": rawstr.substring(byteIndex,byteIndex+1))+"");
+			}else {
+				builder.append(blank_pandding_str+hv+"_"+(byteIndex >= rawStr_size ?"?": rawstr.substring(byteIndex,byteIndex+1))+" "+","+" ");
+			}
+		
+			byteIndex++;
+			
+		}
+
+//        System.out.println(builder.toString());
+		return builder.toString();
+	}
+	
+	static String bytesToHexString_Padding(byte[] src) {
+		StringBuilder builder = new StringBuilder();
+		if (src == null || src.length <= 0) {
+			return null;
+		}
+		String hv;
+
+		int byteIndex = 0 ;
+		for (byte aSrc : src) {
+			// 以十六进制（基数 16）无符号整数形式返回一个整数参数的字符串表示形式，并转换为大写
+			hv = Integer.toHexString(aSrc & 0xFF).toUpperCase();
+			if (hv.length() < 2) {
+				builder.append(0);
+			}
+			if(byteIndex == src.length -1) {
+				builder.append("0x"+hv+" ");
+			}else {
+				builder.append("0x"+hv+"   "+","+" ");
+			}
+		
+			byteIndex++;
+			
+		}
+
+//        System.out.println(builder.toString());
+		return builder.toString();
+	}
+	
+	
+	static String bytesToHexCharString(byte[] src,String rawstr) {
+		StringBuilder builder = new StringBuilder();
+		if (src == null || src.length <= 0) {
+			return null;
+		}
+		String hv;
+		int rawStr_size = rawstr.length();
+
+		int byteIndex = 0 ;
+		for (byte aSrc : src) {
+			// 以十六进制（基数 16）无符号整数形式返回一个整数参数的字符串表示形式，并转换为大写
+			hv = Integer.toHexString(aSrc & 0xFF).toUpperCase();
+			if (hv.length() < 2) {
+				builder.append(0);
+			}
+			if(byteIndex == src.length -1) {
+				builder.append("0x"+hv+"_"+(byteIndex >= rawStr_size ?"?": rawstr.substring(byteIndex,byteIndex+1))+"");
+			}else {
+				builder.append("0x"+hv+"_"+(byteIndex >= rawStr_size ?"?": rawstr.substring(byteIndex,byteIndex+1))+" "+","+" ");
+			}
+		
+			byteIndex++;
+			
+		}
+
+//        System.out.println(builder.toString());
+		return builder.toString();
+	}
+	
+	static String getTimeStamp_yyyyMMdd_HHmmss() {
+
+		SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd_HHmmss");// 设置日期格式
+		String date = df.format(new Date());
+		return date;
+	}
+
+    static ArrayList<File> initJavaDirFromParam(ArrayList<String> keyList) {
+        ArrayList<File> curJavaDirList = new ArrayList<File>();
+
+        for (int i = 0; i < keyList.size(); i++) {
+            String itemStr = keyList.get(i);
+            String absItemStr = "";
+            if (itemStr.startsWith("./") || itemStr.startsWith(".\\")) {
+                itemStr = itemStr.replace("./", "");
+                itemStr = itemStr.replace(".\\", "");
+                absItemStr = curProjectPath + File.separator + itemStr;
+            } else {
+                absItemStr = itemStr;    // 传递过来的就是绝对路径
+            }
+
+            File cuAabsItemStrFile = new File(absItemStr);
+            if (cuAabsItemStrFile.exists() && cuAabsItemStrFile.isDirectory()) {
+                // 文件存在 并且是以  当前文件是文件夹
+                curJavaDirList.add(cuAabsItemStrFile);
+            }
+        }
+
+        return curJavaDirList;
+
+    }
+
+    static boolean checkExceptionFlag(String codeBack1) {
+        boolean flag = false;
+        if (codeBack1.contains("(>)") || codeBack1.contains("(>>)") || codeBack1.contains("(>>>)") || codeBack1.contains("(<)")
+                || codeBack1.contains("(=)") || codeBack1.contains("(|)") || codeBack1.contains("(<<)") || codeBack1.contains("(<<<)")
+                || codeBack1.contains("(&)") || codeBack1.contains("(+)") || codeBack1.contains("(-)") || codeBack1.contains("(!=)") ||
+                codeBack1.contains("(/)") || codeBack1.contains("(!)") || codeBack1.contains("(*)") || codeBack1.contains("(^)") ||
+                codeBack1.contains("(%)") || codeBack1.contains("(:)") || codeBack1.contains("(*=)") || codeBack1.contains("(%=)") ||
+                codeBack1.contains("(&&)") || codeBack1.contains("(&=)") || codeBack1.contains("()") || codeBack1.contains("(+=)") ||
+                codeBack1.contains("(-=)") || codeBack1.contains("(->)") || codeBack1.contains("(/=)") || codeBack1.contains("(::)") ||
+                codeBack1.contains("(<<=)") || codeBack1.contains("(==)") || codeBack1.contains("(>=)") || codeBack1.contains("(>>=)") ||
+                codeBack1.contains("(>>>=)") || codeBack1.contains("(^=)") || codeBack1.contains("(||)")
+        ) {
+
+            flag = true;
+        }
+
+        return flag;
+
+//                expected one of "!=" "%" "%=" "&" "&&" "&=" "(" ")" "*" "*=" "+" "+=" "," "-" "-=" "->"
+//                "/" "/=" "::" "<" "<<=" "<=" "=" "==" ">" ">=" ">>=" ">>>=" "?" "^" "^="
+//                "instanceof" "|" "|=" "||"
+
+    }
 	
 	static String getUserName() {
 		// user.home=C:\Users\zhuzj5

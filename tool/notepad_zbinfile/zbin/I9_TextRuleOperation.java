@@ -631,14 +631,22 @@ public class I9_TextRuleOperation {
 		}
 
 		
+		public  ArrayList<String> Bash_Sh_File_Add_Echo(File srcFile) {
+			
+			return Bash_Sh_File_Add_Echo(srcFile,false);
+		}
 
 		
-		public  ArrayList<String> Bash_Sh_File_Add_Echo(File srcFile) {
+		public  ArrayList<String> Bash_Sh_File_Add_Echo(File srcFile , boolean isFullname) {
 			ArrayList<String> newListContent = new ArrayList<String>();
 
 			File curFile = srcFile;
 
 			String file_name = curFile.getName();
+			if(isFullname) {
+				file_name =  curFile.getAbsolutePath();
+			}
+			String operation_timestamp =getTimeStamp_yyyyMMdd_HHmmss();
 			
 			int echo_count = 1;
 			if (curFile != null) {
@@ -651,10 +659,17 @@ public class I9_TextRuleOperation {
 					BufferedReader curBR = new BufferedReader(new InputStreamReader(new FileInputStream(curFile), "utf-8"));
 					String oldOneLine = "";
 					String newOneLine = "";
+					String pre_one_line = "";
+					
 
 					while (oldOneLine != null) {
 
 						oldOneLine = curBR.readLine();
+						
+						if(!newOneLine.contains("zukgit")) {  // 修改 老的 上一句  会被 echo代替 
+							pre_one_line = newOneLine;
+						}
+						
 						if (oldOneLine == null || oldOneLine.trim().isEmpty()) {
 							newListContent.add("");
 							continue;
@@ -664,6 +679,17 @@ public class I9_TextRuleOperation {
 //	                    System.out.println("adb shell am broadcast -a com.Android.test --es<string> test_string \"this is test string\" —ei<int> test_int 100 —ez<boolean> test_boolean true");
 						newOneLine = new String(oldOneLine).trim();
 
+						//1.注释
+						if(newOneLine.contains("zukgit")) {  //  如果当前行 包含 zukgit  那么是旧的 打印  不理它 直接跳过  继续检测下一行
+							continue;
+						}
+				
+						//1.注释
+						if(newOneLine.startsWith("#")) {  // 以 # 开头 是注释  直接 跳过 
+							
+							newListContent.add(newOneLine);
+							continue;
+						}
 						
 						
 						// 最后是以 " 或者 \ 结尾的  不操作
@@ -685,13 +711,8 @@ public class I9_TextRuleOperation {
 							continue;
 						}
 	
-						
-						//1.注释
-						if(newOneLine.startsWith("#")) {  // 以 # 开头 是注释  直接 跳过 
-							
-							newListContent.add(newOneLine);
-							continue;
-						}
+		
+				
  
 						
 						
@@ -709,7 +730,7 @@ public class I9_TextRuleOperation {
 								continue;
 							}
 							
-							String echo_var_command = "echo zukgit_"+file_name+"_"+echo_count+"  "+"\"$ {"+equal_var_str+"}=${"+equal_var_str+"}\"";
+							String echo_var_command = "echo zukgit_"+file_name+"_"+echo_count+"_"+operation_timestamp+"  "+"\"$ {"+equal_var_str+"}=${"+equal_var_str+"}\"";
 							echo_count++;
 							newListContent.add(newOneLine);
 							newListContent.add(echo_var_command);
@@ -718,11 +739,11 @@ public class I9_TextRuleOperation {
 						
 						
 						//3. 方法的内部  那么打印调用的方法 
-						//function release_build_info {
-						if(newOneLine.startsWith("function ")) {
+						//function release_build_info {    并且是 以 { 为结尾的 方法  否则 报错 
+						if(newOneLine.startsWith("function ") && newOneLine.endsWith("{")) {
 				
-							String function_name = newOneLine.replace("{", "").replace("}", "").replace("(", "").replace(")", "").trim();
-							String method_echo_command =  "echo zukgit_"+file_name+"_"+echo_count+" ______func_begin___________ "+function_name+" ___________";
+							String function_name = newOneLine.replace("{", "").replace("}", "").replace("(", "").replace(")", "").replace("function", "zfunc").trim();
+							String method_echo_command =  "echo zukgit_"+file_name+"_"+echo_count+"_"+operation_timestamp+"  "+" ______func_begin___________ "+function_name+" ___________";
 							echo_count++;
 							newListContent.add(newOneLine);
 							newListContent.add(method_echo_command);
@@ -733,6 +754,10 @@ public class I9_TextRuleOperation {
 						// 如果当前语句中有变量  那么 获取 所有的变量的名字  并打印
 						//          cp ${RBE_log_dir}/rbe_metrics.* ${build_info_dir}/ || true
 						//4. 
+					// 4.1 如果当前 不是以 \ 为 结尾  但 包含${   , 那么 要
+					// 	cp -f ${BUILD_SCRIPT_DIR}/boot/QcomPkg/SocPkg/Palima/Common/uefipil_oneli.cfg \
+					//	${BUILD_SCRIPT_DIR}/boot/QcomPkg/SocPkg/Palima/Common/uefipil.cfg
+						
 						if(newOneLine.contains("${")) {
 							String[] var_arr = newOneLine.split("\\$\\{");
 							if(var_arr == null) {
@@ -740,6 +765,7 @@ public class I9_TextRuleOperation {
 								continue;
 							}
 							
+							ArrayList<String> var_list = new ArrayList<String>();
 							for (int i = 0; i < var_arr.length; i++) {
 								String varItem = var_arr[i]+" ";;
 								
@@ -754,13 +780,26 @@ public class I9_TextRuleOperation {
 										continue;
 									}
 									
-									String echo_var_command =  "echo zukgit_"+file_name+"_"+echo_count+"  "+"\"$ {"+var_name+"}=${"+var_name+"}\"";
+									String echo_var_command =  "echo zukgit_"+file_name+"_"+echo_count+"_"+operation_timestamp+"  "+"  "+"\"$ {"+var_name+"}=${"+var_name+"}\"";
 									echo_count++;
-									newListContent.add(echo_var_command);
+//									newListContent.add(echo_var_command);
+									var_list.add(echo_var_command);
+									
 									
 								}
 							}
-							newListContent.add(newOneLine);
+							
+							if(pre_one_line != null && pre_one_line.endsWith("\\")) {
+								 // 如果 当前行的上一行 是 \ 结尾的话  当前行 说明是多行的最后一行 那么先输出当前行 再 打印
+								newListContent.add(newOneLine);  
+								newListContent.addAll(var_list);
+								
+							}else {
+								// 先打印  再 输出
+								newListContent.addAll(var_list);
+								newListContent.add(newOneLine);
+							}
+							
 							continue;
 						}
 						
@@ -791,7 +830,7 @@ public class I9_TextRuleOperation {
 										continue;
 									}
 									var_name = var_name.replace("\\", "").replace("/", "").replace("\"", "").replace(",", "").replace(" ", "");
-									String echo_var_command =  "echo zukgit_"+file_name+"_"+echo_count+"  "+"\"$ {"+var_name+"}=${"+var_name+"}\"";
+									String echo_var_command =  "echo zukgit_"+file_name+"_"+echo_count+"_"+operation_timestamp+"  "+"  "+"\"$ {"+var_name+"}=${"+var_name+"}\"";
 									echo_count++;
 									newListContent.add(echo_var_command);
 									
@@ -5675,7 +5714,7 @@ public class I9_TextRuleOperation {
 
 		@Override
 		String simpleDesc() {
-			return " 对于 avc denied deny 这类的 权限问题 动态计算解决方程 例如: allow platform_app default_android_service:service_manager find;  ";
+			return " 对于 avc: denied  avc deny 这类的 权限问题 动态计算解决方程 例如: allow platform_app default_android_service:service_manager find;  ";
 		}
 
 		@Override
@@ -14317,13 +14356,20 @@ public class I9_TextRuleOperation {
 		return sb.toString();
 	}
 
-	static String getTimeStamp() {
+	static String getTimeStamp_yyyyMMdd_HHmmss() {
 
 		SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd_HHmmss");// 设置日期格式
 		String date = df.format(new Date());
 		return date;
 	}
 
+	static String getTimeStamp() {
+
+		SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd_HHmmss");// 设置日期格式
+		String date = df.format(new Date());
+		return date;
+	}
+	
 	static String getTimeStampHHmmss() {
 
 		SimpleDateFormat df = new SimpleDateFormat("HHmmss");// 设置日期格式
