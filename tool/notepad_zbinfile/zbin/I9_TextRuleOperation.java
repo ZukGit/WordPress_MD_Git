@@ -165,19 +165,19 @@ public class I9_TextRuleOperation {
 
 	// 固定6 从shell 中获取到的 除了 args[0] 和 args[1] 之外的所有其他的输入参数类型
 	static ArrayList<String> CUR_INPUT_3_ParamStrList = new ArrayList<>();
-	
+
 	// 固定2 当前执行文件的编号 I9_preparam.properties    预制放置参数的地方
 	static File I9_PreParam_Properties_File = new File(
 			System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin"
 					+ File.separator + get_Bat_Sh_FlagNumber(Cur_Bat_Name)+"_"+"preparam" + ".properties");
-	// 从  I9_preparam.properties prop里 读取  , 从 参数中设置到 properties  然后 传给 每个 rule 
+	// 从  I9_preparam.properties prop里 读取  , 从 参数中设置到 properties  然后 传给 每个 rule
 	// propname  可以是  1 2 3 4 5 //  开头的数据   value 是 从 预先 设置好的数据
 	static ArrayList<String> I9_PreParam_PropValue_List = new ArrayList<>();
 	static InputStream I9_PreParam_Properties_InputStream;
 	static OutputStream I9_PreParam_Properties_OutputStream;
 	static Properties I9_PreParam_Properties = new Properties();
-	
-	
+
+
 
 	// 固定7 当前保存 Rule的集合
 	static ArrayList<Rule> CUR_RULE_LIST = new ArrayList<Rule>(); // 规则的集合
@@ -291,10 +291,10 @@ public class I9_TextRuleOperation {
 				propKey2ValueList.put(key, I9_Properties.getProperty(key));
 			}
 			I9_Properties_InputStream.close();
-			
-			
-			
-			// 预制 参数的  设置 
+
+
+
+			// 预制 参数的  设置
 			if (!I9_PreParam_Properties_File.exists()) {
 				I9_PreParam_Properties_File.createNewFile();
 			}
@@ -306,14 +306,14 @@ public class I9_TextRuleOperation {
 				String key = it_param.next();
 				String  preparams = I9_PreParam_Properties.getProperty(key);
 
-				I9_PreParam_PropValue_List.add(preparams); //  预制参数 
+				I9_PreParam_PropValue_List.add(preparams); //  预制参数
 			}
 			I9_Properties_InputStream.close();
-			
-			
-			
-			
-			
+
+
+
+
+
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -331,8 +331,8 @@ public class I9_TextRuleOperation {
 			e.printStackTrace();
 		}
 	}
-	
-	
+
+
 	static void setProperity_PreParam() {
 		try {
 			I9_PreParam_Properties_OutputStream = new BufferedOutputStream(
@@ -343,7 +343,7 @@ public class I9_TextRuleOperation {
 			e.printStackTrace();
 		}
 	}
-	
+
 
 	enum OS_TYPE {
 		Windows, Linux, MacOS
@@ -354,23 +354,23 @@ public class I9_TextRuleOperation {
 
 	// 初始化 从 bat sh 传输而来的参数
 	static void initInputParams(String[] args) {
-		
+
 		if(I9_PreParam_PropValue_List != null && I9_PreParam_PropValue_List.size() > 0 ) {
-			
+
 			for (int i = 0; i < I9_PreParam_PropValue_List.size(); i++) {
 				System.out.println("pre_param["+i+"] = "+ I9_PreParam_PropValue_List.get(i));
 			}
 		}else {
 			System.out.println("pre_param_list   预制参数列表为空!! ");
 		}
-	 
+
 		System.out.println();
 		if (args != null) {
-			
+
 			for (int i = 0; i < args.length; i++) {
 				System.out.println("args[" + i + "] = " + args[i]);
 			}
-			
+
 			for (int i = 0; i < args.length; i++) {
 				System.out.println("exe_args[" + i + "] = " + args[i]);
 				if (i == 0) { // 第一个参数永远是 当前 shell的目录
@@ -403,9 +403,9 @@ public class I9_TextRuleOperation {
 					if (args[i].contains("default_index_")) {
 						FreshDefaultInputStr = args[i];
 						isFreshDefault_SelectedIndex = true;    //  后面可能会有输入参数
-						
+
 // ztextrule_operation_I9.bat default_index_53  53_ssidmod_fafa  53_threadcount_100  53_bssidmod_ffffffff 53_crackorder_12345
-//   把 一个 列表 保存到 prop ? 						 
+//   把 一个 列表 保存到 prop ?
 						return;
 					}
 					CUR_INPUT_3_ParamStrList.add(args[i]); // 当前cmd目录 第一个类型选项 之后所有的参数 保存在 CUR_INPUT_3_ParamStrList
@@ -563,29 +563,29 @@ public class I9_TextRuleOperation {
 		// 检测当前的 txt文件 只 保留 url 内容 , 并 对这些 内容 进行 排序 在 temp 中 打印出来
 		CUR_RULE_LIST.add(new Analysis_URI_IN_Txt_Download_DouYinMP4_Rule_55());
 
-		
+
 		// 在当前的 md 文件中 把 # 号 里面 转为 # 1.   ## --> ## 2.   ###### --> ###### 6.
 		CUR_RULE_LIST.add(new MD_File_Head_JingHao_AddIndex_Rule_56());
-		
-		
-		// 在当前的中的文件 .c .cpp .java  .txt 等转为 一个 codeblock 写入 MD 文件 
+
+
+		// 在当前的中的文件 .c .cpp .java  .txt 等转为 一个 codeblock 写入 MD 文件
 		CUR_RULE_LIST.add(new RealFile_To_MD_CodeBlock_Rule_57());
-		
-		
+
+
 		//  把当前的 变量表达式  等号前的 值 转为  echo 类型的输出
 		// gen_fact_package=0
 		//echo "$ {gen_fact_package}=${gen_fact_package}"
 		CUR_RULE_LIST.add(new Bash_Var_To_Echo_Rule_58());
-		
-		
-		//  把当前 bash  文件 和 sh 文件  空格插入echo  追踪 打印数据  然后 查看 执行 调用过程 
+
+
+		//  把当前 bash  文件 和 sh 文件  空格插入echo  追踪 打印数据  然后 查看 执行 调用过程
 		// gen_fact_package=0
 		//echo "$ {gen_fact_package}=${gen_fact_package}"
 		CUR_RULE_LIST.add(new Add_Echo_Log_To_SH_BASH_Rule_59());
-		
-		
+
+
 	}
-	
+
 	class Add_Echo_Log_To_SH_BASH_Rule_59 extends Basic_Rule {
 
 
@@ -598,19 +598,19 @@ public class I9_TextRuleOperation {
 			super(59, false);
 		}
 
-		
+
 		@Override
 		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
-				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 			for (int i = 0; i < curInputFileList.size(); i++) {
 				File fileItem = curInputFileList.get(i);
-				
+
 				String file_name = fileItem.getName();
-				
+
 				if(!file_name.toLowerCase().endsWith(".sh") && !file_name.toLowerCase().endsWith(".bash") ) {
-					
+
 					System.out.println("当前文件 不是  sh 文件 或者 bash  文件 无法执行  添加 echo 打印变量的操作  请检查!");
-					
+
 					return null;
 				}
 
@@ -630,13 +630,13 @@ public class I9_TextRuleOperation {
 			return super.applyOperationRule(curFileList, subFileTypeMap, curDirList, curRealFileList);
 		}
 
-		
+
 		public  ArrayList<String> Bash_Sh_File_Add_Echo(File srcFile) {
-			
+
 			return Bash_Sh_File_Add_Echo(srcFile,false);
 		}
 
-		
+
 		public  ArrayList<String> Bash_Sh_File_Add_Echo(File srcFile , boolean isFullname) {
 			ArrayList<String> newListContent = new ArrayList<String>();
 
@@ -647,7 +647,7 @@ public class I9_TextRuleOperation {
 				file_name =  curFile.getAbsolutePath();
 			}
 			String operation_timestamp =getTimeStamp_yyyyMMdd_HHmmss();
-			
+
 			int echo_count = 1;
 			if (curFile != null) {
 
@@ -660,16 +660,16 @@ public class I9_TextRuleOperation {
 					String oldOneLine = "";
 					String newOneLine = "";
 					String pre_one_line = "";
-					
+
 
 					while (oldOneLine != null) {
 
 						oldOneLine = curBR.readLine();
-						
-						if(!newOneLine.contains("zukgit")) {  // 修改 老的 上一句  会被 echo代替 
+
+						if(!newOneLine.contains("zukgit")) {  // 修改 老的 上一句  会被 echo代替
 							pre_one_line = newOneLine;
 						}
-						
+
 						if (oldOneLine == null || oldOneLine.trim().isEmpty()) {
 							newListContent.add("");
 							continue;
@@ -683,65 +683,65 @@ public class I9_TextRuleOperation {
 						if(newOneLine.contains("zukgit")) {  //  如果当前行 包含 zukgit  那么是旧的 打印  不理它 直接跳过  继续检测下一行
 							continue;
 						}
-				
+
 						//1.注释
-						if(newOneLine.startsWith("#")) {  // 以 # 开头 是注释  直接 跳过 
-							
+						if(newOneLine.startsWith("#")) {  // 以 # 开头 是注释  直接 跳过
+
 							newListContent.add(newOneLine);
 							continue;
 						}
-						
-						
+
+
 						// 最后是以 " 或者 \ 结尾的  不操作
 						//echo zukgit_build_device_old.bash_479  "$ {build_int_files}=${build_int_files}"
 						// ramdisk-recovery.img \
-						
-						//1. 不包含 等号 而且是以 \ 和  为 结尾 说明 可能是 多行操作   不执行 打印操作 
-						// fuck 这里 " 为结尾 不能 这样写 
-						if( (newOneLine.endsWith("\\") ))   {  // 以 \   为 结尾 开头 是多行  直接 跳过 
-							
+
+						//1. 不包含 等号 而且是以 \ 和  为 结尾 说明 可能是 多行操作   不执行 打印操作
+						// fuck 这里 " 为结尾 不能 这样写
+						if( (newOneLine.endsWith("\\") ))   {  // 以 \   为 结尾 开头 是多行  直接 跳过
+
 							newListContent.add(newOneLine);
 							continue;
 						}
-				
+
 						// 当前 只有 一个 引号  那么 也 跳过
-						if( (newOneLine.endsWith("\"")) && ( newOneLine.indexOf("\"") == newOneLine.lastIndexOf("\"") ))   {  // 以 \   为 结尾 开头 是多行  直接 跳过 
-							
+						if( (newOneLine.endsWith("\"")) && ( newOneLine.indexOf("\"") == newOneLine.lastIndexOf("\"") ))   {  // 以 \   为 结尾 开头 是多行  直接 跳过
+
 							newListContent.add(newOneLine);
 							continue;
 						}
-	
-		
-				
- 
-						
-						
-						// 只对 包含 = 等号的 变量进行输出 
+
+
+
+
+
+
+						// 只对 包含 = 等号的 变量进行输出
 						//  script_name=$(basename ${script_path})   不以 if 开头  只有 一个 等号
 						//2. 只有一个等号的 赋值 的 表达式的处理
-						if(!newOneLine.startsWith("if") 
-								&& !newOneLine.contains("!=") 
+						if(!newOneLine.startsWith("if")
+								&& !newOneLine.contains("!=")
 								&& newOneLine.contains("=")
 								&& newOneLine.indexOf("=") == newOneLine.lastIndexOf("=") ) {
 							String equal_var_str = newOneLine.substring(0,newOneLine.indexOf("=")).trim();
-							
-							if(equal_var_str.contains(" ")) {  //  // 如果 变量名称中 含有 空格那么 就不打印它了 
+
+							if(equal_var_str.contains(" ")) {  //  // 如果 变量名称中 含有 空格那么 就不打印它了
 								newListContent.add(newOneLine);
 								continue;
 							}
-							
+
 							String echo_var_command = "echo zukgit_"+file_name+"_"+echo_count+"_"+operation_timestamp+"  "+"\"$ {"+equal_var_str+"}=${"+equal_var_str+"}\"";
 							echo_count++;
 							newListContent.add(newOneLine);
 							newListContent.add(echo_var_command);
 							continue;
 						}
-						
-						
-						//3. 方法的内部  那么打印调用的方法 
-						//function release_build_info {    并且是 以 { 为结尾的 方法  否则 报错 
+
+
+						//3. 方法的内部  那么打印调用的方法
+						//function release_build_info {    并且是 以 { 为结尾的 方法  否则 报错
 						if(newOneLine.startsWith("function ") && newOneLine.endsWith("{")) {
-				
+
 							String function_name = newOneLine.replace("{", "").replace("}", "").replace("(", "").replace(")", "").replace("function", "zfunc").trim();
 							String method_echo_command =  "echo zukgit_"+file_name+"_"+echo_count+"_"+operation_timestamp+"  "+" ______func_begin___________ "+function_name+" ___________";
 							echo_count++;
@@ -749,101 +749,101 @@ public class I9_TextRuleOperation {
 							newListContent.add(method_echo_command);
 							continue;
 						}
-						
-						
+
+
 						// 如果当前语句中有变量  那么 获取 所有的变量的名字  并打印
 						//          cp ${RBE_log_dir}/rbe_metrics.* ${build_info_dir}/ || true
-						//4. 
-					// 4.1 如果当前 不是以 \ 为 结尾  但 包含${   , 那么 要
-					// 	cp -f ${BUILD_SCRIPT_DIR}/boot/QcomPkg/SocPkg/Palima/Common/uefipil_oneli.cfg \
-					//	${BUILD_SCRIPT_DIR}/boot/QcomPkg/SocPkg/Palima/Common/uefipil.cfg
-						
+						//4.
+						// 4.1 如果当前 不是以 \ 为 结尾  但 包含${   , 那么 要
+						// 	cp -f ${BUILD_SCRIPT_DIR}/boot/QcomPkg/SocPkg/Palima/Common/uefipil_oneli.cfg \
+						//	${BUILD_SCRIPT_DIR}/boot/QcomPkg/SocPkg/Palima/Common/uefipil.cfg
+
 						if(newOneLine.contains("${")) {
 							String[] var_arr = newOneLine.split("\\$\\{");
 							if(var_arr == null) {
 								newListContent.add(newOneLine);
 								continue;
 							}
-							
+
 							ArrayList<String> var_list = new ArrayList<String>();
 							for (int i = 0; i < var_arr.length; i++) {
 								String varItem = var_arr[i]+" ";;
-								
+
 								if(i == 0) {   // 第一个分隔项 是 没有匹配的
 									continue;
 								}
-								
+
 								if(varItem.contains("}")) {
 									String var_name = varItem.trim().substring(0,varItem.indexOf("}"));
-									
-									if(var_name.contains(" ")) {  // 如果 变量名称中 含有 空格那么 就不打印它了 
+
+									if(var_name.contains(" ")) {  // 如果 变量名称中 含有 空格那么 就不打印它了
 										continue;
 									}
-									
+
 									String echo_var_command =  "echo zukgit_"+file_name+"_"+echo_count+"_"+operation_timestamp+"  "+"  "+"\"$ {"+var_name+"}=${"+var_name+"}\"";
 									echo_count++;
 //									newListContent.add(echo_var_command);
 									var_list.add(echo_var_command);
-									
-									
+
+
 								}
 							}
-							
+
 							if(pre_one_line != null && pre_one_line.endsWith("\\")) {
-								 // 如果 当前行的上一行 是 \ 结尾的话  当前行 说明是多行的最后一行 那么先输出当前行 再 打印
-								newListContent.add(newOneLine);  
+								// 如果 当前行的上一行 是 \ 结尾的话  当前行 说明是多行的最后一行 那么先输出当前行 再 打印
+								newListContent.add(newOneLine);
 								newListContent.addAll(var_list);
-								
+
 							}else {
 								// 先打印  再 输出
 								newListContent.addAll(var_list);
 								newListContent.add(newOneLine);
 							}
-							
+
 							continue;
 						}
-						
-						//5. 
-						// generate_product_graph $NINJA_BUILD_FILE $MSI_TARGET  没有 括号 扩起的 变量 
+
+						//5.
+						// generate_product_graph $NINJA_BUILD_FILE $MSI_TARGET  没有 括号 扩起的 变量
 						if(newOneLine.contains("$") && !newOneLine.contains("${") && !newOneLine.contains(")")   ) {
 							String[] var_arr = newOneLine.split("\\$");
 							if(var_arr == null) {
 								newListContent.add(newOneLine);
 								continue;
 							}
-							
-							
-							
+
+
+
 							for (int i = 0; i < var_arr.length; i++) {
 								String varItem = var_arr[i]+" ";
-								
+
 								if(i == 0) {   // 第一个分隔项 是 没有匹配的
 									continue;
 								}
-								
+
 								String var_name = "";
 								if(varItem.contains(" ")) {
 									var_name = varItem.trim().substring(0,varItem.indexOf(" "));
-									
-									
-									if(var_name.contains(" ") || var_name.contains("/") || var_name.contains(".") ) {  // 如果 变量名称中 含有 空格那么 就不打印它了 
+
+
+									if(var_name.contains(" ") || var_name.contains("/") || var_name.contains(".") ) {  // 如果 变量名称中 含有 空格那么 就不打印它了
 										continue;
 									}
 									var_name = var_name.replace("\\", "").replace("/", "").replace("\"", "").replace(",", "").replace(" ", "");
 									String echo_var_command =  "echo zukgit_"+file_name+"_"+echo_count+"_"+operation_timestamp+"  "+"  "+"\"$ {"+var_name+"}=${"+var_name+"}\"";
 									echo_count++;
 									newListContent.add(echo_var_command);
-									
+
 								}
 							}
 							newListContent.add(newOneLine);
 							continue;
-							
-							
+
+
 						}
-						
-						
-						
+
+
+
 						newListContent.add(newOneLine.trim());
 					}
 					curBR.close();
@@ -856,7 +856,7 @@ public class I9_TextRuleOperation {
 			}
 			return newListContent;
 		}
-		
+
 
 		// 3. 如果当前 执行 错误 checkParams 返回 false 那么 将 打印这个函数 说明错误的可能原因
 		@Override
@@ -881,8 +881,8 @@ public class I9_TextRuleOperation {
 		}
 	}
 
-	
-	
+
+
 	class Bash_Var_To_Echo_Rule_58 extends Basic_Rule {
 
 
@@ -897,7 +897,7 @@ public class I9_TextRuleOperation {
 
 		@Override
 		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
-				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 			for (int i = 0; i < curInputFileList.size(); i++) {
 				File fileItem = curInputFileList.get(i);
 
@@ -917,9 +917,9 @@ public class I9_TextRuleOperation {
 			return super.applyOperationRule(curFileList, subFileTypeMap, curDirList, curRealFileList);
 		}
 
-		
 
-		
+
+
 		public  ArrayList<String> Linxu_Var_Echo_Method(File srcFile) {
 			ArrayList<String> newContent = new ArrayList<String>();
 
@@ -940,7 +940,7 @@ public class I9_TextRuleOperation {
 
 						oldOneLine = curBR.readLine();
 						if (oldOneLine == null || oldOneLine.trim().isEmpty()) {
-						//	newContent.add("System.out.println();");
+							//	newContent.add("System.out.println();");
 							continue;
 						}
 
@@ -948,18 +948,18 @@ public class I9_TextRuleOperation {
 //	                    System.out.println("adb shell am broadcast -a com.Android.test --es<string> test_string \"this is test string\" —ei<int> test_int 100 —ez<boolean> test_boolean true");
 						newOneLine = new String(oldOneLine).trim();
 
-						
-						// 只对 包含 = 等号的 变量进行输出 
+
+						// 只对 包含 = 等号的 变量进行输出
 						if(!newOneLine.contains("=")) {
 							continue;
 						}
-						
+
 						String equal_var_str = newOneLine.substring(0,newOneLine.indexOf("=")).trim();
-						
+
 						// echo "$ {gen_fact_package}=${gen_fact_package}"
-						
+
 						String echo_command = "echo \"$ {"+equal_var_str+"}=${"+equal_var_str+"}\"";
-						
+
 
 						newContent.add(echo_command.trim());
 					}
@@ -973,7 +973,7 @@ public class I9_TextRuleOperation {
 			}
 			return newContent;
 		}
-		
+
 
 		// 3. 如果当前 执行 错误 checkParams 返回 false 那么 将 打印这个函数 说明错误的可能原因
 		@Override
@@ -998,7 +998,7 @@ public class I9_TextRuleOperation {
 		}
 	}
 
-	
+
 	class RealFile_To_MD_CodeBlock_Rule_57 extends Basic_Rule {
 		ArrayList<String> allMD_Content;
 
@@ -1007,13 +1007,13 @@ public class I9_TextRuleOperation {
 			allMD_Content = new ArrayList<String>();
 
 		}
-		
+
 		boolean  isFile_In_MD(File realFile) {
-			
-			
+
+
 			boolean flag = false ;
-			
-			
+
+
 			File mDir_SubFile = realFile;
 
 			if (mDir_SubFile == null || mDir_SubFile.isDirectory()) {
@@ -1021,22 +1021,22 @@ public class I9_TextRuleOperation {
 			}
 
 			String filename_lowwer = mDir_SubFile.getName().toLowerCase();
-			
-			if (filename_lowwer.endsWith(".txt") 
-					||	filename_lowwer.endsWith(".h") 	
-					||	filename_lowwer.endsWith(".c") 	
-					||	filename_lowwer.endsWith(".sh") 	
-					||	filename_lowwer.endsWith(".mk") 	
-					||	filename_lowwer.endsWith(".cpp") 	
-					||	filename_lowwer.endsWith(".java") 	
 
-					) {
+			if (filename_lowwer.endsWith(".txt")
+					||	filename_lowwer.endsWith(".h")
+					||	filename_lowwer.endsWith(".c")
+					||	filename_lowwer.endsWith(".sh")
+					||	filename_lowwer.endsWith(".mk")
+					||	filename_lowwer.endsWith(".cpp")
+					||	filename_lowwer.endsWith(".java")
+
+			) {
 				return true ;
 			}
-			
-			
+
+
 			return flag ;
-			
+
 		}
 
 		@Override
@@ -1046,8 +1046,8 @@ public class I9_TextRuleOperation {
 
 		@Override
 		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
-				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
-			
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+
 			System.out.println("执行 规则:"+rule_index+" 的 applyOperationRule 方法!  curInputFileList.size()="+curInputFileList.size());
 			for (int i = 0; i < curInputFileList.size(); i++) {
 				File fileItem = curInputFileList.get(i);
@@ -1063,7 +1063,7 @@ public class I9_TextRuleOperation {
 
 				System.out.println("当前的  txt_fileItem=" + fileItem + "    cur_txt_dir_file="
 						+ cur_txt_dir_file);
-				
+
 				File[] all_sub_file_arr = cur_txt_dir_file.listFiles();
 
 				if (all_sub_file_arr == null) {
@@ -1072,46 +1072,46 @@ public class I9_TextRuleOperation {
 
 					return null;
 				}
-				
+
 				ArrayList<File> avaliable_file_list = new ArrayList<File>();
-				
-				
+
+
 				for (int j = 0; j < all_sub_file_arr.length; j++) {
 					File fileItem_temp = all_sub_file_arr[j];
-					
+
 					if(fileItem_temp.isFile() ) {
-						
+
 						avaliable_file_list.add(fileItem_temp);
 					}
 				}
-				
+
 				avaliable_file_list.sort(new Comparator<File>() {
 					@Override
 					public int compare(File o1, File o2) {
 						if(o1.length() > o2.length()) {
-							
+
 							return -1;
 						}
-						
-				        if(o1.length() < o2.length()) {
-							
+
+						if(o1.length() < o2.length()) {
+
 							return 1;
 						}
-				        
-				        if(o1.length() == o2.length()) {
-							
+
+						if(o1.length() == o2.length()) {
+
 							return -1;
 						}
-				
+
 						return 1;
 					}
 				});
-				
-		
-				
+
+
+
 
 				System.out.println("当前的  avaliable_file_list  =" + avaliable_file_list );
-				
+
 				for (int j = 0; j < avaliable_file_list.size(); j++) {
 					File mDir_SubFile = avaliable_file_list.get(j);
 
@@ -1127,19 +1127,19 @@ public class I9_TextRuleOperation {
 					ArrayList<String> txtFileList = ReadFileContentAsList(mDir_SubFile);
 					System.out.println("当前的  mDir_SubFile["+j+"]  =" + mDir_SubFile +"  txtFileList="+txtFileList );
 
-					
+
 					ArrayList<String> mdContentList = 	addCodeBlock_To_MD(mDir_SubFile,txtFileList);
-					
+
 					if(mdContentList != null ) {
 						allMD_Content.addAll(mdContentList);
 					}
-					
+
 					System.out.println("当前的  mDir_SubFile["+j+"]  =" + mDir_SubFile +"  txtFileList="+txtFileList );
-					
+
 
 				}
 
-	
+
 
 				for (int j = 0; j < allMD_Content.size(); j++) {
 					String line_str = allMD_Content.get(j);
@@ -1159,11 +1159,11 @@ public class I9_TextRuleOperation {
 		ArrayList<String>  addCodeBlock_To_MD(File realFile , ArrayList<String> lineList) {
 
 			ArrayList<String> codeBlockList =  new ArrayList<String>();
-			
+
 			int fileRow_Count  = lineList.size();
 			String file_name = realFile.getName();
-			
-			
+
+
 			String HeadTip = "###  "+ realFile.getName()+"("+fileRow_Count+")";
 
 			codeBlockList.add(HeadTip);
@@ -1177,8 +1177,8 @@ public class I9_TextRuleOperation {
 		}
 
 	}
-	
-	
+
+
 	class MD_File_Head_JingHao_AddIndex_Rule_56 extends Basic_Rule {
 
 
@@ -1193,7 +1193,7 @@ public class I9_TextRuleOperation {
 
 		@Override
 		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
-				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 			for (int i = 0; i < curInputFileList.size(); i++) {
 				File fileItem = curInputFileList.get(i);
 				if(!fileItem.getName().toLowerCase().endsWith(".md")) {   // 只对  md 文件操作
@@ -1208,34 +1208,34 @@ public class I9_TextRuleOperation {
 			System.out.println("rule_"+rule_index+" -> 把当前文件加入 Head# 井号 添加索引  执行完成" );
 			return super.applyOperationRule(curFileList, subFileTypeMap, curDirList, curRealFileList);
 		}
-		
+
 		ArrayList<String> Make_JingHao_Add_Index(ArrayList<String>  contentList){
 			ArrayList<String> addJingHaoList  = new ArrayList<String>();
-			
+
 			for (int i = 0; i < contentList.size(); i++) {
 				String one_line_str = contentList.get(i);
 				if(one_line_str.startsWith("#")) {
-					
+
 					String new_line_str = operation_add_JingHao_Index(one_line_str);
 					addJingHaoList.add(new_line_str);
 					continue;
 				}
-				
+
 				addJingHaoList.add(one_line_str);
-				
+
 			}
-			
-			
+
+
 			return addJingHaoList;
-			
-			
+
+
 		}
-		
-		
+
+
 		String operation_add_JingHao_Index(String rawHeadStr) {
 			String headLine =  rawHeadStr;
 			String clear_jing_str = headLine.replace("#", "").trim();
-			
+
 			System.out.println("rawLine = "+rawHeadStr);
 			if(clear_jing_str.startsWith("1_")) {
 				clear_jing_str = clear_jing_str.replace("1_","");
@@ -1250,35 +1250,35 @@ public class I9_TextRuleOperation {
 			} else		if(clear_jing_str.startsWith("6_")) {
 				clear_jing_str = clear_jing_str.replace("6_","");
 			}
-			
-			System.out.println("A1_clear_jing_str = "+clear_jing_str);
-			
-			  // 需要 处理 原始存在在  1.  2.  3.  4.  5.  6. 这样的情况
 
-			if(headLine.startsWith("######")) { // 6 
-				
+			System.out.println("A1_clear_jing_str = "+clear_jing_str);
+
+			// 需要 处理 原始存在在  1.  2.  3.  4.  5.  6. 这样的情况
+
+			if(headLine.startsWith("######")) { // 6
+
 				headLine = "###### "+"6_"+clear_jing_str;
-				
+
 			} else 			if(headLine.startsWith("#####")) { // 5
 				headLine = "##### "+"5_"+clear_jing_str;
-				
+
 			}else 			if(headLine.startsWith("####")) { // 4
-				
+
 				headLine = "#### "+"4_"+clear_jing_str;
 			}else 			if(headLine.startsWith("###")) { // 3
-				
+
 				headLine = "### "+"3_"+clear_jing_str;
 			}else 			if(headLine.startsWith("##")) { // 2
 				headLine = "## "+"2_"+clear_jing_str;
-				
+
 			}else 			if(headLine.startsWith("#")) { // 1
 				headLine = "# "+"1_"+clear_jing_str;
-				
+
 			}
 			System.out.println("A2_headLine = "+headLine);
 
 			return headLine;
-			
+
 		}
 
 		@Override
@@ -1308,7 +1308,7 @@ public class I9_TextRuleOperation {
 			return itemDesc;
 		}
 	}
-	
+
 
 	class PcaPng_TXT_WifiFrame_ByteShow_Rule_52 extends Basic_Rule {
 
@@ -1318,9 +1318,9 @@ public class I9_TextRuleOperation {
 		// I9_beacon_eapol_pwd-cesarwisl.pcapng 密码是 cesarwisl
 		File pcapng_eap_beacon_frame_file;
 
-		File I9_wpa2_crack_rule53_pwd_dictionary_file; 
+		File I9_wpa2_crack_rule53_pwd_dictionary_file;
 
-		
+
 		PcaPng_TXT_WifiFrame_ByteShow_Rule_52() {
 			super(52, false);
 
@@ -1334,7 +1334,7 @@ public class I9_TextRuleOperation {
 			I9_wpa2_crack_rule53_pwd_dictionary_file = new File(
 					zbinPath + File.separator + "I9_wpa2_crack_rule53_pwd_dictionary.txt");
 
-			
+
 		}
 
 		@Override
@@ -1344,7 +1344,7 @@ public class I9_TextRuleOperation {
 
 		@Override
 		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
-				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 			for (int i = 0; i < curInputFileList.size(); i++) {
 				File fileItem = curInputFileList.get(i);
 
@@ -1362,7 +1362,7 @@ public class I9_TextRuleOperation {
 					NotePadOpenTargetFile(I9_wpa2_crack_rule53_pwd_dictionary_file.getAbsolutePath());
 				}
 
-				
+
 				if (pcapng_wififrame_file.exists()) {
 					execCMD(pcapng_wififrame_file.getAbsolutePath());
 				}
@@ -1371,9 +1371,9 @@ public class I9_TextRuleOperation {
 					execCMD(pcapng_eap_beacon_frame_file.getAbsolutePath());
 				}
 
-				
-				
-				
+
+
+
 			}
 
 			return super.applyOperationRule(curFileList, subFileTypeMap, curDirList, curRealFileList);
@@ -1399,7 +1399,7 @@ public class I9_TextRuleOperation {
 
 		@Override
 		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
-				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 			for (int i = 0; i < curInputFileList.size(); i++) {
 				File fileItem = curInputFileList.get(i);
 
@@ -1487,25 +1487,25 @@ public class I9_TextRuleOperation {
 
 	}
 
-	
+
 	// 破解 程序 执行的 order 顺序
 	public  static String Rule_53_Input_SSID_Str = "12345";
 	public  static String Rule_53_Input_BSSID_Str = "12345";
-	
+
 	public  static String Rule_53_Crack_Order_Default = "12345";
 	public  static int  namechar_2_3_areacode6_order1 = 1; // 名字+6位areacode   一千万数据
 	public  static int  digital_8_number_order2 = 2;  // 纯8位数字  一亿数据
 	public  static int  namechar_2_3_birthday6_order3 = 3;  // 姓氏+ 生日日期  1千两百万 + 3亿
 	public  static int  digital_9_number_order4 = 4;  // 纯9位数字  十亿数据
-	public  static int  tel_11_number_order5 = 5;  // 电话号码  40*  四十亿 
+	public  static int  tel_11_number_order5 = 5;  // 电话号码  40*  四十亿
 
 	public  static int  Rule_53_Thread_Count = 100; // 破解 WIFI的 默认的线程个数
-	
-	
-	
+
+
+
 	static File Rule_53_wp2_password_dictionary_file; // wpa2的 密码字典 I9_wpa2_crack_rule53_pwd_dictionary.txt
-	
-	
+
+
 	// .pcapng wifi 包 文件解析 对wifi包的分析 待开发
 	class PcaPng_Wifi_Frame_Analysis_Rule_53 extends Basic_Rule {
 
@@ -1521,7 +1521,7 @@ public class I9_TextRuleOperation {
 		static final int Block_Tail_Total_Length = 4;
 
 		ArrayList<Wifi_Crack_Info_Struct> wifiCrackInfoList; // 可以进行 破解密码的 配对帧信息集合
-		ArrayList<String> wifiCrack_BSSID_InfoList;  // 用于 确保 wifiCrackInfoList 唯一 标识的集合 
+		ArrayList<String> wifiCrack_BSSID_InfoList;  // 用于 确保 wifiCrackInfoList 唯一 标识的集合
 
 		ArrayList<Wifi_Frame_AbsCommon_Struct> wifiFrameStructList; // 帧解析的集合
 
@@ -1539,10 +1539,10 @@ public class I9_TextRuleOperation {
 
 		ArrayList<String> tel_number_begin_3num_list; // 电话号码开头的三位
 		ArrayList<String> tel_number_pre_5num_list; // 电话号码前面的七位
-		
-		String input_ssid_str ;   // 外部输入的 ssid 
+
+		String input_ssid_str ;   // 外部输入的 ssid
 		byte[] input_ssid_str_bytearr;
-		String input_bssid_str ;   // 外部输入的 bssid 
+		String input_bssid_str ;   // 外部输入的 bssid
 		byte[] input_bssid_str_bytearr;
 		PcaPng_Wifi_Frame_Analysis_Rule_53() {
 			super(53, false);
@@ -1551,46 +1551,46 @@ public class I9_TextRuleOperation {
 			wifiBeaconFrameStructList = new ArrayList<Wifi_Frame_AbsCommon_Struct>();
 			wifiBeaconIdetifyList = new ArrayList<String>();
 			wifiCrackInfoList = new ArrayList<Wifi_Crack_Info_Struct>();
-			
+
 			wifiCrack_BSSID_InfoList  = new ArrayList<String>();
-			
+
 
 		}
-		
+
 		@Override
 		void init_pre_params(ArrayList<String> preParamList) {
 			// TODO Auto-generated method stub
-			
-			
+
+
 			// 53_crackorder_2  Rule_53_Crack_Order_Default = "12345";
-			
+
 			String crackorder_prefix = rule_index+"_"+"crackorder_" ;
-			
-			
-			
+
+
+
 			String threadcount_prefix = rule_index+"_"+"threadcount_" ;
-			
-			
+
+
 			String ssid_prefix = rule_index+"_"+"ssid_" ;
-			
-			
+
+
 			String bssid_prefix = rule_index+"_"+"bssid_" ;
-			
+
 			for (int i = 0; i < preParamList.size(); i++) {
 				String pre_param = preParamList.get(i);
-				
+
 				if(pre_param.startsWith(crackorder_prefix)) {
 					String crackorder_preparam = pre_param.replace(crackorder_prefix, "").trim();
 					Rule_53_Crack_Order_Default = crackorder_preparam;
 					System.out.println("Crack 的执行规则 序列为: "+ crackorder_preparam);
-					
+
 				}
-				
+
 				if(pre_param.startsWith(ssid_prefix)) {
 					String ssid_input = pre_param.replace(ssid_prefix, "").trim();
-					
+
 					ssid_input = ssid_input.replace("_z_", " ").trim();
-					
+
 					// 由于 输入的 ssid 可能 包含空格  , 传入空格会使得程序 当做另外的参数  使用 _z_ 来代替 空格
 					Rule_53_Input_SSID_Str = ssid_input;
 					System.out.println("Crack 外部输入的 SSID为 : "+ Rule_53_Input_SSID_Str);
@@ -1599,61 +1599,61 @@ public class I9_TextRuleOperation {
 						input_ssid_str_bytearr = input_ssid_str.getBytes("UTF-8");
 					} catch (UnsupportedEncodingException e) {
 
-					    // TODO Auto-generated catch block
+						// TODO Auto-generated catch block
 
-					    e.printStackTrace();
+						e.printStackTrace();
 
-					    }
-			
+					}
+
 				}
-				
-				
+
+
 				if(pre_param.startsWith(bssid_prefix)) {
 					String bssid_input = pre_param.replace(bssid_prefix, "").trim();
 					Rule_53_Input_BSSID_Str = bssid_input;
 					if(Rule_53_Input_BSSID_Str.length() == 12) {
-		
+
 						System.out.println("Crack 外部输入的 BSSID为 : "+ Rule_53_Input_BSSID_Str);
 						input_bssid_str = Rule_53_Input_BSSID_Str;
-						
-						
+
+
 						input_bssid_str_bytearr = HexStrToBytes(input_bssid_str);
-						
+
 					}else {
 						System.out.println("Crack 外部输入的 BSSID为 : "+ bssid_input+"=["+bssid_input.length()+"]   长度不足12 无法组成6字节Mac地址 请检查!");
 					}
-					
+
 				}
-				
-				
-				
-				
-				
+
+
+
+
+
 				if(pre_param.startsWith(threadcount_prefix)) {
 					String threadcount_preparam = pre_param.replace(threadcount_prefix, "").trim();
 					if(isNumeric(threadcount_preparam)) {
-						
+
 						int threadcount_preparam_int = Integer.parseInt(threadcount_preparam);
 						if(threadcount_preparam_int > 0 ) {
 							Rule_53_Thread_Count = threadcount_preparam_int;
 						}
-				
+
 						System.out.println("Crack 的执行线程 个数为: "+ Rule_53_Thread_Count);
-						
+
 					}
-	
-					
+
+
 				}
-				
-				
-				
+
+
+
 			}
-			
-			
+
+
 			super.init_pre_params(preParamList);
 		}
-		
-		
+
+
 
 		void init_tel_number() {
 			tel_number_begin_3num_list = new ArrayList<String>();
@@ -1719,8 +1719,8 @@ public class I9_TextRuleOperation {
 			String preparam_crackorder = " "+rule_index+"_"+"crackorder_2";
 			String preparam_ssid_input = " "+rule_index+"_"+"ssid_TP-LINK_4F6C90";
 			String preparam_bssid_input = " "+rule_index+"_"+"bssid_20dce64f6c90";
-			
-			
+
+
 			String preparam_selected = " "+rule_index+"_"+"frameno_2";
 			String preparam_ssidmod = " "+rule_index+"_"+"ssidmod_CMCC";
 			String preparam_bssidmod = " "+rule_index+"_"+"bssidmod_ffffffff";
@@ -1730,19 +1730,19 @@ public class I9_TextRuleOperation {
 			String preparam_crackorder_tip = "crackorder【设置破解密码类型 1.名字+6位areacode 2.8位数字 3.姓氏+ 生日 4.9位数字 5.11位号码】";
 			String preparam_ssidmod_tip = "ssid【ssid为指定字符串 _z_代替空格】";
 			String preparam_selected_tip = "bssid【热点的mac地址】";
-			
+
 			StringBuilder preParamSB_tip = new StringBuilder();
 			preParamSB_tip.append("                  ## "+preparam_thread_tip+preparam_crackorder_tip+preparam_selected_tip+preparam_ssidmod_tip);
-			
+
 			return ".pcapng  beacon-eap wifi帧 匹配并暴力破解 8_9位纯数字 姓名+生日 + wifi明文字典 I9_wpa2_crack_rule53_pwd_dictionary.txt 破解  预置参数 \n"+
-		       Cur_Bat_Name+" "+"default_index_"+rule_index + preParamSB.toString() +"\n" +
-		       Cur_Bat_Name+" "+"default_index_"+rule_index+ " "+preParamSB_tip.toString() +"\n" +
-		       "";
+					Cur_Bat_Name+" "+"default_index_"+rule_index + preParamSB.toString() +"\n" +
+					Cur_Bat_Name+" "+"default_index_"+rule_index+ " "+preParamSB_tip.toString() +"\n" +
+					"";
 		}
 
 		@Override
 		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
-				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 
 			area_policy_code_file = new File(zbinPath + File.separator + "I9_wp2_crack_rule53_areacode.txt");
 			Rule_53_wp2_password_dictionary_file = new File(
@@ -1956,7 +1956,7 @@ public class I9_TextRuleOperation {
 				if (wif_frame_struct.getEAPOL_Handshake_Message_Number() > 0) {
 					wifiEapolFrameStructList.add(wif_frame_struct);
 				}
-//    	
+//
 				if (wif_frame_struct.is_beacon_frame()) {
 					String ssid_identify = wif_frame_struct.getBeacon_Identify();
 					if (!wifiBeaconIdetifyList.contains(ssid_identify) && wif_frame_struct.get_wifi_ssid() != null) {
@@ -1984,11 +1984,11 @@ public class I9_TextRuleOperation {
 				init_tel_number(); // 初始化 电话 号码
 				System.out.println("初始化 前5 位 电话号码数据 结束");
 			}
-			
-			
+
+
 			Wifi_Frame_AbsCommon_Struct temp_eap_frame_message1 = null;
 			Wifi_Frame_AbsCommon_Struct temp_eap_frame_message2 = null;
-			
+
 			for (int i = 0; i < wifiEapolFrameStructList.size(); i++) {
 				Wifi_Frame_AbsCommon_Struct wif_eapol_frame_struct = wifiEapolFrameStructList.get(i);
 				System.out.println("══════No." + wif_eapol_frame_struct.package_number + "═══════EAPOL[" + (i + 1) + "]"
@@ -2026,17 +2026,17 @@ public class I9_TextRuleOperation {
 
 					temp_eap_frame_message1 = wif_eapol_frame_struct;
 				}
-				
-				
-				
+
+
+
 				if(input_ssid_str_bytearr != null && input_bssid_str_bytearr != null &&
 						temp_eap_frame_message2 !=  null && temp_eap_frame_message1 != null ) {
-					
-		
-					
-					if (Arrays.equals(input_bssid_str_bytearr, temp_eap_frame_message1.get_wifi_bssid_Bytes()) && 
+
+
+
+					if (Arrays.equals(input_bssid_str_bytearr, temp_eap_frame_message1.get_wifi_bssid_Bytes()) &&
 							Arrays.equals(input_bssid_str_bytearr, temp_eap_frame_message2.get_wifi_bssid_Bytes())){
-						
+
 						add_used_wpa2_password(wp2_password_dictionary_list);
 						Wifi_Crack_Info_Struct matchCrackInfo = new Wifi_Crack_Info_Struct(input_ssid_str_bytearr,
 								temp_eap_frame_message1, temp_eap_frame_message2, area_policy_code_list, wp2_password_dictionary_list,
@@ -2046,30 +2046,30 @@ public class I9_TextRuleOperation {
 							wifiCrack_BSSID_InfoList.add(input_bssid_str);
 							wifiCrackInfoList.add(matchCrackInfo);
 						}
-			
-						
-						
+
+
+
 					}
 
-					
+
 				}
-				
-				
+
+
 
 			}
-			
 
-	
+
+
 			System.out.println("input_ssid_str_bytearr = "+Arrays.toString(input_ssid_str_bytearr));
 			System.out.println("input_bssid_str_bytearr = "+Arrays.toString(input_bssid_str_bytearr));
-			
+
 			System.out.println("temp_eap_frame_message1 = "+Arrays.toString(temp_eap_frame_message1.get_wifi_bssid_Bytes()));
 			System.out.println("temp_eap_frame_message2 = "+Arrays.toString(temp_eap_frame_message2.get_wifi_bssid_Bytes()));
-			
-			
 
-		
-			
+
+
+
+
 			System.out.println(" WIFI Beacon 帧数量:"+ wifiBeaconFrameStructList.size());
 			for (int i = 0; i < wifiBeaconFrameStructList.size(); i++) {
 				Wifi_Frame_AbsCommon_Struct wif_beacon_frame_struct = wifiBeaconFrameStructList.get(i);
@@ -2099,8 +2099,8 @@ public class I9_TextRuleOperation {
 						}
 
 					}
-					
-			
+
+
 
 				}
 
@@ -2112,21 +2112,21 @@ public class I9_TextRuleOperation {
 					Wifi_Crack_Info_Struct matchCrackInfo = new Wifi_Crack_Info_Struct(wif_beacon_frame_struct,
 							eap_frame_message1, eap_frame_message2, area_policy_code_list, wp2_password_dictionary_list,
 							tel_number_pre_5num_list);
-					
-					
+
+
 					if(!wifiCrack_BSSID_InfoList.contains(wif_beacon_frame_struct.get_wifi_ssid())) {
 						wifiCrack_BSSID_InfoList.add(wif_beacon_frame_struct.get_wifi_ssid());
 						wifiCrackInfoList.add(matchCrackInfo);
 					}
-					
+
 
 				}
 
 			}
-			
-			
-			
-		
+
+
+
+
 
 			System.out.println("总共解析的帧数量如下: wifiFrameStructList.size() = " + wifiFrameStructList.size()
 					+ "  mFile_CurSor_Position=" + mFile_CurSor_Position);
@@ -2143,41 +2143,41 @@ public class I9_TextRuleOperation {
 				if(crackWifiInfo.beacon_frame != null) {
 					System.out.println("wifi_" + (i + 1) + "【" + crackWifiInfo.beacon_frame.get_wifi_ssid() + "】");
 				}else {
-					 String ssid_name_temp = "";
+					String ssid_name_temp = "";
 
-					 try {
-						  ssid_name_temp = new String(crackWifiInfo.target_ssid_byte_arr,"UTF-8");
-					 }catch (UnsupportedEncodingException e) {
+					try {
+						ssid_name_temp = new String(crackWifiInfo.target_ssid_byte_arr,"UTF-8");
+					}catch (UnsupportedEncodingException e) {
 
-						    // TODO Auto-generated catch block
+						// TODO Auto-generated catch block
 
-						    e.printStackTrace();
+						e.printStackTrace();
 
-						    }
-				
+					}
+
 					System.out.println("wifi_" + (i + 1) + "【" + ssid_name_temp +"】__【target_ssid_byte_arr("+ByteAsHexString(crackWifiInfo.target_ssid_byte_arr)+")"+ "(手动输入 SSID["+input_ssid_str+"]["+ByteAsHexString(input_ssid_str_bytearr)+"]  BSSID["+input_bssid_str+"]["+ByteAsHexString(input_bssid_str_bytearr)+"]) 】");
 
-					
+
 				}
-	
+
 
 			}
 
 			System.out.println("提示信息:\n");
 
-			System.out.println(success_crack_tip);		
+			System.out.println(success_crack_tip);
 			for (int i = 0; i < wifiCrackInfoList.size(); i++) {
 				Wifi_Crack_Info_Struct crackWifiInfo = wifiCrackInfoList.get(i);
-				
-				
+
+
 				System.out.println("开始破解 当前搜索到的 可以暴力穷举破解wifi " + "wifi_" + (i + 1) + "【"
 						+ new String(crackWifiInfo.target_ssid_byte_arr) + "】");
-				
-				
-				
-//    	crackWifiInfo.begin_wifi_crack();   // 10个线程 去搞 ? 
+
+
+
+//    	crackWifiInfo.begin_wifi_crack();   // 10个线程 去搞 ?
 				int all_thread_count = Rule_53_Thread_Count; // 当前用于运算的线程数量
-				
+
 				mCountDownLatch = new CountDownLatch(all_thread_count);
 				for (int j = 0; j < all_thread_count; j++) { // 用 10 个 线程 去执行
 					Wifi_Crack_Info_Struct crackWifiInfo_cloneItem = crackWifiInfo.deep_clone(crackWifiInfo);
@@ -2206,7 +2206,7 @@ public class I9_TextRuleOperation {
 			mCountDownLatch.countDown();
 		}
 
-// 添加 常用 密码 
+		// 添加 常用 密码
 		void add_used_wpa2_password(ArrayList<String> pwd_list) {
 
 //	pwd_list.add("LINUXZSJ");
@@ -2217,8 +2217,8 @@ public class I9_TextRuleOperation {
 	}
 
 
-	
-	
+
+
 	public volatile static boolean success_crack_flag = false; // 成功破解 密码 标识符号
 	public volatile static String success_crack_tip = zbinPath+File.separator+"I9_wpa2_crack_rule53_pwd_dictionary.txt    该文件包含用户自定义明文密码"; // 成功破解 密码 标识符号 提示
 
@@ -2236,7 +2236,7 @@ public class I9_TextRuleOperation {
 
 		ArrayList<String> area_policy_code_alllist; // 默认的 所有的 区域列表
 		ArrayList<String> area_policy_code_sublist; // 身份证 前6位 列表 I9_wp2_crack_rule53_areacode.txt 依据线程id thread_count
-													// 来分
+		// 来分
 		ArrayList<String> wp2_password_dictionary_alllist;
 		ArrayList<String> wp2_password_dictionary_sublist; // wpa2的 密码字典 I9_wpa2_crack_rule53_pwd_dictionary.txt 依照线程分
 
@@ -2305,9 +2305,9 @@ public class I9_TextRuleOperation {
 
 			}
 
-//		thread[0][1]  pwd_8_begin_long=0  pwd_8_end_long=99999999  pwd_9_begin_long=0 pwd_9_end_long=999999999  
-//				year_search_begin=1876  year_search_end=1949  current_Year=2022 distance_year=73  YEAR_BEGIN_SEARCH_DEFAULT=1949  
-//				area_begin_index=0  area_end_index=1  area_all_length=3520  area_policy_code_sublist.size()=0 wpa_pwd_begin_index=0 
+//		thread[0][1]  pwd_8_begin_long=0  pwd_8_end_long=99999999  pwd_9_begin_long=0 pwd_9_end_long=999999999
+//				year_search_begin=1876  year_search_end=1949  current_Year=2022 distance_year=73  YEAR_BEGIN_SEARCH_DEFAULT=1949
+//				area_begin_index=0  area_end_index=1  area_all_length=3520  area_policy_code_sublist.size()=0 wpa_pwd_begin_index=0
 //				wpa_pwd_end_index=2 all_wpa_pwd_length=2  wp2_password_dictionary_sublist.size()=0
 
 			tel_code_pre5_sublist = new ArrayList<String>();
@@ -2352,13 +2352,13 @@ public class I9_TextRuleOperation {
 		Wifi_Crack_Info_Struct deep_clone(Wifi_Crack_Info_Struct crackInfo) {
 			Wifi_Crack_Info_Struct crack_clone =  null ;
 			if(crackInfo.beacon_frame == null) {
-				
-				 crack_clone = new Wifi_Crack_Info_Struct(crackInfo.target_ssid_byte_arr,
-							crackInfo.eap_frame_1, crackInfo.eap_frame_2, crackInfo.area_policy_code_alllist,
-							crackInfo.wp2_password_dictionary_alllist, crackInfo.tel_code_pre5_alllist);
+
+				crack_clone = new Wifi_Crack_Info_Struct(crackInfo.target_ssid_byte_arr,
+						crackInfo.eap_frame_1, crackInfo.eap_frame_2, crackInfo.area_policy_code_alllist,
+						crackInfo.wp2_password_dictionary_alllist, crackInfo.tel_code_pre5_alllist);
 			} else {
-				
-				 crack_clone = new Wifi_Crack_Info_Struct(crackInfo.beacon_frame,
+
+				crack_clone = new Wifi_Crack_Info_Struct(crackInfo.beacon_frame,
 						crackInfo.eap_frame_1, crackInfo.eap_frame_2, crackInfo.area_policy_code_alllist,
 						crackInfo.wp2_password_dictionary_alllist, crackInfo.tel_code_pre5_alllist);
 			}
@@ -2444,14 +2444,14 @@ public class I9_TextRuleOperation {
 			all_char_list.add("\"");
 
 		}
-		
-		
-		Wifi_Crack_Info_Struct(byte[] ssid_byte, Wifi_Frame_AbsCommon_Struct eap1,
-				Wifi_Frame_AbsCommon_Struct eap2,
 
-				ArrayList<String> area_code_list, ArrayList<String> wpa2_pwd_list, ArrayList<String> tel_list) {
+
+		Wifi_Crack_Info_Struct(byte[] ssid_byte, Wifi_Frame_AbsCommon_Struct eap1,
+							   Wifi_Frame_AbsCommon_Struct eap2,
+
+							   ArrayList<String> area_code_list, ArrayList<String> wpa2_pwd_list, ArrayList<String> tel_list) {
 			target_ssid_byte_arr = ssid_byte;
-	
+
 			eap_frame_1 = eap1;
 			eap_frame_2 = eap2;
 			wp2_password_dictionary_alllist = wpa2_pwd_list;
@@ -2476,12 +2476,12 @@ public class I9_TextRuleOperation {
 			init_all_char_list();
 
 		}
-		
+
 
 		Wifi_Crack_Info_Struct(Wifi_Frame_AbsCommon_Struct beacon, Wifi_Frame_AbsCommon_Struct eap1,
-				Wifi_Frame_AbsCommon_Struct eap2,
+							   Wifi_Frame_AbsCommon_Struct eap2,
 
-				ArrayList<String> area_code_list, ArrayList<String> wpa2_pwd_list, ArrayList<String> tel_list) {
+							   ArrayList<String> area_code_list, ArrayList<String> wpa2_pwd_list, ArrayList<String> tel_list) {
 			beacon_frame = beacon;
 			target_ssid_byte_arr = beacon_frame.get_wifi_ssid_Bytes();
 			eap_frame_1 = eap1;
@@ -2539,8 +2539,8 @@ public class I9_TextRuleOperation {
 		// 号码-前三位运行商--后四位地区-最后四位排序
 
 		private void begin_wifi_crack_inner(ArrayList<String> pwdList, byte[] ssid_bytes, byte[] ap_mac_bytes,
-				byte[] sta_mac_bytes, byte[] ap_nonce_bytes, byte[] sta_nonce_bytes, byte[] step2_data_bytes,
-				byte[] mic_bytes) {
+											byte[] sta_mac_bytes, byte[] ap_nonce_bytes, byte[] sta_nonce_bytes, byte[] step2_data_bytes,
+											byte[] mic_bytes) {
 
 			byte[] min_mac_bytes = Min_Byte(sta_mac_bytes, ap_mac_bytes);
 			byte[] max_mac_bytes = Max_Byte(sta_mac_bytes, ap_mac_bytes);
@@ -2562,14 +2562,14 @@ public class I9_TextRuleOperation {
 			if (pwdList.size() > 0) {
 				System.out.println("thread_id=" + thread_id + " 使用历史明文密码破解: 明文数量=" + pwdList.size()+"  明文文件:" +Rule_53_wp2_password_dictionary_file.getAbsolutePath());
 			}
-			
-			
+
+
 			long begin_time_long = System.currentTimeMillis();
 			long temp_time_long = System.currentTimeMillis();
 			int print_inteval_time = 1000;
 			int default_begin = 0 ;
 			int default_end = 0 ;
-			
+
 
 			for (int i = 0; i < pwdList.size(); i++) {
 				String password_temp_item = pwdList.get(i);
@@ -2578,11 +2578,11 @@ public class I9_TextRuleOperation {
 				if (success_crack_flag) {
 					return;
 				}
-				
+
 				if(i != 0 &&  (i % print_inteval_time) == 0) {
-					
-					
-					
+
+
+
 					long cur_time_long = System.currentTimeMillis();
 					long time_distance_long = cur_time_long - temp_time_long;
 					temp_time_long = cur_time_long;
@@ -2590,9 +2590,9 @@ public class I9_TextRuleOperation {
 
 
 					double percent = ((double) (i - default_begin) / (default_end - default_begin)) * 100;
-					
+
 					password_retry_calcul_percent = ((double) i / pwdList.size()) * 100;
-					
+
 //					System.out.println("thread_id=" + thread_id + " all_thread=" + thread_count + "  " + numberCount
 //							+ "位数字 " + "cur_number_str=" + get_match_numcount_digital_str + "  else_num="
 //							+ (default_end - i) + " persent=" + String.format("%.4f", percent) + "%"
@@ -2601,17 +2601,17 @@ public class I9_TextRuleOperation {
 //							+ String.format("%.4f", password_retry_calcul_percent) + "%  " + print_inteval_time
 //							+ "次密码尝试花销:" + (time_distance_long / 1000) + "秒 " + numberCount + "位密码破解以花销:"
 //							+ (time_alltake_long / 1000) + "秒 ");
-					
-					System.out.println("thread_id=[" + thread_id + "][" + thread_count + "] 进度="+String.format("%.4f", password_retry_calcul_percent) + "% "+
-					" 明文索引["+i+"]_sub["+pwdList.size()+"]_all["+wp2_password_dictionary_alllist.size()+"]="+password_temp_item 
-							+"  明文来自于"+Rule_53_wp2_password_dictionary_file.getAbsolutePath()+" "+ 
-							print_inteval_time+ "次密码尝试花销:" + (time_distance_long / 1000) + "秒 " + 
-							i+ "位密码破解以花销:" + (time_alltake_long / 1000) + "秒 " + 
 
-							
+					System.out.println("thread_id=[" + thread_id + "][" + thread_count + "] 进度="+String.format("%.4f", password_retry_calcul_percent) + "% "+
+							" 明文索引["+i+"]_sub["+pwdList.size()+"]_all["+wp2_password_dictionary_alllist.size()+"]="+password_temp_item
+							+"  明文来自于"+Rule_53_wp2_password_dictionary_file.getAbsolutePath()+" "+
+							print_inteval_time+ "次密码尝试花销:" + (time_distance_long / 1000) + "秒 " +
+							i+ "位密码破解以花销:" + (time_alltake_long / 1000) + "秒 " +
+
+
 							"");
 
-					
+
 
 				}
 
@@ -2620,104 +2620,104 @@ public class I9_TextRuleOperation {
 			if (success_crack_flag) { // 历史明文密码 破解了 wifi 那么 直接返回
 				return;
 			}
-			
+
 //			public  static int  namechar_2_3_areacode6 = 1; // 名字+6位areacode   一千万数据
 //			public  static int  digital_8_number = 2;  // 纯8位数字  一亿数据
 //			public  static int  namechar_2_3_birthday6 = 3;  // 姓氏+ 生日日期  1千两百万 + 3亿
 //			public  static int  digital_9_number = 4;  // 纯9位数字  十亿数据
-//			public  static int  tel_11_number = 5;  // 电话号码  40*  四十亿 
+//			public  static int  tel_11_number = 5;  // 电话号码  40*  四十亿
 
 			char[] crack_execute_order_chararr = Rule_53_Crack_Order_Default.toCharArray();
 			if(crack_execute_order_chararr == null || crack_execute_order_chararr.length <= 0 ) {
 				System.out.println("当前执行顺序为空! crack_execute_order_chararr = " + Arrays.toString(crack_execute_order_chararr));
 				return;
 			}
-			
+
 			for (int i = 0; i < crack_execute_order_chararr.length; i++) {
 				String curCrackOrder_Str = crack_execute_order_chararr[i]+"";
 				switch(curCrackOrder_Str) {
-				case "1":
-					System.out.println("使用 thread_id["+thread_id+"]["+thread_count+"] 规则【"+curCrackOrder_Str+"】 使用 名字+6位areacode 进行破解!! ");
+					case "1":
+						System.out.println("使用 thread_id["+thread_id+"]["+thread_count+"] 规则【"+curCrackOrder_Str+"】 使用 名字+6位areacode 进行破解!! ");
 
-					// 使用 名字+6位areacode 进行破解
-					begin_name_areacode_wifi_crack(ssid_bytes, ap_mac_bytes, sta_mac_bytes, ap_nonce_bytes, sta_nonce_bytes,
-							step2_data_bytes, mic_bytes);
-					if (success_crack_flag) { // 历史明文密码 破解了 wifi 那么 直接返回
-						return;
-					}
-					
-					break;
-					
-				case "2":
-					
-					System.out.println("使用 thread_id["+thread_id+"]["+thread_count+"] 规则【"+curCrackOrder_Str+"】 使用 8 位 数字 密码 进行破解!! ");
+						// 使用 名字+6位areacode 进行破解
+						begin_name_areacode_wifi_crack(ssid_bytes, ap_mac_bytes, sta_mac_bytes, ap_nonce_bytes, sta_nonce_bytes,
+								step2_data_bytes, mic_bytes);
+						if (success_crack_flag) { // 历史明文密码 破解了 wifi 那么 直接返回
+							return;
+						}
 
-					// 使用 8 位 数字 密码 进行破解 Begin
-					System.out.println("══════════════════════ thread[" + thread_id + "][" + thread_count
-							+ "] 使用 8 位 数字 密码 进行破解 " + " pwd_8_begin_long=" + pwd_8_begin_long + "  pwd_8_end_long="
-							+ pwd_8_end_long + " ══════════════════════ ");
-					begin_digital_wifi_crack(8, ssid_bytes, ap_mac_bytes, sta_mac_bytes, ap_nonce_bytes, sta_nonce_bytes,
-							step2_data_bytes, mic_bytes);
-					if (success_crack_flag) { // 历史明文密码 破解了 wifi 那么 直接返回
-						return;
-					}
+						break;
 
-					
-					break;
-					
-					
-				case "3":
-					System.out.println("使用 thread_id["+thread_id+"]["+thread_count+"] 规则【"+curCrackOrder_Str+"】 使用 名字+生日 姓氏+生日 进行 破解!! ");
+					case "2":
 
-					// 使用 名字+生日 姓氏+生日 进行 破解
-					begin_name_birthday_wifi_crack(ssid_bytes, ap_mac_bytes, sta_mac_bytes, ap_nonce_bytes, sta_nonce_bytes,
-							step2_data_bytes, mic_bytes);
-					if (success_crack_flag) { // 历史明文密码 破解了 wifi 那么 直接返回
-						return;
-					}
+						System.out.println("使用 thread_id["+thread_id+"]["+thread_count+"] 规则【"+curCrackOrder_Str+"】 使用 8 位 数字 密码 进行破解!! ");
 
-					
-					break;
-					
-				case "4":
-					// 使用 9 位 数字 密码 进行破解 Begin
-					System.out.println("使用 thread_id["+thread_id+"]["+thread_count+"] 规则【"+curCrackOrder_Str+"】 使用 9 位 数字 密码 进行破解!! ");
+						// 使用 8 位 数字 密码 进行破解 Begin
+						System.out.println("══════════════════════ thread[" + thread_id + "][" + thread_count
+								+ "] 使用 8 位 数字 密码 进行破解 " + " pwd_8_begin_long=" + pwd_8_begin_long + "  pwd_8_end_long="
+								+ pwd_8_end_long + " ══════════════════════ ");
+						begin_digital_wifi_crack(8, ssid_bytes, ap_mac_bytes, sta_mac_bytes, ap_nonce_bytes, sta_nonce_bytes,
+								step2_data_bytes, mic_bytes);
+						if (success_crack_flag) { // 历史明文密码 破解了 wifi 那么 直接返回
+							return;
+						}
 
-					System.out.println("══════════════════════thread[" + thread_id + "][" + thread_count
-							+ "] 使用 9 位 数字 密码 进行破解 " + " pwd_9_begin_long=" + pwd_9_begin_long + "  pwd_9_end_long="
-							+ pwd_9_end_long + " ══════════════════════ ");
-					begin_digital_wifi_crack(9, ssid_bytes, ap_mac_bytes, sta_mac_bytes, ap_nonce_bytes, sta_nonce_bytes,
-							step2_data_bytes, mic_bytes);
-					if (success_crack_flag) { // 历史明文密码 破解了 wifi 那么 直接返回
-						return;
-					}
-					break;
-					
-					
-				case "5":
-					System.out.println("使用 thread_id["+thread_id+"]["+thread_count+"] 规则【"+curCrackOrder_Str+"】 使用11 位 电话 号码 破解!! ");
 
-					// 使用11 位 电话 号码 破解 40 * 10000 * 10000
-					System.out.println("══════════════════════thread[" + thread_id + "][" + thread_count
-							+ "] 使用 9 位 数字 密码 进行破解 " + " pwd_9_begin_long=" + pwd_9_begin_long + "  pwd_9_end_long="
-							+ pwd_9_end_long + " ══════════════════════ ");
-					begin_11_telcode_wifi_crack(ssid_bytes, ap_mac_bytes, sta_mac_bytes, ap_nonce_bytes, sta_nonce_bytes,
-							step2_data_bytes, mic_bytes);
-					if (success_crack_flag) { // 历史明文密码 破解了 wifi 那么 直接返回
-						return;
-					}
+						break;
 
-					break;
-					
+
+					case "3":
+						System.out.println("使用 thread_id["+thread_id+"]["+thread_count+"] 规则【"+curCrackOrder_Str+"】 使用 名字+生日 姓氏+生日 进行 破解!! ");
+
+						// 使用 名字+生日 姓氏+生日 进行 破解
+						begin_name_birthday_wifi_crack(ssid_bytes, ap_mac_bytes, sta_mac_bytes, ap_nonce_bytes, sta_nonce_bytes,
+								step2_data_bytes, mic_bytes);
+						if (success_crack_flag) { // 历史明文密码 破解了 wifi 那么 直接返回
+							return;
+						}
+
+
+						break;
+
+					case "4":
+						// 使用 9 位 数字 密码 进行破解 Begin
+						System.out.println("使用 thread_id["+thread_id+"]["+thread_count+"] 规则【"+curCrackOrder_Str+"】 使用 9 位 数字 密码 进行破解!! ");
+
+						System.out.println("══════════════════════thread[" + thread_id + "][" + thread_count
+								+ "] 使用 9 位 数字 密码 进行破解 " + " pwd_9_begin_long=" + pwd_9_begin_long + "  pwd_9_end_long="
+								+ pwd_9_end_long + " ══════════════════════ ");
+						begin_digital_wifi_crack(9, ssid_bytes, ap_mac_bytes, sta_mac_bytes, ap_nonce_bytes, sta_nonce_bytes,
+								step2_data_bytes, mic_bytes);
+						if (success_crack_flag) { // 历史明文密码 破解了 wifi 那么 直接返回
+							return;
+						}
+						break;
+
+
+					case "5":
+						System.out.println("使用 thread_id["+thread_id+"]["+thread_count+"] 规则【"+curCrackOrder_Str+"】 使用11 位 电话 号码 破解!! ");
+
+						// 使用11 位 电话 号码 破解 40 * 10000 * 10000
+						System.out.println("══════════════════════thread[" + thread_id + "][" + thread_count
+								+ "] 使用 9 位 数字 密码 进行破解 " + " pwd_9_begin_long=" + pwd_9_begin_long + "  pwd_9_end_long="
+								+ pwd_9_end_long + " ══════════════════════ ");
+						begin_11_telcode_wifi_crack(ssid_bytes, ap_mac_bytes, sta_mac_bytes, ap_nonce_bytes, sta_nonce_bytes,
+								step2_data_bytes, mic_bytes);
+						if (success_crack_flag) { // 历史明文密码 破解了 wifi 那么 直接返回
+							return;
+						}
+
+						break;
+
 					default:
 						System.out.println("当前 curCrackOrder_Str ="+ curCrackOrder_Str +" 没有匹配到破解逻辑");
 						break;
-				
+
 				}
-				
-				
+
+
 			}
-			
+
 
 			// 前缀2字母 + 使用 6 位 数字 密码 进行破解 Begin aa11111 放弃
 //			System.out.println("══════════════════════thread["+thread_id+"]["+thread_count+"] 使用 9 位 数字 密码 进行破解 "+" pwd_9_begin_long="+pwd_9_begin_long+"  pwd_9_end_long="+pwd_9_end_long+" ══════════════════════ ");
@@ -2740,7 +2740,7 @@ public class I9_TextRuleOperation {
 		//
 
 		void begin_name_areacode_wifi_crack(byte[] ssid_bytes, byte[] ap_mac_bytes, byte[] sta_mac_bytes,
-				byte[] ap_nonce_bytes, byte[] sta_nonce_bytes, byte[] step2_data_bytes, byte[] mic_bytes) {
+											byte[] ap_nonce_bytes, byte[] sta_nonce_bytes, byte[] step2_data_bytes, byte[] mic_bytes) {
 
 			// a19490101
 
@@ -2748,10 +2748,10 @@ public class I9_TextRuleOperation {
 			// 对 area_policy_code_list 下手
 
 			// aa19490101
-			
-			
-			
-			
+
+
+
+
 			for (int i = 0; i < little_char_arr_A.length; i++) {
 				String char_A_str = little_char_arr_A[i];
 				for (int j = 0; j < little_char_arr_B.length; j++) {
@@ -2809,7 +2809,7 @@ public class I9_TextRuleOperation {
 //     begin_11_telcode_wifi_crack
 
 		void begin_11_telcode_wifi_crack(byte[] ssid_bytes, byte[] ap_mac_bytes, byte[] sta_mac_bytes,
-				byte[] ap_nonce_bytes, byte[] sta_nonce_bytes, byte[] step2_data_bytes, byte[] mic_bytes) {
+										 byte[] ap_nonce_bytes, byte[] sta_nonce_bytes, byte[] step2_data_bytes, byte[] mic_bytes) {
 
 			for (int i = 0; i < tel_code_pre5_sublist.size(); i++) {
 				String pre_5_telcode = tel_code_pre5_sublist.get(i);
@@ -2840,7 +2840,7 @@ public class I9_TextRuleOperation {
 		// 使用中国 名字 + 生日日期进行 破解
 		// 25*25*25*365 = 5703125 依据 thread_count 动态指定 year_search_begin year_search_end
 		void begin_name_birthday_wifi_crack(byte[] ssid_bytes, byte[] ap_mac_bytes, byte[] sta_mac_bytes,
-				byte[] ap_nonce_bytes, byte[] sta_nonce_bytes, byte[] step2_data_bytes, byte[] mic_bytes) {
+											byte[] ap_nonce_bytes, byte[] sta_nonce_bytes, byte[] step2_data_bytes, byte[] mic_bytes) {
 
 			// a19490101
 			for (int i = 0; i < little_char_arr_A.length; i++) {
@@ -2892,8 +2892,8 @@ public class I9_TextRuleOperation {
 		}
 
 		void begin_name_birthday_wifi_crack(String preName, int beginYear, int endYear, byte[] ssid_bytes,
-				byte[] ap_mac_bytes, byte[] sta_mac_bytes, byte[] ap_nonce_bytes, byte[] sta_nonce_bytes,
-				byte[] step2_data_bytes, byte[] mic_bytes) {
+											byte[] ap_mac_bytes, byte[] sta_mac_bytes, byte[] ap_nonce_bytes, byte[] sta_nonce_bytes,
+											byte[] step2_data_bytes, byte[] mic_bytes) {
 
 			long test_count = 0;
 			for (int i = beginYear; i <= endYear; i++) {
@@ -2941,8 +2941,8 @@ public class I9_TextRuleOperation {
 		// 1234567890abcdefghijklmnopqrstuvwxyz 爆炸了
 		//
 		void begin_xchars_xdigital_wifi_crack(int charCount, int numberCount, byte[] ssid_bytes, byte[] ap_mac_bytes,
-				byte[] sta_mac_bytes, byte[] ap_nonce_bytes, byte[] sta_nonce_bytes, byte[] step2_data_bytes,
-				byte[] mic_bytes) {
+											  byte[] sta_mac_bytes, byte[] ap_nonce_bytes, byte[] sta_nonce_bytes, byte[] step2_data_bytes,
+											  byte[] mic_bytes) {
 
 			// 0 , 0 ,0 , 0 , 0 ,0
 			// 0 , 0 ,0 , 0 , 0 , 1
@@ -2955,7 +2955,7 @@ public class I9_TextRuleOperation {
 //       多维for循环
 //       var loop_index = 0;
 // 		 for(a:A;b:B;c:C;d:D;e:E;f:F;g:G){
-//            var item =a+b+c+d+e+f+g; 	
+//            var item =a+b+c+d+e+f+g;
 //            loop_index++;
 //            print("loop_index="+loop_index+"  item="+item)
 // 	        }
@@ -2986,14 +2986,14 @@ public class I9_TextRuleOperation {
 
 		// 使用 前缀字母 后缀带数字的 密码
 		void begin_xdigital_xchars_wifi_crack(int numberCount, int charCount, byte[] ssid_bytes, byte[] ap_mac_bytes,
-				byte[] sta_mac_bytes, byte[] ap_nonce_bytes, byte[] sta_nonce_bytes, byte[] step2_data_bytes,
-				byte[] mic_bytes) {
+											  byte[] sta_mac_bytes, byte[] ap_nonce_bytes, byte[] sta_nonce_bytes, byte[] step2_data_bytes,
+											  byte[] mic_bytes) {
 
 		}
 
 		// 使用 纯数字 进行 破解 8 位 9位 10位 11位
 		void begin_digital_wifi_crack(int numberCount, byte[] ssid_bytes, byte[] ap_mac_bytes, byte[] sta_mac_bytes,
-				byte[] ap_nonce_bytes, byte[] sta_nonce_bytes, byte[] step2_data_bytes, byte[] mic_bytes) {
+									  byte[] ap_nonce_bytes, byte[] sta_nonce_bytes, byte[] step2_data_bytes, byte[] mic_bytes) {
 			long default_begin = pwd_8_begin_long;
 			long default_end = pwd_8_end_long;
 			MAX_CUR_COUNT = MAX_8_COUNT;
@@ -3081,8 +3081,8 @@ public class I9_TextRuleOperation {
 		}
 
 		private boolean begin_wifi_crack_inner_withstr(String pwd_str, byte[] ssid_bytes, byte[] ap_mac_bytes,
-				byte[] sta_mac_bytes, byte[] ap_nonce_bytes, byte[] sta_nonce_bytes, byte[] step2_data_bytes,
-				byte[] mic_bytes) {
+													   byte[] sta_mac_bytes, byte[] ap_nonce_bytes, byte[] sta_nonce_bytes, byte[] step2_data_bytes,
+													   byte[] mic_bytes) {
 			boolean is_success_flag = false;
 
 			String password_temp_item = pwd_str;
@@ -3132,7 +3132,7 @@ public class I9_TextRuleOperation {
 	class Wifi_Frame_Struct_00000001 extends Wifi_Frame_Base_Struct {
 
 		Wifi_Frame_Struct_00000001(byte[] block_type_bytes, byte[] block_head_length_bytes, byte[] all_frame_bytes,
-				int beginInFile, int endInFile) {
+								   int beginInFile, int endInFile) {
 			super(block_type_bytes, block_head_length_bytes, all_frame_bytes, beginInFile, endInFile);
 			// TODO Auto-generated constructor stub
 		}
@@ -3146,7 +3146,7 @@ public class I9_TextRuleOperation {
 	class Wifi_Frame_Struct_00000005 extends Wifi_Frame_Base_Struct {
 
 		Wifi_Frame_Struct_00000005(byte[] block_type_bytes, byte[] block_head_length_bytes, byte[] all_frame_bytes,
-				int beginInFile, int endInFile) {
+								   int beginInFile, int endInFile) {
 			super(block_type_bytes, block_head_length_bytes, all_frame_bytes, beginInFile, endInFile);
 			// TODO Auto-generated constructor stub
 		}
@@ -3203,7 +3203,7 @@ public class I9_TextRuleOperation {
 		int Captured_Packet_Real_Length; // 有效字节占用 32位对齐 后的实际占用
 		int Original_Packet_Real_Length;
 		byte[] Packet_Data_bytes; // 内部协议的解析 包数据 看得见的数据包的部分
-//		int Packet_Data_Visibal_Length ;   // wireshark 打开 可见帧数据长度 等于 Packet_Data_bytes 的长度
+		//		int Packet_Data_Visibal_Length ;   // wireshark 打开 可见帧数据长度 等于 Packet_Data_bytes 的长度
 		String timestamp_str; // 时间戳代表的内容
 		// ════════════════ Block Format End ════════════════
 
@@ -3241,7 +3241,7 @@ public class I9_TextRuleOperation {
 		// eapol-接受的帧有 发送的帧 没有 frame_check_sequeue 【路由器发送的帧 都有 frame_check_sequeue ？ 】
 		byte[] wifi_qosdata_frame_check_sequeue_4bytes; // Qos-data 数据的最后四个 校验码 注意 EAP-类型 没有该字段
 
-//   8 比特位 的 Flag   
+//   8 比特位 的 Flag
 //      .... ..10 = DS status: Frame from DS to a STA via AP(To DS: 0 From DS: 1) (0x2)    对于STA  0:发送帧   1:接收帧
 //    	.... .0.. = More Fragments: This is the last fragment     该帧是否还有分包数据
 //    	.... 0... = Retry: Frame is not being retransmitted       重传
@@ -3583,217 +3583,217 @@ public class I9_TextRuleOperation {
 			// https://www.radiotap.org/fields/XChannel.html
 			// https://www.radiotap.org/fields/MCS.html
 			Option_RadiotapPresent_Bit_ByteLength_Map.put(radiotap_present_tsft_1bit, 8);// .... .... .... .... ....
-																							// .... .... ...1 = TSFT:
-																							// radiotap.present.tsft ==
-																							// 1 【包含字段 radiotap.mactime
-																							// 08字节 】 #接收到数据包的时间戳单位毫秒
+			// .... .... ...1 = TSFT:
+			// radiotap.present.tsft ==
+			// 1 【包含字段 radiotap.mactime
+			// 08字节 】 #接收到数据包的时间戳单位毫秒
 			Option_RadiotapPresent_Bit_ByteLength_Map.put(radiotap_present_flags_2bit, 1);// .... .... .... .... ....
-																							// .... .... ..1. = Flags:
-																							// radiotap.present.flags ==
-																							// 1 【包含字段 radiotap.flags
-																							// 01字节-8比特位】 #标记
+			// .... .... ..1. = Flags:
+			// radiotap.present.flags ==
+			// 1 【包含字段 radiotap.flags
+			// 01字节-8比特位】 #标记
 			Option_RadiotapPresent_Bit_ByteLength_Map.put(radiotap_present_rate_3bit, 1);// .... .... .... .... ....
-																							// .... .... .1.. = Rate:
-																							// radiotap.present.rate ==
-																							// 1 【包含字段 radiotap.datarate
-																							// 01字节】 #速度
+			// .... .... .1.. = Rate:
+			// radiotap.present.rate ==
+			// 1 【包含字段 radiotap.datarate
+			// 01字节】 #速度
 			Option_RadiotapPresent_Bit_ByteLength_Map.put(radiotap_present_channel_4bit, 4);// .... .... .... .... ....
-																							// .... .... 1... = Channel:
-																							// radiotap.present.channel
-																							// == 1 【包含字段
-																							// radiotap.channel.freq 2字节
-																							// radiotap.channel.flags
-																							// 2字节 共4字节】#信道
+			// .... .... 1... = Channel:
+			// radiotap.present.channel
+			// == 1 【包含字段
+			// radiotap.channel.freq 2字节
+			// radiotap.channel.flags
+			// 2字节 共4字节】#信道
 			Option_RadiotapPresent_Bit_ByteLength_Map.put(radiotap_present_fhss_5bit, 2);// .... .... .... .... ....
-																							// .... ...0 .... = FHSS:
-																							// radiotap.present.fhss ==
-																							// 1 布尔值 #跳频技术
-																							// 【radiotap.fhss.hopset 1字节
-																							// radiotap.fhss.pattern 1字节
-																							// 共2字节】
+			// .... ...0 .... = FHSS:
+			// radiotap.present.fhss ==
+			// 1 布尔值 #跳频技术
+			// 【radiotap.fhss.hopset 1字节
+			// radiotap.fhss.pattern 1字节
+			// 共2字节】
 			Option_RadiotapPresent_Bit_ByteLength_Map.put(radiotap_present_dbm_antsignal_6bit, 1);// .... .... .... ....
-																									// .... .... ..1.
-																									// .... = dBm
-																									// Antenna Signal:
-																									// radiotap.present.dbm_antsignal
-																									// == 1 【包含字段
-																									// radiotap.dbm_antsignal
-																									// 1字节】 #天线信号
+			// .... .... ..1.
+			// .... = dBm
+			// Antenna Signal:
+			// radiotap.present.dbm_antsignal
+			// == 1 【包含字段
+			// radiotap.dbm_antsignal
+			// 1字节】 #天线信号
 			Option_RadiotapPresent_Bit_ByteLength_Map.put(radiotap_present_db_antnoise_7bit, 1);// .... .... .... ....
-																								// .... .... .0.. .... =
-																								// dBm Antenna Noise:
-																								// Boolean
-																								// radiotap.present.db_antnoise
-																								// == 1 【1字节】 #天线噪声
+			// .... .... .0.. .... =
+			// dBm Antenna Noise:
+			// Boolean
+			// radiotap.present.db_antnoise
+			// == 1 【1字节】 #天线噪声
 			Option_RadiotapPresent_Bit_ByteLength_Map.put(radiotap_present_lock_quality_8bit, 2);// .... .... .... ....
-																									// .... .... 0...
-																									// .... = Lock
-																									// Quality: Boolean
-																									// radiotap.present.lock_quality
-																									// == 1 【2字节】 Barker
-																									// Lock的质量. 单调不降低,
-																									// 锁定强度更高.
-																									// 数据表中称为“信号质量”
+			// .... .... 0...
+			// .... = Lock
+			// Quality: Boolean
+			// radiotap.present.lock_quality
+			// == 1 【2字节】 Barker
+			// Lock的质量. 单调不降低,
+			// 锁定强度更高.
+			// 数据表中称为“信号质量”
 			Option_RadiotapPresent_Bit_ByteLength_Map.put(radiotap_present_tx_attenuation_9bit, 2);// .... .... ....
-																									// .... .... ...0
-																									// .... .... = TX
-																									// Attenuation:
-																									// Boolean无数据
-																									// radiotap.present.tx_attenuation
-																									// == 1 【2字节】 u16
+			// .... .... ...0
+			// .... .... = TX
+			// Attenuation:
+			// Boolean无数据
+			// radiotap.present.tx_attenuation
+			// == 1 【2字节】 u16
 			Option_RadiotapPresent_Bit_ByteLength_Map.put(radiotap_present_db_tx_attenuation_10bit, 2);// .... .... ....
-																										// .... ....
-																										// ..0. ....
-																										// .... = dB TX
-																										// Attenuation:
-																										// Boolean无数据
-																										// 【2字节】 u16
-																										// radiotap.present.db_tx_attenuation
-																										// == 1
+			// .... ....
+			// ..0. ....
+			// .... = dB TX
+			// Attenuation:
+			// Boolean无数据
+			// 【2字节】 u16
+			// radiotap.present.db_tx_attenuation
+			// == 1
 			Option_RadiotapPresent_Bit_ByteLength_Map.put(radiotap_present_dbm_tx_power_11bit, 1);// .... .... .... ....
-																									// .... .0.. ....
-																									// .... = dBm TX
-																									// Power:
-																									// radiotap.present.dbm_tx_power
-																									// == 1 【包含字段
-																									// radiotap.不知道
-																									// 01字节】
-																									// 发射功率以dBm(1毫瓦参考分贝)表示.
-																									// 这是在天线端口测量的绝对功率电平
+			// .... .0.. ....
+			// .... = dBm TX
+			// Power:
+			// radiotap.present.dbm_tx_power
+			// == 1 【包含字段
+			// radiotap.不知道
+			// 01字节】
+			// 发射功率以dBm(1毫瓦参考分贝)表示.
+			// 这是在天线端口测量的绝对功率电平
 			Option_RadiotapPresent_Bit_ByteLength_Map.put(radiotap_present_antenna_12bit, 1);// .... .... .... .... ....
-																								// 1... .... .... =
-																								// Antenna:
-																								// radiotap.present.antenna
-																								// == 1 【包含字段
-																								// radiotap.antenna
-																								// 01字节】 #天线
+			// 1... .... .... =
+			// Antenna:
+			// radiotap.present.antenna
+			// == 1 【包含字段
+			// radiotap.antenna
+			// 01字节】 #天线
 			Option_RadiotapPresent_Bit_ByteLength_Map.put(radiotap_present_db_antsignal_13bit, 1);// .... .... .... ....
-																									// ...0 .... ....
-																									// .... = dB Antenna
-																									// Signal:
-																									// radiotap.present.db_antsignal
-																									// == 1 【1字节】
-																									// 天线处的RF信号功率,
-																									// 与任意固定参考之间的分贝差
+			// ...0 .... ....
+			// .... = dB Antenna
+			// Signal:
+			// radiotap.present.db_antsignal
+			// == 1 【1字节】
+			// 天线处的RF信号功率,
+			// 与任意固定参考之间的分贝差
 			Option_RadiotapPresent_Bit_ByteLength_Map.put(radiotap_present_db_antnoise_14bit, 1);// .... .... .... ....
-																									// ..0. .... ....
-																									// .... = dB Antenna
-																									// Noise:
-																									// radiotap.present.db_antnoise
-																									// == 1 【1字节】
-																									// 天线的RF噪声功率,
-																									// 与任意固定参考之间的分贝差.
-																									// 该字段包含单个无符号的8位值
+			// ..0. .... ....
+			// .... = dB Antenna
+			// Noise:
+			// radiotap.present.db_antnoise
+			// == 1 【1字节】
+			// 天线的RF噪声功率,
+			// 与任意固定参考之间的分贝差.
+			// 该字段包含单个无符号的8位值
 			Option_RadiotapPresent_Bit_ByteLength_Map.put(radiotap_present_rxflags_15bit, 2);// .... .... .... .... .1..
-																								// .... .... .... = RX
-																								// flags:
-																								// radiotap.present.rxflags
-																								// == 1 【包含字段
-																								// radiotap.rxflags
-																								// 02字节】 #接收标识
+			// .... .... .... = RX
+			// flags:
+			// radiotap.present.rxflags
+			// == 1 【包含字段
+			// radiotap.rxflags
+			// 02字节】 #接收标识
 			Option_RadiotapPresent_Bit_ByteLength_Map.put(radiotap_present_txflags_16bit, 3);// .... .... .... .... 0...
-																								// .... .... .... = TX
-																								// flags:
-																								// radiotap.present.txflags
-																								// == 1 【包含字段
-																								// radiotap.txflags
-																								// 02字节】#发送标识 暂时
-																								// 默认后面会带有一个1个字节的 奇怪点
-																								// 2或3 unknown TLV data:
-																								// 00
+			// .... .... .... = TX
+			// flags:
+			// radiotap.present.txflags
+			// == 1 【包含字段
+			// radiotap.txflags
+			// 02字节】#发送标识 暂时
+			// 默认后面会带有一个1个字节的 奇怪点
+			// 2或3 unknown TLV data:
+			// 00
 			Option_RadiotapPresent_Bit_ByteLength_Map.put(radiotap_present_xchannel_19bit, 8);// .... .... .... .0..
-																								// .... .... .... .... =
-																								// Channel+:
-																								// radiotap.present.xchannel
-																								// == 1 【8字节】 u32 flags,
-																								// u16 freq, u8 channel,
-																								// u8 maxpower
-																								// https://www.radiotap.org/fields/XChannel.html
+			// .... .... .... .... =
+			// Channel+:
+			// radiotap.present.xchannel
+			// == 1 【8字节】 u32 flags,
+			// u16 freq, u8 channel,
+			// u8 maxpower
+			// https://www.radiotap.org/fields/XChannel.html
 			Option_RadiotapPresent_Bit_ByteLength_Map.put(radiotap_present_mcs_20bit, 3);// .... .... .... 0... ....
-																							// .... .... .... = MCS
-																							// information:
-																							// radiotap.present.mcs == 1
-																							// 【包含字段 radiotap.mcs 03字节】
+			// .... .... .... = MCS
+			// information:
+			// radiotap.present.mcs == 1
+			// 【包含字段 radiotap.mcs 03字节】
 			Option_RadiotapPresent_Bit_ByteLength_Map.put(radiotap_present_ampdu_21bit, 8);// .... .... ...0 .... ....
-																							// .... .... .... = A-MPDU
-																							// Status:
-																							// radiotap.present.ampdu ==
-																							// 1 【8字节】 u32 reference
-																							// number, u16 flags, u8
-																							// delimiter CRC value, u8
-																							// reserved ## Aggregate
-																							// MPDU, MPDU 帧聚合
-																							// 进一步提高效率和可靠性,增加了MPDU帧的大小和A-MPDU帧的大小
+			// .... .... .... = A-MPDU
+			// Status:
+			// radiotap.present.ampdu ==
+			// 1 【8字节】 u32 reference
+			// number, u16 flags, u8
+			// delimiter CRC value, u8
+			// reserved ## Aggregate
+			// MPDU, MPDU 帧聚合
+			// 进一步提高效率和可靠性,增加了MPDU帧的大小和A-MPDU帧的大小
 			Option_RadiotapPresent_Bit_ByteLength_Map.put(radiotap_present_vht_22bit, 8);// .... .... ..0. .... ....
-																							// .... .... .... = VHT
-																							// information:
-																							// radiotap.present.vht == 1
-																							// 【8字节】 u16 known, u8
-																							// flags, u8 bandwidth, u8
-																							// mcs_nss[4], u8 coding, u8
-																							// group_id, u16 partial_aid
-																							// ## very high traslation
+			// .... .... .... = VHT
+			// information:
+			// radiotap.present.vht == 1
+			// 【8字节】 u16 known, u8
+			// flags, u8 bandwidth, u8
+			// mcs_nss[4], u8 coding, u8
+			// group_id, u16 partial_aid
+			// ## very high traslation
 			Option_RadiotapPresent_Bit_ByteLength_Map.put(radiotap_present_timestamp_23bit, 12);// .... .... .0.. ....
-																								// .... .... .... .... =
-																								// frame timestamp:
-																								// radiotap.present.timestamp
-																								// == 1 u64 timestamp,
-																								// u16 accuracy, u8
-																								// unit/position, u8
-																								// flags 【包含字段
-																								// radiotap.timestamp
-																								// timestampinfo-12字节(
-																								// timestamp8+ accuracy2
-																								// +unit2)】
+			// .... .... .... .... =
+			// frame timestamp:
+			// radiotap.present.timestamp
+			// == 1 u64 timestamp,
+			// u16 accuracy, u8
+			// unit/position, u8
+			// flags 【包含字段
+			// radiotap.timestamp
+			// timestampinfo-12字节(
+			// timestamp8+ accuracy2
+			// +unit2)】
 			Option_RadiotapPresent_Bit_ByteLength_Map.put(radiotap_present_he_24bit, 12);// .... .... 0... .... ....
-																							// .... .... .... = HE
-																							// information:
-																							// radiotap.present.he == 1
-																							// 【12字节】u16 data1, data2,
-																							// data3, data4, data5,
-																							// data6 多选
+			// .... .... .... = HE
+			// information:
+			// radiotap.present.he == 1
+			// 【12字节】u16 data1, data2,
+			// data3, data4, data5,
+			// data6 多选
 			Option_RadiotapPresent_Bit_ByteLength_Map.put(radiotap_present_he_mu_25bit, 6);// .... ...0 .... .... ....
-																							// .... .... .... = HE-MU
-																							// information:
-																							// radiotap.present.he_mu ==
-																							// 1 【6字节】 u16 flags1 u16
-																							// flags2 u8 RU_channel1[4]
-																							// u8 RU_channel2[4]
+			// .... .... .... = HE-MU
+			// information:
+			// radiotap.present.he_mu ==
+			// 1 【6字节】 u16 flags1 u16
+			// flags2 u8 RU_channel1[4]
+			// u8 RU_channel2[4]
 			Option_RadiotapPresent_Bit_ByteLength_Map.put(radiotap_present_0_length_psdu_27bit, 1);// .... .0.. ....
-																									// .... .... ....
-																									// .... .... = 0
-																									// Length PSDU:
-																									// radiotap.present.0_length.psdu
-																									// == 1 【1字节】u8 type
+			// .... .... ....
+			// .... .... = 0
+			// Length PSDU:
+			// radiotap.present.0_length.psdu
+			// == 1 【1字节】u8 type
 			Option_RadiotapPresent_Bit_ByteLength_Map.put(radiotap_present_l_sig_28bit, 4);// .... 0... .... .... ....
-																							// .... .... .... = L-SIG:
-																							// radiotap.present.l_sig ==
-																							// 1 【4字节】 u16 data1, data2
+			// .... .... .... = L-SIG:
+			// radiotap.present.l_sig ==
+			// 1 【4字节】 u16 data1, data2
 			Option_RadiotapPresent_Bit_ByteLength_Map.put(radiotap_present_tlv_29bit, 0);// ...0 .... .... .... ....
-																							// .... .... .... = TLVs:
-																							// radiotap.present.tlv == 1
-																							// 类型-长度-值 的结构动态解析
+			// .... .... .... = TLVs:
+			// radiotap.present.tlv == 1
+			// 类型-长度-值 的结构动态解析
 			Option_RadiotapPresent_Bit_ByteLength_Map.put(radiotap_present_rtap_ns_30bit, 0);// ..0. .... .... .... ....
-																								// .... .... .... =
-																								// Radiotap NS next:
-																								// Boolean无数据
-																								// radiotap.present.rtap_ns
-																								// == 1【未包含显示字段
-																								// 标记属性为True False 】
+			// .... .... .... =
+			// Radiotap NS next:
+			// Boolean无数据
+			// radiotap.present.rtap_ns
+			// == 1【未包含显示字段
+			// 标记属性为True False 】
 			Option_RadiotapPresent_Bit_ByteLength_Map.put(radiotap_present_vendor_ns_31bit, 0);// .0.. .... .... ....
-																								// .... .... .... .... =
-																								// Vendor NS next:
-																								// Boolean无数据
-																								// radiotap.present.vendor_ns
-																								// == 1【未包含显示字段
-																								// 标记属性为True False 】
+			// .... .... .... .... =
+			// Vendor NS next:
+			// Boolean无数据
+			// radiotap.present.vendor_ns
+			// == 1【未包含显示字段
+			// 标记属性为True False 】
 			Option_RadiotapPresent_Bit_ByteLength_Map.put(radiotap_present_ext_32bit, 0);// 0... .... .... .... ....
-																							// .... .... .... = Ext:
-																							// Boolean无数据
-																							// 标识是否还有present存在了
-																							// 多个present_flag
-																							// radiotap.present.ext == 1
-																							// 【present中的Ext代表着还有另外的present字段存在】
+			// .... .... .... = Ext:
+			// Boolean无数据
+			// 标识是否还有present存在了
+			// 多个present_flag
+			// radiotap.present.ext == 1
+			// 【present中的Ext代表着还有另外的present字段存在】
 
 		}
 
@@ -3906,7 +3906,7 @@ public class I9_TextRuleOperation {
 				second_8_str = "0" + second_8;
 			}
 
-//		                long_time_stamp_test=1396710020801071 long_time_stamp_test.length=16 
+//		                long_time_stamp_test=1396710020801071 long_time_stamp_test.length=16
 //		                                     1560950936695086634
 			String time_stamp_style2_str = " " + year_8_str + "-" + month_8_str + "-" + day_8_str + "_" + hour_8_str
 					+ ":" + minute_8_str + ":" + second_8_str + "." + long_time_stamp_ws + " long_time_stamp_test="
@@ -4026,22 +4026,22 @@ public class I9_TextRuleOperation {
 
 		}
 
-// STA 接受帧(DS=2)     RA    TA   DA    SA    八个 地址 
-// .... ..10 = DS status: Frame from DS to a STA via AP(To DS: 0 From DS: 1) (0x2)        
+// STA 接受帧(DS=2)     RA    TA   DA    SA    八个 地址
+// .... ..10 = DS status: Frame from DS to a STA via AP(To DS: 0 From DS: 1) (0x2)
 //        E0 B9 A5 1F E7 94 【六个字节 wlan.ra == E0:B9:A5:1F:E7:94 接收Mac地址】
-//        20 DC E6 4F 6C 90【六字节 传输Mac地址 wlan.ta == 20:DC:E6:4F:6C:90 】	
+//        20 DC E6 4F 6C 90【六字节 传输Mac地址 wlan.ta == 20:DC:E6:4F:6C:90 】
 //        20 DC E6 4F 6C 90【六字节 原Mac地址 wlan.sa ==20:DC:E6:4F:6C:90 】
-//     没有 目的 DA , 目的地址 就是 RA 接收地址 
+//     没有 目的 DA , 目的地址 就是 RA 接收地址
 
 // STA 发送帧(DS=1)
-//.... ..01 = DS status: Frame from STA to DS via an AP (To DS: 1 From DS: 0) (0x1)        
+//.... ..01 = DS status: Frame from STA to DS via an AP (To DS: 1 From DS: 0) (0x1)
 //     20 DC E6 4F 6C 90【六个字节 wlan.ra == 20 DC:E6:4F:6C:90 接收Mac地址】
-//     E0 B9 A5 1F E7 94 【六字节  wlan.ta == E0:B9:A5:1F:E7:94 】 
-//     20 DC  E6 4F 6C 90 【六字节 目的Mac地址 wlan.da ==20:DC:E6:4F:6C:90 】   
-//        
+//     E0 B9 A5 1F E7 94 【六字节  wlan.ta == E0:B9:A5:1F:E7:94 】
+//     20 DC  E6 4F 6C 90 【六字节 目的Mac地址 wlan.da ==20:DC:E6:4F:6C:90 】
+//
 
 		void IE80211_Format_Parser() {
-//    radiotrap 帧的  Header_length_Int 规定了 头的大小  那么 依据 此   就 可以得到  IE80211 格式的开头  
+//    radiotrap 帧的  Header_length_Int 规定了 头的大小  那么 依据 此   就 可以得到  IE80211 格式的开头
 
 			int wifi_type_begin_position_length1 = Header_length_Int;
 			int wifi_type_end_position_length1 = Header_length_Int + 1 - 1;
@@ -4171,9 +4171,9 @@ public class I9_TextRuleOperation {
 
 				// 结尾是 总长度 - 4 - 1
 
-//			
-//			int  Original_Packet_Real_Length; 	
-//			byte[] Packet_Data_bytes ;  // 内部协议的解析 包数据 
+//
+//			int  Original_Packet_Real_Length;
+//			byte[] Packet_Data_bytes ;  // 内部协议的解析 包数据
 
 				int wifi_qos_data_begin_position_8bytes = wifi_ccmp_paramters_end_position_8bytes + 1;
 				int wifi_qos_data_end_position_8bytes = Original_Packet_Real_Length - 4 - 1;
@@ -4232,10 +4232,10 @@ public class I9_TextRuleOperation {
 
 			wifi_80211_wireless_management_beacon_bytes = beginIndex_endIndex_byteArr(Packet_Data_bytes,
 					wifi_sequence_frame_number_end_position_2bytes + 1, Packet_Data_bytes.length - 4 - 1); // 最后有四个
-																										// Squeue
+			// Squeue
 // 当前查询 子byte数组     beginIndex=42  endIndex=39  cur_byte_length=-2异常  请检查!  java.lang.NullPointerException
 			if(wifi_80211_wireless_management_beacon_bytes == null) {
-				return ;   // 
+				return ;   //
 			}
 			System.out.println("wifi_80211_wireless_management_beacon_bytes.length = "
 					+ wifi_80211_wireless_management_beacon_bytes.length);
@@ -4311,11 +4311,11 @@ public class I9_TextRuleOperation {
 				cur_tagged_position = tagged_paramter_field_end_position_bytes + 1;
 
 				if (tagged_paramter_fields_bytes == null) {
-//					System.out.println("package_number = "+package_number+" cur_tagged_position="+(cur_tagged_position)+" (beacon_management_bytes.length-2)="+(beacon_management_bytes.length -2)+"  tagged_paramter_field_begin_position_bytes="+tagged_paramter_field_begin_position_bytes+"  tagged_paramter_field_end_position_bytes="+tagged_paramter_field_end_position_bytes+"    tagged_type_index="+tagged_type_index+" tagged_type_length="+tagged_type_length+"   filed.length="+tagged_paramter_fields_bytes+"  == null");	
+//					System.out.println("package_number = "+package_number+" cur_tagged_position="+(cur_tagged_position)+" (beacon_management_bytes.length-2)="+(beacon_management_bytes.length -2)+"  tagged_paramter_field_begin_position_bytes="+tagged_paramter_field_begin_position_bytes+"  tagged_paramter_field_end_position_bytes="+tagged_paramter_field_end_position_bytes+"    tagged_type_index="+tagged_type_index+" tagged_type_length="+tagged_type_length+"   filed.length="+tagged_paramter_fields_bytes+"  == null");
 					continue;
 				} else {
 
-//					System.out.println("package_number = "+package_number+" cur_tagged_position="+(cur_tagged_position)+" (beacon_management_bytes.length-2)="+(beacon_management_bytes.length -2)+"  tagged_paramter_field_begin_position_bytes="+tagged_paramter_field_begin_position_bytes+"  tagged_paramter_field_end_position_bytes="+tagged_paramter_field_end_position_bytes+"    tagged_type_index="+tagged_type_index+" tagged_type_length="+tagged_type_length+"   filed.length="+tagged_paramter_fields_bytes.length);	
+//					System.out.println("package_number = "+package_number+" cur_tagged_position="+(cur_tagged_position)+" (beacon_management_bytes.length-2)="+(beacon_management_bytes.length -2)+"  tagged_paramter_field_begin_position_bytes="+tagged_paramter_field_begin_position_bytes+"  tagged_paramter_field_end_position_bytes="+tagged_paramter_field_end_position_bytes+"    tagged_type_index="+tagged_type_index+" tagged_type_length="+tagged_type_length+"   filed.length="+tagged_paramter_fields_bytes.length);
 
 				}
 
@@ -4333,7 +4333,7 @@ public class I9_TextRuleOperation {
 							wifi_80211_wireless_management_beacon_ssid_bytes.length);
 
 					ssid_name = ssid_name_temp;
-//					System.out.println("ssid_hexstr="+ssid_hexstr +"   ssid_name="+ssid_name  );	
+//					System.out.println("ssid_hexstr="+ssid_hexstr +"   ssid_name="+ssid_name  );
 
 				} else if (tagged_type_index == 3) { // typeid=3 就是 channel
 
@@ -4346,12 +4346,12 @@ public class I9_TextRuleOperation {
 					wifi_80211_wireless_management_beacon_channel_id = (int) (wifi_80211_wireless_management_beacon_channel_bytes[0]
 							& 0x0FF);
 
-//					System.out.println("wifi_80211_wireless_management_beacon_channel_id="+wifi_80211_wireless_management_beacon_channel_id   );	
+//					System.out.println("wifi_80211_wireless_management_beacon_channel_id="+wifi_80211_wireless_management_beacon_channel_id   );
 
 					wifi_80211_wireless_management_beacon_channel_hz = getChannelId_2_ChanneHz(
 							wifi_80211_wireless_management_beacon_channel_id);
 
-//					System.out.println("wifi_80211_wireless_management_beacon_channel_id="+wifi_80211_wireless_management_beacon_channel_id  +"    wifi_80211_wireless_management_beacon_channel_hz="+wifi_80211_wireless_management_beacon_channel_hz );	
+//					System.out.println("wifi_80211_wireless_management_beacon_channel_id="+wifi_80211_wireless_management_beacon_channel_id  +"    wifi_80211_wireless_management_beacon_channel_hz="+wifi_80211_wireless_management_beacon_channel_hz );
 
 				}
 
@@ -4442,7 +4442,7 @@ public class I9_TextRuleOperation {
 					wifi_logical_link_conteolflag_end_position_8bytes);
 
 			if(wifi_logical_link_conteolflag_8bytes == null) {
-				
+
 				return;
 			}
 			byte[] wifi_logical_link_type_2bytes_temp = {
@@ -4469,65 +4469,65 @@ public class I9_TextRuleOperation {
 			// 当前 读取到的 位置 int wifi_logical_link_conteolflag_end_position_8bytes
 			switch (wifi_logical_link_type_2bytes_hexstr) {
 
-			case "888e": // eapol--888e eap-888e
+				case "888e": // eapol--888e eap-888e
 
 //	        byte[] wifi_8021x_auth_version_1byte;  // Version: 802.1X-2001 (1)
-//	        byte[] wifi_8021x_auth_type_1byte;  // eapol==3   eap=0 
-//	        byte[] wifi_8021x_auth_length_2byte; 
+//	        byte[] wifi_8021x_auth_type_1byte;  // eapol==3   eap=0
+//	        byte[] wifi_8021x_auth_length_2byte;
 
-				int wifi_8021x_auth_version_begin_position_1byte = wifi_logical_link_conteolflag_end_position_8bytes
-						+ 1;
-				int wifi_8021x_auth_version_end_position_1byte = wifi_8021x_auth_version_begin_position_1byte + 1 - 1;
-				wifi_8021x_auth_version_1byte = beginIndex_endIndex_byteArr(Packet_Data_bytes,
-						wifi_8021x_auth_version_begin_position_1byte, wifi_8021x_auth_version_end_position_1byte);
+					int wifi_8021x_auth_version_begin_position_1byte = wifi_logical_link_conteolflag_end_position_8bytes
+							+ 1;
+					int wifi_8021x_auth_version_end_position_1byte = wifi_8021x_auth_version_begin_position_1byte + 1 - 1;
+					wifi_8021x_auth_version_1byte = beginIndex_endIndex_byteArr(Packet_Data_bytes,
+							wifi_8021x_auth_version_begin_position_1byte, wifi_8021x_auth_version_end_position_1byte);
 
-				int wifi_8021x_auth_type_begin_position_1byte = wifi_8021x_auth_version_end_position_1byte + 1;
-				int wifi_8021x_auth_type_end_position_1byte = wifi_8021x_auth_type_begin_position_1byte + 1 - 1;
-				wifi_8021x_auth_type_1byte = beginIndex_endIndex_byteArr(Packet_Data_bytes,
-						wifi_8021x_auth_type_begin_position_1byte, wifi_8021x_auth_type_end_position_1byte);
+					int wifi_8021x_auth_type_begin_position_1byte = wifi_8021x_auth_version_end_position_1byte + 1;
+					int wifi_8021x_auth_type_end_position_1byte = wifi_8021x_auth_type_begin_position_1byte + 1 - 1;
+					wifi_8021x_auth_type_1byte = beginIndex_endIndex_byteArr(Packet_Data_bytes,
+							wifi_8021x_auth_type_begin_position_1byte, wifi_8021x_auth_type_end_position_1byte);
 
-				int wifi_8021x_auth_length_begin_position_2byte = wifi_8021x_auth_type_end_position_1byte + 1;
-				int wifi_8021x_auth_length_end_position_2byte = wifi_8021x_auth_length_begin_position_2byte + 2 - 1;
-				wifi_8021x_auth_length_2byte = beginIndex_endIndex_byteArr(Packet_Data_bytes,
-						wifi_8021x_auth_length_begin_position_2byte, wifi_8021x_auth_length_end_position_2byte);
+					int wifi_8021x_auth_length_begin_position_2byte = wifi_8021x_auth_type_end_position_1byte + 1;
+					int wifi_8021x_auth_length_end_position_2byte = wifi_8021x_auth_length_begin_position_2byte + 2 - 1;
+					wifi_8021x_auth_length_2byte = beginIndex_endIndex_byteArr(Packet_Data_bytes,
+							wifi_8021x_auth_length_begin_position_2byte, wifi_8021x_auth_length_end_position_2byte);
 
-				wifi_8021x_auth_version_int = wifi_8021x_auth_version_1byte[0];
-				wifi_8021x_auth_type_int = wifi_8021x_auth_type_1byte[0];
+					wifi_8021x_auth_version_int = wifi_8021x_auth_version_1byte[0];
+					wifi_8021x_auth_type_int = wifi_8021x_auth_type_1byte[0];
 
-				wifi_8021x_auth_length_int = merge2ByteToInt(wifi_8021x_auth_length_2byte[0],
-						wifi_8021x_auth_length_2byte[1]);
+					wifi_8021x_auth_length_int = merge2ByteToInt(wifi_8021x_auth_length_2byte[0],
+							wifi_8021x_auth_length_2byte[1]);
 
-				if (wifi_8021x_auth_type_int == 3) { // eapol帧
+					if (wifi_8021x_auth_type_int == 3) { // eapol帧
 
-					int wifi_8021x_auth_data_begin_position_bytes = wifi_8021x_auth_length_end_position_2byte + 1;
-					int wifi_8021x_auth_data_end_position_bytes = wifi_8021x_auth_data_begin_position_bytes
-							+ wifi_8021x_auth_length_int - 1;
-					wifi_eapol_auth_data_bytes = beginIndex_endIndex_byteArr(Packet_Data_bytes,
-							wifi_8021x_auth_data_begin_position_bytes, wifi_8021x_auth_data_end_position_bytes);
+						int wifi_8021x_auth_data_begin_position_bytes = wifi_8021x_auth_length_end_position_2byte + 1;
+						int wifi_8021x_auth_data_end_position_bytes = wifi_8021x_auth_data_begin_position_bytes
+								+ wifi_8021x_auth_length_int - 1;
+						wifi_eapol_auth_data_bytes = beginIndex_endIndex_byteArr(Packet_Data_bytes,
+								wifi_8021x_auth_data_begin_position_bytes, wifi_8021x_auth_data_end_position_bytes);
 
-					// 所有的 auth data 包含 length
-					wifi_eapol_all_data_bytes = beginIndex_endIndex_byteArr(Packet_Data_bytes,
-							wifi_8021x_auth_version_begin_position_1byte, wifi_8021x_auth_data_end_position_bytes);
+						// 所有的 auth data 包含 length
+						wifi_eapol_all_data_bytes = beginIndex_endIndex_byteArr(Packet_Data_bytes,
+								wifi_8021x_auth_version_begin_position_1byte, wifi_8021x_auth_data_end_position_bytes);
 
-					parser_80211_eap_frame(wifi_eapol_auth_data_bytes); // 开始解析 eapol-data 的 数据
+						parser_80211_eap_frame(wifi_eapol_auth_data_bytes); // 开始解析 eapol-data 的 数据
 
-				} else if (wifi_8021x_auth_type_int == 0) { // eap tlsv1.2 等 其他帧
+					} else if (wifi_8021x_auth_type_int == 0) { // eap tlsv1.2 等 其他帧
 
-				}
+					}
 
-				break;
+					break;
 
-			case "0806": // arp--0806
+				case "0806": // arp--0806
 
-				break;
+					break;
 
-			case "0800": // dns--0800 tlsv1.2
+				case "0800": // dns--0800 tlsv1.2
 
-				break;
+					break;
 
-			default:
-				System.out.println(
-						" wifi_logical_link_type_2bytes_hexstr=" + wifi_logical_link_type_2bytes_hexstr + " 不清楚什么类型");
+				default:
+					System.out.println(
+							" wifi_logical_link_type_2bytes_hexstr=" + wifi_logical_link_type_2bytes_hexstr + " 不清楚什么类型");
 
 			}
 
@@ -4639,7 +4639,7 @@ public class I9_TextRuleOperation {
 		}
 
 		@Override
-		// 是否是 STA 接受到的 帧 (即 AP 发送的帧数据)
+			// 是否是 STA 接受到的 帧 (即 AP 发送的帧数据)
 		boolean is_receive_for_sta() {
 			return wifi_is_receive_farme;
 		}
@@ -4705,56 +4705,56 @@ public class I9_TextRuleOperation {
 
 				switch (wifi_subtype_int) {
 
-				case 0:
+					case 0:
 // Association Request 关联请求帧	管理帧 wlan.fc.type == 0	wlan.fc.subtype == 0x00
 
-					break;
+						break;
 
-				case 1:
+					case 1:
 // Association Response 关联响应帧	管理帧 wlan.fc.type == 0	wlan.fc.subtype == 0x01
 
-					break;
+						break;
 
-				case 2:
-// 		
-					break;
+					case 2:
+//
+						break;
 
-				case 3:
-//			 		
-					break;
+					case 3:
+//
+						break;
 
-				case 4:
-//			 		
-					break;
+					case 4:
+//
+						break;
 
-				case 5:
-//			 		
-					break;
+					case 5:
+//
+						break;
 
-				case 8: // wlan.fc.type == 0 && wlan.fc.subtype == 0x08 beacon 帧
-//			 		
-					type0_sub8_80211_beacon_parser(wifi_during_end_position_2bytes); // beacon 帧 解析
+					case 8: // wlan.fc.type == 0 && wlan.fc.subtype == 0x08 beacon 帧
+//
+						type0_sub8_80211_beacon_parser(wifi_during_end_position_2bytes); // beacon 帧 解析
 
-					break;
+						break;
 
-				case 10:
-//			 		
-					break;
+					case 10:
+//
+						break;
 
-				case 11:
-//			 		
-					break;
+					case 11:
+//
+						break;
 
-				case 12:
-//			 		
-					break;
+					case 12:
+//
+						break;
 
-				case 13:
-//			 		
-					break;
-				default:
-					System.out.println("没有找到合适的 对应的解析类型 wifi_type_int=" + wifi_type_int + "  wifi_subtype_int="
-							+ wifi_subtype_int);
+					case 13:
+//
+						break;
+					default:
+						System.out.println("没有找到合适的 对应的解析类型 wifi_type_int=" + wifi_type_int + "  wifi_subtype_int="
+								+ wifi_subtype_int);
 
 				}
 
@@ -4762,52 +4762,52 @@ public class I9_TextRuleOperation {
 
 				switch (wifi_subtype_int) {
 
-				case 0:
+					case 0:
 
-					break;
+						break;
 
-				case 1:
+					case 1:
 
-					break;
+						break;
 
-				case 2:
-// 		
-					break;
+					case 2:
+//
+						break;
 
-				case 3:
-//			 		
-					break;
+					case 3:
+//
+						break;
 
-				case 4:
-//			 		
-					break;
+					case 4:
+//
+						break;
 
-				case 5:
-//			 		
-					break;
+					case 5:
+//
+						break;
 
-				case 8:
-//			 		
-					break;
+					case 8:
+//
+						break;
 
-				case 10:
-//			 		
-					break;
+					case 10:
+//
+						break;
 
-				case 11:
-//			 		
-					break;
+					case 11:
+//
+						break;
 
-				case 12:
-//			 		
-					break;
+					case 12:
+//
+						break;
 
-				case 13:
-//			 		
-					break;
-				default:
-					System.out.println("没有找到合适的 对应的解析类型 wifi_type_int=" + wifi_type_int + "  wifi_subtype_int="
-							+ wifi_subtype_int);
+					case 13:
+//
+						break;
+					default:
+						System.out.println("没有找到合适的 对应的解析类型 wifi_type_int=" + wifi_type_int + "  wifi_subtype_int="
+								+ wifi_subtype_int);
 
 				}
 
@@ -4815,70 +4815,70 @@ public class I9_TextRuleOperation {
 
 				switch (wifi_subtype_int) {
 
-				case 0:
+					case 0:
 
-					break;
+						break;
 
-				case 1:
+					case 1:
 
-					break;
+						break;
 
-				case 2:
-// 		
-					break;
+					case 2:
+//
+						break;
 
-				case 3:
-//			 		
-					break;
+					case 3:
+//
+						break;
 
-				case 4:
-//			 		
-					break;
+					case 4:
+//
+						break;
 
-				case 5:
-//			 		
-					break;
+					case 5:
+//
+						break;
 
-				case 8: // type2_sub8_qosdata_parser();
-					// wlan.fc.subtype == 0x08 && wlan.fc.type == 2
+					case 8: // type2_sub8_qosdata_parser();
+						// wlan.fc.subtype == 0x08 && wlan.fc.type == 2
 //  1.有 Protected-Data-Flag=1 的 Qos Data 帧
 
-//  Protected-Data-Flag=0       Logic-Link-Control-8字节 
+//  Protected-Data-Flag=0       Logic-Link-Control-8字节
 //  2.有  的 EAPOL帧   802.1X Authentication type = 3  【802.1X Authentication  verison=2 auth-type=3 】
-//  3.有  EAP 帧 【802.1X Authentication  verison=1 auth-type=0 】 Logic-Link-Control 的 Type-是 0x888e【 802.1X Authentication 】 
-//	4.有 TLSv1.2 帧 	Logic-Link-Control 的 Type-是 0x0800【 TCP 】	  没有 	802.1X Authentication 区块 		
-//  5. 有 Qos-Data 类型的 TCP帧? 	Logic-Link-Control 的 Type-是 0x0800【 TCP 】		
+//  3.有  EAP 帧 【802.1X Authentication  verison=1 auth-type=0 】 Logic-Link-Control 的 Type-是 0x888e【 802.1X Authentication 】
+//	4.有 TLSv1.2 帧 	Logic-Link-Control 的 Type-是 0x0800【 TCP 】	  没有 	802.1X Authentication 区块
+//  5. 有 Qos-Data 类型的 TCP帧? 	Logic-Link-Control 的 Type-是 0x0800【 TCP 】
 
-// arp  dns  也都是 可能是 qos_data  
+// arp  dns  也都是 可能是 qos_data
 
-					if (wifi_is_protected) { // 带有数据的 Qos Data 类型
+						if (wifi_is_protected) { // 带有数据的 Qos Data 类型
 
-						type2_sub8_80211_qosdata_parser(wifi_during_end_position_2bytes);
-					} else {
+							type2_sub8_80211_qosdata_parser(wifi_during_end_position_2bytes);
+						} else {
 
-						type2_sub8_eapol_eap_tlvs_tcp_key_parser(wifi_during_end_position_2bytes);
-					}
+							type2_sub8_eapol_eap_tlvs_tcp_key_parser(wifi_during_end_position_2bytes);
+						}
 
-					break;
+						break;
 
-				case 10:
-//			 		
-					break;
+					case 10:
+//
+						break;
 
-				case 11:
-//			 		
-					break;
+					case 11:
+//
+						break;
 
-				case 12:
-//			 		
-					break;
+					case 12:
+//
+						break;
 
-				case 13:
-//			 		
-					break;
-				default:
-					System.out.println("没有找到合适的 对应的解析类型 wifi_type_int=" + wifi_type_int + "  wifi_subtype_int="
-							+ wifi_subtype_int);
+					case 13:
+//
+						break;
+					default:
+						System.out.println("没有找到合适的 对应的解析类型 wifi_type_int=" + wifi_type_int + "  wifi_subtype_int="
+								+ wifi_subtype_int);
 
 				}
 
@@ -4887,7 +4887,7 @@ public class I9_TextRuleOperation {
 		}
 
 		Wifi_Frame_Struct_00000006(byte[] block_type_bytes, byte[] block_head_length_bytes, byte[] all_frame_bytes,
-				int beginInFile, int endInFile) {
+								   int beginInFile, int endInFile) {
 			super(block_type_bytes, block_head_length_bytes, all_frame_bytes, beginInFile, endInFile);
 			// TODO Auto-generated constructor stub
 		}
@@ -4901,7 +4901,7 @@ public class I9_TextRuleOperation {
 	class Wifi_Frame_Struct_0A0D0D0A extends Wifi_Frame_Base_Struct {
 
 		Wifi_Frame_Struct_0A0D0D0A(byte[] block_type_bytes, byte[] block_head_length_bytes, byte[] all_frame_bytes,
-				int beginInFile, int endInFile) {
+								   int beginInFile, int endInFile) {
 			super(block_type_bytes, block_head_length_bytes, all_frame_bytes, beginInFile, endInFile);
 			// TODO Auto-generated constructor stub
 		}
@@ -4919,7 +4919,7 @@ public class I9_TextRuleOperation {
 	class Wifi_Frame_Base_Struct extends Wifi_Frame_AbsCommon_Struct {
 
 		Wifi_Frame_Base_Struct(byte[] block_type_bytes, byte[] block_head_length_bytes, byte[] all_frame_bytes,
-				int beginInFile, int endInFile) {
+							   int beginInFile, int endInFile) {
 			super(block_type_bytes, block_head_length_bytes, all_frame_bytes, beginInFile, endInFile);
 		}
 
@@ -4930,24 +4930,24 @@ public class I9_TextRuleOperation {
 		Wifi_Frame_AbsCommon_Struct getMatch_Wifi_Frame(String block_type_str) {
 			switch (block_type_str) {
 
-			case "00000001":
+				case "00000001":
 
-				return new Wifi_Frame_Struct_00000001();
+					return new Wifi_Frame_Struct_00000001();
 
-			case "00000005":
+				case "00000005":
 
-				return new Wifi_Frame_Struct_00000005();
+					return new Wifi_Frame_Struct_00000005();
 
-			case "00000006":
+				case "00000006":
 
-				return new Wifi_Frame_Struct_00000006();
+					return new Wifi_Frame_Struct_00000006();
 
-			case "0A0D0D0A":
+				case "0A0D0D0A":
 
-				return new Wifi_Frame_Struct_0A0D0D0A();
+					return new Wifi_Frame_Struct_0A0D0D0A();
 
-			default:
-				break;
+				default:
+					break;
 			}
 
 			System.out.println("没有选中 block_type_str = " + block_type_str + "的解析类!  ");
@@ -4995,7 +4995,7 @@ public class I9_TextRuleOperation {
 
 		}
 
-//			  Options-Length=19   那么对齐长度 【(19%4 == 0) ? 19:(Math.flow(19/4)*4)】=20个字节
+		//			  Options-Length=19   那么对齐长度 【(19%4 == 0) ? 19:(Math.flow(19/4)*4)】=20个字节
 //			  Options-Length=45   那么对齐长度 【(45%4 == 0) ? 45:(Math.flow(45/4)*4)】=48个字节
 		int getRealLength_From_AvaliableLength(int avaliableLength) {
 
@@ -5070,7 +5070,7 @@ public class I9_TextRuleOperation {
 		String frame_bytes_hexstr;
 
 		byte[] block_type_4bytes; // Block Type = 0x0A0D0D0A Block Type=0x00000001 Block Type=0x0000060 Block
-									// Type=0x000005
+		// Type=0x000005
 		String block_type_str;
 
 		byte[] head_block_total_length_4bytes; // 头部的 长度
@@ -5094,7 +5094,7 @@ public class I9_TextRuleOperation {
 		}
 
 		Wifi_Frame_AbsCommon_Struct(byte[] block_type_bytes, byte[] block_head_length_bytes, byte[] all_frame_bytes,
-				int beginInFile, int endInFile) {
+									int beginInFile, int endInFile) {
 
 			block_type_4bytes = block_type_bytes;
 
@@ -5190,7 +5190,7 @@ public class I9_TextRuleOperation {
 
 		@Override
 		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
-				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 			// TODO Auto-generated method stub
 
 			for (int i = 0; i < curInputFileList.size(); i++) {
@@ -5394,10 +5394,10 @@ public class I9_TextRuleOperation {
 				byte[] data = new byte[length];
 				try {
 
-//		            byte[] data =    new byte[] { (byte)0x00, 0x00, (byte)0x00, (byte)0x00, 
-//		            		(byte)0x00, 0x00, (byte)0x00, (byte)0x00, 
+//		            byte[] data =    new byte[] { (byte)0x00, 0x00, (byte)0x00, (byte)0x00,
 //		            		(byte)0x00, 0x00, (byte)0x00, (byte)0x00,
-//		            		(byte)0x00, 0x00, (byte)0x00, (byte)0x00, 
+//		            		(byte)0x00, 0x00, (byte)0x00, (byte)0x00,
+//		            		(byte)0x00, 0x00, (byte)0x00, (byte)0x00,
 //		             };
 
 					int avaliableNum = input.available();
@@ -5719,7 +5719,7 @@ public class I9_TextRuleOperation {
 
 		@Override
 		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
-				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 			for (int i = 0; i < curInputFileList.size(); i++) {
 				File fileItem = curInputFileList.get(i);
 
@@ -5919,7 +5919,7 @@ public class I9_TextRuleOperation {
 
 		@Override
 		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
-				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 
 			if (!J9_I9_Dynamic_ClearDesc_File.exists()) {
 				System.out.println("当前 J9_I9_Dynamic_ClearDesc_File=" + J9_I9_Dynamic_ClearDesc_File.getAbsolutePath()
@@ -5993,7 +5993,7 @@ public class I9_TextRuleOperation {
 
 		@Override
 		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
-				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 
 			ArrayList<String> readMD5List = new ArrayList<String>();
 
@@ -6071,7 +6071,7 @@ public class I9_TextRuleOperation {
 
 		@Override
 		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
-				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 
 			ArrayList<File> needDeleteFileList = new ArrayList<File>();
 
@@ -6103,11 +6103,16 @@ public class I9_TextRuleOperation {
 				File realfileItem = allMatchFileList.get(i);
 //				System.out.println("file["+i+"]["+curRealFileList.size()+"] "+ realfileItem.getAbsolutePath() );
 
+				String fileName = realfileItem.getName();
 				String filemd5 = getMD5Three(realfileItem.getAbsolutePath());
 				if (inputMD5List.contains(filemd5)) {
 					needDeleteFileList.add(realfileItem);
-
 				}
+
+				if (inputMD5List.contains(fileName)) {
+					needDeleteFileList.add(realfileItem);
+				}
+
 			}
 
 			if (needDeleteFileList.size() == 0) {
@@ -6127,7 +6132,7 @@ public class I9_TextRuleOperation {
 
 		@Override
 		String simpleDesc() {
-			return " 依据当前每行的MD5字符串 与 每个文件的md5去判断  如果文件的md5包含在输入字符串行中 那么删除这个文件 ";
+			return " 依据当前每行的MD5字符串 与 每个文件的md5去判断 以及文件名判断 如果文件的md5包含在输入字符串行中 或者名字相同 那么删除这个文件 ";
 		}
 
 	}
@@ -6145,7 +6150,7 @@ public class I9_TextRuleOperation {
 
 		@Override
 		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
-				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 			for (int i = 0; i < curInputFileList.size(); i++) {
 
 				File fileItem = curInputFileList.get(i);
@@ -6211,23 +6216,23 @@ public class I9_TextRuleOperation {
 	}
 
 	/*	*//**
-			 * BASE64解密
-			 * 
-			 * @throws Exception
-			 */
+	 * BASE64解密
+	 *
+	 * @throws Exception
+	 */
 
 	/*
 	 * public static String jiemi_decryptBASE64(String key) throws Exception {
 	 * return new String(Base64.getDecoder().decode(key)); }
-	 * 
-	 * 
+	 *
+	 *
 	 *//**
-		 * BASE64加密
-		 *//*
-			 * public static String jiami_encryptBASE64(byte[] key) throws Exception {
-			 * 
-			 * return new String(Base64.getEncoder().encode(key)); }
-			 */
+	 * BASE64加密
+	 *//*
+	 * public static String jiami_encryptBASE64(byte[] key) throws Exception {
+	 *
+	 * return new String(Base64.getEncoder().encode(key)); }
+	 */
 
 // 对当前文件过来  保留开头不是空格 以及 开头两行是空格第三个不是空格的 行 adb shell dumpsys 使用到
 	// 开头两行是空格第三个不是空格的 行
@@ -6240,7 +6245,7 @@ public class I9_TextRuleOperation {
 
 		@Override
 		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
-				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 			for (int i = 0; i < curInputFileList.size(); i++) {
 
 				File fileItem = curInputFileList.get(i);
@@ -6301,7 +6306,7 @@ public class I9_TextRuleOperation {
 
 		@Override
 		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
-				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 			for (int i = 0; i < curInputFileList.size(); i++) {
 
 				File fileItem = curInputFileList.get(i);
@@ -6395,7 +6400,7 @@ public class I9_TextRuleOperation {
 
 		@Override
 		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
-				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 			for (int i = 0; i < curInputFileList.size(); i++) {
 				File fileItem = curInputFileList.get(i);
 
@@ -6553,7 +6558,7 @@ public class I9_TextRuleOperation {
 
 		@Override
 		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
-				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 			for (int i = 0; i < curInputFileList.size(); i++) {
 				File fileItem = curInputFileList.get(i);
 
@@ -6587,7 +6592,7 @@ public class I9_TextRuleOperation {
 
 		@Override
 		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
-				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 			for (int i = 0; i < curInputFileList.size(); i++) {
 				File fileItem = curInputFileList.get(i);
 
@@ -6644,7 +6649,7 @@ public class I9_TextRuleOperation {
 
 		@Override
 		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
-				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 			for (int i = 0; i < curInputFileList.size(); i++) {
 				File fileItem = curInputFileList.get(i);
 
@@ -6712,7 +6717,7 @@ public class I9_TextRuleOperation {
 		@SuppressWarnings("unchecked")
 		@Override
 		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
-				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 			ArrayList<String> realFileNameList = new ArrayList<String>();
 
 			File currentTxtFile = curInputFileList.get(0);
@@ -6858,7 +6863,7 @@ public class I9_TextRuleOperation {
 
 		@Override
 		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
-				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 			for (int i = 0; i < curInputFileList.size(); i++) {
 				File fileItem = curInputFileList.get(i);
 
@@ -7042,7 +7047,7 @@ public class I9_TextRuleOperation {
 
 		@Override
 		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
-				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 			for (int i = 0; i < curInputFileList.size(); i++) {
 				ArrayList<String> allContentList = new ArrayList<String>();
 				File targetFile = curInputFileList.get(i);
@@ -7475,7 +7480,7 @@ public class I9_TextRuleOperation {
 		}
 
 		public File mergeBliBli_Video_Audio_Files(File videoFile, File audioFile, BliBliVideoInfo mBliBli_VIDEO_INFO,
-				String outputFilePath) {
+												  String outputFilePath) {
 			File outPutFile = null;
 			System.out.println("--------------开始合并音视频--------------");
 			String outFilePath = outputFilePath;
@@ -7595,29 +7600,29 @@ public class I9_TextRuleOperation {
 					} else {
 						System.out.println("解析出的 base64_jiami_url=[" + base64_jiami_url + "]  尝试解密base64");
 
-						
-						
-// 当前寻找到的 base64_url = 
+
+
+// 当前寻找到的 base64_url =
 // aHR0cDovL3YzLXhnLXdlYi1wYy5peGlndWEuY29tLzc4ZGUwNTEzOTI4MWE4NjAwNGI4NDA0Njc5ZGI4ZWRmLzYzMzEyMDJmL3ZpZGVvL3Rvcy9jbi90b3MtY24tdmUtNC8wNmEyMGNhZGZmN2I0YzE4YmU2NmIwMmU2Y2RiM2M2Yi8
 // \u002FYT0xNzY4JmNoPTAmY3I9MCZkcj0wJmVyPTAmY2Q9MCU3QzAlN0MwJTdDMCZjdj0xJmJyPTMwMDQmYnQ9MzAwNCZjcz0wJmRzPTQmZnQ9ZUluSjcyMkhqd2s5S3lCTXlxc1ExLUM1cVNZSGF+UHVEdEc3WHZsVlJxOCZtaW1lX3R5cGU9dmlkZW9fbXA0JnFzPTAmcmM9TlRnMk9EcGtPenRrTkdZOE9HYzRNMEJwTTNrNU5XcDFjSE40TlRNek5EY3pNMEJlWUdNME1qTmZOalF4TW1Jd05HTTFZU05tWDJCalkyTTBhREpnTFMxa0xTOXpjdyUzRCUzRCZsPTIwMjIwOTI2MTA0MDUxMDEwMjEyMTM4MDUxMDQyNjhEMTY=
-// 需要 判断 当前的 解析的 url 是否 包含 u001  u002   如果包含  那么  需要 截取 
-						
-						
+// 需要 判断 当前的 解析的 url 是否 包含 u001  u002   如果包含  那么  需要 截取
+
+
 						if(base64_jiami_url.contains("\\u002")) {
 							System.out.println("当前 base-url 包含 \\u002 间隔字符");
-							
+
 							base64_jiami_url = base64_jiami_url.substring(0,base64_jiami_url.indexOf("\\u002"));
-							
+
 						}
-						
+
 						if(base64_jiami_url.contains("\\u001")) {
 							System.out.println("当前 base-url 包含 \\u001 间隔字符");
-							
+
 							base64_jiami_url = base64_jiami_url.substring(0,base64_jiami_url.indexOf("\\u001"));
-							
+
 						}
 						System.out.println(" base64_jiami_url=[" + base64_jiami_url + "]  开始尝试解密base64");
-						
+
 						jiemi_base64_url = jiemi_decryptBASE64(base64_jiami_url);
 						System.out.println();
 
@@ -8040,7 +8045,7 @@ public class I9_TextRuleOperation {
 
 		/**
 		 * 方法描述: 抖音解析下载视频
-		 * 
+		 *
 		 */
 		@SuppressWarnings("unchecked")
 		public void douYinParseUrl(String url) {
@@ -8407,7 +8412,7 @@ public class I9_TextRuleOperation {
 
 		/**
 		 * 方法描述: 过滤分享链接的中文汉字
-		 * 
+		 *
 		 */
 		public String filterUrl(String rowLine, String url) {
 			String regex = "https?://(\\w|-)+(\\.(\\w|-)+)+(/(\\w+(\\?(\\w+=(\\w|%|-)*(\\&\\w+=(\\w|%|-)*)*)?)?)?)+";// 匹配网址
@@ -8422,7 +8427,7 @@ public class I9_TextRuleOperation {
 		/**
 		 * 方法描述: 获取分享视频id
 		 *
-		 * 
+		 *
 		 */
 		public String getItemId(String url) {
 			int start = url.indexOf("/video/") + 7;
@@ -8462,7 +8467,7 @@ public class I9_TextRuleOperation {
 
 		@Override
 		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
-				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 			for (int i = 0; i < curInputFileList.size(); i++) {
 				ArrayList<String> allContentList = new ArrayList<String>();
 				File targetFile = curInputFileList.get(i);
@@ -8471,7 +8476,7 @@ public class I9_TextRuleOperation {
 
 				// 每一个 item 只包含 两个长度 最小00 最大FF
 				ArrayList<String> mTwoHexNum_OneByte_List = new ArrayList<String>(); // 只包含 十六进制字节的 字符串的列表 每一个Item 是
-																						// 一个字节 00--AA--FF 这样
+				// 一个字节 00--AA--FF 这样
 
 				// 解析出的 byte 的 数组
 				ArrayList<Byte> resultByte_List = new ArrayList<Byte>();
@@ -8511,7 +8516,7 @@ public class I9_TextRuleOperation {
 		// 把 contentList 中原始的数据转为 一个接一个的 一个字节2个16进制字符串 存入到 item_2hexstr_1byte_StrArr , 再
 		// 把 item_2hexstr_1byte_StrArr 转为 Array<Byte>
 		synchronized boolean Try_TwoHexNum_OneByte_AsOneItem(ArrayList<String> contentList,
-				ArrayList<String> item_2hexstr_1byte_StrArr, ArrayList<Byte> resultByeArr) {
+															 ArrayList<String> item_2hexstr_1byte_StrArr, ArrayList<Byte> resultByeArr) {
 			boolean isOnly_HexStr_flag = true;
 
 			// 从 contentList 过滤出来的 只包含 16进制数值的字符串的集合 包含 注释 【】 去除【】的 内容
@@ -8522,7 +8527,7 @@ public class I9_TextRuleOperation {
 //			1.包含 ║  和 0x开头
 //          2. 包含 ║  但没有 0x 开头   【一定是字符串】
 //          3. 不包含 ║ 但是 0x开头
-//          4. 不包含 ║  也不是 0x开头	
+//          4. 不包含 ║  也不是 0x开头
 
 			// 0x000002E0 0000000736 空格分隔 第一个数据 和 第二个数据的长度 必须是
 			StringBuilder sb = new StringBuilder();
@@ -8712,7 +8717,7 @@ public class I9_TextRuleOperation {
 
 		@Override
 		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
-				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 			for (int i = 0; i < curInputFileList.size(); i++) {
 				ArrayList<String> allContentList = new ArrayList<String>();
 				File targetFile = curInputFileList.get(i);
@@ -8757,7 +8762,7 @@ public class I9_TextRuleOperation {
 		}
 
 		synchronized boolean Try8bitAsOneItem(ArrayList<String> contentList, ArrayList<String> item8bitArr,
-				ArrayList<Byte> resultByeArr) {
+											  ArrayList<Byte> resultByeArr) {
 			boolean isOnly_0_1_flag = true;
 
 			StringBuilder sb = new StringBuilder();
@@ -8850,7 +8855,7 @@ public class I9_TextRuleOperation {
 
 		@Override
 		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
-				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 			for (int i = 0; i < curInputFileList.size(); i++) {
 				ArrayList<String> allContentList = new ArrayList<String>();
 				File targetFile = curInputFileList.get(i);
@@ -8958,7 +8963,7 @@ public class I9_TextRuleOperation {
 
 		@Override
 		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
-				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 			for (int i = 0; i < curInputFileList.size(); i++) {
 				File fileItem = curInputFileList.get(i);
 				ArrayList<String> contentList = ReadFileContentAsList(fileItem);
@@ -9115,7 +9120,7 @@ public class I9_TextRuleOperation {
 
 		@Override
 		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
-				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 			for (int i = 0; i < curInputFileList.size(); i++) {
 				File fileItem = curInputFileList.get(i);
 				ArrayList<String> contentList = ReadFileContentAsList(fileItem);
@@ -9186,7 +9191,7 @@ public class I9_TextRuleOperation {
 
 		@Override
 		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
-				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 			ArrayList<String> realFileNameList = new ArrayList<String>();
 
 			File dirFile = curInputFileList.get(0).getParentFile();
@@ -9359,7 +9364,7 @@ public class I9_TextRuleOperation {
 
 		@Override
 		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
-				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 
 			for (int i = 0; i < curInputFileList.size(); i++) {
 				File fileItem = curInputFileList.get(i);
@@ -10591,7 +10596,7 @@ public class I9_TextRuleOperation {
 			// getFileNameNoPointWithFullPath_return_1=[Z_TEMP]
 			// param1=[C:\Users\zhuzj5\Desktop\zbin\Z_TEMP.txt]
 			void buildEndPrintCode(String methodName, String methodName_nofunc, int inputParamCount,
-					int outputParamCount, boolean isRuleMethod) {
+								   int outputParamCount, boolean isRuleMethod) {
 				endPrintCode = "";
 				String preCode = "echo [" + methodName + " EndPrintCode] ";
 				if (inputParamCount == 0 && outputParamCount == 0) {
@@ -10921,7 +10926,7 @@ public class I9_TextRuleOperation {
 
 		@Override
 		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
-				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 			ArrayList<String> result_list = new ArrayList<String>();
 			if (!bat_template_file.exists()) {
 				result_list.add("当前 模板文件 " + bat_template_file.getAbsolutePath() + " 不存在 请检查该文件！");
@@ -10982,7 +10987,7 @@ public class I9_TextRuleOperation {
 
 		@Override
 		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
-				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 
 			ArrayList<String> MDAllContentList = new ArrayList<String>();
 
@@ -11144,7 +11149,7 @@ public class I9_TextRuleOperation {
 
 		@Override
 		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
-				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 			ArrayList<String> result_list = new ArrayList<String>();
 			String Test_Java_FileName = "Test_" + getTimeStampMMdd() + "_" + getTimeStampHHmmss();
 			String public_class_declare = "public class " + Test_Java_FileName;
@@ -11226,7 +11231,7 @@ public class I9_TextRuleOperation {
 
 		@Override
 		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
-				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 			for (int i = 0; i < curInputFileList.size(); i++) {
 				File fileItem = curInputFileList.get(i);
 				ArrayList<String> contentList = ReadFileContentAsList(fileItem);
@@ -11302,7 +11307,7 @@ public class I9_TextRuleOperation {
 
 		@Override
 		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
-				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 			ArrayList<File> realShellFileList = new ArrayList<File>();
 			ArrayList<String> logInfo = new ArrayList<String>();
 			for (int i = 0; i < curInputFileList.size(); i++) {
@@ -11410,7 +11415,7 @@ public class I9_TextRuleOperation {
 
 		@Override
 		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
-				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 			ArrayList<String> realFileNameList = new ArrayList<String>();
 
 			File dirFile = curInputFileList.get(0).getParentFile();
@@ -11467,7 +11472,7 @@ public class I9_TextRuleOperation {
 
 		@Override
 		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
-				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 
 			ArrayList<String> AllQrStrList = new ArrayList<String>();
 			ArrayList<String> CommonQrStrList = new ArrayList<String>();
@@ -11557,7 +11562,7 @@ public class I9_TextRuleOperation {
 
 		@Override
 		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
-				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 			File dirFile = curInputFileList.get(0).getParentFile();
 			File[] fileList = dirFile.listFiles();
 			System.out.println("dirFile = " + dirFile + "        fileList = " + fileList.length);
@@ -11691,7 +11696,7 @@ public class I9_TextRuleOperation {
 
 		@Override
 		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
-				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 			for (int i = 0; i < curInputFileList.size(); i++) {
 				File fileItem = curInputFileList.get(i);
 
@@ -11909,7 +11914,7 @@ public class I9_TextRuleOperation {
 
 		@Override
 		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
-				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 			for (int i = 0; i < curInputFileList.size(); i++) {
 				File fileItem = curInputFileList.get(i);
 
@@ -11984,7 +11989,7 @@ public class I9_TextRuleOperation {
 
 		@Override
 		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
-				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 			File dirFile = curInputFileList.get(0).getParentFile();
 			File[] fileList = dirFile.listFiles();
 			System.out.println("dirFile = " + dirFile + "        fileList = " + fileList.length);
@@ -12117,7 +12122,7 @@ public class I9_TextRuleOperation {
 
 		@Override
 		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
-				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 			for (int i = 0; i < curInputFileList.size(); i++) {
 				File fileItem = curInputFileList.get(i);
 				File curDirFile = fileItem.getParentFile();
@@ -12223,7 +12228,7 @@ public class I9_TextRuleOperation {
 
 		@Override
 		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
-				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 			for (int i = 0; i < curInputFileList.size(); i++) {
 				File fileItem = curInputFileList.get(i);
 				ArrayList<String> contentList = ReadFileContentAsList(fileItem);
@@ -12286,7 +12291,7 @@ public class I9_TextRuleOperation {
 
 		@Override
 		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
-				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 			for (int i = 0; i < curInputFileList.size(); i++) {
 				File fileItem = curInputFileList.get(i);
 				File parentFile = fileItem.getParentFile();
@@ -12329,7 +12334,7 @@ public class I9_TextRuleOperation {
 
 		@Override
 		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
-				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 			for (int i = 0; i < curInputFileList.size(); i++) {
 				File fileItem = curInputFileList.get(i);
 				if (CUR_OS_TYPE == OS_TYPE.Windows) {
@@ -12365,7 +12370,7 @@ public class I9_TextRuleOperation {
 
 		@Override
 		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
-				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 			for (int i = 0; i < curInputFileList.size(); i++) {
 				File fileItem = curInputFileList.get(i);
 				if (CUR_OS_TYPE == OS_TYPE.Windows) {
@@ -12405,7 +12410,7 @@ public class I9_TextRuleOperation {
 
 		@Override
 		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
-				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 			for (int i = 0; i < curInputFileList.size(); i++) {
 				File fileItem = curInputFileList.get(i);
 
@@ -12465,7 +12470,7 @@ public class I9_TextRuleOperation {
 
 		@Override
 		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
-				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 			for (int i = 0; i < curInputFileList.size(); i++) {
 				File fileItem = curInputFileList.get(i);
 
@@ -12525,7 +12530,7 @@ public class I9_TextRuleOperation {
 
 		@Override
 		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
-				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 			for (int i = 0; i < curInputFileList.size(); i++) {
 				File fileItem = curInputFileList.get(i);
 
@@ -12587,7 +12592,7 @@ public class I9_TextRuleOperation {
 
 		@Override
 		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
-				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 			for (int i = 0; i < curInputFileList.size(); i++) {
 				File fileItem = curInputFileList.get(i);
 
@@ -12655,7 +12660,7 @@ public class I9_TextRuleOperation {
 
 		@Override
 		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
-				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 			for (int i = 0; i < curInputFileList.size(); i++) {
 				File fileItem = curInputFileList.get(i);
 				ArrayList<String> contentList = ReadFileContentAsList(fileItem);
@@ -12747,7 +12752,7 @@ public class I9_TextRuleOperation {
 
 		@Override
 		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
-				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 			Rule6_num_row = rowSize;
 			for (int i = 0; i < curInputFileList.size(); i++) {
 				File fileItem = curInputFileList.get(i);
@@ -12810,7 +12815,7 @@ public class I9_TextRuleOperation {
 
 		@Override
 		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
-				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 			for (int i = 0; i < curInputFileList.size(); i++) {
 				File fileItem = curInputFileList.get(i);
 
@@ -12871,7 +12876,7 @@ public class I9_TextRuleOperation {
 
 		@Override
 		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
-				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 			for (int i = 0; i < curInputFileList.size(); i++) {
 				File fileItem = curInputFileList.get(i);
 				ArrayList<String> contentList = ReadFileContentAsList(fileItem);
@@ -12930,7 +12935,7 @@ public class I9_TextRuleOperation {
 
 		@Override
 		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
-				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 			for (int i = 0; i < curInputFileList.size(); i++) {
 				File fileItem = curInputFileList.get(i);
 				ArrayList<String> contentList = ReadFileContentAsList(fileItem);
@@ -12989,7 +12994,7 @@ public class I9_TextRuleOperation {
 
 		@Override
 		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
-				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 			for (int i = 0; i < curInputFileList.size(); i++) {
 				File fileItem = curInputFileList.get(i);
 				ArrayList<String> contentList = ReadFileContentAsList(fileItem);
@@ -13050,7 +13055,7 @@ public class I9_TextRuleOperation {
 
 		@Override
 		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
-				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 			for (int i = 0; i < curInputFileList.size(); i++) {
 				File fileItem = curInputFileList.get(i);
 				ArrayList<String> contentList = ReadFileContentAsList(fileItem);
@@ -13093,15 +13098,15 @@ public class I9_TextRuleOperation {
 	}
 
 	class Basic_Rule extends Rule {
-		
-		
-		
-		
+
+
+
+
 		void init_pre_params( ArrayList<String> preParamList) {
-			
+
 		}
-		
-		
+
+
 		Basic_Rule(String ctype, int cindex, int opera_type) {
 			this.file_type = ctype;
 			this.rule_index = cindex;
@@ -13177,7 +13182,7 @@ public class I9_TextRuleOperation {
 
 		@Override
 		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
-				ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
 			return null;
 		}
 
@@ -13297,8 +13302,8 @@ public class I9_TextRuleOperation {
 //        abstract    ArrayList<File> applyFileListRule3(ArrayList<File> subFileList , HashMap<String, ArrayList<File>> fileTypeMap);
 		// applyFileListRule4
 		abstract ArrayList<File> applyOperationRule(ArrayList<File> curFileList,
-				HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList,
-				ArrayList<File> curRealFileList);
+													HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList,
+													ArrayList<File> curRealFileList);
 
 		// abstract void initParams4InputParam(String inputParam); // 初始化Rule的参数
 		// 依据输入的字符串
@@ -13309,9 +13314,9 @@ public class I9_TextRuleOperation {
 
 		abstract boolean checkParamsOK(File shellDir, String type2Param, ArrayList<String> otherParams);
 
-		
+
 		abstract void init_pre_params( ArrayList<String> preParamList);
-		
+
 		abstract void showWrongMessage();
 	}
 
@@ -13620,46 +13625,46 @@ public class I9_TextRuleOperation {
 						I9_Properties.setProperty(Default_Selected_Rule_Index_Key, "" + CUR_TYPE_INDEX);
 						setProperity();
 //                        System.out.println(" 设置新的 默认 Index 成功   Default_Selected_Index = "+ CUR_TYPE_INDEX );
-						
-						
+
+
 						Properties I9_PreParam_Properties_Temp = new Properties();
-						
+
 						ArrayList<String>  I9_PreParam_PropValue_List_TEMP = new ArrayList<String> ();
-						
+
 						// 开始 检测 是否有  预制参数的输入    并且 输入的参数是 rule_开头的数据  这个 规则  一一对应
 						int pre_param_count = 0;
 						for (int i = 0; i < args.length; i++) {
 							String preparam_item = args[i];
 							//   1.必须以  ruleIdex_   2. 必须只能包含 三个段 53_ssidmod_dafafa 这样
 							boolean isStartWithRuleIndx = preparam_item.startsWith(CUR_TYPE_INDEX+"_");
-							
-						   String[]	 preparam = preparam_item.split("_");
-						   boolean is3segment = false;
-						   if(preparam != null && preparam.length >= 3) {  // 我擦   53_ssid_TP-LINK_4F6C90  有 四个  后面的词组包含下划线
-							   is3segment = true;
-						   }
-						   
-						   if(isStartWithRuleIndx && is3segment) {
-							   
-							   System.out.println("pre_param_"+pre_param_count+" = "+ preparam_item);
 
-							   I9_PreParam_Properties_Temp.setProperty(pre_param_count+"", "" + preparam_item);
-							   I9_PreParam_PropValue_List_TEMP.add(preparam_item);
-							   pre_param_count++;
-						   }
+							String[]	 preparam = preparam_item.split("_");
+							boolean is3segment = false;
+							if(preparam != null && preparam.length >= 3) {  // 我擦   53_ssid_TP-LINK_4F6C90  有 四个  后面的词组包含下划线
+								is3segment = true;
+							}
+
+							if(isStartWithRuleIndx && is3segment) {
+
+								System.out.println("pre_param_"+pre_param_count+" = "+ preparam_item);
+
+								I9_PreParam_Properties_Temp.setProperty(pre_param_count+"", "" + preparam_item);
+								I9_PreParam_PropValue_List_TEMP.add(preparam_item);
+								pre_param_count++;
+							}
 
 						}
 						if(pre_param_count > 0 && I9_PreParam_Properties_Temp.size() > 0 ) {
-							   if(I9_PreParam_PropValue_List.size() > 0 ) {  // 原始 有数据了   清楚原始的数据
-								   I9_PreParam_Properties.clear();
-								   setProperity_PreParam();
-							   }
-							   I9_PreParam_PropValue_List.clear();
-							   I9_PreParam_PropValue_List.addAll(I9_PreParam_PropValue_List_TEMP);
-							   I9_PreParam_Properties = I9_PreParam_Properties_Temp;
-								setProperity_PreParam();  // 更新数据
+							if(I9_PreParam_PropValue_List.size() > 0 ) {  // 原始 有数据了   清楚原始的数据
+								I9_PreParam_Properties.clear();
+								setProperity_PreParam();
+							}
+							I9_PreParam_PropValue_List.clear();
+							I9_PreParam_PropValue_List.addAll(I9_PreParam_PropValue_List_TEMP);
+							I9_PreParam_Properties = I9_PreParam_Properties_Temp;
+							setProperity_PreParam();  // 更新数据
 						}
-						
+
 					}
 				} else {
 					System.out.println("当前过滤出的 default_index 不为数值  请检查输入!");
@@ -13669,10 +13674,10 @@ public class I9_TextRuleOperation {
 						"当前 输入的 更新 default_index 的参数参数没有获取到 请重新执行!  FreshDefaultInputStr = " + FreshDefaultInputStr);
 
 			}
-			
-			
 
-		
+
+
+
 		}
 		System.out.println();
 		System.out.println();
@@ -13694,10 +13699,10 @@ public class I9_TextRuleOperation {
 		if(I9_PreParam_PropValue_List.size() == 0) {
 			System.out.println("当前预置参数列表为空! ");
 		}
-		//  1.I9_PreParam_PropValue_List 从 prop 读取到 旧的  而 当前用户输入  又是新的情况   这里却打印旧的 
+		//  1.I9_PreParam_PropValue_List 从 prop 读取到 旧的  而 当前用户输入  又是新的情况   这里却打印旧的
 		for (int i = 0; i < I9_PreParam_PropValue_List.size(); i++) {
 			System.out.println("预置参数 pre_param["+i+"] = "+ I9_PreParam_PropValue_List.get(i));
-			
+
 		}
 
 		// 显示 当前默认的 default_index=1
@@ -14369,7 +14374,7 @@ public class I9_TextRuleOperation {
 		String date = df.format(new Date());
 		return date;
 	}
-	
+
 	static String getTimeStampHHmmss() {
 
 		SimpleDateFormat df = new SimpleDateFormat("HHmmss");// 设置日期格式
@@ -14631,7 +14636,7 @@ public class I9_TextRuleOperation {
 			return;
 		}
 
-		
+
 
 		if (!CUR_Dir_FILE.exists() || !CUR_Dir_FILE.isDirectory()) {
 			System.out.println("当前执行替换逻辑的文件路径:" + CUR_Dir_1_PATH + "  不存在! ");
@@ -14645,7 +14650,7 @@ public class I9_TextRuleOperation {
 			System.out.println("当前 预置参数索引 与 选中的参数规则索引 不匹配  选中规则:"+CUR_TYPE_INDEX);
 			System.out.println("预置参数列表:" + Arrays.toString(I9_PreParam_PropValue_List.toArray()));
 		}
-		
+
 		/*
 		 * if(!checkInputParamsOK()){ System.out.
 		 * println("当前用户输入的格式错误   input=【类型_索引】  例如    html_1   html_2    html_3  ");
@@ -14657,39 +14662,39 @@ public class I9_TextRuleOperation {
 		setProperity();
 
 	}
-	
+
 	public static boolean isPreParamMatchRuleIndex(int  ruleIndex , ArrayList<String> preParamList) {
 		boolean isMatch = true;
 		if(preParamList == null | preParamList.size() == 0) {
 			isMatch = false;
 			return isMatch;
 		}
-		
+
 		for (int i = 0; i < preParamList.size(); i++) {
 			String pre_param_item = preParamList.get(i);
 			boolean is_match_item_flag = false;
 			//
-			
-			boolean isStartWithRuleIndx = pre_param_item.startsWith(ruleIndex+"_");
-			
-			   String[]	 preparamArr = pre_param_item.split("_");
-			   boolean is3segment = false;
-			   if(preparamArr != null && preparamArr.length >= 3) {
-				   is3segment = true;
-			   }
-			   
-			   if(is3segment && isStartWithRuleIndx) {
-				   is_match_item_flag = true;
-			   }
 
-			   isMatch &= is_match_item_flag;
+			boolean isStartWithRuleIndx = pre_param_item.startsWith(ruleIndex+"_");
+
+			String[]	 preparamArr = pre_param_item.split("_");
+			boolean is3segment = false;
+			if(preparamArr != null && preparamArr.length >= 3) {
+				is3segment = true;
+			}
+
+			if(is3segment && isStartWithRuleIndx) {
+				is_match_item_flag = true;
+			}
+
+			isMatch &= is_match_item_flag;
 
 		}
 
 		return isMatch;
 
 	}
-	
+
 
 	public static int getImageHigh(File picture) {
 		int high = 0;
@@ -15556,7 +15561,7 @@ public class I9_TextRuleOperation {
 
 	// 往 每行开头加入〖* 第一个字符串后加入* 其余不变(方便生成tushare的输入参数格式) ts_code -> 〖*ts_code* 描述
 	static ArrayList<String> addTushare_Params_Flag_18(ArrayList<String> originStrList, String beginStr,
-			String endStr) {
+													   String endStr) {
 		ArrayList<String> newContentList_Padding = new ArrayList<String>();
 		ArrayList<String> newContentList = new ArrayList<String>();
 		for (int i = 0; i < originStrList.size(); i++) {
@@ -15831,7 +15836,7 @@ public class I9_TextRuleOperation {
 	}
 
 	static ArrayList<String> Rule12_tryWriteNewContentToFile(ArrayList<String> clipList, ArrayList<String> oldList,
-			File file) {
+															 File file) {
 
 		ArrayList<String> newStrList = new ArrayList<String>();
 		if (file != null && file.exists()) {
@@ -16296,7 +16301,7 @@ public class I9_TextRuleOperation {
 
 	/**
 	 * 汉字转为拼音 汉字---> HanZi
-	 * 
+	 *
 	 * @param chinese
 	 * @return
 	 */
@@ -16317,8 +16322,8 @@ public class I9_TextRuleOperation {
 			if (newChar[i] > 128) {
 				try {
 					pinyinStr += toUpperFirstChar(PinyinHelper.toHanyuPinyinStringArray(newChar[i], defaultFormat)[0]); // [0]
-																														// 标识当前拼音
-																														// 汉->
+					// 标识当前拼音
+					// 汉->
 					// han
 				} catch (BadHanyuPinyinOutputFormatCombination e) {
 					e.printStackTrace();
@@ -18341,7 +18346,7 @@ public class I9_TextRuleOperation {
 		}
 
 		public Json2Bean(String json, String name, String fatherName, NameGenerator nameGeneration, JsonParse jsonParse,
-				BeanGenerator generationBean) {
+						 BeanGenerator generationBean) {
 			this.json = json;
 			this.name = fixedName_Json2Bean(name);
 			this.nameGeneration = nameGeneration;
@@ -19814,7 +19819,7 @@ public class I9_TextRuleOperation {
 	}
 
 	public static String dumpHexString(byte[] array, StringBuilder xBinarySB, StringBuilder xAsciiSB,
-			StringBuilder xHexSB) {
+									   StringBuilder xHexSB) {
 		if (array == null)
 			return "(null)";
 		return dumpHexString(array, 0, array.length, xBinarySB, xAsciiSB, xHexSB);
@@ -19828,7 +19833,7 @@ public class I9_TextRuleOperation {
 	static int byteIndex = 0;
 
 	public static String dumpHexString(byte[] array, int offset, int length, StringBuilder mBinarySB,
-			StringBuilder mAsciiSB, StringBuilder mHexSB) {
+									   StringBuilder mAsciiSB, StringBuilder mHexSB) {
 		StringBuilder result = new StringBuilder();
 		boolean isTooBig_Flag = false;
 
@@ -19948,7 +19953,7 @@ public class I9_TextRuleOperation {
 													+ " 】 ");
 								}
 
-//								
+//
 								byteIndex++;
 								dumpHexString_result_append(isTooBig_Flag, result, showByte(curByte, mBinarySB));
 							}
@@ -20084,7 +20089,7 @@ public class I9_TextRuleOperation {
 
 //		result.end.size=222218811 mBinarySB.end.size = 36103552   mAsciiSB.end.size=4477953     mHexSB.init.end=13713752
 //		bytes.length = 4477960   offset=0     length=4477960
-// 	    222218811/4477960=49.6      result.length=1207959533会报错   那么 判断 大于这个值 就舍弃 result 
+// 	    222218811/4477960=49.6      result.length=1207959533会报错   那么 判断 大于这个值 就舍弃 result
 		System.out.println("result.end.size=" + result.length() + " " + "mBinarySB.end.size = " + mBinarySB.length()
 				+ "   mAsciiSB.end.size=" + mAsciiSB.length() + "     mHexSB.init.end=" + mHexSB.length() + "");
 
@@ -20299,7 +20304,7 @@ public class I9_TextRuleOperation {
 		initMoshuTypeItem("424D8E1B030000000000", "bmp"); // 256色位图(bmp)
 
 		initMoshuTypeItem("0a0d0d0a", "pcapng"); // CAD
-		
+
 		//
 		initMoshuTypeItem("41433130", "dwg"); // CAD
 		initMoshuTypeItem("38425053", "psd");
@@ -20602,7 +20607,7 @@ public class I9_TextRuleOperation {
 
 	/**
 	 * BASE64解密
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	public static String jiemi_decryptBASE64(String key) throws Exception {
@@ -20789,7 +20794,7 @@ public class I9_TextRuleOperation {
 
 	/**
 	 * 利用 {@link java.nio.ByteBuffer}实现byte[]转long
-	 * 
+	 *
 	 * @param input
 	 * @param offset
 	 * @param littleEndian 输入数组是否小端模式
@@ -20828,7 +20833,7 @@ public class I9_TextRuleOperation {
 
 	/**
 	 * 将一个 int 型数据转化为两个byte 数据
-	 * 
+	 *
 	 * @param value int 数值
 	 * @return 两个字节的byte 数组
 	 */
@@ -20865,221 +20870,221 @@ public class I9_TextRuleOperation {
 		int mHz = channel_id;
 		switch (channel_id) {
 
-		case 1:
-			mHz = 2412;
-			break;
+			case 1:
+				mHz = 2412;
+				break;
 
-		case 2:
-			mHz = 2417;
-			break;
+			case 2:
+				mHz = 2417;
+				break;
 
-		case 3:
-			mHz = 2422;
-			break;
+			case 3:
+				mHz = 2422;
+				break;
 
-		case 4:
-			mHz = 2427;
-			break;
+			case 4:
+				mHz = 2427;
+				break;
 
-		case 5:
-			mHz = 2432;
-			break;
+			case 5:
+				mHz = 2432;
+				break;
 
-		case 6:
-			mHz = 2437;
-			break;
+			case 6:
+				mHz = 2437;
+				break;
 
-		case 7:
-			mHz = 2442;
-			break;
+			case 7:
+				mHz = 2442;
+				break;
 
-		case 8:
-			mHz = 2447;
-			break;
+			case 8:
+				mHz = 2447;
+				break;
 
-		case 9:
-			mHz = 2452;
-			break;
+			case 9:
+				mHz = 2452;
+				break;
 
-		case 10:
-			mHz = 2457;
-			break;
+			case 10:
+				mHz = 2457;
+				break;
 
-		case 11:
-			mHz = 2462;
-			break;
+			case 11:
+				mHz = 2462;
+				break;
 
-		case 12:
-			mHz = 2467;
-			break;
+			case 12:
+				mHz = 2467;
+				break;
 
-		case 13:
-			mHz = 2472;
-			break;
+			case 13:
+				mHz = 2472;
+				break;
 
-		case 16:
-			mHz = 5080;
-			break;
+			case 16:
+				mHz = 5080;
+				break;
 
-		case 34:
-			mHz = 5170;
-			break;
+			case 34:
+				mHz = 5170;
+				break;
 
-		case 36:
-			mHz = 5180;
-			break;
+			case 36:
+				mHz = 5180;
+				break;
 
-		case 38:
-			mHz = 5190;
-			break;
+			case 38:
+				mHz = 5190;
+				break;
 
-		case 40:
-			mHz = 5200;
-			break;
-		case 42:
-			mHz = 5210;
-			break;
+			case 40:
+				mHz = 5200;
+				break;
+			case 42:
+				mHz = 5210;
+				break;
 
-		case 44:
-			mHz = 5220;
-			break;
+			case 44:
+				mHz = 5220;
+				break;
 
-		case 46:
-			mHz = 5230;
-			break;
+			case 46:
+				mHz = 5230;
+				break;
 
-		case 48:
-			mHz = 5240;
-			break;
+			case 48:
+				mHz = 5240;
+				break;
 
-		case 50:
-			mHz = 5250;
-			break;
+			case 50:
+				mHz = 5250;
+				break;
 
-		case 52:
-			mHz = 5260;
-			break;
+			case 52:
+				mHz = 5260;
+				break;
 
-		case 56:
-			mHz = 5280;
-			break;
+			case 56:
+				mHz = 5280;
+				break;
 
-		case 60:
-			mHz = 5300;
-			break;
+			case 60:
+				mHz = 5300;
+				break;
 
-		case 64:
-			mHz = 5320;
-			break;
+			case 64:
+				mHz = 5320;
+				break;
 
-		case 70:
-			mHz = 5350;
-			break;
+			case 70:
+				mHz = 5350;
+				break;
 
-		case 94:
-			mHz = 5470;
-			break;
+			case 94:
+				mHz = 5470;
+				break;
 
-		case 100:
-			mHz = 5500;
-			break;
+			case 100:
+				mHz = 5500;
+				break;
 
-		case 104:
-			mHz = 5520;
-			break;
+			case 104:
+				mHz = 5520;
+				break;
 
-		case 108:
-			mHz = 5540;
-			break;
+			case 108:
+				mHz = 5540;
+				break;
 
-		case 112:
-			mHz = 5560;
-			break;
+			case 112:
+				mHz = 5560;
+				break;
 
-		case 116:
-			mHz = 5580;
-			break;
+			case 116:
+				mHz = 5580;
+				break;
 
-		case 120:
-			mHz = 5600;
-			break;
+			case 120:
+				mHz = 5600;
+				break;
 
-		case 124:
-			mHz = 5620;
-			break;
+			case 124:
+				mHz = 5620;
+				break;
 
-		case 128:
-			mHz = 5640;
-			break;
+			case 128:
+				mHz = 5640;
+				break;
 
-		case 132:
-			mHz = 5660;
-			break;
+			case 132:
+				mHz = 5660;
+				break;
 
-		case 136:
-			mHz = 5680;
-			break;
+			case 136:
+				mHz = 5680;
+				break;
 
-		case 140:
-			mHz = 5700;
-			break;
+			case 140:
+				mHz = 5700;
+				break;
 
-		case 145:
-			mHz = 5725;
-			break;
+			case 145:
+				mHz = 5725;
+				break;
 
-		case 149:
-			mHz = 5745;
-			break;
+			case 149:
+				mHz = 5745;
+				break;
 
-		case 153:
-			mHz = 5765;
-			break;
+			case 153:
+				mHz = 5765;
+				break;
 
-		case 157:
-			mHz = 5785;
-			break;
+			case 157:
+				mHz = 5785;
+				break;
 
-		case 161:
-			mHz = 5805;
-			break;
+			case 161:
+				mHz = 5805;
+				break;
 
-		case 165:
-			mHz = 5825;
-			break;
+			case 165:
+				mHz = 5825;
+				break;
 
-		case 183:
-			mHz = 4915;
-			break;
+			case 183:
+				mHz = 4915;
+				break;
 
-		case 184:
-			mHz = 4920;
-			break;
+			case 184:
+				mHz = 4920;
+				break;
 
-		case 185:
-			mHz = 4925;
-			break;
+			case 185:
+				mHz = 4925;
+				break;
 
-		case 187:
-			mHz = 4935;
-			break;
+			case 187:
+				mHz = 4935;
+				break;
 
-		case 188:
-			mHz = 4940;
-			break;
+			case 188:
+				mHz = 4940;
+				break;
 
-		case 189:
-			mHz = 4945;
-			break;
+			case 189:
+				mHz = 4945;
+				break;
 
-		case 192:
-			mHz = 4960;
-			break;
-		case 196:
-			mHz = 4980;
-			break;
+			case 192:
+				mHz = 4960;
+				break;
+			case 196:
+				mHz = 4980;
+				break;
 
-		default:
+			default:
 
 		}
 		return mHz;
@@ -21295,21 +21300,21 @@ public class I9_TextRuleOperation {
 	}
 
 
-	public static  String  ByteAsHexString(byte [] byteArray) {        
+	public static  String  ByteAsHexString(byte [] byteArray) {
 		StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < byteArray.length; i++) {
-            String hex = Integer.toHexString(byteArray[i] & 0xFF);
-            if (hex.length() == 1) {
-                hex = '0' + hex;
-            }
+		for (int i = 0; i < byteArray.length; i++) {
+			String hex = Integer.toHexString(byteArray[i] & 0xFF);
+			if (hex.length() == 1) {
+				hex = '0' + hex;
+			}
 
-            sb.append(hex.toLowerCase()+" ");
-        }
-        return sb.toString();
-    
-    }
-	
-	
+			sb.append(hex.toLowerCase()+" ");
+		}
+		return sb.toString();
+
+	}
+
+
 	// List<A_B_C> 需要把这个 创建了三个 JavaBean
 // A , B  ,C  这三个 对象的 execute()方法 会执行  parseMap();  zzj
 //         而不会执行  parseMap()  的  generationBean.writeList(clz);  去 生成
