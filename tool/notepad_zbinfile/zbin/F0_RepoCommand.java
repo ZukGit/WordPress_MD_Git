@@ -910,7 +910,7 @@ public class F0_RepoCommand {
         
         product_txt_List.add(getSchema("【"+productName+" MSI Init && Zrule 】 MSI Repo Init 初始化 MSI 命令  && Zrule修改命令 "));
         product_txt_List.add("");
-        product_txt_List.add(metaData.buildinstruction_msionly_repo_fixed_init+" && "+ " repo sync -j2 " +" && "+" repo start --all TEMP " +" && "+"zrule_apply_G2"+Cur_Batch_End+" #_57 1  2  tip_qcom_mtk"+" && "+"source /opt/conf/moto.conf "+" && "+metaData.buildinstruction_msionly_compile_command+ " 2>&1 | tee "+getTimeStamp()+"_"+metaData.buildsummary_build_target+".log");
+        product_txt_List.add(metaData.buildinstruction_msionly_repo_fixed_init+" && "+ " repo sync -j2 " +" && "+" repo start --all TEMP " +" && "+"zrule_apply_G2"+Cur_Batch_End+" @_57 1  2  tip_qcom_mtk"+" && "+"source /opt/conf/moto.conf "+" && "+metaData.buildinstruction_msionly_compile_command+ " 2>&1 | tee "+getTimeStamp()+"_"+metaData.buildsummary_build_target+".log");
 
         
         
@@ -922,7 +922,7 @@ public class F0_RepoCommand {
 
         product_txt_List.add(getSchema("【"+productName+" MSI-Track Init && Zrule  】  MSI Repo Trace Init 初始化 MSI 命令  && Zrule修改命令 "));
         product_txt_List.add("");
-        product_txt_List.add(metaData.buildinstruction_msionly_repo_fixed_init+" && "+ " repo --trace sync  -cdf  -j2  " +" && "+" repo start --all TEMP " +" && "+"zrule_apply_G2"+Cur_Batch_End+" #_57 1  2  tip_qcom_mtk"+" && "+"source /opt/conf/moto.conf "+" && "+metaData.buildinstruction_msionly_compile_command+ " 2>&1 | tee "+getTimeStamp()+"_"+metaData.buildsummary_build_target+".log");
+        product_txt_List.add(metaData.buildinstruction_msionly_repo_fixed_init+" && "+ " repo --trace sync  -cdf  -j2  " +" && "+" repo start --all TEMP " +" && "+"zrule_apply_G2"+Cur_Batch_End+" @_57 1  2  tip_qcom_mtk"+" && "+"source /opt/conf/moto.conf "+" && "+metaData.buildinstruction_msionly_compile_command+ " 2>&1 | tee "+getTimeStamp()+"_"+metaData.buildsummary_build_target+".log");
 
         product_txt_List.add("");
         
@@ -934,7 +934,7 @@ public class F0_RepoCommand {
         product_txt_List.add("");
         product_txt_List.add(getSchema("【"+productName+" MSI Rebuild && Zrule  】 &&  Zrule修改命令 "));
         product_txt_List.add("");
-        product_txt_List.add("zrule_apply_G2"+Cur_Batch_End+" #_57 1  2  tip_qcom_mtk"+" && "+"source /opt/conf/moto.conf "+" && "+metaData.buildinstruction_msionly_compile_command+ " 2>&1 | tee "+getTimeStamp()+"_"+metaData.buildsummary_build_target+".log");
+        product_txt_List.add("zrule_apply_G2"+Cur_Batch_End+" @_57 1  2  tip_qcom_mtk"+" && "+"source /opt/conf/moto.conf "+" && "+metaData.buildinstruction_msionly_compile_command+ " 2>&1 | tee "+getTimeStamp()+"_"+metaData.buildsummary_build_target+".log");
 
         
         
@@ -951,7 +951,7 @@ public class F0_RepoCommand {
         product_txt_List.add("");
         product_txt_List.add(getSchema("【"+productName+" Vendor Init && Zrule  】  Vendor Repo Init 初始化 Vendor 命令 && zrule修改命令"));
         product_txt_List.add("");
-        product_txt_List.add( metaData.buildinstruction_vendoronly_repo_fixed_init+" && " +" repo sync -j2 " +" && "+" repo start --all TEMP "+" && "+"zrule_apply_G2"+Cur_Batch_End+" #_57 1  2  tip_qcom_mtk"  +" && "+"source /opt/conf/moto.conf "+" && "+metaData.buildinstruction_vendoronly_compile_command+ " 2>&1 | tee "+getTimeStamp()+"_"+metaData.buildsummary_build_target+".log");
+        product_txt_List.add( metaData.buildinstruction_vendoronly_repo_fixed_init+" && " +" repo sync -j2 " +" && "+" repo start --all TEMP "+" && "+"zrule_apply_G2"+Cur_Batch_End+" @_57 1  2  tip_qcom_mtk"  +" && "+"source /opt/conf/moto.conf "+" && "+metaData.buildinstruction_vendoronly_compile_command+ " 2>&1 | tee "+getTimeStamp()+"_"+metaData.buildsummary_build_target+".log");
 
         
         
@@ -964,7 +964,7 @@ public class F0_RepoCommand {
         product_txt_List.add("");
         product_txt_List.add(getSchema("【"+productName+" Vendor Track Init && Zrule  】 Vendor Repo Trace Init  初始化 Vendor 命令 && Zrule修改命令 "));
         product_txt_List.add("");
-        product_txt_List.add( metaData.buildinstruction_vendoronly_repo_fixed_init+" && " +" repo --trace sync  -cdf  -j2 " +" && "+" repo start --all TEMP "+" && "+"zrule_apply_G2"+Cur_Batch_End+" #_57 1  2  tip_qcom_mtk"  +" && "+"source /opt/conf/moto.conf "+" && "+metaData.buildinstruction_vendoronly_compile_command+ " 2>&1 | tee "+getTimeStamp()+"_"+metaData.buildsummary_build_target+".log");
+        product_txt_List.add( metaData.buildinstruction_vendoronly_repo_fixed_init+" && " +" repo --trace sync  -cdf  -j2 " +" && "+" repo start --all TEMP "+" && "+"zrule_apply_G2"+Cur_Batch_End+" @_57 1  2  tip_qcom_mtk"  +" && "+"source /opt/conf/moto.conf "+" && "+metaData.buildinstruction_vendoronly_compile_command+ " 2>&1 | tee "+getTimeStamp()+"_"+metaData.buildsummary_build_target+".log");
 
         
         product_txt_List.add("");
@@ -978,7 +978,7 @@ public class F0_RepoCommand {
         
         product_txt_List.add(getSchema("【"+productName+" Vendor Rebuild  && Zrule 】  && Zrule修改命令"));
         product_txt_List.add("");
-        product_txt_List.add("zrule_apply_G2"+Cur_Batch_End+" #_57 1  2  tip_qcom_mtk"+" && "+"source /opt/conf/moto.conf "+"  && "+metaData.buildinstruction_vendoronly_compile_command+ " 2>&1 | tee "+getTimeStamp()+"_"+metaData.buildsummary_build_target+".log");
+        product_txt_List.add("zrule_apply_G2"+Cur_Batch_End+" @_57 1  2  tip_qcom_mtk"+" && "+"source /opt/conf/moto.conf "+"  && "+metaData.buildinstruction_vendoronly_compile_command+ " 2>&1 | tee "+getTimeStamp()+"_"+metaData.buildsummary_build_target+".log");
 
         product_txt_List.add("");
 

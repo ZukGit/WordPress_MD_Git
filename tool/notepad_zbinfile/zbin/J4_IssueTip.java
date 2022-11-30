@@ -701,6 +701,8 @@ public class J4_IssueTip {
 
     static void  GPS_Issue_Tip(){
         System.out.println("═══════════════════════ GPS PAGE ════════════════════════════════════════════════");
+        System.out.println("【 GPS DUMP 相关命令】");
+        System.out.println("adb shell dumpsys location         > location.txt                 # 【查看当前 location 服务情况 】");
         System.out.println("【设置位置模式 0-关闭位置模式 1-打开位置模式 2-打开省电位置模式 3-打开高性能位置模式 】");
         System.out.println("adb shell settings get secure location_mode");
         System.out.println("adb shell settings put secure location_mode 0");

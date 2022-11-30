@@ -24,6 +24,7 @@ import com.github.javaparser.ast.stmt.ExpressionStmt;
 import com.github.javaparser.ast.stmt.IfStmt;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
+import com.github.javaparser.utils.StringEscapeUtils;
 import com.google.common.collect.Maps;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
@@ -419,8 +420,13 @@ public class G2_ApplyRuleFor_TypeFile {
 		// bash   sh    java   等等  需要   添加Log 的 操作
 		realTypeRuleList.add(new AddLog_CompileCheck_For_File_Rule_57());
 		
+
+		
+		
 		
 	}
+	
+	
 	
     static String Rule_57_TAG = "zukgit_"+getTimeStampyyyyMMdd_HHmmss();
     static String Rule_57_LogTypeStr = "log";   // log   slog   syso  三种类型的打印
@@ -4844,6 +4850,10 @@ public class G2_ApplyRuleFor_TypeFile {
 
 		boolean showmd5 = false;
 		boolean force_delete = false;
+		
+		boolean clear_emptydir = false;  // 清除  空 文件夹
+		
+		
 		ArrayList<File> needDeleteFileList; // 需要删除的文件
 
 		ArrayList<String> allMD5List; // 所有文件的MD5的值
@@ -4875,12 +4885,46 @@ public class G2_ApplyRuleFor_TypeFile {
 					showmd5 = true;
 				}
 
+				if (paramItem_lower_trim.startsWith("clear_emptydir")) {
+					clear_emptydir = true;
+				}
+				
 			}
 
-			System.out.println(" 当前输入 delete_true=" + force_delete);
+			System.out.println(" 当前输入 delete_true=" + force_delete +  "  showmd5="+showmd5+"   clear_emptydir="+clear_emptydir);
 
 			// TODO Auto-generated method stub
 			return super.initParamsWithInputList(inputParamList);
+		}
+		
+		void operation_delete_empty_dirs(ArrayList<File> allDirFileList) {
+			
+			allDirFileList.sort(mFileDateComparion_Deep_Seperator);
+			
+			
+			for (int i = 0; i < allDirFileList.size(); i++) {
+				File file_item =  allDirFileList.get(i);
+				boolean isEmptyDir = true;
+				if(file_item.exists() && file_item.listFiles() != null  && file_item.listFiles().length > 0 ) {
+					isEmptyDir = false;
+					
+				}
+				
+			
+				if(isEmptyDir) {
+					System.out.println("删除 all_dir["+i+"]["+allDirFileList.size()+"] = " +" file_seperator["+getStrRepeatCount(file_item.getAbsolutePath(), File.separator)+"] isEmptyDir["+isEmptyDir+"]  Path=" + file_item.getAbsolutePath() );
+
+					file_item.delete();
+					
+				}else {
+					
+					System.out.println("保留 all_dir["+i+"]["+allDirFileList.size()+"] = " +" file_seperator["+getStrRepeatCount(file_item.getAbsolutePath(), File.separator)+"] isEmptyDir["+isEmptyDir+"]  Path=" + file_item.getAbsolutePath() );
+	
+				}
+
+			
+			}
+			
 		}
 
 		@Override
@@ -4891,6 +4935,14 @@ public class G2_ApplyRuleFor_TypeFile {
 				allOperationDirList.addAll(allSubDirFileList);
 			}
 			allSubDirFileList.add(curDirFile);
+			
+			if(clear_emptydir) {
+				
+				System.out.println("执行删除 空文件夹的操作! ");
+				operation_delete_empty_dirs(allSubDirFileList);
+				
+				return null ;
+			}
 
 			for (int i = 0; i < allOperationDirList.size(); i++) {
 				File subDir = allOperationDirList.get(i);
@@ -4954,8 +5006,9 @@ public class G2_ApplyRuleFor_TypeFile {
 			return "\n" + Cur_Bat_Name + " #_" + rule_index
 					+ "  delete_true      //  去除在 一个文件夹中 多余的相同的 MD5 文件   只保留 一个MD5  去重操作  \n" + Cur_Bat_Name + "  #_"
 					+ rule_index + " showmd5_true    ###  把 当前的目录中的文件的MD5 输出到文本中   \n" + Cur_Bat_Name + "  #_"
-					+ rule_index + " showmd5_true delete_true    ###  把 当前的目录中的文件的MD5 输出到文本中 并删除重复文件  \n" + Cur_Bat_Name
-					+ "  #_" + rule_index + "    ### 打印当前目录的重复文件  \n" + ""
+					+ rule_index + " showmd5_true delete_true    ###  把 当前的目录中的文件的MD5 输出到文本中 并删除重复文件  \n" 
+					+ Cur_Bat_Name	+ "  #_" + rule_index + "  clear_emptydir   ###  删除所有子目录 孙目录 为空的 文件夹   \n" + ""
+					+ Cur_Bat_Name	+ "  #_" + rule_index + "    ### 打印当前目录的重复文件  \n" + ""
 //			zrule_apply_G2.bat  #_46  copyright_show  harddir_true
 			;
 		}
@@ -13536,6 +13589,28 @@ public class G2_ApplyRuleFor_TypeFile {
 
 	};
 
+     static int getStrRepeatCount(String mainStr, String subStr) {
+//声明一个要返回的变量
+       int count = 0;
+//声明一个初始的下标，从初始位置开始查找
+       int index = 0;
+//获取主数据的长度
+       int mainStrLength = mainStr.length();
+//获取要查找的数据长度
+       int subStrLength = subStr.length();
+//如果要查找的数据长度大于主数据的长度则返回0
+       if (subStrLength > mainStrLength) {
+           return 0;
+       }
+//循环使用indexOf查找出现的下标，如果出现一次则count++
+       while ((index = mainStr.indexOf(subStr, index)) != -1) {
+           count++;
+//从找到的位置下标加上要查找的字符串长度，让指针往后移动继续查找
+           index += subStrLength;
+       }
+       return count;
+   }
+    
 	static Comparator mFileDateComparion_New_To_Old = new Comparator<File>() {
 		@Override
 		public int compare(File o1, File o2) {
@@ -13550,6 +13625,39 @@ public class G2_ApplyRuleFor_TypeFile {
 
 	};
 
+	
+	static Comparator mFileDateComparion_Deep_Seperator = new Comparator<File>() {
+		@Override
+		public int compare(File o1, File o2) {
+			String o1_name = o1.getAbsolutePath();
+			String o2_name = o2.getAbsolutePath();
+			
+			int o1_separator_count = getStrRepeatCount(o1_name,File.separator);
+			
+			int o2_separator_count = getStrRepeatCount(o2_name,File.separator);
+			
+			
+		//	repeat
+//			o1.separator
+			
+			if(o1_separator_count > o2_separator_count) {
+				
+				return -1;
+			}
+			
+			if(o1_separator_count < o2_separator_count) {
+				
+				return 1;
+			}
+			
+			return 0;
+			
+		}
+
+	};
+	
+	
+	
 	static Comparator mStringComparion = new Comparator<String>() {
 		@Override
 		public int compare(String o1, String o2) {
@@ -22764,19 +22872,19 @@ public class G2_ApplyRuleFor_TypeFile {
 		try {
 			Security.addProvider(new com.sun.crypto.provider.SunJCE());
 			Key key = getKey(strDefaultKey_Rule7.getBytes());
-			System.out.println("getFormat()=【"+key.getFormat()+"】  bytesToHexString=【getEncoded = "+bytesToHexString(key.getEncoded())+"】"
-			+"【getAlgorithm= "+key.getAlgorithm()+"】" +"【toString = "+key.toString()+"】" +"【serialVersionUID= "+key.serialVersionUID+"】");
+		//	System.out.println("getFormat()=【"+key.getFormat()+"】  bytesToHexString=【getEncoded = "+bytesToHexString(key.getEncoded())+"】"
+		//	+"【getAlgorithm= "+key.getAlgorithm()+"】" +"【toString = "+key.toString()+"】" +"【serialVersionUID= "+key.serialVersionUID+"】");
 			encryptCipher = Cipher.getInstance("DES/ECB/NoPadding");
 			encryptCipher.init(Cipher.ENCRYPT_MODE, key);
 			decryptCipher = Cipher.getInstance("DES/ECB/NoPadding");
 			decryptCipher.init(Cipher.DECRYPT_MODE, key);
-			System.out.println("getFormat()=【"+key.getFormat()+"】  bytesToHexString=【"+bytesToHexString(key.getEncoded())+"】");
+		//	System.out.println("getFormat()=【"+key.getFormat()+"】  bytesToHexString=【"+bytesToHexString(key.getEncoded())+"】");
 			
-			System.out.println("SunJCE_decryptCipher.toString()=【1 "+decryptCipher.toString()+"】"+"【2 "+decryptCipher+"】"
-					+"【3getAlgorithm  "+decryptCipher.getAlgorithm()+"】"+"【4getBlockSize "+decryptCipher.getBlockSize()+"】"+
-					"【5VI "+bytesToHexString(decryptCipher.getIV())+"】"+"【6getParameters "+decryptCipher.getParameters()+"】"+
-					"【7getProvider  "+decryptCipher.getProvider()+"】"	+"【8getExemptionMechanism "+decryptCipher.getExemptionMechanism()+"】") ;	
-			
+//			System.out.println("SunJCE_decryptCipher.toString()=【1 "+decryptCipher.toString()+"】"+"【2 "+decryptCipher+"】"
+//					+"【3getAlgorithm  "+decryptCipher.getAlgorithm()+"】"+"【4getBlockSize "+decryptCipher.getBlockSize()+"】"+
+//					"【5VI "+bytesToHexString(decryptCipher.getIV())+"】"+"【6getParameters "+decryptCipher.getParameters()+"】"+
+//					"【7getProvider  "+decryptCipher.getProvider()+"】"	+"【8getExemptionMechanism "+decryptCipher.getExemptionMechanism()+"】") ;	
+		
 			
 		} catch (Exception e) {
 
