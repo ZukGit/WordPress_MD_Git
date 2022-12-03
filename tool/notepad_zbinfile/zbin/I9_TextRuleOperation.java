@@ -586,9 +586,72 @@ public class I9_TextRuleOperation {
 		// 对 文件名为 zbatrule_I9_Rule60.sh  进行格式化 方法名 必须小写
 		CUR_RULE_LIST.add(new SH_Format_Rule_60());
 		
+		// 在  打印 每一行的起始 空格数量 
+		CUR_RULE_LIST.add(new Add_EmptyCount_For_EveryOneLine_Rule_61());
+		
 	}
 
 
+	class Add_EmptyCount_For_EveryOneLine_Rule_61 extends Basic_Rule {
+
+		Add_EmptyCount_For_EveryOneLine_Rule_61(boolean mIsInputDirAsSearchPoint) {
+			super(61);
+			isInputDirAsSearchPoint = mIsInputDirAsSearchPoint;
+		}
+
+		Add_EmptyCount_For_EveryOneLine_Rule_61() {
+			super(61, false);
+
+		}
+
+		// 1. 完成参数的 自我客制化 实现 checkParamsOK 方法
+
+		// 2. 对应的逻辑方法 实现方法 applyOperationRule
+
+		@Override
+		ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
+										   ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+			for (int i = 0; i < curInputFileList.size(); i++) {
+				File fileItem = curInputFileList.get(i);
+				ArrayList<String> contentList = ReadFileContentAsList(fileItem);
+			
+				ArrayList<String> fixedStrArr = addEmptyCount_ForOneLine_Rule_61(contentList);
+				writeContentToFile(I9_Temp_Text_File, fixedStrArr);
+				NotePadOpenTargetFile(I9_Temp_Text_File.getAbsolutePath());
+				System.out.println("rule_"+rule_index+" -> 把当前文件加入【行号_空格数】  File=" + fileItem.getAbsolutePath());
+			}
+
+			return super.applyOperationRule(curFileList, subFileTypeMap, curDirList, curRealFileList);
+		}
+
+		@Override
+		String simpleDesc() {
+			return " 打印 每一行 【行号_起始空格数量】  保持原始空格(判断python文件的起始空格数量)";
+		}
+
+		// 3. 如果当前 执行 错误 checkParams 返回 false 那么 将 打印这个函数 说明错误的可能原因
+		@Override
+		void showWrongMessage() {
+			System.out.println("当前 type 索引 " + rule_index + " 执行错误  可能是输入参数错误 请检查输入参数!");
+			System.out.println(" errorMsg = " + errorMsg);
+		}
+
+		// 4. 当前 rule的 说明 将会打印在 用户输入为空时的 提示语句！
+		@Override
+		String ruleTip(String type, int index, String batName, OS_TYPE curType) {
+			String itemDesc = "";
+			if (curType == OS_TYPE.Windows) {
+				itemDesc = batName.trim() + "  " + type + "_" + index + "    [索引 " + index + "]  描述:" + ""
+						+ simpleDesc();
+			} else {
+				itemDesc = batName.trim() + " " + type + "_" + index + "    [索引 " + index + "]  描述:" + ""
+						+ simpleDesc();
+			}
+
+			return itemDesc;
+		}
+	}
+	
 	class SH_Format_Rule_60 extends Basic_Rule {
 
 		ArrayList<Sh_Method> allMethodList = new ArrayList<Sh_Method>();
@@ -2185,7 +2248,7 @@ public class I9_TextRuleOperation {
 
 		@Override
 		String simpleDesc() {
-			return "  把当前 bash  文件 和 sh 文件  空格插入echo  追踪 打印数据  然后 查看 执行 调用过程  ";
+			return "  把当前 bash  文件 和 sh 文件 py文件  空格插入echo  追踪 打印数据  然后 查看 执行 调用过程  ";
 		}
 
 		Add_Echo_Log_To_SH_BASH_Rule_59() {
@@ -2201,30 +2264,326 @@ public class I9_TextRuleOperation {
 
 				String file_name = fileItem.getName();
 
-				if(!file_name.toLowerCase().endsWith(".sh") && !file_name.toLowerCase().endsWith(".bash") ) {
-
-					System.out.println("当前文件 不是  sh 文件 或者 bash  文件 无法执行  添加 echo 打印变量的操作  请检查!");
-
-					return null;
-				}
+	
 
 //                ArrayList<String>  fixedStrArr =   clearChinese_Rule_13(fileItem);
-				ArrayList<String> fixedStrArr = Bash_Sh_File_Add_Echo(fileItem);
+				
+				
+				ArrayList<String> fixedStrArr = new ArrayList<String>();
+				String tip_message = "";
+				if(file_name.toLowerCase().endsWith(".sh") ||file_name.toLowerCase().endsWith(".bash") ) {
+					
+					fixedStrArr = Bash_Sh_File_Add_Echo(fileItem);
+					
+					tip_message = "rule_" + rule_index + " ->  把当前 sh文件的 等号表达式=  都 转为 echo ${ var } = ${var} 的内容   File="
+							+ fileItem.getAbsolutePath();
+					
+				} else if(file_name.toLowerCase().endsWith(".py")) {
+					
+					fixedStrArr = PythonFile_Add_Log_Echo(fileItem,true);
+					
+				} else {
+					
+					System.out.println("当前文件 不是  sh 文件 或者 bash py  文件 无法执行  添加 echo 打印变量的操作  请检查!");
+					return null;
+				}
+	
+				
 				System.out.println("════════════" + "输出文件 Begin " + "════════════");
 				for (int j = 0; j < fixedStrArr.size(); j++) {
 					System.out.println(fixedStrArr.get(j));
 				}
 				System.out.println("════════════" + "输出文件 End " + "════════════");
+				System.out.println(tip_message);
 				writeContentToFile(I9_Temp_Text_File, fixedStrArr);
 				NotePadOpenTargetFile(I9_Temp_Text_File.getAbsolutePath());
-				System.out.println("rule_" + rule_index + " ->  把当前文件的 等号表达式=  都 转为 echo ${ var } = ${var} 的内容   File="
-						+ fileItem.getAbsolutePath());
+	
 			}
 
 			return super.applyOperationRule(curFileList, subFileTypeMap, curDirList, curRealFileList);
 		}
 
 
+		
+		
+		
+		public  ArrayList<String> PythonFile_Add_Log_Echo(File srcFile) {
+
+			return PythonFile_Add_Log_Echo(srcFile,false);
+		}
+		
+		
+		public  ArrayList<String> PythonFile_Add_Log_Echo(File srcFile , boolean isFullname) {
+			ArrayList<String> newListContent = new ArrayList<String>();
+
+			File curFile = srcFile;
+
+			String file_name = curFile.getName();
+			if(isFullname) {
+				file_name =  curFile.getAbsolutePath();
+			}
+			String operation_timestamp =getTimeStamp_yyyyMMdd_HHmmss();
+			
+			
+			ArrayList<String> python_rawList = ReadFileContentAsList(srcFile);
+			
+			// lg.log  和 print 
+			// print("════════════════"+"System Info Begin"+"════════════════")
+			
+			if(python_rawList == null) {
+				System.out.println("读取文件 "+srcFile.getAbsolutePath()+" 失败! ");
+				return newListContent;
+			}
+			
+			
+			boolean isLogPrint_Flag = isContainInStrList(python_rawList,"lg.log");
+			int mOneStepCount = calculPythonOneEmptyStep(python_rawList);
+			
+			System.out.println("mOneStepCount = "+ mOneStepCount +" isLogPrint_Flag="+isLogPrint_Flag);
+			String print_line_pre = "print(\"";
+			String print_line_end = "\")";
+			if(isLogPrint_Flag) {
+//				 print_line_pre = "lg.log(\"";
+//				 print_line_end = "\")";
+				
+				 print_line_pre = "print(\"";
+				 print_line_end = "\")";
+			}
+			
+			int print_count = 1;
+			String print_tag = "zukgit ";
+			 
+			
+			for (int i = 0; i < python_rawList.size(); i++) {
+				
+				String preLine = "";
+				String curLine = python_rawList.get(i);
+				String nextLine = "";
+				int pre_line_num = i;
+				if(i >= 1 &&  i <= python_rawList.size() -2 ) {
+					
+					do  {
+					//	System.out.println("pre_line_num = "+pre_line_num);
+						preLine = python_rawList.get(pre_line_num-1);
+						pre_line_num = pre_line_num -1;
+					
+					} while((pre_line_num) > 1 && "".equals(preLine.trim()));
+					
+					
+					int next_line_num = i;
+					do  {
+						nextLine = python_rawList.get(next_line_num+1);
+						next_line_num = next_line_num + 1;
+						
+					} while((next_line_num) < (python_rawList.size() -2)  && "".equals(nextLine.trim()));
+					
+					
+				}
+
+				if(curLine.contains(print_tag.trim())) {
+					System.out.println("已经 包含 tag["+print_tag+"]  跳过该行!");
+		
+					continue;
+				}
+				
+			
+				
+				if(curLine.trim().startsWith("#") || curLine.trim().startsWith("====") || curLine.trim().startsWith("\\") 
+						|| curLine.trim().endsWith("\\")  || curLine.trim().endsWith(",")   ) {
+					System.out.println("以 # 号 ==== 号 \\\\号  开头 那么是注释  那么 跳过");
+					newListContent.add(curLine);
+					continue;
+				}
+				
+				
+	
+				
+				
+	
+				
+				
+				int emptyCount = getEmptyBeginCount(curLine);
+				int emptyCount_next = getEmptyBeginCount(nextLine);
+				int emptyCount_pre = getEmptyBeginCount(preLine);
+				
+			
+				if(curLine.trim().startsWith("for ") && curLine.trim().contains("in ")) {
+					String var_item = curLine.substring(0,curLine.indexOf("in ")).trim();
+					var_item = 	var_item.replace("for ", "").replace(" ", "");
+					
+					if(curLine.trim().endsWith("]")) {
+						System.out.println("不是正常的 for 循环  不执行打印!");
+						newListContent.add(curLine);   // 先打印 原始 数据
+						continue;
+					}
+					
+
+//				    for i in range(1, 4):
+//				            print("zukgit  _887_ D:\1A\1\build_old.py\Z9_prule.py_20221202_174509_i="+i+"")
+//				            enemy = Rule5_EnemyTank(i)
+			            
+					int for_space_count = emptyCount+mOneStepCount;
+					if(for_space_count != emptyCount_next && emptyCount_next != 0 ) {  //  和 下 一行  保持 一致 
+						for_space_count = emptyCount_next;
+					}
+					System.out.println("pre_line="+preLine+"【emptyCount_pre】="+emptyCount_pre);
+					System.out.println("curLine="+curLine+"【emptyCount】="+emptyCount);
+					System.out.println("nextLine="+nextLine+"【emptyCount_pre】="+emptyCount_next);
+					
+					var_item = "str("+var_item+")";
+					
+					
+					String print_code_py = getRepeatString(" ", for_space_count)+print_line_pre+
+							print_tag+" _"+print_count+"_ "+file_name+"_"+operation_timestamp+"_"+var_item+"="+"\"+"+var_item+"+\""     // 打印的数据 
+					+print_line_end;
+				
+					print_count++;
+					
+					newListContent.add(curLine);   // 先打印 原始 数据
+					
+					newListContent.add(print_code_py);  //  再 打印输出 
+					
+			
+					
+					continue;
+					
+				}
+				
+				//  进入方法 的 打印 
+				if(curLine.trim().startsWith("def ")  && curLine.contains(":")
+						 && curLine.contains("(")  && curLine.contains(")")) {
+					String func_name = curLine.substring(0,curLine.indexOf("(")).trim();	
+					func_name = func_name.replace("def ", "").trim();	
+					
+					String func_params= curLine.substring(curLine.indexOf("("), curLine.indexOf(")")).trim();	
+					func_params = func_params.replace("(","").trim();	
+					func_params = func_params.replace(")","").trim();	
+					
+					ArrayList<String> param_list = new ArrayList<String>();
+					if(func_params.equals("")) {  // 为 空的参数 
+						param_list.add("");
+					} else if(!func_params.contains(",")) {
+						
+						if(!func_params.contains("*")) {
+							
+							func_params = "str("+func_params+")";
+							param_list.add(func_params);
+						}
+					
+						
+					} else if(func_params.contains(",")) {
+						String[] param_arr = func_params.split(",");
+						
+						if(param_arr != null) {
+							
+							for (int j = 0; j < param_arr.length; j++) {
+								String param_item = param_arr[j].trim();
+								// copytree(src, dst, symlinks=False, ignore=None)
+								// __init__(self, length = 3, headPos = [5,3], direction = 'right')
+								
+							
+								if(!param_item.contains("]") &&  !param_item.contains("[")
+										&& !param_item.contains(")") &&  !param_item.contains("(") && 
+										!param_item.contains("*")) {
+									String param_name = param_item;
+									if(param_item.contains("=")) {
+										param_name =  param_name.substring(0,param_name.indexOf("="));	
+									}
+									
+									param_name = "str("+param_name+")";
+									param_list.add(param_name);
+						
+								}
+		
+								
+							}
+							
+							
+						}
+
+					}
+		
+					
+					StringBuilder param_sb = new StringBuilder();
+					for (int j = 0; j < param_list.size(); j++) {
+					String param_name_item =	param_list.get( j).trim();
+		
+					if(!"".equals(param_name_item)) {
+						param_sb.append("+\"  "+param_name_item+"=\"+"+param_name_item);
+					}
+					
+					}
+					
+					param_sb.append(");");  // print_line_end
+					
+					
+					
+					String print_code_py = getRepeatString(" ", emptyCount+mOneStepCount)+print_line_pre+
+							print_tag+" _"+print_count+"_ "+file_name+"_"+operation_timestamp+"_[ method_in "+func_name+" ] \""+param_sb.toString();      // 打印的数据 
+//					+print_line_end;
+			
+					print_count++;
+					
+			
+					newListContent.add(curLine);   // 先打印 原始 数据
+					
+					newListContent.add(print_code_py);  //  再 打印输出 
+					continue;
+					
+					
+					
+				}
+				
+				
+				
+				if(curLine.contains("=") && !curLine.trim().endsWith("{") ) {
+					String var_item = curLine.substring(0,curLine.indexOf("=")).trim();
+					
+					// 如果 变量 还包含 空格 那么 不打印 var  
+					if(var_item.contains(" ") || var_item.contains("\"") ||
+							var_item.contains("(") || var_item.contains(")")) {
+						newListContent.add(curLine);
+						continue;
+					}
+					
+//			        texts = [font.render(str(letter[i]), True, (0, 255, 0))
+//			                 for i in range(len(letter))]    // 多行 表达式时   不打印 
+			                		 
+					if(nextLine.contains("]") && !nextLine.contains("[")) {
+						newListContent.add(curLine);
+						continue;
+					}
+	
+					var_item = "str("+var_item+")";
+					
+					// ['exec_dir']    在 字符串里 去掉 '  变为 空
+			String print_code_py = getRepeatString(" ", emptyCount)+print_line_pre+
+						print_tag+" _"+print_count+"_ "+file_name+"_"+operation_timestamp+"_ "+var_item.replace("'", "")+"="+"\"+"+var_item+"+\""     // 打印的数据 
+				+print_line_end;
+				print_count++;
+				
+
+				
+				newListContent.add(curLine);   // 先打印 原始 数据
+				
+				newListContent.add(print_code_py);  //  再 打印输出 
+				continue;
+				}
+				
+				newListContent.add(curLine);   // 先打印 原始 数据
+				
+			}
+			
+			
+			
+			return newListContent;
+		}
+		
+		
+		
+		
+		
+		
 		public  ArrayList<String> Bash_Sh_File_Add_Echo(File srcFile) {
 
 			return Bash_Sh_File_Add_Echo(srcFile,false);
@@ -14935,6 +15294,9 @@ public class I9_TextRuleOperation {
 		}
 	}
 
+	
+	
+	
 	public static ArrayList<String> ReadFileContentAsList(File mFilePath) {
 
 		if (mFilePath != null && mFilePath.exists()) {
@@ -16368,6 +16730,57 @@ public class I9_TextRuleOperation {
 		System.out.println("═════════════" + "输入到文件的新内容 End" + "═════════════");
 
 		return fixedStrArr;
+	}
+	
+	
+	ArrayList<String> addEmptyCount_ForOneLine_Rule_61(ArrayList<String> originStrList) {
+		if (originStrList == null)
+			return null;
+		ArrayList<String> fixedStrArr = new ArrayList<String>();
+		int lineNum = 1;
+		for (int i = 0; i < originStrList.size(); i++) {
+			String onrLineStr = originStrList.get(i);
+			
+			
+			int empty_count = getEmptyBeginCount(onrLineStr);
+	
+			fixedStrArr.add("【"+lineNum+"_"+empty_count+"】"+ onrLineStr);
+			lineNum++;
+		
+		}
+		System.out.println("═════════════" + "输入到文件的新内容 Begin 如下:" + "═════════════");
+		for (int i = 0; i < fixedStrArr.size(); i++) {
+			System.out.println(fixedStrArr.get(i));
+		}
+		System.out.println("═════════════" + "输入到文件的新内容 End" + "═════════════");
+
+		return fixedStrArr;
+	}
+	
+	static int getEmptyBeginCount(String oneLine) {
+		int empty_count = 0;
+		if(!oneLine.startsWith(" ")) {
+			return empty_count;
+		}
+		
+
+		
+		
+		int strLength = oneLine.length();
+		
+		for (int i = 0; i < strLength ;  i++) {
+			String pre_str = oneLine.charAt(i)+"";
+			if(pre_str.equals(" ")) {
+				empty_count++;
+			} else {
+				break;
+			}
+			 
+			
+		}
+		
+		return empty_count;
+		
 	}
 
 	static ArrayList<String> clearOneBlankCharAsOneStr_Rule_2(ArrayList<String> originStrList) {
@@ -22908,7 +23321,99 @@ public class I9_TextRuleOperation {
 
 	}
 
+	static int calculPythonOneEmptyStep(ArrayList<String> srtList) {
+		int step_count = 0;
+		HashSet<Integer> intSet = new HashSet<Integer>();
+		
+		boolean  Tip_Block_Begin = false;
+		boolean  Tip_Block_End = false;
+		for (int i = 0; i < srtList.size(); i++) {
+			String oneLine = srtList.get(i);
+			if("".equals(oneLine.trim()) ) {
+				continue;
+			}
+			
+			if(!Tip_Block_Begin && oneLine.trim().startsWith("'''") &&  oneLine.trim().indexOf("'''") == oneLine.trim().lastIndexOf("'''")) {
+				Tip_Block_Begin = true;
+				continue;
+			}
+			
+			if(!Tip_Block_End &&  oneLine.trim().startsWith("'''") &&  oneLine.trim().indexOf("'''") == oneLine.trim().lastIndexOf("'''")) {
+				Tip_Block_Begin = false;
+				Tip_Block_End = false;
+				continue;
+			}
+			
+			if(Tip_Block_Begin && !Tip_Block_End) {
+				System.out.println("注释阶段 不判断 space! ");
+				continue;
+			}
+			
+			
+			int space = getEmptyBeginCount(oneLine);
+		
+			
+			if(!intSet.contains(space)) {
+				 System.out.println("Line["+i+"]_space="+space+" Line="+oneLine);
+			}
+			
+			intSet.add(space);
+			
+		}
+		
+		if(intSet.size() == 0) {
+			return step_count;
+		}
+		
+		ArrayList<Integer> intArr  = new ArrayList<Integer>();
+		intArr.addAll(intSet);
+		
 
+		
+		intArr.sort(new Comparator<Integer>() {
+			@Override
+			public int compare(Integer o1, Integer o2) {
+		
+				return o2-o1;
+			}
+		});
+
+		
+		
+		for (int i = 0; i < intArr.size(); i++) {
+			int space_item = intArr.get(i);
+			if(space_item == 0 ) {
+				continue;
+			}
+			
+			if(step_count == 0) {
+				step_count = space_item;
+			}
+		
+			if(space_item < step_count ) {
+				step_count = space_item;
+			}
+			
+			
+		}
+	
+		
+		
+		return step_count;
+		
+		
+	}
+static	boolean isContainInStrList(ArrayList<String> srtList, String matchStr) {
+
+		for (int i = 0; i < srtList.size(); i++) {
+			String str_item = srtList.get(i);
+			if (str_item.contains(matchStr)) {
+				return true;
+			}
+		}
+		return false;
+
+	}
 	// List<A_B_C> 需要把这个 创建了三个 JavaBean
 // A , B  ,C  这三个 对象的 execute()方法 会执行  parseMap();  zzj
 //         而不会执行  parseMap()  的  generationBean.writeList(clz);  去 生成
