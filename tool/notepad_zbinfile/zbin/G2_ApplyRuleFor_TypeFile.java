@@ -8,6 +8,7 @@ import it.sauronsoftware.jave.Encoder;
 import it.sauronsoftware.jave.MultimediaInfo;
 import it.sauronsoftware.jave.VideoSize;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.drew.imaging.jpeg.JpegMetadataReader;
@@ -420,12 +421,357 @@ public class G2_ApplyRuleFor_TypeFile {
 		// bash   sh    java   等等  需要   添加Log 的 操作
 		realTypeRuleList.add(new AddLog_CompileCheck_For_File_Rule_57());
 		
-
+		/*
+		 * { "jpg_lin_land":{"":["12.jpg","34.jpg"],"123":["123.jpg"]},
+		 * "jpg_lin_port":{"":["12.jpg","34.jpg"],"123":["123.jpg"]} }
+		 */
+		//  对输入的目录结构进行文件统计 并生成 json 数据输出
 		
+		realTypeRuleList.add(new InputDirSearch_To_JsonSummary_Rule_58());
 		
 		
 	}
 	
+	
+	class InputDirSearch_To_JsonSummary_Rule_58 extends Basic_Rule {
+		boolean isDirInput; //   是否有指定的 目录进行输入  
+
+		ArrayList<File> inputDirFileList;   // 输入的目录的集合
+		
+//		ArrayList<RootDirFile> rootDirList ;  // 构建 json-file-Summary 的 Bean类
+		FileSummary  mFileSummary;
+		File targetJsonDir;   // 指定当前 json 的 输出路径    //  如果为空 那么就在shell输出 json
+		File targetJsonFile ;  // 当前输出的Json 的文件的位置   // 名称固定  filesummary_rule58.json
+		String jsonFileName ;  // filesummary_rule58.json  固定死
+		InputDirSearch_To_JsonSummary_Rule_58() {
+			super("#", 58, 5); //
+			inputDirFileList = new ArrayList<File>();
+//			rootDirList = new  ArrayList<RootDirFile>();
+			isDirInput = false;
+			jsonFileName = "filesummary_rule"+rule_index+".json";
+			mFileSummary = new FileSummary("3333332");
+		}
+
+		@Override
+		boolean allowEmptyDirFileList() {
+			// TODO Auto-generated method stub
+			return true;
+		}
+		
+		
+		@Override
+		String simpleDesc() {
+			return "  \n"
+					+ Cur_Bat_Name  + " #_"+rule_index+"    ### 指定当前目录 输出当前目录的文件情况的 json 数据统计 \n"
+					+ Cur_Bat_Name  + " #_"+rule_index+"   C:\\Users\\zhuzj5\\Desktop\\ScreenShot\\1\\testA   C:\\Users\\zhuzj5\\Desktop\\ScreenShot\\1\\testB  outjsondir_C:\\Users\\zhuzj5\\Desktop\\ScreenShot\\1  ### 指定目录输出该目录的文件情况的 json 数据统计 \n"
+
+					;
+		}
+		
+		@Override
+		boolean initParamsWithInputList(ArrayList<String> inputParamList) {
+			// mdname_true // kaoyan_true gaokao_true
+
+			for (int i = 0; i < inputParamList.size(); i++) {
+				String paramItem_trim = inputParamList.get(i);
+				
+				File input_dir_file = new File(paramItem_trim);
+				
+				if(input_dir_file.exists() && input_dir_file.isDirectory()) {
+					
+					inputDirFileList.add(input_dir_file);
+				}
+				
+				
+				if(paramItem_trim.toLowerCase().trim().startsWith("outjsondir_")) {
+					
+					String outDirPath = paramItem_trim.replace("outjsondir_", "");
+					
+					File outDirFile = new File(outDirPath);
+					if(outDirFile.exists() && outDirFile.isDirectory()) {
+						targetJsonDir = outDirFile;
+						
+					}
+					
+				}
+				
+
+
+			}
+			
+			
+			if(targetJsonDir == null) {
+				System.out.println("当前 没有指定 "+ jsonFileName+" json文件的输出目录 目前输出到当前shell目录:"+curDirPath);
+			
+				targetJsonDir  = new File(curDirPath);
+			} else {
+				
+				System.out.println("当前指定的"+jsonFileName+" 文件输出目录:"+ targetJsonDir.getAbsolutePath());
+			}
+			
+			
+			targetJsonFile = new File(targetJsonDir.getAbsolutePath()+File.separator+jsonFileName);
+			
+			System.out.println("输出Json文件路径: "+ targetJsonFile.getAbsolutePath() );
+			
+			
+			if(inputDirFileList.size() != 0) {
+				isDirInput = true;
+				
+				for (int i = 0; i < inputDirFileList.size(); i++) {
+					File dirFile = inputDirFileList.get(i);
+					System.out.println("SearchDir统计文件夹列表["+i+"]["+inputDirFileList.size()+"] = "+  dirFile.getAbsolutePath());
+				}
+			} else {
+				
+				System.out.println("当前没有 指定输入文件夹! 将把Shell目录 "+curDirPath+" 作为输入参数 统计文件情况 并输出json文件!");
+			}
+			
+			// TODO Auto-generated method stub
+			return super.initParamsWithInputList(inputParamList);
+		}
+
+		
+		
+		void filesummary_operation(ArrayList<File> inputDirFileList) {
+			
+			
+			for (int i = 0; i < inputDirFileList.size(); i++) {
+				File dirFile = inputDirFileList.get(i);
+				System.out.println("_____SearchDir统计文件夹列表["+i+"]["+inputDirFileList.size()+"] _____"  );
+			
+				
+				
+			ArrayList<File> allSubDir = 	getAllSubDirFile(dirFile);
+			
+//			System.out.println("SearchDir["+i+"]["+inputDirFileList.size()+"] _____allSubDir.size()="+allSubDir.size()+" dirPath:"+dirFile.getAbsolutePath()  );
+				
+			RootDirFile rootDirFile_Item = new RootDirFile(dirFile.getName());
+			System.out.println("RootDirFile["+i+"]["+inputDirFileList.size()+"] _____allSubDir.size()="+allSubDir.size()+" dirPath:"+dirFile.getAbsolutePath()  +"  rootDirFile_ItemName="+dirFile.getName());
+
+			
+			for (int j = 0; j < allSubDir.size(); j++) {
+				ArrayList<File> subRealFileList = new ArrayList<File>();
+				ArrayList<String> subRealFileNameList = new ArrayList<String>();
+	
+				
+				File subDirFle = allSubDir.get(j);
+				
+				
+				// 当前子目录的路径 应该是相对于 根目录后剩下的目录
+				
+				// subDirRelativeFileName 为空的话 标识 是 自身root目录
+			String subDirRelativeFileName = getRelativeSubDirName(subDirFle.getAbsolutePath() , dirFile.getAbsolutePath() );
+				
+				SubDirFile subDirFile  = new SubDirFile(subDirRelativeFileName);
+//				System.out.println("SearchDir["+i+"]["+inputDirFileList.size()+"] _____allSubDir["+j+"]["+allSubDir.size()+"] = "+ subDirFle.getAbsolutePath()  );
+//				System.out.println("SubDirFile subDirRelativeFileName="+subDirRelativeFileName);
+				System.out.println("SubDirFile["+i+"]["+inputDirFileList.size()+"] _____allSubDir["+j+"]["+allSubDir.size()+"] = "+ subDirFle.getAbsolutePath()  +" subDirRelativeFileName="+subDirRelativeFileName );
+
+				File[] subFileArr = subDirFle.listFiles();
+				
+				if(subFileArr == null || subFileArr.length == 0) {
+					continue;
+				}
+				
+				for(File fileitem_in_subFileArr:subFileArr ) {
+					if(fileitem_in_subFileArr.isFile()) {
+						subRealFileList.add(fileitem_in_subFileArr);
+						subRealFileNameList.add(fileitem_in_subFileArr.getName());
+						subDirFile.realfilenamelist.add(fileitem_in_subFileArr.getName());
+					}
+				}
+				
+				System.out.println("SubDirFile["+i+"]["+inputDirFileList.size()+"] ____realfilenamelist.size()="+subDirFile.realfilenamelist.size());
+
+				rootDirFile_Item.allsubdir.add(subDirFile);
+				
+				
+			}
+			
+			mFileSummary.rootdirlist.add(rootDirFile_Item);
+			
+			}
+			
+			System.out.println("_____"+"rootDirList.size()="+mFileSummary.rootdirlist.size()+"_____");
+			
+			if(mFileSummary.rootdirlist.size() == 0) {
+				System.out.println("当前没有检测到 文件夹  请检出 输入的文件夹!");
+				return ;
+			}
+			
+			String dir_json_summary = build_dir_json_summary(mFileSummary);
+			
+			System.out.println();
+			System.out.println("_____________________ json summary _____________________");
+			System.out.println();
+			System.out.println();
+			
+			System.out.println(dir_json_summary);
+			
+			if(dir_json_summary != null) {
+				
+				writeContentToFile(targetJsonFile, dir_json_summary);
+				
+				System.out.println("输出json文件名称:  "+jsonFileName);
+				System.out.println("输出json文件路径:  "+targetJsonFile.getAbsolutePath());
+				
+			}
+			System.out.println();
+			
+		}
+		
+
+		@Override
+		ArrayList<File> applyDir_SubFileListRule5(ArrayList<File> allSubDirFileList,
+				ArrayList<File> allSubRealFileList) {
+
+			
+			
+			if(isDirInput) {   // 对输入的 目录 进行统计 
+				
+				filesummary_operation(inputDirFileList);
+
+			} else {  //  对自身Shell 路径进行统计 
+				
+				System.out.println("当前没有 指定遍历的目录 对当前shell路径进行遍历:"+ curDirPath);
+
+				ArrayList<File> searchDirFileList = new ArrayList<File> ();
+				
+				searchDirFileList.add(new File(curDirPath));
+				
+				filesummary_operation(searchDirFileList);
+				System.out.println("当前没有 指定遍历的目录 对当前shell路径进行遍历:"+ curDirPath);
+
+			}
+
+
+              
+			return super.applyDir_SubFileListRule5(allSubDirFileList, allSubRealFileList);
+		}
+
+	
+		String getRelativeSubDirName(String subDirAbsPath , String rootDirAbsPath) {
+			String relative_name = subDirAbsPath.replace(rootDirAbsPath, "");
+			
+			return relative_name;
+		}
+		
+		String build_dir_json_summary(FileSummary fileSummary) {
+
+			
+			 String jsonString = JSONUtil.toJsonStr(fileSummary);
+		
+			 if(jsonString != null) {
+				 jsonString = 	 JSONUtil.formatJsonStr(jsonString);
+			 }
+		
+			 
+			
+			return jsonString;
+			
+		}
+
+		class FileSummary {
+			String password;
+//			ArrayList<String> allowidlist;   // 设备id
+			
+			ArrayList<RootDirFile> rootdirlist;
+			
+			FileSummary(){
+			}
+			
+			FileSummary(String pwd){
+				password = pwd;
+				rootdirlist = new ArrayList<RootDirFile>();
+			}
+
+			public String getPassword() {
+				return password;
+			}
+
+			public void setPassword(String password) {
+				this.password = password;
+			}
+
+			public ArrayList<RootDirFile> getRootdirlist() {
+				return rootdirlist;
+			}
+
+			public void setRootdirlist(ArrayList<RootDirFile> rootdirlist) {
+				this.rootdirlist = rootdirlist;
+			}
+
+		
+			
+			
+		}
+		
+		
+		class RootDirFile{         //  当前的 一个指定的 输入的目录 
+			String rootdirname ;   //  根目录的文件夹名称  
+			ArrayList<SubDirFile> allsubdir;
+			
+			RootDirFile(){
+			}
+
+			RootDirFile(String rootname ){
+				rootdirname = rootname;
+				allsubdir = new ArrayList<SubDirFile> ();
+			}
+			
+			public String getRootdirname() {
+				return rootdirname;
+			}
+
+			public void setRootdirname(String rootdirname) {
+				this.rootdirname = rootdirname;
+			}
+
+			public ArrayList<SubDirFile> getAllsubdir() {
+				return allsubdir;
+			}
+
+			public void setAllsubdir(ArrayList<SubDirFile> allsubdir) {
+				this.allsubdir = allsubdir;
+			}
+			
+		}
+		
+		
+		class SubDirFile{
+			String subdirname;    // 当前的目录的名称
+			ArrayList<String> realfilenamelist;  //  当前目录下的实体文件名称的集合
+			
+			SubDirFile(){
+			}
+
+			SubDirFile(String subname ){
+				subdirname = subname;
+				realfilenamelist = new ArrayList<String> ();
+				
+			}
+			
+			public String getSubdirname() {
+				return subdirname;
+			}
+
+			public void setSubdirname(String subdirname) {
+				this.subdirname = subdirname;
+			}
+
+			public ArrayList<String> getRealfilenamelist() {
+				return realfilenamelist;
+			}
+
+			public void setRealfilenamelist(ArrayList<String> realfilenamelist) {
+				this.realfilenamelist = realfilenamelist;
+			}
+			
+			
+		}
+		
+	}
 	
 	
     static String Rule_57_TAG = "zukgit_"+getTimeStampyyyyMMdd_HHmmss();

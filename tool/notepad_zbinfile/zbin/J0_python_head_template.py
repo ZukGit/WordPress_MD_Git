@@ -178,16 +178,23 @@ print("now_yyyymmdd = "+ str(now_yyyymmdd))
 
 ############################## 时间Date End ##############################
 
+# 43acb9a5ddc2cf73c6c4ea54796748f965457ed57daaa736bb778ea2  ## 自身过期了  没有访问该接口的权限
+# 8545ac7ddbd900bfc35e7627ef57c3856e256ed20427094cc6ff1c0d  ## 没有访问该接口的权限
+# 4c562465125a1b5822095898168cd21a8870bac2dbbee0ed24fce68f  ## 没有访问该接口的权限
+# 4a7caeea1e5e4718dac4386b6e4f7bfefdafd2f9634f9e71e6ffaaef  ## 没有访问该接口的权限
+# 217696db052cdea3e43bec347ee55a8ebbcb501e0b6d57d816a7542f  ## 20230111可用  https://blog.csdn.net/matrix_quant/article/details/120005787
+# 87f1d7a5331b94a843c1cbf0d15a86fe9212a2de61052f59e1ffc2ac  ## 20230111可用  https://www.baidu.com/link?url=QdkmfSZsh4ozKavVQIGdsU5ifVY_sacqxw7yaHwhGWUJNumMgf63H4XqlzT4YKA-i_pIb6BEUAmcccInvQON-a&wd=&eqid=b01a3910000500b90000000563be8fc2
 
+# ef0f57f6c63416271c140912cb1e2bf58e1580f1aa5147efa19538085b21cf60  ## 20221230 TOKEN无效
+# c8811a29e9b51d03b2b3f6be3937f331d6187999563900664056c438          ## 20221230 TOKEN无效
+# edc37d879a4757aae38b00cf49cc2dffe936bf3efb0f700c3cbb1f798ec82d5d  ## 20221230 TOKEN无效
+# 8a72d90cf841a0dcc4d2d4cf55e48c603e0b3d21295c5b0f93f4be846158d903  ## 20221230 TOKEN无效
+# 77ac42d684c5dedeca8aa6b62a1a8714f7aeaf6def3198d3a8307f8665c9f694  ## 20221230 TOKEN无效
+# af16a92da767cebb8f57df28c6b2f5ed7fc6e488e1fbc8647efc124fc8adb840  ## 20221230 TOKEN无效
 
-#过期   您输入的TOKEN无效
-#pro = ts.pro_api('c8811a29e9b51d03b2b3f6be3937f331d6187999563900664056c438')    ## 百度查pro_api 得到的 https://www.pythonheidong.com/blog/article/524786/a1fa3d379c91be81a4de/ 
-
-#抱歉，您没有访问该接口的权限
 #pro = ts.pro_api('43acb9a5ddc2cf73c6c4ea54796748f965457ed57daaa736bb778ea2')   ## 自身过期了
-
-pro = ts.pro_api('217696db052cdea3e43bec347ee55a8ebbcb501e0b6d57d816a7542f')   ## https://blog.csdn.net/matrix_quant/article/details/120005787
- 
+#pro = ts.pro_api('c8811a29e9b51d03b2b3f6be3937f331d6187999563900664056c438')    ## 百度查pro_api 得到的 https://www.pythonheidong.com/blog/article/524786/a1fa3d379c91be81a4de/ 
+pro =  ts.pro_api('217696db052cdea3e43bec347ee55a8ebbcb501e0b6d57d816a7542f')  
 # print(J0_PROPS.get(tree_node_name+"record_date"))           #根据key读取value
 # J0_PROPS.put(tree_node_name+"record_date", now_yyyymmdd)       ###  覆盖原有的 key 和 value
 #  zukgit
