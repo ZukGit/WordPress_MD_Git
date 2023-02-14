@@ -2,8 +2,10 @@
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.io.*;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -324,7 +326,7 @@ public class K2_NotepadTip implements ClipboardOwner {
 		// grep 开始加入Log
 		String subTitle_grep = Title_2(" " + selectedMode + " grep -rins -E 过滤执行(cmder目录):");
 		allPrintList.add(subTitle_grep);
-		allPrintList.add(" grep -rins -E  " + "\"" + mKeySB_With_Line_SB + "\"" + " .  ");
+		allPrintList.add(" grep -rins -E  " + "\"" + mKeySB_With_Line_SB + "\"" + " .  " +" > "+ selectedMode+"_"+getTimeStampMMdd_HHmmss()+".log");
 		allPrintList.add("");
 		allPrintList.add("");
 
@@ -399,4 +401,12 @@ public class K2_NotepadTip implements ClipboardOwner {
 
 	}
 
+	static String getTimeStampMMdd_HHmmss() {
+
+		SimpleDateFormat df = new SimpleDateFormat("MMdd_HHmmss");// 设置日期格式
+		String date = df.format(new Date());
+		return date;
+	}
+
+	
 }

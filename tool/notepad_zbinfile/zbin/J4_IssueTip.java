@@ -76,6 +76,9 @@ public class J4_IssueTip {
         System.out.println("════════════════════════ zwisl_log_search_J9.bat J9_Log.xlsx  ════════════════════════════════════════════════");
 
         System.out.println(Zbin_Path+File.separator+"J9_Log.xlsx");
+        
+        System.out.println(Zbin_Path+File.separator+"E1_贷款月供计算表.xls");
+        
     }
     
     static void  AOSP_PATH_Tip(){
@@ -625,6 +628,14 @@ public class J4_IssueTip {
         System.out.println("adb root & adb shell cmd wifi  network-requests-has-user-approved <package name>");
         System.out.println();
         System.out.println();
+        System.out.println("【一般操作 Hotspot (WIFI) 热点集合 】");
+        System.out.println("adb root & adb shell cmd wifi start-softap   321 open -b 2   //【 打开一个 ssid=321 的 open的 2G频段的热点】");
+        System.out.println("adb root & adb shell cmd wifi start-softap   321 open -b 5   //【 打开一个 ssid=321 的 open的 5G频段的热点】");
+        System.out.println("adb root & adb shell cmd wifi start-softap   321 open -b 6   //【 打开一个 ssid=321 的 open的 6G频段的热点】");
+        System.out.println("adb root & adb shell cmd wifi start-softap   321 wpa2 87654321 -b 5   //【 打开一个 ssid=321 的 wpa2密码87654321的 5G频段的热点】");
+
+        System.out.println();
+        
 
 
 
