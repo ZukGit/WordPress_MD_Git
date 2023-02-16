@@ -2311,11 +2311,54 @@ public class J9_Wisl_Log_Search {
         showEntryMap();
     }
 
+    public static   boolean isRefresh_J9_K2_Dynamic_KeyWord_TxtFile(String[] args) {
+    	boolean isRefresh = false ; 
+    	
+    	if(args != null && args.length > 0 ) {
+    		
+    		for (int i = 0; i < args.length; i++) {
+				String args_item = args[i];
+				if("refresh_dynamic_txt".equals(args_item.trim())) {
+					isRefresh = true;
+					return isRefresh;
+				}
+			}
+    		
+    	}
+    	return isRefresh;
+
+    }
+    
+    public static void Refresh_DynamicTxt_Operation(){
+    	
+    	
+        readKeyItemFromXlsx(J9_Log_Path);
+        showSheetMap();
+        initEntryFromMap();   // 动态写入了 J9_K2_Dynamic_KeyWord_GPS.txt 等文件
+       
+        showEntryMap();
+        
+        System.out.println("当前\n"
+           		+ "J9_K2_Dynamic_KeyWord_WIFI.txt\n"
+           		+ "J9_K2_Dynamic_KeyWord_BT.txt\n"
+           		+ "J9_K2_Dynamic_KeyWord_GPS.txt\n"
+           		+ "J9_K2_Dynamic_KeyWord_GPS.txt\n"+"  "+" 文件已更新! ");
+            	return;
+            	
+    	
+    }
     public static void main(String[] args) {
 
         initSystemInfo();
 
 
+        boolean  isRefreshDynamicTxt = isRefresh_J9_K2_Dynamic_KeyWord_TxtFile(args);
+        
+        if(isRefreshDynamicTxt) {
+        	Refresh_DynamicTxt_Operation();
+        	return;
+        }
+        
         if (!initInputParams2(args) && Log_Operation_Type == 0) {
             System.out.println("当前输入参数无法找到 对应的");
             return;
@@ -2332,9 +2375,11 @@ public class J9_Wisl_Log_Search {
         // 读取 xlsx 文件 开始对
         readKeyItemFromXlsx(J9_Log_Path);
         showSheetMap();
-        initEntryFromMap();
+        initEntryFromMap();   // 动态写入了 J9_K2_Dynamic_KeyWord_GPS.txt 等文件
+       
         showEntryMap();
-
+        
+  
 
         EntryKey_List.addAll(EntryList_Map.keySet());
 

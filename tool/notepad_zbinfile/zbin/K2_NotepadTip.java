@@ -220,16 +220,18 @@ public class K2_NotepadTip implements ClipboardOwner {
 		}
 
 		
-		if (CUR_OS_TYPE == OS_TYPE.Windows) {
 
-		} else if (CUR_OS_TYPE == OS_TYPE.Linux) {
-
-		} else if (CUR_OS_TYPE == OS_TYPE.MacOS) {
-
-		}
 
 		System.out.println("InputMode【"+inputType+"】  SelectedMode【" + selectedMode + "】");
 
+        System.out.println(zbinPath+File.separator+"J9_Log.xlsx"+"     【Log-Item Xml文件】");
+
+		
+        System.out.println("zwisl_log_search_J9.bat  refresh_dynamic_txt"+"          【更新 xlsx 文件到 Dynamic_Txt 文件中】");
+
+        
+        
+        
 	}
 
 	@SuppressWarnings("unchecked")
