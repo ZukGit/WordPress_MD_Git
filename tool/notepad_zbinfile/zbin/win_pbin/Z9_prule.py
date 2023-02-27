@@ -13,7 +13,7 @@ from random import randint
 from random import seed
 import math
 import platform
-
+import copy
 
 #  全局变量  与系统 息息相关的 项
 class OS_TYPE(Enum):
@@ -29,7 +29,7 @@ CUR_Bat_Name_Notype = "prule_apply_Z9"
 CUR_Bat_Name = "prule_apply_Z9"
 CUR_OS_TYPE = OS_TYPE.Windows
 CUR_OS_ExeTYPE = ""
-OS_SEQ="\\"
+OS_SEQ = "\\"
 CUR_Shell_PATH = ""
 CUR_Rule_Index = "-1"
 zbinPath = ""
@@ -84,18 +84,18 @@ def initSystemInfo():
     if sysstr == "Windows":
         # print("Call Windows tasks")
         CUR_OS_TYPE = OS_TYPE.Windows
-        CUR_Batch_End=".bat"
-        OS_SEQ="\\"
+        CUR_Batch_End = ".bat"
+        OS_SEQ = "\\"
     elif sysstr == "Linux":
         # print("Call Linux tasks")
         CUR_OS_TYPE = OS_TYPE.Linux
-        CUR_Batch_End=".sh"
-        OS_SEQ="/"
+        CUR_Batch_End = ".sh"
+        OS_SEQ = "/"
     elif sysstr == "Darwin":
         # print("Call MacOS tasks")
         CUR_OS_TYPE = OS_TYPE.MacOS
-        CUR_Batch_End=".sh"
-        OS_SEQ="/"
+        CUR_Batch_End = ".sh"
+        OS_SEQ = "/"
     else:
         print("Other System tasks")
 
@@ -242,6 +242,11 @@ class CodeRain_Rule_1(Basic_Rule):
         # global Device_Width
         # global Device_Height
         # winSur = pygame.display.set_mode((Device_Width, Device_Height))  # 全屏模式
+
+        # 创建一个可视窗口
+        window = pygame.display.set_mode(
+            (PANEL_width, PANEL_highly), flags=pygame.FULLSCREEN | pygame.NOFRAME
+        )  # 全屏显示，并设置无窗体控制按钮
         font = pygame.font.SysFont("arial", 20)
         bg_suface = pygame.Surface((PANEL_width, PANEL_highly), flags=pygame.SRCALPHA)
         pygame.Surface.convert(bg_suface)
@@ -377,23 +382,28 @@ def rule_1_main():
     # 设置难度级别
     level = 1
 
-    score_font = pygame.font.Font(pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule1_font"+OS_SEQ+"font.ttf", 36)
+    score_font = pygame.font.Font(pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule1_font" + OS_SEQ + "font.ttf", 36)
 
     # 标志是否暂停游戏
     paused = False
-    pause_nor_image = pygame.image.load(pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule1_images"+OS_SEQ+"pause_nor.png").convert_alpha()
-    pause_pressed_image = pygame.image.load(pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule1_images"+OS_SEQ+"pause_pressed.png").convert_alpha()
-    resume_nor_image = pygame.image.load(pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule1_images"+OS_SEQ+"resume_nor.png").convert_alpha()
-    resume_pressed_image = pygame.image.load(pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule1_images"+OS_SEQ+"resume_pressed.png").convert_alpha()
+    pause_nor_image = pygame.image.load(
+        pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule1_images" + OS_SEQ + "pause_nor.png").convert_alpha()
+    pause_pressed_image = pygame.image.load(
+        pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule1_images" + OS_SEQ + "pause_pressed.png").convert_alpha()
+    resume_nor_image = pygame.image.load(
+        pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule1_images" + OS_SEQ + "resume_nor.png").convert_alpha()
+    resume_pressed_image = pygame.image.load(
+        pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule1_images" + OS_SEQ + "resume_pressed.png").convert_alpha()
     paused_rect = pause_nor_image.get_rect()
     paused_rect.left, paused_rect.top = rule1_width - paused_rect.width - 10, 10  # 暂停按钮设置  480 , 720
     # paused_rect.left, paused_rect.top = rule1_width - paused_rect.width + 150, 10    # 暂停按钮设置 1080 720
     paused_image = pause_nor_image
 
     # 全屏炸弹
-    bomb_image = pygame.image.load(pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule1_images"+OS_SEQ+"bomb.png").convert_alpha()
+    bomb_image = pygame.image.load(
+        pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule1_images" + OS_SEQ + "bomb.png").convert_alpha()
     bomb_rect = bomb_image.get_rect()
-    bomb_font = pygame.font.Font(pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule1_font"+OS_SEQ+"font.ttf", 48)
+    bomb_font = pygame.font.Font(pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule1_font" + OS_SEQ + "font.ttf", 48)
     # 超级子弹数量
     bomb_num = 300
 
@@ -413,7 +423,8 @@ def rule_1_main():
     INVINCIBLE_TIME = USEREVENT + 2
 
     # 生命数量
-    life_image = pygame.image.load(pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule1_images"+OS_SEQ+"life.png").convert_alpha()
+    life_image = pygame.image.load(
+        pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule1_images" + OS_SEQ + "life.png").convert_alpha()
     life_rect = life_image.get_rect()
     life_num = 3
 
@@ -421,10 +432,12 @@ def rule_1_main():
     recorded = False
 
     # 游戏结束画面
-    gameover_font = pygame.font.Font(pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule1_font"+OS_SEQ+"font.TTF", 48)
-    again_image = pygame.image.load(pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule1_images"+OS_SEQ+"again.png").convert_alpha()
+    gameover_font = pygame.font.Font(pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule1_font" + OS_SEQ + "font.TTF", 48)
+    again_image = pygame.image.load(
+        pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule1_images" + OS_SEQ + "again.png").convert_alpha()
     again_rect = again_image.get_rect()
-    gameover_image = pygame.image.load(pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule1_images"+OS_SEQ+"gameover.png").convert_alpha()
+    gameover_image = pygame.image.load(
+        pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule1_images" + OS_SEQ + "gameover.png").convert_alpha()
     gameover_rect = gameover_image.get_rect()
 
     # 用于切换图片
@@ -752,13 +765,13 @@ def rule_1_main():
                 recorded = True
                 # 读取历史最高得分
                 # with open("record.txt", "r") as f:
-                with open(pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule1_font"+OS_SEQ+"record.txt", "r") as f:
+                with open(pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule1_font" + OS_SEQ + "record.txt", "r") as f:
                     record_score = int(f.read())
 
                 # 如果玩家得分高于历史最高得分，则存档
                 if score > record_score:
                     # with open("record.txt", "w") as f:
-                    with open(pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule1_font"+OS_SEQ+"record.txt", "w") as f:
+                    with open(pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule1_font" + OS_SEQ + "record.txt", "w") as f:
                         f.write(str(score))
 
             # 绘制结束画面
@@ -824,14 +837,20 @@ class MyPlane(pygame.sprite.Sprite):
     def __init__(self, rule1_bg_size):
         pygame.sprite.Sprite.__init__(self)
 
-        self.image1 = pygame.image.load(pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule1_images"+OS_SEQ+"me1.png").convert_alpha()
-        self.image2 = pygame.image.load(pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule1_images"+OS_SEQ+"me2.png").convert_alpha()
+        self.image1 = pygame.image.load(
+            pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule1_images" + OS_SEQ + "me1.png").convert_alpha()
+        self.image2 = pygame.image.load(
+            pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule1_images" + OS_SEQ + "me2.png").convert_alpha()
         self.destroy_images = []
         self.destroy_images.extend([ \
-            pygame.image.load(pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule1_images"+OS_SEQ+"me_destroy_1.png").convert_alpha(), \
-            pygame.image.load(pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule1_images"+OS_SEQ+"me_destroy_2.png").convert_alpha(), \
-            pygame.image.load(pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule1_images"+OS_SEQ+"me_destroy_3.png").convert_alpha(), \
-            pygame.image.load(pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule1_images"+OS_SEQ+"me_destroy_4.png").convert_alpha() \
+            pygame.image.load(
+                pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule1_images" + OS_SEQ + "me_destroy_1.png").convert_alpha(), \
+            pygame.image.load(
+                pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule1_images" + OS_SEQ + "me_destroy_2.png").convert_alpha(), \
+            pygame.image.load(
+                pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule1_images" + OS_SEQ + "me_destroy_3.png").convert_alpha(), \
+            pygame.image.load(
+                pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule1_images" + OS_SEQ + "me_destroy_4.png").convert_alpha() \
             ])
         self.rect = self.image1.get_rect()
         self.width, self.height = rule1_bg_size[0], rule1_bg_size[1]
@@ -879,13 +898,18 @@ class SmallEnemy(pygame.sprite.Sprite):
     def __init__(self, rule1_bg_size):
         pygame.sprite.Sprite.__init__(self)
 
-        self.image = pygame.image.load(pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule1_images"+OS_SEQ+"enemy1.png").convert_alpha()
+        self.image = pygame.image.load(
+            pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule1_images" + OS_SEQ + "enemy1.png").convert_alpha()
         self.destroy_images = []
         self.destroy_images.extend([ \
-            pygame.image.load(pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule1_images"+OS_SEQ+"enemy1_down1.png").convert_alpha(), \
-            pygame.image.load(pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule1_images"+OS_SEQ+"enemy1_down2.png").convert_alpha(), \
-            pygame.image.load(pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule1_images"+OS_SEQ+"enemy1_down3.png").convert_alpha(), \
-            pygame.image.load(pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule1_images"+OS_SEQ+"enemy1_down4.png").convert_alpha() \
+            pygame.image.load(
+                pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule1_images" + OS_SEQ + "enemy1_down1.png").convert_alpha(), \
+            pygame.image.load(
+                pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule1_images" + OS_SEQ + "enemy1_down2.png").convert_alpha(), \
+            pygame.image.load(
+                pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule1_images" + OS_SEQ + "enemy1_down3.png").convert_alpha(), \
+            pygame.image.load(
+                pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule1_images" + OS_SEQ + "enemy1_down4.png").convert_alpha() \
             ])
         self.rect = self.image.get_rect()
         self.width, self.height = rule1_bg_size[0], rule1_bg_size[1]
@@ -915,14 +939,20 @@ class MidEnemy(pygame.sprite.Sprite):
     def __init__(self, rule1_bg_size):
         pygame.sprite.Sprite.__init__(self)
 
-        self.image = pygame.image.load(pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule1_images"+OS_SEQ+"enemy2.png").convert_alpha()
-        self.image_hit = pygame.image.load(pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule1_images"+OS_SEQ+"enemy2_hit.png").convert_alpha()
+        self.image = pygame.image.load(
+            pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule1_images" + OS_SEQ + "enemy2.png").convert_alpha()
+        self.image_hit = pygame.image.load(
+            pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule1_images" + OS_SEQ + "enemy2_hit.png").convert_alpha()
         self.destroy_images = []
         self.destroy_images.extend([ \
-            pygame.image.load(pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule1_images"+OS_SEQ+"enemy2_down1.png").convert_alpha(), \
-            pygame.image.load(pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule1_images"+OS_SEQ+"enemy2_down2.png").convert_alpha(), \
-            pygame.image.load(pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule1_images"+OS_SEQ+"enemy2_down3.png").convert_alpha(), \
-            pygame.image.load(pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule1_images"+OS_SEQ+"enemy2_down4.png").convert_alpha() \
+            pygame.image.load(
+                pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule1_images" + OS_SEQ + "enemy2_down1.png").convert_alpha(), \
+            pygame.image.load(
+                pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule1_images" + OS_SEQ + "enemy2_down2.png").convert_alpha(), \
+            pygame.image.load(
+                pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule1_images" + OS_SEQ + "enemy2_down3.png").convert_alpha(), \
+            pygame.image.load(
+                pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule1_images" + OS_SEQ + "enemy2_down4.png").convert_alpha() \
             ])
         self.rect = self.image.get_rect()
         self.width, self.height = rule1_bg_size[0], rule1_bg_size[1]
@@ -955,17 +985,26 @@ class BigEnemy(pygame.sprite.Sprite):
     def __init__(self, rule1_bg_size):
         pygame.sprite.Sprite.__init__(self)
 
-        self.image1 = pygame.image.load(pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule1_images"+OS_SEQ+"enemy3_n1.png").convert_alpha()
-        self.image2 = pygame.image.load(pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule1_images"+OS_SEQ+"enemy3_n2.png").convert_alpha()
-        self.image_hit = pygame.image.load(pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule1_images"+OS_SEQ+"enemy3_hit.png").convert_alpha()
+        self.image1 = pygame.image.load(
+            pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule1_images" + OS_SEQ + "enemy3_n1.png").convert_alpha()
+        self.image2 = pygame.image.load(
+            pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule1_images" + OS_SEQ + "enemy3_n2.png").convert_alpha()
+        self.image_hit = pygame.image.load(
+            pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule1_images" + OS_SEQ + "enemy3_hit.png").convert_alpha()
         self.destroy_images = []
         self.destroy_images.extend([ \
-            pygame.image.load(pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule1_images"+OS_SEQ+"enemy3_down1.png").convert_alpha(), \
-            pygame.image.load(pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule1_images"+OS_SEQ+"enemy3_down2.png").convert_alpha(), \
-            pygame.image.load(pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule1_images"+OS_SEQ+"enemy3_down3.png").convert_alpha(), \
-            pygame.image.load(pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule1_images"+OS_SEQ+"enemy3_down4.png").convert_alpha(), \
-            pygame.image.load(pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule1_images"+OS_SEQ+"enemy3_down5.png").convert_alpha(), \
-            pygame.image.load(pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule1_images"+OS_SEQ+"enemy3_down6.png").convert_alpha() \
+            pygame.image.load(
+                pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule1_images" + OS_SEQ + "enemy3_down1.png").convert_alpha(), \
+            pygame.image.load(
+                pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule1_images" + OS_SEQ + "enemy3_down2.png").convert_alpha(), \
+            pygame.image.load(
+                pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule1_images" + OS_SEQ + "enemy3_down3.png").convert_alpha(), \
+            pygame.image.load(
+                pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule1_images" + OS_SEQ + "enemy3_down4.png").convert_alpha(), \
+            pygame.image.load(
+                pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule1_images" + OS_SEQ + "enemy3_down5.png").convert_alpha(), \
+            pygame.image.load(
+                pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule1_images" + OS_SEQ + "enemy3_down6.png").convert_alpha() \
             ])
         self.rect = self.image1.get_rect()
         self.width, self.height = rule1_bg_size[0], rule1_bg_size[1]
@@ -996,7 +1035,8 @@ class Bullet1(pygame.sprite.Sprite):
     def __init__(self, position):
         pygame.sprite.Sprite.__init__(self)
         global rule1_bg_size
-        self.image = pygame.image.load(pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule1_images"+OS_SEQ+"bullet1.png").convert_alpha()
+        self.image = pygame.image.load(
+            pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule1_images" + OS_SEQ + "bullet1.png").convert_alpha()
         self.rect = self.image.get_rect()
         self.rect.left, self.rect.top = position
         # self.rect.left = position[0]
@@ -1020,7 +1060,8 @@ class Bullet2(pygame.sprite.Sprite):
     def __init__(self, position):
         pygame.sprite.Sprite.__init__(self)
 
-        self.image = pygame.image.load(pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule1_images"+OS_SEQ+"bullet2.png").convert_alpha()
+        self.image = pygame.image.load(
+            pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule1_images" + OS_SEQ + "bullet2.png").convert_alpha()
         self.rect = self.image.get_rect()
         self.rect.left, self.rect.top = position
         self.speed = 14
@@ -1042,7 +1083,8 @@ class Bullet_Supply(pygame.sprite.Sprite):
     def __init__(self, rule1_bg_size):
         pygame.sprite.Sprite.__init__(self)
         global pbinPath
-        self.image = pygame.image.load(pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule1_images"+OS_SEQ+"bullet_supply.png").convert_alpha()
+        self.image = pygame.image.load(
+            pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule1_images" + OS_SEQ + "bullet_supply.png").convert_alpha()
         self.rect = self.image.get_rect()
         self.width, self.height = rule1_bg_size[0], rule1_bg_size[1]
         self.rect.left, self.rect.bottom = \
@@ -1069,7 +1111,8 @@ class Bomb_Supply(pygame.sprite.Sprite):
     def __init__(self, rule1_bg_size):
         pygame.sprite.Sprite.__init__(self)
 
-        self.image = pygame.image.load(pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule1_images"+OS_SEQ+"bomb_supply.png").convert_alpha()
+        self.image = pygame.image.load(
+            pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule1_images" + OS_SEQ + "bomb_supply.png").convert_alpha()
         self.rect = self.image.get_rect()
         self.width, self.height = rule1_bg_size[0], rule1_bg_size[1]
         self.rect.left, self.rect.bottom = \
@@ -1123,7 +1166,7 @@ class PlaneWars_Rule_2(Basic_Rule):
             global rule1_enemy2_down_sound
             global rule1_enemy3_down_sound
             global rule1_me_down_sound
-     
+
             pygame.init()
             screenInfo = pygame.display.Info()
             PANEL_width = screenInfo.current_w
@@ -1148,20 +1191,32 @@ class PlaneWars_Rule_2(Basic_Rule):
             pygame.display.set_caption("飞机大战 -- FishC Demo")
             pygame.mixer.init()
 
-            print("OS_SEQ="+OS_SEQ)
-            rule1_background = pygame.image.load(str(pbinPath) + OS_SEQ+"Z9"+OS_SEQ+"rule1_images"+OS_SEQ+"background.png").convert()
-            rule1_bullet_sound = pygame.mixer.Sound(pbinPath + OS_SEQ+"Z9"+OS_SEQ+"rule1_sound"+OS_SEQ+"bullet.wav")
-            rule1_bomb_sound = pygame.mixer.Sound(pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule1_sound"+OS_SEQ+"use_bomb.wav")
-            rule1_supply_sound = pygame.mixer.Sound(pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule1_sound"+OS_SEQ+"supply.wav")
-            get_rule1_bomb_sound = pygame.mixer.Sound(pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule1_sound"+OS_SEQ+"get_bomb.wav")
-            get_rule1_bullet_sound = pygame.mixer.Sound(pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule1_sound"+OS_SEQ+"get_bullet.wav")
-            rule1_upgrade_sound = pygame.mixer.Sound(pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule1_sound"+OS_SEQ+"upgrade.wav")
-            rule1_enemy3_fly_sound = pygame.mixer.Sound(pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule1_sound"+OS_SEQ+"enemy3_flying.wav")
-            rule1_enemy1_down_sound = pygame.mixer.Sound(pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule1_sound"+OS_SEQ+"enemy1_down.wav")
-            rule1_enemy2_down_sound = pygame.mixer.Sound(pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule1_sound"+OS_SEQ+"enemy2_down.wav")
-            rule1_enemy3_down_sound = pygame.mixer.Sound(pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule1_sound"+OS_SEQ+"enemy3_down.wav")
-            rule1_me_down_sound = pygame.mixer.Sound(pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule1_sound"+OS_SEQ+"me_down.wav")
-            pygame.mixer.music.load(pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule1_sound"+OS_SEQ+"game_music.ogg")
+            print("OS_SEQ=" + OS_SEQ)
+            rule1_background = pygame.image.load(
+                str(pbinPath) + OS_SEQ + "Z9" + OS_SEQ + "rule1_images" + OS_SEQ + "background.png").convert()
+            rule1_bullet_sound = pygame.mixer.Sound(
+                pbinPath + OS_SEQ + "Z9" + OS_SEQ + "rule1_sound" + OS_SEQ + "bullet.wav")
+            rule1_bomb_sound = pygame.mixer.Sound(
+                pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule1_sound" + OS_SEQ + "use_bomb.wav")
+            rule1_supply_sound = pygame.mixer.Sound(
+                pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule1_sound" + OS_SEQ + "supply.wav")
+            get_rule1_bomb_sound = pygame.mixer.Sound(
+                pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule1_sound" + OS_SEQ + "get_bomb.wav")
+            get_rule1_bullet_sound = pygame.mixer.Sound(
+                pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule1_sound" + OS_SEQ + "get_bullet.wav")
+            rule1_upgrade_sound = pygame.mixer.Sound(
+                pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule1_sound" + OS_SEQ + "upgrade.wav")
+            rule1_enemy3_fly_sound = pygame.mixer.Sound(
+                pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule1_sound" + OS_SEQ + "enemy3_flying.wav")
+            rule1_enemy1_down_sound = pygame.mixer.Sound(
+                pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule1_sound" + OS_SEQ + "enemy1_down.wav")
+            rule1_enemy2_down_sound = pygame.mixer.Sound(
+                pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule1_sound" + OS_SEQ + "enemy2_down.wav")
+            rule1_enemy3_down_sound = pygame.mixer.Sound(
+                pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule1_sound" + OS_SEQ + "enemy3_down.wav")
+            rule1_me_down_sound = pygame.mixer.Sound(
+                pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule1_sound" + OS_SEQ + "me_down.wav")
+            pygame.mixer.music.load(pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule1_sound" + OS_SEQ + "game_music.ogg")
             pygame.mixer.music.set_volume(0.2)
             rule1_bullet_sound.set_volume(0.2)
             rule1_bomb_sound.set_volume(0.2)
@@ -1669,9 +1724,11 @@ class Rule4_SnakeGame:
 
         self.fpsClock = pygame.time.Clock()
         #
-        self.fontObj = pygame.font.Font(pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule4_file"+OS_SEQ+"Kaiti_GB2312.ttf", 20)
+        self.fontObj = pygame.font.Font(
+            pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule4_file" + OS_SEQ + "Kaiti_GB2312.ttf", 20)
 
-        self.scoreFont = pygame.font.Font(pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule4_file"+OS_SEQ+"Kaiti_GB2312.ttf", 32)
+        self.scoreFont = pygame.font.Font(
+            pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule4_file" + OS_SEQ + "Kaiti_GB2312.ttf", 32)
 
         self.screen = self.new_screen(self.gs.screen_size)
         pygame.display.set_caption('贪吃蛇')
@@ -1901,16 +1958,18 @@ class Rule4_Snake:
 class Rule4_SoundManager:
     def __init__(self):
         self._init_music()
-        self.sound_eat = self._loadSound(pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule4_file"+OS_SEQ+"eat.ogg")
-        self.sound_fail = self._loadSound(pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule4_file"+OS_SEQ+"gameover.ogg")
-        self.sound_jiayou = self._loadSound(pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule4_file"+OS_SEQ+"jiayou.ogg")
+        self.sound_eat = self._loadSound(pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule4_file" + OS_SEQ + "eat.ogg")
+        self.sound_fail = self._loadSound(
+            pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule4_file" + OS_SEQ + "gameover.ogg")
+        self.sound_jiayou = self._loadSound(
+            pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule4_file" + OS_SEQ + "jiayou.ogg")
 
         # 背景音乐
 
     def _init_music(self):
         pygame.mixer.init()
         global pbinPath
-        pygame.mixer.music.load(pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule4_file"+OS_SEQ+"background.mp3")
+        pygame.mixer.music.load(pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule4_file" + OS_SEQ + "background.mp3")
         #  pygame.mixer.music.load('res/bg.mp3')
         pygame.mixer.music.set_volume(0.2)
         pygame.mixer.music.play(-1)
@@ -1958,10 +2017,14 @@ class Rule5_Bullet(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
 
-        self.bullet_up = pygame.image.load(pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule5_file"+OS_SEQ+"bullet_up.png")
-        self.bullet_down = pygame.image.load(pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule5_file"+OS_SEQ+"bullet_down.png")
-        self.bullet_left = pygame.image.load(pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule5_file"+OS_SEQ+"bullet_left.png")
-        self.bullet_right = pygame.image.load(pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule5_file"+OS_SEQ+"bullet_right.png")
+        self.bullet_up = pygame.image.load(
+            pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule5_file" + OS_SEQ + "bullet_up.png")
+        self.bullet_down = pygame.image.load(
+            pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule5_file" + OS_SEQ + "bullet_down.png")
+        self.bullet_left = pygame.image.load(
+            pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule5_file" + OS_SEQ + "bullet_left.png")
+        self.bullet_right = pygame.image.load(
+            pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule5_file" + OS_SEQ + "bullet_right.png")
 
         # 子弹方向   速度   生命   碎石
         self.dir_x, self.dir_y = 0, 0
@@ -2017,8 +2080,8 @@ class Rule5_Bullet(pygame.sprite.Sprite):
         # return moving
 
 
-Rule5_brickImage = pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule5_file"+OS_SEQ+"brick.png"
-Rule5_ironImage = pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule5_file"+OS_SEQ+"iron.png"
+Rule5_brickImage = pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule5_file" + OS_SEQ + "brick.png"
+Rule5_ironImage = pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule5_file" + OS_SEQ + "iron.png"
 
 
 class Rule5_Brick(pygame.sprite.Sprite):
@@ -2085,12 +2148,12 @@ class Rule5_Map():
             self.ironGroup.add(self.iron)
 
 
-tank_T1_0 = pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule5_file"+OS_SEQ+"tank_T1_0.png"
-tank_T1_1 = pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule5_file"+OS_SEQ+"tank_T1_1.png"
-tank_T1_2 = pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule5_file"+OS_SEQ+"tank_T1_2.png"
-tank_T2_0 = pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule5_file"+OS_SEQ+"tank_T2_0.png"
-tank_T2_1 = pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule5_file"+OS_SEQ+"tank_T2_1.png"
-tank_T2_2 = pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule5_file"+OS_SEQ+"tank_T2_2.png"
+tank_T1_0 = pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule5_file" + OS_SEQ + "tank_T1_0.png"
+tank_T1_1 = pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule5_file" + OS_SEQ + "tank_T1_1.png"
+tank_T1_2 = pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule5_file" + OS_SEQ + "tank_T1_2.png"
+tank_T2_0 = pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule5_file" + OS_SEQ + "tank_T2_0.png"
+tank_T2_1 = pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule5_file" + OS_SEQ + "tank_T2_1.png"
+tank_T2_2 = pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule5_file" + OS_SEQ + "tank_T2_2.png"
 
 
 class Rule5_MyTank(pygame.sprite.Sprite):
@@ -2268,19 +2331,29 @@ class Rule5_EnemyTank(pygame.sprite.Sprite):
 
             # 选择敌军坦克种类
         if self.kind == 1:
-            self.enemy_x_0 = pygame.image.load(pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule5_file"+OS_SEQ+"enemy_1_0.png").convert_alpha()
-            self.enemy_x_3 = pygame.image.load(pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule5_file"+OS_SEQ+"enemy_1_3.png").convert_alpha()
+            self.enemy_x_0 = pygame.image.load(
+                pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule5_file" + OS_SEQ + "enemy_1_0.png").convert_alpha()
+            self.enemy_x_3 = pygame.image.load(
+                pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule5_file" + OS_SEQ + "enemy_1_3.png").convert_alpha()
         if self.kind == 2:
-            self.enemy_x_0 = pygame.image.load(pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule5_file"+OS_SEQ+"enemy_2_0.png").convert_alpha()
-            self.enemy_x_3 = pygame.image.load(pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule5_file"+OS_SEQ+"enemy_2_3.png").convert_alpha()
+            self.enemy_x_0 = pygame.image.load(
+                pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule5_file" + OS_SEQ + "enemy_2_0.png").convert_alpha()
+            self.enemy_x_3 = pygame.image.load(
+                pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule5_file" + OS_SEQ + "enemy_2_3.png").convert_alpha()
         if self.kind == 3:
-            self.enemy_x_0 = pygame.image.load(pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule5_file"+OS_SEQ+"enemy_3_1.png").convert_alpha()
-            self.enemy_x_3 = pygame.image.load(pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule5_file"+OS_SEQ+"enemy_3_0.png").convert_alpha()
+            self.enemy_x_0 = pygame.image.load(
+                pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule5_file" + OS_SEQ + "enemy_3_1.png").convert_alpha()
+            self.enemy_x_3 = pygame.image.load(
+                pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule5_file" + OS_SEQ + "enemy_3_0.png").convert_alpha()
         if self.kind == 4:
-            self.enemy_x_0 = pygame.image.load(pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule5_file"+OS_SEQ+"enemy_4_0.png").convert_alpha()
-            self.enemy_x_3 = pygame.image.load(pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule5_file"+OS_SEQ+"enemy_4_3.png").convert_alpha()
-        self.enemy_3_0 = pygame.image.load(pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule5_file"+OS_SEQ+"enemy_3_0.png").convert_alpha()
-        self.enemy_3_2 = pygame.image.load(pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule5_file"+OS_SEQ+"enemy_3_2.png").convert_alpha()
+            self.enemy_x_0 = pygame.image.load(
+                pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule5_file" + OS_SEQ + "enemy_4_0.png").convert_alpha()
+            self.enemy_x_3 = pygame.image.load(
+                pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule5_file" + OS_SEQ + "enemy_4_3.png").convert_alpha()
+        self.enemy_3_0 = pygame.image.load(
+            pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule5_file" + OS_SEQ + "enemy_3_0.png").convert_alpha()
+        self.enemy_3_2 = pygame.image.load(
+            pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule5_file" + OS_SEQ + "enemy_3_2.png").convert_alpha()
 
         # 参数:是否携带食物
         self.isred = isred
@@ -2372,20 +2445,27 @@ class Rule5_EnemyTank(pygame.sprite.Sprite):
             self.dir_x, self.dir_y = random.choice(([0, 1], [0, -1], [1, 0], [-1, 0]))
 
 
-Rule5_brickImage = pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule5_file"+OS_SEQ+"brick.png"
-Rule5_ironImage = pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule5_file"+OS_SEQ+"iron.png"
+Rule5_brickImage = pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule5_file" + OS_SEQ + "brick.png"
+Rule5_ironImage = pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule5_file" + OS_SEQ + "iron.png"
 
 
 class Rule5_Food(pygame.sprite.Sprite):
     def __init__(self):
 
-        self.food_boom = pygame.image.load(pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule5_file"+OS_SEQ+"food_boom.png").convert_alpha()
-        self.food_clock = pygame.image.load(pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule5_file"+OS_SEQ+"food_clock.png").convert_alpha()
-        self.food_gun = pygame.image.load(pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule5_file"+OS_SEQ+"food_gun.png").convert_alpha()
-        self.food_iron = pygame.image.load(pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule5_file"+OS_SEQ+"food_iron.png").convert_alpha()
-        self.food_protect = pygame.image.load(pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule5_file"+OS_SEQ+"food_protect.png").convert_alpha()
-        self.food_star = pygame.image.load(pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule5_file"+OS_SEQ+"food_star.png").convert_alpha()
-        self.food_tank = pygame.image.load(pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule5_file"+OS_SEQ+"food_tank.png").convert_alpha()
+        self.food_boom = pygame.image.load(
+            pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule5_file" + OS_SEQ + "food_boom.png").convert_alpha()
+        self.food_clock = pygame.image.load(
+            pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule5_file" + OS_SEQ + "food_clock.png").convert_alpha()
+        self.food_gun = pygame.image.load(
+            pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule5_file" + OS_SEQ + "food_gun.png").convert_alpha()
+        self.food_iron = pygame.image.load(
+            pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule5_file" + OS_SEQ + "food_iron.png").convert_alpha()
+        self.food_protect = pygame.image.load(
+            pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule5_file" + OS_SEQ + "food_protect.png").convert_alpha()
+        self.food_star = pygame.image.load(
+            pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule5_file" + OS_SEQ + "food_star.png").convert_alpha()
+        self.food_tank = pygame.image.load(
+            pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule5_file" + OS_SEQ + "food_tank.png").convert_alpha()
         self.kind = random.choice([1, 2, 3, 4, 5, 6, 7])
         if self.kind == 1:
             self.image = self.food_boom
@@ -2501,14 +2581,16 @@ def rule5_main():
     pygame.display.set_caption("Tank War ")
 
     # 加载图片,音乐,音效.
-    background_image = pygame.image.load(pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule5_file"+OS_SEQ+"background.png")
-    home_image = pygame.image.load(pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule5_file"+OS_SEQ+"home.png")
-    home_destroyed_image = pygame.image.load(pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule5_file"+OS_SEQ+"home_destroyed.png")
+    background_image = pygame.image.load(
+        pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule5_file" + OS_SEQ + "background.png")
+    home_image = pygame.image.load(pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule5_file" + OS_SEQ + "home.png")
+    home_destroyed_image = pygame.image.load(
+        pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule5_file" + OS_SEQ + "home_destroyed.png")
 
-    bang_sound = pygame.mixer.Sound(pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule5_file"+OS_SEQ+"bang.wav")
+    bang_sound = pygame.mixer.Sound(pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule5_file" + OS_SEQ + "bang.wav")
     bang_sound.set_volume(1)
-    fire_sound = pygame.mixer.Sound(pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule5_file"+OS_SEQ+"Gunfire.wav")
-    start_sound = pygame.mixer.Sound(pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule5_file"+OS_SEQ+"start.wav")
+    fire_sound = pygame.mixer.Sound(pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule5_file" + OS_SEQ + "Gunfire.wav")
+    start_sound = pygame.mixer.Sound(pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule5_file" + OS_SEQ + "start.wav")
     start_sound.play()
 
     # 定义精灵组:坦克，我方坦克，敌方坦克，敌方子弹
@@ -2543,7 +2625,8 @@ def rule5_main():
             continue
         otherEnemyGroup.add(enemy)
     # 敌军坦克出现动画
-    appearance_image = pygame.image.load(pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule5_file"+OS_SEQ+"appear.png").convert_alpha()
+    appearance_image = pygame.image.load(
+        pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule5_file" + OS_SEQ + "appear.png").convert_alpha()
     appearance = []
     appearance.append(appearance_image.subsurface((0, 0), (48, 48)))
     appearance.append(appearance_image.subsurface((48, 0), (48, 48)))
@@ -3025,14 +3108,14 @@ class TankWar_Rule_5(Basic_Rule):
             global tank_T2_0
             global tank_T2_1
             global tank_T2_2
-            Rule5_brickImage = pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule5_file"+OS_SEQ+"brick.png"
-            Rule5_ironImage = pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule5_file"+OS_SEQ+"iron.png"
-            tank_T1_0 = pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule5_file"+OS_SEQ+"tank_T1_0.png"
-            tank_T1_1 = pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule5_file"+OS_SEQ+"tank_T1_1.png"
-            tank_T1_2 = pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule5_file"+OS_SEQ+"tank_T1_2.png"
-            tank_T2_0 = pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule5_file"+OS_SEQ+"tank_T2_0.png"
-            tank_T2_1 = pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule5_file"+OS_SEQ+"tank_T2_1.png"
-            tank_T2_2 = pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule5_file"+OS_SEQ+"tank_T2_2.png"
+            Rule5_brickImage = pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule5_file" + OS_SEQ + "brick.png"
+            Rule5_ironImage = pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule5_file" + OS_SEQ + "iron.png"
+            tank_T1_0 = pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule5_file" + OS_SEQ + "tank_T1_0.png"
+            tank_T1_1 = pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule5_file" + OS_SEQ + "tank_T1_1.png"
+            tank_T1_2 = pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule5_file" + OS_SEQ + "tank_T1_2.png"
+            tank_T2_0 = pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule5_file" + OS_SEQ + "tank_T2_0.png"
+            tank_T2_1 = pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule5_file" + OS_SEQ + "tank_T2_1.png"
+            tank_T2_2 = pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule5_file" + OS_SEQ + "tank_T2_2.png"
 
             rule5_main()
         except SystemExit:
@@ -3054,7 +3137,8 @@ class TankWar_Rule_5(Basic_Rule):
 one_time_rule6 = 0.5  # 时间流速
 show_n_rule6 = 0
 show_frequency_rule6 = 0.0015  # 烟花绽放频率，数值越大频率越高
-yanhua_count_rule6 = 30  # 烟花数量
+
+yanhua_count_rule6 = 35  # 烟花数量
 
 
 class Yanhua():
@@ -3123,14 +3207,16 @@ def rule6_main(yanhua_count):
     pygame.Surface.convert(bg_suface)
     bg_suface.fill(pygame.Color(0, 0, 0, 28))
 
-    sound_wav_rule6 = pygame.mixer.music.load(pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule6_file"+OS_SEQ+"yanhua.mp3")
+    sound_wav_rule6 = pygame.mixer.music.load(
+        pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule6_file" + OS_SEQ + "yanhua.mp3")
     #  pygame.mixer.music.load('res/bg.mp3')
     pygame.mixer.music.set_volume(0.2)
     pygame.mixer.music.play()
     pygame.display.set_caption("烟花")
     print("rule6_main.yanhua_count:" + str(yanhua_count))
     # 加载图片,音乐,音效.
-    background_image = pygame.image.load(pbinPath + ""+OS_SEQ+"Z9"+OS_SEQ+"rule6_file"+OS_SEQ+"background.jpg")
+    background_image = pygame.image.load(
+        pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule6_file" + OS_SEQ + "background.jpg")
     screen.fill((0, 0, 0))
     screen.blit(background_image, (0, 0))
     yanhua_list = []
@@ -3198,6 +3284,397 @@ class YanHua_Rule_6(Basic_Rule):
 
 ###################### Rule_6 End  ######################
 
+###################### Rule_7  俄罗斯方块Begin  ######################
+
+
+rule7_purple = 255, 0, 255
+rule7_green = 50, 205, 50
+rule7_blue = 123, 104, 238
+rule7_yellow = 238, 179, 34
+rule7_red = 255, 0, 0
+rule7_white = 255, 255, 255
+rule7_black = 0, 0, 0
+
+def rule7_main():
+    rule7_ganmestart()
+
+# 计算方块是否重叠
+def rule7_algorithm(tetris, FixedBlock, equal):
+    m = 0
+    for judge_1 in range(0, len(tetris)):
+        if equal == "equal":
+            break
+        i = 0
+        for judge_2 in range(0, len(FixedBlock)):
+            if equal == "equal":
+                break
+            z = 0
+            for judge_3 in range(0, len(FixedBlock[i])):
+                if (FixedBlock[i])[z] == tetris[m]:
+                    equal = "equal"
+                    break
+                else:
+                    z += 1
+            i += 1
+        m += 1
+    return equal
+
+
+# 判断是否有一排的情况，如果是，则输出rule7_eliminate(y轴为一排的值)
+def rule7_eliminate(FixedBlock):
+    list_a = []
+    list_b = []
+    for x_1 in FixedBlock:
+        for x_2 in x_1:
+            list_a.append(x_2)
+    for y_1 in list_a:
+        if y_1[1] % 20 == 0 and y_1[1] != 0:
+            list_b.append(y_1[1])
+    rule7_eliminate = []
+    n = 1
+    for xx in range(0, 39):
+        k = 20 * n
+        if list_b.count(k) >= 30:
+            rule7_eliminate.append(k)
+        n += 1
+    return rule7_eliminate
+
+
+# 判断下落的方块是否到底部
+def rule7_numbers_t_or_f(argument, tetris):
+    switcher = {
+        1: (tetris[0])[1] < 780,
+        2: (tetris[0])[1] < 780 and (tetris[1])[1] < 780,
+        3: (tetris[0])[1] < 780 and (tetris[1])[1] < 780 and (tetris[2])[1] < 780,
+        4: (tetris[0])[1] < 780 and (tetris[1])[1] < 780 and (tetris[2])[1] < 780 and (tetris[3])[1] < 780
+    }
+    return switcher.get(argument, "nothing")
+
+
+# 游戏结束判断
+def rule7_gameover(screen):
+    time.sleep(1)
+    font = pygame.font.Font(None, 60)  # 游戏结束显示
+    text = font.render("Game Over", True, rule7_black)
+    screen.fill(rule7_white)
+    screen.blit(text, (210, 320))
+    pygame.display.update()
+    time.sleep(1)
+    pygame.quit()
+    sys.exit()
+
+
+# 游戏循环
+def rule7_ganmestart():
+    # 进行游戏初始化
+    pygame.init()
+    clock = pygame.time.Clock()
+    screen = pygame.display.set_mode((600, 800), 0, 0)
+    pygame.display.set_caption("My PyGame")
+    # 从左下开始构造，列出方块的各种形状和位置,共5种
+    list = [[[280, -20], [300, -20], [280, -40], [280, -60]],  # 1
+            [[280, -20], [280, -40], [280, -60], [280, -80]],  # 2
+            [[280, -20], [300, -20], [320, -20], [300, -40]],  # 3
+            [[280, -20], [300, -20], [280, -40], [300, -40]],  # 4
+            [[280, -20], [300, -20], [300, -40], [320, -40]]]  # 5
+    exist = 0
+    FixedBlock = []
+    change = 0
+    # 游戏主循环
+    while True:
+        clock.tick(7)  # 控制下落速度
+        direction = ""  # 初始化键盘接受的值
+        # 判断从键盘接受的值
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                pygame.quit()
+                sys.exit()
+            elif event.type == pygame.KEYDOWN:  # 判断键盘事件
+                if event.key == pygame.K_UP or event.key == pygame.K_w:
+                    direction = "w"
+                elif event.key == pygame.K_DOWN or event.key == pygame.K_s:
+                    direction = "s"
+                elif event.key == pygame.K_LEFT or event.key == pygame.K_a:
+                    direction = "a"
+                elif event.key == pygame.K_RIGHT or event.key == pygame.K_d:
+                    direction = "d"
+                elif event.key == K_ESCAPE:
+                    pygame.event.post(pygame.event.Event(QUIT))
+        # 如果当前下落方块为空，则随机生成一种方块
+        if exist % 2 == 0:
+            tetris = random.choice(list)  # 随机一个方块
+            if tetris == [[280, -20], [300, -20], [280, -40], [280, -60]]:
+                color = rule7_red
+            if tetris == [[280, -20], [280, -40], [280, -60], [280, -80]]:
+                color = rule7_blue
+            if tetris == [[280, -20], [300, -20], [320, -20], [300, -40]]:
+                color = rule7_purple
+            if tetris == [[280, -20], [300, -20], [280, -40], [300, -40]]:
+                color = rule7_yellow
+            if tetris == [[280, -20], [300, -20], [300, -40], [320, -40]]:
+                color = rule7_green
+            exist += 1
+
+            list = [[[280, -20], [300, -20], [280, -40], [280, -60]],  # 1
+                    [[280, -20], [280, -40], [280, -60], [280, -80]],  # 2
+                    [[280, -20], [300, -20], [320, -20], [300, -40]],  # 3
+                    [[280, -20], [300, -20], [280, -40], [300, -40]],  # 4
+                    [[280, -20], [300, -20], [300, -40], [320, -40]]]  # 5
+
+        equal = ""  # 初始化方块是否重叠的值
+        # 判断4个方块的坐标是否等于已下落完毕的方块的坐标，如果不是，则继续下落
+        if (tetris[0])[1] < 780 and (tetris[1])[1] < 780 and (tetris[2])[1] < 780 and (tetris[3])[1] < 780:
+            (tetris[0])[1] += 20
+            (tetris[1])[1] += 20
+            (tetris[2])[1] += 20
+            (tetris[3])[1] += 20
+            # 判断继续下落的方块是否重叠，如果重叠，则减少
+            if exist > 1:
+                equal = rule7_algorithm(tetris=tetris, FixedBlock=FixedBlock, equal="")
+                if equal == "equal":
+                    (tetris[0])[1] -= 20
+                    (tetris[1])[1] -= 20
+                    (tetris[2])[1] -= 20
+                    (tetris[3])[1] -= 20
+        # 若果下落到底，则把当前方块放入已下落完毕的方块数列中
+        if (tetris[0])[1] >= 780 or (tetris[1])[1] >= 780 or (tetris[2])[1] >= 780 or (tetris[3])[
+            1] >= 780 or equal == "equal":
+            exist += 1
+            tetris.append(color)
+            FixedBlock.insert(0, tetris)
+            # 如果一排时，进行消除
+            num = rule7_eliminate(FixedBlock=FixedBlock)
+            delete_2 = []
+            change = 0
+            if len(num) > 0:
+                for delete_1 in FixedBlock:
+                    z = 0
+                    for x_1 in range(0, len(num)):
+                        i = 0
+                        for x_2 in range(0, len(delete_1)):
+                            if (delete_1[i])[1] == num[z]:
+                                if (delete_1[i])[0] % 20 == 0:
+                                    delete_2.append((delete_1[i])[0])
+                                delete_1.pop(i)
+
+                                if i > len(delete_1) - 1:
+                                    break
+                            else:
+                                if i < len(delete_1) - 1:
+                                    i += 1
+                                else:
+                                    break
+                        if z < len(num) - 1:
+                            z += 1
+                    if len(delete_1) == 1:
+                        delete_1.pop(0)
+
+                lens = len(num) - 1
+                for delete_3 in FixedBlock:
+                    for delete_4 in delete_3:
+                        i = 0
+                        if len(delete_4) > 0:
+                            if delete_4[1] % 20 == 0 and delete_4[1] != 0:
+                                if delete_4[1] <= num[i]:
+                                    delete_4[1] += 20
+                                if i < lens:
+                                    i += 1
+                        else:
+                            delete_3.remove(delete_4)
+
+        # 如果不重叠，则判断是否进行位移
+        else:
+            if rule7_numbers_t_or_f(len(tetris), tetris=tetris) == True:
+                #  改变形状
+                # 1顺时针改变
+                # 2用颜色区别形状，在初始化变形的次数确定变形方位
+                if direction == "w":
+                    back_tetris = copy.deepcopy(tetris)
+                    if color == rule7_purple:
+                        if change == 0:
+                            (tetris[0])[0] += 20
+                            (tetris[0])[1] -= 20
+                            (tetris[2])[0] -= 20
+                            (tetris[2])[1] += 20
+                            (tetris[3])[0] += 20
+                            (tetris[3])[1] += 20
+                            change += 1
+                        elif change == 1:
+                            (tetris[0])[0] += 20
+                            (tetris[0])[1] += 20
+                            (tetris[2])[0] -= 20
+                            (tetris[2])[1] -= 20
+                            (tetris[3])[0] -= 20
+                            (tetris[3])[1] += 20
+                            change += 1
+                        elif change == 2:
+                            (tetris[0])[0] -= 20
+                            (tetris[0])[1] += 20
+                            (tetris[2])[0] += 20
+                            (tetris[2])[1] -= 20
+                            (tetris[3])[0] -= 20
+                            (tetris[3])[1] -= 20
+                            change += 1
+                        elif change == 3:
+                            (tetris[0])[0] -= 20
+                            (tetris[0])[1] -= 20
+                            (tetris[2])[0] += 20
+                            (tetris[2])[1] += 20
+                            (tetris[3])[0] += 20
+                            (tetris[3])[1] -= 20
+                            change = 0
+                    elif color == rule7_green:
+                        if change == 0:
+                            (tetris[0])[0] += 20
+                            (tetris[0])[1] -= 20
+                            (tetris[2])[0] += 20
+                            (tetris[2])[1] += 20
+                            (tetris[3])[1] += 40
+                            change += 1
+                        elif change == 1:
+                            (tetris[0])[0] -= 20
+                            (tetris[0])[1] += 20
+                            (tetris[2])[0] -= 20
+                            (tetris[2])[1] -= 20
+                            (tetris[3])[1] -= 40
+                            change = 0
+                    elif color == rule7_red:
+                        if change == 0:
+                            (tetris[0])[1] -= 40
+                            (tetris[1])[0] -= 20
+                            (tetris[1])[1] -= 20
+                            (tetris[2])[0] += 20
+                            (tetris[2])[1] -= 20
+                            (tetris[3])[0] += 40
+                            change += 1
+                        elif change == 1:
+                            (tetris[0])[0] += 20
+                            (tetris[1])[1] -= 20
+                            (tetris[2])[1] += 20
+                            (tetris[3])[0] -= 20
+                            (tetris[3])[1] += 40
+                            change += 1
+                        elif change == 2:
+                            (tetris[0])[0] += 20
+                            (tetris[0])[1] += 20
+                            (tetris[1])[0] += 40
+                            (tetris[3])[0] -= 20
+                            (tetris[3])[1] -= 20
+                            change += 1
+                        elif change == 3:
+                            (tetris[0])[0] -= 40
+                            (tetris[0])[1] += 20
+                            (tetris[1])[0] -= 20
+                            (tetris[1])[1] += 40
+                            (tetris[2])[0] -= 20
+                            (tetris[3])[1] -= 20
+                            change = 0
+                    elif color == rule7_blue:
+                        if change == 0:
+                            (tetris[0])[0] -= 20
+                            (tetris[0])[1] -= 40
+                            (tetris[1])[1] -= 20
+                            (tetris[2])[0] += 20
+                            (tetris[3])[0] += 40
+                            (tetris[3])[1] += 20
+                            change += 1
+                        elif change == 1:
+                            (tetris[0])[0] += 20
+                            (tetris[0])[1] += 40
+                            (tetris[1])[1] += 20
+                            (tetris[2])[0] -= 20
+                            (tetris[3])[0] -= 40
+                            (tetris[3])[1] -= 20
+                            change = 0
+                    if exist > 1:
+                        equal = rule7_algorithm(tetris=tetris, FixedBlock=FixedBlock, equal="")
+                        if equal == "equal" or (tetris[0])[0] >= 580 or (tetris[1])[0] >= 580 or (tetris[2])[
+                            0] >= 580 or (tetris[3])[
+                            0] >= 580 or (tetris[0])[0] < 0 or (tetris[1])[0] < 0 or (tetris[2])[0] < 0 or (tetris[3])[
+                            0] < 0:
+                            tetris = back_tetris
+
+
+                # 判断从键盘接受的数值进行增加
+                elif direction == "s":
+                    i = 0
+                    for tetris_s in range(0, len(tetris)):
+                        (tetris[i])[1] += 20
+                        i += 1
+                    # 如果重叠则减少
+                    if equal != (rule7_algorithm(tetris=tetris, FixedBlock=FixedBlock, equal="")):
+                        i = 0
+                        for tetris_s_1 in range(0, len(tetris)):
+                            (tetris[i])[1] -= 20
+                            i += 1
+                elif direction == "a" and (tetris[0])[0] > 0 and (tetris[1])[0] > 0 and (tetris[2])[0] > 0 and \
+                        (tetris[3])[0] > 0:
+                    i = 0
+                    for tetris_a in range(0, len(tetris)):
+                        (tetris[i])[0] -= 20
+                        i += 1
+                    if equal != (rule7_algorithm(tetris=tetris, FixedBlock=FixedBlock, equal="")):
+                        i = 0
+                        for tetris_a_1 in range(0, len(tetris)):
+                            (tetris[i])[0] += 20
+                            i += 1
+                elif direction == "d" and (tetris[0])[0] < 580 and (tetris[1])[0] < 580 and (tetris[2])[0] < 580 and \
+                        (tetris[3])[0] < 580:
+                    i = 0
+                    for tetris_d in range(0, len(tetris)):
+                        (tetris[i])[0] += 20
+                        i += 1
+                    if equal != (rule7_algorithm(tetris=tetris, FixedBlock=FixedBlock, equal="")):
+                        i = 0
+                        for tetris_d in range(0, len(tetris)):
+                            (tetris[i])[0] -= 20
+                            i += 1
+        # 填充背景
+        screen.fill(rule7_black)
+        # 正在下落方块的绘画
+        for number in tetris:
+            # 判断当前坐标是否为颜色的值，如果不是，则进行绘画
+            if number != rule7_green and number != rule7_blue and number != rule7_yellow and number != rule7_red and number != rule7_purple:
+                pygame.draw.rect(screen, color, Rect(number[0], number[1], 20, 20))
+        # 已到底或重叠方块的绘画
+        for undergrounds in FixedBlock:
+            # 将当前方块的颜色存在color_1中
+            if len(undergrounds) > 1:
+                color_1 = undergrounds[len(undergrounds) - 1]
+                for underground in undergrounds:
+                    # 判断当前坐标是否为颜色的值，如果不是，则进行绘画
+                    if underground != rule7_green and underground != rule7_blue and underground != rule7_yellow and underground != rule7_red and underground != rule7_purple:
+                        pygame.draw.rect(screen, color_1, Rect(underground[0], underground[1], 20, 20))
+                        # 如果y轴的值为0，则游戏结束
+                        if underground[1] == 0:
+                            rule7_gameover(screen)
+
+        # 更新显示
+        pygame.display.flip()
+
+
+class Tetris_Game_Rule_7(Basic_Rule):
+
+    def __init__(self, rule_index, operation_type):
+        self.rule_index = rule_index
+        self.operation_type = operation_type
+
+    #    def __init__(self, rule_index, operation_type,file_type):
+    #        self.rule_index = rule_index
+    #        self.operation_type = operation_type
+    #        self.file_type = file_type
+
+    def applyNoParamOperationRule0(self):
+        global yanhua_count_rule6
+        rule7_main() # 烟花的数量
+
+    def simpleDesc(self):
+        return "俄罗斯方块游戏"
+
+
+###################### Rule_6 End  ######################
+
+
 def initRule():
     realTypeRuleList.append(CodeRain_Rule_1(1, 0));
     realTypeRuleList.append(PlaneWars_Rule_2(2, 0));
@@ -3205,7 +3682,7 @@ def initRule():
     realTypeRuleList.append(SnakeEatFood_Rule_4(4, 0));
     realTypeRuleList.append(TankWar_Rule_5(5, 0));
     realTypeRuleList.append(YanHua_Rule_6(6, 0));
-
+    realTypeRuleList.append(Tetris_Game_Rule_7(7, 0));
     print("当前规则数量:" + str(len(realTypeRuleList)))
 
 
