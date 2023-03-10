@@ -3672,8 +3672,40 @@ class Tetris_Game_Rule_7(Basic_Rule):
         return "俄罗斯方块游戏"
 
 
-###################### Rule_6 End  ######################
+###################### Rule_7 俄罗斯方块 End  ######################
 
+###################### Rule_8  Html 烟花 Begin  ######################
+
+
+def rule8_main():
+    sysstr = platform.system()
+    if sysstr == "Windows":
+        os.system('' + pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule8_file" + OS_SEQ + "index.html")
+    elif sysstr == "Linux":
+        os.system('open ' + pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule8_file" + OS_SEQ + "index.html")
+    elif sysstr == "Darwin":
+        os.system('open '+ pbinPath + "" + OS_SEQ + "Z9" + OS_SEQ + "rule8_file" + OS_SEQ + "index.html")
+    else:
+        print("Other System , can not open YanHua_Html!")
+
+
+class Html_YanHua_Rule_8(Basic_Rule):
+
+    def __init__(self, rule_index, operation_type):
+        self.rule_index = rule_index
+        self.operation_type = operation_type
+
+    #    def __init__(self, rule_index, operation_type,file_type):
+    #        self.rule_index = rule_index
+    #        self.operation_type = operation_type
+    #        self.file_type = file_type
+
+    def applyNoParamOperationRule0(self):
+        rule8_main() # 烟花的数量
+
+    def simpleDesc(self):
+        return "俄罗斯方块游戏"
+###################### Rule_8  Html 烟花 End  ######################
 
 def initRule():
     realTypeRuleList.append(CodeRain_Rule_1(1, 0));
@@ -3683,6 +3715,7 @@ def initRule():
     realTypeRuleList.append(TankWar_Rule_5(5, 0));
     realTypeRuleList.append(YanHua_Rule_6(6, 0));
     realTypeRuleList.append(Tetris_Game_Rule_7(7, 0));
+    realTypeRuleList.append(Html_YanHua_Rule_8(8, 0));
     print("当前规则数量:" + str(len(realTypeRuleList)))
 
 
