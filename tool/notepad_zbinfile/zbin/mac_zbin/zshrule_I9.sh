@@ -20,7 +20,8 @@ echo
 
 echo "╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤ Input_Var Begin ╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤"
 init_os_name=$(uname -a)     # 当前操作系统的简介 Darwin Mac-mini.local 22.3.0 Darwin Kernel Version 22.3.0
-init_cd=$(pwd)     #  当前执行命令的路径   init_cd=/Users/zukgit/Deskto
+init_cd=$(pwd)     #  当前执行命令的路径   init_cd=/Users/zukgit/Desktop
+init_pwd=$(pwd)     #  当前执行命令的路径   init_cd=/Users/zukgit/Desktop
 init_shfile_path=$(dirname "$0")    #  当前执行文件自身的文件夹路径    # init_shfile_path=/Users/zukgit/Desktop/zbin/mac_zbin
 init_shfile_name=$(basename "$0")   # 当前执行文件的文件名称  init_shfile_name=zshrule_I9.sh
 init_input_0=$0                     # init_input_0=/Users/zukgit/Desktop/zbin/mac_zbin/zshrule_I9.sh
@@ -126,7 +127,394 @@ echo "__________________________________Method_Out "$FUNCNAME
 }
 
 
-echo $init_shfile_name" _27_  ip_10.106.20.115 ipport_54321 paircode_654321 pairport_54321   ## 本地无线 wireless adb 连接 需要打开 Android10以上 开发者模式无线调试"
+function rule902vrepobackupoperation_func_0x0(){
+# =========================================================================== rule902vrepobackupoperation_func_0x0
+# rule_tip:  $init_shfile_name  _901_   ##  repo_backup_operation 依据当前路径的 repo_backup.txt  来对当前 repo 进行备份恢复操作 
+# desc: repo_backup_operation 依据当前路径的 repo_backup.txt  来对当前 repo 进行备份恢复操作
+# sample:  
+# sample_out: 
+CUR_REPO_PATH=$init_pwd
+REPO_BackUp_File=$CUR_REPO_PATH/repo_backup.txt
+backup_all_number=`grep -n  ""   $REPO_BackUp_File | wc -l`
+backup_line_number=1
+
+if [ -f "$REPO_BackUp_File" ] ; then
+    echo  "$REPO_BackUp_File File exist!"
+else 
+    echo  "$REPO_BackUp_File File not exist!  backup_operation stop! "
+    exit
+fi
+
+## 使用 while read 使得可以一行一行读取  而不是空格进行切分的读取
+while read  backup_line
+do
+    echo "backup_line["$backup_line_number"_"$backup_all_number"]:"$backup_line 
+    ####repo_git[1077_2071]_gitpath:xxxxx  切换到对应路径  并且去除掉对应的 untrack文件 ( git reset 没法删除 untrack文件)
+    if [[ ${backup_line} =~ "####repo_git" ]] ; then 
+        cur_git_abspath=${backup_line#*gitpath:}   ##  #井号截取 右边字符串 后面
+        echo "cur_git_abspath=$cur_git_abspath"
+        cd $cur_git_abspath
+        git clean -ndxf
+        git clean -dxf
+    fi
+    
+    ##__git_local_branch:TEMP  切换到记录的本地分支
+    if [[ ${backup_line} =~ "__git_local_branch:" ]] ; then 
+        cur_git_branch=${backup_line#*__git_local_branch:}   ##  #井号截取 右边字符串 后面
+        echo "cur_git_branch=$cur_git_branch"
+        git checkout $cur_git_branch
+    fi
+    
+    ##__git_head_commitid:0f015b711ae44b8bd6b3be8ba1d21cbfc32442e6   reset到指定的commitid
+    if [[ ${backup_line} =~ "__git_head_commitid:" ]] ; then 
+        git_head_commitid=${backup_line#*__git_head_commitid:}   ##  #井号截取 右边字符串 后面
+        echo "git_head_commitid=$git_head_commitid"
+        git reset --hard $git_head_commitid
+    fi
+
+     backup_line_number=$(($backup_line_number+1))
+done  < $REPO_BackUp_File
+
+cd $CUR_REPO_PATH
+
+}
+
+
+
+function rule901vrepobackuprecord_func_0x0(){
+# =========================================================================== rule901vrepobackuprecord_func_0x0
+# rule_tip:  $init_shfile_name  _901_   ##  repo_backup_record    对当前repo仓库 状态进行状态备份   会生成 repo_backup.txt 文件 
+# desc:  repo_backup_record    对当前repo仓库 状态进行状态备份   会生成 repo_backup.txt 文件
+# sample:  
+# sample_out: 
+echo "__________________________________Method_In "$FUNCNAME
+CUR_REPO_PATH=$init_pwd
+rule900_timestamp=`date +%Y-%m-%d_%H-%M-%S`  ##  获取到时间戳 2023-03-21_16-33-13 
+REPO_BackUp_File=$CUR_REPO_PATH/repo_backup.txt
+## 获取所有的 AOSP的repo的 路径到 repo_pwd.txt
+repo forall -c pwd > ./repo_git_path.txt
+## 当前遍历到的 repo_pwd.txt 的 行数
+gitpath_line_number=1
+gitpath_min_count=500
+## 获取 repo_pwd.txt 所有的行  既 当前 AOSP的 所有的 repo仓库的 个数
+gitpath_all_number=`grep -n  ""   ./repo_git_path.txt | wc -l`
+
+if [ $gitpath_all_number -lt $gitpath_min_count ] ; then
+  echo " gitpath_all_number="$gitpath_all_number" xiaoyu 500   repo forall -c pwd > ./repo_git_path.txt   # check error"
+  exit
+fi
+echo "CUR_REPO_PATH="$CUR_REPO_PATH
+echo "REPO_BackUp_File="$REPO_BackUp_File
+echo "gitpath_all_number="$gitpath_all_number
+echo -e "" > $REPO_BackUp_File
+
+for gitpath_line in `cat ./repo_git_path.txt`
+do
+    cd $gitpath_line
+    echo "####repo_git["$gitpath_line_number"_"$gitpath_all_number"]_gitpath:"$gitpath_line
+    echo "####repo_git["$gitpath_line_number"_"$gitpath_all_number"]_gitpath:"$gitpath_line >> $REPO_BackUp_File
+    echo -e   >> $REPO_BackUp_File
+    ## 打印 git status 信息
+    
+    
+    ### Command 本地主分支
+    git_local_branch_desc=`git branch -vv | grep "*" |awk -F' ' '{ print $2 }'`
+    echo "__git_local_branch:"$git_local_branch_desc  >> $REPO_BackUp_File
+    echo -e   >> $REPO_BackUp_File
+    
+    ### Command 获取本地主分支的第一个commitid
+    git_head_commitid_desc=`git rev-parse HEAD`
+    echo "__git_head_commitid:"$git_head_commitid_desc  >> $REPO_BackUp_File
+    echo -e   >> $REPO_BackUp_File
+    
+    ### Command 获取本地的 分支详细信息
+    git_branch_vv_desc=`git branch -vv`
+    echo "__git_branch_vv:"$git_branch_vv_desc  >> $REPO_BackUp_File
+    echo -e   >> $REPO_BackUp_File
+    
+    
+    ### Command 获取本地的 git 状态 信息
+    git_status_desc=`git status`
+    echo "__git_status:"$git_status_desc  >> $REPO_BackUp_File
+    echo -e   >> $REPO_BackUp_File
+
+    ### Command 获取远程主分支(可能 没有 )
+    git_master_branch_desc=`git branch -r | grep " -" |awk -F' ' '{ print $3 }'`
+    echo "__git_master_branch:"$git_master_branch_desc  >> $REPO_BackUp_File
+    echo -e   >> $REPO_BackUp_File
+    
+    ### Command 获取远程第一个分支(远程主分支没有情况下 )
+    git_nomaster_number1_branch=`git branch -r |awk 'NR==1'`
+    echo "__git_nomaster_number1_branch:"$git_nomaster_number1_branch  >> $REPO_BackUp_File
+    echo -e   >> $REPO_BackUp_File
+    
+    
+    ### Prop "Untracked files"  标记是否有 未追踪文件
+    git_status_untracked=`git status | grep "Untracked files"`
+    git_status_untracked_flag="false"
+    if [ -n "$git_status_untracked" ]; then
+        git_status_untracked_flag="true"
+    else
+        git_status_untracked_flag="false"
+    fi
+    echo "__git_status_untracked:"$git_status_untracked_flag   >> $REPO_BackUp_File
+    echo -e   >> $REPO_BackUp_File
+        
+    ### Prop "modified:" 标记是否有 修改后未提交文件
+    git_status_modified=`git status | grep "modified:"`
+    git_status_modified_flag="false"
+    if [ -n "$git_status_modified" ]; then
+        git_status_modified_flag="true"
+    else
+        git_status_modified_flag="false"
+    fi
+    echo "__git_status_modified:"$git_status_modified_flag   >> $REPO_BackUp_File
+    echo -e   >> $REPO_BackUp_File
+        
+        
+    ### Prop "commits" 标记是否有未提交commit标识
+    git_status_commits=`git status | grep "commits"`  
+    git_status_commits_flag="false"
+    if [ -n "$git_status_commits" ]; then
+        git_status_commits_flag="true"
+    else
+        git_status_commits_flag="false"
+    fi
+    echo "__git_status_uncommits:"$git_status_commits_flag   >> $REPO_BackUp_File
+    echo -e   >> $REPO_BackUp_File
+    
+    
+    
+    #  Prop Your branch is ahead of   标记是否本地分支有超过远程分支提交的标识
+    git_status_ahead_commits=`git status | grep "Your branch is ahead of"`  
+    git_status_ahead_commits_flag="false"
+    if [ -n "$git_status_ahead_commits" ]; then
+        git_status_ahead_commits_flag="true"
+    else
+        git_status_ahead_commits_flag="false"
+    fi
+    echo "__git_status_aheadcommits:"$git_status_ahead_commits_flag   >> $REPO_BackUp_File
+    echo -e   >> $REPO_BackUp_File    
+
+
+    #  Prop Have Master Branch  标记是否有远程主分支 标识位
+    is_have_master_branch_flag="false"
+    if [ -n "$git_master_branch_desc" ]; then
+        is_have_master_branch_flag="true"
+    else
+        is_have_master_branch_flag="false"
+    fi
+    echo "__git_have_master_branch:"$is_have_master_branch_flag   >> $REPO_BackUp_File
+    echo -e   >> $REPO_BackUp_File    
+    echo -e   >> $REPO_BackUp_File
+    echo -e   >> $REPO_BackUp_File
+     gitpath_line_number=$(($gitpath_line_number+1))
+ done
+
+echo "__________________________________Method_Out "$FUNCNAME
+}
+
+
+
+
+
+function rule900vreporeset_func_0x0(){
+# =========================================================================== rule900vreporeset_func_0x0
+# rule_tip:  $init_shfile_name  _0_   ##  强制更新repo仓库 比 repo sync -j2强 会有log文件 repo_sync_log_*.txt 文件生成
+# desc:  强制更新repo仓库 比 repo sync -j2强 会有log文件 repo_sync_log_*.txt 文件生成
+# sample:  
+# sample_out: 
+echo "__________________________________Method_In "$FUNCNAME
+CUR_REPO_PATH=$init_pwd
+rule900_timestamp=`date +%Y-%m-%d_%H-%M-%S`  ##  获取到时间戳 2023-03-21_16-33-13 
+CUR_REPO_File=$CUR_REPO_PATH/repo_sync_log_$rule900_timestamp.txt
+## 获取所有的 AOSP的repo的 路径到 repo_pwd.txt
+repo forall -c pwd > ./repo_git_path.txt
+## 当前遍历到的 repo_pwd.txt 的 行数
+gitpath_line_number=1
+gitpath_min_count=500
+## 获取 repo_pwd.txt 所有的行  既 当前 AOSP的 所有的 repo仓库的 个数
+gitpath_all_number=`grep -n  ""   ./repo_git_path.txt | wc -l`
+
+if [ $gitpath_all_number -lt $gitpath_min_count ] ; then
+  echo " gitpath_all_number="$gitpath_all_number" 当前读取到的repo_git仓库数量小于500  似乎出现错误,请检查! repo forall -c pwd > ./repo_git_path.txt   # check error"
+  exit
+fi
+echo "CUR_REPO_PATH="$CUR_REPO_PATH
+echo "CUR_REPO_File="$CUR_REPO_File
+echo "gitpath_all_number="$gitpath_all_number
+echo -e "__Reset_Operation__" > $CUR_REPO_File
+echo -e  >> $CUR_REPO_File
+echo -e  >> $CUR_REPO_File
+for gitpath_line in `cat ./repo_git_path.txt`
+do
+    cd $gitpath_line
+    echo "####repo_git["$gitpath_line_number"_"$gitpath_all_number"]_gitpath:"$gitpath_line
+    echo "####repo_git["$gitpath_line_number"_"$gitpath_all_number"]_gitpath:"$gitpath_line >> $CUR_REPO_File
+    echo -e   >> $CUR_REPO_File
+
+    
+    ### Command  获取本地分支名称
+    git_local_branch_desc=`git branch -vv | grep "*" |awk -F' ' '{ print $2 }'`
+    echo "__git_local_branch:"$git_local_branch_desc  >> $CUR_REPO_File
+    echo -e   >> $CUR_REPO_File
+    
+    ### Command 获取当前最新提交的commitid
+    git_head_commitid_desc=`git rev-parse HEAD`
+    echo "__git_head_commitid:"$git_head_commitid_desc  >> $CUR_REPO_File
+    echo -e   >> $CUR_REPO_File
+    
+    ### Command 获取分支详细信息
+    git_branch_vv_desc=`git branch -vv`
+    echo "__git_branch_vv:"$git_branch_vv_desc  >> $CUR_REPO_File
+    echo -e   >> $CUR_REPO_File
+    
+
+    
+    ### Command 获取当前 git status 信息
+    git_status_desc=`git status`
+    echo "__git_status:"$git_status_desc  >> $CUR_REPO_File
+    echo -e   >> $CUR_REPO_File
+
+    ### Command 获取当前本地分支绑定的远程分支(可能不存在)
+    git_master_branch_desc=`git branch -r | grep " -" |awk -F' ' '{ print $3 }'`
+    echo "__git_master_branch:"$git_master_branch_desc  >> $CUR_REPO_File
+    echo -e   >> $CUR_REPO_File
+    
+    ### Command 获取所有分支中第一个打印的分支(一般来说是主分支)
+    git_nomaster_number1_branch=`git branch -r |awk 'NR==1'`
+    echo "__git_nomaster_number1_branch:"$git_nomaster_number1_branch  >> $CUR_REPO_File
+    echo -e   >> $CUR_REPO_File
+    
+    
+    ### Prop "Untracked files" 新创建还没有add commit到工程的 还没有任何历史记录的文件 的一种状态
+    git_status_untracked=`git status | grep "Untracked files"`
+    git_status_untracked_flag="false"
+    if [ -n "$git_status_untracked" ]; then
+        git_status_untracked_flag="true"
+    else
+        git_status_untracked_flag="false"
+    fi
+    echo "__git_status_untracked:"$git_status_untracked_flag   >> $CUR_REPO_File
+    echo -e   >> $CUR_REPO_File
+        
+    ### Prop "modified:" 对当前已经存在的文件的修改的打印信息
+    git_status_modified=`git status | grep "modified:"`
+    git_status_modified_flag="false"
+    if [ -n "$git_status_modified" ]; then
+        git_status_modified_flag="true"
+    else
+        git_status_modified_flag="false"
+    fi
+    echo "__git_status_modified:"$git_status_modified_flag   >> $CUR_REPO_File
+    echo -e   >> $CUR_REPO_File
+        
+        
+        
+
+	### Prop "commits"     当前已经有提交但还没上传的 一种状态
+    git_status_commits=`git status | grep "commits"`  
+    git_status_commits_flag="false"
+    if [ -n "$git_status_commits" ]; then
+        git_status_commits_flag="true"
+    else
+        git_status_commits_flag="false"
+    fi
+    echo "__git_status_uncommits:"$git_status_commits_flag   >> $CUR_REPO_File
+    echo -e   >> $CUR_REPO_File
+    
+    
+    
+    ###  Prop Your branch is ahead of   当前分支比远程主线分支多了几个提交commit的状态
+    git_status_ahead_commits=`git status | grep "Your branch is ahead of"`  
+    git_status_ahead_commits_flag="false"
+    if [ -n "$git_status_ahead_commits" ]; then
+        git_status_ahead_commits_flag="true"
+    else
+        git_status_ahead_commits_flag="false"
+    fi
+    echo "__git_status_aheadcommits:"$git_status_ahead_commits_flag   >> $CUR_REPO_File
+    echo -e   >> $CUR_REPO_File    
+
+
+    ###  Prop Have Master Branch  当前本地分支是否有对应的远程分支的标识位
+    is_have_master_branch_flag="false"
+    if [ -n "$git_master_branch_desc" ]; then
+        is_have_master_branch_flag="true"
+    else
+        is_have_master_branch_flag="false"
+    fi
+    echo "__git_have_master_branch:"$is_have_master_branch_flag   >> $CUR_REPO_File
+    echo -e   >> $CUR_REPO_File    
+    
+    
+
+    ######### Reset Operation Area  #########
+    gitpath_operation_index=1
+	### 当有远程主分支  并且  本地有ahead-commit时   执行清除ahead-commit的操作 
+    if [ "$git_status_ahead_commits_flag" = "true" -a  "$is_have_master_branch_flag" = "true" ]; then
+       echo "__Reset_Operation__"$gitpath_operation_index   >> $CUR_REPO_File
+       echo "__Reset_Operation__"$gitpath_operation_index 
+       echo "git_status_ahead_commits_flag(true) && is_have_master_branch_flag(true) : git reset --hard HEAD~5 && repo sync ."   >> $CUR_REPO_File    
+       echo "git_status_ahead_commits_flag(true) && is_have_master_branch_flag(true) : git reset --hard HEAD~5 && repo sync ."
+       echo -e   >> $CUR_REPO_File
+       gitpath_operation_index=$(($gitpath_operation_index+1))
+       git reset --hard HEAD~5
+       repo sync .
+       repo sync .
+    fi
+    
+
+	### 当有远程主分支  并且  本地有 未追踪 untrack 的文件时   执行清除untrack文件 并 更新的操作( untrack-file 无法通过 git reset命令删除)
+    if [ "$git_status_untracked_flag" = "true" -a  "$is_have_master_branch_flag" = "true" ]; then
+       echo "__Reset_Operation__"$gitpath_operation_index   >> $CUR_REPO_File
+       echo "__Reset_Operation__"$gitpath_operation_index 
+       echo "git_status_untracked_flag(true) && is_have_master_branch_flag(true) : git clean -dxf && git reset --hard HEAD~5 && repo sync ."   >> $CUR_REPO_File    
+       echo "git_status_untracked_flag(true) && is_have_master_branch_flag(true) : git clean -dxf && git reset --hard HEAD~5 && repo sync ."  
+       echo -e   >> $CUR_REPO_File
+       gitpath_operation_index=$(($gitpath_operation_index+1))
+	   # git clean -ndxf 会打印当前 所有可以 去除 untrack-file 的文件和目录
+	   # git clean -dxf 去除所有的 untrack-file 
+       git clean -ndxf
+       git clean -dxf
+       git reset --hard HEAD~5
+       repo sync .
+       repo sync .
+    fi
+
+	### 当有远程主分支  并且  本地有 未uncommit 的文件时   执行恢复文件的操作
+    if [ "$git_status_modified_flag" = "true" -a  "$is_have_master_branch_flag" = "true" ]; then
+       echo "__Reset_Operation__"$gitpath_operation_index   >> $CUR_REPO_File
+       echo "__Reset_Operation__"$gitpath_operation_index 
+       echo "git_status_modified_flag(true) && is_have_master_branch_flag(true) : git reset --hard HEAD~5 && repo sync ."   >> $CUR_REPO_File    
+       echo "git_status_modified_flag(true) && is_have_master_branch_flag(true) : git reset --hard HEAD~5 && repo sync ."  
+       echo -e   >> $CUR_REPO_File
+       gitpath_operation_index=$(($gitpath_operation_index+1))
+       git reset --hard HEAD~5
+       repo sync .
+       repo sync .
+    fi
+
+    echo -e   >> $CUR_REPO_File
+    echo -e   >> $CUR_REPO_File
+     gitpath_line_number=$(($gitpath_line_number+1))
+ done
+
+echo "=========================== repo sync -j2 -f   begin ==========================="  >> $CUR_REPO_File  
+echo "=========================== repo sync -j2 -f   begin ==========================="
+##  当前去除了所有repo git 的  uncommit和 ahead_commit 后 才开始 强制更新所有 repo git 仓库
+repo sync -j2 -f 
+echo "=========================== repo sync -j2 -f   end ==========================="
+echo "=========================== repo sync -j2 -f   end ==========================="  >> $CUR_REPO_File  
+
+echo " repo sync -j2 -f && mv out out_"$rule900_timestamp
+echo " repo sync -j2 -f && mv out out_"$rule900_timestamp   >> $CUR_REPO_File  
+
+echo "__________________________________Method_Out "$FUNCNAME
+}
+
+
+
 
 function rule27vwirelessadbconnect_func_0x0(){
 # =========================================================================== rule0v_func_0x0
@@ -244,14 +632,14 @@ rule6_apk_index=1
     for package_line in `cat sh_rule6.txt`
     do 
         echo "sh_rule6["$rule6_apk_index"]:${package_line}"
-		package_apk_name=${package_line#*==/base.apk=}   ##  #井号截取  ==/base.apk= 右边字符串 后面
+        package_apk_name=${package_line#*==/base.apk=}   ##  #井号截取  ==/base.apk= 右边字符串 后面
 
         echo "sh_rule6["$rule6_apk_index"]:${package_apk_name}"
         echo "sh_rule6["$rule6_apk_index"]:${package_apk_name} 卸载命令如下:"
         echo "adb uninstall "$package_apk_name
-		adb uninstall $package_apk_name
-		rule6_apk_index=$(($rule6_apk_index+1))
-		echo 
+        adb uninstall $package_apk_name
+        rule6_apk_index=$(($rule6_apk_index+1))
+        echo 
     done
 rm -fr  sh_rule3.txt
 echo "__________________________________Method_Out "$FUNCNAME
@@ -276,20 +664,20 @@ echo "当前安装 apk 的 本地路径 rule3_dir_path="$rule3_dir_path
 sh_rule3_fileindex=1
 sh_rule3_apkcount=0
     for real_file_path in `find ${rule3_dir_path} -type f -name "*.apk"`; do  ## 过滤当前文件夹下的apk 结尾的文件
-	    # rule3_realfile[2]: /Users/zukgit/Desktop/zbin/mac_zbin/apk/com.samsundot.talking.apk
+        # rule3_realfile[2]: /Users/zukgit/Desktop/zbin/mac_zbin/apk/com.samsundot.talking.apk
         echo "rule3_realfile["$sh_rule3_fileindex"]: "$real_file_path
         sh_rule3_apkcount=$(($sh_rule3_apkcount+1))
         sh_rule3_fileindex=$(($sh_rule3_fileindex+1))
     done
 sh_rule3_apkindex=1
-	for real_file_path in `find ${rule3_dir_path} -type f -name "*.apk"`; do  ## 过滤当前文件夹下的apk 结尾的文件
-	    # rule3_realfile[2]: /Users/zukgit/Desktop/zbin/mac_zbin/apk/com.samsundot.talking.apk
+    for real_file_path in `find ${rule3_dir_path} -type f -name "*.apk"`; do  ## 过滤当前文件夹下的apk 结尾的文件
+        # rule3_realfile[2]: /Users/zukgit/Desktop/zbin/mac_zbin/apk/com.samsundot.talking.apk
         echo "安装apk rule3_realfile["$sh_rule3_apkindex"_"$sh_rule3_apkcount"]: "$real_file_path"命令:"
-		echo "adb install -r "$real_file_path
-		adb install -r $real_file_path      ## 开始安装apk
+        echo "adb install -r "$real_file_path
+        adb install -r $real_file_path      ## 开始安装apk
         sh_rule3_apkindex=$(($sh_rule3_apkindex+1))
     done
-	
+    
 echo "__________________________________Method_Out "$FUNCNAME
 }
 
@@ -313,39 +701,39 @@ sh_rule2_seperat_line_str="/"
     for package_line in `cat sh_rule2.txt`
     do 
         echo "sh_rule2["$sh_rule2_lineindex"]:${package_line}"
-		if [[ ${package_line} =~ ${sh_rule2_seperat_line_str} ]];then      ##  包含子字符串
-		echo "当前行["$sh_rule2_lineindex"_"$sh_rule2_linecout"]包含应用名称: "${package_line}
-		forground_apk_name=${package_line%/*}
-		echo "当前行["$sh_rule2_lineindex"_"$sh_rule2_linecout"]前台应用名称 forground_apk_name="${forground_apk_name}
-		
-		adb shell pm list package -3 -f  | grep ${forground_apk_name} > sh_rule2_foreground_app.txt
-		
-		sh_rule2_forground_app_lineindex=1
-		sh_rule2_forground_app_flag_str="base.apk"
-		## package:/data/app/com.ss.android.article.news-LIGZLzy_kSW_08CkcqgxQQ==/base.apk=com.ss.android.article.news
+        if [[ ${package_line} =~ ${sh_rule2_seperat_line_str} ]];then      ##  包含子字符串
+        echo "当前行["$sh_rule2_lineindex"_"$sh_rule2_linecout"]包含应用名称: "${package_line}
+        forground_apk_name=${package_line%/*}
+        echo "当前行["$sh_rule2_lineindex"_"$sh_rule2_linecout"]前台应用名称 forground_apk_name="${forground_apk_name}
+        
+        adb shell pm list package -3 -f  | grep ${forground_apk_name} > sh_rule2_foreground_app.txt
+        
+        sh_rule2_forground_app_lineindex=1
+        sh_rule2_forground_app_flag_str="base.apk"
+        ## package:/data/app/com.ss.android.article.news-LIGZLzy_kSW_08CkcqgxQQ==/base.apk=com.ss.android.article.news
             for foreground_app_line in `cat sh_rule2_foreground_app.txt`
-		    do
-			
-				if [[ ${foreground_app_line} =~ ${sh_rule2_forground_app_flag_str} ]];then      ##  包含子字符串
+            do
+            
+                if [[ ${foreground_app_line} =~ ${sh_rule2_forground_app_flag_str} ]];then      ##  包含子字符串
                      echo "foreground_app_line["$sh_rule2_forground_app_lineindex"]:${foreground_app_line}"
-				     package_apk_prepath=${foreground_app_line%==/base.apk*}  ##  %百分号号截取 左边字符串 前面
-				     package_apk_endpath=${foreground_app_line#*==/base.apk=}   ##  #井号截取 右边字符串 后面
-				     package_apk_path=${package_apk_prepath:8}"==/base.apk"    ## 去除前面的8个字符  package:
-		             package_apk_name=${package_apk_endpath}".apk"
-				     echo "当前前台APP["$package_apk_name"]拉取命令:    adb pull "${package_apk_path}"  " ${package_apk_name}
-		             adb pull ${package_apk_path}   ${package_apk_name}
-			         sh_rule2_forground_app_lineindex=$(($sh_rule2_forground_app_lineindex+1))
-				     rm -fr sh_rule2_foreground_app.txt
-				     rm -fr sh_rule2.txt
-				     echo "__________________________________Method_Out "$FUNCNAME
-				     echo "Press any key to start...or Press Ctrl+c to cancel  按任意键继续抓取当前前台APP! ....."
+                     package_apk_prepath=${foreground_app_line%==/base.apk*}  ##  %百分号号截取 左边字符串 前面
+                     package_apk_endpath=${foreground_app_line#*==/base.apk=}   ##  #井号截取 右边字符串 后面
+                     package_apk_path=${package_apk_prepath:8}"==/base.apk"    ## 去除前面的8个字符  package:
+                     package_apk_name=${package_apk_endpath}".apk"
+                     echo "当前前台APP["$package_apk_name"]拉取命令:    adb pull "${package_apk_path}"  " ${package_apk_name}
+                     adb pull ${package_apk_path}   ${package_apk_name}
+                     sh_rule2_forground_app_lineindex=$(($sh_rule2_forground_app_lineindex+1))
+                     rm -fr sh_rule2_foreground_app.txt
+                     rm -fr sh_rule2.txt
+                     echo "__________________________________Method_Out "$FUNCNAME
+                     echo "Press any key to start...or Press Ctrl+c to cancel  按任意键继续抓取当前前台APP! ....."
                      char=`pause_get_char`
-					 rule2vbankupapk_func_0x0
+                     rule2vbankupapk_func_0x0
                fi
-		    done
-		fi
-		
-		sh_rule2_lineindex=$(($sh_rule2_lineindex+1))
+            done
+        fi
+        
+        sh_rule2_lineindex=$(($sh_rule2_lineindex+1))
     done
 rm -fr sh_rule2_foreground_app.txt
 rm -fr sh_rule2.txt
@@ -376,19 +764,19 @@ sh_rule1_linecout=`awk 'END{print NR}' sh_rule1.txt`    ## 统计文件行数
     for package_line in `cat sh_rule1.txt`
     do 
         echo "sh_rule1["$rule1_apk_index"]:${package_line}"
-		package_apk_prepath=${package_line%==/base.apk*}    ##  %百分号号截取 左边字符串 前面
-		package_apk_endpath=${package_line#*==/base.apk=}   ##  #井号截取 右边字符串 后面
+        package_apk_prepath=${package_line%==/base.apk*}    ##  %百分号号截取 左边字符串 前面
+        package_apk_endpath=${package_line#*==/base.apk=}   ##  #井号截取 右边字符串 后面
         echo "sh_rule1["$rule1_apk_index"]_package_apk_prepath:${package_apk_prepath}"
         echo "sh_rule1["$rule1_apk_index"]_package_apk_endpath:${package_apk_endpath}"
-		package_apk_path=${package_apk_prepath:8}"==/base.apk"    ## 去除前面的8个字符  package:
-		package_apk_name=${package_apk_endpath}".apk"
-		echo "sh_rule1["$rule1_apk_index"]_apkpath:${package_apk_path}"
+        package_apk_path=${package_apk_prepath:8}"==/base.apk"    ## 去除前面的8个字符  package:
+        package_apk_name=${package_apk_endpath}".apk"
+        echo "sh_rule1["$rule1_apk_index"]_apkpath:${package_apk_path}"
         echo "sh_rule1["$rule1_apk_index"]_apkname:${package_apk_name}"
-		echo "拉取 ${package_apk_name} 的命令如下:"
-		echo "app["$rule1_apk_index"_"$sh_rule1_linecout"]: adb pull "${package_apk_path}"  " ${package_apk_name}
-		adb pull ${package_apk_path}   ${package_apk_name}
-		echo 
-		rule1_apk_index=$(($rule1_apk_index+1))
+        echo "拉取 ${package_apk_name} 的命令如下:"
+        echo "app["$rule1_apk_index"_"$sh_rule1_linecout"]: adb pull "${package_apk_path}"  " ${package_apk_name}
+        adb pull ${package_apk_path}   ${package_apk_name}
+        echo 
+        rule1_apk_index=$(($rule1_apk_index+1))
     done
 rm -fr  sh_rule1.txt
 echo "__________________________________Method_Out "$FUNCNAME
@@ -420,15 +808,19 @@ echo $init_shfile_name" _14_    ## 对当前手机屏幕进行录屏 然后拔�
 echo
 echo $init_shfile_name" _27_  ip_10.106.20.115 ipport_54321 paircode_654321 pairport_54321   ## 本地无线 wireless adb 连接 需要打开 Android10以上 开发者模式无线调试"
 echo $init_shfile_name" _27_  ip_192.168.0.2 ipport_54321 paircode_654321 pairport_54321   ## 本地无线 wireless adb 连接 需要打开 Android10以上 开发者模式无线调试"
-
 echo
-
+echo $init_shfile_name" _900_    ## AOSP_repo_foce_sync        强制更新repo仓库 比 repo sync -j2强 会有log文件 repo_sync_log_*.txt 文件生成 "
+echo
+echo $init_shfile_name" _901_    ## AOSP_repo_backup_record    对当前repo仓库 状态进行状态备份   会生成 repo_backup.txt 文件"
+echo
+echo $init_shfile_name" _902_    ## AOSP_repo_backup_operation 依据当前路径的 repo_backup.txt  来对当前 repo 进行备份恢复操作 "
+echo
 echo "__________________________________Method_Out "$FUNCNAME
 }
 
 
 
-function ruletipanalysis_func_0x1(){
+function ruletipanalysis_func_0x0(){
 # =========================================================================== ruletipanalysis_func_0x1
 # desc:
 # sample:
@@ -436,52 +828,53 @@ function ruletipanalysis_func_0x1(){
 echo "__________________________________Method_In "$FUNCNAME
 if [ ! -n "$init_input_1" ] ; then
     echo "没有任何的 _RuleIndex_ 输入 将打印 RuleTip"
-	ruletipprint_func_0x0
-	echo "__________________________________Method_Out "$FUNCNAME
-	exit 
+    ruletipprint_func_0x0
+    echo "__________________________________Method_Out "$FUNCNAME
+    exit 
 fi
-	ruletipanalysis_return_1=""
+    ruletipanalysis_return_1=""
     real_rule_index=${init_input_1:1}        ### 输入 _123_  去除第一个字符 _ 变为  123_
-	real_rule_index=${real_rule_index%?}     ### 去除最后一个字符    从 123_ 变为123
+    real_rule_index=${real_rule_index%?}     ### 去除最后一个字符    从 123_ 变为123
     echo "用户当前输入的 RuleIndex ="$init_input_1
     echo "real_rule_index="$real_rule_index
-	fliter_rule_str="^function.rule"$real_rule_index"v*"
-	echo "fliter_rule_str="$fliter_rule_str
-	cat $init_f0 | grep $fliter_rule_str  > zzZZzz.txt     ##  过滤当前的方法找到那个匹配好的 ruleXfunc名称
-	
-	select_method_name="rule"$real_rule_index"v"
-	echo select_method_name=$select_method_name
+    fliter_rule_str="^function.rule"$real_rule_index"v*"
+    echo "fliter_rule_str="$fliter_rule_str
+    cat $init_f0 | grep $fliter_rule_str  > zzZZzz.txt     ##  过滤当前的方法找到那个匹配好的 ruleXfunc名称
+    
+    select_method_name="rule"$real_rule_index"v"
+    echo select_method_name=$select_method_name
 
-	line_index=1
-	is_match_rule_name=false
+    line_index=1
+    is_match_rule_name=false
     for line in `cat zzZZzz.txt`
     do 
         echo "FileLine["$line_index"]:${line}"
-		if [[ ${line} =~ ^${select_method_name}.* ]] ; then   ##  判断是否是以 RuleName 开头 ruleXv开头
-		    is_match_rule_name=true
-			match_rule_method_name=${line}
-			real_rule_method_name=${match_rule_method_name%???}   ## 去除末尾的 (){ 总共三个字符
-			echo "从文件匹配到了 IndexRule函数 match_rule_method_name=${match_rule_method_name}"
-			echo "从文件匹配到了 IndexRule函数 real_rule_method_name=${real_rule_method_name}"
-			ruletipanalysis_return_1=${real_rule_method_name}
-			echo "__________________________________执行选中方法 【  "$ruletipanalysis_return_1"】________________________________"
-			$ruletipanalysis_return_1    ## 执行选中方法
-			rm -fr zzZZzz.txt
-			echo "["$FUNCNAME" EndPrint] ruletipanalysis_return_1="$ruletipanalysis_return_1"  param1=[__empty__]"
-			echo "__________________________________Method_Out "$FUNCNAME
-			return $ruletipanalysis_return_1
-		fi
-		line_index=$(($line_index+1))
+        if [[ ${line} =~ ^${select_method_name}.* ]] ; then   ##  判断是否是以 RuleName 开头 ruleXv开头
+            is_match_rule_name=true
+            match_rule_method_name=${line}
+            real_rule_method_name=${match_rule_method_name%???}   ## 去除末尾的 (){ 总共三个字符
+            echo "从文件匹配到了 IndexRule函数 match_rule_method_name=${match_rule_method_name}"
+            echo "从文件匹配到了 IndexRule函数 real_rule_method_name=${real_rule_method_name}"
+            ruletipanalysis_return_1=${real_rule_method_name}
+            echo "__________________________________执行选中方法 【  "$ruletipanalysis_return_1"】________________________________"
+            $ruletipanalysis_return_1    ## 执行选中方法
+            rm -fr zzZZzz.txt
+            echo "["$FUNCNAME" EndPrint] ruletipanalysis_return_1="$ruletipanalysis_return_1"  param1=[__empty__]"
+            echo "__________________________________Method_Out "$FUNCNAME
+            return 
+            
+        fi
+        line_index=$(($line_index+1))
     done
 rm -fr zzZZzz.txt
 if [[ "$is_match_rule_name" == false ]]; then
     echo "在当前 zshrule_I9.sh 文件中没有搜索到对应RuleIndex的方法  init_input_1="$init_input_1"  select_method_name="$select_method_name
-	ruletipprint_func_0x0
+    ruletipprint_func_0x0
 fi
 
 echo "["$FUNCNAME" EndPrint] ruletipanalysis_return_1="$ruletipanalysis_return_1"  param1=[__empty__]"
 echo "__________________________________Method_Out "$FUNCNAME
-return $ruletipanalysis_return_1
+
 }
 
 
@@ -496,6 +889,7 @@ echo "__________________________________Method_Out "$FUNCNAME
 }
 ##  ════════════════════Main Function End ═══════════════════════════
 ##  ═══════════════════════════ Function Define Area Endxx ═══════════════════════════
-ruletipanalysis_func_0x1
+ruletipanalysis_func_0x0
 __Main__
 exit
+

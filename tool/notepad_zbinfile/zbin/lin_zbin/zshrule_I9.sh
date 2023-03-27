@@ -1,0 +1,1 @@
+../mac_zbin/zshrule_I9.sh

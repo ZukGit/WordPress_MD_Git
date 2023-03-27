@@ -1,0 +1,118 @@
+[
+  {
+    "host": "fonts.geekzu.org",
+    "port": 443
+  },
+  {
+    "host": "docs.github.com",
+    "port": 443
+  },
+  {
+    "host": "raw.githubusercontent.com",
+    "port": 443
+  },
+  {
+    "host": "cloud.githubusercontent.com",
+    "port": 443
+  },
+  {
+    "host": "viewscreen.githubusercontent.com",
+    "port": 443
+  },
+  {
+    "host": "evilboy1973.github.io",
+    "port": 443
+  },
+  {
+    "host": "github.githubassets.com",
+    "port": 443
+  },
+  {
+    "host": "js.monitor.azure.com",
+    "port": 443
+  },
+  {
+    "host": "gapis.geekzu.org",
+    "port": 443
+  },
+  {
+    "host": "bartertone.github.io",
+    "port": 443
+  },
+  {
+    "host": "api.github.com",
+    "port": 443
+  },
+  {
+    "host": "google.github.io",
+    "port": 443
+  },
+  {
+    "host": "dc.services.visualstudio.com",
+    "port": 443
+  },
+  {
+    "host": "secure.gravatar.com",
+    "port": 443
+  },
+  {
+    "host": "zukgit.github.io",
+    "port": 443
+  },
+  {
+    "host": "alive.github.com",
+    "port": 443
+  },
+  {
+    "host": "user-images.githubusercontent.com",
+    "port": 443
+  },
+  {
+    "host": "github.com",
+    "port": 443
+  },
+  {
+    "host": "avatars.githubusercontent.com",
+    "port": 443
+  },
+  {
+    "host": "cdnjs.cloudflare.com",
+    "port": 443
+  },
+  {
+    "host": "officeci-mauservice.azurewebsites.net",
+    "port": 443
+  },
+  {
+    "host": "banned-historical-archives.github.io",
+    "port": 443
+  },
+  {
+    "host": "www.gravatar.com",
+    "port": 443
+  },
+  {
+    "host": "camo.githubusercontent.com",
+    "port": 443
+  },
+  {
+    "host": "objects.githubusercontent.com",
+    "port": 443
+  },
+  {
+    "host": "collector.github.com",
+    "port": 443
+  },
+  {
+    "host": "media-mbst-pub-ue1.s3.amazonaws.com",
+    "port": 443
+  },
+  {
+    "host": "lixiaogang03.github.io",
+    "port": 443
+  },
+  {
+    "host": "gist.github.com",
+    "port": 443
+  }
+]
