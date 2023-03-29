@@ -180,15 +180,23 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
     static String  getEnvironmentExePath(String program){
         String exename = program.trim().toLowerCase();
         String executePath = null;
-        for (int i = 0; i < EnvironmentList.length; i++) {
-            String itemPath = EnvironmentList[i];
-            String itemPathLower = itemPath.toLowerCase();
+        if(CUR_OS_TYPE == OS_TYPE.Windows){
+            for (int i = 0; i < EnvironmentList.length; i++) {
+                String itemPath = EnvironmentList[i];
+                String itemPathLower = itemPath.toLowerCase();
 
-            if(itemPathLower.contains(exename)){
-                executePath =   itemPath + File.separator + program + (CUR_OS_TYPE==OS_TYPE.Windows? ".exe" : "");
-                break;
+                if(itemPathLower.contains(exename)){
+                    executePath =   itemPath + File.separator + program + (CUR_OS_TYPE==OS_TYPE.Windows? ".exe" : "");
+                    break;
+                }
             }
+
+        } else { // 在 Mac 和 Linux 下 不使用全路径 而直接使用命令  ffmpeg
+
+            executePath =   "ffmpeg ";
+
         }
+
 
         return executePath;
     }
@@ -334,8 +342,8 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
 
         //  合并 多个 mp4 文件到  一个 mp4 文件中 
         CUR_RULE_LIST.add( new Concat_MulMp4_To_OneMp4_Rule_12());
-        
-        
+
+
     }
 
     class Concat_MulMp4_To_OneMp4_Rule_12 extends  Basic_Rule{
@@ -363,9 +371,9 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
 
 
             System.out.println("otherParams.size() = "+ otherParams.size());
-            
+
             ArrayList<String> fileTypeList = new  ArrayList<String> ();
-            
+
             for (int i = 0; i <otherParams.size() ; i++) {
                 String pre = "."+File.separator;
                 String curStringItem = otherParams.get(i).toString();
@@ -377,49 +385,49 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
                 File curFIle = new File(curAbsPath) ;
                 System.out.println("curAbsPath  = "+ curAbsPath);
                 String fileType = getFileTypeWithPoint(curFIle.getName()).trim().toLowerCase();
-                
+
                 fileTypeList.add(fileType);
                 inputFileType = fileType;
-                
+
                 if(curFIle.exists() && videoTypeList.contains(fileType) ){  // 判断
-                	
+
 //                  if(curFIle.exists() && "mp4".equals(getFileTypeWithPoint(curFIle.getName()).toLowerCase().trim()) ){  // 判断
                     mInputMP4FileList.add(curFIle);
                 }
-                  
+
             }
             if(mInputMP4FileList.size() == 0){
                 errorMsg = "当前从参数找不到对应的输入源 .mp4   文件   请检查 ! ";
                 System.out.println(errorMsg);
                 return false;
             }
-            
+
             if(mInputMP4FileList.size() == 1){
                 errorMsg = "当前从参数只找到一个输入 mp4 文件 "+mInputMP4FileList.get(0).getAbsolutePath()+"   无法完成视频的合并操作    请检查 ! ";
                 System.out.println(errorMsg);
                 return false;
             }
-            
+
             if(inputFileType == null) {
                 errorMsg = "当前从参数 中计算得到的类型  inputFileType="+inputFileType+" 为空    无法完成视频的合并操作    请检查 ! ";
                 System.out.println(errorMsg);
-                return false; 	
-            	
+                return false;
+
             }
-            
+
             for (int i = 0; i < fileTypeList.size(); i++) {
-            	String  fileType_item = fileTypeList.get(i);
-            	
-            	System.out.println("input_type["+i+"] = "+ fileType_item);
-            	if(!inputFileType.equals(fileType_item)) {
-            		
+                String  fileType_item = fileTypeList.get(i);
+
+                System.out.println("input_type["+i+"] = "+ fileType_item);
+                if(!inputFileType.equals(fileType_item)) {
+
                     errorMsg = "当前从参数 中计算得到的类型列表不一致  inputFileType="+inputFileType+"  "+fileType_item+"=fileType_item"+"   无法完成视频的合并操作    请检查 ! ";
                     System.out.println(errorMsg);
-                    return false; 	
-            		
-            	}
-			}
-            
+                    return false;
+
+                }
+            }
+
             System.out.println("rule"+rule_index+" checkParamsOK mInputMP4FileList.size() = "+ mInputMP4FileList.size() +" inputFileType="+inputFileType);
             return  super.checkParamsOK(shellDir,type2Param,otherParams);
         }
@@ -435,8 +443,8 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
         void operationRule(ArrayList<String> inputParamsList) {
 
 
-  
-        	
+
+
             //  ffmpeg -f concat -i filelist.txt -c copy output.mkv     // 把mp4文件的音频分离出来 单独生成 mp3        文件
 
             String ffmpeg_path = getEnvironmentExePath("ffmpeg");
@@ -448,58 +456,58 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
             System.out.println("rule"+rule_index+" curInputFileList.size() = "+mInputMP4FileList.size());
             System.out.println("rule"+rule_index+" ffmpeg_path = "+ffmpeg_path);
             // 把 当前的 mp4 文件写入 G8_1_MergedRule.txt
-            
-            
-          	
-        	File ffmpeg_txt_inputfile = new File(CUR_Dir_FILE.getAbsolutePath()+File.separator+"Concat_FFmpeg_"+getTimeStamp_yyyyMMdd_HHmmss()+".txt");
-        	
-        	
-        	File output_file = new File(CUR_Dir_FILE.getAbsolutePath()+File.separator+"out_cancat_"+getTimeStamp_yyyyMMdd_HHmmss()+inputFileType);
 
-        	
-        	
-        	// file '绝对路径input1.mkv'    构建全局的 file '绝对路径input1.mkv' 
-        	
+
+
+            File ffmpeg_txt_inputfile = new File(CUR_Dir_FILE.getAbsolutePath()+File.separator+"Concat_FFmpeg_"+getTimeStamp_yyyyMMdd_HHmmss()+".txt");
+
+
+            File output_file = new File(CUR_Dir_FILE.getAbsolutePath()+File.separator+"out_cancat_"+getTimeStamp_yyyyMMdd_HHmmss()+inputFileType);
+
+
+
+            // file '绝对路径input1.mkv'    构建全局的 file '绝对路径input1.mkv'
+
             ArrayList<String> input_file_list =new  ArrayList<String>();
-            
+
             for (int i = 0; i < mInputMP4FileList.size(); i++) {
 
                 File mp4File = mInputMP4FileList.get(i);
-                
+
 //                String mp4_abs_path =   mp4File.getAbsolutePath();
                 String mp4_abs_path =   mp4File.getName();
                 input_file_list.add("file '"+mp4_abs_path+"'");
-            
+
             }
-            
+
             writeContentToFile(ffmpeg_txt_inputfile, input_file_list);
 
-            
+
 
             //  ffmpeg -f concat -i filelist.txt -c copy output.mkv     // 把mp4文件的音频分离出来 单独生成 mp3        文件
-            
-            String command_concat = ffmpeg_path+ " -f concat -i "+ffmpeg_txt_inputfile.getAbsolutePath()+" -c copy  "+ output_file.getAbsolutePath();
-   
-       	 System.out.println(" 执行命令:\n"+ command_concat);
-            
 
-             execCMDNoStart(command_concat);
+            String command_concat = ffmpeg_path+ " -f concat -i "+ffmpeg_txt_inputfile.getAbsolutePath()+" -c copy  "+ output_file.getAbsolutePath();
+
+            System.out.println(" 执行命令:\n"+ command_concat);
+
+
+            execCMDNoStart(command_concat);
 //             execCMD(command_concat);
-             if(output_file.exists() && output_file.length() > 0) {
-              	 System.out.println(" 合并文件成功命令:\n  output_file ="+ command_concat);
-            	 System.out.println(" 合并文件成功:  output_file ="+ output_file.getAbsolutePath());
-            	 
-            	 ffmpeg_txt_inputfile.delete();
-             }else {
-            	 System.out.println(" 合并文件失败:  output_file ="+ output_file);
-                 System.out.println(" 请手动执行命令:\n"+ command_concat);
-             }
-		
+            if(output_file.exists() && output_file.length() > 0) {
+                System.out.println(" 合并文件成功命令:\n  output_file ="+ command_concat);
+                System.out.println(" 合并文件成功:  output_file ="+ output_file.getAbsolutePath());
+
+                ffmpeg_txt_inputfile.delete();
+            }else {
+                System.out.println(" 合并文件失败:  output_file ="+ output_file);
+                System.out.println(" 请手动执行命令:\n"+ command_concat);
+            }
+
         }
 
 
-    	
-    	
+
+
     }
 
     class Revert_MP4_To_Gif_Rule_11 extends  Basic_Rule{
@@ -1257,7 +1265,7 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
 
                 String type = getFileTypeWithPoint(movFile.getName()).toLowerCase();
 
-               // ffmpeg -i 2.ts -acodec copy -vcodec copy -absf aac_adtstoasc output.mp4
+                // ffmpeg -i 2.ts -acodec copy -vcodec copy -absf aac_adtstoasc output.mp4
 
                 //  ffmpeg -i movie.mov -vcodec copy -acodec copy out.mp4
 
@@ -1270,9 +1278,9 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
                 } else  if(type.endsWith("avi")){   // ffmpeg -i input_filename.avi -c:v copy -c:a copy -y output_filename.mp4
                     command = ffmpeg_path +" -i "+movFileAbs  + "   -c:v copy -c:a copy -y   " + target_mp4_abs_path;
                 } else if(type.endsWith("ts")){
-                     command = ffmpeg_path +" -i "+movFileAbs  + "  -vcodec copy -absf aac_adtstoasc   " + target_mp4_abs_path;
+                    command = ffmpeg_path +" -i "+movFileAbs  + "  -vcodec copy -absf aac_adtstoasc   " + target_mp4_abs_path;
                 }else{
-                     command = ffmpeg_path +" -i "+movFileAbs  + "  -vcodec copy -acodec copy  " + target_mp4_abs_path;
+                    command = ffmpeg_path +" -i "+movFileAbs  + "  -vcodec copy -acodec copy  " + target_mp4_abs_path;
                 }
 
                 System.out.println("--------ruleIndex["+rule_index+"] fileIndex["+i+"]  Path=["+movFile.getAbsolutePath().replace(" ","")+"] ");
@@ -3000,8 +3008,8 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
         CUR_Selected_Rule = getRuleByIndex(CUR_TYPE_INDEX);  //  获取用户选中的 规则
 
 // 检测是否 包含 该文件
-        if(!isContainEnvironment("FFmpeg")){
-            String  errorMsg = " 当前 merge合并操作依赖环境变量 FFmpeg 请添加环境变量";
+        if(!isContainEnvironment("FFmpeg") && CUR_OS_TYPE == OS_TYPE.Windows){
+            String  errorMsg = " 当前Windows版本下  merge合并操作依赖环境变量 FFmpeg 请添加环境变量";
             System.out.println(errorMsg);
             return ;
         }
@@ -3086,36 +3094,103 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
     }
 
 
+    /**
+     * 执行 mac(unix) 脚本命令~
+     *
+     * @param command
+     * @return
+     */
+    public static String execCMD_Mac(String command) {
+        String[] cmd = { "/bin/bash" };
+        Runtime rt = Runtime.getRuntime();
+        Process proc = null;
+        try {
+            proc = rt.exec(cmd);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        // 打开流
+        OutputStream os = proc.getOutputStream();
+        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(os));
+
+        try {
+            bw.write(command);
+
+            bw.flush();
+            bw.close();
+
+            /** 真奇怪，把控制台的输出打印一遍之后竟然能正常终止了~ */
+//            readConsole(proc);
+
+            /** waitFor() 的作用在于 java 程序是否等待 Terminal 执行脚本完毕~ */
+            proc.waitFor();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        int retCode = proc.exitValue();
+        if (retCode != 0) {
+            System.out.println("unix script retCode = " + retCode);
+
+//            System.out.println(readConsole(proc));
+            System.out.println("UnixScriptUil.execute 出错了!!");
+        }
+        return retCode + "";
+    }
+
     public static String execCMDNoStart(String command) {
         StringBuilder sb =new StringBuilder();
-        try {
-            Process process=Runtime.getRuntime().exec("cmd /c  "+command);
-            BufferedReader bufferedReader=new BufferedReader(new InputStreamReader(process.getInputStream()));
-            String line;
-            while((line=bufferedReader.readLine())!=null)
-            {
-                sb.append(line+"\n");
+
+        if(CUR_OS_TYPE == OS_TYPE.Windows){
+            try {
+                Process process=Runtime.getRuntime().exec("cmd /c  "+command);
+                BufferedReader bufferedReader=new BufferedReader(new InputStreamReader(process.getInputStream()));
+                String line;
+                while((line=bufferedReader.readLine())!=null)
+                {
+                    sb.append(line+"\n");
+                }
+            } catch (Exception e) {
+                return e.toString();
             }
-        } catch (Exception e) {
-            return e.toString();
+
+        } else {   // mac  和  Linux的  执行的 命令
+
+            sb.append(execCMD_Mac(command));
+
         }
+
         return sb.toString();
     }
 
 
+
+
     public static String execCMD(String command) {
         StringBuilder sb =new StringBuilder();
-        try {
-            Process process=Runtime.getRuntime().exec("cmd /c start "+command  +" ");
-            BufferedReader bufferedReader=new BufferedReader(new InputStreamReader(process.getInputStream()));
-            String line;
-            while((line=bufferedReader.readLine())!=null)
-            {
-                sb.append(line+"\n");
+
+        if(CUR_OS_TYPE == OS_TYPE.Windows){
+
+            try {
+                Process process=Runtime.getRuntime().exec("cmd /c start "+command  +" ");
+                BufferedReader bufferedReader=new BufferedReader(new InputStreamReader(process.getInputStream()));
+                String line;
+                while((line=bufferedReader.readLine())!=null)
+                {
+                    sb.append(line+"\n");
+                }
+            } catch (Exception e) {
+                return e.toString();
             }
-        } catch (Exception e) {
-            return e.toString();
+
+
+        } else {   // mac  和  Linux的  执行的 命令
+
+            sb.append(execCMD_Mac(command));
+
         }
+      System.out.println("result: "+ sb.toString() +" command="+command);
+
         return sb.toString();
     }
 
