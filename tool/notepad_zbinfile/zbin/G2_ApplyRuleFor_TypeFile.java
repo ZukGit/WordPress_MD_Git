@@ -21373,6 +21373,9 @@ public class G2_ApplyRuleFor_TypeFile {
     // // zrule_apply_G2.bat #_9 mp4_ 去除当前mp4的格式 使得其文件格式未知
     // // zrule_apply_G2.bat #_9 _mp4 把没有类型的文件名称修改为 mp4格式名称
     // // zrule_apply_G2.bat #_9 原类型_目标类型 把没有类型的文件名称修改为 jpg格式名称
+    // // zrule_apply_G2.bat #_9 _jpg 把没有类型的文件名称修改为 jpg格式名称
+    // // zrule_apply_G2.bat #_9 jpg_ 去除当前jpg的格式 使得其文件格式未知
+
     class FileType_Rule_9 extends Basic_Rule {
         String originType;
         String targetType;
@@ -21391,6 +21394,9 @@ public class G2_ApplyRuleFor_TypeFile {
                     + Cur_Bat_Name + " #_9  mp4_   去除当前mp4的格式 使得其文件格式未知 \n " + Cur_Bat_Name
                     + " #_9  _mp4   把没有类型的文件名称修改为 mp4格式名称 \n " + Cur_Bat_Name
                     + " #_9  7z_7疫z   把当前 7z文件名后缀改为 7疫z 使得无法检测具体类型 \n " + Cur_Bat_Name
+                    + " #_9  jpg_orig.jpg    把当前所有的 ori_jpg类型都转为jpg类型(有时存在类型.ori_jpg 这样的类型有用) \n " + Cur_Bat_Name
+                    + " #_9  png_orig.jpg    把当前所有的 ori_jpg类型都转为jpg类型(有时存在类型.ori_jpg 这样的类型有用) \n " + Cur_Bat_Name
+                    + " #_9  png_orig.png    把当前所有的 ori_jpg类型都转为jpg类型(有时存在类型.ori_jpg 这样的类型有用) \n " + Cur_Bat_Name
                     + " #_9  原类型_目标类型   把没有类型的文件名称【原类型】->【目标类型】 \n ";
         }
 
@@ -21400,29 +21406,59 @@ public class G2_ApplyRuleFor_TypeFile {
 
             // 获取到装换的类型
             String inputFileTypeParams = inputParamList.get(inputParamList.size() - 1);
-
-            if (!inputFileTypeParams.contains("_")) {
-                Flag = false;
-                System.out.println("无法检测到当前 第9 Rule   原始类型_目标类型参数   请检查后重新执行");
-            } else {
-
-                if (inputFileTypeParams.endsWith("_")) {
-                    String target = "";
-                    String[] parmas = inputFileTypeParams.split("_");
-                    String origin = parmas[0];
-                    System.out.println("item=" + inputFileTypeParams + "   origin=" + origin + "     target=" + target);
-                    originType = origin;
-                    targetType = target;
-
+            if (inputFileTypeParams.contains(".")) {
+                if (!inputFileTypeParams.contains(".")) {
+                    Flag = false;
+                    System.out.println("无法检测到当前 第9 Rule   原始类型_目标类型参数   请检查后重新执行");
                 } else {
-                    String[] parmas = inputFileTypeParams.split("_");
-                    System.out.println(
-                            "item=" + inputFileTypeParams + "   origin=" + parmas[0] + "     target=" + parmas[1]);
-                    originType = parmas[0];
-                    targetType = parmas[1];
+
+                    if (inputFileTypeParams.endsWith(".")) {
+                        String target = "";
+
+                        String origin = inputFileTypeParams.substring(0,inputFileTypeParams.length()-1);
+                        System.out.println("item=" + inputFileTypeParams + "   origin=" + origin + "     target=" + target);
+                        originType = origin;
+                        targetType = target;
+
+                    } else {
+
+                        String[] parmas = inputFileTypeParams.split("\\.");
+                        System.out.println("rule9_item=" + inputFileTypeParams + "   rule9_origin=" + parmas[0] + "     rule9_target=" + parmas[1]);
+                        originType = parmas[0];
+                        targetType = parmas[1];
+                    }
+
+                    Flag = true;
+
                 }
 
-                Flag = true;
+            }else{
+
+                if (!inputFileTypeParams.contains("_")) {
+                    Flag = false;
+                    System.out.println("无法检测到当前 第9 Rule   原始类型_目标类型参数   请检查后重新执行");
+                } else {
+
+                    if (inputFileTypeParams.endsWith("_")) {
+                        String target = "";
+                        String[] parmas = inputFileTypeParams.split("_");
+                        String origin = parmas[0];
+                        System.out.println("item=" + inputFileTypeParams + "   origin=" + origin + "     target=" + target);
+                        originType = origin;
+                        targetType = target;
+
+                    } else {
+                        String[] parmas = inputFileTypeParams.split("_");
+                        System.out.println(
+                                "item=" + inputFileTypeParams + "   origin=" + parmas[0] + "     target=" + parmas[1]);
+                        originType = parmas[0];
+                        targetType = parmas[1];
+                    }
+
+                    Flag = true;
+
+                }
+
 
             }
             curFilterFileTypeList.add(originType);
