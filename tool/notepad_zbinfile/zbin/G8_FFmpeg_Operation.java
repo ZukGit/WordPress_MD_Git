@@ -1228,9 +1228,9 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
 
         String ruleTip(String type, int index, String batName, OS_TYPE curType) {
             return
-                    "\n"+Cur_Bat_Name+ " "+rule_index+ "     ##  把当前的 .wmv  .mkv .ts .mov .avi .m4v  文件转为 mp4文件 生成在 目录 Mov_To_Mp4_时间戳 目录中   \n"+
-                            "\n"+Cur_Bat_Name+ "  "+rule_index+ "    ##  把当前的.wmv .mkv .avi .ts .mov .m4v  文件转为 mp4文件 生成在 目录 Mov_To_Mp4_时间戳 目录中  \n"+
-                            "\n"+Cur_Bat_Name+ "  "+rule_index+ " samedir_true   ##  把当前的 .wmv .mkv .avi .ts .mov .m4v  文件转为 mp4文件 生成在 当前相同目录中  并删除原始文件  \n" ; }
+                    "\n"+Cur_Bat_Name+ " "+rule_index+ "     ##  把当前的 .vob  .wmv  .mkv .ts .mov .avi .m4v  文件转为 mp4文件 生成在 目录 Mov_To_Mp4_时间戳 目录中   \n"+
+                            "\n"+Cur_Bat_Name+ "  "+rule_index+ "    ##  把当前的 .vob   .wmv .mkv .avi .ts .mov .m4v  文件转为 mp4文件 生成在 目录 Mov_To_Mp4_时间戳 目录中  \n"+
+                            "\n"+Cur_Bat_Name+ "  "+rule_index+ " samedir_true   ##  把当前的  .vob .wmv .mkv .avi .ts .mov .m4v  文件转为 mp4文件 生成在 当前相同目录中  并删除原始文件  \n" ; }
 
 
 
@@ -1350,7 +1350,7 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
                 }
                 String fileName_tolower = itemFile.getName().toLowerCase();
                 if(fileName_tolower.endsWith(".mov") || fileName_tolower.endsWith(".m4v")
-                        || fileName_tolower.endsWith(".ts")   || fileName_tolower.endsWith(".avi")
+                        || fileName_tolower.endsWith(".ts")   || fileName_tolower.endsWith(".avi") || fileName_tolower.endsWith(".vob")
                         || fileName_tolower.endsWith(".mkv")  || fileName_tolower.endsWith("wmv")){
                     curDirMovFileList.add(itemFile);
                 }
@@ -3189,7 +3189,7 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
             sb.append(execCMD_Mac(command));
 
         }
-      System.out.println("result: "+ sb.toString() +" command="+command);
+        System.out.println("result: "+ sb.toString() +" command="+command);
 
         return sb.toString();
     }

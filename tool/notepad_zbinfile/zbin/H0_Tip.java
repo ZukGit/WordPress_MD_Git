@@ -869,7 +869,7 @@ public class H0_Tip {
         System.out.println("zrule_apply_G2"+BAT_OR_SH_Point+" " +" #_12_gif       ******文件名包含gif文件夹生成 gif-html文件");
         System.out.println("zrule_apply_G2"+BAT_OR_SH_Point+" " +"#_7_good_batch && cd ./good_batch  &&  zrule_apply_G2"+BAT_OR_SH_Point+" " +" #_27  _jpg  &&  zrule_apply_G2"+BAT_OR_SH_Point+" " +" #_27  _mp4  &&  zrule_apply_G2"+BAT_OR_SH_Point+" " +" #_27  _gif &&  zrule_apply_G2"+BAT_OR_SH_Point+" " +" #_12_jpg  &&  zrule_apply_G2"+BAT_OR_SH_Point+" " +" #_12_mp4 &&  zrule_apply_G2"+BAT_OR_SH_Point+" " +" #_12_gif");
         System.out.println();
-        
+
         System.out.println("________________________ 【zapp】【Rust 解密】【Html】 ________________________");
         System.out.println("zrrust_rule_apply_A1"+BAT_OR_SH_Point+" " +"#_2 good_batch   ******原封不动解码");
         System.out.println("cd ./good_batch                       ******进入解码文件夹");
@@ -881,28 +881,29 @@ public class H0_Tip {
         System.out.println("zrule_apply_G2"+BAT_OR_SH_Point+" " +" #_12_gif       ******文件名包含gif文件夹生成 gif-html文件");
         System.out.println("zrrust_rule_apply_A1"+BAT_OR_SH_Point+" " +"#_2 good_batch && cd ./good_batch  &&  zrule_apply_G2"+BAT_OR_SH_Point+" " +" #_27  _jpg  &&  zrule_apply_G2"+BAT_OR_SH_Point+" " +" #_27  _mp4  &&  zrule_apply_G2"+BAT_OR_SH_Point+" " +" #_27  _gif &&  zrule_apply_G2"+BAT_OR_SH_Point+" " +" #_12_jpg  &&  zrule_apply_G2"+BAT_OR_SH_Point+" " +" #_12_mp4 &&  zrule_apply_G2"+BAT_OR_SH_Point+" " +" #_12_gif");
         System.out.println();
-        
+
 
 
         System.out.println("________________________ 【zapp】【Java 加密】 ________________________");
-        System.out.println("zrule_apply_G2.bat #_18  .jpg .png .gif .webp .mp4   && zrule_apply_G2.bat #_7_bad_batch &&  cd ./bad_batch  &&  zrule_apply_G2.bat #_9  jpg_ && zrule_apply_G2.bat #_9  webp_ &&  zrule_apply_G2.bat #_9 png_  &&  zrule_apply_G2.bat #_9 gif_ &&  zrule_apply_G2.bat #_9 mp4_");
+        System.out.println("zrule_apply_G2"+BAT_OR_SH_Point+" #_18  .jpg .png .gif .webp .mp4   && zrule_apply_G2"+BAT_OR_SH_Point+" #_7_bad_batch &&  cd ./bad_batch  &&  zrule_apply_G2"+BAT_OR_SH_Point+" #_9  jpg_ && zrule_apply_G2"+BAT_OR_SH_Point+" #_9  webp_ &&  zrule_apply_G2"+BAT_OR_SH_Point+" #_9 png_  &&  zrule_apply_G2"+BAT_OR_SH_Point+" #_9 gif_ &&  zrule_apply_G2"+BAT_OR_SH_Point+" #_9 mp4_");
         System.out.println();
 
         System.out.println("________________________ 【zapp】【Rust 加密】 ________________________");
-        System.out.println("zrule_apply_G2.bat #_18  .jpg .png .gif .webp .mp4   && zrrust_rule_apply_A1.bat #_2 bad_batch  &&  cd ./bad_batch  &&  zrule_apply_G2.bat #_9  jpg_ && zrule_apply_G2.bat #_9  webp_ &&  zrule_apply_G2.bat #_9 png_  &&  zrule_apply_G2.bat #_9 gif_ &&  zrule_apply_G2.bat #_9 mp4_");
+        System.out.println("zrule_apply_G2"+BAT_OR_SH_Point+" #_18  .jpg .png .gif .webp .mp4   && zrrust_rule_apply_A1"+BAT_OR_SH_Point+" #_2 bad_batch  &&  cd ./bad_batch  &&  zrule_apply_G2"+BAT_OR_SH_Point+" #_9  jpg_ && zrule_apply_G2"+BAT_OR_SH_Point+" #_9  webp_ &&  zrule_apply_G2"+BAT_OR_SH_Point+" #_9 png_  &&  zrule_apply_G2"+BAT_OR_SH_Point+" #_9 gif_ &&  zrule_apply_G2"+BAT_OR_SH_Point+" #_9 mp4_");
         System.out.println();
-        
+
         System.out.println();
         System.out.println("________________ gif jpg png mp4 资源归统【zmain】到 jpg_home_port[land]  gif_common_port[land]  mp4_home_port[land]____________ ");
-        System.out.println("adb pull /sdcard/1/.  &  zmpeg_ffmpeg_G8.bat  8 samedir_true && zrule_apply_G2.bat  #_21  clearblank_true &&   zrule_apply_G2.bat #_9  png_jpg && zrule_apply_G2.bat #_9  MP4_mp4 && zrule_apply_G2.bat #_9 jpeg_jpg  && zrule_apply_G2.bat #_9 JPG_jpg && zrule_apply_G2.bat #_9 PNG_jpg &&  zmpeg_ffmpeg_G8.bat 9 && zrule_apply_G2.bat #_44   && zrule_apply_G2.bat   #_21_jpg_png_gif_webp  portland_true  &&  zbatrule_I9_Rule30.bat  _32_\r\n"
+        System.out.println("adb pull /sdcard/1/.  &  zmpeg_ffmpeg_G8"+BAT_OR_SH_Point+"  8 samedir_true && zrule_apply_G2"+BAT_OR_SH_Point+"  #_21  clearblank_true &&   zrule_apply_G2"+BAT_OR_SH_Point+" #_9  png_jpg && zrule_apply_G2"+BAT_OR_SH_Point+" #_9  MP4_mp4 && zrule_apply_G2"+BAT_OR_SH_Point+" #_9 jpeg_jpg  && zrule_apply_G2"+BAT_OR_SH_Point+" #_9 JPG_jpg && zrule_apply_G2"+BAT_OR_SH_Point+" #_9 PNG_jpg &&  zmpeg_ffmpeg_G8"+BAT_OR_SH_Point+" 9 && zrule_apply_G2"+BAT_OR_SH_Point+" #_44   && zrule_apply_G2"+BAT_OR_SH_Point+"   #_21_jpg_png_gif_webp  portland_true  &&  zbatrule_I9_Rule30"+BAT_OR_SH_Point+"  _32_\r\n"
                 + " \r\n"+ "");
         System.out.println();
 
         System.out.println();
         System.out.println("________________ gif jpg png mp4 资源归统【zapp】到 jpg_common_port[land]  gif_common_port[land]  mp4_common_port[land]____________ ");
-        System.out.println("adb pull /sdcard/1/.  &  zmpeg_ffmpeg_G8.bat  8 samedir_true && zrule_apply_G2.bat  #_21  clearblank_true &&   zrule_apply_G2.bat #_9  png_jpg && zrule_apply_G2.bat #_9  MP4_mp4 && zrule_apply_G2.bat #_9 jpeg_jpg && zrule_apply_G2.bat #_9 jfif_jpg  && zrule_apply_G2.bat #_9 JPG_jpg  && zrule_apply_G2.bat #_9 PNG_jpg &&  zmpeg_ffmpeg_G8.bat 9 && zrule_apply_G2.bat #_44   && zrule_apply_G2.bat   #_21_jpg_png_gif_webp  portland_true  &&  zbatrule_I9_Rule30.bat  _29_\r\n"
+        System.out.println("adb pull /sdcard/1/.  &  zmpeg_ffmpeg_G8"+BAT_OR_SH_Point+"  8 samedir_true && zrule_apply_G2"+BAT_OR_SH_Point+"  #_21  clearblank_true &&   zrule_apply_G2"+BAT_OR_SH_Point+" #_9  png_jpg && zrule_apply_G2"+BAT_OR_SH_Point+" #_9  MP4_mp4 && zrule_apply_G2"+BAT_OR_SH_Point+" #_9 jpeg_jpg && zrule_apply_G2"+BAT_OR_SH_Point+" #_9 jfif_jpg  && zrule_apply_G2"+BAT_OR_SH_Point+" #_9 JPG_jpg  && zrule_apply_G2"+BAT_OR_SH_Point+" #_9 PNG_jpg &&  zmpeg_ffmpeg_G8"+BAT_OR_SH_Point+" 9 && zrule_apply_G2"+BAT_OR_SH_Point+" #_44   && zrule_apply_G2"+BAT_OR_SH_Point+"   #_21_jpg_png_gif_webp  portland_true  &&  zbatrule_I9_Rule30"+BAT_OR_SH_Point+"  _29_\r\n"
                 + " \r\n"+ "");
         System.out.println();
+
 
 
         System.out.println("╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤");
@@ -1087,7 +1088,7 @@ public class H0_Tip {
 
         }
 
-        String jiemi_command= " && cd ./zapp/ && zrule_apply_G2.bat #_7_good_batch && cd ./good_batch  &&  zrule_apply_G2.bat  #_27  _jpg  &&  zrule_apply_G2.bat  #_27  _mp4  &&  zrule_apply_G2.bat  #_27  _gif &&  zrule_apply_G2.bat  #_12_jpg  &&  zrule_apply_G2.bat  #_12_mp4 &&  zrule_apply_G2.bat  #_12_gif";
+        String jiemi_command= " && cd ./zapp/ && zrule_apply_G2"+BAT_OR_SH_Point+" #_7_good_batch && cd ./good_batch  &&  zrule_apply_G2"+BAT_OR_SH_Point+"  #_27  _jpg  &&  zrule_apply_G2"+BAT_OR_SH_Point+"  #_27  _mp4  &&  zrule_apply_G2"+BAT_OR_SH_Point+"  #_27  _gif &&  zrule_apply_G2"+BAT_OR_SH_Point+"  #_12_jpg  &&  zrule_apply_G2"+BAT_OR_SH_Point+"  #_12_mp4 &&  zrule_apply_G2"+BAT_OR_SH_Point+"  #_12_gif";
 
         System.out.println("________________________ 【zapp】【pull shoucang 并解密 】 ________________________");
         System.out.println(shoucang_tip.toString()+" "+jiemi_command);
