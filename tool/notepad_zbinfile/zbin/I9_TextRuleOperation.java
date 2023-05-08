@@ -586,6 +586,158 @@ public class I9_TextRuleOperation {
 
         // 贷款 首付 计算器
         CUR_RULE_LIST.add(new Shanghai_Home_PayMent_Calculate_Rule_62());
+
+        // 当前目录下的 文本 内容进行替换 在新目录生成替换后的新文件读取原文件内容得到替换参数格式:【American】_【美国】
+        CUR_RULE_LIST.add(new ReplaceTxtFile_Src_to_Dst_Rule_63());
+
+    }
+
+    class ReplaceTxtFile_Src_to_Dst_Rule_63 extends Basic_Rule {
+
+
+        HashMap<String,String> mSrc_Dst_StrMap;   // 从输入文件得到的  原内容 和 替换内容的集合Map
+        ArrayList<String> mSrcList ;   //  原始替换内容的集合  用于快速查询当前是否有 匹配的字符串
+        ArrayList<String>  logList;
+        File resultDirFile ;
+
+        ReplaceTxtFile_Src_to_Dst_Rule_63() {
+            super(63, false);
+            mSrc_Dst_StrMap = new HashMap<String,String>();
+            logList = new   ArrayList<String>();
+            mSrcList = new ArrayList<String>() ;
+        }
+
+        @Override
+        String simpleDesc() {
+            return "当前目录下的 文本 内容进行替换 在新目录生成替换后的新文件读取原文件内容得到替换参数格式: 每行【src】_【dst】 【American】_【美国】 ";
+        }
+
+        void init_Input_Src_Dst(File inputFile){   // 从输入的文件读取到 对应的 【】_【】
+            ArrayList<String> txtFileStrList = ReadFileContentAsList(inputFile);
+            for (int i = 0; i < txtFileStrList.size(); i++) {
+
+                String oneLine = txtFileStrList.get(i).trim();
+
+                if(oneLine.startsWith("【") && oneLine.endsWith("】") && oneLine.contains("】_【")){
+
+                    String clear_pre_end_str = oneLine.substring(1,oneLine.length()-1);
+
+                    String[] splitArr = clear_pre_end_str.split("】_【");
+                    if(splitArr == null || splitArr.length != 2){
+                        System.out.println("当前行["+(i+1)+"]输入参数内容: "+ oneLine+"  无法解析为  【原始字符串】_【替换字符串】 跳过该行  请注意!");
+                    continue;
+                    }
+
+                    String srcStr = splitArr[0];
+
+                    String dstStr = splitArr[1];
+
+                    mSrcList.add(srcStr);
+                    mSrc_Dst_StrMap.put(srcStr,dstStr);
+
+                }
+
+            }
+
+            if(mSrcList.size() > 0){
+                for (int i = 0; i < mSrcList.size() ; i++) {
+                    String srcStr = mSrcList.get(i);
+                    String dstStr = mSrc_Dst_StrMap.get(srcStr);
+                    System.out.println("输入替换字符串["+i+"_"+mSrcList.size()+"] src=【"+srcStr+"】  dst=【"+dstStr+"】");
+                    logList.add("输入替换字符串["+i+"_"+mSrcList.size()+"] src=【"+srcStr+"】  dst=【"+dstStr+"】");
+                }
+                logList.add("");
+
+            }
+
+        }
+        @Override
+        ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
+                                           ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+
+
+            ArrayList<File>  resultFileList = new   ArrayList<File>();
+            for (int i = 0; i < curInputFileList.size(); i++) {
+                File fileItem = curInputFileList.get(i);
+
+
+                init_Input_Src_Dst(fileItem);
+
+                if(mSrcList.size() == 0){
+                  System.out.println("当前没有从 当前打开文件 读取到 输入格式为 【原始字符串】_【替换字符串】  的参数 请检查! ");
+                    return null;
+                }
+
+
+                File cur_txt_dir_file = fileItem.getParentFile();
+
+
+                if (cur_txt_dir_file == null || !cur_txt_dir_file.exists()) {
+                    System.out.println("当前的 txt文件的父目录不存在 请检查! txt_fileItem=" + fileItem + "    cur_txt_dir_file="
+                            + cur_txt_dir_file);
+
+                    return null;
+                }
+                File[] all_sub_file_arr = cur_txt_dir_file.listFiles();
+
+                if (all_sub_file_arr == null) {
+                    System.out.println("当前的 txt文件的父目录为空  请检查! txt_fileItem=" + fileItem + "    cur_txt_dir_file="
+                            + cur_txt_dir_file + "   all_sub_file_arr=" + all_sub_file_arr);
+                    return null;
+                }
+
+                resultDirFile = new File(cur_txt_dir_file.getAbsolutePath()+File.separator+rule_index+"_"+"批替换_"+getTimeStamp_yyyyMMdd_HHmmss());
+
+                resultDirFile.mkdirs();
+
+                for (int j = 0; j < all_sub_file_arr.length; j++) {
+                    File mDir_SubFile = all_sub_file_arr[j];
+                    if(mDir_SubFile.getAbsolutePath().equals(fileItem.getAbsolutePath())){
+                        continue;  // 不对 输入的参数文件进行操作
+                    }
+
+
+                    ArrayList<String> rawFileContentList = ReadFileContentAsList(mDir_SubFile);
+
+                    String fileName = mDir_SubFile.getName();
+                    ArrayList<String> newFileContentList = new   ArrayList<String>();
+
+                    for (int k = 0; k < rawFileContentList.size(); k++) {
+                        String oneLine = rawFileContentList.get(k);
+                        String  mNextStr = oneLine;
+
+                        for (int m = 0; m < mSrcList.size(); m++) {
+                            String  mMatchStrItem =     mSrcList.get(i);
+                            if(mNextStr.contains(mMatchStrItem)){
+                                mNextStr = mNextStr.replaceAll(mMatchStrItem,mSrc_Dst_StrMap.get(mMatchStrItem));
+
+                            }
+
+                        }
+                        newFileContentList.add(mNextStr);
+
+                    }
+
+                    File resultDir_RealFile = new File(resultDirFile.getAbsolutePath()+File.separator+fileName);
+                    writeContentToFile(resultDir_RealFile,newFileContentList);
+                    resultFileList.add(resultDir_RealFile);
+
+                }
+
+
+                for (int j = 0; j < resultFileList.size(); j++) {
+                    logList.add("替换文件["+i+"_"+resultFileList.size()+"]_"+resultFileList.get(j).getAbsolutePath());
+                }
+
+
+            }
+            writeContentToFile(I9_Temp_Text_File,logList);
+            NotePadOpenTargetFile(I9_Temp_Text_File.getAbsolutePath());
+            return super.applyOperationRule(curFileList, subFileTypeMap, curDirList, curRealFileList);
+        }
+
+
+
     }
 
     static String macOS_FangDai_seperator_str = "╠═══════════════════════════════════════╣";
