@@ -412,6 +412,402 @@ public class G2_ApplyRuleFor_TypeFile {
         //  读取 releasenote.html  解析出来数据 然后 产生 tip 文件
         realTypeRuleList.add(new ReleaseNoteHtml_Revert_TipTxt_Rule_60());
 
+        //  把在 zmain-Life 中实现的  Wireless 相关 逻辑 通过  这个规则 移植到  AOSP的 Settings 中 使得 能在系统层级调用以及对应设备 调用一些相关代码逻辑
+        realTypeRuleList.add(new Add_Zmain_Life_Wireless_Embedded_AOSP_Settings_Rule61());
+    }
+
+
+
+    static String Rule61_showWirelessDialog_Method ="";  // 动态从 Zmain-Life 读取 showWirelessDialog 函数
+
+
+    //  把在 zmain-Life 中实现的  Wireless 相关 逻辑 通过  这个规则 移植到  AOSP的 Settings 中 使得 能在系统层级调用以及对应设备 调用一些相关代码逻辑
+    class Add_Zmain_Life_Wireless_Embedded_AOSP_Settings_Rule61 extends Basic_Rule {
+
+        File aosp_settings_wifienabler_file;
+
+
+        // 作为  在 Zmain-Life 实现的逻辑 用于在 Settings 修改时  获取到 对应的修改的逻辑
+        File G2_Zmain_Life_Source_Dir;
+
+
+
+        //   当前  定义函数 showWirelessDialog() 的 来自 Zmain-Life 的定义的来源  来自Txt_TxtEdit_Fragment.java 定义的 showWirelessDialog() 函数
+        File G2_Zmain_Life_Txt_TxtEdit_Fragment_showWirelessDialog_JavaFile;
+
+
+
+        File G2_Zmain_Life_Source_Res_LayoutDir;   // 当前 需要 拷贝的  res/layout 下的文件和目录
+        // 当前 需要 拷贝的  res/layout 下的 以 wireless 开头的 xml 文件的集合
+        ArrayList<File> G2_Zmain_Life_Source_Res_WiressXml_FileList;
+        File AOSP_Settings_Res_LayoutDir;   // 在 AOSP_Settings 中对应的 放置 res/layout/wireless_xxxx.xml 文件的目录
+
+
+        // 以 wireless_ 开头  activity.java 为结尾的文件
+        ArrayList<File> G2_Zmain_Life_Source_Wireless_Activity_FileList;
+
+
+        File AOSP_Settings_AndroidManifest_XMLFile ;   // Settings 的   AndroidManifest.xml 文件
+
+
+
+        ArrayList<File> G2_Zmain_Life_Source_Wireless_Java_FileList ; // // 在 G2_Zmain-Life 资源文件中需要拷贝的  wireless 包名的Java 代码  需要 统一修改里面的 包名
+       File G2_Zmain_Life_Source_Wireless_Java_Dir; // 在 G2_Zmain-Life 资源文件中需要拷贝的  wireless 包名的目录
+        File AOSP_Settings_Target_Wireless_Java_Dir ;   // Settings 的  放置 Wireless 包名 的 那个目录
+
+
+
+
+        // 判断当前路径是否是 AOSP 路径   直接检测 WifiEnable 是否存在
+        boolean isCurPath_AOSP = false;  // 当前的目录是否是
+
+        String timestamp_yyyymmdd_hhmmss;  // 时间戳   统一 使用
+
+
+        boolean isAOSPSettings_Already_Embedded;   // 当前 AOSP_Settings 是否 已经 完成 过 嵌入 ?
+
+        Add_Zmain_Life_Wireless_Embedded_AOSP_Settings_Rule61() {
+            super("#", 61, 4);
+
+            timestamp_yyyymmdd_hhmmss = getTimeStamp_yyyyMMdd_HHmmss();
+            G2_Zmain_Life_Source_Wireless_Java_FileList = new ArrayList<File>();
+            G2_Zmain_Life_Source_Res_WiressXml_FileList  = new ArrayList<File>();
+            G2_Zmain_Life_Source_Wireless_Activity_FileList = new ArrayList<File>();
+            isAOSPSettings_Already_Embedded = false;
+        }
+
+
+        boolean isCurPathAOSP () {
+
+            String shellpath = curDirPath ;
+
+            File shellFile = new File(shellpath);
+
+            aosp_settings_wifienabler_file = new File(shellFile.getAbsolutePath()+File.separator+"packages/apps/Settings/src/com/android/settings/wifi/WifiEnabler.java");
+
+            return  aosp_settings_wifienabler_file.exists() && aosp_settings_wifienabler_file.length() > 100;
+        }
+
+        @Override
+        boolean initParamsWithInputList(ArrayList<String> inputParamList) {
+            boolean Flag = true;
+            isCurPath_AOSP = isCurPathAOSP();
+
+            if(!isCurPath_AOSP){
+                System.out.println("当前路径不是 AOSP 的 根 路径 无法执行 嵌入 Settings 对应 zmain-Life-Wireless 的相关逻辑!  aosp_settings_wifienabler_file="+aosp_settings_wifienabler_file.getAbsolutePath());
+                return false;
+            }
+
+            G2_Zmain_Life_Source_Dir = new File(zbinPath+File.separator+"G2_rule61_zmain-Life");
+
+            if(!G2_Zmain_Life_Source_Dir.exists()){
+                System.out.println("当前 修改Settings 逻辑来源 文件夹  ~/Desktop/zbin/G2_rule61_zmain-Life/ 该目录不存在 请检查! ");
+                return false;
+            }
+
+              AOSP_Settings_AndroidManifest_XMLFile  = new File(curDirPath+File.separator+"/packages/apps/Settings/AndroidManifest.xml");
+
+            // 需要 嵌入的 相关的 目标文件夹
+              AOSP_Settings_Target_Wireless_Java_Dir  = new File(curDirPath+File.separator+"/packages/apps/Settings/src/com/android/settings/wifi/wireless/");
+
+              AOSP_Settings_Res_LayoutDir  = new File(curDirPath+File.separator+"/packages/apps/Settings/res/layout/");
+
+
+            G2_Zmain_Life_Txt_TxtEdit_Fragment_showWirelessDialog_JavaFile = new File(G2_Zmain_Life_Source_Dir.getAbsoluteFile()+File.separator+"/app/src/main/java/com/and/zmain_life/fragment/Txt_TxtEdit_Fragment.java");
+
+            if(G2_Zmain_Life_Txt_TxtEdit_Fragment_showWirelessDialog_JavaFile.exists()){
+
+             ArrayList<String> txtFragmentCodeList =    ReadFileContentAsList(G2_Zmain_Life_Txt_TxtEdit_Fragment_showWirelessDialog_JavaFile);
+
+             ArrayList<String> showWirelessDialogCodeList = getSubArrayWithBeginTag_EndTag(txtFragmentCodeList,"showWirelessDialog_Begin","showWirelessDialog_End");
+
+                System.out.println("txtFragmentCodeList.size() = "+ txtFragmentCodeList.size());
+                System.out.println("showWirelessDialogCodeList.size() = "+ showWirelessDialogCodeList.size());
+
+
+                if(showWirelessDialogCodeList.size() != 0){
+
+                    Rule61_showWirelessDialog_Method =   ArrToStr(showWirelessDialogCodeList);
+                    System.out.println("读取到的 showWirelessDialog 定义如下:\n"+Rule61_showWirelessDialog_Method);
+
+                    if("".equals(Rule61_showWirelessDialog_Method)){
+
+                        System.out.println("无法从 "+G2_Zmain_Life_Txt_TxtEdit_Fragment_showWirelessDialog_JavaFile.getAbsolutePath()+" 获取 showWirelessDialog() 定义函数 请检查! Rule61_showWirelessDialog_Method= "+Rule61_showWirelessDialog_Method);
+                    }
+
+             }else {
+                 System.out.println("无法从 "+G2_Zmain_Life_Txt_TxtEdit_Fragment_showWirelessDialog_JavaFile.getAbsolutePath()+" 获取 showWirelessDialog() 定义函数 请检查! ");
+                 return false;
+             }
+
+            } else {
+                System.out.println("当前 修改Settings 逻辑来源 文件夹 G2_Zmain_Life_Source_Wireless_Java_Dir ="+ G2_Zmain_Life_Source_Wireless_Java_Dir.getAbsolutePath()+" 不存在! 请检查!");
+
+                return false;
+            }
+
+
+
+
+            G2_Zmain_Life_Source_Wireless_Java_Dir = new File(G2_Zmain_Life_Source_Dir.getAbsoluteFile()+File.separator+"/app/src/main/java/com/and/zmain_life/wireless/");
+
+             if(G2_Zmain_Life_Source_Wireless_Java_Dir.exists()){
+
+                 File[] mWirelessJavaFileArr = G2_Zmain_Life_Source_Wireless_Java_Dir.listFiles();
+
+                 if(mWirelessJavaFileArr == null || mWirelessJavaFileArr.length == 0){
+                     System.out.println("当前 修改Settings 逻辑来源 文件夹 G2_Zmain_Life_Source_Wireless_Java_Dir ="+ G2_Zmain_Life_Source_Wireless_Java_Dir.getAbsolutePath()+" 不存在原始Java 文件!");
+                     return false;
+                 }
+                 G2_Zmain_Life_Source_Wireless_Java_FileList.addAll(Arrays.asList(mWirelessJavaFileArr));
+             } else {
+                 System.out.println("当前 修改Settings 逻辑来源 文件夹 G2_Zmain_Life_Source_Wireless_Java_Dir ="+ G2_Zmain_Life_Source_Wireless_Java_Dir.getAbsolutePath()+" 不存在! 请检查!");
+
+                 return false;
+             }
+
+
+            G2_Zmain_Life_Source_Res_LayoutDir = new File(G2_Zmain_Life_Source_Dir.getAbsoluteFile()+File.separator+"/app/src/main/res/layout/");
+
+
+            if(G2_Zmain_Life_Source_Res_LayoutDir.exists()){
+
+                File[] mWirelessLayoutXmlFileArr = G2_Zmain_Life_Source_Res_LayoutDir.listFiles();
+
+                if(mWirelessLayoutXmlFileArr == null || mWirelessLayoutXmlFileArr.length == 0){
+                    System.out.println("当前 修改Settings 逻辑来源 文件夹 G2_Zmain_Life_Source_Res_LayoutDir ="+ G2_Zmain_Life_Source_Res_LayoutDir.getAbsolutePath()+" 不存在原始 Wireless_*.xml 配置 文件!");
+                    return false;
+                }
+
+                for (int i = 0; i < mWirelessLayoutXmlFileArr.length; i++) {
+                    File source_res_lauout_file = mWirelessLayoutXmlFileArr[i];
+                    String layout_file_name = source_res_lauout_file.getName();
+                    if(layout_file_name.toLowerCase().startsWith("wireless") && layout_file_name.toLowerCase().endsWith("xml")){
+                        G2_Zmain_Life_Source_Res_WiressXml_FileList.add(source_res_lauout_file);
+                    }
+                }
+
+            } else {
+                System.out.println("当前 修改Settings 逻辑来源 文件夹 G2_Zmain_Life_Source_Wireless_Java_Dir ="+ G2_Zmain_Life_Source_Res_LayoutDir.getAbsolutePath()+" 不存在! 请检查!");
+
+                return false;
+            }
+
+
+
+            System.out.println("G2_Zmain_Life_Source_Wireless_Java_FileList.size() = "+ G2_Zmain_Life_Source_Wireless_Java_FileList.size());
+
+            System.out.println("G2_Zmain_Life_Source_Res_WiressXml_FileList.size() = "+ G2_Zmain_Life_Source_Res_WiressXml_FileList.size());
+
+            if(G2_Zmain_Life_Source_Res_WiressXml_FileList.size() == 0 || G2_Zmain_Life_Source_Wireless_Java_FileList.size() == 0){
+
+                System.out.println("当前 从 G2_Zmain-Life 目录 "+G2_Zmain_Life_Source_Res_LayoutDir.getAbsolutePath()+"读取以 wireless 开头的xml   和  "+G2_Zmain_Life_Source_Wireless_Java_Dir.getAbsolutePath()+" 以 wireless 开头 的 Java 文件为空 ! ç∂ 请检查! ");
+
+                return false;
+            }
+
+
+
+            String wifiEnable_CodeStr = readStringFromFile(aosp_settings_wifienabler_file);
+
+            if(wifiEnable_CodeStr.contains("showWirelessDialog")){
+
+                isAOSPSettings_Already_Embedded  = true;
+
+            }
+
+
+            if(isAOSPSettings_Already_Embedded){
+                System.out.println("当前 WifiEnable.java 中 已经存在 之前导入的 关键函数 !  showWirelessDialog   请注意! ");
+            }else{
+                System.out.println("当前 WifiEnable.java 中 是完全新的函数 !   没有 关键函数字符串 showWirelessDialog    可以操作!! ");
+            }
+
+            return super.initParamsWithInputList(inputParamList) && Flag;
+        }
+        @Override
+        String simpleDesc() {
+            return "  \n"
+                    + Cur_Bat_Name  + " #_"+rule_index+"  ### 把在 zmain-Life 中实现的  Wireless 相关 逻辑 通过  这个规则 移植到  AOSP的 Settings 中 使得 能在系统层级调用以及对应设备 调用一些相关代码逻辑 \n"
+
+                    ;
+        }
+
+        @Override
+        boolean allowEmptyDirFileList() {
+            return true;
+        }
+
+        @Override
+        ArrayList<File> applySubFileListRule4(ArrayList<File> curFileList,
+                                              HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList,
+                                              ArrayList<File> curRealFileList) {
+            // 从 原始 Zmain-Life 来 读取 关键 showWirelessDialog()   不写死
+
+
+            // 插装
+            if(!aosp_wifi_enable_cha_zhuang()){
+
+                System.out.println("往 WifiEnable.java 插装失败 请检查! ");
+            }
+
+            //  复制 res_wireless
+            for (int i = 0; i < G2_Zmain_Life_Source_Res_WiressXml_FileList.size() ; i++) {
+                File src_res_layout_file = G2_Zmain_Life_Source_Res_WiressXml_FileList.get(i);
+                File dst_res_layout_file = new File(AOSP_Settings_Res_LayoutDir.getAbsolutePath()+File.separator+src_res_layout_file.getName());
+                fileCopy(src_res_layout_file,dst_res_layout_file);
+                System.out.println("res_layout["+i+"_"+G2_Zmain_Life_Source_Res_WiressXml_FileList.size() +"]:"+dst_res_layout_file.getAbsolutePath()+"复制完成!");
+            }
+
+            // Wireless_
+            //  复制 java_wireless
+            int wireless_activity_count = 1;
+            for (int i = 0; i < G2_Zmain_Life_Source_Wireless_Java_FileList.size() ; i++) {
+                File src_wireless_java_file = G2_Zmain_Life_Source_Wireless_Java_FileList.get(i);
+                File dst_wireless_java_file = new File(AOSP_Settings_Target_Wireless_Java_Dir.getAbsolutePath()+File.separator+src_wireless_java_file.getName());
+                // 对 源文件进行 解析  去掉一些 package 之类的 再写入到  dst 目标中
+                ArrayList<String> raw_java_codelist = ReadFileContentAsList(src_wireless_java_file);
+                ArrayList<String> raw_java_codelist_fixed_1 = replaceInList(raw_java_codelist,"package com.and.zmain_life.wireless;","package com.android.settings.wifi.wireless;");
+                ArrayList<String> raw_java_codelist_fixed_2 = replaceInList(raw_java_codelist_fixed_1,"import com.and.zmain_life.R;","import com.android.settings.R;");
+
+                writeContentToFile(dst_wireless_java_file,raw_java_codelist_fixed_2);
+
+                System.out.println("java["+i+"_"+G2_Zmain_Life_Source_Wireless_Java_FileList.size() +"]:"+dst_wireless_java_file.getAbsolutePath()+"复制完成!");
+
+                String activity_java_file_name = src_wireless_java_file.getName();
+
+
+
+                if(activity_java_file_name.toLowerCase().startsWith("wireless_") && activity_java_file_name.toLowerCase().endsWith("activity.java") ){
+                    G2_Zmain_Life_Source_Wireless_Activity_FileList.add(src_wireless_java_file);
+                    System.out.println("Wireless_XXXX_Activity["+wireless_activity_count+"] = "+ activity_java_file_name);
+                    wireless_activity_count++;
+                }
+
+            }
+
+            System.out.println("嵌入的Activity的数量: G2_Zmain_Life_Source_Wireless_Activity_FileList.size() = "+ G2_Zmain_Life_Source_Wireless_Activity_FileList.size());
+
+            if(G2_Zmain_Life_Source_Wireless_Activity_FileList.size() == 0){
+                System.out.println("嵌入的Activity的数量 为0  执行操作失败!  请检查! ");
+                return  null;
+
+            }
+            StringBuilder activitySB = new StringBuilder();
+            for (int i = 0; i < G2_Zmain_Life_Source_Wireless_Activity_FileList.size() ; i++) {
+                File src_wireless_activity_file = G2_Zmain_Life_Source_Wireless_Activity_FileList.get(i);
+
+                String fileName_NoPoint = getFileNameNoPoint(src_wireless_activity_file);
+
+                String line_1 = "<!-- zukgit -->  <activity android:name=\".wifi.wireless."+fileName_NoPoint+"\"";
+                String line_2 = "android:configChanges=\"orientation|screenSize|keyboardHidden\"/> <!--  zukgit -->";
+
+                activitySB.append(line_1+"\n"+line_2+"\n");
+
+            }
+
+
+            ArrayList<String>  AOSP_Settings_Manifest_StrList = ReadFileContentAsListWithClearTag(AOSP_Settings_AndroidManifest_XMLFile,"zukgit");
+
+            ArrayList<String> new_AOSP_Settings_Manifest_StrList = replaceInList(AOSP_Settings_Manifest_StrList,"</application>","\n"+activitySB.toString()+"\n"+"</application>");
+
+//            </application>  替换为 指定的 Activity的列表
+            writeContentToFile(AOSP_Settings_AndroidManifest_XMLFile,new_AOSP_Settings_Manifest_StrList);
+            System.out.println("完成  AndroidManifest.xml文件的修改操作!  "+AOSP_Settings_AndroidManifest_XMLFile.getAbsolutePath()+"  activitySB="+activitySB.toString());
+
+
+
+
+            return null;
+        }
+
+
+        boolean aosp_wifi_enable_cha_zhuang() {
+
+//            ArrayList<String> wpasupplicant_file_contentlist = ReadFileContentAsList(aosp_settings_wifienabler_file);
+
+            boolean is_wifi_enable_cha_zhuang_success = false;
+
+            //  包含 这 两行 的 内容  不读取进来
+            ArrayList<String> wpasupplicant_file_contentlist = ReadFileJavaContentAsList_Begin_End(aosp_settings_wifienabler_file,"showWirelessDialog_Begin","showWirelessDialog_End");
+
+            if(wpasupplicant_file_contentlist == null || wpasupplicant_file_contentlist.size() == 0 ){
+
+                System.out.println("读取出来的 WifiEnable 文件 内容为空 !  无法执行嵌入Settings 操作  请检查! ");
+                return is_wifi_enable_cha_zhuang_success;
+            }
+            ArrayList<String> newCodeList = new ArrayList<String> ();
+
+
+            for (int i = 0; i < wpasupplicant_file_contentlist.size(); i++) {
+
+                String oneLine = wpasupplicant_file_contentlist.get(i);
+
+                if(oneLine.contains("zukgit")) {
+                    continue;
+                }
+
+                if(oneLine.contains("com.android.settings.wifi.wireless")) {
+                    continue;
+                }
+
+                if(oneLine.contains("showWirelessDialog();")) {
+                    continue;
+                }
+
+
+                if(oneLine.contains("onSwitchToggled(boolean isChecked)") ) {
+//					 android.util.Log.i("zoggled", "this_i2");
+
+
+                    newCodeList.add(oneLine);
+                    newCodeList.add("android.util.Log.i(\"wifienabler_zukgit\", \""+aosp_settings_wifienabler_file.getAbsolutePath()+"_"+timestamp_yyyymmdd_hhmmss+"_【 WifiEnabler_onSwitchToggled isChecked=\"+isChecked+\"】\");");
+                    newCodeList.add("showWirelessDialog();");
+
+                    continue;
+                }
+
+                newCodeList.add(oneLine);
+
+            }
+
+            String lastCode = newCodeList.get(newCodeList.size()-1);
+
+            lastCode =  lastCode.trim();
+
+            if(lastCode.endsWith("}")){
+
+              String last_code_no_block = lastCode.substring(0,lastCode.length()-1);
+
+
+              String new_last_Code = last_code_no_block +"\n" + Rule61_showWirelessDialog_Method +"\n"+"}";
+
+                new_last_Code =  new_last_Code.replace("ztimestamp",timestamp_yyyymmdd_hhmmss);
+                new_last_Code =  new_last_Code.replace("zabspath",aosp_settings_wifienabler_file.getAbsolutePath());
+
+                newCodeList.remove(newCodeList.size()-1);
+                newCodeList.add(new_last_Code);
+
+
+
+            } else {
+
+                System.out.println("当前读取到的 WifiEnabler.java 的最后一行不是 以 } 为 结尾  读取操作失败 请检查!   lastCode="+lastCode);
+                return  false;
+            }
+
+
+
+            ArrayList<String> newCode_list1 = replaceInList(newCodeList,"package com.android.settings.wifi;","package com.android.settings.wifi;\nimport com.android.settings.wifi.wireless.*;");
+
+            writeContentToFile(aosp_settings_wifienabler_file, newCode_list1);
+            System.out.println(""+aosp_settings_wifienabler_file.getAbsolutePath()+" 插桩成功!");
+
+            return true;
+
+        }
+
+
 
     }
 
@@ -461,7 +857,7 @@ public class G2_ApplyRuleFor_TypeFile {
         }
 
 
-         void MapFilePrint(Map<String, ArrayList<File>> sameFileTypeArrMap) {
+        void MapFilePrint(Map<String, ArrayList<File>> sameFileTypeArrMap) {
             Map.Entry<String, ArrayList<File>> entry;
             if (sameFileTypeArrMap != null) {
                 System.out.println("sameFileTypeArrMap != null &&  size = "+sameFileTypeArrMap.size());
@@ -582,7 +978,7 @@ public class G2_ApplyRuleFor_TypeFile {
             String mRawHtmlContent  ;   // 从 mrawReleaseNoteHtmlFile 读取到的 原始的 文件的内容
             ArrayList<String> mHtmlContentList ;    // 从  Html 中读取到的字符串的列表
 
-           ArrayList<String> product_txt_List ;
+            ArrayList<String> product_txt_List ;
 
             boolean is_manifestinfo_exist ;   //
             boolean is_buildinstruct_exist ;
@@ -592,14 +988,14 @@ public class G2_ApplyRuleFor_TypeFile {
             ReleaseNoteHtmlItem(File rawHtmlFile){
 
                 mrawReleaseNoteHtmlFile = rawHtmlFile;
-                 mRawHtmlContent = ReadFileContent(rawHtmlFile);
-              mHtmlContentList = ReadFileContentAsList(rawHtmlFile);
+                mRawHtmlContent = ReadFileContent(rawHtmlFile);
+                mHtmlContentList = ReadFileContentAsList(rawHtmlFile);
                 product_txt_List = new   ArrayList<String>();
 
-                 is_buildinstruct_exist =  isStringContainInList("Build Instructions",mHtmlContentList)  || isStringContainInList("BUILD INSTRUCTIONS",mHtmlContentList);
+                is_buildinstruct_exist =  isStringContainInList("Build Instructions",mHtmlContentList)  || isStringContainInList("BUILD INSTRUCTIONS",mHtmlContentList);
 
 
-                 is_manifestinfo_exist =  isStringContainInList("Manifest Info",mHtmlContentList)  || isStringContainInList("MANIFEST INFO",mHtmlContentList);
+                is_manifestinfo_exist =  isStringContainInList("Manifest Info",mHtmlContentList)  || isStringContainInList("MANIFEST INFO",mHtmlContentList);
                 isVendor_2 =   isStringContainInList("Vendor Build",mHtmlContentList)  || isStringContainInList("VENDOR BUILD",mHtmlContentList);
 
 
@@ -629,19 +1025,32 @@ public class G2_ApplyRuleFor_TypeFile {
 
             }
 
-             String buildSettingsApk(HashMap<String,String> valueMap) {
+            String buildSettingsApk(HashMap<String,String> valueMap) {
                 String result = "";
 
                 String str1_1 = " export PATH=/apps/android/python-2.7.6-x64/bin:$PATH  && export PATH=/apps/android/perl-5.1aclmsx8.4-x64/bin:$PATH && ";
                 String str2_1 = " source build/envsetup.sh && source /opt/android.conf  &&   source /opt/conf/moto.conf  && ";
                 String str3_1 = " lunch " +  valueMap.get("productname")  + "-userdebug && ";
-                String str4_1 = " mmm packages/apps/Settings ";
+                String str4_1 = " mmm  /packages/apps/Settings ";
+                result = str1_1 + str2_1 + str3_1 + str4_1;
+                return result;
+            }
+
+            String buildSettingsApk_make(HashMap<String,String> valueMap) {
+                String result = "";
+
+                String str1_1 = " export PATH=/apps/android/python-2.7.6-x64/bin:$PATH  && export PATH=/apps/android/perl-5.1aclmsx8.4-x64/bin:$PATH && ";
+                String str2_1 = " source build/envsetup.sh && source /opt/android.conf  &&   source /opt/conf/moto.conf  && ";
+                String str3_1 = " lunch " +  valueMap.get("productname")  + "-userdebug && ";
+                String str4_1 = " make Settings ";
                 result = str1_1 + str2_1 + str3_1 + str4_1;
                 return result;
             }
 
 
-             String buildFrameworkJar(HashMap<String,String> valueMap) {
+
+
+            String buildFrameworkJar(HashMap<String,String> valueMap) {
                 String result = "";
                 String str1_1 = " export PATH=/apps/android/python-2.7.6-x64/bin:$PATH  && export PATH=/apps/android/perl-5.1aclmsx8.4-x64/bin:$PATH && ";
                 String str2_1 = " source build/envsetup.sh && source /opt/android.conf  &&   source /opt/conf/moto.conf  && ";
@@ -651,7 +1060,42 @@ public class G2_ApplyRuleFor_TypeFile {
                 return result;
             }
 
-             String buildWifiServiceJar(HashMap<String,String> valueMap) {
+            String buildFrameworkJar_make(HashMap<String,String> valueMap) {
+                String result = "";
+                String str1_1 = " export PATH=/apps/android/python-2.7.6-x64/bin:$PATH  && export PATH=/apps/android/perl-5.1aclmsx8.4-x64/bin:$PATH && ";
+                String str2_1 = " source build/envsetup.sh && source /opt/android.conf  &&   source /opt/conf/moto.conf  && ";
+                String str3_1 = " lunch " + valueMap.get("productname")  + "-userdebug && ";
+                String str4_1 = " make framework ";
+                result = str1_1 + str2_1 + str3_1 + str4_1;
+                return result;
+            }
+
+
+            String buildFrameworkRes_make(HashMap<String,String> valueMap) {
+                String result = "";
+                String str1_1 = " export PATH=/apps/android/python-2.7.6-x64/bin:$PATH  && export PATH=/apps/android/perl-5.1aclmsx8.4-x64/bin:$PATH && ";
+                String str2_1 = " source build/envsetup.sh && source /opt/android.conf  &&   source /opt/conf/moto.conf  && ";
+                String str3_1 = " lunch " + valueMap.get("productname")  + "-userdebug && ";
+                String str4_1 = " make framework-res ";
+                result = str1_1 + str2_1 + str3_1 + str4_1;
+                return result;
+            }
+
+            String buildFrameworkService_make(HashMap<String,String> valueMap) {
+                String result = "";
+                String str1_1 = " export PATH=/apps/android/python-2.7.6-x64/bin:$PATH  && export PATH=/apps/android/perl-5.1aclmsx8.4-x64/bin:$PATH && ";
+                String str2_1 = " source build/envsetup.sh && source /opt/android.conf  &&   source /opt/conf/moto.conf  && ";
+                String str3_1 = " lunch " + valueMap.get("productname")  + "-userdebug && ";
+                String str4_1 = " make services ";
+                result = str1_1 + str2_1 + str3_1 + str4_1;
+                return result;
+            }
+
+
+
+
+
+            String buildWifiServiceJar(HashMap<String,String> valueMap) {
                 String result = "";
                 String str1_1 = " export PATH=/apps/android/python-2.7.6-x64/bin:$PATH  && export PATH=/apps/android/perl-5.1aclmsx8.4-x64/bin:$PATH && ";
                 String str2_1 = " source build/envsetup.sh && source /opt/android.conf  &&   source /opt/conf/moto.conf  && ";
@@ -661,7 +1105,7 @@ public class G2_ApplyRuleFor_TypeFile {
                 return result;
             }
 
-             String buildWpaSupplicant(HashMap<String,String> valueMap) {
+            String buildWpaSupplicant(HashMap<String,String> valueMap) {
                 String result = "";
                 String str1_1 = " export PATH=/apps/android/python-2.7.6-x64/bin:$PATH  && export PATH=/apps/android/perl-5.1aclmsx8.4-x64/bin:$PATH && ";
                 String str2_1 = " source build/envsetup.sh && source /opt/android.conf  &&   source /opt/conf/moto.conf  && ";
@@ -673,7 +1117,7 @@ public class G2_ApplyRuleFor_TypeFile {
 
 
 
-             void printSchema(String title) {
+            void printSchema(String title) {
                 if("".equals(title)){
                     System.out.println();
                     return;
@@ -682,7 +1126,7 @@ public class G2_ApplyRuleFor_TypeFile {
             }
 
 
-             String getSchema(String title) {
+            String getSchema(String title) {
                 String mtitle = title;
                 if("".equals(title)){
                     mtitle = "════════════════════════════════════════════" + title + "════════════════════════════════════════════";
@@ -695,8 +1139,8 @@ public class G2_ApplyRuleFor_TypeFile {
 
 
 
-     public  String getTextFromTHML(String htmlStr) {
-         org.jsoup.nodes.Document doc = Jsoup.parse(htmlStr);
+            public  String getTextFromTHML(String htmlStr) {
+                org.jsoup.nodes.Document doc = Jsoup.parse(htmlStr);
                 String text = doc.text();
                 // remove extra white space
                 StringBuilder builder = new StringBuilder(text);
@@ -729,12 +1173,12 @@ public class G2_ApplyRuleFor_TypeFile {
 
 
                 if(!rawStr.contains(keyStr) && !keyStr.contains(".") ){
-if(rawStr.length() > 100){
-    System.out.println("当前参数  keyStr 不包含正则表达式的点. 同时  keyStr="+keyStr+" 并不包含在 rawStr  请检查! rawStr.length="+ rawStr.length()+" ");
-} else{
-    System.out.println("当前参数  keyStr 不包含正则表达式的点. 同时  keyStr="+keyStr+" 并不包含在 rawStr  请检查! rawStr="+rawStr+"");
+                    if(rawStr.length() > 100){
+                        System.out.println("当前参数  keyStr 不包含正则表达式的点. 同时  keyStr="+keyStr+" 并不包含在 rawStr  请检查! rawStr.length="+ rawStr.length()+" ");
+                    } else{
+                        System.out.println("当前参数  keyStr 不包含正则表达式的点. 同时  keyStr="+keyStr+" 并不包含在 rawStr  请检查! rawStr="+rawStr+"");
 
-}
+                    }
 
                     return matchFistStr;
                 }
@@ -804,12 +1248,12 @@ if(rawStr.length() > 100){
 
 
             String getFirstStringAfterKey(String keyStr , String rawStr ){
-                 String matchFistStr = null ;
-                 if(keyStr == null ){
+                String matchFistStr = null ;
+                if(keyStr == null ){
 
-                     System.out.println("当前 从 Html解析的 getFirstStringAfterKey  参数 keyStr == null ! 请检查");
-                     return matchFistStr;
-                 }
+                    System.out.println("当前 从 Html解析的 getFirstStringAfterKey  参数 keyStr == null ! 请检查");
+                    return matchFistStr;
+                }
                 if(rawStr == null ){
 
                     System.out.println("当前 从 rawStr 解析的 getFirstStringAfterKey  参数 rawStr == null ! 请检查");
@@ -857,7 +1301,7 @@ if(rawStr.length() > 100){
                 }
 
 
-                 return matchFistStr;
+                return matchFistStr;
 
 
 
@@ -1174,11 +1618,25 @@ if(rawStr.length() > 100){
                 product_txt_List.add("");
                 product_txt_List.add(getSchema("【"+productName+"】 【 编译 apk jar so bin 命令】"));
 
-                product_txt_List.add("【 Settings.apk " + productName + "" + "】");
+                product_txt_List.add("【 Settings.apk   mmm Vednor_Code/packages/apps/Settings " + productName + "" + "】");
                 product_txt_List.add(buildSettingsApk(valueMap));
                 product_txt_List.add("");
-                product_txt_List.add("【 framework.jar " + productName + "-userdebug" + "】");
+
+                product_txt_List.add("【 Settings.apk   make Settings  [/packages/apps/Settings] " + productName + "" + "】");
+                product_txt_List.add(buildSettingsApk_make(valueMap));
+                product_txt_List.add("");
+
+                product_txt_List.add("【 framework.jar  frameworks/base " + productName + "-userdebug" + "】");
                 product_txt_List.add(buildFrameworkJar(valueMap));
+                product_txt_List.add("");
+                product_txt_List.add(buildFrameworkJar_make(valueMap));
+                product_txt_List.add("");
+                product_txt_List.add("【 framework-res   frameworks/base/core/res  " + productName + "-userdebug" + "】");
+                product_txt_List.add(buildFrameworkRes_make(valueMap));
+                product_txt_List.add("");
+                product_txt_List.add("【 framework-services [system_server] services.art  mmma frameworks/base/services  " + productName + "-userdebug" + "】");
+                product_txt_List.add(buildFrameworkService_make(valueMap));
+
 
                 product_txt_List.add("");
                 product_txt_List.add("【 wifi-services.jar " + productName + "-userdebug" + "】");
@@ -1346,6 +1804,7 @@ if(rawStr.length() > 100){
                 product_txt_List.add("示例16:  git push origin TEMP:refs/for/bu-mtk");
                 product_txt_List.add("示例17:  git push origin TEMP:refs/for/prodt-mtk");
                 product_txt_List.add("示例18:  git push origin TEMP:refs/for/produ-mtk");
+                product_txt_List.add("示例19:  git push origin TEMP:refs/for/prods-mtktc2sp2");
                 product_txt_List.add("");
                 product_txt_List.add("");
 
@@ -1372,11 +1831,11 @@ if(rawStr.length() > 100){
             }
 
             boolean isQcomProduct(String rawHtml){
-         boolean isQcom = true;
+                boolean isQcom = true;
 
-         String all_lower_text = rawHtml.toLowerCase();
+                String all_lower_text = rawHtml.toLowerCase();
 
-         String[] qcom_split_arr = all_lower_text.split("qcom");
+                String[] qcom_split_arr = all_lower_text.split("qcom");
 
                 String[] mtk_split_arr = all_lower_text.split("mtk");
 
@@ -1395,13 +1854,13 @@ if(rawStr.length() > 100){
 
 
 
-          return isQcom;
+                return isQcom;
 
 
             }
 
             String getPadding2(int value){
-             String int_str = "" +value;
+                String int_str = "" +value;
                 if(value >= 0 && value <= 9 ){
                     return "0"+int_str;
                 }
@@ -1410,91 +1869,91 @@ if(rawStr.length() > 100){
             }
 
             String  getAndroidVersionTip(String charVersion){
-                 String detailVersionTip = charVersion;
+                String detailVersionTip = charVersion;
 
-                 switch (charVersion){
+                switch (charVersion){
 
-                     case "Z":
-                         return charVersion+"_(Android_19)";
+                    case "Z":
+                        return charVersion+"_(Android_19)";
 
-                     case "Y":
-                         return charVersion+"_(Android_18)";
+                    case "Y":
+                        return charVersion+"_(Android_18)";
 
-                     case "X":
-                         return charVersion+"_(Android_17)";
+                    case "X":
+                        return charVersion+"_(Android_17)";
 
-                     case "W":
-                         return charVersion+"_(Android_16)";
+                    case "W":
+                        return charVersion+"_(Android_16)";
 
-                     case "V":
-                         return charVersion+"_(Android_15)";
+                    case "V":
+                        return charVersion+"_(Android_15)";
 
-                     case "U":
-                         return charVersion+"_(Android_14)";
+                    case "U":
+                        return charVersion+"_(Android_14)";
 
-                     case "T":
-                         return charVersion+"_(Android_13)";
+                    case "T":
+                        return charVersion+"_(Android_13)";
 
-                     case "S":
-                         return charVersion+"_(Android_12)";
+                    case "S":
+                        return charVersion+"_(Android_12)";
 
-                     case "R":
-                         return charVersion+"_(Android_11)";
+                    case "R":
+                        return charVersion+"_(Android_11)";
 
-                     case "Q":
-                         return charVersion+"_(Android_10)";
+                    case "Q":
+                        return charVersion+"_(Android_10)";
 
-                     case "P":
-                         return charVersion+"_(Android_9)";
+                    case "P":
+                        return charVersion+"_(Android_9)";
 
-                     case "O":
-                         return charVersion+"_(Android_8)";
+                    case "O":
+                        return charVersion+"_(Android_8)";
 
-                     case "N":
-                         return charVersion+"_(Android_7)";
-
-
-                     case "M":
-
-                     return charVersion+"_(Android_6)";
+                    case "N":
+                        return charVersion+"_(Android_7)";
 
 
-                     case "L":
-                         return charVersion+"_(Android_5)";
+                    case "M":
+
+                        return charVersion+"_(Android_6)";
 
 
-
-                     case "K":
-                     case "J":
-                         return charVersion+"_(Android_4)";
-
-
-                     case "I":
-                         return "J_(Android_3)";
-
-                     case "H":
-                         return charVersion+"_(Android_3)";
-
-
-                     case "D":
-                     case "C":
-                     case "B":
-                         return charVersion+"_(Android_1)";
+                    case "L":
+                        return charVersion+"_(Android_5)";
 
 
 
+                    case "K":
+                    case "J":
+                        return charVersion+"_(Android_4)";
 
 
-                     default:
+                    case "I":
+                        return "J_(Android_3)";
 
-                 }
+                    case "H":
+                        return charVersion+"_(Android_3)";
 
 
-                 return detailVersionTip;
+                    case "D":
+                    case "C":
+                    case "B":
+                        return charVersion+"_(Android_1)";
+
+
+
+
+
+                    default:
+
+                }
+
+
+                return detailVersionTip;
             }
 
             String getChineseDateTip(String englishDate){
-              String mChineseDateTip = englishDate;
+                String mChineseDateTip = englishDate;
 
                 mChineseDateTip =  mChineseDateTip.replace("Mon","周一")
                         .replace("Tue","周二")
@@ -1518,7 +1977,7 @@ if(rawStr.length() > 100){
                         .replace("Nov","十一月")
                         .replace("Dec","十二月");
 
-              return mChineseDateTip;
+                return mChineseDateTip;
 
 
             }
@@ -24595,6 +25054,132 @@ if(rawStr.length() > 100){
 
     }
 
+
+
+    public static ArrayList<String> ReadFileJavaContentAsList_Begin_End(File mFilePath  , String beginClearTag , String endClearTag ) {
+
+
+        if (mFilePath != null && mFilePath.exists()) {
+            // System.out.println("存在 当前文件 "+ mFilePath.getAbsolutePath());
+        } else {
+            System.out.println("不存在 当前文件  ReadFileContentAsList  mFilePath = null "  );
+
+            return null;
+        }
+        ArrayList<String> contentList = new ArrayList<String>();
+
+        boolean isContainLine = true;
+        try {
+            BufferedReader curBR = new BufferedReader(new InputStreamReader(new FileInputStream(mFilePath), "utf-8"));
+            String oldOneLine = "";
+            int index = 1;
+            while (oldOneLine != null) {
+
+                oldOneLine = curBR.readLine();
+                if (oldOneLine == null) {
+                    continue;
+                }
+
+                if(oldOneLine.contains(beginClearTag) && isContainLine){
+                    isContainLine = false;
+                    continue;
+                }
+
+                // 如果当前 包含 EndTag  b 并且 当前的  f lag是   false 的 话 那么 就 说明 这个  区间结束了
+                if(oldOneLine.contains(endClearTag) && !isContainLine){
+                    isContainLine = true;
+                    continue;
+
+                }
+
+
+                if(isContainLine){
+                    contentList.add(oldOneLine);
+                    index++;
+                }
+
+//                    System.out.println("第"+index+"行读取到的字符串:"+oldOneLine);
+
+            }
+            curBR.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        int lineSize  = contentList.size();
+
+        String lastLine = "";
+
+        if(lineSize > 0){
+            lastLine = contentList.get(lineSize-1).trim();
+        }
+
+
+        while("".equals(lastLine)){
+            int end_index = contentList.size()-1;
+
+            if(contentList.size() <= 0){
+                break;
+            }
+            if(end_index >= 0  ){
+                lastLine = contentList.get(end_index).trim();
+                if(lastLine.trim().endsWith("}")){
+                    break;
+                }else{
+                    contentList.remove(end_index);
+                }
+            }
+
+        }
+
+        return contentList;
+
+    }
+
+
+    public static ArrayList<String> ReadFileContentAsListWithClearTag(File mFilePath , String clearTag) {
+
+        if (mFilePath != null && mFilePath.exists()) {
+            // System.out.println("存在 当前文件 "+ mFilePath.getAbsolutePath());
+        } else {
+            System.out.println("不存在 当前文件  ReadFileContentAsList  mFilePath = null "  );
+
+            return null;
+        }
+        ArrayList<String> contentList = new ArrayList<String>();
+
+        try {
+            BufferedReader curBR = new BufferedReader(new InputStreamReader(new FileInputStream(mFilePath), "utf-8"));
+            String oldOneLine = "";
+            int index = 1;
+            while (oldOneLine != null) {
+
+                oldOneLine = curBR.readLine();
+                if (oldOneLine == null) {
+                    continue;
+                }
+
+                if(oldOneLine.contains(clearTag)){
+                    continue;
+                }
+
+                contentList.add(oldOneLine);
+//                    System.out.println("第"+index+"行读取到的字符串:"+oldOneLine);
+                index++;
+
+            }
+            curBR.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return contentList;
+
+    }
+
+
+
     public static ArrayList<String> ReadFileContentAsList(File mFilePath) {
 
         if (mFilePath != null && mFilePath.exists()) {
@@ -27278,6 +27863,70 @@ if(rawStr.length() > 100){
 
 
         return step_count;
+
+
+    }
+
+    static String ArrToStr(ArrayList<String>  rawList ){
+        StringBuilder sb = new StringBuilder();
+
+
+        for (int i = 0; i < rawList.size(); i++) {
+            sb.append(rawList.get(i)+"\n");
+        }
+
+        return sb.toString();
+
+    }
+
+    static ArrayList<String> getSubArrayWithBeginTag_EndTag(ArrayList<String>  rawList , String beginTag , String endTag){
+        ArrayList<String> resultList = new      ArrayList<String>();
+
+        boolean isBegin = false ;
+
+        for (int i = 0; i < rawList.size() ; i++) {
+            String oneLine = rawList.get(i);
+            if(oneLine.contains(beginTag)){
+                isBegin = true;
+                resultList.add(oneLine);
+                continue;
+            }
+
+            if(oneLine.contains(endTag) && isBegin){
+                isBegin = false;
+                resultList.add(oneLine);
+                break;
+            }
+
+            if(isBegin){
+                resultList.add(oneLine);
+            }
+
+        }
+
+        return resultList;
+
+
+    }
+
+
+
+
+
+    static ArrayList<String> replaceInList(ArrayList<String>  rawList , String srcTag , String dstTag){
+        ArrayList<String> resultList = new      ArrayList<String>();
+
+        for (int i = 0; i < rawList.size() ; i++) {
+            String oneLine = rawList.get(i);
+        if(oneLine.contains(srcTag)){
+            String newLine = oneLine.replace(srcTag,dstTag);
+            resultList.add(newLine);
+            continue;
+        }
+            resultList.add(oneLine);
+        }
+
+        return resultList;
 
 
     }
