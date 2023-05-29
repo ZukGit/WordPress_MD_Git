@@ -414,9 +414,248 @@ public class G2_ApplyRuleFor_TypeFile {
 
         //  把在 zmain-Life 中实现的  Wireless 相关 逻辑 通过  这个规则 移植到  AOSP的 Settings 中 使得 能在系统层级调用以及对应设备 调用一些相关代码逻辑
         realTypeRuleList.add(new Add_Zmain_Life_Wireless_Embedded_AOSP_Settings_Rule61());
+
+
+        // 输入 bssid_11:11:11:11:55  mac_11:22:33:44:55  来统计所有的 过滤条件  可多输入   一比一匹配
+        //    bssid_11:11:11:11:55  mac_11:22:33:44:55   bssid_00:11:11:11:55  mac_aa:22:33:44:55
+        realTypeRuleList.add(new Wifi_Wireshark_Fliter_Calcul_Rule62());
+
+
     }
 
 
+    class Wifi_Wireshark_Fliter_Calcul_Rule62 extends Basic_Rule {
+
+
+        ArrayList<String> bssidList ;
+        ArrayList<String> macList ;
+
+        ArrayList<Bssid_Mac_Item>  mFliterItemList ;
+        Wifi_Wireshark_Fliter_Calcul_Rule62() {
+            super("#", 62, 4);
+            bssidList =    new   ArrayList<String>();
+            macList =    new   ArrayList<String>();
+            mFliterItemList = new   ArrayList<Bssid_Mac_Item>();
+        }
+
+        @Override
+        boolean initParamsWithInputList(ArrayList<String> inputParamList) {
+
+            for (int i = 0; i < inputParamList.size(); i++) {
+                String strInput = inputParamList.get(i);
+
+                if(strInput.startsWith("bssid_")){
+                    String bssid_item = strInput.replace("bssid_","");
+
+                    if(isMacAddress(bssid_item) && !bssidList.contains(bssid_item)){
+                        bssidList.add(bssid_item);
+                    }
+
+
+
+                } else if(strInput.startsWith("mac_")){
+                    String mac_item = strInput.replace("mac_","");
+
+                    if(isMacAddress(mac_item) && !macList.contains(mac_item)){
+                        macList.add(mac_item);
+                    }
+                }
+
+
+            }
+
+            System.out.println(" 当前输入的 bssid 个数: "+ bssidList.size() );
+            System.out.println(" 当前输入的 设备Mac地址 个数: "+ macList.size() );
+
+            if(bssidList.size() == 0 || macList.size() == 0){
+                System.out.println("当前 输入的 bssid  或者  mac地址 数量为0   无法生成正常的 Wireshark 过滤条件! ");
+                return false;
+
+            }
+
+            int all_fliter_count = bssidList.size() * macList.size();
+
+            for (int i = 0; i < bssidList.size() ; i++) {
+                String bssid_item = bssidList.get(i);
+
+                for (int j = 0; j < macList.size(); j++) {
+
+                    String mac_item = macList.get(j);
+
+                    int index = i* macList.size() + j ;
+
+                    Bssid_Mac_Item  fliterItem = new Bssid_Mac_Item(index,all_fliter_count,bssid_item,mac_item);
+
+                    mFliterItemList.add(fliterItem);
+
+                }
+
+            }
+            System.out.println("生成需要输出的过滤条件的 组合数量为  mFliterItemList.size()="+mFliterItemList.size());
+            if(mFliterItemList.size() == 0){
+                System.out.println("没有生成 过滤条件 需要的  Bssid 和 Mac 地址的 匹配的 数据项  请检查! ");
+                return false;
+            }
+
+            return super.initParamsWithInputList(inputParamList);
+        }
+
+
+        @Override
+        ArrayList<File> applySubFileListRule4(ArrayList<File> curFileList,
+                                              HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList,
+                                              ArrayList<File> curRealFileList) {
+
+            ArrayList<String> fliterInfoList = new      ArrayList<String>();
+            for (int i = 0; i < mFliterItemList.size(); i++) {
+                Bssid_Mac_Item fliterItem = mFliterItemList.get(i);
+
+
+                String  headTip = "组合["+i+"_"+mFliterItemList.size()+"]: "+ getPaddingIntString(fliterItem.index, 2, "0", true)+": bssid_"+fliterItem.bssid.toUpperCase()+"    mac_"+fliterItem.mac.toUpperCase();
+
+                fliterInfoList.add(headTip);
+
+            }
+            fliterInfoList.add("");
+            fliterInfoList.add("");
+            for (int i = 0; i < mFliterItemList.size(); i++) {
+                Bssid_Mac_Item fliterItem = mFliterItemList.get(i);
+                String  fliter_title = "════组合["+i+"_"+mFliterItemList.size()+"]: "+ getPaddingIntString(fliterItem.index, 2, "0", true)+": bssid_"+fliterItem.bssid.toUpperCase()+"    mac_"+fliterItem.mac.toUpperCase();
+                fliterInfoList.add(fliter_title);
+                ArrayList<String> fliterInfo = fliterItem.calWireSharkFliter();
+                fliterInfoList.addAll(fliterInfo);
+                fliterInfoList.add("");
+                fliterInfoList.add("");
+
+            }
+
+            writeContentToFile(G2_Temp_Text_File, fliterInfoList);
+            NotePadOpenTargetFile(G2_Temp_Text_File.getAbsolutePath());
+            return super.applySubFileListRule4(curFileList, subFileTypeMap, curDirList, curRealFileList);
+        }
+
+
+
+
+        class Bssid_Mac_Item {
+            String bssid;
+            String mac;
+
+            int index ;
+
+            int allFliterCount ;
+
+            int mRuleIndex;
+            Bssid_Mac_Item(int mIndex , int count ,  String mBssid  , String mMac  ){
+                index = mIndex;
+                bssid =  mBssid.toUpperCase();
+                mac = mMac.toUpperCase();
+                allFliterCount = count;
+                mRuleIndex = 1;
+            }
+
+
+            String getRuleIndexTip(){
+                return "____["+index+"_"+allFliterCount+"]Rule"+(mRuleIndex++)+":";
+
+            }
+
+            ArrayList<String> calWireSharkFliter(){
+                ArrayList<String> wireshard_fliterlist = new       ArrayList<String>();
+
+                // bssid_1c:5f:2b:5e:d5:53  mac_a4:50:46:44:c9:77
+//                (wlan.sa == 1c:5f:2b:5e:d5:53 ||  wlan.da == 1c:5f:2b:5e:d5:53 )
+
+
+                wireshard_fliterlist.add(getRuleIndexTip()+" 查询所有wifi eap 认证帧:");
+                //  (wlan.sa == 1c:5f:2b:5e:d5:53 ||  wlan.da == 1c:5f:2b:5e:d5:53 ) && eapol
+                wireshard_fliterlist.add("(wlan.sa == "+bssid+" ||  wlan.da == "+bssid+" ) && eapol");
+                wireshard_fliterlist.add("");
+
+
+                wireshard_fliterlist.add(getRuleIndexTip()+" 查询wifi 与 mac eap认证帧:");
+                //  ((wlan.sa == 1c:5f:2b:5e:d5:53 &&  wlan.da == a4:50:46:44:c9:77 ) ||  (wlan.sa == a4:50:46:44:c9:77  &&  wlan.da ==  1c:5f:2b:5e:d5:53 )) && eapol
+                wireshard_fliterlist.add("((wlan.sa == "+bssid+" &&  wlan.da == "+mac+" ) || (wlan.sa == "+mac+" &&  wlan.da == "+bssid+")) && eapol");
+                wireshard_fliterlist.add("");
+
+
+                wireshard_fliterlist.add(getRuleIndexTip()+" 查询wifi 与 mac  关联交互帧 认证 关联 断关联 断认证 eap:");
+                //    ((wlan.sa == 1c:5f:2b:5e:d5:53 &&  wlan.da == a4:50:46:44:c9:77 ) ||  (wlan.sa == a4:50:46:44:c9:77  &&  wlan.da ==  1c:5f:2b:5e:d5:53 )) && (wlan.fc == 0xc000 || eapol ||  wlan.fc.subtype == 0x000B  ||  wlan.fc.subtype == 0x0000  ||	 wlan.fc.type_subtype == 0x0001 )
+                wireshard_fliterlist.add("((wlan.sa == "+bssid+" &&  wlan.da == "+mac+" ) || (wlan.sa == "+mac+" &&  wlan.da == "+bssid+"))  && (wlan.fc == 0xc000 || eapol ||  wlan.fc.subtype == 0x000B  ||  wlan.fc.subtype == 0x0000  ||\t wlan.fc.type_subtype == 0x0001 )");
+                wireshard_fliterlist.add("");
+
+
+                wireshard_fliterlist.add(getRuleIndexTip()+" Mac 和 Bssid 所有交互帧   不包含广播");
+                //  (wlan.sa == 1c:5f:2b:5e:d5:53 &&  wlan.da == a4:50:46:44:c9:77 ) ||  (wlan.sa == a4:50:46:44:c9:77  &&  wlan.da ==  1c:5f:2b:5e:d5:53 )
+                wireshard_fliterlist.add("(wlan.sa == "+bssid+" &&  wlan.da == "+mac+" ) || (wlan.sa == "+mac+" &&  wlan.da == "+bssid+" )");
+                wireshard_fliterlist.add("");
+
+
+                wireshard_fliterlist.add(getRuleIndexTip()+" Mac 和 Bssid 所有交互帧   包含广播");
+                //  (wlan.sa == 1c:5f:2b:5e:d5:53 &&  wlan.da == a4:50:46:44:c9:77 ) ||  (wlan.sa == a4:50:46:44:c9:77  &&  wlan.da ==  1c:5f:2b:5e:d5:53 ) || (wlan.sa == 1c:5f:2b:5e:d5:53 && wlan.da == ff:ff:ff:ff:ff:ff) || (wlan.sa == a4:50:46:44:c9:77 && wlan.da == ff:ff:ff:ff:ff:ff)
+                wireshard_fliterlist.add("((wlan.sa == "+bssid+" &&  wlan.da == "+mac+" ) || (wlan.sa == "+mac+" &&  wlan.da == "+bssid+")) || (wlan.sa == "+bssid+" && wlan.da == ff:ff:ff:ff:ff:ff) || (wlan.sa == "+mac+" && wlan.da == ff:ff:ff:ff:ff:ff)\n");
+                wireshard_fliterlist.add("");
+
+
+
+
+
+                return wireshard_fliterlist;
+
+
+            }
+        }
+
+
+        // 11:22:33:44:55 这样的格式 才是 Mac 地址
+        boolean isMacAddress(String  inputMacAddress ){
+        boolean isMac = false ;
+
+        if(inputMacAddress == null){
+            return  false;
+        }
+
+        int  length_no_spilit = inputMacAddress.replace(":","").trim().length();
+
+        if(length_no_spilit != 12){
+            System.out.println("当前 输入的 Mac 地址 inputMacAddress="+inputMacAddress+" 去除:号后长度不是12位!  无效地址! ");
+        return false;
+        }
+
+
+        String[] macSplitArr = inputMacAddress.split(":");
+
+        if(macSplitArr.length == 6){
+            for (int i = 0; i < macSplitArr.length; i++) {
+                if(macSplitArr[i].length() != 2){
+                    System.out.println("当前 输入的 Mac 地址 inputMacAddress="+inputMacAddress+" 分割后 长度不为2  不是规范的Mac地址!  无效地址! ");
+                    return  false;
+                }
+            }
+            return true;
+        }
+
+            System.out.println("当前 输入的 Mac 地址 inputMacAddress="+inputMacAddress+" 长度 规范的Mac地址!  无效地址! ");
+
+        return isMac;
+
+        }
+
+        @Override
+        String simpleDesc() {
+            return "  \n"
+                    + Cur_Bat_Name  + " #_"+rule_index+" bssid_1c:5f:2b:5e:d5:53  mac_a4:50:46:44:c9:77   ###输入 bssid_1c:5f:2b:5e:d5:53【CMCC】  mac_a4:50:46:44:c9:77【Mix3】  来统计所有的 wireshark 过滤条件  可多输入   一比一匹配 \n"
+
+                    ;
+        }
+
+        @Override
+        boolean allowEmptyDirFileList() {
+            return true;
+        }
+
+
+    }
 
     static String Rule61_showWirelessDialog_Method ="";  // 动态从 Zmain-Life 读取 showWirelessDialog 函数
 

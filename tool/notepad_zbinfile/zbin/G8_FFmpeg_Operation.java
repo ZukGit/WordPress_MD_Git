@@ -1229,8 +1229,9 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
         String ruleTip(String type, int index, String batName, OS_TYPE curType) {
             return
                     "\n"+Cur_Bat_Name+ " "+rule_index+ "     ##  把当前的 .vob  .wmv  .mkv .ts .mov .avi .m4v  文件转为 mp4文件 生成在 目录 Mov_To_Mp4_时间戳 目录中   \n"+
-                            "\n"+Cur_Bat_Name+ "  "+rule_index+ "    ##  把当前的 .vob   .wmv .mkv .avi .ts .mov .m4v  文件转为 mp4文件 生成在 目录 Mov_To_Mp4_时间戳 目录中  \n"+
-                            "\n"+Cur_Bat_Name+ "  "+rule_index+ " samedir_true   ##  把当前的  .vob .wmv .mkv .avi .ts .mov .m4v  文件转为 mp4文件 生成在 当前相同目录中  并删除原始文件  \n" ; }
+                    "\n"+Cur_Bat_Name+ "  "+rule_index+ "    ##  把当前的 .vob   .wmv .mkv .avi .ts .mov .m4v  文件转为 mp4文件 生成在 目录 Mov_To_Mp4_时间戳 目录中  \n"+
+                    "\n"+Cur_Bat_Name+ "  "+rule_index+ " samedir_true   ##  把当前的  .vob .wmv .mkv .avi .ts .mov .m4v  文件转为 mp4文件 生成在 当前相同目录中  并删除原始文件  \n"
+            ; }
 
 
 
@@ -1279,6 +1280,9 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
                     command = ffmpeg_path +" -i "+movFileAbs  + "   -c:v copy -c:a copy -y   " + target_mp4_abs_path;
                 } else if(type.endsWith("ts")){
                     command = ffmpeg_path +" -i "+movFileAbs  + "  -vcodec copy -absf aac_adtstoasc   " + target_mp4_abs_path;
+                } else if(type.endsWith("mov")){
+                    // ffmpeg -i 2.mov -vcodec libx264 -preset fast -crf 20 -y -vf "scale=1920:-1" -acodec libmp3lame -ab 128k new_2.mp4
+                    command = ffmpeg_path +" -i "+movFileAbs  + " -vcodec libx264 -preset fast -crf 20 -y -vf \"scale=1920:-1\" -acodec libmp3lame -ab 128k   " + target_mp4_abs_path;
                 }else{
                     command = ffmpeg_path +" -i "+movFileAbs  + "  -vcodec copy -acodec copy  " + target_mp4_abs_path;
                 }
