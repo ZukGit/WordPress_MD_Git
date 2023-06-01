@@ -565,6 +565,33 @@ public class G2_ApplyRuleFor_TypeFile {
 
                 // bssid_1c:5f:2b:5e:d5:53  mac_a4:50:46:44:c9:77
 //                (wlan.sa == 1c:5f:2b:5e:d5:53 ||  wlan.da == 1c:5f:2b:5e:d5:53 )
+                wireshard_fliterlist.add("______________ 常用过滤条件 ______________");
+                wireshard_fliterlist.add("wlan.fc.type_subtype == 0x0000            ## Type/Subtype: Association Request (0x0000)");
+                wireshard_fliterlist.add("wlan.fc.type_subtype == 0x0001            ## Type/Subtype: Association Response (0x0001)");
+                wireshard_fliterlist.add("wlan.fc.type_subtype == 0x0008            ## Type/Subtype: Beacon frame (0x0008)");
+                wireshard_fliterlist.add("wlan.fc.type_subtype == 0x000b            ## Type/Subtype: Authentication (0x000b)");
+                wireshard_fliterlist.add("wlan.fc.type_subtype == 0x000c            ## Type/Subtype: Deauthentication (0x000c)");
+                wireshard_fliterlist.add("wlan.fc.type_subtype == 0x000d            ## Type/Subtype: Action (0x000d)");
+                wireshard_fliterlist.add("wlan.fc.type_subtype == 0x000e            ## Type/Subtype: Action No Ack (0x000e) ACK帧");
+                wireshard_fliterlist.add("wlan.fc.type_subtype == 0x001b            ## Type/Subtype: Request-to-send (0x001b)");
+                wireshard_fliterlist.add("wlan.fc.type_subtype == 0x001c            ## Type/Subtype: Clear-to-send (0x001c)");
+                wireshard_fliterlist.add("wlan.fc.type_subtype == 0x001d            ## Type/Subtype: Acknowledgement (0x001d)");
+                wireshard_fliterlist.add("wlan.fc.type_subtype == 0x002c            ## Type/Subtype: QoS Null function (No data) (0x002c)");
+                wireshard_fliterlist.add("wlan.fc.type_subtype == 0x0024            ## Type/Subtype: Null function (No data) (0x0024)");
+                wireshard_fliterlist.add("wlan.fc.type_subtype == 0x0028            ## Qos_Data");
+                wireshard_fliterlist.add("wlan.fc.type_subtype == 0x0028  && eap    ## Qos_Data &  EAPOL Key (Message 1 of 4) 帧");
+                wireshard_fliterlist.add("");
+                wireshard_fliterlist.add("## Action code: [wlan.fc.type_subtype == 0x000d]");
+                wireshard_fliterlist.add("wlan.fixed.action_code == 0x00   ## Action code: Add Block Ack Request (0x00)");
+                wireshard_fliterlist.add("wlan.fixed.action_code == 0x01   ## Action code: Add Block Ack Response (0x01)");
+                wireshard_fliterlist.add("wlan.fixed.action_code == 0x02   ## Action code: Delete Block Ack (0x02) (当次DUT发送 Qos Data 传输完成标识)");
+                wireshard_fliterlist.add("wlan.fixed.action_code == 5      ## Action code: Neighbor Report Response (5)");
+                wireshard_fliterlist.add("");
+                wireshard_fliterlist.add("wlan.fixed.baparams.policy == 1  ##  Block Ack Policy: Immediate Block Ack   immediate BA 立即应答：适用于高带宽，低时延业务；");
+                wireshard_fliterlist.add("wlan.fixed.baparams.policy == 0  ##  Block Ack Policy: delayed Block Ack   delayed   BA 延迟应答：适用于时延可容忍业务。");
+                wireshard_fliterlist.add("");
+                wireshard_fliterlist.add("__________________________________");
+
 
 
                 wireshard_fliterlist.add(getRuleIndexTip()+" 查询所有wifi eap 认证帧:");
@@ -581,13 +608,13 @@ public class G2_ApplyRuleFor_TypeFile {
 
                 wireshard_fliterlist.add(getRuleIndexTip()+" 查询wifi 与 mac  关联交互帧 认证 关联 断关联 断认证 eap:");
                 //    ((wlan.sa == 1c:5f:2b:5e:d5:53 &&  wlan.da == a4:50:46:44:c9:77 ) ||  (wlan.sa == a4:50:46:44:c9:77  &&  wlan.da ==  1c:5f:2b:5e:d5:53 )) && (wlan.fc == 0xc000 || eapol ||  wlan.fc.subtype == 0x000B  ||  wlan.fc.subtype == 0x0000  ||	 wlan.fc.type_subtype == 0x0001 )
-                wireshard_fliterlist.add("((wlan.sa == "+bssid+" &&  wlan.da == "+mac+" ) || (wlan.sa == "+mac+" &&  wlan.da == "+bssid+"))  && (wlan.fc == 0xc000 || eapol ||  wlan.fc.subtype == 0x000B  ||  wlan.fc.subtype == 0x0000  ||\t wlan.fc.type_subtype == 0x0001 )");
+                wireshard_fliterlist.add("((wlan.sa == "+bssid+" &&  wlan.da == "+mac+" ) || (wlan.sa == "+mac+" &&  wlan.da == "+bssid+"))  && (wlan.fc == 0xc000 || eapol ||  wlan.fc.subtype == 0x000B  ||  wlan.fc.subtype == 0x0000  || wlan.fc.type_subtype == 0x0001 )");
                 wireshard_fliterlist.add("");
 
 
                 wireshard_fliterlist.add(getRuleIndexTip()+" Mac 和 Bssid 所有交互帧   不包含广播");
                 //  (wlan.sa == 1c:5f:2b:5e:d5:53 &&  wlan.da == a4:50:46:44:c9:77 ) ||  (wlan.sa == a4:50:46:44:c9:77  &&  wlan.da ==  1c:5f:2b:5e:d5:53 )
-                wireshard_fliterlist.add("(wlan.sa == "+bssid+" &&  wlan.da == "+mac+" ) || (wlan.sa == "+mac+" &&  wlan.da == "+bssid+" )");
+                wireshard_fliterlist.add("((wlan.sa == "+bssid+" &&  wlan.da == "+mac+" ) || (wlan.sa == "+mac+" &&  wlan.da == "+bssid+" )) ");
                 wireshard_fliterlist.add("");
 
 
@@ -597,7 +624,9 @@ public class G2_ApplyRuleFor_TypeFile {
                 wireshard_fliterlist.add("");
 
 
-
+                wireshard_fliterlist.add(getRuleIndexTip()+" Mac 和 Bssid  Block_Ack 交互过程");
+                wireshard_fliterlist.add("((wlan.sa == "+bssid+" &&  wlan.da == "+mac+" ) || (wlan.sa == "+mac+" &&  wlan.da == "+bssid+"))  && ( wlan.fixed.action_code == 0x00 || wlan.fixed.action_code == 0x01 || wlan.fc.type_subtype == 0x000e || wlan.fc == 0xc000 || eapol ||  wlan.fc.subtype == 0x000B  ||  wlan.fc.subtype == 0x0000  || wlan.fc.type_subtype == 0x0001 )");
+                wireshard_fliterlist.add("");
 
 
                 return wireshard_fliterlist;
@@ -682,6 +711,15 @@ public class G2_ApplyRuleFor_TypeFile {
         File AOSP_Settings_Res_LayoutDir;   // 在 AOSP_Settings 中对应的 放置 res/layout/wireless_xxxx.xml 文件的目录
 
 
+
+        ArrayList<File> G2_Zmain_Life_Source_Res_Drable_FileList;
+        ArrayList<File> G2_Zmain_Life_Source_Res_DrableV24_FileList;
+         File G2_Zmain_Life_Source_Res_DrableDir;   // 当前 需要 拷贝的  res/drable 下的文件和目录
+        File G2_Zmain_Life_Source_Res_DrableV24Dir;   // 当前 需要 拷贝的  res/drable-v24 下的文件和目录
+         File AOSP_Settings_Res_DrableDir;   // 在 AOSP_Settings 中对应的 放置 res/drable/wireless_xxxx 文件的目录
+        File AOSP_Settings_Res_DrableV24Dir;   // 在 AOSP_Settings 中对应的 放置 res/drable-v24/wireless_xxxx 文件的目录
+
+
         // 以 wireless_ 开头  activity.java 为结尾的文件
         ArrayList<File> G2_Zmain_Life_Source_Wireless_Activity_FileList;
 
@@ -712,6 +750,10 @@ public class G2_ApplyRuleFor_TypeFile {
             G2_Zmain_Life_Source_Wireless_Java_FileList = new ArrayList<File>();
             G2_Zmain_Life_Source_Res_WiressXml_FileList  = new ArrayList<File>();
             G2_Zmain_Life_Source_Wireless_Activity_FileList = new ArrayList<File>();
+            G2_Zmain_Life_Source_Res_Drable_FileList   = new ArrayList<File>();
+            G2_Zmain_Life_Source_Res_DrableV24_FileList   = new ArrayList<File>();
+
+
             isAOSPSettings_Already_Embedded = false;
         }
 
@@ -750,6 +792,10 @@ public class G2_ApplyRuleFor_TypeFile {
               AOSP_Settings_Target_Wireless_Java_Dir  = new File(curDirPath+File.separator+"/packages/apps/Settings/src/com/android/settings/wifi/wireless/");
 
               AOSP_Settings_Res_LayoutDir  = new File(curDirPath+File.separator+"/packages/apps/Settings/res/layout/");
+
+            AOSP_Settings_Res_DrableDir  = new File(curDirPath+File.separator+"/packages/apps/Settings/res/drawable/");
+            AOSP_Settings_Res_DrableV24Dir = new File(curDirPath+File.separator+"/packages/apps/Settings/res/drawable-v24/");
+
 
 
             G2_Zmain_Life_Txt_TxtEdit_Fragment_showWirelessDialog_JavaFile = new File(G2_Zmain_Life_Source_Dir.getAbsoluteFile()+File.separator+"/app/src/main/java/com/and/zmain_life/fragment/Txt_TxtEdit_Fragment.java");
@@ -804,6 +850,58 @@ public class G2_ApplyRuleFor_TypeFile {
 
                  return false;
              }
+
+            G2_Zmain_Life_Source_Res_DrableDir = new File(G2_Zmain_Life_Source_Dir.getAbsoluteFile()+File.separator+"/app/src/main/res/drawable/");
+            G2_Zmain_Life_Source_Res_DrableV24Dir = new File(G2_Zmain_Life_Source_Dir.getAbsoluteFile()+File.separator+"/app/src/main/res/drawable-v24/");
+
+            if(G2_Zmain_Life_Source_Res_DrableDir.exists() || G2_Zmain_Life_Source_Res_DrableV24Dir.exists() ){
+
+                File[] mWirelessDrableFileArr = G2_Zmain_Life_Source_Res_DrableDir.listFiles();
+
+                if(mWirelessDrableFileArr == null || mWirelessDrableFileArr.length == 0){
+                    System.out.println("当前 修改Settings 逻辑来源 文件夹 G2_Zmain_Life_Source_Res_DrableDir ="+ G2_Zmain_Life_Source_Res_LayoutDir.getAbsolutePath()+" 不存在原始 Wireless_*.xml 配置 文件!");
+
+                } else {
+
+                    for (int i = 0; i < mWirelessDrableFileArr.length; i++) {
+                        File source_res_lauout_file = mWirelessDrableFileArr[i];
+                        String layout_file_name = source_res_lauout_file.getName();
+                        if(layout_file_name.toLowerCase().startsWith("wireless") ){
+                            G2_Zmain_Life_Source_Res_Drable_FileList.add(source_res_lauout_file);
+                        }
+                    }
+
+
+                }
+
+
+                File[] mWirelessDrableV24FileArr = G2_Zmain_Life_Source_Res_DrableV24Dir.listFiles();
+
+                if(mWirelessDrableV24FileArr == null || mWirelessDrableV24FileArr.length == 0){
+                    System.out.println("当前 修改Settings 逻辑来源 文件夹 G2_Zmain_Life_Source_Res_DrableV24Dir ="+ G2_Zmain_Life_Source_Res_DrableV24Dir.getAbsolutePath()+" 不存在原始 Wireless_*.xml 配置 文件!");
+
+                } else {
+
+                    for (int i = 0; i < mWirelessDrableV24FileArr.length; i++) {
+                        File source_res_lauout_file = mWirelessDrableV24FileArr[i];
+                        String layout_file_name = source_res_lauout_file.getName();
+                        if(layout_file_name.toLowerCase().startsWith("wireless") ){
+                            G2_Zmain_Life_Source_Res_DrableV24_FileList.add(source_res_lauout_file);
+                        }
+                    }
+
+
+                }
+
+
+
+
+            }
+
+
+
+
+
 
 
             G2_Zmain_Life_Source_Res_LayoutDir = new File(G2_Zmain_Life_Source_Dir.getAbsoluteFile()+File.separator+"/app/src/main/res/layout/");
@@ -897,6 +995,25 @@ public class G2_ApplyRuleFor_TypeFile {
                 fileCopy(src_res_layout_file,dst_res_layout_file);
                 System.out.println("res_layout["+i+"_"+G2_Zmain_Life_Source_Res_WiressXml_FileList.size() +"]:"+dst_res_layout_file.getAbsolutePath()+"复制完成!");
             }
+
+            //  复制 res_drable
+            for (int i = 0; i < G2_Zmain_Life_Source_Res_Drable_FileList.size() ; i++) {
+                File src_res_layout_file = G2_Zmain_Life_Source_Res_Drable_FileList.get(i);
+                File dst_res_layout_file = new File(AOSP_Settings_Res_DrableDir.getAbsolutePath()+File.separator+src_res_layout_file.getName());
+                fileCopy(src_res_layout_file,dst_res_layout_file);
+                System.out.println("res_drable["+i+"_"+G2_Zmain_Life_Source_Res_Drable_FileList.size() +"]:"+dst_res_layout_file.getAbsolutePath()+"复制完成!");
+            }
+
+            //  复制 res_drable-V24
+            for (int i = 0; i < G2_Zmain_Life_Source_Res_DrableV24_FileList.size() ; i++) {
+                File src_res_layout_file = G2_Zmain_Life_Source_Res_DrableV24_FileList.get(i);
+                File dst_res_layout_file = new File(AOSP_Settings_Res_DrableV24Dir.getAbsolutePath()+File.separator+src_res_layout_file.getName());
+                fileCopy(src_res_layout_file,dst_res_layout_file);
+                System.out.println("res_drable-V24["+i+"_"+G2_Zmain_Life_Source_Res_DrableV24_FileList.size() +"]:"+dst_res_layout_file.getAbsolutePath()+"复制完成!");
+            }
+
+
+
 
             // Wireless_
             //  复制 java_wireless

@@ -4424,13 +4424,9 @@ goto:eof
 
 :rule27vwirelessadbconnect_func_4x0
 rem ======================================== rule27vwirelessadbconnect_func_4x0
-rem rule_tip: %init_input_0% _27_   192ipend3_115  ipport_44971  paircode_300827 pairport_43173     ## 对当前输入的 192ipend3(IP地址最后三位) 192.168.0.115 的 安卓设置进行无线连接
+rem rule_tip: %init_input_0% _27_   ip_10.106.20.115  ipport_44971  paircode_300827 pairport_43173     ## 对当前输入的 ip 地址 10.106.20.115 的 安卓设置进行无线连接
 
-rem rule_tip: %init_input_0% _27_   10ipend3_115  ipport_44971  paircode_300827 pairport_43173     ## 对当前输入的 10ipend3(IP地址最后三位) 10.106.20.115 的 安卓设置进行无线连接
-
-rem rule_tip: %init_input_0% _27_   10ipend3_  ipport_  paircode_ pairport_     ## 对当前输入的 10ipend3(IP地址最后三位) 10.106.20.115 的 安卓设置进行无线连接
-
-rem rule_tip: %init_input_0% _27_   192ipend3_  ipport_  paircode_ pairport_     ## 对当前输入的 192ipend3(IP地址最后三位) 192.168.0.115 的 安卓设置进行无线连接
+rem rule_tip: %init_input_0% _27_   ip_192.168.0.2  ipport_44971  paircode_300827 pairport_43173     ## 对当前输入的 10ipend3(IP地址最后三位) 192.168.0.2  的 安卓设置进行无线连接
 
 rem desc: 对无线安卓调试设备进行无线连接adb操作
 rem sample: 
@@ -4447,27 +4443,47 @@ set rule27vwirelessadbconnect_dynamic_param3=%init_input_4%
 set rule27vwirelessadbconnect_dynamic_param4=%init_input_5% 
 rem Param1______192ipend3_115        Param1______10ipend3_115
 set ipaddress=
-set ipaddress_pre=192.168.0.
+set ipaddress_pre=
 set ipaddress_end3_number=
+
 call :isstartwith_func_2x1 %init_input_2%  192ipend3_ 
 set is192ipaddress=!isstartwith_return_1!
 if "!is192ipaddress!"=="true" (
-set ipaddress_pre=192.168.0.
+set ipaddress_pre=
 call :stringreplace_func_3x1 %init_input_2%  192ipend3_  ""
 set ipaddress_end3_number=!stringreplace_return_1!
 ) else (
 call :isstartwith_func_2x1 %init_input_2%  10ipend3_ 
 set is10ipaddress=!isstartwith_return_1!
 if "!is10ipaddress!"=="true" (
-set ipaddress_pre=10.106.20.
+set ipaddress_pre=
 call :stringreplace_func_3x1 %init_input_2%  10ipend3_  ""
 set ipaddress_end3_number=!stringreplace_return_1!
 )
 )
+
+call :isstartwith_func_2x1 %init_input_2%  ip_ 
+set isip_input=!isstartwith_return_1!
+if "!isip_input!"=="true" (
+call :stringreplace_func_3x1 %init_input_2%  ip_  ""
+set ip_address_value=!stringreplace_return_1!
+set ipaddress_end3_number=!stringreplace_return_1!
+set ipaddress_pre=
+echo ip_address_value=!ip_address_value!  
+echo ipaddress_pre=!ipaddress_pre!  
+echo ipaddress_end3_number=!ipaddress_end3_number!
+)
+
+echo 1_ip_address_value=!ip_address_value!  
+echo 1_ipaddress_pre=!ipaddress_pre!  
+echo 1_ipaddress_end3_number=!ipaddress_end3_number!
+
 echo ipaddress_pre=!ipaddress_pre!
 echo ipaddress_end3_number=!ipaddress_end3_number!
 set ipaddress=!ipaddress_pre!!ipaddress_end3_number!
 echo ipaddress=!ipaddress!
+
+
 rem Param2______ipport_44971      
 set ipport=
 call :stringreplace_func_3x1 %init_input_3%  ipport_  ""
@@ -5601,13 +5617,9 @@ echo %init_input_0% _26_  mkdir_zmain  ##  在当前目录创建 zmain 对应的
 
 echo %init_input_0% _26_  mkdir_yymmdd_1970zvi  ##  在当前目录创建 temp_media 对应日期的 1970zvi 目录
 
-echo %init_input_0% _27_   192ipend3_115  ipport_44971  paircode_300827 pairport_43173     ## 对当前输入的 192ipend3(IP地址最后三位) 192.168.0.115 的 安卓设置进行无线连接
+echo %init_input_0% _27_   ip_192.168.0.2  ipport_44971  paircode_300827 pairport_43173     ## 对当前输入的 ip 192.168.0.115 的 安卓设置进行无线连接
 
-echo %init_input_0% _27_   10ipend3_115  ipport_44971  paircode_300827 pairport_43173     ## 对当前输入的 10ipend3(IP地址最后三位) 10.106.20.115 的 安卓设置进行无线连接
-
-echo %init_input_0% _27_   10ipend3_  ipport_  paircode_ pairport_     ## 对当前输入的 10ipend3(IP地址最后三位) 10.106.20.115 的 安卓设置进行无线连接
-
-echo %init_input_0% _27_   192ipend3_  ipport_  paircode_ pairport_     ## 对当前输入的 192ipend3(IP地址最后三位) 192.168.0.115 的 安卓设置进行无线连接
+echo %init_input_0% _27_   ip_10.106.20.115   ipport_44971  paircode_300827 pairport_43173     ## 对当前输入的 ip 10.106.20.115 的 安卓设置进行无线连接
 
 echo %init_input_0% _28_   mediafilter_true  ## 搜索所有(包含孙文件)当前目录下的所有多媒体文件 把它们 统一归类到 一个文件类型的文件夹Z_jpg Z_mp4 Z_gif Z_avi Z_webp 中
 
