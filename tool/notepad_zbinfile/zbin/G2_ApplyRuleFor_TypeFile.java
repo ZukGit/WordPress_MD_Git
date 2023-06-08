@@ -566,6 +566,16 @@ public class G2_ApplyRuleFor_TypeFile {
                 // bssid_1c:5f:2b:5e:d5:53  mac_a4:50:46:44:c9:77
 //                (wlan.sa == 1c:5f:2b:5e:d5:53 ||  wlan.da == 1c:5f:2b:5e:d5:53 )
                 wireshard_fliterlist.add("______________ 常用过滤条件 ______________");
+                wireshard_fliterlist.add("802.11X eap 认证中 区分出 eap 认证中的 第 1|2|3|4 次握手包 可以用于区分  DUT  和 热点 ");
+                wireshard_fliterlist.add("wlan_rsna_eapol.keydes.key_info.secure == 0 && wlan_rsna_eapol.keydes.key_info.key_ack == 1  ## DUT -> BSS (eap1)");
+                wireshard_fliterlist.add("wlan_rsna_eapol.keydes.key_info.secure == 0 && wlan_rsna_eapol.keydes.key_info.key_ack == 0  ## BSS -> DUT (eap2)");
+                wireshard_fliterlist.add("wlan_rsna_eapol.keydes.key_info.secure == 1 && wlan_rsna_eapol.keydes.key_info.key_ack == 1  ## DUT -> BSS (eap3)");
+                wireshard_fliterlist.add("wlan_rsna_eapol.keydes.key_info.secure == 1 && wlan_rsna_eapol.keydes.key_info.key_ack == 0  ## BSS -> DUT (eap4)");
+                wireshard_fliterlist.add("");
+                wireshard_fliterlist.add("");
+
+                wireshard_fliterlist.add("");
+                wireshard_fliterlist.add("");
                 wireshard_fliterlist.add("wlan.fc.type_subtype == 0x0000            ## Type/Subtype: Association Request (0x0000)");
                 wireshard_fliterlist.add("wlan.fc.type_subtype == 0x0001            ## Type/Subtype: Association Response (0x0001)");
                 wireshard_fliterlist.add("wlan.fc.type_subtype == 0x0008            ## Type/Subtype: Beacon frame (0x0008)");
@@ -590,6 +600,8 @@ public class G2_ApplyRuleFor_TypeFile {
                 wireshard_fliterlist.add("wlan.fixed.baparams.policy == 1  ##  Block Ack Policy: Immediate Block Ack   immediate BA 立即应答：适用于高带宽，低时延业务；");
                 wireshard_fliterlist.add("wlan.fixed.baparams.policy == 0  ##  Block Ack Policy: delayed Block Ack   delayed   BA 延迟应答：适用于时延可容忍业务。");
                 wireshard_fliterlist.add("");
+
+
                 wireshard_fliterlist.add("__________________________________");
 
 
@@ -611,14 +623,25 @@ public class G2_ApplyRuleFor_TypeFile {
                 wireshard_fliterlist.add("((wlan.sa == "+bssid+" &&  wlan.da == "+mac+" ) || (wlan.sa == "+mac+" &&  wlan.da == "+bssid+"))  && (wlan.fc == 0xc000 || eapol ||  wlan.fc.subtype == 0x000B  ||  wlan.fc.subtype == 0x0000  || wlan.fc.type_subtype == 0x0001 )");
                 wireshard_fliterlist.add("");
 
+                wireshard_fliterlist.add(getRuleIndexTip()+" Mac 和 Bssid 所有交互帧     da=ra   ta=sa  或者 da不存在 sa不存在 只包含 ta和ra");
+                //  wlan.addr == 96:8d:a8:12:fc:ea && wlan.addr == D0:4D:C6:CB:55:25
+                wireshard_fliterlist.add("( wlan.addr == "+bssid+" && wlan.addr == "+mac+" ) ");
+                wireshard_fliterlist.add("");
 
-                wireshard_fliterlist.add(getRuleIndexTip()+" Mac 和 Bssid 所有交互帧   不包含广播");
+
+                wireshard_fliterlist.add(getRuleIndexTip()+" Mac 和 Bssid 所有交互帧   ");
+                //  wlan.addr == 96:8d:a8:12:fc:ea && wlan.addr == D0:4D:C6:CB:55:25
+                wireshard_fliterlist.add("( wlan.addr == "+bssid+" && wlan.addr == "+mac+" )  && ( wlan.fixed.action_code == 0x00 || wlan.fixed.action_code == 0x01 || wlan.fc.type_subtype == 0x000e || wlan.fc == 0xc000 || eapol ||  wlan.fc.subtype == 0x000B  ||  wlan.fc.subtype == 0x0000  || wlan.fc.type_subtype == 0x0001 )");
+                wireshard_fliterlist.add("");
+
+
+                wireshard_fliterlist.add(getRuleIndexTip()+" Mac 和 Bssid 所有交互帧  da=ra 必须存在  ta=sa 必须存在  不包含广播  da  ");
                 //  (wlan.sa == 1c:5f:2b:5e:d5:53 &&  wlan.da == a4:50:46:44:c9:77 ) ||  (wlan.sa == a4:50:46:44:c9:77  &&  wlan.da ==  1c:5f:2b:5e:d5:53 )
                 wireshard_fliterlist.add("((wlan.sa == "+bssid+" &&  wlan.da == "+mac+" ) || (wlan.sa == "+mac+" &&  wlan.da == "+bssid+" )) ");
                 wireshard_fliterlist.add("");
 
 
-                wireshard_fliterlist.add(getRuleIndexTip()+" Mac 和 Bssid 所有交互帧   包含广播");
+                wireshard_fliterlist.add(getRuleIndexTip()+" Mac 和 Bssid 所有交互帧   包含广播 da=ra 必须存在    ta=sa 必须存在");
                 //  (wlan.sa == 1c:5f:2b:5e:d5:53 &&  wlan.da == a4:50:46:44:c9:77 ) ||  (wlan.sa == a4:50:46:44:c9:77  &&  wlan.da ==  1c:5f:2b:5e:d5:53 ) || (wlan.sa == 1c:5f:2b:5e:d5:53 && wlan.da == ff:ff:ff:ff:ff:ff) || (wlan.sa == a4:50:46:44:c9:77 && wlan.da == ff:ff:ff:ff:ff:ff)
                 wireshard_fliterlist.add("((wlan.sa == "+bssid+" &&  wlan.da == "+mac+" ) || (wlan.sa == "+mac+" &&  wlan.da == "+bssid+")) || (wlan.sa == "+bssid+" && wlan.da == ff:ff:ff:ff:ff:ff) || (wlan.sa == "+mac+" && wlan.da == ff:ff:ff:ff:ff:ff)\n");
                 wireshard_fliterlist.add("");
