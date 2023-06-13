@@ -61,6 +61,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.Collator;
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.List;
@@ -420,6 +421,209 @@ public class G2_ApplyRuleFor_TypeFile {
         //    bssid_11:11:11:11:55  mac_11:22:33:44:55   bssid_00:11:11:11:55  mac_aa:22:33:44:55
         realTypeRuleList.add(new Wifi_Wireshark_Fliter_Calcul_Rule62());
 
+
+        // 对当前目录 执行 打印 当前 结构的操作
+        realTypeRuleList.add(new Print_Dir_FileTree_Info_Rule63());
+
+
+
+    }
+
+
+    class Print_Dir_FileTree_Info_Rule63 extends Basic_Rule {
+
+
+        public class DefaultFileNameFileter implements FilenameFilter
+        {
+            @Override
+            public boolean accept(File dir, String name)
+            {
+
+                if(".git".equals(name) || name.startsWith(".")){
+                    return false;
+                }
+                return true;
+            }
+        }
+
+        String RootPath = null;
+
+        DefaultFileNameFileter defaultFileNameFileter=null;
+         NumberFormat onlyone_nf = new DecimalFormat("0");
+
+
+         int sum_file_count = 0 ;
+         int all_real_file_count = 0;
+         int all_dir_file_count = 0 ;
+
+        Print_Dir_FileTree_Info_Rule63() {
+            super("#", 63, 4);
+
+        }
+
+
+        @Override
+        ArrayList<File> applySubFileListRule4(ArrayList<File> curFileList,
+                                              HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList,
+                                              ArrayList<File> curRealFileList) {
+
+            ArrayList<String> dirTreeInfoList = new ArrayList<String>();
+
+
+            RootPath = curDirPath;
+
+            defaultFileNameFileter= new DefaultFileNameFileter();
+
+            File dir = new File(RootPath);
+
+            System.out.println();
+            System.out.println();
+            System.out.println();
+            System.out.println();
+            System.out.println();
+            System.out.println();
+
+
+            System.out.println("user.dir = "+ dir.getAbsolutePath());
+            printTreeFileAndDir(dir, defaultFileNameFileter,dirTreeInfoList);
+
+            dirTreeInfoList.add(0,"```\n["+sum_file_count+"_"+all_dir_file_count+"_"+all_real_file_count+"]_"+(new File(curDirPath)).getName());
+            dirTreeInfoList.add("");
+            dirTreeInfoList.add("```");
+
+            for (int i = 0; i < dirTreeInfoList.size(); i++) {
+                System.out.println(dirTreeInfoList.get(i));
+            }
+
+            writeContentToFile(G2_Temp_Text_File, dirTreeInfoList);
+            NotePadOpenTargetFile(G2_Temp_Text_File.getAbsolutePath());
+            return super.applySubFileListRule4(curFileList, subFileTypeMap, curDirList, curRealFileList);
+        }
+
+        public  void printTreeFileAndDir(File dir,FilenameFilter fileNameFilter, ArrayList<String> dirInfoList)
+        {
+            // 打印根目录
+            System.out.println(dir.getAbsolutePath());
+            printTreeFileAndDir(dir, fileNameFilter,dirInfoList ,"", 10);
+        }
+
+
+        private  void printTreeFileAndDir(File dir, FilenameFilter fileNameFilter, ArrayList<String> dirInfoList ,String prefix, int deep)
+        {
+            // 列出目录下的子目录
+            File[] childs = dir.listFiles(fileNameFilter);
+            if(childs == null){
+                return;
+            }
+
+            ArrayList<File> all_real_file_list = new       ArrayList<File>();
+            ArrayList<File> all_dir_file_list = new       ArrayList<File>();
+            sum_file_count = sum_file_count + childs.length;
+            for (int i = 0; i < childs.length; i++)
+            {
+
+                if (childs[i].isDirectory())
+                {
+                    all_dir_file_list.add(childs[i]);
+
+                } else {
+                    all_real_file_list.add(childs[i]);
+                }
+
+            }
+
+            ArrayList<File>  all_sorted_file_arr  = new       ArrayList<File>();
+            all_sorted_file_arr.addAll(all_real_file_list);
+            all_sorted_file_arr.addAll(all_dir_file_list);
+
+
+            all_real_file_count = all_real_file_count + all_real_file_list.size();
+
+            all_dir_file_count = all_dir_file_count + all_dir_file_list.size();
+
+            //  实体的 文件夹 靠近 前面   ， 目录 靠近 后面
+            // 遍历子目录
+            int real_file_index = 0 ;
+            int dir_file_index = 0 ;
+            for (int i = 0; i < all_sorted_file_arr.size(); i++)
+            {
+                // 本次递归的前缀
+                String thisPrefix = "";
+                // 下一个递归的前缀
+                String nextPrefix = "";
+                if (deep >= 0)
+                {
+                    // 如果不是最后一个元素
+                    if ((i + 1 < all_sorted_file_arr.size()))
+                    {
+                        nextPrefix = prefix + "│ ";
+                        thisPrefix = prefix + "├─";
+                    } else
+                    {
+                        nextPrefix = prefix + "  ";
+                        thisPrefix = prefix + "└─";
+                    }
+                }
+
+                if (all_sorted_file_arr.get(i).isDirectory())
+                {
+
+                    dir_file_index++;
+//                System.out.println(thisPrefix + all_sorted_file_arr.get(i).getName()+" ["+all_sorted_file_arr.get(i).getAbsolutePath()+"]");  // 文件夹  打印 全路径
+
+//                System.out.println(thisPrefix + all_sorted_file_arr.get(i).getName()+" ["+all_sorted_file_arr.get(i).getAbsolutePath()+"]");  // 文件夹  打印 全路径
+                    int childFileArr_size = 0 ;
+                    if(all_sorted_file_arr.get(i).listFiles(fileNameFilter) != null){
+                        childFileArr_size = all_sorted_file_arr.get(i).listFiles(fileNameFilter).length;
+                    }
+
+
+                    System.out.println(thisPrefix +"["+all_sorted_file_arr.size()+"_"+all_dir_file_list.size()+"_"+all_real_file_list.size()+"]["+all_dir_file_list.size()+"_"+(dir_file_index)+"]_["+childFileArr_size+"]  " + all_sorted_file_arr.get(i).getName()+" -> "+all_sorted_file_arr.get(i).getAbsolutePath().replace(RootPath,"")+"");
+                    dirInfoList.add(thisPrefix +"["+all_sorted_file_arr.size()+"_"+all_dir_file_list.size()+"_"+all_real_file_list.size()+"]["+all_dir_file_list.size()+"_"+(dir_file_index)+"]_["+childFileArr_size+"]  " + all_sorted_file_arr.get(i).getName()+" -> "+all_sorted_file_arr.get(i).getAbsolutePath().replace(RootPath,"")+"");
+
+                } else {
+                    real_file_index++;
+
+                    long file_size = all_sorted_file_arr.get(i).length();
+                    String file_size_MB_str = ""+ onlyone_nf.format(file_size / (1024d * 1024  )) + "-MB";
+
+//                System.out.println(thisPrefix + all_sorted_file_arr.get(i).getName()+"["+all_real_file_list.size()+"_"+(i+1)+"]");
+
+                    System.out.println(thisPrefix +"["+all_sorted_file_arr.size()+"_"+all_dir_file_list.size()+"_"+(all_real_file_list.size())+"]["+all_real_file_list.size()+"_"+(real_file_index)+"]_"+file_size_MB_str+"==="+ all_sorted_file_arr.get(i).getName());
+                    dirInfoList.add(thisPrefix +"["+all_sorted_file_arr.size()+"_"+all_dir_file_list.size()+"_"+(all_real_file_list.size())+"]["+all_real_file_list.size()+"_"+(real_file_index)+"]_"+file_size_MB_str+"==="+ all_sorted_file_arr.get(i).getName());
+
+
+                }
+
+
+
+
+                if (all_sorted_file_arr.get(i).isDirectory())
+                {
+                    printTreeFileAndDir(all_sorted_file_arr.get(i), fileNameFilter, dirInfoList , nextPrefix, deep + 1);
+                }
+            }
+        }
+
+
+        @Override
+        String simpleDesc() {
+            return "  \n"
+                    + Cur_Bat_Name  + " #_"+rule_index+"  ## 执行类似 tree 的相关程序 在"+G2_Temp_Text_File.getName()+"打印出所有文件列表 [文件总数_文件夹数_实体文件数][文件夹数_文件夹索引]_[文件夹下文件总数] \n"
+                    + Cur_Bat_Name  + " #_"+rule_index+"  ## 执行类似 tree 的相关程序 在"+G2_Temp_Text_File.getName()+"打印出所有文件列表 [文件总数_文件夹数_实体文件数][实体文件数_文件索引]_文件大小MB \n"
+
+                    ;
+        }
+
+        @Override
+        boolean allowEmptyDirFileList() {
+            return true;
+        }
+
+        @Override
+        boolean initParamsWithInputList(ArrayList<String> inputParamList) {
+            return super.initParamsWithInputList(inputParamList);
+        }
 
     }
 
