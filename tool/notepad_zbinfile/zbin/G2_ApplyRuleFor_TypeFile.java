@@ -23591,6 +23591,8 @@ public class G2_ApplyRuleFor_TypeFile {
         String originType;
         String targetType;
 
+        boolean isFileNameReplace = false;
+
         FileType_Rule_9() {
             super("#", 9, 3);
         }
@@ -23604,6 +23606,7 @@ public class G2_ApplyRuleFor_TypeFile {
                     + " #_9  _gif   把没有类型的文件名称修改为 jpg格式名称  \n " + Cur_Bat_Name + " #_9  png_jpg  把  jpg的格式转为png的格式 \n "
                     + Cur_Bat_Name + " #_9  mp4_   去除当前mp4的格式 使得其文件格式未知 \n " + Cur_Bat_Name
                     + " #_9  _mp4   把没有类型的文件名称修改为 mp4格式名称 \n " + Cur_Bat_Name
+                    + " #_9_replace  123_789   把当前 文件名包含 123 改为 789 (依据文件名 判断 而不是类型 ) 123.jpg -> 789.jpg \n " + Cur_Bat_Name
                     + " #_9  7z_7疫z   把当前 7z文件名后缀改为 7疫z 使得无法检测具体类型 \n " + Cur_Bat_Name
                     + " #_9  jpg_orig.jpg    把当前所有的 ori_jpg类型都转为jpg类型(有时存在类型.ori_jpg 这样的类型有用) \n " + Cur_Bat_Name
                     + " #_9  png_orig.jpg    把当前所有的 ori_jpg类型都转为jpg类型(有时存在类型.ori_jpg 这样的类型有用) \n " + Cur_Bat_Name
@@ -23611,9 +23614,26 @@ public class G2_ApplyRuleFor_TypeFile {
                     + " #_9  原类型_目标类型   把没有类型的文件名称【原类型】->【目标类型】 \n ";
         }
 
+
+
+        @Override
+        boolean initParams4InputParam(String inputParam) {
+
+            if (inputParam.contains("_replace")) {
+                isFileNameReplace = true;
+
+            }
+
+            return super.initParams4InputParam(inputParam);
+        }
+
+
         @Override
         boolean initParamsWithInputList(ArrayList<String> inputParamList) {
             boolean Flag = true;
+
+
+
 
             // 获取到装换的类型
             String inputFileTypeParams = inputParamList.get(inputParamList.size() - 1);
@@ -23672,41 +23692,73 @@ public class G2_ApplyRuleFor_TypeFile {
 
 
             }
-            curFilterFileTypeList.add(originType);
+            System.out.println("originType="+originType+"   targetType="+targetType+"  isFileNameReplace = "+ isFileNameReplace+"  Flag"+ Flag);
+            if(isFileNameReplace){
+                curFilterFileTypeList.add("*");
+            }else{
+                curFilterFileTypeList.add(originType);
+            }
+
 
             return super.initParamsWithInputList(inputParamList) && Flag;
         }
 
         @Override
+        boolean allowEmptyDirFileList() {
+            return true;
+        }
+
+
+
+        @Override
         ArrayList<File> applyFileListRule3(ArrayList<File> subFileList, HashMap<String, ArrayList<File>> fileTypeMap) {
 
+            System.out.println(rule_index+":  applyFileListRule3 execute!" );
+
+            int mFileNameReplace_index = 0 ;
             for (int i = 0; i < subFileList.size(); i++) {
                 File curFIle = subFileList.get(i);
                 String originName = curFIle.getName();
                 // 执行 修改文件类型的操作
 
-                // 1. 如果当前文件 过滤类型是 空 那么 可能就是没有任何的类型了
-                // 如果当前过滤的类型是 originType 是"" 空的话 那么就会过滤出所有的文件 那么只操作 不包含.的那些文件
-                if ("".equals(originType)) {
-                    if (originName.contains(".")) {
-                        continue; // 包含了 . 说明有类型 那么 不操作
-                    }
-                    String newName = originName + "." + targetType;
-                    tryReName(curFIle, newName);
-                } else {
-                    // 有具体的 过滤的文件
-                    String oldType = "." + originType;
-                    String newType = "." + targetType;
-                    if ("".equals(targetType)) {
-                        newType = "";
+                if(isFileNameReplace){  // 文件名称替换
+
+                    if(originName.contains(originType)){
+                        mFileNameReplace_index++;
+                        String newFileName  = originName.replaceAll(originType,targetType);
+                        tryReName(curFIle, newFileName);
+                        System.out.println("RenameFile["+mFileNameReplace_index+"]: "+curFIle.getName()+" --> "+newFileName);
                     }
 
-                    if (originName.contains(oldType)) {
-                        String newName = originName.replace(oldType, newType);
+
+                }else {   // 文件类型替换
+
+                    // 1. 如果当前文件 过滤类型是 空 那么 可能就是没有任何的类型了
+                    // 如果当前过滤的类型是 originType 是"" 空的话 那么就会过滤出所有的文件 那么只操作 不包含.的那些文件
+                    if ("".equals(originType)) {
+                        if (originName.contains(".")) {
+                            continue; // 包含了 . 说明有类型 那么 不操作
+                        }
+                        String newName = originName + "." + targetType;
                         tryReName(curFIle, newName);
+                    } else {
+                        // 有具体的 过滤的文件
+                        String oldType = "." + originType;
+                        String newType = "." + targetType;
+                        if ("".equals(targetType)) {
+                            newType = "";
+                        }
+
+                        if (originName.contains(oldType)) {
+                            String newName = originName.replace(oldType, newType);
+                            tryReName(curFIle, newName);
+                        }
+
                     }
 
                 }
+
+
 
             }
 
