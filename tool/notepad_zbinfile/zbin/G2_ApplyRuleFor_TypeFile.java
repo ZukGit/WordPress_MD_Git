@@ -425,10 +425,153 @@ public class G2_ApplyRuleFor_TypeFile {
         // 对当前目录 执行 打印 当前 结构的操作
         realTypeRuleList.add(new Print_Dir_FileTree_Info_Rule63());
 
-
+        //  对当前  依据  md5_type  组成的规则的文件  还原为  md5.type 这样的 文件
+        realTypeRuleList.add(new Make_Md5Type_Hide_File_Back_To_FileType_Rule64());
 
     }
 
+    class Make_Md5Type_Hide_File_Back_To_FileType_Rule64 extends Basic_Rule {
+        boolean isDirOperation; // 是否没有输入 xlsx 文件 而是 输入了一个 目录 默认shell 目录 已经 输入的目录
+
+        File inputDirFile;
+        ArrayList<File> inputDirFileList;
+
+        Make_Md5Type_Hide_File_Back_To_FileType_Rule64() {
+            super("#", 64, 3); //
+            inputDirFileList = new ArrayList<File>();
+            inputDirFile = null;
+            isDirOperation = false;
+
+        }
+
+        @Override
+        boolean allowEmptyDirFileList() {
+            // TODO Auto-generated method stub
+            return true;
+        }
+
+        @Override
+        ArrayList<File> applyFileListRule3(ArrayList<File> subFileList, HashMap<String, ArrayList<File>> fileTypeMap) {
+            // TODO Auto-generated method stub
+
+
+            int rename_file_count = 0 ;
+            for (int i = 0; i < inputDirFileList.size(); i++) {
+                File inputRealFile = inputDirFileList.get(i);
+                String realFileName = inputRealFile.getName();
+                String md5name =  getMD5Three(inputRealFile.getAbsolutePath());
+
+                String fileType_name = realFileName;
+                if(realFileName.startsWith(md5name+"_")){   // 符合规则的文件  进行处理
+
+                    fileType_name = fileType_name.replace("_",".");
+
+                   // 从 adafagfea_txt   转为 adafagfea.txt
+//                    File filetype_name = new File(inputDirFile.getAbsolutePath() + File.separator + fileType_name);
+
+                    tryReName(inputRealFile,fileType_name);
+                    rename_file_count++;
+
+
+                } else{    // 不符合规则的文件   不主动操作
+
+                }
+
+
+
+            }
+            System.out.println("当前源文件总数["+inputDirFileList.size()+"] 更新文件总数["+rename_file_count+"]  不符合md5_type规则文件数["+(inputDirFileList.size() - rename_file_count)+"]");
+
+            return super.applyFileListRule3(subFileList, fileTypeMap);
+        }
+
+        @Override
+        String simpleDesc() {
+
+            return Cur_Bat_Name + " #_" + rule_index
+                    + "   ### 对当前  依据  md5_type  组成的规则的文件  还原为  md5.type 这样的 文件   \n"
+                    + Cur_Bat_Name + " #_" + rule_index
+                    + "    ### 对当前  依据  md5_type  组成的规则的文件  还原为  md5.type 这样的 文件    \n"
+                  ;
+        }
+
+
+
+        @Override
+        boolean initParamsWithInputList(ArrayList<String> inputParamList) {
+
+            for (int i = 0; i < inputParamList.size(); i++) {
+                String strInput = inputParamList.get(i);
+
+                File tempFile = new File(curDirPath + File.separator + strInput);
+                if (tempFile.exists() && !tempFile.isDirectory()) {
+                    String inputFileName = tempFile.getName().toLowerCase();
+
+                    inputDirFileList.add(tempFile);
+
+
+                }
+
+                File inputDir = new File(strInput);
+                if (inputDir.exists() && inputDir.isDirectory()) {
+                    isDirOperation = true;
+                    inputDirFile = inputDir;
+                }
+
+                System.out.println("initParamsWithInputList[" + i + "_"+inputParamList.size()+"] = " + strInput + "  inputDir.exists()="
+                        + inputDir.exists() + "  inputDir.isDirectory()=" + inputDir.isDirectory());
+
+            }
+
+            if(inputDirFile == null || !inputDirFile.exists()){
+
+                inputDirFile = curDirFile;
+            }
+
+            System.out.println("输入文件夹转为当前 shell  路径  :  inputDirFile = "+ inputDirFile);
+            if (inputDirFile != null) {
+                File[] listArr = inputDirFile.listFiles();
+                if (listArr == null || listArr.length == 0) {
+                    System.out.println("当前 输入的目录  " + inputDirFile.getAbsolutePath() + "没有 任何文件操作!!");
+
+                    return false;
+                }
+                for (int i = 0; i < listArr.length; i++) {
+                    File fileItem = listArr[i];
+
+                    String inputFileName = fileItem.getName().toLowerCase();
+                        inputDirFileList.add(fileItem);
+
+                    System.out.println(
+                            "inputDir_xlsx[" + i + "] = " + fileItem.getAbsolutePath() + "  Size=" + fileItem.length());
+
+                }
+
+            }
+
+            if (inputDirFileList.size() == 0) {
+                System.out.println(
+                        "当前 输入的目录  inputDirFile =" + (inputDirFile == null ? "null" : inputDirFile.getAbsolutePath())
+                                + "没有 任何类型文件进行操作!!");
+
+                return false;
+
+            }
+            if (inputDirFile == null) {
+                System.out.println("ZXX inputDirFile = null " + " inputDirFileList.size()=" + inputDirFileList.size()
+                        + "   isDirOperation=" + isDirOperation);
+
+            } else {
+                System.out.println("ZXX inputDirFile =" + inputDirFile.getAbsolutePath() + "    inputDirFileList.size()="
+                        + inputDirFileList.size() + "   isDirOperation=" + isDirOperation);
+
+            }
+
+            // TODO Auto-generated method stub
+            return super.initParamsWithInputList(inputParamList);
+        }
+
+    }
 
     class Print_Dir_FileTree_Info_Rule63 extends Basic_Rule {
 
@@ -449,12 +592,12 @@ public class G2_ApplyRuleFor_TypeFile {
         String RootPath = null;
 
         DefaultFileNameFileter defaultFileNameFileter=null;
-         NumberFormat onlyone_nf = new DecimalFormat("0");
+        NumberFormat onlyone_nf = new DecimalFormat("0");
 
 
-         int sum_file_count = 0 ;
-         int all_real_file_count = 0;
-         int all_dir_file_count = 0 ;
+        int sum_file_count = 0 ;
+        int all_real_file_count = 0;
+        int all_dir_file_count = 0 ;
 
         Print_Dir_FileTree_Info_Rule63() {
             super("#", 63, 4);
@@ -865,35 +1008,35 @@ public class G2_ApplyRuleFor_TypeFile {
 
         // 11:22:33:44:55 这样的格式 才是 Mac 地址
         boolean isMacAddress(String  inputMacAddress ){
-        boolean isMac = false ;
+            boolean isMac = false ;
 
-        if(inputMacAddress == null){
-            return  false;
-        }
-
-        int  length_no_spilit = inputMacAddress.replace(":","").trim().length();
-
-        if(length_no_spilit != 12){
-            System.out.println("当前 输入的 Mac 地址 inputMacAddress="+inputMacAddress+" 去除:号后长度不是12位!  无效地址! ");
-        return false;
-        }
-
-
-        String[] macSplitArr = inputMacAddress.split(":");
-
-        if(macSplitArr.length == 6){
-            for (int i = 0; i < macSplitArr.length; i++) {
-                if(macSplitArr[i].length() != 2){
-                    System.out.println("当前 输入的 Mac 地址 inputMacAddress="+inputMacAddress+" 分割后 长度不为2  不是规范的Mac地址!  无效地址! ");
-                    return  false;
-                }
+            if(inputMacAddress == null){
+                return  false;
             }
-            return true;
-        }
+
+            int  length_no_spilit = inputMacAddress.replace(":","").trim().length();
+
+            if(length_no_spilit != 12){
+                System.out.println("当前 输入的 Mac 地址 inputMacAddress="+inputMacAddress+" 去除:号后长度不是12位!  无效地址! ");
+                return false;
+            }
+
+
+            String[] macSplitArr = inputMacAddress.split(":");
+
+            if(macSplitArr.length == 6){
+                for (int i = 0; i < macSplitArr.length; i++) {
+                    if(macSplitArr[i].length() != 2){
+                        System.out.println("当前 输入的 Mac 地址 inputMacAddress="+inputMacAddress+" 分割后 长度不为2  不是规范的Mac地址!  无效地址! ");
+                        return  false;
+                    }
+                }
+                return true;
+            }
 
             System.out.println("当前 输入的 Mac 地址 inputMacAddress="+inputMacAddress+" 长度 规范的Mac地址!  无效地址! ");
 
-        return isMac;
+            return isMac;
 
         }
 
@@ -941,9 +1084,9 @@ public class G2_ApplyRuleFor_TypeFile {
 
         ArrayList<File> G2_Zmain_Life_Source_Res_Drable_FileList;
         ArrayList<File> G2_Zmain_Life_Source_Res_DrableV24_FileList;
-         File G2_Zmain_Life_Source_Res_DrableDir;   // 当前 需要 拷贝的  res/drable 下的文件和目录
+        File G2_Zmain_Life_Source_Res_DrableDir;   // 当前 需要 拷贝的  res/drable 下的文件和目录
         File G2_Zmain_Life_Source_Res_DrableV24Dir;   // 当前 需要 拷贝的  res/drable-v24 下的文件和目录
-         File AOSP_Settings_Res_DrableDir;   // 在 AOSP_Settings 中对应的 放置 res/drable/wireless_xxxx 文件的目录
+        File AOSP_Settings_Res_DrableDir;   // 在 AOSP_Settings 中对应的 放置 res/drable/wireless_xxxx 文件的目录
         File AOSP_Settings_Res_DrableV24Dir;   // 在 AOSP_Settings 中对应的 放置 res/drable-v24/wireless_xxxx 文件的目录
 
 
@@ -956,7 +1099,7 @@ public class G2_ApplyRuleFor_TypeFile {
 
 
         ArrayList<File> G2_Zmain_Life_Source_Wireless_Java_FileList ; // // 在 G2_Zmain-Life 资源文件中需要拷贝的  wireless 包名的Java 代码  需要 统一修改里面的 包名
-       File G2_Zmain_Life_Source_Wireless_Java_Dir; // 在 G2_Zmain-Life 资源文件中需要拷贝的  wireless 包名的目录
+        File G2_Zmain_Life_Source_Wireless_Java_Dir; // 在 G2_Zmain-Life 资源文件中需要拷贝的  wireless 包名的目录
         File AOSP_Settings_Target_Wireless_Java_Dir ;   // Settings 的  放置 Wireless 包名 的 那个目录
 
 
@@ -1013,12 +1156,12 @@ public class G2_ApplyRuleFor_TypeFile {
                 return false;
             }
 
-              AOSP_Settings_AndroidManifest_XMLFile  = new File(curDirPath+File.separator+"/packages/apps/Settings/AndroidManifest.xml");
+            AOSP_Settings_AndroidManifest_XMLFile  = new File(curDirPath+File.separator+"/packages/apps/Settings/AndroidManifest.xml");
 
             // 需要 嵌入的 相关的 目标文件夹
-              AOSP_Settings_Target_Wireless_Java_Dir  = new File(curDirPath+File.separator+"/packages/apps/Settings/src/com/android/settings/wifi/wireless/");
+            AOSP_Settings_Target_Wireless_Java_Dir  = new File(curDirPath+File.separator+"/packages/apps/Settings/src/com/android/settings/wifi/wireless/");
 
-              AOSP_Settings_Res_LayoutDir  = new File(curDirPath+File.separator+"/packages/apps/Settings/res/layout/");
+            AOSP_Settings_Res_LayoutDir  = new File(curDirPath+File.separator+"/packages/apps/Settings/res/layout/");
 
             AOSP_Settings_Res_DrableDir  = new File(curDirPath+File.separator+"/packages/apps/Settings/res/drawable/");
             AOSP_Settings_Res_DrableV24Dir = new File(curDirPath+File.separator+"/packages/apps/Settings/res/drawable-v24/");
@@ -1029,9 +1172,9 @@ public class G2_ApplyRuleFor_TypeFile {
 
             if(G2_Zmain_Life_Txt_TxtEdit_Fragment_showWirelessDialog_JavaFile.exists()){
 
-             ArrayList<String> txtFragmentCodeList =    ReadFileContentAsList(G2_Zmain_Life_Txt_TxtEdit_Fragment_showWirelessDialog_JavaFile);
+                ArrayList<String> txtFragmentCodeList =    ReadFileContentAsList(G2_Zmain_Life_Txt_TxtEdit_Fragment_showWirelessDialog_JavaFile);
 
-             ArrayList<String> showWirelessDialogCodeList = getSubArrayWithBeginTag_EndTag(txtFragmentCodeList,"showWirelessDialog_Begin","showWirelessDialog_End");
+                ArrayList<String> showWirelessDialogCodeList = getSubArrayWithBeginTag_EndTag(txtFragmentCodeList,"showWirelessDialog_Begin","showWirelessDialog_End");
 
                 System.out.println("txtFragmentCodeList.size() = "+ txtFragmentCodeList.size());
                 System.out.println("showWirelessDialogCodeList.size() = "+ showWirelessDialogCodeList.size());
@@ -1047,10 +1190,10 @@ public class G2_ApplyRuleFor_TypeFile {
                         System.out.println("无法从 "+G2_Zmain_Life_Txt_TxtEdit_Fragment_showWirelessDialog_JavaFile.getAbsolutePath()+" 获取 showWirelessDialog() 定义函数 请检查! Rule61_showWirelessDialog_Method= "+Rule61_showWirelessDialog_Method);
                     }
 
-             }else {
-                 System.out.println("无法从 "+G2_Zmain_Life_Txt_TxtEdit_Fragment_showWirelessDialog_JavaFile.getAbsolutePath()+" 获取 showWirelessDialog() 定义函数 请检查! ");
-                 return false;
-             }
+                }else {
+                    System.out.println("无法从 "+G2_Zmain_Life_Txt_TxtEdit_Fragment_showWirelessDialog_JavaFile.getAbsolutePath()+" 获取 showWirelessDialog() 定义函数 请检查! ");
+                    return false;
+                }
 
             } else {
                 System.out.println("当前 修改Settings 逻辑来源 文件夹 G2_Zmain_Life_Source_Wireless_Java_Dir ="+ G2_Zmain_Life_Source_Wireless_Java_Dir.getAbsolutePath()+" 不存在! 请检查!");
@@ -1063,20 +1206,20 @@ public class G2_ApplyRuleFor_TypeFile {
 
             G2_Zmain_Life_Source_Wireless_Java_Dir = new File(G2_Zmain_Life_Source_Dir.getAbsoluteFile()+File.separator+"/app/src/main/java/com/and/zmain_life/wireless/");
 
-             if(G2_Zmain_Life_Source_Wireless_Java_Dir.exists()){
+            if(G2_Zmain_Life_Source_Wireless_Java_Dir.exists()){
 
-                 File[] mWirelessJavaFileArr = G2_Zmain_Life_Source_Wireless_Java_Dir.listFiles();
+                File[] mWirelessJavaFileArr = G2_Zmain_Life_Source_Wireless_Java_Dir.listFiles();
 
-                 if(mWirelessJavaFileArr == null || mWirelessJavaFileArr.length == 0){
-                     System.out.println("当前 修改Settings 逻辑来源 文件夹 G2_Zmain_Life_Source_Wireless_Java_Dir ="+ G2_Zmain_Life_Source_Wireless_Java_Dir.getAbsolutePath()+" 不存在原始Java 文件!");
-                     return false;
-                 }
-                 G2_Zmain_Life_Source_Wireless_Java_FileList.addAll(Arrays.asList(mWirelessJavaFileArr));
-             } else {
-                 System.out.println("当前 修改Settings 逻辑来源 文件夹 G2_Zmain_Life_Source_Wireless_Java_Dir ="+ G2_Zmain_Life_Source_Wireless_Java_Dir.getAbsolutePath()+" 不存在! 请检查!");
+                if(mWirelessJavaFileArr == null || mWirelessJavaFileArr.length == 0){
+                    System.out.println("当前 修改Settings 逻辑来源 文件夹 G2_Zmain_Life_Source_Wireless_Java_Dir ="+ G2_Zmain_Life_Source_Wireless_Java_Dir.getAbsolutePath()+" 不存在原始Java 文件!");
+                    return false;
+                }
+                G2_Zmain_Life_Source_Wireless_Java_FileList.addAll(Arrays.asList(mWirelessJavaFileArr));
+            } else {
+                System.out.println("当前 修改Settings 逻辑来源 文件夹 G2_Zmain_Life_Source_Wireless_Java_Dir ="+ G2_Zmain_Life_Source_Wireless_Java_Dir.getAbsolutePath()+" 不存在! 请检查!");
 
-                 return false;
-             }
+                return false;
+            }
 
             G2_Zmain_Life_Source_Res_DrableDir = new File(G2_Zmain_Life_Source_Dir.getAbsoluteFile()+File.separator+"/app/src/main/res/drawable/");
             G2_Zmain_Life_Source_Res_DrableV24Dir = new File(G2_Zmain_Life_Source_Dir.getAbsoluteFile()+File.separator+"/app/src/main/res/drawable-v24/");
@@ -1360,10 +1503,10 @@ public class G2_ApplyRuleFor_TypeFile {
 
             if(lastCode.endsWith("}")){
 
-              String last_code_no_block = lastCode.substring(0,lastCode.length()-1);
+                String last_code_no_block = lastCode.substring(0,lastCode.length()-1);
 
 
-              String new_last_Code = last_code_no_block +"\n" + Rule61_showWirelessDialog_Method +"\n"+"}";
+                String new_last_Code = last_code_no_block +"\n" + Rule61_showWirelessDialog_Method +"\n"+"}";
 
                 new_last_Code =  new_last_Code.replace("ztimestamp",timestamp_yyyymmdd_hhmmss);
                 new_last_Code =  new_last_Code.replace("zabspath",aosp_settings_wifienabler_file.getAbsolutePath());
@@ -28553,11 +28696,11 @@ public class G2_ApplyRuleFor_TypeFile {
 
         for (int i = 0; i < rawList.size() ; i++) {
             String oneLine = rawList.get(i);
-        if(oneLine.contains(srcTag)){
-            String newLine = oneLine.replace(srcTag,dstTag);
-            resultList.add(newLine);
-            continue;
-        }
+            if(oneLine.contains(srcTag)){
+                String newLine = oneLine.replace(srcTag,dstTag);
+                resultList.add(newLine);
+                continue;
+            }
             resultList.add(oneLine);
         }
 
