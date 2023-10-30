@@ -431,17 +431,21 @@ public class G2_ApplyRuleFor_TypeFile {
     }
 
     class Make_Md5Type_Hide_File_Back_To_FileType_Rule64 extends Basic_Rule {
-        boolean isDirOperation; // 是否没有输入 xlsx 文件 而是 输入了一个 目录 默认shell 目录 已经 输入的目录
+        boolean isDirOperation; // 是否没有输入 real 文件 而是 输入了一个 目录 默认shell 目录 已经 输入的目录
 
         File inputDirFile;
         ArrayList<File> inputDirFileList;
+
+        // 0 ---- hidejpg 文件夹的操作 默认 md5_type 还原操作
+        // 1 ---- lin  文件夹下的文件名称重命名还原操作
+        int mRenameType = 0 ;
 
         Make_Md5Type_Hide_File_Back_To_FileType_Rule64() {
             super("#", 64, 3); //
             inputDirFileList = new ArrayList<File>();
             inputDirFile = null;
             isDirOperation = false;
-
+            mRenameType = 0;
         }
 
         @Override
@@ -456,31 +460,75 @@ public class G2_ApplyRuleFor_TypeFile {
 
 
             int rename_file_count = 0 ;
-            for (int i = 0; i < inputDirFileList.size(); i++) {
-                File inputRealFile = inputDirFileList.get(i);
-                String realFileName = inputRealFile.getName();
-                String md5name =  getMD5Three(inputRealFile.getAbsolutePath());
 
-                String fileType_name = realFileName;
-                if(realFileName.startsWith(md5name+"_")){   // 符合规则的文件  进行处理
+            if(mRenameType == 0){
+                for (int i = 0; i < inputDirFileList.size(); i++) {
+                    File inputRealFile = inputDirFileList.get(i);
+                    String realFileName = inputRealFile.getName();
+                    String md5name =  getMD5Three(inputRealFile.getAbsolutePath());
 
-                    fileType_name = fileType_name.replace("_",".");
+                    String fileType_name = realFileName;
+                    if(realFileName.startsWith(md5name+"_")){   // 符合规则的文件  进行处理
 
-                   // 从 adafagfea_txt   转为 adafagfea.txt
+                        fileType_name = fileType_name.replace("_",".");
+
+                        // 从 adafagfea_txt   转为 adafagfea.txt
 //                    File filetype_name = new File(inputDirFile.getAbsolutePath() + File.separator + fileType_name);
 
-                    tryReName(inputRealFile,fileType_name);
-                    rename_file_count++;
+                        tryReName(inputRealFile,fileType_name);
+                        rename_file_count++;
 
 
-                } else{    // 不符合规则的文件   不主动操作
+                    } else{    // 不符合规则的文件   不主动操作
+
+                    }
+
+
 
                 }
+                System.out.println("当前源文件总数["+inputDirFileList.size()+"] 更新文件总数["+rename_file_count+"]  不符合md5_type规则文件数["+(inputDirFileList.size() - rename_file_count)+"]");
 
 
+
+            } else if (mRenameType == 1){
+
+                ArrayList<File>  unKnowFileList =      fileTypeMap.get("unknow");
+
+                if(unKnowFileList == null){
+
+                    System.out.println("当前 目录【"+curDirFile.getAbsolutePath()+"】没有找到 无类型 unknown 的文件!");
+                    return  null;
+                }
+                System.out.println("当前存在 unknow 文件 总共 【"+unKnowFileList.size()+"】个");
+                int renameCount = 0 ;
+                for (int i = 0; i < unKnowFileList.size(); i++) {
+
+                 File unknowFile =    unKnowFileList.get(i);
+
+                    System.out.println("unknowFile["+i+"_"+unKnowFileList.size()+"] : "+ unknowFile.getAbsolutePath());
+
+                    String realFileName = unknowFile.getName();
+//                    String md5name =  getMD5Three(unknowFile.getAbsolutePath());
+                    String newName =  realFileName;
+
+                    if(unknowFile.getAbsolutePath().contains("jpg_lin")){
+                        newName = realFileName+"."+"jpg";
+                        tryReName(unknowFile,newName);
+                        renameCount++;
+                    } else if(unknowFile.getAbsolutePath().contains("mp4_lin")){
+                        newName = realFileName+"."+"mp4";
+                        tryReName(unknowFile,newName);
+                        renameCount++;
+                    } else if(unknowFile.getAbsolutePath().contains("gif_lin")){
+                        newName = realFileName+"."+"gif";
+                        tryReName(unknowFile,newName);
+                        renameCount++;
+                    }
+
+                }
+                System.out.println("当前存在 rename_lin 操作  unknow 文件 总共 【"+unKnowFileList.size()+"】个  改名成功【"+renameCount+"】个! ");
 
             }
-            System.out.println("当前源文件总数["+inputDirFileList.size()+"] 更新文件总数["+rename_file_count+"]  不符合md5_type规则文件数["+(inputDirFileList.size() - rename_file_count)+"]");
 
             return super.applyFileListRule3(subFileList, fileTypeMap);
         }
@@ -491,8 +539,12 @@ public class G2_ApplyRuleFor_TypeFile {
             return Cur_Bat_Name + " #_" + rule_index
                     + "   ### 对当前  依据  md5_type  组成的规则的文件  还原为  md5.type 这样的 文件   \n"
                     + Cur_Bat_Name + " #_" + rule_index
-                    + "    ### 对当前  依据  md5_type  组成的规则的文件  还原为  md5.type 这样的 文件    \n"
-                  ;
+                    + "    ### ( /sdcard/1/jpg_hide 操作 ) 对当前  依据  md5_type  组成的规则的文件  还原为  md5.type 这样的 文件    \n"
+                    + Cur_Bat_Name + " #_" + rule_index +" rename_jpghide"
+                    + "    ### ( /sdcard/1/jpg_hide 操作 ) 对当前  依据  md5_type  组成的规则的文件  还原为  md5.type 这样的 文件    \n"
+                    + Cur_Bat_Name + " #_" + rule_index +" rename_lin"
+                    + "    ### ( /sdcard/1/lin 操作 ) 对当前  lin 目录下的 unknow文件依据 文件夹m名称(mp4 jpg) 进行还原为对应的type    \n"
+                    ;
         }
 
 
@@ -502,6 +554,12 @@ public class G2_ApplyRuleFor_TypeFile {
 
             for (int i = 0; i < inputParamList.size(); i++) {
                 String strInput = inputParamList.get(i);
+
+                if(strInput.equals("rename_jpghide")){
+                    mRenameType = 0 ;
+                } else if(strInput.equals("rename_lin")){
+                    mRenameType = 1 ;
+                }
 
                 File tempFile = new File(curDirPath + File.separator + strInput);
                 if (tempFile.exists() && !tempFile.isDirectory()) {
@@ -540,7 +598,7 @@ public class G2_ApplyRuleFor_TypeFile {
                     File fileItem = listArr[i];
 
                     String inputFileName = fileItem.getName().toLowerCase();
-                        inputDirFileList.add(fileItem);
+                    inputDirFileList.add(fileItem);
 
                     System.out.println(
                             "inputDir_xlsx[" + i + "] = " + fileItem.getAbsolutePath() + "  Size=" + fileItem.length());
@@ -567,6 +625,12 @@ public class G2_ApplyRuleFor_TypeFile {
 
             }
 
+            System.out.println("mRenameType = "+mRenameType);
+            if(mRenameType == 0){
+                System.out.println("当前  Rename 执行的逻辑:  对 jpg_hide 文件夹下的 unknow 文件进行 还原文件type 的处理 !");
+            } else  if(mRenameType == 1){
+                System.out.println("当前  Rename 执行的逻辑: 对 lin 文件夹下的 unknow 文件 依据文件夹名称 类型(mp4 jpg gif)还原文件type 的处理 !");
+            }
             // TODO Auto-generated method stub
             return super.initParamsWithInputList(inputParamList);
         }
