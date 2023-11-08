@@ -503,7 +503,7 @@ public class G2_ApplyRuleFor_TypeFile {
                 int renameCount = 0 ;
                 for (int i = 0; i < unKnowFileList.size(); i++) {
 
-                 File unknowFile =    unKnowFileList.get(i);
+                    File unknowFile =    unKnowFileList.get(i);
 
                     System.out.println("unknowFile["+i+"_"+unKnowFileList.size()+"] : "+ unknowFile.getAbsolutePath());
 
@@ -1994,6 +1994,8 @@ public class G2_ApplyRuleFor_TypeFile {
                         index_1_str = splitStrArr[1].trim();
                     } else {
                         index_1_str = splitStrArr[splitStrArr.length -1].trim();
+
+
                     }
 
 
@@ -2176,19 +2178,24 @@ public class G2_ApplyRuleFor_TypeFile {
                 String mValue_End_repo_init_fixed = fixed_repo_url(mValue_End_repo_init,  mValue_MANIFEST_BRANCH, mValue_MANIFEST_FILE ); // 替换 -b  和 -m 的 参数
                 System.out.println((mEnd_Key_Index)+"_1"+"_fixed_repo_url="+mValue_End_repo_init_fixed);
 
-
+                //  motorola/build/bin/build_device.bash   // 截取
                 //___2____ Vendor  motorola/build/bin/build_device.bash -b【1】]nightly【2】-p【3】xxxx【4】-g【5】-jX【6】-M【7】<path【8】to【9】MSI【10】workspace>【11】-D【12】mt-r1【13】
                 //MSI motorola/build/bin/build_device.bash -b[1]nightly[2]-p[3]aion_g[4]-g[5]-jX[6]
-                String mTag_End_build_device= "motorola/build/bin/build_device.bash ";
+
+                //  motorola/build/bin/build_device.bash -b   // 截取
+                //___2____ Vendor  motorola/build/bin/build_device.bash -b nightly【1】-p【2】xxxx【3】-g【4】-jX【5】-M【6】<path【7】to【8】MSI【9】workspace>【10】-D【11】mt-r1【12】
+                //MSI motorola/build/bin/build_device.bash -b nightly[1]-p[2]aion_g[3]-g[4]-jX[5]
+
+                String mTag_End_build_device= "motorola/build/bin/build_device.bash -b";
                 String mValue_End_build_device  = "";
                 if(isVendor_2){
-                    mValue_End_build_device  =   getDirectXStringAfterKey(mTag_End_build_device,rawText_Html,false,13);
+                    mValue_End_build_device  =   getDirectXStringAfterKey(mTag_End_build_device,rawText_Html,false,12);
                 } else {
-                    mValue_End_build_device  =   getDirectXStringAfterKey(mTag_End_build_device,rawText_Html,false,6);
+                    mValue_End_build_device  =   getDirectXStringAfterKey(mTag_End_build_device,rawText_Html,false,5);
                 }
 
                 if(mValue_End_build_device != null){
-                    mValue_End_build_device = mTag_End_build_device+mValue_End_build_device;
+                    mValue_End_build_device = mTag_End_build_device+" "+mValue_End_build_device;
                 }
                 System.out.println((mEnd_Key_Index++)+"_getDirectXStringAfterKey_【"+mTag_End_build_device+"】_"+mValue_End_build_device);
 
