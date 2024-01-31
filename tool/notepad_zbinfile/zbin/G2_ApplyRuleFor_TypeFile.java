@@ -2480,8 +2480,8 @@ public class G2_ApplyRuleFor_TypeFile {
                 product_txt_List.add("");
                 product_txt_List.add("zzfile_3.sh   ./out/target/product/"+device_shell_name+"/vendor/lib64/libmdmcutback.so");
                 product_txt_List.add("zzfile_3.sh   ./out/target/product/"+device_shell_name+"/vendor/lib/libmdmcutback.so");
-
-
+                product_txt_List.add("cd     ./out/target/product/"+device_shell_name+"/vendor/lib64/ && fex -u  libmdmcutback.so");
+                product_txt_List.add("cd     ./out/target/product/"+device_shell_name+"/vendor/lib/   && fex -u  libmdmcutback.so");
 
 
 
