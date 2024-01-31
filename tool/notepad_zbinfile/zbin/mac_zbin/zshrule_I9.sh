@@ -127,14 +127,389 @@ echo "__________________________________Method_Out "$FUNCNAME
 }
 
 
+function rule903vmsivendorbackup_func_0x0(){
+# =========================================================================== rule0v_func_0x0
+# rule_tip:  $init_shfile_name  _903_  Msi_1  Vendor_1    ##   msi vendor 同时进行备份 满足编译成功节点记录
+# desc: 
+# sample:  
+# sample_out: 
+echo "__________________________________Method_In "$FUNCNAME
+
+CUR_REPO_PATH=$init_pwd
+Code_Tag_Vendor_1="vendor"
+Code_Tag_Msi_1="msi"
+Code_Tag_Msi_2="system"
+rule903_timestamp=`date +%Y-%m-%d_%H-%M-%S`    ##  获取到时间戳 2023-03-21_16-33-13 
+REPO_NODE_LIST_DIR=$init_pwd/repo_node_record/$rule903_timestamp
+REPO_MSI_NODE_FILE=$REPO_NODE_LIST_DIR/repo_backup_msi.txt
+REPO_VENDOR_NODE_FILE=$REPO_NODE_LIST_DIR/repo_backup_vendor.txt
+INPUT_DIR_1=$init_pwd/$init_input_2
+INPUT_DIR_2=$init_pwd/$init_input_3
+CUR_INPUT_MSI_DIR=
+CUR_INPUT_VENDOR_DIR=
+
+## 对输入的  Msi 和  Vendor 路径 进行拼凑 绝对路径
+INPUT_DIR_1_Msi_Result=$(echo "$INPUT_DIR_1" | grep -ie "$Code_Tag_Msi_1"  -ie "$Code_Tag_Msi_2")
+if [[ "$INPUT_DIR_1_Msi_Result" != "" ]] ; then
+CUR_INPUT_MSI_DIR=$INPUT_DIR_1
+fi
+
+INPUT_DIR_1_Vendor_Result=$(echo "$INPUT_DIR_1" | grep -ie "$Code_Tag_Vendor_1")
+if [[ "$INPUT_DIR_1_Vendor_Result" != "" ]] ; then
+CUR_INPUT_VENDOR_DIR=$INPUT_DIR_1
+fi
+
+INPUT_DIR_2_Msi_Result=$(echo "$INPUT_DIR_2" | grep -ie "$Code_Tag_Msi_1"  -ie "$Code_Tag_Msi_2")
+if [[ "$INPUT_DIR_2_Msi_Result" != "" ]] ; then
+CUR_INPUT_MSI_DIR=$INPUT_DIR_2
+fi
+
+INPUT_DIR_2_Vendor_Result=$(echo "$INPUT_DIR_2" | grep -ie "$Code_Tag_Vendor_1")
+if [[ "$INPUT_DIR_2_Vendor_Result" != "" ]] ; then
+CUR_INPUT_VENDOR_DIR=$INPUT_DIR_2
+fi
+
+
+echo "CUR_REPO_PATH="$CUR_REPO_PATH
+echo "REPO_NODE_LIST_DIR="$REPO_NODE_LIST_DIR
+echo "REPO_MSI_NODE_FILE="$REPO_MSI_NODE_FILE
+echo "REPO_VENDOR_NODE_FILE="$REPO_VENDOR_NODE_FILE
+echo "CUR_INPUT_MSI_DIR="$CUR_INPUT_MSI_DIR
+echo "CUR_INPUT_VENDOR_DIR="$CUR_INPUT_VENDOR_DIR
+
+### 判断当前 输入的 Msi  和  Vendor 命令是否存在
+
+if [[ "$CUR_INPUT_MSI_DIR" == "" ]] ; then
+echo "CUR_INPUT_MSI_DIR="$CUR_INPUT_MSI_DIR" is empty , please check the msi path you input! "
+exit
+fi
+
+if [[ "$CUR_INPUT_VENDOR_DIR" == "" ]] ; then
+echo "CUR_INPUT_VENDOR_DIR="$CUR_INPUT_VENDOR_DIR" is empty , please check the vendor path you input! "
+exit
+fi
+
+### 判断当前 输入的 Msi  和  Vendor  文件夹是否存在
+
+
+if [ -d "$CUR_INPUT_MSI_DIR" ] ; then
+    echo "CUR_INPUT_MSI_DIR="$CUR_INPUT_MSI_DIR" Msi File exist ! "
+else 
+    echo "CUR_INPUT_MSI_DIR="$CUR_INPUT_MSI_DIR" Msi File not exist !  please check the msi dir exist you input!  "
+    exit
+fi
+
+if [ -d "$CUR_INPUT_VENDOR_DIR" ] ; then
+    echo "CUR_INPUT_VENDOR_DIR="$CUR_INPUT_VENDOR_DIR" Vendor Dir File exist ! "
+else 
+    echo "CUR_INPUT_VENDOR_DIR="$CUR_INPUT_VENDOR_DIR" Dir File not exist !  please check the vendor dir exist you input!  "
+    exit
+fi
+
+
+
+###############  执行  Msi的 记录保存   ###############
+
+cd $CUR_INPUT_MSI_DIR
+REPO_BackUp_File=$CUR_INPUT_MSI_DIR/repo_backup_msi.txt
+## 获取所有的 AOSP的repo的 路径到 repo_git_path.txt
+
+repo forall -c pwd > ./repo_git_path.txt
+## 当前遍历到的 repo_git_path.txt 的 行数
+gitpath_line_number=1
+gitpath_min_count=500
+## 获取 repo_git_path.txt 所有的行  既 当前 AOSP的 所有的 repo仓库的 个数
+gitpath_all_number=`grep -n  ""   ./repo_git_path.txt | wc -l`
+
+if [ $gitpath_all_number -lt $gitpath_min_count ] ; then
+  echo " gitpath_all_number="$gitpath_all_number" xiaoyu 500   repo forall -c pwd > ./repo_git_path.txt   # check error"
+  exit
+fi
+echo "CUR_MSI_REPO_PATH="$CUR_INPUT_MSI_DIR
+echo "REPO_BackUp_File="$REPO_BackUp_File
+echo "gitpath_all_number="$gitpath_all_number
+echo -e "" > $REPO_BackUp_File
+
+for gitpath_line in `cat ./repo_git_path.txt`
+do
+    cd $gitpath_line
+    echo "####repo_git["$gitpath_line_number"_"$gitpath_all_number"]_gitpath:"$gitpath_line
+    echo "####repo_git["$gitpath_line_number"_"$gitpath_all_number"]_gitpath:"$gitpath_line >> $REPO_BackUp_File
+    echo -e   >> $REPO_BackUp_File
+    ## 打印 git status 信息
+    
+    
+    ### Command 本地主分支
+    git_local_branch_desc=`git branch -vv | grep "*" |awk -F' ' '{ print $2 }'`
+    echo "__git_local_branch:"$git_local_branch_desc  >> $REPO_BackUp_File
+    echo -e   >> $REPO_BackUp_File
+
+    ### Command 获取本地主分支的第一个commitid   git rev-parse HEAD  || git rev-parse origin/master
+    git_remote_branch_desc=`git branch -r | grep " -" |awk -F' ' '{ print $3 }'`
+    if [[ "$git_remote_branch_desc" == "" ]] ; then
+        git_remote_branch_desc="HEAD"
+    fi
+    git_head_commitid_desc=`git rev-parse $git_remote_branch_desc`
+    echo "__git_head_commitid:"$git_head_commitid_desc  >> $REPO_BackUp_File
+    echo -e   >> $REPO_BackUp_File
+    
+    ### Command 获取本地的 分支详细信息
+    git_branch_vv_desc=`git branch -vv`
+    echo "__git_branch_vv:"$git_branch_vv_desc  >> $REPO_BackUp_File
+    echo -e   >> $REPO_BackUp_File
+    
+    
+    ### Command 获取本地的 git 状态 信息
+    git_status_desc=`git status`
+    echo "__git_status:"$git_status_desc  >> $REPO_BackUp_File
+    echo -e   >> $REPO_BackUp_File
+
+    ### Command 获取远程主分支(可能 没有 )
+    git_master_branch_desc=`git branch -r | grep " -" |awk -F' ' '{ print $3 }'`
+    echo "__git_master_branch:"$git_master_branch_desc  >> $REPO_BackUp_File
+    echo -e   >> $REPO_BackUp_File
+    
+    ### Command 获取远程第一个分支(远程主分支没有情况下 )
+    git_nomaster_number1_branch=`git branch -r |awk 'NR==1'`
+    echo "__git_nomaster_number1_branch:"$git_nomaster_number1_branch  >> $REPO_BackUp_File
+    echo -e   >> $REPO_BackUp_File
+    
+    
+    ### Prop "Untracked files"  标记是否有 未追踪文件
+    git_status_untracked=`git status | grep "Untracked files"`
+    git_status_untracked_flag="false"
+    if [ -n "$git_status_untracked" ]; then
+        git_status_untracked_flag="true"
+    else
+        git_status_untracked_flag="false"
+    fi
+    echo "__git_status_untracked:"$git_status_untracked_flag   >> $REPO_BackUp_File
+    echo -e   >> $REPO_BackUp_File
+        
+    ### Prop "modified:" 标记是否有 修改后未提交文件
+    git_status_modified=`git status | grep "modified:"`
+    git_status_modified_flag="false"
+    if [ -n "$git_status_modified" ]; then
+        git_status_modified_flag="true"
+    else
+        git_status_modified_flag="false"
+    fi
+    echo "__git_status_modified:"$git_status_modified_flag   >> $REPO_BackUp_File
+    echo -e   >> $REPO_BackUp_File
+        
+        
+    ### Prop "commits" 标记是否有未提交commit标识
+    git_status_commits=`git status | grep "commits"`  
+    git_status_commits_flag="false"
+    if [ -n "$git_status_commits" ]; then
+        git_status_commits_flag="true"
+    else
+        git_status_commits_flag="false"
+    fi
+    echo "__git_status_uncommits:"$git_status_commits_flag   >> $REPO_BackUp_File
+    echo -e   >> $REPO_BackUp_File
+    
+    
+    
+    #  Prop Your branch is ahead of   标记是否本地分支有超过远程分支提交的标识
+    git_status_ahead_commits=`git status | grep "Your branch is ahead of"`  
+    git_status_ahead_commits_flag="false"
+    if [ -n "$git_status_ahead_commits" ]; then
+        git_status_ahead_commits_flag="true"
+    else
+        git_status_ahead_commits_flag="false"
+    fi
+    echo "__git_status_aheadcommits:"$git_status_ahead_commits_flag   >> $REPO_BackUp_File
+    echo -e   >> $REPO_BackUp_File    
+
+
+    #  Prop Have Master Branch  标记是否有远程主分支 标识位
+    is_have_master_branch_flag="false"
+    if [ -n "$git_master_branch_desc" ]; then
+        is_have_master_branch_flag="true"
+    else
+        is_have_master_branch_flag="false"
+    fi
+    echo "__git_have_master_branch:"$is_have_master_branch_flag   >> $REPO_BackUp_File
+    echo -e   >> $REPO_BackUp_File    
+    echo -e   >> $REPO_BackUp_File
+    echo -e   >> $REPO_BackUp_File
+     gitpath_line_number=$(($gitpath_line_number+1))
+ done
+
+mkdir -p $REPO_NODE_LIST_DIR  
+cp -fr $REPO_BackUp_File $REPO_MSI_NODE_FILE
+
+
+###############  执行  Vendor 的 记录保存  ###############
+cd $CUR_INPUT_VENDOR_DIR
+REPO_BackUp_File=$CUR_INPUT_VENDOR_DIR/repo_backup_vendor.txt
+
+
+## 获取所有的 AOSP的repo的 路径到 repo_git_path.txt
+
+repo forall -c pwd > ./repo_git_path.txt
+## 当前遍历到的 repo_git_path.txt 的 行数
+gitpath_line_number=1
+gitpath_min_count=500
+## 获取 repo_git_path.txt 所有的行  既 当前 AOSP的 所有的 repo仓库的 个数
+gitpath_all_number=`grep -n  ""   ./repo_git_path.txt | wc -l`
+
+if [ $gitpath_all_number -lt $gitpath_min_count ] ; then
+  echo " gitpath_all_number="$gitpath_all_number" xiaoyu 500   repo forall -c pwd > ./repo_git_path.txt   # check error"
+  exit
+fi
+echo "CUR_VENDOR_REPO_PATH="$CUR_INPUT_VENDOR_DIR
+echo "REPO_BackUp_File="$REPO_BackUp_File
+echo "gitpath_all_number="$gitpath_all_number
+echo -e "" > $REPO_BackUp_File
+
+for gitpath_line in `cat ./repo_git_path.txt`
+do
+    cd $gitpath_line
+    echo "####repo_git["$gitpath_line_number"_"$gitpath_all_number"]_gitpath:"$gitpath_line
+    echo "####repo_git["$gitpath_line_number"_"$gitpath_all_number"]_gitpath:"$gitpath_line >> $REPO_BackUp_File
+    echo -e   >> $REPO_BackUp_File
+    ## 打印 git status 信息
+    
+    
+    ### Command 本地主分支
+    git_local_branch_desc=`git branch -vv | grep "*" |awk -F' ' '{ print $2 }'`
+    echo "__git_local_branch:"$git_local_branch_desc  >> $REPO_BackUp_File
+    echo -e   >> $REPO_BackUp_File
+
+    ### Command 获取本地主分支的第一个commitid   git rev-parse HEAD  || git rev-parse origin/master
+    git_remote_branch_desc=`git branch -r | grep " -" |awk -F' ' '{ print $3 }'`
+    if [[ "$git_remote_branch_desc" == "" ]] ; then
+        git_remote_branch_desc="HEAD"
+    fi
+    git_head_commitid_desc=`git rev-parse $git_remote_branch_desc`
+    echo "__git_head_commitid:"$git_head_commitid_desc  >> $REPO_BackUp_File
+    echo -e   >> $REPO_BackUp_File
+    
+    ### Command 获取本地的 分支详细信息
+    git_branch_vv_desc=`git branch -vv`
+    echo "__git_branch_vv:"$git_branch_vv_desc  >> $REPO_BackUp_File
+    echo -e   >> $REPO_BackUp_File
+    
+    
+    ### Command 获取本地的 git 状态 信息
+    git_status_desc=`git status`
+    echo "__git_status:"$git_status_desc  >> $REPO_BackUp_File
+    echo -e   >> $REPO_BackUp_File
+
+    ### Command 获取远程主分支(可能 没有 )
+    git_master_branch_desc=`git branch -r | grep " -" |awk -F' ' '{ print $3 }'`
+    echo "__git_master_branch:"$git_master_branch_desc  >> $REPO_BackUp_File
+    echo -e   >> $REPO_BackUp_File
+    
+    ### Command 获取远程第一个分支(远程主分支没有情况下 )
+    git_nomaster_number1_branch=`git branch -r |awk 'NR==1'`
+    echo "__git_nomaster_number1_branch:"$git_nomaster_number1_branch  >> $REPO_BackUp_File
+    echo -e   >> $REPO_BackUp_File
+    
+    
+    ### Prop "Untracked files"  标记是否有 未追踪文件
+    git_status_untracked=`git status | grep "Untracked files"`
+    git_status_untracked_flag="false"
+    if [ -n "$git_status_untracked" ]; then
+        git_status_untracked_flag="true"
+    else
+        git_status_untracked_flag="false"
+    fi
+    echo "__git_status_untracked:"$git_status_untracked_flag   >> $REPO_BackUp_File
+    echo -e   >> $REPO_BackUp_File
+        
+    ### Prop "modified:" 标记是否有 修改后未提交文件
+    git_status_modified=`git status | grep "modified:"`
+    git_status_modified_flag="false"
+    if [ -n "$git_status_modified" ]; then
+        git_status_modified_flag="true"
+    else
+        git_status_modified_flag="false"
+    fi
+    echo "__git_status_modified:"$git_status_modified_flag   >> $REPO_BackUp_File
+    echo -e   >> $REPO_BackUp_File
+        
+        
+    ### Prop "commits" 标记是否有未提交commit标识
+    git_status_commits=`git status | grep "commits"`  
+    git_status_commits_flag="false"
+    if [ -n "$git_status_commits" ]; then
+        git_status_commits_flag="true"
+    else
+        git_status_commits_flag="false"
+    fi
+    echo "__git_status_uncommits:"$git_status_commits_flag   >> $REPO_BackUp_File
+    echo -e   >> $REPO_BackUp_File
+    
+    
+    
+    #  Prop Your branch is ahead of   标记是否本地分支有超过远程分支提交的标识
+    git_status_ahead_commits=`git status | grep "Your branch is ahead of"`  
+    git_status_ahead_commits_flag="false"
+    if [ -n "$git_status_ahead_commits" ]; then
+        git_status_ahead_commits_flag="true"
+    else
+        git_status_ahead_commits_flag="false"
+    fi
+    echo "__git_status_aheadcommits:"$git_status_ahead_commits_flag   >> $REPO_BackUp_File
+    echo -e   >> $REPO_BackUp_File    
+
+
+    #  Prop Have Master Branch  标记是否有远程主分支 标识位
+    is_have_master_branch_flag="false"
+    if [ -n "$git_master_branch_desc" ]; then
+        is_have_master_branch_flag="true"
+    else
+        is_have_master_branch_flag="false"
+    fi
+    echo "__git_have_master_branch:"$is_have_master_branch_flag   >> $REPO_BackUp_File
+    echo -e   >> $REPO_BackUp_File    
+    echo -e   >> $REPO_BackUp_File
+    echo -e   >> $REPO_BackUp_File
+     gitpath_line_number=$(($gitpath_line_number+1))
+ done
+
+cp -fr $REPO_BackUp_File $REPO_VENDOR_NODE_FILE
+
+echo "REPO_MSI_NODE_FILE="$REPO_MSI_NODE_FILE" Success!"
+echo "REPO_VENDOR_NODE_FILE="$REPO_VENDOR_NODE_FILE" Success!"
+echo "__________________________________Method_Out "$FUNCNAME
+cd $init_pwd
+}
+
+
+
 function rule902vrepobackupoperation_func_0x0(){
 # =========================================================================== rule902vrepobackupoperation_func_0x0
 # rule_tip:  $init_shfile_name  _901_   ##  repo_backup_operation 依据当前路径的 repo_backup.txt  来对当前 repo 进行备份恢复操作 
-# desc: repo_backup_operation 依据当前路径的 repo_backup.txt  来对当前 repo 进行备份恢复操作
+# desc: repo_backup_operation 依据当前路径的 repo_backup_msi.txt   repo_backup_vendor.txt  来对当前 repo 进行备份恢复操作
 # sample:  
 # sample_out: 
 CUR_REPO_PATH=$init_pwd
-REPO_BackUp_File=$CUR_REPO_PATH/repo_backup.txt
+Code_Tag_Vendor_1="vendor"
+Code_Tag_Msi_1="msi"
+Code_Tag_Msi_2="system"
+REPO_BackUp_File=$CUR_REPO_PATH/repo_backup_vendor.txt
+Code_Match_Vendor_Result=$(echo "$CUR_REPO_PATH" | grep -ie "$Code_Tag_Vendor_1")
+if [[ "$Code_Match_Vendor_Result" != "" ]] ; then
+REPO_BackUp_File=$CUR_REPO_PATH/repo_backup_vendor.txt
+else
+REPO_BackUp_File=$CUR_REPO_PATH/repo_backup_msi.txt
+fi
+
+Code_Match_Msi_Result=$(echo "$CUR_REPO_PATH" | grep -ie "$Code_Tag_Msi_1"  -ie "$Code_Tag_Msi_2")
+if [[ "$Code_Match_Msi_Result" != "" ]] ; then
+REPO_BackUp_File=$CUR_REPO_PATH/repo_backup_msi.txt
+else
+REPO_BackUp_File=$CUR_REPO_PATH/repo_backup_vendor.txt
+fi
+
+echo "Code_Match_Vendor_Result="$Code_Match_Vendor_Result
+echo "Code_Match_Msi_Result="$Code_Match_Msi_Result
+echo "REPO_BackUp_File="$REPO_BackUp_File
+
 backup_all_number=`grep -n  ""   $REPO_BackUp_File | wc -l`
 backup_line_number=1
 
@@ -183,20 +558,43 @@ cd $CUR_REPO_PATH
 
 function rule901vrepobackuprecord_func_0x0(){
 # =========================================================================== rule901vrepobackuprecord_func_0x0
-# rule_tip:  $init_shfile_name  _901_   ##  repo_backup_record    对当前repo仓库 状态进行状态备份   会生成 repo_backup.txt 文件 
+# rule_tip:  $init_shfile_name  _901_   ##  repo_backup_record    对当前repo仓库 状态进行状态备份   会生成 repo_backup_msi.txt  repo_backup_vendor.txt 文件 
 # desc:  repo_backup_record    对当前repo仓库 状态进行状态备份   会生成 repo_backup.txt 文件
 # sample:  
 # sample_out: 
 echo "__________________________________Method_In "$FUNCNAME
-CUR_REPO_PATH=$init_pwd
+CUR_REPO_PATH=$init_pwd   ## Vendor_xxx   Msi_xxx 开头
+Code_Tag_Vendor_1="vendor"
+Code_Tag_Msi_1="msi"
+Code_Tag_Msi_2="system"
+REPO_BackUp_File=$CUR_REPO_PATH/repo_backup_vendor.txt
+Code_Match_Vendor_Result=$(echo "$CUR_REPO_PATH" | grep -ie "$Code_Tag_Vendor_1")
+if [[ "$Code_Match_Vendor_Result" != "" ]] ; then
+REPO_BackUp_File=$CUR_REPO_PATH/repo_backup_vendor.txt
+else
+REPO_BackUp_File=$CUR_REPO_PATH/repo_backup_msi.txt
+fi
+
+Code_Match_Msi_Result=$(echo "$CUR_REPO_PATH" | grep -ie "$Code_Tag_Msi_1"  -ie "$Code_Tag_Msi_2")
+if [[ "$Code_Match_Msi_Result" != "" ]] ; then
+REPO_BackUp_File=$CUR_REPO_PATH/repo_backup_msi.txt
+else
+REPO_BackUp_File=$CUR_REPO_PATH/repo_backup_vendor.txt
+fi
+
+echo "Code_Match_Vendor_Result="$Code_Match_Vendor_Result
+echo "Code_Match_Msi_Result="$Code_Match_Msi_Result
+echo "REPO_BackUp_File="$REPO_BackUp_File
+
 rule900_timestamp=`date +%Y-%m-%d_%H-%M-%S`  ##  获取到时间戳 2023-03-21_16-33-13 
-REPO_BackUp_File=$CUR_REPO_PATH/repo_backup.txt
-## 获取所有的 AOSP的repo的 路径到 repo_pwd.txt
+
+## 获取所有的 AOSP的repo的 路径到 repo_git_path.txt
+
 repo forall -c pwd > ./repo_git_path.txt
-## 当前遍历到的 repo_pwd.txt 的 行数
+## 当前遍历到的 repo_git_path.txt 的 行数
 gitpath_line_number=1
 gitpath_min_count=500
-## 获取 repo_pwd.txt 所有的行  既 当前 AOSP的 所有的 repo仓库的 个数
+## 获取 repo_git_path.txt 所有的行  既 当前 AOSP的 所有的 repo仓库的 个数
 gitpath_all_number=`grep -n  ""   ./repo_git_path.txt | wc -l`
 
 if [ $gitpath_all_number -lt $gitpath_min_count ] ; then
@@ -221,9 +619,13 @@ do
     git_local_branch_desc=`git branch -vv | grep "*" |awk -F' ' '{ print $2 }'`
     echo "__git_local_branch:"$git_local_branch_desc  >> $REPO_BackUp_File
     echo -e   >> $REPO_BackUp_File
-    
-    ### Command 获取本地主分支的第一个commitid
-    git_head_commitid_desc=`git rev-parse HEAD`
+
+    ### Command 获取本地主分支的第一个commitid   git rev-parse HEAD  || git rev-parse origin/master
+    git_remote_branch_desc=`git branch -r | grep " -" |awk -F' ' '{ print $3 }'`
+    if [[ "$git_remote_branch_desc" == "" ]] ; then
+        git_remote_branch_desc="HEAD"
+    fi
+    git_head_commitid_desc=`git rev-parse $git_remote_branch_desc`
     echo "__git_head_commitid:"$git_head_commitid_desc  >> $REPO_BackUp_File
     echo -e   >> $REPO_BackUp_File
     
@@ -811,10 +1213,14 @@ echo $init_shfile_name" _27_  ip_192.168.0.2 ipport_54321 paircode_654321 pairpo
 echo
 echo $init_shfile_name" _900_    ## AOSP_repo_foce_sync        强制更新repo仓库 比 repo sync -j2强 会有log文件 repo_sync_log_*.txt 文件生成 "
 echo
-echo $init_shfile_name" _901_    ## AOSP_repo_backup_record    对当前repo仓库 状态进行状态备份   会生成 repo_backup.txt 文件"
+echo $init_shfile_name" _901_    ## AOSP_repo_backup_record    对当前repo仓库 状态进行状态备份   会生成 repo_backup_msi.txt  repo_backup_vendor.txt 文件"
 echo
 echo $init_shfile_name" _902_    ## AOSP_repo_backup_operation 依据当前路径的 repo_backup.txt  来对当前 repo 进行备份恢复操作 "
 echo
+echo $init_shfile_name" _903_   Msi_1  Vendor_1   ## AOSP_msi_vendor_backup_operation 输入当前 Msi Vendor文件夹 对 Msi Vendor进行备份在repo_node_list 目录保存 repo_backup_msi.txt  repo_backup_vendor.txt "
+echo
+
+
 echo "__________________________________Method_Out "$FUNCNAME
 }
 
