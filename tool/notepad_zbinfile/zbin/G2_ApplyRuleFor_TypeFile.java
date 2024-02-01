@@ -428,8 +428,242 @@ public class G2_ApplyRuleFor_TypeFile {
         //  对当前  依据  md5_type  组成的规则的文件  还原为  md5.type 这样的 文件
         realTypeRuleList.add(new Make_Md5Type_Hide_File_Back_To_FileType_Rule64());
 
+        // 指定文件 进行 文本的 替换
+        realTypeRuleList.add(new ReplaceTxtFile_Src_to_Dst_Rule_65());
     }
 
+class ReplaceTxtFile_Src_to_Dst_Rule_65 extends Basic_Rule {
+
+
+        HashMap<String,String> mSrc_Dst_StrMap;   // 从输入文件得到的  原内容 和 替换内容的集合Map
+        ArrayList<String> mSrcList ;   //  原始替换内容的集合  用于快速查询当前是否有 匹配的字符串
+
+
+       boolean   isSearAllLocalFile = true;     // 无参数输入 那么 搜索所有文件
+        ArrayList<File> inputFileList;    // 输入的文件 和 文件夹集合
+
+        ArrayList<File> mOperationFileList;   //  需要操作文件的集合
+
+        ReplaceTxtFile_Src_to_Dst_Rule_65() {
+            super("#", 65, 4); //
+            mSrc_Dst_StrMap = new HashMap<String,String>();
+            mSrcList = new ArrayList<String>() ;
+            inputFileList = new  ArrayList<File>();
+            mOperationFileList = new  ArrayList<File>();
+            isSearAllLocalFile = false;
+        }
+
+
+
+        @Override
+        String simpleDesc() {
+
+            return
+                     Cur_Bat_Name + " #_" + rule_index + "  '[][]'     ##  无文件参数 那么默认读取本地路径下文件 【American 替换为 美国的操作】 文本替换 每行 [src][dst] [American][美国]    \n"
+                   +   Cur_Bat_Name + " #_" + rule_index + "  '[][]'  [American][美国]   ## 读取当前指定输入文件的命令 或者当前 所有文件 进行文字上 【American 替换为 美国的操作】 文本替换 每行 [src][dst] [American][美国]    \n"
+                     +   Cur_Bat_Name + " #_" + rule_index + "  '[**zukgit**][*Big*]'  '[American][美国]'   ## *代表一个空格 读取当前指定输入文件的命令 或者当前 所有文件 进行文字上 【American 替换为 美国的操作】 文本替换 每行 [src][dst] [American][美国]    \n"
+
+                     + Cur_Bat_Name + " #_" + rule_index + " A.txt B.txt  '[][]'  '[American][美国]'     ### 解析当前目录下所有的html文件 尝试按照 releaseNote.html文件用于输入 产生 product_tip.txt文件    \n";
+        }
+
+
+
+        @Override
+        boolean initParamsWithInputList(ArrayList<String> inputParamList) {
+
+            for (int i = 0; i < inputParamList.size(); i++) {
+                String strInput = inputParamList.get(i);
+
+                File tempFile_relative = new File(curDirPath + File.separator + strInput);   // 相对路径
+                File  tempFile_abs = new File(strInput);   // 相对路径
+                if (tempFile_relative.exists() && !tempFile_relative.isDirectory()) {
+                    inputFileList.add(tempFile_relative);
+                } else if(tempFile_relative.exists() && tempFile_relative.isDirectory()){
+
+                    if(tempFile_relative.listFiles() != null && tempFile_relative.listFiles().length > 0 ){
+                        inputFileList.addAll(Arrays.asList(tempFile_relative.listFiles()));
+                    }
+                } else  if (tempFile_abs.exists() && !tempFile_abs.isDirectory()) {
+                    inputFileList.add(tempFile_abs);
+                } else if(tempFile_abs.exists() && tempFile_abs.isDirectory()){
+
+                    if(tempFile_abs.listFiles() != null && tempFile_abs.listFiles().length > 0 ){
+                        inputFileList.addAll(Arrays.asList(tempFile_abs.listFiles()));
+                    }
+                }
+
+
+                String oneLine = inputParamList.get(i).trim();
+
+                if(oneLine.startsWith("[") && oneLine.endsWith("]") && oneLine.contains("][")){
+
+                    String clear_pre_end_str = oneLine.substring(1,oneLine.length()-1);
+
+                    String[] splitArr = clear_pre_end_str.split("\\]\\[");
+                    if(splitArr == null || splitArr.length != 2){
+                        System.out.println("当前行["+(i+1)+"]输入参数内容: "+ oneLine+"  无法解析为  【原始字符串】_【替换字符串】 跳过该行  请注意!");
+                        continue;
+                    }
+
+                    String srcStr = splitArr[0].trim();
+
+                    String dstStr = splitArr[1].trim();
+
+                    System.out.println("param["+i+"_"+""+inputParamList.size()+"] ____ value["+oneLine+"]"+ "srcStr["+srcStr+"]  dstStr["+dstStr+"]   ["+srcStr+"]["+dstStr+"]");
+
+                    if(srcStr.contains("*")){
+                        srcStr =   srcStr.replaceAll("\\*"," ");
+                    }
+
+                    if(dstStr.contains("*")){
+                        dstStr =   dstStr.replaceAll("\\*"," ");
+                    }
+
+                     //  如果 当前  src[] dst[]  那么 忽略 这样的文本替换  [][]   [][]   [][]   [][]   [][]
+                    if("".equals(srcStr) && "".equals(dstStr)){
+                        System.out.println("当前输入参数 ["+i+"_"+inputParamList.size()+"] [src][dst]!!   ["+srcStr+"]["+dstStr+"] 可能都为空 无法作为 [][] 文本替换源");
+
+                        continue;
+                    }
+
+
+
+                    mSrcList.add(srcStr);
+                    mSrc_Dst_StrMap.put(srcStr,dstStr);
+
+                }
+
+            }
+            
+            if(inputFileList.size() > 0 ){
+
+                for (int i = 0; i < inputFileList.size(); i++) {
+                    if(inputFileList.get(i).isFile()){
+                        mOperationFileList.add(inputFileList.get(i));
+                    }
+                }
+            }
+
+            if (mOperationFileList.size() == 0 && mSrc_Dst_StrMap.size() == 0 ) {
+                System.out.println("当前没有输入任何文件 文件夹  以及 输入文本替换为 空  [][]  请检查输入! ");
+                return  false;
+            }
+            
+            if(mOperationFileList.size() == 0 && mSrc_Dst_StrMap.size() > 0){
+
+                File tempFile_relative = new File(curDirPath );   // 相对路径
+              File[] localFileArr  = tempFile_relative.listFiles() ;
+              if(localFileArr != null && localFileArr.length > 0 ){
+                  isSearAllLocalFile = true;
+                  for (File fileItem: localFileArr) {
+                      if(fileItem.isFile()){
+                          mOperationFileList.add(fileItem);
+                      }
+                  }
+              }
+                
+            }
+
+            if(mOperationFileList.size() == 0 && mSrc_Dst_StrMap.size() > 0 ){
+                System.out.println("当前没有输入任何文件  本地文件夹也没有可操作文件  "+buildReplaceTip(mSrcList,mSrc_Dst_StrMap)+"   文本替换工作! ");
+                return  false;
+            }
+
+
+            for (int i = 0; i < mOperationFileList.size(); i++) {
+                File fileItem = mOperationFileList.get(i);
+                System.out.println(" File["+i+"_"+""+mOperationFileList.size()+"]____"+fileItem.getAbsolutePath());
+            }
+
+            if(mSrc_Dst_StrMap.size() == 0){
+                System.out.println("当前没有输入替换规则   [][]  请检查输入! ");
+
+                return  false;
+            }
+            System.out.println("开始执行替换规则: "+ buildReplaceTip(mSrcList,mSrc_Dst_StrMap));
+
+            return super.initParamsWithInputList(inputParamList);
+        }
+
+
+        String buildReplaceTip(ArrayList<String> srcList , HashMap<String,String> src_dst_map  ){
+        StringBuilder  tipSB = new StringBuilder();
+
+            for (int i = 0; i < srcList.size(); i++) {
+                String src_item = srcList.get(i);
+                String dst_item = src_dst_map.get(src_item);
+                tipSB.append(" ["+src_item+"]["+dst_item+"]" );
+            }
+
+        return tipSB.toString();
+
+        }
+
+
+
+        @Override
+        ArrayList<File> applySubFileListRule4(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+
+
+            System.out.println("begin applySubFileListRule4 _____");
+
+                int avaliable_product_txt_count = 0 ;
+                ArrayList<String> failed_htmlparse_tiplist = new  ArrayList<String>();
+
+
+                for (int i = 0; i < mOperationFileList.size() ; i++) {
+
+                    boolean isContainFlag = false;
+                    File operationFile = mOperationFileList.get(i);
+
+                    System.out.println("╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤ InputFile["+i+"_"+mOperationFileList.size()+"]_"+operationFile.getName()+"_"+"begin ╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤");
+
+
+                    ArrayList<String> rawFileContentList = ReadFileContentAsList(operationFile);
+
+
+                   ArrayList<String> newFileContentList = new   ArrayList<String>();
+
+                    for (int k = 0; k < rawFileContentList.size(); k++) {
+                        String oneLine = rawFileContentList.get(k);
+                        String  mNextStr = oneLine;
+
+                        for (int m = 0; m < mSrcList.size(); m++) {
+                            String  mMatchStrItem =     mSrcList.get(m);
+                            if(mNextStr.contains(mMatchStrItem)){
+                                mNextStr = mNextStr.replaceAll(mMatchStrItem,mSrc_Dst_StrMap.get(mMatchStrItem));
+                                isContainFlag = true;
+                                System.out.println("Raw_Line_"+k+":"+oneLine);
+                                System.out.println("New_Line_"+k+":"+mNextStr);
+                                System.out.println();
+                            }
+
+                        }
+                        newFileContentList.add(mNextStr);
+
+                    }
+
+                    if(isContainFlag){
+                        writeContentToFile(operationFile,newFileContentList);
+                        System.out.println("OperationFile["+i+"_"+mOperationFileList.size()+"]_"+operationFile.getName()+""+" " + buildReplaceTip(mSrcList,mSrc_Dst_StrMap));
+
+                    }
+
+                    System.out.println();
+                    System.out.println();
+                    System.out.println();
+
+                }
+
+
+            return super.applySubFileListRule4(curFileList, subFileTypeMap, curDirList, curRealFileList);
+        }
+
+
+
+
+    }
+	
     class Make_Md5Type_Hide_File_Back_To_FileType_Rule64 extends Basic_Rule {
         boolean isDirOperation; // 是否没有输入 real 文件 而是 输入了一个 目录 默认shell 目录 已经 输入的目录
 
