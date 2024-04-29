@@ -115,6 +115,7 @@ import org.openqa.selenium.Keys;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.interactions.Actions;
+import org.openxmlformats.schemas.spreadsheetml.x2006.main.impl.CTCellFormulaImpl;
 
 import java.security.Key;
 import java.security.Security;
@@ -428,11 +429,221 @@ public class G2_ApplyRuleFor_TypeFile {
         //  对当前  依据  md5_type  组成的规则的文件  还原为  md5.type 这样的 文件
         realTypeRuleList.add(new Make_Md5Type_Hide_File_Back_To_FileType_Rule64());
 
+        // 对于 ZHide 文件夹内的所有文件 进行 md5_type 操作  md5.type 操作
+        realTypeRuleList.add(new ZHide_MD5Type_Operation_Rule_65());
+        
         // 指定文件 进行 文本的 替换
-        realTypeRuleList.add(new ReplaceTxtFile_Src_to_Dst_Rule_65());
+        realTypeRuleList.add(new ReplaceTxtFile_Src_to_Dst_Rule_66());
+        
+
+        // 指定src文件  放入 dest.txt 文件指向的每一行目录
+        realTypeRuleList.add(new CopyFile_Src_to_Dst_Rule_67());
+        
+        
     }
 
-class ReplaceTxtFile_Src_to_Dst_Rule_65 extends Basic_Rule {
+    class CopyFile_Src_to_Dst_Rule_67 extends Basic_Rule {
+
+
+        HashMap<File,File> mSrc_Dst_FileMap;   // 从输入文件得到的  原内容 和 替换内容的集合Map
+
+
+        boolean isMakeNewDir = false;   // 是否在没有路径的文件创建新的文件夹路径
+     
+        CopyFile_Src_to_Dst_Rule_67() {
+            super("#", 67, 4); //
+            mSrc_Dst_FileMap = new HashMap<File,File>();
+
+        }
+
+
+
+        @Override
+        String simpleDesc() {
+        	if(CUR_OS_TYPE == OS_TYPE.Windows) {
+        		
+                return
+                          Cur_Bat_Name + " #_" + rule_index + "  [raw文件路径][路径内容txt文件路径]    ## 指定src文件  放入 dest.txt 文件指向的每一行目录    \n"
+                      +   Cur_Bat_Name + " #_" + rule_index + "  [D:\\jira_work\\143453\\src.so][D:\\jira_work\\143453\\dst.txt]     ##  指定src.so文件  放入 dest.txt 文件每一行存在的文件路径   \n"
+                      +   Cur_Bat_Name + " #_" + rule_index + " makedir_true   [D:\\jira_work\\143453\\src.so][D:\\jira_work\\143453\\dst.txt]     ##  指定src.so文件  放入 dest.txt 文件每一行存在的文件路径   \n"
+                      +   Cur_Bat_Name + " #_" + rule_index + "    [src_file][path_list_file]     ##  指定 src_file.so 文件  放入 path_list_file 文件每一行存在的文件路径   \n"
+                      +   Cur_Bat_Name + " #_" + rule_index + "    [][]     ##  指定 src_file.so 文件  放入 path_list_file 文件每一行存在的文件路径   \n"
+
+                      ;
+          
+                
+        	} 
+
+            return
+                    Cur_Bat_Name + " #_" + rule_index + "  '[raw文件路径][路径内容txt文件路径]'    ## 指定src文件  放入 dest.txt 文件指向的每一行目录    \n"
+                +   Cur_Bat_Name + " #_" + rule_index + "  '[D:\\jira_work\\143453\\src.so][D:\\jira_work\\143453\\dst.txt]'     ##  指定src.so文件  放入 dest.txt 文件每一行存在的文件路径   \n"
+                +   Cur_Bat_Name + " #_" + rule_index + " makedir_true   '[D:\\jira_work\\143453\\src.so][D:\\jira_work\\143453\\dst.txt]'     ##  指定src.so文件  放入 dest.txt 文件每一行存在的文件路径   \n"
+                  +   Cur_Bat_Name + " #_" + rule_index + "    '[src_file][path_list_file]'     ##  指定 src_file.so 文件  放入 path_list_file 文件每一行存在的文件路径   \n"
+                  +   Cur_Bat_Name + " #_" + rule_index + "    '[][]'     ##  指定 src_file.so 文件  放入 path_list_file 文件每一行存在的文件路径   \n"
+
+                ;
+      }
+
+
+
+        @Override
+        boolean initParamsWithInputList(ArrayList<String> inputParamList) {
+
+            for (int i = 0; i < inputParamList.size(); i++) {
+                String strInput = inputParamList.get(i);
+
+                File tempFile_relative = new File(curDirPath + File.separator + strInput);   // 相对路径
+                File  tempFile_abs = new File(strInput);   // 相对路径
+
+
+                String oneLine = inputParamList.get(i).trim();
+                if("makedir_true".equals(oneLine)) {
+                	isMakeNewDir = true;
+                }
+
+                if(oneLine.startsWith("[") && oneLine.endsWith("]") && oneLine.contains("][")){
+
+                    String clear_pre_end_str = oneLine.substring(1,oneLine.length()-1);
+
+                    String[] splitArr = clear_pre_end_str.split("\\]\\[");
+                    if(splitArr == null || splitArr.length != 2){
+                        System.out.println("当前行["+(i+1)+"]输入参数内容: "+ oneLine+"  无法解析为  【Src文件路径】【Dst内容路径】 跳过该行  请注意!");
+                        continue;
+                    }
+
+                    String srcStr = splitArr[0].trim();
+
+                    String dstStr = splitArr[1].trim();
+
+                    System.out.println("param["+i+"_"+""+inputParamList.size()+"] ____ value["+oneLine+"]"+ "srcStr["+srcStr+"]  dstStr["+dstStr+"]   ["+srcStr+"]["+dstStr+"]");
+
+                     //  如果 当前  src[] dst[]  那么 忽略 这样的文本替换  [][]   [][]   [][]   [][]   [][]
+                    if("".equals(srcStr) && "".equals(dstStr)){
+                        System.out.println("当前输入参数 ["+i+"_"+inputParamList.size()+"] [src][dst]!!   ["+srcStr+"]["+dstStr+"] 可能都为空 无法作为 [][] 文本替换源");
+
+                        continue;
+                    }
+                    
+                    File  srcFile =new File(srcStr);
+                    File  dstContentFile =new File(dstStr);
+
+                    if(!srcFile.exists() || !dstContentFile.exists() ) {
+                    	if(!srcFile.exists()) {
+                            System.out.println("当前输入参数 ["+i+"_"+inputParamList.size()+"] [src][dst]!!  SrcFile路径为空! ["+srcStr+"]["+dstStr+"] 可能都为空 无法作为 [][] 文本替换源");
+                    	}
+
+                       	if(!dstContentFile.exists()) {
+                            System.out.println("当前输入参数 ["+i+"_"+inputParamList.size()+"] [src][dst]!!  DstContentFile路径为空! ["+srcStr+"]["+dstStr+"] 可能都为空 无法作为 [][] 文本替换源");
+                    	}
+                    
+                    } 
+                  
+                    
+                    if(srcFile.exists() && dstContentFile.exists() ) {
+                    	mSrc_Dst_FileMap.put(srcFile,dstContentFile);
+                    }
+           
+                }
+
+            }
+            
+    
+
+            if (mSrc_Dst_FileMap.size() == 0  ) {
+                System.out.println("当前没有输入任何 src文件 dstPathTxt文件  以及 输入文本替换为 空  [][]  请检查输入! ");
+                return  false;
+            }
+
+
+            System.out.println("开始执行替换规则: "+ buildReplaceFileTip(mSrc_Dst_FileMap));
+
+            return super.initParamsWithInputList(inputParamList);
+        }
+        
+        String buildReplaceFileTip(HashMap<File,File> src_dst_map  ){
+        StringBuilder  tipSB = new StringBuilder();
+
+
+        Map.Entry<File, File> entryItem;
+        int item_index = 0;
+        int map_size = 0;
+        map_size = src_dst_map.size();
+        Iterator iterator = src_dst_map.entrySet().iterator();
+        while (iterator.hasNext()) {
+            entryItem = (Map.Entry<File, File>) iterator.next();
+            File src_file = entryItem.getKey(); // Map的Key
+            File dst_content_file = entryItem.getValue(); // Map的Value
+            
+            tipSB.append("["+src_file.getAbsolutePath()+"]["+dst_content_file.getAbsolutePath()+"] ");
+        }
+         
+
+        return tipSB.toString();
+
+        }
+        
+
+
+        @Override
+        ArrayList<File> applySubFileListRule4(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+
+
+            System.out.println("begin applySubFileListRule4 _____");
+
+  
+            
+            Map.Entry<File, File> entryItem;
+            int item_index = 0;
+            int map_size = 0;
+            map_size = mSrc_Dst_FileMap.size();
+            Iterator iterator = mSrc_Dst_FileMap.entrySet().iterator();
+            while (iterator.hasNext()) {
+                entryItem = (Map.Entry<File, File>) iterator.next();
+                File src_file = entryItem.getKey(); // Map的Key
+                File dst_content_file = entryItem.getValue(); // Map的Value
+                
+                
+               ArrayList<String> dstAllContent =  ReadFileContentAsList(dst_content_file);
+                
+               System.out.println("╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤ InputSrcDstFile["+item_index+"_"+map_size+"]_"+src_file.getAbsolutePath()+"_"+"begin ╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤");
+
+               
+              for (int i = 0; i < dstAllContent.size(); i++) {
+            	  String oneLine = dstAllContent.get(i).trim();
+            	  
+            	  File tempDir = new File(oneLine);
+            	  
+
+                  System.out.println("══════ InputSrcDstFile["+item_index+"_"+map_size+"]_["+i+"_"+dstAllContent.size()+"]"+src_file.getAbsolutePath()+"____"+oneLine);
+
+                  
+                  
+            	  if(tempDir.exists()) {
+            		  File tempDstFile = new File(tempDir.getAbsolutePath()+File.separator+src_file.getName());
+            		  
+            		
+            		  fileCopy(src_file, tempDstFile);
+            		  
+                      System.out.println("InputSrcDstFile["+item_index+"_"+map_size+"]_["+i+"_"+dstAllContent.size()+"]"+" CopyResult:"+tempDstFile.exists()+"  DstPath:"+tempDstFile.getAbsolutePath());
+                      System.out.println();
+            	  }
+			}
+              item_index++;
+              System.out.println();
+            }
+            
+  
+            return super.applySubFileListRule4(curFileList, subFileTypeMap, curDirList, curRealFileList);
+        }
+
+
+
+
+    }
+	
+
+    
+class ReplaceTxtFile_Src_to_Dst_Rule_66 extends Basic_Rule {
 
 
         HashMap<String,String> mSrc_Dst_StrMap;   // 从输入文件得到的  原内容 和 替换内容的集合Map
@@ -444,8 +655,8 @@ class ReplaceTxtFile_Src_to_Dst_Rule_65 extends Basic_Rule {
 
         ArrayList<File> mOperationFileList;   //  需要操作文件的集合
 
-        ReplaceTxtFile_Src_to_Dst_Rule_65() {
-            super("#", 65, 4); //
+        ReplaceTxtFile_Src_to_Dst_Rule_66() {
+            super("#", 66, 4); //
             mSrc_Dst_StrMap = new HashMap<String,String>();
             mSrcList = new ArrayList<String>() ;
             inputFileList = new  ArrayList<File>();
@@ -457,6 +668,17 @@ class ReplaceTxtFile_Src_to_Dst_Rule_65 extends Basic_Rule {
 
         @Override
         String simpleDesc() {
+        	if(CUR_OS_TYPE == OS_TYPE.Windows) {
+        		
+                return
+                        Cur_Bat_Name + " #_" + rule_index + "  [][]     ##  无文件参数 那么默认读取本地路径下文件 【American 替换为 美国的操作】 文本替换 每行 [src][dst] [American][美国]    \n"
+                      +   Cur_Bat_Name + " #_" + rule_index + "  [][]  [American][美国]   ## 读取当前指定输入文件的命令 或者当前 所有文件 进行文字上 【American 替换为 美国的操作】 文本替换 每行 [src][dst] [American][美国]    \n"
+                        +   Cur_Bat_Name + " #_" + rule_index + "  [**zukgit**][*Big*]  [American][美国]   ## *代表一个空格 读取当前指定输入文件的命令 或者当前 所有文件 进行文字上 【American 替换为 美国的操作】 文本替换 每行 [src][dst] [American][美国]    \n"
+
+                        + Cur_Bat_Name + " #_" + rule_index + " A.txt B.txt  [][]  [American][美国]     ### 解析当前目录下所有的html文件 尝试按照 releaseNote.html文件用于输入 产生 product_tip.txt文件    \n";
+          
+                
+        	} 
 
             return
                      Cur_Bat_Name + " #_" + rule_index + "  '[][]'     ##  无文件参数 那么默认读取本地路径下文件 【American 替换为 美国的操作】 文本替换 每行 [src][dst] [American][美国]    \n"
@@ -664,7 +886,137 @@ class ReplaceTxtFile_Src_to_Dst_Rule_65 extends Basic_Rule {
 
     }
 	
-    class Make_Md5Type_Hide_File_Back_To_FileType_Rule64 extends Basic_Rule {
+
+//对于 ZHide 文件夹内的所有文件 进行 md5_type 变为(unknow文件类型) 操作  md5.type 操作 (变为 type类型)
+class ZHide_MD5Type_Operation_Rule_65 extends Basic_Rule {
+
+	// 0 -----  默认 不操作 
+    // 1 ---- dohide  对所有文件进行 md5_type 操作 转为 unknow类型
+    // 2 ---- retype  对所有文件 md5_type 操作 转为 md5.type类型 type类型
+    int mOperationType = 0 ;
+
+
+	ZHide_MD5Type_Operation_Rule_65() {
+        super("#", 65, 5);
+        mOperationType = 0 ;
+    }
+	
+    @Override
+    ArrayList<File> applyDir_SubFileListRule5(ArrayList<File> allSubDirFileList,
+                                              ArrayList<File> allSubRealFileList) {
+
+        
+ 	   for (int i = 0; i < allSubRealFileList.size(); i++) {
+		   File inputRealFile = allSubRealFileList.get(i);
+		   
+	        System.out.println("mRealFile["+i+"_"+allSubRealFileList.size()+"] = "+ inputRealFile.getName()+"  : "+ inputRealFile.getAbsolutePath() );
+	
+if(mOperationType == 1) {  // dohide
+	
+	String fileType_name =	getFileTypeNoPoint(inputRealFile.getName());
+    String md5name =  getMD5Three(inputRealFile.getAbsolutePath());
+    
+    String newName = md5name+"_"+fileType_name;
+    
+    if(new File(curDirPath+File.separator+newName).exists()) {
+    	
+    	newName = md5name+"-"+getTimeStamp_yyyyMMddHHmmss()+"_"+fileType_name;
+    }
+    
+    tryReName(inputRealFile,newName);
+    
+    System.out.println("dohide mRealFile["+i+"_"+allSubRealFileList.size()+"]  newName="+ newName );
+
+    
+} else if(mOperationType == 2) {  // retype
+	
+
+    String realFileName = inputRealFile.getName(); //  fjoafjoa_mp4
+    String md5name =  getMD5Three(inputRealFile.getAbsolutePath());
+
+    String fileType_name = realFileName;
+    if(realFileName.startsWith(md5name+"_")){   // 符合规则的文件  进行处理
+
+        fileType_name = fileType_name.replace("_",".");
+
+        // 从 adafagfea_txt   转为 adafagfea.txt
+//    File filetype_name = new File(inputDirFile.getAbsolutePath() + File.separator + fileType_name);
+
+        tryReName(inputRealFile,fileType_name);
+  
+        System.out.println("retype mRealFile["+i+"_"+allSubRealFileList.size()+"]  newName="+ fileType_name );
+
+
+    } else{    // 不符合规则的文件   不主动操作
+
+    }
+    
+	
+}
+ 	   }
+ 	   
+
+
+        return super.applyDir_SubFileListRule5(allSubDirFileList, allSubRealFileList);
+    }
+
+
+	
+    @Override
+    boolean initParamsWithInputList(ArrayList<String> inputParamList) {
+
+        for (int i = 0; i < inputParamList.size(); i++) {
+            String strInput = inputParamList.get(i);
+
+            if(strInput.equals("dohide")){
+            	mOperationType = 1 ;
+            } else if(strInput.equals("retype")){
+            	mOperationType = 2 ;
+            }
+        }
+
+
+        System.out.println("mOperationType = "+mOperationType+" CurPath:"+curDirPath);
+        if(mOperationType == 1){
+            System.out.println("当前  mOperationType["+mOperationType+"]  dohide 执行的逻辑:  对所有文件进行 md5_type 操作 转为 unknow类型 !");
+        } else  if(mOperationType == 2){
+            System.out.println("当前  mOperationType["+mOperationType+"]  retype 执行的逻辑:  对所有文件 md5_type 操作 还原转为 md5.type类型 type类型 !");
+        }else {
+            System.out.println("当前  mOperationType["+mOperationType+"]   非执行逻辑(避免大规模把 好的文件 震坏! )");
+        }
+        
+        if(!curDirPath.toLowerCase().contains("zhide")) {
+            System.out.println("当前 路径不是在 ZHide 文件，无法执行 dohide 隐藏类型 以及 retype 还原类型的操作");
+
+            return false ;
+        	
+        }
+        
+        // TODO Auto-generated method stub
+        return super.initParamsWithInputList(inputParamList);
+    }
+    
+    @Override
+    String simpleDesc() {
+
+        return Cur_Bat_Name + " #_" + rule_index
+                + "   ### 对当前  ZHide 文件夹  进行  HideType 隐藏类型 以及  ReType 还原类型 操作 \n"
+                + Cur_Bat_Name + " #_" + rule_index
+                + "    ###  ZHide 文件夹  进行  HideType 隐藏类型 以及  ReType 还原类型 操作   \n"
+                + Cur_Bat_Name + " #_" + rule_index +" dohide"
+                + "    ### 对当前ZHide 文件夹    依据  md5_type  组成新的 文件名称 (unknow)文件类型   \n"
+                + Cur_Bat_Name + " #_" + rule_index +" retype"
+                + "    ### 对当前ZHide 文件夹 符合  md5_type 类型的 unknow文件 还原为 md5.type  的 type 类型文件    \n"
+                ;
+    }
+
+    
+}
+    
+
+
+
+class Make_Md5Type_Hide_File_Back_To_FileType_Rule64 extends Basic_Rule {
         boolean isDirOperation; // 是否没有输入 real 文件 而是 输入了一个 目录 默认shell 目录 已经 输入的目录
 
         File inputDirFile;
@@ -6803,7 +7155,7 @@ class ReplaceTxtFile_Src_to_Dst_Rule_65 extends Basic_Rule {
         @Override
         String simpleDesc() {
 
-            return  "\n" + Cur_Bat_Name + " #_" + rule_index + " key_zukgit12  12345678 87654321   // 对 输入的字符串   进行 加密  并打印 前后数据 对比 key_zukgit12 key_12345678 选中Key密钥 method_DES/ECB/NoPadding 选中加密方法 \n"
+            return  "\n" + Cur_Bat_Name + " #_" + rule_index + " key_zukgit12  12345678 874321   // 对 输入的字符串   进行 加密  并打印 前后数据 对比 key_zukgit12 key_12345678 选中Key密钥 method_DES/ECB/NoPadding 选中加密方法 \n"
                     + Cur_Bat_Name + " #_" + rule_index + " key_abcdefgh 11223344  method_DES/ECB/NoPadding 7788   // 对 输入的字符串   进行 加密  并打印 前后数据 对比 key_zukgit12 key_12345678 选中Key密钥 method_DES/ECB/NoPadding 选中加密方法 \n"
                     + "  \n"
                     + Cur_Bat_Name + " #_" + rule_index + " key_87654321 11223344   // 对 输入的字符串   进行 加密  并打印 前后数据 对比 key_zukgit12 key_12345678 选中Key密钥 method_DES/ECB/NoPadding 选中加密方法 \n"
@@ -26476,7 +26828,7 @@ class ReplaceTxtFile_Src_to_Dst_Rule_65 extends Basic_Rule {
 
     static {
         try {
-            Security.addProvider(new com.sun.crypto.provider.SunJCE());
+            Security.addProvider(new cn.gmssl.sun.crypto.provider.SunJCE());
             Key key = getKey(strDefaultKey_Rule7.getBytes());
             //	System.out.println("getFormat()=【"+key.getFormat()+"】  bytesToHexString=【getEncoded = "+bytesToHexString(key.getEncoded())+"】"
             //	+"【getAlgorithm= "+key.getAlgorithm()+"】" +"【toString = "+key.toString()+"】" +"【serialVersionUID= "+key.serialVersionUID+"】");
@@ -27079,6 +27431,13 @@ class ReplaceTxtFile_Src_to_Dst_Rule_65 extends Basic_Rule {
         return date;
     }
 
+    static String getTimeStamp_yyyyMMddHHmmss() {
+
+        SimpleDateFormat df = new SimpleDateFormat("yyyyMMddHHmmss");// 设置日期格式
+        String date = df.format(new Date());
+        return date;
+    }
+    
     static String getTimeStamp_YYYYMMdd() {
 
         SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd");// 设置日期格式
