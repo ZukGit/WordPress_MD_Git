@@ -914,18 +914,34 @@ class ZHide_MD5Type_Operation_Rule_65 extends Basic_Rule {
 if(mOperationType == 1) {  // dohide
 	
 	String fileType_name =	getFileTypeNoPoint(inputRealFile.getName());
+    String origin_file_nmae = inputRealFile.getName();
+
     String md5name =  getMD5Three(inputRealFile.getAbsolutePath());
-    
     String newName = md5name+"_"+fileType_name;
+
+
+    // 当前文件 已经是 hide 过的文件了
+    if(origin_file_nmae.startsWith(md5name+"_") && "".equals(fileType_name)){
+        System.out.println("dohide mRealFile["+i+"_"+allSubRealFileList.size()+"]  File is Already Hide !" );
+        continue;
+
+    }
+
     
-    if(new File(curDirPath+File.separator+newName).exists()) {
+    if(new File(curDirPath+File.separator+newName).exists()) { //  第二个重复的 文件 那么 重新改名
     	
     	newName = md5name+"-"+getTimeStamp_yyyyMMddHHmmss()+"_"+fileType_name;
     }
+
+    if(!new File(curDirPath+File.separator+newName).exists()){
+        tryReName(inputRealFile,newName);
+        System.out.println("dohide mRealFile["+i+"_"+allSubRealFileList.size()+"]  newName="+ newName );
+    } else {
+        System.out.println("dohide mRealFile["+i+"_"+allSubRealFileList.size()+"]  newName="+ newName  +" Already Exist!" );
+    }
+
     
-    tryReName(inputRealFile,newName);
-    
-    System.out.println("dohide mRealFile["+i+"_"+allSubRealFileList.size()+"]  newName="+ newName );
+
 
     
 } else if(mOperationType == 2) {  // retype
@@ -4968,7 +4984,7 @@ class Make_Md5Type_Hide_File_Back_To_FileType_Rule64 extends Basic_Rule {
 
     static String calculIndexFlag(Node curNode) {
         String indexFlag = "";
-        if (curNode != null && curNode.getMetaModel().getType() == com.github.javaparser.ast.body.MethodDeclaration.class) {
+        if (curNode != null && curNode.getMetaModel().getType() == MethodDeclaration.class) {
             return "[0]";
         } else {  // 把自己在
             List<Node> curChildList = curNode.getParentNode().get().getChildNodes();
