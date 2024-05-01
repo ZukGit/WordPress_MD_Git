@@ -908,6 +908,8 @@ class ZHide_MD5Type_Operation_Rule_65 extends Basic_Rule {
         
  	   for (int i = 0; i < allSubRealFileList.size(); i++) {
 		   File inputRealFile = allSubRealFileList.get(i);
+           String parentPath = inputRealFile.getParent();
+           
 		   
 	        System.out.println("mRealFile["+i+"_"+allSubRealFileList.size()+"] = "+ inputRealFile.getName()+"  : "+ inputRealFile.getAbsolutePath() );
 	
@@ -920,24 +922,29 @@ if(mOperationType == 1) {  // dohide
     String newName = md5name+"_"+fileType_name;
 
 
+    if( "".equals(fileType_name)){   // 已经是  unknow 文件类型的  那么 不操作 这个文件了
+        System.out.println("dohide1 mRealFile["+i+"_"+allSubRealFileList.size()+"]  File is an Unknow Hide Hide !" );
+        continue;
+    }
+
     // 当前文件 已经是 hide 过的文件了
     if(origin_file_nmae.startsWith(md5name+"_") && "".equals(fileType_name)){
-        System.out.println("dohide mRealFile["+i+"_"+allSubRealFileList.size()+"]  File is Already Hide !" );
+        System.out.println("dohide2 mRealFile["+i+"_"+allSubRealFileList.size()+"]  File is Already Hide !" );
         continue;
 
     }
 
     
-    if(new File(curDirPath+File.separator+newName).exists()) { //  第二个重复的 文件 那么 重新改名
+    if(new File(parentPath+File.separator+newName).exists()) { //  第二个重复的 文件 那么 重新改名
     	
-    	newName = md5name+"-"+getTimeStamp_yyyyMMddHHmmss()+"_"+fileType_name;
+    	newName = md5name+"_"+getTimeStamp_yyyyMMddHHmmss()+"_"+fileType_name;
     }
 
-    if(!new File(curDirPath+File.separator+newName).exists()){
+    if(!new File(parentPath+File.separator+newName).exists()){
         tryReName(inputRealFile,newName);
-        System.out.println("dohide mRealFile["+i+"_"+allSubRealFileList.size()+"]  newName="+ newName );
+        System.out.println("dohide3 mRealFile["+i+"_"+allSubRealFileList.size()+"]  newName="+ newName );
     } else {
-        System.out.println("dohide mRealFile["+i+"_"+allSubRealFileList.size()+"]  newName="+ newName  +" Already Exist!" );
+        System.out.println("dohide4 mRealFile["+i+"_"+allSubRealFileList.size()+"]  newName="+ newName  +" Already Exist!" );
     }
 
     
@@ -945,26 +952,47 @@ if(mOperationType == 1) {  // dohide
 
     
 } else if(mOperationType == 2) {  // retype
-	
 
+    String origin_file_type =	getFileTypeNoPoint(inputRealFile.getName());
+    String origin_file_name = inputRealFile.getName();
     String realFileName = inputRealFile.getName(); //  fjoafjoa_mp4
     String md5name =  getMD5Three(inputRealFile.getAbsolutePath());
 
-    String fileType_name = realFileName;
-    if(realFileName.startsWith(md5name+"_")){   // 符合规则的文件  进行处理
 
-        fileType_name = fileType_name.replace("_",".");
+
+
+    // 当前文件 已经是 ReType 过的文件了
+    if(origin_file_name.startsWith(md5name) && !"".equals(origin_file_type)){
+        System.out.println("retype1  mRealFile["+i+"_"+allSubRealFileList.size()+"]  File is Already ReType File !" );
+        continue;
+
+    }
+
+
+
+    String   retype_new_name = realFileName;
+
+    if(realFileName.startsWith(md5name+"_") && "".equals(origin_file_type) ){   // 符合规则的文件  进行处理
+
+         retype_new_name = realFileName.replaceAll("_",".");
+
+
+        if(new File(parentPath+File.separator+retype_new_name).exists()) { //  第二个重复的 文件 那么 重新改名
+
+            retype_new_name = retype_new_name.replace(md5name,md5name+"_"+getTimeStamp_yyyyMMddHHmmss());
+            System.out.println("retype2 mRealFile["+i+"_"+allSubRealFileList.size()+"]  newName="+ retype_new_name );
+        }
 
         // 从 adafagfea_txt   转为 adafagfea.txt
 //    File filetype_name = new File(inputDirFile.getAbsolutePath() + File.separator + fileType_name);
 
-        tryReName(inputRealFile,fileType_name);
+        tryReName(inputRealFile,retype_new_name);
   
-        System.out.println("retype mRealFile["+i+"_"+allSubRealFileList.size()+"]  newName="+ fileType_name );
+        System.out.println("retype3 mRealFile["+i+"_"+allSubRealFileList.size()+"]  newName="+ retype_new_name );
 
 
     } else{    // 不符合规则的文件   不主动操作
-
+        System.out.println("retype4 mRealFile["+i+"_"+allSubRealFileList.size()+"]  newName="+ retype_new_name +" Do not Apply ReType Rule! ");
     }
     
 	
