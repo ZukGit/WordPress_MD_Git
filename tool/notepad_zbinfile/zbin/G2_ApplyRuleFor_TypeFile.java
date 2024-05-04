@@ -891,8 +891,11 @@ class ReplaceTxtFile_Src_to_Dst_Rule_66 extends Basic_Rule {
 class ZHide_MD5Type_Operation_Rule_65 extends Basic_Rule {
 
 	// 0 -----  默认 不操作 
-    // 1 ---- dohide  对所有文件进行 md5_type 操作 转为 unknow类型
-    // 2 ---- retype  对所有文件 md5_type 操作 转为 md5.type类型 type类型
+    // 1 ---- dohide_md5name   对所有文件进行 md5_type 操作 转为 unknow类型
+    // 2 ---- retype_md5name   对所有文件 md5_type 操作 转为 md5.type类型 type类型
+    // 3 ---- dohide_timename  时间 hide
+    // 4 ---- retype_timename  retype hide
+
     int mOperationType = 0 ;
 
 
@@ -913,23 +916,26 @@ class ZHide_MD5Type_Operation_Rule_65 extends Basic_Rule {
 		   
 	        System.out.println("mRealFile["+i+"_"+allSubRealFileList.size()+"] = "+ inputRealFile.getName()+"  : "+ inputRealFile.getAbsolutePath() );
 	
-if(mOperationType == 1) {  // dohide
+if(mOperationType == 1) {  // dohide_md5name
 	
 	String fileType_name =	getFileTypeNoPoint(inputRealFile.getName());
     String origin_file_nmae = inputRealFile.getName();
 
     String md5name =  getMD5Three(inputRealFile.getAbsolutePath());
+
+    System.out.println("dohide_md5name_rule1_1 mRealFile["+i+"_"+allSubRealFileList.size()+"]  " );
+
     String newName = md5name+"_"+fileType_name;
 
 
     if( "".equals(fileType_name)){   // 已经是  unknow 文件类型的  那么 不操作 这个文件了
-        System.out.println("dohide1 mRealFile["+i+"_"+allSubRealFileList.size()+"]  File is an Unknow Hide Hide !" );
+        System.out.println("dohide_md5name_rule1_2 mRealFile["+i+"_"+allSubRealFileList.size()+"]  File is an Unknow Hide Hide !" );
         continue;
     }
 
     // 当前文件 已经是 hide 过的文件了
     if(origin_file_nmae.startsWith(md5name+"_") && "".equals(fileType_name)){
-        System.out.println("dohide2 mRealFile["+i+"_"+allSubRealFileList.size()+"]  File is Already Hide !" );
+        System.out.println("dohide_md5name_rule1_3 mRealFile["+i+"_"+allSubRealFileList.size()+"]  File is Already Hide !" );
         continue;
 
     }
@@ -942,16 +948,16 @@ if(mOperationType == 1) {  // dohide
 
     if(!new File(parentPath+File.separator+newName).exists()){
         tryReName(inputRealFile,newName);
-        System.out.println("dohide3 mRealFile["+i+"_"+allSubRealFileList.size()+"]  newName="+ newName );
+        System.out.println("dohide_md5name_rule1_4 mRealFile["+i+"_"+allSubRealFileList.size()+"]  newName="+ newName );
     } else {
-        System.out.println("dohide4 mRealFile["+i+"_"+allSubRealFileList.size()+"]  newName="+ newName  +" Already Exist!" );
+        System.out.println("dohide_md5name_rule1_5 mRealFile["+i+"_"+allSubRealFileList.size()+"]  newName="+ newName  +" Already Exist!" );
     }
 
     
 
 
     
-} else if(mOperationType == 2) {  // retype
+} else if(mOperationType == 2) {  // retype_md5name
 
     String origin_file_type =	getFileTypeNoPoint(inputRealFile.getName());
     String origin_file_name = inputRealFile.getName();
@@ -963,7 +969,7 @@ if(mOperationType == 1) {  // dohide
 
     // 当前文件 已经是 ReType 过的文件了
     if(origin_file_name.startsWith(md5name) && !"".equals(origin_file_type)){
-        System.out.println("retype1  mRealFile["+i+"_"+allSubRealFileList.size()+"]  File is Already ReType File !" );
+        System.out.println("retype_md5name_rule2_1  mRealFile["+i+"_"+allSubRealFileList.size()+"]  File is Already ReType File !" );
         continue;
 
     }
@@ -980,7 +986,7 @@ if(mOperationType == 1) {  // dohide
         if(new File(parentPath+File.separator+retype_new_name).exists()) { //  第二个重复的 文件 那么 重新改名
 
             retype_new_name = retype_new_name.replace(md5name,md5name+"_"+getTimeStamp_yyyyMMddHHmmss());
-            System.out.println("retype2 mRealFile["+i+"_"+allSubRealFileList.size()+"]  newName="+ retype_new_name );
+            System.out.println("retype_md5name_rule2_2 mRealFile["+i+"_"+allSubRealFileList.size()+"]  newName="+ retype_new_name );
         }
 
         // 从 adafagfea_txt   转为 adafagfea.txt
@@ -988,16 +994,88 @@ if(mOperationType == 1) {  // dohide
 
         tryReName(inputRealFile,retype_new_name);
   
-        System.out.println("retype3 mRealFile["+i+"_"+allSubRealFileList.size()+"]  newName="+ retype_new_name );
+        System.out.println("retype_md5name_rule2_3  mRealFile["+i+"_"+allSubRealFileList.size()+"]  newName="+ retype_new_name );
 
 
     } else{    // 不符合规则的文件   不主动操作
-        System.out.println("retype4 mRealFile["+i+"_"+allSubRealFileList.size()+"]  newName="+ retype_new_name +" Do not Apply ReType Rule! ");
+        System.out.println("retype_md5name_rule2_4 mRealFile["+i+"_"+allSubRealFileList.size()+"]  newName="+ retype_new_name +" Do not Apply ReType Rule! ");
     }
     
 	
+} else if(mOperationType == 3) {  // dohide_timename
+
+               String fileType_name =	getFileTypeNoPoint(inputRealFile.getName());
+               String origin_file_name = inputRealFile.getName();
+
+               String timeStampName  = getTimeStamp_yyyyMMddHHmmss()+"-"+ i+"-"+allSubRealFileList.size();
+
+               System.out.println("dohide_tinemname_rule3_1 mRealFile["+i+"_"+allSubRealFileList.size()+"]  " );
+
+               String newName = timeStampName+"_"+fileType_name;
+
+
+               if( "".equals(fileType_name)){   // 已经是  unknow 文件类型的  那么 不操作 这个文件了
+                   System.out.println("dohide_tinemname_rule3_2 mRealFile["+i+"_"+allSubRealFileList.size()+"]  File is an Unknow Hide Hide !" );
+                   continue;
+               }
+
+               // 当前文件 已经是 hide 过的文件了
+               if( "".equals(fileType_name)){
+                   System.out.println("dohide_tinemname_rule3_3 mRealFile["+i+"_"+allSubRealFileList.size()+"]  File is Already Hide !" );
+                   continue;
+
+               }
+
+
+               if(!new File(parentPath+File.separator+newName).exists()){
+                   tryReName(inputRealFile,newName);
+                   System.out.println("dohide_tinemname_rule3_4 mRealFile["+i+"_"+allSubRealFileList.size()+"]  newName="+ newName );
+               } else {
+                   System.out.println("dohide_tinemname_rule3_5 mRealFile["+i+"_"+allSubRealFileList.size()+"]  newName="+ newName  +" Already Exist!" );
+               }
+
+
+
+
+
+           } else if(mOperationType == 4) {  // retype_timename
+
+    String origin_file_type =	getFileTypeNoPoint(inputRealFile.getName());
+
+    String realFileName = inputRealFile.getName(); //  fjoafjoa_mp4
+
+
+
+
+
+    // 当前文件 已经是 ReType 过的文件了
+    if( !"".equals(origin_file_type)){
+        System.out.println("retype_timename_rule4_1  mRealFile["+i+"_"+allSubRealFileList.size()+"]  File is Already ReType File !" );
+        continue;
+
+    }
+
+
+
+    String   retype_new_name = realFileName;
+
+    if(realFileName.contains("_") && "".equals(origin_file_type) ){   // 符合规则的文件  进行处理
+
+        retype_new_name = realFileName.replaceAll("_",".");
+
+        tryReName(inputRealFile,retype_new_name);
+
+        System.out.println("retype_timename_rule4_2 mRealFile["+i+"_"+allSubRealFileList.size()+"]  newName="+ retype_new_name );
+
+
+    } else{    // 不符合规则的文件   不主动操作
+        System.out.println("retype_timename_rule4_3 mRealFile["+i+"_"+allSubRealFileList.size()+"]  newName="+ retype_new_name +" Do not Apply ReType Rule! ");
+    }
+
+
 }
- 	   }
+
+ }
  	   
 
 
@@ -1012,11 +1090,16 @@ if(mOperationType == 1) {  // dohide
         for (int i = 0; i < inputParamList.size(); i++) {
             String strInput = inputParamList.get(i);
 
-            if(strInput.equals("dohide")){
+            if(strInput.equals("dohide_md5name")){
             	mOperationType = 1 ;
-            } else if(strInput.equals("retype")){
+            } else if(strInput.equals("retype_md5name")){
             	mOperationType = 2 ;
+            }else if(strInput.equals("dohide_timename")){
+                mOperationType = 3 ;
+            }else if(strInput.equals("retype_timename")){
+                mOperationType = 4 ;
             }
+
         }
 
 
@@ -1025,6 +1108,10 @@ if(mOperationType == 1) {  // dohide
             System.out.println("当前  mOperationType["+mOperationType+"]  dohide 执行的逻辑:  对所有文件进行 md5_type 操作 转为 unknow类型 !");
         } else  if(mOperationType == 2){
             System.out.println("当前  mOperationType["+mOperationType+"]  retype 执行的逻辑:  对所有文件 md5_type 操作 还原转为 md5.type类型 type类型 !");
+        } else  if(mOperationType == 3){
+            System.out.println("当前  mOperationType["+mOperationType+"]  dohide 执行的逻辑:  对所有文件进行 timename_type 操作 转为 unknow类型 !");
+        } else  if(mOperationType == 4){
+            System.out.println("当前  mOperationType["+mOperationType+"]  retype 执行的逻辑:  对所有文件 timename_type 操作 还原转为 timename.type类型 type类型 !");
         }else {
             System.out.println("当前  mOperationType["+mOperationType+"]   非执行逻辑(避免大规模把 好的文件 震坏! )");
         }
@@ -1047,10 +1134,14 @@ if(mOperationType == 1) {  // dohide
                 + "   ### 对当前  ZHide 文件夹  进行  HideType 隐藏类型 以及  ReType 还原类型 操作 \n"
                 + Cur_Bat_Name + " #_" + rule_index
                 + "    ###  ZHide 文件夹  进行  HideType 隐藏类型 以及  ReType 还原类型 操作   \n"
-                + Cur_Bat_Name + " #_" + rule_index +" dohide"
+                + Cur_Bat_Name + " #_" + rule_index +" dohide_md5name"
                 + "    ### 对当前ZHide 文件夹    依据  md5_type  组成新的 文件名称 (unknow)文件类型   \n"
-                + Cur_Bat_Name + " #_" + rule_index +" retype"
+                + Cur_Bat_Name + " #_" + rule_index +" retype_md5name"
                 + "    ### 对当前ZHide 文件夹 符合  md5_type 类型的 unknow文件 还原为 md5.type  的 type 类型文件    \n"
+                + Cur_Bat_Name + " #_" + rule_index +" dohide_timename"
+                + "    ### 对当前ZHide 文件夹    依据  timestamp_type  组成新的 文件名称 (unknow)文件类型   \n"
+                + Cur_Bat_Name + " #_" + rule_index +" retype_timename"
+                + "    ### 对当前ZHide 文件夹 符合  timestamp_type 类型的 unknow文件 还原为 timestamp.type  的 type 类型文件    \n"
                 ;
     }
 
