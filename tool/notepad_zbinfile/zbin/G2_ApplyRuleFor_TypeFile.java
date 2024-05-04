@@ -24527,6 +24527,7 @@ class Make_Md5Type_Hide_File_Back_To_FileType_Rule64 extends Basic_Rule {
         String targetType;
 
         boolean isFileNameReplace = false;
+        boolean isSrcTypeAll = false; // 是否当前输入的 输入类型是* 所有类型
 
         FileType_Rule_9() {
             super("#", 9, 3);
@@ -24541,6 +24542,7 @@ class Make_Md5Type_Hide_File_Back_To_FileType_Rule64 extends Basic_Rule {
                     + " #_9  _gif   把没有类型的文件名称修改为 jpg格式名称  \n " + Cur_Bat_Name + " #_9  png_jpg  把  jpg的格式转为png的格式 \n "
                     + Cur_Bat_Name + " #_9  mp4_   去除当前mp4的格式 使得其文件格式未知 \n " + Cur_Bat_Name
                     + " #_9  _mp4   把没有类型的文件名称修改为 mp4格式名称 \n " + Cur_Bat_Name
+                    + " #_9  *_mp4   把所有别的类型的文件名称修改为 mp4格式名称 \n " + Cur_Bat_Name
                     + " #_9_replace  123_789   把当前 文件名包含 123 改为 789 (依据文件名 判断 而不是类型 ) 123.jpg -> 789.jpg \n " + Cur_Bat_Name
                     + " #_9  7z_7疫z   把当前 7z文件名后缀改为 7疫z 使得无法检测具体类型 \n " + Cur_Bat_Name
                     + " #_9  jpg_orig.jpg    把当前所有的 ori_jpg类型都转为jpg类型(有时存在类型.ori_jpg 这样的类型有用) \n " + Cur_Bat_Name
@@ -24627,7 +24629,11 @@ class Make_Md5Type_Hide_File_Back_To_FileType_Rule64 extends Basic_Rule {
 
 
             }
-            System.out.println("originType="+originType+"   targetType="+targetType+"  isFileNameReplace = "+ isFileNameReplace+"  Flag"+ Flag);
+
+            if("*".equals(originType)){
+                isSrcTypeAll = true;
+            }
+            System.out.println("originType="+originType+"   targetType="+targetType+"  isFileNameReplace = "+ isFileNameReplace+"   isSrcTypeAll=" +isSrcTypeAll+   "  Flag"+ Flag);
             if(isFileNameReplace){
                 curFilterFileTypeList.add("*");
             }else{
@@ -24676,6 +24682,16 @@ class Make_Md5Type_Hide_File_Back_To_FileType_Rule64 extends Basic_Rule {
                         }
                         String newName = originName + "." + targetType;
                         tryReName(curFIle, newName);
+                    } else if ("*".equals(originType)) {
+                        if (originName.contains(".")) {  // 包含了 . 说明有类型 那么 不操作  那么 执行操作
+                            String newName = originName + "." + targetType;
+                            tryReName(curFIle, newName);
+                        } else{    // 没有 类型的 那么 也改名
+
+                            String newName = originName + "." + targetType;
+                            tryReName(curFIle, newName);
+                        }
+
                     } else {
                         // 有具体的 过滤的文件
                         String oldType = "." + originType;
