@@ -61,11 +61,19 @@ public class J4_IssueTip {
         
         Other_Tip();
   
+        Button_Tip();
+        
         Pass_Tip();
         zwisl_log_search_J9();
     }
     
-
+    static void  Button_Tip(){
+        System.out.println("════════════════════════ Button Tip  ════════════════════════════════════════════════");
+        System.out.println("【WIFI-Verbose Button Info】");
+        System.out.println("[ Settings -> About phone -> Device identifiers -> Build number ] Keep touch a few seconds, will open developer.");
+        System.out.println("[ Settings -> System -> Developer options -> Networking -> Enable WiFi verbose logging.]  【toogle open】");
+    }
+    
     static void  Pass_Tip(){
         System.out.println("════════════════════════ Vendor Tip  ════════════════════════════════════════════════");
 
