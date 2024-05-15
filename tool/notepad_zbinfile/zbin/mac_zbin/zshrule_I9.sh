@@ -265,9 +265,15 @@ do
     git_head_commitid_desc=`git rev-parse $git_remote_branch_desc`
     echo "__git_head_commitid:"$git_head_commitid_desc  >> $REPO_BackUp_File
     echo -e   >> $REPO_BackUp_File
-    
+
+    echo "__git_head_command:" 'cd' $gitpath_line '&&' 'git rev-parse' $git_remote_branch_desc  >> $REPO_BackUp_File
+    echo -e   >> $REPO_BackUp_File
+	
 	git_local_first_commitid_desc=`git rev-parse HEAD`
     echo "__git_local_first_commitid:"$git_local_first_commitid_desc  >> $REPO_BackUp_File
+    echo -e   >> $REPO_BackUp_File
+
+    echo "__git_local_first_command:" 'cd' $gitpath_line '&&' 'git rev-parse HEAD'  >> $REPO_BackUp_File
     echo -e   >> $REPO_BackUp_File
 	
     ### Command 获取本地的 分支详细信息
@@ -463,11 +469,17 @@ do
     git_head_commitid_desc=`git rev-parse $git_remote_branch_desc`
     echo "__git_head_commitid:"$git_head_commitid_desc  >> $REPO_BackUp_File
     echo -e   >> $REPO_BackUp_File
-    
+
+    echo "__git_head_command:" 'cd' $gitpath_line '&&' 'git rev-parse' $git_remote_branch_desc  >> $REPO_BackUp_File
+    echo -e   >> $REPO_BackUp_File
+
     git_local_first_commitid_desc=`git rev-parse HEAD`
     echo "__git_local_first_commitid:"$git_local_first_commitid_desc  >> $REPO_BackUp_File
     echo -e   >> $REPO_BackUp_File
 
+    echo "__git_local_first_command:" 'cd' $gitpath_line '&&' 'git rev-parse HEAD'  >> $REPO_BackUp_File
+    echo -e   >> $REPO_BackUp_File
+	
     ### Command 获取本地的 分支详细信息
     git_branch_vv_desc=`git branch -vv`
     echo "__git_branch_vv:"$git_branch_vv_desc  >> $REPO_BackUp_File
@@ -770,8 +782,15 @@ do
     echo "__git_head_commitid:"$git_head_commitid_desc  >> $REPO_BackUp_File
     echo -e   >> $REPO_BackUp_File
 
+    echo "__git_head_command:" 'cd' $gitpath_line '&&' 'git rev-parse' $git_remote_branch_desc  >> $REPO_BackUp_File
+    echo -e   >> $REPO_BackUp_File
+	
+
     git_local_first_commitid_desc=`git rev-parse HEAD`
     echo "__git_local_first_commitid:"$git_local_first_commitid_desc  >> $REPO_BackUp_File
+    echo -e   >> $REPO_BackUp_File
+
+    echo "__git_local_first_command:" 'cd' $gitpath_line '&&' 'git rev-parse HEAD'  >> $REPO_BackUp_File
     echo -e   >> $REPO_BackUp_File
 	
     ### Command 获取本地的 分支详细信息
@@ -977,11 +996,17 @@ do
     echo "__git_head_commitid:"$git_head_commitid_desc  >> $CUR_REPO_File
     echo -e   >> $CUR_REPO_File
 
+    echo "__git_head_command:" 'cd' $gitpath_line '&&' 'git rev-parse' $git_remote_branch_desc  >> $REPO_BackUp_File
+    echo -e   >> $REPO_BackUp_File
+	
     ### Command 获取当前local最新提交的commitid
     git_local_first_commitid_desc=`git rev-parse HEAD`
     echo "__git_local_first_commitid:"$git_local_first_commitid_desc  >> $CUR_REPO_File
     echo -e   >> $CUR_REPO_File
 	
+    echo "__git_local_first_command:" 'cd' $gitpath_line '&&' 'git rev-parse HEAD'  >> $REPO_BackUp_File
+    echo -e   >> $REPO_BackUp_File
+
     ### Command 获取分支详细信息
     git_branch_vv_desc=`git branch -vv`
     echo "__git_branch_vv:"$git_branch_vv_desc  >> $CUR_REPO_File
