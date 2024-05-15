@@ -213,6 +213,19 @@ fi
 cd $CUR_INPUT_MSI_DIR
 REPO_BackUp_File=$CUR_INPUT_MSI_DIR/repo_backup_msi.txt
 ## 获取所有的 AOSP的repo的 路径到 repo_git_path.txt
+repo forall -c pwd  2>&1 | tee repo_git_path_error_check.log
+REPO_Git_Path_Check_Message=`cat repo_git_path_error_check.log | grep "Error:"`
+    if [[ "$REPO_Git_Path_Check_Message" == "" ]] ; then
+     echo " REPO_Git_Path_Check_Message  =  $REPO_Git_Path_Check_Message "
+     echo " cd $CUR_INPUT_MSI_DIR &&  cat repo_git_path_error_check.log | grep "'Error:'"   <<___Command Success___>>"
+else
+     echo " repo forall -c pwd  2>&1 | tee repo_git_path_error_check.log "
+     echo " REPO_Git_Path_Check_Message  =  $REPO_Git_Path_Check_Message "
+     echo " cd $CUR_INPUT_MSI_DIR &&  cat repo_git_path_error_check.log | grep "'Error:'"   <<___Command Failed___>> <<___Path_Error__>>"
+     exit
+fi
+rm -fr repo_git_path_error_check.log
+
 
 repo forall -c pwd > ./repo_git_path.txt
 ## 当前遍历到的 repo_git_path.txt 的 行数
@@ -253,6 +266,10 @@ do
     echo "__git_head_commitid:"$git_head_commitid_desc  >> $REPO_BackUp_File
     echo -e   >> $REPO_BackUp_File
     
+	git_local_first_commitid_desc=`git rev-parse HEAD`
+    echo "__git_local_first_commitid:"$git_local_first_commitid_desc  >> $REPO_BackUp_File
+    echo -e   >> $REPO_BackUp_File
+	
     ### Command 获取本地的 分支详细信息
     git_branch_vv_desc=`git branch -vv`
     echo "__git_branch_vv:"$git_branch_vv_desc  >> $REPO_BackUp_File
@@ -274,7 +291,17 @@ do
     echo "__git_nomaster_number1_branch:"$git_nomaster_number1_branch  >> $REPO_BackUp_File
     echo -e   >> $REPO_BackUp_File
     
-    
+
+    ### Local 和 Remote分支 的Head Commit 是否相等
+	git_branch_local_remote_head_same_flag="false"
+    if [[ "$git_head_commitid_desc" == "$git_local_first_commitid_desc" ]] ; then
+        git_branch_local_remote_head_same_flag="true"
+    else
+        git_branch_local_remote_head_same_flag="false"
+    fi
+    echo "__git_status_local_remote_samehead:"$git_branch_local_remote_head_same_flag   >> $REPO_BackUp_File
+    echo -e   >> $REPO_BackUp_File
+
     ### Prop "Untracked files"  标记是否有 未追踪文件
     git_status_untracked=`git status | grep "Untracked files"`
     git_status_untracked_flag="false"
@@ -323,6 +350,41 @@ do
     echo -e   >> $REPO_BackUp_File    
 
 
+    #  Prop Your branch is behind   标记是否本地分支有少于远程分支提交的标识
+    git_status_behind_commits=`git status | grep "Your branch is behind"`  
+    git_status_behind_commits_flag="false"
+    if [ -n "$git_status_behind_commits" ]; then
+        git_status_behind_commits_flag="true"
+    else
+        git_status_behind_commits_flag="false"
+    fi
+    echo "__git_status_behindcommits:"$git_status_behind_commits_flag   >> $REPO_BackUp_File
+    echo -e   >> $REPO_BackUp_File    
+
+
+    #  Prop Your branch is up to date   标记是否本地分支是否与远程分支一致
+    git_status_update_commits=`git status | grep "Your branch is up to date"`  
+    git_status_update_commits_flag="false"
+    if [ -n "$git_status_update_commits" ]; then
+        git_status_update_commits_flag="true"
+    else
+        git_status_update_commits_flag="false"
+    fi
+    echo "__git_status_updatecommits:"$git_status_update_commits_flag   >> $REPO_BackUp_File
+    echo -e   >> $REPO_BackUp_File
+	
+
+    #  Prop Have TEMP Branch  标记是否有本地 TEMP分支 标识位
+    is_have_TEMP_branch_flag="false"
+    if [[ "$git_local_branch_desc" == "TEMP" ]] ; then
+        is_have_TEMP_branch_flag="true"
+    else
+        is_have_TEMP_branch_flag="false"
+    fi
+    echo "__git_have_TEMP_branch:"$is_have_TEMP_branch_flag   >> $REPO_BackUp_File
+    echo -e   >> $REPO_BackUp_File   
+	
+
     #  Prop Have Master Branch  标记是否有远程主分支 标识位
     is_have_master_branch_flag="false"
     if [ -n "$git_master_branch_desc" ]; then
@@ -347,6 +409,21 @@ REPO_BackUp_File=$CUR_INPUT_VENDOR_DIR/repo_backup_vendor.txt
 
 
 ## 获取所有的 AOSP的repo的 路径到 repo_git_path.txt
+
+repo forall -c pwd  2>&1 | tee repo_git_path_error_check.log
+REPO_Git_Path_Check_Message=`cat repo_git_path_error_check.log | grep "Error:"`
+    if [[ "$REPO_Git_Path_Check_Message" == "" ]] ; then
+     echo " REPO_Git_Path_Check_Message  =  $REPO_Git_Path_Check_Message "
+     echo " cd $CUR_INPUT_VENDOR_DIR &&  cat repo_git_path_error_check.log | grep "'Error:'"   <<___Command Success___>>"
+else
+     echo " repo forall -c pwd  2>&1 | tee repo_git_path_error_check.log "
+     echo " REPO_Git_Path_Check_Message  =  $REPO_Git_Path_Check_Message "
+
+     echo " cd $CUR_INPUT_VENDOR_DIR &&  cat repo_git_path_error_check.log | grep "'Error:'"   <<___Command Failed___>> <<___Path_Error__>>"
+     exit
+fi
+rm -fr repo_git_path_error_check.log
+
 
 repo forall -c pwd > ./repo_git_path.txt
 ## 当前遍历到的 repo_git_path.txt 的 行数
@@ -387,6 +464,10 @@ do
     echo "__git_head_commitid:"$git_head_commitid_desc  >> $REPO_BackUp_File
     echo -e   >> $REPO_BackUp_File
     
+    git_local_first_commitid_desc=`git rev-parse HEAD`
+    echo "__git_local_first_commitid:"$git_local_first_commitid_desc  >> $REPO_BackUp_File
+    echo -e   >> $REPO_BackUp_File
+
     ### Command 获取本地的 分支详细信息
     git_branch_vv_desc=`git branch -vv`
     echo "__git_branch_vv:"$git_branch_vv_desc  >> $REPO_BackUp_File
@@ -408,7 +489,17 @@ do
     echo "__git_nomaster_number1_branch:"$git_nomaster_number1_branch  >> $REPO_BackUp_File
     echo -e   >> $REPO_BackUp_File
     
-    
+
+    ### Local 和 Remote分支 的Head Commit 是否相等
+	git_branch_local_remote_head_same_flag="false"
+    if [[ "$git_head_commitid_desc" == "$git_local_first_commitid_desc" ]] ; then
+        git_branch_local_remote_head_same_flag="true"
+    else
+        git_branch_local_remote_head_same_flag="false"
+    fi
+    echo "__git_status_local_remote_samehead:"$git_branch_local_remote_head_same_flag   >> $REPO_BackUp_File
+    echo -e   >> $REPO_BackUp_File
+
     ### Prop "Untracked files"  标记是否有 未追踪文件
     git_status_untracked=`git status | grep "Untracked files"`
     git_status_untracked_flag="false"
@@ -457,6 +548,40 @@ do
     echo -e   >> $REPO_BackUp_File    
 
 
+    #  Prop Your branch is behind   标记是否本地分支有少于远程分支提交的标识
+    git_status_behind_commits=`git status | grep "Your branch is behind"`  
+    git_status_behind_commits_flag="false"
+    if [ -n "$git_status_behind_commits" ]; then
+        git_status_behind_commits_flag="true"
+    else
+        git_status_behind_commits_flag="false"
+    fi
+    echo "__git_status_behindcommits:"$git_status_behind_commits_flag   >> $REPO_BackUp_File
+    echo -e   >> $REPO_BackUp_File    
+
+
+    #  Prop Your branch is up to date   标记是否本地分支是否与远程分支一致
+    git_status_update_commits=`git status | grep "Your branch is up to date"`  
+    git_status_update_commits_flag="false"
+    if [ -n "$git_status_update_commits" ]; then
+        git_status_update_commits_flag="true"
+    else
+        git_status_update_commits_flag="false"
+    fi
+    echo "__git_status_updatecommits:"$git_status_update_commits_flag   >> $REPO_BackUp_File
+    echo -e   >> $REPO_BackUp_File
+	
+
+    #  Prop Have TEMP Branch  标记是否有本地 TEMP分支 标识位
+    is_have_TEMP_branch_flag="false"
+    if [[ "$git_local_branch_desc" == "TEMP" ]] ; then
+        is_have_TEMP_branch_flag="true"
+    else
+        is_have_TEMP_branch_flag="false"
+    fi
+    echo "__git_have_TEMP_branch:"$is_have_TEMP_branch_flag   >> $REPO_BackUp_File
+    echo -e   >> $REPO_BackUp_File   
+
     #  Prop Have Master Branch  标记是否有远程主分支 标识位
     is_have_master_branch_flag="false"
     if [ -n "$git_master_branch_desc" ]; then
@@ -483,7 +608,7 @@ cd $init_pwd
 
 function rule902vrepobackupoperation_func_0x0(){
 # =========================================================================== rule902vrepobackupoperation_func_0x0
-# rule_tip:  $init_shfile_name  _901_   ##  repo_backup_operation 依据当前路径的 repo_backup.txt  来对当前 repo 进行备份恢复操作 
+# rule_tip:  $init_shfile_name  _902_   ##  repo_backup_operation 依据当前路径的 repo_backup.txt  来对当前 repo 进行备份恢复操作 
 # desc: repo_backup_operation 依据当前路径的 repo_backup_msi.txt   repo_backup_vendor.txt  来对当前 repo 进行备份恢复操作
 # sample:  
 # sample_out: 
@@ -588,6 +713,22 @@ echo "REPO_BackUp_File="$REPO_BackUp_File
 
 rule900_timestamp=`date +%Y-%m-%d_%H-%M-%S`  ##  获取到时间戳 2023-03-21_16-33-13 
 
+
+repo forall -c pwd  2>&1 | tee repo_git_path_error_check.log
+REPO_Git_Path_Check_Message=`cat repo_git_path_error_check.log | grep "Error:"`
+    if [[ "$REPO_Git_Path_Check_Message" == "" ]] ; then
+     echo " REPO_Git_Path_Check_Message  =  $REPO_Git_Path_Check_Message "
+     echo " cd $CUR_REPO_PATH &&  cat repo_git_path_error_check.log | grep "'Error:'"   <<___Command Success___>>"
+else
+     echo " repo forall -c pwd  2>&1 | tee repo_git_path_error_check.log "
+     echo " REPO_Git_Path_Check_Message  =  $REPO_Git_Path_Check_Message "
+
+     echo " cd $CUR_REPO_PATH &&  cat repo_git_path_error_check.log | grep "'Error:'"   <<___Command Failed___>> <<___Path_Error__>>"
+     exit
+fi
+rm -fr repo_git_path_error_check.log
+
+
 ## 获取所有的 AOSP的repo的 路径到 repo_git_path.txt
 
 repo forall -c pwd > ./repo_git_path.txt
@@ -628,7 +769,11 @@ do
     git_head_commitid_desc=`git rev-parse $git_remote_branch_desc`
     echo "__git_head_commitid:"$git_head_commitid_desc  >> $REPO_BackUp_File
     echo -e   >> $REPO_BackUp_File
-    
+
+    git_local_first_commitid_desc=`git rev-parse HEAD`
+    echo "__git_local_first_commitid:"$git_local_first_commitid_desc  >> $REPO_BackUp_File
+    echo -e   >> $REPO_BackUp_File
+	
     ### Command 获取本地的 分支详细信息
     git_branch_vv_desc=`git branch -vv`
     echo "__git_branch_vv:"$git_branch_vv_desc  >> $REPO_BackUp_File
@@ -649,7 +794,17 @@ do
     git_nomaster_number1_branch=`git branch -r |awk 'NR==1'`
     echo "__git_nomaster_number1_branch:"$git_nomaster_number1_branch  >> $REPO_BackUp_File
     echo -e   >> $REPO_BackUp_File
-    
+
+    ### Local 和 Remote分支 的Head Commit 是否相等
+	git_branch_local_remote_head_same_flag="false"
+    if [[ "$git_head_commitid_desc" == "$git_local_first_commitid_desc" ]] ; then
+        git_branch_local_remote_head_same_flag="true"
+    else
+        git_branch_local_remote_head_same_flag="false"
+    fi
+    echo "__git_status_local_remote_samehead:"$git_branch_local_remote_head_same_flag   >> $REPO_BackUp_File
+    echo -e   >> $REPO_BackUp_File
+
     
     ### Prop "Untracked files"  标记是否有 未追踪文件
     git_status_untracked=`git status | grep "Untracked files"`
@@ -699,6 +854,41 @@ do
     echo -e   >> $REPO_BackUp_File    
 
 
+    #  Prop Your branch is behind   标记是否本地分支有少于远程分支提交的标识
+    git_status_behind_commits=`git status | grep "Your branch is behind"`  
+    git_status_behind_commits_flag="false"
+    if [ -n "$git_status_behind_commits" ]; then
+        git_status_behind_commits_flag="true"
+    else
+        git_status_behind_commits_flag="false"
+    fi
+    echo "__git_status_behindcommits:"$git_status_behind_commits_flag   >> $REPO_BackUp_File
+    echo -e   >> $REPO_BackUp_File    
+
+
+    #  Prop Your branch is up to date   标记是否本地分支是否与远程分支一致
+    git_status_update_commits=`git status | grep "Your branch is up to date"`  
+    git_status_update_commits_flag="false"
+    if [ -n "$git_status_update_commits" ]; then
+        git_status_update_commits_flag="true"
+    else
+        git_status_update_commits_flag="false"
+    fi
+    echo "__git_status_updatecommits:"$git_status_update_commits_flag   >> $REPO_BackUp_File
+    echo -e   >> $REPO_BackUp_File
+	
+
+    #  Prop Have TEMP Branch  标记是否有本地 TEMP分支 标识位
+    is_have_TEMP_branch_flag="false"
+    if [[ "$git_local_branch_desc" == "TEMP" ]] ; then
+        is_have_TEMP_branch_flag="true"
+    else
+        is_have_TEMP_branch_flag="false"
+    fi
+    echo "__git_have_TEMP_branch:"$is_have_TEMP_branch_flag   >> $REPO_BackUp_File
+    echo -e   >> $REPO_BackUp_File   
+	
+
     #  Prop Have Master Branch  标记是否有远程主分支 标识位
     is_have_master_branch_flag="false"
     if [ -n "$git_master_branch_desc" ]; then
@@ -730,6 +920,21 @@ echo "__________________________________Method_In "$FUNCNAME
 CUR_REPO_PATH=$init_pwd
 rule900_timestamp=`date +%Y-%m-%d_%H-%M-%S`  ##  获取到时间戳 2023-03-21_16-33-13 
 CUR_REPO_File=$CUR_REPO_PATH/repo_sync_log_$rule900_timestamp.txt
+
+repo forall -c pwd  2>&1 | tee repo_git_path_error_check.log
+REPO_Git_Path_Check_Message=`cat repo_git_path_error_check.log | grep "Error:"`
+    if [[ "$REPO_Git_Path_Check_Message" == "" ]] ; then
+     echo " REPO_Git_Path_Check_Message  =  $REPO_Git_Path_Check_Message "
+     echo " cd $CUR_REPO_PATH &&  cat repo_git_path_error_check.log | grep "'Error:'"   <<___Command Success___>>"
+else
+     echo " repo forall -c pwd  2>&1 | tee repo_git_path_error_check.log "
+     echo " REPO_Git_Path_Check_Message  =  $REPO_Git_Path_Check_Message "
+
+     echo " cd $CUR_REPO_PATH &&  cat repo_git_path_error_check.log | grep "'Error:'"   <<___Command Failed___>> <<___Path_Error__>>"
+     exit
+fi
+rm -fr repo_git_path_error_check.log
+
 ## 获取所有的 AOSP的repo的 路径到 repo_pwd.txt
 repo forall -c pwd > ./repo_git_path.txt
 ## 当前遍历到的 repo_pwd.txt 的 行数
@@ -761,11 +966,22 @@ do
     echo "__git_local_branch:"$git_local_branch_desc  >> $CUR_REPO_File
     echo -e   >> $CUR_REPO_File
     
-    ### Command 获取当前最新提交的commitid
-    git_head_commitid_desc=`git rev-parse HEAD`
+
+
+    ### Command 获取本地远程主分支的第一个commitid   git rev-parse HEAD  || git rev-parse origin/master
+    git_remote_branch_desc=`git branch -r | grep " -" |awk -F' ' '{ print $3 }'`
+    if [[ "$git_remote_branch_desc" == "" ]] ; then
+        git_remote_branch_desc="HEAD"
+    fi
+    git_head_commitid_desc=`git rev-parse $git_remote_branch_desc`
     echo "__git_head_commitid:"$git_head_commitid_desc  >> $CUR_REPO_File
     echo -e   >> $CUR_REPO_File
-    
+
+    ### Command 获取当前local最新提交的commitid
+    git_local_first_commitid_desc=`git rev-parse HEAD`
+    echo "__git_local_first_commitid:"$git_local_first_commitid_desc  >> $CUR_REPO_File
+    echo -e   >> $CUR_REPO_File
+	
     ### Command 获取分支详细信息
     git_branch_vv_desc=`git branch -vv`
     echo "__git_branch_vv:"$git_branch_vv_desc  >> $CUR_REPO_File
