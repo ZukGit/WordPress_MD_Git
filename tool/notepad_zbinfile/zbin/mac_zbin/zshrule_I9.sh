@@ -276,6 +276,16 @@ do
     echo "__git_local_first_command:" 'cd' $gitpath_line '&&' 'git rev-parse HEAD'  >> $REPO_BackUp_File
     echo -e   >> $REPO_BackUp_File
 	
+	git_local_head_1_commitid_desc=`git rev-parse HEAD~1`
+    echo "__git_local_head_1_commitid:"$git_local_head_1_commitid_desc" cd " $gitpath_line '&&' 'git rev-parse HEAD~1'  >> $REPO_BackUp_File
+	git_local_head_2_commitid_desc=`git rev-parse HEAD~2`
+    echo "__git_local_head_2_commitid:"$git_local_head_2_commitid_desc" cd " $gitpath_line '&&' 'git rev-parse HEAD~2'  >> $REPO_BackUp_File
+	git_local_head_3_commitid_desc=`git rev-parse HEAD~3`
+    echo "__git_local_head_3_commitid:"$git_local_head_3_commitid_desc" cd " $gitpath_line '&&' 'git rev-parse HEAD~3'  >> $REPO_BackUp_File
+	git_local_head_4_commitid_desc=`git rev-parse HEAD~4`
+    echo "__git_local_head_4_commitid:"$git_local_head_4_commitid_desc" cd " $gitpath_line '&&' 'git rev-parse HEAD~4'  >> $REPO_BackUp_File
+    echo -e   >> $REPO_BackUp_File
+	
     ### Command 获取本地的 分支详细信息
     git_branch_vv_desc=`git branch -vv`
     echo "__git_branch_vv:"$git_branch_vv_desc  >> $REPO_BackUp_File
@@ -399,6 +409,8 @@ do
         is_have_master_branch_flag="false"
     fi
     echo "__git_have_master_branch:"$is_have_master_branch_flag   >> $REPO_BackUp_File
+    echo -e   >> $REPO_BackUp_File    
+    echo "___________________________________________________________"   >> $REPO_BackUp_File
     echo -e   >> $REPO_BackUp_File    
     echo -e   >> $REPO_BackUp_File
     echo -e   >> $REPO_BackUp_File
@@ -479,6 +491,16 @@ do
 
     echo "__git_local_first_command:" 'cd' $gitpath_line '&&' 'git rev-parse HEAD'  >> $REPO_BackUp_File
     echo -e   >> $REPO_BackUp_File
+
+	git_local_head_1_commitid_desc=`git rev-parse HEAD~1`
+    echo "__git_local_head_1_commitid:"$git_local_head_1_commitid_desc" cd " $gitpath_line '&&' 'git rev-parse HEAD~1'  >> $REPO_BackUp_File
+	git_local_head_2_commitid_desc=`git rev-parse HEAD~2`
+    echo "__git_local_head_2_commitid:"$git_local_head_2_commitid_desc" cd " $gitpath_line '&&' 'git rev-parse HEAD~2'  >> $REPO_BackUp_File
+	git_local_head_3_commitid_desc=`git rev-parse HEAD~3`
+    echo "__git_local_head_3_commitid:"$git_local_head_3_commitid_desc" cd " $gitpath_line '&&' 'git rev-parse HEAD~3'  >> $REPO_BackUp_File
+	git_local_head_4_commitid_desc=`git rev-parse HEAD~4`
+    echo "__git_local_head_4_commitid:"$git_local_head_4_commitid_desc" cd " $gitpath_line '&&' 'git rev-parse HEAD~4'  >> $REPO_BackUp_File
+    echo -e   >> $REPO_BackUp_File
 	
     ### Command 获取本地的 分支详细信息
     git_branch_vv_desc=`git branch -vv`
@@ -602,9 +624,11 @@ do
         is_have_master_branch_flag="false"
     fi
     echo "__git_have_master_branch:"$is_have_master_branch_flag   >> $REPO_BackUp_File
-    echo -e   >> $REPO_BackUp_File    
+    echo -e   >> $REPO_BackUp_File
+    echo "___________________________________________________________"   >> $REPO_BackUp_File
     echo -e   >> $REPO_BackUp_File
     echo -e   >> $REPO_BackUp_File
+	echo -e   >> $REPO_BackUp_File  
      gitpath_line_number=$(($gitpath_line_number+1))
  done
 
@@ -620,7 +644,7 @@ cd $init_pwd
 
 function rule902vrepobackupoperation_func_0x0(){
 # =========================================================================== rule902vrepobackupoperation_func_0x0
-# rule_tip:  $init_shfile_name  _902_   ##  repo_backup_operation 依据当前路径的 repo_backup.txt  来对当前 repo 进行备份恢复操作 
+# rule_tip:  $init_shfile_name  _902_   ##  repo_backup_operation 依据当前路径的 repo_backup.txt  来对当前 repo 进行备份恢复操作  与服务器提交一致
 # desc: repo_backup_operation 依据当前路径的 repo_backup_msi.txt   repo_backup_vendor.txt  来对当前 repo 进行备份恢复操作
 # sample:  
 # sample_out: 
@@ -657,31 +681,222 @@ else
     exit
 fi
 
+
+
+############### param define begin ###############
+repo_param_gitpath=""
+repo_param_local_branch=""
+repo_param_remote_head_commitid=""
+repo_param_local_first_commitid=""
+repo_param_local_remote_samehead_flag=""
+repo_param_untracked_flag=""
+repo_param_modified_flag=""
+repo_param_uncommits_flag=""
+repo_param_aheadcommits_flag=""
+repo_param_behindcommits_flag=""
+repo_param_updatecommits_flag=""
+repo_param_have_temp_branch_flag=""
+repo_param_have_master_branch_flag=""
+
+############### param define end ###############
+
 ## 使用 while read 使得可以一行一行读取  而不是空格进行切分的读取
 while read  backup_line
 do
     echo "backup_line["$backup_line_number"_"$backup_all_number"]:"$backup_line 
     ####repo_git[1077_2071]_gitpath:xxxxx  切换到对应路径  并且去除掉对应的 untrack文件 ( git reset 没法删除 untrack文件)
     if [[ ${backup_line} =~ "####repo_git" ]] ; then 
-        cur_git_abspath=${backup_line#*gitpath:}   ##  #井号截取 右边字符串 后面
-        echo "cur_git_abspath=$cur_git_abspath"
-        cd $cur_git_abspath
-        git clean -ndxf
-        git clean -dxf
+        repo_param_gitpath=${backup_line#*gitpath:}   ##  #井号截取 右边字符串 后面
+        echo "repo_param_gitpath=$repo_param_gitpath"
+		cd $repo_param_gitpath
+        repo_param_local_branch=""
+        repo_param_remote_head_commitid=""
+        repo_param_local_first_commitid=""
+        repo_param_local_remote_samehead_flag=""
+        repo_param_untracked_flag=""
+        repo_param_modified_flag=""
+        repo_param_uncommits_flag=""
+        repo_param_aheadcommits_flag=""
+        repo_param_behindcommits_flag=""
+        repo_param_updatecommits_flag=""
+        repo_param_have_temp_branch_flag=""
+        repo_param_have_master_branch_flag=""
+		continue
     fi
     
     ##__git_local_branch:TEMP  切换到记录的本地分支
     if [[ ${backup_line} =~ "__git_local_branch:" ]] ; then 
-        cur_git_branch=${backup_line#*__git_local_branch:}   ##  #井号截取 右边字符串 后面
-        echo "cur_git_branch=$cur_git_branch"
-        git checkout $cur_git_branch
+        repo_param_local_branch=${backup_line#*__git_local_branch:}   ##  #井号截取 右边字符串 后面
+        #echo "repo_param_local_branch=$repo_param_local_branch"
+		continue
     fi
     
     ##__git_head_commitid:0f015b711ae44b8bd6b3be8ba1d21cbfc32442e6   reset到指定的commitid
     if [[ ${backup_line} =~ "__git_head_commitid:" ]] ; then 
-        git_head_commitid=${backup_line#*__git_head_commitid:}   ##  #井号截取 右边字符串 后面
-        echo "git_head_commitid=$git_head_commitid"
-        git reset --hard $git_head_commitid
+        repo_param_remote_head_commitid=${backup_line#*__git_head_commitid:}   ##  #井号截取 右边字符串 后面
+        #echo "repo_param_remote_head_commitid=$repo_param_remote_head_commitid"
+		continue
+    fi
+
+    ##__git_local_first_commitid:0f015b711ae44b8bd6b3be8ba1d21cbfc32442e6   本地的第一个提交
+    if [[ ${backup_line} =~ "__git_local_first_commitid:" ]] ; then 
+        repo_param_local_first_commitid=${backup_line#*__git_local_first_commitid:}   ##  #井号截取 右边字符串 后面
+        #echo "repo_param_local_first_commitid=$repo_param_local_first_commitid"
+		continue
+    fi
+
+    ##__git_status_local_remote_samehead:false   本地Head提交 和 服务器 Head 提交是否 一致 
+    if [[ ${backup_line} =~ "__git_status_local_remote_samehead:" ]] ; then 
+        repo_param_local_remote_samehead_flag=${backup_line#*__git_status_local_remote_samehead:}   ##  #井号截取 右边字符串 后面
+        #echo "repo_param_local_remote_samehead_flag=$repo_param_local_remote_samehead_flag"
+		continue
+    fi
+	
+    ##__git_status_untracked:false   是否有 未追踪的文件
+    if [[ ${backup_line} =~ "__git_status_untracked:" ]] ; then 
+        repo_param_untracked_flag=${backup_line#*__git_status_untracked:}   ##  #井号截取 右边字符串 后面
+        #echo "repo_param_untracked_flag=$repo_param_untracked_flag"
+		continue
+    fi
+
+    ##__git_status_modified:false   是否有 修改的文件
+    if [[ ${backup_line} =~ "__git_status_modified:" ]] ; then 
+        repo_param_modified_flag=${backup_line#*__git_status_modified:}   ##  #井号截取 右边字符串 后面
+        #echo "repo_param_modified_flag=$repo_param_modified_flag"
+		continue
+    fi
+	
+    ##__git_status_uncommits:false   是否有 本地提交未上传的 commit 
+    if [[ ${backup_line} =~ "__git_status_uncommits:" ]] ; then 
+        repo_param_uncommits_flag=${backup_line#*__git_status_uncommits:}   ##  #井号截取 右边字符串 后面
+        #echo "repo_param_uncommits_flag=$repo_param_uncommits_flag"
+		continue
+    fi
+	
+    ##__git_status_aheadcommits:false   本地是否有还未上传服务器的提交 
+    if [[ ${backup_line} =~ "__git_status_aheadcommits:" ]] ; then 
+        repo_param_aheadcommits_flag=${backup_line#*__git_status_aheadcommits:}   ##  #井号截取 右边字符串 后面
+        #echo "repo_param_aheadcommits_flag=$repo_param_aheadcommits_flag"
+		continue
+    fi
+	
+    ##__git_status_behindcommits:false   本地是否有落后服务器提交
+    if [[ ${backup_line} =~ "__git_status_behindcommits:" ]] ; then 
+        repo_param_behindcommits_flag=${backup_line#*__git_status_behindcommits:}   ##  #井号截取 右边字符串 后面
+        #echo "repo_param_behindcommits_flag=$repo_param_behindcommits_flag"
+		continue
+    fi
+	
+    ##__git_status_updatecommits:false   本地是否与服务器的提交保持一致
+    if [[ ${backup_line} =~ "__git_status_updatecommits:" ]] ; then 
+        repo_param_updatecommits_flag=${backup_line#*__git_status_updatecommits:}   ##  #井号截取 右边字符串 后面
+        #echo "repo_param_updatecommits_flag=$repo_param_updatecommits_flag"
+		continue
+    fi
+
+    ##__git_have_TEMP_branch:false   本地 是否 所在为 TEMP 分支
+    if [[ ${backup_line} =~ "__git_have_TEMP_branch:" ]] ; then 
+        repo_param_have_temp_branch_flag=${backup_line#*__git_have_TEMP_branch:}   ##  #井号截取 右边字符串 后面
+        #echo "repo_param_have_temp_branch_flag=$repo_param_have_temp_branch_flag"
+		continue
+    fi
+
+    ##__git_have_master_branch:false   本地 是否 有远程主分支 master
+    if [[ ${backup_line} =~ "__git_have_master_branch:" ]] ; then 
+        repo_param_have_master_branch_flag=${backup_line#*__git_have_master_branch:}   ##  #井号截取 右边字符串 后面
+        #echo "repo_param_have_master_branch_flag=$repo_param_have_master_branch_flag"
+		continue
+    fi
+	
+    if [[ ${backup_line} =~ "________________________________________" ]] ; then   ### 当前这个repo 结束 时候的打印  这里 执行 一些 逻辑操作
+    echo "_______________["$backup_line_number"_"$backup_all_number"]_____"$repo_param_gitpath"_____Git_Operation_Begin_____"        
+    echo "__param1__ repo_param_gitpath=$repo_param_gitpath"
+    echo "__param2__ repo_param_local_branch=$repo_param_local_branch"
+    echo "__param3__ repo_param_remote_head_commitid=$repo_param_remote_head_commitid"
+    echo "__param4__ repo_param_local_first_commitid=$repo_param_local_first_commitid"
+    echo "__param5__ repo_param_local_remote_samehead_flag=$repo_param_local_remote_samehead_flag"
+    echo "__param6__ repo_param_untracked_flag=$repo_param_untracked_flag"
+    echo "__param7__ repo_param_modified_flag=$repo_param_modified_flag"
+    echo "__param8__ repo_param_uncommits_flag=$repo_param_uncommits_flag"
+    echo "__param9__ repo_param_aheadcommits_flag=$repo_param_aheadcommits_flag"
+    echo "__param10__ repo_param_behindcommits_flag=$repo_param_behindcommits_flag"
+    echo "__param11__ repo_param_updatecommits_flag=$repo_param_updatecommits_flag"
+    echo "__param12__ repo_param_have_temp_branch_flag=$repo_param_have_temp_branch_flag"
+    echo "__param13__ repo_param_have_master_branch_flag=$repo_param_have_master_branch_flag"
+	
+	git_command_line_number=1
+	cd $repo_param_gitpath
+### rule1  (repo_param_updatecommits_flag == true &&  repo_param_local_remote_samehead_flag == true  && repo_param_modified_flag == false)  那么 跳过更新这个仓库
+
+        if [ "$repo_param_updatecommits_flag" = "true" -a  "$repo_param_local_remote_samehead_flag" = "true" -a "$repo_param_modified_flag" = "false"  ]; then
+            echo "==== rule1 No Need Update ===="
+	    else 
+            echo "###### Need Update "$repo_param_gitpath" ######"
+	    	cd  $repo_param_gitpath 
+	    
+### rule 2  (repo_param_have_temp_branch_flag == false )   如果当前分支 不在 TEMP  那么 切换到这个 branch
+            if [ "$repo_param_have_temp_branch_flag" = "false"  ]; then
+                echo "command_"$git_command_line_number": git checkout TEMP"
+		    	git_command_line_number=$(($git_command_line_number+1))
+		        git checkout TEMP    
+		    
+	        fi
+		    
+            if [ "$repo_param_modified_flag" = "true"  ]; then
+		        echo "command_"$git_command_line_number": git checkout ."
+		    	git_command_line_number=$(($git_command_line_number+1))
+		        git checkout .
+		    
+	        fi
+		    
+		    
+            if [ "$repo_param_untracked_flag" = "true"  ]; then
+		       echo "command_"$git_command_line_number": git clean -dxf "
+		    	git_command_line_number=$(($git_command_line_number+1))
+		        git clean -dxf
+		    
+	        fi
+		    
+            #if [ "$repo_param_behindcommits_flag" = "true"  ]; then
+		    #    echo "command_"$git_command_line_number": repo sync . "
+		    #	git_command_line_number=$(($git_command_line_number+1))
+		    #    repo sync .
+		    #
+	        #fi
+		
+		
+            if [ "$repo_param_local_remote_samehead_flag" = "false"  ]; then   ## 与远程分支不一致 
+		         cd  $repo_param_gitpath 
+	             git_local_head_1_commitid_desc=`git rev-parse HEAD~1`
+	             git_local_head_2_commitid_desc=`git rev-parse HEAD~2`
+	             git_local_head_3_commitid_desc=`git rev-parse HEAD~3`
+	             git_local_head_4_commitid_desc=`git rev-parse HEAD~4`
+	             echo "repo_param_gitpath=$repo_param_gitpath"
+	             echo "remote_head_commitid=$repo_param_remote_head_commitid"
+                 echo "local_first_commitid=$repo_param_local_first_commitid"
+                 echo "local_head_1_commitid=$git_local_head_1_commitid_desc"
+                 echo "local_head_2_commitid=$git_local_head_2_commitid_desc"
+                 echo "local_head_3_commitid=$git_local_head_3_commitid_desc"
+                 echo "local_head_4_commitid=$git_local_head_4_commitid_desc"
+			
+			## 如果 远程分支 在 这 head_1  head_2  head_3 head_4 中间 那么就切换到这个commitid , 否则 维持原样  ||  或者 运算符  -o   -o==||    -a==&&
+			
+                if [ "$git_local_head_1_commitid_desc" = "$repo_param_remote_head_commitid" -o  "$git_local_head_2_commitid_desc" = "$repo_param_remote_head_commitid" -o "$git_local_head_3_commitid_desc" = "$repo_param_remote_head_commitid"  -o  "$git_local_head_4_commitid_desc" = "$repo_param_remote_head_commitid"  ]; then
+                    echo "command_"$git_command_line_number": git reset --hard  "$repo_param_remote_head_commitid
+	    			git_command_line_number=$(($git_command_line_number+1))
+	    			git reset --hard $repo_param_remote_head_commitid
+	    		else
+	    		    echo "command_"$git_command_line_number":failed to search remote commitid: "$repo_param_remote_head_commitid" on previos 5 commitids !!  we do not do anything change!"
+	    			git_command_line_number=$(($git_command_line_number+1))
+	    		fi 
+	    
+	        fi
+	    	
+	    fi
+	
+	
+	echo "_______________["$backup_line_number"_"$backup_all_number"]_____"$repo_param_gitpath"_____Git_Operation_End_____"
+    continue	
     fi
 
      backup_line_number=$(($backup_line_number+1))
@@ -792,7 +1007,17 @@ do
 
     echo "__git_local_first_command:" 'cd' $gitpath_line '&&' 'git rev-parse HEAD'  >> $REPO_BackUp_File
     echo -e   >> $REPO_BackUp_File
-	
+
+	git_local_head_1_commitid_desc=`git rev-parse HEAD~1`
+    echo "__git_local_head_1_commitid:"$git_local_head_1_commitid_desc" cd " $gitpath_line '&&' 'git rev-parse HEAD~1'  >> $REPO_BackUp_File
+	git_local_head_2_commitid_desc=`git rev-parse HEAD~2`
+    echo "__git_local_head_2_commitid:"$git_local_head_2_commitid_desc" cd " $gitpath_line '&&' 'git rev-parse HEAD~2'  >> $REPO_BackUp_File
+	git_local_head_3_commitid_desc=`git rev-parse HEAD~3`
+    echo "__git_local_head_3_commitid:"$git_local_head_3_commitid_desc" cd " $gitpath_line '&&' 'git rev-parse HEAD~3'  >> $REPO_BackUp_File
+	git_local_head_4_commitid_desc=`git rev-parse HEAD~4`
+    echo "__git_local_head_4_commitid:"$git_local_head_4_commitid_desc" cd " $gitpath_line '&&' 'git rev-parse HEAD~4'  >> $REPO_BackUp_File
+    echo -e   >> $REPO_BackUp_File
+
     ### Command 获取本地的 分支详细信息
     git_branch_vv_desc=`git branch -vv`
     echo "__git_branch_vv:"$git_branch_vv_desc  >> $REPO_BackUp_File
@@ -916,7 +1141,9 @@ do
         is_have_master_branch_flag="false"
     fi
     echo "__git_have_master_branch:"$is_have_master_branch_flag   >> $REPO_BackUp_File
-    echo -e   >> $REPO_BackUp_File    
+    echo -e   >> $REPO_BackUp_File  
+    echo "___________________________________________________________"   >> $REPO_BackUp_File
+    echo -e   >> $REPO_BackUp_File
     echo -e   >> $REPO_BackUp_File
     echo -e   >> $REPO_BackUp_File
      gitpath_line_number=$(($gitpath_line_number+1))
@@ -1007,6 +1234,17 @@ do
     echo "__git_local_first_command:" 'cd' $gitpath_line '&&' 'git rev-parse HEAD'  >> $REPO_BackUp_File
     echo -e   >> $REPO_BackUp_File
 
+
+	git_local_head_1_commitid_desc=`git rev-parse HEAD~1`
+    echo "__git_local_head_1_commitid:"$git_local_head_1_commitid_desc" cd " $gitpath_line '&&' 'git rev-parse HEAD~1'  >> $REPO_BackUp_File
+	git_local_head_2_commitid_desc=`git rev-parse HEAD~2`
+    echo "__git_local_head_2_commitid:"$git_local_head_2_commitid_desc" cd " $gitpath_line '&&' 'git rev-parse HEAD~2'  >> $REPO_BackUp_File
+	git_local_head_3_commitid_desc=`git rev-parse HEAD~3`
+    echo "__git_local_head_3_commitid:"$git_local_head_3_commitid_desc" cd " $gitpath_line '&&' 'git rev-parse HEAD~3'  >> $REPO_BackUp_File
+	git_local_head_4_commitid_desc=`git rev-parse HEAD~4`
+    echo "__git_local_head_4_commitid:"$git_local_head_4_commitid_desc" cd " $gitpath_line '&&' 'git rev-parse HEAD~4'  >> $REPO_BackUp_File
+    echo -e   >> $REPO_BackUp_File
+
     ### Command 获取分支详细信息
     git_branch_vv_desc=`git branch -vv`
     echo "__git_branch_vv:"$git_branch_vv_desc  >> $CUR_REPO_File
@@ -1089,7 +1327,8 @@ do
     fi
     echo "__git_have_master_branch:"$is_have_master_branch_flag   >> $CUR_REPO_File
     echo -e   >> $CUR_REPO_File    
-    
+    echo "___________________________________________________________"   >> $CUR_REPO_File
+    echo -e   >> $CUR_REPO_File
     
 
     ######### Reset Operation Area  #########
