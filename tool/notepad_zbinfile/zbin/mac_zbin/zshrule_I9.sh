@@ -882,12 +882,22 @@ do
 			## 如果 远程分支 在 这 head_1  head_2  head_3 head_4 中间 那么就切换到这个commitid , 否则 维持原样  ||  或者 运算符  -o   -o==||    -a==&&
 			
                 if [ "$git_local_head_1_commitid_desc" = "$repo_param_remote_head_commitid" -o  "$git_local_head_2_commitid_desc" = "$repo_param_remote_head_commitid" -o "$git_local_head_3_commitid_desc" = "$repo_param_remote_head_commitid"  -o  "$git_local_head_4_commitid_desc" = "$repo_param_remote_head_commitid"  ]; then
-                    echo "command_"$git_command_line_number": git reset --hard  "$repo_param_remote_head_commitid
+                    echo "command_"$git_command_line_number": git reset --hard  "$repo_param_remote_head_commitid "    ( remote_head_commitid same with  previos 5 commitids )"
 	    			git_command_line_number=$(($git_command_line_number+1))
 	    			git reset --hard $repo_param_remote_head_commitid
 	    		else
-	    		    echo "command_"$git_command_line_number":failed to search remote commitid: "$repo_param_remote_head_commitid" on previos 5 commitids !!  we do not do anything change!"
-	    			git_command_line_number=$(($git_command_line_number+1))
+				
+				    ## 如果当前  有 TEMP 并且 behingcommits = true 的话 那么 也更新这个 repo 仓库
+				    if [ "$repo_param_have_temp_branch_flag" = "true" -a  "$repo_param_behindcommits_flag" = "true"  ]; then
+                        echo "command_"$git_command_line_number": git reset --hard  "$repo_param_remote_head_commitid "     ( repo_param_behindcommits_flag="$repo_param_behindcommits_flag")"
+	    			    git_command_line_number=$(($git_command_line_number+1))
+	    			    git reset --hard $repo_param_remote_head_commitid
+                    else
+	    		        echo "command_"$git_command_line_number":failed to search remote commitid: "$repo_param_remote_head_commitid" on previos 5 commitids !!  we do not do anything change!"
+	    			    git_command_line_number=$(($git_command_line_number+1))
+					fi
+
+
 	    		fi 
 	    
 	        fi
