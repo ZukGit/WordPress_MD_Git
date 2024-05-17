@@ -126,6 +126,162 @@ echo "__________________________________Method_In "$FUNCNAME
 echo "__________________________________Method_Out "$FUNCNAME
 }
 
+function rule904vfixreporevisionerror_func_0x0(){
+# =========================================================================== rule901vrepobackuprecord_func_0x0
+# rule_tip:  $init_shfile_name  _904_   ##  repo_fix_revision_error  对当前的 repo 仓库 执行失败 repo forall -c pwd 的那个路径git仓库执行更新 使得 repo forall -c pwd执行成功
+# desc:  ManifestInvalidRevisionError  repo_fix_revision_error    对当前的 repo 仓库 执行失败 repo forall -c pwd 的那个路径git 执行 repo sync .  使得 repo forall -c pwd执行成功
+# sample:  
+# sample_out: 
+echo "__________________________________Method_In "$FUNCNAME
+CUR_REPO_PATH=$init_pwd   ## Vendor_xxx   Msi_xxx 开头
+Code_Tag_Vendor_1="vendor"
+Code_Tag_Msi_1="msi"
+Code_Tag_Msi_2="system"
+rule904_timestamp=`date +%Y-%m-%d_%H-%M-%S`  ##  获取到时间戳 2023-03-21_16-33-13 
+
+REPO_BackUp_File=$CUR_REPO_PATH/vendor_RevisionError_$rule904_timestamp.txt
+Code_Match_Vendor_Result=$(echo "$CUR_REPO_PATH" | grep -ie "$Code_Tag_Vendor_1")
+if [[ "$Code_Match_Vendor_Result" != "" ]] ; then
+REPO_BackUp_File=$CUR_REPO_PATH/vendor_RevisionError_$rule904_timestamp.txt
+else
+REPO_BackUp_File=$CUR_REPO_PATH/msi_RevisionError_$rule904_timestamp.txt
+fi
+
+Code_Match_Msi_Result=$(echo "$CUR_REPO_PATH" | grep -ie "$Code_Tag_Msi_1"  -ie "$Code_Tag_Msi_2")
+if [[ "$Code_Match_Msi_Result" != "" ]] ; then
+REPO_BackUp_File=$CUR_REPO_PATH/msi_RevisionError_$rule904_timestamp.txt
+else
+REPO_BackUp_File=$CUR_REPO_PATH/vendor_RevisionError_$rule904_timestamp.txt
+fi
+
+echo "Code_Match_Vendor_Result="$Code_Match_Vendor_Result
+echo "Code_Match_Msi_Result="$Code_Match_Msi_Result
+echo "REPO_BackUp_File="$REPO_BackUp_File
+
+Repo_Check_Loop_Number=50;
+
+for   i in {1..$Repo_Check_Loop_Number}
+do
+         echo "_________ repo forall -c pwd ____Loop["$i"_"$Repo_Check_Loop_Number"]_________"
+	  
+         repo forall -c pwd  2>&1 | tee repo_git_path_error_check.log
+         REPO_Git_Path_Check_Message=`cat repo_git_path_error_check.log | grep "Error:"`
+         if [[ "$REPO_Git_Path_Check_Message" == "" ]] ; then
+             echo " REPO_Git_Path_Check_Message  =  $REPO_Git_Path_Check_Message "
+             echo " cat repo_git_path_error_check.log | grep "'Error:'"  is Epmty!! <<Fix Error>>   <<___Command Success___>>"
+	         break
+         else
+             echo " REPO_Git_Path_Check_Message=$REPO_Git_Path_Check_Message "
+             Manifest_InvalidRevision_Error_AOSP_Path=""
+			 Manifest_InvalidRevision_Error_AOSP_FullPath=""
+			 
+			 
+             #Project list error on project home/repo/dev/platform/android/platform/    external/sonivox:
+             if [[ ${REPO_Git_Path_Check_Message} =~ "Project list error on project home/repo/dev/platform/android/platform/" ]] ; then 
+                 Manifest_InvalidRevision_Error_AOSP_Path=${REPO_Git_Path_Check_Message#*Project list error on project home/repo/dev/platform/android/platform/}  
+                 echo "1_1_Manifest_InvalidRevision_Error_AOSP_Path=$Manifest_InvalidRevision_Error_AOSP_Path"
+                 Manifest_InvalidRevision_Error_AOSP_Path=${Manifest_InvalidRevision_Error_AOSP_Path%%:*}  
+                 echo "1_2_Manifest_InvalidRevision_Error_AOSP_Path=$Manifest_InvalidRevision_Error_AOSP_Path"
+	             Manifest_InvalidRevision_Error_AOSP_FullPath=$CUR_REPO_PATH/$Manifest_InvalidRevision_Error_AOSP_Path
+                 echo "Manifest_InvalidRevision_Error_AOSP_FullPath=$Manifest_InvalidRevision_Error_AOSP_FullPath"    
+	         
+                if [ -d "$Manifest_InvalidRevision_Error_AOSP_FullPath" ] ; then
+                         echo "Manifest_InvalidRevision_Error_AOSP_FullPath="$Manifest_InvalidRevision_Error_AOSP_FullPath" Git Dir Path exist !  execute ( repo sync .)"
+                         cd $Manifest_InvalidRevision_Error_AOSP_FullPath
+                         repo sync . 
+                         cd $CUR_REPO_PATH
+                         continue
+                else 
+                         echo "1_Manifest_InvalidRevision_Error_AOSP_FullPath="$Manifest_InvalidRevision_Error_AOSP_FullPath" Git Dir Path not exist !  please check the Path!!!  "
+                fi
+
+		        continue
+             fi
+			 
+			 
+	         #Project list error on project home/repo/dev/platform/android/         oneplus/packages/apps/DemoMode-binary
+             if [[ ${REPO_Git_Path_Check_Message} =~ "Project list error on project home/repo/dev/platform/android/" ]] ; then 
+                 Manifest_InvalidRevision_Error_AOSP_Path=${REPO_Git_Path_Check_Message#*Project list error on project home/repo/dev/platform/android/}  
+                 echo "2_1_Manifest_InvalidRevision_Error_AOSP_Path=$Manifest_InvalidRevision_Error_AOSP_Path"
+                 Manifest_InvalidRevision_Error_AOSP_Path=${Manifest_InvalidRevision_Error_AOSP_Path%%:*}  
+                 echo "2_2_Manifest_InvalidRevision_Error_AOSP_Path=$Manifest_InvalidRevision_Error_AOSP_Path"
+	             Manifest_InvalidRevision_Error_AOSP_FullPath=$CUR_REPO_PATH/$Manifest_InvalidRevision_Error_AOSP_Path
+                 echo "Manifest_InvalidRevision_Error_AOSP_FullPath=$Manifest_InvalidRevision_Error_AOSP_FullPath"    
+	         
+                if [ -d "$Manifest_InvalidRevision_Error_AOSP_FullPath" ] ; then
+                         echo "Manifest_InvalidRevision_Error_AOSP_FullPath="$Manifest_InvalidRevision_Error_AOSP_FullPath" Git Dir Path exist !  execute ( repo sync .)"
+                         cd $Manifest_InvalidRevision_Error_AOSP_FullPath
+                         repo sync . 
+                         cd $CUR_REPO_PATH
+                         continue
+                else 
+                         echo "2_Manifest_InvalidRevision_Error_AOSP_FullPath="$Manifest_InvalidRevision_Error_AOSP_FullPath" Git Dir Path not exist !  please check the Path!!!  "
+                fi
+
+		         continue
+             fi
+			 
+	
+             #Project list error on project home/repo/dev/apps/        OnePlusSpaces-binary:
+             if [[ ${REPO_Git_Path_Check_Message} =~ "Project list error on project home/repo/dev/apps/" ]] ; then 
+                 Manifest_InvalidRevision_Error_AOSP_Path=${REPO_Git_Path_Check_Message#*Project list error on project home/repo/dev/apps/}  
+                 echo "3_1_Manifest_InvalidRevision_Error_AOSP_Path=$Manifest_InvalidRevision_Error_AOSP_Path"
+                 Manifest_InvalidRevision_Error_AOSP_Path=${Manifest_InvalidRevision_Error_AOSP_Path%%:*}  
+                 echo "3_2_Manifest_InvalidRevision_Error_AOSP_Path=$Manifest_InvalidRevision_Error_AOSP_Path"
+	             Manifest_InvalidRevision_Error_AOSP_FullPath=$CUR_REPO_PATH/$Manifest_InvalidRevision_Error_AOSP_Path
+                 echo "Manifest_InvalidRevision_Error_AOSP_FullPath=$Manifest_InvalidRevision_Error_AOSP_FullPath"    
+	         
+                 if [ -d "$Manifest_InvalidRevision_Error_AOSP_FullPath" ] ; then
+                         echo "3_2_1_Manifest_InvalidRevision_Error_AOSP_FullPath="$Manifest_InvalidRevision_Error_AOSP_FullPath" Git Dir Path exist !  execute ( repo sync .)"
+                         cd $Manifest_InvalidRevision_Error_AOSP_FullPath
+                         repo sync . 
+                         cd $CUR_REPO_PATH
+                         continue
+                 else 
+                         echo "3_3_Manifest_InvalidRevision_Error_AOSP_FullPath="$Manifest_InvalidRevision_Error_AOSP_FullPath" Git Dir Path not exist !   # search for  repo manifest | grep $Manifest_InvalidRevision_Error_AOSP_Path Path!!!  "
+                         Search_Manifest_Path_Info=`repo manifest | grep $Manifest_InvalidRevision_Error_AOSP_FullPath`
+                         echo "3_4_Search_Manifest_Path_Info="$Search_Manifest_Path_Info
+                         Manifest_InvalidRevision_Error_AOSP_Path=${Search_Manifest_Path_Info#*path=\"}  
+                         echo "3_5_Manifest_InvalidRevision_Error_AOSP_Path=$Manifest_InvalidRevision_Error_AOSP_Path"
+                         Manifest_InvalidRevision_Error_AOSP_Path=${Manifest_InvalidRevision_Error_AOSP_Path%%\"*}  
+                         echo "3_6_Manifest_InvalidRevision_Error_AOSP_Path=$Manifest_InvalidRevision_Error_AOSP_Path"
+	                     Manifest_InvalidRevision_Error_AOSP_FullPath=$CUR_REPO_PATH/$Manifest_InvalidRevision_Error_AOSP_Path
+                         echo "3_7_Manifest_InvalidRevision_Error_AOSP_FullPath=$Manifest_InvalidRevision_Error_AOSP_FullPath"
+                             if [ -d "$Manifest_InvalidRevision_Error_AOSP_FullPath" ] ; then
+                                echo "3_8_Manifest_InvalidRevision_Error_AOSP_FullPath="$Manifest_InvalidRevision_Error_AOSP_FullPath" Git Dir Path exist !  execute ( repo sync .)"
+                                cd $Manifest_InvalidRevision_Error_AOSP_FullPath
+                                repo sync . 
+                                cd $CUR_REPO_PATH
+                                continue
+                             else
+                               echo "failed to find the Git Dir Path: Manifest_InvalidRevision_Error_AOSP_Path=$Manifest_InvalidRevision_Error_AOSP_Path"  
+                               echo "failed to find the Git Dir Path: Manifest_InvalidRevision_Error_AOSP_FullPath=$Manifest_InvalidRevision_Error_AOSP_FullPath"  
+                               echo "failed to find the Git Dir Path: Search_Manifest_Path_Info=$Search_Manifest_Path_Info"  
+                               echo "failed to find the Git Dir Path: please check the path  REPO_Git_Path_Check_Message="$REPO_Git_Path_Check_Message
+                               echo "_________________________execute failed__________"
+                               exit
+                             fi
+                        
+                          
+                 fi
+
+		         continue
+            fi
+
+             #Project list error_add
+             #Project list error_add
+             #Project list error_add
+            echo "Failed Find the Rule To Resolve the Error Message: REPO_Git_Path_Check_Message="$REPO_Git_Path_Check_Message" please add check rule!!"
+
+         fi
+done
+
+echo " _904_ finish!! _________  repo forall -c pwd  (ok!)_____________  please repo sync -j2 "
+
+rm -fr repo_git_path_error_check.log
+
+echo "__________________________________Method_Out "$FUNCNAME
+}
 
 function rule903vmsivendorbackup_func_0x0(){
 # =========================================================================== rule0v_func_0x0
@@ -1708,6 +1864,8 @@ echo
 echo $init_shfile_name" _902_    ## AOSP_repo_backup_operation 依据当前路径的 repo_backup.txt  来对当前 repo 进行备份恢复操作 "
 echo
 echo $init_shfile_name" _903_   Msi_1  Vendor_1   ## AOSP_msi_vendor_backup_operation 输入当前 Msi Vendor文件夹 对 Msi Vendor进行备份在repo_node_list 目录保存 repo_backup_msi.txt  repo_backup_vendor.txt "
+echo
+echo $init_shfile_name" _904_    ## AOSP_repo_foce_sync        当执行 repo forall -c pwd (_901_) 执行失败时 去更新那么失败的仓库 "
 echo
 
 
