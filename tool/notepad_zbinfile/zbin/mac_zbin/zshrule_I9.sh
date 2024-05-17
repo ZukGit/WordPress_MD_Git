@@ -129,7 +129,8 @@ echo "__________________________________Method_Out "$FUNCNAME
 function rule904vfixreporevisionerror_func_0x0(){
 # =========================================================================== rule901vrepobackuprecord_func_0x0
 # rule_tip:  $init_shfile_name  _904_   ##  repo_fix_revision_error  对当前的 repo 仓库 执行失败 repo forall -c pwd 的那个路径git仓库执行更新 使得 repo forall -c pwd执行成功
-# desc:  ManifestInvalidRevisionError  repo_fix_revision_error    对当前的 repo 仓库 执行失败 repo forall -c pwd 的那个路径git 执行 repo sync .  使得 repo forall -c pwd执行成功
+# desc:  ManifestInvalidRevisionError  repo_fix_revision_error    修复 repo forall -c pwd 遇到的  ManifestInvalidRevisionError   当执行 repo forall -c pwd (_901_) 执行失败时出现的 ManifestInvalidRevisionError 修复  "
+echo
 # sample:  
 # sample_out: 
 echo "__________________________________Method_In "$FUNCNAME
@@ -1865,7 +1866,7 @@ echo $init_shfile_name" _902_    ## AOSP_repo_backup_operation 依据当前路�
 echo
 echo $init_shfile_name" _903_   Msi_1  Vendor_1   ## AOSP_msi_vendor_backup_operation 输入当前 Msi Vendor文件夹 对 Msi Vendor进行备份在repo_node_list 目录保存 repo_backup_msi.txt  repo_backup_vendor.txt "
 echo
-echo $init_shfile_name" _904_    ## AOSP_repo_foce_sync        当执行 repo forall -c pwd (_901_) 执行失败时 去更新那么失败的仓库 "
+echo $init_shfile_name" _904_    ##  修复 repo forall -c pwd 遇到的  ManifestInvalidRevisionError   当执行 repo forall -c pwd (_901_) 执行失败时出现的 ManifestInvalidRevisionError 修复  "
 echo
 
 
