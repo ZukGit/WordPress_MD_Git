@@ -159,14 +159,18 @@ echo "Code_Match_Vendor_Result="$Code_Match_Vendor_Result
 echo "Code_Match_Msi_Result="$Code_Match_Msi_Result
 echo "REPO_BackUp_File="$REPO_BackUp_File
 
-Repo_Check_Loop_Number=50;
+Repo_Check_Loop_Number=20;
+Repo_Check_Loop_Index=1;
 
-for   i in {1..$Repo_Check_Loop_Number}
+
+for i in $(seq 1 ${Repo_Check_Loop_Number})
 do
          echo "_________ repo forall -c pwd ____Loop["$i"_"$Repo_Check_Loop_Number"]_________"
-	  
+         
          repo forall -c pwd  2>&1 | tee repo_git_path_error_check.log
          REPO_Git_Path_Check_Message=`cat repo_git_path_error_check.log | grep "Error:"`
+         Manifest_InvalidRevision_Error_AOSP_FullPath=""
+         Manifest_InvalidRevision_Error_AOSP_Path=""
          if [[ "$REPO_Git_Path_Check_Message" == "" ]] ; then
              echo " REPO_Git_Path_Check_Message  =  $REPO_Git_Path_Check_Message "
              echo " cat repo_git_path_error_check.log | grep "'Error:'"  is Epmty!! <<Fix Error>>   <<___Command Success___>>"
@@ -184,7 +188,7 @@ do
                  Manifest_InvalidRevision_Error_AOSP_Path=${Manifest_InvalidRevision_Error_AOSP_Path%%:*}  
                  echo "1_2_Manifest_InvalidRevision_Error_AOSP_Path=$Manifest_InvalidRevision_Error_AOSP_Path"
 	             Manifest_InvalidRevision_Error_AOSP_FullPath=$CUR_REPO_PATH/$Manifest_InvalidRevision_Error_AOSP_Path
-                 echo "Manifest_InvalidRevision_Error_AOSP_FullPath=$Manifest_InvalidRevision_Error_AOSP_FullPath"    
+                 echo "1_2_1_Manifest_InvalidRevision_Error_AOSP_FullPath=$Manifest_InvalidRevision_Error_AOSP_FullPath"    
 	         
                 if [ -d "$Manifest_InvalidRevision_Error_AOSP_FullPath" ] ; then
                          echo "Manifest_InvalidRevision_Error_AOSP_FullPath="$Manifest_InvalidRevision_Error_AOSP_FullPath" Git Dir Path exist !  execute ( repo sync .)"
@@ -193,7 +197,28 @@ do
                          cd $CUR_REPO_PATH
                          continue
                 else 
-                         echo "1_Manifest_InvalidRevision_Error_AOSP_FullPath="$Manifest_InvalidRevision_Error_AOSP_FullPath" Git Dir Path not exist !  please check the Path!!!  "
+                                                                          
+                         Search_Manifest_Path_Info=`repo manifest | grep $Manifest_InvalidRevision_Error_AOSP_Path`
+                         echo "1_3_Search_Manifest_Path_Info="$Search_Manifest_Path_Info
+                         Manifest_InvalidRevision_Error_AOSP_Path=${Search_Manifest_Path_Info#*path=\"}  
+                         echo "1_4_Manifest_InvalidRevision_Error_AOSP_Path=$Manifest_InvalidRevision_Error_AOSP_Path"
+                         Manifest_InvalidRevision_Error_AOSP_Path=${Manifest_InvalidRevision_Error_AOSP_Path%%\"*}  
+                         echo "1_5_Manifest_InvalidRevision_Error_AOSP_Path=$Manifest_InvalidRevision_Error_AOSP_Path"
+	                     Manifest_InvalidRevision_Error_AOSP_FullPath=$CUR_REPO_PATH/$Manifest_InvalidRevision_Error_AOSP_Path
+                         echo "1_6_Manifest_InvalidRevision_Error_AOSP_FullPath=$Manifest_InvalidRevision_Error_AOSP_FullPath""___Exist__ "          
+                            if [ -d "$Manifest_InvalidRevision_Error_AOSP_FullPath" ] ; then
+                               cd $Manifest_InvalidRevision_Error_AOSP_FullPath
+                               repo sync . 
+                               cd $CUR_REPO_PATH
+                               continue
+                            else 
+
+                               echo "1_7_Manifest_InvalidRevision_Error_AOSP_Path=$Manifest_InvalidRevision_Error_AOSP_Path"
+	                         Manifest_InvalidRevision_Error_AOSP_FullPath=$CUR_REPO_PATH/$Manifest_InvalidRevision_Error_AOSP_Path" ___Not Exist ___"
+	             
+                            fi
+                            
+                    echo "1_8_Manifest_InvalidRevision_Error_AOSP_FullPath="$Manifest_InvalidRevision_Error_AOSP_FullPath" Git Dir Path not exist ! "    
                 fi
 
 		        continue
@@ -216,9 +241,32 @@ do
                          cd $CUR_REPO_PATH
                          continue
                 else 
-                         echo "2_Manifest_InvalidRevision_Error_AOSP_FullPath="$Manifest_InvalidRevision_Error_AOSP_FullPath" Git Dir Path not exist !  please check the Path!!!  "
-                fi
 
+                         
+                         Search_Manifest_Path_Info=`repo manifest | grep $Manifest_InvalidRevision_Error_AOSP_Path`
+                         echo "2_3_Search_Manifest_Path_Info="$Search_Manifest_Path_Info
+                         Manifest_InvalidRevision_Error_AOSP_Path=${Search_Manifest_Path_Info#*path=\"}  
+                         echo "2_4_Manifest_InvalidRevision_Error_AOSP_Path=$Manifest_InvalidRevision_Error_AOSP_Path"
+                         Manifest_InvalidRevision_Error_AOSP_Path=${Manifest_InvalidRevision_Error_AOSP_Path%%\"*}  
+                         echo "2_5_Manifest_InvalidRevision_Error_AOSP_Path=$Manifest_InvalidRevision_Error_AOSP_Path"
+	                     Manifest_InvalidRevision_Error_AOSP_FullPath=$CUR_REPO_PATH/$Manifest_InvalidRevision_Error_AOSP_Path
+                         echo "2_6_Manifest_InvalidRevision_Error_AOSP_FullPath=$Manifest_InvalidRevision_Error_AOSP_FullPath""___Exist__ "          
+                            if [ -d "$Manifest_InvalidRevision_Error_AOSP_FullPath" ] ; then
+                               cd $Manifest_InvalidRevision_Error_AOSP_FullPath
+                               repo sync . 
+                               cd $CUR_REPO_PATH
+                               continue
+                            else 
+
+                               echo "2_7_Manifest_InvalidRevision_Error_AOSP_Path=$Manifest_InvalidRevision_Error_AOSP_Path"
+	                         Manifest_InvalidRevision_Error_AOSP_FullPath=$CUR_REPO_PATH/$Manifest_InvalidRevision_Error_AOSP_Path" ___Not Exist ___"
+	             
+                            fi
+                            
+                         echo "2_8_Manifest_InvalidRevision_Error_AOSP_FullPath="$Manifest_InvalidRevision_Error_AOSP_FullPath" Git Dir Path not exist !  please check the Path!!!  "
+                         
+                fi
+                
 		         continue
              fi
 			 
@@ -240,7 +288,7 @@ do
                          continue
                  else 
                          echo "3_3_Manifest_InvalidRevision_Error_AOSP_FullPath="$Manifest_InvalidRevision_Error_AOSP_FullPath" Git Dir Path not exist !   # search for  repo manifest | grep $Manifest_InvalidRevision_Error_AOSP_Path Path!!!  "
-                         Search_Manifest_Path_Info=`repo manifest | grep $Manifest_InvalidRevision_Error_AOSP_FullPath`
+                         Search_Manifest_Path_Info=`repo manifest | grep $Manifest_InvalidRevision_Error_AOSP_Path`
                          echo "3_4_Search_Manifest_Path_Info="$Search_Manifest_Path_Info
                          Manifest_InvalidRevision_Error_AOSP_Path=${Search_Manifest_Path_Info#*path=\"}  
                          echo "3_5_Manifest_InvalidRevision_Error_AOSP_Path=$Manifest_InvalidRevision_Error_AOSP_Path"
@@ -269,20 +317,73 @@ do
 		         continue
             fi
 
+
+
+
+
+	         #Project list error on project home/repo/dev/platform/  oneplus/packages/apps/DolbyUI-binary: 
+             if [[ ${REPO_Git_Path_Check_Message} =~ "Project list error on project home/repo/dev/platform/" ]] ; then 
+                 Manifest_InvalidRevision_Error_AOSP_Path=${REPO_Git_Path_Check_Message#*Project list error on project home/repo/dev/platform/}  
+                 echo "4_1_Manifest_InvalidRevision_Error_AOSP_Path=$Manifest_InvalidRevision_Error_AOSP_Path"
+                 Manifest_InvalidRevision_Error_AOSP_Path=${Manifest_InvalidRevision_Error_AOSP_Path%%:*}  
+                 echo "4_2_Manifest_InvalidRevision_Error_AOSP_Path=$Manifest_InvalidRevision_Error_AOSP_Path"
+	             Manifest_InvalidRevision_Error_AOSP_FullPath=$CUR_REPO_PATH/$Manifest_InvalidRevision_Error_AOSP_Path
+                 echo "Manifest_InvalidRevision_Error_AOSP_FullPath=$Manifest_InvalidRevision_Error_AOSP_FullPath"    
+	         
+                if [ -d "$Manifest_InvalidRevision_Error_AOSP_FullPath" ] ; then
+                         echo "Manifest_InvalidRevision_Error_AOSP_FullPath="$Manifest_InvalidRevision_Error_AOSP_FullPath" Git Dir Path exist !  execute ( repo sync .)"
+                         cd $Manifest_InvalidRevision_Error_AOSP_FullPath
+                         repo sync . 
+                         cd $CUR_REPO_PATH
+                         continue
+                else 
+
+                         
+                         Search_Manifest_Path_Info=`repo manifest | grep $Manifest_InvalidRevision_Error_AOSP_Path`
+                         echo "4_3_Search_Manifest_Path_Info="$Search_Manifest_Path_Info
+                         Manifest_InvalidRevision_Error_AOSP_Path=${Search_Manifest_Path_Info#*path=\"}  
+                         echo "4_4_Manifest_InvalidRevision_Error_AOSP_Path=$Manifest_InvalidRevision_Error_AOSP_Path"
+                         Manifest_InvalidRevision_Error_AOSP_Path=${Manifest_InvalidRevision_Error_AOSP_Path%%\"*}  
+                         echo "4_5_Manifest_InvalidRevision_Error_AOSP_Path=$Manifest_InvalidRevision_Error_AOSP_Path"
+	                     Manifest_InvalidRevision_Error_AOSP_FullPath=$CUR_REPO_PATH/$Manifest_InvalidRevision_Error_AOSP_Path
+                         echo "4_6_Manifest_InvalidRevision_Error_AOSP_FullPath=$Manifest_InvalidRevision_Error_AOSP_FullPath""___Exist__ "          
+                            if [ -d "$Manifest_InvalidRevision_Error_AOSP_FullPath" ] ; then
+                               cd $Manifest_InvalidRevision_Error_AOSP_FullPath
+                               repo sync . 
+                               cd $CUR_REPO_PATH
+                               continue
+                            else 
+
+                               echo "4_7_Manifest_InvalidRevision_Error_AOSP_Path=$Manifest_InvalidRevision_Error_AOSP_Path"
+	                         Manifest_InvalidRevision_Error_AOSP_FullPath=$CUR_REPO_PATH/$Manifest_InvalidRevision_Error_AOSP_Path" ___Not Exist ___"
+	             
+                            fi
+                            
+                         echo "4_8_Manifest_InvalidRevision_Error_AOSP_FullPath="$Manifest_InvalidRevision_Error_AOSP_FullPath" Git Dir Path not exist !  please check the Path!!!  "
+                         
+                fi
+                
+		         continue
+             fi
+             
              #Project list error_add
              #Project list error_add
              #Project list error_add
             echo "Failed Find the Rule To Resolve the Error Message: REPO_Git_Path_Check_Message="$REPO_Git_Path_Check_Message" please add check rule!!"
 
          fi
+         echo "_________ repo forall -c pwd ____Loop["$i"_"$Repo_Check_Loop_Number"] End_________"
+         Repo_Check_Loop_Index=$(($Repo_Check_Loop_Index+1))
 done
 
-echo " _904_ finish!! _________  repo forall -c pwd  (ok!)_____________  please repo sync -j2 "
+echo " _904_ finish!! _________  repo forall -c pwd  (ok!)_____________Loop_Index="$Repo_Check_Loop_Index"  please repo sync -j2 "
 
 rm -fr repo_git_path_error_check.log
 
 echo "__________________________________Method_Out "$FUNCNAME
 }
+
+
 
 function rule903vmsivendorbackup_func_0x0(){
 # =========================================================================== rule0v_func_0x0
