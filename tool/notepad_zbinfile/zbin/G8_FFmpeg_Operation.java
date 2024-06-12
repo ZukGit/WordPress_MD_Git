@@ -15,6 +15,7 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+
 //
 public class G8_FFmpeg_Operation {
 
@@ -343,8 +344,504 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
         //  合并 多个 mp4 文件到  一个 mp4 文件中 
         CUR_RULE_LIST.add( new Concat_MulMp4_To_OneMp4_Rule_12());
 
+        
+     // 一个输入 模糊 多个文件输出   
+     // ffmpeg -ss 00:00:00  -accurate_seek  -to 00:00:10  -i 1.mp4 -codec copy 1_output.mp4   //  截取视频
+        CUR_RULE_LIST.add( new CutDown_MultiVideoOut_Rule_13());
+        
 
     }
+    
+    
+    
+    // ffmpeg -ss 00:00:00  -accurate_seek  -to 00:00:10  -i 1.mp4 -codec copy 1_output.mp4   //  截取视频
+    class CutDown_MultiVideoOut_Rule_13 extends  Basic_Rule{
+        ArrayList<File> mInputMediaFileList ;  // 输入的 视频文件
+
+        File targetInputMP4File ;  // 输入的 Mp4文件
+        
+        
+        // 通过计算得到的 需要 多次截图的信息集合 列表
+        ArrayList<CutVideo_Info>  outVideoInfoList ;  
+        
+        String beginTimeStr;    // 外部输入的开始时间字符串
+        String endTimeStr;      // 外部输入的结束时间字符串
+        String outputFileName;  // 输出文件的名称
+        int stepInterval = 500 ; // 毫秒   step_500 间隔
+        File outputDirFile ;   // 输出文件的目录  用于检测 输出的文件大小 
+
+        CutDown_MultiVideoOut_Rule_13(){
+            super(13);
+            mInputMediaFileList = new  ArrayList<File>();
+            outVideoInfoList  = new  ArrayList<CutVideo_Info>();
+            stepInterval = 500 ;
+        }
+
+
+        @Override
+        String ruleTip(String type, int index, String batName, OS_TYPE curType) {
+            return
+                    "\n"+Cur_Bat_Name+ "  13   10-     1.mp4      <mp4,flv,avi.rmvb 路径>      ## 秒数往后截取视频   \n"+
+                            "\n"+Cur_Bat_Name+ "  13   -100     1.mp4          <mp4,flv,avi.rmvb 路径>    ## 秒数往后截取视频   \n"+
+                            "\n"+Cur_Bat_Name+ "  13  10-50     1.mp4          <mp4,flv,avi.rmvb 路径>    ## 秒数往后截取视频   \n"+
+                            "\n"+Cur_Bat_Name+ "  13  01:10-    1.mp4          <mp4,flv,avi.rmvb 路径>    ## 分钟数往后截取视频 \n"+
+                            "\n"+Cur_Bat_Name+ "  13  -01:10    1.mp4         <mp4,flv,avi.rmvb 路径>    ## 分钟数往后截取视频 \n"+
+                            "\n"+Cur_Bat_Name+ "  13   01:10-02:50  stepms_500   1.mp4      <mp4,flv,avi.rmvb 路径>    ## 分钟数往后截取视频 \n"+
+                            "\n"+Cur_Bat_Name+ "  13   00:00:10-    stepms_500   1.mp4      <mp4,flv,avi.rmvb 路径>    ## 时分秒往后截取视频 \n"+
+                            "\n"+Cur_Bat_Name+ "  13   -00:00:10    stepms_500   1.mp4     <mp4,flv,avi.rmvb 路径>    ## 时分秒往后截取视频 \n"+
+                            "\n"+Cur_Bat_Name+ "  13   00:00:10-00:00:50  stepms_800 1.mp4  <mp4,flv,avi.rmvb 路径>    ## 时分秒往后截取视频 \n"; }
+
+
+
+        // ffmpeg -ss 00:00:00  -accurate_seek  -to 00:00:10  -i 1.mp4 -codec copy 1_output.mp4    //  截取视频
+        @Override
+        boolean checkParamsOK(File shellDir, String type2Param, ArrayList<String> otherParams) {
+            System.out.println("rule13 shellDir = "+ shellDir);
+            System.out.println("rule13  otherParams = "+ otherParams.size());
+
+
+            if(otherParams == null || otherParams.size() ==0){
+                errorMsg = "用户输入的文件参数为空";
+                System.out.println(errorMsg);
+                return false;
+            }
+
+
+
+            System.out.println("rule13 otherParams.size() = "+ otherParams.size());
+
+            for (int i = 0; i <otherParams.size() ; i++) {
+                String pre = "."+File.separator;
+                String curStringItem = otherParams.get(i).toString();
+                String curAbsPath = "";
+                if(curStringItem.startsWith(pre)){
+                    curStringItem = curStringItem.substring(2);
+                }
+                
+                
+                if(curStringItem.startsWith("stepms_")){
+                    String stepMsStr  = curStringItem.replace("stepms_", "");
+                    if(isNumeric(stepMsStr)) {
+                    	stepInterval = Integer.parseInt(stepMsStr);
+                    }
+                    continue;
+                }
+                
+                curAbsPath = shellDir.getAbsolutePath() + File.separator + curStringItem;
+                File curFIle = new File(curAbsPath) ;
+                System.out.println("curAbsPath  = "+ curAbsPath);
+                if(curFIle.exists() && videoTypeList.contains(getFileTypeWithPoint(curFIle.getName())) ){  // 判断
+                    mInputMediaFileList.add(curFIle);
+                }
+            }
+            if(mInputMediaFileList.size() == 0){
+                errorMsg = "当前从参数找不到对应的输入源 .mp4  .flv .rmvb .avi 文件 ";
+                System.out.println(errorMsg);
+                return false;
+            }
+            System.out.println("rule13 checkParamsOK mInputMediaFileList.size() = "+ mInputMediaFileList.size());
+            targetInputMP4File = mInputMediaFileList.get(mInputMediaFileList.size()-1);
+            String tagFlag = otherParams.get(0);
+            System.out.println("targetInputMP4File = "+ targetInputMP4File.getAbsolutePath());
+            System.out.println("tagFlag = "+ tagFlag);
+
+            if(!tagFlag.contains("-"))
+            {
+                System.out.println("输入的 时间标识字符串 " +tagFlag +" 不包含分割符号 -  无法识别! 程序退出!");
+                return false;
+            }
+
+            if(tagFlag.startsWith("-")){
+                tagFlag = "00:00:00"+tagFlag;
+            }
+
+            if(tagFlag.endsWith("-")){
+                tagFlag = tagFlag+ReadVideoTime(targetInputMP4File);
+            }
+
+            String[] tagArr = tagFlag.split("-");
+            if(tagArr == null || tagArr.length != 2){
+                System.out.println("tagFlag = "+ tagFlag +" 分割符号 - 数组为空 或者长度不为2  程序退出!  tagArr.length = " + tagArr.length);
+                return false;
+            }
+
+
+
+            String pre_Str = tagArr[0];
+            if(!"".equals(pre_Str.trim())){
+                beginTimeStr =   fixedTimeStr(pre_Str);
+            }else{
+                beginTimeStr =  "00:00:00";
+            }
+
+
+
+            String end_Str = tagArr[1];
+            if(!"".equals(end_Str.trim())){
+                endTimeStr =   fixedTimeStr(end_Str);
+            }else{
+                endTimeStr =  ReadVideoTime(targetInputMP4File);
+            }
+
+
+            String originName = targetInputMP4File.getName();
+            String typeStr = getFileTypeWithPoint(originName);
+            String fileNameOnly = getFileNameNoPoint(originName);
+
+            outputFileName = fileNameOnly+"_"+beginTimeStr.replace(":","")+"_"+endTimeStr.replace(":","")+"_"+System.currentTimeMillis()/1000+typeStr;
+            outputFileName = outputFileName.replace(" ","");
+            String beginTemp1 = beginTimeStr.replace(":","");
+            String endTemp1 = endTimeStr.replace(":","");
+            int beginTemp1_int = Integer.parseInt(beginTemp1);
+            int endTemp1_int = Integer.parseInt(endTemp1);
+
+            // D:\zsoft\win_env_zip\ffmpeg\ffmpeg.exe
+            // -ss 00:00:00 -accurate_seek  -to 00:00:10  -i "1.mp4"  
+            // -codec copy -avoid_negative_ts 1 1_000000_000010_1718186515.mp4
+            
+            // D:\zsoft\win_env_zip\ffmpeg\ffmpeg.exe -ss 00:00:00.600 -accurate_seek  -to 00:00:10.100  -i "1.mp4"   -codec copy -avoid_negative_ts 1 1_000000_000010_1718186515.mp4
+            
+            System.out.println("beginTimeStr = "+ beginTimeStr +"   endTimeStr = "+ endTimeStr  +"   outputFileName =  "+ outputFileName  + "targetInputMP4File = "+ targetInputMP4File.getName());
+
+            if(beginTemp1_int > endTemp1_int){
+                System.out.println("开始时间大于结束时间! 请检查参数!   beginTimeStr = "+ beginTimeStr  +"       endTimeStr = "+ endTimeStr);
+            }
+
+            String outDirPath = targetInputMP4File.getParentFile().getAbsolutePath()+File.separator+"zzzz_"+targetInputMP4File.getName();
+            outDirPath = outDirPath.replace(" ", "");
+        	
+            
+            outputDirFile = new File(outDirPath);
+            
+            long video_file_endtime_millsecond_long = ReadVideoTimeWithMillSecond(targetInputMP4File) ;
+            // 进行 多文件的参数的计算 
+            
+            // 把 自身 00 00 加入
+            outVideoInfoList.add(calCutVideoInfo(beginTimeStr,endTimeStr,-1,-1,0,video_file_endtime_millsecond_long,targetInputMP4File));
+            
+            
+            //  8 个 组别
+            for (int i = 0; i < 8 ; i++) {
+				
+            	// 多产生 ， 最后生成 后 还要检测大小是否相同,只保留一个size 一致的
+ 
+                // 00:00:10      00:00:20
+                //outnum_20   step_500毫秒 , 可以通过外部获取
+                // group_num = 0 ..... 7 
+                // step
+                // count 第几次  余%6
+                // beginstring
+                // endString 
+                
+                // out_name   
+                
+                // 每个 组 有 6 个 数据
+                for (int j = 0; j < 6; j++) {
+                	
+                	CutVideo_Info cutInfo = calCutVideoInfo(beginTimeStr,endTimeStr,i,j,stepInterval,video_file_endtime_millsecond_long,targetInputMP4File);
+           
+                    outVideoInfoList.add(cutInfo);
+				}
+
+                
+			}
+            
+  
+            System.out.println("outVideoInfoList.size=【"+outVideoInfoList.size()+"】");
+            
+
+            
+            return  super.checkParamsOK(shellDir,type2Param,otherParams);
+        }
+
+        
+        
+        
+        
+        //Group【0】_______________________ ←【A】   B____________
+        //【1】 00:00:09.500  00:00:20   
+        //【2】 00:00:09.000  00:00:20
+        //【3】 00:00:08.500  00:00:20
+        //【4】 00:00:08.000  00:00:20
+        //【5】 00:00:07.500  00:00:20
+        //【6】 00:00:07.000  00:00:20
+        //Group【1】_______________________ 【A】→   B____________
+        //【7】 00:00:10.500  00:00:20
+        //【8】 00:00:11.000  00:00:20
+        //【9】 00:00:11.500  00:00:20
+        //【A】 00:00:12.000  00:00:20
+        //【B】 00:00:12.500  00:00:20
+        //【C】 00:00:13.000  00:00:20
+        
+        //Group【2】_______________________ A   ←【B】  ____________ 
+
+        //【1】 00:00:10.000  00:00:19.500   
+        //【2】 00:00:10.000  00:00:19.000
+        //【3】 00:00:10.000  00:00:18.500
+        //【4】 00:00:10.000  00:00:18.000
+        //【5】 00:00:10.000  00:00:17.500
+        //【6】 00:00:10.000  00:00:17.000
+
+        //Group【3】_______________________  A   【B】→____________
+        //【1】 00:00:10.000  00:00:20.500   
+        //【2】 00:00:10.000  00:00:21.000
+        //【3】 00:00:10.000  00:00:21.500
+        //【4】 00:00:10.000  00:00:22.000
+        //【5】 00:00:10.000  00:00:22.500
+        //【6】 00:00:10.000  00:00:23.000
+        
+        
+        //Group【4】_______________________  ←【A】   【B】→____________
+        //【1】 00:00:09.500  00:00:20.500   
+        //【2】 00:00:09.000  00:00:21.000
+        //【3】 00:00:08.500  00:00:21.500
+        //【4】 00:00:08.000  00:00:22.000
+        //【5】 00:00:07.500  00:00:22.500
+        //【6】 00:00:07.000  00:00:23.000
+
+        //Group【5】_______________________  【A】→   ←【B】____________
+        //【7】 00:00:10.500  00:00:19.500
+        //【8】 00:00:11.000  00:00:19.000
+        //【9】 00:00:11.500  00:00:18.500
+        //【A】 00:00:12.000  00:00:18.000
+        //【B】 00:00:12.500  00:00:17.500
+        //【C】 00:00:13.000  00:00:17.000
+
+        //Group【6】_______________________  ←【A】   ←【B】____________ 
+        //【7】 00:00:09.500  00:00:19.500
+        //【8】 00:00:09.000  00:00:19.000
+        //【9】 00:00:08.500  00:00:18.500
+        //【A】 00:00:08.000  00:00:18.000
+        //【B】 00:00:07.500  00:00:17.500
+        //【C】 00:00:07.000  00:00:17.000
+        
+        //Group【7】_______________________  【A】→   【B】→____________    
+        //【1】 00:00:10.500  00:00:20.500   
+        //【2】 00:00:11.000  00:00:21.000
+        //【3】 00:00:11.500  00:00:21.500
+        //【4】 00:00:12.000  00:00:22.000
+        //【5】 00:00:12.500  00:00:22.500
+        //【6】 00:00:13.000  00:00:23.000
+
+        CutVideo_Info   calCutVideoInfo(String beginTimeStr , String endTimeStr  , int groupIndex , int arrayIndex , int stepInterval , long videoAllMillSecond, File matchFile){
+        	// -1 左边    0不动    1 中间
+        	int A_dir = 0 ;
+        	int B_dir = 0 ;
+        	CutVideo_Info  info = new CutVideo_Info();
+        	
+        	// 00:00:10   10
+        	// 00:20:00   2000
+        	// 02:03:04   20304
+        	long inputBeginTime_MillSecond = calVideoStringTimeAsMillSecond(beginTimeStr);
+        	
+        	long inputEndTime_MillSecond = calVideoStringTimeAsMillSecond(endTimeStr);
+
+            
+            //Group【0】_______________________ ←【A】   B____________
+        	if(groupIndex == 0 ) {
+        		A_dir = -1;
+        		B_dir = 0;	
+            //Group【1】_______________________ 【A】→   B____________
+        	} else if(groupIndex == 1 ) {
+        		A_dir = 1;
+        		B_dir = 0;	
+            //Group【2】_______________________ A   ←【B】  ____________ 
+        	}else if(groupIndex == 2 ) {
+        		A_dir = 0;
+        		B_dir = -1;	
+             //Group【3】_______________________  A   【B】→____________
+        	}else if(groupIndex == 3 ) {
+        		A_dir = 0;
+        		B_dir = 1;	
+            //Group【4】_______________________  ←【A】   【B】→____________
+        	}else if(groupIndex == 4 ) {
+        		A_dir = -1;
+        		B_dir = 1;	
+            //Group【5】_______________________  【A】→   ←【B】____________
+        	}else if(groupIndex == 5 ) {
+        		A_dir = 1;
+        		B_dir = -1;	
+            //Group【6】_______________________  ←【A】   ←【B】____________ 	
+        	}else if(groupIndex == 6 ) {
+        		A_dir = -1;
+        		B_dir = -1;	
+            //Group【7】_______________________  【A】→   【B】→____________    
+        	}else if(groupIndex == 7 ) {
+        		A_dir = 1;
+        		B_dir = 1;		
+        	}
+        	// 3000 毫秒
+        	long A_allStep = A_dir * arrayIndex * stepInterval;
+        	long B_allStep = B_dir * arrayIndex * stepInterval;
+        	
+        	
+        	long A_result_millsecond = inputBeginTime_MillSecond + A_allStep;
+        	
+        	if(A_result_millsecond < 0 ) {
+        		A_result_millsecond = 0 ;
+        	}
+        	long B_result_millsecond = inputEndTime_MillSecond + B_allStep;
+        	
+        	if(B_result_millsecond > videoAllMillSecond  ) {
+        		
+        		B_result_millsecond  = videoAllMillSecond;
+        	}
+
+        	System.out.println("beginTimeStr="+beginTimeStr+"   inputBeginTime_MillSecond = "+ inputBeginTime_MillSecond +"   endTimeStr="+endTimeStr+"   inputEndTime_MillSecond="+inputEndTime_MillSecond+" groupIndex【"+groupIndex+"】 arrayIndex【"+arrayIndex+"】  stepInterval【"+stepInterval+"】  videoAllMillSecond【"+videoAllMillSecond+"】  A_result_millsecond【"+A_result_millsecond+"】 B_result_millsecond【"+B_result_millsecond+"】");
+
+        	
+        	// 00:00:10   10    10000、
+        	// 00:20:00   2000
+        	// 02:03:04   20304
+        	
+        	String A_result_timeString = calTimeMillSecondAsString(A_result_millsecond);
+        	
+        	String B_result_timeString = calTimeMillSecondAsString(B_result_millsecond);
+
+        	
+        	//  把  毫秒 转为  01:02:03.456 这样子
+        	
+        	info.mBeginTimeStr = A_result_timeString;
+        	
+        	
+        	info.mEndTimeStr = B_result_timeString;
+        	
+        	String fileName = outputDirFile.getAbsolutePath()+File.separator+groupIndex+"_"+arrayIndex+"_"+getTimeStamp_yyyyMMdd_HHmmssSSS()+"_" +matchFile.getName();
+        	
+        	info.AbsPath =  fileName.replaceAll(" ", "");
+	
+        	
+        	info.parentDirFile = outputDirFile;
+        	System.out.println("Group【"+groupIndex+"】Array【"+arrayIndex+"】_____________A_result_timeString【"+A_result_timeString+"】  B_result_timeString【"+B_result_timeString+"】 Path: "+info.AbsPath);
+
+        	
+        	return info;
+        }
+
+        @Override
+        void operationRule(ArrayList<String> inputParamsList) {
+
+
+            System.out.println("beginTimeStr = "+ beginTimeStr +"   endTimeStr = "+ endTimeStr  +"   outputFileName =  "+ outputFileName  + "targetInputMP4File = "+ targetInputMP4File.getName());
+
+
+
+            //     ffmpeg -i sky1.mp4  image%d.jpg    抠图
+
+            String ffmpeg_path = getEnvironmentExePath("ffmpeg");
+            if(ffmpeg_path ==null){
+                errorMsg = "当前 ffmpeg 不在环境变量中 请下载该库 并添加到 环境变量中";
+                System.out.println(errorMsg);
+                return;
+            }
+            System.out.println("rule13 curInputFileList.size() = "+mInputMediaFileList.size());
+            System.out.println("rule13 ffmpeg_path = "+ffmpeg_path);
+            // 把 当前的 mp4 文件写入 G8_1_MergedRule.txt
+
+
+            System.out.println("═══════════════════════════ outVideoInfoList.size【"+outVideoInfoList.size()+"】═════════════");
+            for (int i = 0; i < outVideoInfoList.size(); i++) {
+				
+            	
+            	CutVideo_Info curVideoInfo = outVideoInfoList.get(i);
+            	 if(!curVideoInfo.parentDirFile.exists()) {
+            		 
+            		 curVideoInfo.parentDirFile.mkdirs();
+            	 }
+            	
+             	System.out.println("═════【"+i+"_"+ outVideoInfoList.size()+"】 begin["+curVideoInfo.mBeginTimeStr+"] end["+curVideoInfo.mEndTimeStr+"]  path["+curVideoInfo.AbsPath+"]");
+
+                String command = ffmpeg_path +" -ss "+curVideoInfo.mBeginTimeStr  + " -accurate_seek  -to " + curVideoInfo.mEndTimeStr +"  -i " + "\""+targetInputMP4File.getName()+ "\"" +" "+ "  -codec copy -avoid_negative_ts 1 "+ curVideoInfo.AbsPath;
+                execCMD(command);
+                
+                System.out.println("裁剪输出文件完成 -》 " + curVideoInfo.AbsPath);
+                
+			}
+            
+            
+          File[] subFileList =   outputDirFile.listFiles();
+          
+          System.out.println("subFileList.length = "+ subFileList.length);
+            
+          ArrayList<Long> fileSizeList = new  ArrayList<Long> ();
+          
+          for (int i = 0; i < subFileList.length; i++) {
+        	  File curFile = subFileList[i];
+        	  if(curFile.exists() && curFile.length() > 0) {
+        		  
+        		  if(fileSizeList.contains(curFile.length())) {
+        			  
+        		      System.out.println("subFile["+i+"_"+subFileList.length+"] size["+curFile.length()+"] = "+ curFile.getAbsolutePath()+" will be delete!");
+
+        		      
+        			  curFile.delete();
+        		  } else {
+        			  
+        			  fileSizeList.add( curFile.length());
+        		  }
+        		  
+        	  }
+			
+		}
+            
+            
+            // ffmpeg -ss 00:00:00  -accurate_seek  -to 00:00:10  -i 1.mp4 -codec copy 1_output.mp4
+        
+
+   
+
+       
+
+/*            for (int i = 0; i < mInputMediaFileList.size(); i++) {
+
+                File mp4File = mInputMediaFileList.get(i);
+                StringBuilder sb =new StringBuilder();
+
+                String originName = mp4File.getName();
+                String noPointFileName = getFileNameNoPoint(originName);
+                String type = getFileTypeWithPoint(mp4File.getName());
+//                File jpgDirFile = new File(CUR_Dir_1_PATH+File.separator+noPointFileName+"_"+DateFormat.format(new Date())+File.separator);
+//                jpgDirFile.mkdirs();
+//                String newFileName = originName+"_mp3_"+DateFormat.format(new Date())+".mp3";
+                String newFileName = originName.replace(type,"_"+"_"+DateFormat.format(new Date())+type);
+//                String newFileName = mp4File.getName().replace(".mp4","_x"+bigNum+"_"+DateFormat.format(new Date())+".mp4");     //  新的文件的名称  2.mp4 2_mergedxxxxxxxxxx.mp4
+//                String imageStr = noPointFileName+"_%d.jpg";
+//                String absImagePath = jpgDirFile.getAbsolutePath()+File.separator+imageStr;
+                String newFileAbsPath = mp4File.getParentFile().getAbsolutePath()+File.separator + newFileName;
+
+*//*                ffmpeg -i 1.mp4 -vf "rotate=90*PI/180" 2.mp4        // 顺时针旋转90度
+                ffmpeg -i 1.mp4 -vf "rotate=PI"      3.mp4          // 顺时针旋转180度
+                ffmpeg -i 1.mp4 -vf "rotate=270*PI/180"  4.mp4      // 顺时针旋转270度*//*
+
+                String command = "";
+
+//                    command = ffmpeg_path +" -i "+ mp4File.getAbsolutePath() + " -vf \"rotate="+rotate+"*PI/180\" " + newFileAbsPath;
+
+
+                System.out.println(command);
+                execCMD(command);
+            }*/
+
+
+
+        }
+
+
+
+    }
+
+
+    
+    class CutVideo_Info{
+    	
+        String mBeginTimeStr;
+        String mEndTimeStr;
+        String AbsPath;  // 输出文件的完整的名称
+        File parentDirFile;
+    	
+    }
+
+    
 
     class Concat_MulMp4_To_OneMp4_Rule_12 extends  Basic_Rule{
         ArrayList<File> mInputMP4FileList ;  // 输入的 视频文件
@@ -1380,6 +1877,8 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
         String beginTimeStr;
         String endTimeStr;
         String outputFileName;  // 输出文件的名称
+        
+
 
 
         CutDown_Video_Rule_7(){
@@ -1392,15 +1891,15 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
         @Override
         String ruleTip(String type, int index, String batName, OS_TYPE curType) {
             return
-                    "\n"+Cur_Bat_Name+ "  7   10-              <mp4,flv,avi.rmvb 路径>      ## 秒数往后截取视频   \n"+
-                            "\n"+Cur_Bat_Name+ "  7   -100              <mp4,flv,avi.rmvb 路径>    ## 秒数往后截取视频   \n"+
-                            "\n"+Cur_Bat_Name+ "  7  10-50              <mp4,flv,avi.rmvb 路径>    ## 秒数往后截取视频   \n"+
-                            "\n"+Cur_Bat_Name+ "  7  01:10-             <mp4,flv,avi.rmvb 路径>    ## 分钟数往后截取视频 \n"+
-                            "\n"+Cur_Bat_Name+ "  7  -01:10             <mp4,flv,avi.rmvb 路径>    ## 分钟数往后截取视频 \n"+
-                            "\n"+Cur_Bat_Name+ "  7  01:10-02:50        <mp4,flv,avi.rmvb 路径>    ## 分钟数往后截取视频 \n"+
-                            "\n"+Cur_Bat_Name+ "  7  00:00:10-          <mp4,flv,avi.rmvb 路径>    ## 时分秒往后截取视频 \n"+
-                            "\n"+Cur_Bat_Name+ "  7  -00:00:10          <mp4,flv,avi.rmvb 路径>    ## 时分秒往后截取视频 \n"+
-                            "\n"+Cur_Bat_Name+ "  7  00:00:10-00:00:50  <mp4,flv,avi.rmvb 路径>    ## 时分秒往后截取视频 \n"; }
+                    "\n"+Cur_Bat_Name+ "  7   10-   1.mp4       <mp4,flv,avi.rmvb 路径>      ## 秒数往后截取视频   \n"+
+                            "\n"+Cur_Bat_Name+ "  7   -100     1.mp4           <mp4,flv,avi.rmvb 路径>    ## 秒数往后截取视频   \n"+
+                            "\n"+Cur_Bat_Name+ "  7  10-50     1.mp4           <mp4,flv,avi.rmvb 路径>    ## 秒数往后截取视频   \n"+
+                            "\n"+Cur_Bat_Name+ "  7  01:10-    1.mp4           <mp4,flv,avi.rmvb 路径>    ## 分钟数往后截取视频 \n"+
+                            "\n"+Cur_Bat_Name+ "  7  -01:10    1.mp4          <mp4,flv,avi.rmvb 路径>    ## 分钟数往后截取视频 \n"+
+                            "\n"+Cur_Bat_Name+ "  7  01:10-02:50    1.mp4        <mp4,flv,avi.rmvb 路径>    ## 分钟数往后截取视频 \n"+
+                            "\n"+Cur_Bat_Name+ "  7  00:00:10-      1.mp4       <mp4,flv,avi.rmvb 路径>    ## 时分秒往后截取视频 \n"+
+                            "\n"+Cur_Bat_Name+ "  7  -00:00:10      1.mp4      <mp4,flv,avi.rmvb 路径>    ## 时分秒往后截取视频 \n"+
+                            "\n"+Cur_Bat_Name+ "  7  00:00:10-00:00:50  stepms_500  1.mp4  <mp4,flv,avi.rmvb 路径>    ## 时分秒往后截取视频 \n"; }
 
 
 
@@ -1428,6 +1927,9 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
                 if(curStringItem.startsWith(pre)){
                     curStringItem = curStringItem.substring(2);
                 }
+                
+ 
+                
                 curAbsPath = shellDir.getAbsolutePath() + File.separator + curStringItem;
                 File curFIle = new File(curAbsPath) ;
                 System.out.println("curAbsPath  = "+ curAbsPath);
@@ -1599,7 +2101,23 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
 
     }
 
+    
+    static long ReadVideoTimeWithMillSecond(File source) {
+        Encoder encoder = new Encoder();
+        long length = 0L;
+        try {
+            MultimediaInfo m = encoder.getInfo(source);
+            length = m.getDuration();
 
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return length;
+    }
+
+    
+
+    
     static String ReadVideoTime(File source) {
         Encoder encoder = new Encoder();
         String length = "";
@@ -1621,9 +2139,57 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
         return length;
     }
 
+    
+    static String calTimeMillSecondAsString(long mTimeMillSecond) { // 毫秒
+    	String timeResult = null ;
+
+        int hour = (int) (mTimeMillSecond/ (3600 * 1000 ));
+        int minute = (int)( (mTimeMillSecond - hour * 3600 * 1000)/ (60 * 1000) );
+        int second = (int) ((mTimeMillSecond-hour*3600*1000-minute*60*1000)/1000);
+        int millSecond = (int)(mTimeMillSecond%1000);
+        
+        System.out.println("mTimeMillSecond【"+mTimeMillSecond+"】 mTimeMillSecond【"+mTimeMillSecond+"】   hour【"+hour+"】  minute【"+minute+"】  second【"+second+"】 millSecond【"+millSecond+"】");
+        if(hour !=0 || minute !=0 || second !=0 || millSecond !=0 ) {
+        	
+            String hourStr =  hour >= 10?hour+"":"0"+hour;
+            String minutesStr =  minute >= 10?minute+"":"0"+minute;
+            String secondRestStr =  second >= 10?second+"":"0"+second;
+            String millSecondRestStr =  millSecond >= 100 ? millSecond+"":(millSecond >= 10 ? ("0"+millSecond ):("00"+millSecond ));
+          String   fixedStr =  hourStr+":"+minutesStr+":"+secondRestStr+"."+millSecondRestStr;
+          return fixedStr;
+        }
+    	
+    	return "00:00:00.000";
+    	
+    	
+    }
+
+    // 00:00:00 转为对应的毫秒数
+    static long calVideoStringTimeAsMillSecond(String timeString) {
+        long millSecondResult = 0;
+        String fixedStr = timeString;
+        
+        if(timeString.contains(":") && timeString.indexOf(":") != timeString.lastIndexOf(":") ){
+            // 输入的就是 时分秒
+            fixedStr =   fixedStr.replace(" ","").trim();
+            String[] timeStr =   fixedStr.split(":");
 
 
+            int hourInt = Integer.parseInt(timeStr[0]);
+            int minutes =  Integer.parseInt(timeStr[1]);
+            int secondInt = Integer.parseInt(timeStr[2]);
 
+            long matchMills =  hourInt * 60 * 60 *  1000  + minutes * 60 * 1000 + secondInt * 1000;
+            
+            return matchMills;
+
+        }
+        
+        return millSecondResult;
+      }
+      
+    
+    
     // 对给定的 字符串 进行 时间 上的设置   总是输出  00:00:00 这样的字段
     static  String fixedTimeStr(String originStr){
         String fixedStr = originStr;
@@ -2115,6 +2681,13 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
         return date;
     }
 
+    static String getTimeStamp_yyyyMMdd_HHmmssSSS(){
+
+        SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd_HHmmss");//设置日期格式
+        String date = df.format(new Date());
+        return date;
+    }
+    
     class VideoRoast_Rule_4 extends  Basic_Rule{
         ArrayList<File> mInputMediaFileList ;  // 输入的 视频文件
         int rotate = 90;
@@ -3177,12 +3750,14 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
 
             try {
                 Process process=Runtime.getRuntime().exec("cmd /c start "+command  +" ");
+
                 BufferedReader bufferedReader=new BufferedReader(new InputStreamReader(process.getInputStream()));
                 String line;
                 while((line=bufferedReader.readLine())!=null)
                 {
                     sb.append(line+"\n");
                 }
+              
             } catch (Exception e) {
                 return e.toString();
             }
