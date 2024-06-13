@@ -363,6 +363,8 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
         
         // 通过计算得到的 需要 多次截图的信息集合 列表
         ArrayList<CutVideo_Info>  outVideoInfoList ;  
+        HashMap<String,CutVideo_Info> originAbsPath_CutVideo_Map ; 
+        
         
         String beginTimeStr;    // 外部输入的开始时间字符串
         String endTimeStr;      // 外部输入的结束时间字符串
@@ -374,6 +376,7 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
             super(13);
             mInputMediaFileList = new  ArrayList<File>();
             outVideoInfoList  = new  ArrayList<CutVideo_Info>();
+            originAbsPath_CutVideo_Map = new HashMap<String,CutVideo_Info>();
             stepInterval = 500 ;
         }
 
@@ -507,7 +510,7 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
                 System.out.println("开始时间大于结束时间! 请检查参数!   beginTimeStr = "+ beginTimeStr  +"       endTimeStr = "+ endTimeStr);
             }
 
-            String outDirPath = targetInputMP4File.getParentFile().getAbsolutePath()+File.separator+"zzzz_"+targetInputMP4File.getName();
+            String outDirPath = targetInputMP4File.getParentFile().getAbsolutePath()+File.separator+"zzzz_"+getTimeStamp_yyyyMMdd_HHmmss()+"_"+targetInputMP4File.getName();
             outDirPath = outDirPath.replace(" ", "");
         	
             
@@ -541,6 +544,8 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
                 	CutVideo_Info cutInfo = calCutVideoInfo(beginTimeStr,endTimeStr,i,j,stepInterval,video_file_endtime_millsecond_long,targetInputMP4File);
            
                     outVideoInfoList.add(cutInfo);
+                    
+                    originAbsPath_CutVideo_Map.put(cutInfo.AbsPath, cutInfo);
 				}
 
                 
@@ -706,7 +711,10 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
         	
         	info.mEndTimeStr = B_result_timeString;
         	
-        	String fileName = outputDirFile.getAbsolutePath()+File.separator+groupIndex+"_"+arrayIndex+"_"+getTimeStamp_yyyyMMdd_HHmmssSSS()+"_" +matchFile.getName();
+        	info.yyyyMMdd_HHmmssSSS  = getTimeStamp_yyyyMMdd_HHmmssSSS();
+        	
+        	
+        	String fileName = outputDirFile.getAbsolutePath()+File.separator+A_dir+"_"+B_dir+"_"+arrayIndex+"_"+info.yyyyMMdd_HHmmssSSS+"_" +matchFile.getName();
         	
         	info.AbsPath =  fileName.replaceAll(" ", "");
 	
@@ -765,10 +773,10 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
             
           ArrayList<Long> fileSizeList = new  ArrayList<Long> ();
           
+          // 删除重复的文件 
           for (int i = 0; i < subFileList.length; i++) {
         	  File curFile = subFileList[i];
         	  if(curFile.exists() && curFile.length() > 0) {
-        		  
         		  if(fileSizeList.contains(curFile.length())) {
         			  
         		      System.out.println("subFile["+i+"_"+subFileList.length+"] size["+curFile.length()+"] = "+ curFile.getAbsolutePath()+" will be delete!");
@@ -779,10 +787,69 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
         			  
         			  fileSizeList.add( curFile.length());
         		  }
-        		  
         	  }
-			
 		}
+          
+          // 重命名 更为有意义的文件名称
+          
+          File[] mExistFileList =   outputDirFile.listFiles();
+          
+          System.out.println("mExistFileList.length = "+ mExistFileList.length);
+            
+          HashMap<File,String> renameMap = new HashMap<File,String>();
+        
+          for (int i = 0; i < subFileList.length; i++) {
+        	  File curFile = subFileList[i];
+        	  if(curFile.exists() && curFile.length() > 0) {
+        		  
+        		  if(curFile.getName().toLowerCase().endsWith(".mp4")) {
+        			  
+        			 long timeStamp = ReadVideoTimeWithMillSecond(curFile);
+        			 
+        			 String short_videotime_str = calTimeMillSecondAsShortString(timeStamp);
+        			 
+        			 CutVideo_Info matchVideoInfo = originAbsPath_CutVideo_Map.get(curFile.getAbsolutePath());
+        			 
+        			 if(matchVideoInfo != null) {
+        				 
+        				 String newPartName = short_videotime_str+"_" +matchVideoInfo.yyyyMMdd_HHmmssSSS;
+        				 
+        				 String oldName = curFile.getName();
+        				 String newName = oldName.replace(matchVideoInfo.yyyyMMdd_HHmmssSSS, newPartName);
+        				 
+        				 if(newName != null && !"".equals(newName.trim()) && newName.trim().length() > 0 ) {
+        					 
+        					 
+        					 renameMap.put(curFile, newName);
+//        					 tryReName(curFile, newName);
+        					 
+        				 }
+        				 
+        			 }
+
+        		  }
+        	
+        	  }
+		}
+          
+          
+          try {
+			Thread.sleep(100);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+          
+          Map.Entry<File, String> entry;
+          Iterator iterator = renameMap.entrySet().iterator();
+          while (iterator.hasNext()) {
+              entry = (Map.Entry<File, String>) iterator.next();
+              File oriFile = entry.getKey();  //Map的Value
+              String newName = entry.getValue();  //Map的Value
+         	  tryReName(oriFile, newName);
+          }
+          
+          
             
             
             // ffmpeg -ss 00:00:00  -accurate_seek  -to 00:00:10  -i 1.mp4 -codec copy 1_output.mp4
@@ -838,6 +905,8 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
         String mEndTimeStr;
         String AbsPath;  // 输出文件的完整的名称
         File parentDirFile;
+        String yyyyMMdd_HHmmssSSS;   // 用于替换  202414142232 替换为 20s_202414142232
+        String mVideoTimeStr; // 视频播放时长的字符串 1h2m3s 这样的字符串
     	
     }
 
@@ -2140,6 +2209,26 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
     }
 
     
+    // 1h20m30s
+    static String calTimeMillSecondAsShortString(long mTimeMillSecond) { // 毫秒
+    	String timeResult = null ;
+
+        int hour = (int) (mTimeMillSecond/ (3600 * 1000 ));
+        int minute = (int)( (mTimeMillSecond - hour * 3600 * 1000)/ (60 * 1000) );
+        int second = (int) ((mTimeMillSecond-hour*3600*1000-minute*60*1000)/1000);
+        int millSecond = (int)(mTimeMillSecond%1000);
+        
+        System.out.println("mTimeMillSecond【"+mTimeMillSecond+"】 mTimeMillSecond【"+mTimeMillSecond+"】   hour【"+hour+"】  minute【"+minute+"】  second【"+second+"】 millSecond【"+millSecond+"】");
+        if(hour !=0 || minute !=0 || second !=0 || millSecond !=0 ) {
+        	
+        String   fixedStr =  hour+"h"+minute+"m"+second+"s";
+          return fixedStr;
+        }
+    	return "0s";
+    	
+    }
+    
+    
     static String calTimeMillSecondAsString(long mTimeMillSecond) { // 毫秒
     	String timeResult = null ;
 
@@ -2683,7 +2772,7 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
 
     static String getTimeStamp_yyyyMMdd_HHmmssSSS(){
 
-        SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd_HHmmss");//设置日期格式
+        SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd_HHmmssSSS");//设置日期格式
         String date = df.format(new Date());
         return date;
     }
