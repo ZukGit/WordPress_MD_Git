@@ -5354,7 +5354,9 @@ rem ======================================== rule34vaddcontextmenu_func_0x0
 rem rule_tip: %init_input_0% _33_    ##  在当前目录自动提交代码默认main分支
 rem desc:
 rem sample: call :rule34vaddcontextmenu_func_0x0
-rem sample_out:
+rem sample_out: Add_Url_Context_Menu(有输入路径)  Add_Empty_Context_Menu(无输入路径)
+
+
 ::SETLOCAL
 echo ______________Method_In rule34vaddcontextmenu_func_0x0
 echo :rule34vaddcontextmenu_func_0x0
@@ -5368,10 +5370,25 @@ if %errorlevel%==0 (
     echo Adding "Add to Context Menu" option...
 
 rem 添加右键菜单项
-   REG ADD "HKCU\Software\Classes\*\shell\AddToContextMenu" /ve /d "Add to Context Menu" /f
+   REG ADD "HKCU\Software\Classes\*\shell\AddToContextMenu" /ve /d "Add Url Context Menu" /f
    REG ADD "HKCU\Software\Classes\*\shell\AddToContextMenu\command" /ve /d "\"%userprofile%\Desktop\zbin\win_zbin\zzhandle_add_to_context_menu.bat\" \"%%1\"" /f
-   echo "Add to Context Menu" option added successfully.
+   echo "Add Url Context Menu" option added successfully.
 )
+
+
+rem 检查是否存在右键菜单项
+REG QUERY "HKCU\Software\Classes\*\shell\AddEmptyContextMenu" >nul 2>&1
+if %errorlevel%==0 (
+    echo "Add to Context Menu" option already exists.
+) else (
+    echo Adding "Add to Context Menu" option...
+
+rem 添加右键菜单项
+   REG ADD "HKCU\Software\Classes\*\shell\AddEmptyContextMenu" /ve /d "Add Empty Context Menu" /f
+   REG ADD "HKCU\Software\Classes\*\shell\AddEmptyContextMenu\command" /ve /d "\"%userprofile%\Desktop\zbin\win_zbin\zzhandle_add_empty_context_menu.bat\" \"%%1\"" /f
+   echo "Add Empty Context Menu" option added successfully.
+)
+
 echo [rule34vaddcontextmenu_func_0x0 EndPrintCode]   output=[__empty__]  param1=[__empty__]
 echo ______________Method_Out rule34vaddcontextmenu_func_0x0
 ::ENDLOCAL
@@ -5671,7 +5688,7 @@ echo %init_input_0% _32_      ## main 过滤当前路径(不包括孙文件)下P
 
 echo %init_input_0% _33_    ##  在当前目录自动提交代码默认main分支
 
-echo %init_input_0% _34_    ##  往文件右击鼠标菜单添加选项 Add_Context_Menu
+echo %init_input_0% _34_    ##  往文件右击鼠标菜单添加选项 Add_Url_Context_Menu(有输入路径)  Add_Empty_Context_Menu(无输入路径)
 
 
 echo %init_input_0% _996_     ## 不断循环打开关闭 CMD页面  感觉像 轰炸屏幕 寓意轰炸996  无奈下周修好电脑继续
