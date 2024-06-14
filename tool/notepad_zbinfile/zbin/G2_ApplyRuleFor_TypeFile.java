@@ -1,6 +1,9 @@
 
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ImageUtil;
+import cn.hutool.core.util.RuntimeUtil;
+import cn.hutool.extra.qrcode.QrCodeUtil;
+import cn.hutool.extra.qrcode.QrConfig;
 import cn.hutool.http.HttpUtil;
 import cn.hutool.json.JSONUtil;
 import it.sauronsoftware.jave.Encoder;
@@ -39,6 +42,7 @@ import com.spire.presentation.Presentation;
 import com.spire.presentation.ShapeType;
 import com.spire.presentation.drawing.FillFormatType;
 import com.sun.mail.util.MailSSLSocketFactory;
+
 
 import net.jimmc.jshortcut.JShellLink;
 import net.sourceforge.pinyin4j.PinyinHelper;
@@ -196,6 +200,12 @@ public class G2_ApplyRuleFor_TypeFile {
             System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin"
                     + File.separator + get_Bat_Sh_FlagNumber(Cur_Bat_Name) + "_Temp_Text.txt");
 
+    static File G2_Temp_Dir_File = new File(
+            System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin"
+                    + File.separator + get_Bat_Sh_FlagNumber(Cur_Bat_Name) +"_Temp_Dir");
+
+    
+    
     static OS_TYPE CUR_OS_TYPE = OS_TYPE.Windows;
     static String curOS_ExeTYPE = "";
     static ArrayList<String> mKeyWordName = new ArrayList<String>();
@@ -444,7 +454,277 @@ public class G2_ApplyRuleFor_TypeFile {
         realTypeRuleList.add(new AOSP_Replace_Src_TagFlag_Dst_Rule_68());
         
         
+        // 实现一个模拟的 HTTP 服务器 为 无线 adb 做准备
+        realTypeRuleList.add(new PC_Show_QrCode_HttpServer_Rule69());
+        
+        
+        
     }
+    
+ 
+    
+    class PC_Show_QrCode_HttpServer_Rule69 extends Basic_Rule {
+
+    	String  mQrCodeImageName;
+    	File  mQrCodeImageFile;
+    	File  mDetailQrCodeImageFile;
+       	int Client_Index = 1 ; 
+       	String upTipStr ; 
+       	String downTipStr ; 	
+       	
+       	
+        PC_Show_QrCode_HttpServer_Rule69() {
+            super("#", 69, 4);
+            mQrCodeImageName = getTimeStamp_yyyyMMdd_HHmmssSSS()+".jpg";
+        }
+        
+        @Override
+        boolean allowEmptyDirFileList() {
+            return true;
+        }
+
+        @Override
+        ArrayList<File> applySubFileListRule4(ArrayList<File> curFileList,
+                                              HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList,
+                                              ArrayList<File> curRealFileList) {
+
+        	
+        	Http_Main();
+        	
+        	
+        	
+       
+            return super.applySubFileListRule4(curFileList, subFileTypeMap, curDirList, curRealFileList);
+        }
+
+    
+        void Http_Main() {
+        	
+     
+            // ServerSocket指定端口port
+        	java.net.ServerSocket serverSocket = null ;
+        	int monitorPort = 8080;
+			try {
+				
+				// http://192.168.199.11:65000/wirelessadb_connect_rule1
+				
+				upTipStr = "请使用ZMain的CmdList页面选择 Rule1_WirelessAdb 规则执行扫描操作";
+				downTipStr = "http://192.168.199.11:65000/wirelessadb_connect_rule1";
+		        InetAddress addr;
+		        addr = InetAddress.getLocalHost();  // 【InetAddress.getLocalHost().getHostAddress()】
+		        String ip = addr.getHostAddress();
+		        
+		        
+				serverSocket = new java.net.ServerSocket(monitorPort);
+			
+			if(serverSocket == null) {
+	            System.out.println("无法启动Http服务---ip:port【"+ip+":"+monitorPort+"】");
+	            return ;
+			}
+			
+			
+			String mQrCodeTipStr = "http://"+ip+":"+monitorPort+"/wirelessadb_connect_rule1";
+			QrCodeOperation(mQrCodeTipStr);
+			
+            System.out.println("启动Http服务---ip:port【"+ip+":"+monitorPort+"】");
+
+            while(true){
+                // 阻塞到有连接访问，拿到socket
+            
+			System.out.println("主线程开始在端口______"+"【"+ip+":"+monitorPort+"】监听Accept()方法_______");
+			Socket 	socket = serverSocket.accept();
+			System.out.println();
+			System.out.println();
+			System.out.println();
+			System.out.println("主线程监听到在端口______"+"【"+ip+":"+monitorPort+"】有请求,从Accept()阻塞方法中苏醒_执行逻辑_______");
+
+		
+           System.out.println("主线程接受到 客户端Client_Socket HashCode:"+socket.hashCode());
+
+                // STEP. 启动线程
+                new Thread(()->{
+                    try {
+                        // STEP. 获取输入流、输出流
+                        OutputStream outputStream = null;
+                        InputStream inputStream = null;
+                        inputStream = socket.getInputStream();
+                        outputStream = socket.getOutputStream();
+
+                        // STEP. 获取输入内容
+                        byte[] bytes = new byte[inputStream.available()];
+                        int result = inputStream.read(bytes);
+                        if (result != -1) {
+                            System.out.println("_________子线程客户ID["+Client_Index+"]打印Begin_______");
+                            System.out.println(new String(bytes));
+                            System.out.println("_________子线程客户ID["+Client_Index+"]End_______");
+
+
+                        }
+
+                        // STEP. 响应内容
+                        // http 状态
+                        String httpStatus = "200 OK";
+                        // String httpStatus = "404 Not Found";
+                        // String httpStatus = "500 Internal Server Error";
+
+                        // 状态行、响应头部、空行、响应信息
+                        String body = "<h1>hello</h1>";
+                        String responseStatusLine = "HTTP/1.1 "+httpStatus+"\r\n";
+                        String responseHeader = "";
+                        responseHeader += "Content-Length: " + body.getBytes().length + "\r\n";
+                        responseHeader += "Content-Type: text/html; charset-utf-8\r\n";
+                        String responseLine = "\r\n";
+                        String responseBody = body + "\r\n";
+                        String response = responseStatusLine + responseHeader +responseLine + responseBody;
+
+                        // 输出响应内容、关闭流
+                        outputStream.write(response.getBytes());//按照协议，将返回请求由outputStream写入
+                        outputStream.flush();
+                        socket.shutdownInput();
+                        socket.shutdownOutput();
+                        socket.close();
+                        Client_Index++;
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+
+                },String.valueOf(socket.hashCode())).start();
+            }
+            
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			System.out.println("_______Port:"+monitorPort+" While(true) 结束!_______");
+
+            
+        }
+
+        void QrCodeOperation(String message) {
+        
+        	// 创建 二维码    
+        	
+        	// 显示二维码
+        	
+            if (CUR_OS_TYPE == OS_TYPE.Windows) {
+                TextAs_QrCode_Rule_15_Win(message);
+            } else if (CUR_OS_TYPE == OS_TYPE.MacOS || CUR_OS_TYPE == OS_TYPE.Linux) {
+                // 实现 Mac 下 显示 二维码
+                TextAs_QrCode_Rule_15_Mac(message);
+
+            } 
+            
+        	
+        }
+        
+          void TextAs_QrCode_Rule_15_Win(String mQrCodeStr) {
+        	
+              QrConfig config = new QrConfig();
+              if(G2_Temp_Dir_File != null && !G2_Temp_Dir_File.exists()) {
+            	  
+            	  G2_Temp_Dir_File.mkdirs();
+              }
+              
+              mQrCodeImageFile =  new File(G2_Temp_Dir_File.getAbsolutePath() + File.separator + mQrCodeImageName);
+              
+              config.setMargin(10);
+              config.setWidth(500);
+              config.setHeight(500);
+           
+             File targetQrCodeImageFile = QrCodeUtil.generate(mQrCodeStr, config, mQrCodeImageFile );
+             mDetailQrCodeImageFile = new File(G2_Temp_Dir_File.getAbsolutePath() + File.separator + "detail_"+mQrCodeImageName);
+             
+             drawTagJpg(targetQrCodeImageFile,mDetailQrCodeImageFile,upTipStr,downTipStr);
+             
+             
+//             System.out.println("targetQrCodeImageFile = "+ targetQrCodeImageFile.getAbsolutePath());
+             RuntimeUtil.exec("rundll32.exe C:\\\\Windows\\\\System32\\\\shimgvw.dll,ImageView_Fullscreen  " + mDetailQrCodeImageFile.getAbsolutePath());
+             
+              
+        }
+        
+          void TextAs_QrCode_Rule_15_Mac(String mQrCodeStr) {
+          	
+        }
+          
+          
+          void drawTagJpg(File srcJpgFile, File dstJpgFile, String upTip ,  String downTip) {
+
+              if (!dstJpgFile.getParentFile().exists()) {
+                  dstJpgFile.getParentFile().mkdirs();
+              }
+
+              fileCopy(srcJpgFile, dstJpgFile);
+              File mCurFile = srcJpgFile;
+
+              ImageIcon imageIcon = new ImageIcon(dstJpgFile.getAbsolutePath());
+
+              BufferedImage bi = getBufferedImage(dstJpgFile);
+              int heigh = bi.getHeight();
+              int width = bi.getWidth();
+              int jpg_width = width;
+              int jpg_hight = heigh;
+
+//  				BufferedImage bi = new BufferedImage(width, heigh, BufferedImage.TYPE_INT_RGB);// INT精确度达到一定,RGB三原色，高度70,宽度150
+              // 得到它的绘制环境(这张图片的笔)
+              Graphics2D g2 = (Graphics2D) bi.getGraphics();
+//  				g2.fillRect(0, 0, jpg_width, jpg_width);// 填充一个矩形 左上角坐标(0,0),宽500,高500;填充整张图片
+              g2.setColor(new Color(0, 0, 0));// 设置颜色
+//  				g2.fillRect(0, 0, width, heigh);// 填充整张图片(其实就是设置背景颜色)
+              int frontSize = 14;
+              int centerx = jpg_width / 2;
+              int centery = jpg_hight / 2;
+
+              int centery_20 = jpg_hight / 20;
+              int centerx_20 = (jpg_width / 20) * 19;
+
+              Font f = new Font("楷体",  Font.BOLD, frontSize);
+              g2.setFont(f); // 设置字体:字体、字号、大小
+              FontRenderContext context = g2.getFontRenderContext();
+              Rectangle2D mUpBounds = f.getStringBounds(upTip + "", context);
+
+              Rectangle2D mDownBounds = f.getStringBounds(downTip + "", context);
+              
+//              g2.setColor(Color.RED);
+              g2.drawString(upTip + "", (float) (centerx - mUpBounds.getCenterX() ),
+                      (float) (centery -   mUpBounds.getCenterY() - 200)); // 向图片上写字符串
+
+//              g2.setColor(Color.BLACK);
+              g2.drawString(downTip + "", (float) (centerx - mDownBounds.getCenterX() ),
+                      (float) (centery + mDownBounds.getCenterY() + 200)); // 向图片上写字符串
+              
+//  				g2.drawString(drawText + "", (float) (centerx - bounds.getCenterX()),	(float) (centery - bounds.getCenterY())); // 向图片上写字符串
+
+              try {
+//  					dstJpgFile.createNewFile();
+                  ImageIO.write(bi, "jpg", new FileOutputStream(dstJpgFile));// 保存图片 JPEG表示保存格式
+//                  System.out.println("创建文件[" + dstJpgFile.getName() + "]  = " + dstJpgFile.getAbsolutePath() + "成功");
+              } catch (Exception e) {
+                  System.out.println("复制图片格式出现异常！");
+              }
+
+          }
+          
+          
+        @Override
+        String simpleDesc() {
+            return "  \n"
+                    + Cur_Bat_Name  + " #_"+rule_index+"  ## 实现一个模拟的 HTTP 服务器 为 无线 adb 做准备\n"
+                    + Cur_Bat_Name  + " #_"+rule_index+"  ## 实现一个模拟的 HTTP 服务器 为 无线 adb 做准备 \n"
+
+                    ;
+        }
+
+
+        @Override
+        boolean initParamsWithInputList(ArrayList<String> inputParamList) {
+            return super.initParamsWithInputList(inputParamList);
+        }
+
+    }
+
+
     
     class AOSP_Replace_Src_TagFlag_Dst_Rule_68 extends Basic_Rule {
 
@@ -488,7 +768,7 @@ public class G2_ApplyRuleFor_TypeFile {
         	if(CUR_OS_TYPE == OS_TYPE.Windows) {
         		
                 return
-                          Cur_Bat_Name + " #_" + rule_index + "  [src源路径][tag标识符][dst目的目录]    ##         // 指定当前 src 源目录文件夹 在该路径搜索指定 tagString , 然后在目的Dst路径搜索 如果 后缀路径与 src源匹配 并且 也有匹配到 tagString 那么替换该字符串所在行\r\n"
+                          Cur_Bat_Name + " #_" + rule_index + "  [src源路径][tag标识符][dst目的目录]    ##   AOSP中字符串的替换      // 指定当前 src 源目录文件夹 在该路径搜索指定 tagString , 然后在目的Dst路径搜索 如果 后缀路径与 src源匹配 并且 也有匹配到 tagString 那么替换该字符串所在行\r\n"
                           		+ "           \n"
                       +   Cur_Bat_Name + " #_" + rule_index + "  [D:\\jira_work\\143453\\src][wifi_hotspot_maximize_compatibility_single_ap_summary][D:\\jira_work\\143453\\dst]     ##  指定src目录 查询 tagString所在字符串行 匹配替换到dst目录查询到的路径名称相同的文件内   \n"
 
@@ -498,7 +778,7 @@ public class G2_ApplyRuleFor_TypeFile {
         	} 
 
             return
-                    Cur_Bat_Name + " #_" + rule_index + "  '[src源路径][tag标识符][dst目的目录]'    ##         // 指定当前 src 源目录文件夹 在该路径搜索指定 tagString , 然后在目的Dst路径搜索 如果 后缀路径与 src源匹配 并且 也有匹配到 tagString 那么替换该字符串所在行\r\n"
+                    Cur_Bat_Name + " #_" + rule_index + "  '[src源路径][tag标识符][dst目的目录]'    ##   AOSP中字符串的替换      // 指定当前 src 源目录文件夹 在该路径搜索指定 tagString , 然后在目的Dst路径搜索 如果 后缀路径与 src源匹配 并且 也有匹配到 tagString 那么替换该字符串所在行\r\n"
               		+ "           \n"
           +   Cur_Bat_Name + " #_" + rule_index + "  '[D:\\jira_work\\143453\\src][wifi_hotspot_maximize_compatibility_single_ap_summary][D:\\jira_work\\143453\\dst]'     ##  指定src目录 查询 tagString所在字符串行 匹配替换到dst目录查询到的路径名称相同的文件内   \n"
 
@@ -11245,41 +11525,9 @@ class Make_Md5Type_Hide_File_Back_To_FileType_Rule64 extends Basic_Rule {
 
         }
 
-        public BufferedImage getBufferedImage(File file) {
-            Image img = null;
-            try {
-                img = ImageIO.read(file); // 构造Image对象
-            } catch (Exception e) {
-                System.out.println(e);
-                return null;
-            }
 
-            int width = img.getWidth(null); // 得到源图宽
-            int height = img.getHeight(null); // 得到源图长
 
-//    return resizeFix(400, 492);
-            return resize(img, width, height);
-        }
-
-        public BufferedImage resize(Image mImage, int w, int h) {
-            // SCALE_SMOOTH 的缩略算法 生成缩略图片的平滑度的 优先级比速度高 生成的图片质量比较好 但速度慢
-            BufferedImage image = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
-            Graphics g = image.getGraphics();
-            try {
-                g.drawImage(mImage, 0, 0, w, h, null); // 绘制缩小后的图
-            } finally {
-                if (g != null) {
-                    g.dispose();
-                }
-            }
-            return image;
-            // File destFile = new File("C:\\temp\\456.jpg");
-            // FileOutputStream out = new FileOutputStream(destFile); // 输出到文件流
-            // // 可以正常实现bmp、png、gif转jpg
-            // JPEGImageEncoder encoder = JPEGCodec.createJPEGEncoder(out);
-            // encoder.encode(image); // JPEG编码
-            // out.close();
-        }
+   
 
     }
 
@@ -29742,6 +29990,13 @@ class Make_Md5Type_Hide_File_Back_To_FileType_Rule64 extends Basic_Rule {
         return builder.toString();
     }
 
+    static String getTimeStamp_yyyyMMdd_HHmmssSSS() {
+
+        SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd_HHmmssSSS");// 设置日期格式
+        String date = df.format(new Date());
+        return date;
+    }
+    
     static String getTimeStamp_yyyyMMdd_HHmmss() {
 
         SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd_HHmmss");// 设置日期格式
@@ -30000,7 +30255,45 @@ class Make_Md5Type_Hide_File_Back_To_FileType_Rule64 extends Basic_Rule {
     }
     
     
-    static	String  getContainLineInStrList(ArrayList<String> srtList, String matchStr) {
+    static public BufferedImage getBufferedImage(File file) {
+        Image img = null;
+        try {
+            img = ImageIO.read(file); // 构造Image对象
+        } catch (Exception e) {
+            System.out.println(e);
+            return null;
+        }
+
+        int width = img.getWidth(null); // 得到源图宽
+        int height = img.getHeight(null); // 得到源图长
+
+//return resizeFix(400, 492);
+        return resize(img, width, height);
+    }
+    
+    
+    public static  BufferedImage resize(Image mImage, int w, int h) {
+        // SCALE_SMOOTH 的缩略算法 生成缩略图片的平滑度的 优先级比速度高 生成的图片质量比较好 但速度慢
+        BufferedImage image = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
+        Graphics g = image.getGraphics();
+        try {
+            g.drawImage(mImage, 0, 0, w, h, null); // 绘制缩小后的图
+        } finally {
+            if (g != null) {
+                g.dispose();
+            }
+        }
+        return image;
+        // File destFile = new File("C:\\temp\\456.jpg");
+        // FileOutputStream out = new FileOutputStream(destFile); // 输出到文件流
+        // // 可以正常实现bmp、png、gif转jpg
+        // JPEGImageEncoder encoder = JPEGCodec.createJPEGEncoder(out);
+        // encoder.encode(image); // JPEG编码
+        // out.close();
+    }
+    
+    
+    public static	String  getContainLineInStrList(ArrayList<String> srtList, String matchStr) {
 
         for (int i = 0; i < srtList.size(); i++) {
             String str_item = srtList.get(i);
