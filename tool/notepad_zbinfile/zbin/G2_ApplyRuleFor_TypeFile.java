@@ -471,11 +471,14 @@ public class G2_ApplyRuleFor_TypeFile {
         int Client_Index = 1 ;
         String upTipStr ;
         String downTipStr ;
+        
+        String  mQrCodeRule1Tag ;
 
 
         PC_Show_QrCode_HttpServer_Rule69() {
             super("#", 69, 4);
             mQrCodeImageName = getTimeStamp_yyyyMMdd_HHmmssSSS()+".jpg";
+            mQrCodeRule1Tag = "wirelessadb_connect_rule1";
         }
 
         @Override
@@ -544,7 +547,7 @@ public class G2_ApplyRuleFor_TypeFile {
                 }
 
                 upTipStr = "请使用ZMain的CmdList页面选择 Rule1_WirelessAdb 规则执行扫描操作";
-                downTipStr = "http://"+localHostIpAddr+":"+monitorPort+"/wirelessadb_connect_rule1";
+                downTipStr = "http://"+localHostIpAddr+":"+monitorPort+"/"+mQrCodeRule1Tag;
                 serverSocket = new java.net.ServerSocket(monitorPort);
 
                 if(serverSocket == null) {
@@ -553,7 +556,7 @@ public class G2_ApplyRuleFor_TypeFile {
                 }
 
 
-                String mQrCodeTipStr = "http://"+localHostIpAddr+":"+monitorPort+"/wirelessadb_connect_rule1";
+                String mQrCodeTipStr = "http://"+localHostIpAddr+":"+monitorPort+"/"+mQrCodeRule1Tag;
                 downTipStr = mQrCodeTipStr;
                 QrCodeOperation(mQrCodeTipStr);
 
@@ -586,7 +589,9 @@ public class G2_ApplyRuleFor_TypeFile {
                             int result = inputStream.read(bytes);
                             if (result != -1) {
                                 System.out.println("_________子线程客户ID["+Client_Index+"]打印Begin_______");
-                                System.out.println(new String(bytes));
+                                String mByteStr = new String(bytes);
+                                System.out.println(mByteStr);
+                                Operation_MobileUrl(mByteStr);
                                 System.out.println("_________子线程客户ID["+Client_Index+"]End_______");
 
 
@@ -631,6 +636,125 @@ public class G2_ApplyRuleFor_TypeFile {
 
 
         }
+        
+        
+        void Operation_MobileUrl(String message) {
+        	String[] mMessageList = message.split("\n");
+        	
+        	String mTargetMessage = null ;
+        	if(mMessageList != null ) {
+        		
+        		for (int i = 0; i < mMessageList.length; i++) {
+        			String mMessageItem = mMessageList[i];
+        			
+        			System.out.println("mMessageList["+i+"_"+mMessageList.length+"] = "+ mMessageItem);
+        			
+        			if(mMessageItem.contains(mQrCodeRule1Tag)) {
+        				mTargetMessage = mMessageItem;
+        			}
+					
+				}
+        			
+        	}else {
+        		
+                System.out.println("message【"+message+"】  以\n 切割 为空  mMessageList ="+ mMessageList);
+                return ;
+        	}
+        	
+        	// mMessageList[0_7] = GET /wirelessadb_connect_rule1?ip=192.168.1.102&port=37897 HTTP/1.1
+        	if(mTargetMessage == null) {
+                System.out.println("message【"+message+"】  以\n 找不到包含 【"+mQrCodeRule1Tag+"】  mTargetMessage 的字符串 ="+ mTargetMessage);
+                return ;	
+        		
+        	}
+        	
+        	if(mTargetMessage.contains(" ")) {
+        	   	String[] mItemList = 	mTargetMessage.split(" ");
+            	
+        		for (int i = 0; i < mItemList.length; i++) {
+        			String mMessageItem = mItemList[i];
+        			
+        			System.out.println("mItemList["+i+"_"+mItemList.length+"] = "+ mMessageItem);
+        			
+        			if(mMessageItem.contains(mQrCodeRule1Tag)) {
+        				mTargetMessage = mMessageItem;
+        			}
+					
+				}        		
+        	}
+        	
+        	
+        	// /wirelessadb_connect_rule1?ip=192.168.1.102&port=37897
+        	
+        	String shortUrl = mTargetMessage.replace(mQrCodeRule1Tag, "").replace("/", "").replace("?", "").trim();
+        	
+        	
+//			System.out.println("shortUrl  = "+ shortUrl);
+			
+        	
+			System.out.println("shortUrl["+ shortUrl+"]");
+			
+			if(!shortUrl.contains("&")) {
+	  			System.out.println("shortUrl = "+ shortUrl +" 携带的参数不够  没有包含& 符号!! 请检查!! ");
+	  			return ;
+	  			
+			}
+			
+			String[] urlParams = shortUrl.split("&");
+			
+			String mobile_ip = "";
+			
+			String mobile_port = "";
+			
+			for (int i = 0; i < urlParams.length; i++) {
+				String mParamItem = urlParams[i];
+				
+    			System.out.println("mParamItem["+i+"_"+urlParams.length+"] = "+ mParamItem);
+
+	  			
+				if(mParamItem.startsWith("ip=")) {
+					mobile_ip = mParamItem.replace("ip=", "");
+					
+				}
+				
+				if(mParamItem.startsWith("port=")) {
+					mobile_port = mParamItem.replace("port=", "");
+					
+				}
+				
+			}
+        	
+			if("".equals(mobile_ip) || "".equals(mobile_port)) {
+				
+	  			System.out.println("mobile_ip = "+ mobile_ip +" mobile_port["+mobile_port+"]  为空! 请检查! ");
+	  			return ;
+			}
+
+  			System.out.println("Success---> "+"mobile_ip["+ mobile_ip +"]  mobile_port["+mobile_port+"]  ");
+
+  			String adb_connect_command = "  adb start-server &&  adb connect  "+mobile_ip+":"+mobile_port +" && "+" adb -s "+mobile_ip+":"+mobile_port+" shell ";
+  			
+  			
+  			System.out.println("Success_adbconnect_command--->  \n"+adb_connect_command);
+
+  			// adb kill-server && adb connect 
+        	
+  			try {
+  				
+  				
+  				String cmdCommand = "CMD.exe /c start cmd /k  " + adb_connect_command; 
+  	  			System.out.println("Success_cmd_command--->  \n"+cmdCommand);
+//  	  		execCMD(cmdCommand);
+  	  	
+  	  	
+		Runtime.getRuntime().exec(cmdCommand);
+//  				Runtime.getRuntime().exec(cmdCommand);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+        }
+        
 
         void QrCodeOperation(String message) {
 
