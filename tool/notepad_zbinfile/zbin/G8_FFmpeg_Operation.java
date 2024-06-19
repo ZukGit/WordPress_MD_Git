@@ -372,12 +372,16 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
         int stepInterval = 500 ; // 毫秒   step_500 间隔
         File outputDirFile ;   // 输出文件的目录  用于检测 输出的文件大小 
 
+        int mFootNum  = 6 ; // (-1,0,1)(-1,0,1)给个方向 前进的步数 目前默认为6
+        
+        
         CutDown_MultiVideoOut_Rule_13(){
             super(13);
             mInputMediaFileList = new  ArrayList<File>();
             outVideoInfoList  = new  ArrayList<CutVideo_Info>();
             originAbsPath_CutVideo_Map = new HashMap<String,CutVideo_Info>();
             stepInterval = 500 ;
+            mFootNum = 6 ;
         }
 
 
@@ -392,7 +396,8 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
                             "\n"+Cur_Bat_Name+ "  13   01:10-02:50  stepms_500   1.mp4      <mp4,flv,avi.rmvb 路径>    ## 分钟数往后截取视频 \n"+
                             "\n"+Cur_Bat_Name+ "  13   00:00:10-    stepms_500   1.mp4      <mp4,flv,avi.rmvb 路径>    ## 时分秒往后截取视频 \n"+
                             "\n"+Cur_Bat_Name+ "  13   -00:00:10    stepms_500   1.mp4     <mp4,flv,avi.rmvb 路径>    ## 时分秒往后截取视频 \n"+
-                            "\n"+Cur_Bat_Name+ "  13   00:00:10-00:00:50  stepms_800 1.mp4  <mp4,flv,avi.rmvb 路径>    ## 时分秒往后截取视频 \n"; }
+                            "\n"+Cur_Bat_Name+ "  13   00:00:10-00:00:50  stepms_800 1.mp4  <mp4,flv,avi.rmvb 路径>    ## 时分秒往后截取视频 \n" +
+                            "\n"+Cur_Bat_Name+ "  13   00:00:10-00:00:50  footnum_10 stepms_800 1.mp4  <mp4,flv,avi.rmvb 路径>    ## 往方向生成footnum个视频(当前默认 6 步)时分秒往后截取视频 \n"; }
 
 
 
@@ -419,6 +424,14 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
                 String curAbsPath = "";
                 if(curStringItem.startsWith(pre)){
                     curStringItem = curStringItem.substring(2);
+                }
+                
+                if(curStringItem.startsWith("footnum_")){
+                    String mFootNumStr  = curStringItem.replace("footnum_", "");
+                    if(isNumeric(mFootNumStr)) {
+                    	mFootNum = Integer.parseInt(mFootNumStr);
+                    }
+                    continue;
                 }
                 
                 
@@ -539,7 +552,7 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
                 // out_name   
                 
                 // 每个 组 有 6 个 数据
-                for (int j = 0; j < 6; j++) {
+                for (int j = 0; j < mFootNum; j++) {
                 	
                 	CutVideo_Info cutInfo = calCutVideoInfo(beginTimeStr,endTimeStr,i,j,stepInterval,video_file_endtime_millsecond_long,targetInputMP4File);
            
