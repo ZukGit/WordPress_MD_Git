@@ -200,6 +200,10 @@ public class G2_ApplyRuleFor_TypeFile {
             System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin"
                     + File.separator + get_Bat_Sh_FlagNumber(Cur_Bat_Name) + "_Temp_Text.txt");
 
+    static File G2_Temp_Bat_File = new File(
+            System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin"
+                    + File.separator + get_Bat_Sh_FlagNumber(Cur_Bat_Name) + "_Temp_Bat.bat");
+    
     static File G2_Temp_Dir_File = new File(
             System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin"
                     + File.separator + get_Bat_Sh_FlagNumber(Cur_Bat_Name) +"_Temp_Dir");
@@ -546,7 +550,7 @@ public class G2_ApplyRuleFor_TypeFile {
                     localHostIpAddr = localWifiIpAddr;
                 }
 
-                upTipStr = "请使用ZMain的CmdList页面选择 Rule1_WirelessAdb 规则执行扫描操作";
+                upTipStr = "复制无线调式IP地址和端口 && ZMain执行Rule1_WirelessAdb扫描操作";
                 downTipStr = "http://"+localHostIpAddr+":"+monitorPort+"/"+mQrCodeRule1Tag;
                 serverSocket = new java.net.ServerSocket(monitorPort);
 
@@ -730,6 +734,10 @@ public class G2_ApplyRuleFor_TypeFile {
                 System.out.println("mobile_ip = "+ mobile_ip +" mobile_port["+mobile_port+"]  为空! 请检查! ");
                 return null;
             }
+            
+            
+        	String ipPortStr = mobile_ip+":"+mobile_port;
+        	
 
             System.out.println("Success---> "+"mobile_ip["+ mobile_ip +"]  mobile_port["+mobile_port+"]  ");
 
@@ -740,11 +748,31 @@ public class G2_ApplyRuleFor_TypeFile {
 
             // adb kill-server && adb connect
 
+            
+        	// 写入 adb**.bat 文件   然后 执行 
+        	ArrayList<String> mWindowAdbCommandList = new ArrayList<String>();
+        	mWindowAdbCommandList.add("@ECHO off");
+        	mWindowAdbCommandList.add("Setlocal ENABLEDELAYEDEXPANSION");
+        	mWindowAdbCommandList.add("adb start-server");
+        	mWindowAdbCommandList.add("adb connect "+ ipPortStr);
+        	mWindowAdbCommandList.add("set ip="+ipPortStr+"");
+        	mWindowAdbCommandList.add("adb devices");
+        	mWindowAdbCommandList.add("set device_name=\"\"");
+        	mWindowAdbCommandList.add("for /F \"delims=\" %%i in ('adb -s "+ipPortStr +  " shell getprop ro.product.name') do set device_name=%%i");
+        	mWindowAdbCommandList.add("set device_brand=\"\"");
+        	mWindowAdbCommandList.add("for /F \"delims=\" %%i in ('adb -s "+ ipPortStr +" shell getprop ro.product.brand') do set device_brand=%%i");
+        	mWindowAdbCommandList.add("echo adb start-server ^&^&^  adb connect "+ipPortStr+"  ^&^&^ adb -s "+ipPortStr+" shell ");
+        	mWindowAdbCommandList.add("echo  _______brand[%device_brand%]_______name[%device_name%]_______ip[%ip%]_______");
+        	mWindowAdbCommandList.add("adb -s "+ipPortStr+" shell");
+        	
+        	writeContentToFile(G2_Temp_Bat_File , mWindowAdbCommandList);
+        	
             try {
 
 
-                String cmdCommand = "CMD.exe /c start cmd /k  " + adb_connect_command;
-                System.out.println("Success_cmd_command--->  \n"+cmdCommand);
+            	// 这里 需要 改进 ， 新打开 Cmd 后 执行命令 并显示命令结果 
+                String cmdCommand = "CMD.exe /c start cmd /k  " + G2_Temp_Bat_File.getAbsolutePath();
+                System.out.println("Success_cmd_command--->  exe bat File -> \n"+G2_Temp_Bat_File.getAbsolutePath());
 //  	  		execCMD(cmdCommand);
 
 
