@@ -813,16 +813,17 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
                 batchBatCommandList.add(command);
             
 			}
-            
+            batchBatCommandList.add("exit");
 
- 
-            
-            
+
+
+
+
             writeContentToFile(G8_TEMP_Bat_File, batchBatCommandList);
-            
-            
+
+            execCMD_slient(G8_TEMP_Bat_File.getAbsolutePath());
           
-            
+/*
           final  Thread curThrad = new Thread(new Runnable() {
 				
 				@Override
@@ -848,7 +849,7 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-			}
+			}*/
             
          
          
@@ -876,7 +877,7 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
         			
             		  if(fileSizeList.contains(targetFile.length())) {
             			  
-            		      System.out.println("subFile["+i+"_"+mItemArr.size()+"]"+"_["+mItemArr.size()+"_"+mCutVideoArrList.size()+"] size["+targetFile.length()+"] = "+ targetFile.getAbsolutePath()+" will be delete!");
+            		      System.out.println("subFile["+j+"_"+mItemArr.size()+"]"+"_["+mItemArr.size()+"_"+mCutVideoArrList.size()+"] size["+targetFile.length()+"] = "+ targetFile.getAbsolutePath()+" will be delete!");
 
             		      
             		      targetFile.delete();
@@ -956,19 +957,14 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
 		}
           
           
-          try {
-			Thread.sleep(100);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-          
+
           Map.Entry<File, String> entry;
           Iterator iterator = renameMap.entrySet().iterator();
           while (iterator.hasNext()) {
               entry = (Map.Entry<File, String>) iterator.next();
               File oriFile = entry.getKey();  //Map的Value
               String newName = entry.getValue();  //Map的Value
+              newName = newName.replace("-1","负");
          	  tryReName(oriFile, newName);
           }
           
@@ -3952,23 +3948,56 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
         return sb.toString();
     }
 
-    
-    // zukgit _妈蛋
+
+
+
+    // zukgit _
+    // 1. getRuntime().exe   和  cmd  /c  start 冲突  ,     使用了 start 那么  process.waitFor() 就不生效
+    // 2. 不使用 start  单独读取 输入流 getInputStream   主线程会卡住  ， 需要而外读取 getErrorStream() 情况缓存 才能继续  参考    https://blog.csdn.net/meryvn/article/details/49663721
+
     public static String execCMD_slient(String command) {
         StringBuilder sb =new StringBuilder();
 
         if(CUR_OS_TYPE == OS_TYPE.Windows){
 
             try {
-                Process process=Runtime.getRuntime().exec(" cmd /c /q start  "+command  +" ");
-
-                BufferedReader bufferedReader=new BufferedReader(new InputStreamReader(process.getInputStream()));
+//                Process process=Runtime.getRuntime().exec(" cmd /c  start  "+command  +" ");
+                Process process=Runtime.getRuntime().exec(" cmd /c  "+command  +" ");
+/*                BufferedReader bufferedReader=new BufferedReader(new InputStreamReader(process.getInputStream()));
                 String line;
                 while((line=bufferedReader.readLine())!=null)
                 {
                     sb.append(line+"\n");
+                }*/
+
+
+                //Process p = Runtime.getRuntime().exec("cmd.exe /c dir");
+                final InputStream is1 = process.getInputStream();
+                new Thread(new Runnable() {
+                    public void run() {
+                        BufferedReader br = new BufferedReader(new InputStreamReader(is1));
+                        try{
+                            while(br.readLine() != null) ;
+                        }
+                        catch(Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }).start(); // 启动单独的线程来清空p.getInputStream()的缓冲区
+                InputStream is2 = process.getErrorStream();
+                BufferedReader br2 = new BufferedReader(new InputStreamReader(is2));
+                StringBuilder buf = new StringBuilder(); // 保存输出结果流
+                String line = null;
+                while((line = br2.readLine()) != null) buf.append(line); //
+                System.out.println("输出结果为：" + buf);
+
+                int exitCode =   process.waitFor();
+                if(exitCode == 0){
+                    System.out.println("result ok: exitCode="+exitCode  +" command="+command);
+                } else {
+
+                    System.out.println("result failed! exitCode="+exitCode  +" command="+command);
                 }
-                process.destroy();
               
             } catch (Exception e) {
                 return e.toString();
