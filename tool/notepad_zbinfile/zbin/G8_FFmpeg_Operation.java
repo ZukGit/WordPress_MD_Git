@@ -79,6 +79,10 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
 
     // 固定2 当前执行文件的编号 A1  A2  A3   ... G1   G2   G3 ... Z9
     static File G8_Properties_File = new File(System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin" + File.separator + get_Bat_Sh_FlagNumber(Cur_Bat_Name)+".properties");
+  
+    static File G8_TEMP_Bat_File = new File(System.getProperties().getProperty("user.home") + File.separator + "Desktop" + File.separator + "zbin" + File.separator + get_Bat_Sh_FlagNumber(Cur_Bat_Name)+"_Temp"+".bat");
+
+    
     static InputStream G8_Properties_InputStream;
     static OutputStream G8_Properties_OutputStream;
     static Properties G8_Properties = new Properties();
@@ -366,6 +370,11 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
         HashMap<String,CutVideo_Info> originAbsPath_CutVideo_Map ; 
         
         
+        
+        // 各个方向的列表的集合
+        ArrayList<ArrayList<CutVideo_Info>> mCutVideoArrList ;
+        
+        
         String beginTimeStr;    // 外部输入的开始时间字符串
         String endTimeStr;      // 外部输入的结束时间字符串
         String outputFileName;  // 输出文件的名称
@@ -375,11 +384,17 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
         int mFootNum  = 6 ; // (-1,0,1)(-1,0,1)给个方向 前进的步数 目前默认为6
         
         
+        // 批处理的 命令的 内容
+        ArrayList<String> batchBatCommandList  ; 
+        
         CutDown_MultiVideoOut_Rule_13(){
             super(13);
             mInputMediaFileList = new  ArrayList<File>();
             outVideoInfoList  = new  ArrayList<CutVideo_Info>();
             originAbsPath_CutVideo_Map = new HashMap<String,CutVideo_Info>();
+            mCutVideoArrList = new ArrayList<ArrayList<CutVideo_Info>>();
+            
+            batchBatCommandList = new  ArrayList<String>();
             stepInterval = 500 ;
             mFootNum = 6 ;
         }
@@ -551,6 +566,9 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
                 
                 // out_name   
                 
+            	ArrayList<CutVideo_Info>  mDirCutVideoArr = new ArrayList<CutVideo_Info>();
+            	
+            	
                 // 每个 组 有 6 个 数据
                 for (int j = 0; j < mFootNum; j++) {
                 	
@@ -559,8 +577,11 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
                     outVideoInfoList.add(cutInfo);
                     
                     originAbsPath_CutVideo_Map.put(cutInfo.AbsPath, cutInfo);
-				}
-
+                    mDirCutVideoArr.add(cutInfo);				
+                    
+                }
+                
+                mCutVideoArrList.add(mDirCutVideoArr);
                 
 			}
             
@@ -726,8 +747,17 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
         	
         	info.yyyyMMdd_HHmmssSSS  = getTimeStamp_yyyyMMdd_HHmmssSSS();
         	
+        	String first_Char = A_dir+"";
+//        	if("-1".equals(first_Char)) {
+//        		first_Char = "负";
+//        	}
         	
-        	String fileName = outputDirFile.getAbsolutePath()+File.separator+A_dir+"_"+B_dir+"_"+arrayIndex+"_"+info.yyyyMMdd_HHmmssSSS+"_" +matchFile.getName();
+        	String second_Char = B_dir+"";
+//        	if("-1".equals(second_Char)) {
+//        		second_Char = "负";
+//        	}
+        	
+        	String fileName = outputDirFile.getAbsolutePath()+File.separator+first_Char+"_"+second_Char+"_"+arrayIndex+"_"+info.yyyyMMdd_HHmmssSSS+"_" +matchFile.getName();
         	
         	info.AbsPath =  fileName.replaceAll(" ", "");
 	
@@ -759,8 +789,13 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
             System.out.println("rule13 ffmpeg_path = "+ffmpeg_path);
             // 把 当前的 mp4 文件写入 G8_1_MergedRule.txt
 
-
+            ArrayList<Thread>  mThreadList = new ArrayList<Thread> ();
             System.out.println("═══════════════════════════ outVideoInfoList.size【"+outVideoInfoList.size()+"】═════════════");
+        
+            
+            
+            batchBatCommandList.add("@ECHO off");
+            batchBatCommandList.add("setlocal enabledelayedexpansion");   
             for (int i = 0; i < outVideoInfoList.size(); i++) {
 				
             	
@@ -773,35 +808,110 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
              	System.out.println("═════【"+i+"_"+ outVideoInfoList.size()+"】 begin["+curVideoInfo.mBeginTimeStr+"] end["+curVideoInfo.mEndTimeStr+"]  path["+curVideoInfo.AbsPath+"]");
 
                 String command = ffmpeg_path +" -ss "+curVideoInfo.mBeginTimeStr  + " -accurate_seek  -to " + curVideoInfo.mEndTimeStr +"  -i " + "\""+targetInputMP4File.getName()+ "\"" +" "+ "  -codec copy -avoid_negative_ts 1 "+ curVideoInfo.AbsPath;
-                execCMD(command);
-                
-                System.out.println("裁剪输出文件完成 -》 " + curVideoInfo.AbsPath);
-                
+            
+         
+                batchBatCommandList.add(command);
+            
 			}
+            
+
+ 
+            
+            
+            writeContentToFile(G8_TEMP_Bat_File, batchBatCommandList);
+            
+            
+          
+            
+          final  Thread curThrad = new Thread(new Runnable() {
+				
+				@Override
+				public void run() {
+					// TODO Auto-generated method stub
+	                System.out.println("______ execCMD_slient 子线程等待开始Begin______");
+
+	                execCMD_slient(G8_TEMP_Bat_File.getAbsolutePath());
+	             
+	                System.out.println("______ execCMD_slient 子线程结束End______");
+
+				}
+			});
+          
+            try {
+             
+            	curThrad.start();
+            	curThrad.join();
+                System.out.println("______ 主线程等待开始Begin    pre_join ______");
+            
+                System.out.println("______ 主线程等待结束Finish   after_join ______");
+  
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+            
+         
+         
             
             
           File[] subFileList =   outputDirFile.listFiles();
           
           System.out.println("subFileList.length = "+ subFileList.length);
             
-          ArrayList<Long> fileSizeList = new  ArrayList<Long> ();
-          
-          // 删除重复的文件 
-          for (int i = 0; i < subFileList.length; i++) {
-        	  File curFile = subFileList[i];
-        	  if(curFile.exists() && curFile.length() > 0) {
-        		  if(fileSizeList.contains(curFile.length())) {
-        			  
-        		      System.out.println("subFile["+i+"_"+subFileList.length+"] size["+curFile.length()+"] = "+ curFile.getAbsolutePath()+" will be delete!");
 
-        		      
-        			  curFile.delete();
-        		  } else {
+          
+          ;
+          
+          for (int i = 0; i < mCutVideoArrList.size(); i++) {
+        	  ArrayList<CutVideo_Info> mItemArr = mCutVideoArrList.get(i);
+        	  
+              ArrayList<Long> fileSizeList = new  ArrayList<Long> ();
+        	  for (int j = 0; j < mItemArr.size(); j++) {
+        		  CutVideo_Info cutItem = mItemArr.get(j);
+        		  
+        		  File targetFile = new File(cutItem.AbsPath);
+        		  
+        		  if(targetFile.exists() &&  targetFile.length() > 0 ) {
         			  
-        			  fileSizeList.add( curFile.length());
+        			
+            		  if(fileSizeList.contains(targetFile.length())) {
+            			  
+            		      System.out.println("subFile["+i+"_"+mItemArr.size()+"]"+"_["+mItemArr.size()+"_"+mCutVideoArrList.size()+"] size["+targetFile.length()+"] = "+ targetFile.getAbsolutePath()+" will be delete!");
+
+            		      
+            		      targetFile.delete();
+            		  } else {
+            			  
+            			  fileSizeList.add( targetFile.length());
+            		  }
+        			  
         		  }
-        	  }
+        		  
+        		  
+        		  
+			}
+			
 		}
+          
+          
+          
+          // 删除重复的文件   文件大小 
+//          ArrayList<Long> fileSizeList = new  ArrayList<Long> ();
+//          for (int i = 0; i < subFileList.length; i++) {
+//        	  File curFile = subFileList[i];
+//        	  if(curFile.exists() && curFile.length() > 0) {
+//        		  if(fileSizeList.contains(curFile.length())) {
+//        			  
+//        		      System.out.println("subFile["+i+"_"+subFileList.length+"] size["+curFile.length()+"] = "+ curFile.getAbsolutePath()+" will be delete!");
+//
+//        		      
+//        			  curFile.delete();
+//        		  } else {
+//        			  
+//        			  fileSizeList.add( curFile.length());
+//        		  }
+//        	  }
+//		}
           
           // 重命名 更为有意义的文件名称
           
@@ -3842,8 +3952,41 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
         return sb.toString();
     }
 
+    
+    // zukgit _妈蛋
+    public static String execCMD_slient(String command) {
+        StringBuilder sb =new StringBuilder();
+
+        if(CUR_OS_TYPE == OS_TYPE.Windows){
+
+            try {
+                Process process=Runtime.getRuntime().exec(" cmd /c /q start  "+command  +" ");
+
+                BufferedReader bufferedReader=new BufferedReader(new InputStreamReader(process.getInputStream()));
+                String line;
+                while((line=bufferedReader.readLine())!=null)
+                {
+                    sb.append(line+"\n");
+                }
+                process.destroy();
+              
+            } catch (Exception e) {
+                return e.toString();
+            }
 
 
+        } else {   // mac  和  Linux的  执行的 命令
+
+            sb.append(execCMD_Mac(command));
+
+        }
+        System.out.println("result: "+ sb.toString() +" command="+command);
+
+        return sb.toString();
+    }
+    
+
+ 
 
     public static String execCMD(String command) {
         StringBuilder sb =new StringBuilder();
@@ -3859,6 +4002,7 @@ ffmpeg -i 1.mp4 -vf "rotate=270*PI/180:ow=ih:oh=iw"  4.mp4      // 顺时针旋�
                 {
                     sb.append(line+"\n");
                 }
+                process.destroy();
               
             } catch (Exception e) {
                 return e.toString();
