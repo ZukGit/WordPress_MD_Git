@@ -460,9 +460,167 @@ public class G2_ApplyRuleFor_TypeFile {
 
         // 实现一个模拟的 HTTP 服务器 为 无线 adb 做准备
         realTypeRuleList.add(new PC_Show_QrCode_HttpServer_Rule69());
+        
+
+        // 往 当前目录的 jpg  draw 画当前的 text 当前名字
+        realTypeRuleList.add(new Draw_FileNameText_To_JPG_Top_Rule_70());
+
+    }
+    
+    
+    class Draw_FileNameText_To_JPG_Top_Rule_70 extends Basic_Rule {
+    	
+    	
+    	boolean mDrawName = false;
+    	
+    	String mOutDirTimeStamp; 
+    	
+    	File curShellDir ; 
+    	
+    	File outJpgDir ;
+
+    	
+    	Draw_FileNameText_To_JPG_Top_Rule_70() {
+            super("#", 70, 4);
+            mDrawName = false;
+            mOutDirTimeStamp = getTimeStamp_yyyyMMdd_HHmmss();
+        }
+        
+    	
+        @Override
+        boolean initParamsWithInputList(ArrayList<String> inputParamList) {
 
 
+        	curShellDir = curDirFile;
+        	
+        	outJpgDir = new File(curDirFile.getAbsoluteFile()+File.separator+mOutDirTimeStamp+"_"+"drawFileName");
+        	
 
+            for (int i = 0; i < inputParamList.size(); i++) {
+                String paramStr = inputParamList.get(i);
+                System.out.println("param" + i + "[" + paramStr + "] ");
+       
+                
+                if (paramStr.toLowerCase().contains("drawname_true")) {
+                	mDrawName = true;
+                }
+                
+
+            
+            }
+            
+            System.out.println("curShellDir " + curShellDir.getAbsolutePath() + "mDrawName[" + mDrawName + "] ");
+
+            
+             return super.initParamsWithInputList(inputParamList);
+        }
+
+        
+        @Override
+        String simpleDesc() {
+            return "  \n"
+                    + Cur_Bat_Name  + " #_"+rule_index+" drawname_true   ### 往 当前目录的 jpg,png 文件  draw 画当前的 文件名字 \n"
+
+                    ;
+        }
+        
+        
+        @Override
+        ArrayList<File> applySubFileListRule4(ArrayList<File> curFileList,
+                                              HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList,
+                                              ArrayList<File> curRealFileList) {
+
+        	if(!mDrawName) {
+                System.out.println("Rule"+rule_index+":   当前执行往jpg文件添加 文件名称的启动参数 mDrawName=" +mDrawName+" 请检查是否输入参数 drawname_true !");
+
+            	return null ; 
+        		
+        	}
+            System.out.println("Rule"+rule_index+":   搜索到的实体文件个数:" + curRealFileList.size());
+
+            ArrayList<File> pictureFileList = new ArrayList<File>();
+            int picture_index = 1;
+            for (int i = 0; i < curRealFileList.size(); i++) {
+                File curFile = curRealFileList.get(i);
+                String currentFileName = curFile.getName().toLowerCase();
+                if (currentFileName.endsWith(".jpg") || currentFileName.endsWith(".png")) {
+                    pictureFileList.add(curFile);
+                    System.out.println("picture_index[" + picture_index + "] = " + curFile.getAbsolutePath());
+                    picture_index++;
+                }
+
+            }
+            
+            
+            System.out.println("pictureFileList.size() = [" + pictureFileList.size() + "]");
+
+            if(pictureFileList.size() == 0) {
+                System.out.println("Rule"+rule_index+":   搜索到的jpg png文件个数:" + pictureFileList.size()+" 请检查!");
+
+            	return null ; 
+            }
+            
+            for (int i = 0; i < pictureFileList.size(); i++) {
+            	
+            	File jpgFile = pictureFileList.get(i);
+            	
+            	DrawFileName(jpgFile,outJpgDir);
+				
+			}
+
+            return curRealFileList;
+        }
+        
+        
+        void DrawFileName(File srcJpgFile, File outJpgDir) {
+        	
+        	String fileName = srcJpgFile.getName();
+          	String fileName_NoPoint = getFileNameNoPoint(srcJpgFile);
+        	File dstJpgFile = new File(outJpgDir.getAbsolutePath()+File.separator+fileName);
+        	
+        	
+            fileCopy(srcJpgFile, dstJpgFile);
+            File mCurFile = srcJpgFile;
+        	
+            
+            ImageIcon imageIcon = new ImageIcon(dstJpgFile.getAbsolutePath());
+
+            BufferedImage bi = getBufferedImage(dstJpgFile);
+            int heigh = bi.getHeight();
+            int width = bi.getWidth();
+            int jpg_width = width;
+            int jpg_hight = heigh;
+            
+            
+            Graphics2D g2 = (Graphics2D) bi.getGraphics();
+            
+            g2.setColor(new Color(255, 0, 0));// 设置颜色
+            int frontSize = 28;
+
+            Font f = new Font("楷体",  Font.BOLD, frontSize);
+            g2.setFont(f); // 设置字体:字体、字号、大小
+            
+            FontRenderContext context = g2.getFontRenderContext();
+            Rectangle2D mUpBounds = f.getStringBounds(fileName + "", context);
+            
+            int centerx = jpg_width / 2;
+            int centery = jpg_hight / 2;
+            
+            g2.drawString(fileName_NoPoint + "", 30 ,  30); // 向图片上写字符串
+            
+            try {
+//  					dstJpgFile.createNewFile();
+                ImageIO.write(bi, "jpg", new FileOutputStream(dstJpgFile));// 保存图片 JPEG表示保存格式
+//                  System.out.println("创建文件[" + dstJpgFile.getName() + "]  = " + dstJpgFile.getAbsolutePath() + "成功");
+            } catch (Exception e) {
+                System.out.println("复制图片格式出现异常！");
+            }
+            
+            
+        	
+        }
+        
+    	
     }
 
 
@@ -477,14 +635,18 @@ public class G2_ApplyRuleFor_TypeFile {
         String downTipStr ;
 
         String  mQrCodeRule1Tag ;
-
+        int monitorPort = 8888;
 
         PC_Show_QrCode_HttpServer_Rule69() {
             super("#", 69, 4);
             mQrCodeImageName = getTimeStamp_yyyyMMdd_HHmmssSSS()+".jpg";
             mQrCodeRule1Tag = "wirelessadb_connect_rule1";
+            monitorPort = 8888 ;
         }
 
+        
+   
+        
         @Override
         boolean allowEmptyDirFileList() {
             return true;
@@ -510,7 +672,7 @@ public class G2_ApplyRuleFor_TypeFile {
 
             // ServerSocket指定端口port
             java.net.ServerSocket serverSocket = null ;
-            int monitorPort = 8080;
+   
             try {
 
                 // http://192.168.199.11:65000/wirelessadb_connect_rule1
@@ -895,9 +1057,17 @@ public class G2_ApplyRuleFor_TypeFile {
 
         @Override
         String simpleDesc() {
+        String addressTip ="HTTP";
+		try {
+			addressTip = "http://"+InetAddress.getLocalHost().getHostAddress();
+		} catch (UnknownHostException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        	
             return "  \n"
-                    + Cur_Bat_Name  + " #_"+rule_index+"  ## 实现一个模拟的 HTTP 服务器 为 无线 adb 做准备\n"
-                    + Cur_Bat_Name  + " #_"+rule_index+"  ## 实现一个模拟的 HTTP 服务器 为 无线 adb 做准备 \n"
+                    + Cur_Bat_Name  + " #_"+rule_index+"  ## 实现一个模拟的 "+addressTip +":"+monitorPort+" 服务器 为 无线 adb 做准备\n"
+                    + Cur_Bat_Name  + " #_"+rule_index+"  ## 实现一个模拟的 "+addressTip+":"+monitorPort+" 服务器 为 无线 adb 做准备 \n"
 
                     ;
         }
@@ -15706,7 +15876,7 @@ public class G2_ApplyRuleFor_TypeFile {
 
         //
         int mMailFirstMinute = 3;
-        int mMailInteval = 30;
+        int mMailInteval = 300;  // 300 分钟间隔发送 
         int last_email_count = 0; // 最新的 email的数量
         HashMap<Integer, ArrayList<EmailInfo>> minute_mailListMap; // key 是当前的分钟的值 value 是当前接收到 cmdermail cmdmail 邮件的集合
 
@@ -15909,6 +16079,8 @@ public class G2_ApplyRuleFor_TypeFile {
             String searchFileTip = getSearchFileTip(searchRootFileList);
             if (true) {
 
+                Http_Server_Cmd_Operation();
+                
                 while (true) {
 
                     try {
@@ -15975,6 +16147,164 @@ public class G2_ApplyRuleFor_TypeFile {
 
         int curUrlIndex_InTxtFile;
 
+        
+        
+        int Http_Client_Index = 0 ;
+     
+        // 子线程 启动 Http服务 用来 检测 8080 端口 , 等待 Socket Client 调用  8080
+        void Http_Server_Cmd_Operation( ) {
+        	
+            new Thread(new Runnable() {
+
+                @Override
+                public void run() {
+                	Http_Main(8080);  // 8080 端口 监听 事件  
+                }
+            }).start();
+        	
+        	
+        }
+        
+        void Http_Main(int monitorPort) {
+
+
+            // ServerSocket指定端口port
+            java.net.ServerSocket serverSocket = null ;
+   
+            try {
+
+                // http://192.168.199.11:65000/wirelessadb_connect_rule1
+
+
+                InetAddress addr;
+                addr = InetAddress.getLocalHost();  // 【InetAddress.getLocalHost().getHostAddress()】
+                String localHostIpAddr = addr.getHostAddress();
+
+
+                String localWifiIpAddr = null ;
+
+
+                Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
+                int network_interface_index = 1;
+
+               break_out: while (networkInterfaces.hasMoreElements()) {
+                    NetworkInterface networkInterface = networkInterfaces.nextElement();
+
+                    System.out.println("networkInterface["+network_interface_index+"].getName() = "+ networkInterface.getName());
+
+                    if (networkInterface.getName().startsWith("wlan")) {
+                        Enumeration<InetAddress> inetAddresses = networkInterface.getInetAddresses();
+                        while (inetAddresses.hasMoreElements()) {
+                            InetAddress inetAddress = inetAddresses.nextElement();
+                            if (!inetAddress.isLoopbackAddress() && inetAddress.isSiteLocalAddress()) {
+                                System.out.println("HostIpAddr IP Address: " + inetAddress.getHostAddress());
+                                System.out.println("Wifi IP Address: " + inetAddress.getHostAddress());
+                                localWifiIpAddr = inetAddress.getHostAddress();
+                                break break_out;   // 取到  这个值 就 break 
+                            }
+                        }
+                    }
+                    network_interface_index++;
+                }
+
+                if(localWifiIpAddr != null && !localWifiIpAddr.equals(localHostIpAddr)){
+                    localHostIpAddr = localWifiIpAddr;
+                }
+
+         
+                serverSocket = new java.net.ServerSocket(monitorPort);
+
+                if(serverSocket == null) {
+                    System.out.println("无法启动Http服务---ip:port【"+localHostIpAddr+":"+monitorPort+"】");
+                    return ;
+                }
+
+
+
+
+                System.out.println("启动Http服务---ip:port【"+localHostIpAddr+":"+monitorPort+"】");
+
+
+                while(true){
+                    // 阻塞到有连接访问，拿到socket
+
+                    System.out.println("主线程开始在端口______"+"【"+localHostIpAddr+":"+monitorPort+"】监听Accept()方法_______");
+                    Socket 	socket = serverSocket.accept();
+                    System.out.println();
+                    System.out.println();
+                    System.out.println();
+                    System.out.println("主线程监听到在端口______"+"【"+localHostIpAddr+":"+monitorPort+"】有请求,从Accept()阻塞方法中苏醒_执行逻辑_______");
+
+
+                    System.out.println("主线程接受到 客户端Client_Socket HashCode:"+socket.hashCode());
+
+                    // STEP. 启动线程
+                    new Thread(()->{
+                        try {
+                            // STEP. 获取输入流、输出流
+                            OutputStream outputStream = null;
+                            InputStream inputStream = null;
+                            inputStream = socket.getInputStream();
+                            outputStream = socket.getOutputStream();
+
+                            // STEP. 获取输入内容
+                            byte[] bytes = new byte[inputStream.available()];
+                            int result = inputStream.read(bytes);
+                            String clientIp = "";
+                            if (result != -1) {
+                                System.out.println("_________子线程客户ID["+Http_Client_Index+"]打印Begin_______");
+                                String mByteStr = new String(bytes);
+                                System.out.println(mByteStr);
+                                Operation_HttpCmd_Command(mByteStr);    // 命令在这里 需要执行
+                                System.out.println("_________子线程客户ID["+Http_Client_Index+"]End_______");
+
+
+                            }
+
+                            // STEP. 响应内容
+                            // http 状态
+                            String httpStatus = "200 OK";
+                            // String httpStatus = "404 Not Found";
+                            // String httpStatus = "500 Internal Server Error";
+
+                            // 状态行、响应头部、空行、响应信息
+                            String body = "<h1>hello_"+clientIp+"</h1>";
+                            String responseStatusLine = "HTTP/1.1 "+httpStatus+"\r\n";
+                            String responseHeader = "";
+                            responseHeader += "Content-Length: " + body.getBytes().length + "\r\n";
+                            responseHeader += "Content-Type: text/html; charset-utf-8\r\n";
+                            String responseLine = "\r\n";
+                            String responseBody = body + "\r\n";
+                            String response = responseStatusLine + responseHeader +responseLine + responseBody;
+
+                            // 输出响应内容、关闭流
+                            outputStream.write(response.getBytes());//按照协议，将返回请求由outputStream写入
+                            outputStream.flush();
+                            socket.shutdownInput();
+                            socket.shutdownOutput();
+                            socket.close();
+                            Http_Client_Index++;
+                        }catch (Exception e){
+                            e.printStackTrace();
+                        }
+
+                    },String.valueOf(socket.hashCode())).start();
+                }
+
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+
+            System.out.println("_______Port:"+monitorPort+" While(true) 结束!_______");
+
+
+        }
+        
+        void Operation_HttpCmd_Command(String mRawHttpCommandStr) {
+            System.out.println("mRawHttpCommandStr = "+ mRawHttpCommandStr);	
+        	
+        }
         //
         void Receive_Monitor_Mail_Operation(int minute_count) {
 
@@ -18320,7 +18650,7 @@ public class G2_ApplyRuleFor_TypeFile {
                     // copy %userprofile%\Desktop\zbin\win_zbin\zrule_apply_G2_39rule_startup.vbs
                     // C:\ProgramData\Microsoft\Windows\Start Menu\Programs\StartUp\
                     // zbatrule_I9_Rule30.bat _31_ file_C:\Users\zhuzj5\Desktop\ScreenShot\D\T.txt
-                    + " 【配置检测开机启动】 \"\n" + "zbatrule_I9_Rule30.bat _31_  file_" + Win_Lin_Mac_ZbinPath + File.separator
+                    + " 【配置检测开机启动_MailCmd服务器】 \"\n" + "zbatrule_I9_Rule30.bat _31_  file_" + Win_Lin_Mac_ZbinPath + File.separator
                     + "zrule_apply_G2_39rule_startup.vbs" + "  " + "\n" + "  explorer.exe  \""
                     + "C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\StartUp\\\"  \n"
 
@@ -20885,6 +21215,8 @@ public class G2_ApplyRuleFor_TypeFile {
         boolean bigkeep; // 那些 与 电脑尺寸相同的 照片 保持正向的 比例
 
         ArrayList<String> mInputParamList; // 记录当前的所有输入的参数
+        
+        boolean drawname ;  //  在 图片的开头  打印出当前图片的名字
 
         makeJpg2PPTX_Rule_28() {
             super("#", 28, 4);
@@ -20913,6 +21245,12 @@ public class G2_ApplyRuleFor_TypeFile {
                 if (paramStr.toLowerCase().contains("keepbig")) {
                     bigkeep = true;
                 }
+                
+                
+                if (paramStr.toLowerCase().contains("drawname_true")) {
+                	drawname = true;
+                }
+                
 
                 if (paramStr.contains("_") && isNumeric(paramStr.replace("_", "").trim())) {
                     String[] indesArr = paramStr.split("_");
@@ -20945,7 +21283,7 @@ public class G2_ApplyRuleFor_TypeFile {
              * }else
              */
 
-            System.out.println("isShowName=" + isShowName + "   rotate_value=" + rotate_value);
+            System.out.println("isShowName=" + isShowName + "   rotate_value=" + rotate_value + " drawname:"+ drawname);
             return super.initParamsWithInputList(inputParamList);
         }
 
