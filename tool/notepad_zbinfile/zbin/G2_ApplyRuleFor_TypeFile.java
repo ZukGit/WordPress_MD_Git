@@ -3607,7 +3607,7 @@ public class G2_ApplyRuleFor_TypeFile {
 
 
                 is_manifestinfo_exist =  isStringContainInList("Manifest Info",mHtmlContentList)  || isStringContainInList("MANIFEST INFO",mHtmlContentList);
-                isVendor_2 =   isStringContainInList("Vendor Build",mHtmlContentList)  || isStringContainInList("VENDOR BUILD",mHtmlContentList);
+                isVendor_2 =   isStringContainInList("Vendor Build",mHtmlContentList)  || isStringContainInList("VENDOR BUILD",mHtmlContentList) || isStringContainInList("Vendor Side",mHtmlContentList) || isStringContainInList("VENDOR SIDE",mHtmlContentList)  ; 
 
 
                 is_inputHtml_Avaliable = is_buildinstruct_exist && is_manifestinfo_exist;
@@ -3800,6 +3800,11 @@ public class G2_ApplyRuleFor_TypeFile {
                 if(splitStrArr.length > 2){
                     System.out.println();
                     System.out.println("当前 关键字 keyStr="+keyStr+" 在 rawStr 中存在 "+(splitStrArr.length -1) +"个 请注意唯一性!");
+                   for (int i = 0; i < splitStrArr.length; i++) { 
+                    System.out.println(" 关键字 "+keyStr+"["+i+"_"+splitStrArr.length+"] = "+splitStrArr[i]+"   注意唯一性!");
+		   
+				   }
+                 
                 }
 
                 if(splitStrArr != null && splitStrArr.length < 2){
@@ -3812,7 +3817,10 @@ public class G2_ApplyRuleFor_TypeFile {
                 if(splitStrArr.length >= 2){
                     String index_1_str = null;
                     if(beginflag){
-                        index_1_str = splitStrArr[1].trim();
+//                        index_1_str = splitStrArr[1].trim();
+                    	
+                        index_1_str = splitStrArr[splitStrArr.length -1].trim();
+
                     } else {
                         index_1_str = splitStrArr[splitStrArr.length -1].trim();
 
@@ -3890,9 +3898,14 @@ public class G2_ApplyRuleFor_TypeFile {
 
                 String[] splitStrArr = rawStr.split(keyStr);
 
-                if(splitStrArr.length > 2){
+                if(splitStrArr.length >= 2){
                     System.out.println();
                     System.out.println("当前 关键字 keyStr="+keyStr+" 在 rawStr 中存在 "+(splitStrArr.length -1) +"个 请注意唯一性!");
+               
+                    for (int i = 0; i < splitStrArr.length; i++) { 
+                        System.out.println(" 关键字 "+keyStr+"["+i+"_"+splitStrArr.length+"] = "+splitStrArr[i]+"   注意唯一性!");
+    		   
+    				   }
                 }
 
                 if(splitStrArr != null && splitStrArr.length < 2){
@@ -3920,6 +3933,72 @@ public class G2_ApplyRuleFor_TypeFile {
 
             }
 
+
+            String getLastStringAfterKey(String keyStr , String rawStr ){
+                String matchFistStr = null ;
+                if(keyStr == null ){
+
+                    System.out.println("当前 从 Html解析的 getFirstStringAfterKey  参数 keyStr == null ! 请检查");
+                    return matchFistStr;
+                }
+                if(rawStr == null ){
+
+                    System.out.println("当前 从 rawStr 解析的 getFirstStringAfterKey  参数 rawStr == null ! 请检查");
+                    return matchFistStr;
+                }
+
+
+
+                if(!rawStr.contains(keyStr) && !keyStr.contains(".") ){
+
+                    if(rawStr.length() > 100){
+                        System.out.println("getFirstStringAfterKey 当前参数  keyStr 不包含正则表达式的点. 同时  keyStr="+keyStr+" 并不包含在 rawStr  请检查! rawStr.length="+ rawStr.length()+" ");
+                    } else{
+                        System.out.println("getFirstStringAfterKey 当前参数  keyStr 不包含正则表达式的点. 同时  keyStr="+keyStr+" 并不包含在 rawStr  请检查! rawStr="+rawStr+"");
+
+                    }
+
+                    return matchFistStr;
+                }
+
+
+                String[] splitStrArr = rawStr.split(keyStr);
+
+                if(splitStrArr.length >= 2){
+                    System.out.println();
+                    System.out.println("当前 关键字 keyStr="+keyStr+" 在 rawStr 中存在 "+(splitStrArr.length -1) +"个 请注意唯一性!");
+               
+                    for (int i = 0; i < splitStrArr.length; i++) { 
+                        System.out.println(" 关键字 "+keyStr+"["+i+"_"+splitStrArr.length+"] = "+splitStrArr[i]+"   注意唯一性!");
+    		   
+    				   }
+                }
+
+                if(splitStrArr != null && splitStrArr.length < 2){
+                    if(splitStrArr.length == 1){
+                        System.out.println("当前解析 keyStr=【"+keyStr+"】 splitStrArr.length="+splitStrArr.length +" Arr[0]="+splitStrArr[0]);
+                    }
+
+                }
+
+                if(splitStrArr.length >= 2){
+                    String index_1_str = splitStrArr[splitStrArr.length-1].trim();
+
+                    String[] indedx_1_BlockSplit_Arr = index_1_str.split(" ");
+
+                    if(indedx_1_BlockSplit_Arr != null && indedx_1_BlockSplit_Arr.length > 1){
+
+                        matchFistStr =  indedx_1_BlockSplit_Arr[0].trim();
+                    }
+                }
+
+
+                return matchFistStr;
+
+
+
+            }
+            
             boolean init_ReleateNoteData(File htmlFile, String htmlContent  , ArrayList<String> mHtmlContentList , ReleaseNoteHtmlItem  metaData) {
 
                 String rawText_Html = getTextFromTHML(htmlContent);
@@ -3950,19 +4029,19 @@ public class G2_ApplyRuleFor_TypeFile {
 
 
                 String mTag_MANIFEST_BRANCH = "MANIFEST BRANCH";
-                String mValue_MANIFEST_BRANCH  =   getFirstStringAfterKey(mTag_MANIFEST_BRANCH,rawText_Html);
+                String mValue_MANIFEST_BRANCH  =   getLastStringAfterKey(mTag_MANIFEST_BRANCH,rawText_Html);
                 System.out.println((mBegin_Key_Index++)+"_getFirstStringAfterKey_【"+mTag_MANIFEST_BRANCH+"】_"+mValue_MANIFEST_BRANCH);
 
 
                 String mTag_MANIFEST_FILE = "MANIFEST FILE";
-                String mValue_MANIFEST_FILE  =   getFirstStringAfterKey(mTag_MANIFEST_FILE,rawText_Html);
+                String mValue_MANIFEST_FILE  =   getLastStringAfterKey(mTag_MANIFEST_FILE,rawText_Html);
                 System.out.println((mBegin_Key_Index++)+"_getFirstStringAfterKey_【"+mTag_MANIFEST_FILE+"】_"+mValue_MANIFEST_FILE);
 
 
 
 
                 String mTag_MANIFEST_URL = "MANIFEST URL";
-                String mValue_MANIFEST_URL  =   getFirstStringAfterKey(mTag_MANIFEST_URL,rawText_Html);
+                String mValue_MANIFEST_URL  =   getLastStringAfterKey(mTag_MANIFEST_URL,rawText_Html);
                 System.out.println((mBegin_Key_Index++)+"_getFirstStringAfterKey_【"+mTag_MANIFEST_URL+"】_"+mValue_MANIFEST_URL);
                 String mValue_MANIFEST_URL_Android_Version = "null";
                 if(mValue_MANIFEST_URL.contains("/")){
@@ -4039,7 +4118,7 @@ public class G2_ApplyRuleFor_TypeFile {
                 }
 
 
-                isVendor_2 =   isStringContainInList("Vendor Build",mHtmlContentList)  || isStringContainInList("VENDOR BUILD",mHtmlContentList);
+                isVendor_2 =   isStringContainInList("Vendor Build",mHtmlContentList)  || isStringContainInList("VENDOR BUILD",mHtmlContentList) || isStringContainInList("Vendor Side",mHtmlContentList) || isStringContainInList("VENDOR SIDE",mHtmlContentList) ;
 
 
                 isMainLineBranch_3 = !mValue_MANIFEST_BRANCH.contains("stable");  // 不包含 stable 字样 那么 就是 main线
@@ -4053,8 +4132,9 @@ public class G2_ApplyRuleFor_TypeFile {
 
 
                 int mDynic_Key_Index = 1 ;
+                
                 System.out.println((mDynic_Key_Index++)+"_produce_name_1_【"+ product_name_1 +"】");
-                System.out.println((mDynic_Key_Index++)+"_isVendor_2_【"+isVendor_2+"】");
+                System.out.println((mDynic_Key_Index++)+"_isVendor_2_【"+isVendor_2+"】 ");
                 System.out.println((mDynic_Key_Index++)+"_isMainLineBranch_3_【"+isMainLineBranch_3+"】");
                 System.out.println((mDynic_Key_Index++)+"_version_identify_4_【"+version_identify_4+"】");
                 System.out.println((mDynic_Key_Index++)+"_timeStamp_5_【"+timeStamp_5+"】");
