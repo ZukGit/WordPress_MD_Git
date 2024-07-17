@@ -1491,27 +1491,27 @@ do
     echo "__git_head_commitid:"$git_head_commitid_desc  >> $CUR_REPO_File
     echo -e   >> $CUR_REPO_File
 
-    echo "__git_head_command:" 'cd' $gitpath_line '&&' 'git rev-parse' $git_remote_branch_desc  >> $REPO_BackUp_File
-    echo -e   >> $REPO_BackUp_File
+    echo "__git_head_command:" 'cd' $gitpath_line '&&' 'git rev-parse' $git_remote_branch_desc  >> $CUR_REPO_File
+    echo -e   >> $CUR_REPO_File
 	
     ### Command 获取当前local最新提交的commitid
     git_local_first_commitid_desc=`git rev-parse HEAD`
     echo "__git_local_first_commitid:"$git_local_first_commitid_desc  >> $CUR_REPO_File
     echo -e   >> $CUR_REPO_File
 	
-    echo "__git_local_first_command:" 'cd' $gitpath_line '&&' 'git rev-parse HEAD'  >> $REPO_BackUp_File
-    echo -e   >> $REPO_BackUp_File
+    echo "__git_local_first_command:" 'cd' $gitpath_line '&&' 'git rev-parse HEAD'  >> $CUR_REPO_File
+    echo -e   >> $CUR_REPO_File
 
 
 	git_local_head_1_commitid_desc=`git rev-parse HEAD~1`
-    echo "__git_local_head_1_commitid:"$git_local_head_1_commitid_desc" cd " $gitpath_line '&&' 'git rev-parse HEAD~1'  >> $REPO_BackUp_File
+    echo "__git_local_head_1_commitid:"$git_local_head_1_commitid_desc" cd " $gitpath_line '&&' 'git rev-parse HEAD~1'  >> $CUR_REPO_File
 	git_local_head_2_commitid_desc=`git rev-parse HEAD~2`
-    echo "__git_local_head_2_commitid:"$git_local_head_2_commitid_desc" cd " $gitpath_line '&&' 'git rev-parse HEAD~2'  >> $REPO_BackUp_File
+    echo "__git_local_head_2_commitid:"$git_local_head_2_commitid_desc" cd " $gitpath_line '&&' 'git rev-parse HEAD~2'  >> $CUR_REPO_File
 	git_local_head_3_commitid_desc=`git rev-parse HEAD~3`
-    echo "__git_local_head_3_commitid:"$git_local_head_3_commitid_desc" cd " $gitpath_line '&&' 'git rev-parse HEAD~3'  >> $REPO_BackUp_File
+    echo "__git_local_head_3_commitid:"$git_local_head_3_commitid_desc" cd " $gitpath_line '&&' 'git rev-parse HEAD~3'  >> $CUR_REPO_File
 	git_local_head_4_commitid_desc=`git rev-parse HEAD~4`
-    echo "__git_local_head_4_commitid:"$git_local_head_4_commitid_desc" cd " $gitpath_line '&&' 'git rev-parse HEAD~4'  >> $REPO_BackUp_File
-    echo -e   >> $REPO_BackUp_File
+    echo "__git_local_head_4_commitid:"$git_local_head_4_commitid_desc" cd " $gitpath_line '&&' 'git rev-parse HEAD~4'  >> $CUR_REPO_File
+    echo -e   >> $CUR_REPO_File  
 
     ### Command 获取分支详细信息
     git_branch_vv_desc=`git branch -vv`
