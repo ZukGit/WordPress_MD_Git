@@ -4483,7 +4483,7 @@ public class G2_ApplyRuleFor_TypeFile {
 
 
                 if(isVendor_2){ 
-                    product_txt_List.add("1.AOSP根目录执行 2.批量重新拉取Vendor代码 3.并启动编译!");
+                    product_txt_List.add("1.AOSP根目录执行 2.批量重新拉取Vendor代码 3.【编译填充Msi绝对地址】 4.启动编译(Vendor)!");
                     product_txt_List.add("repo forall -c git clean -dxf  && repo forall -c git checkout . ; repo forall -c git branch TEMP && repo forall -c git checkout TEMP  && source /opt/conf/moto.conf && gsync --no-tag "	+ " && source /opt/conf/moto.conf "+" && "+ mValue_End_repo_init_fixed +" && "+mValue_End_build_device+ " 2>&1 | tee "+getTimeStamp()+"_"+mValue_BUILD_TARGET+".log");
                     product_txt_List.add("");
                     product_txt_List.add("【1.cherry_pick预留】 【2.编译填充Msi绝对地址】 3.批量拉取  4.启动编译(Vendor)!"); 
@@ -4494,7 +4494,7 @@ public class G2_ApplyRuleFor_TypeFile {
 
                     
                 } else {
-                    product_txt_List.add("1.AOSP根目录执行 2.批量重新拉取Msi代码  3.并启动编译!");
+                    product_txt_List.add("1.AOSP根目录执行 2.批量重新拉取Msi代码  3.并启动编译(Msi)!");
 
                     product_txt_List.add("repo forall -c git clean -dxf  && repo forall -c git checkout . ; repo forall -c git branch TEMP && repo forall -c git checkout TEMP  && source /opt/conf/moto.conf && gsync --no-tag "	+ " && source /opt/conf/moto.conf "+" && "+mValue_End_build_device+ " 2>&1 | tee "+getTimeStamp()+"_"+mValue_BUILD_TARGET+".log");
                     product_txt_List.add("");
