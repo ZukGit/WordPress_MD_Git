@@ -4475,11 +4475,13 @@ public class G2_ApplyRuleFor_TypeFile {
                 product_txt_List.add("存在分支  remotes/origin/bt");
                 product_txt_List.add("git fetch origin bt:TEMP_bt            ## 拉取远程分支 remotes/origin/bt 到本地新建分支 TEMP_bt");
                 product_txt_List.add("git push origin TEMP_bt:refs/for/bt    ## TEMP_bt 上传到远程分支 remotes/origin/bt");
+                product_txt_List.add("");
+                product_txt_List.add("");
+                product_txt_List.add("");
+                product_txt_List.add("AOSP根目录执行 批量重新拉取Vendor Msi 代码 ");
+                product_txt_List.add("repo forall -c git clean -dxf  && repo forall -c git checkout . ; repo forall -c git checkout TEMP  && source /opt/conf/moto.conf && gsync --no-tag\r\n"	+ "");
 
-
-
-
-
+                
                 product_txt_List.add("");
                 product_txt_List.add("");
                 product_txt_List.add(getSchema("【 提交commit命令 提示】"));
@@ -4503,6 +4505,21 @@ public class G2_ApplyRuleFor_TypeFile {
                 product_txt_List.add("示例17:  git push origin TEMP:refs/for/prodt-mtk");
                 product_txt_List.add("示例18:  git push origin TEMP:refs/for/produ-mtk");
                 product_txt_List.add("示例19:  git push origin TEMP:refs/for/prods-mtktc2sp2");
+                product_txt_List.add("示例20:  git push origin TEMP:refs/for/bv-mtk");
+                product_txt_List.add("示例21:  git push origin TEMP:refs/for/prodv-mtk");
+                product_txt_List.add("示例22:  git push origin TEMP:refs/for/bv");
+                product_txt_List.add("示例23:  git push origin TEMP:refs/for/prodv-mtktc2sp2");
+                product_txt_List.add("示例24:  git push origin TEMP:refs/for/bv-qc");
+                product_txt_List.add("示例25:  git push origin TEMP:refs/for/bv-6450");
+                product_txt_List.add("示例26:  git push origin TEMP:refs/for/bv-8450");
+                product_txt_List.add("示例27:  git push origin TEMP:refs/for/bw-mtk");
+                product_txt_List.add("示例28:  git push origin TEMP:refs/for/prodw-mtk");
+                product_txt_List.add("示例29:  git push origin TEMP:refs/for/bw");
+                product_txt_List.add("示例30:  git push origin TEMP:refs/for/prodw-mtktc2sp2");
+                product_txt_List.add("示例31:  git push origin TEMP:refs/for/bw-qc");
+                product_txt_List.add("示例32:  git push origin TEMP:refs/for/bw-6450");
+                product_txt_List.add("示例33:  git push origin TEMP:refs/for/bw-8450");
+                
                 product_txt_List.add("");
                 product_txt_List.add("");
 
