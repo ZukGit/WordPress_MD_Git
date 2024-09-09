@@ -4438,9 +4438,22 @@ public class G2_ApplyRuleFor_TypeFile {
                 product_txt_List.add("zzfile_3"+Cur_Batch_End+" " +" ./frameworks/base/wifi/java/android/net/wifi");
                 product_txt_List.add("【7. framework/opt/wifi/service/wifi 路径 wifiservice 】");
                 product_txt_List.add("zzfile_3"+Cur_Batch_End+" " +" ./frameworks/opt/net/wifi/service/java/com/android/server/wifi");
-
-
                 product_txt_List.add("");
+                product_txt_List.add("");
+                product_txt_List.add(getSchema("【 AOSP 根目录 快速查询命令提示】"));
+                product_txt_List.add("【1. 查看当前AOSP对应的硬件产品名称 vhw.xml 中配置的 device_name 以及sar对应的 radioid区域码 】 以及搜索关键字 radio/.range 能查看到 产品所有的出货地区码(NA PRC LATAM DCM KDDI LATAM EMEA BR INDIA EUAPEM ALL JAPAN VZW ROW) 等");
+               
+                product_txt_List.add("cd ./device && grep -rins \"device name=\" . | grep vhw");
+                product_txt_List.add("gedit vhw.xml  && 搜索 关键字 radio/.range");
+                product_txt_List.add("");
+                product_txt_List.add("");
+                product_txt_List.add("【2. 查看查看高通 Build_ID ,在高通项目的 AOSP/vendor/qcom/nonhlos编译会审生成 Non-HLOS  在改目录编译完成时会产出 Ver_Info.txt , 该 Ver_Info.txt  标注了 高通项目的 Build_ID  ");
+
+                product_txt_List.add("cd ./vendor/qcom/nonhlos  && find -name \"*Ver_Info*\"  ");
+                product_txt_List.add("gedit Ver_Info.txt");
+                product_txt_List.add("");
+                product_txt_List.add("");
+                
                 product_txt_List.add("");
                 product_txt_List.add(getSchema("【"+productName+"】  Git Sync Error  命令提示"));
                 product_txt_List.add("一.unable to read sha1 file of xx 问题的处理");
@@ -4478,32 +4491,31 @@ public class G2_ApplyRuleFor_TypeFile {
                 product_txt_List.add("");
                 product_txt_List.add("");
                 product_txt_List.add("1.AOSP根目录执行 2.批量重新拉取Vendor ||  Msi 代码 ");
-                product_txt_List.add("repo forall -c git clean -dxf  && repo forall -c git checkout . ; repo forall -c git branch TEMP && repo forall -c git checkout TEMP  && source /opt/conf/moto.conf && gsync --no-tag\r\n"	+ "");
+                product_txt_List.add("repo forall -c git clean -dxf  && repo forall -c git checkout .  ; git cherry-pick --abort ; repo forall -c git branch TEMP ;  repo forall -c git checkout TEMP  && source /opt/conf/moto.conf && gsync --no-tag\r\n"	+ "");
                 product_txt_List.add("");
 
 
                 if(isVendor_2){ 
                     product_txt_List.add("1.AOSP根目录执行 2.批量重新拉取Vendor代码 3.【编译填充Msi绝对地址】 4.启动编译(Vendor)!");
-                    product_txt_List.add("repo forall -c git clean -dxf  && repo forall -c git checkout . ; repo forall -c git branch TEMP && repo forall -c git checkout TEMP  && source /opt/conf/moto.conf && gsync --no-tag "	+ " && source /opt/conf/moto.conf "+" && "+ mValue_End_repo_init_fixed +" && "+mValue_End_build_device+ " 2>&1 | tee "+getTimeStamp()+"_"+mValue_BUILD_TARGET+".log");
+                    product_txt_List.add("repo forall -c git clean -dxf  && repo forall -c git checkout .  ; git cherry-pick --abort  ; repo forall -c git branch TEMP ; repo forall -c git checkout TEMP  && source /opt/conf/moto.conf && gsync --no-tag "	+ " && source /opt/conf/moto.conf "+" && "+ mValue_End_repo_init_fixed +" && "+mValue_End_build_device+ " 2>&1 | tee "+getTimeStamp()+"_"+mValue_BUILD_TARGET+".log");
                     product_txt_List.add("");
                     product_txt_List.add("【1.cherry_pick预留】 【2.编译填充Msi绝对地址】 3.批量拉取  4.启动编译(Vendor)!"); 
-                    product_txt_List.add("repo forall -c git clean -dxf  && repo forall -c git checkout . ; repo forall -c git branch TEMP && repo forall -c git checkout TEMP  && source /opt/conf/moto.conf && gsync --no-tag "	+ " && cd 【cherry_pick预留】  && source /opt/conf/moto.conf "+" && "+ mValue_End_repo_init_fixed +" && "+mValue_End_build_device+ " 2>&1 | tee "+getTimeStamp()+"_"+mValue_BUILD_TARGET+".log");
+                    product_txt_List.add("repo forall -c git clean -dxf  && repo forall -c git checkout .  ; git cherry-pick --abort ; repo forall -c git branch TEMP ; repo forall -c git checkout TEMP  && source /opt/conf/moto.conf && gsync --no-tag "	+ " && cd 【cherry_pick预留】  && source /opt/conf/moto.conf "+" && "+ mValue_End_repo_init_fixed +" && "+mValue_End_build_device+ " 2>&1 | tee "+getTimeStamp()+"_"+mValue_BUILD_TARGET+".log");
                     product_txt_List.add("");
-                    product_txt_List.add("1.重名命名out目录 2.【编译填充Msi绝对地址】3.批量拉取 4.启动编译(Vendor)!"); 
-                    product_txt_List.add("mv out  out_"+getTimeStamp()+" ; repo forall -c git clean -dxf  && repo forall -c git checkout . ; repo forall -c git branch TEMP && repo forall -c git checkout TEMP  && source /opt/conf/moto.conf && gsync --no-tag "	+ "  && source /opt/conf/moto.conf "+" && "+ mValue_End_repo_init_fixed +" && "+mValue_End_build_device+ " 2>&1 | tee "+getTimeStamp()+"_"+mValue_BUILD_TARGET+".log");
+                    product_txt_List.add("1.重名命名out kernel_platorm\\out 目录 2.【编译填充Msi绝对地址】3.批量拉取 4.启动编译(Vendor)!"); 
+                    product_txt_List.add("mv out  out_"+getTimeStamp()+" ; "+" mv kernel_platform\\out  kernel_platform\\out_"+getTimeStamp()+" ; "+ "repo forall -c git clean -dxf  && repo forall -c git checkout .   ; git cherry-pick --abort ; repo forall -c git branch TEMP ; repo forall -c git checkout TEMP  && source /opt/conf/moto.conf && gsync --no-tag "	+ "  && source /opt/conf/moto.conf "+" && "+ mValue_End_repo_init_fixed +" && "+mValue_End_build_device+ " 2>&1 | tee "+getTimeStamp()+"_"+mValue_BUILD_TARGET+".log");
 
                     
                 } else {
                     product_txt_List.add("1.AOSP根目录执行 2.批量重新拉取Msi代码  3.并启动编译(Msi)!");
 
-                    product_txt_List.add("repo forall -c git clean -dxf  && repo forall -c git checkout . ; repo forall -c git branch TEMP && repo forall -c git checkout TEMP  && source /opt/conf/moto.conf && gsync --no-tag "	+ " && source /opt/conf/moto.conf "+" && "+mValue_End_build_device+ " 2>&1 | tee "+getTimeStamp()+"_"+mValue_BUILD_TARGET+".log");
+                    product_txt_List.add("repo forall -c git clean -dxf  && repo forall -c git checkout . ; git cherry-pick --abort ; repo forall -c git branch TEMP ; repo forall -c git checkout TEMP  && source /opt/conf/moto.conf && gsync --no-tag "	+ " && source /opt/conf/moto.conf "+" && "+mValue_End_build_device+ " 2>&1 | tee "+getTimeStamp()+"_"+mValue_BUILD_TARGET+".log");
                     product_txt_List.add("");
                     product_txt_List.add("1.【cherry_pick预留】 2.批量拉取  3.启动编译(Msi)!"); 
-                    product_txt_List.add("repo forall -c git clean -dxf  && repo forall -c git checkout . ; repo forall -c git branch TEMP && repo forall -c git checkout TEMP  && source /opt/conf/moto.conf && gsync --no-tag "	+ " &&  cd 【cherry_pick预留】 && source /opt/conf/moto.conf "+" && "+mValue_End_build_device+ " 2>&1 | tee "+getTimeStamp()+"_"+mValue_BUILD_TARGET+".log");
+                    product_txt_List.add("repo forall -c git clean -dxf  && repo forall -c git checkout . ; git cherry-pick --abort ; repo forall -c git branch TEMP ; repo forall -c git checkout TEMP  && source /opt/conf/moto.conf && gsync --no-tag "	+ " &&  cd 【cherry_pick预留】 && source /opt/conf/moto.conf "+" && "+mValue_End_build_device+ " 2>&1 | tee "+getTimeStamp()+"_"+mValue_BUILD_TARGET+".log");
                     product_txt_List.add("");
-                    product_txt_List.add("1.重名命名out目录  2.批量拉取 3.启动编译(Msi)!"); 
-
-                    product_txt_List.add("mv out  out_"+getTimeStamp()+" ; "+"repo forall -c git clean -dxf  && repo forall -c git checkout . ; repo forall -c git branch TEMP && repo forall -c git checkout TEMP  && source /opt/conf/moto.conf && gsync --no-tag "	+ " && source /opt/conf/moto.conf "+" && "+mValue_End_build_device+ " 2>&1 | tee "+getTimeStamp()+"_"+mValue_BUILD_TARGET+".log");
+                    product_txt_List.add("1.重名命名out目录 kernel_platform\\out目录  2.批量拉取 3.启动编译(Msi)!"); 
+                    product_txt_List.add("mv out  out_"+getTimeStamp()+" ; "+" mv kernel_platform\\out  kernel_platform\\out_"+getTimeStamp()+" ; "+" repo forall -c git clean -dxf  && repo forall -c git checkout .  ; git cherry-pick --abort ; repo forall -c git branch TEMP ; repo forall -c git checkout TEMP  && source /opt/conf/moto.conf && gsync --no-tag "	+ " && source /opt/conf/moto.conf "+" && "+mValue_End_build_device+ " 2>&1 | tee "+getTimeStamp()+"_"+mValue_BUILD_TARGET+".log");
 
                 }
 
