@@ -3573,7 +3573,16 @@ public class G2_ApplyRuleFor_TypeFile {
             String product_name_1;
 
 
+            // true---vendor   false----msi
             boolean isVendor_2;  //  html 是否包含 Vendor  Build
+            
+         // 当前文档是否包含  -M <path to MSI workspace> -V <path to VENDOR workspace>
+         // 包含的话 说明当前文件 是一个新出现的 融合 msi  和 Vendor 的仓库 需要新建 这个文件 Merge_1 区别于Msi_1 Vendor_1
+            boolean isMerge_2 ;   
+            
+            
+            
+            
             boolean  isMainLineBranch_3;   // MANIFEST BRANCH	mt-r1-stable12   , branch 名称是否包含 stable 字样
             String version_identify_4 ;  //  SOFTWARE BUILD ID ( + REV) 后面的数据
             String timeStamp_5;   //  时间戳
@@ -3607,8 +3616,14 @@ public class G2_ApplyRuleFor_TypeFile {
 
 
                 is_manifestinfo_exist =  isStringContainInList("Manifest Info",mHtmlContentList)  || isStringContainInList("MANIFEST INFO",mHtmlContentList);
-                isVendor_2 =   isStringContainInList("Vendor Build",mHtmlContentList)  || isStringContainInList("VENDOR BUILD",mHtmlContentList) || isStringContainInList("Vendor Side",mHtmlContentList) || isStringContainInList("VENDOR SIDE",mHtmlContentList)  ; 
+                isVendor_2 =   isStringContainInList("Vendor Build",mHtmlContentList)  || isStringContainInList("VENDOR BUILD",mHtmlContentList) || isStringContainInList("Vendor Side",mHtmlContentList) || isStringContainInList("VENDOR SIDE",mHtmlContentList) || isStringContainInList("VENDOR RELEASE VERSION",mHtmlContentList) ; 
 
+                isMerge_2 =   isStringContainInList("path to MSI workspace",mHtmlContentList) && isStringContainInList("path to VENDOR workspace",mHtmlContentList)   ; 
+
+                System.out.println("isMerge_1  <path to MSI workspace>    flag = "+ isStringContainInList("<path to MSI workspace>",mHtmlContentList));
+                System.out.println("isMerge_2  <path to VENDOR workspace> flag = "+ isStringContainInList("<path to VENDOR workspace>",mHtmlContentList));
+
+                
 
                 is_inputHtml_Avaliable = is_buildinstruct_exist && is_manifestinfo_exist;
 
@@ -3767,6 +3782,92 @@ public class G2_ApplyRuleFor_TypeFile {
                 return text;
             }
 
+            
+            
+        
+
+            String getSpltAStrAndEndWithBStr(String keyStr , String indexOfKeyStr , String rawStr   ){
+                String matchFistStr = null ;
+                if(keyStr == null  ){
+
+                    System.out.println("getSpltAStrAndEndWithBStr 当前 从 Html解析的 getFirstStringAfterKey  参数 keyStr == null ! 请检查");
+                    return matchFistStr;
+                }
+                
+                if( indexOfKeyStr == null ){
+
+                    System.out.println("indexOfKeyStr 为空 getSpltAStrAndEndWithBStr 当前 从 Html解析的 getFirstStringAfterKey  参数 keyStr == null ! 请检查");
+                    return matchFistStr;
+                }
+                
+                if(rawStr == null ){
+
+                    System.out.println("getSpltAStrAndEndWithBStr 当前 从 rawStr 解析的 getFirstStringAfterKey  参数 rawStr == null ! 请检查");
+                    return matchFistStr;
+                }
+
+
+
+                if(!rawStr.contains(keyStr) && !keyStr.contains(".") ){
+                    if(rawStr.length() > 100){
+                        System.out.println("当前参数  keyStr 不包含正则表达式的点. 同时  keyStr="+keyStr+" 并不包含在 rawStr  请检查! rawStr.length="+ rawStr.length()+" ");
+                    } else{
+                        System.out.println("当前参数  keyStr 不包含正则表达式的点. 同时  keyStr="+keyStr+" 并不包含在 rawStr  请检查! rawStr="+rawStr+"");
+
+                    }
+
+                    return matchFistStr;
+                }
+
+
+                String[] splitStrArr = rawStr.split(keyStr);
+
+                if(splitStrArr.length > 2){
+                    System.out.println();
+                    System.out.println("当前 关键字 keyStr="+keyStr+" 在 rawStr 中存在 "+(splitStrArr.length -1) +"个 请注意唯一性!");
+                   for (int i = 0; i < splitStrArr.length; i++) { 
+                    System.out.println(" 关键字 "+keyStr+"["+i+"_"+splitStrArr.length+"] = "+splitStrArr[i]+"   注意唯一性!");
+		   
+				   }
+                 
+                }
+
+                if(splitStrArr != null && splitStrArr.length < 2){
+                    if(splitStrArr.length == 1){
+                        System.out.println("当前解析 keyStr=【"+keyStr+"】 splitStrArr.length="+splitStrArr.length +" Arr[0].length="+splitStrArr[0].length());
+                    }
+
+                }
+
+                if(splitStrArr.length >= 2){
+                    String lastindex_1_str = null;
+                    lastindex_1_str = splitStrArr[splitStrArr.length -1].trim();
+
+                    
+                    if(lastindex_1_str.contains(indexOfKeyStr)) {
+                    	
+                    	matchFistStr =    lastindex_1_str.substring(0,lastindex_1_str.indexOf(indexOfKeyStr)+ indexOfKeyStr.length());
+                        System.out.println("matchFistStr  = 当前解析 keyStr=【"+keyStr+"】  indexofKeyStr【"+indexOfKeyStr+"】"+" 有包含在 lastindex_1_str 中   matchFistStr="+matchFistStr);
+
+                    } else {
+                    	matchFistStr = "null";// 无法 搜索到 当前的
+                        System.out.println("matchFistStr = 当前解析 keyStr=【"+keyStr+"】  indexofKeyStr【"+indexOfKeyStr+"】"+" 没有包含在 lastindex_1_str 中   lastindex_1_str="+lastindex_1_str);
+
+                    }
+
+                }
+
+
+
+                System.out.println(" getSpltAStrAndEndWithBStr = 【"+matchFistStr+"】");
+
+                return matchFistStr;
+
+
+
+            }
+
+            
 
             String getDirectXStringAfterKey(String keyStr , String rawStr , boolean beginflag , int blockCount  ){
                 String matchFistStr = null ;
@@ -3934,6 +4035,67 @@ public class G2_ApplyRuleFor_TypeFile {
             }
 
 
+            //  获取 匹配字符串 前面的那个字符串
+            String getLastStringBeforeKey(String keyStr , String rawStr ){
+            	
+                String matchFistStr = null ;
+                if(keyStr == null ){
+
+                    System.out.println("当前 从 Html解析的 getLastStringBeforeKey  往前取得字符串  参数 keyStr == null ! 请检查");
+                    return matchFistStr;
+                }
+                if(rawStr == null ){
+
+                    System.out.println("当前 从 rawStr 解析的 getLastStringBeforeKey 往前取得字符串  参数 rawStr == null ! 请检查");
+                    return matchFistStr;
+                }
+
+
+
+                if(!rawStr.contains(keyStr) && !keyStr.contains(".") ){
+
+                    if(rawStr.length() > 100){
+                        System.out.println("getLastStringBeforeKey 当前参数  keyStr 不包含正则表达式的点. 同时  keyStr="+keyStr+" 并不包含在 rawStr  请检查! rawStr.length="+ rawStr.length()+" ");
+                    } else{
+                        System.out.println("getLastStringBeforeKey 当前参数  keyStr 不包含正则表达式的点. 同时  keyStr="+keyStr+" 并不包含在 rawStr  请检查! rawStr="+rawStr+"");
+
+                    }
+
+                    return matchFistStr;
+                }
+
+
+                String[] splitStrArr = rawStr.split(keyStr);
+
+             
+
+                if(splitStrArr != null && splitStrArr.length < 2){
+                    if(splitStrArr.length == 1){
+                        System.out.println("当前解析 keyStr=【"+keyStr+"】 splitStrArr.length="+splitStrArr.length +" Arr[0]="+splitStrArr[0]);
+                    }
+
+                }
+
+                if(splitStrArr.length >= 2){
+                    String index_1_str = splitStrArr[splitStrArr.length-2].trim();  // 前面的数字是存在倒数第二个item中
+
+                    String[] indedx_1_BlockSplit_Arr = index_1_str.split(" ");
+
+                    if(indedx_1_BlockSplit_Arr != null && indedx_1_BlockSplit_Arr.length > 1){
+
+                        matchFistStr =  indedx_1_BlockSplit_Arr[indedx_1_BlockSplit_Arr.length-1].trim();
+                    }
+                }
+
+
+                return matchFistStr;
+
+
+            	
+            	
+            }
+            
+            // 获取匹配字符串 后面的那个字符
             String getLastStringAfterKey(String keyStr , String rawStr ){
                 String matchFistStr = null ;
                 if(keyStr == null ){
@@ -4079,17 +4241,29 @@ public class G2_ApplyRuleFor_TypeFile {
                 System.out.println((mEnd_Key_Index)+"_1"+"_fixed_repo_url="+mValue_End_repo_init_fixed);
 
                 //  motorola/build/bin/build_device.bash   // 截取
-                //___2____ Vendor  motorola/build/bin/build_device.bash -b【1】]nightly【2】-p【3】xxxx【4】-g【5】-jX【6】-M【7】<path【8】to【9】MSI【10】workspace>【11】-D【12】mt-r1【13】
-                //MSI motorola/build/bin/build_device.bash -b[1]nightly[2]-p[3]aion_g[4]-g[5]-jX[6]
+                //___2____ 
+                //Vendor  motorola/build/bin/build_device.bash -b【1】]nightly【2】-p【3】xxxx【4】-g【5】-jX【6】-M【7】<path【8】to【9】MSI【10】workspace>【11】-D【12】mt-r1【13】
+                //Msi  motorola/build/bin/build_device.bash -b[1]nightly[2]-p[3]aion_g[4]-g[5]-jX[6]
 
                 //  motorola/build/bin/build_device.bash -b   // 截取
-                //___2____ Vendor  motorola/build/bin/build_device.bash -b nightly【1】-p【2】xxxx【3】-g【4】-jX【5】-M【6】<path【7】to【8】MSI【9】workspace>【10】-D【11】mt-r1【12】
-                //MSI motorola/build/bin/build_device.bash -b nightly[1]-p[2]aion_g[3]-g[4]-jX[5]
+                //___2____ 
+                // Vendor  motorola/build/bin/build_device.bash -b nightly【1】-p【2】xxxx【3】-g【4】-jX【5】-M【6】<path【7】to【8】MSI【9】workspace>【10】-D【11】mt-r1【12】
+                //Msi motorola/build/bin/build_device.bash -b nightly[1]-p[2]aion_g[3]-g[4]-jX[5]
 
+                
+                //  motorola/build/bin/build_device.bash -b   // 截取
+                //___2___  motorola/build/bin/build_device.bash[1]-b[2]nightly[3]-p[4]mona[5]-g[6]-j48[7]
+                
+                
                 String mTag_End_build_device= "motorola/build/bin/build_device.bash -b";
                 String mValue_End_build_device  = "";
                 if(isVendor_2){
                     mValue_End_build_device  =   getDirectXStringAfterKey(mTag_End_build_device,rawText_Html,false,12);
+                    if(mValue_End_build_device != null && mValue_End_build_device.contains(" NOTE:")) {
+                	// -b nightly -p xxxa -g -j48 NOTE: If any gsync issues, please review 
+                    	mValue_End_build_device = mValue_End_build_device.substring(0,mValue_End_build_device.indexOf(" NOTE:"));
+                    }
+                
                 } else {
                     mValue_End_build_device  =   getDirectXStringAfterKey(mTag_End_build_device,rawText_Html,false,5);
                 }
@@ -4118,8 +4292,14 @@ public class G2_ApplyRuleFor_TypeFile {
                 }
 
 
-                isVendor_2 =   isStringContainInList("Vendor Build",mHtmlContentList)  || isStringContainInList("VENDOR BUILD",mHtmlContentList) || isStringContainInList("Vendor Side",mHtmlContentList) || isStringContainInList("VENDOR SIDE",mHtmlContentList) ;
+                isVendor_2 =   isStringContainInList("Vendor Build",mHtmlContentList)  || isStringContainInList("VENDOR BUILD",mHtmlContentList) || isStringContainInList("Vendor Side",mHtmlContentList) || isStringContainInList("VENDOR SIDE",mHtmlContentList) || isStringContainInList("VENDOR RELEASE VERSION",mHtmlContentList) ;
 
+                isMerge_2 =   isStringContainInList("path to MSI workspace",mHtmlContentList) && isStringContainInList("path to VENDOR workspace",mHtmlContentList)   ; 
+
+                System.out.println("isMerge_A1  <path to MSI workspace>    flag = "+ isStringContainInList("<path to MSI workspace>",mHtmlContentList));
+                System.out.println("isMerge_A2  <path to VENDOR workspace> flag = "+ isStringContainInList("<path to VENDOR workspace>",mHtmlContentList));
+
+                
 
                 isMainLineBranch_3 = !mValue_MANIFEST_BRANCH.contains("stable");  // 不包含 stable 字样 那么 就是 main线
 
@@ -4135,6 +4315,8 @@ public class G2_ApplyRuleFor_TypeFile {
                 
                 System.out.println((mDynic_Key_Index++)+"_produce_name_1_【"+ product_name_1 +"】");
                 System.out.println((mDynic_Key_Index++)+"_isVendor_2_【"+isVendor_2+"】 ");
+                System.out.println((mDynic_Key_Index++)+"_isMergeCode_2_【"+isMerge_2+"】 ");
+
                 System.out.println((mDynic_Key_Index++)+"_isMainLineBranch_3_【"+isMainLineBranch_3+"】");
                 System.out.println((mDynic_Key_Index++)+"_version_identify_4_【"+version_identify_4+"】");
                 System.out.println((mDynic_Key_Index++)+"_timeStamp_5_【"+timeStamp_5+"】");
@@ -4162,7 +4344,7 @@ public class G2_ApplyRuleFor_TypeFile {
                 product_txt_List.add((getPadding2(mResultValue_Index++))+"_product_name       =  " +mValue_BUILD_TARGET);
                 product_txt_List.add((getPadding2(mResultValue_Index++))+"_device_shell_name  =  " +device_shell_name);
                 product_txt_List.add((getPadding2(mResultValue_Index++))+"_android_version    =  " +getAndroidVersionTip(mValue_MANIFEST_URL_Android_Version));
-                product_txt_List.add((getPadding2(mResultValue_Index++))+"_vendor_msi_code    =  " +mValue_BUILD_TARGET+"_"+(isVendor_2?"Vendor_Code":"Msi_Code"));
+                product_txt_List.add((getPadding2(mResultValue_Index++))+"_msi_vendor_merge_code =  " +mValue_BUILD_TARGET+"_"+(isVendor_2?(isMerge_2?"Merge_Code":"Vendor_Code"):"Msi_Code"));
                 product_txt_List.add((getPadding2(mResultValue_Index++))+"_soc_vendor_name    =  " +(isQcomProduct_6?"Qcom":"Mtk"));
                 product_txt_List.add((getPadding2(mResultValue_Index++))+"_code_line_type     =  " +(isMainLineBranch_3?"MainLine":"StableLine"));
 
@@ -4564,12 +4746,27 @@ public class G2_ApplyRuleFor_TypeFile {
 
                 System.out.println("═════════════════════════ 已保存当前解析的 ReleaseNote.html produce_name【"+mValue_BUILD_TARGET+"  】  详情调用如下: ═════════════════════════ ");
 
-                String product_tip_file_name = product_name_1 +"_"+(isVendor_2?"Vendor":"Msi")+"_"+(isMainLineBranch_3?"Main":"Stable")+"_"+version_identify_4+"_"+timestamp_yyyyMMddHHmmss ;
+                String product_tip_file_name = product_name_1 +"_"+(isVendor_2?(isMerge_2?"Merge":"Vendor"):"Msi")+"_"+(isMainLineBranch_3?"Main":"Stable")+"_"+version_identify_4+"_"+timestamp_yyyyMMddHHmmss ;
                 product_tip_file_name = product_tip_file_name.replace(" ","");
                 mResultProductTipTxtFileName = product_tip_file_name;
 
                 resultTipTxtDir = new File(curDirFile.getAbsoluteFile()+File.separator+"ReleaseNote_ResultTip_"+timestamp_yyyyMMddHHmmss);
                 mResultProductTipTxtFile = new File(resultTipTxtDir.getAbsoluteFile()+File.separator+product_tip_file_name+".txt");
+              
+                if(isMerge_2) {   // 当前是融合仓库 
+                	product_txt_List.clear();   // 重新计算融合仓库的参数
+                	ArrayList<String> mMergeRepoTxtList = calculMergeRepo( mValue_BUILD_TARGET , device_shell_name ,  mValue_MANIFEST_URL_Android_Version ,
+                    		  isVendor_2 ,  isMerge_2 ,  isQcomProduct_6 , isMainLineBranch_3  ,
+                    		 mValue_Modem_Release_Notes , mValue_JOB_NAME ,  mValue_SOFTWARE_BUILD_ID   ,  mValue_End_Release_Date ,  mValue_MANIFEST_BRANCH ,
+                    		 mValue_MANIFEST_FILE ,  mValue_MANIFEST_URL ,  mValue_End_repo_init ,  mValue_End_repo_init_fixed ,  mValue_End_build_device  , rawText_Html  );
+                	
+                	product_txt_List.addAll(mMergeRepoTxtList);
+                	  resultTipTxtDir = new File(curDirFile.getAbsoluteFile()+File.separator+"ReleaseNote_ResultTip_"+timestamp_yyyyMMddHHmmss);
+                      mResultProductTipTxtFile = new File(resultTipTxtDir.getAbsoluteFile()+File.separator+product_tip_file_name+".txt");
+                    
+                }
+                
+                
                 writeContentToFile(mResultProductTipTxtFile,product_txt_List);
 
 
@@ -4584,6 +4781,169 @@ public class G2_ApplyRuleFor_TypeFile {
                 return true;
             }
 
+            
+            ArrayList<String> calculMergeRepo(String  mValue_BUILD_TARGET ,String device_shell_name , String mValue_MANIFEST_URL_Android_Version ,
+            		boolean  isVendor_2 , boolean isMerge_2 , boolean isQcomProduct_6 ,boolean isMainLineBranch_3  ,
+            		String mValue_Modem_Release_Notes ,String mValue_JOB_NAME , String mValue_SOFTWARE_BUILD_ID   ,String  mValue_End_Release_Date , String xValue_MANIFEST_BRANCH ,
+            		String xValue_MANIFEST_FILE , String xValue_MANIFEST_URL , String mValue_End_repo_init , String xValue_End_repo_init_fixed , String xValue_End_build_device  ,String  rawText_Html  ){
+            	ArrayList<String> product_txt_List = new 	ArrayList<String>();
+            	
+            	
+            	
+            	int mBegin_Key_Index = 1; 
+                String mTag_MANIFEST_BRANCH = "MANIFEST FILE";  //  当前关键字 前面的那个字符串 是我们需要的
+                String mValue_MANIFEST_BRANCH  =   getLastStringBeforeKey(mTag_MANIFEST_BRANCH,rawText_Html);
+                System.out.println((mBegin_Key_Index++)+"_getLastStringBeforeKey_【"+mTag_MANIFEST_BRANCH+"】_mTemp_Value_MANIFEST_BRANCH = "+mValue_MANIFEST_BRANCH);
+
+
+                String mTag_MANIFEST_FILE = "MANIFEST GROUP";  // mTag_MANIFEST_FILEMANIFEST GROUP  的取值的前面是  当前关键字 前面的那个字符串 是我们需要的
+                String mValue_MANIFEST_FILE  =   getLastStringBeforeKey(mTag_MANIFEST_FILE,rawText_Html);
+                System.out.println((mBegin_Key_Index++)+"_getLastStringBeforeKey_【"+mTag_MANIFEST_FILE+"】_mTemp_mValue_MANIFEST_FILE="+mValue_MANIFEST_FILE);
+
+
+
+
+                String mTag_MANIFEST_URL = "MANIFEST BRANCH";
+                String mValue_MANIFEST_URL  =   getLastStringBeforeKey(mTag_MANIFEST_URL,rawText_Html);
+                System.out.println((mBegin_Key_Index++)+"_getLastStringBeforeKey_【"+mTag_MANIFEST_URL+"】_mTemp_mValue_MANIFEST_URL="+mValue_MANIFEST_URL);
+          
+                // mValue_End_repo_init_fixed
+                //___1____ repo init -u【1】ssh://gerrit.xx.com:29418/home/repo/dev/platform/android/platform/manifest/s.git【2】-b【3】refs/tags/T1TGN33.60-59-GENEVN-SHA1【4】-m【5】sha1_embedded_manifest.xml【6】--repo-url=ssh://gerrit.mot.com/home/repo/dev/platform/android/repo.git【7】--repo-branch=mot【8】
+                //___2____ repo init -u【1】ssh://gerrit.xx.com:29418/home/repo/dev/platform/android/platform/manifest/v.git【2】-b【3】refs/tags/VVA35.1-MONA-MONA-G-SHA1【4】-m【5】sha1_embedded_manifest.xml【6】--repo-url=ssh://gerrit.mot.com/home/repo/dev/platform/android/repo.git【7】--repo-branch=mot【8】
+                int mEnd_Key_Index = 1 ;
+                String mTag_End_repo_init = "repo init ";
+                String mTemp_mValue_End_repo_init  =   getDirectXStringAfterKey(mTag_End_repo_init,rawText_Html,false,8);
+                if(mTemp_mValue_End_repo_init != null){
+                	mTemp_mValue_End_repo_init = mTag_End_repo_init+mTemp_mValue_End_repo_init;
+                }
+                System.out.println((mEnd_Key_Index++)+"_getDirectXStringAfterKey_【"+mTag_End_repo_init+"】_mTemp_mValue_End_repo_init_fixed="+mValue_End_repo_init);
+                String mTemp_mValue_End_repo_init_fixed = fixed_repo_url(mValue_End_repo_init,  mValue_MANIFEST_BRANCH, mValue_MANIFEST_FILE ); // 替换 -b  和 -m 的 参数
+                System.out.println((mEnd_Key_Index)+"_1"+"_fixed_repo_url  mTemp_mValue_End_repo_init_fixed ="+mTemp_mValue_End_repo_init_fixed);
+
+                
+                // mValue_End_build_device
+                String mTag_End_build_device= "motorola/build/bin/build_device.bash -b";
+                String mTemp_mValue_End_build_device  = "";
+                if(isMerge_2){
+                	
+                	// motorola/build/bin/build_device.bash -b nightly -p xxx_g -g -j48 -M <path to MSI workspace> -V <path to VENDOR workspace>
+                	mTemp_mValue_End_build_device  =   getSpltAStrAndEndWithBStr(mTag_End_build_device,"<path to VENDOR workspace>",rawText_Html);
+                
+                    System.out.println((mEnd_Key_Index++)+"_getSpltAStrAndEndWithBStr_【"+mTag_End_build_device+"】_ mTemp_mValue_End_build_device = "+mTemp_mValue_End_build_device);
+
+                } 
+
+                if(mTemp_mValue_End_build_device != null){
+                	mTemp_mValue_End_build_device = mTag_End_build_device+" "+mTemp_mValue_End_build_device;
+                }
+                System.out.println((mEnd_Key_Index++)+"_getDirectXStringAfterKey_【"+mTag_End_build_device+"】_"+mTemp_mValue_End_build_device);
+
+                
+                
+
+
+                
+            	
+                // 写入文件 zukgit
+                int mResultValue_Index = 1;
+                product_txt_List.add((getPadding2(mResultValue_Index++))+"_product_name       =  " +mValue_BUILD_TARGET);
+                product_txt_List.add((getPadding2(mResultValue_Index++))+"_device_shell_name  =  " +device_shell_name);
+                product_txt_List.add((getPadding2(mResultValue_Index++))+"_android_version    =  " +getAndroidVersionTip(mValue_MANIFEST_URL_Android_Version));
+                product_txt_List.add((getPadding2(mResultValue_Index++))+"_msi_vendor_merge_code =  " +mValue_BUILD_TARGET+"_"+(isVendor_2?(isMerge_2?"Merge_Code":"Vendor_Code"):"Msi_Code"));
+                product_txt_List.add((getPadding2(mResultValue_Index++))+"_soc_vendor_name    =  " +(isQcomProduct_6?"Qcom":"Mtk"));
+                product_txt_List.add((getPadding2(mResultValue_Index++))+"_code_line_type     =  " +(isMainLineBranch_3?"MainLine":"StableLine"));
+
+
+
+                product_txt_List.add((getPadding2(mResultValue_Index++))+"_soc_name           =  " + mValue_Modem_Release_Notes);
+                product_txt_List.add((getPadding2(mResultValue_Index++))+"_job_name           =  " +mValue_JOB_NAME);
+                product_txt_List.add((getPadding2(mResultValue_Index++))+"_identify           =  " +mValue_SOFTWARE_BUILD_ID);
+                product_txt_List.add((getPadding2(mResultValue_Index++))+"_ReleaseDate        =  " +getChineseDateTip(mValue_End_Release_Date));
+                product_txt_List.add((getPadding2(mResultValue_Index++))+"_manifest_branch    =  " +mValue_MANIFEST_BRANCH);
+                product_txt_List.add((getPadding2(mResultValue_Index++))+"_manifest_xmlfile   =  " +mValue_MANIFEST_FILE);
+                product_txt_List.add((getPadding2(mResultValue_Index++))+"_manifest_url       =  " +mValue_MANIFEST_URL);
+
+                if(isMerge_2){
+                    product_txt_List.add((getPadding2(mResultValue_Index++))+"_merge_init        =  " +mValue_End_repo_init);
+                    product_txt_List.add((getPadding2(mResultValue_Index++))+"_merge_init_fixed  =  " +mTemp_mValue_End_repo_init_fixed);
+                    product_txt_List.add((getPadding2(mResultValue_Index++))+"_merge_build       =  " +mTemp_mValue_End_build_device);
+
+                }
+
+                
+            	// 【xxx_g Merge Init 】 Merge Repo Init 初始化 Merge 命令
+                
+                // 【xxx_g Merge Rebuild 】
+                
+                product_txt_List.add("");
+                product_txt_List.add("");
+
+                String productName = product_name_1;
+                String mValue_End_repo_init_fixed = mTemp_mValue_End_repo_init_fixed;
+                String mValue_End_build_device = mTemp_mValue_End_build_device;
+                
+                product_txt_List.add(getSchema("【"+productName+" Merge Init  】  Vendor Repo Init 初始化 Vendor 命令"));
+                product_txt_List.add("");
+                product_txt_List.add("source /opt/conf/moto.conf "+" && "+ mValue_End_repo_init_fixed+" && " +" repo sync -j2 " +" && "+" repo start --all TEMP "  +" && "+mValue_End_build_device+ " 2>&1 | tee "+getTimeStamp()+"_merge_"+mValue_BUILD_TARGET+".log");
+
+
+                product_txt_List.add("");
+                product_txt_List.add("");
+
+                product_txt_List.add(getSchema("【"+productName+" Merge Rebuild 】 "));
+                product_txt_List.add("");
+                product_txt_List.add("source /opt/conf/moto.conf "+"  && "+mValue_End_build_device+ " 2>&1 | tee "+getTimeStamp()+"_merge_"+mValue_BUILD_TARGET+".log");
+
+                
+                
+                product_txt_List.add("");
+                product_txt_List.add("");
+                product_txt_List.add(getSchema("【 提交commit命令 提示】"));
+                product_txt_List.add("git push origin TEMP:refs/for/【当前分支| 通过 git gui ，gitk  , git branch -vv 查看提交分支】");
+                product_txt_List.add("示例01:  git push origin TEMP:refs/for/bp");
+                product_txt_List.add("示例02:  git push origin TEMP:refs/for/bp-mtk");
+                product_txt_List.add("示例03:  git push origin TEMP:refs/for/bq");
+                product_txt_List.add("示例04:  git push origin TEMP:refs/for/br");
+                product_txt_List.add("示例05:  git push origin TEMP:refs/for/br-mtk");
+                product_txt_List.add("示例06:  git push origin TEMP:refs/for/bs");
+                product_txt_List.add("示例07:  git push origin TEMP:refs/for/bs-mtk");
+                product_txt_List.add("示例08:  git push origin TEMP:refs/for/prods-mtk");
+                product_txt_List.add("示例09:  git push origin TEMP:refs/for/bt");
+                product_txt_List.add("示例10:  git push origin TEMP:refs/for/bt-mtk");
+                product_txt_List.add("示例11:  git push origin TEMP:refs/for/mt-r1/bt");
+                product_txt_List.add("示例12:  git push origin TEMP:refs/for/bs-6450");
+                product_txt_List.add("示例13:  git push origin TEMP:refs/for/bs-8450");
+                product_txt_List.add("示例14:  git push origin TEMP:refs/for/bs-qc");
+                product_txt_List.add("示例15:  git push origin TEMP:refs/for/bu");
+                product_txt_List.add("示例16:  git push origin TEMP:refs/for/bu-mtk");
+                product_txt_List.add("示例17:  git push origin TEMP:refs/for/prodt-mtk");
+                product_txt_List.add("示例18:  git push origin TEMP:refs/for/produ-mtk");
+                product_txt_List.add("示例19:  git push origin TEMP:refs/for/prods-mtktc2sp2");
+                product_txt_List.add("示例20:  git push origin TEMP:refs/for/bv-mtk");
+                product_txt_List.add("示例21:  git push origin TEMP:refs/for/prodv-mtk");
+                product_txt_List.add("示例22:  git push origin TEMP:refs/for/bv");
+                product_txt_List.add("示例23:  git push origin TEMP:refs/for/prodv-mtktc2sp2");
+                product_txt_List.add("示例24:  git push origin TEMP:refs/for/bv-qc");
+                product_txt_List.add("示例25:  git push origin TEMP:refs/for/bv-6450");
+                product_txt_List.add("示例26:  git push origin TEMP:refs/for/bv-8450");
+                product_txt_List.add("示例27:  git push origin TEMP:refs/for/bw-mtk");
+                product_txt_List.add("示例28:  git push origin TEMP:refs/for/prodw-mtk");
+                product_txt_List.add("示例29:  git push origin TEMP:refs/for/bw");
+                product_txt_List.add("示例30:  git push origin TEMP:refs/for/prodw-mtktc2sp2");
+                product_txt_List.add("示例31:  git push origin TEMP:refs/for/bw-qc");
+                product_txt_List.add("示例32:  git push origin TEMP:refs/for/bw-6450");
+                product_txt_List.add("示例33:  git push origin TEMP:refs/for/bw-8450");
+                
+                product_txt_List.add("");
+                product_txt_List.add("");
+                
+            	
+            	return product_txt_List;
+            	
+            }
+            
+            
+            
             boolean isQcomProduct(String rawHtml){
                 boolean isQcom = true;
 
