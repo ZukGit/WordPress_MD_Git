@@ -590,7 +590,337 @@ public class I9_TextRuleOperation {
         // 当前目录下的 文本 内容进行替换 在新目录生成替换后的新文件读取原文件内容得到替换参数格式:【American】_【美国】
         CUR_RULE_LIST.add(new ReplaceTxtFile_Src_to_Dst_Rule_63());
 
+        
+        // 对当前文件 的 每一行 检测 是否属于 相同的空格  相同的空格 那么 就转为 相同的 MD表格模式
+        CUR_RULE_LIST.add(new Detect_Line_To_MD_Table_Rule_64());
+        
     }
+    
+    
+    
+    class Detect_Line_To_MD_Table_Rule_64 extends Basic_Rule {
+ 
+        ArrayList<String> mTxtContentList ;   //  一个文件的所有行
+        
+        
+        
+
+        
+        Detect_Line_To_MD_Table_Rule_64() {
+            super(64);
+        }
+
+        @Override
+        ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
+                                           ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+
+            for (int i = 0; i < curInputFileList.size(); i++) {
+                File fileItem = curInputFileList.get(i);
+
+//                ArrayList<String> contentList = calcul_duiqi_Rule_5(fileItem,I9_Temp_Text_File);
+                ArrayList<String> fixedStrArr = ReadTrimFileContentAsList(fileItem);
+                ArrayList<Integer> oneRowBlankList = new  ArrayList<Integer> ();
+                
+                
+                // 把 多个空格 转为 一个 空格的形式
+                ArrayList<String> paddingBlankContentList = new ArrayList<String> ();
+                
+                System.out.println("════════════" + "输出文件 Begin " + "════════════");
+
+
+
+                
+
+                for (int j = 0; j < fixedStrArr.size(); j++) {
+                	
+                    // 把 多个空格 转为 一个 空格的形式
+                	String onlyOneEmptySplitStr = fixedStrArr.get(j).trim().replace("    ", " ").replace("   ", " ").replace("  ", " ").replace("  ", " ").replace("  ", " ");
+                	String oneLineStr = onlyOneEmptySplitStr.trim();
+                	paddingBlankContentList.add(oneLineStr);
+                	String[] splitArr = oneLineStr.split(" ");
+                	int rowBlankNum = 0 ;
+                	if(splitArr != null) {
+                		oneRowBlankList.add(splitArr.length);
+                		rowBlankNum = splitArr.length;
+                	} else {
+                		oneRowBlankList.add(0);
+                	}
+                	
+                    System.out.println("Line["+j+"] Blank【"+rowBlankNum+"】: "+oneLineStr);
+                }
+             
+             // 4 转成 table4    16 转成table16  8转成table8 
+//              Line[4] Blank【4】: IcmpMsg: InType3 InType11 OutType3
+//              Line[5] Blank【4】: IcmpMsg: 50 99 147
+//              Line[6] Blank【16】: Tcp: RtoAlgorithm RtoMin RtoMax MaxConn ActiveOpens PassiveOpens AttemptFails EstabResets CurrEstab InSegs OutSegs RetransSegs InErrs OutRsts InCsumErrors
+//              Line[7] Blank【16】: Tcp: 1 200 120000 -1 376 6 0 0 4 236711 223186 292 0 4 0
+//              Line[8] Blank【8】: Udp: InDatagrams NoPorts InErrors OutDatagrams RcvbufErrors SndbufErrors InCsumErrors
+//              Line[9] Blank【8】: Udp: 1405 438 0 1896 0 0 0
+                
+        
+                ArrayList<List<Integer>> allGroupIndexList  =  new   ArrayList<List<Integer>>();
+                for (int j = 0; j < oneRowBlankList.size(); j++) {
+
+                	// one_group_head
+                	int curBlankHeadCount  = oneRowBlankList.get(j); 
+                	int preBlankHeadCount  =  0 ; 
+                	
+//                    System.out.println(" j = "+j + "curBlankHeadCount = "+curBlankHeadCount +"  oneRowBlankList.size()"+oneRowBlankList.size());
+
+                    
+                	if(j > 0  ) {
+                		 preBlankHeadCount  = oneRowBlankList.get(j-1); 
+                	}
+                	
+                	if(curBlankHeadCount ==  preBlankHeadCount) {
+                		continue;
+                	}
+                	
+//                    System.out.println(" j = "+j);
+
+                  
+                    ArrayList<Integer> oneGroupIndexList = new   ArrayList<Integer>();
+
+                	// one_group_body
+                   
+                	  for (int k = j; k < oneRowBlankList.size(); k++) {
+                		 int curBlankBodyCount  = oneRowBlankList.get(k);
+//                         System.out.println("1__ j = "+j +" body k="+ k);
+                		  if(curBlankHeadCount == curBlankBodyCount) {
+//                              System.out.println("2__ j = "+j +" body k="+ k);
+
+                			  oneGroupIndexList.add(j);
+                			  oneGroupIndexList.add(k);
+                			  
+                			  // 循环到最后一个 那么直接 添加到allGroupList
+                			  if(k == oneRowBlankList.size() -1 ) {
+                				  
+                			        List<Integer> distinctList = oneGroupIndexList.stream().distinct().collect(java.util.stream.Collectors.toList());
+
+                      		        if(distinctList.size() > 0 ) {
+                      		   	     allGroupIndexList.add(distinctList);
+                      		        }
+                      		
+                      			   break;
+                      			   
+                			  }
+
+                		   } else {
+                
+                			   if(oneGroupIndexList.size() == 0) {
+                				   oneGroupIndexList.add(k);
+                			   }
+                			   
+                		        List<Integer> distinctList = oneGroupIndexList.stream().distinct().collect(java.util.stream.Collectors.toList());
+
+                  		        if(distinctList.size() > 0 ) {
+                  		   	        allGroupIndexList.add(distinctList);
+                  		        }
+                  		
+                  			   break;
+                  			   
+
+                		   }
+                      	
+                    }
+                	  
+      		
+                	  
+                	
+                } 
+              
+        		  System.out.println("allGroupIndexList.size() = "+ allGroupIndexList.size());
+
+                
+                for (int j = 0; j < allGroupIndexList.size(); j++) {
+
+                List<Integer> oneGroup = allGroupIndexList.get(j);
+                	
+              	  for (int k = 0; k < oneGroup.size(); k++) {
+              		  int itemValue =  oneGroup.get(k);
+
+              		  System.out.println("Group["+j+"_"+allGroupIndexList.size()+"] Item["+k+"_"+oneGroup.size()+"] : "+itemValue);
+              		  
+              	  }
+              	  
+                	
+                	
+                }
+                
+                
+
+                
+                
+//                Group[6_10] Item[0_1] : 14
+//                Group[7_10] Item[0_1] : 15
+//                Group[8_10] Item[0_1] : 16
+              
+             
+                
+            ArrayList<String> outResultList  =    doTablePadding(paddingBlankContentList , allGroupIndexList);
+                
+                
+                
+        	  for (int k = 0; k < outResultList.size(); k++) {
+          		  String mResultLineStr =  outResultList.get(k);
+
+          		  System.out.println("mResultLineStr["+k+"_"+outResultList.size()+"] Item["+k+"_"+outResultList.size()+"] : "+mResultLineStr);
+          		  
+          	  }
+        	  
+                
+                
+                
+                System.out.println("════════════" + "输出文件 End " + "════════════");
+                writeContentToFile( I9_Temp_Text_File,outResultList );
+     
+                NotePadOpenTargetFile(I9_Temp_Text_File.getAbsolutePath());
+         
+            }
+
+            return super.applyOperationRule(curFileList, subFileTypeMap, curDirList, curRealFileList);
+        }
+
+        ArrayList<String> doTablePadding( ArrayList<String> contentList ,ArrayList<List<Integer>> allGroupList ) {
+        	ArrayList<String>  mPaddingResult  = new ArrayList<String>();
+
+//        	        allGroupIndexList.size() = 5
+//        			Group[0_5] Item[0_2] : 0
+//        			Group[0_5] Item[1_2] : 1
+//        			Group[1_5] Item[0_2] : 2
+//        			Group[1_5] Item[1_2] : 3
+//        			Group[2_5] Item[0_2] : 4
+//        			Group[2_5] Item[1_2] : 5
+//        			Group[3_5] Item[0_2] : 6
+//        			Group[3_5] Item[1_2] : 7
+//        			Group[4_5] Item[0_5] : 8
+//        			Group[4_5] Item[1_5] : 9
+//        			Group[4_5] Item[2_5] : 10
+//        			Group[4_5] Item[3_5] : 11
+//        			Group[4_5] Item[4_5] : 12
+        			
+        	for (int i = 0; i < allGroupList.size(); i++) {
+        		
+        		List<Integer> oneIndexGroupList = 	allGroupList.get(i);
+        		
+        		
+        		//     Group[6_10] Item[0_1] : 14
+        		if(oneIndexGroupList.size() == 1) {   // 只有一行 
+        			
+        			String oneLineStr = contentList.get(oneIndexGroupList.get(0));
+        			
+        			mPaddingResult.add(oneLineStr);
+        			continue;
+        			
+        		}
+        		
+        		
+//        	    一个组 有三个 元素  但存在空行格的情况 
+//              Line[6] Blank【1】:
+//              Line[7] Blank【1】: 11111111111111111111111
+//              Line[8] Blank【1】:
+//              Group[3_10] Item[0_3] : 6
+//              Group[3_10] Item[1_3] : 7
+//              Group[3_10] Item[2_3] : 8
+        		
+        		// 判断当前 组合 是否 有 全部都是空行的
+        		boolean isEmptyLine = false;  //  当前组合Group 是否有空行
+
+        		for (int j = 0; j < oneIndexGroupList.size(); j++) {
+        			
+        			 String itemStr = contentList.get(oneIndexGroupList.get(j));
+         			
+        			 if(itemStr.split(" ").length ==1 ||  "".equals(itemStr.trim().replace(" ", ""))) {
+        				 isEmptyLine = true;
+        			 }
+				}
+        		
+        		
+        		if(isEmptyLine) {   // 存在 空行 那么 这组 数据 也不处理   直接原始添加
+        			
+        			
+        			
+            		for (int j = 0; j < oneIndexGroupList.size(); j++) {
+            			
+              			String oneLineStr = contentList.get(oneIndexGroupList.get(0));
+            			
+            			mPaddingResult.add(oneLineStr);            	
+   				}
+            		continue;
+            		
+        		}
+        		
+        		
+        		//   需要 添加 修改后的数据的情况
+        		
+        		
+        		for (int j = 0; j < oneIndexGroupList.size(); j++) {
+        			
+          			String oneLineStr = contentList.get(oneIndexGroupList.get(j));
+        			
+          			// | 
+          			String fixedStr = "| " + oneLineStr.replace(" ", " | ")+" |";
+          			
+          			if(j == 0 ) {
+               			mPaddingResult.add("|      |");    
+               			mPaddingResult.add("| ---- |");    
+               			mPaddingResult.add("|      |");   
+               			mPaddingResult.add("\n\n");  
+          			}
+        			mPaddingResult.add(fixedStr);          
+          			int splitSize = oneLineStr.split(" ").length;
+          			
+          			
+          			if(j == 0 ) {   // 一组的起始  还需要 添加 分割符号 "| ----"
+    
+ 
+          				String paddingStr = getPadding_WithZero_LongString(splitSize, "| ----")+" |";
+               			mPaddingResult.add(paddingStr);       
+          			}
+          			
+          			if(j == oneIndexGroupList.size()-1) {
+          				String paddingStr = "\n\n";
+               			mPaddingResult.add(paddingStr);
+          			}
+         	
+				}
+        		
+			}
+        	
+        	return mPaddingResult ;
+        	
+        }
+        
+        
+        
+        @Override
+        String simpleDesc() {
+            return " 把当前顺序排列的每行数据 MD  table 化 按照空格数量对齐 转为 对应 匹配的 MD 表格的排序方式输出";
+        }
+
+        // 3. 如果当前 执行 错误 checkParams 返回 false 那么 将 打印这个函数 说明错误的可能原因
+        @Override
+        void showWrongMessage() {
+            System.out.println("当前 type 索引 " + rule_index + " 执行错误  可能是输入参数错误 请检查输入参数!");
+            System.out.println(" errorMsg = " + errorMsg);
+        }
+
+        // 4. 当前 rule的 说明 将会打印在 用户输入为空时的 提示语句！
+        @Override
+        String ruleTip(String type, int index, String batName, OS_TYPE curType) {
+            String itemDesc = "";
+            if (curType == OS_TYPE.Windows) {
+                itemDesc = batName.trim() + "  " + type + "_" + index + "    [索引 " + index + "]  描述:" + ""
+                        + simpleDesc();
+            } else {
+                itemDesc = batName.trim() + " " + type + "_" + index + "    [索引 " + index + "]  描述:" + ""
+                        + simpleDesc();
+            }
+
+            return itemDesc;
+        }
+    }
+    
 
     class ReplaceTxtFile_Src_to_Dst_Rule_63 extends Basic_Rule {
 
@@ -17799,6 +18129,43 @@ public class I9_TextRuleOperation {
 
 
 
+    public static ArrayList<String> ReadTrimFileContentAsList(File mFilePath) {
+
+        if (mFilePath != null && mFilePath.exists()) {
+            // System.out.println("存在 当前文件 "+ mFilePath.getAbsolutePath());
+        } else {
+            System.out.println("不存在 当前文件 " + mFilePath.getAbsolutePath());
+
+            return null;
+        }
+        ArrayList<String> contentList = new ArrayList<String>();
+
+        try {
+            BufferedReader curBR = new BufferedReader(new InputStreamReader(new FileInputStream(mFilePath), "utf-8"));
+            String oldOneLine = "";
+            int index = 1;
+            while (oldOneLine != null) {
+
+                oldOneLine = curBR.readLine();
+                if (oldOneLine == null) {
+                    continue;
+                }
+
+                contentList.add(oldOneLine.trim());
+//                    System.out.println("第"+index+"行读取到的字符串:"+oldOneLine);
+                index++;
+
+            }
+            curBR.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return contentList;
+    	
+    	
+    }
+    
 
     public static ArrayList<String> ReadFileContentAsList(File mFilePath) {
 
