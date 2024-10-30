@@ -593,10 +593,167 @@ public class I9_TextRuleOperation {
         
         // 对当前文件 的 每一行 检测 是否属于 相同的空格  相同的空格 那么 就转为 相同的 MD表格模式
         CUR_RULE_LIST.add(new Detect_Line_To_MD_Table_Rule_64());
+
+        // 10-29 12:09:53.612  1874  2665 I DataStallMonitor: TcpDataFromSnmp:328,385,40,4
+        // 计算重传率:          
+        // 10-29 12:09:53.612  1874  2665 I DataStallMonitor: TcpDataFromSnmp:328,385,40,4  FailPercentage: 80%
+        CUR_RULE_LIST.add(new DataStallMonitor_TcpDataFromSnmp_CalCul_ReTransRate_Rule_65());
         
     }
     
     
+    class DataStallMonitor_TcpDataFromSnmp_CalCul_ReTransRate_Rule_65 extends Basic_Rule {
+    	
+    	DataStallMonitor_TcpDataFromSnmp_CalCul_ReTransRate_Rule_65() {
+            super(65);
+        }
+    	
+        @Override
+        ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
+                                           ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+
+            for (int i = 0; i < curInputFileList.size(); i++) {
+                File fileItem = curInputFileList.get(i);
+
+//                ArrayList<String> contentList = calcul_duiqi_Rule_5(fileItem,I9_Temp_Text_File);
+                ArrayList<String> fixedStrArr = ReadFileContentAsList(fileItem);
+
+             
+                ArrayList<String> outResultList = new     ArrayList<String>();
+                
+                
+                for (int j = 0; j < fixedStrArr.size(); j++) {
+                	
+                	String oneLine = fixedStrArr.get(j);
+                	// 10-29 12:09:56.617  1874  2665 I DataStallMonitor: TcpDataFromSnmp:338,481,29,12
+                	if(oneLine.contains("DataStallMonitor") && oneLine.contains("TcpDataFromSnmp")
+                			&& oneLine.contains(",") && oneLine.contains(":")) {
+                		
+                                // 338,481,29,12
+                				String lastMaoHaoStr =  oneLine.substring(oneLine.lastIndexOf(":")+":".length()).trim();
+                		
+                			
+                				System.out.println("line["+j+"_"+fixedStrArr.size()+"]  lastMaoHaoStr="+lastMaoHaoStr +" rawStr=【"+oneLine+"】");
+                				
+                				if(lastMaoHaoStr.contains(",")) {
+                					String[] tcpValueStrArr = lastMaoHaoStr.split(",");
+                					
+                					if(tcpValueStrArr.length == 4) {
+                						String receivedTCPCountStr = tcpValueStrArr[0].trim();
+                						String sentTCPCountStr = tcpValueStrArr[1].trim();
+                						String retransTCPCountStr = tcpValueStrArr[2].trim();
+                						String lostTCPCountStr = tcpValueStrArr[3].trim();
+                						
+                					
+                         				System.out.println("line["+j+"_"+fixedStrArr.size()+"]  receivedTCPCountStr="+receivedTCPCountStr +" isNumeric="+isNumeric(receivedTCPCountStr));
+                         				System.out.println("line["+j+"_"+fixedStrArr.size()+"]  sentTCPCountStr="+sentTCPCountStr +" isNumeric="+isNumeric(sentTCPCountStr));
+                         				System.out.println("line["+j+"_"+fixedStrArr.size()+"]  retransTCPCountStr="+retransTCPCountStr +" isNumeric="+isNumeric(retransTCPCountStr));
+                         				System.out.println("line["+j+"_"+fixedStrArr.size()+"]  lostTCPCountStr="+lostTCPCountStr +" isNumeric="+isNumeric(lostTCPCountStr));
+
+                         				
+                						if(isNumeric(receivedTCPCountStr) && isNumeric(sentTCPCountStr) && 
+                								isNumeric(retransTCPCountStr) && isNumeric(lostTCPCountStr)	) {
+                							
+                							
+                							int receivedTCPCountInt = Integer.parseInt(receivedTCPCountStr);
+                							int sentTCPCountInt = Integer.parseInt(sentTCPCountStr);
+                							int retransTCPCountInt = Integer.parseInt(retransTCPCountStr);
+                							int lostTCPCountInt = Integer.parseInt(lostTCPCountStr);
+                							if(sentTCPCountInt == 0 ) {  // 避免分母为 0 
+                								
+                								sentTCPCountInt = 1;
+                							}
+	
+                						
+                							 double  mLatestFailPercentageFromSnmp  = (((double)retransTCPCountInt + (double)lostTCPCountInt) / (double)sentTCPCountInt) * 100;
+                							   
+                							  DecimalFormat df = new DecimalFormat("#0.00");
+                						        String formattedNumber = df.format(mLatestFailPercentageFromSnmp);
+                						        
+                						     
+                							
+                							 String paddingStr = ", mRetransLost/TotalTrans = "+formattedNumber+"%";
+                             				System.out.println("line["+j+"_"+fixedStrArr.size()+"]  lastMaoHaoStr="+lastMaoHaoStr +" rawStr=【"+oneLine+"】  paddingStr="+paddingStr);
+                             				
+                             				if(sentTCPCountInt >= 10 && mLatestFailPercentageFromSnmp > 9 ) {  // 只计算 那些 发送数据大于 10个的 
+                             					
+                             		        	outResultList.add(oneLine+" "+paddingStr);
+                                 	           	continue;	
+                             				}
+                             	   
+
+                							
+                						}
+                					}
+                					
+                    				System.out.println("line["+j+"_"+fixedStrArr.size()+"]  lastMaoHaoStr="+lastMaoHaoStr +" rawStr=【"+oneLine+"】  tcpValueStrArr.length="+tcpValueStrArr.length);
+
+                					
+                					
+                				}
+                		
+                		
+                		
+                	} 
+                	
+                	
+                	outResultList.add(oneLine);
+					
+				}
+                
+                		
+                System.out.println("════════════" + "输出文件 Begin " + "════════════");
+
+
+                
+                
+                System.out.println("════════════" + "输出文件 End " + "════════════");
+                writeContentToFile( I9_Temp_Text_File,outResultList );
+     
+                NotePadOpenTargetFile(I9_Temp_Text_File.getAbsolutePath());
+         
+            }
+
+            return super.applyOperationRule(curFileList, subFileTypeMap, curDirList, curRealFileList);
+        }
+
+        // 10-29 12:09:53.612  1874  2665 I DataStallMonitor: TcpDataFromSnmp:328,385,40,4
+        // 计算重传率:          
+      
+        
+        @Override
+        String simpleDesc() {
+            return " 对于出现 DataStallMonitor : TcpDataFromSnmp 328(接受包数量),385(发送包数量),40(重传包数量),4(丢失包数量) 的行追加 重传错误率  mRetransLost/TotalTrans = 200%";
+        }
+
+        // 3. 如果当前 执行 错误 checkParams 返回 false 那么 将 打印这个函数 说明错误的可能原因
+        @Override
+        void showWrongMessage() {
+            System.out.println("当前 type 索引 " + rule_index + " 执行错误  可能是输入参数错误 请检查输入参数!");
+            System.out.println(" errorMsg = " + errorMsg);
+        }
+
+        // 4. 当前 rule的 说明 将会打印在 用户输入为空时的 提示语句！
+        @Override
+        String ruleTip(String type, int index, String batName, OS_TYPE curType) {
+            String itemDesc = "";
+            if (curType == OS_TYPE.Windows) {
+                itemDesc = batName.trim() + "  " + type + "_" + index + "    [索引 " + index + "]  描述:" + ""
+                        + simpleDesc();
+            } else {
+                itemDesc = batName.trim() + " " + type + "_" + index + "    [索引 " + index + "]  描述:" + ""
+                        + simpleDesc();
+            }
+
+            return itemDesc;
+        }
+   
+
+        
+    	
+    	
+    	
+    }
     
     class Detect_Line_To_MD_Table_Rule_64 extends Basic_Rule {
  
