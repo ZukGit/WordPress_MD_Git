@@ -27,6 +27,8 @@ import net.sourceforge.pinyin4j.format.HanyuPinyinToneType;
 import net.sourceforge.pinyin4j.format.exception.BadHanyuPinyinOutputFormatCombination;
 
 import java.text.DecimalFormat;
+import java.text.ParseException;
+
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.io.*;
@@ -627,6 +629,13 @@ public class I9_TextRuleOperation {
 
                 ArrayList<String> outResultList = new     ArrayList<String>();
                 
+                HashMap<Integer,MTK_Speed_Entry_Value>  mSpeedEntryMap  = new     HashMap<Integer,MTK_Speed_Entry_Value>();
+                
+                ArrayList<MTK_Speed_Entry_Value> mSpeedEntryList = new   ArrayList<MTK_Speed_Entry_Value> ();
+                
+                
+                int max_log_length = 0 ;
+                int str_padding_length = 0;
                 
                 for (int j = 0; j < fixedStrArr.size(); j++) {
 // link speed=2865/2065, bw=0/0, rssi=-63, BSSID:[d0:15:**:**:**:b2], idx=0,TxFail=0, TxTimeOut=0, TxOK=81650, RxOK=121025, FcsErr=0  AvaSpeed: 43.2p/s TimeDiff=6.32s TxFail-UP=32  TxTimeOut-UP=0 TxOK-UP=0 RxOK_UP=0 FcsErr_UP=0
@@ -637,6 +646,11 @@ public class I9_TextRuleOperation {
                 			&& oneLine.contains("TxTimeOut=") && oneLine.contains("TxOK=")
                 			&& oneLine.contains("RxOK=") && oneLine.contains("FcsErr=")) {
                 		
+                		
+                		if(oneLine.length() > max_log_length) {  
+                			max_log_length = oneLine.length() ;   // 拿到最大的空格. 
+                			
+                		}
                                 // 338,481,29,12
                 		
 //                		line[84_85]_linkSpeedRawArr[0_18] : 10-17
@@ -660,13 +674,16 @@ public class I9_TextRuleOperation {
         				String[] linkSpeedBlankRawArr = oneLine.split(" ");
         				
         				
+        				String mTimeStr = null ;
+        				
+        				if(linkSpeedBlankRawArr != null  && linkSpeedBlankRawArr.length >= 2) {
+        					mTimeStr = linkSpeedBlankRawArr[1];	
+        				}
+        				
         	
         				
-        				
-                			
-                				System.out.println("line["+j+"_"+fixedStrArr.size()+"]  oneLine="+oneLine +" linkSpeedRawArr.size() =【"+linkSpeedBlankRawArr.length+"】");
-                				
-                				for (int k = 0; k < linkSpeedBlankRawArr.length; k++) {
+        			System.out.println("line["+j+"_"+fixedStrArr.size()+"]  oneLine="+oneLine +" linkSpeedRawArr.size() =【"+linkSpeedBlankRawArr.length+"】");
+                		for (int k = 0; k < linkSpeedBlankRawArr.length; k++) {
                     				System.out.println("line["+j+"_"+fixedStrArr.size()+ "]"+"_linkSpeedBlankRawArr["+k+"_"+linkSpeedBlankRawArr.length+"] : "+linkSpeedBlankRawArr[k]);
 
 									
@@ -685,78 +702,138 @@ public class I9_TextRuleOperation {
                 				String[] linkSpeedSepliteRawArr = oneLine.split(",");
                 				
                 				
-          			     	System.out.println("line["+j+"_"+fixedStrArr.size()+"]  oneLine="+oneLine +" linkSpeedRawArr.size() =【"+linkSpeedSepliteRawArr.length+"】");
+                				// 计算数组中 以 "TxTimeOut=" 开头的那个Item  , 并去除掉 "TxTimeOut="
+                				String mTxFailStr = calculMatchIntStr(linkSpeedSepliteRawArr,"TxFail=");
+                 				String mTxTimeOutStr = calculMatchIntStr(linkSpeedSepliteRawArr,"TxTimeOut=");
+                 				String mTxOKStr = calculMatchIntStr(linkSpeedSepliteRawArr,"TxOK=");
+                 				String mRxOKStr = calculMatchIntStr(linkSpeedSepliteRawArr,"RxOK=");
+                 				String mFcsErrStr = calculMatchIntStr(linkSpeedSepliteRawArr,"FcsErr=");			
+                 				
+                				
+                 				MTK_Speed_Entry_Value mSpeedMatchEntry = new MTK_Speed_Entry_Value(j,mTimeStr,mTxFailStr,mTxTimeOutStr,mTxOKStr,mRxOKStr,mFcsErrStr);
+                 				
+                 				mSpeedEntryMap.put(j, mSpeedMatchEntry);
+                 				mSpeedEntryList.add(mSpeedMatchEntry);
+                 				
+                 				
+                 					
+          			         	System.out.println("line["+j+"_"+fixedStrArr.size()+"]  oneLine="+oneLine +" linkSpeedRawArr.size() =【"+linkSpeedSepliteRawArr.length+"】");
                 				
                 				for (int k = 0; k < linkSpeedSepliteRawArr.length; k++) {
                     				System.out.println("line["+j+"_"+fixedStrArr.size()+ "]"+"_linkSpeedSepliteRawArr["+k+"_"+linkSpeedSepliteRawArr.length+"] : "+linkSpeedSepliteRawArr[k]);
 								}
                 				
                 				
-                				if(oneLine.contains(",")) {
-                					String[] tcpValueStrArr = oneLine.split(",");
-                					
-                					if(tcpValueStrArr.length == 4) {
-                						String receivedTCPCountStr = tcpValueStrArr[0].trim();
-                						String sentTCPCountStr = tcpValueStrArr[1].trim();
-                						String retransTCPCountStr = tcpValueStrArr[2].trim();
-                						String lostTCPCountStr = tcpValueStrArr[3].trim();
-                						
-                					
-                         				System.out.println("line["+j+"_"+fixedStrArr.size()+"]  receivedTCPCountStr="+receivedTCPCountStr +" isNumeric="+isNumeric(receivedTCPCountStr));
-                         				System.out.println("line["+j+"_"+fixedStrArr.size()+"]  sentTCPCountStr="+sentTCPCountStr +" isNumeric="+isNumeric(sentTCPCountStr));
-                         				System.out.println("line["+j+"_"+fixedStrArr.size()+"]  retransTCPCountStr="+retransTCPCountStr +" isNumeric="+isNumeric(retransTCPCountStr));
-                         				System.out.println("line["+j+"_"+fixedStrArr.size()+"]  lostTCPCountStr="+lostTCPCountStr +" isNumeric="+isNumeric(lostTCPCountStr));
+                				System.out.println("line["+j+"_"+fixedStrArr.size()+ "]"+"_mTimeStr["+mTimeStr+"]  mTxFailStr["+mTxFailStr+"]  mTxTimeOutStr["+mTxTimeOutStr+"]  mTxOKStr["+mTxOKStr+"]  mRxOKStr["+mRxOKStr+"]  mFcsErrStr["+mFcsErrStr+"]");
 
-                         				
-                						if(isNumeric(receivedTCPCountStr) && isNumeric(sentTCPCountStr) && 
-                								isNumeric(retransTCPCountStr) && isNumeric(lostTCPCountStr)	) {
-                							
-                							
-                							int receivedTCPCountInt = Integer.parseInt(receivedTCPCountStr);
-                							int sentTCPCountInt = Integer.parseInt(sentTCPCountStr);
-                							int retransTCPCountInt = Integer.parseInt(retransTCPCountStr);
-                							int lostTCPCountInt = Integer.parseInt(lostTCPCountStr);
-                							if(sentTCPCountInt == 0 ) {  // 避免分母为 0 
-                								
-                								sentTCPCountInt = 1;
-                							}
-	
-                						
-                							 double  mLatestFailPercentageFromSnmp  = (((double)retransTCPCountInt + (double)lostTCPCountInt) / (double)sentTCPCountInt) * 100;
-                							   
-                							  DecimalFormat df = new DecimalFormat("#0.00");
-                						        String formattedNumber = df.format(mLatestFailPercentageFromSnmp);
-                						        
-                						     
-                							
-                							 String paddingStr = ", mRetransLost/TotalTrans = "+formattedNumber+"%";
-                             				System.out.println("line["+j+"_"+fixedStrArr.size()+"]  oneLine="+oneLine +" rawStr=【"+oneLine+"】  paddingStr="+paddingStr);
-                             				
-                             				if(sentTCPCountInt >= 10 && mLatestFailPercentageFromSnmp > 9 ) {  // 只计算 那些 发送数据大于 10个的 
-                             					
-                             		        	outResultList.add(oneLine+" "+paddingStr);
-                                 	           	continue;	
-                             				}
-                             	   
-
-                							
-                						}
-                					}
-                					
-                    				System.out.println("line["+j+"_"+fixedStrArr.size()+"]  oneLine="+oneLine +" rawStr=【"+oneLine+"】  tcpValueStrArr.length="+tcpValueStrArr.length);
-
-                					
-                					
-                				}
+                				
+                				
+								/*
+								 * if(oneLine.contains(",")) { String[] tcpValueStrArr = oneLine.split(",");
+								 * 
+								 * if(tcpValueStrArr.length == 4) { String receivedTCPCountStr =
+								 * tcpValueStrArr[0].trim(); String sentTCPCountStr = tcpValueStrArr[1].trim();
+								 * String retransTCPCountStr = tcpValueStrArr[2].trim(); String lostTCPCountStr
+								 * = tcpValueStrArr[3].trim();
+								 * 
+								 * 
+								 * System.out.println("line["+j+"_"+fixedStrArr.size()+"]  receivedTCPCountStr="
+								 * +receivedTCPCountStr +" isNumeric="+isNumeric(receivedTCPCountStr));
+								 * System.out.println("line["+j+"_"+fixedStrArr.size()+"]  sentTCPCountStr="
+								 * +sentTCPCountStr +" isNumeric="+isNumeric(sentTCPCountStr));
+								 * System.out.println("line["+j+"_"+fixedStrArr.size()+"]  retransTCPCountStr="
+								 * +retransTCPCountStr +" isNumeric="+isNumeric(retransTCPCountStr));
+								 * System.out.println("line["+j+"_"+fixedStrArr.size()+"]  lostTCPCountStr="
+								 * +lostTCPCountStr +" isNumeric="+isNumeric(lostTCPCountStr));
+								 * 
+								 * 
+								 * if(isNumeric(receivedTCPCountStr) && isNumeric(sentTCPCountStr) &&
+								 * isNumeric(retransTCPCountStr) && isNumeric(lostTCPCountStr) ) {
+								 * 
+								 * 
+								 * int receivedTCPCountInt = Integer.parseInt(receivedTCPCountStr); int
+								 * sentTCPCountInt = Integer.parseInt(sentTCPCountStr); int retransTCPCountInt =
+								 * Integer.parseInt(retransTCPCountStr); int lostTCPCountInt =
+								 * Integer.parseInt(lostTCPCountStr); if(sentTCPCountInt == 0 ) { // 避免分母为 0
+								 * 
+								 * sentTCPCountInt = 1; }
+								 * 
+								 * 
+								 * double mLatestFailPercentageFromSnmp = (((double)retransTCPCountInt +
+								 * (double)lostTCPCountInt) / (double)sentTCPCountInt) * 100;
+								 * 
+								 * DecimalFormat df = new DecimalFormat("#0.00"); String formattedNumber =
+								 * df.format(mLatestFailPercentageFromSnmp);
+								 * 
+								 * 
+								 * 
+								 * String paddingStr = ", mRetransLost/TotalTrans = "+formattedNumber+"%";
+								 * System.out.println("line["+j+"_"+fixedStrArr.size()+"]  oneLine="+oneLine
+								 * +" rawStr=【"+oneLine+"】  paddingStr="+paddingStr);
+								 * 
+								 * if(sentTCPCountInt >= 10 && mLatestFailPercentageFromSnmp > 9 ) { // 只计算 那些
+								 * 发送数据大于 10个的
+								 * 
+								 * outResultList.add(oneLine+" "+paddingStr); continue; }
+								 * 
+								 * 
+								 * 
+								 * } }
+								 * 
+								 * System.out.println("line["+j+"_"+fixedStrArr.size()+"]  oneLine="+oneLine
+								 * +" rawStr=【"+oneLine+"】  tcpValueStrArr.length="+tcpValueStrArr.length);
+								 * 
+								 * 
+								 * 
+								 * }
+								 */
                 		
                 		
                 		
                 	} 
-                	
-                	
-                	outResultList.add(oneLine);
 					
 				}
+                
+                System.out.println("════════════" + "mSpeedEntryList.size【= " + mSpeedEntryList.size()+ "】max_log_length="+max_log_length+"════════════");
+
+                
+                for (int j = 0; j < mSpeedEntryList.size(); j++) {
+                	if(j == 0 ) {
+                		continue;
+                	}
+                	
+                	MTK_Speed_Entry_Value curObj = mSpeedEntryList.get(j);
+                	MTK_Speed_Entry_Value preObj = mSpeedEntryList.get(j-1);
+                	curObj.setPreSpeedEntry(preObj);
+                	System.out.println("mSpeedEntryList["+j+"_"+mSpeedEntryList.size()+"]: "+curObj.toString());
+				} 
+                
+                
+                
+                int max_padding_length = max_log_length+ 1 ;
+                for (int j = 0; j < fixedStrArr.size(); j++) {
+// link speed=2865/2065, bw=0/0, rssi=-63, BSSID:[d0:15:**:**:**:b2], idx=0,TxFail=0, TxTimeOut=0, TxOK=81650, RxOK=121025, FcsErr=0  AvaSpeed: 43.2p/s TimeDiff=6.32s TxFail-UP=32  TxTimeOut-UP=0 TxOK-UP=0 RxOK_UP=0 FcsErr_UP=0
+                			   
+                	String oneLine = fixedStrArr.get(j);
+                	MTK_Speed_Entry_Value matchSpeedEntry = mSpeedEntryMap.get(j);
+                	
+                	if(matchSpeedEntry == null) {
+                		outResultList.add(oneLine);
+                		continue;
+                		
+                	}
+                	
+                	
+                	int padding_empty_length = max_padding_length - oneLine.trim().length();
+                	String  emptyBlankStr ="" ;
+                	if(padding_empty_length > 0) {
+                		emptyBlankStr = getEmptyString(padding_empty_length);
+             
+                	}
+                	String calculAppendStr = matchSpeedEntry.calculAppendStr();
+            		outResultList.add(oneLine+emptyBlankStr+" , "+calculAppendStr);
+	
+                }
                 
                 		
                 System.out.println("════════════" + "输出文件 Begin " + "════════════");
@@ -775,12 +852,36 @@ public class I9_TextRuleOperation {
         }
 
         // 10-29 12:09:53.612  1874  2665 I DataStallMonitor: TcpDataFromSnmp:328,385,40,4
-        // 计算重传率:          
+        // 计算重传率:   
+        
+        String calculMatchIntStr(String[] strArr , String preHeadStr) {
+        	String mResult = null;
+        	
+        	if(strArr == null) {
+        		return mResult;
+        	}
+        	
+        	
+        	for (int i = 0; i < strArr.length; i++) {
+        		String itemStr = strArr[i].trim();
+        		
+        		if(itemStr.startsWith(preHeadStr)) {
+        			itemStr = itemStr.replace(preHeadStr, "");
+        			return itemStr;
+        			
+        		}
+				
+			}
+        	
+        	
+        	return mResult;
+        	
+        }
       
         
         @Override
         String simpleDesc() {
-            return " 对于出现  mtk_cfg80211_get_station: (REQ INFO) link speed=2865/2294 TxFail=0, TxTimeOut=0, TxOK=83024, RxOK=123222, FcsErr=0 的 LOG 计算速率";
+            return " 对于出现  mtk_cfg80211_get_station: (REQ INFO) link speed=2865/2294 【上行链速/下行链速__(单位100kbit/s) 0.1Mbit/s】 TxFail=0(传输失败包个数), TxTimeOut=0(传输超时包个数), TxOK=83024(传输成功包个数), RxOK=123222(传输成功包个数), FcsErr=0(校验失败包个数) 的 LOG 计算速率";
         }
 
         // 3. 如果当前 执行 错误 checkParams 返回 false 那么 将 打印这个函数 说明错误的可能原因
@@ -812,6 +913,244 @@ public class I9_TextRuleOperation {
     	
     }
     
+   
+   SimpleDateFormat speed_sdf = new SimpleDateFormat("HH:mm:ss.SSS");
+   DecimalFormat two_point_df = new DecimalFormat("#0.00");
+   DecimalFormat one_point_df = new DecimalFormat("#0.0");
+
+   // line[59_60]_mTimeStr[07:10:02.562]  mTxFailStr[0]  mTxTimeOutStr[0]  mTxOKStr[911003]  mRxOKStr[1294889]  mFcsErrStr[0]
+   class MTK_Speed_Entry_Value{
+	   
+	   int mCurMatchLine = -1 ; 
+	   MTK_Speed_Entry_Value  mPreSpeedEntry = null ; 	  
+	   String  mTimeStr ;  
+	   String  mTxFailStr ;
+	   String  mTxTimeOutStr ;
+	   String  mTxOKStr ;
+	   String  mRxOKStr ;
+	   String  mFcsErrStr;
+	   
+	   Date  mTimeDate ;  
+	   int  mTxFailInt ;
+	   int  mTxTimeOutInt ;
+	   int  mTxOKInt ;
+	   int  mRxOKInt ;
+	   int  mFcsErrInt;
+	   
+	   
+	   
+	  public String  calculAppendStr(  ){
+		  one_point_df.setRoundingMode(java.math.RoundingMode.DOWN);
+		  StringBuilder mResultSB = new StringBuilder();
+		  if(mPreSpeedEntry == null) {
+			  return mResultSB.toString();
+		  }
+		  
+		  int mTxFailDiff = mTxFailInt - mPreSpeedEntry.mTxFailInt;
+		  int mTxTimeOutDiff = mTxTimeOutInt - mPreSpeedEntry.mTxTimeOutInt;
+		  int mTxOKDiff = mTxOKInt - mPreSpeedEntry.mTxOKInt;
+		  int mRxOKDiff = mRxOKInt - mPreSpeedEntry.mRxOKInt;
+
+		  int mFcsErrDiff = mFcsErrInt - mPreSpeedEntry.mFcsErrInt;
+
+//		  AvaSpeed: 43.2p/s TimeDiff=6.32s TxFail-UP=32  TxTimeOut-UP=0 TxOK-UP=0 RxOK_UP=0 FcsErr_UP=0
+//		  mResultSB.append(" FcsErr_UP="+mFcsErrDiff+" , TimeDiff=XXs "+" , TxOK-UP="+mTxOKDiff+" , AvaTxSpeed=43.2p/s , RxOK_UP="+mRxOKDiff+" , AvaTxSpeed=43.2p/s ");
+
+		  long mTimeDiffMillSecond = 0 ;
+		  double  mAvaTxSpeed = 0 ;
+		  double  mAvaRxSpeed = 0 ;
+		  String mTimeDiffSecondStr = "" ;
+		  
+		  String mTxOKUpStr = "" ;
+		  
+		  String mTxAvaSpeedStr = "" ;
+		  
+		
+		  String mRxOKUpStr = "" ;
+
+		  String mRxAvaSpeedStr = "" ;
+		  
+		  if(mTimeDate != null && mPreSpeedEntry.mTimeDate != null ) {
+			  
+			  
+			  
+//			  mTimeDiffMillSecond =   TimeUnit.MILLISECONDS.toSeconds(mTimeDate.getTime() - mPreSpeedEntry.mTimeDate.getTime());
+
+			  mTimeDiffMillSecond =  mTimeDate.getTime() - mPreSpeedEntry.mTimeDate.getTime();
+
+			  
+			  mAvaTxSpeed =  ((double)mTxOKDiff/ mTimeDiffMillSecond ) * 1000;
+	
+			  mAvaRxSpeed =  ((double)mRxOKDiff/ mTimeDiffMillSecond ) * 1000;
+
+			  mTimeDiffSecondStr = two_point_df.format((double)mTimeDiffMillSecond/1000)+"s";
+			  
+			  if(mTimeDiffMillSecond < 10000) {
+				  mTimeDiffSecondStr = " "+mTimeDiffSecondStr;
+			  }
+			  
+			  if(mTxOKDiff < 10) {
+				  mTxOKUpStr = "   "+mTxOKDiff;
+				  
+			  } else if(mTxOKDiff < 100) {
+				  mTxOKUpStr = "  "+mTxOKDiff;
+				  
+			  }else if(mTxOKDiff < 1000) {
+				  mTxOKUpStr = " "+mTxOKDiff;
+				  
+			  }else {
+				  mTxOKUpStr = ""+mTxOKDiff;  
+			  }
+			  
+	
+			  
+			  mTxAvaSpeedStr = one_point_df.format(mAvaTxSpeed)+"p/s";
+			  if(mAvaTxSpeed < 10d) {
+				  mTxAvaSpeedStr = "   "+mTxAvaSpeedStr;
+				  
+			  } else if(mAvaTxSpeed < 100d) {
+				  mTxAvaSpeedStr = "  "+mTxAvaSpeedStr;
+				  
+			  }else if(mAvaTxSpeed < 1000d) {
+				  mTxAvaSpeedStr = " "+mTxAvaSpeedStr;
+				  
+			  }else {
+				  mTxAvaSpeedStr = ""+mTxAvaSpeedStr;  
+			  }
+			  
+			  
+			  
+			  
+			  if(mRxOKDiff < 10) {
+				  mRxOKUpStr = "   "+mRxOKDiff;
+				  
+			  } else if(mRxOKDiff < 100) {
+				  mRxOKUpStr = "  "+mRxOKDiff;
+				  
+			  }else if(mRxOKDiff < 1000) {
+				  mRxOKUpStr = " "+mRxOKDiff;
+				  
+			  }else {
+				  mRxOKUpStr = ""+mRxOKDiff;  
+			  }
+			  
+			  
+			  
+			  
+			  mRxAvaSpeedStr = one_point_df.format(mAvaRxSpeed)+"p/s";
+			  if(mAvaRxSpeed < 10d) {
+				  mRxAvaSpeedStr = "   "+mRxAvaSpeedStr;
+				  
+			  } else if(mAvaRxSpeed < 100d) {
+				  mRxAvaSpeedStr = "  "+mRxAvaSpeedStr;
+				  
+			  }else if(mAvaRxSpeed < 1000d) {
+				  mRxAvaSpeedStr = " "+mRxAvaSpeedStr;
+				  
+			  }else {
+				  mRxAvaSpeedStr = ""+mRxAvaSpeedStr;  
+			  }
+			  
+			  
+			   
+		  }
+		  
+		
+		  
+		 
+	
+		  // 9041_ms     9.04s
+		  
+		  if(mTimeDate == null ||  mPreSpeedEntry == null 
+				  ||  mPreSpeedEntry.mTimeDate == null
+				  ||  mTimeDiffMillSecond > 100000) {  // 大于 50 秒 不统计
+			  return "";
+		  }
+//		  mResultSB.append(" TimeDiff="+mTimeDiffMillSecond+"_ms"+" mTimeDate="+speed_sdf.format(mTimeDate)+" ,  preTimeDate="+speed_sdf.format(mPreSpeedEntry.mTimeDate) +" , TxOK_up="+mTxOKDiff+" , AvaTxSpeed=43.2p/s , RxOK_up="+mRxOKDiff+" , AvaTxSpeed=43.2p/s ");
+		  mResultSB.append(" TimeDiff="+mTimeDiffSecondStr+" , TxOK_up="+mTxOKUpStr+" , mAvaTxSpeed="+mTxAvaSpeedStr+" , RxOK_up="+mRxOKUpStr+" , AvaRxSpeed="+mRxAvaSpeedStr +" ");
+
+		  
+		  return mResultSB.toString();
+	   }
+	   
+	   
+	  public void setPreSpeedEntry(MTK_Speed_Entry_Value objX){
+		   mPreSpeedEntry =  objX; 
+	   }
+	   
+	   MTK_Speed_Entry_Value(int xMatchLine  , String  xTimeStr ,   String  xTxFailStr  ,  String  xTxTimeOutStr , 
+			   String  xTxOKStr ,   String  xRxOKStr ,   String  xFcsErrStr  ){
+		   
+		   mCurMatchLine  = xMatchLine;
+//		   mPreMatchLine =   xPreMatchLine;
+		   // 07:10:02.562
+		   
+		   mTimeStr = xTimeStr;
+		   mTxFailStr = xTxFailStr;
+		   mTxTimeOutStr = xTxTimeOutStr;
+		   mTxOKStr = xTxOKStr;
+		   mRxOKStr = xRxOKStr;
+		   mFcsErrStr = xFcsErrStr;
+		   
+		   try {
+			   if(mTimeStr != null && mTimeStr.contains(".")){
+					mTimeDate = speed_sdf.parse(mTimeStr);
+			   }
+		
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		   
+		   
+		   if(isNumeric(mTxFailStr)) {
+			   mTxFailInt = Integer.parseInt(mTxFailStr);
+		   }
+		   
+		   if(isNumeric(mTxTimeOutStr)) {
+			   mTxTimeOutInt = Integer.parseInt(mTxTimeOutStr);
+		   }
+		   
+		   if(isNumeric(mTxOKStr)) {
+			   mTxOKInt = Integer.parseInt(mTxOKStr);
+		   }
+		   
+		   
+		   if(isNumeric(mRxOKStr)) {
+			   mRxOKInt = Integer.parseInt(mRxOKStr);
+		   }
+		   
+		   if(isNumeric(mFcsErrStr)) {
+			   mFcsErrInt = Integer.parseInt(mFcsErrStr);
+		   }
+		   
+		   
+		   
+		   
+		   
+		   
+	   }
+	   
+
+		public String SimpleDesc() {
+			return "MTK_Speed_Entry [mCurMatchLine=" + mCurMatchLine 
+					+ ", mTimeStr=" + mTimeStr + ", mTxFailStr=" + mTxFailStr + ", mTxTimeOutStr=" + mTxTimeOutStr
+					+ ", mTxOKStr=" + mTxOKStr + ", mRxOKStr=" + mRxOKStr + ", mFcsErrStr=" + mFcsErrStr + ", mTimeDate="
+					+ mTimeDate  + ", mTxFailInt=" + mTxFailInt + ", mTxTimeOutInt=" + mTxTimeOutInt + ", mTxOKInt="
+					+ mTxOKInt + ", mRxOKInt=" + mRxOKInt + ", mFcsErrInt=" + mFcsErrInt +" ]";
+		}
+		
+
+	@Override
+	public String toString() {
+		return "MTK_Speed_Entry [mCurMatchLine=" + mCurMatchLine 
+				+ ", mTimeStr=" + mTimeStr + ", mTxFailStr=" + mTxFailStr + ", mTxTimeOutStr=" + mTxTimeOutStr
+				+ ", mTxOKStr=" + mTxOKStr + ", mRxOKStr=" + mRxOKStr + ", mFcsErrStr=" + mFcsErrStr + ", mTimeDate="
+				+ mTimeDate + ", mTxFailInt=" + mTxFailInt + ", mTxTimeOutInt=" + mTxTimeOutInt + ", mTxOKInt="
+				+ mTxOKInt + ", mRxOKInt=" + mRxOKInt + ", mFcsErrInt=" + mFcsErrInt +  " , mPreSpeedEntry=【" + (mPreSpeedEntry == null ? "null":mPreSpeedEntry.SimpleDesc()) +"】]";
+	}
+	   
+   }
    
     
     class DataStallMonitor_TcpDataFromSnmp_CalCul_ReTransRate_Rule_65 extends Basic_Rule {
