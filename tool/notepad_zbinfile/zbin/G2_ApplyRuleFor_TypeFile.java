@@ -465,8 +465,604 @@ public class G2_ApplyRuleFor_TypeFile {
         // 往 当前目录的 jpg  draw 画当前的 text 当前名字
         realTypeRuleList.add(new Draw_FileNameText_To_JPG_Top_Rule_70());
 
+        
+        // 统计当前输入文件夹 文件大小 占用情况   并输出到指定的文件夹 可以是 README.md
+        realTypeRuleList.add(new CalCul_DirFile_SizeSpace_Rule_71());
+
+        
+        
+     
     }
     
+    
+    class CalCul_DirFile_SizeSpace_Rule_71 extends Basic_Rule {
+        boolean isDirInput; //   是否有指定的 目录进行输入
+        ArrayList<File> inputDirFileList;   // 输入的目录的集合
+        
+        boolean isNeedOutFile ; // 是否 需要输出 文件 
+        String outFileName ;  //  输出的文件名称
+        String outDirPath ;   //  输出的文件的目录
+        File outResultFile ; 
+        ArrayList<String>  outResultTipList  ;  // 输出文件的内容
+        CalCul_DirFile_SizeSpace_Rule_71() {
+            super("#", 71, 5); //
+            inputDirFileList = new ArrayList<File>();
+            isDirInput = false;
+            outFileName = "README.md";
+            outResultFile = null ;
+            outResultTipList =  new ArrayList<String>();
+        }
+
+        @Override
+        boolean allowEmptyDirFileList() {
+            // TODO Auto-generated method stub
+            return true;
+        }
+
+
+        @Override
+        String simpleDesc() {
+            return "  \n"
+                    + Cur_Bat_Name  + " #_"+rule_index+"    ### 统计当前输入文件夹 文件大小 占用情况   并输出到指定的文件夹 可以是 README.md \n"
+                    + Cur_Bat_Name  + " #_"+rule_index+"    ### 统 无参数 默认只打印 当前目录 的文件占用情况 \n"
+                    + Cur_Bat_Name  + " #_"+rule_index+"  outname_README.md   outdir_D:\\\\ScreenShot\\\\0    D:\\ScreenShot\\0A ###  输入指定文件夹  outname_指定输出文件名称  outdir_指定输出文案目录 默认打印当前目录 \n"
+                    + Cur_Bat_Name  + " #_"+rule_index+"  outname_README.md   outdir_D:\\Git_Dir\\mp4_lin_action  ###  在GIT根目录执行 选中需要解析的目录 可以把文件夹内容更新到 README.md \n"
+
+                    
+                    ;
+        }
+
+        @Override
+        boolean initParamsWithInputList(ArrayList<String> inputParamList) {
+            // mdname_true // kaoyan_true gaokao_true
+
+            for (int i = 0; i < inputParamList.size(); i++) {
+                String paramItem_trim = inputParamList.get(i);
+
+                File input_dir_file = new File(paramItem_trim);
+
+                if(input_dir_file.exists() && input_dir_file.isDirectory()) {
+
+                    inputDirFileList.add(input_dir_file);
+                }
+
+
+                if(paramItem_trim.toLowerCase().trim().startsWith("outdir_")) {
+
+                    String outDirPathInput = paramItem_trim.replace("outdir_", "");
+
+                    File outDirFile = new File(outDirPathInput);
+                    
+                    System.out.println("outdir_ 原始输入: paramItem_trim["+ paramItem_trim+"] outDirPath["+outDirPath+"]" +"outDirFile.exists()["+outDirFile.exists()+"]");
+
+                    
+                    if(outDirFile.exists() && outDirFile.isDirectory()) {
+                    	outDirPath = outDirFile.getAbsolutePath();
+
+                        isNeedOutFile = true;
+                        System.out.println("选中 outDirPath = "+ outDirPathInput);
+                    }
+
+                }
+
+                
+                if(paramItem_trim.toLowerCase().trim().startsWith("outname_")) {
+
+                    String outName = paramItem_trim.replace("outname_", "");
+
+                    outFileName = outName;
+                    isNeedOutFile = true;
+
+                }
+                
+
+
+            }
+
+
+            if(outDirPath == null && outFileName == null) {
+                System.out.println("当前 没有指定输出文件夹路径 outDirPath="+outDirPath+"  没有指定输出文件名称  outFileName="+ outFileName+" 使用默认路径: curDirPath="+curDirPath+" 默认文件名称:  rule_"+ rule_index+"_filesummary.txt" );
+
+                outFileName =  "rule_"+rule_index+"_filesummary.txt";
+                outDirPath = curDirPath;
+         
+            } else if(outDirPath != null && outFileName == null)  {
+
+                System.out.println("当前指定的"+outFileName+" 文件输出目录:"+ outDirPath +" 默认文件名称:  rule_"+ rule_index+"_filesummary.txt" );
+         
+                outFileName =  "rule_"+rule_index+"_filesummary.txt";
+
+            }else if(outDirPath == null && outFileName != null)  {
+
+                System.out.println("当前 没有指定输出文件夹路径 outDirPath="+outDirPath+"  有指定输出文件名称  outFileName="+ outFileName+" 使用默认路径: curDirPath="+curDirPath );
+         
+                outDirPath = curDirPath;
+
+            }
+            System.out.println("outDirPath = "+ outDirPath);
+            System.out.println("outFileName = "+ outFileName);
+            
+
+
+            outResultFile = new File(outDirPath+File.separator+outFileName);
+
+            System.out.println("是否输出文件标识: isNeedOutFile="+isNeedOutFile+"  输出out文件路径: "+ outResultFile.getAbsolutePath() );
+
+          
+
+            if(inputDirFileList.size() != 0) {
+                isDirInput = true;
+
+                for (int i = 0; i < inputDirFileList.size(); i++) {
+                    File dirFile = inputDirFileList.get(i);
+                
+                        System.out.println("SearchDir统计文件夹列表["+i+"]["+inputDirFileList.size()+"] = "+  dirFile.getAbsolutePath());
+
+                   
+                }
+            } else {
+
+                System.out.println("当前没有 指定输入文件夹! 将把Shell目录 "+curDirPath+" 作为输入参数 统计文件情况  输出Flag: isNeedOutFile="+isNeedOutFile );
+            }
+
+            // TODO Auto-generated method stub
+            return super.initParamsWithInputList(inputParamList);
+        }
+
+
+
+        void filesummary_operation(ArrayList<File> inputDirFileList) {
+
+
+            for (int i = 0; i < inputDirFileList.size(); i++) {
+                File inputDirFile = inputDirFileList.get(i);
+                
+                
+                
+                 ArrayList<String> summaryTipList = new ArrayList<String>();
+            	 ArrayList<String> dirFileTipList = new ArrayList<String>();
+            	 ArrayList<String> realFileTipList = new ArrayList<String>();
+                 ArrayList<String> fileTypeTipList = new ArrayList<String>();
+            	 HashMap<File,Long> dirFileSizeMap = new HashMap<File,Long> ();
+            	
+            	
+            	 
+            	Set<File> allDirFileSet = new HashSet<>(); // 工程下所有的 文件夹文件
+            	Set<File> allSimpleFileSet = new HashSet<>();
+            	// 文件 类型 对应的 文件集合
+            	HashMap<String, ArrayList<File>> arrFileMap = new HashMap<String, ArrayList<File>>();
+
+            	 
+            	 
+                 ArrayList<File> allSubDir = 	getAllSubDirFile(inputDirFile);
+
+         		
+         		ArrayList<File> allDirFileArr = new ArrayList<File>();
+        		
+        		allDirFileArr.addAll(allSubDir);
+         	
+         		
+        		long allDirFileSize = 0 ; // 当前所有目录 所有文件的大小
+        		
+        		
+        		for (int j = 0; j < allDirFileArr.size(); j++) {
+        			
+        		File dirFile = allSubDir.get(j);
+        		if(dirFile.isFile()) {
+        			continue;
+        		}
+        		long dirLength = getDirectorySizeByte(dirFile);
+        			
+        		dirFileSizeMap.put(dirFile, dirLength);
+        		
+        		allDirFileSize += dirLength;
+        			
+        		}
+        		
+        		allDirFileArr.sort(new Comparator<File>() {
+        			@Override
+        			public int compare(File o1, File o2) {
+        				// TODO Auto-generated method stub
+        				Long o1_length = dirFileSizeMap.get(o1);
+        				Long o2_length = dirFileSizeMap.get(o2);
+        				if(o1_length > o2_length) {
+        					
+        					return -1;
+        				}
+        				if(o1_length < o2_length) {
+        					
+        					return 1;
+        				}
+        				return 0;
+        			}
+        		});
+        		
+
+//        		System.out.println("AllSize_"+"[ "+get15FixedType(""+(getPaddingString(getFileSizeGBString(allDirFileSize), 8, " ", true))).trim()+" ]"+" [ "+get15FixedType(""+(getPaddingString(getFileSizeMBString(allDirFileSize), 8, " ", true))).trim()+" ]");
+
+//        		System.out.println("文件夹总数:"+ dirFileSizeMap.size() );
+//        		System.out.println("文件总数:" );
+
+        		summaryTipList.add("AllSize_"+"[ "+get15FixedType(""+(getPaddingString(getFileSizeGBString(allDirFileSize), 8, " ", true))).trim()+" ]"+" [ "+get15FixedType(""+(getPaddingString(getFileSizeMBString(allDirFileSize), 8, " ", true))).trim()+" ]");
+        		summaryTipList.add("目录文件总数:["+ getPaddingIntString(dirFileSizeMap.size(),6," ",true)+"   ]");
+
+        		int fileDirIndex = 1;
+        		for (File dirFile : allDirFileArr) {
+//        			System.out.println("Dir[ " + allDirFileArr.size()+"_" +getPaddingIntString(fileDirIndex,5," ",false) + "]"+ "   " +"Size["+ get15FixedType(""+(getPaddingString(getFileSizeMBString(dirFileSizeMap.get(dirFile)), 9, " ", true)))+"]"+"    " + dirFile.getAbsolutePath());
+        		
+        			dirFileTipList.add("Dir[ " + allDirFileArr.size()+"_" +getPaddingIntString(fileDirIndex,5," ",false) + "]"+ "   " +"Size["+ get15FixedType(""+(getPaddingString(getFileSizeMBString(dirFileSizeMap.get(dirFile)), 9, " ", true)))+"]"+"    " + dirFile.getAbsolutePath());
+        		
+        			fileDirIndex++;
+        		}
+        		
+        		
+        		for (File dirFile : allDirFileArr) {  //  获取到 所有实体文件
+        			File[] childFileList = dirFile.listFiles();
+        		if (childFileList != null && childFileList.length > 0) {
+        			for (int x = 0; x < childFileList.length; x++) {
+        				if (!childFileList[x].isDirectory()) {
+        					allSimpleFileSet.add(childFileList[x]);
+        				}
+        			}
+
+        		   }
+        		}
+        		
+        		
+        		//----------- 获取到 所有实体文件的 类型 Begin -----------
+        		int mFileTypeindex = 1;
+        		System.out.println();
+        		System.out.println();
+        		int allFileCount = allSimpleFileSet.size();
+        		
+        		ArrayList<File> allFileArray = new ArrayList<File> ();
+        		allFileArray.addAll(allSimpleFileSet);
+        		
+        		allFileArray.sort(fileSizeCompara);
+        	
+        		for (File curFile : allFileArray) {
+        			String fileName = curFile.getName();
+//        			System.out.println("文件索引[ " + allFileCount+"_"+getPaddingIntString(index,6," ",false) + "]"+" Size[ " +getPaddingString(getFileSizeMBString(curFile.length()),9," ",true)+" ]"+"  路径: " + curFile.getAbsolutePath() );
+        			realFileTipList.add("文件索引[ " + allFileCount+"_"+getPaddingIntString(mFileTypeindex,6," ",false) + "]"+" Size[ " +getPaddingString(getFileSizeMBString(curFile.length()),9," ",true)+" ]"+"  路径: " + curFile.getAbsolutePath() );
+        		
+        			if (!fileName.contains(".")) {
+        				addFileMapItemWithKey("unknow", curFile,arrFileMap);
+        				
+        			} else {
+        				String suffix = fileName.substring(fileName.lastIndexOf(".")).trim().toLowerCase();
+        				addFileMapItemWithKey(suffix, curFile,arrFileMap);
+        			}
+        			mFileTypeindex++;
+
+        		}
+        		//----------- 获取到 所有实体文件的 类型 End -----------
+
+ 
+        		
+        		//----------- 遍历所有文件 Begin  -----------
+
+        		int fileSumIndex = 0;
+        		System.out.println();
+        		System.out.println();
+        		Map.Entry<String, ArrayList<File>> entry;
+        		if (arrFileMap != null) {
+        			Iterator iterator = arrFileMap.entrySet().iterator();
+        			while (iterator.hasNext()) {
+        				entry = (Map.Entry<String, ArrayList<File>>) iterator.next();
+        				String typeStr = entry.getKey(); // Map的Value
+        				ArrayList<File> fileArr = entry.getValue(); // Map的Value
+        				
+        			    long mSameTypeFileSize = 0 ;
+        			    if(fileArr != null && fileArr.size() > 0 ) {
+        			    	
+        			    	for (int k = 0; k < fileArr.size(); k++) {
+        			    		mSameTypeFileSize  +=  ( fileArr.get(k) == null ? 0 : fileArr.get(k).length());
+        					}
+        			    }
+        				int curFileSize = fileArr.size();
+        				fileSumIndex = fileSumIndex + curFileSize;
+        				// System.out.println("文件类型:" + get15FixedType(typeStr) + " 匹配文件个数:" +
+        				// fileArr.size());
+        				
+        				fileTypeTipList.add("文件类型:" + get15FixedType(typeStr) + "  匹配文件个数:" + get15FixedType(""+curFileSize) +"类型文件大小:"+get15FixedType(""+(getPaddingString(getFileSizeMBString(mSameTypeFileSize), 9, " ", true)))+typeStr);
+        			
+        			
+        			}
+        		}
+        		fileTypeTipList.sort(strCompara);
+//        		for (String infoItem : fileTypeTipList) {
+//        			System.out.println(infoItem);
+//        		}
+//        		System.out.println("文件夹总数:" + allSimpleFileSet.size() +"           匹配文件类型总数:"+fileTypeTipList.size());
+//        		System.out.println("文件总数:" + fileSum);
+        		summaryTipList.add("实体文件总数:[" + getPaddingIntString(fileSumIndex,6," ",true)+"   ]");
+        		
+        		
+        		summaryTipList.add("文件类型总数:["+getPaddingIntString(fileTypeTipList.size(),6," ",true)+"   ]"  );
+        		summaryTipList.add("当前路径: "+inputDirFile.getAbsoluteFile());
+        		//----------- 遍历所有文件 End  -----------
+
+        		
+        		//----------- 打印 所有文件  End  -----------
+        		
+        		
+        		ArrayList<String> allPrintInfo = new 	ArrayList<String>();
+        		
+        		
+        		for (String infoItem : summaryTipList) {
+        			System.out.println(infoItem);
+        			allPrintInfo.add(infoItem);
+        		}
+        		
+        		System.out.println();
+        		System.out.println();
+        		allPrintInfo.add("\n");
+          		allPrintInfo.add("\n");
+        		for (String infoItem : dirFileTipList) {
+        			System.out.println(infoItem);
+        			allPrintInfo.add(infoItem);
+        		}
+        		
+        		System.out.println();
+        		System.out.println();
+        		allPrintInfo.add("\n");
+          		allPrintInfo.add("\n");
+        		
+        		for (String infoItem : realFileTipList ) {
+        			System.out.println(infoItem);
+         			allPrintInfo.add(infoItem);
+        		}
+        		
+        		System.out.println();
+        		System.out.println();
+        		allPrintInfo.add("\n");
+          		allPrintInfo.add("\n");
+          		
+        		for (String infoItem : fileTypeTipList) {
+        		System.out.println(infoItem);
+      			allPrintInfo.add(infoItem);
+        	    }
+
+        		System.out.println();
+        		allPrintInfo.add("\n");
+        		
+        		for (String infoItem : summaryTipList) {
+        			System.out.println(infoItem);
+          			allPrintInfo.add(infoItem);
+        		}
+        		
+           		allPrintInfo.add("\n");
+           		allPrintInfo.add("\n");
+           		allPrintInfo.add("\n");
+        		
+        		
+        		//----------- 打印 所有文件 Begin   -----------
+        		
+       
+
+           		if(isNeedOutFile ) {
+           			
+           			outResultTipList.addAll(allPrintInfo);
+           		}
+
+          
+
+            }
+
+            System.out.println();
+            
+            if(isNeedOutFile && outResultFile != null) {
+            	System.out.println("输出当前目录详情到 out文件 : "+ outResultFile.getAbsolutePath());
+            	
+            	writeContentToFile(outResultFile, outResultTipList);
+            	
+            } else {
+            	
+            	System.out.println("当前 无输出文件!  无输出 outname_  outdir_参数 仅打印 目录情况!");
+
+            }
+            
+            System.out.println("________程序结束___________");
+
+            
+        }
+
+        
+        void addFileMapItemWithKey(String keyType, File curFile , HashMap<String, ArrayList<File>> arrFileMap) {
+    		if (arrFileMap.containsKey(keyType)) {
+    			ArrayList<File> fileList = arrFileMap.get(keyType);
+    			fileList.add(curFile);
+    		} else {
+    			ArrayList<File> fileList = new ArrayList<File>();
+    			fileList.add(curFile);
+    			arrFileMap.put(keyType, fileList);
+    		}
+    	}
+        
+        
+    
+        @Override
+        ArrayList<File> applyDir_SubFileListRule5(ArrayList<File> allSubDirFileList,
+                                                  ArrayList<File> allSubRealFileList) {
+
+
+
+            if(isDirInput) {   // 对输入的 目录 进行统计
+
+                filesummary_operation(inputDirFileList);
+
+            } else {  //  对自身Shell 路径进行统计
+
+                System.out.println("当前没有 指定遍历的目录 对当前shell路径进行遍历:"+ curDirPath);
+
+                ArrayList<File> searchDirFileList = new ArrayList<File> ();
+
+                searchDirFileList.add(new File(curDirPath));
+
+                filesummary_operation(searchDirFileList);
+                System.out.println("当前没有 指定遍历的目录 对当前shell路径进行遍历:"+ curDirPath);
+
+            }
+
+
+
+            return super.applyDir_SubFileListRule5(allSubDirFileList, allSubRealFileList);
+        }
+
+
+        String getRelativeSubDirName(String subDirAbsPath , String rootDirAbsPath) {
+            String relative_name = subDirAbsPath.replace(rootDirAbsPath, "");
+
+            return relative_name;
+        }
+
+    
+
+    }
+    
+    
+	public static Comparator strCompara = new Comparator<String>() {
+		@Override
+		public int compare(String o1, String o2) {
+			return o1.compareTo(o2);
+		}
+	};
+    
+	public static Comparator fileSizeCompara = new Comparator<File>() {
+		@Override
+		public int compare(File o1, File o2) {
+			if(o1.length() > o2.length()) {
+				return -1;
+			}
+			
+			if(o1.length() == o2.length()) {
+			  return 0 ; 	
+			 }
+			
+			return 1;
+			
+		}
+	};
+    
+	static String get15FixedType(String type) {
+		// type 最长保留10位
+		String fixedType = "";
+		int curLength = type.length();
+		if (curLength < 15) {
+			int blankIndex = 15 - curLength;
+			for (int i = 0; i < blankIndex; i++) {
+				fixedType = " " + fixedType;
+			}
+
+		}
+
+		return type + fixedType;
+	}
+
+
+	static String getPaddingString(String rawStr, int padinglength, String oneStr, boolean dirPre) {
+		String result = "" + rawStr;
+		int length = ("" + rawStr).length();
+
+		if (length < padinglength) {
+			int distance = padinglength - length;
+			for (int i = 0; i < distance; i++) {
+				if (dirPre) {
+					result = oneStr + result;
+				} else {
+					result = result + oneStr;
+				}
+
+			}
+
+		}
+		return result;
+
+	}
+	
+	
+
+	
+    public static String getFileSizeGBString(long fileSize) {
+    	double length = 0;
+
+    	length = (double) ((double) fileSize / (1024*1024*1024));
+
+    	String result = decimalFormatOne.format(length)+"GB";
+//    	System.out.println("GGGGGBBBBresult="+result+"   length="+length+"   fileSize="+fileSize);
+
+    	
+        return result;
+    }
+    
+    
+    public static String getFileSizeMBString(long fileSize) {
+    	double length = 0;
+
+    	length = (double) ((double)  fileSize / (1024*1024));
+
+    	String result = decimalFormatOne.format(length)+"MB";
+    	
+//    	System.out.println("result="+result+"   length="+length+"   fileSize="+fileSize);
+    	
+        return result;
+    }
+    
+	
+    public static double getFileSizeMBLong(long fileSize) {
+    	double length = 0;
+
+    	length = (double) ((double) fileSize / (1024*1024));
+
+    	
+    	
+        return (long)length;
+    }
+    
+	static  DecimalFormat decimalFormatOne = new DecimalFormat("#0.0");
+
+    
+    /**
+     * This method gets you the total size in Mb of a given directory
+     *
+     * @param dir Directory
+     * @return Total size in Mb (int)
+     */
+    public static double getDirectorySizeMb(File dir) {
+        double length = 0;
+        File[] files = dir.listFiles();
+        if (files != null) {
+            for (File file : files) {
+                if (file.isFile())
+                    length += (double)file.length() / (1024 * 1024);
+                else
+                    length += getDirectorySizeMb(file);
+            }
+        }
+
+        return length;
+    }
+
+    
+    public static long getDirectorySizeByte(File dir) {
+        long length = 0;
+        File[] files = dir.listFiles();
+        if (files != null) {
+            for (File file : files) {
+                if (file.isFile())
+                    length += file.length() ;
+                else
+                    length += getDirectorySizeMb(file);
+            }
+        }
+
+        return length;
+    }
+    
+    
+    public static double getDirectorySizeMb(String path) {
+        return getDirectorySizeMb(new File(path));
+    }
     
     class Draw_FileNameText_To_JPG_Top_Rule_70 extends Basic_Rule {
     	
