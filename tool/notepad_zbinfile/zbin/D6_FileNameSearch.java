@@ -5,6 +5,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.text.DecimalFormat;
 import java.util.*;
 
 import com.drew.imaging.jpeg.JpegMetadataReader;
@@ -97,6 +98,7 @@ System.out.println("defaultCharSet: "+Charset.defaultCharset());
 			initSimpleFileSetDetail();
 			getFileTypeInfo();
 			showMapSummaryDataStyle2();
+			showAllTip();
 			System.out.println("程序正常结束!");
 			return;
 		}
@@ -660,6 +662,22 @@ System.out.println("defaultCharSet: "+Charset.defaultCharset());
 		}
 	};
 
+	public static Comparator fileSizeCompara = new Comparator<File>() {
+		@Override
+		public int compare(File o1, File o2) {
+			if(o1.length() > o2.length()) {
+				return -1;
+			}
+			
+			if(o1.length() == o2.length()) {
+			  return 0 ; 	
+			 }
+			
+			return 1;
+			
+		}
+	};
+	
 	@SuppressWarnings("unchecked")
 	public static void sortMapData() {
 		Set<String> keySet = arrFileMap.keySet();
@@ -705,6 +723,28 @@ System.out.println("defaultCharSet: "+Charset.defaultCharset());
 		}
 	}
 
+	
+	static String getPaddingString(String rawStr, int padinglength, String oneStr, boolean dirPre) {
+		String result = "" + rawStr;
+		int length = ("" + rawStr).length();
+
+		if (length < padinglength) {
+			int distance = padinglength - length;
+			for (int i = 0; i < distance; i++) {
+				if (dirPre) {
+					result = oneStr + result;
+				} else {
+					result = result + oneStr;
+				}
+
+			}
+
+		}
+		return result;
+
+	}
+	
+	
 	static String getPaddingIntString(int index, int padinglength, String oneStr, boolean dirPre) {
 		String result = "" + index;
 		int length = ("" + index).length();
@@ -815,12 +855,51 @@ System.out.println("defaultCharSet: "+Charset.defaultCharset());
 		return rtnStr;
 	}
 
+	
+	
+	public static void showAllTip() {
+		
+		
+		for (String infoItem : summaryTipList) {
+			System.out.println(infoItem);
+		}
+		
+		System.out.println();
+		System.out.println();
+
+		for (String infoItem : dirFileTipList) {
+			System.out.println(infoItem);
+		}
+		
+		System.out.println();
+		System.out.println();
+
+		
+		for (String infoItem : realFileTipList ) {
+			System.out.println(infoItem);
+		}
+		
+		System.out.println();
+		System.out.println();
+
+		for (String infoItem : fileTypeTipList) {
+		System.out.println(infoItem);
+	    }
+
+		System.out.println();
+		
+		for (String infoItem : summaryTipList) {
+			System.out.println(infoItem);
+		}
+		
+		
+		
+	}
 	@SuppressWarnings("unchecked")
 	public static void showMapSummaryDataStyle2() {
 		int fileSum = 0;
 		System.out.println();
 		System.out.println();
-		ArrayList<String> formatStringList = new ArrayList<String>();
 		Map.Entry<String, ArrayList<File>> entry;
 		if (arrFileMap != null) {
 			Iterator iterator = arrFileMap.entrySet().iterator();
@@ -828,19 +907,36 @@ System.out.println("defaultCharSet: "+Charset.defaultCharset());
 				entry = (Map.Entry<String, ArrayList<File>>) iterator.next();
 				String typeStr = entry.getKey(); // Map的Value
 				ArrayList<File> fileArr = entry.getValue(); // Map的Value
+				
+			    long mSameTypeFileSize = 0 ;
+			    if(fileArr != null && fileArr.size() > 0 ) {
+			    	
+			    	for (int i = 0; i < fileArr.size(); i++) {
+			    		mSameTypeFileSize  +=  ( fileArr.get(i) == null ? 0 : fileArr.get(i).length());
+					}
+			    }
 				int curFileSize = fileArr.size();
 				fileSum = fileSum + curFileSize;
 				// System.out.println("文件类型:" + get15FixedType(typeStr) + " 匹配文件个数:" +
 				// fileArr.size());
-				formatStringList.add("文件类型:" + get15FixedType(typeStr) + "  匹配文件个数:" + curFileSize);
+				
+				fileTypeTipList.add("文件类型:" + get15FixedType(typeStr) + "  匹配文件个数:" + get15FixedType(""+curFileSize) +"类型文件大小:"+get15FixedType(""+(getPaddingString(getFileSizeMBString(mSameTypeFileSize), 9, " ", true)))+typeStr);
+			
+			
 			}
 		}
-		formatStringList.sort(strCompara);
-		for (String infoItem : formatStringList) {
-			System.out.println(infoItem);
-		}
-		System.out.println("文件夹总数:" + allSimpleFileSet.size() +"           匹配文件类型总数:"+formatStringList.size());
-		System.out.println("文件总数:" + fileSum);
+		fileTypeTipList.sort(strCompara);
+//		for (String infoItem : fileTypeTipList) {
+//			System.out.println(infoItem);
+//		}
+//		System.out.println("文件夹总数:" + allSimpleFileSet.size() +"           匹配文件类型总数:"+fileTypeTipList.size());
+//		System.out.println("文件总数:" + fileSum);
+		summaryTipList.add("实体文件总数:[" + getPaddingIntString(fileSum,6," ",true)+"   ]");
+		
+		
+		summaryTipList.add("文件类型总数:["+getPaddingIntString(fileTypeTipList.size(),6," ",true)+"   ]"  );
+
+
 	}
 
 	@SuppressWarnings("unchecked")
@@ -972,9 +1068,18 @@ System.out.println("defaultCharSet: "+Charset.defaultCharset());
 		int index = 1;
 		System.out.println();
 		System.out.println();
-		for (File curFile : allSimpleFileSet) {
+		int allFileCount = allSimpleFileSet.size();
+		
+		ArrayList<File> allFileArray = new ArrayList<File> ();
+		allFileArray.addAll(allSimpleFileSet);
+		
+		allFileArray.sort(fileSizeCompara);
+	
+		for (File curFile : allFileArray) {
 			String fileName = curFile.getName();
-			System.out.println("文件索引[ " + getPaddingIntString(index,6," ",true) + "]"+" Size["+getPaddingIntString((int)curFile.length(),12," ",true)+"]"+"  路径: " + curFile.getAbsolutePath() );
+//			System.out.println("文件索引[ " + allFileCount+"_"+getPaddingIntString(index,6," ",false) + "]"+" Size[ " +getPaddingString(getFileSizeMBString(curFile.length()),9," ",true)+" ]"+"  路径: " + curFile.getAbsolutePath() );
+			realFileTipList.add("文件索引[ " + allFileCount+"_"+getPaddingIntString(index,6," ",false) + "]"+" Size[ " +getPaddingString(getFileSizeMBString(curFile.length()),9," ",true)+" ]"+"  路径: " + curFile.getAbsolutePath() );
+		
 			if (!fileName.contains(".")) {
 				addFileMapItemWithKey("unknow", curFile);
 			} else {
@@ -1002,24 +1107,105 @@ System.out.println("defaultCharSet: "+Charset.defaultCharset());
 			fileIndex++;
 		}
 	}
-
+	
+	
+	// AllSize_[ 12.5GB ] [ 12833.2MB ]
+	static ArrayList<String> summaryTipList = new ArrayList<String>();
+	
+	
+	
+//	Dir[ 111_4    ]   Size[ 1763.9MB      ]    D:\ScreenShot
+//	Dir[ 111_5    ]   Size[ 1729.7MB      ]    D:\ScreenShot\PK\APK
+	static ArrayList<String> dirFileTipList = new ArrayList<String>();
+	
+	
+//	文件索引[ 1213_1     ] Size[  1661.7MB ]  路径: D:\ScreenShot\books-master.zip
+//	文件索引[ 1213_2     ] Size[   299.0MB ]  路径: D:\ScreenShot\1\1.mp4
+	static ArrayList<String> realFileTipList = new ArrayList<String>();
+	
+	
+//	文件类型:.7z              匹配文件个数:1              类型文件大小:    9.5MB      .7z
+//	文件类型:.apk             匹配文件个数:61             类型文件大小: 1734.8MB      .apk
+//	文件类型:.bat             匹配文件个数:3              类型文件大小:    0.0MB      .bat
+	static ArrayList<String> fileTypeTipList = new ArrayList<String>();
+	
+	
+	
+	static public HashMap<File,Long> dirFileSizeMap = new HashMap<File,Long> ();
 	static void initSimpleFileSetDetail() {
-		int fileIndex = 1;
-		System.out.println();
-		System.out.println();
-		for (File dirFile : allDirFileSet) {
-			System.out.println("文件夹索引index=" + fileIndex + "   PATH: " + dirFile.getAbsolutePath());
-			File[] childFileList = dirFile.listFiles();
-			if (childFileList != null && childFileList.length > 0) {
-				for (int i = 0; i < childFileList.length; i++) {
-					if (!childFileList[i].isDirectory()) {
-						allSimpleFileSet.add(childFileList[i]);
-					}
-				}
 
-			}
-			fileIndex++;
+		System.out.println();
+		System.out.println();
+		ArrayList<File> allDirFileArr = new ArrayList<File>();
+		
+		allDirFileArr.addAll(allDirFileSet);
+	
+		long allDirFileSize = 0 ; // 当前所有目录 所有文件的大小
+		
+		
+		for (int i = 0; i < allDirFileArr.size(); i++) {
+			
+		File dirFile = allDirFileArr.get(i);
+		if(dirFile.isFile()) {
+			continue;
 		}
+		long dirLength = getDirectorySizeByte(dirFile);
+			
+		dirFileSizeMap.put(dirFile, dirLength);
+		
+		allDirFileSize += dirLength;
+			
+		}
+		
+	
+		allDirFileArr.sort(new Comparator<File>() {
+			@Override
+			public int compare(File o1, File o2) {
+				// TODO Auto-generated method stub
+				Long o1_length = dirFileSizeMap.get(o1);
+				Long o2_length = dirFileSizeMap.get(o2);
+				if(o1_length > o2_length) {
+					
+					return -1;
+				}
+				if(o1_length < o2_length) {
+					
+					return 1;
+				}
+				return 0;
+			}
+		});
+		int fileDirIndex = 1;
+//		System.out.println("AllSize_"+"[ "+get15FixedType(""+(getPaddingString(getFileSizeGBString(allDirFileSize), 8, " ", true))).trim()+" ]"+" [ "+get15FixedType(""+(getPaddingString(getFileSizeMBString(allDirFileSize), 8, " ", true))).trim()+" ]");
+
+//		System.out.println("文件夹总数:"+ dirFileSizeMap.size() );
+//		System.out.println("文件总数:" );
+
+		summaryTipList.add("AllSize_"+"[ "+get15FixedType(""+(getPaddingString(getFileSizeGBString(allDirFileSize), 8, " ", true))).trim()+" ]"+" [ "+get15FixedType(""+(getPaddingString(getFileSizeMBString(allDirFileSize), 8, " ", true))).trim()+" ]");
+		summaryTipList.add("目录文件总数:["+ getPaddingIntString(dirFileSizeMap.size(),6," ",true)+"   ]");
+
+		
+		
+		for (File dirFile : allDirFileArr) {
+//			System.out.println("Dir[ " + allDirFileArr.size()+"_" +getPaddingIntString(fileDirIndex,5," ",false) + "]"+ "   " +"Size["+ get15FixedType(""+(getPaddingString(getFileSizeMBString(dirFileSizeMap.get(dirFile)), 9, " ", true)))+"]"+"    " + dirFile.getAbsolutePath());
+		
+			dirFileTipList.add("Dir[ " + allDirFileArr.size()+"_" +getPaddingIntString(fileDirIndex,5," ",false) + "]"+ "   " +"Size["+ get15FixedType(""+(getPaddingString(getFileSizeMBString(dirFileSizeMap.get(dirFile)), 9, " ", true)))+"]"+"    " + dirFile.getAbsolutePath());
+		
+			fileDirIndex++;
+		}
+		
+		for (File dirFile : allDirFileSet) {
+			File[] childFileList = dirFile.listFiles();
+		if (childFileList != null && childFileList.length > 0) {
+			for (int i = 0; i < childFileList.length; i++) {
+				if (!childFileList[i].isDirectory()) {
+					allSimpleFileSet.add(childFileList[i]);
+				}
+			}
+
+		   }
+		}
+		
 	}
 
 	static int addAllFileDir(File dirFile) { // 添加所有的 文件夹对象
@@ -1225,6 +1411,7 @@ System.out.println("defaultCharSet: "+Charset.defaultCharset());
 	
 	
 
+
 	static String byteArrToString(byte[] byteArr) {
 		InputStream inputStream = null;
 		byte[] result = byteArr;
@@ -1250,6 +1437,87 @@ System.out.println("defaultCharSet: "+Charset.defaultCharset());
 	}
 	
 	
+    public static String getFileSizeGBString(long fileSize) {
+    	double length = 0;
 
+    	length = (double) ((double) fileSize / (1024*1024*1024));
+
+    	String result = decimalFormatOne.format(length)+"GB";
+//    	System.out.println("GGGGGBBBBresult="+result+"   length="+length+"   fileSize="+fileSize);
+
+    	
+        return result;
+    }
+    
+    
+    public static String getFileSizeMBString(long fileSize) {
+    	double length = 0;
+
+    	length = (double) ((double)  fileSize / (1024*1024));
+
+    	String result = decimalFormatOne.format(length)+"MB";
+    	
+//    	System.out.println("result="+result+"   length="+length+"   fileSize="+fileSize);
+    	
+        return result;
+    }
+    
+	
+    public static double getFileSizeMBLong(long fileSize) {
+    	double length = 0;
+
+    	length = (double) ((double) fileSize / (1024*1024));
+
+    	
+    	
+        return (long)length;
+    }
+    
+	static  DecimalFormat decimalFormatOne = new DecimalFormat("#0.0");
+
+    
+    /**
+     * This method gets you the total size in Mb of a given directory
+     *
+     * @param dir Directory
+     * @return Total size in Mb (int)
+     */
+    public static double getDirectorySizeMb(File dir) {
+        double length = 0;
+        File[] files = dir.listFiles();
+        if (files != null) {
+            for (File file : files) {
+                if (file.isFile())
+                    length += (double)file.length() / (1024 * 1024);
+                else
+                    length += getDirectorySizeMb(file);
+            }
+        }
+
+        return length;
+    }
+
+    
+    public static long getDirectorySizeByte(File dir) {
+        long length = 0;
+        File[] files = dir.listFiles();
+        if (files != null) {
+            for (File file : files) {
+                if (file.isFile())
+                    length += file.length() ;
+                else
+                    length += getDirectorySizeMb(file);
+            }
+        }
+
+        return length;
+    }
+    
+    
+    public static double getDirectorySizeMb(String path) {
+        return getDirectorySizeMb(new File(path));
+    }
+
+    
     
 }
