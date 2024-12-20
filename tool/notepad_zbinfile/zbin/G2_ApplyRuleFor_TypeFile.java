@@ -684,7 +684,7 @@ public class G2_ApplyRuleFor_TypeFile {
 //        		System.out.println("文件总数:" );
 
         		summaryTipList.add("AllSize_"+"[ "+get15FixedType(""+(getPaddingString(getFileSizeGBString(allDirFileSize), 8, " ", true))).trim()+" ]"+" [ "+get15FixedType(""+(getPaddingString(getFileSizeMBString(allDirFileSize), 8, " ", true))).trim()+" ]");
-        		summaryTipList.add("目录文件总数:["+ getPaddingIntString(dirFileSizeMap.size(),6," ",true)+"   ]");
+        		summaryTipList.add("AllDireCount:["+ getPaddingIntString(dirFileSizeMap.size(),6," ",true)+"   ]");
 
         		int fileDirIndex = 1;
         		for (File dirFile : allDirFileArr) {
@@ -723,7 +723,7 @@ public class G2_ApplyRuleFor_TypeFile {
         		for (File curFile : allFileArray) {
         			String fileName = curFile.getName();
 //        			System.out.println("文件索引[ " + allFileCount+"_"+getPaddingIntString(index,6," ",false) + "]"+" Size[ " +getPaddingString(getFileSizeMBString(curFile.length()),9," ",true)+" ]"+"  路径: " + curFile.getAbsolutePath() );
-        			realFileTipList.add("文件索引[ " + allFileCount+"_"+getPaddingIntString(mFileTypeindex,6," ",false) + "]"+" Size[ " +getPaddingString(getFileSizeMBString(curFile.length()),9," ",true)+" ]"+"  路径: " + curFile.getAbsolutePath() );
+        			realFileTipList.add("File[ " + allFileCount+"_"+getPaddingIntString(mFileTypeindex,6," ",false) + "]"+" Size[ " +getPaddingString(getFileSizeMBString(curFile.length()),9," ",true)+" ]"+"  Path: " + curFile.getAbsolutePath() );
         		
         			if (!fileName.contains(".")) {
         				addFileMapItemWithKey("unknow", curFile,arrFileMap);
@@ -764,7 +764,7 @@ public class G2_ApplyRuleFor_TypeFile {
         				// System.out.println("文件类型:" + get15FixedType(typeStr) + " 匹配文件个数:" +
         				// fileArr.size());
         				
-        				fileTypeTipList.add("文件类型:" + get15FixedType(typeStr) + "  匹配文件个数:" + get15FixedType(""+curFileSize) +"类型文件大小:"+get15FixedType(""+(getPaddingString(getFileSizeMBString(mSameTypeFileSize), 9, " ", true)))+typeStr);
+        				fileTypeTipList.add("FileType:" + get15FixedType(typeStr) + "  MatchCount:" + get15FixedType(""+curFileSize) +"TypeSpace:"+get15FixedType(""+(getPaddingString(getFileSizeMBString(mSameTypeFileSize), 9, " ", true)))+typeStr);
         			
         			
         			}
@@ -775,11 +775,11 @@ public class G2_ApplyRuleFor_TypeFile {
 //        		}
 //        		System.out.println("文件夹总数:" + allSimpleFileSet.size() +"           匹配文件类型总数:"+fileTypeTipList.size());
 //        		System.out.println("文件总数:" + fileSum);
-        		summaryTipList.add("实体文件总数:[" + getPaddingIntString(fileSumIndex,6," ",true)+"   ]");
+        		summaryTipList.add("AllFileCount:[" + getPaddingIntString(fileSumIndex,6," ",true)+"   ]");
         		
         		
-        		summaryTipList.add("文件类型总数:["+getPaddingIntString(fileTypeTipList.size(),6," ",true)+"   ]"  );
-        		summaryTipList.add("当前路径: "+inputDirFile.getAbsoluteFile());
+        		summaryTipList.add("AllTypeCount:["+getPaddingIntString(fileTypeTipList.size(),6," ",true)+"   ]"  );
+        		summaryTipList.add("CurPath: "+inputDirFile.getAbsoluteFile());
         		//----------- 遍历所有文件 End  -----------
 
         		
@@ -841,8 +841,10 @@ public class G2_ApplyRuleFor_TypeFile {
        
 
            		if(isNeedOutFile ) {
-           			
+           			outResultTipList.add("```");
            			outResultTipList.addAll(allPrintInfo);
+           			outResultTipList.add("```");
+
            		}
 
           
@@ -29155,6 +29157,8 @@ public class G2_ApplyRuleFor_TypeFile {
         }
         return true;
     }
+    
+    
 
     static void writeContentToFile(File file, ArrayList<String> strList) {
 
