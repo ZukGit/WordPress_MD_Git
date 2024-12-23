@@ -471,9 +471,227 @@ public class G2_ApplyRuleFor_TypeFile {
 
         
         
+        // 在当前 GIT 的根目录执行 用来给 GIT 增加 Git Action 
+        realTypeRuleList.add(new Add_GitAction_To_GitDir_72());
+        
      
     }
     
+
+    
+    
+    //   mdshow_filesize  //按 文件大小 排序 ，
+    //   mdshow_dirtime   //  按照 时间文件夹排序
+
+    class Add_GitAction_To_GitDir_72 extends Basic_Rule {
+
+     
+    	int  mMdShowTyle = 0;  // md显示的方式类型  默认是0  按照文件大小
+    	
+    	File curShellPathFile ;   //  当前的 Shell 目录的 File 类
+        Add_GitAction_To_GitDir_72() {
+            super("#", 72, 4); //
+            mMdShowTyle = 0; 
+        }
+
+        @Override
+        boolean allowEmptyDirFileList() {
+            return true;
+        }
+        
+        @Override
+        boolean initParamsWithInputList(ArrayList<String> inputParamList) {
+            // mdname_true // kaoyan_true gaokao_true
+
+//			src_xxxxxx
+//			dst_xxxxx
+
+            for (int i = 0; i < inputParamList.size(); i++) {
+                String paramItem_lower_trim = inputParamList.get(i);
+//				String paramItem_lower_trim = paramItem.toLowerCase().trim();
+
+                if (paramItem_lower_trim.startsWith("mdshow_filesize")) {
+                	mMdShowTyle = 0 ;
+                			
+                }
+
+                
+                if (paramItem_lower_trim.startsWith("mdshow_dirtime")) {
+                	mMdShowTyle = 1 ;
+                			
+                }
+     
+
+            }
+            
+            curShellPathFile = new File(curDirPath) ;
+            
+            System.out.println("mMdShowTyle="+mMdShowTyle+"   curDirPath="+curDirPath +"  curShellPathFile="+curShellPathFile);
+            
+
+            File mREADME_File =  new File(curDirPath+File.separator+"README.md");
+            
+            if(!mREADME_File.exists()) {
+            	
+            	System.out.println("当前目录没有 README.md 可能不是GIT的根目录, 如需要继续执行程序 请执行 【 echo AA > README.md 】  创建本地 README.md 后再执行新增Git Action的规则"+rule_index);
+            	
+            	
+            	return false;
+            }
+            
+
+            
+            
+            // TODO Auto-generated method stub
+            return super.initParamsWithInputList(inputParamList);
+        }
+
+        // 如果当前的需要 提交的 文件中 不包含 json 文件 那么 不提交这次文件 以达到 省空间的 目的
+        // xlsx 每次更新都是全替换 而不是 部分替换 导致 更新文件大小过大
+
+        @Override
+        String simpleDesc() {
+
+            return "\n"
+                    + Cur_Bat_Name + " #_" + rule_index + "  // 【需要在Git Setting目录增加Action的读写权限】 在当前的Git目录中 增加 GitAction 用于统计当前文件详情到 README.md 文件中( 默认文件大小排序)  \n"
+                    + Cur_Bat_Name + "  #_" + rule_index + "mdshow_filesize  ### 【需要在Git Setting目录增加Action的读写权限】 mdshow_filesize 标识按照大小排序 在当前的Git目录中 增加 GitAction 用于统计当前文件详情到 README.md 文件中( 默认文件大小排序)   \n"
+                    + Cur_Bat_Name + "  #_" + rule_index + "mdshow_dirtime  ### mdshow_dirtime 标识按照文件目录以及时间排序 在当前的Git目录中 增加 GitAction 用于统计当前文件详情到 README.md 文件中(按照文件目录以及时间排序)   \n"
+
+                    + ""
+//			zrule_apply_G2.bat  #_46  copyright_show  harddir_true
+                    ;
+        }
+
+        @Override
+        ArrayList<File> applySubFileListRule4(ArrayList<File> curFileList,
+                                              HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList,
+                                              ArrayList<File> curRealFileList) {
+
+        	//1.1  复制 Desktop/zbin 下面的 G2 开头的文件 和 文件夹
+        	//1.2   复制 Desktop/zbin/win_zbin  到当前的 zbin/win_zbin 目录
+        	//    读取 G2_rule72_main.yml  并替换 mp4_lin_action1_2412 为当前根目录
+        	
+        	File mDesktopZbinFile = new File(zbinPath);
+        	
+        	
+        	if(!mDesktopZbinFile.exists()) {
+        		System.out.println("当前不存在 ~/Desktop/zbin 目录 程序失败退出! 请检查!!  mDesktopZbinFile="+mDesktopZbinFile.getAbsolutePath());
+        	
+        		return  null ;
+        	}
+        	
+        	
+        	ArrayList<File> allG2RealFileList = new ArrayList<File> ();
+        	File[] fileArr = mDesktopZbinFile.listFiles();
+        	
+        	
+        	for (int i = 0; i < fileArr.length; i++) {
+				File mFileItem =  fileArr[i];
+				String  fileName_lower = mFileItem.getName().toLowerCase().trim();
+				if(mFileItem.isFile() && fileName_lower.startsWith("g2")) {
+					
+					// 不复制 .class 的文件
+					if(!fileName_lower.endsWith(".class")) {
+						
+						allG2RealFileList.add(mFileItem);
+					}
+			
+					
+				}
+			}
+        	
+        	
+        	for (int i = 0; i < allG2RealFileList.size(); i++) {
+        		File mCopyFileItem = allG2RealFileList.get(i);
+        		String rawFileName = mCopyFileItem.getName();
+        		fileCopy(mCopyFileItem, new File(curShellPathFile.getAbsolutePath()+File.separator+"zbin"+File.separator+rawFileName));
+				
+        		System.out.println("G2_File["+allG2RealFileList.size()+"_"+i+"] "+mCopyFileItem.getAbsolutePath()+" Copy!");
+			}
+        	
+        	
+        	
+        	//1.2   win_zbin 目录的复制 
+        	File mWinZbinFile = new File(zbinPath+File.separator+"win_zbin");
+        	
+        	ArrayList<File> allWinZBinBatRealFileList = new ArrayList<File> ();
+        	File[] winzbinFileArr = mWinZbinFile.listFiles();
+        	
+        	
+        	for (int i = 0; i < winzbinFileArr.length; i++) {
+				File mFileItem =  winzbinFileArr[i];
+				String  fileName_lower = mFileItem.getName().toLowerCase().trim();
+				if(mFileItem.isFile() && fileName_lower.endsWith(".bat")) {
+					allWinZBinBatRealFileList.add(mFileItem);
+					
+				}
+			}
+        	
+        	
+        	for (int i = 0; i < allWinZBinBatRealFileList.size(); i++) {
+        		File mCopyFileItem = allWinZBinBatRealFileList.get(i);
+        		String rawFileName = mCopyFileItem.getName();
+        		fileCopy(mCopyFileItem, new File(curShellPathFile.getAbsolutePath()+File.separator+"zbin"+File.separator+"win_zbin"+File.separator+rawFileName));
+        		System.out.println("WinZbin_File["+allWinZBinBatRealFileList.size()+"_"+i+"] "+mCopyFileItem.getAbsolutePath()+" Copy!");
+
+			}
+        	
+        	// 2. 创建目录  .github\workflows\main.yml
+        	
+        	File G2_main_yml_File = new File(mDesktopZbinFile+File.separator+"G2_rule72_main.yml");
+        	
+        	if(!G2_main_yml_File.exists()) {
+        		
+        		System.out.println("当前 Git Action 的模板  G2_main_yml_File="+G2_main_yml_File+" 不存在 请检查！ 失败退出!");
+        		return null;
+        	}
+        			
+        	
+        	String  mMainYmlContent = ReadFileContent_UTF8(G2_main_yml_File);
+        	
+        	
+        	
+        	mMainYmlContent = mMainYmlContent.replace("mp4_lin_action1_2412", curShellPathFile.getName()) ;
+        	
+        	
+        	
+        	File targetMainYmlFile = new File(curShellPathFile.getAbsolutePath()+File.separator+".github"+File.separator+"workflows"+File.separator+"main.yml");
+        	
+        	writeContentToFile(targetMainYmlFile, mMainYmlContent);
+        	
+        	System.out.println(targetMainYmlFile.getAbsolutePath()+" Git Action 配置文件导入完成! ");
+        	
+        	//  3. 复制 win_zbin/zbatrule_I9_Rule30.bat
+        	
+        	
+        	File batRuleSrcFile = new  File(mDesktopZbinFile.getAbsolutePath()+File.separator+"win_zbin"+File.separator+"zbatrule_I9_Rule30.bat");
+        	
+        	if(!batRuleSrcFile.exists()) {
+        		
+        		System.out.println("当前 Git Action 的模板 zbatrule_I9_Rule30.bat="+ batRuleSrcFile.getAbsolutePath()+" 不存在 ！ 程序执行失败退出!");
+
+        		return null ;
+        	}
+        	
+        	
+        	File batRuleDstFile = new File(curShellPathFile.getAbsolutePath()+File.separator+File.separator+"zbatrule_I9_Rule30.bat");
+        	
+        	
+        	
+        	fileCopy(batRuleSrcFile, batRuleDstFile);
+        	
+        	System.out.println(batRuleDstFile.getAbsolutePath()+" Git Action 的 zbatrule_I9_Rule30.bat 文件复制成功!  ");
+
+        	System.out.println("程序执行结束!  Success! ");
+        	
+            return super.applySubFileListRule4(curFileList, subFileTypeMap, curDirList, curRealFileList);
+
+        }
+
+  
+
+    }
+
     
     class CalCul_DirFile_SizeSpace_Rule_71 extends Basic_Rule {
         boolean isDirInput; //   是否有指定的 目录进行输入
@@ -10715,7 +10933,7 @@ public class G2_ApplyRuleFor_TypeFile {
             return "\n" + Cur_Bat_Name + " #_" + rule_index
                     + "  appname_xxxxxx  productappend_xxxxx    // 如果 当前 shell 目录是app代码根目录 那么在clone一个apk到父文件夹 appname指定显示的apk名称 productappend用于在原有工程名添加后缀使得app相互独立  \n"
                     + Cur_Bat_Name + "  #_" + rule_index
-                    + " appname_z      ### 如果 当前 shell 目录是app代码根目录 那么在clone一个apk到父文件夹 appname指定显示的apk名称为z  productappend用于在原有工程名添加后缀使得app相互独立   \n"
+                    + " appname_z      ### 如果 当前 shell 目录是app代码根目录 那么在clone一个apk到父文件夹 appname指定显示的apk名称为z  productappend用于在原有工程名添加后缀使得app相互独立  复制zapp zmain 代码目录  \n"
                     + ""
 //			zrule_apply_G2.bat  #_53  appname_z  productappend_xxx
                     ;

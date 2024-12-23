@@ -1,0 +1,92 @@
+# This is a basic workflow to help you get started with Actions
+
+name: DirFileSummary_Action
+
+# Controls when the workflow will run
+on:
+  schedule:
+    - cron: ' 0 5 5 * * '
+  # Triggers the workflow on push or pull request events but only for the main branch
+  # push:
+  #  branches: [ main ]
+  # pull_request:
+  #  branches: [ main ]
+
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: windows-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+        env: 
+          git_name: mp4_lin_action1_2412
+
+      # Runs a single command using the runners shell
+      - name: Run FileSummary For mp4_lin_action1_2412
+        run: |
+         echo ___________tree_begin ___________
+         tree
+         echo ___________tree_end___________
+         echo ___________dir_begin___________
+         # Directory: D:\a\mp4_lin_action1_2412\mp4_lin_action1_2412
+         dir
+         echo ___________dir_end___________
+         echo Hello, mp4_lin_action1_2412! 
+         echo ___________java_begin___________
+         java -version
+         java 
+         echo ___________java_end___________
+         echo ___________python_begin___________
+         python --version
+         echo ___________python_end___________
+         echo $git_name
+         dir
+         cmd
+
+         echo zbatrule_I9_Rule30.bat
+         echo ___________PATH_begin___________
+         echo ___________ PATH end___________
+         echo ___________env_begin___________
+         env
+         echo ___________env_end___________
+       
+         echo USERPROFILE__Begin  $USERPROFILE
+         echo ___________cmdA_begin___________
+         dir
+   
+         xcopy /y /c  /e /h /r /s zbin\*.*  C:\Users\runneradmin\Desktop\zbin\
+
+         cmd /K C:\Users\runneradmin\Desktop\zbin\win_zbin\zrule_apply_G2.bat
+
+         echo ___________cmdA_end___________
+
+ 
+          cmd /K C:\Users\runneradmin\Desktop\zbin\win_zbin\zrule_apply_G2.bat  _71  D:\a\mp4_lin_action1_2412\mp4_lin_action1_2412\zapp\   outdir_D:\a\mp4_lin_action1_2412\mp4_lin_action1_2412\  outname_README.md
+           
+          git config --global user.email "ZukGit"
+          git config --global user.name "382581427@qq.com" 
+
+          cmd /K zbatrule_I9_Rule30.bat _33_
+          # git status
+          # git add .
+          # git commit -m "update by mp4_lin_action1_2412 to calculate file_summary json_status"
+          # git push 
+          # git log 
+           
+          cd D:\a\mp4_lin_action1_2412\mp4_lin_action1_2412\
+          dir
+
+      # Runs a set of commands using the runners shell
+      - name: Run a multi-line script
+        run: |
+          echo Add other actions to build,
+          echo test, and deploy your project.
