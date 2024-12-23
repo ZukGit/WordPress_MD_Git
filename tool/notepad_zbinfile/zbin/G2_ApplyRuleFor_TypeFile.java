@@ -590,8 +590,8 @@ public class G2_ApplyRuleFor_TypeFile {
 				String  fileName_lower = mFileItem.getName().toLowerCase().trim();
 				if(mFileItem.isFile() && fileName_lower.startsWith("g2")) {
 					
-					// 不复制 .class 的文件
-					if(!fileName_lower.endsWith(".class")) {
+					// 不复制 .class  .txt 的文件
+					if(!fileName_lower.endsWith(".class") && !fileName_lower.endsWith(".txt")) {
 						
 						allG2RealFileList.add(mFileItem);
 					}
