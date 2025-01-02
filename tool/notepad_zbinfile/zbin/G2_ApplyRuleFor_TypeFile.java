@@ -590,8 +590,8 @@ public class G2_ApplyRuleFor_TypeFile {
 				String  fileName_lower = mFileItem.getName().toLowerCase().trim();
 				if(mFileItem.isFile() && fileName_lower.startsWith("g2")) {
 					
-					// 不复制 .class  .txt 的文件
-					if(!fileName_lower.endsWith(".class") && !fileName_lower.endsWith(".txt")) {
+					// 不复制 .class 的文件
+					if(!fileName_lower.endsWith(".class")) {
 						
 						allG2RealFileList.add(mFileItem);
 					}
@@ -901,14 +901,51 @@ public class G2_ApplyRuleFor_TypeFile {
 //        		System.out.println("文件夹总数:"+ dirFileSizeMap.size() );
 //        		System.out.println("文件总数:" );
 
-        		summaryTipList.add("AllSize_"+"[ "+get15FixedType(""+(getPaddingString(getFileSizeGBString(allDirFileSize), 8, " ", true))).trim()+" ]"+" [ "+get15FixedType(""+(getPaddingString(getFileSizeMBString(allDirFileSize), 8, " ", true))).trim()+" ]");
+        		summaryTipList.add("AllSize_"+"[ "+get12FixedType(""+(getPaddingString(getFileSizeGBString(allDirFileSize), 8, " ", true))).trim()+" ]"+" [ "+get12FixedType(""+(getPaddingString(getFileSizeMBString(allDirFileSize), 8, " ", true))).trim()+" ]");
         		summaryTipList.add("AllDireCount:["+ getPaddingIntString(dirFileSizeMap.size(),6," ",true)+"   ]");
 
         		int fileDirIndex = 1;
         		for (File dirFile : allDirFileArr) {
 //        			System.out.println("Dir[ " + allDirFileArr.size()+"_" +getPaddingIntString(fileDirIndex,5," ",false) + "]"+ "   " +"Size["+ get15FixedType(""+(getPaddingString(getFileSizeMBString(dirFileSizeMap.get(dirFile)), 9, " ", true)))+"]"+"    " + dirFile.getAbsolutePath());
         		
-        			dirFileTipList.add("Dir[ " + allDirFileArr.size()+"_" +getPaddingIntString(fileDirIndex,5," ",false) + "]"+ "   " +"Size["+ get15FixedType(""+(getPaddingString(getFileSizeMBString(dirFileSizeMap.get(dirFile)), 9, " ", true)))+"]"+"    " + dirFile.getAbsolutePath());
+        			int subDirSize = 0 ;
+        			int subRealFileSize = 0 ;
+        			int mAllFileSize = 0 ;
+
+        			File[] mAllSubDirFileArr = 	dirFile.listFiles(new FileFilter() {
+						
+						@Override
+						public boolean accept(File pathname) {
+							// TODO Auto-generated method stub
+							return pathname.isDirectory();
+						}
+					});
+        			
+	                 	if(mAllSubDirFileArr != null) {
+	                 		subDirSize = 	mAllSubDirFileArr.length;
+        				
+        			    }
+		
+        			
+        			File[] mAllSubRealFileArr = 	dirFile.listFiles(new FileFilter() {
+						
+						@Override
+						public boolean accept(File pathname) {
+							// TODO Auto-generated method stub
+							return pathname.isFile();
+						}
+					});
+        			
+                   	if(mAllSubRealFileArr != null) {
+                   		subRealFileSize = 	mAllSubRealFileArr.length;
+    				
+    			    }
+        	
+                   	mAllFileSize =  subDirSize +subRealFileSize;
+        			
+        			
+        			
+        			dirFileTipList.add("Dir[ " + allDirFileArr.size()+"_" +getPaddingIntString(fileDirIndex,5," ",false) + "]"+ "   " +"Size["+ get12FixedType(""+(getPaddingString(getFileSizeMBString(dirFileSizeMap.get(dirFile)), 9, " ", true)))+"]"+"   all_dir_file["+getPaddingIntString(mAllFileSize,6," ",true)+","+getPaddingIntString(subDirSize,6," ",true)+","+getPaddingIntString(subRealFileSize,6," ",true)+"]"+"  " + dirFile.getAbsolutePath());
         		
         			fileDirIndex++;
         		}
@@ -1164,6 +1201,37 @@ public class G2_ApplyRuleFor_TypeFile {
 		}
 	};
     
+	static String get10FixedType(String type) {
+		// type 最长保留10位
+		String fixedType = "";
+		int curLength = type.length();
+		if (curLength < 10) {
+			int blankIndex = 10 - curLength;
+			for (int i = 0; i < blankIndex; i++) {
+				fixedType = " " + fixedType;
+			}
+
+		}
+
+		return type + fixedType;
+	}
+	
+	static String get12FixedType(String type) {
+		// type 最长保留10位
+		String fixedType = "";
+		int curLength = type.length();
+		if (curLength < 12) {
+			int blankIndex = 12 - curLength;
+			for (int i = 0; i < blankIndex; i++) {
+				fixedType = " " + fixedType;
+			}
+
+		}
+
+		return type + fixedType;
+	}
+	
+	
 	static String get15FixedType(String type) {
 		// type 最长保留10位
 		String fixedType = "";
