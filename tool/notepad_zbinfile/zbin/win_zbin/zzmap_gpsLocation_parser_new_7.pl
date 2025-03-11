@@ -95,8 +95,11 @@ sub parse_files
        
 	    #if (($line =~ /.*reportLocation lat: (-*\d+\.\d+) long: (.*) timestame: (.*) positionSource: .*/)) {
 	    if (($line =~ /(\d\d-\d\d \d\d:\d\d:\d\d.\d+).*reportLocation lat: (-*\d+\.\d+) long: (-*\d+\.\d+) .*accuracy: (\d+\.\d+) .*bearing: (-*\d+\.\d+) .*speed: (-*\d+\.\d+).*timestamp: (\d+)/)) {
-			printf ("\n-- IF-State-1 --\n");
 		    # bearing: 0.0
+
+		printf ("__match_type_01__");
+
+
 		$speed = $6;               # m/s
 
 	        $speedmph = $speed * 2.23694;  # convert to mph
@@ -136,8 +139,9 @@ sub parse_files
 		$CNO = "";
 
 		#Android O and bearing existed
-	    }elsif($line =~ /(\d\d-\d\d \d\d:\d\d:\d\d.\d+).*reportLocation Location\[gps (-*\d+\.\d+)\,(-*\d+\.\d+) hAcc=(\d+).*vel=(\d+\.\d+).*bear=(-*\d+\.\d+)/){
-			printf ("\n-- IF-State-2 --\n");
+	    }elsif($line =~ /(\d\d-\d\d \d\d:\d\d:\d\d.\d+).*reportLocation Location\[gps (-*\d+\.\d+)\,(-*\d+\.\d+) hAcc=(\d+).*vel=(\d+\.\d+) bear=(-*\d+\.\d+)/){
+			printf ("__match_type_02__");
+
 			#printf ("$line\n");
 			$speed = $5;               # m/s
 
@@ -180,7 +184,7 @@ sub parse_files
 			$CNO = "";
 		#Android O and bearing is not existed	
 		}elsif($line =~ /(\d\d-\d\d \d\d:\d\d:\d\d.\d+).*reportLocation Location\[gps (-*\d+\.\d+)\,(-*\d+\.\d+) hAcc=(\d+).*vel=(\d+\.\d+)/){
-			printf ("\n-- IF-State-3 --\n");
+		   printf ("__match_type_03__");
 			#printf ("$line\n");
 			$speed = $5;               # m/s
 
@@ -223,8 +227,9 @@ sub parse_files
 			$CNO = "";
 		#Android OMR1 and bearing existed
 	    }elsif($line =~ /(\d\d-\d\d \d\d:\d\d:\d\d.\d+).*reportLocation Location\[gps (-*\d+)\,(\d+)\,(-*\d+)\,(\d+) hAcc=(\d+).*vel=(\d+\.\d+) bear=(-*\d+\.\d+)/){
-			printf ("\n-- IF-State-4 --\n");
 			#printf ("$line\n");
+			printf ("__match_type_04__");
+
 			$speed = $7;               # m/s
 
 			$speedmph = $speed * 2.23694;  # convert to mph
@@ -270,7 +275,9 @@ sub parse_files
 			$CNO = "";
 		#Android OMR1 and bearing is not existed	
 		}elsif($line =~ /(\d\d-\d\d \d\d:\d\d:\d\d.\d+).*reportLocation Location\[gps (-*\d+)\,(\d+)\,(-*\d+)\,(\d+) hAcc=(\d+).*vel=(\d+\.\d+)/){
-			printf ("\n-- IF-State-5 --\n");
+
+		 printf ("__match_type_05__");
+
 			#printf ("$line\n");
 			$speed = $7;               # m/s
 
@@ -315,6 +322,8 @@ sub parse_files
 			$CNO = "";
 	    }elsif($line =~ /GpsLocationProvider: sv count: (\d+) usedMask: (\w+) ephemerisMask: (\w+) almanacMask: (\w+)/){
 		$parseSv = 1;
+		 printf ("__match_type_06 parser failed!__");
+
 		#print($line);
 	    }
 
