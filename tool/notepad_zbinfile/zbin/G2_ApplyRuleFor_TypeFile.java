@@ -4539,7 +4539,7 @@ public class G2_ApplyRuleFor_TypeFile {
                 String result = "";
 
                 String str1_1 = " export PATH=/apps/android/python-2.7.6-x64/bin:$PATH  && export PATH=/apps/android/perl-5.1aclmsx8.4-x64/bin:$PATH && ";
-                String str2_1 = " source build/envsetup.sh && source /opt/android.conf  &&   source /opt/conf/moto.conf  && ";
+                String str2_1 = " source /opt/android.conf  &&   source /opt/conf/moto.conf  && source build/envsetup.sh && ";
                 String str3_1 = " lunch " +  valueMap.get("productname")  + "-userdebug && ";
                 String str4_1 = " mmm  /packages/apps/Settings ";
                 result = str1_1 + str2_1 + str3_1 + str4_1;
@@ -4550,7 +4550,7 @@ public class G2_ApplyRuleFor_TypeFile {
                 String result = "";
 
                 String str1_1 = " export PATH=/apps/android/python-2.7.6-x64/bin:$PATH  && export PATH=/apps/android/perl-5.1aclmsx8.4-x64/bin:$PATH && ";
-                String str2_1 = " source build/envsetup.sh && source /opt/android.conf  &&   source /opt/conf/moto.conf  && ";
+                String str2_1 = " source /opt/android.conf  &&   source /opt/conf/moto.conf  && source build/envsetup.sh && ";
                 String str3_1 = " lunch " +  valueMap.get("productname")  + "-userdebug && ";
                 String str4_1 = " make Settings ";
                 result = str1_1 + str2_1 + str3_1 + str4_1;
@@ -4563,7 +4563,7 @@ public class G2_ApplyRuleFor_TypeFile {
             String buildFrameworkJar(HashMap<String,String> valueMap) {
                 String result = "";
                 String str1_1 = " export PATH=/apps/android/python-2.7.6-x64/bin:$PATH  && export PATH=/apps/android/perl-5.1aclmsx8.4-x64/bin:$PATH && ";
-                String str2_1 = " source build/envsetup.sh && source /opt/android.conf  &&   source /opt/conf/moto.conf  && ";
+                String str2_1 = " source /opt/android.conf  &&   source /opt/conf/moto.conf  && source build/envsetup.sh && ";
                 String str3_1 = " lunch " + valueMap.get("productname")  + "-userdebug && ";
                 String str4_1 = " mmm frameworks/base/ ";
                 result = str1_1 + str2_1 + str3_1 + str4_1;
@@ -4573,7 +4573,7 @@ public class G2_ApplyRuleFor_TypeFile {
             String buildFrameworkJar_make(HashMap<String,String> valueMap) {
                 String result = "";
                 String str1_1 = " export PATH=/apps/android/python-2.7.6-x64/bin:$PATH  && export PATH=/apps/android/perl-5.1aclmsx8.4-x64/bin:$PATH && ";
-                String str2_1 = " source build/envsetup.sh && source /opt/android.conf  &&   source /opt/conf/moto.conf  && ";
+                String str2_1 = " source /opt/android.conf  &&   source /opt/conf/moto.conf  && source build/envsetup.sh && ";
                 String str3_1 = " lunch " + valueMap.get("productname")  + "-userdebug && ";
                 String str4_1 = " make framework ";
                 result = str1_1 + str2_1 + str3_1 + str4_1;
@@ -4584,7 +4584,7 @@ public class G2_ApplyRuleFor_TypeFile {
             String buildFrameworkRes_make(HashMap<String,String> valueMap) {
                 String result = "";
                 String str1_1 = " export PATH=/apps/android/python-2.7.6-x64/bin:$PATH  && export PATH=/apps/android/perl-5.1aclmsx8.4-x64/bin:$PATH && ";
-                String str2_1 = " source build/envsetup.sh && source /opt/android.conf  &&   source /opt/conf/moto.conf  && ";
+                String str2_1 = " source /opt/android.conf  &&   source /opt/conf/moto.conf  && source build/envsetup.sh && ";
                 String str3_1 = " lunch " + valueMap.get("productname")  + "-userdebug && ";
                 String str4_1 = " make framework-res ";
                 result = str1_1 + str2_1 + str3_1 + str4_1;
@@ -4594,7 +4594,7 @@ public class G2_ApplyRuleFor_TypeFile {
             String buildFrameworkService_make(HashMap<String,String> valueMap) {
                 String result = "";
                 String str1_1 = " export PATH=/apps/android/python-2.7.6-x64/bin:$PATH  && export PATH=/apps/android/perl-5.1aclmsx8.4-x64/bin:$PATH && ";
-                String str2_1 = " source build/envsetup.sh && source /opt/android.conf  &&   source /opt/conf/moto.conf  && ";
+                String str2_1 = " source /opt/android.conf  &&   source /opt/conf/moto.conf  && source build/envsetup.sh && ";
                 String str3_1 = " lunch " + valueMap.get("productname")  + "-userdebug && ";
                 String str4_1 = " make services ";
                 result = str1_1 + str2_1 + str3_1 + str4_1;
@@ -4608,7 +4608,7 @@ public class G2_ApplyRuleFor_TypeFile {
             String buildWifiServiceJar(HashMap<String,String> valueMap) {
                 String result = "";
                 String str1_1 = " export PATH=/apps/android/python-2.7.6-x64/bin:$PATH  && export PATH=/apps/android/perl-5.1aclmsx8.4-x64/bin:$PATH && ";
-                String str2_1 = " source build/envsetup.sh && source /opt/android.conf  &&   source /opt/conf/moto.conf  && ";
+                String str2_1 = " source /opt/android.conf  &&   source /opt/conf/moto.conf  && source build/envsetup.sh && ";
                 String str3_1 = " lunch " + valueMap.get("productname") + "-userdebug && ";
                 String str4_1 = " mmm frameworks/opt/net/wifi/service ";
                 result = str1_1 + str2_1 + str3_1 + str4_1;
@@ -4618,7 +4618,7 @@ public class G2_ApplyRuleFor_TypeFile {
             String buildWpaSupplicant(HashMap<String,String> valueMap) {
                 String result = "";
                 String str1_1 = " export PATH=/apps/android/python-2.7.6-x64/bin:$PATH  && export PATH=/apps/android/perl-5.1aclmsx8.4-x64/bin:$PATH && ";
-                String str2_1 = " source build/envsetup.sh && source /opt/android.conf  &&   source /opt/conf/moto.conf  && ";
+                String str2_1 = " source /opt/android.conf  &&   source /opt/conf/moto.conf  &&  source build/envsetup.sh && ";
                 String str3_1 = " lunch " + valueMap.get("productname") + "-userdebug && ";
                 String str4_1 = " mmm external/wpa_supplicant_8 ";
                 result = str1_1 + str2_1 + str3_1 + str4_1;
@@ -5416,7 +5416,7 @@ public class G2_ApplyRuleFor_TypeFile {
 
                 product_txt_List.add("【 mtk/SarControlService " + productName + "-userdebug" + "】");
                 product_txt_List.add("");
-                product_txt_List.add(" export PATH=/apps/android/python-2.7.6-x64/bin:$PATH  && export PATH=/apps/android/perl-5.1aclmsx8.4-x64/bin:$PATH &&  source build/envsetup.sh &&  source /opt/conf/moto.conf  && lunch "+productName+"-userdebug  && cd ./motorola/modem/mtk/SarControl/SarControlService &&  mm ");
+                product_txt_List.add(" export PATH=/apps/android/python-2.7.6-x64/bin:$PATH  && export PATH=/apps/android/perl-5.1aclmsx8.4-x64/bin:$PATH &&  source /opt/conf/moto.conf &&  source build/envsetup.sh  && lunch "+productName+"-userdebug  && cd ./motorola/modem/mtk/SarControl/SarControlService &&  mm ");
                 product_txt_List.add("");
                 product_txt_List.add("zzfile_3.sh   ./out/target/product/"+device_shell_name+"/system/priv-app/MtkSarControlService.apk");
                 product_txt_List.add("");
@@ -5424,7 +5424,7 @@ public class G2_ApplyRuleFor_TypeFile {
 
                 product_txt_List.add("【 mtk/SarStatusDisplay.apk " + productName + "-userdebug" + "】");
                 product_txt_List.add("");
-                product_txt_List.add("cd AOSP_Root &&  export PATH=/apps/android/python-2.7.6-x64/bin:$PATH  && export PATH=/apps/android/perl-5.1aclmsx8.4-x64/bin:$PATH &&  source build/envsetup.sh &&  source /opt/conf/moto.conf  && lunch "+productName+"-userdebug && cd  ./motorola/modem/mtk/SarControl/SarStatusDisplay &&  mm ");
+                product_txt_List.add("cd AOSP_Root &&  export PATH=/apps/android/python-2.7.6-x64/bin:$PATH  && export PATH=/apps/android/perl-5.1aclmsx8.4-x64/bin:$PATH  &&  source /opt/conf/moto.conf  &&  source build/envsetup.sh  && lunch "+productName+"-userdebug && cd  ./motorola/modem/mtk/SarControl/SarStatusDisplay &&  mm ");
                 product_txt_List.add("");
                 product_txt_List.add("zzfile_3.sh   out/target/product/"+device_shell_name+"/system/priv-app/MtkSarControlService/MtkSarControlService.apk");
                 product_txt_List.add("");
@@ -5432,18 +5432,18 @@ public class G2_ApplyRuleFor_TypeFile {
 
 
                 product_txt_List.add("【 MotoWifiMetrics "+productName+"-userdebug】");
-                product_txt_List.add("cd AOSP_Root &&  export PATH=/apps/android/python-2.7.6-x64/bin:$PATH  && export PATH=/apps/android/perl-5.1aclmsx8.4-x64/bin:$PATH &&  source build/envsetup.sh &&  source /opt/conf/moto.conf  && lunch "+productName+"-userdebug && cd ./motorola/packages/apps/MotoWifiMetrics &&  mm ");
+                product_txt_List.add("cd AOSP_Root &&  export PATH=/apps/android/python-2.7.6-x64/bin:$PATH  && export PATH=/apps/android/perl-5.1aclmsx8.4-x64/bin:$PATH  &&  source /opt/conf/moto.conf &&  source build/envsetup.sh   && lunch "+productName+"-userdebug && cd ./motorola/packages/apps/MotoWifiMetrics &&  mm ");
                 product_txt_List.add("");
                 product_txt_List.add("zzfile_3.sh   ./out/target/product/"+device_shell_name+"/system_ext/priv-app/MotoWifiMetrics");
 
                 product_txt_List.add("");
                 product_txt_List.add("【 mtk/sarwifi " + productName + "-userdebug" + "】");
-                product_txt_List.add(" export PATH=/apps/android/python-2.7.6-x64/bin:$PATH  && export PATH=/apps/android/perl-5.1aclmsx8.4-x64/bin:$PATH &&  source build/envsetup.sh &&  source /opt/conf/moto.conf  && lunch "+productName+"-userdebug  &&   cd ./vendor/mediatek/proprietary/hardware/connectivity/wlan/sarwifi/service &&  mm   ");
+                product_txt_List.add(" export PATH=/apps/android/python-2.7.6-x64/bin:$PATH  && export PATH=/apps/android/perl-5.1aclmsx8.4-x64/bin:$PATH  &&  source /opt/conf/moto.conf  &&  source build/envsetup.sh  && lunch "+productName+"-userdebug  &&   cd ./vendor/mediatek/proprietary/hardware/connectivity/wlan/sarwifi/service &&  mm   ");
 
 
                 product_txt_List.add("");
                 product_txt_List.add("【 qcom/libmdmcutback " + productName + "-userdebug" + "】");
-                product_txt_List.add(" export PATH=/apps/android/python-2.7.6-x64/bin:$PATH  && export PATH=/apps/android/perl-5.1aclmsx8.4-x64/bin:$PATH &&  source build/envsetup.sh &&  source /opt/conf/moto.conf  && lunch "+productName+"-userdebug  &&   make libmdmcutback | tee build_libmdmcutback.log     ");
+                product_txt_List.add(" export PATH=/apps/android/python-2.7.6-x64/bin:$PATH  && export PATH=/apps/android/perl-5.1aclmsx8.4-x64/bin:$PATH  &&  source /opt/conf/moto.conf &&  source build/envsetup.sh  && lunch "+productName+"-userdebug  &&   make libmdmcutback | tee build_libmdmcutback.log     ");
                 product_txt_List.add("");
                 product_txt_List.add("zzfile_3.sh   ./out/target/product/"+device_shell_name+"/vendor/lib64/libmdmcutback.so");
                 product_txt_List.add("zzfile_3.sh   ./out/target/product/"+device_shell_name+"/vendor/lib/libmdmcutback.so");
