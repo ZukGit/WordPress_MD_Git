@@ -139,7 +139,7 @@ sub parse_files
 		$CNO = "";
 
 		#Android O and bearing existed
-	    }elsif($line =~ /(\d\d-\d\d \d\d:\d\d:\d\d.\d+).*reportLocation Location\[gps (-*\d+\.\d+)\,(-*\d+\.\d+) hAcc=(\d+).*vel=(\d+\.\d+) bear=(-*\d+\.\d+)/){
+	    }elsif($line =~ /(\d\d-\d\d \d\d:\d\d:\d\d.\d+).*reportLocation Location\[gps (-*\d+\.\d+)\,(-*\d+\.\d+) hAcc=(\d+).*vel=(\d+\.\d+).*bear=(-*\d+\.\d+)/){
 			printf ("__match_type_02__");
 
 			#printf ("$line\n");
