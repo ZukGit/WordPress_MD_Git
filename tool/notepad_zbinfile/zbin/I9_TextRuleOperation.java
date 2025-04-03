@@ -609,7 +609,380 @@ public class I9_TextRuleOperation {
         CUR_RULE_LIST.add(new mtk_cfg80211_get_station_reqInfo_link_speed_Rule_66());
         
         
+        // 移除指定的 包含字符串的那一行  其他行保留 
+        CUR_RULE_LIST.add(new Clear_Identify_String_Line_Rule_67());
+        
+        
+        
+        // 只保留 包含指定字符串的那一行  其他行保留 
+        CUR_RULE_LIST.add(new OnlyKeep_Identify_String_Line_Rule_68());
+        
+        
+        
     }
+    
+    class OnlyKeep_Identify_String_Line_Rule_68 extends Basic_Rule {
+    	
+    	
+    	
+    	ArrayList<String> mPreKeepStrList ;  // 预置到的值 删除字符串集合
+      	ArrayList<String> mOperationKeepStrList ;   // 实际操作的值 
+        String mKeepPrefix  ;
+        OnlyKeep_Identify_String_Line_Rule_68() {
+               super(68);
+               mKeepPrefix = rule_index+"_"+"keepstr_" ;
+               mPreKeepStrList = new ArrayList<String>();
+         
+               mOperationKeepStrList = new ArrayList<String>();
+           }
+    	
+    	
+      
+        @Override
+        String simpleDesc() {
+            String preparam_tipA = " "+mKeepPrefix+"AAAA" + " "+mKeepPrefix+"BBBB";
+            
+            
+           String preparam_tipB =  buildPreParamValue(I9_PreParam_PropValue_List);
+            
+            String mPropValue =  preparam_tipB.replace(mKeepPrefix, "");
+          
+            
+            
+            
+           
+          
+            return  "\n"+
+                    Cur_Bat_Name+" "+"default_index_"+rule_index + preparam_tipA +"   ## KeepStr 只保留包含 AAAA  BBBB 的当前行\n" +
+                    Cur_Bat_Name+" "+"default_index_"+rule_index+ " "+preparam_tipB +"   ##  当前程序保存 只保留字符串列表 \n" +
+                    Cur_Bat_Name+" "+"default_index_"+rule_index+ " " +"  ## KeepStr Prop=【"+mPropValue+"】  当前程序保存 只保留 字符串列表 \n" +
+
+                    "";
+        }
+        
+
+        // 3. 如果当前 执行 错误 checkParams 返回 false 那么 将 打印这个函数 说明错误的可能原因
+        @Override
+        void showWrongMessage() {
+            System.out.println("当前 type 索引 " + rule_index + " 执行错误  可能是输入参数错误 请检查输入参数!");
+            System.out.println(" errorMsg = " + errorMsg);
+        }
+
+        // 4. 当前 rule的 说明 将会打印在 用户输入为空时的 提示语句！
+        @Override
+        String ruleTip(String type, int index, String batName, OS_TYPE curType) {
+            String itemDesc = "";
+            if (curType == OS_TYPE.Windows) {
+                itemDesc = batName.trim() + "  " + type + "_" + index + "    [索引 " + index + "]  描述:" + ""
+                        + simpleDesc();
+            } else {
+                itemDesc = batName.trim() + " " + type + "_" + index + "    [索引 " + index + "]  描述:" + ""
+                        + simpleDesc();
+            }
+
+            return itemDesc;
+        }
+   
+
+        
+    	String buildPreParamValue (ArrayList<String> removeStrList) {
+    		
+    		StringBuilder sb = new StringBuilder();
+    		
+    		for (int i = 0; i < removeStrList.size(); i++) {
+    			String itemStr = removeStrList.get(i) ;
+    			if(itemStr.contains(""+rule_index+"_")) {
+    				sb.append(itemStr+" ");
+    			}
+    		
+			}
+    		
+    		return sb.toString().trim();
+    		
+    	}
+    	
+    	
+
+        @Override
+        ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
+                                           ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+            for (int i = 0; i < curInputFileList.size(); i++) {
+                File fileItem = curInputFileList.get(i);
+                ArrayList<String> contentList = ReadFileContentAsList(fileItem);
+
+                ArrayList<String> fixedStrArr = KeepStr_ForEveryOneLine(contentList,mOperationKeepStrList);
+                writeContentToFile(I9_Temp_Text_File, fixedStrArr);
+                NotePadOpenTargetFile(I9_Temp_Text_File.getAbsolutePath());
+                
+                String cleanStrInputTip = buildPreParamValue(mOperationKeepStrList);
+                System.out.println("rule_"+rule_index+" -> 把当前文件每行删除匹配字符串【"+cleanStrInputTip+"】  File=" + fileItem.getAbsolutePath());
+            }
+
+            return super.applyOperationRule(curFileList, subFileTypeMap, curDirList, curRealFileList);
+        }
+    	
+        ArrayList<String> KeepStr_ForEveryOneLine(ArrayList<String> originStrList , ArrayList<String> removeStrList) {
+            if (originStrList == null)
+                return null;
+            ArrayList<String> fixedStrArr = new ArrayList<String>();
+            int lineNum = 1;
+          A:  for (int i = 0; i < originStrList.size(); i++) {
+                String onrLineStr = originStrList.get(i);
+                
+             B:   for (int j = 0; j < removeStrList.size(); j++) {
+                	String cleanStr = removeStrList.get(j);
+                	
+                	if(onrLineStr.contains(cleanStr)) {
+                		
+                        fixedStrArr.add(onrLineStr);
+                        lineNum++;
+                        
+                		continue A;
+                	}
+					
+				}
+
+
+
+            }
+
+            return fixedStrArr;
+        }
+        
+        @Override
+        void init_pre_params(ArrayList<String> preParamList) {
+        	
+        	
+            for (int i = 0; i < preParamList.size(); i++) {
+                String pre_param = preParamList.get(i);
+              if(pre_param.startsWith(mKeepPrefix)) {
+                String mCleanStrparam = pre_param.replace(mKeepPrefix, "").trim();
+               
+                
+                 System.out.println("KeepStr 的 保留标识符为["+preParamList.size()+"_"+i+"]: "+ mCleanStrparam);
+
+                 mPreKeepStrList.add(mCleanStrparam);
+                  }
+            
+            }
+            
+        
+            if( mPreKeepStrList.size() == 0) {
+            	
+            	System.out.println("程序执行失败! 请先输入需要预置的 keepstr 格式为: 【"+mKeepPrefix+"XXXX 】");
+            	return ; 
+            }
+            
+            
+            // 预置参数 组合  arrsada════
+            if(mPreKeepStrList.size() > 0) {
+            	
+            	StringBuilder preValueSb =new StringBuilder();
+            	for (int i = 0; i < mPreKeepStrList.size(); i++) {
+            		
+                	System.out.println("mPreKeepStrList["+mPreKeepStrList.size()+"_"+i+"] = "+ mPreKeepStrList.get(i));
+
+            	
+				}
+            	
+
+            	
+            	mOperationKeepStrList.addAll(mPreKeepStrList);
+
+            	return ;
+            }
+            
+            
+            // 1111═2222═3333
+            
+         
+            
+//            I9_Properties.setProperty(Default_Selected_Rule_Index_Key, "" + CUR_TYPE_INDEX);
+
+        	
+        }
+    }
+    
+    // 
+    class Clear_Identify_String_Line_Rule_67 extends Basic_Rule {
+    	
+    	
+    	
+    	ArrayList<String> mPreClearStrList ;  // 预置到的值 删除字符串集合
+      	ArrayList<String> mOperationClearStrList ;   // 实际操作的值 
+        String mCleanPrefix  ;
+    	Clear_Identify_String_Line_Rule_67() {
+               super(67);
+               mCleanPrefix = rule_index+"_"+"cleanstr_" ;
+               mPreClearStrList = new ArrayList<String>();
+         
+               mOperationClearStrList = new ArrayList<String>();
+           }
+    	
+    	
+      
+        @Override
+        String simpleDesc() {
+            String preparam_tipA = " "+mCleanPrefix+"AAAA" + " "+mCleanPrefix+"BBBB";
+            
+            
+           String preparam_tipB =  buildPreParamValue(I9_PreParam_PropValue_List);
+            
+            String mPropValue =  preparam_tipB.replace(mCleanPrefix, "");
+          
+            
+            
+            
+           
+          
+            return  "\n"+
+                    Cur_Bat_Name+" "+"default_index_"+rule_index + preparam_tipA +"   ## 删除包含 AAAA  BBBB 的当前行\n" +
+                    Cur_Bat_Name+" "+"default_index_"+rule_index+ " "+preparam_tipB +"   ##  当前程序保存删除字符串列表 \n" +
+                    Cur_Bat_Name+" "+"default_index_"+rule_index+ " " +"  ## Prop=【"+mPropValue+"】  当前程序保存删除字符串列表 \n" +
+
+                    "";
+        }
+        
+
+        // 3. 如果当前 执行 错误 checkParams 返回 false 那么 将 打印这个函数 说明错误的可能原因
+        @Override
+        void showWrongMessage() {
+            System.out.println("当前 type 索引 " + rule_index + " 执行错误  可能是输入参数错误 请检查输入参数!");
+            System.out.println(" errorMsg = " + errorMsg);
+        }
+
+        // 4. 当前 rule的 说明 将会打印在 用户输入为空时的 提示语句！
+        @Override
+        String ruleTip(String type, int index, String batName, OS_TYPE curType) {
+            String itemDesc = "";
+            if (curType == OS_TYPE.Windows) {
+                itemDesc = batName.trim() + "  " + type + "_" + index + "    [索引 " + index + "]  描述:" + ""
+                        + simpleDesc();
+            } else {
+                itemDesc = batName.trim() + " " + type + "_" + index + "    [索引 " + index + "]  描述:" + ""
+                        + simpleDesc();
+            }
+
+            return itemDesc;
+        }
+   
+
+        
+    	String buildPreParamValue (ArrayList<String> removeStrList) {
+    		
+    		StringBuilder sb = new StringBuilder();
+    		
+    		for (int i = 0; i < removeStrList.size(); i++) {
+    			String itemStr = removeStrList.get(i) ;
+    			if(itemStr.contains(""+rule_index+"_")) {
+    				sb.append(itemStr+" ");
+    			}
+    		
+			}
+    		
+    		return sb.toString().trim();
+    		
+    	}
+    	
+    	
+
+        @Override
+        ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
+                                           ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+            for (int i = 0; i < curInputFileList.size(); i++) {
+                File fileItem = curInputFileList.get(i);
+                ArrayList<String> contentList = ReadFileContentAsList(fileItem);
+
+                ArrayList<String> fixedStrArr = CleanStr_ForEveryOneLine(contentList,mOperationClearStrList);
+                writeContentToFile(I9_Temp_Text_File, fixedStrArr);
+                NotePadOpenTargetFile(I9_Temp_Text_File.getAbsolutePath());
+                
+                String cleanStrInputTip = buildPreParamValue(mOperationClearStrList);
+                System.out.println("rule_"+rule_index+" -> 把当前文件每行删除匹配字符串【"+cleanStrInputTip+"】  File=" + fileItem.getAbsolutePath());
+            }
+
+            return super.applyOperationRule(curFileList, subFileTypeMap, curDirList, curRealFileList);
+        }
+    	
+        ArrayList<String> CleanStr_ForEveryOneLine(ArrayList<String> originStrList , ArrayList<String> removeStrList) {
+            if (originStrList == null)
+                return null;
+            ArrayList<String> fixedStrArr = new ArrayList<String>();
+            int lineNum = 1;
+          A:  for (int i = 0; i < originStrList.size(); i++) {
+                String onrLineStr = originStrList.get(i);
+                
+             B:   for (int j = 0; j < removeStrList.size(); j++) {
+                	String cleanStr = removeStrList.get(j);
+                	
+                	if(onrLineStr.contains(cleanStr)) {
+                		continue A;
+                	}
+					
+				}
+
+                fixedStrArr.add(onrLineStr);
+                lineNum++;
+
+            }
+
+            return fixedStrArr;
+        }
+        
+        @Override
+        void init_pre_params(ArrayList<String> preParamList) {
+        	
+        	
+            for (int i = 0; i < preParamList.size(); i++) {
+                String pre_param = preParamList.get(i);
+              if(pre_param.startsWith(mCleanPrefix)) {
+                String mCleanStrparam = pre_param.replace(mCleanPrefix, "").trim();
+               
+                
+                 System.out.println("ClearStr 的删除标识符为["+preParamList.size()+"_"+i+"]: "+ mCleanStrparam);
+
+                 mPreClearStrList.add(mCleanStrparam);
+                  }
+            
+            }
+            
+        
+            if( mPreClearStrList.size() == 0) {
+            	
+            	System.out.println("程序执行失败! 请先输入需要预置的 cleanstr 格式为: 【"+mCleanPrefix+"XXXX 】");
+            	return ; 
+            }
+            
+            
+            // 预置参数 组合  arrsada════
+            if(mPreClearStrList.size() > 0) {
+            	
+            	StringBuilder preValueSb =new StringBuilder();
+            	for (int i = 0; i < mPreClearStrList.size(); i++) {
+            		
+                	System.out.println("mPreClearStrList["+mPreClearStrList.size()+"_"+i+"] = "+ mPreClearStrList.get(i));
+
+            	
+				}
+            	
+
+            	
+            	mOperationClearStrList.addAll(mPreClearStrList);
+
+            	return ;
+            }
+            
+            
+            // 1111═2222═3333
+            
+         
+            
+//            I9_Properties.setProperty(Default_Selected_Rule_Index_Key, "" + CUR_TYPE_INDEX);
+
+        	
+        }
+    }
+    
     
    class mtk_cfg80211_get_station_reqInfo_link_speed_Rule_66 extends Basic_Rule {
     	
