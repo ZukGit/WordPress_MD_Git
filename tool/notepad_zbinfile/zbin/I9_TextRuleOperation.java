@@ -618,8 +618,229 @@ public class I9_TextRuleOperation {
         CUR_RULE_LIST.add(new OnlyKeep_Identify_String_Line_Rule_68());
         
         
+        // 指定第一个关键字 后面追加字符串的规则 
+        CUR_RULE_LIST.add(new Match_First_String_AppendStr_Rule_69());
+        
         
     }
+    
+    class Match_First_String_AppendStr_Rule_69 extends Basic_Rule {
+    	
+    	
+    	
+    	ArrayList<String> mPreMatchStrList ;  // 预置到的值 删除字符串集合
+      	ArrayList<String> mOperationMatchStrList ;   // 实际操作的值 
+      	
+      	String matchString ;   // 匹配到的 需要 搜索到的值
+      	String appendString ;   // 匹配到的 需要 搜索到的值
+        String mMatchPrefix  ;
+        String mAppendPrefix  ;
+        Match_First_String_AppendStr_Rule_69() {
+               super(69);
+               mMatchPrefix = rule_index+"_"+"matchstr_" ;
+               mAppendPrefix= rule_index+"_"+"appendstr_" ;
+               matchString =  null ;
+               appendString = null ;
+               mPreMatchStrList = new ArrayList<String>();
+         
+               mOperationMatchStrList = new ArrayList<String>();
+           }
+    	
+    	
+      
+        @Override
+        String simpleDesc() {
+            String preparam_tipA = " "+mMatchPrefix+"AAAA" + " "+mAppendPrefix+"BBBB";
+            
+            
+           String preparam_tipB =  buildPreParamValue(I9_PreParam_PropValue_List);
+            
+            String mPropValue =  preparam_tipB.replace(mMatchPrefix, "").replace(mAppendPrefix, "");
+          
+            
+            
+            
+           
+          
+            return  "\n"+
+                    Cur_Bat_Name+" "+"default_index_"+rule_index + preparam_tipA +"   ## MatchStr 匹配包含 AAAA 的当前行 在第一个AAAA 后追加 AppendStr_BBB字符串\n" +
+                    Cur_Bat_Name+" "+"default_index_"+rule_index+ " "+preparam_tipB +"   ##  当前程序保存 匹配字符串 和 追加字符串表 \n" +
+                    Cur_Bat_Name+" "+"default_index_"+rule_index+ " " +"  ## KeepStr Prop=【"+mPropValue+"】  当前程序保存 只匹配字符并追加 AppendStr操作 \n" +
+
+                    "";
+        }
+        
+
+        // 3. 如果当前 执行 错误 checkParams 返回 false 那么 将 打印这个函数 说明错误的可能原因
+        @Override
+        void showWrongMessage() {
+            System.out.println("当前 type 索引 " + rule_index + " 执行错误  可能是输入参数错误 请检查输入参数!");
+            System.out.println(" errorMsg = " + errorMsg);
+        }
+
+        // 4. 当前 rule的 说明 将会打印在 用户输入为空时的 提示语句！
+        @Override
+        String ruleTip(String type, int index, String batName, OS_TYPE curType) {
+            String itemDesc = "";
+            if (curType == OS_TYPE.Windows) {
+                itemDesc = batName.trim() + "  " + type + "_" + index + "    [索引 " + index + "]  描述:" + ""
+                        + simpleDesc();
+            } else {
+                itemDesc = batName.trim() + " " + type + "_" + index + "    [索引 " + index + "]  描述:" + ""
+                        + simpleDesc();
+            }
+
+            return itemDesc;
+        }
+   
+
+        
+    	String buildPreParamValue (ArrayList<String> removeStrList) {
+    		
+    		StringBuilder sb = new StringBuilder();
+    		
+    		for (int i = 0; i < removeStrList.size(); i++) {
+    			String itemStr = removeStrList.get(i) ;
+    			if(itemStr.contains(""+rule_index+"_")) {
+    				sb.append(itemStr+" ");
+    			}
+    		
+			}
+    		
+    		return sb.toString().trim();
+    		
+    	}
+    	
+    	
+
+        @Override
+        ArrayList<File> applyOperationRule(ArrayList<File> curFileList, HashMap<String, ArrayList<File>> subFileTypeMap,
+                                           ArrayList<File> curDirList, ArrayList<File> curRealFileList) {
+       
+        	if(appendString == null ) {
+        		
+        		System.out.println("当前程序执行失败  所有获得 "+rule_index+" 所需要的 appendStr=【"+appendString+"】");
+        		return  null;
+        	}
+        	for (int i = 0; i < curInputFileList.size(); i++) {
+                File fileItem = curInputFileList.get(i);
+                ArrayList<String> contentList = ReadFileContentAsList(fileItem);
+
+                ArrayList<String> fixedStrArr = MatchStr_AppendStr_ForEveryOneLine(contentList,mOperationMatchStrList);
+                writeContentToFile(I9_Temp_Text_File, fixedStrArr);
+                NotePadOpenTargetFile(I9_Temp_Text_File.getAbsolutePath());
+                
+                String cleanStrInputTip = buildPreParamValue(mOperationMatchStrList);
+                System.out.println("rule_"+rule_index+" -> 把当前文件每行匹配字符串及追加字符串【"+cleanStrInputTip+"】  File=" + fileItem.getAbsolutePath());
+            }
+
+            return super.applyOperationRule(curFileList, subFileTypeMap, curDirList, curRealFileList);
+        }
+    	
+        ArrayList<String> MatchStr_AppendStr_ForEveryOneLine(ArrayList<String> originStrList , ArrayList<String> matchStrList) {
+            if (originStrList == null)
+                return null;
+            ArrayList<String> fixedStrArr = new ArrayList<String>();
+            int lineNum = 1;
+          A:  for (int i = 0; i < originStrList.size(); i++) {
+                String onrLineStr = originStrList.get(i);
+                
+             B:   for (int j = 0; j < matchStrList.size(); j++) {
+                	String matchStr = matchStrList.get(j);
+                	
+                	if(onrLineStr.contains(matchStr)) {
+                		
+                		String preStr = onrLineStr.substring(0,onrLineStr.indexOf(matchStr)+1);
+                		String endStr = onrLineStr.substring(onrLineStr.indexOf(matchStr)+1);
+	
+                		String newLine = preStr + appendString + endStr;
+                		
+                        fixedStrArr.add(newLine);
+                        lineNum++;
+                        
+                		continue A;
+                	}
+                	
+                    fixedStrArr.add(onrLineStr);
+                    
+					
+				}
+
+
+
+            }
+
+            return fixedStrArr;
+        }
+        
+        @Override
+        void init_pre_params(ArrayList<String> preParamList) {
+        	
+        	
+            for (int i = 0; i < preParamList.size(); i++) {
+                String pre_param = preParamList.get(i);
+              if(pre_param.startsWith(mMatchPrefix)) {
+                String mCleanStrparam = pre_param.replace(mMatchPrefix, "").trim();
+               
+                matchString = mCleanStrparam ;
+                
+            
+                		
+                 System.out.println("KeepStr 的 保留标识符为["+preParamList.size()+"_"+i+"]: "+ mCleanStrparam);
+
+                 mPreMatchStrList.add(mCleanStrparam);
+                  }
+              
+              
+              if(pre_param.startsWith(mAppendPrefix)) {
+            	  
+                  String mAppendStr = pre_param.replace(mAppendPrefix, "").trim();
+
+            	    appendString = mAppendStr ;
+            	    
+              }
+            
+            }
+            
+        
+            if( appendString == null || matchString == null ) {
+            	
+            	System.out.println("程序执行失败! 请先输入需要预置的 matchstr=【"+matchString+"】 和 appendStr【"+appendString+"】 ");
+            	return ; 
+            }
+            
+            
+            // 预置参数 组合  arrsada════
+            if(mPreMatchStrList.size() > 0) {
+            	
+            	StringBuilder preValueSb =new StringBuilder();
+            	for (int i = 0; i < mPreMatchStrList.size(); i++) {
+            		
+                	System.out.println("mPreMatchStrList["+mPreMatchStrList.size()+"_"+i+"] = "+ mPreMatchStrList.get(i));
+
+            	
+				}
+            	
+
+            	
+            	mOperationMatchStrList.addAll(mPreMatchStrList);
+
+            	return ;
+            }
+            
+            
+            // 1111═2222═3333
+            
+         
+            
+//            I9_Properties.setProperty(Default_Selected_Rule_Index_Key, "" + CUR_TYPE_INDEX);
+
+        	
+        }
+    }
+    
+    // 
+    
     
     class OnlyKeep_Identify_String_Line_Rule_68 extends Basic_Rule {
     	
@@ -733,7 +954,7 @@ public class I9_TextRuleOperation {
                 	String cleanStr = removeStrList.get(j);
                 	
                 	if(onrLineStr.contains(cleanStr)) {
-                		
+    
                         fixedStrArr.add(onrLineStr);
                         lineNum++;
                         
