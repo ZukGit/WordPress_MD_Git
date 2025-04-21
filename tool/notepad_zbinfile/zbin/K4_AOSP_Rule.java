@@ -36,6 +36,8 @@ public class K4_AOSP_Rule {
 
     static String Cur_Batch_End = ".bat";  // 动态计算当前系统下 bat sh 的 后缀
     static String Cur_Bat_Name = "zaosp_rule_K4";
+    static String Cur_Notepad_Name = "notepad++";
+    
     static String Cur_Bat_Only_Name = "zaosp_rule_K4";
 
     static String zbinPath = System.getProperties().getProperty("user.home") + File.separator + "Desktop"
@@ -122,6 +124,7 @@ public class K4_AOSP_Rule {
             Cur_Bat_Name = Cur_Bat_Name + ".bat";
             Cur_Batch_End = ".bat";
             curOS_ExeTYPE = ".exe";
+            Cur_Notepad_Name = "notepad++";
             initJDKPath_Windows(curLibraryPath);
             Win_Lin_Mac_ZbinPath = zbinPath + File.separator + "win_zbin";
 
@@ -132,6 +135,7 @@ public class K4_AOSP_Rule {
             Cur_Batch_End = ".sh";
             initJDKPath_Linux_MacOS(curLibraryPath);
             Win_Lin_Mac_ZbinPath = zbinPath + File.separator + "lin_zbin";
+            Cur_Notepad_Name = "gedit";
 
         } else if (osName.contains("mac")) {
             CUR_OS_TYPE = OS_TYPE.MacOS;
@@ -140,7 +144,7 @@ public class K4_AOSP_Rule {
             Cur_Batch_End = ".sh";
             initJDKPath_Linux_MacOS(curLibraryPath);
             Win_Lin_Mac_ZbinPath = zbinPath + File.separator + "mac_zbin";
-
+            Cur_Notepad_Name = "notepad";
         }
 
     }
@@ -295,11 +299,330 @@ public class K4_AOSP_Rule {
 
     void InitRule() {
 
-    	// 
+    	// 对 各个 模块的 文件的数据 进行遍历 输出 模块大概分布
         realTypeRuleList.add(new Show_CurAOSP_AllStoredGit_FileInfo_Rule_1());
 
+        
+        // 对当前目录下 的 vhw.xml 文件打印出当前的 device  和 当前的  radioid列表
+        // 如果是AOSP  那么 进入  device/moto 搜索 到 vhw.xml的文件
+        // 如果不是AOSP  那么 搜索当前 所有的  vhw.xml的文件进行解析
+        
+        realTypeRuleList.add(new Show_AOSP_VHW_XML_Device_RadioIds_INfo_Rule_2());
+
+        
     }
     
+    
+    class Show_AOSP_VHW_XML_Device_RadioIds_INfo_Rule_2 extends Basic_Rule {
+    	
+    	
+    	ArrayList<File> allVhwFileList ;
+    	
+    	// 当前 device  匹配的 radio_auto_map 字符串
+      	HashMap<String,ArrayList<String>> device_radios_map ;
+      	
+    	// 当前 device  匹配的 radio_auto_map 字符串
+     	HashMap<String,String> device_radio_auto_map ;
+     	
+     	// 当前 device 所在的 文件
+    	HashMap<File,ArrayList<String>> file_devicelist_map; 
+    	
+    	Show_AOSP_VHW_XML_Device_RadioIds_INfo_Rule_2() {
+            super("#", 2, 4);
+            allVhwFileList = new ArrayList<File>();
+            device_radios_map =new HashMap<String,ArrayList<String>>();
+            device_radio_auto_map = new 	HashMap<String,String> ();
+            file_devicelist_map = new	HashMap<File,ArrayList<String>> ();
+            
+        }
+    	
+    	
+    	void     showAllVhwDeviceRadioInfo() {
+    		
+    		ArrayList<String> logList = new 	ArrayList<String> ();
+    		
+    		ArrayList<String> vhwFileInfoList = new 	ArrayList<String> ();
+    		
+    		for (int i = 0; i < allVhwFileList.size(); i++) {
+				File vhwXmlFile = allVhwFileList.get(i);
+				String vhwXmlFilePath = vhwXmlFile.getAbsolutePath();
+				
+				
+//				System.out.println("════════════【"+allVhwFileList.size()+"_"+(i+1)+"】vhw.xml  ["+vhwXmlFilePath+"]════════════");
+				logList.add("════════════【"+allVhwFileList.size()+"_"+(i+1)+"】vhw.xml  ["+vhwXmlFilePath+"]════════════");
+				
+				ArrayList<String> mMatchDeviceList = file_devicelist_map.get(vhwXmlFile);
+				
+				if(mMatchDeviceList == null || mMatchDeviceList.size() == 0) {
+					continue;
+				}
+				
+				StringBuilder sb = new StringBuilder();
+				
+				
+				for (int j = 0; j < mMatchDeviceList.size(); j++) {
+					String mDeviceStr = mMatchDeviceList.get(j);
+					String mRadioAuto = device_radio_auto_map.get(mDeviceStr);
+					ArrayList<String> radioidList = device_radios_map.get(mDeviceStr);
+					logList.add("");
+					logList.add("["+mDeviceStr+" " +mMatchDeviceList.size()+"_"+(j+1)+"] : " + mRadioAuto);
+
+			
+					sb.append((j+1)+"_"+mDeviceStr+" ");
+					
+					for (int k = 0; k < radioidList.size(); k++) {
+						String radioId = radioidList.get(k);
+						
+						logList.add("["+mDeviceStr+" " +mMatchDeviceList.size()+"_"+(j+1)+"]__"+"["+radioidList.size()+"_"+(k+1)+"] "+radioId );
+
+					}
+					
+				}
+	
+			
+				
+				vhwFileInfoList.add("vhw["+allVhwFileList.size()+"_"+(i+1)+"]\n"+Cur_Notepad_Name+" "+vhwXmlFilePath +"      【"+sb.toString()+"】");
+
+				
+				logList.add("");
+				
+			}
+			logList.add("");
+			logList.add("");
+
+    		
+			
+			logList.addAll(vhwFileInfoList);
+			
+			
+			for (int i = 0; i < logList.size(); i++) {
+				System.out.println(logList.get(i));
+				
+			}
+    		
+    		
+    	}
+
+        @Override
+        boolean allowEmptyDirFileList() {
+            return true;
+        }
+        
+        
+        
+        @Override
+        ArrayList<File> applySubFileListRule4(ArrayList<File> curFileList,
+                                              HashMap<String, ArrayList<File>> subFileTypeMap, ArrayList<File> curDirList,
+                                              ArrayList<File> curRealFileList) {
+         
+		 // 执行 打印当前保存的git路径下的所有文件的目录详细信息出来
+    		
+			System.out.println("【Rule"+rule_index+"】"+"curFileList.size()="+ curFileList.size()+"   subFileTypeMap.size()="+subFileTypeMap.size()+"  curDirList.size()="+curDirList.size()+"  curRealFileList.size()="+curRealFileList.size());
+
+			
+    		if(isInputPathAOSP) {
+    			
+    			System.out.println(" 当前执行路是AOSP根目录  CurPath="+Cur_Dir_Path +" 搜索 AOSP/device/skyline下 所有 vhw.xml 文件! ");
+
+    			File targetSearchFile = new File(Cur_Dir_Path+File.separator+"device"+File.separator+"moto");
+    			
+    			
+  		    	ArrayList<File> curDirAllSubFileList = getAllSubFile(targetSearchFile);
+	    		System.out.println("curFile:"+targetSearchFile.getAbsolutePath()+"  AllSubFileList.size()="+ curDirAllSubFileList.size());
+	    	for (int j = 0; j < curDirAllSubFileList.size(); j++) {
+	    		File curSubFile = curDirAllSubFileList.get(j);
+	    		System.out.println("curSubFile["+curDirAllSubFileList.size()+"_"+j+"] : "+curSubFile.getAbsolutePath());
+	    		if(curSubFile.isFile()) {
+		    		
+		    	    if("vhw.xml".equals(curSubFile.getName().toLowerCase().trim())) {
+    		        	
+    		        	allVhwFileList.add(curSubFile);
+    		        }
+		    	}
+			}
+	    	
+    			
+    			
+    		
+    		} else {
+    			System.out.println(" 当前执行路不是AOSP根目录  CurPath="+Cur_Dir_Path +" 搜索当前目录下所有 vhw.xml 文件! ");
+
+
+    			
+
+    		    for (int i = 0; i < curFileList.size(); i++) {
+    		    	File curFile = curFileList.get(i);
+    		    	if(curFile.isFile()) {
+    		    		
+    		    	    if("vhw.xml".equals(curFileList.get(i).getName().toLowerCase().trim())) {
+        		        	
+        		        	allVhwFileList.add(curFileList.get(i));
+        		        }
+    		    	} else {
+    		    		
+    		    		
+    		    	ArrayList<File> curDirAllSubFileList = getAllSubFile(curFile);
+    		    		System.out.println("curFile:"+curFile.getAbsolutePath()+"  AllSubFileList.size()="+ curDirAllSubFileList.size());
+    		    	for (int j = 0; j < curDirAllSubFileList.size(); j++) {
+    		    		File curSubFile = curDirAllSubFileList.get(j);
+    		    		System.out.println("curSubFile["+curDirAllSubFileList.size()+"_"+j+"] : "+curSubFile.getAbsolutePath());
+    		    		if(curSubFile.isFile()) {
+        		    		
+        		    	    if("vhw.xml".equals(curSubFile.getName().toLowerCase().trim())) {
+            		        	
+            		        	allVhwFileList.add(curSubFile);
+            		        }
+        		    	}
+					}
+    		    }
+    		    
+    		    }
+    		    
+    	
+		
+    		}
+    	
+    	    System.out.println("allVhwFileList.size() = "+ allVhwFileList.size());
+		    
+             if(allVhwFileList.size() == 0) {
+	
+    	 System.out.println("当前AOSP:"+isInputPathAOSP+  "PATH:"+Cur_Dir_Path+"   无法搜索到vhw.xml 文件,解析失败!" );
+		    
+              return null;
+             }
+    
+		    for (int i = 0; i < allVhwFileList.size(); i++) {
+				File vhwFile = allVhwFileList.get(i);
+				System.out.println("VhwFile["+allVhwFileList.size()+"_"+i+"] : "+ vhwFile.getAbsolutePath());
+			}
+		    
+			
+		    for (int i = 0; i < allVhwFileList.size(); i++) {
+					File vhwFile = allVhwFileList.get(i);
+					operationVhwXmlFile(vhwFile);
+				}
+		    
+		
+        	
+		    showAllVhwDeviceRadioInfo();
+		    
+		    System.out.println("AOSP根目录:"+ isInputPathAOSP);
+        	return super.applySubFileListRule4(curFileList,subFileTypeMap , curDirList , curRealFileList);
+        }
+      
+    
+  
+        String simpleDesc() {
+            return "  读取AOSP/device目录下的 vhw.xml 或者本地 vhw.xml文件信息 打印出 device-radioid信息! ";
+        }
+        
+        
+        
+        void operationVhwXmlFile(File mVhwXmlFile) {
+        
+       
+         	
+//        	ArrayList<String> allLineList = ReadFileContentAsList(mVhwXmlFile);
+        	
+        	String rawContentStr = readStringFromFile(mVhwXmlFile);
+        	ArrayList<String> deviceList = new ArrayList<String> ();
+        	
+        	if(rawContentStr == null || "".equals(rawContentStr)) {
+        		System.out.println("读取 文件:"+mVhwXmlFile.getAbsolutePath()+" 内容为空!");
+        		return ; 
+        	}
+        	
+        	String[] deviceXmlContentArr = rawContentStr.split("<device name=");
+        	
+        	if(deviceXmlContentArr == null || deviceXmlContentArr.length ==0) {
+        		
+        		System.out.println("文件:"+mVhwXmlFile.getAbsolutePath()+" 无法通过 【<device name=】 进行切割 请检查!");
+	
+        		return ;
+        	}
+        	
+        	
+        	for (int i = 0; i < deviceXmlContentArr.length; i++) {
+        		
+        		if(i == 0) {  // 第一个切割的  <device name=  Arr[0] 是 【<?xml】
+        			continue;
+        		}
+        		String mDeviceStr = deviceXmlContentArr[i];
+        		
+        		String device = mDeviceStr.split(" ")[0].replace("\"", "");
+        		
+        		deviceList.add(device);
+        		
+        		System.out.println("device【"+device+"】");
+
+        		
+        		String radioAutoSearchStr = "<string name=\"radio/.auto\">";
+        		String stringXmlEndSearchStr =  "</string>";
+        		
+        		
+        		if(mDeviceStr.indexOf(radioAutoSearchStr)> 0 ) {
+        			
+        			String rawRadioAutoStr = mDeviceStr.substring(mDeviceStr.indexOf(radioAutoSearchStr)+radioAutoSearchStr.length());
+        			String radioAutoStr = rawRadioAutoStr.split(stringXmlEndSearchStr)[0].trim();
+        		
+            		System.out.println("radioauto【"+radioAutoStr+"】");
+
+            		device_radio_auto_map.put(device, radioAutoStr);
+        			
+        		}
+        		
+        		ArrayList<String> radioidList = new 	ArrayList<String> ();
+        		
+        		String radioRangeSearchStr = "<string-array name=\"radio/.range\">";
+        		String stringArrXmlEndSearchStr =  "</string-array>";
+   		        if(mDeviceStr.indexOf(radioRangeSearchStr)> 0 ) {
+        			
+        			String rawRadioRangeStr = mDeviceStr.substring(mDeviceStr.indexOf(radioRangeSearchStr)+radioRangeSearchStr.length());
+        			String radioRangeStr = rawRadioRangeStr.split(stringArrXmlEndSearchStr)[0].trim();
+        		
+//            		System.out.println("radiorange【"+radioRangeStr+"】");
+            		
+            		String itemXmlEndSearchStr = "</item>";
+            		
+            		String[] radioidRawArr = radioRangeStr.split(itemXmlEndSearchStr);
+            		
+            		ArrayList<String> radioList = new ArrayList<String> ();
+            		
+            		for (int j = 0; j < radioidRawArr.length; j++) {
+						String radioidRawStr = radioidRawArr[j];
+//						System.out.println("radioidRawStr["+radioidRawArr.length+"_"+j+"] = "+ radioidRawStr);
+					  
+						String  radioidStr = radioidRawStr.replace(" ", "").replace("<item>", "").trim();
+						System.out.println("radioidStr["+radioidRawArr.length+"_"+j+"] = "+ radioidStr);
+
+						radioList.add(radioidStr);
+						
+						
+            		}
+            		if(radioList.size() > 0 ) {
+            			
+            		}
+            		
+            		device_radios_map.put(device, radioList);
+
+        			
+        		}
+   		
+        		
+        		
+        		
+        		
+
+			}
+        	
+        	
+       
+        	file_devicelist_map.put(mVhwXmlFile, deviceList);
+
+        	
+        }
+    	
+    }
 
     
     //  打印当前保存的git路径下的所有文件的目录详细信息出来 当前是AOSP根目录(Msi || Vendor )根目录
@@ -464,9 +787,12 @@ public class K4_AOSP_Rule {
                 String  simple_desc = simpleDesc();
                 String fixed_simple_desc  = simple_desc.replace("#_","@_");
                 itemDesc = batName.trim() + ".sh " + type + "_" + index + "    [索引 " + index + "]  描述:" + fixed_simple_desc;
+                itemDesc  = itemDesc.replace("#_","@_");
+
             } else   if (curType == OS_TYPE.MacOS) {
                 //  在Mac 下  # 能被识别
                 itemDesc = batName.trim() + ".sh " + type + "_" + index + "    [索引 " + index + "]  描述:" + simpleDesc();
+                itemDesc  = itemDesc.replace("#_","@_");
             } else{
 
                 //  在 Linux 下  #_42 会被当成注释  无法 被识别  所以  必须 把 第一个 # 号改为 下划线
