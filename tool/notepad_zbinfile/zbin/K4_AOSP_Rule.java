@@ -316,6 +316,10 @@ public class K4_AOSP_Rule {
     class Show_AOSP_VHW_XML_Device_RadioIds_INfo_Rule_2 extends Basic_Rule {
     	
     	
+    	String urlTip_Base64 = "aHR0cHM6Ly9zaXRlcy5nb29nbGUuY29tL21vdG9yb2xhLmNvbS9ydW50aW1lLXByb2R1Y3QtaWRzLTIwMTgvc202NDc1";
+    	String urlGoogleSheet = "https://docs.google.com/spreadsheets/d/1DjMXKSXD87n8VvXzoeKHMbsddTVjt7aRng59tq3_czk/edit?gid=0#gid=0";
+    	
+    	
     	ArrayList<File> allVhwFileList ;
     	
     	// 当前 device  匹配的 radio_auto_map 字符串
@@ -505,8 +509,22 @@ public class K4_AOSP_Rule {
 		
         	
 		    showAllVhwDeviceRadioInfo();
-		    
+		    System.out.println();
 		    System.out.println("AOSP根目录:"+ isInputPathAOSP);
+		    System.out.println();
+		    try {
+				System.out.println("查看ProductIDs网页:\n"+ jiemi_decryptBASE64(urlTip_Base64));
+			    System.out.println();
+
+				System.out.println("查看Product ctbk txpowerctrl.cfg GooleSheet配置网页:\n"+ urlGoogleSheet);
+
+				
+		    } catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		    
+		    
         	return super.applySubFileListRule4(curFileList,subFileTypeMap , curDirList , curRealFileList);
         }
       
