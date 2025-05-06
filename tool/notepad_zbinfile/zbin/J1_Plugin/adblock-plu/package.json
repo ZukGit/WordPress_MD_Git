@@ -19,7 +19,7 @@
     "eslint-config-eyeo": "^3.0.0",
     "extract-zip": "^2.0.0",
     "geckodriver": "^1.14.1",
-    "handlebars": "^4.7.6",
+    "handlebars": "^4.7.7",
     "jimp": "^0.10.2",
     "jsdoc": "^3.6.3",
     "mocha": "^7.1.1",
